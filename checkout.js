@@ -89,8 +89,9 @@ function formsubmit(e){
 }
 
 function successCall(data){
-    $(RazorPayForm).html(
-        '<input type="hidden" name="transaction_id" value="'+data.data.id+'">'
-    );
+    var inputs='';
+    for(i in data.data)
+        inputs+='<input type="hidden" name="'+i+'" value="'+data.data[i]+'">'
+    $(RazorPayForm).html(inputs);
     $(RazorPayForm).submit();
 }
