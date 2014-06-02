@@ -82,7 +82,7 @@ function formsubmit(e){
             $('div.modal').center();
             XD.receiveMessage(successCall);
         }else{
-            successCall(data);
+            successCall(response);
         }
     });
     e.preventDefault();
@@ -90,8 +90,14 @@ function formsubmit(e){
 
 function successCall(data){
     var inputs='';
-    for(i in data.data)
-        inputs+='<input type="hidden" name="'+i+'" value="'+data.data[i]+'">'
+    for(i in data)
+    {
+        if(typeof data[i]=='object')
+            for(j in data[i])
+                inputs+='<input type="hidden" name="'+i+'['+j+']" value="'+data[i][j]+'">'
+        else
+            inputs+='<input type="hidden" name="'+i+'" value="'+data[i]+'">'
+    }
     $(RazorPayForm).html(inputs);
     $(RazorPayForm).submit();
 }
