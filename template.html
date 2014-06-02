@@ -1,0 +1,28 @@
+<div class="modal ow-closed">
+    <div class="header">
+    	<div class="merchant_image">
+    		<img src="${image}">
+    	</div>
+    	<div class="merchant_name">
+    		${name}
+    	</div>
+    	<img class="merchant_powered" src="powered_by_rzp.jpg">
+    	<div class="clear">
+    </div>
+    <hr>
+    <form class="body">
+    	<input type="hidden" name="amount" value="${amount}">
+        <input type="hidden" name="key" value="${key}">
+        <input type="hidden" name="currency" value="INR">
+    	<input type="hidden" name="udf[contact]" value="991889902">
+    	<input name="card[name]" placeholder="Name" value="Abhay Rana">
+    	<input name="udf[email]" type="email" placeholder="Email Address" value="capt.n3m0@gmail.com">
+    	<div class="card">
+    		<input name="card[number]" class="card_number" placeholder="Card Number" value="4012001037141112">
+    		<input name="card[expiry_month]" size="2" placeholder="MM" value="05">/
+            <input name="card[expiry_year]" size="2" placeholder="YYYY" value="2017">
+    		<input name="card[cvv]" size="3" placeholder="CVV" value="868">
+    	</div>
+    	<input type="submit" class="submit" value="Pay $${amount}">
+    </div>
+</div>

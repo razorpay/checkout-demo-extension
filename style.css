@@ -1,0 +1,79 @@
+/* Default class for an overlay */
+.ow-overlay {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #424242;
+  opacity: 0.8;
+}
+
+/* Default class for both hidden overlay and modal window */
+.ow-closed {
+  display: none;
+}
+
+/* Default class for modal window */
+.modal {
+  position: fixed;
+  z-index: 20;
+  height: 250px;
+  left: 50%;
+  top: 50px;
+  width: 500px;
+  background-color: #fff;
+  border-radius: 5px;
+  background:#EDEDED;
+}
+.modal hr{
+  border-color:#D9D9D9;
+  background-color:#D9D9D9;
+  color:#D9D9D9;
+}
+.merchant_image{
+  margin:5px 0px 0px 5px;
+  float:left;
+}
+.merchant_name{
+  margin:0 auto;
+  padding-top: 10px;
+  width:115px;
+  font-weight: bold;
+  text-transform: capitalize;
+  font-family: Sans-serif, Roboto;
+}
+.merchant_powered{
+  float:right;
+  margin-top: -20px;
+}
+.clear{
+  clear:both;
+}
+form.body{
+  margin:0 auto;
+  width:280px;
+}
+form.body .card_number{
+  background: url(cards.png) no-repeat right center;
+}
+form input{
+  color:#28B3D2;
+  border:none;
+  background: #EDEDED;
+  font-size:20px;
+}
+form .card{
+  border:1px solid gray;
+  border-radius:3px;
+}
+
+form input.submit{
+  background-color:#28B3D2;
+  color:white;
+  width:100%;
+  padding:0 auto;
+  border-radius: 3px;
+  margin-top:15px;
+}
