@@ -45,6 +45,8 @@ function createLightBox(template_url){
         });
 
         $('form.body').submit(formsubmit);
+        $('div.modal').data('busy', true);
+        //Marks the modal window as busy so it is not closable
     });
 }
 

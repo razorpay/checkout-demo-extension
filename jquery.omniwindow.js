@@ -59,6 +59,9 @@
           afterShow:   function(subjects, internalCallback) { return internalCallback(subjects); },   // 3
           beforeHide:  function(subjects, internalCallback) { return internalCallback(subjects); },   // 4 (stop if retruns false)
           afterHide:   function(subjects, internalCallback) { return internalCallback(subjects); },   // 5
+          isBusy: function(subjects){
+            return subjects.modal.data('busy');
+          },
           internal: {
             beforeShow: function(subjects) {
               if (subjects.modal.data(options.modal.internal.stateAttribute)) {
@@ -128,7 +131,8 @@
 
       var hideModal = function(subjects) {
         if (!options.callbacks.beforeHide(subjects, options.callbacks.internal.beforeHide)) { return; } // cancel hiding if beforeHide callback return false
-
+        if (options.callbacks.isBusy(subjects)) //cancel hiding if isBusy returns true
+          return;
         animate('hide', subjects, 'afterHide');
       };
 
