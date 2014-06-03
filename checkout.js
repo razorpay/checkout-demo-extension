@@ -37,6 +37,11 @@ function createLightBox(template_url){
         $modal.trigger('show');
 
         $('form.body').submit(function(e){
+            //Disable the input button
+            $('form input.submit').attr('disabled','disabled').animate({
+                'marginLeft':'25%',
+                'width':'50%'
+            }, 1000);
             //Marks the modal window as busy so it is not closable
             $('div.modal').data('busy', true);
             //Handles the form submission
