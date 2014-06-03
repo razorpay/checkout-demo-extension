@@ -36,17 +36,13 @@ function createLightBox(template_url){
         $modal = $('div.modal').omniWindow()
         $modal.trigger('show');
 
-
-        //Attach some evens to the modal
-
-        $('.close-button').click(function(e){
-            e.preventDefault();
-            $modal.trigger('hide');
+        $('form.body').submit(function(e){
+            //Marks the modal window as busy so it is not closable
+            $('div.modal').data('busy', true);
+            //Handles the form submission
+            formsubmit.call(this,e);
+            e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
         });
-
-        $('form.body').submit(formsubmit);
-        $('div.modal').data('busy', true);
-        //Marks the modal window as busy so it is not closable
     });
 }
 
@@ -93,7 +89,6 @@ function formsubmit(e){
             successCall(response);
         }
     });
-    e.preventDefault();
 }
 
 function successCall(data){
