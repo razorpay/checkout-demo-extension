@@ -39,14 +39,14 @@
 .merchant_name{
   margin:0 auto;
   padding-top: 10px;
-  width:115px;
+  width:145px;
   font-weight: bold;
   text-transform: capitalize;
   font-family: Sans-serif, Roboto;
 }
 .merchant_powered{
   float:right;
-  margin-top: -20px;
+  margin-top: -35px;
 }
 .clear{
   clear:both;

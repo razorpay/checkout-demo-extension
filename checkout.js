@@ -10,8 +10,6 @@ var RazorPayForm = $(RazorPayScript).parent();
 
 button.onclick = createLightBox('./template.html');
 
-
-
 $.fn.center = function () {
    this.css("position","absolute");
    this.css("top", ( $(window).height() - this.height() ) / 2  + "px");
@@ -80,7 +78,9 @@ function formsubmit(e){
             //Now we need to resize the modal box so as to accomodate 3dsecure.
             $('div.modal, div.modal iframe').width('800px').height('500px');
             $('div.modal').center();
-            XD.receiveMessage(successCall);
+            XD.receiveMessage(function(message){
+                successCall(message.data);
+            });
         }else{
             successCall(response);
         }
