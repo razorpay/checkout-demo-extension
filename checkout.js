@@ -10,10 +10,11 @@ var RazorPayForm = $(RazorPayScript).parent();
 
 button.onclick = createLightBox('./template.html');
 
-$.fn.center = function () {
+$.fn.Rzpcenter = function () {
    this.css("position","absolute");
    this.css("top", ( $(window).height() - this.height() ) / 2  + "px");
    this.css("left", ( $(window).width() - this.width() ) / 2 + "px");
+   //The following two are needed for clearing omniWindow settings
    this.css('margin-left','auto');
    this.css('margin-top','auto');
    return this;
@@ -77,7 +78,7 @@ function formsubmit(e){
             //This form should autosubmit
             //Now we need to resize the modal box so as to accomodate 3dsecure.
             $('div.modal, div.modal iframe').width('800px').height('500px');
-            $('div.modal').center();
+            $('div.modal').Rzpcenter();
             XD.receiveMessage(function(message){
                 successCall(message.data);
             });
@@ -92,6 +93,7 @@ function successCall(data){
     var inputs='';
     for(i in data)
     {
+        //For fields like udf, which are an array themselves
         if(typeof data[i]=='object')
             for(j in data[i])
                 inputs+='<input type="hidden" name="'+i+'['+j+']" value="'+data[i][j]+'">'

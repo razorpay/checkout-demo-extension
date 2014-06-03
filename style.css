@@ -26,6 +26,7 @@
   background-color: #fff;
   border-radius: 5px;
   background:#EDEDED;
+  font-family:'Lato', Sans-serif;
 }
 .modal hr{
   border-color:#D9D9D9;
@@ -35,6 +36,7 @@
 .merchant_image{
   margin:5px 0px 0px 5px;
   float:left;
+  width:60px;
 }
 .merchant_name{
   margin:0 auto;
@@ -42,33 +44,42 @@
   width:145px;
   font-weight: bold;
   text-transform: capitalize;
-  font-family: Sans-serif, Roboto;
+  float:none;
+  text-align: center;
 }
 .merchant_powered{
   float:right;
-  margin-top: -35px;
+  width:100px;
+  margin-top:10px;
 }
 .clear{
   clear:both;
 }
 form.body{
   margin:0 auto;
-  width:280px;
+  width:350px;
 }
 form.body .card_number{
-  background: url(cards.png) no-repeat right center;
+  /*background: url(cards.png) no-repeat right center;*/
 }
 form input{
   color:#28B3D2;
   border:none;
   background: #EDEDED;
   font-size:20px;
+  font-family: 'Lato';
 }
 form .card{
+  margin-top: 5px;
   border:1px solid gray;
   border-radius:3px;
 }
-
+form input[name="card[name]"], form input[name="udf[email]"]{
+  font-size:15px;
+  padding-bottom:3px;
+  border-bottom:1px solid #999;
+  width:100%;
+}
 form input.submit{
   background-color:#28B3D2;
   color:white;
