@@ -19,7 +19,7 @@
 .modal {
   position: fixed;
   z-index: 20;
-  height: 250px;
+  height: 300px;
   left: 50%;
   top: 50px;
   width: 500px;
@@ -27,6 +27,7 @@
   border-radius: 5px;
   background:#EDEDED;
   font-family:'Lato', Sans-serif;
+  box-shadow: 5px 5px 12px 0px rgba(0,0,0,0.75);
 }
 .modal hr{
   border-color:#D9D9D9;
@@ -73,10 +74,12 @@ form input{
   background: #EDEDED;
   font-size:15px;
   font-family: 'Lato';
-  padding-left: 5px;
+  padding-left: 7px;
+  padding-top:7px;
+  padding-bottom:7px;
 }
 form .card{
-  margin-top: 5px;
+  margin-top: 15px;
   border:1px solid #727272;
   border-radius:3px;
 }
@@ -90,14 +93,14 @@ form input[name="card[number]"]{
   border-bottom: 1px solid #727272;
   background: url('icons/card.png');
   background-repeat: no-repeat;
-  padding-left:32px;
-  background-position: 3px 1px;
+  padding-left:35px;
+  background-position: 5px 8px;
 }
 form input[name="card[expiry]"]{
   background: url('icons/calendar.png');
   background-repeat: no-repeat;
-  padding-left:32px;
-  background-position: 3px -1px;
+  padding-left:35px;
+  background-position: 7px 6px;
   width:48%;
   border-right:1px solid #727272;
 }
@@ -105,7 +108,7 @@ form input[name="card[cvv]"]{
   background: url('icons/lock.png');
   background-repeat: no-repeat;
   padding-left:32px;
-  background-position: 3px 0px;
+  background-position: 3px 6px;
   width:48%;
 }
 form input.submit{
