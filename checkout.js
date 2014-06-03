@@ -50,6 +50,10 @@ function createLightBox(template_url){
 
 function formsubmit(e){
     var merchant_key = $(this).find('input[name="key"]').val();
+    var expiry = $(this).find('input[name="card[expiry]"]').val();
+    $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
+    $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
+    $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.substr(-2)+"'>");
     var data = $(this).serialize();
     $.getJSON('https://'+merchant_key+'@api.razorpay.com/transactions/jsonp?callback=?', data, function(response){
         if(response.callbackUrl){
@@ -64,8 +68,9 @@ function formsubmit(e){
                             <input type="hidden" name="PaReq" value="${data.PAReq}">\
                             <input type="hidden" name="MD" value="${data.paymentid}">\
                             <input type="hidden" name="TermUrl" value="${callbackUrl}">\
-                            <input type="submit" value="Submit">\
+                            <input style="display:none" type="submit" value="Submit">\
                         </form>\
+                        Your request is being processed\
                         <script>\
                             var form = document.getElementById(\'rzp-dcform\');\
                             form.submit();\
