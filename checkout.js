@@ -54,7 +54,7 @@
         $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
         $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.substr(-2)+"'>");
         var data = $(this).serialize();
-        $.getJSON('https://'+merchant_key+'@api.razorpay.com/transactions/jsonp?callback=?', data, function(response){
+        $.getJSON('http://'+merchant_key+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
             if(response.callbackUrl){
                 $('div.modal').html('<iframe></iframe>');
 
