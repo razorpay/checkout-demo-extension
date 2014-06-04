@@ -5,6 +5,8 @@ require('config.php');
 use Razorpay\Api\Api;
 $api = new Api(RZP_KEY_ID,RZP_KEY_SECRET);
 
+if(!isset($_POST['id'])) die("Transaction id required");
+
 $id = $_POST['id'];
 $amount = $_POST['amount'];
 

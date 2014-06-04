@@ -43,13 +43,14 @@
   margin:0 auto;
   padding-top: 10px;
   width:145px;
-  font-weight: bold;
+  font-weight: 400;
   text-transform: capitalize;
   float:none;
   text-align: center;
 }
 .merchant_powered{
   float:right;
+  margin-right: 10px;
   width:100px;
   margin-top:10px;
 }
@@ -111,7 +112,7 @@ form input[name="card[cvv]"]{
   background-position: 3px 6px;
   width:48%;
 }
-form input.submit{
+form .submit{
   background-color:#28B3D2;
   color:white;
   width:100%;
@@ -121,7 +122,28 @@ form input.submit{
   height:40px;
   font-size: 20px;
   text-align: center;
+  border: none;
 }
-form input.submit[disabled=disabled]{
-  background-color: #727272;
+form .submit[disabled=disabled] .ring{
+  display:inline-block;
+}
+form .submit[disabled=disabled] .text{
+  display:none;
+}
+.ring {
+    border: 1px solid white;
+    border-radius: 30px;
+    height: 18px;
+    width: 18px;
+    display:none;
+    -webkit-animation: pulsate 1s ease-out;
+    -webkit-animation-iteration-count: infinite; 
+    opacity: 0.0;
+    left:50px;
+    top:-5px;
+}
+@-webkit-keyframes pulsate {
+    0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
+    50% {opacity: 1.0;}
+    100% {-webkit-transform: scale(1.2, 1.2); opacity: 0.0;}
 }

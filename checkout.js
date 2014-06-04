@@ -27,8 +27,6 @@ function createLightBox(template_url){
     //Create the overlay
     $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
 
-    
-
     $.get(template_url, function(template){
         var html = $.tmpl(template, $(RazorPayScript).data());
         html.appendTo('body');
@@ -38,10 +36,7 @@ function createLightBox(template_url){
 
         $('form.body').submit(function(e){
             //Disable the input button
-            $('form input.submit').attr('disabled','disabled').animate({
-                'marginLeft':'25%',
-                'width':'50%'
-            }, 1000);
+            $('form .submit').attr('disabled','disabled');
             //Marks the modal window as busy so it is not closable
             $('div.modal').data('busy', true);
             //Handles the form submission
@@ -85,7 +80,7 @@ function formsubmit(e){
             $('div.modal iframe').get()[0].contentWindow.document.write(div.innerHTML);
             //This form should autosubmit
             //Now we need to resize the modal box so as to accomodate 3dsecure.
-            $('div.modal, div.modal iframe').width('800px').height('500px');
+            $('div.modal, div.modal iframe').width('1000px').height('500px');
             $('div.modal').Rzpcenter();
             XD.receiveMessage(function(message){
                 successCall(message.data);
