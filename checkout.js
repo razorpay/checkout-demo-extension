@@ -45,7 +45,6 @@
             $form.find('input[name="card[number]"]').addClass('invalid');
             errors.push('Invalid Credit Card Number');
         }
-
         if(!$.payment.validateCardExpiry(expiry_month, expiry_year)){
             $form.find('input[name="card[expiry]"]').addClass('invalid');
             errors.push('Invalid Expiry Date');
@@ -91,9 +90,9 @@
     function formsubmit(e){
         var merchant_key = $(this).find('input[name="key"]').val();
         var expiry = $(this).find('input[name="card[expiry]"]').val();
-        
         $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
-        $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.substr(-2)+"'>");
+        $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.replace(/[ \/]/g,'').substr(2)+"'>");
+        //strip all spaces and backslashes, and then cut off first two digits (month);
 
         var data = $(this).serialize();
         var errors = postValidate($(this));
@@ -113,6 +112,10 @@
             var html = $.tmpl(template,{err:errors}).appendTo(div)
             $('.error_box').html(div.innerHTML);
             return false;
+        }
+        else{
+            //Cleanup errors created by any previous attempts
+            $('.error_box').html('');
         }
         $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
         $.getJSON('http://'+merchant_key+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
