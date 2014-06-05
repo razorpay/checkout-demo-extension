@@ -34,6 +34,7 @@
             $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
     }
     function postValidate($form){
+        $form.find('input').removeClass('invalid');
         var cardNumber = $form.find('input[name="card[number]"]').val();
         var expiry_month = $form.find('input[name="card[expiry_month]"]').val();
         var expiry_year = $form.find('input[name="card[expiry_year]"]').val();
