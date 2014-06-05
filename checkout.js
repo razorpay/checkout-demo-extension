@@ -31,7 +31,7 @@
         var number = $form.find('input[name="card[number]"]').val();
 
         //Attach a focusout handler to show card type
-        $form.find('input[name="card[number]"]').focusout(function(e){
+        $form.find('input[name="card[number]"]').off().focusout(function(e){
             var cardType = $.payment.cardType(this.value);
             if(cardType!=null)
                 $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
