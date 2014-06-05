@@ -69,17 +69,17 @@
             html.appendTo('body');
             var $modal = $('div.modal').omniWindow();
             $modal.trigger('show');
-            preValidate($('form'));
+            preValidate($('form.body'));
             $('form.body').submit(function(e){
                 //Handles the form submission
                 var submission  = formsubmit.call(this,e);//This variable stores whether we are submitting the form or not
                 if(submission){
-                    $('form .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                    $('form.body .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
                     //Marks the modal window as busy so it is not closable
                     $('div.modal').data('busy', true);
                 }
                 else{
-                    $('form .submit').removeAttr('disabled');
+                    $('form.body .submit').removeAttr('disabled');
                     $('div.modal').data('busy', false);
                 }
                 e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
