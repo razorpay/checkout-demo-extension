@@ -13,7 +13,7 @@
     button.onclick = createLightBox('./template.html');
 
     var center = function (selector) {
-        $el = $($el);
+        var $el = $(selector);
         $el.css("position","absolute");
         $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
         $el.css("left", ( $(window).width() - $el.width() ) / 2 + "px");
