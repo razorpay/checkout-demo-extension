@@ -12,16 +12,36 @@
 
     button.onclick = createLightBox('./template.html');
 
-    $.fn.Rzpcenter = function () {
-       this.css("position","absolute");
-       this.css("top", ( $(window).height() - this.height() ) / 2  + "px");
-       this.css("left", ( $(window).width() - this.width() ) / 2 + "px");
-       //The following two are needed for clearing omniWindow settings
-       this.css('margin-left','auto');
-       this.css('margin-top','auto');
-       return this;
+    var center = function (selector) {
+        $el = $($el);
+        $el.css("position","absolute");
+        $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
+        $el.css("left", ( $(window).width() - $el.width() ) / 2 + "px");
+        //The following two are needed for clearing omniWindow settings
+        $el.css('margin-left','auto');
+        $el.css('margin-top','auto');
+        return this;
     }
 
+    function preValidate($form){
+        //Card Number
+        $form.find('input[name="card[number]"]').payment('formatCardNumber');
+        $form.find('input[name="card[expiry]"]').payment('formatCardExpiry');
+        $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
+        var number = $form.find('input[name="card[number]"]').val();
+        var cardType = $.payment.cardType(number);
+        $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
+
+    }
+    function postValidate($form){
+        var cardNumber = $form.find('input[name="card[number]"]').val();
+        var expiry_month = $form.find('input[name="card[expiry_month]"]').val();
+        var expiry_year = $form.find('input[name="card[expiry_year]"]').val();
+        var cvc = $form.find('input[name="card[cvv]"]').val();
+        return $.payment.validateCardNumber(cardNumber) 
+                && $.payment.validateCardExpiry(expiry_month, expiry_year) 
+                && $.payment.validateCardCVC(cvc);
+    }
     function createLightBox(template_url){
         //Make an ajax request to template_url, fetch the template
         //replace the contents
@@ -34,7 +54,7 @@
             html.appendTo('body');
             var $modal = $('div.modal').omniWindow();
             $modal.trigger('show');
-
+            preValidate($('form'));
             $('form.body').submit(function(e){
                 //Disable the input button
                 $('form .submit').attr('disabled','disabled');
@@ -54,8 +74,16 @@
         $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
         $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.substr(-2)+"'>");
         var data = $(this).serialize();
+        if(!postValidate($(this))){
+            alert("Form validation failed");
+            return false;
+        }
         $.getJSON('http://'+merchant_key+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
-            if(response.callbackUrl){
+            if(response.exception){
+                $('form .submit .text').text('Server Error').show().parent().addClass('error');
+                $('form .submit .ring').hide();
+            }
+            else if(response.callbackUrl){
                 $('div.modal').html('<iframe></iframe>');
 
                 var autosubmit_form_template = '<!doctype html> \
@@ -82,14 +110,14 @@
                 //This form should autosubmit
                 //Now we need to resize the modal box so as to accomodate 3dsecure.
                 $('div.modal, div.modal iframe').width('1000px').height('500px');
-                $('div.modal').Rzpcenter();
+                center('div.modal');
                 XD.receiveMessage(function(message){
                     successCall(message.data);
                 });
             }else{
                 successCall(response);
             }
-        });
+        }).error()
     }
 
     function successCall(data){

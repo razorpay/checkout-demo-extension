@@ -26,7 +26,7 @@
   background-color: #fff;
   border-radius: 5px;
   background:#EDEDED;
-  font-family:'Lato', Sans-serif;
+  font-family: 'Lato', Sans-serif;
   box-shadow: 5px 5px 12px 0px rgba(0,0,0,0.75);
 }
 .modal hr{
@@ -62,7 +62,6 @@ form.body{
   width:350px;
 }
 form.body .card_image{
-  background: url('icons/visa.png') no-repeat right center;  
   float:right;
   width:26px;
   height:7px;
@@ -74,7 +73,7 @@ form input{
   border:none;
   background: #EDEDED;
   font-size:15px;
-  font-family: 'Lato';
+  font-family: 'Lato',Sans-serif;
   padding-left: 7px;
   padding-top:7px;
   padding-bottom:7px;
@@ -129,6 +128,9 @@ form .submit[disabled=disabled] .ring{
 }
 form .submit[disabled=disabled] .text{
   display:none;
+}
+form .submit.error{
+  background-color:#FB797E;
 }
 .ring {
     border: 1px solid white;
