@@ -70,7 +70,7 @@
             var $modal = $('div.modal').omniWindow();
             $modal.trigger('show');
             preValidate($('form'));
-            $('form').submit(function(e){
+            $('form.body').submit(function(e){
                 //Handles the form submission
                 var submission  = formsubmit.call(this,e);//This variable stores whether we are submitting the form or not
                 if(submission){
