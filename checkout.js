@@ -29,9 +29,13 @@
         $form.find('input[name="card[expiry]"]').payment('formatCardExpiry');
         $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
         var number = $form.find('input[name="card[number]"]').val();
-        var cardType = $.payment.cardType(number);
-        if(cardType!=null)
-            $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
+
+        //Attach a focusout handler to show card type
+        $form.find('input[name="card[number]"]').focusout(function(e){
+            var cardType = $.payment.cardType(this.value);
+            if(cardType!=null)
+                $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
+        });
     }
     function postValidate($form){
         $form.find('input').removeClass('invalid');
