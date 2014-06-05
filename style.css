@@ -19,7 +19,6 @@
 .modal {
   position: fixed;
   z-index: 20;
-  height: 300px;
   left: 50%;
   top: 50px;
   width: 500px;
@@ -28,6 +27,7 @@
   background:#EDEDED;
   font-family: 'Lato', Sans-serif;
   box-shadow: 5px 5px 12px 0px rgba(0,0,0,0.75);
+  min-height: 300px;
 }
 .modal hr{
   border-color:#D9D9D9;
@@ -73,17 +73,26 @@ form input{
   border:none;
   background: #EDEDED;
   font-size:15px;
+  height:30px;
   font-family: 'Lato',Sans-serif;
   padding-left: 7px;
   padding-top:7px;
   padding-bottom:7px;
+  outline:none;
+  margin:0px;
+  box-sizing: border-box;
+}
+form input[name="card[number]"].invalid{
+  border:1px solid #FB797E;
+  border-width: 1px 1px 0px 1px;
 }
 form .card{
   margin-top: 15px;
-  border:1px solid #727272;
   border-radius:3px;
+  width:350px;
 }
 form input[name="card[name]"], form input[name="udf[email]"]{
+  margin-top:3px;
   padding-bottom:3px;
   border-bottom:1px solid #727272;
   width:100%;
@@ -95,21 +104,47 @@ form input[name="card[number]"]{
   background-repeat: no-repeat;
   padding-left:35px;
   background-position: 5px 8px;
+  border:1px solid #727272;
+  border-radius:3px 3px 0px 0px;
+  border-bottom:0px;
 }
 form input[name="card[expiry]"]{
   background: url('icons/calendar.png');
   background-repeat: no-repeat;
   padding-left:35px;
   background-position: 7px 6px;
-  width:48%;
-  border-right:1px solid #727272;
+  width:175px;
+  border-right:5px solid #727272;
+  border:1px solid #727272;
+  border-radius:0px 0px 0px 3px;
+}
+form input[name="card[expiry]"].invalid{
+  border:1px solid #FB797E;
+  border-bottom:0px;
+}
+/** All sibling inputs of an invalid card number **/
+form input[name="card[number]"].invalid ~ input{
+  border-top:1px solid #FB797E;
+}
+form input[name="card[expiry]"].invalid{
+  border:1px solid #FB797E;
+}
+form input[name="card[expiry]"].invalid ~ input{
+  border-left: 0px !important;
+}
+form input[name="card[cvv]"].invalid{
+  border:1px solid #FB797E;
 }
 form input[name="card[cvv]"]{
   background: url('icons/lock.png');
   background-repeat: no-repeat;
   padding-left:32px;
   background-position: 3px 6px;
-  width:48%;
+  border:1px solid #727272;
+  border-radius: 0px 0px 3px 0px;
+  left: 249px;  
+  position: absolute;
+  width: 176px;
 }
 form .submit{
   background-color:#28B3D2;
@@ -148,4 +183,11 @@ form .submit.error{
     0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
     50% {opacity: 1.0;}
     100% {-webkit-transform: scale(1.2, 1.2); opacity: 0.0;}
+}
+.error_box{
+  color: #FB797E;
+  text-align:center;
+  font-size: 12px;
+  list-style-type: none;
+  padding: 0px;
 }

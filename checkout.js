@@ -30,18 +30,33 @@
         $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
         var number = $form.find('input[name="card[number]"]').val();
         var cardType = $.payment.cardType(number);
-        $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
-
+        if(cardType!=null)
+            $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
     }
     function postValidate($form){
         var cardNumber = $form.find('input[name="card[number]"]').val();
         var expiry_month = $form.find('input[name="card[expiry_month]"]').val();
         var expiry_year = $form.find('input[name="card[expiry_year]"]').val();
         var cvc = $form.find('input[name="card[cvv]"]').val();
-        return $.payment.validateCardNumber(cardNumber) 
-                && $.payment.validateCardExpiry(expiry_month, expiry_year) 
-                && $.payment.validateCardCVC(cvc);
+
+        var errors = [];
+        if(!$.payment.validateCardNumber(cardNumber)){
+            $form.find('input[name="card[number]"]').addClass('invalid');
+            errors.push('Invalid Credit Card Number');
+        }
+
+        if(!$.payment.validateCardExpiry(expiry_month, expiry_year)){
+            $form.find('input[name="card[expiry]"]').addClass('invalid');
+            errors.push('Invalid Expiry Date');
+        }
+
+        if(!$.payment.validateCardCVC(cvc)){
+            $form.find('input[name="card[cvv]"]').addClass('invalid');
+            errors.push('Invalid CVV Number');
+        }
+        return errors;
     }
+
     function createLightBox(template_url){
         //Make an ajax request to template_url, fetch the template
         //replace the contents
@@ -55,13 +70,18 @@
             var $modal = $('div.modal').omniWindow();
             $modal.trigger('show');
             preValidate($('form'));
-            $('form.body').submit(function(e){
-                //Disable the input button
-                $('form .submit').attr('disabled','disabled');
-                //Marks the modal window as busy so it is not closable
-                $('div.modal').data('busy', true);
+            $('form').submit(function(e){
                 //Handles the form submission
-                formsubmit.call(this,e);
+                var submission  = formsubmit.call(this,e);//This variable stores whether we are submitting the form or not
+                if(submission){
+                    $('form .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                    //Marks the modal window as busy so it is not closable
+                    $('div.modal').data('busy', true);
+                }
+                else{
+                    $('form .submit').removeAttr('disabled');
+                    $('div.modal').data('busy', false);
+                }
                 e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
             });
         });
@@ -70,14 +90,30 @@
     function formsubmit(e){
         var merchant_key = $(this).find('input[name="key"]').val();
         var expiry = $(this).find('input[name="card[expiry]"]').val();
-        $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
+        
         $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
         $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.substr(-2)+"'>");
+
         var data = $(this).serialize();
-        if(!postValidate($(this))){
-            alert("Form validation failed");
+        var errors = postValidate($(this));
+        if(errors.length > 0){//If we have more than one errors
+            //Cleanup a bit
+            $(this).find("input[name='card[expiry_month]']").remove();
+            $(this).find("input[name='card[expiry_year]']").remove();
+
+            //Shake the modal window
+            $('div.modal').addClass('shake');
+            window.setTimeout(function(){$('div.modal').removeClass("shake");}, 150);
+
+            var template = '{{each err}}\
+                    <li>${$value}<li>\
+                {{/each}}';
+            var div = document.createElement('div');
+            var html = $.tmpl(template,{err:errors}).appendTo(div)
+            $('.error_box').html(div.innerHTML);
             return false;
         }
+        $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
         $.getJSON('http://'+merchant_key+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('form .submit .text').text('Server Error').show().parent().addClass('error');
@@ -117,7 +153,8 @@
             }else{
                 successCall(response);
             }
-        }).error()
+        })
+        return true;
     }
 
     function successCall(data){
