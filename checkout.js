@@ -61,6 +61,10 @@
         return errors;
     }
 
+    function clearSubmission(){
+        $('form.body .submit').removeAttr('disabled');
+        $('div.modal').data('busy', false);
+    }
     function createLightBox(template_url){
         //Make an ajax request to template_url, fetch the template
         //replace the contents
@@ -83,8 +87,7 @@
                     $('div.modal').data('busy', true);
                 }
                 else{
-                    $('form.body .submit').removeAttr('disabled');
-                    $('div.modal').data('busy', false);
+                    clearSubmission();
                 }
                 e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
             });
@@ -125,7 +128,11 @@
         $.getJSON('http://'+merchant_key+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('form .submit .text').text('Server Error').show().parent().addClass('error');
-                $('form .submit .ring').hide();
+                clearSubmission();
+            }
+            else if(response.error){
+                $('.error_box').html('<li>'+response.error.message+'</li>');
+                clearSubmission();
             }
             else if(response.callbackUrl){
                 $('div.modal').html('<iframe></iframe>');
