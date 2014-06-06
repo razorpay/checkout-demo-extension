@@ -41,6 +41,7 @@
 }
 .merchant_name{
   margin:0 auto;
+  font-size: 13px;
   padding-top: 10px;
   width:145px;
   font-weight: 400;
@@ -87,11 +88,11 @@ form input[name="card[number]"].invalid{
   border-width: 1px 1px 0px 1px;
 }
 form .card{
-  margin-top: 15px;
+  margin-top: 10px;
   border-radius:3px;
   width:350px;
 }
-form input[name="card[name]"], form input[name="udf[email]"]{
+form input[name="card[name]"], form input[name="udf[email]"], form input[name="udf[contact]"]{
   margin-top:3px;
   padding-bottom:3px;
   border-bottom:1px solid #727272;
