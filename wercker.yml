@@ -9,4 +9,4 @@ build:
             code: sed -i '/singleRun/c\singleRun:true' karma.conf.js
         - script:
             name: Run unit tests
-            code: karma start
+            code: ./node_modules/karma/bin/karma start
