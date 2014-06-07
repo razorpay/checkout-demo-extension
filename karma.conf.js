@@ -1,7 +1,8 @@
 // Karma configuration
 // Generated on Sat Jun 07 2014 15:21:18 GMT+0530 (IST)
-
+/* global module*/
 module.exports = function(config) {
+  "use strict";
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -15,14 +16,12 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'src/js/checkout.js',
-      'src/js/test.js',
-      'test/*.js'
+      'src/js/**.js'
     ],
 
     // list of files to exclude
     exclude: [
-      
+      'src/js/lib/*.js'
     ],
 
 
@@ -49,7 +48,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_ERROR,
+    logLevel: config.LOG_DEBUG,
 
 
     // enable / disable watching file and executing tests whenever any file changes
@@ -63,6 +62,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true
+    singleRun: false
   });
 };
