@@ -1,5 +1,5 @@
 <?php
-require('../client-api-php/Razorpay.php');
+require('../../client-api-php/Razorpay.php');
 require('config.php');
 
 use Razorpay\Api\Api;

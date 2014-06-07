@@ -222,14 +222,17 @@
 
     /** Now everything is defined */
     //Start by creating a new button to press
-    window.Razorpay = function(){
+    var Razorpay = function(){
+        createlightBox('src/templates/modal.tmpl');//Create the lightbox but don't show it yet
+        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
+    };
+    Razorpay.prototype.addButton = function(){
         var button = document.createElement('button');
         $(button).click(function(e){
             showLightBox();
             e.preventDefault();
         }).html('Pay with Card')
         .appendTo('body');
-        createlightBox('src/templates/modal.tmpl');//Create the lightbox but don't show it yet
-        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
     };
+    window['Razorpay'] = Razorpay;
 })();
