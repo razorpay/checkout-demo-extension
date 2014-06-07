@@ -1,0 +1,12 @@
+box: wercker/nodejs
+build:
+    steps:
+        - script:
+            name: Install npm packages
+            code: npm install
+        - script:
+            name: Replace singleRun with true
+            code: sed -i '/singleRun/c\singleRun:true' karma.conf.js
+        - script:
+            name: Run unit tests
+            code: karma start
