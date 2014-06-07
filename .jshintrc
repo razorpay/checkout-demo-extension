@@ -1,0 +1,23 @@
+{
+	"camelcase": true,
+	"curly": true,
+	"eqeqeq": true,
+	"es3": true,
+	"freeze": true,
+	"indent": true,
+	"latedef": true,
+	"newcap": true,
+	"noarg": true,
+	"sub": true,
+	"undef": true,
+	"multistr":true,
+	"boss": true,
+	"devel": true,
+	"eqnull": true,
+	"browser": true,
+	"strict": true,
+	"globals": {
+	    "jQuery": false,
+	    "$":false
+	}
+}

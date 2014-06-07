@@ -10,14 +10,14 @@
   "scripts": {
     "test": "karma start"
   },
-  "bugs": { 
-    "url": "https://bitbucket.org/razorpay/checkout-js/issues" 
+  "bugs": {
+    "url": "https://bitbucket.org/razorpay/checkout-js/issues"
   },
-  "devDependencies":{
-    "karma":"~0.12",
-    "karma-phantomjs-launcher": "~0.1",
-    "karma-chrome-launcher": "~0.1",
-    "karma-jasmine": "~0.1.0"
+  "devDependencies": {
+    "karma": "~0.12",
+    "karma-jasmine": "~0.1.0",
+    "karma-jshint-preprocessor": "0.0.3",
+    "karma-phantomjs-launcher": "~0.1"
   },
-  "private":"true"
+  "private": "true"
 }

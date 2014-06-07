@@ -1,3 +1,4 @@
+"use strict";
 $(function(){
 	window.setTimeout(function(){
 		var $form = $('form.body');
@@ -8,4 +9,4 @@ $(function(){
         $form.find('input[name="udf[contact]"]').val('9458113956');
         $form.find('input[name="udf[email]"]').val('nemo@razorpay.com');
 	},1000);
-})
+});
