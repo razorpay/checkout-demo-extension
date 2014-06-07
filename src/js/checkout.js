@@ -9,7 +9,7 @@
         showLightBox();
         e.preventDefault();
     }).appendTo(document.body);
-    createLightBox('./template.html');//Create the lightbox but don't show it yet
+    createLightBox('src/templates/modal.tmpl');//Create the lightbox but don't show it yet
     $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
 
     var RazorPayScript = document.currentScript || (function() {

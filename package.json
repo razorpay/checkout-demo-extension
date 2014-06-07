@@ -1,0 +1,23 @@
+{
+  "author": "Abhay Rana <nemo@razorpay.com>",
+  "name": "checkout-js",
+  "description": "Internal package for the Razorpay Checkout JavaScript",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:razorpay/checkout-js.git"
+  },
+  "scripts": {
+    "test": "karma start"
+  },
+  "bugs": { 
+    "url": "https://bitbucket.org/razorpay/checkout-js/issues" 
+  },
+  "devDependencies":{
+    "karma":"~0.12",
+    "karma-phantomjs-launcher": "~0.1",
+    "karma-chrome-launcher": "~0.1",
+    "karma-jasmine": "~0.1.0"
+  },
+  "private":"true"
+}

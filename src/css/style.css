@@ -101,7 +101,7 @@ form input[name="card[name]"], form input[name="udf[email]"], form input[name="u
 form input[name="card[number]"]{
   width:100%;
   border-bottom: 1px solid #727272;
-  background: url('icons/card.png');
+  background: url('../images/icons/card.png');
   background-repeat: no-repeat;
   padding-left:35px;
   background-position: 5px 8px;
@@ -110,7 +110,7 @@ form input[name="card[number]"]{
   border-bottom:0px;
 }
 form input[name="card[expiry]"]{
-  background: url('icons/calendar.png');
+  background: url('../images/icons/calendar.png');
   background-repeat: no-repeat;
   padding-left:35px;
   background-position: 7px 6px;
@@ -137,7 +137,7 @@ form input[name="card[cvv]"].invalid{
   border:1px solid #FB797E;
 }
 form input[name="card[cvv]"]{
-  background: url('icons/lock.png');
+  background: url('../images/icons/lock.png');
   background-repeat: no-repeat;
   padding-left:32px;
   background-position: 3px 6px;
