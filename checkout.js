@@ -52,8 +52,40 @@
         var expiry_month = $form.find('input[name="card[expiry_month]"]').val();
         var expiry_year = $form.find('input[name="card[expiry_year]"]').val();
         var cvc = $form.find('input[name="card[cvv]"]').val();
+        var name = $form.find('input[name="card[name]"]').val();
+        var email = $form.find('input[name="udf[email]"]').val();
+        var contact = $form.find('input[name="udf[contact]"]').val();
 
         var errors = [];
+
+        if(name == ''){
+            $form.find('input[name="card[name]"]').addClass('invalid');
+            errors.push('Missing Name');
+        }
+        if(name.length>100){
+            $form.find('input[name="card[name]"]').addClass('invalid');
+            errors.push('Maximum name length is 100');
+        }
+        if(email == ''){
+            $form.find('input[name="udf[email]"]').addClass('invalid');
+            errors.push('Missing email address');
+        }
+        if(email.length>250){
+            $form.find('input[name="udf[email]"]').addClass('invalid');
+            errors.push('Maximum email length is 250');
+        }
+        if(contact == ''){
+            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            errors.push('Missing contact number');
+        }
+        if(contact.length>12 || contact.length<8){
+            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            errors.push('Contact number should be between 8 and 12 digits long');
+        }
+        if(!/^\d+$/.test(contact)){
+            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            errors.push('Contact number should be made of entirely digits');
+        }
         if(!$.payment.validateCardNumber(cardNumber)){
             $form.find('input[name="card[number]"]').addClass('invalid');
             errors.push('Invalid Credit Card Number');
@@ -62,7 +94,6 @@
             $form.find('input[name="card[expiry]"]').addClass('invalid');
             errors.push('Invalid Expiry Date');
         }
-
         if(!$.payment.validateCardCVC(cvc)){
             $form.find('input[name="card[cvv]"]').addClass('invalid');
             errors.push('Invalid CVV Number');
