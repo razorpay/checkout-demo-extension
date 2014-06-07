@@ -1,16 +1,6 @@
+/* global $ */
 (function(){
     "use strict";
-
-    //Start by creating a new button to press
-    var button = document.createElement('button');
-    $(button)
-    .html('Pay with Card')
-    .click(function(e){
-        showLightBox();
-        e.preventDefault();
-    }).appendTo(document.body);
-    createLightBox('src/templates/modal.tmpl');//Create the lightbox but don't show it yet
-    $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
 
     var RazorPayScript = document.currentScript || (function() {
         var scripts = document.getElementsByTagName('script');
@@ -26,7 +16,7 @@
         $el.css('margin-left','auto');
         $el.css('margin-top','auto');
         return this;
-    }
+    };
 
     function showLightBox(){
         var $modal = $('div.modal').omniWindow();
@@ -37,20 +27,20 @@
         $form.find('input[name="card[number]"]').payment('formatCardNumber');
         $form.find('input[name="card[expiry]"]').payment('formatCardExpiry');
         $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
-        var number = $form.find('input[name="card[number]"]').val();
 
         //Attach a focusout handler to show card type
-        $form.find('input[name="card[number]"]').off().focusout(function(e){
+        $form.find('input[name="card[number]"]').off().focusout(function(){
             var cardType = $.payment.cardType(this.value);
-            if(cardType!=null)
+            if(cardType!=null){
                 $form.find('.card_image').css('background', "url('icons/"+cardType+".png') no-repeat right center");
+            }
         });
     }
     function postValidate($form){
         $form.find('input').removeClass('invalid');
         var cardNumber = $form.find('input[name="card[number]"]').val();
-        var expiry_month = $form.find('input[name="card[expiry_month]"]').val();
-        var expiry_year = $form.find('input[name="card[expiry_year]"]').val();
+        var expiryMonth = $form.find('input[name="card[expiry_month]"]').val();
+        var expiryYear = $form.find('input[name="card[expiry_year]"]').val();
         var cvc = $form.find('input[name="card[cvv]"]').val();
         var name = $form.find('input[name="card[name]"]').val();
         var email = $form.find('input[name="udf[email]"]').val();
@@ -58,7 +48,7 @@
 
         var errors = [];
 
-        if(name == ''){
+        if(name === ''){
             $form.find('input[name="card[name]"]').addClass('invalid');
             errors.push('Missing Name');
         }
@@ -66,7 +56,7 @@
             $form.find('input[name="card[name]"]').addClass('invalid');
             errors.push('Maximum name length is 100');
         }
-        if(email == ''){
+        if(email === ''){
             $form.find('input[name="udf[email]"]').addClass('invalid');
             errors.push('Missing email address');
         }
@@ -74,7 +64,7 @@
             $form.find('input[name="udf[email]"]').addClass('invalid');
             errors.push('Maximum email length is 250');
         }
-        if(contact == ''){
+        if(contact === ''){
             $form.find('input[name="udf[contact]"]').addClass('invalid');
             errors.push('Missing contact number');
         }
@@ -90,7 +80,7 @@
             $form.find('input[name="card[number]"]').addClass('invalid');
             errors.push('Invalid Credit Card Number');
         }
-        if(!$.payment.validateCardExpiry(expiry_month, expiry_year)){
+        if(!$.payment.validateCardExpiry(expiryMonth, expiryYear)){
             $form.find('input[name="card[expiry]"]').addClass('invalid');
             errors.push('Invalid Expiry Date');
         }
@@ -105,13 +95,13 @@
         $('form.body .submit').removeAttr('disabled');
         $('div.modal').data('busy', false);
     }
-    function createLightBox(template_url){
+    function createlightBox(templateUrl){
         //Make an ajax request to template_url, fetch the template
         //replace the contents
 
         //Create the overlay
 
-        $.get(template_url, function(template){
+        $.get(templateUrl, function(template){
             var html = $.tmpl(template, $(RazorPayScript).data());
             html.appendTo('body');
             preValidate($('form.body'));
@@ -131,8 +121,9 @@
         });
     }
 
-    function formsubmit(e){
-        var merchant_key = $(this).find('input[name="key"]').val();
+    function formsubmit(){
+        
+        var merchantKey = $(this).find('input[name="key"]').val();
         var expiry = $(this).find('input[name="card[expiry]"]').val();
         $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
         $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.replace(/[ \/]/g,'').substr(2)+"'>");
@@ -153,7 +144,7 @@
                     <li>${$value}<li>\
                 {{/each}}';
             var div = document.createElement('div');
-            var html = $.tmpl(template,{err:errors}).appendTo(div)
+            $.tmpl(template,{err:errors}).appendTo(div);
             $('.error_box').html(div.innerHTML);
             return false;
         }
@@ -162,7 +153,7 @@
             $('.error_box').html('');
         }
         $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
-        $.getJSON('http://'+merchant_key+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
+        $.getJSON('http://'+merchantKey+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('form .submit .text').text('Server Error').show().parent().addClass('error');
                 clearSubmission();
@@ -174,7 +165,7 @@
             else if(response.callbackUrl){
                 $('div.modal').html('<iframe></iframe>');
 
-                var autosubmit_form_template = '<!doctype html> \
+                var autosubmitformTemplate = '<!doctype html> \
                     <html> \
                         <head>\
                         </head>\
@@ -191,21 +182,22 @@
                                 form.submit();\
                             </script>\
                         </body>\
-                    </html>'
+                    </html>';
                 var div = document.createElement('div');
-                $.tmpl(autosubmit_form_template, response).appendTo(div);
+                $.tmpl(autosubmitformTemplate, response).appendTo(div);
                 $('div.modal iframe').get()[0].contentWindow.document.write(div.innerHTML);
                 //This form should autosubmit
                 //Now we need to resize the modal box so as to accomodate 3dsecure.
                 $('div.modal, div.modal iframe').width('1000px').height('500px');
                 center('div.modal');
+                /* global XD */
                 XD.receiveMessage(function(message){
                     successCall(message.data);
                 });
             }else{
                 successCall(response);
             }
-        })
+        });
         return true;
     }
 
@@ -214,14 +206,28 @@
         for(var i in data)
         {
             //For fields like udf, which are an array themselves
-            if(typeof data[i]=='object')
-                for(var j in data[i])
-                    inputs+='<input type="hidden" name="'+i+'['+j+']" value="'+data[i][j]+'">'
-            else
-                inputs+='<input type="hidden" name="'+i+'" value="'+data[i]+'">'
+            if(typeof data[i]==='object'){
+                for(var j in data[i]){
+                    inputs+='<input type="hidden" name="'+i+'['+j+']" value="'+data[i][j]+'">';
+                }
+            }
+            else{
+                inputs+='<input type="hidden" name="'+i+'" value="'+data[i]+'">';
+            }
         }
         var RazorPayForm = RazorPayScript.parentElement;
         $(RazorPayForm).html(inputs);
         $(RazorPayForm).submit();
     }
+
+    /** Now everything is defined */
+    //Start by creating a new button to press
+    var button = document.createElement('button');
+    $(button).click(function(e){
+        showLightBox();
+        e.preventDefault();
+    }).html('Pay with Card')
+    .appendTo('body');
+    createlightBox('src/templates/modal.tmpl');//Create the lightbox but don't show it yet
+    $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
 })();

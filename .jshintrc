@@ -16,8 +16,10 @@
 	"eqnull": true,
 	"browser": true,
 	"strict": true,
-	"globals": {
-	    "jQuery": false,
-	    "$":false
+	"validthis":true,
+	"validthis":true,
+	"unused":true,
+	"globals":{
+		"$":"true"
 	}
 }
