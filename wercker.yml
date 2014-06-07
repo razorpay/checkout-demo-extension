@@ -10,3 +10,8 @@ build:
         - script:
             name: Run unit tests
             code: ./node_modules/karma/bin/karma start
+    after-steps:
+        - sherzberg/slack-notify:
+            subdomain: razorpay
+            token: $SLACK_TOKEN
+            channel: general
