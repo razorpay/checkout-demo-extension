@@ -1,16 +1,21 @@
 (function(){
     "use strict";
+
     //Start by creating a new button to press
     var button = document.createElement('button');
+    $(button)
+    .html('Pay with Card')
+    .click(function(e){
+        showLightBox();
+        e.preventDefault();
+    }).appendTo(document.body);
+    createLightBox('./template.html');//Create the lightbox but don't show it yet
+    $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
 
     var RazorPayScript = document.currentScript || (function() {
         var scripts = document.getElementsByTagName('script');
         return scripts[scripts.length - 1];
     })();
-
-    var RazorPayForm = $(RazorPayScript).parent();
-
-    button.onclick = createLightBox('./template.html');
 
     var center = function (selector) {
         var $el = $(selector);
@@ -23,6 +28,10 @@
         return this;
     }
 
+    function showLightBox(){
+        var $modal = $('div.modal').omniWindow();
+        $modal.trigger('show');
+    }
     function preValidate($form){
         //Card Number
         $form.find('input[name="card[number]"]').payment('formatCardNumber');
@@ -70,13 +79,10 @@
         //replace the contents
 
         //Create the overlay
-        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
 
         $.get(template_url, function(template){
             var html = $.tmpl(template, $(RazorPayScript).data());
             html.appendTo('body');
-            var $modal = $('div.modal').omniWindow();
-            $modal.trigger('show');
             preValidate($('form.body'));
             $('form.body').submit(function(e){
                 //Handles the form submission
@@ -183,6 +189,7 @@
             else
                 inputs+='<input type="hidden" name="'+i+'" value="'+data[i]+'">'
         }
+        var RazorPayForm = RazorPayScript.parentElement;
         $(RazorPayForm).html(inputs);
         $(RazorPayForm).submit();
     }
