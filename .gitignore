@@ -1,4 +1,3 @@
-index.html
-checkout_fill.jpg
-config.php
-node_modules
+/index.html
+/node_modules
+/merchant/config.php
