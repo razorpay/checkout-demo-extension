@@ -223,7 +223,9 @@
     /** Now everything is defined */
     //Start by creating a new button to press
     var Razorpay = function(){
-        createlightBox('src/templates/modal.tmpl');//Create the lightbox but don't show it yet
+        var path= RazorPayScript.src.split('?')[0]; //Remove ?query portion
+        var mydir= path.split('/').slice(0, -1).join('/')+'/';  // remove last filename part of path
+        createlightBox(mydir+'../templates/modal.tmpl');//Create the lightbox but don't show it yet
         $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
     };
     Razorpay.prototype.addButton = function(){
