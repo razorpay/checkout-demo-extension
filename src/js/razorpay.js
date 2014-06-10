@@ -1,4 +1,4 @@
-/* global $ */
+/* global $,templates */
 (function(){
     "use strict";
 
@@ -95,29 +95,22 @@
         $('form.body .submit').removeAttr('disabled');
         $('div.modal').data('busy', false);
     }
-    function createlightBox(templateUrl){
-        //Make an ajax request to template_url, fetch the template
-        //replace the contents
-
-        //Create the overlay
-
-        $.get(templateUrl, function(template){
-            var html = $.tmpl(template, $(RazorPayScript).data());
-            html.appendTo('body');
-            preValidate($('form.body'));
-            $('form.body').submit(function(e){
-                //Handles the form submission
-                var submission  = formsubmit.call(this,e);//This variable stores whether we are submitting the form or not
-                if(submission){
-                    $('form.body .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
-                    //Marks the modal window as busy so it is not closable
-                    $('div.modal').data('busy', true);
-                }
-                else{
-                    clearSubmission();
-                }
-                e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
-            });
+    function createlightBox(template){
+        var html = $.tmpl(template, $(RazorPayScript).data());
+        html.appendTo('body');
+        preValidate($('form.body'));
+        $('form.body').submit(function(e){
+            //Handles the form submission
+            var submission  = formsubmit.call(this,e);//This variable stores whether we are submitting the form or not
+            if(submission){
+                $('form.body .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                //Marks the modal window as busy so it is not closable
+                $('div.modal').data('busy', true);
+            }
+            else{
+                clearSubmission();
+            }
+            e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
         });
     }
 
@@ -164,25 +157,7 @@
             }
             else if(response.callbackUrl){
                 $('div.modal').html('<iframe></iframe>');
-
-                var autosubmitformTemplate = '<!doctype html> \
-                    <html> \
-                        <head>\
-                        </head>\
-                        <body>\
-                            <form method="POST" action = "${data.url}" id="rzp-dcform">\
-                                <input type="hidden" name="PaReq" value="${data.PAReq}">\
-                                <input type="hidden" name="MD" value="${data.paymentid}">\
-                                <input type="hidden" name="TermUrl" value="${callbackUrl}">\
-                                <input style="display:none" type="submit" value="Submit">\
-                            </form>\
-                            Your request is being processed\
-                            <script>\
-                                var form = document.getElementById(\'rzp-dcform\');\
-                                form.submit();\
-                            </script>\
-                        </body>\
-                    </html>';
+                var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
                 var div = document.createElement('div');
                 $.tmpl(autosubmitformTemplate, response).appendTo(div);
                 $('div.modal iframe').get()[0].contentWindow.document.write(div.innerHTML);
@@ -223,9 +198,7 @@
     /** Now everything is defined */
     //Start by creating a new button to press
     var Razorpay = function(){
-        var path= RazorPayScript.src.split('?')[0]; //Remove ?query portion
-        var mydir= path.split('/').slice(0, -1).join('/')+'/';  // remove last filename part of path
-        createlightBox(mydir+'../templates/modal.tmpl');//Create the lightbox but don't show it yet
+        createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
         $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
     };
     Razorpay.prototype.addButton = function(){

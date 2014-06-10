@@ -1,3 +1,5 @@
 /index.html
 /node_modules
 /merchant/config.php
+/.tmp
+/dist
