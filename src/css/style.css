@@ -70,6 +70,20 @@ form.body .card_image{
   height:7px;
   margin-top: -20px;
   margin-right: 5px;
+  background-repeat: no-repeat;
+  background-position: right center;
+}
+.card_image.visa{
+  background-image: url('../images/icons/visa.png');
+}
+.card_image.mastercard{
+  background-image: url('../images/icons/mastercard.png');
+}
+.card_image.maestro{
+  background-image: url('../images/icons/maestro.png');
+}
+.card_image.rupay{
+  background-image: url('../images/icons/rupay.png');
 }
 form input{
   color:#28B3D2;
