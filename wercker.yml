@@ -17,3 +17,29 @@ build:
             subdomain: razorpay
             token: $SLACK_TOKEN
             channel: general
+deploy:
+    steps:
+        - script:
+            name: Create lease on AWS
+            code: wget -O /dev/null https://ac.razorpay.com/invite/$concierge_token --quiet
+        - add-to-known_hosts:
+            hostname: checkout.razorpay.com
+        - mktemp:
+            envvar: PRIVATEKEY_PATH
+        - create-file:
+            name: write key
+            filename: $PRIVATEKEY_PATH
+            content: $AWS_deploykey
+            overwrite: true
+            hide-from-log: true
+        - script:
+            name: copy with rsync over ssh
+            code: >
+                rsync --archive --verbose --force --delete --progress --recursive
+                -e "ssh -i $PRIVATEKEY_PATH -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+                ./dist ubuntu@api.razorpay.com:/home/ubuntu/checkout/
+    after-steps:
+        - sherzberg/slack-notify:
+            subdomain: razorpay
+            token: $SLACK_TOKEN
+            channel: general
