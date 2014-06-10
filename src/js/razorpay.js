@@ -146,7 +146,7 @@
             $('.error_box').html('');
         }
         $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
-        $.getJSON('http://'+merchantKey+'@api.razorpay.dev/transactions/jsonp?callback=?', data, function(response){
+        $.getJSON('https://'+merchantKey+'@api.razorpay.com/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('form .submit .text').text('Server Error').show().parent().addClass('error');
                 clearSubmission();
