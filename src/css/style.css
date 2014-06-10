@@ -55,6 +55,7 @@
   width:100px;
   margin-top:10px;
   background-image:url('../images/powered_by_rzp.jpg');
+  min-height: 30px;
 }
 .clear{
   clear:both;
