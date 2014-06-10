@@ -33,8 +33,6 @@
             var cardType = $.payment.cardType(this.value);
             if(cardType!=null){
                 $form.find('.card_image').addClass(cardType);
-
-                css('background', "url('icons/"+cardType+".png') no-repeat right center");
             }
         });
     }
