@@ -150,7 +150,7 @@
         $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
         $.getJSON('https://'+merchantKey+'@api.razorpay.com/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
-                $('form .submit .text').text('Server Error').show().parent().addClass('error');
+                $('.error_box').html('<li>There was an error in handling your request</li>');
                 clearSubmission();
             }
             else if(response.error){
