@@ -15,3 +15,4 @@
 - See `karma.conf.js` for karma configuration, and `Gruntfile.js` for grunt configuration.
 - `layout.html` is used for configuring the minification and concat portion of grunt using the `usemin` package.
 - All pushes to master are auto-deployed by wercker if the build succeeds(see `wercker.yml`).
+- It is recommended that you keep 2 terminal windows open: one with `grunt watch` and another with `karma start` running.

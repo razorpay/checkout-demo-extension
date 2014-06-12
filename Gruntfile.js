@@ -24,6 +24,14 @@ module.exports = function(grunt){
                 cwd: 'src/images/',
                 expand: true
             }
+        },
+        watch:{
+            files:'**',
+            tasks:'default',
+            options:{
+                spawn: false,
+                cwd:'src/'
+            }
         }
     });
     grunt.registerTask('default', ['htmlConvert','useminPrepare','concat','uglify','cssmin','copy']);
