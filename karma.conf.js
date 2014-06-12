@@ -17,6 +17,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'dist/v1/checkout.js',
+      'spec/jasmine-jquery.js',
       'test/*.js'
     ],
 

@@ -1,8 +1,6 @@
-/* global $,Razorpay */
+/* global $ */
 (function(){
     "use strict";
-    var rzp = new Razorpay();
-    rzp.addButton();
 	(function(){
 		window.setTimeout(function(){
 			var $form = $('form.body');
