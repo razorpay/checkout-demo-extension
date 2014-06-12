@@ -29,8 +29,9 @@ module.exports = function(grunt){
             files:'**',
             tasks:'default',
             options:{
-                spawn: false,
-                cwd:'src/'
+                spawn: true,
+                cwd:'src/',
+                interrupt: true
             }
         }
     });
