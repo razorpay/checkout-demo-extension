@@ -1,18 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- build:js v1/checkout.js -->
-	<meta charset="utf-8">
-	<script src="src/js/lib/jquery-1.11.1.min.js"></script>
-	<script src="src/js/lib/jquery.tmpl.js"></script>
-	<script src="src/js/lib/jquery.omniwindow.js"></script>
-	<script src="src/js/lib/jquery.payment.js"></script>
-	<script src="src/js/lib/xdm.js"></script>
-	<script src=".tmp/templates.js"></script>
-	<script src="src/js/razorpay.js"></script>
-	<!-- endbuild -->
-	<!-- build:css v1/css/style.css -->
-	<link href="src/css/style.css" type="text/css" rel="stylesheet">
-	<link href="src/css/shake.css" type="text/css" rel="stylesheet">
-	<!-- endbuild -->
+    <!-- build:js v1/checkout.js -->
+    <meta charset="utf-8">
+    <script src="src/js/lib/jquery-1.11.1.min.js"></script>
+    <script src="src/js/lib/jquery.tmpl.js"></script>
+    <script src="src/js/lib/jquery.omniwindow.js"></script>
+    <script src="src/js/lib/jquery.payment.js"></script>
+    <script src="src/js/lib/xdm.js"></script>
+    <script src=".tmp/templates.js"></script>
+    <script src="src/js/razorpay.js"></script>
+    <!-- endbuild -->
+    <!-- build:css v1/css/style.css -->
+    <link href="src/css/style.css" type="text/css" rel="stylesheet">
+    <link href="src/css/shake.css" type="text/css" rel="stylesheet">
+    <!-- endbuild -->
 </head>
+<body>
+    <button id="rzp-button2">Click to Pay</button>
+    <script>
+        var rzp = new Razorpay();
+        rzp.configure({
+            'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f',
+            'amount':'20',
+            'name':'Google',
+            'description':'Google Glass',
+            'image':'https://api.razorpay.com/test/merchant/vk.jpg',
+            'handler': function (transaction){
+                console.log(transaction);
+            }
+        });
+        $('#rzp-button2').click(function(e){
+            rzp.open();
+            e.preventDefault();
+        })
+    </script>
+    <script src="src/js/autofill.js"></script>
+</body>

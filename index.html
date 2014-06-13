@@ -1,25 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-	<meta charset="utf-8">
-	<link href="dist/v1/css/style.css" type="text/css" rel="stylesheet">
+    <meta charset="utf-8">
+    <link href="dist/v1/css/style.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-	<form action="https://api.razorpay.com/test/merchant/charge.php" method="POST">
-	  <script
-	    src="dist/v1/checkout.js"
-	    data-key="d9c6bf091a1a64cb5678d8c1d5e7360f"
-	    data-amount="20"
-	    data-name="Merchant Name"
-	    data-description="Purchase Description"
-	    data-image="https://api.razorpay.com/test/merchant/vk.jpg">
-	  </script>
-	</form>
-	<link href='https://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
-	<script src="src/js/test.js"></script>
-	<script>
-		var rzp = new Razorpay();
-		rzp.addButton();
-	</script>
+    <form action="https://api.razorpay.com/test/merchant/charge.php" method="POST">
+      <script
+        src="dist/v1/checkout.js"
+        data-key="d9c6bf091a1a64cb5678d8c1d5e7360f"
+        data-amount="20"
+        data-name="Merchant Name"
+        data-description="Purchase Description"
+        data-image="https://api.razorpay.com/test/merchant/vk.jpg">
+      </script>
+    </form>
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
+    <script src="src/js/autofill.js"></script><!-- Only sets up auto-filling-->
 </body>
 </html>
