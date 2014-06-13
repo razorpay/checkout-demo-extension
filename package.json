@@ -24,6 +24,7 @@
     "grunt-html-convert": "0.0.1",
     "grunt-usemin": "^2.2.0",
     "karma": "~0.12",
+    "karma-chrome-launcher": "^0.1.4",
     "karma-jasmine": "~0.1.0",
     "karma-jshint-preprocessor": "0.0.3",
     "karma-phantomjs-launcher": "~0.1",
