@@ -37,6 +37,7 @@ describe("Razorpay", function() {
     //Add handler to rzp
     var flag = false;
     rzp.options.handler = function(transaction){
+      expect(transaction.status).toEqual('auth');
       expect(transaction.amount).toEqual(options.amount);
       expect(transaction.status).toEqual('auth');
       flag = true;
@@ -46,15 +47,11 @@ describe("Razorpay", function() {
       $('.submit').click();
       expect($('.error_box')).toContainHtml('');//there should be no errors
     });
-    window.setTimeout(function(){
-      console.log(document.body.innerHTML);
-    }, 1000);
 
     waitsFor(function(){
       //flag is set to true when handler is called
       //thus we're checking handler to have been called
-      return true;
-    }, "Handler function should be called", 500);
-    
+      return flag;
+    }, "Handler function should be called", 10000);
   });
 });
