@@ -21,7 +21,9 @@ describe("Razorpay", function() {
     
     rzp.open(); //Show the modal
     expect($('.modal')).toBeVisible();
-    
+
+    $('form.body').find('input').removeAttr('required'); //This is so that chrome does not freak out about "required" attibutes
+
     $('.submit').click();
     expect($('.error_box li')).toHaveLength(16);
   });

@@ -216,7 +216,6 @@
         button.setAttribute('id','rzp-button');
         var that = this;
         $(button).click(function(e){
-            console.info("Button clicked");
             that.open();
             e.preventDefault();
         }).html('Pay with Card')
