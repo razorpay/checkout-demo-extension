@@ -29,7 +29,7 @@
         $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
 
         //Attach a focusout handler to show card type
-        $form.find('input[name="card[number]"]').off().focusout(function(){
+        $form.find('input[name="card[number]"]').off('focusout').focusout(function(){
             var cardType = $.payment.cardType(this.value);
             if(cardType!=null){
                 $form.find('.card_image').addClass(cardType);
