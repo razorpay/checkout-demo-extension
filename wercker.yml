@@ -2,14 +2,11 @@ box: wercker/nodejs
 build:
     steps:
         - npm-install
-        - script:
-            name: Replace singleRun with true
-            code: sed -i '/singleRun/c\singleRun:true' karma.conf.js
         - grunt:
             tasks: default
         - script:
             name: Run unit tests
-            code: ./node_modules/karma/bin/karma start
+            code: ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS
     after-steps:
         - sherzberg/slack-notify:
             subdomain: razorpay
