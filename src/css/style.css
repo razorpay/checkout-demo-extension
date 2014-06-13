@@ -208,3 +208,7 @@ form .submit.error{
   list-style-type: none;
   padding: 0px;
 }
+.modal iframe{
+  border: none;
+  border-radius: 5px;
+}
