@@ -222,7 +222,7 @@
         this.showLightBox();
     };
     Razorpay.prototype.configure = function(options){
-        this.options = options;//Setup options
+        $.extend(this.options, options);
         //These options will be used in creating the lightbox
         this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
     };

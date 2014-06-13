@@ -17,8 +17,7 @@ describe("Razorpay", function() {
   });
   it('configure should work', function(){
 
-    rzp.configure(options);
-    expect(rzp.options).toEqual(options);
+    rzp.configure(options);//This will continue to use the default handler
     
     rzp.open(); //Show the modal
     expect($('.modal')).toBeVisible();
