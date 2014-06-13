@@ -22,11 +22,6 @@
         $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
     };
 
-    Razorpay.prototype.showLightBox = function(){
-        var $modal = $('div.modal').omniWindow();
-        $modal.trigger('show');
-    };
-
     Razorpay.prototype.preValidate = function($form){
         //Card Number
         $form.find('input[name="card[number]"]').payment('formatCardNumber');
@@ -175,16 +170,25 @@
                 center('div.modal');
                 /* global XD */
                 XD.receiveMessage(function(message){
+                    that.hide();
                     that.options.handler(message.data);
                 });
             }else{
+                that.hide();
                 that.options.handler(response);
             }
         });
         return true;
     };
 
+    Razorpay.prototype.hide = function(){
+        this.clearSubmission();
+        this.$modal.trigger('hide');
+    };
+
     Razorpay.prototype.options = {};//We can specify any default options here
+    //default handler for success
+    //default handler does not care about error or success messages, it just submits everything via the form
     Razorpay.prototype.options.handler = function(data){
         var inputs='';
         for(var i in data)
@@ -219,7 +223,8 @@
         .appendTo('body');
     };
     Razorpay.prototype.open = function(){
-        this.showLightBox();
+        this.$modal = $('div.modal').omniWindow();
+        this.$modal.trigger('show');
     };
     Razorpay.prototype.configure = function(options){
         $.extend(this.options, options);
@@ -237,3 +242,4 @@
     window['Razorpay'] = Razorpay;
 
 })();
+

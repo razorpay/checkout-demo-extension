@@ -27,6 +27,7 @@ describe("Razorpay", function() {
   });
   it("should show no errors after filling the form", function(){
     var $form = $('form.body');
+    //We are using a CC here, so as to avoid having to press the button inside the iframe (3d secure)
     $form.find('input[name="card[number]"]').val('4012001038443335');
     $form.find('input[name="card[expiry]"]').val('05 / 19');
     $form.find('input[name="card[cvv]"]').val('888');
@@ -52,6 +53,6 @@ describe("Razorpay", function() {
       //flag is set to true when handler is called
       //thus we're checking handler to have been called
       return flag;
-    }, "Handler function should be called", 10000);
+    }, "Handler function should be called", 20000);
   });
 });
