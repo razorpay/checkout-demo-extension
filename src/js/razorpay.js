@@ -7,7 +7,7 @@
         return scripts[scripts.length - 1];
     })();
 
-    var center = function (selector) {
+    var center = function(selector) {
         var $el = $(selector);
         $el.css("position","absolute");
         $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
@@ -18,11 +18,16 @@
         return this;
     };
 
-    function showLightBox(){
+    var Razorpay = function(){
+        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
+    };
+
+    Razorpay.prototype.showLightBox = function(){
         var $modal = $('div.modal').omniWindow();
         $modal.trigger('show');
-    }
-    function preValidate($form){
+    };
+
+    Razorpay.prototype.preValidate = function($form){
         //Card Number
         $form.find('input[name="card[number]"]').payment('formatCardNumber');
         $form.find('input[name="card[expiry]"]').payment('formatCardExpiry');
@@ -35,8 +40,9 @@
                 $form.find('.card_image').addClass(cardType);
             }
         });
-    }
-    function postValidate($form){
+    };
+
+    Razorpay.prototype.postValidate = function($form){
         $form.find('input').removeClass('invalid');
         var cardNumber = $form.find('input[name="card[number]"]').val();
         var expiryMonth = $form.find('input[name="card[expiry_month]"]').val();
@@ -89,45 +95,46 @@
             errors.push('Invalid CVV Number');
         }
         return errors;
-    }
+    };
 
-    function clearSubmission(){
+    Razorpay.prototype.clearSubmission = function(){
         $('form.body .submit').removeAttr('disabled');
         $('div.modal').data('busy', false);
-    }
-    function createlightBox(template){
-        var html = $.tmpl(template, $(RazorPayScript).data());
+    };
+
+    Razorpay.prototype.createlightBox = function(template){
+        var html = $.tmpl(template, this.options);
         html.appendTo('body');
-        preValidate($('form.body'));
+        this.preValidate($('form.body'));
+        var that = this;
         $('form.body').submit(function(e){
             //Handles the form submission
-            var submission  = formsubmit.call(this,e);//This variable stores whether we are submitting the form or not
+            var submission  = that.formsubmit(this);//submission stores whether we are submitting the form or not
             if(submission){
                 $('form.body .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
                 //Marks the modal window as busy so it is not closable
                 $('div.modal').data('busy', true);
             }
             else{
-                clearSubmission();
+                that.clearSubmission();
             }
             e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
         });
-    }
+    };
 
-    function formsubmit(){
-        
-        var merchantKey = $(this).find('input[name="key"]').val();
-        var expiry = $(this).find('input[name="card[expiry]"]').val();
-        $(this).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
-        $(this).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.replace(/[ \/]/g,'').substr(2)+"'>");
+    Razorpay.prototype.formsubmit = function(form){
+        var merchantKey = $(form).find('input[name="key"]').val();
+        var expiry = $(form).find('input[name="card[expiry]"]').val();
+        $(form).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
+        $(form).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.replace(/[ \/]/g,'').substr(2)+"'>");
         //strip all spaces and backslashes, and then cut off first two digits (month);
 
-        var data = $(this).serialize();
-        var errors = postValidate($(this));
+        var data = $(form).serialize();
+        var errors = this.postValidate($(form));
         if(errors.length > 0){//If we have more than one errors
             //Cleanup a bit
-            $(this).find("input[name='card[expiry_month]']").remove();
-            $(this).find("input[name='card[expiry_year]']").remove();
+            $(form).find("input[name='card[expiry_month]']").remove();
+            $(form).find("input[name='card[expiry_year]']").remove();
 
             //Shake the modal window
             $('div.modal').addClass('shake');
@@ -145,15 +152,16 @@
             //Cleanup errors created by any previous attempts
             $('.error_box').html('');
         }
-        $(this).find('input[name="expiry"]').remove();//Remove the singly expiry field
+        $(form).find('input[name="expiry"]').remove();//Remove the singly expiry field
+        var that = this;
         $.getJSON('https://'+merchantKey+'@api.razorpay.com/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('.error_box').html('<li>There was an error in handling your request</li>');
-                clearSubmission();
+                that.clearSubmission();
             }
             else if(response.error){
                 $('.error_box').html('<li>'+response.error.message+'</li>');
-                clearSubmission();
+                that.clearSubmission();
             }
             else if(response.callbackUrl){
                 $('div.modal').html('<iframe></iframe>');
@@ -167,16 +175,17 @@
                 center('div.modal');
                 /* global XD */
                 XD.receiveMessage(function(message){
-                    successCall(message.data);
+                    that.options.handler(message.data);
                 });
             }else{
-                successCall(response);
+                that.options.handler(response);
             }
         });
         return true;
-    }
+    };
 
-    function successCall(data){
+    Razorpay.prototype.options = {};//We can specify any default options here
+    Razorpay.prototype.options.handler = function(data){
         var inputs='';
         for(var i in data)
         {
@@ -193,21 +202,38 @@
         var RazorPayForm = RazorPayScript.parentElement;
         $(RazorPayForm).html(inputs);
         $(RazorPayForm).submit();
-    }
+    };
 
     /** Now everything is defined */
     //Start by creating a new button to press
-    var Razorpay = function(){
-        createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
-        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
-    };
+
     Razorpay.prototype.addButton = function(){
         var button = document.createElement('button');
+        button.setAttribute('id','rzp-button');
+        var that = this;
         $(button).click(function(e){
-            showLightBox();
+            console.info("Button clicked");
+            that.open();
             e.preventDefault();
         }).html('Pay with Card')
         .appendTo('body');
     };
+    Razorpay.prototype.open = function(){
+        this.showLightBox();
+    };
+    Razorpay.prototype.configure = function(options){
+        this.options = options;//Setup options
+        //These options will be used in creating the lightbox
+        this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
+    };
+    
+    var key = $(RazorPayScript).data('key');
+    if(key && key.length>0){
+        //If we have a key set, that means we are in auto mode and need to display the button automatically
+        var rzp = new Razorpay();
+        rzp.configure($(RazorPayScript).data());
+        rzp.addButton();
+    }
     window['Razorpay'] = Razorpay;
+
 })();

@@ -1,8 +1,61 @@
-/* global describe, it, Razorpay */
-describe("A suite", function() {
+/* global describe, it, Razorpay, expect, runs, waitsFor */
+describe("Razorpay", function() {
   "use strict";
-  it("Create the rzp instance", function() {
-  	var rzp = new Razorpay();
+  var rzp = new Razorpay();
+  var options = {
+    'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f',
+    'amount':'20',
+    'name':'Google',
+    'description':'Google Glass',
+    'image':'https://api.razorpay.com/test/merchant/vk.jpg'
+  };
+  it("addButton should work", function() {
+    //Since karma is automatically injecting the scripts, we cannot add the data- parameters to the script tag
+    //Therefore we must manually add the button
     rzp.addButton();
+    expect($('#rzp-button')[0]).toBeInDOM();
+  });
+  it('configure should work', function(){
+
+    rzp.configure(options);
+    expect(rzp.options).toEqual(options);
+    
+    rzp.open(); //Show the modal
+    expect($('.modal')).toBeVisible();
+    
+    $('.submit').click();
+    expect($('.error_box li')).toHaveLength(16);
+  });
+  it("should show no errors after filling the form", function(){
+    var $form = $('form.body');
+    $form.find('input[name="card[number]"]').val('4012001038443335');
+    $form.find('input[name="card[expiry]"]').val('05 / 19');
+    $form.find('input[name="card[cvv]"]').val('888');
+    $form.find('input[name="card[name]"]').val('Abhay Rana');
+    $form.find('input[name="udf[contact]"]').val('9458113956');
+    $form.find('input[name="udf[email]"]').val('nemo@razorpay.com');
+
+    //Add handler to rzp
+    var flag = false;
+    rzp.options.handler = function(transaction){
+      expect(transaction.amount).toEqual(options.amount);
+      expect(transaction.status).toEqual('auth');
+      flag = true;
+    };
+
+    runs(function(){
+      $('.submit').click();
+      expect($('.error_box')).toContainHtml('');//there should be no errors
+    });
+    window.setTimeout(function(){
+      console.log(document.body.innerHTML);
+    }, 1000);
+
+    waitsFor(function(){
+      //flag is set to true when handler is called
+      //thus we're checking handler to have been called
+      return true;
+    }, "Handler function should be called", 500);
+    
   });
 });
