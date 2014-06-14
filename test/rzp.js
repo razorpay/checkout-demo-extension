@@ -32,15 +32,27 @@ describe("Razorpay", function() {
         expect($('.error_box li')).toHaveLength(16);
     });
 
+    it("should accept arguments to .open and use them", function(){
+        var prefillOptions = {
+            name: 'Harshil Mathur',
+            contact: '9999999999',
+            email: 'harshil@razorpay.com'
+        };
+        rzp.open({
+            prefill:prefillOptions
+        });
+        var $form = $('form.body');
+        expect($form.find('input[name="card[name]"]')).toHaveValue(prefillOptions.name);
+        expect($form.find('input[name="udf[contact]"]')).toHaveValue(prefillOptions.contact);
+        expect($form.find('input[name="udf[email]"]')).toHaveValue(prefillOptions.email);
+    });
+
     it("should show no errors after filling the form", function(){
         var $form = $('form.body');
         //We are using a CC here, so as to avoid having to press the button inside the iframe (3d secure)
         $form.find('input[name="card[number]"]').val('4012001038443335');
         $form.find('input[name="card[expiry]"]').val('05 / 19');
         $form.find('input[name="card[cvv]"]').val('888');
-        $form.find('input[name="card[name]"]').val('Abhay Rana');
-        $form.find('input[name="udf[contact]"]').val('9458113956');
-        $form.find('input[name="udf[email]"]').val('nemo@razorpay.com');
 
         //Add handler to rzp
         var flag = false;

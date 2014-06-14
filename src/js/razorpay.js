@@ -229,8 +229,23 @@
         }).html('Pay with Card')
         .appendTo('body');
     };
+    Razorpay.prototype.updateData = function(data){
+        var $form = $('form.body');
+        if(data.name){
+            $form.find('input[name="card[name]"]').val(data.name);
+        }
+        if(data.contact){
+            $form.find('input[name="udf[contact]"]').val(data.contact);
+        }
+        if(data.email){
+            $form.find('input[name="udf[email]"]').val(data.email);
+        }
+    };
     Razorpay.prototype.open = function(options){
         $.extend(this.options, options);
+        if(this.options.prefill){
+            this.updateData(this.options.prefill);
+        }
         this.$modal = $('div.modal').omniWindow();
         this.$modal.trigger('show');
     };
