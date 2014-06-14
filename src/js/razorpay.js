@@ -245,7 +245,7 @@
         //If we have a key set, that means we are in auto mode and need to display the button automatically
         var rzp = new Razorpay();
         rzp.configure($(RazorPayScript).data());
-        rzp.addButton();
+        rzp.addButton();//We leave this unstyled
     }
     window['Razorpay'] = Razorpay;
 
