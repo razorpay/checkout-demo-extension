@@ -155,7 +155,8 @@
                 that.clearSubmission();
             }
             else if(response.error){
-                $('.error_box').html('<li>'+response.error.message+'</li>');
+                var message = response.error.message || 'There was an error in handling your request';
+                $('.error_box').html('<li>'+message+'</li>');
                 that.clearSubmission();
             }
             else if(response.callbackUrl){
@@ -228,7 +229,8 @@
         }).html('Pay with Card')
         .appendTo('body');
     };
-    Razorpay.prototype.open = function(){
+    Razorpay.prototype.open = function(options){
+        $.extend(this.options, options);
         this.$modal = $('div.modal').omniWindow();
         this.$modal.trigger('show');
     };
