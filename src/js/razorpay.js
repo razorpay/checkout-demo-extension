@@ -149,7 +149,7 @@
         }
         $(form).find('input[name="expiry"]').remove();//Remove the singly expiry field
         var that = this;
-        $.getJSON('https://'+merchantKey+'@api.razorpay.com/transactions/jsonp?callback=?', data, function(response){
+        $.getJSON(this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('.error_box').html('<li>There was an error in handling your request</li>');
                 that.clearSubmission();
@@ -186,14 +186,17 @@
         this.$modal.trigger('hide');
     };
 
-    Razorpay.prototype.options = {};//We can specify any default options here
+    Razorpay.prototype.options = {
+        protocol: 'https',
+        hostname: 'api.razorpay.com'
+    };//We can specify any default options here
     //default handler for success
     //default handler does not care about error or success messages, it just submits everything via the form
     Razorpay.prototype.options.handler = function(data){
         var inputs='';
         for(var i in data)
         {
-            //For fields like udf, which are an array themselves
+            //For fields like udf, which are an object themselves
             if(typeof data[i]==='object'){
                 for(var j in data[i]){
                     inputs+='<input type="hidden" name="'+i+'['+j+']" value="'+data[i][j]+'">';
@@ -208,6 +211,10 @@
         $(RazorPayForm).submit();
     };
 
+    Razorpay.prototype.setEndpoint = function(protocol, hostname){
+        this.options.protocol = protocol;
+        this.options.hostname = hostname;
+    };
     /** Now everything is defined */
     //Start by creating a new button to press
 
@@ -241,4 +248,3 @@
     window['Razorpay'] = Razorpay;
 
 })();
-

@@ -9,6 +9,7 @@ describe("Razorpay", function() {
     'description':'Google Glass',
     'image':'https://api.razorpay.com/test/merchant/vk.jpg'
   };
+  rzp.setEndpoint('http','api.razorpay.dev');
   it("addButton should work", function() {
     //Since karma is automatically injecting the scripts, we cannot add the data- parameters to the script tag
     //Therefore we must manually add the button
