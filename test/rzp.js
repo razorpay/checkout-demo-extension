@@ -1,4 +1,4 @@
-/* global describe, it, Razorpay, expect, runs, waitsFor */
+/* global describe, it, Razorpay, expect, runs, waitsFor, endpoint */
 describe("Razorpay", function() {
   "use strict";
   var rzp = new Razorpay();
@@ -9,7 +9,9 @@ describe("Razorpay", function() {
     'description':'Google Glass',
     'image':'https://api.razorpay.com/test/merchant/vk.jpg'
   };
-  rzp.setEndpoint('http','api.razorpay.dev');
+  if(endpoint){
+    rzp.setEndpoint(endpoint.protocol, endpoint.hostname);
+  }
   it("addButton should work", function() {
     //Since karma is automatically injecting the scripts, we cannot add the data- parameters to the script tag
     //Therefore we must manually add the button

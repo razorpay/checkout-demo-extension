@@ -2,3 +2,4 @@
 /merchant/config.php
 /.tmp
 /dist
+/test/env.js
