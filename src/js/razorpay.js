@@ -208,7 +208,7 @@
             }
         }
         var RazorPayForm = RazorPayScript.parentElement;
-        $(RazorPayForm).html(inputs);
+        $(inputs).appendTo(RazorPayForm);
         $(RazorPayForm).submit();
     };
 
