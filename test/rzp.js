@@ -9,7 +9,7 @@ describe("Razorpay", function() {
     'description':'Google Glass',
     'image':'https://api.razorpay.com/test/merchant/vk.jpg'
   };
-  if(endpoint){
+  if(typeof endpoint !== 'undefined'){
     rzp.setEndpoint(endpoint.protocol, endpoint.hostname);
   }
   it("addButton should work", function() {
