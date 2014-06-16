@@ -170,7 +170,8 @@
                     that.hide();
                     that.options.handler(message.data);
                 });
-            }else{
+            }
+            else{
                 that.hide();
                 that.options.handler(response);
             }
@@ -180,7 +181,7 @@
 
     Razorpay.prototype.hide = function(){
         this.clearSubmission();
-        this.$modal.trigger('hide');
+        this.$modal.trigger('hide.ow');
     };
 
     Razorpay.prototype.options = {
