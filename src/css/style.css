@@ -120,20 +120,26 @@ form input[name="card[number]"]{
   background: url('../images/icons/card.png');
   background-repeat: no-repeat;
   padding-left:35px;
-  background-position: 5px 8px;
+  background-position: 5px 6px;
   border:1px solid #727272;
   border-radius:3px 3px 0px 0px;
   border-bottom:0px;
+}
+form input[name="card[number]"]:focus{
+  background-position: 5px -20px;
 }
 form input[name="card[expiry]"]{
   background: url('../images/icons/calendar.png');
   background-repeat: no-repeat;
   padding-left:35px;
-  background-position: 7px 6px;
+  background-position: 7px 4px;
   width:175px;
   border-right:5px solid #727272;
   border:1px solid #727272;
   border-radius:0px 0px 0px 3px;
+}
+form input[name="card[expiry]"]:focus{
+  background-position: 7px -25px;
 }
 form input[name="card[expiry]"].invalid{
   border:1px solid #FB797E;
@@ -156,13 +162,16 @@ form input[name="card[cvv]"]{
   background: url('../images/icons/lock.png');
   background-repeat: no-repeat;
   padding-left:32px;
-  background-position: 3px 6px;
+  background-position: 3px 4px;
   border:1px solid #727272;
   border-radius: 0px 0px 3px 0px;
   left: 249px;  
   position: absolute;
   width: 176px;
 }
+form input[name="card[cvv]"]:focus{
+  background-position: 3px -25px;
+} 
 form .submit{
   background-color:#28B3D2;
   color:white;
