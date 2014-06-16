@@ -117,14 +117,23 @@
         });
     };
 
+    Razorpay.prototype.breakExpiry = function(expiry){
+        //Returns month, year as a tuple inside an object
+        return {
+            month: expiry.substr(0,2), 
+            //strip all spaces and backslashes, and then cut off first two digits (month);
+            year: expiry.replace(/[ \/]/g,'').substr(2)
+        };
+    };
     Razorpay.prototype.formsubmit = function(form){
         var merchantKey = this.options.key;
-        var expiry = $(form).find('input[name="card[expiry]"]').val();
-        $(form).find("input[name='card[expiry_month]']").val(expiry.substr(0,2));   
-        $(form).find("input[name='card[expiry_year]']").val(expiry.replace(/[ \/]/g,'').substr(2));
-        //strip all spaces and backslashes, and then cut off first two digits (month);
+
+        var expiry = this.breakExpiry($(form).find('input[name="card[expiry]"]').val());
+        $(form).find("input[name='card[expiry_month]']").val(expiry.month);
+        $(form).find("input[name='card[expiry_year]']").val(expiry.year);
 
         var data = $(form).serialize();
+
         var errors = this.postValidate($(form));
         if(errors.length > 0){//If we have more than one errors
 
@@ -145,6 +154,7 @@
             $('.error_box').html('');
         }
         var that = this;
+
         $.getJSON(this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
                 $('.error_box').html('<li>There was an error in handling your request</li>');
