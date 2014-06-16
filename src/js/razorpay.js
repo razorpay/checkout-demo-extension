@@ -118,18 +118,15 @@
     };
 
     Razorpay.prototype.formsubmit = function(form){
-        var merchantKey = $(form).find('input[name="key"]').val();
+        var merchantKey = this.options.key;
         var expiry = $(form).find('input[name="card[expiry]"]').val();
-        $(form).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
-        $(form).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.replace(/[ \/]/g,'').substr(2)+"'>");
+        $(form).find("input[name='card[expiry_month]']").val(expiry.substr(0,2));   
+        $(form).find("input[name='card[expiry_year]']").val(expiry.replace(/[ \/]/g,'').substr(2));
         //strip all spaces and backslashes, and then cut off first two digits (month);
 
         var data = $(form).serialize();
         var errors = this.postValidate($(form));
         if(errors.length > 0){//If we have more than one errors
-            //Cleanup a bit
-            $(form).find("input[name='card[expiry_month]']").remove();
-            $(form).find("input[name='card[expiry_year]']").remove();
 
             //Shake the modal window
             $('div.modal').addClass('shake');
@@ -147,7 +144,6 @@
             //Cleanup errors created by any previous attempts
             $('.error_box').html('');
         }
-        $(form).find('input[name="expiry"]').remove();//Remove the singly expiry field
         var that = this;
         $.getJSON(this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){

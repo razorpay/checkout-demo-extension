@@ -14,8 +14,9 @@
     <hr>
     <form class="body" method="POST">
     	<input type="hidden" name="amount" value="${amount}">
-        <input type="hidden" name="key" value="${key}">
         <input type="hidden" name="currency" value="INR">
+        <input type="hidden" name="card[expiry_month]">
+        <input type="hidden" name="card[expiry_year]">
     	<input name="card[name]" placeholder="Name" required>
     	<input name="udf[email]" type="email" placeholder="Email Address" required>
         <input name="udf[contact]" type="tel" placeholder="Contact Number" required>
