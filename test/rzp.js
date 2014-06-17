@@ -65,12 +65,13 @@ describe("Razorpay", function() {
         rzp.configure(options);//This will continue to use the default handler
         
         rzp.open(); //Show the modal
-        expect($('.modal')).toBeVisible();
+        expect(rzp.$el).toBeVisible();
 
-        $('form.body').find('input').removeAttr('required'); //This is so that chrome does not freak out about "required" attibutes
+        rzp.$el.find('input').removeAttr('required'); //This is so that chrome does not freak out about "required" attibutes
 
-        $('.submit').click();
-        expect($('.error_box li')).toHaveLength(16);
+        rzp.$el.find('.submit').click();
+
+        expect(rzp.$el.find('.error_box li')).toHaveLength(16);
     });
 
     it("should accept arguments to .open and use them", function(){
@@ -82,38 +83,35 @@ describe("Razorpay", function() {
         rzp.open({
             prefill:prefillOptions
         });
-        var $form = $('form.body');
-        expect($form.find('input[name="card[name]"]')).toHaveValue(prefillOptions.name);
-        expect($form.find('input[name="udf[contact]"]')).toHaveValue(prefillOptions.contact);
-        expect($form.find('input[name="udf[email]"]')).toHaveValue(prefillOptions.email);
+        var $form = rzp.$el.find('form.body');
+        expect($form.find(rzp.fieldNames.name)).toHaveValue(prefillOptions.name);
+        expect($form.find(rzp.fieldNames.contact)).toHaveValue(prefillOptions.contact);
+        expect($form.find(rzp.fieldNames.email)).toHaveValue(prefillOptions.email);
     });
 
     it("should show no errors after filling the form", function(){
-        var $form = $('form.body');
+        var $form = rzp.$el.find('form.body');
         //We are using a CC here, so as to avoid having to press the button inside the iframe (3d secure)
-        $form.find('input[name="card[number]"]').val('4012001038443335');
-        $form.find('input[name="card[expiry_month]"]').val('05');
-        $form.find('input[name="card[expiry_year]"]').val('19');
-        $form.find('input[name="card[cvv]"]').val('888');
+        $form.find(rzp.fieldNames.number).val('4012001038443335');
+        $form.find(rzp.fieldNames.expiryMonth).val('05');
+        $form.find(rzp.fieldNames.expiryYear).val('19');
+        $form.find(rzp.fieldNames.cvv).val('888');
         var errors = rzp.postValidate($form);
         expect(errors).toEqual([]);
     });
 
     it("should call the handler function after its done", function(done){
-        var $form = $('form.body');
+        var $form = rzp.$el.find('form.body');
         //We manually set the expiry here because we are testing user-click based form submission, which uses expiry and breaks it down into two fields
-        $form.find('input[name="card[expiry]"]').val('05 / 19');
-        $('.submit').click();
+        $form.find(rzp.fieldNames.expiry).val('05 / 19');
+
         //Add handler to rzp
         rzp.options.handler = function(transaction){
             expect(transaction.status).toEqual('auth');
             expect(transaction.amount).toEqual(options.amount);
             done();
         };
-        expect($('.error_box')).toContainHtml('');//there should be no errors
-    });
-    it("should hide the modal after successfull transaction", function(){
-
-        //expect(rzp.$modal).toBeHidden();
+        rzp.$el.find('.submit').click();
+        expect(rzp.$el.find('.error_box')).toContainHtml('');//there should be no errors
     });
 });

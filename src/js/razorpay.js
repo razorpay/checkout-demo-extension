@@ -7,8 +7,7 @@
         return scripts[scripts.length - 1];
     })();
 
-    var center = function(selector) {
-        var $el = $(selector);
+    var center = function($el) {
         $el.css("position","absolute");
         $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
         $el.css("left", ( $(window).width() - $el.width() ) / 2 + "px");
@@ -19,17 +18,28 @@
     };
 
     var Razorpay = function(){
-        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
+        $('<div class="ow-overlay ow-closed"></div>').appendTo("body");
+    };
+
+    Razorpay.prototype.fieldNames = {
+        number : 'input[name="card[number]"]',
+        expiry : 'input[name="card[expiry]"]',
+        cvv: 'input[name="card[cvv]"]',
+        name: 'input[name="card[name]"]',
+        email: 'input[name="udf[email]"]',
+        contact: 'input[name="udf[contact]"]',
+        expiryMonth: 'input[name="card[expiry_month]"]',
+        expiryYear: 'input[name="card[expiry_year]"]'
     };
 
     Razorpay.prototype.preValidate = function($form){
         //Card Number
-        $form.find('input[name="card[number]"]').payment('formatCardNumber');
-        $form.find('input[name="card[expiry]"]').payment('formatCardExpiry');
-        $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
+        $form.find(this.fieldNames.number).payment('formatCardNumber');
+        $form.find(this.fieldNames.expiry).payment('formatCardExpiry');
+        $form.find(this.fieldNames.cvv).payment('formatCardCVC');
 
         //Attach a focusout handler to show card type
-        $form.find('input[name="card[number]"]').off('focusout').focusout(function(){
+        $form.find(this.fieldNames.number).off('focusout').focusout(function(){
             var cardType = $.payment.cardType(this.value);
             if(cardType!=null){
                 $form.find('.card_image').addClass(cardType);
@@ -39,76 +49,78 @@
 
     Razorpay.prototype.postValidate = function($form){
         $form.find('input').removeClass('invalid');
-        var cardNumber = $form.find('input[name="card[number]"]').val();
-        var expiryMonth = $form.find('input[name="card[expiry_month]"]').val();
-        var expiryYear = $form.find('input[name="card[expiry_year]"]').val();
-        var cvc = $form.find('input[name="card[cvv]"]').val();
-        var name = $form.find('input[name="card[name]"]').val();
-        var email = $form.find('input[name="udf[email]"]').val();
-        var contact = $form.find('input[name="udf[contact]"]').val();
+        var cardNumber = $form.find(this.fieldNames.number).val();
+        var expiryMonth = $form.find(this.fieldNames.expiryMonth).val();
+        var expiryYear = $form.find(this.fieldNames.expiryYear).val();
+        var cvv = $form.find(this.fieldNames.cvv).val();
+        var name = $form.find(this.fieldNames.name).val();
+        var email = $form.find(this.fieldNames.email).val();
+        var contact = $form.find(this.fieldNames.contact).val();
 
         var errors = [];
 
         if(name === ''){
-            $form.find('input[name="card[name]"]').addClass('invalid');
+            $form.find(this.fieldNames.name).addClass('invalid');
             errors.push('Missing Name');
         }
         if(name.length>100){
-            $form.find('input[name="card[name]"]').addClass('invalid');
+            $form.find(this.fieldNames.name).addClass('invalid');
             errors.push('Maximum name length is 100');
         }
         if(email === ''){
-            $form.find('input[name="udf[email]"]').addClass('invalid');
+            $form.find(this.fieldNames.email).addClass('invalid');
             errors.push('Missing email address');
         }
         if(email.length>250){
-            $form.find('input[name="udf[email]"]').addClass('invalid');
+            $form.find(this.fieldNames.email).addClass('invalid');
             errors.push('Maximum email length is 250');
         }
         if(contact === ''){
-            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('invalid');
             errors.push('Missing contact number');
         }
         if(contact.length>12 || contact.length<8){
-            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('invalid');
             errors.push('Contact number should be between 8 and 12 digits long');
         }
         if(!/^\d+$/.test(contact)){
-            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('invalid');
             errors.push('Contact number should be made of entirely digits');
         }
         if(!$.payment.validateCardNumber(cardNumber)){
-            $form.find('input[name="card[number]"]').addClass('invalid');
+            $form.find(this.fieldNames.number).addClass('invalid');
             errors.push('Invalid Credit Card Number');
         }
         if(!$.payment.validateCardExpiry(expiryMonth, expiryYear)){
-            $form.find('input[name="card[expiry]"]').addClass('invalid');
+            $form.find(this.fieldNames.expiry).addClass('invalid');
             errors.push('Invalid Expiry Date');
         }
-        if(!$.payment.validateCardCVC(cvc)){
-            $form.find('input[name="card[cvv]"]').addClass('invalid');
+        if(!$.payment.validateCardCVC(cvv)){
+            $form.find(this.fieldNames.cvv).addClass('invalid');
             errors.push('Invalid CVV Number');
         }
         return errors;
     };
 
     Razorpay.prototype.clearSubmission = function(){
-        $('form.body .submit').removeAttr('disabled');
-        $('div.modal').data('busy', false);
+        this.$el.find('.submit').removeAttr('disabled');
+        this.$el.data('busy', false);
     };
 
     Razorpay.prototype.createlightBox = function(template){
+        this.options.id = (Math.random()).toString(36).replace(/[^a-z]+/g, '');
         var html = $.tmpl(template, this.options);
         html.appendTo('body');
-        this.preValidate($('form.body'));
+        this.$el = $('#'+this.options.id);
+        this.preValidate(this.$el.find('form.body'));
         var that = this;
-        $('form.body').submit(function(e){
+        this.$el.find('form').submit(function(e){
             //Handles the form submission
             var submission  = that.formsubmit(this);//submission stores whether we are submitting the form or not
             if(submission){
-                $('form.body .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                that.$el.find('.submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
                 //Marks the modal window as busy so it is not closable
-                $('div.modal').data('busy', true);
+                that.$el.data('busy', true);
             }
             else{
                 that.clearSubmission();
@@ -127,54 +139,55 @@
     };
     Razorpay.prototype.formsubmit = function(form){
         var merchantKey = this.options.key;
+        var $form = $(form);
+        var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
+        $form.find(this.fieldNames.expiryMonth).val(expiry.month);
+        $form.find(this.fieldNames.expiryYear).val(expiry.year);
 
-        var expiry = this.breakExpiry($(form).find('input[name="card[expiry]"]').val());
-        $(form).find("input[name='card[expiry_month]']").val(expiry.month);
-        $(form).find("input[name='card[expiry_year]']").val(expiry.year);
+        var data = $form.serialize();
 
-        var data = $(form).serialize();
-
-        var errors = this.postValidate($(form));
+        var errors = this.postValidate($form);
+        var that = this;
         if(errors.length > 0){//If we have more than one errors
 
             //Shake the modal window
-            $('div.modal').addClass('shake');
-            window.setTimeout(function(){$('div.modal').removeClass("shake");}, 150);
+            this.$el.addClass('shake');
+            
+            window.setTimeout(function(){that.$el.removeClass("shake");}, 150);
 
             var template = '{{each err}}\
                     <li>${$value}<li>\
                 {{/each}}';
             var div = document.createElement('div');
             $.tmpl(template,{err:errors}).appendTo(div);
-            $('.error_box').html(div.innerHTML);
+            this.$el.find('.error_box').html(div.innerHTML);
             return false;
         }
         else{
             //Cleanup errors created by any previous attempts
-            $('.error_box').html('');
+            this.$el.find('.error_box').html('');
         }
-        var that = this;
 
         $.getJSON(this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp?callback=?', data, function(response){
             if(response.exception){
-                $('.error_box').html('<li>There was an error in handling your request</li>');
+                that.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
                 that.clearSubmission();
             }
             else if(response.error){
                 var message = response.error.message || 'There was an error in handling your request';
-                $('.error_box').html('<li>'+message+'</li>');
+                that.$el.find('.error_box').html('<li>'+message+'</li>');
                 that.clearSubmission();
             }
             else if(response.callbackUrl){
-                $('div.modal').html('<iframe></iframe>');
+                that.$el.html('<iframe></iframe>');
                 var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
                 var div = document.createElement('div');
                 $.tmpl(autosubmitformTemplate, response).appendTo(div);
-                $('div.modal iframe').get()[0].contentWindow.document.write(div.innerHTML);
+                that.$el.find('iframe').get(0).contentWindow.document.write(div.innerHTML);
                 //This form should autosubmit
                 //Now we need to resize the modal box so as to accomodate 3dsecure.
-                $('div.modal, div.modal iframe').width('1000px').height('500px');
-                center('div.modal');
+                $(that.$el, that.$el.find('iframe')).width('1000px').height('500px');
+                center(that.$el);
                 /* global XD */
                 XD.receiveMessage(function(message){
                     that.hide();
@@ -237,7 +250,7 @@
         .appendTo('body');
     };
     Razorpay.prototype.updateData = function(data){
-        var $form = $('form.body');
+        var $form = this.$el.find('form.body');
         if(data.name){
             $form.find('input[name="card[name]"]').val(data.name);
         }
@@ -253,7 +266,7 @@
         if(this.options.prefill){
             this.updateData(this.options.prefill);
         }
-        this.$modal = $('div.modal').omniWindow();
+        this.$modal = this.$el.omniWindow();
         this.$modal.trigger('show');
     };
     Razorpay.prototype.configure = function(options){
@@ -270,5 +283,4 @@
         rzp.addButton();//We leave this unstyled
     }
     window['Razorpay'] = Razorpay;
-
 })();
