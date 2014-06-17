@@ -42,7 +42,6 @@ describe("Razorpay", function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 
     var options = {
-        'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f',
         'amount':'20',
         'name':'Google',
         'description':'Google Glass',
@@ -62,7 +61,12 @@ describe("Razorpay", function() {
 
     it('configure should work', function(){
 
-        rzp.configure(options);//This will continue to use the default handler
+        //should throw an error for missing key
+        expect(function(){rzp.configure(options);}).toThrow(new Error("No merchant key specified"));
+
+        options.key = 'd9c6bf091a1a64cb5678d8c1d5e7360f';
+        
+        rzp.configure(options);
         
         rzp.open(); //Show the modal
         expect(rzp.$el).toBeVisible();

@@ -251,6 +251,7 @@
     };
     Razorpay.prototype.updateData = function(data){
         var $form = this.$el.find('form.body');
+        //The only three whitelisted fields we support for prefilling
         if(data.name){
             $form.find('input[name="card[name]"]').val(data.name);
         }
@@ -270,6 +271,9 @@
         this.$modal.trigger('show');
     };
     Razorpay.prototype.configure = function(options){
+        if(typeof options.key === "undefined"){
+            throw new Error("No merchant key specified");
+        }
         $.extend(this.options, options);
         //These options will be used in creating the lightbox
         this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
