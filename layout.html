@@ -31,7 +31,7 @@
                 console.log(transaction);
             },
             'protocol': 'http',
-            'hostname': 'razorpay.api.dev'
+            'hostname': 'api.razorpay.dev'
         }
         var rzp1 = new Razorpay(options);
 
@@ -49,7 +49,7 @@
             console.log(transaction);
         };
         var rzp2 = new Razorpay(options);
-        
+
         $('#rzp-button2').click(function(e){
             rzp2.open();
             e.preventDefault();

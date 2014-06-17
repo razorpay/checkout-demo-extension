@@ -189,7 +189,8 @@
                 that.$el.find('iframe').get(0).contentWindow.document.write(div.innerHTML);
                 //This form should autosubmit
                 //Now we need to resize the modal box so as to accomodate 3dsecure.
-                $(that.$el, that.$el.find('iframe')).width('1000px').height('500px');
+                $(that.$el).width('1000px').height('500px');
+                $(that.$el.find('iframe')).width('1000px').height('500px');
                 center(that.$el);
                 /* global XD */
                 XD.receiveMessage(function(message){
