@@ -7,6 +7,9 @@
         return scripts[scripts.length - 1];
     })();
 
+    var init = function(){
+        $('<div class="ow-overlay ow-closed"></div>').appendTo("html");
+    };
     var center = function($el) {
         $el.css("position","absolute");
         $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
@@ -17,8 +20,8 @@
         return this;
     };
 
-    var Razorpay = function(){
-        $('<div class="ow-overlay ow-closed"></div>').appendTo("body");
+    var Razorpay = function(options){
+        this.configure(options);
     };
 
     Razorpay.prototype.fieldNames = {
@@ -271,7 +274,7 @@
         this.$modal.trigger('show');
     };
     Razorpay.prototype.configure = function(options){
-        if(typeof options.key === "undefined"){
+        if(typeof options['key'] === "undefined"){
             throw new Error("No merchant key specified");
         }
         $.extend(this.options, options);
@@ -279,12 +282,14 @@
         this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
     };
     
-    var key = $(RazorPayScript).data('key');
-    if(key && key.length>0){
-        //If we have a key set, that means we are in auto mode and need to display the button automatically
-        var rzp = new Razorpay();
-        rzp.configure($(RazorPayScript).data());
-        rzp.addButton();//We leave this unstyled
-    }
-    window['Razorpay'] = Razorpay;
+    (function(){
+        var key = $(RazorPayScript).data('key');
+        if(key && key.length>0){
+            //If we have a key set, that means we are in auto mode and need to display the button automatically
+            var rzp = new Razorpay($(RazorPayScript).data());
+            rzp.addButton();//We leave this unstyled
+        }
+        window['Razorpay'] = Razorpay;
+        init();
+    })();
 })();

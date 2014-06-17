@@ -20,8 +20,7 @@
     <button class="btn" id="rzp-button1">Tron Legacy</button>
     <button class="btn" id="rzp-button2">Alive (2007)</button>
     <script>
-        var rzp1 = new Razorpay();
-        rzp1.configure({
+        var options = {
             'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f',
             'amount':'20',
             'name':'Daft Punk',
@@ -30,28 +29,27 @@
             'handler': function (transaction){
                 console.log("transaction 1 succeeded");
                 console.log(transaction);
-            }
-        });
-        rzp1.setEndpoint('http','api.razorpay.dev');
+            },
+            'protocol': 'http',
+            'hostname': 'razorpay.api.dev'
+        }
+        var rzp1 = new Razorpay(options);
+
         $('#rzp-button1').click(function(e){
             rzp1.open();
             e.preventDefault();
         });
 
 
-        var rzp2 = new Razorpay();
-        rzp2.configure({
-            'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f',
-            'amount':'200',
-            'name':'Daft Punk',
-            'description':'Alive (2007)',
-            'image':'https://i.imgur.com/GXalrU0.png',
-            'handler': function (transaction){
-                console.log("transaction 2 finished");
-                console.log(transaction);
-            }
-        });
-        rzp2.setEndpoint('http','api.razorpay.dev');
+        options.amount = 200;
+        options.description = 'Alive (2007)';
+        options.image = 'https://i.imgur.com/GXalrU0.png';
+        options.handler = function (transaction){
+            console.log("transaction 2 finished");
+            console.log(transaction);
+        };
+        var rzp2 = new Razorpay(options);
+        
         $('#rzp-button2').click(function(e){
             rzp2.open();
             e.preventDefault();
