@@ -37,7 +37,10 @@
 .merchant_image{
   margin:5px 0px 0px 5px;
   float:left;
-  width:60px;
+}
+.merchant_image img{
+  max-width:60px;
+  max-height: 40px;
 }
 .merchant_name{
   margin:0 auto;
