@@ -284,7 +284,7 @@
         }
     };
     Razorpay.prototype.open = function(options){
-        $.extend(this.options, options);
+        this.options = $.extend({}, this.options, options);
         if(this.options.prefill){
             this.updateData(this.options.prefill);
         }
@@ -295,7 +295,7 @@
         if(typeof options['key'] === "undefined"){
             throw new Error("No merchant key specified");
         }
-        $.extend(this.options, options);
+        this.options = $.extend({}, this.options, options);
         //These options will be used in creating the lightbox
         this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
     };

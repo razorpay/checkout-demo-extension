@@ -40,15 +40,17 @@
             e.preventDefault();
         });
 
-
-        options.amount = 200;
-        options.description = 'Alive (2007)';
-        options.image = 'https://i.imgur.com/GXalrU0.png';
-        options.handler = function (transaction){
-            console.log("transaction 2 finished");
-            console.log(transaction);
-        };
-        var rzp2 = new Razorpay(options);
+        var options2 = $.extend({}, options,{
+            amount : 200,
+            description : 'Alive (2007)',
+            image : 'https://i.imgur.com/GXalrU0.png',
+            handler : function (transaction){
+                console.log(this);
+                console.log("transaction 2 finished");
+                console.log(transaction);
+            }
+        });
+        var rzp2 = new Razorpay(options2);
 
         $('#rzp-button2').click(function(e){
             rzp2.open();

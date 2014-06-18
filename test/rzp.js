@@ -149,7 +149,7 @@ describe("Razorpay", function() {
         });
         rzp.open({
             prefill:prefillOptions,
-            handler: function(transaction){
+            handler: function(){
                 done();
             }
         });
