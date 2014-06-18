@@ -1,4 +1,4 @@
-/* global describe, it, Razorpay, expect, endpoint, jasmine, afterEach, beforeEach */
+/* global describe, it, Razorpay, expect, endpoint, jasmine, afterEach, beforeEach, spyOn */
 "use strict";
 
 describe("breakExpiry", function(){
@@ -51,7 +51,6 @@ describe("overlay", function(){
 
 describe("Razorpay", function() {
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
     var rzp;
     var options = {
         'amount':'20',
@@ -130,26 +129,31 @@ describe("Razorpay", function() {
         var errors = rzp.postValidate($form);
         expect(errors).toEqual([]);
     });
-
+    
     it("should call the handler function after its done", function(done){
         var $form = rzp.$el.find('form.body');
 
         $form.find(rzp.fieldNames.number).val('4012001038443335');
         $form.find(rzp.fieldNames.cvv).val('888');
+        //We manually set the expiry here because we are testing user-click based form submission, which uses expiry and breaks it down into two fields
         $form.find(rzp.fieldNames.expiry).val('05 / 19');
+
+        //Fake ajax call
+        //@link http://www.htmlgoodies.com/html5/javascript/testing-ajax-event-handlers-using-jasmine-spies.html
+        spyOn($, "ajax").and.callFake(function(options){
+            //We make sure that the context for the success request is set to the context passed to $.ajax (rzp object)
+            var ajaxSuccess = $.proxy(options.success, options.context);
+            ajaxSuccess({
+                "id":"e6091ef0f6d911e398770090f5fbf011"
+            });
+        });
         rzp.open({
             prefill:prefillOptions,
             handler: function(transaction){
-                expect(transaction.status).toEqual('auth');
-                expect(transaction.amount).toEqual(options.amount);
                 done();
             }
         });
-
-        //We manually set the expiry here because we are testing user-click based form submission, which uses expiry and breaks it down into two fields
         
-
         rzp.$el.find('.submit').click();
-        expect(rzp.$el.find('.error_box', 0)).toContainHtml('');//there should be no errors
     });
 });

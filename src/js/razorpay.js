@@ -171,39 +171,55 @@
             this.$el.find('.error_box').html('');
         }
 
-        $.getJSON(this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp?callback=?', data, function(response){
-            if(response.exception){
-                that.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
-                that.clearSubmission();
-            }
-            else if(response.error){
-                var message = response.error.message || 'There was an error in handling your request';
-                that.$el.find('.error_box').html('<li>'+message+'</li>');
-                that.clearSubmission();
-            }
-            else if(response.callbackUrl){
-                that.$el.html('<iframe></iframe>');
-                var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
-                var div = document.createElement('div');
-                $.tmpl(autosubmitformTemplate, response).appendTo(div);
-                that.$el.find('iframe').get(0).contentWindow.document.write(div.innerHTML);
-                //This form should autosubmit
-                //Now we need to resize the modal box so as to accomodate 3dsecure.
-                $(that.$el).width('1000px').height('500px');
-                $(that.$el.find('iframe')).width('1000px').height('500px');
-                center(that.$el);
-                /* global XD */
-                XD.receiveMessage(function(message){
-                    that.hide();
-                    that.options.handler(message.data);
-                });
-            }
-            else{
-                that.hide();
-                that.options.handler(response);
-            }
+        $.ajax({
+            url: this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp',
+            dataType: 'jsonp',
+            context: this,
+            success: this.handleAjaxResponse,
+            timeout: 35000,//35 seconds = 30s for gateway + 5s for razorpay
+            error: this.handleAjaxError,
+            data: data
         });
         return true;
+    };
+
+    Razorpay.prototype.handleAjaxError = function(){
+        this.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
+        this.clearSubmission();
+    };
+
+    Razorpay.prototype.handleAjaxResponse = function(response){
+        if(response.exception){
+            this.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
+            this.clearSubmission();
+        }
+        else if(response.error){
+            var message = response.error.message || 'There was an error in handling your request';
+            this.$el.find('.error_box').html('<li>'+message+'</li>');
+            this.clearSubmission();
+        }
+        else if(response.callbackUrl){
+            this.$el.html('<iframe></iframe>');
+            var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
+            var div = document.createElement('div');
+            $.tmpl(autosubmitformTemplate, response).appendTo(div);
+            this.$el.find('iframe').get(0).contentWindow.document.write(div.innerHTML);
+            //This form should autosubmit
+            //Now we need to resize the modal box so as to accomodate 3dsecure.
+            $(this.$el).width('1000px').height('500px');
+            $(this.$el.find('iframe')).width('1000px').height('500px');
+            center(this.$el);
+            var that = this;
+            /* global XD */
+            XD.receiveMessage(function(message){
+                that.hide();
+                that.options.handler(message.data);
+            });
+        }
+        else{
+            this.hide();
+            this.options.handler(response);
+        }
     };
 
     Razorpay.prototype.hide = function(){
@@ -215,6 +231,7 @@
         protocol: 'https',
         hostname: 'api.razorpay.com'
     };//We can specify any default options here
+
     //default handler for success
     //default handler does not care about error or success messages, it just submits everything via the form
     Razorpay.prototype.options.handler = function(data){
