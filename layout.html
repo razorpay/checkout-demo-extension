@@ -28,7 +28,6 @@
             'image':'https://i.imgur.com/3g7nmJC.png',
             'handler': function (transaction){
                 console.log("transaction 1 succeeded");
-                console.log(transaction);
             },
             'protocol': 'http',
             'hostname': 'api.razorpay.dev'
@@ -40,18 +39,20 @@
             e.preventDefault();
         });
 
-        var options2 = $.extend({}, options,{
+        var options2 = {
+            key: 'd9c6bf091a1a64cb5678d8c1d5e7360f',
             amount : 200,
+            name:'Daft Punk',
             description : 'Alive (2007)',
             image : 'https://i.imgur.com/GXalrU0.png',
             handler : function (transaction){
-                console.log(this);
                 console.log("transaction 2 finished");
-                console.log(transaction);
             }
-        });
-        var rzp2 = new Razorpay(options2);
+        };
 
+        var rzp2 = new Razorpay(options2);
+        rzp2.setEndpoint('http','api.razorpay.dev');
+        
         $('#rzp-button2').click(function(e){
             rzp2.open();
             e.preventDefault();

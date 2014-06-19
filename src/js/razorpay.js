@@ -24,6 +24,17 @@
         this.configure(options);
     };
 
+    /** This function is passed an rzp instance and it is saved in Razorpay **/
+    Razorpay.prototype.setXDInstance = function(){
+        Razorpay.lastXDInstance = this;
+    };
+
+    Razorpay.XDCallback = function(message){
+        var rzp = Razorpay.lastXDInstance;
+        rzp.hide();
+        rzp.options.handler(message.data);
+    };
+
     Razorpay.prototype.fieldNames = {
         number : 'input[name="card[number]"]',
         expiry : 'input[name="card[expiry]"]',
@@ -209,12 +220,8 @@
             $(this.$el).width('1000px').height('500px');
             $(this.$el.find('iframe')).width('1000px').height('500px');
             center(this.$el);
-            var that = this;
-            /* global XD */
-            XD.receiveMessage(function(message){
-                that.hide();
-                that.options.handler(message.data);
-            });
+            //Make this instance of rzp the instance called by the XDCallback
+            this.setXDInstance();
         }
         else{
             this.hide();
@@ -301,13 +308,19 @@
     };
     
     (function(){
+
         var key = $(RazorPayScript).data('key');
         if(key && key.length>0){
             //If we have a key set, that means we are in auto mode and need to display the button automatically
             var rzp = new Razorpay($(RazorPayScript).data());
             rzp.addButton();//We leave this unstyled
         }
+
         window['Razorpay'] = Razorpay;
         init();
+
     })();
+
+    /* global XD */
+    XD.receiveMessage(Razorpay.XDCallback);
 })();
