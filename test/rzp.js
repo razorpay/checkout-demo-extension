@@ -130,12 +130,6 @@ describe("Razorpay", function() {
     });
     
     it("should call the handler function after its done", function(done){
-        var $form = rzp.$el.find('.rzp-body');
-
-        $form.find(rzp.fieldNames.number).val('4012001038443335');
-        $form.find(rzp.fieldNames.cvv).val('888');
-        //We manually set the expiry here because we are testing user-click based form submission, which uses expiry and breaks it down into two fields
-        $form.find(rzp.fieldNames.expiry).val('05 / 19');
 
         //Fake ajax call
         //@link http://www.htmlgoodies.com/html5/javascript/testing-ajax-event-handlers-using-jasmine-spies.html
@@ -146,12 +140,20 @@ describe("Razorpay", function() {
                 "id":"e6091ef0f6d911e398770090f5fbf011"
             });
         });
+
         rzp.open({
             prefill:prefillOptions,
             handler: function(){
                 done();
             }
         });
+        
+        var $form = rzp.$el.find('.rzp-body');
+
+        $form.find(rzp.fieldNames.number).val('4012001038443335');
+        $form.find(rzp.fieldNames.cvv).val('888');
+        //We manually set the expiry here because we are testing user-click based form submission, which uses expiry and breaks it down into two fields
+        $form.find(rzp.fieldNames.expiry).val('05 / 19');
         
         rzp.$el.find('.rzp-submit').click();
     });

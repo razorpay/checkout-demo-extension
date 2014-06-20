@@ -16,9 +16,9 @@
         <input type="hidden" name="currency" value="INR">
         <input type="hidden" name="card[expiry_month]">
         <input type="hidden" name="card[expiry_year]">
-    	<input name="card[name]" placeholder="Name" required>
-    	<input name="udf[email]" type="email" placeholder="Email Address" required>
-        <input name="udf[contact]" type="tel" placeholder="Contact Number" required>
+    	<input name="card[name]" placeholder="Name" required value="${prefill.name}">
+    	<input name="udf[email]" type="email" placeholder="Email Address" required value="${prefill.email}">
+        <input name="udf[contact]" type="tel" placeholder="Contact Number" required value="${prefill.contact}">
     	<div class="rzp-card">
     		<input name="card[number]" class="card_number" placeholder="Card Number" required>
             <span class="rzp-card_image"></span>

@@ -240,7 +240,12 @@
 
     Razorpay.prototype.options = {
         protocol: 'https',
-        hostname: 'api.razorpay.com'
+        hostname: 'api.razorpay.com',
+        prefill: {
+            name: "",
+            contact: "",
+            email: ""
+        }
     };//We can specify any default options here
 
     /** This function is called just before control is passed on to the handler specified in options */
@@ -288,19 +293,7 @@
         }).html('Pay with Card')
         .appendTo('body');
     };
-    Razorpay.prototype.updateData = function(data){
-        var $form = this.$el.find('form.rzp-body');
-        //The only three whitelisted fields we support for prefilling
-        if(data.name){
-            $form.find(this.fieldNames.name).val(data.name);
-        }
-        if(data.contact){
-            $form.find(this.fieldNames.contact).val(data.contact);
-        }
-        if(data.email){
-            $form.find(this.fieldNames.email).val(data.email);
-        }
-    };
+
     Razorpay.prototype.validateOptions = function(){
         if(typeof this.options.amount === 'undefined'){
             throw new Error("No amount specified");
@@ -320,9 +313,7 @@
     };
     Razorpay.prototype.open = function(options){
         this.options = $.extend({}, this.options, options);
-        if(this.options.prefill){
-            this.updateData(this.options.prefill);
-        }
+        this.createlightBox(templates['templates/modal.tmpl']);
         this.$modal = this.$el.omniWindow();
         this.$modal.trigger('show');
         center(this.$el);
@@ -335,8 +326,6 @@
             throw new Error("No merchant key specified");
         }
         this.options = $.extend({}, this.options, options);
-        //These options will be used in creating the lightbox
-        this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
     };
     
     (function(){
