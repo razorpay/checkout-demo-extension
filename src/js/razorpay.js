@@ -7,8 +7,10 @@
         return scripts[scripts.length - 1];
     })();
 
-    var center = function(selector) {
-        var $el = $(selector);
+    var init = function(){
+        $('<div class="ow-overlay ow-closed"></div>').appendTo("html");
+    };
+    var center = function($el) {
         $el.css("position","absolute");
         $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
         $el.css("left", ( $(window).width() - $el.width() ) / 2 + "px");
@@ -18,18 +20,40 @@
         return this;
     };
 
-    var Razorpay = function(){
-        $('<div class="ow-overlay ow-closed"></div> ').appendTo("body");
+    var Razorpay = function(options){
+        this.configure(options);
+    };
+
+    /** This function is passed an rzp instance and it is saved in Razorpay **/
+    Razorpay.prototype.setXDInstance = function(){
+        Razorpay.lastXDInstance = this;
+    };
+
+    Razorpay.XDCallback = function(message){
+        var rzp = Razorpay.lastXDInstance;
+        rzp.preHandler();
+        rzp.options.handler(message.data);
+    };
+
+    Razorpay.prototype.fieldNames = {
+        number : 'input[name="card[number]"]',
+        expiry : 'input[name="card[expiry]"]',
+        cvv: 'input[name="card[cvv]"]',
+        name: 'input[name="card[name]"]',
+        email: 'input[name="udf[email]"]',
+        contact: 'input[name="udf[contact]"]',
+        expiryMonth: 'input[name="card[expiry_month]"]',
+        expiryYear: 'input[name="card[expiry_year]"]'
     };
 
     Razorpay.prototype.preValidate = function($form){
         //Card Number
-        $form.find('input[name="card[number]"]').payment('formatCardNumber');
-        $form.find('input[name="card[expiry]"]').payment('formatCardExpiry');
-        $form.find('input[name="card[cvv]"]').payment('formatCardCVC');
+        $form.find(this.fieldNames.number).payment('formatCardNumber');
+        $form.find(this.fieldNames.expiry).payment('formatCardExpiry');
+        $form.find(this.fieldNames.cvv).payment('formatCardCVC');
 
         //Attach a focusout handler to show card type
-        $form.find('input[name="card[number]"]').off('focusout').focusout(function(){
+        $form.find(this.fieldNames.number).off('focusout').focusout(function(){
             var cardType = $.payment.cardType(this.value);
             if(cardType!=null){
                 $form.find('.card_image').addClass(cardType);
@@ -39,158 +63,193 @@
 
     Razorpay.prototype.postValidate = function($form){
         $form.find('input').removeClass('invalid');
-        var cardNumber = $form.find('input[name="card[number]"]').val();
-        var expiryMonth = $form.find('input[name="card[expiry_month]"]').val();
-        var expiryYear = $form.find('input[name="card[expiry_year]"]').val();
-        var cvc = $form.find('input[name="card[cvv]"]').val();
-        var name = $form.find('input[name="card[name]"]').val();
-        var email = $form.find('input[name="udf[email]"]').val();
-        var contact = $form.find('input[name="udf[contact]"]').val();
+        var cardNumber = $form.find(this.fieldNames.number).val();
+        var expiryMonth = $form.find(this.fieldNames.expiryMonth).val();
+        var expiryYear = $form.find(this.fieldNames.expiryYear).val();
+        var cvv = $form.find(this.fieldNames.cvv).val();
+        var name = $form.find(this.fieldNames.name).val();
+        var email = $form.find(this.fieldNames.email).val();
+        var contact = $form.find(this.fieldNames.contact).val();
 
         var errors = [];
 
         if(name === ''){
-            $form.find('input[name="card[name]"]').addClass('invalid');
+            $form.find(this.fieldNames.name).addClass('invalid');
             errors.push('Missing Name');
         }
         if(name.length>100){
-            $form.find('input[name="card[name]"]').addClass('invalid');
+            $form.find(this.fieldNames.name).addClass('invalid');
             errors.push('Maximum name length is 100');
         }
         if(email === ''){
-            $form.find('input[name="udf[email]"]').addClass('invalid');
+            $form.find(this.fieldNames.email).addClass('invalid');
             errors.push('Missing email address');
         }
         if(email.length>250){
-            $form.find('input[name="udf[email]"]').addClass('invalid');
+            $form.find(this.fieldNames.email).addClass('invalid');
             errors.push('Maximum email length is 250');
         }
         if(contact === ''){
-            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('invalid');
             errors.push('Missing contact number');
         }
         if(contact.length>12 || contact.length<8){
-            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('invalid');
             errors.push('Contact number should be between 8 and 12 digits long');
         }
         if(!/^\d+$/.test(contact)){
-            $form.find('input[name="udf[contact]"]').addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('invalid');
             errors.push('Contact number should be made of entirely digits');
         }
         if(!$.payment.validateCardNumber(cardNumber)){
-            $form.find('input[name="card[number]"]').addClass('invalid');
+            $form.find(this.fieldNames.number).addClass('invalid');
             errors.push('Invalid Credit Card Number');
         }
         if(!$.payment.validateCardExpiry(expiryMonth, expiryYear)){
-            $form.find('input[name="card[expiry]"]').addClass('invalid');
+            $form.find(this.fieldNames.expiry).addClass('invalid');
             errors.push('Invalid Expiry Date');
         }
-        if(!$.payment.validateCardCVC(cvc)){
-            $form.find('input[name="card[cvv]"]').addClass('invalid');
+        if(!$.payment.validateCardCVC(cvv)){
+            $form.find(this.fieldNames.cvv).addClass('invalid');
             errors.push('Invalid CVV Number');
         }
         return errors;
     };
 
     Razorpay.prototype.clearSubmission = function(){
-        $('form.body .submit').removeAttr('disabled');
-        $('div.modal').data('busy', false);
+        this.$el.find('.submit').removeAttr('disabled');
+        this.$el.data('busy', false);
     };
 
     Razorpay.prototype.createlightBox = function(template){
+        if(this.options.id){
+            //Lets remove the div first
+            $('#'+this.options.id).remove();
+        }
+        this.options.id = (Math.random()).toString(36).replace(/[^a-z]+/g, '');
         var html = $.tmpl(template, this.options);
         html.appendTo('body');
-        this.preValidate($('form.body'));
-        var that = this;
-        $('form.body').submit(function(e){
+        this.$el = $('#'+this.options.id);
+        this.preValidate(this.$el.find('form.body'));
+        var self = this;
+        this.$el.find('form').submit(function(e){
             //Handles the form submission
-            var submission  = that.formsubmit(this);//submission stores whether we are submitting the form or not
+            var submission  = self.formsubmit(this);//submission stores whether we are submitting the form or not
             if(submission){
-                $('form.body .submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                self.$el.find('.submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
                 //Marks the modal window as busy so it is not closable
-                $('div.modal').data('busy', true);
+                self.$el.data('busy', true);
             }
             else{
-                that.clearSubmission();
+                self.clearSubmission();
             }
             e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
         });
     };
 
+    Razorpay.prototype.breakExpiry = function(expiry){
+        //Returns month, year as a tuple inside an object
+        return {
+            month: expiry.substr(0,2), 
+            //strip all spaces and backslashes, and then cut off first two digits (month);
+            year: expiry.replace(/[ \/]/g,'').substr(2)
+        };
+    };
     Razorpay.prototype.formsubmit = function(form){
-        var merchantKey = $(form).find('input[name="key"]').val();
-        var expiry = $(form).find('input[name="card[expiry]"]').val();
-        $(form).append("<input type='hidden' name='card[expiry_month]' value='"+expiry.substr(0,2)+"'>");
-        $(form).append("<input type='hidden' name='card[expiry_year]' value='"+expiry.replace(/[ \/]/g,'').substr(2)+"'>");
-        //strip all spaces and backslashes, and then cut off first two digits (month);
+        var merchantKey = this.options.key;
+        var $form = $(form);
+        var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
+        $form.find(this.fieldNames.expiryMonth).val(expiry.month);
+        $form.find(this.fieldNames.expiryYear).val(expiry.year);
 
-        var data = $(form).serialize();
-        var errors = this.postValidate($(form));
+        var data = $form.serialize();
+
+        var errors = this.postValidate($form);
+        var self = this;
         if(errors.length > 0){//If we have more than one errors
-            //Cleanup a bit
-            $(form).find("input[name='card[expiry_month]']").remove();
-            $(form).find("input[name='card[expiry_year]']").remove();
 
             //Shake the modal window
-            $('div.modal').addClass('shake');
-            window.setTimeout(function(){$('div.modal').removeClass("shake");}, 150);
+            this.$el.addClass('shake');
+            
+            window.setTimeout(function(){self.$el.removeClass("shake");}, 150);
 
             var template = '{{each err}}\
                     <li>${$value}<li>\
                 {{/each}}';
             var div = document.createElement('div');
             $.tmpl(template,{err:errors}).appendTo(div);
-            $('.error_box').html(div.innerHTML);
+            this.$el.find('.error_box').html(div.innerHTML);
             return false;
         }
         else{
             //Cleanup errors created by any previous attempts
-            $('.error_box').html('');
+            this.$el.find('.error_box').html('');
         }
-        $(form).find('input[name="expiry"]').remove();//Remove the singly expiry field
-        var that = this;
-        $.getJSON(this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp?callback=?', data, function(response){
-            if(response.exception){
-                $('.error_box').html('<li>There was an error in handling your request</li>');
-                that.clearSubmission();
-            }
-            else if(response.error){
-                var message = response.error.message || 'There was an error in handling your request';
-                $('.error_box').html('<li>'+message+'</li>');
-                that.clearSubmission();
-            }
-            else if(response.callbackUrl){
-                $('div.modal').html('<iframe></iframe>');
-                var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
-                var div = document.createElement('div');
-                $.tmpl(autosubmitformTemplate, response).appendTo(div);
-                $('div.modal iframe').get()[0].contentWindow.document.write(div.innerHTML);
-                //This form should autosubmit
-                //Now we need to resize the modal box so as to accomodate 3dsecure.
-                $('div.modal, div.modal iframe').width('1000px').height('500px');
-                center('div.modal');
-                /* global XD */
-                XD.receiveMessage(function(message){
-                    that.hide();
-                    that.options.handler(message.data);
-                });
-            }else{
-                that.hide();
-                that.options.handler(response);
-            }
+
+        $.ajax({
+            url: this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp',
+            dataType: 'jsonp',
+            context: this,
+            success: this.handleAjaxResponse,
+            timeout: 35000,//35 seconds = 30s for gateway + 5s for razorpay
+            error: this.handleAjaxError,
+            data: data
         });
         return true;
     };
 
+    Razorpay.prototype.handleAjaxError = function(){
+        this.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
+        this.clearSubmission();
+    };
+
+    Razorpay.prototype.handleAjaxResponse = function(response){
+        if(response.exception){
+            this.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
+            this.clearSubmission();
+        }
+        else if(response.error){
+            var message = response.error.message || 'There was an error in handling your request';
+            this.$el.find('.error_box').html('<li>'+message+'</li>');
+            this.clearSubmission();
+        }
+        else if(response.callbackUrl){
+            this.$el.html('<iframe></iframe>');
+            var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
+            var div = document.createElement('div');
+            $.tmpl(autosubmitformTemplate, response).appendTo(div);
+            this.$el.find('iframe').get(0).contentWindow.document.write(div.innerHTML);
+            //This form should autosubmit
+            //Now we need to resize the modal box so as to accomodate 3dsecure.
+            $(this.$el).width('1000px').height('500px');
+            $(this.$el.find('iframe')).width('1000px').height('500px');
+            center(this.$el);
+            //Make this instance of rzp the instance called by the XDCallback
+            this.setXDInstance();
+        }
+        else{
+            this.preHandler();
+            this.options.handler(response);
+        }
+    };
+
     Razorpay.prototype.hide = function(){
         this.clearSubmission();
-        this.$modal.trigger('hide');
+        this.$modal.trigger('hide.ow');
     };
 
     Razorpay.prototype.options = {
         protocol: 'https',
         hostname: 'api.razorpay.com'
     };//We can specify any default options here
+
+    /** This function is called just before control is passed on to the handler specified in options */
+    Razorpay.prototype.preHandler = function(){
+        this.hide();//Hide the modal window when the transaction is complete
+        //Prepare the lightBox for re-opening
+        this.createlightBox(templates['templates/modal.tmpl']);
+    };
+
     //default handler for success
     //default handler does not care about error or success messages, it just submits everything via the form
     Razorpay.prototype.options.handler = function(data){
@@ -222,15 +281,16 @@
     Razorpay.prototype.addButton = function(){
         var button = document.createElement('button');
         button.setAttribute('id','rzp-button');
-        var that = this;
+        var self = this;
         $(button).click(function(e){
-            that.open();
+            self.open();
             e.preventDefault();
         }).html('Pay with Card')
         .appendTo('body');
     };
     Razorpay.prototype.updateData = function(data){
-        var $form = $('form.body');
+        var $form = this.$el.find('form.body');
+        //The only three whitelisted fields we support for prefilling
         if(data.name){
             $form.find('input[name="card[name]"]').val(data.name);
         }
@@ -241,27 +301,58 @@
             $form.find('input[name="udf[email]"]').val(data.email);
         }
     };
+    Razorpay.prototype.validateOptions = function(){
+        if(typeof this.options.amount === 'undefined'){
+            throw new Error("No amount specified");
+        }
+        if(this.options.amount < 0){
+            throw new Error("Invalid amount specified");
+        }
+        if(["https", "http"].indexOf(this.options.protocol) < 0){
+            throw new Error("Invalid Protocol specified");
+        }
+        if(!$.isFunction(this.options.handler)){
+            throw new Error("Handler must be a function");
+        }
+        if(typeof this.options.key === 'undefined'){
+            throw new Error("No merchant key specified");
+        }
+    };
     Razorpay.prototype.open = function(options){
-        $.extend(this.options, options);
+        this.options = $.extend({}, this.options, options);
         if(this.options.prefill){
             this.updateData(this.options.prefill);
         }
-        this.$modal = $('div.modal').omniWindow();
+        this.$modal = this.$el.omniWindow();
         this.$modal.trigger('show');
+        center(this.$el);
     };
     Razorpay.prototype.configure = function(options){
-        $.extend(this.options, options);
+        if(typeof options === 'undefined'){
+            throw new Error("No options specified");
+        }
+        if(typeof options['key'] === "undefined"){
+            throw new Error("No merchant key specified");
+        }
+        this.options = $.extend({}, this.options, options);
         //These options will be used in creating the lightbox
         this.createlightBox(templates['templates/modal.tmpl']);//Create the lightbox but don't show it yet
     };
     
-    var key = $(RazorPayScript).data('key');
-    if(key && key.length>0){
-        //If we have a key set, that means we are in auto mode and need to display the button automatically
-        var rzp = new Razorpay();
-        rzp.configure($(RazorPayScript).data());
-        rzp.addButton();//We leave this unstyled
-    }
-    window['Razorpay'] = Razorpay;
+    (function(){
 
+        var key = $(RazorPayScript).data('key');
+        if(key && key.length>0){
+            //If we have a key set, that means we are in auto mode and need to display the button automatically
+            var rzp = new Razorpay($(RazorPayScript).data());
+            rzp.addButton();//We leave this unstyled
+        }
+
+        window['Razorpay'] = Razorpay;
+        init();
+
+    })();
+
+    /* global XD */
+    XD.receiveMessage(Razorpay.XDCallback);
 })();
