@@ -1,37 +1,34 @@
-<div class="modal ow-closed" id="${id}">
-    <div class="header">
-    	<div class="merchant_image">
+<div class="rzp-modal ow-closed" id="${id}">
+    <div class="rzp-header">
+    	<div class="rzp-merchant_image">
     		<img src="${image}">
     	</div>
-        <div class="merchant_powered"></div>
-    	<div class="merchant_name">
+        <div class="rzp-merchant_powered"></div>
+    	<div class="rzp-merchant_name">
     		${name}
             <br>
             ${description}
     	</div>
-    	<div class="clear">
+    	<div class="rzp-clear"></div>
     </div>
-    <hr>
-    <form class="body" method="POST">
+    <form class="rzp-body" method="POST">
     	<input type="hidden" name="amount" value="${amount}">
         <input type="hidden" name="currency" value="INR">
         <input type="hidden" name="card[expiry_month]">
         <input type="hidden" name="card[expiry_year]">
-    	<input name="card[name]" placeholder="Name" required>
-    	<input name="udf[email]" type="email" placeholder="Email Address" required>
-        <input name="udf[contact]" type="tel" placeholder="Contact Number" required>
-    	<div class="card">
+    	<input name="card[name]" placeholder="Name" required value="${prefill.name}">
+    	<input name="udf[email]" type="email" placeholder="Email Address" required value="${prefill.email}">
+        <input name="udf[contact]" type="tel" placeholder="Contact Number" required value="${prefill.contact}">
+    	<div class="rzp-card">
     		<input name="card[number]" class="card_number" placeholder="Card Number" required>
-            <span class="card_image"></span>
+            <span class="rzp-card_image"></span>
     		<input name="card[expiry]" size="2" placeholder="MM / YY" required>
     		<input type="password" name="card[cvv]" size="3" placeholder="CVV" maxlength="4" required>
     	</div>
-        <button class="submit">
-            <span class="ring"></span>
-            <span class="text">Pay ₹${amount}</span>
+        <button class="rzp-submit">
+            <span class="rzp-ring"></span>
+            <span class="rzp-text">Pay ₹${amount}</span>
         </button>
-        <ul class="error_box">
-            
-        </ul>
+        <ul class="rzp-error_box"></ul>
     </div>
 </div>
