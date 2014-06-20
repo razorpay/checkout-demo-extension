@@ -290,6 +290,23 @@
             $form.find('input[name="udf[email]"]').val(data.email);
         }
     };
+    Razorpay.prototype.validateOptions = function(){
+        if(typeof this.options.amount === 'undefined'){
+            throw new Error("No amount specified");
+        }
+        if(this.options.amount < 0){
+            throw new Error("Invalid amount specified");
+        }
+        if(["https", "http"].indexOf(this.options.protocol) < 0){
+            throw new Error("Invalid Protocol specified");
+        }
+        if(!$.isFunction(this.options.handler)){
+            throw new Error("Handler must be a function");
+        }
+        if(typeof this.options.key === 'undefined'){
+            throw new Error("No merchant key specified");
+        }
+    };
     Razorpay.prototype.open = function(options){
         this.options = $.extend({}, this.options, options);
         if(this.options.prefill){
@@ -299,6 +316,9 @@
         this.$modal.trigger('show');
     };
     Razorpay.prototype.configure = function(options){
+        if(typeof options === 'undefined'){
+            throw new Error("No options specified");
+        }
         if(typeof options['key'] === "undefined"){
             throw new Error("No merchant key specified");
         }
