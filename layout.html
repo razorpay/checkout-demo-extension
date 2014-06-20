@@ -30,7 +30,12 @@
                 console.log("transaction 1 succeeded");
             },
             'protocol': 'http',
-            'hostname': 'api.razorpay.dev'
+            'hostname': 'api.razorpay.dev',
+            'prefill':{
+                'name': 'Harshil Mathur',
+                'email': 'harshil@razorpay.com',
+                'contact':'9999999999'
+            }
         }
         var rzp1 = new Razorpay(options);
 
@@ -39,19 +44,16 @@
             e.preventDefault();
         });
 
-        var options2 = {
-            key: 'd9c6bf091a1a64cb5678d8c1d5e7360f',
+        $.extend(options, {
             amount : 200,
-            name:'Daft Punk',
             description : 'Alive (2007)',
             image : 'https://i.imgur.com/GXalrU0.png',
             handler : function (transaction){
                 console.log("transaction 2 finished");
             }
-        };
+        });
 
-        var rzp2 = new Razorpay(options2);
-        rzp2.setEndpoint('http','api.razorpay.dev');
+        var rzp2 = new Razorpay(options);
         
         $('#rzp-button2').click(function(e){
             rzp2.open();
