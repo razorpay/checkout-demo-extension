@@ -16,33 +16,31 @@
 }
 
 /* Default class for modal window */
-.modal {
+.rzp-modal {
   position: fixed;
   z-index: 20;
   left: 50%;
   top: 50px;
   width: 500px;
-  background-color: #fff;
   border-radius: 5px;
   background:#EDEDED;
   font-family: 'Lato', Sans-serif;
   box-shadow: 5px 5px 12px 0px rgba(0,0,0,0.75);
   min-height: 300px;
+  color: black;
 }
-.modal hr{
-  border-color:#D9D9D9;
-  background-color:#D9D9D9;
-  color:#D9D9D9;
+.rzp-header{
+  border-bottom: 1px solid #D9D9D9;
 }
-.merchant_image{
+.rzp-merchant_image{
   margin:5px 0px 0px 5px;
   float:left;
 }
-.merchant_image img{
+.rzp-merchant_image img{
   max-width:60px;
   max-height: 40px;
 }
-.merchant_name{
+.rzp-merchant_name{
   margin:0 auto;
   font-size: 13px;
   padding-top: 10px;
@@ -52,7 +50,7 @@
   float:none;
   text-align: center;
 }
-.merchant_powered{
+.rzp-merchant_powered{
   float:right;
   margin-right: 10px;
   width:100px;
@@ -60,14 +58,14 @@
   background-image:url('../images/powered_by_rzp.jpg');
   min-height: 30px;
 }
-.clear{
+.rzp-clear{
   clear:both;
 }
-form.body{
+form.rzp-body{
   margin:0 auto;
   width:350px;
 }
-form.body .card_image{
+form.rzp-body .rzp-card_image{
   float:right;
   width:26px;
   height:7px;
@@ -76,19 +74,19 @@ form.body .card_image{
   background-repeat: no-repeat;
   background-position: right center;
 }
-.card_image.visa{
+.rzp-card_image.visa{
   background-image: url('../images/icons/visa.png');
 }
-.card_image.mastercard{
+.rzp-card_image.mastercard{
   background-image: url('../images/icons/mastercard.png');
 }
-.card_image.maestro{
+.rzp-card_image.maestro{
   background-image: url('../images/icons/maestro.png');
 }
-.card_image.rupay{
+.rzp-card_image.rupay{
   background-image: url('../images/icons/rupay.png');
 }
-form input{
+form.rzp-body input{
   color:#28B3D2;
   border:none;
   background: #EDEDED;
@@ -102,22 +100,22 @@ form input{
   margin:0px;
   box-sizing: border-box;
 }
-form input[name="card[number]"].invalid{
+form.rzp-body input[name="card[number]"].rzp-invalid{
   border:1px solid #FB797E;
   border-width: 1px 1px 0px 1px;
 }
-form .card{
+form.rzp-body .rzp-card{
   margin-top: 10px;
   border-radius:3px;
   width:350px;
 }
-form input[name="card[name]"], form input[name="udf[email]"], form input[name="udf[contact]"]{
+form.rzp-body input[name="card[name]"], form.rzp-body input[name="udf[email]"], form.rzp-body input[name="udf[contact]"]{
   margin-top:3px;
   padding-bottom:3px;
   border-bottom:1px solid #727272;
   width:100%;
 }
-form input[name="card[number]"]{
+form.rzp-body input[name="card[number]"]{
   width:100%;
   border-bottom: 1px solid #727272;
   background: url('../images/icons/card.png');
@@ -128,10 +126,10 @@ form input[name="card[number]"]{
   border-radius:3px 3px 0px 0px;
   border-bottom:0px;
 }
-form input[name="card[number]"]:focus{
+form.rzp-body input[name="card[number]"]:focus{
   background-position: 5px -20px;
 }
-form input[name="card[expiry]"]{
+form.rzp-body input[name="card[expiry]"]{
   background: url('../images/icons/calendar.png');
   background-repeat: no-repeat;
   padding-left:35px;
@@ -141,27 +139,27 @@ form input[name="card[expiry]"]{
   border:1px solid #727272;
   border-radius:0px 0px 0px 3px;
 }
-form input[name="card[expiry]"]:focus{
+form.rzp-body input[name="card[expiry]"]:focus{
   background-position: 7px -25px;
 }
-form input[name="card[expiry]"].invalid{
+form.rzp-body input[name="card[expiry]"].rzp-invalid{
   border:1px solid #FB797E;
   border-bottom:0px;
 }
 /** All sibling inputs of an invalid card number **/
-form input[name="card[number]"].invalid ~ input{
+form.rzp-body input[name="card[number]"].rzp-invalid ~ input{
   border-top:1px solid #FB797E;
 }
-form input[name="card[expiry]"].invalid{
+form.rzp-body input[name="card[expiry]"].rzp-invalid{
   border:1px solid #FB797E;
 }
-form input[name="card[expiry]"].invalid ~ input{
+form.rzp-body input[name="card[expiry]"].rzp-invalid ~ input{
   border-left: 0px !important;
 }
-form input[name="card[cvv]"].invalid{
+form.rzp-body input[name="card[cvv]"].rzp-invalid{
   border:1px solid #FB797E;
 }
-form input[name="card[cvv]"]{
+form.rzp-body input[name="card[cvv]"]{
   background: url('../images/icons/lock.png');
   background-repeat: no-repeat;
   padding-left:32px;
@@ -172,10 +170,10 @@ form input[name="card[cvv]"]{
   position: absolute;
   width: 176px;
 }
-form input[name="card[cvv]"]:focus{
+form.rzp-body input[name="card[cvv]"]:focus{
   background-position: 3px -25px;
 } 
-form .submit{
+form.rzp-body .rzp-submit{
   background-color:#28B3D2;
   color:white;
   width:100%;
@@ -187,40 +185,40 @@ form .submit{
   text-align: center;
   border: none;
 }
-form .submit[disabled=disabled] .ring{
+form.rzp-body .rzp-submit[disabled=disabled] .rzp-ring{
   display:inline-block;
 }
-form .submit[disabled=disabled] .text{
+form.rzp-body .rzp-submit[disabled=disabled] .rzp-text{
   display:none;
 }
-form .submit.error{
+form.rzp-body .rzp-submit.error{
   background-color:#FB797E;
 }
-.ring {
+.rzp-ring {
     border: 1px solid white;
     border-radius: 30px;
     height: 18px;
     width: 18px;
     display:none;
-    -webkit-animation: pulsate 1s ease-out;
+    -webkit-animation: rzp-pulsate 1s ease-out;
     -webkit-animation-iteration-count: infinite; 
     opacity: 0.0;
     left:50px;
     top:-5px;
 }
-@-webkit-keyframes pulsate {
+@-webkit-keyframes rzp-pulsate {
     0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
     50% {opacity: 1.0;}
     100% {-webkit-transform: scale(1.2, 1.2); opacity: 0.0;}
 }
-.error_box{
+.rzp-error_box{
   color: #FB797E;
   text-align:center;
   font-size: 12px;
   list-style-type: none;
   padding: 0px;
 }
-.modal iframe{
+.rzp-modal iframe{
   border: none;
   border-radius: 5px;
 }

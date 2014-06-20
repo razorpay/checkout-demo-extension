@@ -56,13 +56,13 @@
         $form.find(this.fieldNames.number).off('focusout').focusout(function(){
             var cardType = $.payment.cardType(this.value);
             if(cardType!=null){
-                $form.find('.card_image').addClass(cardType);
+                $form.find('.rzp-card_image').addClass(cardType);
             }
         });
     };
 
     Razorpay.prototype.postValidate = function($form){
-        $form.find('input').removeClass('invalid');
+        $form.find('input').removeClass('rzp-invalid');
         var cardNumber = $form.find(this.fieldNames.number).val();
         var expiryMonth = $form.find(this.fieldNames.expiryMonth).val();
         var expiryYear = $form.find(this.fieldNames.expiryYear).val();
@@ -74,50 +74,50 @@
         var errors = [];
 
         if(name === ''){
-            $form.find(this.fieldNames.name).addClass('invalid');
+            $form.find(this.fieldNames.name).addClass('rzp-invalid');
             errors.push('Missing Name');
         }
         if(name.length>100){
-            $form.find(this.fieldNames.name).addClass('invalid');
+            $form.find(this.fieldNames.name).addClass('rzp-invalid');
             errors.push('Maximum name length is 100');
         }
         if(email === ''){
-            $form.find(this.fieldNames.email).addClass('invalid');
+            $form.find(this.fieldNames.email).addClass('rzp-invalid');
             errors.push('Missing email address');
         }
         if(email.length>250){
-            $form.find(this.fieldNames.email).addClass('invalid');
+            $form.find(this.fieldNames.email).addClass('rzp-invalid');
             errors.push('Maximum email length is 250');
         }
         if(contact === ''){
-            $form.find(this.fieldNames.contact).addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('rzp-invalid');
             errors.push('Missing contact number');
         }
         if(contact.length>12 || contact.length<8){
-            $form.find(this.fieldNames.contact).addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('rzp-invalid');
             errors.push('Contact number should be between 8 and 12 digits long');
         }
         if(!/^\d+$/.test(contact)){
-            $form.find(this.fieldNames.contact).addClass('invalid');
+            $form.find(this.fieldNames.contact).addClass('rzp-invalid');
             errors.push('Contact number should be made of entirely digits');
         }
         if(!$.payment.validateCardNumber(cardNumber)){
-            $form.find(this.fieldNames.number).addClass('invalid');
-            errors.push('Invalid Credit Card Number');
+            $form.find(this.fieldNames.number).addClass('rzp-invalid');
+            errors.push('rzp-invalid Credit Card Number');
         }
         if(!$.payment.validateCardExpiry(expiryMonth, expiryYear)){
-            $form.find(this.fieldNames.expiry).addClass('invalid');
-            errors.push('Invalid Expiry Date');
+            $form.find(this.fieldNames.expiry).addClass('rzp-invalid');
+            errors.push('rzp-invalid Expiry Date');
         }
         if(!$.payment.validateCardCVC(cvv)){
-            $form.find(this.fieldNames.cvv).addClass('invalid');
+            $form.find(this.fieldNames.cvv).addClass('rzp-invalid');
             errors.push('Invalid CVV Number');
         }
         return errors;
     };
 
     Razorpay.prototype.clearSubmission = function(){
-        this.$el.find('.submit').removeAttr('disabled');
+        this.$el.find('.rzp-submit').removeAttr('disabled');
         this.$el.data('busy', false);
     };
 
@@ -130,13 +130,13 @@
         var html = $.tmpl(template, this.options);
         html.appendTo('body');
         this.$el = $('#'+this.options.id);
-        this.preValidate(this.$el.find('form.body'));
+        this.preValidate(this.$el.find('form.rzp-body'));
         var self = this;
-        this.$el.find('form').submit(function(e){
+        this.$el.find('form.rzp-body').submit(function(e){
             //Handles the form submission
             var submission  = self.formsubmit(this);//submission stores whether we are submitting the form or not
             if(submission){
-                self.$el.find('.submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                self.$el.find('.rzp-submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
                 //Marks the modal window as busy so it is not closable
                 self.$el.data('busy', true);
             }
@@ -178,12 +178,12 @@
                 {{/each}}';
             var div = document.createElement('div');
             $.tmpl(template,{err:errors}).appendTo(div);
-            this.$el.find('.error_box').html(div.innerHTML);
+            this.$el.find('.rzp-error_box').html(div.innerHTML);
             return false;
         }
         else{
             //Cleanup errors created by any previous attempts
-            this.$el.find('.error_box').html('');
+            this.$el.find('.rzp-error_box').html('');
         }
 
         $.ajax({
@@ -199,18 +199,18 @@
     };
 
     Razorpay.prototype.handleAjaxError = function(){
-        this.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
+        this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
         this.clearSubmission();
     };
 
     Razorpay.prototype.handleAjaxResponse = function(response){
         if(response.exception){
-            this.$el.find('.error_box').html('<li>There was an error in handling your request</li>');
+            this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
             this.clearSubmission();
         }
         else if(response.error){
             var message = response.error.message || 'There was an error in handling your request';
-            this.$el.find('.error_box').html('<li>'+message+'</li>');
+            this.$el.find('.rzp-error_box').html('<li>'+message+'</li>');
             this.clearSubmission();
         }
         else if(response.callbackUrl){
@@ -289,16 +289,16 @@
         .appendTo('body');
     };
     Razorpay.prototype.updateData = function(data){
-        var $form = this.$el.find('form.body');
+        var $form = this.$el.find('form.rzp-body');
         //The only three whitelisted fields we support for prefilling
         if(data.name){
-            $form.find('input[name="card[name]"]').val(data.name);
+            $form.find(this.fieldNames.name).val(data.name);
         }
         if(data.contact){
-            $form.find('input[name="udf[contact]"]').val(data.contact);
+            $form.find(this.fieldNames.contact).val(data.contact);
         }
         if(data.email){
-            $form.find('input[name="udf[email]"]').val(data.email);
+            $form.find(this.fieldNames.email).val(data.email);
         }
     };
     Razorpay.prototype.validateOptions = function(){
