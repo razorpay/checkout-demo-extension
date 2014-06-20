@@ -31,7 +31,7 @@
 
     Razorpay.XDCallback = function(message){
         var rzp = Razorpay.lastXDInstance;
-        rzp.hide();
+        rzp.preHandler();
         rzp.options.handler(message.data);
     };
 
@@ -122,6 +122,10 @@
     };
 
     Razorpay.prototype.createlightBox = function(template){
+        if(this.options.id){
+            //Lets remove the div first
+            $('#'+this.options.id).remove();
+        }
         this.options.id = (Math.random()).toString(36).replace(/[^a-z]+/g, '');
         var html = $.tmpl(template, this.options);
         html.appendTo('body');
@@ -224,7 +228,7 @@
             this.setXDInstance();
         }
         else{
-            this.hide();
+            this.preHandler();
             this.options.handler(response);
         }
     };
@@ -238,6 +242,13 @@
         protocol: 'https',
         hostname: 'api.razorpay.com'
     };//We can specify any default options here
+
+    /** This function is called just before control is passed on to the handler specified in options */
+    Razorpay.prototype.preHandler = function(){
+        this.hide();//Hide the modal window when the transaction is complete
+        //Prepare the lightBox for re-opening
+        this.createlightBox(templates['templates/modal.tmpl']);
+    };
 
     //default handler for success
     //default handler does not care about error or success messages, it just submits everything via the form
@@ -314,6 +325,7 @@
         }
         this.$modal = this.$el.omniWindow();
         this.$modal.trigger('show');
+        center(this.$el);
     };
     Razorpay.prototype.configure = function(options){
         if(typeof options === 'undefined'){

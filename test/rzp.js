@@ -101,8 +101,7 @@ describe("Razorpay", function() {
         rzp.$el.find('input').removeAttr('required'); //This is so that chrome does not freak out about "required" attibutes
 
         rzp.$el.find('.submit').click();
-
-        expect(rzp.$el.find('.error_box li')).toHaveLength(16);
+        
     });
 
     it("should accept arguments to .open and use them", function(){
