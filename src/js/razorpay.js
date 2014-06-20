@@ -127,17 +127,17 @@
         html.appendTo('body');
         this.$el = $('#'+this.options.id);
         this.preValidate(this.$el.find('form.body'));
-        var that = this;
+        var self = this;
         this.$el.find('form').submit(function(e){
             //Handles the form submission
-            var submission  = that.formsubmit(this);//submission stores whether we are submitting the form or not
+            var submission  = self.formsubmit(this);//submission stores whether we are submitting the form or not
             if(submission){
-                that.$el.find('.submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
+                self.$el.find('.submit').attr('disabled','disabled');//Disable the input button to prevent double submissions
                 //Marks the modal window as busy so it is not closable
-                that.$el.data('busy', true);
+                self.$el.data('busy', true);
             }
             else{
-                that.clearSubmission();
+                self.clearSubmission();
             }
             e.preventDefault();//So that form is not submitted by the browser, but by us over ajax
         });
@@ -161,13 +161,13 @@
         var data = $form.serialize();
 
         var errors = this.postValidate($form);
-        var that = this;
+        var self = this;
         if(errors.length > 0){//If we have more than one errors
 
             //Shake the modal window
             this.$el.addClass('shake');
             
-            window.setTimeout(function(){that.$el.removeClass("shake");}, 150);
+            window.setTimeout(function(){self.$el.removeClass("shake");}, 150);
 
             var template = '{{each err}}\
                     <li>${$value}<li>\
@@ -270,9 +270,9 @@
     Razorpay.prototype.addButton = function(){
         var button = document.createElement('button');
         button.setAttribute('id','rzp-button');
-        var that = this;
+        var self = this;
         $(button).click(function(e){
-            that.open();
+            self.open();
             e.preventDefault();
         }).html('Pay with Card')
         .appendTo('body');
