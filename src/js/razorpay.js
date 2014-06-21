@@ -1,3 +1,4 @@
+
 /* global $,templates */
 (function(){
     "use strict";
@@ -10,9 +11,10 @@
     var init = function(){
         $('<div class="ow-overlay ow-closed"></div>').appendTo("html");
     };
-    var center = function($el) {
+
+    var position = function($el) {
         $el.css("position","absolute");
-        $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
+        $el.css("top", ( $(window).height() - $el.height() ) / 4  + "px");
         $el.css("left", ( $(window).width() - $el.width() ) / 2 + "px");
         //The following two are needed for clearing omniWindow settings
         $el.css('margin-left','auto');
@@ -223,7 +225,7 @@
             //Now we need to resize the modal box so as to accomodate 3dsecure.
             $(this.$el).width('1000px').height('500px');
             $(this.$el.find('iframe')).width('1000px').height('500px');
-            center(this.$el);
+            position(this.$el);
             //Make this instance of rzp the instance called by the XDCallback
             this.setXDInstance();
         }
@@ -316,7 +318,7 @@
         this.createlightBox(templates['templates/modal.tmpl']);
         this.$modal = this.$el.omniWindow();
         this.$modal.trigger('show');
-        center(this.$el);
+        position(this.$el);
     };
     Razorpay.prototype.configure = function(options){
         if(typeof options === 'undefined'){
