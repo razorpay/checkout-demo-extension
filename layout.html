@@ -27,7 +27,7 @@
             'description':'Tron Legacy',
             'image':'https://i.imgur.com/3g7nmJC.png',
             'handler': function (transaction){
-                console.log("transaction 1 succeeded");
+                alert("You have successfully purchased "+rzp1.options.description);
             },
             'protocol': 'http',
             'hostname': 'api.razorpay.dev',
@@ -49,7 +49,7 @@
             description : 'Alive (2007)',
             image : 'https://i.imgur.com/GXalrU0.png',
             handler : function (transaction){
-                console.log("transaction 2 finished");
+                alert("You have successfully purchased "+rzp2.options.description);
             }
         });
 
@@ -62,8 +62,11 @@
     </script>
     <script src="src/js/autofill.js"></script>
     <style>
-    body{
+    html{
         background-image: url('http://www.youredm.com/wp-content/uploads/2014/03/Daft-Punk-Wallpaper-2560x1024-1.jpg');
+        background-size: cover cover;
+        /**background-position: center center fixed;*/
+        background-repeat: no-repeat;
         background-position: -300px 0px;
     }
     .btn{
