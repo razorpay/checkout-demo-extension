@@ -52,11 +52,11 @@
 }
 .rzp-merchant_powered{
   float:right;
-  margin-right: 10px;
-  width:100px;
+  width:100px; 
   margin-top:10px;
-  background-image:url('../images/powered_by_rzp.jpg');
+  background-image:url('../images/powered_by_rzp.png');
   min-height: 30px;
+  background-repeat:no-repeat;
 }
 .rzp-clear{
   clear:both;
@@ -99,6 +99,9 @@ form.rzp-body input{
   outline:none;
   margin:0px;
   box-sizing: border-box;
+  /** see http://davidwalsh.name/input-shadows-ipad */
+  -webkit-appearance: none;
+  -moz-appearance: none; /* mobile firefox too! */
 }
 form.rzp-body input[name="card[number]"].rzp-invalid{
   border:1px solid #FB797E;
