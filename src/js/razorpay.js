@@ -105,11 +105,11 @@
         }
         if(!$.payment.validateCardNumber(cardNumber)){
             $form.find(this.fieldNames.number).addClass('rzp-invalid');
-            errors.push('rzp-invalid Credit Card Number');
+            errors.push('Invalid Credit Card Number');
         }
         if(!$.payment.validateCardExpiry(expiryMonth, expiryYear)){
             $form.find(this.fieldNames.expiry).addClass('rzp-invalid');
-            errors.push('rzp-invalid Expiry Date');
+            errors.push('Invalid Expiry Date');
         }
         if(!$.payment.validateCardCVC(cvv)){
             $form.find(this.fieldNames.cvv).addClass('rzp-invalid');
