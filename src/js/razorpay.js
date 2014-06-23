@@ -171,9 +171,9 @@
         if(errors.length > 0){//If we have more than one errors
 
             //Shake the modal window
-            this.$el.addClass('shake');
+            this.$el.addClass('rzp-shake');
             
-            window.setTimeout(function(){self.$el.removeClass("shake");}, 150);
+            window.setTimeout(function(){self.$el.removeClass("rzp-shake");}, 150);
 
             var template = '{{each err}}\
                     <li>${$value}<li>\

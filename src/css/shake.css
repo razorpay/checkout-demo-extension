@@ -1,8 +1,8 @@
-.shake { 
+.rzp-shake { 
 	display: inline-block; -webkit-transform-origin: center center; -ms-transform-origin: center center; transform-origin: center center;
-	-webkit-animation-name: shake-horizontal; -ms-animation-name: shake-horizontal; animation-name: shake-horizontal; -webkit-animation-duration: 1000ms; -ms-animation-duration: 1000ms; animation-duration: 1000ms; -webkit-animation-iteration-count: infinite; -ms-animation-iteration-count: infinite; animation-iteration-count: infinite; -webkit-animation-timing-function: ease-in-out; -ms-animation-timing-function: ease-in-out; animation-timing-function: ease-in-out; -webkit-animation-delay: 0s; -ms-animation-delay: 0s; animation-delay: 0s; -webkit-animation-play-state: running; -ms-animation-play-state: running; animation-play-state: running; }
+	-webkit-animation-name: rzp-shake-horizontal; -ms-animation-name: rzp-shake-horizontal; animation-name: rzp-shake-horizontal; -webkit-animation-duration: 1000ms; -ms-animation-duration: 1000ms; animation-duration: 1000ms; -webkit-animation-iteration-count: infinite; -ms-animation-iteration-count: infinite; animation-iteration-count: infinite; -webkit-animation-timing-function: ease-in-out; -ms-animation-timing-function: ease-in-out; animation-timing-function: ease-in-out; -webkit-animation-delay: 0s; -ms-animation-delay: 0s; animation-delay: 0s; -webkit-animation-play-state: running; -ms-animation-play-state: running; animation-play-state: running; }
 
-@-webkit-keyframes shake-horizontal { 0% { -webkit-transform: translate(0px, 0px) rotate(0deg); }
+@-webkit-keyframes rzp-shake-horizontal { 0% { -webkit-transform: translate(0px, 0px) rotate(0deg); }
   2% { -webkit-transform: translate(-6px, 0px) rotate(0deg); }
   4% { -webkit-transform: translate(5px, 0px) rotate(0deg); }
   6% { -webkit-transform: translate(3px, 0px) rotate(0deg); }
@@ -53,7 +53,7 @@
   96% { -webkit-transform: translate(-8px, 0px) rotate(0deg); }
   98% { -webkit-transform: translate(4px, 0px) rotate(0deg); } }
 
-@-ms-keyframes shake-horizontal { 0% { -ms-transform: translate(0px, 0px) rotate(0deg); }
+@-ms-keyframes rzp-shake-horizontal { 0% { -ms-transform: translate(0px, 0px) rotate(0deg); }
   2% { -ms-transform: translate(-9px, 0px) rotate(0deg); }
   4% { -ms-transform: translate(-6px, 0px) rotate(0deg); }
   6% { -ms-transform: translate(-2px, 0px) rotate(0deg); }
@@ -104,7 +104,7 @@
   96% { -ms-transform: translate(-1px, 0px) rotate(0deg); }
   98% { -ms-transform: translate(-5px, 0px) rotate(0deg); } }
 
-@keyframes shake-horizontal { 0% { transform: translate(0px, 0px) rotate(0deg); }
+@keyframes rzp-shake-horizontal { 0% { transform: translate(0px, 0px) rotate(0deg); }
   2% { transform: translate(-4px, 0px) rotate(0deg); }
   4% { transform: translate(2px, 0px) rotate(0deg); }
   6% { transform: translate(-3px, 0px) rotate(0deg); }
