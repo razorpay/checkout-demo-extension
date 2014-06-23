@@ -12,7 +12,7 @@
 }(function($) {
   'use strict';
   $.fn.extend({
-    omniWindow: function(options) {
+    rzpomniWindow: function(options) {
 
       options = $.extend(true, {
         animationsPriority: {

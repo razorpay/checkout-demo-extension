@@ -1,4 +1,3 @@
-
 /* global $,templates */
 (function(){
     "use strict";
@@ -316,7 +315,7 @@
     Razorpay.prototype.open = function(options){
         this.options = $.extend({}, this.options, options);
         this.createlightBox(templates['templates/modal.tmpl']);
-        this.$modal = this.$el.omniWindow();
+        this.$modal = this.$el.rzpomniWindow();
         this.$modal.trigger('show');
         position(this.$el);
     };
