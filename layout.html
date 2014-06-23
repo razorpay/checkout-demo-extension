@@ -35,6 +35,9 @@
                 'name': 'Harshil Mathur',
                 'email': 'harshil@razorpay.com',
                 'contact':'9999999999'
+            },
+            udf:{
+                'address':"Hello World"
             }
         }
         var rzp1 = new Razorpay(options);
@@ -44,12 +47,15 @@
             e.preventDefault();
         });
 
-        $.extend(options, {
+        $.extend(true, options, {
             amount : 200,
             description : 'Alive (2007)',
             image : 'https://i.imgur.com/GXalrU0.png',
             handler : function (transaction){
                 alert("You have successfully purchased "+rzp2.options.description);
+            },
+            udf:{
+                'shipping': "Bye World"
             }
         });
 

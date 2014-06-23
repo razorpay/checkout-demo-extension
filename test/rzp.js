@@ -1,4 +1,4 @@
-/* global describe, it, Razorpay, expect, endpoint, afterEach, beforeEach, spyOn */
+/* global describe, it, Razorpay, expect, endpoint, afterEach, beforeEach, spyOn, rzpXD */
 "use strict";
 
 describe("Available modules", function(){
@@ -178,52 +178,52 @@ describe("Razorpay", function() {
 });
 
 describe("Errors", function(){
-    
-    it("should be thrown on missing options", function(){
+    var error, options;
 
+    afterEach(function(){
         expect(function(){
-            new Razorpay();
-        }).toThrow(new Error("No options specified"));
+            var rzp = new Razorpay(options);
+            rzp.validateOptions();
+        }).toThrow(new Error(error));
+    });
 
+    it("should be thrown on missing options", function(){
+        options = undefined;
+        error = "No options specified";
     });
 
     it("should be thrown on missing key", function(){
-       
-        expect(function(){
-            new Razorpay({});
-        }).toThrow(new Error("No merchant key specified"));
+       options = {};
+       error = "No merchant key specified";
+    });
 
+    it("should be thrown on missing amount", function(){
+        options = {key:1};
+        error = "No amount specified";
     });
 
     it("should be thrown on invalid amount", function(){
-
-        expect(function(){
-            var rzp = new Razorpay({key:1});
-            rzp.validateOptions();
-        }).toThrow(new Error("No amount specified"));
-
-        expect(function(){
-            var rzp = new Razorpay({key:1, amount:-20});
-            rzp.validateOptions();
-        }).toThrow(new Error("Invalid amount specified"));
-
+        error = "Invalid amount specified";
+        options = {key:1,amount:-1};
     });
 
     it("should be be thrown on handler not being a function", function(){
-
-        expect(function(){
-            var rzp = new Razorpay({key:1, amount:10, handler: false});
-            rzp.validateOptions();
-        }).toThrow(new Error("Handler must be a function"));
-
+        options = {key:1, amount:10, handler: false};
+        error = "Handler must be a function";
     });
 
     it("should be thrown on invalid protocol", function(){
+        options = {key:1, amount:10, protocol: 'ftp'};
+        error = "Invalid Protocol specified";
+    });
 
-        expect(function(){
-            var rzp = new Razorpay({key:1, amount:10, protocol: 'ftp'});
-            rzp.validateOptions();
-        }).toThrow(new Error("Invalid Protocol specified"));
+    it("should be thrown on udf.contact being set", function(){
+        options = {key:1, amount:10, udf:{contact:"9999999999"}};
+        error = "You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2.";
+    });
 
+    it("should be thrown on udf.email being set", function(){
+        options = {key:1, amount:1, udf:{email:"nemo@gmail.com"}};
+        error = "You cannot pass the email field via udf. Use the prefill option, or use another field name like email2";
     });
 });
