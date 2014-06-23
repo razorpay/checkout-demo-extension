@@ -316,11 +316,15 @@
         }
         for(var i in this.options.udf){
             if(i==='contact'){
-                throw new Error("You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2.");
+                throw new Error("You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2");
             }
             if(i==='email'){
                 throw new Error("You cannot pass the email field via udf. Use the prefill option, or use another field name like email2");
             }
+        }
+
+        if(Object.keys(this.options.udf).length > 13){
+            throw new Error("You can only pass at most 13 fields in the udf object");
         }
     };
     Razorpay.prototype.open = function(options){

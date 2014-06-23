@@ -188,7 +188,6 @@ describe("Errors", function(){
     });
 
     it("should be thrown on missing options", function(){
-        options = undefined;
         error = "No options specified";
     });
 
@@ -219,11 +218,24 @@ describe("Errors", function(){
 
     it("should be thrown on udf.contact being set", function(){
         options = {key:1, amount:10, udf:{contact:"9999999999"}};
-        error = "You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2.";
+        error = "You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2";
     });
 
     it("should be thrown on udf.email being set", function(){
         options = {key:1, amount:1, udf:{email:"nemo@gmail.com"}};
         error = "You cannot pass the email field via udf. Use the prefill option, or use another field name like email2";
+    });
+
+    it("should be thrown on more than 13 udf fields", function(){
+        options = {
+            key: 1,
+            amount: 2,
+            udf:{
+            }
+        };
+        for(var i =1;i<=14;i++){
+            options.udf[i] = "Dummy Test";
+        }
+        error = "You can only pass at most 13 fields in the udf object";
     });
 });
