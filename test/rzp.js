@@ -94,6 +94,14 @@ describe("Razorpay", function() {
         }
     });
     
+    it("should work with dotted property names", function(){
+        var newOptions = $.extend({}, options);
+        newOptions['prefill.name'] = 'Harshil Mathur';
+        newOptions['udf.address'] = 'Jaipur';
+        var rzp = new Razorpay(newOptions);
+        expect(rzp.options.prefill.name).toBe('Harshil Mathur');
+        expect(rzp.options.udf.address).toBe('Jaipur');
+    });
 
     it("should throw an error on missing merchant key", function(){
         var newOptions = $.extend({}, options); 

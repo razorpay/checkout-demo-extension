@@ -335,6 +335,19 @@
         position(this.$el);
     };
     Razorpay.prototype.configure = function(options){
+        /** The following loop converts property names of the form x.y="Value" to proper objects x = {y:"Value"} */
+        for(var i in options){
+            if(i.indexOf('.') > -1){
+                //We have a dot in an option name
+                //Break it into 2
+                var dotPosition = i.indexOf('.');
+                var category = i.substr(0,dotPosition);
+                var property = i.substr(dotPosition+1);
+                options[category] = options[category]||{};
+                options[category][property] = options[i];
+                delete(options[i]);//Delete the existing property
+            }
+        }
         if(typeof options === 'undefined'){
             throw new Error("No options specified");
         }
