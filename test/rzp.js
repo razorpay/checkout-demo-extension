@@ -1,6 +1,24 @@
 /* global describe, it, Razorpay, expect, endpoint, afterEach, beforeEach, spyOn */
 "use strict";
 
+describe("Available modules", function(){
+    it("should include jQuery", function(){
+        expect($).toBeDefined();
+    });
+    it("should include jQuery.payment", function(){
+        expect($.payment).toBeDefined();
+    });
+    it("should include omniWindow", function(){
+        expect($.fn.rzpomniWindow).toBeDefined();
+    });
+    //This is our cross domain communication library
+    it("should include XD", function(){
+        expect(rzpXD).toBeDefined();
+    });
+    it("should include Razorpay", function(){
+        expect(Razorpay).toBeDefined();
+    });
+});
 describe("breakExpiry", function(){
 
     var expiry;

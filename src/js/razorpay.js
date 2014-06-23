@@ -343,6 +343,6 @@
 
     })();
 
-    /* global XD */
-    XD.receiveMessage(Razorpay.XDCallback);
+    /* global rzpXD */
+    rzpXD.receiveMessage(Razorpay.XDCallback);
 })();
