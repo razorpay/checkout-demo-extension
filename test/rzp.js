@@ -87,11 +87,6 @@ describe("Razorpay", function() {
     beforeEach(function(){
         //This is to reset options after every test
         rzp = new Razorpay(options);
-
-        //This won't run on wercker where env.js is missing
-        if(typeof endpoint !== 'undefined'){
-            rzp.setEndpoint(endpoint.protocol, endpoint.hostname);
-        }
     });
     
     it("should work with dotted property names", function(){
