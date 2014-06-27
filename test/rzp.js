@@ -1,6 +1,24 @@
-/* global describe, it, Razorpay, expect, endpoint, afterEach, beforeEach, spyOn */
+/* global describe, it, Razorpay, expect, endpoint, afterEach, beforeEach, spyOn, rzpXD */
 "use strict";
 
+describe("Available modules", function(){
+    it("should include jQuery", function(){
+        expect($).toBeDefined();
+    });
+    it("should include jQuery.payment", function(){
+        expect($.payment).toBeDefined();
+    });
+    it("should include omniWindow", function(){
+        expect($.fn.rzpomniWindow).toBeDefined();
+    });
+    //This is our cross domain communication library
+    it("should include XD", function(){
+        expect(rzpXD).toBeDefined();
+    });
+    it("should include Razorpay", function(){
+        expect(Razorpay).toBeDefined();
+    });
+});
 describe("breakExpiry", function(){
 
     var expiry;
@@ -69,13 +87,16 @@ describe("Razorpay", function() {
     beforeEach(function(){
         //This is to reset options after every test
         rzp = new Razorpay(options);
-
-        //This won't run on wercker where env.js is missing
-        if(typeof endpoint !== 'undefined'){
-            rzp.setEndpoint(endpoint.protocol, endpoint.hostname);
-        }
     });
     
+    it("should work with dotted property names", function(){
+        var newOptions = $.extend({}, options);
+        newOptions['prefill.name'] = 'Harshil Mathur';
+        newOptions['udf.address'] = 'Jaipur';
+        var rzp = new Razorpay(newOptions);
+        expect(rzp.options.prefill.name).toBe('Harshil Mathur');
+        expect(rzp.options.udf.address).toBe('Jaipur');
+    });
 
     it("should throw an error on missing merchant key", function(){
         var newOptions = $.extend({}, options); 
@@ -160,52 +181,64 @@ describe("Razorpay", function() {
 });
 
 describe("Errors", function(){
-    
-    it("should be thrown on missing options", function(){
+    var error, options;
 
+    afterEach(function(){
         expect(function(){
-            new Razorpay();
-        }).toThrow(new Error("No options specified"));
+            var rzp = new Razorpay(options);
+            rzp.validateOptions();
+        }).toThrow(new Error(error));
+    });
 
+    it("should be thrown on missing options", function(){
+        error = "No options specified";
     });
 
     it("should be thrown on missing key", function(){
-       
-        expect(function(){
-            new Razorpay({});
-        }).toThrow(new Error("No merchant key specified"));
+       options = {};
+       error = "No merchant key specified";
+    });
 
+    it("should be thrown on missing amount", function(){
+        options = {key:1};
+        error = "No amount specified";
     });
 
     it("should be thrown on invalid amount", function(){
-
-        expect(function(){
-            var rzp = new Razorpay({key:1});
-            rzp.validateOptions();
-        }).toThrow(new Error("No amount specified"));
-
-        expect(function(){
-            var rzp = new Razorpay({key:1, amount:-20});
-            rzp.validateOptions();
-        }).toThrow(new Error("Invalid amount specified"));
-
+        error = "Invalid amount specified";
+        options = {key:1,amount:-1};
     });
 
     it("should be be thrown on handler not being a function", function(){
-
-        expect(function(){
-            var rzp = new Razorpay({key:1, amount:10, handler: false});
-            rzp.validateOptions();
-        }).toThrow(new Error("Handler must be a function"));
-
+        options = {key:1, amount:10, handler: false};
+        error = "Handler must be a function";
     });
 
     it("should be thrown on invalid protocol", function(){
+        options = {key:1, amount:10, protocol: 'ftp'};
+        error = "Invalid Protocol specified";
+    });
 
-        expect(function(){
-            var rzp = new Razorpay({key:1, amount:10, protocol: 'ftp'});
-            rzp.validateOptions();
-        }).toThrow(new Error("Invalid Protocol specified"));
+    it("should be thrown on udf.contact being set", function(){
+        options = {key:1, amount:10, udf:{contact:"9999999999"}};
+        error = "You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2";
+    });
 
+    it("should be thrown on udf.email being set", function(){
+        options = {key:1, amount:1, udf:{email:"nemo@gmail.com"}};
+        error = "You cannot pass the email field via udf. Use the prefill option, or use another field name like email2";
+    });
+
+    it("should be thrown on more than 13 udf fields", function(){
+        options = {
+            key: 1,
+            amount: 2,
+            udf:{
+            }
+        };
+        for(var i =1;i<=14;i++){
+            options.udf[i] = "Dummy Test";
+        }
+        error = "You can only pass at most 13 fields in the udf object";
     });
 });

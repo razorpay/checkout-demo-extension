@@ -3,6 +3,8 @@
 <head lang="en">
     <meta charset="utf-8">
     <link href="dist/v1/css/style.css" type="text/css" rel="stylesheet">
+    <title>Sample Razorpay Payment Page</title>
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
 </head>
 <body>
     <form action="http://api.razorpay.dev/test/merchant/charge.php" method="POST">
@@ -14,11 +16,14 @@
         data-description="Purchase Description"
         data-image="https://api.razorpay.com/test/merchant/vk.jpg"
         data-hostname="api.razorpay.dev"
-        data-protocol='http'>
-      </script>
+        data-protocol='http'
+        data-prefill.name="Harshil Mathur"
+        data-udf.address="Jaipur"
+        data-prefill.email='harshil@razorpay.com'
+        data-prefill.contact='9999999999'
+      ></script>
       <input type="hidden" value="Hidden Element" name="hidden">
     </form>
-    <link href='https://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
     <script src="src/js/autofill.js"></script><!-- Only sets up auto-filling-->
 </body>
 </html>

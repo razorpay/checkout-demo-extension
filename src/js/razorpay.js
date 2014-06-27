@@ -10,9 +10,10 @@
     var init = function(){
         $('<div class="ow-overlay ow-closed"></div>').appendTo("html");
     };
-    var center = function($el) {
+
+    var position = function($el) {
         $el.css("position","absolute");
-        $el.css("top", ( $(window).height() - $el.height() ) / 2  + "px");
+        $el.css("top", ( $(window).height() - $el.height() ) / 4  + "px");
         $el.css("left", ( $(window).width() - $el.width() ) / 2 + "px");
         //The following two are needed for clearing omniWindow settings
         $el.css('margin-left','auto');
@@ -103,11 +104,11 @@
         }
         if(!$.payment.validateCardNumber(cardNumber)){
             $form.find(this.fieldNames.number).addClass('rzp-invalid');
-            errors.push('rzp-invalid Credit Card Number');
+            errors.push('Invalid Credit Card Number');
         }
         if(!$.payment.validateCardExpiry(expiryMonth, expiryYear)){
             $form.find(this.fieldNames.expiry).addClass('rzp-invalid');
-            errors.push('rzp-invalid Expiry Date');
+            errors.push('Invalid Expiry Date');
         }
         if(!$.payment.validateCardCVC(cvv)){
             $form.find(this.fieldNames.cvv).addClass('rzp-invalid');
@@ -150,7 +151,7 @@
     Razorpay.prototype.breakExpiry = function(expiry){
         //Returns month, year as a tuple inside an object
         return {
-            month: expiry.substr(0,2), 
+            month: expiry.substr(0,2),
             //strip all spaces and backslashes, and then cut off first two digits (month);
             year: expiry.replace(/[ \/]/g,'').substr(2)
         };
@@ -161,6 +162,7 @@
         var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
         $form.find(this.fieldNames.expiryMonth).val(expiry.month);
         $form.find(this.fieldNames.expiryYear).val(expiry.year);
+        $form.find(this.fieldNames.expiry).remove();
 
         var data = $form.serialize();
 
@@ -169,9 +171,9 @@
         if(errors.length > 0){//If we have more than one errors
 
             //Shake the modal window
-            this.$el.addClass('shake');
-            
-            window.setTimeout(function(){self.$el.removeClass("shake");}, 150);
+            this.$el.addClass('rzp-shake');
+
+            window.setTimeout(function(){self.$el.removeClass("rzp-shake");}, 150);
 
             var template = '{{each err}}\
                     <li>${$value}<li>\
@@ -223,7 +225,7 @@
             //Now we need to resize the modal box so as to accomodate 3dsecure.
             $(this.$el).width('1000px').height('500px');
             $(this.$el.find('iframe')).width('1000px').height('500px');
-            center(this.$el);
+            position(this.$el);
             //Make this instance of rzp the instance called by the XDCallback
             this.setXDInstance();
         }
@@ -245,6 +247,9 @@
             name: "",
             contact: "",
             email: ""
+        },
+        //These fields are specified by the merchant
+        udf:{
         }
     };//We can specify any default options here
 
@@ -310,15 +315,40 @@
         if(typeof this.options.key === 'undefined'){
             throw new Error("No merchant key specified");
         }
+        for(var i in this.options.udf){
+            if(i==='contact'){
+                throw new Error("You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2");
+            }
+            if(i==='email'){
+                throw new Error("You cannot pass the email field via udf. Use the prefill option, or use another field name like email2");
+            }
+        }
+
+        if(Object.keys(this.options.udf).length > 13){
+            throw new Error("You can only pass at most 13 fields in the udf object");
+        }
     };
     Razorpay.prototype.open = function(options){
         this.options = $.extend({}, this.options, options);
         this.createlightBox(templates['templates/modal.tmpl']);
-        this.$modal = this.$el.omniWindow();
+        this.$modal = this.$el.rzpomniWindow();
         this.$modal.trigger('show');
-        center(this.$el);
+        position(this.$el);
     };
     Razorpay.prototype.configure = function(options){
+        /** The following loop converts property names of the form x.y="Value" to proper objects x = {y:"Value"} */
+        for(var i in options){
+            if(i.indexOf('.') > -1){
+                //We have a dot in an option name
+                //Break it into 2
+                var dotPosition = i.indexOf('.');
+                var category = i.substr(0,dotPosition);
+                var property = i.substr(dotPosition+1);
+                options[category] = options[category]||{};
+                options[category][property] = options[i];
+                delete(options[i]);//Delete the existing property
+            }
+        }
         if(typeof options === 'undefined'){
             throw new Error("No options specified");
         }
@@ -327,7 +357,7 @@
         }
         this.options = $.extend({}, this.options, options);
     };
-    
+
     (function(){
 
         var key = $(RazorPayScript).data('key');
@@ -342,6 +372,6 @@
 
     })();
 
-    /* global XD */
-    XD.receiveMessage(Razorpay.XDCallback);
+    /* global rzpXD */
+    rzpXD.receiveMessage(Razorpay.XDCallback);
 })();
