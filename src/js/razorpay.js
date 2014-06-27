@@ -151,7 +151,7 @@
     Razorpay.prototype.breakExpiry = function(expiry){
         //Returns month, year as a tuple inside an object
         return {
-            month: expiry.substr(0,2), 
+            month: expiry.substr(0,2),
             //strip all spaces and backslashes, and then cut off first two digits (month);
             year: expiry.replace(/[ \/]/g,'').substr(2)
         };
@@ -162,6 +162,7 @@
         var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
         $form.find(this.fieldNames.expiryMonth).val(expiry.month);
         $form.find(this.fieldNames.expiryYear).val(expiry.year);
+        $form.find(this.fieldNames.expiry).remove();
 
         var data = $form.serialize();
 
@@ -171,7 +172,7 @@
 
             //Shake the modal window
             this.$el.addClass('rzp-shake');
-            
+
             window.setTimeout(function(){self.$el.removeClass("rzp-shake");}, 150);
 
             var template = '{{each err}}\
@@ -356,7 +357,7 @@
         }
         this.options = $.extend({}, this.options, options);
     };
-    
+
     (function(){
 
         var key = $(RazorPayScript).data('key');
