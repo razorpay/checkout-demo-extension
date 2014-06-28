@@ -162,7 +162,9 @@
         var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
         $form.find(this.fieldNames.expiryMonth).val(expiry.month);
         $form.find(this.fieldNames.expiryYear).val(expiry.year);
-        $form.find(this.fieldNames.expiry).remove();
+
+        //Prevent Expiry field from being submitted
+        $form.find(this.fieldNames.expiry).attr('name', '');;
 
         var data = $form.serialize();
 
