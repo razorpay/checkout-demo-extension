@@ -164,7 +164,7 @@
         $form.find(this.fieldNames.expiryYear).val(expiry.year);
 
         //Prevent Expiry field from being submitted
-        $form.find(this.fieldNames.expiry).attr('name', '');;
+        $form.find(this.fieldNames.expiry).prop('disabled', true);
 
         var data = $form.serialize();
 
