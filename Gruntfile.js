@@ -43,7 +43,7 @@ module.exports = function(grunt){
         }
     });
 
-    grunt.registerTask('default', ['htmlConvert','useminPrepare','concat','cssmin','copy']);
+    grunt.registerTask('default', ['htmlConvert','useminPrepare','concat','uglify','cssmin','copy']);
 
     grunt.registerTask('template',['htmlConvert']);
 };
