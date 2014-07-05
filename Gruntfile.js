@@ -1,9 +1,13 @@
 'use strict';
 module.exports = function(grunt){
-    //Load all grunt tasks
+
+    //
+    // Load all grunt tasks
+    //
     require('load-grunt-tasks')(grunt);
 
     grunt.file.defaultEncoding = 'utf8';
+
     grunt.initConfig({
         htmlConvert:{
             templates: {
@@ -11,12 +15,14 @@ module.exports = function(grunt){
                 dest:'.tmp/templates.js'
             }
         },
+
         useminPrepare:{
             html:'layout.html',
             options: {
-              dest: 'dist'//dist is the only directory served
+              dest: 'dist' // dist is the only directory served
             }
         },
+
         copy:{
             main: {
                 src: ['**'],
@@ -25,6 +31,7 @@ module.exports = function(grunt){
                 expand: true
             }
         },
+
         watch:{
             files:'**',
             tasks:'default',
@@ -35,6 +42,8 @@ module.exports = function(grunt){
             }
         }
     });
-    grunt.registerTask('default', ['htmlConvert','useminPrepare','concat','uglify','cssmin','copy']);
+
+    grunt.registerTask('default', ['htmlConvert','useminPrepare','concat','cssmin','copy']);
+
     grunt.registerTask('template',['htmlConvert']);
 };
