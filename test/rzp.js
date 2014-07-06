@@ -81,10 +81,10 @@ describe("Razorpay", function() {
 
     var rzp;
     var options = {
-        'amount':'20',
-        'name':'Razorpay',
-        'description':'Karma',
-        'image':'https://api.razorpay.com/test/merchant/vk.jpg',
+        'amount': '20',
+        'name': 'Razorpay',
+        'description': 'Karma',
+        'image': 'https://api.razorpay.com/test/merchant/vk.jpg',
         'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f'
     };
 
@@ -95,15 +95,20 @@ describe("Razorpay", function() {
     };
 
     beforeEach(function(){
-        //This is to reset options after every test
+        //
+        // This is to reset options after every test
+        //
         rzp = new Razorpay(options);
     });
 
     it("should work with dotted property names", function(){
         var newOptions = $.extend({}, options);
+
         newOptions['prefill.name'] = 'Harshil Mathur';
         newOptions['udf.address'] = 'Jaipur';
+
         var rzp = new Razorpay(newOptions);
+
         expect(rzp.options.prefill.name).toBe('Harshil Mathur');
         expect(rzp.options.udf.address).toBe('Jaipur');
     });
@@ -119,22 +124,27 @@ describe("Razorpay", function() {
     });
 
     it("addButton should work", function() {
-        //Since karma is automatically injecting the scripts, we cannot add the data- parameters to the script tag
-        //Therefore we must manually add the button
+        //
+        // Since karma is automatically injecting the scripts,
+        // we cannot add the data- parameters to the script tag
+        // Therefore we must manually add the button
+        //
         rzp.addButton();
         expect($('#rzp-button')).toBeInDOM();
     });
 
     it('open should work', function(){
 
-        rzp.open(); //Show the modal
+        rzp.open(); // Show the modal
 
         expect(rzp.$el).toBeVisible();
 
-        rzp.$el.find('input').removeAttr('required'); //This is so that chrome does not freak out about "required" attibutes
+        //
+        // This is so that chrome does not freak out about "required" attibutes
+        //
+        rzp.$el.find('input').removeAttr('required');
 
         rzp.$el.find('.rzp-submit').click();
-
     });
 
     it("should accept arguments to .open and use them", function(){

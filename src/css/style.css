@@ -52,7 +52,7 @@
 }
 .rzp-merchant_powered{
   float:right;
-  width:100px; 
+  width:100px;
   margin-top:10px;
   background-image:url('../images/powered_by_rzp.png');
   min-height: 30px;
@@ -112,7 +112,7 @@ form.rzp-body .rzp-card{
   border-radius:3px;
   width:350px;
 }
-form.rzp-body input[name="card[name]"], form.rzp-body input[name="udf[email]"], form.rzp-body input[name="udf[contact]"]{
+form.rzp-body input[name="card[name]"], form.rzp-body input[name="email"], form.rzp-body input[name="contact"]{
   margin-top:3px;
   padding-bottom:3px;
   border-bottom:1px solid #727272;
@@ -169,13 +169,13 @@ form.rzp-body input[name="card[cvv]"]{
   background-position: 3px 4px;
   border:1px solid #727272;
   border-radius: 0px 0px 3px 0px;
-  left: 249px;  
+  left: 249px;
   position: absolute;
   width: 176px;
 }
 form.rzp-body input[name="card[cvv]"]:focus{
   background-position: 3px -25px;
-} 
+}
 form.rzp-body .rzp-submit{
   background-color:#28B3D2;
   color:white;
@@ -204,7 +204,7 @@ form.rzp-body .rzp-submit.error{
     width: 18px;
     display:none;
     -webkit-animation: rzp-pulsate 1s ease-out;
-    -webkit-animation-iteration-count: infinite; 
+    -webkit-animation-iteration-count: infinite;
     opacity: 0.0;
     left:50px;
     top:-5px;

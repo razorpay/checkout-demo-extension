@@ -163,8 +163,10 @@
 
     Razorpay.prototype.createlightBox = function(template) {
         if (this.options.id) {
-            //Lets remove the div first
-            $('#'+this.options.id).remove();
+            //
+            // Lets remove the div first
+            //
+            $('#' + this.options.id).remove();
         }
 
         this.options.id = (Math.random()).toString(36).replace(/[^a-z]+/g, '');
