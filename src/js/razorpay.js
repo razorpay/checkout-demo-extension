@@ -32,7 +32,7 @@
         return this;
     };
 
-    var Razorpay = function(options){
+    var Razorpay = function(options) {
         this.configure(options);
     };
 
@@ -55,10 +55,10 @@
         expiry : 'input[name="card[expiry]"]',
         cvv: 'input[name="card[cvv]"]',
         name: 'input[name="card[name]"]',
-        email: 'input[name="udf[email]"]',
-        contact: 'input[name="udf[contact]"]',
         expiryMonth: 'input[name="card[expiry_month]"]',
-        expiryYear: 'input[name="card[expiry_year]"]'
+        expiryYear: 'input[name="card[expiry_year]"]',
+        email: 'input[name="email"]',
+        contact: 'input[name="contact"]'
     };
 
     Razorpay.prototype.preValidate = function($form){
@@ -71,16 +71,24 @@
 
         $form.find(this.fieldNames.cvv).payment('formatCardCVC');
 
-        //Attach a focusout handler to show card type
+        //
+        // Attach a focusout handler to show card type
+        //
         $form.find(this.fieldNames.number).off('focusout').focusout(function(){
             var cardType = $.payment.cardType(this.value);
 
-            if(cardType!=null){
+            if (cardType != null) {
                 $form.find('.rzp-card_image').addClass(cardType);
             }
         });
     };
 
+    /**
+     * Validates form fields
+     *
+     * @param  {[type]} $form
+     * @return array            array of error messages
+     */
     Razorpay.prototype.postValidate = function($form){
         $form.find('input').removeClass('rzp-invalid');
 
@@ -108,19 +116,21 @@
             $form.find(this.fieldNames.email).addClass('rzp-invalid');
             errors.push('Missing email address');
         }
-        if (email.length > 250) {
+
+        if (email.length > 255) {
             $form.find(this.fieldNames.email).addClass('rzp-invalid');
-            errors.push('Maximum email length is 250');
+            errors.push('Maximum email length is 255');
         }
+
         if (contact === '' ) {
             $form.find(this.fieldNames.contact).addClass('rzp-invalid');
             errors.push('Missing contact number');
         }
 
         if ((contact.length > 12) ||
-            (contact.length < 8)) {
+            (contact.length < 10)) {
             $form.find(this.fieldNames.contact).addClass('rzp-invalid');
-            errors.push('Contact number should be between 8 and 12 digits long');
+            errors.push('Contact number should be between 10 and 12 digits long');
         }
 
         if (!/^\d+$/.test(contact)) {
@@ -162,7 +172,7 @@
         var html = $.tmpl(template, this.options);
         html.appendTo('body');
 
-        this.$el = $('#'+this.options.id);
+        this.$el = $('#' + this.options.id);
         this.preValidate(this.$el.find('form.rzp-body'));
         var self = this;
 
@@ -187,7 +197,7 @@
 
                 self.$el.data('busy', true);
             }
-            else{
+            else {
                 self.clearSubmission();
             }
 
@@ -217,16 +227,21 @@
     Razorpay.prototype.formsubmit = function(form){
         var merchantKey = this.options.key;
         var $form = $(form);
+
+        //
+        // Break expiry date into month and year
+        //
         var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
+
         $form.find(this.fieldNames.expiryMonth).val(expiry.month);
         $form.find(this.fieldNames.expiryYear).val(expiry.year);
 
         //
-        // Prevent Expiry field from being submitted
+        // Prevent 'expiry' field from being submitted
+        // since expiry month and year are being submitted individually
         //
         $form.find(this.fieldNames.expiry).prop('disabled', true);
 
-        var data = $form.serialize();
 
         var errors = this.postValidate($form);
         var self = this;
@@ -240,7 +255,9 @@
             //
             this.$el.addClass('rzp-shake');
 
-            window.setTimeout(function(){self.$el.removeClass("rzp-shake");}, 150);
+            window.setTimeout(function() {
+                self.$el.removeClass("rzp-shake");
+            }, 150);
 
             var template = '{{each err}}\
                     <li>${$value}<li>\
@@ -260,6 +277,8 @@
             //
             this.$el.find('.rzp-error_box').html('');
         }
+
+        var data = $form.serialize();
 
         $.ajax({
             url: this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp',
@@ -284,11 +303,20 @@
             this.clearSubmission();
         }
         else if (response.error) {
-            var message = response.error.message || 'There was an error in handling your request';
-            this.$el.find('.rzp-error_box').html('<li>'+message+'</li>');
+            //
+            // if there is an error then it needs to be displayed.
+            //
+            var defaultMessage = 'There was an error in handling your request';
+            var message = response.error.message || defaultMessage;
+
+            this.$el.find('.rzp-error_box').html('<li>' + message + '</li>');
             this.clearSubmission();
         }
         else if (response.callbackUrl) {
+            //
+            // If a proper response with callbackUrl has been received, then an
+            // iframe needs to be opened
+            //
             this.$el.html('<iframe></iframe>');
 
             var autosubmitformTemplate = templates['templates/autosubmit.tmpl'];
@@ -422,21 +450,7 @@
             throw new Error("No merchant key specified");
         }
 
-        for (var i in this.options.udf) {
-            if (i === 'contact') {
-                throw new Error(
-                    "You cannot pass the contact field via udf. Use the prefill option," +
-                    " or use another field name like contact2");
-            }
-
-            if (i === 'email') {
-                throw new Error(
-                    "You cannot pass the email field via udf. Use the prefill option, " +
-                    "or use another field name like email2");
-            }
-        }
-
-        if (Object.keys(this.options.udf).length > 13) {
+        if (Object.keys(this.options.udf).length > 15) {
             throw new Error("You can only pass at most 13 fields in the udf object");
         }
     };
@@ -452,28 +466,37 @@
     Razorpay.prototype.configure = function(options){
         //
         // The following loop converts property names of the form
-        //  x.y="Value" to proper objects x = {y:"Value"}
+        //  x.y = "Value" to proper objects x = {y:"Value"}
         //
-        for(var i in options){
-            if(i.indexOf('.') > -1){
+        for (var i in options) {
+            var ix = i.indexOf('.');
+
+            if (ix > -1) {
                 //
                 // We have a dot in an option name
                 // Break it into 2
                 //
-                var dotPosition = i.indexOf('.');
-                var category = i.substr(0,dotPosition);
-                var property = i.substr(dotPosition+1);
-                options[category] = options[category]||{};
+                var dotPosition = ix;
+
+                // Get the category
+                var category = i.substr(0, dotPosition);
+                // Get the property (after the dot)
+                var property = i.substr(dotPosition + 1);
+
+                options[category] = options[category] || {};
+
                 options[category][property] = options[i];
-                delete(options[i]);//Delete the existing property
+
+                // Delete the existing property
+                delete(options[i]);
             }
         }
 
-        if(typeof options === 'undefined') {
+        if (typeof options === 'undefined') {
             throw new Error("No options specified");
         }
 
-        if(typeof options['key'] === "undefined") {
+        if (typeof options['key'] === "undefined") {
             throw new Error("No merchant key specified");
         }
 
@@ -484,13 +507,15 @@
 
         var key = $(RazorPayScript).data('key');
 
-        if (key && key.length>0) {
+        if (key && key.length > 0) {
             //
             // If we have a key set, that means we are in auto mode
             // and need to display the button automatically
             //
             var rzp = new Razorpay($(RazorPayScript).data());
-            rzp.addButton();//We leave this unstyled
+
+            // We leave this unstyled
+            rzp.addButton();
         }
 
         window['Razorpay'] = Razorpay;

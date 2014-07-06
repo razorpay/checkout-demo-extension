@@ -26,27 +26,27 @@
     <script>
         var options = {
             'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f',
-            'amount':'20',
-            'name':'Daft Punk',
-            'description':'Tron Legacy',
-            'image':'https://i.imgur.com/3g7nmJC.png',
-            'handler': function (transaction){
-                alert("You have successfully purchased "+rzp1.options.description);
+            'amount': '20',
+            'name': 'Daft Punk',
+            'description': 'Tron Legacy',
+            'image': 'https://i.imgur.com/3g7nmJC.png',
+            'handler': function (transaction) {
+                alert("You have successfully purchased " + rzp1.options.description);
             },
             'protocol': 'http',
             'hostname': 'api.razorpay.dev',
-            'prefill':{
+            'prefill': {
                 'name': 'Harshil Mathur',
                 'email': 'harshil@razorpay.com',
-                'contact':'9999999999'
+                'contact': '9999999999'
             },
-            udf:{
-                'address':"Hello World"
+            udf: {
+                'address': 'Hello World'
             }
         }
         var rzp1 = new Razorpay(options);
 
-        $('#rzp-button1').click(function(e){
+        $('#rzp-button1').click(function(e) {
             rzp1.open();
             e.preventDefault();
         });
@@ -58,7 +58,7 @@
             handler : function (transaction){
                 alert("You have successfully purchased "+rzp2.options.description);
             },
-            udf:{
+            udf: {
                 'shipping': "Bye World"
             }
         });
