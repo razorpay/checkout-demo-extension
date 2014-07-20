@@ -67,9 +67,9 @@ form.rzp-body{
 }
 form.rzp-body .rzp-card_image{
   float:right;
-  width:26px;
-  height:7px;
-  margin-top: -20px;
+  width:40px;
+  height:25px;
+  margin-top: -25px;
   margin-right: 5px;
   background-repeat: no-repeat;
   background-position: right center;
