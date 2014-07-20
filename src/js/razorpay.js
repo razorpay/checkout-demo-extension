@@ -238,13 +238,6 @@
         $form.find(this.fieldNames.expiryMonth).val(expiry.month);
         $form.find(this.fieldNames.expiryYear).val(expiry.year);
 
-        //
-        // Prevent 'expiry' field from being submitted
-        // since expiry month and year are being submitted individually
-        //
-        $form.find(this.fieldNames.expiry).prop('disabled', true);
-
-
         var errors = this.postValidate($form);
         var self = this;
 
@@ -280,7 +273,18 @@
             this.$el.find('.rzp-error_box').html('');
         }
 
+        //
+        // Prevent 'expiry' field from being submitted
+        // since expiry month and year are being submitted individually
+        //
+        $form.find(this.fieldNames.expiry).prop('disabled', true);
+
         var data = $form.serialize();
+
+        //
+        // Renable after getting required data
+        // 
+        $(this.fieldNames.expiry).prop('disabled', false);
 
         $.ajax({
             url: this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp',
@@ -296,12 +300,10 @@
 
     Razorpay.prototype.handleAjaxError = function() {
         this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
-        $(this.fieldNames.expiry).prop('disabled', false);
         this.clearSubmission();
     };
 
     Razorpay.prototype.handleAjaxResponse = function(response) {
-        $(this.fieldNames.expiry).prop('disabled', false);
         if (response.exception) {
             this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
             this.clearSubmission();
