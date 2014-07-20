@@ -296,10 +296,12 @@
 
     Razorpay.prototype.handleAjaxError = function() {
         this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
+        $(this.fieldNames.expiry).prop('disabled', false);
         this.clearSubmission();
     };
 
     Razorpay.prototype.handleAjaxResponse = function(response) {
+        $(this.fieldNames.expiry).prop('disabled', false);
         if (response.exception) {
             this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
             this.clearSubmission();
