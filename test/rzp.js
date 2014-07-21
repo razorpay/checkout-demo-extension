@@ -29,7 +29,7 @@ describe("Available modules", function(){
 describe("breakExpiry", function(){
 
     var expiry;
-    var rzp = new Razorpay({key:'d9c6bf091a1a64cb5678d8c1d5e7360f'});
+    var rzp = new Razorpay({key:'d9c6bf091a1a64cb5678d8c1'});
 
     afterEach(function(){
         expiry = rzp.breakExpiry(expiry);
@@ -81,11 +81,11 @@ describe("Razorpay", function() {
 
     var rzp;
     var options = {
-        'amount': '20',
+        'amount': '200',
         'name': 'Razorpay',
         'description': 'Karma',
         'image': 'https://api.razorpay.com/test/merchant/vk.jpg',
-        'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f'
+        'key': 'd9c6bf091a1a64cb5678d8c1'
     };
 
     var prefillOptions = {
@@ -197,7 +197,8 @@ describe("Razorpay", function() {
             var ajaxSuccess = $.proxy(options.success, options.context);
 
             ajaxSuccess({
-                "id":"e6091ef0f6d911e398770090f5fbf011"
+                "id":"e6091ef0f6d911e398770090f5fbf011",
+                "status":"authorised"
             });
         });
 
