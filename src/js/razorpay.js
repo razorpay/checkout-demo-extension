@@ -248,11 +248,7 @@
             //
             // Shake the modal window
             //
-            this.$el.addClass('rzp-shake');
-
-            window.setTimeout(function() {
-                self.$el.removeClass("rzp-shake");
-            }, 150);
+            this.shake();
 
             var template = '{{each err}}\
                     <li>${$value}<li>\
@@ -304,21 +300,26 @@
     };
 
     Razorpay.prototype.handleAjaxResponse = function(response) {
-        if (response.exception) {
-            this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
-            this.clearSubmission();
-        }
-        else if (response.error) {
-            //
-            // if there is an error then it needs to be displayed.
-            //
+        if(response.http_status_code != 200 && response.error)
+        {
+            this.shake();
+            if(response.error.field)
+            {   
+                if(this.$el.find('input[name="'+response.error.field+'"]').length)
+                {
+                    this.$el.find('input[name="'+response.error.field+'"]').addClass('rzp-invalid');
+                }
+            }
+            
+
             var defaultMessage = 'There was an error in handling your request';
-            var message = response.error.message || defaultMessage;
+            var message = response.error.desc || defaultMessage;
 
             this.$el.find('.rzp-error_box').html('<li>' + message + '</li>');
             this.clearSubmission();
+            
         }
-        else if (response.callbackUrl) {
+        else if (response.callbackUrl){
             //
             // If a proper response with callbackUrl has been received, then an
             // iframe needs to be opened
@@ -344,10 +345,26 @@
             //
             this.setXDInstance();
         }
-        else {
+        else if (response.status) {
             this.preHandler();
+
             this.options.handler(response);
         }
+        else {
+            this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
+
+            this.clearSubmission(); 
+        }
+    };
+
+    Razorpay.prototype.shake = function() {
+        var self = this;
+
+        this.$el.addClass('rzp-shake');
+
+        window.setTimeout(function() {
+            self.$el.removeClass("rzp-shake");
+        }, 150);
     };
 
     Razorpay.prototype.hide = function() {
