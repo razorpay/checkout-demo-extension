@@ -1,5 +1,5 @@
 /* global $,templates */
-(function(){
+(function() {
     "use strict";
 
     var RazorPayScript = document.currentScript || (function() {
@@ -9,7 +9,7 @@
         return scripts[scripts.length - 1];
     })();
 
-    var init = function(){
+    var init = function() {
         $('<div class="ow-overlay ow-closed"></div>').appendTo("html");
     };
 
@@ -40,11 +40,11 @@
      * This function is passed an rzp instance and
      * it is saved in Razorpay
      */
-    Razorpay.prototype.setXDInstance = function(){
+    Razorpay.prototype.setXDInstance = function() {
         Razorpay.lastXDInstance = this;
     };
 
-    Razorpay.XDCallback = function(message){
+    Razorpay.XDCallback = function(message) {
         var rzp = Razorpay.lastXDInstance;
         rzp.preHandler();
         rzp.options.handler(message.data);
@@ -61,7 +61,7 @@
         contact: 'input[name="contact"]'
     };
 
-    Razorpay.prototype.preValidate = function($form){
+    Razorpay.prototype.preValidate = function($form) {
         //
         // Card Number
         //
@@ -74,7 +74,7 @@
         //
         // Attach a focusout handler to show card type
         //
-        $form.find(this.fieldNames.number).off('focusout').focusout(function(){
+        $form.find(this.fieldNames.number).off('focusout').focusout(function() {
             var cardType = $.payment.cardType(this.value);
 
             if (cardType != null) {
@@ -89,7 +89,7 @@
      * @param  {[type]} $form
      * @return array            array of error messages
      */
-    Razorpay.prototype.postValidate = function($form){
+    Razorpay.prototype.postValidate = function($form) {
         $form.find('input').removeClass('rzp-invalid');
 
         var cardNumber = $form.find(this.fieldNames.number).val();
@@ -211,7 +211,7 @@
         });
     };
 
-    Razorpay.prototype.breakExpiry = function(expiry){
+    Razorpay.prototype.breakExpiry = function(expiry) {
         //
         // Returns month, year as a tuple inside an object
         //
@@ -226,7 +226,7 @@
         };
     };
 
-    Razorpay.prototype.formsubmit = function(form){
+    Razorpay.prototype.formsubmit = function(form) {
         var merchantKey = this.options.key;
         var $form = $(form);
 
@@ -244,7 +244,7 @@
         //
         // If we have more than one errors
         //
-        if (errors.length > 0){
+        if (errors.length > 0) {
             //
             // Shake the modal window
             //
@@ -279,11 +279,12 @@
 
         //
         // Renable after getting required data
-        // 
+        //
         $(this.fieldNames.expiry).prop('disabled', false);
 
         $.ajax({
-            url: this.options.protocol+'://'+merchantKey+'@'+this.options.hostname+'/transactions/jsonp',
+            url: this.options.protocol +'://' + merchantKey + '@' + this.options.hostname + '/' +
+                this.options.version + this.options.jsonpUrl,
             dataType: 'jsonp',
             context: this,
             success: this.handleAjaxResponse,
@@ -291,6 +292,7 @@
             error: this.handleAjaxError,
             data: data
         });
+
         return true;
     };
 
@@ -300,26 +302,26 @@
     };
 
     Razorpay.prototype.handleAjaxResponse = function(response) {
-        if(response.http_status_code != 200 && response.error)
+        if (response.http_status_code != 200 && response.error)
         {
             this.shake();
-            if(response.error.field)
-            {   
-                if(this.$el.find('input[name="'+response.error.field+'"]').length)
+            if (response.error.field)
+            {
+                if (this.$el.find('input[name="'+response.error.field+'"]').length)
                 {
                     this.$el.find('input[name="'+response.error.field+'"]').addClass('rzp-invalid');
                 }
             }
-            
+
 
             var defaultMessage = 'There was an error in handling your request';
             var message = response.error.desc || defaultMessage;
 
             this.$el.find('.rzp-error_box').html('<li>' + message + '</li>');
             this.clearSubmission();
-            
+
         }
-        else if (response.callbackUrl){
+        else if (response.callbackUrl) {
             //
             // If a proper response with callbackUrl has been received, then an
             // iframe needs to be opened
@@ -353,7 +355,7 @@
         else {
             this.$el.find('.rzp-error_box').html('<li>There was an error in handling your request</li>');
 
-            this.clearSubmission(); 
+            this.clearSubmission();
         }
     };
 
@@ -375,6 +377,8 @@
     Razorpay.prototype.options = {
         protocol: 'https',
         hostname: 'api.razorpay.com',
+        version: 'v1',
+        jsonpUrl: '/payments/create/jsonp',
         prefill: {
             name: "",
             contact: "",
@@ -393,9 +397,13 @@
      * This function is called just before control is passed on
      * to the handler specified in options
      */
-    Razorpay.prototype.preHandler = function(){
-        this.hide();//Hide the modal window when the transaction is complete
-        //Prepare the lightBox for re-opening
+    Razorpay.prototype.preHandler = function() {
+        //
+        // Hide the modal window when the transaction is complete
+        //
+        this.hide();
+
+        // Prepare the lightBox for re-opening
         this.createlightBox(templates['templates/modal.tmpl']);
     };
 
@@ -406,17 +414,16 @@
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    Razorpay.prototype.options.handler = function(data){
-        var inputs='';
-        for(var i in data)
-        {
-            //For fields like udf, which are an object themselves
-            if(typeof data[i]==='object'){
-                for(var j in data[i]){
+    Razorpay.prototype.options.handler = function(data) {
+        var inputs = '';
+        for (var i in data) {
+            // For fields like udf, which are an object themselves
+            if (typeof data[i] === 'object') {
+                for (var j in data[i]) {
                     inputs+='<input type="hidden" name="'+i+'['+j+']" value="'+data[i][j]+'">';
                 }
             }
-            else{
+            else {
                 inputs+='<input type="hidden" name="'+i+'" value="'+data[i]+'">';
             }
         }
@@ -425,7 +432,7 @@
         $(RazorPayForm).submit();
     };
 
-    Razorpay.prototype.setEndpoint = function(protocol, hostname){
+    Razorpay.prototype.setEndpoint = function(protocol, hostname) {
         this.options.protocol = protocol;
         this.options.hostname = hostname;
     };
@@ -441,18 +448,18 @@
     /**
      * Creates a new button to press
      */
-    Razorpay.prototype.addButton = function(){
+    Razorpay.prototype.addButton = function() {
         var button = document.createElement('button');
         button.setAttribute('id','rzp-button');
         var self = this;
-        $(button).click(function(e){
+        $(button).click(function(e) {
             self.open();
             e.preventDefault();
         }).html('Pay with Card')
         .appendTo('body');
     };
 
-    Razorpay.prototype.validateOptions = function(){
+    Razorpay.prototype.validateOptions = function() {
         if (typeof this.options.amount === 'undefined') {
             throw new Error("No amount specified");
         }
@@ -486,7 +493,7 @@
         position(this.$el);
     };
 
-    Razorpay.prototype.configure = function(options){
+    Razorpay.prototype.configure = function(options) {
         //
         // The following loop converts property names of the form
         //  x.y = "Value" to proper objects x = {y:"Value"}
@@ -526,7 +533,7 @@
         this.options = $.extend({}, this.options, options);
     };
 
-    (function(){
+    (function() {
 
         var key = $(RazorPayScript).data('key');
 
