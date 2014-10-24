@@ -47,7 +47,15 @@
     Razorpay.XDCallback = function(message) {
         var rzp = Razorpay.lastXDInstance;
         rzp.preHandler();
-        rzp.options.handler(message.data);
+
+        if(message.data.error && message.data.error.description){
+            //In case of error reopen box and show error
+            rzp.open();
+            rzp.handleAjaxResponse(message.data);
+        }
+        else{
+            rzp.options.handler(message.data);
+        }
     };
 
     Razorpay.prototype.fieldNames = {
@@ -302,6 +310,7 @@
     };
 
     Razorpay.prototype.handleAjaxResponse = function(response) {
+
         if (response.http_status_code != 200 && response.error)
         {
             this.shake();
@@ -315,7 +324,7 @@
 
 
             var defaultMessage = 'There was an error in handling your request';
-            var message = response.error.desc || defaultMessage;
+            var message = response.error.description || defaultMessage;
 
             this.$el.find('.rzp-error_box').html('<li>' + message + '</li>');
             this.clearSubmission();
