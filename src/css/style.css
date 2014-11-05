@@ -228,7 +228,7 @@ form.rzp-body .rzp-submit.error{
 
 .rzp-select-style {
     padding: 0;
-    margin: 0;
+    margin: 10px 0 0 0;
     border:1px solid #727272;
     border-radius: 3px;
     overflow: hidden;
