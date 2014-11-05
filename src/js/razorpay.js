@@ -66,7 +66,8 @@
         expiryMonth: 'input[name="card[expiry_month]"]',
         expiryYear: 'input[name="card[expiry_year]"]',
         email: 'input[name="email"]',
-        contact: 'input[name="contact"]'
+        contact: 'input[name="contact"]',
+        bank: 'select[name="bank"]'
     };
 
     Razorpay.prototype.preValidate = function($form) {
@@ -92,12 +93,12 @@
     };
 
     /**
-     * Validates form fields
+     * Validates form fields for Card submission
      *
      * @param  {[type]} $form
      * @return array            array of error messages
      */
-    Razorpay.prototype.postValidate = function($form) {
+    Razorpay.prototype.postValidateCard = function($form) {
         $form.find('input').removeClass('rzp-invalid');
 
         var cardNumber = $form.find(this.fieldNames.number).val();
@@ -159,6 +160,27 @@
         if (!$.payment.validateCardCVC(cvv)) {
             $form.find(this.fieldNames.cvv).addClass('rzp-invalid');
             errors.push('Invalid CVV Number');
+        }
+
+        return errors;
+    };
+
+    /**
+     * Validates form fields for Net Banking submission
+     *
+     * @param  {[type]} $form
+     * @return array            array of error messages
+     */
+    Razorpay.prototype.postValidateNB = function($form) {
+        $form.find('input').removeClass('rzp-invalid');
+
+        var bank = $form.find(this.fieldNames.bank).val();
+
+        var errors = [];
+
+        if (bank === '') {
+            $form.find(this.fieldNames.bank).addClass('rzp-invalid');
+            errors.push('Bank not selected.');
         }
 
         return errors;
@@ -238,15 +260,36 @@
         var merchantKey = this.options.key;
         var $form = $(form);
 
-        //
-        // Break expiry date into month and year
-        //
-        var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
+        if($form.find(this.fieldNames.bank).length === 0) {
+            // CC/DC Submission
+            //
+            // Break expiry date into month and year
+            //
+            var expiry = this.breakExpiry($form.find(this.fieldNames.expiry).val());
 
-        $form.find(this.fieldNames.expiryMonth).val(expiry.month);
-        $form.find(this.fieldNames.expiryYear).val(expiry.year);
+            $form.find(this.fieldNames.expiryMonth).val(expiry.month);
+            $form.find(this.fieldNames.expiryYear).val(expiry.year);
 
-        var errors = this.postValidate($form);
+            //
+            // Prevent 'expiry' field from being submitted
+            // since expiry month and year are being submitted individually
+            //
+            $form.find(this.fieldNames.expiry).prop('disabled', true);
+
+            var data = $form.serialize();
+
+            //
+            // Renable after getting required data
+            //
+            $(this.fieldNames.expiry).prop('disabled', false);  
+
+            var errors = this.postValidateCard($form);
+        } else {
+            var data = $form.serialize();
+
+            var errors = this.postValidateNB($form);
+        }
+
         var self = this;
 
         //
@@ -276,19 +319,6 @@
             //
             this.$el.find('.rzp-error_box').html('');
         }
-
-        //
-        // Prevent 'expiry' field from being submitted
-        // since expiry month and year are being submitted individually
-        //
-        $form.find(this.fieldNames.expiry).prop('disabled', true);
-
-        var data = $form.serialize();
-
-        //
-        // Renable after getting required data
-        //
-        $(this.fieldNames.expiry).prop('disabled', false);
 
         $.ajax({
             url: this.options.protocol +'://' + merchantKey + '@' + this.options.hostname + '/' +
@@ -341,6 +371,27 @@
             var div = document.createElement('div');
             $.tmpl(autosubmitformTemplate, response).appendTo(div);
             this.$el.find('iframe').get(0).contentWindow.document.write(div.innerHTML);
+
+            //
+            // This form should autosubmit
+            // Now we need to resize the modal box so as to accomodate 3dsecure.
+            //
+            $(this.$el).width('1000px').height('500px');
+            $(this.$el.find('iframe')).width('1000px').height('500px');
+
+            position(this.$el);
+
+            //
+            // Make this instance of rzp the instance called by the XDCallback
+            //
+            this.setXDInstance();
+        }
+        else if (response.redirectUrl) {
+            //
+            // If a proper response with redirectUrl has been received, then an
+            // iframe needs to be opened
+            //
+            this.$el.html('<iframe src=' + response.redirectUrl + '></iframe>');
 
             //
             // This form should autosubmit
