@@ -1,13 +1,13 @@
 <!doctype html>
-<html> 
+<html>
     <head>
     </head>
     <body>
-        <form method="POST" action = "${data.url}" id="rzp-dcform">
-            <input type="hidden" name="PaReq" value="${data.PAReq}">
-            <input type="hidden" name="MD" value="${data.paymentid}">
-            <input type="hidden" name="TermUrl" value="${callbackUrl}">
-            <input style="display:none" type="submit" value="Submit">
+        <form method = "POST" action = "${data.url}" id = "rzp-dcform">
+            <input type = "hidden" name = "PaReq" value = "${data.PAReq}">
+            <input type = "hidden" name = "MD" value = "${data.paymentid}">
+            <input type = "hidden" name = "TermUrl" value = "${callbackUrl}">
+            <input style = "display:none" type = "submit" value = "Submit">
         </form>
         Your request is being processed
         <script>
