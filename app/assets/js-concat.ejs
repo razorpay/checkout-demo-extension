@@ -1,0 +1,18 @@
+!function(){
+	var module = {exports: null};
+	<%- include js/lib/jquery-1.11.1.js %>
+	var $, jQuery;
+	$ = jQuery = module.exports;
+
+	<%- include js/lib/jquery.easytabs.js %>
+	<%- include js/lib/jquery.omniwindow.js %>
+	<%- include js/lib/jquery.payment.js %>
+	<%- include js/lib/xdm.js %>
+	<%- include js/razorpay.js %>
+
+	<%- include js/lib/handlebars-v2.0.0.js %>
+	window.templates = {}
+	Handlebars.registerHelper('toRupee', function(paise) {
+		return parseInt(paise)/100;
+	});
+}()

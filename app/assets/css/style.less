@@ -1,0 +1,247 @@
+@import "common";
+
+.rzp-container{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	display: none;
+	opacity: 0;
+	background: rgba(0,0,0,0.6);
+	white-space: nowrap;
+	.transition(0.25s ease-out opacity);
+	&:after{
+		content: '';
+		vertical-align: middle;
+		height: 100%;
+		display: inline-block;
+	}
+	&.shown{
+		opacity: 1;
+		.rzp-modal{
+			.scale(1);
+			.transition-transform(~"0.25s cubic-bezier(0.3, 1.5, 0.7, 1)");
+		}
+	}
+}
+.rzp-modal{
+	position: relative;
+	vertical-align: middle;
+	display: inline-block;
+	text-align: left;
+	white-space: normal;
+	.scale(0.8);
+	.transition(0.2s ease-in all);
+
+	width: 500px;
+	border-radius: 5px;
+	background:#EDEDED;
+	font-family: 'Lato', Sans-serif;
+	box-shadow: 1px 1px 8px 0px rgba(0,0,0, 0.2);
+	min-height: 300px;
+	color: black;
+}
+
+/* Default class for an overlay */
+.rzp-header{
+	border-bottom: 1px solid #D9D9D9;
+}
+.rzp-merchant_image{
+	margin:5px 0px 0px 5px;
+	float:left;
+}
+.rzp-merchant_image img{
+	max-width:60px;
+	max-height: 40px;
+}
+.rzp-merchant_name{
+	margin:0 auto;
+	font-size: 13px;
+	padding-top: 10px;
+	width:145px;
+	font-weight: 400;
+	text-transform: capitalize;
+	float:none;
+	text-align: center;
+}
+.rzp-merchant_powered{
+	float:right;
+	width:100px; 
+	margin-top:10px;
+	background-image:url('../images/powered_by_rzp.png');
+	min-height: 30px;
+	background-repeat:no-repeat;
+}
+.rzp-clear{
+	clear:both;
+}
+.rzp-body{
+	margin:0 auto;
+	width:350px;
+}
+.rzp-body .rzp-card_image{
+	float:right;
+	width:26px;
+	height:7px;
+	margin-top: -20px;
+	margin-right: 5px;
+	background-repeat: no-repeat;
+	background-position: right center;
+}
+.rzp-card_image.visa{
+	background-image: url('../images/icons/visa.png');
+}
+.rzp-card_image.mastercard{
+	background-image: url('../images/icons/mastercard.png');
+}
+.rzp-card_image.maestro{
+	background-image: url('../images/icons/maestro.png');
+}
+.rzp-card_image.rupay{
+	background-image: url('../images/icons/rupay.png');
+}
+.input-row{
+	white-space: nowrap;
+	input{
+		width: 50%;
+		display: inline-block;
+	}
+}
+.rzp-body input{
+	color:#28B3D2;
+	border:none;
+	background: #EDEDED;
+	font-size:15px;
+	height:30px;
+	font-family: 'Lato',Sans-serif;
+	padding-left: 7px;
+	padding-top:7px;
+	padding-bottom:7px;
+	outline:none;
+	margin:0px;
+	box-sizing: border-box;
+	/** see http://davidwalsh.name/input-shadows-ipad */
+	-webkit-appearance: none;
+	-moz-appearance: none; /* mobile firefox too! */
+}
+.rzp-body input[name="card[number]"].rzp-invalid{
+	border:1px solid #FB797E;
+	border-width: 1px 1px 0px 1px;
+}
+.rzp-body .rzp-card{
+	margin-top: 10px;
+	border-radius:3px;
+	width:350px;
+}
+.rzp-body input[name="card[name]"], .rzp-body input[name="udf[email]"], .rzp-body input[name="udf[contact]"]{
+	margin-top:3px;
+	padding-bottom:3px;
+	border-bottom:1px solid #727272;
+	width:100%;
+}
+.rzp-body input[name="card[number]"]{
+	width:100%;
+	border-bottom: 1px solid #727272;
+	background: url('../images/icons/card.png');
+	background-repeat: no-repeat;
+	padding-left:35px;
+	background-position: 5px 6px;
+	border:1px solid #727272;
+	border-radius:3px 3px 0px 0px;
+	border-bottom:0px;
+}
+.rzp-body input[name="card[number]"]:focus{
+	background-position: 5px -20px;
+}
+.rzp-body input[name="card[expiry]"]{
+	background: url('../images/icons/calendar.png');
+	background-repeat: no-repeat;
+	padding-left:35px;
+	background-position: 7px 4px;
+	width:175px;
+	border-right:5px solid #727272;
+	border:1px solid #727272;
+	border-radius:0px 0px 0px 3px;
+}
+.rzp-body input[name="card[expiry]"]:focus{
+	background-position: 7px -25px;
+}
+.rzp-body input[name="card[expiry]"].rzp-invalid{
+	border:1px solid #FB797E;
+	border-bottom:0px;
+}
+/** All sibling inputs of an invalid card number **/
+.rzp-body input[name="card[number]"].rzp-invalid ~ input{
+	border-top:1px solid #FB797E;
+}
+.rzp-body input[name="card[expiry]"].rzp-invalid{
+	border:1px solid #FB797E;
+}
+.rzp-body input[name="card[expiry]"].rzp-invalid ~ input{
+	border-left: 0px !important;
+}
+.rzp-body input[name="card[cvv]"].rzp-invalid{
+	border:1px solid #FB797E;
+}
+.rzp-body input[name="card[cvv]"]{
+	background: url('../images/icons/lock.png');
+	background-repeat: no-repeat;
+	padding-left:32px;
+	background-position: 3px 4px;
+	border:1px solid #727272;
+	border-radius: 0px 0px 3px 0px;
+}
+.rzp-body input[name="card[cvv]"]:focus{
+	background-position: 3px -25px;
+} 
+.rzp-body .rzp-submit{
+	background-color:#28B3D2;
+	color:white;
+	width:100%;
+	padding:0 auto;
+	border-radius: 3px;
+	margin-top:20px;
+	height:40px;
+	font-size: 20px;
+	text-align: center;
+	border: none;
+}
+.rzp-body .rzp-submit[disabled=disabled] .rzp-ring{
+	display:inline-block;
+}
+.rzp-body .rzp-submit[disabled=disabled] .rzp-text{
+	display:none;
+}
+.rzp-body .rzp-submit.error{
+	background-color:#FB797E;
+}
+.rzp-ring {
+		border: 1px solid white;
+		border-radius: 30px;
+		height: 18px;
+		width: 18px;
+		display:none;
+		-webkit-animation: rzp-pulsate 1s ease-out;
+		-webkit-animation-iteration-count: infinite; 
+		opacity: 0.0;
+		left:50px;
+		top:-5px;
+}
+@-webkit-keyframes rzp-pulsate {
+		0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
+		50% {opacity: 1.0;}
+		100% {-webkit-transform: scale(1.2, 1.2); opacity: 0.0;}
+}
+.rzp-error_box{
+	color: #FB797E;
+	text-align:center;
+	font-size: 12px;
+	list-style-type: none;
+	padding: 0px;
+}
+.rzp-modal iframe{
+	border: none;
+	border-radius: 5px;
+}
