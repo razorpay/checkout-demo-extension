@@ -9,7 +9,7 @@
 
 #Development Instructions
 - All source code is kept inside the `src` directory
-- All unit tests are in test directory
+- All unit tests are in test directory.
 - Karma runs JSHint using settings from `.jshintrc` before running unit tests
 - Karma directly loads the compiled files from the `dist` directory, so you need to save files, and then run `grunt` again to get karma to re-run tests.
 - See `karma.conf.js` for karma configuration, and `Gruntfile.js` for grunt configuration.

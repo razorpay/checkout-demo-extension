@@ -5,64 +5,74 @@ describe("Available modules", function(){
     it("should include jQuery", function(){
         expect($).toBeDefined();
     });
+
     it("should include jQuery.payment", function(){
         expect($.payment).toBeDefined();
     });
+
     it("should include omniWindow", function(){
         expect($.fn.rzpomniWindow).toBeDefined();
     });
-    //This is our cross domain communication library
+
+    //
+    // This is our cross domain communication library
+    //
     it("should include XD", function(){
         expect(rzpXD).toBeDefined();
     });
+
     it("should include Razorpay", function(){
         expect(Razorpay).toBeDefined();
     });
 });
+
 describe("breakExpiry", function(){
 
     var expiry;
-    var rzp = new Razorpay({key:'d9c6bf091a1a64cb5678d8c1d5e7360f'});
+    var rzp = new Razorpay({key:'d9c6bf091a1a64cb5678d8c1'});
 
     afterEach(function(){
         expiry = rzp.breakExpiry(expiry);
         expect(expiry.month).toBe('05');
-        if(expiry.year.length === 2){
+
+        if (expiry.year.length === 2) {
             expect(expiry.year).toBe('19');
         }
-        else if(expiry.year.length === 4){
-            expect(expiry.year).toBe('2019');   
+        else if (expiry.year.length === 4) {
+            expect(expiry.year).toBe('2019');
         }
-        else{
+        else {
             throw "Invalid Year Error";
         }
     });
 
-    it("should work with spaces", function(){
+    it("should work with spaces", function() {
         expiry = '05 / 19';
     });
 
-    it("should work without spaces", function(){
+    it("should work without spaces", function() {
         expiry = '05/19';
     });
 
-    it("should work with 4 digit years", function(){
+    it("should work with 4 digit years", function() {
         expiry = '05/2019';
     });
 
-    it("should work with 4 digit years (with spaces)", function(){
+    it("should work with 4 digit years (with spaces)", function() {
         expiry = '05 / 2019';
     });
 });
 
 describe("overlay", function(){
-    it("should be present in DOM", function(){
+    it("should be present in DOM", function() {
         expect($('.ow-overlay')).toBeInDOM();
     });
-    it("should be hidden", function(){
+
+    it("should be hidden", function() {
         expect($('.ow-overlay')).toHaveClass('ow-closed');
     });
-    it("should be single", function(){
+
+    it("should be single", function() {
         expect($('.ow-overlay').length).toBe(1);
     });
 });
@@ -71,11 +81,11 @@ describe("Razorpay", function() {
 
     var rzp;
     var options = {
-        'amount':'20',
-        'name':'Razorpay',
-        'description':'Karma',
-        'image':'https://api.razorpay.com/test/merchant/vk.jpg',
-        'key': 'd9c6bf091a1a64cb5678d8c1d5e7360f'
+        'amount': '200',
+        'name': 'Razorpay',
+        'description': 'Karma',
+        'image': 'https://api.razorpay.com/test/merchant/vk.jpg',
+        'key': 'd9c6bf091a1a64cb5678d8c1'
     };
 
     var prefillOptions = {
@@ -85,80 +95,110 @@ describe("Razorpay", function() {
     };
 
     beforeEach(function(){
-        //This is to reset options after every test
+        //
+        // This is to reset options after every test
+        //
         rzp = new Razorpay(options);
     });
-    
+
     it("should work with dotted property names", function(){
         var newOptions = $.extend({}, options);
+
         newOptions['prefill.name'] = 'Harshil Mathur';
         newOptions['udf.address'] = 'Jaipur';
+
         var rzp = new Razorpay(newOptions);
+
         expect(rzp.options.prefill.name).toBe('Harshil Mathur');
         expect(rzp.options.udf.address).toBe('Jaipur');
     });
 
     it("should throw an error on missing merchant key", function(){
-        var newOptions = $.extend({}, options); 
+        var newOptions = $.extend({}, options);
+
         delete newOptions['key'];
-        expect(function(){
+
+        expect(function() {
             new Razorpay(newOptions);
         }).toThrow(new Error("No merchant key specified"));
     });
 
     it("addButton should work", function() {
-        //Since karma is automatically injecting the scripts, we cannot add the data- parameters to the script tag
-        //Therefore we must manually add the button
+        //
+        // Since karma is automatically injecting the scripts,
+        // we cannot add the data- parameters to the script tag
+        // Therefore we must manually add the button
+        //
         rzp.addButton();
         expect($('#rzp-button')).toBeInDOM();
     });
 
     it('open should work', function(){
-        
-        rzp.open(); //Show the modal
+
+        rzp.open(); // Show the modal
 
         expect(rzp.$el).toBeVisible();
 
-        rzp.$el.find('input').removeAttr('required'); //This is so that chrome does not freak out about "required" attibutes
+        //
+        // This is so that chrome does not freak out about "required" attibutes
+        //
+        rzp.$el.find('input').removeAttr('required');
 
         rzp.$el.find('.rzp-submit').click();
-        
     });
 
     it("should accept arguments to .open and use them", function(){
         rzp.open({
             prefill:prefillOptions
         });
+
         var $form = rzp.$el.find('.rzp-body');
+
         expect($form.find(rzp.fieldNames.name)).toHaveValue(prefillOptions.name);
         expect($form.find(rzp.fieldNames.contact)).toHaveValue(prefillOptions.contact);
         expect($form.find(rzp.fieldNames.email)).toHaveValue(prefillOptions.email);
     });
 
     it("should show no errors after filling the form", function(){
-        //This is to fill the name, email, and contact
+        //
+        // This is to fill the name, email, and contact
+        //
         rzp.open({
             prefill:prefillOptions
         });
+
         var $form = rzp.$el.find('.rzp-body');
-        //We are using a CC here, so as to avoid having to press the button inside the iframe (3d secure)
+
+        //
+        // We are using a CC here, so as to avoid
+        // having to press the button inside the iframe (3d secure)
+        //
         $form.find(rzp.fieldNames.number).val('4012001038443335');
         $form.find(rzp.fieldNames.expiryMonth).val('05');
         $form.find(rzp.fieldNames.expiryYear).val('19');
         $form.find(rzp.fieldNames.cvv).val('888');
+
         var errors = rzp.postValidate($form);
+
         expect(errors).toEqual([]);
     });
-    
+
     it("should call the handler function after its done", function(done){
 
-        //Fake ajax call
-        //@link http://www.htmlgoodies.com/html5/javascript/testing-ajax-event-handlers-using-jasmine-spies.html
+        //
+        // Fake ajax call
+        // @link http://www.htmlgoodies.com/html5/javascript/testing-ajax-event-handlers-using-jasmine-spies.html
+        //
         spyOn($, "ajax").and.callFake(function(options){
-            //We make sure that the context for the success request is set to the context passed to $.ajax (rzp object)
+            //
+            // We make sure that the context for the success request
+            // is set to the context passed to $.ajax (rzp object)
+            //
             var ajaxSuccess = $.proxy(options.success, options.context);
+
             ajaxSuccess({
-                "id":"e6091ef0f6d911e398770090f5fbf011"
+                "id":"e6091ef0f6d911e398770090f5fbf011",
+                "status":"authorised"
             });
         });
 
@@ -168,14 +208,19 @@ describe("Razorpay", function() {
                 done();
             }
         });
-        
+
         var $form = rzp.$el.find('.rzp-body');
 
         $form.find(rzp.fieldNames.number).val('4012001038443335');
         $form.find(rzp.fieldNames.cvv).val('888');
-        //We manually set the expiry here because we are testing user-click based form submission, which uses expiry and breaks it down into two fields
+
+        //
+        // We manually set the expiry here because we are testing
+        // user-click based form submission, which uses expiry and
+        // breaks it down into two fields
+        //
         $form.find(rzp.fieldNames.expiry).val('05 / 19');
-        
+
         rzp.$el.find('.rzp-submit').click();
     });
 });
@@ -219,24 +264,15 @@ describe("Errors", function(){
         error = "Invalid Protocol specified";
     });
 
-    it("should be thrown on udf.contact being set", function(){
-        options = {key:1, amount:10, udf:{contact:"9999999999"}};
-        error = "You cannot pass the contact field via udf. Use the prefill option, or use another field name like contact2";
-    });
-
-    it("should be thrown on udf.email being set", function(){
-        options = {key:1, amount:1, udf:{email:"nemo@gmail.com"}};
-        error = "You cannot pass the email field via udf. Use the prefill option, or use another field name like email2";
-    });
-
-    it("should be thrown on more than 13 udf fields", function(){
+    it("should be thrown on more than 15 udf fields", function(){
         options = {
             key: 1,
             amount: 2,
-            udf:{
+            udf: {
             }
         };
-        for(var i =1;i<=14;i++){
+
+        for(var i = 1; i <= 16; i++) {
             options.udf[i] = "Dummy Test";
         }
         error = "You can only pass at most 13 fields in the udf object";
