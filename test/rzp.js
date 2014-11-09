@@ -85,7 +85,8 @@ describe("Razorpay", function() {
         'name': 'Razorpay',
         'description': 'Karma',
         'image': 'https://api.razorpay.com/test/merchant/vk.jpg',
-        'key': 'd9c6bf091a1a64cb5678d8c1'
+        'key': 'd9c6bf091a1a64cb5678d8c1',
+        'netbanking': 'false'
     };
 
     var prefillOptions = {
@@ -178,7 +179,7 @@ describe("Razorpay", function() {
         $form.find(rzp.fieldNames.expiryYear).val('19');
         $form.find(rzp.fieldNames.cvv).val('888');
 
-        var errors = rzp.postValidate($form);
+        var errors = rzp.postValidateCard($form);
 
         expect(errors).toEqual([]);
     });

@@ -26,8 +26,8 @@
 
     <script>
         var options = {
-            'key': 'd9c6bf091a1a64cb5678d8c1',
-            'amount': '20',
+            'key': 'rzp_test_d9c6bf091a1a64cb5678d8c1',
+            'amount': '5100',
             'name': 'Daft Punk',
             'description': 'Tron Legacy',
             'image': 'https://i.imgur.com/3g7nmJC.png',
@@ -43,7 +43,8 @@
             },
             udf: {
                 'address': 'Hello World'
-            }
+            },
+            netbanking: true
         }
         var rzp1 = new Razorpay(options);
 
@@ -53,7 +54,7 @@
         });
 
         $.extend(true, options, {
-            amount : 200,
+            amount : 5200,
             description : 'Alive (2007)',
             image : 'https://i.imgur.com/GXalrU0.png',
             handler : function (transaction){
