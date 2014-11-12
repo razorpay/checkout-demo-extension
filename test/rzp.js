@@ -85,8 +85,7 @@ describe("Razorpay", function() {
         'name': 'Razorpay',
         'description': 'Karma',
         'image': 'https://api.razorpay.com/test/merchant/vk.jpg',
-        'key': 'd9c6bf091a1a64cb5678d8c1',
-        'netbanking': 'false'
+        'key': 'rzp_test_d9c6bf091a1a64cb5678d8c1'
     };
 
     var prefillOptions = {
