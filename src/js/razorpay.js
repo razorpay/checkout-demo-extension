@@ -550,7 +550,7 @@
         this.createlightBox(templates['templates/modal.tmpl']);
         this.$modal = this.$el.rzpomniWindow();
         this.$modal.trigger('show');
-        if(this.options.netbanking === true)
+        if(this.options.netbanking)
             $('.rzp-tabs-container').easytabs();
         position(this.$el);
     };

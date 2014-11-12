@@ -12,7 +12,7 @@
     	<div class = "rzp-clear"></div>
     </div>
     <div class="rzp-tabs-container">
-        {{if netbanking === true}}
+        {{if netbanking }}
         <ul class="rzp-tabs">
             <li><a href="#rzp-tabs-cc">Card</a></li>
             <li><a href="#rzp-tabs-nb">Net Banking</a></li>
@@ -46,7 +46,7 @@
             <ul class = "rzp-error_box"></ul>
             </form>
         </div>
-        {{if netbanking === true}}
+        {{if netbanking }}
             <div id="rzp-tabs-nb" class="rzp-padder-top">
                 <form class = "rzp-body" method = "POST">
                 <input type = "hidden" name = "amount" value = "${amount}">
