@@ -2,7 +2,7 @@
 
 @width: 440px;
 @bordercol: #ddd;
-@backcol: #f9fafb;
+@backcol: #f6f9fb;
 @padding: 20px;
 @color: #333;
 @fontsize: 14px;
@@ -63,7 +63,7 @@
 	}
 	button{
 		border: none;
-		background: rgb(53, 142, 251);
+		background: #28B3D2;
 		line-height: 40px;
 		color: #fff;
 		font-size: 16px;
@@ -73,10 +73,11 @@
 	}
 }
 .rzp-elem{
-	height: 34px;
-	line-height: 34px;
+	@gap: 14px;
+	height: 40px;
+	line-height: 40px;
 	border: 1px solid #e2e2e2;
-	background: #f9f9f9;
+	background: #fff;
 	position: relative;
 	margin-bottom: -1px;
 	input, select, textarea{
@@ -90,13 +91,14 @@
 		max-height: 100%;
 		width: 100%;
 		display: block;
-		padding: 0 @padding;
-		margin: 0 -@padding;
+		padding: 0 @gap;
+		margin: 0 -@gap;
+		.box-sizing(content-box); // modern browsers being oversmart
 	}
-}
-.rzp-elem-inner{
-	margin: 0 @padding;
-	height: 100%;
+	.rzp-elem-inner{
+		margin: 0 @gap;
+		height: 100%;
+	}
 }
 .rzp-double{
 	white-space: nowrap;
@@ -122,14 +124,13 @@
 	border-radius: 2px 2px 0 0;
 }
 .rzp-merchant{
-	padding: 10px 0;
+	padding: 10px;
 }
 /* Default class for an overlay */
 .rzp-header{
 	border-bottom: 1px solid @bordercol;
 }
 .rzp-merchant_image{
-	margin:5px 0px 0px 5px;
 	float:left;
 }
 .rzp-merchant_image img{
@@ -139,7 +140,6 @@
 .rzp-merchant_name{
 	margin:0 auto;
 	font-size: 13px;
-	padding-top: 10px;
 	width:145px;
 	font-weight: 400;
 	text-transform: capitalize;
@@ -148,11 +148,9 @@
 }
 .rzp-merchant_powered{
 	float:right;
-	width:100px; 
-	margin-top:10px;
-	background-image:url('../images/powered_by_rzp.png');
+	width:100px;
+	background: url('../images/powered_by_rzp.png') right center no-repeat;
 	min-height: 30px;
-	background-repeat:no-repeat;
 }
 .rzp-clear{
 	clear:both;
@@ -182,13 +180,6 @@
 		background-image: url('../images/icons/rupay.png');
 	}
 }
-.input-row{
-	white-space: nowrap;
-	input{
-		width: 50%;
-		display: inline-block;
-	}
-}
 .rzp-body input[name="card[number]"]{
 	background-image: url('../images/icons/card.png');
 }
@@ -199,11 +190,12 @@
 .rzp-body .rzp-submit.error{
 	background-color:#FB797E;
 }
-.rzp-error_box{
+.rzp-error{
+	margin: 0;
 	color: #FB797E;
 	text-align:center;
 	font-size: 12px;
-	list-style-type: none;
+	list-style: none;
 	padding: 0px;
 }
 .rzp-modal iframe{
@@ -220,7 +212,7 @@
 .rzp-tabs{
 	font-size: 0;
 	white-space: nowrap;
-	margin: 0 1px -2px 0;
+	margin: 0 2px -5px 1px;
 	padding: 0;
 
 	li{
@@ -228,21 +220,24 @@
 		display: inline-block;
 		font-size: 14px;
 		text-align: center;
-		border-top: 1px solid #ddd;
+		border: 1px solid #ddd;
 		width: 50%;
 		cursor: pointer;
 		background: #eee;
-		&:first-child{
-			border-right: 1px solid @bordercol;
-		}
+		border-bottom: 1px solid #ddd;
+		margin-left: -1px;
+		
 		&.active{
-			background: @backcol;
+			background: #f6f9fb;
 			border-bottom: none;
+			height: 44px;
+			position: relative;
+			top: -3px;
+			border-radius: 2px 2px 0 0;
+			cursor: default;
 		}
 	}
 }
 .rzp-footer{
-	// background: #eef4ff;
 	padding: 0 @padding @padding;
-	// border-top: 1px solid #dde7ee;
 }

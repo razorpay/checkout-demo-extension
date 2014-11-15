@@ -2,7 +2,7 @@ window.Razorpay.templates.modal = '
 <div class="rzp-container">
 	<div class = "rzp-modal" id = "{{id}}">
 		<div class = "rzp-header">
-			<div class="rzp-merchant">
+			<div class="rzp-merchant rzp-clear">
 				<div class = "rzp-merchant_image">
 					<img src = "{{image}}">
 				</div>
@@ -54,7 +54,7 @@ window.Razorpay.templates.modal = '
 							<input type = "password" name = "card[cvv]" size = "3" placeholder = "CVV" maxlength = "4" required>
 						</div></div>
 					</div>
-					<ul class = "rzp-error_box"></ul>
+					<ul class = "rzp-error"></ul>
 				</form>
 			</div>
 			{{#if netbanking}}
@@ -85,7 +85,7 @@ window.Razorpay.templates.modal = '
 								<option value="SBIN">State Bank of India</option>
 							</select>
 						</div></div>
-						<ul class = "rzp-error_box"></ul>
+						<ul class = "rzp-error"></ul>
 					</form>
 				</div>
 			{{/if}}
