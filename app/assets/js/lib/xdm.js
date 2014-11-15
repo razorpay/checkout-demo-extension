@@ -1,5 +1,5 @@
 // everything is wrapped in the XD function to reduce namespace collisions
-var rzpXD = function(){
+Razorpay.XD = function(){
 
     var interval_id,
     last_hash,

@@ -30,8 +30,10 @@
 	-ms-transform-origin: @args;
 	transform-origin: @args;
 }
-.clear:after{
-	content: '';
-	clear: both;
-	display: block;
+.rzp-clear{
+	&:after{
+		content: '';
+		clear: both;
+		display: block;
+	}
 }
