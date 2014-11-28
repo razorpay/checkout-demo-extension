@@ -4,7 +4,7 @@
 2. Install npm supporting packages (`npm install`).
 2. Run grunt (`grunt`) on the command line. It should generate a dist directory
 3. Open `layout.html` via http(s) in your browser. By default, we use the `api.razorpay.dev` endpoint.
-4. Install karma, which we use for testing `npm install -g karma`.
+4. Install karma, which we use for testing `npm install -g karma-cli`.
 5. Run `karma start` to run the unit tests in a phantomjs+chrome instance. You can choose which browsers to run the test cases in by passing them using the `--browsers flag`. Use `Chrome`, or `PhantomJS` (or both). Capitalization matters.
 
 #Development Instructions
