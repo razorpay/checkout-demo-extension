@@ -1,1 +1,0 @@
-window.Razorpay = {templates: {}}

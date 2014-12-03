@@ -1,11 +1,11 @@
 // everything is wrapped in the XD function to reduce namespace collisions
-Razorpay.XD = function(){
+window.Razorpay.prototype.XD = (function(){
 
     var interval_id,
     last_hash,
     cache_bust = 1,
-    attached_callback,
-    window = this;
+    attached_callback;
+    // window = this;
 
     return {
         postMessage : function(message, target_url, target) {
@@ -57,4 +57,4 @@ Razorpay.XD = function(){
              }
          }
     };
-}();
+})();

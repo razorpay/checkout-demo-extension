@@ -1,4 +1,4 @@
-window.Razorpay.templates.autosubmit = '<!doctype html>
+Razorpay::templates.autosubmit = '<!doctype html>
 <html>
     <head>
     </head>

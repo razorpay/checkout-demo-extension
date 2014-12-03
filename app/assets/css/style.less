@@ -1,8 +1,8 @@
 @import "common";
 
-@width: 440px;
+@width: 320px;
 @bordercol: #ddd;
-@backcol: #f6f9fb;
+@backcol: #f7f9fc;
 @padding: 20px;
 @color: #333;
 @fontsize: 14px;
@@ -23,7 +23,7 @@
 	&:after{
 		content: '';
 		vertical-align: middle;
-		height: 95%;
+		height: 96%;
 		display: inline-block;
 	}
 	&.shown{
@@ -39,6 +39,7 @@
 	vertical-align: middle;
 	display: inline-block;
 	white-space: normal;
+	margin: 20px 0;
 	.scale(0.8);
 	.transition(0.2s ease-in all);
 
@@ -70,6 +71,7 @@
 		border-radius: 2px;
 		box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
 		width: 180px;
+		cursor: pointer;
 	}
 }
 .rzp-elem{
@@ -80,10 +82,28 @@
 	background: #fff;
 	position: relative;
 	margin-bottom: -1px;
+	color: #555;
+	.transition(0.25s);
+
+	&.rzp-focused{
+		border-color: #3498db;
+		color: #333;
+		z-index: 1;
+	}
+	&.rzp-mature.rzp-invalid{
+		color: #d35400;
+		&.rzp-focused{
+			border-color: #d35400;
+		}
+	}
+	.rzp-elem-inner{
+		margin: 0 @gap;
+		height: 100%;
+	}
 	input, select, textarea{
+		color: inherit;
 		background: none center right no-repeat!important;
 		line-height: 14px;
-		color: #333;
 		font-size: 14px;
 		height: 100%;
 		resize: none;
@@ -95,10 +115,10 @@
 		margin: 0 -@gap;
 		.box-sizing(content-box); // modern browsers being oversmart
 	}
-	.rzp-elem-inner{
-		margin: 0 @gap;
-		height: 100%;
-	}
+}
+.rzp-tooltip{
+	pointer-events: none;
+	display: none;
 }
 .rzp-double{
 	white-space: nowrap;
@@ -111,17 +131,8 @@
 		margin-left: -1px;
 	}
 }
-.rzp-allradius{
-	border-radius: 2px;
-}
-.rzp-blradius{
-	border-radius: 0 0 0 2px;
-}
-.rzp-brradius{
-	border-radius: 0 0 2px 0;
-}
-.rzp-tradius{
-	border-radius: 2px 2px 0 0;
+.rzp-fieldset{
+	margin: 20px 0;
 }
 .rzp-merchant{
 	padding: 10px;
@@ -157,7 +168,7 @@
 }
 .rzp-body{
 	text-align: left;
-	padding: @padding;
+	padding: 0 @padding;
 }
 .rzp-body .rzp-card_image{
 	float:right;
@@ -223,7 +234,7 @@
 		border: 1px solid #ddd;
 		width: 50%;
 		cursor: pointer;
-		background: #eee;
+		background: #f0f2f5;
 		border-bottom: 1px solid #ddd;
 		margin-left: -1px;
 		
