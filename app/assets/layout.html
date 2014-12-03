@@ -3,9 +3,12 @@
 <head>
 	<meta charset="utf-8">
 	<!-- build:js checkout.js -->
-	<script type="text/javascript" src="js-concat.html"></script>
+	<script type="text/javascript" src="js/init.html"></script>
+	<script type="text/javascript" src="js/lib/xdm.js"></script>
 	<script type="text/javascript" src="templates/modal.js"></script>
 	<script type="text/javascript" src="templates/autosubmit.js"></script>
+	<script type="text/javascript" src="js/input.js"></script>
+	<script type="text/javascript" src="js/razorpay.js"></script>
 	<!-- endbuild -->
 	<!-- build:css css/style.css -->
 	<link href="css/style.css" type="text/css" rel="stylesheet">
@@ -29,6 +32,7 @@
 			'handler': function (transaction) {
 				alert("You have successfully purchased " + rzp1.options.description);
 			},
+			'netbanking': 'true',
 			'protocol': 'http',
 			'hostname': 'api.razorpay.dev',
 			'prefill': {
@@ -65,6 +69,7 @@
 			rzp2.open();
 			e.preventDefault();
 		})
+		rzp1.open();
 	</script>
 
 	<script src="src/js/autofill.js"></script>
@@ -72,11 +77,8 @@
 	<style>
 
 	html {
-		background-image: url('http://www.youredm.com/wp-content/uploads/2014/03/Daft-Punk-Wallpaper-2560x1024-1.jpg');
-		background-size: cover cover;
-		/**background-position: center center fixed;*/
-		background-repeat: no-repeat;
-		background-position: -300px 0px;
+		/*background-image: url('http://www.youredm.com/wp-content/uploads/2014/03/Daft-Punk-Wallpaper-2560x1024-1.jpg');*/
+		background: #555;
 	}
 	.btn {
 		width: 20px;
