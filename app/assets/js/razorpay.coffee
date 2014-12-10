@@ -6,7 +6,7 @@ do () ->
 	Razorpay = window.Razorpay
 	$ = Razorpay::$
 	Handlebars = Razorpay::Handlebars
-		
+
 	###*
 	This function is passed an rzp instance and
 	it is saved in Razorpay
@@ -26,61 +26,41 @@ do () ->
 			rzp.options.handler message.data
 
 	Razorpay::clearSubmission = ->
-		@$el.find(".rzp-submit").removeAttr "disabled"
-		@$el.data "busy", false
-		return
+		@$el.find('.rzp-submit').removeAttr 'disabled'
+		@modal.options.backdropClose = true
 
 	Razorpay::createlightBox = (template) ->
-		$("#" + @options.id).parent().remove() if @options.id
-		@options.id = (Math.random()).toString(36).replace(/[^a-z]+/g, "")
-		html = $((Handlebars.compile(template))(@options))
-		html.smarty()
-		document.body.style.overflow = 'hidden'
-		html.appendTo(document.body).show()[0].offsetWidth
-		html.addClass('shown').click (e) ->
-			if this is e.target
-				$(this).remove()
-				document.body.style.overflow = ''
+		if @$el
+			return @modal.show()
+		@$el = $((Handlebars.compile(template))(@options))
+		@$el.smarty()
+		@modal = new Razorpay.modal @$el
 
 		if @options.netbanking
-			$('.rzp-tabs li').click ->
-				$('#' + @getAttribute("data-target")).addClass("active").siblings(".active").removeClass "active"
-				$(this).addClass("active").siblings(".active").removeClass "active"
+			@$el.find('.rzp-tabs li').click ->
+				inner = $(this).closest('.rzp-modal-inner')
+				return if not inner.length
+				modal = inner.parent()
+				modal.height inner.height()
+				inner.css 'opacity', 0.5
+				$('#' + @getAttribute('data-target')).addClass('active').siblings('.active').removeClass 'active'
+				$(this).addClass('active').siblings('.active').removeClass 'active'
+				modal.height inner.height()
+				setTimeout ->
+					inner.css 'opacity', 1
+				, 150
 
-		@$el = $('#' + @options.id)
-		self = this
-		@$el.find("form.rzp-body").submit (e) ->
-			
-			#
-			# Handles the form submission
-			#
-			submission = self.formsubmit(this)
-			
-			#
-			# submission stores whether we are submitting the form or not
-			#
-			if submission
-				
-				#
-				# Disable the input button to prevent double submissions
-				#
-				self.$el.find(".rzp-submit").attr "disabled", "disabled"
-				
-				#
-				# Marks the modal window as busy so it is not closable
-				#
-				self.$el.data "busy", true
-			else
-				self.clearSubmission()
-			
-			#
-			# So that form is not submitted by the browser,
-			# but by us over ajax
-			#
+		@$el.find('form.rzp-body').submit (e) =>
 			e.preventDefault()
 			return
-
-		return
+			submission = @formsubmit @
+			if submission
+				# Disable the input button to prevent double submissions
+				@$el.find(".rzp-submit").attr "disabled", "disabled"
+				# Marks the modal window as busy so it is not closable
+				@modal.options.backdropClose = false
+			else
+				@clearSubmission()
 
 	Razorpay::breakExpiry = (expiry) ->
 		
@@ -327,7 +307,6 @@ do () ->
 		@createlightBox @templates.modal
 
 	Razorpay::configure = (options) ->
-		
 		#
 		# The following loop converts property names of the form
 		#	x.y = "Value" to proper objects x = {y:"Value"}

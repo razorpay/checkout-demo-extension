@@ -2,6 +2,7 @@
 	prefix = 'rzp-'
 	Smarty = (form, options)->
 		@element = form
+		@ttel = $(form[0].querySelector @selector 'tooltip')
 		@options = options or {}
 		@listeners = []
 		@common_events()
@@ -44,7 +45,8 @@
 			@on 'input', @input, true
 			@on 'change', @input, true
 			@on 'keypress', @keypress
-			@on 'mouseover', @selector('tooltip'), (e)-> $(e.currentTarget).hide()
+			@on 'mousedown', @selector('tooltip'), (e)=>
+				$(e.currentTarget).hide()
 
 		on: ()->
 			event = arguments[0]
@@ -73,15 +75,49 @@
 
 		focus: (e)->
 			el = e.target
+			return if not (/(INPUT|SELECT)/.test el.nodeName)
 			# placeholder polyfill for IE <= 9
 			if el.rzp_placeholder
 				el.value = ''
 				el.rzp_placeholder = false
 
 			$(@parent(el)).addClass @class 'focused'
+			
+			# tooltip placement
+			@tooltip el
+
+		tooltip: (el)->
+			positioned = @ttel.data 'pos'
+			parent = @parent(el)
+
+			state = @parent(el).className
+			show = /mature/.test(state) and /invalid/.test(state)
+			classname = @class 'shown'
+			shown = @ttel.hasClass classname
+
+			if show
+				@ttel.html @helptext el
+				if not positioned
+					if @ttel.is(':hidden')
+						@ttel.show()
+					parent_rect = parent.getBoundingClientRect()
+					modal_rect = @element.children(@selector('modal'))[0].getBoundingClientRect()
+					tt_top = parent_rect.bottom - modal_rect.top - 5
+					tt_left = parent_rect.left - modal_rect.left + 10
+				
+					@ttel.css
+						top: tt_top
+						left: tt_left
+					.data 'pos', true
+
+			if show and not shown
+				@ttel.addClass classname
+			else if not show
+				@ttel.removeClass classname
 
 		blur: (e)->
 			el = e.target
+			return if not (/(INPUT|SELECT)/.test el.nodeName)
 			# placeholder polyfill for IE <= 9
 			if !el.value and !el.placeholder and typeof el.getAttribute('placeholder') isnt 'string'
 				el.rzp_placeholder = true
@@ -93,6 +129,9 @@
 			# helps with :invalid after losing focus once.
 			if not parent.hasClass @class 'mature'
 				parent.addClass @class 'mature'
+
+			@ttel.removeClass @class 'shown'
+				.data 'pos', false
 
 		input: (e)->
 			el = e.target
@@ -114,23 +153,25 @@
 				if valid and pattern
 					valid = new RegExp(pattern).test value
 
-			if valid and not parent.hasClass @class 'mature'
+			isMature = parent.hasClass @class 'mature'
+			if valid and not isMature
 				parent.addClass @class 'mature'
+				isMature = true
 
 			if valid and parent.hasClass @class 'invalid'
 				parent.removeClass @class 'invalid'
 			else if not valid
 				parent.addClass @class 'invalid'
 
+			@tooltip el
+
 		keypress: (e)->
+			return if e.metaKey or e.altKey or e.ctrlKey
 			chars = e.target.getAttribute 'data-chars'
-			return if not chars
+			return if not (chars and e.which)
+			return if e.which is 8 # backspace fires keypress in some browsers
 			key = String.fromCharCode(e.which)
 			return false if !(new RegExp(chars).test key)
-
-
-			# return true if name is 'card[expiry]' and key is 191
-			# return false if /card[expiry]|card[number]|card[cvv]|contact/.test(name) and (key <= 48 or key >= 57)
 
 		refresh: ()->
 			@element.find @selector('input')
@@ -140,10 +181,6 @@
 
 		initiate: (parent, el, type)->
 			parent.data('smarty', true)
-			
-			help = @helptext el
-			if help
-				parent.append('<div class='+@class('tooltip')+'>'+@helptext(el)+'</div>')
 			
 			if document.activeElement is el
 				parent.addClass @class('focused')
