@@ -95,10 +95,8 @@
 		z-index: 1;
 	}
 	&.rzp-mature.rzp-invalid{
+		border-color: #d35400;
 		color: #d35400;
-		&.rzp-focused{
-			border-color: #d35400;
-		}
 	}
 	.rzp-elem-inner{
 		margin: 0 @gap;
@@ -107,7 +105,7 @@
 	input, select, textarea{
 		color: inherit;
 		outline: none;
-		background: none center right no-repeat!important;
+		background: none center right no-repeat;
 		line-height: 14px;
 		font-size: 14px;
 		height: 100%;
@@ -207,6 +205,15 @@
 	text-align: left;
 	padding: 0 @padding;
 }
+.rzp-input[name="card[name]"]{
+	background-image: url('../images/ei-user.png');
+}
+.rzp-input[name="email"]{
+	background-image: url('../images/email.png');
+}
+.rzp-input[name="contact"]{
+	background-image: url('../images/phone.png');
+}
 .rzp-body .rzp-card_image{
 	float:right;
 	width:26px;
@@ -228,11 +235,14 @@
 		background-image: url('../images/icons/rupay.png');
 	}
 }
-.rzp-body input[name="card[number]"]{
-	background-image: url('../images/icons/card.png');
+.rzp-input[name="card[number]"]{
+	background-image: url('../images/card.png');
 }
-.rzp-body input[name="card[expiry]"]{
-	background-image: url('../images/icons/calendar.png');
+.rzp-input[name="card[expiry]"]{
+	background-image: url('../images/ei-calendar.png');
+}
+.rzp-input[name="card[cvv]"]{
+	background-image: url('../images/ei-lock.png');
 }
 
 .rzp-body .rzp-submit.error{
