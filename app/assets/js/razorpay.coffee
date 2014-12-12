@@ -142,9 +142,9 @@ do () ->
 		return
 
 	Razorpay::shake = ->
-		@$el.addClass 'rzp-shake'
+		@$el.find('.rzp-modal').addClass 'rzp-shake'
 		setTimeout =>
-			@$el.removeClass 'rzp-shake'
+			@$el.find('.rzp-modal').removeClass 'rzp-shake'
 		, 150
 
 	Razorpay::hide = ->
