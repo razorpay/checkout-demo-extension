@@ -26,7 +26,7 @@ do () ->
 			rzp.options.handler message.data
 
 	Razorpay::clearSubmission = ->
-		@$el.find('.rzp-submit').removeAttr 'disabled'
+		form.find('.rzp-error').html ''
 		@modal.options.backdropClose = true
 
 	Razorpay::createlightBox = (template) ->
@@ -50,111 +50,54 @@ do () ->
 					inner.css 'opacity', 1
 				, 150
 
-		@$el.find('form.rzp-body').submit (e) =>
+		@$el.find('form').on 'submit', (e) =>
 			e.preventDefault()
-			return
-			submission = @formsubmit @
+			form = $(e.currentTarget)
+			invalid = form.find('.rzp-invalid')
+			if invalid.length
+				invalid.addClass('rzp-mature').find('.rzp-input')[0].focus()
+				return @shake()
+			return @submit form
 			if submission
 				# Disable the input button to prevent double submissions
-				@$el.find(".rzp-submit").attr "disabled", "disabled"
+				@$el.find('.rzp-submit').attr 'disabled', 'disabled'
 				# Marks the modal window as busy so it is not closable
 				@modal.options.backdropClose = false
 			else
 				@clearSubmission()
 
-	Razorpay::breakExpiry = (expiry) ->
-		
-		#
-		# Returns month, year as a tuple inside an object
-		#
-		month: expiry.substr(0, 2)
-		
-		#
-		# Strip all spaces and backslashes,
-		# and then cut off first two digits (month);
-		#
-		year: expiry.replace(/[ \/]/g, "").substr(2)
+	Razorpay::submit = (form) ->
+		data = {}
+		form.find('input[name]').each (index,el)->
+			data[el.name] = el.value if el.value
 
-	Razorpay::formsubmit = (form) ->
-		merchantKey = @options.key
-		$form = $(form)
-		if $form.find(@fieldNames.bank).length is 0
-			
-			# CC/DC Submission
-			#
+		# Card
+		if !form.find('select[name=bank]').length
 			# Break expiry date into month and year
-			#
-			expiry = @breakExpiry($form.find(@fieldNames.expiry).val())
-			$form.find(@fieldNames.expiryMonth).val expiry.month
-			$form.find(@fieldNames.expiryYear).val expiry.year
-			
-			#
-			# Prevent 'expiry' field from being submitted
-			# since expiry month and year are being submitted individually
-			#
-			$form.find(@fieldNames.expiry).prop "disabled", true
-			data = $form.serialize()
-			
-			#
-			# Renable after getting required data
-			#
-			$(@fieldNames.expiry).prop "disabled", false
-		else
-			data = $form.serialize()
-			errors = @postValidateNB($form)
-		self = this
-		
-		#
-		# If we have more than one errors
-		#
-		if errors.length > 0
-			
-			#
-			# Shake the modal window
-			#
-			@shake()
-			template = "{{#each err}}\t\t\t\t\t<li>{{$value}}<li>\t\t\t\t{{/each}}"
-			div = document.createElement("div")
-			$((Handlebars(template))(err: errors)).appendTo div
-			@$el.find(".rzp-error_box").html div.innerHTML
-			return false
-		else
-			
-			#
-			# Cleanup errors created by any previous attempts
-			#
-			@$el.find(".rzp-error_box").html ""
+			expiry = data['card[expiry]'].split('/')
+			data['card[expiry_month]'] = expiry[0]
+			data['card[expiry_year]'] = expiry[1]
+			delete data['card[expiry]']
+
 		$.ajax
-			url: @options.protocol + "://" + merchantKey + "@" + @options.hostname + "/" + @options.version + @options.jsonpUrl
-			dataType: "jsonp"
-			context: this
-			success: @handleAjaxResponse
+			url: @options.protocol + '://' + @options.key + '@' + @options.hostname + '/' + @options.version + @options.jsonpUrl
+			dataType: 'jsonp'
+			success: @handleAjaxSuccess
 			timeout: 35000 # 35 seconds = 30s for gateway + 5s for razorpay
 			error: @handleAjaxError
 			data: data
+			form: form
 
-		true
+	Razorpay::handleAjaxError = =>
+		`var form = this.form`
+		form.find('.rzp-error').html 'There was an error in handling your request'
 
-	Razorpay::handleAjaxError = ->
-		@$el.find(".rzp-error_box").html "<li>There was an error in handling your request</li>"
-		@clearSubmission()
-		return
-
-	Razorpay::handleAjaxResponse = (response) ->
-		if response.http_status_code isnt 200 and response.error
-			@shake()
-			@$el.find("input[name=\"" + response.error.field + "\"]").addClass "rzp-invalid"	if @$el.find("input[name=\"" + response.error.field + "\"]").length	if response.error.field
-			defaultMessage = "There was an error in handling your request"
-			message = response.error.description or defaultMessage
-			@$el.find(".rzp-error_box").html "<li>" + message + "</li>"
-			@clearSubmission()
-		else if response.callbackUrl
-			
-			#
+	Razorpay::handleAjaxResponse = (response)=>
+		`var form = this.form`
+		if response.callbackUrl
 			# If a proper response with callbackUrl has been received, then an
 			# iframe needs to be opened
-			#
-			@$el.html "<iframe></iframe>"
+			@$el.html '<iframe></iframe>'
 			autosubmitformTemplate = @templates.autosubmit
 			div = document.createElement("div")
 			$((Handlebars.compile(autosubmitformTemplate))(response)).appendTo div
@@ -194,7 +137,7 @@ do () ->
 			@preHandler()
 			@options.handler response
 		else
-			@$el.find(".rzp-error_box").html "<li>There was an error in handling your request</li>"
+			@$el.find('.rzp-error').html 'There was an error in handling your request'
 			@clearSubmission()
 		return
 
@@ -206,7 +149,6 @@ do () ->
 
 	Razorpay::hide = ->
 		@clearSubmission()
-		return
 
 	Razorpay::options =
 		protocol: 'https'

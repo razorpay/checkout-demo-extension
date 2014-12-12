@@ -25,7 +25,7 @@ Razorpay::templates.modal = '
 			<div class="rzp-body">
 				<div id="rzp-tabs-cc" class="rzp-tab-content active">
 					<form class="rzp-form" method="POST" novalidate>
-						<input class="rzp-input" type="hidden" name="amount" value="${amount}">
+						<input class="rzp-input" type="hidden" name="amount" value="{{$amount}}">
 						<input class="rzp-input" type="hidden" name="currency" value="INR">
 						{{#each udf}}
 						<!-- udf fields provided by merchant -->
@@ -60,7 +60,13 @@ Razorpay::templates.modal = '
 								</div></div>
 							</div>
 						</div>
-						<ul class="rzp-error"></ul>
+						<div class="rzp-error"></div>
+						<div class="rzp-footer rzp-clear">
+							<button class="rzp-submit" type="submit">
+								<span class="rzp-ring"></span>
+								<span class="rzp-text">Pay ₹{{toRupee amount}}</span>
+							</button>
+						</div>
 					</form>
 				</div>
 				{{#if netbanking}}
@@ -97,16 +103,16 @@ Razorpay::templates.modal = '
 									</select>
 								</div></div>
 							</div>
-							<ul class="rzp-error"></ul>
+							<div class="rzp-error"></div>
+							<div class="rzp-footer rzp-clear">
+								<button class="rzp-submit" type="submit">
+									<span class="rzp-ring"></span>
+									<span class="rzp-text">Pay ₹{{toRupee amount}}</span>
+								</button>
+							</div>
 						</form>
 					</div>
 				{{/if}}
-			</div>
-			<div class="rzp-footer rzp-clear">
-				<button class="rzp-submit">
-					<span class="rzp-ring"></span>
-					<span class="rzp-text">Pay ₹{{toRupee amount}}</span>
-				</button>
 			</div>
 		</div>
 	</div>
