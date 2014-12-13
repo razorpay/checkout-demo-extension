@@ -232,7 +232,7 @@ form.rzp-body .rzp-submit.error{
     border:1px solid #727272;
     border-radius: 3px;
     overflow: hidden;
-    background: transparent url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 98% 50%;
+    background: transparent url("https://imgur.com/zMIgpTN") no-repeat 98% 50%;
 }
 
 .rzp-select-style select {
@@ -262,47 +262,47 @@ form.rzp-body .rzp-submit.error{
 
 
 .rzp-tabs-container ul.rzp-tabs {
-  height: 52px; 
-  width: 100%; 
-  list-style: none; 
-  margin: 0; 
+  height: 52px;
+  width: 100%;
+  list-style: none;
+  margin: 0;
   padding: 0;
 }
 
 .rzp-tabs-container ul.rzp-tabs li {
-  float: left; 
-  width: 50%; 
-  margin: 0; 
-  padding: 0; 
-  text-align: center; 
+  float: left;
+  width: 50%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
-.rzp-tabs-container ul.rzp-tabs li a { 
-  display: block; 
-  padding: 15px 0; 
-  line-height: 10px; 
-  outline: none; 
-  color:#28B3D2; 
-  text-decoration: none; 
-}
-
-.rzp-tabs-container ul.rzp-tabs li a:hover { 
-  text-decoration: underline; 
-}
-
-.rzp-tabs-container ul.rzp-tabs li.active {
- background: #fff; 
- position: relative; 
- left: 1px; 
-}
-
-.rzp-tabs-container ul.rzp-tabs li a.active { 
-  font-weight: bold; 
+.rzp-tabs-container ul.rzp-tabs li a {
+  display: block;
+  padding: 15px 0;
+  line-height: 10px;
+  outline: none;
+  color:#28B3D2;
   text-decoration: none;
 }
 
-.rzp-tabs-container .panel-container { 
-  background: #fff; 
-  padding: 10px; 
-  border: solid 1px; 
+.rzp-tabs-container ul.rzp-tabs li a:hover {
+  text-decoration: underline;
+}
+
+.rzp-tabs-container ul.rzp-tabs li.active {
+ background: #fff;
+ position: relative;
+ left: 1px;
+}
+
+.rzp-tabs-container ul.rzp-tabs li a.active {
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.rzp-tabs-container .panel-container {
+  background: #fff;
+  padding: 10px;
+  border: solid 1px;
 }
