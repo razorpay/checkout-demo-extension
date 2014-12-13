@@ -1,11 +1,17 @@
 ((root) ->
 	$ = root::$
 	cardhelper = (el)->
-		
-		
-	luhnCheck = (number) ->
+		origClass = el.className
+		el.oninput = ()->
+			className = cardVendor @value
+			className = if className then ' ' + className.type  else ''
+			className = origClass + className
+			if className isnt @className
+				@className = className
+
+	luhnCheck = (num) ->
 		odd = true
-		sum = _(number.split '').reduceRight (total, digit) ->
+		sum = num.split('').reduceRight (total, digit) ->
 			digit = parseInt(digit)
 			digit *= 2 if (odd = !odd)
 			digit -= 9 if digit > 9
@@ -13,7 +19,9 @@
 		, 0
 		sum % 10 == 0
 
-	cardType = (number)->
+	cardVendor = (num) ->
+		num = (num + '').replace(/\D/g, '')
+		return card for card in cards when card.pattern.test(num)
 
 	cards = [
 	# Debit cards must come first, since they have more
@@ -57,7 +65,6 @@
 		{
 			type: 'unionpay'
 			pattern: /^(62|88)/
-			format: defaultFormat
 			length: [16..19]
 			luhn: false
 		}

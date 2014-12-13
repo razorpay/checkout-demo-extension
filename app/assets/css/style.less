@@ -95,8 +95,10 @@
 		z-index: 1;
 	}
 	&.rzp-mature.rzp-invalid{
-		border-color: #d35400;
 		color: #d35400;
+		&.rzp-focused{
+			border-color: #d35400;
+		}
 	}
 	.rzp-elem-inner{
 		margin: 0 @gap;
@@ -171,6 +173,7 @@
 }
 .rzp-merchant{
 	padding: 10px;
+	height: 40px;
 }
 /* Default class for an overlay */
 .rzp-header{
@@ -214,14 +217,8 @@
 .rzp-input[name="contact"]{
 	background-image: url('../images/phone.png');
 }
-.rzp-body .rzp-card_image{
-	float:right;
-	width:26px;
-	height:7px;
-	margin-top: -20px;
-	margin-right: 5px;
-	background-repeat: no-repeat;
-	background-position: right center;
+.rzp-input[name="card[number]"]{
+	background-image: url('../images/card.png');
 	&.visa{
 		background-image: url('../images/icons/visa.png');
 	}
@@ -234,9 +231,6 @@
 	&.rupay{
 		background-image: url('../images/icons/rupay.png');
 	}
-}
-.rzp-input[name="card[number]"]{
-	background-image: url('../images/card.png');
 }
 .rzp-input[name="card[expiry]"]{
 	background-image: url('../images/ei-calendar.png');

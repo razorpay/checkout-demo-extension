@@ -6,6 +6,7 @@
 		modalSelector: '.rzp-modal'
 		show: true
 		escape: true
+		animation: true
 		stopKeyPropagation: true
 		backdropClose: true
 		hiddenCallback: null
@@ -21,7 +22,7 @@
 			@element.appendTo(document.body or @options.parent)
 		
 		if @options.animation and @transitionProperty
-			durationStyle = getComputedStyle(element)[@transitionProperty]
+			durationStyle = getComputedStyle(element[0])[@transitionProperty]
 			duration = @options.animation and @transitionProperty and parseFloat(durationStyle) or 0
 			
 			# if animation is in seconds
@@ -109,7 +110,6 @@
 			if not $(this).find(e.relatedTarget).length # if tab key is pressed, and something out of modal-container is focused, snatch it back.
 				this.focus()
 
-		# TODO:pranav dropdowns prevent escape, so modal is not closed on escape if dropdowns are focused.
 		bind_events: ->
 			# parent[0].addEventListener 'blur', @steal_focus, true
 			if @options.stopKeyPropagation

@@ -35,6 +35,7 @@ do () ->
 		@$el = $((Handlebars.compile(template))(@options))
 		@$el.smarty()
 		@modal = new Razorpay.modal @$el
+		Razorpay.cardhelper @$el.find('.rzp-input[name="card[number]"]')[0]
 
 		if @options.netbanking
 			@$el.find('.rzp-tabs li').click ->

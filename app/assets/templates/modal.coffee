@@ -49,7 +49,6 @@ Razorpay::templates.modal = '
 						<div class="rzp-fieldset">
 							<div class="rzp-elem" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
 								<input class="rzp-input" name="card[number]" class="card_number" placeholder="Card Number" required data-chars="[0-9]">
-								<span class="rzp-card_image"></span>
 							</div></div>
 							<div class="rzp-double">
 								<div class="rzp-elem" style="border-radius: 0 0 0 4px"><div class="rzp-elem-inner">
