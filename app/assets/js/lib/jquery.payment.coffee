@@ -319,19 +319,19 @@ do ()->
     val.length <= 4
 
   setCardType = (e) ->
-    $target  = $(e.currentTarget)
-    val      = $target.val()
-    cardType = $.payment.cardType(val) or 'unknown'
+    val = e.currentTarget.value
+    $target  = $(e.currentTarget.parentNode.parentNode)
+    cardType = $.payment.cardType(val)
 
     unless $target.hasClass(cardType)
       allTypes = (card.type for card in cards)
 
-      $target.removeClass('unknown')
+      # $target.removeClass('unknown')
       $target.removeClass(allTypes.join(' '))
 
-      $target.addClass(cardType)
-      $target.toggleClass('identified', cardType isnt 'unknown')
-      $target.trigger('payment.cardType', cardType)
+      $target.addClass(cardType) if cardType
+      # $target.toggleClass('identified', cardType isnt 'unknown')
+      # $target.trigger('payment.cardType', cardType)
 
   # Public
 

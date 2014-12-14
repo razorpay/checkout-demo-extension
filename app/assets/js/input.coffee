@@ -27,14 +27,16 @@
 
 	Smarty:: =
 		class: (str)->
-			str.split(' ').map((s)->
-				prefix + s
-			).join(' ')
+			arr = str.split(' ')
+			for a, i in arr
+				arr[i] = prefix + a
+			arr.join(' ')
 
 		selector: (str)->
-			str.split(' ').map((s)->
-				'.' + prefix + s
-			).join(' ')
+			arr = str.split(' ')
+			for a, i in arr
+				arr[i] = '.' + prefix + a
+			arr.join(' ')
 
 		parent: (el)->
 			el.parentNode.parentNode
@@ -44,9 +46,11 @@
 			@on 'blur', @blur, true
 			@on 'input', @input, true
 			@on 'change', @input, true
-			@on 'keypress', @keypress
+			@on 'click', '.rzp-elem', @intercept_click
 			@on 'mousedown', @selector('tooltip'), (e)=>
 				$(e.currentTarget).hide()
+
+			@element.find('input[name=contact]').on 'keypress', @keypress
 
 		on: ()->
 			event = arguments[0]
@@ -59,7 +63,10 @@
 					if typeof e.target.value is 'string'
 						handler.apply @, arguments
 				, @
-				@element[0].addEventListener event, proxy, true
+				if window.addEventListener
+					@element[0].addEventListener event, proxy, true
+				else
+					@element.find(target).on event, proxy
 				@listeners.push [event, proxy, true]
 			else
 				proxy = $.proxy lastarg, @
@@ -72,6 +79,10 @@
 					@element[0].removeEventListener l[0], l[1], true
 				else
 					@element.off l[0], l[1], l[2]
+
+		intercept_click: (e)->
+			if !e.target.value
+				$(e.target).find(@selector 'input')[0].focus()
 
 		focus: (e)->
 			el = e.target
@@ -167,11 +178,9 @@
 
 		keypress: (e)->
 			return if e.metaKey or e.altKey or e.ctrlKey
-			chars = e.target.getAttribute 'data-chars'
-			return if not (chars and e.which)
-			return if e.which is 8 # backspace fires keypress in some browsers
+			return if not e.which or e.which is 8 # backspace fires keypress in some browsers
 			key = String.fromCharCode(e.which)
-			return false if !(new RegExp(chars).test key)
+			return false if !(new RegExp('[0-9]').test key)
 
 		refresh: ()->
 			@element.find @selector('input')

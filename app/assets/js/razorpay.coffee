@@ -26,8 +26,8 @@ do () ->
 		if @$el
 			return @modal.show()
 		@$el = $((Handlebars.compile(template))(@options))
+		@modal = new Razorpay::getmodal @$el
 		@$el.smarty()
-		@modal = new Razorpay.modal @$el
 		
 		# jquery payment validation
 		@$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on 'blur', ()->

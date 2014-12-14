@@ -11,7 +11,7 @@
 		backdropClose: true
 		hiddenCallback: null
 		parent: null
-	
+
 	modal = (element, options) ->
 		@options = $.extend defaults, options
 		@element = element
@@ -43,22 +43,22 @@
 		# vendor css transition prefix detection
 		transitionProperty: do ->
 			prop = ''
-			['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some (i) ->
-				if typeof document.head.style[i] is 'string'
-					prop = i + 'Duration'
-					true
+			if Array::some
+				['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some (i) ->
+					if typeof document.head.style[i] is 'string'
+						prop = i + 'Duration'
+						true
 			prop
 
 		toggle: ->
 			do @[if not @isShown then 'show' else 'hide']
 
 		show: ->
-			# return if @isShown
-			# gracefully close other modals
+			return if @isShown
 
 			$(document.body).css 'overflow', 'hidden'
 			@isShown = true
-			@bind_events()
+			# @bind_events()
 			
 			@element.show().get(0).focus()
 			@element.children(@options.modalSelector).css('display', 'inline-block')
@@ -124,5 +124,5 @@
 				@on 'click', @element, (e)=>
 					@hide() if e.target is @element[0] and @options.backdropClose
 
-	root.modal = modal
+	root::getmodal = modal
 )(window.Razorpay)
