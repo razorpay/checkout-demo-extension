@@ -65,7 +65,7 @@
 	}
 	button{
 		border: none;
-		background: #28B3D2;
+		background: #28B3D2 no-repeat 12px center;
 		line-height: 40px;
 		color: #fff;
 		font-size: 16px;
@@ -73,6 +73,11 @@
 		box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
 		width: 180px;
 		cursor: pointer;
+		&[disabled]{
+			background-image: url('../images/loaders/2.gif');
+			background-size: 16px;
+			opacity: 0.7;
+		}
 	}
 }
 .rzp-modal-inner{

@@ -19,7 +19,7 @@ do () ->
 			rzp.options.handler message.data
 
 	Razorpay::clearSubmission = ->
-		form.find('.rzp-error').html ''
+		@$el.find('.rzp-error').html '' if @$el
 		@modal.options.backdropClose = true
 
 	Razorpay::createlightBox = (template) ->
@@ -64,10 +64,9 @@ do () ->
 			if invalid.length
 				invalid.addClass('rzp-mature').find('.rzp-input')[0].focus()
 				return @shake()
-			return @submit form
-			if submission
+			if @submit form
 				# Disable the input button to prevent double submissions
-				@$el.find('.rzp-submit').attr 'disabled', 'disabled'
+				@$el.find('.rzp-submit').attr 'disabled', true
 				# Marks the modal window as busy so it is not closable
 				@modal.options.backdropClose = false
 			else
@@ -105,6 +104,7 @@ do () ->
 		form = @form
 		$el = @Razorpay.$el
 		if response.callbackUrl
+			@Razorpay.$el = null
 			# If a proper response with callbackUrl has been received, then an
 			# iframe needs to be opened
 			iframe = document.createElement 'iframe'
@@ -120,15 +120,11 @@ do () ->
 			# Make this instance of rzp the instance called by the XDCallback
 			Razorpay.lastXDInstance = @Razorpay
 		else if response.redirectUrl
-			
+			@Razorpay.$el = null
 			# If a proper response with redirectUrl has been received, then an
 			# iframe needs to be opened
-			@$el.html "<iframe src=" + response.redirectUrl + "></iframe>"
-			
-			# This form should autosubmit
-			# Now we need to resize the modal box so as to accomodate 3dsecure.
-			$(@$el).width("1000px").height "500px"
-			$(@$el.find("iframe")).width("1000px").height "500px"
+			modal = $el.find('.rzp-modal').addClass 'rzp-frame'
+				.html '<iframe src=' + response.redirectUrl + '></iframe>'
 			
 			# Make this instance of rzp the instance called by the XDCallback
 			Razorpay.lastXDInstance = @Razorpay
