@@ -1,6 +1,6 @@
 Razorpay::templates.modal = '
 <div class="rzp-container" tabIndex="0">
-	<div class="rzp-modal" id="{{id}}">
+	<div class="rzp-modal">
 		<div class="rzp-tooltip"></div>
 		<div class="rzp-modal-inner">
 			<div class="rzp-header">
@@ -16,10 +16,10 @@ Razorpay::templates.modal = '
 					</div>
 				</div>
 				{{#if netbanking}}
-				<ul class="rzp-tabs">
-					<li data-target="rzp-tabs-cc" class="active">Card</li>
-					<li data-target="rzp-tabs-nb">Net Banking</li>
-				</ul>
+					<ul class="rzp-tabs">
+						<li data-target="rzp-tabs-cc" class="active">Card</li>
+						<li data-target="rzp-tabs-nb">Net Banking</li>
+					</ul>
 				{{/if}}
 			</div>
 			<div class="rzp-body">
@@ -48,11 +48,11 @@ Razorpay::templates.modal = '
 						</div>
 						<div class="rzp-fieldset">
 							<div class="rzp-elem" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
-								<input class="rzp-input" name="card[number]" class="card_number" placeholder="Card Number" required data-chars="[0-9]">
+								<input class="rzp-input" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
 							</div></div>
 							<div class="rzp-double">
 								<div class="rzp-elem" style="border-radius: 0 0 0 4px"><div class="rzp-elem-inner">
-									<input class="rzp-input" name="card[expiry]" placeholder="MM/YY" required pattern="(0[1-9]|1[0-2])\/[0-9]{2}" maxlength="5" data-chars="([0-9]|\/)">
+									<input class="rzp-input" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
 								</div></div>
 								<div class="rzp-elem" style="border-radius: 0 0 4px 0"><div class="rzp-elem-inner">
 									<input class="rzp-input" type="password" name="card[cvv]" placeholder="CVV" maxlength="4" required>

@@ -53,7 +53,7 @@
 			do @[if not @isShown then 'show' else 'hide']
 
 		show: ->
-			return if @isShown
+			# return if @isShown
 			# gracefully close other modals
 
 			$(document.body).css 'overflow', 'hidden'
@@ -111,7 +111,7 @@
 				this.focus()
 
 		bind_events: ->
-			# parent[0].addEventListener 'blur', @steal_focus, true
+			@element[0].addEventListener 'blur', @steal_focus, true
 			if @options.stopKeyPropagation
 				@on 'keyup keydown keypress', @element, (e)=>
 					e.stopPropagation()

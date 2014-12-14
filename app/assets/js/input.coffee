@@ -224,7 +224,7 @@
 			else if name is 'card[number]'
 				'Please enter valid card number.'
 			else if name is 'card[expiry]'
-				'Please enter valid expiry date, like 01/22'
+				'Please enter valid expiry date, like 01 / 22'
 			else if name is 'card[cvv]'
 				'Please enter 3 or 4 digit CVV number.'
 			else

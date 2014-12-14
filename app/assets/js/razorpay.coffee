@@ -35,7 +35,9 @@ do () ->
 		@$el = $((Handlebars.compile(template))(@options))
 		@$el.smarty()
 		@modal = new Razorpay.modal @$el
-		Razorpay.cardhelper @$el.find('.rzp-input[name="card[number]"]')[0]
+		@$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber')
+		@$el.find('.rzp-input[name="card[expiry]"]').payment('formatCardExpiry')
+		@$el.find('.rzp-input[name="card[cvv]"]').payment('formatCardCVC')
 
 		if @options.netbanking
 			@$el.find('.rzp-tabs li').click ->
@@ -44,7 +46,7 @@ do () ->
 				modal = inner.parent()
 				modal.height inner.height()
 				inner.css 'opacity', 0.5
-				$('#' + @getAttribute('data-target')).addClass('active').siblings('.active').removeClass 'active'
+				inner.find('#' + @getAttribute('data-target')).addClass('active').siblings('.active').removeClass 'active'
 				$(this).addClass('active').siblings('.active').removeClass 'active'
 				modal.height inner.height()
 				setTimeout ->
@@ -75,7 +77,8 @@ do () ->
 		# Card
 		if !form.find('select[name=bank]').length
 			# Break expiry date into month and year
-			expiry = data['card[expiry]'].split('/')
+			data['card[number]'] = data['card[number]'].replace(/\ /g,'')
+			expiry = data['card[expiry]'].replace(/\ /g,'').split('/')
 			data['card[expiry_month]'] = expiry[0]
 			data['card[expiry_year]'] = expiry[1]
 			delete data['card[expiry]']
@@ -89,9 +92,8 @@ do () ->
 			data: data
 			form: form
 
-	Razorpay::handleAjaxError = =>
-		`var form = this.form`
-		form.find('.rzp-error').html 'There was an error in handling your request'
+	Razorpay::handleAjaxError = ->
+		@form.find('.rzp-error').html 'There was an error in handling your request'
 
 	Razorpay::handleAjaxResponse = (response)=>
 		`var form = this.form`
@@ -104,35 +106,25 @@ do () ->
 			$((Handlebars.compile(autosubmitformTemplate))(response)).appendTo div
 			@$el.find("iframe").get(0).contentWindow.document.write div.innerHTML
 			
-			#
 			# This form should autosubmit
 			# Now we need to resize the modal box so as to accomodate 3dsecure.
-			#
 			$(@$el).width("1000px").height "500px"
 			$(@$el.find("iframe")).width("1000px").height "500px"
 			
-			#
 			# Make this instance of rzp the instance called by the XDCallback
-			#
 			@setXDInstance()
 		else if response.redirectUrl
 			
-			#
 			# If a proper response with redirectUrl has been received, then an
 			# iframe needs to be opened
-			#
 			@$el.html "<iframe src=" + response.redirectUrl + "></iframe>"
 			
-			#
 			# This form should autosubmit
 			# Now we need to resize the modal box so as to accomodate 3dsecure.
-			#
 			$(@$el).width("1000px").height "500px"
 			$(@$el.find("iframe")).width("1000px").height "500px"
 			
-			#
 			# Make this instance of rzp the instance called by the XDCallback
-			#
 			@setXDInstance()
 		else if response.status
 			@preHandler()
@@ -140,7 +132,6 @@ do () ->
 		else
 			@$el.find('.rzp-error').html 'There was an error in handling your request'
 			@clearSubmission()
-		return
 
 	Razorpay::shake = ->
 		@$el.find('.rzp-modal').addClass 'rzp-shake'
@@ -164,8 +155,6 @@ do () ->
 		# These fields are specified by the merchant
 		udf: {}
 
-	
-	#
 	# We can specify any default options here
 	#
 	
@@ -174,10 +163,7 @@ do () ->
 	to the handler specified in options
 	###
 	Razorpay::preHandler = ->
-		
-		#
 		# Hide the modal window when the transaction is complete
-		#
 		@hide()
 		
 		# Prepare the lightBox for re-opening
@@ -204,25 +190,8 @@ do () ->
 		RazorPayForm = RazorPayScript.parentElement
 		$(inputs).appendTo RazorPayForm
 		$(RazorPayForm).submit()
-		return
-
-	Razorpay::setEndpoint = (protocol, hostname) ->
-		@options.protocol = protocol
-		@options.hostname = hostname
-		return
-
 	
-	###*
-	Now everything is defined
-	###
-	
-	#
 	# Start by creating a new button to press
-	#
-	
-	###*
-	Creates a new button to press
-	###
 	Razorpay::addButton = ->
 		button = document.createElement("button")
 		button.setAttribute "id", "rzp-button"
@@ -250,18 +219,14 @@ do () ->
 		@createlightBox @templates.modal
 
 	Razorpay::configure = (options) ->
-		#
 		# The following loop converts property names of the form
 		#	x.y = "Value" to proper objects x = {y:"Value"}
-		#
 		for i of options
 			ix = i.indexOf(".")
 			if ix > -1
 				
-				#
 				# We have a dot in an option name
 				# Break it into 2
-				#
 				dotPosition = ix
 				
 				# Get the category
@@ -281,11 +246,9 @@ do () ->
 	do ->
 		key = $(RazorPayScript).data("key")
 		if key and key.length > 0
-			
-			#
+
 			# If we have a key set, that means we are in auto mode
 			# and need to display the button automatically
-			#
 			rzp = new Razorpay($(RazorPayScript).data())
 			
 			# We leave this unstyled
