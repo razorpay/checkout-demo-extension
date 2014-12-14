@@ -2,7 +2,7 @@ Razorpay::templates.autosubmit = '<!doctype html>
 <html>
     <head>
     </head>
-    <body>
+    <body style="text-align: center; padding-top: 30px;">
         <form method = "POST" action = "{{data.url}}" id = "rzp-dcform">
             <input type = "hidden" name = "PaReq" value = "{{data.PAReq}}">
             <input type = "hidden" name = "MD" value = "{{data.paymentid}}">

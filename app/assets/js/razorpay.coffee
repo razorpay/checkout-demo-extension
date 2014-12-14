@@ -7,13 +7,6 @@ do () ->
 	$ = Razorpay::$
 	Handlebars = Razorpay::Handlebars
 
-	###*
-	This function is passed an rzp instance and
-	it is saved in Razorpay
-	###
-	Razorpay::setXDInstance = ->
-		Razorpay.lastXDInstance = this
-
 	Razorpay.XDCallback = (message) ->
 		rzp = Razorpay.lastXDInstance
 		rzp.preHandler()
@@ -35,9 +28,20 @@ do () ->
 		@$el = $((Handlebars.compile(template))(@options))
 		@$el.smarty()
 		@modal = new Razorpay.modal @$el
-		@$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber')
+		
+		# jquery payment validation
+		@$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on 'blur', ()->
+			parent = $(@parentNode.parentNode)
+			parent[if $.payment.validateCardNumber(@value) then 'removeClass' else 'addClass']('rzp-invalid')
+
 		@$el.find('.rzp-input[name="card[expiry]"]').payment('formatCardExpiry')
-		@$el.find('.rzp-input[name="card[cvv]"]').payment('formatCardCVC')
+		#	.on 'blur', ()->
+		#	 	parent = $(@parentNode.parentNode)
+		#	 	parent[if $.payment.validateCardExpiry(@value) then 'removeClass' else 'addClass']('rzp-invalid')
+
+		@$el.find('.rzp-input[name="card[cvv]"]').payment('formatCardCVC').on 'blur', ()->
+			parent = $(@parentNode.parentNode)
+			parent[if $.payment.validateCardCVC(@value) then 'removeClass' else 'addClass']('rzp-invalid')
 
 		if @options.netbanking
 			@$el.find('.rzp-tabs li').click ->
@@ -71,7 +75,8 @@ do () ->
 
 	Razorpay::submit = (form) ->
 		data = {}
-		form.find('input[name]').each (index,el)->
+		# data.key = @options.key
+		form.find('[name]').each (index,el)->
 			data[el.name] = el.value if el.value
 
 		# Card
@@ -91,28 +96,29 @@ do () ->
 			error: @handleAjaxError
 			data: data
 			form: form
+			Razorpay: @
 
 	Razorpay::handleAjaxError = ->
 		@form.find('.rzp-error').html 'There was an error in handling your request'
 
-	Razorpay::handleAjaxResponse = (response)=>
-		`var form = this.form`
+	Razorpay::handleAjaxSuccess = (response)->
+		form = @form
+		$el = @Razorpay.$el
 		if response.callbackUrl
 			# If a proper response with callbackUrl has been received, then an
 			# iframe needs to be opened
-			@$el.html '<iframe></iframe>'
-			autosubmitformTemplate = @templates.autosubmit
-			div = document.createElement("div")
-			$((Handlebars.compile(autosubmitformTemplate))(response)).appendTo div
-			@$el.find("iframe").get(0).contentWindow.document.write div.innerHTML
+			iframe = document.createElement 'iframe'
+			modal = $el.find('.rzp-modal').html ''
+				.append iframe
+			template = Handlebars.compile(@Razorpay.templates.autosubmit) response
+			iframe.contentWindow.document.write template
 			
 			# This form should autosubmit
 			# Now we need to resize the modal box so as to accomodate 3dsecure.
-			$(@$el).width("1000px").height "500px"
-			$(@$el.find("iframe")).width("1000px").height "500px"
+			modal.addClass 'rzp-frame'
 			
 			# Make this instance of rzp the instance called by the XDCallback
-			@setXDInstance()
+			Razorpay.lastXDInstance = @Razorpay
 		else if response.redirectUrl
 			
 			# If a proper response with redirectUrl has been received, then an
@@ -125,7 +131,7 @@ do () ->
 			$(@$el.find("iframe")).width("1000px").height "500px"
 			
 			# Make this instance of rzp the instance called by the XDCallback
-			@setXDInstance()
+			Razorpay.lastXDInstance = @Razorpay
 		else if response.status
 			@preHandler()
 			@options.handler response
@@ -141,6 +147,7 @@ do () ->
 
 	Razorpay::hide = ->
 		@clearSubmission()
+		@modal.hide()
 
 	Razorpay::options =
 		protocol: 'https'
@@ -165,10 +172,6 @@ do () ->
 	Razorpay::preHandler = ->
 		# Hide the modal window when the transaction is complete
 		@hide()
-		
-		# Prepare the lightBox for re-opening
-		@createlightBox @templates.modal
-
 	
 	###*
 	default handler for success
