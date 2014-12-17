@@ -1,6 +1,7 @@
 (function($) {
   var Smarty, prefix;
   prefix = 'rzp-';
+
   Smarty = function(form, options) {
     this.element = form;
     this.ttel = $(form[0].querySelector(this.selector('tooltip')));
@@ -10,6 +11,7 @@
     this.refresh();
     return this;
   };
+
   $.fn.smarty = function(options) {
     return this.each(function() {
       var data, el;
@@ -29,20 +31,24 @@
       }
     });
   };
+
   return Smarty.prototype = {
     "class": function(str) {
       return str.split(' ').map(function(s) {
         return prefix + s;
       }).join(' ');
     },
+
     selector: function(str) {
       return str.split(' ').map(function(s) {
         return '.' + prefix + s;
       }).join(' ');
     },
+
     parent: function(el) {
       return el.parentNode.parentNode;
     },
+
     common_events: function() {
       this.on('focus', this.focus, true);
       this.on('blur', this.blur, true);
@@ -55,6 +61,7 @@
         };
       })(this));
     },
+
     on: function() {
       var event, handler, lastarg, proxy, target;
       event = arguments[0];
@@ -75,6 +82,7 @@
         return this.listeners.push([event, target, proxy]);
       }
     },
+
     bye: function() {
       return this.listeners.forEach((function(_this) {
         return function(l) {
@@ -86,6 +94,7 @@
         };
       })(this));
     },
+
     focus: function(e) {
       var el;
       el = e.target;
@@ -99,6 +108,7 @@
       $(this.parent(el)).addClass(this["class"]('focused'));
       return this.tooltip(el);
     },
+
     tooltip: function(el) {
       var classname, modal_rect, parent, parent_rect, positioned, show, shown, state, tt_left, tt_top;
       positioned = this.ttel.data('pos');
@@ -129,6 +139,7 @@
         return this.ttel.removeClass(classname);
       }
     },
+
     blur: function(e) {
       var el, parent;
       el = e.target;
@@ -146,6 +157,7 @@
       }
       return this.ttel.removeClass(this["class"]('shown')).data('pos', false);
     },
+
     input: function(e) {
       var el, isMature, parent, pattern, required, valid, value;
       el = e.target;
@@ -176,6 +188,7 @@
       }
       return this.tooltip(el);
     },
+
     keypress: function(e) {
       var chars, key;
       if (e.metaKey || e.altKey || e.ctrlKey) {
@@ -193,6 +206,7 @@
         return false;
       }
     },
+
     refresh: function() {
       return this.element.find(this.selector('input')).each((function(_this) {
         return function(index, el) {
@@ -202,12 +216,14 @@
         };
       })(this));
     },
+
     initiate: function(parent, el, type) {
       parent.data('smarty', true);
       if (document.activeElement === el) {
         return parent.addClass(this["class"]('focused'));
       }
     },
+
     update: function(parent, el) {
       var type;
       type = el.getAttribute('type');
@@ -222,6 +238,7 @@
         target: el
       });
     },
+
     helptext: function(el) {
       var name, node, value;
       name = el.name;

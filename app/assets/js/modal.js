@@ -2,6 +2,7 @@
   var $, defaults, modal, timeout;
   $ = root.prototype.$;
   timeout = null;
+
   defaults = {
     shownClass: 'rzp-shown',
     modalSelector: '.rzp-modal',
@@ -13,6 +14,7 @@
     hiddenCallback: null,
     parent: null
   };
+
   modal = function(element, options) {
     var duration, durationStyle;
     this.options = $.extend(defaults, options);
@@ -36,14 +38,17 @@
     }
     return this;
   };
+
   modal.prototype = {
     listeners: [],
+
     on: function(event, target, callback) {
       var handler;
       handler = $.proxy(callback, this);
       target.on(event, handler);
       return this.listeners.push([target, event, handler]);
     },
+
     transitionProperty: (function() {
       var prop;
       prop = '';
@@ -55,9 +60,11 @@
       });
       return prop;
     })(),
+
     toggle: function() {
       return this[!this.isShown ? 'show' : 'hide']();
     },
+
     show: function() {
       $(document.body).css('overflow', 'hidden');
       this.isShown = true;
@@ -70,9 +77,11 @@
       this.clearTimeout();
       return timeout = setTimeout($.proxy(this.shown, this), this.animationDuration);
     },
+
     shown: function() {
       return this.clearTimeout();
     },
+
     hide: function() {
       if (!this.isShown) {
         return;
@@ -90,12 +99,14 @@
         };
       })(this), this.animationDuration);
     },
+
     clearTimeout: function() {
       if (timeout) {
         clearTimeout(timeout);
       }
       return timeout = null;
     },
+
     hidden: function() {
       $(document.body).css('overflow', '');
       this.clearTimeout();
@@ -104,6 +115,7 @@
         return this.options.hiddenCallback();
       }
     },
+
     steal_focus: function(e) {
       if (!e.relatedTarget) {
         return;
@@ -112,6 +124,7 @@
         return this.focus();
       }
     },
+
     bind_events: function() {
       this.element[0].addEventListener('blur', this.steal_focus, true);
       if (this.options.stopKeyPropagation) {
@@ -141,5 +154,6 @@
       }
     }
   };
+
   return root.modal = modal;
 })(window.Razorpay);

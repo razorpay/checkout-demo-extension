@@ -1,17 +1,21 @@
 (function() {
   var $, Handlebars, RazorPayScript, Razorpay;
+
   RazorPayScript = document.currentScript || (function() {
     var scripts;
     scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
   })();
+
   Razorpay = window.Razorpay;
   $ = Razorpay.prototype.$;
   Handlebars = Razorpay.prototype.Handlebars;
+
   Razorpay.XDCallback = function(message) {
     var rzp;
     rzp = Razorpay.lastXDInstance;
     rzp.preHandler();
+
     if (message.data.error && message.data.error.description) {
       rzp.open();
       return rzp.handleAjaxResponse(message.data);
@@ -19,16 +23,19 @@
       return rzp.options.handler(message.data);
     }
   };
+
   Razorpay.prototype.clearSubmission = function() {
     if (this.$el) {
       this.$el.find('.rzp-error').html('');
     }
     return this.modal.options.backdropClose = true;
   };
+
   Razorpay.prototype.createlightBox = function(template) {
     if (this.$el) {
       return this.modal.show();
     }
+
     this.$el = $((Handlebars.compile(template))(this.options));
     this.$el.smarty();
     this.modal = new Razorpay.modal(this.$el);
@@ -37,12 +44,14 @@
       parent = $(this.parentNode.parentNode);
       return parent[$.payment.validateCardNumber(this.value) ? 'removeClass' : 'addClass']('rzp-invalid');
     });
+
     this.$el.find('.rzp-input[name="card[expiry]"]').payment('formatCardExpiry');
     this.$el.find('.rzp-input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function() {
       var parent;
       parent = $(this.parentNode.parentNode);
       return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('rzp-invalid');
     });
+
     if (this.options.netbanking) {
       this.$el.find('.rzp-tabs li').click(function() {
         var inner, modal;
@@ -61,6 +70,7 @@
         }, 150);
       });
     }
+
     return this.$el.find('form').on('submit', (function(_this) {
       return function(e) {
         var form, invalid;
@@ -80,6 +90,7 @@
       };
     })(this));
   };
+
   Razorpay.prototype.submit = function(form) {
     var data, expiry;
     data = {};
@@ -88,6 +99,7 @@
         return data[el.name] = el.value;
       }
     });
+
     if (!form.find('select[name=bank]').length) {
       data['card[number]'] = data['card[number]'].replace(/\ /g, '');
       expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
@@ -95,6 +107,7 @@
       data['card[expiry_year]'] = expiry[1];
       delete data['card[expiry]'];
     }
+
     return $.ajax({
       url: this.options.protocol + '://' + this.options.key + '@' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
       dataType: 'jsonp',
@@ -106,13 +119,16 @@
       Razorpay: this
     });
   };
+
   Razorpay.prototype.handleAjaxError = function() {
     return this.form.find('.rzp-error').html('There was an error in handling your request');
   };
+
   Razorpay.prototype.handleAjaxSuccess = function(response) {
     var $el, form, iframe, modal, template;
     form = this.form;
     $el = this.Razorpay.$el;
+
     if (response.callbackUrl) {
       this.Razorpay.$el = null;
       iframe = document.createElement('iframe');
@@ -133,18 +149,22 @@
       return this.clearSubmission();
     }
   };
+
   Razorpay.prototype.shake = function() {
     this.$el.find('.rzp-modal').addClass('rzp-shake');
+
     return setTimeout((function(_this) {
       return function() {
         return _this.$el.find('.rzp-modal').removeClass('rzp-shake');
       };
     })(this), 150);
   };
+
   Razorpay.prototype.hide = function() {
     this.clearSubmission();
     return this.modal.hide();
   };
+
   Razorpay.prototype.options = {
     protocol: 'https',
     hostname: 'api.razorpay.com',
@@ -159,19 +179,19 @@
   };
 
   /**
-  	This function is called just before control is passed on
-  	to the handler specified in options
+    This function is called just before control is passed on
+    to the handler specified in options
    */
   Razorpay.prototype.preHandler = function() {
     return this.hide();
   };
 
   /**
-  	default handler for success
-  	default handler does not care about error or success messages,
-  	it just submits everything via the form
-  	@param	{[type]} data [description]
-  	@return {[type]}		[description]
+    default handler for success
+    default handler does not care about error or success messages,
+    it just submits everything via the form
+    @param  {[type]} data [description]
+    @return {[type]}    [description]
    */
   Razorpay.prototype.options.handler = function(data) {
     var RazorPayForm, i, inputs, j;
@@ -189,6 +209,7 @@
     $(inputs).appendTo(RazorPayForm);
     return $(RazorPayForm).submit();
   };
+
   Razorpay.prototype.addButton = function() {
     var button, self;
     button = document.createElement("button");
@@ -199,6 +220,7 @@
       e.preventDefault();
     }).html("Pay with Card").appendTo("body");
   };
+
   Razorpay.prototype.validateOptions = function() {
     if (typeof this.options.amount === "undefined") {
       throw new Error("No amount specified");
@@ -219,10 +241,12 @@
       throw new Error("You can only pass at most 13 fields in the udf object");
     }
   };
+
   Razorpay.prototype.open = function(options) {
     this.options = $.extend({}, this.options, options);
     return this.createlightBox(this.templates.modal);
   };
+
   Razorpay.prototype.configure = function(options) {
     var category, dotPosition, i, ix, property;
     for (i in options) {
@@ -244,6 +268,7 @@
     }
     return this.options = $.extend({}, this.options, options);
   };
+
   (function() {
     var key, rzp;
     key = $(RazorPayScript).data("key");
@@ -252,5 +277,6 @@
       return rzp.addButton();
     }
   })();
+
   return Razorpay.prototype.XD.receiveMessage(Razorpay.XDCallback);
 })();
