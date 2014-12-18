@@ -3,18 +3,19 @@ window.Razorpay = function(options){
     this.configure(options)
 }
 !function(){
+  var RazorpayLibs = window.RazorpayLibs = {};
   var exports = null;
   var module = {exports: null};
 
   // jquery
   <%- include lib/jquery-1.11.1.js %>
-  Razorpay.prototype.$ = module.exports;
+  RazorpayLibs.$ = module.exports;
 
   // handlebars
   <%- include lib/handlebars-v2.0.0.js %>
   module.exports.registerHelper('toRupee', function(paise) {
     return parseInt(paise)/100;
   });
-  Razorpay.prototype.Handlebars = module.exports
-  Razorpay.prototype.templates = {}
+  RazorpayLibs.Handlebars = module.exports
+  RazorpayLibs.templates = {}
 }()
