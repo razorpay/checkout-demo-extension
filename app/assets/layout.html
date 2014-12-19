@@ -11,6 +11,7 @@
   <script type="text/javascript" src="js/lib/jquery.payment.js"></script>
   <script type="text/javascript" src="js/modal.js"></script>
   <script type="text/javascript" src="js/razorpay.js"></script>
+  <script type="text/javascript" src="js/checkout.js"></script>
   <!-- endbuild -->
   <!-- build:css css/style.css -->
   <link href="css/style.css" type="text/css" rel="stylesheet">
@@ -32,11 +33,11 @@
       'description': 'Tron Legacy',
       'image': 'https://i.imgur.com/3g7nmJC.png',
       'handler': function (transaction) {
-        alert("You have successfully purchased " + rzp1.options.description);
+        alert("You have successfully purchased " + options.description);
       },
       'netbanking': 'true',
-      'protocol': 'https',
-      'hostname': 'api.razorpay.com',
+      'protocol': 'http',
+      'hostname': 'api.razorpay.dev',
       'prefill': {
         'name': 'Harshil Mathur',
         'email': 'harshil@razorpay.com',
@@ -46,7 +47,7 @@
         'address': 'Hello World'
       }
     }
-    var rzp1 = new Razorpay(options);
+    var rzp1 = new Checkout(options);
 
     $('#rzp-button1').click(function(e) {
       rzp1.open();
@@ -58,14 +59,14 @@
       description : 'Alive (2007)',
       image : 'https://i.imgur.com/GXalrU0.png',
       handler : function (transaction){
-        alert("You have successfully purchased "+rzp2.options.description);
+        alert("You have successfully purchased "+options.description);
       },
       udf: {
         'shipping': "Bye World"
       }
     });
 
-    var rzp2 = new Razorpay(options);
+    var rzp2 = new Checkout(options);
 
     $('#rzp-button2').click(function(e){
       rzp2.open();
