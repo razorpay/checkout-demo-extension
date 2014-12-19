@@ -1,6 +1,6 @@
 (function(root) {
   var $, defaults, modal, timeout;
-  $ = root.prototype.$;
+  $ = root.$;
   timeout = null;
 
   defaults = {
@@ -156,4 +156,4 @@
   };
 
   return root.modal = modal;
-})(window.Razorpay);
+})(window.RazorpayLibs);

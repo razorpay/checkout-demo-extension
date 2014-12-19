@@ -1,4 +1,4 @@
-Razorpay::templates.modal = '
+RazorpayLibs.templates.modal = '
 <div class="rzp-container" tabIndex="0">
   <div class="rzp-modal">
     <div class="rzp-tooltip"></div>

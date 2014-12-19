@@ -3,7 +3,7 @@ var __slice = [].slice,
 
 (function() {
   var $, cardFromNumber, cardFromType, cards, defaultFormat, formatBackCardNumber, formatBackExpiry, formatCardNumber, formatExpiry, formatForwardExpiry, formatForwardSlashAndSpace, hasTextSelected, luhnCheck, reFormatCardNumber, reFormatExpiry, restrictCVC, restrictCardNumber, restrictExpiry, restrictNumeric, setCardType;
-  $ = Razorpay.prototype.$;
+  $ = RazorpayLibs.$;
   $.payment = {};
   $.payment.fn = {};
   $.fn.payment = function() {
