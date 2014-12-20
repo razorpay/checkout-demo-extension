@@ -199,7 +199,6 @@
           if (typeof options["key"] === "undefined") {
             throw new Error("No merchant key specified");
           }
-          // TODO can't use extend. Objects are referenced in JS
           co.options = $.extend({}, co.options, options);
         },
 
@@ -263,7 +262,6 @@
     }
 
     co.init(options);
-    // TODO change to co.public
     return co.public;
   };
 

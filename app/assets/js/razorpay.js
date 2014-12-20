@@ -134,7 +134,6 @@
     }
 
     rzp.init(options);
-    // TODO change to rzp.public
     return rzp.public;
   };
 

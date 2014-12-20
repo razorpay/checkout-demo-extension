@@ -54,7 +54,7 @@
       e.preventDefault();
     });
 
-    $.extend(true, options, {
+    var opt2 = $.extend({}, options, {
       amount : 200,
       description : 'Alive (2007)',
       image : 'https://i.imgur.com/GXalrU0.png',
@@ -66,7 +66,7 @@
       }
     });
 
-    var rzp2 = new Checkout(options);
+    var rzp2 = new Checkout(opt2);
 
     $('#rzp-button2').click(function(e){
       rzp2.open();
