@@ -209,6 +209,17 @@
           }
           co.rzp.validateOptions(options, true);
           co.options = $.extend({}, co.options, options);
+          for (var i in co.options){
+            if(typeof co.options[i] === undefined){
+              continue;
+            }
+            if(i === "udf"){
+              co.options.udf = $.extend({}, co.options.udf, options.udf);
+            }
+            else if(typeof co.options[i] !== "object" && typeof options[i] !== "undefined"){
+              co.options[i] = options[i];
+            }
+          }
         },
 
         handleAjaxError: function() {
@@ -273,10 +284,6 @@
     co.init(options);
     return co.public;
   };
-
-  /** TODO s
-   * calls to Razorpay.validate?
-   */
 
   window.Checkout = Checkout;
 })();

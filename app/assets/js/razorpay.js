@@ -6,16 +6,11 @@
 
     var rzp = {
       options: {
-        protocol: 'https',
-        hostname: 'api.razorpay.com',
+        protocol: 'http',
+        hostname: 'api.razorpay.dev',
         version: 'v1',
         jsonpUrl: '/payments/create/jsonp',
-        prefill: {
-          name: '',
-          contact: '',
-          email: ''
-        },
-        udf: {}
+        key: ''
       },
 
       XD: window.RazorpayLibs.XD,
@@ -79,9 +74,7 @@
             success: rzp.handleAjaxSuccess,
             timeout: 35000,
             error: rzp.handleAjaxError,
-            data: data,
-            form: form,
-            Razorpay: rzp
+            data: data
           });
         },
 
@@ -93,7 +86,17 @@
             throw new Error("No merchant key specified");
           }
           rzp.public.validateOptions(options, true);
-          rzp.options = $.extend({}, rzp.options, options);
+          for (var i in rzp.options){
+            if(typeof rzp.options[i] === undefined){
+              continue;
+            }
+            if(i === "udf"){
+              rzp.options.udf = $.extend({}, rzp.options.udf, options);
+            }
+            else if(typeof rzp.options[i] !== "object" && typeof options[i] !== "undefined"){
+              rzp.options[i] = options[i];
+            }
+          }
         },
 
         /**
@@ -113,10 +116,6 @@
           else if (options.amount < 0) {
             message = "Invalid amount specified";
             field = "amount";
-          }
-          else if (["https", "http"].indexOf(options.protocol) < 0) {
-            message = "Invalid Protocol specified";
-            field = "protocol";
           }
           else if (!$.isFunction(options.handler)) {
             message = "Handler must be a function";
@@ -156,7 +155,9 @@
 
         client: {
           handleAjaxSuccess: '',
-          handleAjaxError: ''
+          handleAjaxError: '',
+          preHandler: '', // TODO Need to handle completely manual case where these would be client functions
+          postHandler: ''
         }
       }
     }
