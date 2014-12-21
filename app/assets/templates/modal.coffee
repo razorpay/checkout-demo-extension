@@ -26,7 +26,7 @@ RazorpayLibs.templates.modal = '
         <div id="rzp-tabs-cc" class="rzp-tab-content active">
           <form class="rzp-form" method="POST" novalidate>
             <input class="rzp-input" type="hidden" name="amount" value="{{amount}}">
-            <input class="rzp-input" type="hidden" name="currency" value="INR">
+            <input class="rzp-input" type="hidden" name="currency" value="{{currency}}">
             {{#each udf}}
             <!-- udf fields provided by merchant -->
             <input class="rzp-input" type="hidden" name="udf[{{$index}}]" value="{{$value}}">
@@ -72,7 +72,7 @@ RazorpayLibs.templates.modal = '
           <div id="rzp-tabs-nb" class="rzp-tab-content rzp-padder-top">
             <form class="rzp-form" method="POST" novalidate>
               <input class="rzp-input" type="hidden" name="amount" value="{{amount}}">
-              <input class="rzp-input" type="hidden" name="currency" value="INR">
+              <input class="rzp-input" type="hidden" name="currency" value="{{currency}}">
               {{#each udf}}
               <!-- udf fields provided by merchant -->
               <input class="rzp-input" type="hidden" name="udf[{{$index}}]" value="{{$value}}">

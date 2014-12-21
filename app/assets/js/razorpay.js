@@ -102,9 +102,13 @@
           if (typeof options["key"] === "undefined") {
             throw new Error("No merchant key specified");
           }
+          if (typeof options["currency"] === "undefined") {
+            throw new Error("No currency specified");
+          }
           rzp.options = $.extend({}, rzp.options, options);
         },
 
+        // TODO rewrite to not throw errors always #1
         validateOptions: function() {
           if (typeof rzp.options.amount === "undefined") {
             throw new Error("No amount specified");

@@ -199,6 +199,9 @@
           if (typeof options["key"] === "undefined") {
             throw new Error("No merchant key specified");
           }
+          if (typeof options["currency"] === "undefined") {
+            throw new Error("No currency specified");
+          }
           co.options = $.extend({}, co.options, options);
         },
 
@@ -266,7 +269,6 @@
   };
 
   /** TODO s
-   * options.handler method needs to be handled
    * calls to Razorpay.validate?
    */
 
