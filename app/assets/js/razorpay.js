@@ -103,7 +103,7 @@
             throw new Error("No merchant key specified");
           }
           if (typeof options["currency"] === "undefined") {
-            throw new Error("No currency specified");
+            options['currency'] == 'INR';
           }
           rzp.options = $.extend({}, rzp.options, options);
         },
