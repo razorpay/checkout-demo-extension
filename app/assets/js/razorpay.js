@@ -21,7 +21,9 @@
       XD: window.RazorpayLibs.XD,
 
       init: function(options){
-        rzp.public.configure(options);
+        if(options !== undefined){
+          rzp.public.configure(options);
+        }
       },
 
       XDCallback: function(message){
@@ -90,32 +92,66 @@
           if (typeof options["key"] === "undefined") {
             throw new Error("No merchant key specified");
           }
-          if (typeof options["currency"] === "undefined") {
-            options['currency'] == 'INR';
-          }
+          rzp.public.validateOptions(options, true);
           rzp.options = $.extend({}, rzp.options, options);
         },
 
-        // TODO rewrite to not throw errors always #1
-        validateOptions: function() {
-          if (typeof rzp.options.amount === "undefined") {
-            throw new Error("No amount specified");
+        /**
+         * Validates options
+         * throwError = bool // throws an error if true, otherwise returns object with the state
+         * options = object
+         *
+         * return object
+         */
+        validateOptions: function(options, throwError) {
+          var field = "";
+          var message = "";
+          if (typeof options.amount === "undefined") {
+            message = "No amount specified";
+            field = "amount";
           }
-          if (rzp.options.amount < 0) {
-            throw new Error("Invalid amount specified");
+          else if (options.amount < 0) {
+            message = "Invalid amount specified";
+            field = "amount";
           }
-          if (["https", "http"].indexOf(rzp.options.protocol) < 0) {
-            throw new Error("Invalid Protocol specified");
+          else if (["https", "http"].indexOf(options.protocol) < 0) {
+            message = "Invalid Protocol specified";
+            field = "protocol";
           }
-          if (!$.isFunction(rzp.options.handler)) {
-            throw new Error("Handler must be a function");
+          else if (!$.isFunction(options.handler)) {
+            message = "Handler must be a function";
+            field = "handler";
           }
-          if (typeof rzp.options.key === "undefined") {
-            throw new Error("No merchant key specified");
+          else if (typeof options.key === "undefined") {
+            message = "No merchant key specified";
+            field = "key";
           }
-          if (Object.keys(rzp.options.udf).length > 15) {
-            throw new Error("You can only pass at most 13 fields in the udf object");
+          else if (options.key === "") {
+            message = "Merchant key cannot be empty";
+            field = "key";
           }
+          else if (Object.keys(options.udf).length > 15) {
+            message = "You can only pass at most 13 fields in the udf object";
+            field = "udf";
+          }
+
+          if(message !== "" && throwError === true){
+            throw new Error("Field: " + field + "; Error:" + message);
+          }
+          if(message === ""){
+            return {error: false};
+          }
+          else {
+            return {error: {
+              description: message,
+              field: field
+            }}
+          }
+        },
+
+        // TODO
+        validateData: function(){
+
         },
 
         client: {

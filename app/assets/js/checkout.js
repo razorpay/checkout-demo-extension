@@ -19,10 +19,6 @@
       },
 
       options: {
-        protocol: 'https',
-        hostname: 'api.razorpay.com',
-        version: 'v1',
-        jsonpUrl: '/payments/create/jsonp',
         prefill: {
           name: '',
           contact: '',
@@ -38,7 +34,8 @@
       },
 
       init: function(options){
-        co.public.configure(options);
+        co.rzp = new window.Razorpay();
+
         // TODO handle options through data-attr
         var key = $(co.rzpscript).data("key");
         if (key && key.length > 0) {
@@ -47,12 +44,13 @@
           co.public.configure(options);
           co.public.addButton();
         }
-        co.createRzpInstance();
+        co.public.configure(options);
+        co.configureRzpInstance();
         // TODO else?
       },
 
-      createRzpInstance: function(){
-        co.rzp = new window.Razorpay(co.options);
+      configureRzpInstance: function(){
+        co.rzp.configure(co.options);
         co.rzp.client = {
           handleAjaxSuccess: co.public.handleAjaxSuccess,
           handleAjaxError: co.public.handleAjaxError,
@@ -203,16 +201,13 @@
       },
 
       public: {
+        // Handles Checkout.js related options
+        // and also calls Razorpay.validateOptions
         configure: function(options){
-          if (typeof options === "undefined") {
-            throw new Error("No options specified");
-          }
-          if (typeof options["key"] === "undefined") {
-            throw new Error("No merchant key specified");
-          }
           if (typeof options["currency"] === "undefined") {
-            options['currency'] == 'INR';
+            options['currency'] = 'INR';
           }
+          co.rzp.validateOptions(options, true);
           co.options = $.extend({}, co.options, options);
         },
 
