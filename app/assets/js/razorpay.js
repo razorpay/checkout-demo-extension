@@ -84,18 +84,6 @@
         },
 
         configure: function(options){
-          var category, dotPosition, i, ix, property;
-          for (i in options) {
-            ix = i.indexOf(".");
-            if (ix > -1) {
-              dotPosition = ix;
-              category = i.substr(0, dotPosition);
-              property = i.substr(dotPosition + 1);
-              options[category] = options[category] || {};
-              options[category][property] = options[i];
-              delete options[i];
-            }
-          }
           if (typeof options === "undefined") {
             throw new Error("No options specified");
           }

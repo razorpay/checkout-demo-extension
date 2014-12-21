@@ -28,6 +28,12 @@
           contact: '',
           email: ''
         },
+        key: '',
+        amount: '',
+        currency: '',
+        name: '', // of merchant
+        description: '',
+        image: '',
         udf: {}
       },
 
@@ -37,9 +43,11 @@
         var key = $(co.rzpscript).data("key");
         if (key && key.length > 0) {
           var options = $(co.rzpscript).data();
+          options = co.parseScriptOptions(options);
           co.public.configure(options);
           co.public.addButton();
         }
+        co.createRzpInstance();
         // TODO else?
       },
 
@@ -64,7 +72,6 @@
           return co.modal.show();
         }
 
-        co.createRzpInstance();
         co.$el = $((Handlebars.compile(template))(co.options));
         co.$el.smarty();
         co.modal = new RazorpayLibs.modal(co.$el);
@@ -179,20 +186,24 @@
         $(RazorPayForm).submit();
       },
 
+      parseScriptOptions: function(options){
+        var category, dotPosition, i, ix, property;
+        for (i in options) {
+          ix = i.indexOf(".");
+          if (ix > -1) {
+            dotPosition = ix;
+            category = i.substr(0, dotPosition);
+            property = i.substr(dotPosition + 1);
+            options[category] = options[category] || {};
+            options[category][property] = options[i];
+            delete options[i];
+          }
+        }
+        return options;
+      },
+
       public: {
         configure: function(options){
-          var category, dotPosition, i, ix, property;
-          for (i in options) {
-            ix = i.indexOf(".");
-            if (ix > -1) {
-              dotPosition = ix;
-              category = i.substr(0, dotPosition);
-              property = i.substr(dotPosition + 1);
-              options[category] = options[category] || {};
-              options[category][property] = options[i];
-              delete options[i];
-            }
-          }
           if (typeof options === "undefined") {
             throw new Error("No options specified");
           }
