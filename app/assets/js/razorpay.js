@@ -22,8 +22,6 @@
 
       init: function(options){
         rzp.public.configure(options);
-        var source = rzp.options.protocol + '://' + rzp.options.hostname;
-        rzp.XD.receiveMessage(rzp.XDCallback, source);
       },
 
       XDCallback: function(message){
@@ -71,6 +69,8 @@
           // data['card[expiry_month]'] = expiry[0];
           // data['card[expiry_year]'] = expiry[1];
 
+          var source = rzp.options.protocol + '://' + rzp.options.hostname;
+          rzp.XD.receiveMessage(rzp.XDCallback, source);
           return $.ajax({
             url: rzp.options.protocol + '://' + rzp.options.key + '@' + rzp.options.hostname + '/' + rzp.options.version + rzp.options.jsonpUrl,
             dataType: 'jsonp',
