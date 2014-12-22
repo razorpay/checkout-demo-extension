@@ -4,4 +4,4 @@
 /app/dist
 /app/srv
 /test/env.js
-/test/files
+/test/checkout.built.js
