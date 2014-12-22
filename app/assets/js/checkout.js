@@ -115,14 +115,9 @@
             co.shake();
             return;
           }
-          if (co.submit(form)) {
-            co.$('.rzp-submit').attr('disabled', true);
-            co.modal.options.backdropClose = false;
-            return;
-          } else {
-            co.clearSubmission();
-            return;
-          }
+          co.submit(form)
+          co.$('.rzp-submit').attr('disabled', true);
+          co.modal.options.backdropClose = false;
         });
       },
 
