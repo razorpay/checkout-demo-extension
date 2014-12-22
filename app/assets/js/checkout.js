@@ -146,6 +146,8 @@
           delete data['card[expiry]'];
         }
 
+        data['udf'] = co.options.udf;
+
         co.rzp.submit(form, data);
       },
 
