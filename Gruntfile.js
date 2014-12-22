@@ -110,7 +110,7 @@ module.exports = function(grunt){
    * Alias for build
    */
   grunt.registerTask('default', [
-    'default'
+    'build'
   ]);
 
   /**

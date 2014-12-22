@@ -3,7 +3,7 @@ build:
     steps:
         - npm-install
         - grunt:
-            tasks: default
+            tasks: test:prepare
         - script:
             name: Run unit tests
             code: ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS
