@@ -279,7 +279,14 @@
     }
 
     co.init(options);
-    return co.public;
+
+    // @if NODE_ENV='production'
+    return co.public
+    // @endif
+
+    // @if NODE_ENV='test'
+    return co
+    // @endif
   };
 
   window.Checkout = Checkout;

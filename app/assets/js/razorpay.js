@@ -163,7 +163,14 @@
     }
 
     rzp.init(options);
-    return rzp.public;
+
+    // @if NODE_ENV='production'
+    return rzp.public
+    // @endif
+
+    // @if NODE_ENV='test'
+    return rzp
+    // @endif
   };
 
   window.Razorpay = Razorpay;
