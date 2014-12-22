@@ -2,6 +2,9 @@ box: wercker/nodejs
 build:
     steps:
         - npm-install
+        - script:
+            name: Install harp globally
+            code: sudo npm install -g harp
         - grunt:
             tasks: test:prepare
         - script:
