@@ -204,7 +204,7 @@
           if (typeof options["currency"] === "undefined") {
             options['currency'] = 'INR';
           }
-          co.rzp.validateOptions(options, true);
+          co.public.validateOptions(options, true);
           co.options = $.extend({}, co.options, options);
           for (var i in co.options){
             if(typeof co.options[i] === undefined){
@@ -216,6 +216,55 @@
             else if(typeof co.options[i] !== "object" && typeof options[i] !== "undefined"){
               co.options[i] = options[i];
             }
+          }
+        },
+
+        /**
+         * Validates options
+         * throwError = bool // throws an error if true, otherwise returns object with the state
+         * options = object
+         *
+         * return object
+         */
+        validateOptions: function(options, throwError) {
+          var field = "";
+          var message = "";
+          if (typeof options.amount === "undefined") {
+            message = "No amount specified";
+            field = "amount";
+          }
+          else if (options.amount < 0) {
+            message = "Invalid amount specified";
+            field = "amount";
+          }
+          else if (!$.isFunction(options.handler)) {
+            message = "Handler must be a function";
+            field = "handler";
+          }
+          else if (typeof options.key === "undefined") {
+            message = "No merchant key specified";
+            field = "key";
+          }
+          else if (options.key === "") {
+            message = "Merchant key cannot be empty";
+            field = "key";
+          }
+          else if (Object.keys(options.udf).length > 15) {
+            message = "You can only pass at most 13 fields in the udf object";
+            field = "udf";
+          }
+
+          if(message !== "" && throwError === true){
+            throw new Error("Field: " + field + "; Error:" + message);
+          }
+          if(message === ""){
+            return {error: false};
+          }
+          else {
+            return {error: {
+              description: message,
+              field: field
+            }}
           }
         },
 
