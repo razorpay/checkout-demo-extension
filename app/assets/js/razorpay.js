@@ -48,6 +48,7 @@
           modal.addClass('rzp-frame');
           return;
         } else if (response.redirectUrl) {
+          // TODO tests for this
           var modal = $el.find('.rzp-modal').addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
           return;
         } else if (response.status) {
@@ -118,6 +119,8 @@
     // @endif
 
     // @if NODE_ENV='test'
+    rzp.$ = $;
+    rzp.Handlebars = Handlebars;
     return rzp
     // @endif
   };

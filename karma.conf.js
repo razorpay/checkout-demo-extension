@@ -18,6 +18,7 @@ module.exports = function(config) {
     files: [
       'app/assets/js/lib/jquery-1.11.1.js',
       'spec/jasmine-jquery.js',
+      'spec/fixtures/*',
       'test/*.js'
     ],
 
@@ -51,7 +52,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS','Chrome'],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode
