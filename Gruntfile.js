@@ -62,7 +62,7 @@ module.exports = function(grunt){
     watch: {
       build_files: {
         files: ['app/assets/js/**/*.js'],
-        tasks: ['test:prepare', 'karma:watch:run']
+        tasks: ['test:prepare']
       },
       test_files: {
         files: ['test/*.js'],
