@@ -126,7 +126,9 @@
     },
 
     bind_events: function() {
-      this.element[0].addEventListener('blur', this.steal_focus, true);
+      if(window.addEventListener)
+        this.element[0].addEventListener('blur', this.steal_focus, true);
+      
       if (this.options.stopKeyPropagation) {
         this.on('keyup keydown keypress', this.element, (function(_this) {
           return function(e) {

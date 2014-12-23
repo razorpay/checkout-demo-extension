@@ -1,6 +1,5 @@
 (function(){
   var Razorpay = function(options){
-    var RazorpayLibs = window.RazorpayLibs;
     var $ = window.RazorpayLibs.$;
     var Handlebars = window.RazorpayLibs.Handlebars;
 

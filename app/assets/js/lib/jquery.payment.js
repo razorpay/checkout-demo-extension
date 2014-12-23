@@ -343,9 +343,9 @@ var __slice = [].slice,
   };
   setCardType = function(e) {
     var $target, allTypes, card, cardType, val;
-    $target = $(e.currentTarget);
-    val = $target.val();
-    cardType = $.payment.cardType(val) || 'unknown';
+    val = e.currentTarget.value;
+    $target = $(e.currentTarget.parentNode.parentNode);
+    cardType = $.payment.cardType(val);
     if (!$target.hasClass(cardType)) {
       allTypes = (function() {
         var _i, _len, _results;
@@ -356,11 +356,10 @@ var __slice = [].slice,
         }
         return _results;
       })();
-      $target.removeClass('unknown');
       $target.removeClass(allTypes.join(' '));
-      $target.addClass(cardType);
-      $target.toggleClass('identified', cardType !== 'unknown');
-      return $target.trigger('payment.cardType', cardType);
+      if (cardType) {
+        return $target.addClass(cardType);
+      }
     }
   };
   $.payment.fn.formatCardCVC = function() {
