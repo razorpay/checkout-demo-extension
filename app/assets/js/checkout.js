@@ -1,4 +1,6 @@
+/* jshint -W027 */
 (function(){
+  'use strict';
   var Checkout = function(options){
     var $ = window.RazorpayLibs.$;
     var Handlebars = window.RazorpayLibs.Handlebars;
@@ -39,12 +41,12 @@
         // TODO handle options through data-attr
         var key = $(co.rzpscript).data("key");
         if (key && key.length > 0) {
-          var options = $(co.rzpscript).data();
-          options = co.parseScriptOptions(options);
-          co.public.configure(options);
-          co.public.addButton();
+          var opts = $(co.rzpscript).data();
+          options = co.parseScriptOptions(opts);
+          co.methods.configure(opts);
+          co.methods.addButton();
         }
-        co.public.configure(options);
+        co.methods.configure(options);
         co.configureRzpInstance();
         // TODO else?
       },
@@ -52,11 +54,11 @@
       configureRzpInstance: function(){
         co.rzp.configure(co.options);
         co.rzp.client = {
-          handleAjaxSuccess: co.public.handleAjaxSuccess,
-          handleAjaxError: co.public.handleAjaxError,
-          preHandler: co.public.preHandler,
-          postHandler: co.public.postHandler
-        }
+          handleAjaxSuccess: co.methods.handleAjaxSuccess,
+          handleAjaxError: co.methods.handleAjaxError,
+          preHandler: co.methods.preHandler,
+          postHandler: co.methods.postHandler
+        };
       },
 
       rzpscript: document.currentScript || (function() {
@@ -115,7 +117,7 @@
             co.shake();
             return;
           }
-          co.submit(form)
+          co.submit(form);
           co.$('.rzp-submit').attr('disabled', true);
           co.modal.options.backdropClose = false;
         });
@@ -166,10 +168,10 @@
         @return {[type]}    [description]
       */
       defaultPostHandler: function(data){
-        inputs = "";
-        for (i in data) {
+        var inputs = "";
+        for (var i in data) {
           if (typeof data[i] === "object") {
-            for (j in data[i]) {
+            for (var j in data[i]) {
               inputs += "<input type=\"hidden\" name=\"" + i + "[" + j + "]\" value=\"" + data[i][j] + "\">";
             }
           } else {
@@ -197,14 +199,14 @@
         return options;
       },
 
-      public: {
+      methods: {
         // Handles Checkout.js related options
         // and also calls Razorpay.validateOptions
         configure: function(options){
           if (typeof options["currency"] === "undefined") {
             options['currency'] = 'INR';
           }
-          co.public.validateOptions(options, true);
+          co.methods.validateOptions(options, true);
           co.options = $.extend({}, co.options, options);
           for (var i in co.options){
             if(typeof co.options[i] === undefined){
@@ -261,10 +263,12 @@
             return {error: false};
           }
           else {
-            return {error: {
-              description: message,
-              field: field
-            }}
+            return {
+              error: {
+                description: message,
+                field: field
+              }
+            };
           }
         },
 
@@ -280,7 +284,7 @@
           } else if (response.redirectUrl) {
             co.$el = null;
           } else if (response.status) {
-            co.public.preHandler();
+            co.methods.preHandler();
             co.options.handler(response);
           } else {
             co.$('.rzp-error').html('There was an error in handling your request');
@@ -297,7 +301,7 @@
         },
 
         preHandler: function() {
-          co.public.hide();
+          co.methods.hide();
         },
 
         addButton: function() {
@@ -305,7 +309,7 @@
           button = document.createElement("button");
           button.setAttribute("id", "rzp-button");
           $(button).click(function(e) {
-            co.public.open();
+            co.methods.open();
             e.preventDefault();
           }).html("Pay with Card").appendTo("body");
         },
@@ -325,16 +329,16 @@
         }
 
       }
-    }
+    };
 
     co.init(options);
 
     // @if NODE_ENV='production'
-    return co.public
+    return co.methods;
     // @endif
 
     // @if NODE_ENV='test'
-    return co
+    return co;
     // @endif
   };
 

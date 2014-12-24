@@ -62,7 +62,7 @@ module.exports = function(grunt){
     watch: {
       build_files: {
         files: ['app/assets/js/**/*.js'],
-        tasks: ['test:prepare']
+        tasks: ['test:prepare', 'jshint']
       },
       test_files: {
         files: ['test/*.js', '.tmp/checkout.built.js'],
@@ -79,7 +79,19 @@ module.exports = function(grunt){
         configFile: 'karma.conf.js',
         singleRun: true
       }
-    }
+    },
+
+    jshint: {
+      options: {
+        reporter: require('jshint-stylish'),
+        jshintrc: true,
+        force: true,
+      },
+      all: [
+        'app/assets/js/*.js',
+      ]
+    },
+
   });
 
   /**

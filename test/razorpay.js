@@ -84,27 +84,27 @@ describe("Razorpay Ajax", function(){
 
     it("should call handleAjaxSuccess", function(){
       spyOn(rzp, 'handleAjaxSuccess');
-      rzp.public.submit(data);
+      rzp.methods.submit(data);
       expect(rzp.handleAjaxSuccess).toHaveBeenCalled();
     });
 
     it("should call client handleAjaxSuccess", function(){
-      spyOn(rzp.public.client, 'handleAjaxSuccess').and.callFake(function(){
+      spyOn(rzp.methods.client, 'handleAjaxSuccess').and.callFake(function(){
         loadFixtures('iframe_container.html');
         return $('.rzp-container');
       });
-      rzp.public.submit(data);
-      expect(rzp.public.client.handleAjaxSuccess).toHaveBeenCalled();
+      rzp.methods.submit(data);
+      expect(rzp.methods.client.handleAjaxSuccess).toHaveBeenCalled();
     });
 
     describe("should load iframe and", function(){
       beforeEach(function(){
-        spyOn(rzp.public.client, 'handleAjaxSuccess').and.callFake(function(){
+        spyOn(rzp.methods.client, 'handleAjaxSuccess').and.callFake(function(){
           loadFixtures('iframe_container.html');
           return $('.rzp-container');
         })
 
-        rzp.public.submit(data);
+        rzp.methods.submit(data);
       });
 
       it("iframe should be visible", function(){
@@ -153,7 +153,7 @@ describe("Razorpay Ajax", function(){
           spyCalled();
           done();
         })
-        rzp.public.submit(data);
+        rzp.methods.submit(data);
       });
 
       it("should not call XDCallback", function(done){
@@ -171,7 +171,7 @@ describe("Razorpay Ajax", function(){
         spyOn(rzp, 'XDCallback').and.callFake(function(){
           spyNotCalled();
         })
-        rzp.public.submit(data);
+        rzp.methods.submit(data);
       });
 
       it("should call XDCallback", function(done){
@@ -185,7 +185,7 @@ describe("Razorpay Ajax", function(){
           spyCalled();
           done();
         })
-        rzp.public.submit(data);
+        rzp.methods.submit(data);
       })
     });
   });
@@ -199,14 +199,14 @@ describe("Razorpay Ajax", function(){
 
     it("should call handleAjaxError", function(){
       spyOn(rzp, 'handleAjaxError');
-      rzp.public.submit(data);
+      rzp.methods.submit(data);
       expect(rzp.handleAjaxError).toHaveBeenCalled();
     })
 
     it("should call client handleAjaxError", function(){
-      spyOn(rzp.public.client, 'handleAjaxError');
-      rzp.public.submit(data);
-      expect(rzp.public.client.handleAjaxError).toHaveBeenCalled();
+      spyOn(rzp.methods.client, 'handleAjaxError');
+      rzp.methods.submit(data);
+      expect(rzp.methods.client.handleAjaxError).toHaveBeenCalled();
     });
   })
 });

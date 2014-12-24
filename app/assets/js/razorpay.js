@@ -1,7 +1,10 @@
+/* jshint -W027 */
 (function(){
+  'use strict';
   var Razorpay = function(options){
-    var $ = window.RazorpayLibs.$;
-    var Handlebars = window.RazorpayLibs.Handlebars;
+    var RazorpayLibs = window.RazorpayLibs;
+    var $ = RazorpayLibs.$;
+    var Handlebars = RazorpayLibs.Handlebars;
 
     var rzp = {
       options: {
@@ -12,53 +15,58 @@
         key: ''
       },
 
-      XD: window.RazorpayLibs.XD,
+      XD: RazorpayLibs.XD,
 
       init: function(options){
         if(options !== undefined){
-          rzp.public.configure(options);
+          rzp.methods.configure(options);
         }
       },
 
       XDCallback: function(message){
-        rzp.public.client.preHandler();
+        rzp.methods.client.preHandler();
 
         if (message.data.error && message.data.error.description) {
           rzp.open();
           // TODO Left as it is in refactor. Method not defined
           return rzp.handleAjaxResponse(message.data);
         } else {
-          rzp.public.client.postHandler(message.data);
+          rzp.methods.client.postHandler(message.data);
         }
       },
 
       handleAjaxError: function() {
-        rzp.public.client.handleAjaxError();
+        rzp.methods.client.handleAjaxError();
       },
 
       handleAjaxSuccess: function(response) {
         // Add client part
-        var $el = rzp.public.client.handleAjaxSuccess(response);
+        var $el = rzp.methods.client.handleAjaxSuccess(response);
+
+        var modal;
 
         if (response.callbackUrl) {
           var iframe = document.createElement('iframe');
-          var modal = $el.find('.rzp-modal').html('').append(iframe);
+          modal = $el.find('.rzp-modal').html('').append(iframe);
           var template = Handlebars.compile(RazorpayLibs.templates.autosubmit)(response);
           iframe.contentWindow.document.write(template);
           modal.addClass('rzp-frame');
           return;
-        } else if (response.redirectUrl) {
+        }
+        else if (response.redirectUrl) {
           // TODO tests for this
-          var modal = $el.find('.rzp-modal').addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
+          modal = $el.find('.rzp-modal').addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
           return;
-        } else if (response.status) {
+        }
+        else if (response.status) {
           // Nothing to do here. Checkout does stuff
-        } else {
+        }
+        else {
           // Again, nothing for us to do here. Checkout magic.
         }
       },
 
-      public: {
+      methods: {
         submit: function(form, data){
           // TODO what's to be done for netbanking?
           // TODO better validation
@@ -110,18 +118,18 @@
           postHandler: ''
         }
       }
-    }
+    };
 
     rzp.init(options);
 
     // @if NODE_ENV='production'
-    return rzp.public
+    return rzp.methods;
     // @endif
 
     // @if NODE_ENV='test'
     rzp.$ = $;
     rzp.Handlebars = Handlebars;
-    return rzp
+    return rzp;
     // @endif
   };
 
