@@ -36,7 +36,7 @@ module.exports = function(grunt){
         cmd: 'cp app/srv/layout.html app/dist/v1/'
       },
       copy_for_test:{
-        cmd: 'cp .tmp/concat/checkout.js test/checkout.built.js'
+        cmd: 'cp .tmp/concat/checkout.js .tmp/checkout.built.js'
       }
     },
     useminPrepare:{
