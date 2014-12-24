@@ -3,7 +3,7 @@
 jasmine.getFixtures().fixturesPath = 'base/spec/fixtures/';
 
 var options = {
-  'key': 'rzp_test_1DP5mmOlF5G5ag'
+  'key': 'key_id'
 }
 
 describe("Razorpay options", function(){
