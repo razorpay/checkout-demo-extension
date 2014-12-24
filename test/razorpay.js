@@ -117,6 +117,77 @@ describe("Razorpay Ajax", function(){
 
     })
 
+    describe('should load iframe which', function () {
+      var spyCalled;
+      var spyNotCalled;
+      var prevHostname;
+      var prevProtocol;
+
+      beforeEach(function(done){
+        prevHostname = rzp.options.hostname;
+        prevProtocol = rzp.options.protocol;
+
+        spyOn(rzp, 'handleAjaxSuccess').and.callFake(function(){
+          loadFixtures('iframe_container.html');
+          var iframe = document.createElement('iframe');
+          var xdm = jasmine.getFixtures().read('iframe_xdm.html');
+          $('.rzp-modal').append(iframe);
+          iframe.contentWindow.document.write(xdm);
+        });
+        done();
+      })
+
+      afterEach(function(done) {
+        expect(spyCalled).toHaveBeenCalled();
+        expect(spyNotCalled).not.toHaveBeenCalled();
+        rzp.options.protocol = prevProtocol;
+        rzp.options.hostname = prevHostname;
+        done();
+      });
+
+      it("should send a window postmessage", function(done){
+        spyCalled = jasmine.createSpy('message');
+        spyNotCalled = jasmine.createSpy('message');
+
+        rzp.XD.receiveMessage(function(e){
+          spyCalled();
+          done();
+        })
+        rzp.public.submit(data);
+      });
+
+      it("should not call XDCallback", function(done){
+        spyCalled = jasmine.createSpy('message');
+        spyNotCalled = jasmine.createSpy('message');
+
+        rzp.XD.receiveMessage(function(e){
+          spyCalled();
+
+          // timeout is needed to ensure that done doesn't get called before XDCallback is hit
+          setTimeout(function(){
+            done();
+          }, 200);
+        })
+        spyOn(rzp, 'XDCallback').and.callFake(function(){
+          spyNotCalled();
+        })
+        rzp.public.submit(data);
+      });
+
+      it("should call XDCallback", function(done){
+        spyCalled = jasmine.createSpy('message');
+        spyNotCalled = jasmine.createSpy('message');
+
+        rzp.options.hostname = 'localhost:9876';
+        rzp.options.protocol = 'http';
+
+        spyOn(rzp, 'XDCallback').and.callFake(function(){
+          spyCalled();
+          done();
+        })
+        rzp.public.submit(data);
+      })
+    });
   });
 
   describe("on error", function(){
