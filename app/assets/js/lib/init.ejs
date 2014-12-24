@@ -8,11 +8,11 @@ window.Razorpay = function(options){
   var module = { exports: null };
 
   // jquery
-  <%- include lib/jquery-1.11.1.js %>
+  <%- include jquery-1.11.1.js %>
   RazorpayLibs.$ = module.exports;
 
   // handlebars
-  <%- include lib/handlebars-v2.0.0.js %>
+  <%- include handlebars-v2.0.0.js %>
   module.exports.registerHelper('toRupee', function(paise) {
     return parseInt(paise)/100;
   });
