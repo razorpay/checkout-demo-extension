@@ -1,11 +1,11 @@
 window.Razorpay = function(options){
   if(typeof this.configure == 'function')
-    this.configure(options)
-}
-!function(){
+    this.configure(options);
+};
+(function(){
   var RazorpayLibs = window.RazorpayLibs = {};
   var exports = null;
-  var module = {exports: null};
+  var module = { exports: null };
 
   // jquery
   <%- include lib/jquery-1.11.1.js %>
@@ -16,6 +16,6 @@ window.Razorpay = function(options){
   module.exports.registerHelper('toRupee', function(paise) {
     return parseInt(paise)/100;
   });
-  RazorpayLibs.Handlebars = module.exports
-  RazorpayLibs.templates = {}
-}()
+  RazorpayLibs.Handlebars = module.exports;
+  RazorpayLibs.templates = {};
+})();
