@@ -65,7 +65,7 @@ module.exports = function(grunt){
         tasks: ['test:prepare']
       },
       test_files: {
-        files: ['test/*.js'],
+        files: ['test/*.js', '.tmp/checkout.built.js'],
         tasks: ['karma:watch:run']
       },
     },
