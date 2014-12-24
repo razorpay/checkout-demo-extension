@@ -5,8 +5,8 @@
 
     var rzp = {
       options: {
-        protocol: 'http',
-        hostname: 'api.razorpay.dev',
+        protocol: 'https',
+        hostname: 'api.razorpay.com',
         version: 'v1',
         jsonpUrl: '/payments/create/jsonp',
         key: ''
