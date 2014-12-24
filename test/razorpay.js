@@ -51,9 +51,9 @@ describe("Razorpay Ajax", function(){
       "data": {
           "paymentid" : "5668898417810430",
           "PAReq"     : "abcsafsf",
-          "url"       : "http:\/\/api.razorpay.dev\/gateway\/3dsecure"
+          "url"       : "http://api.razorpay.dev/gateway/3dsecure"
       },
-      "callbackUrl"   : "http:\/\/rzp_test_1DP5mmOlF5G5ag@api.razorpay.dev\/v1\/payments\/pay-2H7CKjN02Ubsfb\/callback",
+      "callbackUrl"   : "http://rzp_test_1DP5mmOlF5G5ag@api.razorpay.dev/v1/payments/pay-2H7CKjN02Ubsfb/callback",
       "http_status_code": 200
     },
     error: {
