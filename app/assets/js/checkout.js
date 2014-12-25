@@ -239,7 +239,7 @@
             message = "Invalid amount specified";
             field = "amount";
           }
-          else if (!$.isFunction(options.handler)) {
+          else if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
             message = "Handler must be a function";
             field = "handler";
           }
@@ -252,7 +252,7 @@
             field = "key";
           }
           else if (Object.keys(options.udf).length > 15) {
-            message = "You can only pass at most 13 fields in the udf object";
+            message = "You can only pass at most 15 fields in the udf object";
             field = "udf";
           }
 
@@ -330,7 +330,6 @@
 
       }
     };
-
     co.init(options);
 
     // @if NODE_ENV='production'
