@@ -91,7 +91,7 @@ describe("Razorpay Ajax", function(){
     it("should call client handleAjaxSuccess", function(){
       spyOn(rzp.methods.client, 'handleAjaxSuccess').and.callFake(function(){
         loadFixtures('iframe_container.html');
-        return $('.rzp-container');
+        return $('.rzp-container-test');
       });
       rzp.methods.submit(data);
       expect(rzp.methods.client.handleAjaxSuccess).toHaveBeenCalled();
@@ -101,7 +101,7 @@ describe("Razorpay Ajax", function(){
       beforeEach(function(){
         spyOn(rzp.methods.client, 'handleAjaxSuccess').and.callFake(function(){
           loadFixtures('iframe_container.html');
-          return $('.rzp-container');
+          return $('.rzp-container-test');
         })
 
         rzp.methods.submit(data);
