@@ -19,8 +19,10 @@ module.exports = function(config) {
       'app/assets/js/lib/jquery-1.11.1.js',
       'spec/jasmine-jquery.js',
       'spec/fixtures/*',
+      'app/assets/js/lib/sendkeys.js',
       'test/*.js',
-      '.tmp/checkout.built.js'
+      '.tmp/checkout.built.js',
+      'app/dist/v1/css/style.css'
     ],
 
     // list of files to exclude

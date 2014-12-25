@@ -308,6 +308,7 @@
           var button;
           button = document.createElement("button");
           button.setAttribute("id", "rzp-button");
+          // TODO append should not be in body;
           $(button).click(function(e) {
             co.methods.open();
             e.preventDefault();

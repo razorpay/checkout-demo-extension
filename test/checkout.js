@@ -1,43 +1,51 @@
-var coOptions = {
-  'key': 'key_id',
-  'amount': '5100',
-  'name': 'Daft Punk',
-  'description': 'Tron Legacy',
-  'image': 'https://i.imgur.com/3g7nmJC.png',
-  'handler': function (transaction) {
-    alert("You have successfully purchased " + options.description);
+var coData = {
+  options: {
+    'key': 'key_id',
+    'amount': '5100',
+    'name': 'Daft Punk',
+    'description': 'Tron Legacy',
+    'image': 'https://i.imgur.com/3g7nmJC.png',
+    'handler': function (transaction) {
+      alert("You have successfully purchased " + options.description);
+    },
+    'netbanking': 'true',
+    'prefill': {
+      'name': 'Harshil Mathur',
+      'email': 'harshil@razorpay.com',
+      'contact': '9999999999'
+    },
+    udf: {
+      'address': 'Hello World'
+    },
+    protocol: 'http',
+    hostname: 'api.razorpay.dev'
   },
-  'netbanking': 'true',
-  'prefill': {
-    'name': 'Harshil Mathur',
-    'email': 'harshil@razorpay.com',
-    'contact': '9999999999'
-  },
-  udf: {
-    'address': 'Hello World'
-  },
-  protocol: 'http',
-  hostname: 'api.razorpay.dev'
+
+  cc: {
+    number: '4012001037141112',
+    expiry: '05 / 19',
+    cvv: '888'
+  }
 }
 
 describe("Checkout init", function(){
   var co;
-  var custom = $.extend({}, coOptions);
+  var custom = $.extend({}, coData.options);
   custom.unwanted = 'fake';
 
   beforeEach(function(){
-    co = new Checkout(coOptions);
+    co = new Checkout(coData.options);
     spyOn(co.methods, 'validateOptions').and.callThrough();
     spyOn(co, 'configureRzpInstance').and.callThrough();
-    co.init(coOptions);
+    co.init(coData.options);
   });
 
   it("should set key", function(){
-    expect(co.options.key).toBe(coOptions.key);
+    expect(co.options.key).toBe(coData.options.key);
   });
 
   it("should set amount", function(){
-    expect(co.options.amount).toBe(coOptions.amount);
+    expect(co.options.amount).toBe(coData.options.amount);
   });
 
   it("should set default currency", function(){
@@ -45,28 +53,28 @@ describe("Checkout init", function(){
   });
 
   it("should set name of merchant", function(){
-    expect(co.options.name).toBe(coOptions.name);
+    expect(co.options.name).toBe(coData.options.name);
   });
 
   it("should set description", function(){
-    expect(co.options.description).toBe(coOptions.description);
+    expect(co.options.description).toBe(coData.options.description);
   });
 
   it("should set image", function(){
-    expect(co.options.image).toBe(coOptions.image);
+    expect(co.options.image).toBe(coData.options.image);
   });
 
   it("should set udf fields", function(){
     for(var i in co.options.udf){
-      expect(co.options.udf[i]).toBe(coOptions.udf[i]);
+      expect(co.options.udf[i]).toBe(coData.options.udf[i]);
     }
-    expect(Object.keys(co.options.udf).length).toBe(Object.keys(coOptions.udf).length)
+    expect(Object.keys(co.options.udf).length).toBe(Object.keys(coData.options.udf).length)
   });
 
   it("should set prefill options", function(){
-    expect(co.options.prefill.name).toBe(coOptions.prefill.name);
-    expect(co.options.prefill.contact).toBe(coOptions.prefill.contact);
-    expect(co.options.prefill.email).toBe(coOptions.prefill.email);
+    expect(co.options.prefill.name).toBe(coData.options.prefill.name);
+    expect(co.options.prefill.contact).toBe(coData.options.prefill.contact);
+    expect(co.options.prefill.email).toBe(coData.options.prefill.email);
   });
 
   it("should not set unknown option", function(){
@@ -87,8 +95,8 @@ describe("Checkout validateOptions method", function(){
   var field;
 
   beforeEach(function(){
-    co = new Checkout(coOptions);
-    customOptions = $.extend({}, coOptions);
+    co = new Checkout(coData.options);
+    customOptions = $.extend({}, coData.options);
   });
 
   describe("should return error", function(){
@@ -156,3 +164,101 @@ describe("Checkout validateOptions method", function(){
   });
 
 });
+
+describe("Razorpay open method", function(){
+  var co;
+
+  beforeEach(function(){
+    co = new Checkout(coData.options);
+    co.open();
+
+  });
+
+  afterEach(function(){
+    $('.rzp-container').remove();
+  });
+
+  it("should load modal", function(){
+    expect($('.rzp-modal')).toBeVisible();
+  });
+
+  it("should prefill name", function(){
+    var value = $('.rzp-input[name="card[name]"]').val();
+    expect(value).toBe(coData.options.prefill.name);
+  });
+
+  it("should prefill email", function(){
+    var value = $('.rzp-input[name="email"]').val();
+    expect(value).toBe(coData.options.prefill.email);
+  });
+
+  it("should prefill contact number", function(){
+    var value = $('.rzp-input[name="contact"]').val();
+    expect(value).toBe(coData.options.prefill.contact);
+  });
+
+  describe("and submit method", function(){
+    var spyCalled;
+    var spyNotCalled;
+    var $ccNumber;
+    var $ccExpiry;
+    var $ccCVV;
+
+    beforeEach(function(){
+      $ccNumber = $('.rzp-input[name="card[number]"]');
+      $ccExpiry = $('.rzp-input[name="card[expiry]"]');
+      $ccCVV = $('.rzp-input[name="card[cvv]"]');
+      spyCalled = jasmine.createSpy();
+      spyNotCalled = jasmine.createSpy();
+    });
+
+    afterEach(function(done){
+      // sendkeys needs little delay
+      setTimeout(function(){
+        $('.rzp-modal #rzp-tabs-cc .rzp-submit').click();
+        expect(spyCalled).toHaveBeenCalled();
+        expect(spyNotCalled).not.toHaveBeenCalled();
+        done();
+      }, 10);
+    })
+
+    it("should submit form with all details in place", function(){
+      $ccNumber.sendkeys(coData.cc.number);
+      $ccExpiry.sendkeys(coData.cc.expiry);
+      $ccCVV.sendkeys(coData.cc.cvv);
+
+      spyOn(co, 'submit').and.callFake(function(){
+        spyCalled();
+      });
+    });
+
+    it("should not submit form without cc card", function(){
+      $ccExpiry.sendkeys(coData.cc.expiry);
+      $ccCVV.sendkeys(coData.cc.cvv);
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit form without cc expiry", function(){
+      $ccNumber.sendkeys(coData.cc.number);
+      $ccCVV.sendkeys(coData.cc.cvv);
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit form without cc cvv", function(){
+      $ccCVV.val('').sendkeys('0');
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+  })
+})
