@@ -125,18 +125,34 @@ describe("Checkout validateOptions method", function(){
     it("when handler is not a function", function(){
       customOptions.handler = 'string';
       field = 'handler';
-    })
+    });
   })
 
-  describe("should return error", function(){
+  describe("should not return error", function(){
     afterEach(function(){
       var val = co.methods.validateOptions(customOptions);
       expect(val.error).toBe(false);
-    })
+    });
 
     it("when handler is not defined", function(){
       delete customOptions.handler;
-    })
+    });
+
+    it("when description is not defined", function(){
+      delete customOptions.description;
+    });
+
+    it("when image is not defined", function(){
+      delete customOptions.image;
+    });
+
+    it("when udf is not defined", function(){
+      delete customOptions.udf;
+    });
+
+    it("when name is not defined", function(){
+      delete customOptions.name;
+    });
   });
 
 });
