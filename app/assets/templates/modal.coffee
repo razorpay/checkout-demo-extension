@@ -29,7 +29,7 @@ RazorpayLibs.templates.modal = '
             <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
             {{for(udfkey in it.udf){}}
               <!-- udf fields provided by merchant -->
-              <input class="rzp-input" type="hidden" name="{{=udfkey}}" value="{{=it.udf[udfkey]}}">
+              <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
             {{}}}
 
             <input class="rzp-input" type="hidden" name="card[expiry_month]">
