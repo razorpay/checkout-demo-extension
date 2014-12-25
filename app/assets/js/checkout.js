@@ -3,7 +3,7 @@
   'use strict';
   var Checkout = function(options){
     var $ = window.RazorpayLibs.$;
-    var Handlebars = window.RazorpayLibs.Handlebars;
+    var doT = window.RazorpayLibs.doT;
     var RazorpayLibs = window.RazorpayLibs;
 
     var co = {
@@ -72,7 +72,7 @@
           return co.modal.show();
         }
 
-        co.$el = $((Handlebars.compile(template))(co.options));
+        co.$el = $((doT.compile(template))(co.options));
         co.$el.smarty();
         co.modal = new RazorpayLibs.modal(co.$el);
         co.$('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {

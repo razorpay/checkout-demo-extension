@@ -2,9 +2,8 @@
 (function(){
   'use strict';
   var Razorpay = function(options){
-    var RazorpayLibs = window.RazorpayLibs;
     var $ = RazorpayLibs.$;
-    var Handlebars = RazorpayLibs.Handlebars;
+    var doT = RazorpayLibs.doT;
 
     var rzp = {
       options: {
@@ -48,7 +47,7 @@
         if (response.callbackUrl) {
           var iframe = document.createElement('iframe');
           modal = $el.find('.rzp-modal').html('').append(iframe);
-          var template = Handlebars.compile(RazorpayLibs.templates.autosubmit)(response);
+          var template = doT.compile(RazorpayLibs.templates.autosubmit)(response);
           iframe.contentWindow.document.write(template);
           modal.addClass('rzp-frame');
           return;
@@ -128,7 +127,7 @@
 
     // @if NODE_ENV='test'
     rzp.$ = $;
-    rzp.Handlebars = Handlebars;
+    rzp.doT = doT;
     return rzp;
     // @endif
   };

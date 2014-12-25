@@ -6,44 +6,44 @@ RazorpayLibs.templates.modal = '
       <div class="rzp-header">
         <div class="rzp-merchant rzp-clear">
           <div class="rzp-merchant_image">
-            <img src="{{image}}">
+            <img src="{{=it.image}}">
           </div>
           <div class="rzp-merchant_powered"></div>
           <div class="rzp-merchant_name">
-            {{name}}
+            {{=it.name}}
             <br>
-            {{description}}
+            {{=it.description}}
           </div>
         </div>
-        {{#if netbanking}}
+        {{if(it.netbanking){}}
           <ul class="rzp-tabs">
             <li data-target="rzp-tabs-cc" class="active">Card</li>
             <li data-target="rzp-tabs-nb">Net Banking</li>
           </ul>
-        {{/if}}
+        {{}}}
       </div>
       <div class="rzp-body">
         <div id="rzp-tabs-cc" class="rzp-tab-content active">
           <form class="rzp-form" method="POST" novalidate>
-            <input class="rzp-input" type="hidden" name="amount" value="{{amount}}">
-            <input class="rzp-input" type="hidden" name="currency" value="{{currency}}">
-            {{#each udf}}
-            <!-- udf fields provided by merchant -->
-            <input class="rzp-input" type="hidden" name="udf[{{$index}}]" value="{{$value}}">
-            {{/each}}
+            <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
+            <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
+            {{for(udfkey in it.udf){}}
+              <!-- udf fields provided by merchant -->
+              <input class="rzp-input" type="hidden" name="{{=udfkey}}" value="{{=it.udf[udfkey]}}">
+            {{}}}
 
             <input class="rzp-input" type="hidden" name="card[expiry_month]">
             <input class="rzp-input" type="hidden" name="card[expiry_year]">
 
             <div class="rzp-fieldset">
               <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
-                <input class="rzp-input" name="card[name]" placeholder="Name" required value="{{prefill.name}}" pattern=".{1,100}">
+                <input class="rzp-input" name="card[name]" placeholder="Name" required value="{{=it.prefill.name}}" pattern=".{1,100}">
               </div></div>
               <div class="rzp-elem rzp-elem-email"><div class="rzp-elem-inner">
-                <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{prefill.email}}" pattern="[a-zA-Z0-9!#$%&\'*+/=?^_{|}~-]+(?:.[a-zA-Z0-9!#$%&\'*+/=?^_{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?">
+                <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$">
               </div></div>
               <div class="rzp-elem rzp-elem-contact" style="border-radius: 0 0 4px 4px"><div class="rzp-elem-inner">
-                <input class="rzp-input" name="contact" type="tel" placeholder="Contact Number" required value="{{prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
+                <input class="rzp-input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
               </div></div>
             </div>
             <div class="rzp-fieldset">
@@ -63,28 +63,28 @@ RazorpayLibs.templates.modal = '
             <div class="rzp-footer rzp-clear">
               <button class="rzp-submit" type="submit">
                 <span class="rzp-ring"></span>
-                <span class="rzp-text">Pay ₹{{toRupee amount}}</span>
+                <span class="rzp-text">Pay ₹{{=it.amount/100}}</span>
               </button>
             </div>
           </form>
         </div>
-        {{#if netbanking}}
+        {{if(it.netbanking){}}
           <div id="rzp-tabs-nb" class="rzp-tab-content rzp-padder-top">
             <form class="rzp-form" method="POST" novalidate>
-              <input class="rzp-input" type="hidden" name="amount" value="{{amount}}">
-              <input class="rzp-input" type="hidden" name="currency" value="{{currency}}">
-              {{#each udf}}
-              <!-- udf fields provided by merchant -->
-              <input class="rzp-input" type="hidden" name="udf[{{$index}}]" value="{{$value}}">
-              {{/each}}
+              <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
+              <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
+              {{for(udfkey in it.udf){}}
+                <!-- udf fields provided by merchant -->
+                <input class="rzp-input" type="hidden" name="{{=udfkey}}" value="{{=it.udf[udfkey]}}">
+              {{}}}
               <input class="rzp-input" type="hidden" name="method" value="net banking">
 
               <div class="rzp-fieldset">
                 <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
-                  <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{prefill.email}}" pattern="[a-zA-Z0-9!#$%&\'*+/=?^_{|}~-]+(?:.[a-zA-Z0-9!#$%&\'*+/=?^_{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?">
+                  <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$">
                 </div></div>
                 <div class="rzp-elem rzp-elem-contact" style="border-radius: 0 0 4px 4px"><div class="rzp-elem-inner">
-                  <input class="rzp-input" name="contact" type="tel" placeholder="Contact Number" required value="{{prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
+                  <input class="rzp-input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
                 </div></div>
               </div>
               <div class="rzp-fieldset">
@@ -106,12 +106,12 @@ RazorpayLibs.templates.modal = '
               <div class="rzp-footer rzp-clear">
                 <button class="rzp-submit" type="submit">
                   <span class="rzp-ring"></span>
-                  <span class="rzp-text">Pay ₹{{toRupee amount}}</span>
+                  <span class="rzp-text">Pay ₹{{=it.amount/100}}</span>
                 </button>
               </div>
             </form>
           </div>
-        {{/if}}
+        {{}}}
       </div>
     </div>
   </div>

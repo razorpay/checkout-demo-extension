@@ -12,10 +12,7 @@ window.Razorpay = function(options){
   RazorpayLibs.$ = module.exports;
 
   // handlebars
-  <%- include handlebars-v2.0.0.js %>
-  module.exports.registerHelper('toRupee', function(paise) {
-    return parseInt(paise)/100;
-  });
-  RazorpayLibs.Handlebars = module.exports;
+  <%- include doT.js %>
+  RazorpayLibs.doT = module.exports;
   RazorpayLibs.templates = {};
 })();
