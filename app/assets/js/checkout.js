@@ -338,6 +338,12 @@
     // @endif
 
     // @if NODE_ENV='test'
+    for(var i in co.methods){
+      if(typeof co[i] !== 'undefined'){
+        throw new Error("Method " + i + " already defined");
+      }
+      co[i] = co.methods[i];
+    }
     return co;
     // @endif
   };

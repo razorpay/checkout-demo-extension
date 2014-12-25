@@ -1,3 +1,4 @@
+/* global RazorpayLibs */
 /* jshint -W027 */
 (function(){
   'use strict';
@@ -128,6 +129,12 @@
     // @if NODE_ENV='test'
     rzp.$ = $;
     rzp.doT = doT;
+    for(var i in rzp.methods){
+      if(typeof rzp[i] !== 'undefined'){
+        throw new Error("Method " + i + " already defined");
+      }
+      rzp[i] = rzp.methods[i];
+    }
     return rzp;
     // @endif
   };
