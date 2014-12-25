@@ -15,8 +15,8 @@ describe("Available modules", function(){
     expect(RazorpayLibs.XD).toBeDefined();
   });
 
-  it("should include Handlebars", function(){
-    expect(RazorpayLibs.Handlebars).toBeDefined();
+  it("should include dot", function(){
+    expect(RazorpayLibs.doT).toBeDefined();
   });
 
   it("should include Razorpay", function(){
