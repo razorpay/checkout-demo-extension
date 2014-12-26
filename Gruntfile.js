@@ -27,7 +27,7 @@ module.exports = function(grunt){
         cmd: 'harp compile app/assets app/srv'
       },
       dir_images: {
-        cmd: 'mkdir app/dist/v1'
+        cmd: 'mkdir app/dist && mkdir app/dist/v1'
       },
       copy_images:{
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
