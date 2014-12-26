@@ -30,6 +30,8 @@ deploy:
             content: $AWS_deploykey
             overwrite: true
             hide-from-log: true
+        - grunt:
+            tasks: build
         - script:
             name: copy with rsync over ssh
             code: >
