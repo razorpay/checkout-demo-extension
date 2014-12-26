@@ -30,6 +30,10 @@ deploy:
             content: $AWS_deploykey
             overwrite: true
             hide-from-log: true
+        - npm-install
+        - script:
+            name: Install harp globally
+            code: sudo npm install -g harp
         - grunt:
             tasks: build
         - script:
