@@ -171,7 +171,6 @@ describe("Razorpay open method", function(){
   beforeEach(function(){
     co = new Checkout(coData.options);
     co.open();
-
   });
 
   afterEach(function(){
@@ -200,22 +199,31 @@ describe("Razorpay open method", function(){
   describe("and submit method", function(){
     var spyCalled;
     var spyNotCalled;
-    var $ccNumber;
-    var $ccExpiry;
-    var $ccCVV;
+    var $ccNumber, $ccExpiry, $ccCVV;
+    var $name, $email, $contact;
+    var $nbLink, $nbBank;
+    var submitBtn, $ccSubmit, $nbSubmit;
 
     beforeEach(function(){
-      $ccNumber = $('.rzp-input[name="card[number]"]');
-      $ccExpiry = $('.rzp-input[name="card[expiry]"]');
-      $ccCVV = $('.rzp-input[name="card[cvv]"]');
-      spyCalled = jasmine.createSpy();
+      $ccNumber    = $('.rzp-input[name="card[number]"]');
+      $ccExpiry    = $('.rzp-input[name="card[expiry]"]');
+      $ccCVV       = $('.rzp-input[name="card[cvv]"]');
+      $name        = $('.rzp-input[name="card[name]"]');
+      $email       = $('.rzp-input[name="email"]');
+      $contact     = $('.rzp-input[name="contact"]');
+      $nbLink      = $('.rzp-tabs li[data-target="rzp-tabs-nb"]');
+      $nbBank      = $('#rzp-tabs-nb select[name="bank"]');
+      $ccSubmit    = $('.rzp-modal #rzp-tabs-cc .rzp-submit');
+      $nbSubmit    = $('.rzp-modal #rzp-tabs-nb .rzp-submit');
+      submitBtn    = $('.rzp-modal #rzp-tabs-cc .rzp-submit');
+      spyCalled    = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
     });
 
     afterEach(function(done){
       // sendkeys needs little delay
       setTimeout(function(){
-        $('.rzp-modal #rzp-tabs-cc .rzp-submit').click();
+        submitBtn.click();
         expect(spyCalled).toHaveBeenCalled();
         expect(spyNotCalled).not.toHaveBeenCalled();
         done();
@@ -260,5 +268,41 @@ describe("Razorpay open method", function(){
         spyNotCalled();
       });
     });
+
+    it("should not submit form without name", function(){
+      $name.val('');
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit form without email", function(){
+      $email.val('');
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit form without contact", function(){
+      $contact.val('');
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    // failing for some reason on phantom only
+    // L92 in checkout,js click handler not executing in phantom
+//    it("should show netbanking form on clicking", function(){
+//      $nbLink.click();
+//      submitBtn = $nbSubmit;
+//      expect($nbSubmit).toBeVisible();
+//      spyCalled();
+//    })
   })
 })
