@@ -41,7 +41,7 @@ deploy:
             code: >
                 rsync --archive --verbose --force --delete --progress --recursive
                 -e "ssh -i $PRIVATEKEY_PATH -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-                ./dist ubuntu@checkout.razorpay.com:/home/ubuntu/checkout/
+                ./app/dist ubuntu@checkout.razorpay.com:/home/ubuntu/checkout/
     after-steps:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
