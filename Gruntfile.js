@@ -21,7 +21,7 @@ module.exports = function(grunt){
         cmd: 'rm -rf app/srv'
       },
       clean_dist: {
-        cmd: 'rm -rf app/dist/v1'
+        cmd: 'rm -rf app/dist'
       },
       harp_compile:{
         cmd: 'harp compile app/assets app/srv'

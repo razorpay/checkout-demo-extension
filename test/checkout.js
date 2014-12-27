@@ -10,8 +10,8 @@ var coData = {
     },
     'netbanking': 'true',
     'prefill': {
-      'name': 'Harshil Mathur',
-      'email': 'harshil@razorpay.com',
+      'name': 'Shashank Mehta',
+      'email': 'sm@razorpay.com',
       'contact': '9999999999'
     },
     udf: {
@@ -30,14 +30,11 @@ var coData = {
 
 describe("Checkout init", function(){
   var co;
-  var custom = $.extend({}, coData.options);
+  var custom = $.extend(true, {}, coData.options);
   custom.unwanted = 'fake';
 
   beforeEach(function(){
-    co = new Checkout(coData.options);
-    spyOn(co.methods, 'validateOptions').and.callThrough();
-    spyOn(co, 'configureRzpInstance').and.callThrough();
-    co.init(coData.options);
+    co = new Razorpay(custom);
   });
 
   it("should set key", function(){
@@ -81,13 +78,6 @@ describe("Checkout init", function(){
     expect(co.options.unwanted).toBeUndefined();
   });
 
-  it("should call validateOptions", function(){
-    expect(co.methods.validateOptions).toHaveBeenCalled();
-  });
-
-  it("should call rzp.configure", function(){
-    expect(co.configureRzpInstance).toHaveBeenCalled();
-  })
 });
 
 describe("Checkout validateOptions method", function(){
@@ -95,13 +85,13 @@ describe("Checkout validateOptions method", function(){
   var field;
 
   beforeEach(function(){
-    co = new Checkout(coData.options);
-    customOptions = $.extend({}, coData.options);
+    co = new Razorpay(coData.options);
+    customOptions = $.extend(true, {}, coData.options);
   });
 
   describe("should return error", function(){
     afterEach(function(){
-      var val = co.methods.validateOptions(customOptions);
+      var val = co.validate(customOptions);
       expect(val.error.field).toBe(field);
     })
 
@@ -138,7 +128,7 @@ describe("Checkout validateOptions method", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      var val = co.methods.validateOptions(customOptions);
+      var val = co.validate(customOptions);
       expect(val.error).toBe(false);
     });
 
@@ -165,12 +155,17 @@ describe("Checkout validateOptions method", function(){
 
 });
 
-describe("Razorpay open method", function(){
+// Tests on Credit Card page
+describe("Razorpay open cc page", function(){
   var co;
+  var $name, $email, $contact;
 
   beforeEach(function(){
-    co = new Checkout(coData.options);
+    co = new Razorpay(coData.options);
     co.open();
+    $name    = $('#rzp-tabs-cc .rzp-input[name="card[name]"]');
+    $email   = $('#rzp-tabs-cc .rzp-input[name="email"]');
+    $contact = $('#rzp-tabs-cc .rzp-input[name="contact"]');
   });
 
   afterEach(function(){
@@ -182,127 +177,253 @@ describe("Razorpay open method", function(){
   });
 
   it("should prefill name", function(){
-    var value = $('.rzp-input[name="card[name]"]').val();
-    expect(value).toBe(coData.options.prefill.name);
+    expect($name.val()).toBe(coData.options.prefill.name);
   });
 
   it("should prefill email", function(){
-    var value = $('.rzp-input[name="email"]').val();
-    expect(value).toBe(coData.options.prefill.email);
+    expect($email.val()).toBe(coData.options.prefill.email);
   });
 
   it("should prefill contact number", function(){
-    var value = $('.rzp-input[name="contact"]').val();
-    expect(value).toBe(coData.options.prefill.contact);
+    expect($contact.val()).toBe(coData.options.prefill.contact);
   });
 
-  describe("and submit method", function(){
-    var spyCalled;
-    var spyNotCalled;
-    var $ccNumber, $ccExpiry, $ccCVV;
-    var $name, $email, $contact;
-    var $nbLink, $nbBank;
-    var submitBtn, $ccSubmit, $nbSubmit;
+});
 
-    beforeEach(function(){
-      $ccNumber    = $('.rzp-input[name="card[number]"]');
-      $ccExpiry    = $('.rzp-input[name="card[expiry]"]');
-      $ccCVV       = $('.rzp-input[name="card[cvv]"]');
-      $name        = $('.rzp-input[name="card[name]"]');
-      $email       = $('.rzp-input[name="email"]');
-      $contact     = $('.rzp-input[name="contact"]');
-      $nbLink      = $('.rzp-tabs li[data-target="rzp-tabs-nb"]');
-      $nbBank      = $('#rzp-tabs-nb select[name="bank"]');
-      $ccSubmit    = $('.rzp-modal #rzp-tabs-cc .rzp-submit');
-      $nbSubmit    = $('.rzp-modal #rzp-tabs-nb .rzp-submit');
-      submitBtn    = $('.rzp-modal #rzp-tabs-cc .rzp-submit');
-      spyCalled    = jasmine.createSpy();
-      spyNotCalled = jasmine.createSpy();
-    });
+describe("Razorpay open cc and submit method", function(){
+  var co;
+  var spyCalled;
+  var spyNotCalled;
+  var $ccNumber, $ccExpiry, $ccCVV;
+  var $name, $email, $contact;
+  var $nbLink, $nbBank;
+  var $ccSubmit, $nbSubmit;
+  var customOptions;
 
-    afterEach(function(done){
-      // sendkeys needs little delay
-      setTimeout(function(){
-        submitBtn.click();
-        expect(spyCalled).toHaveBeenCalled();
-        expect(spyNotCalled).not.toHaveBeenCalled();
-        done();
-      }, 10);
-    })
+  beforeEach(function(){
+    spyCalled    = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
 
-    it("should submit form with all details in place", function(){
-      $ccNumber.sendkeys(coData.cc.number);
-      $ccExpiry.sendkeys(coData.cc.expiry);
-      $ccCVV.sendkeys(coData.cc.cvv);
+    customOptions = $.extend(true, {}, coData.options);
+  });
 
-      spyOn(co, 'submit').and.callFake(function(){
-        spyCalled();
-      });
-    });
+  function launch(){
+    co = new Razorpay(customOptions);
+    co.open();
+    $ccNumber    = $('#rzp-tabs-cc .rzp-input[name="card[number]"]');
+    $ccExpiry    = $('#rzp-tabs-cc .rzp-input[name="card[expiry]"]');
+    $ccCVV       = $('#rzp-tabs-cc .rzp-input[name="card[cvv]"]');
+    $name        = $('#rzp-tabs-cc .rzp-input[name="card[name]"]');
+    $email       = $('#rzp-tabs-cc .rzp-input[name="email"]');
+    $contact     = $('#rzp-tabs-cc .rzp-input[name="contact"]');
+    $ccSubmit    = $('#rzp-tabs-cc .rzp-submit');
+  }
 
-    it("should not submit form without cc card", function(){
-      $ccExpiry.sendkeys(coData.cc.expiry);
-      $ccCVV.sendkeys(coData.cc.cvv);
+  function addAllCC(){
+    $ccNumber.sendkeys(coData.cc.number);
+    $ccExpiry.sendkeys(coData.cc.expiry);
+    $ccCVV.sendkeys(coData.cc.cvv);
+  }
 
-      spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
-        spyNotCalled();
-      });
-    });
-
-    it("should not submit form without cc expiry", function(){
-      $ccNumber.sendkeys(coData.cc.number);
-      $ccCVV.sendkeys(coData.cc.cvv);
-
-      spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
-        spyNotCalled();
-      });
-    });
-
-    it("should not submit form without cc cvv", function(){
-      $ccCVV.val('').sendkeys('0');
-
-      spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
-        spyNotCalled();
-      });
-    });
-
-    it("should not submit form without name", function(){
-      $name.val('');
-
-      spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
-        spyNotCalled();
-      });
-    });
-
-    it("should not submit form without email", function(){
-      $email.val('');
-
-      spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
-        spyNotCalled();
-      });
-    });
-
-    it("should not submit form without contact", function(){
-      $contact.val('');
-
-      spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
-        spyNotCalled();
-      });
-    });
-
-    // failing for some reason on phantom only
-    // L92 in checkout,js click handler not executing in phantom
-//    it("should show netbanking form on clicking", function(){
-//      $nbLink.click();
-//      submitBtn = $nbSubmit;
-//      expect($nbSubmit).toBeVisible();
-//      spyCalled();
-//    })
+  afterEach(function(done){
+    // sendkeys needs little delay
+    setTimeout(function(){
+      $ccSubmit.click();
+      expect(spyCalled).toHaveBeenCalled();
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      $('.rzp-container').remove();
+      done();
+    }, 100);
   })
-})
+
+  it("should submit with all details in place", function(){
+    launch();
+
+    console.log($ccNumber.length);
+    $ccNumber.sendkeys(coData.cc.number);
+    $ccExpiry.sendkeys(coData.cc.expiry);
+    $ccCVV.sendkeys(coData.cc.cvv);
+
+    spyOn(co, 'submit').and.callFake(function(){
+      spyCalled();
+    });
+  });
+
+  it("should not submit without cc card", function(){
+    launch();
+    $ccExpiry.sendkeys(coData.cc.expiry);
+    $ccCVV.sendkeys(coData.cc.cvv);
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+
+  it("should not submit without cc expiry", function(){
+    launch();
+    $ccNumber.sendkeys(coData.cc.number);
+    $ccCVV.sendkeys(coData.cc.cvv);
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+
+  it("should not submit without cc cvv", function(){
+    launch();
+    $ccCVV.val('').sendkeys('0');
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+
+  it("should not submit without name", function(){
+    customOptions.prefill.name = '';
+    launch();
+    addAllCC();
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+
+  it("should not submit without email", function(){
+    customOptions.prefill.email = '';
+    launch();
+    addAllCC();
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+
+  it("should not submit without contact", function(){
+    customOptions.prefill.contact = '';
+    launch();
+    addAllCC();
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+});
+
+describe("Razorpay open netbanking page", function(){
+  var co;
+  var $email, $contact;
+  var $nbLink, $nbSubmit;
+
+  beforeEach(function(){
+    co = new Razorpay(coData.options);
+    co.open();
+    $email    = $('#rzp-tabs-nb .rzp-input[name="email"]');
+    $contact  = $('#rzp-tabs-nb .rzp-input[name="contact"]');
+    $nbSubmit = $('#rzp-tabs-nb .rzp-submit');
+
+    // using Razorpay.$ due to some bug in phantomjs
+    // The bug turns up when there are two jquery involved
+    $nbLink = Razorpay.$('.rzp-tabs li[data-target="rzp-tabs-nb"]');
+
+    $nbLink.click();
+  });
+
+  afterEach(function(){
+    $('.rzp-container').remove();
+  })
+
+  it("should show netbanking form on clicking", function(){
+    expect($nbSubmit).toBeVisible();
+  });
+
+  it("should prefill email", function(){
+    expect($email.val()).toBe(coData.options.prefill.email);
+  });
+
+  it("should prefill contact number", function(){
+    expect($contact.val()).toBe(coData.options.prefill.contact);
+  });
+});
+
+describe("and submit method", function(){
+  var co;
+  var spyCalled;
+  var spyNotCalled;
+  var $email, $contact;
+  var $nbLink, $nbBank;
+  var $nbSubmit;
+  var customOptions;
+
+  beforeEach(function(){
+    spyCalled    = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
+
+    customOptions = $.extend(true, {}, coData.options);
+  });
+
+  function launch(){
+    co = new Razorpay(customOptions);
+    co.open();
+    $email       = $('#rzp-tabs-nb .rzp-input[name="email"]');
+    $contact     = $('#rzp-tabs-nb .rzp-input[name="contact"]');
+    $nbBank      = $('#rzp-tabs-nb select[name="bank"]');
+    $nbSubmit    = $('#rzp-tabs-nb .rzp-submit');
+
+    // using Razorpay.$ due to some bug in phantomjs
+    // The bug turns up when there are two jquery involved
+    $nbLink = Razorpay.$('.rzp-tabs li[data-target="rzp-tabs-nb"]');
+  }
+
+  afterEach(function(){
+    // sendkeys needs little delay
+    $nbSubmit.click();
+    expect(spyCalled).toHaveBeenCalled();
+    expect(spyNotCalled).not.toHaveBeenCalled();
+    $('.rzp-container').remove();
+  })
+
+  it("should submit with all details in place", function(){
+    launch();
+    $nbSubmit.val('SBIN');
+
+    spyOn(co, 'submit').and.callFake(function(){
+      spyCalled();
+    });
+  });
+
+  // This is failing right now
+  // Waiting for pronav to merge before fixing
+//  it("should not submit without bank selected", function(){
+//    launch();
+//    spyCalled();
+//    spyOn(co, 'submit').and.callFake(function(){
+//      spyNotCalled();
+//    });
+//  });
+
+  it("should not submit without email", function(){
+    delete customOptions.prefill.email;
+    launch();
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+
+  it("should not submit without contact", function(){
+    delete customOptions.prefill.contact;
+    launch();
+
+    spyCalled();
+    spyOn(co, 'submit').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
+});

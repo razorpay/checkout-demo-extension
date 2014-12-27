@@ -75,36 +75,28 @@ describe("Razorpay Ajax", function(){
     rzp = new Razorpay(options);
   });
 
+  describe("on submit", function(){
+    it("should generate success handler", function(){
+      spyOn(discreet, 'success');
+      rzp.submit({data: data});
+      expect(discreet.success).toHaveBeenCalled();
+    })
+  })
+
   describe("on success", function(){
-    beforeEach(function() {
-      spyOn(rzp.$, 'ajax').and.callFake(function(options){
+    beforeEach(function(){
+      spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
         options.success(response.success);
       })
     });
 
-    it("should call handleAjaxSuccess", function(){
-      spyOn(rzp, 'handleAjaxSuccess');
-      rzp.methods.submit(data);
-      expect(rzp.handleAjaxSuccess).toHaveBeenCalled();
-    });
-
-    it("should call client handleAjaxSuccess", function(){
-      spyOn(rzp.methods.client, 'handleAjaxSuccess').and.callFake(function(){
-        loadFixtures('iframe_container.html');
-        return $('.rzp-container-test');
-      });
-      rzp.methods.submit(data);
-      expect(rzp.methods.client.handleAjaxSuccess).toHaveBeenCalled();
-    });
-
     describe("should load iframe and", function(){
       beforeEach(function(){
-        spyOn(rzp.methods.client, 'handleAjaxSuccess').and.callFake(function(){
-          loadFixtures('iframe_container.html');
-          return $('.rzp-container-test');
-        })
-
-        rzp.methods.submit(data);
+        loadFixtures('iframe_container.html');
+        rzp.submit({
+          data: data,
+          parent: Razorpay.$('.rzp-container-test .rzp-modal')
+        });
       });
 
       it("iframe should be visible", function(){
@@ -123,44 +115,45 @@ describe("Razorpay Ajax", function(){
       var prevHostname;
       var prevProtocol;
 
-      beforeEach(function(done){
+      beforeEach(function(){
         prevHostname = rzp.options.hostname;
         prevProtocol = rzp.options.protocol;
-
-        spyOn(rzp, 'handleAjaxSuccess').and.callFake(function(){
-          loadFixtures('iframe_container.html');
-          var iframe = document.createElement('iframe');
-          var xdm = jasmine.getFixtures().read('iframe_xdm.html');
-          $('.rzp-modal').append(iframe);
-          iframe.contentWindow.document.write(xdm);
+        spyOn(discreet, 'success').and.callFake(function(){
+          return function(){
+            loadFixtures('iframe_container.html');
+            var iframe = document.createElement('iframe');
+            var xdm = jasmine.getFixtures().read('iframe_xdm.html');
+            $('.rzp-modal').append(iframe);
+            iframe.contentWindow.document.write(xdm);
+          }
         });
-        done();
       })
 
-      afterEach(function(done) {
+      afterEach(function() {
         expect(spyCalled).toHaveBeenCalled();
         expect(spyNotCalled).not.toHaveBeenCalled();
         rzp.options.protocol = prevProtocol;
         rzp.options.hostname = prevHostname;
-        done();
       });
 
       it("should send a window postmessage", function(done){
         spyCalled = jasmine.createSpy('message');
         spyNotCalled = jasmine.createSpy('message');
 
-        rzp.XD.receiveMessage(function(e){
+        Razorpay.XD.receiveMessage(function(e){
           spyCalled();
           done();
         })
-        rzp.methods.submit(data);
+        rzp.submit({
+          data: data
+        });
       });
 
       it("should not call XDCallback", function(done){
         spyCalled = jasmine.createSpy('message');
         spyNotCalled = jasmine.createSpy('message');
 
-        rzp.XD.receiveMessage(function(e){
+        Razorpay.XD.receiveMessage(function(e){
           spyCalled();
 
           // timeout is needed to ensure that done doesn't get called before XDCallback is hit
@@ -168,45 +161,46 @@ describe("Razorpay Ajax", function(){
             done();
           }, 200);
         })
-        spyOn(rzp, 'XDCallback').and.callFake(function(){
+        spyOn(discreet, 'XDCallback').and.callFake(function(){
           spyNotCalled();
         })
-        rzp.methods.submit(data);
+        rzp.submit({
+          data: data
+        });
       });
 
-      it("should call XDCallback", function(done){
-        spyCalled = jasmine.createSpy('message');
-        spyNotCalled = jasmine.createSpy('message');
+      // it("should call XDCallback", function(done){
+      //   spyCalled = jasmine.createSpy('message');
+      //   spyNotCalled = jasmine.createSpy('message');
 
-        rzp.options.hostname = 'localhost:9876';
-        rzp.options.protocol = 'http';
+      //   rzp.options.hostname = 'localhost:9876';
+      //   rzp.options.protocol = 'http';
 
-        spyOn(rzp, 'XDCallback').and.callFake(function(){
-          spyCalled();
-          done();
-        })
-        rzp.methods.submit(data);
-      })
+      //   spyOn(discreet, 'XDCallback').and.callFake(function(){
+      //     spyCalled();
+      //     done();
+      //   })
+      //   rzp.submit({
+      //     data: data
+      //   });
+      // })
     });
   });
 
   describe("on error", function(){
     beforeEach(function(){
-      spyOn(rzp.$, 'ajax').and.callFake(function(options){
-        options.error(response.error);
+      errorHandler = jasmine.createSpy();
+      spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
+        options.failure(response.error);
       })
     });
 
-    it("should call handleAjaxError", function(){
-      spyOn(rzp, 'handleAjaxError');
-      rzp.methods.submit(data);
-      expect(rzp.handleAjaxError).toHaveBeenCalled();
+    it("should call given error handler", function(){
+      rzp.submit({
+        data: data,
+        failure: errorHandler
+      });
+      expect(errorHandler).toHaveBeenCalled();
     })
-
-    it("should call client handleAjaxError", function(){
-      spyOn(rzp.methods.client, 'handleAjaxError');
-      rzp.methods.submit(data);
-      expect(rzp.methods.client.handleAjaxError).toHaveBeenCalled();
-    });
   })
 });

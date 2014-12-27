@@ -6,13 +6,15 @@
   var $ = Razorpay.$;
   var doT = Razorpay.doT;
   var XD = Razorpay.XD;
+  var discreet = {}
 
-  var options = {
+  var defaults = {
     protocol: 'https',
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
     currency: 'INR',
+    netbanking: true,
     prefill: {
       name: '',
       contact: '',
@@ -23,68 +25,83 @@
     name: '', // of merchant
     description: '',
     image: '',
-    udf: {}
+    udf: {},
+    handler: function(){}
   };
 
   var lastRequestInstance = null
   
-  var XDCallback = function(message){
+  discreet.XDCallback = function(message){
+    if(!lastRequestInstance)
+      return
     if (message.data.error && message.data.error.description){
-      lastRequestInstance.error(message.data);
+      lastRequestInstance.failure(message.data);
     } else {
       lastRequestInstance.success(message.data);
     }
     lastRequestInstance = null
   }
 
-  XD.receiveMessage(XDCallback)
+  discreet.success = function(request){
+    var request = request || {}
+    if(!(request.parent instanceof $))
+      // TODO remove docu.body
+      request.parent = $('body')
 
-  var errorHandler = function(request){
-
-  }
-  var successHandler = function(request){
     return function(response){
-      if (response.callbackUrl){
+      if (response['http_status_code'] != 200 && response.error){
+        if(typeof request.failure == 'function')
+          request.failure(response)
+      }
+      else if (response.callbackUrl){
+        if(typeof request.prehandler == 'function')
+          request.prehandler()
         var iframe = document.createElement('iframe');
         request.parent.html('').append(iframe);
         var template = doT.compile(Razorpay.templates.autosubmit)(response);
         iframe.contentWindow.document.write(template);
-        request.parent.addClass('rzp-frame');
         return;
       }
       else if (response.redirectUrl){
+        if(typeof request.prehandler == 'function')
+          request.prehandler()
+
         // TODO tests for this
-        request.parent.addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
+        request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
         return;
       }
       else if (response.status) {
         if(typeof request.success == 'function')
-          request.success()
+          request.success(response)
       }
       else {
-        if(typeof request.error == 'function')
-          request.error()
+        if(typeof request.failure == 'function')
+          request.failure(response)
       }
     }
   }
 
+  /**
+    method for payment data submission to razorpay api
+    @param request  contains payment data and optionally callbacks to success, failure and element to put iframe in
+  */
   Razorpay.prototype.submit = function(request){
+
+    // window.p = window.open('', "", "width=600, height=400, scrollbars=yes");
     // TODO what's to be done for netbanking?
     // TODO better validation
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
     // data['card[expiry_month]'] = expiry[0];
     // data['card[expiry_year]'] = expiry[1];
 
-    // var source = options.protocol + '://' + options.hostname;
-
     lastRequestInstance = request
-    
     return $.ajax({
-      url: options.protocol + '://' + options.key + '@' + options.hostname + '/' + options.version + options.jsonpUrl,
+      url: this.options.protocol + '://' + this.options.key + '@' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
       dataType: 'jsonp',
-      success: successHandler(request),
+      success: discreet.success(request),
       timeout: 35000,
-      error: errorHandler(request),
+      failure: request.failure,
+      // complete: function(){request.complete(request)},
       data: request.data
     });
   }
@@ -97,22 +114,74 @@
       throw new Error("No merchant key specified");
     }
 
-    this.options = options
-    for (var i in overrides){
-      if(typeof overrides[i] === undefined){
-        continue;
-      }
-      if(i === 'udf' && typeof overrides['udf'] == 'object'){
-        this.options.udf = overrides.udf
-      }
-      else if(typeof overrides[i] !== "object"){
-        this.options[i] = overrides[i];
+    // TODO options validation
+    this.options = this.options || {}
+
+    for (var i in defaults){
+      if(typeof overrides[i] == 'undefined' && typeof this.options[i] == 'undefined'){
+        this.options[i] = defaults[i]
+      } else{
+        this.options[i] = overrides[i]
       }
     }
+
+    // setting up XD
+    // TODO make sure multiple listeners are not attached
+    var source = this.options.protocol + '://' + this.options.hostname;
+    XD.receiveMessage(discreet.XDCallback, source);
   }
 
-  Razorpay.prototype.validate = function(){
-    return true
-  }
+  /**
+   * Validates options
+   * throwError = bool // throws an error if true, otherwise returns object with the state
+   * options = object
+   *
+   * return object
+  */
+  Razorpay.prototype.validate = function(options, throwError){
+    var field = "";
+    var message = "";
+    if (typeof options.amount === "undefined") {
+      message = "No amount specified";
+      field = "amount";
+    }
+    else if (options.amount < 0) {
+      message = "Invalid amount specified";
+      field = "amount";
+    }
+    else if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
+      message = "Handler must be a function";
+      field = "handler";
+    }
+    else if (typeof options.key === "undefined") {
+      message = "No merchant key specified";
+      field = "key";
+    }
+    else if (options.key === "") {
+      message = "Merchant key cannot be empty";
+      field = "key";
+    }
+    else if (typeof options.udf === 'object' && Object.keys(options.udf).length > 15) {
+      message = "You can only pass at most 15 fields in the udf object";
+      field = "udf";
+    }
 
+    if(message !== "" && throwError === true){
+      throw new Error("Field: " + field + "; Error:" + message);
+    }
+    if(message === ""){
+      return {error: false};
+    }
+    else {
+      return {
+        error: {
+          description: message,
+          field: field
+        }
+      };
+    }
+  }
+  // @if NODE_ENV='test'
+  window.discreet = discreet;
+  // @endif
 })();

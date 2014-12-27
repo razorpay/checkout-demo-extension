@@ -1,8 +1,8 @@
 Razorpay.templates.modal = '
 <div class="rzp-container" tabIndex="0">
   <div class="rzp-modal">
-    <div class="rzp-tooltip"></div>
     <div class="rzp-modal-inner">
+      <div class="rzp-tooltip"></div>
       <div class="rzp-header">
         <div class="rzp-merchant rzp-clear">
           <div class="rzp-merchant_image">

@@ -5,38 +5,17 @@
   var $ = Razorpay.$;
   var doT = Razorpay.doT;
   var XD = Razorpay.XD;
-  var modal = Razorpay.modal
+  var modal = Razorpay.modal;
+  var discreet = window.discreet || {}
 
-  var rzpscript = document.currentScript || (function() {
-    var scripts;
-    scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })()
-
-  var parseScriptOptions = function(options){
-    var category, dotPosition, i, ix, property;
-    for (i in options) {
-      ix = i.indexOf(".");
-      if (ix > -1) {
-        dotPosition = ix;
-        category = i.substr(0, dotPosition);
-        property = i.substr(dotPosition + 1);
-        options[category] = options[category] || {};
-        options[category][property] = options[i];
-        delete options[i];
-      }
-    }
-    return options;
-  }
-
-  var shake = function(element) {
+  discreet.shake = function(element) {
     element.addClass('rzp-shake');
     setTimeout(function() {
       element.removeClass('rzp-shake');
     }, 150);
   }
 
-  var getFormData = function(form) {
+  discreet.getFormData = function(form) {
     var data, expiry;
     data = {};
     form.find('[name]').each(function(index, el) {
@@ -98,20 +77,21 @@
 
     var self = this;
     this.$el.find('form').on('submit', function(e){
-      var form, invalid;
       e.preventDefault();
+      var form, invalid;
       form = $(e.currentTarget);
       invalid = form.find('.rzp-invalid');
       var modal = form.closest('.rzp-modal')
       if (invalid.length) {
         invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
-        shake(modal);
+        discreet.shake(modal);
         return;
       }
       self.submit({
-        data: getFormData(form),
-        error: errorHandler(form),
-        success: successHandler(self),
+        data: discreet.getFormData(form),
+        failure: discreet.failureHandler(self),
+        success: discreet.successHandler(self),
+        prehandler: discreet.preHandler(self),
         parent: modal
       });
       self.$el.find('.rzp-submit').attr('disabled', true);
@@ -151,65 +131,20 @@
         inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
       }
     }
-    var RazorPayForm = rzpscript.parentElement;
+    var RazorPayForm = discreet.rzpscript.parentElement;
     $(inputs).appendTo(RazorPayForm);
     $(RazorPayForm).submit();
   }
 
-  /**
-   * Validates options
-   * throwError = bool // throws an error if true, otherwise returns object with the state
-   * options = object
-   *
-   * return object
-   */
-  var validateOptions = function(options, throwError) {
-    var field = "";
-    var message = "";
-    if (typeof options.amount === "undefined") {
-      message = "No amount specified";
-      field = "amount";
-    }
-    else if (options.amount < 0) {
-      message = "Invalid amount specified";
-      field = "amount";
-    }
-    else if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
-      message = "Handler must be a function";
-      field = "handler";
-    }
-    else if (typeof options.key === "undefined") {
-      message = "No merchant key specified";
-      field = "key";
-    }
-    else if (options.key === "") {
-      message = "Merchant key cannot be empty";
-      field = "key";
-    }
-    else if (typeof options.udf === 'object' && Object.keys(options.udf).length > 15) {
-      message = "You can only pass at most 15 fields in the udf object";
-      field = "udf";
-    }
-
-    if(message !== "" && throwError === true){
-      throw new Error("Field: " + field + "; Error:" + message);
-    }
-    if(message === ""){
-      return {error: false};
-    }
-    else {
-      return {
-        error: {
-          description: message,
-          field: field
-        }
-      };
+  discreet.preHandler = function(rzp){
+    return function(){
+      rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove()
     }
   }
-
-  var successHandler = function(rzp){
+  discreet.successHandler = function(rzp){
     return function(message){
-      rzp.modal.hide()
+      if(rzp.modal)
+        rzp.modal.hide()
       rzp.modal = null
       if(typeof rzp.options.handler == "function"){
         // This is automatic checkout
@@ -221,21 +156,68 @@
     }
   }
 
-  var errorHandler = function(form){
-    return function(){
-      form.find('.rzp-error').html('There was an error in handling your request');
+  discreet.failureHandler = function(rzp){
+    return function(response){
+      var modal = rzp.$el.find('.rzp-modal')
+      discreet.shake(modal)
+      if(rzp.modalRef)
+        modal.html('').removeClass('rzp-frame').append(rzp.modalRef)
+        modal.height('')
+      
+      rzp.modalRef = null
+      rzp.$el.find('.rzp-submit').removeAttr('disabled');
+      rzp.modal.options.backdropClose = true;
+      
+      if (response && response.error && response.error.field){
+          if (rzp.$el.find('input[name="'+response.error.field+'"]').length){
+            rzp.$el.find('input[name="'+response.error.field+'"]').addClass('rzp-invalid');
+          }
+        }
+
+      var defaultMessage = 'There was an error in handling your request';
+      var message = response.error.description || defaultMessage;
+
+      rzp.$el.find('.rzp-error').html('<li>' + message + '</li>');
     }
   };
 
-  // addButton: function() {
-  //   var button;
-  //   button = document.createElement("button");
-  //   button.setAttribute("id", "rzp-button");
-  //   // TODO append should not be in body;
-  //   $(button).click(function(e) {
-  //     co.methods.open();
-  //     e.preventDefault();
-  //   }).html("Pay with Card").appendTo("body");
-  // }
+  discreet.rzpscript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })()
+
+  discreet.parseScriptOptions = function(options){
+    var category, dotPosition, i, ix, property;
+    for (i in options) {
+      ix = i.indexOf(".");
+      if (ix > -1) {
+        dotPosition = ix;
+        category = i.substr(0, dotPosition);
+        property = i.substr(dotPosition + 1);
+        options[category] = options[category] || {};
+        options[category][property] = options[i];
+        delete options[i];
+      }
+    }
+    return options;
+  }
+
+  discreet.addButton = function(rzp){
+    var button = document.createElement("button");
+    button.setAttribute("id", "rzp-button");
+    // TODO append should not be in body;
+    $(button).click(function(e) {
+      rzp.open();
+      e.preventDefault();
+    }).html("Pay with Card").appendTo(discreet.rzpscript.parentNode);
+  }
+
+  var key = $(discreet.rzpscript).data('key');
+  if (key && key.length > 0) {
+    var opts = $(discreet.rzpscript).data();
+    var options = discreet.parseScriptOptions(opts);
+    discreet.addButton(new Razorpay(options));
+  }
 
 })();

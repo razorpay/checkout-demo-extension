@@ -3,27 +3,27 @@
  */
 
 describe("Available modules", function(){
-  it("should include RazorpayLibs", function(){
-    expect(RazorpayLibs).toBeDefined();
-  });
-
-  it("should include Rzp jQuery", function(){
-    expect(RazorpayLibs.$).toBeDefined();
-  });
-
-  it("should include XDM", function(){
-    expect(RazorpayLibs.XD).toBeDefined();
-  });
-
-  it("should include dot", function(){
-    expect(RazorpayLibs.doT).toBeDefined();
-  });
-
   it("should include Razorpay", function(){
     expect(Razorpay).toBeDefined();
   });
 
-  it("should include Checkout", function(){
-    expect(Checkout).toBeDefined();
+  it("should include Rzp jQuery", function(){
+    expect(Razorpay.$).toBeDefined();
+  });
+
+  it("should include XDM", function(){
+    expect(Razorpay.XD).toBeDefined();
+  });
+
+  it("should include dot", function(){
+    expect(Razorpay.doT).toBeDefined();
+  });
+
+  it("should include modal", function(){
+    expect(Razorpay.modal).toBeDefined();
+  });
+
+  it("should include jquery.payment", function(){
+    expect(Razorpay.$.fn.payment).toBeDefined();
   });
 });

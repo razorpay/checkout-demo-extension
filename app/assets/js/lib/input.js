@@ -55,6 +55,7 @@
       this.on('input', this.input, true);
       this.on('change', this.input, true);
       this.on('keypress', this.keypress);
+      this.on('click', this.selector('elem'), this.intercept)
       return this.on('mousedown', this.selector('tooltip'), (function(_this) {
         return function(e) {
           return $(e.currentTarget).hide();
@@ -109,6 +110,9 @@
       return this.tooltip(el);
     },
 
+    intercept: function(e){
+      $(e.currentTarget).find(this.selector('input')).focus()
+    },
     tooltip: function(el) {
       var classname, modal_rect, parent, parent_rect, positioned, show, shown, state, tt_left, tt_top;
       positioned = this.ttel.data('pos');
