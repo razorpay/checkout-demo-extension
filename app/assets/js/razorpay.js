@@ -26,52 +26,49 @@
     udf: {}
   };
 
-  var lastRazorpayInstance = null
+  var lastRequestInstance = null
+  
   var XDCallback = function(message){
-    lastRazorpayInstance.hide();
-
-    if (message.data.error && message.data.error.description) {
-      lastRazorpayInstance.open();
-      // TODO Left as it is in refactor. Method not defined
-      return// lastRazorpayInstance.handleAjaxResponse(message.data);
+    if (message.data.error && message.data.error.description){
+      lastRequestInstance.error(message.data);
     } else {
-      var handler = lastRazorpayInstance.options.handler;
-      if(typeof handler == 'function')
-        handler(message.data);
+      lastRequestInstance.success(message.data);
     }
+    lastRequestInstance = null
   }
+
   XD.receiveMessage(XDCallback)
 
-  var ajaxErrorHandler = function(){
+  var errorHandler = function(request){
 
   }
-  var ajaxSuccessHandler = function(response){
-    // Add client part
-    // var $el = rzp.methods.client.handleAjaxSuccess(response);
-    var modal;
-
-    if (response.callbackUrl) {
-      var iframe = document.createElement('iframe');
-      modal = $('.rzp-modal').html('').append(iframe);
-      var template = doT.compile(Razorpay.templates.autosubmit)(response);
-      iframe.contentWindow.document.write(template);
-      modal.addClass('rzp-frame');
-      return;
-    }
-    else if (response.redirectUrl) {
-      // TODO tests for this
-      modal = $('.rzp-modal').addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
-      return;
-    }
-    else if (response.status) {
-      // Nothing to do here. Checkout does stuff
-    }
-    else {
-      // Again, nothing for us to do here. Checkout magic.
+  var successHandler = function(request){
+    return function(response){
+      if (response.callbackUrl){
+        var iframe = document.createElement('iframe');
+        request.parent.html('').append(iframe);
+        var template = doT.compile(Razorpay.templates.autosubmit)(response);
+        iframe.contentWindow.document.write(template);
+        request.parent.addClass('rzp-frame');
+        return;
+      }
+      else if (response.redirectUrl){
+        // TODO tests for this
+        request.parent.addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
+        return;
+      }
+      else if (response.status) {
+        if(typeof request.success == 'function')
+          request.success()
+      }
+      else {
+        if(typeof request.error == 'function')
+          request.error()
+      }
     }
   }
 
-  Razorpay.prototype.submit = function(data){
+  Razorpay.prototype.submit = function(request){
     // TODO what's to be done for netbanking?
     // TODO better validation
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
@@ -80,15 +77,15 @@
 
     // var source = options.protocol + '://' + options.hostname;
 
-    lastRazorpayInstance = this
+    lastRequestInstance = request
     
     return $.ajax({
       url: options.protocol + '://' + options.key + '@' + options.hostname + '/' + options.version + options.jsonpUrl,
       dataType: 'jsonp',
-      success: ajaxSuccessHandler,
+      success: successHandler(request),
       timeout: 35000,
-      error: ajaxErrorHandler,
-      data: data
+      error: errorHandler(request),
+      data: request.data
     });
   }
 

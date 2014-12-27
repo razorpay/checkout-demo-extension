@@ -7,11 +7,54 @@
   var XD = Razorpay.XD;
   var modal = Razorpay.modal
 
-      // rzpscript: document.currentScript || (function() {
-      //   var scripts;
-      //   scripts = document.getElementsByTagName('script');
-      //   return scripts[scripts.length - 1];
-      // })(),
+  var rzpscript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })()
+
+  var parseScriptOptions = function(options){
+    var category, dotPosition, i, ix, property;
+    for (i in options) {
+      ix = i.indexOf(".");
+      if (ix > -1) {
+        dotPosition = ix;
+        category = i.substr(0, dotPosition);
+        property = i.substr(dotPosition + 1);
+        options[category] = options[category] || {};
+        options[category][property] = options[i];
+        delete options[i];
+      }
+    }
+    return options;
+  }
+
+  var shake = function(element) {
+    element.addClass('rzp-shake');
+    setTimeout(function() {
+      element.removeClass('rzp-shake');
+    }, 150);
+  }
+
+  var getFormData = function(form) {
+    var data, expiry;
+    data = {};
+    form.find('[name]').each(function(index, el) {
+      if (el.value) {
+        return data[el.name] = el.value;
+      }
+    });
+
+    if (!form.find('select[name=bank]').length) {
+      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+      expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+      data['card[expiry_month]'] = expiry[0];
+      data['card[expiry_year]'] = expiry[1];
+      delete data['card[expiry]'];
+    }
+
+    return data
+  }
 
   Razorpay.prototype.open = function(){
     if(this.modal){
@@ -59,12 +102,18 @@
       e.preventDefault();
       form = $(e.currentTarget);
       invalid = form.find('.rzp-invalid');
+      var modal = form.closest('.rzp-modal')
       if (invalid.length) {
         invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
-        shake(form.closest('.rzp-modal'));
+        shake(modal);
         return;
       }
-      self.submit(getFormData(form));
+      self.submit({
+        data: getFormData(form),
+        error: errorHandler(form),
+        success: successHandler(self),
+        parent: modal
+      });
       self.$el.find('.rzp-submit').attr('disabled', true);
       self.modal.options.backdropClose = false;
     });
@@ -84,80 +133,36 @@
       this.modal.hide();
   }
 
-  var shake = function(element) {
-    element.addClass('rzp-shake');
-    setTimeout(function() {
-      element.removeClass('rzp-shake');
-    }, 150);
-  }
-
-  var getFormData = function(form) {
-    var data, expiry;
-    data = {};
-    form.find('[name]').each(function(index, el) {
-      if (el.value) {
-        return data[el.name] = el.value;
+  /**
+    default handler for success
+    default handler does not care about error or success messages,
+    it just submits everything via the form
+    @param  {[type]} data [description]
+    @return {[type]}    [description]
+  */
+  Razorpay.prototype.defaultPostHandler = function(data){
+    var inputs = "";
+    for (var i in data) {
+      if (typeof data[i] === "object") {
+        for (var j in data[i]) {
+          inputs += "<input type=\"hidden\" name=\"" + i + "[" + j + "]\" value=\"" + data[i][j] + "\">";
+        }
+      } else {
+        inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
       }
-    });
-
-    if (!form.find('select[name=bank]').length) {
-      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-      expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
-      data['card[expiry_month]'] = expiry[0];
-      data['card[expiry_year]'] = expiry[1];
-      delete data['card[expiry]'];
     }
-
-    // data['udf'] = this.options.udf;
-    return data
+    var RazorPayForm = rzpscript.parentElement;
+    $(inputs).appendTo(RazorPayForm);
+    $(RazorPayForm).submit();
   }
 
-      /**
-        default handler for success
-        default handler does not care about error or success messages,
-        it just submits everything via the form
-        @param  {[type]} data [description]
-        @return {[type]}    [description]
-      */
-      // defaultPostHandler: function(data){
-      //   var inputs = "";
-      //   for (var i in data) {
-      //     if (typeof data[i] === "object") {
-      //       for (var j in data[i]) {
-      //         inputs += "<input type=\"hidden\" name=\"" + i + "[" + j + "]\" value=\"" + data[i][j] + "\">";
-      //       }
-      //     } else {
-      //       inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
-      //     }
-      //   }
-      //   var RazorPayForm = co.rzpscript.parentElement;
-      //   $(inputs).appendTo(RazorPayForm);
-      //   $(RazorPayForm).submit();
-      // },
-
-      // parseScriptOptions: function(options){
-      //   var category, dotPosition, i, ix, property;
-      //   for (i in options) {
-      //     ix = i.indexOf(".");
-      //     if (ix > -1) {
-      //       dotPosition = ix;
-      //       category = i.substr(0, dotPosition);
-      //       property = i.substr(dotPosition + 1);
-      //       options[category] = options[category] || {};
-      //       options[category][property] = options[i];
-      //       delete options[i];
-      //     }
-      //   }
-      //   return options;
-      // },
-
-        /**
-         * Validates options
-         * throwError = bool // throws an error if true, otherwise returns object with the state
-         * options = object
-         *
-         * return object
-         */
+  /**
+   * Validates options
+   * throwError = bool // throws an error if true, otherwise returns object with the state
+   * options = object
+   *
+   * return object
+   */
   var validateOptions = function(options, throwError) {
     var field = "";
     var message = "";
@@ -202,52 +207,35 @@
     }
   }
 
-        // handleAjaxError: function() {
-        //   co.$('.rzp-error').html('There was an error in handling your request');
-        // },
+  var successHandler = function(rzp){
+    return function(message){
+      rzp.modal.hide()
+      rzp.modal = null
+      if(typeof rzp.options.handler == "function"){
+        // This is automatic checkout
+        rzp.options.handler(message);
+      }
+      else {
+        rzp.defaultPostHandler(message);
+      }
+    }
+  }
 
-        // handleAjaxSuccess: function(response) {
-        //   var $el = co.$el;
-        //   if (response.callbackUrl) {
-        //     co.$('.rzp-modal').html('');
-        //     co.$el = null;
-        //   } else if (response.redirectUrl) {
-        //     co.$el = null;
-        //   } else if (response.status) {
-        //     co.methods.preHandler();
-        //     co.options.handler(response);
-        //   } else {
-        //     co.$('.rzp-error').html('There was an error in handling your request');
-        //     co.clearSubmission();
-        //   }
+  var errorHandler = function(form){
+    return function(){
+      form.find('.rzp-error').html('There was an error in handling your request');
+    }
+  };
 
-        //   // Passing element to rzp wherein to put 3DS iframe
-        //   return $el;
-        // },
-
-        // preHandler: function() {
-        //   co.methods.hide();
-        // },
-
-        // addButton: function() {
-        //   var button;
-        //   button = document.createElement("button");
-        //   button.setAttribute("id", "rzp-button");
-        //   // TODO append should not be in body;
-        //   $(button).click(function(e) {
-        //     co.methods.open();
-        //     e.preventDefault();
-        //   }).html("Pay with Card").appendTo("body");
-        // }
-
-        // postHandler: function(message){
-        //   if(co.options.handler === undefined || typeof co.options.handler !== "function"){
-        //     // This is automatic checkout
-        //     co.defaultPostHandler(message);
-        //   }
-        //   else {
-        //     co.options.handler(message);
-        //   }
-        // }
+  // addButton: function() {
+  //   var button;
+  //   button = document.createElement("button");
+  //   button.setAttribute("id", "rzp-button");
+  //   // TODO append should not be in body;
+  //   $(button).click(function(e) {
+  //     co.methods.open();
+  //     e.preventDefault();
+  //   }).html("Pay with Card").appendTo("body");
+  // }
 
 })();
