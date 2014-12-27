@@ -1,5 +1,5 @@
 // everything is wrapped in the XD function to reduce namespace collisions
-window.RazorpayLibs.XD = (function(){
+window.Razorpay.XD = (function(){
 
   var interval_id,
   last_hash,

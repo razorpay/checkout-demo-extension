@@ -45,9 +45,9 @@
         'address': 'Hello World'
       },
       protocol: 'http',
-      hostname: 'api.razorpay.dev'
+      hostname: 'api.razorpay.com'
     }
-    var rzp1 = new Checkout(options);
+    var rzp1 = new Razorpay(options);
 
     $('#rzp-button1').click(function(e) {
       rzp1.open();
@@ -55,7 +55,7 @@
     });
 
     var opt2 = $.extend({}, options, {
-      amount : 200,
+      amount : 20000,
       description : 'Alive (2007)',
       image : 'https://i.imgur.com/GXalrU0.png',
       handler : function (transaction){
@@ -66,7 +66,7 @@
       }
     });
 
-    var rzp2 = new Checkout(opt2);
+    var rzp2 = new Razorpay(opt2);
 
     $('#rzp-button2').click(function(e){
       rzp2.open();

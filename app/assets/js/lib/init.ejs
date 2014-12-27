@@ -3,16 +3,15 @@ window.Razorpay = function(options){
     this.configure(options);
 };
 (function(){
-  var RazorpayLibs = window.RazorpayLibs = {};
   var exports = null;
   var module = { exports: null };
 
   // jquery
   <%- include jquery-1.11.1.js %>
-  RazorpayLibs.$ = module.exports;
+  Razorpay.$ = module.exports;
 
-  // handlebars
+  // doT
   <%- include doT.js %>
-  RazorpayLibs.doT = module.exports;
-  RazorpayLibs.templates = {};
+  Razorpay.doT = module.exports;
+  Razorpay.templates = {};
 })();

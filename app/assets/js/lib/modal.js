@@ -158,4 +158,4 @@
   };
 
   return root.modal = modal;
-})(window.RazorpayLibs);
+})(window.Razorpay);

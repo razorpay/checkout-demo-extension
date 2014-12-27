@@ -2,142 +2,120 @@
 /* jshint -W027 */
 (function(){
   'use strict';
-  var Razorpay = function(options){
-    var $ = RazorpayLibs.$;
-    var doT = RazorpayLibs.doT;
 
-    var rzp = {
-      options: {
-        protocol: 'https',
-        hostname: 'api.razorpay.com',
-        version: 'v1',
-        jsonpUrl: '/payments/create/jsonp',
-        key: ''
-      },
+  var $ = Razorpay.$;
+  var doT = Razorpay.doT;
+  var XD = Razorpay.XD;
 
-      XD: RazorpayLibs.XD,
-
-      init: function(options){
-        if(options !== undefined){
-          rzp.methods.configure(options);
-        }
-      },
-
-      XDCallback: function(message){
-        rzp.methods.client.preHandler();
-
-        if (message.data.error && message.data.error.description) {
-          rzp.open();
-          // TODO Left as it is in refactor. Method not defined
-          return rzp.handleAjaxResponse(message.data);
-        } else {
-          rzp.methods.client.postHandler(message.data);
-        }
-      },
-
-      handleAjaxError: function() {
-        rzp.methods.client.handleAjaxError();
-      },
-
-      handleAjaxSuccess: function(response) {
-        // Add client part
-        var $el = rzp.methods.client.handleAjaxSuccess(response);
-
-        var modal;
-
-        if (response.callbackUrl) {
-          var iframe = document.createElement('iframe');
-          modal = $el.find('.rzp-modal').html('').append(iframe);
-          var template = doT.compile(RazorpayLibs.templates.autosubmit)(response);
-          iframe.contentWindow.document.write(template);
-          modal.addClass('rzp-frame');
-          return;
-        }
-        else if (response.redirectUrl) {
-          // TODO tests for this
-          modal = $el.find('.rzp-modal').addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
-          return;
-        }
-        else if (response.status) {
-          // Nothing to do here. Checkout does stuff
-        }
-        else {
-          // Again, nothing for us to do here. Checkout magic.
-        }
-      },
-
-      methods: {
-        submit: function(form, data){
-          // TODO what's to be done for netbanking?
-          // TODO better validation
-          // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-          // data['card[expiry_month]'] = expiry[0];
-          // data['card[expiry_year]'] = expiry[1];
-
-          var source = rzp.options.protocol + '://' + rzp.options.hostname;
-          rzp.XD.receiveMessage(rzp.XDCallback, source);
-          return $.ajax({
-            url: rzp.options.protocol + '://' + rzp.options.key + '@' + rzp.options.hostname + '/' + rzp.options.version + rzp.options.jsonpUrl,
-            dataType: 'jsonp',
-            success: rzp.handleAjaxSuccess,
-            timeout: 35000,
-            error: rzp.handleAjaxError,
-            data: data
-          });
-        },
-
-        configure: function(options){
-          if (typeof options === "undefined") {
-            throw new Error("No options specified");
-          }
-          if (typeof options["key"] === "undefined") {
-            throw new Error("No merchant key specified");
-          }
-          for (var i in rzp.options){
-            if(typeof rzp.options[i] === undefined){
-              continue;
-            }
-            if(i === "udf"){
-              rzp.options.udf = $.extend({}, rzp.options.udf, options);
-            }
-            else if(typeof rzp.options[i] !== "object" && typeof options[i] !== "undefined"){
-              rzp.options[i] = options[i];
-            }
-          }
-        },
-
-        // TODO
-        validateData: function(){
-
-        },
-
-        client: {
-          handleAjaxSuccess: '',
-          handleAjaxError: '',
-          preHandler: '', // TODO Need to handle completely manual case where these would be client functions
-          postHandler: ''
-        }
-      }
-    };
-
-    rzp.init(options);
-
-    // @if NODE_ENV='production'
-    return rzp.methods;
-    // @endif
-
-    // @if NODE_ENV='test'
-    rzp.$ = $;
-    rzp.doT = doT;
-    for(var i in rzp.methods){
-      if(typeof rzp[i] !== 'undefined'){
-        throw new Error("Method " + i + " already defined");
-      }
-      rzp[i] = rzp.methods[i];
-    }
-    return rzp;
-    // @endif
+  var options = {
+    protocol: 'https',
+    hostname: 'api.razorpay.com',
+    version: 'v1',
+    jsonpUrl: '/payments/create/jsonp',
+    currency: 'INR',
+    prefill: {
+      name: '',
+      contact: '',
+      email: ''
+    },
+    key: '',
+    amount: '',
+    name: '', // of merchant
+    description: '',
+    image: '',
+    udf: {}
   };
 
-  window.Razorpay = Razorpay;
+  var lastRazorpayInstance = null
+  var XDCallback = function(message){
+    lastRazorpayInstance.hide();
+
+    if (message.data.error && message.data.error.description) {
+      lastRazorpayInstance.open();
+      // TODO Left as it is in refactor. Method not defined
+      return// lastRazorpayInstance.handleAjaxResponse(message.data);
+    } else {
+      var handler = lastRazorpayInstance.options.handler;
+      if(typeof handler == 'function')
+        handler(message.data);
+    }
+  }
+  XD.receiveMessage(XDCallback)
+
+  var ajaxErrorHandler = function(){
+
+  }
+  var ajaxSuccessHandler = function(response){
+    // Add client part
+    // var $el = rzp.methods.client.handleAjaxSuccess(response);
+    var modal;
+
+    if (response.callbackUrl) {
+      var iframe = document.createElement('iframe');
+      modal = $('.rzp-modal').html('').append(iframe);
+      var template = doT.compile(Razorpay.templates.autosubmit)(response);
+      iframe.contentWindow.document.write(template);
+      modal.addClass('rzp-frame');
+      return;
+    }
+    else if (response.redirectUrl) {
+      // TODO tests for this
+      modal = $('.rzp-modal').addClass('rzp-frame').html('<iframe src=' + response.redirectUrl + '></iframe>');
+      return;
+    }
+    else if (response.status) {
+      // Nothing to do here. Checkout does stuff
+    }
+    else {
+      // Again, nothing for us to do here. Checkout magic.
+    }
+  }
+
+  Razorpay.prototype.submit = function(data){
+    // TODO what's to be done for netbanking?
+    // TODO better validation
+    // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+    // data['card[expiry_month]'] = expiry[0];
+    // data['card[expiry_year]'] = expiry[1];
+
+    // var source = options.protocol + '://' + options.hostname;
+
+    lastRazorpayInstance = this
+    
+    return $.ajax({
+      url: options.protocol + '://' + options.key + '@' + options.hostname + '/' + options.version + options.jsonpUrl,
+      dataType: 'jsonp',
+      success: ajaxSuccessHandler,
+      timeout: 35000,
+      error: ajaxErrorHandler,
+      data: data
+    });
+  }
+
+  Razorpay.prototype.configure = function(overrides){
+    if (typeof overrides === "undefined") {
+      throw new Error("No options specified");
+    }
+    if (typeof overrides["key"] === "undefined") {
+      throw new Error("No merchant key specified");
+    }
+
+    this.options = options
+    for (var i in overrides){
+      if(typeof overrides[i] === undefined){
+        continue;
+      }
+      if(i === 'udf' && typeof overrides['udf'] == 'object'){
+        this.options.udf = overrides.udf
+      }
+      else if(typeof overrides[i] !== "object"){
+        this.options[i] = overrides[i];
+      }
+    }
+  }
+
+  Razorpay.prototype.validate = function(){
+    return true
+  }
+
 })();

@@ -276,4 +276,4 @@
       }
     }
   };
-})(RazorpayLibs.$);
+})(Razorpay.$);
