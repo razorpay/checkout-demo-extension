@@ -34,12 +34,19 @@
   discreet.XDCallback = function(message){
     if(!lastRequestInstance)
       return
+    
     if (message.data.error && message.data.error.description){
-      lastRequestInstance.failure(message.data);
+      if(typeof lastRequestInstance.failure == 'function')
+        lastRequestInstance.failure(message.data);
     } else {
-      lastRequestInstance.success(message.data);
+      if(typeof lastRequestInstance.success == 'function')
+        lastRequestInstance.success(message.data);
     }
+    
     lastRequestInstance = null
+
+    // remove postMessage listener
+    XD.receiveMessage()
   }
 
   discreet.success = function(request){
@@ -93,28 +100,35 @@
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
     // data['card[expiry_month]'] = expiry[0];
     // data['card[expiry_year]'] = expiry[1];
+    if(typeof request.data != 'object')
+      return false
 
+    var errors = this.validateData(request.data)
+    if(errors && errors.length)
+      return false
+
+    // setting up XD
     lastRequestInstance = request
+    XD.receiveMessage() // remove previous listener
+    var source = this.options.protocol + '://' + this.options.hostname;
+    XD.receiveMessage(discreet.XDCallback, source);
+
     return $.ajax({
       url: this.options.protocol + '://' + this.options.key + '@' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
       dataType: 'jsonp',
       success: discreet.success(request),
       timeout: 35000,
       failure: request.failure,
-      // complete: function(){request.complete(request)},
       data: request.data
     });
   }
 
   Razorpay.prototype.configure = function(overrides){
-    if (typeof overrides === "undefined") {
-      throw new Error("No options specified");
-    }
-    if (typeof overrides["key"] === "undefined") {
-      throw new Error("No merchant key specified");
+    var errors = this.validateOptions(overrides)
+    if(errors && errors.length){
+      return
     }
 
-    // TODO options validation
     this.options = this.options || {}
 
     for (var i in defaults){
@@ -124,20 +138,71 @@
         this.options[i] = overrides[i]
       }
     }
-
-    // setting up XD
-    // TODO make sure multiple listeners are not attached
-    var source = this.options.protocol + '://' + this.options.hostname;
-    XD.receiveMessage(discreet.XDCallback, source);
   }
 
   /**
-   * Validates options
+   * Validates options TODO
    * throwError = bool // throws an error if true, otherwise returns object with the state
    * options = object
    *
    * return object
   */
+  Razorpay.prototype.validateOptions = function(options, throwError){
+    if (typeof options === "undefined") {
+      throw new Error("No options specified");
+    }
+    if (typeof options["key"] === "undefined") {
+      throw new Error("No merchant key specified");
+    }
+  }
+
+  // TODO validate data
+  Razorpay.prototype.validateData = function(data, throwError){
+    var errors = []
+    
+    if (!options.amount || typeof options.amount != 'number' || options.amount < 0) {
+      errors.push({
+        message: "Invalid amount specified",
+        field: "amount"
+      })
+    }
+
+    if (typeof options.key == "undefined") {
+      errors.push({
+        message: "No merchant key specified",
+        field: "key" 
+      })
+    }
+    
+    if (options.key === "") {
+      errors.push({
+        message: "Merchant key cannot be empty",
+        field: "key" 
+      })
+    }
+   
+    // if (typeof options.udf === 'object' && Object.keys(options.udf).length > 15) {
+    //   message = "You can only pass at most 15 fields in the udf object";
+    //   field = "udf";
+    // }
+
+    // if(message !== "" && throwError === true){
+    //   throw new Error("Field: " + field + "; Error:" + message);
+    // }
+    // if(message === ""){
+    //   return {error: false};
+    // }
+    // else {
+    //   return {
+    //     error: {
+    //       description: message,
+    //       field: field
+    //     }
+    //   };
+    // }
+  }
+
+  // TODO replace this with validateData and validateOptions
   Razorpay.prototype.validate = function(options, throwError){
     var field = "";
     var message = "";

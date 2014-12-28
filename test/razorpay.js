@@ -136,54 +136,37 @@ describe("Razorpay Ajax", function(){
         rzp.options.hostname = prevHostname;
       });
 
-      it("should send a window postmessage", function(done){
-        spyCalled = jasmine.createSpy('message');
-        spyNotCalled = jasmine.createSpy('message');
-
-        Razorpay.XD.receiveMessage(function(e){
-          spyCalled();
-          done();
-        })
-        rzp.submit({
-          data: data
-        });
-      });
-
       it("should not call XDCallback", function(done){
         spyCalled = jasmine.createSpy('message');
         spyNotCalled = jasmine.createSpy('message');
 
-        Razorpay.XD.receiveMessage(function(e){
-          spyCalled();
-
-          // timeout is needed to ensure that done doesn't get called before XDCallback is hit
-          setTimeout(function(){
-            done();
-          }, 200);
-        })
-        spyOn(discreet, 'XDCallback').and.callFake(function(){
-          spyNotCalled();
-        })
         rzp.submit({
-          data: data
+          data: data,
+          success: function(){
+            spyNotCalled();
+            done();
+          }
         });
+        setTimeout(function(){
+          spyCalled();
+          done();
+        }, 500)
       });
 
-      // it("should call XDCallback", function(done){
-      //   spyCalled = jasmine.createSpy('message');
-      //   spyNotCalled = jasmine.createSpy('message');
+      it("should call XDCallback", function(done){
+        rzp.options.hostname = 'localhost:9876'
+        rzp.options.protocol = 'http'
+        spyCalled = jasmine.createSpy('message');
+        spyNotCalled = jasmine.createSpy('message');
 
-      //   rzp.options.hostname = 'localhost:9876';
-      //   rzp.options.protocol = 'http';
-
-      //   spyOn(discreet, 'XDCallback').and.callFake(function(){
-      //     spyCalled();
-      //     done();
-      //   })
-      //   rzp.submit({
-      //     data: data
-      //   });
-      // })
+        rzp.submit({
+          data: data,
+          success: function(){
+            spyCalled();
+            done();
+          }
+        });
+      });
     });
   });
 

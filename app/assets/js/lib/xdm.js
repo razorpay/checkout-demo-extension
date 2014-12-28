@@ -34,27 +34,33 @@ window.Razorpay.XD = (function(){
              }
              callback(e);
            };
-         }
-         if (window['addEventListener']) {
-           window[callback ? 'addEventListener' : 'removeEventListener']('message', attached_callback, !1);
-         } else {
-           window[callback ? 'attachEvent' : 'detachEvent']('onmessage', attached_callback);
-         }
-       } else {
+        }
+        else if(!attached_callback){
+          return
+        }
+        if (window['addEventListener']) {
+          window[callback ? 'addEventListener' : 'removeEventListener']('message', attached_callback, !1);
+        } else {
+          window[callback ? 'attachEvent' : 'detachEvent']('onmessage', attached_callback);
+        }
+        if(!callback){
+          attached_callback = null
+        }
+      } else {
          // a polling loop is started & callback is called whenever the location.hash changes
-         interval_id && clearInterval(interval_id);
-         interval_id = null;
-         if (callback) {
-           interval_id = setInterval(function() {
-             var hash = document.location.hash,
-             re = /^#?\d+&/;
-             if (hash !== last_hash && re.test(hash)) {
-               last_hash = hash;
-               callback({data: hash.replace(re, '')});
-             }
-           }, 100);
-         }
-       }
-     }
+        interval_id && clearInterval(interval_id);
+        interval_id = null;
+        if (callback) {
+          interval_id = setInterval(function() {
+            var hash = document.location.hash,
+            re = /^#?\d+&/;
+            if (hash !== last_hash && re.test(hash)) {
+              last_hash = hash;
+              callback({data: hash.replace(re, '')});
+            }
+          }, 100);
+        }
+      }
+    }
   };
 })();
