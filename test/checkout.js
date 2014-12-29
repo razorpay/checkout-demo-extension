@@ -78,6 +78,10 @@ describe("Checkout init", function(){
     expect(co.options.unwanted).toBeUndefined();
   });
 
+  it("should insert checkout styles into dom", function(){
+    expect($('link[href*="checkout.css"]')[0]).toBeInDOM()
+  })
+
 });
 
 describe("Checkout validateOptions method", function(){

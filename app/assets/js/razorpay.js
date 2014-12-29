@@ -8,11 +8,15 @@
   var XD = Razorpay.XD;
   var discreet = {}
 
+  // TODO add style link to insert
   var defaults = {
     protocol: 'https',
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
+    key: '',
+    handler: function(){},
+    // checkout fields, not needed for razorpay alone
     currency: 'INR',
     netbanking: true,
     prefill: {
@@ -20,13 +24,11 @@
       contact: '',
       email: ''
     },
-    key: '',
     amount: '',
     name: '', // of merchant
     description: '',
     image: '',
-    udf: {},
-    handler: function(){}
+    udf: {}
   };
 
   var lastRequestInstance = null
@@ -124,11 +126,7 @@
   }
 
   Razorpay.prototype.configure = function(overrides){
-    var errors = this.validateOptions(overrides)
-    if(errors && errors.length){
-      return
-    }
-
+    this.validateOptions(overrides, true)
     this.options = this.options || {}
 
     for (var i in defaults){
@@ -148,11 +146,11 @@
    * return object
   */
   Razorpay.prototype.validateOptions = function(options, throwError){
-    if (typeof options === "undefined") {
-      throw new Error("No options specified");
+    if (typeof options == 'undefined') {
+      throw new Error('No options specified');
     }
-    if (typeof options["key"] === "undefined") {
-      throw new Error("No merchant key specified");
+    if (typeof options.key == 'undefined') {
+      throw new Error('No merchant key specified');
     }
   }
 

@@ -187,6 +187,15 @@
     return scripts[scripts.length - 1];
   })()
 
+  discreet.rzpstyle = (function(){
+    var linkTag = document.createElement('link');
+    linkTag.rel = 'stylesheet'
+    linkTag.href = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/css/checkout.css')
+    discreet.rzpscript.parentNode.appendChild(linkTag);
+    return linkTag
+  })()
+  
+
   discreet.parseScriptOptions = function(options){
     var category, dotPosition, i, ix, property;
     for (i in options) {

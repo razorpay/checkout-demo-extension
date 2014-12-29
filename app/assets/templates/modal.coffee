@@ -1,5 +1,5 @@
 Razorpay.templates.modal = '
-<div class="rzp-container" tabIndex="0">
+<div class="rzp-container" tabIndex="0" style="display: none">
   <div class="rzp-modal">
     <div class="rzp-modal-inner">
       <div class="rzp-tooltip"></div>

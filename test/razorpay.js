@@ -6,6 +6,19 @@ var options = {
   'key': 'key_id'
 }
 
+describe("new Razorpay", function(){
+  var rzp;
+
+  it('without options should fail', function(){
+    expect(function(){new Razorpay()}).toThrow();
+  });
+
+  it('should create Razorpay instance', function(){
+    rzp = new Razorpay(options);
+    expect(rzp).toBeDefined();
+  });
+})
+
 describe("Razorpay options", function(){
   var rzp;
   var custom = $.extend({}, options);

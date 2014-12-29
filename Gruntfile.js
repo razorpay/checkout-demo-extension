@@ -54,7 +54,7 @@ module.exports = function(grunt){
     },
     preprocess: {
       tmpfolder: {
-        src : ['.tmp/concat/checkout.js'],
+        src : ['.tmp/concat/checkout.js', '.tmp/concat/razorpay.js'],
         options: {
           inline : true,
         }
