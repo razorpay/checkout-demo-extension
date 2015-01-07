@@ -157,5 +157,5 @@
     }
   };
 
-  return root.modal = modal;
+  return root.Modal = modal;
 })(window.Razorpay);

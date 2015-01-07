@@ -243,7 +243,6 @@ describe("Razorpay open cc and submit method", function(){
   it("should submit with all details in place", function(){
     launch();
 
-    console.log($ccNumber.length);
     $ccNumber.sendkeys(coData.cc.number);
     $ccExpiry.sendkeys(coData.cc.expiry);
     $ccCVV.sendkeys(coData.cc.cvv);

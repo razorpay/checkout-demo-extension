@@ -1,4 +1,4 @@
-/* global RazorpayLibs */
+/* global Razorpay */
 /* jshint -W027 */
 (function(){
   'use strict';
@@ -6,7 +6,7 @@
   var $ = Razorpay.$;
   var doT = Razorpay.doT;
   var XD = Razorpay.XD;
-  var discreet = {}
+  var discreet = {};
 
   // TODO add style link to insert
   var defaults = {
@@ -31,40 +31,46 @@
     udf: {}
   };
 
-  var lastRequestInstance = null
-  
+  var lastRequestInstance = null;
+
   discreet.XDCallback = function(message){
-    if(!lastRequestInstance)
-      return
-    
-    if (message.data.error && message.data.error.description){
-      if(typeof lastRequestInstance.failure == 'function')
-        lastRequestInstance.failure(message.data);
-    } else {
-      if(typeof lastRequestInstance.success == 'function')
-        lastRequestInstance.success(message.data);
+    if(!lastRequestInstance){
+      return;
     }
-    
-    lastRequestInstance = null
+
+    if (message.data.error && message.data.error.description){
+      if(typeof lastRequestInstance.failure === 'function'){
+        lastRequestInstance.failure(message.data);
+      }
+    } else {
+      if(typeof lastRequestInstance.success === 'function'){
+        lastRequestInstance.success(message.data);
+      }
+    }
+
+    lastRequestInstance = null;
 
     // remove postMessage listener
-    XD.receiveMessage()
-  }
+    XD.receiveMessage();
+  };
 
-  discreet.success = function(request){
-    var request = request || {}
-    if(!(request.parent instanceof $))
+  discreet.success = function(req){
+    var request = req || {};
+    if(!(request.parent instanceof $)){
       // TODO remove docu.body
-      request.parent = $('body')
+      request.parent = $('body');
+    }
 
     return function(response){
-      if (response['http_status_code'] != 200 && response.error){
-        if(typeof request.failure == 'function')
-          request.failure(response)
+      if (response['http_status_code'] !== 200 && response.error){
+        if(typeof request.failure === 'function'){
+          request.failure(response);
+        }
       }
       else if (response.callbackUrl){
-        if(typeof request.prehandler == 'function')
-          request.prehandler()
+        if(typeof request.prehandler === 'function'){
+          request.prehandler();
+        }
         var iframe = document.createElement('iframe');
         request.parent.html('').append(iframe);
         var template = doT.compile(Razorpay.templates.autosubmit)(response);
@@ -72,23 +78,26 @@
         return;
       }
       else if (response.redirectUrl){
-        if(typeof request.prehandler == 'function')
-          request.prehandler()
+        if(typeof request.prehandler === 'function'){
+          request.prehandler();
+        }
 
         // TODO tests for this
         request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
         return;
       }
       else if (response.status) {
-        if(typeof request.success == 'function')
-          request.success(response)
+        if(typeof request.success === 'function'){
+          request.success(response);
+        }
       }
       else {
-        if(typeof request.failure == 'function')
-          request.failure(response)
+        if(typeof request.failure === 'function'){
+          request.failure(response);
+        }
       }
-    }
-  }
+    };
+  };
 
   /**
     method for payment data submission to razorpay api
@@ -102,16 +111,18 @@
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
     // data['card[expiry_month]'] = expiry[0];
     // data['card[expiry_year]'] = expiry[1];
-    if(typeof request.data != 'object')
-      return false
+    if(typeof request.data !== 'object'){
+      return false;
+    }
 
-    var errors = this.validateData(request.data)
-    if(errors && errors.length)
-      return false
+    var errors = this.validateData(request.data);
+    if(errors && errors.length){
+      return false;
+    }
 
     // setting up XD
-    lastRequestInstance = request
-    XD.receiveMessage() // remove previous listener
+    lastRequestInstance = request;
+    XD.receiveMessage(); // remove previous listener
     var source = this.options.protocol + '://' + this.options.hostname;
     XD.receiveMessage(discreet.XDCallback, source);
 
@@ -123,20 +134,20 @@
       failure: request.failure,
       data: request.data
     });
-  }
+  };
 
   Razorpay.prototype.configure = function(overrides){
-    this.validateOptions(overrides, true)
-    this.options = this.options || {}
+    this.validateOptions(overrides, true);
+    this.options = this.options || {};
 
     for (var i in defaults){
-      if(typeof overrides[i] == 'undefined' && typeof this.options[i] == 'undefined'){
-        this.options[i] = defaults[i]
+      if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
+        this.options[i] = defaults[i];
       } else{
-        this.options[i] = overrides[i]
+        this.options[i] = overrides[i];
       }
     }
-  }
+  };
 
   /**
    * Validates options TODO
@@ -146,39 +157,39 @@
    * return object
   */
   Razorpay.prototype.validateOptions = function(options, throwError){
-    if (typeof options == 'undefined') {
+    if (typeof options === 'undefined') {
       throw new Error('No options specified');
     }
-    if (typeof options.key == 'undefined') {
+    if (typeof options.key === 'undefined') {
       throw new Error('No merchant key specified');
     }
-  }
+  };
 
   // TODO validate data
   Razorpay.prototype.validateData = function(data, throwError){
-    var errors = []
-    
-    if (!options.amount || typeof options.amount != 'number' || options.amount < 0) {
+    var errors = [];
+
+    if (!this.options.amount || typeof this.options.amount !== 'number' || this.options.amount < 0) {
       errors.push({
         message: "Invalid amount specified",
         field: "amount"
-      })
+      });
     }
 
-    if (typeof options.key == "undefined") {
+    if (typeof this.options.key === "undefined") {
       errors.push({
         message: "No merchant key specified",
-        field: "key" 
-      })
+        field: "key"
+      });
     }
-    
-    if (options.key === "") {
+
+    if (this.options.key === "") {
       errors.push({
         message: "Merchant key cannot be empty",
-        field: "key" 
-      })
+        field: "key"
+      });
     }
-   
+
     // if (typeof options.udf === 'object' && Object.keys(options.udf).length > 15) {
     //   message = "You can only pass at most 15 fields in the udf object";
     //   field = "udf";
@@ -198,7 +209,7 @@
     //     }
     //   };
     // }
-  }
+  };
 
   // TODO replace this with validateData and validateOptions
   Razorpay.prototype.validate = function(options, throwError){
@@ -243,7 +254,7 @@
         }
       };
     }
-  }
+  };
   // @if NODE_ENV='test'
   window.discreet = discreet;
   // @endif

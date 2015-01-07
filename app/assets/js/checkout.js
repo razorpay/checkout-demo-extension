@@ -1,19 +1,19 @@
+/* global Razorpay */
 /* jshint -W027 */
 (function(){
   'use strict';
-  
+
   var $ = Razorpay.$;
   var doT = Razorpay.doT;
-  var XD = Razorpay.XD;
-  var modal = Razorpay.modal;
-  var discreet = window.discreet || {}
+  var Modal = Razorpay.Modal;
+  var discreet = window.discreet || {};
 
   discreet.shake = function(element) {
     element.addClass('rzp-shake');
     setTimeout(function() {
       element.removeClass('rzp-shake');
     }, 150);
-  }
+  };
 
   discreet.getFormData = function(form) {
     var data, expiry;
@@ -32,17 +32,17 @@
       delete data['card[expiry]'];
     }
 
-    return data
-  }
+    return data;
+  };
 
   Razorpay.prototype.open = function(){
     if(this.modal){
-      return this.modal.show()
+      return this.modal.show();
     }
 
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
-    this.modal = new modal(this.$el);
+    this.modal = new Modal(this.$el);
     this.$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
       parent = $(this.parentNode.parentNode);
@@ -81,7 +81,7 @@
       var form, invalid;
       form = $(e.currentTarget);
       invalid = form.find('.rzp-invalid');
-      var modal = form.closest('.rzp-modal')
+      var modal = form.closest('.rzp-modal');
       if (invalid.length) {
         invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
         discreet.shake(modal);
@@ -97,7 +97,7 @@
       self.$el.find('.rzp-submit').attr('disabled', true);
       self.modal.options.backdropClose = false;
     });
-  }
+  };
 
   // close on backdrop click and remove errors
   Razorpay.prototype.renew = function(){
@@ -105,13 +105,14 @@
       this.$el.find('.rzp-error').html('');
     }
     this.modal.options.backdropClose = true;
-  }
+  };
 
   Razorpay.prototype.hide = function(){
     this.renew();
-    if(this.modal)
+    if(this.modal){
       this.modal.hide();
-  }
+    }
+  };
 
   /**
     default handler for success
@@ -134,40 +135,42 @@
     var RazorPayForm = discreet.rzpscript.parentElement;
     $(inputs).appendTo(RazorPayForm);
     $(RazorPayForm).submit();
-  }
+  };
 
   discreet.preHandler = function(rzp){
     return function(){
-      rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove()
-    }
-  }
+      rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove();
+    };
+  };
   discreet.successHandler = function(rzp){
     return function(message){
-      if(rzp.modal)
-        rzp.modal.hide()
-      rzp.modal = null
-      if(typeof rzp.options.handler == "function"){
+      if(rzp.modal){
+        rzp.modal.hide();
+      }
+      rzp.modal = null;
+      if(typeof rzp.options.handler === "function"){
         // This is automatic checkout
         rzp.options.handler(message);
       }
       else {
         rzp.defaultPostHandler(message);
       }
-    }
-  }
+    };
+  };
 
   discreet.failureHandler = function(rzp){
     return function(response){
-      var modal = rzp.$el.find('.rzp-modal')
-      discreet.shake(modal)
-      if(rzp.modalRef)
-        modal.html('').removeClass('rzp-frame').append(rzp.modalRef)
-        modal.height('')
-      
-      rzp.modalRef = null
+      var modal = rzp.$el.find('.rzp-modal');
+      discreet.shake(modal);
+      if(rzp.modalRef){
+        modal.html('').removeClass('rzp-frame').append(rzp.modalRef);
+        modal.height('');
+      }
+
+      rzp.modalRef = null;
       rzp.$el.find('.rzp-submit').removeAttr('disabled');
       rzp.modal.options.backdropClose = true;
-      
+
       if (response && response.error && response.error.field){
           if (rzp.$el.find('input[name="'+response.error.field+'"]').length){
             rzp.$el.find('input[name="'+response.error.field+'"]').addClass('rzp-invalid');
@@ -178,23 +181,23 @@
       var message = response.error.description || defaultMessage;
 
       rzp.$el.find('.rzp-error').html('<li>' + message + '</li>');
-    }
+    };
   };
 
   discreet.rzpscript = document.currentScript || (function() {
     var scripts;
     scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
-  })()
+  })();
 
   discreet.rzpstyle = (function(){
     var linkTag = document.createElement('link');
-    linkTag.rel = 'stylesheet'
-    linkTag.href = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/css/checkout.css')
+    linkTag.rel = 'stylesheet';
+    linkTag.href = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/css/checkout.css');
     discreet.rzpscript.parentNode.appendChild(linkTag);
-    return linkTag
-  })()
-  
+    return linkTag;
+  })();
+
 
   discreet.parseScriptOptions = function(options){
     var category, dotPosition, i, ix, property;
@@ -210,7 +213,7 @@
       }
     }
     return options;
-  }
+  };
 
   discreet.addButton = function(rzp){
     var button = document.createElement("button");
@@ -220,7 +223,7 @@
       rzp.open();
       e.preventDefault();
     }).html("Pay with Card").appendTo(discreet.rzpscript.parentNode);
-  }
+  };
 
   var key = $(discreet.rzpscript).data('key');
   if (key && key.length > 0) {
