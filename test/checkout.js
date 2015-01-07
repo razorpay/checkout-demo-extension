@@ -14,7 +14,7 @@ var coData = {
       'email': 'sm@razorpay.com',
       'contact': '9999999999'
     },
-    udf: {
+    notes: {
       'address': 'Hello World'
     },
     protocol: 'http',
@@ -61,11 +61,11 @@ describe("Checkout init", function(){
     expect(co.options.image).toBe(coData.options.image);
   });
 
-  it("should set udf fields", function(){
-    for(var i in co.options.udf){
-      expect(co.options.udf[i]).toBe(coData.options.udf[i]);
+  it("should set notes fields", function(){
+    for(var i in co.options.notes){
+      expect(co.options.notes[i]).toBe(coData.options.notes[i]);
     }
-    expect(Object.keys(co.options.udf).length).toBe(Object.keys(coData.options.udf).length)
+    expect(Object.keys(co.options.notes).length).toBe(Object.keys(coData.options.notes).length)
   });
 
   it("should set prefill options", function(){
@@ -119,7 +119,7 @@ describe("Checkout validateOptions method", function(){
       field = 'key';
     });
 
-    it("when udf has more than 15 fields", function(){
+    it("when notes has more than 15 fields", function(){
       delete customOptions.key;
       field = 'key';
     });
@@ -148,8 +148,8 @@ describe("Checkout validateOptions method", function(){
       delete customOptions.image;
     });
 
-    it("when udf is not defined", function(){
-      delete customOptions.udf;
+    it("when notes is not defined", function(){
+      delete customOptions.notes;
     });
 
     it("when name is not defined", function(){

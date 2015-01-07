@@ -28,7 +28,7 @@
     name: '', // of merchant
     description: '',
     image: '',
-    udf: {}
+    notes: {}
   };
 
   var lastRequestInstance = null;
@@ -235,9 +235,9 @@
       message = "Merchant key cannot be empty";
       field = "key";
     }
-    else if (typeof options.udf === 'object' && Object.keys(options.udf).length > 15) {
-      message = "You can only pass at most 15 fields in the udf object";
-      field = "udf";
+    else if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
+      message = "You can only pass at most 15 fields in the notes object";
+      field = "notes";
     }
 
     if(message !== "" && throwError === true){

@@ -149,10 +149,10 @@
       }
       rzp.modal = null;
       if(typeof rzp.options.handler === "function"){
-        // This is automatic checkout
         rzp.options.handler(message);
       }
       else {
+        // This is automatic checkout
         rzp.defaultPostHandler(message);
       }
     };

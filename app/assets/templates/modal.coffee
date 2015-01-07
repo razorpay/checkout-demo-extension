@@ -27,9 +27,9 @@ Razorpay.templates.modal = '
           <form class="rzp-form" method="POST" novalidate>
             <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
             <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
-            {{for(udfkey in it.udf){}}
-              <!-- udf fields provided by merchant -->
-              <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
+            {{for(noteskey in it.notes){}}
+              <!-- notes fields provided by merchant -->
+              <input class="rzp-input" type="hidden" name="notes[{{=noteskey}}]" value="{{=it.notes[noteskey]}}">
             {{}}}
 
             <input class="rzp-input" type="hidden" name="card[expiry_month]">
@@ -73,9 +73,9 @@ Razorpay.templates.modal = '
             <form class="rzp-form" method="POST" novalidate>
               <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
               <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
-              {{for(udfkey in it.udf){}}
-                <!-- udf fields provided by merchant -->
-                <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
+              {{for(noteskey in it.notes){}}
+                <!-- notes fields provided by merchant -->
+                <input class="rzp-input" type="hidden" name="notes[{{=noteskey}}]" value="{{=it.notes[noteskey]}}">
               {{}}}
               <input class="rzp-input" type="hidden" name="method" value="net banking">
 

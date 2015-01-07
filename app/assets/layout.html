@@ -49,11 +49,11 @@
         'email': 'harshil@razorpay.com',
         'contact': '9999999999'
       },
-      udf: {
+      notes: {
         'address': 'Hello World'
       },
-      protocol: 'https',
-      hostname: 'api.razorpay.com'
+      protocol: 'http',
+      hostname: 'api.razorpay.dev'
     }
     var rzp1 = new Razorpay(options);
 
@@ -69,7 +69,7 @@
       handler : function (transaction){
         alert("You have successfully purchased "+options.description);
       },
-      udf: {
+      notes: {
         'shipping': "Bye World"
       }
     });

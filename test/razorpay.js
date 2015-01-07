@@ -56,7 +56,7 @@ describe("Razorpay Ajax", function(){
     "card[cvv]"          : "888",
     "card[expiry_month]" : "05",
     "card[expiry_year]"  : "19",
-    "udf[address]"       : "Hello World",
+    "notes[address]"     : "Hello World",
   }
 
   var response = {
