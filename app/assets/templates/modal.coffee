@@ -77,7 +77,7 @@ Razorpay.templates.modal = '
                 <!-- notes fields provided by merchant -->
                 <input class="rzp-input" type="hidden" name="notes[{{=noteskey}}]" value="{{=it.notes[noteskey]}}">
               {{}}}
-              <input class="rzp-input" type="hidden" name="method" value="net banking">
+              <input class="rzp-input" type="hidden" name="method" value="netbanking">
 
               <div class="rzp-fieldset">
                 <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
