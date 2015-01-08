@@ -120,8 +120,11 @@ describe("Checkout validateOptions method", function(){
     });
 
     it("when notes has more than 15 fields", function(){
-      delete customOptions.key;
-      field = 'key';
+      customOptions.notes = {};
+      for(var i = 0; i < 16; i++){
+        customOptions.notes['note-' + i] = i;
+      }
+      field = 'notes';
     });
 
     it("when handler is not a function", function(){
