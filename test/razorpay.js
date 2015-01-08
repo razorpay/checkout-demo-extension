@@ -91,6 +91,7 @@ describe("Razorpay Ajax", function(){
   describe("on submit", function(){
     it("should generate success handler", function(){
       spyOn(discreet, 'success');
+      spyOn(Razorpay.$, 'ajax');
       rzp.submit({data: data});
       expect(discreet.success).toHaveBeenCalled();
     })
