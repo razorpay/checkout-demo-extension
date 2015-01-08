@@ -131,7 +131,7 @@
       dataType: 'jsonp',
       success: discreet.success(request),
       timeout: 35000,
-      failure: request.failure,
+      error: request.failure,
       data: request.data
     });
   };

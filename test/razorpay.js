@@ -187,7 +187,7 @@ describe("Razorpay Ajax", function(){
     beforeEach(function(){
       errorHandler = jasmine.createSpy();
       spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
-        options.failure(response.error);
+        options.error(response.error);
       })
     });
 
