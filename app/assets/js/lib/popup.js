@@ -83,6 +83,11 @@
     this.window = window.open(src, name, optsStr);
     this.focus();
 
+    this.$el = root.$(this.window.document.body);
+  }
+
+  Popup.prototype.$ = function (query) {
+    return root.$(this.window.document).find(query);
   }
 
   /**
