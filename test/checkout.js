@@ -164,6 +164,14 @@ describe("Checkout validateOptions method", function(){
     it("when name is not defined", function(){
       delete customOptions.name;
     });
+
+    it("when amount is in string", function(){
+      customOptions.amount = '1000';
+    });
+
+    it("when amount is in integer", function(){
+      customOptions.amount = 1000;
+    })
   });
 
 });
