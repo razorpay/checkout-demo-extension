@@ -83,7 +83,10 @@
         }
 
         // TODO tests for this
-        request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
+        // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
+
+        // Popup for netbanking
+        request.popup.location(response.redirectUrl);
         return;
       }
       else if (response.status) {
@@ -99,13 +102,16 @@
     };
   };
 
+  discreet.setupPopup = function(request){
+    request.popup = new Razorpay.Popup('');
+  }
+
   /**
     method for payment data submission to razorpay api
     @param request  contains payment data and optionally callbacks to success, failure and element to put iframe in
   */
   Razorpay.prototype.submit = function(request){
 
-    // window.p = window.open('', "", "width=600, height=400, scrollbars=yes");
     // TODO what's to be done for netbanking?
     // TODO better validation
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
@@ -118,6 +124,10 @@
     var errors = this.validateData(request.data);
     if(errors && errors.length){
       return false;
+    }
+
+    if(request.data.method === 'netbanking'){
+      discreet.setupPopup(request);
     }
 
     // setting up XD
