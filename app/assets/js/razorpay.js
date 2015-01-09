@@ -38,6 +38,7 @@
       return;
     }
 
+    lastRequestInstance.popup.close();
     if (message.data.error && message.data.error.description){
       if(typeof lastRequestInstance.failure === 'function'){
         lastRequestInstance.failure(message.data);
