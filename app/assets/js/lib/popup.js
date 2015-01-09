@@ -16,7 +16,7 @@
   */
 
   var defaults = {
-      width: 700
+      width: 800
     , height: 520
     , menubar: 'no'
     , resizable: 'yes'
@@ -96,6 +96,10 @@
 
   Popup.prototype.close = function () {
     this.window.close();
+  }
+
+  Popup.prototype.location = function (location) {
+    this.window.location = location;
   }
 
   /**
