@@ -181,7 +181,7 @@
     }
 
     var amount = parseInt(options.amount);
-    if (!amount || typeof amount !== 'number' || amount < 0) {
+    if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
       errors.push({
         message: "Invalid amount specified",
         field: "amount"

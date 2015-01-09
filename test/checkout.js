@@ -106,7 +106,12 @@ describe("Checkout validateOptions method", function(){
     });
 
     it("when amount is less than 0", function(){
-      customOptions.amount = -10;
+      customOptions.amount = '-10';
+      field = 'amount';
+    });
+
+    it("when amount is in decimal", function(){
+      customOptions.amount = '10.10';
       field = 'amount';
     });
 
