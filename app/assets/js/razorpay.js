@@ -157,11 +157,60 @@
    * return object
   */
   Razorpay.prototype.validateOptions = function(options, throwError){
+    var errors = [];
+
     if (typeof options === 'undefined') {
-      throw new Error('No options specified');
+      errors.push({
+        message: "No options defined",
+        field: "options"
+      });
     }
+
     if (typeof options.key === 'undefined') {
-      throw new Error('No merchant key specified');
+      errors.push({
+        message: "No merchant key specified",
+        field: "key"
+      });
+    }
+
+    if (options.key === "") {
+      errors.push({
+        message: "Merchant key cannot be empty",
+        field: "key"
+      });
+    }
+
+    var amount = parseInt(options.amount);
+    if (!amount || typeof amount !== 'number' || amount < 0) {
+      errors.push({
+        message: "Invalid amount specified",
+        field: "amount"
+      });
+    }
+
+    if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
+      errors.push({
+        message: "You can only pass at most 15 fields in the notes object",
+        field: "notes"
+      });
+    }
+
+    if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
+      errors.push({
+        message: "Handler must be a function",
+        field: "handler"
+      });
+    }
+
+    if(typeof throwError === 'undefined'){
+      return errors;
+    }
+    else if(throwError === true){
+      if(errors.length > 0){
+        var field = errors[0].field;
+        var message = errors[0].message;
+        throw new Error("Field: " + field + "; Error:" + message);
+      }
     }
   };
 
@@ -190,11 +239,6 @@
       });
     }
 
-    // if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
-    //   message = "You can only pass at most 15 fields in the notes object";
-    //   field = "notes";
-    // }
-
     // if(message !== "" && throwError === true){
     //   throw new Error("Field: " + field + "; Error:" + message);
     // }
@@ -211,50 +255,6 @@
     // }
   };
 
-  // TODO replace this with validateData and validateOptions
-  Razorpay.prototype.validate = function(options, throwError){
-    var field = "";
-    var message = "";
-    if (typeof options.amount === "undefined") {
-      message = "No amount specified";
-      field = "amount";
-    }
-    else if (options.amount < 0) {
-      message = "Invalid amount specified";
-      field = "amount";
-    }
-    else if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
-      message = "Handler must be a function";
-      field = "handler";
-    }
-    else if (typeof options.key === "undefined") {
-      message = "No merchant key specified";
-      field = "key";
-    }
-    else if (options.key === "") {
-      message = "Merchant key cannot be empty";
-      field = "key";
-    }
-    else if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
-      message = "You can only pass at most 15 fields in the notes object";
-      field = "notes";
-    }
-
-    if(message !== "" && throwError === true){
-      throw new Error("Field: " + field + "; Error:" + message);
-    }
-    if(message === ""){
-      return {error: false};
-    }
-    else {
-      return {
-        error: {
-          description: message,
-          field: field
-        }
-      };
-    }
-  };
   // @if NODE_ENV='test'
   window.discreet = discreet;
   // @endif

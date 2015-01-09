@@ -95,8 +95,9 @@ describe("Checkout validateOptions method", function(){
 
   describe("should return error", function(){
     afterEach(function(){
-      var val = co.validate(customOptions);
-      expect(val.error.field).toBe(field);
+      var errors = co.validateOptions(customOptions);
+      expect(errors.length).toBe(1);
+      expect(errors[0].field).toBe(field);
     })
 
     it("when amount not specified", function(){
@@ -135,8 +136,8 @@ describe("Checkout validateOptions method", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      var val = co.validate(customOptions);
-      expect(val.error).toBe(false);
+      var errors = co.validateOptions(customOptions);
+      expect(errors.length).toBe(0);
     });
 
     it("when handler is not defined", function(){

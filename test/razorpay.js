@@ -3,7 +3,8 @@
 jasmine.getFixtures().fixturesPath = 'base/spec/fixtures/';
 
 var options = {
-  'key': 'key_id'
+  'key': 'key_id',
+  'amount': '4000'
 }
 
 describe("new Razorpay", function(){
