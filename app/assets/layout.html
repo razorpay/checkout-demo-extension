@@ -16,6 +16,7 @@
   <script type="text/javascript" src="templates/modal.js"></script>
   <script type="text/javascript" src="templates/autosubmit.js"></script>
   <script type="text/javascript" src="js/lib/jquery.payment.js"></script>
+  <script type="text/javascript" src="js/lib/popup.js"></script>
   <script type="text/javascript" src="js/razorpay.js"></script>
   <script type="text/javascript" src="js/lib/input.js"></script>
   <script type="text/javascript" src="js/lib/modal.js"></script>
@@ -77,10 +78,11 @@
     var rzp2 = new Razorpay(opt2);
 
     $('#rzp-button2').click(function(e){
-      rzp2.open();
+      rzp2.popup();
+      // rzp2.open();
       e.preventDefault();
     })
-    rzp1.open();
+    // rzp1.open();
   </script>
 
   <script src="js/lib/sendkeys.js"></script>
