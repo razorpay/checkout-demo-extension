@@ -19,26 +19,28 @@ Razorpay.templates.modal = '
       </div>
       <div class="rzp-body">
         <form class="rzp-form" method="POST" novalidate>
-          <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
-          <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
-          {{for(udfkey in it.udf){}}
-            <!-- udf fields provided by merchant -->
-            <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
-          {{}}}
+          <div class="rzp-form-common">
+            <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
+            <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
+            {{for(udfkey in it.udf){}}
+              <!-- udf fields provided by merchant -->
+              <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
+            {{}}}
 
-          <input class="rzp-input" type="hidden" name="card[expiry_month]">
-          <input class="rzp-input" type="hidden" name="card[expiry_year]">
+            <input class="rzp-input" type="hidden" name="card[expiry_month]">
+            <input class="rzp-input" type="hidden" name="card[expiry_year]">
 
-          <div class="rzp-fieldset">
-            <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
-              <input class="rzp-input" name="card[name]" placeholder="Name" required value="{{=it.prefill.name}}" pattern=".{1,100}">
-            </div></div>
-            <div class="rzp-elem rzp-elem-email"><div class="rzp-elem-inner">
-              <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$">
-            </div></div>
-            <div class="rzp-elem rzp-elem-contact" style="border-radius: 0 0 4px 4px"><div class="rzp-elem-inner">
-              <input class="rzp-input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
-            </div></div>
+            <div class="rzp-fieldset">
+              <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0"><div class="rzp-elem-inner">
+                <input class="rzp-input" name="card[name]" placeholder="Name" required value="{{=it.prefill.name}}" pattern=".{1,100}">
+              </div></div>
+              <div class="rzp-elem rzp-elem-email"><div class="rzp-elem-inner">
+                <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$">
+              </div></div>
+              <div class="rzp-elem rzp-elem-contact" style="border-radius: 0 0 4px 4px"><div class="rzp-elem-inner">
+                <input class="rzp-input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
+              </div></div>
+            </div>
           </div>
           {{if(it.netbanking){}}
             <ul class="rzp-tabs">
@@ -47,7 +49,7 @@ Razorpay.templates.modal = '
             </ul>
             <div class="rzp-fieldset rzp-tab-content" id="rzp-tab-nb">
               <div class="rzp-elem" style="border-radius: 4px"><div class="rzp-elem-inner">
-                <select name="bank" required>
+                <select name="bank" required class="rzp-input">
                   <option value="">Select Bank</option>
                   <option value="ALLA">Allahabad Bank</option>
                   <option value="CITI">Citi Bank</option>

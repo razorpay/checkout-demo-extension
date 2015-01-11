@@ -82,9 +82,10 @@
         $(this).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
         if(change_modal_height){
           modal.height(inner.height());
-          return setTimeout(function(){
-            return form.css('opacity', 1);
-          }, 150);
+          setTimeout(function(){
+            form.css('opacity', 1);
+            modal.height('');
+          }, 250);
         }
       });
     }
@@ -94,7 +95,9 @@
       e.preventDefault();
       var form, invalid;
       form = $(e.currentTarget);
-      invalid = form.find('.rzp-invalid');
+      self.$el.smarty('refresh');
+      form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
+      invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
       var modal = form.closest('.rzp-modal');
       if (invalid.length) {
         invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
