@@ -6,6 +6,7 @@
   defaults = {
     shownClass: 'rzp-shown',
     modalSelector: '.rzp-modal',
+    curtainClass: 'rzp-curtain', //curtain (fullscreen) mode
     show: true,
     escape: true,
     animation: true,
@@ -19,6 +20,10 @@
     var duration, durationStyle;
     this.options = $.extend(defaults, options);
     this.element = element;
+    if (window.screen && (screen.width <= 480 || screen.height <= 480)){
+      this.element.addClass(this.options.curtainClass)
+      root.curtainMode = true
+    }
     if (!this.element.attr('tabIndex')) {
       this.element.attr('tabIndex', '0');
     }

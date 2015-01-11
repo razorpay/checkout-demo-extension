@@ -63,15 +63,21 @@
         if (!inner.length) {
           return;
         }
+        var form = inner.find('.rzp-form')
         modal = inner.parent();
-        modal.height(inner.height());
-        inner.css('opacity', 0.5);
-        inner.find('#' + this.getAttribute('data-target')).addClass('active').siblings('.active').removeClass('active');
-        $(this).addClass('active').siblings('.active').removeClass('active');
-        modal.height(inner.height());
-        return setTimeout(function() {
-          return inner.css('opacity', 1);
-        }, 150);
+        var change_modal_height = !Razorpay.curtainMode;
+        if(change_modal_height){
+          modal.height(inner.height());
+          form.css('opacity', 0.5);
+        }
+        inner.find('#' + this.getAttribute('data-target')).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
+        $(this).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
+        if(change_modal_height){
+          modal.height(inner.height());
+          return setTimeout(function(){
+            return form.css('opacity', 1);
+          }, 150);
+        }
       });
     }
 
@@ -215,7 +221,6 @@
   discreet.addButton = function(rzp){
     var button = document.createElement("button");
     button.setAttribute("id", "rzp-button");
-    // TODO append should not be in body;
     $(button).click(function(e) {
       rzp.open();
       e.preventDefault();

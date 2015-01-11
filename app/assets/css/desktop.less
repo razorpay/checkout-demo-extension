@@ -1,0 +1,322 @@
+@width: 320px;
+@bordercol: #ccc;
+@backcol: #f0f2f4;
+@padding: 20px;
+@color: #333;
+@fontsize: 14px;
+// input elements horizontal padding
+@gap: 14px;
+
+.rzp-container{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: none;
+  opacity: 0;
+  background: rgba(0,0,0,0.6);
+  white-space: nowrap;
+  .transition(0.25s ease-out opacity);
+  overflow: auto;
+  &:after{
+    content: '';
+    vertical-align: middle;
+    height: 96%;
+    display: inline-block;
+  }
+  &.rzp-shown{
+    opacity: 1;
+    .rzp-modal{
+      .scale(1);
+      .transition-transform(~"0.25s cubic-bezier(0.3, 1.5, 0.7, 1), 0.3s ease-out height, 0.3s ease-out width");
+    }
+  }
+}
+.rzp-modal{
+  position: relative;
+  vertical-align: middle;
+  display: inline-block;
+  white-space: normal;
+  margin: 20px 0;
+  overflow: hidden;
+  .scale(0.8);
+  .transition(0.2s ease-in all);
+
+  color: @color;
+  font-size: @fontsize;
+  width: @width;
+  border-radius: 5px;
+  background: @backcol;
+  font-family: 'Lato', Sans-serif;
+  box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
+  min-height: 200px;
+
+  button, input, select, textarea{
+    outline: none!important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    // color:#28B3D2;
+    border-radius: 2px;
+    border: none!important;
+    outline: none!important;
+  }
+  button{
+    border: none;
+    background: #28B3D2 no-repeat 12px center;
+    line-height: 40px;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 2px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
+    width: 180px;
+    cursor: pointer;
+    &[disabled]{
+      background-image: url('../images/loaders/2.gif');
+      background-size: 16px;
+      opacity: 0.7;
+    }
+  }
+}
+.rzp-modal-inner{
+  .transition(0.15s ease-out opacity);
+}
+.rzp-frame{
+  width: 80%;
+  max-width: 780px;
+  height: 80%;
+  max-height: 580px;
+  iframe{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+.rzp-elem{
+  height: 40px;
+  line-height: 40px;
+  border: 1px solid @bordercol;
+  background: #fff;
+  position: relative;
+  margin-bottom: -1px;
+  color: #555;
+  cursor: text;
+  .transition(0.25s);
+  background: #fff center right no-repeat;
+
+  &.rzp-focused{
+    border-color: #3498db;
+    color: #333;
+    z-index: 1;
+  }
+  &.rzp-mature.rzp-invalid{
+    color: #d35400;
+    &.rzp-focused{
+      border-color: #d35400;
+    }
+  }
+  input, select, textarea{
+    color: inherit;
+    outline: none;
+    background: none;
+    line-height: 14px;
+    font-size: 14px;
+    height: 16px;
+    resize: none;
+    width: 100%;
+    display: block;
+    padding: 0 @gap;
+    margin: 0 -@gap;
+    .box-sizing(content-box); // modern browsers being oversmart
+  }
+  select{
+    margin-top: -12px;
+    line-height: 38px;
+    height: 40px;
+  }
+}
+.rzp-elem-inner{
+  margin: 0 @gap;
+  height: 16px;
+  padding: 12px 0;
+}
+.rzp-tooltip{
+  color: #fff;
+  pointer-events: none;
+  z-index: 2;
+  position: absolute;
+  max-width: 220px;
+  line-height: 16px;
+  padding: 6px 10px;
+  font-size: 80%;
+  text-align: center;
+  background: #333;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
+  opacity: 0;
+  .transition-transform(~"0.3s ease-in, 0.2s ease-in opacity");
+  .transform(translateY(-20px));
+  margin-top: 7px;
+  left: @padding + 10px;
+  &:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+    top: 0;
+    left: 25px;
+    margin: -13px 0 0 -7px;
+  }
+  &.rzp-shown{
+    opacity: 0.9;
+    .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
+    .transform(none);
+  }
+}
+.rzp-double{
+  white-space: nowrap;
+  font-size: 0;
+  margin: 0 2px 0 1px;
+  .rzp-elem{
+    font-size: @fontsize;
+    display: inline-block;
+    width: 50%;
+    margin-left: -1px;
+  }
+}
+.rzp-fieldset{
+  margin: 20px 0;
+}
+.rzp-modal-close{
+  display: none;
+  float: left;
+}
+.rzp-merchant{
+  padding: 10px;
+  height: 40px;
+}
+/* Default class for an overlay */
+.rzp-header{
+  border-bottom: 1px solid @bordercol;
+}
+.rzp-merchant_image{
+  float:left;
+}
+.rzp-merchant_image img{
+  max-width:60px;
+  max-height: 40px;
+}
+.rzp-merchant_name{
+  margin:0 auto;
+  font-size: 13px;
+  width:145px;
+  font-weight: 400;
+  text-transform: capitalize;
+  float:none;
+  text-align: center;
+}
+.rzp-merchant_powered{
+  float:right;
+  width:100px;
+  background: url('../images/powered_by_rzp.png') right center no-repeat;
+  min-height: 30px;
+}
+.rzp-clear{
+  clear:both;
+}
+.rzp-body{
+  text-align: left;
+  padding: 0 @padding;
+}
+.rzp-elem-name{
+  background-image: url('../images/ei-user.png');
+}
+.rzp-elem-email{
+  background-image: url('../images/ei-envelope.png');
+}
+.rzp-elem-contact{
+  background-image: url('../images/phone.png');
+}
+.rzp-elem-card{
+  background-image: url('../images/card.png');
+  &.visa{
+    background-image: url('../images/icons/visa.png');
+  }
+  &.mastercard{
+    background-image: url('../images/icons/mastercard.png');
+  }
+  &.maestro{
+    background-image: url('../images/icons/maestro.png');
+  }
+  &.rupay{
+    background-image: url('../images/icons/rupay.png');
+  }
+  &.amex{
+    background-image: url('../images/icons/amex.png');
+  }
+}
+.rzp-elem-expiry{
+  background-image: url('../images/ei-calendar.png');
+}
+.rzp-elem-cvv{
+  background-image: url('../images/ei-lock.png');
+}
+
+.rzp-body .rzp-submit.error{
+  background-color:#FB797E;
+}
+.rzp-error{
+  margin-bottom: 12px;
+  color: #FB797E;
+  text-align:center;
+  font-size: 12px;
+}
+.rzp-modal iframe{
+  border: none;
+  border-radius: 5px;
+}
+.rzp-tab-content{
+  display: none;
+}
+.rzp-tab-content.rzp-active{
+  display: block;
+}
+
+.rzp-tabs{
+  font-size: 0;
+  white-space: nowrap;
+  margin: 0 0 -5px 0;
+  padding: 0;
+
+  li{
+    line-height: 40px;
+    display: inline-block;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid @bordercol;
+    width: 50%;
+    cursor: pointer;
+    background: #ddd;
+    margin-left: -1px;
+    border-radius: 0 4px 4px 0;
+    
+    &.rzp-active{
+      background: #f6f7fa;
+      cursor: default;
+      pointer-events: none;
+    }
+    &:first-child{
+      border-radius: 4px 0 0 4px;
+    }
+  }
+}
+.rzp-footer{
+  padding: 0 @padding @padding;
+  text-align: center;
+}
