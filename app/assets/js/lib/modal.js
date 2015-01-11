@@ -7,6 +7,7 @@
     shownClass: 'rzp-shown',
     modalSelector: '.rzp-modal',
     curtainClass: 'rzp-curtain', //curtain (fullscreen) mode
+    closeButton: '.rzp-modal-close',
     show: true,
     escape: true,
     animation: true,
@@ -22,7 +23,7 @@
     this.element = element;
     if (window.screen && (screen.width <= 480 || screen.height <= 480)){
       this.element.addClass(this.options.curtainClass)
-      root.curtainMode = true
+      this.curtainMode = true
     }
     if (!this.element.attr('tabIndex')) {
       this.element.attr('tabIndex', '0');
@@ -131,8 +132,12 @@
     },
 
     bind_events: function() {
-      if(window.addEventListener)
+      if (window.addEventListener)
         this.element[0].addEventListener('blur', this.steal_focus, true);
+      
+      if (this.curtainMode){
+        this.on('click', this.element.find(this.options.closeButton), this.hide)
+      }
       
       if (this.options.stopKeyPropagation) {
         this.on('keyup keydown keypress', this.element, (function(_this) {
@@ -162,5 +167,5 @@
     }
   };
 
-  return root.modal = modal;
+  return root.Modal = modal;
 })(window.Razorpay);

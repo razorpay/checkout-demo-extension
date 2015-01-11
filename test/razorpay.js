@@ -3,7 +3,8 @@
 jasmine.getFixtures().fixturesPath = 'base/spec/fixtures/';
 
 var options = {
-  'key': 'key_id'
+  'key': 'key_id',
+  'amount': '4000'
 }
 
 describe("new Razorpay", function(){
@@ -56,7 +57,7 @@ describe("Razorpay Ajax", function(){
     "card[cvv]"          : "888",
     "card[expiry_month]" : "05",
     "card[expiry_year]"  : "19",
-    "udf[address]"       : "Hello World",
+    "notes[address]"     : "Hello World",
   }
 
   var response = {
@@ -91,6 +92,7 @@ describe("Razorpay Ajax", function(){
   describe("on submit", function(){
     it("should generate success handler", function(){
       spyOn(discreet, 'success');
+      spyOn(Razorpay.$, 'ajax');
       rzp.submit({data: data});
       expect(discreet.success).toHaveBeenCalled();
     })
@@ -187,7 +189,7 @@ describe("Razorpay Ajax", function(){
     beforeEach(function(){
       errorHandler = jasmine.createSpy();
       spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
-        options.failure(response.error);
+        options.error(response.error);
       })
     });
 

@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- build:js razorpay.js -->
   <script type="text/javascript" src="js/lib/init.html"></script>
   <script type="text/javascript" src="js/lib/xdm.js"></script>
@@ -49,7 +50,7 @@
         'email': 'harshil@razorpay.com',
         'contact': '9999999999'
       },
-      udf: {
+      notes: {
         'address': 'Hello World'
       },
       protocol: 'https',
@@ -69,7 +70,7 @@
       handler : function (transaction){
         alert("You have successfully purchased "+options.description);
       },
-      udf: {
+      notes: {
         'shipping': "Bye World"
       }
     });

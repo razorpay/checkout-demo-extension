@@ -22,7 +22,7 @@ module.exports = function(config) {
       'app/assets/js/lib/sendkeys.js',
       'test/*.js',
       '.tmp/checkout.built.js',
-      'app/dist/v1/css/style.css'
+      'app/dist/v1/css/checkout.css'
     ],
 
     // list of files to exclude

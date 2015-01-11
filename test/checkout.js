@@ -14,7 +14,7 @@ var coData = {
       'email': 'sm@razorpay.com',
       'contact': '9999999999'
     },
-    udf: {
+    notes: {
       'address': 'Hello World'
     },
     protocol: 'http',
@@ -61,11 +61,11 @@ describe("Checkout init", function(){
     expect(co.options.image).toBe(coData.options.image);
   });
 
-  it("should set udf fields", function(){
-    for(var i in co.options.udf){
-      expect(co.options.udf[i]).toBe(coData.options.udf[i]);
+  it("should set notes fields", function(){
+    for(var i in co.options.notes){
+      expect(co.options.notes[i]).toBe(coData.options.notes[i]);
     }
-    expect(Object.keys(co.options.udf).length).toBe(Object.keys(coData.options.udf).length)
+    expect(Object.keys(co.options.notes).length).toBe(Object.keys(coData.options.notes).length)
   });
 
   it("should set prefill options", function(){
@@ -95,8 +95,9 @@ describe("Checkout validateOptions method", function(){
 
   describe("should return error", function(){
     afterEach(function(){
-      var val = co.validate(customOptions);
-      expect(val.error.field).toBe(field);
+      var errors = co.validateOptions(customOptions);
+      expect(errors.length).toBe(1);
+      expect(errors[0].field).toBe(field);
     })
 
     it("when amount not specified", function(){
@@ -105,7 +106,12 @@ describe("Checkout validateOptions method", function(){
     });
 
     it("when amount is less than 0", function(){
-      customOptions.amount = -10;
+      customOptions.amount = '-10';
+      field = 'amount';
+    });
+
+    it("when amount is in decimal", function(){
+      customOptions.amount = '10.10';
       field = 'amount';
     });
 
@@ -119,9 +125,12 @@ describe("Checkout validateOptions method", function(){
       field = 'key';
     });
 
-    it("when udf has more than 15 fields", function(){
-      delete customOptions.key;
-      field = 'key';
+    it("when notes has more than 15 fields", function(){
+      customOptions.notes = {};
+      for(var i = 0; i < 16; i++){
+        customOptions.notes['note-' + i] = i;
+      }
+      field = 'notes';
     });
 
     it("when handler is not a function", function(){
@@ -132,8 +141,8 @@ describe("Checkout validateOptions method", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      var val = co.validate(customOptions);
-      expect(val.error).toBe(false);
+      var errors = co.validateOptions(customOptions);
+      expect(errors.length).toBe(0);
     });
 
     it("when handler is not defined", function(){
@@ -148,13 +157,21 @@ describe("Checkout validateOptions method", function(){
       delete customOptions.image;
     });
 
-    it("when udf is not defined", function(){
-      delete customOptions.udf;
+    it("when notes is not defined", function(){
+      delete customOptions.notes;
     });
 
     it("when name is not defined", function(){
       delete customOptions.name;
     });
+
+    it("when amount is in string", function(){
+      customOptions.amount = '1000';
+    });
+
+    it("when amount is in integer", function(){
+      customOptions.amount = 1000;
+    })
   });
 
 });
@@ -243,7 +260,6 @@ describe("Razorpay open cc and submit method", function(){
   it("should submit with all details in place", function(){
     launch();
 
-    console.log($ccNumber.length);
     $ccNumber.sendkeys(coData.cc.number);
     $ccExpiry.sendkeys(coData.cc.expiry);
     $ccCVV.sendkeys(coData.cc.cvv);

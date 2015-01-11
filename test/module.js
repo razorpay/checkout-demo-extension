@@ -20,7 +20,7 @@ describe("Available modules", function(){
   });
 
   it("should include modal", function(){
-    expect(Razorpay.modal).toBeDefined();
+    expect(Razorpay.Modal).toBeDefined();
   });
 
   it("should include jquery.payment", function(){
