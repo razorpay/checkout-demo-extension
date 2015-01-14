@@ -203,11 +203,18 @@
       });
     }
 
-    if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
-      errors.push({
-        message: "You can only pass at most 15 fields in the notes object",
-        field: "notes"
-      });
+    if (typeof options.notes === 'object'){
+      // Object.keys unsupported in old browsers
+      var notesCount = 0
+      for(var note in options.notes){
+        notesCount++
+      }
+      if(notesCount > 15) {
+        errors.push({
+          message: "You can only pass at most 15 fields in the notes object",
+          field: "notes"
+        });
+      }
     }
 
     if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {

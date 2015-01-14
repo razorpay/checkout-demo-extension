@@ -37,6 +37,7 @@
         delete data['card[number]'];
         delete data['card[cvv]'];
         delete data['card[expiry]'];
+        data.method = 'netbanking'
       }
     }
 
@@ -45,12 +46,15 @@
 
   Razorpay.prototype.open = function(){
     if(this.modal){
-      return this.modal.show();
+      this.modal.show();
+      return;
     }
 
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
     this.modal = new Modal(this.$el);
+    this.renew();
+    
     this.$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
       parent = $(this.parentNode.parentNode);

@@ -57,13 +57,15 @@
 
     transitionProperty: (function() {
       var prop;
-      prop = '';
-      ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
-        if (typeof document.head.style[i] === 'string') {
-          prop = i + 'Duration';
-          return true;
-        }
-      });
+      if(Array.prototype.some){
+        prop = '';
+        ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
+          if (typeof document.head.style[i] === 'string') {
+            prop = i + 'Duration';
+            return true;
+          }
+        });
+      }
       return prop;
     })(),
 
