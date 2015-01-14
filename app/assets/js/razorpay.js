@@ -141,10 +141,24 @@
     this.options = this.options || {};
 
     for (var i in defaults){
-      if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
+      if(i === 'prefill'){
+        continue;
+      }
+      else if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
         this.options[i] = defaults[i];
-      } else{
+      }
+      else {
         this.options[i] = overrides[i];
+      }
+    }
+
+    this.options['prefill'] = {};
+    for(var i in defaults['prefill']){
+      if(typeof overrides['prefill'][i] === 'undefined'){
+        this.options['prefill'][i] = defaults['prefill'][i];
+      }
+      else {
+        this.options['prefill'][i] = overrides['prefill'][i];
       }
     }
   };
