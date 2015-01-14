@@ -2,8 +2,11 @@ box: wercker/nodejs
 build:
     steps:
         - npm-install
+        - script:
+            name: Install harp globally
+            code: sudo npm install -g harp
         - grunt:
-            tasks: default
+            tasks: test:prepare
         - script:
             name: Run unit tests
             code: ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS
@@ -14,25 +17,19 @@ build:
             channel: general
 deploy:
     steps:
+        - npm-install
         - script:
-            name: Create lease on AWS
-            code: wget -O /dev/null https://ac.razorpay.com/invite/$concierge_token --quiet
-        - add-to-known_hosts:
-            hostname: checkout.razorpay.com
-        - mktemp:
-            envvar: PRIVATEKEY_PATH
-        - create-file:
-            name: write key
-            filename: $PRIVATEKEY_PATH
-            content: $AWS_deploykey
-            overwrite: true
-            hide-from-log: true
-        - script:
-            name: copy with rsync over ssh
-            code: >
-                rsync --archive --verbose --force --delete --progress --recursive
-                -e "ssh -i $PRIVATEKEY_PATH -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-                ./dist ubuntu@checkout.razorpay.com:/home/ubuntu/checkout/
+            name: Install harp globally
+            code: sudo npm install -g harp
+        - grunt:
+            tasks: build
+        - nhuray/aws-code-deploy:
+            key: $AWS_KEY
+            secret: $AWS_SECRET
+            region: $AWS_REGION
+            application-name: Checkout
+            deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
+            s3-bucket: checkout-deploy
     after-steps:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay

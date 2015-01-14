@@ -1,0 +1,44 @@
+.box-sizing(@sizing){
+  -webkit-box-sizing: @sizing;
+  -moz-box-sizing: @sizing;
+  box-sizing: @sizing;
+}
+.grad (@startColor: transparent, @endColor: #fff) {
+  background-color: @startColor;
+  background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+  background: -webkit-linear-gradient(top, @startColor, @endColor);
+  background: -moz-linear-gradient(top, @startColor, @endColor);
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@startColor),argb(@endColor)));
+}
+.transition (@transition) {
+  -webkit-transition: @transition;
+  -moz-transition: @transition;
+  transition: @transition;
+}
+.transform(@string){
+  -webkit-transform: @string;
+  -moz-transform: @string;
+  -ms-transform: @string;
+  transform: @string;
+}
+.scale(@args){
+  .transform(scale(@args));
+}
+.transition-transform(@args){
+  -webkit-transition: -webkit-transform @args;
+  -moz-transition: -moz-transform @args;
+  transition: transform @args;
+}
+.transform-origin(@args){
+  -webkit-transform-origin: @args;
+  -moz-transform-origin: @args;
+  -ms-transform-origin: @args;
+  transform-origin: @args;
+}
+.rzp-clear{
+  &:after{
+    content: '';
+    clear: both;
+    display: block;
+  }
+}

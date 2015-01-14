@@ -16,21 +16,18 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'dist/v1/checkout.js',
+      'app/assets/js/lib/jquery-1.11.1.js',
       'spec/jasmine-jquery.js',
-      'test/*.js'
+      'spec/fixtures/*',
+      'app/assets/js/lib/sendkeys.js',
+      'test/*.js',
+      '.tmp/checkout.built.js',
+      'app/dist/v1/css/checkout.css'
     ],
 
     // list of files to exclude
     exclude: [
     ],
-
-
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-        './src/js/*.js': ['jshint']
-    },
 
 
     // test results reporter to use
@@ -53,12 +50,12 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    // autoWatch: true,
 
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS','Chrome'],
+    browsers: ['PhantomJS', 'Chrome'],
 
 
     // Continuous Integration mode

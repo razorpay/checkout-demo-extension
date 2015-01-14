@@ -1,0 +1,17 @@
+window.Razorpay = function(options){
+  if(typeof this.configure == 'function')
+    this.configure(options);
+};
+(function(){
+  var exports = null;
+  var module = { exports: null };
+
+  // jquery
+  <%- include jquery-1.11.1.js %>
+  Razorpay.$ = module.exports;
+
+  // doT
+  <%- include doT.js %>
+  Razorpay.doT = module.exports;
+  Razorpay.templates = {};
+})();
