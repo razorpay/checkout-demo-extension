@@ -154,7 +154,7 @@
 
     this.options['prefill'] = {};
     for(var i in defaults['prefill']){
-      if(typeof overrides['prefill'][i] === 'undefined'){
+      if(typeof overrides['prefill'] === 'undefined' || typeof overrides['prefill'][i] === 'undefined'){
         this.options['prefill'][i] = defaults['prefill'][i];
       }
       else {
