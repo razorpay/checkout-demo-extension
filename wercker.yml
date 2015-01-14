@@ -29,7 +29,7 @@ deploy:
             region: $AWS_REGION
             application-name: Checkout
             deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
-            s3-bucket: checkout-deploy
+            s3-bucket: rzp-codedeploy
     after-steps:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
