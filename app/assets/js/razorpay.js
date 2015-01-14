@@ -15,7 +15,7 @@
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
     key: '',
-    handler: function(){},
+    handler: '',
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     netbanking: true,
