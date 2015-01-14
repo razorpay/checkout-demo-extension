@@ -80,6 +80,13 @@ describe("Checkout init", function(){
 
   it("should insert checkout styles into dom", function(){
     expect($('link[href*="checkout.css"]')[0]).toBeInDOM()
+  });
+
+  it("should set handler as empty string if not passed", function(){
+    var local = $.extend({}, custom);
+    delete local.handler;
+    var co = new Razorpay(local);
+    expect(co.options.handler).toBe('');
   })
 
 });
