@@ -54,6 +54,10 @@
     XD.receiveMessage();
   };
 
+  /**
+   * Handles success callback of ajax request
+   * This is where different actions are taken for CC/3DS/NB
+   */
   discreet.success = function(req){
     var request = req || {};
     if(!(request.parent instanceof $)){
@@ -86,7 +90,7 @@
         request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
         return;
       }
-      else if (response.status) {
+      else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
           request.success(response);
         }
