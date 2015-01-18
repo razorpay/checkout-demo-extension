@@ -191,9 +191,9 @@ describe("Razorpay open cc page", function(){
   beforeEach(function(){
     co = new Razorpay(coData.options);
     co.open();
-    $name    = $('#rzp-tabs-cc .rzp-input[name="card[name]"]');
-    $email   = $('#rzp-tabs-cc .rzp-input[name="email"]');
-    $contact = $('#rzp-tabs-cc .rzp-input[name="contact"]');
+    $name    = $('.rzp-input[name="card[name]"]');
+    $email   = $('.rzp-input[name="email"]');
+    $contact = $('.rzp-input[name="contact"]');
   });
 
   afterEach(function(){
@@ -238,13 +238,13 @@ describe("Razorpay open cc and submit method", function(){
   function launch(){
     co = new Razorpay(customOptions);
     co.open();
-    $ccNumber    = $('#rzp-tabs-cc .rzp-input[name="card[number]"]');
-    $ccExpiry    = $('#rzp-tabs-cc .rzp-input[name="card[expiry]"]');
-    $ccCVV       = $('#rzp-tabs-cc .rzp-input[name="card[cvv]"]');
-    $name        = $('#rzp-tabs-cc .rzp-input[name="card[name]"]');
-    $email       = $('#rzp-tabs-cc .rzp-input[name="email"]');
-    $contact     = $('#rzp-tabs-cc .rzp-input[name="contact"]');
-    $ccSubmit    = $('#rzp-tabs-cc .rzp-submit');
+    $ccNumber    = $('.rzp-input[name="card[number]"]');
+    $ccExpiry    = $('.rzp-input[name="card[expiry]"]');
+    $ccCVV       = $('.rzp-input[name="card[cvv]"]');
+    $name        = $('.rzp-input[name="card[name]"]');
+    $email       = $('.rzp-input[name="email"]');
+    $contact     = $('.rzp-input[name="contact"]');
+    $ccSubmit    = $('.rzp-submit');
   }
 
   function addAllCC(){
@@ -345,20 +345,13 @@ describe("Razorpay open cc and submit method", function(){
 describe("Razorpay open netbanking page", function(){
   var co;
   var $email, $contact;
-  var $nbLink, $nbSubmit;
 
   beforeEach(function(){
     co = new Razorpay(coData.options);
     co.open();
-    $email    = $('#rzp-tabs-nb .rzp-input[name="email"]');
-    $contact  = $('#rzp-tabs-nb .rzp-input[name="contact"]');
-    $nbSubmit = $('#rzp-tabs-nb .rzp-submit');
-
     // using Razorpay.$ due to some bug in phantomjs
     // The bug turns up when there are two jquery involved
-    $nbLink = Razorpay.$('.rzp-tabs li[data-target="rzp-tabs-nb"]');
-
-    $nbLink.click();
+    Razorpay.$('.rzp-tabs li[data-target="rzp-tab-nb"]').click();
   });
 
   afterEach(function(){
@@ -366,91 +359,77 @@ describe("Razorpay open netbanking page", function(){
   })
 
   it("should show netbanking form on clicking", function(){
-    expect($nbSubmit).toBeVisible();
+    expect($('#rzp-tab-nb').hasClass('rzp-active')).toBe(true);
+    expect($('#rzp-tab-cc').hasClass('rzp-active')).toBe(false);
   });
 
-  it("should prefill email", function(){
-    expect($email.val()).toBe(coData.options.prefill.email);
-  });
+  describe("and submit method", function(){
+    var spyCalled;
+    var spyNotCalled;
+    var $email, $contact;
+    var $nbLink, $nbBank;
+    var $nbSubmit;
+    var customOptions;
 
-  it("should prefill contact number", function(){
-    expect($contact.val()).toBe(coData.options.prefill.contact);
-  });
-});
+    beforeEach(function(){
+      spyCalled    = jasmine.createSpy();
+      spyNotCalled = jasmine.createSpy();
 
-describe("and submit method", function(){
-  var co;
-  var spyCalled;
-  var spyNotCalled;
-  var $email, $contact;
-  var $nbLink, $nbBank;
-  var $nbSubmit;
-  var customOptions;
+      customOptions = $.extend(true, {}, coData.options);
+    });
 
-  beforeEach(function(){
-    spyCalled    = jasmine.createSpy();
-    spyNotCalled = jasmine.createSpy();
+    function launch(){
+      $email       = $('.rzp-input[name="email"]');
+      $contact     = $('.rzp-input[name="contact"]');
+      $nbBank      = $('select[name="bank"]');
+      $nbSubmit    = $('.rzp-submit');
+    }
 
-    customOptions = $.extend(true, {}, coData.options);
-  });
+    afterEach(function(){
+      // sendkeys needs little delay
+      $nbSubmit.click();
+      expect(spyCalled).toHaveBeenCalled();
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      $('.rzp-container').remove();
+    })
 
-  function launch(){
-    co = new Razorpay(customOptions);
-    co.open();
-    $email       = $('#rzp-tabs-nb .rzp-input[name="email"]');
-    $contact     = $('#rzp-tabs-nb .rzp-input[name="contact"]');
-    $nbBank      = $('#rzp-tabs-nb select[name="bank"]');
-    $nbSubmit    = $('#rzp-tabs-nb .rzp-submit');
+    it("should submit with all details in place", function(){
+      launch();
+      $nbBank.val('SBIN');
 
-    // using Razorpay.$ due to some bug in phantomjs
-    // The bug turns up when there are two jquery involved
-    $nbLink = Razorpay.$('.rzp-tabs li[data-target="rzp-tabs-nb"]');
-  }
+      spyOn(co, 'submit').and.callFake(function(){
+        spyCalled();
+      });
+    });
 
-  afterEach(function(){
-    // sendkeys needs little delay
-    $nbSubmit.click();
-    expect(spyCalled).toHaveBeenCalled();
-    expect(spyNotCalled).not.toHaveBeenCalled();
-    $('.rzp-container').remove();
-  })
+   it("should not submit without bank selected", function(){
+     launch();
+     spyCalled();
+     spyOn(co, 'submit').and.callFake(function(){
+       spyNotCalled();
+     });
+   });
 
-  it("should submit with all details in place", function(){
-    launch();
-    $nbSubmit.val('SBIN');
+    it("should not submit without email", function(){
+      launch();
+      $nbBank.val('SBIN');
+      $email.val('');
 
-    spyOn(co, 'submit').and.callFake(function(){
       spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
     });
-  });
 
-  // This is failing right now
-  // Waiting for pronav to merge before fixing
-//  it("should not submit without bank selected", function(){
-//    launch();
-//    spyCalled();
-//    spyOn(co, 'submit').and.callFake(function(){
-//      spyNotCalled();
-//    });
-//  });
+    it("should not submit without contact", function(){
+      launch();
+      $nbBank.val('SBIN');
+      $contact.val('');
 
-  it("should not submit without email", function(){
-    delete customOptions.prefill.email;
-    launch();
-
-    spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  it("should not submit without contact", function(){
-    delete customOptions.prefill.contact;
-    launch();
-
-    spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
-      spyNotCalled();
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
     });
   });
 });

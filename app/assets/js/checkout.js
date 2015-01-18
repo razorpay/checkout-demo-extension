@@ -15,7 +15,7 @@
     }, 150);
   };
 
-  discreet.getFormData = function(form) {
+  discreet.getFormData = function(form, netbanking) {
     var data, expiry;
     data = {};
     form.find('[name]').each(function(index, el) {
@@ -24,12 +24,21 @@
       }
     });
 
-    if (!form.find('select[name=bank]').length) {
-      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-      expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
-      data['card[expiry_month]'] = expiry[0];
-      data['card[expiry_year]'] = expiry[1];
-      delete data['card[expiry]'];
+    if(netbanking){
+      if(form.find('.rzp-tabs .rzp-active').data('target') == 'rzp-tab-cc'){
+        delete data.bank;
+        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+        expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+        data['card[expiry_month]'] = expiry[0];
+        data['card[expiry_year]'] = expiry[1];
+        delete data['card[expiry]'];
+      } else {
+        delete data['card[name]'];
+        delete data['card[number]'];
+        delete data['card[cvv]'];
+        delete data['card[expiry]'];
+        data.method = 'netbanking'
+      }
     }
 
     return data;
@@ -37,12 +46,15 @@
 
   Razorpay.prototype.open = function(){
     if(this.modal){
-      return this.modal.show();
+      this.modal.show();
+      return;
     }
 
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
     this.modal = new Modal(this.$el);
+    this.renew();
+    
     this.$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
       parent = $(this.parentNode.parentNode);
@@ -63,15 +75,22 @@
         if (!inner.length) {
           return;
         }
+        var form = inner.find('.rzp-form')
         modal = inner.parent();
-        modal.height(inner.height());
-        inner.css('opacity', 0.5);
-        inner.find('#' + this.getAttribute('data-target')).addClass('active').siblings('.active').removeClass('active');
-        $(this).addClass('active').siblings('.active').removeClass('active');
-        modal.height(inner.height());
-        return setTimeout(function() {
-          return inner.css('opacity', 1);
-        }, 150);
+        var change_modal_height = true// !this.modal.curtainMode;
+        if(change_modal_height){
+          modal.height(inner.height());
+          form.css('opacity', 0.5);
+        }
+        inner.find('#' + this.getAttribute('data-target')).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
+        $(this).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
+        if(change_modal_height){
+          modal.height(inner.height());
+          setTimeout(function(){
+            form.css('opacity', 1);
+            modal.height('');
+          }, 250);
+        }
       });
     }
 
@@ -80,7 +99,9 @@
       e.preventDefault();
       var form, invalid;
       form = $(e.currentTarget);
-      invalid = form.find('.rzp-invalid');
+      self.$el.smarty('refresh');
+      form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
+      invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
       var modal = form.closest('.rzp-modal');
       if (invalid.length) {
         invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
@@ -88,7 +109,7 @@
         return;
       }
       self.submit({
-        data: discreet.getFormData(form),
+        data: discreet.getFormData(form, self.options.netbanking),
         failure: discreet.failureHandler(self),
         success: discreet.successHandler(self),
         prehandler: discreet.preHandler(self),
@@ -218,7 +239,6 @@
   discreet.addButton = function(rzp){
     var button = document.createElement("button");
     button.setAttribute("id", "rzp-button");
-    // TODO append should not be in body;
     $(button).click(function(e) {
       rzp.open();
       e.preventDefault();
