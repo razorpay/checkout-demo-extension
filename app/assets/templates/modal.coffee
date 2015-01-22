@@ -32,11 +32,6 @@ Razorpay.templates.modal = '
             <input class="rzp-input" type="hidden" name="card[expiry_year]">
 
             <div class="rzp-fieldset">
-              <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0">
-                <div class="rzp-elem-inner">
-                  <input class="rzp-input" name="card[name]" placeholder="Name" required value="{{=it.prefill.name}}" pattern=".{1,100}">
-                </div>
-              </div>
               <div class="rzp-elem rzp-elem-email">
                 <div class="rzp-elem-inner">
                   <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$">
@@ -73,6 +68,11 @@ Razorpay.templates.modal = '
             </div>
           {{}}}
           <div class="rzp-fieldset rzp-tab-content rzp-active" id="rzp-tab-cc">
+            <div class="rzp-elem rzp-elem-name" style="border-radius: 4px 4px 0 0">
+              <div class="rzp-elem-inner">
+                <input class="rzp-input" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}" pattern=".{1,100}">
+              </div>
+            </div>
             <div class="rzp-elem rzp-elem-card" style="border-radius: 4px 4px 0 0">
               <div class="rzp-elem-inner">
                 <input class="rzp-input" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
