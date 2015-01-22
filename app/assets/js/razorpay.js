@@ -15,7 +15,7 @@
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
     key: '',
-    handler: function(){},
+    handler: '',
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     netbanking: true,
@@ -55,6 +55,10 @@
     XD.receiveMessage();
   };
 
+  /**
+   * Handles success callback of ajax request
+   * This is where different actions are taken for CC/3DS/NB
+   */
   discreet.success = function(req){
     var request = req || {};
     if(!(request.parent instanceof $)){
@@ -90,7 +94,7 @@
         request.popup.location(response.redirectUrl);
         return;
       }
-      else if (response.status) {
+      else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
           request.success(response);
         }
@@ -152,10 +156,24 @@
     this.options = this.options || {};
 
     for (var i in defaults){
-      if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
+      if(i === 'prefill'){
+        continue;
+      }
+      else if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
         this.options[i] = defaults[i];
-      } else{
+      }
+      else {
         this.options[i] = overrides[i];
+      }
+    }
+
+    this.options['prefill'] = {};
+    for(var i in defaults['prefill']){
+      if(typeof overrides['prefill'] === 'undefined' || typeof overrides['prefill'][i] === 'undefined'){
+        this.options['prefill'][i] = defaults['prefill'][i];
+      }
+      else {
+        this.options['prefill'][i] = overrides['prefill'][i];
       }
     }
   };
@@ -200,11 +218,18 @@
       });
     }
 
-    if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
-      errors.push({
-        message: "You can only pass at most 15 fields in the notes object",
-        field: "notes"
-      });
+    if (typeof options.notes === 'object'){
+      // Object.keys unsupported in old browsers
+      var notesCount = 0
+      for(var note in options.notes){
+        notesCount++
+      }
+      if(notesCount > 15) {
+        errors.push({
+          message: "You can only pass at most 15 fields in the notes object",
+          field: "notes"
+        });
+      }
     }
 
     if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {

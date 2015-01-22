@@ -6,6 +6,8 @@
   defaults = {
     shownClass: 'rzp-shown',
     modalSelector: '.rzp-modal',
+    curtainClass: 'rzp-curtain', //curtain (fullscreen) mode
+    closeButton: '.rzp-modal-close',
     show: true,
     escape: true,
     animation: true,
@@ -19,6 +21,10 @@
     var duration, durationStyle;
     this.options = $.extend(defaults, options);
     this.element = element;
+    if (window.screen && (screen.width <= 480 || screen.height <= 480)){
+      this.element.addClass(this.options.curtainClass)
+      this.curtainMode = true
+    }
     if (!this.element.attr('tabIndex')) {
       this.element.attr('tabIndex', '0');
     }
@@ -51,13 +57,15 @@
 
     transitionProperty: (function() {
       var prop;
-      prop = '';
-      ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
-        if (typeof document.head.style[i] === 'string') {
-          prop = i + 'Duration';
-          return true;
-        }
-      });
+      if(Array.prototype.some){
+        prop = '';
+        ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
+          if (typeof document.head.style[i] === 'string') {
+            prop = i + 'Duration';
+            return true;
+          }
+        });
+      }
       return prop;
     })(),
 
@@ -126,8 +134,12 @@
     },
 
     bind_events: function() {
-      if(window.addEventListener)
+      if (window.addEventListener)
         this.element[0].addEventListener('blur', this.steal_focus, true);
+      
+      if (this.curtainMode){
+        this.on('click', this.element.find(this.options.closeButton), this.hide)
+      }
       
       if (this.options.stopKeyPropagation) {
         this.on('keyup keydown keypress', this.element, (function(_this) {
