@@ -22,6 +22,7 @@ Razorpay.templates.modal = '
           <div class="rzp-form-common">
             <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
             <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
+            <input class="rzp-input" type="hidden" name="description" value="{{=it.description}}">
             {{for(udfkey in it.udf){}}
               <!-- udf fields provided by merchant -->
               <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
