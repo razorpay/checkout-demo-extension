@@ -11,6 +11,8 @@
   *     });
   */
 
+  var $ = root.$;
+
   /**
   * Default Popup options.
   */
@@ -83,11 +85,24 @@
     this.window = window.open(src, name, optsStr);
     this.focus();
 
-    this.$el = root.$(this.window.document.body);
+    this.$el = $(this.window.document.body);
+
+    var that = this;
+
+    $(window).on('beforeunload', this.beforeunload);
+    $(window).on('unload', this.unload);
+  }
+
+  Popup.prototype.beforeunload = function(e){
+    return "Transaction isn't complete yet.";
+  }
+
+  Popup.prototype.unload = function(e){
+    this.close();
   }
 
   Popup.prototype.$ = function (query) {
-    return root.$(this.window.document).find(query);
+    return $(this.window.document).find(query);
   }
 
   /**
@@ -96,6 +111,8 @@
 
   Popup.prototype.close = function () {
     this.window.close();
+    $(window).on('beforeunload', function(){});
+    $(window).off('beforeunload');
   }
 
   Popup.prototype.location = function (location) {
