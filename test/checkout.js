@@ -24,7 +24,9 @@ var coData = {
   cc: {
     number: '4012001037141112',
     expiry: '05 / 19',
-    cvv: '888'
+    cvv: '888',
+    expiry_month: '05',
+    expiry_year: '19'
   }
 }
 
@@ -349,6 +351,7 @@ describe("Razorpay open netbanking page", function(){
   beforeEach(function(){
     co = new Razorpay(coData.options);
     co.open();
+
     // using Razorpay.$ due to some bug in phantomjs
     // The bug turns up when there are two jquery involved
     Razorpay.$('.rzp-tabs li[data-target="rzp-tab-nb"]').click();
@@ -369,13 +372,10 @@ describe("Razorpay open netbanking page", function(){
     var $email, $contact;
     var $nbLink, $nbBank;
     var $nbSubmit;
-    var customOptions;
 
     beforeEach(function(){
       spyCalled    = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
-
-      customOptions = $.extend(true, {}, coData.options);
     });
 
     function launch(){
@@ -432,4 +432,134 @@ describe("Razorpay open netbanking page", function(){
       });
     });
   });
+
+  describe("and getFormData method", function(){
+    var data;
+
+    beforeEach(function(){
+      var $nbBank = $('select[name="bank"]');
+      $nbBank.val('SBIN');
+      data = discreet.getFormData($('.rzp-modal form'), true);
+    });
+
+    it("should return description", function(){
+      expect(data.description).toBe(coData.options.description);
+    });
+
+    it("should return amount", function(){
+      expect(data.amount).toBe(coData.options.amount);
+    });
+
+    it("should return currency", function(){
+      expect(data.currency).toBe('INR');
+    });
+
+    it("should return contact", function(){
+      expect(data.contact).toBe(coData.options.prefill.contact);
+    });
+
+    it("should return email", function(){
+      expect(data.email).toBe(coData.options.prefill.email);
+    });
+
+    it("should not return name", function(){
+      expect(data['card[name]']).toBeUndefined();
+    });
+
+    it("should not return card number", function(){
+      expect(data['card[number]']).toBeUndefined();
+    });
+
+    it("should not return card expiry month", function(){
+      expect(data['card[expiry_month]']).toBeUndefined();
+    });
+
+    it("should not return card expiry year", function(){
+      expect(data['card[expiry_year]']).toBeUndefined();
+    });
+
+    it("should not return card cvv", function(){
+      expect(data['card[cvv]']).toBeUndefined();
+    });
+
+    it("should return bank", function(){
+      expect(data.bank).toBe('SBIN');
+    });
+  })
 });
+
+/**
+ * While there are tests on submit method and fields,
+ * those tests only test if submit can be called without those fields set by user.
+ * The following tests test the function that extracts data from the form
+ */
+describe("Checkout getFormData", function(){
+  var co, data;
+  var $ccNumber, $ccExpiry, $ccCVV;
+
+  function addAllCC(){
+    $ccNumber.sendkeys(coData.cc.number);
+    $ccExpiry.sendkeys(coData.cc.expiry);
+    $ccCVV.sendkeys(coData.cc.cvv);
+  }
+
+  beforeEach(function(done){
+    co = new Razorpay(coData.options);
+    co.open();
+
+    $ccNumber    = $('.rzp-input[name="card[number]"]');
+    $ccExpiry    = $('.rzp-input[name="card[expiry]"]');
+    $ccCVV       = $('.rzp-input[name="card[cvv]"]');
+
+    addAllCC();
+
+    setTimeout(function(){
+      data = discreet.getFormData($('.rzp-modal form'), true);
+      done();
+    }, 100);
+  });
+
+  it("should return description", function(){
+    expect(data.description).toBe(coData.options.description);
+  });
+
+  it("should return amount", function(){
+    expect(data.amount).toBe(coData.options.amount);
+  });
+
+  it("should return currency", function(){
+    expect(data.currency).toBe('INR');
+  });
+
+  it("should return contact", function(){
+    expect(data.contact).toBe(coData.options.prefill.contact);
+  });
+
+  it("should return email", function(){
+    expect(data.email).toBe(coData.options.prefill.email);
+  });
+
+  it("should return name", function(){
+    expect(data['card[name]']).toBe(coData.options.prefill.name);
+  });
+
+  it("should return card number", function(){
+    expect(data['card[number]']).toBe(coData.cc.number);
+  });
+
+  it("should return card expiry month", function(){
+    expect(data['card[expiry_month]']).toBe(coData.cc.expiry_month);
+  });
+
+  it("should return card expiry year", function(){
+    expect(data['card[expiry_year]']).toBe(coData.cc.expiry_year);
+  });
+
+  it("should return card cvv", function(){
+    expect(data['card[cvv]']).toBe(coData.cc.cvv);
+  });
+
+  it("should not return bank", function(){
+    expect(data.bank).toBeUndefined();
+  });
+})
