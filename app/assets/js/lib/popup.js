@@ -122,6 +122,7 @@
 
   Popup.prototype.close = function () {
     this.window.close();
+    clearInterval(this.interval);
     $(window).off('beforeunload');
     $(window).off('unload');
   }
