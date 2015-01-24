@@ -87,6 +87,8 @@
 
     this.$el = $(this.window.document.body);
 
+    this.interval = setInterval(checkClose(this), 500);
+
     var that = this;
 
     /**
@@ -134,6 +136,30 @@
 
   Popup.prototype.focus = function () {
     this.window.focus();
+  }
+
+  Popup.prototype.onClose = function(cb){
+    this.closeCB = cb;
+  }
+
+  /**
+  * Emits the "close" event.
+  */
+
+  Popup.prototype._checkClose = function () {
+    if (this.window.closed) {
+      if(typeof this.closeCB === 'function'){
+        this.closeCB();
+      }
+      this.close();
+      clearInterval(this.interval);
+    }
+  }
+
+  function checkClose (popup) {
+    return function () {
+      popup._checkClose();
+    }
   }
 
   return root.Popup = Popup;
