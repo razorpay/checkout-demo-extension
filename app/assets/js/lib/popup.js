@@ -89,8 +89,17 @@
 
     var that = this;
 
-    $(window).on('beforeunload', this.beforeunload);
-    $(window).on('unload', this.unload);
+    /**
+     * Could have used
+     *  $(window).on('unload', this.unload)
+     * but it isn't working for some reason in Chrome.
+     */
+    $(window).on('unload', function(){
+      that.unload();
+    });
+    $(window).on('beforeunload', function(){
+      return that.beforeunload();
+    });
   }
 
   Popup.prototype.beforeunload = function(e){
@@ -111,8 +120,8 @@
 
   Popup.prototype.close = function () {
     this.window.close();
-    $(window).on('beforeunload', function(){});
     $(window).off('beforeunload');
+    $(window).off('unload');
   }
 
   Popup.prototype.location = function (location) {
