@@ -76,6 +76,7 @@
     show: function() {
       $(document.body).css('overflow', 'hidden');
       this.isShown = true;
+      this.setViewport();
       this.bind_events();
       this.element.show().get(0).focus();
       this.element.children(this.options.modalSelector).css('display', 'inline-block');
@@ -84,6 +85,24 @@
       this.element.addClass(this.options.shownClass);
       this.clearTimeout();
       return timeout = setTimeout($.proxy(this.shown, this), this.animationDuration);
+    },
+
+    setViewport: function(){
+      if($('meta[name="viewport"]').length !== 0){
+        this.originalViewport = $('meta[name="viewport"]');
+        $('meta[name="viewport"]').remove();
+      }
+
+      if($('meta.rzp-viewport').length === 0){
+        $('head').append('<meta name="viewport" class="rzp-viewport" content="width=device-width, initial-scale=1">')
+      }
+    },
+
+    removeViewport: function(){
+      $('head meta.rzp-viewport').remove();
+      if(typeof this.originalViewport !== 'undefined'){
+        $('head').append(this.originalViewport);
+      }
     },
 
     shown: function() {
@@ -95,6 +114,7 @@
         return;
       }
       this.isShown = false;
+      this.removeViewport();
       this.element.removeClass(this.options.shownClass);
       this.listeners.forEach(function(l) {
         return l[0].off(l[1], l[2]);
