@@ -115,6 +115,7 @@
 
   discreet.setupPopup = function(request){
     request.popup = new Razorpay.Popup('');
+    window.popup = request.popup;
   }
 
   /**

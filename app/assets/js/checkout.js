@@ -108,13 +108,14 @@
         discreet.shake(modal);
         return;
       }
-      self.submit({
+      self.request = {
         data: discreet.getFormData(form, self.options.netbanking),
         failure: discreet.failureHandler(self),
         success: discreet.successHandler(self),
         prehandler: discreet.preHandler(self),
         parent: modal
-      });
+      };
+      self.submit(self.request);
       self.$el.find('.rzp-submit').attr('disabled', true);
       self.modal.options.backdropClose = false;
     });
@@ -160,7 +161,9 @@
 
   discreet.preHandler = function(rzp){
     return function(){
-      rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove();
+      if(rzp.request.data.method !== 'netbanking'){
+        rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove();
+      }
     };
   };
   discreet.successHandler = function(rzp){
