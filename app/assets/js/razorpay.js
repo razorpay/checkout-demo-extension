@@ -114,8 +114,16 @@
   };
 
   discreet.setupPopup = function(request){
-    request.popup = new Razorpay.Popup('');
-    window.popup = request.popup;
+    var popup = request.popup = new Razorpay.Popup('');
+    popup.onClose(discreet.popupClose);
+  }
+
+  discreet.popupClose = function(){
+    lastRequestInstance.failure({
+      error: {
+        description: 'Payment cancelled'
+      }
+    });
   }
 
   /**
