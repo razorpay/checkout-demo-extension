@@ -71,7 +71,7 @@
 
     return function(response){
       if (response['http_status_code'] !== 200 && response.error){
-        if(typeof request.popup !== undefined){
+        if(typeof request.popup !== 'undefined'){
           request.popup.close();
         }
         if(typeof request.failure === 'function'){
