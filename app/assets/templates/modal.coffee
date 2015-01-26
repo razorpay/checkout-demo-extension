@@ -54,13 +54,11 @@ Razorpay.templates.modal = '
                 <div class="rzp-elem-inner">
                   <select name="bank" required class="rzp-input">
                     <option value="">Select Bank</option>
-                    <option value="ALLA">Allahabad Bank</option>
                     <option value="CITI">Citi Bank</option>
                     <option value="HDFC">HDFC Bank</option>
                     <option value="IBKL">IDBI Bank</option>
                     <option value="ICIC">ICICI Bank</option>
                     <option value="KKBK">Kotak Mahindra Bank</option>
-                    <option value="PUNB">Punjab National Bank</option>
                     <option value="SBIN">State Bank of India</option>
                   </select>
                 </div>
