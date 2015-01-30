@@ -1,5 +1,5 @@
 (function(){
-  var script = document.currentScript;
+  var script = document.currentScript || {src: ''};
   var src = script.src;
 
   var _rollbarConfig = {
