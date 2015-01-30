@@ -315,7 +315,7 @@
         return true;
       }
       else {
-        false;
+        return false;
       }
     },
 
@@ -323,7 +323,6 @@
       if(discreet.Rollbar._check() === false){
         return;
       }
-      console.log('starting Rollbar')
       discreet.Rollbar.state = true;
       Rollbar.configure({enabled: true});
     },
@@ -332,7 +331,6 @@
       if(discreet.Rollbar._check() === false){
         return;
       }
-      console.log('stopping Rollbar')
       discreet.Rollbar.state = false;
       Rollbar.configure({enabled: false})
     }
