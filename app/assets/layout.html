@@ -2,8 +2,10 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- build:js razorpay.js -->
   <script type="text/javascript" src="js/lib/init.html"></script>
+  <script type="text/javascript" src="js/lib/rollbar.js"></script>
   <script type="text/javascript" src="js/lib/xdm.js"></script>
   <script type="text/javascript" src="templates/modal.js"></script>
   <script type="text/javascript" src="templates/autosubmit.js"></script>
@@ -16,6 +18,7 @@
   <script type="text/javascript" src="templates/modal.js"></script>
   <script type="text/javascript" src="templates/autosubmit.js"></script>
   <script type="text/javascript" src="js/lib/jquery.payment.js"></script>
+  <script type="text/javascript" src="js/lib/popup.js"></script>
   <script type="text/javascript" src="js/razorpay.js"></script>
   <script type="text/javascript" src="js/lib/input.js"></script>
   <script type="text/javascript" src="js/lib/modal.js"></script>
@@ -52,8 +55,8 @@
       notes: {
         'address': 'Hello World'
       },
-      protocol: 'http',
-      hostname: 'api.razorpay.dev'
+      protocol: 'https',
+      hostname: 'api.razorpay.com'
     }
     var rzp1 = new Razorpay(options);
 

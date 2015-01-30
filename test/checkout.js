@@ -24,7 +24,9 @@ var coData = {
   cc: {
     number: '4012001037141112',
     expiry: '05 / 19',
-    cvv: '888'
+    cvv: '888',
+    expiry_month: '05',
+    expiry_year: '19'
   }
 }
 
@@ -80,6 +82,13 @@ describe("Checkout init", function(){
 
   it("should insert checkout styles into dom", function(){
     expect($('link[href*="checkout.css"]')[0]).toBeInDOM()
+  });
+
+  it("should set handler as empty string if not passed", function(){
+    var local = $.extend({}, custom);
+    delete local.handler;
+    var co = new Razorpay(local);
+    expect(co.options.handler).toBe('');
   })
 
 });
@@ -184,9 +193,9 @@ describe("Razorpay open cc page", function(){
   beforeEach(function(){
     co = new Razorpay(coData.options);
     co.open();
-    $name    = $('#rzp-tabs-cc .rzp-input[name="card[name]"]');
-    $email   = $('#rzp-tabs-cc .rzp-input[name="email"]');
-    $contact = $('#rzp-tabs-cc .rzp-input[name="contact"]');
+    $name    = $('.rzp-input[name="card[name]"]');
+    $email   = $('.rzp-input[name="email"]');
+    $contact = $('.rzp-input[name="contact"]');
   });
 
   afterEach(function(){
@@ -231,13 +240,13 @@ describe("Razorpay open cc and submit method", function(){
   function launch(){
     co = new Razorpay(customOptions);
     co.open();
-    $ccNumber    = $('#rzp-tabs-cc .rzp-input[name="card[number]"]');
-    $ccExpiry    = $('#rzp-tabs-cc .rzp-input[name="card[expiry]"]');
-    $ccCVV       = $('#rzp-tabs-cc .rzp-input[name="card[cvv]"]');
-    $name        = $('#rzp-tabs-cc .rzp-input[name="card[name]"]');
-    $email       = $('#rzp-tabs-cc .rzp-input[name="email"]');
-    $contact     = $('#rzp-tabs-cc .rzp-input[name="contact"]');
-    $ccSubmit    = $('#rzp-tabs-cc .rzp-submit');
+    $ccNumber    = $('.rzp-input[name="card[number]"]');
+    $ccExpiry    = $('.rzp-input[name="card[expiry]"]');
+    $ccCVV       = $('.rzp-input[name="card[cvv]"]');
+    $name        = $('.rzp-input[name="card[name]"]');
+    $email       = $('.rzp-input[name="email"]');
+    $contact     = $('.rzp-input[name="contact"]');
+    $ccSubmit    = $('.rzp-submit');
   }
 
   function addAllCC(){
@@ -338,20 +347,14 @@ describe("Razorpay open cc and submit method", function(){
 describe("Razorpay open netbanking page", function(){
   var co;
   var $email, $contact;
-  var $nbLink, $nbSubmit;
 
   beforeEach(function(){
     co = new Razorpay(coData.options);
     co.open();
-    $email    = $('#rzp-tabs-nb .rzp-input[name="email"]');
-    $contact  = $('#rzp-tabs-nb .rzp-input[name="contact"]');
-    $nbSubmit = $('#rzp-tabs-nb .rzp-submit');
 
     // using Razorpay.$ due to some bug in phantomjs
     // The bug turns up when there are two jquery involved
-    $nbLink = Razorpay.$('.rzp-tabs li[data-target="rzp-tabs-nb"]');
-
-    $nbLink.click();
+    Razorpay.$('.rzp-tabs li[data-target="rzp-tab-nb"]').click();
   });
 
   afterEach(function(){
@@ -359,91 +362,204 @@ describe("Razorpay open netbanking page", function(){
   })
 
   it("should show netbanking form on clicking", function(){
-    expect($nbSubmit).toBeVisible();
+    expect($('#rzp-tab-nb').hasClass('rzp-active')).toBe(true);
+    expect($('#rzp-tab-cc').hasClass('rzp-active')).toBe(false);
   });
 
-  it("should prefill email", function(){
-    expect($email.val()).toBe(coData.options.prefill.email);
+  describe("and submit method", function(){
+    var spyCalled;
+    var spyNotCalled;
+    var $email, $contact;
+    var $nbLink, $nbBank;
+    var $nbSubmit;
+
+    beforeEach(function(){
+      spyCalled    = jasmine.createSpy();
+      spyNotCalled = jasmine.createSpy();
+    });
+
+    function launch(){
+      $email       = $('.rzp-input[name="email"]');
+      $contact     = $('.rzp-input[name="contact"]');
+      $nbBank      = $('select[name="bank"]');
+      $nbSubmit    = $('.rzp-submit');
+    }
+
+    afterEach(function(){
+      // sendkeys needs little delay
+      $nbSubmit.click();
+      expect(spyCalled).toHaveBeenCalled();
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      $('.rzp-container').remove();
+    })
+
+    it("should submit with all details in place", function(){
+      launch();
+      $nbBank.val('SBIN');
+
+      spyOn(co, 'submit').and.callFake(function(){
+        spyCalled();
+      });
+    });
+
+   it("should not submit without bank selected", function(){
+     launch();
+     spyCalled();
+     spyOn(co, 'submit').and.callFake(function(){
+       spyNotCalled();
+     });
+   });
+
+    it("should not submit without email", function(){
+      launch();
+      $nbBank.val('SBIN');
+      $email.val('');
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit without contact", function(){
+      launch();
+      $nbBank.val('SBIN');
+      $contact.val('');
+
+      spyCalled();
+      spyOn(co, 'submit').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
   });
 
-  it("should prefill contact number", function(){
-    expect($contact.val()).toBe(coData.options.prefill.contact);
-  });
+  describe("and getFormData method", function(){
+    var data;
+
+    beforeEach(function(){
+      var $nbBank = $('select[name="bank"]');
+      $nbBank.val('SBIN');
+      data = discreet.getFormData($('.rzp-modal form'), true);
+    });
+
+    it("should return description", function(){
+      expect(data.description).toBe(coData.options.description);
+    });
+
+    it("should return amount", function(){
+      expect(data.amount).toBe(coData.options.amount);
+    });
+
+    it("should return currency", function(){
+      expect(data.currency).toBe('INR');
+    });
+
+    it("should return contact", function(){
+      expect(data.contact).toBe(coData.options.prefill.contact);
+    });
+
+    it("should return email", function(){
+      expect(data.email).toBe(coData.options.prefill.email);
+    });
+
+    it("should not return name", function(){
+      expect(data['card[name]']).toBeUndefined();
+    });
+
+    it("should not return card number", function(){
+      expect(data['card[number]']).toBeUndefined();
+    });
+
+    it("should not return card expiry month", function(){
+      expect(data['card[expiry_month]']).toBeUndefined();
+    });
+
+    it("should not return card expiry year", function(){
+      expect(data['card[expiry_year]']).toBeUndefined();
+    });
+
+    it("should not return card cvv", function(){
+      expect(data['card[cvv]']).toBeUndefined();
+    });
+
+    it("should return bank", function(){
+      expect(data.bank).toBe('SBIN');
+    });
+  })
 });
 
-describe("and submit method", function(){
-  var co;
-  var spyCalled;
-  var spyNotCalled;
-  var $email, $contact;
-  var $nbLink, $nbBank;
-  var $nbSubmit;
-  var customOptions;
+/**
+ * While there are tests on submit method and fields,
+ * those tests only test if submit can be called without those fields set by user.
+ * The following tests test the function that extracts data from the form
+ */
+describe("Checkout getFormData", function(){
+  var co, data;
+  var $ccNumber, $ccExpiry, $ccCVV;
 
-  beforeEach(function(){
-    spyCalled    = jasmine.createSpy();
-    spyNotCalled = jasmine.createSpy();
-
-    customOptions = $.extend(true, {}, coData.options);
-  });
-
-  function launch(){
-    co = new Razorpay(customOptions);
-    co.open();
-    $email       = $('#rzp-tabs-nb .rzp-input[name="email"]');
-    $contact     = $('#rzp-tabs-nb .rzp-input[name="contact"]');
-    $nbBank      = $('#rzp-tabs-nb select[name="bank"]');
-    $nbSubmit    = $('#rzp-tabs-nb .rzp-submit');
-
-    // using Razorpay.$ due to some bug in phantomjs
-    // The bug turns up when there are two jquery involved
-    $nbLink = Razorpay.$('.rzp-tabs li[data-target="rzp-tabs-nb"]');
+  function addAllCC(){
+    $ccNumber.sendkeys(coData.cc.number);
+    $ccExpiry.sendkeys(coData.cc.expiry);
+    $ccCVV.sendkeys(coData.cc.cvv);
   }
 
-  afterEach(function(){
-    // sendkeys needs little delay
-    $nbSubmit.click();
-    expect(spyCalled).toHaveBeenCalled();
-    expect(spyNotCalled).not.toHaveBeenCalled();
-    $('.rzp-container').remove();
-  })
+  beforeEach(function(done){
+    co = new Razorpay(coData.options);
+    co.open();
 
-  it("should submit with all details in place", function(){
-    launch();
-    $nbSubmit.val('SBIN');
+    $ccNumber    = $('.rzp-input[name="card[number]"]');
+    $ccExpiry    = $('.rzp-input[name="card[expiry]"]');
+    $ccCVV       = $('.rzp-input[name="card[cvv]"]');
 
-    spyOn(co, 'submit').and.callFake(function(){
-      spyCalled();
-    });
+    addAllCC();
+
+    setTimeout(function(){
+      data = discreet.getFormData($('.rzp-modal form'), true);
+      done();
+    }, 100);
   });
 
-  // This is failing right now
-  // Waiting for pronav to merge before fixing
-//  it("should not submit without bank selected", function(){
-//    launch();
-//    spyCalled();
-//    spyOn(co, 'submit').and.callFake(function(){
-//      spyNotCalled();
-//    });
-//  });
-
-  it("should not submit without email", function(){
-    delete customOptions.prefill.email;
-    launch();
-
-    spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
-      spyNotCalled();
-    });
+  it("should return description", function(){
+    expect(data.description).toBe(coData.options.description);
   });
 
-  it("should not submit without contact", function(){
-    delete customOptions.prefill.contact;
-    launch();
-
-    spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
-      spyNotCalled();
-    });
+  it("should return amount", function(){
+    expect(data.amount).toBe(coData.options.amount);
   });
-});
+
+  it("should return currency", function(){
+    expect(data.currency).toBe('INR');
+  });
+
+  it("should return contact", function(){
+    expect(data.contact).toBe(coData.options.prefill.contact);
+  });
+
+  it("should return email", function(){
+    expect(data.email).toBe(coData.options.prefill.email);
+  });
+
+  it("should return name", function(){
+    expect(data['card[name]']).toBe(coData.options.prefill.name);
+  });
+
+  it("should return card number", function(){
+    expect(data['card[number]']).toBe(coData.cc.number);
+  });
+
+  it("should return card expiry month", function(){
+    expect(data['card[expiry_month]']).toBe(coData.cc.expiry_month);
+  });
+
+  it("should return card expiry year", function(){
+    expect(data['card[expiry_year]']).toBe(coData.cc.expiry_year);
+  });
+
+  it("should return card cvv", function(){
+    expect(data['card[cvv]']).toBe(coData.cc.cvv);
+  });
+
+  it("should not return bank", function(){
+    expect(data.bank).toBeUndefined();
+  });
+})

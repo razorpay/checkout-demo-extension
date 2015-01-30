@@ -6,6 +6,8 @@
   defaults = {
     shownClass: 'rzp-shown',
     modalSelector: '.rzp-modal',
+    curtainClass: 'rzp-curtain', //curtain (fullscreen) mode
+    closeButton: '.rzp-modal-close',
     show: true,
     escape: true,
     animation: true,
@@ -19,6 +21,10 @@
     var duration, durationStyle;
     this.options = $.extend(defaults, options);
     this.element = element;
+    if (window.screen && (screen.width <= 480 || screen.height <= 480)){
+      this.element.addClass(this.options.curtainClass)
+      this.curtainMode = true
+    }
     if (!this.element.attr('tabIndex')) {
       this.element.attr('tabIndex', '0');
     }
@@ -51,13 +57,15 @@
 
     transitionProperty: (function() {
       var prop;
-      prop = '';
-      ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
-        if (typeof document.head.style[i] === 'string') {
-          prop = i + 'Duration';
-          return true;
-        }
-      });
+      if(Array.prototype.some){
+        prop = '';
+        ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
+          if (typeof document.head.style[i] === 'string') {
+            prop = i + 'Duration';
+            return true;
+          }
+        });
+      }
       return prop;
     })(),
 
@@ -68,6 +76,7 @@
     show: function() {
       $(document.body).css('overflow', 'hidden');
       this.isShown = true;
+      this.setViewport();
       this.bind_events();
       this.element.show().get(0).focus();
       this.element.children(this.options.modalSelector).css('display', 'inline-block');
@@ -76,6 +85,24 @@
       this.element.addClass(this.options.shownClass);
       this.clearTimeout();
       return timeout = setTimeout($.proxy(this.shown, this), this.animationDuration);
+    },
+
+    setViewport: function(){
+      if($('meta[name="viewport"]').length !== 0){
+        this.originalViewport = $('meta[name="viewport"]');
+        $('meta[name="viewport"]').remove();
+      }
+
+      if($('meta.rzp-viewport').length === 0){
+        $('head').append('<meta name="viewport" class="rzp-viewport" content="width=device-width, initial-scale=1">')
+      }
+    },
+
+    removeViewport: function(){
+      $('head meta.rzp-viewport').remove();
+      if(typeof this.originalViewport !== 'undefined'){
+        $('head').append(this.originalViewport);
+      }
     },
 
     shown: function() {
@@ -87,6 +114,7 @@
         return;
       }
       this.isShown = false;
+      this.removeViewport();
       this.element.removeClass(this.options.shownClass);
       this.listeners.forEach(function(l) {
         return l[0].off(l[1], l[2]);
@@ -126,8 +154,12 @@
     },
 
     bind_events: function() {
-      if(window.addEventListener)
+      if (window.addEventListener)
         this.element[0].addEventListener('blur', this.steal_focus, true);
+      
+      if (this.curtainMode){
+        this.on('click', this.element.find(this.options.closeButton), this.hide)
+      }
       
       if (this.options.stopKeyPropagation) {
         this.on('keyup keydown keypress', this.element, (function(_this) {

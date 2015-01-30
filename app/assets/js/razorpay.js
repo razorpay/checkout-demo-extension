@@ -15,7 +15,7 @@
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
     key: '',
-    handler: function(){},
+    handler: '',
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     netbanking: true,
@@ -37,6 +37,10 @@
     if(!lastRequestInstance){
       return;
     }
+    // Close the popup in case of netbanking
+    if(typeof lastRequestInstance.popup !== 'undefined'){
+      lastRequestInstance.popup.close();
+    }
 
     if (message.data.error && message.data.error.description){
       if(typeof lastRequestInstance.failure === 'function'){
@@ -54,6 +58,10 @@
     XD.receiveMessage();
   };
 
+  /**
+   * Handles success callback of ajax request
+   * This is where different actions are taken for CC/3DS/NB
+   */
   discreet.success = function(req){
     var request = req || {};
     if(!(request.parent instanceof $)){
@@ -63,6 +71,9 @@
 
     return function(response){
       if (response['http_status_code'] !== 200 && response.error){
+        if(typeof request.popup !== 'undefined'){
+          request.popup.close();
+        }
         if(typeof request.failure === 'function'){
           request.failure(response);
         }
@@ -83,10 +94,13 @@
         }
 
         // TODO tests for this
-        request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
+        // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
+
+        // Popup for netbanking
+        request.popup.location(response.redirectUrl);
         return;
       }
-      else if (response.status) {
+      else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
           request.success(response);
         }
@@ -99,13 +113,25 @@
     };
   };
 
+  discreet.setupPopup = function(request){
+    var popup = request.popup = new Razorpay.Popup('');
+    popup.onClose(discreet.popupClose);
+  }
+
+  discreet.popupClose = function(){
+    lastRequestInstance.failure({
+      error: {
+        description: 'Payment cancelled'
+      }
+    });
+  }
+
   /**
     method for payment data submission to razorpay api
     @param request  contains payment data and optionally callbacks to success, failure and element to put iframe in
   */
   Razorpay.prototype.submit = function(request){
 
-    // window.p = window.open('', "", "width=600, height=400, scrollbars=yes");
     // TODO what's to be done for netbanking?
     // TODO better validation
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
@@ -118,6 +144,10 @@
     var errors = this.validateData(request.data);
     if(errors && errors.length){
       return false;
+    }
+
+    if(request.data.method === 'netbanking'){
+      discreet.setupPopup(request);
     }
 
     // setting up XD
@@ -141,10 +171,24 @@
     this.options = this.options || {};
 
     for (var i in defaults){
-      if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
+      if(i === 'prefill'){
+        continue;
+      }
+      else if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
         this.options[i] = defaults[i];
-      } else{
+      }
+      else {
         this.options[i] = overrides[i];
+      }
+    }
+
+    this.options['prefill'] = {};
+    for(var i in defaults['prefill']){
+      if(typeof overrides['prefill'] === 'undefined' || typeof overrides['prefill'][i] === 'undefined'){
+        this.options['prefill'][i] = defaults['prefill'][i];
+      }
+      else {
+        this.options['prefill'][i] = overrides['prefill'][i];
       }
     }
   };
@@ -189,11 +233,18 @@
       });
     }
 
-    if (typeof options.notes === 'object' && Object.keys(options.notes).length > 15) {
-      errors.push({
-        message: "You can only pass at most 15 fields in the notes object",
-        field: "notes"
-      });
+    if (typeof options.notes === 'object'){
+      // Object.keys unsupported in old browsers
+      var notesCount = 0
+      for(var note in options.notes){
+        notesCount++
+      }
+      if(notesCount > 15) {
+        errors.push({
+          message: "You can only pass at most 15 fields in the notes object",
+          field: "notes"
+        });
+      }
     }
 
     if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
@@ -255,6 +306,37 @@
     //   };
     // }
   };
+
+  discreet.Rollbar = {
+    state: false,
+
+    _check: function(){
+      if(typeof Rollbar !== 'undefined'){
+        return true;
+      }
+      else {
+        false;
+      }
+    },
+
+    start: function(){
+      if(discreet.Rollbar._check() === false){
+        return;
+      }
+      console.log('starting Rollbar')
+      discreet.Rollbar.state = true;
+      Rollbar.configure({enabled: true});
+    },
+
+    stop: function(){
+      if(discreet.Rollbar._check() === false){
+        return;
+      }
+      console.log('stopping Rollbar')
+      discreet.Rollbar.state = false;
+      Rollbar.configure({enabled: false})
+    }
+  }
 
   // @if NODE_ENV='test'
   window.discreet = discreet;

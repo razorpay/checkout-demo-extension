@@ -34,15 +34,11 @@
 
   return Smarty.prototype = {
     "class": function(str) {
-      return str.split(' ').map(function(s) {
-        return prefix + s;
-      }).join(' ');
+      return str.replace(/([^ ]+)/g, prefix + '$1')
     },
 
     selector: function(str) {
-      return str.split(' ').map(function(s) {
-        return '.' + prefix + s;
-      }).join(' ');
+      return str.replace(/([^ ]+)/g, '.' + prefix + '$1')
     },
 
     parent: function(el) {
@@ -75,7 +71,11 @@
             return handler.apply(this, arguments);
           }
         }, this);
-        this.element[0].addEventListener(event, proxy, true);
+        if(window.addEventListener){
+          this.element[0].addEventListener(event, proxy, true);
+        } else if(window.attachEvent){
+          this.element[0].attachEvent(event, proxy);
+        }
         return this.listeners.push([event, proxy, true]);
       } else {
         proxy = $.proxy(lastarg, this);
