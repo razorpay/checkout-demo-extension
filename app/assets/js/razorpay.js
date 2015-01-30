@@ -307,6 +307,37 @@
     // }
   };
 
+  discreet.Rollbar = {
+    state: false,
+
+    _check: function(){
+      if(typeof Rollbar !== 'undefined'){
+        return true;
+      }
+      else {
+        false;
+      }
+    },
+
+    start: function(){
+      if(discreet.Rollbar._check() === false){
+        return;
+      }
+      console.log('starting Rollbar')
+      discreet.Rollbar.state = true;
+      Rollbar.configure({enabled: true});
+    },
+
+    stop: function(){
+      if(discreet.Rollbar._check() === false){
+        return;
+      }
+      console.log('stopping Rollbar')
+      discreet.Rollbar.state = false;
+      Rollbar.configure({enabled: false})
+    }
+  }
+
   // @if NODE_ENV='test'
   window.discreet = discreet;
   // @endif

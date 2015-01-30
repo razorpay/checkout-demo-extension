@@ -8,6 +8,9 @@
   var Modal = Razorpay.Modal;
   var discreet = window.discreet || {};
 
+  // This is used by razorpay to check if it is in standalone mode or integrated with checkout mode
+  Razorpay.prototype.checkout = true;
+
   discreet.shake = function(element) {
     element.addClass('rzp-shake');
     setTimeout(function() {
@@ -44,8 +47,26 @@
     return data;
   };
 
+  /**
+   * This handles stopping of rollbar in case checkout is closed via backdrop click
+   */
+  discreet.modalRollbarClose = function(rzp){
+    rzp.modal.on('click', rzp.modal.element, function(e){
+      if (e.target === rzp.modal.element[0] && rzp.modal.options.backdropClose) {
+        discreet.Rollbar.stop();
+      }
+    });
+  };
+
   Razorpay.prototype.open = function(){
+    if(discreet.Rollbar.state === false){
+      discreet.Rollbar.start();
+    }
+
     if(this.modal){
+      // Reattaching listener for rollbar
+      discreet.modalRollbarClose(this);
+
       this.modal.show();
       return;
     }
@@ -54,7 +75,9 @@
     this.$el.smarty();
     this.modal = new Modal(this.$el);
     this.renew();
-    
+
+    discreet.modalRollbarClose(this);
+
     this.$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
       parent = $(this.parentNode.parentNode);
@@ -130,6 +153,10 @@
   };
 
   Razorpay.prototype.hide = function(){
+    if(discreet.Rollbar.state === true){
+      discreet.Rollbar.stop();
+    }
+
     this.renew();
     if(this.modal){
       this.modal.hide();
@@ -168,9 +195,7 @@
   };
   discreet.successHandler = function(rzp){
     return function(message){
-      if(rzp.modal){
-        rzp.modal.hide();
-      }
+      rzp.hide();
       rzp.modal = null;
       if(typeof rzp.options.handler === "function"){
         rzp.options.handler(message);
