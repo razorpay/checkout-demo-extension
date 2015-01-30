@@ -307,7 +307,7 @@
     // }
   };
 
-  discreet.Rollbar = {
+  Razorpay.prototype.Rollbar = {
     state: false,
 
     _check: function(){
@@ -320,18 +320,18 @@
     },
 
     start: function(){
-      if(discreet.Rollbar._check() === false){
+      if(this._check() === false){
         return;
       }
-      discreet.Rollbar.state = true;
+      this.state = true;
       Rollbar.configure({enabled: true});
     },
 
     stop: function(){
-      if(discreet.Rollbar._check() === false){
+      if(this._check() === false){
         return;
       }
-      discreet.Rollbar.state = false;
+      this.state = false;
       Rollbar.configure({enabled: false})
     }
   }
