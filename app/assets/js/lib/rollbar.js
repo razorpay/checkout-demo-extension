@@ -1,4 +1,4 @@
-(function(root){
+(function(){
   var script = document.currentScript;
   var src = script.src;
 
