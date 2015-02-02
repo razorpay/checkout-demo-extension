@@ -115,6 +115,7 @@
 
   discreet.setupPopup = function(request){
     var popup = request.popup = new Razorpay.Popup('');
+    popup.$('body').append(discreet.loader());
     popup.onClose(discreet.popupClose);
   }
 
@@ -306,6 +307,20 @@
     //   };
     // }
   };
+
+  discreet.rzpscript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })();
+
+  window.loader = discreet.loader = function(id){
+    var src = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/images/loader-logo.png');
+    return doT.compile(Razorpay.templates.loader)({
+      src: src,
+      id: id || ''
+    });
+  }
 
   Razorpay.prototype.Rollbar = {
     state: false,
