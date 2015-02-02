@@ -53,14 +53,14 @@
   discreet.modalRollbarClose = function(rzp){
     rzp.modal.on('click', rzp.modal.element, function(e){
       if (e.target === rzp.modal.element[0] && rzp.modal.options.backdropClose) {
-        discreet.Rollbar.stop();
+        rzp.Rollbar.stop();
       }
     });
   };
 
   Razorpay.prototype.open = function(){
-    if(discreet.Rollbar.state === false){
-      discreet.Rollbar.start();
+    if(this.Rollbar.state === false){
+      this.Rollbar.start();
     }
 
     if(this.modal){
@@ -153,8 +153,8 @@
   };
 
   Razorpay.prototype.hide = function(){
-    if(discreet.Rollbar.state === true){
-      discreet.Rollbar.stop();
+    if(this.Rollbar.state === true){
+      this.Rollbar.stop();
     }
 
     this.renew();

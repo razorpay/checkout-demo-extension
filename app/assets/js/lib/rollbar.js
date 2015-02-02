@@ -1,5 +1,5 @@
-(function(root){
-  var script = document.currentScript;
+(function(){
+  var script = document.currentScript || {src: ''};
   var src = script.src;
 
   var _rollbarConfig = {
@@ -12,8 +12,8 @@
   };
 
   var list = {
-    beta: 'betacheckout.razorpay.com',
-    prod: 'checkout.razorpay.com'
+    prod: 'checkout.razorpay.com',
+    beta: 'betacheckout.razorpay.com'
   }
 
   for(var i in list){
