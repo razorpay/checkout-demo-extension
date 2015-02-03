@@ -157,8 +157,10 @@
     var source = this.options.protocol + '://' + this.options.hostname;
     XD.receiveMessage(discreet.XDCallback, source);
 
+    request.data.key_id = this.options.key;
+
     return $.ajax({
-      url: this.options.protocol + '://' + this.options.key + '@' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
+      url: this.options.protocol + '://' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
       dataType: 'jsonp',
       success: discreet.success(request),
       timeout: 35000,
