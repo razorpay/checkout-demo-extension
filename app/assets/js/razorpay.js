@@ -14,6 +14,7 @@
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
+    netbankingListUrl: '/merchant/banks',
     key: '',
     handler: '',
     // checkout fields, not needed for razorpay alone
@@ -127,6 +128,10 @@
     });
   }
 
+  Razorpay.prototype.makeUrl = function(){
+    return this.options.protocol + '://' + this.options.hostname + '/' + this.options.version;
+  }
+
   /**
     method for payment data submission to razorpay api
     @param request  contains payment data and optionally callbacks to success, failure and element to put iframe in
@@ -160,7 +165,7 @@
     request.data.key_id = this.options.key;
 
     return $.ajax({
-      url: this.options.protocol + '://' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
+      url: this.makeUrl() + this.options.jsonpUrl,
       dataType: 'jsonp',
       success: discreet.success(request),
       timeout: 35000,
@@ -194,6 +199,8 @@
         this.options['prefill'][i] = overrides['prefill'][i];
       }
     }
+
+    discreet.getNetbankingList(this);
   };
 
   /**
@@ -351,6 +358,40 @@
       this.state = false;
       Rollbar.configure({enabled: false})
     }
+  }
+
+  discreet.getNetbankingList = function(rzp){
+    $.ajax({
+      url: rzp.makeUrl() + rzp.options.netbankingListUrl,
+      data: {
+        key_id: rzp.options.key
+      },
+      dataType: 'jsonp',
+      success: function(response){
+        if (response['http_status_code'] !== 200 && response.error){
+          callback({error: true});
+        }
+
+        rzp.options.netbankingList = response;
+
+        if(typeof rzp.options.netbankingListCB !== 'undefined'){
+          rzp.options.netbankingListCB(response);
+        }
+      },
+      timeout: 30000,
+      error: function(response){
+        callback({error: true});
+      }
+    });
+  }
+
+  Razorpay.prototype.getNetbankingList = function(callback){
+    if(typeof this.options.netbankingList === "undefined" ){
+      this.options.netbankingListCB = callback;
+      return;
+    }
+
+    callback(this.options.netbankingList);
   }
 
   // @if NODE_ENV='test'
