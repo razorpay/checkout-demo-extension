@@ -60,7 +60,6 @@
 
   discreet.showNetbankingList = function(rzp){
     rzp.getNetbankingList(function(data){
-      console.log(data);
       if(typeof data.error !== 'undefined'){
         $('#rzp-tab-nb .rzp-elem').remove();
         $('.rzp-error').append('<li class="rzp-nb-na">Netbanking is not available right now. Please try later.</li>');

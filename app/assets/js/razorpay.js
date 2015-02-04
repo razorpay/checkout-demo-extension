@@ -14,7 +14,7 @@
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
-    netbankingListUrl: '/merchant/banks',
+    netbankingListUrl: '/banks',
     key: '',
     handler: '',
     // checkout fields, not needed for razorpay alone
