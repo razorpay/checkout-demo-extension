@@ -20,29 +20,6 @@ describe("new Razorpay", function(){
   });
 })
 
-describe("Razorpay options", function(){
-  var rzp;
-  var custom = $.extend({}, options);
-  custom.protocol = 'https';
-  custom.unwanted = 'fake';
-
-  beforeEach(function(){
-    rzp = new Razorpay(custom);
-  });
-
-  it("should set key", function(){
-    expect(rzp.options.key).toBe(options.key);
-  });
-
-  it("should not set unknown option", function(){
-    expect(rzp.options.unwanted).toBeUndefined();
-  });
-
-  it("should override optional settings", function(){
-    expect(rzp.options.protocol).toBe(custom.protocol);
-  });
-});
-
 describe("Razorpay Ajax", function(){
   var rzp;
   var request;

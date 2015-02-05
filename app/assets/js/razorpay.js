@@ -28,7 +28,8 @@
     name: '', // of merchant
     description: '',
     image: '',
-    notes: {}
+    notes: {},
+    signature: ''
   };
 
   var lastRequestInstance = null;
@@ -115,6 +116,7 @@
 
   discreet.setupPopup = function(request){
     var popup = request.popup = new Razorpay.Popup('');
+    popup.$('body').append(discreet.loader());
     popup.onClose(discreet.popupClose);
   }
 
@@ -156,8 +158,10 @@
     var source = this.options.protocol + '://' + this.options.hostname;
     XD.receiveMessage(discreet.XDCallback, source);
 
+    request.data.key_id = this.options.key;
+
     return $.ajax({
-      url: this.options.protocol + '://' + this.options.key + '@' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
+      url: this.options.protocol + '://' + this.options.hostname + '/' + this.options.version + this.options.jsonpUrl,
       dataType: 'jsonp',
       success: discreet.success(request),
       timeout: 35000,
@@ -306,6 +310,20 @@
     //   };
     // }
   };
+
+  discreet.rzpscript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })();
+
+  window.loader = discreet.loader = function(id){
+    var src = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/images/loader-logo.png');
+    return doT.compile(Razorpay.templates.loader)({
+      src: src,
+      id: id || ''
+    });
+  }
 
   Razorpay.prototype.Rollbar = {
     state: false,
