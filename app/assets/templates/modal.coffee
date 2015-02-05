@@ -23,9 +23,9 @@ Razorpay.templates.modal = '
             <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
             <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
             <input class="rzp-input" type="hidden" name="description" value="{{=it.description}}">
-            {{for(udfkey in it.udf){}}
+            {{for(note in it.notes){}}
               <!-- udf fields provided by merchant -->
-              <input class="rzp-input" type="hidden" name="udf[{{=udfkey}}]" value="{{=it.udf[udfkey]}}">
+              <input class="rzp-input" type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
             {{}}}
 
             <input class="rzp-input" type="hidden" name="card[expiry_month]">

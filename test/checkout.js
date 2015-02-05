@@ -372,6 +372,12 @@ describe("Razorpay open cc and submit method", function(){
         field = 'card[expiry_year]';
         value = coData.cc.expiry_year;
       });
+
+      it("should pass notes[address]", function(){
+        launch();
+        field = 'notes[address]';
+        value = coData.options.notes.address;
+      });
     })
   })
 
