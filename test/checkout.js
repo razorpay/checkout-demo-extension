@@ -91,6 +91,16 @@ describe("Checkout init", function(){
     expect(co.options.handler).toBe('');
   })
 
+  it("should set signature", function(){
+    var local = $.extend({}, custom);
+    local.signature = 'asdasd';
+    var co = new Razorpay(local);
+    expect(co.options.signature).toBe(local.signature);
+  })
+
+  it("should leave signature blank if not set", function(){
+    expect(co.options.signature).toBe('');
+  })
 });
 
 describe("Checkout validateOptions method", function(){
@@ -266,17 +276,104 @@ describe("Razorpay open cc and submit method", function(){
     }, 100);
   })
 
-  it("should submit with all details in place", function(){
-    launch();
+  describe("with all details in place", function(){
+    var field;
+    var value;
 
-    $ccNumber.sendkeys(coData.cc.number);
-    $ccExpiry.sendkeys(coData.cc.expiry);
-    $ccCVV.sendkeys(coData.cc.cvv);
+    afterEach(function(){
+      $ccNumber.sendkeys(coData.cc.number);
+      $ccExpiry.sendkeys(coData.cc.expiry);
+      $ccCVV.sendkeys(coData.cc.cvv);
 
-    spyOn(co, 'submit').and.callFake(function(){
-      spyCalled();
+      spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
+        spyCalled();
+        expect(options.data[field]).toBe(value);
+      });
     });
-  });
+
+    it("should submit with all details in place", function(){
+      launch();
+
+      spyOn(co, 'submit').and.callFake(function(){
+        spyCalled();
+      });
+    });
+
+    describe(": in ajax request to server", function(){
+      it("should pass signature if set", function(){
+        customOptions.signature = 'asdasd';
+        launch();
+        field = 'signature';
+        value = customOptions.signature;
+      });
+
+      it("should not pass signature if not set", function(){
+        launch();
+        field = 'signature';
+        value = undefined;
+      });
+
+      it("should pass amount", function(){
+        launch();
+        field = 'amount';
+        value = customOptions.amount;
+      });
+
+      it("should pass currency", function(){
+        launch();
+        field = 'currency';
+        value = 'INR';
+      });
+
+      it("should pass email", function(){
+        launch();
+        field = 'email';
+        value = customOptions.prefill.email;
+      });
+
+      it("should pass contact", function(){
+        launch();
+        field = 'contact';
+        value = customOptions.prefill.contact;
+      });
+
+      it("should pass description", function(){
+        launch();
+        field = 'description';
+        value = customOptions.description;
+      });
+
+      it("should pass card[name]", function(){
+        launch();
+        field = 'card[name]';
+        value = customOptions.prefill.name;
+      });
+
+      it("should pass card[number]", function(){
+        launch();
+        field = 'card[number]';
+        value = coData.cc.number;
+      });
+
+      it("should pass card[cvv]", function(){
+        launch();
+        field = 'card[cvv]';
+        value = coData.cc.cvv;
+      });
+
+      it("should pass card[expiry_month]", function(){
+        launch();
+        field = 'card[expiry_month]';
+        value = coData.cc.expiry_month;
+      });
+
+      it("should pass card[expiry_year]", function(){
+        launch();
+        field = 'card[expiry_year]';
+        value = coData.cc.expiry_year;
+      });
+    })
+  })
 
   it("should not submit without cc card", function(){
     launch();

@@ -131,8 +131,15 @@
         discreet.shake(modal);
         return;
       }
+      var data = discreet.getFormData(form, self.options.netbanking)
+
+      // Signature is set in case of hosted checkout
+      if(self.options.signature !== ''){
+        data.signature = self.options.signature;
+      }
+
       self.request = {
-        data: discreet.getFormData(form, self.options.netbanking),
+        data: data,
         failure: discreet.failureHandler(self),
         success: discreet.successHandler(self),
         prehandler: discreet.preHandler(self),
