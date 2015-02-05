@@ -28,7 +28,8 @@
     name: '', // of merchant
     description: '',
     image: '',
-    notes: {}
+    notes: {},
+    signature: ''
   };
 
   var lastRequestInstance = null;
