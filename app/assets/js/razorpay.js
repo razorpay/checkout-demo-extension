@@ -195,6 +195,12 @@
         this.options['prefill'][i] = overrides['prefill'][i];
       }
     }
+
+    Rollbar.configure({
+      payload: {
+        config: this.options
+      }
+    });
   };
 
   /**
