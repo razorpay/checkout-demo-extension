@@ -196,9 +196,13 @@
       }
     }
 
+    var rbPayload = $.extend(true, {}, this.options);
+    delete rbPayload.notes;
+    delete rbPayload.prefill;
+
     Rollbar.configure({
       payload: {
-        config: this.options
+        config: rbPayload
       }
     });
   };
@@ -331,11 +335,40 @@
     });
   }
 
+  discreet.environment = (function(){
+    var script = document.currentScript || {src: ''};
+    var src = script.src;
+
+    var list = {
+      beta: 'betacheckout.razorpay.com',
+      production: 'checkout.razorpay.com',
+    }
+
+    var env = 'dev';
+    for(var i in list){
+      if(src.indexOf(list[i]) !== -1){
+        env = i;
+      }
+    }
+
+    return env;
+  })();
+
   Razorpay.prototype.Rollbar = {
     state: false,
 
+    configure: function(){
+      if(discreet.environment !== 'dev'){
+        Rollbar.configure({
+          payload: {
+            environment: discreet.environment
+          }
+        });
+      }
+    },
+
     _check: function(){
-      if(typeof Rollbar !== 'undefined'){
+      if(typeof Rollbar !== 'undefined' && discreet.environment !== 'dev'){
         return true;
       }
       else {
