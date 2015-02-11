@@ -200,11 +200,13 @@
     delete rbPayload.notes;
     delete rbPayload.prefill;
 
-    Rollbar.configure({
-      payload: {
-        config: rbPayload
-      }
-    });
+    if(typeof Rollbar !== 'undefined' && Razorpay.rollbarDisable !== true){
+      Rollbar.configure({
+        payload: {
+          config: rbPayload
+        }
+      });
+    }
   };
 
   /**
@@ -368,7 +370,7 @@
     },
 
     _check: function(){
-      if(typeof Rollbar !== 'undefined' && discreet.environment !== 'dev'){
+      if(typeof Rollbar !== 'undefined' && discreet.environment !== 'dev' && Razorpay.rollbarDisable !== true){
         return true;
       }
       else {
