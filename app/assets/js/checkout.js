@@ -58,6 +58,22 @@
     });
   };
 
+  discreet.showNetbankingList = function(rzp){
+    rzp.getNetbankingList(function(data){
+      if(typeof data.error !== 'undefined'){
+        $('#rzp-tab-nb .rzp-elem').remove();
+        $('.rzp-error').append('<li class="rzp-nb-na">Netbanking is not available right now. Please try later.</li>');
+      }
+
+      for(var i in data){
+        if(i === 'http_status_code'){
+          continue;
+        }
+        $('#rzp-tab-nb select').append('<option value="'+i+'">' + data[i] + '</option>');
+      }
+    });
+  }
+
   Razorpay.prototype.open = function(){
     if(this.Rollbar.state === false){
       this.Rollbar.start();
@@ -77,6 +93,7 @@
     this.renew();
 
     discreet.modalRollbarClose(this);
+    discreet.showNetbankingList(this);
 
     this.$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
@@ -107,6 +124,9 @@
         }
         inner.find('#' + this.getAttribute('data-target')).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
         $(this).addClass('rzp-active').siblings('.rzp-active').removeClass('rzp-active');
+
+        $('.rzp-nb-na').toggle();
+
         if(change_modal_height){
           modal.height(inner.height());
           setTimeout(function(){
