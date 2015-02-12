@@ -437,6 +437,9 @@
   }
 
   // @if NODE_ENV='test'
+  discreet.getNetbankingList = function(){
+    return;
+  }
   window.discreet = discreet;
   // @endif
 })();
