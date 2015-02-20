@@ -336,7 +336,7 @@
     return scripts[scripts.length - 1];
   })();
 
-  window.loader = discreet.loader = function(id){
+  discreet.loader = function(id){
     var src = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/images/loader-logo.png');
     return doT.compile(Razorpay.templates.loader)({
       src: src,
