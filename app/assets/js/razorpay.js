@@ -99,7 +99,10 @@
         // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
 
         // Popup for netbanking
-        request.popup.location(response.redirectUrl);
+        XD.postMessage({
+          rzp: true,
+          location: response.redirectUrl
+        }, '*', request.popup.window);
         return;
       }
       else if (response.razorpay_payment_id) {
@@ -115,9 +118,10 @@
     };
   };
 
-  discreet.setupPopup = function(request){
+  discreet.setupPopup = function(rzp, request){
     var popup = request.popup = new Razorpay.Popup('');
-    popup.$('body').append(discreet.loader());
+    // popup.$('body').append(discreet.loader());
+    popup.location(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
     popup.onClose(discreet.popupClose);
   }
 
@@ -154,7 +158,7 @@
     }
 
     if(request.data.method === 'netbanking'){
-      discreet.setupPopup(request);
+      discreet.setupPopup(this, request);
     }
 
     // setting up XD
@@ -336,7 +340,7 @@
     return scripts[scripts.length - 1];
   })();
 
-  window.loader = discreet.loader = function(id){
+  discreet.loader = function(id){
     var src = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/images/loader-logo.png');
     return doT.compile(Razorpay.templates.loader)({
       src: src,
