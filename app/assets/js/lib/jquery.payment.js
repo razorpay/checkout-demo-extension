@@ -158,7 +158,7 @@ var __slice = [].slice,
     value = $target.val();
     card = cardFromNumber(value + digit);
     length = (value.replace(/\D/g, '') + digit).length;
-    upperLength = 16;
+    upperLength = 19;
     if (card) {
       upperLength = card.length[card.length.length - 1];
     }
@@ -309,7 +309,7 @@ var __slice = [].slice,
     if (card) {
       return value.length <= card.length[card.length.length - 1];
     } else {
-      return value.length <= 16;
+      return value.length <= 19;
     }
   };
   restrictExpiry = function(e) {
@@ -421,7 +421,7 @@ var __slice = [].slice,
     }
     card = cardFromNumber(num);
     if (!card) {
-      return false;
+      return luhnCheck(num) === true ? true : false
     }
     return (_ref = num.length, __indexOf.call(card.length, _ref) >= 0) && (card.luhn === false || luhnCheck(num));
   };
