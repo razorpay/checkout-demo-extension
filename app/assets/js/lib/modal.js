@@ -171,7 +171,7 @@
       if (this.options.escape) {
         this.on('keyup', this.element, (function(_this) {
           return function(e) {
-            if (e.which === 27) {
+            if (e.which === 27 && _this.options.backdropClose) {
               return _this.hide();
             }
           };
