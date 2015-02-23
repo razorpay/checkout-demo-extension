@@ -36,6 +36,16 @@
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
+    /**
+     * Popup sends an XDM message to tell that it has loaded
+     * Ignore that
+     */
+    if(message.data.source === 'popup'){
+      lastRequestInstance.popup._loaded = true;
+      lastRequestInstance.popup.loaded();
+      return;
+    }
+
     if(!lastRequestInstance){
       return;
     }
@@ -99,10 +109,7 @@
         // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
 
         // Popup for netbanking
-        XD.postMessage({
-          rzp: true,
-          location: response.redirectUrl
-        }, '*', request.popup.window);
+        discreet.redirectPopup(request, response.redirectUrl);
         return;
       }
       else if (response.razorpay_payment_id) {
@@ -120,9 +127,25 @@
 
   discreet.setupPopup = function(rzp, request){
     var popup = request.popup = new Razorpay.Popup('');
-    // popup.$('body').append(discreet.loader());
     popup.location(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
     popup.onClose(discreet.popupClose);
+    popup._loaded = false;
+    popup.loaded = function(){};
+  }
+
+  discreet.redirectPopup = function(request, location){
+    var popup = request.popup;
+
+    popup.loaded = function(){
+      XD.postMessage({
+        rzp: true,
+        location: location
+      }, '*', popup.window);
+    }
+
+    if(popup._loaded === true){
+      popup.loaded();
+    }
   }
 
   discreet.popupClose = function(){
