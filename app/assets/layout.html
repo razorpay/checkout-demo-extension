@@ -59,7 +59,9 @@
         'address': 'Hello World'
       },
       protocol: 'https',
-      hostname: 'beta.razorpay.com'
+      hostname: 'beta.razorpay.com',
+      oncancel: function(){console.log(1)},
+      onhidden: function(){console.log(2)}
     }
     var rzp1 = new Razorpay(options);
 

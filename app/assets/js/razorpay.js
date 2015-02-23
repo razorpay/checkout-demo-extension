@@ -30,7 +30,9 @@
     description: '',
     image: '',
     notes: {},
-    signature: ''
+    signature: '',
+    oncancel: null,
+    onhidden: null
   };
 
   var lastRequestInstance = null;

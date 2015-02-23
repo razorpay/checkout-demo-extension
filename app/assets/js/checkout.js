@@ -89,7 +89,14 @@
 
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
-    this.modal = new Modal(this.$el);
+
+    // init modal
+    var hiddenCallback = null;
+    this.modal = new Modal(this.$el, {
+      onhide: this.options.oncancel, // typeof check is inside modal.js
+      onhidden: this.options.onhidden
+    });
+
     this.renew();
 
     discreet.modalRollbarClose(this);
@@ -222,6 +229,7 @@
   };
   discreet.successHandler = function(rzp){
     return function(message){
+      rzp.modal.options.onhide = null
       rzp.hide();
       rzp.modal = null;
       if(typeof rzp.options.handler === "function"){
