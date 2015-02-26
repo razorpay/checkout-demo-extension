@@ -35,6 +35,16 @@
       .transition-transform(~"0.25s cubic-bezier(0.3, 1.5, 0.7, 1), 0.3s ease-out height, 0.3s ease-out width");
     }
   }
+  *{
+    margin: 0;
+    padding: 0;
+    box-shadow:  none!important;
+    outline: none!important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    .box-sizing(content-box);
+  }
 }
 .rzp-modal{
   position: relative;
@@ -56,17 +66,11 @@
   min-height: 200px;
 
   button, input, select, textarea{
-    outline: none!important;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    // color:#28B3D2;
     border-radius: 2px;
     border: none!important;
-    outline: none!important;
+    background: none;
   }
   button{
-    border: none;
     background: #28B3D2 no-repeat 12px center;
     line-height: 40px;
     color: #fff;
@@ -132,7 +136,7 @@
     display: block;
     padding: 0 @gap;
     margin: 0 -@gap;
-    .box-sizing(content-box); // modern browsers being oversmart
+    background: none!important;
   }
   select{
     margin-top: -12px;
