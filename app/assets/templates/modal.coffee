@@ -71,7 +71,7 @@ Razorpay.templates.modal = '
                 <input class="rzp-input" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}" pattern=".{1,100}">
               </div>
             </div>
-            <div class="rzp-elem rzp-elem-card" style="border-radius: 4px 4px 0 0">
+            <div class="rzp-elem rzp-elem-card">
               <div class="rzp-elem-inner">
                 <input class="rzp-input" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
               </div>

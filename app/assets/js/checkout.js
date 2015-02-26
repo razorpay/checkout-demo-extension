@@ -76,6 +76,18 @@
     });
   }
 
+  Razorpay.prototype.sanitizeOptions = function(obj){ // warning: modifies original object
+    if(obj){
+      if(obj.prefill){
+        if(obj.prefill.contact){
+          if(typeof obj.prefill.contact != 'string')
+            obj.prefill.contact = obj.prefill.contact + ''
+          obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'')
+        }
+      }
+    }
+  }
+
   Razorpay.prototype.open = function(){
     if(this.Rollbar.state === false){
       this.Rollbar.start();
@@ -89,6 +101,7 @@
       return;
     }
 
+    this.sanitizeOptions(this.options)
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
 
