@@ -63,8 +63,10 @@
       if(typeof data.error !== 'undefined'){
         $('#rzp-tab-nb .rzp-elem').remove();
         $('.rzp-error').append('<li class="rzp-nb-na">Netbanking is not available right now. Please try later.</li>');
+        return;
       }
 
+      $('#rzp-tab-nb select').html('<option value="">Select Bank</option>');
       for(var i in data){
         if(i === 'http_status_code'){
           continue;
