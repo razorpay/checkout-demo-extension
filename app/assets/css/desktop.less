@@ -43,7 +43,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    .box-sizing(content-box);
+    .box-sizing(content-box)!important; // because old browsers are content-box only, so we write the old way
   }
 }
 .rzp-modal{
@@ -126,11 +126,10 @@
   }
   input, select, textarea{
     color: inherit;
-    outline: none;
-    background: none;
-    line-height: 14px;
+    line-height: inherit;
+    height: inherit;
+    border-radius: inherit;
     font-size: 14px;
-    height: 16px;
     resize: none;
     width: 100%;
     display: block;
@@ -138,16 +137,12 @@
     margin: 0 -@gap;
     background: none!important;
   }
-  select{
-    margin-top: -12px;
-    line-height: 38px;
-    height: 40px;
-  }
 }
 .rzp-elem-inner{
   margin: 0 @gap;
-  height: 16px;
-  padding: 12px 0;
+  height: inherit;
+  line-height: inherit;
+  border-radius: inherit;
 }
 .rzp-tooltip{
   color: #fff;
@@ -164,7 +159,7 @@
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
   opacity: 0;
   .transition-transform(~"0.3s ease-in, 0.2s ease-in opacity");
-  .transform(translateY(-20px));
+  .transform(translateY(20px));
   margin-top: 7px;
   left: @padding + 10px;
   &:after {
@@ -174,10 +169,10 @@
     height: 0;
     border-width: 7px;
     border-style: solid;
-    border-color: transparent transparent #333 transparent;
-    top: 0;
+    border-color: #333 transparent transparent transparent;
+    bottom: 0;
     left: 25px;
-    margin: -13px 0 0 -7px;
+    margin: 0 0 -13px -7px;
   }
   &.rzp-shown{
     opacity: 0.9;

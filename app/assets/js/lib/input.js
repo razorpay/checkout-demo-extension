@@ -129,10 +129,10 @@
           }
           parent_rect = parent.getBoundingClientRect();
           modal_rect = this.element.children(this.selector('modal'))[0].getBoundingClientRect();
-          tt_top = parent_rect.bottom - modal_rect.top - 5;
+          tt_bot = modal_rect.bottom - parent_rect.top + 3;
           tt_left = parent_rect.left - modal_rect.left + 10;
           this.ttel.css({
-            top: tt_top,
+            bottom: tt_bot,
             left: tt_left
           }).data('pos', true);
         }
