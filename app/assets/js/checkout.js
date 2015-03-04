@@ -161,37 +161,41 @@
 
     var self = this;
     this.$el.find('form').on('submit', function(e){
-      e.preventDefault();
-      var form, invalid;
-      form = $(e.currentTarget);
-      self.$el.smarty('refresh');
-      form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
-      invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
-      var modal = form.closest('.rzp-modal');
-      if (invalid.length) {
-        invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
-        discreet.shake(modal);
-        return;
-      }
-      var data = discreet.getFormData(form, self.options.netbanking)
-
-      // Signature is set in case of hosted checkout
-      if(self.options.signature !== ''){
-        data.signature = self.options.signature;
-      }
-
-      self.request = {
-        data: data,
-        failure: discreet.failureHandler(self),
-        success: discreet.successHandler(self),
-        prehandler: discreet.preHandler(self),
-        parent: modal
-      };
-      self.submit(self.request);
-      self.$el.find('.rzp-submit').attr('disabled', true);
-      self.modal.options.backdropClose = false;
+      discreet.formSubmit(e, self);
     });
   };
+
+  discreet.formSubmit = function(e, self){
+    e.preventDefault();
+    var form, invalid;
+    form = $(e.currentTarget);
+    self.$el.smarty('refresh');
+    form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
+    invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
+    var modal = form.closest('.rzp-modal');
+    if (invalid.length) {
+      invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
+      discreet.shake(modal);
+      return;
+    }
+    var data = discreet.getFormData(form, self.options.netbanking)
+
+    // Signature is set in case of hosted checkout
+    if(self.options.signature !== ''){
+      data.signature = self.options.signature;
+    }
+
+    self.request = {
+      data: data,
+      failure: discreet.failureHandler(self),
+      success: discreet.successHandler(self),
+      prehandler: discreet.preHandler(self),
+      parent: modal
+    };
+    self.submit(self.request);
+    self.$el.find('.rzp-submit').attr('disabled', true);
+    self.modal.options.backdropClose = false;
+  }
 
   // close on backdrop click and remove errors
   Razorpay.prototype.renew = function(){
@@ -264,6 +268,11 @@
       if(rzp.modalRef){
         modal.html('').removeClass('rzp-frame').append(rzp.modalRef);
         modal.height('');
+
+        // Need to reattach click handler since modal was taken out of DOM
+        rzp.$el.find('form').on('submit', function(e){
+          discreet.formSubmit(e, rzp);
+        });
       }
 
       rzp.modalRef = null;
