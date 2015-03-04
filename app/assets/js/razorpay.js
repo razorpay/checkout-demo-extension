@@ -110,17 +110,6 @@
         if(response.redirectUrl && typeof(request.popup) === 'undefined'){
           var iframe = document.createElement('iframe');
           request.parent.html('').append(iframe);
-//          lastRequestInstance.popup = {
-//            _loaded: 'false',
-//            loaded: function(){
-//              delete lastRequestInstance.popup;
-//              XD.postMessage({
-//                rzp: true,
-//                location: response.redirectUrl
-//              }, '*', iframe.contentWindow);
-//            }
-//          }
-//          iframe.src = request.rzp.options.protocol + '://' + request.rzp.options.hostname + '/' + 'processing.html';
           iframe.src = response.redirectUrl;
           return;
         }
@@ -212,7 +201,6 @@
     XD.receiveMessage(discreet.XDCallback, source);
 
     request.data.key_id = this.options.key;
-    request.rzp = this;
 
     return $.ajax({
       url: this.makeUrl() + this.options.jsonpUrl,
