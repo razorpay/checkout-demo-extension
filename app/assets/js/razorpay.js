@@ -107,12 +107,31 @@
           request.prehandler();
         }
 
-        // TODO tests for this
-        // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
+        if(response.redirectUrl && typeof(request.popup) === 'undefined'){
+          var iframe = document.createElement('iframe');
+          request.parent.html('').append(iframe);
+          iframe.src = response.redirectUrl;
+          lastRequestInstance.popup = {
+            _loaded: 'false',
+            loaded: function(){
+              delete lastRequestInstance.popup;
+              XD.postMessage({
+                rzp: true,
+                location: response.redirectUrl
+              }, '*', iframe.contentWindow);
+            }
+          }
+          iframe.src = request.rzp.options.protocol + '://' + request.rzp.options.hostname + '/' + 'processing.html';
+          return;
+        }
+        else {
+          // TODO tests for this
+          // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
 
-        // Popup for netbanking
-        discreet.redirectPopup(request, response.redirectUrl);
-        return;
+          // Popup for netbanking
+          discreet.redirectPopup(request, response.redirectUrl);
+          return;
+        }
       }
       else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
@@ -193,6 +212,7 @@
     XD.receiveMessage(discreet.XDCallback, source);
 
     request.data.key_id = this.options.key;
+    request.rzp = this;
 
     return $.ajax({
       url: this.makeUrl() + this.options.jsonpUrl,
