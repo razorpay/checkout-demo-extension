@@ -162,11 +162,11 @@
     var self = this;
     this.$el.find('form').on('submit', function(e){
       discreet.formSubmit(e, self);
+      return false // prevent default
     });
   };
 
   discreet.formSubmit = function(e, self){
-    e.preventDefault();
     var form, invalid;
     form = $(e.currentTarget);
     self.$el.smarty('refresh');

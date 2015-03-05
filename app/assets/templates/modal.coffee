@@ -18,7 +18,7 @@ Razorpay.templates.modal = '
         </div>
       </div>
       <div class="rzp-body">
-        <form class="rzp-form" method="POST" novalidate>
+        <form class="rzp-form" method="POST" novalidate onsubmit="return false">
           <div class="rzp-form-common">
             <input class="rzp-input" type="hidden" name="amount" value="{{=it.amount}}">
             <input class="rzp-input" type="hidden" name="currency" value="{{=it.currency}}">
