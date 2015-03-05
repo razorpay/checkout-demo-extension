@@ -244,6 +244,8 @@
       if(rzp.request.data.method !== 'netbanking'){
         var modal_parent = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame')
         rzp.modalRef = modal_parent.children('.rzp-modal-inner')[0]
+        if(!rzp.modalRef)
+          return
         modal_parent[0].removeChild(rzp.modalRef)
       }
     };
@@ -270,11 +272,6 @@
       if(rzp.modalRef){
         modal.html('').removeClass('rzp-frame').append(rzp.modalRef);
         modal.height('');
-
-        // Need to reattach click handler since modal was taken out of DOM
-        rzp.$el.find('form').on('submit', function(e){
-          discreet.formSubmit(e, rzp);
-        });
       }
 
       rzp.modalRef = null;
