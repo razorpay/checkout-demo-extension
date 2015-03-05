@@ -242,7 +242,9 @@
   discreet.preHandler = function(rzp){
     return function(){
       if(rzp.request.data.method !== 'netbanking'){
-        rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove();
+        var modal_parent = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame')
+        rzp.modalRef = modal_parent.children('.rzp-modal-inner')[0]
+        modal_parent[0].removeChild(rzp.modalRef)
       }
     };
   };
