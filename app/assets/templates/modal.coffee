@@ -7,7 +7,9 @@ Razorpay.templates.modal = '
         <div class="rzp-merchant rzp-clear">
           <div class="rzp-modal-close"></div>
           <div class="rzp-merchant_image">
-            <img src="{{=it.image}}">
+            {{if(it.image){}}
+              <img src="{{=it.image}}">
+            {{}}}
           </div>
           <div class="rzp-merchant_powered"></div>
           <div class="rzp-merchant_name">
