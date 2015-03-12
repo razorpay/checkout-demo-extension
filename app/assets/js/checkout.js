@@ -331,7 +331,7 @@
     $(button).click(function(e) {
       rzp.open();
       e.preventDefault();
-    }).html("Pay with Card").appendTo(discreet.rzpscript.parentNode);
+    }).html("Pay Now").appendTo(discreet.rzpscript.parentNode);
   };
 
   var key = $(discreet.rzpscript).data('key');
