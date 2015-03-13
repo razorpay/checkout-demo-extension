@@ -35,19 +35,25 @@
   -ms-transform-origin: @args;
   transform-origin: @args;
 }
-.rzp-clear{
+.appearance(@appearance){
+  -webkit-appearance: @appearance;
+  -moz-appearance: @appearance;
+  appearance: @appearance;
+}
+.clearfix(){
   &:after{
     content: '';
     clear: both;
     display: block;
   }
 }
-.rzp-nb-na {
-  display: none;
-}
-
-#rzp-tab-nb.rzp-active {
-  .rzp-nb-na {
-    display: block;
+.middlefix(){
+  white-space: nowrap;
+  &:after{
+    content: '';
+    height: 100%;
+    display: inline-block;
+    width: 0;
+    vertical-align: middle;
   }
 }
