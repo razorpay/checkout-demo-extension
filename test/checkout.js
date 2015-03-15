@@ -195,6 +195,35 @@ describe("Checkout validateOptions method", function(){
 
 });
 
+// Modal functionality
+describe("Razorpay modal", function(){
+  var cancelSpy;
+  var hiddenSpy;
+  var co;
+  beforeEach(function(){
+    cancelSpy = jasmine.createSpy();
+    hiddenSpy = jasmine.createSpy();
+    var opts = $.extend(coData.options, {
+      oncancel: cancelSpy,
+      onhidden: hiddenSpy
+    })
+    co = new Razorpay(opts);
+    co.open();
+  });
+
+  afterEach(function(){
+    $('.rzp-container').remove();
+  });
+
+  it("should call cancel callback", function(){
+    co.modal.hide()
+    setTimeout(function(){
+      expect(cancelSpy).toHaveBeenCalled();
+    }, 100)
+  });
+});
+
+
 // Tests on Credit Card page
 describe("Razorpay open cc page", function(){
   var co;

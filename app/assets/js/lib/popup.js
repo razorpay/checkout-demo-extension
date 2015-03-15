@@ -75,7 +75,7 @@
     var name = opts.name;
 
     // if a "name" was not provided, then create a random one
-    if (!name) name = 'popup-' + (Math.random() * 0x10000000 | 0).toString(36);
+    if (!name) name = 'popup_' + (Math.random() * 0x10000000 | 0).toString(36); // hyphen in name creates problem in old IEs
 
     this.name = name;
     this.opts = opts;

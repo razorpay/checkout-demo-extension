@@ -1,7 +1,7 @@
 /* Default class for an overlay */
 .ow-overlay {
   position: fixed;
-  z-index: 10;
+  z-index: 19999;
   top: 0;
   left: 0;
   height: 100%;
@@ -18,7 +18,7 @@
 /* Default class for modal window */
 .rzp-modal {
   position: fixed;
-  z-index: 20;
+  z-index: 20000;
   left: 50%;
   top: 50px;
   width: 500px;

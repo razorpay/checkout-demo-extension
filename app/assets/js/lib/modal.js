@@ -13,7 +13,8 @@
     animation: true,
     stopKeyPropagation: true,
     backdropClose: true,
-    hiddenCallback: null,
+    onhide: null,
+    onhidden: null,
     parent: null
   };
 
@@ -121,6 +122,9 @@
       });
       this.listeners = [];
       this.clearTimeout();
+      if (typeof this.options.onhide === 'function') {
+        this.options.onhide();
+      }
       return timeout = setTimeout((function(_this) {
         return function() {
           return _this.hidden();
@@ -139,8 +143,8 @@
       $(document.body).css('overflow', '');
       this.clearTimeout();
       this.element.hide().children(this.options.modalSelector).hide();
-      if (typeof this.options.hiddenCallback === 'function') {
-        return this.options.hiddenCallback();
+      if (typeof this.options.onhidden === 'function') {
+        this.options.onhidden();
       }
     },
 
@@ -171,7 +175,7 @@
       if (this.options.escape) {
         this.on('keyup', this.element, (function(_this) {
           return function(e) {
-            if (e.which === 27) {
+            if (e.which === 27 && _this.options.backdropClose) {
               return _this.hide();
             }
           };

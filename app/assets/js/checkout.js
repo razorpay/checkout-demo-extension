@@ -63,8 +63,10 @@
       if(typeof data.error !== 'undefined'){
         $('#rzp-tab-nb .rzp-elem').remove();
         $('.rzp-error').append('<li class="rzp-nb-na">Netbanking is not available right now. Please try later.</li>');
+        return;
       }
 
+      $('#rzp-tab-nb select').html('<option value="">Select Bank</option>');
       for(var i in data){
         if(i === 'http_status_code'){
           continue;
@@ -72,6 +74,18 @@
         $('#rzp-tab-nb select').append('<option value="'+i+'">' + data[i] + '</option>');
       }
     });
+  }
+
+  Razorpay.prototype.sanitizeOptions = function(obj){ // warning: modifies original object
+    if(obj){
+      if(obj.prefill){
+        if(obj.prefill.contact){
+          if(typeof obj.prefill.contact != 'string')
+            obj.prefill.contact = obj.prefill.contact + ''
+          obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'')
+        }
+      }
+    }
   }
 
   Razorpay.prototype.open = function(){
@@ -87,9 +101,17 @@
       return;
     }
 
+    this.sanitizeOptions(this.options)
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
-    this.modal = new Modal(this.$el);
+
+    // init modal
+    var hiddenCallback = null;
+    this.modal = new Modal(this.$el, {
+      onhide: this.options.oncancel, // typeof check is inside modal.js
+      onhidden: this.options.onhidden
+    });
+
     this.renew();
 
     discreet.modalRollbarClose(this);
@@ -139,37 +161,41 @@
 
     var self = this;
     this.$el.find('form').on('submit', function(e){
-      e.preventDefault();
-      var form, invalid;
-      form = $(e.currentTarget);
-      self.$el.smarty('refresh');
-      form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
-      invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
-      var modal = form.closest('.rzp-modal');
-      if (invalid.length) {
-        invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
-        discreet.shake(modal);
-        return;
-      }
-      var data = discreet.getFormData(form, self.options.netbanking)
-
-      // Signature is set in case of hosted checkout
-      if(self.options.signature !== ''){
-        data.signature = self.options.signature;
-      }
-
-      self.request = {
-        data: data,
-        failure: discreet.failureHandler(self),
-        success: discreet.successHandler(self),
-        prehandler: discreet.preHandler(self),
-        parent: modal
-      };
-      self.submit(self.request);
-      self.$el.find('.rzp-submit').attr('disabled', true);
-      self.modal.options.backdropClose = false;
+      discreet.formSubmit(e, self);
+      return false // prevent default
     });
   };
+
+  discreet.formSubmit = function(e, self){
+    var form, invalid;
+    form = $(e.currentTarget);
+    self.$el.smarty('refresh');
+    form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
+    invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
+    var modal = form.closest('.rzp-modal');
+    if (invalid.length) {
+      invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
+      discreet.shake(modal);
+      return;
+    }
+    var data = discreet.getFormData(form, self.options.netbanking)
+
+    // Signature is set in case of hosted checkout
+    if(self.options.signature !== ''){
+      data.signature = self.options.signature;
+    }
+
+    self.request = {
+      data: data,
+      failure: discreet.failureHandler(self),
+      success: discreet.successHandler(self),
+      prehandler: discreet.preHandler(self),
+      parent: modal
+    };
+    self.submit(self.request);
+    self.$el.find('.rzp-submit').attr('disabled', true);
+    self.modal.options.backdropClose = false;
+  }
 
   // close on backdrop click and remove errors
   Razorpay.prototype.renew = function(){
@@ -216,12 +242,17 @@
   discreet.preHandler = function(rzp){
     return function(){
       if(rzp.request.data.method !== 'netbanking'){
-        rzp.modalRef = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame').children('.rzp-modal-inner').remove();
+        var modal_parent = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame')
+        rzp.modalRef = modal_parent.children('.rzp-modal-inner')[0]
+        if(!rzp.modalRef)
+          return
+        modal_parent[0].removeChild(rzp.modalRef)
       }
     };
   };
   discreet.successHandler = function(rzp){
     return function(message){
+      rzp.modal.options.onhide = null
       rzp.hide();
       rzp.modal = null;
       if(typeof rzp.options.handler === "function"){
@@ -297,7 +328,7 @@
     $(button).click(function(e) {
       rzp.open();
       e.preventDefault();
-    }).html("Pay with Card").appendTo(discreet.rzpscript.parentNode);
+    }).html("Pay Now").appendTo(discreet.rzpscript.parentNode);
   };
 
   var key = $(discreet.rzpscript).data('key');
