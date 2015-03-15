@@ -82,6 +82,10 @@ describe("Razorpay Ajax", function(){
       })
     });
 
+    /**
+     * Disabling iframe tests for now.
+     * TODO replace with tests for popup
+     *
     describe("should load iframe and", function(){
       beforeEach(function(){
         loadFixtures('iframe_container.html');
@@ -100,6 +104,7 @@ describe("Razorpay Ajax", function(){
       })
 
     })
+    */
 
     describe('should load iframe which', function () {
       var spyCalled;
