@@ -241,7 +241,10 @@
 
   discreet.preHandler = function(rzp){
     return function(){
+      /**
       if(rzp.request.data.method !== 'netbanking'){
+      */
+      if(typeof(window.RZP_FORCE_IFRAME) !== "undefined"){
         var modal_parent = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame')
         rzp.modalRef = modal_parent.children('.rzp-modal-inner')[0]
         if(!rzp.modalRef)

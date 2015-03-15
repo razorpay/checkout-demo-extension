@@ -96,11 +96,22 @@
         if(typeof request.prehandler === 'function'){
           request.prehandler();
         }
-        var iframe = document.createElement('iframe');
-        request.parent.html('').append(iframe);
-        var template = doT.compile(Razorpay.templates.autosubmit)(response);
-        iframe.contentWindow.document.write(template);
-        return;
+
+        /**
+         * This for demoing the iframe method to clients/investors
+         */
+        if(typeof(window.RZP_FORCE_IFRAME) !== "undefined"){
+          var iframe = document.createElement('iframe');
+          request.parent.html('').append(iframe);
+          var template = doT.compile(Razorpay.templates.autosubmit)(response);
+          iframe.contentWindow.document.write(template);
+          return;
+        }
+        else {
+          var data = response.data;
+          data.callbackUrl = response.callbackUrl;
+          discreet.autoSubmitPopup(request, data);
+        }
       }
       else if (response.redirectUrl){
         if(typeof request.prehandler === 'function'){
@@ -108,26 +119,28 @@
         }
 
         if(response.redirectUrl && typeof(request.popup) === 'undefined'){
-          var iframe = document.createElement('iframe');
-          request.parent.html('').append(iframe);
-          iframe.src = response.redirectUrl;
-          lastRequestInstance.popup = {
-            _loaded: 'false',
-            loaded: function(){
-              delete lastRequestInstance.popup;
-              XD.postMessage({
-                rzp: true,
-                location: response.redirectUrl
-              }, '*', iframe.contentWindow);
+          if(typeof(window.RZP_FORCE_IFRAME) !== "undefined"){
+            var iframe = document.createElement('iframe');
+            request.parent.html('').append(iframe);
+            iframe.src = response.redirectUrl;
+            lastRequestInstance.popup = {
+              _loaded: 'false',
+              loaded: function(){
+                delete lastRequestInstance.popup;
+                XD.postMessage({
+                  rzp: true,
+                  location: response.redirectUrl
+                }, '*', iframe.contentWindow);
+              }
             }
+            iframe.src = request.rzp.options.protocol + '://' + request.rzp.options.hostname + '/' + 'processing.html';
+            return;
           }
-          iframe.src = request.rzp.options.protocol + '://' + request.rzp.options.hostname + '/' + 'processing.html';
-          return;
+          else {
+            discreet.redirectPopup(request, response.redirectUrl);
+          }
         }
         else {
-          // TODO tests for this
-          // request.parent.html('<iframe src=' + response.redirectUrl + '></iframe>');
-
           // Popup for netbanking
           discreet.redirectPopup(request, response.redirectUrl);
           return;
@@ -136,6 +149,9 @@
       else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
           request.success(response);
+          if(typeof request.popup !== 'undefined'){
+            request.popup.close();
+          }
         }
       }
       else {
@@ -161,6 +177,21 @@
       XD.postMessage({
         rzp: true,
         location: location
+      }, '*', popup.window);
+    }
+
+    if(popup._loaded === true){
+      popup.loaded();
+    }
+  }
+
+  discreet.autoSubmitPopup = function(request, data){
+    var popup = request.popup;
+
+    popup.loaded = function(){
+      XD.postMessage({
+        rzp: true,
+        autosubmit: data
       }, '*', popup.window);
     }
 
@@ -201,7 +232,14 @@
       return false;
     }
 
+    /**
+     * Setup popup in advance because popup can be opened only on click
+     * Right now, setting up popup for all cases, CC/NB
     if(request.data.method === 'netbanking'){
+      discreet.setupPopup(this, request);
+    }
+     */
+    if(typeof(window.RZP_FORCE_IFRAME) === "undefined"){
       discreet.setupPopup(this, request);
     }
 
