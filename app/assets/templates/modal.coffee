@@ -15,7 +15,7 @@ Razorpay.templates.modal = '
             <div class="rzp-merchant-title">{{=it.name}}</div>
             <div class="rzp-merchant-desc">{{=it.description}}</div>
           </div>
-          <div class="rzp-merchant-powered"></div>
+          <a class="rzp-merchant-powered" href="https://razorpay.com" target="_blank"></a>
         </div>
       </div>
       <div class="rzp-body">
