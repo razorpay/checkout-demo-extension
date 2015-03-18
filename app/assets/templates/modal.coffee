@@ -4,19 +4,18 @@ Razorpay.templates.modal = '
     <div class="rzp-modal-inner">
       <div class="rzp-tooltip"></div>
       <div class="rzp-header">
-        <div class="rzp-merchant rzp-clear">
+        <div class="rzp-merchant">
           <div class="rzp-modal-close"></div>
-          <div class="rzp-merchant_image">
+          <div class="rzp-merchant-image">
             {{if(it.image){}}
               <img src="{{=it.image}}">
             {{}}}
           </div>
-          <div class="rzp-merchant_powered"></div>
-          <div class="rzp-merchant_name">
-            {{=it.name}}
-            <br>
-            {{=it.description}}
+          <div class="rzp-merchant-name">
+            <div class="rzp-merchant-title">{{=it.name}}</div>
+            <div class="rzp-merchant-desc">{{=it.description}}</div>
           </div>
+          <a class="rzp-merchant-powered" href="https://razorpay.com" target="_blank"></a>
         </div>
       </div>
       <div class="rzp-body">
@@ -95,7 +94,7 @@ Razorpay.templates.modal = '
           <div class="rzp-footer rzp-clear">
             <button class="rzp-submit" type="submit">
               <span class="rzp-ring"></span>
-              <span class="rzp-text">Pay ₹{{=it.amount/100}}</span>
+              <span class="rzp-text">Pay <span class="rzp-rupee-icon"></span>{{=it.amount/100}}</span>
             </button>
           </div>
         </form>

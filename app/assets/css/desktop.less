@@ -1,12 +1,29 @@
 @import "common";
+
+@primary: #29b3d2;
+@color: #7f7f7f;
+@border-color: #e6e6e6;
+@background-color: #fafafa;
+
 @width: 320px;
-@bordercol: #ccc;
-@backcol: #f0f2f4;
 @padding: 20px;
-@color: #333;
-@fontsize: 14px;
+
+@font-size: 14px;
 // input elements horizontal padding
-@gap: 14px;
+@input-padding: 14px;
+
+.rzp-clear{
+  .clearfix();
+}
+.rzp-nb-na {
+  display: none;
+}
+
+#rzp-tab-nb.rzp-active {
+  .rzp-nb-na {
+    display: block;
+  }
+}
 
 .rzp-container{
   position: fixed;
@@ -18,16 +35,10 @@
   display: none;
   opacity: 0;
   background: rgba(0,0,0,0.6);
-  white-space: nowrap;
   .transition(0.25s ease-out opacity);
   overflow: auto;
   z-index: 19999;
-  &:after{
-    content: '';
-    vertical-align: middle;
-    height: 96%;
-    display: inline-block;
-  }
+  .middlefix();
   &.rzp-shown{
     opacity: 1;
     .rzp-modal{
@@ -40,9 +51,7 @@
     padding: 0;
     box-shadow:  none!important;
     outline: none!important;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+    .appearance(none);
     .box-sizing(content-box)!important; // because old browsers are content-box only, so we write the old way
   }
 }
@@ -57,27 +66,26 @@
   .transition(0.2s ease-in all);
 
   color: @color;
-  font-size: @fontsize;
+  font-size: @font-size;
   width: @width;
   border-radius: 5px;
-  background: @backcol;
+  background: @background-color;
   font-family: 'Lato', Sans-serif;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 200px;
 
   button, input, select, textarea{
-    border-radius: 2px;
     border: none!important;
     background: none;
   }
   button{
-    background: #28B3D2 no-repeat 12px center;
-    line-height: 40px;
+    border-radius: 0 0 2px 2px;
+    background: @primary no-repeat 12px center;
+    line-height: 52px;
     color: #fff;
     font-size: 16px;
-    border-radius: 2px;
     box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
-    width: 180px;
+    width: 100%;
     cursor: pointer;
     &[disabled]{
       background-image: url('../images/loaders/2.gif');
@@ -103,18 +111,17 @@
 .rzp-elem{
   height: 40px;
   line-height: 40px;
-  border: 1px solid @bordercol;
+  border: 1px solid @border-color;
   background: #fff;
   position: relative;
   margin-bottom: -1px;
-  color: #555;
   cursor: text;
   .transition(0.25s);
   background: #fff center right no-repeat;
 
   &.rzp-focused{
-    border-color: #3498db;
-    color: #333;
+    border-color: @primary;
+    color: black;
     z-index: 1;
   }
   &.rzp-mature.rzp-invalid{
@@ -132,13 +139,13 @@
     resize: none;
     width: 100%;
     display: block;
-    padding: 0 @gap;
-    margin: 0 -@gap;
+    padding: 0 @input-padding;
+    margin: 0 -@input-padding;
     background: none!important;
   }
 }
 .rzp-elem-inner{
-  margin: 0 @gap;
+  margin: 0 @input-padding;
   height: inherit;
   line-height: inherit;
   border-radius: inherit;
@@ -184,7 +191,7 @@
   font-size: 0;
   margin: 0 2px 0 1px;
   .rzp-elem{
-    font-size: @fontsize;
+    font-size: @font-size;
     display: inline-block;
     width: 50%;
     margin-left: -1px;
@@ -198,30 +205,55 @@
   float: left;
 }
 .rzp-merchant{
+  border-radius: 2px 2px 0 0;
+  background: #fff;
+  position: relative;
   padding: 10px;
-  min-height: 40px;
+  height: 40px;
+  .middlefix();
 }
 /* Default class for an overlay */
 .rzp-header{
-  border-bottom: 1px solid @bordercol;
+  border-bottom: 2px solid @primary;
 }
-.rzp-merchant_image{
-  float:left;
+.rzp-merchant-image{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  padding-left: 10px;
+  .middlefix();
 }
-.rzp-merchant_image img{
-  max-width:60px;
+.rzp-merchant-image img{
+  max-width: 60px;
   max-height: 40px;
+  vertical-align: middle;
+  display: inline-block;
 }
-.rzp-merchant_name{
-  margin:0 auto;
-  width:145px;
-  text-transform: capitalize;
+.rzp-merchant-name{
+  vertical-align: middle;
+  display: inline-block;
 }
-.rzp-merchant_powered{
-  float:right;
-  width:100px;
-  background: url('../images/powered_by_rzp.png') right center no-repeat;
-  min-height: 30px;
+.rzp-merchant-title{
+  color: #333;
+  margin-bottom: 5px;
+}
+.rzp-merchant-powered{
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 52px;
+  background: url('../images/favicon.png') center no-repeat;
+  background-size: 26px;
+}
+.rzp-rupee-icon{
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAYAAADzoH0MAAABoUlEQVQ4EZWUu0oDURCGdzV4QUkjRhALURBBQbBSRFsfwcpW0tkJErCys12xCYJiJV4KfQUVrSwECwleQETUQqKFRrN+E8/AySYn2fzwMZMz88/sHpZ4HgrDcBp+oVFtiLkDzhp10n8p3gQPMAr3cAvN0Al9MAwtoLojOYEmcxD4vv9p8vLAZB/G4BhUjyTd5Z2e58sBBdksW1UhSQG64Aj6QbQC26Xs35sv5QzIQB4+Irzz+wtUBRLteyYfl+3yqK/w7UBMqiKJ9q3KdnnXHqI8alEOIpJXmYeMOQ+I6ybPcYnymrXFggOzXrZP1e6OVDEswI8ZcEiUy64UhVZoB/moUjADmyBbRefQW+k0JxR34AZy8AYqufEA5I7couFUHcQn2IJFGHK7rAqNS6CSL27QKtdPMSRgTycQLyBZ32l1YJDLuwZV1irHS3FOgFycKh3PaXXhTKubKMMmrXK8FFPWGiKvlYrnNF0YkiAXqdonqf4VuiZjGIEXnUBcdvU6zzHNgf7Zyv/CrLPZVcC0BqoHkgFXb9VzDG1wpROIu3bjH9Lpayomlf62AAAAAElFTkSuQmCC') center no-repeat;
+  display: inline-block;
+  background-size: 8px;
+  width: 14px;
+  height: 14px;
+  margin: 0px -1px -1px;
 }
 .rzp-clear{
   clear:both;
@@ -285,34 +317,41 @@
 }
 
 .rzp-tabs{
-  font-size: 0;
+  margin: 0 -20px;
   white-space: nowrap;
-  margin: 0 2px -5px 0;
-  padding: 0;
+  font-size: 0;
 
   li{
-    line-height: 40px;
+    line-height: 52px;
     display: inline-block;
-    font-size: 14px;
     text-align: center;
-    border: 1px solid @bordercol;
+    border: 1px solid @border-color;
+    border-right: none;
     width: 50%;
+    font-size: @font-size;
     cursor: pointer;
-    background: #ddd;
-    margin-left: -1px;
-    border-radius: 0 4px 4px 0;
+    background: #fff;
+    padding-bottom: 2px;
     
     &.rzp-active{
-      background: #f6f7fa;
+      color: @primary;
       cursor: default;
       pointer-events: none;
+      padding-bottom: 1px;
+      border-bottom: 2px solid @primary;
     }
     &:first-child{
-      border-radius: 4px 0 0 4px;
+      border-left: none;
+      margin-right: -1px;
     }
   }
 }
+.rzp-form{
+  padding-bottom: 52px;
+}
 .rzp-footer{
-  padding: 0 @padding @padding;
-  text-align: center;
+  margin: 0 -@padding;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
 }
