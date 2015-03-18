@@ -66,7 +66,7 @@
         return;
       }
 
-      var optionsString = '';
+      var optionsString = '<option style="display: none" selected></option>';
       for(var i in data){
         if(i === 'http_status_code'){
           continue;
