@@ -3,32 +3,26 @@
 .rzp-curtain{
 	overflow-x: hidden;
 	.rzp-modal{
+		color: #666;
 		width: 100%;
 		border-radius: 0;
 		height: 100%!important;
 		margin: 0;
 		.transform(translateX(-100%));
 	}
-	.rzp-header{
-		color: #fff;
-	}
 	.rzp-modal-close{
 		display: block;
-		background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAUCAYAAAB4d5a9AAAAg0lEQVQ4Ee2VwQ2AMAhFiZOzQUdgVPweMB4q0IBelMQ0EXjPoo1EiVDVgcuCEy1rJSCL0W1dIwTVM8EhCtry6TsB7o88xal0BOK05VO/IJyVMyKkysEEhJQxAWALt9lV8PBu+HxOR9Rz+MzkiHoO4SdF77wjG23bOvsY2uBXEESl3+8OU6GkQUWD4zYAAAAASUVORK5CYII=') center no-repeat;
+		background: url('data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGZJREFUeNrs18EJgDAQRcFg5XaQElJq9KDgUcTL38zA3l9A4qY1AACopJ8zr9nT4scj/p7o+Jke35Pjh3jxi8X/MXty/Kdrd1txVYj+hEr8uErcRA5hmbNOF3zQlHhSAgDAe4cAAwCSWJ8qggqOaAAAAABJRU5ErkJggg==') center no-repeat;
 		height: 100%;
 		width: 48px;
 		position: absolute;
 		top: 0;
 		left: 0;
+		opacity: 0.65;
+		background-size: 36px;
 	}
 	.rzp-merchant-image{
 		display: none;
-	}
-	.rzp-merchant{
-		background: #29b3d2;
-	}
-	.rzp-merchant-title{
-		color: #fff;
 	}
 	&.rzp-shown .rzp-modal{
 		.transition(0.3s ease all);
