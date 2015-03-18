@@ -5,7 +5,7 @@
 @border-color: #e6e6e6;
 @background-color: #fafafa;
 
-@width: 320px;
+@width: 340px;
 @padding: 20px;
 
 @font-size: 14px;
@@ -75,16 +75,15 @@
   min-height: 200px;
 
   button, input, select, textarea{
-    border-radius: 2px;
     border: none!important;
     background: none;
   }
   button{
+    border-radius: 0 0 2px 2px;
     background: @primary no-repeat 12px center;
     line-height: 52px;
     color: #fff;
     font-size: 16px;
-    border-radius: 2px;
     box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
     width: 100%;
     cursor: pointer;
@@ -132,6 +131,7 @@
     }
   }
   input, select, textarea{
+    border-radius: 2px;
     color: inherit;
     line-height: inherit;
     height: inherit;
@@ -206,16 +206,18 @@
   float: left;
 }
 .rzp-merchant{
+  border-radius: 2px 2px 0 0;
   background: #fff;
   position: relative;
   padding: 10px;
-  min-height: 40px;
+  height: 40px;
+  .middlefix();
 }
 /* Default class for an overlay */
 .rzp-header{
   border-bottom: 2px solid @primary;
 }
-.rzp-merchant_image{
+.rzp-merchant-image{
   position: absolute;
   left: 0;
   top: 0;
@@ -223,24 +225,28 @@
   padding-left: 10px;
   .middlefix();
 }
-.rzp-merchant_image img{
+.rzp-merchant-image img{
   max-width: 60px;
   max-height: 40px;
   vertical-align: middle;
   display: inline-block;
 }
-.rzp-merchant_name{
-  margin:0 auto;
-  width:145px;
-  text-transform: capitalize;
+.rzp-merchant-name{
+  vertical-align: middle;
+  display: inline-block;
 }
-.rzp-merchant_powered{
+.rzp-merchant-title{
+  color: #333;
+  margin-bottom: 5px;
+}
+.rzp-merchant-powered{
   position: absolute;
   right: 0;
   top: 0;
   height: 100%;
-  width:100px;
-  background: url('../images/powered_by_rzp.png') center no-repeat;
+  width: 52px;
+  background: url('../images/favicon.png') center no-repeat;
+  background-size: 26px;
 }
 .rzp-clear{
   clear:both;
@@ -313,11 +319,11 @@
     display: inline-block;
     text-align: center;
     border: 1px solid @border-color;
+    border-right: none;
     width: 50%;
     font-size: @font-size;
     cursor: pointer;
     background: #fff;
-    margin-left: -1px;
     padding-bottom: 2px;
     
     &.rzp-active{
@@ -326,6 +332,10 @@
       pointer-events: none;
       padding-bottom: 1px;
       border-bottom: 2px solid @primary;
+    }
+    &:first-child{
+      border-left: none;
+      margin-right: -1px;
     }
   }
 }

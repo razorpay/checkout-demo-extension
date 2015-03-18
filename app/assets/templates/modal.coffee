@@ -4,19 +4,18 @@ Razorpay.templates.modal = '
     <div class="rzp-modal-inner">
       <div class="rzp-tooltip"></div>
       <div class="rzp-header">
-        <div class="rzp-merchant rzp-clear">
+        <div class="rzp-merchant">
           <div class="rzp-modal-close"></div>
-          <div class="rzp-merchant_image">
+          <div class="rzp-merchant-image">
             {{if(it.image){}}
               <img src="{{=it.image}}">
             {{}}}
           </div>
-          <div class="rzp-merchant_powered"></div>
-          <div class="rzp-merchant_name">
-            {{=it.name}}
-            <br>
-            {{=it.description}}
+          <div class="rzp-merchant-name">
+            <div class="rzp-merchant-title">{{=it.name}}</div>
+            <div class="rzp-merchant-desc">{{=it.description}}</div>
           </div>
+          <div class="rzp-merchant-powered"></div>
         </div>
       </div>
       <div class="rzp-body">
