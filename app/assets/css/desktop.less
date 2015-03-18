@@ -142,7 +142,13 @@
     padding: 0 @input-padding;
     margin: 0 -@input-padding;
     background: none!important;
+    position: relative;
   }
+}
+.rzp-select:not(.rzp-filled) .rzp-elem-inner:before{
+  content: 'Select a bank';
+  position: absolute;
+  top: 0;
 }
 .rzp-elem-inner{
   margin: 0 @input-padding;

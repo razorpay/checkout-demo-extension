@@ -66,13 +66,14 @@
         return;
       }
 
-      $('#rzp-tab-nb select').html('<option value="">Select Bank</option>');
+      var optionsString = '';
       for(var i in data){
         if(i === 'http_status_code'){
           continue;
         }
-        $('#rzp-tab-nb select').append('<option value="'+i+'">' + data[i] + '</option>');
+        optionsString += '<option value="'+i+'">' + data[i] + '</option>';
       }
+      $('#rzp-tab-nb select').html(optionsString);
     });
   }
 

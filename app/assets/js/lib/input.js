@@ -190,6 +190,12 @@
       } else if (!valid) {
         parent.addClass(this["class"]('invalid'));
       }
+      if(value && !parent.hasClass(this["class"]('filled'))){
+        parent.addClass(this["class"]('filled'));
+      } else if(!value){
+        parent.removeClass(this["class"]('filled'));
+      }
+
       return this.tooltip(el);
     },
 
