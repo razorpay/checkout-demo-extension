@@ -94,7 +94,7 @@ Razorpay.templates.modal = '
           <div class="rzp-footer rzp-clear">
             <button class="rzp-submit" type="submit">
               <span class="rzp-ring"></span>
-              <span class="rzp-text">Pay ₹{{=it.amount/100}}</span>
+              <span class="rzp-text">Pay <span class="rzp-rupee-icon"></span>{{=it.amount/100}}</span>
             </button>
           </div>
         </form>
