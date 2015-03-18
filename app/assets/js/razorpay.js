@@ -149,6 +149,9 @@
       else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
           request.success(response);
+          if(typeof request.popup !== 'undefined'){
+            request.popup.close();
+          }
         }
       }
       else {
