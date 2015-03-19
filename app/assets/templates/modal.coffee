@@ -53,8 +53,8 @@ Razorpay.templates.modal = '
             <div class="rzp-fieldset rzp-tab-content" id="rzp-tab-nb">
               <div class="rzp-elem rzp-select" style="border-radius: 4px">
                 <div class="rzp-elem-inner">
-                  <select name="bank" required class="rzp-input">
-                    <option disabled selected="selected" value=""></option>
+                  <select name="bank" required class="rzp-input" pattern="[a-z]+">
+                    <option selected="selected" value="">Select Bank</option>
                     <option value="CITI">Citi Bank</option>
                     <option value="HDFC">HDFC Bank</option>
                     <option value="IBKL">IDBI Bank</option>

@@ -66,7 +66,7 @@
         return;
       }
 
-      var optionsString = '<option disabled selected="selected" value=""></option>';
+      var optionsString = '<option selected="selected" value="">Select Bank</option>';
       for(var i in data){
         if(i === 'http_status_code'){
           continue;
