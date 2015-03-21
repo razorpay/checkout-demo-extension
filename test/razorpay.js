@@ -150,20 +150,20 @@ describe("Razorpay Ajax", function(){
         }, 500)
       });
 
-      it("should call XDCallback", function(done){
-        rzp.options.hostname = 'localhost:9876'
-        rzp.options.protocol = 'http'
-        spyCalled = jasmine.createSpy('message');
-        spyNotCalled = jasmine.createSpy('message');
-
-        rzp.submit({
-          data: data,
-          success: function(){
-            spyCalled();
-            done();
-          }
-        });
-      });
+//      it("should call XDCallback", function(done){
+//        rzp.options.hostname = 'localhost:9876'
+//        rzp.options.protocol = 'http'
+//        spyCalled = jasmine.createSpy('message');
+//        spyNotCalled = jasmine.createSpy('message');
+//
+//        rzp.submit({
+//          data: data,
+//          success: function(){
+//            spyCalled();
+//            done();
+//          }
+//        });
+//      });
     });
   });
 
