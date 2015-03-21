@@ -6,6 +6,7 @@
   var $ = Razorpay.$;
   var doT = Razorpay.doT;
   var XD = Razorpay.XD;
+  var Hedwig = Razorpay.Hedwig;
   var discreet = {};
 
   // TODO add style link to insert
@@ -66,10 +67,10 @@
       }
     }
 
-    lastRequestInstance = null;
-
     // remove postMessage listener
-    XD.receiveMessage();
+    lastRequestInstance.rzp.hedwig.clearReceiveMessage();
+
+    lastRequestInstance = null;
   };
 
   /**
@@ -163,7 +164,8 @@
   };
 
   discreet.setupPopup = function(rzp, request){
-    var popup = request.popup = new Razorpay.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
+    var popup = request.popup = new Razorpay.Popup('');
+    popup.location(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
     popup.onClose(discreet.popupClose);
     popup._loaded = false;
     popup.loaded = function(){};
@@ -173,8 +175,7 @@
     var popup = request.popup;
 
     popup.loaded = function(){
-      XD.postMessage({
-        rzp: true,
+      request.rzp.hedwig.sendMessage({
         location: location
       }, '*', popup.window);
     }
@@ -188,8 +189,7 @@
     var popup = request.popup;
 
     popup.loaded = function(){
-      XD.postMessage({
-        rzp: true,
+      request.rzp.hedwig.sendMessage({
         autosubmit: data
       }, '*', popup.window);
     }
@@ -242,11 +242,12 @@
       discreet.setupPopup(this, request);
     }
 
-    // setting up XD
+    /**
+     * Setting up Hedwig
+     */
     lastRequestInstance = request;
-    XD.receiveMessage(); // remove previous listener
     var source = this.options.protocol + '://' + this.options.hostname;
-    XD.receiveMessage(discreet.XDCallback, source);
+    this.hedwig.receiveMessage(discreet.XDCallback, source);
 
     request.data.key_id = this.options.key;
     request.rzp = this;
@@ -264,6 +265,10 @@
   Razorpay.prototype.configure = function(overrides){
     this.validateOptions(overrides, true);
     this.options = this.options || {};
+
+    if(typeof this.hedwig === 'undefined'){
+      this.hedwig = new Hedwig(XD, Razorpay.CrossStorageClient);
+    }
 
     for (var i in defaults){
       if(i === 'prefill'){
