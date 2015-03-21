@@ -15,6 +15,10 @@
     this.XD = XD;
     this.CS = CS;
 
+    if(typeof options !== 'undefined' && typeof options.csHubLocation !== 'undefined'){
+      this.options.csHubLocation = options.csHubLocation;
+    }
+
     /**
      * clear any postmessage data receive listeners
      */
@@ -28,7 +32,7 @@
 
   Hedwig.prototype.options = {
     method: 'xd',
-    csHubLocation: 'http://api.razorpay.dev/crossStorage.html',
+    csHubLocation: '',
     csLabel: 'rzp'
   }
 

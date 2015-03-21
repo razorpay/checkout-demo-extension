@@ -266,10 +266,6 @@
     this.validateOptions(overrides, true);
     this.options = this.options || {};
 
-    if(typeof this.hedwig === 'undefined'){
-      this.hedwig = new Hedwig(XD, Razorpay.CrossStorageClient);
-    }
-
     for (var i in defaults){
       if(i === 'prefill'){
         continue;
@@ -301,6 +297,12 @@
         payload: {
           config: rbPayload
         }
+      });
+    }
+
+    if(typeof this.hedwig === 'undefined'){
+      this.hedwig = new Hedwig(XD, Razorpay.CrossStorageClient, {
+        csHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossStorage.html'
       });
     }
 
