@@ -39,13 +39,17 @@
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
+    // console.log(1)
     /**
      * Popup sends an XDM message to tell that it has loaded
      * Ignore that
      */
     if(message.data.source === 'popup'){
-      lastRequestInstance.popup._loaded = true;
-      lastRequestInstance.popup.loaded();
+      if(!lastRequestInstance.popup._loaded){
+        // console.log(2)
+        lastRequestInstance.popup._loaded = true;
+        lastRequestInstance.popup.loaded();
+      }
       return;
     }
 
@@ -135,6 +139,7 @@
               }
             }
             iframe.src = request.rzp.options.protocol + '://' + request.rzp.options.hostname + '/' + 'processing.html';
+            // iframe.src = location.origin.replace('9000', '9001') + '/processing.html';
             return;
           }
           else {
@@ -164,7 +169,7 @@
   };
 
   discreet.setupPopup = function(rzp, request){
-    // var popup = request.popup = new Razorpay.Popup('processing.html');
+    // var popup = request.popup = new Razorpay.Popup(location.origin.replace('9000', '9001') + '/processing.html');
     var popup = request.popup = new Razorpay.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
     popup.onClose(discreet.popupClose);
     popup._loaded = false;
@@ -247,7 +252,7 @@
      */
     lastRequestInstance = request;
     var source = this.options.protocol + '://' + this.options.hostname;
-    this.hedwig.receiveMessage(discreet.XDCallback, source);
+    this.hedwig.receiveMessage(discreet.XDCallback, source);//location.origin.replace('9000', '9001'));
 
     request.data.key_id = this.options.key;
     request.rzp = this;
@@ -304,7 +309,7 @@
       this.hedwig = new Hedwig(XD, Razorpay.CrossStorageClient, {
         csHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossStorage.html',
         ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.html'
-        // ccHubLocation: '/crossCookies.html'
+        // ccHubLocation: location.origin.replace('9000', '9001') + '/crossCookies.html'
       });
     }
 
