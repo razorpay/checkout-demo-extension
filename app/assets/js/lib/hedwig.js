@@ -75,7 +75,7 @@
    * OPTIONS: xd | cs
    */
   Hedwig.prototype.decideMethod = function(){
-    if(this.detectBrowser() === false && false){
+    if(this.detectBrowser() === false){
       this.options.method = 'xd';
     }
     else {
