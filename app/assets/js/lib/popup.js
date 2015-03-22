@@ -85,7 +85,7 @@
     this.window = window.open(src, name, optsStr);
     this.focus();
 
-    this.$el = $(this.window.document.body);
+    // this.$el = $(this.window.document.body);
 
     this.interval = setInterval(checkClose(this), 500);
 
