@@ -18,6 +18,9 @@
     if(typeof options !== 'undefined' && typeof options.csHubLocation !== 'undefined'){
       this.options.csHubLocation = options.csHubLocation;
     }
+    if(typeof options !== 'undefined' && typeof options.ccHubLocation !== 'undefined'){
+      this.options.ccHubLocation = options.ccHubLocation;
+    }
 
     /**
      * clear any postmessage data receive listeners
@@ -45,6 +48,9 @@
     if(this.options.method === 'xd'){
       method = 'xd' + method;
     }
+    else if(this.options.method === 'cc'){
+      method = 'cc' + method;
+    }
     else if(this.options.method === 'cs'){
       method = 'cs' + method;
     }
@@ -69,12 +75,12 @@
    * OPTIONS: xd | cs
    */
   Hedwig.prototype.decideMethod = function(){
-    if(this.detectBrowser() === false){
+    if(this.detectBrowser() === false && false){
       this.options.method = 'xd';
     }
     else {
-      this.options.method = 'cs';
-      this.setupCS();
+      this.options.method = 'cc';
+      this.setupCC();
     }
   }
 
@@ -83,6 +89,9 @@
   }
 
   Hedwig.prototype.xdReceiveMessage = function(callback, source){
+    this.XD.receiveMessage(callback, source);
+  }
+  Hedwig.prototype.ccReceiveMessage = function(callback, source){
     this.XD.receiveMessage(callback, source);
   }
 
@@ -109,6 +118,10 @@
     data.rzp = true;
     this.XD.postMessage(data, url, target);
   }
+  Hedwig.prototype.ccSendMessage = function(data, url, target){
+    data.rzp = true;
+    this.XD.postMessage(data, url, this.ccFrame);
+  }
 
   Hedwig.prototype.csSendMessage = function(data, url, target){
     data.rzp = true;
@@ -118,6 +131,17 @@
   /**
    * Init ZenDesk's Cross Storage and setup polling
    */
+  Hedwig.prototype.setupCC = function(){
+    this.ccFrame = document.createElement('iframe')
+    this.ccFrame.src = this.options.ccHubLocation
+    this.ccFrame.style.display = 'none'
+    this.currentScript = document.currentScript || (function() {
+      var scripts;
+      scripts = document.getElementsByTagName('script');
+      return scripts[scripts.length - 1];
+    })();
+    this.currentScript.parentNode.appendChild(this.ccFrame)
+  }
   Hedwig.prototype.setupCS = function(){
     var storage = this.cs.storage = new this.CS(this.options.csHubLocation);
 
