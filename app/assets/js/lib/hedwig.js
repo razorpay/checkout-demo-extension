@@ -91,11 +91,11 @@
   Hedwig.prototype.xdReceiveMessage = function(callback, source){
     this.XD.receiveMessage(callback, source);
   }
+
   Hedwig.prototype.ccReceiveMessage = function(callback, source){
     this.XD.receiveMessage(callback, source);
   }
 
-  // TODO
   Hedwig.prototype.csReceiveMessage = function(callback, source){
     this.options.receiveMessageCallback = callback;
     if(typeof this.cs.data !== 'undefined' && typeof this.cs.data.time !== 'undefined'){
@@ -118,6 +118,7 @@
     data.rzp = true;
     this.XD.postMessage(data, url, target);
   }
+
   Hedwig.prototype.ccSendMessage = function(data, url, target){
     data.rzp = true;
     this.XD.postMessage(data, url, this.ccFrame.contentWindow);
@@ -128,9 +129,6 @@
     this.cs.storage.set('rzp-receive', data);
   }
 
-  /**
-   * Init ZenDesk's Cross Storage and setup polling
-   */
   Hedwig.prototype.setupCC = function(){
     this.ccFrame = document.createElement('iframe')
     this.ccFrame.src = this.options.ccHubLocation + '#' + location.origin
@@ -142,6 +140,10 @@
     })();
     this.currentScript.parentNode.appendChild(this.ccFrame)
   }
+
+  /**
+   * Init ZenDesk's Cross Storage and setup polling
+   */
   Hedwig.prototype.setupCS = function(){
     var storage = this.cs.storage = new this.CS(this.options.csHubLocation);
 
