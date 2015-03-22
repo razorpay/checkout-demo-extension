@@ -164,7 +164,7 @@
   };
 
   discreet.setupPopup = function(rzp, request){
-    // var popup = request.popup = new Razorpay.Popup('pro.html');
+    // var popup = request.popup = new Razorpay.Popup('processing.html');
     var popup = request.popup = new Razorpay.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
     popup.onClose(discreet.popupClose);
     popup._loaded = false;
@@ -303,7 +303,7 @@
     if(typeof this.hedwig === 'undefined'){
       this.hedwig = new Hedwig(XD, Razorpay.CrossStorageClient, {
         csHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossStorage.html',
-        ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossStorage.html'
+        ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.html'
         // ccHubLocation: '/crossCookies.html'
       });
     }

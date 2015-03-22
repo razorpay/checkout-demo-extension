@@ -120,7 +120,7 @@
   }
   Hedwig.prototype.ccSendMessage = function(data, url, target){
     data.rzp = true;
-    this.XD.postMessage(data, url, this.ccFrame);
+    this.XD.postMessage(data, url, this.ccFrame.contentWindow);
   }
 
   Hedwig.prototype.csSendMessage = function(data, url, target){
@@ -133,7 +133,7 @@
    */
   Hedwig.prototype.setupCC = function(){
     this.ccFrame = document.createElement('iframe')
-    this.ccFrame.src = this.options.ccHubLocation
+    this.ccFrame.src = this.options.ccHubLocation + '#' + location.origin
     this.ccFrame.style.display = 'none'
     this.currentScript = document.currentScript || (function() {
       var scripts;
