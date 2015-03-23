@@ -131,6 +131,8 @@
 
   Hedwig.prototype.setupCC = function(){
     this.ccFrame = document.createElement('iframe')
+    this.ccFrame.width = 0;
+    this.ccFrame.height = 0;
     this.ccFrame.src = this.options.ccHubLocation + '#' + location.origin
     this.ccFrame.style.display = 'none'
     this.currentScript = document.currentScript || (function() {
