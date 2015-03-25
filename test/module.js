@@ -11,10 +11,6 @@ describe("Available modules", function(){
     expect(Razorpay.$).toBeDefined();
   });
 
-  it("should include XDM", function(){
-    expect(Razorpay.XD).toBeDefined();
-  });
-
   it("should include dot", function(){
     expect(Razorpay.doT).toBeDefined();
   });
