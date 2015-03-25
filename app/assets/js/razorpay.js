@@ -39,7 +39,6 @@
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
-    // console.log(1)
     /**
      * Popup sends an XDM message to tell that it has loaded
      * Ignore that
@@ -304,8 +303,7 @@
     }
 
     if(typeof this.hedwig === 'undefined'){
-      this.hedwig = new Hedwig(XD, Razorpay.CrossStorageClient, {
-        csHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossStorage.html',
+      this.hedwig = new Hedwig({
         ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.php'
       });
     }
