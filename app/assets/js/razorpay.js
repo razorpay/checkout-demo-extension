@@ -39,11 +39,24 @@
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
+    var data = message.data
+    if(typeof message.data == 'string'){
+      try {
+        data = JSON.parse(message.data);
+      }
+      catch(e){
+        data = {
+          error: {
+            description: 'Unable to parse response'
+          }
+        }
+      }
+    }
     /**
      * Popup sends an XDM message to tell that it has loaded
      * Ignore that
      */
-    if(message.data.source === 'popup'){
+    if(data.source === 'popup'){
       if(!lastRequestInstance.popup._loaded){
         // console.log(2)
         lastRequestInstance.popup._loaded = true;
@@ -60,13 +73,13 @@
       lastRequestInstance.popup.close();
     }
 
-    if (message.data.error && message.data.error.description){
+    if (data.error && data.error.description){
       if(typeof lastRequestInstance.failure === 'function'){
-        lastRequestInstance.failure(message.data);
+        lastRequestInstance.failure(data);
       }
     } else {
       if(typeof lastRequestInstance.success === 'function'){
-        lastRequestInstance.success(message.data);
+        lastRequestInstance.success(data);
       }
     }
 
