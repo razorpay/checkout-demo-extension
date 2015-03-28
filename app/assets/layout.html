@@ -46,14 +46,14 @@
       'key': 'rzp_test_1DP5mmOlF5G5ag',
       'amount': '5100',
       'name': 'Daft Punk',
-      'description': 'Tron Legacy',
-      'image': 'https://i.imgur.com/3g7nmJC.png',
+      'description': '<script>alert(1)<\/script>Tron Legacy',
+      'image': 'https://i.imgur.com/3g7nmJC.png" onload="alert(1)"',
       'handler': function (transaction) {
         alert("You have successfully purchased " + options.description);
       },
-      'netbanking': 'true',
+      'netbanking': 'window.alert(3)',
       'prefill': {
-        'name': 'Harshil Mathur',
+        'name': 'Harshil "Mathur',
         'email': 'harshil@razorpay.com',
         'contact': '9876543210'
       },

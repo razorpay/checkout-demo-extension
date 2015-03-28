@@ -77,8 +77,42 @@
     });
   }
 
+  Razorpay.prototype.purifyDOMOptions = function(obj){
+    // directly appended tags
+    var user_fields = ['name', 'description', 'amount', 'currency'];
+    for(var i = 0; i < user_fields.length; i++){
+      obj[user_fields[i]] = Razorpay.DOMPurify.sanitize(obj[user_fields[i]]);
+    }
+
+    // if conditions
+    obj.netbanking = !!obj.netbanking
+
+    // attributes
+    if(typeof obj.image == 'string'){
+      obj.image = obj.image.replace(/"/g,'');
+    }
+
+    // prefills
+    if(typeof obj.prefill == 'object'){
+      for(var i in obj.prefill){
+        if(typeof obj.prefill[i] == 'string'){
+          obj.prefill[i] = obj.prefill[i].replace(/"/g,'');
+        }
+      }
+    }
+
+    // notes
+    if(typeof obj.notes == 'object'){
+      for(var i in obj.notes){
+        if(typeof obj.notes[i] == 'string'){
+          obj.notes[i] = obj.notes[i].replace(/"/g,'');
+        }
+      }
+    }
+  }
   Razorpay.prototype.sanitizeOptions = function(obj){ // warning: modifies original object
     if(obj){
+      this.purifyDOMOptions(obj);
       if(obj.prefill){
         if(obj.prefill.contact){
           if(typeof obj.prefill.contact != 'string')
@@ -102,7 +136,7 @@
       return;
     }
 
-    this.sanitizeOptions(this.options)
+    this.sanitizeOptions(this.options);
     this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
     this.$el.smarty();
 

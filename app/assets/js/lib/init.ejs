@@ -14,6 +14,10 @@ window.Razorpay = function(options){
   <%- include hedwig.js %>
   Razorpay.Hedwig = module.exports;
 
+  // DOM purify for user input sanitization
+  <%- include purify.js %>
+  Razorpay.DOMPurify = module.exports;
+
   // doT
   <%- include doT.js %>
   Razorpay.doT = module.exports;
