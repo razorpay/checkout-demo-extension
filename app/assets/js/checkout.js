@@ -78,14 +78,10 @@
   }
 
   Razorpay.prototype.sanitizeDOM = function(obj){
-    var testdiv = document.createElement('div');
-
     // directly appended tags
     var user_fields = ['name', 'description', 'amount', 'currency'];
     for(var i = 0; i < user_fields.length; i++){
-      testdiv.innerHTML = obj[user_fields[i]]
-      var textonly = testdiv.textContent || testdiv.innerText || '';
-      obj[user_fields[i]] = textonly;
+      obj[user_fields[i]] = obj[user_fields[i]].replace(/<[^>]*>?/g, "");
     }
 
     // if conditions
