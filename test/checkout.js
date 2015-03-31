@@ -84,11 +84,11 @@ describe("Checkout init", function(){
     expect($('link[href*="checkout.css"]')[0]).toBeInDOM()
   });
 
-  it("should set handler as empty string if not passed", function(){
+  it("should set handler as null if not passed", function(){
     var local = $.extend({}, custom);
     delete local.handler;
     var co = new Razorpay(local);
-    expect(co.options.handler).toBe('');
+    expect(co.options.handler).toBe(null);
   })
 
   it("should set signature", function(){
