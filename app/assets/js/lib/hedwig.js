@@ -55,7 +55,7 @@
   }
 
   /**
-   * Decide whether to use window.postmessage or cross local storage
+   * Decide whether to use window.postmessage or cookie polling
    * OPTIONS: xd | cc
    */
   Hedwig.prototype.decideMethod = function(){

@@ -292,7 +292,6 @@
         ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.php'
       });
     }
-
     discreet.getNetbankingList(this);
   };
 
@@ -467,7 +466,6 @@
       Rollbar.configure({enabled: false})
     }
   }
-
   discreet.getNetbankingList = function(rzp){
     $.ajax({
       url: rzp.makeUrl() + rzp.options.netbankingListUrl,
@@ -476,19 +474,23 @@
       },
       dataType: 'jsonp',
       success: function(response){
-        if (response['http_status_code'] !== 200 && response.error){
-          callback({error: true});
-        }
-
         rzp.options.netbankingList = response;
-
-        if(typeof rzp.options.netbankingListCB !== 'undefined'){
-          rzp.options.netbankingListCB(response);
+        
+        if(typeof rzp.options.netbankingListCB == 'function'){
+          var callback_param;
+          if (response['http_status_code'] !== 200 && response.error){
+            callback_param = {error: true};
+          } else{
+            callback_param = response;
+          }
+          rzp.options.netbankingListCB(callback_param);
         }
       },
       timeout: 30000,
       error: function(response){
-        callback({error: true});
+        if(typeof rzp.options.netbankingListCB == 'function'){
+          rzp.options.netbankingListCB({error: true});
+        }
       }
     });
   }
@@ -496,10 +498,9 @@
   Razorpay.prototype.getNetbankingList = function(callback){
     if(typeof this.options.netbankingList === "undefined" ){
       this.options.netbankingListCB = callback;
-      return;
+    } else {
+      callback(this.options.netbankingList);
     }
-
-    callback(this.options.netbankingList);
   }
 
   // @if NODE_ENV='test'
