@@ -14,7 +14,7 @@ build:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
             token: $SLACK_TOKEN
-            channel: general
+            channel: tech
 deploy:
     steps:
         - npm-install
