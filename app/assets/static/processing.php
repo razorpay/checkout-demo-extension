@@ -1,3 +1,6 @@
+<?php
+require('headers.php');
+?>
 <!doctype html>
 <head>
     <title>Razorpay - Payment in progress</title>
