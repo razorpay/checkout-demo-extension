@@ -35,6 +35,9 @@ module.exports = function(grunt){
       copy_static:{
         cmd: 'cp -r app/srv/static app/dist/v1/static/'
       },
+      mv_connector:{
+        cmd: 'mv app/dist/v1/static/connector/index.html app/dist/v1/static/connector/index.php'
+      },
       // Not needed anymore
       copy_html:{
         cmd: 'cp app/srv/layout.html app/dist/v1/'
@@ -108,7 +111,8 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'exec:dir_images',
     'exec:copy_images',
-    'exec:copy_static'
+    'exec:copy_static',
+    'exec:mv_connector'
   ]);
 
   grunt.registerTask('build',[

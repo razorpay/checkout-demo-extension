@@ -39,7 +39,6 @@
 		setInterval(post_message, 300)
 
 		var listener = function(e){
-			debugger
 			if(e.data){
 				post_message()
 				createCookie('rzp-receive', JSON.stringify(e.data))
