@@ -91,6 +91,7 @@
       } else if(window.detachEvent){
         window.detachEvent('onmessage', this.currentCallback);
       }
+      this.currentCallback = null
     }
   }
 
