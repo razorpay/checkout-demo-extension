@@ -68,31 +68,31 @@
     }
   }
 
-  Hedwig.prototype._postMessageReceive = function(callback){
+  Hedwig.prototype.receiveMessage = function(callback){
+    if(this.currentCallback){
+      this.clearReceiveMessage()
+    }
+
+    this.currentCallback = callback;
     if (window.addEventListener) {
       window.addEventListener('message', callback, false);
-    } else {
+    } else if(window.attachEvent){
       window.attachEvent('onmessage', callback);
     }
-  }
-
-  Hedwig.prototype.receiveMessage = function(callback, source){
-    this.callMethod('ReceiveMessage', arguments);
-  }
-
-  Hedwig.prototype.xdReceiveMessage = function(callback){
-    this._postMessageReceive(callback);
-  }
-
-  Hedwig.prototype.ccReceiveMessage = function(callback){
-    this._postMessageReceive(callback);
   }
 
   /**
    * Removes xd listeners
    */
   Hedwig.prototype.clearReceiveMessage = function(){
-    this._postMessageReceive(function(){});
+    if(this.currentCallback){
+      if(window.removeEventListener){
+        window.removeEventListener('message', this.currentCallback, false);
+      } else if(window.detachEvent){
+        window.detachEvent('onmessage', this.currentCallback);
+      }
+      this.currentCallback = null
+    }
   }
 
   Hedwig.prototype.sendMessage = function(data, url, target){
@@ -113,7 +113,7 @@
     this.ccFrame = document.createElement('iframe')
     this.ccFrame.width = 0;
     this.ccFrame.height = 0;
-    this.ccFrame.src = this.options.ccHubLocation + '#' + location.origin
+    this.ccFrame.src = this.options.ccHubLocation
     this.ccFrame.style.display = 'none'
     this.currentScript = document.currentScript || (function() {
       var scripts;
