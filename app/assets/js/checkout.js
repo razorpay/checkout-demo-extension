@@ -77,11 +77,11 @@
     });
   }
 
-  Razorpay.prototype.purifyDOMOptions = function(obj){
+  Razorpay.prototype.sanitizeDOM = function(obj){
     // directly appended tags
     var user_fields = ['name', 'description', 'amount', 'currency'];
     for(var i = 0; i < user_fields.length; i++){
-      obj[user_fields[i]] = Razorpay.DOMPurify.sanitize(obj[user_fields[i]]);
+      obj[user_fields[i]] = obj[user_fields[i]].replace(/<[^>]*>?/g, "");
     }
 
     // if conditions
@@ -112,7 +112,7 @@
   }
   Razorpay.prototype.sanitizeOptions = function(obj){ // warning: modifies original object
     if(obj){
-      this.purifyDOMOptions(obj);
+      this.sanitizeDOM(obj);
       if(obj.prefill){
         if(obj.prefill.contact){
           if(typeof obj.prefill.contact != 'string')

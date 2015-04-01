@@ -17,7 +17,7 @@
     jsonpUrl: '/payments/create/jsonp',
     netbankingListUrl: '/banks',
     key: '',
-    handler: '',
+    handler: null,
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     netbanking: true,
@@ -289,7 +289,11 @@
         this.options[i] = defaults[i];
       }
       else {
-        this.options[i] = overrides[i];
+        if(typeof defaults[i] == 'string' && typeof overrides[i] != 'string'){
+          this.options[i] = String(overrides[i]);
+        } else {
+          this.options[i] = overrides[i];
+        }
       }
     }
 
@@ -366,9 +370,9 @@
 
     if (typeof options.notes === 'object'){
       // Object.keys unsupported in old browsers
-      var notesCount = 0
+      var notesCount = 0;
       for(var note in options.notes){
-        notesCount++
+        notesCount++;
       }
       if(notesCount > 15) {
         errors.push({
@@ -378,7 +382,7 @@
       }
     }
 
-    if (typeof options.handler !== 'undefined' && !$.isFunction(options.handler)) {
+    if ((typeof options.handler !== 'undefined') && (typeof options.handler != 'function')){
       errors.push({
         message: "Handler must be a function",
         field: "handler"
