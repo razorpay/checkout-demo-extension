@@ -35,11 +35,20 @@
     oncancel: null,
     onhidden: null
   };
+  
+  discreet.rzpscript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })();
+
+  discreet.rzpBaseUrl = discreet.rzpscript.src.replace(/[^/]+$/,'');
+  discreet.rzpBaseUrl = discreet.rzpBaseUrl.replace(/js\/$/,'');
 
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
-    var data = message.data
+    var data = message.data;
     if(typeof message.data == 'string'){
       try {
         data = JSON.parse(message.data);
@@ -96,7 +105,6 @@
   discreet.success = function(req){
     var request = req || {};
     if(!(request.parent instanceof $)){
-      // TODO remove docu.body
       request.parent = $('body');
     }
 
@@ -113,55 +121,15 @@
         if(typeof request.prehandler === 'function'){
           request.prehandler();
         }
-
-        /**
-         * This for demoing the iframe method to clients/investors
-         */
-        if(typeof(window.RZP_FORCE_IFRAME) !== "undefined"){
-          var iframe = document.createElement('iframe');
-          request.parent.html('').append(iframe);
-          var template = doT.compile(Razorpay.templates.autosubmit)(response);
-          iframe.contentWindow.document.write(template);
-          return;
-        }
-        else {
-          var data = response.data;
-          data.callbackUrl = response.callbackUrl;
-          discreet.autoSubmitPopup(request, data);
-        }
+        var data = response.data;
+        data.callbackUrl = response.callbackUrl;
+        discreet.autoSubmitPopup(request, data);
       }
       else if (response.redirectUrl){
         if(typeof request.prehandler === 'function'){
           request.prehandler();
         }
-
-        if(response.redirectUrl && typeof(request.popup) === 'undefined'){
-          if(typeof(window.RZP_FORCE_IFRAME) !== "undefined"){
-            var iframe = document.createElement('iframe');
-            request.parent.html('').append(iframe);
-            iframe.src = response.redirectUrl;
-            lastRequestInstance.popup = {
-              _loaded: 'false',
-              loaded: function(){
-                delete lastRequestInstance.popup;
-                XD.postMessage({
-                  rzp: true,
-                  location: response.redirectUrl
-                }, '*', iframe.contentWindow);
-              }
-            }
-            iframe.src = request.rzp.options.protocol + '://' + request.rzp.options.hostname + '/' + 'processing.html';
-            return;
-          }
-          else {
-            discreet.redirectPopup(request, response.redirectUrl);
-          }
-        }
-        else {
-          // Popup for netbanking
-          discreet.redirectPopup(request, response.redirectUrl);
-          return;
-        }
+        discreet.redirectPopup(request, response.redirectUrl);
       }
       else if (response.razorpay_payment_id) {
         if(typeof request.success === 'function'){
@@ -441,20 +409,6 @@
     //   };
     // }
   };
-
-  discreet.rzpscript = document.currentScript || (function() {
-    var scripts;
-    scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })();
-
-  discreet.loader = function(id){
-    var src = discreet.rzpscript.src.replace(/\/[^\/]+$/,'/images/loader-logo.png');
-    return doT.compile(Razorpay.templates.loader)({
-      src: src,
-      id: id || ''
-    });
-  }
 
   discreet.environment = (function(){
     var script = document.currentScript || {src: ''};
