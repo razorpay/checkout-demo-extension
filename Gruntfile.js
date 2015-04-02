@@ -35,8 +35,8 @@ module.exports = function(grunt){
       copy_static:{
         cmd: 'cp -r app/srv/static app/dist/v1/static/'
       },
-      mv_connector:{
-        cmd: 'find app/dist/v1/static -name index.html | while read f; do mv "$f" "${f/.html/.php}"; done;'
+      mv_static:{
+        cmd: 'find app/dist/v1/static -name index.html | while read f; do echo "$f" | sed "s/html/php/"; done;'
       },
       // Not needed anymore
       copy_html:{
@@ -112,7 +112,7 @@ module.exports = function(grunt){
     'exec:dir_images',
     'exec:copy_images',
     'exec:copy_static',
-    'exec:mv_connector'
+    'exec:mv_static'
   ]);
 
   grunt.registerTask('build',[
