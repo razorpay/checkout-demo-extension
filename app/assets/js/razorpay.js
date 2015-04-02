@@ -147,7 +147,7 @@
   };
 
   discreet.setupPopup = function(rzp, request){
-    var popup = request.popup = new Razorpay.Popup(discreet.rzpBaseUrl + 'static/processing.html');
+    var popup = request.popup = new Razorpay.Popup(discreet.rzpBaseUrl + 'static/processing');
     popup.onClose(discreet.popupClose);
     popup._loaded = false;
     popup.loaded = function(){};

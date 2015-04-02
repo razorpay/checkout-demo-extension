@@ -36,7 +36,7 @@ module.exports = function(grunt){
         cmd: 'cp -r app/srv/static app/dist/v1/static/'
       },
       mv_connector:{
-        cmd: 'mv app/dist/v1/static/connector/index.html app/dist/v1/static/connector/index.php'
+        cmd: 'find app/dist/v1/static -name index.html | while read f; do mv "$f" "${f/.html/.php}"; done;'
       },
       // Not needed anymore
       copy_html:{
