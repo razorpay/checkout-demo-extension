@@ -35,9 +35,6 @@ module.exports = function(grunt){
       copy_static:{
         cmd: 'cp -r app/srv/static app/dist/v1/static/'
       },
-      mv_static:{
-        cmd: 'find app/dist/v1/static -name index.html | while read f; do echo mv $f $f | sed "s/html/php/2" | sh; done;'
-      },
       // Not needed anymore
       copy_html:{
         cmd: 'cp app/srv/layout.html app/dist/v1/'
@@ -111,8 +108,7 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'exec:dir_images',
     'exec:copy_images',
-    'exec:copy_static',
-    'exec:mv_static'
+    'exec:copy_static'
   ]);
 
   grunt.registerTask('build',[

@@ -212,16 +212,13 @@
       discreet.setupPopup(this, request);
     }
      */
-    if(typeof(window.RZP_FORCE_IFRAME) === "undefined"){
-      discreet.setupPopup(this, request);
-    }
+    discreet.setupPopup(this, request);
 
     /**
      * Setting up Hedwig
      */
     lastRequestInstance = request;
-    var source = this.options.protocol + '://' + this.options.hostname;
-    this.hedwig.receiveMessage(discreet.XDCallback, source);
+    this.hedwig.receiveMessage(discreet.XDCallback);
 
     request.data.key_id = this.options.key;
     request.rzp = this;
