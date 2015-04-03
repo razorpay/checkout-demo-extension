@@ -32,9 +32,6 @@ module.exports = function(grunt){
       copy_images:{
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
       },
-      copy_static:{
-        cmd: 'cp -r app/srv/static app/dist/v1/static/'
-      },
       // Not needed anymore
       copy_html:{
         cmd: 'cp app/srv/layout.html app/dist/v1/'
@@ -107,8 +104,7 @@ module.exports = function(grunt){
     'exec:clean_dist',
     'exec:harp_compile',
     'exec:dir_images',
-    'exec:copy_images',
-    'exec:copy_static'
+    'exec:copy_images'
   ]);
 
   grunt.registerTask('build',[
