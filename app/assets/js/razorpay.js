@@ -36,15 +36,6 @@
     onhidden: null
   };
   
-  discreet.rzpscript = document.currentScript || (function() {
-    var scripts;
-    scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })();
-
-  discreet.rzpBaseUrl = discreet.rzpscript.src.replace(/[^/]+$/,'');
-  discreet.rzpBaseUrl = discreet.rzpBaseUrl.replace(/js\/$/,'');
-
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
