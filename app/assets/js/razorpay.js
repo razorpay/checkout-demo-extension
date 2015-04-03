@@ -36,13 +36,14 @@
     onhidden: null
   };
   
-  discreet.rzpscript = document.currentScript || (function(){
+  discreet.rzpscript = document.currentScript || (function() {
     var scripts;
     scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
   })();
 
-  discreet.rzpBaseUrl = discreet.rzpscript.src.replace(/(js\/)?[^/]+$/,'');
+  discreet.rzpBaseUrl = discreet.rzpscript.src.replace(/[^/]+$/,'');
+  discreet.rzpBaseUrl = discreet.rzpBaseUrl.replace(/js\/$/,'');
 
   var lastRequestInstance = null;
 
@@ -147,7 +148,7 @@
   };
 
   discreet.setupPopup = function(rzp, request){
-    var popup = request.popup = new Razorpay.Popup(discreet.rzpBaseUrl + 'static/processing');
+    var popup = request.popup = new Razorpay.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.html');
     popup.onClose(discreet.popupClose);
     popup._loaded = false;
     popup.loaded = function(){};
@@ -220,13 +221,16 @@
       discreet.setupPopup(this, request);
     }
      */
-    discreet.setupPopup(this, request);
+    if(typeof(window.RZP_FORCE_IFRAME) === "undefined"){
+      discreet.setupPopup(this, request);
+    }
 
     /**
      * Setting up Hedwig
      */
     lastRequestInstance = request;
-    this.hedwig.receiveMessage(discreet.XDCallback);
+    var source = this.options.protocol + '://' + this.options.hostname;
+    this.hedwig.receiveMessage(discreet.XDCallback, source);
 
     request.data.key_id = this.options.key;
     request.rzp = this;
@@ -285,7 +289,7 @@
 
     if(typeof this.hedwig === 'undefined'){
       this.hedwig = new Hedwig({
-        ccHubLocation: discreet.rzpBaseUrl + 'static/connector'
+        ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.php'
       });
     }
     discreet.getNetbankingList(this);
