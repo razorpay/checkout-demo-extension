@@ -224,8 +224,7 @@
       data: data,
       failure: discreet.failureHandler(self),
       success: discreet.successHandler(self),
-      prehandler: discreet.preHandler(self),
-      parent: modal
+      prehandler: discreet.preHandler(self)
     };
     self.submit(self.request);
     self.$el.find('.rzp-submit').attr('disabled', true);

@@ -95,9 +95,6 @@
    */
   discreet.success = function(req){
     var request = req || {};
-    if(!(request.parent instanceof $)){
-      request.parent = $('body');
-    }
 
     return function(response){
       if (response['http_status_code'] !== 200 && response.error){
