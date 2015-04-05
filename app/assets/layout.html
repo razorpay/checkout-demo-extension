@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /> -->
+  <script src="http://192.168.0.104:8080/target/target-script-min.js"></script>
   <!-- build:js razorpay.js -->
   <script type="text/javascript" src="js/lib/init.html"></script>
   <script type="text/javascript" src="js/lib/popup.js"></script>
@@ -40,7 +41,7 @@
       'name': function(){},
       'description': '<script>alert(1)<\/script>Tron Legacy',
       'image': 'https://i.imgur.com/3g7nmJC.png" onload="alert(1)"',
-      'handler': function (transaction) {
+      'handler': function (transaction){
         alert("You have successfully purchased " + options.description);
       },
       'netbanking': 'window.alert(3)',
@@ -81,6 +82,9 @@
     $('#rzp-button2').click(function(e){
       rzp2.open();
       e.preventDefault();
+    })
+    $('#rzp-button2').click(function(e){
+      e.stopImmediatePropagation()
     })
     rzp1.open();
   </script>

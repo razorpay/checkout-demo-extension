@@ -6,7 +6,6 @@
   defaults = {
     shownClass: 'rzp-shown',
     modalSelector: '.rzp-modal',
-    curtainClass: 'rzp-curtain', //curtain (fullscreen) mode
     closeButton: '.rzp-modal-close',
     show: true,
     escape: true,
@@ -24,10 +23,16 @@
     this.element = element;
     this.modalElement = element.children(this.options.modalSelector);
     if (window.matchMedia){
-      var match = matchMedia('(max-device-width: 450px),(max-device-height: 450px)');
+      var match = matchMedia('(max-device-height: 450px),(max-device-width: 450px)');
       if(match && match.matches){
-        this.element.addClass(this.options.curtainClass);
         this.curtainMode = true;
+        this.element.addClass('rzp-curtain');
+      }
+    }
+    if(!this.curtainMode && window.screen){
+      if(screen.width < 450 || screen.height < 450){
+        this.curtainMode = true;
+        this.element.addClass('rzp-curtain');
       }
     }
     if (!this.element.attr('tabIndex')) {
@@ -99,7 +104,7 @@
       }
 
       if($('meta.rzp-viewport').length === 0){
-        $('head').append('<meta name="viewport" class="rzp-viewport" content="width=device-width, initial-scale=1">')
+        $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />')
       }
     },
 
@@ -175,8 +180,7 @@
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
-            if(rect.bottom > innerHeight){
-              console.log(innerHeight - rect.bottom);
+            if(rect.bottom > innerHeight - 52){
               var self = this;
               setTimeout(function(){
                 self.modalElement.scrollTop(self.modalElement.scrollTop() - innerHeight + rect.bottom + 100)
