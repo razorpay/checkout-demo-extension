@@ -360,12 +360,14 @@
   };
 
   discreet.addButton = function(rzp){
-    var button = document.createElement("button");
-    button.setAttribute("id", "rzp-button");
-    $(button).click(function(e) {
+    var button = document.createElement('input');
+    button.type = 'button';
+    button.value = 'Pay ' + (rzp.options.amount || 'Now');
+    button.className = 'razropay-payment-button';
+    $(button).click(function(e){
       rzp.open();
       e.preventDefault();
-    }).html("Pay Now").appendTo(discreet.rzpscript.parentNode);
+    }).appendTo(discreet.rzpscript.parentNode);
   };
 
   var key = $(discreet.rzpscript).data('key');

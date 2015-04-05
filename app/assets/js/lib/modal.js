@@ -22,9 +22,13 @@
     var duration, durationStyle;
     this.options = $.extend(defaults, options);
     this.element = element;
-    if (window.screen && (screen.width <= 480 || screen.height <= 480)){
-      this.element.addClass(this.options.curtainClass)
-      this.curtainMode = true
+    this.modalElement = element.children(this.options.modalSelector);
+    if (window.matchMedia){
+      var match = matchMedia('(max-device-width: 450px),(max-device-height: 450px)');
+      if(match && match.matches){
+        this.element.addClass(this.options.curtainClass);
+        this.curtainMode = true;
+      }
     }
     if (!this.element.attr('tabIndex')) {
       this.element.attr('tabIndex', '0');
@@ -80,9 +84,9 @@
       this.setViewport();
       this.bind_events();
       this.element.show().get(0).focus();
-      this.element.children(this.options.modalSelector).css('display', 'inline-block');
+      this.modalElement.css('display', 'inline-block');
       this.element.prop('offsetWidth');
-      this.element.children(this.options.modalSelector).prop('offsetWidth');
+      this.modalElement.prop('offsetWidth');
       this.element.addClass(this.options.shownClass);
       this.clearTimeout();
       return timeout = setTimeout($.proxy(this.shown, this), this.animationDuration);
@@ -142,7 +146,8 @@
     hidden: function() {
       $(document.body).css('overflow', '');
       this.clearTimeout();
-      this.element.hide().children(this.options.modalSelector).hide();
+      this.element.hide()
+      this.modalElement.hide();
       if (typeof this.options.onhidden === 'function') {
         this.options.onhidden();
       }
@@ -157,38 +162,48 @@
       }
     },
 
-    bind_events: function() {
-      if (window.addEventListener)
+    bind_events: function(){
+      if (window.addEventListener){
         this.element[0].addEventListener('blur', this.steal_focus, true);
+      }
       
       if (this.curtainMode){
-        this.on('click', this.element.find(this.options.closeButton), this.hide)
+        this.on('click', this.element.find(this.options.closeButton), this.hide);
+        this.on('resize', $(window), function(){
+          // scrollTo(0,0);
+          // this.element.height(innerHeight);
+          var el = document.activeElement;
+          if(el){
+            var rect = el.getBoundingClientRect();
+            if(rect.bottom > innerHeight){
+              console.log(innerHeight - rect.bottom);
+              var self = this;
+              setTimeout(function(){
+                self.modalElement.scrollTop(self.modalElement.scrollTop() - innerHeight + rect.bottom + 100)
+              }, 400)
+            }
+          }
+        })
       }
       
       if (this.options.stopKeyPropagation) {
-        this.on('keyup keydown keypress', this.element, (function(_this) {
-          return function(e) {
-            return e.stopPropagation();
-          };
-        })(this));
+        this.on('keyup keydown keypress', this.element, function(e) {
+          return e.stopPropagation();
+        });
       }
       if (this.options.escape) {
-        this.on('keyup', this.element, (function(_this) {
-          return function(e) {
-            if (e.which === 27 && _this.options.backdropClose) {
-              return _this.hide();
-            }
-          };
-        })(this));
+        this.on('keyup', this.element, function(e) {
+          if (e.which === 27 && this.options.backdropClose) {
+            return this.hide();
+          }
+        })
       }
       if (this.options.backdropClose) {
-        return this.on('click', this.element, (function(_this) {
-          return function(e) {
-            if (e.target === _this.element[0] && _this.options.backdropClose) {
-              return _this.hide();
-            }
-          };
-        })(this));
+        this.on('click', this.element, function(e) {
+          if (e.target === this.element[0] && this.options.backdropClose) {
+            return this.hide();
+          }
+        })
       }
     }
   };

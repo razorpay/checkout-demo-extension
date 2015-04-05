@@ -167,19 +167,17 @@
       el = e.target;
       parent = $(this.parent(el));
       value = el.value;
-      if (el.validity) {
-        valid = el.validity.valid;
-      } else {
-        valid = true;
-        required = typeof el.getAttribute('required' === 'string');
-        pattern = el.getAttribute('pattern');
-        if (required && !value) {
-          valid = false;
-        }
-        if (valid && pattern) {
-          valid = new RegExp(pattern).test(value);
-        }
+      
+      valid = true;
+      required = typeof el.getAttribute('required' === 'string');
+      pattern = el.getAttribute('pattern');
+      if (required && !value) {
+        valid = false;
       }
+      if (valid && pattern) {
+        valid = new RegExp(pattern).test(value);
+      }
+      
       isMature = parent.hasClass(this["class"]('mature'));
       if (valid && !isMature) {
         parent.addClass(this["class"]('mature'));

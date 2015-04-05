@@ -1,6 +1,8 @@
 @import "common";
 
 .rzp-curtain{
+	height: auto;
+	bottom: 0;
 	overflow-x: hidden;
 	.rzp-modal{
 		color: #666;
@@ -9,6 +11,10 @@
 		height: 100%!important;
 		margin: 0;
 		.transform(translateX(-100%));
+		overflow-y: auto;
+	}
+	.rzp-footer{
+		position: fixed;
 	}
 	.rzp-modal-close{
 		display: block;

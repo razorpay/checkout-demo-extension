@@ -74,18 +74,18 @@ Razorpay.templates.modal = '
             </div>
             <div class="rzp-elem rzp-elem-card">
               <div class="rzp-elem-inner">
-                <input class="rzp-input" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
+                <input class="rzp-input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
               </div>
             </div>
             <div class="rzp-double">
               <div class="rzp-elem rzp-elem-expiry" style="border-radius: 0 0 0 4px">
                 <div class="rzp-elem-inner">
-                  <input class="rzp-input" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
+                  <input class="rzp-input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
                 </div>
               </div>
               <div class="rzp-elem rzp-elem-cvv" style="border-radius: 0 0 4px 0">
                 <div class="rzp-elem-inner">
-                  <input class="rzp-input" type="password" name="card[cvv]" placeholder="CVV" maxlength="4" required>
+                  <input class="rzp-input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </div>
               </div>
             </div>
