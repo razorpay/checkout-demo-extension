@@ -363,7 +363,6 @@
     var button = document.createElement('input');
     button.type = 'button';
     button.value = 'Pay Now';
-    button.id = 'rzp-button';
     button.className = 'razropay-payment-button';
     $(button).click(function(e){
       rzp.open();
