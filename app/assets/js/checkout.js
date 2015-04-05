@@ -362,7 +362,7 @@
   discreet.addButton = function(rzp){
     var button = document.createElement('input');
     button.type = 'button';
-    button.value = 'Pay Now');
+    button.value = 'Pay Now';
     button.className = 'razropay-payment-button';
     $(button).click(function(e){
       rzp.open();
