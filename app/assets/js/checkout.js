@@ -363,6 +363,7 @@
     var button = document.createElement('input');
     button.type = 'button';
     button.value = 'Pay Now';
+    button.id = 'rzp-button';
     button.className = 'razropay-payment-button';
     $(button).click(function(e){
       rzp.open();
@@ -371,7 +372,7 @@
   };
 
   var key = $(discreet.rzpscript).data('key');
-  if (key && key.length > 0) {
+  if (key && key.length > 0){
     var opts = $(discreet.rzpscript).data();
     var options = discreet.parseScriptOptions(opts);
     discreet.addButton(new Razorpay(options));
