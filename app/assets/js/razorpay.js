@@ -39,6 +39,9 @@
   var lastRequestInstance = null;
 
   discreet.XDCallback = function(message){
+    if(!message || !message.data){
+      return;
+    }
     var data = message.data;
     if(typeof message.data == 'string'){
       try {

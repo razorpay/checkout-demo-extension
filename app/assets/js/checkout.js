@@ -207,7 +207,7 @@
     invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
     var modal = form.closest('.rzp-modal');
     if (invalid.length) {
-      invalid.addClass('rzp-mature').find('.rzp-input')[0].focus();
+      invalid.addClass('rzp-mature').find('.rzp-input').eq(0).focus();
       discreet.shake(modal);
       return;
     }

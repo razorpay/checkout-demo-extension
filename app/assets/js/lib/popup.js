@@ -82,7 +82,7 @@
     this.optsStr = optsStr;
 
     // finally, open and return the popup window
-    this.window = window.open(src, name, optsStr);
+    this.window = window.open(src, name, optsStr); // might be null in IE9 if protected mode is turned on
     this.focus();
 
     // this.$el = $(this.window.document.body);
@@ -110,10 +110,6 @@
 
   Popup.prototype.unload = function(e){
     this.close();
-  }
-
-  Popup.prototype.$ = function (query) {
-    return $(this.window.document).find(query);
   }
 
   /**
