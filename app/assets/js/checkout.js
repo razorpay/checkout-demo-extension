@@ -27,21 +27,19 @@
       }
     });
 
-    if(netbanking){
-      if(form.find('.rzp-tabs .rzp-active').data('target') == 'rzp-tab-cc'){
-        delete data.bank;
-        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-        expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
-        data['card[expiry_month]'] = expiry[0];
-        data['card[expiry_year]'] = expiry[1];
-        delete data['card[expiry]'];
-      } else {
-        delete data['card[name]'];
-        delete data['card[number]'];
-        delete data['card[cvv]'];
-        delete data['card[expiry]'];
-        data.method = 'netbanking'
-      }
+    if(!netbanking || form.find('.rzp-tabs .rzp-active').data('target') == 'rzp-tab-cc'){
+      delete data.bank;
+      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+      expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+      data['card[expiry_month]'] = expiry[0];
+      data['card[expiry_year]'] = expiry[1];
+      delete data['card[expiry]'];
+    } else {
+      delete data['card[name]'];
+      delete data['card[number]'];
+      delete data['card[cvv]'];
+      delete data['card[expiry]'];
+      data.method = 'netbanking'
     }
 
     return data;
@@ -316,10 +314,11 @@
       rzp.modal.options.backdropClose = true;
 
       if (response && response.error && response.error.field){
-          if (rzp.$el.find('input[name="'+response.error.field+'"]').length){
-            rzp.$el.find('input[name="'+response.error.field+'"]').addClass('rzp-invalid');
-          }
+        error_el = rzp.$el.find('input[name="'+response.error.field+'"]')
+        if (error_el.length){
+          error_el.closest('.rzp-elem').addClass('rzp-invalid');
         }
+      }
 
       var defaultMessage = 'There was an error in handling your request';
       var message = response.error.description || defaultMessage;
