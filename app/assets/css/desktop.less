@@ -4,6 +4,7 @@
 @color: #7f7f7f;
 @border-color: #e6e6e6;
 @background-color: #fafafa;
+@danger: #ef1818;
 
 @width: 320px;
 @padding: 20px;
@@ -125,9 +126,9 @@
     z-index: 1;
   }
   &.rzp-mature.rzp-invalid{
-    color: #d35400;
+    color: @danger;
     &.rzp-focused{
-      border-color: #d35400;
+      border-color: @danger;
     }
   }
   input, select, textarea{
@@ -308,13 +309,16 @@
 }
 
 .rzp-body .rzp-submit.error{
-  background-color:#FB797E;
+  background-color: @danger;
 }
 .rzp-error{
   margin-bottom: 12px;
-  color: #FB797E;
+  color: @danger;
   text-align:center;
-  font-size: 12px;
+  li{
+    list-style: none;
+    font-size: @font-size;
+  }
 }
 .rzp-modal iframe{
   border: none;

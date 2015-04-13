@@ -314,7 +314,7 @@
       rzp.modal.options.backdropClose = true;
 
       if (response && response.error && response.error.field){
-        error_el = rzp.$el.find('input[name="'+response.error.field+'"]')
+        var error_el = rzp.$el.find('input[name="'+response.error.field+'"]')
         if (error_el.length){
           error_el.closest('.rzp-elem').addClass('rzp-invalid');
         }
