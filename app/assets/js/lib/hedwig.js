@@ -106,6 +106,9 @@
 
   Hedwig.prototype.ccSendMessage = function(data, url, target){
     data.rzp = true;
+    if(typeof data != 'string'){
+      data = JSON.stringify(data);
+    }
     this.ccFrame.contentWindow.postMessage(data, url);
   }
 
