@@ -85,8 +85,8 @@
     },
 
     bye: function(){
-      for(var i = 0; i < listeners.length; i++){
-        var l = listeners[i];
+      for(var i = 0; i < this.listeners.length; i++){
+        var l = this.listeners[i];
         if(l[2] !== true){
           this.element.off(l[0], l[1], l[2]);
         } else if (window.removeEventListener){

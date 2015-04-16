@@ -126,8 +126,8 @@
       this.isShown = false;
       this.removeViewport();
       this.element.removeClass(this.options.shownClass);
-      for(var i = 0; i < listeners.length; i++){
-        var l = listeners[i];
+      for(var i = 0; i < this.listeners.length; i++){
+        var l = this.listeners[i];
         l[0].off(l[1], l[2]);
       }
       this.listeners = [];
