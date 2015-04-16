@@ -126,9 +126,10 @@
       this.isShown = false;
       this.removeViewport();
       this.element.removeClass(this.options.shownClass);
-      this.listeners.forEach(function(l) {
-        return l[0].off(l[1], l[2]);
-      });
+      for(var i = 0; i < listeners.length; i++){
+        var l = listeners[i];
+        l[0].off(l[1], l[2]);
+      }
       this.listeners = [];
       this.clearTimeout();
       if (typeof this.options.onhide === 'function') {

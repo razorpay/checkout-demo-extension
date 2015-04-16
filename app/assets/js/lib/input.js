@@ -74,7 +74,7 @@
         if(window.addEventListener){
           this.element[0].addEventListener(event, proxy, true);
         } else if(window.attachEvent){
-          this.element[0].attachEvent(event, proxy);
+          this.element[0].attachEvent('on' + event, proxy);
         }
         return this.listeners.push([event, proxy, true]);
       } else {
@@ -84,16 +84,17 @@
       }
     },
 
-    bye: function() {
-      return this.listeners.forEach((function(_this) {
-        return function(l) {
-          if (l[2] === true) {
-            return _this.element[0].removeEventListener(l[0], l[1], true);
-          } else {
-            return _this.element.off(l[0], l[1], l[2]);
-          }
-        };
-      })(this));
+    bye: function(){
+      for(var i = 0; i < listeners.length; i++){
+        var l = listeners[i];
+        if(l[2] !== true){
+          this.element.off(l[0], l[1], l[2]);
+        } else if (window.removeEventListener){
+          this.element[0].removeEventListener(l[0], l[1], true);
+        } else if(window.detachEvent){
+          this.element[0].detachEvent('on' + l[0], l[1]);
+        }
+      }
     },
 
     focus: function(e) {
