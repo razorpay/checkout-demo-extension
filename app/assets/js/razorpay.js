@@ -33,7 +33,8 @@
     notes: {},
     signature: '',
     oncancel: null,
-    onhidden: null
+    onhidden: null,
+    parent: null
   };
   
   var lastRequestInstance = null;

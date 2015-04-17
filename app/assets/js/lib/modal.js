@@ -39,7 +39,11 @@
       this.element.attr('tabIndex', '0');
     }
     if (!this.element.parent().length) {
-      this.element.appendTo(document.body || this.options.parent);
+      var parent = this.options.parent;
+      if(!(parent && $(parent).length)){
+        parent = document.body;
+      }
+      this.element.appendTo(parent);
     }
     if (this.options.animation && this.transitionProperty) {
       durationStyle = getComputedStyle(element[0])[this.transitionProperty];

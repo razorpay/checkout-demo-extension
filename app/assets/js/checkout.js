@@ -142,7 +142,8 @@
     var hiddenCallback = null;
     this.modal = new Modal(this.$el, {
       onhide: this.options.oncancel, // typeof check is inside modal.js
-      onhidden: this.options.onhidden
+      onhidden: this.options.onhidden,
+      parent: this.options.parent
     });
 
     this.renew();
