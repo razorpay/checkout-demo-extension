@@ -1,6 +1,8 @@
 window.Razorpay = function(options){
-  if(typeof this.configure == 'function')
+  if(typeof this.configure == 'function'){
     this.configure(options);
+  }
+  return this;
 };
 (function(){
   var exports = null;
@@ -8,17 +10,10 @@ window.Razorpay = function(options){
 
   // jquery
   <%- include jquery-1.11.1.js %>
-  Razorpay.$ = module.exports;
+  Razorpay.prototype.$ = module.exports;
 
   // hedwig
   <%- include hedwig.js %>
-  Razorpay.Hedwig = module.exports;
+  Razorpay.prototype.Hedwig = module.exports;
 
-  // doT
-  <%- include doT.js %>
-  Razorpay.doT = module.exports;
-  Razorpay.templates = {};
-
-  // full screen mode for mobile
-  Razorpay.curtainMode = false;
 })();

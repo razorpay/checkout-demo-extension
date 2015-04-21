@@ -1,4 +1,6 @@
-Razorpay.templates.modal = '
+unless templates
+  templates = {}
+templates.modal = '
 <div class="rzp-container" tabIndex="0" style="display: none">
   <div class="rzp-modal">
     <div class="rzp-modal-inner">

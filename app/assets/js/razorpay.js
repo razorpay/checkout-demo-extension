@@ -3,10 +3,8 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.$;
-  var doT = Razorpay.doT;
-  var XD = Razorpay.XD;
-  var Hedwig = Razorpay.Hedwig;
+  var $ = Razorpay.prototype.$;
+  var Hedwig = Razorpay.prototype.Hedwig;
   var discreet = {};
 
   // TODO add style link to insert
@@ -37,29 +35,55 @@
     parent: null
   };
   
+  discreet.rzpscript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })();
+
+  discreet.baseUrl = discreet.rzpscript.src.replace(/(js\/)?[^\/]+$/,'');
+
   var lastRequestInstance = null;
 
+  
+  discreet.onFrameMessage = function(data){
+    // this == rzp
+    debugger
+    if(!this.checkoutFrame){
+      return;
+    }
+    if(data.loaded){
+      var response = {
+        options: this.options
+      }
+      return this.checkoutFrame.postMessage(JSON.stringify(this.options), '*');
+    }
+  }
   discreet.XDCallback = function(message){
+    debugger
     if(!message || !message.data){
       return;
     }
     var data = message.data;
+    
     if(typeof message.data == 'string'){
       try {
         data = JSON.parse(message.data);
       }
       catch(e){
-        data = {
-          error: {
-            description: 'Unable to parse response'
-          }
-        }
+        data.error = 'Unable to parse response'
       }
     }
     /**
      * Popup sends an XDM message to tell that it has loaded
      * Ignore that
      */
+
+    if(data.source === 'frame'){
+      if(message.origin && discreet.baseUrl.indexOf(message.origin) != -1){
+        return discreet.onFrameMessage(data);
+      }
+    }
     if(data.source === 'popup'){
       if(!lastRequestInstance.popup._loaded){
         // console.log(2)
@@ -140,7 +164,7 @@
   };
 
   discreet.setupPopup = function(rzp, request){
-    var popup = request.popup = new Razorpay.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
+    var popup = request.popup = new Razorpay.prototype.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
     popup.onClose(discreet.popupClose);
     popup._loaded = false;
     popup.loaded = function(){};
@@ -262,18 +286,6 @@
       else {
         this.options['prefill'][i] = overrides['prefill'][i];
       }
-    }
-
-    var rbPayload = $.extend(true, {}, this.options);
-    delete rbPayload.notes;
-    delete rbPayload.prefill;
-
-    if(typeof Rollbar !== 'undefined' && Razorpay.rollbarDisable !== true){
-      Rollbar.configure({
-        payload: {
-          config: rbPayload
-        }
-      });
     }
 
     if(typeof this.hedwig === 'undefined'){
@@ -417,44 +429,6 @@
     return env;
   })();
 
-  Razorpay.prototype.Rollbar = {
-    state: false,
-
-    configure: function(){
-      if(discreet.environment !== 'dev'){
-        Rollbar.configure({
-          payload: {
-            environment: discreet.environment
-          }
-        });
-      }
-    },
-
-    _check: function(){
-      if(typeof Rollbar !== 'undefined' && discreet.environment !== 'dev' && Razorpay.rollbarDisable !== true){
-        return true;
-      }
-      else {
-        return false;
-      }
-    },
-
-    start: function(){
-      if(this._check() === false){
-        return;
-      }
-      this.state = true;
-      Rollbar.configure({enabled: true});
-    },
-
-    stop: function(){
-      if(this._check() === false){
-        return;
-      }
-      this.state = false;
-      Rollbar.configure({enabled: false})
-    }
-  }
   discreet.getNetbankingList = function(rzp){
     $.ajax({
       url: rzp.makeUrl() + rzp.options.netbankingListUrl,

@@ -68,16 +68,17 @@
     }
   }
 
-  Hedwig.prototype.receiveMessage = function(callback){
+  Hedwig.prototype.receiveMessage = function(callback, context){
     if(this.currentCallback){
-      this.clearReceiveMessage()
+      this.clearReceiveMessage();
     }
 
-    this.currentCallback = callback;
+    this.currentCallback = $.proxy(callback, context);
+    debugger
     if (window.addEventListener) {
-      window.addEventListener('message', callback, false);
+      window.addEventListener('message', this.currentCallback, false);
     } else if(window.attachEvent){
-      window.attachEvent('onmessage', callback);
+      window.attachEvent('onmessage', this.currentCallback);
     }
   }
 
