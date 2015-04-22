@@ -37,7 +37,7 @@ templates.modal = '
             <div class="rzp-fieldset">
               <div class="rzp-elem rzp-elem-email" style="border-radius: 4px 4px 0 0">
                 <div class="rzp-elem-inner">
-                  <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                  <input class="rzp-input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
                 </div>
               </div>
               <div class="rzp-elem rzp-elem-contact" style="border-radius: 0 0 4px 4px">
