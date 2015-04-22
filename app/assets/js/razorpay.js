@@ -5,7 +5,7 @@
 
   var $ = Razorpay.prototype.$;
   var Hedwig = Razorpay.prototype.Hedwig;
-  var discreet = {};
+  var discreet = Razorpay.prototype.discreet;
 
   // TODO add style link to insert
   var defaults = {
@@ -34,33 +34,11 @@
     onhidden: null,
     parent: null
   };
-  
-  discreet.rzpscript = document.currentScript || (function() {
-    var scripts;
-    scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })();
 
-  discreet.baseUrl = discreet.rzpscript.src.replace(/(js\/)?[^\/]+$/,'');
-
+  // TODO remove shared var
   var lastRequestInstance = null;
 
-  
-  discreet.onFrameMessage = function(data){
-    // this == rzp
-    debugger
-    if(!this.checkoutFrame){
-      return;
-    }
-    if(data.loaded){
-      var response = {
-        options: this.options
-      }
-      return this.checkoutFrame.postMessage(JSON.stringify(this.options), '*');
-    }
-  }
   discreet.XDCallback = function(message){
-    debugger
     if(!message || !message.data){
       return;
     }
@@ -80,11 +58,12 @@
      */
 
     if(data.source === 'frame'){
-      if(message.origin && discreet.baseUrl.indexOf(message.origin) != -1){
-        return discreet.onFrameMessage(data);
+      if(discreet.onFrameMessage && message.origin && discreet.checkoutUrl.indexOf(message.origin) != -1){
+        discreet.onFrameMessage.call(this, data);
       }
+      return
     }
-    if(data.source === 'popup'){
+    else if(data.source === 'popup'){
       if(!lastRequestInstance.popup._loaded){
         // console.log(2)
         lastRequestInstance.popup._loaded = true;

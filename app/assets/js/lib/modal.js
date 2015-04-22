@@ -91,7 +91,7 @@
       $(document.body).css('overflow', 'hidden');
       this.isShown = true;
       this.bind_events();
-      this.element.show().get(0).focus();
+      this.element[0].style.display = 'block';
       this.modalElement.css('display', 'inline-block');
       this.element.prop('offsetWidth');
       this.modalElement.prop('offsetWidth');

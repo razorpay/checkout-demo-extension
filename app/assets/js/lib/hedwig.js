@@ -74,7 +74,6 @@
     }
 
     this.currentCallback = $.proxy(callback, context);
-    debugger
     if (window.addEventListener) {
       window.addEventListener('message', this.currentCallback, false);
     } else if(window.attachEvent){

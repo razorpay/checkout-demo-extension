@@ -2,17 +2,15 @@
 /* jshint -W027 */
 (function(){
   'use strict';
+  var modal, $el, options;
 
-  if(window.parent && typeof window.parent.postMessage == 'function'){
-    debugger
-    parent.postMessage('{"source": "frame", "loaded": 1}', '*')
-  }
-  $(window).on('message', function(e){
-    debugger
+
+  postMessage({event: 'load'});
+
+  window.onmessage = function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
     if(!e || !e.data)
       return;
 
-    debugger
     var data;
     if(typeof e.data == 'string'){
       try{
@@ -23,9 +21,20 @@
     } else {
       data = e.data;
     }
-    debugger
-  })
 
+    if(data.options && !options){ // open modal
+      options = data.options;
+      open();
+    }
+  }
+
+  function postMessage(message){
+    message.source = 'frame';
+    if(typeof message != 'string'){
+      message = JSON.stringify(message);
+    }
+    window.parent.postMessage(message, '*')
+  }
 
   function shake(element){
     element.addClass('shake');
@@ -116,7 +125,7 @@
 
   function sanitizeOptions(obj){ // warning: modifies original object
     if(obj){
-      this.sanitizeDOM(obj);
+      sanitizeDOM(obj);
       if(obj.prefill){
         if(obj.prefill.contact){
           if(typeof obj.prefill.contact != 'string')
@@ -128,50 +137,50 @@
   }
 
   function open(){
-    if(this.Rollbar.state === false){
-      this.Rollbar.start();
+    if(modal){
+      return modal.show();
     }
-
-    if(this.modal){
-      // Reattaching listener for rollbar
-      discreet.modalRollbarClose(this);
-
-      this.modal.show();
-      return;
-    }
-
-    this.sanitizeOptions(this.options);
-    this.$el = $((doT.compile(Razorpay.templates.modal))(this.options));
-    this.$el.smarty();
+    sanitizeOptions(options);
+    $el = $((doT.compile(templates.modal))(options));
+    $el.smarty();
 
     // init modal
-    var hiddenCallback = null;
-    this.modal = new Modal(this.$el, {
-      onhide: this.options.oncancel, // typeof check is inside modal.js
-      onhidden: this.options.onhidden,
-      parent: this.options.parent
-    });
+    var modalOptions = {
+      onhide: null,
+      onhidden: null
+    }
+    if(options.oncancel){
+      modalOptions.onhide = function(){
+        postMessage({event: 'cancel'})
+      }
+    }
+    if(options.onhidden){
+      modalOptions.onhidden = function(){
+        postMessage({event: 'hidden'})
+      } 
+    }
+    modal = new Modal($el, modalOptions);
 
-    this.renew();
+    renew();
 
-    discreet.modalRollbarClose(this);
-    discreet.showNetbankingList(this);
+    // discreet.modalRollbarClose(this);
+    // discreet.showNetbankingList.call(this);
 
-    this.$el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
+    $el.find('.rzp-input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
       parent = $(this.parentNode.parentNode);
       return parent[$.payment.validateCardNumber(this.value) ? 'removeClass' : 'addClass']('rzp-invalid');
     });
 
-    this.$el.find('.rzp-input[name="card[expiry]"]').payment('formatCardExpiry');
-    this.$el.find('.rzp-input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function(){
+    $el.find('.rzp-input[name="card[expiry]"]').payment('formatCardExpiry');
+    $el.find('.rzp-input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function(){
       var parent;
       parent = $(this.parentNode.parentNode);
       return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('rzp-invalid');
     });
 
-    if (this.options.netbanking) {
-      this.$el.find('.rzp-tabs li').click(function() {
+    if (options.netbanking) {
+      $el.find('.rzp-tabs li').click(function() {
         var inner, modal;
         inner = $(this).closest('.rzp-modal-inner');
         if (!inner.length) {
@@ -199,33 +208,32 @@
       });
     }
 
-    var self = this;
-    this.$el.find('form').on('submit', function(e){
-      discreet.formSubmit(e, self);
+    $el.find('form').on('submit', function(e){
+      formSubmit(e);
       return false // prevent default
     });
   };
 
-  function formSubmit(e, self){
+  function formSubmit(e){
     var form, invalid;
     form = $(e.currentTarget);
-    self.$el.smarty('refresh');
+    $el.smarty('refresh');
     form.find('.rzp-input[name="card[number]"], .rzp-input[name="card[cvv]"]').trigger('blur');
     invalid = form.find('.rzp-form-common, .rzp-tab-content.rzp-active').find('.rzp-invalid');
     var modal = form.closest('.rzp-modal');
     if (invalid.length) {
       invalid.addClass('rzp-mature').find('.rzp-input').eq(0).focus();
-      discreet.shake(modal);
+      shake(modal);
       return;
     }
-    var data = discreet.getFormData(form, self.options.netbanking)
+    var data = getFormData(form, options.netbanking);
 
     // Signature is set in case of hosted checkout
-    if(self.options.signature !== ''){
-      data.signature = self.options.signature;
+    if(options.signature !== ''){
+      data.signature = options.signature;
     }
 
-    self.request = {
+    request = {
       data: data,
       failure: discreet.failureHandler(self),
       success: discreet.successHandler(self),
@@ -238,20 +246,20 @@
 
   // close on backdrop click and remove errors
   function renew(){
-    if (this.$el) {
-      this.$el.find('.rzp-error').html('');
+    if ($el) {
+      $el.find('.rzp-error').html('');
     }
-    this.modal.options.backdropClose = true;
+    modal.options.backdropClose = true;
   };
 
   function hide(){
-    if(this.Rollbar.state === true){
-      this.Rollbar.stop();
-    }
+    // if(this.Rollbar.state === true){
+    //   this.Rollbar.stop();
+    // }
 
-    this.renew();
-    if(this.modal){
-      this.modal.hide();
+    renew();
+    if(modal){
+      modal.hide();
     }
   };
 
@@ -279,19 +287,9 @@
   };
 
   function preHandler(rzp){
-    return function(){
-      /**
-      if(rzp.request.data.method !== 'netbanking'){
-      */
-      if(typeof(window.RZP_FORCE_IFRAME) !== "undefined"){
-        var modal_parent = rzp.modal.element.children('.rzp-modal').addClass('rzp-frame')
-        rzp.modalRef = modal_parent.children('.rzp-modal-inner')[0]
-        if(!rzp.modalRef)
-          return
-        modal_parent[0].removeChild(rzp.modalRef)
-      }
-    };
+  
   };
+
   function successHandler(rzp){
     return function(message){
       rzp.modal.options.onhide = null
@@ -311,12 +309,7 @@
     return function(response){
       var modal = rzp.$el.find('.rzp-modal');
       discreet.shake(modal);
-      if(rzp.modalRef){
-        modal.html('').removeClass('rzp-frame').append(rzp.modalRef);
-        modal.height('');
-      }
 
-      rzp.modalRef = null;
       rzp.$el.find('.rzp-submit').removeAttr('disabled');
       rzp.modal.options.backdropClose = true;
 

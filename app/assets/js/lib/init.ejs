@@ -5,6 +5,17 @@ window.Razorpay = function(options){
   return this;
 };
 (function(){
+  var currentScript = document.currentScript || (function() {
+    var scripts;
+    scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })()
+  Razorpay.prototype.discreet = {
+    currentScript: currentScript,
+    checkoutUrl: currentScript.src.replace(/(js\/lib\/)?[^\/]+$/,''),
+    merchantData: {}
+  }
+  
   var exports = null;
   var module = { exports: null };
 
