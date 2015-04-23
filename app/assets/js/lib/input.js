@@ -1,10 +1,9 @@
 (function($) {
   var Smarty, prefix;
-  prefix = 'rzp-';
+  prefix = '';
 
   Smarty = function(form, options) {
     this.element = form;
-    this.ttel = $(form[0].querySelector(this.selector('tooltip')));
     this.options = options || {};
     this.listeners = [];
     this.common_events();
@@ -115,33 +114,19 @@
       $(e.currentTarget).find(this.selector('input')).focus()
     },
     tooltip: function(el) {
-      var classname, modal_rect, parent, parent_rect, positioned, show, shown, state, tt_left, tt_top;
-      positioned = this.ttel.data('pos');
-      parent = this.parent(el);
-      state = this.parent(el).className;
-      show = /mature/.test(state) && /invalid/.test(state);
-      classname = this["class"]('shown');
-      shown = this.ttel.hasClass(classname);
-      if (show) {
-        this.ttel.html(this.helptext(el));
-        if (!positioned) {
-          if (this.ttel.is(':hidden')) {
-            this.ttel.show();
-          }
-          parent_rect = parent.getBoundingClientRect();
-          modal_rect = this.element.children(this.selector('modal'))[0].getBoundingClientRect();
-          tt_bot = modal_rect.bottom - parent_rect.top + 3;
-          tt_left = parent_rect.left - modal_rect.left + 10;
-          this.ttel.css({
-            bottom: tt_bot,
-            left: tt_left
-          }).data('pos', true);
-        }
+      var parent = this.parent(el);
+      var state = parent.className;
+      var show = /mature/.test(state) && /invalid/.test(state);
+      var tooltip = $(this.parent(el)).children('.help-text');
+      var shown = tooltip.hasClass('shown');
+
+      if(show){
+        tooltip.html(this.helptext(el));
       }
-      if (show && !shown) {
-        return this.ttel.addClass(classname);
-      } else if (!show) {
-        return this.ttel.removeClass(classname);
+      if(show && !shown){
+        tooltip.addClass('shown');
+      } else if (!show){
+        tooltip.removeClass('shown');
       }
     },
 
@@ -160,7 +145,7 @@
       if (!parent.hasClass(this["class"]('mature'))) {
         parent.addClass(this["class"]('mature'));
       }
-      return this.ttel.removeClass(this["class"]('shown')).data('pos', false);
+      parent.children('.help-text').removeClass('shown');
     },
 
     input: function(e) {
@@ -217,7 +202,7 @@
     },
 
     refresh: function() {
-      return this.element.find(this.selector('input')).each((function(_this) {
+      return this.element.find('.input').each((function(_this) {
         return function(index, el) {
           var parent;
           parent = $(_this.parent(el));
@@ -231,6 +216,7 @@
       if (document.activeElement === el) {
         return parent.addClass(this["class"]('focused'));
       }
+      parent.append('<div class="help-text"></div>')
     },
 
     update: function(parent, el) {

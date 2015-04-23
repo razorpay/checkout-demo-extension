@@ -13,20 +13,20 @@
 // input elements horizontal padding
 @input-padding: 14px;
 
-.rzp-clear{
+.clear{
   .clearfix();
 }
-.rzp-nb-na {
+.nb-na {
   display: none;
 }
 
-#rzp-tab-nb.rzp-active {
-  .rzp-nb-na {
+#tab-nb.active {
+  .nb-na {
     display: block;
   }
 }
 
-.rzp-container{
+.container{
   position: fixed;
   top: 0;
   left: 0;
@@ -40,9 +40,9 @@
   overflow: auto;
   z-index: 19999;
   .middlefix();
-  &.rzp-shown{
+  &.shown{
     opacity: 1;
-    .rzp-modal{
+    .modal{
       .scale(1);
       .transition-transform(~"0.25s cubic-bezier(0.3, 1.5, 0.7, 1), 0.3s ease-out height, 0.3s ease-out width");
     }
@@ -56,7 +56,7 @@
     .box-sizing(content-box)!important; // because old browsers are content-box only, so we write the old way
   }
 }
-.rzp-modal{
+.modal{
   position: relative;
   vertical-align: middle;
   display: inline-block;
@@ -95,10 +95,10 @@
     }
   }
 }
-.rzp-modal-inner{
+.modal-inner{
   .transition(0.15s ease-out opacity);
 }
-.rzp-frame{
+.frame{
   width: 75%;
   height: 80%;
   max-height: 700px;
@@ -109,7 +109,7 @@
     padding: 0;
   }
 }
-.rzp-elem{
+.elem{
   height: 40px;
   line-height: 40px;
   border: 1px solid @border-color;
@@ -120,14 +120,14 @@
   .transition(0.25s);
   background: #fff center right no-repeat;
 
-  &.rzp-focused{
+  &.focused{
     border-color: @primary;
     color: black;
     z-index: 1;
   }
-  &.rzp-mature.rzp-invalid{
+  &.mature.invalid{
     color: @danger;
-    &.rzp-focused{
+    &.focused{
       border-color: @danger;
     }
   }
@@ -146,23 +146,23 @@
     position: relative;
   }
 }
-.rzp-select:not(.rzp-filled){
-  .rzp-input{
+.select:not(.filled){
+  .input{
     opacity: 0;
   }
-  .rzp-elem-inner:before{
+  .elem-inner:before{
     content: 'Select Bank';
     position: absolute;
     top: 1px;
   }
 }
-.rzp-elem-inner{
+.elem-inner{
   margin: 0 @input-padding;
   height: inherit;
   line-height: inherit;
   border-radius: inherit;
 }
-.rzp-tooltip{
+.help-text{
   color: #fff;
   pointer-events: none;
   z-index: 2;
@@ -178,45 +178,46 @@
   opacity: 0;
   .transition-transform(~"0.3s ease-in, 0.2s ease-in opacity");
   .transform(translateY(20px));
-  margin-top: 7px;
-  left: @padding + 10px;
+  bottom: 100%;
+  left: 10px;
+  margin-bottom: 3px;
   &:after {
     content: '';
     position: absolute;
     width: 0;
     height: 0;
-    border-width: 7px;
+    border-width: 6px;
     border-style: solid;
     border-color: #333 transparent transparent transparent;
     bottom: 0;
-    left: 25px;
-    margin: 0 0 -13px -7px;
+    left: 20px;
+    margin: 0 0 -11px -7px;
   }
-  &.rzp-shown{
+  &.shown{
     opacity: 0.9;
-    .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
     .transform(none);
+    .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
   }
 }
-.rzp-double{
+.double{
   white-space: nowrap;
   font-size: 0;
   margin: 0 2px 0 1px;
-  .rzp-elem{
+  .elem{
     font-size: @font-size;
     display: inline-block;
     width: 50%;
     margin-left: -1px;
   }
 }
-.rzp-fieldset{
+.fieldset{
   margin: 20px 0;
 }
-.rzp-modal-close{
+.modal-close{
   display: none;
   float: left;
 }
-.rzp-merchant{
+.merchant{
   border-radius: 2px 2px 0 0;
   background: #fff;
   position: relative;
@@ -225,10 +226,10 @@
   .middlefix();
 }
 /* Default class for an overlay */
-.rzp-header{
+.header{
   border-bottom: 2px solid @primary;
 }
-.rzp-merchant-image{
+.merchant-image{
   position: absolute;
   left: 0;
   top: 0;
@@ -236,21 +237,21 @@
   padding-left: 10px;
   .middlefix();
 }
-.rzp-merchant-image img{
+.merchant-image img{
   max-width: 60px;
   max-height: 40px;
   vertical-align: middle;
   display: inline-block;
 }
-.rzp-merchant-name{
+.merchant-name{
   vertical-align: middle;
   display: inline-block;
 }
-.rzp-merchant-title{
+.merchant-title{
   color: #333;
   margin-bottom: 5px;
 }
-.rzp-merchant-powered{
+.merchant-powered{
   position: absolute;
   right: 0;
   top: 0;
@@ -259,7 +260,7 @@
   background: url('../images/favicon.png') center no-repeat;
   background-size: 26px;
 }
-.rzp-rupee-icon{
+.rupee-icon{
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAYAAADzoH0MAAABoUlEQVQ4EZWUu0oDURCGdzV4QUkjRhALURBBQbBSRFsfwcpW0tkJErCys12xCYJiJV4KfQUVrSwECwleQETUQqKFRrN+E8/AySYn2fzwMZMz88/sHpZ4HgrDcBp+oVFtiLkDzhp10n8p3gQPMAr3cAvN0Al9MAwtoLojOYEmcxD4vv9p8vLAZB/G4BhUjyTd5Z2e58sBBdksW1UhSQG64Aj6QbQC26Xs35sv5QzIQB4+Irzz+wtUBRLteyYfl+3yqK/w7UBMqiKJ9q3KdnnXHqI8alEOIpJXmYeMOQ+I6ybPcYnymrXFggOzXrZP1e6OVDEswI8ZcEiUy64UhVZoB/moUjADmyBbRefQW+k0JxR34AZy8AYqufEA5I7couFUHcQn2IJFGHK7rAqNS6CSL27QKtdPMSRgTycQLyBZ32l1YJDLuwZV1irHS3FOgFycKh3PaXXhTKubKMMmrXK8FFPWGiKvlYrnNF0YkiAXqdonqf4VuiZjGIEXnUBcdvU6zzHNgf7Zyv/CrLPZVcC0BqoHkgFXb9VzDG1wpROIu3bjH9Lpayomlf62AAAAAElFTkSuQmCC') center no-repeat;
   display: inline-block;
   background-size: 8px;
@@ -267,23 +268,23 @@
   height: 14px;
   margin: 0px -1px -1px;
 }
-.rzp-clear{
+.clear{
   clear:both;
 }
-.rzp-body{
+.body{
   text-align: left;
   padding: 0 @padding;
 }
-.rzp-elem-name{
+.elem-name{
   background-image: url('../images/ei-user.png');
 }
-.rzp-elem-email{
+.elem-email{
   background-image: url('../images/ei-envelope.png');
 }
-.rzp-elem-contact{
+.elem-contact{
   background-image: url('../images/phone.png');
 }
-.rzp-elem-card{
+.elem-card{
   background-image: url('../images/card.png');
   &.visa{
     background-image: url('../images/icons/visa.png');
@@ -301,17 +302,17 @@
     background-image: url('../images/icons/amex.png');
   }
 }
-.rzp-elem-expiry{
+.elem-expiry{
   background-image: url('../images/ei-calendar.png');
 }
-.rzp-elem-cvv{
+.elem-cvv{
   background-image: url('../images/ei-lock.png');
 }
 
-.rzp-body .rzp-submit.error{
+.body .submit.error{
   background-color: @danger;
 }
-.rzp-error{
+.error{
   margin-bottom: 12px;
   color: @danger;
   text-align:center;
@@ -320,18 +321,18 @@
     font-size: @font-size;
   }
 }
-.rzp-modal iframe{
+.modal iframe{
   border: none;
   border-radius: 5px;
 }
-.rzp-tab-content{
+.tab-content{
   display: none;
 }
-.rzp-tab-content.rzp-active{
+.tab-content.active{
   display: block;
 }
 
-.rzp-tabs{
+.tabs{
   margin: 0 -20px;
   white-space: nowrap;
   font-size: 0;
@@ -348,7 +349,7 @@
     background: #fff;
     padding-bottom: 2px;
     
-    &.rzp-active{
+    &.active{
       color: @primary;
       cursor: default;
       pointer-events: none;
@@ -361,11 +362,11 @@
     }
   }
 }
-.rzp-form{
+.form{
   padding-bottom: 52px;
   display: block;
 }
-.rzp-footer{
+.footer{
   z-index: 2;
   margin: 0 -@padding;
   position: absolute;

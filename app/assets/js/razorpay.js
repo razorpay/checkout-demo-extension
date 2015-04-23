@@ -18,6 +18,7 @@
     handler: null,
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
+    display_currency: '',
     netbanking: true,
     prefill: {
       name: '',
@@ -25,6 +26,7 @@
       email: ''
     },
     amount: '',
+    display_amount: '',
     name: '', // of merchant
     description: '',
     image: '',
@@ -200,13 +202,15 @@
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
     // data['card[expiry_month]'] = expiry[0];
     // data['card[expiry_year]'] = expiry[1];
+
+    var failure = false;
     if(typeof request.data !== 'object'){
-      return false;
+      failure = true;
     }
 
     var errors = this.validateData(request.data);
     if(errors && errors.length){
-      return false;
+      failure = true;
     }
 
     /**
@@ -227,7 +231,10 @@
     request.data.key_id = this.options.key;
     request.rzp = this;
 
-    return $.ajax({
+    if(failure){
+      return request.failure();
+    }
+    $.ajax({
       url: this.makeUrl() + this.options.jsonpUrl,
       dataType: 'jsonp',
       success: discreet.success(request),
@@ -313,6 +320,23 @@
         message: "Invalid amount specified",
         field: "amount"
       });
+    }
+    
+    if(options.display_currency){
+      if(options.display_currency === 'USD'){
+        options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
+        if(!options.display_amount){
+          errors.push({
+            message: "Invalid display_amount specified",
+            field: "display_amount"
+          });
+        }
+      } else {
+        errors.push({
+          message: "Invalid display currency specified",
+          field: "display_currency"
+        });
+      }
     }
 
     if (typeof options.notes === 'object'){

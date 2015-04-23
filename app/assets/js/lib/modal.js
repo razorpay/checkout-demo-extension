@@ -4,9 +4,9 @@
   timeout = null;
 
   defaults = {
-    shownClass: 'rzp-shown',
-    modalSelector: '.rzp-modal',
-    closeButton: '.rzp-modal-close',
+    shownClass: 'shown',
+    modalSelector: '.modal',
+    closeButton: '.modal-close',
     show: true,
     escape: true,
     animation: true,
@@ -26,13 +26,13 @@
       var match = matchMedia('(max-device-height: 450px),(max-device-width: 450px)');
       if(match && match.matches){
         this.curtainMode = true;
-        this.element.addClass('rzp-curtain');
+        this.element.addClass('curtain');
       }
     }
     if(!this.curtainMode && window.screen){
       if(screen.width < 450 || screen.height < 450){
         this.curtainMode = true;
-        this.element.addClass('rzp-curtain');
+        this.element.addClass('curtain');
       }
     }
     if (!this.element.attr('tabIndex')) {

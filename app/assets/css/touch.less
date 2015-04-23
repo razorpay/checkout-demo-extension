@@ -1,10 +1,10 @@
 @import "common";
 
-.rzp-curtain{
+.curtain{
 	height: auto;
 	bottom: 0;
 	overflow-x: hidden;
-	.rzp-modal{
+	.modal{
 		color: #666;
 		width: 100%;
 		border-radius: 0;
@@ -13,10 +13,10 @@
 		.transform(translateX(-100%));
 		overflow-y: auto;
 	}
-	.rzp-footer{
+	.footer{
 		position: fixed;
 	}
-	.rzp-modal-close{
+	.modal-close{
 		display: block;
 		background: url('data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGZJREFUeNrs18EJgDAQRcFg5XaQElJq9KDgUcTL38zA3l9A4qY1AACopJ8zr9nT4scj/p7o+Jke35Pjh3jxi8X/MXty/Kdrd1txVYj+hEr8uErcRA5hmbNOF3zQlHhSAgDAe4cAAwCSWJ8qggqOaAAAAABJRU5ErkJggg==') center no-repeat;
 		height: 100%;
@@ -27,10 +27,10 @@
 		opacity: 0.65;
 		background-size: 36px;
 	}
-	.rzp-merchant-image{
+	.merchant-image{
 		display: none;
 	}
-	&.rzp-shown .rzp-modal{
+	&.shown .modal{
 		.transition(0.3s ease all);
 		.transform(none);
 	}

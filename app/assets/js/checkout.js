@@ -62,6 +62,13 @@
     discreet.addButton(new Razorpay(options));
   }
 
+  discreet.sendFrameMessage = function(response){
+    if(typeof response !== 'string'){
+      response = JSON.stringify(response)
+    }
+    this.checkoutFrame.contentWindow.postMessage(response, '*');
+  }
+
   discreet.onFrameMessage = function(data){
     // this == rzp
     if(!this.checkoutFrame){
@@ -85,9 +92,21 @@
       var response = {
         options: options
       }
-      return this.checkoutFrame.contentWindow.postMessage(JSON.stringify(response), '*');
+      return discreet.sendFrameMessage.call(this, response);
     } else if (event == 'submit'){
-      
+      this.submit({
+        data: data.data,
+        failure: function(){
+
+        },
+        success: function(response){
+          var message = {
+            event: 'success',
+            response: response
+          }
+          discreet.sendFrameMessage.call(this, message);
+        }
+      });
     } else if (event == 'cancel'){
       if(typeof this.options.oncancel == 'function')
         this.options.oncancel()
@@ -96,4 +115,29 @@
         this.options.onhidden()
     }
   }
+
+
+    /**
+    default handler for success
+    default handler does not care about error or success messages,
+    it just submits everything via the form
+    @param  {[type]} data [description]
+    @return {[type]}    [description]
+  */
+  discreet.defaultPostHandler = function(data){
+    var inputs = "";
+    for (var i in data) {
+      if (typeof data[i] === "object") {
+        for (var j in data[i]) {
+          inputs += "<input type=\"hidden\" name=\"" + i + "[" + j + "]\" value=\"" + data[i][j] + "\">";
+        }
+      } else {
+        inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
+      }
+    }
+    var RazorPayForm = discreet.rzpscript.parentElement;
+    $(inputs).appendTo(RazorPayForm);
+    $(RazorPayForm).submit();
+  };
+
 })()
