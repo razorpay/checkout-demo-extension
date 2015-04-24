@@ -135,6 +135,9 @@
             request.popup.close();
           }
         }
+        if(request.rzp && request.rzp.options && typeof request.rzp.options.handler == 'function'){
+          request.rzp.options.handler(response);
+        }
       }
       else {
         if(typeof request.failure === 'function'){

@@ -37,7 +37,6 @@
   opacity: 0;
   background: rgba(0,0,0,0.6);
   .transition(0.25s ease-out opacity);
-  overflow: auto;
   z-index: 19999;
   .middlefix();
   &.shown{
@@ -98,17 +97,6 @@
 .modal-inner{
   .transition(0.15s ease-out opacity);
 }
-.frame{
-  width: 75%;
-  height: 80%;
-  max-height: 700px;
-  iframe{
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-}
 .elem{
   height: 40px;
   line-height: 40px;
@@ -117,7 +105,7 @@
   position: relative;
   margin-bottom: -1px;
   cursor: text;
-  .transition(0.25s);
+  .transition(0.25s border-color);
   background: #fff center right no-repeat;
 
   &.focused{

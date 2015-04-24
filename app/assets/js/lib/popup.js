@@ -160,4 +160,4 @@
   }
 
   return root.Popup = Popup;
-})(window.Razorpay);
+})(window.Razorpay.prototype);

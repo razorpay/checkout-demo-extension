@@ -216,7 +216,7 @@
       if (document.activeElement === el) {
         return parent.addClass(this["class"]('focused'));
       }
-      parent.append('<div class="help-text"></div>')
+      parent.append('<div class="help-text" style="opacity: 0"></div>')
     },
 
     update: function(parent, el) {

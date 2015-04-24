@@ -16,11 +16,14 @@
     this.hedwig.receiveMessage(discreet.XDCallback, this);
     var frame = document.createElement('iframe');
     this.checkoutFrame = frame;
-    frame.className = 'razorpay-checkout-frame';
-    frame.setAttribute('style', 'z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;');
-    frame.setAttribute('allowtransparency', 'true');
-    frame.setAttribute('frameborder', '0');
-    frame.src = discreet.checkoutUrl + 'checkout.html';
+    
+    $(frame).attr({
+      'class': 'razorpay-checkout-frame',
+      'style': 'z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
+      'allowtransparency': 'true',
+      'frameborder': '0',
+      'src': discreet.checkoutUrl + 'checkout.html'
+    });
     
     var parent = $(this.options.parent);
     if(!parent.is(':visible'))
@@ -94,23 +97,30 @@
       }
       return discreet.sendFrameMessage.call(this, response);
     } else if (event == 'submit'){
+      var self = this;
       this.submit({
         data: data.data,
-        failure: function(){
-
+        failure: function(response){
+          var message = {
+            event: 'failure',
+            response: response
+          }
+          discreet.sendFrameMessage.call(self, message);
         },
         success: function(response){
           var message = {
             event: 'success',
             response: response
           }
-          discreet.sendFrameMessage.call(this, message);
+          discreet.sendFrameMessage.call(self, message);
         }
       });
     } else if (event == 'cancel'){
       if(typeof this.options.oncancel == 'function')
         this.options.oncancel()
     } else if (event == 'hidden'){
+      $(this.checkoutFrame).remove();
+      $('body').css('overflow', discreet.merchantData.bodyOverflow);
       if(typeof this.options.onhidden == 'function')
         this.options.onhidden()
     }

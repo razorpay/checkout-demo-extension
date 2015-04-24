@@ -46,7 +46,12 @@
       this.element.appendTo(parent);
     }
     if (this.options.animation && this.transitionProperty) {
-      durationStyle = getComputedStyle(element[0])[this.transitionProperty];
+      if(!this.transitionProperty){
+        durationStyle = 0;
+      } else {
+        durationStyle = getComputedStyle(element[0])[this.transitionProperty] || 250;
+      }
+
       duration = this.options.animation && this.transitionProperty && parseFloat(durationStyle) || 0;
       if (duration && typeof durationStyle === 'string' && durationStyle[durationStyle.length - 2] !== 'm') {
         duration *= 1000;
@@ -88,7 +93,7 @@
     },
 
     show: function() {
-      $(document.body).css('overflow', 'hidden');
+      // $(document.body).css('overflow', 'hidden');
       this.isShown = true;
       this.bind_events();
       this.element[0].style.display = 'block';
@@ -134,7 +139,7 @@
     },
 
     hidden: function() {
-      $(document.body).css('overflow', '');
+      // $(document.body).css('overflow', '');
       this.clearTimeout();
       this.element.hide()
       this.modalElement.hide();

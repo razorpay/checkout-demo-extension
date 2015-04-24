@@ -25,6 +25,10 @@
     if(data.options && !options){ // open modal
       options = data.options;
       open();
+    } else if(data.event == 'success'){
+      successHandler();
+    } else if(data.event == 'failure'){
+      failureHandler(data.response);
     }
   }
 
@@ -148,18 +152,16 @@
     // init modal
     var modalOptions = {
       onhide: null,
-      onhidden: null
+      onhidden: function(){
+        postMessage({event: 'hidden'})
+      }
     }
     if(options.oncancel){
       modalOptions.onhide = function(){
         postMessage({event: 'cancel'})
       }
     }
-    if(options.onhidden){
-      modalOptions.onhidden = function(){
-        postMessage({event: 'hidden'})
-      } 
-    }
+
     modal = new Modal($el, modalOptions);
 
     renew();
@@ -269,28 +271,21 @@
   
   };
 
-  function successHandler(message){
+  function successHandler(){
     modal.options.onhide = null;
-    // rzp.hide();
+    modal.hide();
     modal = null;
-    if(typeof options.handler === "function"){
-      options.handler(message);
-    }
-    else {
-      // This is automatic checkout
-      defaultPostHandler(message);
-    }
   };
 
   function failureHandler(response){
-    var modal = rzp.$el.find('.modal');
-    discreet.shake(modal);
+    var modalEl = modal.modalElement;
+    shake(modalEl[0]);
 
-    rzp.$el.find('.submit').removeAttr('disabled');
-    rzp.modal.options.backdropClose = true;
+    modalEl.find('.submit').removeAttr('disabled');
+    modal.options.backdropClose = true;
 
     if (response && response.error && response.error.field){
-      var error_el = rzp.$el.find('input[name="'+response.error.field+'"]')
+      var error_el = $el.find('input[name="'+response.error.field+'"]')
       if (error_el.length){
         error_el.closest('.elem').addClass('invalid');
       }
@@ -299,6 +294,6 @@
     var defaultMessage = 'There was an error in handling your request';
     var message = response.error.description || defaultMessage;
 
-    rzp.$el.find('.error').html('<li>' + message + '</li>');
+    $el.find('.error').html(message);
   };
 })();
