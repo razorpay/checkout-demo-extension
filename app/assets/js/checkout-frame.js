@@ -44,7 +44,7 @@
     element.addClass('shake');
     setTimeout(function() {
       element.removeClass('shake');
-    }, 150);
+    }, 200);
   };
 
   function getFormData(form, netbanking) {
@@ -257,10 +257,6 @@
   };
 
   function hide(){
-    // if(this.Rollbar.state === true){
-    //   this.Rollbar.stop();
-    // }
-
     renew();
     if(modal){
       modal.hide();
@@ -279,7 +275,7 @@
 
   function failureHandler(response){
     var modalEl = modal.modalElement;
-    shake(modalEl[0]);
+    shake(modalEl);
 
     modalEl.find('.submit').removeAttr('disabled');
     modal.options.backdropClose = true;

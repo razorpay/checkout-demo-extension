@@ -1,7 +1,3 @@
-// 'base' is needed due to karma
-// https://github.com/karma-runner/karma/issues/481
-jasmine.getFixtures().fixturesPath = 'base/spec/fixtures/';
-
 var options = {
   'key': 'key_id',
   'amount': '4000'
@@ -20,24 +16,21 @@ describe("new Razorpay", function(){
   });
 })
 
-describe("Razorpay Ajax", function(){
+describe("Options validation", function(){
   var rzp;
   var request;
 
-  var data = {
-    "amount"             : "5100",
-    "currency"           : "INR",
-    "card[name]"         : "Harshil Mathur",
-    "email"              : "harshil@razorpay.com",
-    "contact"            : "9999999999",
-    "card[number]"       : "4012001037141112",
-    "card[cvv]"          : "888",
-    "card[expiry_month]" : "05",
-    "card[expiry_year]"  : "19",
-    "notes[address]"     : "Hello World",
+  var init_options = {
+    protocol: 'https',
+    hostname: 'api.razorpay.dev',
+    version: 'v1',
+    jsonpUrl: '/payments/create/jsonp',
+    netbankingListUrl: '/banks',
+    key: 'rzp_test_1DP5mmOlF5G5ag',
+    handler: null
   }
 
-  var response = {
+  var response_v0 = {
     success: {
       "data": {
           "paymentid" : "5668898417810430",
@@ -62,8 +55,17 @@ describe("Razorpay Ajax", function(){
     }
   }
 
+  var response_v1 = {
+    success: {
+
+    },
+    error: {
+
+    }
+  }
+
   beforeEach(function(){
-    rzp = new Razorpay(options);
+    rzp = new Razorpay(init_options);
   });
 
   describe("on submit", function(){

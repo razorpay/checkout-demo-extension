@@ -45,19 +45,22 @@
       }
       this.element.appendTo(parent);
     }
-    if (this.options.animation && this.transitionProperty) {
-      if(!this.transitionProperty){
-        durationStyle = 0;
-      } else {
-        durationStyle = getComputedStyle(element[0])[this.transitionProperty] || 250;
-      }
 
-      duration = this.options.animation && this.transitionProperty && parseFloat(durationStyle) || 0;
-      if (duration && typeof durationStyle === 'string' && durationStyle[durationStyle.length - 2] !== 'm') {
-        duration *= 1000;
+    if(!this.options.animation || !this.transitionProperty){
+      duration = 0;
+    } else {
+      if(typeof window.getComputedStyle == 'function'){
+        durationStyle = window.getComputedStyle(this.element[0])[this.transitionProperty];
+        duration = parseFloat(durationStyle) || 0;
       }
-      this.animationDuration = duration;
     }
+
+    if (typeof durationStyle === 'string' && durationStyle[durationStyle.length - 2] !== 'm') {
+      duration *= 1000;
+    }
+
+    this.animationDuration = duration;
+
     if (this.options.show) {
       this.show();
     }
@@ -102,6 +105,7 @@
       this.modalElement.prop('offsetWidth');
       this.element.addClass(this.options.shownClass);
       this.clearTimeout();
+      this.element.focus();
       return timeout = setTimeout($.proxy(this.shown, this), this.animationDuration);
     },
 
@@ -120,22 +124,24 @@
         l[0].off(l[1], l[2]);
       }
       this.listeners = [];
+      if (window.removeEventListener){
+        this.element[0].removeEventListener('blur', this.steal_focus, true);
+      }
       this.clearTimeout();
       if (typeof this.options.onhide === 'function') {
         this.options.onhide();
       }
-      return timeout = setTimeout((function(_this) {
-        return function() {
-          return _this.hidden();
-        };
-      })(this), this.animationDuration);
+      var self = this;
+      timeout = setTimeout(function(){
+        self.hidden();
+      }, this.animationDuration);
     },
 
     clearTimeout: function() {
       if (timeout) {
         clearTimeout(timeout);
       }
-      return timeout = null;
+      timeout = null;
     },
 
     hidden: function() {
@@ -182,25 +188,25 @@
       
       if (this.options.stopKeyPropagation) {
         this.on('keyup keydown keypress', this.element, function(e) {
-          return e.stopPropagation();
+          e.stopPropagation();
         });
       }
       if (this.options.escape) {
         this.on('keyup', this.element, function(e) {
           if (e.which === 27 && this.options.backdropClose) {
-            return this.hide();
+            this.hide();
           }
         })
       }
       if (this.options.backdropClose) {
         this.on('click', this.element, function(e) {
           if (e.target === this.element[0] && this.options.backdropClose) {
-            return this.hide();
+            this.hide();
           }
         })
       }
     }
   };
 
-  return root.Modal = modal;
+  root.Modal = modal;
 })(window);

@@ -24,6 +24,11 @@
       'frameborder': '0',
       'src': discreet.checkoutUrl + 'checkout.html'
     });
+    // if(frame.contentWindow){
+      // setTimeout(function(){
+        // frame.contentWindow.focus()
+      // 0})
+    // }
     
     var parent = $(this.options.parent);
     if(!parent.is(':visible'))
