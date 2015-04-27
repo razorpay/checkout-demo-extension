@@ -105,9 +105,9 @@
       var self = this;
       this.submit({
         data: data.data,
-        failure: function(response){
+        error: function(response){
           var message = {
-            event: 'failure',
+            event: 'error',
             response: response
           }
           discreet.sendFrameMessage.call(self, message);

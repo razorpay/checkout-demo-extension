@@ -27,8 +27,8 @@
       open();
     } else if(data.event == 'success'){
       successHandler();
-    } else if(data.event == 'failure'){
-      failureHandler(data.response);
+    } else if(data.event == 'error'){
+      errorHandler(data.response);
     }
   }
 
@@ -236,13 +236,6 @@
     }
 
     postMessage({event: 'submit', data: data});
-    // request = {
-    //   data: data,
-    //   failure: failureHandler,
-    //   success: successHandler,
-    //   prehandler: preHandler
-    // };
-    // submit(request);
     renew();
     $el.find('.submit').attr('disabled', true);
     modal.options.backdropClose = false;
@@ -263,17 +256,13 @@
     }
   };
 
-  function preHandler(rzp){
-  
-  };
-
   function successHandler(){
     modal.options.onhide = null;
     modal.hide();
     modal = null;
   };
 
-  function failureHandler(response){
+  function errorHandler(response){
     var modalEl = modal.modalElement;
     shake(modalEl);
 

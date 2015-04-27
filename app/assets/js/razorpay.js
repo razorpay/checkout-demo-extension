@@ -5,6 +5,7 @@
 
   var $ = Razorpay.prototype.$;
   var Hedwig = Razorpay.prototype.Hedwig;
+  var Popup = Razorpay.prototype.Popup;
   var discreet = Razorpay.prototype.discreet;
 
   // TODO add style link to insert
@@ -37,130 +38,183 @@
     parent: null
   };
 
-  // TODO remove shared var
-  var lastRequestInstance = null;
-
   discreet.XDCallback = function(message){
     if(!message || !message.data){
       return;
     }
-    var data = message.data;
     
+    var data = message.data;
     if(typeof message.data == 'string'){
       try {
         data = JSON.parse(message.data);
       }
       catch(e){
-        data.error = 'Unable to parse response'
+        data = {
+          error: {
+            description: 'Unable to parse response'
+          }
+        }
       }
     }
-    /**
-     * Popup sends an XDM message to tell that it has loaded
-     * Ignore that
-     */
-
+    
     if(data.source === 'frame'){
+      // this  == rzp
       if(discreet.onFrameMessage && message.origin && discreet.checkoutUrl.indexOf(message.origin) != -1){
         discreet.onFrameMessage.call(this, data);
       }
       return
     }
-    else if(data.source === 'popup'){
-      if(!lastRequestInstance.popup._loaded){
-        // console.log(2)
-        lastRequestInstance.popup._loaded = true;
-        lastRequestInstance.popup.loaded();
+
+    // this == request
+    // checking source url
+    if(!(this.popup.window === message.source || /^https:\/\/[a-z]+\.razorpay\.com/.test(message.origin))){
+      return;
+    }
+    
+    if(data.source === 'popup'){
+      if(!this.popup._loaded){
+        this.popup._loaded = true;
+        this.popup.loaded();
       }
       return;
     }
 
-    if(!lastRequestInstance){
-      return;
-    }
     // Close the popup in case of netbanking
-    if(typeof lastRequestInstance.popup !== 'undefined'){
-      lastRequestInstance.popup.close();
+    if(typeof this.popup !== 'undefined'){
+      this.popup.close();
     }
 
     if (data.error && data.error.description){
-      if(typeof lastRequestInstance.failure === 'function'){
-        lastRequestInstance.failure(data);
+      if(typeof this.error === 'function'){
+        this.error(data);
       }
     } else {
-      if(typeof lastRequestInstance.success === 'function'){
-        lastRequestInstance.success(data);
+      if(typeof this.success === 'function'){
+        this.success(data);
       }
     }
 
     // remove postMessage listener
-    lastRequestInstance.rzp.hedwig.clearReceiveMessage();
-
-    lastRequestInstance = null;
+    this.rzp.hedwig.clearReceiveMessage();
   };
 
-  /**
-   * Handles success callback of ajax request
-   * This is where different actions are taken for CC/3DS/NB
-   */
-  discreet.success = function(req){
-    var request = req || {};
+  discreet.apiResponseHandler = {
+    '1' : function(response){
+      // this == request
 
+      var payment_id = response.payment_id;
+      var error = response.error;
+      var request = response.request;
+      var success = response.success;
+
+      if(!payment_id || typeof error == 'object'){
+        return discreet.error.call(this, response);
+      }
+
+      else if(success){
+        return 
+      }
+      
+      else if(typeof request == 'object'){
+        if(request.url){
+          return discreet.navigatePopup.call(this, request);
+        }
+      }
+    }
+  }
+
+  discreet.error = function(response){
+    // this == request
+    if(this.popup && typeof this.popup.close == 'function'){
+      this.popup.close();
+    }
+    if(typeof this.error == 'function'){
+      this.error.call(null, response); // dont expose request as this
+    }
+  }
+  discreet.success = function(response){
+    // this == request
+    if(this.popup && typeof this.popup.close == 'function'){
+      this.popup.close();
+    }
+    if(typeof this.success == 'function'){
+      this.success.call(null, response); // dont expose request as this
+    }
+  }
+
+  discreet.getSuccessHandler = function(request){
     return function(response){
-      if (response['http_status_code'] !== 200 && response.error){
-        if(typeof request.popup !== 'undefined'){
-          request.popup.close();
+      if(response.version){
+        var successCallback = discreet.apiResponseHandler[response.version];
+        if(typeof successCallback == 'function'){
+          return successCallback.call(request, response);
         }
-        if(typeof request.failure === 'function'){
-          request.failure(response);
-        }
-      }
-      else if (response.callbackUrl){
-        if(typeof request.prehandler === 'function'){
-          request.prehandler();
-        }
-        var data = response.data;
-        data.callbackUrl = response.callbackUrl;
-        discreet.autoSubmitPopup(request, data);
-      }
-      else if (response.redirectUrl){
-        if(typeof request.prehandler === 'function'){
-          request.prehandler();
-        }
-        discreet.redirectPopup(request, response.redirectUrl);
-      }
-      else if (response.razorpay_payment_id) {
-        if(typeof request.success === 'function'){
-          request.success(response);
-          if(typeof request.popup !== 'undefined'){
-            request.popup.close();
-          }
-        }
-        if(request.rzp && request.rzp.options && typeof request.rzp.options.handler == 'function'){
-          request.rzp.options.handler(response);
-        }
-      }
-      else {
-        if(typeof request.failure === 'function'){
-          request.failure(response);
-        }
-      }
-    };
-  };
+      }    
 
-  discreet.setupPopup = function(rzp, request){
-    var popup = request.popup = new Razorpay.prototype.Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
-    popup.onClose(discreet.popupClose);
+      // else version 0
+      if (response['http_status_code'] !== 200){
+        discreet.error.call(request, response);
+      }
+      
+      else if (response.callbackUrl){
+        var nextRequest = {
+          autosubmit: response.data,
+          rzp: 1
+        }
+        nextRequest.autosubmit.callbackUrl = response.callbackUrl;
+        discreet.navigatePopup.call(request, nextRequest);
+      }
+      
+      else if (response.redirectUrl){
+        var nextRequest = {
+          location: response.redirectUrl,
+          rzp: 1
+        }
+        discreet.navigatePopup.call(request, nextRequest);
+      }
+      
+      else if (response.razorpay_payment_id) {
+        response.payment_id = response.razorpay_payment_id;
+        response.success = true;
+        delete response.razorpay_payment_id;
+        discreet.success.call(request, response);
+      }
+      
+      else discreet.error.call(request, response);
+    }
+  }
+  discreet.setupPopup = function(request){
+    var rzp = request.rzp;
+    if(!rzp.hedwig){
+      rzp.hedwig = new Hedwig({
+        ccHubLocation: rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php'
+      });
+    }
+    rzp.hedwig.receiveMessage(discreet.XDCallback, request);
+    var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
+
+    if (typeof request.error == 'function'){
+      popup.onClose(discreet.getPopupClose(request));  
+    }
+    
     popup._loaded = false;
     popup.loaded = function(){};
   }
 
-  discreet.redirectPopup = function(request, location){
-    var popup = request.popup;
+  discreet.navigatePopup = function(nextRequest){
+    // this == request
+    var popup = this.popup;
+    if(!popup){
+      return this.error({
+        error: {
+          description: 'Unable to navigate to bank site'
+        }
+      })
+    }
 
+    var rzp = this.rzp;
     popup.loaded = function(){
-      request.rzp.hedwig.sendMessage({
-        location: location
-      }, '*', popup.window);
+      rzp.hedwig.sendMessage(nextRequest, '*', popup.window);
     }
 
     if(popup._loaded === true){
@@ -168,26 +222,14 @@
     }
   }
 
-  discreet.autoSubmitPopup = function(request, data){
-    var popup = request.popup;
-
-    popup.loaded = function(){
-      request.rzp.hedwig.sendMessage({
-        autosubmit: data
-      }, '*', popup.window);
+  discreet.getPopupClose = function(request){
+    return function(){
+      request.error({
+        error: {
+          description: 'Payment cancelled'
+        }
+      })
     }
-
-    if(popup._loaded === true){
-      popup.loaded();
-    }
-  }
-
-  discreet.popupClose = function(){
-    lastRequestInstance.failure({
-      error: {
-        description: 'Payment cancelled'
-      }
-    });
   }
 
   Razorpay.prototype.makeUrl = function(){
@@ -196,7 +238,7 @@
 
   /**
     method for payment data submission to razorpay api
-    @param request  contains payment data and optionally callbacks to success, failure and element to put iframe in
+    @param request  contains payment data and optionally callbacks to success, error and element to put iframe in
   */
   Razorpay.prototype.submit = function(request){
 
@@ -205,44 +247,26 @@
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
     // data['card[expiry_month]'] = expiry[0];
     // data['card[expiry_year]'] = expiry[1];
-
-    var failure = false;
     if(typeof request.data !== 'object'){
-      failure = true;
+      return false;
     }
 
     var errors = this.validateData(request.data);
     if(errors && errors.length){
-      failure = true;
+      return false;
     }
-
-    /**
-     * Setup popup in advance because popup can be opened only on click
-     * Right now, setting up popup for all cases, CC/NB
-    if(request.data.method === 'netbanking'){
-      discreet.setupPopup(this, request);
-    }
-     */
-    discreet.setupPopup(this, request);
-
-    /**
-     * Setting up Hedwig
-     */
-    lastRequestInstance = request;
-    this.hedwig.receiveMessage(discreet.XDCallback);
 
     request.data.key_id = this.options.key;
     request.rzp = this;
 
-    if(failure){
-      return request.failure();
-    }
-    $.ajax({
+    discreet.setupPopup(request);
+
+    return $.ajax({
       url: this.makeUrl() + this.options.jsonpUrl,
       dataType: 'jsonp',
-      success: discreet.success(request),
+      success: discreet.getSuccessHandler(request),
       timeout: 35000,
-      error: request.failure,
+      error: request.error,
       data: request.data
     });
   };

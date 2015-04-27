@@ -83,7 +83,9 @@
 
     // finally, open and return the popup window
     this.window = window.open(src, name, optsStr); // might be null in IE9 if protected mode is turned on
-    this.focus();
+    if(this.window){
+      this.focus();
+    }
 
     // this.$el = $(this.window.document.body);
 
@@ -91,16 +93,11 @@
 
     var that = this;
 
-    /**
-     * Could have used
-     *  $(window).on('unload', this.unload)
-     * but it isn't working for some reason in Chrome.
-     */
     $(window).on('unload', function(){
       that.unload();
     });
     $(window).on('beforeunload', function(){
-      return that.beforeunload();
+      that.beforeunload();
     });
   }
 
@@ -145,11 +142,11 @@
 
   Popup.prototype._checkClose = function () {
     if (this.window.closed) {
+      clearInterval(this.interval);
+      this.close();
       if(typeof this.closeCB === 'function'){
         this.closeCB();
       }
-      this.close();
-      clearInterval(this.interval);
     }
   }
 
