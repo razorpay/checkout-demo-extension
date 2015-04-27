@@ -41,13 +41,13 @@ module.exports = function(grunt){
       }
     },
     useminPrepare:{
-      html:'app/srv/layout.html',
+      html:['app/srv/layout.html', 'app/srv/checkout.html'],
       options: {
         dest: 'app/dist/v1' //dist is the only directory served
       }
     },
     usemin:{
-      html:'app/dist/v1/layout.html',
+      html:'app/dist/v1/checkout.html',
       options: {
         dest: 'app/dist/v1' //dist is the only directory served
       }
