@@ -9,6 +9,8 @@
   var discreet = Razorpay.prototype.discreet;
 
   discreet.isCheckout = true;
+  discreet.nblist = null;
+  discreet.nbajax = null;
 
   Razorpay.prototype.open = function() {
     if(discreet.isOpen){
@@ -54,6 +56,10 @@
   discreet.onClose = function(){
     discreet.removeMessageListener();
     discreet.isOpen = false;
+    if(this.checkoutFrame && this.checkoutFrame.data('removable')){
+      this.checkoutFrame.remove();
+      this.checkoutFrame = null;
+    }
   }
 
   discreet.parseScriptOptions = function(options){
@@ -103,6 +109,7 @@
       return;
     }
     var event = data.event;
+    
     if(event == 'load'){
       var options = {
         prefill: this.options.prefill,
@@ -118,25 +125,37 @@
       }
 
       var response = {
-        options: options
+        options: options,
+        nblist: discreet.nblist
       }
       return discreet.sendFrameMessage.call(this, response);
-    } else if (event == 'submit'){
+    }
+
+    else if (event == 'submit'){
+      // TODO save customer data
       true;
-    } else if (event == 'cancel'){
+    }
+
+    else if (event == 'cancel'){
       if(typeof this.options.oncancel == 'function')
         this.options.oncancel()
-    } else if (event == 'hidden'){
+    }
+
+    else if (event == 'hidden'){
       $('body').css('overflow', discreet.merchantData.bodyOverflow);
-      if(this.checkoutFrame){
-        this.checkoutFrame.hide();
-      }
-      discreet.onClose();
+      this.checkoutFrame && this.checkoutFrame.hide();
+      discreet.onClose.call(this);
       if(typeof this.options.onhidden == 'function')
-        this.options.onhidden()
-    } else if (event == 'success'){
-      this.checkoutFrame.remove();
-      this.checkoutFrame = null;
+        this.options.onhidden();
+    }
+
+    else if (event == 'success'){
+      if(this.checkoutFrame){
+        this.checkoutFrame.data('removable', true);
+      }
+      if(typeof this.options.handler == 'function'){
+        this.options.handler.call(null, data);
+      }
     } else if (event == 'error'){
       true;
     }
@@ -165,7 +184,17 @@
     $(RazorPayForm).submit();
   };
 
-  Razorpay.prototype.validateCheckout = function(options, error){
+  discreet.initCheckout = function(){
+    if(!discreet.nblist && !discreet.nbajax){
+      discreet.nbajax = this.getNetbankingList(function(response){
+        discreet.nbajax = null;
+        if(!response.error){
+          discreet.nblist = response;
+        }
+      });
+    }
+  }
+  discreet.validateCheckout = function(options, error){
     if(options.display_currency){
       if(options.display_currency === 'USD'){
         options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');

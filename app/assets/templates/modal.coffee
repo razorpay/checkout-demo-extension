@@ -56,7 +56,6 @@ templates.modal = '
                 <div class="elem-inner">
                   <select name="bank" required class="input" pattern="[\\w]+">
                     <option selected="selected" value="">Select Bank</option>
-                    <option value="CITI">Citi Bank</option>
                     <option value="HDFC">HDFC Bank</option>
                     <option value="IBKL">IDBI Bank</option>
                     <option value="ICIC">ICICI Bank</option>

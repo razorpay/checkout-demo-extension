@@ -3,9 +3,7 @@
 (function(){
   'use strict';
 
-  window.$ = Razorpay.prototype.$;
-  var modal, $el, options, rzp;
-
+  var modal, $el, options, rzp, nblist;
   postMessage({event: 'load'});
 
   window.onmessage = function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
@@ -21,6 +19,10 @@
       }
     } else {
       data = e.data;
+    }
+
+    if(data.nblist){
+      nblist = data.nblist;
     }
 
     if(data.options && !options){ // open modal
@@ -78,23 +80,24 @@
     return data;
   };
 
-  function showNetbankingList(rzp){
-    rzp.getNetbankingList(function(data){
-      if(typeof data.error !== 'undefined'){
-        $('#tab-nb .elem').remove();
-        $('.error').append('<li class="nb-na">Netbanking is not available right now. Please try later.</li>');
-        return;
-      }
+  function showNetbankingList(nblist){
+    if(!nblist && rzp){
+      return rzp.getNetbankingList(showNetbankingList)
+    }
+    if(nblist.error){
+      $('#tab-nb .elem').remove();
+      $('.error').append('<li class="nb-na">Netbanking is not available right now. Please try later.</li>');
+      return;
+    }
 
-      var optionsString = '<option selected="selected" value="">Select Bank</option>';
-      for(var i in data){
-        if(i === 'http_status_code'){
-          continue;
-        }
-        optionsString += '<option value="'+i+'">' + data[i] + '</option>';
+    var optionsString = '<option selected="selected" value="">Select Bank</option>';
+    for(var i in nblist){
+      if(i === 'http_status_code'){
+        continue;
       }
-      $('#tab-nb select').html(optionsString);
-    });
+      optionsString += '<option value="'+i+'">' + nblist[i] + '</option>';
+    }
+    $('#tab-nb select').html(optionsString);
   }
 
   function sanitizeDOM(obj){
@@ -148,6 +151,8 @@
     if(modal){
       return modal.show();
     }
+
+    showNetbankingList();
     sanitizeOptions(options);
     $el = $((doT.compile(templates.modal))(options));
     $el.smarty();
@@ -168,9 +173,6 @@
     modal = new Modal($el, modalOptions);
 
     renew();
-
-    // discreet.modalRollbarClose(this);
-    // discreet.showNetbankingList.call(this);
 
     $el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
       var parent;
@@ -270,11 +272,14 @@
   };
 
   function successHandler(response){
-    debugger
     postMessage({ event: 'success', data: response});
+    hide();
   };
 
   function errorHandler(response){
+    if(!modal){
+      return;
+    }
     var modalEl = modal.modalElement;
     shake(modalEl);
 
@@ -295,4 +300,5 @@
 
     postMessage({ event: 'error', data: response});
   };
+
 })();

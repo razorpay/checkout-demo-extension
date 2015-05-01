@@ -4,8 +4,6 @@
   'use strict';
 
   var $ = Razorpay.prototype.$;
-  var Hedwig = Razorpay.prototype.Hedwig;
-  var Popup = Razorpay.prototype.Popup;
   var discreet = Razorpay.prototype.discreet;
 
   // TODO add style link to insert
@@ -79,222 +77,6 @@
     }
   }
 
-  discreet.XDCallback = function(message, data){
-    if(data.source === 'frame'){
-      if(discreet.onFrameMessage && message.origin && discreet.checkoutUrl.indexOf(message.origin) != -1){
-        discreet.onFrameMessage.call(this.rzp, data);
-      }
-      return
-    }
-
-    // this == request
-    // checking source url
-    if(!(this.popup.window === message.source || /^https:\/\/[a-z]+\.razorpay\.com/.test(message.origin))){
-      return;
-    }
-    
-    if(data.source === 'popup'){
-      if(!this.popup._loaded){
-        this.popup._loaded = true;
-        this.popup.loaded();
-      }
-      return;
-    }
-
-    // Close the popup in case of netbanking
-    if(typeof this.popup !== 'undefined'){
-      this.popup.close();
-    }
-
-    if (data.error && data.error.description){
-      if(typeof this.error === 'function'){
-        this.error(data);
-      }
-    } else {
-      if(typeof this.success === 'function'){
-        this.success(data);
-      }
-    }
-
-    // remove postMessage listener
-    discreet.removeMessageListener();
-  };
-
-  discreet.apiResponseHandler = {
-    '1' : function(response){
-      // this == request
-
-      var payment_id = response.payment_id;
-      var error = response.error;
-      var request = response.request;
-      var success = response.success;
-
-      if(!payment_id || typeof error == 'object'){
-        return discreet.error.call(this, response);
-      }
-
-      else if(success){
-        return 
-      }
-      
-      else if(typeof request == 'object'){
-        if(request.url){
-          return discreet.navigatePopup.call(this, request);
-        }
-      }
-    }
-  }
-
-  discreet.error = function(response){
-    // this == request
-    if(this.popup && typeof this.popup.close == 'function'){
-      this.popup.close();
-    }
-    if(typeof this.error == 'function'){
-      this.error.call(null, response); // dont expose request as this
-    }
-  }
-  discreet.success = function(response){
-    // this == request
-    if(this.popup && typeof this.popup.close == 'function'){
-      this.popup.close();
-    }
-    if(typeof this.success == 'function'){
-      this.success.call(null, response); // dont expose request as this
-    }
-  }
-
-  discreet.getSuccessHandler = function(request){
-    return function(response){
-      if(response.version){
-        var successCallback = discreet.apiResponseHandler[response.version];
-        if(typeof successCallback == 'function'){
-          return successCallback.call(request, response);
-        }
-      }    
-
-      // else version 0
-      if (response['http_status_code'] !== 200){
-        discreet.error.call(request, response);
-      }
-      
-      else if (response.callbackUrl){
-        var nextRequest = {
-          autosubmit: response.data,
-          rzp: 1
-        }
-        nextRequest.autosubmit.callbackUrl = response.callbackUrl;
-        discreet.navigatePopup.call(request, nextRequest);
-      }
-      
-      else if (response.redirectUrl){
-        var nextRequest = {
-          location: response.redirectUrl,
-          rzp: 1
-        }
-        discreet.navigatePopup.call(request, nextRequest);
-      }
-      
-      else if (response.razorpay_payment_id) {
-        response.payment_id = response.razorpay_payment_id;
-        response.success = true;
-        delete response.razorpay_payment_id;
-        discreet.success.call(request, response);
-      }
-      
-      else discreet.error.call(request, response);
-    }
-  }
-  discreet.setupPopup = function(request){
-    var rzp = request.rzp;
-    if(!rzp.hedwig){
-      rzp.hedwig = new Hedwig({
-        ccHubLocation: rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php'
-      });
-    }
-    
-    discreet.addMessageListener(discreet.XDCallback, request);
-
-    var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
-
-    if (typeof request.error == 'function'){
-      popup.onClose(discreet.getPopupClose(request));  
-    }
-    
-    popup._loaded = false;
-    popup.loaded = function(){};
-  }
-
-  discreet.navigatePopup = function(nextRequest){
-    // this == request
-    var popup = this.popup;
-    if(!popup){
-      return this.error({
-        error: {
-          description: 'Unable to navigate to bank site'
-        }
-      })
-    }
-
-    var rzp = this.rzp;
-    popup.loaded = function(){
-      rzp.hedwig.sendMessage(nextRequest, '*', popup.window);
-    }
-
-    if(popup._loaded === true){
-      popup.loaded();
-    }
-  }
-
-  discreet.getPopupClose = function(request){
-    return function(){
-      request.error({
-        error: {
-          description: 'Payment cancelled'
-        }
-      })
-    }
-  }
-
-  Razorpay.prototype.makeUrl = function(){
-    return this.options.protocol + '://' + this.options.hostname + '/' + this.options.version;
-  }
-
-  /**
-    method for payment data submission to razorpay api
-    @param request  contains payment data and optionally callbacks to success, error and element to put iframe in
-  */
-  Razorpay.prototype.submit = function(request){
-
-    // TODO what's to be done for netbanking?
-    // TODO better validation
-    // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-    // data['card[expiry_month]'] = expiry[0];
-    // data['card[expiry_year]'] = expiry[1];
-    if(typeof request.data !== 'object'){
-      return false;
-    }
-
-    var errors = this.validateData(request.data);
-    if(errors && errors.length){
-      return false;
-    }
-
-    request.data.key_id = this.options.key;
-    request.rzp = this;
-
-    discreet.setupPopup(request);
-
-    return $.ajax({
-      url: this.makeUrl() + this.options.jsonpUrl,
-      dataType: 'jsonp',
-      success: discreet.getSuccessHandler(request),
-      timeout: 35000,
-      error: request.error,
-      data: request.data
-    });
-  };
-
   Razorpay.prototype.configure = function(overrides){
     this.validateOptions(overrides, true);
     this.options = this.options || {};
@@ -325,12 +107,11 @@
       }
     }
 
-    if(typeof this.hedwig === 'undefined'){
-      this.hedwig = new Hedwig({
-        ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.php'
-      });
+    if(typeof discreet.initRazorpay == 'function'){
+      discreet.initRazorpay.call(this);
+    } else if(typeof discreet.initCheckout == 'function'){
+      discreet.initCheckout.call(this);
     }
-    discreet.getNetbankingList(this);
   };
 
   /**
@@ -401,8 +182,8 @@
       });
     }
 
-    if(typeof this.validateCheckout == 'function'){
-      this.validateCheckout(options, errors);
+    if(typeof discreet.validateCheckout == 'function'){
+      discreet.validateCheckout.call(this, options, errors);
     }
 
     if(!throwError){
@@ -477,45 +258,40 @@
     return env;
   })();
 
-  discreet.getNetbankingList = function(rzp){
-    $.ajax({
-      url: rzp.makeUrl() + rzp.options.netbankingListUrl,
-      data: {
-        key_id: rzp.options.key
-      },
+  discreet.makeUrl = function(rzp){
+    return rzp.options.protocol + '://' + rzp.options.hostname + '/' + rzp.options.version;
+  }
+
+  Razorpay.prototype.getNetbankingList = function(callback){
+    var rzp = this;
+    return $.ajax({
+      url: discreet.makeUrl(this) + this.options.netbankingListUrl,
+      data: {key_id: this.options.key},
+      timeout: 30000,
       dataType: 'jsonp',
       success: function(response){
-        rzp.options.netbankingList = response;
+        rzp.netbankingList = response;
         
-        if(typeof rzp.options.netbankingListCB == 'function'){
+        if(typeof callback == 'function'){
           var callback_param;
           if (response['http_status_code'] !== 200 && response.error){
             callback_param = {error: true};
           } else{
             callback_param = response;
           }
-          rzp.options.netbankingListCB(callback_param);
+          callback(callback_param);
         }
       },
-      timeout: 30000,
       error: function(response){
-        if(typeof rzp.options.netbankingListCB == 'function'){
-          rzp.options.netbankingListCB({error: true});
+        if(typeof callback == 'function'){
+          callback({error: true});
         }
       }
     });
   }
 
-  Razorpay.prototype.getNetbankingList = function(callback){
-    if(typeof this.options.netbankingList === "undefined" ){
-      this.options.netbankingListCB = callback;
-    } else {
-      callback(this.options.netbankingList);
-    }
-  }
-
   // @if NODE_ENV='test'
-  discreet.getNetbankingList = function(){
+  Razorpay.prototype.getNetbankingList = function(){
     return;
   }
   window.discreet = discreet;
