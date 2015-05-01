@@ -38,29 +38,51 @@
     parent: null
   };
 
-  discreet.XDCallback = function(message){
-    if(!message || !message.data){
-      return;
-    }
-    
-    var data = message.data;
-    if(typeof message.data == 'string'){
-      try {
-        data = JSON.parse(message.data);
+  discreet.getMessageCallback = function(callback, context){
+    return function(e){
+      if(!e || !e.data || typeof callback != 'function'){
+        return;
       }
-      catch(e){
-        data = {
-          error: {
-            description: 'Unable to parse response'
+      var data = e.data;
+      if(typeof data == 'string'){
+        try {
+          data = JSON.parse(data);
+        }
+        catch(e){
+          data = {
+            error: {
+              description: 'Unable to parse response'
+            }
           }
         }
       }
+      callback.call(context, e, data);
     }
-    
+  }
+
+  discreet.listener = null;
+  
+  discreet.addMessageListener = function(callback, context) {
+    discreet.listener = discreet.getMessageCallback(callback, context);
+    if (window.addEventListener) {
+      window.addEventListener('message', discreet.listener, false);
+    } else if(window.attachEvent){
+      window.attachEvent('onmessage', discreet.listener);
+    }
+  }
+
+  discreet.removeMessageListener = function() {
+    if (window.removeEventListener) {
+      window.removeEventListener('message', discreet.listener, false);
+    } else if(window.detachEvent){
+      window.detachEvent('onmessage', discreet.listener);
+    }
+  }
+
+  discreet.XDCallback = function(message, data){
     if(data.source === 'frame'){
-      // this  == rzp
       if(discreet.onFrameMessage && message.origin && discreet.checkoutUrl.indexOf(message.origin) != -1){
-        discreet.onFrameMessage.call(this, data);
+        discreet.onFrameMessage.call(this.rzp, data);
       }
       return
     }
@@ -95,7 +117,7 @@
     }
 
     // remove postMessage listener
-    this.rzp.hedwig.clearReceiveMessage();
+    discreet.removeMessageListener();
   };
 
   discreet.apiResponseHandler = {
@@ -190,7 +212,9 @@
         ccHubLocation: rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php'
       });
     }
-    rzp.hedwig.receiveMessage(discreet.XDCallback, request);
+    
+    discreet.addMessageListener(discreet.XDCallback, request);
+
     var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
 
     if (typeof request.error == 'function'){
@@ -319,24 +343,31 @@
   Razorpay.prototype.validateOptions = function(options, throwError){
     var errors = [];
 
-    if (typeof options === 'undefined') {
+    if (typeof options == 'undefined') {
       errors.push({
-        message: "No options defined",
-        field: "options"
+        message: 'no initialization options are passed',
+        field: ''
       });
     }
 
-    if (typeof options.key === 'undefined') {
+    if (typeof options != 'object') {
       errors.push({
-        message: "No merchant key specified",
-        field: "key"
+        message: 'passed initialization options are invalid',
+        field: ''
       });
     }
 
-    if (options.key === "") {
+    if (typeof options.key == 'undefined') {
       errors.push({
-        message: "Merchant key cannot be empty",
-        field: "key"
+        message: 'No merchant key specified',
+        field: 'key'
+      });
+    }
+
+    if (options.key == "") {
+      errors.push({
+        message: 'Merchant key cannot be empty',
+        field: 'key'
       });
     }
 
@@ -344,26 +375,9 @@
     options.amount = String(options.amount);
     if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
       errors.push({
-        message: "Invalid amount specified",
-        field: "amount"
+        message: 'Invalid amount specified',
+        field: 'amount'
       });
-    }
-    
-    if(options.display_currency){
-      if(options.display_currency === 'USD'){
-        options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
-        if(!options.display_amount){
-          errors.push({
-            message: "Invalid display_amount specified",
-            field: "display_amount"
-          });
-        }
-      } else {
-        errors.push({
-          message: "Invalid display currency specified",
-          field: "display_currency"
-        });
-      }
     }
 
     if (typeof options.notes === 'object'){
@@ -374,27 +388,31 @@
       }
       if(notesCount > 15) {
         errors.push({
-          message: "You can only pass at most 15 fields in the notes object",
-          field: "notes"
+          message: 'You can only pass at most 15 fields in the notes object',
+          field: 'notes'
         });
       }
     }
 
-    if ((typeof options.handler !== 'undefined') && (typeof options.handler != 'function')){
+    if ((typeof options.handler != 'undefined') && (typeof options.handler != 'function')){
       errors.push({
-        message: "Handler must be a function",
-        field: "handler"
+        message: 'Handler must be a function',
+        field: 'handler'
       });
     }
 
-    if(typeof throwError === 'undefined'){
-      return errors;
+    if(typeof this.validateCheckout == 'function'){
+      this.validateCheckout(options, errors);
     }
-    else if(throwError === true){
+
+    if(!throwError){
+      return errors;
+    } else {
       if(errors.length > 0){
         var field = errors[0].field;
         var message = errors[0].message;
         throw new Error("Field: " + field + "; Error:" + message);
+        return;
       }
     }
   };

@@ -8,32 +8,52 @@
   var doT = Razorpay.prototype.doT;
   var discreet = Razorpay.prototype.discreet;
 
-  Razorpay.prototype.open = function(){
+  discreet.isCheckout = true;
+
+  Razorpay.prototype.open = function() {
+    if(discreet.isOpen){
+      return;
+    }
+    discreet.isOpen = true;
     var $body = $('body')
     discreet.merchantData.bodyOverflow = $body[0].style.overflow; // dont use $body.css, that will give real css value, we want just the js override, preferably blank string.
     $body.css('overflow', 'hidden');
 
-    this.hedwig.receiveMessage(discreet.XDCallback, this);
-    var frame = document.createElement('iframe');
-    this.checkoutFrame = frame;
-    
-    $(frame).attr({
+    discreet.addMessageListener(discreet.onFrameMessage, this);
+
+    if(!this.checkoutFrame){
+      var parent = $(this.options.parent);
+      if(!parent.is(':visible'))
+        parent = $body
+      this.checkoutFrame = discreet.createFrame();
+      parent.append(this.checkoutFrame);
+    } else {
+      this.checkoutFrame.show();
+      discreet.sendFrameMessage.call(this, {event: 'open'});
+    }
+  }
+
+  discreet.createFrame = function(rzp){
+    var frame = $(document.createElement('iframe'));
+    frame.attr({
       'class': 'razorpay-checkout-frame',
       'style': 'z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
       'allowtransparency': 'true',
       'frameborder': '0',
       'src': discreet.checkoutUrl + 'checkout.html'
     });
-    // if(frame.contentWindow){
-      // setTimeout(function(){
-        // frame.contentWindow.focus()
-      // 0})
-    // }
-    
-    var parent = $(this.options.parent);
-    if(!parent.is(':visible'))
-      parent = $body
-    parent.append(frame);
+    return frame;
+  }
+
+  Razorpay.prototype.close = function(){
+    if(discreet.isOpen){
+      discreet.sendFrameMessage.call(this, {event: 'close'});
+    }
+  }
+
+  discreet.onClose = function(){
+    discreet.removeMessageListener();
+    discreet.isOpen = false;
   }
 
   discreet.parseScriptOptions = function(options){
@@ -74,12 +94,12 @@
     if(typeof response !== 'string'){
       response = JSON.stringify(response)
     }
-    this.checkoutFrame.contentWindow.postMessage(response, '*');
+    this.checkoutFrame.prop('contentWindow').postMessage(response, '*');
   }
 
-  discreet.onFrameMessage = function(data){
+  discreet.onFrameMessage = function(e, data){
     // this == rzp
-    if(!this.checkoutFrame){
+    if(!e.origin || !this.checkoutFrame || (discreet.checkoutUrl.indexOf(e.origin) == -1) || (data.source != 'frame')){ // source check
       return;
     }
     var event = data.event;
@@ -102,37 +122,27 @@
       }
       return discreet.sendFrameMessage.call(this, response);
     } else if (event == 'submit'){
-      var self = this;
-      this.submit({
-        data: data.data,
-        error: function(response){
-          var message = {
-            event: 'error',
-            response: response
-          }
-          discreet.sendFrameMessage.call(self, message);
-        },
-        success: function(response){
-          var message = {
-            event: 'success',
-            response: response
-          }
-          discreet.sendFrameMessage.call(self, message);
-        }
-      });
+      true;
     } else if (event == 'cancel'){
       if(typeof this.options.oncancel == 'function')
         this.options.oncancel()
     } else if (event == 'hidden'){
-      $(this.checkoutFrame).remove();
       $('body').css('overflow', discreet.merchantData.bodyOverflow);
+      if(this.checkoutFrame){
+        this.checkoutFrame.hide();
+      }
+      discreet.onClose();
       if(typeof this.options.onhidden == 'function')
         this.options.onhidden()
+    } else if (event == 'success'){
+      this.checkoutFrame.remove();
+      this.checkoutFrame = null;
+    } else if (event == 'error'){
+      true;
     }
   }
 
-
-    /**
+  /**
     default handler for success
     default handler does not care about error or success messages,
     it just submits everything via the form
@@ -154,5 +164,24 @@
     $(inputs).appendTo(RazorPayForm);
     $(RazorPayForm).submit();
   };
+
+  Razorpay.prototype.validateCheckout = function(options, error){
+    if(options.display_currency){
+      if(options.display_currency === 'USD'){
+        options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
+        if(!options.display_amount){
+          errors.push({
+            message: 'Invalid display_amount specified',
+            field: 'display_amount'
+          });
+        }
+      } else {
+        errors.push({
+          message: 'Invalid display currency specified',
+          field: 'display_currency'
+        });
+      }
+    }
+  }
 
 })()

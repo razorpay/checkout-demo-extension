@@ -10,8 +10,8 @@
  */
 
 (function(root){
-
   function Hedwig(options){
+    this.listeners = {};
     if(typeof options !== 'undefined' && typeof options.ccHubLocation !== 'undefined'){
       this.options.ccHubLocation = options.ccHubLocation;
     }
@@ -68,30 +68,27 @@
     }
   }
 
-  Hedwig.prototype.receiveMessage = function(callback, context){
-    if(this.currentCallback){
-      this.clearReceiveMessage();
-    }
+  Hedwig.prototype.addListener = function(callback, context){
+    var callback = $.proxy(callback, context);
+  }
 
-    this.currentCallback = $.proxy(callback, context);
-    if (window.addEventListener) {
-      window.addEventListener('message', this.currentCallback, false);
-    } else if(window.attachEvent){
-      window.attachEvent('onmessage', this.currentCallback);
+  Hedwig.prototype._removeListener = function(lid){
+    if(window.removeEventListener){
+      window.removeEventListener('message', this.listeners[lid], false);
+    } else if(window.detachEvent){
+      window.detachEvent('onmessage', this.listeners[lid]);
     }
   }
 
-  /**
-   * Removes xd listeners
-   */
-  Hedwig.prototype.clearReceiveMessage = function(){
-    if(this.currentCallback){
-      if(window.removeEventListener){
-        window.removeEventListener('message', this.currentCallback, false);
-      } else if(window.detachEvent){
-        window.detachEvent('onmessage', this.currentCallback);
+  Hedwig.prototype.removeListener = function(lid){
+    if(lid){
+      this._removeListener(lid);    
+      delete this.listeners[lid];
+    } else {
+      for(var i in this.listeners){
+        this._removeListener(i); 
       }
-      this.currentCallback = null
+      this.listeners = [];
     }
   }
 

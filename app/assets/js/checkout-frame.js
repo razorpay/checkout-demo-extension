@@ -2,8 +2,9 @@
 /* jshint -W027 */
 (function(){
   'use strict';
-  var modal, $el, options;
 
+  window.$ = Razorpay.prototype.$;
+  var modal, $el, options, rzp;
 
   postMessage({event: 'load'});
 
@@ -24,11 +25,13 @@
 
     if(data.options && !options){ // open modal
       options = data.options;
+      options.handler = $.noop;
+      rzp = new Razorpay(options);
       open();
-    } else if(data.event == 'success'){
-      successHandler();
-    } else if(data.event == 'error'){
-      errorHandler(data.response);
+    } else if(data.event == 'close'){
+      close();      
+    } else if(data.event == 'open' && rzp){
+      open();
     }
   }
 
@@ -141,7 +144,7 @@
     }
   }
 
-  function open(){
+  function open() {
     if(modal){
       return modal.show();
     }
@@ -153,12 +156,12 @@
     var modalOptions = {
       onhide: null,
       onhidden: function(){
-        postMessage({event: 'hidden'})
+        postMessage({event: 'hidden'});
       }
     }
     if(options.oncancel){
       modalOptions.onhide = function(){
-        postMessage({event: 'cancel'})
+        postMessage({event: 'cancel'});
       }
     }
 
@@ -184,6 +187,7 @@
 
     if (options.netbanking) {
       $el.find('.tabs li').click(function() {
+        renew();
         var inner = $(this).closest('.modal-inner');
         if (!inner.length) {
           return;
@@ -210,13 +214,13 @@
       });
     }
 
-    $el.find('form').on('submit', function(e){
+    $el.find('form').on('submit', function(e) {
       formSubmit(e);
       return false // prevent default
     });
   };
 
-  function formSubmit(e){
+  function formSubmit(e) {
     var form = $(e.currentTarget);
     $el.smarty('refresh');
     form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
@@ -235,14 +239,23 @@
       data.signature = options.signature;
     }
 
-    postMessage({event: 'submit', data: data});
     renew();
     $el.find('.submit').attr('disabled', true);
     modal.options.backdropClose = false;
+
+    rzp.submit({
+      data: data,
+      error: errorHandler,
+      success: successHandler
+    })
+    postMessage({
+      event: 'submit',
+      data: data
+    });
   }
 
   // close on backdrop click and remove errors
-  function renew(){
+  function renew() {
     if ($el) {
       $el.find('.error').html('');
     }
@@ -250,16 +263,15 @@
   };
 
   function hide(){
-    renew();
     if(modal){
       modal.hide();
     }
+    modal = null;
   };
 
-  function successHandler(){
-    modal.options.onhide = null;
-    modal.hide();
-    modal = null;
+  function successHandler(response){
+    debugger
+    postMessage({ event: 'success', data: response});
   };
 
   function errorHandler(response){
@@ -280,5 +292,7 @@
     var message = response.error.description || defaultMessage;
 
     $el.find('.error').html(message);
+
+    postMessage({ event: 'error', data: response});
   };
 })();
