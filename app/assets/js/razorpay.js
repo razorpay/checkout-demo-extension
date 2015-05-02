@@ -83,10 +83,10 @@
     this.options = this.options || {};
 
     for (var i in defaults){
-      if(i === 'prefill'){
+      if(i == 'prefill'){
         continue;
       }
-      else if(typeof overrides[i] === 'undefined' && typeof this.options[i] === 'undefined'){
+      else if(typeof overrides[i] == 'undefined' && typeof this.options[i] == 'undefined'){
         this.options[i] = defaults[i];
       }
       else {
@@ -98,13 +98,13 @@
       }
     }
 
-    this.options['prefill'] = {};
-    for(var i in defaults['prefill']){
-      if(typeof overrides['prefill'] === 'undefined' || typeof overrides['prefill'][i] === 'undefined'){
-        this.options['prefill'][i] = defaults['prefill'][i];
+    this.options.prefill = {};
+    for(var i in defaults.prefill){
+      if(typeof overrides.prefill == 'undefined' || typeof overrides.prefill[i] == 'undefined'){
+        this.options.prefill[i] = defaults.prefill[i];
       }
       else {
-        this.options['prefill'][i] = overrides['prefill'][i];
+        this.options.prefill[i] = overrides.prefill[i];
       }
     }
 
@@ -176,7 +176,7 @@
       }
     }
 
-    if ((typeof options.handler != 'undefined') && (typeof options.handler != 'function')){
+    if (options.handler && typeof options.handler != 'function'){
       errors.push({
         message: 'Handler must be a function',
         field: 'handler'

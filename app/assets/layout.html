@@ -31,29 +31,7 @@
   <script>
     var options = {
       'key': 'rzp_test_1DP5mmOlF5G5ag',
-      'amount': 5100,
-      'display_currency': 'USD',
-      'display_amount': ' 3 4 .fsgfd 6sdg<script>alert()<\/script>',
-      'name': function(){},
-      'description': '<script>alert(1)<\/script>Tron Legacy',
-      'image': 'https://i.imgur.com/3g7nmJC.png" onload="alert(1)"',
-      'handler': function (transaction){
-        alert("You have successfully purchased " + options.description);
-      },
-      'netbanking': 'window.alert(3)',
-      'prefill': {
-        'name': 'Harshil \"Mathur',
-        'email': 'harshil@razorpay.com',
-        'contact': '9876543210'
-      },
-      notes: {
-        'address': 'Hello World'
-      },
-      protocol: 'https',
-      hostname: 'beta.razorpay.com',
-      oncancel: function(){console.log(1)},
-      onhidden: function(){console.log(2)},
-      parent: $('#x')
+      'amount': 5100
     }
     var rzp1 = new Razorpay(options);
 

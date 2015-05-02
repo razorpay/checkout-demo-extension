@@ -15,9 +15,9 @@
     }
 
     if(message.options && !options){ // open modal
-      options = message.options;
-      options.handler = $.noop;
-      rzp = new Razorpay(options);
+      message.options.handler = null;
+      rzp = new Razorpay(message.options);
+      options = rzp.options;
       open();
     } else if(message.event == 'close'){
       close();      

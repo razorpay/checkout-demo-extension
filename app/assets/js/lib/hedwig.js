@@ -11,14 +11,9 @@
 
 (function(root){
   function Hedwig(options){
-    this.listeners = {};
     if(typeof options !== 'undefined' && typeof options.ccHubLocation !== 'undefined'){
       this.options.ccHubLocation = options.ccHubLocation;
     }
-
-    /**
-     * clear any postmessage data receive listeners
-     */
 
     /**
      * decide what to use, dependent on browser + platform
@@ -50,7 +45,7 @@
       return (parseInt(ua.substring(msie + 5, ua.indexOf(".", msie))));
     }
     else {
-      return false
+      return false;
     }
   }
 
@@ -65,30 +60,6 @@
     else {
       this.options.method = 'cc';
       this.setupCC();
-    }
-  }
-
-  Hedwig.prototype.addListener = function(callback, context){
-    var callback = $.proxy(callback, context);
-  }
-
-  Hedwig.prototype._removeListener = function(lid){
-    if(window.removeEventListener){
-      window.removeEventListener('message', this.listeners[lid], false);
-    } else if(window.detachEvent){
-      window.detachEvent('onmessage', this.listeners[lid]);
-    }
-  }
-
-  Hedwig.prototype.removeListener = function(lid){
-    if(lid){
-      this._removeListener(lid);    
-      delete this.listeners[lid];
-    } else {
-      for(var i in this.listeners){
-        this._removeListener(i); 
-      }
-      this.listeners = [];
     }
   }
 
@@ -110,19 +81,19 @@
   }
 
   Hedwig.prototype.setupCC = function(){
-    this.ccFrame = document.createElement('iframe')
+    this.ccFrame = document.createElement('iframe');
     this.ccFrame.width = 0;
     this.ccFrame.height = 0;
-    this.ccFrame.src = this.options.ccHubLocation
-    this.ccFrame.style.display = 'none'
+    this.ccFrame.src = this.options.ccHubLocation;
+    this.ccFrame.style.display = 'none';
     this.currentScript = document.currentScript || (function() {
       var scripts;
       scripts = document.getElementsByTagName('script');
       return scripts[scripts.length - 1];
     })();
-    this.currentScript.parentNode.appendChild(this.ccFrame)
+    this.currentScript.parentNode.appendChild(this.ccFrame);
   }
 
   root.Hedwig = Hedwig;
 
-})(window.Razorpay.prototype)
+})(window.Razorpay.prototype);
