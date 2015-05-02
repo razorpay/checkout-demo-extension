@@ -123,6 +123,6 @@
     this.currentScript.parentNode.appendChild(this.ccFrame)
   }
 
-  root.exports = Hedwig;
+  root.Hedwig = Hedwig;
 
-})(typeof module !== 'undefined' ? module : window)
+})(window.Razorpay.prototype)

@@ -1,10 +1,30 @@
-/* global Razorpay */
+/* global handleMessage */
 /* jshint -W027 */
 (function(){
   'use strict';
 
   var modal, $el, options, rzp, nblist;
   postMessage({event: 'load'});
+
+  window.handleMessage = function(message){
+    if(typeof message != 'object'){
+      return;
+    }
+    if(message.nblist){
+      nblist = message.nblist;
+    }
+
+    if(message.options && !options){ // open modal
+      options = message.options;
+      options.handler = $.noop;
+      rzp = new Razorpay(options);
+      open();
+    } else if(message.event == 'close'){
+      close();      
+    } else if(message.event == 'open' && rzp){
+      open();
+    }
+  }
 
   window.onmessage = function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
     if(!e || !e.data)
@@ -20,21 +40,7 @@
     } else {
       data = e.data;
     }
-
-    if(data.nblist){
-      nblist = data.nblist;
-    }
-
-    if(data.options && !options){ // open modal
-      options = data.options;
-      options.handler = $.noop;
-      rzp = new Razorpay(options);
-      open();
-    } else if(data.event == 'close'){
-      close();      
-    } else if(data.event == 'open' && rzp){
-      open();
-    }
+    window.handleMessage(data);
   }
 
   function postMessage(message){

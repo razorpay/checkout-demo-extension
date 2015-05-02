@@ -33,7 +33,8 @@
     signature: '',
     oncancel: null,
     onhidden: null,
-    parent: null
+    parent: null,
+    redirect: true
   };
 
   discreet.getMessageCallback = function(callback, context){
@@ -202,7 +203,8 @@
   Razorpay.prototype.validateData = function(data, throwError){
     var errors = [];
 
-    if (!this.options.amount || typeof this.options.amount !== 'number' || this.options.amount < 0) {
+    var amount = parseInt(this.options.amount);
+    if (!amount || typeof amount !== 'number' || amount < 0) {
       errors.push({
         message: "Invalid amount specified",
         field: "amount"
@@ -223,20 +225,11 @@
       });
     }
 
-    // if(message !== "" && throwError === true){
-    //   throw new Error("Field: " + field + "; Error:" + message);
-    // }
-    // if(message === ""){
-    //   return {error: false};
-    // }
-    // else {
-    //   return {
-    //     error: {
-    //       description: message,
-    //       field: field
-    //     }
-    //   };
-    // }
+    if(errors.length && throwError){
+      throw new Error("Field: " + errors[0].field + "; Error:" + errors[0].message);
+    } else {
+      return errors;
+    }
   };
 
   discreet.environment = (function(){

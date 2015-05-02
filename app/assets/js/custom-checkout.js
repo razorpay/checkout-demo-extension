@@ -188,6 +188,7 @@
     // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
     // data['card[expiry_month]'] = expiry[0];
     // data['card[expiry_year]'] = expiry[1];
+
     if(typeof request.data !== 'object'){
       return false;
     }
@@ -200,10 +201,23 @@
     request.data.key_id = this.options.key;
     request.rzp = this;
 
-    discreet.setupPopup(request);
+    var url = discreet.makeUrl(this);
+
+    if(this.options.redirect){
+      var redirForm = $('<form style="display: none" action="'+url+'/payments" method="post"></form>');
+      var formHTML = '';
+      for(var i in request.data){
+        var j = i.replace(/"/g,''); // attribute sanitize
+        formHTML += '<input type="hidden" name="'+j+'" value="'+request.data[i]+'">';
+      }
+      redirForm.html(formHTML).appendTo('body');
+      return redirForm[0].submit();
+    } else {
+      discreet.setupPopup(request);
+    }
 
     return $.ajax({
-      url: discreet.makeUrl(this) + this.options.jsonpUrl,
+      url: url + this.options.jsonpUrl,
       dataType: 'jsonp',
       success: discreet.getSuccessHandler(request),
       timeout: 35000,
