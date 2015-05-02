@@ -44,11 +44,17 @@
   }
 
   function postMessage(message){
-    message.source = 'frame';
-    if(typeof message != 'string'){
-      message = JSON.stringify(message);
+    if(window.CheckoutBridge){
+      if(typeof CheckoutBridge.onready == 'function'){
+        CheckoutBridge.onready();
+      }
+    } else {
+      message.source = 'frame';
+      if(typeof message != 'string'){
+        message = JSON.stringify(message);
+      }
+      window.parent.postMessage(message, '*')
     }
-    window.parent.postMessage(message, '*')
   }
 
   function shake(element){
