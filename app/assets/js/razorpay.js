@@ -193,12 +193,12 @@
       if(errors.length > 0){
         var field = errors[0].field;
         var message = errors[0].message;
-        throw new Error("Field: " + field + "; Error:" + message);
+        var errorMessage = '{"field":"' + field + '","error":"' + message + '"}';
+        throw new Error(errorMessage);
         return;
       }
     }
   };
-
   // TODO validate data
   Razorpay.prototype.validateData = function(data, throwError){
     var errors = [];

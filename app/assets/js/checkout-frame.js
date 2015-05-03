@@ -16,11 +16,16 @@
 
     if(message.options && !options){ // open modal
       message.options.handler = null;
-      rzp = new Razorpay(message.options);
+      try{
+        rzp = new Razorpay(message.options);
+      } catch(e){
+        notifyBridge('onerror', e.message);
+        return;
+      }
       options = rzp.options;
       open();
     } else if(message.event == 'close'){
-      close();      
+      close();
     } else if(message.event == 'open' && rzp){
       open();
     }
@@ -43,12 +48,23 @@
     window.handleMessage(data);
   }
 
-  function postMessage(message){
+  function notifyBridge(method, message){
     if(window.CheckoutBridge){
-      if(typeof CheckoutBridge.onready == 'function'){
-        CheckoutBridge.onready();
+      var method = window.CheckoutBridge[method];
+      if(typeof method == 'function'){
+        if(typeof message == 'string'){
+          method(message);
+        } else {
+          method();
+        }
       }
-    } else {
+      return true;
+    }
+    return false;
+  }
+
+  function postMessage(message){
+    if(!notifyBridge('onready')){
       message.source = 'frame';
       if(typeof message != 'string'){
         message = JSON.stringify(message);
