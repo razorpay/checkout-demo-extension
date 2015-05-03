@@ -6,6 +6,7 @@
   var modal, $el, options, rzp, nblist;
   postMessage({event: 'load'});
 
+
   window.handleMessage = function(message){
     if(typeof message != 'object'){
       return;
@@ -19,7 +20,7 @@
       try{
         rzp = new Razorpay(message.options);
       } catch(e){
-        notifyBridge('onerror', e.message);
+        postMessage({event: 'error', data: e.message});
         return;
       }
       options = rzp.options;
@@ -48,23 +49,26 @@
     window.handleMessage(data);
   }
 
-  function notifyBridge(method, message){
-    if(window.CheckoutBridge){
-      var method = window.CheckoutBridge[method];
+  function notifyBridge(message){
+    var method, data;
+    if(window.CheckoutBridge && message && message.event){
+      var method = window.CheckoutBridge['on' + message.event];
       if(typeof method == 'function'){
-        if(typeof message == 'string'){
-          method(message);
-        } else {
-          method();
+        if(typeof data != 'string'){
+          if(!data){
+            method.call(CheckoutBridge);
+          }
+          data = JSON.stringify(data);
         }
+        method.call(CheckoutBridge);
       }
-      return true;
     }
-    return false;
   }
 
   function postMessage(message){
-    if(!notifyBridge('onready')){
+    if(window.CheckoutBridge){
+      notifyBridge(message);
+    } else {
       message.source = 'frame';
       if(typeof message != 'string'){
         message = JSON.stringify(message);
@@ -325,8 +329,6 @@
     var message = response.error.description || defaultMessage;
 
     $el.find('.error').html(message);
-
-    postMessage({ event: 'error', data: response});
   };
 
 })();
