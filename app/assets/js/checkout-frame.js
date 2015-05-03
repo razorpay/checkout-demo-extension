@@ -6,7 +6,6 @@
   var modal, $el, options, rzp, nblist;
   postMessage({event: 'load'});
 
-
   window.handleMessage = function(message){
     if(typeof message != 'object'){
       return;
@@ -52,15 +51,16 @@
   function notifyBridge(message){
     var method, data;
     if(window.CheckoutBridge && message && message.event){
-      var method = window.CheckoutBridge['on' + message.event];
-      if(typeof method == 'function'){
+      var method = 'on' + message.event;
+      if(typeof window.CheckoutBridge[method] == 'function'){
+        data = message.data;
         if(typeof data != 'string'){
           if(!data){
-            method.call(CheckoutBridge);
+            return window.CheckoutBridge[method]();
           }
           data = JSON.stringify(data);
         }
-        method.call(CheckoutBridge);
+        window.CheckoutBridge[method](data);
       }
     }
   }
@@ -68,7 +68,7 @@
   function postMessage(message){
     if(window.CheckoutBridge){
       notifyBridge(message);
-    } else {
+    } else if(window != window.parent){
       message.source = 'frame';
       if(typeof message != 'string'){
         message = JSON.stringify(message);
