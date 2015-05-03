@@ -20,15 +20,7 @@ describe("Options validation", function(){
   var rzp;
   var request;
 
-  var init_options = {
-    protocol: 'https',
-    hostname: 'api.razorpay.dev',
-    version: 'v1',
-    jsonpUrl: '/payments/create/jsonp',
-    netbankingListUrl: '/banks',
-    key: 'rzp_test_1DP5mmOlF5G5ag',
-    handler: null
-  }
+  var init_options;
 
   var response_v0 = {
     success: {
@@ -78,6 +70,19 @@ describe("Options validation", function(){
   }
 
   beforeEach(function(){
-    rzp = new Razorpay(init_options);
+     init_options = $.clone(options);
+  });
+
+  describe("should return error", function(){
+    
+    afterEach(function(){
+      var errors = co.validateOptions(customOptions);
+      expect(errors.length).toBe(1);
+      expect(errors[0].field).toBe(field);
+    })
+
+  it("should fail when no key", function(){
+    var init_options = init_options;
+    delete init_options.key;
   });
 });

@@ -39,7 +39,7 @@
     var frame = $(document.createElement('iframe'));
     frame.attr({
       'class': 'razorpay-checkout-frame',
-      'style': 'z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
+      'style': 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
       'allowtransparency': 'true',
       'frameborder': '0',
       'src': discreet.checkoutUrl + 'checkout.html'
@@ -56,9 +56,14 @@
   discreet.onClose = function(){
     discreet.removeMessageListener();
     discreet.isOpen = false;
-    if(this.checkoutFrame && this.checkoutFrame.data('removable')){
-      this.checkoutFrame.remove();
-      this.checkoutFrame = null;
+    $('body').css('overflow', discreet.merchantData.bodyOverflow);
+    
+    if(this.checkoutFrame){
+      this.checkoutFrame.hide();
+      if(this.checkoutFrame.data('removable')){
+        this.checkoutFrame.remove();
+        this.checkoutFrame = null;
+      }
     }
   }
 
@@ -142,8 +147,6 @@
     }
 
     else if (event == 'hidden'){
-      $('body').css('overflow', discreet.merchantData.bodyOverflow);
-      this.checkoutFrame && this.checkoutFrame.hide();
       discreet.onClose.call(this);
       if(typeof this.options.onhidden == 'function')
         this.options.onhidden();
