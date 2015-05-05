@@ -56,7 +56,7 @@ body{
   *{
     margin: 0;
     padding: 0;
-    box-shadow:  none!important;
+    box-shadow: none;
     outline: none!important;
     .appearance(none);
     .box-sizing(content-box)!important; // because old browsers are content-box only, so we write the old way
@@ -123,6 +123,7 @@ body{
   }
   &.mature.invalid{
     color: @danger;
+    box-shadow: 0 0 1px @danger inset;
     &.focused{
       border-color: @danger;
     }
@@ -190,7 +191,7 @@ body{
     margin: 0 0 -11px -7px;
   }
   &.shown{
-    opacity: 0.9;
+    opacity: 0.9!important;
     .transform(none);
     .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
   }

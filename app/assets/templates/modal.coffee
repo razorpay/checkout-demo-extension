@@ -61,6 +61,7 @@ templates.modal = '
                     <option value="ICIC">ICICI Bank</option>
                     <option value="KKBK">Kotak Mahindra Bank</option>
                     <option value="SBIN">State Bank of India</option>
+                    <option value="SE">AXIS</option>
                   </select>
                 </div>
               </div>
