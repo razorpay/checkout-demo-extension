@@ -2,7 +2,7 @@ var options = {
   'key': 'key_id',
   'amount': '40000'
 }
-var $ = Razorpay.prototype.$;
+// var $ = Razorpay.prototype.$;
 
 describe("new Razorpay", function(){
   var rzp;
