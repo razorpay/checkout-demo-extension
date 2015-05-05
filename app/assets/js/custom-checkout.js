@@ -232,7 +232,6 @@
         ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.php'
       });
     }
-    // this.getNetbankingList();
   }
   
 })();

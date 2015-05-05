@@ -20,8 +20,8 @@ module.exports = function(config) {
       'spec/jasmine-jquery.js',
       'spec/fixtures/*',
       'app/assets/js/lib/sendkeys.js',
-      'test/*.js',
       '.tmp/checkout.built.js',
+      'test/*.js',
       'app/dist/v1/css/checkout.css'
     ],
 

@@ -235,25 +235,6 @@
     }
   };
 
-  discreet.environment = (function(){
-    var script = document.currentScript || {src: ''};
-    var src = script.src;
-
-    var list = {
-      beta: 'betacheckout.razorpay.com',
-      production: 'checkout.razorpay.com',
-    }
-
-    var env = 'dev';
-    for(var i in list){
-      if(src.indexOf(list[i]) !== -1){
-        env = i;
-      }
-    }
-
-    return env;
-  })();
-
   discreet.makeUrl = function(rzp){
     return rzp.options.protocol + '://' + rzp.options.hostname + '/' + rzp.options.version;
   }
