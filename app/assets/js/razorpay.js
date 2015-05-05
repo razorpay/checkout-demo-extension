@@ -130,61 +130,64 @@
         message: 'no initialization options are passed',
         field: ''
       });
+
     }
 
-    if (typeof options != 'object') {
+    else if (typeof options != 'object') {
       errors.push({
         message: 'passed initialization options are invalid',
         field: ''
       });
     }
 
-    if (typeof options.key == 'undefined') {
-      errors.push({
-        message: 'No merchant key specified',
-        field: 'key'
-      });
-    }
-
-    if (options.key == "") {
-      errors.push({
-        message: 'Merchant key cannot be empty',
-        field: 'key'
-      });
-    }
-
-    var amount = parseInt(options.amount);
-    options.amount = String(options.amount);
-    if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
-      errors.push({
-        message: 'Invalid amount specified',
-        field: 'amount'
-      });
-    }
-
-    if (typeof options.notes === 'object'){
-      // Object.keys unsupported in old browsers
-      var notesCount = 0;
-      for(var note in options.notes){
-        notesCount++;
-      }
-      if(notesCount > 15) {
+    if(!errors.length){
+      if (typeof options.key == 'undefined') {
         errors.push({
-          message: 'You can only pass at most 15 fields in the notes object',
-          field: 'notes'
+          message: 'No merchant key specified',
+          field: 'key'
         });
       }
-    }
 
-    if (options.handler && typeof options.handler != 'function'){
-      errors.push({
-        message: 'Handler must be a function',
-        field: 'handler'
-      });
-    }
+      if (options.key == "") {
+        errors.push({
+          message: 'Merchant key cannot be empty',
+          field: 'key'
+        });
+      }
 
-    if(typeof discreet.validateCheckout == 'function'){
-      discreet.validateCheckout.call(this, options, errors);
+      var amount = parseInt(options.amount);
+      options.amount = String(options.amount);
+      if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
+        errors.push({
+          message: 'Invalid amount specified',
+          field: 'amount'
+        });
+      }
+
+      if (typeof options.notes === 'object'){
+        // Object.keys unsupported in old browsers
+        var notesCount = 0;
+        for(var note in options.notes){
+          notesCount++;
+        }
+        if(notesCount > 15) {
+          errors.push({
+            message: 'You can only pass at most 15 fields in the notes object',
+            field: 'notes'
+          });
+        }
+      }
+
+      if (options.handler && typeof options.handler != 'function'){
+        errors.push({
+          message: 'Handler must be a function',
+          field: 'handler'
+        });
+      }
+
+      if(typeof discreet.validateCheckout == 'function'){
+        discreet.validateCheckout.call(this, options, errors);
+      }
     }
 
     if(!throwError){
