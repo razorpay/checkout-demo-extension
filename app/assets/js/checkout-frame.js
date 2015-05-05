@@ -117,7 +117,7 @@
       return rzp.getNetbankingList(showNetbankingList)
     }
     if(nblist.error){
-      $('#tab-nb .elem').remove();
+      $('#tab-nb .elem').hide();
       $('.error').append('<li class="nb-na">Netbanking is not available right now. Please try later.</li>');
       return;
     }
@@ -129,7 +129,7 @@
       }
       optionsString += '<option value="'+i+'">' + nblist[i] + '</option>';
     }
-    $('#tab-nb select').html(optionsString);
+    $('#tab-nb select').html(optionsString).removeClass('loading').prop('disabled', false);
   }
 
   function sanitizeDOM(obj){

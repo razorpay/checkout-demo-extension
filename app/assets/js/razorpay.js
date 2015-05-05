@@ -34,7 +34,7 @@
     oncancel: null,
     onhidden: null,
     parent: null,
-    redirect: true
+    redirect: false
   };
 
   discreet.getMessageCallback = function(callback, context){
@@ -283,10 +283,10 @@
     });
   }
 
-  // @if NODE_ENV='test'
-  Razorpay.prototype.getNetbankingList = function(){
-    return;
-  }
-  window.discreet = discreet;
+  // // @if NODE_ENV='test'
+  // Razorpay.prototype.getNetbankingList = function(){
+  //   return;
+  // }
+  // window.discreet = discreet;
   // @endif
 })();

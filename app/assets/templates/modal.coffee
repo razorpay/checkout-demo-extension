@@ -52,16 +52,15 @@ templates.modal = '
               <li data-target="tab-nb">Net Banking</li>
             </ul>
             <div class="fieldset tab-content" id="tab-nb">
-              <div class="elem select" style="border-radius: 4px">
+              <div class="elem select loading" style="border-radius: 4px">
                 <div class="elem-inner">
-                  <select name="bank" required class="input" pattern="[\\w]+">
-                    <option selected="selected" value="">Select Bank</option>
+                  <select name="bank" disabled required class="input" pattern="[\\w]+">
+                    <option selected="selected" value="">Loading list of banks...</option>
                     <option value="HDFC">HDFC Bank</option>
                     <option value="IBKL">IDBI Bank</option>
                     <option value="ICIC">ICICI Bank</option>
                     <option value="KKBK">Kotak Mahindra Bank</option>
                     <option value="SBIN">State Bank of India</option>
-                    <option value="SE">AXIS</option>
                   </select>
                 </div>
               </div>
