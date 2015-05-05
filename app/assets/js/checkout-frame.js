@@ -129,7 +129,7 @@
       }
       optionsString += '<option value="'+i+'">' + nblist[i] + '</option>';
     }
-    $('#tab-nb select').html(optionsString).removeClass('loading').prop('disabled', false);
+    $('#tab-nb .select').removeClass('loading').find('select').html(optionsString).prop('disabled', false);
   }
 
   function sanitizeDOM(obj){
