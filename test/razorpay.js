@@ -57,16 +57,16 @@ describe("init options validation", function(){
   });
 })
 
-// describe("getNetbankingList should", function(){
-//   it("set rzp.netbankingList and call back", function(){
-//     var nblist = [];
-//     var spyCalled = jasmine.createSpy();
-//     rzp = new Razorpay(options);
-//     spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
-//       options.success(nblist);
-//     });
-//     rzp.getNetbankingList(spyCalled);
-//     expect(rzp.netbankingList).toBe(nblist);
-//     expect(spyCalled).toHaveBeenCalled();
-//   })
-// })
+describe("getNetbankingList should", function(){
+  it("set rzp.netbankingList and call back", function(){
+    var nblist = [];
+    var spyCalled = jasmine.createSpy();
+    rzp = new Razorpay(options);
+    spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
+      options.success(nblist);
+    });
+    rzp.getNetbankingList(spyCalled);
+    expect(rzp.netbankingList).toBe(nblist);
+    expect(spyCalled).toHaveBeenCalled();
+  })
+})

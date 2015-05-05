@@ -25,6 +25,22 @@ var response_v1 = {
   }
 }
 
-describe("submit method", function(){
+describe("validate submission data method should", function(){
   var init_options, errors, field;
+})
+
+describe("submit should", function(){
+  var init_options, rzp;
+  
+  beforeEach(function(){
+    init_options = jQuery.extend(true, {}, options);
+    rzp = new Razorpay(init_options);
+  });
+
+  // it("fail when invalid data passed", function(){
+  //   spyOn(Razorpay.prototype, 'validateData').and.callFake(function(){
+  //     return [null];
+  //   })
+  //   expect(rzp.submit({})).toBe(false);
+  // })
 })
