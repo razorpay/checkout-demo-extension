@@ -1,11 +1,15 @@
 #Setup Instructions
 
-1. Install grunt-cli (`npm install -g grunt-cli`)
-2. Install harp (`npm install -g harp`)
-3. Install npm supporting packages (`npm install`).
-5. Run harp (`harp server`) in `app/assets` directory.
-3. Open `localhost:9000/assets/layout.html` via http(s) in your browser. By default, we use the `api.razorpay.dev` endpoint.
-4. Install karma, which we use for testing `npm install -g karma-cli`.
+1. Install harp (`npm install -g harp`)
+2. Run harp (`harp server`) in `app/assets` directory.
+3. Start development in `app/assets`
+4. Open `localhost:9000/assets/layout.html` via http(s) in your browser.
+
+5. Install npm supporting packages (`npm install`).
+6. Install karma, which we use for testing `npm install -g karma-cli`.
+7. Install grunt-cli (`npm install -g grunt-cli`)
+8. `grunt` to generate minified assets in `app/dist/v1`
+9. `grunt test` for tests.
 
 
 #Grunt Commands
