@@ -56,7 +56,7 @@
       }
 
       else if(success){
-        return 
+        return;
       }
       
       else if(typeof request == 'object'){
@@ -96,7 +96,7 @@
       }    
 
       // else version 0
-      if (response['http_status_code'] !== 200){
+      if (response.http_status_code !== 200){
         discreet.error.call(request, response);
       }
       
@@ -113,7 +113,7 @@
         var nextRequest = {
           location: response.redirectUrl,
           rzp: 1
-        }
+        };
         discreet.navigatePopup.call(request, nextRequest);
       }
       
@@ -155,7 +155,7 @@
         error: {
           description: 'Unable to navigate to bank site'
         }
-      })
+      });
     }
 
     var rzp = this.rzp;

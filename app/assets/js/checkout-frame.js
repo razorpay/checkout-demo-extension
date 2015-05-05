@@ -38,7 +38,7 @@
     var data;
     if(typeof e.data == 'string'){
       try{
-        data = JSON.parse(e.data)
+        data = JSON.parse(e.data);
       } catch(e){
         return;
       }
@@ -51,7 +51,7 @@
   function notifyBridge(message){
     var method, data;
     if(window.CheckoutBridge && message && message.event){
-      var method = 'on' + message.event;
+      method = 'on' + message.event;
       if(typeof window.CheckoutBridge[method] == 'function'){
         data = message.data;
         if(typeof data != 'string'){
@@ -73,7 +73,7 @@
       if(typeof message != 'string'){
         message = JSON.stringify(message);
       }
-      window.parent.postMessage(message, '*')
+      window.parent.postMessage(message, '*');
     }
   }
 
@@ -82,7 +82,7 @@
     setTimeout(function() {
       element.removeClass('shake');
     }, 200);
-  };
+  }
 
   function getFormData(form, netbanking) {
     var data, expiry;
@@ -106,7 +106,7 @@
       delete data['card[number]'];
       delete data['card[cvv]'];
       delete data['card[expiry]'];
-      data.method = 'netbanking'
+      data.method = 'netbanking';
     }
 
     return data;
@@ -114,7 +114,7 @@
 
   function showNetbankingList(nblist){
     if(!nblist && rzp){
-      return rzp.getNetbankingList(showNetbankingList)
+      return rzp.getNetbankingList(showNetbankingList);
     }
     if(nblist.error){
       $('#tab-nb .elem').hide();
@@ -140,7 +140,7 @@
     }
 
     // if conditions
-    obj.netbanking = !!obj.netbanking
+    obj.netbanking = !!obj.netbanking;
 
     // attributes
     if(typeof obj.image == 'string'){
@@ -171,9 +171,10 @@
       sanitizeDOM(obj);
       if(obj.prefill){
         if(obj.prefill.contact){
-          if(typeof obj.prefill.contact != 'string')
-            obj.prefill.contact = obj.prefill.contact + ''
-          obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'')
+          if(typeof obj.prefill.contact != 'string'){
+            obj.prefill.contact = obj.prefill.contact + '';
+          }
+          obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
         }
       }
     }
@@ -226,9 +227,9 @@
         if (!inner.length) {
           return;
         }
-        var form = inner.find('.form')
+        var form = inner.find('.form');
         var modalEl = inner.parent();
-        var change_modal_height = true// !this.modal.curtainMode;
+        var change_modal_height = true;// !this.modal.curtainMode;
         if(change_modal_height){
           modalEl.height(inner.height());
           form.css('opacity', 0.5);
@@ -250,9 +251,9 @@
 
     $el.find('form').on('submit', function(e) {
       formSubmit(e);
-      return false // prevent default
+      return false; // prevent default
     });
-  };
+  }
 
   function formSubmit(e) {
     var form = $(e.currentTarget);
@@ -294,19 +295,19 @@
       $el.find('.error').html('');
     }
     modal.options.backdropClose = true;
-  };
+  }
 
   function hide(){
     if(modal){
       modal.hide();
     }
     modal = null;
-  };
+  }
 
   function successHandler(response){
     postMessage({ event: 'success', data: response});
     hide();
-  };
+  }
 
   function errorHandler(response){
     if(!modal){
@@ -319,7 +320,7 @@
     modal.options.backdropClose = true;
 
     if (response && response.error && response.error.field){
-      var error_el = $el.find('input[name="'+response.error.field+'"]')
+      var error_el = $el.find('input[name="'+response.error.field+'"]');
       if (error_el.length){
         error_el.closest('.elem').addClass('invalid');
       }
@@ -329,6 +330,6 @@
     var message = response.error.description || defaultMessage;
 
     $el.find('.error').html(message);
-  };
+  }
 
 })();

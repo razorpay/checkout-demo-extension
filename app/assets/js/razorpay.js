@@ -148,7 +148,7 @@
         });
       }
 
-      if (options.key == "") {
+      if (options.key === "") {
         errors.push({
           message: 'Merchant key cannot be empty',
           field: 'key'
@@ -270,7 +270,7 @@
         
         if(typeof callback == 'function'){
           var callback_param;
-          if (response['http_status_code'] !== 200 && response.error){
+          if (response.http_status_code !== 200 && response.error){
             callback_param = {error: true};
           } else{
             callback_param = response;
@@ -285,11 +285,4 @@
       }
     });
   }
-
-  // // @if NODE_ENV='test'
-  // Razorpay.prototype.getNetbankingList = function(){
-  //   return;
-  // }
-  // window.discreet = discreet;
-  // @endif
 })();

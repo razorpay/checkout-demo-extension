@@ -51,11 +51,8 @@
     if (opts.centered) {
       var screenX = null == window.screenX ? window.screenLeft : window.screenX;
       var screenY = null == window.screenY ? window.screenTop : window.screenY;
-      var outerWidth = null == window.outerWidth
-        ? document.documentElement.clientWidth : window.outerWidth;
-      var outerHeight = null == window.outerHeight
-        // 22= IE toolbar height
-        ? (document.documentElement.clientHeight - 22) : window.outerHeight;
+      var outerWidth = null == window.outerWidth ? document.documentElement.clientWidth : window.outerWidth;
+      var outerHeight = null == window.outerHeight ? (document.documentElement.clientHeight - 22) : window.outerHeight;
 
       if (null == opts.left)
         opts.left = parseInt(screenX + ((outerWidth - opts.width) / 2), 10);
@@ -156,5 +153,5 @@
     }
   }
 
-  return root.Popup = Popup;
+  root.Popup = Popup;
 })(window.Razorpay.prototype);

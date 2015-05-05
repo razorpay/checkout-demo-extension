@@ -31,7 +31,7 @@
     });
   };
 
-  return Smarty.prototype = {
+  Smarty.prototype = {
     "class": function(str) {
       return str.replace(/([^ ]+)/g, prefix + '$1')
     },
