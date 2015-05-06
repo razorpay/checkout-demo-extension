@@ -58,10 +58,10 @@ module.exports = function(grunt){
     },
     karma: {
       custom: {
-        configFile: 'spec/custom.conf.js'
+        configFile: 'karma-custom.js'
       },
       manual: {
-        configFile: 'spec/manual.conf.js'
+        configFile: 'karma-manual.js'
       }
     },
 
