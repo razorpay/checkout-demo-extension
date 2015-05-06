@@ -6,10 +6,10 @@ build:
             name: Install harp globally
             code: sudo npm install -g harp
         - grunt:
-            tasks: test:prepare
-        - script:
-            name: Run unit tests
-            code: ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS
+            tasks: test
+        # - script:
+        #     name: Run unit tests
+        #     code: ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS
     after-steps:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
