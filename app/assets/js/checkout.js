@@ -157,7 +157,7 @@
         this.checkoutFrame.data('removable', true);
       }
       if(typeof this.options.handler == 'function'){
-        this.options.handler.call(null, data);
+        this.options.handler.call(null, data.data);
       }
     } else if (event == 'error'){
       true;
