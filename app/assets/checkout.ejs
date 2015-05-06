@@ -10,28 +10,27 @@
     <link href="css/style.css" type="text/css" rel="stylesheet">
     <link href="css/shake.css" type="text/css" rel="stylesheet">
     <!-- endbuild -->
-
-    <!-- build:js checkout-frame.js -->
-    <% if(environment == "production") { %>
-    <script type="text/javascript" src="js/rollbar.js"></script>
-    <% } %>
-    <script type="text/javascript" src="js/lib/init.html"></script>
-    <script type="text/javascript" src="js/lib/popup.js"></script>
-    <script type="text/javascript" src="js/lib/hedwig.js"></script>
-    <script type="text/javascript" src="js/razorpay.js"></script>
-    <script type="text/javascript" src="js/custom-checkout.js"></script>
-
-    <script type="text/javascript" src="js/checkout-frame-init.js"></script>
-    <script type="text/javascript" src="templates/modal.js"></script>
-    <script type="text/javascript" src="js/lib/doT.js"></script>
-    <script type="text/javascript" src="js/lib/jquery.payment.js"></script>
-    <script type="text/javascript" src="js/lib/input.js"></script>
-    <script type="text/javascript" src="js/lib/modal.js"></script>
-    <script type="text/javascript" src="js/checkout-frame.js"></script>
-    <!-- endbuild -->
-    <link href='//fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
-  </head>
+ </head>
   <body>
     <div id="loading"></div>
   </body>
+  <!-- build:js checkout-frame.js -->
+  <% if(environment == "production") { %>
+  <script type="text/javascript" src="js/rollbar.js"></script>
+  <% } %>
+  <script type="text/javascript" src="js/lib/init.html"></script>
+  <script type="text/javascript" src="js/lib/popup.js"></script>
+  <script type="text/javascript" src="js/lib/hedwig.js"></script>
+  <script type="text/javascript" src="js/razorpay.js"></script>
+  <script type="text/javascript" src="js/custom-checkout.js"></script>
+
+  <script type="text/javascript" src="js/checkout-frame-init.js"></script>
+  <script type="text/javascript" src="templates/modal.js"></script>
+  <script type="text/javascript" src="js/lib/doT.js"></script>
+  <script type="text/javascript" src="js/lib/jquery.payment.js"></script>
+  <script type="text/javascript" src="js/lib/input.js"></script>
+  <script type="text/javascript" src="js/lib/modal.js"></script>
+  <script type="text/javascript" src="js/checkout-frame.js"></script>
+  <!-- endbuild -->
+  <link href='//fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 </html>
