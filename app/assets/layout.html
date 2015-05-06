@@ -38,6 +38,7 @@
       'description': 'Tron Legacy',
       'image': 'https://i.imgur.com/3g7nmJC.png" onload="alert(1)"',
       'handler': function (transaction){
+        console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
       'netbanking': 'window.alert(3)',

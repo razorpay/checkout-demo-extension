@@ -34,9 +34,6 @@ module.exports = function(grunt){
       },
       copy_html:{
         cmd: 'cp app/srv/checkout.html app/dist/v1/'
-      },
-      copy_for_test:{
-        cmd: 'cp .tmp/concat/checkout.js .tmp/checkout.built.js'
       }
     },
     useminPrepare:{
@@ -59,25 +56,12 @@ module.exports = function(grunt){
         }
       }
     },
-    watch: {
-      build_files: {
-        files: ['app/assets/js/**/*.js'],
-        tasks: ['test:prepare', 'jshint']
-      },
-      test_files: {
-        files: ['test/*.js', '.tmp/checkout.built.js'],
-        tasks: ['karma:watch:run']
-      },
-    },
     karma: {
-      watch: {
-        configFile: 'karma.conf.js',
-        background: true,
-        singleRun: false
+      custom: {
+        configFile: 'spec/custom.conf.js'
       },
-      run: {
-        configFile: 'karma.conf.js',
-        singleRun: true
+      manual: {
+        configFile: 'spec/manual.conf.js'
       }
     },
 
@@ -136,18 +120,12 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'useminPrepare',
     'concat:generated',
-    'preprocess',
-    'exec:copy_for_test'
-  ]);
-
-  grunt.registerTask('test:watch', [
-    'test:prepare',
-    'karma:watch:start',
-    'watch'
+    'preprocess'
   ]);
 
   grunt.registerTask('test', [
     'test:prepare',
-    'karma:run'
+    'karma:custom',
+    'karma:manual'
   ]);
 };

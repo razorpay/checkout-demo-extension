@@ -1,43 +1,30 @@
-// var coData = {
-//   options: {
-//     'key': 'key_id',
-//     'amount': '5100',
-//     'name': 'Daft Punk',
-//     'description': 'Tron Legacy',
-//     'image': 'https://i.imgur.com/3g7nmJC.png',
-//     'handler': function (transaction) {
-//       alert("You have successfully purchased " + options.description);
-//     },
-//     'netbanking': 'true',
-//     'prefill': {
-//       'name': 'Shashank Mehta',
-//       'email': 'sm@razorpay.com',
-//       'contact': '9999999999'
-//     },
-//     notes: {
-//       'address': 'Hello World'
-//     },
-//     protocol: 'http',
-//     hostname: 'api.razorpay.dev'
-//   },
+var options = {
+	'key': 'key_id',
+	'amount': '5100',
+	'netbanking': 'true',
+	'prefill': {
+	  'name': 'Shashank Mehta',
+	  'email': 'sm@razorpay.com',
+	  'contact': '9999999999'
+	}
+}
 
-//   cc: {
-//     number: '4012001037141112',
-//     expiry: '05 / 19',
-//     cvv: '888',
-//     expiry_month: '05',
-//     expiry_year: '19'
-//   }
-// }
+var cc = {
+	number: '4012001037141112',
+	expiry: '05 / 19',
+	cvv: '888'
+}
 
-// describe("Checkout init", function(){
+describe("Checkout should handle frame message", function(){
+	var co, co_opts;
 //   var co;
 //   var custom = $.extend(true, {}, coData.options);
 //   custom.unwanted = 'fake';
 
-//   beforeEach(function(){
-//     co = new Razorpay(custom);
-//   });
+	beforeEach(function(){
+		co_opts = $.extend(true, {}, options);
+	});
+})
 
 //   it("should set key", function(){
 //     expect(co.options.key).toBe(coData.options.key);

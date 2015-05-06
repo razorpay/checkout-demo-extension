@@ -6,7 +6,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: '../',
 
 
     // frameworks to use
@@ -18,11 +18,10 @@ module.exports = function(config) {
     files: [
       'app/assets/js/lib/jquery-1.11.1.js',
       'spec/jasmine-jquery.js',
-      'spec/fixtures/*',
-      'app/assets/js/lib/sendkeys.js',
-      '.tmp/checkout.built.js',
-      'test/*.js',
-      'app/dist/v1/css/checkout.css'
+      // 'spec/fixtures/*',
+      // 'app/assets/js/lib/sendkeys.js',
+      '.tmp/concat/checkout.js',
+      'test/checkout.js'
     ],
 
     // list of files to exclude
@@ -60,7 +59,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: true,
 
     browserNoActivityTimeout: 30000
   });
