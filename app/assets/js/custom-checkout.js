@@ -8,6 +8,18 @@
   var Popup = Razorpay.prototype.Popup;
   var discreet = Razorpay.prototype.discreet;
 
+  discreet.paymentSuccess = function(data){
+    // this == request
+    if(this.popup && typeof this.popup.close == 'function'){
+      this.popup.close();
+    }
+    if(typeof this.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
+      this.success.call(null, {razorpay_payment_id: data.razorpay_payment_id}); // dont expose request as this
+    } else {
+      this.error({description: 'Unable to parse server response'});
+    }
+  }
+
   discreet.XDCallback = function(message, data){
     // this == request
     // checking source url
@@ -33,9 +45,7 @@
         this.error(data);
       }
     } else {
-      if(typeof this.success === 'function'){
-        this.success(data);
-      }
+      discreet.paymentSuccess.call(this, data);
     }
 
     // remove postMessage listener
@@ -56,7 +66,7 @@
       }
 
       else if(success){
-        return;
+        discreet.paymentSuccess.call(this, {razorpay_payment_id: payment_id});
       }
       
       else if(typeof request == 'object'){
@@ -74,15 +84,6 @@
     }
     if(typeof this.error == 'function'){
       this.error.call(null, response); // dont expose request as this
-    }
-  }
-  discreet.success = function(response){
-    // this == request
-    if(this.popup && typeof this.popup.close == 'function'){
-      this.popup.close();
-    }
-    if(typeof this.success == 'function'){
-      this.success.call(null, response); // dont expose request as this
     }
   }
 
@@ -118,10 +119,7 @@
       }
       
       else if (response.razorpay_payment_id) {
-        response.payment_id = response.razorpay_payment_id;
-        response.success = true;
-        delete response.razorpay_payment_id;
-        discreet.success.call(request, response);
+        discreet.paymentSuccess.call(this, response);
       }
       
       else discreet.error.call(request, response);
