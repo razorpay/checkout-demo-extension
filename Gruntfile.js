@@ -62,6 +62,9 @@ module.exports = function(grunt){
       },
       manual: {
         configFile: 'spec/manual.conf.js'
+      },
+      frame: {
+        configFile: 'spec/frame.conf.js'
       }
     },
 
@@ -126,6 +129,7 @@ module.exports = function(grunt){
   grunt.registerTask('test', [
     'test:prepare',
     'karma:custom',
-    'karma:manual'
+    'karma:manual',
+    'karma:frame'
   ]);
 };
