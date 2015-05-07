@@ -197,7 +197,7 @@
       });
     }
   }
-  discreet.validateCheckout = function(options, error){
+  discreet.validateCheckout = function(options, errors){
     if(options.display_currency){
       if(options.display_currency === 'USD'){
         options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');

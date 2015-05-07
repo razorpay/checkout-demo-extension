@@ -26,6 +26,39 @@ describe("Checkout should handle frame message", function(){
 	});
 })
 
+describe("checkout validate", function(){
+  var init_options, errors, field;
+	
+	describe("should throw error if", function(){
+		beforeEach(function(){
+		   init_options = jQuery.extend(true, {}, options);
+		});
+
+		afterEach(function(){
+		  expect(errors.length).toBe(1);
+		  expect(errors[0].field).toBe(field);
+		});
+
+		it("display_currency is present and not USD", function(){
+			init_options.display_currency = 'YEN';
+		  field = 'display_currency';
+		  errors = Razorpay.prototype.validateOptions(init_options, false);
+		})
+
+		it("display_currency is USD and  display_amount is not there", function(){
+		  field = 'display_amount';
+			init_options.display_currency = 'USD';
+		  errors = Razorpay.prototype.validateOptions(init_options, false);
+		})
+
+		it("display_currency is USD and display_amount is invalid", function(){
+		  field = 'display_amount';
+			init_options.display_currency = 'USD';
+			init_options.display_amount = 'swag';
+		  errors = Razorpay.prototype.validateOptions(init_options, false);
+		})
+	})
+})
 //   it("should set key", function(){
 //     expect(co.options.key).toBe(coData.options.key);
 //   });
