@@ -63,31 +63,29 @@ describe("submit should", function(){
   });
 
   it("fail when invalid data passed", function(){
-    rzp = new Razorpay(init_options);
     spyOn(Razorpay.prototype, 'validateData').and.callFake(function(){
       return [null];
     })
-    expect(rzp.submit(req)).toBe(false);
+    expect(new Razorpay(init_options).submit(req)).toBe(false);
   });
 
   it("submit html post form if redirect flag is passed", function(){
-    init_options.redirect = true;
-    rzp = new Razorpay(init_options);
     var spyCalled = jasmine.createSpy();
     HTMLFormElement.prototype.submit = spyCalled;
-    rzp.submit(req);
+
+    init_options.redirect = true;
+    new Razorpay(init_options).submit(req);
+
     expect(spyCalled).toHaveBeenCalled();
   });
 
   it("add merchant key in request data", function(){
-    rzp = new Razorpay(init_options);
-    rzp.submit(req);
+    new Razorpay(init_options).submit(req);
     expect(req.data.key_id).toBe(options.key);
   })
 
   it("setup popup", function(){
-    rzp = new Razorpay(init_options);
-    rzp.submit(req);
+    new Razorpay(init_options).submit(req);
     var isPopup = req.popup instanceof Razorpay.prototype.Popup; 
     expect(isPopup).toBe(true);
   })
@@ -101,11 +99,30 @@ describe("submit should", function(){
 
   it("return ajax object", function(){
     rzp = new Razorpay(init_options);
-    expect(typeof rzp.submit(req)).toBe("object");
+    var obj = rzp.submit(req);
+    expect(typeof obj).toBe("object");
+    expect(typeof obj.abort).toBe("function");
+  })
+
+  it("invoke success callback when immediate success", function(){
+    spyOn($, 'ajax').and.callFake(function(request){
+      var successResponse = $.extend(true, {}, response_v1.success);
+      request.success(successResponse);
+    })
+    var spy = jasmine.createSpy();
+    req.success = function(response){
+      if(typeof response.razorpay_payment_id == 'string')
+        spy();
+    }
+    new Razorpay(init_options).submit(req);
+    
+    setTimeout(function(){
+      expect(spy).toHaveBeenCalled();
+    }, 0)
   })
 })
 
-describe("XDCallback", function(){
+describe("XDCallback should", function(){
   var req;
   var init_options = jQuery.extend(true, {}, options);
   var rzp = new Razorpay(init_options);
@@ -116,7 +133,7 @@ describe("XDCallback", function(){
     req.popup.window = window;
   });
 
-  it("should call popup.loaded", function(){
+  it("call popup.loaded", function(){
     var spyCalled = jasmine.createSpy();
     spyOn(req.popup, 'loaded').and.callFake(spyCalled);
     window.postMessage({source: 'popup'}, '*');
@@ -126,7 +143,7 @@ describe("XDCallback", function(){
     }, 0)
   })
 
-  it("should close popup if source is not \"popup\"", function(){
+  it("close popup if source is not \"popup\"", function(){
     var spyCalled = jasmine.createSpy();
     spyOn(req.popup, 'close').and.callFake(spyCalled);
     window.postMessage({}, '*');
@@ -136,7 +153,7 @@ describe("XDCallback", function(){
     }, 0)
   })
 
-  it("should invoke error callback", function(){
+  it("invoke error callback", function(){
     var spyCalled = jasmine.createSpy();
     req.error = $.noop;
     spyOn(req, 'error').and.callFake(spyCalled);
@@ -147,10 +164,13 @@ describe("XDCallback", function(){
     }, 0)
   })
 
-  it("should invoke success callback", function(){
+  it("invoke success callback", function(){
     var spyCalled = jasmine.createSpy();
     req.success = $.noop;
-    spyOn(req, 'success').and.callFake(spyCalled);
+    spyOn(req, 'success').and.callFake(function(response){
+      if(typeof response.razorpay_payment_id == 'string')
+        spyCalled();
+    });
     window.postMessage({}, '*');
     
     setTimeout(function(){
