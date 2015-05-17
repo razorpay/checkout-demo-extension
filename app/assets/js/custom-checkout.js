@@ -144,7 +144,7 @@
   discreet.navigatePopup = function(nextRequest){
     // this == request
     var popup = this.popup;
-    if(!popup){
+    if(!(popup instanceof Popup)){
       return this.error({
         error: {
           description: 'Unable to navigate to bank site'

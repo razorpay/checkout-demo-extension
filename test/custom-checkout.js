@@ -1,9 +1,11 @@
 var $ = Razorpay.prototype.$;
+var Hedwig = Razorpay.prototype.Hedwig;
 var discreet = Razorpay.prototype.discreet;
 
 var options = {
   'key': 'key_id',
-  'amount': '40000'
+  'amount': '40000',
+  'host': 'api.razorpay.dev'
 }
 
 var response_v1 = {
@@ -49,7 +51,7 @@ var request = {
 
 describe("init razorpay should", function(){
   it("set hedwig", function(){
-    isHedwig = new Razorpay(options).hedwig instanceof Razorpay.prototype.Hedwig;
+    isHedwig = new Razorpay(options).hedwig instanceof Hedwig;
     expect(isHedwig).toBe(true);
   })
 })
@@ -145,7 +147,7 @@ describe("submit ajax should invoke", function(){
 
 describe("XDCallback should", function(){
   var req, spyCalled, rzp, receivedMessage, origin;
-  var init_options = jQuery.extend(true, {host: 'api.razorpay.dev'}, options);
+  var init_options = jQuery.extend(true, {}, options);
 
   beforeEach(function(){
     origin = '';
@@ -187,27 +189,38 @@ describe("XDCallback should", function(){
   })
 })
 
-// describe("navigatePopup method should", function(){
-//   var req = jQuery.extend(true, {}, request);
-//   var init_options = jQuery.extend(true, {}, options);
+describe("navigatePopup method should", function(){
+  var req, init_options;
+
+  beforeEach(function(){
+    req = jQuery.extend(true, {error: $.noop}, request);
+    init_options = jQuery.extend(true, {}, options);
+    spyOn($, 'ajax').and.callFake($.noop);
+    new Razorpay(init_options).submit(req);
+  })
+
+  it("invoke request's error callback if popup has not been setup", function(){
+    req.popup = 'pop';
+    var spyCalled = jasmine.createSpy();
+    spyOn(req, 'error').and.callFake(spyCalled);
+    discreet.navigatePopup.call(req, {});
+    expect(spyCalled).toHaveBeenCalled();
+  })
   
-//   new Razorpay(init_options).submit(req);
-//   req.popup.window = window;
+  it("convey request details to popup", function(){
+    var customObject = {};
+    var anObject;
 
-//   var customObject = {};
-//   var anObject;
-
-//   it("convey request details to popup", function(){
-//     spyOn(discreet, 'XDCallback').and.callFake(function(message, data){
-//       anObject = data;
-//     })
-//     discreet.navigatePopup.call(req, customObject);
-    
-//     // setTimeout(function(){
-//       expect(anObject).toBe(customObject);
-//     // }, 0)
-//   })
-// })
+    spyOn(Hedwig.prototype, 'sendMessage').and.callFake(function(message, origin, source){
+      if(source == req.popup.window){
+        anObject = message;
+      }
+    })
+    req.popup._loaded = true;
+    discreet.navigatePopup.call(req, customObject);
+    expect(anObject).toBe(customObject);
+  })
+})
 
 describe("api ajax handler should", function(){
   var req = jQuery.extend(true, {}, request);
