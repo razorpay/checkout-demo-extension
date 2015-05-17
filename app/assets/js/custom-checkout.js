@@ -87,7 +87,7 @@
     }
   }
 
-  discreet.getSuccessHandler = function(request){
+  discreet.getAjaxSuccess = function(request){
     return function(response){
       if(response.version){
         var successCallback = discreet.apiResponseHandler[response.version];
@@ -95,9 +95,11 @@
           return successCallback.call(request, response);
         }
       }    
-
+      if (response.razorpay_payment_id) {
+        discreet.paymentSuccess.call(request, response);
+      }
       // else version 0
-      if (response.http_status_code !== 200){
+      else if (response.http_status_code !== 200){
         discreet.error.call(request, response);
       }
       
@@ -117,11 +119,7 @@
         };
         discreet.navigatePopup.call(request, nextRequest);
       }
-      
-      else if (response.razorpay_payment_id) {
-        discreet.paymentSuccess.call(this, response);
-      }
-      
+
       else discreet.error.call(request, response);
     }
   }
@@ -217,7 +215,7 @@
     return $.ajax({
       url: url + this.options.jsonpUrl,
       dataType: 'jsonp',
-      success: discreet.getSuccessHandler(request),
+      success: discreet.getAjaxSuccess(request),
       timeout: 35000,
       error: request.error,
       data: request.data

@@ -28,6 +28,9 @@ var response_v1 = {
   }
 }
 
+var no3dsecureResponse = {
+  razorpay_payment_id: 'xyz'
+}
 // var popupMessage = {
 //   message: {
 //     origin: 'checkout.razorpay.com'
@@ -103,22 +106,45 @@ describe("submit should", function(){
     expect(typeof obj).toBe("object");
     expect(typeof obj.abort).toBe("function");
   })
+})
 
-  it("invoke success callback when immediate success", function(){
+describe("submit ajax should invoke", function(){
+  var init_options, rzp, req, spyCalled, spyNotCalled;
+  
+  beforeEach(function(){
+    req = jQuery.extend(true, {}, request);
+    init_options = jQuery.extend(true, {}, options);
+    spyCalled = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
+  });
+
+  it("paymentSuccess when immediate success", function(){
     spyOn($, 'ajax').and.callFake(function(request){
-      var successResponse = $.extend(true, {}, response_v1.success);
-      request.success(successResponse);
+      request.success(no3dsecureResponse);
     })
-    var spy = jasmine.createSpy();
+    spyOn(discreet, 'paymentSuccess').and.callFake(spyCalled);
+    
+    // req.success = function(response){
+    //   if(typeof response.razorpay_payment_id == 'string')
+    //     spyCalled();
+    // }
+    new Razorpay(init_options).submit(req);
+  })
+
+  it("request success callback when immediate success", function(){
+    spyOn($, 'ajax').and.callFake(function(request){
+      request.success(no3dsecureResponse);
+    })    
     req.success = function(response){
       if(typeof response.razorpay_payment_id == 'string')
-        spy();
+        spyCalled();
     }
     new Razorpay(init_options).submit(req);
-    
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
-    }, 0)
+  })
+
+  afterEach(function(){
+    expect(spyCalled).toHaveBeenCalled();
+    expect(spyNotCalled).not.toHaveBeenCalled();
   })
 })
 
@@ -137,7 +163,7 @@ describe("XDCallback should", function(){
     var spyCalled = jasmine.createSpy();
     spyOn(req.popup, 'loaded').and.callFake(spyCalled);
     window.postMessage({source: 'popup'}, '*');
-    
+
     setTimeout(function(){
       expect(spyCalled).toHaveBeenCalled();
     }, 0)

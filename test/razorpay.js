@@ -7,11 +7,11 @@ var options = {
 describe("new Razorpay", function(){
   var rzp;
 
-  it('without options should fail', function(){
+  it("without options should fail", function(){
     expect(function(){new Razorpay()}).toThrow();
   });
 
-  it('should create Razorpay instance', function(){
+  it("should create Razorpay instance", function(){
     rzp = new Razorpay(options);
     expect(rzp).toBeDefined();
   });
