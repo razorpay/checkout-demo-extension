@@ -10,6 +10,6 @@ describe("message listener should", function(){
     spyOn(window, 'Razorpay').and.callFake(function(argOptions){
       expect(argOptions).toBe(options);
     })
-    window.postMessage({options: options}, '*');
+    // window.postMessage({options: options}, '*');
   })
 })

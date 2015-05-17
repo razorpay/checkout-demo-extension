@@ -15,7 +15,7 @@
     }
     if(typeof this.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
       this.success.call(null, {razorpay_payment_id: data.razorpay_payment_id}); // dont expose request as this
-    } else {
+    } else if(typeof this.error == 'function'){
       this.error({description: 'Unable to parse server response'});
     }
   }
@@ -26,7 +26,6 @@
     if(!(this.popup.window === message.source || /^https:\/\/[a-z]+\.razorpay\.com/.test(message.origin))){
       return;
     }
-    
     if(data.source === 'popup'){
       if(!this.popup._loaded){
         this.popup._loaded = true;
@@ -34,7 +33,6 @@
       }
       return;
     }
-
     // Close the popup in case of netbanking
     if(typeof this.popup !== 'undefined'){
       this.popup.close();
@@ -153,12 +151,10 @@
         }
       });
     }
-
     var rzp = this.rzp;
     popup.loaded = function(){
       rzp.hedwig.sendMessage(nextRequest, '*', popup.window);
     }
-
     if(popup._loaded === true){
       popup.loaded();
     }

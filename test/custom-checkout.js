@@ -118,16 +118,16 @@ describe("submit ajax should invoke", function(){
     spyNotCalled = jasmine.createSpy();
   });
 
+  afterEach(function(){
+    expect(spyCalled).toHaveBeenCalled();
+    expect(spyNotCalled).not.toHaveBeenCalled();
+  });
+
   it("paymentSuccess when immediate success", function(){
     spyOn($, 'ajax').and.callFake(function(request){
       request.success(no3dsecureResponse);
     })
     spyOn(discreet, 'paymentSuccess').and.callFake(spyCalled);
-    
-    // req.success = function(response){
-    //   if(typeof response.razorpay_payment_id == 'string')
-    //     spyCalled();
-    // }
     new Razorpay(init_options).submit(req);
   })
 
@@ -141,91 +141,73 @@ describe("submit ajax should invoke", function(){
     }
     new Razorpay(init_options).submit(req);
   })
-
-  afterEach(function(){
-    expect(spyCalled).toHaveBeenCalled();
-    expect(spyNotCalled).not.toHaveBeenCalled();
-  })
 })
 
 describe("XDCallback should", function(){
-  var req;
-  var init_options = jQuery.extend(true, {}, options);
-  var rzp = new Razorpay(init_options);
+  var req, spyCalled, rzp, receivedMessage, origin;
+  var init_options = jQuery.extend(true, {host: 'api.razorpay.dev'}, options);
 
   beforeEach(function(){
+    origin = '';
+    rzp = new Razorpay(init_options);
     req = jQuery.extend(true, {}, request);
+    spyOn($, 'ajax').and.callFake($.noop);
     rzp.submit(req);
-    req.popup.window = window;
+    spyCalled = jasmine.createSpy();
   });
 
-  it("call popup.loaded", function(){
-    var spyCalled = jasmine.createSpy();
-    spyOn(req.popup, 'loaded').and.callFake(spyCalled);
-    window.postMessage({source: 'popup'}, '*');
-
-    setTimeout(function(){
-      expect(spyCalled).toHaveBeenCalled();
-    }, 0)
+  afterEach(function(){
+    discreet.listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
+    expect(spyCalled).toHaveBeenCalled();
   })
 
+  it("call popup.loaded", function(){
+    receivedMessage = {source: 'popup'};
+    spyOn(req.popup, 'loaded').and.callFake(spyCalled);
+  });
+
   it("close popup if source is not \"popup\"", function(){
-    var spyCalled = jasmine.createSpy();
+    receivedMessage = {};
     spyOn(req.popup, 'close').and.callFake(spyCalled);
-    window.postMessage({}, '*');
-    
-    setTimeout(function(){
-      expect(spyCalled).toHaveBeenCalled();
-    }, 0)
   })
 
   it("invoke error callback", function(){
-    var spyCalled = jasmine.createSpy();
     req.error = $.noop;
+    receivedMessage = {error:{description:'yolo'}};
     spyOn(req, 'error').and.callFake(spyCalled);
-    window.postMessage({error:{description:'yolo'}}, '*');
-    
-    setTimeout(function(){
-      expect(spyCalled).toHaveBeenCalled();
-    }, 0)
   })
 
   it("invoke success callback", function(){
-    var spyCalled = jasmine.createSpy();
     req.success = $.noop;
     spyOn(req, 'success').and.callFake(function(response){
       if(typeof response.razorpay_payment_id == 'string')
         spyCalled();
     });
-    window.postMessage({}, '*');
-    
-    setTimeout(function(){
-      expect(spyCalled).toHaveBeenCalled();
-    }, 0)
+    receivedMessage = {razorpay_payment_id: 'xyz'};
   })
 })
 
-describe("navigatePopup method should", function(){
-  var req = jQuery.extend(true, {}, request);
-  var init_options = jQuery.extend(true, {}, options);
+// describe("navigatePopup method should", function(){
+//   var req = jQuery.extend(true, {}, request);
+//   var init_options = jQuery.extend(true, {}, options);
   
-  new Razorpay(init_options).submit(req);
-  req.popup.window = window;
+//   new Razorpay(init_options).submit(req);
+//   req.popup.window = window;
 
-  var customObject = {};
-  var anObject;
+//   var customObject = {};
+//   var anObject;
 
-  it("convey request details to popup", function(){
-    spyOn(discreet, 'XDCallback').and.callFake(function(message, data){
-      anObject = data;
-    })
-    discreet.navigatePopup.call(req, customObject);
+//   it("convey request details to popup", function(){
+//     spyOn(discreet, 'XDCallback').and.callFake(function(message, data){
+//       anObject = data;
+//     })
+//     discreet.navigatePopup.call(req, customObject);
     
-    setTimeout(function(){
-      expect(anObject).toBe(customObject);
-    }, 0)
-  })
-})
+//     // setTimeout(function(){
+//       expect(anObject).toBe(customObject);
+//     // }, 0)
+//   })
+// })
 
 describe("api ajax handler should", function(){
   var req = jQuery.extend(true, {}, request);
