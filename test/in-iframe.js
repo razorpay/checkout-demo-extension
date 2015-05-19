@@ -6,7 +6,7 @@ var options = {
 }
 
 describe("in-iframe should have", function(){
-	it("jQuery", function(){
+  it("jQuery", function(){
 		expect($).toBeDefined();
 	})
 	it("jQuery.payment", function(){
@@ -18,13 +18,26 @@ describe("in-iframe should have", function(){
 	it("smarty", function(){
 		expect($.fn.smarty).toBeDefined();
 	})
+	it("doT", function(){
+		expect(doT).toBeDefined();
+	})
+	it("modal template", function(){
+		expect(templates.modal).toBeDefined();
+	})
 })
 
 describe("message listener should", function(){
-  it("show checkout form on receiving init options", function(){
+  it("show checkout form on receiving init options", function(done){
+  	var spyCalled = jasmine.createSpy();
+    var origRazorpay = Razorpay;
     spyOn(window, 'Razorpay').and.callFake(function(argOptions){
-      expect(argOptions).toBe(options);
+      spyCalled();
+      return new origRazorpay(argOptions)
     })
-    // window.postMessage({options: options}, '*');
+    window.postMessage({options: options}, '*');
+    setTimeout(function(){
+      expect(spyCalled).toHaveBeenCalled();
+      done();
+    }, 0)
   })
 })
