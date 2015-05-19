@@ -108,7 +108,7 @@ describe("init options validation", function(){
 
     it("no options passed", function(){
       field = '';
-      var init_options;
+      init_options = '';
     });
 
     it("invalid options passed", function(){
