@@ -19,7 +19,7 @@ module.exports = function(config) {
       'app/assets/js/lib/jquery-1.11.1.js',
       'spec/jasmine-jquery.js',
       // 'spec/fixtures/*',
-      // 'app/assets/js/lib/sendkeys.js',
+      'app/assets/js/lib/sendkeys.js',
       '.tmp/concat/checkout-frame.js',
       'test/in-iframe.js'
     ],

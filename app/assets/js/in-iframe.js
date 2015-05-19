@@ -78,7 +78,6 @@ window.$ = Razorpay.prototype.$;
 
       return data;
     },
-    
     showNetbankingList: function(nblist){
       if(!nblist && discreet.rzp){
         return discreet.rzp.getNetbankingList(discreet.showNetbankingList);
