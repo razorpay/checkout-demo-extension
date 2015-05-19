@@ -173,17 +173,9 @@
     method for payment data submission to razorpay api
     @param request  contains payment data and optionally callbacks to success, error and element to put iframe in
   */
-  Razorpay.prototype.submit = function(requestObject){
-    if(typeof requestObject != 'object'){
-      return false;
-    }
-    var request = {
-      data: requestObject.data,
-      error: requestObject.error,
-      success: requestObject.success
-    }
+  Razorpay.prototype.submit = function(request){
 
-    if(typeof request.data !== 'object'){
+    if(typeof request != 'object' || typeof request.data !== 'object'){
       return false;
     }
 
