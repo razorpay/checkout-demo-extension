@@ -155,32 +155,41 @@ describe("XDCallback should", function(){
     req = jQuery.extend(true, {}, request);
     spyOn($, 'ajax').and.callFake($.noop);
     rzp.submit(req);
+    req.popup.window = window;
     spyCalled = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
   });
 
-  afterEach(function(){
-    discreet.listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
-    expect(spyCalled).toHaveBeenCalled();
+  afterEach(function(done){
+    window.postMessage(receivedMessage, '*');
+    // discreet.listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
+    setTimeout(function(){
+      expect(spyCalled).toHaveBeenCalled();
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      done();
+    }, 100)
   })
 
   it("call popup.loaded", function(){
-    receivedMessage = {source: 'popup'};
+    receivedMessage = {'source': 'popup'};
     spyOn(req.popup, 'loaded').and.callFake(spyCalled);
   });
 
   it("close popup if source is not \"popup\"", function(){
     receivedMessage = {};
-    spyOn(req.popup, 'close').and.callFake(spyCalled);
+    spyOn(Razorpay.prototype.Popup.prototype, 'close').and.callFake(spyCalled);
   })
 
   it("invoke error callback", function(){
-    req.error = $.noop;
+    req.error = req.success = $.noop;
     receivedMessage = {error:{description:'yolo'}};
     spyOn(req, 'error').and.callFake(spyCalled);
+    spyOn(discreet, 'paymentSuccess').and.callFake(spyNotCalled);
   })
 
   it("invoke success callback", function(){
-    req.success = $.noop;
+    req.error = req.success = $.noop;
+    spyOn(req, 'error').and.callFake(spyNotCalled);
     spyOn(req, 'success').and.callFake(function(response){
       if(typeof response.razorpay_payment_id == 'string')
         spyCalled();

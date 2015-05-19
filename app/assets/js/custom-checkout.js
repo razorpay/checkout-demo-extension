@@ -26,6 +26,7 @@
     if(!(this.popup.window === message.source || /^https:\/\/[a-z]+\.razorpay\.com/.test(message.origin))){
       return;
     }
+
     if(data.source === 'popup'){
       if(!this.popup._loaded){
         this.popup._loaded = true;
@@ -33,8 +34,8 @@
       }
       return;
     }
-    // Close the popup in case of netbanking
-    if(typeof this.popup !== 'undefined'){
+
+    if(typeof this.popup != 'undefined'){
       this.popup.close();
     }
 
@@ -45,7 +46,6 @@
     } else {
       discreet.paymentSuccess.call(this, data);
     }
-
     // remove postMessage listener
     discreet.removeMessageListener();
   };
