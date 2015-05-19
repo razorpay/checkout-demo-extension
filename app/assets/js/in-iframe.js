@@ -147,6 +147,7 @@ window.$ = Razorpay.prototype.$;
     },
 
     showModal: function() {
+      $('#loading').remove();
       if(discreet.modal){
         return discreet.modal.show();
       }
