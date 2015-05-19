@@ -13,7 +13,6 @@ var optionsExtended = {
   'description': 'Tron Legacy',
   'image': 'https://i.imgur.com/3g7nmJC.png',
   'netbanking': true,
-  'signature': 'random',
   'handler': function (transaction) {
     alert("You have successfully purchased " + options.description);
   },
@@ -45,6 +44,54 @@ describe("new Razorpay", function(){
     expect(rzp).toBeDefined();
   });
 })
+
+describe("configure method", function(){
+  var co;
+  var custom = $.extend(true, {}, optionsExtended);
+  custom.unwanted = 'fake';
+
+  beforeEach(function(){
+    co = new Razorpay(custom);
+  });
+
+  it("should override default options", function(){
+    expect(co.options.key).toBe(optionsExtended.key);
+    expect(co.options.amount).toBe(optionsExtended.amount);
+    expect(co.options.currency).toBe(optionsExtended.currency);
+    expect(co.options.name).toBe(optionsExtended.name);
+    expect(co.options.description).toBe(optionsExtended.description);
+    expect(co.options.image).toBe(optionsExtended.image);
+    expect(Object.keys(co.options.notes).length).toBe(Object.keys(optionsExtended.notes).length)
+    expect(co.options.prefill.name).toBe(optionsExtended.prefill.name);
+    expect(co.options.prefill.contact).toBe(optionsExtended.prefill.contact);
+    expect(co.options.prefill.email).toBe(optionsExtended.prefill.email);
+    for(var i in co.options.notes){
+      expect(co.options.notes[i]).toBe(optionsExtended.notes[i]);
+    }
+  });
+
+  it("should not set unknown option", function(){
+    expect(co.options.unwanted).toBeUndefined();
+  });
+
+  it("should set handler as null if not passed", function(){
+    var local = $.extend({}, custom);
+    delete local.handler;
+    var co = new Razorpay(local);
+    expect(co.options.handler).toBe(null);
+  })
+
+  it("should set signature", function(){
+    var local = $.extend({}, custom);
+    local.signature = 'asdasd';
+    var co = new Razorpay(local);
+    expect(co.options.signature).toBe(local.signature);
+  })
+
+  it("should leave signature blank if not set", function(){
+    expect(co.options.signature).toBe('');
+  })
+});
 
 describe("init options validation", function(){
   var init_options, errors, field;

@@ -21,6 +21,7 @@ module.exports = function(config) {
       // 'spec/fixtures/*',
       // 'app/assets/js/lib/sendkeys.js',
       '.tmp/concat/checkout.js',
+      'test/base.js',
       'test/checkout-open.js'
     ],
 

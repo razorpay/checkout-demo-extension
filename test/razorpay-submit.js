@@ -61,7 +61,7 @@ describe("validate submission data method should", function(){
 
 describe("submit should", function(){
   var init_options, rzp, req;
-  
+
   beforeEach(function(){
     req = jQuery.extend(true, {}, request);
     init_options = jQuery.extend(true, {}, options);
@@ -91,7 +91,7 @@ describe("submit should", function(){
 
   it("setup popup", function(){
     new Razorpay(init_options).submit(req);
-    var isPopup = req.popup instanceof Razorpay.prototype.Popup; 
+    var isPopup = req.popup instanceof Razorpay.prototype.Popup;
     expect(isPopup).toBe(true);
   })
 
@@ -112,7 +112,7 @@ describe("submit should", function(){
 
 describe("submit ajax should invoke", function(){
   var init_options, rzp, req, spyCalled, spyNotCalled;
-  
+
   beforeEach(function(){
     req = jQuery.extend(true, {}, request);
     init_options = jQuery.extend(true, {}, options);
@@ -136,7 +136,7 @@ describe("submit ajax should invoke", function(){
   it("request success callback when immediate success", function(){
     spyOn($, 'ajax').and.callFake(function(request){
       request.success(no3dsecureResponse);
-    })    
+    })
     req.success = function(response){
       if(typeof response.razorpay_payment_id == 'string')
         spyCalled();
@@ -239,7 +239,7 @@ describe("navigatePopup method should", function(){
     discreet.navigatePopup.call(req, {});
     expect(spyCalled).toHaveBeenCalled();
   })
-  
+
   it("convey request details to popup", function(){
     var customObject = {};
     var anObject;
@@ -259,7 +259,7 @@ describe("api ajax handler should", function(){
   var req = jQuery.extend(true, {}, request);
   var init_options = jQuery.extend(true, {}, options);
   var responseData, rzp;
-  
+
   beforeEach(function(){
     spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
       options.success(responseData);
@@ -287,7 +287,7 @@ describe("api ajax handler should", function(){
     }
     var nextRequest = {url: 'abc'};
     responseData.request = nextRequest;
-    
+
     spyOn(discreet, 'navigatePopup').and.callFake(function(request){
       isSameObj = request === nextRequest;
     })

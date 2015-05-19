@@ -21,7 +21,6 @@ module.exports = function(config) {
       // 'spec/fixtures/*',
       // 'app/assets/js/lib/sendkeys.js',
       '.tmp/concat/razorpay.js',
-      'test/base.js',
       'test/razorpay-submit.js'
     ],
 
