@@ -63,6 +63,9 @@
   discreet.listener = null;
 
   discreet.addMessageListener = function(callback, context) {
+    if(discreet.listener){
+      discreet.removeMessageListener();
+    }
     discreet.listener = discreet.getMessageCallback(callback, context);
     if (window.addEventListener) {
       window.addEventListener('message', discreet.listener, false);
@@ -77,6 +80,7 @@
     } else if(window.detachEvent){
       window.detachEvent('onmessage', discreet.listener);
     }
+    discreet.listener = null;
   }
 
   Razorpay.prototype.configure = function(overrides){

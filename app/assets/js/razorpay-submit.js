@@ -132,7 +132,6 @@
     discreet.addMessageListener(discreet.XDCallback, request);
 
     var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
-
     if (typeof request.error == 'function'){
       popup.onClose(discreet.getPopupClose(request));
     }
@@ -174,12 +173,15 @@
     method for payment data submission to razorpay api
     @param request  contains payment data and optionally callbacks to success, error and element to put iframe in
   */
-  Razorpay.prototype.submit = function(request){
-
-    // TODO better validation
-    // data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-    // data['card[expiry_month]'] = expiry[0];
-    // data['card[expiry_year]'] = expiry[1];
+  Razorpay.prototype.submit = function(requestObject){
+    if(typeof requestObject != 'object'){
+      return false;
+    }
+    var request = {
+      data: requestObject.data,
+      error: requestObject.error,
+      success: requestObject.success
+    }
 
     if(typeof request.data !== 'object'){
       return false;
