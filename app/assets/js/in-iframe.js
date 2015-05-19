@@ -24,6 +24,7 @@ window.$ = Razorpay.prototype.$;
       message.options.handler = null;
       try{
         rzp = new Razorpay(message.options);
+        window.rzp = rzp;
       } catch(e){
         postMessage({event: 'error', data: e.message});
         return;
