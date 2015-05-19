@@ -110,7 +110,7 @@
 
   discreet.onFrameMessage = function(e, data){
     // this == rzp
-    if(!e.origin || !this.checkoutFrame || (discreet.checkoutUrl.indexOf(e.origin) == -1) || (data.source != 'frame')){ // source check
+    if((typeof e.origin != 'string') || !this.checkoutFrame || (discreet.checkoutUrl.replace(/^https?/,'').indexOf(e.origin.replace(/^https?/,'')) == -1) || (data.source != 'frame')){ // source check
       return;
     }
     var event = data.event;
