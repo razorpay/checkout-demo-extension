@@ -146,93 +146,58 @@ describe("submit ajax should invoke", function(){
 })
 
 describe("XDCallback should", function(){
-  var spyCalled, rzp, receivedMessage;
+  var req, spyCalled, rzp, receivedMessage, origin;
   var init_options = jQuery.extend(true, {}, options);
 
-  rzp = new Razorpay(init_options);
-
-  function createRequest(){
+  beforeEach(function(){
+    origin = '';
+    rzp = new Razorpay(init_options);
+    req = jQuery.extend(true, {}, request);
     spyOn($, 'ajax').and.callFake($.noop);
-    var req = jQuery.extend(true, {}, request);
-    req.error = req.success = $.noop;
     rzp.submit(req);
-    req.popup.window = window;
+    spyCalled = jasmine.createSpy();
+  });
 
-    var spyCalled = jasmine.createSpy();
-    var spyNotCalled = jasmine.createSpy();
-
-    return {
-      req: req,
-      spyCalled: spyCalled,
-      spyNotCalled: spyNotCalled
-    };
-  }
+  afterEach(function(){
+    discreet.listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
+    expect(spyCalled).toHaveBeenCalled();
+  })
 
   it("call popup.loaded", function(){
-    var testRequest = createRequest();
-    receivedMessage = {'source': 'popup'};
-    spyOn(testRequest.req.popup, 'loaded').and.callFake(testRequest.spyCalled);
-
-    window.postMessage(receivedMessage, '*');
-    setTimeout(function(){
-      expect(testRequest.spyCalled).toHaveBeenCalled();
-      expect(testRequest.spyNotCalled).not.toHaveBeenCalled();
-    }, 0)
+    receivedMessage = {source: 'popup'};
+    spyOn(req.popup, 'loaded').and.callFake(spyCalled);
   });
 
   it("close popup if source is not \"popup\"", function(){
-    var testRequest = createRequest();
     receivedMessage = {};
-    spyOn(Razorpay.prototype.Popup.prototype, 'close').and.callFake(testRequest.spyCalled);
-
-    window.postMessage(receivedMessage, '*');
-    setTimeout(function(){
-      expect(testRequest.spyCalled).toHaveBeenCalled();
-      expect(testRequest.spyNotCalled).not.toHaveBeenCalled();
-    }, 0)
+    spyOn(req.popup, 'close').and.callFake(spyCalled);
   })
 
   it("invoke error callback", function(){
-    var testRequest = createRequest();
+    req.error = $.noop;
     receivedMessage = {error:{description:'yolo'}};
-    spyOn(testRequest.req, 'error').and.callFake(testRequest.spyCalled);
-    spyOn(discreet, 'paymentSuccess').and.callFake(testRequest.spyNotCalled);
-
-    window.postMessage(receivedMessage, '*');
-    setTimeout(function(){
-      expect(testRequest.spyCalled).toHaveBeenCalled();
-      expect(testRequest.spyNotCalled).not.toHaveBeenCalled();
-    }, 0)
+    spyOn(req, 'error').and.callFake(spyCalled);
   })
 
   it("invoke success callback", function(){
-    var testRequest = createRequest();
-    spyOn(testRequest.req, 'error').and.callFake(testRequest.spyNotCalled);
-    spyOn(testRequest.req, 'success').and.callFake(function(response){
+    req.success = $.noop;
+    spyOn(req, 'success').and.callFake(function(response){
       if(typeof response.razorpay_payment_id == 'string')
-        testRequest.spyCalled();
+        spyCalled();
     });
     receivedMessage = {razorpay_payment_id: 'xyz'};
-
-    window.postMessage(receivedMessage, '*');
-    setTimeout(function(){
-      expect(testRequest.spyCalled).toHaveBeenCalled();
-      expect(testRequest.spyNotCalled).not.toHaveBeenCalled();
-    }, 0)
   })
 })
 
 describe("navigatePopup method should", function(){
-  var req, init_options;
-
-  beforeEach(function(){
-    req = jQuery.extend(true, {error: $.noop}, request);
-    init_options = jQuery.extend(true, {}, options);
-    spyOn($, 'ajax').and.callFake($.noop);
-    new Razorpay(init_options).submit(req);
-  })
+  var init_options = jQuery.extend(true, {}, options);
+  var rzp = new Razorpay(init_options);
 
   it("invoke request's error callback if popup has not been setup", function(){
+    spyOn($, 'ajax').and.callFake($.noop);
+    var req = jQuery.extend(true, {error: $.noop}, request);
+    rzp.submit(req);
+    
     req.popup = 'pop';
     var spyCalled = jasmine.createSpy();
     spyOn(req, 'error').and.callFake(spyCalled);
@@ -241,8 +206,13 @@ describe("navigatePopup method should", function(){
   })
 
   it("convey request details to popup", function(){
+    spyOn($, 'ajax').and.callFake($.noop);
+    var req = jQuery.extend(true, {error: $.noop}, request);
+    rzp.submit(req);
+
     var customObject = {};
     var anObject;
+    var spyCalled = jasmine.createSpy();
 
     spyOn(Hedwig.prototype, 'sendMessage').and.callFake(function(message, origin, source){
       if(source == req.popup.window){

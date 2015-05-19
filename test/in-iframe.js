@@ -27,7 +27,7 @@ describe("in-iframe should have", function(){
 })
 
 describe("message listener should", function(){
-  it("show checkout form on receiving init options", function(done){
+  it("init razorpay on receiving init options", function(done){
   	var spyCalled = jasmine.createSpy();
     var origRazorpay = Razorpay;
     spyOn(window, 'Razorpay').and.callFake(function(argOptions){
@@ -40,4 +40,26 @@ describe("message listener should", function(){
       done();
     }, 0)
   })
+  // it("throw error on erroneous options", function(done){
+  //   var spyCalled = jasmine.createSpy();
+  //   var origRazorpay = Razorpay;
+  //   var custom_options = $.extend(true, {}, options);
+  //   custom_options.amount = 'dsf';
+  //   spyOn(window, 'Razorpay').and.callFake(function(argOptions){
+  //     return new origRazorpay(argOptions)
+  //     try{
+  //       var rzp = new origRazorpay(argOptions)
+  //     } catch(e){
+  //       spyCalled();
+  //       return new Error("custom error");
+  //     }
+  //   });
+  //   window.postMessage({options: custom_options}, '*');
+  //   setTimeout(function(){
+  //     expect(spyCalled).toHaveBeenCalled();
+  //     done();
+  //   }, 0)
+  // })
 })
+
+// describe("CheckoutBridge")

@@ -7,7 +7,7 @@ var optionsExtended = {
   'key': 'key_id',
   'amount': '5100',
   'currency': 'INR',
-  'display_currency': 'INR',
+  'display_currency': 'USD',
   'display_amount': '1000',
   'name': 'Daft Punk',
   'description': 'Tron Legacy',
