@@ -1,5 +1,11 @@
 /* global handleMessage */
 /* jshint -W027 */
+
+/**
+ * This exposes jquery for in iframe usage
+ */
+window.$ = Razorpay.prototype.$;
+
 (function(){
   'use strict';
 
@@ -23,11 +29,11 @@
         return;
       }
       options = rzp.options;
-      open();
+      showModal();
     } else if(message.event == 'close'){
       close();
     } else if(message.event == 'open' && rzp){
-      open();
+      showModal();
     }
   }
 
@@ -180,7 +186,7 @@
     }
   }
 
-  function open() {
+  function showModal() {
     if(modal){
       return modal.show();
     }
@@ -259,7 +265,7 @@
     var form = $(e.currentTarget);
     $el.smarty('refresh');
     form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
-    
+
     var invalid = form.find('.form-common, .tab-content.active').find('.invalid');
     var modalEl = form.closest('.modal');
     if (invalid.length) {
