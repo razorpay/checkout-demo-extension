@@ -2,6 +2,35 @@ var options = {
   'key': 'key_id',
   'amount': '40000'
 }
+
+var optionsExtended = {
+  'key': 'key_id',
+  'amount': '5100',
+  'currency': 'INR',
+  'display_currency': 'INR',
+  'display_amount': '1000',
+  'name': 'Daft Punk',
+  'description': 'Tron Legacy',
+  'image': 'https://i.imgur.com/3g7nmJC.png',
+  'netbanking': true,
+  'signature': 'random',
+  'handler': function (transaction) {
+    alert("You have successfully purchased " + options.description);
+  },
+  'oncancel': function(){},
+  'onhidden': function(){},
+  'netbanking': 'true',
+  'prefill': {
+    'name': 'Shashank Mehta',
+    'email': 'sm@razorpay.com',
+    'contact': '9999999999'
+  },
+  notes: {
+    'address': 'Hello World'
+  },
+  protocol: 'http',
+  hostname: 'api.razorpay.dev'
+}
 // var $ = Razorpay.prototype.$;
 
 describe("new Razorpay", function(){

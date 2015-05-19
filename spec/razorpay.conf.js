@@ -22,7 +22,7 @@ module.exports = function(config) {
       // 'app/assets/js/lib/sendkeys.js',
       '.tmp/concat/razorpay.js',
       'test/base.js',
-      'test/submit.js'
+      'test/razorpay-submit.js'
     ],
 
     // list of files to exclude

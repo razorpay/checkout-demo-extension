@@ -15,6 +15,7 @@
     netbankingListUrl: '/banks',
     key: '',
     handler: null,
+
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     display_currency: '',
@@ -60,7 +61,7 @@
   }
 
   discreet.listener = null;
-  
+
   discreet.addMessageListener = function(callback, context) {
     discreet.listener = discreet.getMessageCallback(callback, context);
     if (window.addEventListener) {
@@ -185,6 +186,9 @@
         });
       }
 
+      /**
+       * There are some options which are checkout specific only
+       */
       if(typeof discreet.validateCheckout == 'function'){
         discreet.validateCheckout.call(this, options, errors);
       }
@@ -202,7 +206,12 @@
       }
     }
   };
+
   // TODO validate data
+  /**
+   * Validation of data during the time of submitting data
+   * to our server through the ajax request
+   */
   Razorpay.prototype.validateData = function(data, throwError){
     var errors = [];
 
@@ -248,7 +257,7 @@
       dataType: 'jsonp',
       success: function(response){
         rzp.netbankingList = response;
-        
+
         if(typeof callback == 'function'){
           var callback_param;
           if (response.http_status_code !== 200 && response.error){
