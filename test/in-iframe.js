@@ -43,6 +43,11 @@ describe("message listener should", function(){
     var origRazorpay = Razorpay;
     var custom_options = $.extend(true, {}, co_options);
     custom_options.amount = 'dsf';
+
+    afterEach(function(){
+      window.hide();
+      $('.container').remove();
+    });
     
     spyOn(window, 'Razorpay').and.callFake(function(argOptions){
       try{
@@ -77,8 +82,6 @@ describe("message listener should", function(){
 // Tests on Credit Card page
 describe("Razorpay open cc page", function(){
   var $name, $email, $contact;
-  window.hide();
-  $('.container').remove();
 
   beforeEach(function(){
     handleMessage({options: co_options});
