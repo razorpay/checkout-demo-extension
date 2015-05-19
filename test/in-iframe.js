@@ -169,7 +169,7 @@ describe("Razorpay open cc and submit method", function(){
       $('.container').remove();
 
       done();
-    }, 100);
+    }, 0);
   })
 
   describe("with all details in place", function(){
@@ -341,6 +341,71 @@ describe("Razorpay open cc and submit method", function(){
       spyNotCalled();
     });
   });
+
+  describe("and getFormData method", function(){
+    var co, data;
+
+    function addAllCC(){
+      $ccNumber.sendkeys(cc.number);
+      $ccExpiry.sendkeys(cc.expiry);
+      $ccCVV.sendkeys(cc.cvv);
+    }
+
+    beforeEach(function(done){
+      launch();
+      addAllCC();
+      spyCalled();
+
+      setTimeout(function(){
+        data = frameDiscreet.getFormData($('.modal form'), true);
+        done();
+      }, 0);
+    });
+
+    it("should return description", function(){
+      expect(data.description).toBe(coOptions.description);
+    });
+
+    it("should return amount", function(){
+      expect(data.amount).toBe(coOptions.amount);
+    });
+
+    it("should return currency", function(){
+      expect(data.currency).toBe('INR');
+    });
+
+    it("should return contact", function(){
+      expect(data.contact).toBe(coOptions.prefill.contact);
+    });
+
+    it("should return email", function(){
+      expect(data.email).toBe(coOptions.prefill.email);
+    });
+
+    it("should return name", function(){
+      expect(data['card[name]']).toBe(coOptions.prefill.name);
+    });
+
+    it("should return card number", function(){
+      expect(data['card[number]']).toBe(cc.number);
+    });
+
+    it("should return card expiry month", function(){
+      expect(data['card[expiry_month]']).toBe(cc.expiry_month);
+    });
+
+    it("should return card expiry year", function(){
+      expect(data['card[expiry_year]']).toBe(cc.expiry_year);
+    });
+
+    it("should return card cvv", function(){
+      expect(data['card[cvv]']).toBe(cc.cvv);
+    });
+
+    it("should not return bank", function(){
+      expect(data.bank).toBeUndefined();
+    });
+  })
 });
 
 
