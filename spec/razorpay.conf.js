@@ -21,8 +21,8 @@ module.exports = function(config) {
       // 'spec/fixtures/*',
       // 'app/assets/js/lib/sendkeys.js',
       '.tmp/concat/razorpay.js',
-      'test/razorpay.js',
-      'test/custom-checkout.js'
+      'test/base.js',
+      'test/submit.js'
     ],
 
     // list of files to exclude
