@@ -101,6 +101,7 @@ describe("init options validation", function(){
        init_options = jQuery.extend(true, {}, options);
     });
     afterEach(function(){
+      errors = Razorpay.prototype.validateOptions(init_options, false);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });
@@ -108,27 +109,41 @@ describe("init options validation", function(){
     it("no options passed", function(){
       field = '';
       var init_options;
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("invalid options passed", function(){
       field = '';
       init_options = 'options';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("no key specified", function(){
       field = 'key';
       delete init_options.key;
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("blank key specified", function(){
       field = 'key';
       init_options.key = '';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("amount is invalid", function(){
       field = 'amount';
       init_options.amount = 'amount';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
+    });
+
+    it("when amount not specified", function(){
+      delete init_options.amount;
+      field = 'amount';
+    });
+
+    it("when amount is less than 0", function(){
+      init_options.amount = '-10';
+      field = 'amount';
+    });
+
+    it("when amount is in decimal", function(){
+      init_options.amount = '10.10';
+      field = 'amount';
     });
   });
 })
