@@ -154,13 +154,22 @@ describe("XDCallback should", function(){
     rzp = new Razorpay(init_options);
     req = jQuery.extend(true, {}, request);
     spyOn($, 'ajax').and.callFake($.noop);
+    req.error = function(){
+      alert(1);
+    }
     rzp.submit(req);
+    req.error = function(){
+      alert(2);
+    }
     req.popup.window = window;
     spyCalled = jasmine.createSpy();
     spyNotCalled = jasmine.createSpy();
   });
 
   afterEach(function(done){
+    req.error = function(){
+      alert(4);
+    }
     window.postMessage(receivedMessage, '*');
     // discreet.listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
     setTimeout(function(){
@@ -181,9 +190,12 @@ describe("XDCallback should", function(){
   })
 
   it("invoke error callback", function(){
-    req.error = req.success = $.noop;
+    // req.error = req.success = $.noop;
     receivedMessage = {error:{description:'yolo'}};
-    spyOn(req, 'error').and.callFake(spyCalled);
+    req.error = function(){
+      alert(3);
+    }
+    // spyOn(req, 'error').and.callFake(spyCalled);
     spyOn(discreet, 'paymentSuccess').and.callFake(spyNotCalled);
   })
 
