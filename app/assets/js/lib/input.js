@@ -213,9 +213,12 @@
 
     initiate: function(parent, el, type) {
       parent.data('smarty', true);
-      if (document.activeElement === el) {
-        return parent.addClass(this["class"]('focused'));
-      }
+      // catching IE unspecified error of document.activeElement
+      try{
+        if (document.activeElement == el) {
+          parent.addClass(this["class"]('focused'));
+        }
+      } catch(e){}
       parent.append('<div class="help-text" style="opacity: 0"></div>')
     },
 
