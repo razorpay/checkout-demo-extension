@@ -57,14 +57,14 @@ module.exports = function(grunt){
       }
     },
     karma: {
-      custom: {
-        configFile: 'spec/custom.conf.js'
+      razorpay: {
+        configFile: 'spec/razorpay.conf.js'
       },
-      manual: {
-        configFile: 'spec/manual.conf.js'
+      checkout: {
+        configFile: 'spec/checkout.conf.js'
       },
       frame: {
-        configFile: 'spec/frame.conf.js'
+        configFile: 'spec/checkout-frame.conf.js'
       }
     },
 
@@ -128,8 +128,8 @@ module.exports = function(grunt){
 
   grunt.registerTask('test', [
     'test:prepare',
-    'karma:custom',
-    'karma:manual',
+    'karma:razorpay',
+    'karma:checkout',
     'karma:frame'
   ]);
 };

@@ -20,8 +20,8 @@ module.exports = function(config) {
       'spec/jasmine-jquery.js',
       // 'spec/fixtures/*',
       // 'app/assets/js/lib/sendkeys.js',
-      '.tmp/concat/checkout-frame.js',
-      'test/checkout-frame.js'
+      '.tmp/concat/checkout.js',
+      'test/open.js'
     ],
 
     // list of files to exclude
