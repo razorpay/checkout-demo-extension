@@ -94,42 +94,106 @@ describe("configure method", function(){
 });
 
 describe("init options validation", function(){
-  var init_options, errors, field;
+  var init_options, field;
+
+  beforeEach(function(){
+    init_options = jQuery.extend(true, {}, options);
+  });
 
   describe("should throw error if", function(){
-    beforeEach(function(){
-       init_options = jQuery.extend(true, {}, options);
-    });
     afterEach(function(){
+      var errors = Razorpay.prototype.validateOptions(init_options, false);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });
 
     it("no options passed", function(){
       field = '';
-      var init_options;
-      errors = Razorpay.prototype.validateOptions(init_options, false);
+      init_options = '';
     });
+
     it("invalid options passed", function(){
       field = '';
       init_options = 'options';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("no key specified", function(){
       field = 'key';
       delete init_options.key;
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("blank key specified", function(){
       field = 'key';
       init_options.key = '';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
     it("amount is invalid", function(){
       field = 'amount';
       init_options.amount = 'amount';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     });
+
+    it("when amount not specified", function(){
+      delete init_options.amount;
+      field = 'amount';
+    });
+
+    it("when amount is less than 0", function(){
+      init_options.amount = '-10';
+      field = 'amount';
+    });
+
+    it("when amount is in decimal", function(){
+      init_options.amount = '10.10';
+      field = 'amount';
+    });
+
+    it("when notes has more than 15 fields", function(){
+      init_options.notes = {};
+      for(var i = 0; i < 16; i++){
+        init_options.notes['note-' + i] = i;
+      }
+      field = 'notes';
+    });
+
+    it("when handler is not a function", function(){
+      init_options.handler = 'string';
+      field = 'handler';
+    });
+  });
+
+  describe("should not return error", function(){
+    afterEach(function(){
+      var errors = Razorpay.prototype.validateOptions(init_options, false);
+      expect(errors.length).toBe(0);
+    });
+
+    it("when handler is not defined", function(){
+      delete init_options.handler;
+    });
+
+    it("when description is not defined", function(){
+      delete init_options.description;
+    });
+
+    it("when image is not defined", function(){
+      delete init_options.image;
+    });
+
+    it("when notes is not defined", function(){
+      delete init_options.notes;
+    });
+
+    it("when name is not defined", function(){
+      delete init_options.name;
+    });
+
+    it("when amount is in string", function(){
+      init_options.amount = '1000';
+    });
+
+    it("when amount is in integer", function(){
+      init_options.amount = 1000;
+    })
   });
 })
 
