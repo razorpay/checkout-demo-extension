@@ -230,7 +230,7 @@ window.$ = Razorpay.prototype.$;
       var modalEl = form.closest('.modal');
       if (invalid.length) {
         invalid.addClass('mature').find('.input').eq(0).focus();
-        shake(modalEl);
+        discreet.shake(modalEl);
         return;
       }
       var data = discreet.getFormData(form, discreet.options.netbanking);
@@ -246,8 +246,8 @@ window.$ = Razorpay.prototype.$;
 
       discreet.rzp.submit({
         data: data,
-        error: errorHandler,
-        success: successHandler
+        error: discreet.errorHandler,
+        success: discreet.successHandler
       })
       discreet.postMessage({
         event: 'submit',
@@ -347,5 +347,5 @@ window.$ = Razorpay.prototype.$;
 // @if NODE_ENV='test'
 window.frameDiscreet = discreet;
 // @endif
-  
+
 })();
