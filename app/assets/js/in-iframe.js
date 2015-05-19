@@ -6,10 +6,8 @@
  */
 window.$ = Razorpay.prototype.$;
 
-// @if NODE_ENV!='test'
 (function(){
   'use strict';
-// @endif
 
   var modal, $el, options, rzp, nblist;
   postMessage({event: 'load'});
@@ -310,9 +308,10 @@ window.$ = Razorpay.prototype.$;
       modal.hide();
     }
     modal = null;
+    options = null;
   }
 
-  close = hide;
+  var close = window.hide = hide;
 
   function successHandler(response){
     postMessage({ event: 'success', data: response});
@@ -341,6 +340,4 @@ window.$ = Razorpay.prototype.$;
 
     $el.find('.error').html(message);
   }
-// @if NODE_ENV!='test'
 })();
-// @endif
