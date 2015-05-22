@@ -14,16 +14,24 @@
     jsonpUrl: '/payments/create/jsonp',
     netbankingListUrl: '/banks',
     key: '',
-    handler: null,
+    handler: $.noop,
 
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     display_currency: '',
-    netbanking: true,
+
+    method: {
+      netbanking: true,
+      card: true
+    },
     prefill: {
       name: '',
       contact: '',
       email: ''
+    },
+    modal: {
+      oncancel: $.noop,
+      onhidden: $.noop
     },
     amount: '',
     display_amount: '',
@@ -32,8 +40,6 @@
     image: '',
     notes: {},
     signature: '',
-    oncancel: null,
-    onhidden: null,
     parent: null,
     redirect: false
   };
@@ -83,34 +89,46 @@
     discreet.listener = null;
   }
 
+  discreet.setOption = function(key, options, overrides, defaults){
+    var defaultValue = defaults[key];
+    if(typeof overrides != 'object'){
+      if(!(key in options)){
+        options[key] = defaultValue;
+      }
+      return;
+    }
+    
+    var overrideValue = overrides[key];
+    if(typeof defaultValue == 'string' && typeof overrideValue != 'undefined' && typeof overrideValue != 'string'){
+      overrideValue = String(overrideValue);
+    }
+
+    var types = ['string', 'boolean', 'function', 'object'];
+    for(var i = 0; i < types.length; i++){
+      if(typeof defaultValue == types[i]){
+        if(typeof overrideValue == types[i]){
+          options[key] = overrideValue;
+        } else if(!(key in options)){
+          options[key] = defaultValue;
+        }
+        break;
+      }
+    }
+  }
+
   Razorpay.prototype.configure = function(overrides){
     this.validateOptions(overrides, true);
     this.options = this.options || {};
 
     for (var i in defaults){
-      if(i == 'prefill'){
-        continue;
-      }
-      else if(typeof overrides[i] == 'undefined' && typeof this.options[i] == 'undefined'){
-        this.options[i] = defaults[i];
-      }
-      else {
-        if(typeof defaults[i] == 'string' && typeof overrides[i] != 'string'){
-          this.options[i] = String(overrides[i]);
-        } else {
-          this.options[i] = overrides[i];
+      if(i != 'parent' && typeof defaults[i] == 'object'){
+        var subObject = defaults[i];
+        this.options[i] = this.options[i] || {};
+        for(var j in subObject){
+          discreet.setOption(j, this.options[i], overrides[i], subObject);
         }
       }
-    }
-
-    this.options.prefill = {};
-    for(var i in defaults.prefill){
-      if(typeof overrides.prefill == 'undefined' || typeof overrides.prefill[i] == 'undefined'){
-        this.options.prefill[i] = defaults.prefill[i];
-      }
-      else {
-        this.options.prefill[i] = overrides.prefill[i];
-      }
+      else discreet.setOption(i, this.options, overrides, defaults);
     }
 
     if(typeof discreet.initRazorpay == 'function'){

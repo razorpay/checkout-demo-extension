@@ -95,15 +95,10 @@
     var event = data.event;
     
     if(event == 'load'){
-      var options = {
-        prefill: this.options.prefill,
-        notes: this.options.notes
-      }
+      var options = {};
       for(var i in this.options){
         var value = this.options[i];
-        if(typeof value == 'function'){
-          options[i] = true; // indicating callbacks do exist
-        } else if(typeof value != 'object'){ // safe for stringify
+        if(typeof value != 'function' && i != 'parent'){
           options[i] = value;
         }
       }
@@ -122,14 +117,14 @@
     }
 
     else if (event == 'cancel'){
-      if(typeof this.options.oncancel == 'function')
-        this.options.oncancel()
+      if(typeof this.options.modal.oncancel == 'function')
+        this.options.modal.oncancel()
     }
 
     else if (event == 'hidden'){
       discreet.onClose.call(this);
-      if(typeof this.options.onhidden == 'function')
-        this.options.onhidden();
+      if(typeof this.options.modal.onhidden == 'function')
+        this.options.modal.onhidden();
     }
 
     else if (event == 'success'){

@@ -49,7 +49,7 @@ templates.modal = '
               </div>
             </div>
           </div>
-          {{if(it.netbanking){}}
+          {{if(it.method.netbanking){}}
             <ul class="tabs">
               <li data-target="tab-cc" class="active">Card</li>
               <li data-target="tab-nb">Net Banking</li>

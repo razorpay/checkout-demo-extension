@@ -41,7 +41,9 @@
         console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
-      'netbanking': 'window.alert(3)',
+      'method': {
+        'netbanking': true
+      },
       'prefill': {
         'name': 'Harshil \"Mathur',
         'email': 'harshil@razorpay.com',
@@ -52,8 +54,10 @@
       },
       protocol: 'https',
       hostname: 'beta.razorpay.com',
-      oncancel: function(){console.log(1)},
-      onhidden: function(){console.log(2)},
+      modal: {
+        oncancel: function(){console.log(1)},
+        onhidden: function(){console.log(2)}
+      },
       parent: $('#x')
     }
     var rzp1 = new Razorpay(options);

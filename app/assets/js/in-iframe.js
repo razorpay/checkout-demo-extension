@@ -159,14 +159,11 @@ window.$ = Razorpay.prototype.$;
 
       // init modal
       var modalOptions = {
-        onhide: null,
+        onhide: function(){
+          discreet.postMessage({event: 'cancel'});
+        },
         onhidden: function(){
           discreet.postMessage({event: 'hidden'});
-        }
-      }
-      if(discreet.options.oncancel){
-        modalOptions.onhide = function(){
-          discreet.postMessage({event: 'cancel'});
         }
       }
 
@@ -187,7 +184,7 @@ window.$ = Razorpay.prototype.$;
         return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
-      if (discreet.options.netbanking) {
+      if (discreet.options.method.netbanking) {
         discreet.$el.find('.tabs li').click(function() {
           discreet.renew();
           var inner = $(this).closest('.modal-inner');
@@ -236,7 +233,7 @@ window.$ = Razorpay.prototype.$;
         discreet.shake(modalEl);
         return;
       }
-      var data = discreet.getFormData(form, discreet.options.netbanking);
+      var data = discreet.getFormData(form, discreet.options.method.netbanking);
 
       // Signature is set in case of hosted checkout
       if(discreet.options.signature !== ''){
@@ -317,7 +314,7 @@ window.$ = Razorpay.prototype.$;
     }
 
     if(message.options && !discreet.options){ // open modal
-      message.options.handler = null;
+      // message.options.handler = null;
       try{
         discreet.rzp = new Razorpay(message.options);
       } catch(e){
