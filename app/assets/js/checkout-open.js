@@ -57,7 +57,7 @@
     discreet.removeMessageListener();
     discreet.isOpen = false;
     $('body').css('overflow', discreet.merchantData.bodyOverflow);
-    
+
     if(this.checkoutFrame){
       this.checkoutFrame.hide();
       if(this.checkoutFrame.data('removable')){
@@ -93,7 +93,7 @@
       return;
     }
     var event = data.event;
-    
+
     if(event == 'load'){
       var options = {
         prefill: this.options.prefill,
@@ -128,8 +128,8 @@
 
     else if (event == 'hidden'){
       discreet.onClose.call(this);
-      if(typeof this.options.onhidden == 'function')
-        this.options.onhidden();
+      if(typeof this.options.onhide == 'function')
+        this.options.onhide();
     }
 
     else if (event == 'success'){

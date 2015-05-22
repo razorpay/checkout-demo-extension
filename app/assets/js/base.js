@@ -33,7 +33,7 @@
     notes: {},
     signature: '',
     oncancel: null,
-    onhidden: null,
+    onhide: null,
     parent: null,
     redirect: false
   };
