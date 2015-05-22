@@ -23,7 +23,15 @@
     this.element = element;
     this.modalElement = element.children(this.options.modalSelector);
     if (window.matchMedia){
-      var match = matchMedia('(max-device-height: 450px),(max-device-width: 450px)');
+      var query;
+      // device-width doesn't work well in android app/cordova
+      // browser is good though
+      if(window.CheckoutBridge){
+        query = '(max-height: 450px),(max-width: 450px)';
+      } else {
+        query = '(max-device-height: 450px),(max-device-width: 450px)';
+      }
+      var match = matchMedia(query);
       if(match && match.matches){
         this.curtainMode = true;
         this.element.addClass('curtain');

@@ -74,6 +74,7 @@
     this.checkoutFrame.prop('contentWindow').postMessage(response, '*');
   }
 
+  // to handle absolute/relative url of options.image
   discreet.setImageOption = function(options){
     if(typeof options.image == 'string'){
       if(options.image.indexOf('http')){ // not 0
@@ -145,7 +146,6 @@
 
   /**
     default handler for success
-    default handler does not care about error or success messages,
     it just submits everything via the form
     @param  {[type]} data [description]
     @return {[type]}    [description]
