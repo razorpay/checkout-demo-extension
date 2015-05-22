@@ -67,45 +67,23 @@
     }
   }
 
-  discreet.parseScriptOptions = function(options){
-    var category, dotPosition, i, ix, property;
-    for (i in options) {
-      ix = i.indexOf(".");
-      if (ix > -1) {
-        dotPosition = ix;
-        category = i.substr(0, dotPosition);
-        property = i.substr(dotPosition + 1);
-        options[category] = options[category] || {};
-        options[category][property] = options[i];
-        delete options[i];
-      }
-    }
-    return options;
-  };
-
-  discreet.addButton = function(rzp){
-    var button = document.createElement('input');
-    button.type = 'button';
-    button.value = 'Pay Now';
-    button.className = 'razropay-payment-button';
-    $(button).click(function(e){
-      rzp.open();
-      e.preventDefault();
-    }).appendTo(discreet.currentScript.parentNode);
-  };
-
-  var key = discreet.currentScript.getAttribute('data-key');
-  if (key && key.length > 0){
-    var opts = $(discreet.currentScript).data();
-    var options = discreet.parseScriptOptions(opts);
-    discreet.addButton(new Razorpay(options));
-  }
-
   discreet.sendFrameMessage = function(response){
     if(typeof response !== 'string'){
       response = JSON.stringify(response)
     }
     this.checkoutFrame.prop('contentWindow').postMessage(response, '*');
+  }
+
+  discreet.setImageOption = function(options){
+    if(typeof options.image == 'string'){
+      if(options.image.indexOf('http')){ // not 0
+        var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+        if(options.image[0] != '/'){
+          baseUrl += '/' + location.pathname.replace(/[^\/]*$/g,'');
+        }
+        options.image = baseUrl + options.image;
+      }
+    }
   }
 
   discreet.onFrameMessage = function(e, data){
@@ -128,6 +106,7 @@
           options[i] = value;
         }
       }
+      discreet.setImageOption(options);
 
       var response = {
         options: options,
@@ -182,10 +161,44 @@
         inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
       }
     }
-    var RazorPayForm = discreet.rzpscript.parentElement;
+    var RazorPayForm = discreet.currentScript.parentElement;
     $(inputs).appendTo(RazorPayForm);
     $(RazorPayForm).submit();
   };
+
+  discreet.parseScriptOptions = function(options){
+    var category, dotPosition, i, ix, property;
+    for (i in options) {
+      ix = i.indexOf(".");
+      if (ix > -1) {
+        dotPosition = ix;
+        category = i.substr(0, dotPosition);
+        property = i.substr(dotPosition + 1);
+        options[category] = options[category] || {};
+        options[category][property] = options[i];
+        delete options[i];
+      }
+    }
+    options.handler = discreet.defaultPostHandler;
+    return options;
+  };
+
+  discreet.addButton = function(rzp){
+    var button = document.createElement('input');
+    button.type = 'button';
+    button.value = 'Pay Now';
+    button.className = 'razropay-payment-button';
+    $(button).click(function(e){
+      rzp.open();
+      e.preventDefault();
+    }).appendTo(discreet.currentScript.parentNode);
+  };
+  var key = discreet.currentScript.getAttribute('data-key');
+  if (key && key.length > 0){
+    var opts = $(discreet.currentScript).data();
+    var options = discreet.parseScriptOptions(opts);
+    discreet.addButton(new Razorpay(options));
+  }
 
   discreet.initCheckout = function(){
     if(!discreet.nblist && !discreet.nbajax){
