@@ -364,9 +364,9 @@ window.$ = Razorpay.prototype.$;
         if(!qpmap[dotsplit[0]]){
           qpmap[dotsplit[0]] = {};
         }
-        qpmap[dotsplit[0]][dotsplit[1]] = split[1];
+        qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
       } else {
-        qpmap[split[0]] = split[1];
+        qpmap[split[0]] = decodeURIComponent(split[1]);
       }
     }
   }
