@@ -220,6 +220,10 @@ window.$ = Razorpay.prototype.$;
         discreet.formSubmit(e);
         return false; // prevent default
       });
+
+      if(discreet.qpmap && discreet.qpmap.error){
+        discreet.errorHandler(qpmap);
+      }
     },
 
     formSubmit: function(e) {
@@ -346,7 +350,25 @@ window.$ = Razorpay.prototype.$;
   discreet.postMessage({event: 'load'});
 
 // @if NODE_ENV='test'
-window.frameDiscreet = discreet;
+  window.frameDiscreet = discreet;
 // @endif
+
+  // initial error (helps in case of redirection flow)
+  if(location.search){
+    var qpmap = discreet.qpmap = {};
+    var params = location.search.replace(/^\?/,'').split('&');
+    for(var i=0; i < params.length; i++){
+      var split = params[i].split('=', 2);
+      if(split[0].indexOf('.') != -1){
+        var dotsplit = split[0].split('.', 2);
+        if(!qpmap[dotsplit[0]]){
+          qpmap[dotsplit[0]] = {};
+        }
+        qpmap[dotsplit[0]][dotsplit[1]] = split[1];
+      } else {
+        qpmap[split[0]] = split[1];
+      }
+    }
+  }
 
 })();

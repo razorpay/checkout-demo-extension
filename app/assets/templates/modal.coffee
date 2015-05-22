@@ -20,7 +20,7 @@ templates.modal = '
         </div>
       </div>
       <div class="body">
-        <form class="form" method="POST" novalidate onsubmit="return false">
+        <form class="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
           <div class="form-common">
             <input type="hidden" name="amount" value="{{=it.amount}}">
             <input type="hidden" name="currency" value="{{=it.currency}}">
