@@ -22,6 +22,9 @@ templates.modal = '
       <div class="body">
         <form class="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
           <div class="form-common">
+            <div class="error-container">
+              <div class="error"></div>
+            </div>
             <input type="hidden" name="amount" value="{{=it.amount}}">
             <input type="hidden" name="currency" value="{{=it.currency}}">
             <input type="hidden" name="description" value="{{=it.description}}">
@@ -90,7 +93,6 @@ templates.modal = '
               </div>
             </div>
           </div>
-          <div class="error"></div>
           <div class="footer clear">
             <button class="submit" type="submit">
               <span class="ring"></span>

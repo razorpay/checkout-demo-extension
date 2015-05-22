@@ -199,7 +199,6 @@ window.$ = Razorpay.prototype.$;
           var change_modal_height = true;// !this.modal.curtainMode;
           if(change_modal_height){
             modalEl.height(inner.height());
-            form.css('opacity', 0.5);
           }
           inner.find('#' + this.getAttribute('data-target')).addClass('active').siblings('.active').removeClass('active');
           $(this).addClass('active').siblings('.active').removeClass('active');
@@ -209,9 +208,8 @@ window.$ = Razorpay.prototype.$;
           if(change_modal_height){
             modalEl.height(inner.height());
             setTimeout(function(){
-              form.css('opacity', 1);
               modalEl.height('');
-            }, 250);
+            }, 300);
           }
         });
       }
@@ -263,7 +261,10 @@ window.$ = Razorpay.prototype.$;
     // close on backdrop click and remove errors
     renew: function() {
       if (discreet.$el) {
-        discreet.$el.find('.error').html('');
+        var errorForm = discreet.$el.find('.has-error');
+        if(errorForm.length){
+          errorForm.removeClass('has-error').css('paddingTop', '');
+        }
       }
       discreet.modal.options.backdropClose = true;
     },
@@ -295,13 +296,15 @@ window.$ = Razorpay.prototype.$;
         var error_el = discreet.$el.find('input[name="'+response.error.field+'"]');
         if (error_el.length){
           error_el.closest('.elem').addClass('invalid');
+          error_el.focus();
         }
       }
 
       var defaultMessage = 'There was an error in handling your request';
       var message = response.error.description || defaultMessage;
 
-      discreet.$el.find('.error').html(message);
+      var error_ht = modalEl.find('.error').html(message)[0].offsetHeight;
+      modalEl.find('.error-container').addClass('has-error').css('paddingTop', error_ht);
     }
   }
 

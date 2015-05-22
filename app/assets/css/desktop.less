@@ -4,7 +4,7 @@
 @color: #7f7f7f;
 @border-color: #e6e6e6;
 @background-color: #fafafa;
-@danger: #ef1818;
+@danger: #f46060;
 
 @width: 320px;
 @padding: 20px;
@@ -314,13 +314,31 @@ body{
   background-color: @danger;
 }
 .error{
-  margin: -6px 0 15px;
-  color: @danger;
-  text-align:center;
+  left: 0;
+  right: 0;
+  position: absolute;
+  margin: 0 -@padding;
+  background-color: @danger;
+  color: #fff;
+  text-align: center;
+  line-height: 18px;
+  padding: 10px 20px 12px;
+  overflow: hidden;
+  .transition(0.3s);
+  bottom: 100%;
   li{
     list-style: none;
     font-size: @font-size;
   }
+}
+.error-container{
+  position: relative;
+  overflow: hidden;
+  margin: 0 -@padding;
+  .transition(0.3s);
+}
+.error-container.has-error .error{
+  bottom: 0;
 }
 .modal iframe{
   border: none;
