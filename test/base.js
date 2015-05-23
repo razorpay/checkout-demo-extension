@@ -12,13 +12,9 @@ var optionsExtended = {
   'name': 'Daft Punk',
   'description': 'Tron Legacy',
   'image': 'https://i.imgur.com/3g7nmJC.png',
-  'netbanking': true,
   'handler': function (transaction) {
     alert("You have successfully purchased " + options.description);
   },
-  'oncancel': function(){},
-  'onhidden': function(){},
-  'netbanking': 'true',
   'prefill': {
     'name': 'Shashank Mehta',
     'email': 'sm@razorpay.com',
@@ -68,6 +64,7 @@ describe("configure method", function(){
     for(var i in co.options.notes){
       expect(co.options.notes[i]).toBe(optionsExtended.notes[i]);
     }
+    expect(co.options.handler).toBe(optionsExtended.handler);
   });
 
   it("should not set unknown option", function(){
