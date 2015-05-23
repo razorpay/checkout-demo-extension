@@ -57,7 +57,7 @@
     discreet.removeMessageListener();
     discreet.isOpen = false;
     $('body').css('overflow', discreet.merchantData.bodyOverflow);
-    
+
     if(this.checkoutFrame){
       this.checkoutFrame.hide();
       if(this.checkoutFrame.data('removable')){
@@ -93,7 +93,7 @@
       return;
     }
     var event = data.event;
-    
+
     if(event == 'load'){
       var options = {};
       for(var i in this.options){
