@@ -77,6 +77,9 @@
   // to handle absolute/relative url of options.image
   discreet.setImageOption = function(options){
     if(typeof options.image == 'string'){
+      if(/data:image\/[^;]+;base64/.test(options.image)){
+        return;
+      }
       if(options.image.indexOf('http')){ // not 0
         var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
         if(options.image[0] != '/'){
