@@ -216,8 +216,13 @@ window.$ = Razorpay.prototype.$;
         return false; // prevent default
       });
 
-      if(discreet.qpmap && discreet.qpmap.error){
-        discreet.errorHandler(qpmap);
+      if(discreet.qpmap){
+        if(discreet.qpmap.tab){
+          $('.tabs li[data-target=tab-'+discreet.qpmap.tab+']').click()
+        }
+        if(discreet.qpmap.error){
+          discreet.errorHandler(qpmap)
+        }
       }
     },
 
