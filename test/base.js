@@ -61,7 +61,7 @@ describe("configure method", function(){
     expect(co.options.name).toBe(optionsExtended.name);
     expect(co.options.description).toBe(optionsExtended.description);
     expect(co.options.image).toBe(optionsExtended.image);
-    expect(Object.keys(co.options.notes).length).toBe(Object.keys(optionsExtended.notes).length)
+    expect(Object.keys(co.options.notes).length).toBe(Object.keys(optionsExtended.notes).length);
     expect(co.options.prefill.name).toBe(optionsExtended.prefill.name);
     expect(co.options.prefill.contact).toBe(optionsExtended.prefill.contact);
     expect(co.options.prefill.email).toBe(optionsExtended.prefill.email);
@@ -73,13 +73,6 @@ describe("configure method", function(){
   it("should not set unknown option", function(){
     expect(co.options.unwanted).toBeUndefined();
   });
-
-  it("should set handler as null if not passed", function(){
-    var local = $.extend({}, custom);
-    delete local.handler;
-    var co = new Razorpay(local);
-    expect(co.options.handler).toBe(null);
-  })
 
   it("should set signature", function(){
     var local = $.extend({}, custom);

@@ -122,7 +122,7 @@
 
     for (var i in defaults){
       if(i != 'parent' && typeof defaults[i] == 'object'){
-        var subObject = defaults[i];
+        var subObject = i == 'notes' ? (overrides[i] || {}) : defaults[i];
         this.options[i] = this.options[i] || {};
         for(var j in subObject){
           discreet.setOption(j, this.options[i], overrides[i], subObject);
