@@ -148,6 +148,7 @@ window.$ = Razorpay.prototype.$;
 
     showModal: function() {
       $('#loading').remove();
+      discreet.renew();
       if(discreet.modal){
         return discreet.modal.show();
       }
@@ -168,8 +169,6 @@ window.$ = Razorpay.prototype.$;
       }
 
       discreet.modal = new Modal(discreet.$el, modalOptions);
-
-      discreet.renew();
 
       discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
         var parent;
@@ -193,19 +192,20 @@ window.$ = Razorpay.prototype.$;
           }
           var form = inner.find('.form');
           var modalEl = inner.parent();
-          var change_modal_height = true;// !this.modal.curtainMode;
+          var change_modal_height = !discreet.modal.curtainMode;
+          
           if(change_modal_height){
-            modalEl.height(inner.height());
+            modalEl[0].style.height = inner[0].offsetHeight + 'px';
+            modalEl.addClass('animate');
           }
+
           inner.find('#' + this.getAttribute('data-target')).addClass('active').siblings('.active').removeClass('active');
           $(this).addClass('active').siblings('.active').removeClass('active');
 
-          $('.nb-na').toggle();
-
           if(change_modal_height){
-            modalEl.height(inner.height());
+            modalEl[0].style.height = inner[0].offsetHeight + 'px';
             setTimeout(function(){
-              modalEl.height('');
+              modalEl.removeClass('animate').height('');
             }, 300);
           }
         });
@@ -268,7 +268,9 @@ window.$ = Razorpay.prototype.$;
           errorForm.removeClass('has-error').css('paddingTop', '');
         }
       }
-      discreet.modal.options.backdropClose = true;
+      if(discreet.modal){
+        discreet.modal.options.backdropClose = true;
+      }
     },
 
     hide: function(){

@@ -8,10 +8,22 @@
   var Popup = Razorpay.prototype.Popup;
   var discreet = Razorpay.prototype.discreet;
 
+  discreet.popupClose = function(){
+    try{
+      if(this.popup && typeof this.popup.close == 'function'){
+        if(this.popup.window){
+          this.rzp.hedwig.sendMessage('{"pingback": true}', '*', this.popup.window);
+        }
+        this.popup.close();
+      }
+    } catch(e){
+      return; // TODO rollbar
+    }
+  }
   discreet.paymentSuccess = function(data){
     // this == request
     if(this.popup && typeof this.popup.close == 'function'){
-      this.popup.close();
+      discreet.popupClose.call(this);
     }
     if(typeof this.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
       this.success.call(null, {razorpay_payment_id: data.razorpay_payment_id}); // dont expose request as this
@@ -35,16 +47,16 @@
       return;
     }
 
-    if(typeof this.popup != 'undefined'){
-      this.popup.close();
-    }
-
     if (data.error && data.error.description){
       if(typeof this.error === 'function'){
         this.error(data);
       }
     } else {
       discreet.paymentSuccess.call(this, data);
+    }
+
+    if(typeof this.popup != 'undefined'){
+      discreet.popupClose(this);
     }
     // remove postMessage listener
     discreet.removeMessageListener();
@@ -77,12 +89,10 @@
 
   discreet.error = function(response){
     // this == request
-    if(this.popup && typeof this.popup.close == 'function'){
-      this.popup.close();
-    }
     if(typeof this.error == 'function'){
       this.error.call(null, response); // dont expose request as this
     }
+    discreet.popupClose(this);
   }
 
   discreet.getAjaxSuccess = function(request){
