@@ -11,10 +11,19 @@
   discreet.popupClose = function(){
     try{
       if(this.popup && typeof this.popup.close == 'function'){
-        if(this.popup.window){
-          this.rzp.hedwig.sendMessage('{"pingback": true}', '*', this.popup.window);
-        }
         this.popup.close();
+        if(this.popup.window.closed){
+          return;
+        }
+        var self = this;
+        var popup_close = function(){
+          self.rzp.hedwig.sendMessage('{"pingback": "payment_complete"}', '*', self.popup.window);
+        }
+        if(this.popup._loaded){
+          popup_close();
+        } else {
+          this.popup.loaded = popup_close;
+        }
       }
     } catch(e){
       return; // TODO rollbar
@@ -47,16 +56,16 @@
       return;
     }
 
+    if(typeof this.popup != 'undefined'){
+      discreet.popupClose.call(this);
+    }
+
     if (data.error && data.error.description){
       if(typeof this.error === 'function'){
         this.error(data);
       }
     } else {
       discreet.paymentSuccess.call(this, data);
-    }
-
-    if(typeof this.popup != 'undefined'){
-      discreet.popupClose(this);
     }
     // remove postMessage listener
     discreet.removeMessageListener();
@@ -89,10 +98,10 @@
 
   discreet.error = function(response){
     // this == request
+    discreet.popupClose.call(this);
     if(typeof this.error == 'function'){
       this.error.call(null, response); // dont expose request as this
     }
-    discreet.popupClose(this);
   }
 
   discreet.getAjaxSuccess = function(request){
