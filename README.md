@@ -3,7 +3,7 @@
 1. Install harp (`npm install -g harp`)
 2. Run harp (`harp server`) in `app/assets` directory.
 3. Start development in `app/assets`
-4. Open `localhost:9000/assets/layout.html` via http(s) in your browser.
+4. Open `localhost:9000/assets/manual-demo` or `localhost:9000/assets/auto-demo` via http(s) in your browser.
 
 5. Install npm supporting packages (`npm install`).
 6. Install karma, which we use for testing `npm install -g karma-cli`.

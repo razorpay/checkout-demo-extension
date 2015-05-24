@@ -183,13 +183,15 @@
 
   discreet.addButton = function(rzp){
     var button = document.createElement('input');
-    button.type = 'button';
+    var form = discreet.currentScript.parentNode;
+    button.type = 'submit';
     button.value = 'Pay Now';
     button.className = 'razropay-payment-button';
-    $(button).click(function(e){
-      rzp.open();
+    $(form).submit(function(e){
       e.preventDefault();
-    }).appendTo(discreet.currentScript.parentNode);
+      rzp.open();
+      return false;
+    }).append(button);
   };
   var key = discreet.currentScript.getAttribute('data-key');
   if (key && key.length > 0){

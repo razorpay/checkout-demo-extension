@@ -153,6 +153,7 @@ window.$ = Razorpay.prototype.$;
         return discreet.modal.show();
       }
 
+      $('.nb-na').remove();
       discreet.showNetbankingList();
       discreet.sanitizeOptions(discreet.options);
       discreet.$el = $((doT.compile(templates.modal))(discreet.options));

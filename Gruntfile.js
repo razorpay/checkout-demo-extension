@@ -33,17 +33,17 @@ module.exports = function(grunt){
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
       },
       copy_html:{
-        cmd: 'cp app/srv/checkout.html app/dist/v1/'
+        cmd: 'cp app/srv/*.html app/dist/v1/'
       }
     },
     useminPrepare:{
-      html:['app/srv/layout.html', 'app/srv/checkout.html'],
+      html:['app/srv/*.html'],
       options: {
         dest: 'app/dist/v1' //dist is the only directory served
       }
     },
     usemin:{
-      html:'app/dist/v1/checkout.html',
+      html:'app/dist/v1/*.html',
       options: {
         dest: 'app/dist/v1' //dist is the only directory served
       }
