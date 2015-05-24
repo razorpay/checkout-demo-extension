@@ -160,7 +160,7 @@ describe("XDCallback should", function(){
   });
 
   afterEach(function(){
-    discreet.listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
+    discreet.xdm._listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
     expect(spyCalled).toHaveBeenCalled();
   })
 
