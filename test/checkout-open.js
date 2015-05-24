@@ -1,6 +1,7 @@
 var options = {
 	'key': 'key_id',
 	'amount': '5100',
+  'name': 'Merchant Name',
 	'netbanking': 'true',
 	'prefill': {
 	  'name': 'Shashank Mehta',
@@ -26,6 +27,10 @@ describe("Checkout should handle frame message", function(){
 	});
 })
 
+/**
+ * validateOptions method in Razorpay calls validateCheckout
+ * which tests Checkout specific options only
+ */
 describe("checkout validate", function(){
   var init_options, errors, field;
 
@@ -35,8 +40,8 @@ describe("checkout validate", function(){
 		});
 
 		afterEach(function(){
-		  expect(errors.length).toBe(1);
-		  expect(errors[0].field).toBe(field);
+      expect(errors.length).toBe(1);
+      expect(errors[0].field).toBe(field);
 		});
 
 		it("display_currency is present and not USD", function(){

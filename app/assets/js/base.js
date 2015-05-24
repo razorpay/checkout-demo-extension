@@ -97,7 +97,7 @@
       }
       return;
     }
-    
+
     var overrideValue = overrides[key];
     if(typeof defaultValue == 'string' && typeof overrideValue != 'undefined' && typeof overrideValue != 'string'){
       overrideValue = String(overrideValue);
@@ -185,6 +185,13 @@
           message: 'Invalid amount specified',
           field: 'amount'
         });
+      }
+
+      if (typeof options.name === 'undefined'){
+        errors.push({
+          message: 'Merchant name cannot be empty',
+          field: 'name'
+        })
       }
 
       if (typeof options.notes === 'object'){

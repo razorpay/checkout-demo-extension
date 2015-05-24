@@ -5,6 +5,7 @@ var discreet = Razorpay.prototype.discreet;
 var options = {
   'key': 'key_id',
   'amount': '40000',
+  'name': 'Merchant Name',
   'host': 'api.razorpay.dev'
 }
 
@@ -197,7 +198,7 @@ describe("navigatePopup method should", function(){
     spyOn($, 'ajax').and.callFake($.noop);
     var req = jQuery.extend(true, {error: $.noop}, request);
     rzp.submit(req);
-    
+
     req.popup = 'pop';
     var spyCalled = jasmine.createSpy();
     spyOn(req, 'error').and.callFake(spyCalled);
