@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
-  <form action="/hello">
+  <form action="https://razorpay.com/">
     we've got plenty o' steel for fightin' men.
     <input placeholder="Required Field*" required>
     <input placeholder="Pattern Min 3 Chars" pattern=".{3,}">
@@ -79,7 +79,7 @@
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
     }
-    input[type=submit]{
+    .razorpay-payment-button{
       line-height: 48px;
       border: 1px solid transparent;
       background: #fff;
@@ -95,6 +95,9 @@
       background-image: url('images/demo-shop.jpg');
       background-size: cover;
       background-attachment: fixed;
+      position: absolute;
+      height: 100%;
+      width: 100%;
     }
   </style>
 </body>

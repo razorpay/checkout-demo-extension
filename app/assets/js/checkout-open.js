@@ -187,7 +187,7 @@
     var form = discreet.currentScript.parentNode;
     button.type = 'submit';
     button.value = 'Pay Now';
-    button.className = 'razropay-payment-button';
+    button.className = 'razorpay-payment-button';
     $(form).submit(function(e){
       if(discreet.isOpen){
         return;
