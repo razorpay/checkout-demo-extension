@@ -189,6 +189,9 @@
     button.value = 'Pay Now';
     button.className = 'razropay-payment-button';
     $(form).submit(function(e){
+      if(discreet.isOpen){
+        return;
+      }
       e.preventDefault();
       rzp.open();
       return false;
