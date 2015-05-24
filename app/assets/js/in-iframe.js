@@ -60,7 +60,7 @@ window.$ = Razorpay.prototype.$;
         }
       });
 
-      if(!netbanking || form.find('.tabs .active').data('target') == 'tab-cc'){
+      if(!netbanking || form.find('.tabs .active').data('target') == 'tab-card'){
         delete data.bank;
         data['card[number]'] = data['card[number]'].replace(/\ /g, '');
         expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
@@ -83,7 +83,7 @@ window.$ = Razorpay.prototype.$;
         return discreet.rzp.getNetbankingList(discreet.showNetbankingList);
       }
       if(nblist.error){
-        $('#tab-nb .elem').hide();
+        $('#tab-netbanking .elem').hide();
         $('.error').append('<li class="nb-na">Netbanking is not available right now. Please try later.</li>');
         return;
       }
@@ -95,7 +95,7 @@ window.$ = Razorpay.prototype.$;
         }
         optionsString += '<option value="'+i+'">' + nblist[i] + '</option>';
       }
-      $('#tab-nb .select').removeClass('loading').find('select').html(optionsString).prop('disabled', false);
+      $('#tab-netbanking .select').removeClass('loading').find('select').html(optionsString).prop('disabled', false);
     },
 
     sanitizeDOM: function(obj){
@@ -257,7 +257,9 @@ window.$ = Razorpay.prototype.$;
       })
       discreet.postMessage({
         event: 'submit',
-        data: data
+        data: {
+          method: data.method
+        }
       });
     },
 

@@ -115,8 +115,9 @@
     }
 
     else if (event == 'submit'){
-      // TODO save customer data
-      true;
+      if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit == 'function'){
+        window.CheckoutBridge.onsubmit(JSON.stringify(data.data));
+      }
     }
 
     else if (event == 'cancel'){

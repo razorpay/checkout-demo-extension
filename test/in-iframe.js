@@ -420,7 +420,7 @@ describe("Razorpay open netbanking page", function(){
 
     // using Razorpay.$ due to some bug in phantomjs
     // The bug turns up when there are two jquery involved
-    $('.tabs li[data-target="tab-nb"]').click();
+    $('.tabs li[data-target="tab-netbanking"]').click();
   });
 
   afterEach(function(){
@@ -429,8 +429,8 @@ describe("Razorpay open netbanking page", function(){
   })
 
   it("should show netbanking form on clicking", function(){
-    expect($('#tab-nb').hasClass('active')).toBe(true);
-    expect($('#tab-cc').hasClass('active')).toBe(false);
+    expect($('#tab-netbanking').hasClass('active')).toBe(true);
+    expect($('#tab-card').hasClass('active')).toBe(false);
   });
 
   describe("and submit method", function(){

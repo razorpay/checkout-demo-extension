@@ -51,10 +51,10 @@ templates.modal = '
           </div>
           {{if(it.method.netbanking){}}
             <ul class="tabs">
-              <li data-target="tab-cc" class="active">Card</li>
-              <li data-target="tab-nb">Net Banking</li>
+              <li data-target="tab-card" class="active">Card</li>
+              <li data-target="tab-netbanking">Net Banking</li>
             </ul>
-            <div class="fieldset tab-content" id="tab-nb">
+            <div class="fieldset tab-content" id="tab-netbanking">
               <div class="elem select loading" style="border-radius: 4px">
                 <div class="elem-inner">
                   <select name="bank" disabled required class="input" pattern="[\\w]+">
@@ -69,7 +69,7 @@ templates.modal = '
               </div>
             </div>
           {{}}}
-          <div class="fieldset tab-content active" id="tab-cc">
+          <div class="fieldset tab-content active" id="tab-card">
             <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
               <div class="elem-inner">
                 <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
