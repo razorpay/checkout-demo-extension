@@ -120,9 +120,9 @@
       }
     }
 
-    else if (event == 'cancel'){
-      if(typeof this.options.modal.oncancel == 'function')
-        this.options.modal.oncancel()
+    else if (event == 'dismiss'){
+      if(typeof this.options.modal.ondismiss == 'function')
+        this.options.modal.ondismiss()
     }
 
     else if (event == 'hidden'){

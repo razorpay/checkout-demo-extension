@@ -30,7 +30,7 @@
       email: ''
     },
     modal: {
-      oncancel: $.noop,
+      ondismiss: $.noop,
       onhidden: $.noop
     },
     amount: '',

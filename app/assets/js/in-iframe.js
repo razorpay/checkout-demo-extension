@@ -162,7 +162,7 @@ window.$ = Razorpay.prototype.$;
       // init modal
       var modalOptions = {
         onhide: function(){
-          discreet.postMessage({event: 'cancel'});
+          discreet.postMessage({event: 'dismiss'});
         },
         onhidden: function(){
           discreet.postMessage({event: 'hidden'});

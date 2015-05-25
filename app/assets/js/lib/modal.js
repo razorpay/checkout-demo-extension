@@ -38,7 +38,9 @@
       }
     }
     if(!this.curtainMode && window.screen){
-      if(screen.width < 450 || screen.height < 450){
+      var dpr = (typeof window.devicePixelRatio == 'number') ? window.devicePixelRatio : 1;
+      var dim = Math.min(screen.width, screen.height)/dpr;
+      if(dim < 450){
         this.curtainMode = true;
         this.element.addClass('curtain');
       }
