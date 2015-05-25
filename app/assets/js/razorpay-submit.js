@@ -68,7 +68,7 @@
       discreet.paymentSuccess.call(this, data);
     }
     // remove postMessage listener
-    discreet.removeMessageListener();
+    discreet.xdm.removeMessageListener();
   };
 
   discreet.apiResponseHandler = {
@@ -87,7 +87,7 @@
       else if(success){
         discreet.paymentSuccess.call(this, {razorpay_payment_id: payment_id});
       }
-      
+
       else if(typeof request == 'object'){
         if(request.url){
           return discreet.navigatePopup.call(this, request);
@@ -111,7 +111,7 @@
         if(typeof successCallback == 'function'){
           return successCallback.call(request, response);
         }
-      }    
+      }
       if (response.razorpay_payment_id) {
         discreet.paymentSuccess.call(request, response);
       }
@@ -119,7 +119,7 @@
       else if (response.http_status_code !== 200){
         discreet.error.call(request, response);
       }
-      
+
       else if (response.callbackUrl){
         var nextRequest = {
           autosubmit: response.data,
@@ -128,7 +128,7 @@
         nextRequest.autosubmit.callbackUrl = response.callbackUrl;
         discreet.navigatePopup.call(request, nextRequest);
       }
-      
+
       else if (response.redirectUrl){
         var nextRequest = {
           location: response.redirectUrl,
@@ -147,14 +147,14 @@
         ccHubLocation: rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php'
       });
     }
-    
-    discreet.addMessageListener(discreet.XDCallback, request);
+
+    discreet.xdm.addMessageListener(discreet.XDCallback, request);
 
     var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
     if (typeof request.error == 'function'){
       popup.onClose(discreet.getPopupClose(request));
     }
-    
+
     popup._loaded = false;
     popup.loaded = function(){};
   }
@@ -238,5 +238,5 @@
       });
     }
   }
-  
+
 })();

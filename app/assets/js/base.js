@@ -44,49 +44,55 @@
     redirect: false
   };
 
-  discreet.getMessageCallback = function(callback, context){
-    return function(e){
-      if(!e || !e.data || typeof callback != 'function'){
-        return;
-      }
-      var data = e.data;
-      if(typeof data == 'string'){
-        try {
-          data = JSON.parse(data);
+  /**
+   * Cross Domain Post Message
+   * Generic functions
+   */
+  discreet.xdm = {
+    _getMessageCallback:  function(callback, context){
+      return function(e){
+        if(!e || !e.data || typeof callback != 'function'){
+          return;
         }
-        catch(e){
-          data = {
-            error: {
-              description: 'Unable to parse response'
+        var data = e.data;
+        if(typeof data == 'string'){
+          try {
+            data = JSON.parse(data);
+          }
+          catch(e){
+            data = {
+              error: {
+                description: 'Unable to parse response'
+              }
             }
           }
         }
+        callback.call(context, e, data);
       }
-      callback.call(context, e, data);
-    }
-  }
+    },
 
-  discreet.listener = null;
+    _listener: null,
 
-  discreet.addMessageListener = function(callback, context) {
-    if(discreet.listener){
-      discreet.removeMessageListener();
-    }
-    discreet.listener = discreet.getMessageCallback(callback, context);
-    if (window.addEventListener) {
-      window.addEventListener('message', discreet.listener, false);
-    } else if(window.attachEvent){
-      window.attachEvent('onmessage', discreet.listener);
-    }
-  }
+    addMessageListener: function(callback, context) {
+      if(discreet.xdm._listener){
+        discreet.xdm.removeMessageListener();
+      }
+      discreet.xdm._listener = discreet.xdm._getMessageCallback(callback, context);
+      if (window.addEventListener) {
+        window.addEventListener('message', discreet.xdm._listener, false);
+      } else if(window.attachEvent){
+        window.attachEvent('onmessage', discreet.xdm._listener);
+      }
+    },
 
-  discreet.removeMessageListener = function() {
-    if (window.removeEventListener) {
-      window.removeEventListener('message', discreet.listener, false);
-    } else if(window.detachEvent){
-      window.detachEvent('onmessage', discreet.listener);
+    removeMessageListener: function() {
+      if (window.removeEventListener) {
+        window.removeEventListener('message', discreet.xdm._listener, false);
+      } else if(window.detachEvent){
+        window.detachEvent('onmessage', discreet.xdm._listener);
+      }
+      discreet.xdm._listener = null;
     }
-    discreet.listener = null;
   }
 
   discreet.setOption = function(key, options, overrides, defaults){
@@ -97,7 +103,7 @@
       }
       return;
     }
-    
+
     var overrideValue = overrides[key];
     if(typeof defaultValue == 'string' && typeof overrideValue != 'undefined' && typeof overrideValue != 'string'){
       overrideValue = String(overrideValue);
@@ -185,6 +191,13 @@
           message: 'Invalid amount specified',
           field: 'amount'
         });
+      }
+
+      if (typeof options.name === 'undefined'){
+        errors.push({
+          message: 'Merchant name cannot be empty',
+          field: 'name'
+        })
       }
 
       if (typeof options.notes === 'object'){

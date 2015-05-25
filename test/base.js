@@ -1,6 +1,7 @@
 var options = {
   'key': 'key_id',
-  'amount': '40000'
+  'amount': '40000',
+  'name': 'Merchant Name'
 }
 
 var optionsExtended = {
@@ -149,6 +150,11 @@ describe("init options validation", function(){
       init_options.handler = 'string';
       field = 'handler';
     });
+
+    it("when merchant name is not passed", function(){
+      delete init_options.name;
+      field = 'name';
+    })
   });
 
   describe("should not return error", function(){
@@ -171,10 +177,6 @@ describe("init options validation", function(){
 
     it("when notes is not defined", function(){
       delete init_options.notes;
-    });
-
-    it("when name is not defined", function(){
-      delete init_options.name;
     });
 
     it("when amount is in string", function(){

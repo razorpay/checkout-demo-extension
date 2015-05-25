@@ -21,7 +21,7 @@
     discreet.merchantData.bodyOverflow = $body[0].style.overflow; // dont use $body.css, that will give real css value, we want just the js override, preferably blank string.
     $body.css('overflow', 'hidden');
 
-    discreet.addMessageListener(discreet.onFrameMessage, this);
+    discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
 
     if(!this.checkoutFrame){
       var parent = $(this.options.parent);
@@ -54,7 +54,7 @@
   }
 
   discreet.onClose = function(){
-    discreet.removeMessageListener();
+    discreet.xdm.removeMessageListener();
     discreet.isOpen = false;
     $('body').css('overflow', discreet.merchantData.bodyOverflow);
 
