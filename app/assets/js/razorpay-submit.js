@@ -12,7 +12,7 @@
     try{
       if(this.popup && typeof this.popup.close == 'function'){
         this.popup.close();
-        if(this.popup.window.closed){
+        if(this.popup.window && this.popup.window.closed){
           return;
         }
         var self = this;
