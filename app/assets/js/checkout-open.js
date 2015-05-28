@@ -76,7 +76,7 @@
 
   // to handle absolute/relative url of options.image
   discreet.setImageOption = function(options){
-    if(typeof options.image == 'string'){
+    if(options.image && typeof options.image == 'string'){
       if(/data:image\/[^;]+;base64/.test(options.image)){
         return;
       }
