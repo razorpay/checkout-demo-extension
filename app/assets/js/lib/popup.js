@@ -138,7 +138,7 @@
   */
 
   Popup.prototype._checkClose = function () {
-    if (this.window.closed) {
+    if (this.window && this.window.closed) {
       clearInterval(this.interval);
       this.close();
       if(typeof this.closeCB === 'function'){
