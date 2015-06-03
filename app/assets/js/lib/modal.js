@@ -22,29 +22,7 @@
     this.options = $.extend(defaults, options);
     this.element = element;
     this.modalElement = element.children(this.options.modalSelector);
-    if (window.matchMedia){
-      var query;
-      // device-width doesn't work well in android app/cordova
-      // browser is good though
-      if(window.CheckoutBridge){
-        query = '(max-height: 450px),(max-width: 450px)';
-      } else {
-        query = '(max-device-height: 450px),(max-device-width: 450px)';
-      }
-      var match = matchMedia(query);
-      if(match && match.matches){
-        this.curtainMode = true;
-        this.element.addClass('curtain');
-      }
-    }
-    if(!this.curtainMode && window.screen){
-      var dpr = (typeof window.devicePixelRatio == 'number') ? window.devicePixelRatio : 1;
-      var dim = Math.min(screen.width, screen.height)/dpr;
-      if(dim < 450){
-        this.curtainMode = true;
-        this.element.addClass('curtain');
-      }
-    }
+    
     if (!this.element.attr('tabIndex')) {
       this.element.attr('tabIndex', '0');
     }
@@ -70,6 +48,9 @@
     }
 
     this.animationDuration = duration;
+    if(duration){
+      this.modalElement.addClass('animate')
+    }
 
     if (this.options.show) {
       this.show();
@@ -107,6 +88,12 @@
 
     show: function() {
       // $(document.body).css('overflow', 'hidden');
+      var footer = this.modalElement.find('.footer');
+      if(footer.length && footer.css('position') == 'fixed'){
+        this.curtainMode = footer;
+        footer.css('width', innerWidth);
+      }
+
       this.isShown = true;
       this.bind_events();
       this.element[0].style.display = 'block';
@@ -120,12 +107,18 @@
     },
 
     shown: function() {
-      return this.clearTimeout();
+      this.clearTimeout();
+      if(this.curtainMode){
+        this.curtainMode.show();
+      }
     },
 
     hide: function() {
       if (!this.isShown) {
         return;
+      }
+      if(this.curtainMode){
+        this.curtainMode.hide();
       }
       this.isShown = false;
       this.element.removeClass(this.options.shownClass);
@@ -178,23 +171,26 @@
         this.element[0].addEventListener('blur', this.steal_focus, true);
       }
       
-      if (this.curtainMode){
+      // if (this.curtainMode){
         this.on('click', this.element.find(this.options.closeButton), this.hide);
         this.on('resize', $(window), function(){
-          // scrollTo(0,0);
-          // this.element.height(innerHeight);
+          var self = this;
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
             if(rect.bottom > innerHeight - 52){
-              var self = this;
               setTimeout(function(){
                 self.modalElement.scrollTop(self.modalElement.scrollTop() - innerHeight + rect.bottom + 100)
               }, 400)
             }
           }
+          if(this.curtainMode){
+            setTimeout(function(){
+              self.curtainMode.css('width', innerWidth)
+            }, 0)
+          }
         })
-      }
+      // }
       
       if (this.options.stopKeyPropagation) {
         this.on('keyup keydown keypress', this.element, function(e) {
