@@ -93,7 +93,7 @@ templates.modal = '
               </div>
             </div>
           </div>
-          <div class="footer clear">
+          <div class="footer">
             <button class="submit" type="submit">
               <span class="ring"></span>
               <span class="text">

@@ -87,13 +87,6 @@
     },
 
     show: function() {
-      // $(document.body).css('overflow', 'hidden');
-      var footer = this.modalElement.find('.footer');
-      if(footer.length && footer.css('position') == 'fixed'){
-        this.curtainMode = footer;
-        footer.css('width', innerWidth);
-      }
-
       this.isShown = true;
       this.bind_events();
       this.element[0].style.display = 'block';
@@ -108,17 +101,11 @@
 
     shown: function() {
       this.clearTimeout();
-      if(this.curtainMode){
-        this.curtainMode.show();
-      }
     },
 
     hide: function() {
       if (!this.isShown) {
         return;
-      }
-      if(this.curtainMode){
-        this.curtainMode.hide();
       }
       this.isShown = false;
       this.element.removeClass(this.options.shownClass);
@@ -183,11 +170,6 @@
                 self.modalElement.scrollTop(self.modalElement.scrollTop() - innerHeight + rect.bottom + 100)
               }, 400)
             }
-          }
-          if(this.curtainMode){
-            setTimeout(function(){
-              self.curtainMode.css('width', innerWidth)
-            }, 0)
           }
         })
       // }
