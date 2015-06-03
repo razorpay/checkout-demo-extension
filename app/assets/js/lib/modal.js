@@ -108,6 +108,9 @@
         return;
       }
       this.isShown = false;
+      if(this.animationDuration){
+        this.modalElement.addClass('animate');
+      }
       this.element.removeClass(this.options.shownClass);
       for(var i = 0; i < this.listeners.length; i++){
         var l = this.listeners[i];
@@ -165,9 +168,10 @@
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
-            if(rect.bottom > innerHeight - 52){
+            window.rect = rect;
+            if(rect.bottom > innerHeight - 20){
               setTimeout(function(){
-                self.modalElement.scrollTop(self.modalElement.scrollTop() - innerHeight + rect.bottom + 100)
+                scrollTo(0, pageYOffset - innerHeight + rect.bottom + 20)
               }, 400)
             }
           }

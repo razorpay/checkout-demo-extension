@@ -30,6 +30,7 @@
       this.checkoutFrame = discreet.createFrame();
       parent.append(this.checkoutFrame);
     } else {
+      discreet.setMetaViewport();
       this.checkoutFrame.show();
       discreet.sendFrameMessage.call(this, {event: 'open'});
     }
@@ -58,6 +59,13 @@
     discreet.isOpen = false;
     $('body').css('overflow', discreet.merchantData.bodyOverflow);
 
+    if(discreet.merchantData.metaViewport){
+      var $head = $('head');
+      $head.find('meta[name=viewport]').remove();
+      $head.append(discreet.merchantData.metaViewport); // please do not chain
+      discreet.merchantData.metaViewport = null;
+    }
+      
     if(this.checkoutFrame){
       this.checkoutFrame.hide();
       if(this.checkoutFrame.data('removable')){
@@ -90,6 +98,16 @@
     }
   }
 
+  discreet.setMetaViewport = function(){
+    if(!discreet.merchantData.metaViewport){
+      discreet.merchantData.metaViewport = $('meta[name]').filter(function(i, el){
+        var name = el.getAttribute('name');
+        return (typeof name == 'string') && (name.toLowerCase() == 'viewport');
+      }).remove();
+      $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1">');
+    }
+  }
+
   discreet.onFrameMessage = function(e, data){
     // this == rzp
     if((typeof e.origin != 'string') || !this.checkoutFrame || (discreet.checkoutUrl.replace(/^https?/,'').indexOf(e.origin.replace(/^https?/,'')) == -1) || (data.source != 'frame')){ // source check
@@ -98,6 +116,7 @@
     var event = data.event;
 
     if(event == 'load'){
+      discreet.setMetaViewport();
       var options = {};
       for(var i in this.options){
         var value = this.options[i];
