@@ -1,3 +1,5 @@
+[![wercker status](https://app.wercker.com/status/1f8380cb72c916c46521d02d52e0174d/m "wercker status")](https://app.wercker.com/project/bykey/1f8380cb72c916c46521d02d52e0174d)
+
 #Setup Instructions
 
 1. Install harp (`npm install -g harp`)
