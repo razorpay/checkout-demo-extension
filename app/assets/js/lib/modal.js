@@ -168,10 +168,9 @@
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
-            window.rect = rect;
-            if(rect.bottom > innerHeight - 20){
+            if(rect.bottom > innerHeight - 50){
               setTimeout(function(){
-                scrollTo(0, pageYOffset - innerHeight + rect.bottom + 20)
+                self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
               }, 400)
             }
           }
