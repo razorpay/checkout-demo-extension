@@ -49,12 +49,17 @@ templates.modal = '
               </div>
             </div>
           </div>
-          {{if(it.method.netbanking){}}
+          {{if(it.method.netbanking && it.method.card){}}
             <ul class="tabs">
               <li data-target="tab-card" class="active">Card</li>
               <li data-target="tab-netbanking">Net Banking</li>
             </ul>
             <div class="fieldset tab-content" id="tab-netbanking">
+          {{} else if(!it.method.card){}}
+            <div class="fieldset tab-content active" id="tab-netbanking">
+          {{}}}
+          {{if(it.method.netbanking){}}
+              <input type="hidden" name="method" value="netbanking">
               <div class="elem select loading" style="border-radius: 4px">
                 <div class="elem-inner">
                   <select name="bank" disabled required class="input" pattern="[\\w]+">
@@ -69,30 +74,33 @@ templates.modal = '
               </div>
             </div>
           {{}}}
-          <div class="fieldset tab-content active" id="tab-card">
-            <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
-              <div class="elem-inner">
-                <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
-              </div>
-            </div>
-            <div class="elem elem-card">
-              <div class="elem-inner">
-                <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
-              </div>
-            </div>
-            <div class="double">
-              <div class="elem elem-expiry" style="border-radius: 0 0 0 4px">
+          {{if(it.method.card){}}
+            <div class="fieldset tab-content active" id="tab-card">
+              <input type="hidden" name="method" value="card">
+              <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
                 <div class="elem-inner">
-                  <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
+                  <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
                 </div>
               </div>
-              <div class="elem elem-cvv" style="border-radius: 0 0 4px 0">
+              <div class="elem elem-card">
                 <div class="elem-inner">
-                  <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
+                  <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
+                </div>
+              </div>
+              <div class="double">
+                <div class="elem elem-expiry" style="border-radius: 0 0 0 4px">
+                  <div class="elem-inner">
+                    <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
+                  </div>
+                </div>
+                <div class="elem elem-cvv" style="border-radius: 0 0 4px 0">
+                  <div class="elem-inner">
+                    <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          {{}}}
           <div class="footer">
             <button class="submit" type="submit">
               <span class="ring"></span>

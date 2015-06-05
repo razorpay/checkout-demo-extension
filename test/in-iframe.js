@@ -6,7 +6,10 @@ var coOptions = {
   'name': 'Daft Punk',
   'description': 'Tron Legacy',
   'image': 'https://i.imgur.com/3g7nmJC.png',
-  'netbanking': 'true',
+  'method': {
+    'netbanking': 1,
+    'card': 1
+  },
   'prefill': {
     'name': 'Shashank Mehta',
     'email': 'sm@razorpay.com',
@@ -88,6 +91,9 @@ describe("in-iframe should have", function(){
 //  })
 //})
 
+describe("init options.method: ", function(){
+  var opts = $.extend(true, {}, coOptions);
+})
 // Tests on Credit Card page
 describe("Razorpay open cc page", function(){
   var $name, $email, $contact;

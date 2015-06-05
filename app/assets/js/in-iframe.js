@@ -51,31 +51,24 @@ window.$ = Razorpay.prototype.$;
         }
       }
     },
-    getFormData: function(form, netbanking) {
+    getFormData: function(form) {
       var data, expiry;
       data = {};
-      form.find('[name]').each(function(index, el) {
-        if (el.value) {
+      form.find('.form-common [name], .tab-content.active [name]').each(function(index, el) {
+        if (el.name && el.value) {
           return data[el.name] = el.value;
         }
       });
-
-      if(!netbanking || form.find('.tabs .active').data('target') == 'tab-card'){
-        delete data.bank;
-        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-        expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
-        data['card[expiry_month]'] = expiry[0];
-        data['card[expiry_year]'] = expiry[1];
-        delete data['card[expiry]'];
-        data.method = 'card';
-      } else {
-        delete data['card[name]'];
-        delete data['card[number]'];
-        delete data['card[cvv]'];
-        delete data['card[expiry]'];
-        data.method = 'netbanking';
+      var target_tab = form.find('.tab-content.active').attr('id');
+      if(target_tab == 'tab-card'){
+        if(target_tab == 'tab-card'){
+          data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+          expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+          data['card[expiry_month]'] = expiry[0];
+          data['card[expiry_year]'] = expiry[1];
+          delete data['card[expiry]'];
+        }
       }
-
       return data;
     },
     showNetbankingList: function(nblist){
@@ -239,7 +232,7 @@ window.$ = Razorpay.prototype.$;
         discreet.shake(modalEl);
         return;
       }
-      var data = discreet.getFormData(form, discreet.options.method.netbanking);
+      var data = discreet.getFormData(form);
 
       // Signature is set in case of hosted checkout
       if(discreet.options.signature !== ''){
