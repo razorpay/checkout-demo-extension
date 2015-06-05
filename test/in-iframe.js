@@ -28,6 +28,29 @@ var cc = {
   expiry_year: '23'
 }
 
+describe("init options.method: ", function(){
+  var opts = $.extend(true, {}, coOptions);
+  var disableTab;
+
+  it("hide tabs and card fields if method.card == false", function(){
+    disableTab = 'card';
+  })
+  it("hide tabs and netbanking fields if method.netbanking == false", function(){
+    disableTab = 'netbanking';
+  })
+
+  afterEach(function(){
+    opts.method = {};
+    opts.method[disableTab] = false;
+    handleMessage({options: opts});
+    expect($('#tab-'+disableTab).length).toBe(0);
+    expect($('.tab-content:visible').length).toBe(1);
+    delete window.frameDiscreet.options;
+    delete window.frameDiscreet.modal;
+    $('.container').remove();
+  })
+})
+
 describe("in-iframe should have", function(){
   it("jQuery", function(){
 		expect($).toBeDefined();
@@ -91,9 +114,25 @@ describe("in-iframe should have", function(){
 //  })
 //})
 
-describe("init options.method: ", function(){
+describe("init options.method", function(){
   var opts = $.extend(true, {}, coOptions);
+  delete opts.method;
+
+  beforeEach(function(){
+    handleMessage({options: opts});
+  })
+
+  it("should enable both netbanking and card by default and show card initially", function(){
+    expect($('.tabs')).toBeVisible();
+    expect($('.tabs li').length).toBe(2);
+  // });
+
+  // it("should show card tab initially", function(){
+    expect($('.tabs li.active').attr('data-target')).toBe('tab-card');
+    expect($('#tab-card')).toBeVisible();
+  })
 })
+
 // Tests on Credit Card page
 describe("Razorpay open cc page", function(){
   var $name, $email, $contact;
