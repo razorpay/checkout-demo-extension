@@ -60,6 +60,10 @@ templates.modal = '
           {{}}}
           {{if(it.method.netbanking){}}
               <input type="hidden" name="method" value="netbanking">
+              <div class="nb-na">
+                <div>Netbanking not available right now.</div>
+                <a class="nb-retry">Try again</a>
+              </div>
               <div class="elem select loading" style="border-radius: 4px">
                 <div class="elem-inner">
                   <select name="bank" disabled required class="input" pattern="[\\w]+">

@@ -77,7 +77,14 @@ window.$ = Razorpay.prototype.$;
       }
       if(nblist.error){
         $('#tab-netbanking .elem').hide();
-        $('.error').append('<li class="nb-na">Netbanking is not available right now. Please try later.</li>');
+        if(nblist.error.description){
+          $('.nb-na').show().children('div').html(nblist.error.description);
+          $('.nb-retry').one('click', function(){
+            $('.nb-na').hide();
+            $('#tab-netbanking .elem').show();
+            discreet.showNetbankingList();
+          })
+        }
         return;
       }
 
@@ -146,7 +153,6 @@ window.$ = Razorpay.prototype.$;
         return discreet.modal.show();
       }
 
-      $('.nb-na').remove();
       discreet.showNetbankingList();
       discreet.sanitizeOptions(discreet.options);
       discreet.$el = $((doT.compile(templates.modal))(discreet.options));
@@ -177,7 +183,7 @@ window.$ = Razorpay.prototype.$;
         return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
-      if (discreet.options.method.netbanking) {
+      if (discreet.options.method.netbanking && discreet.options.method.card) {
         discreet.$el.find('.tabs li').click(function() {
           discreet.renew();
           var inner = $(this).closest('.modal-inner');

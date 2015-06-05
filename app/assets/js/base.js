@@ -296,7 +296,7 @@
         if(typeof callback == 'function'){
           var callback_param;
           if (response.http_status_code !== 200 && response.error){
-            callback_param = {error: true};
+            callback_param = response;
           } else{
             callback_param = response;
           }
@@ -305,7 +305,10 @@
       },
       error: function(response){
         if(typeof callback == 'function'){
-          callback({error: true});
+          if(!response.error){
+            response.error = true;
+          }
+          callback(response);
         }
       }
     });
