@@ -323,6 +323,11 @@ window.$ = Razorpay.prototype.$;
     }
 
     if(message.options && !discreet.options){ // open modal
+      if(/live/.test(message.options.key)){
+        message.options.method = {
+          card: false
+        }
+      }
       try{
         discreet.rzp = new Razorpay(message.options);
       } catch(e){
