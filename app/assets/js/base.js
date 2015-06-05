@@ -292,7 +292,6 @@
       dataType: 'jsonp',
       success: function(response){
         rzp.netbankingList = response;
-
         if(typeof callback == 'function'){
           var callback_param;
           if (response.http_status_code !== 200 && response.error){
@@ -305,10 +304,11 @@
       },
       error: function(response){
         if(typeof callback == 'function'){
-          if(!response.error){
-            response.error = true;
+          var error = response;
+          if(!(error in response)){
+            error = {error: {description: "Unable to load list of banks."}};
           }
-          callback(response);
+          callback(error);
         }
       }
     });
