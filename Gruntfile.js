@@ -26,6 +26,9 @@ module.exports = function(grunt){
       harp_compile:{
         cmd: 'harp compile app/assets app/srv'
       },
+      initJS: {
+        cmd: 'cp app/srv/js/lib/init.html app/srv/js/lib/init.js'
+      },
       dir_images: {
         cmd: 'mkdir app/dist && mkdir app/dist/v1'
       },
@@ -50,21 +53,73 @@ module.exports = function(grunt){
     },
     preprocess: {
       tmpfolder: {
-        src : ['.tmp/concat/checkout.js', '.tmp/concat/razorpay.js'],
+        src : ['app/srv/**/*.js'],
         options: {
           inline : true,
         }
       }
     },
     karma: {
-      razorpay: {
-        configFile: 'spec/razorpay.conf.js'
+      options: {
+        frameworks: ['jasmine'],
+        reporters: ['progress', 'coverage'],
+        port: 9876,
+        colors: true,
+        logLevel: 'ERROR',
+        browsers: ['PhantomJS'],
+        singleRun: true,
+        browserNoActivityTimeout: 30000,
+        files: [
+          'app/assets/js/lib/jquery-1.11.1.js',
+          'spec/jasmine-jquery.js',
+        ]
       },
-      checkout: {
-        configFile: 'spec/checkout.conf.js'
+      'razorpay': {
+        name: 'razorpay.js',
+        options: {
+          preprocessors: {
+            'app/srv/js/razorpay-submit.js': ['coverage']
+          },
+          coverageReporter: {
+            type : 'json',
+            dir : 'coverage/razorpay/'
+          },
+          files: [
+            'test/razorpay-submit.js'
+          ]
+        }
       },
-      frame: {
-        configFile: 'spec/checkout-frame.conf.js'
+      'checkout': {
+        name: 'checkout.js',
+        options: {
+          preprocessors: {
+            'app/srv/js/checkout-open.js': ['coverage']
+          },
+          coverageReporter: {
+            type : 'json',
+            dir : 'coverage/checkout/'
+          },
+          files: [
+            'test/base.js',
+            'test/checkout-open.js'
+          ]
+        }
+      },
+      'frame': {
+        name: 'checkout-frame.js',
+        options: {
+          preprocessors: {
+            'app/srv/js/in-iframe.js': ['coverage']
+          },
+          coverageReporter: {
+            type : 'json',
+            dir : 'coverage/frame/'
+          },
+          files: [
+            'app/assets/js/lib/sendkeys.js',
+            'test/in-iframe.js'
+          ]
+        }
       }
     },
 
@@ -121,15 +176,75 @@ module.exports = function(grunt){
     'env:test',
     'exec:clean_srv',
     'exec:harp_compile',
+    'exec:initJS',
     'useminPrepare',
-    'concat:generated',
-    'preprocess'
+    'preprocess',
+    'prepareKarma'
   ]);
 
   grunt.registerTask('test', [
     'test:prepare',
     'karma:razorpay',
     'karma:checkout',
-    'karma:frame'
+    'karma:frame',
+    'createReport'
   ]);
+
+  grunt.registerTask('prepareKarma', 'Prepare Karma', function(a, b) {
+    var fileSets = grunt.config.get('concat');
+    fileSets = fileSets.generated.files;
+
+    var blocks = {};
+    for(var i in fileSets){
+      var item = fileSets[i].dest.split('/').pop();
+      blocks[item] = fileSets[i].src;
+
+      for(var i in blocks[item]){
+        var pos = blocks[item][i].indexOf('rollbar');
+        if(pos !== -1){
+          blocks[item].splice(i,1);
+        }
+
+        var pos = blocks[item][i].indexOf('init.html');
+        if(pos !== -1){
+          blocks[item][i] = 'app/srv/js/lib/init.js';
+        }
+      }
+    }
+
+    var karma = grunt.config.get('karma');
+
+    for(var key in karma){
+      var block = blocks[karma[key].name];
+      if(typeof block === 'undefined') continue;
+
+      block = karma.options.files.concat(block);
+      karma[key].options.files = block.concat(karma[key].options.files);
+    }
+
+    grunt.config.set('karma', karma);
+  });
+
+  grunt.registerTask('createReport', 'Creates combined istanbul report', function(){
+    var istanbul = require('istanbul'),
+      fs = require('fs'),
+      collector = new istanbul.Collector(),
+      reporter = new istanbul.Reporter(false, 'coverage/final'),
+      sync = true;
+
+    var folder = fs.readdirSync('coverage/razorpay');
+    var env = folder[0];
+
+    var obj1 = JSON.parse(fs.readFileSync('coverage/razorpay/'+env+'/coverage-final.json', 'utf8'));
+    var obj2 = JSON.parse(fs.readFileSync('coverage/checkout/'+env+'/coverage-final.json', 'utf8'));
+    var obj3 = JSON.parse(fs.readFileSync('coverage/frame/'+env+'/coverage-final.json', 'utf8'));
+
+    collector.add(obj1);
+    collector.add(obj2);
+    collector.add(obj3);
+
+    reporter.add('html');
+    reporter.write(collector, sync, function(){});
+    grunt.log.writeln('Report created in coverage/final');
+  })
 };
