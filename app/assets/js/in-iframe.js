@@ -292,24 +292,29 @@ window.$ = Razorpay.prototype.$;
       if(!discreet.modal){
         return;
       }
+      var message;
       var modalEl = discreet.modal.modalElement;
       discreet.shake(modalEl);
 
       modalEl.find('.submit').removeAttr('disabled');
       discreet.modal.options.backdropClose = true;
 
-      if (response && response.error && response.error.field){
-        var error_el = discreet.$el.find('input[name="'+response.error.field+'"]');
-        if (error_el.length){
-          error_el.closest('.elem').addClass('invalid');
-          error_el.focus();
+      if (response && response.error){
+        message = response.error.description;
+
+        if (response.error.field){
+          var error_el = discreet.$el.find('input[name="'+response.error.field+'"]');
+          if (error_el.length){
+            error_el.closest('.elem').addClass('invalid').eq(0).focus();
+          }
         }
       }
 
-      var defaultMessage = 'There was an error in handling your request';
-      var message = response.error.description || defaultMessage;
+      if (!message){
+        message = 'There was an error in handling your request';
+      }
 
-      var error_ht = modalEl.find('.error').html(message)[0].offsetHeight;
+      var error_ht = modalEl.find('.error').html(message).prop('offsetHeight');
       modalEl.find('.error-container').addClass('has-error').css('paddingTop', error_ht);
     }
   }
