@@ -26,7 +26,7 @@
         }
       }
     } catch(e){
-      return; // TODO rollbar
+      window.Rollbar && Rollbar.error("Error closing popup: " + e.message);
     }
   }
   discreet.paymentSuccess = function(data){
@@ -157,6 +157,19 @@
 
     popup._loaded = false;
     popup.loaded = function(){};
+    try{
+      var info;
+      if(typeof popup.window == 'undefined'){
+        info = "Popup window inaccessible";
+      } else if(popup.window && popup.window.closed){
+        info = "Popup window closed";
+      } else {
+        info = "Popup window opened";
+      }
+      window.Rollbar && Rollbar.info(info);
+    } catch(e){
+      window.Rollbar && Rollbar.error("Error accessing popup: " + e.message);
+    }
   }
 
   discreet.navigatePopup = function(nextRequest){
