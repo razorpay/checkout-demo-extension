@@ -127,6 +127,7 @@
       discreet.setImageOption(options);
 
       var response = {
+        context: location.href,
         options: options,
         nblist: discreet.nblist
       }
@@ -158,7 +159,8 @@
         this.options.handler.call(null, data.data);
       }
     } else if (event == 'error'){
-      true;
+      alert("Oops! Something went wrong.");
+      this.close();
     }
   }
 

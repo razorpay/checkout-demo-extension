@@ -316,6 +316,15 @@ window.$ = Razorpay.prototype.$;
 
       var error_ht = modalEl.find('.error').html(message).prop('offsetHeight');
       modalEl.find('.error-container').addClass('has-error').css('paddingTop', error_ht);
+    },
+
+    configureRollbar: function(message){
+      if(window.Rollbar){
+        Rollbar.configure({payload: {
+          person: message.options.key,
+          context: message.context
+        }});
+      }
     }
   }
 
@@ -330,14 +339,16 @@ window.$ = Razorpay.prototype.$;
     if(message.options && !discreet.options){ // open modal
       try{
         discreet.rzp = new Razorpay(message.options);
+        discreet.configureRollbar(message);
       } catch(e){
         discreet.postMessage({event: 'error', data: e.message});
+        Rollbar.error(e.message, message);
         return;
       }
       discreet.options = discreet.rzp.options;
       discreet.showModal();
     } else if(message.event == 'close'){
-      discreet.close();
+      discreet.hide();
     } else if(message.event == 'open' && discreet.rzp){
       discreet.showModal();
     }
