@@ -7,8 +7,8 @@ var coOptions = {
   'description': 'Tron Legacy',
   'image': 'https://i.imgur.com/3g7nmJC.png',
   'method': {
-    'netbanking': 1,
-    'card': 1
+    'netbanking': true,
+    'card': true
   },
   'prefill': {
     'name': 'Shashank Mehta',
@@ -28,28 +28,28 @@ var cc = {
   expiry_year: '23'
 }
 
-describe("init options.method: ", function(){
-  var opts = $.extend(true, {}, coOptions);
-  var disableTab;
+// describe("init options.method: ", function(){
+//   var opts = $.extend(true, {}, coOptions);
+//   var disableTab;
 
-  it("hide tabs and card fields if method.card == false", function(){
-    disableTab = 'card';
-  })
-  it("hide tabs and netbanking fields if method.netbanking == false", function(){
-    disableTab = 'netbanking';
-  })
+//   it("hide tabs and card fields if method.card == false", function(){
+//     disableTab = 'card';
+//   })
+//   it("hide tabs and netbanking fields if method.netbanking == false", function(){
+//     disableTab = 'netbanking';
+//   })
 
-  afterEach(function(){
-    opts.method = {};
-    opts.method[disableTab] = false;
-    handleMessage({options: opts});
-    expect($('#tab-'+disableTab).length).toBe(0);
-    expect($('.tab-content:visible').length).toBe(1);
-    delete window.frameDiscreet.options;
-    delete window.frameDiscreet.modal;
-    $('.container').remove();
-  })
-})
+//   afterEach(function(){
+//     opts.method = {};
+//     opts.method[disableTab] = false;
+//     handleMessage({options: opts});
+//     expect($('#tab-'+disableTab).length).toBe(0);
+//     expect($('.tab-content:visible').length).toBe(1);
+//     delete window.frameDiscreet.options;
+//     delete window.frameDiscreet.modal;
+//     $('.container').remove();
+//   })
+// })
 
 describe("in-iframe should have", function(){
   it("jQuery", function(){
@@ -114,24 +114,24 @@ describe("in-iframe should have", function(){
 //  })
 //})
 
-describe("init options.method", function(){
-  var opts = $.extend(true, {}, coOptions);
-  delete opts.method;
+// describe("init options.method", function(){
+//   var opts = $.extend(true, {}, coOptions);
+//   delete opts.method;
 
-  beforeEach(function(){
-    handleMessage({options: opts});
-  })
+//   beforeEach(function(){
+//     handleMessage({options: opts});
+//   })
 
-  it("should enable both netbanking and card by default and show card initially", function(){
-    expect($('.tabs')).toBeVisible();
-    expect($('.tabs li').length).toBe(2);
-  // });
+//   it("should enable both netbanking and card by default and show card initially", function(){
+//     expect($('.tabs')).toBeVisible();
+//     expect($('.tabs li').length).toBe(2);
+//   // });
 
-  // it("should show card tab initially", function(){
-    expect($('.tabs li.active').attr('data-target')).toBe('tab-card');
-    expect($('#tab-card')).toBeVisible();
-  })
-})
+//   // it("should show card tab initially", function(){
+//     expect($('.tabs li.active').attr('data-target')).toBe('tab-card');
+//     expect($('#tab-card')).toBeVisible();
+//   })
+// })
 
 // Tests on Credit Card page
 describe("Razorpay open cc page", function(){
@@ -139,9 +139,6 @@ describe("Razorpay open cc page", function(){
 
   beforeEach(function(){
     handleMessage({options: coOptions});
-    $name    = jQuery('.input[name="card[name]"]');
-    $email   = jQuery('.input[name="email"]');
-    $contact = jQuery('.input[name="contact"]');
   });
 
   afterEach(function(){
@@ -154,15 +151,15 @@ describe("Razorpay open cc page", function(){
   });
 
   it("should prefill name", function(){
-    expect($name.val()).toBe(coOptions.prefill.name);
+    expect($('.input[name="card[name]"]').val()).toBe(coOptions.prefill.name);
   });
 
   it("should prefill email", function(){
-    expect($email.val()).toBe(coOptions.prefill.email);
+    expect($('.input[name="email"]').val()).toBe(coOptions.prefill.email);
   });
 
   it("should prefill contact number", function(){
-    expect($contact.val()).toBe(coOptions.prefill.contact);
+    expect($('.input[name="contact"]').val()).toBe(coOptions.prefill.contact);
   });
 });
 
