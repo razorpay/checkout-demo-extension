@@ -323,9 +323,9 @@ window.$ = Razorpay.prototype.$;
     }
 
     if(message.options && !discreet.options){ // open modal
-      if(/live/.test(message.options.key)){
+      if(/test/.test(message.options.key)){
         message.options.method = {
-          card: false
+          card: true
         }
       }
       try{

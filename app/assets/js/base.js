@@ -22,7 +22,7 @@
 
     method: {
       netbanking: true,
-      card: true
+      card: false
     },
     prefill: {
       name: '',
