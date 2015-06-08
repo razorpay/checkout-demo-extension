@@ -320,10 +320,14 @@ window.$ = Razorpay.prototype.$;
 
     configureRollbar: function(message){
       if(window.Rollbar){
-        Rollbar.configure({payload: {
-          person: message.options.key,
-          context: message.context
-        }});
+        Rollbar.configure({
+          payload: {
+            person: {
+              id: message.options.key
+            },
+            context: message.context
+          }
+        });
       }
     }
   }
