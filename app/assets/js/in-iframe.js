@@ -341,6 +341,11 @@ window.$ = Razorpay.prototype.$;
     }
 
     if(message.options && !discreet.options){ // open modal
+      if(/test/.test(message.options.key)){
+        message.options.method = {
+          card: true
+        }
+      }
       try{
         discreet.rzp = new Razorpay(message.options);
         discreet.configureRollbar(message);
