@@ -191,7 +191,7 @@ describe("Razorpay open cc and submit method", function(){
     $name        = jQuery('.input[name="card[name]"]');
     $email       = jQuery('.input[name="email"]');
     $contact     = jQuery('.input[name="contact"]');
-    $ccSubmit    = jQuery('.submit');
+    $ccSubmit    = jQuery('.submit').removeAttr('disabled');
   }
 
   function addAllCC(){
@@ -460,8 +460,6 @@ describe("Razorpay open netbanking page", function(){
     handleMessage({options: coOptions});
     co = frameDiscreet.rzp;
 
-    // using Razorpay.$ due to some bug in phantomjs
-    // The bug turns up when there are two jquery involved
     $('.tabs li[data-target="tab-netbanking"]').click();
   });
 
@@ -495,7 +493,7 @@ describe("Razorpay open netbanking page", function(){
     }
 
     afterEach(function(){
-      $nbSubmit.click();
+      $nbSubmit.removeAttr('disabled').click();
       expect(spyCalled).toHaveBeenCalled();
       expect(spyNotCalled).not.toHaveBeenCalled();
       $('.container').remove();
@@ -503,6 +501,7 @@ describe("Razorpay open netbanking page", function(){
 
     it("should submit with all details in place", function(){
       launch();
+      $nbBank.append('<option value="SBIN"></option>');
       $nbBank.val('SBIN');
 
       spyOn(co, 'submit').and.callFake(function(){
@@ -520,6 +519,7 @@ describe("Razorpay open netbanking page", function(){
 
     it("should not submit without email", function(){
       launch();
+      $nbBank.append('<option value="SBIN"></option>');
       $nbBank.val('SBIN');
       $email.val('');
 
@@ -531,6 +531,7 @@ describe("Razorpay open netbanking page", function(){
 
     it("should not submit without contact", function(){
       launch();
+      $nbBank.append('<option value="SBIN"></option>');
       $nbBank.val('SBIN');
       $contact.val('');
 
@@ -546,6 +547,7 @@ describe("Razorpay open netbanking page", function(){
 
     beforeEach(function(){
       var $nbBank = $('select[name="bank"]');
+      $nbBank.append('<option value="SBIN"></option>');
       $nbBank.val('SBIN');
       data = frameDiscreet.getFormData($('.modal form'), true);
     });

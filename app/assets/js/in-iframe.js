@@ -408,8 +408,7 @@ window.$ = Razorpay.prototype.$;
       } else if(message.methodAjax){
         instanceMethods.ajax = message.methodAjax
       }
-
-      discreet.showModal();
+      discreet.showModal()
     } else if(message.event == 'close'){
       discreet.hide();
     } else if(message.event == 'open' && discreet.rzp){
