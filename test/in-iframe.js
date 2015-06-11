@@ -1,5 +1,5 @@
 var discreet = Razorpay.prototype.discreet;
-window.payment_methods = {"version":1,"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"}};
+var orig_methods = window.payment_methods = {"version":1,"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"}};
 
 function openCheckoutForm(options){
   $('.container').remove();
@@ -36,6 +36,27 @@ var cc = {
   expiry_year: '23'
 }
 
+describe("in-iframe should have", function(){
+  it("jQuery", function(){
+    expect($).toBeDefined();
+  })
+  it("jQuery.payment", function(){
+    expect($.payment).toBeDefined();
+  })
+  it("modal", function(){
+    expect(Modal).toBeDefined();
+  })
+  it("smarty", function(){
+    expect($.fn.smarty).toBeDefined();
+  })
+  it("doT", function(){
+    expect(doT).toBeDefined();
+  })
+  it("modal template", function(){
+    expect(templates.modal).toBeDefined();
+  })
+})
+
 describe("init options.method: ", function(){
   var opts = $.extend(true, {}, coOptions);
   var disableTab;
@@ -55,28 +76,6 @@ describe("init options.method: ", function(){
     expect($('.tab-content:visible').length).toBe(1);
   })
 })
-
-describe("in-iframe should have", function(){
-  it("jQuery", function(){
-		expect($).toBeDefined();
-	})
-	it("jQuery.payment", function(){
-		expect($.payment).toBeDefined();
-	})
-	it("modal", function(){
-		expect(Modal).toBeDefined();
-	})
-	it("smarty", function(){
-		expect($.fn.smarty).toBeDefined();
-	})
-	it("doT", function(){
-		expect(doT).toBeDefined();
-	})
-	it("modal template", function(){
-		expect(templates.modal).toBeDefined();
-	})
-})
-
 //describe("message listener should", function(){
 //  it("throw error on erroneous options", function(done){
 //    var spyCalled = jasmine.createSpy();
@@ -120,18 +119,50 @@ describe("in-iframe should have", function(){
 //})
 
 describe("init options.method", function(){
-  var opts = $.extend(true, {}, coOptions);
-  delete opts.method;
-
+  var opts;
+  
   beforeEach(function(){
-    openCheckoutForm(opts);
+    opts = $.extend(true, {}, coOptions);
+    delete opts.method;
   })
 
   it("should enable both netbanking and card by default and show card initially", function(){
+    openCheckoutForm(opts);
     expect($('.tabs')).toBeVisible();
     expect($('.tabs li').length).toBe(2);
     expect($('.tabs li.active').attr('data-target')).toBe('tab-card');
     expect($('#tab-card')).toBeVisible();
+  });
+
+  describe("", function(){
+    var hide, show;
+
+    beforeEach(function(){
+      window.payment_methods = $.extend(true, {}, orig_methods);
+    })
+
+    afterEach(function(){
+      openCheckoutForm(opts);
+      expect($('.tabs')).not.toBeVisible();
+      expect($('#tab-' + hide)).not.toBeVisible();
+      expect($('#tab-' + show)).toBeVisible();
+    })
+
+    it("should hide card if payment_methods.card=false", function(){
+      window.payment_methods.card = false;
+      hide = 'card';
+      show = 'netbanking';
+    });
+
+    it("should hide netbanking if payment_methods.netbanking=false", function(){
+      window.payment_methods.netbanking = false;
+      hide = 'netbanking';
+      show = 'card';
+    });
+  })
+
+  afterEach(function(){
+    window.payment_methods = orig_methods;
   })
 })
 
