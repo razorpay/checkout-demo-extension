@@ -1,4 +1,12 @@
 var discreet = Razorpay.prototype.discreet;
+window.payment_methods = {"version":1,"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"}};
+
+function openCheckoutForm(options){
+  $('.container').remove();
+  delete window.frameDiscreet.modal;
+  delete window.frameDiscreet.rzp;
+  handleMessage({options: options})
+}
 
 var coOptions = {
   'key': 'key_id',
@@ -7,8 +15,8 @@ var coOptions = {
   'description': 'Tron Legacy',
   'image': 'https://i.imgur.com/3g7nmJC.png',
   'method': {
-    'netbanking': 1,
-    'card': 1
+    'netbanking': true,
+    'card': true
   },
   'prefill': {
     'name': 'Shashank Mehta',
@@ -42,12 +50,9 @@ describe("init options.method: ", function(){
   afterEach(function(){
     opts.method = {};
     opts.method[disableTab] = false;
-    handleMessage({options: opts});
+    openCheckoutForm(opts);
     expect($('#tab-'+disableTab).length).toBe(0);
     expect($('.tab-content:visible').length).toBe(1);
-    delete window.frameDiscreet.options;
-    delete window.frameDiscreet.modal;
-    $('.container').remove();
   })
 })
 
@@ -119,15 +124,12 @@ describe("init options.method", function(){
   delete opts.method;
 
   beforeEach(function(){
-    handleMessage({options: opts});
+    openCheckoutForm(opts);
   })
 
   it("should enable both netbanking and card by default and show card initially", function(){
     expect($('.tabs')).toBeVisible();
     expect($('.tabs li').length).toBe(2);
-  // });
-
-  // it("should show card tab initially", function(){
     expect($('.tabs li.active').attr('data-target')).toBe('tab-card');
     expect($('#tab-card')).toBeVisible();
   })
@@ -138,15 +140,14 @@ describe("Razorpay open cc page", function(){
   var $name, $email, $contact;
 
   beforeEach(function(){
-    handleMessage({options: coOptions});
-    $name    = jQuery('.input[name="card[name]"]');
-    $email   = jQuery('.input[name="email"]');
-    $contact = jQuery('.input[name="contact"]');
+    openCheckoutForm(coOptions);
+    $name    = $('.input[name="card[name]"]');
+    $email   = $('.input[name="email"]');
+    $contact = $('.input[name="contact"]');
   });
 
   afterEach(function(){
     frameDiscreet.hide();
-    $('.container').remove();
   });
 
   it("should load modal", function(){
@@ -185,7 +186,7 @@ describe("Razorpay open cc and submit method", function(){
 
   function launch(){
     // For opening the modal
-    handleMessage({options: customOptions});
+    openCheckoutForm(customOptions);
     co = frameDiscreet.rzp;
 
     $ccNumber    = jQuery('.input[name="card[number]"]');
@@ -209,9 +210,7 @@ describe("Razorpay open cc and submit method", function(){
       $ccSubmit.click();
       expect(spyCalled).toHaveBeenCalled();
       expect(spyNotCalled).not.toHaveBeenCalled();
-
       frameDiscreet.hide();
-      $('.container').remove();
 
       done();
     }, 0);
@@ -460,7 +459,7 @@ describe("Razorpay open netbanking page", function(){
 
   beforeEach(function(){
     // For opening the modal
-    handleMessage({options: coOptions});
+    openCheckoutForm(coOptions);
     co = frameDiscreet.rzp;
 
     // using Razorpay.$ due to some bug in phantomjs

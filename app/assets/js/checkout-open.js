@@ -9,8 +9,6 @@
   var discreet = Razorpay.prototype.discreet;
 
   discreet.isCheckout = true;
-  discreet.nblist = null;
-  discreet.nbajax = null;
 
   Razorpay.prototype.open = function() {
     if(discreet.isOpen){
@@ -27,7 +25,7 @@
       var parent = $(this.options.parent);
       if(!parent.is(':visible'))
         parent = $body
-      this.checkoutFrame = discreet.createFrame();
+      this.checkoutFrame = discreet.createFrame(this);
       parent.append(this.checkoutFrame);
     } else {
       discreet.setMetaViewport();
@@ -38,12 +36,19 @@
 
   discreet.createFrame = function(rzp){
     var frame = $(document.createElement('iframe'));
+    var src = discreet.currentScript.src;
+    if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
+      src = discreet.makeUrl(rzp) + '/checkout?key_id=' + rzp.options.key;
+    } else {
+      src = src.replace(/(js\/lib\/)?[^\/]+$/,'') + 'checkout.html';
+    }
+
     frame.attr({
       'class': 'razorpay-checkout-frame',
       'style': 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
       'allowtransparency': 'true',
       'frameborder': '0',
-      'src': discreet.checkoutUrl + 'checkout.html'
+      'src': src
     });
     return frame;
   }
@@ -110,7 +115,7 @@
 
   discreet.onFrameMessage = function(e, data){
     // this == rzp
-    if((typeof e.origin != 'string') || !this.checkoutFrame || (discreet.checkoutUrl.replace(/^https?/,'').indexOf(e.origin.replace(/^https?/,'')) == -1) || (data.source != 'frame')){ // source check
+    if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.prop('src').indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
     }
     var event = data.event;
@@ -128,8 +133,7 @@
 
       var response = {
         context: location.href,
-        options: options,
-        nblist: discreet.nblist
+        options: options
       }
       return discreet.sendFrameMessage.call(this, response);
     }
@@ -225,16 +229,6 @@
     discreet.addButton(new Razorpay(options));
   }
 
-  discreet.initCheckout = function(){
-    if(!discreet.nblist && !discreet.nbajax){
-      discreet.nbajax = this.getNetbankingList(function(response){
-        discreet.nbajax = null;
-        if(!response.error){
-          discreet.nblist = response;
-        }
-      });
-    }
-  }
   discreet.validateCheckout = function(options, errors){
     if(options.display_currency){
       if(options.display_currency === 'USD'){

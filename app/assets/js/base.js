@@ -12,7 +12,7 @@
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
-    netbankingListUrl: '/banks',
+    methodsUrl: '/methods',
     key: '',
     handler: $.noop,
 
@@ -21,8 +21,8 @@
     display_currency: '',
 
     method: {
-      netbanking: true,
-      card: true
+      netbanking: null,
+      card: null
     },
     prefill: {
       name: '',
@@ -109,16 +109,10 @@
       overrideValue = String(overrideValue);
     }
 
-    var types = ['string', 'boolean', 'function', 'object'];
-    for(var i = 0; i < types.length; i++){
-      if(typeof defaultValue == types[i]){
-        if(typeof overrideValue == types[i]){
-          options[key] = overrideValue;
-        } else if(!(key in options)){
-          options[key] = defaultValue;
-        }
-        break;
-      }
+    if(typeof overrideValue == typeof defaultValue){
+      options[key] = overrideValue;
+    } else if(!(key in options)){
+      options[key] = defaultValue;
     }
   }
 
@@ -127,11 +121,31 @@
     this.options = this.options || {};
 
     for (var i in defaults){
-      if(i != 'parent' && typeof defaults[i] == 'object'){
-        var subObject = i == 'notes' ? (overrides[i] || {}) : defaults[i];
-        this.options[i] = this.options[i] || {};
-        for(var j in subObject){
-          discreet.setOption(j, this.options[i], overrides[i], subObject);
+      if(defaults[i] !== null && typeof defaults[i] == 'object'){
+        if(i == 'notes'){
+          this.options.notes = {};
+          if(typeof overrides.notes == 'object'){
+            for (var j in overrides.notes){
+              if(typeof overrides.notes[j] == 'string'){
+                this.options.notes[j] = overrides.notes[j];
+              }
+            }
+          }
+        } else if (i == 'method') {
+          this.options.method = $.extend(true, {}, defaults.method);
+          if(typeof overrides.method == 'object'){
+            for(var j in defaults.method){
+              if(typeof overrides.method[j] == 'boolean'){
+                this.options.method[j] = overrides.method[j]
+              }
+            }
+          }
+        } else {
+          var subObject = defaults[i];
+          this.options[i] = this.options[i] || {};
+          for(var j in subObject){
+            discreet.setOption(j, this.options[i], overrides[i], subObject);
+          }
         }
       }
       else discreet.setOption(i, this.options, overrides, defaults);
@@ -283,32 +297,28 @@
     return rzp.options.protocol + '://' + rzp.options.hostname + '/' + rzp.options.version;
   }
 
-  Razorpay.prototype.getNetbankingList = function(callback){
+  Razorpay.prototype.getMethods = function(callback){
     var rzp = this;
     return $.ajax({
-      url: discreet.makeUrl(this) + this.options.netbankingListUrl,
+      url: discreet.makeUrl(this) + this.options.methodsUrl,
       data: {key_id: this.options.key},
       timeout: 30000,
       dataType: 'jsonp',
       success: function(response){
-        rzp.netbankingList = response;
+        if (!('error' in response)){
+          delete response.version;
+          rzp.paymentMethods = response;
+        }
         if(typeof callback == 'function'){
-          var callback_param;
-          if (response.http_status_code !== 200 && response.error){
-            callback_param = response;
-          } else{
-            callback_param = response;
-          }
-          callback(callback_param);
+          callback(response);
         }
       },
-      error: function(response){
-        if(typeof callback == 'function'){
-          var error = response;
-          if(!(error in response)){
-            error = {error: {description: "Unable to load list of banks."}};
-          }
-          callback(error);
+      complete: function(xhr, status){
+        if(status != "success" && typeof callback == 'function'){
+          var response = xhr.responseJSON;
+          if(!response || !('error' in response))
+            response = {error: true};
+          callback(response);
         }
       }
     });

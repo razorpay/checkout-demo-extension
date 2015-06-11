@@ -60,19 +60,18 @@ templates.modal = '
           {{}}}
           {{if(it.method.netbanking){}}
               <input type="hidden" name="method" value="netbanking">
-              <div class="nb-na">
-                <div>Netbanking not available right now.</div>
-                <a class="nb-retry">Try again</a>
-              </div>
-              <div class="elem select loading" style="border-radius: 4px">
+              {{if(it.method.netbanking.error){}}
+                <div class="nb-na">
+                  <div>{{=it.method.netbanking.error.description}}</div>
+                </div>
+              {{}}}
+              <div class="elem select" style="border-radius: 4px">
                 <div class="elem-inner">
-                  <select name="bank" disabled required class="input" pattern="[\\w]+">
-                    <option selected="selected" value="">Loading list of banks...</option>
-                    <option value="HDFC">HDFC Bank</option>
-                    <option value="IBKL">IDBI Bank</option>
-                    <option value="ICIC">ICICI Bank</option>
-                    <option value="KKBK">Kotak Mahindra Bank</option>
-                    <option value="SBIN">State Bank of India</option>
+                  <select name="bank" required class="input" pattern="[\\w]+">
+                    <option selected="selected" value="">Select Bank</option>
+                    {{for(var i in it.method.netbanking){}}
+                      <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
+                    {{}}}
                   </select>
                 </div>
               </div>
