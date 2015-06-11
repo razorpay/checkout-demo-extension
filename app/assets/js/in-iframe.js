@@ -5,7 +5,6 @@
  * This exposes jquery for in iframe usage
  */
 window.$ = Razorpay.prototype.$;
-
 (function(){
   'use strict';
 
@@ -14,7 +13,7 @@ window.$ = Razorpay.prototype.$;
     $el: null,
     options: null,
     rzp: null,
-    nblist: null,
+    methods: {},
 
     postMessage: function(message){
       if(window.CheckoutBridge){
@@ -71,31 +70,50 @@ window.$ = Razorpay.prototype.$;
       }
       return data;
     },
-    showNetbankingList: function(nblist){
-      if(!nblist && discreet.rzp){
-        return discreet.rzp.getNetbankingList(discreet.showNetbankingList);
+    getMethods: function(instanceMethods){
+      if(!discreet.rzp){
+        return
       }
-      if(nblist.error){
-        $('#tab-netbanking .elem').hide();
-        if(nblist.error.description){
-          $('.nb-na').show().children('div').html(nblist.error.description);
-          $('.nb-retry').one('click', function(){
-            $('.nb-na').hide();
-            $('#tab-netbanking .elem').show();
-            discreet.showNetbankingList();
-          })
+      if(!instanceMethods){
+        var key = discreet.rzp.options.key;
+        var availMethods = discreet.methods[key];
+        if(!availMethods.methods) {
+          return discreet.rzp.getMethods(discreet.getMethods);
+        } else {
+          instanceMethods = availMethods.methods;
+        }
+      }
+
+      if(instanceMethods.error){
+        discreet.$el.find('.methods-container').removeClass('loading loaded').addClass('loading-error');
+        if(instanceMethods.error.description){
+          discreet.$el.find('.api-error').html(instanceMethods.error.description).show();
+          discreet.$el.find('.default-error').hide();
+        } else {
+          discreet.$el.find('.api-error').hide();
+          discreet.$el.find('.default-error').show();
         }
         return;
       }
 
-      var optionsString = '<option selected="selected" value="">Select Bank</option>';
-      for(var i in nblist){
-        if(i === 'http_status_code'){
-          continue;
+      discreet.methods[key] = instanceMethods;
+      discreet.showTabs(instanceMethods);
+      discreet.setActiveTab(instanceMethods);
+      discreet.$el.find('.methods-container').removeClass('loading loading-error').addClass('loaded');
+      discreet.$el.find('.submit').removeClass('loading').removeAttr('disabled');
+
+      var nblist = instanceMethods.methods.netbanking;
+
+      if(typeof nblist == 'object'){
+        var optionsString = '';
+        for(var i in nblist){
+          if(i === 'http_status_code'){
+            continue;
+          }
+          optionsString += '<option value="'+i+'">' + nblist[i] + '</option>';
         }
-        optionsString += '<option value="'+i+'">' + nblist[i] + '</option>';
+        discreet.$el.find('#tab-netbanking .select').find('select').append(optionsString);
       }
-      $('#tab-netbanking .select').removeClass('loading').find('select').html(optionsString).prop('disabled', false);
     },
 
     sanitizeDOM: function(obj){
@@ -106,7 +124,8 @@ window.$ = Razorpay.prototype.$;
       }
 
       // if conditions
-      obj.netbanking = !!obj.netbanking;
+      obj.method.netbanking = !!obj.method.netbanking;
+      obj.method.card = !!obj.method.card;
 
       // attributes
       if(typeof obj.image == 'string'){
@@ -146,6 +165,35 @@ window.$ = Razorpay.prototype.$;
       }
     },
 
+    showTabs: function(instanceMethods){
+      var methodOptions = instanceMethods && instanceMethods.methods || discreet.options.method;
+      var tabsCount = 0;
+      for(var i in methodOptions){
+        if(i == 'version'){
+          continue;
+        }
+        if(methodOptions[i] == true){
+          tabsCount++;
+        }
+      }
+      if(tabsCount > 1){
+        discreet.$el.find('.tabs').attr('count', tabsCount);
+      }
+    },
+
+    setActiveTab: function(instanceMethods){
+      var activeTab = 'card';
+      if(!instanceMethods.methods.card){
+        if(instanceMethods.methods.netbanking){
+          activeTab = 'netbanking'
+        }
+      }
+
+      discreet.$el.find('li[data-target="tab-'+activeTab+'"]').addClass('active').siblings('.active').removeClass('active');
+      discreet.$el.find('.tab-content.active').removeClass('active');
+      discreet.$el.find('#tab-' + activeTab).addClass('active');
+    },
+
     showModal: function() {
       $('#loading').remove();
       discreet.renew();
@@ -153,7 +201,6 @@ window.$ = Razorpay.prototype.$;
         return discreet.modal.show();
       }
 
-      discreet.showNetbankingList();
       discreet.sanitizeOptions(discreet.options);
       discreet.$el = $((doT.compile(templates.modal))(discreet.options));
       discreet.$el.smarty();
@@ -169,6 +216,8 @@ window.$ = Razorpay.prototype.$;
       }
 
       discreet.modal = new Modal(discreet.$el, modalOptions);
+      discreet.showTabs();
+      discreet.getMethods();
 
       discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
         var parent;
@@ -183,7 +232,6 @@ window.$ = Razorpay.prototype.$;
         return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
-      if (discreet.options.method.netbanking && discreet.options.method.card) {
         discreet.$el.find('.tabs li').click(function() {
           discreet.renew();
           var inner = $(this).closest('.modal-inner');
@@ -209,7 +257,11 @@ window.$ = Razorpay.prototype.$;
             }, 300);
           }
         });
-      }
+
+      $('.method-retry').on('click', function(){
+        discreet.$el.find('methods-container').removeClass('loading-error').addClass('loading');
+        discreet.getMethods();
+      })
 
       discreet.$el.find('form').on('submit', function(e) {
         discreet.formSubmit(e);
@@ -246,7 +298,7 @@ window.$ = Razorpay.prototype.$;
       }
 
       discreet.renew();
-      discreet.$el.find('.submit').attr('disabled', true);
+      discreet.$el.find('.submit').attr('disabled', true).addClass('loading');
       discreet.modal.options.backdropClose = false;
 
       discreet.rzp.submit({
@@ -296,7 +348,7 @@ window.$ = Razorpay.prototype.$;
       var modalEl = discreet.modal.modalElement;
       discreet.shake(modalEl);
 
-      modalEl.find('.submit').removeAttr('disabled');
+      modalEl.find('.submit').removeAttr('disabled').removeClass('loading');
       discreet.modal.options.backdropClose = true;
 
       if (response && response.error){
@@ -336,16 +388,8 @@ window.$ = Razorpay.prototype.$;
     if(typeof message != 'object'){
       return;
     }
-    if(message.nblist){
-      discreet.nblist = message.nblist;
-    }
 
     if(message.options && !discreet.options){ // open modal
-      if(/test/.test(message.options.key)){
-        message.options.method = {
-          card: true
-        }
-      }
       try{
         discreet.rzp = new Razorpay(message.options);
         discreet.configureRollbar(message);
@@ -355,6 +399,16 @@ window.$ = Razorpay.prototype.$;
         return;
       }
       discreet.options = discreet.rzp.options;
+      var key = discreet.options.key;
+      if(!discreet.methods[key]){
+        var instanceMethods = discreet.methods[key] = {}
+      }
+      if(message.methods){
+        instanceMethods.methods = message.methods;
+      } else if(message.methodAjax){
+        instanceMethods.ajax = message.methodAjax
+      }
+
       discreet.showModal();
     } else if(message.event == 'close'){
       discreet.hide();
