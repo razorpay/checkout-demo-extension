@@ -74,8 +74,8 @@ window.$ = Razorpay.prototype.$;
       if(!discreet.rzp){
         return
       }
+      var key = discreet.rzp.options.key;
       if(!instanceMethods){
-        var key = discreet.rzp.options.key;
         var availMethods = discreet.methods[key];
         if(!availMethods.methods) {
           return discreet.rzp.getMethods(discreet.getMethods);
@@ -96,13 +96,16 @@ window.$ = Razorpay.prototype.$;
         return;
       }
 
+      if(/test/.test(key))
+        instanceMethods.card = true;
+
       discreet.methods[key] = instanceMethods;
       discreet.showTabs(instanceMethods);
       discreet.setActiveTab(instanceMethods);
       discreet.$el.find('.methods-container').removeClass('loading loading-error').addClass('loaded');
       discreet.$el.find('.submit').removeClass('loading').removeAttr('disabled');
 
-      var nblist = instanceMethods.methods.netbanking;
+      var nblist = instanceMethods.netbanking;
 
       if(typeof nblist == 'object'){
         var optionsString = '';
@@ -166,13 +169,13 @@ window.$ = Razorpay.prototype.$;
     },
 
     showTabs: function(instanceMethods){
-      var methodOptions = instanceMethods && instanceMethods.methods || discreet.options.method;
+      var methodOptions = typeof instanceMethods == 'object' && instanceMethods || discreet.options.method;
       var tabsCount = 0;
       for(var i in methodOptions){
-        if(i == 'version'){
+        if(i == 'version' || i == 'http_status_code'){
           continue;
         }
-        if(methodOptions[i] == true){
+        if(methodOptions[i] != false){
           tabsCount++;
         }
       }
@@ -183,8 +186,8 @@ window.$ = Razorpay.prototype.$;
 
     setActiveTab: function(instanceMethods){
       var activeTab = 'card';
-      if(!instanceMethods.methods.card){
-        if(instanceMethods.methods.netbanking){
+      if(!instanceMethods.card){
+        if(instanceMethods.netbanking){
           activeTab = 'netbanking'
         }
       }
