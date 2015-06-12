@@ -267,3 +267,17 @@ describe("api ajax handler should", function(){
     expect(isSameObj).toBe(true);
   });
 });
+
+describe("getMethods should", function(){
+  it("set rzp.paymentMethods and call back", function(){
+    var methods = {};
+    var spyCalled = jasmine.createSpy();
+    rzp = new Razorpay(options);
+    spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
+      options.success(methods);
+    });
+    rzp.getMethods(spyCalled);
+    expect(rzp.paymentMethods).toBe(methods);
+    expect(spyCalled).toHaveBeenCalled();
+  })
+})

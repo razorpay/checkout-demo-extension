@@ -244,6 +244,33 @@
     });
   };
 
+  Razorpay.prototype.getMethods = function(callback){
+    var rzp = this;
+    return $.ajax({
+      url: discreet.makeUrl(this) + this.options.methodsUrl,
+      data: {key_id: this.options.key},
+      timeout: 30000,
+      dataType: 'jsonp',
+      success: function(response){
+        if (!('error' in response)){
+          delete response.version;
+          rzp.paymentMethods = response;
+        }
+        if(typeof callback == 'function'){
+          callback(response);
+        }
+      },
+      complete: function(xhr, status){
+        if(status != "success" && typeof callback == 'function'){
+          var response = xhr.responseJSON;
+          if(!response || !('error' in response))
+            response = {error: true};
+          callback(response);
+        }
+      }
+    });
+  }
+
   discreet.initRazorpay = function(){
     if(typeof this.hedwig === 'undefined'){
       this.hedwig = new Hedwig({
