@@ -150,12 +150,7 @@
 
       if(availMethods){
         if(availMethods.methods){
-          response.methods = availMethods;
-        } else if (availMethods.ajax){
-          response.methodAjax = {
-            readyState: availMethods.ajax.readyState,
-            status: availMethods.ajax.status
-          }
+          response.methods = availMethods.methods;
         }
       }
       
