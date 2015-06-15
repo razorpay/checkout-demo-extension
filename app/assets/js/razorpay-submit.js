@@ -76,6 +76,7 @@
       // this == request
 
       var payment_id = response.payment_id;
+      this.payment_id = payment_id;
       var error = response.error;
       var request = response.request;
       var success = response.success;
@@ -198,6 +199,8 @@
           description: 'Payment cancelled'
         }
       })
+      // if(request.payment_id)
+      //   $.get(discreet.makeUrl(request.rzp) + '/payment/'+request.payment_id+'/cancel');
     }
   }
 

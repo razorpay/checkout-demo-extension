@@ -348,9 +348,9 @@ window.$ = Razorpay.prototype.$;
         Rollbar.error(e.message, message);
         return;
       }
-      setTimeout(function(){
+      // setTimeout(function(){
       discreet.showModal();
-    },100)
+    // },100)
     } else if(message.event == 'close'){
       discreet.hide();
     } else if(message.event == 'open' && discreet.rzp){

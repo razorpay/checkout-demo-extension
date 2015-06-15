@@ -8,8 +8,6 @@
   var doT = Razorpay.prototype.doT;
   var discreet = Razorpay.prototype.discreet;
 
-  discreet.isCheckout = true;
-
   Razorpay.prototype.open = function() {
     if(discreet.isOpen){
       return;
