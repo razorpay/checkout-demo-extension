@@ -8,7 +8,6 @@ window.$ = Razorpay.prototype.$;
 
 (function(){
   'use strict';
-
   var discreet = {
     modal: null,
     $el: null,
@@ -70,12 +69,10 @@ window.$ = Razorpay.prototype.$;
       return data;
     },
     
-    setMethods: function(){
-      var payment_methods = window.payment_methods;
+    setMethods: function(payment_methods){      
       var methodOptions = discreet.rzp.options.method;
-      if(!payment_methods){
 
-      } else if(!payment_methods.error){
+      if(!payment_methods.error){
         for (var i in methodOptions) {
           if(methodOptions[i] != false && payment_methods[i] != false){
             methodOptions[i] = payment_methods[i];
@@ -137,13 +134,19 @@ window.$ = Razorpay.prototype.$;
     },
 
     showModal: function() {
-      $('#loading').remove();
       discreet.renew();
       if(discreet.modal){
         return discreet.modal.show();
       }
-
-      discreet.setMethods();
+      if(window.payment_methods){
+        discreet.setMethods(window.payment_methods);
+      } else {
+        return discreet.rzp.getMethods(function(payment_methods){
+          window.payment_methods = payment_methods;
+          discreet.showModal();
+        });
+      }
+      $('#loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
       discreet.$el = $((doT.compile(templates.modal))(discreet.rzp.options));
       discreet.$el.smarty();
@@ -345,9 +348,9 @@ window.$ = Razorpay.prototype.$;
         Rollbar.error(e.message, message);
         return;
       }
-      // setTimeout(function(){
+      setTimeout(function(){
       discreet.showModal();
-    // },100)
+    },100)
     } else if(message.event == 'close'){
       discreet.hide();
     } else if(message.event == 'open' && discreet.rzp){
