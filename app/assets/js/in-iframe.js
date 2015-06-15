@@ -148,6 +148,12 @@ window.$ = Razorpay.prototype.$;
       discreet.$el = $((doT.compile(templates.modal))(discreet.rzp.options));
       discreet.$el.smarty();
 
+      if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
+        if(navigator.userAgent.indexOf('Android 2')){
+          discreet.$el.addClass('shown');
+        }
+      }
+
       // init modal
       var modalOptions = {
         onhide: function(){
@@ -339,7 +345,9 @@ window.$ = Razorpay.prototype.$;
         Rollbar.error(e.message, message);
         return;
       }
+      // setTimeout(function(){
       discreet.showModal();
+    // },100)
     } else if(message.event == 'close'){
       discreet.hide();
     } else if(message.event == 'open' && discreet.rzp){
@@ -347,10 +355,9 @@ window.$ = Razorpay.prototype.$;
     }
   }
 
-  window.onmessage = function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
+  discreet.parseMessage = function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
     if(!e || !e.data)
       return;
-
     var data;
     if(typeof e.data == 'string'){
       try{
@@ -362,6 +369,12 @@ window.$ = Razorpay.prototype.$;
       data = e.data;
     }
     window.handleMessage(data);
+  }
+
+  if (window.addEventListener) {
+    window.addEventListener('message', discreet.parseMessage)
+  } else if(window.attachEvent) { // IE8 or earlier
+    window.attachEvent('onmessage', discreet.parseMessage);
   }
 
   discreet.postMessage({event: 'load'});
