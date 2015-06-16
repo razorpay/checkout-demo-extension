@@ -39,14 +39,13 @@
         alert("You have successfully purchased " + options.description);
       },
       hostname: 'beta.razorpay.com',
+      'method': {
+        'card': 1
+      },
       'prefill': {
         'name': 'Harshil \"Mathur',
         'email': 'harshil@razorpay.com',
         'contact': '9876543210'
-      },
-      method: {
-        card: true,
-        netbanking: true
       },
       notes: {
         'address': 'Hello World'
