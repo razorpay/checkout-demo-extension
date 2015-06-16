@@ -49,37 +49,20 @@ templates.modal = '
               </div>
             </div>
           </div>
-          {{if(it.method.netbanking && it.method.card){}}
+          <div class="methods-container loading">
             <ul class="tabs">
               <li data-target="tab-card" class="active">Card</li>
               <li data-target="tab-netbanking">Net Banking</li>
             </ul>
-            <div class="fieldset tab-content" id="tab-netbanking">
-          {{} else if(!it.method.card){}}
-            <div class="fieldset tab-content active" id="tab-netbanking">
-          {{}}}
-          {{if(it.method.netbanking){}}
-              <input type="hidden" name="method" value="netbanking">
-              <div class="nb-na">
-                <div>Netbanking not available right now.</div>
-                <a class="nb-retry">Try again</a>
-              </div>
-              <div class="elem select loading" style="border-radius: 4px">
-                <div class="elem-inner">
-                  <select name="bank" disabled required class="input" pattern="[\\w]+">
-                    <option selected="selected" value="">Loading list of banks...</option>
-                    <option value="HDFC">HDFC Bank</option>
-                    <option value="IBKL">IDBI Bank</option>
-                    <option value="ICIC">ICICI Bank</option>
-                    <option value="KKBK">Kotak Mahindra Bank</option>
-                    <option value="SBIN">State Bank of India</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          {{}}}
-          {{if(it.method.card){}}
             <div class="fieldset tab-content active" id="tab-card">
+              <div class="method-text">
+                Loading payment options...
+              </div>
+              <div class="method-error">
+                <div class="api-error"></div>
+                <div class="default-error">Payments not available right now.</div>
+                <a class="method-retry">Try again</a>
+              </div>
               <input type="hidden" name="method" value="card">
               <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
                 <div class="elem-inner">
@@ -104,20 +87,38 @@ templates.modal = '
                 </div>
               </div>
             </div>
-          {{}}}
-          <div class="footer">
-            <button class="submit" type="submit">
-              <span class="ring"></span>
-              <span class="text">
-                Pay
-                {{if(it.display_currency){}}
-                  ${{=it.display_amount}}
-                {{} else {}}
-                  <span class="rupee-icon"></span>
-                  {{=it.amount/100}}
-                {{}}}
-              </span>
-            </button>
+            <div class="fieldset tab-content" id="tab-netbanking">
+              <div class="method-text">
+                Loading list of available banks...
+              </div>
+              <div class="method-error">
+                <div class="api-error"></div>
+                <div class="default-error">Unable to load list of banks.</div>
+                <a class="method-retry">Try again</a>
+              </div>
+              <input type="hidden" name="method" value="netbanking">
+              <div class="elem select loading" style="border-radius: 4px">
+                <div class="elem-inner">
+                  <select name="bank" required class="input" pattern="[\\w]+">
+                    <option selected="selected" value="">Select Bank</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="footer">
+              <button class="submit" type="submit" disabled>
+                <span class="ring"></span>
+                <span class="text">
+                  Pay
+                  {{if(it.display_currency){}}
+                    ${{=it.display_amount}}
+                  {{} else {}}
+                    <span class="rupee-icon"></span>
+                    {{=it.amount/100}}
+                  {{}}}
+                </span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
