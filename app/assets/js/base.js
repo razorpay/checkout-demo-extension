@@ -25,7 +25,10 @@
 
     method: {
       netbanking: null,
-      card: null
+      card: null,
+      wallet: {
+        paytm: false
+      }
     },
     prefill: {
       name: '',

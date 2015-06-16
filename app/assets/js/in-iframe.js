@@ -64,11 +64,22 @@
       return data;
     },
     
-    setMethods: function(payment_methods){      
+    setMethods: function(payment_methods){
       var methodOptions = discreet.rzp.options.method;
 
       if(!payment_methods.error){
         for (var i in methodOptions) {
+          if(i == 'wallet'){
+            var wallets = methodOptions.wallet;
+            if(typeof wallets == 'object'){
+              for(var j in wallets){
+                if(methodOptions.wallet[j] != false && wallets[j] != false){
+                  methodOptions.wallet[j] = wallets[j];
+                }
+              }
+            }
+            continue;
+          }
           if(methodOptions[i] != false && payment_methods[i] != false){
             methodOptions[i] = payment_methods[i];
           }
