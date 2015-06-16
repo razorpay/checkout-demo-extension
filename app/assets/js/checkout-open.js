@@ -227,12 +227,17 @@
         category = i.substr(0, dotPosition);
         property = i.substr(dotPosition + 1);
         options[category] = options[category] || {};
-        options[category][property] = options[i];
+        var opt = options[i];
+        if(opt === 'true')
+          opt = true;
+        else if(opt === 'false')
+          opt = false;
+        options[category][property] = opt;
         delete options[i];
       }
     }
-    options.handler = discreet.defaultPostHandler;
-    return options;
+    if(options.method)
+      discreet.parseScriptOptions(options.method);
   };
 
   discreet.addButton = function(rzp){
@@ -262,8 +267,10 @@
         opts[name] = attrs[i].value;
       }
     }
-    var options = discreet.parseScriptOptions(opts);
-    discreet.addButton(new Razorpay(options));
+    discreet.parseScriptOptions(opts);
+    opts.handler = discreet.defaultPostHandler;
+    var rzp = new Razorpay(opts);
+    discreet.addButton(rzp);
   }
 
   discreet.validateCheckout = function(options, errors){

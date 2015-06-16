@@ -25,7 +25,8 @@
 
     method: {
       netbanking: null,
-      card: null
+      card: null,
+      wallet: {}
     },
     prefill: {
       name: '',
@@ -136,11 +137,16 @@
         } else if (i == 'method') {
           this.options.method = $.extend({}, defaults.method);
           if(typeof overrides.method == 'object'){
-            for(var j in defaults.method){
-              if(typeof overrides.method[j] == 'boolean'){
-                this.options.method[j] = overrides.method[j]
+            if(typeof overrides.method.wallet == 'object'){
+              for(var j in overrides.method.wallet){
+                if(typeof overrides.method.wallet[j] == 'boolean')
+                  this.options.method.wallet[j] = overrides.method.wallet[j];
               }
             }
+            if(typeof overrides.method.card == 'boolean')
+              this.options.method.card = overrides.method.card;
+            if(typeof overrides.method.netbanking == 'boolean')
+              this.options.method.netbanking = overrides.method.netbanking;
           }
         } else {
           var subObject = defaults[i];

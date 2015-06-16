@@ -59,7 +59,7 @@ templates.modal = '
               <li data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
             {{?}}
             {{? it.method.wallet }}
-              <li data-target="tab-wallet"></li>
+              <li data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}></li>
             {{?}}
           </ul>
           {{? it.method.card }}
@@ -110,7 +110,7 @@ templates.modal = '
             </div>
           {{?}}
           {{? it.method.wallet }}
-            <div class="fieldset tab-content" id="tab-wallet">
+            <div class="fieldset tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
               <input type="hidden" name="method" value="wallet">
               <input type="radio" name="wallet" value="paytm" id="paytm-radio" checked><label for="paytm-radio">Pay using Paytm wallet</label>
             </div>
