@@ -59,7 +59,9 @@ templates.modal = '
               <li data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
             {{?}}
             {{? it.method.wallet }}
-              <li data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}></li>
+              <li data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
+                <div class="paytm-logo"></div>
+              </li>
             {{?}}
           </ul>
           {{? it.method.card }}
