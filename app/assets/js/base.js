@@ -16,6 +16,9 @@
     key: '',
     handler: $.noop,
 
+    // automatic checkout only
+    buttontext: 'Pay Now',
+
     // checkout fields, not needed for razorpay alone
     currency: 'INR',
     display_currency: '',

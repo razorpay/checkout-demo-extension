@@ -209,7 +209,7 @@
     var button = document.createElement('input');
     var form = discreet.currentScript.parentNode;
     button.type = 'submit';
-    button.value = 'Pay Now';
+    button.value = rzp.options.buttontext;
     button.className = 'razorpay-payment-button';
     $(form).submit(function(e){
       if(discreet.isOpen){
