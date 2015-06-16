@@ -18,7 +18,7 @@
     }
 
     discreet.isOpen = true;
-    discreet.merchantData.bodyOverflow = body.style.overflow; // dont use $body.css, that will give real css value, we want just the js override, preferably blank string.
+    discreet.merchantData.bodyOverflow = body.style.overflow;
     body.style.overflow = 'hidden';
 
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
@@ -27,8 +27,8 @@
       this.checkoutFrame = discreet.createFrame(this);
       body.appendChild(this.checkoutFrame);
     } else {
+      this.checkoutFrame.style.display = 'block';
       discreet.setMetaViewport();
-      this.checkoutFrame.show();
       discreet.sendFrameMessage.call(this, {event: 'open'});
     }
   }
@@ -66,15 +66,21 @@
     discreet.isOpen = false;
     discreet.bodyEl.style.overflow = discreet.merchantData.bodyOverflow;
 
-    if(discreet.merchantData.metaViewport){
+    var meta = discreet.metaViewportTag;
+    if(meta){
+      var parent = discreet.metaViewportTag.parentNode;
+      parent && parent.removeChild(meta);
+    }
+
+    meta = discreet.merchantData.metaViewport;
+    if(meta){
       var head = document.getElementsByTagName('head')[0];
-      $head.find('meta[name=viewport]').remove();
-      $head.append(discreet.merchantData.metaViewport); // please do not chain
+      head && !meta.parentNode && head.appendChild(meta);
       discreet.merchantData.metaViewport = null;
     }
 
     if(this.checkoutFrame){
-      this.checkoutFrame.hide();
+      this.checkoutFrame.style.display = 'none';
       if(this.checkoutFrame.getAttribute('removable')){
         this.checkoutFrame.parentNode && this.checkoutFrame.parentNode.removeChild(this.checkoutFrame);
         this.checkoutFrame = null;
@@ -106,12 +112,32 @@
   }
 
   discreet.setMetaViewport = function(){
-    if(!discreet.merchantData.metaViewport){
-      discreet.merchantData.metaViewport = $('meta[name]').filter(function(i, el){
-        var name = el.getAttribute('name');
-        return (typeof name == 'string') && (name.toLowerCase() == 'viewport');
-      }).remove();
-      $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1">');
+    if(typeof document.querySelector != 'function'){
+      return;
+    }
+    var head = document.querySelector('head')
+    if(!head){
+      return;
+    }
+
+    var meta = head.querySelector('meta[name=viewport]');
+
+    if(meta){
+      if(/width=device-width, ?initial-scale=1/.test(meta.getAttribute('content'))){
+        return;
+      }
+      discreet.merchantData.metaViewport = meta;
+      meta.parentNode.removeChild(meta);
+    }
+
+    if(!discreet.metaViewportTag){
+      meta = discreet.metaViewportTag = document.createElement('meta');
+      meta.setAttribute('name', 'viewport');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1');
+    }
+
+    if(!discreet.metaViewportTag.parentNode){
+      head.appendChild(discreet.metaViewportTag);
     }
   }
 
