@@ -35,7 +35,8 @@
       discreet.popupClose.call(this);
     }
     if(typeof this.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
-      this.success.call(null, {razorpay_payment_id: data.razorpay_payment_id}); // dont expose request as this
+      var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
+      this.success.call(null, returnObj); // dont expose request as this
     } else if(typeof this.error == 'function'){
       this.error({description: 'Unable to parse server response'});
     }
