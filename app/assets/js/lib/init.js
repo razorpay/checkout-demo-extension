@@ -14,12 +14,4 @@ window.Razorpay = function(options){
     currentScript: currentScript,
     merchantData: {}
   }
-  
-  var exports = null;
-  var module = { exports: null };
-
-  // jquery
-  <%- include jquery-1.11.1.js %>
-  Razorpay.prototype.$ = module.exports;
-
 })();

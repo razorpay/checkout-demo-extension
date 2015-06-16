@@ -4,27 +4,28 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.prototype.$;
   var doT = Razorpay.prototype.doT;
   var discreet = Razorpay.prototype.discreet;
 
   Razorpay.prototype.open = function() {
+    var body = discreet.bodyEl = document.getElementsByTagName('body')[0];
+    if(!body){
+      setTimeout(this.open());
+    }
+
     if(discreet.isOpen){
       return;
     }
+
     discreet.isOpen = true;
-    var $body = $('body')
-    discreet.merchantData.bodyOverflow = $body[0].style.overflow; // dont use $body.css, that will give real css value, we want just the js override, preferably blank string.
-    $body.css('overflow', 'hidden');
+    discreet.merchantData.bodyOverflow = body.style.overflow; // dont use $body.css, that will give real css value, we want just the js override, preferably blank string.
+    body.style.overflow = 'hidden';
 
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
 
     if(!this.checkoutFrame){
-      var parent = $(this.options.parent);
-      if(!parent.is(':visible'))
-        parent = $body
       this.checkoutFrame = discreet.createFrame(this);
-      parent.append(this.checkoutFrame);
+      body.appendChild(this.checkoutFrame);
     } else {
       discreet.setMetaViewport();
       this.checkoutFrame.show();
@@ -33,7 +34,7 @@
   }
 
   discreet.createFrame = function(rzp){
-    var frame = $(document.createElement('iframe'));
+    var frame = document.createElement('iframe');
     var src = discreet.currentScript.src;
     if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
       src = discreet.makeUrl(rzp) + '/checkout?key_id=' + rzp.options.key;
@@ -41,13 +42,16 @@
       src = src.replace(/(js\/lib\/)?[^\/]+$/,'') + 'checkout.html';
     }
 
-    frame.attr({
-      'class': 'razorpay-checkout-frame',
-      'style': 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
-      'allowtransparency': 'true',
-      'frameborder': '0',
-      'src': src
-    });
+    var attrs = {
+      class: 'razorpay-checkout-frame',
+      style: 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
+      allowtransparency: true,
+      frameborder: 0,
+      src: src
+    };
+    for(var i in attrs){
+      frame.setAttribute(i, attrs[i]);
+    }
     return frame;
   }
 
@@ -60,19 +64,19 @@
   discreet.onClose = function(){
     discreet.xdm.removeMessageListener();
     discreet.isOpen = false;
-    $('body').css('overflow', discreet.merchantData.bodyOverflow);
+    discreet.bodyEl.style.overflow = discreet.merchantData.bodyOverflow;
 
     if(discreet.merchantData.metaViewport){
-      var $head = $('head');
+      var head = document.getElementsByTagName('head')[0];
       $head.find('meta[name=viewport]').remove();
       $head.append(discreet.merchantData.metaViewport); // please do not chain
       discreet.merchantData.metaViewport = null;
     }
-      
+
     if(this.checkoutFrame){
       this.checkoutFrame.hide();
-      if(this.checkoutFrame.data('removable')){
-        this.checkoutFrame.remove();
+      if(this.checkoutFrame.getAttribute('removable')){
+        this.checkoutFrame.parentNode && this.checkoutFrame.parentNode.removeChild(this.checkoutFrame);
         this.checkoutFrame = null;
       }
     }
@@ -82,7 +86,7 @@
     if(typeof response !== 'string'){
       response = JSON.stringify(response)
     }
-    this.checkoutFrame.prop('contentWindow').postMessage(response, '*');
+    this.checkoutFrame.contentWindow.postMessage(response, '*');
   }
 
   // to handle absolute/relative url of options.image
@@ -113,7 +117,7 @@
 
   discreet.onFrameMessage = function(e, data){
     // this == rzp
-    if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.prop('src').indexOf(e.origin) || (data.source != 'frame')){ // source check
+    if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
     }
     var event = data.event;
@@ -155,7 +159,7 @@
 
     else if (event == 'success'){
       if(this.checkoutFrame){
-        this.checkoutFrame.data('removable', true);
+        this.checkoutFrame.setAttribute('removable', true);
       }
       if(typeof this.options.handler == 'function'){
         this.options.handler.call(null, data.data);
@@ -184,8 +188,8 @@
       }
     }
     var RazorPayForm = discreet.currentScript.parentElement;
-    $(inputs).appendTo(RazorPayForm);
-    $(RazorPayForm).submit();
+    RazorPayForm.innerHTML += inputs;
+    RazorPayForm.submit();
   };
 
   discreet.parseScriptOptions = function(options){
@@ -211,18 +215,27 @@
     button.type = 'submit';
     button.value = rzp.options.buttontext;
     button.className = 'razorpay-payment-button';
-    $(form).submit(function(e){
+    form.appendChild(button);
+    form.onsubmit = function(e){
       if(discreet.isOpen){
         return;
       }
       e.preventDefault();
       rzp.open();
       return false;
-    }).append(button);
+    }
   };
   var key = discreet.currentScript.getAttribute('data-key');
   if (key && key.length > 0){
-    var opts = $(discreet.currentScript).data();
+    var attrs = discreet.currentScript.attributes;
+    var opts = {};
+    for(var i=0; i<attrs.length; i++){
+      var name = attrs[i].name
+      if(/^data-/.test(name)){
+        name = name.replace(/^data-/,'');
+        opts[name] = attrs[i].value;
+      }
+    }
     var options = discreet.parseScriptOptions(opts);
     discreet.addButton(new Razorpay(options));
   }

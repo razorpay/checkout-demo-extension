@@ -46,7 +46,6 @@
     parent: null,
     redirect: false
   };
-
   /**
    * Cross Domain Post Message
    * Generic functions
@@ -135,7 +134,7 @@
             }
           }
         } else if (i == 'method') {
-          this.options.method = $.extend(true, {}, defaults.method);
+          this.options.method = $.extend({}, defaults.method);
           if(typeof overrides.method == 'object'){
             for(var j in defaults.method){
               if(typeof overrides.method[j] == 'boolean'){

@@ -1,11 +1,6 @@
 /* global handleMessage */
 /* jshint -W027 */
 
-/**
- * This exposes jquery for in iframe usage
- */
-window.$ = Razorpay.prototype.$;
-
 (function(){
   'use strict';
   var discreet = {

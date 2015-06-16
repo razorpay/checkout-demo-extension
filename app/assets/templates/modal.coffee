@@ -1,3 +1,4 @@
+$ = Razorpay::$
 unless templates
   templates = {}
 templates.modal = '

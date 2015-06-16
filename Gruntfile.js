@@ -27,7 +27,7 @@ module.exports = function(grunt){
         cmd: 'harp compile app/assets app/srv'
       },
       initJS: {
-        cmd: 'cp app/srv/js/lib/init.html app/srv/js/lib/init.js'
+        cmd: 'cp app/srv/js/lib/inline-libs.html app/srv/js/lib/inline-libs.js'
       },
       dir_images: {
         cmd: 'mkdir app/dist && mkdir app/dist/v1'
@@ -205,9 +205,9 @@ module.exports = function(grunt){
           blocks[item].splice(i,1);
         }
 
-        var pos = blocks[item][i].indexOf('init.html');
+        var pos = blocks[item][i].indexOf('inline-libs.html');
         if(pos !== -1){
-          blocks[item][i] = 'app/srv/js/lib/init.js';
+          blocks[item][i] = 'app/srv/js/lib/inline-libs.js';
         }
       }
     }
