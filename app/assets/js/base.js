@@ -12,7 +12,7 @@
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
-    methodsUrl: '/methods',
+    netbankingListUrl: '/banks',
     key: '',
     handler: $.noop,
 
@@ -124,7 +124,6 @@
 
   Razorpay.prototype.configure = function(overrides){
     this.validateOptions(overrides, true);
-
     this.options = this.options || {};
 
     for (var i in defaults){
@@ -137,12 +136,6 @@
       }
       else discreet.setOption(i, this.options, overrides, defaults);
     }
-
-    var overrideMethods = overrides.method || {};
-    if(!overrideMethods.card)
-      this.options.method.card = null;
-    if(!overrideMethods.netbanking)
-      this.options.method.netbanking = null;
 
     if(typeof discreet.initRazorpay == 'function'){
       discreet.initRazorpay.call(this);
@@ -290,15 +283,15 @@
     return rzp.options.protocol + '://' + rzp.options.hostname + '/' + rzp.options.version;
   }
 
-  Razorpay.prototype.getMethods = function(callback){
+  Razorpay.prototype.getNetbankingList = function(callback){
     var rzp = this;
     return $.ajax({
-      url: discreet.makeUrl(this) + this.options.methodsUrl,
+      url: discreet.makeUrl(this) + this.options.netbankingListUrl,
       data: {key_id: this.options.key},
       timeout: 30000,
       dataType: 'jsonp',
       success: function(response){
-        rzp.methods = response;
+        rzp.netbankingList = response;
         if(typeof callback == 'function'){
           var callback_param;
           if (response.http_status_code !== 200 && response.error){
@@ -313,7 +306,7 @@
         if(typeof callback == 'function'){
           var error = response;
           if(!(error in response)){
-            error = {error: true};
+            error = {error: {description: "Unable to load list of banks."}};
           }
           callback(error);
         }

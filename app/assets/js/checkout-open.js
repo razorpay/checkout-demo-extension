@@ -9,22 +9,8 @@
   var discreet = Razorpay.prototype.discreet;
 
   discreet.isCheckout = true;
-  
-  /*
-  cache methods info
-  key = API key
-  value = {
-    ajax: $.ajax
-    methods: {
-      version: '1'
-      card: true,
-      netbanking: {
-        'AXIS': 'Axis Bank'
-      }
-    }
-  }
-  */
-  discreet.methods = {};
+  discreet.nblist = null;
+  discreet.nbajax = null;
 
   Razorpay.prototype.open = function() {
     if(discreet.isOpen){
@@ -142,18 +128,9 @@
 
       var response = {
         context: location.href,
-        options: options
+        options: options,
+        nblist: discreet.nblist
       }
-
-      var key = this.options.key;
-      var availMethods = discreet.methods[key];
-
-      if(availMethods){
-        if(availMethods.methods){
-          response.methods = availMethods.methods;
-        }
-      }
-      
       return discreet.sendFrameMessage.call(this, response);
     }
 
@@ -249,18 +226,15 @@
   }
 
   discreet.initCheckout = function(){
-    var key = this.options.key;
-    if(!discreet.methods[key]){
-      discreet.methods[key] = {
-        ajax: this.getMethods(function(response){
-          if(!response.error){
-            discreet.methods[key].methods = response;
-          }
-        })
-      }
+    if(!discreet.nblist && !discreet.nbajax){
+      discreet.nbajax = this.getNetbankingList(function(response){
+        discreet.nbajax = null;
+        if(!response.error){
+          discreet.nblist = response;
+        }
+      });
     }
   }
-
   discreet.validateCheckout = function(options, errors){
     if(options.display_currency){
       if(options.display_currency === 'USD'){

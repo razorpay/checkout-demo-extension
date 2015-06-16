@@ -189,16 +189,16 @@ describe("init options validation", function(){
   });
 })
 
-describe("getMethods should", function(){
-  it("set rzp.methods and call back", function(){
-    var methods = {};
+describe("getNetbankingList should", function(){
+  it("set rzp.netbankingList and call back", function(){
+    var nblist = [];
     var spyCalled = jasmine.createSpy();
     rzp = new Razorpay(options);
     spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
-      options.success(methods);
+      options.success(nblist);
     });
-    rzp.getMethods(spyCalled);
-    expect(rzp.methods).toBe(methods);
+    rzp.getNetbankingList(spyCalled);
+    expect(rzp.netbankingList).toBe(nblist);
     expect(spyCalled).toHaveBeenCalled();
   })
 })
