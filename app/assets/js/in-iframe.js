@@ -65,21 +65,36 @@
     },
     
     setMethods: function(payment_methods){
+      if(payment_methods.version){
+        delete payment_methods.version;
+      }
       var methodOptions = discreet.rzp.options.method;
 
-      if(!payment_methods.error){
-        for (var i in methodOptions) {
-          if(i == 'wallet'){
-            var wallets = methodOptions.wallet;
-            if(typeof wallets == 'object'){
-              for(var j in wallets){
-                if(methodOptions.wallet[j] != false && wallets[j] != false){
-                  methodOptions.wallet[j] = wallets[j];
-                }
-              }
+      if(typeof methodOptions.wallet != false && typeof payment_methods.wallet == 'object'){
+        if(typeof methodOptions.wallet == 'object'){
+          for(var i in payment_methods.wallet){
+            if(methodOptions.wallet[i] != false && payment_methods.wallet[i] != false){
+              methodOptions.wallet[i] = payment_methods.wallet[i];
             }
-            continue;
           }
+        } else {
+          methodOptions.wallet = payment_methods.wallet;
+        }
+      }
+      var tabCount = 0;
+      if(typeof methodOptions.wallet == 'object'){
+        for(i in methodOptions.wallet){
+          if(methodOptions.wallet[i]){
+            tabCount++;
+            break;
+          }
+        }
+      }
+      if(!tabCount){
+        methodOptions.wallet = false;
+      }
+      if(!payment_methods.error){
+        for(i in payment_methods){
           if(methodOptions[i] != false && payment_methods[i] != false){
             methodOptions[i] = payment_methods[i];
           }
@@ -91,6 +106,12 @@
 
       if(methodOptions.netbanking != false && typeof methodOptions.netbanking != 'object'){
         methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
+      }
+      if(methodOptions.card){
+        tabCount++;
+      }
+      if(methodOptions.netbanking){
+        tabCount++;
       }
     },
 

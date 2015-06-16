@@ -54,13 +54,50 @@ body{
       .transition-transform(0.25s cubic-bezier(0.3, 1.5, 0.7, 1));
     }
   }
-  *{
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-    outline: none!important;
-    .appearance(none);
-    .box-sizing(content-box)!important; // because old browsers are content-box only, so we write the old way
+}
+label{
+  vertical-align: middle;
+}
+button, input, select, textarea{
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+input, select, textarea{
+  color: inherit;
+  line-height: inherit;
+  height: inherit;
+  border-radius: inherit;
+  font-size: 14px;
+  resize: none;
+  width: 100%;
+  display: block;
+  padding: 0 @input-padding;
+  margin: 0 -@input-padding;
+  background: none;
+  position: relative;
+}
+input[type=radio]{
+  display: inline-block;
+  width: auto;
+  padding: 0;
+  margin: 0 5px 0 0;
+  vertical-align: middle;
+}
+button{
+  padding: 0;
+  border-radius: 0 0 2px 2px;
+  background: @primary no-repeat 12px center;
+  line-height: 52px;
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
+  width: 100%;
+  cursor: pointer;
+  &[disabled]{
+    background-image: url('../images/loaders/2.gif');
+    background-size: 16px;
+    opacity: 0.7;
   }
 }
 .modal{
@@ -85,27 +122,6 @@ body{
   font-family: 'Lato', Sans-serif;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 375px;
-
-  button, input, select, textarea{
-    border: none!important;
-    background: none;
-    font-family: inherit;
-  }
-  button{
-    border-radius: 0 0 2px 2px;
-    background: @primary no-repeat 12px center;
-    line-height: 52px;
-    color: #fff;
-    font-size: 16px;
-    box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
-    width: 100%;
-    cursor: pointer;
-    &[disabled]{
-      background-image: url('../images/loaders/2.gif');
-      background-size: 16px;
-      opacity: 0.7;
-    }
-  }
 }
 .modal-inner{
   .transition(0.15s ease-out opacity);
@@ -132,20 +148,6 @@ body{
     &.focused{
       border-color: @danger;
     }
-  }
-  input, select, textarea{
-    color: inherit;
-    line-height: inherit;
-    height: inherit;
-    border-radius: inherit;
-    font-size: 14px;
-    resize: none;
-    width: 100%;
-    display: block;
-    padding: 0 @input-padding;
-    margin: 0 -@input-padding;
-    background: none!important;
-    position: relative;
   }
 }
 .select:not(.filled){
@@ -355,11 +357,26 @@ body{
 
 .tabs{
   margin: 0 -20px;
+  padding: 0;
   white-space: nowrap;
   font-size: 0;
+  display: none;
+
+  &.tabs-2{
+    display: block;
+  }
+
+  &.tabs-3{
+    display: block;
+    li{
+      width: 33.33%;
+    }
+  }
 
   li{
-    line-height: 52px;
+    line-height: 48px;
+    height: 48px;
+    vertical-align: top;
     display: inline-block;
     text-align: center;
     border: 1px solid @border-color;
@@ -380,6 +397,10 @@ body{
     &:first-child{
       border-left: none;
       margin-right: -1px;
+    }
+    &[data-target=tab-wallet]{
+      background: url('../images/paytm.png') no-repeat center #fff;
+      background-size: 40%;
     }
   }
 }

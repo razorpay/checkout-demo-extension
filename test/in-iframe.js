@@ -143,7 +143,7 @@ describe("init options.method", function(){
 
     afterEach(function(){
       openCheckoutForm(opts);
-      expect($('.tabs')).not.toBeVisible();
+      expect($('.tabs').hasClass('tabs-1')).toBe(true);
       expect($('#tab-' + hide)).not.toBeVisible();
       expect($('#tab-' + show)).toBeVisible();
     })

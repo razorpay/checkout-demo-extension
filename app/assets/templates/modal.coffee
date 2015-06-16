@@ -50,35 +50,19 @@ templates.modal = '
               </div>
             </div>
           </div>
-          {{if(it.method.netbanking && it.method.card){}}
-            <ul class="tabs">
+          {{var tabCount = 0; for(var i in it.method){it.method[i] && tabCount++}}}
+          <ul class="tabs{{if(tabCount){}} tabs-{{=tabCount}}{{}}}">
+            {{? it.method.card }}
               <li data-target="tab-card" class="active">Card</li>
-              <li data-target="tab-netbanking">Net Banking</li>
-            </ul>
-            <div class="fieldset tab-content" id="tab-netbanking">
-          {{} else if(!it.method.card){}}
-            <div class="fieldset tab-content active" id="tab-netbanking">
-          {{}}}
-          {{if(it.method.netbanking){}}
-              <input type="hidden" name="method" value="netbanking">
-              {{if(it.method.netbanking.error){}}
-                <div class="nb-na">
-                  <div>{{=it.method.netbanking.error.description}}</div>
-                </div>
-              {{}}}
-              <div class="elem select" style="border-radius: 4px">
-                <div class="elem-inner">
-                  <select name="bank" required class="input" pattern="[\\w]+">
-                    <option selected="selected" value="">Select Bank</option>
-                    {{for(var i in it.method.netbanking){}}
-                      <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
-                    {{}}}
-                  </select>
-                </div>
-              </div>
-            </div>
-          {{}}}
-          {{if(it.method.card){}}
+            {{?}}
+            {{? it.method.netbanking }}
+              <li data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
+            {{?}}
+            {{? it.method.wallet }}
+              <li data-target="tab-wallet"></li>
+            {{?}}
+          </ul>
+          {{? it.method.card }}
             <div class="fieldset tab-content active" id="tab-card">
               <input type="hidden" name="method" value="card">
               <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
@@ -104,7 +88,33 @@ templates.modal = '
                 </div>
               </div>
             </div>
-          {{}}}
+          {{?}}
+          {{? it.method.netbanking }}
+            <div class="fieldset tab-content{{? !it.method.card }} active{{?}}" id="tab-netbanking">
+              <input type="hidden" name="method" value="netbanking">
+              {{? it.method.netbanking.error }}
+                <div class="nb-na">
+                  <div>{{=it.method.netbanking.error.description}}</div>
+                </div>
+              {{?}}
+              <div class="elem select" style="border-radius: 4px">
+                <div class="elem-inner">
+                  <select name="bank" required class="input" pattern="[\\w]+">
+                    <option selected="selected" value="">Select Bank</option>
+                    {{for(var i in it.method.netbanking){}}
+                      <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
+                    {{}}}
+                  </select>
+                </div>
+              </div>
+            </div>
+          {{?}}
+          {{? it.method.wallet }}
+            <div class="fieldset tab-content" id="tab-wallet">
+              <input type="hidden" name="method" value="wallet">
+              <input type="radio" name="wallet" value="paytm" id="paytm-radio" checked><label for="paytm-radio">Pay using Paytm wallet</label>
+            </div>
+          {{?}}
           <div class="footer">
             <button class="submit" type="submit">
               <span class="ring"></span>
