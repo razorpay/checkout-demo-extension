@@ -403,12 +403,14 @@ button{
   }
 }
 .paytm-logo{
-  height: inherit;
-  background: url('../images/paytm.png') no-repeat center #fff;
-  background-size: 40%;
-  opacity: 0.7;
-  &:hover{
-    opacity: 1;
+  background: url('../images/paytm.png') no-repeat top #fff;
+  height: 12px;
+  background-size: 40px 24px;
+  margin-top: 18px;
+}
+li:hover, li.active{
+  .paytm-logo{
+    background-position: bottom;
   }
 }
 .form{
