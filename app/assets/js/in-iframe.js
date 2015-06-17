@@ -371,7 +371,7 @@
         discreet.rzp = new Razorpay(message.options);
         discreet.configureRollbar(message);
       } catch(e){
-        discreet.postMessage({event: 'error', data: e.message});
+        discreet.postMessage({event: 'fault', data: e.message});
         Rollbar.error(e.message, message);
         return;
       }

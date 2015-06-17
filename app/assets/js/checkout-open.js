@@ -190,7 +190,7 @@
       if(typeof this.options.handler == 'function'){
         this.options.handler.call(null, data.data);
       }
-    } else if (event == 'error'){
+    } else if (event == 'fault'){
       alert("Oops! Something went wrong.");
       this.close();
     }
