@@ -43,8 +43,7 @@ module.exports = function(grunt){
       dist: {
         options:{
             tag: '',
-            uglify: true,
-            cssmin: true
+            uglify: true
         },
         src: 'app/srv/razorpay.html',
         dest: 'app/srv/razorpay.html'
@@ -157,8 +156,8 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'exec:dir_images',
     'exec:copy_images',
-    'exec:copy_html',
-    'inline'
+    'inline',
+    'exec:copy_html'
   ]);
 
   grunt.registerTask('build',[
