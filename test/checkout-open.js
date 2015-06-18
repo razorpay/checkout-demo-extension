@@ -40,27 +40,55 @@ describe("checkout validate", function(){
     });
 
     afterEach(function(){
+      errors = Razorpay.prototype.validateOptions(init_options, false);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });
 
+    it("amount is invalid", function(){
+      field = 'amount';
+      init_options.amount = 'amount';
+    });
+
+    it("when amount not specified", function(){
+      delete init_options.amount;
+      field = 'amount';
+    });
+
+    it("when amount is less than 0", function(){
+      init_options.amount = '-10';
+      field = 'amount';
+    });
+
+    it("when amount is in decimal", function(){
+      init_options.amount = '10.10';
+      field = 'amount';
+    });
+
+    it("when handler is not a function", function(){
+      init_options.handler = 'string';
+      field = 'handler';
+    });
+
+    it("when merchant name is not passed", function(){
+      delete init_options.name;
+      field = 'name';
+    })
+
     it("display_currency is present and not USD", function(){
       init_options.display_currency = 'YEN';
       field = 'display_currency';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     })
 
     it("display_currency is USD and  display_amount is not there", function(){
       field = 'display_amount';
       init_options.display_currency = 'USD';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     })
 
     it("display_currency is USD and display_amount is invalid", function(){
       field = 'display_amount';
       init_options.display_currency = 'USD';
       init_options.display_amount = 'swag';
-      errors = Razorpay.prototype.validateOptions(init_options, false);
     })
   })
 })

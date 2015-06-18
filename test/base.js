@@ -118,26 +118,6 @@ describe("init options validation", function(){
       init_options.key = '';
     });
 
-    it("amount is invalid", function(){
-      field = 'amount';
-      init_options.amount = 'amount';
-    });
-
-    it("when amount not specified", function(){
-      delete init_options.amount;
-      field = 'amount';
-    });
-
-    it("when amount is less than 0", function(){
-      init_options.amount = '-10';
-      field = 'amount';
-    });
-
-    it("when amount is in decimal", function(){
-      init_options.amount = '10.10';
-      field = 'amount';
-    });
-
     it("when notes has more than 15 fields", function(){
       init_options.notes = {};
       for(var i = 0; i < 16; i++){
@@ -145,16 +125,6 @@ describe("init options validation", function(){
       }
       field = 'notes';
     });
-
-    it("when handler is not a function", function(){
-      init_options.handler = 'string';
-      field = 'handler';
-    });
-
-    it("when merchant name is not passed", function(){
-      delete init_options.name;
-      field = 'name';
-    })
   });
 
   describe("should not return error", function(){

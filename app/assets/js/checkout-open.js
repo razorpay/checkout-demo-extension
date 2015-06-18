@@ -274,6 +274,29 @@
   }
 
   discreet.validateCheckout = function(options, errors){
+    var amount = parseInt(options.amount);
+    options.amount = String(options.amount);
+    if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
+      errors.push({
+        message: 'Invalid amount specified',
+        field: 'amount'
+      });
+    }
+
+    if (typeof options.name === 'undefined'){
+      errors.push({
+        message: 'Merchant name cannot be empty',
+        field: 'name'
+      })
+    }
+
+    if (options.handler && typeof options.handler != 'function'){
+      errors.push({
+        message: 'Handler must be a function',
+        field: 'handler'
+      });
+    }
+
     if(options.display_currency){
       if(options.display_currency === 'USD'){
         options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');

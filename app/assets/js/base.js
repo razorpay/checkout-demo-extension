@@ -206,22 +206,6 @@
         });
       }
 
-      var amount = parseInt(options.amount);
-      options.amount = String(options.amount);
-      if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
-        errors.push({
-          message: 'Invalid amount specified',
-          field: 'amount'
-        });
-      }
-
-      if (typeof options.name === 'undefined'){
-        errors.push({
-          message: 'Merchant name cannot be empty',
-          field: 'name'
-        })
-      }
-
       if (typeof options.notes === 'object'){
         // Object.keys unsupported in old browsers
         var notesCount = 0;
@@ -234,13 +218,6 @@
             field: 'notes'
           });
         }
-      }
-
-      if (options.handler && typeof options.handler != 'function'){
-        errors.push({
-          message: 'Handler must be a function',
-          field: 'handler'
-        });
       }
 
       /**
@@ -261,43 +238,6 @@
         throw new Error(errorMessage);
         return;
       }
-    }
-  };
-
-  // TODO validate data
-  /**
-   * Validation of data during the time of submitting data
-   * to our server through the ajax request
-   */
-  Razorpay.prototype.validateData = function(data, throwError){
-    var errors = [];
-
-    var amount = parseInt(this.options.amount);
-    if (!amount || typeof amount !== 'number' || amount < 0) {
-      errors.push({
-        message: "Invalid amount specified",
-        field: "amount"
-      });
-    }
-
-    if (typeof this.options.key === "undefined") {
-      errors.push({
-        message: "No merchant key specified",
-        field: "key"
-      });
-    }
-
-    if (this.options.key === "") {
-      errors.push({
-        message: "Merchant key cannot be empty",
-        field: "key"
-      });
-    }
-
-    if(errors.length && throwError){
-      throw new Error("Field: " + errors[0].field + "; Error:" + errors[0].message);
-    } else {
-      return errors;
     }
   };
 
