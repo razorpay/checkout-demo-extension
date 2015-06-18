@@ -1,4 +1,4 @@
-window.Razorpay = function(options){
+Razorpay = function(options){
   if(typeof this.configure == 'function'){
     this.configure(options);
   }
