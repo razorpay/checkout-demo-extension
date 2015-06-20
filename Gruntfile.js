@@ -39,6 +39,16 @@ module.exports = function(grunt){
         cmd: 'cp app/srv/*.html app/dist/v1/'
       }
     },
+    inline: {
+      dist: {
+        options:{
+            tag: '',
+            uglify: true
+        },
+        src: 'app/srv/razorpay.html',
+        dest: 'app/srv/razorpay.html'
+      }
+    },
     useminPrepare:{
       html:['app/srv/*.html'],
       options: {
@@ -146,6 +156,7 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'exec:dir_images',
     'exec:copy_images',
+    'inline',
     'exec:copy_html'
   ]);
 
