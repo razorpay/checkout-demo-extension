@@ -34,9 +34,6 @@ templates.modal = '
               <input type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
             {{}}}
 
-            <input type="hidden" name="card[expiry_month]">
-            <input type="hidden" name="card[expiry_year]">
-
             <div class="fieldset">
               <div class="elem elem-email" style="border-radius: 4px 4px 0 0">
                 <div class="elem-inner">
@@ -50,7 +47,7 @@ templates.modal = '
               </div>
             </div>
           </div>
-          {{var tabCount = 0; for(var i in it.method){it.method[i] && tabCount++}}}
+          {{it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++}}}
           <ul class="tabs{{if(tabCount){}} tabs-{{=tabCount}}{{}}}">
             {{? it.method.card }}
               <li data-target="tab-card" class="active">Card</li>

@@ -214,7 +214,6 @@
       dataType: 'jsonp',
       success: function(response){
         if (!('error' in response)){
-          delete response.version;
           rzp.paymentMethods = response;
         }
         if(typeof callback == 'function'){

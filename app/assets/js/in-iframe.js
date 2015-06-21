@@ -169,8 +169,12 @@
         discreet.setMethods(window.payment_methods);
       } else {
         return discreet.rzp.getMethods(function(payment_methods){
-          window.payment_methods = payment_methods;
-          discreet.showModal();
+          if('error' in payment_methods){
+            discreet.errorHandler(payment_methods);
+          } else {
+            window.payment_methods = payment_methods;
+            discreet.showModal();
+          }
         });
       }
       $('#loading').remove();
