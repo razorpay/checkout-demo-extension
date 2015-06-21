@@ -217,7 +217,6 @@
         discreet.$el.find('#tab-netbanking .elem').hide();
       }
 
-      if (discreet.rzp.options.method.netbanking && discreet.rzp.options.method.card) {
         discreet.$el.find('.tabs li').click(function() {
           discreet.renew();
           var inner = $(this).closest('.modal-inner');
@@ -243,7 +242,6 @@
             }, 300);
           }
         });
-      }
 
       discreet.$el.find('form').on('submit', function(e) {
         discreet.formSubmit(e);
