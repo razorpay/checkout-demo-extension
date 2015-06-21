@@ -47,7 +47,7 @@ templates.modal = '
               </div>
             </div>
           </div>
-          {{it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++}}}
+          {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++; }}
           <ul class="tabs{{if(tabCount){}} tabs-{{=tabCount}}{{}}}">
             {{? it.method.card }}
               <li data-target="tab-card" class="active">Card</li>
