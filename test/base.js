@@ -1,3 +1,4 @@
+var discreet = Razorpay.prototype.discreet;
 var options = {
   'key': 'key_id',
   'amount': '40000',
@@ -92,7 +93,7 @@ describe("init options validation", function(){
 
   describe("should throw error if", function(){
     afterEach(function(){
-      var errors = Razorpay.prototype.validateOptions(init_options, false);
+      var errors = discreet.validateOptions(init_options);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });
@@ -128,7 +129,7 @@ describe("init options validation", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      var errors = Razorpay.prototype.validateOptions(init_options, false);
+      var errors = discreet.validateOptions(init_options, false);
       expect(errors.length).toBe(0);
     });
 

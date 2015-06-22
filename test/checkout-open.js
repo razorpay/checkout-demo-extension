@@ -1,3 +1,4 @@
+var discreet = Razorpay.prototype.discreet;
 var options = {
   'key': 'key_id',
   'amount': '5100',
@@ -40,7 +41,7 @@ describe("checkout validate", function(){
     });
 
     afterEach(function(){
-      errors = Razorpay.prototype.validateOptions(init_options, false);
+      errors = discreet.validateOptions(init_options, false);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });

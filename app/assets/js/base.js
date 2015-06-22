@@ -125,8 +125,9 @@
   };
 
   discreet.configure = function(overrides){
-    discreet.validateOptions(overrides, true);
-
+    if(typeof overrides != 'object'){
+      throw new Error("invalid options passed");
+    }
     var options = {};
     var defaults = discreet.defaults;
     for (var i in defaults){
@@ -164,6 +165,7 @@
       }
       else discreet.setOption(i, options, overrides, defaults);
     }
+    discreet.validateOptions(options, true);
     return options;
   }
 

@@ -21,7 +21,9 @@
       }
 
       var rdata = request.data;
-      var options = request.options || discreet.defaults;
+      var options = request.options;
+      if(!options)
+         options = request.options = discreet.defaults;
 
       var defaultFields = ['amount', 'notes', 'currency'];
       for(var i=0; i<defaultFields.length;i++){
@@ -75,16 +77,12 @@
     },
 
     getMethods: function(callback){
-      var rzp = this;
       return $.ajax({
-        url: discreet.makeUrl(this) + this.options.methodsUrl,
-        data: {key_id: this.options.key},
+        url: discreet.makeUrl(discreet.defaults) + discreet.defaults.methodsUrl,
+        data: {key_id: discreet.defaults.key},
         timeout: 30000,
         dataType: 'jsonp',
         success: function(response){
-          if (!('error' in response)){
-            rzp.paymentMethods = response;
-          }
           if(typeof callback == 'function'){
             callback(response);
           }
