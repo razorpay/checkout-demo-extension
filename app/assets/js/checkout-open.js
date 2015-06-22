@@ -43,7 +43,7 @@
     }
 
     var attrs = {
-      class: 'razorpay-checkout-frame',
+      'class': 'razorpay-checkout-frame',
       style: 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
       allowtransparency: true,
       frameborder: 0,

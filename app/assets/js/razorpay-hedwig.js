@@ -4,7 +4,6 @@
   'use strict';
 
   var $ = Razorpay.prototype.$;
-  var Hedwig = Razorpay.prototype.Hedwig;
   var Popup = Razorpay.prototype.Popup;
   var discreet = Razorpay.prototype.discreet;
 
@@ -17,7 +16,7 @@
         }
         var self = this;
         var popup_close = function(){
-          self.rzp.hedwig.sendMessage('{"pingback": "payment_complete"}', '*', self.popup.window);
+          discreet.hedwig.sendMessage('{"pingback": "payment_complete"}', '*', self.popup.window);
         }
         if(this.popup._loaded){
           popup_close();
@@ -144,12 +143,8 @@
   }
   discreet.setupPopup = function(request){
     var rzp = request.rzp;
-    if(!rzp.hedwig){
-      rzp.hedwig = new Hedwig({
-        ccHubLocation: rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php'
-      });
-    }
-
+    
+    discreet.hedwig.setupCC(rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php');
     discreet.xdm.addMessageListener(discreet.XDCallback, request);
 
     var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
@@ -184,9 +179,8 @@
         }
       });
     }
-    var rzp = this.rzp;
     popup.loaded = function(){
-      rzp.hedwig.sendMessage(nextRequest, '*', popup.window);
+      discreet.hedwig.sendMessage(nextRequest, '*', popup.window);
     }
     if(popup._loaded === true){
       popup.loaded();
@@ -200,8 +194,8 @@
           description: 'Payment cancelled'
         }
       })
-      // if(request.payment_id)
-      //   $.get(discreet.makeUrl(request.rzp) + '/payments/'+request.payment_id+'/cancel');
+      if(request.payment_id)
+        $.post(discreet.makeUrl(request.rzp) + '/payments/'+request.payment_id+'/cancel');
     }
   }
 
@@ -230,13 +224,4 @@
       }
     });
   }
-
-  discreet.initRazorpay = function(){
-    if(typeof this.hedwig === 'undefined'){
-      this.hedwig = new Hedwig({
-        ccHubLocation: this.options.protocol + '://' + this.options.hostname + '/crossCookies.php'
-      });
-    }
-  }
-
 })();
