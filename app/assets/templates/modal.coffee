@@ -3,6 +3,7 @@ unless templates
   templates = {}
 templates.modal = '
 <div class="container" tabIndex="0" style="display: none">
+  <div class="backdrop"></div>
   <div class="modal">
     <div class="modal-inner">
       <div class="header">

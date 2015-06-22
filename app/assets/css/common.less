@@ -15,6 +15,11 @@
   -moz-transition: @transition;
   transition: @transition;
 }
+.transition-delay (@transition) {
+  -webkit-transition-delay: @transition;
+  -moz-transition-delay: @transition;
+  transition-delay: @transition;
+}
 .transform(@string){
   -webkit-transform: @string;
   -moz-transform: @string;

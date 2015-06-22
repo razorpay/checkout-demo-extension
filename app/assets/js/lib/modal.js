@@ -190,10 +190,8 @@
         })
       }
       if (this.options.backdropClose) {
-        this.on('click', this.element, function(e) {
-          if (e.target === this.element[0] && this.options.backdropClose) {
-            this.hide();
-          }
+        this.on('click', this.element.children('.backdrop'), function(e) {
+          this.options.backdropClose && this.hide();
         })
       }
     }

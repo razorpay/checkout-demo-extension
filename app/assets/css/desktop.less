@@ -13,7 +13,6 @@
 // input elements horizontal padding
 @input-padding: 14px;
 
-
 @font-face {
   font-family: 'lato';
   src: url('fonts/lato.eot?#iefix') format('embedded-opentype'), url('fonts/lato.woff') format('woff'), url('fonts/lato.ttf')  format('truetype'), url('fonts/lato.svg#lato') format('svg');
@@ -42,26 +41,35 @@ i{
   }
 }
 
-body{
-  position: absolute;
+body, html{
   margin: 0;
+  height: 100%;
+}
+
+.backdrop{
+  background: rgba(0,0,0,0.6);
+  filter: alpha(opacity=40);
+  position: fixed;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
 }
 
 .container{
-  outline: none;
   height: 100%;
+  outline: none;
   text-align: center;
-  opacity: 0;
-  background: rgba(0,0,0,0.6);
-  filter: alpha(opacity=40);
-
   .transition(0.25s ease-out opacity);
+
   z-index: 19999;
   .middlefix();
   &.shown{
     opacity: 1;
+
+    .powered-by{
+      opacity: 1;
+    }
     .modal{
       opacity: 1;
       .scale(1);
@@ -429,6 +437,7 @@ li:hover, li.active{
   bottom: 0;
 }
 .powered-by{
+  opacity: 0;
   position: absolute;
   font-size: 50px;
   left: 0;
@@ -437,6 +446,8 @@ li:hover, li.active{
   color: #888;
   line-height: 36px;
   bottom: -60px;
+  .transition(0.3s);
+  .transition-delay(0.2s);
   &:hover{
     color: #ddd;
   }
