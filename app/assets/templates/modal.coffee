@@ -7,7 +7,7 @@ templates.modal = '
     <div class="modal-inner">
       <div class="header">
         <div class="merchant">
-          <div class="modal-close"></div>
+          <div class="modal-close">×</div>
           <div class="merchant-image">
             {{if(it.image){}}
               <img src="{{=it.image}}">
@@ -17,7 +17,6 @@ templates.modal = '
             <div class="merchant-title">{{=it.name}}</div>
             <div class="merchant-desc">{{=it.description}}</div>
           </div>
-          <a class="merchant-powered" href="https://razorpay.com" target="_blank"></a>
         </div>
       </div>
       <div class="body">
@@ -111,7 +110,7 @@ templates.modal = '
             <button class="submit" type="submit">
               <span class="ring"></span>
               <span class="text">
-                Pay
+                <i>&#xe609;</i>
                 {{if(it.display_currency){}}
                   ${{=it.display_amount}}
                 {{} else {}}
@@ -124,5 +123,6 @@ templates.modal = '
         </form>
       </div>
     </div>
+    <a class="powered-by" href="https://razorpay.com" target="_blank">&#xe608;</a>
   </div>
 </div>'
