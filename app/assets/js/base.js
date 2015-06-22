@@ -54,6 +54,8 @@
   discreet.xdm = {
     _getMessageCallback:  function(callback, context){
       return function(e){
+        if(e.originalEvent)
+          e = e.originalEvent;
         if(!e || !e.data || typeof callback != 'function'){
           return;
         }

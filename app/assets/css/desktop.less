@@ -13,6 +13,17 @@
 // input elements horizontal padding
 @input-padding: 14px;
 
+
+@font-face {
+  font-family: 'lato';
+  src: url('fonts/lato.eot?#iefix') format('embedded-opentype'), url('fonts/lato.woff') format('woff'), url('fonts/lato.ttf')  format('truetype'), url('fonts/lato.svg#lato') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+i{
+  font-size: 24px;
+  font-style: normal;
+}
 .clear{
   .clearfix();
 }
@@ -81,6 +92,7 @@ input, select, textarea{
   position: relative;
 }
 select{
+  .appearance(none);
   height: 24px\9; // ie8 and below
 }
 input[type=radio]{
@@ -126,7 +138,7 @@ button{
   width: @width;
   border-radius: 5px;
   background: @background-color;
-  font-family: 'Lato', Sans-serif;
+  font-family: 'lato', Sans-serif;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 375px;
 }
@@ -144,10 +156,18 @@ button{
   .transition(0.25s border-color);
   background: #fff center right no-repeat;
 
+  i{
+    position: absolute;
+    right: @input-padding;
+    z-index: 2;
+    line-height: 28px;
+    font-size: 36px;
+    color: #999;
+  }
   &.focused{
     border-color: @primary;
     color: black;
-    z-index: 1;
+    z-index: 2;
   }
   &.mature.invalid{
     color: @danger;
@@ -270,13 +290,8 @@ button{
   // filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/favicon.png',sizingMethod='scale');
   // -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/favicon.png',sizingMethod='scale')";
 }
-.rupee-icon{
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAYAAADzoH0MAAABoUlEQVQ4EZWUu0oDURCGdzV4QUkjRhALURBBQbBSRFsfwcpW0tkJErCys12xCYJiJV4KfQUVrSwECwleQETUQqKFRrN+E8/AySYn2fzwMZMz88/sHpZ4HgrDcBp+oVFtiLkDzhp10n8p3gQPMAr3cAvN0Al9MAwtoLojOYEmcxD4vv9p8vLAZB/G4BhUjyTd5Z2e58sBBdksW1UhSQG64Aj6QbQC26Xs35sv5QzIQB4+Irzz+wtUBRLteyYfl+3yqK/w7UBMqiKJ9q3KdnnXHqI8alEOIpJXmYeMOQ+I6ybPcYnymrXFggOzXrZP1e6OVDEswI8ZcEiUy64UhVZoB/moUjADmyBbRefQW+k0JxR34AZy8AYqufEA5I7couFUHcQn2IJFGHK7rAqNS6CSL27QKtdPMSRgTycQLyBZ32l1YJDLuwZV1irHS3FOgFycKh3PaXXhTKubKMMmrXK8FFPWGiKvlYrnNF0YkiAXqdonqf4VuiZjGIEXnUBcdvU6zzHNgf7Zyv/CrLPZVcC0BqoHkgFXb9VzDG1wpROIu3bjH9Lpayomlf62AAAAAElFTkSuQmCC') center no-repeat;
-  display: inline-block;
-  background-size: 8px;
-  width: 14px;
-  height: 14px;
-  margin: 0px -1px -1px;
+.rupee-icon:before{
+  content: "\e600";
 }
 .clear{
   clear:both;
@@ -285,38 +300,28 @@ button{
   text-align: left;
   padding: 0 @padding;
 }
-.elem-name{
-  background-image: url('../images/ei-user.png');
-}
-.elem-email{
-  background-image: url('../images/ei-envelope.png');
-}
-.elem-contact{
-  background-image: url('../images/phone.png');
-}
+
 .elem-card{
-  background-image: url('../images/card.png');
   &.visa{
+    i{display: none}
     background-image: url('../images/icons/visa.png');
   }
   &.mastercard{
+    i{display: none}
     background-image: url('../images/icons/mastercard.png');
   }
   &.maestro{
+    i{display: none}
     background-image: url('../images/icons/maestro.png');
   }
   &.rupay{
+    i{display: none}
     background-image: url('../images/icons/rupay.png');
   }
   &.amex{
+    i{display: none}
     background-image: url('../images/icons/amex.png');
   }
-}
-.elem-expiry{
-  background-image: url('../images/ei-calendar.png');
-}
-.elem-cvv{
-  background-image: url('../images/ei-lock.png');
 }
 
 .body .submit.error{

@@ -202,14 +202,14 @@
 
       discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
         var parent;
-        parent = $(this.parentNode.parentNode);
+        parent = $(this.parentNode);
         return parent[$.payment.validateCardNumber(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
       discreet.$el.find('.input[name="card[expiry]"]').payment('formatCardExpiry');
       discreet.$el.find('.input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function(){
         var parent;
-        parent = $(this.parentNode.parentNode);
+        parent = $(this.parentNode);
         return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
