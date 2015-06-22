@@ -36,14 +36,10 @@ templates.modal = '
 
             <div class="fieldset">
               <div class="elem elem-email" style="border-radius: 4px 4px 0 0">
-                <div class="elem-inner">
-                  <input class="input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
-                </div>
+                <input class="input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
               </div>
               <div class="elem elem-contact" style="border-radius: 0 0 4px 4px">
-                <div class="elem-inner">
-                  <input class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
-                </div>
+                <input class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
               </div>
             </div>
           </div>
@@ -65,25 +61,17 @@ templates.modal = '
             <div class="fieldset tab-content active" id="tab-card">
               <input type="hidden" name="method" value="card">
               <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
-                <div class="elem-inner">
-                  <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
-                </div>
+                <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
               </div>
               <div class="elem elem-card">
-                <div class="elem-inner">
-                  <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
-                </div>
+                <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
               </div>
               <div class="double">
                 <div class="elem elem-expiry" style="border-radius: 0 0 0 4px">
-                  <div class="elem-inner">
-                    <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
-                  </div>
+                  <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
                 </div>
                 <div class="elem elem-cvv" style="border-radius: 0 0 4px 0">
-                  <div class="elem-inner">
-                    <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
-                  </div>
+                  <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </div>
               </div>
             </div>
@@ -97,14 +85,12 @@ templates.modal = '
                 </div>
               {{?}}
               <div class="elem select" style="border-radius: 4px">
-                <div class="elem-inner">
-                  <select name="bank" required class="input" pattern="[\\w]+">
-                    <option selected="selected" value="">Select Bank</option>
-                    {{for(var i in it.method.netbanking){}}
-                      <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
-                    {{}}}
-                  </select>
-                </div>
+                <select name="bank" required class="input" pattern="[\\w]+">
+                  <option selected="selected" value="">Select Bank</option>
+                  {{for(var i in it.method.netbanking){}}
+                    <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
+                  {{}}}
+                </select>
               </div>
             </div>
           {{?}}

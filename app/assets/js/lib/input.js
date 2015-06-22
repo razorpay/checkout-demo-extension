@@ -41,7 +41,7 @@
     },
 
     parent: function(el) {
-      return el.parentNode.parentNode;
+      return el.parentNode;
     },
 
     common_events: function() {

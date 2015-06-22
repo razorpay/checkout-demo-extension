@@ -81,19 +81,11 @@
         discreet.xdm.removeMessageListener();
       }
       discreet.xdm._listener = discreet.xdm._getMessageCallback(callback, context);
-      if (window.addEventListener) {
-        window.addEventListener('message', discreet.xdm._listener, false);
-      } else if(window.attachEvent){
-        window.attachEvent('onmessage', discreet.xdm._listener);
-      }
+      $(window).on('message', discreet.xdm._listener);
     },
 
     removeMessageListener: function() {
-      if (window.removeEventListener) {
-        window.removeEventListener('message', discreet.xdm._listener, false);
-      } else if(window.detachEvent){
-        window.detachEvent('onmessage', discreet.xdm._listener);
-      }
+      $(window).off('message', discreet.xdm._listener);
       discreet.xdm._listener = null;
     }
   }
