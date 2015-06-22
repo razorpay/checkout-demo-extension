@@ -123,8 +123,7 @@
 
       else if (response.callbackUrl){
         var nextRequest = {
-          autosubmit: response.data,
-          rzp: 1
+          autosubmit: response.data
         }
         nextRequest.autosubmit.callbackUrl = response.callbackUrl;
         discreet.navigatePopup.call(request, nextRequest);
@@ -132,8 +131,7 @@
 
       else if (response.redirectUrl){
         var nextRequest = {
-          location: response.redirectUrl,
-          rzp: 1
+          location: response.redirectUrl
         };
         discreet.navigatePopup.call(request, nextRequest);
       }
@@ -142,12 +140,12 @@
     }
   }
   discreet.setupPopup = function(request){
-    var rzp = request.rzp;
-    
-    discreet.hedwig.setupCC(rzp.options.protocol + '://' + rzp.options.hostname + '/crossCookies.php');
+    var options = request.options;
+
+    discreet.hedwig.setupCC(options.protocol + '://' + options.hostname + '/crossCookies.php');
     discreet.xdm.addMessageListener(discreet.XDCallback, request);
 
-    var popup = request.popup = new Popup(rzp.options.protocol + '://' + rzp.options.hostname + '/' + 'processing.php');
+    var popup = request.popup = new Popup(options.protocol + '://' + options.hostname + '/' + 'processing.php');
     if (typeof request.error == 'function'){
       popup.onClose(discreet.getPopupClose(request));
     }
@@ -195,33 +193,7 @@
         }
       })
       if(request.payment_id)
-        $.post(discreet.makeUrl(request.rzp) + '/payments/'+request.payment_id+'/cancel');
+        $.post(discreet.makeUrl(request.options) + '/payments/'+request.payment_id+'/cancel');
     }
-  }
-
-  Razorpay.prototype.getMethods = function(callback){
-    var rzp = this;
-    return $.ajax({
-      url: discreet.makeUrl(this) + this.options.methodsUrl,
-      data: {key_id: this.options.key},
-      timeout: 30000,
-      dataType: 'jsonp',
-      success: function(response){
-        if (!('error' in response)){
-          rzp.paymentMethods = response;
-        }
-        if(typeof callback == 'function'){
-          callback(response);
-        }
-      },
-      complete: function(xhr, status){
-        if(status != "success" && typeof callback == 'function'){
-          var response = xhr.responseJSON;
-          if(!response || !('error' in response))
-            response = {error: true};
-          callback(response);
-        }
-      }
-    });
   }
 })();

@@ -27,7 +27,6 @@ var optionsExtended = {
   protocol: 'http',
   hostname: 'api.razorpay.dev'
 }
-// var $ = Razorpay.prototype.$;
 
 describe("new Razorpay", function(){
   var rzp;

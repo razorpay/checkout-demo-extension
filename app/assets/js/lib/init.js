@@ -4,10 +4,10 @@ Razorpay = function(options){
   }
   return this;
 };
+
 (function(){
   var currentScript = document.currentScript || (function() {
-    var scripts;
-    scripts = document.getElementsByTagName('script');
+    var scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
   })()
   Razorpay.prototype.discreet = {

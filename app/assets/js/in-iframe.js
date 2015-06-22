@@ -168,7 +168,7 @@
       if(window.payment_methods){
         discreet.setMethods(window.payment_methods);
       } else {
-        return discreet.rzp.getMethods(function(payment_methods){
+        return discreet.rzp.payment.getMethods(function(payment_methods){
           if('error' in payment_methods){
             discreet.errorHandler(payment_methods);
           } else {
@@ -281,10 +281,11 @@
       discreet.$el.find('.submit').attr('disabled', true);
       discreet.modal && (discreet.modal.options.backdropClose = false);
 
-      discreet.rzp.submit({
+      Razorpay.payment.authorize({
         data: data,
+        options: discreet.rzp.options,
         error: discreet.errorHandler,
-        success: discreet.successHandler
+        success: discreet.successHandler,
       })
       discreet.postMessage({
         event: 'submit',

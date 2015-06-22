@@ -24,7 +24,7 @@
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
 
     if(!this.checkoutFrame){
-      this.checkoutFrame = discreet.createFrame(this);
+      this.checkoutFrame = discreet.createFrame(this.options);
       body.appendChild(this.checkoutFrame);
     } else {
       this.checkoutFrame.style.display = 'block';
@@ -33,17 +33,17 @@
     }
   }
 
-  discreet.createFrame = function(rzp){
+  discreet.createFrame = function(options){
     var frame = document.createElement('iframe');
     var src = discreet.currentScript.src;
     if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
-      src = discreet.makeUrl(rzp) + '/checkout?key_id=' + rzp.options.key;
+      src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
     } else {
       src = src.replace(/(js\/lib\/)?[^\/]+$/,'') + 'checkout.html';
     }
 
     var attrs = {
-      'class': 'razorpay-checkout-frame',
+      'class': 'razorpay-checkout-frame', // quotes needed for ie
       style: 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
       allowtransparency: true,
       frameborder: 0,
