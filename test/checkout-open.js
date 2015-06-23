@@ -94,7 +94,6 @@ describe("checkout validate", function(){
   })
 })
 
-
 // // Modal functionality
 // describe("Razorpay modal", function(){
 //   var cancelSpy;

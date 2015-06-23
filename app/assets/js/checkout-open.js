@@ -256,21 +256,28 @@
       return false;
     }
   };
-  var key = discreet.currentScript.getAttribute('data-key');
-  if (key && key.length > 0){
-    var attrs = discreet.currentScript.attributes;
-    var opts = {};
-    for(var i=0; i<attrs.length; i++){
-      var name = attrs[i].name
-      if(/^data-/.test(name)){
-        name = name.replace(/^data-/,'');
-        opts[name] = attrs[i].value;
+
+  /**
+  * This checks whether we are in automatic mode
+  * If yes, it puts in the button
+  */
+  discreet.automaticCheckoutInit = function(){
+    var key = discreet.currentScript.getAttribute('data-key');
+    if (key && key.length > 0){
+      var attrs = discreet.currentScript.attributes;
+      var opts = {};
+      for(var i=0; i<attrs.length; i++){
+        var name = attrs[i].name
+        if(/^data-/.test(name)){
+          name = name.replace(/^data-/,'');
+          opts[name] = attrs[i].value;
+        }
       }
+      discreet.parseScriptOptions(opts);
+      opts.handler = discreet.defaultPostHandler;
+      var rzp = new Razorpay(opts);
+      discreet.addButton(rzp);
     }
-    discreet.parseScriptOptions(opts);
-    opts.handler = discreet.defaultPostHandler;
-    var rzp = new Razorpay(opts);
-    discreet.addButton(rzp);
   }
 
   discreet.validateCheckout = function(options, errors){
@@ -314,5 +321,8 @@
       }
     }
   }
+
+  // Get the ball rolling in case we are in manual mode
+  discreet.automaticCheckoutInit();
 
 })()
