@@ -38,8 +38,6 @@
       'description': 'Armour 20',
       'image': 'images/image1.jpg',
       'handler': function (transaction){
-        if(window.console) // ie error
-          console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
       hostname: 'beta.razorpay.com',
@@ -68,7 +66,8 @@
 
     document.getElementById('rzp-button1').onclick = function(e) {
       rzp1.open();
-      e.preventDefault();
+      if(e.preventDefault)
+        e.preventDefault();
     };
 
     var opt2 = {
