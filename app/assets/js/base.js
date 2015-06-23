@@ -83,7 +83,8 @@
         discreet.xdm.removeMessageListener();
       }
       discreet.xdm._listener = discreet.xdm._getMessageCallback(callback, context);
-      $(window).on('message', discreet.xdm._listener);
+      var winref = $(window).on('message', discreet.xdm._listener);
+      if(typeof winref == 'function') discreet.xdm._listener = winref; // if listener is returned by minimal-jquery
     },
 
     removeMessageListener: function() {

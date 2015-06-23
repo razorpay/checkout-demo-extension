@@ -35,9 +35,6 @@ module.exports = function(grunt){
       copy_images:{
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
       },
-      copy_fonts:{
-        cmd: 'cp -r app/srv/fonts app/dist/v1/fonts/'
-      },
       copy_html:{
         cmd: 'cp app/srv/*.html app/dist/v1/'
       }
@@ -159,7 +156,6 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'exec:dir_images',
     'exec:copy_images',
-    'exec:copy_fonts',
     'inline',
     'exec:copy_html'
   ]);
