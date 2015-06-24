@@ -51,6 +51,7 @@
     if(data.source === 'popup'){
       if(!this.popup._loaded){
         this.popup._loaded = true;
+        discreet.sendMetadata(this);
         this.popup.loaded();
       }
       return;
@@ -78,7 +79,7 @@
       var payment_id = response.payment_id;
       this.payment_id = payment_id;
       var error = response.error;
-      var request = response.request;
+      var nextRequest = response.request;
       var success = response.success;
 
       if(!payment_id || typeof error == 'object'){
@@ -89,9 +90,9 @@
         discreet.paymentSuccess.call(this, {razorpay_payment_id: payment_id});
       }
 
-      else if(typeof request == 'object'){
-        if(request.url){
-          return discreet.navigatePopup.call(this, request);
+      else if(typeof nextRequest == 'object'){
+        if(nextRequest.url){
+          return discreet.navigatePopup.call(this, nextRequest);
         }
       }
     }
@@ -139,6 +140,20 @@
       else discreet.error.call(request, response);
     }
   }
+  
+  // send order data to popup as soon as it gets loaded
+  discreet.sendMetadata = function(request){
+    var options = request.options;
+    var message = {
+      metadata: {
+        amount: options.amount,
+        description: options.description,
+        name: options.name
+      }
+    }
+    discreet.hedwig.sendMessage(message, '*', request.popup.window);
+  }
+
   discreet.setupPopup = function(request){
     var options = request.options;
 
@@ -151,7 +166,8 @@
     }
 
     popup._loaded = false;
-    popup.loaded = function(){};
+    popup.loaded = $.noop;
+    
     try{
       var info;
       if(typeof popup.window == 'undefined'){
