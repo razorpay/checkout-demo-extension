@@ -44,7 +44,8 @@
 
 
       var url = discreet.makeUrl(options);
-      if(options.redirect){
+
+      if(options.callbackUrl || options.redirect){
         var form = document.createElement('form');
         form.setAttribute('action', url + '/payments');
         form.setAttribute('method', 'post');
@@ -54,6 +55,9 @@
           rdata['notes['+i+']'] = rdata.notes[i];
         }
         delete rdata.notes;
+
+        if(options.callbackUrl) rdata.callbackUrl = options.callbackUrl;
+
         for(i in rdata){
           var j = i.replace(/"/g,''); // attribute sanitize
           formHTML += '<input type="hidden" name="'+j+'" value="'+rdata[i]+'">';
@@ -64,16 +68,16 @@
         return true;
       } else {
         discreet.setupPopup(request);
-      }
 
-      return $.ajax({
-        url: url + options.jsonpUrl,
-        dataType: 'jsonp',
-        success: discreet.getAjaxSuccess(request),
-        timeout: 35000,
-        error: request.error,
-        data: rdata
-      });
+        return $.ajax({
+          url: url + options.jsonpUrl,
+          dataType: 'jsonp',
+          success: discreet.getAjaxSuccess(request),
+          timeout: 35000,
+          error: request.error,
+          data: rdata
+        });
+      }
     },
 
     getMethods: function(callback){

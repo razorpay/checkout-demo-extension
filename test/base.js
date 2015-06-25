@@ -38,8 +38,34 @@ describe("new Razorpay", function(){
 
   it("should create Razorpay instance", function(){
     rzp = new Razorpay(options);
-    expect(rzp).toBeDefined();
+    expect(rzp instanceof Razorpay).toBe(true);
   });
+})
+
+describe("xdm listener should", function(){
+  var spy;
+
+  beforeEach(function(){
+    spy = jasmine.createSpy();
+    discreet.xdm.addMessageListener(spy, null);
+  })
+  
+  it("be called if attached", function(done){
+    postMessage('foo', '*');
+    setTimeout(function(){
+      expect(spy).toHaveBeenCalled();
+      done();
+    });
+  })
+
+  it("not be called if detached", function(done){
+    discreet.xdm.removeMessageListener();
+    postMessage('foo', '*');
+    setTimeout(function(){
+      expect(spy).not.toHaveBeenCalled();
+      done();
+    });
+  })
 })
 
 describe("configure method", function(){

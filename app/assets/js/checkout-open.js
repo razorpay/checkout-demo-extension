@@ -12,7 +12,6 @@
     if(!body){
       setTimeout(this.open());
     }
-
     if(discreet.isOpen){
       return;
     }
@@ -103,10 +102,14 @@
       }
       if(options.image.indexOf('http')){ // not 0
         var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+        var relUrl = '';
         if(options.image[0] != '/'){
-          baseUrl += '/' + location.pathname.replace(/[^\/]*$/g,'');
+          relUrl += location.pathname.replace(/[^\/]*$/g,'');
+          if(relUrl[0] != '/'){
+            relUrl = '/' + relUrl;
+          }
         }
-        options.image = baseUrl + options.image;
+        options.image = baseUrl + relUrl + options.image;
       }
     }
   }

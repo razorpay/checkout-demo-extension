@@ -18,6 +18,7 @@
     currency: 'INR',
     handler: $.noop,
     notes: {},
+    callbackUrl: '',
     redirect: false,
     description: '',
 

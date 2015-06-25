@@ -34,14 +34,6 @@ var response_v1 = {
 var no3dsecureResponse = {
   razorpay_payment_id: 'xyz'
 }
-// var popupMessage = {
-//   message: {
-//     origin: 'checkout.razorpay.com'
-//   },
-//   data{
-
-//   }
-// }
 
 var request = {
   data: {
