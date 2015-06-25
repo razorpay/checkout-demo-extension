@@ -343,7 +343,7 @@ var __slice = [].slice,
   setCardType = function(e) {
     var $target, allTypes, card, cardType, val;
     val = e.currentTarget.value;
-    $target = $(e.currentTarget.parentNode.parentNode);
+    $target = $(e.currentTarget.parentNode);
     cardType = $.payment.cardType(val);
     if (!$target.hasClass(cardType)) {
       allTypes = (function() {

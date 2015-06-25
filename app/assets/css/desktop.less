@@ -5,6 +5,7 @@
 @border-color: #e6e6e6;
 @background-color: #fafafa;
 @danger: #f46060;
+@border-radius: 4px;
 
 @width: 320px;
 @padding: 20px;
@@ -13,6 +14,9 @@
 // input elements horizontal padding
 @input-padding: 14px;
 
+i{
+  font-style: normal;
+}
 .clear{
   .clearfix();
 }
@@ -31,23 +35,35 @@
   }
 }
 
-body{
-  position: absolute;
+body, html{
   margin: 0;
+  height: 100%;
+}
+
+.backdrop{
+  background: rgba(0,0,0,0.6);
+  filter: alpha(opacity=40);
+  position: fixed;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
 }
 
 .container{
   height: 100%;
+  outline: none;
   text-align: center;
-  opacity: 0;
-  background: rgba(0,0,0,0.6);
   .transition(0.25s ease-out opacity);
+
   z-index: 19999;
   .middlefix();
   &.shown{
     opacity: 1;
+
+    .powered-by{
+      opacity: 1;
+    }
     .modal{
       opacity: 1;
       .scale(1);
@@ -65,18 +81,21 @@ button, input, select, textarea{
   outline: none;
 }
 input, select, textarea{
+  display: inline-block;
   color: inherit;
-  line-height: inherit;
   height: inherit;
   border-radius: inherit;
   font-size: 14px;
   resize: none;
   width: 100%;
-  display: block;
   padding: 0 @input-padding;
-  margin: 0 -@input-padding;
+  .box-sizing(border-box);
   background: none;
   position: relative;
+}
+select{
+  .appearance(none);
+  height: 24px\9; // ie8 and below
 }
 input[type=radio]{
   display: inline-block;
@@ -88,9 +107,9 @@ input[type=radio]{
 button{
   padding: 0;
   margin: 0;
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 @border-radius @border-radius;
   background: @primary no-repeat 12px center;
-  line-height: 52px;
+  line-height: 50px;
   color: #fff;
   font-size: 16px;
   box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
@@ -109,7 +128,6 @@ button{
   display: inline-block;
   white-space: normal;
   margin: 20px 0;
-  overflow: hidden;
   opacity: 0;
   .transform(scale(0.9));
   &.animate{
@@ -119,9 +137,9 @@ button{
   color: @color;
   font-size: @font-size;
   width: @width;
-  border-radius: 5px;
+  border-radius: @border-radius;
   background: @background-color;
-  font-family: 'Lato', Sans-serif;
+  font-family: "lato", Arial, Helvetica, sans-serif;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 375px;
 }
@@ -139,14 +157,23 @@ button{
   .transition(0.25s border-color);
   background: #fff center right no-repeat;
 
+  i{
+    position: absolute;
+    right: @input-padding;
+    z-index: 2;
+    line-height: 36px;
+    font-size: 30px;
+    color: #999;
+  }
   &.focused{
     border-color: @primary;
     color: black;
-    z-index: 1;
+    z-index: 2;
   }
   &.mature.invalid{
     color: @danger;
-    box-shadow: 0 0 1px @danger inset;
+    border-color: @danger;
+    z-index: 1;
     &.focused{
       border-color: @danger;
     }
@@ -156,17 +183,11 @@ button{
   .input{
     opacity: 0;
   }
-  .elem-inner:before{
+  &:before{
     content: 'Select Bank';
     position: absolute;
-    top: 1px;
+    left: @input-padding;
   }
-}
-.elem-inner{
-  margin: 0 @input-padding;
-  height: inherit;
-  line-height: inherit;
-  border-radius: inherit;
 }
 .help-text{
   color: #fff;
@@ -179,7 +200,7 @@ button{
   font-size: 80%;
   text-align: center;
   background: #333;
-  border-radius: 4px;
+  border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
   opacity: 0;
   filter: alpha(opacity=0);
@@ -221,12 +242,8 @@ button{
 .fieldset{
   margin: 20px 0;
 }
-.modal-close{
-  display: none;
-  float: left;
-}
 .merchant{
-  border-radius: 2px 2px 0 0;
+  border-radius: @border-radius @border-radius 0 0;
   background: #fff;
   position: relative;
   padding: 10px;
@@ -259,22 +276,21 @@ button{
   color: #333;
   margin-bottom: 5px;
 }
-.merchant-powered{
+.modal-close{
   position: absolute;
   right: 0;
   top: 0;
-  height: 100%;
-  width: 52px;
-  background: url('../images/favicon.png') center no-repeat;
-  background-size: 26px;
+  width: 30px;
+  font-size: 20px;
+  color: #999;
+  line-height: 36px;
+  cursor: pointer;
+  &:hover{
+    color: #333;
+  }
 }
-.rupee-icon{
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAYAAADzoH0MAAABoUlEQVQ4EZWUu0oDURCGdzV4QUkjRhALURBBQbBSRFsfwcpW0tkJErCys12xCYJiJV4KfQUVrSwECwleQETUQqKFRrN+E8/AySYn2fzwMZMz88/sHpZ4HgrDcBp+oVFtiLkDzhp10n8p3gQPMAr3cAvN0Al9MAwtoLojOYEmcxD4vv9p8vLAZB/G4BhUjyTd5Z2e58sBBdksW1UhSQG64Aj6QbQC26Xs35sv5QzIQB4+Irzz+wtUBRLteyYfl+3yqK/w7UBMqiKJ9q3KdnnXHqI8alEOIpJXmYeMOQ+I6ybPcYnymrXFggOzXrZP1e6OVDEswI8ZcEiUy64UhVZoB/moUjADmyBbRefQW+k0JxR34AZy8AYqufEA5I7couFUHcQn2IJFGHK7rAqNS6CSL27QKtdPMSRgTycQLyBZ32l1YJDLuwZV1irHS3FOgFycKh3PaXXhTKubKMMmrXK8FFPWGiKvlYrnNF0YkiAXqdonqf4VuiZjGIEXnUBcdvU6zzHNgf7Zyv/CrLPZVcC0BqoHkgFXb9VzDG1wpROIu3bjH9Lpayomlf62AAAAAElFTkSuQmCC') center no-repeat;
-  display: inline-block;
-  background-size: 8px;
-  width: 14px;
-  height: 14px;
-  margin: 0px -1px -1px;
+.rupee-icon:before{
+  content: "\e600";
 }
 .clear{
   clear:both;
@@ -283,38 +299,28 @@ button{
   text-align: left;
   padding: 0 @padding;
 }
-.elem-name{
-  background-image: url('../images/ei-user.png');
-}
-.elem-email{
-  background-image: url('../images/ei-envelope.png');
-}
-.elem-contact{
-  background-image: url('../images/phone.png');
-}
+
 .elem-card{
-  background-image: url('../images/card.png');
   &.visa{
+    i{display: none}
     background-image: url('../images/icons/visa.png');
   }
   &.mastercard{
+    i{display: none}
     background-image: url('../images/icons/mastercard.png');
   }
   &.maestro{
+    i{display: none}
     background-image: url('../images/icons/maestro.png');
   }
   &.rupay{
+    i{display: none}
     background-image: url('../images/icons/rupay.png');
   }
   &.amex{
+    i{display: none}
     background-image: url('../images/icons/amex.png');
   }
-}
-.elem-expiry{
-  background-image: url('../images/ei-calendar.png');
-}
-.elem-cvv{
-  background-image: url('../images/ei-lock.png');
 }
 
 .body .submit.error{
@@ -345,10 +351,6 @@ button{
 }
 .error-container.has-error .error{
   bottom: 0;
-}
-.modal iframe{
-  border: none;
-  border-radius: 5px;
 }
 .tab-content{
   display: none;
@@ -423,4 +425,20 @@ li:hover, li.active{
   position: absolute;
   width: 100%;
   bottom: 0;
+}
+.powered-by{
+  opacity: 0;
+  position: absolute;
+  font-size: 36px;
+  left: 0;
+  width: 100%;
+  text-decoration: none;
+  color: #888;
+  line-height: 36px;
+  bottom: -60px;
+  .transition(0.3s);
+  .transition-delay(0.2s);
+  &:hover{
+    color: #ddd;
+  }
 }

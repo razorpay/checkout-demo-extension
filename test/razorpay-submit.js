@@ -6,7 +6,7 @@ var options = {
   'key': 'key_id',
   'amount': '40000',
   'name': 'Merchant Name',
-  'host': 'api.razorpay.dev'
+  'hostname': 'api.razorpay.dev'
 }
 
 var response_v1 = {
@@ -34,14 +34,6 @@ var response_v1 = {
 var no3dsecureResponse = {
   razorpay_payment_id: 'xyz'
 }
-// var popupMessage = {
-//   message: {
-//     origin: 'checkout.razorpay.com'
-//   },
-//   data{
-
-//   }
-// }
 
 var request = {
   data: {
@@ -50,73 +42,68 @@ var request = {
   }
 }
 
-describe("init razorpay should", function(){
-  it("set hedwig", function(){
-    isHedwig = new Razorpay(options).hedwig instanceof Hedwig;
-    expect(isHedwig).toBe(true);
+describe("Razorpay.configure should", function(){
+  it("set default options", function(){
+    Razorpay.configure(options);
+    for(var i in options){
+      expect(options[i]).toBe(discreet.defaults[i]);
+    }
   })
 })
-describe("validate submission data method should", function(){
-  var init_options, errors, field;
-})
 
-describe("submit should", function(){
+describe("authorize should", function(){
   var init_options, rzp, req;
 
   beforeEach(function(){
     req = jQuery.extend(true, {}, request);
-    init_options = jQuery.extend(true, {}, options);
   });
 
   it("fail when invalid data passed", function(){
-    spyOn(Razorpay.prototype, 'validateData').and.callFake(function(){
+    spyOn(Razorpay.payment, 'validate').and.callFake(function(){
       return [null];
     })
-    expect(new Razorpay(init_options).submit(req)).toBe(false);
+    expect(Razorpay.payment.authorize(req)).toBe(false);
   });
 
   it("submit html post form if redirect flag is passed", function(){
     var spyCalled = jasmine.createSpy();
     HTMLFormElement.prototype.submit = spyCalled;
 
-    init_options.redirect = true;
-    new Razorpay(init_options).submit(req);
+    Razorpay.configure({redirect: true});
+    Razorpay.payment.authorize(req);
 
     expect(spyCalled).toHaveBeenCalled();
+    Razorpay.configure({redirect: false});
   });
 
   it("add merchant key in request data", function(){
-    new Razorpay(init_options).submit(req);
+    Razorpay.payment.authorize(req);
     expect(req.data.key_id).toBe(options.key);
   })
 
   it("setup popup", function(){
-    new Razorpay(init_options).submit(req);
+    Razorpay.payment.authorize(req);
     var isPopup = req.popup instanceof Razorpay.prototype.Popup;
     expect(isPopup).toBe(true);
   })
 
-  it("add razorpay instance to request object", function(){
-    rzp = new Razorpay(init_options);
-    rzp.submit(req);
-    isRzp = req.rzp instanceof Razorpay;
-    expect(isRzp).toBe(true);
+  it("add options to request object", function(){
+    Razorpay.payment.authorize(req);
+    expect(typeof req.options).toBe('object');
   })
 
   it("return ajax object", function(){
-    rzp = new Razorpay(init_options);
-    var obj = rzp.submit(req);
+    var obj = Razorpay.payment.authorize(req);
     expect(typeof obj).toBe("object");
     expect(typeof obj.abort).toBe("function");
   })
 })
 
-describe("submit ajax should invoke", function(){
-  var init_options, rzp, req, spyCalled, spyNotCalled;
+describe("authorize ajax should invoke", function(){
+  var init_options, req, spyCalled, spyNotCalled;
 
   beforeEach(function(){
     req = jQuery.extend(true, {}, request);
-    init_options = jQuery.extend(true, {}, options);
     spyCalled = jasmine.createSpy();
     spyNotCalled = jasmine.createSpy();
   });
@@ -131,7 +118,7 @@ describe("submit ajax should invoke", function(){
       request.success(no3dsecureResponse);
     })
     spyOn(discreet, 'paymentSuccess').and.callFake(spyCalled);
-    new Razorpay(init_options).submit(req);
+    Razorpay.payment.authorize(req);
   })
 
   it("request success callback when immediate success", function(){
@@ -142,7 +129,7 @@ describe("submit ajax should invoke", function(){
       if(typeof response.razorpay_payment_id == 'string')
         spyCalled();
     }
-    new Razorpay(init_options).submit(req);
+    Razorpay.payment.authorize(req);
   })
 })
 
@@ -155,7 +142,7 @@ describe("XDCallback should", function(){
     rzp = new Razorpay(init_options);
     req = jQuery.extend(true, {}, request);
     spyOn($, 'ajax').and.callFake($.noop);
-    rzp.submit(req);
+    Razorpay.payment.authorize(req);
     spyCalled = jasmine.createSpy();
   });
 
@@ -192,12 +179,11 @@ describe("XDCallback should", function(){
 
 describe("navigatePopup method should", function(){
   var init_options = jQuery.extend(true, {}, options);
-  var rzp = new Razorpay(init_options);
 
   it("invoke request's error callback if popup has not been setup", function(){
     spyOn($, 'ajax').and.callFake($.noop);
     var req = jQuery.extend(true, {error: $.noop}, request);
-    rzp.submit(req);
+    Razorpay.payment.authorize(req);
 
     req.popup = 'pop';
     var spyCalled = jasmine.createSpy();
@@ -209,13 +195,13 @@ describe("navigatePopup method should", function(){
   it("convey request details to popup", function(){
     spyOn($, 'ajax').and.callFake($.noop);
     var req = jQuery.extend(true, {error: $.noop}, request);
-    rzp.submit(req);
+    Razorpay.payment.authorize(req);
 
     var customObject = {};
     var anObject;
     var spyCalled = jasmine.createSpy();
 
-    spyOn(Hedwig.prototype, 'sendMessage').and.callFake(function(message, origin, source){
+    spyOn(discreet.hedwig, 'sendMessage').and.callFake(function(message, origin, source){
       if(source == req.popup.window){
         anObject = message;
       }
@@ -246,7 +232,7 @@ describe("api ajax handler should", function(){
     }
     var spy = jasmine.createSpy();
     req.error = spy;
-    rzp.submit(req);
+    Razorpay.payment.authorize(req);
     expect(spy).toHaveBeenCalled();
   })
 
@@ -263,21 +249,19 @@ describe("api ajax handler should", function(){
       isSameObj = request === nextRequest;
     })
 
-    rzp.submit(req);
+    Razorpay.payment.authorize(req);
     expect(isSameObj).toBe(true);
   });
 });
 
 describe("getMethods should", function(){
-  it("set rzp.paymentMethods and call back", function(){
+  it("set Razorpay.payment.methods and call back", function(){
     var methods = {};
     var spyCalled = jasmine.createSpy();
-    rzp = new Razorpay(options);
     spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
       options.success(methods);
     });
-    rzp.getMethods(spyCalled);
-    expect(rzp.paymentMethods).toBe(methods);
+    Razorpay.payment.getMethods(spyCalled);
     expect(spyCalled).toHaveBeenCalled();
   })
 })

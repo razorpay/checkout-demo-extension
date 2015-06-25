@@ -168,7 +168,7 @@
       if(window.payment_methods){
         discreet.setMethods(window.payment_methods);
       } else {
-        return discreet.rzp.getMethods(function(payment_methods){
+        return discreet.rzp.payment.getMethods(function(payment_methods){
           if('error' in payment_methods){
             discreet.errorHandler(payment_methods);
           } else {
@@ -202,14 +202,14 @@
 
       discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
         var parent;
-        parent = $(this.parentNode.parentNode);
+        parent = $(this.parentNode);
         return parent[$.payment.validateCardNumber(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
       discreet.$el.find('.input[name="card[expiry]"]').payment('formatCardExpiry');
       discreet.$el.find('.input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function(){
         var parent;
-        parent = $(this.parentNode.parentNode);
+        parent = $(this.parentNode);
         return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
       });
 
@@ -217,7 +217,6 @@
         discreet.$el.find('#tab-netbanking .elem').hide();
       }
 
-      if (discreet.rzp.options.method.netbanking && discreet.rzp.options.method.card) {
         discreet.$el.find('.tabs li').click(function() {
           discreet.renew();
           var inner = $(this).closest('.modal-inner');
@@ -243,7 +242,6 @@
             }, 300);
           }
         });
-      }
 
       discreet.$el.find('form').on('submit', function(e) {
         discreet.formSubmit(e);
@@ -283,10 +281,11 @@
       discreet.$el.find('.submit').attr('disabled', true);
       discreet.modal && (discreet.modal.options.backdropClose = false);
 
-      discreet.rzp.submit({
+      Razorpay.payment.authorize({
         data: data,
+        options: discreet.rzp.options,
         error: discreet.errorHandler,
-        success: discreet.successHandler
+        success: discreet.successHandler,
       })
       discreet.postMessage({
         event: 'submit',

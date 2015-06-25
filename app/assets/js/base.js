@@ -7,20 +7,25 @@
   var discreet = Razorpay.prototype.discreet;
 
   // TODO add style link to insert
-  var defaults = {
+  discreet.defaults = {
     protocol: 'https',
     hostname: 'api.razorpay.com',
     version: 'v1',
     jsonpUrl: '/payments/create/jsonp',
     methodsUrl: '/methods',
     key: '',
+    amount: '',
+    currency: 'INR',
     handler: $.noop,
+    notes: {},
+    callbackUrl: '',
+    redirect: false,
+    description: '',
 
     // automatic checkout only
     buttontext: 'Pay Now',
 
     // checkout fields, not needed for razorpay alone
-    currency: 'INR',
     display_currency: '',
 
     method: {
@@ -37,15 +42,11 @@
       ondismiss: $.noop,
       onhidden: $.noop
     },
-    amount: '',
+    signature: '',
     display_amount: '',
     name: '', // of merchant
-    description: '',
     image: '',
-    notes: {},
-    signature: '',
     parent: null,
-    redirect: false
   };
   /**
    * Cross Domain Post Message
@@ -54,6 +55,8 @@
   discreet.xdm = {
     _getMessageCallback:  function(callback, context){
       return function(e){
+        if(e.originalEvent)
+          e = e.originalEvent;
         if(!e || !e.data || typeof callback != 'function'){
           return;
         }
@@ -81,19 +84,12 @@
         discreet.xdm.removeMessageListener();
       }
       discreet.xdm._listener = discreet.xdm._getMessageCallback(callback, context);
-      if (window.addEventListener) {
-        window.addEventListener('message', discreet.xdm._listener, false);
-      } else if(window.attachEvent){
-        window.attachEvent('onmessage', discreet.xdm._listener);
-      }
+      var winref = $(window).on('message', discreet.xdm._listener);
+      if(typeof winref == 'function') discreet.xdm._listener = winref; // if listener is returned by minimal-jquery
     },
 
     removeMessageListener: function() {
-      if (window.removeEventListener) {
-        window.removeEventListener('message', discreet.xdm._listener, false);
-      } else if(window.detachEvent){
-        window.detachEvent('onmessage', discreet.xdm._listener);
-      }
+      $(window).off('message', discreet.xdm._listener);
       discreet.xdm._listener = null;
     }
   }
@@ -120,51 +116,60 @@
   }
 
   Razorpay.prototype.configure = function(overrides){
-    this.validateOptions(overrides, true);
-    this.options = this.options || {};
+    this.options = discreet.configure(overrides);
 
+    if(typeof discreet.initHedwig == 'function'){
+      discreet.initHedwig.call(this);
+    }
+    if(typeof discreet.initCheckout == 'function'){
+      discreet.initCheckout.call(this);
+    }
+  };
+
+  discreet.configure = function(overrides){
+    if(typeof overrides != 'object'){
+      throw new Error("invalid options passed");
+    }
+    var options = {};
+    var defaults = discreet.defaults;
     for (var i in defaults){
       if(defaults[i] !== null && typeof defaults[i] == 'object'){
         if(i == 'notes'){
-          this.options.notes = {};
+          options.notes = {};
           if(typeof overrides.notes == 'object'){
             for (var j in overrides.notes){
               if(typeof overrides.notes[j] == 'string'){
-                this.options.notes[j] = overrides.notes[j];
+                options.notes[j] = overrides.notes[j];
               }
             }
           }
         } else if (i == 'method') {
-          this.options.method = $.extend({}, defaults.method);
+          options.method = $.extend({}, defaults.method);
           if(typeof overrides.method == 'object'){
             if(typeof overrides.method.wallet == 'object'){
               for(var j in overrides.method.wallet){
                 if(typeof overrides.method.wallet[j] == 'boolean')
-                  this.options.method.wallet[j] = overrides.method.wallet[j];
+                  options.method.wallet[j] = overrides.method.wallet[j];
               }
             }
             if(typeof overrides.method.card == 'boolean')
-              this.options.method.card = overrides.method.card;
+              options.method.card = overrides.method.card;
             if(typeof overrides.method.netbanking == 'boolean')
-              this.options.method.netbanking = overrides.method.netbanking;
+              options.method.netbanking = overrides.method.netbanking;
           }
         } else {
           var subObject = defaults[i];
-          this.options[i] = this.options[i] || {};
+          options[i] = options[i] || {};
           for(var j in subObject){
-            discreet.setOption(j, this.options[i], overrides[i], subObject);
+            discreet.setOption(j, options[i], overrides[i], subObject);
           }
         }
       }
-      else discreet.setOption(i, this.options, overrides, defaults);
+      else discreet.setOption(i, options, overrides, defaults);
     }
-
-    if(typeof discreet.initRazorpay == 'function'){
-      discreet.initRazorpay.call(this);
-    } else if(typeof discreet.initCheckout == 'function'){
-      discreet.initCheckout.call(this);
-    }
-  };
+    discreet.validateOptions(options, true);
+    return options;
+  }
 
   /**
    * Validates options TODO
@@ -173,7 +178,7 @@
    *
    * return object
   */
-  Razorpay.prototype.validateOptions = function(options, throwError){
+  discreet.validateOptions = function(options, throwError){
     var errors = [];
 
     if (typeof options == 'undefined') {
@@ -224,7 +229,7 @@
        * There are some options which are checkout specific only
        */
       if(typeof discreet.validateCheckout == 'function'){
-        discreet.validateCheckout.call(this, options, errors);
+        discreet.validateCheckout(options, errors);
       }
     }
 
@@ -241,7 +246,7 @@
     }
   };
 
-  discreet.makeUrl = function(rzp){
-    return rzp.options.protocol + '://' + rzp.options.hostname + '/' + rzp.options.version;
+  discreet.makeUrl = function(options){
+    return options.protocol + '://' + options.hostname + '/' + options.version;
   }
 })();

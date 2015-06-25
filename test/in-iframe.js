@@ -265,7 +265,7 @@ describe("Razorpay open cc and submit method", function(){
     it("should submit with all details in place", function(){
       launch();
 
-      spyOn(co, 'submit').and.callFake(function(){
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyCalled();
       });
     });
@@ -358,7 +358,7 @@ describe("Razorpay open cc and submit method", function(){
     $ccCVV.sendkeys(cc.cvv);
 
     spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
       spyNotCalled();
     });
   });
@@ -369,7 +369,7 @@ describe("Razorpay open cc and submit method", function(){
     $ccCVV.sendkeys(cc.cvv);
 
     spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
       spyNotCalled();
     });
   });
@@ -379,7 +379,7 @@ describe("Razorpay open cc and submit method", function(){
     $ccCVV.val('').sendkeys('0');
 
     spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
       spyNotCalled();
     });
   });
@@ -390,7 +390,7 @@ describe("Razorpay open cc and submit method", function(){
     addAllCC();
 
     spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
       spyNotCalled();
     });
   });
@@ -401,7 +401,7 @@ describe("Razorpay open cc and submit method", function(){
     addAllCC();
 
     spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
       spyNotCalled();
     });
   });
@@ -412,7 +412,7 @@ describe("Razorpay open cc and submit method", function(){
     addAllCC();
 
     spyCalled();
-    spyOn(co, 'submit').and.callFake(function(){
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
       spyNotCalled();
     });
   });
@@ -538,7 +538,7 @@ describe("Razorpay open netbanking page", function(){
       launch();
       $nbBank.val('SBIN');
 
-      spyOn(co, 'submit').and.callFake(function(){
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyCalled();
       });
     });
@@ -546,7 +546,7 @@ describe("Razorpay open netbanking page", function(){
     it("should not submit without bank selected", function(){
       launch();
       spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyNotCalled();
       });
     });
@@ -557,7 +557,7 @@ describe("Razorpay open netbanking page", function(){
       $email.val('');
 
       spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyNotCalled();
       });
     });
@@ -568,7 +568,7 @@ describe("Razorpay open netbanking page", function(){
       $contact.val('');
 
       spyCalled();
-      spyOn(co, 'submit').and.callFake(function(){
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyNotCalled();
       });
     });

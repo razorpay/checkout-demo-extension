@@ -1,3 +1,6 @@
+.font-url(@url){
+  src: url("@{url}.eot?#iefix") format('embedded-opentype'), url("@{url}.woff") format('woff'), url("@{url}.ttf")  format('truetype'), url("@{url}.svg#lato") format('svg');
+}
 .box-sizing(@sizing){
   -webkit-box-sizing: @sizing;
   -moz-box-sizing: @sizing;
@@ -14,6 +17,11 @@
   -webkit-transition: @transition;
   -moz-transition: @transition;
   transition: @transition;
+}
+.transition-delay (@transition) {
+  -webkit-transition-delay: @transition;
+  -moz-transition-delay: @transition;
+  transition-delay: @transition;
 }
 .transform(@string){
   -webkit-transform: @string;

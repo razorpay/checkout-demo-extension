@@ -38,7 +38,6 @@
       'description': 'Armour 20',
       'image': 'images/image1.jpg',
       'handler': function (transaction){
-        console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
       hostname: 'beta.razorpay.com',
@@ -67,7 +66,8 @@
 
     document.getElementById('rzp-button1').onclick = function(e) {
       rzp1.open();
-      e.preventDefault();
+      if(e.preventDefault)
+        e.preventDefault();
     };
 
     var opt2 = {
@@ -116,6 +116,7 @@
     color: white;
     line-height: 48px;
     border-radius: 2px;
+    background: #555;
     background-color: rgba(255,255,255,0.7);
     color: rgba(0, 0, 0, 0.8);
     text-shadow: 1px 1px 3px rgba(255,255,255, 0.14);
@@ -124,12 +125,11 @@
     padding: 0 20px;
     text-align: center;
   }
+  html, body{height: 100%}
   body{
     margin: 0;
-    background: #555;
-    background-image: url('images/demo-shop.jpg');
-    background-size: cover;
-    background-attachment: fixed;
+    background: -webkit-radial-gradient(circle, #1a82f7, #2F2727);
+    background: -moz-radial-gradient(circle, #1a82f7, #2F2727);
   }
 </style>
 </body>

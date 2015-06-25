@@ -1,5 +1,5 @@
 (function($) {
-  var Smarty, prefix;
+  var Smarty, prefix, getTarget;
   prefix = '';
 
   Smarty = function(form, options) {
@@ -10,6 +10,16 @@
     this.refresh();
     return this;
   };
+
+  getTarget = function(e){
+    var targ;
+    if (!e) var e = window.event;
+    if (e.target) targ = e.target;
+    else if (e.srcElement) targ = e.srcElement;
+    if (targ.nodeType == 3) // defeat Safari bug
+      targ = targ.parentNode;
+    return targ;
+  }
 
   $.fn.smarty = function(options) {
     return this.each(function() {
@@ -41,7 +51,7 @@
     },
 
     parent: function(el) {
-      return el.parentNode.parentNode;
+      return el.parentNode;
     },
 
     common_events: function() {
@@ -66,7 +76,8 @@
       if (lastarg === true) {
         handler = arguments[arguments.length - 2];
         proxy = $.proxy(function(e) {
-          if (typeof e.target.value === 'string') {
+          var targ = getTarget(e);
+          if (targ && typeof targ.value === 'string') {
             return handler.apply(this, arguments);
           }
         }, this);
@@ -98,7 +109,9 @@
 
     focus: function(e) {
       var el;
-      el = e.target;
+      el = getTarget(e);
+      if(!el)
+        return;
       if (!(/(INPUT|SELECT)/.test(el.nodeName))) {
         return;
       }
@@ -132,7 +145,9 @@
 
     blur: function(e) {
       var el, parent;
-      el = e.target;
+      el = getTarget(e);
+      if(!el)
+        return;
       if (!(/(INPUT|SELECT)/.test(el.nodeName))) {
         return;
       }
@@ -150,7 +165,9 @@
 
     input: function(e) {
       var el, isMature, parent, pattern, required, valid, value;
-      el = e.target;
+      el = getTarget(e);
+      if(!el)
+        return;
       parent = $(this.parent(el));
       value = el.value;
       
@@ -188,7 +205,10 @@
       if (e.metaKey || e.altKey || e.ctrlKey) {
         return;
       }
-      chars = e.target.getAttribute('data-chars');
+      var targ = getTarget(e);
+      if(!targ)
+        return;
+      chars = targ.getAttribute('data-chars');
       if (!(chars && e.which)) {
         return;
       }
