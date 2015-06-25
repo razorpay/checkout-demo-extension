@@ -260,11 +260,12 @@
       }
     },
 
-    applyFont: function(anchor){
+    applyFont: function(anchor, retryCount){
+      if(!retryCount) retryCount = 0;
       if(anchor.offsetWidth/anchor.offsetHeight > 5) discreet.$el.addClass('font-loaded');
-      else setTimeout(function(){
-        discreet.applyFont(anchor);
-      }, 150);
+      else if(retryCount < 25) setTimeout(function(){
+        discreet.applyFont(anchor, ++retryCount);
+      }, 120 + retryCount*50);
     },
 
     formSubmit: function(e) {
