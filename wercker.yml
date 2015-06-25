@@ -35,3 +35,6 @@ deploy:
             subdomain: razorpay
             token: $SLACK_TOKEN
             channel: tech
+        - script:
+            name: Bozo Regression Analysis
+            code: curl "http://rzp.cloudapp.net:8000/screenshot/$BOZO_TOKEN" -d "commit=$WERCKER_GIT_COMMIT&branch=$WERCKER_GIT_BRANCH"
