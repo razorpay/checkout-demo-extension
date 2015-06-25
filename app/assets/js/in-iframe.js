@@ -160,6 +160,18 @@
       }
     },
 
+    setCardFormatting: function(){
+      var el_number = discreet.$el.find('.input[name="card[number]"]');
+      var el_expiry = discreet.$el.find('.input[name="card[expiry]"]');
+      var el_cvv = discreet.$el.find('.input[name="card[cvv]"]');
+      Razorpay.card.formatNumber(el_number[0]);
+      Razorpay.card.formatExpiry(el_expiry[0]);
+      el_number.on('blur', function(){
+        var valid = Razorpay.card.validateNumber(this.value);
+        $(this.parentNode)[valid ? 'removeClass' : 'addClass']('invalid');
+      });
+    },
+
     showModal: function() {
       discreet.renew();
       if(discreet.modal){
@@ -199,21 +211,8 @@
       }
 
       discreet.modal = new Modal(discreet.$el, modalOptions);
-
-      discreet.applyFont(discreet.$el.find('.powered-by a')[0]);
-
-      discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
-        var parent;
-        parent = $(this.parentNode);
-        return parent[$.payment.validateCardNumber(this.value) ? 'removeClass' : 'addClass']('invalid');
-      });
-
-      discreet.$el.find('.input[name="card[expiry]"]').payment('formatCardExpiry');
-      discreet.$el.find('.input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function(){
-        var parent;
-        parent = $(this.parentNode);
-        return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
-      });
+      // discreet.applyFont(discreet.$el.find('.powered-by a')[0]);
+      discreet.setCardFormatting();
 
       if(discreet.$el.find('.nb-na').length){
         discreet.$el.find('#tab-netbanking .elem').hide();
