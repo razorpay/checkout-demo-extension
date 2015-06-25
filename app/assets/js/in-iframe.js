@@ -200,6 +200,8 @@
 
       discreet.modal = new Modal(discreet.$el, modalOptions);
 
+      discreet.applyFont(discreet.$el.find('.powered-by a')[0]);
+
       discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
         var parent;
         parent = $(this.parentNode);
@@ -256,6 +258,13 @@
           discreet.errorHandler(qpmap)
         }
       }
+    },
+
+    applyFont: function(anchor){
+      if(anchor.offsetWidth/anchor.offsetHeight > 5) discreet.$el.addClass('font-loaded');
+      else setTimeout(function(){
+        discreet.applyFont(anchor);
+      }, 150);
     },
 
     formSubmit: function(e) {

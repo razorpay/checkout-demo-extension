@@ -112,11 +112,13 @@ templates.modal = '
               <span class="ring"></span>
               <span class="text">
                 <i>&#xe609;</i>
+                <u>Pay</u>
                 {{if(it.display_currency){}}
                   ${{=it.display_amount}}
                 {{} else {}}
                    <i>&#xe600;</i>
-                  {{=it.amount/100}}
+                   <u>₹</u>
+                   {{=it.amount/100}}
                 {{}}}
               </span>
             </button>
@@ -124,6 +126,6 @@ templates.modal = '
         </form>
       </div>
     </div>
-    <a class="powered-by" href="https://razorpay.com" target="_blank">&#xe608;</a>
+    <i class="powered-by"><a href="https://razorpay.com" target="_blank">&#xe608;</a></i>
   </div>
 </div>'
