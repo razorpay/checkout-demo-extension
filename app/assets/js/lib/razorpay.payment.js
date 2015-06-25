@@ -58,6 +58,18 @@
     return false;
   }
 
+  var setCaret = function(el, pos){
+    if(typeof el.selectionStart == 'number')
+      el.selectionStart = el.selectionEnd = pos;
+    else {
+      var range = el.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', pos);
+      range.moveStart('character', pos);
+      range.select();
+    }
+  }
+
   var checkSelection = function(el){
     if(typeof el.selectionStart == 'number'){
       if(el.selectionStart != el.selectionEnd) return true;
@@ -91,6 +103,15 @@
     
     var pos = checkSelection(this);
     if(pos === true) return;
+
+    if(this.value.length == 7){
+      return e.preventDefault();
+    }
+
+    setTimeout(function(){
+      el.value = mm + ' / ' + yy;
+      setCaret(el, ++pos);
+    })
   }
 
   var formatNumber = function(e){
@@ -117,15 +138,7 @@
       el.value = value.replace(cardobj.space, cardobj.subs);
       var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
       pos += prespace && ++prespace.length || 1;
-      if(typeof el.selectionStart == 'number')
-        el.selectionStart = el.selectionEnd = pos;
-      else {
-        var range = el.createTextRange();
-        range.collapse(true);
-        range.moveEnd('character', pos);
-        range.moveStart('character', pos);
-        range.select();
-      }
+      setCaret(el, pos);
     });
   }
 
