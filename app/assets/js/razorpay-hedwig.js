@@ -106,18 +106,22 @@
       var error = response.error;
       var nextRequest = response.request;
       var success = response.success;
+      var callback_url = this.options.callback_url;
 
       if(!payment_id || typeof error == 'object'){
         return discreet.error.call(this, response);
       }
 
       else if(success){
-        discreet.paymentSuccess.call(this, {razorpay_payment_id: payment_id});
+        if(callback_url)
+          discreet.nextRequestRedirect({url: callback_url, method: 'post', content: {razorpay_payment_id: payment_id}});
+        else
+          discreet.paymentSuccess.call(this, {razorpay_payment_id: payment_id});
       }
 
       else if(typeof nextRequest == 'object'){
         if(nextRequest.url){
-          if(this.options.callback_url)
+          if(callback_url)
             discreet.nextRequestRedirect(nextRequest);
           else
             discreet.navigatePopup.call(this, nextRequest);
