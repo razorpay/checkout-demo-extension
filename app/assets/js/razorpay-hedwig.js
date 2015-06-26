@@ -100,7 +100,6 @@
   discreet.apiResponseHandler = {
     '1' : function(response){
       // this == request
-
       var payment_id = response.payment_id;
       this.payment_id = payment_id;
       var error = response.error;
@@ -132,10 +131,11 @@
 
   discreet.error = function(response){
     // this == request
-    discreet.popupClose.call(this);
     if(typeof this.error == 'function'){
       this.error.call(null, response); // dont expose request as this
     }
+    if(this.popup)
+      discreet.popupClose.call(this);
   }
 
   discreet.getAjaxSuccess = function(request){
