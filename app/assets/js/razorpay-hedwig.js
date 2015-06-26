@@ -72,6 +72,31 @@
     discreet.xdm.removeMessageListener();
   };
 
+  discreet.nextRequestRedirect = function(data){
+    if(data.method == 'get'){
+      location.href = data.url;
+    } else if (data.method == 'post' && typeof data.content == 'object'){
+      var postForm = document.createElement('form');
+      var html = '';
+
+      for(var i in data.content){
+        html += '<input type="hidden" name="' + i + '" value="' + data.content[i] + '">'
+      }
+      postForm.method='post';
+      postForm.innerHTML = html;
+      postForm.action = data.url;
+      document.body.appendChild(postForm);
+      postForm.submit();
+    } else {
+      var errorData = {
+        error: {
+          description: 'Server Error'
+        }
+      };
+      discreet.error.call(this, errorData);
+    }
+  }
+
   discreet.apiResponseHandler = {
     '1' : function(response){
       // this == request
@@ -92,7 +117,10 @@
 
       else if(typeof nextRequest == 'object'){
         if(nextRequest.url){
-          return discreet.navigatePopup.call(this, nextRequest);
+          if(this.options.callback_url)
+            discreet.nextRequestRedirect(nextRequest);
+          else
+            discreet.navigatePopup.call(this, nextRequest);
         }
       }
     }
