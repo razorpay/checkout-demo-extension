@@ -14,7 +14,7 @@ build:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
             token: $SLACK_TOKEN
-            channel: tech
+            channel: tech_bots
 deploy:
     steps:
         - npm-install
@@ -34,7 +34,7 @@ deploy:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
             token: $SLACK_TOKEN
-            channel: tech
+            channel: tech_bots
         - script:
             name: Bozo Regression Analysis
             code: curl "http://rzp.cloudapp.net:8000/screenshot/$BOZO_TOKEN" -d "commit=$WERCKER_GIT_COMMIT&branch=$WERCKER_GIT_BRANCH&target=$WERCKER_DEPLOYTARGET_NAME"
