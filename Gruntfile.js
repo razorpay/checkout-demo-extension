@@ -3,7 +3,7 @@ module.exports = function(grunt){
   //Load all grunt tasks
   require('load-grunt-tasks')(grunt);
 
-  grunt.file.defaultEncoding = 'utf8';
+  grunt.file.defaultEncoding =  'utf8';
   grunt.initConfig({
     env: {
       dev: {
