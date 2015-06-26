@@ -100,31 +100,18 @@
   discreet.apiResponseHandler = {
     '1' : function(response){
       // this == request
-      var payment_id = response.payment_id;
-      this.payment_id = payment_id;
-      var error = response.error;
       var nextRequest = response.request;
-      var success = response.success;
-      var callback_url = this.options.callback_url;
+      var callback_url = this.data.callback_url;
 
-      if(!payment_id || typeof error == 'object'){
-        return discreet.error.call(this, response);
-      }
-
-      else if(success){
-        if(callback_url)
-          discreet.nextRequestRedirect({url: callback_url, method: 'post', content: {razorpay_payment_id: payment_id}});
-        else
-          discreet.paymentSuccess.call(this, {razorpay_payment_id: payment_id});
-      }
-
-      else if(typeof nextRequest == 'object'){
+      if(typeof nextRequest == 'object'){
         if(nextRequest.url){
           if(callback_url)
             discreet.nextRequestRedirect(nextRequest);
           else
             discreet.navigatePopup.call(this, nextRequest);
         }
+      } else {
+        return discreet.error.call(this, response);
       }
     }
   }
@@ -140,18 +127,19 @@
 
   discreet.getAjaxSuccess = function(request){
     return function(response){
-      if(response.version){
+      
+      if (response.razorpay_payment_id) {
+        discreet.paymentSuccess.call(request, response);
+      }
+      else if(response.error){
+        discreet.error.call(request, response);
+      }
+
+      else if(response.version){
         var successCallback = discreet.apiResponseHandler[response.version];
         if(typeof successCallback == 'function'){
           return successCallback.call(request, response);
         }
-      }
-      if (response.razorpay_payment_id) {
-        discreet.paymentSuccess.call(request, response);
-      }
-      // else version 0
-      else if (response.http_status_code !== 200){
-        discreet.error.call(request, response);
       }
 
       else if (response.callbackUrl){

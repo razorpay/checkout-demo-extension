@@ -19,7 +19,6 @@
       if(typeof request != 'object' || typeof request.data !== 'object'){
         return false;
       }
-
       var rdata = request.data;
       var options = request.options;
       if(!options)
@@ -56,7 +55,6 @@
         }
         delete rdata.notes;
 
-        if(options.callback_url) rdata.callback_url = options.callback_url;
 
         for(i in rdata){
           var j = i.replace(/"/g,''); // attribute sanitize
@@ -67,7 +65,8 @@
         form.submit();
         return true;
       } else {
-        if(!options.callback_url) discreet.setupPopup(request);
+        if(!rdata.callback_url && options.callback_url) rdata.callback_url = options.callback_url;
+        if(!rdata.callback_url) discreet.setupPopup(request);
         
         return $.ajax({
           url: url + options.jsonpUrl,
