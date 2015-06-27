@@ -22,9 +22,18 @@
 
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
 
+    if(!discreet.frameContainer){
+      var parent = discreet.frameContainer = document.createElement('div');
+      parent.className = 'razorpay-frame-container';
+      var style = parent.style;
+      style.zIndex = '99999';
+      style.position = 'relative';
+      body.appendChild(parent);
+    }
+
     if(!this.checkoutFrame){
       this.checkoutFrame = discreet.createFrame(this.options);
-      body.appendChild(this.checkoutFrame);
+      discreet.frameContainer.appendChild(this.checkoutFrame);
     } else {
       this.checkoutFrame.style.display = 'block';
       discreet.setMetaViewport();
@@ -43,7 +52,7 @@
 
     var attrs = {
       'class': 'razorpay-checkout-frame', // quotes needed for ie
-      style: 'transition: 0.25s background;z-index: 9999; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
+      style: 'transition: 0.25s background; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
       allowtransparency: true,
       frameborder: 0,
       width: '100%',

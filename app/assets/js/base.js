@@ -45,8 +45,7 @@
     signature: '',
     display_amount: '',
     name: '', // of merchant
-    image: '',
-    parent: null
+    image: ''
   };
   /**
    * Cross Domain Post Message
