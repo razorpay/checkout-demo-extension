@@ -295,7 +295,7 @@
         data: data,
         options: discreet.rzp.options,
         error: discreet.errorHandler,
-        success: discreet.successHandler,
+        success: discreet.successHandler
       })
       discreet.postMessage({
         event: 'submit',

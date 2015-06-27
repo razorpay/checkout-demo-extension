@@ -46,7 +46,7 @@
     display_amount: '',
     name: '', // of merchant
     image: '',
-    parent: null,
+    parent: null
   };
   /**
    * Cross Domain Post Message
