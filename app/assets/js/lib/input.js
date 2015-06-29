@@ -1,179 +1,77 @@
-(function($) {
-  var Smarty, prefix, getTarget;
-  prefix = '';
+(function(root){
+  var inputClass = 'input';
+  var divClass = 'form-elem';
+  var tooltipClass = 'tooltip';
 
-  Smarty = function(form, options) {
-    this.element = form;
-    this.options = options || {};
-    this.listeners = [];
-    this.common_events();
-    this.refresh();
-    return this;
-  };
+  var focusEvent = 'focus';
+  var blurEvent = 'blur';
 
-  getTarget = function(e){
-    var targ;
-    if (!e) var e = window.event;
-    if (e.target) targ = e.target;
-    else if (e.srcElement) targ = e.srcElement;
-    if (targ.nodeType == 3) // defeat Safari bug
-      targ = targ.parentNode;
-    return targ;
+  var detectSupport = function(){
+    var div = document.createElement('div');
+    if(typeof div.onfocusin != 'undefined'){
+      focusEvent += 'in';
+      blurEvent = 'focusout';
+    }
   }
 
-  $.fn.smarty = function(options) {
-    return this.each(function() {
-      var data, el;
-      el = $(this);
-      data = el.data('smarty');
-      if (typeof options === 'string') {
-        if (data) {
-          return data[options]();
-        }
-      } else if (data) {
-        return data.refresh();
-      } else {
-        options = $.extend($.fn.smarty.defaults, typeof options === 'object' && options);
-        data = new Smarty(el, options);
-        el.data('smarty', data);
-        return data;
-      }
-    });
-  };
+  root.Smarty = function(parent, options){
+    this.parent = $(parent);
+    this.options = options;
+    this.listeners = [];
+    detectSupport();
+    this.common_events();
+    // this.refresh();
+  }
 
   Smarty.prototype = {
-    "class": function(str) {
-      return str.replace(/([^ ]+)/g, prefix + '$1')
+    on: function(eventName, targetClass, eventHandler, useCapture){
+      var listenerRef = this.parent.on(eventName, function(e){
+        if(!targetClass || e.target.className.match(targetClass))
+          eventHandler.call(this, e);
+      }, useCapture);
+      this.listeners.push(eventName, listenerRef, useCapture);
     },
 
-    selector: function(str) {
-      return str.replace(/([^ ]+)/g, '.' + prefix + '$1')
-    },
-
-    parent: function(el) {
-      return el.parentNode;
-    },
-
-    common_events: function() {
-      this.on('focus', this.focus, true);
-      this.on('blur', this.blur, true);
-      this.on('input', this.input, true);
-      this.on('change', this.input, true);
-      this.on('keypress', this.keypress);
-      this.on('click', this.selector('elem'), this.intercept)
-      return this.on('mousedown', this.selector('tooltip'), (function(_this) {
-        return function(e) {
-          return $(e.currentTarget).hide();
-        };
-      })(this));
-    },
-
-    on: function() {
-      var event, handler, lastarg, proxy, target;
-      event = arguments[0];
-      lastarg = arguments[arguments.length - 1];
-      target = typeof arguments[1] === 'string' ? arguments[1] : this.selector('input');
-      if (lastarg === true) {
-        handler = arguments[arguments.length - 2];
-        proxy = $.proxy(function(e) {
-          var targ = getTarget(e);
-          if (targ && typeof targ.value === 'string') {
-            return handler.apply(this, arguments);
-          }
-        }, this);
-        if(window.addEventListener){
-          this.element[0].addEventListener(event, proxy, true);
-        } else if(window.attachEvent){
-          this.element[0].attachEvent('on' + event, proxy);
-        }
-        return this.listeners.push([event, proxy, true]);
-      } else {
-        proxy = $.proxy(lastarg, this);
-        this.element.on(event, target, proxy);
-        return this.listeners.push([event, target, proxy]);
-      }
-    },
-
-    bye: function(){
-      for(var i = 0; i < this.listeners.length; i++){
+    off: function(){
+      for(var i=0; i<this.listeners.length; i++){
         var l = this.listeners[i];
-        if(l[2] !== true){
-          this.element.off(l[0], l[1], l[2]);
-        } else if (window.removeEventListener){
-          this.element[0].removeEventListener(l[0], l[1], true);
-        } else if(window.detachEvent){
-          this.element[0].detachEvent('on' + l[0], l[1]);
-        }
+        this.parent.off(l[0], l[1], l[2]);
       }
     },
 
-    focus: function(e) {
-      var el;
-      el = getTarget(e);
-      if(!el)
-        return;
-      if (!(/(INPUT|SELECT)/.test(el.nodeName))) {
-        return;
-      }
-      if (el.rzp_placeholder) {
-        el.value = '';
-        el.rzp_placeholder = false;
-      }
-      $(this.parent(el)).addClass(this["class"]('focused'));
-      return this.tooltip(el);
+    common_events: function(){
+      this.on(focusEvent, inputClass, this.focus, true);
+      this.on(blurEvent, inputClass, this.blur, true);
+
+      this.on('input', inputClass, this.input, true);
+
+      this.on('click', divClass, this.intercept);
+      this.on('mousedown', tooltipClass, function(e){e.target.style.display = 'none'});
+    },
+
+    focus: function(e){
+      $(e.target.parentNode).addClass('focused');
+    },
+
+    blur: function(e){
+      $div = $(e.target.parentNode);
+      $div.removeClass('focused');
+      $div.addClass('mature');
+      this.input(e);
     },
 
     intercept: function(e){
-      $(e.currentTarget).find(this.selector('input')).focus()
-    },
-    tooltip: function(el) {
-      var parent = this.parent(el);
-      var state = parent.className;
-      var show = /mature/.test(state) && /invalid/.test(state);
-      var tooltip = $(this.parent(el)).children('.help-text');
-      var shown = tooltip.hasClass('shown');
-
-      if(show){
-        tooltip.html(this.helptext(el));
-      }
-      if(show && !shown){
-        tooltip.addClass('shown');
-      } else if (!show){
-        tooltip.removeClass('shown');
-      }
+      e.target.firstChild.focus();
     },
 
-    blur: function(e) {
-      var el, parent;
-      el = getTarget(e);
-      if(!el)
-        return;
-      if (!(/(INPUT|SELECT)/.test(el.nodeName))) {
-        return;
-      }
-      if (!el.value && !el.placeholder && typeof el.getAttribute('placeholder') !== 'string') {
-        el.rzp_placeholder = true;
-        el.value = el.getAttribute('placeholder');
-      }
-      parent = $(this.parent(el));
-      parent.removeClass(this["class"]('focused'));
-      if (!parent.hasClass(this["class"]('mature'))) {
-        parent.addClass(this["class"]('mature'));
-      }
-      parent.children('.help-text').removeClass('shown');
-    },
+    input: function(e){
+      var el = e.target;
+      var parent = el.parentNode;
+      var value = el.value;
+      var valid = true;
+      var required = typeof el.getAttribute('required') == 'string');
+      var pattern = el.getAttribute('pattern');
 
-    input: function(e) {
-      var el, isMature, parent, pattern, required, valid, value;
-      el = getTarget(e);
-      if(!el)
-        return;
-      parent = $(this.parent(el));
-      value = el.value;
-      
-      valid = true;
-      required = typeof el.getAttribute('required' === 'string');
-      pattern = el.getAttribute('pattern');
       if (required && !value) {
         valid = false;
       }
@@ -181,117 +79,23 @@
         valid = new RegExp(pattern).test(value);
       }
       
-      isMature = parent.hasClass(this["class"]('mature'));
-      if (valid && !isMature) {
-        parent.addClass(this["class"]('mature'));
-        isMature = true;
-      }
-      if (valid && parent.hasClass(this["class"]('invalid'))) {
-        parent.removeClass(this["class"]('invalid'));
-      } else if (!valid) {
-        parent.addClass(this["class"]('invalid'));
-      }
-      if(value && !parent.hasClass(this["class"]('filled'))){
-        parent.addClass(this["class"]('filled'));
-      } else if(!value){
-        parent.removeClass(this["class"]('filled'));
-      }
-
-      return this.tooltip(el);
+      parent[valid ? 'removeClass' : 'addClass']('invalid');
+      parent[value ? 'removeClass' : 'addClass']('filled');
     },
 
-    keypress: function(e) {
-      var chars, key;
-      if (e.metaKey || e.altKey || e.ctrlKey) {
-        return;
-      }
-      var targ = getTarget(e);
-      if(!targ)
-        return;
-      chars = targ.getAttribute('data-chars');
-      if (!(chars && e.which)) {
-        return;
-      }
-      if (e.which === 8) {
-        return;
-      }
-      key = String.fromCharCode(e.which);
-      if (!(new RegExp(chars).test(key))) {
-        return false;
+    refresh: function(){
+      var els = this[0].getElementsByTagName('p');
+      var elslen = els.length;
+      for(var i=0; i<elslen; i++){
+        this.update(els[i].firstChild);
       }
     },
 
-    refresh: function() {
-      return this.element.find('.input').each((function(_this) {
-        return function(index, el) {
-          var parent;
-          parent = $(_this.parent(el));
-          return _this.update(parent, el);
-        };
-      })(this));
-    },
-
-    initiate: function(parent, el, type) {
-      parent.data('smarty', true);
-      // catching IE unspecified error of document.activeElement
-      try{
-        if (document.activeElement == el) {
-          parent.addClass(this["class"]('focused'));
-        }
-      } catch(e){}
-      parent.append('<div class="help-text" style="opacity: 0"></div>')
-    },
-
-    update: function(parent, el) {
-      var type;
-      type = el.getAttribute('type');
-      if (!parent.data('smarty')) {
-        this.initiate(parent, el, type);
-      }
-      parent.removeClass(this["class"]('filled mature invalid'));
-      if (el.value) {
-        parent.addClass(this["class"]('filled mature'));
-      }
-      return this.input({
-        target: el
-      });
-    },
-
-    helptext: function(el) {
-      var name, node, value;
-      name = el.name;
-      if (!name) {
-        return '';
-      }
-      node = el.nodeName.toLowerCase();
-      value = el.value;
-      if (node === 'select') {
-        return 'Please select an item in the list.';
-      } else if (!value) {
-        return 'Please fill out this field.';
-      } else if (name === 'contact') {
-        return 'Please enter a valid 10-12 digit phone number.';
-      } else if (name === 'email') {
-        if (value.length > 254) {
-          return 'Entered email is too long.';
-        } else {
-          return 'Please enter a valid email address, like you@example.com';
-        }
-      } else if (name === 'card[name]') {
-        if (value.length > 100) {
-          return 'Entered name is too long.';
-        } else {
-          return 'Please enter a valid name without numbers or special characters.';
-        }
-      } else if (name === 'card[number]') {
-        return 'Please enter valid card number.';
-      } else if (name === 'card[expiry]') {
-        return 'Please enter valid expiry date, like 01 / 22';
-      } else if (name === 'card[cvv]') {
-        return 'Please enter 3 or 4 digit CVV number.';
-      } else {
-        return 'Please enter valid input.';
+    update: function(el){
+      if(el){
+        this.input({target: el});
+        try{ if(document.activeElement == el) el.parentNode.addClass('focused')} catch(e){}
       }
     }
-  };
-})($);
+  }
+})(window)
