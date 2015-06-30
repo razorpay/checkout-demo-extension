@@ -166,7 +166,7 @@
     var options = request.options;
     var message = {
       metadata: {
-        amount: options.amount,
+        amount: parseInt(options.amount)/100,
         description: options.description,
         name: options.name
       }
