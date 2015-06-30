@@ -189,10 +189,11 @@
           }
         });
       }
-      $('#loading').remove();
+      $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
-      discreet.$el = $((doT.compile(templates.modal))(discreet.rzp.options));
-      discreet.$el.smarty();
+      document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
+      discreet.$el = document.body.firstChild;
+      new Razorpay.prototype.Smarty(discreet.$el);
 
       if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
         if(navigator.userAgent.indexOf('Android 2')){

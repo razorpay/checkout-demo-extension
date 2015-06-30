@@ -23,7 +23,7 @@
     // this.refresh();
   }
 
-  Smarty.prototype = {
+  root.Smarty.prototype = {
     on: function(eventName, targetClass, eventHandler, useCapture){
       var listenerRef = this.parent.on(eventName, function(e){
         if(!targetClass || e.target.className.match(targetClass))
@@ -69,7 +69,7 @@
       var parent = el.parentNode;
       var value = el.value;
       var valid = true;
-      var required = typeof el.getAttribute('required') == 'string');
+      var required = typeof el.getAttribute('required') == 'string';
       var pattern = el.getAttribute('pattern');
 
       if (required && !value) {
@@ -98,4 +98,4 @@
       }
     }
   }
-})(window)
+})(Razorpay.prototype)

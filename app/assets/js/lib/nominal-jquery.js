@@ -5,6 +5,7 @@
   }
 
   var $ = root.$ = function(el){
+    if(typeof el == 'string') return $(document.getElementById(el));
     if(!(this instanceof $)) return new $(el);
     this[0] = el;
   }
@@ -37,6 +38,10 @@
       } else if(window.detachEvent){
         this[0].detachEvent('on' + event, callback);
       }
+    },
+
+    remove: function(){
+      this[0].parentNode && this[0].parentNode.removeChild(this[0]);
     },
 
     hasClass: function(str){
@@ -72,5 +77,5 @@
     }
     return target
   };
-// })(Razorpay.prototype);
-})(window);
+})(Razorpay.prototype);
+// })(window);
