@@ -4,6 +4,7 @@
 (function(){
   'use strict';
   var discreet = {
+    smarty: null,
     modal: null,
     $el: null,
     rzp: null,
@@ -161,6 +162,7 @@
     },
 
     setCardFormatting: function(){
+      return;
       var el_number = discreet.$el.find('.input[name="card[number]"]');
       var el_expiry = discreet.$el.find('.input[name="card[expiry]"]');
       var el_cvv = discreet.$el.find('.input[name="card[cvv]"]');
@@ -192,8 +194,8 @@
       $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
       document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
-      discreet.$el = document.getElementById('container');
-      new Razorpay.prototype.Smarty(discreet.$el);
+      discreet.$el = $($.g('container'));
+      discreet.smarty = new Razorpay.prototype.Smarty(discreet.$el);
 
       if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
         if(navigator.userAgent.indexOf('Android 2')){
@@ -211,53 +213,54 @@
         }
       }
 
-      discreet.modal = new Modal(discreet.$el, modalOptions);
       // discreet.applyFont(discreet.$el.find('.powered-by a')[0]);
+      discreet.modal = new Razorpay.prototype.Modal(discreet.$el.children('modal')[0], modalOptions);
       discreet.setCardFormatting();
 
-      if(discreet.$el.find('.nb-na').length){
-        discreet.$el.find('#tab-netbanking .elem').hide();
-      }
+      if($.g('nb-na')) $.g('nb-elem').style.display = 'none';
 
-        discreet.$el.find('.tabs li').click(function() {
-          discreet.renew();
-          var inner = $(this).closest('.modal-inner');
-          if (!inner.length) {
-            return;
-          }
-          var form = inner.find('.form');
-          var modalEl = inner.parent();
-          var change_modal_height = !discreet.modal.curtainMode;
-          
-          if(change_modal_height){
-            modalEl[0].style.height = inner[0].offsetHeight + 'px';
-            modalEl.addClass('animate');
-          }
+      $($.g('tabs')).on('click', function(e){
+        var target = e.target;
+        if(target.className.indexOf('paytm') >= 0) target = target.parentNode;
+        if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0) return;
+        discreet.renew();
 
-          inner.find('#' + this.getAttribute('data-target')).addClass('active').siblings('.active').removeClass('active');
-          $(this).addClass('active').siblings('.active').removeClass('active');
+        var modalEl = $(discreet.modal.modalElement);
+        var inner = modalEl.children('modal-inner')[0];
+        if(!inner) return;
 
-          if(change_modal_height){
-            modalEl[0].style.height = inner[0].offsetHeight + 'px';
-            setTimeout(function(){
-              modalEl.removeClass('animate').height('');
-            }, 300);
-          }
-        });
+        modalEl[0].style.height = inner.offsetHeight + 'px';
+        modalEl.addClass('animate');
 
-      discreet.$el.find('form').on('submit', function(e) {
-        discreet.formSubmit(e);
-        return false; // prevent default
+        var tabContent = $.g(target.getAttribute('data-target'));
+        var activeTab = $(tabContent.parentNode).children('active')[0];
+        activeTab && $(activeTab).removeClass('active');
+        $(tabContent).addClass('active');
+
+        activeTab = $(this).children('active')[0];
+        activeTab && $(activeTab).removeClass('active');
+        $(target).addClass('active');
+
+        modalEl[0].style.height = inner.offsetHeight + 'px';
+        setTimeout(function(){
+          modalEl.removeClass('animate');
+          modalEl[0].style.height = '';
+        }, 300);
       });
 
-      if(discreet.qpmap){
-        if(discreet.qpmap.tab){
-          $('.tabs li[data-target=tab-'+discreet.qpmap.tab+']').click()
-        }
-        if(discreet.qpmap.error){
-          discreet.errorHandler(qpmap)
-        }
-      }
+      $($.g('form')).on('submit', function(e){
+        discreet.formSubmit(e);
+        e.preventDefault();
+      });
+
+      // if(discreet.qpmap){
+      //   if(discreet.qpmap.tab){
+      //     $('.tabs li[data-target=tab-'+discreet.qpmap.tab+']').click()
+      //   }
+      //   if(discreet.qpmap.error){
+      //     discreet.errorHandler(qpmap)
+      //   }
+      // }
     },
 
     applyFont: function(anchor, retryCount){
@@ -269,9 +272,9 @@
     },
 
     formSubmit: function(e) {
-      var form = $(e.currentTarget);
-      discreet.$el.smarty('refresh');
-      form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
+      discreet.smarty.refresh();
+      return;
+      // form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
 
       var invalid = form.find('.form-common, .tab-content.active').find('.invalid');
       var modalEl = form.closest('.modal');

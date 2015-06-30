@@ -25,7 +25,7 @@
 
   var Modal = root.Modal = function(element, options) {
     this.options = $.defaults(options, defaults);
-    this.container = document.getElementById(this.options.containerId);
+    this.container = $.g(this.options.containerId);
     this.modalElement = element;
     
     if(!this.options.animation || !this.transitionProperty){
@@ -120,8 +120,8 @@
 
     on: function(event, target, callback){
       var self = this;
-      $(target).on(event, function(){
-        callback.call(self);
+      $(target).on(event, function(e){
+        callback.call(self, e);
       });
     },
 
@@ -145,7 +145,7 @@
     },
 
     bind_events: function(){
-      this.on('click', document.getElementById(this.options.closeId), this.hide);
+      this.on('click', $.g(this.options.closeId), this.hide);
       this.on('resize', window, function(){
         var self = this;
         var el = document.activeElement;

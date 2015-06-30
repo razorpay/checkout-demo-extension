@@ -16,7 +16,7 @@
   }
 
   root.Smarty = function(parent, options){
-    this.parent = $(parent);
+    this.parent = parent;
     this.options = options;
     this.listeners = [];
     detectSupport();

@@ -66,6 +66,22 @@
         child = child.nextSibling;
       }
       return childList;
+    },
+
+    find: function(filterClass, filterTag){
+      var node = this[0];
+      if('getElementsByClassName' in document){
+        return node.getElementsByClassName(filterClass);
+      }
+      var result = [];
+      !filterTag && (filterTag = '*');
+      var els = node.getElementsByTagName(filterTag);
+      var elsLen = els.length;
+      var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
+      for (var i=0; i<elsLen; i++){
+        if(pattern.test(els[i].className)) result.push(els[i]);
+      }
+      return result;
     }
   }
 
@@ -84,5 +100,10 @@
     }
     return target;
   }
+
+  $.g = function(id){
+    return document.getElementById(id);
+  }
+
 })(Razorpay.prototype);
 // })(window);

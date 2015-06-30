@@ -21,7 +21,7 @@ templates.modal = '
         </div>
       </div>
       <div class="body">
-        <form class="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
+        <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
           <div class="form-common">
             <div class="error-container">
               <div class="error"></div>
@@ -46,7 +46,7 @@ templates.modal = '
             </div>
           </div>
           {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++; }}
-          <ul class="tabs{{if(tabCount){}} tabs-{{=tabCount}}{{}}}">
+          <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
             {{? it.method.card }}
               <li data-target="tab-card" class="active">Card</li>
             {{?}}
@@ -86,11 +86,11 @@ templates.modal = '
             <div class="fieldset tab-content{{? !it.method.card }} active{{?}}" id="tab-netbanking">
               <input type="hidden" name="method" value="netbanking">
               {{? it.method.netbanking.error }}
-                <div class="nb-na">
+                <div id="nb-na">
                   <div>{{=it.method.netbanking.error.description}}</div>
                 </div>
               {{?}}
-              <p class="elem select" style="border-radius: 4px">
+              <p id="nb-elem" class="elem select" style="border-radius: 4px">
                 <i>&#xe601;</i>
                 <select name="bank" required class="input" pattern="[\\w]+">
                   <option selected="selected" value="">Select Bank</option>
