@@ -54,7 +54,7 @@
 
     removeClass: function(str){
       var el = this[0];
-      className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ');
+      className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
       if(el.className != className) el.className = className;
     },
 
@@ -72,10 +72,17 @@
   $.noop = function(){};
 
   $.extend = function(target, source){
-    for(o in source){
+    for(var o in source){
       target[o] = source[o]
     }
     return target
   };
+
+  $.defaults = function(target, defaults){
+    for(var i in defaults){
+      if(!(i in target)) target[i] = defaults[i];
+    }
+    return target;
+  }
 })(Razorpay.prototype);
 // })(window);

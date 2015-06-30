@@ -2,13 +2,13 @@ $ = Razorpay::$
 unless templates
   templates = {}
 templates.modal = '
-<div class="container" tabIndex="0" style="display: none">
+<div id="container" tabIndex="0" style="display: none">
   <div class="backdrop"></div>
   <div class="modal">
     <div class="modal-inner">
       <div class="header">
         <div class="merchant">
-          <div class="modal-close">×</div>
+          <div id="modal-close">×</div>
           <div class="merchant-image">
             {{if(it.image){}}
               <img src="{{=it.image}}">

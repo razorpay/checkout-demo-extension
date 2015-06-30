@@ -1,4 +1,5 @@
 (function(root){
+  var $ = root.$;
   var inputClass = 'input';
   var divClass = 'form-elem';
   var tooltipClass = 'tooltip';
@@ -25,9 +26,10 @@
 
   root.Smarty.prototype = {
     on: function(eventName, targetClass, eventHandler, useCapture){
+      var smarty = this;
       var listenerRef = this.parent.on(eventName, function(e){
         if(!targetClass || e.target.className.match(targetClass))
-          eventHandler.call(this, e);
+          eventHandler.call(smarty, e);
       }, useCapture);
       this.listeners.push(eventName, listenerRef, useCapture);
     },
@@ -61,12 +63,13 @@
     },
 
     intercept: function(e){
-      e.target.firstChild.focus();
+      var child = $(e.target).children('input');
+      child.length && child[0].focus();
     },
 
     input: function(e){
       var el = e.target;
-      var parent = el.parentNode;
+      var parent = $(el.parentNode);
       var value = el.value;
       var valid = true;
       var required = typeof el.getAttribute('required') == 'string';
@@ -79,15 +82,16 @@
         valid = new RegExp(pattern).test(value);
       }
       
-      parent[valid ? 'removeClass' : 'addClass']('invalid');
-      parent[value ? 'removeClass' : 'addClass']('filled');
+      parent[valid && 'removeClass' || 'addClass']('invalid');
+      parent[value && 'removeClass' || 'addClass']('filled');
     },
 
     refresh: function(){
       var els = this[0].getElementsByTagName('p');
       var elslen = els.length;
       for(var i=0; i<elslen; i++){
-        this.update(els[i].firstChild);
+        var child = $(els[i]).children('input');
+        child.length && this.update(child[0]);
       }
     },
 
@@ -99,3 +103,4 @@
     }
   }
 })(Razorpay.prototype)
+// })(window)

@@ -192,7 +192,7 @@
       $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
       document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
-      discreet.$el = document.body.firstChild;
+      discreet.$el = document.getElementById('container');
       new Razorpay.prototype.Smarty(discreet.$el);
 
       if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
