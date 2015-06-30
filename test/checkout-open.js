@@ -32,7 +32,7 @@ describe("open method", function(){
 
   it("should append iframe", function(){
     expect(rzp.checkoutFrame).toBeDefined();
-    expect(rzp.checkoutFrame.parentNode).toBe(document.body);
+    expect(document.body.contains(rzp.checkoutFrame.parentNode)).toBe(true);
   })
 
   afterEach(function(){
