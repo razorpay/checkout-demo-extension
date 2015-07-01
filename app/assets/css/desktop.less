@@ -1,5 +1,7 @@
 @import "common";
 
+@font-family: "lato", Arial, Helvetica, sans-serif;
+
 @primary: #29b3d2;
 @color: #7f7f7f;
 @border-color: #e6e6e6;
@@ -45,8 +47,7 @@ body, html{
 }
 
 .backdrop{
-  background: rgba(0,0,0,0.6);
-  filter: alpha(opacity=40);
+  .background(rgba(0,0,0,0.6));
   position: fixed;
   left: 0;
   top: 0;
@@ -89,7 +90,7 @@ label{
 button, input, select, textarea{
   border: none;
   background: none;
-  font-family: inherit;
+  font-family: @font-family;
   outline: none;
 }
 input, select, textarea{
@@ -151,7 +152,7 @@ button{
   width: @width;
   border-radius: @border-radius;
   background: @background-color;
-  font-family: "lato", Arial, Helvetica, sans-serif;
+  font-family: @font-family;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 377px;
 }
@@ -205,9 +206,9 @@ button{
 .help-text{
   color: #fff;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
   position: absolute;
-  max-width: 220px;
+  max-width: 225px;
   line-height: 16px;
   padding: 6px 10px;
   font-size: 80%;
@@ -215,13 +216,12 @@ button{
   background: #333;
   border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
-  opacity: 0;
-  filter: alpha(opacity=0);
-  .transition-transform(~"0.3s ease-in, 0.2s ease-in opacity");
-  .transform(translateY(20px));
+  .opacity(0);
+  .transform(translateY(10px));
+  .transition-transform(~"0.25s ease-in, 0.16s ease-in opacity");
   bottom: 100%;
   left: 10px;
-  margin-bottom: 3px;
+  margin-bottom: -3px;
   &:after {
     content: '';
     position: absolute;
@@ -234,12 +234,11 @@ button{
     left: 20px;
     margin: 0 0 -11px -7px;
   }
-  &.shown{
-    opacity: 0.9!important;
-    -ms-filter: "none";
-    .transform(none);
-    .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
-  }
+}
+.focused.invalid.mature .help-text{
+  .opacity(0.85);
+  .transform(none);
+  .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
 }
 .double{
   white-space: nowrap;
@@ -253,7 +252,8 @@ button{
   }
 }
 .fieldset{
-  margin: 20px 0;
+  padding: 20px 0;
+  clear: both;
 }
 .merchant{
   border-radius: @border-radius @border-radius 0 0;
@@ -336,7 +336,7 @@ button{
   }
 }
 
-.body .submit.error{
+#submit.error{
   background-color: @danger;
 }
 .error{
@@ -356,13 +356,13 @@ button{
     font-size: @font-size;
   }
 }
-.error-container{
+#error-container{
   position: relative;
   overflow: hidden;
   margin: 0 -@padding;
   .transition(0.3s);
 }
-.error-container.has-error .error{
+#error-container.has-error .error{
   bottom: 0;
 }
 .tab-content{
@@ -375,7 +375,6 @@ button{
 #tabs{
   margin: 0 -20px;
   padding: 0;
-  white-space: nowrap;
   font-size: 0;
   display: none;
 
@@ -386,15 +385,15 @@ button{
   &.tabs-3{
     display: block;
     li{
-      width: 33.33%;
+      width: (@width - 2)/3;
     }
   }
 
   li{
+    list-style: none;
     line-height: 48px;
     height: 48px;
-    vertical-align: top;
-    display: inline-block;
+    float: left;
     text-align: center;
     border: 1px solid @border-color;
     border-right: none;
@@ -413,7 +412,6 @@ button{
     }
     &:first-child{
       border-left: none;
-      margin-right: -1px;
     }
   }
 }

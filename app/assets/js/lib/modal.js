@@ -13,7 +13,7 @@
     animation: true,
     backdropClose: true,
     onhide: null,
-    onhidden: null,
+    onhidden: null
   };
 
   var clearTimeout = function(){
@@ -25,14 +25,14 @@
 
   var Modal = root.Modal = function(element, options) {
     this.options = $.defaults(options, defaults);
-    this.container = $.g(this.options.containerId);
+    this.container = $(this.options.containerId);
     this.modalElement = element;
     
     if(!this.options.animation || !this.transitionProperty){
       duration = 0;
     } else {
       if(typeof window.getComputedStyle == 'function'){
-        durationStyle = window.getComputedStyle(this.container)[this.transitionProperty];
+        durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
     }
@@ -73,14 +73,14 @@
       this.isShown = true;
 
       this.bind_events();
-      this.container.style.display = 'block';
+      this.container.css('display', 'block');
       this.modalElement.style.display = 'inline-block';
-      this.container.offsetWidth;
+      this.container[0].offsetWidth;
       this.modalElement.offsetWidth;
-      $(this.container).addClass(this.options.shownClass);
+      this.container.addClass(this.options.shownClass);
       clearTimeout();
       timeout = setTimeout(this.shown, this.animationDuration);
-      this.container.focus();
+      this.container[0].focus();
     },
 
     shown: function() {
@@ -94,7 +94,7 @@
       if(this.animationDuration){
         $(this.modalElement).addClass('animate');
       }
-      $(this.container).removeClass(this.options.shownClass);
+      this.container.removeClass(this.options.shownClass);
       
       this.off();
       clearTimeout();
@@ -111,7 +111,7 @@
 
     hidden: function() {
       clearTimeout();
-      this.container.style.display = 'none';
+      this.container.css('display', 'none');
       this.modalElement.style.display = 'none';
       if(typeof this.options.onhidden === 'function') {
         this.options.onhidden();
@@ -145,19 +145,21 @@
     },
 
     bind_events: function(){
-      this.on('click', $.g(this.options.closeId), this.hide);
-      this.on('resize', window, function(){
-        var self = this;
-        var el = document.activeElement;
-        if(el){
-          var rect = el.getBoundingClientRect();
-          if(rect.bottom > innerHeight - 50){
-            setTimeout(function(){
-              self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
-            }, 400)
+      this.on('click', $(this.options.closeId)[0], this.hide);
+      
+      if(window.innerHeight) // doesn't exist <ie7. we're concerned about mobile here.
+        this.on('resize', window, function(){
+          var self = this;
+          var el = document.activeElement;
+          if(el){
+            var rect = el.getBoundingClientRect();
+            if(rect.bottom > innerHeight - 50){
+              setTimeout(function(){
+                self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
+              }, 400)
+            }
           }
-        }
-      })
+        })
       
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
@@ -167,7 +169,7 @@
         })
       }
       if (this.options.backdropClose) {
-        this.on('click', $(this.container).children('backdrop')[0], function(e){
+        this.on('click', this.container.children('backdrop')[0], function(e){
           this.options.backdropClose && this.hide();
         })
       }

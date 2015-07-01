@@ -42,6 +42,7 @@
 
     remove: function(){
       this[0].parentNode && this[0].parentNode.removeChild(this[0]);
+      return this;
     },
 
     hasClass: function(str){
@@ -50,12 +51,14 @@
 
     addClass: function(str){
       if(!this.hasClass(str)) this[0].className += ' ' + str;
+      return this;
     },
 
     removeClass: function(str){
       var el = this[0];
       className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
       if(el.className != className) el.className = className;
+      return this;
     },
 
     children: function(filterClass){
@@ -82,6 +85,26 @@
         if(pattern.test(els[i].className)) result.push(els[i]);
       }
       return result;
+    },
+
+    css: function(prop, value){
+      var el = this[0];
+      if(el){
+        if(arguments.length == 1) return el.style[prop];
+        el.style[prop] = value;
+      }
+    },
+
+    attr: function(attr, value){
+      var el = this[0];
+      if(el){
+        if(arguments.length == 1) return el.getAttribute(attr);
+        el.setAttribute(attr, value);
+      }
+    },
+
+    parent: function(){
+      return $(this[0].parentNode)
     }
   }
 
@@ -99,10 +122,6 @@
       if(!(i in target)) target[i] = defaults[i];
     }
     return target;
-  }
-
-  $.g = function(id){
-    return document.getElementById(id);
   }
 
 })(Razorpay.prototype);

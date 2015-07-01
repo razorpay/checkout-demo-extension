@@ -6,6 +6,18 @@
   -moz-box-sizing: @sizing;
   box-sizing: @sizing;
 }
+.opacity(@fraction){
+  opacity: @fraction;
+  @percent: 100*@fraction;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=@{percent})";
+  filter: alpha(opacity=@percent);
+}
+.background(@rgba){
+  background: @rgba;
+  @argb: argb(@rgba);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=@argb, endColorstr=@argb);
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=@{argb}, endColorstr=@{argb})";
+}
 .grad (@startColor: transparent, @endColor: #fff) {
   background-color: @startColor;
   background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));

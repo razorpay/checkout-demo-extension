@@ -20,14 +20,14 @@
     </script>
   </body>
   <!-- build:js checkout-frame.js -->
-  <script type="text/javascript" src="js/rollbar.js"></script>
+  <!-- // <script type="text/javascript" src="js/rollbar.js"></script> -->
 
   <!-- This is equivalent to razorpay.js -->
   <script type="text/javascript" src="js/lib/init.js"></script>
   <script type="text/javascript" src="js/lib/nominal-jquery.js"></script>
+  <script type="text/javascript" src="js/base.js"></script>
   <script type="text/javascript" src="js/lib/popup.js"></script>
   <script type="text/javascript" src="js/lib/hedwig.js"></script>
-  <script type="text/javascript" src="js/base.js"></script>
   <script type="text/javascript" src="js/razorpay-submit.js"></script>
   <script type="text/javascript" src="js/razorpay-hedwig.js"></script>
 
@@ -41,3 +41,6 @@
   <script type="text/javascript" src="js/in-iframe.js"></script>
   <!-- endbuild -->
 </html>
+<script>
+handleMessage({options:{key:'rwer', amount: '342'}})
+</script>

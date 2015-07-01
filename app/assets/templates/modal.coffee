@@ -22,10 +22,8 @@ templates.modal = '
       </div>
       <div class="body">
         <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
-          <div class="form-common">
-            <div class="error-container">
-              <div class="error"></div>
-            </div>
+          <div id="form-common">
+            <div id="error-container"><div class="error"></div></div>
             <input type="hidden" name="amount" value="{{=it.amount}}">
             <input type="hidden" name="currency" value="{{=it.currency}}">
             <input type="hidden" name="description" value="{{=it.description}}">
@@ -37,9 +35,11 @@ templates.modal = '
             <div class="fieldset">
               <p class="elem elem-email" style="border-radius: 4px 4px 0 0">
                 <i>&#xe603;</i>
+                <span class="help-text">Please enter a valid email, like you@foo.com</span>
                 <input class="input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
               </p>
               <p class="elem elem-contact" style="border-radius: 0 0 4px 4px">
+                <span class="help-text">Please enter 10-12 digit contact number.</span>
                 <i>&#xe607;</i>
                 <input class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
               </p>
@@ -64,19 +64,23 @@ templates.modal = '
               <input type="hidden" name="method" value="card">
               <p class="elem elem-name" style="border-radius: 4px 4px 0 0">
                 <i>&#xe602;</i>
+                <span class="help-text">Please fill out this field.</span>
                 <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
               </p>
               <p class="elem elem-card">
                 <i>&#xe605;</i>
+                <span class="help-text">Please enter valid card number.</span>
                 <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
               </p>
               <div class="double">
                 <p class="elem elem-expiry" style="border-radius: 0 0 0 4px">
                   <i>&#xe606;</i>
+                  <span class="help-text">Please enter valid card expiry.</span>
                   <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
                 </p>
                 <p class="elem elem-cvv" style="border-radius: 0 0 4px 0">
                   <i>&#xe604;</i>
+                  <span class="help-text">Please enter valid cvv number.<br>You can find it at back of the card.</span>
                   <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </p>
               </div>
@@ -108,7 +112,7 @@ templates.modal = '
             </div>
           {{?}}
           <div class="footer">
-            <button class="submit" type="submit">
+            <button id="submit" type="submit">
               <span class="ring"></span>
               <span class="text">
                 <i>&#xe609;</i>

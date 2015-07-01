@@ -87,7 +87,7 @@
     },
 
     refresh: function(){
-      var els = this[0].getElementsByTagName('p');
+      var els = this.parent[0].getElementsByTagName('p');
       var elslen = els.length;
       for(var i=0; i<elslen; i++){
         var child = $(els[i]).children('input');
