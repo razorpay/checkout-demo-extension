@@ -16,7 +16,6 @@
   */
   Razorpay.payment = {
     authorize: function(request, throwError){
-      debugger
       if(typeof request != 'object' || typeof request.data !== 'object'){
         return false;
       }

@@ -197,4 +197,4 @@
     }
   }
 
-})(Razorpay)
+})(Razorpay);

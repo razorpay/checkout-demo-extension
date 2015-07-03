@@ -334,7 +334,7 @@
     // close on backdrop click and remove errors
     renew: function(){
       if (discreet.$el)
-        $('error-container').removeClass('has-error').css('paddingTop', '');
+        $('error-container').css('display', 'none').removeClass('has-error').css('paddingTop', '');
 
       if(discreet.modal)
         discreet.modal.options.backdropClose = true;
@@ -360,16 +360,17 @@
       var modalEl = discreet.modal.modalElement;
       discreet.shake();
 
-      $('#submit')[0].removeAttribute('disabled');
+      $('submit')[0].removeAttribute('disabled');
       discreet.modal && (discreet.modal.options.backdropClose = true);
 
       if (response && response.error){
         message = response.error.description;
 
         if (response.error.field){
-          var error_el = discreet.$el.find('input[name="'+response.error.field+'"]');
-          if (error_el.length){
-            error_el.closest('.elem').addClass('invalid').eq(0).focus();
+          var error_el = discreet.$el[0].getElementsByName(response.error.field);
+          if (error_el){
+            $(error_el.parentNode).addClass('invalid');
+            error_el.focus();
           }
         }
       }
@@ -378,8 +379,9 @@
         message = 'There was an error in handling your request';
       }
 
-      var error_ht = modalEl.find('.error').html(message).prop('offsetHeight');
-      $('#error-container').addClass('has-error').css('paddingTop', error_ht);
+      var error_message = $('error-message')[0];
+      error_message.innerHTML = message;
+      $('error-container').css('display', 'block').addClass('has-error').css('paddingTop', error_message.offsetHeight + 'px');
     },
 
     configureRollbar: function(message){

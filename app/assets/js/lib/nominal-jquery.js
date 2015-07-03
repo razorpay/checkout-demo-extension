@@ -4,6 +4,73 @@
     callback.call(el, e);
   }
 
+  var jsonp = function(options){
+    !options.data && (options.data = {});
+    var callback = options.data.callback = 'jsonp_' + randomString(15);
+    var params = getAjaxParams(options);
+    var done = false;
+    
+    window[callback] = function(data){
+      params.success(data, params);
+      params.complete(data, params);
+      try {
+        delete window[callback]
+      }
+      catch(e){
+        window[callback] = undefined;
+      }
+    }
+    
+    var script = document.createElement('script');
+    script.src = params.computedUrl;
+    script.async = true;
+
+    script.onerror = function(e){
+      params.error({ url: script.src, event: e })
+      params.complete({ url: script.src, event: e }, params)
+    }
+
+    script.onload = script.onreadystatechange = function(){
+      if(!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')){
+        done = true;
+        script.onload = script.onreadystatechange = null;
+        script.parentNode.removeChild(script);
+        script = null;
+      }
+    }
+    var head = window.document.getElementsByTagName('head')[0] || window.document.documentElement;
+    head.appendChild(script);
+  }
+
+  var getAjaxParams = function(options){
+    var params = {
+      data: options.data || {},
+      error: options.error || $.noop,
+      success: options.success || $.noop,
+      complete: options.complete || $.noop,
+      url: options.url || ''
+    }
+
+    var url = params.url;
+    url += params.url.indexOf('?') < 0 ? '?' : '&';
+    url += objectToURI(params.data);
+    params.computedUrl = url;
+    return params;
+  }
+
+  var randomString = function(length){
+    var str = '';
+    while(str.length < length) str += Math.random().toString(36)[2];
+    return str
+  }
+
+  var objectToURI = function(obj){
+    var data = [];
+    var encode = window.encodeURIComponent;
+    for (var key in obj) data.push(encode(key) + '=' + encode(obj[key]));
+    return data.join('&')
+  }
+
   var $ = root.$ = function(el){
     if(typeof el == 'string') return $(document.getElementById(el));
     if(!(this instanceof $)) return new $(el);
@@ -50,7 +117,9 @@
     },
 
     addClass: function(str){
-      if(!this.hasClass(str)) this[0].className += ' ' + str;
+      var el = this[0];
+      if(!el.className) el.className = str;
+      else if(!this.hasClass(str)) el.className += ' ' + str;
       return this;
     },
 
@@ -91,8 +160,11 @@
       var el = this[0];
       if(el){
         if(arguments.length == 1) return el.style[prop];
-        el.style[prop] = value;
+        try {
+          el.style[prop] = value;
+        } catch(e){} // IE can not set invalid css rules without throwing up.
       }
+      return this;
     },
 
     attr: function(attr, value){
@@ -106,6 +178,10 @@
     parent: function(){
       return $(this[0].parentNode)
     }
+  }
+
+  $.ajax = function(options){
+    if(options.dataType == 'jsonp') return jsonp(options);
   }
 
   $.noop = function(){};

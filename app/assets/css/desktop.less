@@ -60,12 +60,14 @@ body, html{
   outline: none;
   text-align: center;
   .transition(0.25s ease-out opacity);
-
   z-index: 19999;
   .middlefix();
+
   &.shown{
     opacity: 1;
-
+    .powered-by{
+      opacity: 1;
+    }
     .modal{
       opacity: 1;
       .scale(1);
@@ -155,6 +157,10 @@ button{
   font-family: @font-family;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 377px;
+
+  // ie7 and below, middlefix doesn't work.
+  // NOTE: it isn't because of lack of :after, but buggy white-space support
+  *top: 10%;
 }
 .modal-inner{
   .transition(0.15s ease-out opacity);
@@ -339,7 +345,7 @@ button{
 #submit.error{
   background-color: @danger;
 }
-.error{
+#error-message{
   left: 0;
   right: 0;
   position: absolute;
@@ -351,19 +357,18 @@ button{
   overflow: hidden;
   .transition(0.3s);
   bottom: 100%;
-  li{
-    list-style: none;
-    font-size: @font-size;
-  }
 }
 #error-container{
   position: relative;
   overflow: hidden;
+  display: none;
   margin: 0 -@padding;
   .transition(0.3s);
-}
-#error-container.has-error .error{
-  bottom: 0;
+  &.has-error{
+    #error-message{
+      bottom: 0;
+    }
+  }
 }
 .tab-content{
   display: none;
@@ -427,6 +432,7 @@ li:hover, li.active{
   }
 }
 #form{
+  margin: 0;
   padding-bottom: 52px;
   display: block;
 }

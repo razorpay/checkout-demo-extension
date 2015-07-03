@@ -102,5 +102,5 @@
       }
     }
   }
-})(Razorpay.prototype)
+})(Razorpay.prototype);
 // })(window)
