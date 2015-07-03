@@ -74,16 +74,16 @@ body, html{
       .transition-transform(0.25s cubic-bezier(0.3, 1.5, 0.7, 1));
     }
   }
-  &.font-loaded{
-    #powered-by{
-      opacity: 1;
-    }
-    i{
-      display: inline-block;
-    }
-    u{
-      display: none;
-    }
+}
+.font-loaded{
+  #powered-by{
+    opacity: 1;
+  }
+  i{
+    display: inline-block;
+  }
+  u{
+    display: none;
   }
 }
 label{
@@ -319,30 +319,44 @@ button{
   padding: 0 @padding;
 }
 
+.elem-cvv{
+  .help-text{
+    left: auto;
+    right: -15px;
+    &:after{
+      left: 50%;
+    }
+  }
+}
+
 .elem-card{
-  &.visa{
-    i{display: none}
+  i{display: none}
+}
+#card_number{
+  background: no-repeat right;
+  background-size: 10%;
+  
+  &[cardtype=unknown]{
+    &+i{display: block;}
+  }
+  &[cardtype=visa]{
     background-image: url('../images/icons/visa.png');
   }
-  &.mastercard{
-    i{display: none}
+  &[cardtype=mastercard]{
     background-image: url('../images/icons/mastercard.png');
   }
-  &.maestro{
-    i{display: none}
+  &[cardtype=maestro]{
     background-image: url('../images/icons/maestro.png');
   }
-  &.rupay{
-    i{display: none}
+  &[cardtype=rupay]{
     background-image: url('../images/icons/rupay.png');
   }
-  &.amex{
-    i{display: none}
+  &[cardtype=amex]{
     background-image: url('../images/icons/amex.png');
   }
 }
 
-#submit.error{
+#submitbtn.error{
   background-color: @danger;
 }
 #error-message{

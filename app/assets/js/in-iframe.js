@@ -148,8 +148,14 @@
       var el_number = $('card_number');
       var el_expiry = $('card_expiry');
       var el_cvv = $('card_cvv');
+      
+      Razorpay.card.setType = function(el, type){
+        !type && (type = Razorpay.card.getType(el.value) || 'unknown');
+        el.setAttribute('cardtype', type);
+        $(el.parentNode)[Razorpay.card.validateNumber(el.value, type) ? 'addClass' : 'removeClass']('invalid');
+      }
       Razorpay.card.formatNumber(el_number[0]);
-      Razorpay.card.formatExpiry(el_expiry[0]);
+      // Razorpay.card.formatExpiry(el_expiry[0]);
       // el_number.on('blur', function(){
       //   var valid = Razorpay.card.validateNumber(this.value);
       //   $(this.parentNode)[valid ? 'removeClass' : 'addClass']('invalid');
@@ -281,7 +287,7 @@
         data.signature = discreet.rzp.options.signature;
 
       discreet.renew();
-      $('submit').attr('disabled', true);
+      $('submitbtn').attr('disabled', true);
       if(discreet.modal)
         discreet.modal.options.backdropClose = false;
 
@@ -359,7 +365,7 @@
       var modalEl = discreet.modal.modalElement;
       discreet.shake();
 
-      $('submit')[0].removeAttribute('disabled');
+      $('submitbtn')[0].removeAttribute('disabled');
       discreet.modal && (discreet.modal.options.backdropClose = true);
 
       if (response && response.error){

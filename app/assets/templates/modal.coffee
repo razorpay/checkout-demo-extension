@@ -68,9 +68,9 @@ templates.modal = '
                 <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
               </p>
               <p class="elem elem-card">
-                <i>&#xe605;</i>
                 <span class="help-text">Please enter valid card number.</span>
-                <input class="input" type="tel" id="card_number" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
+                <input class="input" type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off">
+                <i>&#xe605;</i>
               </p>
               <div class="double">
                 <p class="elem elem-expiry" style="border-radius: 0 0 0 4px">
@@ -80,7 +80,7 @@ templates.modal = '
                 </p>
                 <p class="elem elem-cvv" style="border-radius: 0 0 4px 0">
                   <i>&#xe604;</i>
-                  <span class="help-text">Please enter valid cvv number.<br>You can find it at back of the card.</span>
+                  <span class="help-text">Please enter valid cvv number.<br>It is 3 or 4 digit number at back of your card.</span>
                   <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </p>
               </div>
@@ -112,7 +112,7 @@ templates.modal = '
             </div>
           {{?}}
           <div class="footer">
-            <button id="submit" type="submit">
+            <button id="submitbtn" type="submit">
               <span class="ring"></span>
               <span class="text">
                 <i>&#xe609;</i>

@@ -133,7 +133,6 @@
     
     var type = cardType(value) || 'unknown';
     var cardobj = card_formats[type];
-    this.setAttribute('cardtype', type);
 
     if(prefix.length + suffix.length >= cardobj.length) return e.preventDefault();
     pos = prefix.length;
@@ -141,6 +140,7 @@
 
     setTimeout(function(){
       el.value = value.replace(cardobj.space, cardobj.subs);
+      card.setType(el, type);
       var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
       pos += prespace && ++prespace.length || 1;
       setCaret(el, pos);
@@ -149,6 +149,7 @@
 
   var formatNumberBack = function(e){
     if(e.which != 8) return;
+    if(e.type == 'keyup') return card.setType(this);
 
     var el = this;
     var pos = checkSelection(el);
@@ -157,11 +158,13 @@
     
     if(pos == len && val[len-1] == ' '){
       e.preventDefault();
-      setTimeout(function(){el.value = el.value.slice(0, len-2)})
+      setTimeout(function(){
+        el.value = el.value.slice(0, len-2);
+      })
     }
   }
 
-  root.card = {
+  var card = root.card = {
     luhn: function(num){
       var odd = true;
       var sum = 0;
@@ -181,25 +184,30 @@
       return sum % 10 === 0;
     },
     formatNumber: function(el){
+      if(!el) return;
       formatNumber.call(el);
       $(el).on('keypress', formatNumber);
-      $(el).on('keydown', formatNumberBack)
+      $(el).on('keydown', formatNumberBack);
+      $(el).on('keyup', formatNumberBack);
     },
     formatExpiry: function(el){
+      if(!el) return;
       formatExpiry.call(el);
       $(el).on('keypress', formatExpiry);
       $(el).on('keydown', formatExpiryBack)
     },
-    validateNumber: function(num){
+    validateNumber: function(num, type){
       num = (num + '').replace(/\s|-/g,'');
       if(/^[0-9]+$/.test(num)){
-        var type = cardType(num);
+        var type = type || cardType(num);
         if(type && card_formats[type].length === num.length){
           return this.luhn(num);
         }
       }
       return false;
-    }
+    },
+    getType: cardType,
+    setType: $.noop
   }
 
 })(Razorpay);
