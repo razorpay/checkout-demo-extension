@@ -230,9 +230,9 @@ describe("Razorpay open cc and submit method", function(){
   }
 
   function addAllCC(){
-    $ccNumber.val(cc.number);
-    $ccExpiry.val(cc.expiry);
-    $ccCVV.val(cc.cvv);
+    $ccNumber.sendkeys(cc.number)
+    $ccExpiry.sendkeys(cc.expiry)
+    $ccCVV.sendkeys(cc.cvv)
   }
 
   afterEach(function(done){
@@ -260,223 +260,222 @@ describe("Razorpay open cc and submit method", function(){
 
     it("should submit with all details in place", function(){
       launch();
-
       spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyCalled();
       });
     });
 
-    // describe(": in ajax request to server", function(){
-    //   it("should pass signature if set", function(){
-    //     customOptions.signature = 'asdasd';
-    //     launch();
-    //     field = 'signature';
-    //     value = customOptions.signature;
-    //   });
+    describe(": in ajax request to server", function(){
+      it("should pass signature if set", function(){
+        customOptions.signature = 'asdasd';
+        launch();
+        field = 'signature';
+        value = customOptions.signature;
+      });
 
-    //   it("should not pass signature if not set", function(){
-    //     launch();
-    //     field = 'signature';
-    //     value = undefined;
-    //   });
+      it("should not pass signature if not set", function(){
+        launch();
+        field = 'signature';
+        value = undefined;
+      });
 
-    //   it("should pass amount", function(){
-    //     launch();
-    //     field = 'amount';
-    //     value = customOptions.amount;
-    //   });
+      it("should pass amount", function(){
+        launch();
+        field = 'amount';
+        value = customOptions.amount;
+      });
 
-    //   it("should pass currency", function(){
-    //     launch();
-    //     field = 'currency';
-    //     value = 'INR';
-    //   });
+      it("should pass currency", function(){
+        launch();
+        field = 'currency';
+        value = 'INR';
+      });
 
-    //   it("should pass email", function(){
-    //     launch();
-    //     field = 'email';
-    //     value = customOptions.prefill.email;
-    //   });
+      it("should pass email", function(){
+        launch();
+        field = 'email';
+        value = customOptions.prefill.email;
+      });
 
-    //   it("should pass contact", function(){
-    //     launch();
-    //     field = 'contact';
-    //     value = customOptions.prefill.contact;
-    //   });
+      it("should pass contact", function(){
+        launch();
+        field = 'contact';
+        value = customOptions.prefill.contact;
+      });
 
-    //   it("should pass description", function(){
-    //     launch();
-    //     field = 'description';
-    //     value = customOptions.description;
-    //   });
+      it("should pass description", function(){
+        launch();
+        field = 'description';
+        value = customOptions.description;
+      });
 
-    //   it("should pass card[name]", function(){
-    //     launch();
-    //     field = 'card[name]';
-    //     value = customOptions.prefill.name;
-    //   });
+      it("should pass card[name]", function(){
+        launch();
+        field = 'card[name]';
+        value = customOptions.prefill.name;
+      });
 
-    //   it("should pass card[number]", function(){
-    //     launch();
-    //     field = 'card[number]';
-    //     value = cc.number;
-    //   });
+      it("should pass card[number]", function(){
+        launch();
+        field = 'card[number]';
+        value = cc.number;
+      });
 
-    //   it("should pass card[cvv]", function(){
-    //     launch();
-    //     field = 'card[cvv]';
-    //     value = cc.cvv;
-    //   });
+      it("should pass card[cvv]", function(){
+        launch();
+        field = 'card[cvv]';
+        value = cc.cvv;
+      });
 
-    //   it("should pass card[expiry_month]", function(){
-    //     launch();
-    //     field = 'card[expiry_month]';
-    //     value = cc.expiry_month;
-    //   });
+      it("should pass card[expiry_month]", function(){
+        launch();
+        field = 'card[expiry_month]';
+        value = cc.expiry_month;
+      });
 
-    //   it("should pass card[expiry_year]", function(){
-    //     launch();
-    //     field = 'card[expiry_year]';
-    //     value = cc.expiry_year;
-    //   });
+      it("should pass card[expiry_year]", function(){
+        launch();
+        field = 'card[expiry_year]';
+        value = cc.expiry_year;
+      });
 
-    //   it("should pass notes[address]", function(){
-    //     launch();
-    //     field = 'notes[address]';
-    //     value = coOptions.notes.address;
-    //   });
-    // })
+      it("should pass notes[address]", function(){
+        launch();
+        field = 'notes[address]';
+        value = coOptions.notes.address;
+      });
+    })
   })
 
-  // it("should not submit without cc card", function(){
-  //   launch();
-  //   $ccExpiry.val(cc.expiry);
-  //   $ccCVV.val(cc.cvv);
+  it("should not submit without cc card", function(){
+    launch();
+    $ccExpiry.val(cc.expiry);
+    $ccCVV.val(cc.cvv);
 
-  //   spyCalled();
-  //   spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-  //     spyNotCalled();
-  //   });
-  // });
+    spyCalled();
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
 
-  // it("should not submit without cc expiry", function(){
-  //   launch();
-  //   $ccNumber.val(cc.number);
-  //   $ccCVV.val(cc.cvv);
+  it("should not submit without cc expiry", function(){
+    launch();
+    $ccNumber.sendkeys(cc.number);
+    $ccCVV.sendkeys(cc.cvv);
 
-  //   spyCalled();
-  //   spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-  //     spyNotCalled();
-  //   });
-  // });
+    spyCalled();
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
 
-  // it("should not submit without cc cvv", function(){
-  //   launch();
-  //   $ccCVV.val('').sendkeys('0');
+  it("should not submit without cc cvv", function(){
+    launch();
+    $ccCVV.val('').sendkeys('0');
 
-  //   spyCalled();
-  //   spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-  //     spyNotCalled();
-  //   });
-  // });
+    spyCalled();
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
 
-  // it("should not submit without name", function(){
-  //   customOptions.prefill.name = '';
-  //   launch();
-  //   addAllCC();
+  it("should not submit without name", function(){
+    customOptions.prefill.name = '';
+    launch();
+    addAllCC();
 
-  //   spyCalled();
-  //   spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-  //     spyNotCalled();
-  //   });
-  // });
+    spyCalled();
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
 
-  // it("should not submit without email", function(){
-  //   customOptions.prefill.email = '';
-  //   launch();
-  //   addAllCC();
+  it("should not submit without email", function(){
+    customOptions.prefill.email = '';
+    launch();
+    addAllCC();
 
-  //   spyCalled();
-  //   spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-  //     spyNotCalled();
-  //   });
-  // });
+    spyCalled();
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
 
-  // it("should not submit without contact", function(){
-  //   customOptions.prefill.contact = '';
-  //   launch();
-  //   addAllCC();
+  it("should not submit without contact", function(){
+    customOptions.prefill.contact = '';
+    launch();
+    addAllCC();
 
-  //   spyCalled();
-  //   spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-  //     spyNotCalled();
-  //   });
-  // });
+    spyCalled();
+    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyNotCalled();
+    });
+  });
 
-  // describe("and getFormData method", function(){
-  //   var co, data;
+  describe("and getFormData method", function(){
+    var co, data;
 
-  //   function addAllCC(){
-  //     $ccNumber.val(cc.number);
-  //     $ccExpiry.val(cc.expiry);
-  //     $ccCVV.val(cc.cvv);
-  //   }
+    function addAllCC(){
+      $ccNumber.sendkeys(cc.number);
+      $ccExpiry.sendkeys(cc.expiry);
+      $ccCVV.sendkeys(cc.cvv);
+    }
 
-  //   beforeEach(function(done){
-  //     launch();
-  //     addAllCC();
-  //     spyCalled();
+    beforeEach(function(done){
+      launch();
+      addAllCC();
+      spyCalled();
 
-  //     setTimeout(function(){
-  //       data = frameDiscreet.getFormData(jQuery('.modal form'), true);
-  //       done();
-  //     }, 0);
-  //   });
+      setTimeout(function(){
+        data = frameDiscreet.getFormData(jQuery('.modal form'), true);
+        done();
+      }, 0);
+    });
 
-  //   it("should return description", function(){
-  //     expect(data.description).toBe(coOptions.description);
-  //   });
+    it("should return description", function(){
+      expect(data.description).toBe(coOptions.description);
+    });
 
-  //   it("should return amount", function(){
-  //     expect(data.amount).toBe(coOptions.amount);
-  //   });
+    it("should return amount", function(){
+      expect(data.amount).toBe(coOptions.amount);
+    });
 
-  //   it("should return currency", function(){
-  //     expect(data.currency).toBe('INR');
-  //   });
+    it("should return currency", function(){
+      expect(data.currency).toBe('INR');
+    });
 
-  //   it("should return contact", function(){
-  //     expect(data.contact).toBe(coOptions.prefill.contact);
-  //   });
+    it("should return contact", function(){
+      expect(data.contact).toBe(coOptions.prefill.contact);
+    });
 
-  //   it("should return email", function(){
-  //     expect(data.email).toBe(coOptions.prefill.email);
-  //   });
+    it("should return email", function(){
+      expect(data.email).toBe(coOptions.prefill.email);
+    });
 
-  //   it("should return name", function(){
-  //     expect(data['card[name]']).toBe(coOptions.prefill.name);
-  //   });
+    it("should return name", function(){
+      expect(data['card[name]']).toBe(coOptions.prefill.name);
+    });
 
-  //   it("should return card number", function(){
-  //     expect(data['card[number]']).toBe(cc.number);
-  //   });
+    it("should return card number", function(){
+      expect(data['card[number]']).toBe(cc.number);
+    });
 
-  //   it("should return card expiry month", function(){
-  //     expect(data['card[expiry_month]']).toBe(cc.expiry_month);
-  //   });
+    it("should return card expiry month", function(){
+      expect(data['card[expiry_month]']).toBe(cc.expiry_month);
+    });
 
-  //   it("should return card expiry year", function(){
-  //     expect(data['card[expiry_year]']).toBe(cc.expiry_year);
-  //   });
+    it("should return card expiry year", function(){
+      expect(data['card[expiry_year]']).toBe(cc.expiry_year);
+    });
 
-  //   it("should return card cvv", function(){
-  //     expect(data['card[cvv]']).toBe(cc.cvv);
-  //   });
+    it("should return card cvv", function(){
+      expect(data['card[cvv]']).toBe(cc.cvv);
+    });
 
-  //   it("should not return bank", function(){
-  //     expect(data.bank).toBeUndefined();
-  //   });
-  // })
+    it("should not return bank", function(){
+      expect(data.bank).toBeUndefined();
+    });
+  })
 });
 
 

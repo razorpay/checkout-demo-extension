@@ -152,14 +152,12 @@
       Razorpay.card.setType = function(el, type){
         !type && (type = Razorpay.card.getType(el.value) || 'unknown');
         el.setAttribute('cardtype', type);
-        $(el.parentNode)[Razorpay.card.validateNumber(el.value, type) ? 'addClass' : 'removeClass']('invalid');
       }
       Razorpay.card.formatNumber(el_number[0]);
-      // Razorpay.card.formatExpiry(el_expiry[0]);
-      // el_number.on('blur', function(){
-      //   var valid = Razorpay.card.validateNumber(this.value);
-      //   $(this.parentNode)[valid ? 'removeClass' : 'addClass']('invalid');
-      // });
+      el_number.on('blur', function(){
+        $(this.parentNode)[Razorpay.card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
+      })
+      Razorpay.card.formatExpiry(el_expiry[0]);
     },
 
     showModal: function() {

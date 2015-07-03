@@ -79,8 +79,9 @@
 
   $.prototype = {
     on: function(event, callback, capture){
-      var ref;
       var el = this[0];
+      if(!el) return;
+      var ref;
       if (window.addEventListener) {
         ref = function(e){
           if(e.target.nodeType == 3) e.target = e.target.parentNode;// textNode target

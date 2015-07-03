@@ -139,6 +139,7 @@
     var el = this;
 
     setTimeout(function(){
+      if(value != el.value) return;
       el.value = value.replace(cardobj.space, cardobj.subs);
       card.setType(el, type);
       var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
