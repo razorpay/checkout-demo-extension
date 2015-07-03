@@ -26,9 +26,6 @@ module.exports = function(grunt){
       harp_compile:{
         cmd: 'harp compile app/assets app/srv'
       },
-      initJS: {
-        cmd: 'cp app/srv/js/lib/inline-libs.html app/srv/js/lib/inline-libs.js'
-      },
       dir_images: {
         cmd: 'mkdir app/dist && mkdir app/dist/v1'
       },
@@ -83,8 +80,9 @@ module.exports = function(grunt){
         singleRun: true,
         browserNoActivityTimeout: 30000,
         files: [
-          'app/assets/js/lib/jquery-1.11.1.js',
+          'spec/jquery-1.11.1.js',
           'spec/jasmine-jquery.js',
+          'spec/helpers.js',
         ]
       },
       'razorpay': {
@@ -191,7 +189,6 @@ module.exports = function(grunt){
     'env:test',
     'exec:clean_srv',
     'exec:harp_compile',
-    'exec:initJS',
     'useminPrepare',
     'preprocess',
     'prepareKarma'

@@ -70,18 +70,18 @@ templates.modal = '
               <p class="elem elem-card">
                 <i>&#xe605;</i>
                 <span class="help-text">Please enter valid card number.</span>
-                <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
+                <input class="input" type="tel" id="card_number" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
               </p>
               <div class="double">
                 <p class="elem elem-expiry" style="border-radius: 0 0 0 4px">
                   <i>&#xe606;</i>
                   <span class="help-text">Please enter valid card expiry.</span>
-                  <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
+                  <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
                 </p>
                 <p class="elem elem-cvv" style="border-radius: 0 0 4px 0">
                   <i>&#xe604;</i>
                   <span class="help-text">Please enter valid cvv number.<br>You can find it at back of the card.</span>
-                  <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
+                  <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </p>
               </div>
             </div>
@@ -130,6 +130,6 @@ templates.modal = '
         </form>
       </div>
     </div>
-    <i class="powered-by"><a href="https://razorpay.com" target="_blank">&#xe608;</a></i>
+    <i id="powered-by"><a href="https://razorpay.com" target="_blank">&#xe608;</a></i>
   </div>
 </div>'

@@ -145,16 +145,15 @@
     },
 
     setCardFormatting: function(){
-      return;
-      var el_number = discreet.$el.find('.input[name="card[number]"]');
-      var el_expiry = discreet.$el.find('.input[name="card[expiry]"]');
-      var el_cvv = discreet.$el.find('.input[name="card[cvv]"]');
+      var el_number = $('card_number');
+      var el_expiry = $('card_expiry');
+      var el_cvv = $('card_cvv');
       Razorpay.card.formatNumber(el_number[0]);
       Razorpay.card.formatExpiry(el_expiry[0]);
-      el_number.on('blur', function(){
-        var valid = Razorpay.card.validateNumber(this.value);
-        $(this.parentNode)[valid ? 'removeClass' : 'addClass']('invalid');
-      });
+      // el_number.on('blur', function(){
+      //   var valid = Razorpay.card.validateNumber(this.value);
+      //   $(this.parentNode)[valid ? 'removeClass' : 'addClass']('invalid');
+      // });
     },
 
     showModal: function() {
@@ -178,7 +177,7 @@
       discreet.sanitizeOptions(discreet.rzp.options);
       document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
       discreet.$el = $('container');
-      discreet.smarty = new Razorpay.prototype.Smarty(discreet.$el);
+      discreet.smarty = new Smarty(discreet.$el);
 
       if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
         if(navigator.userAgent.indexOf('Android 2')){
@@ -196,8 +195,8 @@
         }
       }
 
-      // discreet.applyFont(discreet.$el.find('.powered-by a')[0]);
-      discreet.modal = new Razorpay.prototype.Modal(discreet.$el.children('modal')[0], modalOptions);
+      discreet.applyFont($('powered-by')[0]);
+      discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);
       discreet.setCardFormatting();
 
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
@@ -323,7 +322,7 @@
 
       if(targetTab == 'tab-card'){
         data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-        expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+        var expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
         data['card[expiry_month]'] = expiry[0];
         data['card[expiry_year]'] = expiry[1];
         delete data['card[expiry]'];
@@ -367,10 +366,10 @@
         message = response.error.description;
 
         if (response.error.field){
-          var error_el = discreet.$el[0].getElementsByName(response.error.field);
-          if (error_el){
-            $(error_el.parentNode).addClass('invalid');
-            error_el.focus();
+          var error_el = document.getElementsByName(response.error.field);
+          if (error_el.length){
+            $(error_el[0].parentNode).addClass('invalid');
+            error_el[0].focus();
           }
         }
       }

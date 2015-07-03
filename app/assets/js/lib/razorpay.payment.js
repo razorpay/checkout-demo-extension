@@ -108,10 +108,15 @@
       return e.preventDefault();
     }
 
-    setTimeout(function(){
-      el.value = mm + ' / ' + yy;
-      setCaret(el, ++pos);
-    })
+    var el = this;
+    // setTimeout(function(){
+      // el.value = mm + ' / ' + yy;
+      // setCaret(el, ++pos);
+    // })
+  }
+
+  var formatExpiryBack = function(){
+
   }
 
   var formatNumber = function(e){

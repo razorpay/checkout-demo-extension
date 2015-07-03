@@ -34,7 +34,7 @@
       if(!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')){
         done = true;
         script.onload = script.onreadystatechange = null;
-        script.parentNode.removeChild(script);
+        script.parentNode && script.parentNode.removeChild(script);
         script = null;
       }
     }
@@ -108,7 +108,8 @@
     },
 
     remove: function(){
-      this[0].parentNode && this[0].parentNode.removeChild(this[0]);
+      var el = this[0];
+      el && el.parentNode && el.parentNode.removeChild(el);
       return this;
     },
 
@@ -201,4 +202,3 @@
   }
 
 })(Razorpay.prototype);
-// })(window);

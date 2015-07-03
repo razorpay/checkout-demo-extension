@@ -175,4 +175,4 @@
       }
     }
   };
-})(Razorpay.prototype);
+})(window);

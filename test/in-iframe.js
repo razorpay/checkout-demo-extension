@@ -2,10 +2,11 @@ var discreet = Razorpay.prototype.discreet;
 var orig_methods = window.payment_methods = {"version":1,"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"}};
 
 function openCheckoutForm(options){
-  $('.container').remove();
+  jQuery('#container').remove();
+  delete window.frameDiscreet.$el;
   delete window.frameDiscreet.modal;
   delete window.frameDiscreet.rzp;
-  handleMessage({options: options})
+  handleMessage({options: options});
 }
 
 var coOptions = {
@@ -40,14 +41,11 @@ describe("in-iframe should have", function(){
   it("jQuery", function(){
     expect($).toBeDefined();
   })
-  it("jQuery.payment", function(){
-    expect($.payment).toBeDefined();
-  })
   it("modal", function(){
     expect(Modal).toBeDefined();
   })
   it("smarty", function(){
-    expect($.fn.smarty).toBeDefined();
+    expect(Smarty).toBeDefined();
   })
   it("doT", function(){
     expect(doT).toBeDefined();
@@ -58,7 +56,7 @@ describe("in-iframe should have", function(){
 })
 
 describe("init options.method: ", function(){
-  var opts = $.extend(true, {}, coOptions);
+  var opts = JSON.parse(JSON.stringify(coOptions));
   var disableTab;
 
   it("hide tabs and card fields if method.card == false", function(){
@@ -72,15 +70,15 @@ describe("init options.method: ", function(){
     opts.method = {};
     opts.method[disableTab] = false;
     openCheckoutForm(opts);
-    expect($('#tab-'+disableTab).length).toBe(0);
-    expect($('.tab-content:visible').length).toBe(1);
+    expect(jQuery('#tab-'+disableTab).length).toBe(0);
+    expect(jQuery('.tab-content:visible').length).toBe(1);
   })
 })
 //describe("message listener should", function(){
 //  it("throw error on erroneous options", function(done){
 //    var spyCalled = jasmine.createSpy();
 //    var origRazorpay = Razorpay;
-//    var custom_options = $.extend(true, {}, coOptions);
+//    var custom_options = jQuery.extend(true, {}, coOptions);
 //    custom_options.amount = 'dsf';
 //
 //    afterEach(function(){
@@ -118,34 +116,35 @@ describe("init options.method: ", function(){
 //  })
 //})
 
+
 describe("init options.method", function(){
   var opts;
   
   beforeEach(function(){
-    opts = $.extend(true, {}, coOptions);
+    opts = jQuery.extend(true, {}, coOptions);
     delete opts.method;
   })
 
   it("should enable both netbanking and card by default and show card initially", function(){
     openCheckoutForm(opts);
-    expect($('.tabs')).toBeVisible();
-    expect($('.tabs li').length).toBe(2);
-    expect($('.tabs li.active').attr('data-target')).toBe('tab-card');
-    expect($('#tab-card')).toBeVisible();
+    expect(jQuery('#tabs')).toBeVisible();
+    expect(jQuery('#tabs li').length).toBe(2);
+    expect(jQuery('#tabs li.active').attr('data-target')).toBe('tab-card');
+    expect(jQuery('#tab-card')).toBeVisible();
   });
 
   describe("", function(){
     var hide, show;
 
     beforeEach(function(){
-      window.payment_methods = $.extend(true, {}, orig_methods);
+      window.payment_methods = jQuery.extend(true, {}, orig_methods);
     })
 
     afterEach(function(){
       openCheckoutForm(opts);
-      expect($('.tabs').hasClass('tabs-1')).toBe(true);
-      expect($('#tab-' + hide)).not.toBeVisible();
-      expect($('#tab-' + show)).toBeVisible();
+      expect(jQuery('#tabs').hasClass('tabs-1')).toBe(true);
+      expect(jQuery('#tab-' + hide)).not.toBeVisible();
+      expect(jQuery('#tab-' + show)).toBeVisible();
     })
 
     it("should hide card if payment_methods.card=false", function(){
@@ -172,9 +171,9 @@ describe("Razorpay open cc page", function(){
 
   beforeEach(function(){
     openCheckoutForm(coOptions);
-    $name    = $('.input[name="card[name]"]');
-    $email   = $('.input[name="email"]');
-    $contact = $('.input[name="contact"]');
+    $name    = jQuery('.input[name="card[name]"]');
+    $email   = jQuery('.input[name="email"]');
+    $contact = jQuery('.input[name="contact"]');
   });
 
   afterEach(function(){
@@ -182,7 +181,7 @@ describe("Razorpay open cc page", function(){
   });
 
   it("should load modal", function(){
-    expect($('.modal')).toBeVisible();
+    expect(jQuery('.modal')).toBeVisible();
   });
 
   it("should prefill name", function(){
@@ -205,14 +204,14 @@ describe("Razorpay open cc and submit method", function(){
   var $ccNumber, $ccExpiry, $ccCVV;
   var $name, $email, $contact;
   var $nbLink, $nbBank;
-  var $ccSubmit, $nbSubmit;
+  var $ccSubmit;
   var customOptions;
 
   beforeEach(function(){
     spyCalled    = jasmine.createSpy();
     spyNotCalled = jasmine.createSpy();
 
-    customOptions = $.extend(true, {}, coOptions);
+    customOptions = jQuery.extend(true, {}, coOptions);
   });
 
   function launch(){
@@ -226,7 +225,7 @@ describe("Razorpay open cc and submit method", function(){
     $name        = jQuery('.input[name="card[name]"]');
     $email       = jQuery('.input[name="email"]');
     $contact     = jQuery('.input[name="contact"]');
-    $ccSubmit    = jQuery('.submit');
+    $ccSubmit    = jQuery('#submit');
   }
 
   function addAllCC(){
@@ -238,7 +237,7 @@ describe("Razorpay open cc and submit method", function(){
   afterEach(function(done){
     // sendkeys needs little delay
     setTimeout(function(){
-      $ccSubmit.click();
+      sendclick($ccSubmit[0]);
       expect(spyCalled).toHaveBeenCalled();
       expect(spyNotCalled).not.toHaveBeenCalled();
       frameDiscreet.hide();
@@ -432,7 +431,7 @@ describe("Razorpay open cc and submit method", function(){
       spyCalled();
 
       setTimeout(function(){
-        data = frameDiscreet.getFormData($('.modal form'), true);
+        data = frameDiscreet.getFormData(jQuery('.modal form'), true);
         done();
       }, 0);
     });
@@ -492,20 +491,17 @@ describe("Razorpay open netbanking page", function(){
     // For opening the modal
     openCheckoutForm(coOptions);
     co = frameDiscreet.rzp;
-
-    // using Razorpay.$ due to some bug in phantomjs
-    // The bug turns up when there are two jquery involved
-    $('.tabs li[data-target="tab-netbanking"]').click();
+    sendclick(jQuery('#tabs li[data-target="tab-netbanking"]')[0]);
   });
 
   afterEach(function(){
     frameDiscreet.hide();
-    $('.container').remove();
+    jQuery('#container').remove();
   })
 
   it("should show netbanking form on clicking", function(){
-    expect($('#tab-netbanking').hasClass('active')).toBe(true);
-    expect($('#tab-card').hasClass('active')).toBe(false);
+    expect(jQuery('#tab-netbanking').hasClass('active')).toBe(true);
+    expect(jQuery('#tab-card').hasClass('active')).toBe(false);
   });
 
   describe("and submit method", function(){
@@ -521,17 +517,17 @@ describe("Razorpay open netbanking page", function(){
     });
 
     function launch(){
-      $email       = $('.input[name="email"]');
-      $contact     = $('.input[name="contact"]');
-      $nbBank      = $('select[name="bank"]');
-      $nbSubmit    = $('.submit');
+      $email       = jQuery('.input[name="email"]');
+      $contact     = jQuery('.input[name="contact"]');
+      $nbBank      = jQuery('select[name="bank"]');
+      $nbSubmit    = jQuery('#submit');
     }
 
     afterEach(function(){
-      $nbSubmit.click();
+      sendclick($nbSubmit[0]);
       expect(spyCalled).toHaveBeenCalled();
       expect(spyNotCalled).not.toHaveBeenCalled();
-      $('.container').remove();
+      jQuery('#container').remove();
     })
 
     it("should submit with all details in place", function(){
@@ -578,9 +574,9 @@ describe("Razorpay open netbanking page", function(){
     var data;
 
     beforeEach(function(){
-      var $nbBank = $('select[name="bank"]');
+      var $nbBank = jQuery('select[name="bank"]');
       $nbBank.val('SBIN');
-      data = frameDiscreet.getFormData($('.modal form'), true);
+      data = frameDiscreet.getFormData();
     });
 
     it("should return description", function(){

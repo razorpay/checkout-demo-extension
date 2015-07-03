@@ -92,10 +92,11 @@ describe("authorize should", function(){
     expect(typeof req.options).toBe('object');
   })
 
-  it("return ajax object", function(){
-    var obj = Razorpay.payment.authorize(req);
-    expect(typeof obj).toBe("object");
-    expect(typeof obj.abort).toBe("function");
+  it("call $.ajax", function(){
+    var spy = jasmine.createSpy();
+    spyOn($, 'ajax').and.callFake(spy);
+    Razorpay.payment.authorize(req);
+    expect(spy).toHaveBeenCalled();
   })
 })
 
@@ -147,7 +148,7 @@ describe("XDCallback should", function(){
   });
 
   afterEach(function(){
-    discreet.xdm._listener({data: receivedMessage, origin: 'https://api.razorpay.com'});
+    discreet.xdm._listener({target: window, data: receivedMessage, origin: 'https://api.razorpay.com'});
     expect(spyCalled).toHaveBeenCalled();
   })
 
