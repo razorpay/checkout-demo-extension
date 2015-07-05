@@ -230,9 +230,9 @@ describe("Razorpay open cc and submit method", function(){
   }
 
   function addAllCC(){
-    $ccNumber.sendkeys(cc.number)
-    $ccExpiry.sendkeys(cc.expiry)
-    $ccCVV.sendkeys(cc.cvv)
+    $ccNumber.sendkeys(cc.number);
+    $ccExpiry.sendkeys(cc.expiry);
+    $ccCVV.sendkeys(cc.cvv);
   }
 
   afterEach(function(done){

@@ -9,7 +9,7 @@
 @danger: #f46060;
 @border-radius: 4px;
 
-@width: 320px;
+@width: 317px;
 @padding: 20px;
 
 @font-size: 14px;
@@ -171,7 +171,7 @@ button{
   border: 1px solid @border-color;
   background: #fff;
   position: relative;
-  margin: 0 0 -1px;
+  margin: -1px 0 0;
   cursor: text;
   .transition(0.25s border-color);
   background: #fff center right no-repeat;
@@ -198,6 +198,29 @@ button{
       border-color: @danger;
     }
   }
+}
+.double{
+  white-space: nowrap;
+  font-size: 0;
+  .elem{
+    font-size: @font-size;
+    display: inline-block;
+    width: (@width - 3px)/2 - @padding;
+    *float: left;
+  }
+}
+.elem-cvv{
+  left: -1px;
+  .help-text{
+    left: auto;
+    right: -15px;
+    &:after{
+      left: 50%;
+    }
+  }
+}
+.elem-card{
+  i{display: none}
 }
 .select:not(.filled){
   .input{
@@ -245,17 +268,6 @@ button{
   .opacity(0.85);
   .transform(none);
   .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
-}
-.double{
-  white-space: nowrap;
-  font-size: 0;
-  margin: 0 2px 0 1px;
-  .elem{
-    font-size: @font-size;
-    display: inline-block;
-    width: 50%;
-    margin-left: -1px;
-  }
 }
 .fieldset{
   padding: 20px 0;
@@ -318,20 +330,6 @@ button{
   text-align: left;
   padding: 0 @padding;
 }
-
-.elem-cvv{
-  .help-text{
-    left: auto;
-    right: -15px;
-    &:after{
-      left: 50%;
-    }
-  }
-}
-
-.elem-card{
-  i{display: none}
-}
 #card_number{
   background: no-repeat right;
   background-size: 10%;
@@ -391,7 +389,7 @@ button{
   display: block;
 }
 
-#tabs{
+#tabs{  
   margin: 0 -20px;
   padding: 0;
   font-size: 0;

@@ -83,6 +83,7 @@ templates.modal = '
                   <span class="help-text">Please enter valid cvv number.<br>It is 3 or 4 digit number at back of your card.</span>
                   <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </p>
+                <div class="clear"></div>
               </div>
             </div>
           {{?}}

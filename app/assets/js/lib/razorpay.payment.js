@@ -134,23 +134,19 @@
     var type = cardType(value) || 'unknown';
     var cardobj = card_formats[type];
 
-    if(prefix.length + suffix.length >= cardobj.length) return e.preventDefault();
+    if(e) e.preventDefault();
+    if(prefix.length + suffix.length >= cardobj.length) return;
     pos = prefix.length;
-    var el = this;
 
-    setTimeout(function(){
-      if(value != el.value) return;
-      el.value = value.replace(cardobj.space, cardobj.subs);
-      card.setType(el, type);
-      var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
-      pos += prespace && ++prespace.length || 1;
-      setCaret(el, pos);
-    });
+    this.value = value.replace(cardobj.space, cardobj.subs);
+    card.setType(this, type);
+    var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
+    pos += prespace && ++prespace.length || 1;
+    setCaret(this, pos);
   }
 
   var formatNumberBack = function(e){
     if(e.which != 8) return;
-    if(e.type == 'keyup') return card.setType(this);
 
     var el = this;
     var pos = checkSelection(el);
@@ -159,9 +155,7 @@
     
     if(pos == len && val[len-1] == ' '){
       e.preventDefault();
-      setTimeout(function(){
-        el.value = el.value.slice(0, len-2);
-      })
+      el.value = el.value.slice(0, len-2);
     }
   }
 
@@ -189,13 +183,15 @@
       formatNumber.call(el);
       $(el).on('keypress', formatNumber);
       $(el).on('keydown', formatNumberBack);
-      $(el).on('keyup', formatNumberBack);
+      $(el).on('keyup', function(){
+        card.setType(this);
+      });
     },
     formatExpiry: function(el){
       if(!el) return;
       formatExpiry.call(el);
       $(el).on('keypress', formatExpiry);
-      $(el).on('keydown', formatExpiryBack)
+      $(el).on('keydown', formatExpiryBack);
     },
     validateNumber: function(num, type){
       num = (num + '').replace(/\s|-/g,'');

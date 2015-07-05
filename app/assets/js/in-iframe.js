@@ -321,7 +321,7 @@
       var data = {};
       discreet.getFormFields('form-common', data);
       
-      var targetTab = activeTab.getAttribute('data-target')
+      var targetTab = activeTab.getAttribute('data-target');
       discreet.getFormFields(targetTab, data);
 
       if(targetTab == 'tab-card'){

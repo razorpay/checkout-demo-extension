@@ -155,7 +155,7 @@
             var rect = el.getBoundingClientRect();
             if(rect.bottom > innerHeight - 50){
               setTimeout(function(){
-                self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
+                // self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
               }, 400)
             }
           }
