@@ -69,6 +69,7 @@
 
     input: function(e){
       var el = e.target;
+      if(e.type == 'input' && typeof el.getAttribute('ignore-input') == 'string') return;
       var parent = $(el.parentNode);
       var value = el.value;
       var valid = true;
@@ -81,7 +82,6 @@
       if (valid && pattern) {
         valid = new RegExp(pattern).test(value);
       }
-      
       parent[valid && 'removeClass' || 'addClass']('invalid');
       parent[value && 'removeClass' || 'addClass']('filled');
     },

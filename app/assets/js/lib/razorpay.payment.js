@@ -104,11 +104,33 @@
     var pos = checkSelection(this);
     if(pos === true) return;
 
-    if(this.value.length == 7){
-      return e.preventDefault();
+    var value = this.value;
+    var prefix = value.slice(0, pos).replace(/[^0-9]/g,'');
+    var suffix = value.slice(pos).replace(/[^0-9]/g,'');
+
+    if(pos == 0){
+      // if(this.value && !/(0[1-9]|1[012])/.test(char + this.value[0]))
+      //   return e && e.preventDefault();
+      if(/0|1/.test(char))
+        return;
+      else
+        char = '0' + char;
+        pos++;
     }
 
-    var el = this;
+    if(pos == 1){
+      this.value = prefix + char + ' / ' + suffix;
+      // pos++;
+      // if(pos > 1 && pos < 5)
+      //   pos = 5;
+      // setCaret(this, pos);
+      e && e.preventDefault();
+    }
+
+    if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(this.value))
+      e && e.preventDefault();
+
+    // var el = this;
     // setTimeout(function(){
       // el.value = mm + ' / ' + yy;
       // setCaret(el, ++pos);
@@ -139,7 +161,7 @@
     pos = prefix.length;
 
     this.value = value.replace(cardobj.space, cardobj.subs);
-    card.setType(this, type);
+    // card.setType(this, type);
     var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
     pos += prespace && ++prespace.length || 1;
     setCaret(this, pos);
@@ -178,6 +200,7 @@
       }
       return sum % 10 === 0;
     },
+
     formatNumber: function(el){
       if(!el) return;
       formatNumber.call(el);
@@ -187,12 +210,18 @@
         card.setType(this);
       });
     },
+
     formatExpiry: function(el){
       if(!el) return;
-      formatExpiry.call(el);
       $(el).on('keypress', formatExpiry);
       $(el).on('keydown', formatExpiryBack);
     },
+
+    ensureNumeric: function(el){
+      if(!el) return;
+      $(el).on('keypress', ensureNumeric);
+    },
+
     validateNumber: function(num, type){
       num = (num + '').replace(/\s|-/g,'');
       if(/^[0-9]+$/.test(num)){

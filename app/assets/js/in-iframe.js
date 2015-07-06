@@ -144,20 +144,26 @@
       }
     },
 
+    setNumberValidity: function(){
+      $(this.parentNode)[Razorpay.card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
+    },
+
     setCardFormatting: function(){
       var el_number = $('card_number');
       var el_expiry = $('card_expiry');
       var el_cvv = $('card_cvv');
+      var el_contact = $('contact');
       
       Razorpay.card.setType = function(el, type){
         !type && (type = Razorpay.card.getType(el.value) || 'unknown');
         el.setAttribute('cardtype', type);
+        discreet.setNumberValidity.call(el);
       }
       Razorpay.card.formatNumber(el_number[0]);
-      el_number.on('blur', function(){
-        $(this.parentNode)[Razorpay.card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
-      })
+      el_number.on('blur', discreet.setNumberValidity);
       Razorpay.card.formatExpiry(el_expiry[0]);
+      Razorpay.card.ensureNumeric(el_cvv[0]);
+      Razorpay.card.ensureNumeric(el_contact[0]);
     },
 
     showModal: function() {

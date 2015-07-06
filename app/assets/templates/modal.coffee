@@ -41,7 +41,7 @@ templates.modal = '
               <p class="elem elem-contact" style="border-radius: 0 0 4px 4px">
                 <span class="help-text">Please enter 10-12 digit contact number.</span>
                 <i>&#xe607;</i>
-                <input class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
+                <input id="contact" class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" pattern="[0-9]{10,12}">
               </p>
             </div>
           </div>
@@ -69,7 +69,7 @@ templates.modal = '
               </p>
               <p class="elem elem-card">
                 <span class="help-text">Please enter valid card number.</span>
-                <input class="input" type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off">
+                <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off">
                 <i>&#xe605;</i>
               </p>
               <div class="double">
