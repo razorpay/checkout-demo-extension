@@ -265,7 +265,7 @@
     toggle_nocvv: function(){
       var checked = this.checked;
       for(var i in {card_expiry: 0, card_cvv: 0}){
-        var el = $(i)[0];
+        var el = $(i).removeClass('invalid')[0];
         el.value = '';
         el.disabled = checked;
         el.required = !checked;
