@@ -69,6 +69,36 @@ module.exports = function(grunt){
         }
       }
     },
+    aws: loadAwsKeys(),
+    aws_s3: {
+      options: {
+        accessKeyId: '<%= aws.AWSAccessKeyId %>', // Use the variables
+        secretAccessKey: '<%= aws.AWSSecretKey %>', // You can also use env variables
+        region: 'us-east-1'
+      },
+      beta: {
+        options: {
+          bucket: 'checkout-beta',
+          differential: true, // Only uploads the files that have changed
+          gzipRename: 'ext' // when uploading a gz file, keep the original extension
+        },
+        files: [{
+          expand: true,
+          cwd: 'app/assets/fonts', src: ['**'], dest: '/'
+        }]
+      },
+      production: {
+        options: {
+          bucket: 'checkout-live',
+          differential: true, // Only uploads the files that have changed
+          gzipRename: 'ext' // when uploading a gz file, keep the original extension
+        },
+        files: [{
+          expand: true,
+          cwd: 'app/assets/fonts', src: ['**'], dest: '/'
+        }]
+      }
+    },
     karma: {
       options: {
         frameworks: ['jasmine'],
@@ -147,6 +177,19 @@ module.exports = function(grunt){
 
   });
 
+  /** Helper method to load AwsKeys from multiple sources */
+  function loadAwsKeys() {
+    if(grunt.file.exists('aws-keys.json')) {
+      return grunt.file.readJSON('aws-keys.json');
+    }
+    else {
+      return({
+        "AWSAccessKeyId": process.env.AWS_KEY,
+        "AWSSecretKey": process.env.AWS_SECRET
+      });
+    }
+  }
+
   /**
    * Internal usage
    * Prepares folders for build
@@ -201,6 +244,9 @@ module.exports = function(grunt){
     'karma:frame',
     'createReport'
   ]);
+
+  var target = grunt.option('target') && grunt.option('target').toLowerCase() || 'beta';
+  grunt.registerTask('fonts:upload', 'Upload Fonts', ['aws_s3:' + target]);
 
   grunt.registerTask('prepareKarma', 'Prepare Karma', function(a, b) {
     var fileSets = grunt.config.get('concat');
