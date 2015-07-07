@@ -5,16 +5,19 @@
   <meta name="Viewport" content="width=device-width, initial-scale=0.6" />
   <!-- <script src="http://192.168.0.105:8080/target/target-script-min.js"></script> -->
   <!-- build:js razorpay.js -->
-  <script type="text/javascript" src="js/lib/init.html"></script>
+  <script type="text/javascript" src="js/lib/init.js"></script>
+  <script type="text/javascript" src="js/lib/nominal-jquery.js"></script>
   <script type="text/javascript" src="js/lib/popup.js"></script>
   <script type="text/javascript" src="js/lib/hedwig.js"></script>
   <script type="text/javascript" src="js/base.js"></script>
   <script type="text/javascript" src="js/razorpay-submit.js"></script>
+  <script type="text/javascript" src="js/razorpay-hedwig.js"></script>
   <script type="text/javascript" src="js/fin.js"></script>
   <!-- endbuild -->
 
   <!-- build:js checkout.js -->
-  <script type="text/javascript" src="js/lib/init.html"></script>
+  <script type="text/javascript" src="js/lib/init.js"></script>
+  <script type="text/javascript" src="js/lib/nominal-jquery.js"></script>
   <script type="text/javascript" src="js/base.js"></script>
   <script type="text/javascript" src="js/checkout-open.js"></script>
   <script type="text/javascript" src="js/fin.js"></script>
@@ -35,12 +38,15 @@
       'description': 'Armour 20',
       'image': 'images/image1.jpg',
       'handler': function (transaction){
-        console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
       hostname: 'beta.razorpay.com',
       'method': {
-        'card': 1
+        netbanking: null,
+        card: null,
+        wallet: {
+          paytm: true
+        }
       },
       'prefill': {
         'name': 'Harshil \"Mathur',
@@ -54,13 +60,12 @@
         ondismiss: function(){console.log(1)},
         onhidden: function(){console.log(2)}
       },
-      parent: '#x'
+      parent: document.getElementById('x')
     }
     var rzp1 = new Razorpay(options);
 
     document.getElementById('rzp-button1').onclick = function(e) {
       rzp1.open();
-      e.preventDefault();
     };
 
     var opt2 = {
@@ -89,7 +94,6 @@
 
     document.getElementById('rzp-button2').onclick = function(e) {
       rzp2.open();
-      e.preventDefault();
     };
   </script>
 
@@ -109,6 +113,7 @@
     color: white;
     line-height: 48px;
     border-radius: 2px;
+    background: #555;
     background-color: rgba(255,255,255,0.7);
     color: rgba(0, 0, 0, 0.8);
     text-shadow: 1px 1px 3px rgba(255,255,255, 0.14);
@@ -117,12 +122,12 @@
     padding: 0 20px;
     text-align: center;
   }
+  html, body{height: 100%}
   body{
     margin: 0;
-    background: #555;
-    background-image: url('images/demo-shop.jpg');
-    background-size: cover;
-    background-attachment: fixed;
+    background: #ccc;
+    background: -webkit-radial-gradient(circle, #1a82f7, #2F2727);
+    background: -moz-radial-gradient(circle, #1a82f7, #2F2727);
   }
 </style>
 </body>

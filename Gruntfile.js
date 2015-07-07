@@ -3,7 +3,7 @@ module.exports = function(grunt){
   //Load all grunt tasks
   require('load-grunt-tasks')(grunt);
 
-  grunt.file.defaultEncoding = 'utf8';
+  grunt.file.defaultEncoding =  'utf8';
   grunt.initConfig({
     env: {
       dev: {
@@ -26,17 +26,27 @@ module.exports = function(grunt){
       harp_compile:{
         cmd: 'harp compile app/assets app/srv'
       },
-      initJS: {
-        cmd: 'cp app/srv/js/lib/init.html app/srv/js/lib/init.js'
-      },
       dir_images: {
         cmd: 'mkdir app/dist && mkdir app/dist/v1'
       },
       copy_images:{
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
       },
+      copy_fonts: {
+        cmd: 'cp -r app/v1/fonts app/dist/v1/fonts/'
+      },
       copy_html:{
         cmd: 'cp app/srv/*.html app/dist/v1/'
+      }
+    },
+    inline: {
+      dist: {
+        options:{
+            tag: '',
+            uglify: true
+        },
+        src: 'app/srv/razorpay.html',
+        dest: 'app/srv/razorpay.html'
       }
     },
     useminPrepare:{
@@ -70,8 +80,9 @@ module.exports = function(grunt){
         singleRun: true,
         browserNoActivityTimeout: 30000,
         files: [
-          'app/assets/js/lib/jquery-1.11.1.js',
+          'spec/jquery-1.11.1.js',
           'spec/jasmine-jquery.js',
+          'spec/helpers.js',
         ]
       },
       'razorpay': {
@@ -146,6 +157,8 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'exec:dir_images',
     'exec:copy_images',
+    'exec:copy_fonts',
+    'inline',
     'exec:copy_html'
   ]);
 
@@ -176,7 +189,6 @@ module.exports = function(grunt){
     'env:test',
     'exec:clean_srv',
     'exec:harp_compile',
-    'exec:initJS',
     'useminPrepare',
     'preprocess',
     'prepareKarma'
@@ -205,9 +217,9 @@ module.exports = function(grunt){
           blocks[item].splice(i,1);
         }
 
-        var pos = blocks[item][i].indexOf('init.html');
+        var pos = blocks[item][i].indexOf('inline-libs.html');
         if(pos !== -1){
-          blocks[item][i] = 'app/srv/js/lib/init.js';
+          blocks[item][i] = 'app/srv/js/lib/inline-libs.js';
         }
       }
     }

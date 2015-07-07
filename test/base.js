@@ -1,3 +1,4 @@
+var discreet = Razorpay.prototype.discreet;
 var options = {
   'key': 'key_id',
   'amount': '40000',
@@ -27,7 +28,6 @@ var optionsExtended = {
   protocol: 'http',
   hostname: 'api.razorpay.dev'
 }
-// var $ = Razorpay.prototype.$;
 
 describe("new Razorpay", function(){
   var rzp;
@@ -38,13 +38,39 @@ describe("new Razorpay", function(){
 
   it("should create Razorpay instance", function(){
     rzp = new Razorpay(options);
-    expect(rzp).toBeDefined();
+    expect(rzp instanceof Razorpay).toBe(true);
   });
+})
+
+describe("xdm listener should", function(){
+  var spy;
+
+  beforeEach(function(){
+    spy = jasmine.createSpy();
+    discreet.xdm.addMessageListener(spy, null);
+  })
+  
+  it("be called if attached", function(done){
+    postMessage('foo', '*');
+    setTimeout(function(){
+      expect(spy).toHaveBeenCalled();
+      done();
+    });
+  })
+
+  it("not be called if detached", function(done){
+    discreet.xdm.removeMessageListener();
+    postMessage('foo', '*');
+    setTimeout(function(){
+      expect(spy).not.toHaveBeenCalled();
+      done();
+    });
+  })
 })
 
 describe("configure method", function(){
   var co;
-  var custom = $.extend(true, {}, optionsExtended);
+  var custom = jQuery.extend(true, {}, optionsExtended);
   custom.unwanted = 'fake';
 
   beforeEach(function(){
@@ -73,7 +99,7 @@ describe("configure method", function(){
   });
 
   it("should set signature", function(){
-    var local = $.extend({}, custom);
+    var local = jQuery.extend({}, custom);
     local.signature = 'asdasd';
     var co = new Razorpay(local);
     expect(co.options.signature).toBe(local.signature);
@@ -93,7 +119,7 @@ describe("init options validation", function(){
 
   describe("should throw error if", function(){
     afterEach(function(){
-      var errors = Razorpay.prototype.validateOptions(init_options, false);
+      var errors = discreet.validateOptions(init_options);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });
@@ -118,26 +144,6 @@ describe("init options validation", function(){
       init_options.key = '';
     });
 
-    it("amount is invalid", function(){
-      field = 'amount';
-      init_options.amount = 'amount';
-    });
-
-    it("when amount not specified", function(){
-      delete init_options.amount;
-      field = 'amount';
-    });
-
-    it("when amount is less than 0", function(){
-      init_options.amount = '-10';
-      field = 'amount';
-    });
-
-    it("when amount is in decimal", function(){
-      init_options.amount = '10.10';
-      field = 'amount';
-    });
-
     it("when notes has more than 15 fields", function(){
       init_options.notes = {};
       for(var i = 0; i < 16; i++){
@@ -145,21 +151,11 @@ describe("init options validation", function(){
       }
       field = 'notes';
     });
-
-    it("when handler is not a function", function(){
-      init_options.handler = 'string';
-      field = 'handler';
-    });
-
-    it("when merchant name is not passed", function(){
-      delete init_options.name;
-      field = 'name';
-    })
   });
 
   describe("should not return error", function(){
     afterEach(function(){
-      var errors = Razorpay.prototype.validateOptions(init_options, false);
+      var errors = discreet.validateOptions(init_options, false);
       expect(errors.length).toBe(0);
     });
 
@@ -187,18 +183,4 @@ describe("init options validation", function(){
       init_options.amount = 1000;
     })
   });
-})
-
-describe("getNetbankingList should", function(){
-  it("set rzp.netbankingList and call back", function(){
-    var nblist = [];
-    var spyCalled = jasmine.createSpy();
-    rzp = new Razorpay(options);
-    spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
-      options.success(nblist);
-    });
-    rzp.getNetbankingList(spyCalled);
-    expect(rzp.netbankingList).toBe(nblist);
-    expect(spyCalled).toHaveBeenCalled();
-  })
 })

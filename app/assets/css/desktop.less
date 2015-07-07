@@ -1,23 +1,34 @@
 @import "common";
 
+@font-family: "lato", Arial, Helvetica, sans-serif;
+
 @primary: #29b3d2;
 @color: #7f7f7f;
 @border-color: #e6e6e6;
 @background-color: #fafafa;
 @danger: #f46060;
+@border-radius: 4px;
 
-@width: 320px;
+@width: 317px;
 @padding: 20px;
 
 @font-size: 14px;
 // input elements horizontal padding
 @input-padding: 14px;
+@input-height: 40px;
+@icon-size: 30px; // input fields icons
 
+u{
+  text-decoration: none;
+}
+i{
+  font-style: normal;
+  display: none;
+}
 .clear{
   .clearfix();
 }
-.nb-na {
-  display: none;
+#nb-na {
   text-align: center;
   div{
     color: @danger;
@@ -32,50 +43,120 @@
   }
 }
 
-body{
-  overflow: hidden;
+body, html{
   margin: 0;
+  height: 100%;
 }
 
-.container{
+.backdrop{
+  .background(rgba(0,0,0,0.6));
   position: fixed;
-  top: 0;
   left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
+}
+
+#container{
+  height: 100%;
+  outline: none;
   text-align: center;
-  display: none;
-  opacity: 0.5;
-  overflow: auto;
-  background: rgba(0,0,0,0.6);
   .transition(0.25s ease-out opacity);
   z-index: 19999;
   .middlefix();
+
   &.shown{
     opacity: 1;
+    #powered-by{
+      opacity: 1;
+    }
     .modal{
       opacity: 1;
       .scale(1);
       .transition-transform(0.25s cubic-bezier(0.3, 1.5, 0.7, 1));
     }
   }
-  *{
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-    outline: none!important;
-    .appearance(none);
-    .box-sizing(content-box)!important; // because old browsers are content-box only, so we write the old way
+}
+.font-loaded{
+  #powered-by{
+    opacity: 1;
+  }
+  i{
+    display: inline-block;
+  }
+  u{
+    display: none;
+  }
+}
+label{
+  vertical-align: middle;
+}
+button, input, select, textarea{
+  border: none;
+  background: none;
+  font-family: @font-family;
+  outline: none;
+}
+input, select, textarea{
+  border-radius: inherit;
+  display: inline-block;
+  color: inherit;
+  font-size: 14px;
+  resize: none;
+  width: 100%;
+  background: none;
+  position: relative;
+  .appearance(none);
+}
+input, textarea{
+  height: @input-height;
+  line-height: @input-height;
+  padding: 0 @input-padding;
+  .box-sizing(border-box);
+}
+select{
+  .box-sizing(content-box);
+  padding: 8px 0 8px @input-padding;
+  height: 24px;
+  line-height: 24px;
+}
+input[disabled]{
+  background: #f4f4f4;
+}
+input[type=checkbox]{
+  width: auto;
+  vertical-align: middle;
+}
+input[type=radio]{
+  width: auto;
+  margin: 0 5px 0 0;
+  vertical-align: middle;
+}
+button{
+  padding: 0;
+  margin: 0;
+  border-radius: 0 0 @border-radius @border-radius;
+  background: @primary no-repeat 12px center;
+  line-height: 50px;
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
+  width: 100%;
+  cursor: pointer;
+  &[disabled]{
+    background-image: url('../images/loaders/2.gif');
+    background-size: 16px;
+    opacity: 0.7;
   }
 }
 .modal{
+  overflow: hidden;
   outline: none;
   position: relative;
   vertical-align: middle;
   display: inline-block;
   white-space: normal;
   margin: 20px 0;
-  overflow: hidden;
   opacity: 0;
   .transform(scale(0.9));
   &.animate{
@@ -85,112 +166,91 @@ body{
   color: @color;
   font-size: @font-size;
   width: @width;
-  border-radius: 5px;
+  border-radius: @border-radius;
   background: @background-color;
-  font-family: 'Lato', Sans-serif;
+  font-family: @font-family;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
-  min-height: 375px;
+  min-height: 377px;
 
-  button, input, select, textarea{
-    border: none!important;
-    background: none;
-    font-family: inherit;
-  }
-  button{
-    border-radius: 0 0 2px 2px;
-    background: @primary no-repeat 12px center;
-    line-height: 52px;
-    color: #fff;
-    font-size: 16px;
-    box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
-    width: 100%;
-    cursor: pointer;
-    &[disabled]{
-      background-image: url('../images/loaders/2.gif');
-      background-size: 16px;
-      opacity: 0.7;
-    }
-  }
+  // ie7 and below, middlefix doesn't work.
+  // NOTE: it isn't because of lack of :after, but buggy white-space support
+  *top: 10%;
 }
 .modal-inner{
   .transition(0.15s ease-out opacity);
 }
 .elem{
-  height: 40px;
-  line-height: 40px;
+  height: @input-height;
+  line-height: @input-height;
   border: 1px solid @border-color;
   background: #fff;
   position: relative;
-  margin-bottom: -1px;
+  margin: -1px 0 0;
   cursor: text;
   .transition(0.25s border-color);
   background: #fff center right no-repeat;
 
+  i{
+    position: absolute;
+    right: @input-padding;
+    z-index: 2;
+    line-height: 34px;
+    top: 0;
+    font-size: @icon-size;
+    color: #999;
+  }
   &.focused{
     border-color: @primary;
     color: black;
-    z-index: 1;
+    z-index: 2!important;
   }
   &.mature.invalid{
     color: @danger;
-    box-shadow: 0 0 1px @danger inset;
+    border-color: @danger;
+    z-index: 1;
     &.focused{
       border-color: @danger;
     }
   }
-  input, select, textarea{
-    color: inherit;
-    line-height: inherit;
-    height: inherit;
-    border-radius: inherit;
-    font-size: 14px;
-    resize: none;
-    width: 100%;
-    display: block;
-    padding: 0 @input-padding;
-    margin: 0 -@input-padding;
-    background: none!important;
-    position: relative;
+}
+.double{
+  white-space: nowrap;
+  font-size: 0;
+  .elem{
+    font-size: @font-size;
+    display: inline-block;
+    width: (@width - 3px)/2 - @padding;
+    *float: left;
   }
 }
-.select:not(.filled){
-  .input{
-    opacity: 0;
+.elem-cvv{
+  left: -1px;
+  .help-text{
+    left: auto;
+    right: -15px;
+    &:after{
+      left: 50%;
+    }
   }
-  .elem-inner:before{
-    content: 'Select Bank';
-    position: absolute;
-    top: 1px;
-  }
-  &.loading .elem-inner:before{
-    content: 'Loading list of banks...';
-  }
-}
-.elem-inner{
-  margin: 0 @input-padding;
-  height: inherit;
-  line-height: inherit;
-  border-radius: inherit;
 }
 .help-text{
   color: #fff;
   pointer-events: none;
-  z-index: 2;
   position: absolute;
-  max-width: 220px;
+  max-width: 225px;
   line-height: 16px;
   padding: 6px 10px;
   font-size: 80%;
   text-align: center;
   background: #333;
-  border-radius: 4px;
+  border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
-  opacity: 0;
-  .transition-transform(~"0.3s ease-in, 0.2s ease-in opacity");
-  .transform(translateY(20px));
+  .opacity(0);
+  .transform(translateY(10px));
+  .transition-transform(~"0.25s ease-in, 0.16s ease-in opacity");
   bottom: 100%;
   left: 10px;
-  margin-bottom: 3px;
+  margin-bottom: -3px;
   &:after {
     content: '';
     position: absolute;
@@ -203,32 +263,19 @@ body{
     left: 20px;
     margin: 0 0 -11px -7px;
   }
-  &.shown{
-    opacity: 0.9!important;
-    .transform(none);
-    .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
-  }
 }
-.double{
-  white-space: nowrap;
-  font-size: 0;
-  margin: 0 2px 0 1px;
-  .elem{
-    font-size: @font-size;
-    display: inline-block;
-    width: 50%;
-    margin-left: -1px;
-  }
+.focused.invalid.mature .help-text{
+  display: block!important; // helps when pointer-events is not supported
+  .opacity(0.85);
+  .transform(none);
+  .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
 }
 .fieldset{
-  margin: 20px 0;
-}
-.modal-close{
-  display: none;
-  float: left;
+  padding: 20px 0;
+  clear: both;
 }
 .merchant{
-  border-radius: 2px 2px 0 0;
+  border-radius: @border-radius @border-radius 0 0;
   background: #fff;
   position: relative;
   padding: 10px;
@@ -261,22 +308,21 @@ body{
   color: #333;
   margin-bottom: 5px;
 }
-.merchant-powered{
+#modal-close{
   position: absolute;
   right: 0;
   top: 0;
-  height: 100%;
-  width: 52px;
-  background: url('../images/favicon.png') center no-repeat;
-  background-size: 26px;
+  width: 30px;
+  font-size: 20px;
+  color: #999;
+  line-height: 36px;
+  cursor: pointer;
+  &:hover{
+    color: #333;
+  }
 }
-.rupee-icon{
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAYAAADzoH0MAAABoUlEQVQ4EZWUu0oDURCGdzV4QUkjRhALURBBQbBSRFsfwcpW0tkJErCys12xCYJiJV4KfQUVrSwECwleQETUQqKFRrN+E8/AySYn2fzwMZMz88/sHpZ4HgrDcBp+oVFtiLkDzhp10n8p3gQPMAr3cAvN0Al9MAwtoLojOYEmcxD4vv9p8vLAZB/G4BhUjyTd5Z2e58sBBdksW1UhSQG64Aj6QbQC26Xs35sv5QzIQB4+Irzz+wtUBRLteyYfl+3yqK/w7UBMqiKJ9q3KdnnXHqI8alEOIpJXmYeMOQ+I6ybPcYnymrXFggOzXrZP1e6OVDEswI8ZcEiUy64UhVZoB/moUjADmyBbRefQW+k0JxR34AZy8AYqufEA5I7couFUHcQn2IJFGHK7rAqNS6CSL27QKtdPMSRgTycQLyBZ32l1YJDLuwZV1irHS3FOgFycKh3PaXXhTKubKMMmrXK8FFPWGiKvlYrnNF0YkiAXqdonqf4VuiZjGIEXnUBcdvU6zzHNgf7Zyv/CrLPZVcC0BqoHkgFXb9VzDG1wpROIu3bjH9Lpayomlf62AAAAAElFTkSuQmCC') center no-repeat;
-  display: inline-block;
-  background-size: 8px;
-  width: 14px;
-  height: 14px;
-  margin: 0px -1px -1px;
+.rupee-icon:before{
+  content: "\e600";
 }
 .clear{
   clear:both;
@@ -285,44 +331,58 @@ body{
   text-align: left;
   padding: 0 @padding;
 }
-.elem-name{
-  background-image: url('../images/ei-user.png');
+.nocvv{
+  opacity: 0;
+  color: #666;
+  margin-top: 10px;
+  line-height: 20px;
+  .transition(0.3s);  
+  display: none\9; // ie8
 }
-.elem-email{
-  background-image: url('../images/ei-envelope.png');
-}
-.elem-contact{
-  background-image: url('../images/phone.png');
-}
-.elem-card{
-  background-image: url('../images/card.png');
-  &.visa{
+#elem-card{
+  .transition(0.3s);
+  i{
+    font-size: 0;
+    width: 24px;
+    background: no-repeat center;
+    background-size: 24px;
+    text-align: center;
+    margin-right: -4px;
+  }
+  &[cardtype=unknown] i{
+    font-size: @icon-size;
+  }
+  &[cardtype=visa] i{
     background-image: url('../images/icons/visa.png');
   }
-  &.mastercard{
+  &[cardtype=mastercard] i{
     background-image: url('../images/icons/mastercard.png');
   }
-  &.maestro{
+  &[cardtype=maestro]{
+    margin-bottom: 40px;
+    i{
+      background-image: url('../images/icons/maestro.png');
+    }
+    .nocvv{
+      opacity: 1;
+      display: block\9;
+    }
+  }
+  &[cardtype=maestro16] i{
     background-image: url('../images/icons/maestro.png');
   }
-  &.rupay{
+  &[cardtype=rupay] i{
     background-image: url('../images/icons/rupay.png');
   }
-  &.amex{
+  &[cardtype=amex] i{
     background-image: url('../images/icons/amex.png');
   }
 }
-.elem-expiry{
-  background-image: url('../images/ei-calendar.png');
-}
-.elem-cvv{
-  background-image: url('../images/ei-lock.png');
-}
 
-.body .submit.error{
+#submitbtn.error{
   background-color: @danger;
 }
-.error{
+#error-message{
   left: 0;
   right: 0;
   position: absolute;
@@ -334,23 +394,18 @@ body{
   overflow: hidden;
   .transition(0.3s);
   bottom: 100%;
-  li{
-    list-style: none;
-    font-size: @font-size;
-  }
 }
-.error-container{
+#error-container{
   position: relative;
   overflow: hidden;
+  display: none;
   margin: 0 -@padding;
   .transition(0.3s);
-}
-.error-container.has-error .error{
-  bottom: 0;
-}
-.modal iframe{
-  border: none;
-  border-radius: 5px;
+  &.has-error{
+    #error-message{
+      bottom: 0;
+    }
+  }
 }
 .tab-content{
   display: none;
@@ -359,14 +414,30 @@ body{
   display: block;
 }
 
-.tabs{
+#tabs{  
   margin: 0 -20px;
-  white-space: nowrap;
+  padding: 0;
   font-size: 0;
+  white-space: nowrap;
+  display: none;
+  *margin-bottom: -20px; // ie7
+
+  &.tabs-2{
+    display: block;
+  }
+
+  &.tabs-3{
+    display: block;
+    li{
+      width: (@width - 2)/3;
+    }
+  }
 
   li{
-    line-height: 52px;
-    display: inline-block;
+    list-style: none;
+    line-height: 48px;
+    height: 48px;
+    float: left;
     text-align: center;
     border: 1px solid @border-color;
     border-right: none;
@@ -375,6 +446,8 @@ body{
     cursor: pointer;
     background: #fff;
     padding-bottom: 2px;
+    display: inline-block;
+    vertical-align: top;
     
     &.active{
       color: @primary;
@@ -385,18 +458,52 @@ body{
     }
     &:first-child{
       border-left: none;
-      margin-right: -1px;
     }
   }
 }
-.form{
+.paytm-logo{
+  background: url('../images/paytm.png') no-repeat top #fff;
+  height: 12px;
+  background-size: 40px 24px;
+  margin-top: 18px;
+}
+li:hover, li.active{
+  .paytm-logo{
+    background-position: bottom;
+  }
+}
+#form{
+  margin: 0;
   padding-bottom: 52px;
   display: block;
 }
 .footer{
-  z-index: 2;
-  margin: 0 -@padding;
-  position: absolute;
-  width: 100%;
   bottom: 0;
+  z-index: 2;
+  width: 100%;
+  position: absolute;
+  margin: 0 -@padding;
+}
+#powered-by{
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  bottom: -60px;
+  display: block;
+  font-size: 36px;
+  .transition(0.3s);
+  position: absolute;
+  .transition-delay(0.2s);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+  
+  a{
+    color: #999;
+    outline: none;
+    line-height: 36px;
+    .transition(0.3s);
+    text-decoration: none;
+    &:hover{
+      color: #ddd;
+    }
+  }
 }

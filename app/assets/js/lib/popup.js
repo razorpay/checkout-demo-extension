@@ -68,18 +68,11 @@
     }
     optsStr = optsStr.join(',');
 
-    // every popup window has a unique "name"
-    var name = opts.name;
-
-    // if a "name" was not provided, then create a random one
-    if (!name) name = 'popup_' + (Math.random() * 0x10000000 | 0).toString(36); // hyphen in name creates problem in old IEs
-
-    this.name = name;
     this.opts = opts;
     this.optsStr = optsStr;
 
     // finally, open and return the popup window
-    this.window = window.open(src, name, optsStr); // might be null in IE9 if protected mode is turned on
+    this.window = window.open(src, '', optsStr); // might be null in IE9 if protected mode is turned on
     if(this.window){
       this.focus();
     }
