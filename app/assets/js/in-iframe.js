@@ -216,50 +216,55 @@
 
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
+      // event listeners
       $('nocvv-check').on('change', discreet.toggle_nocvv)
-
-      $('tabs').on('click', function(e){
-        var target = e.target;
-        if(target.className.indexOf('paytm') >= 0) target = target.parentNode;
-        if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0) return;
-        discreet.renew();
-
-        var modalEl = $(discreet.modal.modalElement);
-        var inner = modalEl.children('modal-inner')[0];
-        if(!inner) return;
-
-        modalEl[0].style.height = inner.offsetHeight + 'px';
-        modalEl.addClass('animate');
-
-        var tabContent = $(target.getAttribute('data-target'));
-        var activeTab = tabContent.parent().children('active')[0];
-        activeTab && $(activeTab).removeClass('active');
-        tabContent.addClass('active');
-
-        activeTab = $(this).children('active')[0];
-        activeTab && $(activeTab).removeClass('active');
-        $(target).addClass('active');
-
-        modalEl[0].style.height = inner.offsetHeight + 'px';
-        setTimeout(function(){
-          modalEl.removeClass('animate');
-          modalEl[0].style.height = '';
-        }, 300);
-      });
-
+      $('tabs').on('click', discreet.tab_change);
       $('form').on('submit', function(e){
         discreet.formSubmit(e);
         e.preventDefault();
       });
 
-      // if(discreet.qpmap){
-      //   if(discreet.qpmap.tab){
-      //     $('.tabs li[data-target=tab-'+discreet.qpmap.tab+']').click()
-      //   }
-      //   if(discreet.qpmap.error){
-      //     discreet.errorHandler(qpmap)
-      //   }
-      // }
+      if(discreet.qpmap){
+        var lis = $(tabs)[0].getElementsByTagName('li');
+        for(var i=0; i<lis.length; i++){
+          if(lis[i].getAttribute('data-target') == 'tab-' + discreet.qpmap.tab){
+            discreet.tab_change({target: lis[i]});
+            break;
+          }
+        }
+        if(discreet.qpmap.error){
+          discreet.errorHandler(qpmap)
+        }
+      }
+    },
+
+    tab_change: function(e){
+      var target = e.target;
+      if(target.className.indexOf('paytm') >= 0) target = target.parentNode;
+      if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0) return;
+      discreet.renew();
+
+      var modalEl = $(discreet.modal.modalElement);
+      var inner = modalEl.children('modal-inner')[0];
+      if(!inner) return;
+
+      modalEl[0].style.height = inner.offsetHeight + 'px';
+      modalEl.addClass('animate');
+
+      var tabContent = $(target.getAttribute('data-target'));
+      var activeTab = tabContent.parent().children('active')[0];
+      activeTab && $(activeTab).removeClass('active');
+      tabContent.addClass('active');
+
+      activeTab = $(this).children('active')[0];
+      activeTab && $(activeTab).removeClass('active');
+      $(target).addClass('active');
+
+      modalEl[0].style.height = inner.offsetHeight + 'px';
+      setTimeout(function(){
+        modalEl.removeClass('animate');
+        modalEl[0].style.height = '';
+      }, 300);
     },
 
     toggle_nocvv: function(){
