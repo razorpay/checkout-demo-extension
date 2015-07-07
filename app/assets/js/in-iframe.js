@@ -350,7 +350,7 @@
         
         if(!data['card[expiry]'])
           data['card[expiry]'] = '';
-        
+
         if(!data['card[cvv]'])
           data['card[cvv]'] = '';
 
