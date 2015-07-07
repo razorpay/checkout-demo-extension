@@ -98,22 +98,27 @@ button, input, select, textarea{
   outline: none;
 }
 input, select, textarea{
+  border-radius: inherit;
   display: inline-block;
   color: inherit;
-  height: @input-height;
-  line-height: @input-height;
-  border-radius: inherit;
   font-size: 14px;
   resize: none;
   width: 100%;
-  padding: 0 @input-padding;
-  .box-sizing(border-box);
   background: none;
   position: relative;
+  .appearance(none);
+}
+input, textarea{
+  height: @input-height;
+  line-height: @input-height;
+  padding: 0 @input-padding;
+  .box-sizing(border-box);
 }
 select{
-  .appearance(none);
-  height: 24px\9; // ie8 and below
+  .box-sizing(content-box);
+  padding: 8px 0 8px @input-padding;
+  height: 24px;
+  line-height: 24px;
 }
 input[disabled]{
   background: #f4f4f4;
@@ -197,7 +202,7 @@ button{
   &.focused{
     border-color: @primary;
     color: black;
-    z-index: 2;
+    z-index: 2!important;
   }
   &.mature.invalid{
     color: @danger;
@@ -228,20 +233,9 @@ button{
     }
   }
 }
-.select:not(.filled){
-  .input{
-    opacity: 0;
-  }
-  &:before{
-    content: 'Select Bank';
-    position: absolute;
-    left: @input-padding;
-  }
-}
 .help-text{
   color: #fff;
   pointer-events: none;
-  z-index: 4;
   position: absolute;
   max-width: 225px;
   line-height: 16px;

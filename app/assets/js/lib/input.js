@@ -83,7 +83,7 @@
         valid = !value && !required || new RegExp(pattern).test(value);
       }
       parent[valid && 'removeClass' || 'addClass']('invalid');
-      parent[value && 'removeClass' || 'addClass']('filled');
+      parent[value && 'addClass' || 'removeClass']('filled');
     },
 
     refresh: function(){
