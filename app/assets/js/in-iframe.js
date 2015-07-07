@@ -156,8 +156,13 @@
       
       Razorpay.card.setType = function(el, type){
         !type && (type = Razorpay.card.getType(el.value) || 'unknown');
-        el.setAttribute('cardtype', type);
+        el.parentNode.setAttribute('cardtype', type);
         discreet.setNumberValidity.call(el);
+        
+        if(type != 'maestro'){
+          $('nocvv-check')[0].checked = false;
+          discreet.toggle_nocvv();
+        }
       }
       Razorpay.card.formatNumber(el_number[0]);
       el_number.on('blur', discreet.setNumberValidity);
@@ -211,6 +216,8 @@
 
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
+      $('nocvv-check').on('change', discreet.toggle_nocvv)
+
       $('tabs').on('click', function(e){
         var target = e.target;
         if(target.className.indexOf('paytm') >= 0) target = target.parentNode;
@@ -253,6 +260,14 @@
       //     discreet.errorHandler(qpmap)
       //   }
       // }
+    },
+
+    toggle_nocvv: function(){
+        var checked = this.checked;
+        $('card_expiry')[0].disabled = checked;
+        $('card_expiry')[0].required = !checked;
+        $('card_cvv')[0].disabled = checked;
+        $('card_cvv')[0].required = !checked;
     },
 
     applyFont: function(anchor, retryCount){
@@ -332,6 +347,13 @@
 
       if(targetTab == 'tab-card'){
         data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+        
+        if(!data['card[expiry]'])
+          data['card[expiry]'] = '';
+        
+        if(!data['card[cvv]'])
+          data['card[cvv]'] = '';
+
         var expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
         data['card[expiry_month]'] = expiry[0];
         data['card[expiry_year]'] = expiry[1];

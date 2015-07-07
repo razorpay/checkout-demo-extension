@@ -6,16 +6,19 @@
     maestro16: /^(508125|508126|508159|508192|508227|504437|504681)/,
     maestro: /^(50|63|66|5[6-8]|6[8-9]|600[0-9]|6010|601[2-9]|60[2-9]|61|620|621|6220|6221[0-1])/,
     // maestro: /^(5(018|0[23]|[68])|6(39|7))/,
-    unknown: /^1|2|[7-9]/,
+    unknown: /^(1|2|[7-9])/,
     amex: /^3[47]/,
-    diners: /^3[0689]/,
-    jcb: /^35/,
-    discover: /^6([045]|22)/
+    diners: /^3[0689]/
+    // jcb: /^35/,
+    // discover: /^6([045]|22)/
     // rupay: /^(508[5-9][0-9][0-9]|60698[5-9]|60699[0-9]|60738[4-9]|60739[0-9]|607[0-8][0-9][0-9]|6079[0-7][0-9]|60798[0-4]|608[0-4][0-9][0-9]|608500|6521[5-9][0-9]|652[2-9][0-9][0-9]|6530[0-9][0-9]|6531[0-4][0-9]|6070(66|90|32|74|94|27|93|02|76)|6071(26|05|65)|607243)/
   }
 
-  var space_14 = /(.{4})(.{6})/;
-  var sub_14 = '$1 $2 ';
+  var space_14 = /(.{4})(.{0,6})/;
+  var sub_14 = function(match, $1, $2, offset, original){
+    $2.length == 6 && ($2 += ' ')
+    return $1 + ' ' + $2;
+  }
 
   var card_formats = {
     amex: {
@@ -109,8 +112,6 @@
     var suffix = value.slice(pos).replace(/[^0-9]/g,'');
 
     if(pos == 0){
-      // if(this.value && !/(0[1-9]|1[012])/.test(char + this.value[0]))
-      //   return e && e.preventDefault();
       if(/0|1/.test(char))
         return;
       else
@@ -119,26 +120,32 @@
     }
 
     if(pos == 1){
-      this.value = prefix + char + ' / ' + suffix;
-      // pos++;
-      // if(pos > 1 && pos < 5)
-      //   pos = 5;
-      // setCaret(this, pos);
-      e && e.preventDefault();
+      char += ' / ';
     }
-
-    if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(this.value))
-      e && e.preventDefault();
-
-    // var el = this;
-    // setTimeout(function(){
-      // el.value = mm + ' / ' + yy;
-      // setCaret(el, ++pos);
-    // })
+    else if(pos == 2){
+      char = ' / ' + char;
+    }
+    else{
+      if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + char + suffix))
+        e && e.preventDefault();
+      else
+        return;
+    }
+    this.value = (prefix + char + suffix).slice(0, 7);
+    setCaret(this, (prefix + char).length);
+    e && e.preventDefault();
   }
 
-  var formatExpiryBack = function(){
+  var formatExpiryBack = function(e){
+    if(e.which != 8) return;
 
+    var el = this;
+    var pos = checkSelection(el);
+    
+    if(pos == 5 && el.value.slice(2, 5) == ' / '){
+      e.preventDefault();
+      el.value = el.value.slice(0, 2);
+    }
   }
 
   var formatNumber = function(e){
@@ -161,7 +168,6 @@
     pos = prefix.length;
 
     this.value = value.replace(cardobj.space, cardobj.subs);
-    // card.setType(this, type);
     var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
     pos += prespace && ++prespace.length || 1;
     setCaret(this, pos);
@@ -203,7 +209,7 @@
 
     formatNumber: function(el){
       if(!el) return;
-      formatNumber.call(el);
+      card.setType(el, 'unknown');
       $(el).on('keypress', formatNumber);
       $(el).on('keydown', formatNumberBack);
       $(el).on('keyup', function(){

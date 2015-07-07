@@ -15,6 +15,7 @@
 @font-size: 14px;
 // input elements horizontal padding
 @input-padding: 14px;
+@icon-size: 30px; // input fields icons
 
 u{
   text-decoration: none;
@@ -112,10 +113,15 @@ select{
   .appearance(none);
   height: 24px\9; // ie8 and below
 }
-input[type=radio]{
-  display: inline-block;
+input[disabled]{
+  background: #f4f4f4;
+}
+input[type=checkbox]{
   width: auto;
-  padding: 0;
+  vertical-align: middle;
+}
+input[type=radio]{
+  width: auto;
   margin: 0 5px 0 0;
   vertical-align: middle;
 }
@@ -137,6 +143,7 @@ button{
   }
 }
 .modal{
+  overflow: hidden;
   outline: none;
   position: relative;
   vertical-align: middle;
@@ -182,7 +189,7 @@ button{
     z-index: 2;
     line-height: 34px;
     top: 0;
-    font-size: 30px;
+    font-size: @icon-size;
     color: #999;
   }
   &.focused{
@@ -218,9 +225,6 @@ button{
       left: 50%;
     }
   }
-}
-.elem-card{
-  i{display: none}
 }
 .select:not(.filled){
   .input{
@@ -330,26 +334,48 @@ button{
   text-align: left;
   padding: 0 @padding;
 }
-#card_number{
-  background: no-repeat right;
-  background-size: 10%;
-  
-  &[cardtype=unknown]{
-    &+i{display: block;}
+.nocvv{
+  opacity: 0;
+  color: #666;
+  margin-top: 10px;
+  line-height: 20px;
+  .transition(0.3s);  
+}
+#elem-card{
+  .transition(0.3s);
+  i{
+    font-size: 0;
+    width: 24px;
+    background: no-repeat center;
+    background-size: 24px;
+    text-align: center;
+    margin-right: -4px;
   }
-  &[cardtype=visa]{
+  &[cardtype=unknown] i{
+    font-size: @icon-size;
+  }
+  &[cardtype=visa] i{
     background-image: url('../images/icons/visa.png');
   }
-  &[cardtype=mastercard]{
+  &[cardtype=mastercard] i{
     background-image: url('../images/icons/mastercard.png');
   }
   &[cardtype=maestro]{
+    margin-bottom: 40px;
+    i{
+      background-image: url('../images/icons/maestro.png');
+    }
+    .nocvv{
+      opacity: 1;
+    }
+  }
+  &[cardtype=maestro16] i{
     background-image: url('../images/icons/maestro.png');
   }
-  &[cardtype=rupay]{
+  &[cardtype=rupay] i{
     background-image: url('../images/icons/rupay.png');
   }
-  &[cardtype=amex]{
+  &[cardtype=amex] i{
     background-image: url('../images/icons/amex.png');
   }
 }

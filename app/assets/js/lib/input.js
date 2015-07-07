@@ -80,7 +80,7 @@
         valid = false;
       }
       if (valid && pattern) {
-        valid = new RegExp(pattern).test(value);
+        valid = !value && !required || new RegExp(pattern).test(value);
       }
       parent[valid && 'removeClass' || 'addClass']('invalid');
       parent[value && 'removeClass' || 'addClass']('filled');
