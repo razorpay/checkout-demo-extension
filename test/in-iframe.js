@@ -415,12 +415,6 @@ describe("Razorpay open cc and submit method", function(){
   describe("and getFormData method", function(){
     var co, data;
 
-    function addAllCC(){
-      $ccNumber.sendkeys(cc.number);
-      $ccExpiry.val(cc.expiry);
-      $ccCVV.sendkeys(cc.cvv);
-    }
-
     beforeEach(function(done){
       launch();
       addAllCC();

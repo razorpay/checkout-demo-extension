@@ -263,11 +263,13 @@
     },
 
     toggle_nocvv: function(){
-        var checked = this.checked;
-        $('card_expiry')[0].disabled = checked;
-        $('card_expiry')[0].required = !checked;
-        $('card_cvv')[0].disabled = checked;
-        $('card_cvv')[0].required = !checked;
+      var checked = this.checked;
+      for(var i in {card_expiry: 0, card_cvv: 0}){
+        var el = $(i)[0];
+        el.value = '';
+        el.disabled = checked;
+        el.required = !checked;
+      }
     },
 
     applyFont: function(anchor, retryCount){
