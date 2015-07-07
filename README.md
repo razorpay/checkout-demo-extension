@@ -3,9 +3,9 @@
 #Setup Instructions
 
 1. Install harp (`npm install -g harp`)
-2. Run harp (`harp server`) in `app/assets` directory.
+2. Run harp (`harp server`) in `app` directory.
 3. Start development in `app/assets`
-4. Open `localhost:9000/assets/manual-demo` or `localhost:9000/assets/auto-demo` via http(s) in your browser.
+4. Open `localhost:9000/assets/bozo` via http(s) in your browser.
 
 5. Install npm supporting packages (`npm install`).
 6. Install karma, which we use for testing `npm install -g karma-cli`.
@@ -17,9 +17,9 @@
 #Grunt Commands
 
 1. `grunt` or `grunt build` create a build
-1. `grunt test` builds checkout.js and runs tests
-1. `grunt test:watch` runs tests when a file changes in `app/assets/js/**.*` or `test/*.js`
-1. `grunt test:prepare` is not needed by devs. Wercker runs it before tests and grunt internally utilizes it.
+2. `grunt test` builds checkout.js and runs tests
+3. `grunt test:watch` runs tests when a file changes in `app/assets/js/**.*` or `test/*.js`
+4. `grunt test:prepare` is not needed by devs. Wercker runs it before tests and grunt internally utilizes it.
 
 #Development Instructions
 - All source code is kept inside the `app/assets` directory
@@ -33,7 +33,7 @@
 
 #Deployment and Branches
 
-`production`: [https://checkout.razorpay.com/](https://checkout.razorpay.com/) | Tested via [https://api.razorpay.com/test/layout.php](https://api.razorpay.com/test/layout.php) and [https://api.razorpay.com/test/checkout.php](https://api.razorpay.com/test/checkout.php)
+`production`: [https://checkout.razorpay.com/](https://checkout.razorpay.com/) | Tested via [https://api.razorpay.com/test/livedemo.php](https://api.razorpay.com/test/livedemo.php) and [https://api.razorpay.com/test/checkout.php](https://api.razorpay.com/test/checkout.php)
 `beta`: [https://betacheckout.razorpay.com/](https://betacheckout.razorpay.com/) | Tested via [https://beta.razorpay.com/test/layout.php](https://beta.razorpay.com/test/layout.php) and [https://beta.razorpay.com/test/checkout.php](https://beta.razorpay.com/test/checkout.php)
 
 - For each new feature/bug fix/enhancement etc, make a new branch.
