@@ -5,3 +5,4 @@
 /app/srv
 /test/env.js
 /test/checkout.built.js
+aws-keys.json

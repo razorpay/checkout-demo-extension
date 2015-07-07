@@ -23,6 +23,11 @@ deploy:
             code: sudo npm install -g harp
         - grunt:
             tasks: build
+        # This command needs a grunt step above it to install grunt
+        # It does differential uploads :rocket:
+        - script:
+            name: Run fonts upload
+            code: grunt fonts:upload --target=$WERCKER_DEPLOYTARGET_NAME
         - nhuray/aws-code-deploy:
             key: $AWS_KEY
             secret: $AWS_SECRET
