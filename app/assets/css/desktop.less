@@ -106,7 +106,6 @@ input, select, textarea{
   width: 100%;
   background: none;
   position: relative;
-  .appearance(none);
 }
 input, textarea{
   height: @input-height;
@@ -115,6 +114,7 @@ input, textarea{
   .box-sizing(border-box);
 }
 select{
+  .appearance(none);
   .box-sizing(content-box);
   padding: 8px 0 8px @input-padding;
   height: 24px;
