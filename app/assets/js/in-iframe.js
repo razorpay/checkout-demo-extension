@@ -256,7 +256,7 @@
       activeTab && $(activeTab).removeClass('active');
       tabContent.addClass('active');
 
-      activeTab = $(this).children('active')[0];
+      activeTab = $(target.parentNode).children('active')[0];
       activeTab && $(activeTab).removeClass('active');
       $(target).addClass('active');
 

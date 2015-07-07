@@ -15,6 +15,7 @@
 @font-size: 14px;
 // input elements horizontal padding
 @input-padding: 14px;
+@input-height: 40px;
 @icon-size: 30px; // input fields icons
 
 u{
@@ -99,7 +100,8 @@ button, input, select, textarea{
 input, select, textarea{
   display: inline-block;
   color: inherit;
-  height: inherit;
+  height: @input-height;
+  line-height: @input-height;
   border-radius: inherit;
   font-size: 14px;
   resize: none;
@@ -173,8 +175,8 @@ button{
   .transition(0.15s ease-out opacity);
 }
 .elem{
-  height: 40px;
-  line-height: 40px;
+  height: @input-height;
+  line-height: @input-height;
   border: 1px solid @border-color;
   background: #fff;
   position: relative;
@@ -269,6 +271,7 @@ button{
   }
 }
 .focused.invalid.mature .help-text{
+  display: block!important; // helps when pointer-events is not supported
   .opacity(0.85);
   .transform(none);
   .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
@@ -340,6 +343,7 @@ button{
   margin-top: 10px;
   line-height: 20px;
   .transition(0.3s);  
+  display: none\9; // ie8
 }
 #elem-card{
   .transition(0.3s);
@@ -367,6 +371,7 @@ button{
     }
     .nocvv{
       opacity: 1;
+      display: block\9;
     }
   }
   &[cardtype=maestro16] i{
@@ -421,6 +426,7 @@ button{
   font-size: 0;
   white-space: nowrap;
   display: none;
+  *margin-bottom: -20px; // ie7
 
   &.tabs-2{
     display: block;

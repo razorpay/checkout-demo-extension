@@ -2,7 +2,7 @@
   var $ = root.$;
   var inputClass = 'input';
   var divClass = 'form-elem';
-  var tooltipClass = 'tooltip';
+  var tooltipClass = 'help-text';
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
@@ -48,7 +48,7 @@
       this.on('input', inputClass, this.input, true);
 
       this.on('click', divClass, this.intercept);
-      this.on('mousedown', tooltipClass, function(e){e.target.style.display = 'none'});
+      this.on('mouseover', tooltipClass, function(e){e.target.style.display = 'none'});
     },
 
     focus: function(e){
@@ -73,7 +73,7 @@
       var parent = $(el.parentNode);
       var value = el.value;
       var valid = true;
-      var required = typeof el.getAttribute('required') == 'string';
+      var required = el.required || typeof el.getAttribute('required') == 'string';
       var pattern = el.getAttribute('pattern');
 
       if (required && !value) {
