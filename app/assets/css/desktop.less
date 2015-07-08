@@ -461,15 +461,32 @@ button{
     }
   }
 }
-.paytm-logo{
-  background: url('../images/paytm.png') no-repeat top #fff;
-  height: 12px;
-  background-size: 40px 24px;
+#paytm-wrapper{
+  width: 40px;
+  display: inline-block;
   margin-top: 18px;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+  img{
+    vertical-align: top;
+  }
+  .colored{
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+  div{
+    font-size: 14px;
+    line-height: 14px;
+  }
 }
-li:hover, li.active{
-  .paytm-logo{
-    background-position: bottom;
+li{
+  &:hover, &.active{
+    #paytm-wrapper .colored{
+      display: block;
+    }
   }
 }
 #form{

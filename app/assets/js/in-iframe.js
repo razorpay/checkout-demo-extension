@@ -240,7 +240,7 @@
 
     tab_change: function(e){
       var target = e.target;
-      if(target.className.indexOf('paytm') >= 0) target = target.parentNode;
+      if(target.className.indexOf('paytm') >= 0) target = target.parentNode.parentNode;
       if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0) return;
       discreet.renew();
 
