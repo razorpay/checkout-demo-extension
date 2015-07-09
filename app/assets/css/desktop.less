@@ -81,6 +81,9 @@ body, html{
 .font-loaded{
   .modal, button, input, select, textarea {
     font-family: @font-family;
+    -webkit-font-feature-settings: "liga" 0;
+    -moz-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0;
   }
   #powered-by{
     visibility: visible;
@@ -372,10 +375,12 @@ button{
   .transition(0.3s);
   i{
     font-size: 0;
-    width: 24px;
-    background: no-repeat center;
-    background-size: 24px;
+    width: 26px;
+    background: no-repeat 5px 5px;;
+    background-size: 26px;
     text-align: center;
+    padding-right: 6px;
+    margin-right: -6px;
   }
   &[cardtype=unknown] i{
     font-size: @icon-size;
