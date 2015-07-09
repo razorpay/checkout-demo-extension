@@ -21,7 +21,7 @@
     this.listeners = [];
     detectSupport();
     this.common_events();
-    // this.refresh();
+    this.init();
   }
 
   root.Smarty.prototype = {
@@ -86,12 +86,21 @@
       parent[value && 'addClass' || 'removeClass']('filled');
     },
 
-    refresh: function(){
+    init: function(){
       var els = this.parent[0].getElementsByTagName('p');
       var elslen = els.length;
       for(var i=0; i<elslen; i++){
         var child = $(els[i]).children('input');
-        child.length && this.update(child[0]);
+        if(child.length){
+          child = child[0];
+          this.update(child);
+          if(typeof child.placeholder != 'string'){
+            var placeholder = document.createElement('span');
+            placeholder.className = 'placeholder';
+            placeholder.innerHTML = child.getAttribute('placeholder');
+            els[i].appendChild(placeholder);
+          }
+        }
       }
     },
 

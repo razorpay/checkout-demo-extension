@@ -107,7 +107,7 @@ input, select, textarea{
   background: none;
   position: relative;
 }
-input, textarea{
+input, textarea, .placeholder{
   height: @input-height;
   line-height: @input-height;
   padding: 0 @input-padding;
@@ -212,6 +212,17 @@ button{
       border-color: @danger;
     }
   }
+  &.filled, &.focused{
+    .placeholder{
+      display: none;
+    }
+  }
+}
+.placeholder{
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #999;
 }
 .double{
   white-space: nowrap;
