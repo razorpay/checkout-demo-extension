@@ -1,6 +1,7 @@
 @import "common";
 
-@font-family: "lato", Arial, Helvetica, sans-serif;
+@font-default: arial, helvetica, sans-serif;
+@font-family: "lato", @font-default;
 
 @primary: #29b3d2;
 @color: #7f7f7f;
@@ -78,7 +79,11 @@ body, html{
   }
 }
 .font-loaded{
+  .modal, button, input, select, textarea {
+    font-family: @font-family;
+  }
   #powered-by{
+    visibility: visible;
     opacity: 1;
   }
   i{
@@ -94,7 +99,7 @@ label{
 button, input, select, textarea{
   border: none;
   background: none;
-  font-family: @font-family;
+  font-family: @font-default;
   outline: none;
 }
 input, select, textarea{
@@ -150,7 +155,6 @@ button{
   }
 }
 .modal{
-  overflow: hidden;
   outline: none;
   position: relative;
   vertical-align: middle;
@@ -168,7 +172,7 @@ button{
   width: @width;
   border-radius: @border-radius;
   background: @background-color;
-  font-family: @font-family;
+  font-family: @font-default;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
   min-height: 377px;
 
@@ -528,6 +532,7 @@ li{
 }
 #powered-by{
   left: 0;
+  visibility: hidden;
   opacity: 0;
   width: 100%;
   bottom: -60px;
