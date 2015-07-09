@@ -248,6 +248,7 @@ button{
   -webkit-text-security: disc;
 }
 .help-text{
+  display: none\9; // <ie9
   color: #fff;
   pointer-events: none;
   position: absolute;
@@ -259,7 +260,7 @@ button{
   background: #333;
   border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
-  .opacity(0);
+  opacity: 0;
   .transform(translateY(10px));
   .transition-transform(~"0.25s ease-in, 0.16s ease-in opacity");
   bottom: 100%;
@@ -279,8 +280,8 @@ button{
   }
 }
 .focused.invalid.mature .help-text{
-  display: block!important; // helps when pointer-events is not supported
-  .opacity(0.85);
+  display: block; // helps when pointer-events is not supported
+  opacity: 0.85;
   .transform(none);
   .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
 }

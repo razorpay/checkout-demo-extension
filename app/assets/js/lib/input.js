@@ -1,7 +1,7 @@
 (function(root){
   var $ = root.$;
   var inputClass = 'input';
-  var divClass = 'form-elem';
+  var interceptClass = /elem|placeholder|help-text/;
   var tooltipClass = 'help-text';
 
   var focusEvent = 'focus';
@@ -44,11 +44,8 @@
     common_events: function(){
       this.on(focusEvent, inputClass, this.focus, true);
       this.on(blurEvent, inputClass, this.blur, true);
-
       this.on('input', inputClass, this.input, true);
-
-      this.on('click', divClass, this.intercept);
-      this.on('mouseover', tooltipClass, function(e){e.target.style.display = 'none'});
+      this.on('click', interceptClass, this.intercept);
     },
 
     focus: function(e){
@@ -63,7 +60,11 @@
     },
 
     intercept: function(e){
-      var child = $(e.target).children('input');
+      var parent = e.target;
+      if(!(/elem/.test(parent.className)))
+         parent = parent.parentNode;
+
+      var child = $(parent).children('input');
       child.length && child[0].focus();
     },
 
@@ -94,10 +95,11 @@
         if(child.length){
           child = child[0];
           this.update(child);
-          if(typeof child.placeholder != 'string'){
+          var attr = child.getAttribute('placeholder');
+          if(true || attr && typeof child.placeholder != 'string'){
             var placeholder = document.createElement('span');
             placeholder.className = 'placeholder';
-            placeholder.innerHTML = child.getAttribute('placeholder');
+            placeholder.innerHTML = attr;
             els[i].appendChild(placeholder);
           }
         }
