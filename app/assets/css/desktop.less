@@ -467,13 +467,14 @@ button{
   }
 
   li{
+    *float: left; // <ie7
     list-style: none;
     line-height: 48px;
     height: 48px;
     text-align: center;
     border: 1px solid @border-color;
     border-right: none;
-    width: 50%;
+    width: (@width - 1px)/2;
     font-size: @font-size;
     cursor: pointer;
     background: #fff;
@@ -488,6 +489,7 @@ button{
       padding-bottom: 1px;
       border-bottom: 2px solid @primary;
     }
+    
     &:first-child{
       border-left: none;
     }
