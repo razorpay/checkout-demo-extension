@@ -216,7 +216,7 @@
         }
       }
 
-      discreet.applyFont($('powered-by')[0]);
+      discreet.applyFont($('powered-link')[0]);
       discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 

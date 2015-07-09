@@ -135,6 +135,6 @@ templates.modal = '
         </form>
       </div>
     </div>
-    <i id="powered-by"><a href="https://razorpay.com" target="_blank">&#xe608;</a></i>
+    <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
   </div>
 </div>'
