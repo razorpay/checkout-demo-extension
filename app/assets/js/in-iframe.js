@@ -171,7 +171,7 @@
       Razorpay.card.ensureNumeric(el_contact);
 
       // if we're in webkit
-      if(window.getComputedStyle && typeof getComputedStyle(el_cvv)['-webkit-text-security'] == 'string'){
+      if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_cvv)['-webkit-text-security'] == 'string'){
         el_cvv.type = 'tel';
       }
     },
