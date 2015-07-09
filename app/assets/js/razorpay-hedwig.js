@@ -100,6 +100,9 @@
   discreet.apiResponseHandler = {
     '1' : function(response){
       // this == request
+      if(response.payment_id)
+        this.payment_id = response.payment_id;
+
       var nextRequest = response.request;
       var callback_url = this.data.callback_url;
 
@@ -230,7 +233,7 @@
       })
       if(request.payment_id){
         $.ajax({
-          method: 'post',
+          dataType: 'jsonp',
           url: discreet.makeUrl(request.options) + '/payments/'+request.payment_id+'/cancel',
           data: {key_id: request.options.key}
         })
