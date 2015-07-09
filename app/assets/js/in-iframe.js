@@ -171,7 +171,8 @@
       Razorpay.card.ensureNumeric(el_contact);
 
       // if we're in webkit
-      if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_cvv)['-webkit-text-security'] == 'string'){
+      // we check el_expiry, as IE does return unsupported styles from getComputedStyle
+      if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] == 'string'){
         el_cvv.type = 'tel';
       }
     },
@@ -217,8 +218,6 @@
 
       discreet.applyFont($('powered-by')[0]);
       discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);
-      discreet.setCardFormatting();
-
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
       // event listeners
@@ -241,12 +240,17 @@
           discreet.errorHandler(qpmap)
         }
       }
+      discreet.setCardFormatting();
     },
 
     tab_change: function(e){
       var target = e.target;
+      
       if(target.className.indexOf('paytm') >= 0) target = target.parentNode.parentNode;
-      if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0) return;
+      
+      if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0)
+        return;
+
       discreet.renew();
 
       var modalEl = $(discreet.modal.modalElement);
