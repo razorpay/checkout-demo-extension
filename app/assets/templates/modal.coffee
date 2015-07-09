@@ -2,13 +2,13 @@ $ = Razorpay::$
 unless templates
   templates = {}
 templates.modal = '
-<div class="container" tabIndex="0" style="display: none">
+<div id="container" tabIndex="0" style="display: none">
   <div class="backdrop"></div>
   <div class="modal">
     <div class="modal-inner">
       <div class="header">
         <div class="merchant">
-          <div class="modal-close">×</div>
+          <div id="modal-close">×</div>
           <div class="merchant-image">
             {{if(it.image){}}
               <img src="{{=it.image}}">
@@ -21,11 +21,9 @@ templates.modal = '
         </div>
       </div>
       <div class="body">
-        <form class="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
-          <div class="form-common">
-            <div class="error-container">
-              <div class="error"></div>
-            </div>
+        <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
+          <div id="form-common">
+            <div id="error-container"><div id="error-message"></div></div>
             <input type="hidden" name="amount" value="{{=it.amount}}">
             <input type="hidden" name="currency" value="{{=it.currency}}">
             <input type="hidden" name="description" value="{{=it.description}}">
@@ -35,18 +33,20 @@ templates.modal = '
             {{}}}
 
             <div class="fieldset">
-              <div class="elem elem-email" style="border-radius: 4px 4px 0 0">
+              <p class="elem elem-email" style="border-radius: 4px 4px 0 0">
                 <i>&#xe603;</i>
+                <span class="help-text">Please enter a valid email, like you@foo.com</span>
                 <input class="input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
-              </div>
-              <div class="elem elem-contact" style="border-radius: 0 0 4px 4px">
+              </p>
+              <p class="elem elem-contact" style="border-radius: 0 0 4px 4px">
+                <span class="help-text">Please enter 10-12 digit contact number.</span>
                 <i>&#xe607;</i>
-                <input class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" data-chars="[0-9]" pattern="[0-9]{10,12}">
-              </div>
+                <input id="contact" class="input" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" pattern="[0-9]{10,12}">
+              </p>
             </div>
           </div>
           {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++; }}
-          <ul class="tabs{{if(tabCount){}} tabs-{{=tabCount}}{{}}}">
+          <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
             {{? it.method.card }}
               <li data-target="tab-card" class="active">Card</li>
             {{?}}
@@ -55,30 +55,39 @@ templates.modal = '
             {{?}}
             {{? it.method.wallet }}
               <li data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
-                <div class="paytm-logo"></div>
+                <div id="paytm-wrapper">
+                  <img class="paytm-logo" src="//checkout.razorpay.com/v1/images/paytm.png" width="40px" height="24px" onerror="this.parentNode.innerHTML=\'<div class=\\\'paytm-logo\\\'>Paytm</div>\'">
+                  <img class="paytm-logo colored" src="//checkout.razorpay.com/v1/images/paytm.png" width="40px" height="24px">
+                </div>
               </li>
             {{?}}
           </ul>
           {{? it.method.card }}
             <div class="fieldset tab-content active" id="tab-card">
               <input type="hidden" name="method" value="card">
-              <div class="elem elem-name" style="border-radius: 4px 4px 0 0">
+              <p class="elem elem-name" style="border-radius: 4px 4px 0 0">
                 <i>&#xe602;</i>
+                <span class="help-text">Please fill out this field.</span>
                 <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
-              </div>
-              <div class="elem elem-card">
+              </p>
+              <p class="elem" id="elem-card">
+                <span class="help-text">Please enter valid card number.</span>
+                <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off">
                 <i>&#xe605;</i>
-                <input class="input" type="tel" name="card[number]" class="card_number" placeholder="Card Number" required autocomplete="off">
-              </div>
+                <label class="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check"> My card doesn\'t have expiry or CVV</label>
+              </p>
               <div class="double">
-                <div class="elem elem-expiry" style="border-radius: 0 0 0 4px">
+                <p class="elem elem-expiry" style="border-radius: 0 0 0 4px">
                   <i>&#xe606;</i>
-                  <input class="input" type="tel" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
-                </div>
-                <div class="elem elem-cvv" style="border-radius: 0 0 4px 0">
+                  <span class="help-text">Please enter valid card expiry.</span>
+                  <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
+                </p>
+                <p class="elem elem-cvv" style="border-radius: 0 0 4px 0">
                   <i>&#xe604;</i>
-                  <input class="input" type="password" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
-                </div>
+                  <span class="help-text">Please enter valid cvv number.<br>It is 3 or 4 digit number at back of your card.</span>
+                  <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
+                </p>
+                <div class="clear"></div>
               </div>
             </div>
           {{?}}
@@ -86,11 +95,11 @@ templates.modal = '
             <div class="fieldset tab-content{{? !it.method.card }} active{{?}}" id="tab-netbanking">
               <input type="hidden" name="method" value="netbanking">
               {{? it.method.netbanking.error }}
-                <div class="nb-na">
+                <div id="nb-na">
                   <div>{{=it.method.netbanking.error.description}}</div>
                 </div>
               {{?}}
-              <div class="elem select" style="border-radius: 4px">
+              <p id="nb-elem" class="elem select" style="border-radius: 4px">
                 <i>&#xe601;</i>
                 <select name="bank" required class="input" pattern="[\\w]+">
                   <option selected="selected" value="">Select Bank</option>
@@ -98,7 +107,7 @@ templates.modal = '
                     <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
                   {{}}}
                 </select>
-              </div>
+              </p>
             </div>
           {{?}}
           {{? it.method.wallet }}
@@ -108,7 +117,7 @@ templates.modal = '
             </div>
           {{?}}
           <div class="footer">
-            <button class="submit" type="submit">
+            <button id="submitbtn" type="submit">
               <span class="ring"></span>
               <span class="text">
                 <i>&#xe609;</i>
@@ -126,6 +135,6 @@ templates.modal = '
         </form>
       </div>
     </div>
-    <i class="powered-by"><a href="https://razorpay.com" target="_blank">&#xe608;</a></i>
+    <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
   </div>
 </div>'

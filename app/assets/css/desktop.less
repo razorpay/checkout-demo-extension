@@ -1,5 +1,8 @@
 @import "common";
 
+@font-default: arial, helvetica, sans-serif;
+@font-family: 'lato', @font-default;
+
 @primary: #29b3d2;
 @color: #7f7f7f;
 @border-color: #e6e6e6;
@@ -7,12 +10,14 @@
 @danger: #f46060;
 @border-radius: 4px;
 
-@width: 320px;
+@width: 317px;
 @padding: 20px;
 
 @font-size: 14px;
 // input elements horizontal padding
 @input-padding: 14px;
+@input-height: 40px;
+@icon-size: 30px; // input fields icons
 
 u{
   text-decoration: none;
@@ -24,7 +29,7 @@ i{
 .clear{
   .clearfix();
 }
-.nb-na {
+#nb-na {
   text-align: center;
   div{
     color: @danger;
@@ -45,8 +50,7 @@ body, html{
 }
 
 .backdrop{
-  background: rgba(0,0,0,0.6);
-  filter: alpha(opacity=40);
+  .background(rgba(0,0,0,0.6));
   position: fixed;
   left: 0;
   top: 0;
@@ -54,33 +58,42 @@ body, html{
   height: 100%;
 }
 
-.container{
+#container{
   height: 100%;
   outline: none;
   text-align: center;
   .transition(0.25s ease-out opacity);
-
   z-index: 19999;
   .middlefix();
+
   &.shown{
     opacity: 1;
-
+    #powered-by{
+      opacity: 1;
+    }
     .modal{
       opacity: 1;
       .scale(1);
       .transition-transform(0.25s cubic-bezier(0.3, 1.5, 0.7, 1));
     }
   }
-  &.font-loaded{
-    .powered-by{
-      opacity: 1;
-    }
-    i{
-      display: inline-block;
-    }
-    u{
-      display: none;
-    }
+}
+.font-loaded{
+  .modal, button, input, select, textarea {
+    font-family: @font-family;
+    -webkit-font-feature-settings: "liga" 0;
+    -moz-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0;
+  }
+  #powered-by{
+    visibility: visible;
+    opacity: 1;
+  }
+  i{
+    display: inline-block;
+  }
+  u{
+    display: none;
   }
 }
 label{
@@ -89,30 +102,41 @@ label{
 button, input, select, textarea{
   border: none;
   background: none;
-  font-family: inherit;
+  font-family: @font-default;
   outline: none;
 }
 input, select, textarea{
+  border-radius: inherit;
   display: inline-block;
   color: inherit;
-  height: inherit;
-  border-radius: inherit;
   font-size: 14px;
   resize: none;
   width: 100%;
-  padding: 0 @input-padding;
-  .box-sizing(border-box);
   background: none;
   position: relative;
 }
+input, textarea, .placeholder{
+  height: @input-height;
+  line-height: @input-height;
+  padding: 0 @input-padding;
+  .box-sizing(border-box);
+}
 select{
   .appearance(none);
-  height: 24px\9; // ie8 and below
+  .box-sizing(content-box);
+  padding: 8px 0 8px @input-padding;
+  height: 24px;
+  line-height: 24px;
+}
+input[disabled]{
+  background: #f4f4f4;
+}
+input[type=checkbox]{
+  width: auto;
+  vertical-align: middle;
 }
 input[type=radio]{
-  display: inline-block;
   width: auto;
-  padding: 0;
   margin: 0 5px 0 0;
   vertical-align: middle;
 }
@@ -151,20 +175,24 @@ button{
   width: @width;
   border-radius: @border-radius;
   background: @background-color;
-  font-family: "lato", Arial, Helvetica, sans-serif;
+  font-family: @font-default;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
-  min-height: 375px;
+  min-height: 377px;
+
+  // ie7 and below, middlefix doesn't work.
+  // NOTE: it isn't because of lack of :after, but buggy white-space support
+  *top: 10%;
 }
 .modal-inner{
   .transition(0.15s ease-out opacity);
 }
 .elem{
-  height: 40px;
-  line-height: 40px;
+  height: @input-height;
+  line-height: @input-height;
   border: 1px solid @border-color;
   background: #fff;
   position: relative;
-  margin-bottom: -1px;
+  margin: -1px 0 0;
   cursor: text;
   .transition(0.25s border-color);
   background: #fff center right no-repeat;
@@ -175,13 +203,13 @@ button{
     z-index: 2;
     line-height: 34px;
     top: 0;
-    font-size: 30px;
+    font-size: @icon-size;
     color: #999;
   }
   &.focused{
     border-color: @primary;
     color: black;
-    z-index: 2;
+    z-index: 2!important;
   }
   &.mature.invalid{
     color: @danger;
@@ -191,23 +219,56 @@ button{
       border-color: @danger;
     }
   }
-}
-.select:not(.filled){
-  .input{
-    opacity: 0;
+  &.filled, &.focused{
+    .placeholder{
+      display: none;
+    }
   }
-  &:before{
-    content: 'Select Bank';
-    position: absolute;
-    left: @input-padding;
+}
+.placeholder{
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #999;
+}
+.double{
+  white-space: nowrap;
+  font-size: 0;
+  .elem{
+    font-size: @font-size;
+    display: inline-block;
+    width: (@width - 3px)/2 - @padding;
+    *float: left;
+  }
+}
+.elem-cvv{
+  left: -1px;
+  .help-text{
+    left: auto;
+    right: -15px;
+    &:after{
+      left: 50%;
+    }
+  }
+}
+#card_cvv{
+  -webkit-text-security: disc;
+}
+// ie9, 10
+@media screen and (~"min-width:0\0") {
+  .help-text{
+    display: none;
+  }
+  .focused.invalid.mature .help-text{
+    display: block;
   }
 }
 .help-text{
+  display: none\9; // <ie9
   color: #fff;
   pointer-events: none;
-  z-index: 2;
   position: absolute;
-  max-width: 220px;
+  max-width: 225px;
   line-height: 16px;
   padding: 6px 10px;
   font-size: 80%;
@@ -216,12 +277,11 @@ button{
   border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
   opacity: 0;
-  filter: alpha(opacity=0);
-  .transition-transform(~"0.3s ease-in, 0.2s ease-in opacity");
-  .transform(translateY(20px));
+  .transform(translateY(10px));
+  .transition-transform(~"0.25s ease-in, 0.16s ease-in opacity");
   bottom: 100%;
   left: 10px;
-  margin-bottom: 3px;
+  margin-bottom: -3px;
   &:after {
     content: '';
     position: absolute;
@@ -234,26 +294,16 @@ button{
     left: 20px;
     margin: 0 0 -11px -7px;
   }
-  &.shown{
-    opacity: 0.9!important;
-    -ms-filter: "none";
-    .transform(none);
-    .transition-transform(~"0.25s cubic-bezier(0.6, 1.6, 0.8, 1), 0.25s ease-out opacity");
-  }
 }
-.double{
-  white-space: nowrap;
-  font-size: 0;
-  margin: 0 2px 0 1px;
-  .elem{
-    font-size: @font-size;
-    display: inline-block;
-    width: 50%;
-    margin-left: -1px;
-  }
+.focused.invalid.mature .help-text{
+  display: block; // helps when pointer-events is not supported
+  opacity: 0.85;
+  .transform(none);
+  .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
 }
 .fieldset{
-  margin: 20px 0;
+  padding: 20px 0;
+  clear: both;
 }
 .merchant{
   border-radius: @border-radius @border-radius 0 0;
@@ -289,7 +339,7 @@ button{
   color: #333;
   margin-bottom: 5px;
 }
-.modal-close{
+#modal-close{
   position: absolute;
   right: 0;
   top: 0;
@@ -312,34 +362,60 @@ button{
   text-align: left;
   padding: 0 @padding;
 }
-
-.elem-card{
-  &.visa{
-    i{display: none}
+.nocvv{
+  opacity: 0;
+  color: #666;
+  margin-top: 10px;
+  line-height: 20px;
+  .transition(0.3s);  
+  display: none\9; // ie8
+  display: none;
+}
+#elem-card{
+  .transition(0.3s);
+  i{
+    font-size: 0;
+    width: 26px;
+    background: no-repeat 4px 7px;
+    background-size: 26px;
+    text-align: center;
+    padding-right: 1px;
+    margin-right: -2px;
+  }
+  &[cardtype=unknown] i{
+    font-size: @icon-size;
+  }
+  &[cardtype=visa] i{
     background-image: url('../images/icons/visa.png');
   }
-  &.mastercard{
-    i{display: none}
+  &[cardtype=mastercard] i{
     background-image: url('../images/icons/mastercard.png');
   }
-  &.maestro{
-    i{display: none}
+  &[cardtype=maestro]{
+    // margin-bottom: 40px;
+    i{
+      background-image: url('../images/icons/maestro.png');
+    }
+    .nocvv{
+      opacity: 1;
+      // display: block\9;
+    }
+  }
+  &[cardtype=maestro16] i{
     background-image: url('../images/icons/maestro.png');
   }
-  &.rupay{
-    i{display: none}
+  &[cardtype=rupay] i{
     background-image: url('../images/icons/rupay.png');
   }
-  &.amex{
-    i{display: none}
+  &[cardtype=amex] i{
     background-image: url('../images/icons/amex.png');
   }
 }
 
-.body .submit.error{
+#submitbtn.error{
   background-color: @danger;
 }
-.error{
+#error-message{
   left: 0;
   right: 0;
   position: absolute;
@@ -351,19 +427,18 @@ button{
   overflow: hidden;
   .transition(0.3s);
   bottom: 100%;
-  li{
-    list-style: none;
-    font-size: @font-size;
-  }
 }
-.error-container{
+#error-container{
   position: relative;
   overflow: hidden;
+  display: none;
   margin: 0 -@padding;
   .transition(0.3s);
-}
-.error-container.has-error .error{
-  bottom: 0;
+  &.has-error{
+    #error-message{
+      bottom: 0;
+    }
+  }
 }
 .tab-content{
   display: none;
@@ -372,12 +447,13 @@ button{
   display: block;
 }
 
-.tabs{
+#tabs{  
   margin: 0 -20px;
   padding: 0;
-  white-space: nowrap;
   font-size: 0;
+  white-space: nowrap;
   display: none;
+  *margin-bottom: -20px; // ie7
 
   &.tabs-2{
     display: block;
@@ -386,23 +462,25 @@ button{
   &.tabs-3{
     display: block;
     li{
-      width: 33.33%;
+      width: (@width - 2)/3;
     }
   }
 
   li{
+    *float: left; // <ie7
+    list-style: none;
     line-height: 48px;
     height: 48px;
-    vertical-align: top;
-    display: inline-block;
     text-align: center;
     border: 1px solid @border-color;
     border-right: none;
-    width: 50%;
+    width: (@width - 1px)/2;
     font-size: @font-size;
     cursor: pointer;
     background: #fff;
     padding-bottom: 2px;
+    display: inline-block;
+    vertical-align: top;
     
     &.active{
       color: @primary;
@@ -411,52 +489,72 @@ button{
       padding-bottom: 1px;
       border-bottom: 2px solid @primary;
     }
+
     &:first-child{
       border-left: none;
-      margin-right: -1px;
     }
   }
 }
-.paytm-logo{
-  background: url('../images/paytm.png') no-repeat top #fff;
-  height: 12px;
-  background-size: 40px 24px;
+#paytm-wrapper{
+  width: 40px;
+  display: inline-block;
   margin-top: 18px;
-}
-li:hover, li.active{
-  .paytm-logo{
-    background-position: bottom;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+  img{
+    vertical-align: top;
+  }
+  .colored{
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+  div{
+    font-size: 14px;
+    line-height: 14px;
   }
 }
-.form{
+li{
+  &:hover, &.active{
+    #paytm-wrapper .colored{
+      display: block;
+    }
+  }
+}
+#form{
+  margin: 0;
   padding-bottom: 52px;
   display: block;
 }
 .footer{
-  z-index: 2;
-  margin: 0 -@padding;
-  position: absolute;
-  width: 100%;
   bottom: 0;
-}
-.powered-by{
-  display: block;
-  opacity: 0;
+  z-index: 2;
+  width: 100%;
   position: absolute;
-  font-size: 36px;
+  margin: 0 -@padding;
+}
+#powered-by{
   left: 0;
+  visibility: hidden;
+  opacity: 0;
   width: 100%;
   bottom: -60px;
+  display: block;
+  font-size: 36px;
   .transition(0.3s);
+  position: absolute;
   .transition-delay(0.2s);
+  font-family: @font-family;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
   
   a{
+    color: #999;
     outline: none;
     line-height: 36px;
-    color: #888;
-    text-decoration: none;
-    color: inherit;
     .transition(0.3s);
+    text-decoration: none;
     &:hover{
       color: #ddd;
     }

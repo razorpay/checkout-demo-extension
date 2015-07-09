@@ -1,44 +1,38 @@
 (function(root) {
-  var $, defaults, modal, timeout;
-  $ = root.$;
-  timeout = null;
+  var $ = root.$;
+  var timeout = null;
 
-  defaults = {
+  var defaults = {
     shownClass: 'shown',
-    modalSelector: '.modal',
-    closeButton: '.modal-close',
+    modalClass: 'modal',
+    backdropClass: 'backdrop',
+    closeId: 'modal-close',
+    containerId: 'container',
     show: true,
     escape: true,
     animation: true,
-    stopKeyPropagation: true,
     backdropClose: true,
     onhide: null,
-    onhidden: null,
-    parent: null
+    onhidden: null
   };
 
-  modal = function(element, options) {
-    var duration, durationStyle;
-    this.options = $.extend(defaults, options);
-    this.element = element;
-    this.modalElement = element.children(this.options.modalSelector);
-    
-    if (!this.element.attr('tabIndex')) {
-      this.element.attr('tabIndex', '0');
+  var clearTimeout = function(){
+    if (timeout) {
+      window.clearTimeout(timeout);
     }
-    if (!this.element.parent().length) {
-      var parent = this.options.parent;
-      if(!(parent && $(parent).length)){
-        parent = document.body;
-      }
-      this.element.appendTo(parent);
-    }
+    timeout = null;
+  }
 
+  var Modal = root.Modal = function(element, options) {
+    this.options = $.defaults(options, defaults);
+    this.container = $(this.options.containerId);
+    this.modalElement = element;
+    
     if(!this.options.animation || !this.transitionProperty){
       duration = 0;
     } else {
       if(typeof window.getComputedStyle == 'function'){
-        durationStyle = window.getComputedStyle(this.element[0])[this.transitionProperty];
+        durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
     }
@@ -49,24 +43,16 @@
 
     this.animationDuration = duration;
     if(duration){
-      this.modalElement.addClass('animate')
+      $(this.modalElement).addClass('animate')
     }
 
     if (this.options.show) {
       this.show();
     }
-    return this;
   };
 
-  modal.prototype = {
+  Modal.prototype = {
     listeners: [],
-
-    on: function(event, target, callback) {
-      var handler;
-      handler = $.proxy(callback, this);
-      target.on(event, handler);
-      return this.listeners.push([target, event, handler]);
-    },
 
     transitionProperty: (function() {
       var prop;
@@ -82,69 +68,71 @@
       return prop;
     })(),
 
-    toggle: function() {
-      return this[!this.isShown ? 'show' : 'hide']();
-    },
-
     show: function() {
+      if(this.isShown) return;
       this.isShown = true;
+
       this.bind_events();
-      this.element[0].style.display = 'block';
-      this.modalElement.css('display', 'inline-block');
-      this.element.prop('offsetWidth');
-      this.modalElement.prop('offsetWidth');
-      this.element.addClass(this.options.shownClass);
-      this.clearTimeout();
-      this.element.focus();
-      return timeout = setTimeout($.proxy(this.shown, this), this.animationDuration);
+      this.container.css('display', 'block');
+      this.modalElement.style.display = 'inline-block';
+      this.container[0].offsetWidth;
+      this.modalElement.offsetWidth;
+      this.container.addClass(this.options.shownClass);
+      clearTimeout();
+      timeout = setTimeout(this.shown, this.animationDuration);
+      this.container[0].focus();
     },
 
     shown: function() {
-      this.clearTimeout();
+      clearTimeout();
     },
 
     hide: function() {
-      if (!this.isShown) {
-        return;
-      }
+      if(!this.isShown) return;
       this.isShown = false;
+
       if(this.animationDuration){
-        this.modalElement.addClass('animate');
+        $(this.modalElement).addClass('animate');
       }
-      this.element.removeClass(this.options.shownClass);
-      for(var i = 0; i < this.listeners.length; i++){
-        var l = this.listeners[i];
-        l[0].off(l[1], l[2]);
-      }
-      this.listeners = [];
-      if (window.removeEventListener){
-        this.element[0].removeEventListener('blur', this.steal_focus, true);
-      }
-      this.clearTimeout();
-      if (typeof this.options.onhide === 'function') {
-        this.options.onhide();
-      }
+      this.container.removeClass(this.options.shownClass);
+      
+      this.off();
+      clearTimeout();
       var self = this;
+
       timeout = setTimeout(function(){
         self.hidden();
       }, this.animationDuration);
-    },
 
-    clearTimeout: function() {
-      if (timeout) {
-        clearTimeout(timeout);
+      if(typeof this.options.onhide === 'function') {
+        this.options.onhide();
       }
-      timeout = null;
     },
 
     hidden: function() {
-      // $(document.body).css('overflow', '');
-      this.clearTimeout();
-      this.element.hide()
-      this.modalElement.hide();
-      if (typeof this.options.onhidden === 'function') {
+      clearTimeout();
+      this.container.css('display', 'none');
+      this.modalElement.style.display = 'none';
+      if(typeof this.options.onhidden === 'function') {
         this.options.onhidden();
       }
+    },
+
+    on: function(event, target, callback){
+      var self = this;
+      $(target).on(event, function(e){
+        callback.call(self, e);
+      });
+    },
+
+    off: function(){
+      // for(var i = 0; i < this.listeners.length; i++){
+      //   var l = this.listeners[i];
+      //   l[0].off(l[1], l[2]);
+      // }
+      // if (window.removeEventListener){
+      //   this.element[0].removeEventListener('blur', this.steal_focus, true);
+      // }
     },
 
     steal_focus: function(e) {
@@ -157,45 +145,34 @@
     },
 
     bind_events: function(){
-      if (window.addEventListener){
-        this.element[0].addEventListener('blur', this.steal_focus, true);
-      }
+      this.on('click', $(this.options.closeId)[0], this.hide);
       
-      // if (this.curtainMode){
-        this.on('click', this.element.find(this.options.closeButton), this.hide);
-        this.on('resize', $(window), function(){
-          var self = this;
+      if(typeof window.pageYOffset == 'number') // doesn't exist <ie9. we're concerned about mobile here.
+        this.on('resize', window, function(){
+          var container = this.container[0];
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
             if(rect.bottom > innerHeight - 50){
               setTimeout(function(){
-                self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
+                scrollTo(0, pageYOffset - innerHeight + rect.bottom + 60)
               }, 400)
             }
           }
         })
-      // }
       
-      if (this.options.stopKeyPropagation) {
-        this.on('keyup keydown keypress', this.element, function(e) {
-          e.stopPropagation();
-        });
-      }
       if (this.options.escape) {
-        this.on('keyup', this.element, function(e) {
+        this.on('keyup', window, function(e) {
           if (e.which === 27 && this.options.backdropClose) {
             this.hide();
           }
         })
       }
       if (this.options.backdropClose) {
-        this.on('click', this.element.children('.backdrop'), function(e) {
+        this.on('click', this.container.children('backdrop')[0], function(e){
           this.options.backdropClose && this.hide();
         })
       }
     }
   };
-
-  root.Modal = modal;
 })(window);

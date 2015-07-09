@@ -2,7 +2,7 @@
 
 @max-width: 384px;
 @media (max-device-height: 450px),(max-device-width: 450px){
-.container{
+#container{
 	min-width: 240px;
 	&:after{
 		content: none;
@@ -22,11 +22,25 @@
 		.transition(0.3s ease-out all);
 		.transform(none);
 	}
-	.powered-by{
+	#powered-by{
 		display: none;
 	}
 	button{
 		border-radius: 0;
+	}
+	#tabs{
+		li{
+			width: 50%;
+		}
+		&.tabs-3 li {
+			width: 33.33%;
+		}
+	}
+	.double .elem{
+		width: 50%;
+	}
+	.elem-cvv{
+		left: -4px;
 	}
 }
 }

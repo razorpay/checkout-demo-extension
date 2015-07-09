@@ -6,6 +6,7 @@ Razorpay = function(options){
 };
 
 (function(){
+  Razorpay.prototype = {};
   Razorpay.card = {};
   Razorpay.prototype.discreet = {
     

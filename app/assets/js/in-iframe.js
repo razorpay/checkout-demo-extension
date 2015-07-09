@@ -4,6 +4,7 @@
 (function(){
   'use strict';
   var discreet = {
+    smarty: null,
     modal: null,
     $el: null,
     rzp: null,
@@ -20,11 +21,14 @@
       }
     },
 
-    shake: function(element){
-      element.addClass('shake');
-      setTimeout(function() {
-        element.removeClass('shake');
-      }, 200);
+    shake: function(){
+      if(discreet.modal){
+        var el = $(discreet.modal.modalElement);
+        el.addClass('shake');
+        setTimeout(function() {
+          el.removeClass('shake');
+        }, 200);
+      }
     },
 
     notifyBridge: function(message){
@@ -42,26 +46,6 @@
           window.CheckoutBridge[method](data);
         }
       }
-    },
-    getFormData: function(form) {
-      var data, expiry;
-      data = {};
-      form.find('.form-common [name], .tab-content.active [name]').each(function(index, el) {
-        if (el.name && el.value) {
-          return data[el.name] = el.value;
-        }
-      });
-      var target_tab = form.find('.tab-content.active').attr('id');
-      if(target_tab == 'tab-card'){
-        if(target_tab == 'tab-card'){
-          data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-          expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
-          data['card[expiry_month]'] = expiry[0];
-          data['card[expiry_year]'] = expiry[1];
-          delete data['card[expiry]'];
-        }
-      }
-      return data;
     },
     
     setMethods: function(payment_methods){
@@ -160,6 +144,39 @@
       }
     },
 
+    setNumberValidity: function(){
+      $(this.parentNode)[Razorpay.card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
+    },
+
+    setCardFormatting: function(){
+      var $el_number = $('card_number');
+      var el_expiry = $('card_expiry')[0];
+      var el_cvv = $('card_cvv')[0];
+      var el_contact = $('contact')[0];
+      
+      Razorpay.card.setType = function(el, type){
+        !type && (type = Razorpay.card.getType(el.value) || 'unknown');
+        el.parentNode.setAttribute('cardtype', type);
+        discreet.setNumberValidity.call(el);
+        
+        if(type != 'maestro'){
+          $('nocvv-check')[0].checked = false;
+          discreet.toggle_nocvv();
+        }
+      }
+      $el_number.on('blur', discreet.setNumberValidity);
+      Razorpay.card.formatNumber($el_number[0]);
+      Razorpay.card.formatExpiry(el_expiry);
+      Razorpay.card.ensureNumeric(el_cvv);
+      Razorpay.card.ensureNumeric(el_contact);
+
+      // if we're in webkit
+      // we check el_expiry, as IE does return unsupported styles from getComputedStyle
+      if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] == 'string'){
+        el_cvv.type = 'tel';
+      }
+    },
+
     showModal: function() {
       discreet.renew();
       if(discreet.modal){
@@ -177,10 +194,11 @@
           }
         });
       }
-      $('#loading').remove();
+      $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
-      discreet.$el = $((doT.compile(templates.modal))(discreet.rzp.options));
-      discreet.$el.smarty();
+      document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
+      discreet.$el = $('container');
+      discreet.smarty = new Smarty(discreet.$el);
 
       if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
         if(navigator.userAgent.indexOf('Android 2')){
@@ -198,65 +216,73 @@
         }
       }
 
-      discreet.modal = new Modal(discreet.$el, modalOptions);
+      discreet.applyFont($('powered-link')[0]);
+      discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);
+      if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
-      discreet.applyFont(discreet.$el.find('.powered-by a')[0]);
-
-      discreet.$el.find('.input[name="card[number]"]').payment('formatCardNumber').on('blur', function() {
-        var parent;
-        parent = $(this.parentNode);
-        return parent[$.payment.validateCardNumber(this.value) ? 'removeClass' : 'addClass']('invalid');
-      });
-
-      discreet.$el.find('.input[name="card[expiry]"]').payment('formatCardExpiry');
-      discreet.$el.find('.input[name="card[cvv]"]').payment('formatCardCVC').on('blur', function(){
-        var parent;
-        parent = $(this.parentNode);
-        return parent[$.payment.validateCardCVC(this.value) ? 'removeClass' : 'addClass']('invalid');
-      });
-
-      if(discreet.$el.find('.nb-na').length){
-        discreet.$el.find('#tab-netbanking .elem').hide();
-      }
-
-        discreet.$el.find('.tabs li').click(function() {
-          discreet.renew();
-          var inner = $(this).closest('.modal-inner');
-          if (!inner.length) {
-            return;
-          }
-          var form = inner.find('.form');
-          var modalEl = inner.parent();
-          var change_modal_height = !discreet.modal.curtainMode;
-          
-          if(change_modal_height){
-            modalEl[0].style.height = inner[0].offsetHeight + 'px';
-            modalEl.addClass('animate');
-          }
-
-          inner.find('#' + this.getAttribute('data-target')).addClass('active').siblings('.active').removeClass('active');
-          $(this).addClass('active').siblings('.active').removeClass('active');
-
-          if(change_modal_height){
-            modalEl[0].style.height = inner[0].offsetHeight + 'px';
-            setTimeout(function(){
-              modalEl.removeClass('animate').height('');
-            }, 300);
-          }
-        });
-
-      discreet.$el.find('form').on('submit', function(e) {
+      // event listeners
+      $('nocvv-check').on('change', discreet.toggle_nocvv)
+      $('tabs').on('click', discreet.tab_change);
+      $('form').on('submit', function(e){
         discreet.formSubmit(e);
-        return false; // prevent default
+        e.preventDefault();
       });
 
       if(discreet.qpmap){
-        if(discreet.qpmap.tab){
-          $('.tabs li[data-target=tab-'+discreet.qpmap.tab+']').click()
+        var lis = $(tabs)[0].getElementsByTagName('li');
+        for(var i=0; i<lis.length; i++){
+          if(lis[i].getAttribute('data-target') == 'tab-' + discreet.qpmap.tab){
+            discreet.tab_change({target: lis[i]});
+            break;
+          }
         }
         if(discreet.qpmap.error){
           discreet.errorHandler(qpmap)
         }
+      }
+      discreet.setCardFormatting();
+    },
+
+    tab_change: function(e){
+      var target = e.target;
+      
+      if(target.className.indexOf('paytm') >= 0) target = target.parentNode.parentNode;
+      
+      if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0)
+        return;
+
+      discreet.renew();
+
+      var modalEl = $(discreet.modal.modalElement);
+      var inner = modalEl.children('modal-inner')[0];
+      if(!inner) return;
+
+      modalEl[0].style.height = inner.offsetHeight + 'px';
+      modalEl.addClass('animate');
+
+      var tabContent = $(target.getAttribute('data-target'));
+      var activeTab = tabContent.parent().children('active')[0];
+      activeTab && $(activeTab).removeClass('active');
+      tabContent.addClass('active');
+
+      activeTab = $(target.parentNode).children('active')[0];
+      activeTab && $(activeTab).removeClass('active');
+      $(target).addClass('active');
+
+      modalEl[0].style.height = inner.offsetHeight + 'px';
+      setTimeout(function(){
+        modalEl.removeClass('animate');
+        modalEl[0].style.height = '';
+      }, 300);
+    },
+
+    toggle_nocvv: function(){
+      var checked = this.checked;
+      for(var i in {card_expiry: 0, card_cvv: 0}){
+        var el = $(i).removeClass('invalid')[0];
+        el.value = '';
+        el.disabled = checked;
+        el.required = !checked;
       }
     },
 
@@ -268,28 +294,37 @@
       }, 120 + retryCount*50);
     },
 
-    formSubmit: function(e) {
-      var form = $(e.currentTarget);
-      discreet.$el.smarty('refresh');
-      form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
-
-      var invalid = form.find('.form-common, .tab-content.active').find('.invalid');
-      var modalEl = form.closest('.modal');
-      if (invalid.length) {
-        invalid.addClass('mature').find('.input').eq(0).focus();
-        discreet.shake(modalEl);
-        return;
+    /* sets focus on invalid input and returns true, if any. */
+    isInvalid: function(parent){
+      var invalids = $(parent).find('invalid', 'p');
+      if(invalids.length){
+        discreet.shake();
+        $(invalids[0]).find('input')[0].focus();
+        for(var i=0; i<invalids.length; i++) $(invalids[i]).addClass('mature');
+        return true;
       }
-      var data = discreet.getFormData(form);
+    },
+
+    formSubmit: function(e) {
+      discreet.smarty.refresh();
+      // form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
+      if (discreet.isInvalid('form-common'))
+        return;
+
+      var activeTab = $('tabs').find('active')[0];
+      if (activeTab && discreet.isInvalid(activeTab.getAttribute('data-target')))
+        return;
+
+      var data = discreet.getFormData();
 
       // Signature is set in case of hosted checkout
-      if(discreet.rzp.options.signature !== ''){
+      if (discreet.rzp.options.signature !== '')
         data.signature = discreet.rzp.options.signature;
-      }
 
       discreet.renew();
-      discreet.$el.find('.submit').attr('disabled', true);
-      discreet.modal && (discreet.modal.options.backdropClose = false);
+      $('submitbtn').attr('disabled', true);
+      if(discreet.modal)
+        discreet.modal.options.backdropClose = false;
 
       Razorpay.payment.authorize({
         data: data,
@@ -297,6 +332,7 @@
         error: discreet.errorHandler,
         success: discreet.successHandler
       })
+
       discreet.postMessage({
         event: 'submit',
         data: {
@@ -305,17 +341,50 @@
       });
     },
 
+    getFormFields: function(container, returnObj){
+      var allels = $(container)[0].getElementsByTagName('*');
+      var len = allels.length;
+      for(var i=0; i<len; i++){
+        var el = allels[i];
+        if(el.name && !el.disabled && el.value.length)
+          returnObj[el.name] = el.value;
+      }
+    },
+
+    getFormData: function() {
+      var activeTab = $('tabs').find('active')[0];
+      if(!activeTab) return;
+      
+      var data = {};
+      discreet.getFormFields('form-common', data);
+      
+      var targetTab = activeTab.getAttribute('data-target');
+      discreet.getFormFields(targetTab, data);
+
+      if(targetTab == 'tab-card'){
+        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+        
+        if(!data['card[expiry]'])
+          data['card[expiry]'] = '';
+
+        if(!data['card[cvv]'])
+          data['card[cvv]'] = '';
+
+        var expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+        data['card[expiry_month]'] = expiry[0];
+        data['card[expiry_year]'] = expiry[1];
+        delete data['card[expiry]'];
+      }
+      return data;
+    },
+
     // close on backdrop click and remove errors
-    renew: function() {
-      if (discreet.$el) {
-        var errorForm = discreet.$el.find('.has-error');
-        if(errorForm.length){
-          errorForm.removeClass('has-error').css('paddingTop', '');
-        }
-      }
-      if(discreet.modal){
+    renew: function(){
+      if (discreet.$el)
+        $('error-container').css('display', 'none').removeClass('has-error').css('paddingTop', '');
+
+      if(discreet.modal)
         discreet.modal.options.backdropClose = true;
-      }
     },
 
     hide: function(){
@@ -336,18 +405,19 @@
       }
       var message;
       var modalEl = discreet.modal.modalElement;
-      discreet.shake(modalEl);
+      discreet.shake();
 
-      modalEl.find('.submit').removeAttr('disabled');
+      $('submitbtn')[0].removeAttribute('disabled');
       discreet.modal && (discreet.modal.options.backdropClose = true);
 
       if (response && response.error){
         message = response.error.description;
 
         if (response.error.field){
-          var error_el = discreet.$el.find('input[name="'+response.error.field+'"]');
+          var error_el = document.getElementsByName(response.error.field);
           if (error_el.length){
-            error_el.closest('.elem').addClass('invalid').eq(0).focus();
+            $(error_el[0].parentNode).addClass('invalid');
+            error_el[0].focus();
           }
         }
       }
@@ -356,8 +426,9 @@
         message = 'There was an error in handling your request';
       }
 
-      var error_ht = modalEl.find('.error').html(message).prop('offsetHeight');
-      modalEl.find('.error-container').addClass('has-error').css('paddingTop', error_ht);
+      var error_message = $('error-message')[0];
+      error_message.innerHTML = message;
+      $('error-container').css('display', 'block').addClass('has-error').css('paddingTop', error_message.offsetHeight + 'px');
     },
 
     configureRollbar: function(message){
@@ -378,7 +449,6 @@
     if(typeof message != 'object'){
       return;
     }
-
     if(message.options && !discreet.rzp){ // open modal
       try{
         discreet.rzp = new Razorpay(message.options);

@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="Viewport" content="width=device-width, initial-scale=0.6" />
-  <!-- <script src="http://192.168.0.105:8080/target/target-script-min.js"></script> -->
   <!-- build:js razorpay.js -->
   <script type="text/javascript" src="js/lib/init.js"></script>
-  <script type="text/javascript" src="js/lib/inline-libs.html"></script>
+  <script type="text/javascript" src="js/lib/nominal-jquery.js"></script>
   <script type="text/javascript" src="js/lib/popup.js"></script>
   <script type="text/javascript" src="js/lib/hedwig.js"></script>
   <script type="text/javascript" src="js/base.js"></script>
@@ -27,7 +26,6 @@
   <div id="x"></div>
   <div id="side">
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
-    <button class="btn" id="rzp-button2">Steel Warhammer</button>  
   </div>
 
   <script>
@@ -38,15 +36,12 @@
       'description': 'Armour 20',
       'image': 'images/image1.jpg',
       'handler': function (transaction){
+        console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
       hostname: 'beta.razorpay.com',
       'method': {
-        netbanking: null,
-        card: null,
-        wallet: {
-          paytm: true
-        }
+        'card': 1
       },
       'prefill': {
         'name': 'Harshil \"Mathur',
@@ -60,74 +55,14 @@
         ondismiss: function(){console.log(1)},
         onhidden: function(){console.log(2)}
       },
-      parent: document.getElementById('x')
+      parent: '#x'
     }
     var rzp1 = new Razorpay(options);
 
     document.getElementById('rzp-button1').onclick = function(e) {
       rzp1.open();
+      e.preventDefault();
     };
-
-    var opt2 = {
-      key: options.key,
-      prefill: options.prefill,
-      modal: options.modal,
-      handler: options.handler,
-      amount : 20000,
-      'display_currency': 'USD',
-      'display_amount': '349',
-      display_amount: '34.99',
-      name: 'Steel Warhammer',
-      protocol: 'http',
-      hostname: 'api.razorpay.dev',
-      description : 'Attack 50',
-      image : 'images/image2.jpg',
-      handler : function (transaction){
-        alert("You have successfully purchased "+options.description);
-      },
-      notes: {
-        'shipping': "Bye World"
-      }
-    }
-
-    var rzp2 = new Razorpay(opt2);
-
-    document.getElementById('rzp-button2').onclick = function(e) {
-      rzp2.open();
-    };
+    rzp1.open();
   </script>
-
-  <style>
-  #side{
-    position: fixed;
-    top: 10px;
-    left: 20px;
-    padding: 20px;
-    text-align: center;
-  }
-  .btn {
-    min-width: 200px;
-    border: none;
-    background: none;
-    display: block;
-    color: white;
-    line-height: 48px;
-    border-radius: 2px;
-    background: #555;
-    background-color: rgba(255,255,255,0.7);
-    color: rgba(0, 0, 0, 0.8);
-    text-shadow: 1px 1px 3px rgba(255,255,255, 0.14);
-    font-size: 16px;
-    margin: 30px 0;
-    padding: 0 20px;
-    text-align: center;
-  }
-  html, body{height: 100%}
-  body{
-    margin: 0;
-    background: #ccc;
-    background: -webkit-radial-gradient(circle, #1a82f7, #2F2727);
-    background: -moz-radial-gradient(circle, #1a82f7, #2F2727);
-  }
-</style>
 </body>

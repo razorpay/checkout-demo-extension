@@ -23,7 +23,7 @@
       frame.height = 0;
       frame.style.display = 'none';
       frame.src = ccHubLocation || defaultCCHub;
-      discreet.currentScript.parentNode.appendChild(frame);
+      document.body.appendChild(frame);
     },
     
     sendMessage: function(data, url, target){

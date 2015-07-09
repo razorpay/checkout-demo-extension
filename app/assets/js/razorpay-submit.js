@@ -41,20 +41,18 @@
         return false;
       }
 
-
+      for(var i in rdata.notes){
+        rdata['notes['+i+']'] = rdata.notes[i];
+      }
+      delete rdata.notes;
+      
       var url = discreet.makeUrl(options);
 
       if(options.redirect){
         var form = document.createElement('form');
         form.setAttribute('action', url + '/payments');
         form.setAttribute('method', 'post');
-
         var formHTML = '';
-        for(var i in rdata.notes){
-          rdata['notes['+i+']'] = rdata.notes[i];
-        }
-        delete rdata.notes;
-
 
         for(i in rdata){
           var j = i.replace(/"/g,''); // attribute sanitize

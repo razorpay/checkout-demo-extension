@@ -84,7 +84,7 @@
       }
       discreet.xdm._listener = discreet.xdm._getMessageCallback(callback, context);
       var winref = $(window).on('message', discreet.xdm._listener);
-      if(typeof winref == 'function') discreet.xdm._listener = winref; // if listener is returned by minimal-jquery
+      if(typeof winref == 'function') discreet.xdm._listener = winref; // if listener is returned by minimal-$
     },
 
     removeMessageListener: function() {

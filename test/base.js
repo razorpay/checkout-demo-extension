@@ -70,7 +70,7 @@ describe("xdm listener should", function(){
 
 describe("configure method", function(){
   var co;
-  var custom = $.extend(true, {}, optionsExtended);
+  var custom = jQuery.extend(true, {}, optionsExtended);
   custom.unwanted = 'fake';
 
   beforeEach(function(){
@@ -99,7 +99,7 @@ describe("configure method", function(){
   });
 
   it("should set signature", function(){
-    var local = $.extend({}, custom);
+    var local = jQuery.extend({}, custom);
     local.signature = 'asdasd';
     var co = new Razorpay(local);
     expect(co.options.signature).toBe(local.signature);
