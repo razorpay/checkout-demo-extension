@@ -247,6 +247,15 @@ button{
 #card_cvv{
   -webkit-text-security: disc;
 }
+// ie9, 10
+@media screen and (~"min-width:0\0") {
+  .help-text{
+    display: none;
+  }
+  .focused.invalid.mature .help-text{
+    display: block;
+  }
+}
 .help-text{
   display: none\9; // <ie9
   color: #fff;
