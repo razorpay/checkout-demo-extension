@@ -88,6 +88,18 @@
     },
 
     init: function(){
+      this.refresh(function(child){
+        var attr = child.getAttribute('placeholder');
+        if(attr && typeof child.placeholder != 'string'){
+          var placeholder = document.createElement('span');
+          placeholder.className = 'placeholder';
+          placeholder.innerHTML = attr;
+          child.parentNode.appendChild(placeholder);
+        }
+      })
+    },
+
+    refresh: function(callback){
       var els = this.parent[0].getElementsByTagName('p');
       var elslen = els.length;
       for(var i=0; i<elslen; i++){
@@ -95,13 +107,7 @@
         if(child.length){
           child = child[0];
           this.update(child);
-          var attr = child.getAttribute('placeholder');
-          if(true || attr && typeof child.placeholder != 'string'){
-            var placeholder = document.createElement('span');
-            placeholder.className = 'placeholder';
-            placeholder.innerHTML = attr;
-            els[i].appendChild(placeholder);
-          }
+          callback && callback(child);
         }
       }
     },
