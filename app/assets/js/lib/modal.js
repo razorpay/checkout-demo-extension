@@ -147,15 +147,15 @@
     bind_events: function(){
       this.on('click', $(this.options.closeId)[0], this.hide);
       
-      if(window.innerHeight) // doesn't exist <ie7. we're concerned about mobile here.
+      if(typeof window.pageYOffset == 'number') // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function(){
-          var self = this;
+          var container = this.container[0];
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
             if(rect.bottom > innerHeight - 50){
               setTimeout(function(){
-                // self.element.scrollTop(self.element.scrollTop() - innerHeight + rect.bottom + 60)
+                scrollTo(0, pageYOffset - innerHeight + rect.bottom + 60)
               }, 400)
             }
           }

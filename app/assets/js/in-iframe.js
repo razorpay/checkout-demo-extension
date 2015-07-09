@@ -149,10 +149,10 @@
     },
 
     setCardFormatting: function(){
-      var el_number = $('card_number');
-      var el_expiry = $('card_expiry');
-      var el_cvv = $('card_cvv');
-      var el_contact = $('contact');
+      var $el_number = $('card_number');
+      var el_expiry = $('card_expiry')[0];
+      var el_cvv = $('card_cvv')[0];
+      var el_contact = $('contact')[0];
       
       Razorpay.card.setType = function(el, type){
         !type && (type = Razorpay.card.getType(el.value) || 'unknown');
@@ -164,11 +164,16 @@
           discreet.toggle_nocvv();
         }
       }
-      Razorpay.card.formatNumber(el_number[0]);
-      el_number.on('blur', discreet.setNumberValidity);
-      Razorpay.card.formatExpiry(el_expiry[0]);
-      Razorpay.card.ensureNumeric(el_cvv[0]);
-      Razorpay.card.ensureNumeric(el_contact[0]);
+      $el_number.on('blur', discreet.setNumberValidity);
+      Razorpay.card.formatNumber($el_number[0]);
+      Razorpay.card.formatExpiry(el_expiry);
+      Razorpay.card.ensureNumeric(el_cvv);
+      Razorpay.card.ensureNumeric(el_contact);
+
+      // if we're in webkit
+      if(window.getComputedStyle && typeof getComputedStyle(el_cvv)['-webkit-text-security'] == 'string'){
+        el_cvv.type = 'tel';
+      }
     },
 
     showModal: function() {
