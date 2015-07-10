@@ -91,7 +91,7 @@
 
   var ensureNumeric = function(e){
     if(!e) return '';
-    if(e.metaKey || e.ctrlKey) return false;
+    if(e.metaKey || e.ctrlKey || e.which == 13) return false;
     var char = String.fromCharCode(e.which || e.keyCode);
     if(/[0-9]/.test(char)){
       return char;
@@ -139,7 +139,6 @@
 
   var formatExpiryBack = function(e){
     if(e.which != 8) return;
-
     var el = this;
     var pos = checkSelection(el);
     

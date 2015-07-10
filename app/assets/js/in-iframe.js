@@ -159,10 +159,10 @@
         el.parentNode.setAttribute('cardtype', type);
         discreet.setNumberValidity.call(el);
         
-        if(type != 'maestro'){
-          $('nocvv-check')[0].checked = false;
-          discreet.toggle_nocvv();
-        }
+        // if(type != 'maestro'){
+          // $('nocvv-check')[0].checked = false;
+          // discreet.toggle_nocvv();
+        // }
       }
       $el_number.on('blur', discreet.setNumberValidity);
       Razorpay.card.formatNumber($el_number[0]);
