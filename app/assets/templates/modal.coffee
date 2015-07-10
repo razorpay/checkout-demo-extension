@@ -56,7 +56,7 @@ templates.modal = '
             {{? it.method.wallet }}
               <li data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
                 <div id="paytm-wrapper">
-                  <img class="paytm-logo" src="//checkout.razorpay.com/v1/images/paytm.png" width="40px" height="24px" onerror="this.parentNode.innerHTML=\'<div class=\\\'paytm-logo\\\'>Paytm</div>\'">
+                  <img class="paytm-logo" src="//checkout.razorpay.com/v1/images/paytm.png" width="40px" height="24px" onerror="this.parentNode.style.overflow=\'visible\'; this.parentNode.innerHTML=\'Paytm\'">
                   <img class="paytm-logo colored" src="//checkout.razorpay.com/v1/images/paytm.png" width="40px" height="24px">
                 </div>
               </li>

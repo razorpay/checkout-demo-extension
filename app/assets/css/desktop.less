@@ -496,10 +496,9 @@ button{
   }
 }
 #paytm-wrapper{
-  width: 40px;
-  display: inline-block;
   margin-top: 18px;
   height: 12px;
+  line-height: 12px;
   overflow: hidden;
   position: relative;
   img{
@@ -507,19 +506,19 @@ button{
   }
   .colored{
     display: none;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-  }
-  div{
-    font-size: 14px;
-    line-height: 14px;
+    position: relative;
+    top: -12px;
   }
 }
 li{
   &:hover, &.active{
-    #paytm-wrapper .colored{
-      display: block;
+    #paytm-wrapper{
+      img{
+        display: none;
+      }
+      .colored{
+        display: inline-block;
+      }
     }
   }
 }
