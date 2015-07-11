@@ -23,7 +23,12 @@
 		.transform(none);
 	}
 	#powered-by{
-		display: none;
+		position: absolute;
+		top: 0;
+		visibility: hidden!important;
+		bottom: auto;
+		z-index: -1;
+		pointer-events: none;
 	}
 	button{
 		border-radius: 0;
