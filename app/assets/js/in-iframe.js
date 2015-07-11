@@ -9,18 +9,6 @@
     $el: null,
     rzp: null,
 
-    postMessage: function(message){
-      if(window.CheckoutBridge){
-        discreet.notifyBridge(message);
-      } else if(window != window.parent){
-        message.source = 'frame';
-        if(typeof message != 'string'){
-          message = JSON.stringify(message);
-        }
-        window.parent.postMessage(message, '*');
-      }
-    },
-
     shake: function(){
       if(discreet.modal){
         var el = $(discreet.modal.modalElement);
@@ -209,10 +197,10 @@
       // init modal
       var modalOptions = {
         onhide: function(){
-          discreet.postMessage({event: 'dismiss'});
+          Razorpay.sendMessage({event: 'dismiss'});
         },
         onhidden: function(){
-          discreet.postMessage({event: 'hidden'});
+          Razorpay.sendMessage({event: 'hidden'});
         }
       }
 
@@ -333,7 +321,7 @@
         success: discreet.successHandler
       })
 
-      discreet.postMessage({
+      Razorpay.sendMessage({
         event: 'submit',
         data: {
           method: data.method
@@ -395,7 +383,7 @@
     },
 
     successHandler: function(response){
-      discreet.postMessage({ event: 'success', data: response});
+      Razorpay.sendMessage({ event: 'success', data: response});
       discreet.hide();
     },
 
@@ -445,6 +433,18 @@
     }
   }
 
+  Razorpay.sendMessage = function(message){
+    if(window.CheckoutBridge){
+      discreet.notifyBridge(message);
+    } else if(window != window.parent){
+      message.source = 'frame';
+      if(typeof message != 'string'){
+        message = JSON.stringify(message);
+      }
+      window.parent.postMessage(message, '*');
+    }
+  }
+
   window.handleMessage = function(message){
     if(typeof message != 'object'){
       return;
@@ -454,7 +454,7 @@
         discreet.rzp = new Razorpay(message.options);
         discreet.configureRollbar(message);
       } catch(e){
-        discreet.postMessage({event: 'fault', data: e.message});
+        Razorpay.sendMessage({event: 'fault', data: e.message});
         Rollbar.error(e.message, message);
         return;
       }
@@ -490,7 +490,7 @@
     window.attachEvent('onmessage', discreet.parseMessage);
   }
 
-  discreet.postMessage({event: 'load'});
+  Razorpay.sendMessage({event: 'load'});
 
 // @if NODE_ENV='test'
   window.frameDiscreet = discreet;

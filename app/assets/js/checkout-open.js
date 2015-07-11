@@ -161,6 +161,7 @@
       return;
     }
     var event = data.event;
+    data = data.data;
 
     if(event == 'load'){
       discreet.setMetaViewport();
@@ -180,9 +181,13 @@
       return discreet.sendFrameMessage.call(this, response);
     }
 
+    else if(event == 'redirect'){
+      discreet.nextRequestRedirect(data);
+    }
+
     else if (event == 'submit'){
       if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit == 'function'){
-        window.CheckoutBridge.onsubmit(JSON.stringify(data.data));
+        window.CheckoutBridge.onsubmit(JSON.stringify(data));
       }
     }
 
@@ -202,7 +207,7 @@
         this.checkoutFrame.setAttribute('removable', true);
       }
       if(typeof this.options.handler == 'function'){
-        this.options.handler.call(null, data.data);
+        this.options.handler.call(null, data);
       }
     } else if (event == 'fault'){
       alert("Oops! Something went wrong.");
