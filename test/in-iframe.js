@@ -74,6 +74,25 @@ describe("init options.method: ", function(){
     expect(jQuery('.tab-content:visible').length).toBe(1);
   })
 })
+
+describe("nextRequestRedirect", function(){
+  it("should postMessage data to parent if inside iframe", function(){
+    var parent = window.parent;
+    window.parent = {postMessage: jQuery.noop};
+
+    var nextRequestData = {};
+    var spy = jasmine.createSpy();
+
+    spyOn(Razorpay, 'sendMessage').and.callFake(function(msg){
+      if(msg.event == 'redirect' && msg.data == nextRequestData)
+        spy();
+    })
+
+    discreet.nextRequestRedirect(nextRequestData);
+    window.parent = parent;
+  })
+})
+
 //describe("message listener should", function(){
 //  it("throw error on erroneous options", function(done){
 //    var spyCalled = jasmine.createSpy();

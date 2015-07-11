@@ -251,7 +251,7 @@
 
   discreet.nextRequestRedirect = function(data){
     if(window != window.parent && typeof Razorpay.sendMessage == 'function'){
-      return window.sendMessage({event: 'redirect', data: data});
+      return Razorpay.sendMessage({event: 'redirect', data: data});
     }
     if(data.method == 'get'){
       location.href = data.url;
