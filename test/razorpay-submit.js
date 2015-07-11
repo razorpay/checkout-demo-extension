@@ -213,19 +213,19 @@ describe("navigatePopup method should", function(){
   })
 })
 
-describe("api ajax handler should", function(){
-  var req = jQuery.extend(true, {}, request);
+describe("api ajax handler should invoke", function(){
   var init_options = jQuery.extend(true, {}, options);
-  var responseData, rzp;
+  var responseData, rzp, req;
 
   beforeEach(function(){
+    req = jQuery.extend(true, {}, request);
     spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
       options.success(responseData);
     })
     rzp = new Razorpay(init_options)
   })
 
-  it("invoke request.error", function(){
+  it("request.error", function(){
     responseData = {
       version: 1,
       error: {description: 'gpl'},
@@ -237,7 +237,7 @@ describe("api ajax handler should", function(){
     expect(spy).toHaveBeenCalled();
   })
 
-  it("invoke navigatePopup when next request details are there", function(){
+  it("navigatePopup when next request details are there", function(){
     var isSameObj;
     responseData = {
       version: 1,
@@ -253,6 +253,25 @@ describe("api ajax handler should", function(){
     Razorpay.payment.authorize(req);
     expect(isSameObj).toBe(true);
   });
+
+  it("redirection if callback_url is passed", function(){
+    var spy = jasmine.createSpy();
+    var nextUrl = 'next.url'
+    responseData = {
+      version: 1,
+      request: {
+        url: nextUrl
+      }
+    };
+    
+    spyOn(discreet, 'nextRequestRedirect').and.callFake(function(data){
+      if(data.url == nextUrl)
+        spy();
+    });
+    req.data.callback_url = 'http://hello.world';
+    Razorpay.payment.authorize(req);
+    expect(spy).toHaveBeenCalled();
+  })
 });
 
 describe("getMethods should", function(){
