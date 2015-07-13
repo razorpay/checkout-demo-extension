@@ -130,10 +130,13 @@
     else{
       if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + char + suffix))
         e && e.preventDefault();
+      if(pos == 6)
+        card.filled(this);
       return;
     }
     this.value = (prenums + char + sufnums).slice(0, 7);
-    setCaret(this, (prefix + char).length);
+    pos = (prefix + char).length;
+    setCaret(this, pos);
     e && e.preventDefault();
   }
 
@@ -169,8 +172,11 @@
 
     this.value = value.replace(cardobj.space, cardobj.subs);
     var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
-    pos += prespace && ++prespace.length || 1;
+    var posdelta = prespace && ++prespace.length || 1;
+    pos += posdelta;
     setCaret(this, pos);
+    if(value.length == cardobj.length)
+      card.filled(this);
   }
 
   var formatNumberBack = function(e){
@@ -239,7 +245,8 @@
       return false;
     },
     getType: cardType,
-    setType: $.noop
+    setType: $.noop,
+    filled: $.noop
   }
 
 })(Razorpay);

@@ -152,6 +152,14 @@
           // discreet.toggle_nocvv();
         // }
       }
+
+      Razorpay.card.filled = function(el){
+        if(el == el_expiry)
+          el_cvv.focus();
+        else
+          el_expiry.focus();
+      }
+      
       $el_number.on('blur', discreet.setNumberValidity);
       Razorpay.card.formatNumber($el_number[0]);
       Razorpay.card.formatExpiry(el_expiry);
