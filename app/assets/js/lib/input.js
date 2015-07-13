@@ -6,6 +6,7 @@
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
+  var shim_placeholder = document.createElement("input").placeholder == undefined;
 
   var detectSupport = function(){
     var div = document.createElement('div');
@@ -90,7 +91,7 @@
     init: function(){
       this.refresh(function(child){
         var attr = child.getAttribute('placeholder');
-        if(attr && typeof child.placeholder != 'string'){
+        if(attr && shim_placeholder){
           var placeholder = document.createElement('span');
           placeholder.className = 'placeholder';
           placeholder.innerHTML = attr;

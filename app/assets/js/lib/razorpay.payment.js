@@ -131,7 +131,7 @@
       if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + char + suffix))
         e && e.preventDefault();
       if(pos == 6)
-        card.filled(this);
+        setTimeout(function(){card.filled(this)});
       return;
     }
     this.value = (prenums + char + sufnums).slice(0, 7);
