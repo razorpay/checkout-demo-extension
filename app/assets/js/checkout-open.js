@@ -190,7 +190,7 @@
         window.CheckoutBridge.onsubmit(JSON.stringify(data));
       }
     }
-
+    
     else if (event == 'dismiss'){
       if(typeof this.options.modal.ondismiss == 'function')
         this.options.modal.ondismiss()

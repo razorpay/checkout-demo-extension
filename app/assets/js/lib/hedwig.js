@@ -17,7 +17,11 @@
   
   discreet.hedwig = {
     setupCC: function(ccHubLocation){
-      var frame = discreet.hedwig.ccFrame = document.createElement('iframe');
+      var frame = discreet.hedwig.ccFrame;
+      if(frame && frame.parentNode)
+        frame.parentNode.removeChild(frame);
+      
+      frame = discreet.hedwig.ccFrame = document.createElement('iframe');
       frame.width = 0;
       frame.height = 0;
       frame.style.display = 'none';
