@@ -9,7 +9,6 @@
  *
  */
 
-// TODO 3dsecure in iframe
 (function(root){
   var discreet = root.discreet;
   var ua = navigator.userAgent;
