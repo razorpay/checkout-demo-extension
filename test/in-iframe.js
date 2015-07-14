@@ -633,3 +633,18 @@ describe("Razorpay open netbanking page", function(){
     });
   })
 });
+
+it("CheckoutBridge", function(){
+  it("should be notified", function(){
+    var data = {};
+    var spy = jasmine.createSpy();
+    window.CheckoutBridge = {
+      onevt: function(msg){
+        if(msg.data == data)
+          spy()
+      }
+    };
+    frameDiscreet.notifyBridge({event: 'evt', data: data});
+    expect(spy).toHaveBeenCalled();
+  })
+})
