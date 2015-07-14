@@ -136,10 +136,13 @@
       }
       return;
     }
-    this.value = (prenums + char + sufnums).slice(0, 7);
-    pos = (prefix + char).length;
-    setCaret(this, pos);
     e && e.preventDefault();
+    
+    setTimeout(function(){
+      this.value = (prenums + char + sufnums).slice(0, 7);
+      pos = (prefix + char).length;
+      setCaret(this, pos);
+    })
   }
 
   var formatExpiryBack = function(e){
