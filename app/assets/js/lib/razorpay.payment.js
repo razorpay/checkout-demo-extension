@@ -170,15 +170,21 @@
 
     if(e) e.preventDefault();
     if(prefix.length + suffix.length >= cardobj.length) return;
-    pos = prefix.length;
 
-    this.value = value.replace(cardobj.space, cardobj.subs);
-    var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
-    var posdelta = prespace && ++prespace.length || 1;
-    pos += posdelta;
-    setCaret(this, pos);
-    if(value.length == cardobj.length)
-      card.filled(this);
+    var el = this;
+
+    setTimeout(function(){
+      el.value = value.replace(cardobj.space, cardobj.subs);
+
+      if(suffix){
+        pos = prefix.length;
+        var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
+        pos += prespace && ++prespace.length || 1;
+        setCaret(el, pos);
+      }
+      if(value.length == cardobj.length)
+        card.filled(el);
+    })
   }
 
   var formatNumberBack = function(e){
