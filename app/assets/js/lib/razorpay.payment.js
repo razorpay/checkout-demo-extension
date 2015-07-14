@@ -112,6 +112,7 @@
     var prenums = prefix.replace(/[^0-9]/g,'');
     var suffix = value.slice(pos);
     var sufnums = suffix.replace(/[^0-9]/g,'');
+    var el = this;
 
     if(pos == 0){
       if(/0|1/.test(char))
@@ -130,18 +131,16 @@
     else{
       if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + char + suffix))
         e && e.preventDefault();
-      if(pos == 6){
-        var el = this;
+      if(pos == 6)
         setTimeout(function(){card.filled(el)});
-      }
       return;
     }
     e && e.preventDefault();
-    
+
     setTimeout(function(){
-      this.value = (prenums + char + sufnums).slice(0, 7);
+      el.value = (prenums + char + sufnums).slice(0, 7);
       pos = (prefix + char).length;
-      setCaret(this, pos);
+      setCaret(el, pos);
     })
   }
 
