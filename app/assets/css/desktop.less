@@ -116,8 +116,8 @@ input, select, textarea{
   position: relative;
 }
 input, textarea, .placeholder{
-  height: @input-height;
-  line-height: @input-height;
+  height: @input-height/2;
+  line-height: @input-height/2;
   padding: 0 @input-padding;
   .box-sizing(border-box);
 }
@@ -227,15 +227,17 @@ button{
 }
 .placeholder{
   position: absolute;
-  top: 0;
+  top: @input-height/4;
   left: 0;
   color: #999;
 }
 .double{
   white-space: nowrap;
   font-size: 0;
+  letter-spacing: -4px;
   .elem{
     font-size: @font-size;
+    letter-spacing: 0;
     display: inline-block;
     width: (@width - 3px)/2 - @padding;
     *float: left;
@@ -451,6 +453,7 @@ button{
   margin: 0 -20px;
   padding: 0;
   font-size: 0;
+  letter-spacing: -4px;
   white-space: nowrap;
   display: none;
   *margin-bottom: -20px; // ie7
@@ -469,13 +472,15 @@ button{
   li{
     *float: left; // <ie7
     list-style: none;
-    line-height: 48px;
+    line-height: 50px;
+    margin: 0;
     height: 48px;
     text-align: center;
     border: 1px solid @border-color;
     border-right: none;
     width: (@width - 1px)/2;
     font-size: @font-size;
+    letter-spacing: 0;
     cursor: pointer;
     background: #fff;
     padding-bottom: 2px;

@@ -97,7 +97,7 @@
       which = e.keyCode;
     }
 
-    if(e.metaKey || e.ctrlKey || which == 13 || which == 9 || which == 8 || which == 0) return false;
+    if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) return false;
     var char = String.fromCharCode(which);
     if(/[0-9]/.test(char)){
       return char;
@@ -138,7 +138,7 @@
       if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + char + suffix))
         e && e.preventDefault();
       if(pos == 6)
-        setTimeout(function(){card.filled(el)});
+        setTimeout(function(){card.filled(el)}, 200);
       return;
     }
     e && e.preventDefault();
