@@ -62,6 +62,8 @@
   }
 
   var setCaret = function(el, pos){
+    if(navigator.userAgent.indexOf('Android'))
+       return;
     if(typeof el.selectionStart == 'number')
       el.selectionStart = el.selectionEnd = pos;
     else {
