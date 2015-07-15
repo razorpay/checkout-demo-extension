@@ -1,9 +1,4 @@
 (function(root){
-  var callListener = function(callback, el, e){
-    if(/^key/.test(e.type)) !e.which && (e.which = e.keyCode);
-    callback.call(el, e);
-  }
-
   var jsonp = function(options){
     !options.data && (options.data = {});
     var callback = options.data.callback = 'jsonp_' + randomString(15);
@@ -85,7 +80,7 @@
       if (window.addEventListener) {
         ref = function(e){
           if(e.target.nodeType == 3) e.target = e.target.parentNode;// textNode target
-          callListener(callback, this, e);
+          callback.call(this, e);
         }
         el.addEventListener(event, ref, !!capture);
       } else if(window.attachEvent){
@@ -93,7 +88,7 @@
           if(!e) var e = window.event;
           if(!e.target) e.target = e.srcElement || document;
           if(!e.preventDefault) e.preventDefault = function(){this.returnValue = false};
-          callListener(callback, el, e);
+          callback.call(el, e);
         }
         el.attachEvent('on' + event, ref);
       }

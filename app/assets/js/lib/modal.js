@@ -163,7 +163,7 @@
       
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
-          if (e.which === 27 && this.options.backdropClose) {
+          if ((e.which || e.keyCode) === 27 && this.options.backdropClose) {
             this.hide();
           }
         })
