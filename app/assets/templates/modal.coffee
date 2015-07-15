@@ -70,15 +70,15 @@ templates.modal = '
               </p>
               <p class="elem" id="elem-card">
                 <span class="help-text">Please enter valid card number.</span>
-                <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off">
+                <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19">
                 <i>&#xe605;</i>
                 <label class="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check"> My card doesn\'t have expiry or CVV</label>
               </p>
               <div class="double">
                 <p class="elem elem-expiry" style="border-radius: 0 0 0 4px">
                   <i>&#xe606;</i>
-                  <span class="help-text">Please enter valid card expiry.</span>
-                  <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) \/ [0-9]{2}" maxlength="7">
+                  <span class="help-text">Please enter valid card expiry<br>in MM / YY format.</span>
+                  <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?[0-9]{2}" maxlength="7">
                 </p>
                 <p class="elem elem-cvv" style="border-radius: 0 0 4px 0">
                   <i>&#xe604;</i>

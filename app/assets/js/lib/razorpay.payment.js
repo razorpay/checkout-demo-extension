@@ -91,8 +91,13 @@
 
   var ensureNumeric = function(e){
     if(!e) return '';
-    var which = e.which || e.keyCode;
-    if(e.metaKey || e.ctrlKey || which == 13 || which == 9) return false;
+
+    var which = e.which;
+    if(typeof which != 'number'){
+      which = e.keyCode;
+    }
+
+    if(e.metaKey || e.ctrlKey || which == 13 || which == 9 || which == 8 || which == 0) return false;
     var char = String.fromCharCode(which);
     if(/[0-9]/.test(char)){
       return char;

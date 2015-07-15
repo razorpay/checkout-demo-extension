@@ -366,7 +366,7 @@
         if(!data['card[cvv]'])
           data['card[cvv]'] = '';
 
-        var expiry = data['card[expiry]'].replace(/\ /g, '').split('/');
+        var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
         data['card[expiry_month]'] = expiry[0];
         data['card[expiry_year]'] = expiry[1];
         delete data['card[expiry]'];
