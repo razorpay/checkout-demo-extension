@@ -79,7 +79,7 @@ body, html{
   }
 }
 .font-loaded{
-  .modal, button, input, select, textarea {
+  .modal, button, input, select {
     font-family: @font-family;
     -webkit-font-feature-settings: "liga" 0;
     -moz-font-feature-settings: "liga" 0;
@@ -99,13 +99,21 @@ body, html{
 label{
   vertical-align: middle;
 }
-button, input, select, textarea{
+.placeholder{
+  position: absolute;
+  top: @input-height/4;
+  left: 0;
+  color: #999;
+}
+button, input, select {
   border: none;
   background: none;
   font-family: @font-default;
   outline: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0); 
+  -webkit-tap-highlight-color: transparent;
 }
-input, select, textarea{
+input, select {
   border-radius: inherit;
   display: inline-block;
   color: inherit;
@@ -115,7 +123,7 @@ input, select, textarea{
   background: none;
   position: relative;
 }
-input, textarea, .placeholder{
+input, .placeholder{
   height: @input-height/2;
   line-height: @input-height/2;
   padding: 0 @input-padding;
@@ -224,12 +232,6 @@ button{
       display: none;
     }
   }
-}
-.placeholder{
-  position: absolute;
-  top: @input-height/4;
-  left: 0;
-  color: #999;
 }
 .double{
   white-space: nowrap;

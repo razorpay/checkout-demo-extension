@@ -66,7 +66,10 @@
          parent = parent.parentNode;
 
       var child = $(parent).children('input');
-      child.length && child[0].focus();
+      if(child.length)
+        setTimeout(function(){
+          child[0].focus()
+        })
     },
 
     input: function(e){
