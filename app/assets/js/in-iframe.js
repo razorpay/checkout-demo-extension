@@ -217,7 +217,7 @@
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
       // event listeners
-      $('nocvv-check').on('change', discreet.toggle_nocvv)
+      // $('nocvv-check').on('change', discreet.toggle_nocvv)
       $('tabs').on('click', discreet.tab_change);
       $('form').on('submit', function(e){
         discreet.formSubmit(e);
@@ -272,15 +272,15 @@
       }, 300);
     },
 
-    toggle_nocvv: function(){
-      var checked = this.checked;
-      for(var i in {card_expiry: 0, card_cvv: 0}){
-        var el = $(i).removeClass('invalid')[0];
-        el.value = '';
-        el.disabled = checked;
-        el.required = !checked;
-      }
-    },
+    // toggle_nocvv: function(){
+    //   var checked = this.checked;
+    //   for(var i in {card_expiry: 0, card_cvv: 0}){
+    //     var el = $(i).removeClass('invalid')[0];
+    //     el.value = '';
+    //     el.disabled = checked;
+    //     el.required = !checked;
+    //   }
+    // },
 
     applyFont: function(anchor, retryCount){
       if(!retryCount) retryCount = 0;
@@ -303,7 +303,7 @@
 
     formSubmit: function(e) {
       discreet.smarty.refresh();
-      // form.find('.input[name="card[number]"], .input[name="card[cvv]"]').trigger('blur');
+
       if (discreet.isInvalid('form-common'))
         return;
 
@@ -361,11 +361,11 @@
       if(targetTab == 'tab-card'){
         data['card[number]'] = data['card[number]'].replace(/\ /g, '');
         
-        if(!data['card[expiry]'])
-          data['card[expiry]'] = '';
+        // if(!data['card[expiry]'])
+        //   data['card[expiry]'] = '';
 
-        if(!data['card[cvv]'])
-          data['card[cvv]'] = '';
+        // if(!data['card[cvv]'])
+        //   data['card[cvv]'] = '';
 
         var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
         data['card[expiry_month]'] = expiry[0];
@@ -467,9 +467,7 @@
         Rollbar.error(e.message, message);
         return;
       }
-      // setTimeout(function(){
       discreet.showModal();
-    // },100)
     } else if(message.event == 'close'){
       discreet.hide();
     } else if(message.event == 'open' && discreet.rzp){

@@ -93,48 +93,53 @@ describe("nextRequestRedirect", function(){
   })
 })
 
-//describe("message listener should", function(){
-//  it("throw error on erroneous options", function(done){
-//    var spyCalled = jasmine.createSpy();
-//    var origRazorpay = Razorpay;
-//    var custom_options = jQuery.extend(true, {}, coOptions);
-//    custom_options.amount = 'dsf';
-//
-//    afterEach(function(){
-//      frameDiscreet.hide();
-//      $('.container').remove();
-//    });
-//
-//    spyOn(window, 'Razorpay').and.callFake(function(argOptions){
-//      try{
-//        return new origRazorpay(argOptions)
-//      } catch(e){
-//        spyCalled();
-//        throw new Error("custom error");
-//      }
-//    });
-//    frameDiscreet.postMessage({options: custom_options}, '*');
-//    setTimeout(function(){
-//      expect(spyCalled).toHaveBeenCalled();
-//      done();
-//    }, 0)
-//  })
-//
-//  it("init razorpay on receiving init options", function(done){
-//  	var spyCalled = jasmine.createSpy();
-//    var origRazorpay = Razorpay;
-//    spyOn(window, 'Razorpay').and.callFake(function(argOptions){
-//      spyCalled();
-//      return new origRazorpay(argOptions)
-//    })
-//    frameDiscreet.postMessage({options: coOptions}, '*');
-//    setTimeout(function(){
-//      expect(spyCalled).toHaveBeenCalled();
-//      done();
-//    }, 0)
-//  })
-//})
+describe("payment authorization", function(){
+  var opts;
 
+  beforeEach(function(){
+    opts = jQuery.extend(true, {}, coOptions);
+  })
+
+  describe("error handler should", function(){
+    var response = {error: {}};
+
+    beforeEach(function(){
+      openCheckoutForm(opts);
+    })
+
+
+    it("display default error discription", function(){
+      frameDiscreet.errorHandler(response);
+      expect(jQuery('#error-container')).toBeVisible();
+      expect(jQuery('#error-message').html().length > 0).toBe(true);
+    })
+
+    it("display custom error description", function(){
+      var str = 'hello error';
+      response.error.description = str;
+      frameDiscreet.errorHandler(response);
+      expect(jQuery('#error-container')).toBeVisible();
+      expect(jQuery('#error-message').html()).toBe(str);
+    })
+
+    it("focus related field and apply invalid", function(){
+      var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
+      response.error.field = field_el.prop('name');
+      frameDiscreet.errorHandler(response);
+      expect(jQuery('#error-container')).toBeVisible();
+      expect(field_el[0]).toBe(document.activeElement);
+      expect(field_el.parent().hasClass('invalid')).toBe(true);
+    })
+  })
+
+  it("success handler should hide form", function(){
+    openCheckoutForm(opts);
+    var spy = jasmine.createSpy();
+    spyOn(frameDiscreet, 'hide').and.callFake(spy);
+    frameDiscreet.successHandler();
+    expect(spy).toHaveBeenCalled();
+  })
+})
 
 describe("init options.method", function(){
   var opts;
