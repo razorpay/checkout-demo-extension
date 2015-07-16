@@ -88,13 +88,9 @@
             callback(response);
           }
         },
-        complete: function(xhr, status){
-          if(status != "success" && typeof callback == 'function'){
-            var response = xhr.responseJSON;
-            if(!response || !('error' in response))
-              response = {error: true};
-            callback(response);
-          }
+        complete: function(data){
+          if(typeof data == 'object' && data.error && typeof callback == 'function')
+            callback({error: true});
         }
       });
     },

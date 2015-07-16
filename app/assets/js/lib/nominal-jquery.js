@@ -21,8 +21,8 @@
     script.async = true;
 
     script.onerror = function(e){
-      params.error({ url: script.src, event: e })
-      params.complete({ url: script.src, event: e }, params)
+      params.error({ error: true, url: script.src, event: e });
+      params.complete({ error: true, url: script.src, event: e }, params);
     }
 
     script.onload = script.onreadystatechange = function(){

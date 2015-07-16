@@ -37,8 +37,12 @@ var no3dsecureResponse = {
 
 var request = {
   data: {
-    'key1': 'value1',
-    'key2': 'value2'
+    key1: 'value1',
+    key2: 'value2',
+    notes: {
+      note1: 'one',
+      note2: 'two'
+    }
   }
 }
 
@@ -62,7 +66,10 @@ describe("authorize should", function(){
     spyOn(Razorpay.payment, 'validate').and.callFake(function(){
       return [null];
     })
+    expect(Razorpay.payment.authorize(123)).toBe(false);
+    expect(Razorpay.payment.authorize({data: true})).toBe(false);
     expect(Razorpay.payment.authorize(req)).toBe(false);
+    expect(function(){Razorpay.payment.authorize(req, true)}).toThrow();
   });
 
   it("submit html post form if redirect flag is passed", function(){
@@ -75,6 +82,21 @@ describe("authorize should", function(){
     expect(spyCalled).toHaveBeenCalled();
     Razorpay.configure({redirect: false});
   });
+
+  it("break down notes", function(){
+    expect(typeof req.data.notes).toBe('object');
+    Razorpay.payment.authorize(req);
+    expect(typeof req.data.notes).toBe('undefined');
+    expect(req.data['notes[note1]']).toBe('one');
+    expect(req.data['notes[note2]']).toBe('two');
+  })
+
+  it("add callback_url if specified in options", function(){
+    discreet.defaults.callback_url = 'swag';
+    Razorpay.payment.authorize(req);
+    expect(req.data.callback_url).toBe('swag');
+    discreet.defaults.callback_url = ''; // reset
+  })
 
   it("add merchant key in request data", function(){
     Razorpay.payment.authorize(req);

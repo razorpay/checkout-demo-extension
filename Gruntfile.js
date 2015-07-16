@@ -116,7 +116,8 @@ module.exports = function(grunt){
         name: 'razorpay.js',
         options: {
           preprocessors: {
-            'app/srv/js/razorpay-submit.js': ['coverage']
+            'app/srv/js/razorpay-submit.js': ['coverage'],
+            'app/srv/js/razorpay-hedwig.js': ['coverage']
           },
           coverageReporter: {
             type : 'json',
