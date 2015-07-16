@@ -147,7 +147,7 @@ describe("init options.method", function(){
   beforeEach(function(){
     opts = jQuery.extend(true, {}, coOptions);
     delete opts.method;
-    window.payment_methods = jQuery.extend(true, {}, orig_methods);
+    window.payment_methods = JSON.parse(JSON.stringify(orig_methods));
   })
 
   afterEach(function(){
@@ -172,6 +172,8 @@ describe("init options.method", function(){
         }
       }
     }
+
+    window.payment_methods = orig_methods;
   })
 
   it("should enable all options by default and show card initially", function(){
@@ -179,11 +181,24 @@ describe("init options.method", function(){
   });
 
   for(var m in window.payment_methods){
+    // disable 1 tab, m is disabled one
     it("should hide " + m + " if specified false", (function(m){
       return function(){
         disableVal = m == 'wallet' ? {} : false;
         window.payment_methods[m] = disableVal;
         disable = [m];
+      }
+    })(m))
+
+    // disable 2 tabs, m is enabled one
+    it("should hide " + m + " if specified false", (function(m){
+      return function(){
+        disable = Object.keys(window.payment_methods);
+        disable.splice(disable.indexOf(m), 1);
+        disable.forEach(function(disabledTab){
+          disableVal = disabledTab == 'wallet' ? {} : false;
+          window.payment_methods[disabledTab] = disableVal;
+        })
       }
     })(m))
   }
