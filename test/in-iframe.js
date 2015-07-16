@@ -157,7 +157,7 @@ describe("init options.method", function(){
     expect(jQuery('#tabs li').length).toBe(countVisible);
     
     disable.forEach(function(meth){
-      expect(jQuery('#tab-' + meth)).not.toBeVisible();
+      expect(jQuery('#tab-' + meth).length).toBe(0);
     })
 
     var active;
@@ -246,330 +246,190 @@ describe("Razorpay open cc and submit method", function(){
   var $ccSubmit;
   var customOptions;
 
-  beforeEach(function(){
-    spyCalled    = jasmine.createSpy();
-    spyNotCalled = jasmine.createSpy();
-
-    customOptions = jQuery.extend(true, {}, coOptions);
-  });
-
-  function launch(){
-    // For opening the modal
-    openCheckoutForm(customOptions);
-    co = frameDiscreet.rzp;
-
-    $ccNumber    = jQuery('.input[name="card[number]"]');
-    $ccExpiry    = jQuery('.input[name="card[expiry]"]');
-    $ccCVV       = jQuery('.input[name="card[cvv]"]');
-    $name        = jQuery('.input[name="card[name]"]');
-    $email       = jQuery('.input[name="email"]');
-    $contact     = jQuery('.input[name="contact"]');
-    $ccSubmit    = jQuery('#submitbtn');
-    $ccForm      = jQuery('#form');
-  }
-
-  function addAllCC(){
-    $ccNumber.sendkeys(cc.number);
-    $ccExpiry.val(cc.expiry);
-    $ccCVV.sendkeys(cc.cvv);
-  }
-
-  afterEach(function(done){
-    setTimeout(function(){
-      sendclick($ccSubmit[0]);
-      expect(spyCalled).toHaveBeenCalled();
-      expect(spyNotCalled).not.toHaveBeenCalled();
-      frameDiscreet.hide();
-      done();
-    });
-  })
-
-  describe("with all details in place", function(){
-    var field;
-    var value;
-
-    afterEach(function(){
-      addAllCC();
-
-      spyOn($, 'ajax').and.callFake(function(options){
-        spyCalled();
-        expect(options.data[field]).toBe(value);
-      });
-    });
-
-    it("should submit with all details in place", function(){
-      launch();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-        spyCalled();
-      });
-    });
-
-    describe(": in ajax request to server", function(){
-      it("should pass signature if set", function(){
-        customOptions.signature = 'asdasd';
-        launch();
-        field = 'signature';
-        value = customOptions.signature;
-      });
-
-      it("should not pass signature if not set", function(){
-        launch();
-        field = 'signature';
-        value = undefined;
-      });
-
-      it("should pass amount", function(){
-        launch();
-        field = 'amount';
-        value = customOptions.amount;
-      });
-
-      it("should pass currency", function(){
-        launch();
-        field = 'currency';
-        value = 'INR';
-      });
-
-      it("should pass email", function(){
-        launch();
-        field = 'email';
-        value = customOptions.prefill.email;
-      });
-
-      it("should pass contact", function(){
-        launch();
-        field = 'contact';
-        value = customOptions.prefill.contact;
-      });
-
-      it("should pass description", function(){
-        launch();
-        field = 'description';
-        value = customOptions.description;
-      });
-
-      it("should pass card[name]", function(){
-        launch();
-        field = 'card[name]';
-        value = customOptions.prefill.name;
-      });
-
-      it("should pass card[number]", function(){
-        launch();
-        field = 'card[number]';
-        value = cc.number;
-      });
-
-      it("should pass card[cvv]", function(){
-        launch();
-        field = 'card[cvv]';
-        value = cc.cvv;
-      });
-
-      it("should pass card[expiry_month]", function(){
-        launch();
-        field = 'card[expiry_month]';
-        value = cc.expiry_month;
-      });
-
-      it("should pass card[expiry_year]", function(){
-        launch();
-        field = 'card[expiry_year]';
-        value = cc.expiry_year;
-      });
-
-      it("should pass notes[address]", function(){
-        launch();
-        field = 'notes[address]';
-        value = coOptions.notes.address;
-      });
-    })
-  })
-
-  it("should not submit without cc card", function(){
-    launch();
-    $ccExpiry.val(cc.expiry);
-    $ccCVV.val(cc.cvv);
-
-    spyCalled();
-    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  it("should not submit without cc expiry", function(){
-    launch();
-    $ccNumber.sendkeys(cc.number);
-    $ccCVV.sendkeys(cc.cvv);
-
-    spyCalled();
-    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  it("should not submit without cc cvv", function(){
-    launch();
-    $ccCVV.val('').sendkeys('0');
-
-    spyCalled();
-    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  it("should not submit without name", function(){
-    customOptions.prefill.name = '';
-    launch();
-    addAllCC();
-
-    spyCalled();
-    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  it("should not submit without email", function(){
-    customOptions.prefill.email = '';
-    launch();
-    addAllCC();
-
-    spyCalled();
-    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  it("should not submit without contact", function(){
-    customOptions.prefill.contact = '';
-    launch();
-    addAllCC();
-
-    spyCalled();
-    spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-      spyNotCalled();
-    });
-  });
-
-  describe("and getFormData method", function(){
-    var co, data;
-
-    beforeEach(function(done){
-      launch();
-      addAllCC();
-      spyCalled();
-
-      setTimeout(function(){
-        data = frameDiscreet.getFormData(jQuery('.modal form'), true);
-        done();
-      }, 0);
-    });
-
-    it("should return description", function(){
-      expect(data.description).toBe(coOptions.description);
-    });
-
-    it("should return amount", function(){
-      expect(data.amount).toBe(coOptions.amount);
-    });
-
-    it("should return currency", function(){
-      expect(data.currency).toBe('INR');
-    });
-
-    it("should return contact", function(){
-      expect(data.contact).toBe(coOptions.prefill.contact);
-    });
-
-    it("should return email", function(){
-      expect(data.email).toBe(coOptions.prefill.email);
-    });
-
-    it("should return name", function(){
-      expect(data['card[name]']).toBe(coOptions.prefill.name);
-    });
-
-    it("should return card number", function(){
-      expect(data['card[number]']).toBe(cc.number);
-    });
-
-    it("should return card expiry month", function(){
-      expect(data['card[expiry_month]']).toBe(cc.expiry_month);
-    });
-
-    it("should return card expiry year", function(){
-      expect(data['card[expiry_year]']).toBe(cc.expiry_year);
-    });
-
-    it("should return card cvv", function(){
-      expect(data['card[cvv]']).toBe(cc.cvv);
-    });
-
-    it("should not return bank", function(){
-      expect(data.bank).toBeUndefined();
-    });
-  })
-});
-
-
-describe("Razorpay open netbanking page", function(){
-  var co;
-  var $email, $contact;
-
-  beforeEach(function(){
-    // For opening the modal
-    openCheckoutForm(coOptions);
-    co = frameDiscreet.rzp;
-    sendclick(jQuery('#tabs li[data-target="tab-netbanking"]')[0]);
-  });
-
-  afterEach(function(){
-    frameDiscreet.hide();
-    jQuery('#container').remove();
-  })
-
-  it("should show netbanking form on clicking", function(){
-    expect(jQuery('#tab-netbanking').hasClass('active')).toBe(true);
-    expect(jQuery('#tab-card').hasClass('active')).toBe(false);
-  });
-
-  describe("and submit method", function(){
-    var spyCalled;
-    var spyNotCalled;
-    var $email, $contact;
-    var $nbLink, $nbBank;
-    var $nbSubmit;
+  [
+    function(o){o.method.netbanking = false},
+    function(o){o.method.wallet = {}},
+    jQuery.noop
+  ].forEach(function(operation){
 
     beforeEach(function(){
       spyCalled    = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
+
+      customOptions = jQuery.extend(true, {}, coOptions);
     });
 
     function launch(){
+      // For opening the modal
+      operation(customOptions);
+      openCheckoutForm(customOptions);
+      co = frameDiscreet.rzp;
+
+      $ccNumber    = jQuery('.input[name="card[number]"]');
+      $ccExpiry    = jQuery('.input[name="card[expiry]"]');
+      $ccCVV       = jQuery('.input[name="card[cvv]"]');
+      $name        = jQuery('.input[name="card[name]"]');
       $email       = jQuery('.input[name="email"]');
       $contact     = jQuery('.input[name="contact"]');
-      $nbBank      = jQuery('select[name="bank"]');
-      $nbSubmit    = jQuery('#submitbtn');
+      $ccSubmit    = jQuery('#submitbtn');
+      $ccForm      = jQuery('#form');
     }
 
-    afterEach(function(){
-      sendclick($nbSubmit[0]);
-      expect(spyCalled).toHaveBeenCalled();
-      expect(spyNotCalled).not.toHaveBeenCalled();
-      jQuery('#container').remove();
+    function addAllCC(){
+      $ccNumber.sendkeys(cc.number);
+      $ccExpiry.val(cc.expiry);
+      $ccCVV.sendkeys(cc.cvv);
+    }
+
+    afterEach(function(done){
+      setTimeout(function(){
+        sendclick($ccSubmit[0]);
+        expect(spyCalled).toHaveBeenCalled();
+        expect(spyNotCalled).not.toHaveBeenCalled();
+        frameDiscreet.hide();
+        done();
+      });
     })
 
-    it("should submit with all details in place", function(){
-      launch();
-      $nbBank.val('SBIN');
+    describe("with all details in place", function(){
+      var field;
+      var value;
 
+      afterEach(function(){
+        addAllCC();
+
+        spyOn($, 'ajax').and.callFake(function(options){
+          spyCalled();
+          expect(options.data[field]).toBe(value);
+        });
+      });
+
+      it("should submit with all details in place", function(){
+        launch();
+        spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+          spyCalled();
+        });
+      });
+
+      describe(": in ajax request to server", function(){
+        it("should pass signature if set", function(){
+          customOptions.signature = 'asdasd';
+          launch();
+          field = 'signature';
+          value = customOptions.signature;
+        });
+
+        it("should not pass signature if not set", function(){
+          launch();
+          field = 'signature';
+          value = undefined;
+        });
+
+        it("should pass amount", function(){
+          launch();
+          field = 'amount';
+          value = customOptions.amount;
+        });
+
+        it("should pass currency", function(){
+          launch();
+          field = 'currency';
+          value = 'INR';
+        });
+
+        it("should pass email", function(){
+          launch();
+          field = 'email';
+          value = customOptions.prefill.email;
+        });
+
+        it("should pass contact", function(){
+          launch();
+          field = 'contact';
+          value = customOptions.prefill.contact;
+        });
+
+        it("should pass description", function(){
+          launch();
+          field = 'description';
+          value = customOptions.description;
+        });
+
+        it("should pass card[name]", function(){
+          launch();
+          field = 'card[name]';
+          value = customOptions.prefill.name;
+        });
+
+        it("should pass card[number]", function(){
+          launch();
+          field = 'card[number]';
+          value = cc.number;
+        });
+
+        it("should pass card[cvv]", function(){
+          launch();
+          field = 'card[cvv]';
+          value = cc.cvv;
+        });
+
+        it("should pass card[expiry_month]", function(){
+          launch();
+          field = 'card[expiry_month]';
+          value = cc.expiry_month;
+        });
+
+        it("should pass card[expiry_year]", function(){
+          launch();
+          field = 'card[expiry_year]';
+          value = cc.expiry_year;
+        });
+
+        it("should pass notes[address]", function(){
+          launch();
+          field = 'notes[address]';
+          value = coOptions.notes.address;
+        });
+      })
+    })
+
+    it("should not submit without cc card", function(){
+      launch();
+      $ccExpiry.val(cc.expiry);
+      $ccCVV.val(cc.cvv);
+
+      spyCalled();
       spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-        spyCalled();
+        spyNotCalled();
       });
     });
 
-    it("should not submit without bank selected", function(){
+    it("should not submit without cc expiry", function(){
       launch();
+      $ccNumber.sendkeys(cc.number);
+      $ccCVV.sendkeys(cc.cvv);
+
+      spyCalled();
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit without cc cvv", function(){
+      launch();
+      $ccCVV.val('').sendkeys('0');
+
+      spyCalled();
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit without name", function(){
+      customOptions.prefill.name = '';
+      launch();
+      addAllCC();
+
       spyCalled();
       spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
         spyNotCalled();
@@ -577,9 +437,9 @@ describe("Razorpay open netbanking page", function(){
     });
 
     it("should not submit without email", function(){
+      customOptions.prefill.email = '';
       launch();
-      $nbBank.val('SBIN');
-      $email.val('');
+      addAllCC();
 
       spyCalled();
       spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
@@ -588,9 +448,148 @@ describe("Razorpay open netbanking page", function(){
     });
 
     it("should not submit without contact", function(){
+      customOptions.prefill.contact = '';
       launch();
+      addAllCC();
+
+      spyCalled();
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    describe("and getFormData method", function(){
+      var co, data;
+
+      beforeEach(function(){
+        launch();
+        addAllCC();
+        spyCalled();
+
+        data = frameDiscreet.getFormData(jQuery('.modal form'), true);
+      });
+
+      it("should return description", function(){
+        expect(data.description).toBe(coOptions.description);
+      });
+
+      it("should return amount", function(){
+        expect(data.amount).toBe(coOptions.amount);
+      });
+
+      it("should return currency", function(){
+        expect(data.currency).toBe('INR');
+      });
+
+      it("should return contact", function(){
+        expect(data.contact).toBe(coOptions.prefill.contact);
+      });
+
+      it("should return email", function(){
+        expect(data.email).toBe(coOptions.prefill.email);
+      });
+
+      it("should return name", function(){
+        expect(data['card[name]']).toBe(coOptions.prefill.name);
+      });
+
+      it("should return card number", function(){
+        expect(data['card[number]']).toBe(cc.number);
+      });
+
+      it("should return card expiry month", function(){
+        expect(data['card[expiry_month]']).toBe(cc.expiry_month);
+      });
+
+      it("should return card expiry year", function(){
+        expect(data['card[expiry_year]']).toBe(cc.expiry_year);
+      });
+
+      it("should return card cvv", function(){
+        expect(data['card[cvv]']).toBe(cc.cvv);
+      });
+
+      it("should not return bank", function(){
+        expect(data.bank).toBeUndefined();
+      });
+    })
+  })
+});
+
+
+describe("Razorpay open netbanking page and submit method", function(){
+  var opts;
+  var spyCalled, spyNotCalled;
+  var $nbBank, $nbSubmit;
+
+  var launch = function(operation){
+    operation(opts);
+    openCheckoutForm(opts);
+    $nbBank = jQuery('select[name="bank"]');
+    sendclick(jQuery('#tabs li[data-target="tab-netbanking"]')[0]);
+  }
+
+  beforeEach(function(){
+    spyCalled    = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
+    opts = JSON.parse(JSON.stringify(coOptions));
+  });
+
+  afterEach(function(){
+    sendclick(jQuery('#submitbtn')[0]);
+    expect(spyCalled).toHaveBeenCalled();
+    expect(spyNotCalled).not.toHaveBeenCalled();
+    frameDiscreet.hide();
+    jQuery('#container').remove();
+  });
+
+  [
+    function(o){o.method.card = false},
+    function(o){o.method.wallet = {}},
+    jQuery.noop
+  ].forEach(function(operation){
+    
+
+    it("should show netbanking form on clicking", function(){
+      launch(operation);
+      var active = jQuery('li.active');
+      expect(active.length).toBe(1);
+      expect(active.attr('data-target')).toBe('tab-netbanking');
+      spyCalled();
+    });
+
+    it("should submit with all details in place", function(){
+      launch(operation);
       $nbBank.val('SBIN');
-      $contact.val('');
+
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+        spyCalled();
+      });
+    });
+
+    it("should not submit without bank selected", function(){
+      launch(operation);
+      spyCalled();
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit without email", function(){
+      launch(operation);
+      $nbBank.val('SBIN');
+      jQuery('.input[name="email"]').val('');
+
+      spyCalled();
+      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+        spyNotCalled();
+      });
+    });
+
+    it("should not submit without contact", function(){
+      launch(operation);
+      $nbBank.val('SBIN');
+      jQuery('.input[name="contact"]').val('');
 
       spyCalled();
       spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
@@ -598,60 +597,72 @@ describe("Razorpay open netbanking page", function(){
       });
     });
   });
+});
 
-  describe("and getFormData method", function(){
-    var data;
+describe("Razorpay netbanking getFormData method", function(){
+  var opts, data;
+
+  [
+    function(o){o.method.card = false},
+    function(o){o.method.wallet = {}},
+    jQuery.noop
+  ].forEach(function(operation){
 
     beforeEach(function(){
-      var $nbBank = jQuery('select[name="bank"]');
-      $nbBank.val('SBIN');
+      opts = JSON.parse(JSON.stringify(coOptions));
+      operation(opts);
+      openCheckoutForm(opts);
+      sendclick(jQuery('#tabs li[data-target="tab-netbanking"]')[0]);
+      jQuery('select[name="bank"]').val('SBIN');
       data = frameDiscreet.getFormData();
     });
 
-    it("should return description", function(){
-      expect(data.description).toBe(coOptions.description);
-    });
+    describe("", function(){
+      it("should return description", function(){
+        expect(data.description).toBe(coOptions.description);
+      });
 
-    it("should return amount", function(){
-      expect(data.amount).toBe(coOptions.amount);
-    });
+      it("should return amount", function(){
+        expect(data.amount).toBe(coOptions.amount);
+      });
 
-    it("should return currency", function(){
-      expect(data.currency).toBe('INR');
-    });
+      it("should return currency", function(){
+        expect(data.currency).toBe('INR');
+      });
 
-    it("should return contact", function(){
-      expect(data.contact).toBe(coOptions.prefill.contact);
-    });
+      it("should return contact", function(){
+        expect(data.contact).toBe(coOptions.prefill.contact);
+      });
 
-    it("should return email", function(){
-      expect(data.email).toBe(coOptions.prefill.email);
-    });
+      it("should return email", function(){
+        expect(data.email).toBe(coOptions.prefill.email);
+      });
 
-    it("should not return name", function(){
-      expect(data['card[name]']).toBeUndefined();
-    });
+      it("should not return name", function(){
+        expect(data['card[name]']).toBeUndefined();
+      });
 
-    it("should not return card number", function(){
-      expect(data['card[number]']).toBeUndefined();
-    });
+      it("should not return card number", function(){
+        expect(data['card[number]']).toBeUndefined();
+      });
 
-    it("should not return card expiry month", function(){
-      expect(data['card[expiry_month]']).toBeUndefined();
-    });
+      it("should not return card expiry month", function(){
+        expect(data['card[expiry_month]']).toBeUndefined();
+      });
 
-    it("should not return card expiry year", function(){
-      expect(data['card[expiry_year]']).toBeUndefined();
-    });
+      it("should not return card expiry year", function(){
+        expect(data['card[expiry_year]']).toBeUndefined();
+      });
 
-    it("should not return card cvv", function(){
-      expect(data['card[cvv]']).toBeUndefined();
-    });
+      it("should not return card cvv", function(){
+        expect(data['card[cvv]']).toBeUndefined();
+      });
 
-    it("should return bank", function(){
-      expect(data.bank).toBe('SBIN');
-    });
-  })
+      it("should return bank", function(){
+        expect(data.bank).toBe('SBIN');
+      });
+    })
+  });
 });
 
 // describe("payment methods: ", function(){
