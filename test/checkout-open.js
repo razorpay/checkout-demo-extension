@@ -17,7 +17,7 @@ var cc = {
   cvv: '888'
 }
 
-describe("open method", function(){
+describe("open method should", function(){
   var rzp;
 
   beforeEach(function(){
@@ -25,12 +25,12 @@ describe("open method", function(){
     rzp.open();
   })
 
-  it("should attach xdm listener", function(){
+  it("attach xdm listener", function(){
     expect(discreet.isOpen).toBe(true);
     expect(typeof discreet.xdm._listener).toBe('function');
   })
 
-  it("should append iframe", function(){
+  it("append iframe", function(){
     expect(rzp.checkoutFrame).toBeDefined();
     expect(document.body.contains(rzp.checkoutFrame.parentNode)).toBe(true);
   })
@@ -40,19 +40,42 @@ describe("open method", function(){
   })
 })
 
-describe("close method", function(){
+describe("close method should", function(){
   var rzp;
 
-  it("should clean up various properties", function(done){
+  beforeEach(function(){
     rzp = new Razorpay(options);
     rzp.open();
-    setTimeout(function(){
-      discreet.onClose.call(rzp);
-      expect(discreet.isOpen).toBe(false);
-      expect(discreet.xdm._listener).toBe(null);
-      expect(rzp.checkoutFrame).not.toBeVisible();
-      done();
+  })
+
+  it("send close message to frame", function(){
+    var spy = jasmine.createSpy();
+    spyOn(discreet, 'sendFrameMessage').and.callFake(function(msg){
+      expect(msg.event).toBe('close');
+      expect(this).toBe(rzp);
+      spy();
     })
+    rzp.close();
+    expect(spy).toHaveBeenCalled();
+  })
+  
+  it("clean up various properties", function(){
+    discreet.onClose.call(rzp);
+    expect(discreet.isOpen).toBe(false);
+    expect(discreet.xdm._listener).toBe(null);
+    expect(rzp.checkoutFrame).not.toBeVisible();
+  })
+
+  it("be followable by re-open", function(){
+    var spy = jasmine.createSpy();
+    spyOn(discreet, 'sendFrameMessage').and.callFake(function(msg){
+      expect(msg.event).toBe('open');
+      expect(this).toBe(rzp);
+      spy();
+    })
+    discreet.onClose.call(rzp);
+    rzp.open();
+    expect(spy).toHaveBeenCalled();
   })
 })
 
@@ -98,8 +121,21 @@ describe("onFrameMessage ", function(){
     discreet.onClose();
   });
 
-  it("load, ", function(){
-    postMessage({source: "frame", event: "load"}, '*');
+  it("return if source isn't valid", function(done){
+    var spyNotCalled = jasmine.createSpy();
+    spyOn(discreet, 'setImageOption').and.callFake(spyNotCalled);
+    postMessage({event: "load"}, '*');
+    setTimeout(function(){
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      done();
+    })
+  })
+
+  describe("load, ", function(){
+    
+    beforeEach(function(){
+      postMessage({source: "frame", event: "load"}, '*');
+    })
     
     it("meta viewport is to be set", function(done){
       setTimeout(function(){
@@ -113,6 +149,7 @@ describe("onFrameMessage ", function(){
       spyOn(discreet, 'setImageOption').and.callFake(spy);
       setTimeout(function(){
         expect(spy).toHaveBeenCalled();
+        done();
       })
     })
  
@@ -128,7 +165,41 @@ describe("onFrameMessage ", function(){
       });
       setTimeout(function(){
         expect(spy).toHaveBeenCalled();
+        done();
       })
+    })
+  })
+
+  it("redirect, next request should be processed", function(done){
+    var spy = jasmine.createSpy();
+    
+    spyOn(discreet, 'nextRequestRedirect').and.callFake(function(data){
+      expect(data).toBe('hello');
+      spy();
+    })
+
+    postMessage({source: "frame", event: "redirect", data: "hello"}, '*');
+    setTimeout(function(){
+      expect(spy).toHaveBeenCalled();
+      done();
+    })
+  })
+
+  it("submit, invoke CheckoutBridge.onsubmit", function(done){
+    var spy = jasmine.createSpy();
+    var data = {foo:2}
+    window.CheckoutBridge = {
+      onsubmit: function(arg){
+        expect(arg).toBe(JSON.stringify(data));
+        spy();
+      }
+    }
+    postMessage({source: "frame", event: "submit", data: data}, '*');
+
+    setTimeout(function(){
+      expect(spy).toHaveBeenCalled();
+      delete window.CheckoutBridge;
+      done();
     })
   })
 
@@ -160,6 +231,16 @@ describe("onFrameMessage ", function(){
       if(this === rzp) spy();
     });
     postMessage({source: "frame", event: "hidden"}, '*');
+    setTimeout(function(){
+      expect(spy).toHaveBeenCalled();
+      done();
+    })
+  })
+
+  it("fault, close.", function(done){
+    var spy = jasmine.createSpy();
+    spyOn(Razorpay.prototype, 'close').and.callFake(spy);
+    postMessage({source: "frame", event: "fault"}, '*');
     setTimeout(function(){
       expect(spy).toHaveBeenCalled();
       done();
@@ -337,6 +418,55 @@ describe("automatic checkout:", function(){
       
       expect(spy).not.toHaveBeenCalled();
       expect(spy2).not.toHaveBeenCalled();
+    })
+  })
+
+  describe("init", function(){
+    var opts = {
+      amount: 12345,
+      key: 'abcd'
+    }
+
+    var spyCalled;
+    var spyNotCalled;
+
+    beforeEach(function(){
+      spyCalled = jasmine.createSpy();
+      spyNotCalled = jasmine.createSpy();
+      for(var i in opts)
+        discreet.currentScript.setAttribute('data-' + i, opts[i]);
+    })
+
+    afterEach(function(){
+      discreet.automaticCheckoutInit();
+
+      spyCalled && expect(spyCalled).toHaveBeenCalled();
+      spyNotCalled && expect(spyNotCalled).not.toHaveBeenCalled();
+
+      for(var i in opts)
+        discreet.currentScript.removeAttribute(i);
+    })
+
+    it("should do nothing if data-key attribute is not present", function(){
+      discreet.currentScript.removeAttribute('data-key');
+      spyCalled = null;
+      spyOn(discreet, 'addButton').and.callFake(spyNotCalled);
+    })
+
+    it("should parse attributes", function(){
+      spyOn(discreet, 'addButton').and.callFake(jQuery.noop);
+      spyOn(discreet, 'parseScriptOptions').and.callFake(function(o){
+        expect(o.key).toBe('abcd');
+        expect(o.amount).toBe('12345');
+        spyCalled();
+      });
+    })
+
+    it("add button", function(){
+      spyOn(discreet, 'addButton').and.callFake(function(r){
+        expect(r instanceof Razorpay).toBe(true);
+        spyCalled();
+      });
     })
   })
 })
