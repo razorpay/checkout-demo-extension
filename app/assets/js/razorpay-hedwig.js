@@ -120,21 +120,6 @@
         }
       }
 
-      else if (response.callbackUrl){
-        var nextRequest = {
-          autosubmit: response.data
-        }
-        nextRequest.autosubmit.callbackUrl = response.callbackUrl;
-        discreet.navigatePopup.call(request, nextRequest);
-      }
-
-      else if (response.redirectUrl){
-        var nextRequest = {
-          location: response.redirectUrl
-        };
-        discreet.navigatePopup.call(request, nextRequest);
-      }
-
       else discreet.error.call(request, response);
     }
   }

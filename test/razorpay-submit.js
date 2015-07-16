@@ -209,7 +209,7 @@ describe("navigatePopup method should", function(){
     Razorpay.payment.authorize(req);
 
     req.popup = 'pop';
-    var spyCalled = jasmine.createSpy();
+    spyCalled = jasmine.createSpy();
     spyOn(req, 'error').and.callFake(spyCalled);
     discreet.navigatePopup.call(req, {});
     expect(spyCalled).toHaveBeenCalled();
@@ -247,12 +247,44 @@ describe("api ajax handler should invoke", function(){
     rzp = new Razorpay(init_options)
   })
 
-  it("request.error", function(){
-    responseData = {
-      version: 1,
-      error: {description: 'gpl'},
-      payment_id: 'id'
-    }
+  describe("request.error if response has", function(){
+    var spy;
+    
+    beforeEach(function(){
+      spy = jasmine.createSpy();
+      req.error = function(res){
+        expect(res).toBe(responseData);
+        spy();
+      }
+    })
+
+    afterEach(function(){
+      Razorpay.payment.authorize(req);
+      expect(spy).toHaveBeenCalled();
+    })
+
+    it("error", function(){
+      responseData = {
+        version: 1,
+        error: {description: 'gpl'},
+        payment_id: 'id'
+      }
+    })
+
+    it("no useful fields", function(){
+      responseData = {}
+    })
+
+    it("no useful fields except version", function(){
+      responseData = {
+        version: 1
+      }
+    })
+    
+  })
+
+  it("request.error if response doesn't have useful fields", function(){
+    responseData = {}
     var spy = jasmine.createSpy();
     req.error = spy;
     Razorpay.payment.authorize(req);
