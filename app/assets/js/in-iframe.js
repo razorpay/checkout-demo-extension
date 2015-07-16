@@ -42,7 +42,7 @@
       }
       var methodOptions = discreet.rzp.options.method;
 
-      if(typeof methodOptions.wallet != false && typeof payment_methods.wallet == 'object'){
+      if(typeof payment_methods.wallet == 'object'){
         if(typeof methodOptions.wallet == 'object'){
           for(var i in payment_methods.wallet){
             if(methodOptions.wallet[i] != false && payment_methods.wallet[i] != false){
@@ -54,6 +54,7 @@
         }
       }
       var tabCount = 0;
+
       if(typeof methodOptions.wallet == 'object'){
         for(i in methodOptions.wallet){
           if(methodOptions.wallet[i]){
@@ -62,6 +63,7 @@
           }
         }
       }
+
       if(!tabCount){
         methodOptions.wallet = false;
       }
@@ -197,7 +199,7 @@
       discreet.smarty = new Smarty(discreet.$el);
 
       if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
-        if(navigator.userAgent.indexOf('Android 2')){
+        if(navigator.userAgent.indexOf('Android 2') > 0){
           discreet.$el.addClass('shown');
         }
       }

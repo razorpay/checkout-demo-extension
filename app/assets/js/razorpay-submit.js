@@ -22,7 +22,7 @@
       var rdata = request.data;
       var options = request.options;
       if(!options)
-         options = request.options = discreet.defaults;
+        options = request.options = JSON.parse(JSON.stringify(discreet.defaults));
 
       var defaultFields = ['amount', 'notes', 'currency'];
       for(var i=0; i<defaultFields.length;i++){

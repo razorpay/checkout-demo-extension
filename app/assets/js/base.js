@@ -131,6 +131,7 @@
     }
     var options = {};
     var defaults = discreet.defaults;
+
     for (var i in defaults){
       if(defaults[i] !== null && typeof defaults[i] == 'object'){
         if(i == 'notes'){
@@ -143,7 +144,7 @@
             }
           }
         } else if (i == 'method') {
-          options.method = $.extend({}, defaults.method);
+          options.method = JSON.parse(JSON.stringify(defaults.method));
           if(typeof overrides.method == 'object'){
             if(typeof overrides.method.wallet == 'object'){
               for(var j in overrides.method.wallet){

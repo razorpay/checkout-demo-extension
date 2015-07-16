@@ -1,11 +1,11 @@
 var discreet = Razorpay.prototype.discreet;
-var orig_methods = window.payment_methods = {"version":1,"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"}};
+var orig_methods = window.payment_methods = {"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},"wallet":{"paytm":true}};
 
 function openCheckoutForm(options){
   jQuery('#container').remove();
-  delete window.frameDiscreet.$el;
-  delete window.frameDiscreet.modal;
-  delete window.frameDiscreet.rzp;
+  delete frameDiscreet.$el;
+  delete frameDiscreet.modal;
+  delete frameDiscreet.rzp;
   handleMessage({options: options});
 }
 
@@ -71,7 +71,7 @@ describe("init options.method: ", function(){
     opts.method[disableTab] = false;
     openCheckoutForm(opts);
     expect(jQuery('#tab-'+disableTab).length).toBe(0);
-    expect(jQuery('.tab-content:visible').length).toBe(1);
+    expect(jQuery('.tab-content:visible').length).toBe(2);
   })
 })
 
@@ -142,51 +142,51 @@ describe("payment authorization", function(){
 })
 
 describe("init options.method", function(){
-  var opts;
-  
+  var opts, disable;
+
   beforeEach(function(){
     opts = jQuery.extend(true, {}, coOptions);
     delete opts.method;
-  })
-
-  it("should enable both netbanking and card by default and show card initially", function(){
-    openCheckoutForm(opts);
-    expect(jQuery('#tabs')).toBeVisible();
-    expect(jQuery('#tabs li').length).toBe(2);
-    expect(jQuery('#tabs li.active').attr('data-target')).toBe('tab-card');
-    expect(jQuery('#tab-card')).toBeVisible();
-  });
-
-  describe("", function(){
-    var hide, show;
-
-    beforeEach(function(){
-      window.payment_methods = jQuery.extend(true, {}, orig_methods);
-    })
-
-    afterEach(function(){
-      openCheckoutForm(opts);
-      expect(jQuery('#tabs').hasClass('tabs-1')).toBe(true);
-      expect(jQuery('#tab-' + hide)).not.toBeVisible();
-      expect(jQuery('#tab-' + show)).toBeVisible();
-    })
-
-    it("should hide card if payment_methods.card=false", function(){
-      window.payment_methods.card = false;
-      hide = 'card';
-      show = 'netbanking';
-    });
-
-    it("should hide netbanking if payment_methods.netbanking=false", function(){
-      window.payment_methods.netbanking = false;
-      hide = 'netbanking';
-      show = 'card';
-    });
+    window.payment_methods = jQuery.extend(true, {}, orig_methods);
   })
 
   afterEach(function(){
-    window.payment_methods = orig_methods;
+    openCheckoutForm(opts);
+    var countVisible = (3 - disable.length);
+    expect(jQuery('#tabs').hasClass('tabs-' + countVisible)).toBe(true);
+    expect(jQuery('#tabs li').length).toBe(countVisible);
+    
+    disable.forEach(function(meth){
+      expect(jQuery('#tab-' + meth)).not.toBeVisible();
+    })
+
+    var active;
+    for(var m2 in window.payment_methods){
+      if(disable.indexOf(m2) < 0){
+        expect(jQuery('#tab-' + m2)).toBeVisible();
+
+        // depends on payment_methods order, should be same as order of visible tabs 
+        if(!active){
+          active = jQuery('#tabs li.active').attr('data-target');
+          expect(active).toBe('tab-' + m2);
+        }
+      }
+    }
   })
+
+  it("should enable all options by default and show card initially", function(){
+    disable = [];
+  });
+
+  for(var m in window.payment_methods){
+    it("should hide " + m + " if specified false", (function(m){
+      return function(){
+        disableVal = m == 'wallet' ? {} : false;
+        window.payment_methods[m] = disableVal;
+        disable = [m];
+      }
+    })(m))
+  }
 })
 
 // Tests on Credit Card page
@@ -638,6 +638,24 @@ describe("Razorpay open netbanking page", function(){
     });
   })
 });
+
+// describe("payment methods: ", function(){
+//   var opts, disabledTab;
+
+//   beforeEach(function(){
+//     opts = JSON.parse(JSON.stringify(coOptions));
+//   });
+
+//   afterEach(function(){
+//     opts.method[disabledTab] = false;
+//     openCheckoutForm(opts);
+//     expect()
+//   })
+
+//   it("disable card", function(){
+//     disabledTab = 'card';
+//   })
+// })
 
 it("CheckoutBridge", function(){
   it("should be notified", function(){
