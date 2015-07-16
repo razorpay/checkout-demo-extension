@@ -233,6 +233,114 @@ describe("checkout validate", function(){
   })
 })
 
+describe("automatic checkout:", function(){
+  
+  it("submit handler should submit with all fields", function(){
+    var spy = jasmine.createSpy();
+    
+    discreet.currentScript.parentNode.submit = function(){
+      var payload = [];
+      jQuery(this).children('input[name]').each(function(index, el){
+        payload.push(el.name + '=' + el.value);
+      }).remove();
+      expect(payload.join('&')).toBe('key1=value1&key2=value2&nested[hello]=2&nested[world]=5');
+      spy();
+    };
+
+    var postData = {
+      key1: 'value1',
+      key2: 'value2',
+      nested: {
+        hello: 2,
+        world: 5
+      }
+    }
+    discreet.defaultPostHandler(postData);
+    expect(spy).toHaveBeenCalled();
+  })
+
+  describe("parse options from DOM should", function(){
+    var opts = {
+      key: 'val',
+      foo: 'bar',
+      'nested.key1': 'value1',
+      'nested.key2': 'value2',
+      'one.two.three': 'four',
+      'method.wallet.paytm': 'false',
+      'one.hello': 'true'
+    }
+    discreet.parseScriptOptions(opts);
+
+    it("have basic keys", function(){
+      expect(opts.key).toBe('val');
+      expect(opts.foo).toBe('bar');
+    })
+
+    it("split first level nested objects", function(){
+      expect(typeof opts.nested).toBe('object');
+      expect(opts.nested.key1).toBe('value1');
+      expect(opts.nested.key2).toBe('value2');
+    })
+
+    it("parse string to boolean", function(){
+      expect(opts.one.hello).toBe(true);
+    })
+
+    it("not split second level objects", function(){
+      expect(opts.one['two.three']).toBe('four');
+    })
+
+    it("split second level method object", function(){
+      expect(opts.method.wallet.paytm).toBe(false);
+    })
+  })
+
+  describe("addButton method: ", function(){
+    var init_options = jQuery.extend(true, {}, options);
+    init_options.buttontext = 'Dont pay';
+    var rzp = new Razorpay(init_options);
+    var parent = discreet.currentScript.parentNode;
+    discreet.addButton(rzp);
+    
+    it("onsubmit should be attached on parent element", function(){
+      expect(typeof parent.onsubmit).toBe('function');
+    })
+
+    it("submit button should be appended", function(){
+      var btn = jQuery(parent).children('.razorpay-payment-button');
+      expect(btn.length).toBe(1);
+      expect(btn.attr('type')).toBe('submit');
+      expect(btn.val()).toBe('Dont pay');
+    })
+
+    it("should open checkout form on submit if not already", function(){
+      discreet.isOpen = false;
+
+      var spy = jasmine.createSpy();
+      var spy2 = jasmine.createSpy();
+      
+      spyOn(rzp, 'open').and.callFake(spy);
+      parent.onsubmit({preventDefault: spy2});
+      
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+    })
+
+    it("shouldn't do default action if form is open", function(){
+      discreet.isOpen = true;
+
+      var spy = jasmine.createSpy();
+      var spy2 = jasmine.createSpy();
+      
+      spyOn(rzp, 'open').and.callFake(spy);
+      parent.onsubmit({preventDefault: spy2});
+      
+      expect(spy).not.toHaveBeenCalled();
+      expect(spy2).not.toHaveBeenCalled();
+    })
+  })
+})
+
 // // Modal functionality
 // describe("Razorpay modal", function(){
 //   var cancelSpy;

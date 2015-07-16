@@ -200,6 +200,7 @@ describe("nextRequestRedirect", function(){
     
     spyOn(HTMLFormElement.prototype, 'submit').and.callFake(function(){
       expect(jQuery(this).serialize()).toBe('field1=val1&field2=val2');
+      this.parentNode.removeChild(this); // clean up
       spy();
     });
 
