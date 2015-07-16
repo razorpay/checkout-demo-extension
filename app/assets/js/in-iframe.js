@@ -37,9 +37,6 @@
     },
     
     setMethods: function(payment_methods){
-      if(payment_methods.version){
-        delete payment_methods.version;
-      }
       var methodOptions = discreet.rzp.options.method;
 
       if(typeof payment_methods.wallet == 'object'){
@@ -198,11 +195,11 @@
       discreet.$el = $('container');
       discreet.smarty = new Smarty(discreet.$el);
 
-      if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
-        if(navigator.userAgent.indexOf('Android 2') > 0){
-          discreet.$el.addClass('shown');
-        }
-      }
+      // if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
+      //   if(navigator.userAgent.indexOf('Android 2') > 0){
+      //     discreet.$el.addClass('shown');
+      //   }
+      // }
 
       // init modal
       var modalOptions = {
@@ -445,7 +442,7 @@
   }
 
   Razorpay.sendMessage = function(message){
-    if(window.CheckoutBridge){
+    if(typeof window.CheckoutBridge == 'object'){
       discreet.notifyBridge(message);
     } else if(window != window.parent){
       message.source = 'frame';

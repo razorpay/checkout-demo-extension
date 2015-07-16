@@ -205,7 +205,7 @@ describe("init options.method", function(){
 })
 
 // Tests on Credit Card page
-describe("Razorpay open cc page", function(){
+describe("Razorpay card tab", function(){
   var $name, $email, $contact;
 
   beforeEach(function(){
@@ -236,7 +236,7 @@ describe("Razorpay open cc page", function(){
   });
 });
 
-describe("Razorpay open cc and submit method", function(){
+describe("Razorpay card tab submit", function(){
   var co;
   var spyCalled;
   var spyNotCalled;
@@ -665,35 +665,43 @@ describe("Razorpay netbanking getFormData method", function(){
   });
 });
 
-// describe("payment methods: ", function(){
-//   var opts, disabledTab;
+describe("CheckoutBridge should", function(){
+  var message = {event: 'evt'};
+  window.CheckoutBridge = {onevt: jQuery.noop};
 
-//   beforeEach(function(){
-//     opts = JSON.parse(JSON.stringify(coOptions));
-//   });
-
-//   afterEach(function(){
-//     opts.method[disabledTab] = false;
-//     openCheckoutForm(opts);
-//     expect()
-//   })
-
-//   it("disable card", function(){
-//     disabledTab = 'card';
-//   })
-// })
-
-it("CheckoutBridge", function(){
-  it("should be notified", function(){
-    var data = {};
+  it("be notified if present", function(){
     var spy = jasmine.createSpy();
-    window.CheckoutBridge = {
-      onevt: function(msg){
-        if(msg.data == data)
-          spy()
-      }
-    };
-    frameDiscreet.notifyBridge({event: 'evt', data: data});
+    spyOn(frameDiscreet, 'notifyBridge').and.callFake(function(msg){
+      if(msg == message)
+        spy()
+    });
+    Razorpay.sendMessage(message);
+  })
+
+  it("be called with given event", function(){
+    var spy = jasmine.createSpy();
+    spyOn(window.CheckoutBridge, 'onevt').and.callFake(spy);
+    frameDiscreet.notifyBridge(message);
     expect(spy).toHaveBeenCalled();
+  })
+
+  it("be called with given event and data", function(){
+    message.data = {'some': 'data'};
+    var spy = jasmine.createSpy();
+    spyOn(window.CheckoutBridge, 'onevt').and.callFake(function(msg){
+      if(msg == JSON.stringify(message.data))
+        spy()
+    })
+    
+    frameDiscreet.notifyBridge(message);
+    expect(spy).toHaveBeenCalled();
+  })
+
+  it("not be notified if absent", function(){
+    delete window.CheckoutBridge;
+    var spy = jasmine.createSpy();
+    spyOn(frameDiscreet, 'notifyBridge').and.callFake(spy);
+    Razorpay.sendMessage(message);
+    expect(spy).not.toHaveBeenCalled();
   })
 })
