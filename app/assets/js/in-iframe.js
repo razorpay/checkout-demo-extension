@@ -208,7 +208,6 @@
           Razorpay.sendMessage({event: 'dismiss'});
         },
         onhidden: function(){
-          discreet.xdm.removeMessageListener();
           Razorpay.sendMessage({event: 'hidden'});
         }
       }

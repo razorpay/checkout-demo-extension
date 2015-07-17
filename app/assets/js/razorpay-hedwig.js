@@ -8,6 +8,7 @@
   var discreet = Razorpay.prototype.discreet;
 
   discreet.popupClose = function(){
+    discreet.xdm.removeMessageListener();
     try{
       if(this.popup && typeof this.popup.close == 'function'){
         this.popup.close();
