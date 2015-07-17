@@ -174,12 +174,12 @@
 
     showModal: function() {
       discreet.renew();
+      
       if(discreet.modal){
         return discreet.modal.show();
       }
-      if(window.payment_methods){
-        discreet.setMethods(window.payment_methods);
-      } else {
+
+      if(!window.payment_methods){
         return discreet.rzp.payment.getMethods(function(payment_methods){
           if('error' in payment_methods){
             discreet.errorHandler(payment_methods);
@@ -189,6 +189,7 @@
           }
         });
       }
+      discreet.setMethods(window.payment_methods);
       $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
       document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
@@ -207,6 +208,7 @@
           Razorpay.sendMessage({event: 'dismiss'});
         },
         onhidden: function(){
+          discreet.xdm.removeMessageListener();
           Razorpay.sendMessage({event: 'hidden'});
         }
       }
