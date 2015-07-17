@@ -120,6 +120,11 @@
         }
       }
 
+      else if(response.callbackUrl || response.redirectUrl){
+        var msgtitle = response.callbackUrl ? 'callbackUrl' : 'redirectUrl';
+        window.Rollbar && Rollbar.warning(msgtitle + ': ' + (response.callbackUrl || response.redirectUrl));
+      }
+
       else discreet.error.call(request, response);
     }
   }
