@@ -189,8 +189,7 @@ module.exports = function(grunt){
       all: [
         'app/assets/js/*.js',
       ]
-    },
-
+    }
   });
 
   /** Helper method to load AwsKeys from multiple sources */
@@ -228,11 +227,14 @@ module.exports = function(grunt){
     'preprocess',
     'uglify:generated',
     'cssmin:generated',
-    'usemin',
-    'testRelease'
-    // 'karma:razorpay',
-    // 'karma:checkout',
-    // 'karma:frame'
+    'usemin'
+  ]);
+
+  grunt.registerTask('testRelease', [
+    'prepareTestRelease',
+    'karma:razorpay',
+    'karma:checkout',
+    'karma:frame'
   ]);
 
   /**
@@ -265,6 +267,7 @@ module.exports = function(grunt){
   ]);
 
   var target = grunt.option('target') && grunt.option('target').toLowerCase() || 'beta';
+
   grunt.registerTask('fonts:upload', 'Upload Fonts', ['aws_s3:' + target]);
 
   grunt.registerTask('prepareKarma', 'Prepare Karma', function(a, b) {
@@ -301,7 +304,7 @@ module.exports = function(grunt){
     grunt.config.set('karma', karma);
   });
 
-  grunt.registerTask('testRelease', 'Testing released files', function(){
+  grunt.registerTask('prepareTestRelease', 'Testing released files', function(){
     var fileSets = grunt.config.get('uglify');
     fileSets = fileSets.generated.files;
 
@@ -320,7 +323,20 @@ module.exports = function(grunt){
   });
 
   grunt.registerTask('sourceMaps', 'Removing source map comments', function(){
+    var fileSets = grunt.option('files').split(/\s/);
+    var blocks = {};
+    var htmlclean = {};
 
+    fileSets.forEach(function(filename){
+      var item = filename.split('/').pop();
+      htmlclean[item] = {
+        src: filename,
+        dest: filename
+      }
+    })
+
+    grunt.config.set('htmlclean', htmlclean);
+    grunt.task.run('htmlclean');
   })
 
   grunt.registerTask('createReport', 'Creates combined istanbul report', function(){
