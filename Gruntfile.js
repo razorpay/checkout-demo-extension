@@ -118,7 +118,7 @@ module.exports = function(grunt){
         reporters: ['progress', 'coverage'],
         port: 9876,
         colors: true,
-        logLevel: 'ERROR',
+        logLevel: 'DEBUG',
         browsers: ['PhantomJS'],
         singleRun: true,
         browserNoActivityTimeout: 30000,
@@ -286,6 +286,7 @@ module.exports = function(grunt){
         // }
       }
     }
+    console.log(blocks);
 
     var karma = grunt.config.get('karma');
 
@@ -295,6 +296,7 @@ module.exports = function(grunt){
 
       block = karma.options.files.concat(block);
       karma[key].options.files = block.concat(karma[key].options.files);
+      console.log(karma[key].options.files);
     }
 
     grunt.config.set('karma', karma);
