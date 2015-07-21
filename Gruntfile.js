@@ -287,7 +287,6 @@ module.exports = function(grunt){
         // }
       }
     }
-    console.log(blocks);
 
     var karma = grunt.config.get('karma');
 
@@ -297,7 +296,6 @@ module.exports = function(grunt){
 
       block = karma.options.files.concat(block);
       karma[key].options.files = block.concat(karma[key].options.files);
-      console.log(karma[key].options.files);
     }
 
     grunt.config.set('karma', karma);
