@@ -282,10 +282,10 @@ module.exports = function(grunt){
           blocks[item].splice(i,1);
         }
 
-        var pos = blocks[item][i].indexOf('inline-libs.html');
-        if(pos !== -1){
-          blocks[item][i] = 'app/srv/js/lib/inline-libs.js';
-        }
+        // var pos = blocks[item][i].indexOf('inline-libs.html');
+        // if(pos !== -1){
+        //   blocks[item][i] = 'app/srv/js/lib/inline-libs.js';
+        // }
       }
     }
 
