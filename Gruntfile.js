@@ -61,6 +61,7 @@ module.exports = function(grunt){
     uglify: {
       options: {
         mangle: {
+          toplevel: true,
           sort: true
         },
         compress: {
@@ -69,6 +70,7 @@ module.exports = function(grunt){
           drop_debugger: true,
           unsafe: true
         },
+        mangleProperties: true,
         preserveComments: false,
         sourceMap: true,
         sourceMapIncludeSources: true
@@ -118,7 +120,7 @@ module.exports = function(grunt){
         reporters: ['progress', 'coverage'],
         port: 9876,
         colors: true,
-        logLevel: 'DEBUG',
+        logLevel: 'ERROR',
         browsers: ['PhantomJS'],
         singleRun: true,
         browserNoActivityTimeout: 30000,
@@ -275,8 +277,7 @@ module.exports = function(grunt){
       blocks[item] = fileSets[i].src;
 
       for(var i in blocks[item]){
-        var pos = /rollbar|fin\.js/.test(blocks[item][i]);
-        if(pos !== -1){
+        if(/rollbar|fin\.js/.test(blocks[item][i])){
           blocks[item].splice(i,1);
         }
 
