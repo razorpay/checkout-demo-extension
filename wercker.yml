@@ -22,7 +22,7 @@ deploy:
 
         - script:
             name: Insert git commit id into rollbar version
-            code: sed -i -e 's/VERSIONSTRING/$WERCKER_GIT_COMMIT/' app/assets/js/rollbar.js
+            code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/assets/js/rollbar.js
 
         - grunt:
             tasks: build
