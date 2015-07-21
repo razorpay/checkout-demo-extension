@@ -231,7 +231,8 @@ module.exports = function(grunt){
     'testRelease',
     'karma:razorpay',
     'karma:checkout',
-    'karma:frame'
+    'karma:frame',
+    'sourceMaps'
   ]);
 
   /**
@@ -317,6 +318,10 @@ module.exports = function(grunt){
     }
 
     grunt.config.set('karma', karma);
+  });
+
+  grunt.registerTask('sourceMaps', 'Removing source map comments', function(){
+
   })
 
   grunt.registerTask('createReport', 'Creates combined istanbul report', function(){

@@ -7,9 +7,7 @@ build:
             code: sudo npm install -g harp
         - grunt:
             tasks: test
-        # - script:
-        #     name: Run unit tests
-        #     code: ./node_modules/karma/bin/karma start --single-run --browsers PhantomJS
+
     after-steps:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay
@@ -23,8 +21,13 @@ deploy:
             code: sudo npm install -g harp
         - grunt:
             tasks: build
+
         # This command needs a grunt step above it to install grunt
         # It does differential uploads :rocket:
+        - script:
+            name: 'Upload source maps'
+            code: 'grunt sourceMaps --token=$ROLLBAR_TOKEN'
+
         - script:
             name: Run fonts upload
             code: grunt fonts:upload --target=$WERCKER_DEPLOYTARGET_NAME
