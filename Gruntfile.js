@@ -61,7 +61,6 @@ module.exports = function(grunt){
     uglify: {
       options: {
         mangle: {
-          toplevel: true,
           sort: true
         },
         compress: {
@@ -70,7 +69,6 @@ module.exports = function(grunt){
           drop_debugger: true,
           unsafe: true
         },
-        mangleProperties: true,
         preserveComments: false,
         sourceMap: true,
         sourceMapIncludeSources: true
