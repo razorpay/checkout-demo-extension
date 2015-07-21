@@ -24,7 +24,7 @@ deploy:
 
         - script:
             name: 'Upload source maps'
-            code: 'FILE=razorpay.js; PREFIX=https://; if [ $WERCKER_DEPLOYTARGET_NAME -eq Beta ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX+$FILE -F source_map=@v1/$FILE.map'
+            code: 'FILE=razorpay.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX+$FILE -F source_map=@app/dist/v1/$FILE.map'
         
         # This command needs a grunt step above it to install grunt
         # It does differential uploads :rocket:
