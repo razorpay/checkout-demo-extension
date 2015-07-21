@@ -331,12 +331,11 @@ module.exports = function(grunt){
     var karma = grunt.config.get('karma');
 
     for(var i in fileSets){
-      var file = fileSets[i].dest;
-      var item = file.split('/').pop();
+      var item = i.split('/').pop();
 
       htmlclean[item] = {
-        src: file,
-        dest: file
+        src: i,
+        dest: i
       }
     }
 
