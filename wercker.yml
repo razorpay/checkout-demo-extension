@@ -19,23 +19,24 @@ deploy:
         - script:
             name: Install harp globally
             code: sudo npm install -g harp
+
+        -script:
+            name: Insert git commit id into rollbar version
+            code: sed -i -e 's/VERSIONSTRING/$WERCKER_GIT_COMMIT/' app/assets/js/rollbar.js
+
         - grunt:
             tasks: build
 
         - script:
             name: 'Upload source maps'
-            code: 'FILE=checkout-frame.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX+$FILE -F source_map=@app/dist/v1/$FILE.map'
-        
-        # This command needs a grunt step above it to install grunt
-        # It does differential uploads :rocket:
-        - script:
-            name: 'Remove sourcemap comment'
-            code: FILES=`ls app/dist/v1/*.js`; grunt sourceMaps --files="$FILES"
+            code: 'FILE=checkout-frame.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX$FILE -F source_map=@app/dist/v1/$FILE.map; echo $PREFIX$FILE'
 
         - script:
             name: 'Remove map files'
             code: rm app/dist/v1/*.map
 
+        # This command needs a grunt step above it to install grunt
+        # It does differential uploads :rocket:
         - script:
             name: Run fonts upload
             code: grunt fonts:upload --target=$WERCKER_DEPLOYTARGET_NAME

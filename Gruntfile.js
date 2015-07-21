@@ -26,11 +26,14 @@ module.exports = function(grunt){
       harp_compile:{
         cmd: 'harp compile app/assets app/srv'
       },
-      dir_images: {
-        cmd: 'mkdir app/dist && mkdir app/dist/v1'
+      make_dir: {
+        cmd: 'mkdir -p app/dist/v1/css'
       },
       copy_images:{
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
+      },
+      copy_css:{
+        cmd: 'cp app/srv/css/style.css app/dist/v1/css/style.css'
       },
       copy_html:{
         cmd: 'cp app/srv/*.html app/dist/v1/'
@@ -49,13 +52,13 @@ module.exports = function(grunt){
     useminPrepare:{
       html:['app/srv/*.html'],
       options: {
-        dest: 'app/dist/v1' //dist is the only directory served
+        dest: 'app/dist/v1'
       }
     },
     usemin:{
       html:'app/dist/v1/*.html',
       options: {
-        dest: 'app/dist/v1' //dist is the only directory served
+        dest: 'app/dist/v1'
       }
     },
     uglify: {
@@ -74,14 +77,6 @@ module.exports = function(grunt){
         preserveComments: false,
         sourceMap: true,
         sourceMapIncludeSources: true
-      }
-    },
-    preprocess: {
-      tmpfolder: {
-        src : ['app/srv/**/*.js'],
-        options: {
-          inline : true,
-        }
       }
     },
     aws: loadAwsKeys(),
@@ -213,8 +208,9 @@ module.exports = function(grunt){
     'exec:clean_srv',
     'exec:clean_dist',
     'exec:harp_compile',
-    'exec:dir_images',
+    'exec:make_dir',
     'exec:copy_images',
+    'exec:copy_css',
     'inline',
     'exec:copy_html'
   ]);
@@ -223,12 +219,21 @@ module.exports = function(grunt){
     'env:prod',
     'exec:build',
     'useminPrepare',
-    'concat:generated',
-    'preprocess',
+    'uglifyPrepare',
     'uglify:generated',
-    'cssmin:generated',
-    'usemin'
+    'usemin',
+    'sourceMaps'
   ]);
+
+  grunt.registerTask('uglifyPrepare', function(){
+    var uglify = grunt.config.get('uglify');
+    uglify.generated.files = {};
+
+    grunt.config.get('concat').generated.files.forEach(function(config){
+      uglify.generated.files['app/dist/v1/' + config.dest.replace(/.+\//g,'')] = config.src;
+    })
+    grunt.config.set('uglify', uglify);
+  })
 
   grunt.registerTask('testRelease', [
     'prepareTestRelease',
@@ -254,7 +259,8 @@ module.exports = function(grunt){
     'exec:clean_srv',
     'exec:harp_compile',
     'useminPrepare',
-    'preprocess',
+    'uglifyPrepare',
+    'uglify:generated',
     'prepareKarma'
   ]);
 
@@ -271,23 +277,18 @@ module.exports = function(grunt){
   grunt.registerTask('fonts:upload', 'Upload Fonts', ['aws_s3:' + target]);
 
   grunt.registerTask('prepareKarma', 'Prepare Karma', function(a, b) {
-    var fileSets = grunt.config.get('concat');
+    var fileSets = grunt.config.get('uglify');
     fileSets = fileSets.generated.files;
 
     var blocks = {};
     for(var i in fileSets){
-      var item = fileSets[i].dest.split('/').pop();
-      blocks[item] = fileSets[i].src;
+      var item = i.split('/').pop();
+      blocks[item] = fileSets[i];
 
       for(var i in blocks[item]){
         if(/rollbar|fin\.js/.test(blocks[item][i])){
           blocks[item].splice(i,1);
         }
-
-        // var pos = blocks[item][i].indexOf('inline-libs.html');
-        // if(pos !== -1){
-        //   blocks[item][i] = 'app/srv/js/lib/inline-libs.js';
-        // }
       }
     }
 
@@ -323,17 +324,21 @@ module.exports = function(grunt){
   });
 
   grunt.registerTask('sourceMaps', 'Removing source map comments', function(){
-    var fileSets = grunt.option('files').split(/\s/);
-    var blocks = {};
-    var htmlclean = {};
+    var fileSets = grunt.config.get('uglify');
+    fileSets = fileSets.generated.files;
 
-    fileSets.forEach(function(filename){
-      var item = filename.split('/').pop();
+    var htmlclean = {};
+    var karma = grunt.config.get('karma');
+
+    for(var i in fileSets){
+      var file = fileSets[i].dest;
+      var item = file.split('/').pop();
+
       htmlclean[item] = {
-        src: filename,
-        dest: filename
+        src: file,
+        dest: file
       }
-    })
+    }
 
     grunt.config.set('htmlclean', htmlclean);
     grunt.task.run('htmlclean');
