@@ -234,7 +234,7 @@ describe("navigatePopup method should", function(){
     var spyCalled = jasmine.createSpy();
 
     spyOn(discreet.hedwig, 'sendMessage').and.callFake(function(message, origin, source){
-      if(source == req.popup.window){
+      if(source === req.popup.window){
         anObject = message;
       }
     })
@@ -328,7 +328,7 @@ describe("api ajax handler should invoke", function(){
     };
     
     spyOn(discreet, 'nextRequestRedirect').and.callFake(function(data){
-      if(data.url == nextUrl)
+      if(data.url === nextUrl)
         spy();
     });
     req.data.callback_url = 'http://hello.world';

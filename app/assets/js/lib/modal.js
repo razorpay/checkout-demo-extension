@@ -1,4 +1,6 @@
 (function(root) {
+  'use strict';
+
   var $ = root.$;
   var timeout = null;
 
@@ -29,10 +31,10 @@
     this.modalElement = element;
     
     if(!this.options.animation || !this.transitionProperty){
-      duration = 0;
+      var duration = 0;
     } else {
       if(typeof window.getComputedStyle == 'function'){
-        durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
+        var durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
     }
@@ -169,7 +171,7 @@
         })
       }
       if (this.options.backdropClose) {
-        this.on('click', this.container.children('backdrop')[0], function(e){
+        this.on('click', this.container.children('backdrop')[0], function(){
           this.options.backdropClose && this.hide();
         })
       }

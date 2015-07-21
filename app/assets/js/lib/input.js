@@ -1,4 +1,6 @@
 (function(root){
+  'use strict';
+
   var $ = root.$;
   var inputClass = 'input';
   var interceptClass = /elem|placeholder|help-text/;
@@ -54,7 +56,7 @@
     },
 
     blur: function(e){
-      $div = $(e.target.parentNode);
+      var $div = $(e.target.parentNode);
       $div.removeClass('focused');
       $div.addClass('mature');
       this.input(e);

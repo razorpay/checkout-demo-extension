@@ -251,12 +251,12 @@
   }
 
   discreet.nextRequestRedirect = function(data){
-    if(window != window.parent && typeof Razorpay.sendMessage == 'function'){
+    if(window !== window.parent && typeof Razorpay.sendMessage == 'function'){
       return Razorpay.sendMessage({event: 'redirect', data: data});
     }
     if(data.method == 'get'){
       location.href = data.url;
-    } else if (data.method == 'post' && typeof data.content == 'object'){
+    } else if (data.method === 'post' && typeof data.content == 'object'){
       var postForm = document.createElement('form');
       var html = '';
 

@@ -91,11 +91,11 @@
     });
   }
 
-  Popup.prototype.beforeunload = function(e){
+  Popup.prototype.beforeunload = function(){
     return "Transaction isn't complete yet.";
   }
 
-  Popup.prototype.unload = function(e){
+  Popup.prototype.unload = function(){
     this.close();
   }
 
