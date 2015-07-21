@@ -227,7 +227,11 @@ module.exports = function(grunt){
     'preprocess',
     'uglify:generated',
     'cssmin:generated',
-    'usemin'
+    'usemin',
+    'testRelease',
+    'karma:razorpay',
+    'karma:checkout',
+    'karma:frame'
   ]);
 
   /**
@@ -272,7 +276,7 @@ module.exports = function(grunt){
       blocks[item] = fileSets[i].src;
 
       for(var i in blocks[item]){
-        var pos = blocks[item][i].indexOf('rollbar');
+        var pos = /rollbar|fin\.js/.test(blocks[item][i]);
         if(pos !== -1){
           blocks[item].splice(i,1);
         }
@@ -296,6 +300,24 @@ module.exports = function(grunt){
 
     grunt.config.set('karma', karma);
   });
+
+  grunt.registerTask('testRelease', 'Testing released files', function(){
+    var fileSets = grunt.config.get('uglify');
+    fileSets = fileSets.generated.files;
+
+    var blocks = {};
+    var karma = grunt.config.get('karma');
+
+    for(var i in fileSets){
+      var item = fileSets[i].dest.split('/').pop();
+      blocks[item] = 'dest/v1/' + item;
+
+      var karmaKey = item.replace(/(^.+[-]|\.js$)/g,'');
+      karma[karmaKey].options.files = karma.options.files.concat([blocks[item], 'test/release/' + item]);
+    }
+
+    grunt.config.set('karma', karma);
+  })
 
   grunt.registerTask('createReport', 'Creates combined istanbul report', function(){
     var istanbul = require('istanbul'),
