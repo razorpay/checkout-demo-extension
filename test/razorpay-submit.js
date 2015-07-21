@@ -157,7 +157,7 @@ describe("authorize ajax should invoke", function(){
 })
 
 describe("XDCallback should", function(){
-  var req, spyCalled, rzp, receivedMessage, origin;
+  var req, spyCalled, spyNotCalled, rzp, receivedMessage, origin;
   var init_options = jQuery.extend(true, {}, options);
 
   beforeEach(function(){
@@ -211,6 +211,7 @@ describe("XDCallback should", function(){
 
 describe("navigatePopup method should", function(){
   var init_options = jQuery.extend(true, {}, options);
+  var spyCalled;
 
   it("invoke request's error callback if popup has not been setup", function(){
     spyOn($, 'ajax').and.callFake($.noop);

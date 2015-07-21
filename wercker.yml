@@ -26,7 +26,11 @@ deploy:
         # It does differential uploads :rocket:
         - script:
             name: 'Upload source maps'
-            code: 'grunt sourceMaps --token=$ROLLBAR_TOKEN'
+            code: 'curl https://api.rollbar.com/api/1/sourcemap \
+                      -F access_token=$ROLLBAR_TOKEN \
+                      -F version=$WERCKER_GIT_COMMIT \
+                      -F minified_url=https://$WERCKER_DEPLOYTARGET_NAMEcheckout.razorpay.com/v1/razorpay.js\
+                      -F source_map=@v1/razorpay.js.map'
 
         - script:
             name: Run fonts upload

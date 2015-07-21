@@ -72,7 +72,8 @@ module.exports = function(grunt){
         },
         mangleProperties: true,
         preserveComments: false,
-        sourceMap: true
+        sourceMap: true,
+        sourceMapIncludeSources: true
       }
     },
     preprocess: {
@@ -228,11 +229,10 @@ module.exports = function(grunt){
     'uglify:generated',
     'cssmin:generated',
     'usemin',
-    'testRelease',
-    'karma:razorpay',
-    'karma:checkout',
-    'karma:frame',
-    'sourceMaps'
+    'testRelease'
+    // 'karma:razorpay',
+    // 'karma:checkout',
+    // 'karma:frame'
   ]);
 
   /**

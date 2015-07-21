@@ -184,7 +184,7 @@ describe("init options.method", function(){
     // disable 1 tab, m is disabled one
     it("should hide " + m + " if specified false", (function(m){
       return function(){
-        disableVal = m == 'wallet' ? {} : false;
+        var disableVal = m == 'wallet' ? {} : false;
         window.payment_methods[m] = disableVal;
         disable = [m];
       }
@@ -196,7 +196,7 @@ describe("init options.method", function(){
         disable = Object.keys(window.payment_methods);
         disable.splice(disable.indexOf(m), 1);
         disable.forEach(function(disabledTab){
-          disableVal = disabledTab == 'wallet' ? {} : false;
+          var disableVal = disabledTab == 'wallet' ? {} : false;
           window.payment_methods[disabledTab] = disableVal;
         })
       }
@@ -243,7 +243,7 @@ describe("Razorpay card tab submit", function(){
   var $ccNumber, $ccExpiry, $ccCVV;
   var $name, $email, $contact;
   var $nbLink, $nbBank;
-  var $ccSubmit;
+  var $ccForm, $ccSubmit;
   var customOptions;
 
   [
