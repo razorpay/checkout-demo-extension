@@ -58,6 +58,23 @@ module.exports = function(grunt){
         dest: 'app/dist/v1' //dist is the only directory served
       }
     },
+    uglify: {
+      options: {
+        mangle: {
+          toplevel: true,
+          sort: true
+        },
+        compress: {
+          negate_iife: true,
+          drop_console: true,
+          drop_debugger: true,
+          unsafe: true
+        },
+        mangleProperties: true,
+        preserveComments: false,
+        sourceMap: true
+      }
+    },
     preprocess: {
       tmpfolder: {
         src : ['app/srv/**/*.js'],
