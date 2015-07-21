@@ -33,7 +33,7 @@ module.exports = function(grunt){
         cmd: 'cp -r app/srv/images app/dist/v1/images/'
       },
       copy_css:{
-        cmd: 'cp app/srv/css/style.css app/dist/v1/css/style.css'
+        cmd: 'cp app/srv/css/checkout.css app/dist/v1/css/checkout.css'
       },
       copy_html:{
         cmd: 'cp app/srv/*.html app/dist/v1/'
