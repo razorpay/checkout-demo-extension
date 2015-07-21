@@ -16,7 +16,7 @@
 
   var space_14 = /(.{4})(.{0,6})/;
   var sub_14 = function(match, $1, $2, offset, original){
-    $2.length == 6 && ($2 += ' ')
+    $2.length === 6 && ($2 += ' ')
     return $1 + ' ' + $2;
   }
 
@@ -84,7 +84,7 @@
       if(range.text){return true};
 
       // get caret position in IE8
-      textInputRange = el.createTextRange();
+      var textInputRange = el.createTextRange();
       textInputRange.moveToBookmark(range.getBookmark());
       return -textInputRange.moveStart('character', -el.value.length);
     }
@@ -153,7 +153,7 @@
   }
 
   var formatExpiryBack = function(e){
-    if((e.which || e.keyCode) != 8) return;
+    if((e.which || e.keyCode) !== 8) return;
     var el = this;
     var pos = checkSelection(el);
     

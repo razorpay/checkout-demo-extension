@@ -163,7 +163,7 @@
     var event = data.event;
     data = data.data;
 
-    if(event == 'load'){
+    if(event === 'load'){
       discreet.setMetaViewport();
       var options = {};
       for(var i in this.options){
@@ -181,35 +181,35 @@
       return discreet.sendFrameMessage.call(this, response);
     }
 
-    else if(event == 'redirect'){
+    else if(event === 'redirect'){
       discreet.nextRequestRedirect(data);
     }
 
-    else if (event == 'submit'){
+    else if (event === 'submit'){
       if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit == 'function'){
         window.CheckoutBridge.onsubmit(JSON.stringify(data));
       }
     }
     
-    else if (event == 'dismiss'){
+    else if (event === 'dismiss'){
       if(typeof this.options.modal.ondismiss == 'function')
         this.options.modal.ondismiss()
     }
 
-    else if (event == 'hidden'){
+    else if (event === 'hidden'){
       discreet.onClose.call(this);
       if(typeof this.options.modal.onhidden == 'function')
         this.options.modal.onhidden();
     }
 
-    else if (event == 'success'){
+    else if (event === 'success'){
       if(this.checkoutFrame){
         this.checkoutFrame.setAttribute('removable', true);
       }
       if(typeof this.options.handler == 'function'){
         this.options.handler.call(null, data);
       }
-    } else if (event == 'fault'){
+    } else if (event === 'fault'){
       alert("Oops! Something went wrong.");
       this.close();
     }

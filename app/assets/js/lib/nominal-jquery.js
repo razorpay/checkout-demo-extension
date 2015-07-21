@@ -1,4 +1,6 @@
 (function(root){
+  'use strict';
+
   var jsonp = function(options){
     !options.data && (options.data = {});
     var callback = options.data.callback = 'jsonp_' + randomString(15);
@@ -122,7 +124,7 @@
 
     removeClass: function(str){
       var el = this[0];
-      className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
+      var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
       if(el.className != className) el.className = className;
       return this;
     },

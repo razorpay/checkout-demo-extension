@@ -53,7 +53,7 @@
       var tabCount = 0;
 
       if(typeof methodOptions.wallet == 'object'){
-        for(i in methodOptions.wallet){
+        for(var i in methodOptions.wallet){
           if(methodOptions.wallet[i]){
             tabCount++;
             break;
@@ -65,7 +65,7 @@
         methodOptions.wallet = false;
       }
       if(!payment_methods.error){
-        for(i in payment_methods){
+        for(var i in payment_methods){
           if(methodOptions[i] != false && payment_methods[i] != false){
             methodOptions[i] = payment_methods[i];
           }
@@ -75,7 +75,7 @@
         methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
       }
 
-      if(methodOptions.netbanking != false && typeof methodOptions.netbanking != 'object'){
+      if(methodOptions.netbanking !== false && typeof methodOptions.netbanking != 'object'){
         methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
       }
       if(methodOptions.card){
@@ -401,7 +401,6 @@
         return;
       }
       var message;
-      var modalEl = discreet.modal.modalElement;
       discreet.shake();
 
       $('submitbtn')[0].removeAttribute('disabled');

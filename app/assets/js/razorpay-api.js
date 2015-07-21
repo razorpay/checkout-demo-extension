@@ -3,8 +3,6 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.prototype.$;
-  var discreet = Razorpay.prototype.discreet;
   Razorpay = new Razorpay(options);
 
   Razorpay.payment = {
