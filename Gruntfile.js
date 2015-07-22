@@ -235,13 +235,6 @@ module.exports = function(grunt){
     grunt.config.set('uglify', uglify);
   })
 
-  grunt.registerTask('testRelease', [
-    'prepareTestRelease',
-    'karma:razorpay',
-    'karma:checkout',
-    'karma:frame'
-  ]);
-
   /**
    * Alias for build
    */
@@ -259,8 +252,6 @@ module.exports = function(grunt){
     'exec:clean_srv',
     'exec:harp_compile',
     'useminPrepare',
-    'uglifyPrepare',
-    'uglify:generated',
     'prepareKarma'
   ]);
 
@@ -300,24 +291,6 @@ module.exports = function(grunt){
 
       block = karma.options.files.concat(block);
       karma[key].options.files = block.concat(karma[key].options.files);
-    }
-
-    grunt.config.set('karma', karma);
-  });
-
-  grunt.registerTask('prepareTestRelease', 'Testing released files', function(){
-    var fileSets = grunt.config.get('uglify');
-    fileSets = fileSets.generated.files;
-
-    var blocks = {};
-    var karma = grunt.config.get('karma');
-
-    for(var i in fileSets){
-      var item = fileSets[i].dest.split('/').pop();
-      blocks[item] = 'dest/v1/' + item;
-
-      var karmaKey = item.replace(/(^.+[-]|\.js$)/g,'');
-      karma[karmaKey].options.files = karma.options.files.concat([blocks[item], 'test/release/' + item]);
     }
 
     grunt.config.set('karma', karma);
