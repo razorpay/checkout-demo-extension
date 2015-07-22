@@ -62,7 +62,7 @@
         }
       }
 
-      if(!tabCount || discreet.rzp.options.amount > 100*10000){ // disable paytm for transactions worth > INR 10,000
+      if(!tabCount || discreet.rzp.options.amount > 100*3000){ // disable paytm for transactions worth > INR 3,000
         methodOptions.wallet = false;
       }
 
