@@ -205,14 +205,14 @@
       // }
 
       // init modal
-      var modalOptions = {
-        onhide: function(){
-          Razorpay.sendMessage({event: 'dismiss'});
-        },
-        onhidden: function(){
-          Razorpay.sendMessage({event: 'hidden'});
-        }
-      }
+      var modalOptions = discreet.rzp.options.modal;
+      modalOptions.onhide = function(){
+        Razorpay.sendMessage({event: 'dismiss'});
+      };
+      modalOptions.onhidden = function(){
+        Razorpay.sendMessage({event: 'hidden'});
+      };
+      delete modalOptions.ondismiss;
 
       discreet.applyFont($('powered-link')[0]);
       discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);

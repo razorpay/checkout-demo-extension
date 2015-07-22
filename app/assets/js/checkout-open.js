@@ -164,13 +164,18 @@
     data = data.data;
 
     if(event === 'load'){
-      discreet.setMetaViewport();
+      var i;
       var options = {};
-      for(var i in this.options){
+      discreet.setMetaViewport();
+
+      for(i in this.options){
         var value = this.options[i];
         if(typeof value != 'function' && i != 'parent'){
           options[i] = value;
         }
+      }
+      for(i in this.modal.options){
+        this.options.modal[i] = this.modal.options[i];
       }
       discreet.setImageOption(options);
 

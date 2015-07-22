@@ -40,7 +40,8 @@
     },
     modal: {
       ondismiss: $.noop,
-      onhidden: $.noop
+      onhidden: $.noop,
+      backdropClose: true
     },
     signature: '',
     display_amount: '',
@@ -116,6 +117,7 @@
 
   Razorpay.prototype.configure = function(overrides){
     this.options = discreet.configure(overrides);
+    this.modal = {options: {}};
 
     if(typeof discreet.initHedwig == 'function'){
       discreet.initHedwig.call(this);
