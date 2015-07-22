@@ -465,7 +465,7 @@
         discreet.configureRollbar(message);
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
-        Rollbar.error(e.message, message);
+        if(window.Rollbar) Rollbar.error(e.message, message);
         return;
       }
       discreet.showModal();

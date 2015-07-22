@@ -30,6 +30,7 @@
 - `app/assets/layout.html` is used for configuring the minification and concat portion of grunt using the `usemin` package.
 - All pushes to master are auto-deployed by wercker if the build succeeds(see `wercker.yml`).
 - If you have to ignore any specific jshint warning in a particular file put `/* jshint -<CODE> */` at the top of the file where code can be obtained from https://github.com/jshint/jshint/blob/master/src/messages.js
+- Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/assets/js/base.js`
 
 #Deployment and Branches
 

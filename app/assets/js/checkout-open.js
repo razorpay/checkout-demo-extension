@@ -96,6 +96,9 @@
         this.checkoutFrame = null;
       }
     }
+
+    if(this instanceof Razorpay && typeof this.options.modal.onhidden == 'function')
+      this.options.modal.onhidden();
   }
 
   discreet.sendFrameMessage = function(response){
@@ -203,8 +206,6 @@
 
     else if (event === 'hidden'){
       discreet.onClose.call(this);
-      if(typeof this.options.modal.onhidden == 'function')
-        this.options.modal.onhidden();
     }
 
     else if (event === 'success'){

@@ -41,6 +41,8 @@
     modal: {
       ondismiss: $.noop,
       onhidden: $.noop,
+      escape: true,
+      animation: true,
       backdropClose: true
     },
     signature: '',
