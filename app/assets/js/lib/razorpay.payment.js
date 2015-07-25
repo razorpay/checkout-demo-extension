@@ -233,12 +233,13 @@
 
     formatNumber: function(el){
       if(!el) return;
-      card.setType(el, 'unknown');
       $(el).on('keypress', formatNumber);
       $(el).on('keydown', formatNumberBack);
       $(el).on('keyup', function(){
         card.setType(this);
       });
+      card.setType(el, !el.value && 'unknown');
+      formatNumber.call(el);
     },
 
     formatExpiry: function(el){
