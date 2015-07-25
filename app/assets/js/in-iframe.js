@@ -309,8 +309,8 @@
       if (discreet.isInvalid('form-common'))
         return;
 
-      var card_number = $('card_number')[0];
-      card_number && discreet.setNumberValidity.call(card_number);
+      // var card_number = $('card_number')[0];
+      // card_number && discreet.setNumberValidity.call(card_number);
 
       var activeTab = $('tabs').find('active')[0];
       if (activeTab && discreet.isInvalid(activeTab.getAttribute('data-target')))
