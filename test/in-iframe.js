@@ -705,3 +705,32 @@ describe("CheckoutBridge should", function(){
     expect(spy).not.toHaveBeenCalled();
   })
 })
+
+describe("handleMessage should", function(){
+  var opts, spyCalled, spyNotCalled;
+
+  beforeEach(function(){
+    spyCalled = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
+  })
+
+  afterEach(function(){
+    openCheckoutForm(opts);
+    expect(spyCalled).toHaveBeenCalled();
+    expect(spyNotCalled).not.toHaveBeenCalled();
+  })
+
+  it("signal fault if Razorpay instantiation fails", function(){
+    opts = 11;
+    spyOn(Razorpay, 'sendMessage').and.callFake(function(m){
+      expect(m.event).toBe('fault');
+      spyCalled();
+    })
+    spyOn(frameDiscreet, 'showModal').and.callFake(spyNotCalled);
+  })
+
+  it("showModal on passing options", function(){
+    opts = coOptions;
+    spyOn(frameDiscreet, 'showModal').and.callFake(spyCalled);    
+  })
+})

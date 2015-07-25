@@ -37,11 +37,12 @@
     },
     
     setMethods: function(payment_methods){
+      var i;
       var methodOptions = discreet.rzp.options.method;
 
       if(typeof payment_methods.wallet == 'object'){
         if(typeof methodOptions.wallet == 'object'){
-          for(var i in payment_methods.wallet){
+          for(i in payment_methods.wallet){
             if(methodOptions.wallet[i] != false && payment_methods.wallet[i] != false){
               methodOptions.wallet[i] = payment_methods.wallet[i];
             }
@@ -53,7 +54,7 @@
       var tabCount = 0;
 
       if(typeof methodOptions.wallet == 'object'){
-        for(var i in methodOptions.wallet){
+        for(i in methodOptions.wallet){
           if(methodOptions.wallet[i]){
             tabCount++;
             break;
@@ -61,11 +62,12 @@
         }
       }
 
-      if(!tabCount){
+      if(!tabCount || discreet.rzp.options.amount > 100*3000){ // disable paytm for transactions worth > INR 3,000
         methodOptions.wallet = false;
       }
+
       if(!payment_methods.error){
-        for(var i in payment_methods){
+        for(i in payment_methods){
           if(methodOptions[i] != false && payment_methods[i] != false){
             methodOptions[i] = payment_methods[i];
           }
@@ -203,14 +205,14 @@
       // }
 
       // init modal
-      var modalOptions = {
-        onhide: function(){
-          Razorpay.sendMessage({event: 'dismiss'});
-        },
-        onhidden: function(){
-          Razorpay.sendMessage({event: 'hidden'});
-        }
-      }
+      var modalOptions = discreet.rzp.options.modal;
+      modalOptions.onhide = function(){
+        Razorpay.sendMessage({event: 'dismiss'});
+      };
+      modalOptions.onhidden = function(){
+        Razorpay.sendMessage({event: 'hidden'});
+      };
+      delete modalOptions.ondismiss;
 
       discreet.applyFont($('powered-link')[0]);
       discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);
@@ -463,7 +465,7 @@
         discreet.configureRollbar(message);
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
-        Rollbar.error(e.message, message);
+        if(window.Rollbar) Rollbar.error(e.message, message);
         return;
       }
       discreet.showModal();
