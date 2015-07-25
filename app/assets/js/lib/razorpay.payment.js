@@ -178,23 +178,26 @@
     var type = cardType(value) || 'unknown';
     var cardobj = card_formats[type];
 
-    if(e) e.preventDefault();
     if(prefix.length + suffix.length >= cardobj.length) return;
 
-    var el = this;
+    if(e){
+      var el = this;
+      e.preventDefault();
+      setTimeout(function(){
+        el.value = value.replace(cardobj.space, cardobj.subs);
 
-    setTimeout(function(){
-      el.value = value.replace(cardobj.space, cardobj.subs);
-
-      if(suffix){
-        pos = prefix.length;
-        var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
-        pos += prespace && ++prespace.length || 1;
-        setCaret(el, pos);
-      }
-      if(value.length == cardobj.length)
-        card.filled(el);
-    })
+        if(suffix){
+          pos = prefix.length;
+          var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
+          pos += prespace && ++prespace.length || 1;
+          setCaret(el, pos);
+        }
+        if(value.length == cardobj.length)
+          card.filled(el);
+      })
+    } else {
+      this.value = value.replace(cardobj.space, cardobj.subs);      
+    }
   }
 
   var formatNumberBack = function(e){
