@@ -36,7 +36,12 @@
     prefill: {
       name: '',
       contact: '',
-      email: ''
+      email: '',
+      card: {
+        number: '',
+        expiry_month: '',
+        expiry_year: ''
+      }
     },
     modal: {
       ondismiss: $.noop,
@@ -144,6 +149,21 @@
             for (var j in overrides.notes){
               if(typeof overrides.notes[j] == 'string'){
                 options.notes[j] = overrides.notes[j];
+              }
+            }
+          }
+        } else if (i == 'prefill') {
+          options.prefill = JSON.parse(JSON.stringify(defaults.prefill));
+          var op = overrides.prefill;
+          if(typeof op == 'object'){
+            for(var j in defaults.prefill){
+              if(typeof op[j] == 'object'){
+                for(var k in op[j]){
+                  if(k in defaults.prefill[j])
+                    options.prefill[j][k] = '' + op[j][k];
+                }
+              } else if(j in op) {
+                options.prefill[j] = '' + op[j];
               }
             }
           }
