@@ -252,6 +252,7 @@ module.exports = function(grunt){
     'exec:clean_srv',
     'exec:harp_compile',
     'useminPrepare',
+    'uglifyPrepare',
     'prepareKarma'
   ]);
 
