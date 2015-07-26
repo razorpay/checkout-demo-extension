@@ -38,6 +38,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-env": "^0.4.2",
     "grunt-exec": "^0.4.6",
+    "grunt-htmlclean": "^2.6.4",
     "grunt-inline": "^0.3.4",
     "grunt-karma": "^0.9.0",
     "grunt-preprocess": "^4.1.0",
@@ -54,5 +55,6 @@
     "karma-phantomjs-launcher": "~0.1",
     "load-grunt-tasks": "^0.4.0"
   },
-  "private": "true"
+  "private": "true",
+  "dependencies": {}
 }

@@ -29,12 +29,14 @@
     this.options = $.defaults(options, defaults);
     this.container = $(this.options.containerId);
     this.modalElement = element;
+
+    var duration, durationStyle;
     
     if(!this.options.animation || !this.transitionProperty){
-      var duration = 0;
+      duration = 0;
     } else {
       if(typeof window.getComputedStyle == 'function'){
-        var durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
+        durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
     }
