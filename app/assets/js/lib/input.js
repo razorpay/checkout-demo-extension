@@ -76,9 +76,11 @@
 
     input: function(e){
       var el = e.target;
-      if(typeof el.getAttribute('ignore-input') == 'string') return;
       var parent = $(el.parentNode);
       var value = el.value;
+      parent[value && 'addClass' || 'removeClass']('filled');
+      if(typeof el.getAttribute('ignore-input') == 'string') return;
+
       var valid = true;
       var required = el.required || typeof el.getAttribute('required') == 'string';
       var pattern = el.getAttribute('pattern');
@@ -90,7 +92,6 @@
         valid = !value && !required || new RegExp(pattern).test(value);
       }
       parent[valid && 'removeClass' || 'addClass']('invalid');
-      parent[value && 'addClass' || 'removeClass']('filled');
     },
 
     init: function(){
