@@ -10,6 +10,8 @@
     rzp: null,
 
     shake: function(){
+      if(/Android|iPhone/.test(navigator.userAgent))
+        return;
       if(discreet.modal){
         var el = $(discreet.modal.modalElement).find('modal-inner');
         if(el[0]){
