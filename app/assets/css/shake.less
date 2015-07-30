@@ -28,24 +28,19 @@
   40% { transform: scale(1); } 
 }
 
-.shake { 
-	display:
-  inline-block;
+.shake {
   transform-origin: center;
 	animation-name: shake; 
-  animation-duration: 350ms;
+  animation-duration: 400ms;
   animation-iteration-count: 1;
   animation-timing-function: ease-in-out; 
 }
 
-@keyframes shake {
-  33% {
-      -webkit-transform: translateX(-8px);
-  }
-  66% {
-      -webkit-transform: translateX(12px);
-  }
-  0%, 100% {
-      -webkit-transform: translateX(0);
-  }
+@keyframes shake{
+  0{transform:none}
+  12.5%{transform:translateX(-6px)}
+  37.5%{transform:translateX(5px)}
+  62.5%{transform:translateX(-3px)}
+  87.5%{transform:translateX(2px)}
+  100%{transform:none}
 }

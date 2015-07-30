@@ -11,11 +11,12 @@
 
     shake: function(){
       if(discreet.modal){
-        var el = $(discreet.modal.modalElement);
-        el.addClass('shake');
-        setTimeout(function() {
-          el.removeClass('shake');
-        }, 400);
+        var el = $(discreet.modal.modalElement).find('modal-inner');
+        if(el[0]){
+          el = $(el[0])
+          el.removeClass('shake')[0].offsetWidth;
+          el.addClass('shake');
+        }
       }
     },
 
