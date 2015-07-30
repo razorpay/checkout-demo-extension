@@ -15,7 +15,7 @@
         el.addClass('shake');
         setTimeout(function() {
           el.removeClass('shake');
-        }, 200);
+        }, 400);
       }
     },
 
