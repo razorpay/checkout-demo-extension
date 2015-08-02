@@ -184,13 +184,13 @@ button{
   width: @width;
   font-family: @font-default;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
-  min-height: 377px;
 
   // ie7 and below, middlefix doesn't work.
   // NOTE: it isn't because of lack of :after, but buggy white-space support
   *top: 10%;
 }
 .modal-inner{
+  min-height: 377px;
   border-radius: @border-radius;
   background: @background-color;
   .transition(0.15s ease-out);
