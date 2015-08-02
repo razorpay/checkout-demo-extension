@@ -13,9 +13,9 @@
       if(/Android|iPhone/.test(navigator.userAgent))
         return;
       if(discreet.modal){
-        var el = $(discreet.modal.modalElement);
-
+        var el = $(discreet.modal.modalElement).find('modal-inner');
         if(el[0]){
+          el = $(el[0]);
           el.removeClass('shake')[0].offsetWidth;
           el.addClass('shake');
         }
