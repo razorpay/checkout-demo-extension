@@ -174,6 +174,7 @@ button{
   margin: 20px 0;
   opacity: 0;
   .transform(scale(0.9));
+
   &.animate{
     .transition(0.25s ease-in)!important;
   }
@@ -192,7 +193,8 @@ button{
 .modal-inner{
   border-radius: @border-radius;
   background: @background-color;
-  .transition(0.15s ease-out opacity);
+  .transition(0.15s ease-out);
+  overflow: hidden;
 }
 .elem{
   height: @input-height;

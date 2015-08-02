@@ -29,11 +29,13 @@
 }
 
 .shake {
-  transform-origin: center;
-	animation-name: shake; 
-  animation-duration: 400ms;
-  animation-iteration-count: 1;
-  animation-timing-function: ease-in-out; 
+  .modal-inner{
+    transform-origin: center;
+    animation-name: shake;
+    animation-duration: 400ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+  }
 }
 
 @keyframes shake{

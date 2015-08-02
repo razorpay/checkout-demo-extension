@@ -13,9 +13,9 @@
       if(/Android|iPhone/.test(navigator.userAgent))
         return;
       if(discreet.modal){
-        var el = $(discreet.modal.modalElement).find('modal-inner');
+        var el = $(discreet.modal.modalElement);
+
         if(el[0]){
-          el = $(el[0])
           el.removeClass('shake')[0].offsetWidth;
           el.addClass('shake');
         }
@@ -257,9 +257,10 @@
       var modalEl = $(discreet.modal.modalElement);
       var inner = modalEl.children('modal-inner')[0];
       if(!inner) return;
+      var content = $(inner).children('modal-content')[0];
+      if(!content) return;
 
-      modalEl[0].style.height = inner.offsetHeight + 'px';
-      modalEl.addClass('animate');
+      inner.style.height = content.offsetHeight + 'px';
 
       var tabContent = $(target.getAttribute('data-target'));
       var activeTab = tabContent.parent().children('active')[0];
@@ -270,10 +271,9 @@
       activeTab && $(activeTab).removeClass('active');
       $(target).addClass('active');
 
-      modalEl[0].style.height = inner.offsetHeight + 'px';
+      inner.style.height = content.offsetHeight + 'px';
       setTimeout(function(){
-        modalEl.removeClass('animate');
-        modalEl[0].style.height = '';
+        inner.style.height = '';
       }, 300);
     },
 
