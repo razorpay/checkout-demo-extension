@@ -261,6 +261,8 @@
       if(!content) return;
 
       inner.style.height = content.offsetHeight + 'px';
+      inner.offsetHeight;
+      $(inner).addClass('anim')
 
       var tabContent = $(target.getAttribute('data-target'));
       var activeTab = tabContent.parent().children('active')[0];
@@ -274,6 +276,7 @@
       inner.style.height = content.offsetHeight + 'px';
       setTimeout(function(){
         inner.style.height = '';
+        $(inner).removeClass('anim')
       }, 300);
     },
 

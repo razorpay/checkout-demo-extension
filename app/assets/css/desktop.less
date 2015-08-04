@@ -189,11 +189,16 @@ button{
   // NOTE: it isn't because of lack of :after, but buggy white-space support
   *top: 10%;
 }
-.modal-inner{
+.modal-content{
   min-height: 377px;
+}
+.modal-inner{
+  position: relative;
   border-radius: @border-radius;
   background: @background-color;
-  .transition(0.15s ease-out);
+  &.anim{
+    .transition(0.15s ease-out);
+  }
   overflow: hidden;
 }
 .elem{
