@@ -184,28 +184,12 @@
         return discreet.modal.show();
       }
 
-      if(!window.payment_methods){
-        return discreet.rzp.payment.getMethods(function(payment_methods){
-          if('error' in payment_methods){
-            discreet.errorHandler(payment_methods);
-          } else {
-            window.payment_methods = payment_methods;
-            discreet.showModal();
-          }
-        });
-      }
       discreet.setMethods(window.payment_methods);
       $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
       document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
       discreet.$el = $('container');
       discreet.smarty = new Smarty(discreet.$el);
-
-      // if(qpmap && qpmap.platform == 'android' && window.navigator && navigator.userAgent){
-      //   if(navigator.userAgent.indexOf('Android 2') > 0){
-      //     discreet.$el.addClass('shown');
-      //   }
-      // }
 
       // init modal
       var modalOptions = discreet.rzp.options.modal;
@@ -500,11 +484,7 @@
     window.handleMessage(data);
   }
 
-  if (window.addEventListener) {
-    window.addEventListener('message', discreet.parseMessage)
-  } else if(window.attachEvent) { // IE8 or earlier
-    window.attachEvent('onmessage', discreet.parseMessage);
-  }
+  $(window).on('message', discreet.parseMessage);
 
   Razorpay.sendMessage({event: 'load'});
 

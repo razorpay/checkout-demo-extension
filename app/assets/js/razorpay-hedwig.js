@@ -201,7 +201,6 @@
 
       if(request.payment_id){
         $.ajax({
-          dataType: 'jsonp',
           url: discreet.makeUrl(request.options) + '/payments/'+request.payment_id+'/cancel',
           data: {key_id: request.options.key}
         })

@@ -180,7 +180,7 @@
   }
 
   $.ajax = function(options){
-    if(options.dataType == 'jsonp') return jsonp(options);
+    return jsonp(options);
   }
 
   $.noop = function(){};

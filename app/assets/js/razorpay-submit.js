@@ -68,7 +68,6 @@
         
         return $.ajax({
           url: url + options.jsonpUrl,
-          dataType: 'jsonp',
           success: discreet.getAjaxSuccess(request),
           timeout: 35000,
           error: request.error,
@@ -82,7 +81,6 @@
         url: discreet.makeUrl(discreet.defaults) + discreet.defaults.methodsUrl,
         data: {key_id: discreet.defaults.key},
         timeout: 30000,
-        dataType: 'jsonp',
         success: function(response){
           if(typeof callback == 'function'){
             callback(response);
