@@ -238,16 +238,6 @@
 
       discreet.renew();
 
-      var modalEl = $(discreet.modal.modalElement);
-      var inner = modalEl.children('modal-inner')[0];
-      if(!inner) return;
-      var content = $(inner).children('modal-content')[0];
-      if(!content) return;
-
-      inner.style.height = content.offsetHeight + 'px';
-      inner.offsetHeight;
-      $(inner).addClass('anim')
-
       var tabContent = $(target.getAttribute('data-target'));
       var activeTab = tabContent.parent().children('active')[0];
       activeTab && $(activeTab).removeClass('active');
@@ -256,12 +246,6 @@
       activeTab = $(target.parentNode).children('active')[0];
       activeTab && $(activeTab).removeClass('active');
       $(target).addClass('active');
-
-      inner.style.height = content.offsetHeight + 'px';
-      setTimeout(function(){
-        inner.style.height = '';
-        $(inner).removeClass('anim')
-      }, 300);
     },
 
     // toggle_nocvv: function(){
