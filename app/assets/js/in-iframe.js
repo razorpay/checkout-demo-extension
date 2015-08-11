@@ -212,6 +212,15 @@
         discreet.formSubmit(e);
         e.preventDefault();
       });
+      var banks = $('netb-banks').children('netb-bank')
+      for(var i=0; i<banks.length; i++){
+        $(banks[i]).on('click', function(){
+          var value = this.getAttribute('data-value');
+          var select = $('bank-select')[0];
+          select.value = value;
+          discreet.smarty.input({target: select});
+        })
+      }
 
       if(discreet.qpmap){
         var lis = $(tabs)[0].getElementsByTagName('li');

@@ -202,6 +202,7 @@ button{
   overflow: hidden;
 }
 .elem{
+  clear: both;
   height: @input-height;
   line-height: @input-height;
   border: 1px solid @border-color;
@@ -562,4 +563,27 @@ button{
       color: #ddd;
     }
   }
+}
+#netb-banks{
+  margin: 0 -3px;
+}
+.netb-bank{
+  width: 50%;
+  float: left;
+}
+.netb-inner{
+  white-space: nowrap;
+  border-radius: 4px;
+  line-height: 20px;
+  cursor: pointer;
+  margin: 0 3px 6px;
+  padding: 6px;
+  border: 1px solid @border-color;
+  background: #fff;
+}
+#tab-netbanking img{
+  vertical-align: top;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
 }
