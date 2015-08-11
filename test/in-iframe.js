@@ -734,3 +734,12 @@ describe("handleMessage should", function(){
     spyOn(frameDiscreet, 'showModal').and.callFake(spyCalled);    
   })
 })
+
+describe("set url query params", function(){
+  it("", function(){
+    frameDiscreet.setQueryParams('qwe=asd&poe.level2=hjk&bnm=786');
+    expect(frameDiscreet.qpmap.qwe).toBe('asd');
+    expect(frameDiscreet.qpmap.poe.level2).toBe('hjk');
+    expect(frameDiscreet.qpmap.bnm).toBe('786');
+  })
+})

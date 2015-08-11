@@ -416,6 +416,36 @@
           }
         });
       }
+    },
+    setQueryParams: function(search){
+      var params = search.replace(/^\?/,'').split('&');
+      for(var i=0; i < params.length; i++){
+        var split = params[i].split('=', 2);
+        if(split[0].indexOf('.') != -1){
+          var dotsplit = split[0].split('.', 2);
+          if(!qpmap[dotsplit[0]]){
+            qpmap[dotsplit[0]] = {};
+          }
+          qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
+        } else {
+          qpmap[split[0]] = decodeURIComponent(split[1]);
+        }
+      }
+    },
+    parseMessage: function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
+      if(!e || !e.data)
+        return;
+      var data;
+      if(typeof e.data == 'string'){
+        try{
+          data = JSON.parse(e.data);
+        } catch(e){
+          return;
+        }
+      } else {
+        data = e.data;
+      }
+      window.handleMessage(data);
     }
   }
 
@@ -452,22 +482,6 @@
     }
   }
 
-  discreet.parseMessage = function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
-    if(!e || !e.data)
-      return;
-    var data;
-    if(typeof e.data == 'string'){
-      try{
-        data = JSON.parse(e.data);
-      } catch(e){
-        return;
-      }
-    } else {
-      data = e.data;
-    }
-    window.handleMessage(data);
-  }
-
   $(window).on('message', discreet.parseMessage);
 
   Razorpay.sendMessage({event: 'load'});
@@ -478,20 +492,8 @@
 
   // initial error (helps in case of redirection flow)
   if(location.search){
-    var qpmap = discreet.qpmap = {};
-    var params = location.search.replace(/^\?/,'').split('&');
-    for(var i=0; i < params.length; i++){
-      var split = params[i].split('=', 2);
-      if(split[0].indexOf('.') != -1){
-        var dotsplit = split[0].split('.', 2);
-        if(!qpmap[dotsplit[0]]){
-          qpmap[dotsplit[0]] = {};
-        }
-        qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
-      } else {
-        qpmap[split[0]] = decodeURIComponent(split[1]);
-      }
-    }
+    discreet.setQueryParams(location.search);
   }
+  var qpmap = discreet.qpmap = {};
 
 })();

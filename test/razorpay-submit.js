@@ -55,6 +55,41 @@ describe("Razorpay.configure should", function(){
   })
 })
 
+describe("Razorpay.payment.validate should", function(){
+  it("throw if invalid data", function(){
+    expect(function(){
+      var data = jQuery.extend(request.data);
+      delete data.key_id;
+      Razorpay.payment.validate(data, true);
+    }).toThrow();
+  })
+
+  describe("report", function(){
+    var data, field;
+
+    beforeEach(function(){
+      data = jQuery.extend(request.data);
+      data.amount = '45555';
+      data.key_id = 'rewerdd';
+    })
+
+    it("amount error", function(){
+      field = 'amount';
+      data.amount = 'asd';
+    })
+
+    it("key error", function(){
+      field = 'key';
+      data.key_id = '';
+    })
+
+    afterEach(function(){
+      expect(Razorpay.payment.validate(data)[0].field).toBe(field);
+    })
+  })
+})
+
+
 describe("authorize should", function(){
   var init_options, rzp, req;
 
