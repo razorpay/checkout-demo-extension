@@ -1,5 +1,5 @@
 var discreet = Razorpay.prototype.discreet;
-var orig_methods = window.payment_methods = {"card":true,"netbanking":{"UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},"wallet":{"paytm":true}};
+var orig_methods = window.payment_methods = {"card":true,"netbanking":{"HDFC":"HDFC Bank", "UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},"wallet":{"paytm":true}};
 
 function openCheckoutForm(options){
   jQuery('#container').remove();
@@ -551,6 +551,14 @@ describe("Razorpay open netbanking page and submit method", function(){
     
 
     it("should show netbanking form on clicking", function(){
+      launch(operation);
+      netb_bank = jQuery('.netb-bank');
+      sendclick(netb_bank[0]);
+      expect(jQuery('select').val()).toBe(netb_bank.attr('data-value'));
+      spyCalled();
+    });
+
+    it("should select bank", function(){
       launch(operation);
       var active = jQuery('li.active');
       expect(active.length).toBe(1);
