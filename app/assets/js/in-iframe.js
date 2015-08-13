@@ -187,7 +187,7 @@
       discreet.setMethods(window.payment_methods);
       $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
-      document.body.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
+      document.body.innerHTML += (doT.compile(templates.modal))(discreet.rzp.options);
       discreet.$el = $('container');
       discreet.smarty = new Smarty(discreet.$el);
 

@@ -50,7 +50,7 @@
 
       if(options.redirect){
         var form = document.createElement('form');
-        form.setAttribute('action', url + '/payments');
+        form.setAttribute('action', url + '/payments/create/checkout');
         form.setAttribute('method', 'post');
         var formHTML = '';
 
