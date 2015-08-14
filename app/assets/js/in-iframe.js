@@ -503,9 +503,9 @@
 // @endif
 
   // initial error (helps in case of redirection flow)
+  var qpmap = discreet.qpmap = {};
   if(location.search){
     discreet.setQueryParams(location.search);
   }
-  var qpmap = discreet.qpmap = {};
 
 })();
