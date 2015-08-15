@@ -8,7 +8,8 @@
   var discreet = Razorpay.prototype.discreet;
 
   // place frameContainer absolute, and add window.onscroll
-  var absoluteContainer = true || /iPhone|iPad/.test(navigator.userAgent);
+  var absoluteContainer = /iPhone|iPad|Android 2/.test(navigator.userAgent);
+  // var pageY = 0;
 
   if(absoluteContainer){
     if(window.addEventListener){
@@ -17,9 +18,15 @@
         if(!c || !discreet.isOpen)
           return;
         var bb = c.getBoundingClientRect();
-        if(bb.bottom < 0 || bb.top > innerHeight){
-          c.style.top = pageYOffset + 'px';
-        }
+        // if(pageY < pageYOffset){
+          if(bb.bottom < 0 || bb.top > innerHeight)
+            c.style.top = pageYOffset + 'px';
+        // }
+        // else if(pageYOffset < pageY){
+          // else if(bb.top > innerHeight)
+            // c.style.top = pageYOffset + 'px';
+        // }
+        // pageY = pageYOffset;
       })
     }
   }
@@ -36,7 +43,8 @@
     discreet.isOpen = true;
     discreet.merchantData.bodyOverflow = body.style.overflow;
 
-    body.style.overflow = 'hidden';
+    if(!absoluteContainer)
+      body.style.overflow = 'hidden';
 
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
 
@@ -50,16 +58,21 @@
         top: '0',
         left: '0',
         width: '100%',
-        height: '100%'
+        height: '100%',
+        background: 'none',
+        transition: '0.15s ease-out background'
+        '-webkit-transition': '0.15s ease-out background',
+        '-moz-transition': '0.15s ease-out background'
       }
       for(var i in rules){
         style[i] = rules[i];
       }
-      parent.innerHTML = '<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6)"></div>';
       body.appendChild(parent);
     }
     parent = discreet.frameContainer;
     parent.style.display = 'block';
+    parent.offsetWidth;
+    parent.style.background = 'rgba(0,0,0,0.6)';
 
     if(absoluteContainer){
       parent.style.top = (window.pageYOffset || '0') + 'px';
@@ -86,12 +99,13 @@
 
     var attrs = {
       'class': 'razorpay-checkout-frame', // quotes needed for ie
-      style: 'position: relative; height: 100%; transition: 0.25s background; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; left: 0px; top: 0px;',
+      style: 'position: relative; height: 100%; background: none; display: block; border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; left: 0px; top: 0px;',
       allowtransparency: true,
       frameborder: 0,
       width: '100%',
       height: '100%',
-      src: src
+      src: src,
+      scrolling: 'auto'
     };
     for(var i in attrs){
       frame.setAttribute(i, attrs[i]);
@@ -195,8 +209,10 @@
     if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
     }
+    var fc = discreet.frameContainer;
     var event = data.event;
     data = data.data;
+
 
     if(event === 'load'){
       var i;
@@ -232,6 +248,8 @@
     }
     
     else if (event === 'dismiss'){
+      if(fc)
+        fc.style.background = '';
       if(typeof this.options.modal.ondismiss == 'function')
         this.options.modal.ondismiss()
     }
@@ -241,6 +259,9 @@
     }
 
     else if (event === 'success'){
+      if(fc)
+        fc.style.background = '';
+
       if(this.checkoutFrame){
         this.checkoutFrame.setAttribute('removable', true);
       }
