@@ -2,7 +2,7 @@ $ = Razorpay::$
 unless templates
   templates = {}
 templates.modal = '
-<div id="container" tabIndex="0" style="display: none">
+<div id="container" tabIndex="0">
   <div class="backdrop"></div>
   <div class="modal">
     <div class="modal-inner">

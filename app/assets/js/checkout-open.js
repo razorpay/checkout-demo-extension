@@ -7,6 +7,23 @@
   var doT = Razorpay.prototype.doT;
   var discreet = Razorpay.prototype.discreet;
 
+  // place frameContainer absolute, and add window.onscroll
+  var absoluteContainer = true || /iPhone|iPad/.test(navigator.userAgent);
+
+  if(absoluteContainer){
+    if(window.addEventListener){
+      window.addEventListener('scroll', function(){
+        var c = discreet.frameContainer;
+        if(!c || !discreet.isOpen)
+          return;
+        var bb = c.getBoundingClientRect();
+        if(bb.bottom < 0 || bb.top > innerHeight){
+          c.style.top = pageYOffset + 'px';
+        }
+      })
+    }
+  }
+
   Razorpay.prototype.open = function() {
     var body = discreet.bodyEl = document.getElementsByTagName('body')[0];
     if(!body){
@@ -18,6 +35,7 @@
 
     discreet.isOpen = true;
     discreet.merchantData.bodyOverflow = body.style.overflow;
+
     body.style.overflow = 'hidden';
 
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
@@ -26,9 +44,25 @@
       var parent = discreet.frameContainer = document.createElement('div');
       parent.className = 'razorpay-frame-container';
       var style = parent.style;
-      style.zIndex = '99999';
-      style.position = 'relative';
+      var rules = {
+        zIndex: '99999',
+        position: (absoluteContainer ? 'absolute' : 'fixed'),
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%'
+      }
+      for(var i in rules){
+        style[i] = rules[i];
+      }
+      parent.innerHTML = '<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6)"></div>';
       body.appendChild(parent);
+    }
+    parent = discreet.frameContainer;
+    parent.style.display = 'block';
+
+    if(absoluteContainer){
+      parent.style.top = (window.pageYOffset || '0') + 'px';
     }
 
     if(!this.checkoutFrame){
@@ -52,7 +86,7 @@
 
     var attrs = {
       'class': 'razorpay-checkout-frame', // quotes needed for ie
-      style: 'transition: 0.25s background; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%;',
+      style: 'position: relative; height: 100%; transition: 0.25s background; display: block; background: rgba(0, 0, 0, 0.1); border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; left: 0px; top: 0px;',
       allowtransparency: true,
       frameborder: 0,
       width: '100%',
@@ -96,7 +130,8 @@
         this.checkoutFrame = null;
       }
     }
-
+    if(discreet.frameContainer)
+      discreet.frameContainer.style.display = 'none';
     if(this instanceof Razorpay && typeof this.options.modal.onhidden == 'function')
       this.options.modal.onhidden();
   }
@@ -140,9 +175,6 @@
     var meta = head.querySelector('meta[name=viewport]');
 
     if(meta){
-      if(/width=device-width, ?initial-scale=1/.test(meta.getAttribute('content'))){
-        return;
-      }
       discreet.merchantData.metaViewport = meta;
       meta.parentNode.removeChild(meta);
     }
@@ -150,7 +182,7 @@
     if(!discreet.metaViewportTag){
       meta = discreet.metaViewportTag = document.createElement('meta');
       meta.setAttribute('name', 'viewport');
-      meta.setAttribute('content', 'width=device-width, initial-scale=1');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
     }
 
     if(!discreet.metaViewportTag.parentNode){

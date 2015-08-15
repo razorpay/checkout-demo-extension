@@ -77,9 +77,7 @@
       this.isShown = true;
 
       this.bind_events();
-      this.container.css('display', 'block');
       this.modalElement.style.display = 'inline-block';
-      this.container[0].offsetWidth;
       this.modalElement.offsetWidth;
       this.container.addClass(this.options.shownClass);
       clearTimeout();
@@ -115,7 +113,6 @@
 
     hidden: function() {
       clearTimeout();
-      this.container.css('display', 'none');
       this.modalElement.style.display = 'none';
       if(typeof this.options.onhidden === 'function') {
         this.options.onhidden();
