@@ -9,7 +9,7 @@
 
   // place frameContainer absolute, and add window.onscroll
   var absoluteContainer = /iPhone|iPad|Android 2/.test(navigator.userAgent);
-  // var pageY = 0;
+  var pageY = 0;
 
   if(absoluteContainer){
     if(window.addEventListener){
@@ -18,15 +18,20 @@
         if(!c || !discreet.isOpen)
           return;
         var bb = c.getBoundingClientRect();
-        // if(pageY < pageYOffset){
-          if(bb.bottom < 0 || bb.top > innerHeight)
-            c.style.top = pageYOffset + 'px';
-        // }
-        // else if(pageYOffset < pageY){
-          // else if(bb.top > innerHeight)
-            // c.style.top = pageYOffset + 'px';
-        // }
-        // pageY = pageYOffset;
+        // if(bb.bottom < 40 || bb.top > innerHeight - 40)
+        //   c.style.top = pageYOffset + 'px';
+        var top;
+        if(pageY < pageYOffset){
+          if(bb.bottom < 0.2*innerHeight && bb.top < 0)
+            top = pageYOffset;
+        }
+        else if(pageY > pageYOffset){
+          if(bb.top > 0.8*innerHeight && bb.bottom > innerHeight)
+            top = pageYOffset + innerHeight - bb.height;
+        }
+        if(typeof top === 'number')
+          c.style.top = Math.max(0, top) + 'px';
+        pageY = pageYOffset;
       })
     }
   }
@@ -55,14 +60,16 @@
       var rules = {
         zIndex: '99999',
         position: (absoluteContainer ? 'absolute' : 'fixed'),
-        top: '0',
+        top: (absoluteContainer ? innerHeight+'px' : '0'),
+        // padding: (absoluteContainer ? '80px 0' : '0'),
         left: '0',
         width: '100%',
         height: '100%',
+        minHeight: '460px',
         background: 'none',
-        transition: '0.15s ease-out background'
-        '-webkit-transition': '0.15s ease-out background',
-        '-moz-transition': '0.15s ease-out background'
+        transition: '0.15s ease-out',
+        '-webkit-transition': '0.15s ease-out',
+        '-moz-transition': '0.15s ease-out'
       }
       for(var i in rules){
         style[i] = rules[i];
@@ -73,10 +80,6 @@
     parent.style.display = 'block';
     parent.offsetWidth;
     parent.style.background = 'rgba(0,0,0,0.6)';
-
-    if(absoluteContainer){
-      parent.style.top = (window.pageYOffset || '0') + 'px';
-    }
 
     if(!this.checkoutFrame){
       this.checkoutFrame = discreet.createFrame(this.options);
@@ -104,8 +107,7 @@
       frameborder: 0,
       width: '100%',
       height: '100%',
-      src: src,
-      scrolling: 'auto'
+      src: src
     };
     for(var i in attrs){
       frame.setAttribute(i, attrs[i]);

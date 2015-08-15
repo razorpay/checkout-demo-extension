@@ -139,7 +139,7 @@ describe("onFrameMessage ", function(){
     
     it("meta viewport is to be set", function(done){
       setTimeout(function(){
-        expect(document.querySelector('meta[name=viewport]').content).toBe('width=device-width, initial-scale=1');
+        expect(document.querySelector('meta[name=viewport]').content.match('width=device-width, initial-scale=1').length).toBe(1);
         done();
       })
     })
