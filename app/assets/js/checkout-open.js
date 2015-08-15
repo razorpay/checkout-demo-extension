@@ -15,7 +15,7 @@
     if(window.addEventListener){
       window.addEventListener('scroll', function(){
         var c = discreet.frameContainer;
-        if(!c || !discreet.isOpen)
+        if(!c || !discreet.isOpen || typeof window.pageYOffset !== 'number')
           return;
         var bb = c.getBoundingClientRect();
         // if(bb.bottom < 40 || bb.top > innerHeight - 40)
@@ -60,26 +60,24 @@
       var rules = {
         zIndex: '99999',
         position: (absoluteContainer ? 'absolute' : 'fixed'),
-        top: (absoluteContainer ? innerHeight+'px' : '0'),
-        // padding: (absoluteContainer ? '80px 0' : '0'),
+        top: (absoluteContainer ? pageYOffset+'px' : '0'),
         left: '0',
         width: '100%',
         height: '100%',
-        minHeight: '460px',
-        background: 'none',
-        transition: '0.15s ease-out',
-        '-webkit-transition': '0.15s ease-out',
-        '-moz-transition': '0.15s ease-out'
+        '-webkit-transition': '0.2s ease-out top'
       }
       for(var i in rules){
         style[i] = rules[i];
       }
+      var back = discreet.backdrop = document.createElement('div');
+      back.setAttribute('style', 'transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%;');
+      parent.appendChild(back);
       body.appendChild(parent);
     }
     parent = discreet.frameContainer;
     parent.style.display = 'block';
     parent.offsetWidth;
-    parent.style.background = 'rgba(0,0,0,0.6)';
+    discreet.backdrop.style.background = 'rgba(0,0,0,0.6)';
 
     if(!this.checkoutFrame){
       this.checkoutFrame = discreet.createFrame(this.options);
@@ -211,7 +209,7 @@
     if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
     }
-    var fc = discreet.frameContainer;
+    var backdrop = discreet.backdrop;
     var event = data.event;
     data = data.data;
 
@@ -250,8 +248,8 @@
     }
     
     else if (event === 'dismiss'){
-      if(fc)
-        fc.style.background = '';
+      if(backdrop)
+        backdrop.style.background = '';
       if(typeof this.options.modal.ondismiss == 'function')
         this.options.modal.ondismiss()
     }
@@ -261,8 +259,8 @@
     }
 
     else if (event === 'success'){
-      if(fc)
-        fc.style.background = '';
+      if(backdrop)
+        backdrop.style.background = '';
 
       if(this.checkoutFrame){
         this.checkoutFrame.setAttribute('removable', true);
