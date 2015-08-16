@@ -13,9 +13,8 @@
       if(/Android|iPhone/.test(navigator.userAgent))
         return;
       if(discreet.modal){
-        var el = $(discreet.modal.modalElement).children('modal-inner');
+        var el = $('modal-inner');
         if(el[0]){
-          el = $(el[0]);
           el.removeClass('shake')[0].offsetWidth;
           el.addClass('shake');
         }
@@ -376,6 +375,7 @@
 
     hide: function(){
       if(discreet.modal){
+        $('modal-inner').removeClass('shake');
         discreet.modal.hide();
       }
       discreet.modal = null;

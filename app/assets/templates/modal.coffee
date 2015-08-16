@@ -6,7 +6,7 @@ templates.modal = '
   <div class="backdrop"></div>
   <div class="modal">
     <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
-    <div class="modal-inner">
+    <div id="modal-inner" class="modal-inner">
       <div class="modal-content">
         <div class="header">
           <div class="merchant">
