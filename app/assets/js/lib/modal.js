@@ -63,7 +63,7 @@
       if(Array.prototype.some){
         prop = '';
         ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
-          if (typeof document.head.style[i] === 'string') {
+          if (typeof document.documentElement.style[i] === 'string') {
             prop = i + 'Duration';
             return true;
           }

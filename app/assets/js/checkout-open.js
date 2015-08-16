@@ -8,26 +8,33 @@
   var discreet = Razorpay.prototype.discreet;
 
   // place frameContainer absolute, and add window.onscroll
-  var absoluteContainer = /iPhone|iPad|Android 2/.test(navigator.userAgent);
+  var backMinHeight = 0;
   var pageY = 0;
+  var ua = navigator.userAgent;
+  var absoluteContainer;
 
-  if(absoluteContainer){
-    if(window.addEventListener){
+  var fallbacks = function(){
+    absoluteContainer = /iPhone|Android 2\./.test(ua);
+
+    if(/iPhone.+Version\/4\./.test(ua) && typeof document.height == 'number'){
+      backMinHeight = document.height;
+    }
+
+    if(absoluteContainer && window.addEventListener){
       window.addEventListener('scroll', function(){
         var c = discreet.frameContainer;
         if(!c || !discreet.isOpen || typeof window.pageYOffset !== 'number')
           return;
-        var bb = c.getBoundingClientRect();
-        // if(bb.bottom < 40 || bb.top > innerHeight - 40)
-        //   c.style.top = pageYOffset + 'px';
         var top;
+        var offTop = c.offsetTop - pageYOffset;
+        var offBot = c.offsetHeight + offTop;
         if(pageY < pageYOffset){
-          if(bb.bottom < 0.2*innerHeight && bb.top < 0)
-            top = pageYOffset;
+          if(offBot < 0.2*innerHeight && offTop < 0)
+            top = pageYOffset + innerHeight - c.offsetHeight;
         }
         else if(pageY > pageYOffset){
-          if(bb.top > 0.1*innerHeight && bb.bottom > innerHeight)
-            top = pageYOffset + innerHeight - bb.height;
+          if(offTop > 0.1*innerHeight && offBot > innerHeight)
+            top = pageYOffset;
         }
         if(typeof top === 'number')
           c.style.top = Math.max(0, top) + 'px';
@@ -47,13 +54,10 @@
 
     discreet.isOpen = true;
     discreet.merchantData.bodyOverflow = body.style.overflow;
-
-    if(!absoluteContainer)
-      body.style.overflow = 'hidden';
-
     discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
 
     if(!discreet.frameContainer){
+      fallbacks();
       var parent = discreet.frameContainer = document.createElement('div');
       parent.className = 'razorpay-frame-container';
       var style = parent.style;
@@ -61,20 +65,21 @@
         zIndex: '99999',
         position: (absoluteContainer ? 'absolute' : 'fixed'),
         top: (absoluteContainer ? pageYOffset+'px' : '0'),
-        minHeight: (absoluteContainer ? '455px' : '0'),
+        height: (absoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
         left: '0',
         width: '100%',
-        height: '100%',
         '-webkit-transition': '0.2s ease-out top'
       }
       for(var i in rules){
         style[i] = rules[i];
       }
       var back = discreet.backdrop = document.createElement('div');
-      back.setAttribute('style', 'transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%;');
+      back.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%;');
       parent.appendChild(back);
       body.appendChild(parent);
     }
+    if(!absoluteContainer)
+      body.style.overflow = 'hidden';
     parent = discreet.frameContainer;
     parent.style.display = 'block';
     parent.offsetWidth;
@@ -101,7 +106,7 @@
 
     var attrs = {
       'class': 'razorpay-checkout-frame', // quotes needed for ie
-      style: 'position: relative; height: 100%; background: none; display: block; border: 0px none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; left: 0px; top: 0px;',
+      style: 'position: absolute; height: 100%; background: none; display: block; border: 0 none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; left: 0px; top: 0px;',
       allowtransparency: true,
       frameborder: 0,
       width: '100%',
