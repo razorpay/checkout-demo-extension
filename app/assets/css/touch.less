@@ -6,14 +6,17 @@
 	animation:none;
 }
 #container{
+	max-width: @max-width;
+	margin: 0 auto;
+
 	&:after{
 		content: none;
 	}
 	.modal{
+		min-width: 100%;
 		display: block;
 		background: #fafafa;
 		color: #666;
-		max-width: @max-width;
 		border-radius: 0;
 		min-height: 100%;
 		margin: 0 auto;
