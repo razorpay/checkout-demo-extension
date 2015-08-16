@@ -1,11 +1,13 @@
 @import "common";
 
-@max-width: 384px;
+@max-width: 414px; // iPhone 6 Plus
 @media (max-device-height: 450px),(max-device-width: 450px){
 .shake{
 	animation:none;
 }
 #container{
+	margin: 0 auto;
+	max-width: @max-width;
 	&:after{
 		content: none;
 	}
@@ -13,7 +15,7 @@
 		background: #fafafa;
 		color: #666;
 		min-width: 100%;
-		max-width: @max-width;
+		max-width: 320px;
 		border-radius: 0;
 		min-height: 100%;
 		margin: 0;
@@ -29,7 +31,7 @@
 	}
 	#powered-by{
 		position: absolute;
-		top: 0;
+		top: 10px;
 		visibility: hidden!important;
 		bottom: auto;
 		z-index: -1;

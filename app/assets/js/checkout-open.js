@@ -21,6 +21,11 @@
     }
 
     if(absoluteContainer && window.addEventListener){
+      window.addEventListener('orientationchange', function(){
+        if(discreet.frameContainer){
+          discreet.frameContainer.style.height = Math.max(innerHeight, 455)+'px';
+        }
+      })
       window.addEventListener('scroll', function(){
         var c = discreet.frameContainer;
         if(!c || !discreet.isOpen || typeof window.pageYOffset !== 'number')
@@ -74,7 +79,7 @@
         style[i] = rules[i];
       }
       var back = discreet.backdrop = document.createElement('div');
-      back.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%;');
+      back.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
       parent.appendChild(back);
       body.appendChild(parent);
     }
@@ -82,8 +87,10 @@
       body.style.overflow = 'hidden';
     parent = discreet.frameContainer;
     parent.style.display = 'block';
-    parent.offsetWidth;
-    discreet.backdrop.style.background = 'rgba(0,0,0,0.6)';
+    try{
+      // setting unsupported value throws error in IE
+      discreet.backdrop.style.background = 'rgba(0,0,0,0.6)';
+    } catch(e){}
 
     if(!this.checkoutFrame){
       this.checkoutFrame = discreet.createFrame(this.options);
