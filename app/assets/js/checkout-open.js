@@ -26,7 +26,7 @@
             top = pageYOffset;
         }
         else if(pageY > pageYOffset){
-          if(bb.top > 0.8*innerHeight && bb.bottom > innerHeight)
+          if(bb.top > 0.1*innerHeight && bb.bottom > innerHeight)
             top = pageYOffset + innerHeight - bb.height;
         }
         if(typeof top === 'number')
@@ -61,6 +61,7 @@
         zIndex: '99999',
         position: (absoluteContainer ? 'absolute' : 'fixed'),
         top: (absoluteContainer ? pageYOffset+'px' : '0'),
+        minHeight: (absoluteContainer ? '455px' : '0'),
         left: '0',
         width: '100%',
         height: '100%',
