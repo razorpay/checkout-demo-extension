@@ -186,7 +186,9 @@
       discreet.setMethods(window.payment_methods);
       $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
-      document.body.innerHTML += (doT.compile(templates.modal))(discreet.rzp.options);
+      var div = document.createElement('div');
+      div.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
+      document.body.appendChild(div.firstChild);
       discreet.$el = $('container');
       discreet.smarty = new Smarty(discreet.$el);
 
@@ -492,6 +494,7 @@
     if(message.data && discreet.rzp){
       try{
         var decode = decodeURIComponent(message.data)
+        alert(typeof decode);
       } catch(e){}
     }
   }
