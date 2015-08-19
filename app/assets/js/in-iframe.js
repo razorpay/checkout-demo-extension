@@ -514,7 +514,7 @@
     var iOSMethod = function(method){
       return function(data){
         var iF = document.createElement('iframe');
-        iF.setAttribute('src', 'razorpay://'+method+'?'+data);
+        iF.setAttribute('src', 'razorpay://on'+method+'?'+data);
         document.documentElement.appendChild(iF);
         iF.parentNode.removeChild(iF);
         iF = null;
