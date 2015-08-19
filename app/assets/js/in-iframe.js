@@ -307,6 +307,10 @@
       if (discreet.rzp.options.signature !== '')
         data.signature = discreet.rzp.options.signature;
 
+      Razorpay.sendMessage({
+        event: 'submit',
+        data: data
+      });
       discreet.renew();
       $('submitbtn').attr('disabled', true);
       if(discreet.modal)
@@ -318,13 +322,6 @@
         error: discreet.errorHandler,
         success: discreet.successHandler
       })
-
-      Razorpay.sendMessage({
-        event: 'submit',
-        data: {
-          method: data.method
-        }
-      });
     },
 
     getFormFields: function(container, returnObj){
@@ -492,11 +489,15 @@
     } else if(message.event == 'open' && discreet.rzp){
       discreet.showModal();
     }
+    if(message.data && discreet.rzp){
+      try{
+        var decode = decodeURIComponent(message.data)
+      } catch(e){}
+    }
   }
 
   $(window).on('message', discreet.parseMessage);
 
-  Razorpay.sendMessage({event: 'load'});
 
 // @if NODE_ENV='test'
   window.frameDiscreet = discreet;
@@ -508,4 +509,21 @@
     discreet.setQueryParams(location.search);
   }
 
+  if(qpmap.platform === 'ios'){
+    window.CheckoutBridge = {};
+    var iOSMethod = function(method){
+      return function(data){
+        var iF = document.createElement('iframe');
+        iF.setAttribute('src', 'razorpay://'+method+'?'+data);
+        document.documentElement.appendChild(iF);
+        iF.parentNode.removeChild(iF);
+        iF = null;
+      }
+    }
+    var bridgeMethods = ['load','dismiss','submit','error','fault','complete'];
+    bridgeMethods.forEach(function(prop){
+      CheckoutBridge['on'+prop] = iOSMethod(prop)
+    })
+  }
+  Razorpay.sendMessage({event: 'load'});
 })();
