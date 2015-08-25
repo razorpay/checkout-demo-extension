@@ -3,6 +3,15 @@
 
 (function(){
   'use strict';
+
+  var ua = navigator.userAgent;
+
+  // iphone/ipad restrict non user initiated focus on input fields
+  var should_focus_next = /iPhone|iPad/.test(ua);
+
+  // dont shake in mobile devices. handled by css, this is just for fallback.
+  var should_shake = !/Android|iPhone/.test(ua);
+
   var discreet = {
     smarty: null,
     modal: null,
@@ -10,9 +19,7 @@
     rzp: null,
 
     shake: function(){
-      if(/Android|iPhone/.test(navigator.userAgent))
-        return;
-      if(discreet.modal){
+      if(should_shake && discreet.modal){
         var el = $('modal-inner');
         if(el[0]){
           el.removeClass('shake')[0].offsetWidth;
@@ -156,11 +163,13 @@
         // }
       }
 
-      Razorpay.card.filled = function(el){
-        if(el == el_expiry)
-          el_cvv.focus();
-        else
-          el_expiry.focus();
+      if(should_focus_next){
+        Razorpay.card.filled = function(el){
+          if(el == el_expiry)
+            el_cvv.focus();
+          else
+            el_expiry.focus();
+        }
       }
       
       $el_number.on('blur', discreet.setNumberValidity);
