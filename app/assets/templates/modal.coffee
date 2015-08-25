@@ -144,7 +144,7 @@ templates.modal = '
             {{? it.method.wallet }}
               <div class="fieldset tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
                 <input type="hidden" name="method" value="wallet">
-                <input type="radio" name="wallet" value="paytm" id="paytm-radio" checked><label for="paytm-radio">Pay using Paytm wallet</label>
+                <input type="radio" name="wallet" value="{{=wallet_name}}" id="wallet-radio" checked><label for="wallet-radio">Pay using {{=(wallet_name[0].toUpperCase()+wallet_name.slice(1))}} wallet</label>
               </div>
             {{?}}
             <div class="footer">
