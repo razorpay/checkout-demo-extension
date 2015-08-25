@@ -170,7 +170,7 @@
       Razorpay.card.ensureNumeric(el_contact);
 
       // if we're in webkit
-      // we check el_expiry, as IE does return unsupported styles from getComputedStyle
+      // we check el_expiry, as IE also returns browser unsupported attribute rules from getComputedStyle
       if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] == 'string'){
         el_cvv.type = 'tel';
       }
