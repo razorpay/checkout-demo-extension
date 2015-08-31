@@ -407,8 +407,11 @@
       if (response && response.error){
         message = response.error.description;
 
-        if (response.error.field){
-          var error_el = document.getElementsByName(response.error.field);
+      var err_field = response.error.field;
+        if (err_field){
+	  if(!err_field.indexOf('expiry'))
+            err_field = 'card[expiry]';
+          var error_el = document.getElementsByName(err_field);
           if (error_el.length){
             $(error_el[0].parentNode).addClass('invalid');
             error_el[0].focus();
@@ -503,7 +506,6 @@
     if(message.data && discreet.rzp){
       try{
         var decode = decodeURIComponent(message.data)
-        alert(typeof decode);
       } catch(e){}
     }
   }
@@ -526,13 +528,15 @@
     var iOSMethod = function(method){
       return function(data){
         var iF = document.createElement('iframe');
-        iF.setAttribute('src', 'razorpay://on'+method+'?'+data);
+        var src = 'razorpay://on'+method;
+        if(data) src += '?' + data;
+        iF.setAttribute('src', src);
         document.documentElement.appendChild(iF);
         iF.parentNode.removeChild(iF);
         iF = null;
       }
     }
-    var bridgeMethods = ['load','dismiss','submit','error','fault','complete'];
+    var bridgeMethods = ['load','dismiss','submit','fault','success'];
     bridgeMethods.forEach(function(prop){
       CheckoutBridge['on'+prop] = iOSMethod(prop)
     })
