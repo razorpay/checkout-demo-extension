@@ -222,18 +222,21 @@
         discreet.formSubmit(e);
         e.preventDefault();
       });
-      var banks = $('netb-banks');
-      if(banks[0]){
-        banks = banks.children('netb-bank')
-        for(var i=0; i<banks.length; i++){
-          $(banks[i]).on('click', function(){
-            var value = this.getAttribute('data-value');
-            var select = $('bank-select')[0];
-            select.value = value;
-            discreet.smarty.input({target: select});
-          })
+
+      $('bank-select').on('change', discreet.bank_change);
+
+      $('netb-banks').on('click', function(e){
+        var target = e.target;
+        if(!target.className)
+          target = target.parentNode;
+        if(target.className.indexOf('netb-inner') != -1){
+          var value = target.getAttribute('data-value');
+          var select = $('bank-select')[0];
+          select.value = value;
+          discreet.smarty.input({target: select});
+          discreet.bank_change(value);
         }
-      }
+      });
 
       if(discreet.qpmap){
         var lis = $(tabs)[0].getElementsByTagName('li');
@@ -248,6 +251,16 @@
         }
       }
       discreet.setCardFormatting();
+    },
+
+    bank_change: function(val){
+      if(typeof val !== 'string')
+        val = this.value;
+      var inners = $('netb-banks').find('netb-inner');
+      for(var i = 0; i < inners.length; i++){
+        var inner = $(inners[i]);
+        inner[inner.attr('data-value') === val ? 'addClass' : 'removeClass']('active')
+      }
     },
 
     tab_change: function(e){
