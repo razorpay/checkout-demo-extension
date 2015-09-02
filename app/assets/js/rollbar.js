@@ -7,7 +7,7 @@ var _rollbarConfig = {
       client: {
         javascript: {
           source_map_enabled: true,
-          code_version: "VERSIONSTRING",
+          code_version: "V",
           guess_uncaught_frames: true
         }
       }

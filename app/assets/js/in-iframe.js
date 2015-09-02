@@ -71,7 +71,7 @@
         }
       }
 
-      if(!tabCount || discreet.rzp.options.amount > 100*3000){ // disable paytm for transactions worth > INR 3,000
+      if(!tabCount || discreet.rzp.options.amount > 100*10000){ // disable wallets for transactions worth > INR 3,000
         methodOptions.wallet = false;
       }
 
@@ -438,6 +438,10 @@
             context: message.context
           }
         });
+        var info = "checkout form opened";
+        if('sdk_version' in window)
+          info += ', sdk_version='+sdk_version;
+        Rollbar.info(info);
       }
     },
     setQueryParams: function(search){
