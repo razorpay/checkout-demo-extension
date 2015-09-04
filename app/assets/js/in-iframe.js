@@ -451,10 +451,9 @@
             context: message.context
           }
         });
-        var info = "checkout form opened";
-        if('sdk_version' in window)
-          info += ', sdk_version='+sdk_version;
-        Rollbar.info(info);
+        if('sdk_version' in window){
+          Rollbar.info('sdk_version='+sdk_version);
+        }
       }
     },
     setQueryParams: function(search){
