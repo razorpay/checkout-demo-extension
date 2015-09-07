@@ -110,6 +110,10 @@
       }
     },
 
+    backdropHide: function(){
+      this.options.backdropClose && this.hide();
+    },
+
     hidden: function() {
       clearTimeout();
       if(typeof this.options.onhidden === 'function') {
@@ -144,8 +148,6 @@
     },
 
     bind_events: function(){
-      this.on('click', $(this.options.closeId)[0], this.hide);
-      
       if(typeof window.pageYOffset == 'number') // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function(){
           var container = this.container[0];
@@ -167,10 +169,13 @@
           }
         })
       }
+
+      var closeBtn = $(this.options.closeId);
       if (this.options.backdropClose) {
-        this.on('click', this.container.children('backdrop')[0], function(){
-          this.options.backdropClose && this.hide();
-        })
+        this.on('click', closeBtn[0], this.backdropHide);
+        this.on('click', this.container.children('backdrop')[0], this.backdropHide)
+      } else {
+        closeBtn.remove();
       }
     }
   };

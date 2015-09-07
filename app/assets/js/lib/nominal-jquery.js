@@ -31,7 +31,7 @@
       if(!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')){
         done = true;
         script.onload = script.onreadystatechange = null;
-        script.parentNode && script.parentNode.removeChild(script);
+        $(script).remove();
         script = null;
       }
     }
@@ -107,7 +107,9 @@
 
     remove: function(){
       var el = this[0];
-      el && el.parentNode && el.parentNode.removeChild(el);
+      try{
+        el && el.parentNode && el.parentNode.removeChild(el);
+      } catch(e){}
       return this;
     },
 
