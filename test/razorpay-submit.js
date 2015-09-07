@@ -1,6 +1,6 @@
-var $ = Razorpay.prototype.$;
-var Hedwig = Razorpay.prototype.Hedwig;
-var discreet = Razorpay.prototype.discreet;
+var $ = Razorpay.$;
+var Hedwig = Razorpay.Hedwig;
+var discreet = Razorpay.discreet;
 
 var options = {
   'key': 'key_id',
@@ -140,7 +140,7 @@ describe("authorize should", function(){
 
   it("setup popup", function(){
     Razorpay.payment.authorize(req);
-    var isPopup = req.popup instanceof Razorpay.prototype.Popup;
+    var isPopup = req.popup instanceof Razorpay.Popup;
     expect(isPopup).toBe(true);
   })
 
@@ -286,7 +286,7 @@ describe("api ajax handler should invoke", function(){
 
   beforeEach(function(){
     req = jQuery.extend(true, {}, request);
-    spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
+    spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
       options.success(responseData);
     })
     rzp = new Razorpay(init_options)
@@ -377,7 +377,7 @@ describe("getMethods should", function(){
   it("set Razorpay.payment.methods and call back", function(){
     var methods = {};
     var spyCalled = jasmine.createSpy();
-    spyOn(Razorpay.prototype.$, 'ajax').and.callFake(function(options){
+    spyOn(Razorpay.$, 'ajax').and.callFake(function(options){
       options.success(methods);
     });
     Razorpay.payment.getMethods(spyCalled);

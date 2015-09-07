@@ -6,9 +6,11 @@ Razorpay = function(options){
 };
 
 (function(){
-  Razorpay.prototype = {};
-  Razorpay.card = {};
-  Razorpay.prototype.discreet = {
+  var r = Razorpay;
+  r.roll = window.roll;
+  r.prototype = {};
+  r.card = {};
+  r.discreet = {
     
     currentScript: document.currentScript || (function() {
       var scripts = document.getElementsByTagName('script');

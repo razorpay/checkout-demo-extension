@@ -1,4 +1,4 @@
-var discreet = Razorpay.prototype.discreet;
+var discreet = Razorpay.discreet;
 var options = {
   'key': 'key_id',
   'amount': '5100',

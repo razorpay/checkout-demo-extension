@@ -3,8 +3,8 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.prototype.$;
-  var discreet = Razorpay.prototype.discreet;
+  var $ = Razorpay.$;
+  var discreet = Razorpay.discreet;
 
   // TODO add style link to insert
   discreet.defaults = {

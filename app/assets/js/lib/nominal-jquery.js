@@ -199,4 +199,4 @@
     return target;
   }
 
-})(Razorpay.prototype);
+})(Razorpay);

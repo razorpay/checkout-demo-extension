@@ -40,4 +40,4 @@
       }
     }
   }
-})(window.Razorpay.prototype);
+})(Razorpay);

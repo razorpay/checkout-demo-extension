@@ -91,51 +91,54 @@
     });
   }
 
-  Popup.prototype.beforeunload = function(){
-    return "Transaction isn't complete yet.";
-  }
+  Popup.prototype = {
+    beforeunload: function(){
+      return "Transaction isn't complete yet.";
+    },
 
-  Popup.prototype.unload = function(){
-    this.close();
-  }
+    unload: function(){
+      this.close();
+    },
 
   /**
   * Closes the popup window.
   */
 
-  Popup.prototype.close = function () {
-    this.window.close();
-    clearInterval(this.interval);
-    $(window).off('beforeunload');
-    $(window).off('unload');
-  }
+    close: function () {
+      this.window.close();
+      clearInterval(this.interval);
+      $(window).off('beforeunload');
+      $(window).off('unload');
+    },
 
-  Popup.prototype.location = function (location) {
-    this.window.location = location;
-  }
+
+    location: function (location) {
+      this.window.location = location;
+    },
 
   /**
   * Focuses the popup window (brings to front).
   */
 
-  Popup.prototype.focus = function () {
-    this.window.focus();
-  }
+    focus: function () {
+      this.window.focus();
+    },
 
-  Popup.prototype.onClose = function(cb){
-    this.closeCB = cb;
-  }
+    onClose: function(cb){
+      this.closeCB = cb;
+    },
 
   /**
   * Emits the "close" event.
   */
 
-  Popup.prototype._checkClose = function () {
-    if (this.window && this.window.closed) {
-      clearInterval(this.interval);
-      this.close();
-      if(typeof this.closeCB === 'function'){
-        this.closeCB();
+    _checkClose: function () {
+      if (this.window && this.window.closed) {
+        clearInterval(this.interval);
+        this.close();
+        if(typeof this.closeCB === 'function'){
+          this.closeCB();
+        }
       }
     }
   }
@@ -147,4 +150,4 @@
   }
 
   root.Popup = Popup;
-})(window.Razorpay.prototype);
+})(Razorpay);

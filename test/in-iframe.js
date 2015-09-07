@@ -1,4 +1,4 @@
-var discreet = Razorpay.prototype.discreet;
+var discreet = Razorpay.discreet;
 var orig_methods = window.payment_methods = {"card":true,"netbanking":{"HDFC":"HDFC Bank", "UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},"wallet":{"paytm":true}};
 
 function openCheckoutForm(options){

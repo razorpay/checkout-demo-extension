@@ -3,10 +3,10 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.prototype.$;
-  var Popup = Razorpay.prototype.Popup;
-  var discreet = Razorpay.prototype.discreet;
-  if(!window.roll) var roll = $.noop;
+  var $ = Razorpay.$;
+  var Popup = Razorpay.Popup;
+  var discreet = Razorpay.discreet;
+  var roll = Razorpay.roll || $.noop;
 
   discreet.popupClose = function(){
     try{
@@ -121,11 +121,6 @@
         if(typeof successCallback == 'function'){
           return successCallback.call(request, response);
         }
-      }
-
-      else if(response.callbackUrl || response.redirectUrl){
-        var msgtitle = response.callbackUrl ? 'callbackUrl' : 'redirectUrl';
-        roll(msgtitle, (response.callbackUrl || response.redirectUrl), 'warning');
       }
 
       else {

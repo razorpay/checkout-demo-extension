@@ -3,8 +3,8 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.prototype.$;
-  var discreet = Razorpay.prototype.discreet;
+  var $ = Razorpay.$;
+  var discreet = Razorpay.discreet;
   
   Razorpay.configure = function(overrides) {
     discreet.defaults = discreet.configure(overrides);

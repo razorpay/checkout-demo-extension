@@ -1,4 +1,5 @@
-delete Razorpay.prototype.$;
-delete Razorpay.prototype.Popup;
-delete Razorpay.prototype.Hedwig;
-delete Razorpay.prototype.discreet;
+delete Razorpay.$;
+delete Razorpay.Popup;
+delete Razorpay.Hedwig;
+delete Razorpay.discreet;
+delete Razorpay.roll;

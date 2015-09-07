@@ -4,8 +4,8 @@
 (function(){
   'use strict';
 
-  var doT = Razorpay.prototype.doT;
-  var discreet = Razorpay.prototype.discreet;
+  var doT = Razorpay.doT;
+  var discreet = Razorpay.discreet;
 
   // place frameContainer absolute, and add window.onscroll
   var backMinHeight = 0;
