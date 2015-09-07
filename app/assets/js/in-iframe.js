@@ -4,6 +4,7 @@
 (function(){
   'use strict';
 
+  if(!window.roll) var roll = $.noop;
   var ua = navigator.userAgent;
 
   // iphone/ipad restrict non user initiated focus on input fields
@@ -454,7 +455,7 @@
           }
         });
         if('sdk_version' in window){
-          Rollbar.info('sdk_version='+sdk_version);
+          roll(null, 'sdk_version='+sdk_version, 'info');
         }
       }
     },
@@ -512,7 +513,7 @@
         discreet.configureRollbar(message);
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
-        if(window.Rollbar) Rollbar.error(e.message, message);
+        roll('fault ' + e.message, message);
         return;
       }
       discreet.showModal();

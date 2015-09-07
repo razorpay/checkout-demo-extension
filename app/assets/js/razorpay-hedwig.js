@@ -6,6 +6,7 @@
   var $ = Razorpay.prototype.$;
   var Popup = Razorpay.prototype.Popup;
   var discreet = Razorpay.prototype.discreet;
+  if(!window.roll) var roll = $.noop;
 
   discreet.popupClose = function(){
     try{
@@ -25,7 +26,7 @@
         }
       }
     } catch(e){
-      window.Rollbar && Rollbar.error("Error closing popup: " + e.message);
+      roll('Error closing popup', e.message);
     }
   }
   discreet.paymentSuccess = function(data){
@@ -38,6 +39,7 @@
       this.success.call(null, returnObj); // dont expose request as this
     } else if(typeof this.error == 'function'){
       this.error({description: 'Unable to parse server response'});
+      roll('unexpected api response', data);
     }
   }
 
@@ -89,7 +91,8 @@
             discreet.navigatePopup.call(this, nextRequest);
         }
       } else {
-        return discreet.error.call(this, response);
+        discreet.error.call(this, response);
+        roll('unexpected api response', response);
       }
     }
   }
@@ -122,10 +125,13 @@
 
       else if(response.callbackUrl || response.redirectUrl){
         var msgtitle = response.callbackUrl ? 'callbackUrl' : 'redirectUrl';
-        window.Rollbar && Rollbar.warning(msgtitle + ': ' + (response.callbackUrl || response.redirectUrl));
+        roll(msgtitle, (response.callbackUrl || response.redirectUrl), 'warning');
       }
 
-      else discreet.error.call(request, response);
+      else {
+        discreet.error.call(request, response);
+        roll('unexpected api response', response);
+      }
     }
   }
   
@@ -165,9 +171,9 @@
       } else {
         info = "Popup window opened";
       }
-      window.Rollbar && Rollbar.info(info);
+      roll(null, info, 'info');
     } catch(e){
-      window.Rollbar && Rollbar.error("Error accessing popup: " + e.message);
+      roll('Error accessing popup', + e.message);
     }
   }
 
