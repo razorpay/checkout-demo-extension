@@ -7,7 +7,7 @@
   var ua = navigator.userAgent;
 
   // iphone/ipad restrict non user initiated focus on input fields
-  var should_focus_next = /iPhone|iPad/.test(ua);
+  var should_focus_next = !/iPhone|iPad/.test(ua);
 
   // dont shake in mobile devices. handled by css, this is just for fallback.
   var should_shake = !/Android|iPhone/.test(ua);
@@ -403,6 +403,8 @@
     },
 
     successHandler: function(response){
+      if(discreet.modal)
+        discreet.modal.options.onhide = null;
       Razorpay.sendMessage({ event: 'success', data: response});
       discreet.hide();
     },
@@ -422,7 +424,7 @@
 
       var err_field = response.error.field;
         if (err_field){
-	  if(!err_field.indexOf('expiry'))
+	        if(!err_field.indexOf('expiry'))
             err_field = 'card[expiry]';
           var error_el = document.getElementsByName(err_field);
           if (error_el.length){
