@@ -522,10 +522,15 @@
     } else if(message.event == 'open' && discreet.rzp){
       discreet.showModal();
     }
-    if(message.data && discreet.rzp){
-      try{
-        var decode = decodeURIComponent(message.data)
-      } catch(e){}
+    if(discreet.rzp){
+      var params = message.params;
+      if(params){
+        try{
+          discreet.errorHandler(JSON.parse(params));
+        } catch(e){
+          roll('message.params', params);
+        }
+      }
     }
   }
 
@@ -543,12 +548,24 @@
   }
 
   if(qpmap.platform === 'ios'){
-    window.CheckoutBridge = {};
+    window.CheckoutBridge = {
+      map: {},
+      get: function(index){
+        var val = this.map[index];
+        delete this.map[index];
+        return val;
+      }
+    };
+    var dataIndex = 0;
     var iOSMethod = function(method){
       return function(data){
         var iF = document.createElement('iframe');
         var src = 'razorpay://on'+method;
-        if(data) src += '?' + data;
+        if(data){
+          src += '?' + dataIndex;
+          CheckoutBridge.map[dataIndex] = data;
+          dataIndex++;
+        }
         iF.setAttribute('src', src);
         document.documentElement.appendChild(iF);
         iF.parentNode.removeChild(iF);
