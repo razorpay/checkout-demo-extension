@@ -229,7 +229,6 @@ button{
   }
   &.focused{
     border-color: @primary;
-    color: black;
     z-index: 2!important;
   }
   &.mature.invalid{
@@ -241,6 +240,7 @@ button{
     }
   }
   &.filled, &.focused{
+    color: #333;
     .placeholder{
       display: none;
     }
@@ -526,12 +526,12 @@ button{
   margin-top: 5px;
 }
 
-#wallet-wrapper{
+#method-wallet-tab{
   .colored{
     display: none;
   }
 }
-#wallet-wrapper{
+#method-wallet-tab{
   &:hover, &.active{
     img{
       display: none;
@@ -568,7 +568,7 @@ button{
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
   
   a{
-    color: #999;
+    color: #bbb;
     outline: none;
     line-height: 36px;
     .transition(0.3s);

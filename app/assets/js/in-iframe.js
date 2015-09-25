@@ -325,7 +325,6 @@
       var activeTab = $('tabs').find('active')[0];
       if (activeTab && discreet.isInvalid(activeTab.getAttribute('data-target')))
         return;
-
       var data = discreet.getFormData();
 
       // Signature is set in case of hosted checkout
@@ -340,7 +339,6 @@
       $('submitbtn').attr('disabled', true);
       if(discreet.modal)
         discreet.modal.options.backdropClose = false;
-
       Razorpay.payment.authorize({
         data: data,
         options: discreet.rzp.options,
@@ -425,7 +423,7 @@
 
       var err_field = response.error.field;
         if (err_field){
-	        if(!err_field.indexOf('expiry'))
+          if(!err_field.indexOf('expiry'))
             err_field = 'card[expiry]';
           var error_el = document.getElementsByName(err_field);
           if (error_el.length){
@@ -442,6 +440,28 @@
       var error_message = $('error-message')[0];
       error_message.innerHTML = message;
       $('error-container').css('display', 'block').addClass('has-error').css('paddingTop', error_message.offsetHeight + 'px');
+    },
+
+    dataHandler: function(data){
+      if(!('method' in data))
+        return;
+
+      discreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
+
+      if('contact' in data) $('contact')[0].value = data.contact;
+      if('email' in data) $('email')[0].value = data.email;
+
+      if(data.method === 'card'){
+        if('card[name]' in data) $('card_name')[0].value = data['card[name]'];
+        if('card[number]' in data) $('card_number')[0].value = data['card[number]'];
+        if(('card[expiry_month]' in data) && ('card[expiry_year]' in data))
+          $('card_expiry')[0].value = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
+        discreet.setCardFormatting();
+        $('card_cvv')[0].focus();
+      } else if(data.method == 'netbanking'){
+        $('bank-select')[0].value = data.bank;
+      }
+      discreet.smarty.refresh();
     },
 
     configureRollbar: function(message){
@@ -530,6 +550,18 @@
         } catch(e){
           roll('message.params', params);
         }
+      }
+      var data = message.data;
+      if(data){
+        if(typeof data === 'string'){
+          try{
+            data = JSON.parse(data);
+          } catch(e){
+            roll('message.data', data);
+          }
+        }
+        if(typeof data == 'object')
+          discreet.dataHandler(data);
       }
     }
   }

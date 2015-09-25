@@ -38,7 +38,7 @@ templates.modal = '
                 <p class="elem elem-email" style="border-radius: 4px 4px 0 0">
                   <i>&#xe603;</i>
                   <span class="help-text">Please enter a valid email, like you@foo.com</span>
-                  <input class="input" name="email" type="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
+                  <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
                 </p>
                 <p class="elem elem-contact" style="border-radius: 0 0 4px 4px">
                   <span class="help-text">Please enter 10-12 digit contact number.</span>
@@ -50,14 +50,14 @@ templates.modal = '
             {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++; }}
             <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
               {{? it.method.card }}
-                <li data-target="tab-card" class="active">Card</li>
+                <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
               {{?}}
               {{? it.method.netbanking }}
-                <li data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
+                <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
               {{?}}
               {{? it.method.wallet }}
                 {{ var wallet_name, wallet_mono, wallet_col, wallet_h; }}
-                <li id="wallet-wrapper" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
+                <li id="id="method-wallet-tab"" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
                   {{ if(it.method.wallet.paytm){
                       wallet_h = "12px";
                       wallet_name = "paytm";
@@ -81,7 +81,7 @@ templates.modal = '
                 <p class="elem elem-name" style="border-radius: 4px 4px 0 0">
                   <i>&#xe602;</i>
                   <span class="help-text">Please fill out this field.</span>
-                  <input class="input" type="text" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
+                  <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
                 </p>
                 <p class="elem" id="elem-card">
                   <span class="help-text">Please enter valid card number.</span>
