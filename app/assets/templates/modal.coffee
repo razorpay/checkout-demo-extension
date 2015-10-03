@@ -47,7 +47,7 @@ templates.modal = '
                 </p>
               </div>
             </div>
-            {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet && tabCount++; }}
+            {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet.length && tabCount++; }}
             <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
               {{? it.method.card }}
                 <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
@@ -55,23 +55,14 @@ templates.modal = '
               {{? it.method.netbanking }}
                 <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
               {{?}}
-              {{? it.method.wallet }}
-                {{ var wallet_name, wallet_mono, wallet_col, wallet_h; }}
-                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>Wallets
-                  {{ if(it.method.wallet.paytm){
-                      wallet_h = "12px";
-                      wallet_name = "paytm";
-                      wallet_mono = "R0lGODlhUAAYAJEDAOHh4cPDw5SUlP///yH5BAEAAAMALAAAAABQABgAAAL/nI+py80AnZy02gFCALf7n2QaBx7QiZJhGiHQiGjbKo4RauC5Pgj+DxSoDEGgKmA0IH+qmkz2gj5tU1KxOLwylcleFzOthsdhjhYYQJx9xG6wSR7F55v1T702u7/OMj0OYMdm8oTltXXoA0cW9VcWxAXUsLT11obo8kTSx1EGBgWJEZqjIUBZuYdJCEXK+gnzWicpOjtwetWZqqjgtDnVKgMse2cbGmiXi2YYoins69orKHCZl3g25CycFrsdLUh9TVvNDN0c+zwiuB20cbyVgcxr3qftbDdjbdUFH04O25vt3Bp8+cANaWTJHz563OzVWsBO3K4dJ25hOxcQoMCHQwqK3BKSI55CdBrqbSTGQNomkZnKufynadSCj8vcXdk20iRDbygX2NSyUgvBljBfLozJ0SeSpaZMwfE4lOjCGiSrFgAAOw==";
-                      wallet_col = "R0lGODlhUAAYANUgAD/L9UJik+/y9oGWtzJVihM6dw++8+/7/mJ8pV/U9+Dl7dDY5M/y/S/H9JGjwCNHgZ/l+r/u/B/C9K/p+9/2/bC90lJvnKGwyW/Y+HGJrsLu/I/h+cDL23/c+AC68gQub////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACAALAAAAABQABgAAAb/QJBwSCwaj8gkEiJhKJ/QqHQKgng8Hap2yy1ar9nuUMEpm8uLI/nMSRMFg7hb6JAXGZPE9ZqIHEAUERFOIBEdHRFDBxAdEH9CBR+Sk5MPHEWRlJIPFUMWkwUKQgigokITe6lXDRoGewkSqRITGK57YZq5BXMguZSdIAGUl73DQx2qqnrJzKpZvpoIRNCSBELCk8SaxCDIzR7L398U1JVEBOUCIA/GxdnH4uHizBvlk29xcZnv20L9QgcaNEvgbZ4Bgak6aKKzEMmAfv/+ESmIRQhFDxRAxNpjwAmAhA05NBTCAUGAk7kuoXvnThI3eLcspgIgcw/NbiApkRxJqtwl7WySgEmECabmlZsUkea8B6In0wv2PvykVCDASpYTExr1oNTmVoVRhVylNtXey69bux79GtVaS7IgHEQ9izNm3bV3ubK1l8EfJQsCFPQTMNYXXYphkqbdS42Aurfa2gkAatgI4sV51WKhVgDBY8h+sYJYUCHOp3ZZ7SrOzFiSEk0ORktcU0YuaqIVWetGPPJIrgD7XApREDylZa27Z7b+oISd2Z3pjqtWnvxWbyMPn4MQSU2a9KLV8fLWmYSwvcfcfTk+cjm83rwdrhaAcuGk/fsXhpjXFMDB5zu2NPBIQHtgIAQDthgwgRAUBHhAEAA7";
-                    } else if(it.method.wallet.mobikwik){
-                      wallet_h = "15.5px";
-                      wallet_name = "mobikwik";
-                      wallet_mono = "R0lGODlhbAAfAKIHAPT09Li4uKWlpcPDw+Hh4f///4iIiP///yH5BAEAAAcALAAAAABsAB8AAAP/eLrMMIO0Sau9OOttR/lABRBDIEhcqq6sAgBfER5jKRh4bsxt7/ue2OCmK+YEggDvx2w2agKY0Eg1EHADp7ZXM+kEsc/A6C0ebtmtenOt7sKFsQ4GIOYO2LX+0q4G4HE6QQV9BgJ4Bml7iwxyVVJhjgZhhYd5jJgHkkV/gI6DhF9tEiMomWqbc4CBOHCFEThIOYqnTqlYkVOJroJ9UWOHtVq3k0KdgWC8OSTLUUjCw1SgSVMEgIXMywGJE0MnFd5ZBONLmhC0GOEESAEUt5EGx0Or2HZH5Zo4pg1yWUT7jvalw9ImGD8jgwDgkGftmo4zRQbgy2cFHBJ/+hZ8SqEu/5a7IsnELBSS60MhiAIiXJAjsMI/BX3QpSj4UUdDGTmOQVoXwxeiNA+IpNSob93CGeuGvlS48ICJbwqGtHPBzts4j1GRpPwCbyQgJD2PICJlL1YIOduKSGiD0UodrGgXLIu6kCVNilYk3WTqlZKhsLFGQVxop52kJA/ZDiaQNooLrDEVpM121dCByI5CFkjbN8aNkDFHyXF8OceDWTBnKRY6Vy6OEJyDmbZrFjVeSHw7h/prcpacxQzSQrizIG2A1VR4CEdkmukh2oaITKWombNuoYAT/Sa+oE2AfgwKIifT/WgsLOCh2yT6pjcnv7GyM7OEo0FBluED57EDK6OCWcuvEfYaRZV9QZRmZcUTBlci6fPZYEsYBx57J+x3iR0z2HNIWXRZ4YttY+xERUibePBWfTe0s5xr2sVXgAJE9NcWCnwFI4lhOkyl3mkDlhBGggsx5kaOeUQGAGc8xvMCZ5XNWF5GuZGyHoF3SafJMYUMqaVt1q1HTDylcfPSAhgOZgCZ3EEXTB/MLLnlmw+xNyVL9kw13j41UjTdaOxVZlBjX8JpxAktPQABnuRcdugCpYQwDgHllEJKot1Byig5kob3KJCCGtESNHokAAA7";
-                      wallet_col = "R0lGODlhbAAfAKIHAJvl5ODt7UPS0L/w73/h4P///wDDwf///yH5BAEAAAcALAAAAABsAB8AAAP/eBfczgPIR4O6OOvNu/9gqBBFaWnDQAiCMYhwLM/cUJpHurZG77u0oHCYAdwKgJ9y2TsRn9CMjnUsEJjMQI8Q7QanPB/peFWulocW18sWlbFV609wC/cO27bek8QajFVvLjcDc3gGa3uKGIJLcXI9dISGPQCLlyN+gIE+NpM+AoWDKkaYbY0/j5CSn1uikXmmXqiVR5tlnq2IfQahSQKys0ysVmNyxCWvLm8ABIXAwVG0uQWIN1cBccoqPwAtlhm4HGVczQROB8XOMOSi0OFLxFfGK4/KAXaRG+L7eTwvF8IUYOdKnwZUubRYK3HO3o80cwAe7CGxCAtL/y68qQjC/5sAAO76zTnCwxg1kw8jVcwGDwiIjAd4cYwRcuKPbCbE2GP1ClgsfD9IZFr2A+CAixCBvLK0Q2KLdwo/skhhMKkAQcTCGDvSq5VPpcMGlsn3J4c/igp7KegDrRrFtVtw1XwTQBDOAsq2lvjlVZQNUM1AHRAkIZUoLv94vHNrAG6sf3L1yRwMimTQOJFaOWsy9sIrbm/T+QB5Vgk4BTwshIHmg7ILd0uHGjiibOENtpr7JK1IrvMFtoeTKnFSxtLwkJF7jda4xfJlrpmTdSpzqDEGd/wUwC6t5N12RJWKu6aqRGIZ2ku28uI5XW1rDGyzm+0VPAz5sgrE9HDLYv/42rL+UbYVEwNWtlcnT+2GQUniMUdfaeBshJohdkCTnHKxXGELHAx1F8FDari2WHv7lVAdaYgoOKFa81XSYor/+YCXDxYQUOAw3vgxRx5phXJUa2/4GEYA9YXWIheMGWBBkgAlB41igxnDi45UFuXYEi/Q4mKRLsn2QhgBvRcji2kFFgFZVer4zou9nIDLlOBwyRGUfSRSp4PkvfOGlmlisWYGRA6ADqApRANCAWj2mYWhmCQAADs=";
-                    }
-                  }}
-                  <img class="wallet-logo" height="{{=wallet_h}}" onerror="this.parentNode.innerHTML=\'{{=wallet_name}}\'" src="data:image/gif;base64,{{=wallet_mono}}"/>
-                  <img class="wallet-logo colored" height="{{=wallet_h}}" src="data:image/gif;base64,{{=wallet_col}}"/>
+              {{? it.method.wallet.length }}
+                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
+                  {{ if(it.method.wallet.length == 1){ }}
+                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" onerror="this.parentNode.innerHTML=\'{{=it.method.wallet[0].name}}\'" src="data:image/gif;base64,{{=it.method.wallet[0].mono}}"/>
+                    <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="data:image/gif;base64,{{=it.method.wallet[0].col}}"/>
+                  {{} else {}}
+                    Wallets
+                  {{}}}
                 </li>
               {{?}}
             </ul>
@@ -149,10 +140,14 @@ templates.modal = '
                 </p>
               </div>
             {{?}}
-            {{? it.method.wallet }}
+            {{? it.method.wallet.length }}
               <div class="fieldset tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
                 <input type="hidden" name="method" value="wallet">
-                <input type="radio" name="wallet" value="{{=wallet_name}}" id="wallet-radio" checked><label for="wallet-radio">Pay using {{=(wallet_name[0].toUpperCase()+wallet_name.slice(1))}} wallet</label>
+                {{~it.method.wallet :w:i}}
+                  <div class="wallet-radio">
+                    <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}" checked><label for="wallet-radio-{{=i}}">Pay using {{=(w.name[0].toUpperCase()+w.name.slice(1))}}</label>
+                  </div>
+                {{~}}
               </div>
             {{?}}
             <div class="footer">

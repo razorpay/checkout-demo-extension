@@ -13,6 +13,19 @@
   // dont shake in mobile devices. handled by css, this is just for fallback.
   var should_shake = !/Android|iPhone/.test(ua);
 
+  var wallet_logos = {
+    paytm: {
+      h: '12',
+      mono: 'R0lGODlhUAAYAJEDAOHh4cPDw5SUlP///yH5BAEAAAMALAAAAABQABgAAAL/nI+py80AnZy02gFCALf7n2QaBx7QiZJhGiHQiGjbKo4RauC5Pgj+DxSoDEGgKmA0IH+qmkz2gj5tU1KxOLwylcleFzOthsdhjhYYQJx9xG6wSR7F55v1T702u7/OMj0OYMdm8oTltXXoA0cW9VcWxAXUsLT11obo8kTSx1EGBgWJEZqjIUBZuYdJCEXK+gnzWicpOjtwetWZqqjgtDnVKgMse2cbGmiXi2YYoins69orKHCZl3g25CycFrsdLUh9TVvNDN0c+zwiuB20cbyVgcxr3qftbDdjbdUFH04O25vt3Bp8+cANaWTJHz563OzVWsBO3K4dJ25hOxcQoMCHQwqK3BKSI55CdBrqbSTGQNomkZnKufynadSCj8vcXdk20iRDbygX2NSyUgvBljBfLozJ0SeSpaZMwfE4lOjCGiSrFgAAOw==',
+      col: 'R0lGODlhUAAYANUgAD/L9UJik+/y9oGWtzJVihM6dw++8+/7/mJ8pV/U9+Dl7dDY5M/y/S/H9JGjwCNHgZ/l+r/u/B/C9K/p+9/2/bC90lJvnKGwyW/Y+HGJrsLu/I/h+cDL23/c+AC68gQub////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACAALAAAAABQABgAAAb/QJBwSCwaj8gkEiJhKJ/QqHQKgng8Hap2yy1ar9nuUMEpm8uLI/nMSRMFg7hb6JAXGZPE9ZqIHEAUERFOIBEdHRFDBxAdEH9CBR+Sk5MPHEWRlJIPFUMWkwUKQgigokITe6lXDRoGewkSqRITGK57YZq5BXMguZSdIAGUl73DQx2qqnrJzKpZvpoIRNCSBELCk8SaxCDIzR7L398U1JVEBOUCIA/GxdnH4uHizBvlk29xcZnv20L9QgcaNEvgbZ4Bgak6aKKzEMmAfv/+ESmIRQhFDxRAxNpjwAmAhA05NBTCAUGAk7kuoXvnThI3eLcspgIgcw/NbiApkRxJqtwl7WySgEmECabmlZsUkea8B6In0wv2PvykVCDASpYTExr1oNTmVoVRhVylNtXey69bux79GtVaS7IgHEQ9izNm3bV3ubK1l8EfJQsCFPQTMNYXXYphkqbdS42Aurfa2gkAatgI4sV51WKhVgDBY8h+sYJYUCHOp3ZZ7SrOzFiSEk0ORktcU0YuaqIVWetGPPJIrgD7XApREDylZa27Z7b+oISd2Z3pjqtWnvxWbyMPn4MQSU2a9KLV8fLWmYSwvcfcfTk+cjm83rwdrhaAcuGk/fsXhpjXFMDB5zu2NPBIQHtgIAQDthgwgRAUBHhAEAA7'
+    },
+    mobikwik: {
+      h: '15.5',
+      mono: 'R0lGODlhbAAfAKIHAPT09Li4uKWlpcPDw+Hh4f///4iIiP///yH5BAEAAAcALAAAAABsAB8AAAP/eLrMMIO0Sau9OOttR/lABRBDIEhcqq6sAgBfER5jKRh4bsxt7/ue2OCmK+YEggDvx2w2agKY0Eg1EHADp7ZXM+kEsc/A6C0ebtmtenOt7sKFsQ4GIOYO2LX+0q4G4HE6QQV9BgJ4Bml7iwxyVVJhjgZhhYd5jJgHkkV/gI6DhF9tEiMomWqbc4CBOHCFEThIOYqnTqlYkVOJroJ9UWOHtVq3k0KdgWC8OSTLUUjCw1SgSVMEgIXMywGJE0MnFd5ZBONLmhC0GOEESAEUt5EGx0Or2HZH5Zo4pg1yWUT7jvalw9ImGD8jgwDgkGftmo4zRQbgy2cFHBJ/+hZ8SqEu/5a7IsnELBSS60MhiAIiXJAjsMI/BX3QpSj4UUdDGTmOQVoXwxeiNA+IpNSob93CGeuGvlS48ICJbwqGtHPBzts4j1GRpPwCbyQgJD2PICJlL1YIOduKSGiD0UodrGgXLIu6kCVNilYk3WTqlZKhsLFGQVxop52kJA/ZDiaQNooLrDEVpM121dCByI5CFkjbN8aNkDFHyXF8OceDWTBnKRY6Vy6OEJyDmbZrFjVeSHw7h/prcpacxQzSQrizIG2A1VR4CEdkmukh2oaITKWombNuoYAT/Sa+oE2AfgwKIifT/WgsLOCh2yT6pjcnv7GyM7OEo0FBluED57EDK6OCWcuvEfYaRZV9QZRmZcUTBlci6fPZYEsYBx57J+x3iR0z2HNIWXRZ4YttY+xERUibePBWfTe0s5xr2sVXgAJE9NcWCnwFI4lhOkyl3mkDlhBGggsx5kaOeUQGAGc8xvMCZ5XNWF5GuZGyHoF3SafJMYUMqaVt1q1HTDylcfPSAhgOZgCZ3EEXTB/MLLnlmw+xNyVL9kw13j41UjTdaOxVZlBjX8JpxAktPQABnuRcdugCpYQwDgHllEJKot1Byig5kob3KJCCGtESNHokAAA7',
+      col: 'R0lGODlhbAAfAKIHAJvl5ODt7UPS0L/w73/h4P///wDDwf///yH5BAEAAAcALAAAAABsAB8AAAP/eBfczgPIR4O6OOvNu/9gqBBFaWnDQAiCMYhwLM/cUJpHurZG77u0oHCYAdwKgJ9y2TsRn9CMjnUsEJjMQI8Q7QanPB/peFWulocW18sWlbFV609wC/cO27bek8QajFVvLjcDc3gGa3uKGIJLcXI9dISGPQCLlyN+gIE+NpM+AoWDKkaYbY0/j5CSn1uikXmmXqiVR5tlnq2IfQahSQKys0ysVmNyxCWvLm8ABIXAwVG0uQWIN1cBccoqPwAtlhm4HGVczQROB8XOMOSi0OFLxFfGK4/KAXaRG+L7eTwvF8IUYOdKnwZUubRYK3HO3o80cwAe7CGxCAtL/y68qQjC/5sAAO76zTnCwxg1kw8jVcwGDwiIjAd4cYwRcuKPbCbE2GP1ClgsfD9IZFr2A+CAixCBvLK0Q2KLdwo/skhhMKkAQcTCGDvSq5VPpcMGlsn3J4c/igp7KegDrRrFtVtw1XwTQBDOAsq2lvjlVZQNUM1AHRAkIZUoLv94vHNrAG6sf3L1yRwMimTQOJFaOWsy9sIrbm/T+QB5Vgk4BTwshIHmg7ILd0uHGjiibOENtpr7JK1IrvMFtoeTKnFSxtLwkJF7jda4xfJlrpmTdSpzqDEGd/wUwC6t5N12RJWKu6aqRGIZ2ku28uI5XW1rDGyzm+0VPAz5sgrE9HDLYv/42rL+UbYVEwNWtlcnT+2GQUniMUdfaeBshJohdkCTnHKxXGELHAx1F8FDari2WHv7lVAdaYgoOKFa81XSYor/+YCXDxYQUOAw3vgxRx5phXJUa2/4GEYA9YXWIheMGWBBkgAlB41igxnDi45UFuXYEi/Q4mKRLsn2QhgBvRcji2kFFgFZVer4zou9nIDLlOBwyRGUfSRSp4PkvfOGlmlisWYGRA6ADqApRANCAWj2mYWhmCQAADs='
+    }
+  }
+
   var discreet = {
     smarty: null,
     modal: null,
@@ -46,35 +59,9 @@
       }
     },
     
-    setMethods: function(payment_methods){
+    setMethods: function(payment_methods, opts){
       var i;
-      var methodOptions = discreet.rzp.options.method;
-
-      if(typeof payment_methods.wallet == 'object'){
-        if(typeof methodOptions.wallet == 'object'){
-          for(i in payment_methods.wallet){
-            if(methodOptions.wallet[i] != false && payment_methods.wallet[i] != false){
-              methodOptions.wallet[i] = payment_methods.wallet[i];
-            }
-          }
-        } else {
-          methodOptions.wallet = payment_methods.wallet;
-        }
-      }
-      var tabCount = 0;
-
-      if(typeof methodOptions.wallet == 'object'){
-        for(i in methodOptions.wallet){
-          if(methodOptions.wallet[i]){
-            tabCount++;
-            break;
-          }
-        }
-      }
-
-      if(!tabCount || discreet.rzp.options.amount > 100*10000){ // disable wallets for transactions worth > INR 3,000
-        methodOptions.wallet = false;
-      }
+      var methodOptions = opts.method;
 
       if(!payment_methods.error){
         for(i in payment_methods){
@@ -82,19 +69,32 @@
             methodOptions[i] = payment_methods[i];
           }
         }
+        var wallets = [];
+        if(methodOptions.wallet && discreet.rzp.options.amount <= 100*10000){
+          var printedWallets = payment_methods['wallet'];
+          if(typeof printedWallets == 'object'){
+            for(i in printedWallets){
+              if(printedWallets[i]){
+                var logos = wallet_logos[i];
+                if(logos){
+                  wallets.push({
+                    'name': i,
+                    'mono': logos.mono,
+                    'col': logos.col,
+                    'h': logos.h
+                  });
+                }
+              }
+            }
+          }
+        }
+        methodOptions.wallet = wallets;
       } else {
         methodOptions.card = false;
         methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
       }
-
       if(methodOptions.netbanking !== false && typeof methodOptions.netbanking != 'object'){
         methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
-      }
-      if(methodOptions.card){
-        tabCount++;
-      }
-      if(methodOptions.netbanking){
-        tabCount++;
       }
     },
 
@@ -193,16 +193,17 @@
         return discreet.modal.show();
       }
 
-      discreet.setMethods(window.payment_methods);
-      discreet.sanitizeOptions(discreet.rzp.options);
+      var opts = $.clone(discreet.rzp.options);
+      discreet.setMethods(window.payment_methods, opts);
+      discreet.sanitizeOptions(opts);
       var div = document.createElement('div');
-      div.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);
+      div.innerHTML = (doT.compile(templates.modal))(opts);
       document.body.appendChild(div.firstChild);
       discreet.$el = $('container');
       discreet.smarty = new Smarty(discreet.$el);
 
       // init modal
-      var modalOptions = discreet.rzp.options.modal;
+      var modalOptions = opts.modal;
       modalOptions.onhide = function(){
         Razorpay.sendMessage({event: 'dismiss'});
       };
