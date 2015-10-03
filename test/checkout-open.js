@@ -1,3 +1,5 @@
+var currentScript = jQuery('script[src*="checkout-open"]')[0];
+console.log(currentScript.src);
 var discreet = Razorpay.discreet;
 var options = {
   'key': 'key_id',
@@ -319,7 +321,7 @@ describe("automatic checkout:", function(){
   it("submit handler should submit with all fields", function(){
     var spy = jasmine.createSpy();
     
-    discreet.currentScript.parentNode.submit = function(){
+    currentScript.parentNode.submit = function(){
       var payload = [];
       jQuery(this).children('input[name]').each(function(index, el){
         payload.push(el.name + '=' + el.value);
@@ -380,7 +382,7 @@ describe("automatic checkout:", function(){
     var init_options = jQuery.extend(true, {}, options);
     init_options.buttontext = 'Dont pay';
     var rzp = new Razorpay(init_options);
-    var parent = discreet.currentScript.parentNode;
+    var parent = currentScript.parentNode;
     discreet.addButton(rzp);
     
     it("onsubmit should be attached on parent element", function(){
@@ -434,7 +436,7 @@ describe("automatic checkout:", function(){
       spyCalled = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
       for(var i in opts)
-        discreet.currentScript.setAttribute('data-' + i, opts[i]);
+        currentScript.setAttribute('data-' + i, opts[i]);
     })
 
     afterEach(function(){
@@ -444,11 +446,11 @@ describe("automatic checkout:", function(){
       spyNotCalled && expect(spyNotCalled).not.toHaveBeenCalled();
 
       for(var i in opts)
-        discreet.currentScript.removeAttribute(i);
+        currentScript.removeAttribute(i);
     })
 
     it("should do nothing if data-key attribute is not present", function(){
-      discreet.currentScript.removeAttribute('data-key');
+      currentScript.removeAttribute('data-key');
       spyCalled = null;
       spyOn(discreet, 'addButton').and.callFake(spyNotCalled);
     })

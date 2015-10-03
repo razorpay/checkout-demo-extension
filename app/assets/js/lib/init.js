@@ -8,14 +8,7 @@
     }
     return this;
   };
-  r.card = {};
-  r.discreet = {
-    currentScript: document.currentScript || (function() {
-      var scripts = document.getElementsByTagName('script');
-      return scripts[scripts.length - 1];
-    })(),
-    merchantData: {}
-  };
+  r.discreet = {};
   r.noop = function(){};
   r.defaults = {
     'protocol': 'https',

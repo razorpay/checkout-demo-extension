@@ -63,8 +63,20 @@ module.exports = function(grunt){
     },
     uglify: {
       options: {
-        mangle: false,
-        compress: false
+        mangle: {
+          // toplevel: true,
+          sort: true
+        },
+        compress: {
+          // negate_iife: true,
+          drop_console: true,
+          drop_debugger: true
+          // unsafe: true
+        },
+        // mangleProperties: true,
+        preserveComments: false,
+        sourceMap: true,
+        sourceMapIncludeSources: true
       }
     },
     aws: loadAwsKeys(),
@@ -203,21 +215,24 @@ module.exports = function(grunt){
     'exec:copy_html'
   ]);
 
-  grunt.registerTask('build', [
+  grunt.registerTask('build',[
     'env:prod',
     'exec:build',
     'useminPrepare',
-    'concatPrepare',
-    'concat:generated',
-    'usemin'
+    'uglifyPrepare',
+    'uglify:generated',
+    'usemin',
+    'sourceMaps'
   ]);
 
-  grunt.registerTask('concatPrepare', function(){
-    var concat = grunt.config.get('concat');
-    concat.generated.files.forEach(function(config){
-      config.dest = config.dest.replace('.tmp/concat', 'app/dist/v1');
+  grunt.registerTask('uglifyPrepare', function(){
+    var uglify = grunt.config.get('uglify');
+    uglify.generated.files = {};
+
+    grunt.config.get('concat').generated.files.forEach(function(config){
+      uglify.generated.files['app/dist/v1/' + config.dest.replace(/.+\//g,'')] = config.src;
     })
-    grunt.config.set('concat', concat);
+    grunt.config.set('uglify', uglify);
   })
 
   /**
@@ -237,7 +252,7 @@ module.exports = function(grunt){
     'exec:clean_srv',
     'exec:harp_compile',
     'useminPrepare',
-    'concatPrepare',
+    'uglifyPrepare',
     'prepareKarma'
   ]);
 
@@ -254,7 +269,7 @@ module.exports = function(grunt){
   grunt.registerTask('fonts:upload', 'Upload Fonts', ['aws_s3:' + target]);
 
   grunt.registerTask('prepareKarma', 'Prepare Karma', function(a, b) {
-    var fileSets = grunt.config.get('concat');
+    var fileSets = grunt.config.get('uglify');
     fileSets = fileSets.generated.files;
 
     var blocks = {};
@@ -281,6 +296,26 @@ module.exports = function(grunt){
 
     grunt.config.set('karma', karma);
   });
+
+  grunt.registerTask('sourceMaps', 'Removing source map comments', function(){
+    var fileSets = grunt.config.get('uglify');
+    fileSets = fileSets.generated.files;
+
+    var htmlclean = {};
+    var karma = grunt.config.get('karma');
+
+    for(var i in fileSets){
+      var item = i.split('/').pop();
+
+      htmlclean[item] = {
+        src: i,
+        dest: i
+      }
+    }
+
+    grunt.config.set('htmlclean', htmlclean);
+    grunt.task.run('htmlclean');
+  })
 
   grunt.registerTask('createReport', 'Creates combined istanbul report', function(){
     var istanbul = require('istanbul'),

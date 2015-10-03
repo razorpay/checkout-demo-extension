@@ -12,6 +12,11 @@
   var pageY = 0;
   var ua = navigator.userAgent;
   var absoluteContainer;
+  var currentScript = document.currentScript || (function() {
+    var scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })();
+  discreet.merchantData = {};
 
   var fallbacks = function(){
     absoluteContainer = /iPhone|Android 2\./.test(ua);
@@ -104,11 +109,11 @@
 
   discreet.createFrame = function(options){
     var frame = document.createElement('iframe');
-    var src = discreet.currentScript.src;
+    var src = currentScript.src;
     if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
       src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
     } else {
-      src = src.replace(/(js\/lib\/)?[^\/]+$/,'') + 'checkout.html';
+      src = src.replace(/(\/js|\/lib|[^\/]+$)/g,'') + 'checkout.html'
     }
 
     var attrs = {
@@ -304,7 +309,7 @@
         inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
       }
     }
-    var RazorPayForm = discreet.currentScript.parentElement;
+    var RazorPayForm = currentScript.parentElement;
     RazorPayForm.innerHTML += inputs;
     RazorPayForm.submit();
   };
@@ -333,7 +338,7 @@
 
   discreet.addButton = function(rzp){
     var button = document.createElement('input');
-    var form = discreet.currentScript.parentNode;
+    var form = currentScript.parentNode;
     button.type = 'submit';
     button.value = rzp.options.buttontext;
     button.className = 'razorpay-payment-button';
@@ -353,9 +358,9 @@
   * If yes, it puts in the button
   */
   discreet.automaticCheckoutInit = function(){
-    var key = discreet.currentScript.getAttribute('data-key');
+    var key = currentScript.getAttribute('data-key');
     if (key && key.length > 0){
-      var attrs = discreet.currentScript.attributes;
+      var attrs = currentScript.attributes;
       var opts = {};
       for(var i=0; i<attrs.length; i++){
         var name = attrs[i].name
