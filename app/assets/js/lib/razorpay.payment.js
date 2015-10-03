@@ -100,17 +100,17 @@
     }
 
     if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) return false;
-    var char = String.fromCharCode(which);
-    if(/[0-9]/.test(char)){
-      return char;
+    var character = String.fromCharCode(which);
+    if(/[0-9]/.test(character)){
+      return character;
     }
     e.preventDefault();
     return false;
   }
 
   var formatExpiry = function(e){
-    var char = ensureNumeric(e);
-    if(char === false) return;
+    var character = ensureNumeric(e);
+    if(character === false) return;
     
     var pos = checkSelection(this);
     if(pos === true) return;
@@ -123,21 +123,21 @@
     var el = this;
 
     if(pos == 0){
-      if(/0|1/.test(char))
+      if(/0|1/.test(character))
         return;
       else
-        char = '0' + char;
+        character = '0' + character;
         pos++;
     }
 
     if(pos == 1){
-      char += ' / ';
+      character += ' / ';
     }
     else if(pos == 2){
-      char = ' / ' + char;
+      character = ' / ' + character;
     }
     else{
-      if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + char + suffix))
+      if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix))
         e && e.preventDefault();
       if(pos == 6)
         setTimeout(function(){card.filled(el)}, 200);
@@ -146,8 +146,8 @@
     e && e.preventDefault();
 
     setTimeout(function(){
-      el.value = (prenums + char + sufnums).slice(0, 7);
-      pos = (prefix + char).length;
+      el.value = (prenums + character + sufnums).slice(0, 7);
+      pos = (prefix + character).length;
       setCaret(el, pos);
     })
   }
@@ -164,8 +164,8 @@
   }
 
   var formatNumber = function(e){
-    var char = ensureNumeric(e);
-    if(char === false) return;
+    var character = ensureNumeric(e);
+    if(character === false) return;
     
     var pos = checkSelection(this);
     if(pos === true) return;
@@ -173,7 +173,7 @@
     var value = this.value;
     var prefix = value.slice(0, pos).replace(/[^0-9]/g,'');
     var suffix = value.slice(pos).replace(/[^0-9]/g,'');
-    value = prefix + char + suffix;
+    value = prefix + character + suffix;
     
     var type = cardType(value) || 'unknown';
     var cardobj = card_formats[type];
