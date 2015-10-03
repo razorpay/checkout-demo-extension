@@ -237,7 +237,7 @@ module.exports = function(grunt){
     'exec:clean_srv',
     'exec:harp_compile',
     'useminPrepare',
-    'uglifyPrepare',
+    'concatPrepare',
     'prepareKarma'
   ]);
 
@@ -254,7 +254,7 @@ module.exports = function(grunt){
   grunt.registerTask('fonts:upload', 'Upload Fonts', ['aws_s3:' + target]);
 
   grunt.registerTask('prepareKarma', 'Prepare Karma', function(a, b) {
-    var fileSets = grunt.config.get('uglify');
+    var fileSets = grunt.config.get('concat');
     fileSets = fileSets.generated.files;
 
     var blocks = {};
@@ -281,26 +281,6 @@ module.exports = function(grunt){
 
     grunt.config.set('karma', karma);
   });
-
-  grunt.registerTask('sourceMaps', 'Removing source map comments', function(){
-    var fileSets = grunt.config.get('uglify');
-    fileSets = fileSets.generated.files;
-
-    var htmlclean = {};
-    var karma = grunt.config.get('karma');
-
-    for(var i in fileSets){
-      var item = i.split('/').pop();
-
-      htmlclean[item] = {
-        src: i,
-        dest: i
-      }
-    }
-
-    grunt.config.set('htmlclean', htmlclean);
-    grunt.task.run('htmlclean');
-  })
 
   grunt.registerTask('createReport', 'Creates combined istanbul report', function(){
     var istanbul = require('istanbul'),
