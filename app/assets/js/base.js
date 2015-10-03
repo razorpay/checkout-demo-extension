@@ -104,7 +104,7 @@
             }
           }
         } else if (i == 'prefill') {
-          options.prefill = JSON.parse(JSON.stringify(defaults.prefill));
+          options.prefill = JSON.parse(JSON.stringify(defaults['prefill']));
           var op = overrides.prefill;
           if(typeof op == 'object'){
             for(var j in defaults.prefill){
@@ -216,7 +216,6 @@
         var message = errors[0].message;
         var errorMessage = '{"field":"' + field + '","error":"' + message + '"}';
         throw new Error(errorMessage);
-        return;
       }
     }
   };
