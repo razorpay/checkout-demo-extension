@@ -7,8 +7,6 @@ Razorpay = function(options){
 
 (function(){
   var r = Razorpay;
-  if(window.Rollbar) r.roll = window.roll;
-  r.prototype = {};
   r.card = {};
   r.discreet = {
     

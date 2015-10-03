@@ -63,20 +63,8 @@ module.exports = function(grunt){
     },
     uglify: {
       options: {
-        mangle: {
-          // toplevel: true,
-          sort: true
-        },
-        compress: {
-          // negate_iife: true,
-          drop_console: true,
-          drop_debugger: true
-          // unsafe: true
-        },
-        // mangleProperties: true,
-        preserveComments: false,
-        sourceMap: true,
-        sourceMapIncludeSources: true
+        mangle: false,
+        compress: false
       }
     },
     aws: loadAwsKeys(),
@@ -215,24 +203,21 @@ module.exports = function(grunt){
     'exec:copy_html'
   ]);
 
-  grunt.registerTask('build',[
+  grunt.registerTask('build', [
     'env:prod',
     'exec:build',
     'useminPrepare',
-    'uglifyPrepare',
-    'uglify:generated',
-    'usemin',
-    'sourceMaps'
+    'concatPrepare',
+    'concat:generated',
+    'usemin'
   ]);
 
-  grunt.registerTask('uglifyPrepare', function(){
-    var uglify = grunt.config.get('uglify');
-    uglify.generated.files = {};
-
-    grunt.config.get('concat').generated.files.forEach(function(config){
-      uglify.generated.files['app/dist/v1/' + config.dest.replace(/.+\//g,'')] = config.src;
+  grunt.registerTask('concatPrepare', function(){
+    var concat = grunt.config.get('concat');
+    concat.generated.files.forEach(function(config){
+      config.dest = config.dest.replace('.tmp/concat', 'app/dist/v1');
     })
-    grunt.config.set('uglify', uglify);
+    grunt.config.set('concat', concat);
   })
 
   /**
