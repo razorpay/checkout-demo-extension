@@ -194,7 +194,6 @@
       }
 
       discreet.setMethods(window.payment_methods);
-      $('loading').remove();
       discreet.sanitizeOptions(discreet.rzp.options);
       var div = document.createElement('div');
       div.innerHTML = (doT.compile(templates.modal))(discreet.rzp.options);

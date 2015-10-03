@@ -6,55 +6,6 @@
   var $ = Razorpay.$;
   var discreet = Razorpay.discreet;
 
-  // TODO add style link to insert
-  discreet.defaults = {
-    protocol: 'https',
-    hostname: 'api.razorpay.com',
-    version: 'v1',
-    jsonpUrl: '/payments/create/jsonp',
-    methodsUrl: '/methods',
-    key: '',
-    amount: '',
-    currency: 'INR',
-    handler: $.noop,
-    notes: {},
-    callback_url: '',
-    redirect: false,
-    description: '',
-
-    // automatic checkout only
-    buttontext: 'Pay Now',
-
-    // checkout fields, not needed for razorpay alone
-    display_currency: '',
-
-    method: {
-      netbanking: null,
-      card: null,
-      wallet: {}
-    },
-    prefill: {
-      name: '',
-      contact: '',
-      email: '',
-      card: {
-        number: '',
-        expiry_month: '',
-        expiry_year: ''
-      }
-    },
-    modal: {
-      ondismiss: $.noop,
-      onhidden: $.noop,
-      escape: true,
-      animation: true,
-      backdropClose: true
-    },
-    signature: '',
-    display_amount: '',
-    name: '', // of merchant
-    image: ''
-  };
   /**
    * Cross Domain Post Message
    * Generic functions
@@ -139,7 +90,7 @@
       throw new Error("invalid options passed");
     }
     var options = {};
-    var defaults = discreet.defaults;
+    var defaults = Razorpay.defaults;
 
     for (var i in defaults){
       if(defaults[i] !== null && typeof defaults[i] == 'object'){

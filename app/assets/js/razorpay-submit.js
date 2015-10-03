@@ -7,7 +7,7 @@
   var discreet = Razorpay.discreet;
   
   Razorpay.configure = function(overrides) {
-    discreet.defaults = discreet.configure(overrides);
+    Razorpay.defaults = discreet.configure(overrides);
   }
 
   /**
@@ -22,7 +22,7 @@
       var rdata = request.data;
       var options = request.options;
       if(!options)
-        options = request.options = JSON.parse(JSON.stringify(discreet.defaults));
+        options = request.options = $.clone(Razorpay.defaults);
 
       var defaultFields = ['amount', 'notes', 'currency'];
       for(var i=0; i<defaultFields.length;i++){
@@ -78,8 +78,8 @@
 
     getMethods: function(callback){
       return $.ajax({
-        url: discreet.makeUrl(discreet.defaults) + discreet.defaults.methodsUrl,
-        data: {key_id: discreet.defaults.key},
+        url: discreet.makeUrl(Razorpay.defaults) + Razorpay.defaults.methodsUrl,
+        data: {key_id: Razorpay.defaults.key},
         timeout: 30000,
         success: function(response){
           if(typeof callback == 'function'){

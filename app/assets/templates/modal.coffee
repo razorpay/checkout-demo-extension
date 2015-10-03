@@ -57,7 +57,7 @@ templates.modal = '
               {{?}}
               {{? it.method.wallet }}
                 {{ var wallet_name, wallet_mono, wallet_col, wallet_h; }}
-                <li id="id="method-wallet-tab"" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
+                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>Wallets
                   {{ if(it.method.wallet.paytm){
                       wallet_h = "12px";
                       wallet_name = "paytm";

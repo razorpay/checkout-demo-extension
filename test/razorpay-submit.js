@@ -50,7 +50,7 @@ describe("Razorpay.configure should", function(){
   it("set default options", function(){
     Razorpay.configure(options);
     for(var i in options){
-      expect(options[i]).toBe(discreet.defaults[i]);
+      expect(options[i]).toBe(Razorpay.defaults[i]);
     }
   })
 })
@@ -127,10 +127,10 @@ describe("authorize should", function(){
   })
 
   it("add callback_url if specified in options", function(){
-    discreet.defaults.callback_url = 'swag';
+    Razorpay.defaults.callback_url = 'swag';
     Razorpay.payment.authorize(req);
     expect(req.data.callback_url).toBe('swag');
-    discreet.defaults.callback_url = ''; // reset
+    Razorpay.defaults.callback_url = ''; // reset
   })
 
   it("add merchant key in request data", function(){

@@ -185,7 +185,10 @@
     return jsonp(options);
   }
 
-  $.noop = function(){};
+  $.noop = root.noop;
+  $.clone = function(target){
+    return JSON.parse(JSON.stringify(target));
+  }
 
   $.extend = function(target, source){
     for(var o in source){
