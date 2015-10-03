@@ -251,4 +251,5 @@
       discreet.error.call(this, errorData);
     }
   }
+  /* INLINE_TESTING */
 })();

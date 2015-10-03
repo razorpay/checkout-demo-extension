@@ -185,7 +185,7 @@
     return jsonp(options);
   }
 
-  $.noop = root.noop;
+  $.noop = root.defaults.handler;
   $.clone = function(target){
     return JSON.parse(JSON.stringify(target));
   }

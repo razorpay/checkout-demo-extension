@@ -3,7 +3,7 @@
 
 (function(){
   'use strict';
-
+  var Razorpay = window.Razorpay;
   var roll = Razorpay.roll || $.noop;
   var ua = navigator.userAgent;
 
@@ -26,7 +26,7 @@
     }
   }
 
-  var discreet = {
+  var discreet = window.frameDiscreet = {
     smarty: null,
     modal: null,
     $el: null,
@@ -569,9 +569,6 @@
   $(window).on('message', discreet.parseMessage);
 
 
-// @if NODE_ENV='test'
-  window.frameDiscreet = discreet;
-// @endif
 
   // initial error (helps in case of redirection flow)
   var qpmap = discreet.qpmap = {};

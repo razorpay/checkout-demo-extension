@@ -9,7 +9,7 @@
     return this;
   };
   r.discreet = {};
-  r.noop = function(){};
+  var noop = function(){};
   r.defaults = {
     'protocol': 'https',
     'hostname': 'api.razorpay.com',
@@ -19,7 +19,7 @@
     'key': '',
     'amount': '',
     'currency': 'INR',
-    'handler': r.noop,
+    'handler': noop,
     'notes': {},
     'callback_url': '',
     'redirect': false,
@@ -47,8 +47,8 @@
       }
     },
     'modal': {
-      'ondismiss': r.noop,
-      'onhidden': r.noop,
+      'ondismiss': noop,
+      'onhidden': noop,
       'escape': true,
       'animation': true,
       'backdropClose': true

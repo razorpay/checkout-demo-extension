@@ -15,11 +15,6 @@ build:
             channel: tech_bots
 deploy:
     steps:
-        - npm-install
-        - script:
-            name: Install harp globally
-            code: sudo npm install -g harp
-
         - script:
             name: Insert git commit id into rollbar version
             code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/assets/js/rollbar.js

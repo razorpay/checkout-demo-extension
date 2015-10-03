@@ -37,6 +37,9 @@ module.exports = function(grunt){
       },
       copy_html:{
         cmd: 'cp app/srv/*.html app/dist/v1/'
+      },
+      inline_testing: {
+        cmd: "for i in app/srv/js/*.js; do j=`basename $i`; sed -i -e '/INLINE_TESTING/r test/inline/'$j $i; echo test/$i; done;"
       }
     },
     inline: {
@@ -136,9 +139,7 @@ module.exports = function(grunt){
             type : 'json',
             dir : 'coverage/razorpay/'
           },
-          files: [
-            'test/razorpay-submit.js'
-          ]
+          files: ['test/razorpay-submit.js']
         }
       },
       'checkout': {
@@ -253,7 +254,8 @@ module.exports = function(grunt){
     'exec:harp_compile',
     'useminPrepare',
     'uglifyPrepare',
-    'prepareKarma'
+    'prepareKarma',
+    'exec:inline_testing'
   ]);
 
   grunt.registerTask('test', [

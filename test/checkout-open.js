@@ -1,5 +1,4 @@
 var currentScript = jQuery('script[src*="checkout-open"]')[0];
-console.log(currentScript.src);
 var discreet = Razorpay.discreet;
 var options = {
   'key': 'key_id',
