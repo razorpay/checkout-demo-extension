@@ -607,4 +607,5 @@
     })
   }
   Razorpay.sendMessage({event: 'load'});
+  /* INLINE_TESTING */
 })();

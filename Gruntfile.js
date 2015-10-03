@@ -39,7 +39,7 @@ module.exports = function(grunt){
         cmd: 'cp app/srv/*.html app/dist/v1/'
       },
       inline_testing: {
-        cmd: "for i in app/srv/js/*.js; do j=`basename $i`; sed -i -e '/INLINE_TESTING/r test/inline/'$j $i; echo test/$i; done;"
+        cmd: "for i in app/srv/js/*.js; do j=`basename $i`; sed -i -e '/INLINE_TESTING/r test/inline/'$j $i; done;"
       }
     },
     inline: {

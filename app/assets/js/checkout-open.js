@@ -4,6 +4,7 @@
 (function(){
   'use strict';
 
+  var frameContainer, backdrop, isOpen, bodyEl, metaViewportTag;
   var doT = Razorpay.doT;
   var discreet = Razorpay.discreet;
 
@@ -16,7 +17,7 @@
     var scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
   })();
-  discreet.merchantData = {};
+  var merchantData = {};
 
   var fallbacks = function(){
     absoluteContainer = /iPhone|Android 2\./.test(ua);
@@ -27,13 +28,13 @@
 
     if(absoluteContainer && window.addEventListener){
       window.addEventListener('orientationchange', function(){
-        if(discreet.frameContainer){
-          discreet.frameContainer.style.height = Math.max(innerHeight, 455)+'px';
+        if(frameContainer){
+          frameContainer.style.height = Math.max(innerHeight, 455)+'px';
         }
       })
       window.addEventListener('scroll', function(){
-        var c = discreet.frameContainer;
-        if(!c || !discreet.isOpen || typeof window.pageYOffset !== 'number')
+        var c = frameContainer;
+        if(!c || !isOpen || typeof window.pageYOffset !== 'number')
           return;
         var top;
         var offTop = c.offsetTop - pageYOffset;
@@ -54,23 +55,19 @@
   }
 
   Razorpay.prototype.open = function() {
-    var body = discreet.bodyEl = document.getElementsByTagName('body')[0];
-    if(!body){
-      setTimeout(this.open());
-    }
-    if(discreet.isOpen){
-      return;
-    }
+    if(!bodyEl) bodyEl = document.getElementsByTagName('body')[0];
+    if(!bodyEl) setTimeout(this.open());
+    if(isOpen) return;
+    isOpen = true;
 
-    discreet.isOpen = true;
-    discreet.merchantData.bodyOverflow = body.style.overflow;
-    discreet.xdm.addMessageListener(discreet.onFrameMessage, this);
+    merchantData.bodyOverflow = bodyEl.style.overflow;
+    discreet.xdm.addMessageListener(onFrameMessage, this);
 
-    if(!discreet.frameContainer){
+    if(!frameContainer){
       fallbacks();
-      var parent = discreet.frameContainer = document.createElement('div');
-      parent.className = 'razorpay-frame-container';
-      var style = parent.style;
+      frameContainer = document.createElement('div');
+      frameContainer.className = 'razorpay-frame-container';
+      var style = frameContainer.style;
       var rules = {
         zIndex: '99999',
         position: (absoluteContainer ? 'absolute' : 'fixed'),
@@ -83,31 +80,29 @@
       for(var i in rules){
         style[i] = rules[i];
       }
-      var back = discreet.backdrop = document.createElement('div');
-      back.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
-      parent.appendChild(back);
-      body.appendChild(parent);
+      backdrop = document.createElement('div');
+      backdrop.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
+      frameContainer.appendChild(backdrop);
+      bodyEl.appendChild(frameContainer);
     }
     if(!absoluteContainer)
-      body.style.overflow = 'hidden';
-    parent = discreet.frameContainer;
-    parent.style.display = 'block';
+      bodyEl.style.overflow = 'hidden';
+    frameContainer.style.display = 'block';
     try{
       // setting unsupported value throws error in IE
-      discreet.backdrop.style.background = 'rgba(0,0,0,0.6)';
+      backdrop.style.background = 'rgba(0,0,0,0.6)';
     } catch(e){}
-
     if(!this.checkoutFrame){
-      this.checkoutFrame = discreet.createFrame(this.options);
-      discreet.frameContainer.appendChild(this.checkoutFrame);
+      this.checkoutFrame = createFrame(this.options);
+      frameContainer.appendChild(this.checkoutFrame);
     } else {
       this.checkoutFrame.style.display = 'block';
-      discreet.setMetaViewport();
-      discreet.sendFrameMessage.call(this, {event: 'open'});
+      setMetaViewport();
+      sendFrameMessage.call(this, {event: 'open'});
     }
   }
 
-  discreet.createFrame = function(options){
+  var createFrame = function(options){
     var frame = document.createElement('iframe');
     var src = currentScript.src;
     if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
@@ -132,27 +127,23 @@
   }
 
   Razorpay.prototype.close = function(){
-    if(discreet.isOpen){
-      discreet.sendFrameMessage.call(this, {event: 'close'});
+    if(isOpen){
+      sendFrameMessage.call(this, {event: 'close'});
     }
   }
 
-  discreet.onClose = function(){
+  var onClose = function(){
     discreet.xdm.removeMessageListener();
-    discreet.isOpen = false;
-    discreet.bodyEl.style.overflow = discreet.merchantData.bodyOverflow;
+    isOpen = false;
+    bodyEl.style.overflow = merchantData.bodyOverflow;
 
-    var meta = discreet.metaViewportTag;
-    if(meta){
-      var parent = discreet.metaViewportTag.parentNode;
-      parent && parent.removeChild(meta);
-    }
+    if(metaViewportTag) metaViewportTag.parentNode && metaViewportTag.parentNode.removeChild(metaViewportTag);
 
-    meta = discreet.merchantData.metaViewport;
+    var meta = merchantData.metaViewport;
     if(meta){
       var head = document.getElementsByTagName('head')[0];
       head && !meta.parentNode && head.appendChild(meta);
-      discreet.merchantData.metaViewport = null;
+      merchantData.metaViewport = null;
     }
 
     if(this.checkoutFrame){
@@ -162,13 +153,13 @@
         this.checkoutFrame = null;
       }
     }
-    if(discreet.frameContainer)
-      discreet.frameContainer.style.display = 'none';
+    if(frameContainer)
+      frameContainer.style.display = 'none';
     if(this instanceof Razorpay && typeof this.options.modal.onhidden == 'function')
       this.options.modal.onhidden();
   }
 
-  discreet.sendFrameMessage = function(response){
+  var sendFrameMessage = function(response){
     if(typeof response !== 'string'){
       response = JSON.stringify(response)
     }
@@ -176,7 +167,7 @@
   }
 
   // to handle absolute/relative url of options.image
-  discreet.setImageOption = function(options){
+  var setImageOption = function(options){
     if(options.image && typeof options.image == 'string'){
       if(/data:image\/[^;]+;base64/.test(options.image)){
         return;
@@ -195,7 +186,7 @@
     }
   }
 
-  discreet.setMetaViewport = function(){
+  var setMetaViewport = function(){
     if(typeof document.querySelector != 'function'){
       return;
     }
@@ -207,27 +198,26 @@
     var meta = head.querySelector('meta[name=viewport]');
 
     if(meta){
-      discreet.merchantData.metaViewport = meta;
+      merchantData.metaViewport = meta;
       meta.parentNode.removeChild(meta);
     }
 
-    if(!discreet.metaViewportTag){
-      meta = discreet.metaViewportTag = document.createElement('meta');
-      meta.setAttribute('name', 'viewport');
-      meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    if(!metaViewportTag){
+      metaViewportTag = document.createElement('meta');
+      metaViewportTag.setAttribute('name', 'viewport');
+      metaViewportTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
     }
 
-    if(!discreet.metaViewportTag.parentNode){
-      head.appendChild(discreet.metaViewportTag);
+    if(!metaViewportTag.parentNode){
+      head.appendChild(metaViewportTag);
     }
   }
 
-  discreet.onFrameMessage = function(e, data){
+  var onFrameMessage = function(e, data){
     // this == rzp
     if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
     }
-    var backdrop = discreet.backdrop;
     var event = data.event;
     data = data.data;
 
@@ -235,7 +225,7 @@
     if(event === 'load'){
       var i;
       var options = {};
-      discreet.setMetaViewport();
+      setMetaViewport();
 
       for(i in this.options){
         var value = this.options[i];
@@ -246,13 +236,13 @@
       for(i in this.modal.options){
         this.options.modal[i] = this.modal.options[i];
       }
-      discreet.setImageOption(options);
+      setImageOption(options);
 
       var response = {
         context: location.href,
         options: options
       }
-      return discreet.sendFrameMessage.call(this, response);
+      return sendFrameMessage.call(this, response);
     }
 
     else if(event === 'redirect'){
@@ -273,7 +263,7 @@
     }
 
     else if (event === 'hidden'){
-      discreet.onClose.call(this);
+      onClose.call(this);
     }
 
     else if (event === 'success'){
@@ -298,7 +288,7 @@
     @param  {[type]} data [description]
     @return {[type]}    [description]
   */
-  discreet.defaultPostHandler = function(data){
+  var defaultPostHandler = function(data){
     var inputs = "";
     for (var i in data) {
       if (typeof data[i] === "object") {
@@ -314,7 +304,7 @@
     RazorPayForm.submit();
   };
 
-  discreet.parseScriptOptions = function(options){
+  var parseScriptOptions = function(options){
     var category, dotPosition, i, ix, property;
     for (i in options) {
       ix = i.indexOf(".");
@@ -333,10 +323,10 @@
       }
     }
     if(options.method)
-      discreet.parseScriptOptions(options.method);
+      parseScriptOptions(options.method);
   };
 
-  discreet.addButton = function(rzp){
+  var addButton = function(rzp){
     var button = document.createElement('input');
     var form = currentScript.parentNode;
     button.type = 'submit';
@@ -344,7 +334,7 @@
     button.className = 'razorpay-payment-button';
     form.appendChild(button);
     form.onsubmit = function(e){
-      if(discreet.isOpen){
+      if(isOpen){
         return;
       }
       e.preventDefault();
@@ -357,7 +347,7 @@
   * This checks whether we are in automatic mode
   * If yes, it puts in the button
   */
-  discreet.automaticCheckoutInit = function(){
+  var automaticCheckoutInit = function(){
     var key = currentScript.getAttribute('data-key');
     if (key && key.length > 0){
       var attrs = currentScript.attributes;
@@ -369,10 +359,10 @@
           opts[name] = attrs[i].value;
         }
       }
-      discreet.parseScriptOptions(opts);
-      opts.handler = discreet.defaultPostHandler;
+      parseScriptOptions(opts);
+      opts.handler = defaultPostHandler;
       var rzp = new Razorpay(opts);
-      discreet.addButton(rzp);
+      addButton(rzp);
     }
   }
 
@@ -419,6 +409,6 @@
   }
 
   // Get the ball rolling in case we are in manual mode
-  discreet.automaticCheckoutInit();
-
+  automaticCheckoutInit();
+  /* INLINE_TESTING */
 })()

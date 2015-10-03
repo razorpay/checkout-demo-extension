@@ -8,7 +8,7 @@
   var discreet = Razorpay.discreet;
   var roll = Razorpay.roll || $.noop;
 
-  discreet.popupClose = function(){
+  var popupClose = function(){
     try{
       if(this.popup && typeof this.popup.close == 'function'){
         this.popup.close();
@@ -32,7 +32,7 @@
   discreet.paymentSuccess = function(data){
     // this == request
     if(this.popup && typeof this.popup.close == 'function'){
-      discreet.popupClose.call(this);
+      popupClose.call(this);
     }
     if(typeof this.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
       var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
@@ -59,9 +59,7 @@
       return;
     }
 
-    if(typeof this.popup != 'undefined'){
-      discreet.popupClose.call(this);
-    }
+    if(typeof this.popup != 'undefined') popupClose.call(this);
 
     if (data.error && data.error.description){
       if(typeof this.error === 'function'){
@@ -102,8 +100,7 @@
     if(typeof this.error == 'function'){
       this.error.call(null, response); // dont expose request as this
     }
-    if(this.popup)
-      discreet.popupClose.call(this);
+    if(this.popup) popupClose.call(this);
   }
 
   discreet.getAjaxSuccess = function(request){
@@ -151,7 +148,7 @@
 
     var popup = request.popup = new Popup(options.protocol + '://' + options.hostname + '/' + 'processing.php');
     if (typeof request.error == 'function'){
-      popup.onClose(discreet.getPopupClose(request));
+      popup.onClose(getPopupClose(request));
     }
 
     popup._loaded = false;
@@ -190,7 +187,7 @@
     }
   }
 
-  discreet.getPopupClose = function(request){
+  var getPopupClose = function(request){
     return function(){
       discreet.xdm.removeMessageListener();
 
@@ -208,4 +205,5 @@
       }
     }
   }
+  /* INLINE_TESTING */
 })();
