@@ -58,8 +58,8 @@ templates.modal = '
               {{? it.method.wallet.length }}
                 <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
                   {{ if(it.method.wallet.length == 1){ }}
-                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" onerror="this.parentNode.innerHTML=\'{{=it.method.wallet[0].name}}\'" src="data:image/gif;base64,{{=it.method.wallet[0].mono}}"/>
-                    <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="data:image/gif;base64,{{=it.method.wallet[0].col}}"/>
+                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].mono}}"/>
+                    <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
                   {{} else {}}
                     Wallets
                   {{}}}
@@ -141,11 +141,16 @@ templates.modal = '
               </div>
             {{?}}
             {{? it.method.wallet.length }}
-              <div class="fieldset tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
+              <div class="fieldset wallets-{{=it.method.wallet.length}} tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
                 <input type="hidden" name="method" value="wallet">
                 {{~it.method.wallet :w:i}}
                   <div class="wallet-radio">
-                    <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}" checked><label for="wallet-radio-{{=i}}">Pay using {{=(w.name[0].toUpperCase()+w.name.slice(1))}}</label>
+                    <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
+                    <label for="wallet-radio-{{=i}}">
+                      Pay using {{= w.name[0].toUpperCase()+w.name.slice(1) }} Wallet
+                      <img class="wallet-button" height="{{=(1.5*w.h)}}" src="{{=w.mono}}"/>
+                      <img class="wallet-button colored" height="{{=(1.5*w.h)}}" src="{{=w.col}}"/>
+                    </label>
                   </div>
                 {{~}}
               </div>

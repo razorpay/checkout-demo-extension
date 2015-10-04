@@ -99,9 +99,6 @@ iframe{
     display: none;
   }
 }
-label{
-  vertical-align: middle;
-}
 .placeholder{
   position: absolute;
   top: 0;
@@ -145,11 +142,6 @@ input[disabled]{
 }
 input[type=checkbox]{
   width: auto;
-  vertical-align: middle;
-}
-input[type=radio]{
-  width: auto;
-  margin: 0 5px 0 0;
   vertical-align: middle;
 }
 button{
@@ -523,7 +515,61 @@ button{
 }
 
 .wallet-radio{
+  font-size: 0;
   margin: 5px 0 10px;
+  float: left;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  &+.wallet-radio:before{
+    content: '';
+    width: 1px;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    background: linear-gradient(to bottom, transparent, #bbb 15%, #999 85%, transparent);
+  }
+  label{
+    line-height: 120px;
+    cursor: pointer;
+    display: block;
+  }
+  input, .colored{
+    display: none;
+  }
+  input:checked + label{
+    img{
+      display: none;
+    }
+    .colored{
+      display: inline-block;
+    }
+  }
+}
+.wallets-2{
+  .wallet-radio{
+    width: 50%;
+  }
+}
+.wallets-1{
+  .wallet-radio{
+    width: 100%;
+    text-align: left;
+    font-size: @font-size;
+  }
+  label{
+    line-height: normal;
+    vertical-align: top;
+    display: inline-block;
+  }
+  img{
+    display: none!important;
+  }
+  input{
+    display: inline-block;
+    width: auto;
+    margin: 0 8px 0 0;
+  }
 }
 #method-wallet-tab{
   .colored{
