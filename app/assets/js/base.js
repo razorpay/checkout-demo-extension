@@ -121,16 +121,10 @@
         } else if (i == 'method') {
           options.method = JSON.parse(JSON.stringify(defaults.method));
           if(typeof overrides.method == 'object'){
-            if(typeof overrides.method.wallet == 'object'){
-              for(var j in overrides.method.wallet){
-                if(typeof overrides.method.wallet[j] == 'boolean')
-                  options.method.wallet[j] = overrides.method.wallet[j];
-              }
+            for(var j in overrides.method){
+              if(typeof overrides.method[j] == 'boolean')
+                options.method[j] = overrides.method[j];
             }
-            if(typeof overrides.method.card == 'boolean')
-              options.method.card = overrides.method.card;
-            if(typeof overrides.method.netbanking == 'boolean')
-              options.method.netbanking = overrides.method.netbanking;
           }
         } else {
           var subObject = defaults[i];
