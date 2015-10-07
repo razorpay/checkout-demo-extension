@@ -353,6 +353,8 @@
       var len = allels.length;
       for(var i=0; i<len; i++){
         var el = allels[i];
+        if(el.getAttribute('type') === 'radio' && !el.checked)
+          continue;
         if(el.name && !el.disabled && el.value.length)
           returnObj[el.name] = el.value;
       }

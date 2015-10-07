@@ -75,9 +75,9 @@ templates.modal = '
                   <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder\'s Name" required value="{{=it.prefill.name}}">
                 </p>
                 <p class="elem" id="elem-card">
+                  <i>&#xe605;</i>
                   <span class="help-text">Please enter valid card number.</span>
                   <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=it.prefill.card.number}}">
-                  <i>&#xe605;</i>
                   <label class="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check"> My card doesn\'t have expiry or CVV</label>
                 </p>
                 <div class="double">
