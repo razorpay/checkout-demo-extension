@@ -28,7 +28,9 @@
   "bugs": {
     "url": "https://bitbucket.org/razorpay/checkout-js/issues"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp-usemin": "^0.3.14"
+  },
   "private": "true",
   "dependencies": {
     "dot": "^1.0.3",

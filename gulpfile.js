@@ -5,6 +5,7 @@ var dot = require('dot');
 var less = require('gulp-less');
 var concat = require('gulp-concat');
 var autoprefixer = require('gulp-autoprefixer');
+var usemin = require('gulp-usemin');
 
 function assetPath(path){
   return 'app/src/' + path;
@@ -40,3 +41,13 @@ gulp.task('dirStructure', function(){
 })
 
 gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
+
+gulp.task('usemin', function(){
+  gulp.src(assetPath('*.html'))
+    .pipe(usemin())
+    .pipe(gulp.dest('app/build'));
+})
+
+gulp.task('build', ['buildDev', 'usemin'], function(){
+
+})
