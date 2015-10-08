@@ -1,7 +1,7 @@
-(function(root) {
+(function() {
   'use strict';
 
-  var $ = root.$;
+  var $ = Razorpay.$;
   var timeout = null;
 
   var defaults = {
@@ -25,7 +25,7 @@
     timeout = null;
   }
 
-  var Modal = root.Modal = function(element, options) {
+  window.Modal = function(element, options) {
     this.options = $.defaults(options, defaults);
     this.container = $(this.options.containerId);
     this.modalElement = element;
@@ -179,4 +179,4 @@
       }
     }
   };
-})(window);
+})();

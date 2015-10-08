@@ -6,6 +6,7 @@
   var Razorpay = window.Razorpay;
   var roll = Razorpay.roll || $.noop;
   var ua = navigator.userAgent;
+  var $ = Razorpay.$;
 
   // iphone/ipad restrict non user initiated focus on input fields
   var should_focus_next = !/iPhone|iPad/.test(ua);
@@ -198,7 +199,7 @@
       discreet.setMethods(window.payment_methods, opts);
       discreet.sanitizeOptions(opts);
       var div = document.createElement('div');
-      div.innerHTML = (doT.compile(templates.modal))(opts);
+      div.innerHTML = Razorpay.templates.modal(opts);
       document.body.appendChild(div.firstChild);
       discreet.$el = $('container');
       discreet.smarty = new Smarty(discreet.$el);

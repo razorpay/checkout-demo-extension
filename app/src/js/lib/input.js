@@ -1,7 +1,7 @@
-(function(root){
+(function(){
   'use strict';
 
-  var $ = root.$;
+  var $ = Razorpay.$;
   var inputClass = 'input';
   var interceptClass = /elem|placeholder|help-text/;
   var tooltipClass = 'help-text';
@@ -18,7 +18,7 @@
     }
   }
 
-  root.Smarty = function(parent, options){
+  window.Smarty = function(parent, options){
     this.parent = parent;
     this.options = options;
     this.listeners = [];
@@ -27,7 +27,7 @@
     this.init();
   }
 
-  root.Smarty.prototype = {
+  Smarty.prototype = {
     on: function(eventName, targetClass, eventHandler, useCapture){
       var smarty = this;
       var listenerRef = this.parent.on(eventName, function(e){
@@ -126,4 +126,4 @@
       }
     }
   }
-})(window);
+})();

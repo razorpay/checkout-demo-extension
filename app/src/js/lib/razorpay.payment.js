@@ -1,5 +1,5 @@
 (function(root){
-
+  var $ = root.$;
   var card_patterns = {
     mastercard: /^5[0-5]/,
     visa: /^4/,

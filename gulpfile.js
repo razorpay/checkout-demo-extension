@@ -11,7 +11,7 @@ function assetPath(path){
 }
 
 gulp.task('watch', ['buildDev'], function() {
-  gulp.watch(assetPath('templates/*.dot'), ['compileTemplates']);
+  gulp.watch(assetPath('templates/*.jst'), ['compileTemplates']);
   gulp.watch(assetPath('css/*.less'), ['compileStyles']);
 });
 
