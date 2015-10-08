@@ -65,7 +65,7 @@ iframe{
   height: 100%;
   outline: none;
   text-align: center;
-  .transition(0.25s ease-out opacity);
+  transition: 0.25s ease-out opacity;
   z-index: 19999;
   .middlefix();
 
@@ -76,16 +76,14 @@ iframe{
     }
     .modal{
       opacity: 1;
-      .scale(1);
-      .transition-transform(0.25s cubic-bezier(0.3, 1.5, 0.7, 1));
+      transform: none;
+      transition: 0.25s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
   }
 }
 .font-loaded{
   .modal, button, input, select {
     font-family: @font-family;
-    -webkit-font-feature-settings: "liga" 0;
-    -moz-font-feature-settings: "liga" 0;
     font-feature-settings: "liga" 0;
   }
   #powered-by{
@@ -124,13 +122,13 @@ input, select {
   position: relative;
 }
 input:not([type=radio]), select{
-  .appearance(none);
+  appearance: none;
 }
 input, .placeholder{
   height: @input-height/2;
   line-height: @input-height/2;
   padding: 10px 0 10px @input-padding;
-  .box-sizing(content-box);
+  box-sizing: content-box;
 }
 select{
   padding: 8px 0 8px @input-padding;
@@ -170,10 +168,10 @@ button{
   white-space: normal;
   margin: 20px 0;
   opacity: 0;
-  .transform(scale(0.9));
+  transform: scale(0.9);
 
   &.animate{
-    .transition(0.25s ease-in)!important;
+    transition: 0.25s ease-in!important;
   }
 
   color: @color;
@@ -194,7 +192,7 @@ button{
   border-radius: @border-radius;
   background: @background-color;
   &.anim{
-    .transition(0.15s ease-out);
+    transition: 0.15s ease-out;
   }
   overflow: hidden;
 }
@@ -207,7 +205,7 @@ button{
   position: relative;
   margin: -1px 0 0;
   cursor: text;
-  .transition(0.25s border-color);
+  transition: 0.25s border-color;
   background: #fff center right no-repeat;
 
   i{
@@ -285,8 +283,8 @@ button{
   border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
   .opacity(0);
-  .transform(translateY(10px));
-  .transition-transform(~"0.25s ease-in, 0.16s ease-in opacity");
+  transform: translateY(10px);
+  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
   bottom: 100%;
   left: 10px;
   margin-bottom: -3px;
@@ -306,8 +304,8 @@ button{
 .focused.invalid.mature .help-text{
   display: block; // helps when pointer-events is not supported
   .opacity(0.85);
-  .transform(none);
-  .transition-transform(~"0.2s cubic-bezier(0.6, 1.6, 0.8, 1), 0.2s ease-out opacity");
+  transform: none;
+  transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
 }
 .fieldset{
   padding: 20px 0;
@@ -375,12 +373,12 @@ button{
   color: #666;
   margin-top: 10px;
   line-height: 20px;
-  .transition(0.3s);  
+  transition: 0.3s;
   display: none\9; // ie8
   display: none;
 }
 #elem-card{
-  .transition(0.3s);
+  transition: 0.3s;
   i{
     font-size: 0;
     width: 26px;
@@ -433,7 +431,7 @@ button{
   line-height: 18px;
   padding: 10px 20px 12px;
   overflow: hidden;
-  .transition(0.3s);
+  transition: 0.3s;
   bottom: 100%;
 }
 #error-container{
@@ -441,7 +439,7 @@ button{
   overflow: hidden;
   display: none;
   margin: 0 -@padding;
-  .transition(0.3s);
+  transition: 0.3s;
   &.has-error{
     #error-message{
       bottom: 0;
@@ -605,9 +603,9 @@ button{
   bottom: -60px;
   display: block;
   font-size: 36px;
-  .transition(0.3s);
+  transition: 0.3s;
   position: absolute;
-  .transition-delay(0.2s);
+  transition-delay: 0.2s;
   font-family: @font-family;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
   
@@ -615,7 +613,7 @@ button{
     color: #bbb;
     outline: none;
     line-height: 36px;
-    .transition(0.3s);
+    transition: 0.3s;
     text-decoration: none;
     &:hover{
       color: #ddd;

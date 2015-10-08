@@ -1,11 +1,6 @@
 .font-url(@url){
   src: url("@{url}.eot?#iefix") format('embedded-opentype'), url("@{url}.woff") format('woff'), url("@{url}.ttf")  format('truetype'), url("@{url}.svg#lato") format('svg');
 }
-.box-sizing(@sizing){
-  -webkit-box-sizing: @sizing;
-  -moz-box-sizing: @sizing;
-  box-sizing: @sizing;
-}
 .opacity(@fraction){
   opacity: @fraction;
   @percent: 100*@fraction;
@@ -19,46 +14,9 @@
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=@{argb}, endColorstr=@{argb})";
 }
 .grad (@startColor: transparent, @endColor: #fff) {
-  background-color: @startColor;
-  background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
-  background: -webkit-linear-gradient(top, @startColor, @endColor);
-  background: -moz-linear-gradient(top, @startColor, @endColor);
+  background-color: average(@startColor, @endColor);
+  background: linear-gradient(@startColor, @endColor);
   filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@startColor),argb(@endColor)));
-}
-.transition (@transition) {
-  -webkit-transition: @transition;
-  -moz-transition: @transition;
-  transition: @transition;
-}
-.transition-delay (@transition) {
-  -webkit-transition-delay: @transition;
-  -moz-transition-delay: @transition;
-  transition-delay: @transition;
-}
-.transform(@string){
-  -webkit-transform: @string;
-  -moz-transform: @string;
-  -ms-transform: @string;
-  transform: @string;
-}
-.scale(@args){
-  .transform(scale(@args));
-}
-.transition-transform(@args){
-  -webkit-transition: -webkit-transform @args;
-  -moz-transition: -moz-transform @args;
-  transition: transform @args;
-}
-.transform-origin(@args){
-  -webkit-transform-origin: @args;
-  -moz-transform-origin: @args;
-  -ms-transform-origin: @args;
-  transform-origin: @args;
-}
-.appearance(@appearance){
-  -webkit-appearance: @appearance;
-  -moz-appearance: @appearance;
-  appearance: @appearance;
 }
 .clearfix(){
   &:after{
