@@ -1,8 +1,4 @@
 /node_modules
-/merchant/config.php
-/.tmp
-/app/dist
-/app/srv
-/test/env.js
-/test/checkout.built.js
 aws-keys.json
+/app/src/_css
+/app/src/_templates
