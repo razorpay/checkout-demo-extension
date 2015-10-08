@@ -7,6 +7,10 @@ var concat = require('gulp-concat');
 var autoprefixer = require('gulp-autoprefixer');
 var usemin = require('gulp-usemin');
 var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
+
+var child_process = require('child_process');
+var karma = require('karma').Server;
 
 function assetPath(path){
   return 'app/' + path;
@@ -17,8 +21,9 @@ gulp.task('watch', ['buildDev'], function() {
   gulp.watch(assetPath('css/*.less'), ['compileStyles']);
 });
 
+// compiles .jst to .js, which is template contained in a function
 gulp.task('compileTemplates', function(){
-  dot.process({
+  return dot.process({
     path: assetPath('templates'),
     destination: assetPath('_templates'),
     global: 'Razorpay.templates'
@@ -26,7 +31,7 @@ gulp.task('compileTemplates', function(){
 });
 
 gulp.task('compileStyles', function(){
-  gulp.src(assetPath('css/*.less'))
+  return gulp.src(assetPath('css/*.less'))
     .pipe(less())
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({browsers: ['last 10 versions']}))
@@ -34,7 +39,7 @@ gulp.task('compileStyles', function(){
 });
 
 gulp.task('dirStructure', function(){
-  ['_css', '_templates'].forEach(function(path){
+  return ['_css', '_templates'].forEach(function(path){
     if(!fs.existsSync(assetPath(path))){
       fs.mkdirSync(assetPath(path));
     }
@@ -44,15 +49,66 @@ gulp.task('dirStructure', function(){
 gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
 
 gulp.task('usemin', function(){
-  gulp.src(assetPath('*.html'))
+  return gulp.src(assetPath('*.html'))
     .pipe(usemin())
-    .pipe(gulp.dest('app/_test'));
+    .pipe(gulp.dest('app/_build'));
 })
 
-gulp.task('build', ['buildDev', 'usemin'], function(){
-  gulp.src('app/_test/*.js')
+gulp.task('sourceMaps', function(){
+  return gulp.src('app/_build/checkout-frame.js')
+    .pipe(sourcemaps.init())
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('app/_build'));
+})
+
+gulp.task('build', ['buildDev', 'usemin', 'sourceMaps'], function(){
+  // uglify
+  gulp.src('app/_build/*.js')
     .pipe(uglify())
     .pipe(gulp.dest('app/_build'));
+
+  // copy css
   gulp.src('app/_css/*.css')
-    .pipe(gulp.dest('app/_build'));
+    .pipe(gulp.dest('app/_build/css'));
+
+  // copy images
+  gulp.src('app/images/**')
+    .pipe(gulp.dest('app/_build/images'));
+})
+
+gulp.task('test', ['buildDev'], function(){
+  // inline test files
+  child_process.execSync('cd app && rm -rf _test && cp -r js _test && for i in _test/*.js; do j=`basename $i`; sed -i -e "/INLINE_TESTING/r ../test/inline/"$j $i; done;');
+  
+  // temporarily point html files to test ones
+  child_process.execSync('sed -i -- s!"js/!"_test/!g app/*.html && mkdir -p app/_test/src');
+
+  // usemin inline tests
+  var testmin = gulp.src(assetPath('*.html'))
+    .pipe(usemin())
+    .pipe(gulp.dest('app/_test/src'));
+
+  testmin.on('finish', function(){
+    var files = [
+      'spec/jquery-1.11.1.js',
+      'spec/jasmine-jquery.js',
+      'spec/helpers.js',
+      'app/_test/src/checkout.js'
+    ];
+    
+    var options = {
+      frameworks: ['jasmine'],
+      port: 9876,
+      colors: true,
+      logLevel: 'ERROR',
+      browsers: ['PhantomJS'],
+      singleRun: true,
+      files: files
+    };
+
+    var server = new karma(options, function(exitCode) {
+      process.exit(exitCode)
+    });
+    server.start();
+  })
 })
