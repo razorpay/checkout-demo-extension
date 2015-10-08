@@ -1,5 +1,3 @@
 /node_modules
 aws-keys.json
-/app/src/_css
-/app/src/_templates
-/app/build
+/app/_*

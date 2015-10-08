@@ -6,9 +6,10 @@ var less = require('gulp-less');
 var concat = require('gulp-concat');
 var autoprefixer = require('gulp-autoprefixer');
 var usemin = require('gulp-usemin');
+var uglify = require('gulp-uglify');
 
 function assetPath(path){
-  return 'app/src/' + path;
+  return 'app/' + path;
 }
 
 gulp.task('watch', ['buildDev'], function() {
@@ -45,9 +46,13 @@ gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
 gulp.task('usemin', function(){
   gulp.src(assetPath('*.html'))
     .pipe(usemin())
-    .pipe(gulp.dest('app/build'));
+    .pipe(gulp.dest('app/_test'));
 })
 
 gulp.task('build', ['buildDev', 'usemin'], function(){
-
+  gulp.src('app/_test/*.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('app/_build'));
+  gulp.src('app/_css/*.css')
+    .pipe(gulp.dest('app/_build'));
 })
