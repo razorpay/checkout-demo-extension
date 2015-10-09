@@ -5,6 +5,7 @@
 
   var $ = Razorpay.$;
   var discreet = Razorpay.discreet;
+  var Popup = Razorpay.Popup;
   
   Razorpay.configure = function(overrides) {
     Razorpay.defaults = discreet.configure(overrides);

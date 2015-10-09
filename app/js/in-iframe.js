@@ -28,14 +28,14 @@
     }
   }
 
-  var discreet = window.frameDiscreet = {
+  var frameDiscreet = {
     smarty: null,
     modal: null,
     $el: null,
     rzp: null,
 
     shake: function(){
-      if(should_shake && discreet.modal){
+      if(should_shake && frameDiscreet.modal){
         var el = $('modal-inner');
         if(el[0]){
           el.removeClass('shake')[0].offsetWidth;
@@ -72,7 +72,7 @@
           }
         }
         var wallets = [];
-        if(methodOptions.wallet && discreet.rzp.options.amount <= 100*10000){
+        if(methodOptions.wallet && frameDiscreet.rzp.options.amount <= 100*10000){
           var printedWallets = payment_methods['wallet'];
           if(typeof printedWallets == 'object'){
             for(i in printedWallets){
@@ -133,7 +133,7 @@
 
     sanitizeOptions: function(obj){ // warning: modifies original object
       if(obj){
-        discreet.sanitizeDOM(obj);
+        frameDiscreet.sanitizeDOM(obj);
         if(obj.prefill){
           if(obj.prefill.contact){
             if(typeof obj.prefill.contact != 'string'){
@@ -158,11 +158,11 @@
       Razorpay.card.setType = function(el, type){
         !type && (type = Razorpay.card.getType(el.value) || 'unknown');
         el.parentNode.setAttribute('cardtype', type);
-        discreet.setNumberValidity.call(el);
+        frameDiscreet.setNumberValidity.call(el);
         
         // if(type != 'maestro'){
           // $('nocvv-check')[0].checked = false;
-          // discreet.toggle_nocvv();
+          // frameDiscreet.toggle_nocvv();
         // }
       }
 
@@ -175,7 +175,7 @@
         }
       }
       
-      $el_number.on('blur', discreet.setNumberValidity);
+      $el_number.on('blur', frameDiscreet.setNumberValidity);
       Razorpay.card.formatNumber($el_number[0]);
       Razorpay.card.formatExpiry(el_expiry);
       Razorpay.card.ensureNumeric(el_cvv);
@@ -189,20 +189,20 @@
     },
 
     showModal: function() {
-      discreet.renew();
+      frameDiscreet.renew();
       
-      if(discreet.modal){
-        return discreet.modal.show();
+      if(frameDiscreet.modal){
+        return frameDiscreet.modal.show();
       }
 
-      var opts = $.clone(discreet.rzp.options);
-      discreet.setMethods(window.payment_methods, opts);
-      discreet.sanitizeOptions(opts);
+      var opts = $.clone(frameDiscreet.rzp.options);
+      frameDiscreet.setMethods(window.payment_methods, opts);
+      frameDiscreet.sanitizeOptions(opts);
       var div = document.createElement('div');
       div.innerHTML = Razorpay.templates.modal(opts);
       document.body.appendChild(div.firstChild);
-      discreet.$el = $('container');
-      discreet.smarty = new Smarty(discreet.$el);
+      frameDiscreet.$el = $('container');
+      frameDiscreet.smarty = new Smarty(frameDiscreet.$el);
 
       // init modal
       var modalOptions = opts.modal;
@@ -214,19 +214,19 @@
       };
       delete modalOptions.ondismiss;
 
-      discreet.applyFont($('powered-link')[0]);
-      discreet.modal = new Modal(discreet.$el.children('modal')[0], modalOptions);
+      frameDiscreet.applyFont($('powered-link')[0]);
+      frameDiscreet.modal = new Modal(frameDiscreet.$el.children('modal')[0], modalOptions);
       if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
       // event listeners
-      // $('nocvv-check').on('change', discreet.toggle_nocvv)
-      $('tabs').on('click', discreet.tab_change);
+      // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
+      $('tabs').on('click', frameDiscreet.tab_change);
       $('form').on('submit', function(e){
-        discreet.formSubmit(e);
+        frameDiscreet.formSubmit(e);
         e.preventDefault();
       });
 
-      $('bank-select').on('change', discreet.bank_change);
+      $('bank-select').on('change', frameDiscreet.bank_change);
 
       $('netb-banks').on('click', function(e){
         var target = e.target;
@@ -236,24 +236,24 @@
           var value = target.getAttribute('data-value');
           var select = $('bank-select')[0];
           select.value = value;
-          discreet.smarty.input({target: select});
-          discreet.bank_change(value);
+          frameDiscreet.smarty.input({target: select});
+          frameDiscreet.bank_change(value);
         }
       });
 
-      if(discreet.qpmap){
+      if(frameDiscreet.qpmap){
         var lis = $(tabs)[0].getElementsByTagName('li');
         for(var i=0; i<lis.length; i++){
-          if(lis[i].getAttribute('data-target') == 'tab-' + discreet.qpmap.tab){
-            discreet.tab_change({target: lis[i]});
+          if(lis[i].getAttribute('data-target') == 'tab-' + frameDiscreet.qpmap.tab){
+            frameDiscreet.tab_change({target: lis[i]});
             break;
           }
         }
-        if(discreet.qpmap.error){
-          discreet.errorHandler(qpmap)
+        if(frameDiscreet.qpmap.error){
+          frameDiscreet.errorHandler(qpmap)
         }
       }
-      discreet.setCardFormatting();
+      frameDiscreet.setCardFormatting();
     },
 
     bank_change: function(val){
@@ -274,7 +274,7 @@
       if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0)
         return;
 
-      discreet.renew();
+      frameDiscreet.renew();
 
       var tabContent = $(target.getAttribute('data-target'));
       var activeTab = tabContent.parent().children('active')[0];
@@ -298,9 +298,9 @@
 
     applyFont: function(anchor, retryCount){
       if(!retryCount) retryCount = 0;
-      if(anchor.offsetWidth/anchor.offsetHeight > 5) discreet.$el.addClass('font-loaded');
+      if(anchor.offsetWidth/anchor.offsetHeight > 5) frameDiscreet.$el.addClass('font-loaded');
       else if(retryCount < 25) setTimeout(function(){
-        discreet.applyFont(anchor, ++retryCount);
+        frameDiscreet.applyFont(anchor, ++retryCount);
       }, 120 + retryCount*50);
     },
 
@@ -308,7 +308,7 @@
     isInvalid: function(parent){
       var invalids = $(parent).find('invalid', 'p');
       if(invalids.length){
-        discreet.shake();
+        frameDiscreet.shake();
         $(invalids[0]).find('input')[0].focus();
         for(var i=0; i<invalids.length; i++) $(invalids[i]).addClass('mature');
         return true;
@@ -316,36 +316,37 @@
     },
 
     formSubmit: function(e) {
-      discreet.smarty.refresh();
+      frameDiscreet.smarty.refresh();
 
-      if (discreet.isInvalid('form-common'))
+      if (frameDiscreet.isInvalid('form-common')){
         return;
+      }
 
       // var card_number = $('card_number')[0];
-      // card_number && discreet.setNumberValidity.call(card_number);
+      // card_number && frameDiscreet.setNumberValidity.call(card_number);
 
       var activeTab = $('tabs').find('active')[0];
-      if (activeTab && discreet.isInvalid(activeTab.getAttribute('data-target')))
+      if (activeTab && frameDiscreet.isInvalid(activeTab.getAttribute('data-target')))
         return;
-      var data = discreet.getFormData();
+      var data = frameDiscreet.getFormData();
 
       // Signature is set in case of hosted checkout
-      if (discreet.rzp.options.signature !== '')
-        data.signature = discreet.rzp.options.signature;
+      if (frameDiscreet.rzp.options.signature !== '')
+        data.signature = frameDiscreet.rzp.options.signature;
 
       Razorpay.sendMessage({
         event: 'submit',
         data: data
       });
-      discreet.renew();
+      frameDiscreet.renew();
       $('submitbtn').attr('disabled', true);
-      if(discreet.modal)
-        discreet.modal.options.backdropClose = false;
+      if(frameDiscreet.modal)
+        frameDiscreet.modal.options.backdropClose = false;
       Razorpay.payment.authorize({
         data: data,
-        options: discreet.rzp.options,
-        error: discreet.errorHandler,
-        success: discreet.successHandler
+        options: frameDiscreet.rzp.options,
+        error: frameDiscreet.errorHandler,
+        success: frameDiscreet.successHandler
       })
     },
 
@@ -366,10 +367,10 @@
       if(!activeTab) return;
       
       var data = {};
-      discreet.getFormFields('form-common', data);
+      frameDiscreet.getFormFields('form-common', data);
       
       var targetTab = activeTab.getAttribute('data-target');
-      discreet.getFormFields(targetTab, data);
+      frameDiscreet.getFormFields(targetTab, data);
 
       if(targetTab == 'tab-card'){
         data['card[number]'] = data['card[number]'].replace(/\ /g, '');
@@ -390,37 +391,37 @@
 
     // close on backdrop click and remove errors
     renew: function(){
-      if (discreet.$el)
+      if (frameDiscreet.$el)
         $('error-container').css('display', 'none').removeClass('has-error').css('paddingTop', '');
 
-      if(discreet.modal)
-        discreet.modal.options.backdropClose = true;
+      if(frameDiscreet.modal)
+        frameDiscreet.modal.options.backdropClose = true;
     },
 
     hide: function(){
-      if(discreet.modal){
+      if(frameDiscreet.modal){
         $('modal-inner').removeClass('shake');
-        discreet.modal.hide();
+        frameDiscreet.modal.hide();
       }
-      discreet.modal = null;
+      frameDiscreet.modal = null;
     },
 
     successHandler: function(response){
-      if(discreet.modal)
-        discreet.modal.options.onhide = null;
+      if(frameDiscreet.modal)
+        frameDiscreet.modal.options.onhide = null;
       Razorpay.sendMessage({ event: 'success', data: response});
-      discreet.hide();
+      frameDiscreet.hide();
     },
 
     errorHandler: function(response){
-      if(!discreet.modal){
+      if(!frameDiscreet.modal){
         return;
       }
       var message;
-      discreet.shake();
+      frameDiscreet.shake();
 
       $('submitbtn')[0].removeAttribute('disabled');
-      discreet.modal && (discreet.modal.options.backdropClose = true);
+      frameDiscreet.modal && (frameDiscreet.modal.options.backdropClose = true);
 
       if (response && response.error){
         message = response.error.description;
@@ -450,7 +451,7 @@
       if(!('method' in data))
         return;
 
-      discreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
+      frameDiscreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
 
       if('contact' in data) $('contact')[0].value = data.contact;
       if('email' in data) $('email')[0].value = data.email;
@@ -460,12 +461,12 @@
         if('card[number]' in data) $('card_number')[0].value = data['card[number]'];
         if(('card[expiry_month]' in data) && ('card[expiry_year]' in data))
           $('card_expiry')[0].value = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
-        discreet.setCardFormatting();
+        frameDiscreet.setCardFormatting();
         $('card_cvv')[0].focus();
       } else if(data.method == 'netbanking'){
         $('bank-select')[0].value = data.bank;
       }
-      discreet.smarty.refresh();
+      frameDiscreet.smarty.refresh();
     },
 
     configureRollbar: function(message){
@@ -517,7 +518,7 @@
 
   Razorpay.sendMessage = function(message){
     if(typeof window.CheckoutBridge == 'object'){
-      discreet.notifyBridge(message);
+      frameDiscreet.notifyBridge(message);
     } else if(window != window.parent){
       message.source = 'frame';
       if(typeof message != 'string'){
@@ -531,26 +532,26 @@
     if(typeof message != 'object'){
       return;
     }
-    if(message.options && !discreet.rzp){ // open modal
+    if(message.options && !frameDiscreet.rzp){ // open modal
       try{
-        discreet.rzp = new Razorpay(message.options);
-        discreet.configureRollbar(message);
+        frameDiscreet.rzp = new Razorpay(message.options);
+        frameDiscreet.configureRollbar(message);
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
         roll('fault ' + e.message, message);
         return;
       }
-      discreet.showModal();
+      frameDiscreet.showModal();
     } else if(message.event == 'close'){
-      discreet.hide();
-    } else if(message.event == 'open' && discreet.rzp){
-      discreet.showModal();
+      frameDiscreet.hide();
+    } else if(message.event == 'open' && frameDiscreet.rzp){
+      frameDiscreet.showModal();
     }
-    if(discreet.rzp){
+    if(frameDiscreet.rzp){
       var params = message.params;
       if(params){
         try{
-          discreet.errorHandler(JSON.parse(params));
+          frameDiscreet.errorHandler(JSON.parse(params));
         } catch(e){
           roll('message.params', params);
         }
@@ -565,19 +566,19 @@
           }
         }
         if(typeof data == 'object')
-          discreet.dataHandler(data);
+          frameDiscreet.dataHandler(data);
       }
     }
   }
 
-  $(window).on('message', discreet.parseMessage);
+  $(window).on('message', frameDiscreet.parseMessage);
 
 
 
   // initial error (helps in case of redirection flow)
-  var qpmap = discreet.qpmap = {};
+  var qpmap = frameDiscreet.qpmap = {};
   if(location.search){
-    discreet.setQueryParams(location.search);
+    frameDiscreet.setQueryParams(location.search);
   }
 
   if(qpmap.platform === 'ios'){

@@ -10,7 +10,7 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 
 var child_process = require('child_process');
-var karma = require('karma').Server;
+var karma = require('karma');
 
 function assetPath(path){
   return 'app/' + path;
@@ -92,8 +92,8 @@ gulp.task('test', ['buildDev'], function(){
     var files = [
       'spec/jquery-1.11.1.js',
       'spec/jasmine-jquery.js',
-      'spec/helpers.js',
-      'app/_test/src/checkout.js'
+      'spec/sendkeys.js',
+      'spec/helpers.js'
     ];
     
     var options = {
@@ -102,13 +102,24 @@ gulp.task('test', ['buildDev'], function(){
       colors: true,
       logLevel: 'ERROR',
       browsers: ['PhantomJS'],
-      singleRun: true,
-      files: files
+      singleRun: true
     };
 
-    var server = new karma(options, function(exitCode) {
-      process.exit(exitCode)
+    allOptions = ['checkout.js', 'razorpay.js', 'checkout-frame.js'].map(function(file){
+      var o = JSON.parse(JSON.stringify(options));
+      o.files = files.concat(['app/_test/src/' + file]);
+      return o;
     });
-    server.start();
+    testFromStack(0, allOptions);
   })
 })
+
+function testFromStack(counter, allOptions){
+  new karma.Server(allOptions[counter], function(exitCode) {
+    if(allOptions[++counter]){
+      testFromStack(counter, allOptions);
+    } else {
+      child_process.execSync('sed -i -- s!"_test/!"js/!g app/*.html && mkdir -p app/_test/src');
+    }
+  }).start();
+}

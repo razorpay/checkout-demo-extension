@@ -37,4 +37,4 @@ Razorpay.roll = function(message, data, level){
   }
 
   Rollbar[level](message);
-}
+};

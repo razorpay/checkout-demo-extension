@@ -34,7 +34,7 @@
                 <p class="elem elem-email" style="border-radius: 4px 4px 0 0">
                   <i>&#xe603;</i>
                   <span class="help-text">Please enter a valid email, like you@foo.com</span>
-                  <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$">
+                  <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                 </p>
                 <p class="elem elem-contact" style="border-radius: 0 0 4px 4px">
                   <span class="help-text">Please enter 10-12 digit contact number.</span>
@@ -127,7 +127,7 @@
                 </div>
                 <p id="nb-elem" class="elem select" style="border-radius: 4px">
                   <i>&#xe601;</i>
-                  <select id="bank-select" name="bank" required class="input" pattern="[\\w]+">
+                  <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                     <option selected="selected" value="">Select Bank</option>
                     {{for(var i in it.method.netbanking){}}
                       <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
