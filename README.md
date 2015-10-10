@@ -2,35 +2,23 @@
 
 #Setup Instructions
 
-1. Install harp (`npm install -g harp`)
-2. Run harp (`harp server`) in `app` directory.
-3. Start development in `app/assets`
-4. Open `localhost:9000/assets/bozo` via http(s) in your browser.
+1. Install gulp globally `npm install -g gulp`
+1. Install npm supporting packages `npm install`
+1. `gulp watch`
+1. Open `app` directory via any web server in your browser
 
-5. Install npm supporting packages (`npm install`).
-6. Install karma, which we use for testing `npm install -g karma-cli`.
-7. Install grunt-cli (`npm install -g grunt-cli`)
-8. `grunt` to generate minified assets in `app/dist/v1`
-9. `grunt test` for tests.
+Testing:
+1. `gulp test` for running karma based tests
+1. tests are located in `test/inline` folder
 
+#Gulp Commands
 
-#Grunt Commands
-
-1. `grunt` or `grunt build` create a build
-2. `grunt test` builds checkout.js and runs tests
-3. `grunt test:watch` runs tests when a file changes in `app/assets/js/**.*` or `test/*.js`
-4. `grunt test:prepare` is not needed by devs. Wercker runs it before tests and grunt internally utilizes it.
+* `gulp` creates production build
 
 #Development Instructions
-- All source code is kept inside the `app/assets` directory
-- All unit tests are in test directory.
-- Karma runs JSHint using settings from `.jshintrc` before running unit tests
-- Karma loads `./tmp/checkout.built.js` which is built whenever `grunt test` or `grunt test:watch` runs.
-- See `karma.conf.js` for karma configuration, and `Gruntfile.js` for grunt configuration.
-- `app/assets/layout.html` is used for configuring the minification and concat portion of grunt using the `usemin` package.
-- All pushes to master are auto-deployed by wercker if the build succeeds(see `wercker.yml`).
-- If you have to ignore any specific jshint warning in a particular file put `/* jshint -<CODE> */` at the top of the file where code can be obtained from https://github.com/jshint/jshint/blob/master/src/messages.js
-- Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/assets/js/base.js`
+- All source code is kept inside the `app` directory
+- All unit tests are in `test` directory.
+- Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/js/base.js`
 
 #Deployment and Branches
 
