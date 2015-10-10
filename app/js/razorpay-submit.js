@@ -48,10 +48,12 @@
       delete rdata.notes;
       
       var url = discreet.makeUrl(options);
+      var jsonpUrl = url + options.jsonpUrl;
+      url += '/payments/create/checkout';
 
       if(options.redirect){
         var form = document.createElement('form');
-        form.setAttribute('action', url + '/payments/create/checkout');
+        form.setAttribute('action', url);
         form.setAttribute('method', 'post');
         var formHTML = '';
 
@@ -65,10 +67,10 @@
         return true;
       } else {
         if(!rdata.callback_url && options.callback_url) rdata.callback_url = options.callback_url;
-        if(!rdata.callback_url) discreet.setupPopup(request);
+        if(!rdata.callback_url) return discreet.setupPopup(request, url);
         
         return $.ajax({
-          url: url + options.jsonpUrl,
+          url: jsonpUrl,
           success: discreet.getAjaxSuccess(request),
           timeout: 35000,
           error: request.error,

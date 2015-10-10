@@ -10,25 +10,16 @@
 
   var popupClose = function(){
     try{
-      if(this.popup && typeof this.popup.close == 'function'){
+      if(this.popup && typeof this.popup.close == 'function' && this.popup.window){
         this.popup.close();
-        if(this.popup.window && this.popup.window.closed){
-          return;
-        }
-        var self = this;
-        var popup_close = function(){
-          discreet.hedwig.sendMessage('{"pingback": "payment_complete"}', '*', self.popup.window);
-        }
-        if(this.popup._loaded){
-          popup_close();
-        } else {
-          this.popup.loaded = popup_close;
-        }
+        if(!this.popup.window.closed)
+          roll('Popup window not closed');
       }
     } catch(e){
-      roll('Error closing popup', e.message);
+      roll('Error closing popup: ' + e.message);
     }
   }
+
   discreet.paymentSuccess = function(data){
     // this == request
     if(this.popup && typeof this.popup.close == 'function'){
@@ -47,15 +38,6 @@
     // this == request
     // checking source url
     if(!(this.popup.window === message.source || /^https:\/\/[a-z]+\.razorpay\.com/.test(message.origin))){
-      return;
-    }
-
-    if(data.source === 'popup'){
-      if(!this.popup._loaded){
-        this.popup._loaded = true;
-        discreet.sendMetadata(this);
-        this.popup.loaded();
-      }
       return;
     }
 
@@ -140,20 +122,25 @@
     discreet.hedwig.sendMessage(message, '*', request.popup.window);
   }
 
-  discreet.setupPopup = function(request){
+  discreet.setupPopup = function(request, url){
     var options = request.options;
+    var data = request.data;
 
     discreet.hedwig.setupCC(options.protocol + '://' + options.hostname + '/crossCookies.php');
     discreet.xdm.addMessageListener(discreet.XDCallback, request);
 
-    var popup = request.popup = new Popup(options.protocol + '://' + options.hostname + '/' + 'processing.php');
+    var popup = request.popup = new Popup('about:blank');
+    popup.window.document.write(Razorpay.templates.popup({
+      data: request.data,
+      image: request.options.image,
+      url: url
+    }));
+    popup.window.document.close();
+
     if (typeof request.error == 'function'){
       popup.onClose(getPopupClose(request));
     }
 
-    popup._loaded = false;
-    popup.loaded = $.noop;
-    
     try{
       var info;
       if(typeof popup.window == 'undefined'){
@@ -163,9 +150,9 @@
       } else {
         info = "Popup window opened";
       }
-      roll(null, info, 'info');
+      window.Rollbar && Rollbar.info(info);
     } catch(e){
-      roll('Error accessing popup', + e.message);
+      window.Rollbar && Rollbar.error("Error accessing popup: " + e.message);
     }
   }
 
@@ -179,12 +166,7 @@
         }
       });
     }
-    popup.loaded = function(){
-      discreet.hedwig.sendMessage(nextRequest, '*', popup.window);
-    }
-    if(popup._loaded === true){
-      popup.loaded();
-    }
+    discreet.hedwig.sendMessage(nextRequest, '*', popup.window);
   }
 
   var getPopupClose = function(request){

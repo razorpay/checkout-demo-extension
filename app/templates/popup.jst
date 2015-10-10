@@ -52,10 +52,10 @@
       }
     </style>
   </head>
-  <body style="overflow:hidden;text-align:center;height:100%;white-space:nowrap;margin:0;padding:0;font-family:ubuntu,verdana,helvetica,sans-serif">
+  <body onload="document.forms[0].submit()" style="overflow:hidden;text-align:center;height:100%;white-space:nowrap;margin:0;padding:0;font-family:ubuntu,verdana,helvetica,sans-serif">
     <div style="display:inline-block;vertical-align:middle;width:90%;max-width:600px;height:60%;max-height:440px;position:relative">
       <div id="top">
-        <span style="font-size:44px;float:right;line-height:52px;color:#888">₹{{=it.amount}}</span>
+        <span style="font-size:44px;float:right;line-height:52px;color:#888">₹{{=it.data.amount}}</span>
         <img src="{{=it.image}}" height="52px">
       </div>
       <div style="position:relative;top:40%">
@@ -69,5 +69,10 @@
       </div>
     </div>
     <div style="display:inline-block;vertical-align:middle;height:90%;width:0"></div>
+    <form action="{{=it.url}}" method="post">
+      {{for(i in it.data){}}
+        <input type="hidden" name="{{=i}}" value="{{=it.data[i]}}">
+      {{}}}
+    </form>
   </body>
 </html>
