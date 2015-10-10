@@ -295,7 +295,7 @@ describe("Razorpay card tab submit", function(){
       afterEach(function(){
         addAllCC();
 
-        spyOn($, 'ajax').and.callFake(function(options){
+        spyOn(discreet, 'setupPopup').and.callFake(function(options){
           spyCalled();
           expect(options.data[field]).toBe(value);
         });
@@ -308,7 +308,7 @@ describe("Razorpay card tab submit", function(){
         });
       });
 
-      describe(": in ajax request to server", function(){
+      describe(": in submitted data", function(){
         it("should pass signature if set", function(){
           customOptions.signature = 'asdasd';
           launch();
