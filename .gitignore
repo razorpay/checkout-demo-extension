@@ -2,3 +2,4 @@
 aws-keys.json
 /app/_*
 /app/dist
+coverage

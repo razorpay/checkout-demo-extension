@@ -11,6 +11,7 @@ var sourcemaps = require('gulp-sourcemaps');
 
 var child_process = require('child_process');
 var karma = require('karma');
+var istanbul = require('istanbul');
 
 function assetPath(path){
   return 'app/' + path;
@@ -76,16 +77,25 @@ gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
     .pipe(gulp.dest('app/dist/v1/images'));
 })
 
-gulp.task('test', ['buildDev'], function(){
-  child_process.execSync('sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find app/js -type f)');
-
-  var testFilesArray = glob.sync(assetPath('*.html')).map(function(html){
-    return fs.readFileSync(html, "utf-8")
-      .match(/<script src="[^"]+"><\/script>/g)
-      .map(function(tag){
-        return assetPath(tag.replace(/(^[^"]+"|"[^"]+$)/g,''));
+function getJSPaths(html, pattern){
+  try{
+    return child_process.execSync(
+        'cat ' + html + ' | grep -F "' + pattern + '" | cut -d\'"\' -f2',
+        {encoding: 'utf-8'}
+      )
+      .split('\n')
+      .filter(function(path){return !!path})
+      .map(function(path){
+        return assetPath(path);
       });
-  })
+  } catch(e){
+    return [];
+  }
+}
+
+gulp.task('test', ['buildDev'], function(){
+  // leak discreet variables
+  child_process.execSync('sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find app/js -type f)');
 
   var libs = [
     'spec/jquery-1.11.1.js',
@@ -96,17 +106,25 @@ gulp.task('test', ['buildDev'], function(){
   
   var options = {
     frameworks: ['jasmine'],
-    // reporters: ['coverage'],
+    reporters: ['progress', 'coverage'],
     port: 9876,
     colors: true,
     logLevel: 'ERROR',
     browsers: ['PhantomJS'],
-    singleRun: true
+    singleRun: true,
+    coverageReporter: {
+      type : 'json'
+    }
   };
 
-  allOptions = testFilesArray.map(function(testFiles){
+  allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(options));
-    o.files = libs.concat(testFiles);
+    o.files = libs.concat(getJSPaths(html, '<script src='));
+    o.preprocessors = {};
+    getJSPaths(html, '<!--coverage-->').forEach(function(path){
+      o.preprocessors[path] = ['coverage'];
+    })
+    o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
     return o;
   });
   testFromStack(0, allOptions);
@@ -117,7 +135,21 @@ function testFromStack(counter, allOptions){
     if(allOptions[++counter]){
       testFromStack(counter, allOptions);
     } else {
-      // child_process.execSync('sed -i -- s@/*ENV_TEST*/@//ENV_TEST@g $(find app/js -type f)');
+      child_process.execSync('sed -i -- s@/*ENV_TEST*/@//ENV_TEST@g $(find app/js -type f)');
+      createCoverageReport();
     }
   }).start();
+}
+
+function createCoverageReport(){
+  var collector = new istanbul.Collector();
+  var reporter = new istanbul.Reporter(false, 'coverage/final');
+
+  glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile){
+    collector.add(JSON.parse(fs.readFileSync(jsonFile, 'utf8')));
+  })
+
+  reporter.add('html');
+  reporter.write(collector, true, function(){});
+  console.log('Report created in coverage/final');
 }

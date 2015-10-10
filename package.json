@@ -41,6 +41,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-less": "^3.0.3",
     "gulp-sourcemaps": "^1.6.0",
+    "istanbul": "^0.3.22",
     "karma": "^0.13.10"
   }
 }
