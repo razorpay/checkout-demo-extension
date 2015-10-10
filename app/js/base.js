@@ -6,75 +6,8 @@
   var $ = Razorpay.$;
   var discreet = Razorpay.discreet;
 
-  /**
-   * Cross Domain Post Message
-   * Generic functions
-   */
-  discreet.xdm = {
-    _getMessageCallback:  function(callback, context){
-      return function(e){
-        if(e.originalEvent)
-          e = e.originalEvent;
-        if(!e || !e.data || typeof callback != 'function'){
-          return;
-        }
-        var data = e.data;
-        if(typeof data == 'string'){
-          try {
-            data = JSON.parse(data);
-          }
-          catch(e){
-            data = {
-              error: {
-                description: 'Unable to parse response'
-              }
-            }
-          }
-        }
-        callback.call(context, e, data);
-      }
-    },
-
-    _listener: null,
-
-    addMessageListener: function(callback, context) {
-      if(discreet.xdm._listener){
-        discreet.xdm.removeMessageListener();
-      }
-      discreet.xdm._listener = discreet.xdm._getMessageCallback(callback, context);
-      var winref = $(window).on('message', discreet.xdm._listener);
-      if(typeof winref == 'function') discreet.xdm._listener = winref; // if listener is returned by minimal-$
-    },
-
-    removeMessageListener: function() {
-      $(window).off('message', discreet.xdm._listener);
-      discreet.xdm._listener = null;
-    }
-  }
-
-  discreet.setOption = function(key, options, overrides, defaults){
-    var defaultValue = defaults[key];
-    if(typeof overrides != 'object'){
-      if(!(key in options)){
-        options[key] = defaultValue;
-      }
-      return;
-    }
-
-    var overrideValue = overrides[key];
-    if(typeof defaultValue == 'string' && typeof overrideValue != 'undefined' && typeof overrideValue != 'string'){
-      overrideValue = String(overrideValue);
-    }
-
-    if(typeof overrideValue == typeof defaultValue){
-      options[key] = overrideValue;
-    } else if(!(key in options)){
-      options[key] = defaultValue;
-    }
-  }
-
   Razorpay.prototype.configure = function(overrides){
-    this.options = discreet.configure(overrides);
+    this.options = _base.configure(overrides);
     this.modal = {options: {}};
 
     if(typeof discreet.initHedwig == 'function'){
@@ -85,134 +18,154 @@
     }
   };
 
-  discreet.configure = function(overrides){
-    if(typeof overrides != 'object'){
-      throw new Error("invalid options passed");
-    }
-    var options = {};
-    var defaults = Razorpay.defaults;
-
-    for (var i in defaults){
-      if(defaults[i] !== null && typeof defaults[i] == 'object'){
-        if(i == 'notes'){
-          options.notes = {};
-          if(typeof overrides.notes == 'object'){
-            for (var j in overrides.notes){
-              if(typeof overrides.notes[j] == 'string'){
-                options.notes[j] = overrides.notes[j];
-              }
-            }
-          }
-        } else if (i == 'prefill') {
-          options.prefill = JSON.parse(JSON.stringify(defaults['prefill']));
-          var op = overrides.prefill;
-          if(typeof op == 'object'){
-            for(var j in defaults.prefill){
-              if(typeof op[j] == 'object'){
-                for(var k in op[j]){
-                  if(k in defaults.prefill[j])
-                    options.prefill[j][k] = '' + op[j][k];
-                }
-              } else if(j in op) {
-                options.prefill[j] = '' + op[j];
-              }
-            }
-          }
-        } else if (i == 'method') {
-          options.method = JSON.parse(JSON.stringify(defaults.method));
-          if(typeof overrides.method == 'object'){
-            for(var j in overrides.method){
-              if(typeof overrides.method[j] == 'boolean')
-                options.method[j] = overrides.method[j];
-            }
-          }
-        } else {
-          var subObject = defaults[i];
-          options[i] = options[i] || {};
-          for(var j in subObject){
-            discreet.setOption(j, options[i], overrides[i], subObject);
-          }
-        }
-      }
-      else discreet.setOption(i, options, overrides, defaults);
-    }
-    discreet.validateOptions(options, true);
-    return options;
+  Razorpay.configure = function(overrides) {
+    Razorpay.defaults = _base.configure(overrides);
   }
 
-  /**
-   * Validates options TODO
-   * throwError = bool // throws an error if true, otherwise returns object with the state
-   * options = object
-   *
-   * return object
-  */
-  discreet.validateOptions = function(options, throwError){
-    var errors = [];
-
-    if (typeof options == 'undefined') {
-      errors.push({
-        message: 'no initialization options are passed',
-        field: ''
-      });
-
-    }
-
-    else if (typeof options != 'object') {
-      errors.push({
-        message: 'passed initialization options are invalid',
-        field: ''
-      });
-    }
-
-    if(!errors.length){
-      if (typeof options.key == 'undefined') {
-        errors.push({
-          message: 'No merchant key specified',
-          field: 'key'
-        });
-      }
-
-      if (options.key === "") {
-        errors.push({
-          message: 'Merchant key cannot be empty',
-          field: 'key'
-        });
-      }
-
-      if (typeof options.notes === 'object'){
-        // Object.keys unsupported in old browsers
-        var notesCount = 0;
-        for(var note in options.notes){
-          notesCount++;
+  var _base = {
+    setOption: function(key, options, overrides, defaults){
+      var defaultValue = defaults[key];
+      if(typeof overrides != 'object'){
+        if(!(key in options)){
+          options[key] = defaultValue;
         }
-        if(notesCount > 15) {
+        return;
+      }
+
+      var overrideValue = overrides[key];
+      if(typeof defaultValue == 'string' && typeof overrideValue != 'undefined' && typeof overrideValue != 'string'){
+        overrideValue = String(overrideValue);
+      }
+
+      if(typeof overrideValue == typeof defaultValue){
+        options[key] = overrideValue;
+      } else if(!(key in options)){
+        options[key] = defaultValue;
+      }
+    },
+
+    configure: function(overrides){
+      if(typeof overrides != 'object'){
+        throw new Error("invalid options passed");
+      }
+      var options = {};
+      var defaults = Razorpay.defaults;
+
+      for (var i in defaults){
+        if(defaults[i] !== null && typeof defaults[i] == 'object'){
+          if(i == 'notes'){
+            options.notes = {};
+            if(typeof overrides.notes == 'object'){
+              for (var j in overrides.notes){
+                if(typeof overrides.notes[j] == 'string'){
+                  options.notes[j] = overrides.notes[j];
+                }
+              }
+            }
+          } else if (i == 'prefill') {
+            options.prefill = JSON.parse(JSON.stringify(defaults['prefill']));
+            var op = overrides.prefill;
+            if(typeof op == 'object'){
+              for(var j in defaults.prefill){
+                if(typeof op[j] == 'object'){
+                  for(var k in op[j]){
+                    if(k in defaults.prefill[j])
+                      options.prefill[j][k] = '' + op[j][k];
+                  }
+                } else if(j in op) {
+                  options.prefill[j] = '' + op[j];
+                }
+              }
+            }
+          } else if (i == 'method') {
+            options.method = JSON.parse(JSON.stringify(defaults.method));
+            if(typeof overrides.method == 'object'){
+              for(var j in overrides.method){
+                if(typeof overrides.method[j] == 'boolean')
+                  options.method[j] = overrides.method[j];
+              }
+            }
+          } else {
+            var subObject = defaults[i];
+            options[i] = options[i] || {};
+            for(var j in subObject){
+              _base.setOption(j, options[i], overrides[i], subObject);
+            }
+          }
+        }
+        else _base.setOption(i, options, overrides, defaults);
+      }
+      _base.validateOptions(options, true);
+      return options;
+    },
+
+    validateOptions: function(options, throwError){
+      var errors = [];
+
+      if (typeof options == 'undefined') {
+        errors.push({
+          message: 'no initialization options are passed',
+          field: ''
+        });
+
+      }
+
+      else if (typeof options != 'object') {
+        errors.push({
+          message: 'passed initialization options are invalid',
+          field: ''
+        });
+      }
+
+      if(!errors.length){
+        if (typeof options.key == 'undefined') {
           errors.push({
-            message: 'You can only pass at most 15 fields in the notes object',
-            field: 'notes'
+            message: 'No merchant key specified',
+            field: 'key'
           });
         }
+
+        if (options.key === "") {
+          errors.push({
+            message: 'Merchant key cannot be empty',
+            field: 'key'
+          });
+        }
+
+        if (typeof options.notes === 'object'){
+          // Object.keys unsupported in old browsers
+          var notesCount = 0;
+          for(var note in options.notes){
+            notesCount++;
+          }
+          if(notesCount > 15) {
+            errors.push({
+              message: 'You can only pass at most 15 fields in the notes object',
+              field: 'notes'
+            });
+          }
+        }
+
+        /**
+         * There are some options which are checkout specific only
+         */
+        if(typeof discreet.validateCheckout == 'function'){
+          discreet.validateCheckout(options, errors);
+        }
       }
 
-      /**
-       * There are some options which are checkout specific only
-       */
-      if(typeof discreet.validateCheckout == 'function'){
-        discreet.validateCheckout(options, errors);
+      if(!throwError){
+        return errors;
+      } else {
+        if(errors.length > 0){
+          var field = errors[0].field;
+          var message = errors[0].message;
+          var errorMessage = '{"field":"' + field + '","error":"' + message + '"}';
+          throw new Error(errorMessage);
+        }
       }
     }
-
-    if(!throwError){
-      return errors;
-    } else {
-      if(errors.length > 0){
-        var field = errors[0].field;
-        var message = errors[0].message;
-        var errorMessage = '{"field":"' + field + '","error":"' + message + '"}';
-        throw new Error(errorMessage);
-      }
-    }
-  };
+  }
 
   discreet.makeUrl = function(options){
     return options.protocol + '://' + options.hostname + '/' + options.version;
@@ -245,5 +198,5 @@
       discreet.error.call(this, errorData);
     }
   }
-  /* INLINE_TESTING */
+  /*ENV_TEST*/ window._base = _base;
 })();

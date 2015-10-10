@@ -204,4 +204,38 @@
     return target;
   }
 
+  $.addMessageListener = function(callback, context) {
+    if(_listener) $.removeMessageListener();
+    _listener = $(window).on('message', createListener(callback, context));
+  },
+
+  $.removeMessageListener = function() {
+    $(window).off('message', _listener);
+    _listener = null;
+  }
+
+  var createListener = function(callback, context){
+    return function(e){
+      if(!e || !e.data || typeof callback != 'function'){
+        return;
+      }
+      var data = e.data;
+      if(typeof data == 'string'){
+        try {
+          data = JSON.parse(data);
+        }
+        catch(e){
+          data = {
+            error: {
+              description: 'Unable to parse response'
+            }
+          }
+        }
+      }
+      callback.call(context, e, data);
+    }
+  }
+
+  var _listener = null;
+
 })(Razorpay);

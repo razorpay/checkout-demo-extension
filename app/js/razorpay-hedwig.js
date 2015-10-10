@@ -51,7 +51,7 @@
       discreet.paymentSuccess.call(this, data);
     }
     // remove postMessage listener
-    discreet.xdm.removeMessageListener();
+    $.removeMessageListener();
   };
 
   discreet.apiResponseHandler = {
@@ -127,7 +127,7 @@
     var data = request.data;
 
     discreet.hedwig.setupCC(options.protocol + '://' + options.hostname + '/crossCookies.php');
-    discreet.xdm.addMessageListener(discreet.XDCallback, request);
+    $.addMessageListener(discreet.XDCallback, request);
 
     var popup = request.popup = new Popup('about:blank');
     popup.window.document.write(Razorpay.templates.popup({
@@ -171,7 +171,7 @@
 
   var getPopupClose = function(request){
     return function(){
-      discreet.xdm.removeMessageListener();
+      $.removeMessageListener();
 
       request.error({
         error: {

@@ -22,7 +22,7 @@ describe("on popup close,", function(){
   })
 
   it("xdm listener should be removed", function(){
-    spyOn(discreet.xdm, 'removeMessageListener').and.callFake(spy);
+    spyOn($, 'removeMessageListener').and.callFake(spy);
   })
 
   it("call back specified error handler", function(){

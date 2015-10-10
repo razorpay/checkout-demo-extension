@@ -1,3 +1,4 @@
 /node_modules
 aws-keys.json
 /app/_*
+/app/dist

@@ -6,10 +6,6 @@
   var $ = Razorpay.$;
   var discreet = Razorpay.discreet;
   var Popup = Razorpay.Popup;
-  
-  Razorpay.configure = function(overrides) {
-    Razorpay.defaults = discreet.configure(overrides);
-  }
 
   /**
     method for payment data submission to razorpay api

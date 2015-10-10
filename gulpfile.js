@@ -1,5 +1,5 @@
-// Include gulp
 var fs = require('fs');
+var glob = require('glob');
 var gulp = require('gulp');
 var dot = require('dot');
 var less = require('gulp-less');
@@ -51,67 +51,65 @@ gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
 gulp.task('usemin', function(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
-    .pipe(gulp.dest('app/_build'));
+    .pipe(gulp.dest('app/dist/v1'));
 })
 
 gulp.task('sourceMaps', function(){
-  return gulp.src('app/_build/checkout-frame.js')
+  return gulp.src('app/dist/v1/checkout-frame.js')
     .pipe(sourcemaps.init())
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('app/_build'));
+    .pipe(gulp.dest('app/dist/v1'));
 })
 
-gulp.task('build', ['buildDev', 'usemin', 'sourceMaps'], function(){
+gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
   // uglify
-  gulp.src('app/_build/*.js')
+  gulp.src('app/dist/v1/*.js')
     .pipe(uglify())
-    .pipe(gulp.dest('app/_build'));
+    .pipe(gulp.dest('app/dist/v1'));
 
   // copy css
   gulp.src('app/_css/*.css')
-    .pipe(gulp.dest('app/_build/css'));
+    .pipe(gulp.dest('app/dist/v1/css'));
 
   // copy images
   gulp.src('app/images/**')
-    .pipe(gulp.dest('app/_build/images'));
+    .pipe(gulp.dest('app/dist/v1/images'));
 })
 
 gulp.task('test', ['buildDev'], function(){
-  // inline test files
-  child_process.execSync('cd app && rm -rf _test && cp -r js _test && for i in _test/*.js; do j=`basename $i`; sed -i -e "/INLINE_TESTING/r ../test/inline/"$j $i; done;');
-  
-  // temporarily point html files to test ones
-  child_process.execSync('sed -i -- s!"js/!"_test/!g app/*.html && mkdir -p app/_test/src');
+  child_process.execSync('sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find app/js -type f)');
 
-  // usemin inline tests
-  var testmin = gulp.src(assetPath('*.html'))
-    .pipe(usemin())
-    .pipe(gulp.dest('app/_test/src'));
-
-  testmin.on('finish', function(){
-    var files = [
-      'spec/jquery-1.11.1.js',
-      'spec/jasmine-jquery.js',
-      'spec/sendkeys.js',
-      'spec/helpers.js'
-    ];
-    
-    var options = {
-      frameworks: ['jasmine'],
-      port: 9876,
-      colors: true,
-      logLevel: 'ERROR',
-      browsers: ['PhantomJS'],
-      singleRun: true
-    };
-
-    allOptions = ['checkout.js', 'razorpay.js', 'checkout-frame.js'].map(function(file){
-      var o = JSON.parse(JSON.stringify(options));
-      o.files = files.concat(['app/_test/src/' + file]);
-      return o;
-    });
-    testFromStack(0, allOptions);
+  var testFilesArray = glob.sync(assetPath('*.html')).map(function(html){
+    return fs.readFileSync(html, "utf-8")
+      .match(/<script src="[^"]+"><\/script>/g)
+      .map(function(tag){
+        return assetPath(tag.replace(/(^[^"]+"|"[^"]+$)/g,''));
+      });
   })
+
+  var libs = [
+    'spec/jquery-1.11.1.js',
+    'spec/jasmine-jquery.js',
+    'spec/sendkeys.js',
+    'spec/helpers.js'
+  ];
+  
+  var options = {
+    frameworks: ['jasmine'],
+    // reporters: ['coverage'],
+    port: 9876,
+    colors: true,
+    logLevel: 'ERROR',
+    browsers: ['PhantomJS'],
+    singleRun: true
+  };
+
+  allOptions = testFilesArray.map(function(testFiles){
+    var o = JSON.parse(JSON.stringify(options));
+    o.files = libs.concat(testFiles);
+    return o;
+  });
+  testFromStack(0, allOptions);
 })
 
 function testFromStack(counter, allOptions){
@@ -119,7 +117,7 @@ function testFromStack(counter, allOptions){
     if(allOptions[++counter]){
       testFromStack(counter, allOptions);
     } else {
-      child_process.execSync('sed -i -- s!"_test/!"js/!g app/*.html && mkdir -p app/_test/src');
+      // child_process.execSync('sed -i -- s@/*ENV_TEST*/@//ENV_TEST@g $(find app/js -type f)');
     }
   }).start();
 }

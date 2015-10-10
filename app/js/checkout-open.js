@@ -4,22 +4,30 @@
 (function(){
   'use strict';
 
-  var frameContainer, backdrop, isOpen, bodyEl, metaViewportTag;
-  var doT = Razorpay.doT;
+  var $ = Razorpay.$;
   var discreet = Razorpay.discreet;
 
-  // place frameContainer absolute, and add window.onscroll
+  // place _chop.frameContainer absolute, and add window.onscroll
   var backMinHeight = 0;
   var pageY = 0;
   var ua = navigator.userAgent;
   var absoluteContainer;
-  var currentScript = document.currentScript || (function() {
-    var scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })();
-  var merchantData = {};
 
-  var fallbacks = function(){
+  var _chop = {
+    currentScript: document.currentScript || (function() {
+      var scripts = document.getElementsByTagName('script');
+      return scripts[scripts.length - 1];
+    })(),
+    isOpen: false,
+    bodyEl: null,
+    frameContainer: null,
+    backdrop: null,
+    metaViewportTag: null,
+    metaViewport: null,
+    bodyOverflow: null
+  };
+
+  _chop.fallbacks = function(){
     absoluteContainer = /iPhone|Android 2\./.test(ua);
 
     if(/iPhone.+Version\/4\./.test(ua) && typeof document.height == 'number'){
@@ -28,13 +36,13 @@
 
     if(absoluteContainer && window.addEventListener){
       window.addEventListener('orientationchange', function(){
-        if(frameContainer){
-          frameContainer.style.height = Math.max(innerHeight, 455)+'px';
+        if(_chop.frameContainer){
+          _chop.frameContainer.style.height = Math.max(innerHeight, 455) + 'px';
         }
       })
       window.addEventListener('scroll', function(){
-        var c = frameContainer;
-        if(!c || !isOpen || typeof window.pageYOffset !== 'number')
+        var c = _chop.frameContainer;
+        if(!c || !_chop.isOpen || typeof window.pageYOffset !== 'number')
           return;
         var top;
         var offTop = c.offsetTop - pageYOffset;
@@ -55,19 +63,19 @@
   }
 
   Razorpay.prototype.open = function() {
-    if(!bodyEl) bodyEl = document.getElementsByTagName('body')[0];
-    if(!bodyEl) setTimeout(this.open());
-    if(isOpen) return;
-    isOpen = true;
+    if(!_chop.bodyEl) _chop.bodyEl = document.getElementsByTagName('body')[0];
+    if(!_chop.bodyEl) setTimeout(this.open());
+    if(_chop.isOpen) return;
+    _chop.isOpen = true;
 
-    merchantData.bodyOverflow = bodyEl.style.overflow;
-    discreet.xdm.addMessageListener(onFrameMessage, this);
+    _chop.bodyOverflow = _chop.bodyEl.style.overflow;
+    $.addMessageListener(_chop.onFrameMessage, this);
 
-    if(!frameContainer){
-      fallbacks();
-      frameContainer = document.createElement('div');
-      frameContainer.className = 'razorpay-frame-container';
-      var style = frameContainer.style;
+    if(!_chop.frameContainer){
+      _chop.fallbacks();
+      _chop.frameContainer = document.createElement('div');
+      _chop.frameContainer.className = 'razorpay-frame-container';
+      var style = _chop.frameContainer.style;
       var rules = {
         zIndex: '99999',
         position: (absoluteContainer ? 'absolute' : 'fixed'),
@@ -80,31 +88,31 @@
       for(var i in rules){
         style[i] = rules[i];
       }
-      backdrop = document.createElement('div');
-      backdrop.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
-      frameContainer.appendChild(backdrop);
-      bodyEl.appendChild(frameContainer);
+      _chop.backdrop = document.createElement('div');
+      _chop.backdrop.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
+      _chop.frameContainer.appendChild(_chop.backdrop);
+      _chop.bodyEl.appendChild(_chop.frameContainer);
     }
     if(!absoluteContainer)
-      bodyEl.style.overflow = 'hidden';
-    frameContainer.style.display = 'block';
+      _chop.bodyEl.style.overflow = 'hidden';
+    _chop.frameContainer.style.display = 'block';
     try{
       // setting unsupported value throws error in IE
-      backdrop.style.background = 'rgba(0,0,0,0.6)';
+      _chop.backdrop.style.background = 'rgba(0,0,0,0.6)';
     } catch(e){}
     if(!this.checkoutFrame){
-      this.checkoutFrame = createFrame(this.options);
-      frameContainer.appendChild(this.checkoutFrame);
+      this.checkoutFrame = _chop.createFrame(this.options);
+      _chop.frameContainer.appendChild(this.checkoutFrame);
     } else {
       this.checkoutFrame.style.display = 'block';
-      setMetaViewport();
-      sendFrameMessage.call(this, {event: 'open'});
+      _chop.setMetaViewport();
+      _chop.sendFrameMessage.call(this, {event: 'open'});
     }
   }
 
-  var createFrame = function(options){
+  _chop.createFrame = function(options){
     var frame = document.createElement('iframe');
-    var src = currentScript.src;
+    var src = _chop.currentScript.src;
     if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
       src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
     } else {
@@ -127,23 +135,23 @@
   }
 
   Razorpay.prototype.close = function(){
-    if(isOpen){
-      sendFrameMessage.call(this, {event: 'close'});
+    if(_chop.isOpen){
+      _chop.sendFrameMessage.call(this, {event: 'close'});
     }
   }
 
-  var onClose = function(){
-    discreet.xdm.removeMessageListener();
-    isOpen = false;
-    bodyEl.style.overflow = merchantData.bodyOverflow;
+  _chop.onClose = function(){
+    $.removeMessageListener();
+    _chop.isOpen = false;
+    _chop.bodyEl.style.overflow = _chop.bodyOverflow;
 
-    if(metaViewportTag) metaViewportTag.parentNode && metaViewportTag.parentNode.removeChild(metaViewportTag);
+    if(_chop.metaViewportTag) _chop.metaViewportTag.parentNode && _chop.metaViewportTag.parentNode.removeChild(_chop.metaViewportTag);
 
-    var meta = merchantData.metaViewport;
+    var meta = _chop.metaViewport;
     if(meta){
       var head = document.getElementsByTagName('head')[0];
       head && !meta.parentNode && head.appendChild(meta);
-      merchantData.metaViewport = null;
+      _chop.metaViewport = null;
     }
 
     if(this.checkoutFrame){
@@ -153,13 +161,13 @@
         this.checkoutFrame = null;
       }
     }
-    if(frameContainer)
-      frameContainer.style.display = 'none';
+    if(_chop.frameContainer)
+      _chop.frameContainer.style.display = 'none';
     if(this instanceof Razorpay && typeof this.options.modal.onhidden == 'function')
       this.options.modal.onhidden();
   }
 
-  var sendFrameMessage = function(response){
+  _chop.sendFrameMessage = function(response){
     if(typeof response !== 'string'){
       response = JSON.stringify(response)
     }
@@ -167,7 +175,7 @@
   }
 
   // to handle absolute/relative url of options.image
-  var setImageOption = function(options){
+  _chop.setImageOption = function(options){
     if(options.image && typeof options.image == 'string'){
       if(/data:image\/[^;]+;base64/.test(options.image)){
         return;
@@ -186,7 +194,7 @@
     }
   }
 
-  var setMetaViewport = function(){
+  _chop.setMetaViewport = function(){
     if(typeof document.querySelector != 'function'){
       return;
     }
@@ -198,22 +206,22 @@
     var meta = head.querySelector('meta[name=viewport]');
 
     if(meta){
-      merchantData.metaViewport = meta;
+      _chop.metaViewport = meta;
       meta.parentNode.removeChild(meta);
     }
 
-    if(!metaViewportTag){
-      metaViewportTag = document.createElement('meta');
-      metaViewportTag.setAttribute('name', 'viewport');
-      metaViewportTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    if(!_chop.metaViewportTag){
+      _chop.metaViewportTag = document.createElement('meta');
+      _chop.metaViewportTag.setAttribute('name', 'viewport');
+      _chop.metaViewportTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
     }
 
-    if(!metaViewportTag.parentNode){
-      head.appendChild(metaViewportTag);
+    if(!_chop.metaViewportTag.parentNode){
+      head.appendChild(_chop.metaViewportTag);
     }
   }
 
-  var onFrameMessage = function(e, data){
+  _chop.onFrameMessage = function(e, data){
     // this == rzp
     if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
@@ -225,7 +233,7 @@
     if(event === 'load'){
       var i;
       var options = {};
-      setMetaViewport();
+      _chop.setMetaViewport();
 
       for(i in this.options){
         var value = this.options[i];
@@ -236,13 +244,13 @@
       for(i in this.modal.options){
         this.options.modal[i] = this.modal.options[i];
       }
-      setImageOption(options);
+      _chop.setImageOption(options);
 
       var response = {
         context: location.href,
         options: options
       }
-      return sendFrameMessage.call(this, response);
+      return _chop.sendFrameMessage.call(this, response);
     }
 
     else if(event === 'redirect'){
@@ -256,19 +264,19 @@
     }
     
     else if (event === 'dismiss'){
-      if(backdrop)
-        backdrop.style.background = '';
+      if(_chop.backdrop)
+        _chop.backdrop.style.background = '';
       if(typeof this.options.modal.ondismiss == 'function')
         this.options.modal.ondismiss()
     }
 
     else if (event === 'hidden'){
-      onClose.call(this);
+      _chop.onClose.call(this);
     }
 
     else if (event === 'success'){
-      if(backdrop)
-        backdrop.style.background = '';
+      if(_chop.backdrop)
+        _chop.backdrop.style.background = '';
 
       if(this.checkoutFrame){
         this.checkoutFrame.setAttribute('removable', true);
@@ -288,7 +296,7 @@
     @param  {[type]} data [description]
     @return {[type]}    [description]
   */
-  var defaultPostHandler = function(data){
+  _chop.defaultPostHandler = function(data){
     var inputs = "";
     for (var i in data) {
       if (typeof data[i] === "object") {
@@ -299,12 +307,12 @@
         inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
       }
     }
-    var RazorPayForm = currentScript.parentElement;
+    var RazorPayForm = _chop.currentScript.parentElement;
     RazorPayForm.innerHTML += inputs;
     RazorPayForm.submit();
   };
 
-  var parseScriptOptions = function(options){
+  _chop.parseScriptOptions = function(options){
     var category, dotPosition, i, ix, property;
     for (i in options) {
       ix = i.indexOf(".");
@@ -323,18 +331,18 @@
       }
     }
     if(options.method)
-      parseScriptOptions(options.method);
+      _chop.parseScriptOptions(options.method);
   };
 
-  var addButton = function(rzp){
+  _chop.addButton = function(rzp){
     var button = document.createElement('input');
-    var form = currentScript.parentNode;
+    var form = _chop.currentScript.parentNode;
     button.type = 'submit';
     button.value = rzp.options.buttontext;
     button.className = 'razorpay-payment-button';
     form.appendChild(button);
     form.onsubmit = function(e){
-      if(isOpen){
+      if(_chop.isOpen){
         return;
       }
       e.preventDefault();
@@ -347,10 +355,10 @@
   * This checks whether we are in automatic mode
   * If yes, it puts in the button
   */
-  var automaticCheckoutInit = function(){
-    var key = currentScript.getAttribute('data-key');
+  _chop.automaticCheckoutInit = function(){
+    var key = _chop.currentScript.getAttribute('data-key');
     if (key && key.length > 0){
-      var attrs = currentScript.attributes;
+      var attrs = _chop.currentScript.attributes;
       var opts = {};
       for(var i=0; i<attrs.length; i++){
         var name = attrs[i].name
@@ -359,10 +367,10 @@
           opts[name] = attrs[i].value;
         }
       }
-      parseScriptOptions(opts);
-      opts.handler = defaultPostHandler;
+      _chop.parseScriptOptions(opts);
+      opts.handler = _chop.defaultPostHandler;
       var rzp = new Razorpay(opts);
-      addButton(rzp);
+      _chop.addButton(rzp);
     }
   }
 
@@ -409,6 +417,6 @@
   }
 
   // Get the ball rolling in case we are in manual mode
-  automaticCheckoutInit();
-  /* INLINE_TESTING */
+  _chop.automaticCheckoutInit();
+  /*ENV_TEST*/ window._chop = _chop;
 })()

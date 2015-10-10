@@ -3,10 +3,11 @@ build:
     steps:
         - npm-install
         - script:
-            name: Install harp globally
-            code: sudo npm install -g harp
-        - grunt:
-            tasks: test
+            name: Install gulp globally
+            code: sudo npm install -g gulp
+        - script:
+            name: Test
+            code: gulp test
 
     after-steps:
         - williamli/slack-notify-no-owner-info:
@@ -17,18 +18,18 @@ deploy:
     steps:
         - npm-install
         - script:
-            name: Install harp globally
-            code: sudo npm install -g harp
+            name: Install gulp globally
+            code: sudo npm install -g gulp
         - script:
             name: Insert git commit id into rollbar version
-            code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/assets/js/rollbar.js
+            code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/js/rollbar.js
 
         - grunt:
             tasks: build
 
         - script:
             name: 'Upload source maps'
-            code: 'FILE=checkout-frame.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX$FILE -F source_map=@app/dist/v1/$FILE.map; echo $PREFIX$FILE'
+            code: 'FILE=checkout-frame.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX$FILE -F source_map=@app/_build/$FILE.map; echo $PREFIX$FILE'
 
         - script:
             name: 'Remove map files'
@@ -37,8 +38,8 @@ deploy:
         # This command needs a grunt step above it to install grunt
         # It does differential uploads :rocket:
         - script:
-            name: Run fonts upload
-            code: grunt fonts:upload --target=$WERCKER_DEPLOYTARGET_NAME
+            name: Run font upload
+            code: grunt fontUpload --target=$WERCKER_DEPLOYTARGET_NAME
 
         - nhuray/aws-code-deploy:
             key: $AWS_KEY

@@ -1,3 +1,4 @@
+var discreet = Razorpay.discreet;
 var options = {
   'key': 'key_id',
   'amount': '5100',
@@ -24,60 +25,50 @@ describe("open method should", function(){
     rzp.open();
   })
 
-  it("attach xdm listener", function(){
-    expect(isOpen).toBe(true);
-    expect(typeof discreet.xdm._listener).toBe('function');
-  })
-
   it("append iframe", function(){
+    expect(_chop.isOpen).toBe(true);
     expect(rzp.checkoutFrame).toBeDefined();
     expect(document.body.contains(rzp.checkoutFrame.parentNode)).toBe(true);
   })
 
   afterEach(function(){
-    onClose.call(rzp);
+    _chop.onClose.call(rzp);
   })
 })
 
 describe("close method should", function(){
-  var rzp, origSendFrameMessage;
+  var rzp;
 
   beforeEach(function(){
     rzp = new Razorpay(options);
     rzp.open();
-    origSendFrameMessage = sendFrameMessage;
-  })
-
-  afterEach(function(){
-    sendFrameMessage = origSendFrameMessage;
   })
 
   it("send close message to frame", function(){
     var spy = jasmine.createSpy();
-    sendFrameMessage = function(msg){
+    spyOn(_chop, 'sendFrameMessage').and.callFake(function(msg){
       expect(msg.event).toBe('close');
       expect(this).toBe(rzp);
       spy();
-    }
+    })
     rzp.close();
     expect(spy).toHaveBeenCalled();
   })
   
   it("clean up various properties", function(){
-    onClose.call(rzp);
-    expect(isOpen).toBe(false);
-    expect(discreet.xdm._listener).toBe(null);
+    _chop.onClose.call(rzp);
+    expect(_chop.isOpen).toBe(false);
     expect(rzp.checkoutFrame).not.toBeVisible();
   })
 
   it("be followable by re-open", function(){
     var spy = jasmine.createSpy();
-    sendFrameMessage = function(msg){
+    spyOn(_chop, 'sendFrameMessage').and.callFake(function(msg){
       expect(msg.event).toBe('open');
       expect(this).toBe(rzp);
       spy();
-    }
-    onClose.call(rzp);
+    })
+    _chop.onClose.call(rzp);
     rzp.open();
     expect(spy).toHaveBeenCalled();
   })
@@ -88,50 +79,46 @@ describe("normalize image option if", function(){
 
   it("path relative url", function(){
     var opts = {image: 'abcdef'};
-    setImageOption(opts);
+    _chop.setImageOption(opts);
     expect(opts.image).toBe(baseUrl + '/abcdef');
   })
 
   it("server relative url", function(){
     var opts = {image: '/hello/world'};
-    setImageOption(opts);
+    _chop.setImageOption(opts);
     expect(opts.image).toBe(baseUrl + '/hello/world');
   })
   
   it("absolute url", function(){
     var opts = {image: 'https://hello/world'};
-    setImageOption(opts);
+    _chop.setImageOption(opts);
     expect(opts.image).toBe('https://hello/world');
   })
 
   it("base64", function(){
     var base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL4AAAC+CAIAAAAEFiLKAAAAA3NCSVQICAjb4U/';
     var opts = {image: base64};
-    setImageOption(opts);
+    _chop.setImageOption(opts);
     expect(opts.image).toBe(base64);
   })
 
 })
 
-describe("onFrameMessage ", function(){
-  var rzp, origSendFrameMessage, origSetImageOption;
+describe("_chop.onFrameMessage ", function(){
+  var rzp;
 
   beforeEach(function(){
     rzp = new Razorpay(options);
     rzp.open();
-    origSendFrameMessage = onFrameMessage;
-    origSetImageOption = setImageOption;
   });
 
   afterEach(function(){
-    onClose.call(rzp);
-    sendFrameMessage = origSendFrameMessage;
-    setImageOption = origSetImageOption;
+    _chop.onClose.call(rzp);
   });
 
   it("return if source isn't valid", function(done){
     var spyNotCalled = jasmine.createSpy();
-    var setImageOption = spyNotCalled;
+    spyOn(_chop, 'setImageOption').and.callFake(spyNotCalled);
     postMessage({event: "load"}, '*');
     setTimeout(function(){
       expect(spyNotCalled).not.toHaveBeenCalled();
@@ -153,23 +140,24 @@ describe("onFrameMessage ", function(){
     })
 
     it("image option is to be normalized", function(done){
-      setImageOption = jasmine.createSpy();
+      var spy = jasmine.createSpy();
+      spyOn(_chop, 'setImageOption').and.callFake(spy);
       setTimeout(function(){
-        expect(setImageOption).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
         done();
       })
     })
  
     it("init options are to be sent to frame", function(done){
       var spy = jasmine.createSpy();
-      sendFrameMessage = function(response){
+      spyOn(_chop, 'sendFrameMessage').and.callFake(function(response){
         if(this === rzp && response.context === location.href){
           var o = response.options;
           if(o.key && o.amount){
             spy();
           }
         }
-      };
+      })
       setTimeout(function(){
         expect(spy).toHaveBeenCalled();
         done();
@@ -232,16 +220,16 @@ describe("onFrameMessage ", function(){
     })
   })
 
-  it("hidden, onClose is to be called", function(done){
-    var origClose = onClose;
+  it("hidden, _chop.onClose is to be called", function(done){
+    var origClose = _chop.onClose;
     var spy = jasmine.createSpy();
-    onClose = function(){
+    _chop.onClose = function(){
       if(this === rzp) spy();
     }
     postMessage({source: "frame", event: "hidden"}, '*');
     setTimeout(function(){
       expect(spy).toHaveBeenCalled();
-      onClose = origClose;
+      _chop.onClose = origClose;
       done();
     })
   })
@@ -269,11 +257,11 @@ describe("checkout validate", function(){
        init_options = jQuery.extend(true, {}, options);
     });
 
-    afterEach(function(){
-      errors = discreet.validateOptions(init_options, false);
-      expect(errors.length).toBe(1);
-      expect(errors[0].field).toBe(field);
-    });
+    // afterEach(function(){
+    //   errors = discreet.validateOptions(init_options, false);
+    //   expect(errors.length).toBe(1);
+    //   expect(errors[0].field).toBe(field);
+    // });
 
     it("amount is invalid", function(){
       field = 'amount';
@@ -328,7 +316,7 @@ describe("automatic checkout:", function(){
   it("submit handler should submit with all fields", function(){
     var spy = jasmine.createSpy();
     
-    currentScript.parentNode.submit = function(){
+    _chop.currentScript.parentNode.submit = function(){
       var payload = [];
       jQuery(this).children('input[name]').each(function(index, el){
         payload.push(el.name + '=' + el.value);
@@ -345,7 +333,7 @@ describe("automatic checkout:", function(){
         world: 5
       }
     }
-    defaultPostHandler(postData);
+    _chop.defaultPostHandler(postData);
     expect(spy).toHaveBeenCalled();
   })
 
@@ -359,7 +347,7 @@ describe("automatic checkout:", function(){
       'method.wallet.paytm': 'false',
       'one.hello': 'true'
     }
-    parseScriptOptions(opts);
+    _chop.parseScriptOptions(opts);
 
     it("have basic keys", function(){
       expect(opts.key).toBe('val');
@@ -385,12 +373,12 @@ describe("automatic checkout:", function(){
     })
   })
 
-  describe("addButton method: ", function(){
+  describe("_chop.addButton method: ", function(){
     var init_options = jQuery.extend(true, {}, options);
     init_options.buttontext = 'Dont pay';
     var rzp = new Razorpay(init_options);
-    var parent = currentScript.parentNode;
-    addButton(rzp);
+    var parent = _chop.currentScript.parentNode;
+    _chop.addButton(rzp);
     
     it("onsubmit should be attached on parent element", function(){
       expect(typeof parent.onsubmit).toBe('function');
@@ -404,7 +392,7 @@ describe("automatic checkout:", function(){
     })
 
     it("should open checkout form on submit if not already", function(){
-      isOpen = false;
+      _chop.isOpen = false;
 
       var spy = jasmine.createSpy();
       var spy2 = jasmine.createSpy();
@@ -417,7 +405,7 @@ describe("automatic checkout:", function(){
     })
 
     it("shouldn't do default action if form is open", function(){
-      isOpen = true;
+      _chop.isOpen = true;
 
       var spy = jasmine.createSpy();
       var spy2 = jasmine.createSpy();
@@ -436,48 +424,45 @@ describe("automatic checkout:", function(){
       key: 'abcd'
     }
 
-    var spyCalled, spyNotCalled, origParseScriptOptions, origAddButton;
+    var spyCalled, spyNotCalled;
 
     beforeEach(function(){
-      origParseScriptOptions = parseScriptOptions;
       spyCalled = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
       for(var i in opts)
-        currentScript.setAttribute('data-' + i, opts[i]);
+        _chop.currentScript.setAttribute('data-' + i, opts[i]);
     })
 
     afterEach(function(){
-      automaticCheckoutInit();
+      _chop.automaticCheckoutInit();
 
       spyCalled && expect(spyCalled).toHaveBeenCalled();
       spyNotCalled && expect(spyNotCalled).not.toHaveBeenCalled();
 
       for(var i in opts)
-        currentScript.removeAttribute(i);
-      parseScriptOptions = origParseScriptOptions;
-      addButton = origAddButton;
+        _chop.currentScript.removeAttribute(i);
     })
 
     it("should do nothing if data-key attribute is not present", function(){
-      currentScript.removeAttribute('data-key');
+      _chop.currentScript.removeAttribute('data-key');
       spyCalled = null;
-      addButton = spyNotCalled;
+      spyOn(_chop, 'addButton').and.callFake(spyNotCalled);
     })
 
     it("should parse attributes", function(){
-      addButton = jQuery.noop;
-      parseScriptOptions = function(o){
+      spyOn(_chop, 'addButton').and.callFake(jQuery.noop);
+      spyOn(_chop, 'parseScriptOptions').and.callFake(function(o){
         expect(o.key).toBe('abcd');
         expect(o.amount).toBe('12345');
         spyCalled();
-      };
+      })
     })
 
     it("add button", function(){
-      addButton = function(r){
+      spyOn(_chop, 'addButton').and.callFake(function(r){
         expect(r instanceof Razorpay).toBe(true);
         spyCalled();
-      };
+      })
     })
   })
 })

@@ -6,25 +6,18 @@
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
 
-  <!-- build:js razorpay.js -->
-  <script type="text/javascript" src="js/lib/init.js"></script>
-  <script type="text/javascript" src="js/lib/nominal-jquery.js"></script>
-  <script type="text/javascript" src="js/lib/popup.js"></script>
-  <script type="text/javascript" src="js/lib/hedwig.js"></script>
-  <script type="text/javascript" src="js/base.js"></script>
-  <script type="text/javascript" src="js/razorpay-submit.js"></script>
-  <script type="text/javascript" src="_templates/popup.js"></script>
-  <script type="text/javascript" src="js/razorpay-hedwig.js"></script>
-  <script type="text/javascript" src="js/fin.js"></script>
+  <!-- build:js checkout.js -->
+  <script src="js/lib/init.js"></script>
+  <script src="js/lib/nominal-jquery.js"></script>
+  <script src="js/base.js"></script>
+  <script src="js/checkout-open.js"></script>
+  <!-- test scripts
+  <script src="../test/base.js"></script>
+  <script src="../test/checkout-open.js"></script>
+  -->
+  <script src="js/fin.js"></script>
   <!-- endbuild -->
 
-  <!-- build:js checkout.js -->
-  <script type="text/javascript" src="js/lib/init.js"></script>
-  <script type="text/javascript" src="js/lib/nominal-jquery.js"></script>
-  <script type="text/javascript" src="js/base.js"></script>
-  <script type="text/javascript" src="js/checkout-open.js"></script>
-  <script type="text/javascript" src="js/fin.js"></script>
-  <!-- endbuild -->
 </head>
 <body>
   <div id="x" style='height: 1000px; background: yellow'></div>
@@ -32,6 +25,7 @@
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
   <script>
+  alert(324234234);
     var options = {
       'key': 'rzp_test_1DP5mmOlF5G5ag',
       'amount': 74900,

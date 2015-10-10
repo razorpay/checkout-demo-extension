@@ -612,5 +612,5 @@
     })
   }
   Razorpay.sendMessage({event: 'load'});
-  /* INLINE_TESTING */
+  /*ENV_TEST*/ window.frameDiscreet = frameDiscreet;
 })();

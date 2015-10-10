@@ -1,3 +1,5 @@
+var Popup = Razorpay.Popup;
+var $ = Razorpay.$;
 var options = {
   'key': 'key_id',
   'amount': '40000',

@@ -1,3 +1,4 @@
+var discreet = Razorpay.discreet;
 var options = {
   'key': 'key_id',
   'amount': '40000',
@@ -39,32 +40,6 @@ describe("new Razorpay", function(){
     rzp = new Razorpay(options);
     expect(rzp instanceof Razorpay).toBe(true);
   });
-})
-
-describe("xdm listener should", function(){
-  var spy;
-
-  beforeEach(function(){
-    spy = jasmine.createSpy();
-    discreet.xdm.addMessageListener(spy, null);
-  })
-
-  it("be called if attached", function(done){
-    postMessage('foo', '*');
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
-      done();
-    });
-  })
-
-  it("not be called if detached", function(done){
-    discreet.xdm.removeMessageListener();
-    postMessage('foo', '*');
-    setTimeout(function(){
-      expect(spy).not.toHaveBeenCalled();
-      done();
-    });
-  })
 })
 
 describe("configure method", function(){
@@ -118,7 +93,7 @@ describe("init options validation", function(){
 
   describe("should throw error if", function(){
     afterEach(function(){
-      var errors = discreet.validateOptions(init_options);
+      var errors = _base.validateOptions(init_options);
       expect(errors.length).toBe(1);
       expect(errors[0].field).toBe(field);
     });
@@ -154,7 +129,7 @@ describe("init options validation", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      var errors = discreet.validateOptions(init_options, false);
+      var errors = _base.validateOptions(init_options, false);
       expect(errors.length).toBe(0);
     });
 
