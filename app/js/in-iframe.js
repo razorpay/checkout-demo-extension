@@ -15,19 +15,17 @@
   var should_shake = !/Android|iPhone/.test(ua);
 
   var logo_image_prefix = 'data:image/gif;base64,';
-  var freq_banks = ['HDFC', 'ICIC', 'UTIB'];
+  var freq_banks = ['HDFC', 'ICIC', 'UTIB', 'HDFC', 'ICIC', 'UTIB'];
   var wallet_logos = {
     paytm: {
-      h: '12',
+      h: '16',
+      offer: '5% Cashback!',
       col: logo_image_prefix + 'R0lGODlhUAAYANUgAD/L9UJik+/y9oGWtzJVihM6dw++8+/7/mJ8pV/U9+Dl7dDY5M/y/S/H9JGjwCNHgZ/l+r/u/B/C9K/p+9/2/bC90lJvnKGwyW/Y+HGJrsLu/I/h+cDL23/c+AC68gQub////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACAALAAAAABQABgAAAb/QJBwSCwaj8gkEiJhKJ/QqHQKgng8Hap2yy1ar9nuUMEpm8uLI/nMSRMFg7hb6JAXGZPE9ZqIHEAUERFOIBEdHRFDBxAdEH9CBR+Sk5MPHEWRlJIPFUMWkwUKQgigokITe6lXDRoGewkSqRITGK57YZq5BXMguZSdIAGUl73DQx2qqnrJzKpZvpoIRNCSBELCk8SaxCDIzR7L398U1JVEBOUCIA/GxdnH4uHizBvlk29xcZnv20L9QgcaNEvgbZ4Bgak6aKKzEMmAfv/+ESmIRQhFDxRAxNpjwAmAhA05NBTCAUGAk7kuoXvnThI3eLcspgIgcw/NbiApkRxJqtwl7WySgEmECabmlZsUkea8B6In0wv2PvykVCDASpYTExr1oNTmVoVRhVylNtXey69bux79GtVaS7IgHEQ9izNm3bV3ubK1l8EfJQsCFPQTMNYXXYphkqbdS42Aurfa2gkAatgI4sV51WKhVgDBY8h+sYJYUCHOp3ZZ7SrOzFiSEk0ORktcU0YuaqIVWetGPPJIrgD7XApREDylZa27Z7b+oISd2Z3pjqtWnvxWbyMPn4MQSU2a9KLV8fLWmYSwvcfcfTk+cjm83rwdrhaAcuGk/fsXhpjXFMDB5zu2NPBIQHtgIAQDthgwgRAUBHhAEAA7'
     },
     mobikwik: {
-      h: '15.5',
-      offer: '5% Cashback!',
       col: logo_image_prefix + 'R0lGODlhbAAfAKIHAJvl5ODt7UPS0L/w73/h4P///wDDwf///yH5BAEAAAcALAAAAABsAB8AAAP/eBfczgPIR4O6OOvNu/9gqBBFaWnDQAiCMYhwLM/cUJpHurZG77u0oHCYAdwKgJ9y2TsRn9CMjnUsEJjMQI8Q7QanPB/peFWulocW18sWlbFV609wC/cO27bek8QajFVvLjcDc3gGa3uKGIJLcXI9dISGPQCLlyN+gIE+NpM+AoWDKkaYbY0/j5CSn1uikXmmXqiVR5tlnq2IfQahSQKys0ysVmNyxCWvLm8ABIXAwVG0uQWIN1cBccoqPwAtlhm4HGVczQROB8XOMOSi0OFLxFfGK4/KAXaRG+L7eTwvF8IUYOdKnwZUubRYK3HO3o80cwAe7CGxCAtL/y68qQjC/5sAAO76zTnCwxg1kw8jVcwGDwiIjAd4cYwRcuKPbCbE2GP1ClgsfD9IZFr2A+CAixCBvLK0Q2KLdwo/skhhMKkAQcTCGDvSq5VPpcMGlsn3J4c/igp7KegDrRrFtVtw1XwTQBDOAsq2lvjlVZQNUM1AHRAkIZUoLv94vHNrAG6sf3L1yRwMimTQOJFaOWsy9sIrbm/T+QB5Vgk4BTwshIHmg7ILd0uHGjiibOENtpr7JK1IrvMFtoeTKnFSxtLwkJF7jda4xfJlrpmTdSpzqDEGd/wUwC6t5N12RJWKu6aqRGIZ2ku28uI5XW1rDGyzm+0VPAz5sgrE9HDLYv/42rL+UbYVEwNWtlcnT+2GQUniMUdfaeBshJohdkCTnHKxXGELHAx1F8FDari2WHv7lVAdaYgoOKFa81XSYor/+YCXDxYQUOAw3vgxRx5phXJUa2/4GEYA9YXWIheMGWBBkgAlB41igxnDi45UFuXYEi/Q4mKRLsn2QhgBvRcji2kFFgFZVer4zou9nIDLlOBwyRGUfSRSp4PkvfOGlmlisWYGRA6ADqApRANCAWj2mYWhmCQAADs='
     },
     payzapp: {
-      h: '14',
       col: 'images/payzapp.png'
     }
   }
@@ -234,18 +232,11 @@
 
       $('bank-select').on('change', frameDiscreet.bank_change);
 
-      $('netb-banks').on('click', function(e){
-        var target = e.target;
-        if(!target.className)
-          target = target.parentNode;
-        if(target.className.indexOf('netb-inner') != -1){
-          var value = target.getAttribute('data-value');
-          var select = $('bank-select')[0];
-          select.value = value;
-          frameDiscreet.smarty.input({target: select});
-          frameDiscreet.bank_change(value);
-        }
-      });
+      $('netb-banks').on('change', function(e){
+        var select = $('bank-select')[0];
+        select.value = e.target.value;
+        frameDiscreet.smarty.input({target: select});
+      }, true);
 
       if(frameDiscreet.qpmap){
         var lis = $(tabs)[0].getElementsByTagName('li');
@@ -262,13 +253,16 @@
       frameDiscreet.setCardFormatting();
     },
 
-    bank_change: function(val){
-      if(typeof val !== 'string')
-        val = this.value;
-      var inners = $('netb-banks').find('netb-inner');
-      for(var i = 0; i < inners.length; i++){
-        var inner = $(inners[i]);
-        inner[inner.attr('data-value') === val ? 'addClass' : 'removeClass']('active')
+    bank_change: function(){
+      var val = this.value;
+      var radios = $('netb-banks')[0].getElementsByTagName('input');
+      for(var i = 0; i < radios.length; i++){
+        var radio = radios[i];
+        if(radio.value === val){
+          radio.checked = true;
+        } else if(!radio.checked){
+          radio.checked = false;
+        }
       }
     },
 

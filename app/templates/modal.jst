@@ -101,7 +101,7 @@
                 {{?}}
                 <div id="netb-banks" class="double">
                   {{~it.netbanks :b:i}}
-                    <input type="radio" name="bank" id="netb-{{=b}}">
+                    <input type="radio" name="bank" id="netb-{{=b}}" value="{{=b}}">
                     <label for="netb-{{=b}}" class="elem">
                       <div class="check"><div class="check-inner"></div></div>
                       <img src="images/{{=b}}.png">
@@ -127,7 +127,7 @@
                   <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                   <label class="elem" for="wallet-radio-{{=i}}">
                     <div class="check"><div class="check-inner"></div></div>
-                    Pay using <img class="wallet-button colored" src="{{=w.col}}"/>
+                    Pay using <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
                     {{?w.offer}}
                       <div class="ribbon">{{=w.offer}}</div>
                     {{?}}

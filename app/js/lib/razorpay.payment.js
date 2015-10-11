@@ -131,6 +131,9 @@
     }
 
     if(pos == 1){
+      if(parseInt(prefix + character) > 12){
+        return e && e.preventDefault();
+      }
       character += ' / ';
     }
     else if(pos == 2){
