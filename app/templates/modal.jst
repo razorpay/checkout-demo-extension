@@ -75,7 +75,7 @@
                 </p>
                 <p class="elem" id="elem-card">
                   <i class="i">&#xe605;</i>
-                  <span class="help-text">Please enter valid card number</span>
+                  <span class="help-text">Please enter a valid card number</span>
                   <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=it.prefill.card.number}}">
                   <label class="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check"> My card doesn't have expiry or CVV</label>
                 </p>
@@ -127,7 +127,10 @@
                   <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                   <label class="elem" for="wallet-radio-{{=i}}">
                     <div class="check"><div class="check-inner"></div></div>
-                    Pay using <img class="wallet-button colored" height="{{=(1.5*w.h)}}" src="{{=w.col}}"/>
+                    Pay using <img class="wallet-button colored" src="{{=w.col}}"/>
+                    {{?w.offer}}
+                      <div class="ribbon">{{=w.offer}}</div>
+                    {{?}}
                   </label>
                 {{~}}
               </div>
