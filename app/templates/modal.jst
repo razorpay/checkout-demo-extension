@@ -5,17 +5,15 @@
     <div id="modal-inner" class="modal-inner">
       <div class="modal-content">
         <div class="header">
+          <div id="modal-close">×</div>
           <div class="merchant">
-            <div id="modal-close">×</div>
-            <div class="merchant-image">
-              {{if(it.image){}}
-                <img src="{{=it.image}}">
-              {{}}}
-            </div>
-            <div class="merchant-name">
+            {{?it.image}}
+              <img class="merchant-image" src="{{=it.image}}">
+            {{?}}
+            {{?it.name}}
               <div class="merchant-title">{{=it.name}}</div>
-              <div class="merchant-desc">{{=it.description}}</div>
-            </div>
+            {{?}}
+            <div class="merchant-desc">{{=it.description}}</div>
           </div>
         </div>
         <div class="body">
