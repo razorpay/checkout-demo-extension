@@ -50,7 +50,9 @@
       },
       modal: {
         ondismiss: function(){console.log(1)},
-        onhidden: function(){console.log(2)}
+        onhidden: function(){console.log(2)},
+        backdropClose: false,
+        escape: false
       }
     }
     var rzp1 = new Razorpay(options);

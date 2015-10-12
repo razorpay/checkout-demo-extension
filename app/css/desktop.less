@@ -5,17 +5,18 @@
 
 @primary: #29b3d2;
 @primary: #26C6DA;
-@primary: #FF9800;
+
+@primary: #7323DC;
 @primary: #f37254;
 
 @color: #7f7f7f;
 @border-color: #dadada;
-@background-color: #fafbfc;
+@background-color: #fbf9f8;
 @danger: #f46060;
 @border-radius: 4px;
 
 @width: 317px;
-@padding: 14px;
+@padding: 15px;
 
 @font-size: 14px;
 // input elements horizontal padding
@@ -142,10 +143,6 @@ select{
 input[disabled]{
   background: #f4f4f4;
 }
-input[type=checkbox]{
-  width: auto;
-  vertical-align: middle;
-}
 .modal{
   perspective: 300;
   outline: none;
@@ -172,7 +169,7 @@ input[type=checkbox]{
   *top: 10%;
 }
 .modal-content{
-  min-height: 501px;
+  min-height: 486px;
 }
 .modal-inner{
   position: relative;
@@ -216,6 +213,15 @@ input[type=checkbox]{
     color: #333;
     .placeholder{
       display: none;
+    }
+  }
+  &+.elem{
+    &:before{
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      border-top: 1px solid #eee;
+      content: '';
     }
   }
 }
@@ -284,7 +290,7 @@ input[type=checkbox]{
   border: 1px solid @border-color;
   padding-top: 1px;
   border-radius: 4px;
-  margin: 16px 0;
+  margin: 0 0 16px;
 }
 .merchant{
   // display: inline-block;
@@ -395,6 +401,20 @@ input[type=checkbox]{
     background-image: url('../images/icons/amex.png');
   }
 }
+#cardsave{
+  width: 15px;
+  -webkit-appearance: checkbox;
+  vertical-align: middle;
+  margin: 0 15px 0 17px;
+}
+.elem-cvv{
+  label{
+    color: #555;
+    position: absolute;
+    right: @input-padding;
+    top: 0;
+  }
+}
 #submitbtn{
   font-size: 18px;
   text-transform: uppercase;
@@ -436,7 +456,7 @@ input[type=checkbox]{
 #error-container{
   position: relative;
   overflow: hidden;
-  display: none;
+  display: none!important;
   margin: 0 -@padding;
   transition: 0.3s;
   &.has-error{
@@ -447,6 +467,9 @@ input[type=checkbox]{
 }
 .tab-content{
   display: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
 }
 .tab-content.active{
   display: block;
@@ -459,6 +482,7 @@ input[type=checkbox]{
   letter-spacing: -4px;
   white-space: nowrap;
   display: none;
+  margin-left: 1px;
   margin-right: 2px;
   *margin-bottom: -@padding; // ie7
 
@@ -508,11 +532,11 @@ input[type=checkbox]{
 
     &:first-child{
       border-top-left-radius: @border-radius;
-      border-bottom-left-radius: @border-radius;
+      // border-bottom-left-radius: @border-radius;
     }
     &:last-child{
       border-top-right-radius: @border-radius;
-      border-bottom-right-radius: @border-radius;
+      // border-bottom-right-radius: @border-radius;
     }
   }
 }
@@ -667,7 +691,7 @@ label{
     right: 1px;
     color: #fff;
     text-shadow: 0 1px 1px rgba(0,0,0,0.2);
-    font-family: ubuntu;
+    font-family: @font-default;
     position: relative;
     top: -6px;
   }

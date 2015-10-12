@@ -20,28 +20,6 @@
         </div>
         <div class="body">
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
-            {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet.length && tabCount++; }}
-            <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
-              {{? it.method.card }}
-                <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
-              {{?}}
-              {{? it.method.netbanking }}
-                <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
-              {{?}}
-              {{? it.method.wallet.length }}
-                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
-                  {{ if(it.method.wallet.length == 1){ }}
-                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].mono}}"/>
-                    <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
-                  {{} else {}}
-                    Wallets
-                    <div class="offer">
-                      <i>★</i>
-                    </div>
-                  {{}}}
-                </li>
-              {{?}}
-            </ul>
             <div id="form-common">
               <div id="error-container"><div id="error-message"></div></div>
               <input type="hidden" name="amount" value="{{=it.amount}}">
@@ -65,6 +43,28 @@
                 </p>
               </div>
             </div>
+            {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet.length && tabCount++; }}
+            <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
+              {{? it.method.card }}
+                <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
+              {{?}}
+              {{? it.method.netbanking }}
+                <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
+              {{?}}
+              {{? it.method.wallet.length }}
+                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
+                  {{ if(it.method.wallet.length == 1){ }}
+                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].mono}}"/>
+                    <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
+                  {{} else {}}
+                    Wallets
+                    <div class="offer">
+                      <i>★</i>
+                    </div>
+                  {{}}}
+                </li>
+              {{?}}
+            </ul>
             {{? it.method.card }}
               <div class="fieldset tab-content active" id="tab-card">
                 <input type="hidden" name="method" value="card">
@@ -89,6 +89,9 @@
                   <span class="help-text">Please enter valid cvv number<br>It is a 3 or 4 digit number at back of your card</span>
                   <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </p>
+                <label class="elem" for="cardsave" style="display: none">
+                  <input type="checkbox" id="cardsave"> Remember Me
+                </label>
               </div>
             {{?}}
             {{? it.method.netbanking }}
@@ -112,7 +115,7 @@
                   <span class="help-text">Please select a bank from the list</span>
                   <i class="i">&#xe601;</i>
                   <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
-                    <option selected="selected" value="">Other Bank</option>
+                    <option selected="selected" value="">Other Banks</option>
                     {{for(var i in it.method.netbanking){}}
                       <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
                     {{}}}
@@ -127,7 +130,7 @@
                   <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                   <label class="elem" for="wallet-radio-{{=i}}">
                     <div class="check"><div class="check-inner"></div></div>
-                    Pay using <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
+                    <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
                     {{?w.offer}}
                       <div class="ribbon">{{=w.offer}}</div>
                     {{?}}
