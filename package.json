@@ -28,10 +28,7 @@
   "bugs": {
     "url": "https://bitbucket.org/razorpay/checkout-js/issues"
   },
-  "devDependencies": {
-    "gulp-uglify": "^1.4.1",
-    "gulp-usemin": "^0.3.14"
-  },
+  "devDependencies": {},
   "private": "true",
   "dependencies": {
     "dot": "^1.0.3",
@@ -41,7 +38,13 @@
     "gulp-concat": "^2.6.0",
     "gulp-less": "^3.0.3",
     "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.4.1",
+    "gulp-usemin": "^0.3.14",
     "istanbul": "^0.3.22",
-    "karma": "^0.13.10"
+    "karma": "^0.13.10",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "phantomjs": "^1.9.18",
+    "karma-coverage": "^0.5.2"
   }
 }

@@ -49,13 +49,13 @@ gulp.task('dirStructure', function(){
 
 gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
 
-gulp.task('usemin', function(){
+gulp.task('usemin', ['buildDev'], function(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(gulp.dest('app/dist/v1'));
 })
 
-gulp.task('sourceMaps', function(){
+gulp.task('sourceMaps', ['buildDev', 'usemin'], function(){
   return gulp.src('app/dist/v1/checkout-frame.js')
     .pipe(sourcemaps.init())
     .pipe(sourcemaps.write('./'))
@@ -93,7 +93,7 @@ function getJSPaths(html, pattern){
   }
 }
 
-gulp.task('test', ['buildDev'], function(){
+gulp.task('test', ['buildDev'], function(done){
   // leak discreet variables
   child_process.execSync('sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find app/js -type f)');
 
@@ -127,16 +127,18 @@ gulp.task('test', ['buildDev'], function(){
     o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
     return o;
   });
-  testFromStack(0, allOptions);
+  testFromStack(0, allOptions, done);
 })
 
-function testFromStack(counter, allOptions){
+function testFromStack(counter, allOptions, done){
   new karma.Server(allOptions[counter], function(exitCode) {
     if(allOptions[++counter]){
-      testFromStack(counter, allOptions);
+      testFromStack(counter, allOptions, done);
     } else {
       child_process.execSync('sed -i -- s@/*ENV_TEST*/@//ENV_TEST@g $(find app/js -type f)');
       createCoverageReport();
+      done();
+      process.exit(exitCode);
     }
   }).start();
 }
