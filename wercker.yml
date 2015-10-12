@@ -37,9 +37,9 @@ deploy:
 
         # This command needs a grunt step above it to install grunt
         # It does differential uploads :rocket:
-        - script:
-            name: Run font upload
-            code: grunt fontUpload --target=$WERCKER_DEPLOYTARGET_NAME
+        # - script:
+        #     name: Run font upload
+        #     code: grunt fontUpload --target=$WERCKER_DEPLOYTARGET_NAME
 
         - nhuray/aws-code-deploy:
             key: $AWS_KEY

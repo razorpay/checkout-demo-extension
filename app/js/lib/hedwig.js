@@ -17,6 +17,9 @@
   
   discreet.hedwig = {
     setupCC: function(ccHubLocation){
+      if(strategy != 'xd'){
+        return;
+      }
       var frame = discreet.hedwig.ccFrame;
       if(frame && frame.parentNode)
         frame.parentNode.removeChild(frame);
