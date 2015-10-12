@@ -135,7 +135,7 @@ function testFromStack(counter, allOptions, done){
     if(allOptions[++counter]){
       testFromStack(counter, allOptions, done);
     } else {
-      child_process.execSync('sed -i -- s@/*ENV_TEST*/@//ENV_TEST@g $(find app/js -type f)');
+      child_process.execSync('sed -i -- s@/\\\\*ENV_TEST\\\\*/@//ENV_TEST@g $(find app/js -type f)');
       createCoverageReport();
       done();
       process.exit(exitCode);
