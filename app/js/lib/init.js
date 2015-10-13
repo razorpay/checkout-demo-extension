@@ -53,6 +53,9 @@
       'animation': true,
       'backdropClose': true
     },
+    'theme': {
+      'brandColor': '#f37254'
+    },
     'signature': '',
     'display_amount': '',
     'name': '', // of merchant

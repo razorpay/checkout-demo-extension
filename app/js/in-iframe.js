@@ -204,6 +204,13 @@
       frameDiscreet.sanitizeOptions(opts);
       var div = document.createElement('div');
       opts.netbanks = freq_banks;
+
+      div.style.color = opts.theme.brandColor;
+      if(div.style.color){
+        div.innerHTML = Razorpay.templates.theme(opts.theme.brandColor);
+        document.body.appendChild(div.firstChild);
+      }
+
       div.innerHTML = Razorpay.templates.modal(opts);
       document.body.appendChild(div.firstChild);
       frameDiscreet.$el = $('container');

@@ -53,7 +53,7 @@
 
       for (var i in defaults){
         if(defaults[i] !== null && typeof defaults[i] == 'object'){
-          if(i == 'notes'){
+          if(i === 'notes'){
             options.notes = {};
             if(typeof overrides.notes == 'object'){
               for (var j in overrides.notes){
@@ -62,12 +62,12 @@
                 }
               }
             }
-          } else if (i == 'prefill') {
+          } else if (i === 'prefill') {
             options.prefill = JSON.parse(JSON.stringify(defaults['prefill']));
             var op = overrides.prefill;
-            if(typeof op == 'object'){
+            if(typeof op === 'object'){
               for(var j in defaults.prefill){
-                if(typeof op[j] == 'object'){
+                if(typeof op[j] === 'object'){
                   for(var k in op[j]){
                     if(k in defaults.prefill[j])
                       options.prefill[j][k] = '' + op[j][k];
@@ -77,9 +77,9 @@
                 }
               }
             }
-          } else if (i == 'method') {
+          } else if (i === 'method') {
             options.method = JSON.parse(JSON.stringify(defaults.method));
-            if(typeof overrides.method == 'object'){
+            if(typeof overrides.method === 'object'){
               for(var j in overrides.method){
                 if(typeof overrides.method[j] == 'boolean')
                   options.method[j] = overrides.method[j];
@@ -94,6 +94,7 @@
           }
         }
         else _base.setOption(i, options, overrides, defaults);
+        // checking theme option upon time of setting
       }
       _base.validateOptions(options, true);
       return options;
