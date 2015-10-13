@@ -26,7 +26,6 @@ gulp.task('watch', ['buildDev'], function() {
 
 // compiles .jst to .js, which is template contained in a function
 gulp.task('compileTemplates', function(){
-  console.log(glob.sync('app/*'));
   return dot.process({
     path: assetPath('templates'),
     destination: assetPath('_templates'),
@@ -120,7 +119,6 @@ var karmaOptions = {
 gulp.task('test', ['buildDev'], function(done){
   // leak discreet variables
   execSync('cd app && cp -r js _test && sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find _test/js -type f)');
-
 
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
