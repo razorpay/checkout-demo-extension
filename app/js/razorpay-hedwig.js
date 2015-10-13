@@ -129,22 +129,19 @@
     discreet.hedwig.setupCC(options.protocol + '://' + options.hostname + '/crossCookies.php');
     $.addMessageListener(discreet.XDCallback, request);
 
-    var popup = request.popup = new Popup('about:blank');
-    setTimeout(function(){
-      popup.window.document.open();
+    try{
+      var popup = request.popup = new Popup('');
       popup.window.document.write(Razorpay.templates.popup({
         data: request.data,
         image: request.options.image,
         url: url
       }));
       popup.window.document.close();
-    });
 
-    if (typeof request.error == 'function'){
-      popup.onClose(getPopupClose(request));
-    }
+      if (typeof request.error == 'function'){
+        popup.onClose(getPopupClose(request));
+      }
 
-    try{
       var info;
       if(typeof popup.window == 'undefined'){
         info = "Popup window inaccessible";
