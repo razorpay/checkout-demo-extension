@@ -130,12 +130,15 @@
     $.addMessageListener(discreet.XDCallback, request);
 
     var popup = request.popup = new Popup('about:blank');
-    popup.window.document.write(Razorpay.templates.popup({
-      data: request.data,
-      image: request.options.image,
-      url: url
-    }));
-    popup.window.document.close();
+    setTimeout(function(){
+      popup.window.document.open();
+      popup.window.document.write(Razorpay.templates.popup({
+        data: request.data,
+        image: request.options.image,
+        url: url
+      }));
+      popup.window.document.close();
+    });
 
     if (typeof request.error == 'function'){
       popup.onClose(getPopupClose(request));
