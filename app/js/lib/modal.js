@@ -5,12 +5,6 @@
   var timeout = null;
 
   var defaults = {
-    shownClass: 'shown',
-    modalClass: 'modal',
-    backdropClass: 'backdrop',
-    closeId: 'modal-close',
-    containerId: 'container',
-    show: true,
     escape: true,
     animation: true,
     backdropClose: true,
@@ -27,16 +21,14 @@
 
   window.Modal = function(element, options) {
     this.options = $.defaults(options, defaults);
-    this.container = $(this.options.containerId);
+    this.container = $('container');
     this.modalElement = element;
 
-    var duration, durationStyle;
-    
     if(!this.options.animation || !this.transitionProperty){
-      duration = 0;
+      var duration = 0;
     } else {
       if(typeof window.getComputedStyle == 'function'){
-        durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
+        var durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
     }
@@ -50,9 +42,8 @@
       $(this.modalElement).addClass('animate')
     }
 
-    if (this.options.show) {
-      this.show();
-    }
+    this.show();
+    this.bind_events();
   };
 
   Modal.prototype = {
@@ -75,10 +66,8 @@
     show: function() {
       if(this.isShown) return;
       this.isShown = true;
-
-      this.bind_events();
       this.modalElement.offsetWidth;
-      this.container.addClass(this.options.shownClass);
+      this.container.addClass('shown');
       clearTimeout();
       timeout = setTimeout(this.shown, this.animationDuration);
       this.container[0].focus();
@@ -95,9 +84,8 @@
       if(this.animationDuration){
         $(this.modalElement).addClass('animate');
       }
-      this.container.removeClass(this.options.shownClass);
+      this.container.removeClass('shown');
       
-      this.off();
       clearTimeout();
       var self = this;
 
@@ -126,16 +114,6 @@
       $(target).on(event, function(e){
         callback.call(self, e);
       });
-    },
-
-    off: function(){
-      // for(var i = 0; i < this.listeners.length; i++){
-      //   var l = this.listeners[i];
-      //   l[0].off(l[1], l[2]);
-      // }
-      // if (window.removeEventListener){
-      //   this.element[0].removeEventListener('blur', this.steal_focus, true);
-      // }
     },
 
     steal_focus: function(e) {
@@ -170,7 +148,7 @@
         })
       }
 
-      var closeBtn = $(this.options.closeId);
+      var closeBtn = $('modal-close');
       if (this.options.backdropClose) {
         this.on('click', closeBtn[0], this.backdropHide);
         this.on('click', this.container.children('backdrop')[0], this.backdropHide)

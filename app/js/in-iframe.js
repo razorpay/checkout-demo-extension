@@ -84,7 +84,6 @@
                 if(logos){
                   wallets.push({
                     'name': i,
-                    'mono': logos.mono,
                     'col': logos.col,
                     'h': logos.h,
                     'offer': logos.offer
@@ -580,7 +579,6 @@
   }
 
   $(window).on('message', frameDiscreet.parseMessage);
-
 
 
   // initial error (helps in case of redirection flow)

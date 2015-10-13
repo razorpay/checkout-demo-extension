@@ -54,7 +54,6 @@
               {{? it.method.wallet.length }}
                 <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
                   {{ if(it.method.wallet.length == 1){ }}
-                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].mono}}"/>
                     <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
                   {{} else {}}
                     Wallets
