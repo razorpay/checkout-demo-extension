@@ -418,5 +418,5 @@
 
   // Get the ball rolling in case we are in manual mode
   _chop.automaticCheckoutInit();
-  /*ENV_TEST*/ window._chop = _chop;
+  //ENV_TEST window._chop = _chop;
 })()

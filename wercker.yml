@@ -1,4 +1,4 @@
-box: wercker/nodejs
+box: node
 build:
     steps:
         - npm-install
@@ -19,17 +19,21 @@ deploy:
         - npm-install
         - script:
             name: Install gulp globally
-            code: sudo npm install -g gulp
+            code: npm install -g gulp
+        - script:
+            name: Install sudo,pip
+            code: apt-get update && apt-get -q -y install python-pip sudo
         - script:
             name: Insert git commit id into rollbar version
             code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/js/rollbar.js
 
-        - grunt:
-            tasks: build
+        - script:
+            name: build
+            code: gulp
 
         - script:
             name: 'Upload source maps'
-            code: 'FILE=checkout-frame.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX$FILE -F source_map=@app/_build/$FILE.map; echo $PREFIX$FILE'
+            code: 'FILE=checkout-frame.js; PREFIX=https://; if [ "$WERCKER_DEPLOYTARGET_NAME" == "Beta" ]; then PREFIX+=beta; fi; PREFIX+=checkout.razorpay.com/v1/; curl "https://api.rollbar.com/api/1/sourcemap" -F access_token=$ROLLBAR_TOKEN -F version=$WERCKER_GIT_COMMIT -F minified_url=$PREFIX$FILE -F source_map=@app/dist/v1/$FILE.map; echo $PREFIX$FILE'
 
         - script:
             name: 'Remove map files'
@@ -37,9 +41,9 @@ deploy:
 
         # This command needs a grunt step above it to install grunt
         # It does differential uploads :rocket:
-        - script:
-            name: Run font upload
-            code: grunt fontUpload --target=$WERCKER_DEPLOYTARGET_NAME
+        # - script:
+        #     name: Run font upload
+        #     code: grunt fontUpload --target=$WERCKER_DEPLOYTARGET_NAME
 
         - nhuray/aws-code-deploy:
             key: $AWS_KEY
@@ -55,4 +59,4 @@ deploy:
             channel: tech_bots
         - script:
             name: Bozo Regression Analysis
-            code: curl "http://rzp.cloudapp.net:8000/screenshot/$BOZO_TOKEN" -d "commit=$WERCKER_GIT_COMMIT&branch=$WERCKER_GIT_BRANCH&target=$WERCKER_DEPLOYTARGET_NAME"
+            code: if [ "$WERCKER_RESULT" != "failed" ]; then curl "http://rzp.cloudapp.net:8000/screenshot/$BOZO_TOKEN" -d "commit=$WERCKER_GIT_COMMIT&branch=$WERCKER_GIT_BRANCH&target=$WERCKER_DEPLOYTARGET_NAME"; fi;

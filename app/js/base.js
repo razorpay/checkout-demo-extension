@@ -198,5 +198,5 @@
       discreet.error.call(this, errorData);
     }
   }
-  /*ENV_TEST*/ window._base = _base;
+  //ENV_TEST window._base = _base;
 })();
