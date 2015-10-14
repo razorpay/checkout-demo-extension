@@ -1,3 +1,4 @@
+try{
 var _rollbarConfig = {
     accessToken: "3cddb790e27342ad86f431498a1f8342",
     captureUncaught: true,
@@ -38,3 +39,4 @@ Razorpay.roll = function(message, data, level){
 
   Rollbar[level](message);
 };
+} catch(e){}
