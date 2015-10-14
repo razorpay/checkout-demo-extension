@@ -547,20 +547,19 @@ describe("Razorpay open netbanking page and submit method", function(){
     jQuery.noop
   ].forEach(function(operation){
 
-
     it("should show netbanking form on clicking", function(){
       launch(operation);
-      var netb_bank = jQuery('.netb-inner');
-      sendclick(netb_bank[0]);
-      expect(jQuery('select').val()).toBe(netb_bank.attr('data-value'));
+      var active = jQuery('li.active');
+      expect(active.length).toBe(1);
+      expect(active.attr('data-target')).toBe('tab-netbanking');
       spyCalled();
     });
 
     it("should select bank", function(){
       launch(operation);
-      var active = jQuery('li.active');
-      expect(active.length).toBe(1);
-      expect(active.attr('data-target')).toBe('tab-netbanking');
+      var netb_bank = jQuery('#netb-banks label');
+      sendclick(netb_bank[0]);
+      expect(jQuery('select').val()).toBe(netb_bank.prev()[0].value);
       spyCalled();
     });
 

@@ -7,6 +7,29 @@
   var Popup = Razorpay.Popup;
   var discreet = Razorpay.discreet;
   var roll = Razorpay.roll || $.noop;
+  var ua = navigator.userAgent;
+
+  if(ua.indexOf('MSIE ') > 0 || /Trident.*rv\:11\./.test(ua)){
+    var frame = _hedwig.frame = document.createElement('iframe');
+    frame.height = frame.width = 0;
+    frame.style.display = 'none';
+    frame.src = Razorpay.defaults.protocol + '://' + Razorpay.defaults.hostname + '/crossCookies.php';
+    document.body.appendChild(frame);
+  }
+
+  var _hedwig = {
+    frame: null,
+    sendMessage: function(data, url, target){
+      if(_hedwig.frame){
+        if(typeof data != 'string'){
+          data = JSON.stringify(data);
+        }
+        _hedwig.frame.contentWindow.postMessage(data, url);
+      } else {
+        target.postMessage(data, url);
+      }
+    }
+  }
 
   var popupClose = function(){
     try{
@@ -119,14 +142,13 @@
         name: options.name
       }
     }
-    discreet.hedwig.sendMessage(message, '*', request.popup.window);
+    _hedwig.sendMessage(message, '*', request.popup.window);
   }
 
   discreet.setupPopup = function(request, url){
     var options = request.options;
     var data = request.data;
 
-    discreet.hedwig.setupCC(options.protocol + '://' + options.hostname + '/crossCookies.php');
     $.addMessageListener(discreet.XDCallback, request);
 
     var popup = request.popup = new Popup('about:blank');
@@ -166,7 +188,7 @@
         }
       });
     }
-    discreet.hedwig.sendMessage(nextRequest, '*', popup.window);
+    _hedwig.sendMessage(nextRequest, '*', popup.window);
   }
 
   var getPopupClose = function(request){
