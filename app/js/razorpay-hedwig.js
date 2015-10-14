@@ -12,8 +12,10 @@
     try{
       if(this.popup && typeof this.popup.close == 'function' && this.popup.window){
         this.popup.close();
-        if(!this.popup.window.closed)
+        if(!this.popup.window.closed){
+          this.popup.window.postMessage('pingback', '*');
           roll('Popup window not closed');
+        }
       }
     } catch(e){
       roll('Error closing popup: ' + e.message);

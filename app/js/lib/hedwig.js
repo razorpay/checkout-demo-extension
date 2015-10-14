@@ -14,22 +14,22 @@
   var ua = navigator.userAgent;
   var strategy = ua.indexOf('MSIE ') > 0 || /Trident.*rv\:11\./.test(ua) ? 'cc' : 'xd';
   var defaultCCHub = 'https://api.razorpay.com/crossCookies.php';
+  var ccFrame;
   
   discreet.hedwig = {
     setupCC: function(ccHubLocation){
-      if(strategy != 'xd'){
+      if(strategy == 'xd'){
         return;
       }
-      var frame = discreet.hedwig.ccFrame;
-      if(frame && frame.parentNode)
-        frame.parentNode.removeChild(frame);
+      if(ccFrame && ccFrame.parentNode)
+        ccFrame.parentNode.removeChild(ccFrame);
       
-      frame = discreet.hedwig.ccFrame = document.createElement('iframe');
-      frame.width = 0;
-      frame.height = 0;
-      frame.style.display = 'none';
-      frame.src = ccHubLocation || defaultCCHub;
-      document.body.appendChild(frame);
+      ccFrame = discreet.hedwig.ccFrame = document.createElement('iframe');
+      ccFrame.width = 0;
+      ccFrame.height = 0;
+      ccFrame.style.display = 'none';
+      ccFrame.src = ccHubLocation || defaultCCHub;
+      document.body.appendChild(ccFrame);
     },
     
     sendMessage: function(data, url, target){
@@ -39,7 +39,7 @@
         if(typeof data != 'string'){
           data = JSON.stringify(data);
         }
-        discreet.hedwig.ccFrame.contentWindow.postMessage(data, url);        
+        ccFrame.contentWindow.postMessage(data, url);
       }
     }
   }
