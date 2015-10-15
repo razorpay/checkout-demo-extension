@@ -102,13 +102,13 @@
                   </div>
                 {{?}}
                 <div id="netb-banks" class="double">
-                  {{~it.netbanks :b:i}}
-                    <input type="radio" name="bank" id="netb-{{=b}}" value="{{=b}}">
-                    <label for="netb-{{=b}}" class="elem">
-                      <div class="check"><div class="check-inner"></div></div>
-                      <img src="images/{{=b}}.png">
+                  {{for(var b in it.netbanks){}}
+                    <label class="elem">
+                      <input type="radio" name="bank" value="{{=b}}">
+                      <span class="check"></span>
+                      <img src="data:image/png;base64,{{=it.netbanks[b]}}">
                     </label>
-                  {{~}}
+                  {{}}}
                 </div>
                 <p id="nb-elem" class="elem select">
                   <span class="help-text">Please select a bank from the list</span>
@@ -126,8 +126,8 @@
               <div class="fieldset wallets-{{=it.method.wallet.length}} tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
                 <input type="hidden" name="method" value="wallet">
                 {{~it.method.wallet :w:i}}
-                  <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
-                  <label class="elem" for="wallet-radio-{{=i}}">
+                  <label class="elem">
+                    <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                     <div class="check"><div class="check-inner"></div></div>
                     <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
                     {{?w.offer}}

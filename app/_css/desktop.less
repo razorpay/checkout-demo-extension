@@ -1,6 +1,6 @@
 @import "common";
 
-@font-default: arial, helvetica, sans-serif;
+@font-default: ubuntu, helvetica, sans-serif;
 @font-family: 'lato', @font-default;
 
 @primary: rgb(128, 88, 165);
@@ -11,7 +11,7 @@
 @danger: #f46060;
 @border-radius: 4px;
 
-@width: 317px;
+@width: 323px;
 @padding: 15px;
 
 @font-size: 14px;
@@ -127,12 +127,12 @@ input:not([type=radio]), select{
 }
 input, .placeholder{
   height: @input-height;
-  line-height: @input-height;
+  line-height: @input-height - 20px;
   padding: 10px 0 10px 3*@input-padding;
   box-sizing: border-box;
 }
 select{
-  padding: 8px 0 8px 3*@input-padding;
+  padding: 8px 0 8px 38px;
   height: @input-height;
   line-height: @input-height/2;
 }
@@ -165,7 +165,7 @@ input[disabled]{
   *top: 10%;
 }
 .modal-content{
-  min-height: 486px;
+  min-height: 487px;
 }
 .modal-inner{
   position: relative;
@@ -206,7 +206,9 @@ input[disabled]{
       display: none;
     }
   }
-  &+.elem{
+}
+#tab-card, #form-common{
+  .elem+.elem{
     &:before{
       position: absolute;
       left: 14px;
@@ -223,7 +225,7 @@ input[disabled]{
     font-size: @font-size;
     letter-spacing: 0;
     display: inline-block;
-    width: (@width - 3px)/2 - @padding;
+    width: 50%;
     *float: left;
   }
 }
@@ -473,8 +475,9 @@ input[disabled]{
   letter-spacing: -4px;
   white-space: nowrap;
   display: none;
-  margin-left: 1px;
-  margin-right: 2px;
+  border-radius: @border-radius @border-radius 0 0;
+  background: #fff;
+  border: 1px solid @border-color;
   *margin-bottom: -@padding; // ie7
 
   &.tabs-2{
@@ -495,14 +498,12 @@ input[disabled]{
     list-style: none;
     height: 48px;
     line-height: 46px;
-    margin: 0 0 0 -1px;
+    margin: 0;
     text-align: center;
-    border: 1px solid @border-color;
     width: 50%;
     font-size: @font-size;
     letter-spacing: 0;
     cursor: pointer;
-    background: #fff;
     display: inline-block;
     vertical-align: top;
     position: relative;
@@ -521,13 +522,9 @@ input[disabled]{
       z-index: 1;
     }
 
-    &:first-child{
-      border-top-left-radius: @border-radius;
-      // border-bottom-left-radius: @border-radius;
-    }
-    &:last-child{
-      border-top-right-radius: @border-radius;
-      // border-bottom-right-radius: @border-radius;
+    &:nth-child(2):nth-last-child(2){
+      border-left: 1px solid @border-color;
+      border-right: 1px solid @border-color;
     }
   }
 }
@@ -629,21 +626,17 @@ label.elem{
   transition: 0.2s;
   box-sizing: border-box;
 }
-input:checked+label{
-  color: #333;
-  .check{
-    border-width: 5px;
-  }
-  img{
-    filter: none!important;
+input:checked+.check{
+  border-width: 5px;
+  &+img{
+    opacity: 1;
   }
 }
 label{
   img{
     vertical-align: middle;
-    height: 16px;
-    // opacity: 0.7;
-    filter: opacity(0.7);
+    height: 18px;
+    opacity: 0.8;
   }
 }
 #tab-wallet{
@@ -657,6 +650,7 @@ label{
 }
 .offer{
   // @primary: #29b3d2;
+  display: none;
   position: absolute;
   right: -2px;
   top: -2px;

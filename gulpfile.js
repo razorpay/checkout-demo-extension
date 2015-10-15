@@ -20,39 +20,36 @@ function assetPath(path){
 var distDir = 'app/dist/v1';
 
 gulp.task('watch', ['buildDev', 'usemin'], function() {
-  gulp.watch(assetPath('**'), ['buildDev', 'usemin']);
+  gulp.watch(assetPath('_css/*.less'), ['compileStyles']);
+  gulp.watch([assetPath('js/**'), assetPath('*.html'), assetPath('_templates/*.jst')], ['usemin']);
 });
 
 // compiles .jst to .js, which is template contained in a function
-gulp.task('compileTemplates', ['dirStructure'], function(){
+gulp.task('compileTemplates', function(){
   return dot.process({
-    path: assetPath('templates'),
+    path: assetPath('_templates'),
     destination: assetPath('templates'),
     global: 'Razorpay.templates'
   });
 });
 
-gulp.task('compileStyles', ['dirStructure'], function(){
-  return gulp.src(assetPath('css/*.less'))
+gulp.task('compileStyles', function(){
+  return gulp.src(assetPath('_css/*.less'))
     .pipe(less())
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({browsers: ['last 10 versions']}))
     .pipe(gulp.dest(assetPath('css')));
 });
 
-gulp.task('dirStructure', function(){
-  execSync('cd app && mkdir -p {templates,dist/v1/css}');
-})
+gulp.task('buildDev', ['compileTemplates', 'compileStyles']);
 
-gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
-
-gulp.task('usemin', ['buildDev'], function(){
+gulp.task('usemin', ['compileTemplates'], function(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(gulp.dest(distDir));
 })
 
-gulp.task('sourceMaps', ['buildDev', 'usemin'], function(){
+gulp.task('sourceMaps', ['compileTemplates', 'usemin'], function(){
   return gulp.src(distDir + '/checkout-frame.js')
     .pipe(sourcemaps.init())
     .pipe(sourcemaps.write('./'))

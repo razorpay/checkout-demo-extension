@@ -81,14 +81,8 @@
 
     this.interval = setInterval(checkClose(this), 500);
 
-    var that = this;
-
-    $(window).on('unload', function(){
-      that.unload();
-    });
-    $(window).on('beforeunload', function(){
-      that.beforeunload();
-    });
+    $(window).on('unload', this.unload);
+    $(window).on('beforeunload', this.beforeunload);
   }
 
   Popup.prototype = {
@@ -106,8 +100,8 @@
 
     close: function () {
       clearInterval(this.interval);
-      $(window).off('beforeunload');
-      $(window).off('unload');
+      $(window).off('unload', this.unload);
+      $(window).off('beforeunload', this.beforeunload);
       this.window.close();
     },
 

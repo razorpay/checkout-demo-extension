@@ -1,5 +1,6 @@
 /* global Razorpay */
 /* jshint -W027 */
+
 (function(){
   'use strict';
 
@@ -11,8 +12,7 @@
   var popupRequest = null;
 
   window.onComplete = function(data){
-    debugger
-    popupRequest = null;
+    data = JSON.parse(data);
     if (data.error && data.error.description){
       if(typeof popupRequest.error === 'function'){
         popupRequest.error(data);
@@ -26,6 +26,14 @@
       popupRequest.error({description: 'Unable to parse server response'});
       roll('unexpected api response', data);
     }
+    try{
+      popupRequest.popup.close();
+    } catch(e){
+      alert(e.message);
+      roll(e.message);
+    }
+    popupRequest = null;
+    return true; // if true, popup closes itself.
   }
 
   discreet.setupPopup = function(request, url){
@@ -34,6 +42,11 @@
     var data = request.data;
 
     var popup = request.popup = new Popup('');
+
+    popup.onClose(function(){
+      window.onComplete('{"error":{"description":"Payment cancelled"}}');
+    })
+
     popup.window.document.write(Razorpay.templates.popup({
       data: request.data,
       image: options.image,

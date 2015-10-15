@@ -54,7 +54,7 @@
       'backdropClose': true
     },
     'theme': {
-      'brandColor': '#f37254'
+      'brandColor': '#00BCD4'
     },
     'signature': '',
     'display_amount': '',
