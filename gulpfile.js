@@ -13,6 +13,8 @@ var execSync = require('child_process').execSync;
 var karmaServer = require('karma').Server;
 var istanbul = require('istanbul');
 
+var awspublish = require('gulp-awspublish');
+
 function assetPath(path){
   return 'app/' + path;
 }
@@ -56,11 +58,11 @@ gulp.task('sourceMaps', ['compileTemplates', 'usemin'], function(){
     .pipe(gulp.dest(distDir));
 })
 
-gulp.task('default', ['buildDev', 'usemin', 'sourcemaps'], function(){
+gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
   // uglify
-  //gulp.src(distDir + '/*.js')
-    //.pipe(gulp.dest(distDir));
-    //.pipe(uglify())
+  gulp.src(distDir + '/*.js')
+    .pipe(uglify())
+    .pipe(gulp.dest(distDir));
 })
 
 function getJSPaths(html, pattern){
@@ -159,3 +161,33 @@ function testRelease(done){
     testFromStack(0, allOptions, done);
   })
 }
+
+gulp.task('fontUpload', function(){
+  var publisher = awspublish.create({
+    accessKeyId: process.env.AWS_KEY,
+    secretAccessKey: process.env.AWS_SECRET,
+    region: 'us-east-1',
+    params: {
+      Bucket: 'checkout-beta'
+    }
+  });
+
+  // define custom headers
+  var headers = {
+    'Cache-Control': 'max-age=315360000, no-transform, public'
+  };
+
+  return gulp.src(distDir + '/fonts/*')
+   // gzip, Set Content-Encoding headers and add .gz extension
+  .pipe(awspublish.gzip({ ext: '' }))
+
+  // publisher will add Content-Length, Content-Type and headers specified above
+  // If not specified it will set x-amz-acl to public-read by default
+  .pipe(publisher.publish(headers))
+
+  // create a cache file to speed up consecutive uploads
+  .pipe(publisher.cache())
+
+   // print upload updates to console
+  .pipe(awspublish.reporter());
+});
