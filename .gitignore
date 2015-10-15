@@ -2,5 +2,5 @@
 aws-keys.json
 /app/css
 /app/templates
-/app/dist
+/app/dist/v1/*.*
 coverage

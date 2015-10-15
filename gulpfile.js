@@ -19,13 +19,12 @@ function assetPath(path){
 
 var distDir = 'app/dist/v1';
 
-gulp.task('watch', ['buildDev'], function() {
-  gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates']);
-  gulp.watch(assetPath('_css/*.less'), ['compileStyles']);
+gulp.task('watch', ['buildDev', 'usemin'], function() {
+  gulp.watch(assetPath('**'), ['buildDev', 'usemin']);
 });
 
 // compiles .jst to .js, which is template contained in a function
-gulp.task('compileTemplates', function(){
+gulp.task('compileTemplates', ['dirStructure'], function(){
   return dot.process({
     path: assetPath('templates'),
     destination: assetPath('templates'),
@@ -33,7 +32,7 @@ gulp.task('compileTemplates', function(){
   });
 });
 
-gulp.task('compileStyles', function(){
+gulp.task('compileStyles', ['dirStructure'], function(){
   return gulp.src(assetPath('css/*.less'))
     .pipe(less())
     .pipe(concat('checkout.css'))
@@ -42,11 +41,7 @@ gulp.task('compileStyles', function(){
 });
 
 gulp.task('dirStructure', function(){
-  return ['css', 'templates'].forEach(function(path){
-    if(!fs.existsSync(assetPath(path))){
-      fs.mkdirSync(assetPath(path));
-    }
-  })
+  execSync('cd app && mkdir -p {templates,dist/v1/css}');
 })
 
 gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
@@ -64,23 +59,11 @@ gulp.task('sourceMaps', ['buildDev', 'usemin'], function(){
     .pipe(gulp.dest(distDir));
 })
 
-gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
+gulp.task('default', ['buildDev', 'usemin', 'sourcemaps'], function(){
   // uglify
   //gulp.src(distDir + '/*.js')
     //.pipe(gulp.dest(distDir));
     //.pipe(uglify())
-
-  // copy css
-  gulp.src('app/css/*.css')
-    .pipe(gulp.dest(distDir + '/css'));
-
-  // copy fonts
-  gulp.src('app/fonts/*')
-    .pipe(gulp.dest(distDir + '/fonts'));
-
-  // copy images
-  gulp.src('app/images/**')
-    .pipe(gulp.dest(distDir + '/images'));
 })
 
 function getJSPaths(html, pattern){
