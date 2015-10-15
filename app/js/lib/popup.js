@@ -111,11 +111,6 @@
       this.window.close();
     },
 
-
-    location: function (location) {
-      this.window.location = location;
-    },
-
   /**
   * Focuses the popup window (brings to front).
   */

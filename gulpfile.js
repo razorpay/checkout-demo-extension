@@ -20,15 +20,15 @@ function assetPath(path){
 var distDir = 'app/dist/v1';
 
 gulp.task('watch', ['buildDev'], function() {
-  gulp.watch(assetPath('templates/*.jst'), ['compileTemplates']);
-  gulp.watch(assetPath('css/*.less'), ['compileStyles']);
+  gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates']);
+  gulp.watch(assetPath('_css/*.less'), ['compileStyles']);
 });
 
 // compiles .jst to .js, which is template contained in a function
 gulp.task('compileTemplates', function(){
   return dot.process({
     path: assetPath('templates'),
-    destination: assetPath('_templates'),
+    destination: assetPath('templates'),
     global: 'Razorpay.templates'
   });
 });
@@ -38,11 +38,11 @@ gulp.task('compileStyles', function(){
     .pipe(less())
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({browsers: ['last 10 versions']}))
-    .pipe(gulp.dest(assetPath('_css')));
+    .pipe(gulp.dest(assetPath('css')));
 });
 
 gulp.task('dirStructure', function(){
-  return ['_css', '_templates', '_test'].forEach(function(path){
+  return ['css', 'templates'].forEach(function(path){
     if(!fs.existsSync(assetPath(path))){
       fs.mkdirSync(assetPath(path));
     }
@@ -66,13 +66,17 @@ gulp.task('sourceMaps', ['buildDev', 'usemin'], function(){
 
 gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
   // uglify
-  gulp.src(distDir + '/*.js')
-    .pipe(uglify())
-    .pipe(gulp.dest(distDir));
+  //gulp.src(distDir + '/*.js')
+    //.pipe(gulp.dest(distDir));
+    //.pipe(uglify())
 
   // copy css
-  gulp.src('app/_css/*.css')
+  gulp.src('app/css/*.css')
     .pipe(gulp.dest(distDir + '/css'));
+
+  // copy fonts
+  gulp.src('app/fonts/*')
+    .pipe(gulp.dest(distDir + '/fonts'));
 
   // copy images
   gulp.src('app/images/**')
@@ -88,7 +92,6 @@ function getJSPaths(html, pattern){
       .split('\n')
       .filter(function(path){return !!path})
       .map(function(path){
-        path = path.replace('js/', '_test/js/');
         return assetPath(path);
       });
   } catch(e){
@@ -118,7 +121,7 @@ var karmaOptions = {
 
 gulp.task('test', ['buildDev'], function(done){
   // leak discreet variables
-  execSync('cd app && cp -r js _test && sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find _test/js -type f)');
+  execSync('cd app && sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find js -type f)');
 
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
@@ -140,8 +143,9 @@ function testFromStack(counter, allOptions, done){
     } else if(allOptions.release){
       done();
     } else {
+      execSync('sed -i -- s@/\\\\*ENV_TEST\\\\*/@//ENV_TEST@g $(find app/js -type f)');
       createCoverageReport();
-      testRelease(done);
+      // testRelease(done);
     }
   }).start();
 }

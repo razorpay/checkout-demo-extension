@@ -20,21 +20,5 @@ if(/^https:\/\/[^\.]+.razorpay.com/.test(location.href)){
 Razorpay.roll = function(message, data, level){
   if(!level) level = 'error';
   if(!window.Rollbar || typeof Rollbar[level] != 'function') return;
-
-  if(typeof message != 'string')
-    message = '';
-  else
-    message += ': ';
-
-  if(typeof data == 'string'){
-    message += data;
-  } else {
-    try{
-      message += JSON.stringify(data);
-    } catch(e){
-      message += 'Error stringifying ' + data + ' ' + e.message;
-    }
-  }
-
-  Rollbar[level](message);
+  Rollbar[level](message, data);
 };
