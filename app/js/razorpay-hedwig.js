@@ -135,7 +135,7 @@
       var popup = request.popup = new Popup('');
       popup.window.document.write(Razorpay.templates.popup({
         data: request.data,
-        image: request.options.image,
+        image: options.image,
         url: url
       }));
       popup.window.document.close();
@@ -152,9 +152,9 @@
       } else {
         info = "Popup window opened";
       }
-      window.Rollbar && Rollbar.info(info);
+      roll(info, {image:options.image, name: options.name, description: options.description}, 'info');
     } catch(e){
-      window.Rollbar && Rollbar.error("Error accessing popup: " + e.message);
+      roll('Error accessing popup: ' + e.message);
     }
   }
 
