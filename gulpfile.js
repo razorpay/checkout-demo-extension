@@ -127,6 +127,7 @@ function testFromStack(counter, allOptions, done){
     } else {
       execSync('sed -i -- s@/\\\\*ENV_TEST\\\\*/@//ENV_TEST@g $(find app/js -type f)');
       createCoverageReport();
+      done();
       // testRelease(done);
     }
   }).start();

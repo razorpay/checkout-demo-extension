@@ -559,7 +559,7 @@ describe("Razorpay open netbanking page and submit method", function(){
       launch(operation);
       var netb_bank = jQuery('#netb-banks label');
       sendclick(netb_bank[0]);
-      expect(jQuery('select').val()).toBe(netb_bank.prev()[0].value);
+      expect(jQuery('select').val()).toBe(netb_bank.children('input').val());
       spyCalled();
     });
 
