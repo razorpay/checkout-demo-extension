@@ -20,6 +20,39 @@
 @input-height: 42px;
 @icon-size: 30px; // input fields icons
 
+#fd{
+  display: none;
+  background: rgba(255, 255, 255, 0.9);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  border-radius: inherit;
+}
+#fd-in{
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 16px;
+  letter-spacing: 0.25px;
+}
+#fd-t{
+  white-space: normal;
+  padding: 20px 30px;
+  line-height: 22px;
+}
+#fd-hide{
+  line-height: 40px;
+  border-radius: 4px;
+  font-weight: bold;
+  padding: 0 18px;
+}
+.mfix{
+  .middlefix();
+}
+a{
+  color: inherit;
+  cursor: pointer;
+}
 u{
   text-decoration: none;
 }
@@ -68,7 +101,6 @@ iframe{
   text-align: center;
   transition: 0.25s ease-out opacity;
   z-index: 19999;
-  .middlefix();
 
   &.shown{
     opacity: 1;
@@ -105,6 +137,7 @@ iframe{
   color: #999;
 }
 button, input, select {
+  display: inline-block;
   border: none;
   background: none;
   font-family: @font-default;
@@ -112,14 +145,37 @@ button, input, select {
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0); 
   -webkit-tap-highlight-color: transparent;
 }
+button{
+  position: relative;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: @primary;
+  color: #fff;
+  &:after{
+    border-radius: inherit;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: 0.2s;
+    opacity: 0;
+    background: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
+  }
+  &:hover:after{
+    opacity: 1;
+  }
+  &:hover:active:after{
+    box-shadow: 0 3px 4px rgba(0,0,0,.22) inset;
+  }
+}
 input, select {
   border-radius: inherit;
-  display: inline-block;
   color: inherit;
   font-size: 14px;
   resize: none;
   width: 100%;
-  background: none;
   position: relative;
 }
 input:not([type=radio]), select{
@@ -255,6 +311,7 @@ input[disabled]{
   border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
   .opacity(0);
+  z-index: 2;
   transform: translateY(10px);
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
   bottom: 100%;
@@ -303,7 +360,6 @@ input[disabled]{
   border: 1px solid @border-color;
   margin: -24px @padding @padding 0;
   background: #fff;
-  .middlefix();
 }
 .merchant-image img{
   max-width: 100%;
@@ -331,6 +387,7 @@ input[disabled]{
   font-size: 16px;
   line-height: 26px;
   cursor: pointer;
+  z-index: 9;
   &:hover{
     color: #333;
   }
@@ -405,33 +462,12 @@ input[disabled]{
 }
 #submitbtn{
   font-size: 18px;
-  text-transform: uppercase;
   padding: 0;
   margin: 0;
   border-radius: 0 0 @border-radius @border-radius;
-  background: @primary;
   line-height: 54px;
-  color: #fff;
   box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
   width: 100%;
-  cursor: pointer;
-  &:after{
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transition: 0.2s;
-    opacity: 0;
-    background: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
-  }
-  &:hover:after{
-    opacity: 1;
-  }
-  &:hover:active:after{
-    box-shadow: 0 3px 5px rgba(0,0,0,.3) inset;
-  }
 }
 #error-message{
   left: 0;

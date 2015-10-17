@@ -4,9 +4,9 @@
 (function(){
   'use strict';
   var Razorpay = window.Razorpay;
-  var roll = Razorpay.roll || $.noop;
-  var ua = navigator.userAgent;
   var $ = Razorpay.$;
+  var roll = Razorpay.roll;
+  var ua = navigator.userAgent;
 
   // iphone/ipad restrict non user initiated focus on input fields
   var should_focus_next = !/iPhone|iPad/.test(ua);
@@ -252,6 +252,9 @@
 
       $('bank-select').on('change', frameDiscreet.bank_change);
       $('netb-banks').on('change', frameDiscreet.bank_radio, true);
+      $('fd-hide').on('click', function(){
+        $('fd').css('display','none');
+      })
       // if(navigator.userAgent.indexOf("MSIE ") > 0)
       //   $('netb-banks').on('click', discreet.bank_radio, true);
 
@@ -420,7 +423,7 @@
     // close on backdrop click and remove errors
     renew: function(){
       if (frameDiscreet.$el)
-        $('error-container').css('display', 'none').removeClass('has-error').css('paddingTop', '');
+        $('fd').css('display', 'none');
 
       if(frameDiscreet.modal)
         frameDiscreet.modal.options.backdropClose = true;
@@ -469,9 +472,8 @@
         message = 'There was an error in handling your request';
       }
 
-      var error_message = $('error-message')[0];
-      error_message.innerHTML = message;
-      $('error-container').css('display', 'block').addClass('has-error').css('paddingTop', error_message.offsetHeight + 'px');
+      $('fd-t')[0].innerHTML = message;
+      $('fd').css('display', 'block');
     },
 
     dataHandler: function(data){

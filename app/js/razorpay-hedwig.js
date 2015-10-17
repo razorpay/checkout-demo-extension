@@ -1,7 +1,7 @@
 /* global Razorpay */
 /* jshint -W027 */
 
-(function(){
+!function(){
   'use strict';
 
   var $ = Razorpay.$;
@@ -137,4 +137,4 @@
   //   _hedwig.sendMessage(nextRequest, '*', popup.window);
   // }
   /* INLINE_TESTING */
-})();
+}();
