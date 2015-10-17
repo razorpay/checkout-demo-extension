@@ -59,7 +59,7 @@
               {{? it.method.wallet.length }}
                 <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
                   {{ if(it.method.wallet.length == 1){ }}
-                    <img class="wallet-logo colored" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
+                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
                   {{} else {}}
                     Wallets
                     <div class="offer">
@@ -134,6 +134,7 @@
                   <label class="elem">
                     <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                     <div class="check"><div class="check-inner"></div></div>
+                    {{?it.method.wallet.length}}Pay using{{?}}
                     <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
                     {{?w.offer}}
                       <div class="ribbon">{{=w.offer}}</div>
