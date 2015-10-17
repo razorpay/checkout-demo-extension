@@ -28,6 +28,7 @@ gulp.task('watch', ['buildDev', 'usemin'], function() {
 
 // compiles .jst to .js, which is template contained in a function
 gulp.task('compileTemplates', function(){
+  execSync('mkdir -p app/templates');
   return dot.process({
     path: assetPath('_templates'),
     destination: assetPath('templates'),
@@ -36,6 +37,7 @@ gulp.task('compileTemplates', function(){
 });
 
 gulp.task('compileStyles', function(){
+  execSync('mkdir -p app/dist/v1/css');
   return gulp.src(assetPath('_css/*.less'))
     .pipe(less())
     .pipe(concat('checkout.css'))

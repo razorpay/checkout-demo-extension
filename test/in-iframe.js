@@ -108,23 +108,23 @@ describe("payment authorization", function(){
 
     it("display default error discription", function(){
       frameDiscreet.errorHandler(response);
-      expect(jQuery('#error-container')).toBeVisible();
-      expect(jQuery('#error-message').html().length > 0).toBe(true);
+      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#fd-t').html().length > 0).toBe(true);
     })
 
     it("display custom error description", function(){
       var str = 'hello error';
       response.error.description = str;
       frameDiscreet.errorHandler(response);
-      expect(jQuery('#error-container')).toBeVisible();
-      expect(jQuery('#error-message').html()).toBe(str);
+      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#fd-t').html()).toBe(str);
     })
 
     it("focus related field and apply invalid", function(){
       var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
       response.error.field = field_el.prop('name');
       frameDiscreet.errorHandler(response);
-      expect(jQuery('#error-container')).toBeVisible();
+      expect(jQuery('#fd')).toBeVisible();
       expect(field_el[0]).toBe(document.activeElement);
       expect(field_el.parent().hasClass('invalid')).toBe(true);
     })

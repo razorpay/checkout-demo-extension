@@ -5,7 +5,7 @@
   'use strict';
   var Razorpay = window.Razorpay;
   var $ = Razorpay.$;
-  var roll = Razorpay.roll;
+  var roll = Razorpay.roll || $.noop;
   var ua = navigator.userAgent;
 
   // iphone/ipad restrict non user initiated focus on input fields
