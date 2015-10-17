@@ -42,7 +42,7 @@ gulp.task('compileStyles', function(){
     .pipe(less())
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({browsers: ['last 10 versions']}))
-    .pipe(gulp.dest(assetPath('css')));
+    .pipe(gulp.dest(distDir + '/css'));
 });
 
 gulp.task('buildDev', ['compileTemplates', 'compileStyles']);
@@ -166,12 +166,15 @@ function testRelease(done){
 }
 
 gulp.task('fontUpload', function(){
+  var target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
+  if(target == 'production') target = 'live';
+
   var publisher = awspublish.create({
     accessKeyId: process.env.AWS_KEY,
     secretAccessKey: process.env.AWS_SECRET,
     region: 'us-east-1',
     params: {
-      Bucket: 'checkout-beta'
+      Bucket: 'checkout-' + target
     }
   });
 
