@@ -1,45 +1,51 @@
 @import "common";
 
 @max-width: 340px; // iPhone 6 Plus
-@media (max-device-height: 450px),(max-device-width: 450px){
-.shake{
-	animation:none;
-}
-#container{
-	max-width: @max-width;
-	margin: 0 auto;
+@media (max-device-height: 400px),(max-device-width: 400px){
+  .shake{
+    animation:none;
+  }
+  #container{
+    max-width: @max-width;
+    margin: 0 auto;
 
-	&:after{
-		content: none;
-	}
-	.modal{
-		min-width: 100%;
-		display: block;
-		background: #fafafa;
-		color: #666;
-		border-radius: 0;
-		min-height: 100%;
-		margin: 0 auto;
-		box-shadow: 0 0 10px rgba(0,0,0,0.2);
-		transform: translateY(10%) scale(0.9);
-	}
-	.modal-inner{
-		position: static;
-	}
-	&.shown .modal{
-		transition: 0.3s ease-out all;
-		transform: none;
-	}
-	#powered-by{
-		position: absolute;
-		top: 10px;
-		visibility: hidden!important;
-		bottom: auto;
-		z-index: -1;
-		pointer-events: none;
-	}
-	button{
-		border-radius: 0;
-	}
-}
+    &:after{
+      content: none;
+    }
+    .modal{
+      min-width: 100%;
+      display: block;
+      background: #fafafa;
+      color: #666;
+      border-radius: 0;
+      min-height: 100%;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      transform: translateY(10%) scale(0.9);
+    }
+    .modal-inner{
+      position: static;
+    }
+    &.shown .modal{
+      transition: 0.3s ease-out all;
+      transform: none;
+    }
+    #powered-by{
+      position: absolute;
+      top: 10px;
+      visibility: hidden!important;
+      bottom: auto;
+      z-index: -1;
+      pointer-events: none;
+    }
+    button{
+      border-radius: 0;
+    }
+    .merchant-image{
+      margin-top: 0;
+    }
+    .merchant{
+      margin-top: 12px;
+    }
+  }
 }

@@ -12,12 +12,12 @@
       <div class="modal-content">
         <div class="header">
           <div id="modal-close">×</div>
+          {{?it.image}}
+            <div class="merchant-image mfix">
+              <img src="{{=it.image}}">
+            </div>
+          {{?}}
           <div class="merchant">
-            {{?it.image}}
-              <div class="merchant-image mfix">
-                <img src="{{=it.image}}">
-              </div>
-            {{?}}
             {{?it.name}}
               <div class="merchant-title">{{=it.name}}</div>
             {{?}}

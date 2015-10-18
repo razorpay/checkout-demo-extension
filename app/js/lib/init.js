@@ -59,6 +59,7 @@
     'signature': '',
     'display_amount': '',
     'name': '', // of merchant
-    'image': ''
+    'image': '',
+    'framePath': ''
   };
 })();
