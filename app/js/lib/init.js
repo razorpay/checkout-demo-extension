@@ -51,7 +51,7 @@
       'onhidden': noop,
       'escape': true,
       'animation': true,
-      'backdropClose': true
+      'backdropClose': false
     },
     'theme': {
       'brandColor': '#00BCD4'

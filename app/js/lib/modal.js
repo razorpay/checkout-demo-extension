@@ -142,18 +142,15 @@
       
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
-          if ((e.which || e.keyCode) === 27 && this.options.backdropClose) {
+          if ((e.which || e.keyCode) === 27) {
             this.hide();
           }
         })
       }
 
-      var closeBtn = $('modal-close');
+      this.on('click', $('modal-close')[0], this.backdropHide);
       if (this.options.backdropClose) {
-        this.on('click', closeBtn[0], this.backdropHide);
         this.on('click', this.container.children('backdrop')[0], this.backdropHide)
-      } else {
-        closeBtn.remove();
       }
     }
   };
