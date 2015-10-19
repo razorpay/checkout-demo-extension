@@ -14,18 +14,17 @@
   window.onComplete = function(data){
     if(typeof popupRequest !== 'object')
       return;
-    
     data = JSON.parse(data);
     if (data.error && data.error.description){
       if(typeof popupRequest.error === 'function'){
         popupRequest.error(data);
       }
     }
-    if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
+    else if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
       var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
       popupRequest.success.call(null, returnObj); // dont expose request as this
     }
-    if(typeof popupRequest.error == 'function'){
+    else if(typeof popupRequest.error == 'function'){
       popupRequest.error({description: 'Unable to parse server response'});
       roll('unexpected api response', data);
     }
