@@ -147,10 +147,9 @@
           }
         })
       }
-
-      this.on('click', $('modal-close')[0], this.backdropHide);
+      this.on('click', $('modal-close')[0], this.hide);
       if (this.options.backdropClose) {
-        this.on('click', this.container.children('backdrop')[0], this.backdropHide)
+        this.on('click', $('backdrop')[0], this.backdropHide)
       }
     }
   };

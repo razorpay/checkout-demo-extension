@@ -1,5 +1,5 @@
 <div id="container" class="mfix" tabIndex="0">
-  <div class="backdrop"></div>
+  <div id="backdrop"></div>
   <div class="modal">
     <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
     <div id="modal-inner" class="modal-inner">
@@ -85,12 +85,12 @@
                 </p>
                 <p class="elem elem-expiry">
                   <i class="i">&#xe606;</i>
-                  <span class="help-text">Please enter valid card expiry in MM / YY format</span>
+                  <span class="help-text">Please enter card expiry date in MM / YY format</span>
                   <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?[0-9]{2}" maxlength="7" value="{{if(it.prefill.card.expiry_month){}}{{=it.prefill.card.expiry_month}} / {{=it.prefill.card.expiry_year}}{{}}}">
                 </p>
                 <p class="elem elem-cvv">
                   <i class="i">&#xe604;</i>
-                  <span class="help-text">Please enter valid cvv number<br>It is a 3 or 4 digit number at back of your card</span>
+                  <span class="help-text">Please enter valid cvv number<br>It is a 3 or 4 digit number at the back of your card</span>
                   <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                 </p>
                 <label class="elem" for="cardsave" style="display: none">
