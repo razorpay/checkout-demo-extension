@@ -270,7 +270,9 @@
           }
         }
         if(frameDiscreet.qpmap.error){
-          frameDiscreet.errorHandler(qpmap)
+          setTimeout(function(){
+            frameDiscreet.errorHandler(qpmap)
+          })
         }
       }
       frameDiscreet.setCardFormatting();
