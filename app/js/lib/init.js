@@ -51,11 +51,15 @@
       'onhidden': noop,
       'escape': true,
       'animation': true,
-      'backdropClose': true
+      'backdropClose': false
+    },
+    'theme': {
+      'brandColor': '#00BCD4'
     },
     'signature': '',
     'display_amount': '',
     'name': '', // of merchant
-    'image': ''
+    'image': '',
+    'framePath': ''
   };
 })();

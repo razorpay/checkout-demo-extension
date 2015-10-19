@@ -124,28 +124,28 @@ describe("authorize should", function(){
     expect(req.data['notes[note2]']).toBe('two');
   })
 
-  it("add callback_url if specified in options", function(){
-    Razorpay.defaults.callback_url = 'swag';
-    Razorpay.payment.authorize(req);
-    expect(req.data.callback_url).toBe('swag');
-    Razorpay.defaults.callback_url = ''; // reset
-  })
+  // it("add callback_url if specified in options", function(){
+  //   Razorpay.defaults.callback_url = 'swag';
+  //   Razorpay.payment.authorize(req);
+  //   expect(req.data.callback_url).toBe('swag');
+  //   Razorpay.defaults.callback_url = ''; // reset
+  // })
 
-  it("add merchant key in request data", function(){
-    Razorpay.payment.authorize(req);
-    expect(req.data.key_id).toBe(options.key);
-  })
+  // it("add merchant key in request data", function(){
+  //   Razorpay.payment.authorize(req);
+  //   expect(req.data.key_id).toBe(options.key);
+  // })
 
-  it("setup popup", function(){
-    Razorpay.payment.authorize(req);
-    var isPopup = req.popup instanceof Popup;
-    expect(isPopup).toBe(true);
-  })
+  // it("setup popup", function(){
+  //   Razorpay.payment.authorize(req);
+  //   var isPopup = req.popup instanceof Popup;
+  //   expect(isPopup).toBe(true);
+  // })
 
-  it("add options to request object", function(){
-    Razorpay.payment.authorize(req);
-    expect(typeof req.options).toBe('object');
-  })
+  // it("add options to request object", function(){
+  //   Razorpay.payment.authorize(req);
+  //   expect(typeof req.options).toBe('object');
+  // })
 })
 
 describe("getMethods should", function(){

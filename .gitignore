@@ -1,5 +1,7 @@
 /node_modules
 aws-keys.json
-/app/_*
-/app/dist
+/app/css
+/app/templates
+/app/dist/v1/*.*
+/app/dist/v1/css
 coverage

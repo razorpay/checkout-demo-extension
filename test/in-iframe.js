@@ -108,23 +108,23 @@ describe("payment authorization", function(){
 
     it("display default error discription", function(){
       frameDiscreet.errorHandler(response);
-      expect(jQuery('#error-container')).toBeVisible();
-      expect(jQuery('#error-message').html().length > 0).toBe(true);
+      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#fd-t').html().length > 0).toBe(true);
     })
 
     it("display custom error description", function(){
       var str = 'hello error';
       response.error.description = str;
       frameDiscreet.errorHandler(response);
-      expect(jQuery('#error-container')).toBeVisible();
-      expect(jQuery('#error-message').html()).toBe(str);
+      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#fd-t').html()).toBe(str);
     })
 
     it("focus related field and apply invalid", function(){
       var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
       response.error.field = field_el.prop('name');
       frameDiscreet.errorHandler(response);
-      expect(jQuery('#error-container')).toBeVisible();
+      expect(jQuery('#fd')).toBeVisible();
       expect(field_el[0]).toBe(document.activeElement);
       expect(field_el.parent().hasClass('invalid')).toBe(true);
     })
@@ -547,20 +547,19 @@ describe("Razorpay open netbanking page and submit method", function(){
     jQuery.noop
   ].forEach(function(operation){
 
-
     it("should show netbanking form on clicking", function(){
       launch(operation);
-      var netb_bank = jQuery('.netb-inner');
-      sendclick(netb_bank[0]);
-      expect(jQuery('select').val()).toBe(netb_bank.attr('data-value'));
+      var active = jQuery('li.active');
+      expect(active.length).toBe(1);
+      expect(active.attr('data-target')).toBe('tab-netbanking');
       spyCalled();
     });
 
     it("should select bank", function(){
       launch(operation);
-      var active = jQuery('li.active');
-      expect(active.length).toBe(1);
-      expect(active.attr('data-target')).toBe('tab-netbanking');
+      var netb_bank = jQuery('#netb-banks label');
+      sendclick(netb_bank[0]);
+      expect(jQuery('select').val()).toBe(netb_bank.children('input').val());
       spyCalled();
     });
 

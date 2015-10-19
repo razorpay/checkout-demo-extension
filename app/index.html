@@ -20,23 +20,27 @@
 
 </head>
 <body>
-  <div id="x" style='height: 1000px; background: yellow'></div>
+  <div id="x" style='height: 1000px; background: yellow'>
+    <h1>Checkout test page</h1>
+  </div>
   <div id="side">
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
   <script>
     var options = {
-      'key': 'rzp_live_ILgsfZCZoFIKMb',
-      'amount': 100,
-      'name': 'Fur Gauntlets',
-      'description': 'Armour 20',
+      'key': 'rzp_test_1DP5mmOlF5G5ag',
+      'amount': 74900,
+      // 'name': 'Fur Gauntlets',
+      'description': 'ZO Rooms Grand Andheri East',
       'image': 'images/merchant-logo.png',
       'handler': function (transaction){
         console.log(transaction);
         alert("You have successfully purchased " + options.description);
       },
+      framePath: 'checkout.html',
       // callback_url: 'http://localhost:9000',
-      hostname: 'api.razorpay.com',
+      // protocol: 'http',
+      // hostname: 'beta.razorpay.com',
       'method': {
         card: 1
       },
@@ -47,6 +51,9 @@
       },
       notes: {
         'address': 'Hello World'
+      },
+      theme: {
+        // brandColor: '#F37254'
       },
       modal: {
         ondismiss: function(){console.log(1)},

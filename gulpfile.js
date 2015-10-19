@@ -13,52 +13,47 @@ var execSync = require('child_process').execSync;
 var karmaServer = require('karma').Server;
 var istanbul = require('istanbul');
 
+var awspublish = require('gulp-awspublish');
+
 function assetPath(path){
   return 'app/' + path;
 }
 
 var distDir = 'app/dist/v1';
 
-gulp.task('watch', ['buildDev'], function() {
-  gulp.watch(assetPath('templates/*.jst'), ['compileTemplates']);
-  gulp.watch(assetPath('css/*.less'), ['compileStyles']);
+gulp.task('watch', ['buildDev', 'usemin'], function() {
+  gulp.watch(assetPath('_css/*.less'), ['compileStyles']);
+  gulp.watch([assetPath('js/**'), assetPath('*.html'), assetPath('_templates/*.jst')], ['usemin']);
 });
 
 // compiles .jst to .js, which is template contained in a function
 gulp.task('compileTemplates', function(){
-  console.log(glob.sync('app/*'));
+  execSync('mkdir -p app/templates');
   return dot.process({
-    path: assetPath('templates'),
-    destination: assetPath('_templates'),
+    path: assetPath('_templates'),
+    destination: assetPath('templates'),
     global: 'Razorpay.templates'
   });
 });
 
 gulp.task('compileStyles', function(){
-  return gulp.src(assetPath('css/*.less'))
+  execSync('mkdir -p app/dist/v1/css');
+  return gulp.src(assetPath('_css/*.less'))
     .pipe(less())
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({browsers: ['last 10 versions']}))
-    .pipe(gulp.dest(assetPath('_css')));
+    .pipe(gulp.dest(distDir + '/css'));
 });
 
-gulp.task('dirStructure', function(){
-  return ['_css', '_templates', '_test'].forEach(function(path){
-    if(!fs.existsSync(assetPath(path))){
-      fs.mkdirSync(assetPath(path));
-    }
-  })
-})
+gulp.task('buildDev', ['compileTemplates', 'compileStyles']);
 
-gulp.task('buildDev', ['dirStructure', 'compileTemplates', 'compileStyles']);
-
-gulp.task('usemin', ['buildDev'], function(){
+gulp.task('usemin', ['compileTemplates'], function(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(gulp.dest(distDir));
 })
 
-gulp.task('sourceMaps', ['buildDev', 'usemin'], function(){
+gulp.task('sourceMaps', ['compileTemplates', 'usemin'], function(){
   return gulp.src(distDir + '/checkout-frame.js')
     .pipe(sourcemaps.init())
     .pipe(sourcemaps.write('./'))
@@ -70,14 +65,6 @@ gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
   gulp.src(distDir + '/*.js')
     .pipe(uglify())
     .pipe(gulp.dest(distDir));
-
-  // copy css
-  gulp.src('app/_css/*.css')
-    .pipe(gulp.dest(distDir + '/css'));
-
-  // copy images
-  gulp.src('app/images/**')
-    .pipe(gulp.dest(distDir + '/images'));
 })
 
 function getJSPaths(html, pattern){
@@ -89,7 +76,6 @@ function getJSPaths(html, pattern){
       .split('\n')
       .filter(function(path){return !!path})
       .map(function(path){
-        path = path.replace('js/', '_test/js/');
         return assetPath(path);
       });
   } catch(e){
@@ -119,8 +105,7 @@ var karmaOptions = {
 
 gulp.task('test', ['buildDev'], function(done){
   // leak discreet variables
-  execSync('cd app && cp -r js _test && sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find _test/js -type f)');
-
+  execSync('cd app && sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find js -type f)');
 
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
@@ -142,8 +127,10 @@ function testFromStack(counter, allOptions, done){
     } else if(allOptions.release){
       done();
     } else {
+      execSync('sed -i -- s@/\\\\*ENV_TEST\\\\*/@//ENV_TEST@g $(find app/js -type f)');
       createCoverageReport();
-      testRelease(done);
+      done();
+      // testRelease(done);
     }
   }).start();
 }
@@ -177,3 +164,36 @@ function testRelease(done){
     testFromStack(0, allOptions, done);
   })
 }
+
+gulp.task('fontUpload', function(){
+  var target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
+  if(target == 'production') target = 'live';
+
+  var publisher = awspublish.create({
+    accessKeyId: process.env.AWS_KEY,
+    secretAccessKey: process.env.AWS_SECRET,
+    region: 'us-east-1',
+    params: {
+      Bucket: 'checkout-' + target
+    }
+  });
+
+  // define custom headers
+  var headers = {
+    'Cache-Control': 'max-age=315360000, no-transform, public'
+  };
+
+  return gulp.src(distDir + '/fonts/*')
+   // gzip, Set Content-Encoding headers and add .gz extension
+  .pipe(awspublish.gzip({ ext: '' }))
+
+  // publisher will add Content-Length, Content-Type and headers specified above
+  // If not specified it will set x-amz-acl to public-read by default
+  .pipe(publisher.publish(headers))
+
+  // create a cache file to speed up consecutive uploads
+  .pipe(publisher.cache())
+
+   // print upload updates to console
+  .pipe(awspublish.reporter());
+});

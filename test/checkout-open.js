@@ -4,6 +4,8 @@ var options = {
   'amount': '5100',
   'name': 'Merchant Name',
   'netbanking': 'true',
+  'protocol': 'http',
+  'hostname': _chop.currentScript.src.replace('http://',''),
   'prefill': {
     'name': 'Shashank Mehta',
     'email': 'sm@razorpay.com',

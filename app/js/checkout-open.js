@@ -112,12 +112,7 @@
 
   _chop.createFrame = function(options){
     var frame = document.createElement('iframe');
-    var src = _chop.currentScript.src;
-    if(/^https?:\/\/[^\.]+.razorpay.com/.test(src)){
-      src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
-    } else {
-      src = src.replace(/(\/js|\/lib|[^\/]+$)/g,'') + 'checkout.html'
-    }
+    var src = options.framePath || discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
 
     var attrs = {
       'class': 'razorpay-checkout-frame', // quotes needed for ie
