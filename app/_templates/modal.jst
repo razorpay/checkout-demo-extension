@@ -134,7 +134,7 @@
                   <label class="elem">
                     <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                     <div class="check"><div class="check-inner"></div></div>
-                    {{?it.method.wallet.length}}Pay using{{?}}
+                    {{?it.method.wallet.length==1}}Pay using{{?}}
                     <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
                     {{?w.offer}}
                       <div class="ribbon">{{=w.offer}}</div>
