@@ -255,6 +255,7 @@
 
       $('bank-select').on('change', frameDiscreet.bank_change);
       $('netb-banks').on('change', frameDiscreet.bank_radio, true);
+      $('netb-banks').on('click', frameDiscreet.bank_radio);
       $('fd-hide').on('click', function(){
         $('fd').css('display','none');
       })
