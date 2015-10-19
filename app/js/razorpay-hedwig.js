@@ -29,7 +29,6 @@
     try{
       popupRequest.popup.close();
     } catch(e){
-      alert(e.message);
       roll(e.message);
     }
     popupRequest = null;
