@@ -42,19 +42,6 @@
     var options = request.options;
     var data = request.data;
 
-    var popup = request.popup = new Popup('');
-
-    popup.onClose(function(){
-      window.onComplete('{"error":{"description":"Payment cancelled"}}');
-    })
-
-    popup.window.document.write(Razorpay.templates.popup({
-      data: request.data,
-      image: options.image,
-      url: url
-    }));
-    popup.window.document.close();
-
     try{
       var popup = request.popup = new Popup('');
       popup.window.document.write(Razorpay.templates.popup({
@@ -64,6 +51,9 @@
       }));
       popup.window.document.close();
 
+      popup.onClose(function(){
+        window.onComplete('{"error":{"description":"Payment cancelled"}}');
+      })
       var info;
       if(typeof popup.window == 'undefined'){
         info = "Popup window inaccessible";
