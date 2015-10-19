@@ -587,11 +587,13 @@
     if(frameDiscreet.rzp){
       var params = message.params;
       if(params){
-        try{
-          frameDiscreet.errorHandler(JSON.parse(params));
-        } catch(e){
-          roll('message.params', params);
-        }
+        setTimeout(function(){
+          try{
+            frameDiscreet.errorHandler(JSON.parse(params));
+          } catch(e){
+            roll('message.params', params);
+          }
+        })
       }
       var data = message.data;
       if(data){

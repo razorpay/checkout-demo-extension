@@ -81,7 +81,10 @@
 
     this.interval = setInterval(checkClose(this), 500);
 
-    $(window).on('unload', this.unload);
+    var that = this;
+    $(window).on('unload', function(){
+      that.close();
+    });
     $(window).on('beforeunload', this.beforeunload);
   }
 
