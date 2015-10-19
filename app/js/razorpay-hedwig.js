@@ -9,59 +9,23 @@
   var discreet = Razorpay.discreet;
   var roll = Razorpay.roll || $.noop;
 
-<<<<<<< HEAD
-  var popupClose = function(){
-    try{
-      if(this.popup && typeof this.popup.close == 'function' && this.popup.window){
-        this.popup.close();
-        if(!this.popup.window.closed){
-          this.popup.window.postMessage('pingback', '*');
-          roll('Popup window not closed');
-        }
-      }
-    } catch(e){
-      roll('Error closing popup: ' + e.message);
-    }
-  }
-
-  discreet.paymentSuccess = function(data){
-    // this == request
-    if(this.popup && typeof this.popup.close == 'function'){
-      popupClose.call(this);
-    }
-    if(typeof this.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
-      var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
-      this.success.call(null, returnObj); // dont expose request as this
-    } else if(typeof this.error == 'function'){
-      this.error({description: 'Unable to parse server response'});
-      roll('unexpected api response', data);
-    }
-  }
-
-  discreet.XDCallback = function(message, data){
-    // this == request
-    // checking source url
-    if(!(this.popup.window === message.source || /^https:\/\/[a-z]+\.razorpay\.com/.test(message.origin))){
-      return;
-    }
-
-    if(typeof this.popup != 'undefined') popupClose.call(this);
-=======
   var popupRequest = null;
->>>>>>> popup2
 
   window.onComplete = function(data){
+    if(typeof popupRequest !== 'object')
+      return;
+    
     data = JSON.parse(data);
     if (data.error && data.error.description){
       if(typeof popupRequest.error === 'function'){
         popupRequest.error(data);
       }
     }
-    else if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
+    if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
       var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
       popupRequest.success.call(null, returnObj); // dont expose request as this
     }
-    else if(typeof popupRequest.error == 'function'){
+    if(typeof popupRequest.error == 'function'){
       popupRequest.error({description: 'Unable to parse server response'});
       roll('unexpected api response', data);
     }
@@ -85,8 +49,6 @@
       window.onComplete('{"error":{"description":"Payment cancelled"}}');
     })
 
-<<<<<<< HEAD
-=======
     popup.window.document.write(Razorpay.templates.popup({
       data: request.data,
       image: options.image,
@@ -94,7 +56,6 @@
     }));
     popup.window.document.close();
 
->>>>>>> popup2
     try{
       var popup = request.popup = new Popup('');
       popup.window.document.write(Razorpay.templates.popup({
@@ -104,10 +65,6 @@
       }));
       popup.window.document.close();
 
-      if (typeof request.error == 'function'){
-        popup.onClose(getPopupClose(request));
-      }
-
       var info;
       if(typeof popup.window == 'undefined'){
         info = "Popup window inaccessible";
@@ -116,11 +73,7 @@
       } else {
         info = "Popup window opened";
       }
-<<<<<<< HEAD
-      roll(info, {image:options.image, name: options.name, description: options.description}, 'info');
-=======
       roll(info, {image: options.image, name: options.name, description: options.description});
->>>>>>> popup2
     } catch(e){
       roll('Error accessing popup: ' + e.message);
     }

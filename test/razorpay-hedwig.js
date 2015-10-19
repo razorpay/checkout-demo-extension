@@ -1,41 +1,38 @@
-describe("on popup close,", function(){
-  var request = {
+var discreet = Razorpay.discreet;
+var $ = Razorpay.$;
+
+describe("onComplete should", function(){
+  var req = {
+    success: jQuery.noop,
     error: jQuery.noop,
-    payment_id: 'qwer',
-    options: {
-      'key': 'key_id',
-      'amount': '40000',
-      'name': 'Merchant Name',
-      'hostname': 'api.razorpay.dev'
+    options: Razorpay.defaults,
+    data: {
+      amount: 3000
     }
-  };
-
-  var spy;
-
+  }
+  
   beforeEach(function(){
-    spy = jasmine.createSpy();
+    discreet.setupPopup(req, '');
   })
 
-  afterEach(function(){
-    getPopupClose(request)();
+  it("invoke success", function(){
+    var spy = jasmine.createSpy();
+    spyOn(req, 'success').and.callFake(function(returnObj){
+      if(returnObj.razorpay_payment_id === 'pay_id')
+        spy();
+    })
+    window.onComplete('{"razorpay_payment_id": "pay_id"}');
     expect(spy).toHaveBeenCalled();
   })
 
-  it("xdm listener should be removed", function(){
-    spyOn($, 'removeMessageListener').and.callFake(spy);
-  })
-
-  it("call back specified error handler", function(){
-    spyOn(request, 'error').and.callFake(function(data){
-      expect('error' in data);
-      spy();
-    });
-  })
-
-  it("xdm listener should be removed", function(){
-    spyOn($, 'ajax').and.callFake(function(ajaxOptions){
-      expect(ajaxOptions.data.key_id).toBe(request.options.key)
-      spy();
-    });
+  it("invoke error", function(){
+    var spy = jasmine.createSpy();
+    var error = {error: {description: "dsf"}};
+    spyOn(req, 'error').and.callFake(function(returnObj){
+      if(returnObj.description === error.description)
+        spy();
+    })
+    window.onComplete(JSON.stringify(error));
+    expect(spy).toHaveBeenCalled();
   })
 })
