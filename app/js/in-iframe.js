@@ -456,7 +456,7 @@
       var message;
       frameDiscreet.shake();
 
-      frameDiscreet.modal && (frameDiscreet.modal.options.backdropClose = true);
+      if(frameDiscreet.modal) frameDiscreet.modal.options.backdropClose = true;
 
       if (response && response.error){
         message = response.error.description;
@@ -470,6 +470,7 @@
             $(error_el[0].parentNode).addClass('invalid');
             error_el[0].focus();
           }
+          return;
         }
       }
 
@@ -479,6 +480,7 @@
 
       $('fd-t')[0].innerHTML = message;
       $('fd').css('display', 'block');
+      $('fd-hide')[0].focus();
     },
 
     dataHandler: function(data){
