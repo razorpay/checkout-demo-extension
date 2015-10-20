@@ -57,7 +57,8 @@
       }
     }
     document.getElementById('rzp-button1').onclick = function(){
-      Razorpay(options).authorize({
+      Razorpay.configure({key: 'rzp_test_1DP5mmOlF5G5ag'});
+      Razorpay.payment.authorize({
         data: {
           amount: 12000,
           method: 'netbanking',
@@ -66,8 +67,10 @@
           contact: '8899911222'
         },
         success: function(e){
+          console.log(e)
         },
         error: function(e){
+          console.log(e)
         }
       })
     }

@@ -380,12 +380,13 @@
       if(frameDiscreet.modal)
         frameDiscreet.modal.options.backdropClose = false;
 
-      frameDiscreet.rzp.authorize({
+      Razorpay.payment.authorize({
         postmessage: false,
+        options: frameDiscreet.rzp.options,
         data: data,
         error: frameDiscreet.errorHandler,
         success: frameDiscreet.successHandler
-      })
+      });
     },
 
     getFormFields: function(container, returnObj){

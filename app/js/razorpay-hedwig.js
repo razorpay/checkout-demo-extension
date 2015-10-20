@@ -13,12 +13,11 @@
 
   discreet.setupPopup = function(request, url){
     if(popupRequest){
-      throw new Error('Razorpay: another payment popup is open');
+      return console.error('Razorpay: another payment popup is open');
     }
     popupRequest = request;
     var options = request.options;
     var data = request.data;
-
     if(request.postmessage === false){
       window.onComplete = _rahe.onComplete;
     }
