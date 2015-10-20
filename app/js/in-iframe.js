@@ -229,7 +229,7 @@
       div.innerHTML = Razorpay.templates.modal(opts);
       document.body.appendChild(div.firstChild);
       if(window.CheckoutBridge)
-        $('container').css('background', 'rgba(0, 0, 0, 0.6)');
+        $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
       frameDiscreet.$el = $('container');
       frameDiscreet.smarty = new Smarty(frameDiscreet.$el);
       // init modal
