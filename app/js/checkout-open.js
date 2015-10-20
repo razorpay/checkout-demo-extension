@@ -276,8 +276,11 @@
       if(this.checkoutFrame){
         this.checkoutFrame.setAttribute('removable', true);
       }
-      if(typeof this.options.handler == 'function'){
-        this.options.handler.call(null, data);
+      var handler = this.options.handler;
+      if(typeof handler == 'function'){
+        setTimeout(function(){
+          handler.call(null, data);
+        })
       }
     } else if (event === 'fault'){
       alert("Oops! Something went wrong.");

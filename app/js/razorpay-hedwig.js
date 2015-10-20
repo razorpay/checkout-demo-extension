@@ -18,6 +18,15 @@
     popupRequest = request;
     var options = request.options;
     var data = request.data;
+
+    if(data.callback_url){
+      return discreet.nextRequestRedirect({
+        method: 'post',
+        url: url,
+        content: data
+      });
+    }
+
     if(request.postmessage === false){
       window.onComplete = _rahe.onComplete;
     }

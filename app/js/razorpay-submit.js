@@ -63,15 +63,7 @@
         return true;
       } else {
         if(!rdata.callback_url && options.callback_url) rdata.callback_url = options.callback_url;
-        if(!rdata.callback_url) return discreet.setupPopup(request, url);
-
-        return $.ajax({
-          url: jsonpUrl,
-          success: discreet.getAjaxSuccess(request),
-          timeout: 35000,
-          error: request.error,
-          data: rdata
-        });
+        discreet.setupPopup(request, url);
       }
     },
 
