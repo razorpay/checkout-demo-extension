@@ -44,7 +44,7 @@
       popup.window.document.close();
 
       popup.onClose(function(){
-        _rahe.onComplete('{"error":{"description":"Payment cancelled"}}');
+        _rahe.onComplete({error:{description:'Payment cancelled'}});
       })
       var info;
       if(typeof popup.window == 'undefined'){
@@ -74,10 +74,7 @@
       if(typeof data === 'string')
         data = JSON.parse(data);
 
-      var popupRequest2 = popupRequest; // make a copy
-      setTimeout(function(){
-        _rahe.handleResponse(popupRequest2, data);
-      })
+      _rahe.handleResponse(popupRequest, data);
 
       try{
         popupRequest.popup.close();
