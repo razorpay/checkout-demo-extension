@@ -379,9 +379,10 @@
       frameDiscreet.renew();
       if(frameDiscreet.modal)
         frameDiscreet.modal.options.backdropClose = false;
-      Razorpay.payment.authorize({
+
+      frameDiscreet.rzp.authorize({
+        postmessage: false,
         data: data,
-        options: frameDiscreet.rzp.options,
         error: frameDiscreet.errorHandler,
         success: frameDiscreet.successHandler
       })

@@ -39,7 +39,7 @@
         alert("You have successfully purchased " + options.description);
       },
       // callback_url: 'http://localhost:9000',
-      hostname: 'api.razorpay.com',
+      // hostname: 'api.razorpay.com',
       'method': {
         card: 1
       },
@@ -56,12 +56,20 @@
         onhidden: function(){console.log(2)}
       }
     }
-    var rzp1 = new Razorpay(options);
-
-    document.getElementById('rzp-button1').onclick = function(e) {
-      rzp1.open();
-      e.preventDefault();
-    };
-    rzp1.open();
+    document.getElementById('rzp-button1').onclick = function(){
+      Razorpay(options).authorize({
+        data: {
+          amount: 12000,
+          method: 'netbanking',
+          bank: 'SBIN',
+          email: 'pranav@razorpay.com',
+          contact: '8899911222'
+        },
+        success: function(e){
+        },
+        error: function(e){
+        }
+      })
+    }
   </script>
 </body>

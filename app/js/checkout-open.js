@@ -28,7 +28,7 @@
   };
 
   _chop.fallbacks = function(){
-    absoluteContainer = /iPhone|Android 2\./.test(ua);
+    absoluteContainer = true || /iPhone|Android 2\./.test(ua);
 
     if(/iPhone.+Version\/4\./.test(ua) && typeof document.height == 'number'){
       backMinHeight = document.height;

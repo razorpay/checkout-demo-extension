@@ -11,36 +11,20 @@
 
   var popupRequest = null;
 
-  window.onComplete = function(data){
-    if(typeof popupRequest !== 'object')
-      return;
-    data = JSON.parse(data);
-    if (data.error && data.error.description){
-      if(typeof popupRequest.error === 'function'){
-        popupRequest.error(data);
-      }
-    }
-    else if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
-      var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
-      popupRequest.success.call(null, returnObj); // dont expose request as this
-    }
-    else if(typeof popupRequest.error == 'function'){
-      popupRequest.error({description: 'Unable to parse server response'});
-      roll('unexpected api response', data);
-    }
-    try{
-      popupRequest.popup.close();
-    } catch(e){
-      roll(e.message);
-    }
-    popupRequest = null;
-    return true; // if true, popup closes itself.
-  }
-
   discreet.setupPopup = function(request, url){
+    if(popupRequest){
+      throw new Error('Razorpay: another payment popup is open');
+    }
     popupRequest = request;
     var options = request.options;
     var data = request.data;
+
+    if(request.postmessage === false){
+      window.onComplete = _rahe.onComplete;
+    }
+    else {
+      $.addMessageListener(_rahe.onmessage, request);
+    }
 
     try{
       var popup = request.popup = new Popup('');
@@ -52,7 +36,7 @@
       popup.window.document.close();
 
       popup.onClose(function(){
-        window.onComplete('{"error":{"description":"Payment cancelled"}}');
+        _rahe.onComplete('{"error":{"description":"Payment cancelled"}}');
       })
       var info;
       if(typeof popup.window == 'undefined'){
@@ -65,6 +49,51 @@
       roll(info, {image: options.image, name: options.name, description: options.description});
     } catch(e){
       roll('Error accessing popup: ' + e.message);
+    }
+  }
+
+  var _rahe = {
+    onmessage: function(e){
+      if(discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0){
+        return roll('message received from origin', e.origin);
+      }
+      _rahe.onComplete(e.data);
+    },
+    onComplete: function(data){
+      if(typeof popupRequest !== 'object')
+        return;
+
+      if(typeof data === 'string')
+        data = JSON.parse(data);
+
+      var popupRequest2 = popupRequest; // make a copy
+      setTimeout(function(){
+        _rahe.handleResponse(popupRequest2, data);
+      })
+
+      try{
+        popupRequest.popup.close();
+      } catch(e){
+        roll(e.message);
+      }
+      popupRequest = null;
+      $.removeMessageListener();
+      return true; // if true, popup closes itself.
+    },
+    handleResponse: function(popupRequest, data){
+      if (data.error && data.error.description){
+        if(typeof popupRequest.error === 'function'){
+          popupRequest.error(data);
+        }
+      }
+      else if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
+        var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
+        popupRequest.success.call(null, returnObj); // dont expose request as this
+      }
+      else if(typeof popupRequest.error == 'function'){
+        popupRequest.error({description: 'Unable to parse server response'});
+        roll('unexpected api response', data);
+      }
     }
   }
   // discreet.apiResponseHandler = {
