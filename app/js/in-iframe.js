@@ -256,9 +256,7 @@
       $('bank-select').on('change', frameDiscreet.bank_change);
       $('netb-banks').on('change', frameDiscreet.bank_radio, true);
       $('netb-banks').on('click', frameDiscreet.bank_radio);
-      $('fd-hide').on('click', function(){
-        $('fd').css('display','none');
-      })
+      $('fd-hide').on('click', frameDiscreet.frontDrop);
       // if(navigator.userAgent.indexOf("MSIE ") > 0)
       //   $('netb-banks').on('click', discreet.bank_radio, true);
 
@@ -376,9 +374,11 @@
         event: 'submit',
         data: data
       });
-      frameDiscreet.renew();
+
       if(frameDiscreet.modal)
         frameDiscreet.modal.options.backdropClose = false;
+
+      frameDiscreet.frontDrop('Please wait while your payment is processed...', 'shown loading');
 
       Razorpay.payment.authorize({
         postmessage: false,
@@ -387,6 +387,11 @@
         error: frameDiscreet.errorHandler,
         success: frameDiscreet.successHandler
       });
+    },
+
+    frontDrop: function(message, className){
+      $('fd-t')[0].innerHTML = message || '';
+      $('fd')[0].className = 'mfix ' + (className || '');
     },
 
     getFormFields: function(container, returnObj){
@@ -430,8 +435,8 @@
 
     // close on backdrop click and remove errors
     renew: function(){
-      if (frameDiscreet.$el)
-        $('fd').css('display', 'none');
+      if(frameDiscreet.$el)
+        frameDiscreet.frontDrop('', 'hidden');
 
       if(frameDiscreet.modal)
         frameDiscreet.modal.options.backdropClose = true;
@@ -481,8 +486,7 @@
         message = 'There was an error in handling your request';
       }
 
-      $('fd-t')[0].innerHTML = message;
-      $('fd').css('display', 'block');
+      frameDiscreet.frontDrop(message, 'shown');
       $('fd-hide')[0].focus();
     },
 
