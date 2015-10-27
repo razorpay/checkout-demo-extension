@@ -468,18 +468,17 @@
 
       if (response && response.error){
         message = response.error.description;
-
       var err_field = response.error.field;
         if (err_field){
           if(!err_field.indexOf('expiry'))
             err_field = 'card[expiry]';
           var error_el = document.getElementsByName(err_field);
-          if (error_el.length){
+          if (error_el.length && error_el[0].type != 'hidden'){
             $(error_el[0].parentNode).addClass('invalid');
             error_el[0].focus();
+            frameDiscreet.frontDrop();
+            return;
           }
-          frameDiscreet.frontDrop();
-          return;
         }
       }
 
