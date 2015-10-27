@@ -478,6 +478,7 @@
             $(error_el[0].parentNode).addClass('invalid');
             error_el[0].focus();
           }
+          frameDiscreet.frontDrop();
           return;
         }
       }
