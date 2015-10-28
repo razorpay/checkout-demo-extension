@@ -15,7 +15,7 @@ try{
         }
       }
     })
-    Razorpay.roll=function(message, data, level){
+    roll = function(message, data, level){
       if(!level) level = 'error';
       if(location.href.indexOf('api.razorpay.com') > 0){
         if(data)

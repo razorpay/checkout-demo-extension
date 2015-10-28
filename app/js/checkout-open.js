@@ -1,40 +1,26 @@
-/* global Razorpay */
-/* jshint -W027 */
 
-(function(){
-  'use strict';
+// place _chop.frameContainer absolute, and add window.onscroll
+var _chBackMinHeight = 0;
+var _chPageY = 0;
+var _chAbsoluteContainer;
 
-  var $ = Razorpay.$;
-  var discreet = Razorpay.discreet;
+var _chop = {
+  isOpen: false,
+  bodyEl: null,
+  frameContainer: null,
+  backdrop: null,
+  metaViewportTag: null,
+  metaViewport: null,
+  bodyOverflow: null,
 
-  // place _chop.frameContainer absolute, and add window.onscroll
-  var backMinHeight = 0;
-  var pageY = 0;
-  var ua = navigator.userAgent;
-  var absoluteContainer;
-
-  var _chop = {
-    currentScript: document.currentScript || (function() {
-      var scripts = document.getElementsByTagName('script');
-      return scripts[scripts.length - 1];
-    })(),
-    isOpen: false,
-    bodyEl: null,
-    frameContainer: null,
-    backdrop: null,
-    metaViewportTag: null,
-    metaViewport: null,
-    bodyOverflow: null
-  };
-
-  _chop.fallbacks = function(){
-    absoluteContainer = /iPhone|Android 2\./.test(ua);
+  fallbacks: function(){
+    _chAbsoluteContainer = /iPhone|Android 2\./.test(ua);
 
     if(/iPhone.+Version\/4\./.test(ua) && typeof document.height == 'number'){
-      backMinHeight = document.height;
+      _chBackMinHeight = document.height;
     }
 
-    if(absoluteContainer && window.addEventListener){
+    if(_chAbsoluteContainer && window.addEventListener){
       window.addEventListener('orientationchange', function(){
         if(_chop.frameContainer){
           _chop.frameContainer.style.height = Math.max(innerHeight, 455) + 'px';
@@ -42,75 +28,27 @@
       })
       window.addEventListener('scroll', function(){
         var c = _chop.frameContainer;
-        if(!c || !_chop.isOpen || typeof window.pageYOffset !== 'number')
+        if(!c || !_chop.isOpen || typeof window._chPageYOffset !== 'number')
           return;
         var top;
-        var offTop = c.offsetTop - pageYOffset;
+        var offTop = c.offsetTop - _chPageYOffset;
         var offBot = c.offsetHeight + offTop;
-        if(pageY < pageYOffset){
+        if(_chPageY < _chPageYOffset){
           if(offBot < 0.2*innerHeight && offTop < 0)
-            top = pageYOffset + innerHeight - c.offsetHeight;
+            top = _chPageYOffset + innerHeight - c.offsetHeight;
         }
-        else if(pageY > pageYOffset){
+        else if(_chPageY > _chPageYOffset){
           if(offTop > 0.1*innerHeight && offBot > innerHeight)
-            top = pageYOffset;
+            top = _chPageYOffset;
         }
         if(typeof top === 'number')
           c.style.top = Math.max(0, top) + 'px';
-        pageY = pageYOffset;
+        _chPageY = _chPageYOffset;
       })
     }
-  }
+  },
 
-  Razorpay.prototype.open = function() {
-    if(!_chop.bodyEl) _chop.bodyEl = document.getElementsByTagName('body')[0];
-    if(!_chop.bodyEl) setTimeout(this.open());
-    if(_chop.isOpen) return;
-    _chop.isOpen = true;
-
-    _chop.bodyOverflow = _chop.bodyEl.style.overflow;
-    $.addMessageListener(_chop.onFrameMessage, this);
-
-    if(!_chop.frameContainer){
-      _chop.fallbacks();
-      _chop.frameContainer = document.createElement('div');
-      _chop.frameContainer.className = 'razorpay-frame-container';
-      var style = _chop.frameContainer.style;
-      var rules = {
-        zIndex: '99999',
-        position: (absoluteContainer ? 'absolute' : 'fixed'),
-        top: (absoluteContainer ? pageYOffset+'px' : '0'),
-        height: (absoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
-        left: '0',
-        width: '100%',
-        '-webkit-transition': '0.2s ease-out top'
-      }
-      for(var i in rules){
-        style[i] = rules[i];
-      }
-      _chop.backdrop = document.createElement('div');
-      _chop.backdrop.setAttribute('style', 'min-height: '+backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
-      _chop.frameContainer.appendChild(_chop.backdrop);
-      _chop.bodyEl.appendChild(_chop.frameContainer);
-    }
-    if(!absoluteContainer)
-      _chop.bodyEl.style.overflow = 'hidden';
-    _chop.frameContainer.style.display = 'block';
-    try{
-      // setting unsupported value throws error in IE
-      _chop.backdrop.style.background = 'rgba(0,0,0,0.6)';
-    } catch(e){}
-    if(!this.checkoutFrame){
-      this.checkoutFrame = _chop.createFrame(this.options);
-      _chop.frameContainer.appendChild(this.checkoutFrame);
-    } else {
-      this.checkoutFrame.style.display = 'block';
-      _chop.setMetaViewport();
-      _chop.sendFrameMessage.call(this, {event: 'open'});
-    }
-  }
-
-  _chop.createFrame = function(options){
+  createFrame: function(options){
     var frame = document.createElement('iframe');
     var src = options.framePath || discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
 
@@ -127,15 +65,9 @@
       frame.setAttribute(i, attrs[i]);
     }
     return frame;
-  }
+  },
 
-  Razorpay.prototype.close = function(){
-    if(_chop.isOpen){
-      _chop.sendFrameMessage.call(this, {event: 'close'});
-    }
-  }
-
-  _chop.onClose = function(){
+  onClose: function(){
     $.removeMessageListener();
     _chop.isOpen = false;
     _chop.bodyEl.style.overflow = _chop.bodyOverflow;
@@ -160,17 +92,17 @@
       _chop.frameContainer.style.display = 'none';
     if(this instanceof Razorpay && typeof this.options.modal.onhidden == 'function')
       this.options.modal.onhidden();
-  }
+  },
 
-  _chop.sendFrameMessage = function(response){
+  sendFrameMessage: function(response){
     if(typeof response !== 'string'){
       response = JSON.stringify(response)
     }
     this.checkoutFrame.contentWindow.postMessage(response, '*');
-  }
+  },
 
   // to handle absolute/relative url of options.image
-  _chop.setImageOption = function(options){
+  setImageOption: function(options){
     if(options.image && typeof options.image == 'string'){
       if(/data:image\/[^;]+;base64/.test(options.image)){
         return;
@@ -187,9 +119,9 @@
         options.image = baseUrl + relUrl + options.image;
       }
     }
-  }
+  },
 
-  _chop.setMetaViewport = function(){
+  setMetaViewport: function(){
     if(typeof document.querySelector != 'function'){
       return;
     }
@@ -214,9 +146,9 @@
     if(!_chop.metaViewportTag.parentNode){
       head.appendChild(_chop.metaViewportTag);
     }
-  }
+  },
 
-  _chop.onFrameMessage = function(e, data){
+  onFrameMessage: function(e, data){
     // this == rzp
     if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
       return;
@@ -286,7 +218,7 @@
       alert("Oops! Something went wrong.");
       this.close();
     }
-  }
+  },
 
   /**
     default handler for success
@@ -294,7 +226,7 @@
     @param  {[type]} data [description]
     @return {[type]}    [description]
   */
-  _chop.defaultPostHandler = function(data){
+  defaultPostHandler: function(data){
     var inputs = "";
     for (var i in data) {
       if (typeof data[i] === "object") {
@@ -305,12 +237,12 @@
         inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
       }
     }
-    var RazorPayForm = _chop.currentScript.parentElement;
+    var RazorPayForm = currentScript.parentElement;
     RazorPayForm.innerHTML += inputs;
     RazorPayForm.submit();
-  };
+  },
 
-  _chop.parseScriptOptions = function(options){
+  parseScriptOptions: function(options){
     var category, dotPosition, i, ix, property;
     for (i in options) {
       ix = i.indexOf(".");
@@ -330,11 +262,11 @@
     }
     if(options.method)
       _chop.parseScriptOptions(options.method);
-  };
+  },
 
-  _chop.addButton = function(rzp){
+  addButton: function(rzp){
     var button = document.createElement('input');
-    var form = _chop.currentScript.parentNode;
+    var form = currentScript.parentNode;
     button.type = 'submit';
     button.value = rzp.options.buttontext;
     button.className = 'razorpay-payment-button';
@@ -347,16 +279,16 @@
       rzp.open();
       return false;
     }
-  };
+  },
 
   /**
   * This checks whether we are in automatic mode
   * If yes, it puts in the button
   */
-  _chop.automaticCheckoutInit = function(){
-    var key = _chop.currentScript.getAttribute('data-key');
+  automaticCheckoutInit: function(){
+    var key = currentScript.getAttribute('data-key');
     if (key && key.length > 0){
-      var attrs = _chop.currentScript.attributes;
+      var attrs = currentScript.attributes;
       var opts = {};
       for(var i=0; i<attrs.length; i++){
         var name = attrs[i].name
@@ -371,50 +303,103 @@
       _chop.addButton(rzp);
     }
   }
+}
 
-  discreet.validateCheckout = function(options, errors){
-    var amount = parseInt(options.amount);
-    options.amount = String(options.amount);
-    if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
-      errors.push({
-        message: 'Invalid amount specified',
-        field: 'amount'
-      });
-    }
+Razorpay.prototype.open = function() {
+  if(!_chop.bodyEl) _chop.bodyEl = document.getElementsByTagName('body')[0];
+  if(!_chop.bodyEl) setTimeout(this.open());
+  if(_chop.isOpen) return;
+  _chop.isOpen = true;
 
-    if (typeof options.name === 'undefined'){
-      errors.push({
-        message: 'Merchant name cannot be empty',
-        field: 'name'
-      })
-    }
+  _chop.bodyOverflow = _chop.bodyEl.style.overflow;
+  $.addMessageListener(_chop.onFrameMessage, this);
 
-    if (options.handler && typeof options.handler != 'function'){
-      errors.push({
-        message: 'Handler must be a function',
-        field: 'handler'
-      });
+  if(!_chop.frameContainer){
+    _chop.fallbacks();
+    _chop.frameContainer = document.createElement('div');
+    _chop.frameContainer.className = 'razorpay-frame-container';
+    var style = _chop.frameContainer.style;
+    var rules = {
+      zIndex: '99999',
+      position: (_chAbsoluteContainer ? 'absolute' : 'fixed'),
+      top: (_chAbsoluteContainer ? _chPageYOffset+'px' : '0'),
+      height: (_chAbsoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
+      left: '0',
+      width: '100%',
+      '-webkit-transition': '0.2s ease-out top'
     }
+    for(var i in rules){
+      style[i] = rules[i];
+    }
+    _chop.backdrop = document.createElement('div');
+    _chop.backdrop.setAttribute('style', 'min-height: '+_chBackMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
+    _chop.frameContainer.appendChild(_chop.backdrop);
+    _chop.bodyEl.appendChild(_chop.frameContainer);
+  }
+  if(!_chAbsoluteContainer)
+    _chop.bodyEl.style.overflow = 'hidden';
+  _chop.frameContainer.style.display = 'block';
+  try{
+    // setting unsupported value throws error in IE
+    _chop.backdrop.style.background = 'rgba(0,0,0,0.6)';
+  } catch(e){}
+  if(!this.checkoutFrame){
+    this.checkoutFrame = _chop.createFrame(this.options);
+    _chop.frameContainer.appendChild(this.checkoutFrame);
+  } else {
+    this.checkoutFrame.style.display = 'block';
+    _chop.setMetaViewport();
+    _chop.sendFrameMessage.call(this, {event: 'open'});
+  }
+};
 
-    if(options.display_currency){
-      if(options.display_currency === 'USD'){
-        options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
-        if(!options.display_amount){
-          errors.push({
-            message: 'Invalid display_amount specified',
-            field: 'display_amount'
-          });
-        }
-      } else {
-        errors.push({
-          message: 'Invalid display currency specified',
-          field: 'display_currency'
-        });
-      }
-    }
+Razorpay.prototype.close = function(){
+  if(_chop.isOpen){
+    _chop.sendFrameMessage.call(this, {event: 'close'});
+  }
+};
+
+discreet.validateCheckout = function(options, errors){
+  var amount = parseInt(options.amount);
+  options.amount = String(options.amount);
+  if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
+    errors.push({
+      message: 'Invalid amount specified',
+      field: 'amount'
+    });
   }
 
-  // Get the ball rolling in case we are in manual mode
-  _chop.automaticCheckoutInit();
-  //ENV_TEST window._chop = _chop;
-})()
+  if (typeof options.name === 'undefined'){
+    errors.push({
+      message: 'Merchant name cannot be empty',
+      field: 'name'
+    })
+  }
+
+  if (options.handler && typeof options.handler != 'function'){
+    errors.push({
+      message: 'Handler must be a function',
+      field: 'handler'
+    });
+  }
+
+  if(options.display_currency){
+    if(options.display_currency === 'USD'){
+      options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
+      if(!options.display_amount){
+        errors.push({
+          message: 'Invalid display_amount specified',
+          field: 'display_amount'
+        });
+      }
+    } else {
+      errors.push({
+        message: 'Invalid display currency specified',
+        field: 'display_currency'
+      });
+    }
+  }
+};
+
+// Get the ball rolling in case we are in manual mode
+_chop.automaticCheckoutInit();
