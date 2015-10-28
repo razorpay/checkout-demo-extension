@@ -3,6 +3,8 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
+var discreet = {};
+var templates = {};
 var roll = noop = function(){};
 var ua = navigator.userAgent;
 
@@ -16,7 +18,6 @@ var Razorpay = window.Razorpay = function(options){
   return this;
 };
 
-var discreet = Razorpay.discreet = {};
 Razorpay.defaults = {
   'protocol': 'https',
   'hostname': 'api.razorpay.com',

@@ -1,7 +1,6 @@
 (function(){
   'use strict';
 
-  var $ = Razorpay.$;
   var inputClass = 'input';
   var interceptClass = /elem|placeholder|help-text/;
   var tooltipClass = 'help-text';

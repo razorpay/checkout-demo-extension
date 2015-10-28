@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  var $ = Razorpay.$;
   var timeout = null;
 
   var defaults = {

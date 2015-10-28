@@ -25,7 +25,7 @@ discreet.setupPopup = function(request, url){
 
   try{
     var popup = request.popup = new Popup('');
-    popup.window.document.write(Razorpay.templates.popup({
+    popup.window.document.write(templates.popup({
       data: request.data,
       image: options.image,
       url: url

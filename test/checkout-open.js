@@ -1,11 +1,10 @@
-var discreet = Razorpay.discreet;
 var options = {
   'key': 'key_id',
   'amount': '5100',
   'name': 'Merchant Name',
   'netbanking': 'true',
   'protocol': 'http',
-  'hostname': _chop.currentScript.src.replace('http://',''),
+  'hostname': currentScript.src.replace('http://',''),
   'prefill': {
     'name': 'Shashank Mehta',
     'email': 'sm@razorpay.com',
@@ -318,7 +317,7 @@ describe("automatic checkout:", function(){
   it("submit handler should submit with all fields", function(){
     var spy = jasmine.createSpy();
     
-    _chop.currentScript.parentNode.submit = function(){
+    currentScript.parentNode.submit = function(){
       var payload = [];
       jQuery(this).children('input[name]').each(function(index, el){
         payload.push(el.name + '=' + el.value);
@@ -379,7 +378,7 @@ describe("automatic checkout:", function(){
     var init_options = jQuery.extend(true, {}, options);
     init_options.buttontext = 'Dont pay';
     var rzp = new Razorpay(init_options);
-    var parent = _chop.currentScript.parentNode;
+    var parent = currentScript.parentNode;
     _chop.addButton(rzp);
     
     it("onsubmit should be attached on parent element", function(){
@@ -432,7 +431,7 @@ describe("automatic checkout:", function(){
       spyCalled = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
       for(var i in opts)
-        _chop.currentScript.setAttribute('data-' + i, opts[i]);
+        currentScript.setAttribute('data-' + i, opts[i]);
     })
 
     afterEach(function(){
@@ -442,11 +441,11 @@ describe("automatic checkout:", function(){
       spyNotCalled && expect(spyNotCalled).not.toHaveBeenCalled();
 
       for(var i in opts)
-        _chop.currentScript.removeAttribute(i);
+        currentScript.removeAttribute(i);
     })
 
     it("should do nothing if data-key attribute is not present", function(){
-      _chop.currentScript.removeAttribute('data-key');
+      currentScript.removeAttribute('data-key');
       spyCalled = null;
       spyOn(_chop, 'addButton').and.callFake(spyNotCalled);
     })

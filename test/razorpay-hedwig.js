@@ -1,6 +1,3 @@
-var discreet = Razorpay.discreet;
-var $ = Razorpay.$;
-
 describe("onComplete should", function(){
   var spy;
   var req = {

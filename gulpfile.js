@@ -6,6 +6,7 @@ var less = require('gulp-less');
 var concat = require('gulp-concat');
 var autoprefixer = require('gulp-autoprefixer');
 var usemin = require('gulp-usemin');
+var insert = require('gulp-insert');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 
@@ -32,7 +33,7 @@ gulp.task('compileTemplates', function(){
   return dot.process({
     path: assetPath('_templates'),
     destination: assetPath('templates'),
-    global: 'Razorpay.templates'
+    global: 'templates'
   });
 });
 
@@ -63,6 +64,7 @@ gulp.task('sourceMaps', ['compileTemplates', 'usemin'], function(){
 gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
   // uglify
   gulp.src(distDir + '/*.js')
+    .pipe(insert.wrap('(function(){', '})()'))
     .pipe(uglify())
     .pipe(gulp.dest(distDir));
 })
@@ -104,9 +106,6 @@ var karmaOptions = {
 };
 
 gulp.task('test', ['buildDev'], function(done){
-  // leak discreet variables
-  execSync('cd app && sed -i -- s@//ENV_TEST@/*ENV_TEST*/@g $(find js -type f)');
-
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
@@ -127,7 +126,6 @@ function testFromStack(counter, allOptions, done){
     } else if(allOptions.release){
       done();
     } else {
-      execSync('sed -i -- s@/\\\\*ENV_TEST\\\\*/@//ENV_TEST@g $(find app/js -type f)');
       createCoverageReport();
       done();
       // testRelease(done);

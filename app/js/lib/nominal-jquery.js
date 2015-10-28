@@ -1,4 +1,4 @@
-var $ = Razorpay.$ = function(el){
+var $ = function(el){
   if(typeof el == 'string') return $(document.getElementById(el));
   if(!(this instanceof $)) return new $(el);
   this[0] = el;

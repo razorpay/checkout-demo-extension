@@ -1,5 +1,3 @@
-var discreet = Razorpay.discreet;
-var $ = Razorpay.$;
 var orig_methods = window.payment_methods = {"card":true,"netbanking":{"HDFC":"HDFC Bank", "UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},"wallet":{"paytm":true}};
 
 function openCheckoutForm(options){
@@ -49,7 +47,7 @@ describe("in-iframe should have", function(){
     expect(Smarty).toBeDefined();
   })
   it("modal template", function(){
-    expect(Razorpay.templates.modal).toBeDefined();
+    expect(templates.modal).toBeDefined();
   })
 })
 
@@ -743,8 +741,8 @@ describe("handleMessage should", function(){
 describe("set url query params", function(){
   it("", function(){
     frameDiscreet.setQueryParams('qwe=asd&poe.level2=hjk&bnm=786');
-    expect(frameDiscreet.qpmap.qwe).toBe('asd');
-    expect(frameDiscreet.qpmap.poe.level2).toBe('hjk');
-    expect(frameDiscreet.qpmap.bnm).toBe('786');
+    expect(qpmap.qwe).toBe('asd');
+    expect(qpmap.poe.level2).toBe('hjk');
+    expect(qpmap.bnm).toBe('786');
   })
 })

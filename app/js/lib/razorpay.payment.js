@@ -151,7 +151,7 @@ var _caFormatExpiry = function(e){
     pos = (prefix + character).length;
     _caSetCaret(el, pos);
   })
-}
+};
 
 var _caFormatExpiryBack = function(e){
   if((e.which || e.keyCode) !== 8) return;
@@ -199,7 +199,7 @@ var _caFormatNumber = function(e){
   } else {
     this.value = value.replace(cardobj.space, cardobj.subs);      
   }
-}
+};
 
 var _caFormatNumberBack = function(e){
   if((e.which || e.keyCode) != 8) return;
@@ -213,7 +213,7 @@ var _caFormatNumberBack = function(e){
     e.preventDefault();
     el.value = el.value.slice(0, len-2);
   }
-}
+};
 
 var card = {
   luhn: function(num){
@@ -270,4 +270,4 @@ var card = {
   getType: _caCardType,
   setType: $.noop,
   filled: $.noop
-}
+};

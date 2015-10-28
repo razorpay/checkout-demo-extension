@@ -206,7 +206,7 @@ var frameDiscreet = {
       if(div.style.color){
         var style = document.createElement('style');
         document.body.appendChild(style);
-        var rules = Razorpay.templates.theme(opts.theme.color);
+        var rules = templates.theme(opts.theme.color);
         if (style.styleSheet) {
           style.styleSheet.cssText = rules;
         } else {
@@ -216,7 +216,7 @@ var frameDiscreet = {
     } catch(e){
       roll(e.message);
     }
-    div.innerHTML = Razorpay.templates.modal(opts);
+    div.innerHTML = templates.modal(opts);
     document.body.appendChild(div.firstChild);
     if(window.CheckoutBridge)
       $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
