@@ -212,11 +212,11 @@
       var div = document.createElement('div');
       opts.netbanks = freq_banks;
       try{
-        div.style.color = opts.theme.brandColor;
+        div.style.color = opts.theme.color;
         if(div.style.color){
           var style = document.createElement('style');
           document.body.appendChild(style);
-          var rules = Razorpay.templates.theme(opts.theme.brandColor);
+          var rules = Razorpay.templates.theme(opts.theme.color);
           if (style.styleSheet) {
             style.styleSheet.cssText = rules;
           } else {

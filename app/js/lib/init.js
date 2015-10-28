@@ -54,7 +54,7 @@
       'backdropClose': false
     },
     'theme': {
-      'brandColor': '#00BCD4'
+      'color': '#00BCD4'
     },
     'signature': '',
     'display_amount': '',
