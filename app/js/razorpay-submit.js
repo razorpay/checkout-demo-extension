@@ -28,14 +28,16 @@ discreet.setupPopup = function(request, url){
     url: url
   }
 
-  if(_rahe.isIEMobile && false){
+  if(_rahe.isIEMobile){
     _rahe.setupCC(request, templateVars);
   } else {
     try{
-      window.showModalDialog('http://google.com');
-      return;
       var popup = request.popup = new Popup('');
-
+    } catch(e){
+      roll('Error creating popup: ' + e.message);
+      _rahe.setupCC(request, templateVars);
+    }
+    try{
       templateVars.image = options.image;
       popup.window.document.write(templates.popup(templateVars));
       popup.window.document.close();
@@ -53,7 +55,6 @@ discreet.setupPopup = function(request, url){
       }
       roll(info, {image: options.image, name: options.name, description: options.description});
     } catch(e){
-      alert(e.message);
       roll('Error accessing popup: ' + e.message);
     }
   }
@@ -94,9 +95,9 @@ var _rahe = {
 
     if(data){
       var formHTML = '';
-      for(i in rdata){
+      for(i in data){
         var j = i.replace(/"/g,''); // attribute sanitize
-        formHTML += '<input type="hidden" name="'+j+'" value="'+rdata[i]+'">';
+        formHTML += '<input type="hidden" name="'+j+'" value="'+data[i]+'">';
       }
       form.innerHTML = formHTML;
     }

@@ -251,7 +251,7 @@ var frameDiscreet = {
     //   $('netb-banks').on('click', discreet.bank_radio, true);
 
     if(frameDiscreet.qpmap){
-      var lis = $(tabs)[0].getElementsByTagName('li');
+      var lis = $('tabs')[0].getElementsByTagName('li');
       for(var i=0; i<lis.length; i++){
         if(lis[i].getAttribute('data-target') == 'tab-' + frameDiscreet.qpmap.tab){
           frameDiscreet.tab_change({target: lis[i]});
