@@ -64,7 +64,7 @@ gulp.task('sourceMaps', ['compileTemplates', 'usemin'], function(){
 gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
   // uglify
   gulp.src(distDir + '/*.js')
-    .pipe(insert.wrap('(function(){', '})()'))
+    .pipe(insert.wrap('"use strict";(function(){', '})()'))
     .pipe(uglify())
     .pipe(gulp.dest(distDir));
 })

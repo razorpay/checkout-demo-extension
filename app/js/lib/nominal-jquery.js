@@ -134,7 +134,7 @@ $.defaults = function(target, defaults){
 // var _$crossCookie = false;
 
 $.setCookie = function(name, value){
-  document.cookie = name + "=" + value + "; path=/";
+  document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
 };
 
 $.getCookie = function(name){

@@ -2,9 +2,6 @@ Razorpay.prototype.configure = function(overrides){
   this.options = _base.configure(overrides);
   this.modal = {options: {}};
 
-  if(typeof discreet.initHedwig == 'function'){
-    discreet.initHedwig.call(this);
-  }
   if(typeof discreet.initCheckout == 'function'){
     discreet.initCheckout.call(this);
   }
@@ -191,4 +188,3 @@ discreet.nextRequestRedirect = function(data){
     discreet.error.call(this, errorData);
   }
 };
-//ENV_TEST window._base = _base;

@@ -5,7 +5,8 @@ var currentScript = document.currentScript || (function() {
 
 var discreet = {};
 var templates = {};
-var roll = noop = function(){};
+var roll = function(){};
+var noop = roll;
 var ua = navigator.userAgent;
 
 var Razorpay = window.Razorpay = function(options){

@@ -23,39 +23,94 @@ discreet.setupPopup = function(request, url){
     $.addMessageListener(_rahe.onmessage, request);
   }
 
-  try{
-    var popup = request.popup = new Popup('');
-    popup.window.document.write(templates.popup({
-      data: request.data,
-      image: options.image,
-      url: url
-    }));
-    popup.window.document.close();
+  var templateVars = {
+    data: request.data,
+    url: url
+  }
 
-    popup.onClose(function(){
-      _rahe.onComplete({error:{description:'Payment cancelled'}});
-    })
-    var info;
-    if(typeof popup.window == 'undefined'){
-      info = "Popup window inaccessible";
-    } else if(popup.window && popup.window.closed){
-      info = "Popup window closed";
-    } else {
-      info = "Popup window opened";
+  if(_rahe.isIEMobile && false){
+    _rahe.setupCC(request, templateVars);
+  } else {
+    try{
+      window.showModalDialog('http://google.com');
+      return;
+      var popup = request.popup = new Popup('');
+
+      templateVars.image = options.image;
+      popup.window.document.write(templates.popup(templateVars));
+      popup.window.document.close();
+
+      popup.onClose(function(){
+        _rahe.onComplete({error:{description:'Payment cancelled'}});
+      })
+      var info;
+      if(typeof popup.window == 'undefined'){
+        info = "Popup window inaccessible";
+      } else if(popup.window && popup.window.closed){
+        info = "Popup window closed";
+      } else {
+        info = "Popup window opened";
+      }
+      roll(info, {image: options.image, name: options.name, description: options.description});
+    } catch(e){
+      alert(e.message);
+      roll('Error accessing popup: ' + e.message);
     }
-    roll(info, {image: options.image, name: options.name, description: options.description});
-  } catch(e){
-    roll('Error accessing popup: ' + e.message);
   }
 }
 
 var _rahe = {
+
+  ccInterval: null,
+  isIEMobile: /Windows Phone/.test(ua),
+
+  setupCC: function(request, templateVars){
+    $.setCookie('submitPayload', JSON.stringify(templateVars));
+    _rahe.formSubmit(
+      request.options.protocol + '://' + request.options.hostname + '/processing.php',
+      null,
+      null,
+      '_blank'
+    );
+    _rahe.ccInterval = setInterval(function(){
+      var c = $.getCookie('onComplete');
+      if(c){
+        _rahe.onComplete(c);
+      }
+    }, 500)
+  },
+
+  formSubmit: function(action, method, data, target){
+    var form = document.createElement('form');
+    form.setAttribute('action', action);
+
+    if(method){
+      form.setAttribute('method', method);
+    }
+
+    if(target){
+      form.setAttribute('target', target);
+    }
+
+    if(data){
+      var formHTML = '';
+      for(i in rdata){
+        var j = i.replace(/"/g,''); // attribute sanitize
+        formHTML += '<input type="hidden" name="'+j+'" value="'+rdata[i]+'">';
+      }
+      form.innerHTML = formHTML;
+    }
+    document.body.appendChild(form);
+    form.submit();
+  },
+
   onmessage: function(e){
     if(discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0){
       return roll('message received from origin', e.origin);
     }
     _rahe.onComplete(e.data);
   },
+
   onComplete: function(data){
     if(typeof popupRequest !== 'object')
       return;
@@ -70,10 +125,16 @@ var _rahe = {
     } catch(e){
       roll(e.message);
     }
+
     popupRequest = null;
     $.removeMessageListener();
+    if(_rahe.ccInterval){
+      clearInterval(_rahe.ccInterval);
+      _rahe.ccInterval = null;
+    }
     return true; // if true, popup closes itself.
   },
+
   handleResponse: function(popupRequest, data){
     if (data.error && data.error.description){
       if(typeof popupRequest.error === 'function'){
@@ -127,23 +188,10 @@ Razorpay.payment = {
       rdata['notes['+i+']'] = rdata.notes[i];
     }
     delete rdata.notes;
-    var url = discreet.makeUrl(options);
-    var jsonpUrl = url + options.jsonpUrl;
-    url += '/payments/create/checkout';
+    var url = discreet.makeUrl(options) + '/payments/create/checkout';
 
     if(options.redirect){
-      var form = document.createElement('form');
-      form.setAttribute('action', url);
-      form.setAttribute('method', 'post');
-      var formHTML = '';
-
-      for(i in rdata){
-        var j = i.replace(/"/g,''); // attribute sanitize
-        formHTML += '<input type="hidden" name="'+j+'" value="'+rdata[i]+'">';
-      }
-      form.innerHTML = formHTML;
-      document.body.appendChild(form);
-      form.submit();
+      _rahe.formSubmit(url, 'post', rdata);
       return true;
     } else {
       if(!rdata.callback_url && options.callback_url) rdata.callback_url = options.callback_url;
