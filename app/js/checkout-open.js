@@ -362,7 +362,8 @@ Razorpay.prototype.close = function(){
 discreet.validateCheckout = function(options, errors){
   var amount = parseInt(options.amount);
   options.amount = String(options.amount);
-  if (!amount || typeof amount !== 'number' || amount < 0 || options.amount.indexOf('.') !== -1) {
+  if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
+    alert('Invalid amount. Minimum amount is Re.1');
     errors.push({
       message: 'Invalid amount specified',
       field: 'amount'

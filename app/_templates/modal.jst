@@ -32,8 +32,7 @@
               <input type="hidden" name="amount" value="{{=it.amount}}">
               <input type="hidden" name="currency" value="{{=it.currency}}">
               <input type="hidden" name="description" value="{{=it.description}}">
-              {{for(note in it.notes){}}
-                <!-- udf fields provided by merchant -->
+              {{for(var note in it.notes){}}
                 <input type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
               {{}}}
 
