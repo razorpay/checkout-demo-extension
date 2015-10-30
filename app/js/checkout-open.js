@@ -174,6 +174,7 @@ var _chop = {
       _chop.setImageOption(options);
 
       var response = {
+        id: this._id,
         context: location.href,
         options: options
       }
