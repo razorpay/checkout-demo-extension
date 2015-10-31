@@ -464,7 +464,10 @@ var frameDiscreet = {
           err_field = 'card[expiry]';
         var error_el = document.getElementsByName(err_field);
         if (error_el.length && error_el[0].type != 'hidden'){
-          $(error_el[0].parentNode).addClass('invalid');
+          var help_text = $(error_el[0].parentNode).addClass('invalid').find('help-text')[0];
+          if(help_text){
+            help_text.innerHTML = message;
+          }
           error_el[0].focus();
           frameDiscreet.frontDrop();
           return;
