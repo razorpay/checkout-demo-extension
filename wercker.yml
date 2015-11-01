@@ -16,10 +16,10 @@ build:
             channel: tech_bots
 deploy:
     steps:
-        - npm-install
         - script:
             name: Install gulp globally
-            code: npm install -g gulp
+            code: rm -rf node_modules && npm install -g gulp
+        - npm-install
         - script:
             name: Install sudo,pip
             code: apt-get update && apt-get -q -y install python-pip sudo
