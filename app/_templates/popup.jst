@@ -70,7 +70,7 @@
     </div>
     <div style="display:inline-block;vertical-align:middle;height:90%;width:0"></div>
     <form action="{{=it.url}}" method="post">
-      {{for(i in it.data){}}
+      {{for(var i in it.data){}}
         <input type="hidden" name="{{=i}}" value="{{=it.data[i]}}">
       {{}}}
     </form>
