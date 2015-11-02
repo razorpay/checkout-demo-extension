@@ -133,6 +133,10 @@ $.defaults = function(target, defaults){
 
 // var _$crossCookie = false;
 
+$.deleteCookie = function(name){
+  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+};
+
 $.setCookie = function(name, value){
   document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
 };

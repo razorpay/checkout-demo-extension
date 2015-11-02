@@ -33,9 +33,10 @@ discreet.setupPopup = function(request, url){
   } else {
     try{
       var popup = request.popup = new Popup('');
+      popup.window.document; // let this throw error
     } catch(e){
-      roll('Error creating popup: ' + e.message);
-      _rahe.setupCC(request, templateVars);
+      roll('Going newtab because ' + e.message);
+      return _rahe.setupCC(request, templateVars);
     }
     try{
       templateVars.image = options.image;
@@ -73,9 +74,11 @@ var _rahe = {
       null,
       '_blank'
     );
+    $.deleteCookie('onComplete');
     _rahe.ccInterval = setInterval(function(){
       var c = $.getCookie('onComplete');
       if(c){
+        $.deleteCookie('onComplete');
         _rahe.onComplete(c);
       }
     }, 500)
