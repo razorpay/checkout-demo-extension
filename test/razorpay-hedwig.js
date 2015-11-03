@@ -2,8 +2,8 @@ describe("onComplete should", function(){
   var spy;
   var req = {
     postmessage: false,
-    success: jQuery.noop,
-    error: jQuery.noop,
+    success: noop,
+    error: noop,
     options: Razorpay.defaults,
     data: {
       amount: 3000

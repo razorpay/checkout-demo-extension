@@ -277,14 +277,11 @@ describe("Razorpay card tab submit", function(){
       $ccCVV.sendkeys(cc.cvv);
     }
 
-    afterEach(function(done){
-      setTimeout(function(){
-        sendclick($ccSubmit[0]);
-        expect(spyCalled).toHaveBeenCalled();
-        expect(spyNotCalled).not.toHaveBeenCalled();
-        frameDiscreet.hide();
-        done();
-      });
+    afterEach(function(){
+      sendclick($ccSubmit[0]);
+      expect(spyCalled).toHaveBeenCalled();
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      frameDiscreet.hide();
     })
 
     describe("with all details in place", function(){
@@ -294,7 +291,7 @@ describe("Razorpay card tab submit", function(){
       afterEach(function(){
         addAllCC();
 
-        spyOn(discreet, 'setupPopup').and.callFake(function(options){
+        spyOn(Razorpay.payment, 'authorize').and.callFake(function(options){
           spyCalled();
           expect(options.data[field]).toBe(value);
         });
@@ -302,9 +299,6 @@ describe("Razorpay card tab submit", function(){
 
       it("should submit with all details in place", function(){
         launch();
-        spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
-          spyCalled();
-        });
       });
 
       describe(": in submitted data", function(){

@@ -15,7 +15,6 @@ discreet.setupPopup = function(request, url){
       content: data
     });
   }
-
   if(request.postmessage === false){
     window.onComplete = _rahe.onComplete;
   }
@@ -119,9 +118,6 @@ var _rahe = {
     if(typeof popupRequest !== 'object')
       return;
 
-    if(typeof data === 'string')
-      data = JSON.parse(data);
-
     _rahe.handleResponse(popupRequest, data);
 
     try{
@@ -140,19 +136,26 @@ var _rahe = {
   },
 
   handleResponse: function(popupRequest, data){
-    if (data.error && data.error.description){
-      if(typeof popupRequest.error === 'function'){
-        popupRequest.error(data);
+    try{
+
+      if(typeof data === 'string')
+        data = JSON.parse(data);
+
+      if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
+        var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
+        return popupRequest.success.call(null, returnObj); // dont expose request as this
       }
+
+      else if(typeof popupRequest.error !== 'function'){
+        return;
+      }
+      data.error.description;
     }
-    else if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
-      var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
-      popupRequest.success.call(null, returnObj); // dont expose request as this
+    catch(e){
+      data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
+      roll('unexpected api response', e.message);
     }
-    else if(typeof popupRequest.error == 'function'){
-      popupRequest.error({description: 'Unable to parse server response'});
-      roll('unexpected api response', data);
-    }
+    popupRequest.error.call(null, data);
   }
 }
 

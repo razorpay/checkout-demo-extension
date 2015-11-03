@@ -1,34 +1,7 @@
 var options = {
   'key': 'key_id',
   'amount': '40000',
-  'name': 'Merchant Name',
-  'hostname': 'api.razorpay.dev'
-}
-
-var response_v1 = {
-  success: {
-    "version": "1",
-    "request": {
-      "url": "http://api.razorpay.dev/gateway/3dsecure",
-      "method": "post",
-      "content": null
-    },
-    "payment_id": "5668898417810430",
-    "gateway": "axis"
-  },
-  error: {
-    "version": "1",
-    "error": {
-      "description": "error_desc",
-      "field": "error_field"
-    },
-    "payment_id": "5668898417810430",
-    "gateway": "axis"
-  }
-}
-
-var no3dsecureResponse = {
-  razorpay_payment_id: 'xyz'
+  'name': 'Merchant Name'
 }
 
 var request = {
@@ -90,6 +63,8 @@ describe("authorize should", function(){
   var init_options, rzp, req;
 
   beforeEach(function(){
+    Razorpay.payment.cancel();
+    popupRequest = null;
     req = jQuery.extend(true, {}, request);
   });
 
@@ -122,28 +97,28 @@ describe("authorize should", function(){
     expect(req.data['notes[note2]']).toBe('two');
   })
 
-  // it("add callback_url if specified in options", function(){
-  //   Razorpay.defaults.callback_url = 'swag';
-  //   Razorpay.payment.authorize(req);
-  //   expect(req.data.callback_url).toBe('swag');
-  //   Razorpay.defaults.callback_url = ''; // reset
-  // })
+  it("add callback_url if specified in options", function(){
+    Razorpay.defaults.callback_url = 'swag';
+    Razorpay.payment.authorize(req);
+    expect(req.data.callback_url).toBe('swag');
+    Razorpay.defaults.callback_url = ''; // reset
+  })
 
-  // it("add merchant key in request data", function(){
-  //   Razorpay.payment.authorize(req);
-  //   expect(req.data.key_id).toBe(options.key);
-  // })
+  it("add merchant key in request data", function(){
+    Razorpay.payment.authorize(req);
+    expect(req.data.key_id).toBe(options.key);
+  })
 
-  // it("setup popup", function(){
-  //   Razorpay.payment.authorize(req);
-  //   var isPopup = req.popup instanceof Popup;
-  //   expect(isPopup).toBe(true);
-  // })
+  it("setup popup", function(){
+    Razorpay.payment.authorize(req);
+    var isPopup = req.popup instanceof Popup;
+    expect(isPopup).toBe(true);
+  })
 
-  // it("add options to request object", function(){
-  //   Razorpay.payment.authorize(req);
-  //   expect(typeof req.options).toBe('object');
-  // })
+  it("add options to request object", function(){
+    Razorpay.payment.authorize(req);
+    expect(typeof req.options).toBe('object');
+  })
 })
 
 describe("getMethods should", function(){
@@ -155,5 +130,60 @@ describe("getMethods should", function(){
     });
     Razorpay.payment.getMethods(spyCalled);
     expect(spyCalled).toHaveBeenCalled();
+  })
+})
+
+describe("handleResponse should invoke", function(){
+  var popupRequest = {
+    error: noop,
+    success: noop
+  };
+  var spyCalled, spyNotCalled;
+
+  beforeEach(function(){
+    spyCalled = jasmine.createSpy();
+    spyNotCalled = jasmine.createSpy();
+  })
+
+  afterEach(function(){
+    expect(spyCalled).toHaveBeenCalled();
+    expect(spyNotCalled).not.toHaveBeenCalled();
+  })
+
+  it("error if response has error", function(){
+    spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
+    spyOn(popupRequest, 'error').and.callFake(function(data){
+      expect(error_data).toBe(data);
+      spyCalled();
+    })
+    var error_data = {
+      error: {
+        description: 'hello'
+      }
+    };
+    _rahe.handleResponse(popupRequest, error_data);
+  })
+
+  it("error if response is invalid", function(){
+    spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
+    spyOn(popupRequest, 'error').and.callFake(function(data){
+      expect(error_data).not.toBe(data);
+      expect(typeof data.error.description).toBe('string');
+      spyCalled();
+    })
+    var error_data = {};
+    _rahe.handleResponse(popupRequest, error_data);
+  })
+
+  it("success if response contains payment id", function(){
+    spyOn(popupRequest, 'error').and.callFake(spyNotCalled);
+    spyOn(popupRequest, 'success').and.callFake(function(data){
+      expect(success_data).not.toBe(data);
+      spyCalled();
+    })
+    var success_data = {
+      razorpay_payment_id: '12344'
+    };
+    _rahe.handleResponse(popupRequest, success_data);
   })
 })
