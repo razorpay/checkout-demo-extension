@@ -158,17 +158,16 @@ var _chop = {
 
 
     if(event === 'load'){
-      var i;
       var options = {};
       _chop.setMetaViewport();
 
-      for(i in this.options){
+      for(var i in this.options){
         var value = this.options[i];
         if(typeof value != 'function' && i != 'parent'){
           options[i] = value;
         }
       }
-      for(i in this.modal.options){
+      for(var i in this.modal.options){
         this.options.modal[i] = this.modal.options[i];
       }
       _chop.setImageOption(options);

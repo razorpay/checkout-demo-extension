@@ -98,7 +98,7 @@ var _rahe = {
 
     if(data){
       var formHTML = '';
-      for(i in data){
+      for(var i in data){
         var j = i.replace(/"/g,''); // attribute sanitize
         formHTML += '<input type="hidden" name="'+j+'" value="'+data[i]+'">';
       }
@@ -161,6 +161,11 @@ var _rahe = {
   @param request  contains payment data and optionally callbacks to success, error and element to put iframe in
 */
 Razorpay.payment = {
+  cancel: function(){
+    if(popupRequest && popupRequest.popup){
+      popupRequest.popup.close();
+    }
+  },
   authorize: function(request, throwError){
     if(typeof request != 'object' || typeof request.data !== 'object'){
       return false;

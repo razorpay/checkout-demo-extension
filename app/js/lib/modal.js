@@ -146,7 +146,6 @@
           }
         })
       }
-      this.on('click', $('modal-close')[0], this.hide);
       if (this.options.backdropClose) {
         this.on('click', $('backdrop')[0], this.backdropHide)
       }

@@ -64,11 +64,10 @@ var frameDiscreet = {
   },
   
   setMethods: function(payment_methods, opts){
-    var i;
     var methodOptions = opts.method;
 
     if(!payment_methods.error){
-      for(i in payment_methods){
+      for(var i in payment_methods){
         if(methodOptions[i] != false && payment_methods[i] != false){
           methodOptions[i] = payment_methods[i];
         }
@@ -77,7 +76,7 @@ var frameDiscreet = {
       if(methodOptions.wallet && frameDiscreet.rzp.options.amount <= 100*10000){
         var printedWallets = payment_methods['wallet'];
         if(typeof printedWallets == 'object'){
-          for(i in printedWallets){
+          for(var i in printedWallets){
             if(printedWallets[i]){
               var logos = _if_wallet_logos[i];
               if(logos){
@@ -237,6 +236,10 @@ var frameDiscreet = {
 
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
+    $('modal-close').on('click', function(){
+      Razorpay.payment.cancel();
+      frameDiscreet.modal.hide();
+    });
     $('tabs').on('click', frameDiscreet.tab_change);
     $('form').on('submit', function(e){
       frameDiscreet.formSubmit(e);
