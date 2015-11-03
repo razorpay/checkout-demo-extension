@@ -18,11 +18,11 @@ try{
   })
   roll = function(message, data, level){
     if(!level) level = 'error';
-    if(location.href.indexOf('api.razorpay.com') > 0){
+    if(window.Rollbar && location.href.indexOf('api.razorpay.com') > 0){
       if(data)
-        r[level](message, data);
+        Rollbar[level](message, data);
       else
-        r[level](message);
+        Rollbar[level](message);
     }
   }
 } catch(e){}

@@ -513,8 +513,8 @@ var frameDiscreet = {
       Rollbar.configure({
         payload: {
           person: {
-            key: message.options.key,
-            id: message.id
+            id: message.options.key,
+            _: message.id
           },
           context: message.context
         }
