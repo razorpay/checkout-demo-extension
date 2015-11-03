@@ -187,3 +187,38 @@ describe("handleResponse should invoke", function(){
     _rahe.handleResponse(popupRequest, success_data);
   })
 })
+
+describe("onComplete should", function(){
+  var spyCalled, spyNotCalled, data;
+
+  beforeEach(function(){
+    popupRequest = null;
+  })
+
+  afterEach(function(){
+    _rahe.onComplete(popupRequest);
+
+    if(spyCalled){
+      expect(spyCalled).toHaveBeenCalled();
+      spyCalled = null;
+    }
+
+    if(spyNotCalled){
+      expect(spyNotCalled).not.toHaveBeenCalled();
+      spyNotCalled = null;
+    }
+
+    expect(popupRequest).toBe(null);
+  })
+
+  it("should not do anything if popupRequest is not present", function(){
+    spyNotCalled = jasmine.createSpy();
+    spyOn(_rahe, 'handleResponse').and.callFake(spyNotCalled);
+  })
+
+  it("invoke appropriate methods", function(){
+    spyCalled = jasmine.createSpy();
+    spyOn(_rahe, 'handleResponse').and.callFake(spyCalled);
+    popupRequest = {};
+  })
+})

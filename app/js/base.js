@@ -44,7 +44,7 @@ var _base = {
       if(defaults[i] !== null && typeof defaults[i] == 'object'){
         if(i === 'notes'){
           options.notes = {};
-          if(typeof overrides.notes == 'object'){
+          if(overrides.notes && typeof overrides.notes == 'object'){
             for (var j in overrides.notes){
               if(typeof overrides.notes[j] == 'string'){
                 options.notes[j] = overrides.notes[j];
@@ -54,9 +54,9 @@ var _base = {
         } else if (i === 'prefill') {
           options.prefill = JSON.parse(JSON.stringify(defaults['prefill']));
           var op = overrides.prefill;
-          if(typeof op === 'object'){
+          if(op && typeof op === 'object'){
             for(var j in defaults.prefill){
-              if(typeof op[j] === 'object'){
+              if(op[j] && typeof op[j] === 'object'){
                 for(var k in op[j]){
                   if(k in defaults.prefill[j])
                     options.prefill[j][k] = '' + op[j][k];

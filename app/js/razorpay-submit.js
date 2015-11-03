@@ -115,7 +115,7 @@ var _rahe = {
   },
 
   onComplete: function(data){
-    if(typeof popupRequest !== 'object')
+    if(!popupRequest)
       return;
 
     _rahe.handleResponse(popupRequest, data);
