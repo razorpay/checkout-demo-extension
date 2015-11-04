@@ -1,5 +1,5 @@
 var $ = function(el){
-  if(typeof el == 'string') return $(document.getElementById(el));
+  if(typeof el === 'string') return $(document.getElementById(el));
   if(!(this instanceof $)) return new $(el);
   this[0] = el;
 };
@@ -11,7 +11,7 @@ $.prototype = {
     var ref;
     if (window.addEventListener) {
       ref = function(e){
-        if(e.target.nodeType == 3) e.target = e.target.parentNode;// textNode target
+        if(e.target.nodeType === 3) e.target = e.target.parentNode;// textNode target
         callback.call(this, e);
       }
       el.addEventListener(event, ref, !!capture);
@@ -57,7 +57,7 @@ $.prototype = {
   removeClass: function(str){
     var el = this[0];
     var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-    if(el.className != className) el.className = className;
+    if(el.className !== className) el.className = className;
     return this;
   },
 
@@ -65,7 +65,7 @@ $.prototype = {
     var child = this[0].firstChild;
     var childList = [];
     while(child){
-      if(child.nodeType == 1 && !filterClass || $(child).hasClass(filterClass)) childList.push(child);
+      if(child.nodeType === 1 && !filterClass || $(child).hasClass(filterClass)) childList.push(child);
       child = child.nextSibling;
     }
     return childList;
@@ -90,7 +90,7 @@ $.prototype = {
   css: function(prop, value){
     var el = this[0];
     if(el){
-      if(arguments.length == 1) return el.style[prop];
+      if(arguments.length === 1) return el.style[prop];
       try {
         el.style[prop] = value;
       } catch(e){} // IE can not set invalid css rules without throwing up.
@@ -101,7 +101,7 @@ $.prototype = {
   attr: function(attr, value){
     var el = this[0];
     if(el){
-      if(arguments.length == 1) return el.getAttribute(attr);
+      if(arguments.length === 1) return el.getAttribute(attr);
       el.setAttribute(attr, value);
     }
   },
@@ -147,7 +147,7 @@ $.getCookie = function(name){
   for(var i=0;i < ca.length;i++){
     var c = ca[i];
     while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
   }
   return null;
 };
@@ -188,11 +188,11 @@ $.removeMessageListener = function() {
 
 var _$createListener = function(callback, context){
   return function(e){
-    if(!e || !e.data || typeof callback != 'function'){
+    if(!e || !e.data || typeof callback !== 'function'){
       return;
     }
     var data = e.data;
-    if(typeof data == 'string'){
+    if(typeof data === 'string'){
       try {
         data = JSON.parse(data);
       }
@@ -236,7 +236,7 @@ $.ajax = function(options){
   }
 
   script.onload = script.onreadystatechange = function(){
-    if(!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')){
+    if(!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete')){
       done = true;
       script.onload = script.onreadystatechange = null;
       $(script).remove();

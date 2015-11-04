@@ -13,7 +13,7 @@ var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
     return new Razorpay(options);
   }
-  if(typeof this.configure == 'function'){
+  if(typeof this.configure === 'function'){
     this.configure(options);
   }
   this._id = (new Date() - 1446190000000).toString(36);

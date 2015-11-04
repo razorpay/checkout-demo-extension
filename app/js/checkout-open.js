@@ -2,7 +2,7 @@
 // place _chop.frameContainer absolute, and add window.onscroll
 var _chBackMinHeight = 0;
 var _chPageY = 0;
-var _chAbsoluteContainer;
+var _chAbsoluteContainer = /iPhone|Android 2\./.test(ua);
 
 var _chop = {
   isOpen: false,
@@ -14,9 +14,8 @@ var _chop = {
   bodyOverflow: null,
 
   fallbacks: function(){
-    _chAbsoluteContainer = /iPhone|Android 2\./.test(ua);
 
-    if(/iPhone.+Version\/4\./.test(ua) && typeof document.height == 'number'){
+    if(/iPhone.+Version\/4\./.test(ua) && typeof document.height === 'number'){
       _chBackMinHeight = document.height;
     }
 
@@ -90,7 +89,7 @@ var _chop = {
     }
     if(_chop.frameContainer)
       _chop.frameContainer.style.display = 'none';
-    if(this instanceof Razorpay && typeof this.options.modal.onhidden == 'function')
+    if(this instanceof Razorpay && typeof this.options.modal.onhidden === 'function')
       this.options.modal.onhidden();
   },
 
@@ -103,16 +102,16 @@ var _chop = {
 
   // to handle absolute/relative url of options.image
   setImageOption: function(options){
-    if(options.image && typeof options.image == 'string'){
+    if(options.image && typeof options.image === 'string'){
       if(/data:image\/[^;]+;base64/.test(options.image)){
         return;
       }
       if(options.image.indexOf('http')){ // not 0
         var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
         var relUrl = '';
-        if(options.image[0] != '/'){
+        if(options.image[0] !== '/'){
           relUrl += location.pathname.replace(/[^\/]*$/g,'');
-          if(relUrl[0] != '/'){
+          if(relUrl[0] !== '/'){
             relUrl = '/' + relUrl;
           }
         }
@@ -122,7 +121,7 @@ var _chop = {
   },
 
   setMetaViewport: function(){
-    if(typeof document.querySelector != 'function'){
+    if(typeof document.querySelector !== 'function'){
       return;
     }
     var head = document.querySelector('head')
@@ -149,8 +148,8 @@ var _chop = {
   },
 
   onFrameMessage: function(e, data){
-    // this == rzp
-    if((typeof e.origin != 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source != 'frame')){ // source check
+    // this === rzp
+    if((typeof e.origin !== 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source !== 'frame')){ // source check
       return;
     }
     var event = data.event;
@@ -163,7 +162,7 @@ var _chop = {
 
       for(var i in this.options){
         var value = this.options[i];
-        if(typeof value != 'function' && i != 'parent'){
+        if(typeof value !== 'function' && i !== 'parent'){
           options[i] = value;
         }
       }
@@ -186,7 +185,7 @@ var _chop = {
     }
 
     else if (event === 'submit'){
-      if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit == 'function'){
+      if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit === 'function'){
         window.CheckoutBridge.onsubmit(JSON.stringify(data));
       }
     }
@@ -194,7 +193,7 @@ var _chop = {
     else if (event === 'dismiss'){
       if(_chop.backdrop)
         _chop.backdrop.style.background = '';
-      if(typeof this.options.modal.ondismiss == 'function')
+      if(typeof this.options.modal.ondismiss === 'function')
         this.options.modal.ondismiss()
     }
 
@@ -210,7 +209,7 @@ var _chop = {
         this.checkoutFrame.setAttribute('removable', true);
       }
       var handler = this.options.handler;
-      if(typeof handler == 'function'){
+      if(typeof handler === 'function'){
         setTimeout(function(){
           handler.call(null, data);
         })
@@ -378,7 +377,7 @@ discreet.validateCheckout = function(options, errors){
     })
   }
 
-  if (options.handler && typeof options.handler != 'function'){
+  if (options.handler && typeof options.handler !== 'function'){
     errors.push({
       message: 'Handler must be a function',
       field: 'handler'

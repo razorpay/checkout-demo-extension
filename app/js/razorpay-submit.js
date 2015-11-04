@@ -122,7 +122,7 @@ var _rahe = {
       if(typeof data === 'string')
         data = JSON.parse(data);
 
-      if(typeof popupRequest.success == 'function' && typeof data.razorpay_payment_id == 'string' && data.razorpay_payment_id){
+      if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
         var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
         return popupRequest.success.call(null, returnObj); // dont expose request as this
       }
@@ -163,7 +163,7 @@ Razorpay.payment = {
     }
   },
   authorize: function(request, throwError){
-    if(typeof request != 'object' || typeof request.data !== 'object'){
+    if(typeof request !== 'object' || typeof request.data !== 'object'){
       return false;
     }
     var rdata = request.data;
@@ -242,12 +242,12 @@ Razorpay.payment = {
       data: {key_id: Razorpay.defaults.key},
       timeout: 30000,
       success: function(response){
-        if(typeof callback == 'function'){
+        if(typeof callback === 'function'){
           callback(response);
         }
       },
       complete: function(data){
-        if(typeof data == 'object' && data.error && typeof callback == 'function')
+        if(typeof data === 'object' && data.error && typeof callback === 'function')
           callback({error: true});
       }
     });

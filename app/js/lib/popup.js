@@ -46,14 +46,14 @@ var Popup = function(src, opts) {
   // we try to place it at the center of the current window
   // note: this "centering" logic borrowed from the Facebook JavaScript SDK
   if (opts.centered) {
-    var screenX = null == window.screenX ? window.screenLeft : window.screenX;
-    var screenY = null == window.screenY ? window.screenTop : window.screenY;
-    var outerWidth = null == window.outerWidth ? document.documentElement.clientWidth : window.outerWidth;
-    var outerHeight = null == window.outerHeight ? (document.documentElement.clientHeight - 22) : window.outerHeight;
+    var screenX = null === window.screenX ? window.screenLeft : window.screenX;
+    var screenY = null === window.screenY ? window.screenTop : window.screenY;
+    var outerWidth = null === window.outerWidth ? document.documentElement.clientWidth : window.outerWidth;
+    var outerHeight = null === window.outerHeight ? (document.documentElement.clientHeight - 22) : window.outerHeight;
 
-    if (null == opts.left)
+    if (null === opts.left)
       opts.left = parseInt(screenX + ((outerWidth - opts.width) / 2), 10);
-    if (null == opts.top)
+    if (null === opts.top)
       opts.top = parseInt(screenY + ((outerHeight - opts.height) / 2.5), 10);
     delete opts.centered;
   }

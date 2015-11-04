@@ -26,7 +26,7 @@
     if(!this.options.animation || !this.transitionProperty){
       var duration = 0;
     } else {
-      if(typeof window.getComputedStyle == 'function'){
+      if(typeof window.getComputedStyle === 'function'){
         var durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
@@ -125,7 +125,7 @@
     },
 
     bind_events: function(){
-      if(typeof window.pageYOffset == 'number') // doesn't exist <ie9. we're concerned about mobile here.
+      if(typeof window.pageYOffset === 'number') // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function(){
           var container = this.container[0];
           var el = document.activeElement;

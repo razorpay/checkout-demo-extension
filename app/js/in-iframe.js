@@ -50,9 +50,9 @@ var frameDiscreet = {
     var method, data;
     if(window.CheckoutBridge && message && message.event){
       method = 'on' + message.event;
-      if(typeof window.CheckoutBridge[method] == 'function'){
+      if(typeof window.CheckoutBridge[method] === 'function'){
         data = message.data;
-        if(typeof data != 'string'){
+        if(typeof data !== 'string'){
           if(!data){
             return window.CheckoutBridge[method]();
           }
@@ -68,14 +68,14 @@ var frameDiscreet = {
 
     if(!payment_methods.error){
       for(var i in payment_methods){
-        if(methodOptions[i] != false && payment_methods[i] != false){
+        if(methodOptions[i] !== false && payment_methods[i] !== false){
           methodOptions[i] = payment_methods[i];
         }
       }
       var wallets = [];
       if(methodOptions.wallet && frameDiscreet.rzp.options.amount <= 100*10000){
         var printedWallets = payment_methods['wallet'];
-        if(typeof printedWallets == 'object'){
+        if(typeof printedWallets === 'object'){
           for(var i in printedWallets){
             if(printedWallets[i]){
               var logos = _if_wallet_logos[i];
@@ -96,7 +96,7 @@ var frameDiscreet = {
       methodOptions.card = false;
       methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
     }
-    if(methodOptions.netbanking !== false && typeof methodOptions.netbanking != 'object'){
+    if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
       methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
     }
   },
@@ -109,23 +109,23 @@ var frameDiscreet = {
     }
 
     // attributes
-    if(typeof obj.image == 'string'){
+    if(typeof obj.image === 'string'){
       obj.image = obj.image.replace(/"/g,'');
     }
 
     // prefills
-    if(typeof obj.prefill == 'object'){
+    if(typeof obj.prefill === 'object'){
       for(var i in obj.prefill){
-        if(typeof obj.prefill[i] == 'string'){
+        if(typeof obj.prefill[i] === 'string'){
           obj.prefill[i] = obj.prefill[i].replace(/"/g,'');
         }
       }
     }
 
     // notes
-    if(typeof obj.notes == 'object'){
+    if(typeof obj.notes === 'object'){
       for(var i in obj.notes){
-        if(typeof obj.notes[i] == 'string'){
+        if(typeof obj.notes[i] === 'string'){
           obj.notes[i] = obj.notes[i].replace(/"/g,'');
         }
       }
@@ -137,7 +137,7 @@ var frameDiscreet = {
       frameDiscreet.sanitizeDOM(obj);
       if(obj.prefill){
         if(obj.prefill.contact){
-          if(typeof obj.prefill.contact != 'string'){
+          if(typeof obj.prefill.contact !== 'string'){
             obj.prefill.contact = obj.prefill.contact + '';
           }
           obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
@@ -161,7 +161,7 @@ var frameDiscreet = {
       el.parentNode.setAttribute('cardtype', type);
       frameDiscreet.setNumberValidity.call(el);
       
-      // if(type != 'maestro'){
+      // if(type !== 'maestro'){
         // $('nocvv-check')[0].checked = false;
         // frameDiscreet.toggle_nocvv();
       // }
@@ -169,7 +169,7 @@ var frameDiscreet = {
 
     if(_if_should_focus_next){
       card.filled = function(el){
-        if(el == el_expiry)
+        if(el === el_expiry)
           el_cvv.focus();
         else
           el_expiry.focus();
@@ -184,7 +184,7 @@ var frameDiscreet = {
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-    if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] == 'string'){
+    if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string'){
       el_cvv.type = 'tel';
     }
   },
@@ -253,11 +253,11 @@ var frameDiscreet = {
     // if(navigator.userAgent.indexOf("MSIE ") > 0)
     //   $('netb-banks').on('click', discreet.bank_radio, true);
 
-    if(typeof qpmap == 'object'){
+    if(typeof qpmap === 'object'){
       if(qpmap.tab){
         var lis = $('tabs')[0].getElementsByTagName('li');
         for(var i=0; i<lis.length; i++){
-          if(lis[i].getAttribute('data-target') == 'tab-' + qpmap.tab){
+          if(lis[i].getAttribute('data-target') === 'tab-' + qpmap.tab){
             frameDiscreet.tab_change({target: lis[i]});
             break;
           }
@@ -274,9 +274,9 @@ var frameDiscreet = {
 
   bank_radio: function(e){
     var target = e.target;
-    if(target.nodeName != 'LABEL')
+    if(target.nodeName !== 'LABEL')
       target = target.parentNode;
-    if(target.nodeName != 'LABEL')
+    if(target.nodeName !== 'LABEL')
       return;
     target = target.getElementsByTagName('input')[0];
     var select = $('bank-select')[0];
@@ -300,9 +300,9 @@ var frameDiscreet = {
   tab_change: function(e){
     var target = e.target;
     
-    if(target.nodeName == 'IMG') target = target.parentNode;
+    if(target.nodeName === 'IMG') target = target.parentNode;
     
-    if(target.nodeName != 'LI' || target.className.indexOf('active') >= 0)
+    if(target.nodeName !== 'LI' || target.className.indexOf('active') >= 0)
       return;
 
     frameDiscreet.renew();
@@ -411,7 +411,7 @@ var frameDiscreet = {
     var targetTab = activeTab.getAttribute('data-target');
     frameDiscreet.getFormFields(targetTab, data);
 
-    if(targetTab == 'tab-card'){
+    if(targetTab === 'tab-card'){
       data['card[number]'] = data['card[number]'].replace(/\ /g, '');
       
       // if(!data['card[expiry]'])
@@ -468,7 +468,7 @@ var frameDiscreet = {
         if(!err_field.indexOf('expiry'))
           err_field = 'card[expiry]';
         var error_el = document.getElementsByName(err_field);
-        if (error_el.length && error_el[0].type != 'hidden'){
+        if (error_el.length && error_el[0].type !== 'hidden'){
           var help_text = $(error_el[0].parentNode).addClass('invalid').find('help-text')[0];
           if(help_text){
             help_text.innerHTML = message;
@@ -504,7 +504,7 @@ var frameDiscreet = {
         $('card_expiry')[0].value = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
       frameDiscreet.setCardFormatting();
       $('card_cvv')[0].focus();
-    } else if(data.method == 'netbanking'){
+    } else if(data.method === 'netbanking'){
       $('bank-select')[0].value = data.bank;
     }
     frameDiscreet.smarty.refresh();
@@ -526,7 +526,7 @@ var frameDiscreet = {
         roll(null, 'sdk_version='+sdk_version, 'info');
       }
       var overrides = message.overrides || message.options;
-      if(typeof overrides == 'object'){
+      if(typeof overrides === 'object'){
         overrides.amount /= 100;
         delete overrides.key;
         delete overrides.currency;
@@ -538,7 +538,7 @@ var frameDiscreet = {
     var params = search.replace(/^\?/,'').split('&');
     for(var i=0; i < params.length; i++){
       var split = params[i].split('=', 2);
-      if(split[0].indexOf('.') != -1){
+      if(split[0].indexOf('.') !== -1){
         var dotsplit = split[0].split('.', 2);
         if(!qpmap[dotsplit[0]]){
           qpmap[dotsplit[0]] = {};
@@ -553,7 +553,7 @@ var frameDiscreet = {
     if(!e || !e.data)
       return;
     var data;
-    if(typeof e.data == 'string'){
+    if(typeof e.data === 'string'){
       try{
         data = JSON.parse(e.data);
       } catch(e){
@@ -567,11 +567,11 @@ var frameDiscreet = {
 }
 
 Razorpay.sendMessage = function(message){
-  if(typeof window.CheckoutBridge == 'object'){
+  if(typeof window.CheckoutBridge === 'object'){
     frameDiscreet.notifyBridge(message);
-  } else if(window != window.parent){
+  } else if(window !== window.parent){
     message.source = 'frame';
-    if(typeof message != 'string'){
+    if(typeof message !== 'string'){
       message = JSON.stringify(message);
     }
     window.parent.postMessage(message, '*');
@@ -579,7 +579,7 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleMessage = function(message){
-  if(typeof message != 'object'){
+  if(typeof message !== 'object'){
     return;
   }
   if(message.options && !frameDiscreet.rzp){ // open modal
@@ -592,9 +592,9 @@ window.handleMessage = function(message){
       return;
     }
     frameDiscreet.showModal();
-  } else if(message.event == 'close'){
+  } else if(message.event === 'close'){
     frameDiscreet.hide();
-  } else if(message.event == 'open' && frameDiscreet.rzp){
+  } else if(message.event === 'open' && frameDiscreet.rzp){
     frameDiscreet.showModal();
   }
   if(frameDiscreet.rzp){
@@ -617,7 +617,7 @@ window.handleMessage = function(message){
           roll('message.data', data);
         }
       }
-      if(typeof data == 'object')
+      if(typeof data === 'object')
         frameDiscreet.dataHandler(data);
     }
   }

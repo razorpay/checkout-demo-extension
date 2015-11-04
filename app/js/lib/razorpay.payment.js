@@ -62,7 +62,7 @@ var _caCardType = function(num){
 var _caSetCaret = function(el, pos){
   if(navigator.userAgent.indexOf('Android'))
      return;
-  if(typeof el.selectionStart == 'number')
+  if(typeof el.selectionStart === 'number')
     el.selectionStart = el.selectionEnd = pos;
   else {
     var range = el.createTextRange();
@@ -74,8 +74,8 @@ var _caSetCaret = function(el, pos){
 }
 
 var _caCheckSelection = function(el){
-  if(typeof el.selectionStart == 'number'){
-    if(el.selectionStart != el.selectionEnd) return true;
+  if(typeof el.selectionStart === 'number'){
+    if(el.selectionStart !== el.selectionEnd) return true;
     return el.selectionStart;
   } else if (document.selection) {
     var range = document.selection.createRange();
@@ -93,7 +93,7 @@ var _caEnsureNumeric = function(e){
   if(!e) return '';
 
   var which = e.which;
-  if(typeof which != 'number'){
+  if(typeof which !== 'number'){
     which = e.keyCode;
   }
 
@@ -120,7 +120,7 @@ var _caFormatExpiry = function(e){
   var sufnums = suffix.replace(/[^0-9]/g,'');
   var el = this;
 
-  if(pos == 0){
+  if(pos === 0){
     if(/0|1/.test(character))
       return;
     else
@@ -128,19 +128,19 @@ var _caFormatExpiry = function(e){
       pos++;
   }
 
-  if(pos == 1){
+  if(pos === 1){
     if(parseInt(prefix + character) > 12){
       return e && e.preventDefault();
     }
     character += ' / ';
   }
-  else if(pos == 2){
+  else if(pos === 2){
     character = ' / ' + character;
   }
   else{
     if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix))
       e && e.preventDefault();
-    if(pos == 6)
+    if(pos === 6)
       setTimeout(function(){card.filled(el)}, 200);
     return;
   }
@@ -158,7 +158,7 @@ var _caFormatExpiryBack = function(e){
   var el = this;
   var pos = _caCheckSelection(el);
   
-  if(pos == 5 && el.value.slice(2, 5) == ' / '){
+  if(pos === 5 && el.value.slice(2, 5) === ' / '){
     e.preventDefault();
     el.value = el.value.slice(0, 2);
   }
@@ -193,7 +193,7 @@ var _caFormatNumber = function(e){
         pos += prespace && ++prespace.length || 1;
         _caSetCaret(el, pos);
       }
-      if(value.length == cardobj.length)
+      if(value.length === cardobj.length)
         card.filled(el);
     })
   } else {
@@ -202,14 +202,14 @@ var _caFormatNumber = function(e){
 };
 
 var _caFormatNumberBack = function(e){
-  if((e.which || e.keyCode) != 8) return;
+  if((e.which || e.keyCode) !== 8) return;
 
   var el = this;
   var pos = _caCheckSelection(el);
   var val = el.value;
   var len = val.length;
   
-  if(pos == len && val[len-1] == ' '){
+  if(pos === len && val[len-1] === ' '){
     e.preventDefault();
     el.value = el.value.slice(0, len-2);
   }

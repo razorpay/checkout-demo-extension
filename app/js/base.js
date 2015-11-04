@@ -11,7 +11,7 @@ Razorpay.configure = function(overrides) {
 var _base = {
   setOption: function(key, options, overrides, defaults){
     var defaultValue = defaults[key];
-    if(typeof overrides != 'object'){
+    if(typeof overrides !== 'object'){
       if(!(key in options)){
         options[key] = defaultValue;
       }
@@ -19,11 +19,11 @@ var _base = {
     }
 
     var overrideValue = overrides[key];
-    if(typeof defaultValue == 'string' && typeof overrideValue != 'undefined' && typeof overrideValue != 'string'){
+    if(typeof defaultValue === 'string' && typeof overrideValue !== 'undefined' && typeof overrideValue !== 'string'){
       overrideValue = String(overrideValue);
     }
 
-    if(typeof overrideValue == typeof defaultValue){
+    if(typeof overrideValue === typeof defaultValue){
       options[key] = overrideValue;
     } else if(!(key in options)){
       options[key] = defaultValue;
@@ -31,19 +31,19 @@ var _base = {
   },
 
   configure: function(overrides){
-    if(typeof overrides != 'object'){
+    if(typeof overrides !== 'object'){
       throw new Error("invalid options passed");
     }
     var options = {};
     var defaults = Razorpay.defaults;
 
     for (var i in defaults){
-      if(defaults[i] !== null && typeof defaults[i] == 'object'){
+      if(defaults[i] !== null && typeof defaults[i] === 'object'){
         if(i === 'notes'){
           options.notes = {};
-          if(overrides.notes && typeof overrides.notes == 'object'){
+          if(overrides.notes && typeof overrides.notes === 'object'){
             for (var j in overrides.notes){
-              if(typeof overrides.notes[j] == 'string'){
+              if(typeof overrides.notes[j] === 'string'){
                 options.notes[j] = overrides.notes[j];
               }
             }
@@ -67,7 +67,7 @@ var _base = {
           options.method = JSON.parse(JSON.stringify(defaults.method));
           if(typeof overrides.method === 'object'){
             for(var j in overrides.method){
-              if(typeof overrides.method[j] == 'boolean')
+              if(typeof overrides.method[j] === 'boolean')
                 options.method[j] = overrides.method[j];
             }
           }
@@ -89,7 +89,7 @@ var _base = {
   validateOptions: function(options, throwError){
     var errors = [];
 
-    if (typeof options == 'undefined') {
+    if (typeof options === 'undefined') {
       errors.push({
         message: 'no initialization options are passed',
         field: ''
@@ -97,7 +97,7 @@ var _base = {
 
     }
 
-    else if (typeof options != 'object') {
+    else if (typeof options !== 'object') {
       errors.push({
         message: 'passed initialization options are invalid',
         field: ''
@@ -105,7 +105,7 @@ var _base = {
     }
 
     if(!errors.length){
-      if (typeof options.key == 'undefined') {
+      if (typeof options.key === 'undefined') {
         errors.push({
           message: 'No merchant key specified',
           field: 'key'
@@ -136,7 +136,7 @@ var _base = {
       /**
        * There are some options which are checkout specific only
        */
-      if(typeof discreet.validateCheckout == 'function'){
+      if(typeof discreet.validateCheckout === 'function'){
         discreet.validateCheckout(options, errors);
       }
     }
@@ -159,12 +159,12 @@ discreet.makeUrl = function(options){
 }
 
 discreet.nextRequestRedirect = function(data){
-  if(window !== window.parent && typeof Razorpay.sendMessage == 'function'){
+  if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
     return Razorpay.sendMessage({event: 'redirect', data: data});
   }
-  if(data.method == 'get'){
+  if(data.method === 'get'){
     location.href = data.url;
-  } else if (data.method === 'post' && typeof data.content == 'object'){
+  } else if (data.method === 'post' && typeof data.content === 'object'){
     var postForm = document.createElement('form');
     var html = '';
 

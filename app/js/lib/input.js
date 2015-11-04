@@ -7,11 +7,11 @@
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
-  var shim_placeholder = document.createElement("input").placeholder == undefined;
+  var shim_placeholder = document.createElement("input").placeholder === undefined;
 
   var detectSupport = function(){
     var div = document.createElement('div');
-    if(typeof div.onfocusin != 'undefined'){
+    if(typeof div.onfocusin !== 'undefined'){
       focusEvent += 'in';
       blurEvent = 'focusout';
     }
@@ -78,10 +78,10 @@
       var parent = $(el.parentNode);
       var value = el.value;
       parent[value && 'addClass' || 'removeClass']('filled');
-      if(typeof el.getAttribute('ignore-input') == 'string') return;
+      if(typeof el.getAttribute('ignore-input') === 'string') return;
 
       var valid = true;
-      var required = el.required || typeof el.getAttribute('required') == 'string';
+      var required = el.required || typeof el.getAttribute('required') === 'string';
       var pattern = el.getAttribute('pattern');
 
       if (required && !value) {
@@ -121,7 +121,7 @@
     update: function(el){
       if(el){
         this.input({target: el});
-        try{ if(document.activeElement == el) el.parentNode.addClass('focused')} catch(e){}
+        try{ if(document.activeElement === el) el.parentNode.addClass('focused')} catch(e){}
       }
     }
   }
