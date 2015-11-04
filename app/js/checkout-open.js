@@ -175,7 +175,8 @@ var _chop = {
       var response = {
         id: this._id,
         context: location.href,
-        options: options
+        options: options,
+        overrides: this._overrides
       }
       return _chop.sendFrameMessage.call(this, response);
     }

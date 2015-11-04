@@ -523,6 +523,9 @@ var frameDiscreet = {
       if('sdk_version' in window){
         roll(null, 'sdk_version='+sdk_version, 'info');
       }
+      message.overrides.amount /= 100;
+      delete message.overrides.key;
+      roll('init', message.overrides, 'info');
     }
   },
   setQueryParams: function(search){

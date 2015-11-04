@@ -1,4 +1,5 @@
 Razorpay.prototype.configure = function(overrides){
+  this._overrides = overrides;
   this.options = _base.configure(overrides);
   this.modal = {options: {}};
 };
