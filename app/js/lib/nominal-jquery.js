@@ -208,6 +208,34 @@ var _$createListener = function(callback, context){
   }
 };
 
+var _$getAjaxParams = function(options){
+  var params = {
+    data: options.data || {},
+    error: options.error || $.noop,
+    success: options.success || $.noop,
+    complete: options.complete || $.noop,
+    url: options.url || ''
+  }
+
+  var url = params.url;
+  url += params.url.indexOf('?') < 0 ? '?' : '&';
+  url += _$objectToURI(params.data);
+  params.computedUrl = url;
+  return params;
+};
+
+var _$randomString = function(length){
+  var str = '';
+  while(str.length < length) str += Math.random().toString(36)[2];
+  return str
+};
+
+var _$objectToURI = function(obj){
+  var data = [];
+  var encode = window.encodeURIComponent;
+  for (var key in obj) data.push(encode(key) + '=' + encode(obj[key]));
+  return data.join('&')
+};
 
 $.ajax = function(options){
   !options.data && (options.data = {});
@@ -245,33 +273,4 @@ $.ajax = function(options){
   }
   var head = document.documentElement;
   head.appendChild(script);
-};
-
-var _$getAjaxParams = function(options){
-  var params = {
-    data: options.data || {},
-    error: options.error || $.noop,
-    success: options.success || $.noop,
-    complete: options.complete || $.noop,
-    url: options.url || ''
-  }
-
-  var url = params.url;
-  url += params.url.indexOf('?') < 0 ? '?' : '&';
-  url += _$objectToURI(params.data);
-  params.computedUrl = url;
-  return params;
-};
-
-var _$randomString = function(length){
-  var str = '';
-  while(str.length < length) str += Math.random().toString(36)[2];
-  return str
-};
-
-var _$objectToURI = function(obj){
-  var data = [];
-  var encode = window.encodeURIComponent;
-  for (var key in obj) data.push(encode(key) + '=' + encode(obj[key]));
-  return data.join('&')
 };

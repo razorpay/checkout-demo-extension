@@ -9,148 +9,82 @@ Razorpay.configure = function(overrides) {
 }
 
 var _base = {
-  setOption: function(key, options, overrides, defaults){
-    var defaultValue = defaults[key];
-    if(typeof overrides !== 'object'){
-      if(!(key in options)){
-        options[key] = defaultValue;
+
+  set: function(baseval, override) {
+
+    if ( typeof baseval === 'object' ) {
+      if( !baseval ){
+        return baseval;
       }
-      return;
+      var options = {};
+      for( var i in baseval ) {
+        var newval;
+        try { newval = override[i] } catch(e){}
+        options[i] = _base.set( baseval[i], newval );
+      }
     }
 
-    var overrideValue = overrides[key];
-    if(typeof defaultValue === 'string' && typeof overrideValue !== 'undefined' && typeof overrideValue !== 'string'){
-      overrideValue = String(overrideValue);
+    else if ( typeof baseval === typeof override ) {
+      return override;
     }
 
-    if(typeof overrideValue === typeof defaultValue){
-      options[key] = overrideValue;
-    } else if(!(key in options)){
-      options[key] = defaultValue;
+    else if ( typeof baseval === 'string' && typeof override != 'undefined' ) {
+      return String(override);
+    }
+
+    else {
+      return baseval;
+    }
+
+    return options;
+  },
+
+  setCustom: function(options, overrides){
+    for( var n in overrides ){
+      var note = overrides[n];
+      if ( typeof note === 'string' ) {
+        options[n] = note;
+      }
     }
   },
 
   configure: function(overrides){
-    if(typeof overrides !== 'object'){
-      throw new Error("invalid options passed");
+    if( !overrides || typeof overrides !== 'object' ) {
+      return window.console && console.error('Invalid options');
     }
-    var options = {};
-    var defaults = Razorpay.defaults;
 
-    for (var i in defaults){
-      if(defaults[i] !== null && typeof defaults[i] === 'object'){
-        if(i === 'notes'){
-          options.notes = {};
-          if(overrides.notes && typeof overrides.notes === 'object'){
-            for (var j in overrides.notes){
-              if(typeof overrides.notes[j] === 'string'){
-                options.notes[j] = overrides.notes[j];
-              }
-            }
-          }
-        } else if (i === 'prefill') {
-          options.prefill = JSON.parse(JSON.stringify(defaults['prefill']));
-          var op = overrides.prefill;
-          if(op && typeof op === 'object'){
-            for(var j in defaults.prefill){
-              if(op[j] && typeof op[j] === 'object'){
-                for(var k in op[j]){
-                  if(k in defaults.prefill[j])
-                    options.prefill[j][k] = '' + op[j][k];
-                }
-              } else if(j in op) {
-                options.prefill[j] = '' + op[j];
-              }
-            }
-          }
-        } else if (i === 'method') {
-          options.method = JSON.parse(JSON.stringify(defaults.method));
-          if(typeof overrides.method === 'object'){
-            for(var j in overrides.method){
-              if(typeof overrides.method[j] === 'boolean')
-                options.method[j] = overrides.method[j];
-            }
-          }
-        } else {
-          var subObject = defaults[i];
-          options[i] = options[i] || {};
-          for(var j in subObject){
-            _base.setOption(j, options[i], overrides[i], subObject);
-          }
-        }
-      }
-      else _base.setOption(i, options, overrides, defaults);
-      // checking theme option upon time of setting
-    }
-    _base.validateOptions(options, true);
+    var options = _base.set( Razorpay.defaults, overrides );
+
+    try { _base.setCustom(options.notes, overrides.notes) } catch(e){}
+    try { _base.setCustom(options.method.wallet, overrides.method.wallet) } catch(e){}
+
+    _base.validateOptions( options );
+
     return options;
+
   },
 
-  validateOptions: function(options, throwError){
-    var errors = [];
+  validateOptions: function(options){
+    var errorMessage;
 
-    if (typeof options === 'undefined') {
-      errors.push({
-        message: 'no initialization options are passed',
-        field: ''
-      });
-
+    if (!options.key) {
+      errorMessage = 'key';
     }
 
-    else if (typeof options !== 'object') {
-      errors.push({
-        message: 'passed initialization options are invalid',
-        field: ''
-      });
+    var notesCount = 0;
+    for(var note in options.notes){
+      notesCount++;
+    }
+    if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
+
+    /**
+     * There are some options which are checkout specific only
+     */
+    if(typeof discreet.validateCheckout === 'function'){
+      errorMessage = discreet.validateCheckout(options);
     }
 
-    if(!errors.length){
-      if (typeof options.key === 'undefined') {
-        errors.push({
-          message: 'No merchant key specified',
-          field: 'key'
-        });
-      }
-
-      if (options.key === "") {
-        errors.push({
-          message: 'Merchant key cannot be empty',
-          field: 'key'
-        });
-      }
-
-      if (typeof options.notes === 'object'){
-        // Object.keys unsupported in old browsers
-        var notesCount = 0;
-        for(var note in options.notes){
-          notesCount++;
-        }
-        if(notesCount > 15) {
-          errors.push({
-            message: 'You can only pass at most 15 fields in the notes object',
-            field: 'notes'
-          });
-        }
-      }
-
-      /**
-       * There are some options which are checkout specific only
-       */
-      if(typeof discreet.validateCheckout === 'function'){
-        discreet.validateCheckout(options, errors);
-      }
-    }
-
-    if(!throwError){
-      return errors;
-    } else {
-      if(errors.length > 0){
-        var field = errors[0].field;
-        var message = errors[0].message;
-        var errorMessage = '{"field":"' + field + '","error":"' + message + '"}';
-        throw new Error(errorMessage);
-      }
-    }
+    if( errorMessage ){ throw new Error('Invalid option: ' + errorMessage) }
   }
 }
 

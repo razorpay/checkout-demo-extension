@@ -321,6 +321,10 @@ var _chop = {
 
 Razorpay.prototype.open = function() {
 
+  if(!this.options){
+    return;
+  }
+
   if(!_chop.bodyEl){
     _chop.bodyEl = document.getElementsByTagName('body')[0];
   }
@@ -382,46 +386,23 @@ Razorpay.prototype.close = function(){
   }
 };
 
-discreet.validateCheckout = function(options, errors){
+discreet.validateCheckout = function(options){
+
   var amount = parseInt(options.amount);
   options.amount = String(options.amount);
   if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
-    alert('Invalid amount. Minimum amount is Re.1');
-    errors.push({
-      message: 'Invalid amount specified',
-      field: 'amount'
-    });
+    var message = 'amount (Minimum amount is ₹ 1)';
+    alert(message);
+    return message;
   }
 
-  if (typeof options.name === 'undefined'){
-    errors.push({
-      message: 'Merchant name cannot be empty',
-      field: 'name'
-    })
-  }
-
-  if (options.handler && typeof options.handler !== 'function'){
-    errors.push({
-      message: 'Handler must be a function',
-      field: 'handler'
-    });
-  }
-
-  if(options.display_currency){
-    if(options.display_currency === 'USD'){
-      options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
-      if(!options.display_amount){
-        errors.push({
-          message: 'Invalid display_amount specified',
-          field: 'display_amount'
-        });
-      }
-    } else {
-      errors.push({
-        message: 'Invalid display currency specified',
-        field: 'display_currency'
-      });
+  if( options.display_currency === 'USD' ){
+    options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
+    if(!options.display_amount){
+      return 'display_amount';
     }
+  } else if ( options.display_currency ) {
+    return 'display_currency';
   }
 };
 
