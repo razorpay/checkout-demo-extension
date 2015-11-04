@@ -242,21 +242,19 @@ var frameDiscreet = {
     // if(navigator.userAgent.indexOf("MSIE ") > 0)
     //   $('netb-banks').on('click', discreet.bank_radio, true);
 
-    if(typeof qpmap === 'object'){
-      if(qpmap.tab){
-        var lis = $('tabs')[0].getElementsByTagName('li');
-        for(var i=0; i<lis.length; i++){
-          if(lis[i].getAttribute('data-target') === 'tab-' + qpmap.tab){
-            frameDiscreet.tab_change({target: lis[i]});
-            break;
-          }
+    if(qpmap.tab){
+      var lis = $('tabs')[0].getElementsByTagName('li');
+      for(var i=0; i<lis.length; i++){
+        if(lis[i].getAttribute('data-target') === 'tab-' + qpmap.tab){
+          frameDiscreet.tab_change({target: lis[i]});
+          break;
         }
       }
-      if(qpmap.error){
-        setTimeout(function(){
-          frameDiscreet.errorHandler(qpmap)
-        })
-      }
+    }
+    if(qpmap.error){
+      setTimeout(function(){
+        frameDiscreet.errorHandler(qpmap)
+      })
     }
     frameDiscreet.setCardFormatting();
   },

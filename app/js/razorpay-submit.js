@@ -34,7 +34,7 @@ discreet.setupPopup = function(request, url){
       var popup = request.popup = new Popup('');
       popup.window.document; // let this throw error
     } catch(e){
-      roll('Going newtab because ' + e.message);
+      roll('Going newtab because ' + e.message, null, 'warn');
       return _rahe.setupCC(request, templateVars);
     }
     try{
@@ -152,7 +152,7 @@ Razorpay.payment = {
     try{
       popupRequest.popup.close();
     } catch(e){
-      roll(e.message);
+      roll(e.message, null, 'warn');
     }
 
     popupRequest = null;

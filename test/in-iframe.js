@@ -6,10 +6,20 @@ var orig_methods = window.payment_methods = {
   }
 };
 
-function openCheckoutForm(options){
+function expectVisibleTab(tab){
+  return function(){
+    expect(jQuery('#tab-' + tab)).toBeVisible();
+    expect(jQuery('#method-'+tab+'-tab').hasClass('active')).toBe(true);
+  }
+}
+
+function openCheckoutForm(options, data){
   jQuery('#container').remove();
   frameDiscreet.$el = frameDiscreet.modal = frameDiscreet.rzp = null;
-  handleMessage({options: options});
+  handleMessage({
+    options: options,
+    data: data
+  });
 }
 
 var coOptions = {
@@ -731,5 +741,93 @@ describe("set url query params", function(){
     expect(qpmap.qwe).toBe('asd');
     expect(qpmap.poe.level2).toBe('hjk');
     expect(qpmap.bnm).toBe('786');
+  })
+})
+
+describe('existing query params should', function(){
+
+  afterEach(function(){
+    qpmap = {};
+  })
+
+  it('set error', function(done){
+    frameDiscreet.setQueryParams('error.description=asd');
+    openCheckoutForm(coOptions);
+    spyOn(frameDiscreet, 'errorHandler').and.callFake(function(response){
+      expect(response.error.description).toBe('asd');
+      done();
+    })
+  })
+
+  it('set tab', function(){
+    frameDiscreet.setQueryParams('tab=netbanking');
+    openCheckoutForm(coOptions);
+    expectVisibleTab('netbanking')();
+  })
+})
+
+describe('close button should close modal', function(){
+  it('', function(){
+    var spy = jasmine.createSpy();
+    var spy2 = jasmine.createSpy();
+    openCheckoutForm(coOptions);
+    spyOn(Razorpay.payment, 'cancel').and.callFake(spy);
+    spyOn(frameDiscreet.modal, 'hide').and.callFake(spy2);
+    sendclick(jQuery('#modal-close')[0]);
+    expect(spy).toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+  })
+})
+
+describe('handleMessage should invoke dataHandler if initial data is passed as', function(){
+  var spy, data, shouldCall;
+
+  afterEach(function(){
+    spy = jasmine.createSpy();
+    spyOn(frameDiscreet, 'dataHandler').and.callFake(spy);
+    openCheckoutForm(coOptions, data);
+    var expectation = expect(spy);
+    if(!shouldCall)
+      expectation = expectation.not
+    expectation.toHaveBeenCalled();
+  })
+
+  it('nothing', noop);
+  it('invalid json string', function(){
+    data = "asdaff";
+  })
+  it('object', function(){
+    shouldCall = true;
+    data = {};
+  })
+  it('valid json string', function(){
+    shouldCall = true;
+    data = '{}';
+  })
+})
+
+describe('dataHandler should', function(){
+  var data, expectation;
+
+  afterEach(function(){
+    openCheckoutForm(coOptions, data);
+    expectation();
+  })
+
+  it('show tab netbanking', function(){
+    data = {
+      method: 'netbanking',
+      bank: 'SBIN'
+    }
+    expectation = function(){
+      expectation = expectVisibleTab('netbanking');
+      expect(jQuery('#bank-select').val()).toBe('SBIN');
+    }
+  })
+  it('show tab card', function(){
+    data = {
+      method: 'card'
+    }
+    expectation = expectVisibleTab('card');
   })
 })
