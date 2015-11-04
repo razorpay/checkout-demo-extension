@@ -253,15 +253,17 @@ var frameDiscreet = {
     // if(navigator.userAgent.indexOf("MSIE ") > 0)
     //   $('netb-banks').on('click', discreet.bank_radio, true);
 
-    if(frameDiscreet.qpmap){
-      var lis = $('tabs')[0].getElementsByTagName('li');
-      for(var i=0; i<lis.length; i++){
-        if(lis[i].getAttribute('data-target') == 'tab-' + frameDiscreet.qpmap.tab){
-          frameDiscreet.tab_change({target: lis[i]});
-          break;
+    if(typeof qpmap == 'object'){
+      if(qpmap.tab){
+        var lis = $('tabs')[0].getElementsByTagName('li');
+        for(var i=0; i<lis.length; i++){
+          if(lis[i].getAttribute('data-target') == 'tab-' + qpmap.tab){
+            frameDiscreet.tab_change({target: lis[i]});
+            break;
+          }
         }
       }
-      if(frameDiscreet.qpmap.error){
+      if(qpmap.error){
         setTimeout(function(){
           frameDiscreet.errorHandler(qpmap)
         })
@@ -523,9 +525,12 @@ var frameDiscreet = {
       if('sdk_version' in window){
         roll(null, 'sdk_version='+sdk_version, 'info');
       }
-      message.overrides.amount /= 100;
-      delete message.overrides.key;
-      roll('init', message.overrides, 'info');
+      var overrides = message.overrides || message.options;
+      if(typeof overrides == 'object'){
+        overrides.amount /= 100;
+        delete overrides.key;
+        roll('init', overrides, 'info');
+      }
     }
   },
   setQueryParams: function(search){
