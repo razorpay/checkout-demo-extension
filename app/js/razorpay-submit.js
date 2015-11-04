@@ -2,7 +2,7 @@ var popupRequest = null;
 
 discreet.setupPopup = function(request, url){
   if(popupRequest){
-    return console.error('Razorpay: another payment popup is open');
+    return window.console && console.error('Razorpay: another payment popup is open');
   }
   popupRequest = request;
   var options = request.options;
@@ -112,18 +112,7 @@ var _rahe = {
 
     _rahe.handleResponse(popupRequest, data);
 
-    try{
-      popupRequest.popup.close();
-    } catch(e){
-      roll(e.message);
-    }
-
-    popupRequest = null;
-    $.removeMessageListener();
-    if(_rahe.ccInterval){
-      clearInterval(_rahe.ccInterval);
-      _rahe.ccInterval = null;
-    }
+    Razorpay.payment.cancel();
     return true; // if true, popup closes itself.
   },
 
@@ -157,8 +146,20 @@ var _rahe = {
 */
 Razorpay.payment = {
   cancel: function(){
-    if(popupRequest && popupRequest.popup){
+    if(!popupRequest)
+      return;
+
+    try{
       popupRequest.popup.close();
+    } catch(e){
+      roll(e.message);
+    }
+
+    popupRequest = null;
+    $.removeMessageListener();
+    if(_rahe.ccInterval){
+      clearInterval(_rahe.ccInterval);
+      _rahe.ccInterval = null;
     }
   },
   authorize: function(request, throwError){
