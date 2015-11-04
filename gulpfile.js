@@ -6,7 +6,7 @@ var less = require('gulp-less');
 var concat = require('gulp-concat');
 var autoprefixer = require('gulp-autoprefixer');
 var usemin = require('gulp-usemin');
-var insert = require('gulp-insert');
+var wrap = require('gulp-insert').wrap;
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 
@@ -54,18 +54,13 @@ gulp.task('usemin', ['compileTemplates'], function(){
     .pipe(gulp.dest(distDir));
 })
 
-gulp.task('sourceMaps', ['compileTemplates', 'usemin'], function(){
-  return gulp.src(distDir + '/checkout-frame.js')
-    .pipe(sourcemaps.init())
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(distDir));
-})
-
-gulp.task('default', ['buildDev', 'usemin', 'sourceMaps'], function(){
-  // uglify
+// create production build and sourcemaps
+gulp.task('default', ['buildDev', 'usemin'], function(){
   gulp.src(distDir + '/*.js')
-    .pipe(insert.wrap('"use strict";(function(){', '})()'))
+    .pipe(wrap('"use strict";(function(){', '})()'))
+    .pipe(sourcemaps.init())
     .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(distDir));
 })
 

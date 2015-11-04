@@ -45,15 +45,7 @@ discreet.setupPopup = function(request, url){
       popup.onClose(function(){
         _rahe.onComplete({error:{description:'Payment cancelled'}});
       })
-      var info;
-      if(typeof popup.window == 'undefined'){
-        info = "Popup window inaccessible";
-      } else if(popup.window && popup.window.closed){
-        info = "Popup window closed";
-      } else {
-        info = "Popup window opened";
-      }
-      roll(info, {image: options.image, name: options.name, description: options.description});
+      roll('popup', null, 'info');
     } catch(e){
       roll('Error accessing popup: ' + e.message);
     }

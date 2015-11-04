@@ -1,10 +1,6 @@
 Razorpay.prototype.configure = function(overrides){
   this.options = _base.configure(overrides);
   this.modal = {options: {}};
-
-  if(typeof discreet.initCheckout == 'function'){
-    discreet.initCheckout.call(this);
-  }
 };
 
 Razorpay.configure = function(overrides) {

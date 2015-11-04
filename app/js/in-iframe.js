@@ -513,6 +513,7 @@ var frameDiscreet = {
       Rollbar.configure({
         payload: {
           person: {
+            cb: !!window.CheckoutBridge,
             id: message.options.key,
             _: message.id
           },
