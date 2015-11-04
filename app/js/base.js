@@ -14,7 +14,7 @@ var _base = {
 
     if ( typeof baseval === 'object' ) {
       if( !baseval ){
-        return baseval;
+        return typeof override === 'boolean' ? override : baseval;
       }
       var options = {};
       for( var i in baseval ) {
@@ -50,13 +50,17 @@ var _base = {
 
   configure: function(overrides){
     if( !overrides || typeof overrides !== 'object' ) {
-      return window.console && console.error('Invalid options');
+      throw new Error('Invalid options');
     }
 
     var options = _base.set( Razorpay.defaults, overrides );
 
     try { _base.setCustom(options.notes, overrides.notes) } catch(e){}
-    try { _base.setCustom(options.method.wallet, overrides.method.wallet) } catch(e){}
+    try {
+      if( typeof overrides.method.wallet === 'boolean' ) {
+        options.method.wallet = overrides.method.wallet;
+      }
+    } catch(e){}
 
     _base.validateOptions( options );
 

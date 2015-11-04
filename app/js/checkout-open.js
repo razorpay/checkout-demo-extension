@@ -228,6 +228,7 @@ var _chop = {
       }
     } else if (event === 'fault'){
       alert("Oops! Something went wrong.");
+      _chop.onClose.call(this);
       this.close();
     }
   },

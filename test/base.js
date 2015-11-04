@@ -93,19 +93,11 @@ describe("init options validation", function(){
 
   describe("should throw error if", function(){
     afterEach(function(){
-      var errors = _base.validateOptions(init_options);
-      expect(errors.length).toBe(1);
-      expect(errors[0].field).toBe(field);
-    });
-
-    it("no options passed", function(){
-      field = '';
-      init_options = '';
-    });
-
-    it("invalid options passed", function(){
-      field = '';
-      init_options = 'options';
+      try{
+        _base.validateOptions(init_options);
+      } catch(e){
+        expect(e.message.indexOf(field) > 0);
+      }
     });
 
     it("no key specified", function(){
@@ -129,8 +121,7 @@ describe("init options validation", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      var errors = _base.validateOptions(init_options, false);
-      expect(errors.length).toBe(0);
+      expect(function(){_base.validateOptions(init_options, false)}).not.toThrow();
     });
 
     it("when handler is not defined", function(){

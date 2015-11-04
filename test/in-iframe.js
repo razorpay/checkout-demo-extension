@@ -30,7 +30,8 @@ var coOptions = {
   'image': 'https://i.imgur.com/3g7nmJC.png',
   'method': {
     'netbanking': true,
-    'card': true
+    'card': true,
+    'wallet': false
   },
   'prefill': {
     'name': 'Shashank Mehta',
