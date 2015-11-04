@@ -529,6 +529,7 @@ var frameDiscreet = {
       if(typeof overrides == 'object'){
         overrides.amount /= 100;
         delete overrides.key;
+        delete overrides.currency;
         roll('init', overrides, 'info');
       }
     }

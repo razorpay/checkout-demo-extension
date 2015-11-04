@@ -28,22 +28,22 @@ var _chop = {
       })
       window.addEventListener('scroll', function(){
         var c = _chop.frameContainer;
-        if(!c || !_chop.isOpen || typeof window._chPageYOffset !== 'number')
+        if(!c || !_chop.isOpen || typeof window.pageYOffset !== 'number')
           return;
         var top;
-        var offTop = c.offsetTop - _chPageYOffset;
+        var offTop = c.offsetTop - pageYOffset;
         var offBot = c.offsetHeight + offTop;
-        if(_chPageY < _chPageYOffset){
+        if(_chPageY < pageYOffset){
           if(offBot < 0.2*innerHeight && offTop < 0)
-            top = _chPageYOffset + innerHeight - c.offsetHeight;
+            top = pageYOffset + innerHeight - c.offsetHeight;
         }
-        else if(_chPageY > _chPageYOffset){
+        else if(_chPageY > pageYOffset){
           if(offTop > 0.1*innerHeight && offBot > innerHeight)
-            top = _chPageYOffset;
+            top = pageYOffset;
         }
         if(typeof top === 'number')
           c.style.top = Math.max(0, top) + 'px';
-        _chPageY = _chPageYOffset;
+        _chPageY = pageYOffset;
       })
     }
   },
@@ -323,7 +323,7 @@ Razorpay.prototype.open = function() {
     var rules = {
       zIndex: '99999',
       position: (_chAbsoluteContainer ? 'absolute' : 'fixed'),
-      top: (_chAbsoluteContainer ? _chPageYOffset+'px' : '0'),
+      top: (_chAbsoluteContainer ? pageYOffset+'px' : '0'),
       height: (_chAbsoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
       left: '0',
       width: '100%',
