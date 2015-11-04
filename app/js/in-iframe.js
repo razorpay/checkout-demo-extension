@@ -189,6 +189,17 @@ var frameDiscreet = {
     }
   },
 
+  createModal: function(el, modalOptions){
+    modalOptions.onhide = function(){
+      Razorpay.sendMessage({event: 'dismiss'});
+    };
+    modalOptions.onhidden = function(){
+      Razorpay.sendMessage({event: 'hidden'});
+    };
+    delete modalOptions.ondismiss;
+    return new Modal(el, modalOptions)
+  },
+
   showModal: function() {
     frameDiscreet.renew();
     
@@ -217,21 +228,16 @@ var frameDiscreet = {
     }
     div.innerHTML = templates.modal(opts);
     document.body.appendChild(div.firstChild);
-    if(window.CheckoutBridge)
+
+    if(window.CheckoutBridge){
       $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+    }
+
     frameDiscreet.$el = $('container');
     frameDiscreet.smarty = new Smarty(frameDiscreet.$el);
-    // init modal
-    var modalOptions = opts.modal;
-    modalOptions.onhide = function(){
-      Razorpay.sendMessage({event: 'dismiss'});
-    };
-    modalOptions.onhidden = function(){
-      Razorpay.sendMessage({event: 'hidden'});
-    };
-    delete modalOptions.ondismiss;
     frameDiscreet.applyFont($('powered-link')[0]);
-    frameDiscreet.modal = new Modal(frameDiscreet.$el.children('modal')[0], modalOptions);
+    frameDiscreet.modal = frameDiscreet.createModal(frameDiscreet.$el.children('modal')[0], opts.modal);
+
     if($('nb-na')[0]) $('nb-elem').css('display', 'none');
 
     // event listeners
@@ -525,7 +531,7 @@ var frameDiscreet = {
       if('sdk_version' in window){
         roll(null, 'sdk_version='+sdk_version, 'info');
       }
-      var overrides = message.overrides || message.options;
+      var overrides = message.overrides || $.clone(message.options);
       if(typeof overrides === 'object'){
         overrides.amount /= 100;
         delete overrides.key;

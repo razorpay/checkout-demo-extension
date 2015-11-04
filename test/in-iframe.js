@@ -1,10 +1,14 @@
-var orig_methods = window.payment_methods = {"card":true,"netbanking":{"HDFC":"HDFC Bank", "UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},"wallet":{"paytm":true}};
+var orig_methods = window.payment_methods = {
+  "card": true,
+  "netbanking": {"HDFC":"HDFC Bank", "UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},
+  "wallet": {
+    "paytm": true
+  }
+};
 
 function openCheckoutForm(options){
   jQuery('#container').remove();
-  delete frameDiscreet.$el;
-  delete frameDiscreet.modal;
-  delete frameDiscreet.rzp;
+  frameDiscreet.$el = frameDiscreet.modal = frameDiscreet.rzp = null;
   handleMessage({options: options});
 }
 
@@ -52,22 +56,25 @@ describe("in-iframe should have", function(){
 })
 
 describe("init options.method: ", function(){
-  var opts = JSON.parse(JSON.stringify(coOptions));
-  var disableTab;
+  var opts, disableTab;
 
-  it("hide tabs and card fields if method.card == false", function(){
+  it("hide netbanking if method.netbanking == false", function(){
+    disableTab = 'netbanking';
+  })
+  it("hide card if method.card == false", function(){
     disableTab = 'card';
   })
-  it("hide tabs and netbanking fields if method.netbanking == false", function(){
-    disableTab = 'netbanking';
+
+  beforeEach(function(){
+    opts = JSON.parse(JSON.stringify(coOptions));
   })
 
   afterEach(function(){
     opts.method = {};
     opts.method[disableTab] = false;
     openCheckoutForm(opts);
+    expect(jQuery('.tab-content').length).toBe(2);
     expect(jQuery('#tab-'+disableTab).length).toBe(0);
-    expect(jQuery('.tab-content:visible').length).toBe(2);
   })
 })
 
@@ -211,23 +218,10 @@ describe("Razorpay card tab", function(){
     $contact = jQuery('.input[name="contact"]');
   });
 
-  afterEach(function(){
-    frameDiscreet.hide();
-  });
-
-  it("should load modal", function(){
+  it("should load modal and prefill fields", function(){
     expect(jQuery('.modal')).toBeVisible();
-  });
-
-  it("should prefill name", function(){
     expect($name.val()).toBe(coOptions.prefill.name);
-  });
-
-  it("should prefill email", function(){
     expect($email.val()).toBe(coOptions.prefill.email);
-  });
-
-  it("should prefill contact number", function(){
     expect($contact.val()).toBe(coOptions.prefill.contact);
   });
 });
@@ -281,7 +275,6 @@ describe("Razorpay card tab submit", function(){
       sendclick($ccSubmit[0]);
       expect(spyCalled).toHaveBeenCalled();
       expect(spyNotCalled).not.toHaveBeenCalled();
-      frameDiscreet.hide();
     })
 
     describe("with all details in place", function(){

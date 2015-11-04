@@ -252,10 +252,12 @@ var _chop = {
         property = i.substr(dotPosition + 1);
         options[category] = options[category] || {};
         var opt = options[i];
-        if(opt === 'true')
+        if(opt === 'true'){
           opt = true;
-        else if(opt === 'false')
+        }
+        else if(opt === 'false'){
           opt = false;
+        }
         options[category][property] = opt;
         delete options[i];
       }

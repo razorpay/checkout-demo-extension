@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  var timeout = null;
+  var timeout, transitionProperty;
 
   var defaults = {
     escape: true,
@@ -18,16 +18,26 @@
     timeout = null;
   }
 
-  window.Modal = function(element, options) {
-    this.options = $.defaults(options, defaults);
-    this.container = $('container');
-    this.modalElement = element;
 
-    if(!this.options.animation || !this.transitionProperty){
-      var duration = 0;
-    } else {
+  if(Array.prototype.some){
+    ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
+      if (typeof document.documentElement.style[i] === 'string') {
+        transitionProperty = i + 'Duration';
+        return true;
+      }
+    });
+  }
+
+  var getDuration = function(modal){
+    var duration, durationStyle;
+
+    if(!modal.options.animation || !transitionProperty){
+      duration = 0;
+    }
+
+    else {
       if(typeof window.getComputedStyle === 'function'){
-        var durationStyle = window.getComputedStyle(this.container[0])[this.transitionProperty];
+        durationStyle = window.getComputedStyle(modal.container[0])[transitionProperty];
         duration = parseFloat(durationStyle) || 0;
       }
     }
@@ -36,8 +46,16 @@
       duration *= 1000;
     }
 
-    this.animationDuration = duration;
-    if(duration){
+    return duration;
+  }
+
+  window.Modal = function(element, options) {
+    this.options = $.defaults(options, defaults);
+    this.container = $('container');
+    this.modalElement = element;
+    this.animationDuration = getDuration(this);
+
+    if(this.animationDuration){
       $(this.modalElement).addClass('animate')
     }
 
@@ -47,20 +65,6 @@
 
   Modal.prototype = {
     listeners: [],
-
-    transitionProperty: (function() {
-      var prop;
-      if(Array.prototype.some){
-        prop = '';
-        ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
-          if (typeof document.documentElement.style[i] === 'string') {
-            prop = i + 'Duration';
-            return true;
-          }
-        });
-      }
-      return prop;
-    })(),
 
     show: function() {
       if(this.isShown) return;
