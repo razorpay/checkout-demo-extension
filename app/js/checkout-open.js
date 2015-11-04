@@ -71,26 +71,38 @@ var _chop = {
     _chop.isOpen = false;
     _chop.bodyEl.style.overflow = _chop.bodyOverflow;
 
-    if(_chop.metaViewportTag) _chop.metaViewportTag.parentNode && _chop.metaViewportTag.parentNode.removeChild(_chop.metaViewportTag);
+    if(_chop.metaViewportTag && _chop.metaViewportTag.parentNode){
+      _chop.metaViewportTag.parentNode.removeChild(_chop.metaViewportTag);
+    }
 
     var meta = _chop.metaViewport;
     if(meta){
       var head = document.getElementsByTagName('head')[0];
-      head && !meta.parentNode && head.appendChild(meta);
-      _chop.metaViewport = null;
+      if(head && !meta.parentNode && head.appendChild(meta)){
+        _chop.metaViewport = null;
+      }
     }
 
     if(this.checkoutFrame){
       this.checkoutFrame.style.display = 'none';
+
       if(this.checkoutFrame.getAttribute('removable')){
-        this.checkoutFrame.parentNode && this.checkoutFrame.parentNode.removeChild(this.checkoutFrame);
+
+        if(this.checkoutFrame.parentNode){
+          this.checkoutFrame.parentNode.removeChild(this.checkoutFrame);
+        }
+
         this.checkoutFrame = null;
       }
     }
-    if(_chop.frameContainer)
+
+    if(_chop.frameContainer){
       _chop.frameContainer.style.display = 'none';
-    if(this instanceof Razorpay && typeof this.options.modal.onhidden === 'function')
+    }
+
+    if(this instanceof Razorpay && typeof this.options.modal.onhidden === 'function'){
       this.options.modal.onhidden();
+    }
   },
 
   sendFrameMessage: function(response){
@@ -308,9 +320,18 @@ var _chop = {
 }
 
 Razorpay.prototype.open = function() {
-  if(!_chop.bodyEl) _chop.bodyEl = document.getElementsByTagName('body')[0];
-  if(!_chop.bodyEl) setTimeout(this.open());
-  if(_chop.isOpen) return;
+
+  if(!_chop.bodyEl){
+    _chop.bodyEl = document.getElementsByTagName('body')[0];
+  }
+
+  if(!_chop.bodyEl){
+    setTimeout(this.open());
+  }
+
+  if(_chop.isOpen){
+    return;
+  }
   _chop.isOpen = true;
 
   _chop.bodyOverflow = _chop.bodyEl.style.overflow;

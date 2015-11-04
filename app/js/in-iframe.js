@@ -101,49 +101,32 @@ var frameDiscreet = {
     }
   },
 
-  sanitizeDOM: function(obj){
+  sanitize: function(obj, attr){
+    var attr = obj[attr];
+
+    if(typeof attr === 'string'){
+      obj[attr] = attr.replace(/"/g,'');
+    }
+    else if(typeof attr === 'object'){
+      for(var i in attr){
+        frameDiscreet.sanitize(attr[i]);
+      }
+    }
+  },
+
+  sanitizeOptions: function(obj){ // warning: modifies original object
     // directly appended tags
     var user_fields = ['name', 'description', 'amount', 'currency', 'display_amount'];
     for(var i = 0; i < user_fields.length; i++){
       obj[user_fields[i]] = obj[user_fields[i]].replace(/<[^>]*>?/g, "");
     }
 
-    // attributes
-    if(typeof obj.image === 'string'){
-      obj.image = obj.image.replace(/"/g,'');
+    var attr_fields = ['image', 'prefill', 'notes'];
+    for(var i = 0; i < attr_fields.length; i++){
+      frameDiscreet.sanitize(obj, attr_fields[i]);
     }
 
-    // prefills
-    if(typeof obj.prefill === 'object'){
-      for(var i in obj.prefill){
-        if(typeof obj.prefill[i] === 'string'){
-          obj.prefill[i] = obj.prefill[i].replace(/"/g,'');
-        }
-      }
-    }
-
-    // notes
-    if(typeof obj.notes === 'object'){
-      for(var i in obj.notes){
-        if(typeof obj.notes[i] === 'string'){
-          obj.notes[i] = obj.notes[i].replace(/"/g,'');
-        }
-      }
-    }
-  },
-
-  sanitizeOptions: function(obj){ // warning: modifies original object
-    if(obj){
-      frameDiscreet.sanitizeDOM(obj);
-      if(obj.prefill){
-        if(obj.prefill.contact){
-          if(typeof obj.prefill.contact !== 'string'){
-            obj.prefill.contact = obj.prefill.contact + '';
-          }
-          obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
-        }
-      }
-    }
+    obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
   },
 
   setNumberValidity: function(){
