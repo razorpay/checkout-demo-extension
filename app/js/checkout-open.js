@@ -40,8 +40,9 @@ var _chop = {
           if(offTop > 0.1*innerHeight && offBot > innerHeight)
             top = pageYOffset;
         }
-        if(typeof top === 'number')
+        if(typeof top === 'number'){
           c.style.top = Math.max(0, top) + 'px';
+        }
         _chPageY = pageYOffset;
       })
     }
@@ -174,7 +175,7 @@ var _chop = {
 
       each(
         this.options, function(i, value){
-          if(typeof value !== 'function' && i !== 'parent'){
+          if(typeof value !== 'function'){
             options[i] = value;
           }
         }

@@ -1,57 +1,5 @@
 var popupRequest = null;
-
-discreet.setupPopup = function(request, url){
-  if(popupRequest){
-    return window.console && console.error('Razorpay: another payment popup is open');
-  }
-  popupRequest = request;
-  var options = request.options;
-  var data = request.data;
-
-  if(data.callback_url){
-    return discreet.nextRequestRedirect({
-      method: 'post',
-      url: url,
-      content: data
-    });
-  }
-  if(request.postmessage === false){
-    window.onComplete = _rahe.onComplete;
-  }
-  else {
-    $.addMessageListener(_rahe.onmessage, request);
-  }
-
-  var templateVars = {
-    data: data,
-    url: url,
-    formHTML: deserialize(data)
-  }
-
-  if(_rahe.isIEMobile){
-    _rahe.setupCC(request, templateVars);
-  } else {
-    try{
-      var popup = request.popup = new Popup('');
-      popup.window.document; // let this throw error
-    } catch(e){
-      roll('Going newtab because ' + e.message, null, 'warn');
-      return _rahe.setupCC(request, templateVars);
-    }
-    try{
-      templateVars.image = options.image;
-      popup.window.document.write(templates.popup(templateVars));
-      popup.window.document.close();
-
-      popup.onClose(function(){
-        _rahe.onComplete({error:{description:'Payment cancelled'}});
-      })
-      roll('popup', null, 'info');
-    } catch(e){
-      roll('Error accessing popup: ' + e.message);
-    }
-  }
-}
+var templates = {};
 
 var _rahe = {
 
@@ -115,8 +63,9 @@ var _rahe = {
   handleResponse: function(popupRequest, data){
     try{
 
-      if(typeof data === 'string')
+      if(typeof data === 'string'){
         data = JSON.parse(data);
+      }
 
       if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
         var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
@@ -247,3 +196,57 @@ Razorpay.payment = {
     });
   }
 };
+
+discreet.setupPopup = function(request, url){
+  if(popupRequest){
+    return window.console && console.error('Razorpay: another payment popup is open');
+  }
+  popupRequest = request;
+  var options = request.options;
+  var data = request.data;
+
+  if(data.callback_url){
+    return discreet.nextRequestRedirect({
+      method: 'post',
+      url: url,
+      content: data
+    });
+  }
+  if(request.postmessage === false){
+    window.onComplete = _rahe.onComplete;
+  }
+  else {
+    $.addMessageListener(_rahe.onmessage, request);
+  }
+
+  var templateVars = {
+    data: data,
+    url: url,
+    formHTML: deserialize(data)
+  }
+
+  if(_rahe.isIEMobile){
+    _rahe.setupCC(request, templateVars);
+  } else {
+    var popup;
+    try{
+      popup = request.popup = new Popup('');
+      popup.window.document; // let this throw error
+    } catch(e){
+      roll('Going newtab because ' + e.message, null, 'warn');
+      return _rahe.setupCC(request, templateVars);
+    }
+    try{
+      templateVars.image = options.image;
+      popup.window.document.write(templates.popup(templateVars));
+      popup.window.document.close();
+
+      popup.onClose(function(){
+        _rahe.onComplete({error:{description:'Payment cancelled'}});
+      })
+      roll('popup', null, 'info');
+    } catch(e){
+      roll('Error accessing popup: ' + e.message);
+    }
+  }
+}

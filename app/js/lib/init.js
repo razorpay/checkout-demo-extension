@@ -3,8 +3,6 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-var discreet = {};
-var templates = {};
 var roll = function(){};
 var noop = roll;
 var ua = navigator.userAgent;

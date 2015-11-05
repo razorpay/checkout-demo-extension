@@ -50,7 +50,7 @@
   }
 
   window.Modal = function(element, options) {
-    $.each(defaults, function(key, val){
+    each(defaults, function(key, val){
       if(!(key in options)){
         options[key] = val;
       }
@@ -107,7 +107,9 @@
     },
 
     backdropHide: function(){
-      this.options.backdropClose && this.hide();
+      if(this.options.backdropClose) {
+        this.hide();
+      }
     },
 
     hidden: function() {
@@ -134,9 +136,8 @@
     },
 
     bind_events: function(){
-      if(typeof window.pageYOffset === 'number') // doesn't exist <ie9. we're concerned about mobile here.
+      if(typeof window.pageYOffset === 'number') { // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function(){
-          var container = this.container[0];
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
@@ -147,7 +148,7 @@
             }
           }
         })
-      
+      }
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {

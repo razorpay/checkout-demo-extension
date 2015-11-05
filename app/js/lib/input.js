@@ -3,7 +3,6 @@
 
   var inputClass = 'input';
   var interceptClass = /elem|placeholder|help-text/;
-  var tooltipClass = 'help-text';
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
@@ -37,7 +36,7 @@
     },
 
     off: function(){
-      $.each( this.listeners, function(i, listener){
+      each( this.listeners, function(i, listener){
         this.parent.off(listener[0], listener[1], listener[2]);
       })
     },
@@ -66,10 +65,11 @@
          parent = parent.parentNode;
 
       var child = $(parent).children('input');
-      if(child.length)
+      if(child.length){
         setTimeout(function(){
           child[0].focus()
         })
+      }
     },
 
     input: function(e){
@@ -106,7 +106,7 @@
 
     refresh: function(callback){
       var self = this;
-      $.each(
+      each(
         this.parent[0].getElementsByTagName('p'),
         function(i, el){
           var child = $(el).children('input')[0];

@@ -1,3 +1,6 @@
+// initial error (helps in case of redirection flow)
+var qpmap = {};
+
 // iphone/ipad restrict non user initiated focus on input fields
 var _if_should_focus_next = !/iPhone|iPad/.test(ua);
 
@@ -24,7 +27,6 @@ var _if_wallet_logos = {
     col: _if_logo_image_prefix + 'R0lGODlhbAAfAKIHAJvl5ODt7UPS0L/w73/h4P///wDDwf///yH5BAEAAAcALAAAAABsAB8AAAP/eBfczgPIR4O6OOvNu/9gqBBFaWnDQAiCMYhwLM/cUJpHurZG77u0oHCYAdwKgJ9y2TsRn9CMjnUsEJjMQI8Q7QanPB/peFWulocW18sWlbFV609wC/cO27bek8QajFVvLjcDc3gGa3uKGIJLcXI9dISGPQCLlyN+gIE+NpM+AoWDKkaYbY0/j5CSn1uikXmmXqiVR5tlnq2IfQahSQKys0ysVmNyxCWvLm8ABIXAwVG0uQWIN1cBccoqPwAtlhm4HGVczQROB8XOMOSi0OFLxFfGK4/KAXaRG+L7eTwvF8IUYOdKnwZUubRYK3HO3o80cwAe7CGxCAtL/y68qQjC/5sAAO76zTnCwxg1kw8jVcwGDwiIjAd4cYwRcuKPbCbE2GP1ClgsfD9IZFr2A+CAixCBvLK0Q2KLdwo/skhhMKkAQcTCGDvSq5VPpcMGlsn3J4c/igp7KegDrRrFtVtw1XwTQBDOAsq2lvjlVZQNUM1AHRAkIZUoLv94vHNrAG6sf3L1yRwMimTQOJFaOWsy9sIrbm/T+QB5Vgk4BTwshIHmg7ILd0uHGjiibOENtpr7JK1IrvMFtoeTKnFSxtLwkJF7jda4xfJlrpmTdSpzqDEGd/wUwC6t5N12RJWKu6aqRGIZ2ku28uI5XW1rDGyzm+0VPAz5sgrE9HDLYv/42rL+UbYVEwNWtlcnT+2GQUniMUdfaeBshJohdkCTnHKxXGELHAx1F8FDari2WHv7lVAdaYgoOKFa81XSYor/+YCXDxYQUOAw3vgxRx5phXJUa2/4GEYA9YXWIheMGWBBkgAlB41igxnDi45UFuXYEi/Q4mKRLsn2QhgBvRcji2kFFgFZVer4zou9nIDLlOBwyRGUfSRSp4PkvfOGlmlisWYGRA6ADqApRANCAWj2mYWhmCQAADs='
   },
   payzapp: {
-    // offer: '5% Cashback!',
     h: '22',
     col: 'images/payzapp.png'
   }
@@ -89,8 +91,7 @@ var frameDiscreet = {
                 wallets.push({
                   'name': wallet,
                   'col': logos.col,
-                  'h': logos.h,
-                  'offer': logos.offer
+                  'h': logos.h
                 });
               }
             }
@@ -107,16 +108,16 @@ var frameDiscreet = {
     }
   },
 
-  sanitize: function(obj, attr){
-    var attr = obj[attr];
+  sanitize: function(obj, key){
+    var attr = obj[key];
 
     if(typeof attr === 'string'){
-      obj[attr] = attr.replace(/"/g,'');
+      obj[key] = attr.replace(/"/g,'');
     }
     else if(typeof attr === 'object'){
-      for(var i in attr){
-        frameDiscreet.sanitize(attr[i]);
-      }
+      each(attr, function(attrKey, attrObj){
+        frameDiscreet.sanitize(attrObj, attrKey);
+      })
     }
   },
 
@@ -251,7 +252,7 @@ var frameDiscreet = {
     });
     $('tabs').on('click', frameDiscreet.tab_change);
     $('form').on('submit', function(e){
-      frameDiscreet.formSubmit(e);
+      frameDiscreet.formSubmit();
       e.preventDefault();
     });
 
@@ -368,7 +369,7 @@ var frameDiscreet = {
     }
   },
 
-  formSubmit: function(e) {
+  formSubmit: function() {
     frameDiscreet.smarty.refresh();
 
     if (frameDiscreet.isInvalid('form-common')) {
@@ -393,8 +394,9 @@ var frameDiscreet = {
       data: data
     });
 
-    if(frameDiscreet.modal)
+    if(frameDiscreet.modal){
       frameDiscreet.modal.options.backdropClose = false;
+    }
 
     frameDiscreet.frontDrop('Please wait while your payment is processed...', 'shown loading');
 
@@ -439,11 +441,13 @@ var frameDiscreet = {
     if(targetTab === 'tab-card'){
       data['card[number]'] = data['card[number]'].replace(/\ /g, '');
       
-      // if(!data['card[expiry]'])
-      //   data['card[expiry]'] = '';
+      if(!data['card[expiry]']){
+        data['card[expiry]'] = '';
+      }
 
-      // if(!data['card[cvv]'])
-      //   data['card[cvv]'] = '';
+      if(!data['card[cvv]']){
+        data['card[cvv]'] = '';
+      }
 
       var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
       data['card[expiry_month]'] = expiry[0];
@@ -473,8 +477,9 @@ var frameDiscreet = {
   },
 
   successHandler: function(response){
-    if(frameDiscreet.modal)
+    if(frameDiscreet.modal){
       frameDiscreet.modal.options.onhide = null;
+    }
     Razorpay.sendMessage({ event: 'success', data: response });
     frameDiscreet.hide();
   },
@@ -522,25 +527,37 @@ var frameDiscreet = {
 
     frameDiscreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
 
-    if('contact' in data) { $('contact')[0].value = data.contact; }
-    if('email' in data) { $('email')[0].value = data.email; }
+    if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
+      data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
+    }
+
+    var lastel;
+    each(
+      {
+        'contact': 'contact',
+        'email': 'email',
+        'card[name]': 'card_name',
+        'card[number]': 'card_number',
+        'card[expiry': 'card_expiry',
+        'bank': 'bank-select'
+      },
+      function(name, id){
+        var el = $(id)[0];
+        if(el) {
+          lastel = el;
+          var val = data[name];
+          if(val){
+            el.value = val;
+          }
+        }
+      }
+    )
 
     if(data.method === 'card'){
-      if('card[name]' in data) {
-        $('card_name')[0].value = data['card[name]'];
-      }
-
-      if('card[number]' in data) {
-        $('card_number')[0].value = data['card[number]'];
-      }
-
-      if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
-        $('card_expiry')[0].value = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
-      }
       frameDiscreet.setCardFormatting();
-      $('card_cvv')[0].focus();
-    } else if(data.method === 'netbanking'){
-      $('bank-select')[0].value = data.bank;
+    }
+    if(lastel){
+      lastel.focus();
     }
     frameDiscreet.smarty.refresh();
   },
@@ -661,8 +678,6 @@ window.handleMessage = function(message){
 
 $(window).on('message', frameDiscreet.parseMessage);
 
-// initial error (helps in case of redirection flow)
-var qpmap = {};
 if(location.search){
   frameDiscreet.setQueryParams(location.search);
 }

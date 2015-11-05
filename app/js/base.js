@@ -1,3 +1,5 @@
+var discreet = {};
+
 Razorpay.prototype.configure = function(overrides){
   this._overrides = overrides;
   this.options = _base.configure(overrides);
@@ -11,16 +13,16 @@ Razorpay.configure = function(overrides) {
 var _base = {
 
   set: function(baseval, override) {
-
     if ( typeof baseval === 'object' ) {
       if( !baseval ){
         return typeof override === 'boolean' ? override : baseval;
       }
-      var options = {};
-      each( baseval, function(i, val){
-        var newval;
-        try { newval = override[i] } catch(e){}
-        options[i] = _base.set( val, newval );
+
+      if( !override || typeof override !== 'object' ){
+        override = {};
+      }
+      return map( baseval, function(val, i){
+        return _base.set( val, override[i] );
       })
     }
 
@@ -28,23 +30,11 @@ var _base = {
       return override;
     }
 
-    else if ( typeof baseval === 'string' && typeof override != 'undefined' ) {
+    else if ( typeof baseval === 'string' && typeof override !== 'undefined' ) {
       return String(override);
     }
 
-    else {
-      return baseval;
-    }
-
-    return options;
-  },
-
-  setCustom: function(options, overrides){
-    each(overrides, function(key, val){
-      if ( typeof val === 'string' ) {
-        options[key] = val;
-      }
-    })
+    return baseval;
   },
 
   configure: function(overrides){
@@ -54,7 +44,11 @@ var _base = {
 
     var options = _base.set( Razorpay.defaults, overrides );
 
-    try { _base.setCustom(options.notes, overrides.notes) } catch(e){}
+    each(overrides.notes, function(key, val){
+      if ( typeof val === 'string' ) {
+        options.notes[key] = val;
+      }
+    })
     try {
       if( typeof overrides.method.wallet === 'boolean' ) {
         options.method.wallet = overrides.method.wallet;

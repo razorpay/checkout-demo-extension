@@ -21,7 +21,6 @@ var _popDefaults = {
   , resizable: 'yes'
   , location: 'no'
   , scrollbars: 'no'
-  , centered: true
 };
 
 /**
@@ -29,32 +28,24 @@ var _popDefaults = {
 */
 
 var Popup = function(src) {
-  if (!(this instanceof Popup)) {
-    return new Popup(src);
-  }
 
   var opts = _popDefaults;
 
   // we try to place it at the center of the current window
   // note: this "centering" logic borrowed from the Facebook JavaScript SDK
-  if (opts.centered) {
-    var screenX = null === window.screenX ? window.screenLeft : window.screenX;
-    var screenY = null === window.screenY ? window.screenTop : window.screenY;
-    var outerWidth = null === window.outerWidth ? document.documentElement.clientWidth : window.outerWidth;
-    var outerHeight = null === window.outerHeight ? (document.documentElement.clientHeight - 22) : window.outerHeight;
+  var screenX = null === window.screenX ? window.screenLeft : window.screenX;
+  var screenY = null === window.screenY ? window.screenTop : window.screenY;
+  var outerWidth = null === window.outerWidth ? document.documentElement.clientWidth : window.outerWidth;
+  var outerHeight = null === window.outerHeight ? (document.documentElement.clientHeight - 22) : window.outerHeight;
 
-    if (null === opts.left)
-      opts.left = parseInt(screenX + ((outerWidth - opts.width) / 2), 10);
-    if (null === opts.top)
-      opts.top = parseInt(screenY + ((outerHeight - opts.height) / 2.5), 10);
-    delete opts.centered;
-  }
+  opts.left = parseInt(screenX + ((outerWidth - opts.width) / 2), 10);
+  opts.top = parseInt(screenY + ((outerHeight - opts.height) / 2.5), 10);
 
   // turn the "opts" object into a window.open()-compatible String
   var optsStr = [];
-  for (var key in opts) {
-    optsStr.push(key + '=' + opts[key]);
-  }
+  each(opts, function(key, val){
+    optsStr.push(key + '=' + val);
+  })
   optsStr = optsStr.join(',');
 
   // finally, open and return the popup window

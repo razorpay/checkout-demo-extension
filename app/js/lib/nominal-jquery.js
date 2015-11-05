@@ -21,7 +21,7 @@ var deserialize = function(data, key){
   return '<input type="hidden" name="' + key + '" value="' + data + '">';
 }
 
-var each = $.each = function( iteratee, eachFunc ) {
+var each = function( iteratee, eachFunc ) {
   var i;
   if( iteratee ) {
     if ( iteratee.length ) { // not using instanceof Array, to iterate over nodeList
@@ -35,6 +35,14 @@ var each = $.each = function( iteratee, eachFunc ) {
       }
     }
   }
+}
+
+var map = function( iteratee, mapFunc ) {
+  var result = iteratee instanceof Array ? [] : {};
+  each(iteratee, function(i, val){
+    result[i] = mapFunc(val, i);
+  })
+  return result;
 }
 
 $.prototype = {
@@ -54,7 +62,7 @@ $.prototype = {
       el.addEventListener(event, ref, !!capture);
     } else if(window.attachEvent){
       ref = function(e){
-        if(!e) { var e = window.event }
+        if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
         callback.call(el, e);
@@ -73,9 +81,8 @@ $.prototype = {
   },
 
   remove: function(){
-    var el = this[0];
     try{
-      el && el.parentNode && el.parentNode.removeChild(el);
+      this[0].removeChild(el);
     } catch(e){}
     return this;
   },
@@ -116,7 +123,6 @@ $.prototype = {
     if('getElementsByClassName' in document){
       return node.getElementsByClassName(filterClass);
     }
-    var result = [];
 
     if( !filterTag ) {
       filterTag = '*';
@@ -125,9 +131,10 @@ $.prototype = {
     var els = node.getElementsByTagName(filterTag);
     var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
 
-    each(els, function(i, val){
-      if( pattern.test(val.className) ) {
-        result.push(val);
+    var result = [];
+    each(els, function(i, el){
+      if( pattern.test(el.className) ) {
+        result.push(el);
       }
     })
     return result;
@@ -177,10 +184,16 @@ $.setCookie = function(name, value){
 
 $.getCookie = function(name){
   var nameEQ = name + "=";
-  each(document.cookie.split(';'), function(i, c){
-    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
-  })
+  var ca = document.cookie.split(';');
+  for( var i=0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1,c.length);
+    }
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length,c.length);
+    }
+  }
   return null;
 };
 
@@ -208,18 +221,6 @@ $.getCookie = function(name){
 
 var _$listener = null;
 
-$.addMessageListener = function(callback, context) {
-  if(_$listener){
-    $.removeMessageListener();
-  }
-  _$listener = $(window).on('message', _$createListener(callback, context));
-};
-
-$.removeMessageListener = function() {
-  $(window).off('message', _$listener);
-  _$listener = null;
-};
-
 var _$createListener = function(callback, context){
   return function(e){
     if(!e || !e.data || typeof callback !== 'function'){
@@ -242,6 +243,27 @@ var _$createListener = function(callback, context){
   }
 };
 
+$.addMessageListener = function(callback, context) {
+  if(_$listener){
+    $.removeMessageListener();
+  }
+  _$listener = $(window).on('message', _$createListener(callback, context));
+};
+
+$.removeMessageListener = function() {
+  $(window).off('message', _$listener);
+  _$listener = null;
+};
+
+var _$objectToURI = function(obj) {
+  var data = [];
+  var encode = window.encodeURIComponent;
+  each( obj, function( key, val ) {
+    data.push(encode(key) + '=' + encode(val));
+  })
+  return data.join('&');
+};
+
 var _$getAjaxParams = function(options){
   var params = {
     data: options.data || {},
@@ -262,15 +284,6 @@ var _$randomString = function(length) {
   var str = '';
   while(str.length < length) str += Math.random().toString(36)[2];
   return str
-};
-
-var _$objectToURI = function(obj) {
-  var data = [];
-  var encode = window.encodeURIComponent;
-  each( obj, function( key, val ) {
-    data.push(encode(key) + '=' + encode(val));
-  })
-  return data.join('&');
 };
 
 $.ajax = function(options){

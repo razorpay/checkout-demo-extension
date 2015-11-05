@@ -13,7 +13,7 @@ var _caPatterns = {
 }
 
 var _ca_space_14 = /(.{4})(.{0,6})/;
-var _ca_sub_14 = function( match, $1, $2, offset ){
+var _ca_sub_14 = function( match, $1, $2 ){
 
   if ( $2.length === 6 ){
     $2 += ' ';
@@ -142,10 +142,12 @@ var _caFormatExpiry = function(e){
     character = ' / ' + character;
   }
   else{
-    if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix))
-      e && e.preventDefault();
-    if(pos === 6)
+    if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix) && e){
+      e.preventDefault();
+    }
+    if(pos === 6){
       setTimeout(function(){card.filled(el)}, 200);
+    }
     return;
   }
   e && e.preventDefault();
@@ -197,8 +199,9 @@ var _caFormatNumber = function(e){
         pos += prespace && ++prespace.length || 1;
         _caSetCaret(el, pos);
       }
-      if(value.length === cardobj.length)
+      if(value.length === cardobj.length){
         card.filled(el);
+      }
     })
   } else {
     this.value = value.replace(cardobj.space, cardobj.subs);      
