@@ -4,6 +4,22 @@ var $ = function(el){
   this[0] = el;
 };
 
+var each = $.each = function( iteratee, eachFunc, is ) {
+  var i;
+  if( iteratee ) {
+    if ( iteratee.length ) { // not using instanceof Array, to iterate over nodeList
+      for ( i = 0; i < iteratee.length; i++ ) {
+        eachFunc(i, iteratee[i]);
+      }
+    }
+    else {
+      for ( i in iteratee ) {
+        eachFunc(i, iteratee[i]);
+      }
+    }
+  }
+}
+
 $.prototype = {
   on: function(event, callback, capture){
     var el = this[0];
@@ -90,13 +106,13 @@ $.prototype = {
     }
 
     var els = node.getElementsByTagName(filterTag);
-    var elsLen = els.length;
     var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
-    for ( var i = 0; i < elsLen; i++ ) {
-      if( pattern.test(els[i].className) ) {
-        result.push(els[i]);
+
+    each(els, function(i, val){
+      if( pattern.test(val.className) ) {
+        result.push(val);
       }
-    }
+    })
     return result;
   },
 
@@ -134,24 +150,6 @@ $.clone = function(target){
   return JSON.parse(JSON.stringify(target));
 };
 
-$.extend = function(target, source){
-  for(var o in source){
-    target[o] = source[o]
-  }
-  return target
-};
-
-$.defaults = function(target, defaults){
-  for( var i in defaults ) {
-    if( !( i in target ) ) {
-      target[i] = defaults[i];
-    }
-  }
-  return target;
-};
-
-// var _$crossCookie = false;
-
 $.deleteCookie = function(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 };
@@ -162,12 +160,10 @@ $.setCookie = function(name, value){
 
 $.getCookie = function(name){
   var nameEQ = name + "=";
-  var ca = document.cookie.split(';');
-  for(var i=0;i < ca.length;i++){
-    var c = ca[i];
+  each(document.cookie.split(';'), function(i, c){
     while (c.charAt(0)==' ') c = c.substring(1,c.length);
     if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
-  }
+  })
   return null;
 };
 
@@ -245,17 +241,19 @@ var _$getAjaxParams = function(options){
   return params;
 };
 
-var _$randomString = function(length){
+var _$randomString = function(length) {
   var str = '';
   while(str.length < length) str += Math.random().toString(36)[2];
   return str
 };
 
-var _$objectToURI = function(obj){
+var _$objectToURI = function(obj) {
   var data = [];
   var encode = window.encodeURIComponent;
-  for (var key in obj) data.push(encode(key) + '=' + encode(obj[key]));
-  return data.join('&')
+  each( obj, function( key, val ) {
+    data.push(encode(key) + '=' + encode(val));
+  })
+  return data.join('&');
 };
 
 $.ajax = function(options){

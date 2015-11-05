@@ -63,25 +63,31 @@ var frameDiscreet = {
     }
   },
   
-  setMethods: function(payment_methods, opts){
-    var methodOptions = opts.method;
+  setMethods: function(payment_methods, methodOptions){
 
     if( !payment_methods.error ) {
-      for(var i in payment_methods){
-        if(methodOptions[i] !== false && payment_methods[i] !== false){
-          methodOptions[i] = payment_methods[i];
+      each(
+        methodOptions,
+        function(method, enabled){
+          var printed = payment_methods[method];
+          if ( !printed || enabled === false ) {
+            methodOptions[method] = false;
+          }
+          else {
+            methodOptions[method] = printed;
+          }
         }
-      }
+      )
       var wallets = [];
-      if( methodOptions.wallet && frameDiscreet.rzp.options.amount <= 100*10000 ) {
-        var printedWallets = payment_methods['wallet'];
-        if(typeof printedWallets === 'object'){
-          for(var i in printedWallets){
-            if(printedWallets[i]){
-              var logos = _if_wallet_logos[i];
+      if( methodOptions.wallet ) {
+        each(
+          payment_methods['wallet'],
+          function(wallet, enabled){
+            if(enabled){
+              var logos = _if_wallet_logos[wallet];
               if(logos){
                 wallets.push({
-                  'name': i,
+                  'name': wallet,
                   'col': logos.col,
                   'h': logos.h,
                   'offer': logos.offer
@@ -89,7 +95,7 @@ var frameDiscreet = {
               }
             }
           }
-        }
+        )
       }
       methodOptions.wallet = wallets;
     } else {
@@ -116,15 +122,19 @@ var frameDiscreet = {
 
   sanitizeOptions: function(obj){ // warning: modifies original object
     // directly appended tags
-    var user_fields = ['name', 'description', 'amount', 'currency', 'display_amount'];
-    for(var i = 0; i < user_fields.length; i++){
-      obj[user_fields[i]] = obj[user_fields[i]].replace(/<[^>]*>?/g, "");
-    }
+    each(
+      ['name', 'description', 'amount', 'currency', 'display_amount'],
+      function(i, key){
+        obj[key] = obj[key].replace(/<[^>]*>?/g, "");
+      }
+    )
 
-    var attr_fields = ['image', 'prefill', 'notes'];
-    for(var i = 0; i < attr_fields.length; i++){
-      frameDiscreet.sanitize(obj, attr_fields[i]);
-    }
+    each(
+      ['image', 'prefill', 'notes'],
+      function(i, key){
+        frameDiscreet.sanitize(obj, key);
+      }
+    )
 
     obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
   },
@@ -193,10 +203,17 @@ var frameDiscreet = {
       return frameDiscreet.modal.show();
     }
     var opts = $.clone(frameDiscreet.rzp.options);
-    frameDiscreet.setMethods(window.payment_methods, opts);
+
+    if(opts.amount >= 100*10000){
+      opts.method.wallet = false;
+    }
+
+    frameDiscreet.setMethods(window.payment_methods, opts.method);
     frameDiscreet.sanitizeOptions(opts);
+
     var div = document.createElement('div');
     opts.netbanks = _if_freq_banks;
+
     try{
       div.style.color = opts.theme.color;
       if(div.style.color){
@@ -246,13 +263,15 @@ var frameDiscreet = {
     //   $('netb-banks').on('click', discreet.bank_radio, true);
 
     if(qpmap.tab){
-      var lis = $('tabs')[0].getElementsByTagName('li');
-      for(var i=0; i<lis.length; i++){
-        if( lis[i].getAttribute('data-target') === 'tab-' + qpmap.tab ) {
-          frameDiscreet.tab_change({target: lis[i]});
-          break;
-        }
-      }
+      each(
+        $('tabs')[0].getElementsByTagName('li'),
+        function(i, li){
+          if( li.getAttribute('data-target') === 'tab-' + qpmap.tab ) {
+            frameDiscreet.tab_change({target: li});
+          }
+        },
+        true
+      )
     }
     if(qpmap.error){
       setTimeout(function(){
@@ -534,9 +553,6 @@ var frameDiscreet = {
           context: message.context
         }
       });
-      if('sdk_version' in window){
-        roll(null, 'sdk_version='+sdk_version, 'info');
-      }
       var overrides = message.overrides || $.clone(message.options);
       if(typeof overrides === 'object'){
         overrides.amount /= 100;

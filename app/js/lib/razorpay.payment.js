@@ -13,7 +13,7 @@ var _caPatterns = {
 }
 
 var _ca_space_14 = /(.{4})(.{0,6})/;
-var _ca_sub_14 = function(match, $1, $2, offset, original){
+var _ca_sub_14 = function( match, $1, $2, offset ){
 
   if ( $2.length === 6 ){
     $2 += ' ';
@@ -55,9 +55,10 @@ for(var c in _caPatterns){
 }
 
 var _caCardType = function(num){
-  for(var t in _caPatterns){
-    if(_caPatterns[t].test(num.replace(/[^0-9]/g,'')))
+  for( var t in _caPatterns ) {
+    if( _caPatterns[t].test(num.replace(/[^0-9]/g,'')) ) {
       return t;
+    }
   }
   return false;
 }
@@ -263,7 +264,9 @@ var card = {
   validateNumber: function(num, type){
     num = (num + '').replace(/\s|-/g,'');
     if(/^[0-9]+$/.test(num)){
-      var type = type || _caCardType(num);
+      if (!type) {
+        type = _caCardType(num);
+      }
       if(type && _ca_card_formats[type].length === num.length){
         return this.luhn(num);
       }

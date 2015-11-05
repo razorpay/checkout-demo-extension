@@ -17,11 +17,11 @@ var _base = {
         return typeof override === 'boolean' ? override : baseval;
       }
       var options = {};
-      for( var i in baseval ) {
+      each( baseval, function(i, val){
         var newval;
         try { newval = override[i] } catch(e){}
-        options[i] = _base.set( baseval[i], newval );
-      }
+        options[i] = _base.set( val, newval );
+      })
     }
 
     else if ( typeof baseval === typeof override ) {
@@ -40,12 +40,11 @@ var _base = {
   },
 
   setCustom: function(options, overrides){
-    for( var n in overrides ){
-      var note = overrides[n];
-      if ( typeof note === 'string' ) {
-        options[n] = note;
+    each(overrides, function(key, val){
+      if ( typeof val === 'string' ) {
+        options[key] = val;
       }
-    }
+    })
   },
 
   configure: function(overrides){
@@ -68,7 +67,7 @@ var _base = {
 
   },
 
-  validateOptions: function(options){
+  validateOptions: function(options) {
     var errorMessage;
 
     if (!options.key) {
@@ -76,15 +75,15 @@ var _base = {
     }
 
     var notesCount = 0;
-    for(var note in options.notes){
+    each(options.notes, function() {
       notesCount++;
-    }
+    })
     if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
 
     /**
      * There are some options which are checkout specific only
      */
-    if(typeof discreet.validateCheckout === 'function'){
+    if( typeof discreet.validateCheckout === 'function' ) {
       errorMessage = discreet.validateCheckout(options);
     }
 
@@ -106,9 +105,9 @@ discreet.nextRequestRedirect = function(data){
     var postForm = document.createElement('form');
     var html = '';
 
-    for(var i in data.content){
-      html += '<input type="hidden" name="' + i + '" value="' + data.content[i] + '">'
-    }
+    each( data.content, function(name, value) {
+      html += '<input type="hidden" name="' + name + '" value="' + value + '">'
+    })
     postForm.method='post';
     postForm.innerHTML = html;
     postForm.action = data.url;

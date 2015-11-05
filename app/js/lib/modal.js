@@ -50,7 +50,12 @@
   }
 
   window.Modal = function(element, options) {
-    this.options = $.defaults(options, defaults);
+    $.each(defaults, function(key, val){
+      if(!(key in options)){
+        options[key] = val;
+      }
+    })
+    this.options = options;
     this.container = $('container');
     this.modalElement = element;
     this.animationDuration = getDuration(this);

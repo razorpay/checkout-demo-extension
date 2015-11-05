@@ -16,13 +16,20 @@ try{
       }
     }
   })
-  roll = function(message, data, level){
-    if(!level) level = 'error';
-    if(window.Rollbar && location.href.indexOf('api.razorpay.com') > 0){
-      if(data)
+  if(window.Rollbar) {
+    if(location.href.indexOf('api.razorpay.com') < 0) {
+      Rollbar.configure({enabled: false});
+    }
+    roll = function(message, data, level) {
+      if(!level){
+        level = 'error';
+      }
+      if(data){
         Rollbar[level](message, data);
-      else
+      }
+      else{
         Rollbar[level](message);
+      }
     }
   }
 } catch(e){}
