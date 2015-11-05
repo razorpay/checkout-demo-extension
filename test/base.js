@@ -25,6 +25,9 @@ var optionsExtended = {
   notes: {
     'address': 'Hello World'
   },
+  method: {
+    wallet: false
+  },
   protocol: 'http',
   hostname: 'api.razorpay.dev'
 }
@@ -62,6 +65,7 @@ describe("configure method", function(){
     expect(co.options.prefill.name).toBe(optionsExtended.prefill.name);
     expect(co.options.prefill.contact).toBe(optionsExtended.prefill.contact);
     expect(co.options.prefill.email).toBe(optionsExtended.prefill.email);
+    expect(co.options.method.wallet).toBe(optionsExtended.method.wallet);
     for(var i in co.options.notes){
       expect(co.options.notes[i]).toBe(optionsExtended.notes[i]);
     }
@@ -70,6 +74,13 @@ describe("configure method", function(){
 
   it("should not set unknown option", function(){
     expect(co.options.unwanted).toBeUndefined();
+  });
+
+  it("should convert types", function(){
+    var local = jQuery.extend({}, custom);
+    local.amount = 1000;
+    var co = new Razorpay(local);
+    expect(co.options.amount).toBe(String(local.amount));
   });
 
   it("should set signature", function(){

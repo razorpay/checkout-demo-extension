@@ -214,3 +214,18 @@ describe("onComplete should", function(){
     popupRequest = {};
   })
 })
+
+describe("setupPopup should submit to new tab for ie mobile", function(){
+  var url = 'url';
+  var request2 = JSON.parse(JSON.stringify(request));
+  request2.options = options;
+
+  it("", function(){
+    _rahe.isIEMobile = true;
+    var spy = jasmine.createSpy();
+    spyOn(_rahe, 'formSubmit').and.callFake(spy);
+    discreet.setupPopup(request2, url);
+    expect(spy).toHaveBeenCalled();
+    _rahe.isIEMobile = false;
+  })
+})
