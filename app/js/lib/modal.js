@@ -86,7 +86,7 @@
     },
 
     hide: function() {
-      if(!this.isShown) return;
+      if(!this.isShown) { return }
       this.isShown = false;
 
       if(this.animationDuration){

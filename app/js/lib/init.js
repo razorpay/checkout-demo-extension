@@ -1,8 +1,3 @@
-var currentScript = document.currentScript || (function() {
-  var scripts = document.getElementsByTagName('script');
-  return scripts[scripts.length - 1];
-})();
-
 var roll = function(){};
 var noop = roll;
 var ua = navigator.userAgent;

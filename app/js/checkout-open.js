@@ -1,3 +1,7 @@
+var currentScript = document.currentScript || (function() {
+  var scripts = document.getElementsByTagName('script');
+  return scripts[scripts.length - 1];
+})();
 
 // place _chop.frameContainer absolute, and add window.onscroll
 var _chBackMinHeight = 0;
@@ -27,18 +31,21 @@ var _chop = {
       })
       window.addEventListener('scroll', function(){
         var c = _chop.frameContainer;
-        if(!c || !_chop.isOpen || typeof window.pageYOffset !== 'number')
+        if(!c || !_chop.isOpen || typeof window.pageYOffset !== 'number'){
           return;
+        }
         var top;
         var offTop = c.offsetTop - pageYOffset;
         var offBot = c.offsetHeight + offTop;
         if(_chPageY < pageYOffset){
-          if(offBot < 0.2*innerHeight && offTop < 0)
+          if(offBot < 0.2*innerHeight && offTop < 0){
             top = pageYOffset + innerHeight - c.offsetHeight;
+          }
         }
         else if(_chPageY > pageYOffset){
-          if(offTop > 0.1*innerHeight && offBot > innerHeight)
+          if(offTop > 0.1*innerHeight && offBot > innerHeight){
             top = pageYOffset;
+          }
         }
         if(typeof top === 'number'){
           c.style.top = Math.max(0, top) + 'px';
@@ -350,16 +357,17 @@ Razorpay.prototype.open = function() {
       width: '100%',
       '-webkit-transition': '0.2s ease-out top'
     }
-    for(var i in rules){
-      style[i] = rules[i];
-    }
+    each(rules, function(i, rule) {
+      style[i] = rule;
+    })
     _chop.backdrop = document.createElement('div');
     _chop.backdrop.setAttribute('style', 'min-height: '+_chBackMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
     _chop.frameContainer.appendChild(_chop.backdrop);
     _chop.bodyEl.appendChild(_chop.frameContainer);
   }
-  if(!_chAbsoluteContainer)
+  if(!_chAbsoluteContainer){
     _chop.bodyEl.style.overflow = 'hidden';
+  }
   _chop.frameContainer.style.display = 'block';
   try{
     // setting unsupported value throws error in IE

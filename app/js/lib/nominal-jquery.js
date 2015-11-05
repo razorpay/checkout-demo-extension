@@ -1,25 +1,8 @@
 var $ = function(el){
-  if(typeof el === 'string') return $(document.getElementById(el));
-  if(!(this instanceof $)) return new $(el);
+  if(typeof el === 'string') { return $(document.getElementById(el)) }
+  if(!(this instanceof $)) { return new $(el) }
   this[0] = el;
 };
-
-var deserialize = function(data, key){
-  if(typeof data === 'object'){
-    var str = '';
-    each(
-      data,
-      function(name, value){
-        if(key){
-          name = key + '[' + name + ']';
-        }
-        str += deserialize(value, name);
-      }
-    )
-    return str;
-  }
-  return '<input type="hidden" name="' + key + '" value="' + data + '">';
-}
 
 var each = function( iteratee, eachFunc ) {
   var i;
@@ -43,6 +26,23 @@ var map = function( iteratee, mapFunc ) {
     result[i] = mapFunc(val, i);
   })
   return result;
+}
+
+var deserialize = function(data, key){
+  if(typeof data === 'object'){
+    var str = '';
+    each(
+      data,
+      function(name, value){
+        if(key){
+          name = key + '[' + name + ']';
+        }
+        str += deserialize(value, name);
+      }
+    )
+    return str;
+  }
+  return '<input type="hidden" name="' + key + '" value="' + data + '">';
 }
 
 $.prototype = {
@@ -287,7 +287,8 @@ var _$randomString = function(length) {
 };
 
 $.ajax = function(options){
-  !options.data && (options.data = {});
+  if(!options.data) { options.data = {} }
+
   var callback = options.data.callback = 'jsonp_' + _$randomString(15);
   var params = _$getAjaxParams(options);
   var done = false;

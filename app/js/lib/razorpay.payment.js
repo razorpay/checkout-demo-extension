@@ -150,7 +150,7 @@ var _caFormatExpiry = function(e){
     }
     return;
   }
-  e && e.preventDefault();
+  if(e) { e.preventDefault() }
 
   setTimeout(function(){
     el.value = (prenums + character + sufnums).slice(0, 7);
@@ -243,7 +243,7 @@ var card = {
   },
 
   formatNumber: function(el){
-    if(!el) return;
+    if(!el) { return }
     $(el).on('keypress', _caFormatNumber);
     $(el).on('keydown', _caFormatNumberBack);
     $(el).on('keyup', function(){
@@ -254,13 +254,13 @@ var card = {
   },
 
   formatExpiry: function(el){
-    if(!el) return;
+    if(!el) { return }
     $(el).on('keypress', _caFormatExpiry);
     $(el).on('keydown', _caFormatExpiryBack);
   },
 
   ensureNumeric: function(el){
-    if(!el) return;
+    if(!el) { return }
     $(el).on('keypress', _caEnsureNumeric);
   },
 

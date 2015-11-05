@@ -166,10 +166,12 @@ var frameDiscreet = {
 
     if(_if_should_focus_next){
       card.filled = function(el){
-        if(el === el_expiry)
+        if(el === el_expiry){
           el_cvv.focus();
-        else
+        }
+        else{
           el_expiry.focus();
+        }
       }
     }
     

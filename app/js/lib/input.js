@@ -29,8 +29,9 @@
     on: function(eventName, targetClass, eventHandler, useCapture){
       var smarty = this;
       var listenerRef = this.parent.on(eventName, function(e){
-        if(!targetClass || e.target.className.match(targetClass))
+        if(!targetClass || e.target.className.match(targetClass)){
           eventHandler.call(smarty, e);
+        }
       }, useCapture);
       this.listeners.push(eventName, listenerRef, useCapture);
     },

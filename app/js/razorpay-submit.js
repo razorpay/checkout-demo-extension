@@ -51,8 +51,7 @@ var _rahe = {
   },
 
   onComplete: function(data){
-    if(!popupRequest)
-      return;
+    if(!popupRequest) { return }
 
     _rahe.handleResponse(popupRequest, data);
 
@@ -91,8 +90,9 @@ var _rahe = {
 */
 Razorpay.payment = {
   cancel: function(){
-    if(!popupRequest)
+    if(!popupRequest){
       return;
+    }
 
     try{
       popupRequest.popup.close();
@@ -113,8 +113,9 @@ Razorpay.payment = {
     }
     var rdata = request.data;
 
-    if(!request.options)
+    if(!request.options){
       request.options = Razorpay.defaults;
+    }
     var options = request.options;
 
     each(
@@ -190,8 +191,9 @@ Razorpay.payment = {
         }
       },
       complete: function(data){
-        if(typeof data === 'object' && data.error && typeof callback === 'function')
+        if(typeof data === 'object' && data.error && typeof callback === 'function') {
           callback({error: true});
+        }
       }
     });
   }
