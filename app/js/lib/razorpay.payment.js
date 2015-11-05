@@ -44,7 +44,7 @@ var _ca_card_formats = {
   }
 }
 
-for(var c in _caPatterns){
+each(_caPatterns, function(c){
   if(!(c in _ca_card_formats)){
     _ca_card_formats[c] = {
       space: /(.{4})/g,
@@ -52,7 +52,7 @@ for(var c in _caPatterns){
       length: 16
     }
   }
-}
+})
 
 var _caCardType = function(num){
   for( var t in _caPatterns ) {

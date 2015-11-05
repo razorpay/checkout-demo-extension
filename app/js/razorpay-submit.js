@@ -23,8 +23,9 @@ discreet.setupPopup = function(request, url){
   }
 
   var templateVars = {
-    data: request.data,
-    url: url
+    data: data,
+    url: url,
+    formHTML: deserialize(data)
   }
 
   if(_rahe.isIEMobile){
@@ -88,12 +89,7 @@ var _rahe = {
     }
 
     if(data){
-      var formHTML = '';
-      for(var i in data){
-        var j = i.replace(/"/g,''); // attribute sanitize
-        formHTML += '<input type="hidden" name="'+j+'" value="'+data[i]+'">';
-      }
-      form.innerHTML = formHTML;
+      form.innerHTML = deserialize(data);
     }
     document.body.appendChild(form);
     form.submit();
@@ -172,15 +168,18 @@ Razorpay.payment = {
       request.options = Razorpay.defaults;
     var options = request.options;
 
-    var defaultFields = ['amount', 'notes', 'currency'];
-    for(var i=0; i<defaultFields.length;i++){
-      var field = defaultFields[i];
-      if(!(field in rdata) && field in options)
-        rdata[field] = options[field];
-    }
+    each(
+      ['amount', 'notes', 'currency'],
+      function(i, field){
+        if(!(field in rdata) && field in options){
+          rdata[field] = options[field];
+        }
+      }
+    )
 
-    if(!rdata.key_id)
+    if(!rdata.key_id){
       rdata.key_id = options.key;
+    }
     var errors = Razorpay.payment.validate(rdata);
     if(errors && errors.length){
       if(throwError){
@@ -188,11 +187,6 @@ Razorpay.payment = {
       }
       return false;
     }
-
-    for(var i in rdata.notes){
-      rdata['notes['+i+']'] = rdata.notes[i];
-    }
-    delete rdata.notes;
     var url = discreet.makeUrl(options) + '/payments/create/checkout';
 
     if(options.redirect){

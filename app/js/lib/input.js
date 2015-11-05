@@ -37,10 +37,9 @@
     },
 
     off: function(){
-      for(var i=0; i<this.listeners.length; i++){
-        var l = this.listeners[i];
-        this.parent.off(l[0], l[1], l[2]);
-      }
+      $.each( this.listeners, function(i, listener){
+        this.parent.off(listener[0], listener[1], listener[2]);
+      })
     },
 
     common_events: function(){
@@ -106,16 +105,19 @@
     },
 
     refresh: function(callback){
-      var els = this.parent[0].getElementsByTagName('p');
-      var elslen = els.length;
-      for(var i=0; i<elslen; i++){
-        var child = $(els[i]).children('input');
-        if(child.length){
-          child = child[0];
-          this.update(child);
-          callback && callback(child);
+      var self = this;
+      $.each(
+        this.parent[0].getElementsByTagName('p'),
+        function(i, el){
+          var child = $(el).children('input')[0];
+          if(child){
+            self.update(child);
+            if(callback){
+              callback(child);
+            }
+          }
         }
-      }
+      )
     },
 
     update: function(el){

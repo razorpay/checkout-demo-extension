@@ -89,14 +89,6 @@ describe("authorize should", function(){
     Razorpay.configure({redirect: false});
   });
 
-  it("break down notes", function(){
-    expect(typeof req.data.notes).toBe('object');
-    Razorpay.payment.authorize(req);
-    expect(typeof req.data.notes).toBe('undefined');
-    expect(req.data['notes[note1]']).toBe('one');
-    expect(req.data['notes[note2]']).toBe('two');
-  })
-
   it("add callback_url if specified in options", function(){
     Razorpay.defaults.callback_url = 'swag';
     Razorpay.payment.authorize(req);

@@ -28,20 +28,12 @@ var _popDefaults = {
 * The "Popup" constructor.
 */
 
-var Popup = function(src, opts) {
+var Popup = function(src) {
   if (!(this instanceof Popup)) {
-    return new Popup(src, opts);
+    return new Popup(src);
   }
 
-  // ensure an opts object exists
-  opts = opts || {};
-
-  // set the defaults if not provided
-  for (var i in _popDefaults) {
-    if (!(i in opts)) {
-      opts[i] = _popDefaults[i];
-    }
-  }
+  var opts = _popDefaults;
 
   // we try to place it at the center of the current window
   // note: this "centering" logic borrowed from the Facebook JavaScript SDK
@@ -64,9 +56,6 @@ var Popup = function(src, opts) {
     optsStr.push(key + '=' + opts[key]);
   }
   optsStr = optsStr.join(',');
-
-  this.opts = opts;
-  this.optsStr = optsStr;
 
   // finally, open and return the popup window
   this.window = window.open(src, '', optsStr); // might be null in IE9 if protected mode is turned on

@@ -60,9 +60,9 @@ var _chop = {
       height: '100%',
       src: src
     };
-    for(var i in attrs){
-      frame.setAttribute(i, attrs[i]);
-    }
+    each(attrs, function(i, attr){
+      frame.setAttribute(i, attr);
+    })
     return frame;
   },
 
@@ -172,12 +172,13 @@ var _chop = {
       var options = {};
       _chop.setMetaViewport();
 
-      for(var i in this.options){
-        var value = this.options[i];
-        if(typeof value !== 'function' && i !== 'parent'){
-          options[i] = value;
+      each(
+        this.options, function(i, value){
+          if(typeof value !== 'function' && i !== 'parent'){
+            options[i] = value;
+          }
         }
-      }
+      )
       for(var i in this.modal.options){
         this.options.modal[i] = this.modal.options[i];
       }
@@ -240,18 +241,8 @@ var _chop = {
     @return {[type]}    [description]
   */
   defaultPostHandler: function(data){
-    var inputs = "";
-    for (var i in data) {
-      if (typeof data[i] === "object") {
-        for (var j in data[i]) {
-          inputs += "<input type=\"hidden\" name=\"" + i + "[" + j + "]\" value=\"" + data[i][j] + "\">";
-        }
-      } else {
-        inputs += "<input type=\"hidden\" name=\"" + i + "\" value=\"" + data[i] + "\">";
-      }
-    }
     var RazorPayForm = currentScript.parentElement;
-    RazorPayForm.innerHTML += inputs;
+    RazorPayForm.innerHTML += deserialize(data);
     RazorPayForm.submit();
   },
 
@@ -303,15 +294,17 @@ var _chop = {
   automaticCheckoutInit: function(){
     var key = currentScript.getAttribute('data-key');
     if (key && key.length > 0){
-      var attrs = currentScript.attributes;
       var opts = {};
-      for(var i=0; i<attrs.length; i++){
-        var name = attrs[i].name
-        if(/^data-/.test(name)){
-          name = name.replace(/^data-/,'');
-          opts[name] = attrs[i].value;
+      each(
+        currentScript.attributes,
+        function(i, attr){
+          var name = attr.name
+          if(/^data-/.test(name)){
+            name = name.replace(/^data-/,'');
+            opts[name] = attr.value;
+          }
         }
-      }
+      )
       _chop.parseScriptOptions(opts);
       opts.handler = _chop.defaultPostHandler;
       var rzp = new Razorpay(opts);

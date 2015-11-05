@@ -4,7 +4,24 @@ var $ = function(el){
   this[0] = el;
 };
 
-var each = $.each = function( iteratee, eachFunc, is ) {
+var deserialize = function(data, key){
+  if(typeof data === 'object'){
+    var str = '';
+    each(
+      data,
+      function(name, value){
+        if(key){
+          name = key + '[' + name + ']';
+        }
+        str += deserialize(value, name);
+      }
+    )
+    return str;
+  }
+  return '<input type="hidden" name="' + key + '" value="' + data + '">';
+}
+
+var each = $.each = function( iteratee, eachFunc ) {
   var i;
   if( iteratee ) {
     if ( iteratee.length ) { // not using instanceof Array, to iterate over nodeList

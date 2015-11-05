@@ -295,17 +295,18 @@ var frameDiscreet = {
     frameDiscreet.smarty.input({target: select});
   },
 
-  bank_change: function(){
+  bank_change: function() {
     var val = this.value;
-    var radios = $('netb-banks')[0].getElementsByTagName('input');
-    for(var i = 0; i < radios.length; i++){
-      var radio = radios[i];
-      if(radio.value === val){
-        radio.checked = true;
-      } else if(radio.checked){
-        radio.checked = false;
+    each(
+      $('netb-banks')[0].getElementsByTagName('input'),
+      function(i, radio) {
+        if(radio.value === val){
+          radio.checked = true;
+        } else if(radio.checked){
+          radio.checked = false;
+        }
       }
-    }
+    )
   },
 
   tab_change: function(e){
@@ -341,7 +342,7 @@ var frameDiscreet = {
   //   }
   // },
 
-  applyFont: function(anchor, retryCount){
+  applyFont: function(anchor, retryCount) {
     if(!retryCount) {
       retryCount = 0;
     }
@@ -354,12 +355,15 @@ var frameDiscreet = {
   },
 
   /* sets focus on invalid input and returns true, if any. */
-  isInvalid: function(parent){
+  isInvalid: function(parent) {
     var invalids = $(parent).find('invalid', 'p');
     if(invalids.length){
       frameDiscreet.shake();
       $(invalids[0]).find('input')[0].focus();
-      for(var i=0; i<invalids.length; i++) $(invalids[i]).addClass('mature');
+
+      each( invalids, function(i, field){
+        $(field).addClass('mature');
+      })
       return true;
     }
   },
@@ -367,7 +371,7 @@ var frameDiscreet = {
   formSubmit: function(e) {
     frameDiscreet.smarty.refresh();
 
-    if (frameDiscreet.isInvalid('form-common')){
+    if (frameDiscreet.isInvalid('form-common')) {
       return;
     }
 
@@ -403,23 +407,23 @@ var frameDiscreet = {
     });
   },
 
-  frontDrop: function(message, className){
+  frontDrop: function(message, className) {
     $('fd-t')[0].innerHTML = message || '';
     $('fd')[0].className = 'mfix ' + (className || '');
   },
 
-  getFormFields: function(container, returnObj){
-    var allels = $(container)[0].getElementsByTagName('*');
-    var len = allels.length;
-    for(var i=0; i<len; i++){
-      var el = allels[i];
-      if(el.getAttribute('type') === 'radio' && !el.checked) {
-        continue;
+  getFormFields: function(container, returnObj) {
+    each(
+      $(container)[0].getElementsByTagName('*'),
+      function(i, el){
+        if(el.getAttribute('type') === 'radio' && el.checked) {
+          return;
+        }
+        if(el.name && !el.disabled && el.value.length) {
+          returnObj[el.name] = el.value;
+        }
       }
-      if(el.name && !el.disabled && el.value.length) {
-        returnObj[el.name] = el.value;
-      }
-    }
+    )
   },
 
   getFormData: function() {
@@ -563,19 +567,21 @@ var frameDiscreet = {
     }
   },
   setQueryParams: function(search){
-    var params = search.replace(/^\?/,'').split('&');
-    for( var i=0; i < params.length; i++ ) {
-      var split = params[i].split('=', 2);
-      if( split[0].indexOf('.') !== -1 ) {
-        var dotsplit = split[0].split('.', 2);
-        if( !qpmap[dotsplit[0]] ) {
-          qpmap[dotsplit[0]] = {};
+    each(
+      search.replace(/^\?/,'').split('&'),
+      function(i, param){
+        var split = param.split('=', 2);
+        if( split[0].indexOf('.') !== -1 ) {
+          var dotsplit = split[0].split('.', 2);
+          if( !qpmap[dotsplit[0]] ) {
+            qpmap[dotsplit[0]] = {};
+          }
+          qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
+        } else {
+          qpmap[split[0]] = decodeURIComponent(split[1]);
         }
-        qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
-      } else {
-        qpmap[split[0]] = decodeURIComponent(split[1]);
       }
-    }
+    )
   },
   parseMessage: function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
     if(!e || !e.data) {
@@ -689,7 +695,7 @@ if(qpmap.platform === 'ios'){
 
   var bridgeMethods = ['load','dismiss','submit','fault','success'];
 
-  bridgeMethods.forEach(function(prop){
+  each(bridgeMethods, function(prop){
     CheckoutBridge['on'+prop] = iOSMethod(prop)
   })
 }
