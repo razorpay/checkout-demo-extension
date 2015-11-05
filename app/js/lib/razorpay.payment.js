@@ -14,7 +14,10 @@ var _caPatterns = {
 
 var _ca_space_14 = /(.{4})(.{0,6})/;
 var _ca_sub_14 = function(match, $1, $2, offset, original){
-  $2.length === 6 && ($2 += ' ')
+
+  if ( $2.length === 6 ){
+    $2 += ' ';
+  }
   return $1 + ' ' + $2;
 }
 

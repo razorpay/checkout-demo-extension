@@ -7,19 +7,23 @@ var $ = function(el){
 $.prototype = {
   on: function(event, callback, capture){
     var el = this[0];
-    if(!el) return;
+    if(!el){
+      return;
+    }
     var ref;
     if (window.addEventListener) {
       ref = function(e){
-        if(e.target.nodeType === 3) e.target = e.target.parentNode;// textNode target
+        if( e.target.nodeType === 3 ) {
+          e.target = e.target.parentNode;// textNode target
+        }
         callback.call(this, e);
       }
       el.addEventListener(event, ref, !!capture);
     } else if(window.attachEvent){
       ref = function(e){
-        if(!e) var e = window.event;
-        if(!e.target) e.target = e.srcElement || document;
-        if(!e.preventDefault) e.preventDefault = function(){this.returnValue = false};
+        if(!e) { var e = window.event }
+        if(!e.target) { e.target = e.srcElement || document }
+        if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
         callback.call(el, e);
       }
       el.attachEvent('on' + event, ref);
@@ -49,7 +53,7 @@ $.prototype = {
 
   addClass: function(str){
     var el = this[0];
-    if(!el.className) el.className = str;
+    if(!el.className) { el.className = str }
     else if(!this.hasClass(str)) el.className += ' ' + str;
     return this;
   },
@@ -57,7 +61,7 @@ $.prototype = {
   removeClass: function(str){
     var el = this[0];
     var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-    if(el.className !== className) el.className = className;
+    if(el.className !== className) { el.className = className }
     return this;
   },
 
@@ -65,7 +69,9 @@ $.prototype = {
     var child = this[0].firstChild;
     var childList = [];
     while(child){
-      if(child.nodeType === 1 && !filterClass || $(child).hasClass(filterClass)) childList.push(child);
+      if(child.nodeType === 1 && !filterClass || $(child).hasClass(filterClass)) {
+        childList.push(child);
+      }
       child = child.nextSibling;
     }
     return childList;
@@ -73,16 +79,23 @@ $.prototype = {
 
   find: function(filterClass, filterTag){
     var node = this[0];
+
     if('getElementsByClassName' in document){
       return node.getElementsByClassName(filterClass);
     }
     var result = [];
-    !filterTag && (filterTag = '*');
+
+    if( !filterTag ) {
+      filterTag = '*';
+    }
+
     var els = node.getElementsByTagName(filterTag);
     var elsLen = els.length;
     var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
-    for (var i=0; i<elsLen; i++){
-      if(pattern.test(els[i].className)) result.push(els[i]);
+    for ( var i = 0; i < elsLen; i++ ) {
+      if( pattern.test(els[i].className) ) {
+        result.push(els[i]);
+      }
     }
     return result;
   },
@@ -90,7 +103,9 @@ $.prototype = {
   css: function(prop, value){
     var el = this[0];
     if(el){
-      if(arguments.length === 1) return el.style[prop];
+      if( arguments.length === 1 ) {
+        return el.style[prop];
+      }
       try {
         el.style[prop] = value;
       } catch(e){} // IE can not set invalid css rules without throwing up.
@@ -101,7 +116,9 @@ $.prototype = {
   attr: function(attr, value){
     var el = this[0];
     if(el){
-      if(arguments.length === 1) return el.getAttribute(attr);
+      if( arguments.length === 1 ) {
+        return el.getAttribute(attr);
+      }
       el.setAttribute(attr, value);
     }
   },
@@ -125,8 +142,10 @@ $.extend = function(target, source){
 };
 
 $.defaults = function(target, defaults){
-  for(var i in defaults){
-    if(!(i in target)) target[i] = defaults[i];
+  for( var i in defaults ) {
+    if( !( i in target ) ) {
+      target[i] = defaults[i];
+    }
   }
   return target;
 };
@@ -177,7 +196,9 @@ $.getCookie = function(name){
 var _$listener = null;
 
 $.addMessageListener = function(callback, context) {
-  if(_$listener) $.removeMessageListener();
+  if(_$listener){
+    $.removeMessageListener();
+  }
   _$listener = $(window).on('message', _$createListener(callback, context));
 };
 

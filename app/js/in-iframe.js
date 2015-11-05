@@ -66,14 +66,14 @@ var frameDiscreet = {
   setMethods: function(payment_methods, opts){
     var methodOptions = opts.method;
 
-    if(!payment_methods.error){
+    if( !payment_methods.error ) {
       for(var i in payment_methods){
         if(methodOptions[i] !== false && payment_methods[i] !== false){
           methodOptions[i] = payment_methods[i];
         }
       }
       var wallets = [];
-      if(methodOptions.wallet && frameDiscreet.rzp.options.amount <= 100*10000){
+      if( methodOptions.wallet && frameDiscreet.rzp.options.amount <= 100*10000 ) {
         var printedWallets = payment_methods['wallet'];
         if(typeof printedWallets === 'object'){
           for(var i in printedWallets){
@@ -140,7 +140,10 @@ var frameDiscreet = {
     var el_contact = $('contact')[0];
     
     card.setType = function(el, type){
-      !type && (type = card.getType(el.value) || 'unknown');
+      if(!type){
+        type = card.getType(el.value) || 'unknown';
+      }
+
       el.parentNode.setAttribute('cardtype', type);
       frameDiscreet.setNumberValidity.call(el);
       
@@ -167,7 +170,7 @@ var frameDiscreet = {
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-    if(el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string'){
+    if ( el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string' ) {
       el_cvv.type = 'tel';
     }
   },
@@ -212,7 +215,7 @@ var frameDiscreet = {
     div.innerHTML = templates.modal(opts);
     document.body.appendChild(div.firstChild);
 
-    if(window.CheckoutBridge){
+    if ( window.CheckoutBridge ) {
       $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
@@ -245,7 +248,7 @@ var frameDiscreet = {
     if(qpmap.tab){
       var lis = $('tabs')[0].getElementsByTagName('li');
       for(var i=0; i<lis.length; i++){
-        if(lis[i].getAttribute('data-target') === 'tab-' + qpmap.tab){
+        if( lis[i].getAttribute('data-target') === 'tab-' + qpmap.tab ) {
           frameDiscreet.tab_change({target: lis[i]});
           break;
         }
@@ -259,12 +262,14 @@ var frameDiscreet = {
     frameDiscreet.setCardFormatting();
   },
 
-  bank_radio: function(e){
+  bank_radio: function(e) {
     var target = e.target;
-    if(target.nodeName !== 'LABEL')
+    if( target.nodeName !== 'LABEL' ) {
       target = target.parentNode;
-    if(target.nodeName !== 'LABEL')
+    }
+    if( target.nodeName !== 'LABEL' ) {
       return;
+    }
     target = target.getElementsByTagName('input')[0];
     var select = $('bank-select')[0];
     select.value = target.value;
@@ -287,10 +292,13 @@ var frameDiscreet = {
   tab_change: function(e){
     var target = e.target;
     
-    if(target.nodeName === 'IMG') target = target.parentNode;
+    if( target.nodeName === 'IMG' ) {
+      target = target.parentNode;
+    }
     
-    if(target.nodeName !== 'LI' || target.className.indexOf('active') >= 0)
+    if( target.nodeName !== 'LI' || target.className.indexOf('active') >= 0 ) {
       return;
+    }
 
     frameDiscreet.renew();
 
@@ -315,8 +323,12 @@ var frameDiscreet = {
   // },
 
   applyFont: function(anchor, retryCount){
-    if(!retryCount) retryCount = 0;
-    if(anchor.offsetWidth/anchor.offsetHeight > 5) frameDiscreet.$el.addClass('font-loaded');
+    if(!retryCount) {
+      retryCount = 0;
+    }
+    if(anchor.offsetWidth/anchor.offsetHeight > 5) {
+      frameDiscreet.$el.addClass('font-loaded');
+    }
     else if(retryCount < 25) setTimeout(function(){
       frameDiscreet.applyFont(anchor, ++retryCount);
     }, 120 + retryCount*50);
@@ -344,8 +356,9 @@ var frameDiscreet = {
     // card_number && frameDiscreet.setNumberValidity.call(card_number);
 
     var activeTab = $('tabs').find('active')[0];
-    if (activeTab && frameDiscreet.isInvalid(activeTab.getAttribute('data-target')))
+    if ( activeTab && frameDiscreet.isInvalid(activeTab.getAttribute('data-target')) ) {
       return;
+    }
     var data = frameDiscreet.getFormData();
 
     // Signature is set in case of hosted checkout
@@ -381,10 +394,12 @@ var frameDiscreet = {
     var len = allels.length;
     for(var i=0; i<len; i++){
       var el = allels[i];
-      if(el.getAttribute('type') === 'radio' && !el.checked)
+      if(el.getAttribute('type') === 'radio' && !el.checked) {
         continue;
-      if(el.name && !el.disabled && el.value.length)
+      }
+      if(el.name && !el.disabled && el.value.length) {
         returnObj[el.name] = el.value;
+      }
     }
   },
 
@@ -417,11 +432,13 @@ var frameDiscreet = {
 
   // close on backdrop click and remove errors
   renew: function(){
-    if(frameDiscreet.$el)
+    if(frameDiscreet.$el) {
       frameDiscreet.frontDrop('', 'hidden');
+    }
 
-    if(frameDiscreet.modal)
+    if(frameDiscreet.modal) {
       frameDiscreet.modal.options.backdropClose = true;
+    }
   },
 
   hide: function(){
@@ -435,7 +452,7 @@ var frameDiscreet = {
   successHandler: function(response){
     if(frameDiscreet.modal)
       frameDiscreet.modal.options.onhide = null;
-    Razorpay.sendMessage({ event: 'success', data: response});
+    Razorpay.sendMessage({ event: 'success', data: response });
     frameDiscreet.hide();
   },
 
@@ -450,7 +467,7 @@ var frameDiscreet = {
 
     if (response && response.error){
       message = response.error.description;
-    var err_field = response.error.field;
+      var err_field = response.error.field;
       if (err_field){
         if(!err_field.indexOf('expiry'))
           err_field = 'card[expiry]';
@@ -476,19 +493,27 @@ var frameDiscreet = {
   },
 
   dataHandler: function(data){
-    if(!('method' in data))
+    if( !('method' in data) ) {
       return;
+    }
 
     frameDiscreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
 
-    if('contact' in data) $('contact')[0].value = data.contact;
-    if('email' in data) $('email')[0].value = data.email;
+    if('contact' in data) { $('contact')[0].value = data.contact; }
+    if('email' in data) { $('email')[0].value = data.email; }
 
     if(data.method === 'card'){
-      if('card[name]' in data) $('card_name')[0].value = data['card[name]'];
-      if('card[number]' in data) $('card_number')[0].value = data['card[number]'];
-      if(('card[expiry_month]' in data) && ('card[expiry_year]' in data))
+      if('card[name]' in data) {
+        $('card_name')[0].value = data['card[name]'];
+      }
+
+      if('card[number]' in data) {
+        $('card_number')[0].value = data['card[number]'];
+      }
+
+      if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
         $('card_expiry')[0].value = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
+      }
       frameDiscreet.setCardFormatting();
       $('card_cvv')[0].focus();
     } else if(data.method === 'netbanking'){
@@ -523,11 +548,11 @@ var frameDiscreet = {
   },
   setQueryParams: function(search){
     var params = search.replace(/^\?/,'').split('&');
-    for(var i=0; i < params.length; i++){
+    for( var i=0; i < params.length; i++ ) {
       var split = params[i].split('=', 2);
-      if(split[0].indexOf('.') !== -1){
+      if( split[0].indexOf('.') !== -1 ) {
         var dotsplit = split[0].split('.', 2);
-        if(!qpmap[dotsplit[0]]){
+        if( !qpmap[dotsplit[0]] ) {
           qpmap[dotsplit[0]] = {};
         }
         qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
@@ -537,10 +562,11 @@ var frameDiscreet = {
     }
   },
   parseMessage: function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
-    if(!e || !e.data)
+    if(!e || !e.data) {
       return;
+    }
     var data;
-    if(typeof e.data === 'string'){
+    if(typeof e.data === 'string') {
       try{
         data = JSON.parse(e.data);
       } catch(e){
@@ -554,11 +580,11 @@ var frameDiscreet = {
 }
 
 Razorpay.sendMessage = function(message){
-  if(typeof window.CheckoutBridge === 'object'){
+  if ( typeof window.CheckoutBridge === 'object' ) {
     frameDiscreet.notifyBridge(message);
   } else if(window !== window.parent){
     message.source = 'frame';
-    if(typeof message !== 'string'){
+    if ( typeof message !== 'string' ) {
       message = JSON.stringify(message);
     }
     window.parent.postMessage(message, '*');
@@ -566,10 +592,10 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleMessage = function(message){
-  if(typeof message !== 'object'){
+  if( typeof message !== 'object' ) {
     return;
   }
-  if(message.options && !frameDiscreet.rzp){ // open modal
+  if( message.options && !frameDiscreet.rzp ) { // open modal
     try{
       frameDiscreet.rzp = new Razorpay(message.options);
       frameDiscreet.configureRollbar(message);
@@ -597,21 +623,21 @@ window.handleMessage = function(message){
     }
     var data = message.data;
     if(data){
-      if(typeof data === 'string'){
+      if( typeof data === 'string' ){
         try{
           data = JSON.parse(data);
         } catch(e){
           roll('message.data', data);
         }
       }
-      if(typeof data === 'object')
+      if( typeof data === 'object' ) {
         frameDiscreet.dataHandler(data);
+      }
     }
   }
 }
 
 $(window).on('message', frameDiscreet.parseMessage);
-
 
 // initial error (helps in case of redirection flow)
 var qpmap = {};
@@ -644,7 +670,9 @@ if(qpmap.platform === 'ios'){
       iF = null;
     }
   }
+
   var bridgeMethods = ['load','dismiss','submit','fault','success'];
+
   bridgeMethods.forEach(function(prop){
     CheckoutBridge['on'+prop] = iOSMethod(prop)
   })
