@@ -387,10 +387,10 @@ var frameDiscreet = {
       return;
     }
     var data = frameDiscreet.getFormData();
-
+    var options = _rzp.options;
     // Signature is set in case of hosted checkout
-    if (_rzp.options.signature !== ''){
-      data.signature = _rzp.options.signature;
+    if (options.signature !== ''){
+      data.signature = options.signature;
     }
 
     Razorpay.sendMessage({
@@ -406,11 +406,19 @@ var frameDiscreet = {
 
     Razorpay.payment.authorize({
       postmessage: false,
-      options: _rzp.options,
+      options: options,
       data: data,
       error: frameDiscreet.errorHandler,
       success: frameDiscreet.successHandler
     });
+    if(!options.redirect){
+      var trackingPayload = {
+        email: data.email,
+        contact: data.contact,
+        method: data.method
+      }
+      track('submit', trackingPayload);
+    }
   },
 
   getFormFields: function(container, returnObj) {
@@ -490,6 +498,7 @@ var frameDiscreet = {
     var message;
     frameDiscreet.shake();
     _modal.options.backdropClose = true;
+    track('error', response);
 
     if (response && response.error){
       message = response.error.description;
@@ -565,6 +574,7 @@ var frameDiscreet = {
   },
 
   configureRollbar: function(message){
+    _uid = message.id;
     if(window.Rollbar){
       Rollbar.configure({
         payload: {

@@ -237,6 +237,7 @@ var _ch_onFrameMessage = function(e, data){
         handler.call(null, data);
       })
     }
+    track('done', data);
   } else if (event === 'fault'){
     alert("Oops! Something went wrong.");
     _ch_onClose.call(this);
@@ -375,14 +376,21 @@ Razorpay.prototype.open = function() {
     // setting unsupported value throws error in IE
     _ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
   } catch(e){}
-  if(!this.checkoutFrame){
+
+  var trackerPayload;
+
+  if(!this.checkoutFrame) {
     this.checkoutFrame = _ch_createFrame(this.options);
     _ch_frameContainer.appendChild(this.checkoutFrame);
-  } else {
+    trackerPayload = $.clone(this._overrides);
+  }
+  else {
     this.checkoutFrame.style.display = 'block';
     _ch_setMetaViewport();
     _ch_sendFrameMessage.call(this, {event: 'open'});
   }
+  _uid = this._id;
+  track('open', trackerPayload);
 };
 
 Razorpay.prototype.close = function(){
