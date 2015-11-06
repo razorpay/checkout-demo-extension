@@ -325,12 +325,10 @@ var frameDiscreet = {
     frameDiscreet.renew();
 
     var tabContent = $(target.getAttribute('data-target'));
-    var activeTab = tabContent.parent().children('active')[0];
-    activeTab && $(activeTab).removeClass('active');
+    $(tabContent.parent().children('active')[0]).removeClass('active');
     tabContent.addClass('active');
 
-    activeTab = $(target.parentNode).children('active')[0];
-    activeTab && $(activeTab).removeClass('active');
+    $($(target.parentNode).children('active')[0]).removeClass('active');
     $(target).addClass('active');
   },
 
@@ -389,8 +387,9 @@ var frameDiscreet = {
     var data = frameDiscreet.getFormData();
 
     // Signature is set in case of hosted checkout
-    if (frameDiscreet.rzp.options.signature !== '')
+    if (frameDiscreet.rzp.options.signature !== ''){
       data.signature = frameDiscreet.rzp.options.signature;
+    }
 
     Razorpay.sendMessage({
       event: 'submit',

@@ -110,12 +110,12 @@ var _caEnsureNumeric = function(e){
   return false;
 }
 
-var _caFormatExpiry = function(e){
+var _caFormatExpiry = function(e) {
   var character = _caEnsureNumeric(e);
-  if(character === false) { return }
+  if (character === false) { return }
   
   var pos = _caCheckSelection(this);
-  if(pos === true) { return }
+  if (pos === true) { return }
 
   var value = this.value;
   var prefix = value.slice(0, pos);
@@ -124,24 +124,20 @@ var _caFormatExpiry = function(e){
   var sufnums = suffix.replace(/[^0-9]/g,'');
   var el = this;
 
-  if(pos === 0){
-    if(/0|1/.test(character)) {
-      return;
-    }
+  if (pos === 0) {
+    if(/0|1/.test(character)) { return }
     character = '0' + character;
     pos++;
   }
 
-  if(pos === 1){
-    if(parseInt(prefix + character) > 12){
-      return e && e.preventDefault();
-    }
+  if (pos === 1) {
+    if( parseInt(prefix + character) > 12 ) { return e && e.preventDefault() }
     character += ' / ';
   }
-  else if(pos === 2){
+  else if ( pos === 2 ) {
     character = ' / ' + character;
   }
-  else{
+  else {
     if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix) && e){
       e.preventDefault();
     }
@@ -150,9 +146,9 @@ var _caFormatExpiry = function(e){
     }
     return;
   }
-  if(e) { e.preventDefault() }
+  if (e) { e.preventDefault() }
 
-  setTimeout(function(){
+  setTimeout(function() {
     el.value = (prenums + character + sufnums).slice(0, 7);
     pos = (prefix + character).length;
     _caSetCaret(el, pos);
@@ -160,7 +156,7 @@ var _caFormatExpiry = function(e){
 };
 
 var _caFormatExpiryBack = function(e){
-  if((e.which || e.keyCode) !== 8) return;
+  if((e.which || e.keyCode) !== 8) { return }
   var el = this;
   var pos = _caCheckSelection(el);
   

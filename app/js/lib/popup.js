@@ -14,6 +14,12 @@
 * Default Popup options.
 */
 
+var _popCheckClose = function(popup) {
+  return function () {
+    popup._checkClose();
+  }
+};
+
 var _popDefaults = {
     width: 800
   , height: 520
@@ -111,9 +117,3 @@ Popup.prototype = {
     }
   }
 }
-
-var _popCheckClose = function(popup) {
-  return function () {
-    popup._checkClose();
-  }
-};

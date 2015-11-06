@@ -79,7 +79,7 @@
       var parent = $(el.parentNode);
       var value = el.value;
       parent[value && 'addClass' || 'removeClass']('filled');
-      if(typeof el.getAttribute('ignore-input') === 'string') return;
+      if ( typeof el.getAttribute('ignore-input') === 'string' ) { return }
 
       var valid = true;
       var required = el.required || typeof el.getAttribute('required') === 'string';
