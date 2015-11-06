@@ -80,6 +80,11 @@ $.prototype = {
     }
   },
 
+  reflow: function(){
+    this[0].offsetWidth;
+    return this;
+  },
+
   remove: function(){
     try{
       this[0].removeChild(el);
@@ -282,7 +287,7 @@ var _$getAjaxParams = function(options){
 
 var _$randomString = function(length) {
   var str = '';
-  while(str.length < length) str += Math.random().toString(36)[2];
+  while(str.length < length) { str += Math.random().toString(36)[2] }
   return str
 };
 

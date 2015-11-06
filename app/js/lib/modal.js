@@ -74,7 +74,7 @@
     show: function() {
       if(this.isShown) { return }
       this.isShown = true;
-      this.modalElement.offsetWidth;
+      $(this.modalElement).reflow();
       this.container.addClass('shown');
       clearTimeout();
       timeout = setTimeout(this.shown, this.animationDuration);

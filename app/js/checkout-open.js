@@ -258,7 +258,7 @@ var _chop = {
   },
 
   parseScriptOptions: function(options){
-    var category, dotPosition, i, ix, property;
+    var category, dotPosition, ix, property;
     each( options, function(i, opt){
       ix = i.indexOf(".");
       if (ix > -1) {

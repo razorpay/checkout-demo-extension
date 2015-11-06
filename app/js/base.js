@@ -1,15 +1,4 @@
 var discreet = {};
-
-Razorpay.prototype.configure = function(overrides){
-  this._overrides = overrides;
-  this.options = _base.configure(overrides);
-  this.modal = {options: {}};
-};
-
-Razorpay.configure = function(overrides) {
-  Razorpay.defaults = _base.configure(overrides);
-}
-
 var _base = {
 
   set: function(baseval, override) {
@@ -26,12 +15,12 @@ var _base = {
       })
     }
 
-    else if ( typeof baseval === typeof override ) {
-      return override;
+    if ( typeof baseval === 'string' && typeof override !== 'undefined' ) {
+      return String(override);
     }
 
-    else if ( typeof baseval === 'string' && typeof override !== 'undefined' ) {
-      return String(override);
+    if ( typeof baseval === typeof override ) {
+      return override;
     }
 
     return baseval;
@@ -83,6 +72,16 @@ var _base = {
 
     if( errorMessage ){ throw new Error('Invalid option: ' + errorMessage) }
   }
+}
+
+Razorpay.prototype.configure = function(overrides){
+  this._overrides = overrides;
+  this.options = _base.configure(overrides);
+  this.modal = {options: {}};
+};
+
+Razorpay.configure = function(overrides) {
+  Razorpay.defaults = _base.configure(overrides);
 }
 
 discreet.makeUrl = function(options){

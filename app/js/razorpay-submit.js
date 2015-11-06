@@ -253,4 +253,4 @@ discreet.setupPopup = function(request, url){
       roll('Error accessing popup: ' + e.message);
     }
   }
-}
+};

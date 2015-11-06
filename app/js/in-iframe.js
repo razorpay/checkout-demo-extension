@@ -42,8 +42,7 @@ var frameDiscreet = {
     if(_if_should_shake && frameDiscreet.modal){
       var el = $('modal-inner');
       if(el[0]){
-        el.removeClass('shake')[0].offsetWidth;
-        el.addClass('shake');
+        el.removeClass('shake').reflow().addClass('shake');
       }
     }
   },
@@ -354,9 +353,11 @@ var frameDiscreet = {
     if(anchor.offsetWidth/anchor.offsetHeight > 5) {
       frameDiscreet.$el.addClass('font-loaded');
     }
-    else if(retryCount < 25) setTimeout(function(){
-      frameDiscreet.applyFont(anchor, ++retryCount);
-    }, 120 + retryCount*50);
+    else if(retryCount < 25) {
+      setTimeout(function(){
+        frameDiscreet.applyFont(anchor, ++retryCount);
+      }, 120 + retryCount*50);
+    }
   },
 
   /* sets focus on invalid input and returns true, if any. */

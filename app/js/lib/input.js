@@ -125,7 +125,12 @@
     update: function(el){
       if(el){
         this.input({target: el});
-        try{ if(document.activeElement === el) el.parentNode.addClass('focused')} catch(e){}
+        try{
+          if(document.activeElement === el) {
+            el.parentNode.addClass('focused')
+          }
+        }
+        catch(e){}
       }
     }
   }
