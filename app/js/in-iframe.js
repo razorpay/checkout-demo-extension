@@ -40,10 +40,7 @@ var frameDiscreet = {
 
   shake: function(){
     if(_if_should_shake && frameDiscreet.modal){
-      var el = $('modal-inner');
-      if(el[0]){
-        el.removeClass('shake').reflow().addClass('shake');
-      }
+      $('modal-inner').removeClass('shake').reflow().addClass('shake');
     }
   },
 
@@ -204,6 +201,7 @@ var frameDiscreet = {
     if(frameDiscreet.modal){
       return frameDiscreet.modal.show();
     }
+    $('loading').remove();
     var opts = $.clone(frameDiscreet.rzp.options);
 
     if(opts.amount >= 100*10000){
@@ -363,7 +361,7 @@ var frameDiscreet = {
   /* sets focus on invalid input and returns true, if any. */
   isInvalid: function(parent) {
     var invalids = $(parent).find('invalid', 'p');
-    if(invalids.length){
+    if(invalids[0]){
       frameDiscreet.shake();
       $(invalids[0]).find('input')[0].focus();
 
@@ -495,34 +493,37 @@ var frameDiscreet = {
     }
     var message;
     frameDiscreet.shake();
-
-    if(frameDiscreet.modal) frameDiscreet.modal.options.backdropClose = true;
+    frameDiscreet.modal.options.backdropClose = true;
 
     if (response && response.error){
       message = response.error.description;
       var err_field = response.error.field;
       if (err_field){
-        if(!err_field.indexOf('expiry'))
+        if(!err_field.indexOf('expiry')){
           err_field = 'card[expiry]';
-        var error_el = document.getElementsByName(err_field);
-        if (error_el.length && error_el[0].type !== 'hidden'){
-          var help_text = $(error_el[0].parentNode).addClass('invalid').find('help-text')[0];
-          if(help_text){
-            help_text.innerHTML = message;
+        }
+        var error_el = document.getElementsByName(err_field)[0];
+        if (error_el && error_el.type !== 'hidden'){
+          var help = $(error_el)
+            .focus()
+            .parent()
+            .addClass('invalid')
+            .find('help-text')[0];
+
+          if(help){
+            $(help).html(message);
           }
-          error_el[0].focus();
           frameDiscreet.frontDrop();
           return;
         }
       }
     }
 
-    if (!message){
-      message = 'There was an error in handling your request';
-    }
-
-    frameDiscreet.frontDrop(message, 'shown');
-    $('fd-hide')[0].focus();
+    frameDiscreet.frontDrop(
+      message || 'There was an error in handling your request',
+      'shown'
+    );
+    $('fd-hide').focus();
   },
 
   dataHandler: function(data){

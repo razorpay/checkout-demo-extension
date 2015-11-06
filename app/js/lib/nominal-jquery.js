@@ -48,9 +48,8 @@ var deserialize = function(data, key){
 $.prototype = {
   on: function(event, callback, capture){
     var el = this[0];
-    if(!el){
-      return;
-    }
+    if(!el) { return }
+
     var ref;
     if (window.addEventListener) {
       ref = function(e){
@@ -80,38 +79,59 @@ $.prototype = {
     }
   },
 
+  prop: function(prop, val){
+    var el = this[0];
+    if(arguments.length === 1){
+      return el[prop];
+    }
+    if(el){
+      if(el){
+        el[prop] = val;
+      }
+      return this;
+    }
+    return '';
+  },
+
   reflow: function(){
-    this[0].offsetWidth;
+    this.prop('offsetWidth');
     return this;
   },
 
   remove: function(){
     try{
-      this[0].removeChild(el);
+      var el = this[0];
+      el.parentNode.removeChild(el);
     } catch(e){}
     return this;
   },
 
   hasClass: function(str){
-    return (' ' + this[0].className + ' ').indexOf(' ' + str + ' ') >= 0;
+    return (' ' + this.prop('className') + ' ').indexOf(' ' + str + ' ') >= 0;
   },
 
   addClass: function(str){
-    var el = this[0];
-    if(!el.className) { el.className = str }
-    else if(!this.hasClass(str)) { el.className += ' ' + str }
+    if(str){
+      if(!this.prop('className')){
+        this.prop('className', str);
+      }
+      else if(!this.hasClass(str)){
+        this[0].className += ' ' + str;
+      }
+    }
     return this;
   },
 
   removeClass: function(str){
-    var el = this[0];
-    var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-    if(el.className !== className) { el.className = className }
+    var className = (' ' + this.prop('className') + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
+    if( this.prop('className') !== className ){
+      this.prop( 'className', className );
+    }
     return this;
   },
 
   children: function(filterClass){
-    var child = this[0].firstChild;
+    var child = this.prop('firstChild');
     var childList = [];
     while(child){
       if(child.nodeType === 1 && !filterClass || $(child).hasClass(filterClass)) {
@@ -123,53 +143,55 @@ $.prototype = {
   },
 
   find: function(filterClass, filterTag){
-    var node = this[0];
-
-    if('getElementsByClassName' in document){
-      return node.getElementsByClassName(filterClass);
-    }
-
-    if( !filterTag ) {
-      filterTag = '*';
-    }
-
-    var els = node.getElementsByTagName(filterTag);
-    var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
-
     var result = [];
-    each(els, function(i, el){
-      if( pattern.test(el.className) ) {
-        result.push(el);
+    var node = this[0];
+    if(node){
+      if('getElementsByClassName' in document){
+        return node.getElementsByClassName(filterClass);
       }
-    })
-    return result;
+
+      if( !filterTag ) {
+        filterTag = '*';
+      }
+
+      var els = node.getElementsByTagName(filterTag);
+      var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
+
+      each(els, function(i, el){
+        if( pattern.test(el.className) ) {
+          result.push(el);
+        }
+      })
+      return result;
+    }
   },
 
   css: function(prop, value){
-    var el = this[0];
-    if(el){
+    var style = this.prop('style');
+    if(style){
       if( arguments.length === 1 ) {
-        return el.style[prop];
+        return style[prop];
       }
       try {
-        el.style[prop] = value;
+        style[prop] = value;
       } catch(e){} // IE can not set invalid css rules without throwing up.
     }
     return this;
   },
 
-  attr: function(attr, value){
-    var el = this[0];
-    if(el){
-      if( arguments.length === 1 ) {
-        return el.getAttribute(attr);
-      }
-      el.setAttribute(attr, value);
-    }
+  parent: function(){
+    return $(this.prop('parentNode'));
   },
 
-  parent: function(){
-    return $(this[0].parentNode)
+  html: function(html){
+    return this.prop('innerHTML', html);
+  },
+
+  focus: function(){
+    if(this[0]){
+      this[0].focus();
+    }
+    return this;
   }
 }
 
@@ -201,28 +223,6 @@ $.getCookie = function(name){
   }
   return null;
 };
-
-// setInterval(function(){
-//   receive_cookie = readCookie('rzp-receive')
-//   if(receive_cookie){
-//     handleMessage(JSON.parse(receive_cookie));
-//     c('rzp-receive', '', -1);
-//   }
-// }, 400)
-
-// $.sendMessage = function(message, win){
-//   if(typeof message !== 'string'){
-//     message = JSON.stringify(message);
-//   }
-
-  // if(win){
-    // win.postMessage(message, '*');
-  // }
-
-  // if(_$crossCookie){
-  //   _$createCookie('submitPayload', message);
-  // }
-// }
 
 var _$listener = null;
 
