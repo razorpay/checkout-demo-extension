@@ -1,89 +1,162 @@
 var popupRequest = null;
 var templates = {};
 
-var _rahe = {
+var _deleteCookie = function(name){
+  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+};
 
-  ccInterval: null,
-  isIEMobile: /Windows Phone/.test(ua),
+var _setCookie = function(name, value){
+  document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
+};
 
-  setupCC: function(request, templateVars){
-    $.setCookie('submitPayload', JSON.stringify(templateVars));
-    _rahe.formSubmit(
-      request.options.protocol + '://' + request.options.hostname + '/processing.php',
-      null,
-      null,
-      '_blank'
-    );
-    $.deleteCookie('onComplete');
-    _rahe.ccInterval = setInterval(function(){
-      var c = $.getCookie('onComplete');
-      if(c){
-        $.deleteCookie('onComplete');
-        _rahe.onComplete(c);
-      }
-    }, 500)
-  },
-
-  formSubmit: function(action, method, data, target){
-    var form = document.createElement('form');
-    form.setAttribute('action', action);
-
-    if(method){
-      form.setAttribute('method', method);
+var _getCookie = function(name){
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for( var i=0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1,c.length);
     }
-
-    if(target){
-      form.setAttribute('target', target);
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length,c.length);
     }
-
-    if(data){
-      form.innerHTML = deserialize(data);
-    }
-    document.body.appendChild(form);
-    form.submit();
-  },
-
-  onmessage: function(e){
-    if(discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0){
-      return roll('message received from origin', e.origin);
-    }
-    _rahe.onComplete(e.data);
-  },
-
-  onComplete: function(data){
-    if(!popupRequest) { return }
-
-    _rahe.handleResponse(popupRequest, data);
-
-    Razorpay.payment.cancel();
-    return true; // if true, popup closes itself.
-  },
-
-  handleResponse: function(popupRequest, data){
-    try{
-
-      if(typeof data === 'string'){
-        data = JSON.parse(data);
-      }
-
-      if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
-        var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
-        return popupRequest.success.call(null, returnObj); // dont expose request as this
-      }
-
-      else if(typeof popupRequest.error !== 'function'){
-        return;
-      }
-      data.error.description;
-    }
-    catch(e){
-      data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
-      roll('unexpected api response', e.message);
-    }
-    popupRequest.error.call(null, data);
   }
+  return null;
+};
+
+var _rs_ccInterval = null;
+var _rs_isIEMobile = /Windows Phone/.test(ua);
+
+var _rs_formSubmit = function(action, method, data, target){
+  var form = document.createElement('form');
+  form.setAttribute('action', action);
+
+  if(method){
+    form.setAttribute('method', method);
+  }
+
+  if(target){
+    form.setAttribute('target', target);
+  }
+
+  if(data){
+    form.innerHTML = deserialize(data);
+  }
+  document.body.appendChild(form);
+  form.submit();
 }
 
+var _rs_setupCC = function(request, templateVars){
+  _setCookie('submitPayload', JSON.stringify(templateVars));
+  _rs_formSubmit(
+    request.options.protocol + '://' + request.options.hostname + '/processing.php',
+    null,
+    null,
+    '_blank'
+  );
+  _deleteCookie('onComplete');
+  _rs_ccInterval = setInterval(function(){
+    var c = _getCookie('onComplete');
+    if(c){
+      _deleteCookie('onComplete');
+      _rs_onComplete(c);
+    }
+  }, 500)
+}
+
+var _rs_handleResponse = function(popupRequest, data){
+  try{
+
+    if(typeof data === 'string'){
+      data = JSON.parse(data);
+    }
+
+    if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
+      var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
+      return popupRequest.success.call(null, returnObj); // dont expose request as this
+    }
+
+    else if(typeof popupRequest.error !== 'function'){
+      return;
+    }
+    data.error.description;
+  }
+  catch(e){
+    data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
+    roll('unexpected api response', e.message);
+  }
+  popupRequest.error.call(null, data);
+}
+
+var _rs_onComplete = function(data){
+  if(!popupRequest) { return }
+
+  _rs_handleResponse(popupRequest, data);
+
+  Razorpay.payment.cancel();
+  return true; // if true, popup closes itself.
+}
+
+var _rs_onmessage = function(e){
+  if(discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0){
+    return roll('message received from origin', e.origin);
+  }
+  _rs_onComplete(e.data);
+}
+
+var _rs_setupPopup = function(request, url){
+  if(popupRequest){
+    return window.console && console.error('Razorpay: another payment popup is open');
+  }
+  popupRequest = request;
+  var options = request.options;
+  var data = request.data;
+
+  if(data.callback_url){
+    return discreet.nextRequestRedirect({
+      method: 'post',
+      url: url,
+      content: data
+    });
+  }
+  if(request.postmessage === false){
+    window.onComplete = _rs_onComplete;
+  }
+  else {
+    $.addMessageListener(_rs_onmessage, request);
+  }
+
+  var templateVars = {
+    data: data,
+    url: url,
+    formHTML: deserialize(data)
+  }
+
+  if(_rs_isIEMobile){
+    _rs_setupCC(request, templateVars);
+  } else {
+    var popup;
+    try{
+      popup = request.popup = new Popup('');
+      popup.window.document; // let this throw error
+    } catch(e){
+      roll('Going newtab because ' + e.message, null, 'warn');
+      return _rs_setupCC(request, templateVars);
+    }
+    try{
+      templateVars.image = options.image;
+      popup.window.document.write(templates.popup(templateVars));
+      popup.window.document.close();
+
+      popup.onClose(function(){
+        _rs_onComplete({error:{description:'Payment cancelled'}});
+      })
+      roll('popup', null, 'info');
+    } catch(e){
+      roll('Error accessing popup: ' + e.message);
+    }
+  }
+};
 /**
   method for payment data submission to razorpay api
   @param request  contains payment data and optionally callbacks to success, error and element to put iframe in
@@ -102,9 +175,9 @@ Razorpay.payment = {
 
     popupRequest = null;
     $.removeMessageListener();
-    if(_rahe.ccInterval){
-      clearInterval(_rahe.ccInterval);
-      _rahe.ccInterval = null;
+    if(_rs_ccInterval){
+      clearInterval(_rs_ccInterval);
+      _rs_ccInterval = null;
     }
   },
   authorize: function(request, throwError){
@@ -140,13 +213,13 @@ Razorpay.payment = {
     var url = discreet.makeUrl(options) + '/payments/create/checkout';
 
     if(options.redirect){
-      _rahe.formSubmit(url, 'post', rdata);
+      _rs_formSubmit(url, 'post', rdata);
       return true;
     } else {
       if(!rdata.callback_url && options.callback_url) {
         rdata.callback_url = options.callback_url;
       }
-      discreet.setupPopup(request, url);
+      _rs_setupPopup(request, url);
     }
   },
 
@@ -198,59 +271,5 @@ Razorpay.payment = {
         }
       }
     });
-  }
-};
-
-discreet.setupPopup = function(request, url){
-  if(popupRequest){
-    return window.console && console.error('Razorpay: another payment popup is open');
-  }
-  popupRequest = request;
-  var options = request.options;
-  var data = request.data;
-
-  if(data.callback_url){
-    return discreet.nextRequestRedirect({
-      method: 'post',
-      url: url,
-      content: data
-    });
-  }
-  if(request.postmessage === false){
-    window.onComplete = _rahe.onComplete;
-  }
-  else {
-    $.addMessageListener(_rahe.onmessage, request);
-  }
-
-  var templateVars = {
-    data: data,
-    url: url,
-    formHTML: deserialize(data)
-  }
-
-  if(_rahe.isIEMobile){
-    _rahe.setupCC(request, templateVars);
-  } else {
-    var popup;
-    try{
-      popup = request.popup = new Popup('');
-      popup.window.document; // let this throw error
-    } catch(e){
-      roll('Going newtab because ' + e.message, null, 'warn');
-      return _rahe.setupCC(request, templateVars);
-    }
-    try{
-      templateVars.image = options.image;
-      popup.window.document.write(templates.popup(templateVars));
-      popup.window.document.close();
-
-      popup.onClose(function(){
-        _rahe.onComplete({error:{description:'Payment cancelled'}});
-      })
-      roll('popup', null, 'info');
-    } catch(e){
-      roll('Error accessing popup: ' + e.message);
-    }
   }
 };

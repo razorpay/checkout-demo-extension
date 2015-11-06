@@ -153,7 +153,7 @@ describe("handleResponse should invoke", function(){
         description: 'hello'
       }
     };
-    _rahe.handleResponse(popupRequest, error_data);
+    _rs_handleResponse(popupRequest, error_data);
   })
 
   it("error if response is invalid", function(){
@@ -164,7 +164,7 @@ describe("handleResponse should invoke", function(){
       spyCalled();
     })
     var error_data = {};
-    _rahe.handleResponse(popupRequest, error_data);
+    _rs_handleResponse(popupRequest, error_data);
   })
 
   it("success if response contains payment id", function(){
@@ -176,7 +176,7 @@ describe("handleResponse should invoke", function(){
     var success_data = {
       razorpay_payment_id: '12344'
     };
-    _rahe.handleResponse(popupRequest, success_data);
+    _rs_handleResponse(popupRequest, success_data);
   })
 })
 
@@ -188,7 +188,7 @@ describe("onComplete should", function(){
   })
 
   afterEach(function(){
-    _rahe.onComplete(popupRequest);
+    _rs_onComplete(popupRequest);
 
     if(spyCalled){
       expect(spyCalled).toHaveBeenCalled();
@@ -205,12 +205,12 @@ describe("onComplete should", function(){
 
   it("should not do anything if popupRequest is not present", function(){
     spyNotCalled = jasmine.createSpy();
-    spyOn(_rahe, 'handleResponse').and.callFake(spyNotCalled);
+    spyOn(window, '_rs_handleResponse').and.callFake(spyNotCalled);
   })
 
   it("invoke appropriate methods", function(){
     spyCalled = jasmine.createSpy();
-    spyOn(_rahe, 'handleResponse').and.callFake(spyCalled);
+    spyOn(window, '_rs_handleResponse').and.callFake(spyCalled);
     popupRequest = {};
   })
 })
@@ -221,11 +221,11 @@ describe("setupPopup should submit to new tab for ie mobile", function(){
   request2.options = options;
 
   it("", function(){
-    _rahe.isIEMobile = true;
+    _rs_isIEMobile = true;
     var spy = jasmine.createSpy();
-    spyOn(_rahe, 'formSubmit').and.callFake(spy);
-    discreet.setupPopup(request2, url);
+    spyOn(window, '_rs_formSubmit').and.callFake(spy);
+    _rs_setupPopup(request2, url);
     expect(spy).toHaveBeenCalled();
-    _rahe.isIEMobile = false;
+    _rs_isIEMobile = false;
   })
 })
