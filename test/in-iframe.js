@@ -15,7 +15,7 @@ function expectVisibleTab(tab){
 
 function openCheckoutForm(options, data){
   jQuery('#container').remove();
-  frameDiscreet.$el = frameDiscreet.modal = frameDiscreet.rzp = null;
+  _$el = _modal = _rzp = null;
   handleMessage({
     options: options,
     data: data
@@ -264,7 +264,7 @@ describe("Razorpay card tab submit", function(){
       // For opening the modal
       operation(customOptions);
       openCheckoutForm(customOptions);
-      co = frameDiscreet.rzp;
+      co = _rzp;
 
       $ccNumber    = jQuery('.input[name="card[number]"]');
       $ccExpiry    = jQuery('.input[name="card[expiry]"]');
@@ -773,7 +773,7 @@ describe('close button should close modal', function(){
     var spy2 = jasmine.createSpy();
     openCheckoutForm(coOptions);
     spyOn(Razorpay.payment, 'cancel').and.callFake(spy);
-    spyOn(frameDiscreet.modal, 'hide').and.callFake(spy2);
+    spyOn(_modal, 'hide').and.callFake(spy2);
     sendclick(jQuery('#modal-close')[0]);
     expect(spy).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();
