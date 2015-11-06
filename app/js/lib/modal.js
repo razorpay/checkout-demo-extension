@@ -72,7 +72,7 @@
     listeners: [],
 
     show: function() {
-      if(this.isShown) return;
+      if(this.isShown) { return }
       this.isShown = true;
       this.modalElement.offsetWidth;
       this.container.addClass('shown');

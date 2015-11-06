@@ -212,10 +212,12 @@ var _chop = {
     }
     
     else if (event === 'dismiss'){
-      if(_chop.backdrop)
+      if(_chop.backdrop){
         _chop.backdrop.style.background = '';
-      if(typeof this.options.modal.ondismiss === 'function')
+      }
+      if(typeof this.options.modal.ondismiss === 'function'){
         this.options.modal.ondismiss()
+      }
     }
 
     else if (event === 'hidden'){
@@ -223,8 +225,9 @@ var _chop = {
     }
 
     else if (event === 'success'){
-      if(_chop.backdrop)
+      if(_chop.backdrop){
         _chop.backdrop.style.background = '';
+      }
 
       if(this.checkoutFrame){
         this.checkoutFrame.setAttribute('removable', true);
@@ -256,14 +259,13 @@ var _chop = {
 
   parseScriptOptions: function(options){
     var category, dotPosition, i, ix, property;
-    for (i in options) {
+    each( options, function(i, opt){
       ix = i.indexOf(".");
       if (ix > -1) {
         dotPosition = ix;
         category = i.substr(0, dotPosition);
         property = i.substr(dotPosition + 1);
         options[category] = options[category] || {};
-        var opt = options[i];
         if(opt === 'true'){
           opt = true;
         }
@@ -273,9 +275,11 @@ var _chop = {
         options[category][property] = opt;
         delete options[i];
       }
-    }
-    if(options.method)
+    })
+
+    if(options.method){
       _chop.parseScriptOptions(options.method);
+    }
   },
 
   addButton: function(rzp){

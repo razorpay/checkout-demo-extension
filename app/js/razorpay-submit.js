@@ -143,7 +143,9 @@ Razorpay.payment = {
       _rahe.formSubmit(url, 'post', rdata);
       return true;
     } else {
-      if(!rdata.callback_url && options.callback_url) rdata.callback_url = options.callback_url;
+      if(!rdata.callback_url && options.callback_url) {
+        rdata.callback_url = options.callback_url;
+      }
       discreet.setupPopup(request, url);
     }
   },

@@ -79,11 +79,11 @@ var _caSetCaret = function(el, pos){
 
 var _caCheckSelection = function(el){
   if(typeof el.selectionStart === 'number'){
-    if(el.selectionStart !== el.selectionEnd) return true;
+    if(el.selectionStart !== el.selectionEnd) { return true }
     return el.selectionStart;
   } else if (document.selection) {
     var range = document.selection.createRange();
-    if(range.text){return true};
+    if(range.text) { return true }
 
     // get caret position in IE8
     var textInputRange = el.createTextRange();
@@ -94,14 +94,14 @@ var _caCheckSelection = function(el){
 }
 
 var _caEnsureNumeric = function(e){
-  if(!e) return '';
+  if(!e) { return '' }
 
   var which = e.which;
   if(typeof which !== 'number'){
     which = e.keyCode;
   }
 
-  if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) return false;
+  if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
   var character = String.fromCharCode(which);
   if(/[0-9]/.test(character)){
     return character;
@@ -112,10 +112,10 @@ var _caEnsureNumeric = function(e){
 
 var _caFormatExpiry = function(e){
   var character = _caEnsureNumeric(e);
-  if(character === false) return;
+  if(character === false) { return }
   
   var pos = _caCheckSelection(this);
-  if(pos === true) return;
+  if(pos === true) { return }
 
   var value = this.value;
   var prefix = value.slice(0, pos);
@@ -125,11 +125,11 @@ var _caFormatExpiry = function(e){
   var el = this;
 
   if(pos === 0){
-    if(/0|1/.test(character))
+    if(/0|1/.test(character)) {
       return;
-    else
-      character = '0' + character;
-      pos++;
+    }
+    character = '0' + character;
+    pos++;
   }
 
   if(pos === 1){
@@ -172,10 +172,10 @@ var _caFormatExpiryBack = function(e){
 
 var _caFormatNumber = function(e){
   var character = _caEnsureNumeric(e);
-  if(character === false) return;
+  if(character === false) { return }
   
   var pos = _caCheckSelection(this);
-  if(pos === true) return;
+  if(pos === true) { return }
   
   var value = this.value;
   var prefix = value.slice(0, pos).replace(/[^0-9]/g,'');
@@ -185,9 +185,9 @@ var _caFormatNumber = function(e){
   var type = _caCardType(value) || 'unknown';
   var cardobj = _ca_card_formats[type];
 
-  if(prefix.length + suffix.length >= cardobj.length) return;
+  if(prefix.length + suffix.length >= cardobj.length) { return }
 
-  if(e){
+  if(e) {
     var el = this;
     e.preventDefault();
     setTimeout(function(){
@@ -209,7 +209,7 @@ var _caFormatNumber = function(e){
 };
 
 var _caFormatNumberBack = function(e){
-  if((e.which || e.keyCode) !== 8) return;
+  if((e.which || e.keyCode) !== 8) { return }
 
   var el = this;
   var pos = _caCheckSelection(el);

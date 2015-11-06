@@ -244,7 +244,9 @@ var frameDiscreet = {
     frameDiscreet.applyFont($('powered-link')[0]);
     frameDiscreet.modal = frameDiscreet.createModal(frameDiscreet.$el.children('modal')[0], opts.modal);
 
-    if($('nb-na')[0]) $('nb-elem').css('display', 'none');
+    if($('nb-na')[0]) {
+      $('nb-elem').css('display', 'none');
+    }
 
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)

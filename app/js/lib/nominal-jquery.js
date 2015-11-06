@@ -94,7 +94,7 @@ $.prototype = {
   addClass: function(str){
     var el = this[0];
     if(!el.className) { el.className = str }
-    else if(!this.hasClass(str)) el.className += ' ' + str;
+    else if(!this.hasClass(str)) { el.className += ' ' + str }
     return this;
   },
 

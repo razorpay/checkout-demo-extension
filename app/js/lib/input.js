@@ -62,8 +62,9 @@
 
     intercept: function(e){
       var parent = e.target;
-      if(!(/elem/.test(parent.className)))
+      if(!(/elem/.test(parent.className))) {
          parent = parent.parentNode;
+      }
 
       var child = $(parent).children('input');
       if(child.length){
