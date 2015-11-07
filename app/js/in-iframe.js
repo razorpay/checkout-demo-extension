@@ -363,7 +363,7 @@ var frameDiscreet = {
     var invalids = $(parent).find('invalid', 'p');
     if(invalids[0]){
       frameDiscreet.shake();
-      $(invalids[0]).find('input')[0].focus();
+      $($(invalids[0]).find('input')[0]).focus();
 
       each( invalids, function(i, field){
         $(field).addClass('mature');
@@ -425,7 +425,7 @@ var frameDiscreet = {
     each(
       $(container)[0].getElementsByTagName('*'),
       function(i, el){
-        if(el.getAttribute('type') === 'radio' && el.checked) {
+        if(el.getAttribute('type') === 'radio' && !el.checked) {
           return;
         }
         if(el.name && !el.disabled && el.value.length) {
