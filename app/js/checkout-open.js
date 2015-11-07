@@ -192,10 +192,12 @@ var _ch_onFrameMessage = function(e, data){
     _ch_setImageOption(options);
 
     var response = {
-      id: this._id,
       context: location.href,
       options: options,
       overrides: this._overrides
+    }
+    if(_uid){
+      response.id = _uid;
     }
     return _ch_sendFrameMessage.call(this, response);
   }
@@ -389,7 +391,9 @@ Razorpay.prototype.open = function() {
     _ch_setMetaViewport();
     _ch_sendFrameMessage.call(this, {event: 'open'});
   }
-  _uid = this._id;
+  if(trackerPayload && !trackerPayload.key.indexOf('rzp_live_')){
+    _uid = this._id;
+  }
   track('open', trackerPayload);
 };
 

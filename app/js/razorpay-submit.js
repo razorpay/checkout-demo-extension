@@ -128,8 +128,7 @@ var _rs_setupPopup = function(request, url){
 
   var templateVars = {
     data: data,
-    url: url,
-    formHTML: deserialize(data)
+    url: url
   }
 
   if(_rs_isIEMobile){
@@ -144,6 +143,7 @@ var _rs_setupPopup = function(request, url){
       return _rs_setupCC(request, templateVars);
     }
     try{
+      templateVars.formHTML = deserialize(data);
       templateVars.image = options.image;
       popup.window.document.write(templates.popup(templateVars));
       popup.window.document.close();
@@ -192,14 +192,13 @@ Razorpay.payment = {
     var options = request.options;
 
     each(
-      ['amount', 'notes', 'currency'],
+      ['amount', 'currency'],
       function(i, field){
         if(!(field in rdata) && field in options){
           rdata[field] = options[field];
         }
       }
     )
-
     if(!rdata.key_id){
       rdata.key_id = options.key;
     }

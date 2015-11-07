@@ -52,23 +52,24 @@ function _toBase64(number){
 var _uid;
 
 function track(event, props) {
-  setTimeout(function(){
-    if(typeof props !== 'object') {
-      props = {};
-    }
+  if(_uid){
+    setTimeout(function(){
+      if(typeof props !== 'object') {
+        props = {};
+      }
 
-    props.token = '907d0c5b156fca57e1b254ccc1b9e8c9';
-    if(_uid) {
+      props.token = '907d0c5b156fca57e1b254ccc1b9e8c9';
       props.distinct_id = _uid;
-    }
-    var data = {
-      event: event,
-      properties: props
-    }
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('post', 'https://api.mixpanel.com/track/', true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.send('data=' + _btoa(JSON.stringify(data)));
-  })
+      var data = {
+        event: event,
+        properties: props
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('post', 'https://api.mixpanel.com/track/', true);
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      xhr.send('data=' + _btoa(JSON.stringify(data)));
+    })
+  }
 }
