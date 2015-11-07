@@ -319,18 +319,6 @@ describe("Razorpay card tab submit", function(){
           value = undefined;
         });
 
-        it("should pass amount", function(){
-          launch();
-          field = 'amount';
-          value = customOptions.amount;
-        });
-
-        it("should pass currency", function(){
-          launch();
-          field = 'currency';
-          value = 'INR';
-        });
-
         it("should pass email", function(){
           launch();
           field = 'email';
@@ -341,12 +329,6 @@ describe("Razorpay card tab submit", function(){
           launch();
           field = 'contact';
           value = customOptions.prefill.contact;
-        });
-
-        it("should pass description", function(){
-          launch();
-          field = 'description';
-          value = customOptions.description;
         });
 
         it("should pass card[name]", function(){
@@ -461,18 +443,6 @@ describe("Razorpay card tab submit", function(){
         spyCalled();
 
         data = frameDiscreet.getFormData(jQuery('.modal form'), true);
-      });
-
-      it("should return description", function(){
-        expect(data.description).toBe(coOptions.description);
-      });
-
-      it("should return amount", function(){
-        expect(data.amount).toBe(coOptions.amount);
-      });
-
-      it("should return currency", function(){
-        expect(data.currency).toBe('INR');
       });
 
       it("should return contact", function(){
@@ -619,18 +589,6 @@ describe("Razorpay netbanking getFormData method", function(){
     });
 
     describe("", function(){
-      it("should return description", function(){
-        expect(data.description).toBe(coOptions.description);
-      });
-
-      it("should return amount", function(){
-        expect(data.amount).toBe(coOptions.amount);
-      });
-
-      it("should return currency", function(){
-        expect(data.currency).toBe('INR');
-      });
-
       it("should return contact", function(){
         expect(data.contact).toBe(coOptions.prefill.contact);
       });
@@ -764,6 +722,19 @@ describe('existing query params should', function(){
     frameDiscreet.setQueryParams('tab=netbanking');
     openCheckoutForm(coOptions);
     expectVisibleTab('netbanking')();
+  })
+})
+
+describe('ios CheckoutBridge', function(){
+  it('should be set up if relevant query params', function(){
+    qpmap.platform = 'ios';
+    delete window.CheckoutBridge;
+    _fr_iosBridge();
+
+    expect(window.CheckoutBridge).toBeDefined();
+    ['load','dismiss','submit','fault','success'].forEach(function(method){
+      expect(typeof CheckoutBridge['on' + method]).toBe('function');
+    })
   })
 })
 

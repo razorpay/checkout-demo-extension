@@ -255,7 +255,7 @@ Razorpay.payment = {
   },
 
   getMethods: function(callback){
-    return $.ajax({
+    return $.jsonp({
       url: discreet.makeUrl(Razorpay.defaults) + Razorpay.defaults.methodsUrl,
       data: {key_id: Razorpay.defaults.key},
       timeout: 30000,

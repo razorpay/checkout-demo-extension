@@ -117,7 +117,7 @@ describe("getMethods should", function(){
   it("set Razorpay.payment.methods and call back", function(){
     var methods = {};
     var spyCalled = jasmine.createSpy();
-    spyOn($, 'ajax').and.callFake(function(options){
+    spyOn($, 'jsonp').and.callFake(function(options){
       options.success(methods);
     });
     Razorpay.payment.getMethods(spyCalled);

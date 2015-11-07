@@ -687,36 +687,42 @@ if(location.search){
   frameDiscreet.setQueryParams(location.search);
 }
 
-if(qpmap.platform === 'ios'){
-  window.CheckoutBridge = {
-    map: {},
-    get: function(index){
-      var val = this.map[index];
-      delete this.map[index];
-      return val;
+function _fr_iOSMethod(method){
+  return function(data){
+    var iF = document.createElement('iframe');
+    var src = 'razorpay://on'+method;
+    if(data){
+      src += '?' + dataIndex;
+      CheckoutBridge.map[dataIndex] = data;
+      dataIndex++;
     }
-  };
-  var dataIndex = 0;
-  var iOSMethod = function(method){
-    return function(data){
-      var iF = document.createElement('iframe');
-      var src = 'razorpay://on'+method;
-      if(data){
-        src += '?' + dataIndex;
-        CheckoutBridge.map[dataIndex] = data;
-        dataIndex++;
-      }
-      iF.setAttribute('src', src);
-      document.documentElement.appendChild(iF);
-      iF.parentNode.removeChild(iF);
-      iF = null;
-    }
+    iF.setAttribute('src', src);
+    document.documentElement.appendChild(iF);
+    iF.parentNode.removeChild(iF);
+    iF = null;
   }
-
-  var bridgeMethods = ['load','dismiss','submit','fault','success'];
-
-  each(bridgeMethods, function(i, prop){
-    CheckoutBridge['on'+prop] = iOSMethod(prop)
-  })
 }
+
+function _fr_iosBridge(){
+  if(qpmap.platform === 'ios'){
+    window.CheckoutBridge = {
+      map: {},
+      get: function(index){
+        var val = this.map[index];
+        delete this.map[index];
+        return val;
+      }
+    };
+    var dataIndex = 0;
+
+    var bridgeMethods = ['load','dismiss','submit','fault','success'];
+
+    each(bridgeMethods, function(i, prop){
+      CheckoutBridge['on'+prop] = _fr_iOSMethod(prop)
+    })
+  }
+}
+
+_fr_iosBridge();
+
 Razorpay.sendMessage({event: 'load'});

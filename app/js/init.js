@@ -9,9 +9,11 @@ var Razorpay = window.Razorpay = function(options){
   if(typeof this.configure === 'function'){
     this.configure(options);
   }
-  this._id = _toBase64(
-    new Date().getTime() + ('000' + parseInt(4096*Math.random())).slice(-4)
-  );
+  if(typeof _toBase64 !== 'undefined'){
+    this._id = _toBase64(
+      new Date().getTime() + ('000' + parseInt(4096*Math.random())).slice(-4)
+    );
+  }
   return this;
 };
 

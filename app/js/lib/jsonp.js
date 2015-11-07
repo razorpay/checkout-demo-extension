@@ -29,7 +29,7 @@ var _$randomString = function(length) {
   return str
 };
 
-$.ajax = function(options){
+$.jsonp = function(options){
   if(!options.data) { options.data = {} }
 
   var callback = options.data.callback = 'jsonp_' + _$randomString(15);
