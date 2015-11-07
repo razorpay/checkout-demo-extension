@@ -586,13 +586,6 @@ var frameDiscreet = {
           context: message.context
         }
       });
-      var overrides = message.overrides || $.clone(message.options);
-      if(typeof overrides === 'object'){
-        overrides.amount /= 100;
-        delete overrides.key;
-        delete overrides.currency;
-        roll('init', overrides, 'info');
-      }
     }
   },
   setQueryParams: function(search){
@@ -722,7 +715,7 @@ if(qpmap.platform === 'ios'){
 
   var bridgeMethods = ['load','dismiss','submit','fault','success'];
 
-  each(bridgeMethods, function(prop){
+  each(bridgeMethods, function(i, prop){
     CheckoutBridge['on'+prop] = iOSMethod(prop)
   })
 }
