@@ -56,6 +56,7 @@ var Popup = function(src) {
 
   // finally, open and return the popup window
   this.window = window.open(src, '', optsStr); // might be null in IE9 if protected mode is turned on
+
   if(this.window){
     this.focus();
   }
@@ -108,7 +109,7 @@ Popup.prototype = {
 */
 
   _checkClose: function () {
-    if (this.window && this.window.closed) {
+    if ( this.window.closed !== false ) { // UC browser makes it undefined instead of true
       clearInterval(this.interval);
       this.close();
       if(typeof this.closeCB === 'function'){
