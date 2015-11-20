@@ -48,7 +48,7 @@ gulp.task('compileStyles', function(){
 
 gulp.task('buildDev', ['compileTemplates', 'compileStyles']);
 
-gulp.task('usemin', ['compileTemplates'], function(){
+gulp.task('usemin', function(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(gulp.dest(distDir));
@@ -116,6 +116,9 @@ gulp.task('test', ['buildDev'], function(done){
 
 function testFromStack(counter, allOptions, done){
   new karmaServer(allOptions[counter], function(exitCode) {
+    if(exitCode !== 0){
+      process.exit(1);
+    }
     if(allOptions[++counter]){
       testFromStack(counter, allOptions, done);
     } else if(allOptions.release){

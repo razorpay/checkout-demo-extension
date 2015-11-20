@@ -15,7 +15,7 @@ function expectVisibleTab(tab){
 
 function openCheckoutForm(options, data){
   jQuery('#container').remove();
-  _$el = _modal = _rzp = null;
+  _$el = _modal = null;
   handleMessage({
     options: options,
     data: data
@@ -27,11 +27,10 @@ var coOptions = {
   'amount': '5100',
   'name': 'Daft Punk',
   'description': 'Tron Legacy',
-  'image': 'https://i.imgur.com/3g7nmJC.png',
   'method': {
     'netbanking': true,
     'card': true,
-    'wallet': false
+    'wallet': true
   },
   'prefill': {
     'name': 'Shashank Mehta',
@@ -81,7 +80,6 @@ describe("init options.method: ", function(){
   })
 
   afterEach(function(){
-    opts.method = {};
     opts.method[disableTab] = false;
     openCheckoutForm(opts);
     expect(jQuery('.tab-content').length).toBe(2);
@@ -238,7 +236,6 @@ describe("Razorpay card tab", function(){
 });
 
 describe("Razorpay card tab submit", function(){
-  var co;
   var spyCalled;
   var spyNotCalled;
   var $ccNumber, $ccExpiry, $ccCVV;
@@ -257,14 +254,13 @@ describe("Razorpay card tab submit", function(){
       spyCalled    = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
 
-      customOptions = jQuery.extend(true, {}, coOptions);
+      customOptions = JSON.parse(JSON.stringify(coOptions));
     });
 
     function launch(){
       // For opening the modal
       operation(customOptions);
       openCheckoutForm(customOptions);
-      co = _rzp;
 
       $ccNumber    = jQuery('.input[name="card[number]"]');
       $ccExpiry    = jQuery('.input[name="card[expiry]"]');
@@ -314,6 +310,7 @@ describe("Razorpay card tab submit", function(){
         });
 
         it("should not pass signature if not set", function(){
+          Razorpay.configure({signature: ''});
           launch();
           field = 'signature';
           value = undefined;

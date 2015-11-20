@@ -32,7 +32,7 @@ var _if_wallet_logos = {
   }
 }
 
-var _smarty, _modal, _$el, _rzp;
+var _smarty, _modal, _$el;
 
 var _fr_frontDrop = function(message, className) {
   $('fd-t')[0].innerHTML = message || '';
@@ -204,7 +204,7 @@ var frameDiscreet = {
       return _modal.show();
     }
     $('loading').remove();
-    var opts = $.clone(_rzp.options);
+    var opts = $.clone(Razorpay.defaults);
 
     if(opts.amount >= 100*10000){
       opts.method.wallet = false;
@@ -387,7 +387,7 @@ var frameDiscreet = {
       return;
     }
     var data = frameDiscreet.getFormData();
-    var options = _rzp.options;
+    var options = Razorpay.defaults;
     // Signature is set in case of hosted checkout
     if (options.signature !== ''){
       data.signature = options.signature;
@@ -639,9 +639,9 @@ window.handleMessage = function(message){
   if( typeof message !== 'object' ) {
     return;
   }
-  if( message.options && !_rzp ) { // open modal
+  if( message.options ) { // open modal
     try{
-      _rzp = new Razorpay(message.options);
+      Razorpay.configure(message.options);
       frameDiscreet.configureRollbar(message);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
@@ -651,32 +651,31 @@ window.handleMessage = function(message){
     frameDiscreet.showModal();
   } else if(message.event === 'close'){
     frameDiscreet.hide();
-  } else if(message.event === 'open' && _rzp){
+  } else if(message.event === 'open'){
     frameDiscreet.showModal();
   }
-  if(_rzp){
-    var params = message.params;
-    if(params){
-      setTimeout(function(){
-        try{
-          frameDiscreet.errorHandler(JSON.parse(params));
-        } catch(e){
-          roll('message.params', params);
-        }
-      })
+
+  var params = message.params;
+  if(params){
+    setTimeout(function(){
+      try{
+        frameDiscreet.errorHandler(JSON.parse(params));
+      } catch(e){
+        roll('message.params', params);
+      }
+    })
+  }
+  var data = message.data;
+  if(data){
+    if( typeof data === 'string' ){
+      try{
+        data = JSON.parse(data);
+      } catch(e){
+        roll('message.data', data);
+      }
     }
-    var data = message.data;
-    if(data){
-      if( typeof data === 'string' ){
-        try{
-          data = JSON.parse(data);
-        } catch(e){
-          roll('message.data', data);
-        }
-      }
-      if( typeof data === 'object' ) {
-        frameDiscreet.dataHandler(data);
-      }
+    if( typeof data === 'object' ) {
+      frameDiscreet.dataHandler(data);
     }
   }
 }

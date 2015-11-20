@@ -1,6 +1,10 @@
 var popupRequest = null;
 var templates = {};
 
+if(location.href.indexOf(discreet.makeUrl(Razorpay.defaults)) !== 0){
+
+}
+
 var _deleteCookie = function(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 };
@@ -11,7 +15,6 @@ var _setCookie = function(name, value){
 
 var _getCookie = function(name){
   var nameEQ = name + "=";
-  var ca = document.cookie.split(';');
   for( var i=0; i < ca.length; i++) {
     var c = ca[i];
     while (c.charAt(0) === ' ') {
@@ -35,7 +38,7 @@ var _rs_formSubmit = function(action, method, data, target){
     form.setAttribute('method', method);
   }
 
-  if(target){
+  if(target) {
     form.setAttribute('target', target);
   }
 
