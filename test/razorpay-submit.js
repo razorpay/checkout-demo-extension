@@ -142,11 +142,12 @@ describe("handleResponse should invoke", function(){
     expect(spyNotCalled).not.toHaveBeenCalled();
   })
 
-  it("error if response has error", function(){
+  it("error if response has error", function(done){
     spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
     spyOn(popupRequest, 'error').and.callFake(function(data){
       expect(error_data).toBe(data);
       spyCalled();
+      done();
     })
     var error_data = {
       error: {
@@ -156,22 +157,24 @@ describe("handleResponse should invoke", function(){
     _rs_handleResponse(popupRequest, error_data);
   })
 
-  it("error if response is invalid", function(){
+  it("error if response is invalid", function(done){
     spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
     spyOn(popupRequest, 'error').and.callFake(function(data){
       expect(error_data).not.toBe(data);
       expect(typeof data.error.description).toBe('string');
       spyCalled();
+      done();
     })
     var error_data = {};
     _rs_handleResponse(popupRequest, error_data);
   })
 
-  it("success if response contains payment id", function(){
+  it("success if response contains payment id", function(done){
     spyOn(popupRequest, 'error').and.callFake(spyNotCalled);
     spyOn(popupRequest, 'success').and.callFake(function(data){
       expect(success_data).not.toBe(data);
       spyCalled();
+      done();
     })
     var success_data = {
       razorpay_payment_id: '12344'

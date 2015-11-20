@@ -337,7 +337,7 @@ Razorpay.prototype.open = function() {
   }
 
   if(!_ch_bodyEl){
-    setTimeout(this.open());
+    setTimeout(this.open(), 100);
   }
 
   if(_ch_isOpen){

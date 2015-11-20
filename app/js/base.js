@@ -79,10 +79,13 @@ Razorpay.prototype.configure = function(overrides){
 
 Razorpay.configure = function(overrides) {
   Razorpay.defaults = _base_configure(overrides);
+  if ( typeof discreet.setCommunicator === 'function' ) {
+    discreet.setCommunicator();
+  }
 }
 
-discreet.makeUrl = function(options){
-  return options.protocol + '://' + options.hostname + '/' + options.version;
+discreet.makeUrl = function(options, noVersion){
+  return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);
 }
 
 discreet.nextRequestRedirect = function(data){

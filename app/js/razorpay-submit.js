@@ -1,9 +1,21 @@
 var popupRequest = null;
 var templates = {};
+var _ch_communicator_frame;
 
-if(location.href.indexOf(discreet.makeUrl(Razorpay.defaults)) !== 0){
-
+discreet.setCommunicator = function(){
+  if(location.href.indexOf(discreet.makeUrl(Razorpay.defaults)) !== 0){
+    if(!_ch_communicator_frame){
+      _ch_communicator_frame = document.createElement('iframe');
+      _ch_communicator_frame.style.display = 'none';
+    }
+    _ch_communicator_frame.src = discreet.makeUrl(Razorpay.defaults, true) + 'communicator.php';
+    document.documentElement.appendChild(_ch_communicator_frame);
+  } else if (_ch_communicator_frame){
+    _ch_communicator_frame.parentNode.removeChild(_ch_communicator_frame);
+    _ch_communicator_frame = null;
+  }
 }
+discreet.setCommunicator();
 
 var _deleteCookie = function(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
@@ -52,7 +64,7 @@ var _rs_formSubmit = function(action, method, data, target){
 var _rs_setupCC = function(request, templateVars){
   _setCookie('submitPayload', JSON.stringify(templateVars));
   _rs_formSubmit(
-    request.options.protocol + '://' + request.options.hostname + '/processing.php',
+    discreet.makeUrl(request.options, true) + 'processing.php',
     null,
     null,
     '_blank'
@@ -76,7 +88,7 @@ var _rs_handleResponse = function(popupRequest, data){
 
     if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
       var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
-      return popupRequest.success.call(null, returnObj); // dont expose request as this
+      return setTimeout(function(){popupRequest.success.call(null, returnObj)}); // dont expose request as this
     }
 
     else if(typeof popupRequest.error !== 'function'){
@@ -88,7 +100,7 @@ var _rs_handleResponse = function(popupRequest, data){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
     roll('unexpected api response', e.message);
   }
-  popupRequest.error.call(null, data);
+  setTimeout(function(){popupRequest.error.call(null, data)});
 }
 
 var _rs_onComplete = function(data){
