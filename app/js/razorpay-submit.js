@@ -3,6 +3,9 @@ var templates = {};
 var _ch_communicator_frame;
 
 discreet.setCommunicator = function(){
+  if(ua.indexOf('MSIE') === -1){
+    return;
+  }
   if(location.href.indexOf(discreet.makeUrl(Razorpay.defaults)) !== 0){
     if(!_ch_communicator_frame){
       _ch_communicator_frame = document.createElement('iframe');
@@ -61,22 +64,24 @@ var _rs_formSubmit = function(action, method, data, target){
   form.submit();
 }
 
-var _rs_setupCC = function(request, templateVars){
+var _rs_setupCC = function(request, templateVars, target){
   _setCookie('submitPayload', JSON.stringify(templateVars));
   _rs_formSubmit(
     discreet.makeUrl(request.options, true) + 'processing.php',
     null,
     null,
-    '_blank'
+    (target || '_blank')
   );
   _deleteCookie('onComplete');
-  _rs_ccInterval = setInterval(function(){
-    var c = _getCookie('onComplete');
-    if(c){
-      _deleteCookie('onComplete');
-      _rs_onComplete(c);
-    }
-  }, 500)
+  if(!target){
+    _rs_ccInterval = setInterval(function(){
+      var c = _getCookie('onComplete');
+      if(c){
+        _deleteCookie('onComplete');
+        _rs_onComplete(c);
+      }
+    }, 500)
+  }
 }
 
 var _rs_handleResponse = function(popupRequest, data){
@@ -146,27 +151,42 @@ var _rs_setupPopup = function(request, url){
     url: url
   }
 
+
+  // new tab for IE Mobile
   if(_rs_isIEMobile){
     _rs_setupCC(request, templateVars);
   } else {
     var popup;
+    var name = 'popup_' + _uid;
+    var routed;
     try{
-      popup = request.popup = new Popup('');
+      popup = request.popup = new Popup('', name);
       popup.window.document; // let this throw error
     } catch(e){
-      roll('Going newtab because ' + e.message, null, 'warn');
-      return _rs_setupCC(request, templateVars);
+
+      // if popup could not be opened
+      if(!popup.window){
+        roll('Going newtab because ' + e.message, null, 'warn');
+        return _rs_setupCC(request, templateVars);
+      }
+
+      // if popup is opened, but could not access document
+      routed = true;
+      roll('Going routed popup because' + e.message, null, 'warn');
+      _rs_setupCC(request, templateVars, name);
     }
     try{
-      templateVars.formHTML = deserialize(data);
-      templateVars.image = options.image;
-      popup.window.document.write(templates.popup(templateVars));
-      popup.window.document.close();
+      if(!routed){
+        templateVars.formHTML = deserialize(data);
+        templateVars.image = options.image;
+        popup.window.document.write(templates.popup(templateVars));
+        popup.window.document.close();
+      }
 
       popup.onClose(function(){
         _rs_onComplete({error:{description:'Payment cancelled'}});
       })
-      roll('popup', null, 'info');
+      track('popup');
     } catch(e){
       roll('Error accessing popup: ' + e.message);
     }
