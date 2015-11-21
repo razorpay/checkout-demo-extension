@@ -142,9 +142,7 @@ var _rs_setupPopup = function(request, url){
   if(request.postmessage === false){
     window.onComplete = _rs_onComplete;
   }
-  else {
-    $.addMessageListener(_rs_onmessage, request);
-  }
+  $.addMessageListener(_rs_onmessage, request);
 
   var templateVars = {
     data: data,

@@ -210,6 +210,7 @@ var _ch_onFrameMessage = function(e, data){
     if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit === 'function'){
       window.CheckoutBridge.onsubmit(JSON.stringify(data));
     }
+    return; // Do not want to track
   }
   
   else if (event === 'dismiss'){
@@ -239,12 +240,12 @@ var _ch_onFrameMessage = function(e, data){
         handler.call(null, data);
       })
     }
-    track('done', data);
   } else if (event === 'fault'){
     alert("Oops! Something went wrong.");
     _ch_onClose.call(this);
     this.close();
   }
+  track(event, data);
 };
 
 /**
