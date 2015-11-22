@@ -32,14 +32,16 @@ var _if_wallet_logos = {
   }
 }
 
-var frameDiscreet = {
-  smarty: null,
-  modal: null,
-  $el: null,
-  rzp: null,
+var _smarty, _modal, _$el;
 
+var _fr_frontDrop = function(message, className) {
+  $('fd-t')[0].innerHTML = message || '';
+  $('fd')[0].className = 'mfix ' + (className || '');
+}
+
+var frameDiscreet = {
   shake: function(){
-    if(_if_should_shake && frameDiscreet.modal){
+    if(_if_should_shake && _modal){
       $('modal-inner').removeClass('shake').reflow().addClass('shake');
     }
   },
@@ -198,11 +200,11 @@ var frameDiscreet = {
   showModal: function() {
     frameDiscreet.renew();
     
-    if(frameDiscreet.modal){
-      return frameDiscreet.modal.show();
+    if(_modal){
+      return _modal.show();
     }
     $('loading').remove();
-    var opts = $.clone(frameDiscreet.rzp.options);
+    var opts = $.clone(Razorpay.defaults);
 
     if(opts.amount >= 100*10000){
       opts.method.wallet = false;
@@ -236,10 +238,10 @@ var frameDiscreet = {
       $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
-    frameDiscreet.$el = $('container');
-    frameDiscreet.smarty = new Smarty(frameDiscreet.$el);
+    _$el = $('container');
+    _smarty = new Smarty(_$el);
     frameDiscreet.applyFont($('powered-link')[0]);
-    frameDiscreet.modal = frameDiscreet.createModal(frameDiscreet.$el.children('modal')[0], opts.modal);
+    _modal = frameDiscreet.createModal(_$el.children('modal')[0], opts.modal);
 
     if($('nb-na')[0]) {
       $('nb-elem').css('display', 'none');
@@ -249,7 +251,7 @@ var frameDiscreet = {
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
     $('modal-close').on('click', function(){
       Razorpay.payment.cancel();
-      frameDiscreet.modal.hide();
+      _modal.hide();
     });
     $('tabs').on('click', frameDiscreet.tab_change);
     $('form').on('submit', function(e){
@@ -260,7 +262,7 @@ var frameDiscreet = {
     $('bank-select').on('change', frameDiscreet.bank_change);
     $('netb-banks').on('change', frameDiscreet.bank_radio, true);
     $('netb-banks').on('click', frameDiscreet.bank_radio);
-    $('fd-hide').on('click', frameDiscreet.frontDrop);
+    $('fd-hide').on('click', _fr_frontDrop);
     // if(navigator.userAgent.indexOf("MSIE ") > 0)
     //   $('netb-banks').on('click', discreet.bank_radio, true);
 
@@ -294,7 +296,7 @@ var frameDiscreet = {
     target = target.getElementsByTagName('input')[0];
     var select = $('bank-select')[0];
     select.value = target.value;
-    frameDiscreet.smarty.input({target: select});
+    _smarty.input({target: select});
   },
 
   bank_change: function() {
@@ -347,7 +349,7 @@ var frameDiscreet = {
       retryCount = 0;
     }
     if(anchor.offsetWidth/anchor.offsetHeight > 5) {
-      frameDiscreet.$el.addClass('font-loaded');
+      _$el.addClass('font-loaded');
     }
     else if(retryCount < 25) {
       setTimeout(function(){
@@ -361,7 +363,7 @@ var frameDiscreet = {
     var invalids = $(parent).find('invalid', 'p');
     if(invalids[0]){
       frameDiscreet.shake();
-      $(invalids[0]).find('input')[0].focus();
+      $($(invalids[0]).find('input')[0]).focus();
 
       each( invalids, function(i, field){
         $(field).addClass('mature');
@@ -371,7 +373,7 @@ var frameDiscreet = {
   },
 
   formSubmit: function() {
-    frameDiscreet.smarty.refresh();
+    _smarty.refresh();
 
     if (frameDiscreet.isInvalid('form-common')) {
       return;
@@ -385,10 +387,10 @@ var frameDiscreet = {
       return;
     }
     var data = frameDiscreet.getFormData();
-
+    var options = Razorpay.defaults;
     // Signature is set in case of hosted checkout
-    if (frameDiscreet.rzp.options.signature !== ''){
-      data.signature = frameDiscreet.rzp.options.signature;
+    if (options.signature !== ''){
+      data.signature = options.signature;
     }
 
     Razorpay.sendMessage({
@@ -396,31 +398,34 @@ var frameDiscreet = {
       data: data
     });
 
-    if(frameDiscreet.modal){
-      frameDiscreet.modal.options.backdropClose = false;
+    if(_modal){
+      _modal.options.backdropClose = false;
     }
 
-    frameDiscreet.frontDrop('Please wait while your payment is processed...', 'shown loading');
+    _fr_frontDrop('Please wait while your payment is processed...', 'shown loading');
 
     Razorpay.payment.authorize({
       postmessage: false,
-      options: frameDiscreet.rzp.options,
+      options: options,
       data: data,
       error: frameDiscreet.errorHandler,
       success: frameDiscreet.successHandler
     });
-  },
-
-  frontDrop: function(message, className) {
-    $('fd-t')[0].innerHTML = message || '';
-    $('fd')[0].className = 'mfix ' + (className || '');
+    if(!options.redirect){
+      var trackingPayload = {
+        email: data.email,
+        contact: data.contact,
+        method: data.method
+      }
+      track('submit', trackingPayload);
+    }
   },
 
   getFormFields: function(container, returnObj) {
     each(
       $(container)[0].getElementsByTagName('*'),
       function(i, el){
-        if(el.getAttribute('type') === 'radio' && el.checked) {
+        if(el.getAttribute('type') === 'radio' && !el.checked) {
           return;
         }
         if(el.name && !el.disabled && el.value.length) {
@@ -461,38 +466,39 @@ var frameDiscreet = {
 
   // close on backdrop click and remove errors
   renew: function(){
-    if(frameDiscreet.$el) {
-      frameDiscreet.frontDrop('', 'hidden');
+    if(_$el) {
+      _fr_frontDrop('', 'hidden');
     }
 
-    if(frameDiscreet.modal) {
-      frameDiscreet.modal.options.backdropClose = true;
+    if(_modal) {
+      _modal.options.backdropClose = true;
     }
   },
 
   hide: function(){
-    if(frameDiscreet.modal){
+    if(_modal){
       $('modal-inner').removeClass('shake');
-      frameDiscreet.modal.hide();
+      _modal.hide();
     }
-    frameDiscreet.modal = null;
+    _modal = null;
   },
 
   successHandler: function(response){
-    if(frameDiscreet.modal){
-      frameDiscreet.modal.options.onhide = null;
+    if(_modal){
+      _modal.options.onhide = null;
     }
     Razorpay.sendMessage({ event: 'success', data: response });
     frameDiscreet.hide();
   },
 
   errorHandler: function(response){
-    if(!frameDiscreet.modal){
+    if(!_modal){
       return;
     }
     var message;
     frameDiscreet.shake();
-    frameDiscreet.modal.options.backdropClose = true;
+    _modal.options.backdropClose = true;
+    track('error', response);
 
     if (response && response.error){
       message = response.error.description;
@@ -512,13 +518,13 @@ var frameDiscreet = {
           if(help){
             $(help).html(message);
           }
-          frameDiscreet.frontDrop();
+          _fr_frontDrop();
           return;
         }
       }
     }
 
-    frameDiscreet.frontDrop(
+    _fr_frontDrop(
       message || 'There was an error in handling your request',
       'shown'
     );
@@ -564,10 +570,11 @@ var frameDiscreet = {
     if(lastel){
       lastel.focus();
     }
-    frameDiscreet.smarty.refresh();
+    _smarty.refresh();
   },
 
   configureRollbar: function(message){
+    _uid = message.id;
     if(window.Rollbar){
       Rollbar.configure({
         payload: {
@@ -579,13 +586,6 @@ var frameDiscreet = {
           context: message.context
         }
       });
-      var overrides = message.overrides || $.clone(message.options);
-      if(typeof overrides === 'object'){
-        overrides.amount /= 100;
-        delete overrides.key;
-        delete overrides.currency;
-        roll('init', overrides, 'info');
-      }
     }
   },
   setQueryParams: function(search){
@@ -639,9 +639,9 @@ window.handleMessage = function(message){
   if( typeof message !== 'object' ) {
     return;
   }
-  if( message.options && !frameDiscreet.rzp ) { // open modal
+  if( message.options ) { // open modal
     try{
-      frameDiscreet.rzp = new Razorpay(message.options);
+      Razorpay.configure(message.options);
       frameDiscreet.configureRollbar(message);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
@@ -651,32 +651,31 @@ window.handleMessage = function(message){
     frameDiscreet.showModal();
   } else if(message.event === 'close'){
     frameDiscreet.hide();
-  } else if(message.event === 'open' && frameDiscreet.rzp){
+  } else if(message.event === 'open'){
     frameDiscreet.showModal();
   }
-  if(frameDiscreet.rzp){
-    var params = message.params;
-    if(params){
-      setTimeout(function(){
-        try{
-          frameDiscreet.errorHandler(JSON.parse(params));
-        } catch(e){
-          roll('message.params', params);
-        }
-      })
+
+  var params = message.params;
+  if(params){
+    setTimeout(function(){
+      try{
+        frameDiscreet.errorHandler(JSON.parse(params));
+      } catch(e){
+        roll('message.params', params);
+      }
+    })
+  }
+  var data = message.data;
+  if(data){
+    if( typeof data === 'string' ){
+      try{
+        data = JSON.parse(data);
+      } catch(e){
+        roll('message.data', data);
+      }
     }
-    var data = message.data;
-    if(data){
-      if( typeof data === 'string' ){
-        try{
-          data = JSON.parse(data);
-        } catch(e){
-          roll('message.data', data);
-        }
-      }
-      if( typeof data === 'object' ) {
-        frameDiscreet.dataHandler(data);
-      }
+    if( typeof data === 'object' ) {
+      frameDiscreet.dataHandler(data);
     }
   }
 }
@@ -687,36 +686,42 @@ if(location.search){
   frameDiscreet.setQueryParams(location.search);
 }
 
-if(qpmap.platform === 'ios'){
-  window.CheckoutBridge = {
-    map: {},
-    get: function(index){
-      var val = this.map[index];
-      delete this.map[index];
-      return val;
+function _fr_iOSMethod(method){
+  return function(data){
+    var iF = document.createElement('iframe');
+    var src = 'razorpay://on'+method;
+    if(data){
+      src += '?' + dataIndex;
+      CheckoutBridge.map[dataIndex] = data;
+      dataIndex++;
     }
-  };
-  var dataIndex = 0;
-  var iOSMethod = function(method){
-    return function(data){
-      var iF = document.createElement('iframe');
-      var src = 'razorpay://on'+method;
-      if(data){
-        src += '?' + dataIndex;
-        CheckoutBridge.map[dataIndex] = data;
-        dataIndex++;
-      }
-      iF.setAttribute('src', src);
-      document.documentElement.appendChild(iF);
-      iF.parentNode.removeChild(iF);
-      iF = null;
-    }
+    iF.setAttribute('src', src);
+    document.documentElement.appendChild(iF);
+    iF.parentNode.removeChild(iF);
+    iF = null;
   }
-
-  var bridgeMethods = ['load','dismiss','submit','fault','success'];
-
-  each(bridgeMethods, function(prop){
-    CheckoutBridge['on'+prop] = iOSMethod(prop)
-  })
 }
+
+function _fr_iosBridge(){
+  if(qpmap.platform === 'ios'){
+    window.CheckoutBridge = {
+      map: {},
+      get: function(index){
+        var val = this.map[index];
+        delete this.map[index];
+        return val;
+      }
+    };
+    var dataIndex = 0;
+
+    var bridgeMethods = ['load','dismiss','submit','fault','success'];
+
+    each(bridgeMethods, function(i, prop){
+      CheckoutBridge['on'+prop] = _fr_iOSMethod(prop)
+    })
+  }
+}
+
+_fr_iosBridge();
+
 Razorpay.sendMessage({event: 'load'});

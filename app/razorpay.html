@@ -7,8 +7,10 @@
   <meta http-equiv="cache-control" content="no-cache">
 
   <!-- build:js razorpay.js -->
-  <script src="js/lib/init.js"></script>
+  <script src="js/tracker.js"></script>
+  <script src="js/init.js"></script>
   <script src="js/lib/nominal-jquery.js"></script>
+  <script src="js/lib/jsonp.js"></script>
   <script src="js/lib/popup.js"></script>
   <script src="js/base.js"></script>
   <script src="js/razorpay-submit.js"></script><!--coverage-->
@@ -21,7 +23,7 @@
 
 </head>
 <body>
-  <div id="x" style='height: 1000px; background: yellow'></div>
+  <div id="x" style='height: 200px; background: yellow'></div>
   <div id="side">
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
@@ -38,6 +40,8 @@
       },
       // callback_url: 'http://localhost:9000',
       // hostname: 'api.razorpay.com',
+      // protocol: 'http',
+      hostname: 'api.razorpay.com',
       'method': {
         card: 1
       },
@@ -55,7 +59,7 @@
       }
     }
     document.getElementById('rzp-button1').onclick = function(){
-      Razorpay.configure({key: 'rzp_test_1DP5mmOlF5G5ag'});
+      Razorpay.configure(options);
       Razorpay.payment.authorize({
         data: {
           amount: 12000,

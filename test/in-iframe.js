@@ -15,7 +15,7 @@ function expectVisibleTab(tab){
 
 function openCheckoutForm(options, data){
   jQuery('#container').remove();
-  frameDiscreet.$el = frameDiscreet.modal = frameDiscreet.rzp = null;
+  _$el = _modal = null;
   handleMessage({
     options: options,
     data: data
@@ -27,11 +27,10 @@ var coOptions = {
   'amount': '5100',
   'name': 'Daft Punk',
   'description': 'Tron Legacy',
-  'image': 'https://i.imgur.com/3g7nmJC.png',
   'method': {
     'netbanking': true,
     'card': true,
-    'wallet': false
+    'wallet': true
   },
   'prefill': {
     'name': 'Shashank Mehta',
@@ -81,7 +80,6 @@ describe("init options.method: ", function(){
   })
 
   afterEach(function(){
-    opts.method = {};
     opts.method[disableTab] = false;
     openCheckoutForm(opts);
     expect(jQuery('.tab-content').length).toBe(2);
@@ -238,7 +236,6 @@ describe("Razorpay card tab", function(){
 });
 
 describe("Razorpay card tab submit", function(){
-  var co;
   var spyCalled;
   var spyNotCalled;
   var $ccNumber, $ccExpiry, $ccCVV;
@@ -257,14 +254,13 @@ describe("Razorpay card tab submit", function(){
       spyCalled    = jasmine.createSpy();
       spyNotCalled = jasmine.createSpy();
 
-      customOptions = jQuery.extend(true, {}, coOptions);
+      customOptions = JSON.parse(JSON.stringify(coOptions));
     });
 
     function launch(){
       // For opening the modal
       operation(customOptions);
       openCheckoutForm(customOptions);
-      co = frameDiscreet.rzp;
 
       $ccNumber    = jQuery('.input[name="card[number]"]');
       $ccExpiry    = jQuery('.input[name="card[expiry]"]');
@@ -314,21 +310,10 @@ describe("Razorpay card tab submit", function(){
         });
 
         it("should not pass signature if not set", function(){
+          Razorpay.configure({signature: ''});
           launch();
           field = 'signature';
           value = undefined;
-        });
-
-        it("should pass amount", function(){
-          launch();
-          field = 'amount';
-          value = customOptions.amount;
-        });
-
-        it("should pass currency", function(){
-          launch();
-          field = 'currency';
-          value = 'INR';
         });
 
         it("should pass email", function(){
@@ -341,12 +326,6 @@ describe("Razorpay card tab submit", function(){
           launch();
           field = 'contact';
           value = customOptions.prefill.contact;
-        });
-
-        it("should pass description", function(){
-          launch();
-          field = 'description';
-          value = customOptions.description;
         });
 
         it("should pass card[name]", function(){
@@ -461,18 +440,6 @@ describe("Razorpay card tab submit", function(){
         spyCalled();
 
         data = frameDiscreet.getFormData(jQuery('.modal form'), true);
-      });
-
-      it("should return description", function(){
-        expect(data.description).toBe(coOptions.description);
-      });
-
-      it("should return amount", function(){
-        expect(data.amount).toBe(coOptions.amount);
-      });
-
-      it("should return currency", function(){
-        expect(data.currency).toBe('INR');
       });
 
       it("should return contact", function(){
@@ -619,18 +586,6 @@ describe("Razorpay netbanking getFormData method", function(){
     });
 
     describe("", function(){
-      it("should return description", function(){
-        expect(data.description).toBe(coOptions.description);
-      });
-
-      it("should return amount", function(){
-        expect(data.amount).toBe(coOptions.amount);
-      });
-
-      it("should return currency", function(){
-        expect(data.currency).toBe('INR');
-      });
-
       it("should return contact", function(){
         expect(data.contact).toBe(coOptions.prefill.contact);
       });
@@ -767,13 +722,26 @@ describe('existing query params should', function(){
   })
 })
 
+describe('ios CheckoutBridge', function(){
+  it('should be set up if relevant query params', function(){
+    qpmap.platform = 'ios';
+    delete window.CheckoutBridge;
+    _fr_iosBridge();
+
+    expect(window.CheckoutBridge).toBeDefined();
+    ['load','dismiss','submit','fault','success'].forEach(function(method){
+      expect(typeof CheckoutBridge['on' + method]).toBe('function');
+    })
+  })
+})
+
 describe('close button should close modal', function(){
   it('', function(){
     var spy = jasmine.createSpy();
     var spy2 = jasmine.createSpy();
     openCheckoutForm(coOptions);
     spyOn(Razorpay.payment, 'cancel').and.callFake(spy);
-    spyOn(frameDiscreet.modal, 'hide').and.callFake(spy2);
+    spyOn(_modal, 'hide').and.callFake(spy2);
     sendclick(jQuery('#modal-close')[0]);
     expect(spy).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();

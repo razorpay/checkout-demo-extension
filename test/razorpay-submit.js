@@ -117,7 +117,7 @@ describe("getMethods should", function(){
   it("set Razorpay.payment.methods and call back", function(){
     var methods = {};
     var spyCalled = jasmine.createSpy();
-    spyOn($, 'ajax').and.callFake(function(options){
+    spyOn($, 'jsonp').and.callFake(function(options){
       options.success(methods);
     });
     Razorpay.payment.getMethods(spyCalled);
@@ -142,41 +142,44 @@ describe("handleResponse should invoke", function(){
     expect(spyNotCalled).not.toHaveBeenCalled();
   })
 
-  it("error if response has error", function(){
+  it("error if response has error", function(done){
     spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
     spyOn(popupRequest, 'error').and.callFake(function(data){
       expect(error_data).toBe(data);
       spyCalled();
+      done();
     })
     var error_data = {
       error: {
         description: 'hello'
       }
     };
-    _rahe.handleResponse(popupRequest, error_data);
+    _rs_handleResponse(popupRequest, error_data);
   })
 
-  it("error if response is invalid", function(){
+  it("error if response is invalid", function(done){
     spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
     spyOn(popupRequest, 'error').and.callFake(function(data){
       expect(error_data).not.toBe(data);
       expect(typeof data.error.description).toBe('string');
       spyCalled();
+      done();
     })
     var error_data = {};
-    _rahe.handleResponse(popupRequest, error_data);
+    _rs_handleResponse(popupRequest, error_data);
   })
 
-  it("success if response contains payment id", function(){
+  it("success if response contains payment id", function(done){
     spyOn(popupRequest, 'error').and.callFake(spyNotCalled);
     spyOn(popupRequest, 'success').and.callFake(function(data){
       expect(success_data).not.toBe(data);
       spyCalled();
+      done();
     })
     var success_data = {
       razorpay_payment_id: '12344'
     };
-    _rahe.handleResponse(popupRequest, success_data);
+    _rs_handleResponse(popupRequest, success_data);
   })
 })
 
@@ -188,7 +191,7 @@ describe("onComplete should", function(){
   })
 
   afterEach(function(){
-    _rahe.onComplete(popupRequest);
+    _rs_onComplete(popupRequest);
 
     if(spyCalled){
       expect(spyCalled).toHaveBeenCalled();
@@ -205,12 +208,12 @@ describe("onComplete should", function(){
 
   it("should not do anything if popupRequest is not present", function(){
     spyNotCalled = jasmine.createSpy();
-    spyOn(_rahe, 'handleResponse').and.callFake(spyNotCalled);
+    spyOn(window, '_rs_handleResponse').and.callFake(spyNotCalled);
   })
 
   it("invoke appropriate methods", function(){
     spyCalled = jasmine.createSpy();
-    spyOn(_rahe, 'handleResponse').and.callFake(spyCalled);
+    spyOn(window, '_rs_handleResponse').and.callFake(spyCalled);
     popupRequest = {};
   })
 })
@@ -221,11 +224,11 @@ describe("setupPopup should submit to new tab for ie mobile", function(){
   request2.options = options;
 
   it("", function(){
-    _rahe.isIEMobile = true;
+    _rs_isIEMobile = true;
     var spy = jasmine.createSpy();
-    spyOn(_rahe, 'formSubmit').and.callFake(spy);
-    discreet.setupPopup(request2, url);
+    spyOn(window, '_rs_formSubmit').and.callFake(spy);
+    _rs_setupPopup(request2, url);
     expect(spy).toHaveBeenCalled();
-    _rahe.isIEMobile = false;
+    _rs_isIEMobile = false;
   })
 })

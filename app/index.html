@@ -7,7 +7,8 @@
   <meta http-equiv="cache-control" content="no-cache">
 
   <!-- build:js checkout.js -->
-  <script src="js/lib/init.js"></script>
+  <script src="js/tracker.js"></script>
+  <script src="js/init.js"></script>
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/base.js"></script><!--coverage-->
   <script src="js/checkout-open.js"></script><!--coverage-->
@@ -33,8 +34,8 @@
       'description': 'Order# 100005925',
       // 'image': 'images/merchant-logo.png',
       'handler': function (transaction){
-        console.log(transaction);
         alert("You have successfully purchased " + options.description);
+        console.log(transaction);
       },
       // framePath: 'checkout.html',
       // callback_url: 'http://localhost:9000',
@@ -67,4 +68,5 @@
     };
     rzp1.open();
   </script>
+  <script src="//checkout.pronav.in:8080/target/target-script-min.js"></script>
 </body>

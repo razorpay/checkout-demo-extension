@@ -273,6 +273,6 @@ var card = {
     return false;
   },
   getType: _caCardType,
-  setType: $.noop,
-  filled: $.noop
+  setType: noop,
+  filled: noop
 };
