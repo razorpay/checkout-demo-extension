@@ -38,7 +38,21 @@ if(!_btoa){
   }
 }
 
-var _uid;
+function _toBase64(number){
+  var rixit;
+  var result = '';
+  while (number) {
+    rixit = number % 64
+    result = _base64_chars[rixit] + result;
+    number = Math.floor(number / 64);
+  }
+  return result;
+}
+
+var _uid = _toBase64(
+  new Date().getTime() + ('0000' + Math.floor(262144*Math.random())).slice(-5)
+);
+
 
 function track(event, props) {
   if(_uid){

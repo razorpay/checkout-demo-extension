@@ -102,6 +102,7 @@ function _rs_handleResponse(popupRequest, data){
 
     if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
       var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
+      track('success', returnObj);
       return setTimeout(function(){popupRequest.success.call(null, returnObj)}); // dont expose request as this
     }
 
@@ -114,6 +115,7 @@ function _rs_handleResponse(popupRequest, data){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
     roll('unexpected api response', e.message);
   }
+  track('fail', data);
   setTimeout(function(){popupRequest.error.call(null, data)});
 }
 
@@ -184,7 +186,6 @@ function _rs_setupPopup(request, url){
       popup.onClose(function(){
         _rs_onComplete({error:{description:'Payment cancelled'}});
       })
-      track('popup');
     } catch(e){
       roll('Error accessing popup: ' + e.message);
     }
@@ -247,7 +248,17 @@ Razorpay.payment = {
     if(options.redirect){
       _rs_formSubmit(url, 'post', rdata);
       return true;
-    } else {
+    }
+
+    else {
+      var trackingPayload = {
+        email: rdata.email,
+        contact: rdata.contact,
+        method: rdata.method
+      }
+
+      track('submit', trackingPayload);
+
       if(!rdata.callback_url && options.callback_url) {
         rdata.callback_url = options.callback_url;
       }

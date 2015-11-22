@@ -1,3 +1,5 @@
+// flag for checkout-frame.js
+discreet.isFrame = true;
 // initial error (helps in case of redirection flow)
 var qpmap = {};
 
@@ -411,14 +413,6 @@ var frameDiscreet = {
       error: frameDiscreet.errorHandler,
       success: frameDiscreet.successHandler
     });
-    if(!options.redirect){
-      var trackingPayload = {
-        email: data.email,
-        contact: data.contact,
-        method: data.method
-      }
-      track('submit', trackingPayload);
-    }
   },
 
   getFormFields: function(container, returnObj) {
@@ -498,7 +492,6 @@ var frameDiscreet = {
     var message;
     frameDiscreet.shake();
     _modal.options.backdropClose = true;
-    track('error', response);
 
     if (response && response.error){
       message = response.error.description;
@@ -574,20 +567,16 @@ var frameDiscreet = {
   },
 
   configureRollbar: function(message){
-    _uid = message.id;
     if(window.Rollbar){
       Rollbar.configure({
         payload: {
           person: {
-            cb: !!window.CheckoutBridge,
-            id: message.options.key,
-            _: message.id
+            id: _uid
           },
           context: message.context
         }
       });
     }
-    roll('init', null, 'info');
   },
   setQueryParams: function(search){
     each(
@@ -607,18 +596,9 @@ var frameDiscreet = {
     )
   },
   parseMessage: function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
-    if(!e || !e.data) {
-      return;
-    }
-    var data;
-    if(typeof e.data === 'string') {
-      try{
-        data = JSON.parse(e.data);
-      } catch(e){
-        return;
-      }
-    } else {
-      data = e.data;
+    var data = e.data;
+    if(typeof data === 'string') {
+      data = JSON.parse(data);
     }
     window.handleMessage(data);
   }
@@ -637,13 +617,11 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleMessage = function(message){
-  if( typeof message !== 'object' ) {
-    return;
-  }
   if( message.options ) { // open modal
     try{
       Razorpay.configure(message.options);
       frameDiscreet.configureRollbar(message);
+      _uid = message.id;
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
       roll('fault ' + e.message, message);

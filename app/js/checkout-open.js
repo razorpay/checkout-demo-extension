@@ -1,3 +1,6 @@
+// flag for checkout-js
+discreet.isCheckout = true;
+
 var currentScript = document.currentScript || (function() {
   var scripts = document.getElementsByTagName('script');
   return scripts[scripts.length - 1];
@@ -186,8 +189,7 @@ var ch_messageHandlers = {
 
     var response = {
       context: location.href,
-      options: options,
-      overrides: this._overrides
+      options: options
     }
     if(_uid){
       response.id = _uid;
@@ -255,7 +257,7 @@ function ch_onFrameMessage(e, data){
     handler.call(this, data);
   }
 
-  if(event !== 'submit'){
+  if(event === 'dismiss' || event === 'fault'){
     track(event, data);
   }
 };
@@ -392,25 +394,15 @@ Razorpay.prototype.open = function() {
     ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
   } catch(e){}
 
-  var trackerPayload;
-
   if(!this.checkoutFrame) {
     this.checkoutFrame = ch_createFrame(this.options);
     ch_frameContainer.appendChild(this.checkoutFrame);
-    trackerPayload = $.clone(this._overrides);
   }
   else {
     this.checkoutFrame.style.display = 'block';
     ch_setMetaViewport();
     ch_sendFrameMessage.call(this, {event: 'open'});
   }
-  if(trackerPayload){
-    if(!trackerPayload.key.indexOf('rzp_live_')){
-      _uid = this._id;
-    }
-    trackerPayload.ua = ua;
-  }
-  track('open', trackerPayload);
 };
 
 Razorpay.prototype.close = function(){

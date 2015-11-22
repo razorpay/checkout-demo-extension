@@ -2,17 +2,6 @@ var roll = function(){};
 var noop = roll;
 var ua = navigator.userAgent;
 
-function _toBase64(number){
-  var rixit;
-  var result = '';
-  while (number) {
-    rixit = number % 64
-    result = _base64_chars[rixit] + result;
-    number = Math.floor(number / 64);
-  }
-  return result;
-}
-
 var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
     return new Razorpay(options);
@@ -20,9 +9,6 @@ var Razorpay = window.Razorpay = function(options){
   if(typeof this.configure === 'function'){
     this.configure(options);
   }
-  this._id = _toBase64(
-    new Date().getTime() + ('000' + parseInt(4096*Math.random())).slice(-4)
-  );
   return this;
 };
 

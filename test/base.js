@@ -105,7 +105,7 @@ describe("init options validation", function(){
   describe("should throw error if", function(){
     afterEach(function(){
       try{
-        _base_validateOptions(init_options);
+        base_validateOptions(init_options);
       } catch(e){
         expect(e.message.indexOf(field) > 0);
       }
@@ -132,7 +132,7 @@ describe("init options validation", function(){
 
   describe("should not return error", function(){
     afterEach(function(){
-      expect(function(){_base_validateOptions(init_options, false)}).not.toThrow();
+      expect(function(){base_validateOptions(init_options, false)}).not.toThrow();
     });
 
     it("when handler is not defined", function(){

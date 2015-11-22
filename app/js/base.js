@@ -66,11 +66,25 @@ function base_configure(overrides){
 
   base_validateOptions( options );
 
+  if(typeof overrides.key === 'string' && overrides.key.indexOf('rzp_live_')){
+    _uid = null;
+  }
+
+  if(!discreet.isFrame){
+    var trackingPayload = $.clone(overrides);
+    trackingPayload.meta = {
+      ua: ua,
+      cb: !!window.CheckoutBridge,
+      context: location.href,
+      co: !!discreet.isCheckout
+    }
+    track('init', trackingPayload);
+  }
+
   return options;
 }
 
 Razorpay.prototype.configure = function(overrides){
-  this._overrides = overrides;
   this.options = base_configure(overrides);
   this.modal = {options: {}};
 };
