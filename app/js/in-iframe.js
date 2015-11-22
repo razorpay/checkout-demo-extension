@@ -686,14 +686,17 @@ if(location.search){
   frameDiscreet.setQueryParams(location.search);
 }
 
+// unique id for ios to retieve resources
+var _fr_iOSdataIndex = 0;
+
 function _fr_iOSMethod(method){
   return function(data){
     var iF = document.createElement('iframe');
     var src = 'razorpay://on'+method;
     if(data){
-      src += '?' + dataIndex;
-      CheckoutBridge.map[dataIndex] = data;
-      dataIndex++;
+      src += '?' + _fr_iOSdataIndex;
+      CheckoutBridge.map[_fr_iOSdataIndex] = data;
+      _fr_iOSdataIndex++;
     }
     iF.setAttribute('src', src);
     document.documentElement.appendChild(iF);
@@ -712,7 +715,6 @@ function _fr_iosBridge(){
         return val;
       }
     };
-    var dataIndex = 0;
 
     var bridgeMethods = ['load','dismiss','submit','fault','success'];
 
