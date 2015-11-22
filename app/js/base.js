@@ -1,6 +1,4 @@
-var discreet = {};
-
-var _base_set = function(baseval, override) {
+function base_set(baseval, override) {
   if ( typeof baseval === 'object' ) {
     if( !baseval ){
       return typeof override === 'boolean' ? override : baseval;
@@ -10,7 +8,7 @@ var _base_set = function(baseval, override) {
       override = {};
     }
     return map( baseval, function(val, i){
-      return _base_set( val, override[i] );
+      return base_set( val, override[i] );
     })
   }
 
@@ -25,7 +23,7 @@ var _base_set = function(baseval, override) {
   return baseval;
 }
 
-var _base_validateOptions = function(options) {
+function base_validateOptions(options) {
   var errorMessage;
 
   if (!options.key) {
@@ -48,12 +46,12 @@ var _base_validateOptions = function(options) {
   if( errorMessage ){ throw new Error('Invalid option: ' + errorMessage) }
 }
 
-var _base_configure = function(overrides){
+function base_configure(overrides){
   if( !overrides || typeof overrides !== 'object' ) {
     throw new Error('Invalid options');
   }
 
-  var options = _base_set( Razorpay.defaults, overrides );
+  var options = base_set( Razorpay.defaults, overrides );
 
   each(overrides.notes, function(key, val){
     if ( typeof val === 'string' ) {
@@ -66,52 +64,54 @@ var _base_configure = function(overrides){
     }
   } catch(e){}
 
-  _base_validateOptions( options );
+  base_validateOptions( options );
 
   return options;
 }
 
 Razorpay.prototype.configure = function(overrides){
   this._overrides = overrides;
-  this.options = _base_configure(overrides);
+  this.options = base_configure(overrides);
   this.modal = {options: {}};
 };
 
 Razorpay.configure = function(overrides) {
-  Razorpay.defaults = _base_configure(overrides);
+  Razorpay.defaults = base_configure(overrides);
   if ( typeof discreet.setCommunicator === 'function' ) {
     discreet.setCommunicator();
   }
 }
 
-discreet.makeUrl = function(options, noVersion){
-  return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);
+var discreet = {
+  makeUrl: function(options, noVersion){
+    return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);
+  },
+
+  nextRequestRedirect: function(data){
+    if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
+      return Razorpay.sendMessage({event: 'redirect', data: data});
+    }
+    if(data.method === 'get'){
+      location.href = data.url;
+    } else if (data.method === 'post' && typeof data.content === 'object'){
+      var postForm = document.createElement('form');
+      var html = '';
+
+      each( data.content, function(name, value) {
+        html += '<input type="hidden" name="' + name + '" value="' + value + '">'
+      })
+      postForm.method='post';
+      postForm.innerHTML = html;
+      postForm.action = data.url;
+      document.body.appendChild(postForm);
+      postForm.submit();
+    } else {
+      var errorData = {
+        error: {
+          description: 'Server Error'
+        }
+      };
+      discreet.error.call(this, errorData);
+    }
+  }
 }
-
-discreet.nextRequestRedirect = function(data){
-  if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
-    return Razorpay.sendMessage({event: 'redirect', data: data});
-  }
-  if(data.method === 'get'){
-    location.href = data.url;
-  } else if (data.method === 'post' && typeof data.content === 'object'){
-    var postForm = document.createElement('form');
-    var html = '';
-
-    each( data.content, function(name, value) {
-      html += '<input type="hidden" name="' + name + '" value="' + value + '">'
-    })
-    postForm.method='post';
-    postForm.innerHTML = html;
-    postForm.action = data.url;
-    document.body.appendChild(postForm);
-    postForm.submit();
-  } else {
-    var errorData = {
-      error: {
-        description: 'Server Error'
-      }
-    };
-    discreet.error.call(this, errorData);
-  }
-};

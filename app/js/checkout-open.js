@@ -3,45 +3,45 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-// place _ch_frameContainer absolute, and add window.onscroll
-var _chBackMinHeight = 0;
-var _chPageY = 0;
-var _chAbsoluteContainer = /iPhone|Android 2\./.test(ua);
+// place ch_frameContainer absolute, and add window.onscroll
+var ch_backMinHeight = 0;
+var ch_PageY = 0;
+var ch_AbsoluteContainer = /iPhone|Android 2\./.test(ua);
 
-var _ch_isOpen,
-_ch_bodyEl,
-_ch_frameContainer,
-_ch_backdrop,
-_ch_metaViewportTag,
-_ch_metaViewport,
-_ch_bodyOverflow;
+var ch_isOpen,
+ch_bodyEl,
+ch_frameContainer,
+ch_backdrop,
+ch_metaViewportTag,
+ch_metaViewport,
+ch_bodyOverflow;
 
-var _ch_fallbacks = function(){
+function ch_fallbacks(){
 
   if(/iPhone.+Version\/4\./.test(ua) && typeof document.height === 'number'){
-    _chBackMinHeight = document.height;
+    ch_backMinHeight = document.height;
   }
 
-  if(_chAbsoluteContainer && window.addEventListener){
+  if(ch_AbsoluteContainer && window.addEventListener){
     window.addEventListener('orientationchange', function(){
-      if(_ch_frameContainer){
-        _ch_frameContainer.style.height = Math.max(innerHeight, 455) + 'px';
+      if(ch_frameContainer){
+        ch_frameContainer.style.height = Math.max(innerHeight, 455) + 'px';
       }
     })
     window.addEventListener('scroll', function(){
-      var c = _ch_frameContainer;
-      if(!c || !_ch_isOpen || typeof window.pageYOffset !== 'number'){
+      var c = ch_frameContainer;
+      if(!c || !ch_isOpen || typeof window.pageYOffset !== 'number'){
         return;
       }
       var top;
       var offTop = c.offsetTop - pageYOffset;
       var offBot = c.offsetHeight + offTop;
-      if(_chPageY < pageYOffset){
+      if(ch_PageY < pageYOffset){
         if(offBot < 0.2*innerHeight && offTop < 0){
           top = pageYOffset + innerHeight - c.offsetHeight;
         }
       }
-      else if(_chPageY > pageYOffset){
+      else if(ch_PageY > pageYOffset){
         if(offTop > 0.1*innerHeight && offBot > innerHeight){
           top = pageYOffset;
         }
@@ -49,12 +49,12 @@ var _ch_fallbacks = function(){
       if(typeof top === 'number'){
         c.style.top = Math.max(0, top) + 'px';
       }
-      _chPageY = pageYOffset;
+      ch_PageY = pageYOffset;
     })
   }
 }
 
-var _ch_createFrame = function(options){
+var ch_createFrame = function(options){
   var frame = document.createElement('iframe');
   var src = options.framePath || discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
 
@@ -73,20 +73,20 @@ var _ch_createFrame = function(options){
   return frame;
 }
 
-var _ch_onClose = function(){
+var ch_onClose = function(){
   $.removeMessageListener();
-  _ch_isOpen = false;
-  _ch_bodyEl.style.overflow = _ch_bodyOverflow;
+  ch_isOpen = false;
+  ch_bodyEl.style.overflow = ch_bodyOverflow;
 
-  if(_ch_metaViewportTag && _ch_metaViewportTag.parentNode){
-    _ch_metaViewportTag.parentNode.removeChild(_ch_metaViewportTag);
+  if(ch_metaViewportTag && ch_metaViewportTag.parentNode){
+    ch_metaViewportTag.parentNode.removeChild(ch_metaViewportTag);
   }
 
-  var meta = _ch_metaViewport;
+  var meta = ch_metaViewport;
   if(meta){
     var head = document.getElementsByTagName('head')[0];
     if(head && !meta.parentNode && head.appendChild(meta)){
-      _ch_metaViewport = null;
+      ch_metaViewport = null;
     }
   }
 
@@ -103,8 +103,8 @@ var _ch_onClose = function(){
     }
   }
 
-  if(_ch_frameContainer){
-    _ch_frameContainer.style.display = 'none';
+  if(ch_frameContainer){
+    ch_frameContainer.style.display = 'none';
   }
 
   if(this instanceof Razorpay && typeof this.options.modal.onhidden === 'function'){
@@ -112,7 +112,7 @@ var _ch_onClose = function(){
   }
 }
 
-var _ch_sendFrameMessage = function(response){
+var ch_sendFrameMessage = function(response){
   if(typeof response !== 'string'){
     response = JSON.stringify(response)
   }
@@ -120,7 +120,7 @@ var _ch_sendFrameMessage = function(response){
 }
 
 // to handle absolute/relative url of options.image
-var _ch_setImageOption = function(options){
+var ch_setImageOption = function(options){
   if(options.image && typeof options.image === 'string'){
     if(/data:image\/[^;]+;base64/.test(options.image)){
       return;
@@ -139,7 +139,7 @@ var _ch_setImageOption = function(options){
   }
 }
 
-var _ch_setMetaViewport = function(){
+var ch_setMetaViewport = function(){
   if(typeof document.querySelector !== 'function'){
     return;
   }
@@ -151,33 +151,26 @@ var _ch_setMetaViewport = function(){
   var meta = head.querySelector('meta[name=viewport]');
 
   if(meta){
-    _ch_metaViewport = meta;
+    ch_metaViewport = meta;
     meta.parentNode.removeChild(meta);
   }
 
-  if(!_ch_metaViewportTag){
-    _ch_metaViewportTag = document.createElement('meta');
-    _ch_metaViewportTag.setAttribute('name', 'viewport');
-    _ch_metaViewportTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+  if(!ch_metaViewportTag){
+    ch_metaViewportTag = document.createElement('meta');
+    ch_metaViewportTag.setAttribute('name', 'viewport');
+    ch_metaViewportTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
   }
 
-  if(!_ch_metaViewportTag.parentNode){
-    head.appendChild(_ch_metaViewportTag);
+  if(!ch_metaViewportTag.parentNode){
+    head.appendChild(ch_metaViewportTag);
   }
 }
 
-var _ch_onFrameMessage = function(e, data){
-  // this === rzp
-  if((typeof e.origin !== 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source !== 'frame')){ // source check
-    return;
-  }
-  var event = data.event;
-  data = data.data;
+var ch_messageHandlers = {
 
-
-  if(event === 'load'){
+  load: function() {
     var options = {};
-    _ch_setMetaViewport();
+    ch_setMetaViewport();
 
     each(
       this.options, function(i, value){
@@ -189,7 +182,7 @@ var _ch_onFrameMessage = function(e, data){
     for(var i in this.modal.options){
       this.options.modal[i] = this.modal.options[i];
     }
-    _ch_setImageOption(options);
+    ch_setImageOption(options);
 
     var response = {
       context: location.href,
@@ -199,36 +192,36 @@ var _ch_onFrameMessage = function(e, data){
     if(_uid){
       response.id = _uid;
     }
-    return _ch_sendFrameMessage.call(this, response);
-  }
+    ch_sendFrameMessage.call(this, response);
+  },
 
-  else if(event === 'redirect'){
+  redirect: function(data){
     discreet.nextRequestRedirect(data);
-  }
+  },
 
-  else if (event === 'submit'){
-    if(window.CheckoutBridge && typeof window.CheckoutBridge.onsubmit === 'function'){
-      window.CheckoutBridge.onsubmit(JSON.stringify(data));
+  submit: function(data){
+    var cb = window.CheckoutBridge;
+    if(cb && typeof cb.onsubmit === 'function'){
+      cb.onsubmit(JSON.stringify(data));
     }
-    return; // Do not want to track
-  }
-  
-  else if (event === 'dismiss'){
-    if(_ch_backdrop){
-      _ch_backdrop.style.background = '';
+  },
+
+  dismiss: function(){
+    if(ch_backdrop){
+      ch_backdrop.style.background = '';
     }
     if(typeof this.options.modal.ondismiss === 'function'){
       this.options.modal.ondismiss()
     }
-  }
+  },
 
-  else if (event === 'hidden'){
-    _ch_onClose.call(this);
-  }
+  hidden: function(){
+    ch_onClose.call(this);
+  },
 
-  else if (event === 'success'){
-    if(_ch_backdrop){
-      _ch_backdrop.style.background = '';
+  success: function(data){
+    if(ch_backdrop){
+      ch_backdrop.style.background = '';
     }
 
     if(this.checkoutFrame){
@@ -240,12 +233,31 @@ var _ch_onFrameMessage = function(e, data){
         handler.call(null, data);
       })
     }
-  } else if (event === 'fault'){
+  },
+
+  fault: function(){
     alert("Oops! Something went wrong.");
-    _ch_onClose.call(this);
+    ch_onClose.call(this);
     this.close();
   }
-  track(event, data);
+}
+
+function ch_onFrameMessage(e, data){
+  // this === rzp
+  if((typeof e.origin !== 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source !== 'frame')){ // source check
+    return;
+  }
+  var event = data.event;
+  data = data.data;
+
+  var handler = ch_messageHandlers[event];
+  if(typeof handler === 'function'){
+    handler.call(this, data);
+  }
+
+  if(event !== 'submit'){
+    track(event, data);
+  }
 };
 
 /**
@@ -254,13 +266,13 @@ var _ch_onFrameMessage = function(e, data){
   @param  {[type]} data [description]
   @return {[type]}    [description]
 */
-var _ch_defaultPostHandler = function(data){
+var ch_defaultPostHandler = function(data){
   var RazorPayForm = currentScript.parentElement;
   RazorPayForm.innerHTML += deserialize(data);
   RazorPayForm.submit();
 }
 
-var _ch_parseScriptOptions = function(options){
+var ch_parseScriptOptions = function(options){
   var category, dotPosition, ix, property;
   each( options, function(i, opt){
     ix = i.indexOf(".");
@@ -281,11 +293,11 @@ var _ch_parseScriptOptions = function(options){
   })
 
   if(options.method){
-    _ch_parseScriptOptions(options.method);
+    ch_parseScriptOptions(options.method);
   }
 }
 
-var _ch_addButton = function(rzp){
+var ch_addButton = function(rzp){
   var button = document.createElement('input');
   var form = currentScript.parentNode;
   button.type = 'submit';
@@ -293,7 +305,7 @@ var _ch_addButton = function(rzp){
   button.className = 'razorpay-payment-button';
   form.appendChild(button);
   form.onsubmit = function(e){
-    if(_ch_isOpen){
+    if(ch_isOpen){
       return;
     }
     e.preventDefault();
@@ -306,7 +318,7 @@ var _ch_addButton = function(rzp){
 * This checks whether we are in automatic mode
 * If yes, it puts in the button
 */
-var _ch_automaticCheckoutInit = function(){
+var ch_automaticCheckoutInit = function(){
   var key = currentScript.getAttribute('data-key');
   if (key && key.length > 0){
     var opts = {};
@@ -320,10 +332,10 @@ var _ch_automaticCheckoutInit = function(){
         }
       }
     )
-    _ch_parseScriptOptions(opts);
-    opts.handler = _ch_defaultPostHandler;
+    ch_parseScriptOptions(opts);
+    opts.handler = ch_defaultPostHandler;
     var rzp = new Razorpay(opts);
-    _ch_addButton(rzp);
+    ch_addButton(rzp);
   }
 }
 
@@ -333,32 +345,32 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  if(!_ch_bodyEl){
-    _ch_bodyEl = document.getElementsByTagName('body')[0];
+  if(!ch_bodyEl){
+    ch_bodyEl = document.getElementsByTagName('body')[0];
   }
 
-  if(!_ch_bodyEl){
+  if(!ch_bodyEl){
     setTimeout(this.open(), 100);
   }
 
-  if(_ch_isOpen){
+  if(ch_isOpen){
     return;
   }
-  _ch_isOpen = true;
+  ch_isOpen = true;
 
-  _ch_bodyOverflow = _ch_bodyEl.style.overflow;
-  $.addMessageListener(_ch_onFrameMessage, this);
+  ch_bodyOverflow = ch_bodyEl.style.overflow;
+  $.addMessageListener(ch_onFrameMessage, this);
 
-  if(!_ch_frameContainer){
-    _ch_fallbacks();
-    _ch_frameContainer = document.createElement('div');
-    _ch_frameContainer.className = 'razorpay-frame-container';
-    var style = _ch_frameContainer.style;
+  if(!ch_frameContainer){
+    ch_fallbacks();
+    ch_frameContainer = document.createElement('div');
+    ch_frameContainer.className = 'razorpay-frame-container';
+    var style = ch_frameContainer.style;
     var rules = {
       zIndex: '99999',
-      position: (_chAbsoluteContainer ? 'absolute' : 'fixed'),
-      top: (_chAbsoluteContainer ? pageYOffset+'px' : '0'),
-      height: (_chAbsoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
+      position: (ch_AbsoluteContainer ? 'absolute' : 'fixed'),
+      top: (ch_AbsoluteContainer ? pageYOffset+'px' : '0'),
+      height: (ch_AbsoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
       left: '0',
       width: '100%',
       '-webkit-transition': '0.2s ease-out top'
@@ -366,41 +378,44 @@ Razorpay.prototype.open = function() {
     each(rules, function(i, rule) {
       style[i] = rule;
     })
-    _ch_backdrop = document.createElement('div');
-    _ch_backdrop.setAttribute('style', 'min-height: '+_chBackMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
-    _ch_frameContainer.appendChild(_ch_backdrop);
-    _ch_bodyEl.appendChild(_ch_frameContainer);
+    ch_backdrop = document.createElement('div');
+    ch_backdrop.setAttribute('style', 'min-height: '+ ch_backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
+    ch_frameContainer.appendChild(ch_backdrop);
+    ch_bodyEl.appendChild(ch_frameContainer);
   }
-  if(!_chAbsoluteContainer){
-    _ch_bodyEl.style.overflow = 'hidden';
+  if(!ch_AbsoluteContainer){
+    ch_bodyEl.style.overflow = 'hidden';
   }
-  _ch_frameContainer.style.display = 'block';
+  ch_frameContainer.style.display = 'block';
   try{
     // setting unsupported value throws error in IE
-    _ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
+    ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
   } catch(e){}
 
   var trackerPayload;
 
   if(!this.checkoutFrame) {
-    this.checkoutFrame = _ch_createFrame(this.options);
-    _ch_frameContainer.appendChild(this.checkoutFrame);
+    this.checkoutFrame = ch_createFrame(this.options);
+    ch_frameContainer.appendChild(this.checkoutFrame);
     trackerPayload = $.clone(this._overrides);
   }
   else {
     this.checkoutFrame.style.display = 'block';
-    _ch_setMetaViewport();
-    _ch_sendFrameMessage.call(this, {event: 'open'});
+    ch_setMetaViewport();
+    ch_sendFrameMessage.call(this, {event: 'open'});
   }
-  if(trackerPayload && !trackerPayload.key.indexOf('rzp_live_')){
-    _uid = this._id;
+  if(trackerPayload){
+    if(!trackerPayload.key.indexOf('rzp_live_')){
+      _uid = this._id;
+    }
+    trackerPayload.ua = ua;
   }
   track('open', trackerPayload);
 };
 
 Razorpay.prototype.close = function(){
-  if(_ch_isOpen){
-    _ch_sendFrameMessage.call(this, {event: 'close'});
+  if(ch_isOpen){
+    ch_sendFrameMessage.call(this, {event: 'close'});
   }
 };
 
@@ -425,4 +440,4 @@ discreet.validateCheckout = function(options){
 };
 
 // Get the ball rolling in case we are in manual mode
-_ch_automaticCheckoutInit();
+ch_automaticCheckoutInit();

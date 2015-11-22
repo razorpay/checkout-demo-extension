@@ -587,6 +587,7 @@ var frameDiscreet = {
         }
       });
     }
+    roll('init', null, 'info');
   },
   setQueryParams: function(search){
     each(
