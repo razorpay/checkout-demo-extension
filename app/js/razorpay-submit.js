@@ -20,15 +20,15 @@ discreet.setCommunicator = function(){
 }
 discreet.setCommunicator();
 
-var _deleteCookie = function(name){
+function _deleteCookie(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 };
 
-var _setCookie = function(name, value){
+function _setCookie(name, value){
   document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
 };
 
-var _getCookie = function(name){
+function _getCookie(name){
   var nameEQ = name + "=";
   for( var i=0; i < ca.length; i++) {
     var c = ca[i];
@@ -45,7 +45,7 @@ var _getCookie = function(name){
 var _rs_ccInterval = null;
 var _rs_isIEMobile = /Windows Phone/.test(ua);
 
-var _rs_formSubmit = function(action, method, data, target){
+function _rs_formSubmit(action, method, data, target){
   var form = document.createElement('form');
   form.setAttribute('action', action);
 
@@ -64,7 +64,16 @@ var _rs_formSubmit = function(action, method, data, target){
   form.submit();
 }
 
-var _rs_setupCC = function(request, templateVars, target){
+function _rs_onComplete(data){
+  if(!popupRequest) { return }
+
+  _rs_handleResponse(popupRequest, data);
+
+  Razorpay.payment.cancel();
+  return true; // if true, popup closes itself.
+}
+
+function _rs_setupCC(request, templateVars, target){
   _setCookie('submitPayload', JSON.stringify(templateVars));
   _rs_formSubmit(
     discreet.makeUrl(request.options, true) + 'processing.php',
@@ -84,7 +93,7 @@ var _rs_setupCC = function(request, templateVars, target){
   }
 }
 
-var _rs_handleResponse = function(popupRequest, data){
+function _rs_handleResponse(popupRequest, data){
   try{
 
     if(typeof data === 'string'){
@@ -108,23 +117,14 @@ var _rs_handleResponse = function(popupRequest, data){
   setTimeout(function(){popupRequest.error.call(null, data)});
 }
 
-var _rs_onComplete = function(data){
-  if(!popupRequest) { return }
-
-  _rs_handleResponse(popupRequest, data);
-
-  Razorpay.payment.cancel();
-  return true; // if true, popup closes itself.
-}
-
-var _rs_onmessage = function(e){
+function _rs_onmessage(e){
   if(discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0){
     return roll('message received from origin', e.origin);
   }
   _rs_onComplete(e.data);
 }
 
-var _rs_setupPopup = function(request, url){
+function _rs_setupPopup(request, url){
   if(popupRequest){
     return window.console && console.error('Razorpay: another payment popup is open');
   }

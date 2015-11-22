@@ -437,7 +437,7 @@ var frameDiscreet = {
 
   getFormData: function() {
     var activeTab = $('tabs').find('active')[0];
-    if(!activeTab) return;
+    if(!activeTab) { return }
     
     var data = {};
     frameDiscreet.getFormFields('form-common', data);

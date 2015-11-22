@@ -12,7 +12,7 @@ if(!_btoa){
     out = '';
     while(i < len) {
       c1 = str.charCodeAt(i++) & 0xff;
-      if(i == len)
+      if(i === len)
       {
         out += _base64_chars.charAt(c1 >> 2);
         out += _base64_chars.charAt((c1 & 0x3) << 4);
@@ -20,7 +20,7 @@ if(!_btoa){
         break;
       }
       c2 = str.charCodeAt(i++);
-      if(i == len)
+      if(i === len)
       {
         out += _base64_chars.charAt(c1 >> 2);
         out += _base64_chars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
@@ -36,17 +36,6 @@ if(!_btoa){
     }
     return out;
   }
-}
-
-function _toBase64(number){
-  var rixit;
-  var result = '';
-  while (number) {
-    rixit = number % 64
-    result = _base64_chars[rixit] + result;
-    number = Math.floor(number / 64);
-  }
-  return result;
 }
 
 var _uid;
