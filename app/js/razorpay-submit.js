@@ -122,14 +122,16 @@ function _rs_handleResponse( popupRequest, data ) {
 }
 
 function _rs_onmessage(e){
-  if (
-    (discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0) ||
-    (e.source && e.source !== popupRequest.popup.window)
-  ){
-    return roll('message received from origin', e.origin);
-  }
+  if(e.origin) {
+    if (
+      (e.source && e.source !== popupRequest.popup.window) ||
+      (discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0)
+    ){
+      return roll('message received from origin', e.origin);
+    }
 
-  _rs_onComplete(e.data);
+    _rs_onComplete(e.data);
+  }
 }
 
 function _rs_setupPopup(request, url){

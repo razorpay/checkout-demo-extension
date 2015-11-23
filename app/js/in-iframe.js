@@ -616,9 +616,9 @@ Razorpay.sendMessage = function(message){
   }
 }
 
-window.handleMessage = function(message){
-  if(message.event === 'open'){
-    if( message.options ) { // open modal
+window.handleMessage = function(message) {
+  if ( message.event === 'open' || message.options ) {
+    if ( message.options ) { // open modal
       try{
         Razorpay.configure(message.options);
         frameDiscreet.configureRollbar(message);
@@ -631,7 +631,7 @@ window.handleMessage = function(message){
     }
     frameDiscreet.showModal();
     track('open');
-  } else if(message.event === 'close'){
+  } else if ( message.event === 'close' ) {
     frameDiscreet.hide();
   }
 
