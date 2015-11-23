@@ -188,6 +188,7 @@ var ch_messageHandlers = {
     ch_setImageOption(options);
 
     var response = {
+      event: 'open',
       context: location.href,
       options: options
     }

@@ -1,5 +1,6 @@
 
-var _base64_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+var _base62_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+var _base64_chars = _base62_chars + '+=';
 
 var _btoa = window.btoa;
 if(!_btoa){
@@ -38,20 +39,18 @@ if(!_btoa){
   }
 }
 
-function _toBase64(number){
+function _toBase62(number){
   var rixit;
   var result = '';
   while (number) {
-    rixit = number % 64
-    result = _base64_chars[rixit] + result;
-    number = Math.floor(number / 64);
+    rixit = number % 62
+    result = _base62_chars[rixit] + result;
+    number = Math.floor(number / 62);
   }
   return result;
 }
 
-var _uid = _toBase64(
-  new Date().getTime() + ('0000' + Math.floor(262144*Math.random())).slice(-5)
-);
+var _uid = _toBase62(new Date().getTime()) + _toBase62(7388168 + Math.floor(238328*Math.random()));
 
 
 function track(event, props) {
@@ -63,6 +62,7 @@ function track(event, props) {
 
       props.token = '907d0c5b156fca57e1b254ccc1b9e8c9';
       props.distinct_id = _uid;
+      props.time = new Date().getTime()
 
       var data = {
         event: event,
@@ -72,7 +72,7 @@ function track(event, props) {
       var xhr = new XMLHttpRequest();
       xhr.open('post', 'https://api.mixpanel.com/track/', true);
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      xhr.send('data=' + _btoa(JSON.stringify(data)));
+      xhr.send('ip=1&data=' + _btoa(JSON.stringify(data)));
     })
   }
 }

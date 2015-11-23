@@ -17,6 +17,7 @@ function openCheckoutForm(options, data){
   jQuery('#container').remove();
   _$el = _modal = null;
   handleMessage({
+    event: 'open',
     options: options,
     data: data
   });

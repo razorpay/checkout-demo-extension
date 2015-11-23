@@ -617,21 +617,22 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleMessage = function(message){
-  if( message.options ) { // open modal
-    try{
-      Razorpay.configure(message.options);
-      frameDiscreet.configureRollbar(message);
-      _uid = message.id;
-    } catch(e){
-      Razorpay.sendMessage({event: 'fault', data: e.message});
-      roll('fault ' + e.message, message);
-      return;
+  if(message.event === 'open'){
+    if( message.options ) { // open modal
+      try{
+        Razorpay.configure(message.options);
+        frameDiscreet.configureRollbar(message);
+        _uid = message.id;
+      } catch(e){
+        Razorpay.sendMessage({event: 'fault', data: e.message});
+        roll('fault ' + e.message, message);
+        return;
+      }
     }
     frameDiscreet.showModal();
+    track('open');
   } else if(message.event === 'close'){
     frameDiscreet.hide();
-  } else if(message.event === 'open'){
-    frameDiscreet.showModal();
   }
 
   var params = message.params;

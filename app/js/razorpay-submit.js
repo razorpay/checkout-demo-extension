@@ -112,8 +112,8 @@ function _rs_handleResponse(popupRequest, data){
     data.error.description;
   }
   catch(e){
+    roll('unexpected api response', data);
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
-    roll('unexpected api response', e.message);
   }
   track('fail', data);
   setTimeout(function(){popupRequest.error.call(null, data)});
