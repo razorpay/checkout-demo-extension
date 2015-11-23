@@ -65,7 +65,17 @@ function _rs_formSubmit(action, method, data, target){
 }
 
 function _rs_onComplete(data){
-  if(!popupRequest) { return }
+  if(!popupRequest || !data) { return }
+
+  try {
+    if(typeof data !== 'object') {
+      data = JSON.parse(data);
+    }
+  }
+  catch(e) {
+    roll('unexpected api response', data);
+    return;
+  }
 
   _rs_handleResponse(popupRequest, data);
 
@@ -93,36 +103,32 @@ function _rs_setupCC(request, templateVars, target){
   }
 }
 
-function _rs_handleResponse(popupRequest, data){
-  try{
-
-    if(typeof data === 'string'){
-      data = JSON.parse(data);
-    }
-
-    if(typeof popupRequest.success === 'function' && typeof data.razorpay_payment_id === 'string' && data.razorpay_payment_id){
-      var returnObj = 'signature' in data ? data : {razorpay_payment_id: data.razorpay_payment_id};
-      track('success', returnObj);
-      return setTimeout(function(){popupRequest.success.call(null, returnObj)}); // dont expose request as this
-    }
-
-    else if(typeof popupRequest.error !== 'function'){
-      return;
-    }
-    data.error.description;
+function _rs_handleResponse( popupRequest, data ) {
+  if (
+    typeof popupRequest.success === 'function' &&
+    typeof data.razorpay_payment_id === 'string' &&
+    data.razorpay_payment_id
+  ) {
+    var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
+    track('success', returnObj);
+    return setTimeout(function(){popupRequest.success.call(null, returnObj)}); // dont expose request as this
   }
-  catch(e){
-    roll('unexpected api response', data);
+
+  if(!data.error || typeof data.error !== 'object' || !data.error.description)
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
-  }
+
   track('fail', data);
   setTimeout(function(){popupRequest.error.call(null, data)});
 }
 
 function _rs_onmessage(e){
-  if(discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0){
+  if (
+    (discreet.makeUrl(popupRequest.options).indexOf(e.origin) !== 0) ||
+    (e.source && e.source !== popupRequest.popup.window)
+  ){
     return roll('message received from origin', e.origin);
   }
+
   _rs_onComplete(e.data);
 }
 
