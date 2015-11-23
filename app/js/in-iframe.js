@@ -615,14 +615,15 @@ Razorpay.sendMessage = function(message){
     window.parent.postMessage(message, '*');
   }
 }
-
 window.handleMessage = function(message) {
   if ( message.event === 'open' || message.options ) {
     if ( message.options ) { // open modal
       try{
         Razorpay.configure(message.options);
         frameDiscreet.configureRollbar(message);
-        _uid = message.id;
+        if(message.id){
+          _uid = message.id;
+        }
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
         roll('fault ' + e.message, message);
@@ -630,7 +631,16 @@ window.handleMessage = function(message) {
       }
     }
     frameDiscreet.showModal();
-    track('open');
+    if(window.CheckoutBridge){
+      message.options.meta = {
+        ua: ua,
+        cb: true
+      }
+      track('init', message.options);
+    }
+    else {
+      track('open');
+    }
   } else if ( message.event === 'close' ) {
     frameDiscreet.hide();
   }
