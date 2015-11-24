@@ -1,4 +1,3 @@
-
 var _base62_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 var _base64_chars = _base62_chars + '+=';
 
@@ -50,8 +49,13 @@ function _toBase62(number){
   return result;
 }
 
-var _uid = _toBase62(new Date().getTime()) + _toBase62(7388168 + Math.floor(238328*Math.random()));
+var _uid = _toBase62(
+    (new Date().getTime() - 1388534400000).toString() +
+    ('000' + Math.floor(1000*Math.random())).slice(-3)
+  ) +
+  _toBase62(Math.floor(56800235584*Math.random()));
 
+_base62_chars = _base62_chars.slice(52) + _base62_chars.slice(0, 52)
 
 function track(event, props) {
   if(_uid){

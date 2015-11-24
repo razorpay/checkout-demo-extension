@@ -23,8 +23,9 @@ function assetPath(path){
 var distDir = 'app/dist/v1';
 
 gulp.task('watch', ['buildDev', 'usemin'], function() {
-  gulp.watch(assetPath('_css/*.less'), ['compileStyles']);
-  gulp.watch([assetPath('js/**'), assetPath('*.html'), assetPath('_templates/*.jst')], ['usemin']);
+  gulp.watch(assetPath('_css/*.less'), ['compileStyles'])
+  gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates'])
+  gulp.watch([assetPath('js/**'), assetPath('*.html')], ['usemin'])
 });
 
 // compiles .jst to .js, which is template contained in a function
