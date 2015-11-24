@@ -343,6 +343,9 @@ var ch_automaticCheckoutInit = function(){
 }
 
 Razorpay.prototype.open = function() {
+  if(/CriOS/.test(ua)) {
+    return alert('Chrome for iOS is not supported.\nPlease try payment in another browser.');
+  }
 
   if(!this.options){
     return;
