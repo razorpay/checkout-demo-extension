@@ -10,8 +10,11 @@ var currentScript = document.currentScript || (function() {
 var ch_backMinHeight = 0;
 var ch_PageY = 0;
 var ch_AbsoluteContainer = /iPhone|Android 2\./.test(ua);
+var isCriOS = /CriOS/.test(ua);
 
 var ch_isOpen,
+ch_CriOS_interval,
+ch_CriOS_listener,
 ch_bodyEl,
 ch_frameContainer,
 ch_backdrop,
@@ -57,9 +60,8 @@ function ch_fallbacks(){
   }
 }
 
-var ch_createFrame = function(options){
-  var frame = document.createElement('iframe');
-  var src = options.framePath || discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
+function ch_createFrame(src, tagName){
+  var frame = document.createElement(tagName);
 
   var attrs = {
     'class': 'razorpay-checkout-frame', // quotes needed for ie
@@ -76,7 +78,20 @@ var ch_createFrame = function(options){
   return frame;
 }
 
-var ch_onClose = function(){
+function ch_close(){
+  ch_messageHandlers.dismiss.call(this);
+  ch_messageHandlers.hidden.call(this);
+}
+
+function ch_onClose(){
+  if(ch_CriOS_interval){
+    clearInterval(ch_CriOS_interval);
+    ch_CriOS_interval = null;
+  }
+  if(ch_CriOS_listener){
+    $(window).off('unload', ch_CriOS_listener);
+    ch_CriOS_listener = null;
+  }
   $.removeMessageListener();
   ch_isOpen = false;
   ch_bodyEl.style.overflow = ch_bodyOverflow;
@@ -92,14 +107,16 @@ var ch_onClose = function(){
       ch_metaViewport = null;
     }
   }
+  var frame = this.checkoutFrame;
+  if(frame){
+    if(isCriOS && frame.contentWindow){
+      frame.contentWindow.close();
+    }
+    frame.style.display = 'none';
 
-  if(this.checkoutFrame){
-    this.checkoutFrame.style.display = 'none';
-
-    if(this.checkoutFrame.getAttribute('removable')){
-
-      if(this.checkoutFrame.parentNode){
-        this.checkoutFrame.parentNode.removeChild(this.checkoutFrame);
+    if(frame.getAttribute('removable')){
+      if(frame.parentNode) {
+        frame.parentNode.removeChild(frame);
       }
 
       this.checkoutFrame = null;
@@ -247,7 +264,12 @@ var ch_messageHandlers = {
 
 function ch_onFrameMessage(e, data){
   // this === rzp
-  if((typeof e.origin !== 'string') || !this.checkoutFrame || this.checkoutFrame.src.indexOf(e.origin) || (data.source !== 'frame')){ // source check
+  if(
+    (typeof e.origin !== 'string') ||
+    !this.checkoutFrame ||
+    (this.checkoutFrame.contentWindow === e.source || this.checkoutFrame.src.indexOf(e.origin)) ||
+    (data.source !== 'frame')
+  ){ // source check
     return;
   }
   var event = data.event;
@@ -321,7 +343,7 @@ var ch_addButton = function(rzp){
 * This checks whether we are in automatic mode
 * If yes, it puts in the button
 */
-var ch_automaticCheckoutInit = function(){
+function ch_automaticCheckoutInit(){
   var key = currentScript.getAttribute('data-key');
   if (key && key.length > 0){
     var opts = {};
@@ -342,28 +364,7 @@ var ch_automaticCheckoutInit = function(){
   }
 }
 
-Razorpay.prototype.open = function() {
-
-  if(!this.options){
-    return;
-  }
-
-  if(!ch_bodyEl){
-    ch_bodyEl = document.getElementsByTagName('body')[0];
-  }
-
-  if(!ch_bodyEl){
-    setTimeout(this.open(), 100);
-  }
-
-  if(ch_isOpen){
-    return;
-  }
-  ch_isOpen = true;
-
-  ch_bodyOverflow = ch_bodyEl.style.overflow;
-  $.addMessageListener(ch_onFrameMessage, this);
-
+function ch_createFrameContainer(){
   if(!ch_frameContainer){
     ch_fallbacks();
     ch_frameContainer = document.createElement('div');
@@ -394,12 +395,63 @@ Razorpay.prototype.open = function() {
     // setting unsupported value throws error in IE
     ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
   } catch(e){}
+}
 
-  if(!this.checkoutFrame) {
-    this.checkoutFrame = ch_createFrame(this.options);
+Razorpay.prototype.open = function() {
+  var options = this.options;
+  if(!options){
+    return;
+  }
+
+  if(!ch_bodyEl){
+    ch_bodyEl = document.getElementsByTagName('body')[0];
+  }
+
+  if(!ch_bodyEl){
+    setTimeout(this.open(), 100);
+  }
+
+  if(ch_isOpen){
+    return;
+  }
+  ch_isOpen = true;
+
+  ch_bodyOverflow = ch_bodyEl.style.overflow;
+  $.addMessageListener(ch_onFrameMessage, this);
+
+  ch_createFrameContainer();
+
+  var existing_frame = this.checkoutFrame;
+  var src = options.framePath || discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
+
+  if(!existing_frame) {
+    this.checkoutFrame = ch_createFrame(
+      src,
+      isCriOS ? 'div' : 'iframe'
+    );
     ch_frameContainer.appendChild(this.checkoutFrame);
   }
-  else {
+
+  if(isCriOS){
+    var self = this;
+    ch_CriOS_listener = $(window).on('unload', ch_close, false, this);
+    this.checkoutFrame.contentWindow = window.open(src, '');
+    ch_CriOS_interval = setInterval(function(){
+      if(self.checkoutFrame.contentWindow.closed){
+        ch_close.call(self);
+      }
+    }, 500)
+  }
+
+  if( !this.checkoutFrame.contentWindow ) {
+    ch_onClose();
+    alert(
+      (isCriOS ? 'Chrome for iOS' : 'This browser') +
+      ' is not supported.\nPlease try payment in another browser.'
+    );
+  }
+
+  if(existing_frame) {
     this.checkoutFrame.style.display = 'block';
     ch_setMetaViewport();
     ch_sendFrameMessage.call(this, {event: 'open'});
@@ -411,6 +463,7 @@ Razorpay.prototype.close = function(){
     ch_sendFrameMessage.call(this, {event: 'close'});
   }
 };
+
 
 discreet.validateCheckout = function(options){
 

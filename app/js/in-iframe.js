@@ -606,13 +606,17 @@ var frameDiscreet = {
 
 Razorpay.sendMessage = function(message){
   if ( typeof window.CheckoutBridge === 'object' ) {
-    frameDiscreet.notifyBridge(message);
-  } else if(window !== window.parent){
+    return frameDiscreet.notifyBridge(message);
+  }
+
+  var ownerWindow = window === window.parent ? window.opener : window.parent;
+
+  if(ownerWindow){
     message.source = 'frame';
     if ( typeof message !== 'string' ) {
       message = JSON.stringify(message);
     }
-    window.parent.postMessage(message, '*');
+    ownerWindow.postMessage(message, '*');
   }
 }
 window.handleMessage = function(message) {
