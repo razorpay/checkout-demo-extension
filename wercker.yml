@@ -1,12 +1,9 @@
-box: node
+box: pronav/checkout
 build:
     steps:
         - script:
             name: npm install
             code: npm install --no-optional
-        - script:
-            name: Install gulp globally
-            code: sudo npm install -g gulp
         - script:
             name: Test
             code: gulp test
@@ -18,13 +15,6 @@ build:
             channel: tech_bots
 deploy:
     steps:
-        - script:
-            name: Install gulp globally
-            code: rm -rf node_modules && npm install -g gulp
-        - npm-install
-        - script:
-            name: Install sudo,pip
-            code: apt-get update && apt-get -q -y install python-pip sudo
         - script:
             name: Insert git commit id into rollbar version
             code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/js/rollbar.js
