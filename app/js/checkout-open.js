@@ -290,14 +290,12 @@ function ch_onFrameMessage(e, data){
     !e.origin ||
     data.source !== 'frame' ||
     !this.checkoutFrame ||
-    this.checkoutFrame.getAttribute('src').indexOf(e.origin) ||
-    (!isCriOS && e.source && this.checkoutFrame.contentWindow !== e.source)
+    this.checkoutFrame.getAttribute('src').indexOf(e.origin)
   ){ // source check
     return;
   }
   var event = data.event;
   data = data.data;
-
   var handler = ch_messageHandlers[event];
   if(typeof handler === 'function'){
     handler.call(this, data);
