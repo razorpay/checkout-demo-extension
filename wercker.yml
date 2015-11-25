@@ -1,7 +1,9 @@
 box: node
 build:
     steps:
-        - npm-install
+        - script:
+            name: npm install
+            code: npm install --no-optional
         - script:
             name: Install gulp globally
             code: sudo npm install -g gulp

@@ -15,12 +15,26 @@ var isCriOS = /CriOS/.test(ua);
 var ch_isOpen,
 ch_CriOS_interval,
 ch_CriOS_listener,
+ch_CriOS_frame,
 ch_bodyEl,
 ch_frameContainer,
 ch_backdrop,
 ch_metaViewportTag,
 ch_metaViewport,
 ch_bodyOverflow;
+
+discreet.setCommunicator = function(opts){
+  if(!isCriOS){
+    return;
+  }
+  if(!ch_CriOS_frame){
+    ch_CriOS_frame = document.createElement('iframe');
+    ch_CriOS_frame.style.display = 'none';
+    document.documentElement.appendChild(ch_CriOS_frame);
+  }
+  ch_CriOS_frame.src = discreet.makeUrl(opts, true) + 'CriOS-frame.php';
+}
+discreet.setCommunicator(Razorpay.defaults);
 
 function ch_fallbacks(){
 
@@ -186,33 +200,36 @@ var ch_setMetaViewport = function(){
   }
 }
 
+function ch_createFrameOptions(){
+  var options = {};
+  ch_setMetaViewport();
+
+  each(
+    this.options, function(i, value){
+      if(typeof value !== 'function'){
+        options[i] = value;
+      }
+    }
+  )
+  for(var i in this.modal.options){
+    this.options.modal[i] = this.modal.options[i];
+  }
+  ch_setImageOption(options);
+
+  var response = {
+    context: location.href,
+    options: options
+  }
+  if(_uid){
+    response.id = _uid;
+  }
+  return response;
+}
+
 var ch_messageHandlers = {
 
   load: function() {
-    var options = {};
-    ch_setMetaViewport();
-
-    each(
-      this.options, function(i, value){
-        if(typeof value !== 'function'){
-          options[i] = value;
-        }
-      }
-    )
-    for(var i in this.modal.options){
-      this.options.modal[i] = this.modal.options[i];
-    }
-    ch_setImageOption(options);
-
-    var response = {
-      event: 'open',
-      context: location.href,
-      options: options
-    }
-    if(_uid){
-      response.id = _uid;
-    }
-    ch_sendFrameMessage.call(this, response);
+    ch_sendFrameMessage.call(this, ch_createFrameOptions.call(this));
   },
 
   redirect: function(data){
@@ -255,6 +272,11 @@ var ch_messageHandlers = {
     }
   },
 
+  failure: function(data){
+    ch_close.call(this);
+    alert('Payment Failed.\n' + data.error.description);
+  },
+
   fault: function(){
     alert("Oops! Something went wrong.");
     ch_onClose.call(this);
@@ -265,10 +287,11 @@ var ch_messageHandlers = {
 function ch_onFrameMessage(e, data){
   // this === rzp
   if(
-    (typeof e.origin !== 'string') ||
+    !e.origin ||
+    data.source !== 'frame' ||
     !this.checkoutFrame ||
-    (this.checkoutFrame.contentWindow === e.source || this.checkoutFrame.src.indexOf(e.origin)) ||
-    (data.source !== 'frame')
+    this.checkoutFrame.getAttribute('src').indexOf(e.origin) ||
+    (!isCriOS && e.source && this.checkoutFrame.contentWindow !== e.source)
   ){ // source check
     return;
   }
@@ -422,7 +445,7 @@ Razorpay.prototype.open = function() {
   ch_createFrameContainer();
 
   var existing_frame = this.checkoutFrame;
-  var src = options.framePath || discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
+  var src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
 
   if(!existing_frame) {
     this.checkoutFrame = ch_createFrame(
@@ -434,6 +457,9 @@ Razorpay.prototype.open = function() {
 
   if(isCriOS){
     var self = this;
+    var opts = ch_createFrameOptions.call(this);
+    opts.options.redirect = true;
+    src += '&message=' + _btoa(JSON.stringify(opts));
     ch_CriOS_listener = $(window).on('unload', ch_close, false, this);
     this.checkoutFrame.contentWindow = window.open(src, '');
     ch_CriOS_interval = setInterval(function(){

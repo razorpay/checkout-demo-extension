@@ -81,6 +81,7 @@ function base_configure(overrides){
     track('init', trackingPayload);
   }
 
+  discreet.setCommunicator(options);
   return options;
 }
 
@@ -91,12 +92,10 @@ Razorpay.prototype.configure = function(overrides){
 
 Razorpay.configure = function(overrides) {
   Razorpay.defaults = base_configure(overrides);
-  if ( typeof discreet.setCommunicator === 'function' ) {
-    discreet.setCommunicator();
-  }
 }
 
 var discreet = {
+  setCommunicator: noop,
   makeUrl: function(options, noVersion){
     return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);
   },
