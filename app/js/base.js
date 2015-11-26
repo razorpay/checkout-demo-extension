@@ -101,7 +101,7 @@ var discreet = {
   },
 
   nextRequestRedirect: function(data){
-    if(window !== window.parent && discreet.isCheckout){
+    if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
       return Razorpay.sendMessage({event: 'redirect', data: data});
     }
     if(data.method === 'get'){
@@ -118,13 +118,6 @@ var discreet = {
       postForm.action = data.url;
       document.body.appendChild(postForm);
       postForm.submit();
-    } else {
-      var errorData = {
-        error: {
-          description: 'Server Error'
-        }
-      };
-      discreet.error.call(this, errorData);
     }
   }
 }

@@ -78,14 +78,12 @@ function createPopup(data, url, options) {
   }
 
   var name = 'popup_' + _uid;
-
   try{
     var popup = new Popup('', name);
   }
   catch(e){
     return null;
   }
-
   var templateVars = {
     options: options,
     url: url,
@@ -158,10 +156,11 @@ function onMessage(e){
   }
 }
 
-function onComplete(data){
-  if(!popupRequest || !data) { return }
+function onComplete(data, request){
+  var request = request || popupRequest;
 
-  var request = popupRequest;
+  if(!request || !data) { return }
+
   clearRequest();
   try {
     if(typeof data !== 'object') {
@@ -184,8 +183,9 @@ function onComplete(data){
   if(!data.error || typeof data.error !== 'object' || !data.error.description){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
   }
-
-  return request.error.call(null, data);
+  if(typeof request.error === 'function'){
+    request.error.call(null, data);
+  }
 }
 
 Razorpay.payment = {
@@ -196,11 +196,9 @@ Razorpay.payment = {
 
   authorize: function(request){
     var error = formatRequest(request);
-
     if(error){
       return error;
     }
-
     var rdata = request.data;
     var options = request.options;
 
@@ -219,7 +217,6 @@ Razorpay.payment = {
 
     var name;
     request.popup = createPopup(rdata, url, options);
-
     if(!request.popup){
       name = '_blank'
     } else if(request.popup.cc){
