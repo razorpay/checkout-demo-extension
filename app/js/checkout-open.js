@@ -304,7 +304,7 @@ function ch_onFrameMessage(e, data){
   if(event === 'dismiss' || event === 'fault'){
     track(event, data);
   }
-};
+}
 
 /**
   default handler for success

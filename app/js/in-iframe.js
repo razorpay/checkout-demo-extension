@@ -1,4 +1,5 @@
 var isCriOS = /CriOS/.test(ua);
+var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
 window.onComplete = onComplete;
@@ -51,18 +52,17 @@ var frameDiscreet = {
   },
 
   notifyBridge: function(message){
-    var method, data;
-    if(window.CheckoutBridge && message && message.event){
-      method = 'on' + message.event;
-      if(typeof window.CheckoutBridge[method] === 'function'){
-        data = message.data;
+    if( message && message.event ){
+      var method = 'on' + message.event;
+      if(typeof CheckoutBridge[method] === 'function'){
+        var data = message.data;
         if(typeof data !== 'string'){
           if(!data){
-            return window.CheckoutBridge[method]();
+            return CheckoutBridge[method]();
           }
           data = JSON.stringify(data);
         }
-        window.CheckoutBridge[method](data);
+        CheckoutBridge[method](data);
       }
     }
   },
@@ -198,7 +198,7 @@ var frameDiscreet = {
       Razorpay.sendMessage({event: 'hidden'});
     };
     delete modalOptions.ondismiss;
-    return new Modal(el, modalOptions)
+    return new window.Modal(el, modalOptions)
   },
 
   showModal: function() {
@@ -238,12 +238,12 @@ var frameDiscreet = {
     div.innerHTML = templates.modal(opts);
     document.body.appendChild(div.firstChild);
 
-    if ( window.CheckoutBridge ) {
+    if ( CheckoutBridge ) {
       $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
     _$el = $('container');
-    _smarty = new Smarty(_$el);
+    _smarty = new window.Smarty(_$el);
     frameDiscreet.applyFont($('powered-link')[0]);
     _modal = frameDiscreet.createModal(_$el.children('modal')[0], opts.modal);
 
@@ -610,7 +610,7 @@ var frameDiscreet = {
 }
 
 Razorpay.sendMessage = function(message){
-  if ( typeof window.CheckoutBridge === 'object' ) {
+  if ( CheckoutBridge && typeof CheckoutBridge === 'object' ) {
     return frameDiscreet.notifyBridge(message);
   }
 
@@ -640,7 +640,7 @@ window.handleMessage = function(message) {
       }
     }
     frameDiscreet.showModal();
-    if(window.CheckoutBridge){
+    if(CheckoutBridge){
       message.options.meta = {
         ua: ua,
         cb: true

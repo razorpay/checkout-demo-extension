@@ -40,7 +40,7 @@ gulp.task('compileTemplates', function(){
   });
   return gulp.src(assetPath('templates/*.js'))
     .pipe(replace('\n/**/',''))
-    .pipe(wrap('/* jshint ignore:start */', '/* jshint ignore:end */'))
+    .pipe(wrap('/* jshint ignore:start */\n\n', '\n\n/* jshint ignore:end */'))
     .pipe(gulp.dest(assetPath('templates')))
 });
 

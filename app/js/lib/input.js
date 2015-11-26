@@ -15,7 +15,7 @@
     }
   }
 
-  window.Smarty = function(parent, options){
+  var Smarty = window.Smarty = function(parent, options){
     this.parent = parent;
     this.options = options;
     this.listeners = [];
