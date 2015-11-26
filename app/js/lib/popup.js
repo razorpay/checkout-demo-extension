@@ -54,28 +54,22 @@ var Popup = function(src, name) {
   })
   optsStr = optsStr.join(',');
 
+  this.name = name;
   // finally, open and return the popup window
   this.window = window.open(src, (name || ''), optsStr); // might be null in IE9 if protected mode is turned on
 
-  if(this.window){
-    this.focus();
+  if(!this.window){
+    return null;
   }
 
-  // this.$el = $(this.window.document.body);
+  this.window.focus();
 
   this.interval = setInterval(_popCheckClose(this), 500);
 
-  var that = this;
-  $(window).on('unload', function(){
-    that.close();
-  });
-  $(window).on('beforeunload', this.beforeunload);
+  $(window).on('unload', this.close, false, this);
 }
 
 Popup.prototype = {
-  beforeunload: function(){
-    return "Transaction isn't complete yet.";
-  },
 
   unload: function(){
     this.close();
@@ -93,18 +87,6 @@ Popup.prototype = {
   },
 
 /**
-* Focuses the popup window (brings to front).
-*/
-
-  focus: function () {
-    this.window.focus();
-  },
-
-  onClose: function(cb){
-    this.closeCB = cb;
-  },
-
-/**
 * Emits the "close" event.
 */
 
@@ -112,8 +94,8 @@ Popup.prototype = {
     if ( this.window.closed !== false ) { // UC browser makes it undefined instead of true
       clearInterval(this.interval);
       this.close();
-      if(typeof this.closeCB === 'function'){
-        this.closeCB();
+      if(typeof this.onClose === 'function'){
+        this.onClose();
       }
     }
   }

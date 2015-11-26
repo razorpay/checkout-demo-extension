@@ -1,6 +1,7 @@
 var isCriOS = /CriOS/.test(ua);
 // flag for checkout-frame.js
 discreet.isFrame = true;
+window.onComplete = onComplete;
 // initial error (helps in case of redirection flow)
 var qpmap = {};
 
@@ -483,8 +484,8 @@ var frameDiscreet = {
       _modal.options.onhide = null;
     }
     Razorpay.sendMessage({ event: 'success', data: response });
-    if(isCriOS){
-      document.cookie = 'onComplete=' + JSON.stringify(response) + ';expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/';
+    if(isCriOS) {
+      setCookie('onComplete', JSON.stringify(response));
     }
     frameDiscreet.hide();
   },
@@ -729,4 +730,4 @@ if(qpmap.message){
   frameDiscreet.parseMessage({data: atob(qpmap.message)});
 }
 // remove old onComplete cookie
-document.cookie = 'onComplete=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+deleteCookie('onComplete');

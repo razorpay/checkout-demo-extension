@@ -48,7 +48,9 @@
   </form>
   <script>
       Razorpay.configure({
-        key: 'rzp_test_1DP5mmOlF5G5ag'
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        protocol: 'http',
+        hostname: 'api.pronav.in'
       });
 
       function updateAmount(el) {

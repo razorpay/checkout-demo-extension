@@ -101,7 +101,7 @@ var discreet = {
   },
 
   nextRequestRedirect: function(data){
-    if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
+    if(window !== window.parent && discreet.isCheckout){
       return Razorpay.sendMessage({event: 'redirect', data: data});
     }
     if(data.method === 'get'){
