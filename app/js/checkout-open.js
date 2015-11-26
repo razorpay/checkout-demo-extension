@@ -491,7 +491,7 @@ Razorpay.prototype.close = function(){
 
 discreet.validateCheckout = function(options){
 
-  var amount = parseInt(options.amount);
+  var amount = parseInt(options.amount, 10);
   options.amount = String(options.amount);
   if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
     var message = 'amount (Minimum amount is ₹ 1)';

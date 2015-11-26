@@ -10,14 +10,15 @@ function clearCookieInterval(){
 
 function deleteCookie(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
-};
+}
 
 function setCookie(name, value){
   document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
-};
+}
 
 function getCookie(name){
   var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
   for( var i=0; i < ca.length; i++) {
     var c = ca[i];
     while (c.charAt(0) === ' ') {
@@ -28,7 +29,7 @@ function getCookie(name){
     }
   }
   return null;
-};
+}
 
 discreet.setCommunicator = function(opts){
   if(communicator && communicator.parentNode){
@@ -77,9 +78,10 @@ function createPopup(data, url, options) {
     return null;
   }
 
+  var popup;
   var name = 'popup_' + _uid;
   try{
-    var popup = new Popup('', name);
+    popup = new Popup('', name);
   }
   catch(e){
     return null;
@@ -157,7 +159,9 @@ function onMessage(e){
 }
 
 function onComplete(data, request){
-  var request = request || popupRequest;
+  if(!request){
+    request = popupRequest;
+  }
 
   if(!request || !data) { return }
 
@@ -233,7 +237,7 @@ Razorpay.payment = {
   validate: function(data){
     var errors = [];
 
-    var amount = parseInt(data.amount);
+    var amount = parseInt(data.amount, 10);
     if (!amount || typeof amount !== 'number' || amount < 0 || String(amount).indexOf('.') !== -1) {
       errors.push({
         why: 'Invalid amount specified',

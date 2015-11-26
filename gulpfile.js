@@ -1,20 +1,23 @@
-var fs = require('fs');
-var glob = require('glob');
-var gulp = require('gulp');
-var dot = require('dot');
-var less = require('gulp-less');
-var concat = require('gulp-concat');
-var autoprefixer = require('gulp-autoprefixer');
-var usemin = require('gulp-usemin');
-var wrap = require('gulp-insert').wrap;
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
+var fs = require('fs')
+var glob = require('glob')
+var gulp = require('gulp')
+var dot = require('dot')
+var less = require('gulp-less')
+var concat = require('gulp-concat')
+var autoprefixer = require('gulp-autoprefixer')
+var usemin = require('gulp-usemin')
+var wrap = require('gulp-insert').wrap
+var uglify = require('gulp-uglify')
+var sourcemaps = require('gulp-sourcemaps')
+var replace = require('gulp-replace')
 
-var execSync = require('child_process').execSync;
-var karmaServer = require('karma').Server;
-var istanbul = require('istanbul');
+var execSync = require('child_process').execSync
+var karmaServer = require('karma').Server
+var istanbul = require('istanbul')
+var jshint = require('gulp-jshint')
+var stylish = require('jshint-stylish')
 
-var awspublish = require('gulp-awspublish');
+var awspublish = require('gulp-awspublish')
 
 function assetPath(path){
   return 'app/' + path;
@@ -25,21 +28,23 @@ var distDir = 'app/dist/v1';
 gulp.task('watch', ['buildDev', 'usemin'], function() {
   gulp.watch(assetPath('_css/*.less'), ['compileStyles'])
   gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates'])
-  gulp.watch([assetPath('js/**'), assetPath('*.html')], ['usemin'])
 });
 
 // compiles .jst to .js, which is template contained in a function
 gulp.task('compileTemplates', function(){
   execSync('mkdir -p app/templates');
-  return dot.process({
+  dot.process({
     path: assetPath('_templates'),
     destination: assetPath('templates'),
     global: 'templates'
   });
+  return gulp.src(assetPath('templates/*.js'))
+    .pipe(replace('\n/**/',''))
+    .pipe(wrap('/* jshint ignore:start */', '/* jshint ignore:end */'))
+    .pipe(gulp.dest(assetPath('templates')))
 });
 
 gulp.task('compileStyles', function(){
-  execSync('mkdir -p app/dist/v1/css');
   return gulp.src(assetPath('_css/*.less'))
     .pipe(less())
     .pipe(concat('checkout.css'))
@@ -49,21 +54,23 @@ gulp.task('compileStyles', function(){
 
 gulp.task('buildDev', ['compileTemplates', 'compileStyles']);
 
-gulp.task('usemin', function(){
+gulp.task('usemin', ['buildDev'], function(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(gulp.dest(distDir));
 })
 
 // create production build and sourcemaps
-gulp.task('default', ['buildDev', 'usemin'], function(){
-  gulp.src(distDir + '/*.js')
-    .pipe(wrap('"use strict";(function(){', '})()'))
+gulp.task('default', ['usemin'], buildProd);
+
+function buildProd(){
+  return gulp.src(distDir + '/*.js')
+    .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(distDir));
-})
+}
 
 function getJSPaths(html, pattern){
   try{
@@ -101,7 +108,8 @@ var karmaOptions = {
   }
 };
 
-gulp.task('test', ['buildDev'], function(done){
+gulp.task('test', ['buildDev', 'usemin'], function(done){
+  // console.log(fs.readFileSync(distDir + '/razorpay.js', 'utf-8'))
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
@@ -126,8 +134,7 @@ function testFromStack(counter, allOptions, done){
       done();
     } else {
       createCoverageReport();
-      done();
-      // testRelease(done);
+      testRelease(done);
     }
   }).start();
 }
@@ -146,20 +153,27 @@ function createCoverageReport(){
 }
 
 function testRelease(done){
-  var stream = gulp.src(assetPath('*.html'))
-    .pipe(usemin())
-    .pipe(gulp.dest(assetPath('_test')));
+  var jsGlob = assetPath('dist/v1/*.js');
+  gulp.src(jsGlob)
+    .pipe(wrap('(function(){"use strict";', '})()'))
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+    .pipe(jshint.reporter('fail'))
+  // var stream = buildProd();
+  // stream.on('finish', function(){
+  // })
   
-  stream.on('finish', function(){
-    allOptions = glob.sync(assetPath('_test/*.js')).map(function(released){
-      var o = JSON.parse(JSON.stringify(karmaOptions));
-      o.files = karmaLibs.concat([released, released.replace('app/_test', 'test/release')]);
-      return o;
-    });
-    allOptions.release = true;
 
-    testFromStack(0, allOptions, done);
-  })
+  
+  //   allOptions = .map(function(released){
+  //     var o = JSON.parse(JSON.stringify(karmaOptions));
+  //     o.files = karmaLibs.concat([released, released.replace('app/_test', 'test/release')]);
+  //     return o;
+  //   });
+  //   allOptions.release = true;
+
+  //   testFromStack(0, allOptions, done);
+  // })
 }
 
 gulp.task('fontUpload', function(){

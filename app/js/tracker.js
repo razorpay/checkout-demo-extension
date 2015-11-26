@@ -1,6 +1,6 @@
-var _base62_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-var _base64_chars = _base62_chars + '+=';
-_base62_chars = _base62_chars.slice(52) + _base62_chars.slice(0, 52);
+var base62Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+var base64Chars = base62Chars + '+=';
+base62Chars = base62Chars.slice(52) + base62Chars.slice(0, 52);
 
 var _btoa = window.btoa;
 if(!_btoa){
@@ -15,36 +15,36 @@ if(!_btoa){
       c1 = str.charCodeAt(i++) & 0xff;
       if(i === len)
       {
-        out += _base64_chars.charAt(c1 >> 2);
-        out += _base64_chars.charAt((c1 & 0x3) << 4);
+        out += base64Chars.charAt(c1 >> 2);
+        out += base64Chars.charAt((c1 & 0x3) << 4);
         out += '==';
         break;
       }
       c2 = str.charCodeAt(i++);
       if(i === len)
       {
-        out += _base64_chars.charAt(c1 >> 2);
-        out += _base64_chars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-        out += _base64_chars.charAt((c2 & 0xF) << 2);
+        out += base64Chars.charAt(c1 >> 2);
+        out += base64Chars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
+        out += base64Chars.charAt((c2 & 0xF) << 2);
         out += '=';
         break;
       }
       c3 = str.charCodeAt(i++);
-      out += _base64_chars.charAt(c1 >> 2);
-      out += _base64_chars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-      out += _base64_chars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6));
-      out += _base64_chars.charAt(c3 & 0x3F);
+      out += base64Chars.charAt(c1 >> 2);
+      out += base64Chars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
+      out += base64Chars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6));
+      out += base64Chars.charAt(c3 & 0x3F);
     }
     return out;
-  }
+  };
 }
 
 function _toBase62(number){
   var rixit;
   var result = '';
   while (number) {
-    rixit = number % 62
-    result = _base62_chars[rixit] + result;
+    rixit = number % 62;
+    result = base62Chars[rixit] + result;
     number = Math.floor(number / 62);
   }
   return result;

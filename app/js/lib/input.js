@@ -1,5 +1,4 @@
 (function(){
-  'use strict';
 
   var inputClass = 'input';
   var interceptClass = /elem|placeholder|help-text/;

@@ -1,13 +1,16 @@
 {
-	"camelcase": true,
+	"predef": {
+		"JSON": true,
+		"innerHeight": true,
+		"pageYOffset": true
+	},
+	"asi": true,
 	"curly": true,
 	"eqeqeq": true,
-	"es3": true,
+	"esversion": true,
   "immed": true,
 	"freeze": true,
 	"indent": true,
-	"latedef": true,
-	"newcap": true,
 	"noarg": true,
 	"sub": true,
 	"undef": true,
@@ -17,7 +20,6 @@
 	"eqnull": true,
 	"browser": true,
 	"strict": true,
-	"validthis":true,
 	"validthis":true,
 	"unused":true
 }

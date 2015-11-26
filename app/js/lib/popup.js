@@ -21,12 +21,12 @@ var _popCheckClose = function(popup) {
 };
 
 var _popDefaults = {
-    width: 800
-  , height: 520
-  , menubar: 'no'
-  , resizable: 'yes'
-  , location: 'no'
-  , scrollbars: 'no'
+  width: 800,
+  height: 520,
+  menubar: 'no',
+  resizable: 'yes',
+  location: 'no',
+  scrollbars: 'no'
 };
 
 /**

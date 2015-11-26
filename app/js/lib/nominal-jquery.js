@@ -211,7 +211,7 @@ var _$createListener = function(callback, context){
       try {
         data = JSON.parse(data);
       }
-      catch(e){
+      catch(errorObj){
         data = {
           error: {
             description: 'Unable to parse response'
