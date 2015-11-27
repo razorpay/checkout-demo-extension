@@ -576,7 +576,7 @@ var frameDiscreet = {
   },
 
   configureRollbar: function(message){
-    if(window.Rollbar){
+    if(Rollbar && typeof Rollbar.configure === 'function'){
       Rollbar.configure({
         payload: {
           person: {
