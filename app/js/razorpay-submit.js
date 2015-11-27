@@ -193,6 +193,28 @@ function onComplete(data, request){
   }
 }
 
+function setupJsonp(request){
+  var options = request.options;
+  $.jsonp({
+    url: discreet.makeUrl(options) + options.jsonpUrl,
+    data: request.data,
+    success: function(response){
+      if(response.version === 1){
+        var nextRequestData = _btoa(JSON.stringify(response.request));
+        var commWin = communicator && communicator.contentWindow;
+
+        if(commWin === window){
+          setCookie('nextRequest', nextRequestData);
+        } else {
+          commWin.location.hash = '#' + nextRequestData;
+        }
+      }
+
+      else onComplete(response);
+    }
+  })
+}
+
 Razorpay.payment = {
 
   cancel: function(errorObj){
@@ -230,6 +252,7 @@ Razorpay.payment = {
 
     if(name){
       submitFormData(discreet.makeUrl(options, true) + 'processing.php', null, null, name);
+      setupJsonp(request);
     }
     $.addMessageListener(onMessage, request);
     popupRequest = request;

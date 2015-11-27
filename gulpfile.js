@@ -25,9 +25,10 @@ function assetPath(path){
 
 var distDir = 'app/dist/v1';
 
-gulp.task('watch', ['buildDev', 'usemin'], function() {
+gulp.task('watch', ['usemin'], function() {
   gulp.watch(assetPath('_css/*.less'), ['compileStyles'])
   gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates'])
+  gulp.watch([assetPath('js/**'), assetPath('*.html')], ['makemin'])
 });
 
 // compiles .jst to .js, which is template contained in a function
@@ -54,11 +55,15 @@ gulp.task('compileStyles', function(){
 
 gulp.task('buildDev', ['compileTemplates', 'compileStyles']);
 
-gulp.task('usemin', ['buildDev'], function(){
+function makemin(){
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(gulp.dest(distDir));
-})
+}
+
+gulp.task('makemin', makemin);
+
+gulp.task('usemin', ['buildDev'], makemin);
 
 // create production build and sourcemaps
 gulp.task('default', ['usemin'], buildProd);
@@ -108,7 +113,7 @@ var karmaOptions = {
   }
 };
 
-gulp.task('test', ['buildDev', 'usemin'], function(done){
+gulp.task('test', ['usemin'], function(done){
   // console.log(fs.readFileSync(distDir + '/razorpay.js', 'utf-8'))
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
