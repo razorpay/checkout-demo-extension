@@ -280,4 +280,4 @@ Razorpay.payment = {
       }
     });
   }
-}
+};

@@ -154,26 +154,24 @@ function createCoverageReport(){
 
 function testRelease(done){
   var jsGlob = assetPath('dist/v1/*.js');
-  gulp.src(jsGlob)
+  var jsHint = gulp.src(jsGlob)
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'))
-  // var stream = buildProd();
-  // stream.on('finish', function(){
-  // })
-  
 
-  
-  //   allOptions = .map(function(released){
-  //     var o = JSON.parse(JSON.stringify(karmaOptions));
-  //     o.files = karmaLibs.concat([released, released.replace('app/_test', 'test/release')]);
-  //     return o;
-  //   });
-  //   allOptions.release = true;
-
-  //   testFromStack(0, allOptions, done);
-  // })
+  jsHint.on('finish', function(){
+    var stream = buildProd();
+    stream.on('finish', function(){
+      allOptions = glob.sync(jsGlob).map(function(released){
+        var o = JSON.parse(JSON.stringify(karmaOptions));
+        o.files = karmaLibs.concat([released, released.replace('app/dist/v1', 'test/release')]);
+        return o;
+      });
+      allOptions.release = true;
+      testFromStack(0, allOptions, done);  
+    })
+  })
 }
 
 gulp.task('fontUpload', function(){

@@ -1,5 +1,5 @@
-describe("new Razorpay", function(){
-  var rzp;
-  it("without options should fail", function(){
+describe('Razorpay', function(){
+  it('', function(){
+    expect(Razorpay).toBeDefined();
   });
 })
