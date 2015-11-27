@@ -46,7 +46,7 @@ var deserialize = function(data, key){
 }
 
 $.prototype = {
-  on: function(event, callback, capture){
+  on: function(event, callback, capture, thisArg){
     var el = this[0];
     if(!el) { return }
 
@@ -56,7 +56,7 @@ $.prototype = {
         if( e.target.nodeType === 3 ) {
           e.target = e.target.parentNode;// textNode target
         }
-        callback.call(this, e);
+        callback.call(thisArg || this, e);
       }
       el.addEventListener(event, ref, !!capture);
     } else if(window.attachEvent){
@@ -64,7 +64,7 @@ $.prototype = {
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
-        callback.call(el, e);
+        callback.call(thisArg || el, e);
       }
       el.attachEvent('on' + event, ref);
     }
@@ -211,7 +211,7 @@ var _$createListener = function(callback, context){
       try {
         data = JSON.parse(data);
       }
-      catch(e){
+      catch(errorObj){
         data = {
           error: {
             description: 'Unable to parse response'
@@ -234,3 +234,23 @@ $.removeMessageListener = function() {
   $(window).off('message', _$listener);
   _$listener = null;
 };
+
+$.post = function(opts){
+  var xhr = new XMLHttpRequest();
+  xhr.open('post', opts.url, true);
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+  if(opts.callback){
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState === 4 && xhr.status === 200){
+        opts.callback(JSON.parse(xhr.responseText));
+      }
+    }
+  }
+
+  var payload = [];
+  each(opts.data, function(key, val){
+    payload.push(key + '=' + val)
+  })
+  xhr.send(payload.join('&'));
+}

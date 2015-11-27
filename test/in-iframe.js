@@ -624,7 +624,14 @@ describe("Razorpay netbanking getFormData method", function(){
 
 describe("CheckoutBridge should", function(){
   var message = {event: 'evt'};
-  window.CheckoutBridge = {onevt: jQuery.noop};
+
+  beforeEach(function(){
+    CheckoutBridge = {onevt: jQuery.noop};
+  })
+
+  afterEach(function(){
+    CheckoutBridge = undefined;
+  })
 
   it("be notified if present", function(){
     var spy = jasmine.createSpy();
@@ -637,7 +644,7 @@ describe("CheckoutBridge should", function(){
 
   it("be called with given event", function(){
     var spy = jasmine.createSpy();
-    spyOn(window.CheckoutBridge, 'onevt').and.callFake(spy);
+    spyOn(CheckoutBridge, 'onevt').and.callFake(spy);
     frameDiscreet.notifyBridge(message);
     expect(spy).toHaveBeenCalled();
   })
@@ -645,7 +652,7 @@ describe("CheckoutBridge should", function(){
   it("be called with given event and data", function(){
     message.data = {'some': 'data'};
     var spy = jasmine.createSpy();
-    spyOn(window.CheckoutBridge, 'onevt').and.callFake(function(msg){
+    spyOn(CheckoutBridge, 'onevt').and.callFake(function(msg){
       if(msg == JSON.stringify(message.data))
         spy()
     })
@@ -655,7 +662,7 @@ describe("CheckoutBridge should", function(){
   })
 
   it("not be notified if absent", function(){
-    delete window.CheckoutBridge;
+    CheckoutBridge = null;
     var spy = jasmine.createSpy();
     spyOn(frameDiscreet, 'notifyBridge').and.callFake(spy);
     Razorpay.sendMessage(message);
@@ -727,7 +734,7 @@ describe('ios CheckoutBridge', function(){
   it('should be set up if relevant query params', function(){
     qpmap.platform = 'ios';
     delete window.CheckoutBridge;
-    _fr_iosBridge();
+    iosBridge();
 
     expect(window.CheckoutBridge).toBeDefined();
     ['load','dismiss','submit','fault','success'].forEach(function(method){

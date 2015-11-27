@@ -1,5 +1,4 @@
 (function() {
-  'use strict';
 
   var timeout, transitionProperty;
 
@@ -17,7 +16,6 @@
     }
     timeout = null;
   }
-
 
   if(Array.prototype.some){
     ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
@@ -49,7 +47,7 @@
     return duration;
   }
 
-  window.Modal = function(element, options) {
+  var Modal = window.Modal = function(element, options) {
     each(defaults, function(key, val){
       if(!(key in options)){
         options[key] = val;

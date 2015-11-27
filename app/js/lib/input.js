@@ -1,5 +1,4 @@
 (function(){
-  'use strict';
 
   var inputClass = 'input';
   var interceptClass = /elem|placeholder|help-text/;
@@ -16,7 +15,7 @@
     }
   }
 
-  window.Smarty = function(parent, options){
+  var Smarty = window.Smarty = function(parent, options){
     this.parent = parent;
     this.options = options;
     this.listeners = [];

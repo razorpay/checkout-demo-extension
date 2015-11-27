@@ -1,5 +1,13 @@
 var roll = function(){};
 var noop = roll;
+
+var err = function(errors){
+  if(errors instanceof Array && !errors.length){
+    return false;
+  }
+  return true;
+};
+
 var ua = navigator.userAgent;
 
 var Razorpay = window.Razorpay = function(options){
@@ -16,8 +24,6 @@ Razorpay.defaults = {
   'protocol': 'https',
   'hostname': 'api.razorpay.com',
   'version': 'v1',
-  'jsonpUrl': '/payments/create/jsonp',
-  'methodsUrl': '/methods',
   'key': '',
   'amount': '',
   'currency': 'INR',

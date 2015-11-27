@@ -64,10 +64,12 @@ var _caCardType = function(num){
 }
 
 var _caSetCaret = function(el, pos){
-  if(navigator.userAgent.indexOf('Android'))
-     return;
-  if(typeof el.selectionStart === 'number')
+  if(navigator.userAgent.indexOf('Android')){
+    return;
+  }
+  if(typeof el.selectionStart === 'number'){
     el.selectionStart = el.selectionEnd = pos;
+  }
   else {
     var range = el.createTextRange();
     range.collapse(true);
@@ -131,7 +133,7 @@ var _caFormatExpiry = function(e) {
   }
 
   if (pos === 1) {
-    if( parseInt(prefix + character) > 12 ) { return e && e.preventDefault() }
+    if( parseInt(prefix + character, 10) > 12 ) { return e && e.preventDefault() }
     character += ' / ';
   }
   else if ( pos === 2 ) {

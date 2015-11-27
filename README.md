@@ -8,9 +8,9 @@
 1. Open `app` directory via any web server in your browser
 
 Testing:
-1. `gulp test` for running karma based tests
+1. `gulp test` for running tests
 1. tests are located in `test` folder
-1. `test/release` folder contains tests to be run after concat
+1. `test/release` folder contains blackbox tests
 
 #Gulp Commands
 

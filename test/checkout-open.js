@@ -105,7 +105,7 @@ describe("normalize image option if", function(){
 
 })
 
-describe("ch_onFrameMessage ", function(){
+describe("ch_onFrameMessage", function(){
   var rzp;
 
   beforeEach(function(){
@@ -127,8 +127,8 @@ describe("ch_onFrameMessage ", function(){
     })
   })
 
-  describe("load, ", function(){
-    
+  describe("load,", function(){
+
     beforeEach(function(){
       postMessage({source: "frame", event: "load"}, '*');
     })
