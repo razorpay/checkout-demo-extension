@@ -31,6 +31,10 @@ function getCookie(name){
   return null;
 }
 
+function getCommuniactorSrc(opts){
+  return discreet.makeUrl(opts, true) + 'communicator.php';
+}
+
 discreet.setCommunicator = function(opts){
   if(communicator && communicator.parentNode){
     communicator.parentNode.removeChild(communicator);
@@ -42,7 +46,7 @@ discreet.setCommunicator = function(opts){
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
     document.documentElement.appendChild(communicator);
-    communicator.src = discreet.makeUrl(opts, true) + 'communicator.php';
+    communicator.src = getCommuniactorSrc(opts);
   } else {
     communicator = {contentWindow: window};
   }
@@ -77,7 +81,7 @@ function submitFormData(action, data, method, target) {
 }
 
 function createPopup(data, url, options) {
-  if(/Windows Phone/.test(ua) || true) {
+  if(/Windows Phone/.test(ua)) {
     return null;
   }
 
@@ -185,14 +189,18 @@ function onComplete(data, request){
     data.razorpay_payment_id
   ) {
     var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    return request.success.call(null, returnObj); // dont expose request as this
+    return setTimeout(function(){
+      request.success.call(null, returnObj); // dont expose request as this
+    })
   }
 
   if(!data.error || typeof data.error !== 'object' || !data.error.description){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
   }
   if(typeof request.error === 'function'){
-    request.error.call(null, data);
+    setTimeout(function(){
+      request.error.call(null, data);
+    })
   }
 }
 
@@ -203,18 +211,25 @@ function setupAjax(request){
     url: discreet.makeUrl(options) + '/payments/create/ajax',
     data: request.data,
     callback: function(response){
-      if(response.version === 1){
-        var nextRequestData = _btoa(JSON.stringify(response.request));
-        var commWin = communicator && communicator.contentWindow;
+      var result;
 
-        if(commWin === window){
-          setCookie('nextRequest', nextRequestData);
-        } else {
-          commWin.location.hash = '#' + nextRequestData;
+      if(response.version === 1){
+        result = response.request;
+      }
+
+      else {
+        onComplete(response);
+        result = {
+          result: response.razorpay_payment_id ? 'Payment Successful.' : response.error && response.error.description || 'Payment Failed.'
         }
       }
 
-      else onComplete(response);
+      result = _btoa(JSON.stringify(result));
+      if(communicator.contentWindow === window){
+        setCookie('nextRequest', result);
+      } else {
+        communicator.src = getCommuniactorSrc(options) + '#' + result;
+      }
     }
   })
 }

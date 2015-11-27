@@ -73,6 +73,8 @@
             amount: val('amount').replace(/[^0-9]+/,'')*100,
             email: val('customer_email'),
             contact: val('customer_phone'),
+            // method: 'netbanking',
+            // bank: 'HDFC'
             method: 'card',
             'card[name]': val('card_name'),
             'card[number]': val('card_number'),
