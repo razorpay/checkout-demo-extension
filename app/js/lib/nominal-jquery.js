@@ -234,3 +234,23 @@ $.removeMessageListener = function() {
   $(window).off('message', _$listener);
   _$listener = null;
 };
+
+$.post = function(opts){
+  var xhr = new XMLHttpRequest();
+  xhr.open('post', opts.url, true);
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+  if(opts.callback){
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState === 4 && xhr.status === 200){
+        opts.callback(JSON.parse(xhr.responseText));
+      }
+    }
+  }
+
+  var payload = [];
+  each(opts.data, function(key, val){
+    payload.push(key + '=' + val)
+  })
+  xhr.send(payload.join('&'));
+}

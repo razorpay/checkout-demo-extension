@@ -57,7 +57,10 @@ function submitFormData(action, data, method, target) {
   if(target) { form.setAttribute('target', target) }
 
   if(data){ form.innerHTML = deserialize(data) }
+
+  document.documentElement.appendChild(form);
   form.submit();
+  form.parentNode.removeChild(form);
 
   if(target && discreet.isFrame){
     deleteCookie('onComplete');
@@ -74,7 +77,7 @@ function submitFormData(action, data, method, target) {
 }
 
 function createPopup(data, url, options) {
-  if(/Windows Phone/.test(ua)) {
+  if(/Windows Phone/.test(ua) || true) {
     return null;
   }
 
@@ -193,12 +196,13 @@ function onComplete(data, request){
   }
 }
 
-function setupJsonp(request){
+function setupAjax(request){
   var options = request.options;
-  $.jsonp({
-    url: discreet.makeUrl(options) + options.jsonpUrl,
+
+  $.post({
+    url: discreet.makeUrl(options) + '/payments/create/ajax',
     data: request.data,
-    success: function(response){
+    callback: function(response){
       if(response.version === 1){
         var nextRequestData = _btoa(JSON.stringify(response.request));
         var commWin = communicator && communicator.contentWindow;
@@ -232,7 +236,7 @@ Razorpay.payment = {
     var url = discreet.makeUrl(options) + '/payments/create/checkout';
 
     if(options.redirect){
-      submitFormData(url, 'post', rdata);
+      submitFormData(url, rdata, 'post');
       return false;
     }
 
@@ -252,7 +256,7 @@ Razorpay.payment = {
 
     if(name){
       submitFormData(discreet.makeUrl(options, true) + 'processing.php', null, null, name);
-      setupJsonp(request);
+      setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
     popupRequest = request;

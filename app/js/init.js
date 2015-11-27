@@ -24,8 +24,6 @@ Razorpay.defaults = {
   'protocol': 'https',
   'hostname': 'api.razorpay.com',
   'version': 'v1',
-  'jsonpUrl': '/payments/create/jsonp',
-  'methodsUrl': '/methods',
   'key': '',
   'amount': '',
   'currency': 'INR',

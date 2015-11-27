@@ -74,10 +74,13 @@ function track(event, props) {
         properties: props
       }
 
-      var xhr = new XMLHttpRequest();
-      xhr.open('post', 'https://api.mixpanel.com/track/', true);
-      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      xhr.send('ip=1&data=' + _btoa(JSON.stringify(data)));
+      $.post({
+        url: 'https://api.mixpanel.com/track/',
+        data: {
+          ip: 1,
+          data: _btoa(JSON.stringify(data))
+        }
+      })
     })
   }
 }
