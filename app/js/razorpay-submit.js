@@ -110,6 +110,7 @@ function createPopup(data, url, options) {
 function clearRequest(){
   try{
     if(popupRequest.popup){
+      popupRequest.popup.onClose = null;
       popupRequest.popup.close();
     }
   } catch(e){
