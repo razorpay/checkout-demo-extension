@@ -662,6 +662,7 @@ describe("CheckoutBridge should", function(){
   })
 
   it("not be notified if absent", function(){
+    CheckoutBridge = null;
     var spy = jasmine.createSpy();
     spyOn(frameDiscreet, 'notifyBridge').and.callFake(spy);
     Razorpay.sendMessage(message);
@@ -733,7 +734,7 @@ describe('ios CheckoutBridge', function(){
   it('should be set up if relevant query params', function(){
     qpmap.platform = 'ios';
     delete window.CheckoutBridge;
-    _fr_iosBridge();
+    iosBridge();
 
     expect(window.CheckoutBridge).toBeDefined();
     ['load','dismiss','submit','fault','success'].forEach(function(method){

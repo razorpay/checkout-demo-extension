@@ -7,7 +7,7 @@
 	"asi": true,
 	"curly": true,
 	"eqeqeq": true,
-	"esversion": true,
+	"esversion": 3,
   "immed": true,
 	"freeze": true,
 	"indent": true,
