@@ -710,7 +710,7 @@ function iosMethod(method){
 
 function iosBridge(){
   if(qpmap.platform === 'ios'){
-    CheckoutBridge = {
+    CheckoutBridge = window.CheckoutBridge = {
       map: {},
       get: function(index){
         var val = this.map[index];
