@@ -143,7 +143,7 @@ function formatRequest(request){
   each(
     ['amount', 'currency', 'callback_url'],
     function(i, field){
-      if(!(field in rdata) && field in options){
+      if(!(field in rdata) && options[field]){
         rdata[field] = options[field];
       }
     }
