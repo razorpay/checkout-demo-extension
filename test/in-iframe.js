@@ -303,20 +303,6 @@ describe("Razorpay card tab submit", function(){
       });
 
       describe(": in submitted data", function(){
-        it("should pass signature if set", function(){
-          customOptions.signature = 'asdasd';
-          launch();
-          field = 'signature';
-          value = customOptions.signature;
-        });
-
-        it("should not pass signature if not set", function(){
-          Razorpay.configure({signature: ''});
-          launch();
-          field = 'signature';
-          value = undefined;
-        });
-
         it("should pass email", function(){
           launch();
           field = 'email';

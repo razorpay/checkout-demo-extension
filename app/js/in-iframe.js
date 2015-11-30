@@ -396,10 +396,8 @@ var frameDiscreet = {
     }
     var data = frameDiscreet.getFormData();
     var options = Razorpay.defaults;
-    // Signature is set in case of hosted checkout
-    if (options.signature !== ''){
-      data.signature = options.signature;
-    }
+
+    data.amount = options.amount;
 
     Razorpay.sendMessage({
       event: 'submit',

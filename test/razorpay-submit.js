@@ -113,6 +113,13 @@ describe('authorize should', function(){
     Razorpay.defaults.callback_url = ''; // reset
   })
 
+  it('add signature if specified in options', function(){
+    Razorpay.defaults.signature = 'swag';
+    Razorpay.payment.authorize(req);
+    expect(req.data.signature).toBe('swag');
+    Razorpay.defaults.signature = ''; // reset
+  })
+
   it('add merchant key in request data', function(){
     Razorpay.defaults.key = 'swag';
     delete req.data.key_id;
