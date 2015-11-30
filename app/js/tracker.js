@@ -53,9 +53,9 @@ function _toBase62(number){
 
 var _uid = _toBase62(
     (new Date().getTime() - 1388534400000).toString() +
-    ('000' + Math.floor(1000*Math.random())).slice(-3)
+    ('000000' + Math.floor(1000000*Math.random())).slice(-6)
   ) +
-  _toBase62(Math.floor(56800235584*Math.random()));
+  _toBase62(Math.floor(14776336*Math.random()));
 
 
 function track(event, props) {
@@ -65,7 +65,7 @@ function track(event, props) {
         props = {};
       }
 
-      props.token = '907d0c5b156fca57e1b254ccc1b9e8c9';
+      props.token = '181b3d7d22f7c71826d2f7db7c322028';
       props.distinct_id = _uid;
       props.time = new Date().getTime()
 
