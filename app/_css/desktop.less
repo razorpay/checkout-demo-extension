@@ -9,10 +9,10 @@
 @border-color: #dadada;
 @background-color: #fbf9f8;
 @danger: #f46060;
-@border-radius: 4px;
+@border-radius: 2px;
 
 @width: 323px;
-@padding: 15px;
+@padding: 22px;
 
 @font-size: 14px;
 // input elements horizontal padding
@@ -195,7 +195,7 @@ input:not([type=radio]), select{
 input, .placeholder{
   height: inherit;
   line-height: @input-height - 20px;
-  padding: 10px 0 10px 3*@input-padding;
+  padding: 10px 0 10px @input-padding;
   box-sizing: border-box;
 }
 select{
@@ -251,10 +251,11 @@ input[disabled]{
   margin: 0;
   cursor: text;
   display: block;
+  border-bottom: 1px solid @border-color;
 
   .i{
     position: absolute;
-    left: @input-padding;
+    right: @input-padding;
     top: 50%;
     margin-top: -4px;
     line-height: 0;
@@ -273,17 +274,6 @@ input[disabled]{
     color: #333;
     .placeholder{
       display: none;
-    }
-  }
-}
-#tab-card, #form-common{
-  .elem+.elem{
-    &:before{
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      border-top: 1px solid #eee;
-      content: '';
     }
   }
 }
@@ -349,10 +339,6 @@ input[disabled]{
   transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
 }
 .fieldset{
-  background: #fff;
-  border: 1px solid @border-color;
-  padding-top: 1px;
-  border-radius: 4px;
   margin: 0 0 16px;
 }
 /* Default class for an overlay */
@@ -437,11 +423,9 @@ input[disabled]{
 #elem-card{
   transition: 0.3s;
   i{
-    left: 14px;
   //   font-size: 0;
   // }
   // &[cardtype=unknown] i{
-    font-size: @icon-size;
   }
   // &[cardtype=visa] i{
   //   background-image: url('../images/icons/visa.png');
@@ -534,10 +518,6 @@ input[disabled]{
   letter-spacing: -4px;
   white-space: nowrap;
   display: none;
-  border-radius: @border-radius @border-radius 0 0;
-  background: #fff;
-  border: 1px solid @border-color;
-  border-bottom: none;
   *margin-bottom: -@padding; // ie7
 
   &.tabs-2{
@@ -568,7 +548,7 @@ input[disabled]{
     vertical-align: top;
     position: relative;
     border-bottom: 1px solid @border-color;
-    padding-bottom: 1px;
+    padding-bottom: 2px;
 
     &:hover{
       color: #333;
@@ -576,18 +556,11 @@ input[disabled]{
     
     &.active{
       color: #333;
-      border-bottom: 2px solid @primary;
+      border-bottom: 3px solid @primary;
       padding: 0;
       cursor: default;
       pointer-events: none;
       z-index: 1;
-    }
-
-    &:nth-child(2){
-      border-left: 1px solid @border-color;
-      &:nth-last-child(2){
-        border-right: 1px solid @border-color;
-      }
     }
   }
 }
