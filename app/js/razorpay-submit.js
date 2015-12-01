@@ -121,7 +121,7 @@ function clearRequest(){
       popupRequest.popup.close();
     }
   } catch(e){
-    roll('error closing popup: ' + e.message, null, 'warn');
+    roll('error closing popup: ' + e.message, null, 'warning');
   }
 
   popupRequest = null;
