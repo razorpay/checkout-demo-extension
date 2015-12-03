@@ -26,7 +26,7 @@ var _popDefaults = {
   menubar: 'no',
   resizable: 'yes',
   location: 'no',
-  scrollbars: 'no'
+  scrollbars: 'yes'
 };
 
 /**
