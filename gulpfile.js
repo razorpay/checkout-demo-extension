@@ -27,7 +27,7 @@ var distDir = 'app/dist/v1';
 
 gulp.task('watch', ['usemin'], function() {
   gulp.watch(assetPath('_css/*.less'), ['compileStyles'])
-  gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates'])
+  gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates', 'makemin'])
   gulp.watch([assetPath('js/**'), assetPath('*.html')], ['makemin'])
 });
 
