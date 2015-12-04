@@ -368,7 +368,7 @@ var frameDiscreet = {
 
   /* sets focus on invalid input and returns true, if any. */
   isInvalid: function(parent) {
-    var invalids = $(parent).find('invalid', 'p');
+    var invalids = $(parent).find('invalid');
     if(invalids[0]){
       shakeModal();
       $($(invalids[0]).find('input')[0]).focus();

@@ -108,7 +108,7 @@
     refresh: function(callback){
       var self = this;
       each(
-        this.parent[0].getElementsByTagName('p'),
+        $(this.parent[0]).find('input'),
         function(i, el){
           var child = $(el).children('input')[0];
           if(child){
