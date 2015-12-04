@@ -331,6 +331,7 @@ iframe{
   letter-spacing: -4px;
   white-space: nowrap;
   display: none;
+  -webkit-tap-highlight-color: transparent;
   margin: 0 @input-padding/2 14px;
   *margin-bottom: 0; // ie7
 
@@ -347,11 +348,9 @@ iframe{
 
   li{
     *float: left; // <ie7
-    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-    -webkit-tap-highlight-color: transparent;
     list-style: none;
-    height: 48px;
-    line-height: 46px;
+    height: 42px;
+    line-height: 44px;
     margin: 0;
     text-align: center;
     width: 50%;
@@ -369,7 +368,7 @@ iframe{
     }
     
     &.active{
-      color: #333;
+      color: #222;
       border-bottom: 3px solid @primary;
       padding: 0;
       cursor: default;

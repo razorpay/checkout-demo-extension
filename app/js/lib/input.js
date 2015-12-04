@@ -5,7 +5,7 @@
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
-  var shim_placeholder = document.createElement("input").placeholder === undefined;
+  var shim_placeholder = document.createElement('input').placeholder === undefined;
 
   var detectSupport = function(){
     var div = document.createElement('div');
