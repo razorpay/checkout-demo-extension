@@ -490,15 +490,6 @@ Razorpay.prototype.close = function(){
 
 
 discreet.validateCheckout = function(options){
-
-  var amount = parseInt(options.amount, 10);
-  options.amount = String(options.amount);
-  if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
-    var message = 'amount (Minimum amount is ₹ 1)';
-    alert(message);
-    return message;
-  }
-
   if( options.display_currency === 'USD' ){
     options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
     if(!options.display_amount){

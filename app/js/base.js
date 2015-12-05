@@ -36,10 +36,16 @@ function base_validateOptions(options) {
   })
   if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
 
+  var amount = parseInt(options.amount, 10);
+  options.amount = String(options.amount);
+  if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
+    errorMessage = 'amount (Minimum amount is ₹ 1)';
+    alert('Invalid ' + errorMessage);
+  }
   /**
    * There are some options which are checkout specific only
    */
-  if( typeof discreet.validateCheckout === 'function' ) {
+  if(!errorMessage && typeof discreet.validateCheckout === 'function' ) {
     errorMessage = discreet.validateCheckout(options);
   }
 

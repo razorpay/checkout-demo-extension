@@ -106,28 +106,34 @@ describe("init options validation", function(){
     afterEach(function(){
       try{
         base_validateOptions(init_options);
+        expect(true).toBe(false); // shouldn't reach here
       } catch(e){
         expect(e.message.indexOf(field) > 0);
       }
     });
 
-    it("no key specified", function(){
+    it('no key specified', function(){
       field = 'key';
       delete init_options.key;
     });
 
-    it("blank key specified", function(){
+    it('blank key specified', function(){
       field = 'key';
       init_options.key = '';
     });
 
-    it("when notes has more than 15 fields", function(){
+    it('when notes has more than 15 fields', function(){
       init_options.notes = {};
       for(var i = 0; i < 16; i++){
         init_options.notes['note-' + i] = i;
       }
       field = 'notes';
     });
+
+    it('invalid amount', function(){
+      field = 'amount';
+      init_options.amount = 99;
+    })
   });
 
   describe("should not return error", function(){
