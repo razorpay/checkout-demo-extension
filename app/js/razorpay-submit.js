@@ -41,7 +41,7 @@ discreet.setCommunicator = function(opts){
   }
   if(
     location.href.indexOf(discreet.makeUrl(opts)) &&
-    (/MSIE|Windows Phone/.test(ua) || (/CriOS/.test(ua) && !discreet.isFrame))
+    (/MSIE|Windows Phone/.test(ua) || (isCriOS && !discreet.isFrame))
   ) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
@@ -81,7 +81,7 @@ function submitFormData(action, data, method, target) {
 }
 
 function createPopup(data, url, options) {
-  if(/Windows Phone/.test(ua)) {
+  if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
     return null;
   }
 

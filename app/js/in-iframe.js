@@ -1,8 +1,8 @@
-var isCriOS = /CriOS/.test(ua);
 if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
+
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
@@ -618,7 +618,7 @@ Razorpay.sendMessage = function(message){
 
   var ownerWindow = window === window.parent ? window.opener : window.parent;
 
-  if(ownerWindow){
+  if(!isCriOS && ownerWindow){
     message.source = 'frame';
     if ( typeof message !== 'string' ) {
       message = JSON.stringify(message);

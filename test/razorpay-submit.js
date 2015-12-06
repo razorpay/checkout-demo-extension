@@ -271,9 +271,8 @@ describe('communicator', function(){
   })
 
   it('should be set in CriOS-Razorpay but not in CriOS-Checkout', function(){
-    var oldua = ua;
+    isCriOS = true;
     var oldFrame = discreet.isFrame;
-    ua = 'CriOS';
 
     discreet.isFrame = true;
     Razorpay.configure({});
@@ -283,7 +282,7 @@ describe('communicator', function(){
     Razorpay.configure({});
     expect(communicator instanceof HTMLIFrameElement).toBe(true);
 
-    ua = oldua;
+    isCriOS = false;
     discreet.isFrame = oldFrame;
   })
 

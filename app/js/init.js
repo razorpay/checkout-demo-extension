@@ -9,6 +9,14 @@ var err = function(errors){
 };
 
 var ua = navigator.userAgent;
+var isCriOS = /\(iP.+(Fx|Cr)iOS\//.test(ua);
+
+if(isCriOS){
+  var chrome_version = ua.match(/CriOS\/([0-9]+)/);
+  if(chrome_version && chrome_version[1] > 46){
+    isCriOS = false;
+  }
+}
 
 var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
