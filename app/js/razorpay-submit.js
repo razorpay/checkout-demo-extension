@@ -41,7 +41,7 @@ discreet.setCommunicator = function(opts){
   }
   if(
     location.href.indexOf(discreet.makeUrl(opts)) &&
-    (/MSIE|Windows Phone/.test(ua) || (/CriOS/.test(ua) && !discreet.isFrame))
+    (/MSIE|Windows Phone/.test(ua) || (isCriOS && !discreet.isFrame))
   ) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
@@ -81,7 +81,7 @@ function submitFormData(action, data, method, target) {
 }
 
 function createPopup(data, url, options) {
-  if(/Windows Phone/.test(ua)) {
+  if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
     return null;
   }
 
@@ -100,8 +100,12 @@ function createPopup(data, url, options) {
   }
 
   try{
-    popup.window.document.write(templates.popup(templateVars));
-    popup.window.document.close();
+    writePopup(popup, templateVars);
+    if(/FxiOS/.test(ua)){
+      setTimeout(function(){
+        writePopup(popup, templateVars);
+      }, 1000)
+    }
   }
   catch(e){
     popup.cc = true;
@@ -112,6 +116,11 @@ function createPopup(data, url, options) {
   }
 
   return popup;
+}
+
+function writePopup(popup, templateVars){
+  popup.window.document.write(templates.popup(templateVars));
+  popup.window.document.close();
 }
 
 function clearRequest(){
@@ -182,7 +191,6 @@ function onComplete(data, request){
   catch(e) {
     return roll('unexpected api response', data);
   }
-
   if (
     typeof request.success === 'function' &&
     typeof data.razorpay_payment_id === 'string' &&
