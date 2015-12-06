@@ -100,8 +100,12 @@ function createPopup(data, url, options) {
   }
 
   try{
-    popup.window.document.write(templates.popup(templateVars));
-    popup.window.document.close();
+    writePopup(popup, templateVars);
+    if(/FxiOS/.test(ua)){
+      setTimeout(function(){
+        writePopup(popup, templateVars);
+      }, 1000)
+    }
   }
   catch(e){
     popup.cc = true;
@@ -112,6 +116,11 @@ function createPopup(data, url, options) {
   }
 
   return popup;
+}
+
+function writePopup(popup, templateVars){
+  popup.window.document.write(templates.popup(templateVars));
+  popup.window.document.close();
 }
 
 function clearRequest(){
@@ -182,7 +191,6 @@ function onComplete(data, request){
   catch(e) {
     return roll('unexpected api response', data);
   }
-
   if (
     typeof request.success === 'function' &&
     typeof data.razorpay_payment_id === 'string' &&
