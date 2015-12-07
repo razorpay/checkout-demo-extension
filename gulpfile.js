@@ -114,7 +114,6 @@ var karmaOptions = {
 };
 
 gulp.task('test', ['usemin'], function(done){
-  // console.log(fs.readFileSync(distDir + '/razorpay.js', 'utf-8'))
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
@@ -125,6 +124,7 @@ gulp.task('test', ['usemin'], function(done){
     o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
     return o;
   });
+  // return testRelease(done);
   testFromStack(0, allOptions, done);
 })
 

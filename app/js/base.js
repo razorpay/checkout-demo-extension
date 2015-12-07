@@ -66,6 +66,17 @@ var optionValidations = {
   }
 }
 
+function validateRequiredFields(options){
+  each(
+    ['key', 'amount'],
+    function(index, key){
+      if(!options[key]){
+        throw new Error('No ' + key + ' passed.');
+      }
+    }
+  )
+}
+
 function validateOverrides(options) {
   var errorMessage;
 
@@ -122,6 +133,7 @@ function base_configure(overrides){
 
 Razorpay.prototype.configure = function(overrides){
   this.options = base_configure(overrides);
+  validateRequiredFields(this.options);
   this.modal = {options: {}};
 };
 

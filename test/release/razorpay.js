@@ -1,5 +1,5 @@
 describe('Razorpay', function(){
-  it('', function(){
+  it('should exist', function(){
     expect(Razorpay).toBeDefined();
   });
 })
