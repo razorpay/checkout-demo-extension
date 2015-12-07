@@ -44,19 +44,19 @@ input, select {
   color: inherit;
   font-size: 14px;
   resize: none;
-  width: 100%;
   position: relative;
 }
 input:not([type=radio]), select{
   appearance: none;
 }
-input, .placeholder{
-  height: @font-size + 2px;
-  line-height: @font-size + 2px;
-  padding: 22px 0 10px @input-padding/2;
-  box-sizing: content-box;
+.input, .placeholder{
+  width: 100%;
+  height: inherit;
+  line-height: inherit;
+  padding: 22px 0 10px (30px + @input-padding/2);
+  box-sizing: border-box;
 }
-select{
+select.input{
   cursor: pointer;
   padding: 8px 0 8px 38px;
   height: inherit;
@@ -76,7 +76,7 @@ input[disabled]{
 
   .i{
     position: absolute;
-    right: @input-padding;
+    left: @input-padding/2;
     top: 50%;
     margin-top: 2px;
     line-height: 0;
@@ -105,12 +105,20 @@ input[disabled]{
 .double{
   font-size: 0;
   letter-spacing: -4px;
+  margin: 0 @input-padding/2;
   .elem{
     font-size: @font-size;
     letter-spacing: 0;
     display: inline-block;
     width: 50%;
     *float: left;
+    left: -@input-padding/2;
+  }
+  .last{
+    left: @input-padding/2;
+  }
+  .help-text{
+    right: -10px;
   }
 }
 .input-wrap{
@@ -134,19 +142,20 @@ input[disabled]{
   color: #fff;
   pointer-events: none;
   position: absolute;
-  max-width: 90%;
+  max-width: 120%;
   line-height: 16px;
   padding: 8px 12px;
   font-size: 12px;
   background: #555;
-  border-radius: @border-radius;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
   .opacity(0);
   z-index: 2;
   transform: translateY(10px);
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+  @left: 10px;
+  left: -@left;
   bottom: 100%;
-  left: 11px;
+  margin-bottom: -10px;
   &:after {
     content: '';
     position: absolute;
@@ -156,8 +165,8 @@ input[disabled]{
     border-style: solid;
     border-color: #555 transparent transparent transparent;
     bottom: 0;
-    left: 14px;
-    margin: 0 0 -11px -7px;
+    left: (@left + 16.5px);
+    margin: 0 0 -10px -7px;
   }
 }
 .focused.invalid.mature .help-text{
@@ -165,15 +174,6 @@ input[disabled]{
   .opacity(1);
   transform: none;
   transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
-}
-
-.elem-cvv{
-  label{
-    color: #555;
-    position: absolute;
-    right: @input-padding;
-    top: 0;
-  }
 }
 
 input[type=radio]{
