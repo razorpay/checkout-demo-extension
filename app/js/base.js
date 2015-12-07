@@ -23,33 +23,80 @@ function base_set(baseval, override) {
   return baseval;
 }
 
-function base_validateOptions(options) {
+var optionValidations = {
+  key: function(key){
+    if(!key){
+      return '';
+    }
+  },
+
+  notes: function(notes){
+    var errorMessage = '';
+    if(typeof notes === 'object'){
+      var notesCount = 0;
+      each(notes, function() {
+        notesCount++;
+      })
+      if(notesCount > 15) { errorMessage = 'At most 15 notes are allowed' }
+      else { return }
+    }
+    return errorMessage;
+  },
+
+  amount: function(amount){
+    var intAmount = parseInt(amount, 10);
+    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100 || String(intAmount).indexOf('.') !== -1) {
+      var errorMessage = 'should be passed in paise. Minimum value is 100';
+      alert('Invalid amount. It ' + errorMessage);
+      return errorMessage;
+    }
+  },
+
+  display_currency: function(currency){
+    if(currency !== 'USD'){
+      return 'Only USD is supported'
+    }
+  },
+
+  display_amount: function(amount){
+    amount = String(amount).replace(/([^0-9\. ])/g,'');
+    if(!amount){
+      return '';
+    }
+  }
+}
+
+function validateRequiredFields(options){
+  each(
+    ['key', 'amount'],
+    function(index, key){
+      if(!options[key]){
+        throw new Error('No ' + key + ' passed.');
+      }
+    }
+  )
+}
+
+function validateOverrides(options) {
   var errorMessage;
 
-  if (!options.key) {
-    errorMessage = 'key';
+  for(var i in options){
+    var validationFunc = optionValidations[i];
+    if(typeof validationFunc === 'function'){
+      errorMessage = validationFunc(options[i]);
+      if(typeof errorMessage === 'string'){
+        throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
+      }
+    }
   }
-
-  var notesCount = 0;
-  each(options.notes, function() {
-    notesCount++;
-  })
-  if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
-
-  /**
-   * There are some options which are checkout specific only
-   */
-  if( typeof discreet.validateCheckout === 'function' ) {
-    errorMessage = discreet.validateCheckout(options);
-  }
-
-  if( errorMessage ){ throw new Error('Invalid option: ' + errorMessage) }
 }
 
 function base_configure(overrides){
   if( !overrides || typeof overrides !== 'object' ) {
     throw new Error('Invalid options');
   }
+
+  validateOverrides(overrides);
 
   var options = base_set( Razorpay.defaults, overrides );
 
@@ -64,7 +111,6 @@ function base_configure(overrides){
     }
   } catch(e){}
 
-  base_validateOptions( options );
 
   if(typeof overrides.key === 'string' && overrides.key.indexOf('rzp_live_')){
     _uid = null;
@@ -87,6 +133,7 @@ function base_configure(overrides){
 
 Razorpay.prototype.configure = function(overrides){
   this.options = base_configure(overrides);
+  validateRequiredFields(this.options);
   this.modal = {options: {}};
 };
 

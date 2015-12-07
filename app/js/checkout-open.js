@@ -10,7 +10,6 @@ var currentScript = document.currentScript || (function() {
 var ch_backMinHeight = 0;
 var ch_PageY = 0;
 var ch_AbsoluteContainer = /iPhone|Android 2\./.test(ua);
-var isCriOS = /CriOS/.test(ua);
 
 var ch_isOpen,
 ch_CriOS_interval,
@@ -147,8 +146,11 @@ function ch_onClose(){
 }
 
 var ch_sendFrameMessage = function(response){
+  if(isCriOS){
+    return;
+  }
   if(typeof response !== 'string'){
-    response = JSON.stringify(response)
+    response = JSON.stringify(response);
   }
   this.checkoutFrame.contentWindow.postMessage(response, '*');
 }
@@ -257,10 +259,6 @@ var ch_messageHandlers = {
   },
 
   success: function(data){
-    if(ch_backdrop){
-      ch_backdrop.style.background = '';
-    }
-
     if(this.checkoutFrame){
       this.checkoutFrame.setAttribute('removable', true);
     }
@@ -269,6 +267,9 @@ var ch_messageHandlers = {
       setTimeout(function(){
         handler.call(null, data);
       })
+    }
+    if(isCriOS){
+      ch_close.call(this);
     }
   },
 
@@ -490,15 +491,6 @@ Razorpay.prototype.close = function(){
 
 
 discreet.validateCheckout = function(options){
-
-  var amount = parseInt(options.amount, 10);
-  options.amount = String(options.amount);
-  if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
-    var message = 'amount (Minimum amount is ₹ 1)';
-    alert(message);
-    return message;
-  }
-
   if( options.display_currency === 'USD' ){
     options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
     if(!options.display_amount){
