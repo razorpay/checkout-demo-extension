@@ -130,7 +130,7 @@ function clearRequest(){
       popupRequest.popup.close();
     }
   } catch(e){
-    roll('error closing popup: ' + e.message, null, 'warning');
+    roll('error closing popup: ' + e.message, null, 'warn');
   }
 
   popupRequest = null;
