@@ -83,20 +83,30 @@ Popup.prototype = {
     clearInterval(this.interval);
     $(window).off('unload', this.unload);
     $(window).off('beforeunload', this.beforeunload);
-    this.window.close();
+    try{
+      this.window.close();
+    }
+    catch(e){
+      roll('Failure closing popup window', null, 'warn');
+    }
   },
 
 /**
 * Emits the "close" event.
 */
 
-  _checkClose: function () {
-    if ( this.window.closed !== false ) { // UC browser makes it undefined instead of true
-      clearInterval(this.interval);
-      this.close();
-      if(typeof this.onClose === 'function'){
-        this.onClose();
+  _checkClose: function (forceClosed) {
+    try {
+      if (forceClosed || this.window.closed !== false ) { // UC browser makes it undefined instead of true
+        if(typeof this.onClose === 'function'){
+          setTimeout(this.onClose);
+        }
+        this.close();
       }
+    }
+    catch(e){ // UC throws error on accessing window if other domain
+      _checkClose.call(this, true);
+      roll('Failure checking popup close', null, 'warn');
     }
   }
 }
