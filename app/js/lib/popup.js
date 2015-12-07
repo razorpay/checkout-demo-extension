@@ -105,7 +105,7 @@ Popup.prototype = {
       }
     }
     catch(e){ // UC throws error on accessing window if other domain
-      _checkClose.call(this, true);
+      this._checkClose(true);
       roll('Failure checking popup close', null, 'warn');
     }
   }

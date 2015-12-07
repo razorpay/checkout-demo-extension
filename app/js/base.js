@@ -36,11 +36,13 @@ function base_validateOptions(options) {
   })
   if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
 
-  var amount = parseInt(options.amount, 10);
-  options.amount = String(options.amount);
-  if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
-    errorMessage = 'amount (should be passed in paise. Minimum value is 100)';
-    alert('Invalid ' + errorMessage);
+  if('amount' in options){
+    var amount = parseInt(options.amount, 10);
+    options.amount = String(options.amount);
+    if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
+      errorMessage = 'amount (should be passed in paise. Minimum value is 100)';
+      alert('Invalid ' + errorMessage);
+    }
   }
   /**
    * There are some options which are checkout specific only
