@@ -130,15 +130,15 @@ describe("init options validation", function(){
       field = 'notes';
     });
 
-    // it('invalid amount', function(){
-    //   field = 'amount';
-    //   init_options.amount = 99;
-    // })
+    it('invalid amount', function(){
+      field = 'amount';
+      init_options.amount = 99;
+    })
   });
 
   describe("should not return error", function(){
     afterEach(function(){
-      expect(function(){base_validateOptions(init_options, false)}).not.toThrow();
+      expect(function(){validateOverrides(init_options, false)}).not.toThrow();
     });
 
     it("when handler is not defined", function(){

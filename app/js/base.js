@@ -23,41 +23,69 @@ function base_set(baseval, override) {
   return baseval;
 }
 
-function base_validateOptions(options) {
-  var errorMessage;
+var optionValidations = {
+  key: function(key){
+    if(!key){
+      return '';
+    }
+  },
 
-  if (!options.key) {
-    errorMessage = 'key';
-  }
+  notes: function(notes){
+    var errorMessage = '';
+    if(typeof notes === 'object'){
+      var notesCount = 0;
+      each(notes, function() {
+        notesCount++;
+      })
+      if(notesCount > 15) { errorMessage = 'At most 15 notes are allowed' }
+      else { return }
+    }
+    return errorMessage;
+  },
 
-  var notesCount = 0;
-  each(options.notes, function() {
-    notesCount++;
-  })
-  if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
+  amount: function(amount){
+    var intAmount = parseInt(amount, 10);
+    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100 || String(intAmount).indexOf('.') !== -1) {
+      var errorMessage = 'should be passed in paise. Minimum value is 100';
+      alert('Invalid amount. It ' + errorMessage);
+      return errorMessage;
+    }
+  },
 
-  if(discreet.isCheckout || discreet.isFrame){
-    var amount = parseInt(options.amount, 10);
-    options.amount = String(options.amount);
-    if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
-      errorMessage = 'amount (should be passed in paise. Minimum value is 100)';
-      alert('Invalid ' + errorMessage);
+  display_currency: function(currency){
+    if(currency !== 'USD'){
+      return 'Only USD is supported'
+    }
+  },
+
+  display_amount: function(amount){
+    amount = String(amount).replace(/([^0-9\. ])/g,'');
+    if(!amount){
+      return '';
     }
   }
-  /**
-   * There are some options which are checkout specific only
-   */
-  if(!errorMessage && typeof discreet.validateCheckout === 'function' ) {
-    errorMessage = discreet.validateCheckout(options);
-  }
+}
 
-  if( errorMessage ){ throw new Error('Invalid option: ' + errorMessage) }
+function validateOverrides(options) {
+  var errorMessage;
+
+  for(var i in options){
+    var validationFunc = optionValidations[i];
+    if(typeof validationFunc === 'function'){
+      errorMessage = validationFunc(options[i]);
+      if(typeof errorMessage === 'string'){
+        throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
+      }
+    }
+  }
 }
 
 function base_configure(overrides){
   if( !overrides || typeof overrides !== 'object' ) {
     throw new Error('Invalid options');
   }
+
+  validateOverrides(overrides);
 
   var options = base_set( Razorpay.defaults, overrides );
 
@@ -72,7 +100,6 @@ function base_configure(overrides){
     }
   } catch(e){}
 
-  base_validateOptions( options );
 
   if(typeof overrides.key === 'string' && overrides.key.indexOf('rzp_live_')){
     _uid = null;
