@@ -130,10 +130,10 @@ describe("init options validation", function(){
       field = 'notes';
     });
 
-    it('invalid amount', function(){
-      field = 'amount';
-      init_options.amount = 99;
-    })
+    // it('invalid amount', function(){
+    //   field = 'amount';
+    //   init_options.amount = 99;
+    // })
   });
 
   describe("should not return error", function(){

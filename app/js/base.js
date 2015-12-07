@@ -36,7 +36,7 @@ function base_validateOptions(options) {
   })
   if(notesCount > 15) { errorMessage = 'notes (At most 15 notes are allowed)' }
 
-  if('amount' in options){
+  if(discreet.isCheckout || discreet.isFrame){
     var amount = parseInt(options.amount, 10);
     options.amount = String(options.amount);
     if (!amount || typeof amount !== 'number' || amount < 100 || options.amount.indexOf('.') !== -1) {
