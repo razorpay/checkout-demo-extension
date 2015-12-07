@@ -22,18 +22,23 @@ try{
   })
   if(Rollbar) {
     if(location.href.indexOf('api.razorpay.com') < 0) {
-      Rollbar.configure({enabled: false});
+      Rollbar.configure({
+        enabled: false,
+        verbose: true
+      });
     }
     roll = function(message, data, level) {
       if(!level){
         level = 'error';
       }
-      if(data){
-        Rollbar[level](message, data);
-      }
-      else{
-        Rollbar[level](message);
-      }
+      setTimeout(function(){
+        if(data){
+          Rollbar[level](message, data);
+        }
+        else{
+          Rollbar[level](message);
+        }
+      })
     }
   }
 } catch(e){}
