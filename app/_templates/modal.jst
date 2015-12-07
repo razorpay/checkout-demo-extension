@@ -55,13 +55,7 @@
                 <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
               {{?}}
               {{? it.method.wallet.length }}
-                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>
-                  {{ if(it.method.wallet.length == 1){ }}
-                    <img class="wallet-logo" height="{{=it.method.wallet[0].h}}" src="{{=it.method.wallet[0].col}}"/>
-                  {{} else {}}
-                    Wallets
-                  {{}}}
-                </li>
+                <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>Wallet</li>
               {{?}}
             </ul>
             {{? it.method.card }}
@@ -103,13 +97,15 @@
                     <div>{{=it.method.netbanking.error.description}}</div>
                   </div>
                 {{?}}
-                <div id="netb-banks" class="double">
+                <div id="netb-banks">
                   {{for(var b in it.netbanks){}}
-                    <label class="elem">
-                      <input type="radio" name="bank" value="{{=b}}">
-                      <span class="check"></span>
-                      <img src="data:image/png;base64,{{=it.netbanks[b]}}">
-                    </label>
+                    <div class="netb-bank">
+                      <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
+                      <label for="bank-radio-{{=b}}">
+                        <img src="data:image/png;base64,{{=it.netbanks[b].image}}">
+                        {{=it.netbanks[b].title}}
+                      </label>
+                    </div>
                   {{}}}
                 </div>
                 <div id="nb-elem" class="elem select">
@@ -128,8 +124,8 @@
               <div class="fieldset wallets-{{=it.method.wallet.length}} tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
                 <input type="hidden" name="method" value="wallet">
                 {{~it.method.wallet :w:i}}
-                  <label class="elem">
-                    <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
+                  <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
+                  <label for="wallet-radio-{{=i}}">
                     <div class="check"><div class="check-inner"></div></div>
                     {{?it.method.wallet.length==1}}Pay using{{?}}
                     <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>

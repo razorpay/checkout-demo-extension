@@ -189,33 +189,36 @@ input[type=radio]{
   width: 0\9;
   height: 16px;
   margin: 0 6px 0 @input-padding;
-}
-label.elem{
-  white-space: nowrap;
-  cursor: pointer;
-}
-.check{
-  border-radius: 50%;
-  height: 14px;
-  width: 14px;
-  vertical-align: middle;
-  margin: -0 10px 0 14px;
-  display: inline-block;
-  border: 1px solid @primary;
-  transition: 0.2s;
-  box-sizing: border-box;
-  display: none\9;
-}
-input:checked+.check{
-  border-width: 5px;
-  &+img{
-    opacity: 1;
+  &:checked + label{
+    background: #e6e6e6;
   }
 }
+label:hover, input[type=radio]:checked+label{
+  border: 1px solid #ddd;
+  padding: 0 7px;
+}
+#netb-banks{
+  margin: 0 -4px;
+}
 label{
+  cursor: pointer;
+  margin: 6px 2px;
+  padding: 1px 8px;
+  height: 36px;
+  line-height: 36px;
+  display: block;
+  border-radius: 2px;
+}
+.netb-bank{
+  position: relative;
+  cursor: pointer;
+  width: 33.33%;
+  float: left;
+  clear: none;
   img{
     vertical-align: middle;
-    height: 18px;
-    opacity: 0.8;
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
   }
 }
