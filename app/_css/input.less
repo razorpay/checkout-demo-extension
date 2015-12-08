@@ -49,20 +49,22 @@ input, select {
 input:not([type=radio]), select{
   appearance: none;
 }
+
+@input-padding-left: (30+@input-padding/2);
+
 .input, .placeholder{
   width: 100%;
-  height: inherit;
-  line-height: inherit;
-  padding: 22px 0 10px (30px + @input-padding/2);
-  box-sizing: border-box;
+  height: 16px;
+  line-height: 16px;
+  padding: (@input-height - 24px) 0 8px @input-padding-left;
+  box-sizing: content-box;
 }
 select.input{
+  padding-left: @input-padding/2;
   cursor: pointer;
-  padding: 12px 0 0 @input-padding/2;
-  height: inherit;
-  line-height: 16px;
 }
 #nb-elem{
+  margin-right: @input-padding/2;
   i{
     left: auto;
     right: @input-padding/2;
@@ -71,8 +73,8 @@ select.input{
 input[disabled]{
   background: #f4f4f4;
 }
-
 .elem{
+  margin-right: @input-padding-left;
   clear: both;
   height: @input-height;
   line-height: @input-height;
@@ -84,7 +86,7 @@ input[disabled]{
     position: absolute;
     left: @input-padding/2;
     top: 50%;
-    margin-top: 2px;
+    margin-top: 4px;
     line-height: 0;
     font-size: @icon-size;
     color: #999;
@@ -112,7 +114,9 @@ input[disabled]{
   font-size: 0;
   letter-spacing: -4px;
   margin: 0 @input-padding/2;
-  .elem{
+
+  .elem-wrap{
+    position: relative;
     font-size: @font-size;
     letter-spacing: 0;
     display: inline-block;
@@ -124,11 +128,8 @@ input[disabled]{
     left: @input-padding/2;
   }
   .help-text{
-    right: -10px;
+    right: -@input-padding-left;
   }
-}
-.input-wrap{
-  margin: 0 @input-padding 0 @input-padding/2;
 }
 #card_cvv{
   -webkit-text-security: disc;
@@ -148,7 +149,6 @@ input[disabled]{
   color: #fff;
   pointer-events: none;
   position: absolute;
-  max-width: 120%;
   line-height: 16px;
   padding: 8px 12px;
   font-size: 12px;
@@ -158,7 +158,7 @@ input[disabled]{
   z-index: 2;
   transform: translateY(10px);
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
-  @left: 10px;
+  @left: 5px;
   left: -@left;
   bottom: 100%;
   margin-bottom: -10px;

@@ -2,14 +2,25 @@
 
 #fd{
   display: none;
-  .background(rgba(255, 255, 255, 0.9));
+  .background(rgba(0, 0, 0, 0.6));
   position: absolute;
   width: 100%;
   height: 100%;
   z-index: 8;
-  border-radius: inherit;
+  text-align: center;
   &.shown{
     display: block;
+    &:after{
+      content: '';
+      position: absolute;
+      left: @padding;
+      top: -12px;
+      height: 12px;
+      width: 82px;
+      background: inherit;
+      filter: inherit;
+      -ms-filter: inherit;
+    }
   }
   &.loading{
     .spin{
@@ -21,10 +32,11 @@
   }
 }
 #fd-in{
-  display: inline-block;
-  vertical-align: middle;
-  font-size: 16px;
-  letter-spacing: 0.25px;
+  height: 200px;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  background: #fff;
 }
 #fd-t{
   white-space: normal;
@@ -212,7 +224,7 @@ iframe{
   font-size: 20px;
   line-height: 30px;
   cursor: pointer;
-  z-index: 9;
+  z-index: 7;
   &:hover{
     color: #333;
   }
@@ -440,12 +452,12 @@ iframe{
 
 .spin{
   display: none;
-  width:60px;
-  height:60px;
-  margin:0 auto;
-  margin-bottom:-60px;
-  position:relative;
-  top:-50px
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  margin-bottom: -60px;
+  position: relative;
+  top: 20px
 }
 .spin div{
   width: 100%;
@@ -458,8 +470,11 @@ iframe{
   box-sizing:border-box;
   opacity: 0
 }
-#spin2 div{
-  animation-delay: 0.65s;
+#spin2{
+  margin-bottom: 20px;
+  div{
+    animation-delay: 0.65s;
+  }
 }
 @keyframes spin {
   0%{transform:scale(0.5);opacity:0;border-width:8px;}
