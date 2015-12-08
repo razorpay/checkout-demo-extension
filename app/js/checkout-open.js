@@ -1,26 +1,39 @@
 // flag for checkout-js
 discreet.isCheckout = true;
-
 var currentScript = document.currentScript || (function() {
   var scripts = document.getElementsByTagName('script');
   return scripts[scripts.length - 1];
 })();
 
-// place ch_frameContainer absolute, and add window.onscroll
-var ch_backMinHeight = 0;
-var ch_PageY = 0;
-var ch_AbsoluteContainer = /iPhone|Android 2\./.test(ua);
-
 var ch_isOpen,
 ch_CriOS_interval,
 ch_CriOS_listener,
 ch_CriOS_frame,
-ch_bodyEl,
 ch_frameContainer,
 ch_backdrop,
 ch_metaViewportTag,
-ch_metaViewport,
-ch_bodyOverflow;
+ch_metaViewport;
+
+// there is no "position: fixed" in iphone
+var shouldFixFixed = /iPhone OS 4|Android 2\./.test(ua);
+var docStyle = document.documentElement.style;
+var merchantMarkup = {
+
+  _: {
+    meta: null,
+    body: null,
+    overflow: ''
+  },
+
+  reset: function() {
+    docStyle.overflow = this._.overflow;
+  },
+
+  clear: function() {
+    this._.overflow = docStyle.overflow;
+    docStyle.overflow = 'hidden';
+  }
+}
 
 discreet.setCommunicator = function(opts){
   if(!isCriOS){
@@ -35,50 +48,12 @@ discreet.setCommunicator = function(opts){
 }
 discreet.setCommunicator(Razorpay.defaults);
 
-function ch_fallbacks(){
-
-  if(/iPhone.+Version\/4\./.test(ua) && typeof document.height === 'number'){
-    ch_backMinHeight = document.height;
-  }
-
-  if(ch_AbsoluteContainer && window.addEventListener){
-    window.addEventListener('orientationchange', function(){
-      if(ch_frameContainer){
-        ch_frameContainer.style.height = Math.max(innerHeight, 455) + 'px';
-      }
-    })
-    window.addEventListener('scroll', function(){
-      var c = ch_frameContainer;
-      if(!c || !ch_isOpen || typeof window.pageYOffset !== 'number'){
-        return;
-      }
-      var top;
-      var offTop = c.offsetTop - pageYOffset;
-      var offBot = c.offsetHeight + offTop;
-      if(ch_PageY < pageYOffset){
-        if(offBot < 0.2*innerHeight && offTop < 0){
-          top = pageYOffset + innerHeight - c.offsetHeight;
-        }
-      }
-      else if(ch_PageY > pageYOffset){
-        if(offTop > 0.1*innerHeight && offBot > innerHeight){
-          top = pageYOffset;
-        }
-      }
-      if(typeof top === 'number'){
-        c.style.top = Math.max(0, top) + 'px';
-      }
-      ch_PageY = pageYOffset;
-    })
-  }
-}
-
 function ch_createFrame(src, tagName){
   var frame = document.createElement(tagName);
 
   var attrs = {
     'class': 'razorpay-checkout-frame', // quotes needed for ie
-    style: 'position: absolute; height: 100%; background: none; display: block; border: 0 none transparent; overflow: hidden; visibility: visible; margin: 0px; padding: 0px; left: 0px; top: 0px;',
+    style: 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
     allowtransparency: true,
     frameborder: 0,
     width: '100%',
@@ -107,7 +82,7 @@ function ch_onClose(){
   }
   $.removeMessageListener();
   ch_isOpen = false;
-  ch_bodyEl.style.overflow = ch_bodyOverflow;
+  merchantMarkup.reset();
 
   if(ch_metaViewportTag && ch_metaViewportTag.parentNode){
     ch_metaViewportTag.parentNode.removeChild(ch_metaViewportTag);
@@ -387,31 +362,31 @@ function ch_automaticCheckoutInit(){
 }
 
 function ch_createFrameContainer(){
+  var formHeight = Math.max(innerHeight, 487) + 'px';
   if(!ch_frameContainer){
-    ch_fallbacks();
     ch_frameContainer = document.createElement('div');
     ch_frameContainer.className = 'razorpay-frame-container';
     var style = ch_frameContainer.style;
     var rules = {
       zIndex: '99999',
-      position: (ch_AbsoluteContainer ? 'absolute' : 'fixed'),
-      top: (ch_AbsoluteContainer ? pageYOffset+'px' : '0'),
-      height: (ch_AbsoluteContainer ? Math.max(innerHeight, 455)+'px' : '100%'),
-      left: '0',
-      width: '100%',
-      '-webkit-transition': '0.2s ease-out top'
+      position: 'fixed',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      '-webkit-transition': '0.2s ease-out top',
+      '-webkit-overflow-scrolling': 'touch',
+      'overflow-y': 'scroll'
     }
     each(rules, function(i, rule) {
       style[i] = rule;
     })
     ch_backdrop = document.createElement('div');
-    ch_backdrop.setAttribute('style', 'min-height: '+ ch_backMinHeight+'px; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
+    ch_backdrop.setAttribute('style', 'min-height: 100%; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
     ch_frameContainer.appendChild(ch_backdrop);
-    ch_bodyEl.appendChild(ch_frameContainer);
+    merchantMarkup._.body.appendChild(ch_frameContainer);
   }
-  if(!ch_AbsoluteContainer){
-    ch_bodyEl.style.overflow = 'hidden';
-  }
+
   ch_frameContainer.style.display = 'block';
   try{
     // setting unsupported value throws error in IE
@@ -425,12 +400,12 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  if(!ch_bodyEl){
-    ch_bodyEl = document.getElementsByTagName('body')[0];
+  if(!merchantMarkup._.body){
+    merchantMarkup._.body = document.getElementsByTagName('body')[0];
   }
 
-  if(!ch_bodyEl){
-    setTimeout(this.open(), 100);
+  if(!merchantMarkup._.body){
+    setTimeout(this.open, 100);
   }
 
   if(ch_isOpen){
@@ -438,7 +413,7 @@ Razorpay.prototype.open = function() {
   }
   ch_isOpen = true;
 
-  ch_bodyOverflow = ch_bodyEl.style.overflow;
+  merchantMarkup.clear();
   $.addMessageListener(ch_onFrameMessage, this);
 
   ch_createFrameContainer();
