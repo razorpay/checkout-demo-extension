@@ -147,7 +147,7 @@ iframe{
   *top: 10%;
 }
 .modal-content{
-  min-height: 487px;
+  min-height: 470px;
 }
 .modal-inner{
   position: relative;
@@ -164,7 +164,7 @@ iframe{
 .header{
   border-radius: @border-radius @border-radius 0 0;
   position: relative;
-  padding: 20px @padding;
+  padding: 12px @padding;
   height: 48px;
   text-align: left;
 }
@@ -178,9 +178,8 @@ iframe{
   display: block;
   width: 56px;
   padding: 12px;
-  border-radius: @border-radius;
   border: 1px solid @border-color;
-  margin: -24px @padding @padding 0;
+  margin: -24px 16px 6px 0;
   background: #fff;
 }
 .merchant-image img{
@@ -196,12 +195,11 @@ iframe{
   font-size: 18px;
   line-height: 22px;
   color: #555;
-  text-transform: uppercase;
 }
 .merchant-title + .merchant-desc{
   font-size: 14px;
   line-height: 17px;
-  color: #777;
+  color: #999;
   text-transform: none;
   margin-top: 5px;
   max-height: 34px;
@@ -322,6 +320,9 @@ iframe{
 .tab-content.active{
   display: block;
 }
+#tab-wallet{
+  padding-top: 10px;
+}
 
 @inner: @width - 2*@padding;
 
@@ -330,18 +331,18 @@ iframe{
   font-size: 0;
   letter-spacing: -4px;
   white-space: nowrap;
-  display: none;
+  display: block;
   -webkit-tap-highlight-color: transparent;
-  margin: 0 0 14px;
+  position: relative;
+  margin: 0 0 6px;
   *margin-bottom: 0; // ie7
 
-  &.tabs-2{
-    display: block;
+  &.tabs-1{
+    display: none;
   }
 
   &.tabs-3{
-    display: block;
-    li{
+    li, #tab-bar{
       width: 33.33%;
     }
   }
@@ -349,8 +350,8 @@ iframe{
   li{
     *float: left; // <ie7
     list-style: none;
-    height: 42px;
-    line-height: 44px;
+    height: 46px;
+    line-height: 48px;
     margin: 0;
     text-align: center;
     width: 50%;
@@ -361,7 +362,6 @@ iframe{
     vertical-align: top;
     position: relative;
     border-bottom: 1px solid @border-color;
-    padding-bottom: 2px;
 
     &:hover{
       color: #333;
@@ -369,39 +369,36 @@ iframe{
     
     &.active{
       color: #222;
-      border-bottom: 3px solid @primary;
-      padding: 0;
       cursor: default;
       pointer-events: none;
-      z-index: 1;
+      &~#tab-bar{
+        left: 0;
+      }
+      &+#tab-bar{
+        left: 33.33%;
+      }
+    }
+  }
+
+  &.tabs-2{
+    #tab-bar{
+      left: 50%!important;
+    }
+    li.active:first-child{
+      &~#tab-bar{
+        left: 0!important;
+      }
     }
   }
 }
-
-.wallet-radio{
-  display: none;
-}
-.wallets-2{
-  .wallet-radio{
-    width: 50%;
-  }
-}
-.wallet-logo{
-  vertical-align: middle;
-  position: relative;
-  top: -1px;
-}
-
-#method-wallet-tab{
-  img{
-    filter: grayscale(1) opacity(0.7);
-    transition: 0.25s;
-  }
-  &:hover, &.active{
-    img{
-      filter: none;
-    }
-  }
+#tab-bar{
+  width: 50%;
+  position: absolute;
+  left: 66.66%;
+  bottom: 0;
+  background: @primary;
+  height: 3px;
+  transition: 0.3s;
 }
 #form{
   margin: 0;
@@ -440,15 +437,7 @@ iframe{
     }
   }
 }
-#tab-wallet{
-  img{
-    height: 20px;
-    margin: -2px 0 0 6px;
-  }
-  .check{
-    margin-right: 14px;
-  }
-}
+
 .spin{
   display: none;
   width:60px;

@@ -362,7 +362,7 @@ function ch_automaticCheckoutInit(){
 }
 
 function ch_createFrameContainer(){
-  var formHeight = Math.max(innerHeight, 487) + 'px';
+  // var formHeight = Math.max(innerHeight, 487) + 'px';
   if(!ch_frameContainer){
     ch_frameContainer = document.createElement('div');
     ch_frameContainer.className = 'razorpay-frame-container';
@@ -375,8 +375,8 @@ function ch_createFrameContainer(){
       bottom: 0,
       left: 0,
       '-webkit-transition': '0.2s ease-out top',
-      '-webkit-overflow-scrolling': 'touch',
-      'overflow-y': 'scroll'
+      '-webkit-overflow-scrolling': 'touch'
+      // 'overflow-y': 'scroll'
     }
     each(rules, function(i, rule) {
       style[i] = rule;

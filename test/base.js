@@ -125,11 +125,15 @@ describe('configure', function(){
   it('display_amount', function(){
     expect(function(){
       Razorpay.configure({display_amount: ''})
-    }).toThrow();
+    }).not.toThrow();
 
     expect(function(){
       Razorpay.configure({display_amount: '3'})
     }).not.toThrow();
+
+    expect(function(){
+      Razorpay.configure({display_amount: ''})
+    }).toThrow();
   })
 })
 

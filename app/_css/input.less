@@ -58,9 +58,15 @@ input:not([type=radio]), select{
 }
 select.input{
   cursor: pointer;
-  padding: 8px 0 8px 38px;
+  padding: 12px 0 0 @input-padding/2;
   height: inherit;
-  line-height: @input-height/2;
+  line-height: 16px;
+}
+#nb-elem{
+  i{
+    left: auto;
+    right: @input-padding/2;
+  }
 }
 input[disabled]{
   background: #f4f4f4;
@@ -193,7 +199,7 @@ input[type=radio]{
     background: #e6e6e6;
   }
 }
-label:hover, input[type=radio]:checked+label{
+label:hover, input[type=radio]:checked + label{
   border: 1px solid #ddd;
   padding: 0 7px;
 }
@@ -220,5 +226,35 @@ label{
     width: 20px;
     height: 20px;
     margin-right: 6px;
+  }
+}
+
+#tab-wallet{
+  label{
+    margin-left: 0;
+    margin-right: 0;
+    height: 38px;
+    line-height: 34px;
+    &:before{
+      content: '';
+      display: inline-block;
+      width: 8px;
+    }
+  }
+  img{
+    vertical-align: middle;
+  }
+  &.wallets-1{
+    text-align: center;
+    label{
+      padding-left: 0;
+      width: 50%;
+      margin: 25px auto 0;
+    }
+    &:after{
+      content: 'More wallets coming soon';
+      display: block;
+      margin-top: 14px;
+    }
   }
 }

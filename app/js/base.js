@@ -53,14 +53,14 @@ var optionValidations = {
   },
 
   display_currency: function(currency){
-    if(currency !== 'USD'){
+    if(currency !== 'USD' && currency !== Razorpay.defaults.display_currency){
       return 'Only USD is supported'
     }
   },
 
   display_amount: function(amount){
     amount = String(amount).replace(/([^0-9\. ])/g,'');
-    if(!amount){
+    if(!amount && amount !== Razorpay.defaults.display_amount){
       return '';
     }
   }
