@@ -5,7 +5,7 @@
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
-  var shim_placeholder = document.createElement("input").placeholder === undefined;
+  var shim_placeholder = document.createElement('input').placeholder === undefined;
 
   var detectSupport = function(){
     var div = document.createElement('div');
@@ -108,14 +108,11 @@
     refresh: function(callback){
       var self = this;
       each(
-        this.parent[0].getElementsByTagName('p'),
+        $(this.parent[0]).find('input'),
         function(i, el){
-          var child = $(el).children('input')[0];
-          if(child){
-            self.update(child);
-            if(callback){
-              callback(child);
-            }
+          self.update(el);
+          if(callback){
+            callback(el);
           }
         }
       )

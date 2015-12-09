@@ -45,7 +45,115 @@ describe("new Razorpay", function(){
   });
 })
 
-describe("configure method", function(){
+describe('configure', function(){
+  var def = Razorpay.defaults;
+
+  afterEach(function(){
+    Razorpay.defaults = def;
+  })
+
+  it('required fields', function(){
+    expect(function(){
+      Razorpay.configure()
+    }).toThrow();
+
+    expect(function(){
+      Razorpay.configure({})
+    }).not.toThrow();
+
+    expect(function(){
+      Razorpay.configure({key: ''})
+    }).toThrow();
+
+    expect(Razorpay.defaults.key).toBe('');
+    expect(function(){
+      Razorpay.configure({key: 'key_id'})
+    }).not.toThrow();
+    expect(Razorpay.defaults.key).toBe('key_id');
+
+    Razorpay.configure({amount: 1000})
+    expect(Razorpay.defaults.amount).toBe('1000');
+    expect(Razorpay.defaults.key).toBe('key_id');
+  })
+
+  it('low amount', function(){
+    expect(function(){
+      Razorpay.configure({amount: 1})
+    }).toThrow();
+  })
+
+  it('NaN amount', function(){
+    expect(function(){
+      Razorpay.configure({amount: 'qwer'})
+    }).toThrow();
+  })
+
+  it('decimal amount', function(){
+    expect(function(){
+      Razorpay.configure({amount: 20.5})
+    }).toThrow();
+  })
+
+  it('notes', function(){
+    var notesObject = {};
+    for(var i = 0; i < 20; i ++){
+      notesObject[i] = i;
+    }
+    expect(function(){
+      Razorpay.configure({notes: notesObject})
+    }).toThrow();
+
+    expect(function(){
+      Razorpay.configure({notes: 2})
+    }).toThrow();
+
+    expect(function(){
+      Razorpay.configure({notes: {a: 2}})
+    }).not.toThrow();
+  })
+
+  it('display_currency', function(){
+    expect(function(){
+      Razorpay.configure({display_currency: 'YEN'})
+    }).toThrow();
+
+    expect(function(){
+      Razorpay.configure({display_currency: 'USD'})
+    }).not.toThrow();
+  })
+
+  it('display_amount', function(){
+    expect(function(){
+      Razorpay.configure({display_amount: ''})
+    }).not.toThrow();
+
+    expect(function(){
+      Razorpay.configure({display_amount: '3'})
+    }).not.toThrow();
+
+    expect(function(){
+      Razorpay.configure({display_amount: ''})
+    }).toThrow();
+  })
+})
+
+describe('new Razorpay', function(){
+  it('should fail if required options are not present', function(){
+    expect(function(){
+      new Razorpay({key: '12'})
+    }).toThrow();
+
+    expect(function(){
+      new Razorpay({amount: '122'})
+    }).toThrow();
+
+    expect(function(){
+      new Razorpay({key: '12', amount: '122'})
+    }).not.toThrow();
+  })
+})
+
+describe('Razorpay new instance', function(){
   var co;
   var custom = jQuery.extend(true, {}, optionsExtended);
   custom.unwanted = 'fake';
@@ -54,7 +162,7 @@ describe("configure method", function(){
     co = new Razorpay(custom);
   });
 
-  it("should override default options", function(){
+  it('should override default options', function(){
     expect(co.options.key).toBe(optionsExtended.key);
     expect(co.options.amount).toBe(optionsExtended.amount);
     expect(co.options.currency).toBe(optionsExtended.currency);
@@ -72,7 +180,7 @@ describe("configure method", function(){
     expect(co.options.handler).toBe(optionsExtended.handler);
   });
 
-  it("should not set unknown option", function(){
+  it('should not set unknown option', function(){
     expect(co.options.unwanted).toBeUndefined();
   });
 
@@ -130,15 +238,15 @@ describe("init options validation", function(){
       field = 'notes';
     });
 
-    // it('invalid amount', function(){
-    //   field = 'amount';
-    //   init_options.amount = 99;
-    // })
+    it('invalid amount', function(){
+      field = 'amount';
+      init_options.amount = 99;
+    })
   });
 
   describe("should not return error", function(){
     afterEach(function(){
-      expect(function(){base_validateOptions(init_options, false)}).not.toThrow();
+      expect(function(){validateOverrides(init_options, false)}).not.toThrow();
     });
 
     it("when handler is not defined", function(){

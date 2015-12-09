@@ -246,10 +246,6 @@ describe("ch_onFrameMessage", function(){
   })
 })
 
-/**
- * validateOptions method in Razorpay calls validateCheckout
- * which tests Checkout specific options only
- */
 describe("checkout validate", function(){
   var init_options, errors, field;
 })
