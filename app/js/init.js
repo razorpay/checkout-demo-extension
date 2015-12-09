@@ -39,6 +39,7 @@ Razorpay.defaults = {
 
   // checkout fields, not needed for razorpay alone
   'display_currency': '',
+  'display_amount': '',
 
   'method': {
     'netbanking': null,
@@ -66,7 +67,6 @@ Razorpay.defaults = {
     'color': '#00BCD4'
   },
   'signature': '',
-  'display_amount': '',
   'name': '', // of merchant
   'image': ''
 };

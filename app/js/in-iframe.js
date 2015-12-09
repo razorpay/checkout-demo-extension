@@ -62,8 +62,10 @@ var freqWallets = {
 var _smarty, _modal, _$el;
 
 function frontDrop(message, className) {
-  $('fd-t')[0].innerHTML = message || '';
-  $('fd')[0].className = className || '';
+  if(!popupRequest){
+    $('fd-t')[0].innerHTML = message || '';
+    $('fd')[0].className = className || '';
+  }
 }
 
 function shakeModal() {
@@ -301,10 +303,11 @@ var frameDiscreet = {
 
     $('fd').on('click', function(e){
       var id = e.target.id;
-      if((id === 'fd' || id === 'fd-hide') && !popupRequest) {
+      if(id === 'fd' || id === 'fd-hide') {
         frontDrop();
       }
     });
+    $('modal-backdrop').on('click', frontDrop);
 
     if(qpmap.tab){
       each(

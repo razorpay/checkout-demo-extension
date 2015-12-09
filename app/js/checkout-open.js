@@ -14,8 +14,8 @@ ch_backdrop,
 ch_metaViewportTag,
 ch_metaViewport;
 
-// there is no "position: fixed" in iphone
 var shouldFixFixed = /iPhone OS 4|Android 2\./.test(ua);
+// there is no "position: fixed" in iphone
 var docStyle = document.documentElement.style;
 var merchantMarkup = {
 
@@ -63,6 +63,11 @@ function ch_createFrame(src, tagName){
   each(attrs, function(i, attr){
     frame.setAttribute(i, attr);
   })
+
+  if(shouldFixFixed){
+    frame.style.height = '480px';
+  }
+
   return frame;
 }
 
@@ -369,14 +374,14 @@ function ch_createFrameContainer(){
     var style = ch_frameContainer.style;
     var rules = {
       zIndex: '99999',
-      position: 'fixed',
+      position: shouldFixFixed ? 'absolute' : 'fixed',
       top: 0,
-      right: 0,
-      bottom: 0,
       left: 0,
+      height: '100%',
+      width: '100%',
       '-webkit-transition': '0.2s ease-out top',
-      '-webkit-overflow-scrolling': 'touch'
-      // 'overflow-y': 'scroll'
+      '-webkit-overflow-scrolling': 'touch',
+      '-webkit-backface-visibility': 'hidden'
     }
     each(rules, function(i, rule) {
       style[i] = rule;

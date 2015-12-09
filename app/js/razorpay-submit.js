@@ -259,7 +259,7 @@ Razorpay.payment = {
 
     var url = discreet.makeUrl(options) + '/payments/create/checkout';
 
-    if(options.redirect){
+    if(options.redirect || options.callback_url){
       submitFormData(url, rdata, 'post');
       return false;
     }
