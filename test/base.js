@@ -23,7 +23,9 @@ var optionsExtended = {
     'contact': '9999999999'
   },
   notes: {
-    'address': 'Hello World'
+    'address': 'Hello World',
+    'intKey': 22,
+    'boolKey': true
   },
   method: {
     wallet: false
@@ -202,6 +204,22 @@ describe('Razorpay new instance', function(){
     expect(co.options.signature).toBe('');
   })
 });
+
+describe('new Razorpay should', function(){
+  var rzp = new Razorpay({
+    key: '123',
+    amount: '123',
+    notes: {
+      key1: 2,
+      key2: []
+    }
+  })
+
+  it('reject object notes', function(){
+    expect(rzp.options.notes.key1).toBe(2);
+    expect('key2' in rzp.options.notes).toBe(false);
+  })
+})
 
 describe("init options validation", function(){
   var init_options, field;
