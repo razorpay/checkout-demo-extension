@@ -307,7 +307,7 @@ var frameDiscreet = {
         frontDrop();
       }
     });
-    $('modal-backdrop').on('click', frontDrop);
+    $('backdrop').on('click', frontDrop);
 
     if(qpmap.tab){
       each(

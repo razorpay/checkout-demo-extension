@@ -14,7 +14,7 @@ ch_backdrop,
 ch_metaViewportTag,
 ch_metaViewport;
 
-var shouldFixFixed = /iPhone OS 4|Android 2\./.test(ua);
+var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 // there is no "position: fixed" in iphone
 var docStyle = document.documentElement.style;
 var merchantMarkup = {
@@ -32,6 +32,10 @@ var merchantMarkup = {
   clear: function() {
     this._.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
+
+    if(shouldFixFixed){
+      scrollTo(0, 0);
+    }
   }
 }
 
@@ -381,7 +385,8 @@ function ch_createFrameContainer(){
       width: '100%',
       '-webkit-transition': '0.2s ease-out top',
       '-webkit-overflow-scrolling': 'touch',
-      '-webkit-backface-visibility': 'hidden'
+      '-webkit-backface-visibility': 'hidden',
+      'overflow-y': 'visible'
     }
     each(rules, function(i, rule) {
       style[i] = rule;
