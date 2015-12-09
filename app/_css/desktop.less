@@ -152,10 +152,6 @@ iframe{
   width: @width;
   font-family: @font-default;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
-
-  // ie7 and below, middlefix doesn't work.
-  // NOTE: it isn't because of lack of :after, but buggy white-space support
-  *top: 10%;
 }
 .modal-content{
   min-height: 470px;
@@ -346,7 +342,6 @@ iframe{
   -webkit-tap-highlight-color: transparent;
   position: relative;
   margin: 0 0 6px;
-  *margin-bottom: 0; // ie7
 
   &.tabs-1{
     display: none;
@@ -359,9 +354,8 @@ iframe{
   }
 
   li{
-    *float: left; // <ie7
     list-style: none;
-    height: 46px;
+    height: 48px;
     line-height: 48px;
     margin: 0;
     text-align: center;

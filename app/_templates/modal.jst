@@ -85,6 +85,14 @@
                     <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="4" required pattern="[0-9]*">
                   </div></div>
                 </div>
+                <div class="double elem-emi">
+                  <div class="elem-wrap first">
+                    EMI Available
+                  </div>
+                  <label class="elem-wrap last" for="emi">
+                    Pay with EMI <input type="checkbox" id="emi">
+                  </label>
+                </div>
                 <label class="elem" for="cardsave" style="display: none">
                   <input type="checkbox" id="cardsave"> Remember Me
                 </label>
@@ -102,7 +110,7 @@
                   {{for(var b in it.netbanks){}}
                     <div class="netb-bank">
                       <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
-                      <label for="bank-radio-{{=b}}">
+                      <label for="bank-radio-{{=b}}" class="radio-label">
                         <img src="data:image/png;base64,{{=it.netbanks[b].image}}">
                         {{=it.netbanks[b].title}}
                       </label>
@@ -126,7 +134,7 @@
                 <input type="hidden" name="method" value="wallet">
                 {{~it.method.wallet :w:i}}
                   <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
-                  <label for="wallet-radio-{{=i}}">
+                  <label for="wallet-radio-{{=i}}" class="radio-label">
                     <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
                   </label>
                 {{~}}

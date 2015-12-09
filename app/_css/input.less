@@ -31,7 +31,7 @@ button{
     height: 100%;
     transition: 0.2s;
     opacity: 0;
-    background: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
+    background: linear-gradient(transparent, rgba(0,0,0,.05) 40%, rgba(0,0,0,.1));
   }
   &:hover:after{
     opacity: 1;
@@ -46,8 +46,15 @@ input, select {
   resize: none;
   position: relative;
 }
-input:not([type=radio]), select{
+input, select{
   appearance: none;
+}
+input[type=checkbox]{
+  appearance: checkbox;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+  top: -1px;
 }
 
 @input-padding-left: (30+@input-padding/2);
@@ -199,14 +206,14 @@ input[type=radio]{
     background: #e6e6e6;
   }
 }
-label:hover, input[type=radio]:checked + label{
+.radio-label:hover, input[type=radio]:checked + label{
   border: 1px solid #ddd;
   padding: 0 7px;
 }
 #netb-banks{
   margin: 0 -4px;
 }
-label{
+.radio-label{
   cursor: pointer;
   margin: 12px 3px 0;
   padding: 1px 8px;
@@ -255,6 +262,42 @@ label{
       content: 'More wallets coming soon';
       display: block;
       margin-top: 14px;
+    }
+  }
+}
+
+.elem-emi{
+  overflow: hidden;
+  height: 0;
+  transition: 0.3s;
+  margin-top: 0;
+
+  &.shown{
+    margin-top: 18px;
+    height: 20px;
+  }
+
+  .elem-wrap{
+    cursor: pointer;
+    &:before{
+      display: inline-block;
+      content: '';
+      width: @input-padding/2;
+    }
+  }
+  .first{
+    &:after{
+      border-radius: 50%;
+      content: '?';
+      color: #fff;
+      background: #616161;
+      display: inline-block;
+      height: 14px;
+      line-height: 14px;
+      width: 14px;
+      font-size: 12px;
+      text-align: center;
+      margin-left: 4px;
     }
   }
 }
