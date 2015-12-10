@@ -276,15 +276,19 @@ var frameDiscreet = {
     frameDiscreet.applyFont($('powered-link')[0]);
     _modal = frameDiscreet.createModal($('modal')[0], opts.modal);
 
-    // if(opts.amount >= 100*5000 && opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+    if(opts.amount >= 100*5000 && opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
       $('emi-wrap')[0].innerHTML = templates.emi();
       $('emi-close').on('click', frontDrop);
-      $('elem-emi').addClass('shown').on('click', function(){
-        $('emi-container').addClass('shown');
-        $('fd').addClass('shown');
-        $('fd-in')[0].style.display = 'none';
-      })
-    // }
+      var elem_emi = $('elem-emi');
+      if(elem_emi[0]){
+        elem_emi.addClass('shown').on('click', function(){
+          $('emi-container').addClass('shown');
+          $('fd').addClass('shown');
+          $('fd-in')[0].style.display = 'none';
+        })
+      }
+      $('methods-specific-fields').children('mchild')[0].style.minHeight = '276px';
+    }
 
     if($('nb-na')[0]) {
       $('nb-elem').css('display', 'none');
