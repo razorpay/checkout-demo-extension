@@ -29,10 +29,10 @@
         <div id="body">
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              {{for(var note in it.notes){}}
-                <input type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
-              {{}}}
               <div id="form-common" class="mfix">
+                {{for(var note in it.notes){}}
+                  <input type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
+                {{}}}
                 <div class="fieldset mchild">
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
