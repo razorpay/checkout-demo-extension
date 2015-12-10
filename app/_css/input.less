@@ -198,13 +198,9 @@ input[type=radio]{
   padding: 0;
   display: inline-block;
   vertical-align: middle;
-  position: static\9;
-  width: 0\9;
-  height: 16px;
-  margin: 0 6px 0 @input-padding;
-  &:checked + label{
-    // background: #e6e6e6;
-  }
+  width: 0;
+  height: 0;
+  margin: 0;
 }
 .radio-label:hover, input[type=radio]:checked + label{
   border: 1px solid @primary;
@@ -213,6 +209,7 @@ input[type=radio]{
 }
 #netb-banks{
   margin: 0 -4px;
+  font-size: 0;
 }
 .radio-label{
   cursor: pointer;
@@ -229,6 +226,7 @@ input[type=radio]{
   width: 33.33%;
   float: left;
   clear: none;
+  font-size: 14px;
   img{
     vertical-align: middle;
     width: 20px;
