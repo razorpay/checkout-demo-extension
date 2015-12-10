@@ -227,7 +227,7 @@ var frameDiscreet = {
 
   showModal: function() {
     frameDiscreet.renew();
-    
+
     if(_modal){
       return _modal.show();
     }
@@ -240,6 +240,10 @@ var frameDiscreet = {
 
     frameDiscreet.setMethods(window.payment_methods, opts.method);
     frameDiscreet.sanitizeOptions(opts);
+
+    if(opts.amount >= 100*5000){
+      opts.method.emi = window.payment_methods.emi || true;
+    }
 
     var div = document.createElement('div');
     opts.netbanks = freqBanks;
