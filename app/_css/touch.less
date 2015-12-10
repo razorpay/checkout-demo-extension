@@ -100,5 +100,17 @@
     margin: 0 -@padding;
   }
 }
-@media(max-device-width: 450px){
+.ip{
+  #form-fields{
+    position: static;
+  }
+  #methods-specific-fields, #form-common{
+    height: auto;
+    &:after{
+      content: none;
+    }
+  }
+  #modal-content{
+    min-height: 470px;
+  }
 }
