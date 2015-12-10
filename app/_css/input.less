@@ -258,8 +258,10 @@ input[type=radio]{
   img{
     vertical-align: middle;
   }
-  input:checked+label{
+  input:checked+label, label:hover{
     padding: 0 15px;
+  }
+  input:checked+label{
     &:after{
       content: '✓';
     }

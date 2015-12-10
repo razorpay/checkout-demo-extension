@@ -294,6 +294,10 @@ var frameDiscreet = {
       $('nb-elem').css('display', 'none');
     }
 
+    if(!opts.image){
+      $('modal-inner').addClass('noimage');
+    }
+
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
     $('modal-close').on('click', function(){
