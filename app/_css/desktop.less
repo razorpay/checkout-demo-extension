@@ -16,7 +16,7 @@
       left: @padding;
       top: -12px;
       height: 12px;
-      width: 82px;
+      width: 86px;
       background: inherit;
       filter: inherit;
       -ms-filter: inherit;
@@ -32,7 +32,8 @@
   }
 }
 #fd-in{
-  height: 160px;
+  height: 180px;
+  padding-top: 20px;
   bottom: 0;
   position: absolute;
   width: 100%;
@@ -49,7 +50,12 @@
   padding: 0 18px;
 }
 .mfix{
-  .middlefix();
+  .mfix();
+}
+.mchild{
+  vertical-align: middle;
+  display: inline-block;
+  white-space: normal;
 }
 a{
   color: inherit;
@@ -109,7 +115,7 @@ iframe{
     #powered-by{
       opacity: 1;
     }
-    .modal{
+    #modal{
       opacity: 1;
       transform: none;
       transition: 0.25s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
@@ -117,7 +123,7 @@ iframe{
   }
 }
 .font-loaded{
-  .modal, button, input, select {
+  #modal, button, input, select {
     font-family: @font-family;
     font-feature-settings: "liga" 0;
   }
@@ -132,13 +138,10 @@ iframe{
     display: none;
   }
 }
-.modal{
+#modal{
   perspective: 300;
   outline: none;
   position: relative;
-  vertical-align: middle;
-  display: inline-block;
-  white-space: normal;
   margin: 20px 0;
   opacity: 0;
   transform: scale(0.9);
@@ -153,25 +156,22 @@ iframe{
   font-family: @font-default;
   box-shadow: 0 0 6px 0px rgba(0,0,0, 0.15);
 }
-.modal-content{
+#modal-content{
   min-height: 470px;
+  padding: 0 @padding;
 }
-.modal-inner{
+#modal-inner{
   position: relative;
-  border-radius: @border-radius;
+  // border-radius: @border-radius;
   background: @background-color;
   &.anim{
     transition: 0.15s ease-out;
   }
 }
-.fieldset{
-  margin: 0 0 16px;
-}
 /* Default class for an overlay */
-.header{
-  border-radius: @border-radius @border-radius 0 0;
-  position: relative;
-  padding: 12px @padding;
+#header{
+  // border-radius: @border-radius @border-radius 0 0;
+  padding-top: 12px;
   height: 48px;
   text-align: left;
 }
@@ -181,12 +181,12 @@ iframe{
 }
 .merchant-image{
   float: left;
-  height: 56px;
+  height: @logo-size - 24px;
+  width: @logo-size - 24px;
   display: block;
-  width: 56px;
   padding: 12px;
   border: 1px solid @border-color;
-  margin: -24px 16px 6px 0;
+  margin: -24px 16px 0 0;
   background: #fff;
 }
 .merchant-image img{
@@ -215,11 +215,12 @@ iframe{
   position: absolute;
   right: 0;
   top: 0;
-  width: 20px;
-  font-size: 20px;
+  width: 36px;
+  font-size: 24px;
   line-height: 30px;
   cursor: pointer;
   z-index: 7;
+  text-align: center;
   &:hover{
     color: #333;
   }
@@ -230,9 +231,9 @@ iframe{
 .clear{
   clear:both;
 }
-.body{
+#body{
   text-align: left;
-  padding: 3px @padding;
+  padding: 3px 0;
   clear: both;
 }
 .nocvv{
@@ -288,9 +289,8 @@ iframe{
   font-size: 18px;
   padding: 0;
   margin: 0;
-  border-radius: 0 0 @border-radius @border-radius;
-  line-height: 54px;
-  box-shadow: 0 0 2px rgba(0,0,0,0.4) inset;
+  // border-radius: 0 0 @border-radius @border-radius;
+  line-height: @submit-height;
   width: 100%;
 }
 #error-message{
@@ -328,7 +328,7 @@ iframe{
   display: block;
 }
 #tab-wallet{
-  padding-top: 10px;
+  padding-top: 4px;
 }
 
 @inner: @width - 2*@padding;
@@ -341,7 +341,7 @@ iframe{
   display: block;
   -webkit-tap-highlight-color: transparent;
   position: relative;
-  margin: 0 0 6px;
+  margin: 16px -10px 6px;
 
   &.tabs-1{
     display: none;
@@ -367,13 +367,14 @@ iframe{
     vertical-align: top;
     position: relative;
     border-bottom: 1px solid @border-color;
+    color: #555;
 
     &:hover{
       color: #333;
     }
     
     &.active{
-      color: #222;
+      color: #111;
       cursor: default;
       pointer-events: none;
       &~#tab-bar{
@@ -404,13 +405,18 @@ iframe{
   background: @primary;
   height: 3px;
   transition: 0.3s;
+  z-index: 1;
 }
 #form{
   margin: 0;
   padding-bottom: 52px;
   display: block;
 }
-.footer{
+#methods-specific-fields .mchild{
+  width: 100%;
+  min-height: 216px;
+}
+#footer{
   bottom: 0;
   z-index: 2;
   width: 100%;

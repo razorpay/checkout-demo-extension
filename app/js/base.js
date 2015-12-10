@@ -101,7 +101,7 @@ function base_configure(overrides){
   var options = base_set( Razorpay.defaults, overrides );
 
   each(overrides.notes, function(key, val){
-    if ( typeof val === 'string' ) {
+    if ( typeof val !== 'object' ) {
       options.notes[key] = val;
     }
   })
