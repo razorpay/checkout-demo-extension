@@ -150,6 +150,9 @@
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
+            if($('emi-container')[0]){
+              return frontDrop();
+            }
             this.hide();
           }
         })

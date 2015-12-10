@@ -66,6 +66,11 @@ function frontDrop(message, className) {
     $('fd-t')[0].innerHTML = message || '';
     $('fd')[0].className = className || '';
   }
+  var emic = $('emi-container');
+  if(emic[0]){
+    emic.removeClass('shown');
+    $('fd-in')[0].style.display = '';
+  }
 }
 
 function shakeModal() {
@@ -273,6 +278,12 @@ var frameDiscreet = {
 
     // if(opts.amount >= 100*5000 && opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
       $('emi-wrap')[0].innerHTML = templates.emi();
+      $('emi-close').on('click', frontDrop);
+      $('elem-emi').addClass('shown').on('click', function(){
+        $('emi-container').addClass('shown');
+        $('fd').addClass('shown');
+        $('fd-in')[0].style.display = 'none';
+      })
     // }
 
     if($('nb-na')[0]) {
