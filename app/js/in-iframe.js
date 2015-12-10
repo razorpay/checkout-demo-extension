@@ -241,10 +241,6 @@ var frameDiscreet = {
     frameDiscreet.setMethods(window.payment_methods, opts.method);
     frameDiscreet.sanitizeOptions(opts);
 
-    if(opts.amount >= 100*5000){
-      opts.method.emi = window.payment_methods.emi || true;
-    }
-
     var div = document.createElement('div');
     opts.netbanks = freqBanks;
 
@@ -274,6 +270,10 @@ var frameDiscreet = {
     _smarty = new window.Smarty(_$el);
     frameDiscreet.applyFont($('powered-link')[0]);
     _modal = frameDiscreet.createModal($('modal')[0], opts.modal);
+
+    // if(opts.amount >= 100*5000 && opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('emi-wrap')[0].innerHTML = templates.emi();
+    // }
 
     if($('nb-na')[0]) {
       $('nb-elem').css('display', 'none');

@@ -1,0 +1,20 @@
+@import "common";
+
+#emi-container{
+  position: absolute;
+  height: 370px;
+  width: 500px;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  z-index: 200;
+  .row:not(:first-child){
+    border-top: 1px solid #e9e9e9;
+    padding: 16px 0;
+    .clearfix();
+  }
+  .col{
+    width: 25%;
+    float: left;
+  }
+}
