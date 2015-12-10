@@ -69,7 +69,7 @@ function ch_createFrame(src, tagName){
   })
 
   if(shouldFixFixed){
-    frame.style.height = '480px';
+    frame.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
   }
 
   return frame;

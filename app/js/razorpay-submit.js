@@ -197,7 +197,7 @@ function onComplete(data, request){
     data.razorpay_payment_id
   ) {
     var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    track('success', {id: data.razorpay_payment_id});
+    track('success', returnObj);
     return setTimeout(function(){
       request.success.call(null, returnObj); // dont expose request as this
     })
