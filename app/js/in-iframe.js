@@ -269,7 +269,7 @@ var frameDiscreet = {
     _$el = $('container');
     _smarty = new window.Smarty(_$el);
     frameDiscreet.applyFont($('powered-link')[0]);
-    _modal = frameDiscreet.createModal(_$el.children('modal')[0], opts.modal);
+    _modal = frameDiscreet.createModal($('modal')[0], opts.modal);
 
     if($('nb-na')[0]) {
       $('nb-elem').css('display', 'none');
