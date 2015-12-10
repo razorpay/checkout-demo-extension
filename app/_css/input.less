@@ -238,6 +238,7 @@ input[type=radio]{
 #tab-wallet{
   text-align: center;
   label{
+    white-space: nowrap;
     text-align: left;
     display: inline-block;
     height: 38px;
@@ -245,11 +246,10 @@ input[type=radio]{
     padding: 1px 16px;
     &:after{
       display: inline-block;
-      margin-left: 12px;
+      margin-left: 10px;
       width: 10px;
       text-align: center;
       content: '';
-      float: right;
       color: @primary;
     }
   }
