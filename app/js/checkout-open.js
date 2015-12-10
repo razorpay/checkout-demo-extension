@@ -14,6 +14,7 @@ ch_backdrop,
 ch_metaViewportTag,
 ch_metaViewport;
 
+var ch_PageY = 0;
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 // there is no "position: fixed" in iphone
 var docStyle = document.documentElement.style;
@@ -27,6 +28,15 @@ var merchantMarkup = {
 
   reset: function() {
     docStyle.overflow = this._.overflow;
+
+    if(shouldFixFixed){
+      each(
+        merchantMarkup.listeners,
+        function(event, handler){
+          $(window).off(event, handler);
+        }
+      )
+    }
   },
 
   clear: function() {
@@ -35,7 +45,49 @@ var merchantMarkup = {
 
     if(shouldFixFixed){
       scrollTo(0, 0);
+      merchantMarkup.scroll();
+      each(
+        ['orientationchange', 'scroll'],
+        function(i, event){
+          var frame = ch_frameContainer && ch_frameContainer.getElementsByTagName('iframe')[0];
+          if(frame){
+            merchantMarkup.listeners[event] = $(window).on(event, merchantMarkup[event], false, frame);
+          }
+        }
+      )
     }
+  },
+
+  listeners: {},
+
+  orientationchange: function(){
+    this.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
+  },
+
+// scroll manually in iPhone
+  scroll: function(){
+    if(!ch_isOpen || typeof window.pageYOffset !== 'number'){
+      return;
+    }
+
+    var top;
+    var offTop = ch_frameContainer.offsetTop - pageYOffset;
+    var offBot = ch_frameContainer.offsetHeight + offTop;
+    if(ch_PageY < pageYOffset){
+      if(offBot < 0.2*innerHeight && offTop < 0){
+        top = pageYOffset + innerHeight - ch_frameContainer.offsetHeight;
+      }
+    }
+    else if(ch_PageY > pageYOffset){
+      if(offTop > 0.1*innerHeight && offBot > innerHeight){
+        top = pageYOffset;
+      }
+    }
+    if(typeof top === 'number'){
+      ch_frameContainer.style.top = Math.max(0, top) + 'px';
+    }
+    ch_PageY = pageYOffset;
+
   }
 }
 
@@ -67,10 +119,6 @@ function ch_createFrame(src, tagName){
   each(attrs, function(i, attr){
     frame.setAttribute(i, attr);
   })
-
-  if(shouldFixFixed){
-    frame.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
-  }
 
   return frame;
 }
@@ -423,7 +471,6 @@ Razorpay.prototype.open = function() {
   }
   ch_isOpen = true;
 
-  merchantMarkup.clear();
   $.addMessageListener(ch_onFrameMessage, this);
 
   ch_createFrameContainer();
@@ -438,6 +485,7 @@ Razorpay.prototype.open = function() {
     );
     ch_frameContainer.appendChild(this.checkoutFrame);
   }
+  merchantMarkup.clear();
 
   if(isCriOS){
     var self = this;
