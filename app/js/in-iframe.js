@@ -285,11 +285,11 @@ var frameDiscreet = {
       var elem_emi = $('elem-emi');
       if(elem_emi[0]){
         elem_emi.addClass('shown').on('mouseup', function(){
-          if(!$('emi')[0].checked){
-            var shouldCheck = $(this).hasClass('check');
+          var shouldCheck = $(this).hasClass('check');
+          if(!$('emi')[0].checked || !shouldCheck){
             var emic = $('emi-container');
             emic[0].style.display = 'block';
-            emic[0].prop('offsetWidth');
+            emic.prop('offsetWidth');
             emic.addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
             $('fd').addClass('shown');
             $('fd-in')[0].style.display = 'none';
