@@ -348,6 +348,7 @@ iframe{
   -webkit-tap-highlight-color: transparent;
   position: relative;
   margin: 16px -10px 6px;
+  border-bottom: 1px solid @border-color;
 
   &.tabs-1{
     display: none;
@@ -372,13 +373,12 @@ iframe{
     display: inline-block;
     vertical-align: top;
     position: relative;
-    border-bottom: 1px solid @border-color;
     color: #555;
 
     &:hover{
       color: #333;
     }
-    
+
     &.active{
       color: #111;
       cursor: default;
