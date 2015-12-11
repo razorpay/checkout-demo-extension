@@ -279,7 +279,7 @@ var frameDiscreet = {
     frameDiscreet.applyFont($('powered-link')[0]);
     _modal = frameDiscreet.createModal($('modal')[0], opts.modal);
 
-    if(opts.amount >= 100*5000 && opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+    if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
       $('emi-wrap')[0].innerHTML = templates.emi();
       $('emi-close').on('click', frontDrop);
       var elem_emi = $('elem-emi');
