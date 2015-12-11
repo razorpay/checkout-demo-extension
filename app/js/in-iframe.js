@@ -69,6 +69,9 @@ function frontDrop(message, className) {
   var emic = $('emi-container');
   if(emic[0]){
     emic.removeClass('shown');
+    setTimeout(function(){
+      emic[0].style.display = 'none';
+    }, 300)
     $('fd-in')[0].style.display = '';
   }
 }
@@ -281,13 +284,39 @@ var frameDiscreet = {
       $('emi-close').on('click', frontDrop);
       var elem_emi = $('elem-emi');
       if(elem_emi[0]){
-        elem_emi.addClass('shown').on('click', function(){
-          $('emi-container').addClass('shown');
-          $('fd').addClass('shown');
-          $('fd-in')[0].style.display = 'none';
+        elem_emi.addClass('shown').on('mouseup', function(){
+          if(!$('emi')[0].checked){
+            var shouldCheck = $(this).hasClass('check');
+            var emic = $('emi-container');
+            emic[0].style.display = 'block';
+            emic[0].prop('offsetWidth');
+            emic.addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
+            $('fd').addClass('shown');
+            $('fd-in')[0].style.display = 'none';
+          }
         })
+        $('card_number').on('input', function(){
+          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
+        })
+        $('card_number').on('keypress', function(){
+          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
+        })
+        each(
+          $('emi-container').children('emi-option'),
+          function(i, el){
+            $(el).on('click', function(){
+              var active = $('emi-container').children('emi-active');
+              if(active[0]){
+                $(active[0]).removeClass('emi-active');
+              }
+              $(this).addClass('emi-active')[0].getElementsByTagName('input')[0].checked = true;
+              frontDrop();
+            })
+          }
+        )
       }
       $('methods-specific-fields').children('mchild')[0].style.minHeight = '276px';
+
     }
 
     if($('nb-na')[0]) {
