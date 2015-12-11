@@ -66,6 +66,14 @@ function frontDrop(message, className) {
     $('#fd-t')[0].innerHTML = message || '';
     $('#fd')[0].className = className || '';
   }
+  var emic = $('emi-container');
+  if(emic[0]){
+    emic.removeClass('shown');
+    setTimeout(function(){
+      emic[0].style.display = 'none';
+    }, 300)
+    $('fd-in')[0].style.display = '';
+  }
 }
 
 function shakeModal() {
@@ -227,7 +235,7 @@ var frameDiscreet = {
 
   showModal: function() {
     frameDiscreet.renew();
-    
+
     if(_modal){
       return _modal.show();
     }
@@ -268,8 +276,58 @@ var frameDiscreet = {
 
     _$el = $('#container');
     _smarty = new window.Smarty(_$el);
+
     frameDiscreet.applyFont($('#powered-link')[0]);
     _modal = frameDiscreet.createModal($('#modal')[0], opts.modal);
+
+    if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('#emi-wrap').html(templates.emi());
+      $('#emi-close').on('click', frontDrop);
+      var elem_emi = $('#elem-emi');
+      if(elem_emi[0]){
+        elem_emi.addClass('shown').on('mouseup', function(){
+          var shouldCheck = $(this).hasClass('check');
+          if(!$('emi')[0].checked || !shouldCheck){
+
+            $('#emi-container');
+              .css('display', 'block')
+              .reflow()
+              .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
+
+            $('#fd').addClass('shown');
+            $('#fd-in').hide();
+          }
+        })
+        $('#card_number').on('input keypress', function(){
+          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
+        })
+        each(
+          $('emi-container').children('emi-option'),
+          function(i, el){
+            $(el).on('click', function(){
+              var active = $('emi-container').children('emi-active');
+              if(active[0]){
+                $(active[0]).removeClass('emi-active');
+              }
+              $(this).addClass('emi-active')[0].getElementsByTagName('input')[0].checked = true;
+              frontDrop();
+            })
+          }
+        )
+      }
+      $('#methods-specific-fields > .mchild').css('minHeight', '276px');
+
+    }
+
+    try{
+      if(!opts.image){
+        $('modal-inner').addClass('noimage');
+      }
+
+      if(shouldFixFixed){
+        $('modal').addClass('ip');
+      }
+    } catch(e){}
 
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
