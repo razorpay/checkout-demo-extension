@@ -1,8 +1,12 @@
 var $ = function(el){
-  if(typeof el === 'string') { return $(document.getElementById(el)) }
+  if(typeof el === 'string') {
+    return $(document.querySelector(el))
+  }
   if(!(this instanceof $)) { return new $(el) }
   this[0] = el;
 };
+
+var $$ = document.querySelectorAll;
 
 var each = function( iteratee, eachFunc ) {
   var i;
@@ -130,39 +134,10 @@ $.prototype = {
     return this;
   },
 
-  children: function(filterClass){
-    var child = this.prop('firstChild');
-    var childList = [];
-    while(child){
-      if(child.nodeType === 1 && !filterClass || $(child).hasClass(filterClass)) {
-        childList.push(child);
-      }
-      child = child.nextSibling;
-    }
-    return childList;
-  },
-
-  find: function(filterClass, filterTag){
-    var result = [];
+  find: function(selector){
     var node = this[0];
     if(node){
-      if('getElementsByClassName' in document){
-        return node.getElementsByClassName(filterClass);
-      }
-
-      if( !filterTag ) {
-        filterTag = '*';
-      }
-
-      var els = node.getElementsByTagName(filterTag);
-      var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
-
-      each(els, function(i, el){
-        if( pattern.test(el.className) ) {
-          result.push(el);
-        }
-      })
-      return result;
+      return document.querySelectorAll(selector);
     }
   },
 

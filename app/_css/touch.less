@@ -15,7 +15,7 @@
     &:after{
       content: none;
     }
-    .modal{
+    #modal{
       min-width: 100%;
       display: block;
       background: #fafafa;
@@ -26,10 +26,10 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       transform: translateY(10%) scale(0.9);
     }
-    .modal-inner{
+    #modal-inner{
       position: static;
     }
-    &.shown .modal{
+    &.shown #modal{
       transition: 0.3s ease-out all;
       transform: none;
     }

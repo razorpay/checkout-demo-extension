@@ -63,14 +63,14 @@ var _smarty, _modal, _$el;
 
 function frontDrop(message, className) {
   if(!popupRequest){
-    $('fd-t')[0].innerHTML = message || '';
-    $('fd')[0].className = className || '';
+    $('#fd-t')[0].innerHTML = message || '';
+    $('#fd')[0].className = className || '';
   }
 }
 
 function shakeModal() {
   if(shouldShakeOnError && _modal){
-    $('modal-inner').removeClass('shake').reflow().addClass('shake');
+    $('#modal-inner').removeClass('shake').reflow().addClass('shake');
   }
 }
 
@@ -171,10 +171,10 @@ var frameDiscreet = {
   },
 
   setCardFormatting: function(){
-    var $el_number = $('card_number');
-    var el_expiry = $('card_expiry')[0];
-    var el_cvv = $('card_cvv')[0];
-    var el_contact = $('contact')[0];
+    var $el_number = $('#card_number');
+    var el_expiry = $('#card_expiry')[0];
+    var el_cvv = $('#card_cvv')[0];
+    var el_contact = $('#contact')[0];
     
     card.setType = function(el, type){
       if(!type){
@@ -231,7 +231,7 @@ var frameDiscreet = {
     if(_modal){
       return _modal.show();
     }
-    $('loading').remove();
+    $('#loading').remove();
     var opts = $.clone(Razorpay.defaults);
 
     if(opts.amount >= 100*10000){
@@ -263,61 +263,56 @@ var frameDiscreet = {
     document.body.appendChild(div.firstChild);
 
     if ( CheckoutBridge ) {
-      $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
-    _$el = $('container');
+    _$el = $('#container');
     _smarty = new window.Smarty(_$el);
-    frameDiscreet.applyFont($('powered-link')[0]);
-    _modal = frameDiscreet.createModal(_$el.children('modal')[0], opts.modal);
-
-    if($('nb-na')[0]) {
-      $('nb-elem').css('display', 'none');
-    }
+    frameDiscreet.applyFont($('#powered-link')[0]);
+    _modal = frameDiscreet.createModal($('#modal')[0], opts.modal);
 
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
-    $('modal-close').on('click', function(){
+    $('#modal-close').on('click', function(){
       Razorpay.payment.cancel();
       _modal.hide();
     });
-    $('tabs').on('click', frameDiscreet.tab_change);
-    $('form').on('submit', function(e){
+    $('#tabs').on('click', frameDiscreet.tab_change);
+    $('#form').on('submit', function(e){
       frameDiscreet.formSubmit();
       e.preventDefault();
     });
 
-    $('bank-select').on('change', frameDiscreet.bank_change);
+    $('#bank-select').on('change', frameDiscreet.bank_change);
 
     if(window.addEventListener){
-      $('netb-banks').on('change', frameDiscreet.bank_radio, true);
+      $('#netb-banks').on('change', frameDiscreet.bank_radio, true);
     }
     else {
       each(
-        $('netb-banks').find('bank-radio'),
+        $$('netb-banks .bank-radio'),
         function(i, bankRadio){
           $(bankRadio).on('click', frameDiscreet.bank_radio, true);
         }
       )
     }
 
-    $('fd').on('click', function(e){
+    $('#fd').on('click', function(e){
       var id = e.target.id;
       if(id === 'fd' || id === 'fd-hide') {
         frontDrop();
       }
     });
-    $('backdrop').on('click', frontDrop);
+    $('#backdrop').on('click', frontDrop);
 
     if(qpmap.tab){
       each(
-        $('tabs')[0].getElementsByTagName('li'),
+        $$('tabs > li'),
         function(i, li){
           if( li.getAttribute('data-target') === 'tab-' + qpmap.tab ) {
             frameDiscreet.tab_change({target: li});
           }
-        },
-        true
+        }
       )
     }
     if(qpmap.error){
@@ -329,7 +324,7 @@ var frameDiscreet = {
   },
 
   bank_radio: function(e) {
-    var select = $('bank-select')[0];
+    var select = $('#bank-select')[0];
     select.value = e.target.value;
     _smarty.input({target: select});
   },
@@ -337,7 +332,7 @@ var frameDiscreet = {
   bank_change: function() {
     var val = this.value;
     each(
-      $('netb-banks')[0].getElementsByTagName('input'),
+      $$('#netb-banks input'),
       function(i, radio) {
         if(radio.value === val){
           radio.checked = true;
@@ -361,11 +356,10 @@ var frameDiscreet = {
 
     frameDiscreet.renew();
 
-    var tabContent = $(target.getAttribute('data-target'));
-    $(tabContent.parent().children('active')[0]).removeClass('active');
-    tabContent.addClass('active');
+    $('.tab-content.active').removeClass('active');
+    $('#' + target.getAttribute('data-target')).addClass('active');
 
-    $($(target.parentNode).children('active')[0]).removeClass('active');
+    $('#tabs > .active').removeClass('active');
     $(target).addClass('active');
   },
 
@@ -395,10 +389,10 @@ var frameDiscreet = {
 
   /* sets focus on invalid input and returns true, if any. */
   isInvalid: function(parent) {
-    var invalids = $(parent).find('invalid');
+    var invalids = $(parent).find('.invalid');
     if(invalids[0]){
       shakeModal();
-      $($(invalids[0]).find('input')[0]).focus();
+      $($(invalids[0]).find('.input')[0]).focus();
 
       each( invalids, function(i, field){
         $(field).addClass('mature');
@@ -417,7 +411,7 @@ var frameDiscreet = {
     // var card_number = $('card_number')[0];
     // card_number && frameDiscreet.setNumberValidity.call(card_number);
 
-    var activeTab = $('tabs').find('active')[0];
+    var activeTab = $('#tabs').find('active')[0];
     if ( activeTab && frameDiscreet.isInvalid(activeTab.getAttribute('data-target')) ) {
       return;
     }
@@ -461,7 +455,7 @@ var frameDiscreet = {
   },
 
   getFormData: function() {
-    var activeTab = $('tabs').find('active')[0];
+    var activeTab = $('#tabs > .active')[0];
     if(!activeTab) { return }
     
     var data = {};
@@ -502,7 +496,7 @@ var frameDiscreet = {
 
   hide: function(){
     if(_modal){
-      $('modal-inner').removeClass('shake');
+      $('#modal-inner').removeClass('shake');
       _modal.hide();
     }
     _modal = null;
@@ -555,7 +549,7 @@ var frameDiscreet = {
       message || 'There was an error in handling your request',
       'shown'
     );
-    $('fd-hide').focus();
+    $('#fd-hide').focus();
   },
 
   dataHandler: function(data){
@@ -563,7 +557,7 @@ var frameDiscreet = {
       return;
     }
 
-    frameDiscreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
+    frameDiscreet.tab_change({target: $('#method-' + data.method + '-tab')[0]});
 
     if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
       data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];

@@ -54,7 +54,7 @@
       }
     })
     this.options = options;
-    this.container = $('container');
+    this.container = $('#container');
     this.modalElement = element;
     this.animationDuration = getDuration(this);
 

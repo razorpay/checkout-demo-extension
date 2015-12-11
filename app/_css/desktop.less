@@ -110,7 +110,7 @@ iframe{
     #powered-by{
       opacity: 1;
     }
-    .modal{
+    #modal{
       opacity: 1;
       transform: none;
       transition: 0.25s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
@@ -118,7 +118,7 @@ iframe{
   }
 }
 .font-loaded{
-  .modal, button, input, select {
+  #modal, button, input, select {
     font-family: @font-family;
     font-feature-settings: "liga" 0;
   }
@@ -133,7 +133,7 @@ iframe{
     display: none;
   }
 }
-.modal{
+#modal{
   perspective: 300;
   outline: none;
   position: relative;
@@ -158,10 +158,10 @@ iframe{
   // NOTE: it isn't because of lack of :after, but buggy white-space support
   *top: 10%;
 }
-.modal-content{
+#modal-content{
   min-height: 470px;
 }
-.modal-inner{
+#modal-inner{
   position: relative;
   border-radius: @border-radius;
   background: @background-color;
@@ -173,7 +173,7 @@ iframe{
   margin: 0 0 16px;
 }
 /* Default class for an overlay */
-.header{
+#header{
   border-radius: @border-radius @border-radius 0 0;
   position: relative;
   padding: 12px @padding;
