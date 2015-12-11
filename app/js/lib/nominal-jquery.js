@@ -55,23 +55,28 @@ $.prototype = {
     if(!el) { return }
 
     var ref;
-    if (window.addEventListener) {
+    var shouldAddListener = window.addEventListener;
+    if (shouldAddListener) {
       ref = function(e){
         if( e.target.nodeType === 3 ) {
           e.target = e.target.parentNode;// textNode target
         }
         callback.call(thisArg || this, e);
       }
-      el.addEventListener(event, ref, !!capture);
-    } else if(window.attachEvent){
+    } else {
       ref = function(e){
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
         callback.call(thisArg || el, e);
       }
-      el.attachEvent('on' + event, ref);
     }
+    each(
+      event.split(' '),
+      function(i, evt){
+        shouldAddListener ? el.addEventListener(evt, ref, !!capture) : el.attachEvent('on' + evt, ref);
+      }
+    )
     return ref;
   },
 
@@ -152,6 +157,10 @@ $.prototype = {
       } catch(e){} // IE can not set invalid css rules without throwing up.
     }
     return this;
+  },
+
+  hide: function(){
+    return this.css('display', 'none');
   },
 
   parent: function(){

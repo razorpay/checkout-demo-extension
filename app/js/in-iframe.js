@@ -289,7 +289,7 @@ var frameDiscreet = {
           var shouldCheck = $(this).hasClass('check');
           if(!$('emi')[0].checked || !shouldCheck){
 
-            $('#emi-container');
+            $('#emi-container')
               .css('display', 'block')
               .reflow()
               .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
