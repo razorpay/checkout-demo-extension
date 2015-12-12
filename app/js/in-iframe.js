@@ -61,6 +61,43 @@ var freqWallets = {
 
 var _smarty, _modal, _$el;
 
+function addModalDOM(opts){
+  var div = document.createElement('div');
+  try{
+    div.style.color = opts.theme.color;
+    if(div.style.color){
+      var style = document.createElement('style');
+      document.body.appendChild(style);
+      var rules = templates.theme(opts.theme.color);
+      if (style.styleSheet) {
+        style.styleSheet.cssText = rules;
+      } else {
+        style.appendChild(document.createTextNode(rules));
+      }
+    }
+  } catch(e){
+    roll(e.message);
+  }
+
+  div.innerHTML = templates.modal(opts);
+  var container = div.firstChild;
+  document.body.appendChild(container);
+
+  var classes = [];
+  if(shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
+    classes.push('mobile');
+  }
+
+  if(!opts.image){
+    classes.push('noimage');
+  }
+
+  if(shouldFixFixed){
+    classes.push('ip')
+  }
+  $(container).addClass(classes.join(' '));
+}
+
 function frontDrop(message, className) {
   if(!popupRequest){
     $('#fd-t')[0].innerHTML = message || '';
@@ -249,27 +286,10 @@ var frameDiscreet = {
     frameDiscreet.setMethods(window.payment_methods, opts.method);
     frameDiscreet.sanitizeOptions(opts);
 
-    var div = document.createElement('div');
     opts.netbanks = freqBanks;
 
-    try{
-      div.style.color = opts.theme.color;
-      if(div.style.color){
-        var style = document.createElement('style');
-        document.body.appendChild(style);
-        var rules = templates.theme(opts.theme.color);
-        if (style.styleSheet) {
-          style.styleSheet.cssText = rules;
-        } else {
-          style.appendChild(document.createTextNode(rules));
-        }
-      }
-    } catch(e){
-      roll(e.message);
-    }
-    div.innerHTML = templates.modal(opts);
-    document.body.appendChild(div.firstChild);
-
+    addModalDOM(opts);
+    
     if ( CheckoutBridge ) {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
@@ -315,16 +335,6 @@ var frameDiscreet = {
       $('#methods-specific-fields > .mchild').css('minHeight', '276px');
 
     }
-
-    try{
-      if(!opts.image){
-        $('modal-inner').addClass('noimage');
-      }
-
-      if(shouldFixFixed){
-        $('modal').addClass('ip');
-      }
-    } catch(e){}
 
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)

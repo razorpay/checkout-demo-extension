@@ -116,26 +116,28 @@ $.prototype = {
   },
 
   hasClass: function(str){
-    return (' ' + this.prop('className') + ' ').indexOf(' ' + str + ' ') >= 0;
+    return (' ' + this[0].className + ' ').indexOf(' ' + str + ' ') >= 0;
   },
 
   addClass: function(str){
-    if(str && this[0]){
-      if(!this.prop('className')){
-        this.prop('className', str);
+    var el = this[0];
+    if(str && el){
+      if(!el.className){
+        el.className = str;
       }
       else if(!this.hasClass(str)){
-        this[0].className += ' ' + str;
+        el.className += ' ' + str;
       }
     }
     return this;
   },
 
   removeClass: function(str){
-    if(this[0]){
-      var className = (' ' + this.prop('className') + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-      if( this.prop('className') !== className ){
-        this.prop( 'className', className );
+    var el = this[0];
+    if(el){
+      var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
+      if( el.className !== className ){
+        el.className = className;
       }
     }
     return this;

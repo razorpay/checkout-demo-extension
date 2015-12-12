@@ -1,9 +1,15 @@
 @import "common";
 
 @max-width: 414px;
-@media (max-device-height: 450px),(max-device-width: 450px){
+@padding: 22px;
 
-  @padding: 22px;
+.mobile{
+  max-width: @max-width;
+  margin: 0 auto;
+
+  &:after{
+    content: none;
+  }
 
   .shake{
     animation:none;
@@ -38,78 +44,65 @@
     padding: 0 @padding;
     min-height: 510px;
   }
-  #form-fields{
-    position: absolute;
-    top: @logo-size + 20px;
-    left: @padding;
-    right: @padding;
-    bottom: @submit-height;
-  }
-  #form-common{
-    height: 33%;
-    &:after{
-      height: 110%;
-    }
-  }
-  #methods-specific-fields{
-    height: 67%;
-    &:after{
-      height: 85%;
-    }
-  }
-  #container{
-    max-width: @max-width;
+  #modal{
+    background: @background-color;
+    width: 100%;
+    min-height: 100%;
     margin: 0 auto;
-
-    &:after{
-      content: none;
-    }
-    #modal{
-      min-width: 100%;
-      display: block;
-      background: #fafafa;
-      color: #666;
-      min-height: 100%;
-      margin: 0 auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      transform: translateY(10%) scale(0.9);
-    }
-    #modal-inner{
-      position: static;
-    }
-    &.shown #modal{
-      transition: 0.3s ease-out all;
-      transform: none;
-    }
-    #powered-by{
-      position: absolute;
-      top: 10px;
-      visibility: hidden!important;
-      bottom: auto;
-      z-index: -1;
-      pointer-events: none;
-    }
-    .merchant-image{
-      margin-top: 0;
-    }
-    .merchant{
-      margin-top: 12px;
-    }
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transform: translateY(10%) scale(0.9);
+  }
+  #modal-inner{
+    position: static;
+  }
+  &.shown #modal{
+    transition: 0.3s ease-out all;
+    transform: none;
+  }
+  #powered-by{
+    position: absolute;
+    top: 10px;
+    visibility: hidden!important;
+    bottom: auto;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .merchant-image{
+    margin-top: 0;
+  }
+  .merchant{
+    margin-top: 12px;
   }
   #footer{
     margin: 0 -@padding;
   }
-}
-.ip{
-  #form-fields{
-    position: static;
-  }
-  #methods-specific-fields, #form-common{
-    height: auto;
-    &:after{
-      content: none;
+
+  @media(min-height: 525px){
+    .input, .placeholder{
+      padding-bottom: 10px;
+      padding-top: 26px;
     }
   }
+  @media(min-height: 550px){
+    .input, .placeholder{
+      padding-bottom: 12px;
+      padding-top: 28px;
+    }
+  }
+  @media(min-height: 575px){
+    .input, .placeholder{
+      padding-bottom: 14px;
+      padding-top: 30px;
+    }
+  }
+  @media(min-height: 600px){
+    .input, .placeholder{
+      padding-bottom: 16px;
+      padding-top: 32px;
+    }
+  }
+}
+.ip{
   #modal-content{
     min-height: 470px;
   }
