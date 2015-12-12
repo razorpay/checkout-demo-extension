@@ -84,7 +84,8 @@ function addModalDOM(opts){
   document.body.appendChild(container);
 
   var classes = [];
-  if(shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
+
+  if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
     classes.push('mobile');
   }
 
@@ -95,21 +96,22 @@ function addModalDOM(opts){
   if(shouldFixFixed){
     classes.push('ip')
   }
+
   $(container).addClass(classes.join(' '));
 }
 
 function frontDrop(message, className) {
   if(!popupRequest){
-    $('#fd-t')[0].innerHTML = message || '';
-    $('#fd')[0].className = className || '';
+    gel('fd-t').innerHTML = message || '';
+    gel('fd').className = className || '';
   }
   var emic = $('emi-container');
   if(emic[0]){
     emic.removeClass('shown');
     setTimeout(function(){
-      emic[0].style.display = 'none';
+      emic.hide();
     }, 300)
-    $('fd-in')[0].style.display = '';
+    gel('fd-in').style.display = '';
   }
 }
 
@@ -217,9 +219,9 @@ var frameDiscreet = {
 
   setCardFormatting: function(){
     var $el_number = $('#card_number');
-    var el_expiry = $('#card_expiry')[0];
-    var el_cvv = $('#card_cvv')[0];
-    var el_contact = $('#contact')[0];
+    var el_expiry = gel('card_expiry');
+    var el_cvv = gel('card_cvv');
+    var el_contact = gel('contact');
     
     card.setType = function(el, type){
       if(!type){
@@ -293,12 +295,11 @@ var frameDiscreet = {
     if ( CheckoutBridge ) {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
-
     _$el = $('#container');
     _smarty = new window.Smarty(_$el);
 
-    frameDiscreet.applyFont($('#powered-link')[0]);
-    _modal = frameDiscreet.createModal($('#modal')[0], opts.modal);
+    frameDiscreet.applyFont(gel('powered-link'));
+    _modal = frameDiscreet.createModal(gel('modal'), opts.modal);
 
     if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
       $('#emi-wrap').html(templates.emi());
@@ -307,7 +308,7 @@ var frameDiscreet = {
       if(elem_emi[0]){
         elem_emi.addClass('shown').on('mouseup', function(){
           var shouldCheck = $(this).hasClass('check');
-          if(!$('#emi')[0].checked || !shouldCheck){
+          if(!gel('emi').checked || !shouldCheck){
 
             $('#emi-container')
               .css('display', 'block')
@@ -335,7 +336,6 @@ var frameDiscreet = {
       $('#methods-specific-fields > .mchild').css('minHeight', '276px');
 
     }
-
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
     $('#modal-close').on('click', function(){
@@ -372,7 +372,7 @@ var frameDiscreet = {
 
     if(qpmap.tab){
       each(
-        $$('tabs > li'),
+        $$('#tabs > li'),
         function(i, li){
           if( li.getAttribute('data-target') === 'tab-' + qpmap.tab ) {
             frameDiscreet.tab_change({target: li});
@@ -389,7 +389,7 @@ var frameDiscreet = {
   },
 
   bank_radio: function(e) {
-    var select = $('#bank-select')[0];
+    var select = gel('bank-select');
     select.value = e.target.value;
     _smarty.input({target: select});
   },
@@ -507,7 +507,7 @@ var frameDiscreet = {
 
   getFormFields: function(containerID, returnObj) {
     each(
-      $('#' + containerID).find('input[name],select[name'),
+      $('#' + containerID).find('input[name],select[name]'),
       function(i, el){
         if(el.getAttribute('type') === 'radio' && !el.checked) {
           return;
@@ -639,7 +639,7 @@ var frameDiscreet = {
         'bank': 'bank-select'
       },
       function(name, id){
-        var el = $(id)[0];
+        var el = gel(id);
         if(el) {
           lastel = el;
           var val = data[name];

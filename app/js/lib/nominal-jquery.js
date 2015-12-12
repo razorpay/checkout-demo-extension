@@ -6,7 +6,13 @@ var $ = function(el){
   this[0] = el;
 };
 
-var $$ = document.querySelectorAll;
+function $$(query){
+  return document.querySelectorAll(query);
+}
+
+function gel(id){
+  return document.getElementById(id);
+}
 
 var each = function( iteratee, eachFunc ) {
   var i;
@@ -74,7 +80,12 @@ $.prototype = {
     each(
       event.split(' '),
       function(i, evt){
-        shouldAddListener ? el.addEventListener(evt, ref, !!capture) : el.attachEvent('on' + evt, ref);
+        if( shouldAddListener ) {
+          el.addEventListener(evt, ref, !!capture)
+        }
+        else {
+          el.attachEvent('on' + evt, ref);
+        }
       }
     )
     return ref;
