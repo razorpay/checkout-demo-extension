@@ -120,7 +120,7 @@ $.prototype = {
   },
 
   addClass: function(str){
-    if(str){
+    if(str && this[0]){
       if(!this.prop('className')){
         this.prop('className', str);
       }
@@ -132,9 +132,11 @@ $.prototype = {
   },
 
   removeClass: function(str){
-    var className = (' ' + this.prop('className') + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-    if( this.prop('className') !== className ){
-      this.prop( 'className', className );
+    if(this[0]){
+      var className = (' ' + this.prop('className') + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
+      if( this.prop('className') !== className ){
+        this.prop( 'className', className );
+      }
     }
     return this;
   },
@@ -142,7 +144,7 @@ $.prototype = {
   find: function(selector){
     var node = this[0];
     if(node){
-      return document.querySelectorAll(selector);
+      return node.querySelectorAll(selector);
     }
   },
 

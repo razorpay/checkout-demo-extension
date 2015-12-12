@@ -65,7 +65,7 @@
          parent = parent.parentNode;
       }
 
-      var child = $(parent).children('input');
+      var child = $(parent).find('.input');
       if(child.length){
         setTimeout(function(){
           child[0].focus()
@@ -108,7 +108,7 @@
     refresh: function(callback){
       var self = this;
       each(
-        $(this.parent[0]).find('input'),
+        $(this.parent[0]).find('.input'),
         function(i, el){
           self.update(el);
           if(callback){

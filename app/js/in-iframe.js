@@ -287,7 +287,7 @@ var frameDiscreet = {
       if(elem_emi[0]){
         elem_emi.addClass('shown').on('mouseup', function(){
           var shouldCheck = $(this).hasClass('check');
-          if(!$('emi')[0].checked || !shouldCheck){
+          if(!$('#emi')[0].checked || !shouldCheck){
 
             $('#emi-container')
               .css('display', 'block')
@@ -302,14 +302,11 @@ var frameDiscreet = {
           elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
         })
         each(
-          $('emi-container').children('emi-option'),
+          $('#emi-container > .emi-option'),
           function(i, el){
             $(el).on('click', function(){
-              var active = $('emi-container').children('emi-active');
-              if(active[0]){
-                $(active[0]).removeClass('emi-active');
-              }
-              $(this).addClass('emi-active')[0].getElementsByTagName('input')[0].checked = true;
+              $('#emi-container > .emi-active').removeClass('emi-active');
+              $(this).addClass('emi-active').find('input')[0].checked = true;
               frontDrop();
             })
           }
@@ -446,11 +443,11 @@ var frameDiscreet = {
   },
 
   /* sets focus on invalid input and returns true, if any. */
-  isInvalid: function(parent) {
-    var invalids = $(parent).find('.invalid');
+  isInvalid: function(parentID) {
+    var invalids = $('#' + parentID).find('.invalid');
     if(invalids[0]){
       shakeModal();
-      $($(invalids[0]).find('.input')[0]).focus();
+      $(invalids[0]).find('.input')[0].focus();
 
       each( invalids, function(i, field){
         $(field).addClass('mature');
@@ -469,7 +466,7 @@ var frameDiscreet = {
     // var card_number = $('card_number')[0];
     // card_number && frameDiscreet.setNumberValidity.call(card_number);
 
-    var activeTab = $('#tabs').find('active')[0];
+    var activeTab = $('#tabs > .active')[0];
     if ( activeTab && frameDiscreet.isInvalid(activeTab.getAttribute('data-target')) ) {
       return;
     }
@@ -498,14 +495,14 @@ var frameDiscreet = {
     });
   },
 
-  getFormFields: function(container, returnObj) {
+  getFormFields: function(containerID, returnObj) {
     each(
-      $(container)[0].getElementsByTagName('*'),
+      $('#' + containerID).find('input[name],select[name'),
       function(i, el){
         if(el.getAttribute('type') === 'radio' && !el.checked) {
           return;
         }
-        if(el.name && !el.disabled && el.value.length) {
+        if(!el.disabled && el.value.length) {
           returnObj[el.name] = el.value;
         }
       }
