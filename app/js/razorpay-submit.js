@@ -3,6 +3,7 @@ var popupRequest, cookieInterval, communicator;
 
 function clearCookieInterval(){
   if(cookieInterval){
+    deleteCookie('onComplete');
     clearInterval(cookieInterval);
     cookieInterval = null;
   }
@@ -66,18 +67,21 @@ function submitFormData(action, data, method, target) {
   form.submit();
   form.parentNode.removeChild(form);
 
-  if(target && discreet.isFrame){
-    deleteCookie('onComplete');
+  // if(target && discreet.isFrame){
+  //   cookiePoll();
+  // }
+}
 
-    cookieInterval = setInterval(function(){
-      var cookie = getCookie('onComplete');
-      if(cookie){
-        clearCookieInterval();
-        deleteCookie('onComplete');
-        onComplete(cookie);
-      }
-    }, 150)
-  }
+function cookiePoll(){
+  deleteCookie('onComplete');
+
+  cookieInterval = setInterval(function(){
+    var cookie = getCookie('onComplete');
+    if(cookie){
+      clearCookieInterval();
+      onComplete(cookie);
+    }
+  }, 150)
 }
 
 function createPopup(data, url, options) {
@@ -283,6 +287,10 @@ Razorpay.payment = {
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
+    if(discreet.isFrame){
+      cookiePoll();
+    }
+
     popupRequest = request;
   },
 

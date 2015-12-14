@@ -55,7 +55,7 @@ var freqWallets = {
   },
   payzapp: {
     h: '24',
-    col: 'images/payzapp.png'
+    col: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAAAlCAMAAACtfZ09AAAAY1BMVEXuQEGBmb/+7+9BZZ/AzN/839/2n6DrICLpEBLxYGH7z9DsMDHvUFH4r7Dv8vf1j5Df5e/ycHHQ2edhf68iTI+gss8SP4dxjLcxWZewv9eQpcdRcqf5v8DzgIEDM3/oAQP///+4CVglAAAAIXRSTlP//////////////////////////////////////////wCfwdAhAAADRUlEQVR4Ab2Ue3PiOBDEZflh/DAG8whhpXV//095jKYlqyp1x20C239ESE755+6ZkcELZacaz/QyYN907Trg7wCdN7tV5N4PrJvjsEYZvBfo5rFdc9XvA9rJmzWJ6vAeYD93ubGknX0LsJ49RaUSelDv7VK7I6+1/x8YP3JGTKcHDoXqfoDoIr8vqGQBsJd1AeBXqgEmcdxwUlSNBVBzM9cKtCvVu5WyQPE7SgCH8KvU0wNweiznPVBHgwPNcjbGVNkGaNaoYwAmTPrcFsCv30kL8EFgJUul/E8A3Uo5miWwzXvpuCY5w1Q0jEYWNvh5AxbYXwncK/AUNkCdZp4GCbRrxkglE448NtsdwXfM4JuXjwCUJK+3wBDyfWGwm8Fag2v5qhAaplGB8nfqjwm4k2yTJikm8CnvBBCAYvBUBmAp+/AnL0anKY5GOAxt4HPn2BUR2AsfKEUXSOA7aM/cwJrdpZAC1POSHQOT6qQGpwiUtWO32FmsM/7G6GnNNrwwYHXyger2WK44C1xO6Jwdkwx6NdgiAqWcDZwsJnTsiHoIdAPUzjngEvvxsauhtaIKeXYhcNGzMp/f1ircE6hmKJc6Vv8DlPY9opaNdxKD1z2B0MMDsvFqGGJNIJ/wWdaxI2BgtStLfrcEDjFMnS/4DNQILIPpfNYGpjsiAtPgDS4LvvUQ4KRTy4GTwAcaLquqWog4FcWZwNgxyYajwdH7VsrEnmFttGMfmx4iE/bY1GqPx8YHG5XihXDKb23zpWjgIlL6EWn3Zey1JLERyY7a64Vwz29tsdHlQLh4jNSxGZDunbXy1+vYV/p28Nq+FoVGWnEwM4NdNOgfagOQgyfis34D9rLnfKp2AO5SKASdGCHKQLoz2WOaeRocY3xu2yKWGkkmYoYUy0jKLxrU8YxAXtupaB50O23AgecAv8xkwIjpUpd7dkaRDN6wAW/hBkKXzTw8IyTQfukZnwF7p6rhKAugekhLuDx+HdKvPaqw7/OZR5+avk/NgCh9eZLBt2RSon+i6dtAt/6ZBuN9GvwfGXwmM/omBfp94PQUtDOdn5wF9VNg+1/hHRke9Qpg8y/hzSm81wJt+zy8lwL98/BeCxwZ3vf0D5XUzxaJRoO1AAAAAElFTkSuQmCC'
   }
 }
 
@@ -65,6 +65,14 @@ function frontDrop(message, className) {
   if(!popupRequest){
     $('fd-t')[0].innerHTML = message || '';
     $('fd')[0].className = className || '';
+  }
+  var emic = $('emi-container');
+  if(emic[0]){
+    emic.removeClass('shown');
+    setTimeout(function(){
+      emic[0].style.display = 'none';
+    }, 300)
+    $('fd-in')[0].style.display = '';
   }
 }
 
@@ -227,7 +235,7 @@ var frameDiscreet = {
 
   showModal: function() {
     frameDiscreet.renew();
-    
+
     if(_modal){
       return _modal.show();
     }
@@ -269,11 +277,61 @@ var frameDiscreet = {
     _$el = $('container');
     _smarty = new window.Smarty(_$el);
     frameDiscreet.applyFont($('powered-link')[0]);
-    _modal = frameDiscreet.createModal(_$el.children('modal')[0], opts.modal);
+    _modal = frameDiscreet.createModal($('modal')[0], opts.modal);
+
+    if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('emi-wrap')[0].innerHTML = templates.emi();
+      $('emi-close').on('click', frontDrop);
+      var elem_emi = $('elem-emi');
+      if(elem_emi[0]){
+        elem_emi.addClass('shown').on('mouseup', function(){
+          var shouldCheck = $(this).hasClass('check');
+          if(!$('emi')[0].checked || !shouldCheck){
+            var emic = $('emi-container');
+            emic[0].style.display = 'block';
+            emic.prop('offsetWidth');
+            emic.addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
+            $('fd').addClass('shown');
+            $('fd-in')[0].style.display = 'none';
+          }
+        })
+        $('card_number').on('input', function(){
+          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
+        })
+        $('card_number').on('keypress', function(){
+          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
+        })
+        each(
+          $('emi-container').children('emi-option'),
+          function(i, el){
+            $(el).on('click', function(){
+              var active = $('emi-container').children('emi-active');
+              if(active[0]){
+                $(active[0]).removeClass('emi-active');
+              }
+              $(this).addClass('emi-active')[0].getElementsByTagName('input')[0].checked = true;
+              frontDrop();
+            })
+          }
+        )
+      }
+      $('methods-specific-fields').children('mchild')[0].style.minHeight = '276px';
+
+    }
 
     if($('nb-na')[0]) {
       $('nb-elem').css('display', 'none');
     }
+
+    try{
+      if(!opts.image){
+        $('modal-inner').addClass('noimage');
+      }
+
+      if(shouldFixFixed){
+        $('modal').addClass('ip');
+      }
+    } catch(e){}
 
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)

@@ -2,11 +2,60 @@
 
 @max-width: 414px;
 @media (max-device-height: 450px),(max-device-width: 450px){
+
+  @padding: 22px;
+
   .shake{
     animation:none;
   }
+  #emi-container{
+    width: 100%;
+    left: 0;
+    top: auto;
+    bottom: 0;
+    transform: translateY(10%);
+
+    &.shown{
+      transform: none;
+    }
+    .col{
+      white-space: normal;
+    }
+  }
+  .lh-34{
+    line-height: 34px;
+  }
+  .lh-17{
+    line-height: 17px;
+  }
   #backdrop{
     background: none!important;
+  }
+  #header{
+    padding-top: 20px;
+  }
+  #modal-content{
+    padding: 0 @padding;
+    min-height: 510px;
+  }
+  #form-fields{
+    position: absolute;
+    top: @logo-size + 20px;
+    left: @padding;
+    right: @padding;
+    bottom: @submit-height;
+  }
+  #form-common{
+    height: 33%;
+    &:after{
+      height: 110%;
+    }
+  }
+  #methods-specific-fields{
+    height: 67%;
+    &:after{
+      height: 85%;
+    }
   }
   #container{
     max-width: @max-width;
@@ -15,21 +64,20 @@
     &:after{
       content: none;
     }
-    .modal{
+    #modal{
       min-width: 100%;
       display: block;
       background: #fafafa;
       color: #666;
-      border-radius: 0;
       min-height: 100%;
       margin: 0 auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       transform: translateY(10%) scale(0.9);
     }
-    .modal-inner{
+    #modal-inner{
       position: static;
     }
-    &.shown .modal{
+    &.shown #modal{
       transition: 0.3s ease-out all;
       transform: none;
     }
@@ -41,9 +89,6 @@
       z-index: -1;
       pointer-events: none;
     }
-    button{
-      border-radius: 0;
-    }
     .merchant-image{
       margin-top: 0;
     }
@@ -51,6 +96,32 @@
       margin-top: 12px;
     }
   }
+  #footer{
+    margin: 0 -@padding;
+  }
 }
-@media(max-device-width: 450px){
+.ip{
+  #form-fields{
+    position: static;
+  }
+  #methods-specific-fields, #form-common{
+    height: auto;
+    &:after{
+      content: none;
+    }
+  }
+  #modal-content{
+    min-height: 470px;
+  }
+  #tab-bar{
+    display: none;
+  }
+  #tabs{
+    li{
+      top: 1px;
+      &.active{
+        border-bottom: 3px solid @primary;
+      }
+    }
+  }
 }

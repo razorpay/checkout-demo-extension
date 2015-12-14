@@ -22,7 +22,7 @@ button{
   background: @primary;
   color: #fff;
   &:after{
-    border-radius: inherit;
+    // border-radius: inherit;
     content: '';
     position: absolute;
     top: 0;
@@ -31,7 +31,7 @@ button{
     height: 100%;
     transition: 0.2s;
     opacity: 0;
-    background: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
+    background: linear-gradient(transparent, rgba(0,0,0,.05) 40%, rgba(0,0,0,.1));
   }
   &:hover:after{
     opacity: 1;
@@ -46,8 +46,15 @@ input, select {
   resize: none;
   position: relative;
 }
-input:not([type=radio]), select{
+input, select{
   appearance: none;
+}
+input[type=checkbox]{
+  appearance: checkbox;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+  top: -1px;
 }
 
 @input-padding-left: (30+@input-padding/2);
@@ -96,7 +103,7 @@ input[disabled]{
       color: #333;
     }
   }
-  &.mature.invalid{
+  &.mature.invalid:not(.focused){
     color: @danger;
   }
   &.filled, &.focused{
@@ -191,22 +198,20 @@ input[type=radio]{
   padding: 0;
   display: inline-block;
   vertical-align: middle;
-  position: static\9;
-  width: 0\9;
-  height: 16px;
-  margin: 0 6px 0 @input-padding;
-  &:checked + label{
-    background: #e6e6e6;
-  }
+  width: 0;
+  height: 0;
+  margin: 0;
 }
-label:hover, input[type=radio]:checked + label{
-  border: 1px solid #ddd;
+.radio-label:hover, input[type=radio]:checked + label{
+  border: 1px solid @primary;
   padding: 0 7px;
+  background: #fff;
 }
 #netb-banks{
   margin: 0 -4px;
+  font-size: 0;
 }
-label{
+.radio-label{
   cursor: pointer;
   margin: 10px 3px 0;
   padding: 1px 8px;
@@ -221,6 +226,7 @@ label{
   width: 33.33%;
   float: left;
   clear: none;
+  font-size: 14px;
   img{
     vertical-align: middle;
     width: 20px;
@@ -230,31 +236,80 @@ label{
 }
 
 #tab-wallet{
+  text-align: center;
   label{
-    margin-left: 0;
-    margin-right: 0;
+    white-space: nowrap;
+    text-align: left;
+    display: inline-block;
     height: 38px;
     line-height: 34px;
-    &:before{
-      content: '';
+    padding: 1px 16px;
+    &:after{
       display: inline-block;
-      width: 8px;
+      margin-left: 10px;
+      width: 10px;
+      text-align: center;
+      content: '';
+      color: @primary;
     }
   }
   img{
     vertical-align: middle;
   }
-  &.wallets-1{
-    text-align: center;
-    label{
-      padding-left: 0;
-      width: 50%;
-      margin: 25px auto 0;
-    }
+  input:checked+label, label:hover{
+    padding: 0 15px;
+  }
+  input:checked+label{
     &:after{
-      content: 'More wallets coming soon';
+      content: '✓';
+    }
+  }
+}
+
+#elem-emi{
+  overflow: hidden;
+  height: 0;
+  transition: 0.3s;
+  margin-top: 0;
+  display: inline-block;
+
+  &.shown{
+    margin: 18px 0;
+    height: 20px;
+  }
+
+  .elem-wrap{
+    cursor: pointer;
+    &:before{
+      display: inline-block;
+      content: '';
+      width: @input-padding/2;
+    }
+  }
+  .first{
+    &:after{
+      border-radius: 50%;
+      content: '?';
+      color: #fff;
+      background: #616161;
+      display: inline-block;
+      height: 14px;
+      line-height: 14px;
+      width: 14px;
+      font-size: 12px;
+      text-align: center;
+      margin-left: 4px;
+    }
+  }
+  .last{
+    display: none;
+  }
+  &.check{
+    .first{
+      display: none;
+    }
+    .last{
       display: block;
-      margin-top: 14px;
     }
   }
 }
