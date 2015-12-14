@@ -301,33 +301,33 @@ describe('communicator', function(){
 })
 
 
-describe('submitFormData', function(){
-  var oldFrame, oldSubmit;
+// describe('submitFormData', function(){
+//   var oldFrame, oldSubmit;
 
-  it('should setup cookie polling if submitted to new tab and we\'re in iframe', function(done){
-    oldSubmit = HTMLFormElement.prototype.submit;
-    oldFrame = discreet.isFrame;
-    discreet.isFrame = true;
+//   it('should setup cookie polling if submitted to new tab and we\'re in iframe', function(done){
+//     oldSubmit = HTMLFormElement.prototype.submit;
+//     oldFrame = discreet.isFrame;
+//     discreet.isFrame = true;
 
-    clearCookieInterval();
-    HTMLFormElement.prototype.submit = jQuery.noop;
-    submitFormData('', null, null, '_blank');
-    expect(!!cookieInterval).toBe(true);
-    setCookie('onComplete', 'hello');
+//     clearCookieInterval();
+//     HTMLFormElement.prototype.submit = jQuery.noop;
+//     submitFormData('', null, null, '_blank');
+//     expect(!!cookieInterval).toBe(true);
+//     setCookie('onComplete', 'hello');
 
-    spyOn(window, 'onComplete').and.callFake(function(response){
-      expect(getCookie('onComplete')).toBe(null);
-      expect(cookieInterval).toBe(null);
-      expect(response).toBe('hello');
-      done();
-    })
-  })
+//     spyOn(window, 'onComplete').and.callFake(function(response){
+//       expect(getCookie('onComplete')).toBe(null);
+//       expect(cookieInterval).toBe(null);
+//       expect(response).toBe('hello');
+//       done();
+//     })
+//   })
 
-  afterEach(function(){
-    discreet.isFrame = oldFrame;
-    HTMLFormElement.prototype.submit = oldSubmit;
-  })
-})
+//   afterEach(function(){
+//     discreet.isFrame = oldFrame;
+//     HTMLFormElement.prototype.submit = oldSubmit;
+//   })
+// })
 
 describe('onMessage should invoke onComplete', function(){
   var spy, shouldCall;
