@@ -67,17 +67,21 @@ function submitFormData(action, data, method, target) {
   form.parentNode.removeChild(form);
 
   if(target && discreet.isFrame){
-    deleteCookie('onComplete');
-
-    cookieInterval = setInterval(function(){
-      var cookie = getCookie('onComplete');
-      if(cookie){
-        clearCookieInterval();
-        deleteCookie('onComplete');
-        onComplete(cookie);
-      }
-    }, 150)
+    cookiePoll();
   }
+}
+
+function cookiePoll(){
+  deleteCookie('onComplete');
+
+  cookieInterval = setInterval(function(){
+    var cookie = getCookie('onComplete');
+    if(cookie){
+      clearCookieInterval();
+      deleteCookie('onComplete');
+      onComplete(cookie);
+    }
+  }, 150)
 }
 
 function createPopup(data, url, options) {
