@@ -5,7 +5,7 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-var ch_isOpen,
+var isOpen, isLoaded, existingInstance,
 ch_CriOS_interval,
 ch_CriOS_listener,
 ch_CriOS_frame,
@@ -15,13 +15,15 @@ ch_metaViewportTag,
 ch_metaViewport;
 
 var ch_PageY = 0;
+var doc = document.body || document.documentElement;
+var docStyle = doc.style;
+var checkoutFrame;
+
 // there is no "position: fixed" in iphone
-var docStyle = document.documentElement.style;
 var merchantMarkup = {
 
   _: {
     meta: null,
-    body: null,
     overflow: ''
   },
 
@@ -66,7 +68,7 @@ var merchantMarkup = {
 
 // scroll manually in iPhone
   scroll: function(){
-    if(!ch_isOpen || typeof window.pageYOffset !== 'number'){
+    if(!isOpen || typeof window.pageYOffset !== 'number'){
       return;
     }
 
@@ -137,8 +139,8 @@ function ch_onClose(){
     $(window).off('unload', ch_CriOS_listener);
     ch_CriOS_listener = null;
   }
-  $.removeMessageListener();
-  ch_isOpen = false;
+  // $.removeMessageListener();
+  isOpen = false;
   merchantMarkup.reset();
 
   if(ch_metaViewportTag && ch_metaViewportTag.parentNode){
@@ -152,17 +154,13 @@ function ch_onClose(){
       ch_metaViewport = null;
     }
   }
-  var frame = this.checkoutFrame;
+  var frame = checkoutFrame;
+
   if(frame){
     if(isCriOS && frame.contentWindow){
       frame.contentWindow.close();
     }
     frame.style.display = 'none';
-
-    if(frame.getAttribute('removable')){
-      $(frame).remove()
-      this.checkoutFrame = null;
-    }
   }
 
   if(ch_frameContainer){
@@ -175,13 +173,13 @@ function ch_onClose(){
 }
 
 var ch_sendFrameMessage = function(response){
-  if(isCriOS){
+  if(isCriOS || !checkoutFrame){
     return;
   }
   if(typeof response !== 'string'){
     response = JSON.stringify(response);
   }
-  this.checkoutFrame.contentWindow.postMessage(response, '*');
+  checkoutFrame.contentWindow.postMessage(response, '*');
 }
 
 // to handle absolute/relative url of options.image
@@ -260,7 +258,10 @@ function ch_createFrameOptions(){
 var ch_messageHandlers = {
 
   load: function() {
-    ch_sendFrameMessage.call(this, ch_createFrameOptions.call(this));
+    isLoaded = true;
+    if(existingInstance){
+      ch_sendFrameMessage.call(existingInstance, ch_createFrameOptions.call(existingInstance));
+    }
   },
 
   redirect: function(data){
@@ -278,49 +279,46 @@ var ch_messageHandlers = {
     if(ch_backdrop){
       ch_backdrop.style.background = '';
     }
-    if(typeof this.options.modal.ondismiss === 'function'){
-      this.options.modal.ondismiss()
+    if(existingInstance && typeof existingInstance.options.modal.ondismiss === 'function'){
+      existingInstance.options.modal.ondismiss()
     }
   },
 
   hidden: function(){
-    ch_onClose.call(this);
+    ch_onClose.call(existingInstance);
   },
 
   success: function(data){
-    if(this.checkoutFrame){
-      this.checkoutFrame.setAttribute('removable', true);
-    }
-    var handler = this.options.handler;
+    var handler = existingInstance.options.handler;
     if(typeof handler === 'function'){
       setTimeout(function(){
         handler.call(null, data);
       })
     }
     if(isCriOS){
-      ch_close.call(this);
+      ch_close.call(existingInstance);
     }
+    existingInstance = null;
   },
 
   failure: function(data){
-    ch_close.call(this);
+    ch_close.call(existingInstance);
     alert('Payment Failed.\n' + data.error.description);
   },
 
   fault: function(){
     alert("Oops! Something went wrong.");
-    ch_onClose.call(this);
-    this.close();
+    ch_onClose.call(existingInstance);
+    existingInstance.close();
   }
 }
 
 function ch_onFrameMessage(e, data){
-  // this === rzp
   if(
     !e.origin ||
     data.source !== 'frame' ||
-    !this.checkoutFrame ||
-    this.checkoutFrame.getAttribute('src').indexOf(e.origin)
+    !checkoutFrame ||
+    checkoutFrame.getAttribute('src').indexOf(e.origin)
   ){ // source check
     return;
   }
@@ -328,7 +326,7 @@ function ch_onFrameMessage(e, data){
   data = data.data;
   var handler = ch_messageHandlers[event];
   if(typeof handler === 'function'){
-    handler.call(this, data);
+    handler.call(existingInstance, data);
   }
 
   if(event === 'dismiss' || event === 'fault'){
@@ -343,7 +341,7 @@ function ch_onFrameMessage(e, data){
   @return {[type]}    [description]
 */
 var ch_defaultPostHandler = function(data){
-  var RazorPayForm = currentScript.parentElement;
+  var RazorPayForm = currentScript.parentNode;
   RazorPayForm.innerHTML += deserialize(data);
   RazorPayForm.submit();
 }
@@ -381,7 +379,7 @@ var ch_addButton = function(rzp){
   button.className = 'razorpay-payment-button';
   form.appendChild(button);
   form.onsubmit = function(e){
-    if(ch_isOpen){
+    if(isOpen){
       return;
     }
     e.preventDefault();
@@ -395,23 +393,61 @@ var ch_addButton = function(rzp){
 * If yes, it puts in the button
 */
 function ch_automaticCheckoutInit(){
-  var key = currentScript.getAttribute('data-key');
-  if (key && key.length > 0){
-    var opts = {};
-    each(
-      currentScript.attributes,
-      function(i, attr){
-        var name = attr.name
-        if(/^data-/.test(name)){
-          name = name.replace(/^data-/,'');
-          opts[name] = attr.value;
-        }
+  var opts = {};
+  each(
+    currentScript.attributes,
+    function(i, attr){
+      var name = attr.name
+      if(/^data-/.test(name)){
+        name = name.replace(/^data-/,'');
+        opts[name] = attr.value;
       }
-    )
-    ch_parseScriptOptions(opts);
-    opts.handler = ch_defaultPostHandler;
+    }
+  )
+  ch_parseScriptOptions(opts);
+  opts.handler = ch_defaultPostHandler;
+
+  var amount = currentScript.getAttribute('data-amount');
+  if (amount && amount.length > 0){
     var rzp = new Razorpay(opts);
     ch_addButton(rzp);
+  }
+}
+
+function preloadFrame(){
+  var key = Razorpay.defaults.key;
+  if (key){
+    loadFrame(key);
+  }
+}
+
+function loadFrame(optionsOrKey){
+  var key, options;
+  if( typeof optionsOrKey === 'object' ){
+    key = optionsOrKey.key;
+    options = optionsOrKey;
+  }
+  else {
+    key = optionsOrKey;
+    options = Razorpay.defaults;
+  }
+
+  var src = discreet.makeUrl(options) + '/checkout?key_id=' + key;
+  isLoaded = false;
+
+  if(!checkoutFrame){
+    $.addMessageListener(ch_onFrameMessage, this);
+    checkoutFrame = ch_createFrame(
+      discreet.makeUrl(options) + '/checkout?key_id=' + key,
+      isCriOS ? 'div' : 'iframe'
+    );
+    ch_frameContainer.appendChild(checkoutFrame);
+  }
+  else if(checkoutFrame.src !== src){
+    checkoutFrame.src = src;
+  }
+  else {
+    isLoaded = true;
   }
 }
 
@@ -419,12 +455,13 @@ function ch_createFrameContainer(){
   // var formHeight = Math.max(innerHeight, 487) + 'px';
   if(!ch_frameContainer){
     ch_frameContainer = document.createElement('div');
-    ch_frameContainer.className = 'razorpay-frame-container';
+    ch_frameContainer.className = 'razorpay-container';
     var style = ch_frameContainer.style;
     var rules = {
       zIndex: '99999',
       position: shouldFixFixed ? 'absolute' : 'fixed',
       top: 0,
+      display: 'none',
       left: 0,
       height: '100%',
       width: '100%',
@@ -439,10 +476,11 @@ function ch_createFrameContainer(){
     ch_backdrop = document.createElement('div');
     ch_backdrop.setAttribute('style', 'min-height: 100%; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
     ch_frameContainer.appendChild(ch_backdrop);
-    merchantMarkup._.body.appendChild(ch_frameContainer);
+    doc.appendChild(ch_frameContainer);
   }
+}
 
-  ch_frameContainer.style.display = 'block';
+function setBackdropBackground(){
   try{
     // setting unsupported value throws error in IE
     ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
@@ -455,50 +493,42 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  if(!merchantMarkup._.body){
-    merchantMarkup._.body = document.querySelector('body');
-  }
-
-  if(!merchantMarkup._.body){
-    setTimeout(this.open, 100);
-  }
-
-  if(ch_isOpen){
+  if(isOpen){
     return;
   }
-  ch_isOpen = true;
 
-  $.addMessageListener(ch_onFrameMessage, this);
+  isOpen = true;
 
-  ch_createFrameContainer();
-
-  var existing_frame = this.checkoutFrame;
-  var src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
-
-  if(!existing_frame) {
-    this.checkoutFrame = ch_createFrame(
-      src,
-      isCriOS ? 'div' : 'iframe'
-    );
-    ch_frameContainer.appendChild(this.checkoutFrame);
+  if(existingInstance !== this){
+    existingInstance = this;
+    if(isLoaded){
+      ch_messageHandlers.load.call(this);
+    }
   }
+
+  loadFrame(options);
+
+
+  ch_frameContainer.style.display = 'block';
   merchantMarkup.clear();
 
-  if(isCriOS){
+  if(isCriOS) {
     var self = this;
     var opts = ch_createFrameOptions.call(this);
     opts.options.redirect = true;
-    src += '&message=' + _btoa(JSON.stringify(opts));
+
+    var src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key + '&message=' + _btoa(JSON.stringify(opts));
     ch_CriOS_listener = $(window).on('unload', ch_close, false, this);
-    this.checkoutFrame.contentWindow = window.open(src, '');
+    checkoutFrame.contentWindow = window.open(src, '');
+
     ch_CriOS_interval = setInterval(function(){
-      if(self.checkoutFrame.contentWindow.closed){
+      if(checkoutFrame.contentWindow.closed){
         ch_close.call(self);
       }
     }, 500)
   }
 
-  if( !this.checkoutFrame.contentWindow ) {
+  if( !checkoutFrame.contentWindow ) {
     ch_onClose();
     alert(
       (isCriOS ? 'Chrome for iOS' : 'This browser') +
@@ -506,15 +536,16 @@ Razorpay.prototype.open = function() {
     );
   }
 
-  if(existing_frame) {
-    this.checkoutFrame.style.display = 'block';
+  if ( existingInstance ) {
+    checkoutFrame.style.display = 'block';
     ch_setMetaViewport();
     ch_sendFrameMessage.call(this, {event: 'open'});
   }
+  setBackdropBackground();
 };
 
 Razorpay.prototype.close = function(){
-  if(ch_isOpen){
+  if(isOpen){
     ch_sendFrameMessage.call(this, {event: 'close'});
   }
 };
@@ -531,5 +562,8 @@ discreet.validateCheckout = function(options){
   }
 };
 
+ch_createFrameContainer();
+
 // Get the ball rolling in case we are in manual mode
 ch_automaticCheckoutInit();
+preloadFrame();
