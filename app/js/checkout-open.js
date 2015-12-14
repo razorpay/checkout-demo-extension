@@ -15,7 +15,6 @@ ch_metaViewportTag,
 ch_metaViewport;
 
 var ch_PageY = 0;
-var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 // there is no "position: fixed" in iphone
 var docStyle = document.documentElement.style;
 var merchantMarkup = {
@@ -45,16 +44,17 @@ var merchantMarkup = {
 
     if(shouldFixFixed){
       scrollTo(0, 0);
-      merchantMarkup.scroll();
-      each(
-        ['orientationchange', 'scroll'],
-        function(i, event){
-          var frame = ch_frameContainer && ch_frameContainer.getElementsByTagName('iframe')[0];
-          if(frame){
+      var frame = ch_frameContainer && ch_frameContainer.getElementsByTagName('iframe')[0];
+      if(frame){
+        merchantMarkup.orientationchange.call(frame);
+        merchantMarkup.scroll();
+        each(
+          ['orientationchange', 'scroll'],
+          function(i, event){
             merchantMarkup.listeners[event] = $(window).on(event, merchantMarkup[event], false, frame);
           }
-        }
-      )
+        )
+      }
     }
   },
 

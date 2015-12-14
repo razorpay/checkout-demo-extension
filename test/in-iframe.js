@@ -229,7 +229,7 @@ describe("Razorpay card tab", function(){
   });
 
   it("should load modal and prefill fields", function(){
-    expect(jQuery('.modal')).toBeVisible();
+    expect(jQuery('#modal')).toBeVisible();
     expect($name.val()).toBe(coOptions.prefill.name);
     expect($email.val()).toBe(coOptions.prefill.email);
     expect($contact.val()).toBe(coOptions.prefill.contact);
@@ -426,7 +426,7 @@ describe("Razorpay card tab submit", function(){
         addAllCC();
         spyCalled();
 
-        data = frameDiscreet.getFormData(jQuery('.modal form'), true);
+        data = frameDiscreet.getFormData(jQuery('#modal form'), true);
       });
 
       it("should return contact", function(){
