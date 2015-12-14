@@ -3,6 +3,7 @@ var popupRequest, cookieInterval, communicator;
 
 function clearCookieInterval(){
   if(cookieInterval){
+    deleteCookie('onComplete');
     clearInterval(cookieInterval);
     cookieInterval = null;
   }
@@ -66,9 +67,9 @@ function submitFormData(action, data, method, target) {
   form.submit();
   form.parentNode.removeChild(form);
 
-  if(target && discreet.isFrame){
-    cookiePoll();
-  }
+  // if(target && discreet.isFrame){
+  //   cookiePoll();
+  // }
 }
 
 function cookiePoll(){
@@ -78,7 +79,6 @@ function cookiePoll(){
     var cookie = getCookie('onComplete');
     if(cookie){
       clearCookieInterval();
-      deleteCookie('onComplete');
       onComplete(cookie);
     }
   }, 150)
@@ -287,6 +287,7 @@ Razorpay.payment = {
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
+    cookiePoll();
     popupRequest = request;
   },
 
