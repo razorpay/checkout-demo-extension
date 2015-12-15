@@ -354,7 +354,10 @@ var frameDiscreet = {
         )
       }
       $('#methods-specific-fields > .mchild').css('minHeight', '276px');
-
+    }
+    if(opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('powered-link')[0].style.visibility = 'hidden';
+      $('powered-link')[0].style.pointerEvents = 'none';
     }
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
