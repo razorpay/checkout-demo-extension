@@ -31,7 +31,7 @@
     }
   }
 }
-#modal-inner.noimage #fd:after{
+.noimage #fd:after{
   content: none;
 }
 #fd-in{
@@ -175,7 +175,6 @@ iframe{
 }
 /* Default class for an overlay */
 #header{
-  // border-radius: @border-radius @border-radius 0 0;
   padding-top: 12px;
   height: 48px;
   text-align: left;
@@ -348,6 +347,7 @@ iframe{
   position: relative;
   margin: 16px -10px 6px;
   border-bottom: 1px solid @border-color;
+  line-height: 48px;
 
   &.tabs-1{
     display: none;
@@ -361,8 +361,6 @@ iframe{
 
   li{
     list-style: none;
-    height: 48px;
-    line-height: 48px;
     margin: 0;
     text-align: center;
     width: 50%;

@@ -61,24 +61,63 @@ var freqWallets = {
 
 var _smarty, _modal, _$el;
 
+function addModalDOM(opts){
+  var div = document.createElement('div');
+  try{
+    div.style.color = opts.theme.color;
+    if(div.style.color){
+      var style = document.createElement('style');
+      document.body.appendChild(style);
+      var rules = templates.theme(opts.theme.color);
+      if (style.styleSheet) {
+        style.styleSheet.cssText = rules;
+      } else {
+        style.appendChild(document.createTextNode(rules));
+      }
+    }
+  } catch(e){
+    roll(e.message);
+  }
+
+  div.innerHTML = templates.modal(opts);
+  var container = div.firstChild;
+  document.body.appendChild(container);
+
+  var classes = [];
+
+  if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
+    classes.push('mobile');
+  }
+
+  if(!opts.image){
+    classes.push('noimage');
+  }
+
+  if(shouldFixFixed){
+    classes.push('ip')
+  }
+
+  $(container).addClass(classes.join(' '));
+}
+
 function frontDrop(message, className) {
   if(!popupRequest){
-    $('fd-t')[0].innerHTML = message || '';
-    $('fd')[0].className = className || '';
+    gel('fd-t').innerHTML = message || '';
+    gel('fd').className = className || '';
   }
   var emic = $('emi-container');
   if(emic[0]){
     emic.removeClass('shown');
     setTimeout(function(){
-      emic[0].style.display = 'none';
+      emic.hide();
     }, 300)
-    $('fd-in')[0].style.display = '';
+    gel('fd-in').style.display = '';
   }
 }
 
 function shakeModal() {
   if(shouldShakeOnError && _modal){
-    $('modal-inner').removeClass('shake').reflow().addClass('shake');
+    $('#modal-inner').removeClass('shake').reflow().addClass('shake');
   }
 }
 
@@ -178,20 +217,40 @@ var frameDiscreet = {
     $(this.parentNode)[card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
   },
 
+  setCVVFormatting: function(cvvlen){
+    var cvv_help = $('.elem-cvv .help-text');
+    cvv_help.html(cvv_help.html().replace(/3|4/, cvvlen));
+    this.maxLength = cvvlen;
+    this.pattern = '[0-9]{'+cvvlen+'}';
+    $(this.parentNode)[this.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
+  },
+
   setCardFormatting: function(){
-    var $el_number = $('card_number');
-    var el_expiry = $('card_expiry')[0];
-    var el_cvv = $('card_cvv')[0];
-    var el_contact = $('contact')[0];
+    var $el_number = $('#card_number');
+    var el_expiry = gel('card_expiry');
+    var el_cvv = gel('card_cvv');
+    var el_contact = gel('contact');
     
     card.setType = function(el, type){
       if(!type){
         type = card.getType(el.value) || 'unknown';
       }
+      var parent = el.parentNode;
 
-      el.parentNode.setAttribute('cardtype', type);
+      var oldType = parent.getAttribute('cardtype');
+      if(type === oldType){
+        return;
+      }
+
+      parent.setAttribute('cardtype', type);
       frameDiscreet.setNumberValidity.call(el);
       
+      if(type === 'amex'){
+        frameDiscreet.setCVVFormatting.call(el_cvv, 4);
+      }
+      else if(oldType === 'amex'){
+        frameDiscreet.setCVVFormatting.call(el_cvv, 3);
+      }
       // if(type !== 'maestro'){
         // $('nocvv-check')[0].checked = false;
         // frameDiscreet.toggle_nocvv();
@@ -239,7 +298,7 @@ var frameDiscreet = {
     if(_modal){
       return _modal.show();
     }
-    $('loading').remove();
+    $('#loading').remove();
     var opts = $.clone(Razorpay.defaults);
 
     if(opts.amount >= 100*10000){
@@ -249,136 +308,99 @@ var frameDiscreet = {
     frameDiscreet.setMethods(window.payment_methods, opts.method);
     frameDiscreet.sanitizeOptions(opts);
 
-    var div = document.createElement('div');
     opts.netbanks = freqBanks;
 
-    try{
-      div.style.color = opts.theme.color;
-      if(div.style.color){
-        var style = document.createElement('style');
-        document.body.appendChild(style);
-        var rules = templates.theme(opts.theme.color);
-        if (style.styleSheet) {
-          style.styleSheet.cssText = rules;
-        } else {
-          style.appendChild(document.createTextNode(rules));
-        }
-      }
-    } catch(e){
-      roll(e.message);
-    }
-    div.innerHTML = templates.modal(opts);
-    document.body.appendChild(div.firstChild);
-
+    addModalDOM(opts);
+    
     if ( CheckoutBridge ) {
-      $('backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
-
-    _$el = $('container');
+    _$el = $('#container');
     _smarty = new window.Smarty(_$el);
-    frameDiscreet.applyFont($('powered-link')[0]);
-    _modal = frameDiscreet.createModal($('modal')[0], opts.modal);
+
+    frameDiscreet.applyFont(gel('powered-link'));
+    _modal = frameDiscreet.createModal(gel('modal'), opts.modal);
 
     if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
-      $('emi-wrap')[0].innerHTML = templates.emi();
-      $('emi-close').on('click', frontDrop);
-      var elem_emi = $('elem-emi');
+      $('#emi-wrap').html(templates.emi());
+      $('#emi-close').on('click', frontDrop);
+      var elem_emi = $('#elem-emi');
       if(elem_emi[0]){
         elem_emi.addClass('shown').on('mouseup', function(){
           var shouldCheck = $(this).hasClass('check');
-          if(!$('emi')[0].checked || !shouldCheck){
-            var emic = $('emi-container');
-            emic[0].style.display = 'block';
-            emic.prop('offsetWidth');
-            emic.addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
-            $('fd').addClass('shown');
-            $('fd-in')[0].style.display = 'none';
+          if(!gel('emi').checked || !shouldCheck){
+
+            $('#emi-container')
+              .css('display', 'block')
+              .reflow()
+              .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
+
+            $('#fd').addClass('shown');
+            $('#fd-in').hide();
           }
         })
-        $('card_number').on('input', function(){
-          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
-        })
-        $('card_number').on('keypress', function(){
+        $('#card_number').on('input keypress', function(){
           elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
         })
         each(
-          $('emi-container').children('emi-option'),
+          $('#emi-container > .emi-option'),
           function(i, el){
             $(el).on('click', function(){
-              var active = $('emi-container').children('emi-active');
-              if(active[0]){
-                $(active[0]).removeClass('emi-active');
-              }
-              $(this).addClass('emi-active')[0].getElementsByTagName('input')[0].checked = true;
+              $('#emi-container > .emi-active').removeClass('emi-active');
+              $(this).addClass('emi-active').find('input')[0].checked = true;
               frontDrop();
             })
           }
         )
       }
-      $('methods-specific-fields').children('mchild')[0].style.minHeight = '276px';
+      $('#methods-specific-fields > .mchild').css('minHeight', '276px');
     }
     if(opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
       $('powered-link')[0].style.visibility = 'hidden';
       $('powered-link')[0].style.pointerEvents = 'none';
     }
-
-    if($('nb-na')[0]) {
-      $('nb-elem').css('display', 'none');
-    }
-
-    try{
-      if(!opts.image){
-        $('modal-inner').addClass('noimage');
-      }
-
-      if(shouldFixFixed){
-        $('modal').addClass('ip');
-      }
-    } catch(e){}
-
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
-    $('modal-close').on('click', function(){
+    $('#modal-close').on('click', function(){
       Razorpay.payment.cancel();
       _modal.hide();
     });
-    $('tabs').on('click', frameDiscreet.tab_change);
-    $('form').on('submit', function(e){
+    $('#tabs').on('click', frameDiscreet.tab_change);
+    $('#form').on('submit', function(e){
       frameDiscreet.formSubmit();
       e.preventDefault();
     });
 
-    $('bank-select').on('change', frameDiscreet.bank_change);
+    $('#bank-select').on('change', frameDiscreet.bank_change);
 
     if(window.addEventListener){
-      $('netb-banks').on('change', frameDiscreet.bank_radio, true);
+      $('#netb-banks').on('change', frameDiscreet.bank_radio, true);
     }
     else {
       each(
-        $('netb-banks').find('bank-radio'),
+        $$('netb-banks .bank-radio'),
         function(i, bankRadio){
           $(bankRadio).on('click', frameDiscreet.bank_radio, true);
         }
       )
     }
 
-    $('fd').on('click', function(e){
+    $('#fd').on('click', function(e){
       var id = e.target.id;
       if(id === 'fd' || id === 'fd-hide') {
         frontDrop();
       }
     });
-    $('backdrop').on('click', frontDrop);
+    $('#backdrop').on('click', frontDrop);
 
     if(qpmap.tab){
       each(
-        $('tabs')[0].getElementsByTagName('li'),
+        $$('#tabs > li'),
         function(i, li){
           if( li.getAttribute('data-target') === 'tab-' + qpmap.tab ) {
             frameDiscreet.tab_change({target: li});
           }
-        },
-        true
+        }
       )
     }
     if(qpmap.error){
@@ -390,7 +412,7 @@ var frameDiscreet = {
   },
 
   bank_radio: function(e) {
-    var select = $('bank-select')[0];
+    var select = gel('bank-select');
     select.value = e.target.value;
     _smarty.input({target: select});
   },
@@ -398,7 +420,7 @@ var frameDiscreet = {
   bank_change: function() {
     var val = this.value;
     each(
-      $('netb-banks')[0].getElementsByTagName('input'),
+      $$('#netb-banks input'),
       function(i, radio) {
         if(radio.value === val){
           radio.checked = true;
@@ -422,11 +444,10 @@ var frameDiscreet = {
 
     frameDiscreet.renew();
 
-    var tabContent = $(target.getAttribute('data-target'));
-    $(tabContent.parent().children('active')[0]).removeClass('active');
-    tabContent.addClass('active');
+    $('.tab-content.active').removeClass('active');
+    $('#' + target.getAttribute('data-target')).addClass('active');
 
-    $($(target.parentNode).children('active')[0]).removeClass('active');
+    $('#tabs > .active').removeClass('active');
     $(target).addClass('active');
   },
 
@@ -455,11 +476,11 @@ var frameDiscreet = {
   },
 
   /* sets focus on invalid input and returns true, if any. */
-  isInvalid: function(parent) {
-    var invalids = $(parent).find('invalid');
+  isInvalid: function(parentID) {
+    var invalids = $('#' + parentID).find('.invalid');
     if(invalids[0]){
       shakeModal();
-      $($(invalids[0]).find('input')[0]).focus();
+      $(invalids[0]).find('.input')[0].focus();
 
       each( invalids, function(i, field){
         $(field).addClass('mature');
@@ -478,7 +499,7 @@ var frameDiscreet = {
     // var card_number = $('card_number')[0];
     // card_number && frameDiscreet.setNumberValidity.call(card_number);
 
-    var activeTab = $('tabs').find('active')[0];
+    var activeTab = $('#tabs > .active')[0];
     if ( activeTab && frameDiscreet.isInvalid(activeTab.getAttribute('data-target')) ) {
       return;
     }
@@ -507,14 +528,14 @@ var frameDiscreet = {
     });
   },
 
-  getFormFields: function(container, returnObj) {
+  getFormFields: function(containerID, returnObj) {
     each(
-      $(container)[0].getElementsByTagName('*'),
+      $('#' + containerID).find('input[name],select[name]'),
       function(i, el){
         if(el.getAttribute('type') === 'radio' && !el.checked) {
           return;
         }
-        if(el.name && !el.disabled && el.value.length) {
+        if(!el.disabled && el.value.length) {
           returnObj[el.name] = el.value;
         }
       }
@@ -522,7 +543,7 @@ var frameDiscreet = {
   },
 
   getFormData: function() {
-    var activeTab = $('tabs').find('active')[0];
+    var activeTab = $('#tabs > .active')[0];
     if(!activeTab) { return }
     
     var data = {};
@@ -563,7 +584,7 @@ var frameDiscreet = {
 
   hide: function(){
     if(_modal){
-      $('modal-inner').removeClass('shake');
+      $('#modal-inner').removeClass('shake');
       _modal.hide();
     }
     _modal = null;
@@ -616,7 +637,7 @@ var frameDiscreet = {
       message || 'There was an error in handling your request',
       'shown'
     );
-    $('fd-hide').focus();
+    $('#fd-hide').focus();
   },
 
   dataHandler: function(data){
@@ -624,7 +645,7 @@ var frameDiscreet = {
       return;
     }
 
-    frameDiscreet.tab_change({target: $('method-' + data.method + '-tab')[0]});
+    frameDiscreet.tab_change({target: $('#method-' + data.method + '-tab')[0]});
 
     if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
       data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
@@ -641,7 +662,7 @@ var frameDiscreet = {
         'bank': 'bank-select'
       },
       function(name, id){
-        var el = $(id)[0];
+        var el = gel(id);
         if(el) {
           lastel = el;
           var val = data[name];

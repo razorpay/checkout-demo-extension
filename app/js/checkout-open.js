@@ -44,7 +44,7 @@ var merchantMarkup = {
 
     if(shouldFixFixed){
       scrollTo(0, 0);
-      var frame = ch_frameContainer && ch_frameContainer.getElementsByTagName('iframe')[0];
+      var frame = ch_frameContainer && ch_frameContainer.querySelector('iframe');
       if(frame){
         merchantMarkup.orientationchange.call(frame);
         merchantMarkup.scroll();
@@ -142,12 +142,12 @@ function ch_onClose(){
   merchantMarkup.reset();
 
   if(ch_metaViewportTag && ch_metaViewportTag.parentNode){
-    ch_metaViewportTag.parentNode.removeChild(ch_metaViewportTag);
+    $(ch_metaViewportTag).remove();
   }
 
   var meta = ch_metaViewport;
   if(meta){
-    var head = document.getElementsByTagName('head')[0];
+    var head = document.querySelector('head');
     if(head && !meta.parentNode && head.appendChild(meta)){
       ch_metaViewport = null;
     }
@@ -160,10 +160,7 @@ function ch_onClose(){
     frame.style.display = 'none';
 
     if(frame.getAttribute('removable')){
-      if(frame.parentNode) {
-        frame.parentNode.removeChild(frame);
-      }
-
+      $(frame).remove()
       this.checkoutFrame = null;
     }
   }
@@ -220,7 +217,7 @@ var ch_setMetaViewport = function(){
 
   if(meta){
     ch_metaViewport = meta;
-    meta.parentNode.removeChild(meta);
+    $(meta).remove();
   }
 
   if(!ch_metaViewportTag){
@@ -459,7 +456,7 @@ Razorpay.prototype.open = function() {
   }
 
   if(!merchantMarkup._.body){
-    merchantMarkup._.body = document.getElementsByTagName('body')[0];
+    merchantMarkup._.body = document.querySelector('body');
   }
 
   if(!merchantMarkup._.body){

@@ -1,8 +1,18 @@
 var $ = function(el){
-  if(typeof el === 'string') { return $(document.getElementById(el)) }
+  if(typeof el === 'string') {
+    return $(document.querySelector(el))
+  }
   if(!(this instanceof $)) { return new $(el) }
   this[0] = el;
 };
+
+function $$(query){
+  return document.querySelectorAll(query);
+}
+
+function gel(id){
+  return document.getElementById(id);
+}
 
 var each = function( iteratee, eachFunc ) {
   var i;
@@ -51,23 +61,33 @@ $.prototype = {
     if(!el) { return }
 
     var ref;
-    if (window.addEventListener) {
+    var shouldAddListener = window.addEventListener;
+    if (shouldAddListener) {
       ref = function(e){
         if( e.target.nodeType === 3 ) {
           e.target = e.target.parentNode;// textNode target
         }
         callback.call(thisArg || this, e);
       }
-      el.addEventListener(event, ref, !!capture);
-    } else if(window.attachEvent){
+    } else {
       ref = function(e){
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
         callback.call(thisArg || el, e);
       }
-      el.attachEvent('on' + event, ref);
     }
+    each(
+      event.split(' '),
+      function(i, evt){
+        if( shouldAddListener ) {
+          el.addEventListener(evt, ref, !!capture)
+        }
+        else {
+          el.attachEvent('on' + evt, ref);
+        }
+      }
+    )
     return ref;
   },
 
@@ -107,62 +127,37 @@ $.prototype = {
   },
 
   hasClass: function(str){
-    return (' ' + this.prop('className') + ' ').indexOf(' ' + str + ' ') >= 0;
+    return (' ' + this[0].className + ' ').indexOf(' ' + str + ' ') >= 0;
   },
 
   addClass: function(str){
-    if(str){
-      if(!this.prop('className')){
-        this.prop('className', str);
+    var el = this[0];
+    if(str && el){
+      if(!el.className){
+        el.className = str;
       }
       else if(!this.hasClass(str)){
-        this[0].className += ' ' + str;
+        el.className += ' ' + str;
       }
     }
     return this;
   },
 
   removeClass: function(str){
-    var className = (' ' + this.prop('className') + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-    if( this.prop('className') !== className ){
-      this.prop( 'className', className );
+    var el = this[0];
+    if(el){
+      var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
+      if( el.className !== className ){
+        el.className = className;
+      }
     }
     return this;
   },
 
-  children: function(filterClass){
-    var child = this.prop('firstChild');
-    var childList = [];
-    while(child){
-      if(child.nodeType === 1 && !filterClass || $(child).hasClass(filterClass)) {
-        childList.push(child);
-      }
-      child = child.nextSibling;
-    }
-    return childList;
-  },
-
-  find: function(filterClass, filterTag){
-    var result = [];
+  find: function(selector){
     var node = this[0];
     if(node){
-      if('getElementsByClassName' in document){
-        return node.getElementsByClassName(filterClass);
-      }
-
-      if( !filterTag ) {
-        filterTag = '*';
-      }
-
-      var els = node.getElementsByTagName(filterTag);
-      var pattern = new RegExp("(^|\\s)"+filterClass+"(\\s|$)");
-
-      each(els, function(i, el){
-        if( pattern.test(el.className) ) {
-          result.push(el);
-        }
-      })
-      return result;
+      return node.querySelectorAll(selector);
     }
   },
 
@@ -179,12 +174,20 @@ $.prototype = {
     return this;
   },
 
+  hide: function(){
+    return this.css('display', 'none');
+  },
+
   parent: function(){
     return $(this.prop('parentNode'));
   },
 
   html: function(html){
-    return this.prop('innerHTML', html);
+    if(arguments.length){
+      this[0].innerHTML = html;
+      return this;
+    }
+    return this[0].innerHTML;
   },
 
   focus: function(){

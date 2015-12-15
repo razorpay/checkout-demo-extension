@@ -83,8 +83,6 @@ input[disabled]{
 .elem{
   margin-right: @input-padding-left;
   clear: both;
-  height: @input-height;
-  line-height: @input-height;
   position: relative;
   cursor: text;
   display: block;
@@ -92,8 +90,8 @@ input[disabled]{
   .i{
     position: absolute;
     left: @input-padding/2;
-    top: 50%;
-    margin-top: 4px;
+    bottom: 50%;
+    margin-bottom: -3px;
     line-height: 0;
     font-size: @icon-size;
     color: #999;
