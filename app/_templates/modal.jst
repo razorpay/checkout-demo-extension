@@ -30,11 +30,11 @@
         <div id="body">
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              <div id="form-common" class="mfix">
+              <div id="form-common">
                 {{for(var note in it.notes){}}
                   <input type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
                 {{}}}
-                <div class="fieldset mchild">
+                <div class="fieldset">
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
                     <span class="help-text">Please enter a valid email. Example:<br> you@example.com</span>
@@ -47,8 +47,8 @@
                   </div></div>
                 </div>
               </div>
-              <div id="methods-specific-fields" class="mfix">
-                <div class="mchild">
+              <div id="methods-specific-fields">
+                <div>
                   {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet.length && tabCount++; }}
                   <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
                     {{? it.method.card }}
