@@ -316,7 +316,10 @@ var frameDiscreet = {
         )
       }
       $('methods-specific-fields').children('mchild')[0].style.minHeight = '276px';
-
+    }
+    if(opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('powered-link')[0].style.visibility = 'hidden';
+      $('powered-link')[0].style.pointerEvents = 'none';
     }
 
     if($('nb-na')[0]) {
