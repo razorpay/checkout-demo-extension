@@ -217,6 +217,14 @@ var frameDiscreet = {
     $(this.parentNode)[card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
   },
 
+  setCVVFormatting: function(cvvlen){
+    var cvv_help = $('.elem-cvv .help-text');
+    cvv_help.html(cvv_help.html().replace(/3|4/, cvvlen));
+    this.maxLength = cvvlen;
+    this.pattern = '[0-9]{'+cvvlen+'}';
+    $(this.parentNode)[this.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
+  },
+
   setCardFormatting: function(){
     var $el_number = $('#card_number');
     var el_expiry = gel('card_expiry');
@@ -227,10 +235,22 @@ var frameDiscreet = {
       if(!type){
         type = card.getType(el.value) || 'unknown';
       }
+      var parent = el.parentNode;
 
-      el.parentNode.setAttribute('cardtype', type);
+      var oldType = parent.getAttribute('cardtype');
+      if(type === oldType){
+        return;
+      }
+
+      parent.setAttribute('cardtype', type);
       frameDiscreet.setNumberValidity.call(el);
       
+      if(type === 'amex'){
+        frameDiscreet.setCVVFormatting.call(el_cvv, 4);
+      }
+      else if(oldType === 'amex'){
+        frameDiscreet.setCVVFormatting.call(el_cvv, 3);
+      }
       // if(type !== 'maestro'){
         // $('nocvv-check')[0].checked = false;
         // frameDiscreet.toggle_nocvv();
@@ -334,7 +354,10 @@ var frameDiscreet = {
         )
       }
       $('#methods-specific-fields > .mchild').css('minHeight', '276px');
-
+    }
+    if(opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('powered-link')[0].style.visibility = 'hidden';
+      $('powered-link')[0].style.pointerEvents = 'none';
     }
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)

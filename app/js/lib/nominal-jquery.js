@@ -183,7 +183,11 @@ $.prototype = {
   },
 
   html: function(html){
-    return this.prop('innerHTML', html);
+    if(arguments.length){
+      this[0].innerHTML = html;
+      return this;
+    }
+    return this[0].innerHTML;
   },
 
   focus: function(){

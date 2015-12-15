@@ -287,7 +287,11 @@ Razorpay.payment = {
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
-    cookiePoll();
+
+    if(discreet.isFrame){
+      cookiePoll();
+    }
+
     popupRequest = request;
   },
 
