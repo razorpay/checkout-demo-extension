@@ -9,7 +9,7 @@ var err = function(errors){
 };
 
 var ua = navigator.userAgent;
-var isCriOS = /\(iP.+CriOS/.test(ua);
+var isCriOS = /\(iP.+(Cr|Fx)iOS/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
 var Razorpay = window.Razorpay = function(options){
