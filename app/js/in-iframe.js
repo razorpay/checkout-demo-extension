@@ -353,7 +353,7 @@ var frameDiscreet = {
           }
         )
       }
-      $('#methods-specific-fields > .mchild').css('minHeight', '276px');
+      $('#methods-specific-fields').css('minHeight', '263px');
     }
     if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
       $('powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
