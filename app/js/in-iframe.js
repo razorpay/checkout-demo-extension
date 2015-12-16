@@ -356,7 +356,7 @@ var frameDiscreet = {
       $('#methods-specific-fields').css('minHeight', '263px');
     }
     if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
-      $('powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
+      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
     }
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
