@@ -2,7 +2,6 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
-
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
@@ -105,7 +104,7 @@ function frontDrop(message, className) {
     gel('fd-t').innerHTML = message || '';
     gel('fd').className = className || '';
   }
-  var emic = $('emi-container');
+  var emic = $('#emi-container');
   if(emic[0]){
     emic.removeClass('shown');
     setTimeout(function(){
@@ -343,7 +342,7 @@ var frameDiscreet = {
           elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
         })
         each(
-          $('#emi-container > .emi-option'),
+          $$('#emi-container > .emi-option'),
           function(i, el){
             $(el).on('click', function(){
               $('#emi-container > .emi-active').removeClass('emi-active');
@@ -353,11 +352,10 @@ var frameDiscreet = {
           }
         )
       }
-      $('#methods-specific-fields > .mchild').css('minHeight', '276px');
+      $('#methods-specific-fields').css('minHeight', '263px');
     }
-    if(opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
-      $('powered-link')[0].style.visibility = 'hidden';
-      $('powered-link')[0].style.pointerEvents = 'none';
+    if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
+      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
     }
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)

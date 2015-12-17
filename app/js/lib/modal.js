@@ -150,7 +150,7 @@
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
-            if($('emi-container')[0]){
+            if(gel('emi-container')){
               return frontDrop();
             }
             this.hide();
@@ -158,7 +158,7 @@
         })
       }
       if (this.options.backdropClose) {
-        this.on('click', $('backdrop')[0], this.backdropHide)
+        this.on('click', gel('backdrop'), this.backdropHide)
       }
     }
   };

@@ -1,10 +1,9 @@
 var _caPatterns = {
-  mastercard: /^5[0-5]/,
-  visa: /^4/,
   maestro16: /^(508125|508126|508159|508192|508227|504437|504681)/,
   maestro: /^(50|63|66|5[6-8]|6[8-9]|600[0-9]|6010|601[2-9]|60[2-9]|61|620|621|6220|6221[0-1])/,
+  mastercard: /^(5[1-5]|2[2-7])/,
+  visa: /^4/,
   // maestro: /^(5(018|0[23]|[68])|6(39|7))/,
-  unknown: /^(1|2|[7-9])/,
   amex: /^3[47]/,
   diners: /^3[0689]/
   // jcb: /^35/,
@@ -60,7 +59,6 @@ var _caCardType = function(num){
       return t;
     }
   }
-  return false;
 }
 
 var _caSetCaret = function(el, pos){

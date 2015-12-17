@@ -3,6 +3,7 @@ var glob = require('glob')
 var gulp = require('gulp')
 var dot = require('dot')
 var less = require('gulp-less')
+var minifyCSS = require('gulp-minify-css')
 var concat = require('gulp-concat')
 var autoprefixer = require('gulp-autoprefixer')
 var usemin = require('gulp-usemin')
@@ -48,8 +49,12 @@ gulp.task('compileTemplates', function(){
 gulp.task('compileStyles', function(){
   return gulp.src(assetPath('_css/*.less'))
     .pipe(less())
+    .pipe(minifyCSS())
     .pipe(concat('checkout.css'))
-    .pipe(autoprefixer({browsers: ['last 10 versions']}))
+    .pipe(autoprefixer({
+      browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
+      cascade: false
+    }))
     .pipe(gulp.dest(distDir + '/css'));
 });
 
