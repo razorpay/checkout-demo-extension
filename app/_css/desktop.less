@@ -251,17 +251,32 @@ iframe{
 }
 #elem-card{
   transition: 0.3s;
+
   i{
-  //   font-size: 0;
-  // }
-  // &[cardtype=unknown] i{
+    font-size: 0;
   }
-  // &[cardtype=visa] i{
-  //   background-image: url('../images/icons/visa.png');
-  // }
-  // &[cardtype=mastercard] i{
-  //   background-image: url('../images/icons/mastercard.png');
-  // }
+  .card-image{
+    background: url('../images/cards@2x.png') no-repeat;
+    width: 28px;
+    height: 20px;
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    background-size: 600%;
+  }
+
+  &[cardtype=unknown] i{
+    .card-image{
+      display: none;
+    }
+    font-size: 30px;
+  }
+  &[cardtype=visa] .card-image{
+    background-position: 0 10px;
+  }
+  &[cardtype=mastercard] i{
+    background-image: url('../images/icons/mastercard.png');
+  }
   // &[cardtype=maestro]{
   //   // margin-bottom: 40px;
   //   i{
