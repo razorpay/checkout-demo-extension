@@ -287,6 +287,7 @@ Razorpay.payment = {
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
+
     if(discreet.isFrame){
       cookiePoll();
     }
