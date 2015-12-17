@@ -405,11 +405,11 @@ function ch_automaticCheckoutInit(){
     }
   )
   ch_parseScriptOptions(opts);
-  opts.handler = ch_defaultPostHandler;
   Razorpay.configure(opts);
 
   var amount = currentScript.getAttribute('data-amount');
   if (amount && amount.length > 0){
+    opts.handler = ch_defaultPostHandler;
     var rzp = new Razorpay({});
     ch_addButton(rzp);
   }
