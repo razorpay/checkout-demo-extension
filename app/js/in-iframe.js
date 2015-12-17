@@ -2,7 +2,6 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
-
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
