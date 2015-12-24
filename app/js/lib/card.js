@@ -35,13 +35,9 @@ var _ca_card_formats = {
     space: /[^0-9]/g,
     subs: '',
     length: 19
-  },
-  unknown: {
-    space: /[^0-9]/g,
-    subs: '',
-    length: 19
   }
 }
+_ca_card_formats.unknown = _ca_card_formats.maestro;
 
 each(_caPatterns, function(c){
   if(!(c in _ca_card_formats)){
@@ -266,7 +262,7 @@ var card = {
       if (!type) {
         type = _caCardType(num);
       }
-      if(type && _ca_card_formats[type].length === num.length){
+      if (!type && num.length > 13 || type && _ca_card_formats[type].length === num.length) {
         return this.luhn(num);
       }
     }
