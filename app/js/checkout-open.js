@@ -420,6 +420,21 @@ function preloadFrame(){
   if (key){
     loadFrame(key);
   }
+  else {
+    prefetchPath('checkout-frame.js');
+    prefetchPath('css/checkout.css');
+  }
+}
+
+function prefetchPath(path){
+  var prefetch = document.createElement('link');
+  prefetch.setAttribute('rel', 'prefetch');
+  prefetch.setAttribute('href', currentScript.src.replace(/\/[^\/]+$/, '/' + path));
+  doc.appendChild(prefetch);
+}
+
+function makeCheckoutUrl(options, key){
+  return discreet.makeUrl(options) + '/checkout?key_id=' + key
 }
 
 function loadFrame(optionsOrKey){
@@ -433,13 +448,13 @@ function loadFrame(optionsOrKey){
     options = Razorpay.defaults;
   }
 
-  var src = discreet.makeUrl(options) + '/checkout?key_id=' + key;
+  var src = makeCheckoutUrl(options, key);
   isLoaded = false;
 
   if(!checkoutFrame){
     $.addMessageListener(ch_onFrameMessage, this);
     checkoutFrame = ch_createFrame(
-      discreet.makeUrl(options) + '/checkout?key_id=' + key,
+      src,
       isCriOS ? 'div' : 'iframe'
     );
     ch_frameContainer.appendChild(checkoutFrame);
