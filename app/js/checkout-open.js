@@ -394,24 +394,29 @@ var ch_addButton = function(rzp){
 */
 function ch_automaticCheckoutInit(){
   var opts = {};
+  var preload = false;
   each(
     currentScript.attributes,
     function(i, attr){
       var name = attr.name
       if(/^data-/.test(name)){
+        preload = true;
         name = name.replace(/^data-/,'');
         opts[name] = attr.value;
       }
     }
   )
-  ch_parseScriptOptions(opts);
-  Razorpay.configure(opts);
 
+  ch_parseScriptOptions(opts);
   var amount = currentScript.getAttribute('data-amount');
+
   if (amount && amount.length > 0){
     opts.handler = ch_defaultPostHandler;
     var rzp = new Razorpay(opts);
     ch_addButton(rzp);
+  }
+  else if(preload){
+    Razorpay.configure(opts);
   }
 }
 

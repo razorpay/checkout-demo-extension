@@ -129,7 +129,10 @@ function base_configure(overrides){
       context: location.href,
       co: !!discreet.isCheckout
     }
-    track('init', trackingPayload);
+    track(
+      this instanceof Razorpay ? 'init' : 'configure',
+      trackingPayload
+    );
   }
 
   discreet.setCommunicator(options);
@@ -137,7 +140,7 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype.configure = function(overrides){
-  this.options = base_configure(overrides);
+  this.options = base_configure.call(this, overrides);
   validateRequiredFields(this.options);
   this.modal = {options: {}};
 };
