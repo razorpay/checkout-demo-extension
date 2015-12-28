@@ -139,7 +139,7 @@
           var el = document.activeElement;
           if(el){
             var rect = el.getBoundingClientRect();
-            if(rect.bottom > innerHeight - 50){
+            if(rect.bottom > innerHeight - 70){
               setTimeout(function(){
                 scrollTo(0, pageYOffset - innerHeight + rect.bottom + 60)
               }, 500)

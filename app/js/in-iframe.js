@@ -737,11 +737,11 @@ window.handleMessage = function(message) {
   if ( message.event === 'open' || message.options ) {
     if ( message.options ) { // open modal
       try{
-        Razorpay.configure(message.options);
-        frameDiscreet.configureRollbar(message);
         if(message.id){
           _uid = message.id;
         }
+        frameDiscreet.configureRollbar(message);
+        Razorpay.configure(message.options);
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
         roll('fault ' + e.message, message);

@@ -57,6 +57,12 @@ var optionValidations = {
     }
   },
 
+  currency: function(currency){
+    if(currency !== 'INR'){
+      return 'INR is the only supported value.';
+    }
+  },
+
   display_currency: function(currency){
     if(currency !== 'USD' && currency !== Razorpay.defaults.display_currency){
       return 'Only USD is supported'

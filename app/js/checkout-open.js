@@ -306,8 +306,8 @@ var ch_messageHandlers = {
     alert('Payment Failed.\n' + data.error.description);
   },
 
-  fault: function(){
-    alert("Oops! Something went wrong.");
+  fault: function(message){
+    alert('Oops! Something went wrong.\n' + message);
     ch_onClose.call(existingInstance);
     existingInstance.close();
   }
