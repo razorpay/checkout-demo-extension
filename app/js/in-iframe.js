@@ -750,10 +750,7 @@ window.handleMessage = function(message) {
     }
     frameDiscreet.showModal();
     if(CheckoutBridge){
-      message.options.meta = {
-        ua: ua,
-        cb: true
-      }
+      discreet.context = qpmap.platform || 'app';
       track('init', message.options);
     }
     else {

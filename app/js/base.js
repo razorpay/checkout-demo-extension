@@ -127,20 +127,6 @@ function base_configure(overrides){
     _uid = null;
   }
 
-  if(!discreet.isFrame){
-    var trackingPayload = $.clone(overrides);
-    trackingPayload.meta = {
-      ua: ua,
-      cb: !!window.CheckoutBridge,
-      context: location.href,
-      co: !!discreet.isCheckout
-    }
-    track(
-      this instanceof Razorpay ? 'init' : 'configure',
-      trackingPayload
-    );
-  }
-
   discreet.setCommunicator(options);
   return options;
 }
@@ -149,6 +135,9 @@ Razorpay.prototype.configure = function(overrides){
   this.options = base_configure.call(this, overrides);
   validateRequiredFields(this.options);
   this.modal = {options: {}};
+
+  var trackingPayload = $.clone(overrides);
+  track( 'init', trackingPayload );
 };
 
 Razorpay.configure = function(overrides) {
@@ -156,6 +145,7 @@ Razorpay.configure = function(overrides) {
 }
 
 var discreet = {
+  context: location.href,
   setCommunicator: noop,
   makeUrl: function(options, noVersion){
     return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);

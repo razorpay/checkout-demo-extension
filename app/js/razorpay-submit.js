@@ -201,7 +201,6 @@ function onComplete(data, request){
     data.razorpay_payment_id
   ) {
     var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    track('success', returnObj);
     return setTimeout(function(){
       request.success.call(null, returnObj); // dont expose request as this
     })
@@ -268,11 +267,16 @@ Razorpay.payment = {
       return false;
     }
 
-    track('submit', {
-      email: rdata.email,
-      contact: rdata.contact,
-      method: rdata.method
-    });
+    var trackingPayload = {};
+    each(
+      ['key_id', 'amount', 'email', 'contact', 'method', 'bank', 'wallet', 'card[name]'],
+      function(i, field){
+        if(field in rdata){
+          trackingPayload[field] = rdata[field];
+        }
+      }
+    )
+    track('submit', trackingPayload);
 
     var name;
     request.popup = createPopup(rdata, url, options);
