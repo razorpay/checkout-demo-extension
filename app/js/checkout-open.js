@@ -412,8 +412,7 @@ function ch_automaticCheckoutInit(){
 
   if (amount && amount.length > 0){
     opts.handler = ch_defaultPostHandler;
-    var rzp = new Razorpay(opts);
-    ch_addButton(rzp);
+    ch_addButton(Razorpay(opts));
   }
   else if(preload){
     Razorpay.configure(opts);

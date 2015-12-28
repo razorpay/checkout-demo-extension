@@ -142,7 +142,7 @@
             if(rect.bottom > innerHeight - 50){
               setTimeout(function(){
                 scrollTo(0, pageYOffset - innerHeight + rect.bottom + 60)
-              }, 400)
+              }, 500)
             }
           }
         })
