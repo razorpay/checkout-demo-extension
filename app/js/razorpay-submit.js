@@ -164,6 +164,9 @@ function formatRequest(request){
   if(!rdata.key_id){
     rdata.key_id = options.key;
   }
+  if(_uid){
+    rdata.sid = _uid;
+  }
   return Razorpay.payment.validate(rdata);
 }
 
