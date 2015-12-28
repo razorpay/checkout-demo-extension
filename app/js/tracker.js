@@ -51,12 +51,42 @@ function _toBase62(number){
 }
 
 
-var _uid = _toBase62(
+function generateUID(){
+  var num = _toBase62(
     (new Date().getTime() - 1388534400000).toString() +
     ('000000' + Math.floor(1000000*Math.random())).slice(-6)
   ) +
-  _toBase62(Math.floor(14776336*Math.random()));
+  _toBase62(Math.floor(238328*Math.random())) + '0';
 
+  var sum = 0, flip = 0, tempdigit;
+  var map62 = {};
+  each(
+    base62Chars,
+    function(i, chr){
+      map62[chr] = i;
+    }
+  )
+  each(
+    num,
+    function(i, chr){
+      tempdigit = map62[num[num.length - 1 - i]];
+      if(!(flip++ % 2)){
+        tempdigit *= 2;
+        if(tempdigit >= 62){
+          tempdigit = tempdigit % 62 + 1;
+        }
+      }
+      sum += tempdigit;
+    }
+  )
+  tempdigit = sum % 62;
+  if(tempdigit){
+    tempdigit = base62Chars[62 - tempdigit];
+  }
+  return num.slice(0, 13) + tempdigit
+}
+
+var _uid = generateUID();
 
 function track(event, props) {
   if(_uid){
