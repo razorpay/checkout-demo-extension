@@ -91,31 +91,46 @@ var _uid = generateUID();
 function track(event, props) {
   if(_uid){
     setTimeout(function(){
-      if(typeof props !== 'object') {
-        props = {};
-      }
+      var data = {
+        id: _uid
+      };
 
-      props.token = '181b3d7d22f7c71826d2f7db7c322028';
-      props.distinct_id = _uid;
-      props.time = new Date().getTime();
+      if(typeof props === 'object') {
+        data.data = props;
+      }
 
       if(event === 'init'){
-        props.ua = ua;
-        props.context = discreet.context;
-      }
-
-      var data = {
-        event: event,
-        properties: props
-      }
-
-      $.post({
-        url: 'https://api.mixpanel.com/track/',
-        data: {
-          ip: 1,
-          data: _btoa(JSON.stringify(data))
+        data.src = discreet.context;
+        data.ip = '${keen.ip}';
+        data.ua = '${keen.user_agent}';
+        data.keen = {
+          addons : [
+            {
+              name : 'keen:ip_to_geo',
+              input : {
+                ip : 'ip'
+              },
+              output : 'ip_info'
+            },
+            {
+              name : 'keen:ua_parser',
+              input : {
+                ua_string : 'ua'
+              },
+              output : 'ua_info'
+            }
+          ]
         }
-      })
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open(
+        'post',
+        'https://api.keen.io/3.0/projects/56815e9096773d537f3aa38d/events/' + event + '?api_key=aaa7ed2762721feae486b937c8860697495484b68941ccc4d8aab85b10ace2a7b99be1b69a08b2bee5338118bdfae828f685f4fe7badbb5fb811b4f55b60413412641841d0ec5201bee394eee329884cf4bd5e784bde605707a2203dcc6afb54871f1ce71a0a02211c9ef4deb62d5d63',
+        true
+      );
+      xhr.setRequestHeader('Content-type', 'application/json');
+      xhr.send(JSON.stringify(data));
     })
   }
 }

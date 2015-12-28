@@ -295,6 +295,7 @@ var ch_messageHandlers = {
         handler.call(null, data);
       })
     }
+    track('success', data);
     if(isCriOS){
       ch_close.call(existingInstance);
     }
@@ -304,6 +305,7 @@ var ch_messageHandlers = {
   failure: function(data){
     ch_close.call(existingInstance);
     alert('Payment Failed.\n' + data.error.description);
+    track('failure');
   },
 
   fault: function(message){

@@ -123,9 +123,9 @@ function base_configure(overrides){
   } catch(e){}
 
 
-  if(typeof overrides.key === 'string' && overrides.key.indexOf('rzp_live_')){
-    _uid = null;
-  }
+  // if(typeof overrides.key === 'string' && overrides.key.indexOf('rzp_live_')){
+  //   _uid = null;
+  // }
 
   discreet.setCommunicator(options);
   return options;
