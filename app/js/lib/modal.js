@@ -27,24 +27,7 @@
   }
 
   var getDuration = function(modal){
-    var duration, durationStyle;
-
-    if(!modal.options.animation || !transitionProperty){
-      duration = 0;
-    }
-
-    else {
-      if(typeof window.getComputedStyle === 'function'){
-        durationStyle = window.getComputedStyle(modal.container[0])[transitionProperty];
-        duration = parseFloat(durationStyle) || 0;
-      }
-    }
-
-    if (typeof durationStyle === 'string' && durationStyle[durationStyle.length - 2] !== 'm') {
-      duration *= 1000;
-    }
-
-    return duration;
+    return (modal.options.animation && transitionProperty) ? 250 : 0;
   }
 
   var Modal = window.Modal = function(element, options) {
