@@ -28,8 +28,8 @@ describe("open method should", function(){
 
   it("append iframe", function(){
     expect(isOpen).toBe(true);
-    expect(checkoutFrame).toBeDefined();
-    expect(document.documentElement.contains(checkoutFrame.parentNode)).toBe(true);
+    expect(rzp.checkoutFrame).toBeDefined();
+    expect(document.documentElement.contains(rzp.checkoutFrame.parentNode)).toBe(true);
   })
 
   afterEach(function(){
@@ -59,7 +59,7 @@ describe("close method should", function(){
   it("clean up various properties", function(){
     ch_onClose.call(rzp);
     expect(isOpen).toBe(false);
-    expect(checkoutFrame).not.toBeVisible();
+    expect(this.checkoutFrame).not.toBeVisible();
   })
 
   it("be followable by re-open", function(){

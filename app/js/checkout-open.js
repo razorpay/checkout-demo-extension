@@ -298,6 +298,7 @@ var ch_messageHandlers = {
     if(isCriOS){
       ch_close.call(existingInstance);
     }
+    $(existingInstance.checkoutFrame).remove();
     existingInstance = null;
   },
 
