@@ -17,7 +17,6 @@ ch_metaViewport;
 var ch_PageY = 0;
 var doc = document.body || document.documentElement;
 var docStyle = doc.style;
-var checkoutFrame;
 
 // there is no "position: fixed" in iphone
 var merchantMarkup = {
@@ -154,7 +153,7 @@ function ch_onClose(){
       ch_metaViewport = null;
     }
   }
-  var frame = checkoutFrame;
+  var frame = this.checkoutFrame;
 
   if(frame){
     if(isCriOS && frame.contentWindow){
@@ -173,13 +172,13 @@ function ch_onClose(){
 }
 
 var ch_sendFrameMessage = function(response){
-  if(isCriOS || !checkoutFrame){
+  if(isCriOS || !this.checkoutFrame){
     return;
   }
   if(typeof response !== 'string'){
     response = JSON.stringify(response);
   }
-  checkoutFrame.contentWindow.postMessage(response, '*');
+  this.checkoutFrame.contentWindow.postMessage(response, '*');
 }
 
 // to handle absolute/relative url of options.image
@@ -298,6 +297,7 @@ var ch_messageHandlers = {
     if(isCriOS){
       ch_close.call(existingInstance);
     }
+    $(existingInstance.checkoutFrame).remove();
     existingInstance = null;
   },
 
@@ -317,8 +317,8 @@ function ch_onFrameMessage(e, data){
   if(
     !e.origin ||
     data.source !== 'frame' ||
-    !checkoutFrame ||
-    checkoutFrame.getAttribute('src').indexOf(e.origin)
+    !this.checkoutFrame ||
+    this.checkoutFrame.getAttribute('src').indexOf(e.origin)
   ){ // source check
     return;
   }
@@ -422,7 +422,7 @@ function ch_automaticCheckoutInit(){
 function preloadFrame(){
   var key = Razorpay.defaults.key;
   if (key){
-    loadFrame(key);
+    // loadFrame(key);
   }
   else {
     prefetchPath('checkout-frame.js');
@@ -455,16 +455,16 @@ function loadFrame(optionsOrKey){
   var src = makeCheckoutUrl(options, key);
   isLoaded = false;
 
-  if(!checkoutFrame){
+  if(!this.checkoutFrame){
     $.addMessageListener(ch_onFrameMessage, this);
-    checkoutFrame = ch_createFrame(
+    this.checkoutFrame = ch_createFrame(
       src,
       isCriOS ? 'div' : 'iframe'
     );
-    ch_frameContainer.appendChild(checkoutFrame);
+    ch_frameContainer.appendChild(this.checkoutFrame);
   }
-  else if(checkoutFrame.src !== src){
-    checkoutFrame.src = src;
+  else if(this.checkoutFrame.src !== src){
+    this.checkoutFrame.src = src;
   }
   else {
     isLoaded = true;
@@ -526,8 +526,7 @@ Razorpay.prototype.open = function() {
     }
   }
 
-  loadFrame(options);
-
+  loadFrame.call(this, options);
 
   ch_frameContainer.style.display = 'block';
   merchantMarkup.clear();
@@ -539,16 +538,16 @@ Razorpay.prototype.open = function() {
 
     var src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key + '&message=' + _btoa(JSON.stringify(opts));
     ch_CriOS_listener = $(window).on('unload', ch_close, false, this);
-    checkoutFrame.contentWindow = window.open(src, '');
+    this.checkoutFrame.contentWindow = window.open(src, '');
 
     ch_CriOS_interval = setInterval(function(){
-      if(checkoutFrame.contentWindow.closed){
+      if(self.checkoutFrame.contentWindow.closed){
         ch_close.call(self);
       }
     }, 500)
   }
 
-  if( !checkoutFrame.contentWindow ) {
+  if( !this.checkoutFrame.contentWindow ) {
     ch_onClose();
     alert(
       (isCriOS ? 'Chrome for iOS' : 'This browser') +
@@ -557,7 +556,7 @@ Razorpay.prototype.open = function() {
   }
 
   if ( existingInstance ) {
-    checkoutFrame.style.display = 'block';
+    this.checkoutFrame.style.display = 'block';
     ch_setMetaViewport();
     ch_sendFrameMessage.call(this, {event: 'open'});
   }
