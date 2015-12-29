@@ -422,7 +422,7 @@ function ch_automaticCheckoutInit(){
 function preloadFrame(){
   var key = Razorpay.defaults.key;
   if (key){
-    loadFrame(key);
+    // loadFrame(key);
   }
   else {
     prefetchPath('checkout-frame.js');
