@@ -209,7 +209,7 @@ var frameDiscreet = {
       }
     )
 
-    obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
+    // obj.prefill.contact = obj.prefill.contact.replace(/[^0-9]/g,'');
   },
 
   setNumberValidity: function(){
@@ -271,7 +271,6 @@ var frameDiscreet = {
     card.formatNumber($el_number[0]);
     card.formatExpiry(el_expiry);
     card.ensureNumeric(el_cvv);
-    card.ensureNumeric(el_contact);
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
