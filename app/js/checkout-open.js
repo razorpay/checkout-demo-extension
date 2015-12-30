@@ -294,9 +294,7 @@ var ch_messageHandlers = {
         handler.call(null, data);
       })
     }
-    if(isCriOS){
-      ch_close.call(existingInstance);
-    }
+    ch_close.call(existingInstance);
     $(existingInstance.checkoutFrame).remove();
     existingInstance = null;
   },
