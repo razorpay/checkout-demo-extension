@@ -91,7 +91,15 @@
     return el.value.length;
   }
 
-  var EnsureNumeric = function(e){
+  function ensureNumeric(e){
+    return ensureRegex(e, /[0-9]/);
+  }
+
+  function ensurePhone(e){
+    return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
+  }
+
+  function ensureRegex(e, regex){
     if(!e) { return '' }
 
     var which = e.which;
@@ -101,7 +109,7 @@
 
     if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
     var character = String.fromCharCode(which);
-    if(/[0-9]/.test(character)){
+    if(regex.test(character)){
       return character;
     }
     e.preventDefault();
@@ -109,7 +117,7 @@
   }
 
   var FormatExpiry = function(e) {
-    var character = EnsureNumeric(e);
+    var character = ensureNumeric(e);
     if (character === false) { return }
 
     var pos = CheckSelection(this);
@@ -165,7 +173,7 @@
   }
 
   var FormatNumber = function(e){
-    var character = EnsureNumeric(e);
+    var character = ensureNumeric(e);
     if(character === false) { return }
 
     var pos = CheckSelection(this);
@@ -255,7 +263,12 @@
 
     ensureNumeric: function(el){
       if(!el) { return }
-      $(el).on('keypress', EnsureNumeric);
+      $(el).on('keypress', ensureNumeric);
+    },
+
+    ensurePhone: function(el){
+      if(!el) { return }
+      $(el).on('keypress', ensurePhone);
     },
 
     validateNumber: function(num, type){
