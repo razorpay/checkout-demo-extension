@@ -2,6 +2,7 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
+var card = window.card;
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
@@ -209,7 +210,13 @@ var frameDiscreet = {
       }
     )
 
-    // obj.prefill.contact = obj.prefill.contact.replace(/[^0-9]/g,'');
+    var contactPrefill = obj.prefill.contact;
+    var contactFirstChar = contactPrefill[0];
+    contactPrefill = contactPrefill.replace(/[^0-9]/g,'');
+    if ( contactFirstChar === '+' ) {
+      contactPrefill = '+' + contactPrefill;
+    }
+    obj.prefill.contact = contactPrefill;
   },
 
   setNumberValidity: function(){
