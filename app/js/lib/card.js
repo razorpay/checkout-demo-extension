@@ -44,7 +44,7 @@
   each(patterns, function(c){
     if(!(c in card_formats)){
       card_formats[c] = {
-        space: /(.{4})/g,
+        space: /(.{4}(?=.))/g,
         subs: '$1 ',
         length: 16
       }
