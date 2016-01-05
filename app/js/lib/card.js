@@ -99,6 +99,11 @@
     return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
   }
 
+  function ensureExpiry(e){
+    var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
+    return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
+  }
+
   function ensureRegex(e, regex){
     if(!e) { return '' }
 
@@ -117,7 +122,7 @@
   }
 
   var FormatExpiry = function(e) {
-    var character = ensureNumeric(e);
+    var character = ensureExpiry(e);
     if (character === false) { return }
 
     var pos = CheckSelection(this);
@@ -125,9 +130,9 @@
 
     var value = this.value;
     var prefix = value.slice(0, pos);
-    var prenums = prefix.replace(/[^0-9]/g,'');
+    var prenums = prefix.replace(/[^\/0-9]/g,'');
     var suffix = value.slice(pos);
-    var sufnums = suffix.replace(/[^0-9]/g,'');
+    var sufnums = suffix.replace(/[^\/0-9]/g,'');
     var el = this;
 
     if (pos === 0) {
@@ -141,7 +146,12 @@
       character += ' / ';
     }
     else if ( pos === 2 ) {
-      character = ' / ' + character;
+      if(character === '/'){
+        character = ' ' + character + ' ';
+      }
+      else {
+        character = ' / ' + character;
+      }
     }
     else {
       if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix) && e){
