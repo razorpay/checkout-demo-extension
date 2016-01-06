@@ -100,7 +100,8 @@ function track(event, props) {
       }
 
       if(event === 'init'){
-        data.src = discreet.context;
+        data.medium = discreet.medium;
+        data.context = discreet.context;
         data.ip = '${keen.ip}';
         data.ua = '${keen.user_agent}';
         data.keen = {
