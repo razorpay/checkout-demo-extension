@@ -750,7 +750,6 @@ window.handleMessage = function(message) {
     }
     frameDiscreet.showModal();
     if(CheckoutBridge){
-      discreet.context = qpmap.platform || 'app';
       track('init', message.options);
     }
     else {
@@ -829,9 +828,14 @@ function iosBridge(){
   }
 }
 
-iosBridge();
+if(CheckoutBridge){
+  discreet.medium = qpmap.platform || 'app';
+  discreet.context = qpmap.context || null;
+}
 
+iosBridge();
 Razorpay.sendMessage({event: 'load'});
+
 if(qpmap.message){
   frameDiscreet.parseMessage({data: atob(qpmap.message)});
 }

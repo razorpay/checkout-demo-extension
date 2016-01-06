@@ -165,11 +165,10 @@ function formatRequest(request){
     rdata.key_id = options.key;
   }
   if(_uid){
-    rdata['log[id]'] = _uid;
+    rdata['_[id]'] = _uid;
   }
-  if(!/^http/.test(discreet.context)){
-    rdata['log[src]'] = discreet.context;
-  }
+  rdata['_[medium]'] = discreet.medium;
+  rdata['_[context]'] = discreet.context;
   return Razorpay.payment.validate(rdata);
 }
 
