@@ -7,6 +7,8 @@ var card = window.card;
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
+
+// onComplete defined in razorpay-submit.js, safe to expose now
 window.onComplete = onComplete;
 // initial error (helps in case of redirection flow)
 var qpmap = {};
@@ -60,14 +62,35 @@ var freqWallets = {
   }
 }
 
-var _smarty, _modal, _$el;
-
 function addModalDOM(opts){
   if(model){
     model.destroy();
   }
   model = new checkoutModal(opts);
   document.body.appendChild(model.render());
+  model.modal = new window.Modal(gel('modal'), model.data.modal);
+  model.smarty = new window.Smarty($(model.el));
+}
+
+function createOpts(){
+  var opts = $.clone(Razorpay.defaults);
+  var modal = opts.modal;
+
+  modal.onhide = function(){
+    Razorpay.sendMessage({event: 'dismiss'});
+  };
+  modal.onhidden = function(){
+    Razorpay.sendMessage({event: 'hidden'});
+  };
+  delete modal.ondismiss;
+
+  if(opts.amount >= 100*10000){
+    opts.method.wallet = false;
+  }
+
+  frameDiscreet.setMethods(window.payment_methods, opts.method);
+  opts.netbanks = freqBanks;
+  return opts;
 }
 
 function frontDrop(message, className) {
@@ -86,7 +109,7 @@ function frontDrop(message, className) {
 }
 
 function shakeModal() {
-  if(shouldShakeOnError && _modal){
+  if(shouldShakeOnError){
     $('#modal-inner').removeClass('shake').reflow().addClass('shake');
   }
 }
@@ -219,43 +242,20 @@ var frameDiscreet = {
     }
   },
 
-  createModal: function(el, modalOptions){
-    modalOptions.onhide = function(){
-      Razorpay.sendMessage({event: 'dismiss'});
-    };
-    modalOptions.onhidden = function(){
-      Razorpay.sendMessage({event: 'hidden'});
-    };
-    delete modalOptions.ondismiss;
-    return new window.Modal(el, modalOptions)
-  },
-
   showModal: function() {
     frameDiscreet.renew();
 
-    if(_modal){
-      return _modal.show();
+    if(model){
+      return model.modal.show();
     }
     $('#loading').remove();
-    var opts = $.clone(Razorpay.defaults);
-
-    if(opts.amount >= 100*10000){
-      opts.method.wallet = false;
-    }
-
-    frameDiscreet.setMethods(window.payment_methods, opts.method);
-
-    opts.netbanks = freqBanks;
+    var opts = createOpts();
 
     addModalDOM(opts);
     
     if ( CheckoutBridge ) {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
-    _$el = $('#container');
-    _smarty = new window.Smarty(_$el);
-
-    _modal = frameDiscreet.createModal(gel('modal'), opts.modal);
 
     if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
       $('#emi-wrap').html(templates.emi());
@@ -298,7 +298,7 @@ var frameDiscreet = {
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
     $('#modal-close').on('click', function(){
       Razorpay.payment.cancel();
-      _modal.hide();
+      model.modal.hide();
     });
     $('#tabs').on('click', frameDiscreet.tab_change);
     $('#form').on('submit', function(e){
@@ -349,7 +349,7 @@ var frameDiscreet = {
   bank_radio: function(e) {
     var select = gel('bank-select');
     select.value = e.target.value;
-    _smarty.input({target: select});
+    model.smarty.input({target: select});
   },
 
   bank_change: function() {
@@ -412,7 +412,7 @@ var frameDiscreet = {
   },
 
   formSubmit: function() {
-    _smarty.refresh();
+    model.smarty.refresh();
 
     if (frameDiscreet.isInvalid('form-common')) {
       return;
@@ -435,8 +435,8 @@ var frameDiscreet = {
       data: data
     });
 
-    if(_modal){
-      _modal.options.backdropClose = false;
+    if(model.modal){
+      model.modal.options.backdropClose = false;
     }
 
     frontDrop('Please wait while your payment is processed...', 'shown loading');
@@ -495,26 +495,23 @@ var frameDiscreet = {
 
   // close on backdrop click and remove errors
   renew: function(){
-    if(_$el) {
+    if(model) {
       frontDrop('', 'hidden');
-    }
-
-    if(_modal) {
-      _modal.options.backdropClose = true;
+      model.modal.options.backdropClose = true;
     }
   },
 
   hide: function(){
-    if(_modal){
+    if(model.modal){
       $('#modal-inner').removeClass('shake');
-      _modal.hide();
+      model.modal.hide();
     }
-    _modal = null;
+    model.modal = null;
   },
 
   successHandler: function(response){
-    if(_modal){
-      _modal.options.onhide = null;
+    if(model.modal){
+      model.modal.options.onhide = null;
     }
     Razorpay.sendMessage({ event: 'success', data: response });
     if(isCriOS) {
@@ -524,12 +521,12 @@ var frameDiscreet = {
   },
 
   errorHandler: function(response){
-    if(!_modal){
+    if(!model.modal){
       return;
     }
     var message;
     shakeModal();
-    _modal.options.backdropClose = true;
+    model.modal.options.backdropClose = true;
 
     if (response && response.error){
       message = response.error.description;
@@ -601,7 +598,7 @@ var frameDiscreet = {
     if(lastel){
       lastel.focus();
     }
-    _smarty.refresh();
+    model.smarty.refresh();
   },
 
   configureRollbar: function(message){

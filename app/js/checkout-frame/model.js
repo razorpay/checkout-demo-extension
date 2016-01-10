@@ -35,7 +35,7 @@ checkoutModal.prototype = {
     div.innerHTML = templates.modal(this.data);
     this.el = div.firstChild;
     this.el.appendChild(this.renderCss());
-    this.applyFont();
+    this.applyFont(this.el.querySelector('#powered-link'));
     return this.el;
   },
 
@@ -104,13 +104,12 @@ checkoutModal.prototype = {
     obj.prefill.contact = contactPrefill;
   },
 
-  applyFont: function(retryCount) {
-    var anchor = this.data.fontAnchor;
+  applyFont: function(anchor, retryCount) {
     if(!retryCount) {
       retryCount = 0;
     }
     if(anchor.offsetWidth/anchor.offsetHeight > 5) {
-      this.el.addClass('font-loaded');
+      $(this.el).addClass('font-loaded');
     }
     else if(retryCount < 25) {
       var self = this;
