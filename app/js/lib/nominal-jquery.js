@@ -14,17 +14,20 @@ function gel(id){
   return document.getElementById(id);
 }
 
-var each = function( iteratee, eachFunc ) {
+var each = function( iteratee, eachFunc, thisArg ) {
   var i;
+  if(arguments.length < 3){
+    thisArg = this;
+  }
   if( iteratee ) {
     if ( iteratee.length ) { // not using instanceof Array, to iterate over nodeList
       for ( i = 0; i < iteratee.length; i++ ) {
-        eachFunc(i, iteratee[i]);
+        eachFunc.call(thisArg, i, iteratee[i]);
       }
     }
     else {
       for ( i in iteratee ) {
-        eachFunc(i, iteratee[i]);
+        eachFunc.call(thisArg, i, iteratee[i]);
       }
     }
   }

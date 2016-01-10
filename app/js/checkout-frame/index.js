@@ -2,6 +2,7 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
+var model;
 var card = window.card;
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
@@ -62,42 +63,11 @@ var freqWallets = {
 var _smarty, _modal, _$el;
 
 function addModalDOM(opts){
-  var div = document.createElement('div');
-  try{
-    div.style.color = opts.theme.color;
-    if(div.style.color){
-      var style = document.createElement('style');
-      document.body.appendChild(style);
-      var rules = templates.theme(opts.theme.color);
-      if (style.styleSheet) {
-        style.styleSheet.cssText = rules;
-      } else {
-        style.appendChild(document.createTextNode(rules));
-      }
-    }
-  } catch(e){
-    roll(e.message);
+  if(model){
+    model.destroy();
   }
-
-  div.innerHTML = templates.modal(opts);
-  var container = div.firstChild;
-  document.body.appendChild(container);
-
-  var classes = [];
-
-  if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
-    classes.push('mobile');
-  }
-
-  if(!opts.image){
-    classes.push('noimage');
-  }
-
-  if(shouldFixFixed){
-    classes.push('ip')
-  }
-
-  $(container).addClass(classes.join(' '));
+  model = new checkoutModal(opts);
+  document.body.appendChild(model.render());
 }
 
 function frontDrop(message, className) {
@@ -179,44 +149,6 @@ var frameDiscreet = {
     if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
       methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
     }
-  },
-
-  sanitize: function(obj, key){
-    var attr = obj[key];
-
-    if(typeof attr === 'string'){
-      obj[key] = attr.replace(/"/g,'');
-    }
-    else if(typeof attr === 'object'){
-      each(attr, function(attrKey, attrObj){
-        frameDiscreet.sanitize(attrObj, attrKey);
-      })
-    }
-  },
-
-  sanitizeOptions: function(obj){ // warning: modifies original object
-    // directly appended tags
-    each(
-      ['name', 'description', 'amount', 'currency', 'display_amount'],
-      function(i, key){
-        obj[key] = obj[key].replace(/<[^>]*>?/g, "");
-      }
-    )
-
-    each(
-      ['image', 'prefill', 'notes'],
-      function(i, key){
-        frameDiscreet.sanitize(obj, key);
-      }
-    )
-
-    var contactPrefill = obj.prefill.contact;
-    var contactFirstChar = contactPrefill[0];
-    contactPrefill = contactPrefill.replace(/[^0-9]/g,'');
-    if ( contactFirstChar === '+' ) {
-      contactPrefill = '+' + contactPrefill;
-    }
-    obj.prefill.contact = contactPrefill;
   },
 
   setNumberValidity: function(){
@@ -312,7 +244,6 @@ var frameDiscreet = {
     }
 
     frameDiscreet.setMethods(window.payment_methods, opts.method);
-    frameDiscreet.sanitizeOptions(opts);
 
     opts.netbanks = freqBanks;
 
@@ -324,7 +255,6 @@ var frameDiscreet = {
     _$el = $('#container');
     _smarty = new window.Smarty(_$el);
 
-    frameDiscreet.applyFont(gel('powered-link'));
     _modal = frameDiscreet.createModal(gel('modal'), opts.modal);
 
     if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
@@ -466,19 +396,6 @@ var frameDiscreet = {
   //   }
   // },
 
-  applyFont: function(anchor, retryCount) {
-    if(!retryCount) {
-      retryCount = 0;
-    }
-    if(anchor.offsetWidth/anchor.offsetHeight > 5) {
-      _$el.addClass('font-loaded');
-    }
-    else if(retryCount < 25) {
-      setTimeout(function(){
-        frameDiscreet.applyFont(anchor, ++retryCount);
-      }, 120 + retryCount*50);
-    }
-  },
 
   /* sets focus on invalid input and returns true, if any. */
   isInvalid: function(parentID) {
