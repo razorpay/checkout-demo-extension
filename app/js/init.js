@@ -29,7 +29,11 @@ Razorpay.defaults = {
   'key': '',
   'amount': '',
   'currency': 'INR',
-  'handler': noop,
+  'handler': function(data){
+    if(this.callback_url){
+      submitForm(this.callback_url, data, 'post');
+    }
+  },
   'notes': {},
   'callback_url': '',
   'redirect': function(){

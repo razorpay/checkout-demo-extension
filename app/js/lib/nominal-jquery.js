@@ -38,7 +38,22 @@ var map = function( iteratee, mapFunc ) {
   return result;
 }
 
-var deserialize = function(data, key){
+function submitForm(action, data, method, target) {
+  var form = document.createElement('form');
+  form.setAttribute('action', action);
+
+  if(method){ form.setAttribute('method', method) }
+  if(target) { form.setAttribute('target', target) }
+
+  if(data){ form.innerHTML = deserialize(data) }
+
+  document.documentElement.appendChild(form);
+  form.submit();
+  form.parentNode.removeChild(form);
+}
+
+
+function deserialize(data, key){
   if(typeof data === 'object'){
     var str = '';
     each(
