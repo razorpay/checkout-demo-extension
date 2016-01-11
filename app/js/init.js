@@ -32,7 +32,9 @@ Razorpay.defaults = {
   'handler': noop,
   'notes': {},
   'callback_url': '',
-  'redirect': false,
+  'redirect': function(){
+    return this.callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)
+  },
   'description': '',
 
   // automatic checkout only

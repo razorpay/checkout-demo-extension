@@ -116,6 +116,10 @@ function base_configure(overrides){
       options.notes[key] = val;
     }
   })
+  if( typeof overrides.redirect === 'boolean' ) {
+    var redirectValue = overrides.redirect;
+    options.redirect = function(){return redirectValue};
+  }
   try {
     if( typeof overrides.method.wallet === 'boolean' ) {
       options.method.wallet = overrides.method.wallet;
