@@ -159,20 +159,6 @@ var discreet = {
     if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
       return Razorpay.sendMessage({event: 'redirect', data: data});
     }
-    if(data.method === 'get'){
-      location.href = data.url;
-    } else if (data.method === 'post' && typeof data.content === 'object'){
-      var postForm = document.createElement('form');
-      var html = '';
-
-      each( data.content, function(name, value) {
-        html += '<input type="hidden" name="' + name + '" value="' + value + '">'
-      })
-      postForm.method='post';
-      postForm.innerHTML = html;
-      postForm.action = data.url;
-      document.body.appendChild(postForm);
-      postForm.submit();
-    }
+    submitForm(data.url, data.content, data.method);
   }
 }
