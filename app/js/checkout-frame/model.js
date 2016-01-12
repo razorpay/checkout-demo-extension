@@ -1,16 +1,73 @@
-function checkoutModal(opts){
+
+// dont shake in mobile devices. handled by css, this is just for fallback.
+var shouldShakeOnError = !/Android|iPhone/.test(ua);
+
+// element to verfy whether font has been loaded
+var fontAnchor = '#powered-link';
+
+// sanitizing innerHTML
+function sanitizeContent(obj, fieldsArr){
   each(
-    {
-      fontAnchor: '#powered-link'
-    },
-    function(key, value){
-      opts[key] = value;
+    fieldsArr,
+    function(i, key){
+      obj[key] = obj[key].replace(/<[^>]*>?/g, "");
     }
   )
-  this.data = opts;
-  this.timeouts = {};
+}
+
+function sanitize(message){ // warning: modifies message;
+  var options = message.options;
+  var data = message.data;
+  // sanitize options affecting innerHTML
+  sanitizeContent(
+    options,
+    ['name', 'description', 'amount', 'currency', 'display_amount']
+  )
+
+
+  sanitizeValue(
+    options,
+    ['image', 'prefill', 'notes']
+  )
+
+  data.contact = sanitizeContact(data.contact || options.prefill.contact);
+}
+
+function sanitizeValue(obj, key){
+  if(key instanceof Array){
+    return each(
+      key,
+      function(i, field){
+        sanitizeValue(obj, field);
+      }
+    )
+  }
+  var attr = obj[key];
+
+  if(typeof attr === 'string'){
+    obj[key] = attr.replace(/"/g,'');
+  }
+  else if(typeof attr === 'object'){
+    each(
+      attr,
+      function(attrKey, attrObj){
+        sanitizeValue(attrObj, attrKey);
+      }
+    )
+  }
+}
+
+function sanitizeContact(contactPrefill){
+  var contactFirstChar = contactPrefill[0];
+  contactPrefill = contactPrefill.replace(/[^0-9]/g,'');
+  if ( contactFirstChar === '+' ) {
+    contactPrefill = '+' + contactPrefill;
+  }
+  return contactPrefill;
+}
+
+function checkoutModal(){
   this.listeners = [];
-  this.sanitize();
 
   // var classes = [];
 
@@ -30,13 +87,56 @@ function checkoutModal(opts){
 }
 
 checkoutModal.prototype = {
-  render: function(){
-    var div = document.createElement('div');
-    div.innerHTML = templates.modal(this.data);
-    this.el = div.firstChild;
-    this.el.appendChild(this.renderCss());
-    this.applyFont(this.el.querySelector('#powered-link'));
+  getEl: function(){
+    if(!this.el){
+      var div = document.createElement('div');
+      div.innerHTML = templates.modal(this.data);
+      this.el = div.firstChild;
+      this.el.appendChild(this.renderCss());
+      this.applyFont(this.el.querySelector('#powered-link'));
+      document.body.appendChild(this.el);
+    }
     return this.el;
+  },
+
+  fillData: function(data){
+
+    if(data.method){
+      this.changeTab({target: $('#method-' + data.method + '-tab')[0]});
+    }
+
+    if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
+      data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
+    }
+
+    each(
+      {
+        'contact': 'contact',
+        'email': 'email',
+        'bank': 'bank-select'
+        'card[name]': 'card_name',
+        'card[number]': 'card_number',
+        'card[expiry]': 'card_expiry',
+        'card[cvv]': 'card_cvv',
+      },
+      function(name, id){
+        var el = gel(id);
+        if(el) {
+          var val = data[name];
+          if(val){
+            el.value = val;
+          }
+        }
+      }
+    )
+  },
+
+  render: function(message){
+    sanitize(message);
+    this.getEl();
+    this.fillData(message.data);
+    this.modal = new Modal(this.el, message.options.modal);
+    this.smarty = new Smarty(this.el);
   },
 
   renderCss: function(){
@@ -60,50 +160,6 @@ checkoutModal.prototype = {
     return style;
   },
 
-  sanitizeOption: function(obj, key){
-    var attr = obj[key];
-
-    if(typeof attr === 'string'){
-      obj[key] = attr.replace(/"/g,'');
-    }
-    else if(typeof attr === 'object'){
-      each(
-        attr,
-        function(attrKey, attrObj){
-          this.sanitizeOption(attrObj, attrKey);
-        },
-        this
-      )
-    }
-  },
-
-  sanitize: function(){ // warning: modifies this.data;
-    var obj = this.data;
-    // directly appended tags
-    each(
-      ['name', 'description', 'amount', 'currency', 'display_amount'],
-      function(i, key){
-        obj[key] = obj[key].replace(/<[^>]*>?/g, "");
-      }
-    )
-
-    each(
-      ['image', 'prefill', 'notes'],
-      function(i, key){
-        this.sanitizeOption(obj, key);
-      },
-      this
-    )
-
-    var contactPrefill = obj.prefill.contact;
-    var contactFirstChar = contactPrefill[0];
-    contactPrefill = contactPrefill.replace(/[^0-9]/g,'');
-    if ( contactFirstChar === '+' ) {
-      contactPrefill = '+' + contactPrefill;
-    }
-    obj.prefill.contact = contactPrefill;
-  },
-
   applyFont: function(anchor, retryCount) {
     if(!retryCount) {
       retryCount = 0;
@@ -119,7 +175,16 @@ checkoutModal.prototype = {
     }
   },
 
-  destroy: function(){
+  shake: function(){
+    if ( this.el ) {
+      $(this.el.querySelector('#modal-inner'))
+        .removeClass('shake')
+        .reflow()
+        .addClass('shake');
+    }
+  },
+
+  unrender: function(){
     each(this.timeouts, function(key, val){
       clearTimeout(val);
     })

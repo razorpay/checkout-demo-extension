@@ -2,6 +2,7 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
+var sessions = {};
 var model;
 var card = window.card;
 var CheckoutBridge = window.CheckoutBridge;
@@ -15,9 +16,6 @@ var qpmap = {};
 
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
-
-// dont shake in mobile devices. handled by css, this is just for fallback.
-var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 var gifBase64Prefix = 'data:image/gif;base64,';
 var freqBanks = {
@@ -62,18 +60,10 @@ var freqWallets = {
   }
 }
 
-function addModalDOM(opts){
-  if(model){
-    model.destroy();
-  }
-  model = new checkoutModal(opts);
-  document.body.appendChild(model.render());
-  model.modal = new window.Modal(gel('modal'), model.data.modal);
-  model.smarty = new window.Smarty($(model.el));
-}
+function processMessage(message) {
+  message.netbanks = freqBanks;
 
-function createOpts(){
-  var opts = $.clone(Razorpay.defaults);
+  var opts = message.options;
   var modal = opts.modal;
 
   modal.onhide = function(){
@@ -89,8 +79,6 @@ function createOpts(){
   }
 
   frameDiscreet.setMethods(window.payment_methods, opts.method);
-  opts.netbanks = freqBanks;
-  return opts;
 }
 
 function frontDrop(message, className) {
@@ -108,9 +96,43 @@ function frontDrop(message, className) {
   }
 }
 
-function shakeModal() {
-  if(shouldShakeOnError){
-    $('#modal-inner').removeClass('shake').reflow().addClass('shake');
+function addEMI(){
+  if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+    $('#emi-wrap').html(templates.emi());
+    $('#emi-close').on('click', frontDrop);
+    var elem_emi = $('#elem-emi');
+    if(elem_emi[0]){
+      elem_emi.addClass('shown').on('mouseup', function(){
+        var shouldCheck = $(this).hasClass('check');
+        if(!gel('emi').checked || !shouldCheck){
+
+          $('#emi-container')
+            .css('display', 'block')
+            .reflow()
+            .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
+
+          $('#fd').addClass('shown');
+          $('#fd-in').hide();
+        }
+      })
+      $('#card_number').on('input keypress', function(){
+        elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
+      })
+      each(
+        $$('#emi-container > .emi-option'),
+        function(i, el){
+          $(el).on('click', function(){
+            $('#emi-container > .emi-active').removeClass('emi-active');
+            $(this).addClass('emi-active').find('input')[0].checked = true;
+            frontDrop();
+          })
+        }
+      )
+    }
+    $('#methods-specific-fields').css('minHeight', '263px');
+  }
+  if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
+    $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
   }
 }
 
@@ -242,58 +264,28 @@ var frameDiscreet = {
     }
   },
 
-  showModal: function() {
-    frameDiscreet.renew();
-
-    if(model){
-      return model.modal.show();
+  showModal: function(message) {
+    // frameDiscreet.renew();
+    if(_uid !== message.id){
+      if(sessions[_uid]){
+        sessions[_uid].unrender();
+      }
+      _uid = message.id;
     }
-    $('#loading').remove();
-    var opts = createOpts();
+    var session = sessions[_uid];
+    if(!session){
+      session = sessions[_uid] = new CheckoutForm();
+    }
 
-    addModalDOM(opts);
+    processMessage(message);
+    session.render(message);
+    session.modal.show();
     
     if ( CheckoutBridge ) {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
-    if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
-      $('#emi-wrap').html(templates.emi());
-      $('#emi-close').on('click', frontDrop);
-      var elem_emi = $('#elem-emi');
-      if(elem_emi[0]){
-        elem_emi.addClass('shown').on('mouseup', function(){
-          var shouldCheck = $(this).hasClass('check');
-          if(!gel('emi').checked || !shouldCheck){
-
-            $('#emi-container')
-              .css('display', 'block')
-              .reflow()
-              .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
-
-            $('#fd').addClass('shown');
-            $('#fd-in').hide();
-          }
-        })
-        $('#card_number').on('input keypress', function(){
-          elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
-        })
-        each(
-          $$('#emi-container > .emi-option'),
-          function(i, el){
-            $(el).on('click', function(){
-              $('#emi-container > .emi-active').removeClass('emi-active');
-              $(this).addClass('emi-active').find('input')[0].checked = true;
-              frontDrop();
-            })
-          }
-        )
-      }
-      $('#methods-specific-fields').css('minHeight', '263px');
-    }
-    if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
-      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
-    }
+    addEMI();
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
     $('#modal-close').on('click', function(){
@@ -401,7 +393,7 @@ var frameDiscreet = {
   isInvalid: function(parentID) {
     var invalids = $('#' + parentID).find('.invalid');
     if(invalids[0]){
-      shakeModal();
+      sessions[_uid].shake();
       $(invalids[0]).find('.input')[0].focus();
 
       each( invalids, function(i, field){
@@ -497,7 +489,6 @@ var frameDiscreet = {
   renew: function(){
     if(model) {
       frontDrop('', 'hidden');
-      model.modal.options.backdropClose = true;
     }
   },
 
@@ -525,7 +516,7 @@ var frameDiscreet = {
       return;
     }
     var message;
-    shakeModal();
+    sessions[_uid].shake();
     model.modal.options.backdropClose = true;
 
     if (response && response.error){
@@ -557,48 +548,6 @@ var frameDiscreet = {
       'shown'
     );
     $('#fd-hide').focus();
-  },
-
-  dataHandler: function(data){
-    if( !('method' in data) ) {
-      return;
-    }
-
-    frameDiscreet.tab_change({target: $('#method-' + data.method + '-tab')[0]});
-
-    if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
-      data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
-    }
-
-    var lastel;
-    each(
-      {
-        'contact': 'contact',
-        'email': 'email',
-        'card[name]': 'card_name',
-        'card[number]': 'card_number',
-        'card[expiry': 'card_expiry',
-        'bank': 'bank-select'
-      },
-      function(name, id){
-        var el = gel(id);
-        if(el) {
-          lastel = el;
-          var val = data[name];
-          if(val){
-            el.value = val;
-          }
-        }
-      }
-    )
-
-    if(data.method === 'card'){
-      frameDiscreet.setCardFormatting();
-    }
-    if(lastel){
-      lastel.focus();
-    }
-    model.smarty.refresh();
   },
 
   configureRollbar: function(message){
@@ -655,21 +604,22 @@ Razorpay.sendMessage = function(message){
   }
 }
 window.handleMessage = function(message) {
-  if ( message.event === 'open' || message.options ) {
-    if ( message.options ) { // open modal
-      try{
-        if(message.id){
-          _uid = message.id;
-        }
-        frameDiscreet.configureRollbar(message);
-        Razorpay.configure(message.options);
-      } catch(e){
-        Razorpay.sendMessage({event: 'fault', data: e.message});
-        roll('fault ' + e.message, message);
-        return;
-      }
+  // if(message.id){
+  //   _uid = message.id;
+  // }
+  if ( message.options ) {
+    try{
+      frameDiscreet.configureRollbar(message);
+      // validate and sanitize message.options
+      Razorpay.prototype.configure.call(message, message.options);
+    } catch(e){
+      Razorpay.sendMessage({event: 'fault', data: e.message});
+      roll('fault ' + e.message, message);
+      return;
     }
-    frameDiscreet.showModal();
+  }
+  if ( message.event === 'open' || message.options ) {
+    frameDiscreet.showModal(message);
     if(CheckoutBridge){
       discreet.context = qpmap.platform || 'app';
       track('init', message.options);
@@ -679,30 +629,6 @@ window.handleMessage = function(message) {
     }
   } else if ( message.event === 'close' ) {
     frameDiscreet.hide();
-  }
-
-  var params = message.params;
-  if(params){
-    setTimeout(function(){
-      try{
-        frameDiscreet.errorHandler(JSON.parse(params));
-      } catch(e){
-        roll('message.params', params);
-      }
-    })
-  }
-  var data = message.data;
-  if(data){
-    if( typeof data === 'string' ){
-      try{
-        data = JSON.parse(data);
-      } catch(e){
-        roll('message.data', data);
-      }
-    }
-    if( typeof data === 'object' ) {
-      frameDiscreet.dataHandler(data);
-    }
   }
 }
 

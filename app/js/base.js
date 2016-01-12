@@ -132,12 +132,14 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype.configure = function(overrides){
-  this.options = base_configure.call(this, overrides);
+  this.options = base_configure(overrides);
   validateRequiredFields(this.options);
-  this.modal = {options: {}};
 
-  var trackingPayload = $.clone(overrides);
-  track( 'init', trackingPayload );
+  if(this instanceof Razorpay){
+    this.modal = {options: {}};
+    var trackingPayload = $.clone(overrides);
+    track( 'init', trackingPayload );
+  }
 };
 
 Razorpay.configure = function(overrides) {
