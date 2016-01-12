@@ -58,7 +58,7 @@ function generateUID(){
   ) +
   _toBase62(Math.floor(238328*Math.random())) + '0';
 
-  var sum = 0, flip = 0, tempdigit;
+  var sum = 0, tempdigit;
   var map62 = {};
   each(
     base62Chars,
@@ -70,11 +70,11 @@ function generateUID(){
     num,
     function(i, chr){
       tempdigit = map62[num[num.length - 1 - i]];
-      if(!(flip++ % 2)){
+      if((num.length - i) % 2){
         tempdigit *= 2;
-        if(tempdigit >= 62){
-          tempdigit = tempdigit % 62 + 1;
-        }
+      }
+      if(tempdigit >= 62){
+        tempdigit = tempdigit % 62 + 1;
       }
       sum += tempdigit;
     }
