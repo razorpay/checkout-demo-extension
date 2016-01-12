@@ -171,9 +171,6 @@ function formatRequest(request){
     rdata['_[context]'] = discreet.context;
   }
 
-  // rdata['_[medium]'] = discreet.medium;
-  // rdata['_[context]'] = discreet.context;
-
   return Razorpay.payment.validate(rdata);
 }
 
