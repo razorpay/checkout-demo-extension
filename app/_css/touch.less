@@ -4,8 +4,7 @@
 @max-height: 659px;
 @padding: 22px;
 
-@media(max-height: @max-height){
-.mobile {
+.mobile-view(){
   max-width: @max-width;
   margin: 0 auto;
 
@@ -111,6 +110,15 @@
       line-height: 56px;
     }
   }
+}
+
+@media (max-device-height: 450px),(max-device-width: 450px){
+  .mobile-view();
+}
+
+@media(max-height: @max-height){
+.mobile {
+  .mobile-view();
 }
 }
 .ip{

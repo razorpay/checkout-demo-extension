@@ -27,9 +27,9 @@ describe("open method should", function(){
   })
 
   it("append iframe", function(){
-    expect(ch_isOpen).toBe(true);
+    expect(isOpen).toBe(true);
     expect(rzp.checkoutFrame).toBeDefined();
-    expect(document.body.contains(rzp.checkoutFrame.parentNode)).toBe(true);
+    expect(document.documentElement.contains(rzp.checkoutFrame.parentNode)).toBe(true);
   })
 
   afterEach(function(){
@@ -58,8 +58,8 @@ describe("close method should", function(){
   
   it("clean up various properties", function(){
     ch_onClose.call(rzp);
-    expect(ch_isOpen).toBe(false);
-    expect(rzp.checkoutFrame).not.toBeVisible();
+    expect(isOpen).toBe(false);
+    expect(this.checkoutFrame).not.toBeVisible();
   })
 
   it("be followable by re-open", function(){
@@ -148,22 +148,6 @@ describe("ch_onFrameMessage", function(){
         done();
       })
     })
- 
-    it("init options are to be sent to frame", function(done){
-      var spy = jasmine.createSpy();
-      spyOn(window, 'ch_sendFrameMessage').and.callFake(function(response){
-        if(this === rzp && response.context === location.href){
-          var o = response.options;
-          if(o.key && o.amount){
-            spy();
-          }
-        }
-      })
-      setTimeout(function(){
-        expect(spy).toHaveBeenCalled();
-        done();
-      })
-    })
   })
 
   it("redirect, next request should be processed", function(done){
@@ -206,7 +190,7 @@ describe("ch_onFrameMessage", function(){
     };
     postMessage({source: "frame", event: "success", data: "payment_id"}, '*');
     setTimeout(function(){
-      expect(rzp.checkoutFrame.getAttribute('removable')).toBe("true");
+      expect(existingInstance).toBe(null);
       done();
     })
   })
@@ -225,7 +209,7 @@ describe("ch_onFrameMessage", function(){
     var origClose = ch_onClose;
     var spy = jasmine.createSpy();
     ch_onClose = function(){
-      if(this === rzp) spy();
+      if(existingInstance === rzp) spy();
     }
     postMessage({source: "frame", event: "hidden"}, '*');
     setTimeout(function(){
@@ -331,7 +315,7 @@ describe("automatic checkout:", function(){
     })
 
     it("should open checkout form on submit if not already", function(){
-      ch_isOpen = false;
+      isOpen = false;
 
       var spy = jasmine.createSpy();
       var spy2 = jasmine.createSpy();
@@ -344,7 +328,7 @@ describe("automatic checkout:", function(){
     })
 
     it("shouldn't do default action if form is open", function(){
-      ch_isOpen = true;
+      isOpen = true;
 
       var spy = jasmine.createSpy();
       var spy2 = jasmine.createSpy();
@@ -382,8 +366,8 @@ describe("automatic checkout:", function(){
         currentScript.removeAttribute(i);
     })
 
-    it("should do nothing if data-key attribute is not present", function(){
-      currentScript.removeAttribute('data-key');
+    it("should do nothing if data-amount attribute is not present", function(){
+      currentScript.removeAttribute('data-amount');
       spyCalled = null;
       spyOn(window, 'ch_addButton').and.callFake(spyNotCalled);
     })

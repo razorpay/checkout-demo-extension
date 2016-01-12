@@ -90,11 +90,11 @@ describe('configure', function(){
     }).toThrow();
   })
 
-  it('decimal amount', function(){
-    expect(function(){
-      Razorpay.configure({amount: 20.5})
-    }).toThrow();
-  })
+  // it('decimal amount', function(){
+  //   expect(function(){
+  //     Razorpay.configure({amount: 200.5})
+  //   }).toThrow();
+  // })
 
   it('notes', function(){
     var notesObject = {};

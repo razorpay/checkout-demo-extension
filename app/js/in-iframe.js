@@ -2,7 +2,6 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
-
 var CheckoutBridge = window.CheckoutBridge;
 // flag for checkout-frame.js
 discreet.isFrame = true;
@@ -210,7 +209,7 @@ var frameDiscreet = {
       }
     )
 
-    obj.prefill.contact = obj.prefill.contact.replace(/[^0-9+]/g,'');
+    // obj.prefill.contact = obj.prefill.contact.replace(/[^0-9]/g,'');
   },
 
   setNumberValidity: function(){
@@ -272,7 +271,6 @@ var frameDiscreet = {
     card.formatNumber($el_number[0]);
     card.formatExpiry(el_expiry);
     card.ensureNumeric(el_cvv);
-    card.ensureNumeric(el_contact);
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
@@ -738,11 +736,11 @@ window.handleMessage = function(message) {
   if ( message.event === 'open' || message.options ) {
     if ( message.options ) { // open modal
       try{
-        Razorpay.configure(message.options);
-        frameDiscreet.configureRollbar(message);
         if(message.id){
           _uid = message.id;
         }
+        frameDiscreet.configureRollbar(message);
+        Razorpay.configure(message.options);
       } catch(e){
         Razorpay.sendMessage({event: 'fault', data: e.message});
         roll('fault ' + e.message, message);
@@ -751,10 +749,7 @@ window.handleMessage = function(message) {
     }
     frameDiscreet.showModal();
     if(CheckoutBridge){
-      message.options.meta = {
-        ua: ua,
-        cb: true
-      }
+      discreet.context = qpmap.platform || 'app';
       track('init', message.options);
     }
     else {

@@ -67,7 +67,12 @@ function track(event, props) {
 
       props.token = '181b3d7d22f7c71826d2f7db7c322028';
       props.distinct_id = _uid;
-      props.time = new Date().getTime()
+      props.time = new Date().getTime();
+
+      if(event === 'init'){
+        props.ua = ua;
+        props.context = discreet.context;
+      }
 
       var data = {
         event: event,

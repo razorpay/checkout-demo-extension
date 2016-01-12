@@ -42,7 +42,7 @@ discreet.setCommunicator = function(opts){
   }
   if(
     location.href.indexOf(discreet.makeUrl(opts)) &&
-    (/MSIE|Windows Phone/.test(ua) || (isCriOS && !discreet.isFrame))
+    (/MSIE |Windows Phone|Trident\//.test(ua) || (isCriOS && !discreet.isFrame))
   ) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
@@ -201,7 +201,6 @@ function onComplete(data, request){
     data.razorpay_payment_id
   ) {
     var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    track('success', returnObj);
     return setTimeout(function(){
       request.success.call(null, returnObj); // dont expose request as this
     })
@@ -264,15 +263,24 @@ Razorpay.payment = {
     var url = discreet.makeUrl(options) + '/payments/create/checkout';
 
     if(options.redirect || options.callback_url){
-      submitFormData(url, rdata, 'post');
+      discreet.nextRequestRedirect({
+        url: url,
+        content: rdata,
+        method: 'post'
+      });
       return false;
     }
 
-    track('submit', {
-      email: rdata.email,
-      contact: rdata.contact,
-      method: rdata.method
-    });
+    var trackingPayload = {};
+    each(
+      ['key_id', 'amount', 'email', 'contact', 'method', 'bank', 'wallet', 'card[name]'],
+      function(i, field){
+        if(field in rdata){
+          trackingPayload[field] = rdata[field];
+        }
+      }
+    )
+    track('submit', trackingPayload);
 
     var name;
     request.popup = createPopup(rdata, url, options);
@@ -287,6 +295,7 @@ Razorpay.payment = {
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
+
     if(discreet.isFrame){
       cookiePoll();
     }

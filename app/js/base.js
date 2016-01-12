@@ -45,10 +45,21 @@ var optionValidations = {
 
   amount: function(amount){
     var intAmount = parseInt(amount, 10);
-    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100 || String(intAmount).indexOf('.') !== -1) {
+    var strAmount = String(amount);
+    var isAmountFloat = strAmount.indexOf('.') !== -1;
+    if(isAmountFloat){
+      roll('Invalid amount', strAmount);
+    }
+    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100) {
       var errorMessage = 'should be passed in paise. Minimum value is 100';
       alert('Invalid amount. It ' + errorMessage);
       return errorMessage;
+    }
+  },
+
+  currency: function(currency){
+    if(currency !== 'INR'){
+      return 'INR is the only supported value.';
     }
   },
 
@@ -116,25 +127,17 @@ function base_configure(overrides){
     _uid = null;
   }
 
-  if(!discreet.isFrame){
-    var trackingPayload = $.clone(overrides);
-    trackingPayload.meta = {
-      ua: ua,
-      cb: !!window.CheckoutBridge,
-      context: location.href,
-      co: !!discreet.isCheckout
-    }
-    track('init', trackingPayload);
-  }
-
   discreet.setCommunicator(options);
   return options;
 }
 
 Razorpay.prototype.configure = function(overrides){
-  this.options = base_configure(overrides);
+  this.options = base_configure.call(this, overrides);
   validateRequiredFields(this.options);
   this.modal = {options: {}};
+
+  var trackingPayload = $.clone(overrides);
+  track( 'init', trackingPayload );
 };
 
 Razorpay.configure = function(overrides) {
@@ -142,6 +145,7 @@ Razorpay.configure = function(overrides) {
 }
 
 var discreet = {
+  context: location.href,
   setCommunicator: noop,
   makeUrl: function(options, noVersion){
     return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);
