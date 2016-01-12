@@ -284,7 +284,7 @@ var ch_messageHandlers = {
   },
 
   hidden: function(){
-    ch_onClose.call(existingInstance);
+    ch_onClose.call(this);
   },
 
   success: function(data){
@@ -294,9 +294,10 @@ var ch_messageHandlers = {
         handler.call(null, data);
       })
     }
-    ch_close.call(existingInstance);
-    $(existingInstance.checkoutFrame).remove();
+    var instance = existingInstance;
     existingInstance = null;
+    ch_close.call(instance);
+    $(instance.checkoutFrame).remove();
   },
 
   failure: function(data){
