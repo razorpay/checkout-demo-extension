@@ -251,52 +251,46 @@ iframe{
   display: none;
 }
 #elem-card{
-  transition: 0.3s;
-
   i{
     font-size: 0;
   }
   .card-image{
-    background: url('../images/cards@2x.png') no-repeat;
-    width: 28px;
+    transition: 0.2s opacity;
+    background: url('../images/cards.png') no-repeat;
+    width: 30px;
     height: 20px;
     position: absolute;
-    left: 2px;
+    margin-top: 2px;
     top: 50%;
     background-size: 600%;
+    opacity: 1;
   }
 
-  &[cardtype=unknown] i{
+  &[cardtype=unknown]{
     .card-image{
-      display: none;
+      opacity: 0;
+      display: none\9;
     }
-    font-size: 30px;
+    i{
+      font-size: 30px;
+    }
   }
-  &[cardtype=visa] .card-image{
-    background-position: 0 10px;
+
+  &[cardtype=mastercard] .card-image{
+    background-position: 20% 0;
   }
-  &[cardtype=mastercard] i{
-    background-image: url('../images/icons/mastercard.png');
+  &[cardtype^=maestro] .card-image{
+    background-position: 40% 0;
   }
-  // &[cardtype=maestro]{
-  //   // margin-bottom: 40px;
-  //   i{
-  //     background-image: url('../images/icons/maestro.png');
-  //   }
-  //   .nocvv{
-  //     opacity: 1;
-  //     // display: block\9;
-  //   }
-  // }
-  // &[cardtype=maestro16] i{
-  //   background-image: url('../images/icons/maestro.png');
-  // }
-  // &[cardtype=rupay] i{
-  //   background-image: url('../images/icons/rupay.png');
-  // }
-  // &[cardtype=amex] i{
-  //   background-image: url('../images/icons/amex.png');
-  // }
+  &[cardtype=diners] .card-image{
+    background-position: 60% 0;
+  }
+  &[cardtype=rupay] .card-image{
+    background-position: 80% 0;
+  }
+  &[cardtype=amex] .card-image{
+    background-position: 100% 0;
+  }
 }
 #cardsave{
   width: 15px;
@@ -309,7 +303,6 @@ iframe{
   font-size: 18px;
   padding: 0;
   margin: 0;
-  // border-radius: 0 0 @border-radius @border-radius;
   line-height: @submit-height;
   width: 100%;
 }
