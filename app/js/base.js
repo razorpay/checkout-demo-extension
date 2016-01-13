@@ -122,11 +122,6 @@ function base_configure(overrides){
     }
   } catch(e){}
 
-
-  if(typeof overrides.key === 'string' && overrides.key.indexOf('rzp_live_')){
-    _uid = null;
-  }
-
   discreet.setCommunicator(options);
   return options;
 }
@@ -136,6 +131,7 @@ Razorpay.prototype.configure = function(overrides){
   validateRequiredFields(this.options);
 
   if(this instanceof Razorpay){
+    this.id = generateUID();
     this.modal = {options: {}};
     var trackingPayload = $.clone(overrides);
     track( 'init', trackingPayload );

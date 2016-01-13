@@ -6,15 +6,16 @@ var $ = function(el){
   this[0] = el;
 };
 
-function $$(query){
-  return document.querySelectorAll(query);
+function bind(func, thisArg){
+  return function(){
+    return func.apply(thisArg, arguments);
+  }
 }
 
-function gel(id){
-  return document.getElementById(id);
-}
+var $$ =  bind(document.querySelectorAll, document);
+var gel = bind(document.getElementById, document);
 
-var each = function( iteratee, eachFunc, thisArg ) {
+function each( iteratee, eachFunc, thisArg ) {
   var i;
   if(arguments.length < 3){
     thisArg = this;
@@ -33,7 +34,7 @@ var each = function( iteratee, eachFunc, thisArg ) {
   }
 }
 
-var map = function( iteratee, mapFunc ) {
+function map( iteratee, mapFunc ) {
   var result = iteratee instanceof Array ? [] : {};
   each(iteratee, function(i, val){
     result[i] = mapFunc(val, i);
@@ -41,7 +42,7 @@ var map = function( iteratee, mapFunc ) {
   return result;
 }
 
-var deserialize = function(data, key){
+function deserialize(data, key){
   if(typeof data === 'object'){
     var str = '';
     each(
@@ -58,7 +59,7 @@ var deserialize = function(data, key){
   return '<input type="hidden" name="' + key + '" value="' + data + '">';
 }
 
-var preventDefault = function(e){
+function preventDefault(e){
   if(e && e.preventDefault){
     e.preventDefault();
   }

@@ -51,22 +51,25 @@ function _toBase62(number){
 }
 
 
-var _uid = _toBase62(
-    (new Date().getTime() - 1388534400000).toString() +
+function generateUID(){
+  return _toBase62(
+    (new Date().getTime() - new Date('2014-01-01')).toString() +
     ('000000' + Math.floor(1000000*Math.random())).slice(-6)
   ) +
-  _toBase62(Math.floor(14776336*Math.random()));
+  _toBase62(Math.floor(62*62*62*62*Math.random()));
+}
 
 
 function track(event, props) {
-  if(_uid){
+  var id = this.id;
+  if(id && /^rzp_live/.test(this.options.key)){
     setTimeout(function(){
       if(typeof props !== 'object') {
         props = {};
       }
 
       props.token = '181b3d7d22f7c71826d2f7db7c322028';
-      props.distinct_id = _uid;
+      props.distinct_id = id;
       props.time = new Date().getTime();
 
       if(event === 'init'){

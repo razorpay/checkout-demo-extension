@@ -149,6 +149,21 @@ function getFormData() {
   return data;
 }
 
+function frontDrop(message, className) {
+  if(!popupRequest){
+    gel('fd-t').innerHTML = message || '';
+    gel('fd').className = className || '';
+  }
+  var emic = $('#emi-container');
+  if(emic[0]){
+    emic.removeClass('shown');
+    setTimeout(function(){
+      emic.hide();
+    }, 300)
+    gel('fd-in').style.display = '';
+  }
+}
+
 function CheckoutModal(){
   this.listeners = [];
 
@@ -305,6 +320,7 @@ CheckoutModal.prototype = {
         frontDrop();
       }
     });
+    // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
   },
 
   close: function(){
@@ -365,8 +381,15 @@ CheckoutModal.prototype = {
     }
   },
 
-  switchTab: function(e){
-    var target = e.target;
+  switchTab: function(target){
+    if(target instanceof $){
+      if(!target[0]){
+        return;
+      }
+    }
+    else{
+      target = e.target;
+    }
 
     if( target.nodeName === 'IMG' ) {
       target = target.parentNode;
@@ -375,8 +398,6 @@ CheckoutModal.prototype = {
     if( target.nodeName !== 'LI' || $(target).hasClass('active') ) {
       return;
     }
-
-    // TODO frameDiscreet.renew();
 
     $('.tab-content.active').removeClass('active');
     $('#' + target.getAttribute('data-target')).addClass('active');
@@ -418,6 +439,59 @@ CheckoutModal.prototype = {
     }
   },
 
+  hide: function(){
+    $('#modal-inner').removeClass('shake');
+    model.modal.hide();
+  },
+
+  successHandler: function(response){
+    this.modal.options.onhide = null;
+    Razorpay.sendMessage({ event: 'success', data: response });
+    if(isCriOS) {
+      setCookie('onComplete', JSON.stringify(response));
+    }
+    this.hide();
+  },
+
+  errorHandler: function(response){
+    if(!this.modal || !response){
+      return;
+    }
+    var message;
+    this.shake();
+    this.modal.options.backdropClose = this.message.options.modal.backdropClose;
+
+    if (response && response.error){
+      message = response.error.description;
+      var err_field = response.error.field;
+      if (err_field){
+        if(!err_field.indexOf('expiry')){
+          err_field = 'card[expiry]';
+        }
+        var error_el = document.getElementsByName(err_field)[0];
+        if (error_el && error_el.type !== 'hidden'){
+          var help = $(error_el)
+            .focus()
+            .parent()
+            .addClass('invalid')
+            .find('help-text')[0];
+
+          if(help){
+            $(help).html(message);
+          }
+          frontDrop();
+          return;
+        }
+      }
+    }
+
+    frontDrop(
+      message || 'There was an error in handling your request',
+      'shown'
+    );
+    $('#fd-hide').focus();
+  },
+
   submit: function(e) {
     preventDefault(e);
     this.smarty.refresh();
@@ -452,8 +526,8 @@ CheckoutModal.prototype = {
       postmessage: false,
       options: options,
       data: data,
-      error: frameDiscreet.errorHandler,
-      success: frameDiscreet.successHandler
+      error: bind(this.errorHandler, this),
+      success: bind(this.successHandler, this)
     });
   },
 

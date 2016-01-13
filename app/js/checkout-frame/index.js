@@ -78,21 +78,6 @@ function processMessage(message) {
   frameDiscreet.setMethods(window.payment_methods, opts.method);
 }
 
-function frontDrop(message, className) {
-  if(!popupRequest){
-    gel('fd-t').innerHTML = message || '';
-    gel('fd').className = className || '';
-  }
-  var emic = $('#emi-container');
-  if(emic[0]){
-    emic.removeClass('shown');
-    setTimeout(function(){
-      emic.hide();
-    }, 300)
-    gel('fd-in').style.display = '';
-  }
-}
-
 function addEMI(){
   return;
   if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
@@ -195,7 +180,6 @@ var frameDiscreet = {
   },
 
   showModal: function(message) {
-    // frameDiscreet.renew();
     if(_uid !== message.id){
       if(sessions[_uid]){
         sessions[_uid].unrender();
@@ -215,25 +199,9 @@ var frameDiscreet = {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
+    session.errorHandler(qpmap.error);
+    session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
     addEMI();
-    // event listeners
-    // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
-
-    if(qpmap.tab){
-      each(
-        $$('#tabs > li'),
-        function(i, li){
-          if( li.getAttribute('data-target') === 'tab-' + qpmap.tab ) {
-            frameDiscreet.tab_change({target: li});
-          }
-        }
-      )
-    }
-    if(qpmap.error){
-      setTimeout(function(){
-        frameDiscreet.errorHandler(qpmap)
-      })
-    }
   },
 
   // toggle_nocvv: function(){
@@ -248,71 +216,6 @@ var frameDiscreet = {
 
 
   /* sets focus on invalid input and returns true, if any. */
-
-  // close on backdrop click and remove errors
-  renew: function(){
-    if(model) {
-      frontDrop('', 'hidden');
-    }
-  },
-
-  hide: function(){
-    if(model.modal){
-      $('#modal-inner').removeClass('shake');
-      model.modal.hide();
-    }
-    model.modal = null;
-  },
-
-  successHandler: function(response){
-    if(model.modal){
-      model.modal.options.onhide = null;
-    }
-    Razorpay.sendMessage({ event: 'success', data: response });
-    if(isCriOS) {
-      setCookie('onComplete', JSON.stringify(response));
-    }
-    frameDiscreet.hide();
-  },
-
-  errorHandler: function(response){
-    if(!model.modal){
-      return;
-    }
-    var message;
-    sessions[_uid].shake();
-    model.modal.options.backdropClose = true;
-
-    if (response && response.error){
-      message = response.error.description;
-      var err_field = response.error.field;
-      if (err_field){
-        if(!err_field.indexOf('expiry')){
-          err_field = 'card[expiry]';
-        }
-        var error_el = document.getElementsByName(err_field)[0];
-        if (error_el && error_el.type !== 'hidden'){
-          var help = $(error_el)
-            .focus()
-            .parent()
-            .addClass('invalid')
-            .find('help-text')[0];
-
-          if(help){
-            $(help).html(message);
-          }
-          frontDrop();
-          return;
-        }
-      }
-    }
-
-    frontDrop(
-      message || 'There was an error in handling your request',
-      'shown'
-    );
-    $('#fd-hide').focus();
-  },
 
   configureRollbar: function(message){
     if(Rollbar && typeof Rollbar.configure === 'function'){
