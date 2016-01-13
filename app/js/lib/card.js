@@ -236,7 +236,9 @@
     }
   };
 
-  var card = root.Card = function(){}
+  var card = root.Card = function(){
+    this.listeners = [];
+  }
 
   Card.luhn = function(num){
     var odd = true;
@@ -272,28 +274,30 @@
 
   card.prototype = {
     bind: function(el, eventListeners){
+      if( !el ) { return }
       var $el = $(el);
       each(
         eventListeners,
         function(event, listener){
-          $el.on(event, listener, null, this)
+          eventListeners[event] = $el.on(event, listener, null, this);
         },
         this
       )
+      this.listeners.push([$el, eventListeners])
     },
     formatCardNumber: function(el){
-      if(!el) { return }
       this.bind(el, {
         keypress: FormatNumber,
         keydown: FormatNumberBack,
         keyup: this.setType
       })
-      this.setType({target: el});
-      FormatNumber.call(this, {target: el});
+      if(el){
+        this.setType({target: el});
+        FormatNumber.call(this, {target: el});
+      }
     },
 
     formatCardExpiry: function(el){
-      if(!el) { return }
       this.bind(el, {
         keypress: FormatExpiry,
         keydown: FormatExpiryBack
@@ -301,14 +305,12 @@
     },
 
     ensureNumeric: function(el){
-      if(!el) { return }
       this.bind(el, {
         keypress: ensureNumeric
       })
     },
 
     ensurePhone: function(el){
-      if(!el) { return }
       this.bind(el, {
         keypress: ensurePhone
       })

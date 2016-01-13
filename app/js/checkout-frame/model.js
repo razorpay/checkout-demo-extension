@@ -89,9 +89,13 @@ function formatMessage(message){
   )
 }
 
-function validateCard(e){
-  var el = e.target;
-  $(el.parentNode)[Card.validateCardNumber(el.value, el.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
+function validateCardNumber(el){
+  if(!(el instanceof Element)){
+    el = el.target;
+  }
+  if(el){
+    $(el.parentNode)[Card.validateCardNumber(el.value, el.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
+  }
 }
 
 function formatCvvHelp(el_cvv, cvvlen){
@@ -100,6 +104,49 @@ function formatCvvHelp(el_cvv, cvvlen){
   el_cvv.maxLength = cvvlen;
   el_cvv.pattern = '[0-9]{'+cvvlen+'}';
   $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
+}
+
+function getFormFields(containerID, returnObj) {
+  each(
+    $('#' + containerID).find('input[name],select[name]'),
+    function(i, el){
+      if(el.getAttribute('type') === 'radio' && !el.checked) {
+        return;
+      }
+      if(!el.disabled && el.value.length) {
+        returnObj[el.name] = el.value;
+      }
+    }
+  )
+}
+
+function getFormData() {
+  var activeTab = $('#tabs > .active')[0];
+  if(!activeTab) { return }
+
+  var data = {};
+  getFormFields('form-common', data);
+
+  var targetTab = activeTab.getAttribute('data-target');
+  getFormFields(targetTab, data);
+
+  if(targetTab === 'tab-card'){
+    data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+
+    if(!data['card[expiry]']){
+      data['card[expiry]'] = '';
+    }
+
+    if(!data['card[cvv]']){
+      data['card[cvv]'] = '';
+    }
+
+    var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
+    data['card[expiry_month]'] = expiry[0];
+    data['card[expiry_year]'] = expiry[1];
+    delete data['card[expiry]'];
+  }
+  return data;
 }
 
 function CheckoutModal(){
@@ -229,18 +276,19 @@ CheckoutModal.prototype = {
     each(
       elements,
       function(i, element){
-        $(element).on(event, listener, useCapture, this)
+        var $el = $(element);
+        listener = $el.on(event, listener, useCapture, this)
+        this.listeners.push([$el, event, listener, useCapture]);
       },
       this
     )
-    this.listeners.push([selector, event, listener, useCapture]);
   },
 
   bindEvents: function(){
     this.on('click', '#modal-close', this.close);
     this.on('click', '#tabs', this.switchTab);
     this.on('submit', '#form', this.submit);
-    this.on('blur', '#card_number', validateCard);
+    this.on('blur', '#card_number', validateCardNumber);
 
     if(this.message.options.method.netbanking){
       this.on('change', '#bank-select', this.switchBank);
@@ -265,11 +313,6 @@ CheckoutModal.prototype = {
     this.modal.hide();
   },
 
-  submit: function(e){
-    frameDiscreet.formSubmit();
-    e.preventDefault();
-  },
-
   setCardFormatting: function(){
     var $el_number = $('#card_number');
     var el_expiry = gel('card_expiry');
@@ -288,7 +331,7 @@ CheckoutModal.prototype = {
       }
 
       parent.setAttribute('cardtype', type);
-      validateCard({target: el});
+      validateCardNumber(el);
       
       if(type === 'amex' || oldType === 'amex'){
         formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
@@ -360,6 +403,58 @@ CheckoutModal.prototype = {
     var select = gel('bank-select');
     select.value = e.target.value;
     this.smarty.input({target: select});
+  },
+
+  checkInvalid: function(parentID) {
+    var invalids = $('#' + parentID).find('.invalid');
+    if(invalids[0]){
+      this.shake();
+      $(invalids[0]).find('.input')[0].focus();
+
+      each( invalids, function(i, field){
+        $(field).addClass('mature');
+      })
+      return true;
+    }
+  },
+
+  submit: function(e) {
+    preventDefault(e);
+    this.smarty.refresh();
+    validateCardNumber(gel('card_number'));
+
+    if (this.checkInvalid('form-common')) {
+      return;
+    }
+
+    var activeTab = $('#tabs > .active')[0];
+    if ( activeTab && this.checkInvalid(activeTab.getAttribute('data-target')) ) {
+      return;
+    }
+    var data = getFormData();
+    var options = this.message.options;
+
+    data.amount = options.amount;
+
+    Razorpay.sendMessage({
+      event: 'submit',
+      data: data
+    });
+
+    if(this.modal){
+      this.modal.options.backdropClose = false;
+    }
+
+    frontDrop('Please wait while your payment is processed...', 'shown loading');
+
+    // TODO
+    Razorpay.payment.authorize({
+      postmessage: false,
+      options: options,
+      data: data,
+      error: frameDiscreet.errorHandler,
+      success: frameDiscreet.successHandler
+    });
   },
 
   unrender: function(){
