@@ -9,23 +9,6 @@ var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 var fontAnchor = '#powered-link';
 var fontTimeout;
 
-var cssClasses = (function(){
-  var classes = [];
-
-  if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
-    classes.push('mobile');
-  }
-
-  if(!opts.image){
-    classes.push('noimage');
-  }
-
-  if(shouldFixFixed){
-    classes.push('ip')
-  }
-  return classes;
-})()
-
 // sanitizing innerHTML
 function sanitizeContent(obj, fieldsArr){
   each(
@@ -188,6 +171,23 @@ function CheckoutModal(){
 }
 
 CheckoutModal.prototype = {
+
+  getClasses: function(){
+    var classes = [];
+    if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
+      classes.push('mobile');
+    }
+
+    if(!this.message.options.image){
+      classes.push('noimage');
+    }
+
+    if(shouldFixFixed){
+      classes.push('ip')
+    }
+    return classes;
+  },
+
   getEl: function(){
     if(!this.el){
       var div = document.createElement('div');
@@ -196,7 +196,7 @@ CheckoutModal.prototype = {
       this.el.appendChild(this.renderCss());
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
-      $(this.el).addClass(cssClasses);
+      $(this.el).addClass(this.getClasses());
     }
     return this.el;
   },
@@ -305,7 +305,7 @@ CheckoutModal.prototype = {
 
   bindEvents: function(){
     this.on('click', '#modal-close', this.close);
-    this.on('click', '#tabs', this.switchTab);
+    this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
     this.on('blur', '#card_number', validateCardNumber);
 
@@ -385,29 +385,19 @@ CheckoutModal.prototype = {
     }
   },
 
-  switchTab: function(target){
-    if(target instanceof $){
-      if(!target[0]){
-        return;
-      }
+  switchTab: function($el){
+    if(!($el instanceof $)){
+      $el = $($el.target);
     }
-    else{
-      target = e.target;
-    }
-
-    if( target.nodeName === 'IMG' ) {
-      target = target.parentNode;
-    }
-
-    if( target.nodeName !== 'LI' || $(target).hasClass('active') ) {
+    else if(!$el[0] || $el.hasClass('active')){
       return;
     }
 
     $('.tab-content.active').removeClass('active');
-    $('#' + target.getAttribute('data-target')).addClass('active');
+    $('#' + $el.attr('data-target')).addClass('active');
 
     $('#tabs > .active').removeClass('active');
-    $(target).addClass('active');
+    $el.addClass('active');
   },
 
   switchBank: function(e){

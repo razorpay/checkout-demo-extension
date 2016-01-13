@@ -123,6 +123,24 @@ $.prototype = {
     return '';
   },
 
+  attr: function(attr, val){
+    if(typeof attr === 'object'){
+      return each(
+        attr,
+        function(key, val){
+          this.attr(key, val);
+        },
+        this
+      )
+    }
+    var el = this[0];
+    if(arguments.length === 1){
+      return el.getAttribute(attr);
+    }
+    el.setAttribute(attr, val);
+    return this;
+  },
+
   reflow: function(){
     this.prop('offsetWidth');
     return this;
