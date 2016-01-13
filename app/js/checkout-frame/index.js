@@ -97,6 +97,7 @@ function frontDrop(message, className) {
 }
 
 function addEMI(){
+  return;
   if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
     $('#emi-wrap').html(templates.emi());
     $('#emi-close').on('click', frontDrop);
@@ -288,37 +289,6 @@ var frameDiscreet = {
     addEMI();
     // event listeners
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
-    $('#modal-close').on('click', function(){
-      Razorpay.payment.cancel();
-      model.modal.hide();
-    });
-    $('#tabs').on('click', frameDiscreet.tab_change);
-    $('#form').on('submit', function(e){
-      frameDiscreet.formSubmit();
-      e.preventDefault();
-    });
-
-    $('#bank-select').on('change', frameDiscreet.bank_change);
-
-    if(window.addEventListener){
-      $('#netb-banks').on('change', frameDiscreet.bank_radio, true);
-    }
-    else {
-      each(
-        $$('netb-banks .bank-radio'),
-        function(i, bankRadio){
-          $(bankRadio).on('click', frameDiscreet.bank_radio, true);
-        }
-      )
-    }
-
-    $('#fd').on('click', function(e){
-      var id = e.target.id;
-      if(id === 'fd' || id === 'fd-hide') {
-        frontDrop();
-      }
-    });
-    $('#backdrop').on('click', frontDrop);
 
     if(qpmap.tab){
       each(
@@ -336,46 +306,6 @@ var frameDiscreet = {
       })
     }
     frameDiscreet.setCardFormatting();
-  },
-
-  bank_radio: function(e) {
-    var select = gel('bank-select');
-    select.value = e.target.value;
-    model.smarty.input({target: select});
-  },
-
-  bank_change: function() {
-    var val = this.value;
-    each(
-      $$('#netb-banks input'),
-      function(i, radio) {
-        if(radio.value === val){
-          radio.checked = true;
-        } else if(radio.checked){
-          radio.checked = false;
-        }
-      }
-    )
-  },
-
-  tab_change: function(e){
-    var target = e.target;
-
-    if( target.nodeName === 'IMG' ) {
-      target = target.parentNode;
-    }
-
-    if( target.nodeName !== 'LI' || $(target).hasClass('active') ) {
-      return;
-    }
-
-    frameDiscreet.renew();
-
-    $('.tab-content.active').removeClass('active');
-    $('#' + target.getAttribute('data-target')).addClass('active');
-
-    $('#tabs > .active').removeClass('active');
-    $(target).addClass('active');
   },
 
   // toggle_nocvv: function(){

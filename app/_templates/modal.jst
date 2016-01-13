@@ -15,72 +15,72 @@
       <div id="modal-content">
         <div id="header">
           <div id="modal-close">×</div>
-          {{?it.image}}
+          {{?it.options.image}}
             <div class="merchant-image mfix">
-              <img src="{{=it.image}}">
+              <img src="{{=it.options.image}}">
             </div>
           {{?}}
           <div class="merchant">
-            {{?it.name}}
-              <div class="merchant-title">{{=it.name}}</div>
+            {{?it.options.name}}
+              <div class="merchant-title">{{=it.options.name}}</div>
             {{?}}
-            <div class="merchant-desc">{{=it.description}}</div>
+            <div class="merchant-desc">{{=it.options.description}}</div>
           </div>
         </div>
         <div id="body">
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
-                {{for(var note in it.notes){}}
-                  <input type="hidden" name="notes[{{=note}}]" value="{{=it.notes[note]}}">
+                {{for(var note in it.options.notes){}}
+                  <input type="hidden" name="notes[{{=note}}]" value="{{=it.options.notes[note]}}">
                 {{}}}
                 <div class="fieldset">
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
                     <span class="help-text">Please enter a valid email. Example:<br> you@example.com</span>
-                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=it.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=it.options.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <span class="help-text">Please enter 10-12 digit contact number</span>
                     <i class="i">&#xe607;</i>
-                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.prefill.contact}}" pattern="^\+?[0-9]{10,12}$" maxlength="13">
+                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.options.prefill.contact}}" pattern="^\+?[0-9]{10,12}$" maxlength="13">
                   </div></div>
                 </div>
               </div>
               <div id="methods-specific-fields">
                 <div>
-                  {{ var tabCount = 0; it.method.card && tabCount++; it.method.netbanking && tabCount++; it.method.wallet.length && tabCount++; }}
+                  {{ var tabCount = 0; it.options.method.card && tabCount++; it.options.method.netbanking && tabCount++; it.options.method.wallet.length && tabCount++; }}
                   <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
-                    {{? it.method.card }}
+                    {{? it.options.method.card }}
                       <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
                     {{?}}
-                    {{? it.method.netbanking }}
-                      <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.method.card}} class="active"{{?}}>Net Banking</li>
+                    {{? it.options.method.netbanking }}
+                      <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.options.method.card}} class="active"{{?}}>Net Banking</li>
                     {{?}}
                     <div id="tab-bar"></div>
-                    {{? it.method.wallet.length }}
-                      <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.method.card && !it.method.netbanking }} class="active"{{?}}>Wallet</li>
+                    {{? it.options.method.wallet.length }}
+                      <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.options.method.card && !it.options.method.netbanking }} class="active"{{?}}>Wallet</li>
                     {{?}}
                   </ul>
-                  {{? it.method.card }}
+                  {{? it.options.method.card }}
                     <div class="fieldset tab-content active" id="tab-card">
                       <input type="hidden" name="method" value="card">
                       <div class="elem-wrap"><div class="elem elem-name">
                         <i class="i">&#xe602;</i>
                         <span class="help-text">Please enter your name</span>
-                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=it.prefill.name}}">
+                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=it.options.prefill.name}}">
                       </div></div>
                       <div class="elem-wrap"><div class="elem" id="elem-card">
                         <i class="i">&#xe605;</i>
                         <span class="help-text">Please enter a valid card number</span>
-                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=it.prefill.card.number}}">
+                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=it.options.prefill.card.number}}">
                         <label class="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check"> My card doesn't have expiry or CVV</label>
                       </div></div>
                       <div class="double">
                         <div class="elem-wrap first"><div class="elem elem-expiry">
                           <i class="i">&#xe606;</i>
                           <span class="help-text">Please enter card expiry date in MM / YY format.</span>
-                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[5-9]|[2-9][0-9])" maxlength="7" value="{{if(it.prefill.card.expiry_month){}}{{=it.prefill.card.expiry_month}} / {{=it.prefill.card.expiry_year}}{{}}}">
+                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[5-9]|[2-9][0-9])" maxlength="7" value="{{if(it.options.prefill.card.expiry_month){}}{{=it.options.prefill.card.expiry_month}} / {{=it.options.prefill.card.expiry_year}}{{}}}">
                         </div></div>
                         <div class="elem-wrap last"><div class="elem elem-cvv">
                           <i class="i">&#xe604;</i>
@@ -101,8 +101,8 @@
                       </label>
                     </div>
                   {{?}}
-                  {{? it.method.netbanking }}
-                    <div class="fieldset tab-content{{? !it.method.card }} active{{?}}" id="tab-netbanking">
+                  {{? it.options.method.netbanking }}
+                    <div class="fieldset tab-content{{? !it.options.method.card }} active{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
                       <div id="netb-banks">
                         {{for(var b in it.netbanks){}}
@@ -120,17 +120,17 @@
                         <i class="i">&#xe601;</i>
                         <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                           <option selected="selected" value="">Other Banks</option>
-                          {{for(var i in it.method.netbanking){}}
-                            <option value="{{=i}}">{{=it.method.netbanking[i]}}</option>
+                          {{for(var i in it.options.method.netbanking){}}
+                            <option value="{{=i}}">{{=it.options.method.netbanking[i]}}</option>
                           {{}}}
                         </select>
                       </div>
                     </div>
                   {{?}}
-                  {{? it.method.wallet.length }}
-                    <div class="fieldset wallets-{{=it.method.wallet.length}} tab-content{{? !it.method.card && !it.method.netbanking }} active{{?}}" id="tab-wallet">
+                  {{? it.options.method.wallet.length }}
+                    <div class="fieldset wallets-{{=it.options.method.wallet.length}} tab-content{{? !it.options.method.card && !it.options.method.netbanking }} active{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
-                      {{~it.method.wallet :w:i}}
+                      {{~it.options.method.wallet :w:i}}
                         <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
                         <label for="wallet-radio-{{=i}}" class="radio-label">
                           <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
@@ -146,12 +146,12 @@
                 <span class="ring"></span>
                 <span class="text">
                   Pay
-                  {{if(it.display_currency){}}
-                    ${{=it.display_amount}}
+                  {{if(it.options.display_currency){}}
+                    ${{=it.options.display_amount}}
                   {{} else {}}
                      <i>&#xe600;</i>
                      <u>₹</u>
-                     {{=it.amount/100}}
+                     {{=it.options.amount/100}}
                   {{}}}
                 </span>
               </button>

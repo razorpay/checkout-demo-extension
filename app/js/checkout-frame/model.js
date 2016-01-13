@@ -4,6 +4,7 @@ var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 // element to verfy whether font has been loaded
 var fontAnchor = '#powered-link';
+var fontTimeout;
 
 // sanitizing innerHTML
 function sanitizeContent(obj, fieldsArr){
@@ -109,7 +110,7 @@ CheckoutModal.prototype = {
   getEl: function(){
     if(!this.el){
       var div = document.createElement('div');
-      div.innerHTML = templates.modal(this.data);
+      div.innerHTML = templates.modal(this.message);
       this.el = div.firstChild;
       this.el.appendChild(this.renderCss());
       this.applyFont(this.el.querySelector('#powered-link'));
@@ -151,17 +152,20 @@ CheckoutModal.prototype = {
   },
 
   render: function(message){
+    this.message = message;
     formatMessage(message);
     sanitize(message);
     this.getEl();
     this.fillData(message.data);
     this.modal = new Modal(this.el, message.options.modal);
     this.smarty = new Smarty(this.el);
+    this.setCardFormatting()
+    this.bindEvents();
   },
 
   renderCss: function(){
     var div = this.el;
-    var col = this.data.theme.color;
+    var col = this.message.options.theme.color;
     var style = document.createElement('style');
     try{
       div.style.color = col;
@@ -189,7 +193,7 @@ CheckoutModal.prototype = {
     }
     else if(retryCount < 25) {
       var self = this;
-      this.timeouts.font = setTimeout(function(){
+      fontTimeout = setTimeout(function(){
         self.applyFont(anchor, ++retryCount);
       }, 120 + retryCount*50);
     }
@@ -204,11 +208,149 @@ CheckoutModal.prototype = {
     }
   },
 
+  on: function(event, selector, listener, useCapture){
+    var elements = $$(selector);
+    each(
+      elements,
+      function(i, element){
+        $(element).on(event, listener, useCapture, this)
+      },
+      this
+    )
+    this.listeners.push([selector, event, listener, useCapture]);
+  },
+
+  bindEvents: function(){
+    this.on('click', '#modal-close', this.close);
+    this.on('click', '#tabs', this.switchTab);
+    this.on('submit', '#form', this.submit);
+
+    if(this.message.options.method.netbanking){
+      this.on('change', '#bank-select', this.switchBank);
+      this.on('change', '#netb-banks', this.selectBankRadio, true);
+      if(!window.addEventListener){
+        this.on('click', '#netb-banks .bank-radio', this.selectBankRadio);
+      }
+    }
+
+    this.on('click', '#backdrop', this.frontDrop);
+    this.on('click', '#fd', function(e){
+      var id = e.target.id;
+      if(id === 'fd' || id === 'fd-hide') {
+        frontDrop();
+      }
+    });
+  },
+
+  close: function(){
+    // TODO this.cancelPayment
+    Razorpay.payment.cancel();
+    this.modal.hide();
+  },
+
+  submit: function(e){
+    frameDiscreet.formSubmit();
+    e.preventDefault();
+  },
+
+  setCardFormatting: function(){
+    var $el_number = $('#card_number');
+    var el_expiry = gel('card_expiry');
+    var el_cvv = gel('card_cvv');
+    var el_contact = gel('contact');
+
+    card.setType = function(el, type){
+      if(!type){
+        type = card.getType(el.value) || 'unknown';
+      }
+      var parent = el.parentNode;
+
+      var oldType = parent.getAttribute('cardtype');
+      if(type === oldType){
+        return;
+      }
+
+      parent.setAttribute('cardtype', type);
+      frameDiscreet.setNumberValidity.call(el);
+      
+      if(type === 'amex'){
+        frameDiscreet.setCVVFormatting.call(el_cvv, 4);
+      }
+      else if(oldType === 'amex'){
+        frameDiscreet.setCVVFormatting.call(el_cvv, 3);
+      }
+      // if(type !== 'maestro'){
+        // $('nocvv-check')[0].checked = false;
+        // frameDiscreet.toggle_nocvv();
+      // }
+    }
+
+    if(shouldFocusNextField){
+      card.filled = function(el){
+        if(el === el_expiry){
+          el_cvv.focus();
+        }
+        else{
+          el_expiry.focus();
+        }
+      }
+    }
+
+    $el_number.on('blur', frameDiscreet.setNumberValidity);
+    card.formatNumber($el_number[0]);
+    card.formatExpiry(el_expiry);
+    card.ensureNumeric(el_cvv);
+    card.ensurePhone(el_contact);
+
+    // check if we're in webkit
+    // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
+    if ( el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string' ) {
+      el_cvv.type = 'tel';
+    }
+  },
+
+  switchTab: function(e){
+    var target = e.target;
+
+    if( target.nodeName === 'IMG' ) {
+      target = target.parentNode;
+    }
+
+    if( target.nodeName !== 'LI' || $(target).hasClass('active') ) {
+      return;
+    }
+
+    // TODO frameDiscreet.renew();
+
+    $('.tab-content.active').removeClass('active');
+    $('#' + target.getAttribute('data-target')).addClass('active');
+
+    $('#tabs > .active').removeClass('active');
+    $(target).addClass('active');
+  },
+
+  switchBank: function(e){
+    var val = e.target.value;
+    each(
+      $$('#netb-banks input'),
+      function(i, radio) {
+        if(radio.value === val){
+          radio.checked = true;
+        } else if(radio.checked){
+          radio.checked = false;
+        }
+      }
+    )
+  },
+
+  selectBankRadio: function(e){
+    var select = gel('bank-select');
+    select.value = e.target.value;
+    this.smarty.input({target: select});
+  },
+
   unrender: function(){
-    each(this.timeouts, function(key, val){
-      clearTimeout(val);
-    })
-    this.timeouts = {};
+    clearTimeout(fontTimeout);
 
     each(this.listeners, function(listener){
       listener[0].off(listener[1], listener[2], listener[3]);
