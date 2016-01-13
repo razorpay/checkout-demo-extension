@@ -134,7 +134,7 @@ Razorpay.prototype.configure = function(overrides){
     this.id = generateUID();
     this.modal = {options: {}};
     var trackingPayload = $.clone(overrides);
-    track( 'init', trackingPayload );
+    track.call( this, 'init', trackingPayload );
   }
 };
 

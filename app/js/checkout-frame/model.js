@@ -14,7 +14,9 @@ function sanitizeContent(obj, fieldsArr){
   each(
     fieldsArr,
     function(i, key){
-      obj[key] = obj[key].replace(/<[^>]*>?/g, "");
+      if(typeof obj[key] === 'string'){
+        obj[key] = obj[key].replace(/<[^>]*>?/g, "");
+      }
     }
   )
 }
@@ -534,9 +536,12 @@ CheckoutModal.prototype = {
   unrender: function(){
     clearTimeout(fontTimeout);
 
-    each(this.listeners, function(listener){
-      listener[0].off(listener[1], listener[2], listener[3]);
-    })
+    each(
+      this.listeners,
+      function(i, listener){
+        listener[0].off(listener[1], listener[2], listener[3]);
+      }
+    )
     this.listeners = [];
     $(this.el).remove();
   }

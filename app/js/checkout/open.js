@@ -171,13 +171,15 @@ function ch_onClose(){
   }
 }
 
-var ch_sendFrameMessage = function(response){
+function postMessageToFrame(response){
   if(isCriOS || !this.checkoutFrame){
     return;
   }
-  if(typeof response !== 'string'){
-    response = JSON.stringify(response);
+  if(typeof response !== 'object'){
+    // TODO roll
   }
+  response.id = this.id;
+  response = JSON.stringify(response);
   this.checkoutFrame.contentWindow.postMessage(response, '*');
 }
 
@@ -248,9 +250,7 @@ function ch_createFrameOptions(){
     context: location.href,
     options: options
   }
-  if(_uid){
-    response.id = _uid;
-  }
+  response.id = this.id;
   return response;
 }
 
@@ -259,7 +259,7 @@ var ch_messageHandlers = {
   load: function() {
     isLoaded = true;
     if(existingInstance){
-      ch_sendFrameMessage.call(existingInstance, ch_createFrameOptions.call(existingInstance));
+      postMessageToFrame.call(existingInstance, ch_createFrameOptions.call(existingInstance));
     }
   },
 
@@ -328,7 +328,7 @@ function ch_onFrameMessage(e, data){
   }
 
   if(event === 'dismiss' || event === 'fault'){
-    track(event, data);
+    track.call(this, event, data);
   }
 }
 
@@ -556,14 +556,14 @@ Razorpay.prototype.open = function() {
   if ( existingInstance ) {
     this.checkoutFrame.style.display = 'block';
     ch_setMetaViewport();
-    ch_sendFrameMessage.call(this, {event: 'open'});
+    postMessageToFrame.call(this, {event: 'open'});
   }
   setBackdropBackground();
 };
 
 Razorpay.prototype.close = function(){
   if(isOpen){
-    ch_sendFrameMessage.call(this, {event: 'close'});
+    postMessageToFrame.call(this, {event: 'close'});
   }
 };
 

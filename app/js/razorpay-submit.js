@@ -280,7 +280,7 @@ Razorpay.payment = {
         }
       }
     )
-    track('submit', trackingPayload);
+    // track('submit', trackingPayload);
 
     var name;
     request.popup = createPopup(rdata, url, options);

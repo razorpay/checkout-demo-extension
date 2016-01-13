@@ -2,7 +2,13 @@ if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
 }
+var _uid;
 var sessions = {};
+
+function getSession () {
+  return sessions[_uid];
+}
+
 var model;
 var card = window.card;
 var CheckoutBridge = window.CheckoutBridge;
@@ -59,8 +65,15 @@ var freqWallets = {
 
 function processMessage(message) {
   message.netbanks = freqBanks;
-
   var opts = message.options;
+  if(!opts){
+    var session = getSession();
+    if(session){
+      message.options = session.message.options;
+    }
+    return;
+  }
+
   var modal = opts.modal;
 
   modal.onhide = function(){
@@ -285,11 +298,12 @@ window.handleMessage = function(message) {
       return;
     }
   }
+  var session = getSession();
   if ( message.event === 'open' || message.options ) {
     frameDiscreet.showModal(message);
     if(CheckoutBridge){
       discreet.context = qpmap.platform || 'app';
-      track('init', message.options);
+      track.call(session, 'init', message.options);
     }
     else {
       track('open');
