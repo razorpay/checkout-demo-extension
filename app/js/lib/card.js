@@ -117,23 +117,23 @@
     if(regex.test(character)){
       return character;
     }
-    e.preventDefault();
+    preventDefault(e);
     return false;
   }
 
   var FormatExpiry = function(e) {
+    var el = e.target;
     var character = ensureExpiry(e);
     if (character === false) { return }
 
-    var pos = CheckSelection(this);
+    var pos = CheckSelection(el);
     if (pos === true) { return }
 
-    var value = this.value;
+    var value = el.value;
     var prefix = value.slice(0, pos);
     var prenums = prefix.replace(/[^\/0-9]/g,'');
     var suffix = value.slice(pos);
     var sufnums = suffix.replace(/[^\/0-9]/g,'');
-    var el = this;
 
     if (pos === 0) {
       if(/0|1/.test(character)) { return }
@@ -142,7 +142,7 @@
     }
 
     if (pos === 1) {
-      if( parseInt(prefix + character, 10) > 12 ) { return e && e.preventDefault() }
+      if( parseInt(prefix + character, 10) > 12 ) { return preventDefault(e) }
       character += ' / ';
     }
     else if ( pos === 2 ) {
@@ -155,14 +155,15 @@
     }
     else {
       if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix) && e){
-        e.preventDefault();
+        preventDefault(e);
       }
       if(pos === 6){
+        var card = this;
         setTimeout(function(){card.filled(el)}, 200);
       }
       return;
     }
-    if (e) { e.preventDefault() }
+    preventDefault(e);
 
     setTimeout(function() {
       el.value = (prenums + character + sufnums).slice(0, 7);
@@ -172,24 +173,24 @@
   };
 
   var FormatExpiryBack = function(e){
+    var el = e.target;
     if((e.which || e.keyCode) !== 8) { return }
-    var el = this;
     var pos = CheckSelection(el);
 
     if(pos === 5 && el.value.slice(2, 5) === ' / '){
-      e.preventDefault();
+      preventDefault(e);
       el.value = el.value.slice(0, 2);
     }
   }
 
   var FormatNumber = function(e){
     var character = ensureNumeric(e);
-    if(character === false) { return }
+    var el = e.target;
 
-    var pos = CheckSelection(this);
+    var pos = CheckSelection(el);
     if(pos === true) { return }
 
-    var value = this.value;
+    var value = el.value;
     var prefix = value.slice(0, pos).replace(/[^0-9]/g,'');
     var suffix = value.slice(pos).replace(/[^0-9]/g,'');
     value = prefix + character + suffix;
@@ -199,9 +200,10 @@
 
     if(prefix.length + suffix.length >= cardobj.length) { return }
 
+    var card = this;
+    preventDefault(e);
+
     if(e) {
-      var el = this;
-      e.preventDefault();
       setTimeout(function(){
         el.value = value.replace(cardobj.space, cardobj.subs);
 
@@ -216,82 +218,100 @@
         }
       })
     } else {
-      this.value = value.replace(cardobj.space, cardobj.subs);
+      el.value = value.replace(cardobj.space, cardobj.subs);
     }
   };
 
   var FormatNumberBack = function(e){
     if((e.which || e.keyCode) !== 8) { return }
 
-    var el = this;
+    var el = e.target;
     var pos = CheckSelection(el);
     var val = el.value;
     var len = val.length;
     
     if(pos === len && val[len-1] === ' '){
-      e.preventDefault();
+      preventDefault(e);
       el.value = el.value.slice(0, len-2);
     }
   };
 
-  var card = root.card = {
-    luhn: function(num){
-      var odd = true;
-      var sum = 0;
-      var digits = (num + '').split('').reverse();
+  var card = root.Card = function(){}
 
-      for(var i=0; i<digits.length; i++){
-        var digit = digits[i];
-        digit = parseInt(digit, 10);
-        if(odd = !odd){
-          digit *= 2;
-        }
-        if(digit > 9){
-          digit -= 9;
-        }
-        sum += digit;
+  Card.luhn = function(num){
+    var odd = true;
+    var sum = 0;
+    var digits = (num + '').split('').reverse();
+
+    for(var i=0; i<digits.length; i++){
+      var digit = digits[i];
+      digit = parseInt(digit, 10);
+      if(odd = !odd){
+        digit *= 2;
       }
-      return sum % 10 === 0;
+      if(digit > 9){
+        digit -= 9;
+      }
+      sum += digit;
+    }
+    return sum % 10 === 0;
+  }
+
+  Card.validateCardNumber = function(num, type){
+    num = (num + '').replace(/\s|-/g,'');
+    if(/^[0-9]+$/.test(num)){
+      if (!type) {
+        type = CardType(num);
+      }
+      if (!type && num.length > 13 || type && card_formats[type].length === num.length) {
+        return Card.luhn(num);
+      }
+    }
+    return false;
+  }
+
+  card.prototype = {
+    bind: function(el, eventListeners){
+      var $el = $(el);
+      each(
+        eventListeners,
+        function(event, listener){
+          $el.on(event, listener, null, this)
+        },
+        this
+      )
+    },
+    formatCardNumber: function(el){
+      if(!el) { return }
+      this.bind(el, {
+        keypress: FormatNumber,
+        keydown: FormatNumberBack,
+        keyup: this.setType
+      })
+      this.setType({target: el});
+      FormatNumber.call(this, {target: el});
     },
 
-    formatNumber: function(el){
+    formatCardExpiry: function(el){
       if(!el) { return }
-      $(el).on('keypress', FormatNumber);
-      $(el).on('keydown', FormatNumberBack);
-      $(el).on('keyup', function(){
-        card.setType(this);
-      });
-      card.setType(el, !el.value && 'unknown');
-      FormatNumber.call(el);
-    },
-
-    formatExpiry: function(el){
-      if(!el) { return }
-      $(el).on('keypress', FormatExpiry);
-      $(el).on('keydown', FormatExpiryBack);
+      this.bind(el, {
+        keypress: FormatExpiry,
+        keydown: FormatExpiryBack
+      })
     },
 
     ensureNumeric: function(el){
       if(!el) { return }
-      $(el).on('keypress', ensureNumeric);
+      this.bind(el, {
+        keypress: ensureNumeric
+      })
     },
 
     ensurePhone: function(el){
       if(!el) { return }
-      $(el).on('keypress', ensurePhone);
-    },
-
-    validateNumber: function(num, type){
-      num = (num + '').replace(/\s|-/g,'');
-      if(/^[0-9]+$/.test(num)){
-        if (!type) {
-          type = CardType(num);
-        }
-        if (!type && num.length > 13 || type && card_formats[type].length === num.length) {
-          return this.luhn(num);
-        }
-      }
-      return false;
+      this.bind(el, {
+        keypress: ensurePhone
+      })
     },
     getType: CardType,
     setType: noop,

@@ -58,6 +58,12 @@ var deserialize = function(data, key){
   return '<input type="hidden" name="' + key + '" value="' + data + '">';
 }
 
+var preventDefault = function(e){
+  if(e && e.preventDefault){
+    e.preventDefault();
+  }
+}
+
 $.prototype = {
   on: function(event, callback, capture, thisArg){
     var el = this[0];

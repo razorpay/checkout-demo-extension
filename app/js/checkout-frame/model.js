@@ -2,6 +2,9 @@
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
+// iphone/ipad restrict non user initiated focus on input fields
+var shouldFocusNextField = !/iPhone|iPad/.test(ua);
+
 // element to verfy whether font has been loaded
 var fontAnchor = '#powered-link';
 var fontTimeout;
@@ -84,6 +87,19 @@ function formatMessage(message){
       }
     }
   )
+}
+
+function validateCard(e){
+  var el = e.target;
+  $(el.parentNode)[Card.validateCardNumber(el.value, el.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
+}
+
+function formatCvvHelp(el_cvv, cvvlen){
+  var cvv_help = $('.elem-cvv .help-text');
+  cvv_help.html(cvv_help.html().replace(/3|4/, cvvlen));
+  el_cvv.maxLength = cvvlen;
+  el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+  $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
 }
 
 function CheckoutModal(){
@@ -224,6 +240,7 @@ CheckoutModal.prototype = {
     this.on('click', '#modal-close', this.close);
     this.on('click', '#tabs', this.switchTab);
     this.on('submit', '#form', this.submit);
+    this.on('blur', '#card_number', validateCard);
 
     if(this.message.options.method.netbanking){
       this.on('change', '#bank-select', this.switchBank);
@@ -258,11 +275,11 @@ CheckoutModal.prototype = {
     var el_expiry = gel('card_expiry');
     var el_cvv = gel('card_cvv');
     var el_contact = gel('contact');
+    var card = this.card = new Card();
 
-    card.setType = function(el, type){
-      if(!type){
-        type = card.getType(el.value) || 'unknown';
-      }
+    card.setType = function(e){
+      var el = e.target;
+      var type = card.getType(el.value) || 'unknown';
       var parent = el.parentNode;
 
       var oldType = parent.getAttribute('cardtype');
@@ -271,13 +288,10 @@ CheckoutModal.prototype = {
       }
 
       parent.setAttribute('cardtype', type);
-      frameDiscreet.setNumberValidity.call(el);
+      validateCard({target: el});
       
-      if(type === 'amex'){
-        frameDiscreet.setCVVFormatting.call(el_cvv, 4);
-      }
-      else if(oldType === 'amex'){
-        frameDiscreet.setCVVFormatting.call(el_cvv, 3);
+      if(type === 'amex' || oldType === 'amex'){
+        formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
       }
       // if(type !== 'maestro'){
         // $('nocvv-check')[0].checked = false;
@@ -296,9 +310,8 @@ CheckoutModal.prototype = {
       }
     }
 
-    $el_number.on('blur', frameDiscreet.setNumberValidity);
-    card.formatNumber($el_number[0]);
-    card.formatExpiry(el_expiry);
+    card.formatCardNumber($el_number[0]);
+    card.formatCardExpiry(el_expiry);
     card.ensureNumeric(el_cvv);
     card.ensurePhone(el_contact);
 

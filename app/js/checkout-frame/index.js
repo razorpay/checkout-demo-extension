@@ -14,9 +14,6 @@ window.onComplete = onComplete;
 // initial error (helps in case of redirection flow)
 var qpmap = {};
 
-// iphone/ipad restrict non user initiated focus on input fields
-var shouldFocusNextField = !/iPhone|iPad/.test(ua);
-
 var gifBase64Prefix = 'data:image/gif;base64,';
 var freqBanks = {
   SBIN: {
@@ -197,74 +194,6 @@ var frameDiscreet = {
     }
   },
 
-  setNumberValidity: function(){
-    $(this.parentNode)[card.validateNumber(this.value, this.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
-  },
-
-  setCVVFormatting: function(cvvlen){
-    var cvv_help = $('.elem-cvv .help-text');
-    cvv_help.html(cvv_help.html().replace(/3|4/, cvvlen));
-    this.maxLength = cvvlen;
-    this.pattern = '[0-9]{'+cvvlen+'}';
-    $(this.parentNode)[this.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
-  },
-
-  setCardFormatting: function(){
-    var $el_number = $('#card_number');
-    var el_expiry = gel('card_expiry');
-    var el_cvv = gel('card_cvv');
-    var el_contact = gel('contact');
-    
-    card.setType = function(el, type){
-      if(!type){
-        type = card.getType(el.value) || 'unknown';
-      }
-      var parent = el.parentNode;
-
-      var oldType = parent.getAttribute('cardtype');
-      if(type === oldType){
-        return;
-      }
-
-      parent.setAttribute('cardtype', type);
-      frameDiscreet.setNumberValidity.call(el);
-      
-      if(type === 'amex'){
-        frameDiscreet.setCVVFormatting.call(el_cvv, 4);
-      }
-      else if(oldType === 'amex'){
-        frameDiscreet.setCVVFormatting.call(el_cvv, 3);
-      }
-      // if(type !== 'maestro'){
-        // $('nocvv-check')[0].checked = false;
-        // frameDiscreet.toggle_nocvv();
-      // }
-    }
-
-    if(shouldFocusNextField){
-      card.filled = function(el){
-        if(el === el_expiry){
-          el_cvv.focus();
-        }
-        else{
-          el_expiry.focus();
-        }
-      }
-    }
-    
-    $el_number.on('blur', frameDiscreet.setNumberValidity);
-    card.formatNumber($el_number[0]);
-    card.formatExpiry(el_expiry);
-    card.ensureNumeric(el_cvv);
-    card.ensurePhone(el_contact);
-
-    // check if we're in webkit
-    // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-    if ( el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string' ) {
-      el_cvv.type = 'tel';
-    }
-  },
-
   showModal: function(message) {
     // frameDiscreet.renew();
     if(_uid !== message.id){
@@ -305,7 +234,6 @@ var frameDiscreet = {
         frameDiscreet.errorHandler(qpmap)
       })
     }
-    frameDiscreet.setCardFormatting();
   },
 
   // toggle_nocvv: function(){
