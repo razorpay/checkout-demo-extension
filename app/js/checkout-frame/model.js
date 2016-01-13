@@ -9,6 +9,23 @@ var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 var fontAnchor = '#powered-link';
 var fontTimeout;
 
+var cssClasses = (function(){
+  var classes = [];
+
+  if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
+    classes.push('mobile');
+  }
+
+  if(!opts.image){
+    classes.push('noimage');
+  }
+
+  if(shouldFixFixed){
+    classes.push('ip')
+  }
+  return classes;
+})()
+
 // sanitizing innerHTML
 function sanitizeContent(obj, fieldsArr){
   each(
@@ -168,22 +185,6 @@ function frontDrop(message, className) {
 
 function CheckoutModal(){
   this.listeners = [];
-
-  // var classes = [];
-
-  // if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
-  //   classes.push('mobile');
-  // }
-
-  // if(!opts.image){
-  //   classes.push('noimage');
-  // }
-
-  // if(shouldFixFixed){
-  //   classes.push('ip')
-  // }
-
-  // $(container).addClass(classes.join(' '));
 }
 
 CheckoutModal.prototype = {
@@ -195,6 +196,7 @@ CheckoutModal.prototype = {
       this.el.appendChild(this.renderCss());
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
+      $(this.el).addClass(cssClasses);
     }
     return this.el;
   },

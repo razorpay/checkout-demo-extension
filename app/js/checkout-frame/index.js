@@ -1,7 +1,10 @@
-if(isCriOS){
-  // remove old onComplete cookie
-  deleteCookie('onComplete');
-}
+
+// flag for checkout-frame.js
+discreet.isFrame = true;
+var CheckoutBridge = window.CheckoutBridge;
+// onComplete defined in razorpay-submit.js, safe to expose now
+window.onComplete = onComplete;
+
 var _uid;
 var sessions = {};
 
@@ -9,14 +12,11 @@ function getSession () {
   return sessions[_uid];
 }
 
-var model;
-var card = window.card;
-var CheckoutBridge = window.CheckoutBridge;
-// flag for checkout-frame.js
-discreet.isFrame = true;
+if(isCriOS){
+  // remove old onComplete cookie
+  deleteCookie('onComplete');
+}
 
-// onComplete defined in razorpay-submit.js, safe to expose now
-window.onComplete = onComplete;
 // initial error (helps in case of redirection flow)
 var qpmap = {};
 
