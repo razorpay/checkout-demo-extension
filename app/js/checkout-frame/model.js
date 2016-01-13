@@ -66,7 +66,26 @@ function sanitizeContact(contactPrefill){
   return contactPrefill;
 }
 
-function checkoutModal(){
+function formatMessage(message){
+  each(
+    ['data', 'params'],
+    function(i, key){
+      var val = message[key];
+      if(typeof val === 'string'){
+        try{
+          message[key] = JSON.parse(val);
+        } catch(e){
+          // TODO roll()
+        }
+      }
+      if(typeof val !== 'object'){
+        message[key] = {};
+      }
+    }
+  )
+}
+
+function CheckoutModal(){
   this.listeners = [];
 
   // var classes = [];
@@ -86,7 +105,7 @@ function checkoutModal(){
   // $(container).addClass(classes.join(' '));
 }
 
-checkoutModal.prototype = {
+CheckoutModal.prototype = {
   getEl: function(){
     if(!this.el){
       var div = document.createElement('div');
@@ -113,11 +132,11 @@ checkoutModal.prototype = {
       {
         'contact': 'contact',
         'email': 'email',
-        'bank': 'bank-select'
+        'bank': 'bank-select',
         'card[name]': 'card_name',
         'card[number]': 'card_number',
         'card[expiry]': 'card_expiry',
-        'card[cvv]': 'card_cvv',
+        'card[cvv]': 'card_cvv'
       },
       function(name, id){
         var el = gel(id);
@@ -132,6 +151,7 @@ checkoutModal.prototype = {
   },
 
   render: function(message){
+    formatMessage(message);
     sanitize(message);
     this.getEl();
     this.fillData(message.data);

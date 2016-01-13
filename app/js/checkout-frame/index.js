@@ -274,7 +274,7 @@ var frameDiscreet = {
     }
     var session = sessions[_uid];
     if(!session){
-      session = sessions[_uid] = new CheckoutForm();
+      session = sessions[_uid] = new CheckoutModal();
     }
 
     processMessage(message);
