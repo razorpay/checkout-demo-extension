@@ -51,25 +51,29 @@ CheckoutFrame.prototype = {
   },
 
   unrzp: function(){
-    //
+    if(this.loaded){
+      $(window).off('message', this.listener);
+      this.listener = null;
+    }
   },
 
   openRzp: function(rzp){
     this.unrzp();
 
-    var $parent = rzp.options.parent;
-    if($parent){
+    var parent = rzp.options.parent;
+    var $parent = $(parent || frameContainer);
+
+    if(parent){
       this.afterClose = noop;
     }
     else {
-      $parent = frameContainer;
+      $parent.css('display', 'block').reflow();
+      setBackdropColor(rzp.options.theme.backdropColor);
     }
 
-    $parent = $($parent);
     $parent.append(this.el);
-    $parent.css('display', 'block').reflow();
 
-    setBackdropColor(rzp.options.theme.backdropColor);
+    this.bind();
     this.rzp = rzp;
     this.afterLoad(function(){
       this.postMessage(this.makeFrameOptions());
@@ -77,7 +81,9 @@ CheckoutFrame.prototype = {
   },
 
   bind: function(){
-    this.listener = $(window).on('message', this.onmessage, null, this);
+    if(!this.listener){
+      this.listener = $(window).on('message', this.onmessage, null, this);
+    }
   },
 
   makeFrameOptions: function(){
@@ -134,7 +140,7 @@ CheckoutFrame.prototype = {
   },
 
   afterLoad: function(handler){
-    if(this.loaded){
+    if(this.loaded === true){
       handler.call(this);
     } else {
       this.loaded = handler;
@@ -165,9 +171,7 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    if(this.loaded){
-      this.loaded();
-    }
+    invoke(this.loaded, this);
     this.loaded = true;
   },
 
@@ -194,7 +198,7 @@ CheckoutFrame.prototype = {
 
   onsuccess: function(data){
     this.close();
-    invoke(this.rzp.options.handler, data, 250);
+    invoke(this.rzp.options.handler, window, data, 200);
   },
 
   onfailure: function(data){
@@ -213,5 +217,6 @@ CheckoutFrame.prototype = {
   },
 
   afterClose: function(){
+    frameContainer.style.display = 'none';
   }
 }

@@ -66,19 +66,22 @@ function preventDefault(e){
   }
 }
 
-function invoke(handler, arg, timeout){
+function invoke(handler, thisArg, param , timeout){
   if(timeout){
     setTimeout(function(){
-      invoke(handler, arg)
+      invoke(handler, thisArg, param)
     }, timeout)
     return;
   }
   if(typeof handler === 'function'){
-    if(arg){
-      handler(arg);
+    if(!thisArg){
+      thisArg = this;
+    }
+    if(arguments.length === 3){
+      handler.call(thisArg, param);
     }
     else {
-      handler();
+      handler.call(thisArg);
     }
   }
 }
