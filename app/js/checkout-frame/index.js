@@ -197,6 +197,16 @@ var frameDiscreet = {
   },
 
   showModal: function(message) {
+    if(!window.payment_methods){
+      // TODO remove this
+      Razorpay.defaults.key = message.options.key;
+      Razorpay.payment.getMethods(function(response){
+        window.payment_methods = response;
+        frameDiscreet.showModal(message);
+      })
+      return;
+    }
+
     if(_uid !== message.id){
       getSession('saveAndClose');
       _uid = message.id;

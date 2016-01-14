@@ -92,7 +92,7 @@ $.prototype = {
       event.split(' '),
       function(i, evt){
         if( shouldAddListener ) {
-          try{el.addEventListener(evt, ref, !!capture)}catch(e){debugger}
+          el.addEventListener(evt, ref, !!capture)
         }
         else {
           el.attachEvent('on' + evt, ref);
