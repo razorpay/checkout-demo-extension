@@ -237,7 +237,7 @@ var frameDiscreet = {
           person: {
             id: _uid
           },
-          context: message.context
+          context: discreet.context
         }
       });
     }
@@ -284,9 +284,6 @@ Razorpay.sendMessage = function(message){
   }
 }
 window.handleMessage = function(message) {
-  // if(message.id){
-  //   _uid = message.id;
-  // }
   if ( message.options ) {
     try{
       frameDiscreet.configureRollbar(message);
@@ -298,18 +295,24 @@ window.handleMessage = function(message) {
       return;
     }
   }
+
   var session = getSession();
+
   if ( message.event === 'open' || message.options ) {
     frameDiscreet.showModal(message);
+
     if(CheckoutBridge){
       discreet.context = qpmap.platform || 'app';
       track.call(session, 'init', message.options);
     }
     else {
-      track('open');
+      track.call(session, 'open');
     }
-  } else if ( message.event === 'close' ) {
-    frameDiscreet.hide();
+
+  }
+
+  else if ( message.event === 'close' ) {
+    session.hide();
   }
 }
 

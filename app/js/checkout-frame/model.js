@@ -1,4 +1,3 @@
-
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
