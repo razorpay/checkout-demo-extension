@@ -15,19 +15,23 @@ ch_metaViewportTag,
 ch_metaViewport;
 
 var ch_PageY = 0;
-var doc = document.body || document.documentElement;
 var docStyle = doc.style;
 
 // there is no "position: fixed" in iphone
 var merchantMarkup = {
+  meta: null,
 
-  _: {
-    meta: null,
-    overflow: ''
+  getMeta: function(){
+    if(!this.meta){
+      this.meta = qs('head meta[name=viewport]');
+    }
+    return this.meta;
   },
 
+  overflow: '',
+
   reset: function() {
-    docStyle.overflow = this._.overflow;
+    docStyle.overflow = this.overflow;
 
     if(shouldFixFixed){
       each(
@@ -40,7 +44,7 @@ var merchantMarkup = {
   },
 
   clear: function() {
-    this._.overflow = docStyle.overflow;
+    this.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
 
     if(shouldFixFixed){
@@ -105,25 +109,6 @@ discreet.setCommunicator = function(opts){
 }
 discreet.setCommunicator(Razorpay.defaults);
 
-function ch_createFrame(src, tagName){
-  var frame = document.createElement(tagName);
-
-  var attrs = {
-    'class': 'razorpay-checkout-frame', // quotes needed for ie
-    style: 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
-    allowtransparency: true,
-    frameborder: 0,
-    width: '100%',
-    height: '100%',
-    src: src
-  };
-  each(attrs, function(i, attr){
-    frame.setAttribute(i, attr);
-  })
-
-  return frame;
-}
-
 function ch_close(){
   ch_messageHandlers.dismiss.call(this);
   ch_messageHandlers.hidden.call(this);
@@ -181,155 +166,6 @@ function postMessageToFrame(response){
   response.id = this.id;
   response = JSON.stringify(response);
   this.checkoutFrame.contentWindow.postMessage(response, '*');
-}
-
-// to handle absolute/relative url of options.image
-var ch_setImageOption = function(options){
-  if(options.image && typeof options.image === 'string'){
-    if(/data:image\/[^;]+;base64/.test(options.image)){
-      return;
-    }
-    if(options.image.indexOf('http')){ // not 0
-      var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
-      var relUrl = '';
-      if(options.image[0] !== '/'){
-        relUrl += location.pathname.replace(/[^\/]*$/g,'');
-        if(relUrl[0] !== '/'){
-          relUrl = '/' + relUrl;
-        }
-      }
-      options.image = baseUrl + relUrl + options.image;
-    }
-  }
-}
-
-var ch_setMetaViewport = function(){
-  if(typeof document.querySelector !== 'function'){
-    return;
-  }
-  var head = document.querySelector('head')
-  if(!head){
-    return;
-  }
-
-  var meta = head.querySelector('meta[name=viewport]');
-
-  if(meta){
-    ch_metaViewport = meta;
-    $(meta).remove();
-  }
-
-  if(!ch_metaViewportTag){
-    ch_metaViewportTag = document.createElement('meta');
-    ch_metaViewportTag.setAttribute('name', 'viewport');
-    ch_metaViewportTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-  }
-
-  if(!ch_metaViewportTag.parentNode){
-    head.appendChild(ch_metaViewportTag);
-  }
-}
-
-function ch_createFrameOptions(){
-  var options = {};
-  ch_setMetaViewport();
-
-  each(
-    this.options, function(i, value){
-      if(typeof value !== 'function'){
-        options[i] = value;
-      }
-    }
-  )
-  for(var i in this.modal.options){
-    this.options.modal[i] = this.modal.options[i];
-  }
-  ch_setImageOption(options);
-
-  var response = {
-    context: location.href,
-    options: options
-  }
-  response.id = this.id;
-  return response;
-}
-
-var ch_messageHandlers = {
-
-  load: function() {
-    isLoaded = true;
-    if(existingInstance){
-      postMessageToFrame.call(existingInstance, ch_createFrameOptions.call(existingInstance));
-    }
-  },
-
-  redirect: function(data){
-    discreet.nextRequestRedirect(data);
-  },
-
-  submit: function(data){
-    var cb = window.CheckoutBridge;
-    if(cb && typeof cb.onsubmit === 'function'){
-      cb.onsubmit(JSON.stringify(data));
-    }
-  },
-
-  dismiss: function(){
-    if(ch_backdrop){
-      ch_backdrop.style.background = '';
-    }
-    if(existingInstance && typeof existingInstance.options.modal.ondismiss === 'function'){
-      existingInstance.options.modal.ondismiss()
-    }
-  },
-
-  hidden: function(){
-    ch_onClose.call(existingInstance);
-  },
-
-  success: function(data){
-    var handler = existingInstance.options.handler;
-    if(typeof handler === 'function'){
-      setTimeout(function(){
-        handler.call(null, data);
-      })
-    }
-    ch_close.call(existingInstance);
-    $(existingInstance.checkoutFrame).remove();
-    existingInstance = null;
-  },
-
-  failure: function(data){
-    ch_close.call(existingInstance);
-    alert('Payment Failed.\n' + data.error.description);
-  },
-
-  fault: function(message){
-    alert('Oops! Something went wrong.\n' + message);
-    ch_onClose.call(existingInstance);
-    existingInstance.close();
-  }
-}
-
-function ch_onFrameMessage(e, data){
-  if(
-    !e.origin ||
-    data.source !== 'frame' ||
-    !this.checkoutFrame ||
-    this.checkoutFrame.getAttribute('src').indexOf(e.origin)
-  ){ // source check
-    return;
-  }
-  var event = data.event;
-  data = data.data;
-  var handler = ch_messageHandlers[event];
-  if(typeof handler === 'function'){
-    handler.call(existingInstance, data);
-  }
-
-  if(event === 'dismiss' || event === 'fault'){
-    track.call(this, event, data);
-  }
 }
 
 /**
@@ -417,95 +253,71 @@ function ch_automaticCheckoutInit(){
   }
 }
 
-function preloadFrame(){
-  var key = Razorpay.defaults.key;
-  if (key){
-    // loadFrame(key);
+function createFrameContainer(){
+  var div = document.createElement('div');
+  div.className = 'razorpay-container';
+  var style = div.style;
+  var rules = {
+    'zIndex': '99999',
+    'position': shouldFixFixed ? 'absolute' : 'fixed',
+    'top': 0,
+    'display': 'none',
+    'left': 0,
+    'height': '100%',
+    'width': '100%',
+    '-webkit-transition': '0.2s ease-out top',
+    '-webkit-overflow-scrolling': 'touch',
+    '-webkit-backface-visibility': 'hidden',
+    'overflow-y': 'visible'
   }
-  else {
-    prefetchPath('checkout-frame.js');
-    prefetchPath('css/checkout.css');
-  }
-}
-
-function prefetchPath(path){
-  var prefetch = document.createElement('link');
-  prefetch.setAttribute('rel', 'prefetch');
-  prefetch.setAttribute('href', currentScript.src.replace(/\/[^\/]+$/, '/' + path));
-  doc.appendChild(prefetch);
-}
-
-function makeCheckoutUrl(options, key){
-  return discreet.makeUrl(options) + '/checkout?key_id=' + key
-}
-
-function loadFrame(optionsOrKey){
-  var key, options;
-  if( typeof optionsOrKey === 'object' ){
-    key = optionsOrKey.key;
-    options = optionsOrKey;
-  }
-  else {
-    key = optionsOrKey;
-    options = Razorpay.defaults;
-  }
-
-  var src = makeCheckoutUrl(options, key);
-  isLoaded = false;
-
-  if(!this.checkoutFrame){
-    $.addMessageListener(ch_onFrameMessage, this);
-    this.checkoutFrame = ch_createFrame(
-      src,
-      isCriOS ? 'div' : 'iframe'
-    );
-    ch_frameContainer.appendChild(this.checkoutFrame);
-  }
-  else if(this.checkoutFrame.src !== src){
-    this.checkoutFrame.src = src;
-  }
-  else {
-    isLoaded = true;
-  }
-}
-
-function ch_createFrameContainer(){
-  // var formHeight = Math.max(innerHeight, 487) + 'px';
-  if(!ch_frameContainer){
-    ch_frameContainer = document.createElement('div');
-    ch_frameContainer.className = 'razorpay-container';
-    var style = ch_frameContainer.style;
-    var rules = {
-      zIndex: '99999',
-      position: shouldFixFixed ? 'absolute' : 'fixed',
-      top: 0,
-      display: 'none',
-      left: 0,
-      height: '100%',
-      width: '100%',
-      '-webkit-transition': '0.2s ease-out top',
-      '-webkit-overflow-scrolling': 'touch',
-      '-webkit-backface-visibility': 'hidden',
-      'overflow-y': 'visible'
-    }
-    each(rules, function(i, rule) {
+  each(
+    rules,
+    function(i, rule) {
       style[i] = rule;
-    })
-    ch_backdrop = document.createElement('div');
-    ch_backdrop.setAttribute('style', 'min-height: 100%; transition: 0.3s ease-out; -webkit-transition: 0.3s ease-out; -moz-transition: 0.3s ease-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);');
-    ch_frameContainer.appendChild(ch_backdrop);
-    doc.appendChild(ch_frameContainer);
-  }
+    }
+  )
+  doc.appendChild(div);
+  return div;
 }
 
-function setBackdropBackground(){
-  try{
-    // setting unsupported value throws error in IE
-    ch_backdrop.style.background = 'rgba(0,0,0,0.6)';
-  } catch(e){}
+function createFrameBackdrop(){
+  var backdrop = document.createElement('div');
+  backdrop.className = 'razorpay-backdrop';
+  var style = backdrop.style;
+  each(
+    {
+      'min-height': '100%',
+      'transition': '0.3s ease-out',
+      '-webkit-transition': '0.3s ease-out',
+      '-moz-transition': '0.3s ease-out',
+      'position': 'fixed',
+      'top': 0,
+      'left': 0,
+      'width': '100%',
+      'height': '100%',
+      'filter': 'progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000)'
+    },
+    function(ruleKey, value){
+      style[ruleKey] = value;
+    }
+  )
+  frameContainer.appendChild(backdrop);
+  return backdrop;
+}
+
+var frameContainer = createFrameContainer();
+var frameBackdrop = createFrameBackdrop();
+
+function setBackdropColor(value){
+  // setting unsupported value throws error in IE
+  try{ frameBackdrop.style.background = value; }
+  catch(e){}
 }
 
 Razorpay.prototype.open = function() {
+  this.checkoutFrame = new CheckoutFrame();
+  this.checkoutFrame.openRzp(this);
+  return;
   var options = this.options;
   if(!options){
     return;
@@ -558,7 +370,7 @@ Razorpay.prototype.open = function() {
     ch_setMetaViewport();
     postMessageToFrame.call(this, {event: 'open'});
   }
-  setBackdropBackground();
+  setBackdropColor(options.theme.backdropColor);
 };
 
 Razorpay.prototype.close = function(){
@@ -579,8 +391,5 @@ discreet.validateCheckout = function(options){
   }
 };
 
-ch_createFrameContainer();
-
 // Get the ball rolling in case we are in manual mode
 ch_automaticCheckoutInit();
-preloadFrame();

@@ -8,6 +8,7 @@ var err = function(errors){
   return true;
 };
 
+var doc = document.body || document.documentElement;
 var ua = navigator.userAgent;
 var isCriOS = /\(iP.+(Cr|Fx)iOS/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
@@ -39,6 +40,7 @@ Razorpay.defaults = {
   'buttontext': 'Pay Now',
 
   // checkout fields, not needed for razorpay alone
+  'parent': null,
   'display_currency': '',
   'display_amount': '',
 
@@ -65,7 +67,8 @@ Razorpay.defaults = {
     'backdropClose': false
   },
   'theme': {
-    'color': '#00BCD4'
+    'color': '#00BCD4',
+    'backdropColor': 'rgba(0,0,0,0.6)'
   },
   'signature': '',
   'name': '', // of merchant

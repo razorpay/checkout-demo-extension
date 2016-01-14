@@ -12,6 +12,7 @@ function bind(func, thisArg){
   }
 }
 
+var qs = bind(document.querySelector, document);
 var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
 
@@ -125,13 +126,14 @@ $.prototype = {
 
   attr: function(attr, val){
     if(typeof attr === 'object'){
-      return each(
+      each(
         attr,
         function(key, val){
           this.attr(key, val);
         },
         this
       )
+      return this;
     }
     var el = this[0];
     if(arguments.length === 1){
@@ -152,6 +154,10 @@ $.prototype = {
       el.parentNode.removeChild(el);
     } catch(e){}
     return this;
+  },
+
+  append: function(el){
+    this[0].appendChild(el);
   },
 
   hasClass: function(str){
