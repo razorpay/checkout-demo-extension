@@ -289,6 +289,7 @@ Razorpay.sendMessage = function(message){
 
   if(!isCriOS && ownerWindow){
     message.source = 'frame';
+    message.id = _uid;
     if ( typeof message !== 'string' ) {
       message = JSON.stringify(message);
     }
@@ -296,6 +297,9 @@ Razorpay.sendMessage = function(message){
   }
 }
 window.handleMessage = function(message) {
+  if(message.config){
+    RazorpayConfig = message.config;
+  }
   if ( message.options ) {
     try{
       frameDiscreet.configureRollbar(message);

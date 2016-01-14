@@ -66,6 +66,23 @@ function preventDefault(e){
   }
 }
 
+function invoke(handler, arg, timeout){
+  if(timeout){
+    setTimeout(function(){
+      invoke(handler, arg)
+    }, timeout)
+    return;
+  }
+  if(typeof handler === 'function'){
+    if(arg){
+      handler(arg);
+    }
+    else {
+      handler();
+    }
+  }
+}
+
 $.prototype = {
   on: function(event, callback, capture, thisArg){
     var el = this[0];

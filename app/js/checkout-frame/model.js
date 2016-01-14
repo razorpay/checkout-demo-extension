@@ -442,11 +442,13 @@ CheckoutModal.prototype = {
 
   hide: function(){
     $('#modal-inner').removeClass('shake');
-    model.modal.hide();
+    this.modal.hide();
   },
 
   successHandler: function(response){
+    // prevent dismiss event
     this.modal.options.onhide = null;
+
     Razorpay.sendMessage({ event: 'success', data: response });
     if(isCriOS) {
       setCookie('onComplete', JSON.stringify(response));

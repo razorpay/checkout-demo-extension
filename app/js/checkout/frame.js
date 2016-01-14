@@ -19,6 +19,7 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(options){
+  this.loaded = null;
   if(options.key){
     return discreet.makeUrl() + 'checkout?key_id=' + options.key;
   }
@@ -55,7 +56,20 @@ CheckoutFrame.prototype = {
 
   openRzp: function(rzp){
     this.unrzp();
-    $(rzp.options.parent || frameContainer).append(this.el);
+
+    var $parent = rzp.options.parent;
+    if($parent){
+      this.afterClose = noop;
+    }
+    else {
+      $parent = frameContainer;
+    }
+
+    $parent = $($parent);
+    $parent.append(this.el);
+    $parent.css('display', 'block').reflow();
+
+    setBackdropColor(rzp.options.theme.backdropColor);
     this.rzp = rzp;
     this.afterLoad(function(){
       this.postMessage(this.makeFrameOptions());
@@ -84,7 +98,8 @@ CheckoutFrame.prototype = {
 
     var response = {
       context: location.href,
-      options: options
+      options: options,
+      config: RazorpayConfig
     }
     response.id = rzp.id;
     return response;
@@ -168,38 +183,31 @@ CheckoutFrame.prototype = {
   },
 
   ondismiss: function(){
-    if(ch_backdrop){
-      ch_backdrop.style.background = '';
-    }
-    if(existingInstance && typeof existingInstance.options.modal.ondismiss === 'function'){
-      existingInstance.options.modal.ondismiss()
-    }
+    setBackdropColor('');
+    invoke(this.rzp.options.modal.ondismiss);
   },
 
   onhidden: function(){
-    ch_onClose.call(existingInstance);
+    this.afterClose();
+    invoke(this.rzp.options.modal.onhidden);
   },
 
   onsuccess: function(data){
-    var handler = existingInstance.options.handler;
-    if(typeof handler === 'function'){
-      setTimeout(function(){
-        handler.call(null, data);
-      })
-    }
-    ch_close.call(existingInstance);
-    $(existingInstance.checkoutFrame).remove();
-    existingInstance = null;
+    invoke(this.rzp.options.handler, data, 300);
   },
 
   onfailure: function(data){
-    ch_close.call(existingInstance);
+    // ch_close.call(existingInstance);
     alert('Payment Failed.\n' + data.error.description);
   },
 
   onfault: function(message){
     alert('Oops! Something went wrong.\n' + message);
-    ch_onClose.call(existingInstance);
-    existingInstance.close();
+    // ch_onClose.call(existingInstance);
+    // existingInstance.close();
+  },
+
+  afterClose: function(){
+    
   }
 }
