@@ -1,3 +1,61 @@
+// there is no "position: fixed" in iphone
+var docStyle = doc.style;
+var merchantMarkup = {
+  overflow: '',
+  meta: null,
+
+  orientationchange: function(){
+    this.el.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
+  },
+
+// scroll manually in iPhone
+  scroll: function(){
+    if(!isOpen || typeof window.pageYOffset !== 'number'){
+      return;
+    }
+
+    var top;
+    var offTop = frameContainer.offsetTop - pageYOffset;
+    var offBot = frameContainer.offsetHeight + offTop;
+    if(ch_PageY < pageYOffset){
+      if(offBot < 0.2*innerHeight && offTop < 0){
+        top = pageYOffset + innerHeight - frameContainer.offsetHeight;
+      }
+    }
+    else if(ch_PageY > pageYOffset){
+      if(offTop > 0.1*innerHeight && offBot > innerHeight){
+        top = pageYOffset;
+      }
+    }
+    if(typeof top === 'number'){
+      frameContainer.style.top = Math.max(0, top) + 'px';
+    }
+    ch_PageY = pageYOffset;
+
+  }
+}
+
+function getMeta(){
+  if(!merchantMarkup.meta){
+    merchantMarkup.meta = qs('head meta[name=viewport]');
+  }
+  return merchantMarkup.meta;
+}
+
+function restoreMeta($meta){
+  if($meta){
+    $meta.remove();
+  }
+  var oldMeta = getMeta();
+  if(oldMeta){
+    qs(head).appendChild(oldMeta);
+  }
+}
+
+function restoreOverflow(){
+  docStyle.overflow = merchantMarkup.overflow;
+}
+
 // to handle absolute/relative url of options.image
 function sanitizeImage(options){
   if(options.image && typeof options.image === 'string'){
@@ -51,10 +109,12 @@ function makeFrameOptions(rzp){
   return response;
 }
 
-function CheckoutFrame(){
+function CheckoutFrame(rzp){
+  if(rzp){
+    this.getEl(rzp.options);
+    return this.openRzp(rzp);
+  }
   this.getEl(Razorpay.defaults);
-  this.bind();
-  // this.setMeta();
 }
 
 CheckoutFrame.prototype = {
@@ -76,16 +136,17 @@ CheckoutFrame.prototype = {
   },
 
   unrzp: function(){
-    if(this.loaded){
-      $(window).off('message', this.listener);
-      this.listener = null;
-    }
+
+  },
+
+  destroy: function(){
+    this.unbind();
   },
 
   openRzp: function(rzp){
+    this.bind();
     var parent = rzp.options.parent;
     var $parent = $(parent || frameContainer);
-
     var message;
 
     if(rzp !== this.rzp){
@@ -93,7 +154,6 @@ CheckoutFrame.prototype = {
 
       if(!this.rzp){
         $parent.append(this.el);
-        this.bind();
       }
       else {
         this.unrzp();
@@ -115,29 +175,73 @@ CheckoutFrame.prototype = {
     else {
       $parent.css('display', 'block').reflow();
       setBackdropColor(rzp.options.theme.backdropColor);
+      this.setMetaAndOverflow();
     }
+  },
+
+  close: function(){
+    setBackdropColor('');
+    restoreMeta(this.$meta);
+    restoreOverflow();
+    this.unbind();
   },
 
   bind: function(){
-    if(!this.listener){
-      this.listener = $(window).on('message', this.onmessage, null, this);
+    if(!this.listeners){
+      this.listeners = {};
+      var eventPair = { message: this.onmessage };
+
+      if(shouldFixFixed){
+        eventPair.orientationchange = merchantMarkup.orientationchange;
+        eventPair.scroll = merchantMarkup.scroll;
+      }
+
+      each(
+        eventPair,
+        function(event, listener){
+          this.listeners.push([
+            event,
+            $(window).on(event, listener, null, this)
+          ])
+        },
+        this
+      )
     }
   },
 
-  setMeta: function(){
+  unbind: function(){
+    each(
+      this.listeners,
+      function(eventPair){
+        $(window).off(eventPair[0], eventPair[1]);
+      }
+    )
+    this.listeners = null;
+  },
+
+  setMetaAndOverflow: function(){
     var head = qs('head');
     if(!head){
       return;
     }
-    $(merchantMarkup.getMeta()).remove();
+    $(getMeta()).remove();
 
-    this.metaTag = $(document.createElement('meta'))
+    this.$meta = $(document.createElement('meta'))
       .attr({
         name: 'viewport',
         content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
-      })[0]
+      })
 
-    head.appendChild(this.metaTag);
+    head.appendChild(this.$meta[0]);
+
+    merchantMarkup.overflow = docStyle.overflow;
+    docStyle.overflow = 'hidden';
+
+    if(shouldFixFixed){
+      scrollTo(0, 0);
+      merchantMarkup.orientationchange.call(this);
+      merchantMarkup.scroll.call(this);
+    }
   },
 
   postMessage: function(response){
@@ -212,18 +316,11 @@ CheckoutFrame.prototype = {
   },
 
   onfailure: function(data){
-    // ch_close.call(existingInstance);
     alert('Payment Failed.\n' + data.error.description);
   },
 
   onfault: function(message){
     alert('Oops! Something went wrong.\n' + message);
-    // ch_onClose.call(existingInstance);
-    // existingInstance.close();
-  },
-
-  close: function(){
-    setBackdropColor('');
   },
 
   afterClose: function(){

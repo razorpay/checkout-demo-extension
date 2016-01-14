@@ -15,86 +15,6 @@ ch_metaViewportTag,
 ch_metaViewport;
 
 var ch_PageY = 0;
-var docStyle = doc.style;
-
-// there is no "position: fixed" in iphone
-var merchantMarkup = {
-  meta: null,
-
-  getMeta: function(){
-    if(!this.meta){
-      this.meta = qs('head meta[name=viewport]');
-    }
-    return this.meta;
-  },
-
-  overflow: '',
-
-  reset: function() {
-    docStyle.overflow = this.overflow;
-
-    if(shouldFixFixed){
-      each(
-        merchantMarkup.listeners,
-        function(event, handler){
-          $(window).off(event, handler);
-        }
-      )
-    }
-  },
-
-  clear: function() {
-    this.overflow = docStyle.overflow;
-    docStyle.overflow = 'hidden';
-
-    if(shouldFixFixed){
-      scrollTo(0, 0);
-      var frame = ch_frameContainer && ch_frameContainer.querySelector('iframe');
-      if(frame){
-        merchantMarkup.orientationchange.call(frame);
-        merchantMarkup.scroll();
-        each(
-          ['orientationchange', 'scroll'],
-          function(i, event){
-            merchantMarkup.listeners[event] = $(window).on(event, merchantMarkup[event], false, frame);
-          }
-        )
-      }
-    }
-  },
-
-  listeners: {},
-
-  orientationchange: function(){
-    this.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
-  },
-
-// scroll manually in iPhone
-  scroll: function(){
-    if(!isOpen || typeof window.pageYOffset !== 'number'){
-      return;
-    }
-
-    var top;
-    var offTop = ch_frameContainer.offsetTop - pageYOffset;
-    var offBot = ch_frameContainer.offsetHeight + offTop;
-    if(ch_PageY < pageYOffset){
-      if(offBot < 0.2*innerHeight && offTop < 0){
-        top = pageYOffset + innerHeight - ch_frameContainer.offsetHeight;
-      }
-    }
-    else if(ch_PageY > pageYOffset){
-      if(offTop > 0.1*innerHeight && offBot > innerHeight){
-        top = pageYOffset;
-      }
-    }
-    if(typeof top === 'number'){
-      ch_frameContainer.style.top = Math.max(0, top) + 'px';
-    }
-    ch_PageY = pageYOffset;
-
-  }
-}
 
 discreet.setCommunicator = function(opts){
   if(!isCriOS){
@@ -154,18 +74,6 @@ function ch_onClose(){
   if(this instanceof Razorpay && typeof this.options.modal.onhidden === 'function'){
     this.options.modal.onhidden();
   }
-}
-
-function postMessageToFrame(response){
-  if(isCriOS || !this.checkoutFrame){
-    return;
-  }
-  if(typeof response !== 'object'){
-    // TODO roll
-  }
-  response.id = this.id;
-  response = JSON.stringify(response);
-  this.checkoutFrame.contentWindow.postMessage(response, '*');
 }
 
 /**
@@ -320,27 +228,7 @@ Razorpay.prototype.open = function() {
   }
   this.checkoutFrame.openRzp(this);
   return;
-  var options = this.options;
-  if(!options){
-    return;
-  }
 
-  if(isOpen){
-    return;
-  }
-
-  isOpen = true;
-
-  if(existingInstance !== this){
-    existingInstance = this;
-    if(isLoaded){
-      ch_messageHandlers.load.call(this);
-    }
-  }
-
-  loadFrame.call(this, options);
-
-  ch_frameContainer.style.display = 'block';
   merchantMarkup.clear();
 
   if(isCriOS) {
@@ -366,21 +254,13 @@ Razorpay.prototype.open = function() {
       ' is not supported.\nPlease try payment in another browser.'
     );
   }
-
-  if ( existingInstance ) {
-    this.checkoutFrame.style.display = 'block';
-    ch_setMetaViewport();
-    postMessageToFrame.call(this, {event: 'open'});
-  }
-  setBackdropColor(options.theme.backdropColor);
 };
 
 Razorpay.prototype.close = function(){
-  if(isOpen){
-    postMessageToFrame.call(this, {event: 'close'});
+  if(this.checkoutFrame){
+    this.checkoutFrame.postMessage({event: 'close'});
   }
 };
-
 
 discreet.validateCheckout = function(options){
   if( options.display_currency === 'USD' ){
