@@ -183,7 +183,7 @@ CheckoutFrame.prototype = {
   },
 
   ondismiss: function(){
-    setBackdropColor('');
+    this.close();
     invoke(this.rzp.options.modal.ondismiss);
   },
 
@@ -193,7 +193,8 @@ CheckoutFrame.prototype = {
   },
 
   onsuccess: function(data){
-    invoke(this.rzp.options.handler, data, 300);
+    this.close();
+    invoke(this.rzp.options.handler, data, 250);
   },
 
   onfailure: function(data){
@@ -207,7 +208,10 @@ CheckoutFrame.prototype = {
     // existingInstance.close();
   },
 
+  close: function(){
+    setBackdropColor('');
+  },
+
   afterClose: function(){
-    
   }
 }

@@ -115,6 +115,12 @@ iframe{
   transition: 0.25s ease-out opacity;
   z-index: 19999;
 
+  &.animate{
+    #modal{
+      transition: 0.25s ease-in!important;
+    }
+  }
+
   &.shown{
     opacity: 1;
     #powered-by{
@@ -151,11 +157,6 @@ iframe{
   margin: 20px 0;
   opacity: 0;
   transform: scale(0.9);
-
-  &.animate{
-    transition: 0.25s ease-in!important;
-  }
-
   color: @color;
   font-size: @font-size;
   width: @width;
