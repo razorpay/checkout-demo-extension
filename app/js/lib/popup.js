@@ -98,9 +98,7 @@ Popup.prototype = {
   _checkClose: function (forceClosed) {
     try {
       if (forceClosed || this.window.closed !== false ) { // UC browser makes it undefined instead of true
-        if(typeof this.onClose === 'function'){
-          setTimeout(this.onClose);
-        }
+        invoke(this.onClose, this, null, 0);
         this.close();
       }
     }

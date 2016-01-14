@@ -17,10 +17,7 @@ var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
     return new Razorpay(options);
   }
-  if(typeof this.configure === 'function'){
-    this.configure(options);
-  }
-  return this;
+  invoke(this.configure, this, options);
 };
 
 var RazorpayConfig = {

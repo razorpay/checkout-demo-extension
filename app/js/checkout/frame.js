@@ -160,10 +160,7 @@ CheckoutFrame.prototype = {
       return;
     }
     data = data.data;
-    var handler = this['on' + event];
-    if(typeof handler === 'function'){
-      handler.call(this, data);
-    }
+    invoke(this['on' + event], this, data);
 
     if(event === 'dismiss' || event === 'fault'){
       track.call(this.rzp, event, data);
@@ -181,8 +178,8 @@ CheckoutFrame.prototype = {
 
   onsubmit: function(data){
     var cb = window.CheckoutBridge;
-    if(cb && typeof cb.onsubmit === 'function'){
-      cb.onsubmit(JSON.stringify(data));
+    if(typeof cb === 'object'){
+      invoke(cb.onsubmit, cb, JSON.stringify(data));
     }
   },
 

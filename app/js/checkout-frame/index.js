@@ -139,17 +139,15 @@ function addEMI(){
 var frameDiscreet = {
   notifyBridge: function(message){
     if( message && message.event ){
-      var method = 'on' + message.event;
-      if(typeof CheckoutBridge[method] === 'function'){
-        var data = message.data;
-        if(typeof data !== 'string'){
-          if(!data){
-            return CheckoutBridge[method]();
-          }
-          data = JSON.stringify(data);
+      var bridgeMethod = CheckoutBridge['on' + message.event];
+      var data = message.data;
+      if(typeof data !== 'string'){
+        if(!data){
+          return invoke(bridgeMethod, CheckoutBridge);
         }
-        CheckoutBridge[method](data);
+        data = JSON.stringify(data);
       }
+      invoke(bridgeMethod, CheckoutBridge, data);
     }
   },
   
@@ -243,15 +241,17 @@ var frameDiscreet = {
   /* sets focus on invalid input and returns true, if any. */
 
   configureRollbar: function(message){
-    if(Rollbar && typeof Rollbar.configure === 'function'){
-      Rollbar.configure({
-        payload: {
-          person: {
-            id: _uid
-          },
-          context: discreet.context
+    if(Rollbar){
+      invoke(
+        Rollbar.configure, {
+          payload: {
+            person: {
+              id: _uid
+            },
+            context: discreet.context
+          }
         }
-      });
+      );
     }
   },
   setQueryParams: function(search){

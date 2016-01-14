@@ -67,7 +67,7 @@ function preventDefault(e){
 }
 
 function invoke(handler, thisArg, param , timeout){
-  if(timeout){
+  if(typeof timeout === 'number'){
     setTimeout(function(){
       invoke(handler, thisArg, param)
     }, timeout)
@@ -78,11 +78,9 @@ function invoke(handler, thisArg, param , timeout){
       thisArg = this;
     }
     if(arguments.length === 3){
-      handler.call(thisArg, param);
+      return handler.call(thisArg, param);
     }
-    else {
-      handler.call(thisArg);
-    }
+    return handler.call(thisArg);
   }
 }
 

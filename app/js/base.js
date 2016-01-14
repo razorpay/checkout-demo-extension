@@ -92,12 +92,13 @@ function validateOverrides(options) {
   var errorMessage;
 
   for(var i in options){
-    var validationFunc = optionValidations[i];
-    if(typeof validationFunc === 'function'){
-      errorMessage = validationFunc(options[i]);
-      if(typeof errorMessage === 'string'){
-        throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
-      }
+    errorMessage = invoke(
+      optionValidations[i],
+      null,
+      options[i]
+    )
+    if(typeof errorMessage === 'string'){
+      throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
     }
   }
 }
@@ -154,8 +155,8 @@ var discreet = {
   },
 
   nextRequestRedirect: function(data){
-    if(window !== window.parent && typeof Razorpay.sendMessage === 'function'){
-      return Razorpay.sendMessage({event: 'redirect', data: data});
+    if(window !== window.parent){
+      invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
     }
     if(data.method === 'get'){
       location.href = data.url;

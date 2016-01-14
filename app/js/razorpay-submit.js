@@ -209,11 +209,7 @@ function onComplete(data, request){
   if(!data.error || typeof data.error !== 'object' || !data.error.description){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
   }
-  if(typeof request.error === 'function'){
-    setTimeout(function(){
-      request.error.call(null, data);
-    })
-  }
+  invoke(request.error, null, data, 0);
 }
 
 function setupAjax(request){
@@ -337,13 +333,11 @@ Razorpay.payment = {
       data: {key_id: Razorpay.defaults.key},
       timeout: 30000,
       success: function(response){
-        if(typeof callback === 'function'){
-          callback(response);
-        }
+        invoke(callback, null, response);
       },
       complete: function(data){
-        if(typeof data === 'object' && data.error && typeof callback === 'function') {
-          callback({error: true});
+        if(typeof data === 'object' && data.error) {
+          invoke(callback, null, {error: true});
         }
       }
     });
