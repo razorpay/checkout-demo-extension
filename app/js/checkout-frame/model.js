@@ -8,7 +8,7 @@ var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 var fontAnchor = '#powered-link';
 var fontTimeout;
 
-// sanitizing innerHTML
+// sanitizes innerHTML, by removing angle brackets
 function sanitizeContent(obj, fieldsArr){
   each(
     fieldsArr,
@@ -20,6 +20,7 @@ function sanitizeContent(obj, fieldsArr){
   )
 }
 
+// higher level sanitize function
 function sanitize(message){ // warning: modifies message;
   var options = message.options;
   var data = message.data;
@@ -38,6 +39,7 @@ function sanitize(message){ // warning: modifies message;
   data.contact = sanitizeContact(data.contact || options.prefill.contact);
 }
 
+// sanitizes attribute values by removing double quote character.
 function sanitizeValue(obj, key){
   if(key instanceof Array){
     return each(
@@ -62,6 +64,7 @@ function sanitizeValue(obj, key){
   }
 }
 
+// enforces numerical value with optional plus at start
 function sanitizeContact(contactPrefill){
   var contactFirstChar = contactPrefill[0];
   contactPrefill = contactPrefill.replace(/[^0-9]/g,'');
@@ -71,6 +74,7 @@ function sanitizeContact(contactPrefill){
   return contactPrefill;
 }
 
+// add missing keys with empty object values to message object
 function formatMessage(message){
   each(
     ['data', 'params'],
@@ -99,6 +103,7 @@ function validateCardNumber(el){
   }
 }
 
+// switches cvv help text between 3-4 characters for amex and non-amex cards
 function formatCvvHelp(el_cvv, cvvlen){
   var cvv_help = $('.elem-cvv .help-text');
   cvv_help.html(cvv_help.html().replace(/3|4/, cvvlen));
