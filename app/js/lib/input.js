@@ -26,12 +26,16 @@
 
   Smarty.prototype = {
     on: function(eventName, targetClass, eventHandler, useCapture){
-      var smarty = this;
-      var listenerRef = this.parent.on(eventName, function(e){
-        if(!targetClass || e.target.className.match(targetClass)){
-          eventHandler.call(smarty, e);
-        }
-      }, useCapture);
+      var listenerRef = this.parent.on(
+        eventName,
+        function(e){
+          if(!targetClass || e.target.className.match(targetClass)){
+            eventHandler.call(this, e);
+          }
+        },
+        useCapture,
+        this
+      );
       this.listeners.push(eventName, listenerRef, useCapture);
     },
 

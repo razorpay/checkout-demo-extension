@@ -45,13 +45,12 @@
       $(this.modalElement).addClass('animate')
     }
 
+    this.listeners = [];
     this.show();
-    this.bind_events();
+    this.bind();
   };
 
   Modal.prototype = {
-    listeners: [],
-
     show: function() {
       if(this.isShown) { return }
       this.isShown = true;
@@ -101,10 +100,9 @@
     },
 
     on: function(event, target, callback){
-      var self = this;
-      $(target).on(event, function(e){
-        callback.call(self, e);
-      });
+      var $target = $(target)
+      var attachedListener = $target.on(event, callback, false, this);
+      this.listeners.push($target, event, attachedListener);
     },
 
     steal_focus: function(e) {
@@ -116,7 +114,7 @@
       }
     },
 
-    bind_events: function(){
+    bind: function(){
       if(typeof window.pageYOffset === 'number') { // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function(){
           var el = document.activeElement;
@@ -143,6 +141,15 @@
       if (this.options.backdropClose) {
         this.on('click', gel('backdrop'), this.backdropHide)
       }
+    },
+
+    destroy: function(){
+      each(
+        this.listeners,
+        function(i, L){
+          L[0].off( L[1], L[2] );
+        }
+      )
     }
   };
 })();

@@ -8,8 +8,12 @@ window.onComplete = onComplete;
 var _uid;
 var sessions = {};
 
-function getSession () {
-  return sessions[_uid];
+function getSession(methodToCall) {
+  var session = sessions[_uid];
+  if(session && methodToCall){
+    session[methodToCall]();
+  }
+  return session;
 }
 
 if(isCriOS){
@@ -194,12 +198,10 @@ var frameDiscreet = {
 
   showModal: function(message) {
     if(_uid !== message.id){
-      if(sessions[_uid]){
-        sessions[_uid].unrender();
-      }
+      getSession('saveAndClose');
       _uid = message.id;
     }
-    var session = sessions[_uid];
+    var session = getSession();
     if(!session){
       session = sessions[_uid] = new CheckoutModal();
     }

@@ -238,8 +238,8 @@ CheckoutModal.prototype = {
     sanitize(message);
     this.getEl();
     this.fillData(message.data);
-    this.modal = new Modal(this.el, message.options.modal);
-    this.smarty = new Smarty(this.el);
+    if(!this.modal) { this.modal = new Modal(this.el, message.options.modal) }
+    if(!this.smarty) { this.smarty = new Smarty(this.el) }
     this.setCardFormatting()
     this.bindEvents();
   },
@@ -333,11 +333,14 @@ CheckoutModal.prototype = {
   },
 
   setCardFormatting: function(){
+    if(!this.card){
+      this.card = new Card();
+    }
+    var card = this.card;
     var $el_number = $('#card_number');
     var el_expiry = gel('card_expiry');
     var el_cvv = gel('card_cvv');
     var el_contact = gel('contact');
-    var card = this.card = new Card();
 
     card.setType = function(e){
       var el = e.target;
@@ -524,8 +527,10 @@ CheckoutModal.prototype = {
     });
   },
 
-  unrender: function(){
+  saveAndClose: function(){
     clearTimeout(fontTimeout);
+
+    this.message.data = getFormData();
 
     each(
       this.listeners,
@@ -534,6 +539,15 @@ CheckoutModal.prototype = {
       }
     )
     this.listeners = [];
+
+    this.modal.close();
+    this.smarty.off();
+    this.card.unbind();
     $(this.el).remove();
+
+    this.modal = null;
+    this.smarty = null;
+    this.card = null;
+    this.el = null;
   }
 }

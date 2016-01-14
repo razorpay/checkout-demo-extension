@@ -285,6 +285,21 @@
       )
       this.listeners.push([$el, eventListeners])
     },
+
+    unbind: function(){
+      each(
+        this.listeners,
+        function(i, L){
+          each(
+            L[1],
+            function(j, event, listenerRef){
+              L[0].off(event, listenerRef);
+            }
+          )
+        }
+      )
+    },
+
     formatCardNumber: function(el){
       this.bind(el, {
         keypress: FormatNumber,
