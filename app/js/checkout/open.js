@@ -105,7 +105,7 @@ discreet.setCommunicator = function(opts){
     ch_CriOS_frame.style.display = 'none';
     document.documentElement.appendChild(ch_CriOS_frame);
   }
-  ch_CriOS_frame.src = discreet.makeUrl(opts, true) + 'CriOS-frame.php';
+  ch_CriOS_frame.src = discreet.makeUrl(true) + 'CriOS-frame.php';
 }
 discreet.setCommunicator(Razorpay.defaults);
 
@@ -346,7 +346,7 @@ Razorpay.prototype.open = function() {
     var opts = ch_createFrameOptions.call(this);
     opts.options.redirect = true;
 
-    var src = discreet.makeUrl(options) + '/checkout?key_id=' + options.key + '&message=' + _btoa(JSON.stringify(opts));
+    var src = discreet.makeUrl() + '/checkout?key_id=' + options.key + '&message=' + _btoa(JSON.stringify(opts));
     ch_CriOS_listener = $(window).on('unload', ch_close, false, this);
     this.checkoutFrame.contentWindow = window.open(src, '');
 

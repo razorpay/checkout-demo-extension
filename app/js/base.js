@@ -145,8 +145,12 @@ Razorpay.configure = function(overrides) {
 var discreet = {
   context: location.href,
   setCommunicator: noop,
-  makeUrl: function(options, noVersion){
-    return options.protocol + '://' + options.hostname + '/' + (noVersion ? '' : options.version);
+  makeUrl: function(unversioned){
+    var url = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/';
+    if(!unversioned){
+      url += RazorpayConfig.version;
+    }
+    return url;
   },
 
   nextRequestRedirect: function(data){

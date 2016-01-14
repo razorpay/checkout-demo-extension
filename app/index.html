@@ -9,6 +9,10 @@
   <!-- build:js checkout.js -->
   <script src="js/tracker.js"></script>
   <script src="js/init.js"></script>
+  <script>
+    RazorpayConfig.protocol = 'http';
+    RazorpayConfig.hostname = 'api.pronav.in';
+  </script>
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/base.js"></script><!--coverage-->
   <script src="js/checkout/open.js"></script>
@@ -40,8 +44,6 @@
       },
       // framePath: 'checkout.html',
       // callback_url: 'http://localhost:9000',
-      protocol: 'http',
-      hostname: 'api.pronav.in',
       'method': {
         card: 1
         // , wallet: false

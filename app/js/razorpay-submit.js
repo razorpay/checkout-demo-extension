@@ -33,7 +33,7 @@ function getCookie(name){
 }
 
 function getCommuniactorSrc(opts){
-  return discreet.makeUrl(opts, true) + 'communicator.php';
+  return discreet.makeUrl(true) + 'communicator.php';
 }
 
 discreet.setCommunicator = function(opts){
@@ -41,7 +41,7 @@ discreet.setCommunicator = function(opts){
     communicator.parentNode.removeChild(communicator);
   }
   if(
-    location.href.indexOf(discreet.makeUrl(opts)) &&
+    location.href.indexOf(discreet.makeUrl()) &&
     (/MSIE |Windows Phone|Trident\//.test(ua) || (isCriOS && !discreet.isFrame))
   ) {
     communicator = document.createElement('iframe');
@@ -171,7 +171,7 @@ function onMessage(e){
   if(e.origin) {
     if (
       (!popupRequest.popup || e.source !== popupRequest.popup.window && e.source !== communicator.contentWindow) ||
-      discreet.makeUrl(popupRequest.options).indexOf(e.origin)
+      discreet.makeUrl().indexOf(e.origin)
     ){
       return roll('message received from origin', e.origin, 'info');
     }
@@ -220,7 +220,7 @@ function setupAjax(request){
   var options = request.options;
 
   $.post({
-    url: discreet.makeUrl(options) + '/payments/create/ajax',
+    url: discreet.makeUrl() + 'payments/create/ajax',
     data: request.data,
     callback: function(response){
       var result;
@@ -260,7 +260,7 @@ Razorpay.payment = {
     var rdata = request.data;
     var options = request.options;
 
-    var url = discreet.makeUrl(options) + '/payments/create/checkout';
+    var url = discreet.makeUrl() + 'payments/create/checkout';
 
     if(options.redirect || options.callback_url){
       discreet.nextRequestRedirect({
@@ -291,7 +291,7 @@ Razorpay.payment = {
     }
 
     if(name){
-      submitFormData(discreet.makeUrl(options, true) + 'processing.php', null, null, name);
+      submitFormData(discreet.makeUrl(true) + 'processing.php', null, null, name);
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
@@ -333,7 +333,7 @@ Razorpay.payment = {
 
   getMethods: function(callback){
     return $.jsonp({
-      url: discreet.makeUrl(Razorpay.defaults) + '/methods',
+      url: discreet.makeUrl() + 'methods',
       data: {key_id: Razorpay.defaults.key},
       timeout: 30000,
       success: function(response){

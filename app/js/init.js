@@ -23,10 +23,13 @@ var Razorpay = window.Razorpay = function(options){
   return this;
 };
 
+var RazorpayConfig = {
+  protocol: 'https',
+  hostname: 'api.razorpay.com',
+  version: 'v1/'
+}
+
 Razorpay.defaults = {
-  'protocol': 'https',
-  'hostname': 'api.razorpay.com',
-  'version': 'v1',
   'key': '',
   'amount': '',
   'currency': 'INR',

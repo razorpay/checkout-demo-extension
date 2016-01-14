@@ -20,9 +20,9 @@ function sanitizeImage(options){
 
 function makeCheckoutUrl(options){
   if(options.key){
-    return discreet.makeUrl(options) + '/checkout?key_id=' + options.key;
+    return discreet.makeUrl() + 'checkout?key_id=' + options.key;
   }
-  return discreet.makeUrl(options, true) + 'checkout';
+  return discreet.makeUrl(true) + 'checkout.php';
 }
 
 function CheckoutFrame(){
