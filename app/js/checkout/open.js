@@ -315,7 +315,9 @@ function setBackdropColor(value){
 }
 
 Razorpay.prototype.open = function() {
-  this.checkoutFrame = new CheckoutFrame();
+  if(!this.checkoutFrame){
+    this.checkoutFrame = new CheckoutFrame();
+  }
   this.checkoutFrame.openRzp(this);
   return;
   var options = this.options;

@@ -26,6 +26,31 @@ function makeCheckoutUrl(options){
   return discreet.makeUrl(true) + 'checkout.php';
 }
 
+function makeFrameOptions(rzp){
+  var options = {};
+
+  each(
+    rzp.options, function(i, value){
+      if(typeof value !== 'function'){
+        options[i] = value;
+      }
+    }
+  )
+  for(var i in rzp.modal.options){
+    rzp.options.modal[i] = rzp.modal.options[i];
+  }
+  sanitizeImage(options);
+
+  var response = {
+    context: location.href,
+    options: options,
+    config: RazorpayConfig,
+    id: rzp.id
+  }
+
+  return response;
+}
+
 function CheckoutFrame(){
   this.getEl(Razorpay.defaults);
   this.bind();
@@ -58,10 +83,31 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
-    this.unrzp();
-
     var parent = rzp.options.parent;
     var $parent = $(parent || frameContainer);
+
+    var message;
+
+    if(rzp !== this.rzp){
+      message = makeFrameOptions(rzp);
+
+      if(!this.rzp){
+        $parent.append(this.el);
+        this.bind();
+      }
+      else {
+        this.unrzp();
+      }
+
+      this.rzp = rzp;
+    }
+    else {
+      message = {event: 'open'};
+    }
+
+    this.afterLoad(function(){
+      this.postMessage(message);
+    })
 
     if(parent){
       this.afterClose = noop;
@@ -70,45 +116,12 @@ CheckoutFrame.prototype = {
       $parent.css('display', 'block').reflow();
       setBackdropColor(rzp.options.theme.backdropColor);
     }
-
-    $parent.append(this.el);
-
-    this.bind();
-    this.rzp = rzp;
-    this.afterLoad(function(){
-      this.postMessage(this.makeFrameOptions());
-    })
   },
 
   bind: function(){
     if(!this.listener){
       this.listener = $(window).on('message', this.onmessage, null, this);
     }
-  },
-
-  makeFrameOptions: function(){
-    var rzp = this.rzp;
-    var options = {};
-
-    each(
-      rzp.options, function(i, value){
-        if(typeof value !== 'function'){
-          options[i] = value;
-        }
-      }
-    )
-    for(var i in rzp.modal.options){
-      rzp.options.modal[i] = rzp.modal.options[i];
-    }
-    sanitizeImage(options);
-
-    var response = {
-      context: location.href,
-      options: options,
-      config: RazorpayConfig
-    }
-    response.id = rzp.id;
-    return response;
   },
 
   setMeta: function(){
