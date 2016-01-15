@@ -78,7 +78,6 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(options){
-  this.loaded = null;
   if(options.key){
     return discreet.makeUrl() + 'checkout?key_id=' + options.key;
   }
@@ -331,6 +330,7 @@ CheckoutFrame.prototype = {
   },
 
   onfault: function(message){
+    this.rzp.close();
     alert('Oops! Something went wrong.\n' + message);
   },
 

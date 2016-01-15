@@ -90,7 +90,7 @@ function createPopup(data, url, options) {
   }
 
   var popup;
-  var name = 'popup_' + _uid;
+  var name = 'popup_'// + _uid;
   try{
     popup = new Popup('', name);
   }

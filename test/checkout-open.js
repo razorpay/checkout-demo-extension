@@ -1,237 +1,312 @@
-var options = {
-  'key': 'key_id',
-  'amount': '5100',
-  'name': 'Merchant Name',
-  'netbanking': 'true',
-  'protocol': 'http',
-  'hostname': currentScript.src.replace('http://',''),
-  'prefill': {
-    'name': 'Shashank Mehta',
-    'email': 'sm@razorpay.com',
-    'contact': '9999999999'
-  }
-}
+var base64image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL4AAAC+CAIAAAAEFiLKAAAAA3NCSVQICAjb4U/';
 
-var cc = {
-  number: '4012001037141112',
-  expiry: '05 / 19',
-  cvv: '888'
-}
+describe('normalize image option if', function(){
+  var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
 
-describe("open method should", function(){
-  var rzp;
-
-  beforeEach(function(){
-    rzp = new Razorpay(options);
-    rzp.open();
+  it('path relative url', function(){
+    var opts = {image: 'abcdef'};
+    sanitizeImage(opts);
+    expect(opts.image)
+      .toBe(baseUrl + '/abcdef');
   })
 
-  it("append iframe", function(){
-    expect(isOpen).toBe(true);
-    expect(rzp.checkoutFrame).toBeDefined();
-    expect(document.documentElement.contains(rzp.checkoutFrame.parentNode)).toBe(true);
+  it('server relative url', function(){
+    var opts = {image: '/hello/world'};
+    sanitizeImage(opts);
+    expect(opts.image)
+      .toBe(baseUrl + '/hello/world');
   })
 
-  afterEach(function(){
-    ch_onClose.call(rzp);
+  it('absolute url', function(){
+    var opts = {image: 'https://hello/world'};
+    sanitizeImage(opts);
+    expect(opts.image)
+      .toBe('https://hello/world');
+  })
+
+  it('base64', function(){
+    var opts = {image: base64image};
+    sanitizeImage(opts);
+    expect(opts.image)
+      .toBe(base64image);
   })
 })
 
-describe("close method should", function(){
+describe('makeCheckoutUrl should', function(){
+  it('compose default checkout url without key', function(){
+    expect(makeCheckoutUrl({}))
+      .toBe(RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/checkout.php');
+  })
+
+  it('compose checkout view url with key', function(){
+    expect(makeCheckoutUrl({key: 'foo'}))
+      .toBe(RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/v1/checkout?key_id=foo');
+  })
+})
+
+describe('makeCheckoutMessage should', function(){
+  var rzp = {
+    id: 'someid',
+    options: {
+      image: 'abcdef',
+      hello: 'world',
+      nested: {
+        key: 'value'
+      },
+      modal: {},
+      func: noop
+    },
+    modal: {
+      options: {
+        dismiss: 'hidden'
+      }
+    }
+  }
+
+  it('set options and modal.options to options.modal', function(){
+    var message = makeCheckoutMessage(rzp);
+    expect(rzp.options.modal.dismiss === rzp.modal.options.dismiss);
+
+    // checking general options
+    expect(message.options.func).not.toBeDefined();
+    expect(message.options.nested.key).toBe('value');
+    expect(message.options.hello).toBe('world');
+
+    // checking image, as absolute url
+    var imageOption = {image: rzp.options.image};
+    sanitizeImage(imageOption);
+    expect(message.options.image).toBe(imageOption.image);
+
+    expect(message.context).toBe(location.href);
+    expect(message.config).toBe(RazorpayConfig);
+    expect(message.id).toBe(rzp.id);
+  })
+
+  describe('if CriOS, should', function(){
+
+    beforeEach(function(){
+      isCriOS = true;
+    })
+
+    it('set redirect option', function(){
+      var message = makeCheckoutMessage(rzp);
+      expect(message.options.redirect).toBe(true);
+    })
+
+    it('discard image option, if base64', function(){
+      rzp.options.image = base64image;
+      var message = makeCheckoutMessage(rzp);
+      expect(message.options.image).not.toBe(base64image);
+      rzp.options.image = 'qwer';
+    })
+
+    afterEach(function(){
+      isCriOS = false;
+    })
+  })
+})
+
+describe('Razorpay close method should', function(){
   var rzp;
+  var options = {
+    key: 'key',
+    amount: 100
+  }
 
   beforeEach(function(){
     rzp = new Razorpay(options);
     rzp.open();
   })
 
-  it("send close message to frame", function(){
+  it('send close message to frame', function(){
     var spy = jasmine.createSpy();
-    spyOn(window, 'ch_sendFrameMessage').and.callFake(function(msg){
+    spyOn(rzp.checkoutFrame, 'postMessage').and.callFake(function(msg){
       expect(msg.event).toBe('close');
-      expect(this).toBe(rzp);
+      expect(this).toBe(rzp.checkoutFrame);
       spy();
     })
     rzp.close();
     expect(spy).toHaveBeenCalled();
   })
   
-  it("clean up various properties", function(){
-    ch_onClose.call(rzp);
-    expect(isOpen).toBe(false);
-    expect(this.checkoutFrame).not.toBeVisible();
-  })
-
-  it("be followable by re-open", function(){
+  it('be followable by re-open', function(){
+    rzp.close();
+    rzp.checkoutFrame.loaded = true;
     var spy = jasmine.createSpy();
-    spyOn(window, 'ch_sendFrameMessage').and.callFake(function(msg){
+    spyOn(rzp.checkoutFrame, 'postMessage').and.callFake(function(msg){
       expect(msg.event).toBe('open');
-      expect(this).toBe(rzp);
+      expect(this).toBe(rzp.checkoutFrame);
       spy();
     })
-    ch_onClose.call(rzp);
     rzp.open();
     expect(spy).toHaveBeenCalled();
   })
 })
 
-describe("normalize image option if", function(){
-  var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
-
-  it("path relative url", function(){
-    var opts = {image: 'abcdef'};
-    ch_setImageOption(opts);
-    expect(opts.image).toBe(baseUrl + '/abcdef');
-  })
-
-  it("server relative url", function(){
-    var opts = {image: '/hello/world'};
-    ch_setImageOption(opts);
-    expect(opts.image).toBe(baseUrl + '/hello/world');
-  })
-  
-  it("absolute url", function(){
-    var opts = {image: 'https://hello/world'};
-    ch_setImageOption(opts);
-    expect(opts.image).toBe('https://hello/world');
-  })
-
-  it("base64", function(){
-    var base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL4AAAC+CAIAAAAEFiLKAAAAA3NCSVQICAjb4U/';
-    var opts = {image: base64};
-    ch_setImageOption(opts);
-    expect(opts.image).toBe(base64);
-  })
-
-})
-
-describe("ch_onFrameMessage", function(){
-  var rzp;
-
-  beforeEach(function(){
-    rzp = new Razorpay(options);
-    rzp.open();
+describe('checkoutFrame on receiveing message from frame contentWindow', function(){
+  var rzp = new Razorpay({
+    key: 'key',
+    amount: 100
   });
+  var cf = new CheckoutFrame(rzp);
+  var src = makeCheckoutUrl(rzp.options);
 
-  afterEach(function(){
-    ch_onClose.call(rzp);
-  });
-
-  it("return if source isn't valid", function(done){
-    var spyNotCalled = jasmine.createSpy();
-    spyOn(window, 'ch_setImageOption').and.callFake(spyNotCalled);
-    postMessage({event: "load"}, '*');
-    setTimeout(function(){
-      expect(spyNotCalled).not.toHaveBeenCalled();
-      done();
-    })
-  })
-
-  describe("load,", function(){
+  describe('return if source isn\'t valid:', function(){
+    var spyNotCalled, event;
 
     beforeEach(function(){
-      postMessage({source: "frame", event: "load"}, '*');
-    })
-    
-    it("meta viewport is to be set", function(done){
-      setTimeout(function(){
-        expect(document.querySelector('meta[name=viewport]').content.match('width=device-width, initial-scale=1').length).toBe(1);
-        done();
-      })
+      spyNotCalled = jasmine.createSpy();
     })
 
-    it("image option is to be normalized", function(done){
-      var spy = jasmine.createSpy();
-      spyOn(window, 'ch_setImageOption').and.callFake(spy);
-      setTimeout(function(){
-        expect(spy).toHaveBeenCalled();
-        done();
-      })
-    })
-  })
-
-  it("redirect, next request should be processed", function(done){
-    var spy = jasmine.createSpy();
-    
-    spyOn(discreet, 'nextRequestRedirect').and.callFake(function(data){
-      expect(data).toBe('hello');
-      spy();
+    afterEach(function(){
+      cf.onmessage(event)
+      spyOn(cf, 'onredirect').and.callFake(spyNotCalled);
+      expect(spyNotCalled).not.toHaveBeenCalled();
     })
 
-    postMessage({source: "frame", event: "redirect", data: "hello"}, '*');
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
-      done();
-    })
-  })
-
-  it("submit, invoke CheckoutBridge.onsubmit", function(done){
-    var spy = jasmine.createSpy();
-    var data = {foo:2}
-    window.CheckoutBridge = {
-      onsubmit: function(arg){
-        expect(arg).toBe(JSON.stringify(data));
-        spy();
+    it('invalid origin', function(){
+      event = {
+        origin: 'asd',
+        data: JSON.stringify({
+          source: 'frame',
+          event: 'redirect',
+          id: rzp.id
+        })
       }
-    }
-    postMessage({source: "frame", event: "submit", data: data}, '*');
+    })
 
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
+    it('invalid source', function(){
+      event = {
+        origin: src,
+        data: JSON.stringify({
+          source: 'frame2',
+          event: 'redirect',
+          id: rzp.id
+        })
+      }
+    })
+
+    it('invalid id', function(){
+      event = {
+        origin: src,
+        data: JSON.stringify({
+          source: 'frame',
+          event: 'redirect',
+          id: 11
+        })
+      }
+    })
+  })
+
+  describe('invoke onevent methods: ', function(){
+    function message(event, data){
+      cf.onmessage({
+        origin: src,
+        data: JSON.stringify({
+          source: 'frame',
+          event: event,
+          id: rzp.id,
+          data: data
+        })
+      })
+    }
+    var spyCalled;
+
+    beforeEach(function(){
+      spyCalled = jasmine.createSpy();
+    })
+
+    afterEach(function(){
+      expect(spyCalled).toHaveBeenCalled();
+    })
+
+    it('generic', function(){
+      cf.onevent = spyCalled;
+      message('event');
+      delete cf.onevent;
+    })
+
+    it('load', function(){
+      cf.loaded = function(){
+        if(this === cf){
+          spyCalled();
+        }
+      };
+      message('load');
+      expect(cf.loaded).toBe(true);
+    })
+
+    it('redirect', function(){
+      spyOn(discreet, 'nextRequestRedirect').and.callFake(function(data){
+        expect(data.foo).toBe(2);
+        spyCalled();
+      })
+      message('redirect', {foo: 2});
+    })
+
+    it('submit', function(){
+      window.CheckoutBridge = {
+        onsubmit: function(data){
+          expect(this).toBe(window.CheckoutBridge);
+          expect(JSON.parse(data).foo).toBe(3);
+          spyCalled();
+        }
+      }
+      message('submit', {foo: 3});
       delete window.CheckoutBridge;
-      done();
     })
-  })
 
-  it("success, handler is to be called", function(done){
-    var spy = jasmine.createSpy();
-    rzp.options.handler = function(data){
-      if(this === null && data == "payment_id") spy();
-    };
-    postMessage({source: "frame", event: "success", data: "payment_id"}, '*');
-    setTimeout(function(){
-      expect(existingInstance).toBe(null);
-      done();
+    it('dismiss', function(){
+      rzp.options.modal.ondismiss = spyCalled;
+      var spy2 = jasmine.createSpy();
+      spyOn(cf, 'close').and.callFake(function(){
+        expect(this).toBe(cf);
+        spy2();
+      })
+      message('dismiss');
+      expect(spy2).toHaveBeenCalled();
     })
-  })
 
-  it("dismiss, modal.ondismiss is to be called", function(done){
-    var spy = jasmine.createSpy();
-    spyOn(rzp.options.modal, 'ondismiss').and.callFake(spy);
-    postMessage({source: "frame", event: "dismiss"}, '*');
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
-      done();
+    it('hidden', function(){
+      rzp.options.modal.onhidden = spyCalled;
+      var spy2 = jasmine.createSpy();
+      spyOn(cf, 'afterClose').and.callFake(function(){
+        expect(this).toBe(cf);
+        spy2();
+      })
+      message('hidden');
+      expect(spy2).toHaveBeenCalled();
     })
-  })
 
-  it("hidden, ch_onClose is to be called", function(done){
-    var origClose = ch_onClose;
-    var spy = jasmine.createSpy();
-    ch_onClose = function(){
-      if(existingInstance === rzp) spy();
-    }
-    postMessage({source: "frame", event: "hidden"}, '*');
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
-      ch_onClose = origClose;
-      done();
+    it('success', function(done){
+      rzp.options.handler = function(data){
+        expect(data.foo).toBe(4);
+        done();
+      }
+
+      spyOn(cf, 'close').and.callFake(function(){
+        expect(this).toBe(cf);
+        spyCalled();
+      })
+      message('success', {foo: 4});
     })
-  })
 
-  it("fault, close.", function(done){
-    var spy = jasmine.createSpy();
-    spyOn(Razorpay.prototype, 'close').and.callFake(spy);
-    postMessage({source: "frame", event: "fault"}, '*');
-    setTimeout(function(){
-      expect(spy).toHaveBeenCalled();
-      done();
+    it('fault', function(){
+      spyOn(rzp, 'close').and.callFake(spyCalled);
+      message('fault');
     })
   })
 })
 
-describe("checkout validate", function(){
-  var init_options, errors, field;
+// describe("checkout validate", function(){
+//   var init_options, errors, field;
+// })
+
+describe('setBackdropColor', function(){
+  it('should set background of backdrop', function(){
+    setBackdropColor('red');
+    expect(frameBackdrop.style.background).toBe('red');
+  })
 })
 
 describe("automatic checkout:", function(){
@@ -256,7 +331,7 @@ describe("automatic checkout:", function(){
         world: 5
       }
     }
-    ch_defaultPostHandler(postData);
+    defaultAutoPostHandler(postData);
     expect(spy).toHaveBeenCalled();
   })
 
@@ -270,7 +345,7 @@ describe("automatic checkout:", function(){
       'method.wallet.paytm': 'false',
       'one.hello': 'true'
     }
-    ch_parseScriptOptions(opts);
+    parseScriptOptions(opts);
 
     it("have basic keys", function(){
       expect(opts.key).toBe('val');
@@ -296,12 +371,12 @@ describe("automatic checkout:", function(){
     })
   })
 
-  describe("ch_addButton method: ", function(){
+  describe("addAutoCheckoutButton method: ", function(){
     var init_options = jQuery.extend(true, {}, options);
     init_options.buttontext = 'Dont pay';
     var rzp = new Razorpay(init_options);
     var parent = currentScript.parentNode;
-    ch_addButton(rzp);
+    addAutoCheckoutButton(rzp);
     
     it("onsubmit should be attached on parent element", function(){
       expect(typeof parent.onsubmit).toBe('function');
@@ -357,7 +432,7 @@ describe("automatic checkout:", function(){
     })
 
     afterEach(function(){
-      ch_automaticCheckoutInit();
+      initAutomaticCheckout();
 
       spyCalled && expect(spyCalled).toHaveBeenCalled();
       spyNotCalled && expect(spyNotCalled).not.toHaveBeenCalled();
@@ -369,12 +444,12 @@ describe("automatic checkout:", function(){
     it("should do nothing if data-amount attribute is not present", function(){
       currentScript.removeAttribute('data-amount');
       spyCalled = null;
-      spyOn(window, 'ch_addButton').and.callFake(spyNotCalled);
+      spyOn(window, 'addAutoCheckoutButton').and.callFake(spyNotCalled);
     })
 
     it("should parse attributes", function(){
-      spyOn(window, 'ch_addButton').and.callFake(jQuery.noop);
-      spyOn(window, 'ch_parseScriptOptions').and.callFake(function(o){
+      spyOn(window, 'addAutoCheckoutButton').and.callFake(jQuery.noop);
+      spyOn(window, 'parseScriptOptions').and.callFake(function(o){
         expect(o.key).toBe('abcd');
         expect(o.amount).toBe('12345');
         spyCalled();
@@ -382,7 +457,7 @@ describe("automatic checkout:", function(){
     })
 
     it("add button", function(){
-      spyOn(window, 'ch_addButton').and.callFake(function(r){
+      spyOn(window, 'addAutoCheckoutButton').and.callFake(function(r){
         expect(r instanceof Razorpay).toBe(true);
         spyCalled();
       })
