@@ -311,14 +311,18 @@ CheckoutModal.prototype = {
     this.on('click', '#modal-close', this.close);
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
-    this.on('blur', '#card_number', validateCardNumber);
 
-    if(this.message.options.method.netbanking){
+    var enableMethods = this.message.options.method;
+    if(enableMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
       if(!window.addEventListener){
         this.on('click', '#netb-banks .bank-radio', this.selectBankRadio);
       }
+    }
+
+    if(enableMethods.card){
+      this.on('blur', '#card_number', validateCardNumber);
     }
 
     this.on('click', '#backdrop', this.frontDrop);

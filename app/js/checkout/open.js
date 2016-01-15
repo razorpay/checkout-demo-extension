@@ -5,16 +5,10 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-var isOpen, isLoaded, existingInstance,
-ch_CriOS_interval,
-ch_CriOS_listener,
-ch_CriOS_frame,
-ch_frameContainer,
-ch_backdrop,
-ch_metaViewportTag,
-ch_metaViewport;
 
-var ch_PageY = 0;
+var ch_CriOS_interval,
+ch_CriOS_listener,
+ch_CriOS_frame;
 
 discreet.setCommunicator = function(opts){
   if(!isCriOS){

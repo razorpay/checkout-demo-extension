@@ -1,3 +1,4 @@
+var ch_PageY = 0;
 // there is no "position: fixed" in iphone
 var docStyle = doc.style;
 var merchantMarkup = {
@@ -8,7 +9,7 @@ var merchantMarkup = {
     this.el.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
   },
 
-// scroll manually in iPhone
+  // scroll manually in iPhone
   scroll: function(){
     if(!isOpen || typeof window.pageYOffset !== 'number'){
       return;
@@ -48,7 +49,7 @@ function restoreMeta($meta){
   }
   var oldMeta = getMeta();
   if(oldMeta){
-    qs(head).appendChild(oldMeta);
+    qs('head').appendChild(oldMeta);
   }
 }
 
@@ -84,7 +85,7 @@ function makeCheckoutUrl(options){
   return discreet.makeUrl(true) + 'checkout.php';
 }
 
-function makeFrameOptions(rzp){
+function makeCheckoutMessage(rzp){
   var options = {};
 
   each(
@@ -98,6 +99,13 @@ function makeFrameOptions(rzp){
     rzp.options.modal[i] = rzp.modal.options[i];
   }
   sanitizeImage(options);
+
+  if(isCriOS){
+    options.redirect = true;
+    if(/^data:image\//.test(options.image)){
+      options.image = '';
+    }
+  }
 
   var response = {
     context: location.href,
@@ -150,7 +158,7 @@ CheckoutFrame.prototype = {
     var message;
 
     if(rzp !== this.rzp){
-      message = makeFrameOptions(rzp);
+      message = makeCheckoutMessage(rzp);
 
       if(!this.rzp){
         $parent.append(this.el);
@@ -199,10 +207,7 @@ CheckoutFrame.prototype = {
       each(
         eventPair,
         function(event, listener){
-          this.listeners.push([
-            event,
-            $(window).on(event, listener, null, this)
-          ])
+          this.listeners[event] = $(window).on(event, listener, null, this);
         },
         this
       )
