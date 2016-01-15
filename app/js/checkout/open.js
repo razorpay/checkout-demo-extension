@@ -5,69 +5,11 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-
-var ch_CriOS_interval,
-ch_CriOS_listener,
-ch_CriOS_frame;
-
-discreet.setCommunicator = function(opts){
-  if(!isCriOS){
-    return;
-  }
-  if(!ch_CriOS_frame){
-    ch_CriOS_frame = document.createElement('iframe');
-    ch_CriOS_frame.style.display = 'none';
-    document.documentElement.appendChild(ch_CriOS_frame);
-  }
-  ch_CriOS_frame.src = discreet.makeUrl(true) + 'CriOS-frame.php';
-}
-discreet.setCommunicator(Razorpay.defaults);
-
-function ch_close(){
-  ch_messageHandlers.dismiss.call(this);
-  ch_messageHandlers.hidden.call(this);
-}
-
-function ch_onClose(){
-  if(ch_CriOS_interval){
-    clearInterval(ch_CriOS_interval);
-    ch_CriOS_interval = null;
-  }
-  if(ch_CriOS_listener){
-    $(window).off('unload', ch_CriOS_listener);
-    ch_CriOS_listener = null;
-  }
-  // $.removeMessageListener();
-  isOpen = false;
-  merchantMarkup.reset();
-
-  if(ch_metaViewportTag && ch_metaViewportTag.parentNode){
-    $(ch_metaViewportTag).remove();
-  }
-
-  var meta = ch_metaViewport;
-  if(meta){
-    var head = document.querySelector('head');
-    if(head && !meta.parentNode && head.appendChild(meta)){
-      ch_metaViewport = null;
-    }
-  }
-  var frame = this.checkoutFrame;
-
-  if(frame){
-    if(isCriOS && frame.contentWindow){
-      frame.contentWindow.close();
-    }
-    frame.style.display = 'none';
-  }
-
-  if(ch_frameContainer){
-    ch_frameContainer.style.display = 'none';
-  }
-
-  if(this instanceof Razorpay && typeof this.options.modal.onhidden === 'function'){
-    this.options.modal.onhidden();
-  }
+if(isCriOS){
+  var communicator = document.createElement('iframe')
+  communicator.style.display = 'none';
+  doc.appendChild(communicator);
+  communicator.src = discreet.makeUrl(true) + 'CriOS-frame.php';
 }
 
 /**
@@ -76,13 +18,13 @@ function ch_onClose(){
   @param  {[type]} data [description]
   @return {[type]}    [description]
 */
-var ch_defaultPostHandler = function(data){
+var defaultAutoPostHandler = function(data){
   var RazorPayForm = currentScript.parentNode;
   RazorPayForm.innerHTML += deserialize(data);
   RazorPayForm.submit();
 }
 
-var ch_parseScriptOptions = function(options){
+var parseScriptOptions = function(options){
   var category, dotPosition, ix, property;
   each( options, function(i, opt){
     ix = i.indexOf(".");
@@ -103,11 +45,11 @@ var ch_parseScriptOptions = function(options){
   })
 
   if(options.method){
-    ch_parseScriptOptions(options.method);
+    parseScriptOptions(options.method);
   }
 }
 
-var ch_addButton = function(rzp){
+var addAutoCheckoutButton = function(rzp){
   var button = document.createElement('input');
   var form = currentScript.parentNode;
   button.type = 'submit';
@@ -128,7 +70,7 @@ var ch_addButton = function(rzp){
 * This checks whether we are in automatic mode
 * If yes, it puts in the button
 */
-function ch_automaticCheckoutInit(){
+function initAutomaticCheckout(){
   var opts = {};
   var preload = false;
   each(
@@ -143,12 +85,12 @@ function ch_automaticCheckoutInit(){
     }
   )
 
-  ch_parseScriptOptions(opts);
+  parseScriptOptions(opts);
   var amount = currentScript.getAttribute('data-amount');
 
   if (amount && amount.length > 0){
-    opts.handler = ch_defaultPostHandler;
-    ch_addButton(Razorpay(opts));
+    opts.handler = defaultAutoPostHandler;
+    addAutoCheckoutButton(Razorpay(opts));
   }
   else if(preload){
     Razorpay.configure(opts);
@@ -220,33 +162,12 @@ Razorpay.prototype.open = function() {
   if(!this.checkoutFrame){
     this.checkoutFrame = new CheckoutFrame();
   }
-  this.checkoutFrame.openRzp(this);
-  return;
+  var frame = this.checkoutFrame;
+  frame.openRzp(this);
 
-  merchantMarkup.clear();
-
-  if(isCriOS) {
-    var self = this;
-    var opts = ch_createFrameOptions.call(this);
-    opts.options.redirect = true;
-
-    var src = discreet.makeUrl() + '/checkout?key_id=' + options.key + '&message=' + _btoa(JSON.stringify(opts));
-    ch_CriOS_listener = $(window).on('unload', ch_close, false, this);
-    this.checkoutFrame.contentWindow = window.open(src, '');
-
-    ch_CriOS_interval = setInterval(function(){
-      if(self.checkoutFrame.contentWindow.closed){
-        ch_close.call(self);
-      }
-    }, 500)
-  }
-
-  if( !this.checkoutFrame.contentWindow ) {
-    ch_onClose();
-    alert(
-      (isCriOS ? 'Chrome for iOS' : 'This browser') +
-      ' is not supported.\nPlease try payment in another browser.'
-    );
+  if(!frame.el.contentWindow){
+    frame.close();
+    alert('This browser is not supported.\nPlease try payment in another browser.');
   }
 };
 
@@ -268,4 +189,4 @@ discreet.validateCheckout = function(options){
 };
 
 // Get the ball rolling in case we are in manual mode
-ch_automaticCheckoutInit();
+initAutomaticCheckout();

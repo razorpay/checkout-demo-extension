@@ -204,6 +204,12 @@ CheckoutFrame.prototype = {
         eventPair.scroll = merchantMarkup.scroll;
       }
 
+      if(isCriOS){
+        eventPair.unload = function(){
+          this.el.contentWindow.close();
+        }
+      }
+
       each(
         eventPair,
         function(event, listener){
