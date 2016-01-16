@@ -162,7 +162,8 @@ Razorpay.configure = function(overrides) {
 }
 
 var discreet = {
-  context: location.href,
+  medium: 'web',
+  context: location.href.replace(/^https?:\/\//,''),
   setCommunicator: noop,
   makeUrl: function(unversioned){
     var url = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/';

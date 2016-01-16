@@ -380,6 +380,11 @@ function iosBridge(){
   }
 }
 
+if(CheckoutBridge){
+  discreet.medium = qpmap.platform || 'app';
+  discreet.context = qpmap.context || null;
+}
+
 iosBridge();
 
 Razorpay.sendMessage({event: 'load'});

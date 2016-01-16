@@ -143,6 +143,13 @@ function formatRequest(request){
   if(!rdata.key_id){
     rdata.key_id = options.key;
   }
+
+  if(_uid){
+    rdata['_[id]'] = _uid;
+    rdata['_[medium]'] = discreet.medium;
+    rdata['_[context]'] = discreet.context;
+  }
+
   return Razorpay.payment.validate(rdata);
 }
 
