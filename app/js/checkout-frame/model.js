@@ -155,19 +155,17 @@ function getFormData() {
   return data;
 }
 
-function frontDrop(message, className) {
-  if(!popupRequest){
-    gel('fd-t').innerHTML = message || '';
-    gel('fd').className = className || '';
-  }
-  var emic = $('#emi-container');
-  if(emic[0]){
-    emic.removeClass('shown');
-    setTimeout(function(){
-      emic.hide();
-    }, 300)
-    gel('fd-in').style.display = '';
-  }
+function frontDrop(message, className){
+  gel('fd-t').innerHTML = message || '';
+  gel('fd').className = className || '';
+}
+
+function showErrorMessage(message){
+  frontDrop(message, 'shown')
+}
+
+function showLoadingMessage(message){
+  frontDrop(message, 'shown loading');
 }
 
 function CheckoutModal(){
@@ -292,6 +290,12 @@ CheckoutModal.prototype = {
     }
   },
 
+  hideErrorMessage: function(){
+    if(!this.rzp){
+      frontDrop();
+    }
+  },
+
   shake: function(){
     if ( this.el ) {
       $(this.el.querySelector('#modal-inner'))
@@ -332,11 +336,12 @@ CheckoutModal.prototype = {
       this.on('blur', '#card_number', validateCardNumber);
     }
 
-    this.on('click', '#backdrop', this.frontDrop);
+    this.on('click', '#backdrop', this.hideErrorMessage);
+
     this.on('click', '#fd', function(e){
       var id = e.target.id;
       if(id === 'fd' || id === 'fd-hide') {
-        frontDrop();
+        this.hideErrorMessage();
       }
     });
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
@@ -451,6 +456,10 @@ CheckoutModal.prototype = {
   },
 
   successHandler: function(response){
+    if(!this.rzp){
+      return;
+    }
+    this.rzp = null;
     // prevent dismiss event
     this.modal.options.onhide = null;
 
@@ -462,9 +471,10 @@ CheckoutModal.prototype = {
   },
 
   errorHandler: function(response){
-    if(!this.modal || !response){
+    if(!this.rzp || !response){
       return;
     }
+    this.rzp = null;
     var message;
     this.shake();
     this.modal.options.backdropClose = this.message.options.modal.backdropClose;
@@ -487,16 +497,13 @@ CheckoutModal.prototype = {
           if(help){
             $(help).html(message);
           }
-          frontDrop();
+          this.hideErrorMessage();
           return;
         }
       }
     }
 
-    frontDrop(
-      message || 'There was an error in handling your request',
-      'shown'
-    );
+    showErrorMessage(message || 'There was an error in handling your request');
     $('#fd-hide').focus();
   },
 
@@ -527,12 +534,11 @@ CheckoutModal.prototype = {
       this.modal.options.backdropClose = false;
     }
 
-    frontDrop('Please wait while your payment is processed...', 'shown loading');
+    showLoadingMessage('Please wait while your payment is processed...');
 
     // TODO
-    Razorpay.payment.authorize({
-      postmessage: false,
-      options: options,
+    this.rzp = Razorpay(this.message.options);
+    this.rzp.authorizePayment({
       data: data,
       error: bind(this.errorHandler, this),
       success: bind(this.successHandler, this)
@@ -541,8 +547,11 @@ CheckoutModal.prototype = {
 
   close: function(){
     if(this.isOpen){
+      if(this.rzp){
+        this.rzp.cancelPayment();
+        this.rzp = null;
+      }
       this.hide();
-      Razorpay.payment.cancel();
       this.isOpen = false;
       clearTimeout(fontTimeout);
       each(

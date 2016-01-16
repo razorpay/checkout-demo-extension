@@ -1,5 +1,5 @@
 var templates = {};
-var popupRequest, cookieInterval, communicator;
+var cookieInterval, communicator;
 
 function clearCookieInterval(){
   if(cookieInterval){
@@ -97,10 +97,6 @@ function createPopup(data, url, options) {
     popup.cc = true;
   }
 
-  popup.onClose = function(){
-    Razorpay.payment.cancel();
-  }
-
   return popup;
 }
 
@@ -109,17 +105,18 @@ function writePopup(popup, templateVars){
   popup.window.document.close();
 }
 
-function clearRequest(){
+function clearRequest(rzp){
+  var request = rzp._request;
   try{
-    if(popupRequest.popup){
-      popupRequest.popup.onClose = null;
-      popupRequest.popup.close();
+    if(request.popup){
+      request.popup.onClose = null;
+      request.popup.close();
     }
   } catch(e){
     roll('error closing popup: ' + e.message, null, 'warn');
   }
 
-  popupRequest = null;
+  this._request = null;
   $.removeMessageListener();
   clearCookieInterval();
 }
@@ -150,25 +147,26 @@ function formatRequest(request){
 }
 
 function onMessage(e){
+  var request = this._request;
   if(e.origin) {
     if (
-      (!popupRequest.popup || e.source !== popupRequest.popup.window && e.source !== communicator.contentWindow) ||
+      (!request.popup || e.source !== request.popup.window && e.source !== communicator.contentWindow) ||
       discreet.makeUrl().indexOf(e.origin)
     ){
       return roll('message received from origin', e.origin, 'info');
     }
-    onComplete(e.data);
+    onComplete.call(this, e.data);
   }
 }
 
-function onComplete(data, request){
-  if(!request){
-    request = popupRequest;
-  }
+function onComplete(data){
+  // this === rzp
+  var request = this._request;
 
   if(!request || !data) { return }
 
-  clearRequest();
+  clearRequest(this);
+
   try {
     if(typeof data !== 'object') {
       data = JSON.parse(data);
@@ -224,63 +222,55 @@ function setupAjax(request){
   })
 }
 
+Razorpay.prototype.authorizePayment = function(request){
+  var error = formatRequest(request);
+  if(error){
+    return error;
+  }
+  var rdata = request.data;
+  var options = this.options;
+
+  var url = discreet.makeUrl() + 'payments/create/checkout';
+
+  if(options.redirect()){
+    discreet.nextRequestRedirect({
+      url: url,
+      content: rdata,
+      method: 'post'
+    });
+    return false;
+  }
+
+  var name;
+  request.popup = createPopup(rdata, url, options);
+
+  if(!request.popup){
+    name = '_blank'
+  } else if(request.popup.cc){
+    name = request.popup.name;
+  }
+
+  request.popup.onClose = bind(this.cancelPayment, this);
+
+  if(name){
+    submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
+    setupAjax(request);
+  }
+
+  request.listener = $(window).on('message', onMessage, null, this);
+
+  if(discreet.isFrame){
+    cookiePoll();
+  }
+
+  this._request = request;
+}
+
+Razorpay.prototype.cancelPayment = function(errorObj){
+  onComplete.call(this, errorObj || {error:{description:'Payment cancelled'}});
+}
+
 Razorpay.payment = {
-
-  cancel: function(errorObj){
-    onComplete(errorObj || {error:{description:'Payment cancelled'}});
-  },
-
-  authorize: function(request){
-    var error = formatRequest(request);
-    if(error){
-      return error;
-    }
-    var rdata = request.data;
-    var options = request.options;
-
-    var url = discreet.makeUrl() + 'payments/create/checkout';
-
-    if(options.redirect()){
-      discreet.nextRequestRedirect({
-        url: url,
-        content: rdata,
-        method: 'post'
-      });
-      return false;
-    }
-
-    var trackingPayload = {};
-    each(
-      ['key_id', 'amount', 'email', 'contact', 'method', 'bank', 'wallet', 'card[name]'],
-      function(i, field){
-        if(field in rdata){
-          trackingPayload[field] = rdata[field];
-        }
-      }
-    )
-    // track('submit', trackingPayload);
-
-    var name;
-    request.popup = createPopup(rdata, url, options);
-    if(!request.popup){
-      name = '_blank'
-    } else if(request.popup.cc){
-      name = request.popup.name;
-    }
-
-    if(name){
-      submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
-      setupAjax(request);
-    }
-    $.addMessageListener(onMessage, request);
-
-    if(discreet.isFrame){
-      cookiePoll();
-    }
-
-    popupRequest = request;
-  },
-
   validate: function(data){
     var errors = [];
 
