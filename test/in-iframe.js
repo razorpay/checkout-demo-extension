@@ -13,14 +13,20 @@ function expectVisibleTab(tab){
   }
 }
 
+function clearSession(){
+  var session = getSession();
+  if(session){
+    session.close();
+    delete sessions[_uid];
+  }
+}
+
 function openCheckoutForm(options, data){
-  jQuery('#container').remove();
-  _$el = _modal = null;
+  clearSession();
   handleMessage({
-    event: 'open',
     options: options,
     data: data
-  });
+  })
 }
 
 var coOptions = {
@@ -122,7 +128,7 @@ describe("payment authorization", function(){
 
 
     it("display default error discription", function(){
-      frameDiscreet.errorHandler(response);
+      getSession().errorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(jQuery('#fd-t').html().length > 0).toBe(true);
     })
@@ -130,7 +136,7 @@ describe("payment authorization", function(){
     it("display custom error description", function(){
       var str = 'hello error';
       response.error.description = str;
-      frameDiscreet.errorHandler(response);
+      getSession().errorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(jQuery('#fd-t').html()).toBe(str);
     })
@@ -138,7 +144,7 @@ describe("payment authorization", function(){
     it("focus related field and apply invalid", function(){
       var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
       response.error.field = field_el.prop('name');
-      frameDiscreet.errorHandler(response);
+      getSession().errorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(field_el[0]).toBe(document.activeElement);
       expect(field_el.parent().hasClass('invalid')).toBe(true);
@@ -148,8 +154,9 @@ describe("payment authorization", function(){
   it("success handler should hide form", function(){
     openCheckoutForm(opts);
     var spy = jasmine.createSpy();
-    spyOn(frameDiscreet, 'hide').and.callFake(spy);
-    frameDiscreet.successHandler();
+    var session = getSession();
+    spyOn(session, 'hide').and.callFake(spy);
+    session.successHandler();
     expect(spy).toHaveBeenCalled();
   })
 })
@@ -426,7 +433,7 @@ describe("Razorpay card tab submit", function(){
         addAllCC();
         spyCalled();
 
-        data = frameDiscreet.getFormData(jQuery('#modal form'), true);
+        data = getFormData(jQuery('#modal form'), true);
       });
 
       it("should return contact", function(){
@@ -471,6 +478,7 @@ describe("Razorpay open netbanking page and submit method", function(){
   var $nbBank, $nbSubmit;
 
   var launch = function(operation){
+    clearSession();
     operation(opts);
     openCheckoutForm(opts);
     $nbBank = jQuery('select[name="bank"]');
@@ -487,8 +495,6 @@ describe("Razorpay open netbanking page and submit method", function(){
     sendclick(jQuery('#submitbtn')[0]);
     expect(spyCalled).toHaveBeenCalled();
     expect(spyNotCalled).not.toHaveBeenCalled();
-    frameDiscreet.hide();
-    jQuery('#container').remove();
   });
 
   [
@@ -569,7 +575,7 @@ describe("Razorpay netbanking getFormData method", function(){
       openCheckoutForm(opts);
       sendclick(jQuery('#tabs li[data-target="tab-netbanking"]')[0]);
       jQuery('select[name="bank"]').val('SBIN');
-      data = frameDiscreet.getFormData();
+      data = getFormData();
     });
 
     describe("", function(){
@@ -662,6 +668,7 @@ describe("handleMessage should", function(){
   beforeEach(function(){
     spyCalled = jasmine.createSpy();
     spyNotCalled = jasmine.createSpy();
+    clearSession();
   })
 
   afterEach(function(){
@@ -700,12 +707,11 @@ describe('existing query params should', function(){
     qpmap = {};
   })
 
-  it('set error', function(done){
+  it('set error', function(){
     frameDiscreet.setQueryParams('error.description=asd');
     openCheckoutForm(coOptions);
-    spyOn(frameDiscreet, 'errorHandler').and.callFake(function(response){
+    spyOn(getSession(), 'errorHandler').and.callFake(function(response){
       expect(response.error.description).toBe('asd');
-      done();
     })
   })
 
@@ -735,36 +741,28 @@ describe('close button should close modal', function(){
     var spy2 = jasmine.createSpy();
     openCheckoutForm(coOptions);
     spyOn(Razorpay.payment, 'cancel').and.callFake(spy);
-    spyOn(_modal, 'hide').and.callFake(spy2);
+    spyOn(getSession().modal, 'hide').and.callFake(spy2);
     sendclick(jQuery('#modal-close')[0]);
     expect(spy).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();
   })
 })
 
-describe('handleMessage should invoke dataHandler if initial data is passed as', function(){
+describe('handleMessage should invoke fillData if initial data is passed as', function(){
   var spy, data, shouldCall;
 
   afterEach(function(){
     spy = jasmine.createSpy();
-    spyOn(frameDiscreet, 'dataHandler').and.callFake(spy);
+    spyOn(CheckoutModal.prototype, 'fillData').and.callFake(spy);
     openCheckoutForm(coOptions, data);
     var expectation = expect(spy);
-    if(!shouldCall)
-      expectation = expectation.not
     expectation.toHaveBeenCalled();
   })
 
-  it('nothing', noop);
-  it('invalid json string', function(){
-    data = "asdaff";
-  })
   it('object', function(){
-    shouldCall = true;
     data = {};
   })
   it('valid json string', function(){
-    shouldCall = true;
     data = '{}';
   })
 })

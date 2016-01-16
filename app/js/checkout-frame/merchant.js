@@ -243,7 +243,9 @@ var frameDiscreet = {
   configureRollbar: function(message){
     if(Rollbar){
       invoke(
-        Rollbar.configure, {
+        Rollbar.configure,
+        Rollbar,
+        {
           payload: {
             person: {
               id: _uid
@@ -312,11 +314,11 @@ window.handleMessage = function(message) {
     }
   }
 
-  var session = getSession();
 
   if ( message.event === 'open' || message.options ) {
     frameDiscreet.showModal(message);
 
+    var session = getSession();
     if(CheckoutBridge){
       discreet.context = qpmap.platform || 'app';
       track.call(session, 'init', message.options);
@@ -328,7 +330,7 @@ window.handleMessage = function(message) {
   }
 
   else if ( message.event === 'close' ) {
-    session.hide();
+    getSession().close();
   }
 }
 

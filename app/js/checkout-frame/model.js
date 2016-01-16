@@ -95,10 +95,10 @@ function formatMessage(message){
 }
 
 function validateCardNumber(el){
-  if(!(el instanceof Element)){
-    el = el.target;
-  }
   if(el){
+    if(!(el instanceof Element)){
+      el = el.target;
+    }
     $(el.parentNode)[Card.validateCardNumber(el.value, el.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
   }
 }
@@ -208,7 +208,7 @@ CheckoutModal.prototype = {
   fillData: function(data){
 
     if(data.method){
-      this.changeTab({target: $('#method-' + data.method + '-tab')[0]});
+      this.switchTab($('#method-' + data.method + '-tab'));
     }
 
     if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
@@ -238,6 +238,13 @@ CheckoutModal.prototype = {
   },
 
   render: function(message){
+    if(this.isOpen){
+      this.close();
+    }
+    else {
+      this.isOpen = true;
+    }
+
     this.message = message;
     formatMessage(message);
     sanitize(message);
@@ -333,12 +340,6 @@ CheckoutModal.prototype = {
       }
     });
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
-  },
-
-  close: function(){
-    // TODO this.cancelPayment
-    Razorpay.payment.cancel();
-    this.modal.hide();
   },
 
   setCardFormatting: function(){
@@ -457,7 +458,7 @@ CheckoutModal.prototype = {
     if(isCriOS) {
       setCookie('onComplete', JSON.stringify(response));
     }
-    this.hide();
+    this.close();
   },
 
   errorHandler: function(response){
@@ -538,27 +539,34 @@ CheckoutModal.prototype = {
     });
   },
 
+  close: function(){
+    if(this.isOpen){
+      this.hide();
+      Razorpay.payment.cancel();
+      this.isOpen = false;
+      clearTimeout(fontTimeout);
+      each(
+        this.listeners,
+        function(i, listener){
+          listener[0].off(listener[1], listener[2], listener[3]);
+        }
+      )
+      this.listeners = [];
+
+      this.modal.destroy();
+      this.smarty.off();
+      this.card.unbind();
+      $(this.el).remove();
+
+      this.modal = null;
+      this.smarty = null;
+      this.card = null;
+      this.el = null;
+    }
+  },
+
   saveAndClose: function(){
-    clearTimeout(fontTimeout);
-
     this.message.data = getFormData();
-
-    each(
-      this.listeners,
-      function(i, listener){
-        listener[0].off(listener[1], listener[2], listener[3]);
-      }
-    )
-    this.listeners = [];
-
-    this.modal.destroy();
-    this.smarty.off();
-    this.card.unbind();
-    $(this.el).remove();
-
-    this.modal = null;
-    this.smarty = null;
-    this.card = null;
-    this.el = null;
+    this.close();
   }
 }
