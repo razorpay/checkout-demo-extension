@@ -30,10 +30,16 @@ Razorpay.defaults = {
   'key': '',
   'amount': '',
   'currency': 'INR',
-  'handler': noop,
+  'handler': function(data){
+    if(this.callback_url){
+      submitForm(this.callback_url, data, 'post');
+    }
+  },
   'notes': {},
   'callback_url': '',
-  'redirect': false,
+  'redirect': function(){
+    return this.callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)
+  },
   'description': '',
 
   // automatic checkout only

@@ -117,6 +117,10 @@ function base_configure(overrides){
       options.notes[key] = val;
     }
   })
+  if( typeof overrides.redirect === 'boolean' ) {
+    var redirectValue = overrides.redirect;
+    options.redirect = function(){return redirectValue};
+  }
   try {
     if( typeof overrides.method.wallet === 'boolean' ) {
       options.method.wallet = overrides.method.wallet;
@@ -158,20 +162,6 @@ var discreet = {
     if(window !== window.parent){
       invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
     }
-    if(data.method === 'get'){
-      location.href = data.url;
-    } else if (data.method === 'post' && typeof data.content === 'object'){
-      var postForm = document.createElement('form');
-      var html = '';
-
-      each( data.content, function(name, value) {
-        html += '<input type="hidden" name="' + name + '" value="' + value + '">'
-      })
-      postForm.method='post';
-      postForm.innerHTML = html;
-      postForm.action = data.url;
-      document.body.appendChild(postForm);
-      postForm.submit();
-    }
+    submitForm(data.url, data.content, data.method);
   }
 }

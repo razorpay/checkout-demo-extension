@@ -54,24 +54,6 @@ discreet.setCommunicator = function(opts){
 }
 discreet.setCommunicator(Razorpay.defaults);
 
-function submitFormData(action, data, method, target) {
-  var form = document.createElement('form');
-  form.setAttribute('action', action);
-
-  if(method){ form.setAttribute('method', method) }
-  if(target) { form.setAttribute('target', target) }
-
-  if(data){ form.innerHTML = deserialize(data) }
-
-  document.documentElement.appendChild(form);
-  form.submit();
-  form.parentNode.removeChild(form);
-
-  // if(target && discreet.isFrame){
-  //   cookiePoll();
-  // }
-}
-
 function cookiePoll(){
   deleteCookie('onComplete');
 
@@ -258,7 +240,7 @@ Razorpay.payment = {
 
     var url = discreet.makeUrl() + 'payments/create/checkout';
 
-    if(options.redirect || options.callback_url){
+    if(options.redirect()){
       discreet.nextRequestRedirect({
         url: url,
         content: rdata,
@@ -287,7 +269,7 @@ Razorpay.payment = {
     }
 
     if(name){
-      submitFormData(discreet.makeUrl(true) + 'processing.php', null, null, name);
+      submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
       setupAjax(request);
     }
     $.addMessageListener(onMessage, request);
