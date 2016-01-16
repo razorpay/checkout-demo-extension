@@ -65,7 +65,7 @@ var optionValidations = {
 
   display_currency: function(currency){
     if(currency !== 'USD' && currency !== Razorpay.defaults.display_currency){
-      return 'Only USD is supported'
+      return 'Only USD is supported';
     }
   },
 
@@ -73,6 +73,12 @@ var optionValidations = {
     amount = String(amount).replace(/([^0-9\. ])/g,'');
     if(!amount && amount !== Razorpay.defaults.display_amount){
       return '';
+    }
+  },
+
+  parent: function(parent){
+    if(!(parent instanceof Element || typeof parent === 'string' || parent === Razorpay.defaults.parent)){
+      return 'Invalid parent';
     }
   }
 }
@@ -127,6 +133,10 @@ function base_configure(overrides){
     }
   } catch(e){}
 
+  if(overrides.parent){
+    options.parent = overrides.parent;
+  }
+
   discreet.setCommunicator(options);
   return options;
 }
@@ -140,6 +150,10 @@ Razorpay.prototype.configure = function(overrides){
     this.modal = {options: {}};
     var trackingPayload = $.clone(overrides);
     track.call( this, 'init', trackingPayload );
+
+    if(this.options.parent){
+      this.open();
+    }
   }
 };
 

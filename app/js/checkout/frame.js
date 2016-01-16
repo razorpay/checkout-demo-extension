@@ -86,6 +86,12 @@ function makeCheckoutUrl(options){
 
 function makeCheckoutMessage(rzp){
   var options = {};
+  var response = {
+    context: location.href,
+    options: options,
+    config: RazorpayConfig,
+    id: rzp.id
+  }
 
   each(
     rzp.options, function(i, value){
@@ -97,6 +103,12 @@ function makeCheckoutMessage(rzp){
   for(var i in rzp.modal.options){
     rzp.options.modal[i] = rzp.modal.options[i];
   }
+
+  if(options.parent){
+    delete options.parent;
+    response.embedded = true;
+  }
+
   sanitizeImage(options);
 
   if(isCriOS){
@@ -105,14 +117,6 @@ function makeCheckoutMessage(rzp){
       options.image = '';
     }
   }
-
-  var response = {
-    context: location.href,
-    options: options,
-    config: RazorpayConfig,
-    id: rzp.id
-  }
-
   return response;
 }
 
@@ -166,6 +170,7 @@ CheckoutFrame.prototype = {
     })
 
     if(parent){
+      this.embedded = true;
       this.afterClose = noop;
     }
     else {
