@@ -301,6 +301,9 @@ Razorpay.sendMessage = function(message){
   }
 }
 window.handleMessage = function(message) {
+  if(message.embedded){
+    $(doc).addClass('embedded');
+  }
   if(message.config){
     RazorpayConfig = message.config;
   }

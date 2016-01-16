@@ -170,6 +170,7 @@ CheckoutFrame.prototype = {
     })
 
     if(parent){
+      this.el.removeAttribute('style');
       this.embedded = true;
       this.afterClose = noop;
     }
