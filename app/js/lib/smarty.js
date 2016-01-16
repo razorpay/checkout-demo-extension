@@ -36,13 +36,17 @@
         useCapture,
         this
       );
-      this.listeners.push(eventName, listenerRef, useCapture);
+      this.listeners.push([eventName, listenerRef, useCapture]);
     },
 
     off: function(){
-      each( this.listeners, function(i, listener){
-        this.parent.off(listener[0], listener[1], listener[2]);
-      })
+      each(
+        this.listeners,
+        function(i, listener){
+          this.parent.off(listener[0], listener[1], listener[2]);
+        },
+        this
+      )
     },
 
     common_events: function(){

@@ -102,7 +102,7 @@
     on: function(event, target, callback){
       var $target = $(target)
       var attachedListener = $target.on(event, callback, false, this);
-      this.listeners.push($target, event, attachedListener);
+      this.listeners.push([$target, event, attachedListener]);
     },
 
     steal_focus: function(e) {

@@ -119,7 +119,7 @@ function getFormFields(containerID, returnObj) {
       if(el.getAttribute('type') === 'radio' && !el.checked) {
         return;
       }
-      if(!el.disabled && el.value.length) {
+      if(!el.disabled) {
         returnObj[el.name] = el.value;
       }
     }
@@ -551,7 +551,7 @@ CheckoutModal.prototype = {
     )
     this.listeners = [];
 
-    this.modal.close();
+    this.modal.destroy();
     this.smarty.off();
     this.card.unbind();
     $(this.el).remove();
