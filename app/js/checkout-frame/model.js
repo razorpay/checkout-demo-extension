@@ -251,12 +251,12 @@ CheckoutModal.prototype = {
 
   renderCss: function(){
     var div = this.el;
-    var col = this.message.options.theme.color;
+    var theme = this.message.options.theme;
     var style = document.createElement('style');
     try{
-      div.style.color = col;
+      div.style.color = theme.color;
       if(div.style.color){
-        var rules = templates.theme(col);
+        var rules = templates.theme(theme);
         if (style.styleSheet) {
           style.styleSheet.cssText = rules;
         } else {
