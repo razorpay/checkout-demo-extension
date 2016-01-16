@@ -162,6 +162,9 @@ Razorpay.configure = function(overrides) {
 }
 
 var discreet = {
+  isBase64Image: function(image){
+    return /data:image\/[^;]+;base64/.test(image);
+  },
   medium: 'web',
   context: location.href.replace(/^https?:\/\//,''),
   setCommunicator: noop,

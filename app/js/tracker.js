@@ -90,17 +90,13 @@ var _uid = generateUID();
 
 function track(event, props) {
   var id = this.id;
-  if(id && /^rzp_live/.test(this.options.key)){
+  if(true || id && /^rzp_live/.test(this.options.key)){
     setTimeout(function(){
       var data = {
         id: _uid
       };
-
-      if(typeof props === 'object') {
-        data.data = props;
-      }
-
       if(event === 'init'){
+        props = formInitProps(props);
         data.medium = discreet.medium;
         data.context = discreet.context;
         data.ip = '${keen.ip}';
@@ -113,16 +109,13 @@ function track(event, props) {
                 ip : 'ip'
               },
               output : 'ip_info'
-            },
-            {
-              name : 'keen:ua_parser',
-              input : {
-                ua_string : 'ua'
-              },
-              output : 'ua_info'
             }
           ]
         }
+      }
+
+      if(typeof props === 'object') {
+        data.data = props;
       }
 
       var xhr = new XMLHttpRequest();
@@ -135,4 +128,24 @@ function track(event, props) {
       xhr.send(JSON.stringify(data));
     })
   }
+}
+
+function formInitProps(overrides){
+  var props = {};
+
+  props.key = overrides.key || '';
+  delete overrides.key;
+
+  props.amount = parseInt(overrides.amount) || 0;
+  delete overrides.amount;
+
+  props.notes = overrides.notes &&  JSON.stringify(overrides.notes) || '';
+  delete props.notes;
+
+  if(discreet.isBase64Image(overrides.image)){
+    overrides.image = 'base64';
+  }
+
+  props.options = JSON.stringify(overrides);
+  return props;
 }
