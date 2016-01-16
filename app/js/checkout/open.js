@@ -167,6 +167,7 @@ Razorpay.prototype.open = function() {
 
   if(!frame.el.contentWindow){
     frame.close();
+    frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
 };

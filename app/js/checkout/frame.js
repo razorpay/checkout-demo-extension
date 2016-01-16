@@ -142,14 +142,6 @@ CheckoutFrame.prototype = {
     return this.el;
   },
 
-  unrzp: function(){
-
-  },
-
-  destroy: function(){
-    this.unbind();
-  },
-
   openRzp: function(rzp){
     this.bind();
     var parent = rzp.options.parent;
@@ -161,9 +153,6 @@ CheckoutFrame.prototype = {
 
       if(!this.rzp){
         $parent.append(this.el);
-      }
-      else {
-        this.unrzp();
       }
 
       this.rzp = rzp;
@@ -190,27 +179,26 @@ CheckoutFrame.prototype = {
     setBackdropColor('');
     restoreMeta(this.$meta);
     restoreOverflow();
-    this.unbind();
   },
 
   bind: function(){
     if(!this.listeners){
       this.listeners = {};
-      var eventPair = { message: this.onmessage };
+      var eventPairs = { message: this.onmessage };
 
       if(shouldFixFixed){
-        eventPair.orientationchange = merchantMarkup.orientationchange;
-        eventPair.scroll = merchantMarkup.scroll;
+        eventPairs.orientationchange = merchantMarkup.orientationchange;
+        eventPairs.scroll = merchantMarkup.scroll;
       }
 
       if(isCriOS){
-        eventPair.unload = function(){
+        eventPairs.unload = function(){
           this.el.contentWindow.close();
         }
       }
 
       each(
-        eventPair,
+        eventPairs,
         function(event, listener){
           this.listeners[event] = $(window).on(event, listener, null, this);
         },
@@ -222,8 +210,8 @@ CheckoutFrame.prototype = {
   unbind: function(){
     each(
       this.listeners,
-      function(eventPair){
-        $(window).off(eventPair[0], eventPair[1]);
+      function(event, listener){
+        $(window).off(event, listener);
       }
     )
     this.listeners = null;
@@ -336,5 +324,6 @@ CheckoutFrame.prototype = {
 
   afterClose: function(){
     frameContainer.style.display = 'none';
+    this.unbind();
   }
 }
