@@ -236,7 +236,7 @@
     }
   };
 
-  var card = root.Card = function(){
+  var Card = root.Card = function(){
     this.listeners = [];
   }
 
@@ -272,7 +272,7 @@
     return false;
   }
 
-  card.prototype = {
+  Card.prototype = {
     bind: function(el, eventListeners){
       if( !el ) { return }
       var $el = $(el);

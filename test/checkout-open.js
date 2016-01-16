@@ -314,14 +314,15 @@ describe("automatic checkout:", function(){
   it("submit handler should submit with all fields", function(){
     var spy = jasmine.createSpy();
     
-    currentScript.parentNode.submit = function(){
+    currentScript.parentNode.submit = noop;
+    spyOn(currentScript.parentNode, 'submit').and.callFake(function(){
       var payload = [];
-      jQuery(this).children('input[name]').each(function(index, el){
+      jQuery(this).find('div:last-child > input[name]').each(function(index, el){
         payload.push(el.name + '=' + el.value);
       }).remove();
       expect(payload.join('&')).toBe('key1=value1&key2=value2&nested[hello]=2&nested[world]=5');
       spy();
-    };
+    });
 
     var postData = {
       key1: 'value1',
@@ -374,9 +375,17 @@ describe("automatic checkout:", function(){
   describe("addAutoCheckoutButton method: ", function(){
     var init_options = jQuery.extend(true, {}, options);
     init_options.buttontext = 'Dont pay';
-    var rzp = new Razorpay(init_options);
-    var parent = currentScript.parentNode;
-    addAutoCheckoutButton(rzp);
+    var parent, rzp;
+
+    beforeEach(function(){
+      rzp = Razorpay(init_options);
+      parent = currentScript.parentNode;
+      addAutoCheckoutButton(rzp);
+    })
+
+    afterEach(function(){
+      jQuery('.razorpay-payment-button').remove();
+    })
     
     it("onsubmit should be attached on parent element", function(){
       expect(typeof parent.onsubmit).toBe('function');
@@ -390,29 +399,14 @@ describe("automatic checkout:", function(){
     })
 
     it("should open checkout form on submit if not already", function(){
-      isOpen = false;
-
-      var spy = jasmine.createSpy();
-      var spy2 = jasmine.createSpy();
+      var spy = jasmine.createSpy('open');
+      var spy2 = jasmine.createSpy('prevent');
       
       spyOn(rzp, 'open').and.callFake(spy);
       parent.onsubmit({preventDefault: spy2});
       
-      expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-    })
-
-    it("shouldn't do default action if form is open", function(){
-      isOpen = true;
-
-      var spy = jasmine.createSpy();
-      var spy2 = jasmine.createSpy();
-      
-      spyOn(rzp, 'open').and.callFake(spy);
-      parent.onsubmit({preventDefault: spy2});
-      
-      expect(spy).not.toHaveBeenCalled();
-      expect(spy2).not.toHaveBeenCalled();
+      expect(spy).toHaveBeenCalled();
     })
   })
 

@@ -1,3 +1,4 @@
+var Card = window.Card;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
@@ -248,8 +249,8 @@ CheckoutModal.prototype = {
     sanitize(message);
     this.getEl();
     this.fillData(message.data);
-    if(!this.modal) { this.modal = new Modal(this.el, message.options.modal) }
-    if(!this.smarty) { this.smarty = new Smarty(this.el) }
+    if(!this.modal) { this.modal = new window.Modal(this.el, message.options.modal) }
+    if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting()
     this.bindEvents();
   },

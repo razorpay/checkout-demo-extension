@@ -95,8 +95,10 @@ function processMessage(message) {
   frameDiscreet.setMethods(window.payment_methods, opts.method);
 }
 
-function addEMI(){
-  return;
+function addEMI(opts){
+  if(true){
+    return;
+  }
   if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
     $('#emi-wrap').html(templates.emi());
     $('#emi-close').on('click', frontDrop);
@@ -224,7 +226,7 @@ var frameDiscreet = {
 
     session.errorHandler(qpmap.error);
     session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
-    addEMI();
+    addEMI(message.options);
   },
 
   // toggle_nocvv: function(){

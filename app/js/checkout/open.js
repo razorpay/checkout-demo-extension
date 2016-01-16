@@ -20,7 +20,10 @@ if(isCriOS){
 */
 var defaultAutoPostHandler = function(data){
   var RazorPayForm = currentScript.parentNode;
-  RazorPayForm.innerHTML += deserialize(data);
+  var div = document.createElement('div');
+  div.innerHTML = deserialize(data);
+  RazorPayForm.appendChild(div);
+  RazorPayForm.onsubmit = noop;
   RazorPayForm.submit();
 }
 
@@ -51,15 +54,12 @@ var parseScriptOptions = function(options){
 
 var addAutoCheckoutButton = function(rzp){
   var button = document.createElement('input');
-  var form = currentScript.parentNode;
+  var form = currentScript.parentElement;
   button.type = 'submit';
   button.value = rzp.options.buttontext;
   button.className = 'razorpay-payment-button';
   form.appendChild(button);
   form.onsubmit = function(e){
-    if(isOpen){
-      return;
-    }
     e.preventDefault();
     rzp.open();
     return false;

@@ -11,7 +11,7 @@ var merchantMarkup = {
 
   // scroll manually in iPhone
   scroll: function(){
-    if(!isOpen || typeof window.pageYOffset !== 'number'){
+    if(!this.isOpen || typeof window.pageYOffset !== 'number'){
       return;
     }
 
