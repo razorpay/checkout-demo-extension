@@ -72,13 +72,11 @@ var addAutoCheckoutButton = function(rzp){
 */
 function initAutomaticCheckout(){
   var opts = {};
-  var preload = false;
   each(
     currentScript.attributes,
     function(i, attr){
       var name = attr.name
       if(/^data-/.test(name)){
-        preload = true;
         name = name.replace(/^data-/,'');
         opts[name] = attr.value;
       }
@@ -91,9 +89,6 @@ function initAutomaticCheckout(){
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
-  }
-  else if(preload){
-    Razorpay.configure(opts);
   }
 }
 
@@ -149,8 +144,18 @@ function createFrameBackdrop(){
   return backdrop;
 }
 
+function createPreloadedFrame(){
+  if(!isCriOS){
+    var preloadedFrame = new CheckoutFrame();
+    preloadedFrame.bind();
+    frameContainer.appendChild(preloadedFrame.el);
+    return preloadedFrame
+  }
+}
+
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
+var preloadedFrame = createPreloadedFrame();
 
 function setBackdropColor(value){
   // setting unsupported value throws error in IE
@@ -158,11 +163,12 @@ function setBackdropColor(value){
   catch(e){}
 }
 
+function createNewCheckoutFrame(){
+  return preloadedFrame || new CheckoutFrame();
+}
+
 Razorpay.prototype.open = function() {
-  if(!this.checkoutFrame){
-    this.checkoutFrame = new CheckoutFrame();
-  }
-  var frame = this.checkoutFrame;
+  var frame = this.checkoutFrame = createNewCheckoutFrame();
   frame.openRzp(this);
 
   if(!frame.el.contentWindow){
