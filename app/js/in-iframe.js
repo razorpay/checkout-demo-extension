@@ -67,7 +67,7 @@ function addModalDOM(opts){
     if(div.style.color){
       var style = document.createElement('style');
       document.body.appendChild(style);
-      var rules = templates.theme(opts.theme.color);
+      var rules = templates.theme(opts.theme);
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {

@@ -1,15 +1,20 @@
 button{
-  background: {{=it}};
+  background: {{=it.color}};
 }
 #tab-bar{
-  background: {{=it}};
+  background: {{=it.color}};
 }
 .radio-label:hover, input[type=radio]:checked + label{
-  border-color: {{=it}};
+  border-color: {{=it.color}};
 }
 #tab-wallet input:checked+label:after{
-  color: {{=it}};
+  color: {{=it.color}};
 }
 .ip #tabs li.active{
-  border-color: {{=it}};
+  border-color: {{=it.color}};
+}
+.merchant-image{
+  width: {{=(72-it.imagePadding)}}px;
+  height: {{=(72-it.imagePadding)}}px;
+  padding: {{=it.imagePadding}}px;
 }

@@ -65,7 +65,8 @@ Razorpay.defaults = {
     'backdropClose': false
   },
   'theme': {
-    'color': '#00BCD4'
+    'color': '#00BCD4',
+    'imagePadding': 12
   },
   'signature': '',
   'name': '', // of merchant
