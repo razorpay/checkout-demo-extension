@@ -116,8 +116,8 @@ function clearRequest(rzp){
     roll('error closing popup: ' + e.message, null, 'warn');
   }
 
-  this._request = null;
-  $.removeMessageListener();
+  $(window).off('message', rzp._request.listener);
+  rzp._request = null;
   clearCookieInterval();
 }
 
@@ -223,12 +223,12 @@ function setupAjax(request){
 }
 
 Razorpay.prototype.authorizePayment = function(request){
+  var options = request.options = this.options;
   var error = formatRequest(request);
   if(error){
     return error;
   }
   var rdata = request.data;
-  var options = this.options;
 
   var url = discreet.makeUrl() + 'payments/create/checkout';
 

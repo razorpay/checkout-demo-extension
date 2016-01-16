@@ -160,7 +160,7 @@ var discreet = {
 
   nextRequestRedirect: function(data){
     if(window !== window.parent){
-      invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
+      return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
     }
     submitForm(data.url, data.content, data.method);
   }

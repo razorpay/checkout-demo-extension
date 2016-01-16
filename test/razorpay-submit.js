@@ -61,11 +61,12 @@ describe('Razorpay.payment.validate should', function(){
 
 
 describe('authorize should', function(){
-  var init_options, rzp, req;
+  var rzp, init_options, req;
 
   beforeEach(function(){
-    Razorpay.payment.cancel();
-    popupRequest = null;
+    if(rzp){
+      rzp.cancelPayment();
+    }
     req = jQuery.extend(true, {}, request);
   });
 
@@ -76,11 +77,15 @@ describe('authorize should', function(){
     describe('', function(){
       var spy, data;
       beforeEach(function(){
+        rzp = Razorpay({
+          key: 'key',
+          amount: 100
+        })
         var spy = jasmine.createSpy();
         spyOn(window, 'err').and.callFake(spy);
       })
       afterEach(function(){
-        Razorpay.payment.authorize(data);
+        rzp.authorizePayment(data);
         expect(spy).toHaveBeenCalled();
       })
       it('', function(){
@@ -97,44 +102,63 @@ describe('authorize should', function(){
 
   it('submit html post form if redirect flag is passed', function(){
     var spyCalled = jasmine.createSpy();
-    HTMLFormElement.prototype.submit = spyCalled;
+    spyOn(discreet, 'nextRequestRedirect').and.callFake(spyCalled);
 
-    Razorpay.configure({redirect: true});
-    Razorpay.payment.authorize(req);
-
+    rzp = Razorpay({
+      redirect: true,
+      key: 'key',
+      amount: 100
+    })
+    rzp.authorizePayment(req);
     expect(spyCalled).toHaveBeenCalled();
-    Razorpay.configure({redirect: false});
   });
 
   it('add callback_url if specified in options', function(){
-    Razorpay.defaults.callback_url = 'swag';
-    Razorpay.payment.authorize(req);
+    rzp = Razorpay({
+      callback_url: 'swag',
+      key: 'key',
+      amount: 100
+    })
+    rzp.authorizePayment(req);
     expect(req.data.callback_url).toBe('swag');
-    Razorpay.defaults.callback_url = ''; // reset
   })
 
   it('add signature if specified in options', function(){
-    Razorpay.defaults.signature = 'swag';
-    Razorpay.payment.authorize(req);
+    rzp = Razorpay({
+      signature: 'swag',
+      key: 'key',
+      amount: 100
+    })
+    rzp.authorizePayment(req);
     expect(req.data.signature).toBe('swag');
-    Razorpay.defaults.signature = ''; // reset
   })
 
   it('add merchant key in request data', function(){
-    Razorpay.defaults.key = 'swag';
+    rzp = Razorpay({
+      key: 'swag',
+      amount: 100
+    })
     delete req.data.key_id;
-    Razorpay.payment.authorize(req);
-    expect(req.data.key_id).toBe(Razorpay.defaults.key);
+    rzp.authorizePayment(req);
+    expect(req.data.key_id).toBe('swag');
   })
 
   it('setup popup', function(){
-    Razorpay.payment.authorize(req);
+    rzp = Razorpay({
+      key: 'swag',
+      amount: 100
+    })
+    rzp.authorizePayment(req);
     var isPopup = req.popup instanceof Popup;
     expect(isPopup).toBe(true);
   })
 
   it('add options to request object', function(){
-    Razorpay.payment.authorize(req);
+    rzp = Razorpay({
+      key: 'swag',
+      amount: 100
+    })
+    rzp.authorizePayment(req);
     expect(typeof req.options).toBe('object');
   })
 })
@@ -152,15 +176,21 @@ describe('getMethods should', function(){
 })
 
 describe('handleResponse should invoke', function(){
-  var popupRequest, spyCalled, spyNotCalled;
+  var rzp, spyCalled, spyNotCalled;
 
   beforeEach(function(){
     spyCalled = jasmine.createSpy();
     spyNotCalled = jasmine.createSpy();
-    popupRequest = {
-      error: noop,
-      success: noop
-    };
+
+    rzp = Razorpay({
+      key: 'key',
+      amount: 100
+    })
+    rzp.authorizePayment({
+      data: {},
+      success: noop,
+      error: noop
+    })
   })
 
   afterEach(function(){
@@ -169,8 +199,8 @@ describe('handleResponse should invoke', function(){
   })
 
   it('error if response has error', function(done){
-    spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
-    spyOn(popupRequest, 'error').and.callFake(function(data){
+    spyOn(rzp._request, 'success').and.callFake(spyNotCalled);
+    spyOn(rzp._request, 'error').and.callFake(function(data){
       expect(error_data).toBe(data);
       spyCalled();
       done();
@@ -180,24 +210,24 @@ describe('handleResponse should invoke', function(){
         description: 'hello'
       }
     };
-    onComplete(error_data, popupRequest);
+    onComplete.call(rzp, error_data);
   })
 
   it('error if response is invalid', function(done){
-    spyOn(popupRequest, 'success').and.callFake(spyNotCalled);
-    spyOn(popupRequest, 'error').and.callFake(function(data){
+    spyOn(rzp._request, 'success').and.callFake(spyNotCalled);
+    spyOn(rzp._request, 'error').and.callFake(function(data){
       expect(error_data).not.toBe(data);
       expect(typeof data.error.description).toBe('string');
       spyCalled();
       done();
     })
     var error_data = {};
-    onComplete(error_data, popupRequest);
+    onComplete.call(rzp, error_data);
   })
 
   it('success if response contains payment id', function(done){
-    spyOn(popupRequest, 'error').and.callFake(spyNotCalled);
-    spyOn(popupRequest, 'success').and.callFake(function(data){
+    spyOn(rzp._request, 'error').and.callFake(spyNotCalled);
+    spyOn(rzp._request, 'success').and.callFake(function(data){
       expect(success_data).not.toBe(data);
       spyCalled();
       done();
@@ -205,44 +235,36 @@ describe('handleResponse should invoke', function(){
     var success_data = {
       razorpay_payment_id: '12344'
     };
-    onComplete(success_data, popupRequest);
+    onComplete.call(rzp, success_data);
   })
 })
 
 describe('createPopup should', function(){
   var url = 'url';
-  var request2 = JSON.parse(JSON.stringify(request));
-  request2.options = options;
+  var request2;
 
   beforeEach(function(){
-    clearRequest();
+    request2 = JSON.parse(JSON.stringify(request));
+    request2.options = options;
   })
 
   it('submit to new tab for ie mobile', function(){
     oldua = ua;
     ua = 'Windows Phone';
-    expect(createPopup(request2, url)).toBe(null);
+    expect(createPopup(request2.data, url, request2.options)).toBe(null);
     ua = oldua;
   })
 
   it('return popup object', function(){
-    var popup = createPopup(request2, url);
+    var popup = createPopup(request2.data, url, request2.options);
     expect(popup instanceof Popup).toBe(true);
-  })
-
-  it('set popup onClose listener', function(){
-    var popup = createPopup(request2, url);
-    var spy = jasmine.createSpy();
-    spyOn(Razorpay.payment, 'cancel').and.callFake(spy);
-    popup.onClose();
-    expect(spy).toHaveBeenCalled();
   })
 
   it('return null if popup creation fails', function(){
     spyOn(window, 'Popup').and.callFake(function(){
       throw 'fail';
     })
-    expect(createPopup(request2, url)).toBe(null);
+    expect(createPopup(request2.data, url, request2.options)).toBe(null);
   })
 })
 

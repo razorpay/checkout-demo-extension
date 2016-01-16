@@ -72,7 +72,7 @@ describe("in-iframe should have", function(){
   })
 })
 
-describe("init options.method: ", function(){
+describe('init options.method: ', function(){
   var opts, disableTab;
 
   it("hide netbanking if method.netbanking == false", function(){
@@ -94,8 +94,8 @@ describe("init options.method: ", function(){
   })
 })
 
-describe("nextRequestRedirect", function(){
-  it("should postMessage data to parent if inside iframe", function(){
+describe('nextRequestRedirect', function(){
+  it('should postMessage data to parent if inside iframe', function(){
     var parent = window.parent;
     window.parent = {postMessage: jQuery.noop};
 
@@ -112,28 +112,30 @@ describe("nextRequestRedirect", function(){
   })
 })
 
-describe("payment authorization", function(){
+describe('payment authorization', function(){
   var opts;
 
   beforeEach(function(){
     opts = jQuery.extend(true, {}, coOptions);
   })
 
-  describe("error handler should", function(){
+  describe('error handler should', function(){
+    var spy;
     var response = {error: {}};
 
     beforeEach(function(){
       openCheckoutForm(opts);
+      var session = getSession();
+      session.rzp = Razorpay({key: 'key', amount: 100});
     })
 
-
-    it("display default error discription", function(){
+    it('display default error discription', function(){
       getSession().errorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(jQuery('#fd-t').html().length > 0).toBe(true);
     })
 
-    it("display custom error description", function(){
+    it('display custom error description', function(){
       var str = 'hello error';
       response.error.description = str;
       getSession().errorHandler(response);
@@ -141,7 +143,7 @@ describe("payment authorization", function(){
       expect(jQuery('#fd-t').html()).toBe(str);
     })
 
-    it("focus related field and apply invalid", function(){
+    it('focus related field and apply invalid', function(){
       var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
       response.error.field = field_el.prop('name');
       getSession().errorHandler(response);
@@ -151,17 +153,21 @@ describe("payment authorization", function(){
     })
   })
 
-  it("success handler should hide form", function(){
+  it('success handler should hide form', function(){
     openCheckoutForm(opts);
-    var spy = jasmine.createSpy();
+    getSession().rzp = Razorpay({key: 'key', amount: 100})
+
     var session = getSession();
-    spyOn(session, 'hide').and.callFake(spy);
+    var spy = jasmine.createSpy('close');
+
+    spyOn(session, 'close').and.callFake(spy);
+
     session.successHandler();
     expect(spy).toHaveBeenCalled();
   })
 })
 
-describe("init options.method", function(){
+describe('init options.method', function(){
   var opts, disable;
 
   beforeEach(function(){
@@ -196,13 +202,13 @@ describe("init options.method", function(){
     window.payment_methods = orig_methods;
   })
 
-  it("should enable all options by default and show card initially", function(){
+  it('should enable all options by default and show card initially', function(){
     disable = [];
   });
 
   for(var m in window.payment_methods){
     // disable 1 tab, m is disabled one
-    it("should hide " + m + " if specified false", (function(m){
+    it('should hide ' + m + ' if specified false', (function(m){
       return function(){
         var disableVal = m == 'wallet' ? {} : false;
         window.payment_methods[m] = disableVal;
@@ -211,7 +217,7 @@ describe("init options.method", function(){
     })(m))
 
     // disable 2 tabs, m is enabled one
-    it("should hide " + m + " if specified false", (function(m){
+    it('should hide ' + m + ' if specified false', (function(m){
       return function(){
         disable = Object.keys(window.payment_methods);
         disable.splice(disable.indexOf(m), 1);
@@ -225,7 +231,7 @@ describe("init options.method", function(){
 })
 
 // Tests on Credit Card page
-describe("Razorpay card tab", function(){
+describe('Razorpay card tab', function(){
   var $name, $email, $contact;
 
   beforeEach(function(){
@@ -235,7 +241,7 @@ describe("Razorpay card tab", function(){
     $contact = jQuery('.input[name="contact"]');
   });
 
-  it("should load modal and prefill fields", function(){
+  it('should load modal and prefill fields', function(){
     expect(jQuery('#modal')).toBeVisible();
     expect($name.val()).toBe(coOptions.prefill.name);
     expect($email.val()).toBe(coOptions.prefill.email);
@@ -243,7 +249,7 @@ describe("Razorpay card tab", function(){
   });
 });
 
-describe("Razorpay card tab submit", function(){
+describe('Razorpay card tab submit', function(){
   var spyCalled;
   var spyNotCalled;
   var $ccNumber, $ccExpiry, $ccCVV;
@@ -292,55 +298,55 @@ describe("Razorpay card tab submit", function(){
       expect(spyNotCalled).not.toHaveBeenCalled();
     })
 
-    describe("with all details in place", function(){
+    describe('with all details in place', function(){
       var field;
       var value;
 
       afterEach(function(){
         addAllCC();
 
-        spyOn(Razorpay.payment, 'authorize').and.callFake(function(options){
+        spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(options){
           spyCalled();
           expect(options.data[field]).toBe(value);
         });
       });
 
-      it("should submit with all details in place", function(){
+      it('should submit with all details in place', function(){
         launch();
       });
 
-      describe(": in submitted data", function(){
-        it("should pass email", function(){
+      describe(': in submitted data', function(){
+        it('should pass email', function(){
           launch();
           field = 'email';
           value = customOptions.prefill.email;
         });
 
-        it("should pass contact", function(){
+        it('should pass contact', function(){
           launch();
           field = 'contact';
           value = customOptions.prefill.contact;
         });
 
-        it("should pass card[name]", function(){
+        it('should pass card[name]', function(){
           launch();
           field = 'card[name]';
           value = customOptions.prefill.name;
         });
 
-        it("should pass card[number]", function(){
+        it('should pass card[number]', function(){
           launch();
           field = 'card[number]';
           value = cc.number;
         });
 
-        it("should pass card[cvv]", function(){
+        it('should pass card[cvv]', function(){
           launch();
           field = 'card[cvv]';
           value = cc.cvv;
         });
 
-        it("should pass card[expiry_month]", function(){
+        it('should pass card[expiry_month]', function(){
           launch();
           field = 'card[expiry_month]';
           value = cc.expiry_month;
@@ -352,7 +358,7 @@ describe("Razorpay card tab submit", function(){
           value = cc.expiry_year;
         });
 
-        it("should pass notes[address]", function(){
+        it('should pass notes[address]', function(){
           launch();
           field = 'notes[address]';
           value = coOptions.notes.address;
@@ -360,72 +366,72 @@ describe("Razorpay card tab submit", function(){
       })
     })
 
-    it("should not submit without cc card", function(){
+    it('should not submit without cc card', function(){
       launch();
       $ccExpiry.val(cc.expiry);
       $ccCVV.val(cc.cvv);
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
 
-    it("should not submit without cc expiry", function(){
+    it('should not submit without cc expiry', function(){
       launch();
       $ccNumber.sendkeys(cc.number);
       $ccCVV.sendkeys(cc.cvv);
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
 
-    it("should not submit without cc cvv", function(){
+    it('should not submit without cc cvv', function(){
       launch();
       $ccCVV.val('').sendkeys('0');
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
 
-    it("should not submit without name", function(){
+    it('should not submit without name', function(){
       customOptions.prefill.name = '';
       launch();
       addAllCC();
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
 
-    it("should not submit without email", function(){
+    it('should not submit without email', function(){
       customOptions.prefill.email = '';
       launch();
       addAllCC();
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
 
-    it("should not submit without contact", function(){
+    it('should not submit without contact', function(){
       customOptions.prefill.contact = '';
       launch();
       addAllCC();
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
 
-    describe("and getFormData method", function(){
+    describe('and getFormData method should return', function(){
       var co, data;
 
       beforeEach(function(){
@@ -436,35 +442,35 @@ describe("Razorpay card tab submit", function(){
         data = getFormData(jQuery('#modal form'), true);
       });
 
-      it("should return contact", function(){
+      it('contact', function(){
         expect(data.contact).toBe(coOptions.prefill.contact);
       });
 
-      it("should return email", function(){
+      it('email', function(){
         expect(data.email).toBe(coOptions.prefill.email);
       });
 
-      it("should return name", function(){
+      it('name', function(){
         expect(data['card[name]']).toBe(coOptions.prefill.name);
       });
 
-      it("should return card number", function(){
+      it('card number', function(){
         expect(data['card[number]']).toBe(cc.number);
       });
 
-      it("should return card expiry month", function(){
+      it('card expiry month', function(){
         expect(data['card[expiry_month]']).toBe(cc.expiry_month);
       });
 
-      it("should return card expiry year", function(){
+      it('card expiry year', function(){
         expect(data['card[expiry_year]']).toBe(cc.expiry_year);
       });
 
-      it("should return card cvv", function(){
+      it('card cvv', function(){
         expect(data['card[cvv]']).toBe(cc.cvv);
       });
 
-      it("should not return bank", function(){
+      it('not bank', function(){
         expect(data.bank).toBeUndefined();
       });
     })
@@ -523,7 +529,7 @@ describe("Razorpay open netbanking page and submit method", function(){
       launch(operation);
       $nbBank.val('SBIN');
 
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyCalled();
       });
     });
@@ -531,7 +537,7 @@ describe("Razorpay open netbanking page and submit method", function(){
     it("should not submit without bank selected", function(){
       launch(operation);
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
@@ -542,7 +548,7 @@ describe("Razorpay open netbanking page and submit method", function(){
       jQuery('.input[name="email"]').val('');
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
@@ -553,7 +559,7 @@ describe("Razorpay open netbanking page and submit method", function(){
       jQuery('.input[name="contact"]').val('');
 
       spyCalled();
-      spyOn(Razorpay.payment, 'authorize').and.callFake(function(){
+      spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(function(){
         spyNotCalled();
       });
     });
@@ -739,9 +745,12 @@ describe('close button should close modal', function(){
   it('', function(){
     var spy = jasmine.createSpy();
     var spy2 = jasmine.createSpy();
+
     openCheckoutForm(coOptions);
-    spyOn(Razorpay.payment, 'cancel').and.callFake(spy);
-    spyOn(getSession().modal, 'hide').and.callFake(spy2);
+    var session = getSession();
+    session.rzp = {cancelPayment: spy}
+
+    spyOn(session.modal, 'hide').and.callFake(spy2);
     sendclick(jQuery('#modal-close')[0]);
     expect(spy).toHaveBeenCalled();
     expect(spy2).toHaveBeenCalled();

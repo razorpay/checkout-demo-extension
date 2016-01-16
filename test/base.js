@@ -293,8 +293,8 @@ describe("init options validation", function(){
   });
 })
 
-describe("nextRequestRedirect", function(){
-  it("should post form with all fields", function(){
+describe('nextRequestRedirect', function(){
+  it('should post form with all fields', function(){
     var nextRequestData = {
       url: 'someurl',
       method: 'post',
@@ -308,7 +308,6 @@ describe("nextRequestRedirect", function(){
 
     spyOn(HTMLFormElement.prototype, 'submit').and.callFake(function(){
       expect(jQuery(this).serialize()).toBe('field1=val1&field2=val2');
-      this.parentNode.removeChild(this); // clean up
       spy();
     });
 
