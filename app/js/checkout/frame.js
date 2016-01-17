@@ -60,7 +60,7 @@ function restoreOverflow(){
 // to handle absolute/relative url of options.image
 function sanitizeImage(options){
   if(options.image && typeof options.image === 'string'){
-    if(/data:image\/[^;]+;base64/.test(options.image)){
+    if(discreet.isBase64Image(options.image)){
       return;
     }
     if(options.image.indexOf('http')){ // not 0
