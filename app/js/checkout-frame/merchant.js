@@ -219,6 +219,7 @@ var frameDiscreet = {
     if(!session){
       session = sessions[_uid] = new CheckoutModal();
     }
+    trackInit(session);
 
     processMessage(message);
     session.render(message);
@@ -323,20 +324,20 @@ window.handleMessage = function(message) {
 
   if ( message.event === 'open' || message.options ) {
     frameDiscreet.showModal(message);
-
-    var session = getSession();
-    if(CheckoutBridge){
-      discreet.context = qpmap.platform || 'app';
-      track.call(session, 'init', message.options);
-    }
-    else {
-      track.call(session, 'open');
-    }
-
   }
 
   else if ( message.event === 'close' ) {
     getSession().close();
+  }
+}
+
+function trackInit(session){
+  if(CheckoutBridge){
+    discreet.context = qpmap.platform || 'app';
+    track.call(session, 'init', message.options);
+  }
+  else {
+    track.call(session, 'open');
   }
 }
 
