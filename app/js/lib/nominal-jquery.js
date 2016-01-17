@@ -268,42 +268,6 @@ $.clone = function(target){
   return JSON.parse(JSON.stringify(target));
 };
 
-var _$listener = null;
-
-var _$createListener = function(callback, context){
-  return function(e){
-    if(!e || !e.data || typeof callback !== 'function'){
-      return;
-    }
-    var data = e.data;
-    if(typeof data === 'string'){
-      try {
-        data = JSON.parse(data);
-      }
-      catch(errorObj){
-        data = {
-          error: {
-            description: 'Unable to parse response'
-          }
-        }
-      }
-    }
-    callback.call(context, e, data);
-  }
-};
-
-$.addMessageListener = function(callback, context) {
-  if(_$listener){
-    $.removeMessageListener();
-  }
-  _$listener = $(window).on('message', _$createListener(callback, context));
-};
-
-$.removeMessageListener = function() {
-  $(window).off('message', _$listener);
-  _$listener = null;
-};
-
 $.post = function(opts){
   var xhr = new XMLHttpRequest();
   xhr.open('post', opts.url, true);
