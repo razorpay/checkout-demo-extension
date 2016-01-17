@@ -13,8 +13,12 @@ button{
 .ip #tabs li.active{
   border-color: {{=it.color}};
 }
+{{?it.imageFrame}}
 .merchant-image{
-  width: {{=(72-it.imagePadding)}}px;
-  height: {{=(72-it.imagePadding)}}px;
-  padding: {{=it.imagePadding}}px;
+  width: 60px;
+  height: 60px;
+  padding: 12px;
+  border: 1px solid #eaeaea;
+  background: #fff;
 }
+{{?}}
