@@ -136,7 +136,7 @@ function formInitProps(overrides){
   props.key = overrides.key || '';
   delete overrides.key;
 
-  props.amount = parseInt(overrides.amount) || 0;
+  props.amount = parseInt(overrides.amount, 10) || 0;
   delete overrides.amount;
 
   props.notes = overrides.notes &&  JSON.stringify(overrides.notes) || '';

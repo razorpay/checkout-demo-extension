@@ -277,6 +277,53 @@ describe('cookie operations', function(){
     deleteCookie(key);
     expect(getCookie(key)).toBe(null);
   })
+
+  it('polling', function(done){
+    deleteCookie('onComplete');
+    spyOn(window, 'deleteCookie').and.callFake(function(cookieName){
+      expect(cookieName).toBe('onComplete');
+    })
+
+    expect(cookieInterval).not.toBeDefined();
+
+    cookiePoll();
+
+    expect(cookieInterval).toBeDefined();
+    var getSpy = jasmine.createSpy('getCookie');
+    var completeSpy = jasmine.createSpy('onComplete');
+
+    var virgin = true;
+
+    spyOn(window, 'getCookie').and.callFake(function(){
+      var completionExpection = expect(completeSpy);
+      var cookie = '';
+
+      if(virgin){
+        virgin = false;
+        completionExpection = completionExpection.not;
+      }
+      else {
+        cookie = 'hello';
+      }
+
+      setTimeout(function(){
+        completionExpection.toHaveBeenCalled();
+        if(!cookieInterval){
+          setTimeout(function(){
+            expect(!!cookieInterval).toBe(false);
+            done();
+          })
+        }
+      })
+      return cookie;
+    })
+
+    spyOn(window, 'onComplete').and.callFake(function(cookie){
+      expect(cookie).toBe('hello');
+      completeSpy();
+    })
+
+  })
 })
 
 describe('communicator', function(){
