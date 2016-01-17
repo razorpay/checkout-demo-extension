@@ -466,7 +466,8 @@ CheckoutModal.prototype = {
 
     Razorpay.sendMessage({ event: 'success', data: response });
     if(isCriOS) {
-      setCookie('onComplete', JSON.stringify(response));
+      response.id = _uid;
+      setCookie('onComplete', stringify(response));
     }
     this.close();
   },

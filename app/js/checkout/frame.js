@@ -129,6 +129,10 @@ function CheckoutFrame(rzp){
 }
 
 CheckoutFrame.prototype = {
+  getEncodedMessage: function(){
+    return _btoa(stringify(makeCheckoutMessage(this.rzp)));
+  },
+
   getEl: function(options){
     if(!this.el){
       this.el = $(document.createElement(isCriOS ? 'div' : 'iframe'))
@@ -255,7 +259,7 @@ CheckoutFrame.prototype = {
       // TODO roll
     }
     response.id = this.rzp.id;
-    response = JSON.stringify(response);
+    response = stringify(response);
     this.el.contentWindow.postMessage(response, '*');
   },
 
@@ -299,7 +303,7 @@ CheckoutFrame.prototype = {
   onsubmit: function(data){
     var cb = window.CheckoutBridge;
     if(typeof cb === 'object'){
-      invoke(cb.onsubmit, cb, JSON.stringify(data));
+      invoke(cb.onsubmit, cb, stringify(data));
     }
   },
 
@@ -319,7 +323,9 @@ CheckoutFrame.prototype = {
   },
 
   onfailure: function(data){
+    this.ondismiss();
     alert('Payment Failed.\n' + data.error.description);
+    this.onhidden();
   },
 
   onfault: function(message){

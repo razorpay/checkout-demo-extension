@@ -125,7 +125,7 @@ function track(event, props) {
         true
       );
       xhr.setRequestHeader('Content-type', 'application/json');
-      xhr.send(JSON.stringify(data));
+      xhr.send(stringify(data));
     })
   }
 }
@@ -139,13 +139,13 @@ function formInitProps(overrides){
   props.amount = parseInt(overrides.amount, 10) || 0;
   delete overrides.amount;
 
-  props.notes = overrides.notes &&  JSON.stringify(overrides.notes) || '';
+  props.notes = overrides.notes &&  stringify(overrides.notes) || '';
   delete props.notes;
 
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
   }
 
-  props.options = JSON.stringify(overrides);
+  props.options = stringify(overrides);
   return props;
 }

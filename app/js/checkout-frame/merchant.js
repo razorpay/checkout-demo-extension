@@ -18,6 +18,11 @@ function getSession(methodToCall) {
 if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
+  $(window).on('unload', function(){
+    var msg = discreet.defaultError();
+    msg.id = _uid;
+    setCookie('onComplete', stringify(msg));
+  })
 }
 
 // initial error (helps in case of redirection flow)
@@ -146,7 +151,7 @@ var frameDiscreet = {
         if(!data){
           return invoke(bridgeMethod, CheckoutBridge);
         }
-        data = JSON.stringify(data);
+        data = stringify(data);
       }
       invoke(bridgeMethod, CheckoutBridge, data);
     }
@@ -294,7 +299,7 @@ Razorpay.sendMessage = function(message){
     message.source = 'frame';
     message.id = _uid;
     if ( typeof message !== 'string' ) {
-      message = JSON.stringify(message);
+      message = stringify(message);
     }
     ownerWindow.postMessage(message, '*');
   }

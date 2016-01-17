@@ -15,6 +15,7 @@ function bind(func, thisArg){
 var qs = bind(document.querySelector, document);
 var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
+var stringify = bind(JSON.stringify, JSON);
 
 function each( iteratee, eachFunc, thisArg ) {
   var i;
@@ -265,7 +266,7 @@ $.prototype = {
 }
 
 $.clone = function(target){
-  return JSON.parse(JSON.stringify(target));
+  return JSON.parse(stringify(target));
 };
 
 $.post = function(opts){

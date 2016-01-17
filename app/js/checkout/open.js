@@ -144,18 +144,18 @@ function createFrameBackdrop(){
   return backdrop;
 }
 
-function createPreloadedFrame(){
-  if(!isCriOS){
-    var preloadedFrame = new CheckoutFrame();
+function getPreloadedFrame(){
+  if(!isCriOS && !preloadedFrame){
+    preloadedFrame = new CheckoutFrame();
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
-    return preloadedFrame
   }
+  return preloadedFrame;
 }
 
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
-var preloadedFrame = createPreloadedFrame();
+var preloadedFrame = getPreloadedFrame();
 
 function setBackdropColor(value){
   // setting unsupported value throws error in IE
@@ -163,12 +163,19 @@ function setBackdropColor(value){
   catch(e){}
 }
 
-function createNewCheckoutFrame(){
-  return preloadedFrame || new CheckoutFrame();
-}
-
 Razorpay.prototype.open = function() {
-  var frame = this.checkoutFrame = createNewCheckoutFrame();
+  var frame;
+  if(isCriOS){
+    frame = new CheckoutFrame(this);
+    frame.el.contentWindow = window.open(
+      frame.el.getAttribute('src') + '&message=' + frame.getEncodedMessage(),
+      '_blank'
+    )
+  }
+  else {
+    frame = getPreloadedFrame();
+  }
+  this.checkoutFrame = frame;
   frame.openRzp(this);
 
   if(!frame.el.contentWindow){

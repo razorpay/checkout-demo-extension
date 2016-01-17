@@ -219,7 +219,7 @@ function setupAjax(request){
         }
       }
 
-      result = _btoa(JSON.stringify(result));
+      result = _btoa(stringify(result));
       if(communicator.contentWindow === window){
         setCookie('nextRequest', result);
       } else {
@@ -275,7 +275,7 @@ Razorpay.prototype.authorizePayment = function(request){
 }
 
 Razorpay.prototype.cancelPayment = function(errorObj){
-  onComplete.call(this, errorObj || {error:{description:'Payment cancelled'}});
+  onComplete.call(this, errorObj || discreet.defaultError());
 }
 
 Razorpay.payment = {
