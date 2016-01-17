@@ -264,6 +264,7 @@ Razorpay.prototype.authorizePayment = function(request){
   }
 
   this._request = request;
+  return this;
 }
 
 Razorpay.prototype.cancelPayment = function(errorObj){
@@ -271,6 +272,9 @@ Razorpay.prototype.cancelPayment = function(errorObj){
 }
 
 Razorpay.payment = {
+  authorize: function(data){
+    return Razorpay({}).authorizePayment(data);
+  },
   validate: function(data){
     var errors = [];
 
