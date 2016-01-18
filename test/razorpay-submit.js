@@ -59,6 +59,15 @@ describe('Razorpay.payment.validate should', function(){
   // })
 })
 
+describe('Razorpay.payment.authorize should', function(){
+  it('return razorpay object', function(){
+    var spy = jasmine.createSpy();
+    spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(spy);
+    var rzp = Razorpay.payment.authorize(req = jQuery.extend(true, {}, request));
+    expect(rzp instanceof Razorpay).toBe(true);
+    expect(spy).toHaveBeenCalled();
+  })
+})
 
 describe('authorize should', function(){
   var rzp, init_options, req;
