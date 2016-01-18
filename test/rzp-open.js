@@ -5,7 +5,6 @@ describe('setBackdropColor', function(){
   })
 })
 
-
 describe('Razorpay close method should', function(){
   var rzp;
   var options = {
@@ -132,7 +131,7 @@ describe("automatic checkout:", function(){
       expect(btn.val()).toBe('Dont pay');
     })
 
-    it("should open checkout form on submit if not already", function(){
+    it('should open checkout form on submit if not already', function(){
       var spy = jasmine.createSpy('open');
       var spy2 = jasmine.createSpy('prevent');
       
@@ -144,7 +143,7 @@ describe("automatic checkout:", function(){
     })
   })
 
-  describe("init", function(){
+  describe('init', function(){
     var opts = {
       amount: 12345,
       key: 'abcd'
@@ -184,7 +183,7 @@ describe("automatic checkout:", function(){
       })
     })
 
-    it("add button", function(){
+    it('add button', function(){
       spyOn(window, 'addAutoCheckoutButton').and.callFake(function(r){
         expect(r instanceof Razorpay).toBe(true);
         spyCalled();
@@ -207,4 +206,55 @@ describe('if Chrome-iOS,', function(){
     communicator.parentNode.removeChild(communicator);
     communicator = null;
   })
+
+  it('Razorpay.open should have contentWindow', function(){
+    preloadedFrame = null;
+    isCriOS = true;
+    expect(getPreloadedFrame()).toBe(null);
+    var rzp = Razorpay({key: 'key', amount: 200});
+    rzp.open();
+    expect(rzp.checkoutFrame.el instanceof HTMLDivElement).toBe(true);
+  })
+
+  it('Razorpay open should fail if window.open doesnt work', function(){
+    spyOn(window, 'open').and.callFake(noop);
+
+    var closeSpy = jasmine.createSpy('close');
+    var afterCloseSpy = jasmine.createSpy('afterClose');
+
+    spyOn(CheckoutFrame.prototype, 'close').and.callFake(closeSpy);
+    spyOn(CheckoutFrame.prototype, 'afterClose').and.callFake(afterCloseSpy);
+
+    var rzp = Razorpay({key: 'key', amount: 200});
+    rzp.open();
+
+    expect(closeSpy).toHaveBeenCalled();
+    expect(afterCloseSpy).toHaveBeenCalled();
+  })
+})
+
+describe('validateCheckout should', function(){
+
+  it('pass if options are not invalid', function(){
+    expect(discreet.validateCheckout({})).not.toBeDefined();
+  })
+
+  it('fail if display_currency is USD, but no display_amount', function(){
+    expect(discreet.validateCheckout({display_currency: 'USD'})).toBe('display_amount');
+
+    expect(discreet.validateCheckout({display_currency: 'USD', display_amount: 'qwer'}))
+      .toBe('display_amount');
+  })
+
+  it('pass if display_currency is USD', function(){
+    expect(discreet.validateCheckout({display_currency: 'USD', display_amount: '300'}))
+      .not.toBeDefined();
+  })
+
+  it('fail if display_currency is YEN', function(){
+    expect(discreet.validateCheckout({display_currency: 'YEN'})).toBe('display_currency');
+    expect(discreet.validateCheckout({display_currency: 'YEN', display_amount: '300'}))
+      .toBe('display_currency');
+  })
+
 })
