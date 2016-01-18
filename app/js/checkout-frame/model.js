@@ -169,6 +169,22 @@ function showLoadingMessage(message){
   frontDrop(message, 'shown loading');
 }
 
+function processModalMethods(session){
+  var modal = session.message.options.modal;
+
+  modal.onhide = function(){
+    Razorpay.sendMessage({event: 'dismiss'});
+  };
+  modal.onhidden = bind(
+    function(){
+      this.saveAndClose();
+      Razorpay.sendMessage({event: 'hidden'});
+    },
+    this
+  )
+  delete modal.ondismiss;
+}
+
 function CheckoutModal(){
   this.listeners = [];
 }
@@ -238,7 +254,7 @@ CheckoutModal.prototype = {
 
   render: function(message){
     if(this.isOpen){
-      this.close();
+      this.saveAndClose();
     }
     else {
       this.isOpen = true;
@@ -249,7 +265,10 @@ CheckoutModal.prototype = {
     sanitize(message);
     this.getEl();
     this.fillData(message.data);
+
+    processModalMethods(this);
     if(!this.modal) { this.modal = new window.Modal(this.el, message.options.modal) }
+
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting()
     this.bindEvents();
@@ -320,7 +339,7 @@ CheckoutModal.prototype = {
   },
 
   bindEvents: function(){
-    this.on('click', '#modal-close', this.close);
+    this.on('click', '#modal-close', this.hide);
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
@@ -553,7 +572,6 @@ CheckoutModal.prototype = {
         this.rzp.cancelPayment();
         this.rzp = null;
       }
-      this.hide();
       this.isOpen = false;
       clearTimeout(fontTimeout);
       each(

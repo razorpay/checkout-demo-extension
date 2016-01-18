@@ -82,16 +82,6 @@ function processMessage(message) {
     return;
   }
 
-  var modal = opts.modal;
-
-  modal.onhide = function(){
-    Razorpay.sendMessage({event: 'dismiss'});
-  };
-  modal.onhidden = function(){
-    Razorpay.sendMessage({event: 'hidden'});
-  };
-  delete modal.ondismiss;
-
   if(opts.amount >= 100*10000){
     opts.method.wallet = false;
   }
