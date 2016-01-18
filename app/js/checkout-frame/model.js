@@ -175,13 +175,10 @@ function processModalMethods(session){
   modal.onhide = function(){
     Razorpay.sendMessage({event: 'dismiss'});
   };
-  modal.onhidden = bind(
-    function(){
-      this.saveAndClose();
-      Razorpay.sendMessage({event: 'hidden'});
-    },
-    this
-  )
+  modal.onhidden = function(){
+    session.saveAndClose();
+    Razorpay.sendMessage({event: 'hidden'});
+  }
   delete modal.ondismiss;
 }
 
