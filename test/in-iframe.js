@@ -743,17 +743,15 @@ describe('ios CheckoutBridge', function(){
 
 describe('close button should close modal', function(){
   it('', function(){
-    var spy = jasmine.createSpy();
-    var spy2 = jasmine.createSpy();
+    var spy = jasmine.createSpy('hide');
 
     openCheckoutForm(coOptions);
     var session = getSession();
-    session.rzp = {cancelPayment: spy}
+    session.rzp = {cancelPayment: spy};
 
-    spyOn(session.modal, 'hide').and.callFake(spy2);
+    spyOn(session.modal, 'hide').and.callFake(spy);
     sendclick(jQuery('#modal-close')[0]);
     expect(spy).toHaveBeenCalled();
-    expect(spy2).toHaveBeenCalled();
   })
 })
 

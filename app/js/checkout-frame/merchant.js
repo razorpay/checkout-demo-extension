@@ -209,11 +209,11 @@ var frameDiscreet = {
     if(!session){
       session = sessions[_uid] = new CheckoutModal();
     }
-    trackInit(session);
 
     processMessage(message);
     session.render(message);
     session.modal.show();
+    trackInit(session);
     
     if ( CheckoutBridge ) {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
@@ -324,7 +324,7 @@ window.handleMessage = function(message) {
 function trackInit(session){
   if(CheckoutBridge){
     discreet.context = qpmap.platform || 'app';
-    track.call(session, 'init', message.options);
+    track.call(session, 'init', session.message.options);
   }
   else {
     track.call(session, 'open');
