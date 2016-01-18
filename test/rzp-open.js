@@ -192,3 +192,19 @@ describe("automatic checkout:", function(){
     })
   })
 })
+
+describe('if Chrome-iOS,', function(){
+  it('communicator between CheckoutFrame and parent window should be present', function(){
+    CriOS_handler();
+    expect(communicator).not.toBeDefined();
+
+    isCriOS = true;
+    CriOS_handler();
+    expect(communicator instanceof HTMLIFrameElement).toBe(true);
+    expect(document.documentElement.contains(communicator)).toBe(true);
+
+    isCriOS = false;
+    communicator.parentNode.removeChild(communicator);
+    communicator = null;
+  })
+})

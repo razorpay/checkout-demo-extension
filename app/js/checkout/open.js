@@ -5,13 +5,18 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-if(isCriOS){
-  var communicator = document.createElement('iframe')
-  communicator.style.display = 'none';
-  doc.appendChild(communicator);
-  communicator.src = discreet.makeUrl(true) + 'CriOS-frame.php';
+var communicator;
+
+function CriOS_handler(){
+  if(isCriOS){
+    communicator = document.createElement('iframe')
+    communicator.style.display = 'none';
+    doc.appendChild(communicator);
+    communicator.src = discreet.makeUrl(true) + 'CriOS-frame.php';
+  }
 }
 
+CriOS_handler();
 /**
   default handler for success
   it just submits everything via the form
