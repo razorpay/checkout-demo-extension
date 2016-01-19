@@ -165,6 +165,22 @@ function hideEmi(){
   }
 }
 
+function onSixDigits(e){
+  var el = e.target;
+  var sixDigits = el.value.length > 5;
+  $(el.parentNode)[sixDigits ? 'addClass' : 'removeClass']('six');
+
+  nocvvCheck = gel('nocvv-check');
+  if(!sixDigits && nocvvCheck.checked){
+    nocvvCheck.checked = false;
+  }
+  noCvvToggle();
+}
+
+function noCvvToggle(){
+  $('#expiry-cvv')[gel('nocvv-check').checked ? 'addClass' : 'removeClass']('hidden');
+}
+
 function frontDrop(message, className){
   gel('fd-t').innerHTML = message || '';
   gel('fd').className = className || '';
@@ -363,6 +379,8 @@ CheckoutModal.prototype = {
 
     if(enableMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
+      this.on('keyup', '#card_number', onSixDigits);
+      this.on('change', '#nocvv-check', noCvvToggle);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -402,10 +420,6 @@ CheckoutModal.prototype = {
       if(type === 'amex' || oldType === 'amex'){
         formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
       }
-      // if(type !== 'maestro'){
-        // $('nocvv-check')[0].checked = false;
-        // frameDiscreet.toggle_nocvv();
-      // }
     }
 
     if(shouldFocusNextField){
