@@ -174,11 +174,11 @@ function onSixDigits(e){
   if(!sixDigits && nocvvCheck.checked){
     nocvvCheck.checked = false;
   }
-  noCvvToggle();
+  noCvvToggle({target: nocvvCheck});
 }
 
-function noCvvToggle(){
-  $('#expiry-cvv')[gel('nocvv-check').checked ? 'addClass' : 'removeClass']('hidden');
+function noCvvToggle(e){
+  $('#expiry-cvv')[e.target.checked ? 'addClass' : 'removeClass']('hidden');
 }
 
 function frontDrop(message, className){
