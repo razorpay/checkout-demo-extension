@@ -278,7 +278,7 @@ CheckoutFrame.prototype = {
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && data.id !== this.rzp.id) ||
+      // (event !== 'load' && data.id !== this.rzp.id) ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
       return;

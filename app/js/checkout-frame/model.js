@@ -183,6 +183,10 @@ function processModalMethods(session){
 
   modal.onhide = function(){
     Razorpay.sendMessage({event: 'dismiss'});
+    if(isCriOS){
+      setDefaultError();
+      window.close();
+    }
   };
   modal.onhidden = function(){
     session.saveAndClose();
@@ -351,7 +355,9 @@ CheckoutModal.prototype = {
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
-    var enableMethods = this.message.options.method;
+    var options = this.message.options;
+    var enableMethods = options.method;
+
     if(enableMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -372,6 +378,10 @@ CheckoutModal.prototype = {
         this.hideErrorMessage();
       }
     });
+
+    if(isCriOS){
+      this.on('unload', window, options.modal.onhide);
+    }
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
   },
 
@@ -489,7 +499,7 @@ CheckoutModal.prototype = {
     }
     this.rzp = null;
     // prevent dismiss event
-    this.modal.options.onhide = null;
+    this.modal.options.onhide = noop;
 
     Razorpay.sendMessage({ event: 'success', data: response });
     if(isCriOS) {

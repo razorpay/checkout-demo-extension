@@ -13,14 +13,15 @@ function getSession(methodToCall) {
   return session;
 }
 
+function setDefaultError(){
+  var msg = discreet.defaultError();
+  msg.id = _uid;
+  setCookie('onComplete', stringify(msg));
+}
+
 if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
-  $(window).on('unload', function(){
-    var msg = discreet.defaultError();
-    msg.id = _uid;
-    setCookie('onComplete', stringify(msg));
-  })
 }
 
 // initial error (helps in case of redirection flow)
