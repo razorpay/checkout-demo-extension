@@ -569,7 +569,7 @@ CheckoutModal.prototype = {
     this.rzp = Razorpay(this.message.options);
 
     // onComplete defined in razorpay-submit.js, safe to expose now
-    window.onComplete = bind(onComplete, this.rzp);
+    window.onComplete = bind(discreet.onComplete, this.rzp);
 
     this.rzp.authorizePayment({
       data: data,

@@ -2,8 +2,6 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
 var CheckoutBridge = window.CheckoutBridge;
-// onComplete defined in razorpay-submit.js, safe to expose now
-window.onComplete = onComplete;
 
 var sessions = {};
 

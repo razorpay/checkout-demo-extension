@@ -232,7 +232,7 @@ describe('handleResponse should invoke', function(){
         description: 'hello'
       }
     };
-    onComplete.call(rzp, error_data);
+    discreet.onComplete.call(rzp, error_data);
   })
 
   it('error if response is invalid', function(done){
@@ -244,7 +244,7 @@ describe('handleResponse should invoke', function(){
       done();
     })
     var error_data = {};
-    onComplete.call(rzp, error_data);
+    discreet.onComplete.call(rzp, error_data);
   })
 
   it('success if response contains payment id', function(done){
@@ -257,7 +257,7 @@ describe('handleResponse should invoke', function(){
     var success_data = {
       razorpay_payment_id: '12344'
     };
-    onComplete.call(rzp, success_data);
+    discreet.onComplete.call(rzp, success_data);
   })
 })
 
@@ -340,7 +340,7 @@ describe('cookie operations', function(){
       return cookie;
     })
 
-    spyOn(window, 'onComplete').and.callFake(function(cookie){
+    spyOn(discreet, 'onComplete').and.callFake(function(cookie){
       expect(cookie).toBe('hello');
       completeSpy();
     })
@@ -425,7 +425,7 @@ describe('onMessage should invoke onComplete', function(){
 
   it('not if on origin', function(){
     spy = jasmine.createSpy();
-    spyOn(window, 'onComplete').and.callFake(spy);
+    spyOn(discreet, 'onComplete').and.callFake(spy);
     onMessage({});
   })
 

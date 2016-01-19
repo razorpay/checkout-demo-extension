@@ -55,14 +55,14 @@ discreet.setCommunicator = function(opts){
 
 discreet.setCommunicator(Razorpay.defaults);
 
-function cookiePoll(){
+function cookiePoll(rzp){
   deleteCookie('onComplete');
 
   cookieInterval = setInterval(function(){
     var cookie = getCookie('onComplete');
     if(cookie){
       clearCookieInterval();
-      onComplete(cookie);
+      discreet.onComplete.call(rzp, cookie);
     }
   }, 150)
 }
@@ -163,11 +163,11 @@ function onMessage(e){
     ){
       return roll('message received from origin', e.origin, 'info');
     }
-    onComplete.call(this, e.data);
+    discreet.onComplete.call(this, e.data);
   }
 }
 
-function onComplete(data){
+discreet.onComplete = function(data){
   // this === rzp
   var request = this._request;
 
@@ -200,7 +200,8 @@ function onComplete(data){
   invoke(request.error, null, data, 0);
 }
 
-function setupAjax(request){
+function setupAjax(rzp){
+  var request = rzp._request;
   var options = request.options;
 
   $.post({
@@ -214,7 +215,7 @@ function setupAjax(request){
       }
 
       else {
-        onComplete(response);
+        discreet.onComplete.call(rzp, response);
         result = {
           result: response.razorpay_payment_id ? 'Payment Successful.' : response.error && response.error.description || 'Payment Failed.'
         }
@@ -259,24 +260,24 @@ Razorpay.prototype.authorizePayment = function(request){
   }
 
   request.popup.onClose = bind(this.cancelPayment, this);
+  this._request = request;
 
   if(name){
     submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
-    setupAjax(request);
+    setupAjax(this);
   }
 
   request.listener = $(window).on('message', onMessage, null, this);
 
   if(discreet.isFrame){
-    cookiePoll();
+    cookiePoll(this);
   }
 
-  this._request = request;
   return this;
 }
 
 Razorpay.prototype.cancelPayment = function(errorObj){
-  onComplete.call(this, errorObj || discreet.defaultError());
+  discreet.onComplete.call(this, errorObj || discreet.defaultError());
 }
 
 Razorpay.payment = {
