@@ -1,4 +1,5 @@
-(function(root){
+var Card;
+!function(){
 
   var patterns = {
     maestro16: /^(508125|508126|508159|508192|508227|504437|504681)/,
@@ -236,7 +237,7 @@
     }
   };
 
-  var Card = root.Card = function(){
+  Card = function(){
     this.listeners = [];
   }
 
@@ -335,4 +336,4 @@
     filled: noop
   };
 
-})(window);
+}();

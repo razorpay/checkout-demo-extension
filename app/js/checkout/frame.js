@@ -105,9 +105,9 @@ function makeCheckoutMessage(rzp){
   }
 
   if(options.parent){
-    delete options.parent;
     response.embedded = true;
   }
+  delete options.parent;
 
   sanitizeImage(options);
 

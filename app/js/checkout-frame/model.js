@@ -1,4 +1,3 @@
-var Card = window.Card;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
@@ -504,7 +503,7 @@ CheckoutModal.prototype = {
     if(!this.rzp || !response){
       return;
     }
-    this.rzp = null;
+    this.rzp = window.onComplete = null;
     var message;
     this.shake();
     this.modal.options.backdropClose = this.message.options.modal.backdropClose;
@@ -568,6 +567,10 @@ CheckoutModal.prototype = {
 
     // TODO
     this.rzp = Razorpay(this.message.options);
+
+    // onComplete defined in razorpay-submit.js, safe to expose now
+    window.onComplete = bind(onComplete, this.rzp);
+
     this.rzp.authorizePayment({
       data: data,
       error: bind(this.errorHandler, this),
@@ -597,11 +600,12 @@ CheckoutModal.prototype = {
       this.emiView.unbind();
       $(this.el).remove();
 
-      this.modal = null;
-      this.smarty = null;
-      this.card = null;
-      this.emiView = null;
-      this.el = null;
+      this.modal =
+      this.smarty =
+      this.card =
+      this.emiView =
+      this.el =
+      window.onComplete = null;
     }
   },
 

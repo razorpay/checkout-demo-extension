@@ -41,7 +41,7 @@ discreet.setCommunicator = function(opts){
     communicator.parentNode.removeChild(communicator);
   }
   if(
-    location.href.indexOf(discreet.makeUrl()) &&
+    location.href.indexOf(discreet.makeUrl(true)) &&
     (/MSIE |Windows Phone|Trident\//.test(ua) || (isCriOS && !discreet.isFrame))
   ) {
     communicator = document.createElement('iframe');
@@ -52,6 +52,7 @@ discreet.setCommunicator = function(opts){
     communicator = {contentWindow: window};
   }
 }
+
 discreet.setCommunicator(Razorpay.defaults);
 
 function cookiePoll(){
