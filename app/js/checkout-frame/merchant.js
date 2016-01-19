@@ -89,49 +89,6 @@ function processMessage(message) {
   frameDiscreet.setMethods(window.payment_methods, opts.method);
 }
 
-function addEMI(opts){
-  if(true){
-    return;
-  }
-  if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
-    $('#emi-wrap').html(templates.emi());
-    $('#emi-close').on('click', frontDrop);
-    var elem_emi = $('#elem-emi');
-    if(elem_emi[0]){
-      elem_emi.addClass('shown').on('mouseup', function(){
-        var shouldCheck = $(this).hasClass('check');
-        if(!gel('emi').checked || !shouldCheck){
-
-          $('#emi-container')
-            .css('display', 'block')
-            .reflow()
-            .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
-
-          $('#fd').addClass('shown');
-          $('#fd-in').hide();
-        }
-      })
-      $('#card_number').on('input keypress', function(){
-        elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
-      })
-      each(
-        $$('#emi-container > .emi-option'),
-        function(i, el){
-          $(el).on('click', function(){
-            $('#emi-container > .emi-active').removeClass('emi-active');
-            $(this).addClass('emi-active').find('input')[0].checked = true;
-            frontDrop();
-          })
-        }
-      )
-    }
-    $('#methods-specific-fields').css('minHeight', '263px');
-  }
-  if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
-    $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
-  }
-}
-
 var frameDiscreet = {
   notifyBridge: function(message){
     if( message && message.event ){
@@ -221,7 +178,6 @@ var frameDiscreet = {
 
     session.errorHandler(qpmap.error);
     session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
-    addEMI(message.options);
   },
 
   // toggle_nocvv: function(){

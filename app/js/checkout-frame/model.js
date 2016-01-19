@@ -156,9 +156,19 @@ function getFormData() {
   return data;
 }
 
+function hideEmi(){
+  var emic = $('#emi-container');
+  if(emic[0]){
+    emic.removeClass('shown');
+    invoke(emic.hide, emic, null, 300)
+    gel('fd-in').style.display = '';
+  }
+}
+
 function frontDrop(message, className){
   gel('fd-t').innerHTML = message || '';
   gel('fd').className = className || '';
+  hideEmi();
 }
 
 function showErrorMessage(message){
@@ -269,6 +279,8 @@ CheckoutModal.prototype = {
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting()
     this.bindEvents();
+
+    this.emiView = new emiView(message.options);
   },
 
   renderCss: function(){
@@ -582,11 +594,13 @@ CheckoutModal.prototype = {
       this.modal.destroy();
       this.smarty.off();
       this.card.unbind();
+      this.emiView.unbind();
       $(this.el).remove();
 
       this.modal = null;
       this.smarty = null;
       this.card = null;
+      this.emiView = null;
       this.el = null;
     }
   },
