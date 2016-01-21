@@ -279,13 +279,18 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
 })
 
 describe('afterClose should', function(){
-  var rzp = new Razorpay({
-    key: 'key',
-    amount: 100
-  });
-  var cf = new CheckoutFrame(rzp);
+  var rzp, cf;
+
+  beforeEach(function(){
+    cf = new CheckoutFrame(rzp);
+    rzp = Razorpay({
+      key: 'key',
+      amount: 100
+    })
+  })
   it('hide container', function(){
     expect(frameContainer).toBeVisible();
+
     var spy = jasmine.createSpy();
     spyOn(cf, 'unbind').and.callFake(spy);
 
