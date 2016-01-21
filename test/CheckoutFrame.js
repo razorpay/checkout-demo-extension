@@ -282,11 +282,11 @@ describe('afterClose should', function(){
   var rzp, cf;
 
   beforeEach(function(){
-    cf = new CheckoutFrame(rzp);
     rzp = Razorpay({
       key: 'key',
       amount: 100
     })
+    cf = new CheckoutFrame(rzp);
   })
   it('hide container', function(){
     expect(frameContainer).toBeVisible();
