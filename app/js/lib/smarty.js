@@ -1,7 +1,7 @@
 (function(){
 
   var inputClass = 'input';
-  var interceptClass = /elem|placeholder|help-text/;
+  var interceptClass = /elem|card-image|i|help-text/;
 
   var focusEvent = 'focus';
   var blurEvent = 'blur';
@@ -69,10 +69,13 @@
 
     intercept: function(e){
       var parent = e.target;
-      if(!(/elem/.test(parent.className))) {
-         parent = parent.parentNode;
+      var className = parent.className;
+      if(/input/.test(className)){
+        return;
       }
-
+      if(!/elem/.test(parent.className)){
+        parent = parent.parentNode;
+      }
       var child = $(parent).find('.input')[0];
       if(child){
         invoke('focus', child, null, 0);
@@ -106,7 +109,7 @@
           var placeholder = document.createElement('span');
           placeholder.className = 'placeholder';
           placeholder.innerHTML = attr;
-          child.parentNode.appendChild(placeholder);
+          child.parentNode.insertBefore(placeholder, child);
         }
       })
     },
