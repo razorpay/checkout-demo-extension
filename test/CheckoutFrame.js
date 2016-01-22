@@ -299,3 +299,51 @@ describe('afterClose should', function(){
     expect(spy).toHaveBeenCalled();
   })
 })
+
+describe('if shouldFixFixed,', function(){
+  var cf;
+
+  beforeEach(function(){
+    cf = new CheckoutFrame();
+  })
+
+  it('scroll, orientationchange listener should be bound', function(){
+    var spy = jasmine.createSpy('scroll');
+    var spy2 = jasmine.createSpy('orientationchange');
+    merchantMarkup.scroll = spy;
+    merchantMarkup.orientationchange = spy2;
+
+    cf.bind();
+    expect(cf.listeners.scroll).not.toBeDefined();
+    cf.unbind();
+
+    shouldFixFixed = true;
+    cf.bind();
+    expect(cf.listeners.scroll).toBeDefined();
+    cf.listeners.scroll({target: window});
+    cf.listeners.orientationchange({target: window});
+    expect(spy).toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+
+    shouldFixFixed = false;
+  })
+})
+
+describe('if CriOS,', function(){
+  var cf;
+
+  beforeEach(function(){
+    cf = new CheckoutFrame();
+  })
+
+  it('set unload listener', function(){
+    cf.bind();
+    expect(cf.listeners.unload).not.toBeDefined();
+    cf.unbind();
+
+    isCriOS = true;
+    cf.bind();
+    expect(cf.listeners.unload).toBeDefined();
+    isCriOS = false;
+  })
+})
