@@ -610,7 +610,6 @@ CheckoutModal.prototype = {
         }
       )
       this.listeners = [];
-
       this.modal.destroy();
       this.smarty.off();
       this.card.unbind();

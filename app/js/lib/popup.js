@@ -35,8 +35,8 @@ function getPopupDimension(varVal, minVal, maxVal){
 */
 
 var Popup = function(src, name) {
-  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-  var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  var width = window.innerWidth || document.documentElement.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight;
 
   var opts = {
     width: getPopupDimension(width*0.6, 720, 1440),
@@ -93,6 +93,7 @@ Popup.prototype = {
     clearInterval(this.interval);
     $(window).off('unload', this.unload);
     $(window).off('beforeunload', this.beforeunload);
+
     try{
       this.window.close();
     }

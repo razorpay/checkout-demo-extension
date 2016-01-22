@@ -295,8 +295,8 @@ var Card;
         function(i, L){
           each(
             L[1],
-            function(j, event, listenerRef){
-              L[0].off(event, listenerRef);
+            function(j, listenerRef){
+              L[0].off(j, listenerRef);
             }
           )
         }

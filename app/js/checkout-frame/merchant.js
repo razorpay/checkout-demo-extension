@@ -207,14 +207,6 @@ function setQueryParams(search){
   )
 }
 
-function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
-  var data = e.data;
-  if(typeof data === 'string') {
-    data = JSON.parse(data);
-  }
-  window.handleMessage(data);
-}
-
 Razorpay.sendMessage = function(message){
   if ( CheckoutBridge && typeof CheckoutBridge === 'object' ) {
     return notifyBridge(message);
@@ -255,6 +247,14 @@ window.handleMessage = function(message) {
   else if ( message.event === 'close' ) {
     getSession().close();
   }
+}
+
+function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
+  var data = e.data;
+  if(typeof data === 'string') {
+    data = JSON.parse(data);
+  }
+  window.handleMessage(data);
 }
 
 function trackInit(session){

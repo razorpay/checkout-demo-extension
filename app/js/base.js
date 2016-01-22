@@ -107,7 +107,7 @@ var optionValidations = {
   },
 
   parent: function(parent){
-    if(!(parent instanceof Element || typeof parent === 'string' || parent === Razorpay.defaults.parent)){
+    if(!(parent && parent.nodeName || typeof parent === 'string' || parent === Razorpay.defaults.parent)){
       return 'Invalid parent';
     }
   }
