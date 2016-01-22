@@ -317,7 +317,6 @@ if(CheckoutBridge){
 }
 
 iosBridge();
-
 Razorpay.sendMessage({event: 'load'});
 if(qpmap.message){
   parseMessage({data: atob(qpmap.message)});
