@@ -93,7 +93,9 @@ function initAutomaticCheckout(){
 
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
-    addAutoCheckoutButton(Razorpay(opts));
+    var rzp = Razorpay(opts);
+    addAutoCheckoutButton(rzp);
+    window.Razorpay = rzp;
   }
 }
 
@@ -168,6 +170,10 @@ function setBackdropColor(value){
   catch(e){}
 }
 
+Razorpay.open = function(options) {
+  return Razorpay(options).open();
+}
+
 Razorpay.prototype.open = function() {
   var frame;
   if(isCriOS){
@@ -188,6 +194,8 @@ Razorpay.prototype.open = function() {
     frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
+
+  return this;
 };
 
 Razorpay.prototype.close = function(){
