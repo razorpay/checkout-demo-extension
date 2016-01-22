@@ -35,9 +35,12 @@ function getPopupDimension(varVal, minVal, maxVal){
 */
 
 var Popup = function(src, name) {
+  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
   var opts = {
-    width: getPopupDimension(innerWidth*0.6, 720, 1440),
-    height: getPopupDimension(innerHeight*0.75, 520, 1060),
+    width: getPopupDimension(width*0.6, 720, 1440),
+    height: getPopupDimension(height*0.75, 520, 1060),
     menubar: 'no',
     resizable: 'yes',
     location: 'no',

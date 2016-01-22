@@ -135,11 +135,22 @@ describe('authorize should', function(){
     expect(spyCalled).toHaveBeenCalled();
   });
 
-  it('add callback_url if specified in options', function(){
+  it('not add callback_url if specified in options', function(){
     rzp = Razorpay({
       callback_url: 'swag',
       key: 'key',
       amount: 100
+    })
+    rzp.authorizePayment(req);
+    expect(req.data.callback_url).not.toBeDefined();
+  })
+
+  it('add callback_url if specified with redirect', function(){
+    rzp = Razorpay({
+      callback_url: 'swag',
+      key: 'key',
+      amount: 100,
+      redirect: true
     })
     rzp.authorizePayment(req);
     expect(req.data.callback_url).toBe('swag');
