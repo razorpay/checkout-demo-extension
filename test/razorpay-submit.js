@@ -62,7 +62,7 @@ describe('Razorpay.payment.validate should', function(){
 describe('Razorpay.payment.authorize should', function(){
 
   beforeEach(function(){
-    Razorpay.configure({key: 'key1', amount: 1000});
+    Razorpay.configure({key: 'key1'});
   })
 
   afterEach(function(){
@@ -71,13 +71,13 @@ describe('Razorpay.payment.authorize should', function(){
   })
 
   it('return razorpay object', function(){
-    expect(Razorpay.payment.authorize({data: {}}) instanceof Razorpay).toBe(true);
+    expect(Razorpay.payment.authorize({data: {amount: 1000}}) instanceof Razorpay).toBe(true);
   })
 
   it('should invoke rzp.authorizePayment', function(){
     var spy = jasmine.createSpy();
     spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(spy);
-    var rzp = Razorpay.payment.authorize({data: {}});
+    var rzp = Razorpay.payment.authorize({data: {amount: 2000}});
     expect(spy).toHaveBeenCalled();
   })
 })
