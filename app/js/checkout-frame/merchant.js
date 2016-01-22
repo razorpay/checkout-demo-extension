@@ -13,12 +13,6 @@ function getSession(methodToCall) {
   return session;
 }
 
-function setDefaultError(){
-  var msg = discreet.defaultError();
-  msg.id = _uid;
-  setCookie('onComplete', stringify(msg));
-}
-
 if(isCriOS){
   // remove old onComplete cookie
   deleteCookie('onComplete');
@@ -85,158 +79,145 @@ function processMessage(message) {
     opts.method.wallet = false;
   }
 
-  frameDiscreet.setMethods(window.payment_methods, opts.method);
+  setPaymentMethods(window.payment_methods, opts.method);
 }
 
-var frameDiscreet = {
-  notifyBridge: function(message){
-    if( message && message.event ){
-      var bridgeMethod = CheckoutBridge['on' + message.event];
-      var data = message.data;
-      if(typeof data !== 'string'){
-        if(!data){
-          return invoke(bridgeMethod, CheckoutBridge);
-        }
-        data = stringify(data);
+function notifyBridge(message){
+  if( message && message.event ){
+    var bridgeMethod = CheckoutBridge['on' + message.event];
+    var data = message.data;
+    if(typeof data !== 'string'){
+      if(!data){
+        return invoke(bridgeMethod, CheckoutBridge);
       }
-      invoke(bridgeMethod, CheckoutBridge, data);
+      data = stringify(data);
     }
-  },
+    invoke(bridgeMethod, CheckoutBridge, data);
+  }
+}
   
-  setMethods: function(payment_methods, methodOptions){
+function setPaymentMethods(payment_methods, methodOptions){
 
-    if( !payment_methods.error ) {
-      each(
-        methodOptions,
-        function(method, enabled){
-          var printed = payment_methods[method];
-          if ( !printed || enabled === false ) {
-            methodOptions[method] = false;
-          }
-          else {
-            methodOptions[method] = printed;
-          }
-        }
-      )
-      var wallets = [];
-      if( methodOptions.wallet ) {
-        each(
-          payment_methods['wallet'],
-          function(wallet, enabled){
-            if(enabled){
-              var logos = freqWallets[wallet];
-              if(logos){
-                wallets.push({
-                  'name': wallet,
-                  'col': logos.col,
-                  'h': logos.h
-                });
-              }
-            }
-          }
-        )
-      }
-      methodOptions.wallet = wallets;
-    } else {
-      methodOptions.card = false;
-      methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
-    }
-    if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
-      methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
-    }
-  },
-
-  showModal: function(message) {
-    if(!window.payment_methods){
-      // TODO remove this
-      Razorpay.defaults.key = message.options.key;
-      Razorpay.payment.getMethods(function(response){
-        window.payment_methods = response;
-        frameDiscreet.showModal(message);
-      })
-      return;
-    }
-
-    if(_uid !== message.id){
-      getSession('saveAndClose');
-      _uid = message.id;
-    }
-    var session = getSession();
-    if(!session){
-      session = sessions[_uid] = new CheckoutModal();
-    }
-
-    processMessage(message);
-    session.render(message);
-    session.modal.show();
-    trackInit(session);
-    
-    if ( CheckoutBridge ) {
-      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-    }
-
-    session.errorHandler(qpmap.error);
-    session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
-  },
-
-  // toggle_nocvv: function(){
-  //   var checked = this.checked;
-  //   for(var i in {card_expiry: 0, card_cvv: 0}){
-  //     var el = $(i).removeClass('invalid')[0];
-  //     el.value = '';
-  //     el.disabled = checked;
-  //     el.required = !checked;
-  //   }
-  // },
-
-
-  /* sets focus on invalid input and returns true, if any. */
-
-  configureRollbar: function(message){
-    if(Rollbar){
-      invoke(
-        Rollbar.configure,
-        Rollbar,
-        {
-          payload: {
-            person: {
-              id: _uid
-            },
-            context: discreet.context
-          }
-        }
-      );
-    }
-  },
-  setQueryParams: function(search){
+  if( !payment_methods.error ) {
     each(
-      search.replace(/^\?/,'').split('&'),
-      function(i, param){
-        var split = param.split('=', 2);
-        if( split[0].indexOf('.') !== -1 ) {
-          var dotsplit = split[0].split('.', 2);
-          if( !qpmap[dotsplit[0]] ) {
-            qpmap[dotsplit[0]] = {};
-          }
-          qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
-        } else {
-          qpmap[split[0]] = decodeURIComponent(split[1]);
+      methodOptions,
+      function(method, enabled){
+        var printed = payment_methods[method];
+        if ( !printed || enabled === false ) {
+          methodOptions[method] = false;
+        }
+        else {
+          methodOptions[method] = printed;
         }
       }
     )
-  },
-  parseMessage: function(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
-    var data = e.data;
-    if(typeof data === 'string') {
-      data = JSON.parse(data);
+    var wallets = [];
+    if( methodOptions.wallet ) {
+      each(
+        payment_methods['wallet'],
+        function(wallet, enabled){
+          if(enabled){
+            var logos = freqWallets[wallet];
+            if(logos){
+              wallets.push({
+                'name': wallet,
+                'col': logos.col,
+                'h': logos.h
+              });
+            }
+          }
+        }
+      )
     }
-    window.handleMessage(data);
+    methodOptions.wallet = wallets;
+  } else {
+    methodOptions.card = false;
+    methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
   }
+  if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
+    methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
+  }
+}
+
+function showModal(message) {
+  if(!window.payment_methods){
+    // TODO remove this
+    Razorpay.defaults.key = message.options.key;
+    Razorpay.payment.getMethods(function(response){
+      window.payment_methods = response;
+      showModal(message);
+    })
+    return;
+  }
+
+  if(_uid !== message.id){
+    getSession('saveAndClose');
+    _uid = message.id;
+  }
+  var session = getSession();
+  if(!session){
+    session = sessions[_uid] = new CheckoutModal();
+  }
+
+  processMessage(message);
+  session.render(message);
+  session.modal.show();
+  trackInit(session);
+
+  if ( CheckoutBridge ) {
+    $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+  }
+
+  session.errorHandler(qpmap.error);
+  session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
+}
+
+function configureRollbar(message){
+  if(Rollbar){
+    invoke(
+      Rollbar.configure,
+      Rollbar,
+      {
+        payload: {
+          person: {
+            id: _uid
+          },
+          context: discreet.context
+        }
+      }
+    );
+  }
+}
+
+function setQueryParams(search){
+  each(
+    search.replace(/^\?/,'').split('&'),
+    function(i, param){
+      var split = param.split('=', 2);
+      if( split[0].indexOf('.') !== -1 ) {
+        var dotsplit = split[0].split('.', 2);
+        if( !qpmap[dotsplit[0]] ) {
+          qpmap[dotsplit[0]] = {};
+        }
+        qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
+      } else {
+        qpmap[split[0]] = decodeURIComponent(split[1]);
+      }
+    }
+  )
+}
+
+function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
+  var data = e.data;
+  if(typeof data === 'string') {
+    data = JSON.parse(data);
+  }
+  window.handleMessage(data);
 }
 
 Razorpay.sendMessage = function(message){
   if ( CheckoutBridge && typeof CheckoutBridge === 'object' ) {
-    return frameDiscreet.notifyBridge(message);
+    return notifyBridge(message);
   }
 
   var ownerWindow = window === window.parent ? window.opener : window.parent;
@@ -256,7 +237,7 @@ window.handleMessage = function(message) {
   }
   if ( message.options ) {
     try{
-      frameDiscreet.configureRollbar(message);
+      configureRollbar(message);
       // validate and sanitize message.options
       Razorpay.prototype.configure.call(message, message.options);
     } catch(e){
@@ -268,7 +249,7 @@ window.handleMessage = function(message) {
 
 
   if ( message.event === 'open' || message.options ) {
-    frameDiscreet.showModal(message);
+    showModal(message);
   }
 
   else if ( message.event === 'close' ) {
@@ -286,10 +267,10 @@ function trackInit(session){
   }
 }
 
-$(window).on('message', frameDiscreet.parseMessage);
+$(window).on('message', parseMessage);
 
 if(location.search){
-  frameDiscreet.setQueryParams(location.search);
+  setQueryParams(location.search);
 }
 
 // unique id for ios to retieve resources
@@ -339,5 +320,5 @@ iosBridge();
 
 Razorpay.sendMessage({event: 'load'});
 if(qpmap.message){
-  frameDiscreet.parseMessage({data: atob(qpmap.message)});
+  parseMessage({data: atob(qpmap.message)});
 }

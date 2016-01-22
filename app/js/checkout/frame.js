@@ -100,9 +100,13 @@ function makeCheckoutMessage(rzp){
       }
     }
   )
-  for(var i in rzp.modal.options){
-    rzp.options.modal[i] = rzp.modal.options[i];
-  }
+
+  each(
+    rzp.modal.options,
+    function(i, option){
+      rzp.options.modal[i] = option;
+    }
+  )
 
   if(options.parent){
     response.embedded = true;
@@ -118,6 +122,12 @@ function makeCheckoutMessage(rzp){
     }
   }
   return response;
+}
+
+function setBackdropColor(value){
+  // setting unsupported value throws error in IE
+  try{ frameBackdrop.style.background = value; }
+  catch(e){}
 }
 
 function CheckoutFrame(rzp){

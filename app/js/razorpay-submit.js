@@ -32,7 +32,7 @@ function getCookie(name){
   return null;
 }
 
-function getCommuniactorSrc(opts){
+function getCommuniactorSrc(){
   return discreet.makeUrl(true) + 'communicator.php';
 }
 

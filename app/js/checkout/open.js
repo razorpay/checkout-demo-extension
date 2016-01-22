@@ -93,9 +93,7 @@ function initAutomaticCheckout(){
 
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
-    var rzp = Razorpay(opts);
-    addAutoCheckoutButton(rzp);
-    window.Razorpay = rzp;
+    addAutoCheckoutButton(Razorpay(opts));
   }
 }
 
@@ -151,6 +149,10 @@ function createFrameBackdrop(){
   return backdrop;
 }
 
+var frameContainer = createFrameContainer();
+var frameBackdrop = createFrameBackdrop();
+var preloadedFrame = getPreloadedFrame();
+
 function getPreloadedFrame(){
   if(!isCriOS && !preloadedFrame){
     preloadedFrame = new CheckoutFrame();
@@ -158,16 +160,6 @@ function getPreloadedFrame(){
     frameContainer.appendChild(preloadedFrame.el);
   }
   return preloadedFrame;
-}
-
-var frameContainer = createFrameContainer();
-var frameBackdrop = createFrameBackdrop();
-var preloadedFrame = getPreloadedFrame();
-
-function setBackdropColor(value){
-  // setting unsupported value throws error in IE
-  try{ frameBackdrop.style.background = value; }
-  catch(e){}
 }
 
 Razorpay.open = function(options) {

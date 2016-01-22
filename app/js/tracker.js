@@ -68,7 +68,7 @@ function generateUID(){
   )
   each(
     num,
-    function(i, chr){
+    function(i){
       tempdigit = map62[num[num.length - 1 - i]];
       if((num.length - i) % 2){
         tempdigit *= 2;

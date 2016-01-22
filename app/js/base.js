@@ -1,3 +1,33 @@
+
+var discreet = {
+  medium: 'web',
+  context: location.href.replace(/^https?:\/\//,''),
+  setCommunicator: noop,
+
+  isBase64Image: function(image){
+    return /data:image\/[^;]+;base64/.test(image);
+  },
+
+  defaultError: function(){
+    return {error:{description:'Payment cancelled'}};
+  },
+
+  makeUrl: function(unversioned){
+    var url = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/';
+    if(!unversioned){
+      url += RazorpayConfig.version;
+    }
+    return url;
+  },
+
+  nextRequestRedirect: function(data){
+    if(window !== window.parent){
+      return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
+    }
+    submitForm(data.url, data.content, data.method);
+  }
+}
+
 function base_set(baseval, override) {
   if ( typeof baseval === 'object' ) {
     if( !baseval ){
@@ -97,16 +127,19 @@ function validateRequiredFields(options){
 function validateOverrides(options) {
   var errorMessage;
 
-  for(var i in options){
-    errorMessage = invoke(
-      optionValidations[i],
-      null,
-      options[i]
-    )
-    if(typeof errorMessage === 'string'){
-      throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
+  each(
+    options,
+    function(i, option){
+      errorMessage = invoke(
+        optionValidations[i],
+        null,
+        option
+      )
+      if(typeof errorMessage === 'string'){
+        throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
+      }
     }
-  }
+  )
 }
 
 function base_configure(overrides){
@@ -159,33 +192,4 @@ Razorpay.prototype.configure = function(overrides){
 
 Razorpay.configure = function(overrides) {
   Razorpay.defaults = base_configure(overrides);
-}
-
-var discreet = {
-  medium: 'web',
-  context: location.href.replace(/^https?:\/\//,''),
-  setCommunicator: noop,
-
-  isBase64Image: function(image){
-    return /data:image\/[^;]+;base64/.test(image);
-  },
-
-  defaultError: function(){
-    return {error:{description:'Payment cancelled'}};
-  },
-
-  makeUrl: function(unversioned){
-    var url = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/';
-    if(!unversioned){
-      url += RazorpayConfig.version;
-    }
-    return url;
-  },
-
-  nextRequestRedirect: function(data){
-    if(window !== window.parent){
-      return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
-    }
-    submitForm(data.url, data.content, data.method);
-  }
 }

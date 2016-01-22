@@ -178,6 +178,12 @@ function showLoadingMessage(message){
   frontDrop(message, 'shown loading');
 }
 
+function setDefaultError(){
+  var msg = discreet.defaultError();
+  msg.id = _uid;
+  setCookie('onComplete', stringify(msg));
+}
+
 function processModalMethods(session){
   var modal = session.message.options.modal;
 
