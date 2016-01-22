@@ -73,11 +73,9 @@
          parent = parent.parentNode;
       }
 
-      var child = $(parent).find('.input');
-      if(child.length){
-        setTimeout(function(){
-          child[0].focus()
-        })
+      var child = $(parent).find('.input')[0];
+      if(child){
+        invoke('focus', child, null, 0);
       }
     },
 

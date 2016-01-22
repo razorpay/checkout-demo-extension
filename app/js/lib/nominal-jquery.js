@@ -262,7 +262,10 @@ $.prototype = {
 
   focus: function(){
     if(this[0]){
-      this[0].focus();
+      try{
+        this[0].focus();
+      }
+      catch(e){}
     }
     return this;
   }
