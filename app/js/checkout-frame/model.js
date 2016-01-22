@@ -296,6 +296,7 @@ CheckoutModal.prototype = {
     var div = this.el;
     var theme = this.message.options.theme;
     var style = document.createElement('style');
+    style.type = 'text/css';
     try{
       div.style.color = theme.color;
       if(div.style.color){
