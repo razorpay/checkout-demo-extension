@@ -186,6 +186,8 @@ var Card;
 
   var FormatNumber = function(e){
     var character = ensureNumeric(e);
+    if(character === false) { return }
+
     var el = e.target;
 
     var pos = CheckSelection(el);
