@@ -158,9 +158,9 @@ describe('payment authorization', function(){
     getSession().rzp = Razorpay({key: 'key', amount: 100})
 
     var session = getSession();
-    var spy = jasmine.createSpy('close');
+    var spy = jasmine.createSpy('hide');
 
-    spyOn(session, 'close').and.callFake(spy);
+    spyOn(session.modal, 'hide').and.callFake(spy);
 
     session.successHandler();
     expect(spy).toHaveBeenCalled();

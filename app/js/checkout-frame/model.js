@@ -490,6 +490,7 @@ CheckoutModal.prototype = {
 
   hide: function(){
     $('#modal-inner').removeClass('shake');
+    frontDrop();
     this.modal.hide();
   },
 
@@ -506,7 +507,7 @@ CheckoutModal.prototype = {
       response.id = _uid;
       setCookie('onComplete', stringify(response));
     }
-    this.close();
+    this.hide();
   },
 
   errorHandler: function(response){
