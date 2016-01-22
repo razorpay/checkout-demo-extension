@@ -329,7 +329,7 @@ CheckoutFrame.prototype = {
 
   onsuccess: function(data){
     this.close();
-    invoke(this.rzp.options.handler, window, data, 200);
+    invoke('handler', this.rzp.options, data, 200);
   },
 
   onfailure: function(data){

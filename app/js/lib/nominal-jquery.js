@@ -88,6 +88,9 @@ function invoke(handler, thisArg, param , timeout){
     }, timeout)
     return;
   }
+  if(typeof handler === 'string'){
+    handler = thisArg[handler];
+  }
   if(typeof handler === 'function'){
     if(!thisArg){
       thisArg = this;

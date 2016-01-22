@@ -241,13 +241,17 @@ Razorpay.prototype.authorizePayment = function(request){
 
   var url = discreet.makeUrl() + 'payments/create/checkout';
 
-  if(options.redirect()){
+  if(options.redirect()) {
     discreet.nextRequestRedirect({
       url: url,
       content: rdata,
       method: 'post'
     });
     return false;
+  }
+  // prevent callback_url from being submitted if not redirecting
+  else {
+    delete rdata.callback_url;
   }
 
   var name;
