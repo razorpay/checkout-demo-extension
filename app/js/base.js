@@ -176,10 +176,10 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype.configure = function(overrides){
+  var key, options;
   try{
-    this.options = base_configure(overrides);
-    var options = this.options;
-    var key = options.key;
+    options = this.options = base_configure(overrides);
+    key = options.key;
     validateRequiredFields(options);
   } catch(e){
     var message = e.message;
