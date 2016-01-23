@@ -192,8 +192,7 @@ Razorpay.prototype.configure = function(overrides){
   if(this instanceof Razorpay){
     this.id = generateUID();
     this.modal = {options: {}};
-    var trackingPayload = $.clone(overrides);
-    track.call( this, 'init', trackingPayload );
+    track.call( this, 'init', overrides );
 
     if(options.parent){
       this.open();

@@ -348,11 +348,6 @@ Razorpay.payment = {
       timeout: 30000,
       success: function(response){
         invoke(callback, null, response);
-      },
-      complete: function(data){
-        if(typeof data === 'object' && data.error) {
-          invoke(callback, null, {error: true});
-        }
       }
     });
   }

@@ -353,6 +353,7 @@ CheckoutFrame.prototype = {
   onfault: function(message){
     this.rzp.close();
     alert('Oops! Something went wrong.\n' + message);
+    this.afterClose();
   },
 
   afterClose: function(){

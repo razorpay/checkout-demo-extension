@@ -78,8 +78,6 @@ function processMessage(message) {
   if(opts.amount >= 100*10000){
     opts.method.wallet = false;
   }
-
-  setPaymentMethods(window.payment_methods, opts.method);
 }
 
 function notifyBridge(message){
@@ -140,16 +138,6 @@ function setPaymentMethods(payment_methods, methodOptions){
 }
 
 function showModal(message) {
-  if(!window.payment_methods){
-    // TODO remove this
-    Razorpay.defaults.key = message.options.key;
-    Razorpay.payment.getMethods(function(response){
-      window.payment_methods = response;
-      showModal(message);
-    })
-    return;
-  }
-
   if(_uid !== message.id){
     getSession('saveAndClose');
     _uid = message.id;
@@ -158,8 +146,28 @@ function showModal(message) {
   if(!session){
     session = sessions[_uid] = new CheckoutModal();
   }
-
   processMessage(message);
+
+  if(!window.payment_methods){
+    // TODO remove this
+    Razorpay.defaults.key = message.options.key;
+    Razorpay.payment.getMethods(function(response){
+      if(response.error){
+        return Razorpay.sendMessage({event: 'fault', data: response.error.description});
+      }
+      window.payment_methods = response;
+      showModalWithMessage(message);
+    })
+    return;
+  }
+  else {
+    showModalWithMessage(message);
+  }
+}
+
+function showModalWithMessage(message){
+  var session = getSession();
+  setPaymentMethods(window.payment_methods, message.options.method);
   session.render(message);
   session.modal.show();
   trackInit(message);
