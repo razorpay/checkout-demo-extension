@@ -124,6 +124,10 @@ function makeCheckoutMessage(rzp){
   return response;
 }
 
+function getEncodedMessage(rzp){
+  return _btoa(stringify(makeCheckoutMessage(rzp)));
+}
+
 function setBackdropColor(value){
   // setting unsupported value throws error in IE
   try{ frameBackdrop.style.background = value; }
@@ -139,9 +143,6 @@ function CheckoutFrame(rzp){
 }
 
 CheckoutFrame.prototype = {
-  getEncodedMessage: function(){
-    return _btoa(stringify(makeCheckoutMessage(this.rzp)));
-  },
 
   getEl: function(options){
     if(!this.el){
@@ -161,12 +162,13 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
+    var el = this.el;
     if(isCriOS){
-      if(this.el.contentWindow){
-        this.el.contentWindow.close();
+      if(el.contentWindow){
+        el.contentWindow.close();
       }
-      this.el.contentWindow = window.open(
-        frame.el.getAttribute('src') + '&message=' + frame.getEncodedMessage(),
+      el.contentWindow = window.open(
+        el.getAttribute('src') + '&message=' + getEncodedMessage(rzp),
         '_blank'
       )
     }

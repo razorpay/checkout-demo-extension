@@ -177,7 +177,6 @@ Razorpay.prototype.open = function() {
     }
     this.checkoutFrame = frame;
   }
-
   if(!frame.embedded){
     frame.openRzp(this);
   }
