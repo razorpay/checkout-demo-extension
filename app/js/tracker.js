@@ -90,7 +90,7 @@ var _uid = generateUID();
 
 function track(event, props) {
   var id = this.id;
-  if(id && /^rzp_live/.test(this.options.key)){
+  if(id && /^rzp_l/.test(this.options.key)){
     setTimeout(function(){
       var data = {
         id: _uid

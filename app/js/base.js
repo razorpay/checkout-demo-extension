@@ -1,4 +1,8 @@
 
+function raise(message){
+  throw new Error(message);
+}
+
 var discreet = {
   medium: 'web',
   context: location.href.replace(/^https?:\/\//,''),
@@ -118,7 +122,7 @@ function validateRequiredFields(options){
     ['key', 'amount'],
     function(index, key){
       if(!options[key]){
-        throw new Error('No ' + key + ' passed.');
+        raise('No ' + key + ' passed.');
       }
     }
   )
@@ -136,7 +140,7 @@ function validateOverrides(options) {
         option
       )
       if(typeof errorMessage === 'string'){
-        throw new Error('Invalid ' + i + ' (' + errorMessage + ')');
+        raise('Invalid ' + i + ' (' + errorMessage + ')');
       }
     }
   )
@@ -144,7 +148,7 @@ function validateOverrides(options) {
 
 function base_configure(overrides){
   if( !overrides || typeof overrides !== 'object' ) {
-    throw new Error('Invalid options');
+    raise('Invalid options');
   }
 
   validateOverrides(overrides);
@@ -175,8 +179,18 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype.configure = function(overrides){
-  this.options = base_configure(overrides);
-  validateRequiredFields(this.options);
+  try{
+    this.options = base_configure(overrides);
+    var options = this.options;
+    var key = options.key;
+    validateRequiredFields(options);
+  } catch(e){
+    var message = e.message;
+    if(!/^rzp_l/.test(key || overrides.key || '')){
+      alert(message);
+    }
+    raise(message);
+  }
 
   if(this instanceof Razorpay){
     this.id = generateUID();
@@ -184,7 +198,7 @@ Razorpay.prototype.configure = function(overrides){
     var trackingPayload = $.clone(overrides);
     track.call( this, 'init', trackingPayload );
 
-    if(this.options.parent){
+    if(options.parent){
       this.open();
     }
   }
