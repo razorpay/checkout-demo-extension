@@ -198,13 +198,13 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
     })
 
     it('load', function(){
-      cf.loaded = function(){
+      cf.loadedCallback = function(){
         if(this === cf){
           spyCalled();
         }
       };
       message('load');
-      expect(cf.loaded).toBe(true);
+      expect(cf.hasLoaded).toBe(true);
     })
 
     it('redirect', function(){

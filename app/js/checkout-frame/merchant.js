@@ -225,7 +225,7 @@ Razorpay.sendMessage = function(message){
 }
 window.handleMessage = function(message) {
   if(message.embedded){
-    $(doc).addClass('embedded');
+    // $(doc).addClass('embedded');
   }
   if(message.config){
     RazorpayConfig = message.config;
@@ -247,7 +247,7 @@ window.handleMessage = function(message) {
   }
 
   else if ( message.event === 'close' ) {
-    getSession().close();
+    getSession().hide();
   }
 }
 

@@ -30,7 +30,7 @@ describe('Razorpay close method should', function(){
   
   it('be followable by re-open', function(){
     rzp.close();
-    rzp.checkoutFrame.loaded = true;
+    rzp.checkoutFrame.hasLoaded = true;
     var spy = jasmine.createSpy();
     spyOn(rzp.checkoutFrame, 'postMessage').and.callFake(function(msg){
       expect(msg.event).toBe('open');

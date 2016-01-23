@@ -494,9 +494,11 @@ CheckoutModal.prototype = {
   },
 
   hide: function(){
-    $('#modal-inner').removeClass('shake');
-    frontDrop();
-    this.modal.hide();
+    if(this.isOpen){
+      $('#modal-inner').removeClass('shake');
+      frontDrop();
+      this.modal.hide();
+    }
   },
 
   successHandler: function(response){

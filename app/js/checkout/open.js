@@ -191,8 +191,9 @@ Razorpay.prototype.open = function() {
 };
 
 Razorpay.prototype.close = function(){
-  if(this.checkoutFrame){
-    this.checkoutFrame.postMessage({event: 'close'});
+  var frame = this.checkoutFrame;
+  if(frame){
+    frame.postMessage({event: 'close'});
   }
 };
 
