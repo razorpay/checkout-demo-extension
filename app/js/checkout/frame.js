@@ -189,7 +189,6 @@ CheckoutFrame.prototype = {
     else {
       message = {event: 'open'};
     }
-
     this.afterLoad(function(){
       this.postMessage(message);
     })
@@ -286,10 +285,10 @@ CheckoutFrame.prototype = {
   },
 
   afterLoad: function(handler){
-    if(this.loaded === true){
+    if(this.hasLoaded === true){
       handler.call(this);
     } else {
-      this.loaded = handler;
+      this.loadedCallback = handler;
     }
   },
 
@@ -298,17 +297,16 @@ CheckoutFrame.prototype = {
     var event = data.event;
     // source check
     if(
-      !this.rzp ||
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && data.id !== this.rzp.id) ||
+      (event !== 'load' && this.rzp && this.rzp.id !== data.id) ||
       e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
       return;
     }
     data = data.data;
-    invoke(this['on' + event], this, data);
+    invoke('on' + event, this, data);
 
     if(event === 'dismiss' || event === 'fault'){
       track.call(this.rzp, event, data);
@@ -316,8 +314,8 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    invoke(this.loaded, this);
-    this.loaded = true;
+    invoke('loadedCallback', this);
+    this.hasLoaded = true;
   },
 
   onredirect: function(data){
@@ -327,7 +325,7 @@ CheckoutFrame.prototype = {
   onsubmit: function(data){
     var cb = window.CheckoutBridge;
     if(typeof cb === 'object'){
-      invoke(cb.onsubmit, cb, stringify(data));
+      invoke('onsubmit', cb, stringify(data));
     }
   },
 

@@ -37,7 +37,7 @@
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
   <style>
-  .razorpay-checkout-frame{
+  #x .razorpay-checkout-frame{
     max-width: 600px;
     margin: 20px;
     display: block;
@@ -54,7 +54,7 @@
       'handler': function (transaction){
         alert("You have successfully purchased " + options.description);
       },
-      parent: '#x',
+      // parent: '#x',
       // framePath: 'checkout.html',
       // callback_url: 'http://localhost:9000',
       'method': {
