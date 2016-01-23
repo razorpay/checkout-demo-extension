@@ -67,8 +67,7 @@ Razorpay.defaults = {
     'email': '',
     'card': {
       'number': '',
-      'expiry_month': '',
-      'expiry_year': ''
+      'expiry': ''
     }
   },
   'modal': {

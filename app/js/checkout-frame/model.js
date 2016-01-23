@@ -240,8 +240,10 @@ CheckoutModal.prototype = {
       this.switchTab($('#method-' + data.method + '-tab'));
     }
 
-    if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
-      data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
+    var exp_m = data['card[expiry_month]'];
+    var exp_y = data['card[expiry_year]']
+    if(exp_m && exp_y) {
+      data['card[expiry]'] = exp_m + ' / ' + exp_y;
     }
 
     each(
@@ -256,11 +258,9 @@ CheckoutModal.prototype = {
       },
       function(name, id){
         var el = gel(id);
-        if(el) {
-          var val = data[name];
-          if(val){
-            el.value = val;
-          }
+        var val = data[name];
+        if(el && val) {
+          el.value = val;
         }
       }
     )
@@ -274,6 +274,9 @@ CheckoutModal.prototype = {
       this.isOpen = true;
     }
 
+    if(!message.data && this.message){
+      message.data = this.message.data;
+    }
     this.message = message;
     formatMessage(message);
     sanitize(message);
