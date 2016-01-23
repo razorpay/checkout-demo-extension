@@ -129,7 +129,7 @@ function formInitProps(overrides){
   each(
     overrides,
     function(key){
-      if(!(key in Razorpay.defaults)){
+      if(!(key in Razorpay.defaults) || Razorpay.defaults[key] === overrides[key]){
         delete overrides[key];
       }
     }

@@ -177,6 +177,7 @@ function showModalWithMessage(message){
   }
 
   if(qpmap.error){
+    session.rzp = true;
     session.errorHandler(qpmap);
   }
   session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));

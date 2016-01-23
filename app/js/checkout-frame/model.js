@@ -522,7 +522,7 @@ CheckoutModal.prototype = {
   },
 
   errorHandler: function(response){
-    if(!response){
+    if(!this.rzp || !response){
       return;
     }
     this.rzp = window.onComplete = null;
