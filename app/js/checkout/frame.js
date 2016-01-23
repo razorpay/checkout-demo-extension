@@ -287,9 +287,11 @@ CheckoutFrame.prototype = {
     var event = data.event;
     // source check
     if(
+      !this.rzp ||
       !e.origin ||
       data.source !== 'frame' ||
-      // (event !== 'load' && data.id !== this.rzp.id) ||
+      (event !== 'load' && data.id !== this.rzp.id) ||
+      e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
       return;

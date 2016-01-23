@@ -171,6 +171,7 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
   describe('invoke onevent methods: ', function(){
     function message(event, data){
       cf.onmessage({
+        source: cf.el.contentWindow,
         origin: src,
         data: JSON.stringify({
           source: 'frame',

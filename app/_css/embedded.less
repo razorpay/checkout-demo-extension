@@ -27,6 +27,11 @@ body.embedded{
       width: auto;
       height: auto;
       transition: none;
+      transform: none;
+    }
+
+    #modal-inner{
+      animation: none;
     }
   }
 
@@ -60,6 +65,9 @@ body.embedded{
     margin-left: 240px;
     border-left: 1px solid @border-color;
     padding: 20px;
+  }
+  #form-fields{
+    min-height: 302px;
   }
 
   #tabs{
@@ -102,12 +110,21 @@ body.embedded{
     }
   }
 
+  .help-text{
+    left: 4px;
+    margin-bottom: -4px;
+  }
   .elem-wrap{
     margin-bottom: 10px;
   }
 
+  #tab-netbanking .elem-wrap{
+    margin-bottom: 0;
+  }
+
   @input-padding-left: 60px;
   #nb-elem {
+    margin-top: 16px;
     .input{
       padding-left: 16px;
       padding-right: @input-padding-left - 16px;

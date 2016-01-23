@@ -242,7 +242,6 @@ window.handleMessage = function(message) {
     }
   }
 
-
   if ( message.event === 'open' || message.options ) {
     showModal(message);
   }

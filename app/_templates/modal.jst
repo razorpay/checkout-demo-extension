@@ -105,7 +105,7 @@
                   {{? it.options.method.netbanking }}
                     <div class="fieldset tab-content{{? !it.options.method.card }} active{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
-                      <div id="netb-banks">
+                      <div id="netb-banks" class="clear">
                         {{for(var b in it.netbanks){}}
                           <div class="netb-bank">
                             <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
