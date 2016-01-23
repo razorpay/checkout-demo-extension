@@ -141,7 +141,7 @@ function formInitProps(overrides){
   delete props.notes;
 
   each(
-    props.method,
+    overrides.method,
     function(method, value){
       props.method[method] = !!value;
     }
@@ -150,6 +150,9 @@ function formInitProps(overrides){
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
   }
+
+  props.image = overrides.image || '';
+  delete overrides.image;
 
   props.options = stringify(overrides);
   return props;

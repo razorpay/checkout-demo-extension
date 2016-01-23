@@ -162,7 +162,7 @@ function showModal(message) {
   processMessage(message);
   session.render(message);
   session.modal.show();
-  trackInit(session);
+  trackInit(message);
 
   if ( CheckoutBridge ) {
     $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
@@ -224,6 +224,9 @@ Razorpay.sendMessage = function(message){
   }
 }
 window.handleMessage = function(message) {
+  if(!message.id){
+    message.id = _uid;
+  }
   if(message.embedded){
     // $(doc).addClass('embedded');
   }
@@ -259,13 +262,13 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
   window.handleMessage(data);
 }
 
-function trackInit(session){
+function trackInit(message){
   if(CheckoutBridge){
     discreet.context = qpmap.platform || 'app';
-    track.call(session, 'init', session.message.options);
+    track.call(message, 'init', message.options);
   }
   else {
-    track.call(session, 'open');
+    track.call(message, 'open');
   }
 }
 
