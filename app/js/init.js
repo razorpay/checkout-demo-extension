@@ -13,18 +13,24 @@ var ua = navigator.userAgent;
 var isCriOS = /\(iP.+(Cr|Fx)iOS/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
+var RazorpayConfig;
+if(typeof window.Razorpay === 'object' && Razorpay && typeof Razorpay.config === 'object'){
+  RazorpayConfig = Razorpay.config;
+}
+else {
+  RazorpayConfig = {
+    protocol: 'https',
+    hostname: 'api.razorpay.com',
+    version: 'v1/'
+  }
+}
+
 var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
     return new Razorpay(options);
   }
   invoke(this.configure, this, options);
 };
-
-var RazorpayConfig = {
-  protocol: 'https',
-  hostname: 'api.razorpay.com',
-  version: 'v1/'
-}
 
 Razorpay.defaults = {
   'key': '',
@@ -75,7 +81,7 @@ Razorpay.defaults = {
   'theme': {
     'color': '#00BCD4',
     'backdropColor': 'rgba(0,0,0,0.6)',
-    'imagePadding': 12
+    'imageFrame': true
   },
   'signature': '',
   'name': '', // of merchant

@@ -11,6 +11,13 @@
  </head>
   <body style='background: rgba(0, 0, 0, 0.7)'>
     <script>
+      Razorpay = {
+        config: {
+          protocol: 'http',
+          hostname: 'api.pronav.in',
+          version: 'v1/'
+        }
+      }
       var payment_methods = {
         "entity":"methods",
         "card":true,
@@ -25,10 +32,10 @@
   </body>
   <!-- build:js checkout-frame.js -->
   <!-- This is equivalent to razorpay.js -->
+  <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/init.js"></script>
   <script src="js/rollbar.js"></script>
-  <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/base.js"></script>
   <script src="js/lib/popup.js"></script>
   <script src="js/lib/jsonp.js"></script>
@@ -42,6 +49,7 @@
   <script src="js/lib/card.js"></script>
   <script src="js/lib/smarty.js"></script>
   <script src="js/lib/modal.js"></script>
+  <script src="js/checkout-frame/emi.js"></script>
   <script src="js/checkout-frame/model.js"></script><!--coverage-->
   <script src="js/checkout-frame/merchant.js"></script><!--coverage-->
   <!-- endbuild -->
@@ -52,5 +60,5 @@
 
 </html>
 <script>
-// handleMessage({embedded: true, options: {key: 'rzp_test_1DP5mmOlF5G5ag', amount: '30000', prefill: {email: 'pra@nav.gupta', contact: '8879524924'}}});
+// handleMessage({options: {key: 'rzp_test_1DP5mmOlF5G5ag', amount: '30000', prefill: {email: 'pra@nav.gupta', contact: '8879524924'}}});
 </script>

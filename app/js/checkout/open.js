@@ -5,13 +5,18 @@ var currentScript = document.currentScript || (function() {
   return scripts[scripts.length - 1];
 })();
 
-if(isCriOS){
-  var communicator = document.createElement('iframe')
-  communicator.style.display = 'none';
-  doc.appendChild(communicator);
-  communicator.src = discreet.makeUrl(true) + 'CriOS-frame.php';
+var communicator;
+
+function CriOS_handler(){
+  if(isCriOS){
+    communicator = document.createElement('iframe')
+    communicator.style.display = 'none';
+    doc.appendChild(communicator);
+    communicator.src = discreet.makeUrl(true) + 'CriOS-frame.php';
+  }
 }
 
+CriOS_handler();
 /**
   default handler for success
   it just submits everything via the form
@@ -72,13 +77,11 @@ var addAutoCheckoutButton = function(rzp){
 */
 function initAutomaticCheckout(){
   var opts = {};
-  var preload = false;
   each(
     currentScript.attributes,
     function(i, attr){
       var name = attr.name
       if(/^data-/.test(name)){
-        preload = true;
         name = name.replace(/^data-/,'');
         opts[name] = attr.value;
       }
@@ -91,9 +94,6 @@ function initAutomaticCheckout(){
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
-  }
-  else if(preload){
-    Razorpay.configure(opts);
   }
 }
 
@@ -151,18 +151,34 @@ function createFrameBackdrop(){
 
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
+var preloadedFrame = getPreloadedFrame();
 
-function setBackdropColor(value){
-  // setting unsupported value throws error in IE
-  try{ frameBackdrop.style.background = value; }
-  catch(e){}
+function getPreloadedFrame(){
+  if(!isCriOS && !preloadedFrame){
+    preloadedFrame = new CheckoutFrame();
+    preloadedFrame.bind();
+    frameContainer.appendChild(preloadedFrame.el);
+  }
+  return preloadedFrame;
+}
+
+Razorpay.open = function(options) {
+  return Razorpay(options).open();
 }
 
 Razorpay.prototype.open = function() {
-  if(!this.checkoutFrame){
-    this.checkoutFrame = new CheckoutFrame();
+  var frame;
+  if(isCriOS){
+    frame = new CheckoutFrame(this);
+    frame.el.contentWindow = window.open(
+      frame.el.getAttribute('src') + '&message=' + frame.getEncodedMessage(),
+      '_blank'
+    )
   }
-  var frame = this.checkoutFrame;
+  else {
+    frame = getPreloadedFrame();
+  }
+  this.checkoutFrame = frame;
   frame.openRzp(this);
 
   if(!frame.el.contentWindow){
@@ -170,6 +186,8 @@ Razorpay.prototype.open = function() {
     frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
+
+  return this;
 };
 
 Razorpay.prototype.close = function(){

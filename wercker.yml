@@ -46,6 +46,11 @@ deploy:
             application-name: Checkout
             deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
             s3-bucket: rzp-codedeploy
+
+        - script:
+            name: Cloudfront cache invalidate
+            code: node scripts/invalidate.js
+
     after-steps:
         - williamli/slack-notify-no-owner-info:
             subdomain: razorpay

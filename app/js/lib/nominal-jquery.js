@@ -15,6 +15,7 @@ function bind(func, thisArg){
 var qs = bind(document.querySelector, document);
 var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
+var stringify = bind(JSON.stringify, JSON);
 
 function each( iteratee, eachFunc, thisArg ) {
   var i;
@@ -86,6 +87,9 @@ function invoke(handler, thisArg, param , timeout){
       invoke(handler, thisArg, param)
     }, timeout)
     return;
+  }
+  if(typeof handler === 'string'){
+    handler = thisArg[handler];
   }
   if(typeof handler === 'function'){
     if(!thisArg){
@@ -258,50 +262,17 @@ $.prototype = {
 
   focus: function(){
     if(this[0]){
-      this[0].focus();
+      try{
+        this[0].focus();
+      }
+      catch(e){}
     }
     return this;
   }
 }
 
 $.clone = function(target){
-  return JSON.parse(JSON.stringify(target));
-};
-
-var _$listener = null;
-
-var _$createListener = function(callback, context){
-  return function(e){
-    if(!e || !e.data || typeof callback !== 'function'){
-      return;
-    }
-    var data = e.data;
-    if(typeof data === 'string'){
-      try {
-        data = JSON.parse(data);
-      }
-      catch(errorObj){
-        data = {
-          error: {
-            description: 'Unable to parse response'
-          }
-        }
-      }
-    }
-    callback.call(context, e, data);
-  }
-};
-
-$.addMessageListener = function(callback, context) {
-  if(_$listener){
-    $.removeMessageListener();
-  }
-  _$listener = $(window).on('message', _$createListener(callback, context));
-};
-
-$.removeMessageListener = function() {
-  $(window).off('message', _$listener);
-  _$listener = null;
+  return JSON.parse(stringify(target));
 };
 
 $.post = function(opts){

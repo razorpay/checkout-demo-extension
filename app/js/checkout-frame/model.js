@@ -1,12 +1,9 @@
-var Card = window.Card;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
-// element to verfy whether font has been loaded
-var fontAnchor = '#powered-link';
 var fontTimeout;
 
 // sanitizes innerHTML, by removing angle brackets
@@ -156,9 +153,19 @@ function getFormData() {
   return data;
 }
 
+function hideEmi(){
+  var emic = $('#emi-container');
+  if(emic[0]){
+    emic.removeClass('shown');
+    invoke(emic.hide, emic, null, 300)
+    gel('fd-in').style.display = '';
+  }
+}
+
 function frontDrop(message, className){
   gel('fd-t').innerHTML = message || '';
   gel('fd').className = className || '';
+  hideEmi();
 }
 
 function showErrorMessage(message){
@@ -167,6 +174,29 @@ function showErrorMessage(message){
 
 function showLoadingMessage(message){
   frontDrop(message, 'shown loading');
+}
+
+function setDefaultError(){
+  var msg = discreet.defaultError();
+  msg.id = _uid;
+  setCookie('onComplete', stringify(msg));
+}
+
+function processModalMethods(session){
+  var modal = session.message.options.modal;
+
+  modal.onhide = function(){
+    Razorpay.sendMessage({event: 'dismiss'});
+    if(isCriOS){
+      setDefaultError();
+      window.close();
+    }
+  };
+  modal.onhidden = function(){
+    session.saveAndClose();
+    Razorpay.sendMessage({event: 'hidden'});
+  }
+  delete modal.ondismiss;
 }
 
 function CheckoutModal(){
@@ -238,7 +268,7 @@ CheckoutModal.prototype = {
 
   render: function(message){
     if(this.isOpen){
-      this.close();
+      this.saveAndClose();
     }
     else {
       this.isOpen = true;
@@ -249,16 +279,22 @@ CheckoutModal.prototype = {
     sanitize(message);
     this.getEl();
     this.fillData(message.data);
+
+    processModalMethods(this);
     if(!this.modal) { this.modal = new window.Modal(this.el, message.options.modal) }
+
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting()
     this.bindEvents();
+
+    this.emiView = new emiView(message.options);
   },
 
   renderCss: function(){
     var div = this.el;
     var theme = this.message.options.theme;
     var style = document.createElement('style');
+    style.type = 'text/css';
     try{
       div.style.color = theme.color;
       if(div.style.color){
@@ -320,11 +356,13 @@ CheckoutModal.prototype = {
   },
 
   bindEvents: function(){
-    this.on('click', '#modal-close', this.close);
+    this.on('click', '#modal-close', this.hide);
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
-    var enableMethods = this.message.options.method;
+    var options = this.message.options;
+    var enableMethods = options.method;
+
     if(enableMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -345,6 +383,10 @@ CheckoutModal.prototype = {
         this.hideErrorMessage();
       }
     });
+
+    if(isCriOS){
+      this.on('unload', window, options.modal.onhide);
+    }
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
   },
 
@@ -453,6 +495,7 @@ CheckoutModal.prototype = {
 
   hide: function(){
     $('#modal-inner').removeClass('shake');
+    frontDrop();
     this.modal.hide();
   },
 
@@ -462,20 +505,21 @@ CheckoutModal.prototype = {
     }
     this.rzp = null;
     // prevent dismiss event
-    this.modal.options.onhide = null;
+    this.modal.options.onhide = noop;
 
     Razorpay.sendMessage({ event: 'success', data: response });
     if(isCriOS) {
-      setCookie('onComplete', JSON.stringify(response));
+      response.id = _uid;
+      setCookie('onComplete', stringify(response));
     }
-    this.close();
+    this.hide();
   },
 
   errorHandler: function(response){
     if(!this.rzp || !response){
       return;
     }
-    this.rzp = null;
+    this.rzp = window.onComplete = null;
     var message;
     this.shake();
     this.modal.options.backdropClose = this.message.options.modal.backdropClose;
@@ -539,6 +583,10 @@ CheckoutModal.prototype = {
 
     // TODO
     this.rzp = Razorpay(this.message.options);
+
+    // onComplete defined in razorpay-submit.js, safe to expose now
+    window.onComplete = bind(discreet.onComplete, this.rzp);
+
     this.rzp.authorizePayment({
       data: data,
       error: bind(this.errorHandler, this),
@@ -552,7 +600,6 @@ CheckoutModal.prototype = {
         this.rzp.cancelPayment();
         this.rzp = null;
       }
-      this.hide();
       this.isOpen = false;
       clearTimeout(fontTimeout);
       each(
@@ -562,16 +609,18 @@ CheckoutModal.prototype = {
         }
       )
       this.listeners = [];
-
       this.modal.destroy();
       this.smarty.off();
       this.card.unbind();
+      this.emiView.unbind();
       $(this.el).remove();
 
-      this.modal = null;
-      this.smarty = null;
-      this.card = null;
-      this.el = null;
+      this.modal =
+      this.smarty =
+      this.card =
+      this.emiView =
+      this.el =
+      window.onComplete = null;
     }
   },
 

@@ -34,17 +34,34 @@ var optionsExtended = {
   hostname: 'api.razorpay.dev'
 }
 
-describe("new Razorpay", function(){
+describe('new Razorpay should', function(){
   var rzp;
 
-  it("without options should fail", function(){
+  it('fail without options', function(){
     expect(function(){new Razorpay()}).toThrow();
   });
 
-  it("should create Razorpay instance", function(){
+  it('create Razorpay instance', function(){
     rzp = new Razorpay(options);
     expect(rzp instanceof Razorpay).toBe(true);
   });
+
+  it('call open method right away if parent option is specified', function(done){
+    var options2 = JSON.parse(JSON.stringify(options));
+    options2.parent = '#p';
+
+    var open = Razorpay.prototype.open;
+    Razorpay.prototype.open = noop;
+    var spy = jasmine.createSpy();
+    spyOn(Razorpay.prototype, 'open').and.callFake(function(){
+      spy();
+      done();
+    })
+    rzp = new Razorpay(options2);
+    Razorpay.prototype.open = open;
+
+    expect(spy).toHaveBeenCalled();
+  })
 })
 
 describe('configure', function(){

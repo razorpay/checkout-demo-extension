@@ -158,9 +158,9 @@ describe('payment authorization', function(){
     getSession().rzp = Razorpay({key: 'key', amount: 100})
 
     var session = getSession();
-    var spy = jasmine.createSpy('close');
+    var spy = jasmine.createSpy('hide');
 
-    spyOn(session, 'close').and.callFake(spy);
+    spyOn(session.modal, 'hide').and.callFake(spy);
 
     session.successHandler();
     expect(spy).toHaveBeenCalled();
@@ -633,7 +633,7 @@ describe("CheckoutBridge should", function(){
 
   it("be notified if present", function(){
     var spy = jasmine.createSpy();
-    spyOn(frameDiscreet, 'notifyBridge').and.callFake(function(msg){
+    spyOn(window, 'notifyBridge').and.callFake(function(msg){
       if(msg == message)
         spy()
     });
@@ -643,7 +643,7 @@ describe("CheckoutBridge should", function(){
   it("be called with given event", function(){
     var spy = jasmine.createSpy();
     spyOn(CheckoutBridge, 'onevt').and.callFake(spy);
-    frameDiscreet.notifyBridge(message);
+    notifyBridge(message);
     expect(spy).toHaveBeenCalled();
   })
 
@@ -655,14 +655,14 @@ describe("CheckoutBridge should", function(){
         spy()
     })
 
-    frameDiscreet.notifyBridge(message);
+    notifyBridge(message);
     expect(spy).toHaveBeenCalled();
   })
 
   it("not be notified if absent", function(){
     CheckoutBridge = null;
     var spy = jasmine.createSpy();
-    spyOn(frameDiscreet, 'notifyBridge').and.callFake(spy);
+    spyOn(window, 'notifyBridge').and.callFake(spy);
     Razorpay.sendMessage(message);
     expect(spy).not.toHaveBeenCalled();
   })
@@ -689,18 +689,18 @@ describe("handleMessage should", function(){
       expect(m.event).toBe('fault');
       spyCalled();
     })
-    spyOn(frameDiscreet, 'showModal').and.callFake(spyNotCalled);
+    spyOn(window, 'showModal').and.callFake(spyNotCalled);
   })
 
   it("showModal on passing options", function(){
     opts = coOptions;
-    spyOn(frameDiscreet, 'showModal').and.callFake(spyCalled);
+    spyOn(window, 'showModal').and.callFake(spyCalled);
   })
 })
 
 describe("set url query params", function(){
   it("", function(){
-    frameDiscreet.setQueryParams('qwe=asd&poe.level2=hjk&bnm=786');
+    setQueryParams('qwe=asd&poe.level2=hjk&bnm=786');
     expect(qpmap.qwe).toBe('asd');
     expect(qpmap.poe.level2).toBe('hjk');
     expect(qpmap.bnm).toBe('786');
@@ -714,7 +714,7 @@ describe('existing query params should', function(){
   })
 
   it('set error', function(){
-    frameDiscreet.setQueryParams('error.description=asd');
+    setQueryParams('error.description=asd');
     openCheckoutForm(coOptions);
     spyOn(getSession(), 'errorHandler').and.callFake(function(response){
       expect(response.error.description).toBe('asd');
@@ -722,7 +722,7 @@ describe('existing query params should', function(){
   })
 
   it('set tab', function(){
-    frameDiscreet.setQueryParams('tab=netbanking');
+    setQueryParams('tab=netbanking');
     openCheckoutForm(coOptions);
     expectVisibleTab('netbanking')();
   })
@@ -743,17 +743,15 @@ describe('ios CheckoutBridge', function(){
 
 describe('close button should close modal', function(){
   it('', function(){
-    var spy = jasmine.createSpy();
-    var spy2 = jasmine.createSpy();
+    var spy = jasmine.createSpy('hide');
 
     openCheckoutForm(coOptions);
     var session = getSession();
-    session.rzp = {cancelPayment: spy}
+    session.rzp = {cancelPayment: spy};
 
-    spyOn(session.modal, 'hide').and.callFake(spy2);
+    spyOn(session.modal, 'hide').and.callFake(spy);
     sendclick(jQuery('#modal-close')[0]);
     expect(spy).toHaveBeenCalled();
-    expect(spy2).toHaveBeenCalled();
   })
 })
 

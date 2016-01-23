@@ -60,7 +60,7 @@ function restoreOverflow(){
 // to handle absolute/relative url of options.image
 function sanitizeImage(options){
   if(options.image && typeof options.image === 'string'){
-    if(/data:image\/[^;]+;base64/.test(options.image)){
+    if(discreet.isBase64Image(options.image)){
       return;
     }
     if(options.image.indexOf('http')){ // not 0
@@ -100,14 +100,18 @@ function makeCheckoutMessage(rzp){
       }
     }
   )
-  for(var i in rzp.modal.options){
-    rzp.options.modal[i] = rzp.modal.options[i];
-  }
+
+  each(
+    rzp.modal.options,
+    function(i, option){
+      rzp.options.modal[i] = option;
+    }
+  )
 
   if(options.parent){
-    delete options.parent;
     response.embedded = true;
   }
+  delete options.parent;
 
   sanitizeImage(options);
 
@@ -120,6 +124,12 @@ function makeCheckoutMessage(rzp){
   return response;
 }
 
+function setBackdropColor(value){
+  // setting unsupported value throws error in IE
+  try{ frameBackdrop.style.background = value; }
+  catch(e){}
+}
+
 function CheckoutFrame(rzp){
   if(rzp){
     this.getEl(rzp.options);
@@ -129,6 +139,10 @@ function CheckoutFrame(rzp){
 }
 
 CheckoutFrame.prototype = {
+  getEncodedMessage: function(){
+    return _btoa(stringify(makeCheckoutMessage(this.rzp)));
+  },
+
   getEl: function(options){
     if(!this.el){
       this.el = $(document.createElement(isCriOS ? 'div' : 'iframe'))
@@ -155,7 +169,7 @@ CheckoutFrame.prototype = {
     if(rzp !== this.rzp){
       message = makeCheckoutMessage(rzp);
 
-      if(!this.rzp){
+      if(!this.rzp && !this.el.parentNode){
         $parent.append(this.el);
       }
 
@@ -256,7 +270,7 @@ CheckoutFrame.prototype = {
       // TODO roll
     }
     response.id = this.rzp.id;
-    response = JSON.stringify(response);
+    response = stringify(response);
     this.el.contentWindow.postMessage(response, '*');
   },
 
@@ -275,7 +289,7 @@ CheckoutFrame.prototype = {
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && data.id !== this.rzp.id) ||
+      // (event !== 'load' && data.id !== this.rzp.id) ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
       return;
@@ -300,7 +314,7 @@ CheckoutFrame.prototype = {
   onsubmit: function(data){
     var cb = window.CheckoutBridge;
     if(typeof cb === 'object'){
-      invoke(cb.onsubmit, cb, JSON.stringify(data));
+      invoke(cb.onsubmit, cb, stringify(data));
     }
   },
 
@@ -316,11 +330,13 @@ CheckoutFrame.prototype = {
 
   onsuccess: function(data){
     this.close();
-    invoke(this.rzp.options.handler, window, data, 200);
+    invoke('handler', this.rzp.options, data, 200);
   },
 
   onfailure: function(data){
+    this.ondismiss();
     alert('Payment Failed.\n' + data.error.description);
+    this.onhidden();
   },
 
   onfault: function(message){

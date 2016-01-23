@@ -58,7 +58,7 @@
       this.container.addClass('shown');
       clearTimeout();
       timeout = setTimeout(this.shown, this.animationDuration);
-      this.container[0].focus();
+      this.container.focus();
     },
 
     shown: function() {

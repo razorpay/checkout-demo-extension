@@ -59,6 +59,28 @@ describe('Razorpay.payment.validate should', function(){
   // })
 })
 
+describe('Razorpay.payment.authorize should', function(){
+
+  beforeEach(function(){
+    Razorpay.configure({key: 'key1'});
+  })
+
+  afterEach(function(){
+    Razorpay.defaults.key = '';
+    Razorpay.defaults.amount = '';
+  })
+
+  it('return razorpay object', function(){
+    expect(Razorpay.payment.authorize({data: {amount: 1000}}) instanceof Razorpay).toBe(true);
+  })
+
+  it('should invoke rzp.authorizePayment', function(){
+    var spy = jasmine.createSpy();
+    spyOn(Razorpay.prototype, 'authorizePayment').and.callFake(spy);
+    var rzp = Razorpay.payment.authorize({data: {amount: 2000}});
+    expect(spy).toHaveBeenCalled();
+  })
+})
 
 describe('authorize should', function(){
   var rzp, init_options, req;
@@ -113,11 +135,22 @@ describe('authorize should', function(){
     expect(spyCalled).toHaveBeenCalled();
   });
 
-  it('add callback_url if specified in options', function(){
+  it('not add callback_url if specified in options', function(){
     rzp = Razorpay({
       callback_url: 'swag',
       key: 'key',
       amount: 100
+    })
+    rzp.authorizePayment(req);
+    expect(req.data.callback_url).not.toBeDefined();
+  })
+
+  it('add callback_url if specified with redirect', function(){
+    rzp = Razorpay({
+      callback_url: 'swag',
+      key: 'key',
+      amount: 100,
+      redirect: true
     })
     rzp.authorizePayment(req);
     expect(req.data.callback_url).toBe('swag');
@@ -210,7 +243,7 @@ describe('handleResponse should invoke', function(){
         description: 'hello'
       }
     };
-    onComplete.call(rzp, error_data);
+    discreet.onComplete.call(rzp, error_data);
   })
 
   it('error if response is invalid', function(done){
@@ -222,7 +255,7 @@ describe('handleResponse should invoke', function(){
       done();
     })
     var error_data = {};
-    onComplete.call(rzp, error_data);
+    discreet.onComplete.call(rzp, error_data);
   })
 
   it('success if response contains payment id', function(done){
@@ -235,7 +268,7 @@ describe('handleResponse should invoke', function(){
     var success_data = {
       razorpay_payment_id: '12344'
     };
-    onComplete.call(rzp, success_data);
+    discreet.onComplete.call(rzp, success_data);
   })
 })
 
@@ -276,6 +309,53 @@ describe('cookie operations', function(){
     expect(getCookie(key)).toBe(val);
     deleteCookie(key);
     expect(getCookie(key)).toBe(null);
+  })
+
+  it('polling', function(done){
+    deleteCookie('onComplete');
+    spyOn(window, 'deleteCookie').and.callFake(function(cookieName){
+      expect(cookieName).toBe('onComplete');
+    })
+
+    expect(cookieInterval).not.toBeDefined();
+
+    cookiePoll();
+
+    expect(cookieInterval).toBeDefined();
+    var getSpy = jasmine.createSpy('getCookie');
+    var completeSpy = jasmine.createSpy('onComplete');
+
+    var virgin = true;
+
+    spyOn(window, 'getCookie').and.callFake(function(){
+      var completionExpection = expect(completeSpy);
+      var cookie = '';
+
+      if(virgin){
+        virgin = false;
+        completionExpection = completionExpection.not;
+      }
+      else {
+        cookie = 'hello';
+      }
+
+      setTimeout(function(){
+        completionExpection.toHaveBeenCalled();
+        if(!cookieInterval){
+          setTimeout(function(){
+            expect(!!cookieInterval).toBe(false);
+            done();
+          })
+        }
+      })
+      return cookie;
+    })
+
+    spyOn(discreet, 'onComplete').and.callFake(function(cookie){
+      expect(cookie).toBe('hello');
+      completeSpy();
+    })
+
   })
 })
 
@@ -356,7 +436,7 @@ describe('onMessage should invoke onComplete', function(){
 
   it('not if on origin', function(){
     spy = jasmine.createSpy();
-    spyOn(window, 'onComplete').and.callFake(spy);
+    spyOn(discreet, 'onComplete').and.callFake(spy);
     onMessage({});
   })
 

@@ -5,21 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
-
+  <script>
+    Razorpay = {
+      config: {
+        protocol: 'http',
+        hostname: 'api.pronav.in',
+        version: 'v1/'
+      }
+    }
+  </script>
   <!-- build:js checkout.js -->
+  <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/init.js"></script>
-  <script>
-    RazorpayConfig.protocol = 'http';
-    RazorpayConfig.hostname = 'api.pronav.in';
-  </script>
-  <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/base.js"></script><!--coverage-->
-  <script src="js/checkout/open.js"></script><!--coverage-->
   <script src="js/checkout/frame.js"></script><!--coverage-->
+  <script src="js/checkout/open.js"></script><!--coverage-->
   <!-- test scripts
   <script src="../test/base.js"></script>
-  <script src="../test/checkout-open.js"></script>
+  <script src="../test/rzp-open.js"></script>
+  <script src="../test/CheckoutFrame.js"></script>
   -->
   <!-- endbuild -->
 
@@ -66,7 +71,6 @@
       theme: {
         color: '#F37254'
       },
-      parent: '#x',
       modal: {
         ondismiss: function(){console.log(1)},
         onhidden: function(){console.log(2)}

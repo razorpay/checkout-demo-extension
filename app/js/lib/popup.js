@@ -20,22 +20,32 @@ var _popCheckClose = function(popup) {
   }
 };
 
-var _popDefaults = {
-  width: 800,
-  height: 520,
-  menubar: 'no',
-  resizable: 'yes',
-  location: 'no',
-  scrollbars: 'yes'
-};
+function getPopupDimension(varVal, minVal, maxVal){
+  return Math.min(
+    Math.max(
+      Math.floor(varVal),
+      minVal
+    ),
+    maxVal
+  )
+}
 
 /**
 * The "Popup" constructor.
 */
 
 var Popup = function(src, name) {
+  var width = window.innerWidth || document.documentElement.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight;
 
-  var opts = _popDefaults;
+  var opts = {
+    width: getPopupDimension(width*0.6, 720, 1440),
+    height: getPopupDimension(height*0.75, 520, 1060),
+    menubar: 'no',
+    resizable: 'yes',
+    location: 'no',
+    scrollbars: 'yes'
+  };
 
   // we try to place it at the center of the current window
   // note: this "centering" logic borrowed from the Facebook JavaScript SDK
@@ -83,6 +93,7 @@ Popup.prototype = {
     clearInterval(this.interval);
     $(window).off('unload', this.unload);
     $(window).off('beforeunload', this.beforeunload);
+
     try{
       this.window.close();
     }
