@@ -169,14 +169,7 @@ Razorpay.open = function(options) {
 Razorpay.prototype.open = function() {
   var frame = this.checkoutFrame;
   if(!frame){
-    if(isCriOS){
-      frame = new CheckoutFrame(this);
-      frame.el.contentWindow = window.open(
-        frame.el.getAttribute('src') + '&message=' + frame.getEncodedMessage(),
-        '_blank'
-      )
-    }
-    else if (this.options.parent){
+    if(isCriOS || this.options.parent){
       frame = new CheckoutFrame(this);
     }
     else {

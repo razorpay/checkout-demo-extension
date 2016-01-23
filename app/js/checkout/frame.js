@@ -161,6 +161,15 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
+    if(isCriOS){
+      if(this.el.contentWindow){
+        this.el.contentWindow.close();
+      }
+      this.el.contentWindow = window.open(
+        frame.el.getAttribute('src') + '&message=' + frame.getEncodedMessage(),
+        '_blank'
+      )
+    }
     this.bind();
     var parent = rzp.options.parent;
     var $parent = $(parent || frameContainer);
