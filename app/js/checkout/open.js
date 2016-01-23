@@ -154,7 +154,7 @@ var frameBackdrop = createFrameBackdrop();
 var preloadedFrame = getPreloadedFrame();
 
 function getPreloadedFrame(){
-  if(!isCriOS && !preloadedFrame){
+  if(!isCriOS && !preloadedFrame && !/ Opera Mini\//.test(ua)){
     preloadedFrame = new CheckoutFrame();
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
