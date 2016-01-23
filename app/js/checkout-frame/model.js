@@ -522,7 +522,7 @@ CheckoutModal.prototype = {
   },
 
   errorHandler: function(response){
-    if(!this.rzp || !response){
+    if(!response){
       return;
     }
     this.rzp = window.onComplete = null;
@@ -530,7 +530,7 @@ CheckoutModal.prototype = {
     this.shake();
     this.modal.options.backdropClose = this.message.options.modal.backdropClose;
 
-    if (response && response.error){
+    if (response.error){
       message = response.error.description;
       var err_field = response.error.field;
       if (err_field){

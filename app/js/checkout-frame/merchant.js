@@ -176,7 +176,9 @@ function showModalWithMessage(message){
     $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
   }
 
-  session.errorHandler(qpmap.error);
+  if(qpmap.error){
+    session.errorHandler(qpmap);
+  }
   session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
 }
 
