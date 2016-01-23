@@ -4,8 +4,6 @@ var shouldShakeOnError = !/Android|iPhone/.test(ua);
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
-// element to verfy whether font has been loaded
-var fontAnchor = '#powered-link';
 var fontTimeout;
 
 // sanitizes innerHTML, by removing angle brackets

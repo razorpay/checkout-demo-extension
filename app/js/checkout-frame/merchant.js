@@ -180,7 +180,7 @@ function configureRollbar(message){
       {
         payload: {
           person: {
-            id: _uid
+            id: message.id
           },
           context: discreet.context
         }
