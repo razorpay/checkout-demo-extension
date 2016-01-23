@@ -116,7 +116,7 @@
                           </div>
                         {{}}}
                       </div>
-                      <div id="nb-elem" class="elem select">
+                      <div class="elem-wrap"><div id="nb-elem" class="elem select">
                         <span class="help-text">Please select a bank from the list</span>
                         <i class="i">&#xe601;</i>
                         <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
@@ -125,7 +125,7 @@
                             <option value="{{=i}}">{{=it.options.method.netbanking[i]}}</option>
                           {{}}}
                         </select>
-                      </div>
+                      </div></div>
                     </div>
                   {{?}}
                   {{? it.options.method.wallet.length }}

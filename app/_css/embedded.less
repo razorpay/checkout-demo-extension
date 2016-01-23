@@ -107,8 +107,18 @@ body.embedded{
   }
 
   @input-padding-left: 60px;
+  #nb-elem {
+    .input{
+      padding-left: 16px;
+      padding-right: @input-padding-left - 16px;
+    }
+    i {
+      right: -@input-padding-left - 2px;
+      border-radius: 0 4px 4px 0;
+    }
+  }
   .elem{
-    margin-right: 60px;
+    margin-right: @input-padding-left;
 
     .input{
       font-size: @font-size;

@@ -169,7 +169,7 @@ CheckoutFrame.prototype = {
     if(rzp !== this.rzp){
       message = makeCheckoutMessage(rzp);
 
-      if(!this.rzp && !this.el.parentNode){
+      if(!this.rzp && this.el.parentNode !== $parent[0]){
         $parent.append(this.el);
       }
 
