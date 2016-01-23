@@ -508,6 +508,7 @@ CheckoutModal.prototype = {
     if(!this.rzp){
       return;
     }
+    track.call(this.rzp, 'success', response);
     this.rzp = null;
     // prevent dismiss event
     this.modal.options.onhide = noop;
