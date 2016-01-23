@@ -16,7 +16,7 @@ var CallerReference = '' + new Date().getTime();
 
 glob('app/dist/**', {}, function(error, files){
   files.forEach(function(f){
-    if(fs.lstatSync(f).isFile()){
+    if(fs.lstatSync(f).isFile() && /\.(css|js)$/.test(f)){
       batch.push(f.replace('app/dist', ''));
     }
   });
