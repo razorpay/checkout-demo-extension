@@ -91,7 +91,9 @@ var _uid = generateUID();
 function track(event, props) {
   var id = this.id;
   if(id && /^rzp_l/.test(this.options.key)){
-    props = $.clone(props);
+    if(props){
+      props = $.clone(props);
+    }
 
     setTimeout(function(){
       var data = {
