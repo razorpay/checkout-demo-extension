@@ -80,11 +80,8 @@ var optionValidations = {
   amount: function(amount){
     var intAmount = parseInt(amount, 10);
     var strAmount = String(amount);
-    var isAmountFloat = strAmount.indexOf('.') !== -1;
-    if(isAmountFloat){
-      roll('Invalid amount', strAmount);
-    }
-    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100) {
+
+    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100 || /\./.test(strAmount)) {
       var errorMessage = 'should be passed in paise. Minimum value is 100';
       alert('Invalid amount. It ' + errorMessage);
       return errorMessage;

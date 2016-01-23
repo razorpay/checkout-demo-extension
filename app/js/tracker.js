@@ -100,18 +100,7 @@ function track(event, props) {
         data.medium = discreet.medium;
         data.context = discreet.context;
         data.ip = '${keen.ip}';
-        data.ua = '${keen.user_agent}';
-        data.keen = {
-          addons : [
-            {
-              name : 'keen:ip_to_geo',
-              input : {
-                ip : 'ip'
-              },
-              output : 'ip_info'
-            }
-          ]
-        }
+        data.ua = ua;
       }
 
       if(typeof props === 'object') {
@@ -132,6 +121,15 @@ function track(event, props) {
 
 function formInitProps(overrides){
   var props = {};
+
+  each(
+    overrides,
+    function(key){
+      if(!(key in Razorpay.defaults)){
+        delete overrides[key];
+      }
+    }
+  )
 
   props.key = overrides.key || '';
   delete overrides.key;
