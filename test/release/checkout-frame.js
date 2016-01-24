@@ -18,7 +18,7 @@ describe('handleMessage should', function(){
 
   it('show checkout form', function(){
     expect(jQuery('#container').length).toBe(0);
-    handleMessage({options: {key: 'rzp_test_1DP5mmOlF5G5ag', amount: '30000'}});
+    handleMessage({id: '4o4VoU9Zseg1GA', options: {key: 'rzp_test_1DP5mmOlF5G5ag', amount: '30000'}});
     expect(jQuery('#container').length).toBe(1);
   })
 })

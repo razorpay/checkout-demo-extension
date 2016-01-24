@@ -5,6 +5,8 @@ var CheckoutBridge = window.CheckoutBridge;
 
 var sessions = {};
 
+var isIframe = window !== parent;
+
 function getSession(methodToCall) {
   var session = sessions[_uid];
   if(session && methodToCall){
@@ -223,7 +225,7 @@ Razorpay.sendMessage = function(message){
     return notifyBridge(message);
   }
 
-  var ownerWindow = window === window.parent ? window.opener : window.parent;
+  var ownerWindow = isIframe ? parent : opener;
 
   if(!isCriOS && ownerWindow){
     message.source = 'frame';
@@ -234,7 +236,17 @@ Razorpay.sendMessage = function(message){
     ownerWindow.postMessage(message, '*');
   }
 }
+
 window.handleMessage = function(message) {
+  if(isIframe){
+    if(typeof message.id !== 'string' || message.id.length < 14 || !/[0-9a-z]/i.test(message.id)){
+      return;
+    }
+    // if(_toBase10(_uid.slice(0,4)) - _toBase10(message.id.slice(0,4)) > 10000){
+    //   return;
+    // }
+  }
+
   if(!message.id){
     message.id = _uid;
   }
@@ -266,11 +278,15 @@ window.handleMessage = function(message) {
 }
 
 function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
-  var data = e.data;
-  if(typeof data === 'string') {
-    data = JSON.parse(data);
+  try{
+    var data = e.data;
+    if(typeof data === 'string') {
+      data = JSON.parse(data);
+    }
+    window.handleMessage(data);
+  } catch(e){
+    roll('invalid message', data);
   }
-  window.handleMessage(data);
 }
 
 function trackInit(message){

@@ -1,3 +1,4 @@
+isIframe = false;
 var orig_methods = window.payment_methods = {
   "card": true,
   "netbanking": {"HDFC":"HDFC Bank", "UTIB":"Axis Bank","BARB":"Bank of Baroda","SBIN":"State Bank of India"},

@@ -281,13 +281,17 @@ Razorpay.prototype.authorizePayment = function(request){
 
   if(!request.popup){
     name = '_blank'
-  } else if(request.popup.cc){
-    name = request.popup.name;
+
+  } else {
+    request.popup.onClose = bind(this.cancelPayment, this);
+
+    if(request.popup.cc){
+      name = request.popup.name;
+    }
   }
 
   trackSubmit(this, rdata);
 
-  request.popup.onClose = bind(this.cancelPayment, this);
   this._request = request;
 
   if(name){

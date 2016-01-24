@@ -1,6 +1,13 @@
 var base62Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 var base64Chars = base62Chars + '+=';
 base62Chars = base62Chars.slice(52) + base62Chars.slice(0, 52);
+var map62 = {};
+each(
+  base62Chars,
+  function(i, chr){
+    map62[chr] = i;
+  }
+)
 
 var _btoa = window.btoa;
 if(!_btoa){
@@ -39,6 +46,18 @@ if(!_btoa){
   };
 }
 
+function _toBase10(str62){
+  var val = 0;
+  var len = str62.length;
+  each(
+    str62,
+    function(index, character){
+      val += map62[character] * Math.pow(62, len - index);
+    }
+  )
+  return val/62;
+}
+
 function _toBase62(number){
   var rixit;
   var result = '';
@@ -59,13 +78,6 @@ function generateUID(){
   _toBase62(Math.floor(238328*Math.random())) + '0';
 
   var sum = 0, tempdigit;
-  var map62 = {};
-  each(
-    base62Chars,
-    function(i, chr){
-      map62[chr] = i;
-    }
-  )
   each(
     num,
     function(i){
