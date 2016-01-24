@@ -237,13 +237,17 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleMessage = function(message) {
-  if(isIframe){
+  if(isIframe && !CheckoutBridge){
     if(typeof message.id !== 'string' || message.id.length < 14 || !/[0-9a-z]/i.test(message.id)){
-      return roll('invalid message', message, 'warn');
+      var keys = [];
+      each(
+        message,
+        function(key){
+          keys.push(key);
+        }
+      )
+      return roll('invalid message', keys.join(), 'warn');
     }
-    // if(_toBase10(_uid.slice(0,4)) - _toBase10(message.id.slice(0,4)) > 10000){
-    //   return;
-    // }
   }
 
   if(!message.id){
