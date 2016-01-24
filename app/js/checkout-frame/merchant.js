@@ -6,6 +6,7 @@ var CheckoutBridge = window.CheckoutBridge;
 var sessions = {};
 
 var isIframe = window !== parent;
+var ownerWindow = isIframe ? parent : opener;
 
 function getSession(methodToCall) {
   var session = sessions[_uid];
@@ -225,8 +226,6 @@ Razorpay.sendMessage = function(message){
     return notifyBridge(message);
   }
 
-  var ownerWindow = isIframe ? parent : opener;
-
   if(!isCriOS && ownerWindow){
     message.source = 'frame';
     message.id = _uid;
@@ -279,6 +278,9 @@ window.handleMessage = function(message) {
 
 function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
   var data = e.data;
+  if(e.source && e.source !== ownerWindow){
+    return;
+  }
   try{
     if(typeof data === 'string') {
       data = JSON.parse(data);
