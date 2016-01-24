@@ -631,7 +631,9 @@ CheckoutModal.prototype = {
   },
 
   saveAndClose: function(){
-    this.message.data = getFormData();
+    if(this.message){
+      this.message.data = getFormData();
+    }
     this.close();
   }
 }

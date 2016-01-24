@@ -278,13 +278,13 @@ window.handleMessage = function(message) {
 }
 
 function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
+  var data = e.data;
   try{
-    var data = e.data;
     if(typeof data === 'string') {
       data = JSON.parse(data);
     }
     window.handleMessage(data);
-  } catch(e){
+  } catch(err){
     roll('invalid message', data);
   }
 }
