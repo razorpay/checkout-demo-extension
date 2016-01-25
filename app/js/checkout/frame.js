@@ -293,7 +293,14 @@ CheckoutFrame.prototype = {
   },
 
   onmessage: function(e){
-    var data = JSON.parse(e.data);
+    var data;
+    try{
+      data = JSON.parse(e.data);
+    }
+    catch(err){
+      return;
+    }
+
     var event = data.event;
     // source check
     if(
