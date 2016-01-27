@@ -68,31 +68,34 @@ var freqWallets = {
 }
 
 var emi_options = {
-  HDFC: {
-    name: 'HDFC Bank',
-    plans: {
-      3: 9,
-      6: 10,
-      9: 11,
-      12: 12
-    }
-  },
-  UTIB: {
-    name: 'Axis Bank',
-    plans: {
-      3: 9,
-      6: 10,
-      9: 11,
-      12: 12
-    }
-  },
-  KKBK: {
-    name: 'Kotak Mahindra Bank',
-    plans: {
-      3: 9,
-      6: 10,
-      9: 11,
-      12: 12
+  selected: 'HDFC',
+  banks: {
+    HDFC: {
+      name: 'HDFC Bank',
+      plans: {
+        3: 9,
+        6: 10,
+        9: 11,
+        12: 12
+      }
+    },
+    UTIB: {
+      name: 'Axis Bank',
+      plans: {
+        3: 8,
+        6: 10,
+        9: 11,
+        12: 12
+      }
+    },
+    KKBK: {
+      name: 'Kotak Mahindra Bank',
+      plans: {
+        3: 9,
+        6: 10,
+        9: 11,
+        12: 12
+      }
     }
   }
 }

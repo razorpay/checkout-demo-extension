@@ -1,9 +1,10 @@
 
 function emiView(opts){
+  this.opts = opts;
   this.listeners = [];
-  if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
-    this.render(opts);
-  }
+  // if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
+    this.render();
+  // }
 
   if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
     $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
@@ -11,9 +12,9 @@ function emiView(opts){
 }
 
 emiView.prototype = {
-  render: function(opts) {
+  render: function() {
     this.unbind();
-    $('#emi-wrap').html(templates.emi(opts));
+    $('#emi-container').html(templates.emi(this.opts));
     $('#emi-close').on('click', frontDrop);
     this.bind($('#elem-emi'));
     $('#methods-specific-fields').css('minHeight', '263px');
@@ -27,23 +28,36 @@ emiView.prototype = {
     ])
   },
 
+  onchange: function(e){
+    this.opts.selected = e.target.value;
+    this.render();
+  },
+
+  onemicheck: function(){
+    var shouldCheck = $(this).hasClass('check');
+    if(!gel('emi').checked || !shouldCheck){
+
+      $('#emi-container')
+        .css('display', 'block')
+        .reflow()
+        .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
+
+      $('#fd').addClass('shown');
+      $('#fd-in').hide();
+    }
+  },
+
   bind: function(elem_emi){
+    this.on(
+      $('#emi_select'),
+      'change',
+      bind(this.onchange, this)
+    );
+
     this.on(
       elem_emi.addClass('shown'),
       'mouseup',
-      function(){
-        var shouldCheck = $(this).hasClass('check');
-        if(!gel('emi').checked || !shouldCheck){
-
-          $('#emi-container')
-            .css('display', 'block')
-            .reflow()
-            .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
-
-          $('#fd').addClass('shown');
-          $('#fd-in').hide();
-        }
-      }
+      this.onemicheck
     )
 
     this.on(
@@ -53,6 +67,7 @@ emiView.prototype = {
         elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
       }
     )
+
     each(
       $$('#emi-container > .emi-option'),
       function(i, el){
