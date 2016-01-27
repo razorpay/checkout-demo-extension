@@ -59,7 +59,8 @@ Razorpay.defaults = {
   'method': {
     'netbanking': null,
     'card': null,
-    'wallet': {}
+    'wallet': null,
+    'emi': null
   },
   'prefill': {
     'name': '',
