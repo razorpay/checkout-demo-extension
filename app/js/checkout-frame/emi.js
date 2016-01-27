@@ -11,8 +11,9 @@ function emiView(opts){
 }
 
 emiView.prototype = {
-  render: function() {
-    $('#emi-wrap').html(templates.emi());
+  render: function(opts) {
+    this.unbind();
+    $('#emi-wrap').html(templates.emi(opts));
     $('#emi-close').on('click', frontDrop);
     this.bind($('#elem-emi'));
     $('#methods-specific-fields').css('minHeight', '263px');
