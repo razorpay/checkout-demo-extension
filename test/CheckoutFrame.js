@@ -48,6 +48,7 @@ describe('makeCheckoutMessage should', function(){
   var rzp = {
     id: 'someid',
     options: {
+      redirect: noop,
       image: 'abcdef',
       hello: 'world',
       nested: {
@@ -80,6 +81,15 @@ describe('makeCheckoutMessage should', function(){
     expect(message.context).toBe(location.href);
     expect(message.config).toBe(RazorpayConfig);
     expect(message.id).toBe(rzp.id);
+  })
+
+  it('set redirect option', function(){
+    var message = makeCheckoutMessage(rzp);
+    expect(message.options.redirect).toBe(false);
+
+    rzp.options.redirect = function(){return true}
+    message = makeCheckoutMessage(rzp);
+    expect(message.options.redirect).toBe(true);
   })
 
   describe('if CriOS, should', function(){

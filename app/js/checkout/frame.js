@@ -108,6 +108,8 @@ function makeCheckoutMessage(rzp){
     }
   )
 
+  options.redirect = !!rzp.options.redirect();
+
   if(options.parent){
     response.embedded = true;
   }
