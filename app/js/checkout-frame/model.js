@@ -290,7 +290,7 @@ CheckoutModal.prototype = {
     this.setCardFormatting()
     this.bindEvents();
 
-    this.emiView = new emiView(message.options);
+    this.emiView = new emiView(message.emiopts);
   },
 
   renderCss: function(){

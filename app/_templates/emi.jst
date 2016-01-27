@@ -2,9 +2,9 @@
   <div class="row em">
     <div class="col">EMI</div>
     <select>
-      <option value="HDFC" selected>HDFC Bank</option>
-      <option value="ICIC">ICICI Bank</option>
-      <option value="UTIB">Axis Bank</option>
+      {{for(var bank in it){}}
+        <option value="{{=bank}}" selected>{{=it[bank].name}}</option>
+      {{}}}
     </select>
     <i class="i">&#xe601;</i>
   </div>

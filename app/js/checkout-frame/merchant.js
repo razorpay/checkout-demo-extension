@@ -67,8 +67,39 @@ var freqWallets = {
   }
 }
 
+var emi_options = {
+  HDFC: {
+    name: 'HDFC Bank',
+    plans: {
+      3: 9,
+      6: 10,
+      9: 11,
+      12: 12
+    }
+  },
+  UTIB: {
+    name: 'Axis Bank',
+    plans: {
+      3: 9,
+      6: 10,
+      9: 11,
+      12: 12
+    }
+  },
+  KKBK: {
+    name: 'Kotak Mahindra Bank',
+    plans: {
+      3: 9,
+      6: 10,
+      9: 11,
+      12: 12
+    }
+  }
+}
+
 function processMessage(message) {
   message.netbanks = freqBanks;
+  message.emiopts = emi_options;
   var opts = message.options;
   if(!opts){
     var session = getSession();
