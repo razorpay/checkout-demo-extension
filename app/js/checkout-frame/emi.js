@@ -1,6 +1,7 @@
 
-function emiView(opts){
-  this.opts = opts;
+function emiView(message){
+  var opts = this.opts = message.emiopts;
+  opts.amount = message.options.amount;
   this.listeners = [];
   // if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
     this.render();

@@ -68,6 +68,12 @@ var freqWallets = {
 }
 
 var emi_options = {
+  installment: function(length, rate, principle){
+    rate /= 1200;
+    multiplier = Math.pow(1+rate, length);
+    return principle*rate*multiplier/(multiplier - 1);
+  },
+
   selected: 'HDFC',
   banks: {
     HDFC: {
