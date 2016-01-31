@@ -17,8 +17,9 @@ emiView.prototype = {
     this.unbind();
     $('#emi-container').html(templates.emi(this.opts));
     $('#emi-close').on('click', frontDrop);
-    this.bind($('#elem-emi'));
+    this.bind($('#elem-emi').addClass('shown'));
     $('#methods-specific-fields').css('minHeight', '263px');
+    this.oncardnumber();
   },
 
   on: function($el, event, listener){
@@ -27,6 +28,10 @@ emiView.prototype = {
       event,
       $el.on(event, listener)
     ])
+  },
+
+  oncardnumber: function(){
+    $('#elem-emi')[gel('card_number').value.length > 6 ? 'addClass' : 'removeClass']('check');
   },
 
   onchange: function(e){
@@ -56,7 +61,7 @@ emiView.prototype = {
     );
 
     this.on(
-      elem_emi.addClass('shown'),
+      elem_emi,
       'mouseup',
       this.onemicheck
     )
@@ -64,9 +69,7 @@ emiView.prototype = {
     this.on(
       $('#card_number'),
       'input keypress',
-      function(){
-        elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
-      }
+      this.oncardnumber
     )
 
     each(

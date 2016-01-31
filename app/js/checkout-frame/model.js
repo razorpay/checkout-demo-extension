@@ -114,7 +114,7 @@ function getFormFields(containerID, returnObj) {
   each(
     $('#' + containerID).find('input[name],select[name]'),
     function(i, el){
-      if(el.getAttribute('type') === 'radio' && !el.checked) {
+      if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
       }
       if(!el.disabled) {
@@ -151,6 +151,13 @@ function getFormData() {
     delete data['card[expiry]'];
   }
   return data;
+}
+
+function setEmiBank(data){
+  if(data.method === 'emi'){
+    var num = data['card[number]'];
+    data.bank = 'HDFC';
+  }
 }
 
 function hideEmi(){
@@ -572,6 +579,7 @@ CheckoutModal.prototype = {
       return;
     }
     var data = getFormData();
+    setEmiBank(data);
     var options = this.message.options;
 
     data.amount = options.amount;
