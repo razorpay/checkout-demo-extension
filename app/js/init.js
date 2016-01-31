@@ -80,7 +80,7 @@ Razorpay.defaults = {
   'theme': {
     'color': '#00BCD4',
     'backdropColor': 'rgba(0,0,0,0.6)',
-    'imageFrame': true
+    'imagePadding': true
   },
   'signature': '',
   'name': '', // of merchant
