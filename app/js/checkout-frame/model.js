@@ -167,15 +167,19 @@ function onSixDigits(e){
   var sixDigits = el.value.length > 5;
   $(el.parentNode)[sixDigits ? 'addClass' : 'removeClass']('six');
 
-  nocvvCheck = gel('nocvv-check');
-  if(!sixDigits && nocvvCheck.checked){
-    nocvvCheck.checked = false;
+  var nocvvCheck = gel('nocvv-check');
+  if(sixDigits && nocvvCheck.disabled){
+    nocvvCheck.disabled = false;
+  } else if(!sixDigits){
+    nocvvCheck.disabled = true;
   }
+
   noCvvToggle({target: nocvvCheck});
 }
 
 function noCvvToggle(e){
-  $('#expiry-cvv')[e.target.checked ? 'addClass' : 'removeClass']('hidden');
+  var nocvvCheck = e.target;
+  $('#expiry-cvv')[nocvvCheck.checked && !nocvvCheck.disabled ? 'addClass' : 'removeClass']('hidden');
 }
 
 function frontDrop(message, className){
@@ -408,7 +412,6 @@ CheckoutModal.prototype = {
     if(isCriOS){
       this.on('unload', window, options.modal.onhide);
     }
-    // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
   },
 
   setCardFormatting: function(){
