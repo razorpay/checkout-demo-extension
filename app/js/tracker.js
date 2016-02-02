@@ -1,6 +1,13 @@
 var base62Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 var base64Chars = base62Chars + '+=';
 base62Chars = base62Chars.slice(52) + base62Chars.slice(0, 52);
+var map62 = {};
+each(
+  base62Chars,
+  function(i, chr){
+    map62[chr] = i;
+  }
+)
 
 var _btoa = window.btoa;
 if(!_btoa){
@@ -39,6 +46,18 @@ if(!_btoa){
   };
 }
 
+function _toBase10(str62){
+  var val = 0;
+  var len = str62.length;
+  each(
+    str62,
+    function(index, character){
+      val += map62[character] * Math.pow(62, len - index);
+    }
+  )
+  return val/62;
+}
+
 function _toBase62(number){
   var rixit;
   var result = '';
@@ -59,16 +78,9 @@ function generateUID(){
   _toBase62(Math.floor(238328*Math.random())) + '0';
 
   var sum = 0, tempdigit;
-  var map62 = {};
-  each(
-    base62Chars,
-    function(i, chr){
-      map62[chr] = i;
-    }
-  )
   each(
     num,
-    function(i, chr){
+    function(i){
       tempdigit = map62[num[num.length - 1 - i]];
       if((num.length - i) % 2){
         tempdigit *= 2;
@@ -90,7 +102,11 @@ var _uid = generateUID();
 
 function track(event, props) {
   var id = this.id;
-  if(id && /^rzp_live/.test(this.options.key)){
+  if(id && /^rzp_l/.test(this.options.key)){
+    if(props){
+      props = $.clone(props);
+    }
+
     setTimeout(function(){
       var data = {
         id: _uid
@@ -100,18 +116,7 @@ function track(event, props) {
         data.medium = discreet.medium;
         data.context = discreet.context;
         data.ip = '${keen.ip}';
-        data.ua = '${keen.user_agent}';
-        data.keen = {
-          addons : [
-            {
-              name : 'keen:ip_to_geo',
-              input : {
-                ip : 'ip'
-              },
-              output : 'ip_info'
-            }
-          ]
-        }
+        data.ua = ua;
       }
 
       if(typeof props === 'object') {
@@ -133,6 +138,15 @@ function track(event, props) {
 function formInitProps(overrides){
   var props = {};
 
+  each(
+    overrides,
+    function(key){
+      if(!(key in Razorpay.defaults) || Razorpay.defaults[key] === overrides[key]){
+        delete overrides[key];
+      }
+    }
+  )
+
   props.key = overrides.key || '';
   delete overrides.key;
 
@@ -142,9 +156,21 @@ function formInitProps(overrides){
   props.notes = overrides.notes &&  stringify(overrides.notes) || '';
   delete props.notes;
 
+  props.method = {};
+  each(
+    overrides.method,
+    function(method, value){
+      props.method[method] = !!value;
+    }
+  )
+  delete overrides.method;
+
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
   }
+
+  props.image = overrides.image || '';
+  delete overrides.image;
 
   props.options = stringify(overrides);
   return props;

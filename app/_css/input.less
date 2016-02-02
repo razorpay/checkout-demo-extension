@@ -68,13 +68,13 @@ input[type=checkbox]{
 }
 select.input{
   padding-left: @input-padding/2;
+  padding-right: @input-padding-left - @input-padding/2;
   cursor: pointer;
 }
 #nb-elem{
-  margin-right: @input-padding/2;
   i{
     left: auto;
-    right: @input-padding/2;
+    right: -26px
   }
 }
 input[disabled]{
@@ -87,6 +87,12 @@ input[disabled]{
   cursor: text;
   display: block;
   transition: 0.25s;
+
+  &:hover{
+    .placeholder{
+      display: none;
+    }
+  }
 
   .i{
     z-index: 1;

@@ -5,7 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
-
+  <script>
+    Razorpay = {
+      config: {
+        protocol: 'http',
+        hostname: 'api.pronav.in',
+        version: 'v1/'
+      }
+    }
+  </script>
   <!-- build:js razorpay.js -->
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
@@ -24,7 +32,7 @@
 </head>
 <body>
   <h1>Demo Razorpay.js Payment Page</h1>
-  <form id="container" onsubmit="return false" class="pure-form">
+  <div id="container" onsubmit="return false" class="pure-form">
       <div class="section">
           <label>Email* </label><input id="customer_email" type="email" placeholder="Email" required value="pranav@razorpay.com">
           <label>Phone </label><input id="customer_phone" type="tel" placeholder="Phone" required value="8888899999">
@@ -44,13 +52,11 @@
           <label>CVV</label><input required id="card_cvv" value="300">
       </div>
       <div style="clear: both"></div>
-      <input id="submit" type="submit" value="Purchase" class="pure-button pure-button-primary">
-  </form>
+      <input id="submit" type="button" value="Purchase" class="pure-button pure-button-primary">
+  </div>
   <script>
       Razorpay.configure({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-        protocol: 'http',
-        hostname: 'api.pronav.in'
+        key: 'rzp_test_1DP5mmOlF5G5ag'
       });
 
       function updateAmount(el) {
@@ -65,9 +71,8 @@
         return gel(id).value;
       }
 
-      gel('container').onsubmit = function(e){
-        e.preventDefault();
-        gel('submit').setAttribute('disabled', 'disabled'); // add loading animation here
+      gel('submit').onclick = function(e){
+        this.setAttribute('disabled', 'disabled'); // add loading animation here
         Razorpay.payment.authorize({
           data: {
             amount: val('amount').replace(/[^0-9]+/,'')*100,

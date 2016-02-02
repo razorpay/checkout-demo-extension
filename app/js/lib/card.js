@@ -1,4 +1,5 @@
-(function(root){
+var Card;
+(function(){
 
   var patterns = {
     maestro16: /^(508125|508126|508159|508192|508227|504437|504681)/,
@@ -185,6 +186,8 @@
 
   var FormatNumber = function(e){
     var character = ensureNumeric(e);
+    if(character === false) { return }
+
     var el = e.target;
 
     var pos = CheckSelection(el);
@@ -236,7 +239,7 @@
     }
   };
 
-  var Card = root.Card = function(){
+  Card = function(){
     this.listeners = [];
   }
 
@@ -292,8 +295,8 @@
         function(i, L){
           each(
             L[1],
-            function(j, event, listenerRef){
-              L[0].off(event, listenerRef);
+            function(j, listenerRef){
+              L[0].off(j, listenerRef);
             }
           )
         }
@@ -335,4 +338,4 @@
     filled: noop
   };
 
-})(window);
+})();

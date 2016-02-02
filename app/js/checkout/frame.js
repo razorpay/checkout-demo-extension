@@ -100,14 +100,20 @@ function makeCheckoutMessage(rzp){
       }
     }
   )
-  for(var i in rzp.modal.options){
-    rzp.options.modal[i] = rzp.modal.options[i];
-  }
+
+  each(
+    rzp.modal.options,
+    function(i, option){
+      rzp.options.modal[i] = option;
+    }
+  )
+
+  options.redirect = !!rzp.options.redirect();
 
   if(options.parent){
-    delete options.parent;
     response.embedded = true;
   }
+  delete options.parent;
 
   sanitizeImage(options);
 
@@ -120,6 +126,16 @@ function makeCheckoutMessage(rzp){
   return response;
 }
 
+function getEncodedMessage(rzp){
+  return _btoa(stringify(makeCheckoutMessage(rzp)));
+}
+
+function setBackdropColor(value){
+  // setting unsupported value throws error in IE
+  try{ frameBackdrop.style.background = value; }
+  catch(e){}
+}
+
 function CheckoutFrame(rzp){
   if(rzp){
     this.getEl(rzp.options);
@@ -129,9 +145,6 @@ function CheckoutFrame(rzp){
 }
 
 CheckoutFrame.prototype = {
-  getEncodedMessage: function(){
-    return _btoa(stringify(makeCheckoutMessage(this.rzp)));
-  },
 
   getEl: function(options){
     if(!this.el){
@@ -151,6 +164,16 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
+    var el = this.el;
+    if(isCriOS){
+      if(el.contentWindow){
+        el.contentWindow.close();
+      }
+      el.contentWindow = window.open(
+        el.getAttribute('src') + '&message=' + getEncodedMessage(rzp),
+        '_blank'
+      )
+    }
     this.bind();
     var parent = rzp.options.parent;
     var $parent = $(parent || frameContainer);
@@ -159,7 +182,7 @@ CheckoutFrame.prototype = {
     if(rzp !== this.rzp){
       message = makeCheckoutMessage(rzp);
 
-      if(!this.rzp){
+      if(!this.rzp && this.el.parentNode !== $parent[0]){
         $parent.append(this.el);
       }
 
@@ -168,18 +191,18 @@ CheckoutFrame.prototype = {
     else {
       message = {event: 'open'};
     }
-
     this.afterLoad(function(){
       this.postMessage(message);
     })
 
     if(parent){
+      this.el.removeAttribute('style');
       this.embedded = true;
       this.afterClose = noop;
     }
     else {
       $parent.css('display', 'block').reflow();
-      setBackdropColor(rzp.options.theme.backdropColor);
+      setBackdropColor(rzp.options.theme.backdrop_color);
       this.setMetaAndOverflow();
     }
   },
@@ -264,27 +287,35 @@ CheckoutFrame.prototype = {
   },
 
   afterLoad: function(handler){
-    if(this.loaded === true){
+    if(this.hasLoaded === true){
       handler.call(this);
     } else {
-      this.loaded = handler;
+      this.loadedCallback = handler;
     }
   },
 
   onmessage: function(e){
-    var data = JSON.parse(e.data);
+    var data;
+    try{
+      data = JSON.parse(e.data);
+    }
+    catch(err){
+      return;
+    }
+
     var event = data.event;
     // source check
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && data.id !== this.rzp.id) ||
+      (event !== 'load' && this.rzp && this.rzp.id !== data.id) ||
+      e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
       return;
     }
     data = data.data;
-    invoke(this['on' + event], this, data);
+    invoke('on' + event, this, data);
 
     if(event === 'dismiss' || event === 'fault'){
       track.call(this.rzp, event, data);
@@ -292,8 +323,8 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    invoke(this.loaded, this);
-    this.loaded = true;
+    invoke('loadedCallback', this);
+    this.hasLoaded = true;
   },
 
   onredirect: function(data){
@@ -303,7 +334,7 @@ CheckoutFrame.prototype = {
   onsubmit: function(data){
     var cb = window.CheckoutBridge;
     if(typeof cb === 'object'){
-      invoke(cb.onsubmit, cb, stringify(data));
+      invoke('onsubmit', cb, stringify(data));
     }
   },
 
@@ -319,7 +350,7 @@ CheckoutFrame.prototype = {
 
   onsuccess: function(data){
     this.close();
-    invoke(this.rzp.options.handler, window, data, 200);
+    invoke('handler', this.rzp.options, data, 200);
   },
 
   onfailure: function(data){
@@ -331,6 +362,7 @@ CheckoutFrame.prototype = {
   onfault: function(message){
     this.rzp.close();
     alert('Oops! Something went wrong.\n' + message);
+    this.afterClose();
   },
 
   afterClose: function(){

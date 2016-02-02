@@ -149,8 +149,12 @@ function createFrameBackdrop(){
   return backdrop;
 }
 
+var frameContainer = createFrameContainer();
+var frameBackdrop = createFrameBackdrop();
+var preloadedFrame = getPreloadedFrame();
+
 function getPreloadedFrame(){
-  if(!isCriOS && !preloadedFrame){
+  if(!isCriOS && !preloadedFrame && !/ Opera Mini\//.test(ua)){
     preloadedFrame = new CheckoutFrame();
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
@@ -158,41 +162,38 @@ function getPreloadedFrame(){
   return preloadedFrame;
 }
 
-var frameContainer = createFrameContainer();
-var frameBackdrop = createFrameBackdrop();
-var preloadedFrame = getPreloadedFrame();
-
-function setBackdropColor(value){
-  // setting unsupported value throws error in IE
-  try{ frameBackdrop.style.background = value; }
-  catch(e){}
+Razorpay.open = function(options) {
+  return Razorpay(options).open();
 }
 
 Razorpay.prototype.open = function() {
-  var frame;
-  if(isCriOS){
-    frame = new CheckoutFrame(this);
-    frame.el.contentWindow = window.open(
-      frame.el.getAttribute('src') + '&message=' + frame.getEncodedMessage(),
-      '_blank'
-    )
+  var frame = this.checkoutFrame;
+  if(!frame){
+    if(isCriOS || this.options.parent){
+      frame = new CheckoutFrame(this);
+    }
+    else {
+      frame = getPreloadedFrame();
+    }
+    this.checkoutFrame = frame;
   }
-  else {
-    frame = getPreloadedFrame();
+  if(!frame.embedded){
+    frame.openRzp(this);
   }
-  this.checkoutFrame = frame;
-  frame.openRzp(this);
 
   if(!frame.el.contentWindow){
     frame.close();
     frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
+
+  return this;
 };
 
 Razorpay.prototype.close = function(){
-  if(this.checkoutFrame){
-    this.checkoutFrame.postMessage({event: 'close'});
+  var frame = this.checkoutFrame;
+  if(frame){
+    frame.postMessage({event: 'close'});
   }
 };
 

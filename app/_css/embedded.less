@@ -1,0 +1,174 @@
+@import "common";
+
+body.embedded{
+  @border-color: #dbdbdb;
+  @font-size: 16px;
+  height: auto;
+
+  #backdrop, #modal-close {
+    display: none;
+  }
+  #powered-by{
+    bottom: 10px;
+    left: 0;
+    width: 240px;
+    z-index: 2;
+    text-shadow: none;
+  }
+  #container{
+    height: auto;
+    &:after{
+      content: none;
+    }
+
+    #modal{
+      opacity: 1;
+      display: block;
+      width: auto;
+      height: auto;
+      transition: none;
+      transform: none;
+    }
+
+    #modal-inner{
+      animation: none;
+    }
+  }
+
+  #modal-inner{
+    background: #fff;
+  }
+  #modal-content{
+    background: #fff;
+    min-height: 0;
+    padding: 0;
+  }
+  #header{
+    height: 80px;
+    padding: 20px;
+
+    .merchant-image{
+      width: 80px;
+      height: 80px;
+      margin: 0 20px 0 0;
+      border: none;
+      padding: 0;
+    }
+  }
+
+  #body{
+    position: relative;
+    border-top: 1px solid @border-color;
+    padding: 0;
+  }
+  #form{
+    margin-left: 240px;
+    border-left: 1px solid @border-color;
+    padding: 20px;
+  }
+  #form-fields{
+    min-height: 302px;
+  }
+
+  #tabs{
+    margin: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 240px;
+    border-bottom: none;
+
+    #tab-bar{
+      display: none;
+    }
+
+    li{
+      font-size: @font-size;
+      text-align: left;
+      width: auto;
+      display: block;
+      padding: 0 20px;
+      background: #f2f3f4;
+      border-top: 1px solid #fff;
+      border-bottom: 1px solid @border-color;
+      &.active{
+        background: #fafbfc;
+        &:after{
+          content: '';
+          width: 0; 
+          height: 0; 
+          border-top: 10px solid transparent;
+          border-bottom: 10px solid transparent; 
+          border-right: 10px solid #888;
+          margin-top: -10px;
+          position: absolute;
+          right: 0;
+          top: 50%;
+          margin-right: -1px;
+        }
+      }
+    }
+  }
+
+  .help-text{
+    left: 4px;
+    margin-bottom: -4px;
+  }
+  .elem-wrap{
+    margin-bottom: 10px;
+  }
+
+  #tab-netbanking .elem-wrap{
+    margin-bottom: 0;
+  }
+
+  @input-padding-left: 60px;
+  #nb-elem {
+    margin-top: 16px;
+    .input{
+      padding-left: 16px;
+      padding-right: @input-padding-left - 16px;
+    }
+    i {
+      right: -@input-padding-left - 2px;
+      border-radius: 0 4px 4px 0;
+    }
+  }
+  .elem{
+    margin-right: @input-padding-left;
+
+    .input{
+      font-size: @font-size;
+      padding-top: 16px;
+      padding-bottom: 16px;
+      padding-left: @input-padding-left;
+      border: 1px solid #eaeaea;
+      border-radius: 4px;
+    }
+    .i{
+      left: 0;
+      font-size: 36px;
+      line-height: 36px;
+      top: 0;
+      bottom: auto;
+      margin-bottom: 0;
+      height: 48px;
+      width: 46px;
+      background: #eee;
+      text-align: center;
+      border-radius: 4px 0 0 4px;
+      border: 1px solid #ddd;
+    }
+  }
+  #elem-emi{
+    display: none;
+  }
+  #footer{
+    margin: 0;
+    position: static;
+  }
+  #submitbtn{
+    margin-top: 20px;
+    border-radius: 4px;
+  }
+}

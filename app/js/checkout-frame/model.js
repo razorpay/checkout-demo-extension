@@ -1,12 +1,9 @@
-var Card = window.Card;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
-// element to verfy whether font has been loaded
-var fontAnchor = '#powered-link';
 var fontTimeout;
 
 // sanitizes innerHTML, by removing angle brackets
@@ -195,11 +192,21 @@ function showLoadingMessage(message){
   frontDrop(message, 'shown loading');
 }
 
+function setDefaultError(){
+  var msg = discreet.defaultError();
+  msg.id = _uid;
+  setCookie('onComplete', stringify(msg));
+}
+
 function processModalMethods(session){
   var modal = session.message.options.modal;
 
   modal.onhide = function(){
     Razorpay.sendMessage({event: 'dismiss'});
+    if(isCriOS){
+      setDefaultError();
+      window.close();
+    }
   };
   modal.onhidden = function(){
     session.saveAndClose();
@@ -249,8 +256,10 @@ CheckoutModal.prototype = {
       this.switchTab($('#method-' + data.method + '-tab'));
     }
 
-    if(('card[expiry_month]' in data) && ('card[expiry_year]' in data)) {
-      data['card[expiry]'] = data['card[expiry_month]'] + ' / ' + data['card[expiry_year]'];
+    var exp_m = data['card[expiry_month]'];
+    var exp_y = data['card[expiry_year]']
+    if(exp_m && exp_y) {
+      data['card[expiry]'] = exp_m + ' / ' + exp_y;
     }
 
     each(
@@ -265,11 +274,9 @@ CheckoutModal.prototype = {
       },
       function(name, id){
         var el = gel(id);
-        if(el) {
-          var val = data[name];
-          if(val){
-            el.value = val;
-          }
+        var val = data[name];
+        if(el && val) {
+          el.value = val;
         }
       }
     )
@@ -283,6 +290,9 @@ CheckoutModal.prototype = {
       this.isOpen = true;
     }
 
+    if(!message.data && this.message){
+      message.data = this.message.data;
+    }
     this.message = message;
     formatMessage(message);
     sanitize(message);
@@ -303,6 +313,7 @@ CheckoutModal.prototype = {
     var div = this.el;
     var theme = this.message.options.theme;
     var style = document.createElement('style');
+    style.type = 'text/css';
     try{
       div.style.color = theme.color;
       if(div.style.color){
@@ -368,7 +379,9 @@ CheckoutModal.prototype = {
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
-    var enableMethods = this.message.options.method;
+    var options = this.message.options;
+    var enableMethods = options.method;
+
     if(enableMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -391,6 +404,10 @@ CheckoutModal.prototype = {
         this.hideErrorMessage();
       }
     });
+
+    if(isCriOS){
+      this.on('unload', window, options.modal.onhide);
+    }
     // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
   },
 
@@ -424,11 +441,8 @@ CheckoutModal.prototype = {
 
     if(shouldFocusNextField){
       card.filled = function(el){
-        if(el === el_expiry){
-          el_cvv.focus();
-        }
-        else{
-          el_expiry.focus();
+        if(!$(el.parentNode).hasClass('invalid')){
+          (el === el_expiry ? el_cvv : el_expiry).focus();
         }
       }
     }
@@ -494,36 +508,40 @@ CheckoutModal.prototype = {
   },
 
   hide: function(){
-    $('#modal-inner').removeClass('shake');
-    this.modal.hide();
+    if(this.isOpen){
+      $('#modal-inner').removeClass('shake');
+      frontDrop();
+      this.modal.hide();
+    }
   },
 
   successHandler: function(response){
     if(!this.rzp){
       return;
     }
+    track.call(this.rzp, 'success', response);
     this.rzp = null;
     // prevent dismiss event
-    this.modal.options.onhide = null;
+    this.modal.options.onhide = noop;
 
     Razorpay.sendMessage({ event: 'success', data: response });
     if(isCriOS) {
       response.id = _uid;
       setCookie('onComplete', stringify(response));
     }
-    this.close();
+    this.hide();
   },
 
   errorHandler: function(response){
     if(!this.rzp || !response){
       return;
     }
-    this.rzp = null;
+    this.rzp = window.onComplete = null;
     var message;
     this.shake();
     this.modal.options.backdropClose = this.message.options.modal.backdropClose;
 
-    if (response && response.error){
+    if (response.error){
       message = response.error.description;
       var err_field = response.error.field;
       if (err_field){
@@ -582,6 +600,10 @@ CheckoutModal.prototype = {
 
     // TODO
     this.rzp = Razorpay(this.message.options);
+
+    // onComplete defined in razorpay-submit.js, safe to expose now
+    window.onComplete = bind(discreet.onComplete, this.rzp);
+
     this.rzp.authorizePayment({
       data: data,
       error: bind(this.errorHandler, this),
@@ -604,23 +626,25 @@ CheckoutModal.prototype = {
         }
       )
       this.listeners = [];
-
       this.modal.destroy();
       this.smarty.off();
       this.card.unbind();
       this.emiView.unbind();
       $(this.el).remove();
 
-      this.modal = null;
-      this.smarty = null;
-      this.card = null;
-      this.emiView = null;
-      this.el = null;
+      this.modal =
+      this.smarty =
+      this.card =
+      this.emiView =
+      this.el =
+      window.onComplete = null;
     }
   },
 
   saveAndClose: function(){
-    this.message.data = getFormData();
+    if(this.message){
+      this.message.data = getFormData();
+    }
     this.close();
   }
 }

@@ -16,7 +16,7 @@
         <div id="header">
           <div id="modal-close">×</div>
           {{?it.options.image}}
-            <div class="merchant-image mfix">
+            <div class="merchant-image">
               <img src="{{=it.options.image}}">
             </div>
           {{?}}
@@ -81,7 +81,7 @@
                         <div class="elem-wrap first"><div class="elem elem-expiry">
                           <i class="i">&#xe606;</i>
                           <span class="help-text">Please enter card expiry date in MM / YY format.</span>
-                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[5-9]|[2-9][0-9])" maxlength="7" value="{{if(it.options.prefill.card.expiry_month){}}{{=it.options.prefill.card.expiry_month}} / {{=it.options.prefill.card.expiry_year}}{{}}}">
+                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=it.options.prefill.card.expiry}}">
                         </div></div>
                         <div class="elem-wrap last"><div class="elem elem-cvv">
                           <i class="i">&#xe604;</i>
@@ -105,7 +105,7 @@
                   {{? it.options.method.netbanking }}
                     <div class="fieldset tab-content{{? !it.options.method.card }} active{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
-                      <div id="netb-banks">
+                      <div id="netb-banks" class="clear">
                         {{for(var b in it.netbanks){}}
                           <div class="netb-bank">
                             <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
@@ -116,7 +116,7 @@
                           </div>
                         {{}}}
                       </div>
-                      <div id="nb-elem" class="elem select">
+                      <div class="elem-wrap"><div id="nb-elem" class="elem select">
                         <span class="help-text">Please select a bank from the list</span>
                         <i class="i">&#xe601;</i>
                         <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
@@ -125,7 +125,7 @@
                             <option value="{{=i}}">{{=it.options.method.netbanking[i]}}</option>
                           {{}}}
                         </select>
-                      </div>
+                      </div></div>
                     </div>
                   {{?}}
                   {{? it.options.method.wallet.length }}

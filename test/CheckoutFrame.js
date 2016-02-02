@@ -48,6 +48,7 @@ describe('makeCheckoutMessage should', function(){
   var rzp = {
     id: 'someid',
     options: {
+      redirect: noop,
       image: 'abcdef',
       hello: 'world',
       nested: {
@@ -80,6 +81,15 @@ describe('makeCheckoutMessage should', function(){
     expect(message.context).toBe(location.href);
     expect(message.config).toBe(RazorpayConfig);
     expect(message.id).toBe(rzp.id);
+  })
+
+  it('set redirect option', function(){
+    var message = makeCheckoutMessage(rzp);
+    expect(message.options.redirect).toBe(false);
+
+    rzp.options.redirect = function(){return true}
+    message = makeCheckoutMessage(rzp);
+    expect(message.options.redirect).toBe(true);
   })
 
   describe('if CriOS, should', function(){
@@ -171,6 +181,7 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
   describe('invoke onevent methods: ', function(){
     function message(event, data){
       cf.onmessage({
+        source: cf.el.contentWindow,
         origin: src,
         data: JSON.stringify({
           source: 'frame',
@@ -197,13 +208,13 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
     })
 
     it('load', function(){
-      cf.loaded = function(){
+      cf.loadedCallback = function(){
         if(this === cf){
           spyCalled();
         }
       };
       message('load');
-      expect(cf.loaded).toBe(true);
+      expect(cf.hasLoaded).toBe(true);
     })
 
     it('redirect', function(){
@@ -279,18 +290,71 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
 })
 
 describe('afterClose should', function(){
-  var rzp = new Razorpay({
-    key: 'key',
-    amount: 100
-  });
-  var cf = new CheckoutFrame(rzp);
+  var rzp, cf;
+
+  beforeEach(function(){
+    rzp = Razorpay({
+      key: 'key',
+      amount: 100
+    })
+    cf = new CheckoutFrame(rzp);
+  })
   it('hide container', function(){
     expect(frameContainer).toBeVisible();
+
     var spy = jasmine.createSpy();
     spyOn(cf, 'unbind').and.callFake(spy);
 
     cf.afterClose();
     expect(frameContainer).not.toBeVisible();
     expect(spy).toHaveBeenCalled();
+  })
+})
+
+describe('if shouldFixFixed,', function(){
+  var cf;
+
+  beforeEach(function(){
+    cf = new CheckoutFrame();
+  })
+
+  it('scroll, orientationchange listener should be bound', function(){
+    var spy = jasmine.createSpy('scroll');
+    var spy2 = jasmine.createSpy('orientationchange');
+    merchantMarkup.scroll = spy;
+    merchantMarkup.orientationchange = spy2;
+
+    cf.bind();
+    expect(cf.listeners.scroll).not.toBeDefined();
+    cf.unbind();
+
+    shouldFixFixed = true;
+    cf.bind();
+    expect(cf.listeners.scroll).toBeDefined();
+    cf.listeners.scroll({target: window});
+    cf.listeners.orientationchange({target: window});
+    expect(spy).toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+
+    shouldFixFixed = false;
+  })
+})
+
+describe('if CriOS,', function(){
+  var cf;
+
+  beforeEach(function(){
+    cf = new CheckoutFrame();
+  })
+
+  it('set unload listener', function(){
+    cf.bind();
+    expect(cf.listeners.unload).not.toBeDefined();
+    cf.unbind();
+
+    isCriOS = true;
+    cf.bind();
+    expect(cf.listeners.unload).toBeDefined();
+    isCriOS = false;
   })
 })

@@ -32,7 +32,7 @@ function getCookie(name){
   return null;
 }
 
-function getCommuniactorSrc(opts){
+function getCommuniactorSrc(){
   return discreet.makeUrl(true) + 'communicator.php';
 }
 
@@ -41,7 +41,7 @@ discreet.setCommunicator = function(opts){
     communicator.parentNode.removeChild(communicator);
   }
   if(
-    location.href.indexOf(discreet.makeUrl()) &&
+    location.href.indexOf(discreet.makeUrl(true)) &&
     (/MSIE |Windows Phone|Trident\//.test(ua) || (isCriOS && !discreet.isFrame))
   ) {
     communicator = document.createElement('iframe');
@@ -52,16 +52,17 @@ discreet.setCommunicator = function(opts){
     communicator = {contentWindow: window};
   }
 }
+
 discreet.setCommunicator(Razorpay.defaults);
 
-function cookiePoll(){
+function cookiePoll(rzp){
   deleteCookie('onComplete');
 
   cookieInterval = setInterval(function(){
     var cookie = getCookie('onComplete');
     if(cookie){
       clearCookieInterval();
-      onComplete(cookie);
+      discreet.onComplete.call(rzp, cookie);
     }
   }, 150)
 }
@@ -153,6 +154,28 @@ function formatRequest(request){
   return Razorpay.payment.validate(rdata);
 }
 
+function trackSubmit(rzp, data){
+  var trackingPayload = {};
+  each(
+    [
+      'key_id',
+      'amount',
+      'email',
+      'contact',
+      'method',
+      'card[name]',
+      'bank',
+      'wallet'
+    ],
+    function(i, key){
+      if(key in data){
+        trackingPayload[key] = data[key];
+      }
+    }
+  )
+  track.call(rzp, 'submit', trackingPayload);
+}
+
 function onMessage(e){
   var request = this._request;
   if(e.origin) {
@@ -162,11 +185,11 @@ function onMessage(e){
     ){
       return roll('message received from origin', e.origin, 'info');
     }
-    onComplete.call(this, e.data);
+    discreet.onComplete.call(this, e.data);
   }
 }
 
-function onComplete(data){
+discreet.onComplete = function(data){
   // this === rzp
   var request = this._request;
 
@@ -199,7 +222,8 @@ function onComplete(data){
   invoke(request.error, null, data, 0);
 }
 
-function setupAjax(request){
+function setupAjax(rzp){
+  var request = rzp._request;
   var options = request.options;
 
   $.post({
@@ -213,7 +237,7 @@ function setupAjax(request){
       }
 
       else {
-        onComplete(response);
+        discreet.onComplete.call(rzp, response);
         result = {
           result: response.razorpay_payment_id ? 'Payment Successful.' : response.error && response.error.description || 'Payment Failed.'
         }
@@ -239,7 +263,7 @@ Razorpay.prototype.authorizePayment = function(request){
 
   var url = discreet.makeUrl() + 'payments/create/checkout';
 
-  if(options.redirect()){
+  if(options.redirect()) {
     discreet.nextRequestRedirect({
       url: url,
       content: rdata,
@@ -247,40 +271,51 @@ Razorpay.prototype.authorizePayment = function(request){
     });
     return false;
   }
+  // prevent callback_url from being submitted if not redirecting
+  else {
+    delete rdata.callback_url;
+  }
 
   var name;
   request.popup = createPopup(rdata, url, options);
 
   if(!request.popup){
     name = '_blank'
-  } else if(request.popup.cc){
-    name = request.popup.name;
+
+  } else {
+    request.popup.onClose = bind(this.cancelPayment, this);
+
+    if(request.popup.cc){
+      name = request.popup.name;
+    }
   }
 
-  request.popup.onClose = bind(this.cancelPayment, this);
+  trackSubmit(this, rdata);
+
+  this._request = request;
 
   if(name){
     submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
-    setupAjax(request);
+    setupAjax(this);
   }
 
   request.listener = $(window).on('message', onMessage, null, this);
 
   if(discreet.isFrame){
-    cookiePoll();
+    cookiePoll(this);
   }
 
-  this._request = request;
   return this;
 }
 
 Razorpay.prototype.cancelPayment = function(errorObj){
-  onComplete.call(this, errorObj || discreet.defaultError());
+  discreet.onComplete.call(this, errorObj || discreet.defaultError());
 }
 
 Razorpay.payment = {
-  authorize: function(data){
-    return Razorpay({}).authorizePayment(data);
+  authorize: function(request){
+    var amount = request.data.amount || Razorpay.defaults.amount;
+    return Razorpay({amount: amount}).authorizePayment(request);
   },
   validate: function(data){
     var errors = [];
@@ -317,11 +352,6 @@ Razorpay.payment = {
       timeout: 30000,
       success: function(response){
         invoke(callback, null, response);
-      },
-      complete: function(data){
-        if(typeof data === 'object' && data.error) {
-          invoke(callback, null, {error: true});
-        }
       }
     });
   }

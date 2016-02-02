@@ -11,7 +11,7 @@ function emiView(opts){
 }
 
 emiView.prototype = {
-  render: function(opts) {
+  render: function() {
     $('#emi-wrap').html(templates.emi());
     $('#emi-close').on('click', frontDrop);
     this.bind($('#elem-emi'));

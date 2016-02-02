@@ -6,10 +6,12 @@
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
   <script>
-    RazorpayConfig = {
-      protocol: 'http',
-      hostname: 'api.pronav.in',
-      version: 'v1/'
+    Razorpay = {
+      config: {
+        protocol: 'http',
+        hostname: 'api.pronav.in',
+        version: 'v1/'
+      }
     }
   </script>
   <!-- build:js checkout.js -->
@@ -34,6 +36,13 @@
   <div id="side">
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
+  <style>
+  #x .razorpay-checkout-frame{
+    max-width: 600px;
+    margin: 20px;
+    display: block;
+  }
+  </style>
   <script>
     var options = {
       // 'key': 'rzp_live_ILgsfZCZoFIKMb',
@@ -45,6 +54,7 @@
       'handler': function (transaction){
         alert("You have successfully purchased " + options.description);
       },
+      // parent: '#x',
       // framePath: 'checkout.html',
       // callback_url: 'http://localhost:9000',
       'method': {

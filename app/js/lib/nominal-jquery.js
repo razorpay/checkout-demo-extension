@@ -88,6 +88,9 @@ function invoke(handler, thisArg, param , timeout){
     }, timeout)
     return;
   }
+  if(typeof handler === 'string'){
+    handler = thisArg[handler];
+  }
   if(typeof handler === 'function'){
     if(!thisArg){
       thisArg = this;
@@ -259,7 +262,10 @@ $.prototype = {
 
   focus: function(){
     if(this[0]){
-      this[0].focus();
+      try{
+        this[0].focus();
+      }
+      catch(e){}
     }
     return this;
   }
