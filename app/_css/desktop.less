@@ -308,8 +308,20 @@ iframe{
   }
 }
 #expiry-cvv{
+  transition: 0.3s;
+  height: 50px;
+  position: relative;
+
   &.hidden{
-    display: none;
+    opacity: 0;
+    height: 0;
+    &:before{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 66px;
+      z-index: 1;
+    }
   }
 }
 #cardsave{
