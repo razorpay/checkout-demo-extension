@@ -179,7 +179,12 @@ function onSixDigits(e){
 
 function noCvvToggle(e){
   var nocvvCheck = e.target;
-  $('#expiry-cvv')[nocvvCheck.checked && !nocvvCheck.disabled ? 'addClass' : 'removeClass']('hidden');
+  $('#expiry-cvv')[
+    nocvvCheck.checked &&
+    !nocvvCheck.disabled &&
+    gel('elem-card').getAttribute('cardtype') === 'maestro' ?
+    'addClass' : 'removeClass'
+  ]('hidden');
 }
 
 function frontDrop(message, className){
@@ -575,7 +580,17 @@ CheckoutModal.prototype = {
   submit: function(e) {
     preventDefault(e);
     this.smarty.refresh();
-    validateCardNumber(gel('card_number'));
+
+    var nocvv = gel('nocvv-check');
+
+    // if card tab exists
+    if(nocvv){
+      validateCardNumber(gel('card_number'));
+      if(nocvv.checked && !nocvv.disabled){
+        $('.elem-expiry').removeClass('invalid');
+        $('.elem-cvv').removeClass('invalid');
+      }
+    }
 
     if (this.checkInvalid('form-common')) {
       return;
