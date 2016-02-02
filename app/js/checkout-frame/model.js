@@ -582,11 +582,13 @@ CheckoutModal.prototype = {
     this.smarty.refresh();
 
     var nocvv = gel('nocvv-check');
+    var nocvv_values;
 
     // if card tab exists
     if(nocvv){
       validateCardNumber(gel('card_number'));
       if(nocvv.checked && !nocvv.disabled){
+        nocvv_values = true;
         $('.elem-expiry').removeClass('invalid');
         $('.elem-cvv').removeClass('invalid');
       }
@@ -604,6 +606,12 @@ CheckoutModal.prototype = {
     var options = this.message.options;
 
     data.amount = options.amount;
+
+    if(nocvv_values){
+      data['card[cvv]'] = '000';
+      data['card[expiry_month]'] = '12';
+      data['card[expiry_year]'] = '21';
+    }
 
     Razorpay.sendMessage({
       event: 'submit',
