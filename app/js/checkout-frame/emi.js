@@ -13,7 +13,7 @@ function emiView(opts){
 emiView.prototype = {
   render: function() {
     $('#emi-wrap').html(templates.emi());
-    $('#emi-close').on('click', frontDrop);
+    $('#emi-close').on('click', toggleErrorMessage);
     this.bind($('#elem-emi'));
     $('#methods-specific-fields').css('minHeight', '263px');
   },
@@ -60,7 +60,7 @@ emiView.prototype = {
           'click', function(){
             $('#emi-container > .emi-active').removeClass('emi-active');
             $(this).addClass('emi-active').find('input')[0].checked = true;
-            frontDrop();
+            toggleErrorMessage();
           }
         )
       },

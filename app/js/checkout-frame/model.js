@@ -179,26 +179,22 @@ function onSixDigits(e){
 
 function noCvvToggle(e){
   var nocvvCheck = e.target;
-  $('#expiry-cvv')[
-    nocvvCheck.checked &&
-    !nocvvCheck.disabled &&
-    gel('elem-card').getAttribute('cardtype') === 'maestro' ?
-    'addClass' : 'removeClass'
-  ]('hidden');
+  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled && gel('elem-card').getAttribute('cardtype') === 'maestro';
+  $('#expiry-cvv')[shouldHideExpiryCVV ? 'addClass' : 'removeClass']('hidden');
 }
 
-function frontDrop(message, className){
+function toggleErrorMessage(message, className){
   gel('fd-t').innerHTML = message || '';
   gel('fd').className = className || '';
   hideEmi();
 }
 
 function showErrorMessage(message){
-  frontDrop(message, 'shown')
+  toggleErrorMessage(message, 'shown')
 }
 
 function showLoadingMessage(message){
-  frontDrop(message, 'shown loading');
+  toggleErrorMessage(message, 'shown loading');
 }
 
 function setDefaultError(){
@@ -357,7 +353,7 @@ CheckoutModal.prototype = {
 
   hideErrorMessage: function(){
     if(!this.rzp){
-      frontDrop();
+      toggleErrorMessage();
     }
   },
 
@@ -389,9 +385,9 @@ CheckoutModal.prototype = {
     this.on('submit', '#form', this.submit);
 
     var options = this.message.options;
-    var enableMethods = options.method;
+    var enabledMethods = options.method;
 
-    if(enableMethods.netbanking){
+    if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
       if(!window.addEventListener){
@@ -399,7 +395,7 @@ CheckoutModal.prototype = {
       }
     }
 
-    if(enableMethods.card){
+    if(enabledMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv-check', noCvvToggle);
@@ -518,7 +514,7 @@ CheckoutModal.prototype = {
   hide: function(){
     if(this.isOpen){
       $('#modal-inner').removeClass('shake');
-      frontDrop();
+      toggleErrorMessage();
       this.modal.hide();
     }
   },
@@ -581,14 +577,14 @@ CheckoutModal.prototype = {
     preventDefault(e);
     this.smarty.refresh();
 
-    var nocvv = gel('nocvv-check');
-    var nocvv_values;
+    var nocvv_el = gel('nocvv-check');
+    var nocvv_dummy_values;
 
     // if card tab exists
-    if(nocvv){
+    if(nocvv_el){
       validateCardNumber(gel('card_number'));
-      if(nocvv.checked && !nocvv.disabled){
-        nocvv_values = true;
+      if(nocvv_el.checked && !nocvv_el.disabled){
+        nocvv_dummy_values = true;
         $('.elem-expiry').removeClass('invalid');
         $('.elem-cvv').removeClass('invalid');
       }
@@ -607,7 +603,7 @@ CheckoutModal.prototype = {
 
     data.amount = options.amount;
 
-    if(nocvv_values){
+    if(nocvv_dummy_values){
       data['card[cvv]'] = '000';
       data['card[expiry_month]'] = '12';
       data['card[expiry_year]'] = '21';

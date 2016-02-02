@@ -132,7 +132,7 @@
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
             if(gel('emi-container')){
-              return frontDrop();
+              return toggleErrorMessage();
             }
             this.hide();
           }
