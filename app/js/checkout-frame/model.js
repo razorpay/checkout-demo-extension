@@ -571,8 +571,6 @@ CheckoutModal.prototype = {
     var data = getFormData();
     var options = this.message.options;
 
-    data.amount = options.amount;
-
     Razorpay.sendMessage({
       event: 'submit',
       data: data

@@ -134,7 +134,7 @@ function formatRequest(request){
   var options = request.options;
 
   each(
-    ['amount', 'currency', 'callback_url', 'signature'],
+    ['amount', 'currency', 'callback_url', 'signature', 'description'],
     function(i, field){
       if(!(field in rdata) && options[field]){
         rdata[field] = options[field];
