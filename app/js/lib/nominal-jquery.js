@@ -252,6 +252,11 @@ $.prototype = {
     return $(this.prop('parentNode'));
   },
 
+  val: function(value){
+    this[0].value = value;
+    return this;
+  },
+
   html: function(html){
     if(arguments.length){
       this[0].innerHTML = html;

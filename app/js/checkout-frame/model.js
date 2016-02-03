@@ -162,18 +162,39 @@ function hideEmi(){
   }
 }
 
-function frontDrop(message, className){
+function onSixDigits(e){
+  var el = e.target;
+  var sixDigits = el.value.length > 5;
+  $(el.parentNode)[sixDigits ? 'addClass' : 'removeClass']('six');
+
+  var nocvvCheck = gel('nocvv-check');
+  if(sixDigits && nocvvCheck.disabled){
+    nocvvCheck.disabled = false;
+  } else if(!sixDigits){
+    nocvvCheck.disabled = true;
+  }
+
+  noCvvToggle({target: nocvvCheck});
+}
+
+function noCvvToggle(e){
+  var nocvvCheck = e.target;
+  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled && gel('elem-card').getAttribute('cardtype') === 'maestro';
+  $('#expiry-cvv')[shouldHideExpiryCVV ? 'addClass' : 'removeClass']('hidden');
+}
+
+function toggleErrorMessage(message, className){
   gel('fd-t').innerHTML = message || '';
   gel('fd').className = className || '';
   hideEmi();
 }
 
 function showErrorMessage(message){
-  frontDrop(message, 'shown')
+  toggleErrorMessage(message, 'shown')
 }
 
 function showLoadingMessage(message){
-  frontDrop(message, 'shown loading');
+  toggleErrorMessage(message, 'shown loading');
 }
 
 function setDefaultError(){
@@ -332,7 +353,7 @@ CheckoutModal.prototype = {
 
   hideErrorMessage: function(){
     if(!this.rzp){
-      frontDrop();
+      toggleErrorMessage();
     }
   },
 
@@ -364,9 +385,9 @@ CheckoutModal.prototype = {
     this.on('submit', '#form', this.submit);
 
     var options = this.message.options;
-    var enableMethods = options.method;
+    var enabledMethods = options.method;
 
-    if(enableMethods.netbanking){
+    if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
       if(!window.addEventListener){
@@ -374,8 +395,10 @@ CheckoutModal.prototype = {
       }
     }
 
-    if(enableMethods.card){
+    if(enabledMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
+      this.on('keyup', '#card_number', onSixDigits);
+      this.on('change', '#nocvv-check', noCvvToggle);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -390,7 +413,6 @@ CheckoutModal.prototype = {
     if(isCriOS){
       this.on('unload', window, options.modal.onhide);
     }
-    // $('nocvv-check').on('change', frameDiscreet.toggle_nocvv)
   },
 
   setCardFormatting: function(){
@@ -419,19 +441,12 @@ CheckoutModal.prototype = {
       if(type === 'amex' || oldType === 'amex'){
         formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
       }
-      // if(type !== 'maestro'){
-        // $('nocvv-check')[0].checked = false;
-        // frameDiscreet.toggle_nocvv();
-      // }
     }
 
     if(shouldFocusNextField){
       card.filled = function(el){
-        if(el === el_expiry){
-          el_cvv.focus();
-        }
-        else{
-          el_expiry.focus();
+        if(!$(el.parentNode).hasClass('invalid')){
+          (el === el_expiry ? el_cvv : el_expiry).focus();
         }
       }
     }
@@ -499,7 +514,7 @@ CheckoutModal.prototype = {
   hide: function(){
     if(this.isOpen){
       $('#modal-inner').removeClass('shake');
-      frontDrop();
+      toggleErrorMessage();
       this.modal.hide();
     }
   },
@@ -561,7 +576,19 @@ CheckoutModal.prototype = {
   submit: function(e) {
     preventDefault(e);
     this.smarty.refresh();
-    validateCardNumber(gel('card_number'));
+
+    var nocvv_el = gel('nocvv-check');
+    var nocvv_dummy_values;
+
+    // if card tab exists
+    if(nocvv_el){
+      validateCardNumber(gel('card_number'));
+      if(nocvv_el.checked && !nocvv_el.disabled){
+        nocvv_dummy_values = true;
+        $('.elem-expiry').removeClass('invalid');
+        $('.elem-cvv').removeClass('invalid');
+      }
+    }
 
     if (this.checkInvalid('form-common')) {
       return;
@@ -575,6 +602,12 @@ CheckoutModal.prototype = {
     var options = this.message.options;
 
     data.amount = options.amount;
+
+    if(nocvv_dummy_values){
+      data['card[cvv]'] = '000';
+      data['card[expiry_month]'] = '12';
+      data['card[expiry_year]'] = '21';
+    }
 
     Razorpay.sendMessage({
       event: 'submit',
