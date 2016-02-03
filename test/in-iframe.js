@@ -733,7 +733,7 @@ describe('ios CheckoutBridge', function(){
   it('should be set up if relevant query params', function(){
     qpmap.platform = 'ios';
     delete window.CheckoutBridge;
-    iosBridge();
+    platformSpecific.ios();
 
     expect(window.CheckoutBridge).toBeDefined();
     ['load','dismiss','submit','fault','success'].forEach(function(method){
