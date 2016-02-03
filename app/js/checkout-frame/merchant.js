@@ -203,6 +203,47 @@ function configureRollbar(message){
   }
 }
 
+// generates ios event handling functions, like onload
+function iosMethod(method){
+  return function(data){
+    var iF = document.createElement('iframe');
+    var src = 'razorpay://on'+method;
+    if(data){
+      src += '?' + CheckoutBridge.index;
+      CheckoutBridge.map[++CheckoutBridge.index] = data;
+    }
+    iF.setAttribute('src', src);
+    document.documentElement.appendChild(iF);
+    iF.parentNode.removeChild(iF);
+    iF = null;
+  }
+}
+
+var platformSpecific = {
+  ios: function(){
+    // set ios specific css
+    $(doc).addClass('ios');
+
+    // setting up js -> ios communication by loading custom protocol inside hidden iframe
+    CheckoutBridge = window.CheckoutBridge = {
+      // unique id for ios to retieve resources
+      index: 0,
+      map: {},
+      get: function(index){
+        var val = this.map[this.index];
+        delete this.map[this.index];
+        return val;
+      }
+    };
+
+    var bridgeMethods = ['load','dismiss','submit','fault','success'];
+
+    each(bridgeMethods, function(i, prop){
+      CheckoutBridge['on'+prop] = iosMethod(prop)
+    })
+  }
+}
+
 function setQueryParams(search){
   each(
     search.replace(/^\?/,'').split('&'),
@@ -219,6 +260,8 @@ function setQueryParams(search){
       }
     }
   )
+
+  invoke(platformSpecific[qpmap.platform]);
 }
 
 Razorpay.sendMessage = function(message){
@@ -311,50 +354,11 @@ if(location.search){
   setQueryParams(location.search);
 }
 
-// unique id for ios to retieve resources
-var iosDataIndex = 0;
-
-function iosMethod(method){
-  return function(data){
-    var iF = document.createElement('iframe');
-    var src = 'razorpay://on'+method;
-    if(data){
-      src += '?' + iosDataIndex;
-      CheckoutBridge.map[iosDataIndex] = data;
-      iosDataIndex++;
-    }
-    iF.setAttribute('src', src);
-    document.documentElement.appendChild(iF);
-    iF.parentNode.removeChild(iF);
-    iF = null;
-  }
-}
-
-function iosBridge(){
-  if(qpmap.platform === 'ios'){
-    CheckoutBridge = window.CheckoutBridge = {
-      map: {},
-      get: function(index){
-        var val = this.map[index];
-        delete this.map[index];
-        return val;
-      }
-    };
-
-    var bridgeMethods = ['load','dismiss','submit','fault','success'];
-
-    each(bridgeMethods, function(i, prop){
-      CheckoutBridge['on'+prop] = iosMethod(prop)
-    })
-  }
-}
-
 if(CheckoutBridge){
   discreet.medium = qpmap.platform || 'app';
   discreet.context = qpmap.context || null;
 }
 
-iosBridge();
 Razorpay.sendMessage({event: 'load'});
 if(qpmap.message){
   parseMessage({data: atob(qpmap.message)});
