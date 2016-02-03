@@ -601,8 +601,6 @@ CheckoutModal.prototype = {
     var data = getFormData();
     var options = this.message.options;
 
-    data.amount = options.amount;
-
     if(nocvv_dummy_values){
       data['card[cvv]'] = '000';
       data['card[expiry_month]'] = '12';
