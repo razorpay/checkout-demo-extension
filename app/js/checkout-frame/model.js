@@ -434,11 +434,8 @@ CheckoutModal.prototype = {
 
     if(shouldFocusNextField){
       card.filled = function(el){
-        if(el === el_expiry){
-          el_cvv.focus();
-        }
-        else{
-          el_expiry.focus();
+        if(!$(el.parentNode).hasClass('invalid')){
+          (el === el_expiry ? el_cvv : el_expiry).focus();
         }
       }
     }
@@ -581,8 +578,6 @@ CheckoutModal.prototype = {
     var data = getFormData();
     setEmiBank(data);
     var options = this.message.options;
-
-    data.amount = options.amount;
 
     Razorpay.sendMessage({
       event: 'submit',

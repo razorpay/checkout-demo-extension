@@ -108,6 +108,8 @@ function makeCheckoutMessage(rzp){
     }
   )
 
+  options.redirect = !!rzp.options.redirect();
+
   if(options.parent){
     response.embedded = true;
   }
@@ -200,7 +202,7 @@ CheckoutFrame.prototype = {
     }
     else {
       $parent.css('display', 'block').reflow();
-      setBackdropColor(rzp.options.theme.backdropColor);
+      setBackdropColor(rzp.options.theme.backdrop_color);
       this.setMetaAndOverflow();
     }
   },
