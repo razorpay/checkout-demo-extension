@@ -167,17 +167,6 @@ function makeEmiDropdown(emiObj, session){
   $('#emi-plans-wrap').html(h);
 }
 
-function selectEmiBank(e){
-  var $target = $(e.target);
-  if($target.hasClass('option')){
-    var duration = $target.attr('value');
-    var parent = $('#emi-check-label').toggleClass('checked', duration);
-    $(parent.find('.active')[0]).removeClass('active');
-    $target.addClass('active');
-    invoke('blur', parent, null, 100);
-  }
-}
-
 function setEmiBank(data){
   if(data.method === 'emi'){
     var num = data['card[number]'];
@@ -376,7 +365,13 @@ CheckoutModal.prototype = {
     this.setCardFormatting()
     this.bindEvents();
 
-    this.emiView = new emiView(message);
+    if(this.emi){
+      this.emiView = new emiView(message);
+    }
+
+    if( options.key === 'rzp_live_kfAFSfgtztVo28' || options.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
+      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
+    }
   },
 
   renderCss: function(){
@@ -464,10 +459,6 @@ CheckoutModal.prototype = {
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv-check', noCvvToggle);
-
-      if(this.emi){
-        this.on('click', '#emi-select', selectEmiBank);
-      }
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
