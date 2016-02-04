@@ -16,7 +16,7 @@ emiView.prototype = {
   render: function() {
     this.unbind();
     $('#emi-container').html(templates.emi(this.opts));
-    $('#emi-close').on('click', frontDrop);
+    $('#emi-close').on('click', toggleErrorMessage);
     this.bind($('#elem-emi').addClass('shown'));
     $('#methods-specific-fields').css('minHeight', '263px');
     this.oncardnumber();
@@ -80,7 +80,7 @@ emiView.prototype = {
           'click', function(){
             $('#emi-container > .emi-active').removeClass('emi-active');
             $(this).addClass('emi-active').find('input')[0].checked = true;
-            frontDrop();
+            toggleErrorMessage();
           }
         )
       },

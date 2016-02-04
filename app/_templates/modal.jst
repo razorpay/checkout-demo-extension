@@ -75,9 +75,9 @@
                         <div class="card-image"></div>
                         <span class="help-text">Please enter a valid card number</span>
                         <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=it.options.prefill.card.number}}">
-                        <label class="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check"> My card doesn't have expiry or CVV</label>
+                        <label id="nocvv" for="nocvv-check"><input type="checkbox" id="nocvv-check" checked disabled> My card doesn't have expiry/CVV</label>
                       </div></div>
-                      <div class="double">
+                      <div class="double" id="expiry-cvv">
                         <div class="elem-wrap first"><div class="elem elem-expiry">
                           <i class="i">&#xe606;</i>
                           <span class="help-text">Please enter card expiry date in MM / YY format.</span>
