@@ -90,12 +90,15 @@
                         </div></div>
                       </div>
                       <div id="elem-emi" class="double">
-                        <label class="elem-wrap first" for="emi" tabIndex="0" id="emi-check-label">
-                          <input type="checkbox" id="emi" name="method" value="emi" disabled>
-                          <span class="help-text">EMI is available on HDFC, Kotak and Axis Credit Cards. Enter your card number to proceed.</span>
+                        <div class="elem-wrap first disabled" for="emi" tabIndex="0" id="emi-check-label">
                           <span class="checkbox"></span>
                           Pay with EMI
-                        </label>
+                          <div class="select dropdown">
+                            <div id="emi-plans-wrap"></div>
+                            <div class="option" value="">Pay without EMI</div>
+                          </div>
+                          <span class="help-text dropdown">EMI is available for Kotak Mahindra Credit Cards. Enter your credit card to avail.</span>
+                        </div>
                         <div class="elem-wrap last" id="view-emi-plans">
                           View EMI Plans
                         </div>

@@ -68,39 +68,26 @@ var freqWallets = {
 }
 
 var emi_options = {
+  // minimum amount to enable emi
+  min: 3000*100-1,
   installment: function(length, rate, principle){
     rate /= 1200;
     multiplier = Math.pow(1+rate, length);
-    return principle*rate*multiplier/(multiplier - 1);
+    return parseInt(principle*rate*multiplier/(multiplier - 1))/100;
   },
 
-  selected: 'HDFC',
+  selected: 'KKBK',
   banks: {
-    HDFC: {
-      name: 'HDFC Bank',
-      plans: {
-        3: 9,
-        6: 10,
-        9: 11,
-        12: 12
-      }
-    },
-    UTIB: {
-      name: 'Axis Bank',
-      plans: {
-        3: 8,
-        6: 10,
-        9: 11,
-        12: 12
-      }
-    },
     KKBK: {
+      patt: /4(04861|78006|34669|1(4767|664[3-6])|363(88|89|90))|5(24253|43705|47981)/,
       name: 'Kotak Mahindra Bank',
       plans: {
-        3: 9,
-        6: 10,
-        9: 11,
-        12: 12
+        3: 12,
+        6: 12,
+        9: 14,
+        12: 14,
+        18: 15,
+        24: 15
       }
     }
   }

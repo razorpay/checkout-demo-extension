@@ -1,6 +1,6 @@
 
   <div class="row em">
-    <div class="col">EMI</div>
+    <div class="col">Select Bank:</div>
     <select id="emi_select">
       {{ for(var bank in it.banks){ }}
         <option value="{{=bank}}"{{?bank===it.selected}} selected{{?}}>{{=it.banks[bank].name}}</option>
@@ -20,10 +20,10 @@
         <input type="radio" name="emi-radio">
         {{=plan}} Months
       </div>
-      {{ var planObj = plans[plan]; var inst = parseInt(it.installment(plan, planObj, it.amount)); }}
+      {{ var planObj = plans[plan]; var inst = it.installment(plan, planObj, it.amount); }}
       <div class="col">{{=planObj}}%</div>
-      <div class="col">₹ {{=inst/100}}</div>
-      <div class="col">₹ {{=inst*plan/100}}</div>
+      <div class="col">₹ {{=inst}}</div>
+      <div class="col">₹ {{=inst*plan}}</div>
     </div>
   {{}}}
   <div id="emi-close">×</div>

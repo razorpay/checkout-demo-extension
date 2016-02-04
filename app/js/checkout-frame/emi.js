@@ -17,7 +17,6 @@ emiView.prototype = {
     this.unbind();
     $('#emi-container').html(templates.emi(this.opts));
     $('#emi-close').on('click', toggleErrorMessage);
-    $('#methods-specific-fields').css('minHeight', '263px');
     this.bind();
     this.oncardnumber();
   },
