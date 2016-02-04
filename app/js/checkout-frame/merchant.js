@@ -73,7 +73,7 @@ var emi_options = {
   installment: function(length, rate, principle){
     rate /= 1200;
     multiplier = Math.pow(1+rate, length);
-    return parseInt(principle*rate*multiplier/(multiplier - 1))/100;
+    return parseInt(principle*rate*multiplier/(multiplier - 1));
   },
 
   selected: 'KKBK',

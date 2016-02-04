@@ -159,9 +159,9 @@ function makeEmiDropdown(emiObj, session){
     emiObj.plans,
     function(length, rate){
       h += '<div class="option" value="'+length+'">'
-        + length + ' month EMI @ ' + rate + '% (<strong>&#xe600; '
-        + emi_options.installment(length, rate, session.message.options.amount)
-        + '</strong> per month)</div>';
+        + length + ' month EMI @ ' + rate + '% (&#xe600; '
+        + emi_options.installment(length, rate, session.message.options.amount)/100
+        + ' per month)</div>';
     }
   )
   $('#emi-plans-wrap').html(h);
@@ -171,7 +171,10 @@ function selectEmiBank(e){
   var $target = $(e.target);
   if($target.hasClass('option')){
     var duration = $target.attr('value');
-    $('#emi-check-label').toggleClass('checked', duration);
+    var parent = $('#emi-check-label').toggleClass('checked', duration);
+    $(parent.find('.active')[0]).removeClass('active');
+    $target.addClass('active');
+    invoke('blur', parent, null, 100);
   }
 }
 
@@ -218,9 +221,13 @@ function onSixDigits(e){
     }
   }
 
-  $('#emi-check-label')[emiObj ? 'removeClass' : 'addClass']('disabled');
+  var emi_parent = $('#emi-check-label')[emiObj ? 'removeClass' : 'addClass']('disabled');
   if(emiObj){
     makeEmiDropdown(emiObj, this);
+  }
+  else {
+    emi_parent.removeClass('checked');
+    $(emi_parent.find('.active')[0]).removeClass('active');
   }
   noCvvToggle({target: nocvvCheck});
 }
@@ -280,7 +287,7 @@ CheckoutModal.prototype = {
       classes.push('mobile');
     }
 
-    if(this.message.options.amount > emi_options.min){
+    if(this.emi){
       classes.push('emi');
     }
 
@@ -351,13 +358,19 @@ CheckoutModal.prototype = {
       message.data = this.message.data;
     }
     this.message = message;
+    var options = message.options;
     formatMessage(message);
     sanitize(message);
+
+    if(options.method.emi && options.amount > emi_options.min){
+      this.emi = true;
+    }
+
     this.getEl();
     this.fillData(message.data);
 
     processModalMethods(this);
-    if(!this.modal) { this.modal = new window.Modal(this.el, message.options.modal) }
+    if(!this.modal) { this.modal = new window.Modal(this.el, options.modal) }
 
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting()
@@ -452,8 +465,8 @@ CheckoutModal.prototype = {
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv-check', noCvvToggle);
 
-      if(options.amount > emi_options.min){
-        this.on('click', '#emi-plans-wrap', selectEmiBank);
+      if(this.emi){
+        this.on('click', '#emi-select', selectEmiBank);
       }
     }
 

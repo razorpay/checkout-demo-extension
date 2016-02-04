@@ -25,9 +25,11 @@ input[type=radio]:checked + label,
 }
 {{?}}
 
-input[type=checkbox]:checked + .checkbox,
-#emi-container .emi-option.emi-active,
-#emi-container .emi-option:hover {
+.option.active,
+.checked .checkbox,
+input[type=checkbox]:checked + .checkbox
+{
+  color: #fff;
   background: {{=it.color}};
   border-color: {{=it.color}};
 }

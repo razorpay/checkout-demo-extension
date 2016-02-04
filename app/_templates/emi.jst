@@ -22,8 +22,8 @@
       </div>
       {{ var planObj = plans[plan]; var inst = it.installment(plan, planObj, it.amount); }}
       <div class="col">{{=planObj}}%</div>
-      <div class="col">₹ {{=inst}}</div>
-      <div class="col">₹ {{=inst*plan}}</div>
+      <div class="col">₹ {{=inst/100}}</div>
+      <div class="col">₹ {{=inst*plan/100}}</div>
     </div>
   {{}}}
   <div id="emi-close">×</div>
