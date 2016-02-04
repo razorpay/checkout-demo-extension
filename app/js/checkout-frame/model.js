@@ -168,9 +168,10 @@ function makeEmiDropdown(emiObj, session){
 }
 
 function setEmiBank(data){
-  if(data.method === 'emi'){
-    var num = data['card[number]'];
-    data.bank = 'HDFC';
+  var activeEmiPlan = $('#emi-plans-wrap .active')[0];
+  if(activeEmiPlan){
+    data.method = 'emi';
+    data.emi_duration = activeEmiPlan.getAttribute('value');
   }
 }
 
@@ -186,8 +187,9 @@ function hideEmi(){
 function onSixDigits(e){
   var el = e.target;
   var val = el.value;
+  var isMaestro = gel('elem-card').getAttribute('cardtype') === 'maestro';
   var sixDigits = val.length > 5;
-  $(el.parentNode)[sixDigits ? 'addClass' : 'removeClass']('six');
+  $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
 
   var nocvvCheck = gel('nocvv-check');
@@ -201,11 +203,13 @@ function onSixDigits(e){
       function(bank, emiObjInner){
         if(emiObjInner.patt.test(val.replace(/ /g,''))){
           emiObj = emiObjInner;
+          this.emiBank = bank;
         }
-      }
+      },
+      this
     )
 
-    if(nocvvCheck.disabled){
+    if(isMaestro && nocvvCheck.disabled){
       nocvvCheck.disabled = false;
     }
   }
@@ -223,7 +227,7 @@ function onSixDigits(e){
 
 function noCvvToggle(e){
   var nocvvCheck = e.target;
-  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled && gel('elem-card').getAttribute('cardtype') === 'maestro';
+  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
   $('#expiry-cvv')[shouldHideExpiryCVV ? 'addClass' : 'removeClass']('hidden');
 }
 
@@ -659,7 +663,12 @@ CheckoutModal.prototype = {
       return;
     }
     var data = getFormData();
+
     setEmiBank(data);
+    if(data.method === 'emi'){
+      data.bank = this.emiBank;
+    }
+
     var options = this.message.options;
 
     if(nocvv_dummy_values){
