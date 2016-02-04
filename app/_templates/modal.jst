@@ -89,13 +89,16 @@
                           <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="3" required pattern="[0-9]{3}">
                         </div></div>
                       </div>
-                      <div id="elem-emi">
-                        <div class="elem-wrap first">
-                          EMI Available
-                        </div>
-                        <label class="elem-wrap last" for="emi">
-                          Pay with EMI <input type="checkbox" id="emi" name="method" value="emi">
+                      <div id="elem-emi" class="double">
+                        <label class="elem-wrap first" for="emi" tabIndex="0" id="emi-check-label">
+                          <input type="checkbox" id="emi" name="method" value="emi" disabled>
+                          <span class="help-text">EMI is available on HDFC, Kotak and Axis Credit Cards. Enter your card number to proceed.</span>
+                          <span class="checkbox"></span>
+                          Pay with EMI
                         </label>
+                        <div class="elem-wrap last" id="view-emi-plans">
+                          View EMI Plans
+                        </div>
                       </div>
                       <label class="elem" for="cardsave" style="display: none">
                         <input type="checkbox" id="cardsave"> Remember Me

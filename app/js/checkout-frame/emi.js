@@ -17,8 +17,8 @@ emiView.prototype = {
     this.unbind();
     $('#emi-container').html(templates.emi(this.opts));
     $('#emi-close').on('click', toggleErrorMessage);
-    this.bind($('#elem-emi').addClass('shown'));
     $('#methods-specific-fields').css('minHeight', '263px');
+    this.bind();
     this.oncardnumber();
   },
 
@@ -40,29 +40,24 @@ emiView.prototype = {
   },
 
   onemicheck: function(){
-    var shouldCheck = $(this).hasClass('check');
-    if(!gel('emi').checked || !shouldCheck){
+    $('#emi-container')
+      .css('display', 'block')
+      .reflow()
+      .addClass('shown');
 
-      $('#emi-container')
-        .css('display', 'block')
-        .reflow()
-        .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
-
-      $('#fd').addClass('shown');
-      $('#fd-in').hide();
-    }
+    $('#fd').addClass('shown');
+    $('#fd-in').hide();
   },
 
-  bind: function(elem_emi){
+  bind: function(){
     this.on(
       $('#emi_select'),
       'change',
       bind(this.onchange, this)
     );
-
     this.on(
-      elem_emi,
-      'mouseup',
+      $('#view-emi-plans'),
+      'click',
       this.onemicheck
     )
 

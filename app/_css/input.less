@@ -49,13 +49,6 @@ input, select {
 input, select{
   appearance: none;
 }
-input[type=checkbox]{
-  appearance: checkbox;
-  vertical-align: middle;
-  cursor: pointer;
-  position: relative;
-  top: -1px;
-}
 
 @input-padding-left: (30+@input-padding/2);
 
@@ -189,6 +182,7 @@ input[disabled]{
     margin: 0 0 -10px -7px;
   }
 }
+#emi-check-label:focus #emi[disabled] + .help-text,
 .focused.invalid.mature .help-text{
   display: block; // helps when pointer-events is not supported
   .opacity(1);
@@ -273,50 +267,75 @@ input[type=radio]{
   }
 }
 
-#elem-emi{
-  overflow: hidden;
-  height: 0;
-  transition: 0.3s;
-  margin-top: 0;
+.checkbox{
   display: inline-block;
-
-  &.shown{
-    margin: 18px 0;
-    height: 20px;
-  }
-
-  .elem-wrap{
-    cursor: pointer;
-    &:before{
-      display: inline-block;
-      content: '';
-      width: @input-padding/2;
-    }
-  }
-  .first{
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+  top: -1px;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: inset 0px 1px 1px #ddd;
+  transition: 0.2s;
+  margin-right: 6px;
+}
+input[type=checkbox]{
+  display: none;
+  &:checked + .checkbox{
+    background: @primary;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
     &:after{
-      border-radius: 50%;
-      content: '?';
-      color: #fff;
-      background: #616161;
-      display: inline-block;
-      height: 14px;
-      line-height: 14px;
-      width: 14px;
-      font-size: 12px;
-      text-align: center;
-      margin-left: 4px;
+      content: '';
+      width: 8px;
+      height: 4px;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      border: 3px solid #fff;
+      border-top: none;
+      border-right: none;
+      transform: rotate(-45deg);
     }
   }
-  .last{
-    display: none;
+}
+
+#elem-emi{
+  margin-top: 18px;
+
+  .help-text{
+    margin-bottom: 12px;
+    white-space: normal;
+    width: 275px;
+    right: auto;
+    padding-right: 2px;
   }
-  &.check{
-    .first{
-      display: none;
-    }
-    .last{
-      display: block;
+  .elem-wrap {
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding-left: 7px;
+
+    &.last{
+      &:before{
+        border-radius: 50%;
+        content: '?';
+        color: #fff;
+        background: #616161;
+        display: inline-block;
+        height: 14px;
+        line-height: 14px;
+        width: 14px;
+        font-size: 12px;
+        text-align: center;
+        margin: 0 4px 0 2px;
+        top: -1px;
+        position: relative;
+      }
     }
   }
 }
