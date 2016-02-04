@@ -719,8 +719,11 @@ CheckoutModal.prototype = {
       this.modal.destroy();
       this.smarty.off();
       this.card.unbind();
-      this.emiView.unbind();
       $(this.el).remove();
+
+      if(this.emiView){
+        this.emiView.unbind();
+      }
 
       this.modal =
       this.smarty =
