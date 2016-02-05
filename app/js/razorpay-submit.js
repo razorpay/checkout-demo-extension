@@ -165,7 +165,9 @@ function trackSubmit(rzp, data){
       'method',
       'card[name]',
       'bank',
-      'wallet'
+      'wallet',
+      'emi_duration',
+      'callback_url'
     ],
     function(i, key){
       if(key in data){
