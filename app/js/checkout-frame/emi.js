@@ -45,7 +45,7 @@ emiView.prototype = {
   },
 
   bind: function(){
-    this.on('click', '#emi-select', selectEmiBank);
+    this.on('mousedown', '#emi-select', selectEmiBank);
     this.on('click', '#view-emi-plans', onemicheck);
   },
 

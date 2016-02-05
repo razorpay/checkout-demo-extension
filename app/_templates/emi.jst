@@ -1,4 +1,4 @@
-
+<div id="emi-inner" class="mchild">
   <div class="row em">
     <div class="col">Select Bank:</div>
     <select id="emi_select">
@@ -16,10 +16,7 @@
   </strong>
   {{ var plans = it.banks[it.selected].plans; for(var plan in it.banks[it.selected].plans){}}
     <div class="row emi-option">
-      <div class="col">
-        <input type="radio" name="emi-radio">
-        {{=plan}} Months
-      </div>
+      <div class="col">{{=plan}} Months</div>
       {{ var planObj = plans[plan]; var inst = it.installment(plan, planObj, it.amount); }}
       <div class="col">{{=planObj}}%</div>
       <div class="col">₹ {{=inst/100}}</div>
@@ -27,3 +24,4 @@
     </div>
   {{}}}
   <div id="emi-close">×</div>
+</div>

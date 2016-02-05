@@ -291,7 +291,7 @@ CheckoutModal.prototype = {
     if(shouldFixFixed){
       classes.push('ip')
     }
-    return classes;
+    return classes.join(' ');
   },
 
   getEl: function(){
