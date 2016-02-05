@@ -165,7 +165,7 @@ function setPaymentMethods(payment_methods, methodOptions){
   if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
     methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
   }
-  methodOptions.emi = true;
+  // methodOptions.emi = true;
 }
 
 function showModal(message) {
