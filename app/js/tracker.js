@@ -105,6 +105,9 @@ function track(event, props) {
   if(id && /^rzp_l/.test(this.options.key)){
     setTimeout(function(){
       var data = {
+        context: {
+          direct: true
+        },
         anonymousId: _uid,
         event: event
       };
