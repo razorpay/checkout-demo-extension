@@ -156,6 +156,10 @@ function formInitProps(overrides){
     overrides.image = 'base64';
   }
 
+  if(overrides.amount){
+    overrides.amount = parseInt(overrides.amount);
+  }
+
   return {
     options: overrides
   }
