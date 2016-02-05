@@ -192,55 +192,6 @@ describe("automatic checkout:", function(){
   })
 })
 
-describe('non CriOS', function(){
-  it('communicator between CheckoutFrame and parent window should not be present', function(){
-    CriOS_handler();
-    expect(communicator).not.toBeDefined();
-  })
-})
-
-describe('if Chrome-iOS,', function(){
-  beforeEach(function(){
-    isCriOS = true;
-  })
-
-  afterEach(function(){
-    isCriOS = false;
-  })
-
-  it('communicator between CheckoutFrame and parent window should be present', function(){
-    CriOS_handler();
-    expect(communicator instanceof HTMLIFrameElement).toBe(true);
-    expect(document.documentElement.contains(communicator)).toBe(true);
-
-    communicator.parentNode.removeChild(communicator);
-    communicator = null;
-  })
-
-  it('Razorpay.open should have contentWindow', function(){
-    preloadedFrame = null;
-    expect(getPreloadedFrame()).toBe(null);
-    var rzp = Razorpay({key: 'key', amount: 200});
-    rzp.open();
-    expect(rzp.checkoutFrame.el instanceof HTMLDivElement).toBe(true);
-  })
-/*
-  it('Razorpay open should fail if window.open doesnt work', function(){
-    spyOn(window, 'open').and.callFake(jQuery.noop);
-
-    var closeSpy = jasmine.createSpy('close');
-    var afterCloseSpy = jasmine.createSpy('afterClose');
-
-    spyOn(CheckoutFrame.prototype, 'close').and.callFake(closeSpy);
-    spyOn(CheckoutFrame.prototype, 'afterClose').and.callFake(afterCloseSpy);
-    Razorpay.open({key: 'key', amount: 200});
-
-    expect(closeSpy).toHaveBeenCalled();
-    expect(afterCloseSpy).toHaveBeenCalled();
-  })
-  */
-})
-
 describe('validateCheckout should', function(){
 
   it('pass if options are not invalid', function(){

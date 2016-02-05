@@ -92,29 +92,6 @@ describe('makeCheckoutMessage should', function(){
     expect(message.options.redirect).toBe(true);
   })
 
-  describe('if CriOS, should', function(){
-
-    beforeEach(function(){
-      isCriOS = true;
-    })
-
-    it('set redirect option', function(){
-      var message = makeCheckoutMessage(rzp);
-      expect(message.options.redirect).toBe(true);
-    })
-
-    it('discard image option, if base64', function(){
-      rzp.options.image = base64image;
-      var message = makeCheckoutMessage(rzp);
-      expect(message.options.image).not.toBe(base64image);
-      rzp.options.image = 'qwer';
-    })
-
-    afterEach(function(){
-      isCriOS = false;
-    })
-  })
-
   it('delete parent option', function(){
     rzp.options.parent = 'x';
     var message = makeCheckoutMessage(rzp);
@@ -337,24 +314,5 @@ describe('if shouldFixFixed,', function(){
     expect(spy2).toHaveBeenCalled();
 
     shouldFixFixed = false;
-  })
-})
-
-describe('if CriOS,', function(){
-  var cf;
-
-  beforeEach(function(){
-    cf = new CheckoutFrame();
-  })
-
-  it('set unload listener', function(){
-    cf.bind();
-    expect(cf.listeners.unload).not.toBeDefined();
-    cf.unbind();
-
-    isCriOS = true;
-    cf.bind();
-    expect(cf.listeners.unload).toBeDefined();
-    isCriOS = false;
   })
 })

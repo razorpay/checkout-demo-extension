@@ -1,4 +1,4 @@
-function roll(){};
+var roll = function(){};
 var noop = roll;
 
 function err(errors){
@@ -6,7 +6,7 @@ function err(errors){
     return false;
   }
   return true;
-};
+}
 
 var doc = document.body || document.documentElement;
 var ua = navigator.userAgent;
