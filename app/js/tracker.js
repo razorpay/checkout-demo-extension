@@ -113,15 +113,12 @@ function track(event, props) {
       };
       if(props){
         props = $.clone(props);
-      }
-      if(event === 'init') {
-        props = formInitProps(props);
-        props.medium = discreet.medium;
-        props.context = discreet.context;
-        props.ua = ua;
-      }
-
-      if(typeof props === 'object') {
+        if(event === 'init') {
+          props = formInitProps(props);
+          props.medium = discreet.medium;
+          props.context = discreet.context;
+          props.ua = ua;
+        }
         data.properties = props;
       }
 
