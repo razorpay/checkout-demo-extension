@@ -14,7 +14,7 @@ var discreet = {
           alertMessage = 'Please update your Chrome browser or';
         }
       }
-      else {
+      else if(/FxiOS|UCBrowser/.test(ua)){
         alertMessage = 'This browser is unsupported. Please';
       }
     }
