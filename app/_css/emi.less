@@ -4,8 +4,12 @@
   #modal-content{
     min-height: 506px;
   }
+  #emi-container,
   #elem-emi{
     display: block;
+  }
+  #emi-container{
+    display: none\9;
   }
 }
 
@@ -30,6 +34,7 @@
   position: relative;
 }
 #emi-container{
+  display: none;
   width: 500px;
   margin-left: -250px;
   left: 50%;
@@ -42,7 +47,6 @@
   opacity: 0;
   transition: 0.3s;
   pointer-events: none;
-  display: none\9;
   z-index: 200;
 
   &:after{
