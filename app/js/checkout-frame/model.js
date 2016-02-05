@@ -194,26 +194,30 @@ function onSixDigits(e){
 
   var nocvvCheck = gel('nocvv-check');
 
-  if(!sixDigits){
-    nocvvCheck.disabled = true;
+  if(sixDigits){
+    if(isMaestro){
+      if(nocvvCheck.disabled){
+        nocvvCheck.disabled = false;
+      }
+    }
+    else {
+      each(
+        emi_options.banks,
+        function(bank, emiObjInner){
+          if(emiObjInner.patt.test(val.replace(/ /g,''))){
+            emiObj = emiObjInner;
+          }
+        }
+      )
+    }
   }
   else {
-    each(
-      emi_options.banks,
-      function(bank, emiObjInner){
-        if(emiObjInner.patt.test(val.replace(/ /g,''))){
-          emiObj = emiObjInner;
-        }
-      }
-    )
-
-    if(isMaestro && nocvvCheck.disabled){
-      nocvvCheck.disabled = false;
-    }
+    nocvvCheck.disabled = true;
   }
 
   var emi_parent = $('#emi-check-label')[emiObj ? 'removeClass' : 'addClass']('disabled');
   if(emiObj){
+    $('#expiry-cvv').removeClass('hidden');
     makeEmiDropdown(emiObj, this);
   }
   else {
@@ -221,12 +225,22 @@ function onSixDigits(e){
     $(emi_parent.find('.active')[0]).removeClass('active');
   }
   noCvvToggle({target: nocvvCheck});
+
+  var elem_emi = $('#elem-emi');
+  var hiddenClass = 'hidden';
+
+  if(isMaestro && sixDigits){
+    elem_emi.addClass(hiddenClass);
+  }
+  else if(elem_emi.hasClass(hiddenClass)) {
+    invoke('removeClass', elem_emi, hiddenClass, 200);
+  }
 }
 
 function noCvvToggle(e){
   var nocvvCheck = e.target;
   var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-  $('#expiry-cvv')[shouldHideExpiryCVV ? 'addClass' : 'removeClass']('hidden');
+  $('#expiry-cvv').toggleClass('hidden', shouldHideExpiryCVV);
 }
 
 function toggleErrorMessage(message, className){
