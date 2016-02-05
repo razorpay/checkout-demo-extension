@@ -116,13 +116,6 @@ function makeCheckoutMessage(rzp){
   delete options.parent;
 
   sanitizeImage(options);
-
-  if(isCriOS){
-    options.redirect = true;
-    if(/^data:image\//.test(options.image)){
-      options.image = '';
-    }
-  }
   return response;
 }
 
@@ -148,7 +141,7 @@ CheckoutFrame.prototype = {
 
   getEl: function(options){
     if(!this.el){
-      this.el = $(document.createElement(isCriOS ? 'div' : 'iframe'))
+      this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
           style: 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
@@ -165,15 +158,6 @@ CheckoutFrame.prototype = {
 
   openRzp: function(rzp){
     var el = this.el;
-    if(isCriOS){
-      if(el.contentWindow){
-        el.contentWindow.close();
-      }
-      el.contentWindow = window.open(
-        el.getAttribute('src') + '&message=' + getEncodedMessage(rzp),
-        '_blank'
-      )
-    }
     this.bind();
     var parent = rzp.options.parent;
     var $parent = $(parent || frameContainer);
@@ -223,12 +207,6 @@ CheckoutFrame.prototype = {
         eventPairs.scroll = merchantMarkup.scroll;
       }
 
-      if(isCriOS){
-        eventPairs.unload = function(){
-          this.el.contentWindow.close();
-        }
-      }
-
       each(
         eventPairs,
         function(event, listener){
@@ -275,9 +253,6 @@ CheckoutFrame.prototype = {
   },
 
   postMessage: function(response){
-    if(isCriOS){
-      return;
-    }
     if(typeof response !== 'object'){
       // TODO roll
     }

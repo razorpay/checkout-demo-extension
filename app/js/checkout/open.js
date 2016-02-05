@@ -7,16 +7,6 @@ var currentScript = document.currentScript || (function() {
 
 var communicator;
 
-function CriOS_handler(){
-  if(isCriOS){
-    communicator = document.createElement('iframe')
-    communicator.style.display = 'none';
-    doc.appendChild(communicator);
-    communicator.src = discreet.makeUrl(true) + 'CriOS-frame.php';
-  }
-}
-
-CriOS_handler();
 /**
   default handler for success
   it just submits everything via the form
@@ -154,7 +144,7 @@ var frameBackdrop = createFrameBackdrop();
 var preloadedFrame = getPreloadedFrame();
 
 function getPreloadedFrame(){
-  if(!isCriOS && !preloadedFrame && !/ Opera Mini\//.test(ua)){
+  if(!preloadedFrame && !/ Opera Mini\//.test(ua)){
     preloadedFrame = new CheckoutFrame();
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
@@ -169,7 +159,7 @@ Razorpay.open = function(options) {
 Razorpay.prototype.open = function() {
   var frame = this.checkoutFrame;
   if(!frame){
-    if(isCriOS || this.options.parent){
+    if(this.options.parent){
       frame = new CheckoutFrame(this);
     }
     else {

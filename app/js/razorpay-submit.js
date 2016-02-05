@@ -42,7 +42,7 @@ discreet.setCommunicator = function(opts){
   }
   if(
     location.href.indexOf(discreet.makeUrl(true)) &&
-    (/MSIE |Windows Phone|Trident\//.test(ua) || (isCriOS && !discreet.isFrame))
+    (/MSIE |Windows Phone|Trident\//.test(ua))
   ) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';

@@ -268,10 +268,6 @@ function processModalMethods(session){
 
   modal.onhide = function(){
     Razorpay.sendMessage({event: 'dismiss'});
-    if(isCriOS){
-      setDefaultError();
-      window.close();
-    }
   };
   modal.onhidden = function(){
     session.saveAndClose();
@@ -485,10 +481,6 @@ CheckoutModal.prototype = {
         this.hideErrorMessage();
       }
     });
-
-    if(isCriOS){
-      this.on('unload', window, options.modal.onhide);
-    }
   },
 
   setCardFormatting: function(){
@@ -605,10 +597,6 @@ CheckoutModal.prototype = {
     this.modal.options.onhide = noop;
 
     Razorpay.sendMessage({ event: 'success', data: response });
-    if(isCriOS) {
-      response.id = _uid;
-      setCookie('onComplete', stringify(response));
-    }
     this.hide();
   },
 

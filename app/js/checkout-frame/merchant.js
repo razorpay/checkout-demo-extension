@@ -16,11 +16,6 @@ function getSession(methodToCall) {
   return session;
 }
 
-if(isCriOS){
-  // remove old onComplete cookie
-  deleteCookie('onComplete');
-}
-
 // initial error (helps in case of redirection flow)
 var qpmap = {};
 
@@ -297,7 +292,7 @@ Razorpay.sendMessage = function(message){
     return notifyBridge(message);
   }
 
-  if(!isCriOS && ownerWindow){
+  if(ownerWindow){
     message.source = 'frame';
     message.id = _uid;
     if ( typeof message !== 'string' ) {
