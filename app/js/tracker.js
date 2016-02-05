@@ -103,41 +103,39 @@ var _uid = generateUID();
 function track(event, props) {
   var id = this.id;
   if(id && /^rzp_l/.test(this.options.key)){
-    if(props){
-      props = $.clone(props);
-    }
-
     setTimeout(function(){
       var data = {
-        id: _uid
+        anonymousId: _uid,
+        event: event
       };
-      if(event === 'init'){
+      if(props){
+        props = $.clone(props);
+      }
+      if(event === 'init') {
         props = formInitProps(props);
-        data.medium = discreet.medium;
-        data.context = discreet.context;
-        data.ip = '${keen.ip}';
-        data.ua = ua;
+        props.medium = discreet.medium;
+        props.context = discreet.context;
+        props.ua = ua;
       }
 
       if(typeof props === 'object') {
-        data.data = props;
+        data.properties = props;
       }
 
       var xhr = new XMLHttpRequest();
       xhr.open(
         'post',
-        'https://api.keen.io/3.0/projects/56815e9096773d537f3aa38d/events/' + event + '?api_key=aaa7ed2762721feae486b937c8860697495484b68941ccc4d8aab85b10ace2a7b99be1b69a08b2bee5338118bdfae828f685f4fe7badbb5fb811b4f55b60413412641841d0ec5201bee394eee329884cf4bd5e784bde605707a2203dcc6afb54871f1ce71a0a02211c9ef4deb62d5d63',
+        'https://api.segment.io/v1/track',
         true
       );
       xhr.setRequestHeader('Content-type', 'application/json');
-      xhr.send(stringify(data));
+      xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
+      xhr.send(JSON.stringify(data));
     })
   }
 }
 
 function formInitProps(overrides){
-  var props = {};
-
   each(
     overrides,
     function(key){
@@ -147,31 +145,18 @@ function formInitProps(overrides){
     }
   )
 
-  props.key = overrides.key || '';
-  delete overrides.key;
-
-  props.amount = parseInt(overrides.amount, 10) || 0;
-  delete overrides.amount;
-
-  props.notes = overrides.notes &&  stringify(overrides.notes) || '';
-  delete props.notes;
-
-  props.method = {};
   each(
     overrides.method,
     function(method, value){
-      props.method[method] = !!value;
+      overrides.method[method] = !!value;
     }
   )
-  delete overrides.method;
 
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
   }
 
-  props.image = overrides.image || '';
-  delete overrides.image;
-
-  props.options = stringify(overrides);
-  return props;
+  return {
+    options: overrides
+  }
 }
