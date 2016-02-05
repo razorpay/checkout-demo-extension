@@ -1,16 +1,15 @@
 var roll = function(){};
 var noop = roll;
 
-var err = function(errors){
+function err(errors){
   if(errors instanceof Array && !errors.length){
     return false;
   }
   return true;
-};
+}
 
 var doc = document.body || document.documentElement;
 var ua = navigator.userAgent;
-var isCriOS = /\(iP.+(Cr|Fx)iOS/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
 var RazorpayConfig;

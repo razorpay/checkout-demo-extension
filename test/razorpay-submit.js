@@ -365,27 +365,11 @@ describe('communicator', function(){
     expect(communicator.contentWindow).toBe(window);
   })
 
-  it('should be set if Razorpay is configured', function(){
+  it('setter should have been called if Razorpay is configured', function(){
     var spy = jasmine.createSpy();
     spyOn(discreet, 'setCommunicator').and.callFake(spy);
     Razorpay.configure({});
     expect(spy).toHaveBeenCalled();
-  })
-
-  it('should be set in CriOS-Razorpay but not in CriOS-Checkout', function(){
-    isCriOS = true;
-    var oldFrame = discreet.isFrame;
-
-    discreet.isFrame = true;
-    Razorpay.configure({});
-    expect(communicator.contentWindow).toBe(window);
-
-    discreet.isFrame = false;
-    Razorpay.configure({});
-    expect(communicator instanceof HTMLIFrameElement).toBe(true);
-
-    isCriOS = false;
-    discreet.isFrame = oldFrame;
   })
 
   it('should be set as iframe for windows phone', function(){

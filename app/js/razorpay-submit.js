@@ -42,7 +42,7 @@ discreet.setCommunicator = function(opts){
   }
   if(
     location.href.indexOf(discreet.makeUrl(true)) &&
-    (/MSIE |Windows Phone|Trident\//.test(ua) || (isCriOS && !discreet.isFrame))
+    (/MSIE |Windows Phone|Trident\//.test(ua))
   ) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
@@ -274,8 +274,9 @@ Razorpay.prototype.authorizePayment = function(request){
     return false;
   }
   // prevent callback_url from being submitted if not redirecting
-  else {
-    delete rdata.callback_url;
+  delete rdata.callback_url;
+  if(!discreet.supported(true)){
+    return false;
   }
 
   var name;
