@@ -312,7 +312,7 @@ window.handleMessage = function(message) {
           keys.push(key);
         }
       )
-      return roll('invalid message', keys.join(), 'warn');
+      return;
     }
   }
 
@@ -332,7 +332,7 @@ window.handleMessage = function(message) {
       Razorpay.prototype.configure.call(message, message.options);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
-      roll('fault ' + e.message, message);
+      roll('fault ' + e.message, message, 'warn');
       return;
     }
   }
