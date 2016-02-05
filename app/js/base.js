@@ -7,27 +7,30 @@ var discreet = {
   supported: function(showAlert){
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
     var alertMessage;
-    if(isIOS && !window.indexedDB){
+
+    if(isIOS){
       if(/CriOS/.test(ua)){
-        alertMessage = 'Please update your Chrome browser or'
+        if(!window.indexedDB){
+          alertMessage = 'Please update your Chrome browser or';
+        }
       }
       else {
         alertMessage = 'This browser is unsupported. Please';
       }
     }
-    else if {
-      /Opera Mini\//.test(ua){
-        alertMessage = 'Opera Mini is unsupported. Please';
-      }
+    else if (/Opera Mini\//.test(ua)) {
+      alertMessage = 'Opera Mini is unsupported. Please';
     }
+
     if(alertMessage){
       if(showAlert){
-        alert(alertMessage + 'choose another browser.');
+        alert(alertMessage + ' choose another browser.');
       }
       return false;
     }
     return true;
   },
+
   medium: 'web',
   context: location.href.replace(/^https?:\/\//,''),
   setCommunicator: noop,

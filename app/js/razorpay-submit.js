@@ -272,8 +272,9 @@ Razorpay.prototype.authorizePayment = function(request){
     return false;
   }
   // prevent callback_url from being submitted if not redirecting
-  else {
-    delete rdata.callback_url;
+  delete rdata.callback_url;
+  if(!discreet.supported(true)){
+    return false;
   }
 
   var name;

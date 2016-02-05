@@ -158,7 +158,7 @@ Razorpay.open = function(options) {
 }
 
 Razorpay.prototype.open = function() {
-  if(!this.options.redirect && !discreet.supported(true)){
+  if(!this.options.redirect() && !discreet.supported(true)){
     return;
   }
 

@@ -1,7 +1,7 @@
-var roll = function(){};
+function roll(){};
 var noop = roll;
 
-var err = function(errors){
+function err(errors){
   if(errors instanceof Array && !errors.length){
     return false;
   }
