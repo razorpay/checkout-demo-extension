@@ -24,6 +24,7 @@ var discreet = {
 
     if(alertMessage){
       if(showAlert){
+        track('unsupported', {message: alertMessage, ua: ua});
         alert(alertMessage + ' choose another browser.');
       }
       return false;

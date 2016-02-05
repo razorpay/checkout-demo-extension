@@ -157,7 +157,7 @@ function formInitProps(overrides){
   }
 
   if(overrides.amount){
-    overrides.amount = parseInt(overrides.amount);
+    overrides.amount = parseInt(overrides.amount, 10);
   }
 
   return {
