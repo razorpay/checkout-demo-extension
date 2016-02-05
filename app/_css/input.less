@@ -49,13 +49,6 @@ input, select {
 input, select{
   appearance: none;
 }
-input[type=checkbox]{
-  appearance: checkbox;
-  vertical-align: middle;
-  cursor: pointer;
-  position: relative;
-  top: -1px;
-}
 
 @input-padding-left: (30+@input-padding/2);
 
@@ -157,25 +150,23 @@ input[disabled]{
     display: block;
   }
 }
+
 .help-text{
-  font-weight: bold;
-  display: none\9; // <ie9
   color: #fff;
-  pointer-events: none;
+  font-weight: bold;
   position: absolute;
   line-height: 16px;
   padding: 8px 12px;
   font-size: 12px;
   background: #555;
   box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
-  .opacity(0);
-  z-index: 2;
-  transform: translateY(10px);
-  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+  z-index: 3;
   @left: 5px;
   left: -@left;
   bottom: 100%;
   margin-bottom: -10px;
+  pointer-events: none!important;
+
   &:after {
     content: '';
     position: absolute;
@@ -189,7 +180,18 @@ input[disabled]{
     margin: 0 0 -10px -7px;
   }
 }
-.focused.invalid.mature .help-text{
+
+.dropdown, .help-text {
+  display: none\9; // <ie9
+  pointer-events: none;
+  .opacity(0);
+  transform: translateY(10px);
+  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+}
+
+#emi-check-label:focus .dropdown,
+.focused.invalid.mature .help-text {
+  pointer-events: auto;
   display: block; // helps when pointer-events is not supported
   .opacity(1);
   transform: none;
@@ -273,50 +275,145 @@ input[type=radio]{
   }
 }
 
-#elem-emi{
-  overflow: hidden;
-  height: 0;
-  transition: 0.3s;
-  margin-top: 0;
+.checkbox{
   display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+  top: -1px;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: inset 0px 1px 1px #ddd;
+  transition: 0.2s;
+  margin-right: 6px;
+}
+input[type=checkbox]{
+  display: none;
+}
 
-  &.shown{
-    margin: 18px 0;
-    height: 20px;
+.checked .checkbox,
+input[type=checkbox]:checked + .checkbox
+{
+  background: @primary;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+  &:after{
+    content: '';
+    width: 7px;
+    height: 3px;
+    position: absolute;
+    top: 3px;
+    left: 2px;
+    border: 3px solid #fff;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
   }
+}
 
-  .elem-wrap{
+#elem-emi{
+  display: none;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  position: relative;
+
+  select{
+    position: absolute;
+    display: block;
+    width: 100%;
+    left: 0;
+    height: 100%;
+    top: 0;
+    .opacity(0);
+    &[disabled]{
+      pointer-events: none;
+    }
+  }
+  .help-text{
+    margin-bottom: 2px;
+    white-space: normal;
+    width: 275px;
+    right: auto;
+    padding-right: 2px;
+  }
+  .elem-wrap {
+    outline: none;
+    white-space: nowrap;
     cursor: pointer;
-    &:before{
-      display: inline-block;
+    box-sizing: border-box;
+    padding: 10px 0 4px 7px;
+
+    &.last{
+      &:before{
+        border-radius: 50%;
+        content: '?';
+        color: #fff;
+        background: #616161;
+        display: inline-block;
+        height: 14px;
+        line-height: 14px;
+        width: 14px;
+        font-size: 12px;
+        text-align: center;
+        margin: 0 4px 0 2px;
+        top: -1px;
+        position: relative;
+      }
+    }
+  }
+}
+
+#emi-check-label{
+  .select{
+    background: #fff;
+    position: absolute;
+    line-height: 20px;
+    bottom: 100%;
+    z-index: 2;
+    border: 1px solid #dedede;
+    border-radius: 2px;
+    left: -10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.12);
+    color: #333;
+
+    &:after, &:before {
       content: '';
-      width: @input-padding/2;
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-width: 6px;
+      border-style: solid;
+      border-color: #fff transparent transparent;
+      bottom: 0;
+      left: 25px;
+      margin: 0 0 -10px -7px;
+      margin-bottom: -12px;
+    }
+    &:before{
+      border-width: 7px;
+      border-color: #ddd transparent transparent;
+      margin-bottom: -14px;
+      margin-left: -8px;
     }
   }
-  .first{
-    &:after{
-      border-radius: 50%;
-      content: '?';
-      color: #fff;
-      background: #616161;
-      display: inline-block;
-      height: 14px;
-      line-height: 14px;
-      width: 14px;
-      font-size: 12px;
-      text-align: center;
-      margin-left: 4px;
+  .option{
+    line-height: 38px;
+    padding: 0 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #dedede;
+  }
+  .help-text{
+    display: none!important;
+  }
+  &.disabled{
+    .help-text{
+      display: block!important;
     }
-  }
-  .last{
-    display: none;
-  }
-  &.check{
-    .first{
+    .select{
       display: none;
-    }
-    .last{
-      display: block;
     }
   }
 }

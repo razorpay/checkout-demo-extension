@@ -67,8 +67,35 @@ var freqWallets = {
   }
 }
 
+var emi_options = {
+  // minimum amount to enable emi
+  min: 3000*100-1,
+  installment: function(length, rate, principle){
+    rate /= 1200;
+    var multiplier = Math.pow(1+rate, length);
+    return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
+  },
+
+  selected: 'KKBK',
+  banks: {
+    KKBK: {
+      patt: /4(04861|78006|34669|1(4767|664[3-6])|363(88|89|90))|5(24253|43705|47981)/,
+      name: 'Kotak Mahindra Bank',
+      plans: {
+        3: 12,
+        6: 12,
+        9: 14,
+        12: 14,
+        18: 15,
+        24: 15
+      }
+    }
+  }
+}
+
 function processMessage(message) {
   message.netbanks = freqBanks;
+  message.emiopts = emi_options;
   var opts = message.options;
   if(!opts){
     var session = getSession();
@@ -138,6 +165,7 @@ function setPaymentMethods(payment_methods, methodOptions){
   if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
     methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
   }
+  // methodOptions.emi = true;
 }
 
 function showModal(message) {

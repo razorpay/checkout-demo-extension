@@ -114,7 +114,7 @@ function getFormFields(containerID, returnObj) {
   each(
     $('#' + containerID).find('input[name],select[name]'),
     function(i, el){
-      if(el.getAttribute('type') === 'radio' && !el.checked) {
+      if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
       }
       if(!el.disabled) {
@@ -153,6 +153,28 @@ function getFormData() {
   return data;
 }
 
+function makeEmiDropdown(emiObj, session){
+  var h = '';
+  each(
+    emiObj.plans,
+    function(length, rate){
+      h += '<div class="option" value="'+length+'">'
+        + length + ' month EMI @ ' + rate + '% (&#xe600; '
+        + emi_options.installment(length, rate, session.message.options.amount)/100
+        + ' per month)</div>';
+    }
+  )
+  $('#emi-plans-wrap').html(h);
+}
+
+function setEmiBank(data){
+  var activeEmiPlan = $('#emi-plans-wrap .active')[0];
+  if(activeEmiPlan){
+    data.method = 'emi';
+    data.emi_duration = activeEmiPlan.getAttribute('value');
+  }
+}
+
 function hideEmi(){
   var emic = $('#emi-container');
   if(emic[0]){
@@ -164,22 +186,46 @@ function hideEmi(){
 
 function onSixDigits(e){
   var el = e.target;
-  var sixDigits = el.value.length > 5;
-  $(el.parentNode)[sixDigits ? 'addClass' : 'removeClass']('six');
+  var val = el.value;
+  var isMaestro = gel('elem-card').getAttribute('cardtype') === 'maestro';
+  var sixDigits = val.length > 5;
+  $(el.parentNode).toggleClass('six', sixDigits);
+  var emiObj;
 
   var nocvvCheck = gel('nocvv-check');
-  if(sixDigits && nocvvCheck.disabled){
-    nocvvCheck.disabled = false;
-  } else if(!sixDigits){
+
+  if(!sixDigits){
     nocvvCheck.disabled = true;
   }
+  else {
+    each(
+      emi_options.banks,
+      function(bank, emiObjInner){
+        if(emiObjInner.patt.test(val.replace(/ /g,''))){
+          emiObj = emiObjInner;
+        }
+      }
+    )
 
+    if(isMaestro && nocvvCheck.disabled){
+      nocvvCheck.disabled = false;
+    }
+  }
+
+  var emi_parent = $('#emi-check-label')[emiObj ? 'removeClass' : 'addClass']('disabled');
+  if(emiObj){
+    makeEmiDropdown(emiObj, this);
+  }
+  else {
+    emi_parent.removeClass('checked');
+    $(emi_parent.find('.active')[0]).removeClass('active');
+  }
   noCvvToggle({target: nocvvCheck});
 }
 
 function noCvvToggle(e){
   var nocvvCheck = e.target;
-  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled && gel('elem-card').getAttribute('cardtype') === 'maestro';
+  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
   $('#expiry-cvv')[shouldHideExpiryCVV ? 'addClass' : 'removeClass']('hidden');
 }
 
@@ -232,6 +278,10 @@ CheckoutModal.prototype = {
       classes.push('mobile');
     }
 
+    if(this.emi){
+      classes.push('emi');
+    }
+
     if(!this.message.options.image){
       classes.push('noimage');
     }
@@ -239,7 +289,7 @@ CheckoutModal.prototype = {
     if(shouldFixFixed){
       classes.push('ip')
     }
-    return classes;
+    return classes.join(' ');
   },
 
   getEl: function(){
@@ -299,19 +349,31 @@ CheckoutModal.prototype = {
       message.data = this.message.data;
     }
     this.message = message;
+    var options = message.options;
     formatMessage(message);
     sanitize(message);
+
+    if(options.method.emi && options.amount > emi_options.min){
+      this.emi = true;
+    }
+
     this.getEl();
     this.fillData(message.data);
 
     processModalMethods(this);
-    if(!this.modal) { this.modal = new window.Modal(this.el, message.options.modal) }
+    if(!this.modal) { this.modal = new window.Modal(this.el, options.modal) }
 
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting()
     this.bindEvents();
 
-    this.emiView = new emiView(message.options);
+    if(this.emi){
+      this.emiView = new emiView(message);
+    }
+
+    if( options.key === 'rzp_live_kfAFSfgtztVo28' || options.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
+      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
+    }
   },
 
   renderCss: function(){
@@ -599,6 +661,9 @@ CheckoutModal.prototype = {
       return;
     }
     var data = getFormData();
+
+    setEmiBank(data);
+
     var options = this.message.options;
 
     if(nocvv_dummy_values){
@@ -649,8 +714,11 @@ CheckoutModal.prototype = {
       this.modal.destroy();
       this.smarty.off();
       this.card.unbind();
-      this.emiView.unbind();
       $(this.el).remove();
+
+      if(this.emiView){
+        this.emiView.unbind();
+      }
 
       this.modal =
       this.smarty =

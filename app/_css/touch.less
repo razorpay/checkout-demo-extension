@@ -18,9 +18,16 @@
   #emi-container{
     width: 100%;
     left: 0;
-    top: auto;
+    margin-left: 0;
+    position: absolute;
     bottom: 0;
+    height: auto;
+    top: auto;
     transform: translateY(10%);
+
+    &:after{
+      height: auto;
+    }
 
     &.shown{
       transform: none;
@@ -29,17 +36,11 @@
       white-space: normal;
     }
   }
-  .lh-34{
-    line-height: 34px;
-  }
-  .lh-17{
-    line-height: 17px;
-  }
   #backdrop{
     background: none!important;
   }
   #header{
-    padding-top: 20px;
+    padding-top: 10px;
   }
   #modal-content{
     padding: 0 @padding;
@@ -80,34 +81,48 @@
 
   @media(min-height: 525px){
     .input {
-      padding-bottom: 10px;
-      padding-top: 26px;
+      padding-bottom: 8px;
+      padding-top: 24px;
+    }
+    #tabs{
+      margin-top: 18px;
+      line-height: 50px;
     }
   }
   @media(min-height: 550px){
     .input {
-      padding-bottom: 12px;
-      padding-top: 28px;
+      padding-bottom: 10px;
+      padding-top: 26px;
     }
     #tabs{
-      margin-top: 20px;
-      line-height: 52px;
+      margin-top: 18px;
+      line-height: 50px;
+    }
+    #elem-emi{
+      line-height: 26px;
     }
   }
   @media(min-height: 575px){
     .input {
-      padding-bottom: 14px;
-      padding-top: 30px;
+      padding-bottom: 12px;
+      padding-top: 28px;
+    }
+    #elem-emi{
+      line-height: 36px;
     }
   }
   @media(min-height: 600px){
     .input {
-      padding-bottom: 16px;
-      padding-top: 32px;
+      padding-bottom: 14px;
+      padding-top: 30px;
     }
     #tabs{
-      margin-top: 24px;
-      line-height: 56px;
+      margin-top: 22px;
+      line-height: 54px;
+    }
+    #elem-emi{
+      margin-top: 15px;
+      margin-bottom: 15px;
     }
   }
 }

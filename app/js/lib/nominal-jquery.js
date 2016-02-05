@@ -224,6 +224,13 @@ $.prototype = {
     return this;
   },
 
+  toggleClass: function(className, condition){
+    if(arguments.length === 1){
+      condition = !this.hasClass(className);
+    }
+    return this[(condition ? 'add' : 'remove') + 'Class'](className);
+  },
+
   find: function(selector){
     var node = this[0];
     if(node){
@@ -269,6 +276,16 @@ $.prototype = {
     if(this[0]){
       try{
         this[0].focus();
+      }
+      catch(e){}
+    }
+    return this;
+  },
+
+  blur: function(){
+    if(this[0]){
+      try{
+        this[0].blur();
       }
       catch(e){}
     }

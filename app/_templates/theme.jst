@@ -1,18 +1,20 @@
-button{
+button,
+#tab-bar
+{
   background: {{=it.color}};
 }
-#tab-bar{
-  background: {{=it.color}};
-}
-.radio-label:hover, input[type=radio]:checked + label{
+
+.radio-label:hover,
+input[type=radio]:checked + label,
+.ip #tabs li.active
+{
   border-color: {{=it.color}};
 }
+
 #tab-wallet input:checked+label:after{
   color: {{=it.color}};
 }
-.ip #tabs li.active{
-  border-color: {{=it.color}};
-}
+
 {{?it.image_padding}}
 .merchant-image{
   width: 60px;
@@ -22,3 +24,12 @@ button{
   background: #fff;
 }
 {{?}}
+
+.option.active,
+.checked .checkbox,
+input[type=checkbox]:checked + .checkbox
+{
+  color: #fff;
+  background: {{=it.color}};
+  border-color: {{=it.color}};
+}

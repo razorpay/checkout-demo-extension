@@ -1,24 +1,42 @@
 
-function emiView(opts){
-  this.listeners = [];
-  if(opts.key === 'rzp_test_s9cT6UE4Mit7zL'){
-    this.render(opts);
-  }
-
-  if( opts.key === 'rzp_live_kfAFSfgtztVo28' || opts.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
-    $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
+function selectEmiBank(e){
+  var $target = $(e.target);
+  if($target.hasClass('option')){
+    var duration = $target.attr('value');
+    var parent = $('#emi-check-label').toggleClass('checked', duration);
+    $(parent.find('.active')[0]).removeClass('active');
+    $target.addClass('active');
+    invoke('blur', parent, null, 100);
   }
 }
 
+function onemicheck(){
+  $('#emi-container')
+    .css('display', 'block')
+    .reflow()
+    .addClass('shown');
+
+  $('#fd').addClass('shown');
+  $('#fd-in').hide();
+}
+
+function emiView(message){
+  var opts = message.emiopts;
+  opts.amount = message.options.amount;
+  this.listeners = [];
+  this.render(opts);
+}
+
 emiView.prototype = {
-  render: function() {
-    $('#emi-wrap').html(templates.emi());
+  render: function(opts) {
+    this.unbind();
+    $('#emi-container').html(templates.emi(opts));
     $('#emi-close').on('click', toggleErrorMessage);
-    this.bind($('#elem-emi'));
-    $('#methods-specific-fields').css('minHeight', '263px');
+    this.bind();
   },
 
-  on: function($el, event, listener){
+  on: function(event, sel, listener){
+    var $el = $(sel);
     this.listeners.push([
       $el,
       event,
@@ -26,46 +44,9 @@ emiView.prototype = {
     ])
   },
 
-  bind: function(elem_emi){
-    this.on(
-      elem_emi.addClass('shown'),
-      'mouseup',
-      function(){
-        var shouldCheck = $(this).hasClass('check');
-        if(!gel('emi').checked || !shouldCheck){
-
-          $('#emi-container')
-            .css('display', 'block')
-            .reflow()
-            .addClass('shown')[shouldCheck ? 'addClass' : 'removeClass']('active');
-
-          $('#fd').addClass('shown');
-          $('#fd-in').hide();
-        }
-      }
-    )
-
-    this.on(
-      $('#card_number'),
-      'input keypress',
-      function(){
-        elem_emi[this.value.length > 6 ? 'addClass' : 'removeClass']('check');
-      }
-    )
-    each(
-      $$('#emi-container > .emi-option'),
-      function(i, el){
-        this.on(
-          $(el),
-          'click', function(){
-            $('#emi-container > .emi-active').removeClass('emi-active');
-            $(this).addClass('emi-active').find('input')[0].checked = true;
-            toggleErrorMessage();
-          }
-        )
-      },
-      this
-    )
+  bind: function(){
+    this.on('mousedown', '#emi-select', selectEmiBank);
+    this.on('click', '#view-emi-plans', onemicheck);
   },
 
   unbind: function(){
