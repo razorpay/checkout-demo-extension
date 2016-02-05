@@ -4,6 +4,13 @@ function raise(message){
 }
 
 var discreet = {
+  supported: function(){
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+    if(isIOS && !window.indexedDB){
+      return false;
+    }
+    return true;
+  },
   medium: 'web',
   context: location.href.replace(/^https?:\/\//,''),
   setCommunicator: noop,

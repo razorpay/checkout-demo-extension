@@ -10,7 +10,6 @@ var err = function(errors){
 
 var doc = document.body || document.documentElement;
 var ua = navigator.userAgent;
-var isCriOS = /\(iP.+(Cr|Fx)iOS/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
 var RazorpayConfig;
