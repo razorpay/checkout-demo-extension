@@ -203,10 +203,8 @@ function onSixDigits(e){
       function(bank, emiObjInner){
         if(emiObjInner.patt.test(val.replace(/ /g,''))){
           emiObj = emiObjInner;
-          this.emiBank = bank;
         }
-      },
-      this
+      }
     )
 
     if(isMaestro && nocvvCheck.disabled){
@@ -665,9 +663,6 @@ CheckoutModal.prototype = {
     var data = getFormData();
 
     setEmiBank(data);
-    if(data.method === 'emi'){
-      data.bank = this.emiBank;
-    }
 
     var options = this.message.options;
 
