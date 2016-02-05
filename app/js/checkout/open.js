@@ -144,7 +144,8 @@ var frameBackdrop = createFrameBackdrop();
 var preloadedFrame = getPreloadedFrame();
 
 function getPreloadedFrame(){
-  if(!preloadedFrame && !/ Opera Mini\//.test(ua)){
+
+  if(!preloadedFrame && discreet.supported()){
     preloadedFrame = new CheckoutFrame();
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
@@ -157,6 +158,10 @@ Razorpay.open = function(options) {
 }
 
 Razorpay.prototype.open = function() {
+  if(!this.options.redirect && !discreet.supported(true)){
+    return;
+  }
+
   var frame = this.checkoutFrame;
   if(!frame){
     if(this.options.parent){
