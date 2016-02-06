@@ -63,6 +63,9 @@ var discreet = {
     each(overrides.notes, function(key, val){
       var valType = typeof val;
       if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
+        if(!('notes' in options)){
+          options.notes = {};
+        }
         options.notes[key] = val;
       }
     })

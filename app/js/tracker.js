@@ -108,7 +108,7 @@ function track(event, props) {
         context: {
           direct: true
         },
-        anonymousId: _uid,
+        anonymousId: id,
         event: event
       };
       if(props){
@@ -147,7 +147,7 @@ function getOverrides(options, defaults){
 
       if(valType === defaultType){
         if(val && valType === 'object'){
-          overrides[key] = getOverrides(val, defaultValue);
+          val = getOverrides(val, defaultValue) || defaultValue;
         }
         if(val !== defaultValue){
           overrodeOnce = true;
@@ -157,27 +157,18 @@ function getOverrides(options, defaults){
     }
   )
   if(arguments.length === 1){
+    overrodeOnce = true;
     discreet.setNotes(overrides, options);
   }
-  return overrides;
+  if(overrodeOnce){
+    return overrides;
+  }
 }
 
 function formInitProps(overrides){
-  each(
-    overrides,
-    function(key){
-      if(!(key in Razorpay.defaults) || Razorpay.defaults[key] === overrides[key]){
-        delete overrides[key];
-      }
-    }
-  )
+  overrides = getOverrides(overrides);
 
-  each(
-    overrides.method,
-    function(method, value){
-      overrides.method[method] = !!value;
-    }
-  )
+  delete overrides.method;
 
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
