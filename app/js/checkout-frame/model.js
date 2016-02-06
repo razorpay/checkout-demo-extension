@@ -568,15 +568,27 @@ CheckoutModal.prototype = {
     if(!($el instanceof $)){
       $el = $($el.target);
     }
-    else if(!$el[0] || $el.hasClass('active')){
+
+    var el = $el[0];
+    if(!el){
       return;
     }
 
+    var parent = $el.parent();
     $('.tab-content.active').removeClass('active');
     $('#' + $el.attr('data-target')).addClass('active');
 
-    $('#tabs > .active').removeClass('active');
-    $el.addClass('active');
+    var index;
+    each(
+      parent.find('li'),
+      function(i, li){
+        if(li === $el[0]){
+          index = i;
+        }
+      }
+    )
+    parent.attr('active', index);
+
   },
 
   switchBank: function(e){
@@ -599,8 +611,8 @@ CheckoutModal.prototype = {
     this.smarty.input({target: select});
   },
 
-  checkInvalid: function(parentID) {
-    var invalids = $('#' + parentID).find('.invalid');
+  checkInvalid: function($parent) {
+    var invalids = $parent.find('.invalid');
     if(invalids[0]){
       this.shake();
       $(invalids[0]).find('.input')[0].focus();
@@ -692,12 +704,12 @@ CheckoutModal.prototype = {
       }
     }
 
-    if (this.checkInvalid('form-common')) {
+    if (this.checkInvalid($('#form-common'))) {
       return;
     }
 
-    var activeTab = $('#tabs > .active')[0];
-    if ( activeTab && this.checkInvalid(activeTab.getAttribute('data-target')) ) {
+    var activeTab = $('.tab-content.active');
+    if ( activeTab[0] && this.checkInvalid(activeTab) ) {
       return;
     }
     var data = getFormData();

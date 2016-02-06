@@ -399,8 +399,19 @@ iframe{
     li, #tab-bar{
       width: 33.33%;
     }
+    &[active="1"] #tab-bar{
+      left: 33.33%;
+    }
+    &[active="2"] #tab-bar{
+      left: 66.66%;
+    }
   }
 
+  &.tabs-2{
+    &[active="1"] #tab-bar{
+      left: 50%;
+    }
+  }
   li{
     list-style: none;
     margin: 0;
@@ -417,35 +428,17 @@ iframe{
     &:hover{
       color: #333;
     }
-
-    &.active{
-      color: #111;
-      cursor: default;
-      pointer-events: none;
-      &~#tab-bar{
-        left: 0;
-      }
-      &+#tab-bar{
-        left: 33.33%;
-      }
-    }
   }
 
-  &.tabs-2{
-    #tab-bar{
-      left: 50%!important;
-    }
-    li.active:first-child{
-      &~#tab-bar{
-        left: 0!important;
-      }
-    }
+  &[active="1"] li:nth-child(1),
+  &[active="2"] li:nth-child(2){
+    color: #111;
   }
 }
 #tab-bar{
   width: 50%;
   position: absolute;
-  left: 66.66%;
+  left: 0;
   bottom: -1px;
   background: @primary;
   height: 3px;

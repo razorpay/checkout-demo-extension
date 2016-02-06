@@ -51,17 +51,17 @@
               <div id="methods-specific-fields">
                 <div>
                   {{ var tabCount = 0; it.options.method.card && tabCount++; it.options.method.netbanking && tabCount++; it.options.method.wallet.length && tabCount++; }}
-                  <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
+                  <ul active="0" id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
                     {{? it.options.method.card }}
-                      <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
+                      <li id="method-card-tab" data-target="tab-card">Card</li>
                     {{?}}
                     {{? it.options.method.netbanking }}
                       <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.options.method.card}} class="active"{{?}}>Net Banking</li>
                     {{?}}
-                    <div id="tab-bar"></div>
                     {{? it.options.method.wallet.length }}
                       <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.options.method.card && !it.options.method.netbanking }} class="active"{{?}}>Wallet</li>
                     {{?}}
+                    <div id="tab-bar"></div>
                   </ul>
                   {{? it.options.method.card }}
                     <div class="fieldset tab-content active" id="tab-card">
