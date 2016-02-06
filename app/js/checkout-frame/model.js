@@ -512,10 +512,8 @@ CheckoutModal.prototype = {
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
-
-    this.on('click', '#overlay', function(e){
-      this.hideErrorMessage();
-    });
+    this.on('click', '#overlay', this.hideErrorMessage);
+    this.on('click', '#fd-hide', this.hideErrorMessage);
   },
 
   setCardFormatting: function(){
