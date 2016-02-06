@@ -1,28 +1,11 @@
 @import "common";
 
-#emi-wrap{
-  display: none;
-  &.shown{
-    display: block;
-
-    #emi-container{
-      display: block;
-      pointer-events: auto;
-      opacity: 1;
-    }
-  }
-}
-
-#container.emi{
+#container.emi {
   #modal-content{
     min-height: 506px;
   }
-  #emi-container,
   #elem-emi{
     display: block;
-  }
-  #emi-container{
-    display: none\9;
   }
 }
 
@@ -46,24 +29,19 @@
   width: 100%;
   position: relative;
 }
-#emi-container{
-  display: none;
+#emi-wrap{
   width: 500px;
   margin-left: -250px;
   left: 50%;
   color: #414141;
-  overflow: hidden;
-  position: absolute;
-  text-align: center;
-  top: 0;
-  height: 100%;
-  opacity: 0;
-  transition: 0.3s;
-  pointer-events: none;
-  z-index: 200;
+  transform: rotateX(-2deg) translateY(10px) scale(0.98);
 
   &:after{
     height: 100%;
+  }
+
+  &.shown{
+    transform: none;
   }
 
   .em{
@@ -81,7 +59,7 @@
     font-size: 22px;
   }
   .row{
-    padding: 20px 0;
+    padding: 16px 0;
     .clearfix();
     &:not(:first-child){
       pointer-events: none;

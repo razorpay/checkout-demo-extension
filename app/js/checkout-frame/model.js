@@ -243,7 +243,7 @@ function makeVisible(){
 
 function makeHidden(){
   this.removeClass('shown');
-  invoke('hide', this, null, 250);
+  invoke('hide', this, null, 200);
 }
 
 function showOverlay($with){
@@ -264,7 +264,7 @@ function hideEmi(){
   var emic = $('#emi-wrap');
   var wasShown = emic.hasClass('shown');
   if(wasShown){
-    makeHidden.call(emic);
+    hideOverlay(emic);
   }
   return wasShown;
 }

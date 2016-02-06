@@ -20,22 +20,22 @@ function emiView(message){
 emiView.prototype = {
   render: function(opts) {
     this.unbind();
-    $('#emi-container').html(templates.emi(opts));
+    $('#emi-wrap').html(templates.emi(opts));
     this.bind();
   },
 
-  on: function(event, sel, listener, thisArg){
+  on: function(event, sel, listener){
     var $el = $(sel);
     this.listeners.push([
       $el,
       event,
-      $el.on(event, listener, false, thisArg)
+      $el.on(event, listener)
     ])
   },
 
   bind: function(){
     this.on('mousedown', '#emi-select', selectEmiBank);
-    this.on('click', '#view-emi-plans', makeVisible, $('#emi-wrap'));
+    this.on('click', '#view-emi-plans', function(){showOverlay($('#emi-wrap'))});
     this.on('click', '#emi-close', hideEmi);
   },
 
