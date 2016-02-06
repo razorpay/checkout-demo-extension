@@ -588,8 +588,11 @@ CheckoutModal.prototype = {
     var oldIndex = parent.attr('active');
     parent.attr('active', index);
 
-    $('.tab-content.active').removeClass('active');
-    $('#' + $el.attr('data-target')).addClass('active');
+    var dirs = ['ltr', 'rtl'];
+    var isLeft = oldIndex < index;
+
+    makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
+    makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
   },
 
   switchBank: function(e){

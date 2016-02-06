@@ -365,12 +365,19 @@ iframe{
   width: 100%;
 }
 .tab-content{
-  display: none;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top: none;
+  background: @background-color;
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  &[animdir="ltr"]{
+    transform: translateX(-20px);
+  }
+  &[animdir="rtl"]{
+    transform: translateX(20px);
+  }
 }
-.tab-content.active{
+.tab-content.shown{
+  transform: none!important;
   display: block;
 }
 #tab-wallet{

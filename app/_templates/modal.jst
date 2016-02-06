@@ -64,7 +64,7 @@
                     <div id="tab-bar"></div>
                   </ul>
                   {{? it.options.method.card }}
-                    <div class="fieldset tab-content active" id="tab-card">
+                    <div class="fieldset tab-content showable shown" id="tab-card">
                       <input type="hidden" name="method" value="card">
                       <div class="elem-wrap"><div class="elem elem-name">
                         <i class="i">&#xe602;</i>
@@ -114,7 +114,7 @@
                     </div>
                   {{?}}
                   {{? it.options.method.netbanking }}
-                    <div class="fieldset tab-content{{? !it.options.method.card }} active{{?}}" id="tab-netbanking">
+                    <div class="fieldset showable tab-content{{? !it.options.method.card }} shown{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
                       <div id="netb-banks" class="clear">
                         {{for(var b in it.netbanks){}}
@@ -140,7 +140,7 @@
                     </div>
                   {{?}}
                   {{? it.options.method.wallet.length }}
-                    <div class="fieldset wallets-{{=it.options.method.wallet.length}} tab-content{{? !it.options.method.card && !it.options.method.netbanking }} active{{?}}" id="tab-wallet">
+                    <div class="fieldset wallets-{{=it.options.method.wallet.length}} showable tab-content{{? !it.options.method.card && !it.options.method.netbanking }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
                       {{~it.options.method.wallet :w:i}}
                         <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
