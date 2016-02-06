@@ -75,7 +75,7 @@ Razorpay.defaults = {
     'onhidden': noop,
     'escape': true,
     'animation': true,
-    'backdropClose': false
+    'backdropclose': false
   },
   'theme': {
     'color': '#00BCD4',

@@ -81,9 +81,12 @@ function base_set(baseval, override) {
     if( !override || typeof override !== 'object' ){
       override = {};
     }
-    return map( baseval, function(val, i){
-      return base_set( val, override[i] );
-    })
+    return map(
+      baseval,
+      function(val, i){
+        return base_set( val, override[i] );
+      }
+    )
   }
 
   if ( typeof baseval === 'string' && typeof override !== 'undefined' ) {
@@ -191,6 +194,14 @@ function base_configure(overrides){
   validateOverrides(overrides);
 
   var options = base_set( Razorpay.defaults, overrides );
+
+  try{
+    var backdropClose = overrides.modal.backdropClose;
+    if(typeof backdropClose === 'boolean'){
+      options.modal.backdropclose = backdropClose;
+    }
+  }
+  catch(e){}
 
   discreet.setNotes(options, overrides);
 

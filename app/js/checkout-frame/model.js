@@ -607,7 +607,7 @@ CheckoutModal.prototype = {
     this.rzp = window.onComplete = null;
     var message;
     this.shake();
-    this.modal.options.backdropClose = this.message.options.modal.backdropClose;
+    this.modal.options.backdropclose = this.message.options.modal.backdropclose;
 
     if (response.error){
       message = response.error.description;
@@ -682,7 +682,7 @@ CheckoutModal.prototype = {
     });
 
     if(this.modal){
-      this.modal.options.backdropClose = false;
+      this.modal.options.backdropclose = false;
     }
 
     showLoadingMessage('Please wait while your payment is processed...');

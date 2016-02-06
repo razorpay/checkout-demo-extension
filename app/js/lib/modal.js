@@ -5,7 +5,7 @@
   var defaults = {
     escape: true,
     animation: true,
-    backdropClose: true,
+    backdropclose: true,
     onhide: null,
     onhidden: null
   };
@@ -87,7 +87,7 @@
     },
 
     backdropHide: function(){
-      if(this.options.backdropClose) {
+      if(this.options.backdropclose) {
         this.hide();
       }
     },
@@ -138,7 +138,7 @@
           }
         })
       }
-      if (this.options.backdropClose) {
+      if (this.options.backdropclose) {
         this.on('click', gel('backdrop'), this.backdropHide)
       }
     },
