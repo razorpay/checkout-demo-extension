@@ -10,13 +10,6 @@ function selectEmiBank(e){
   }
 }
 
-function onemicheck(){
-  $('#emi-container')
-    .css('display', 'block')
-    .reflow()
-    .addClass('shown');
-}
-
 function emiView(message){
   var opts = message.emiopts;
   opts.amount = message.options.amount;
@@ -28,22 +21,22 @@ emiView.prototype = {
   render: function(opts) {
     this.unbind();
     $('#emi-container').html(templates.emi(opts));
-    $('#emi-close').on('click', hideEmi);
     this.bind();
   },
 
-  on: function(event, sel, listener){
+  on: function(event, sel, listener, thisArg){
     var $el = $(sel);
     this.listeners.push([
       $el,
       event,
-      $el.on(event, listener)
+      $el.on(event, listener, false, thisArg)
     ])
   },
 
   bind: function(){
     this.on('mousedown', '#emi-select', selectEmiBank);
-    this.on('click', '#view-emi-plans', onemicheck);
+    this.on('click', '#view-emi-plans', makeVisible, $('#emi-wrap'));
+    this.on('click', '#emi-close', hideEmi);
   },
 
   unbind: function(){

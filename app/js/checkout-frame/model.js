@@ -175,17 +175,6 @@ function setEmiBank(data){
   }
 }
 
-function hideEmi(){
-  var emic = $('#emi-container');
-  if(emic[0]){
-    var wasShown = emic.hasClass('shown');
-    emic.removeClass('shown');
-    invoke(emic.hide, emic, null, 300)
-    gel('fd-in').style.display = '';
-    return wasShown;
-  }
-}
-
 function onSixDigits(e){
   var el = e.target;
   var val = el.value;
@@ -245,21 +234,63 @@ function noCvvToggle(e){
   $('#expiry-cvv').toggleClass('hidden', shouldHideExpiryCVV);
 }
 
-function toggleErrorMessage(message, className){
-  gel('fd-t').innerHTML = message || '';
-  gel('fd').className = className || '';
+function makeVisible(){
+  this
+    .css('display', 'block')
+    .reflow()
+    .addClass('shown');
+}
+
+function makeHidden(){
+  this.removeClass('shown');
+  invoke('hide', this, null, 250);
+}
+
+function showOverlay($with){
+  makeVisible.call($('#overlay'));
+  if($with){
+    makeVisible.call($with);
+  }
+}
+
+function hideOverlay($with){
+  makeHidden.call($('#overlay'));
+  if($with){
+    makeHidden.call($with);
+  }
+}
+
+function hideEmi(){
+  var emic = $('#emi-wrap');
+  var wasShown = emic.hasClass('shown');
+  if(wasShown){
+    makeHidden.call(emic);
+  }
+  return wasShown;
+}
+
+function hideOverlayMessage(){
+  hideOverlay(
+    $('#error-message')
+  )
 }
 
 function errorMessageVisible(){
-  return $('#fd').hasClass('shown');
+  return $('#error-message').hasClass('shown');
 }
 
 function showErrorMessage(message){
-  toggleErrorMessage(message, 'shown')
+  $('#fd-t').html(message);
+  showOverlay(
+    $('#error-message').removeClass('loading')
+  );
 }
 
-function showLoadingMessage(message){
-  toggleErrorMessage(message, 'shown loading');
+function showLoadingMessage(){
+  $('#fd-t').html('Loading, please wait...');
+  showOverlay(
+    $('#error-message').addClass('loading')
+  );
 }
 
 function setDefaultError(){
@@ -432,7 +463,7 @@ CheckoutModal.prototype = {
 
   hideErrorMessage: function(){
     if(!this.rzp){
-      toggleErrorMessage();
+      hideOverlayMessage();
     }
   },
 
@@ -482,11 +513,8 @@ CheckoutModal.prototype = {
 
     this.on('click', '#backdrop', this.hideErrorMessage);
 
-    this.on('click', '#fd', function(e){
-      var id = e.target.id;
-      if(id === 'fd' || id === 'fd-hide') {
-        this.hideErrorMessage();
-      }
+    this.on('click', '#overlay', function(e){
+      this.hideErrorMessage();
     });
   },
 
@@ -589,7 +617,7 @@ CheckoutModal.prototype = {
   hide: function(){
     if(this.isOpen){
       $('#modal-inner').removeClass('shake');
-      toggleErrorMessage();
+      hideOverlayMessage();
       this.modal.hide();
     }
   },

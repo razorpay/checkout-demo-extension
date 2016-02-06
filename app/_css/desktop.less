@@ -1,27 +1,59 @@
 @import "common";
 
-#fd{
-  display: none;
-  .background(rgba(0, 0, 0, 0.3));
+body {
+  &.noimage {
+    #overlay:after{
+      content: none;
+    }
+  }
+}
+
+#overlay, #emi-wrap{
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   z-index: 8;
-  text-align: center;
+  transition: 0.2s;
+}
+
+#overlay{
+  .background(rgba(0, 0, 0, 0.3));
+  display: none;
+  opacity: 0;
+
+  &.shown{
+    opacity: 1;
+  }
+
+  &:after{
+    content: '';
+    position: absolute;
+    left: @padding;
+    top: -12px;
+    height: 12px;
+    width: 86px;
+    background: inherit;
+    filter: inherit;
+    -ms-filter: inherit;
+  }
+}
+
+#error-message{
+  height: 180px;
+  padding-top: 20px;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  background: #fff;
+  z-index: 9;
+  display: none;
+
   &.shown{
     display: block;
-    &:after{
-      content: '';
-      position: absolute;
-      left: @padding;
-      top: -12px;
-      height: 12px;
-      width: 86px;
-      background: inherit;
-      filter: inherit;
-      -ms-filter: inherit;
-    }
   }
+
   &.loading{
     .spin{
       display: block;
@@ -31,17 +63,7 @@
     }
   }
 }
-.noimage #fd:after{
-  content: none;
-}
-#fd-in{
-  height: 180px;
-  padding-top: 20px;
-  bottom: 0;
-  position: absolute;
-  width: 100%;
-  background: #fff;
-}
+
 #fd-t{
   white-space: normal;
   padding: 20px 30px;
@@ -339,31 +361,6 @@ iframe{
   margin: 0;
   line-height: @submit-height;
   width: 100%;
-}
-#error-message{
-  left: 0;
-  right: 0;
-  position: absolute;
-  background-color: @danger;
-  color: #fff;
-  text-align: center;
-  line-height: 18px;
-  padding: 10px 20px 12px;
-  overflow: hidden;
-  transition: 0.3s;
-  bottom: 100%;
-}
-#error-container{
-  position: relative;
-  overflow: hidden;
-  display: none!important;
-  margin: 0 -@padding;
-  transition: 0.3s;
-  &.has-error{
-    #error-message{
-      bottom: 0;
-    }
-  }
 }
 .tab-content{
   display: none;
