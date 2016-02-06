@@ -382,6 +382,8 @@ CheckoutModal.prototype = {
     this.setCardFormatting()
     this.bindEvents();
 
+    this.errorHandler(message.params);
+
     if(this.emi){
       this.emiView = new emiView(message);
     }
@@ -605,36 +607,41 @@ CheckoutModal.prototype = {
     this.hide();
   },
 
-  errorHandler: function(response){
+  instanceErrorHandler: function(response){
     if(!this.rzp || !response){
       return;
     }
     this.rzp = window.onComplete = null;
+    this.errorHandler(response);
+  },
+
+  errorHandler: function(response){
+    if(!response || !response.error){
+      return;
+    }
     var message;
     this.shake();
     this.modal.options.backdropclose = this.message.options.modal.backdropclose;
 
-    if (response.error){
-      message = response.error.description;
-      var err_field = response.error.field;
-      if (err_field){
-        if(!err_field.indexOf('expiry')){
-          err_field = 'card[expiry]';
-        }
-        var error_el = document.getElementsByName(err_field)[0];
-        if (error_el && error_el.type !== 'hidden'){
-          var help = $(error_el)
-            .focus()
-            .parent()
-            .addClass('invalid')
-            .find('help-text')[0];
+    message = response.error.description;
+    var err_field = response.error.field;
+    if (err_field){
+      if(!err_field.indexOf('expiry')){
+        err_field = 'card[expiry]';
+      }
+      var error_el = document.getElementsByName(err_field)[0];
+      if (error_el && error_el.type !== 'hidden'){
+        var help = $(error_el)
+          .focus()
+          .parent()
+          .addClass('invalid')
+          .find('help-text')[0];
 
-          if(help){
-            $(help).html(message);
-          }
-          this.hideErrorMessage();
-          return;
+        if(help){
+          $(help).html(message);
         }
+        this.hideErrorMessage();
+        return;
       }
     }
 
@@ -700,7 +707,7 @@ CheckoutModal.prototype = {
 
     this.rzp.authorizePayment({
       data: data,
-      error: bind(this.errorHandler, this),
+      error: bind(this.instanceErrorHandler, this),
       success: bind(this.successHandler, this)
     });
   },

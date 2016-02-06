@@ -131,7 +131,7 @@ describe('payment authorization', function(){
     })
 
     it('display default error discription', function(){
-      getSession().errorHandler(response);
+      getSession().instanceErrorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(jQuery('#fd-t').html().length > 0).toBe(true);
     })
@@ -139,7 +139,7 @@ describe('payment authorization', function(){
     it('display custom error description', function(){
       var str = 'hello error';
       response.error.description = str;
-      getSession().errorHandler(response);
+      getSession().instanceErrorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(jQuery('#fd-t').html()).toBe(str);
     })
@@ -147,7 +147,7 @@ describe('payment authorization', function(){
     it('focus related field and apply invalid', function(){
       var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
       response.error.field = field_el.prop('name');
-      getSession().errorHandler(response);
+      getSession().instanceErrorHandler(response);
       expect(jQuery('#fd')).toBeVisible();
       expect(field_el[0]).toBe(document.activeElement);
       expect(field_el.parent().hasClass('invalid')).toBe(true);
@@ -717,7 +717,7 @@ describe('existing query params should', function(){
   it('set error', function(){
     setQueryParams('error.description=asd');
     openCheckoutForm(coOptions);
-    spyOn(getSession(), 'errorHandler').and.callFake(function(response){
+    spyOn(getSession(), 'instanceErrorHandler').and.callFake(function(response){
       expect(response.error.description).toBe('asd');
     })
   })
