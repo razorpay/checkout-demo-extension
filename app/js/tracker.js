@@ -135,6 +135,33 @@ function track(event, props) {
   }
 }
 
+function getOverrides(options, defaults){
+  var overrodeOnce = false;
+  var overrides = {};
+  each(
+    defaults || Razorpay.defaults,
+    function(key, defaultValue){
+      var val = options[key];
+      var defaultType = typeof defaultValue;
+      var valType = typeof val;
+
+      if(valType === defaultType){
+        if(val && valType === 'object'){
+          overrides[key] = getOverrides(val, defaultValue);
+        }
+        if(val !== defaultValue){
+          overrodeOnce = true;
+          overrides[key] = val;
+        }
+      }
+    }
+  )
+  if(arguments.length === 1){
+    discreet.setNotes(overrides, options);
+  }
+  return overrides;
+}
+
 function formInitProps(overrides){
   each(
     overrides,

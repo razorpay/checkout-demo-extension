@@ -57,6 +57,15 @@ var discreet = {
       return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
     }
     submitForm(data.url, data.content, data.method);
+  },
+
+  setNotes: function(options, overrides){
+    each(overrides.notes, function(key, val){
+      var valType = typeof val;
+      if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
+        options.notes[key] = val;
+      }
+    })
   }
 }
 
@@ -180,11 +189,8 @@ function base_configure(overrides){
 
   var options = base_set( Razorpay.defaults, overrides );
 
-  each(overrides.notes, function(key, val){
-    if ( typeof val !== 'object' ) {
-      options.notes[key] = val;
-    }
-  })
+  discreet.setNotes(options, overrides);
+
   if( typeof overrides.redirect === 'boolean' ) {
     var redirectValue = overrides.redirect;
     options.redirect = function(){return redirectValue};
