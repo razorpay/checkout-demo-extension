@@ -2,7 +2,7 @@
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 // iphone/ipad restrict non user initiated focus on input fields
-var shouldFocusNextField = !/iPhone|iPad/.test(ua);
+var shouldFocusNextField = false;//!/iPhone|iPad/.test(ua);
 
 var fontTimeout;
 
@@ -673,6 +673,8 @@ CheckoutModal.prototype = {
       data['card[expiry_month]'] = '12';
       data['card[expiry_year]'] = '21';
     }
+
+    data.amount = options.amount;
 
     Razorpay.sendMessage({
       event: 'submit',
