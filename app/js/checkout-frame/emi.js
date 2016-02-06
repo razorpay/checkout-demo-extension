@@ -15,9 +15,6 @@ function onemicheck(){
     .css('display', 'block')
     .reflow()
     .addClass('shown');
-
-  $('#fd').addClass('shown');
-  $('#fd-in').hide();
 }
 
 function emiView(message){
@@ -31,7 +28,7 @@ emiView.prototype = {
   render: function(opts) {
     this.unbind();
     $('#emi-container').html(templates.emi(opts));
-    $('#emi-close').on('click', toggleErrorMessage);
+    $('#emi-close').on('click', hideEmi);
     this.bind();
   },
 

@@ -178,9 +178,11 @@ function setEmiBank(data){
 function hideEmi(){
   var emic = $('#emi-container');
   if(emic[0]){
+    var wasShown = emic.hasClass('shown');
     emic.removeClass('shown');
     invoke(emic.hide, emic, null, 300)
     gel('fd-in').style.display = '';
+    return wasShown;
   }
 }
 
@@ -246,7 +248,10 @@ function noCvvToggle(e){
 function toggleErrorMessage(message, className){
   gel('fd-t').innerHTML = message || '';
   gel('fd').className = className || '';
-  hideEmi();
+}
+
+function errorMessageVisible(){
+  return $('#fd').hasClass('shown');
 }
 
 function showErrorMessage(message){

@@ -131,10 +131,9 @@
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
-            if(gel('emi-container')){
-              return toggleErrorMessage();
+            if(!hideEmi() && !errorMessageVisible()){
+              this.hide();
             }
-            this.hide();
           }
         })
       }
