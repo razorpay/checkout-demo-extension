@@ -575,8 +575,6 @@ CheckoutModal.prototype = {
     }
 
     var parent = $el.parent();
-    $('.tab-content.active').removeClass('active');
-    $('#' + $el.attr('data-target')).addClass('active');
 
     var index;
     each(
@@ -587,8 +585,11 @@ CheckoutModal.prototype = {
         }
       }
     )
+    var oldIndex = parent.attr('active');
     parent.attr('active', index);
 
+    $('.tab-content.active').removeClass('active');
+    $('#' + $el.attr('data-target')).addClass('active');
   },
 
   switchBank: function(e){
