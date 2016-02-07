@@ -16,12 +16,7 @@
     animation:none;
   }
 
-  #emi-wrap.shown{
-    #emi-container{
-      transform: none;
-    }
-  }
-  #emi-container{
+  #emi-wrap {
     width: 100%;
     left: 0;
     margin-left: 0;
@@ -29,7 +24,7 @@
     bottom: 0;
     height: auto;
     top: auto;
-    transform: translateY(10%);
+    transform: translateY(15px);
 
     &:after{
       height: auto;
@@ -37,6 +32,10 @@
 
     .col{
       white-space: normal;
+    }
+
+    .em{
+      font-size: 14px;
     }
   }
   #backdrop{
