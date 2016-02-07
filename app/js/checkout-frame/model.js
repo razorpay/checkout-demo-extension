@@ -490,7 +490,9 @@ CheckoutModal.prototype = {
 
   hideErrorMessage: function(){
     if(!this.rzp){
-      hideOverlayMessage();
+      if(!$('#emi-wrap').hasClass('shown')){
+        hideOverlayMessage();
+      }
     }
     else if(this.nextRequest && confirm('Cancel Payment?')){
       this.cleanupRequest();
