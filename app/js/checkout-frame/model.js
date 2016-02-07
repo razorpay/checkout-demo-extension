@@ -857,7 +857,11 @@ CheckoutModal.prototype = {
       data['card[expiry_year]'] = '21';
     }
 
+    // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = options.amount;
+
+    // data.key_id needed by discreet.shouldAjax
+    data.key_id = options.key;
 
     Razorpay.sendMessage({
       event: 'submit',
