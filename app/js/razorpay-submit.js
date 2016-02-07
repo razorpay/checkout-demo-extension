@@ -276,7 +276,7 @@ Razorpay.prototype.authorizePayment = function(request){
   this._request = request;
 
   if(request.ajax){
-    return setupAjax(this, request.success);
+    return setupAjax(this, request.error);
   }
 
   if(!discreet.supported(true)){

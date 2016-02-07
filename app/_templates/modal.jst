@@ -15,15 +15,21 @@
       </div>
       {{ if(wallet && wallet.mobikwik){ }}
         <form id="powerwallet" class="showable" onsubmit="return false">
-          <div class="power-head">
-            <div class="power-title"></div>
+          <div id="power-head">
+            <div id="power-title"></div>
             <img src="{{=wallet.mobikwik.col}}" height="{{=wallet.mobikwik.h}}">
           </div>
-          <span class="power-desc">An OTP has been sent to </span><span id="power-number"></span>
           <div id="power-var">
+            <div id="power-desc"></div>
             <div class="spin"><div></div></div>
             <div class="spin spin2"><div></div></div>
-            <input id="powerotp" type="tel" placeholder="Enter OTP">
+            <input id="powerotp" type="tel" autocomplete="off" required pattern="^[0-9]+$">
+            <div id="powersignup-wrap">
+              <a id="powersignup" href="https://www.mobikwik.com/" target="_blank">
+                <button>Create Mobikwik Wallet</button>
+              </a>
+              <div id="powercancel">Cancel Payment</div>
+            </div>
             <button id="powerbutton" type="submit">SUBMIT</button>
           </div>
         </form>

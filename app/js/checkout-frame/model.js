@@ -293,11 +293,25 @@ function showLoadingMessage(){
 }
 
 function showPowerScreen(state){
-  if(state.number){
-    $('#power-number').html(state.number);
-    delete state.number;
+
+  gel('power-title').innerHTML = state.title;
+
+  var text = state.text;
+  if(text){
+    if(state.number){
+      text += ' <strong>' + gel('contact').value + '</strong>'
+    }
+    gel('power-desc').innerHTML = text;
   }
-  gel('power-var').className = state.className;
+
+  var className = state.className;
+  if(className){
+    if(className === 'otp'){
+      gel('powerotp').placeholder = 'Enter OTP';
+    }
+    gel('power-var').className = state.className;
+  }
+
   var powerwallet = $('#powerwallet');
   if(!powerwallet.hasClass('shown')){
     showOverlay(powerwallet);
@@ -652,15 +666,47 @@ CheckoutModal.prototype = {
   },
 
   showOtpView: function(response){
-    this.rzp._request.nextRequest = response.nextRequest;
+    this.nextRequest = response.request;
+
     showPowerScreen({
-      className: 'enterotp',
-      title: 'Enter OTP'
+      title: 'Sending OTP',
+      text: 'Sending OTP to',
+      number: true
+    })
+    invoke(
+      showPowerScreen,
+      null,
+      {
+        className: 'otp',
+        title: 'Enter OTP',
+        text: 'An OTP has been sent to',
+        number: true
+      },
+      750
+    )
+  },
+
+  reenterOtpView: function(response){
+    gel('powerotp').placeholder = 'Reenter OTP';
+    showPowerScreen({
+      className: 're enterotp',
+      title: 'Wrong OTP',
+      text: 'Entered OTP is incorrect'
     })
   },
 
-  powerErrorHandler: function(){
-
+  powerErrorHandler: function(response){
+    invoke(
+      showPowerScreen,
+      null,
+      {
+        className: 'signup',
+        text: 'There is no account associated with',
+        title: 'Error',
+        number: true
+      },
+      200
+    )
   },
 
   onOtpSubmit: function(e){
@@ -670,8 +716,11 @@ CheckoutModal.prototype = {
       title: 'Verifying OTP'
     })
 
+    this.rzp._request.success = bind(this.successHandler, this);
+    this.rzp._request.success = bind(this.reenterOtpView, this);
+
     $.post({
-      url: this.rzp._request.nextRequest.url,
+      url: this.nextRequest.url,
       data: {
         type: 'otp',
         otp: $('#powerotp').val()
@@ -797,7 +846,8 @@ CheckoutModal.prototype = {
       showPowerScreen({
         className: 'loading',
         title: 'Verifying Account',
-        number: data.contact
+        number: true,
+        text: 'Checking for a mobikwik account associated with'
       })
     }
 
@@ -813,7 +863,7 @@ CheckoutModal.prototype = {
     // onComplete defined in razorpay-submit.js, safe to expose now
     window.onComplete = bind(discreet.onComplete, this.rzp);
 
-    this.rzp.authorizePayment();
+    this.rzp.authorizePayment(request);
   },
 
   close: function(){
