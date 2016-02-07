@@ -34,3 +34,9 @@ input[type=checkbox]:checked + .checkbox
   background: {{=it.color}};
   border-color: {{=it.color}};
 }
+
+{{?!it.close_button}}
+#modal-close{
+  display: none;
+}
+{{?}}
