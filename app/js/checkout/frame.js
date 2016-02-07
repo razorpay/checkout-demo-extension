@@ -6,12 +6,12 @@ var merchantMarkup = {
   meta: null,
 
   orientationchange: function(){
-    this.el.style.height = Math.max(window.innerHeight || 0, 490) + 'px';
+    this.el.style.height = Math.max(window.innerHeight || 0, 480) + 'px';
   },
 
   // scroll manually in iPhone
   scroll: function(){
-    if(!this.isOpen || typeof window.pageYOffset !== 'number'){
+    if(typeof window.pageYOffset !== 'number'){
       return;
     }
 

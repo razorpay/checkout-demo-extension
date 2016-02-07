@@ -46,7 +46,7 @@
   }
   #modal-content{
     padding: 0 @padding;
-    min-height: 510px;
+    min-height: 474px;
   }
   #modal{
     background: @background-color;
@@ -134,26 +134,13 @@
 }
 
 @media(max-height: @max-height){
-.mobile {
-  .mobile-view();
-}
-}
-.ip{
-  #tab-bar{
-    display: none;
-  }
-  #tabs{
-    li{
-      top: 1px;
-      &.active{
-        border-bottom: 3px solid @primary;
-      }
-    }
+  .mobile {
+    .mobile-view();
   }
 }
 
 body.ios{
-  #fd.loading{
+  #error-message.loading{
     display: none;
   }
 }
