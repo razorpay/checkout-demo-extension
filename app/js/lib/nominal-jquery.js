@@ -309,9 +309,12 @@ $.post = function(opts){
 
   if(opts.callback){
     xhr.onreadystatechange = function(){
-      if(xhr.readyState === 4 && xhr.status === 200){
+      if(xhr.readyState === 4){
         opts.callback(JSON.parse(xhr.responseText));
       }
+    }
+    xhr.onerror = function(){
+      opts.callback({error: {description: 'Network error'}});
     }
   }
 
