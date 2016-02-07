@@ -292,6 +292,18 @@ function showLoadingMessage(){
   );
 }
 
+function showPowerScreen(state){
+  if(state.number){
+    $('#power-number').html(state.number);
+    delete state.number;
+  }
+  gel('power-var').className = state.className;
+  var powerwallet = $('#powerwallet');
+  if(!powerwallet.hasClass('shown')){
+    showOverlay(powerwallet);
+  }
+}
+
 function setDefaultError(){
   var msg = discreet.defaultError();
   msg.id = _uid;
@@ -639,17 +651,24 @@ CheckoutModal.prototype = {
     }
   },
 
-  showOtpView: function(nextRequest){
-    this.rzp._request.nextRequest = nextRequest;
-    makeHidden.call($('#error-message'));
-    $('.power-number').html(gel('contact').value);
-    makeVisible.call($('#powerwallet'));
+  showOtpView: function(response){
+    this.rzp._request.nextRequest = response.nextRequest;
+    showPowerScreen({
+      className: 'enterotp',
+      title: 'Enter OTP'
+    })
+  },
+
+  powerErrorHandler: function(){
+
   },
 
   onOtpSubmit: function(e){
     preventDefault(e);
-    makeHidden.call($('#powerwallet'));
-    makeVisible.call($('#error-message'));
+    showPowerScreen({
+      className: 'loading',
+      title: 'Verifying OTP'
+    })
 
     $.post({
       url: this.rzp._request.nextRequest.url,
@@ -665,9 +684,7 @@ CheckoutModal.prototype = {
     if(!this.rzp){
       return;
     }
-    if(response.type === 'otp'){
-      return this.showOtpView(response.request);
-    }
+
     track.call(this.rzp, 'success', response);
     this.rzp = null;
     // prevent dismiss event
@@ -767,7 +784,28 @@ CheckoutModal.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    showLoadingMessage('Please wait while your payment is processed...');
+    var request = {
+      data: data
+    };
+    var shouldAjax = discreet.shouldAjax(data);
+
+    if(shouldAjax){
+      request.ajax = true;
+      request.error = bind(this.powerErrorHandler, this);
+      request.success = bind(this.showOtpView, this);
+
+      showPowerScreen({
+        className: 'loading',
+        title: 'Verifying Account',
+        number: data.contact
+      })
+    }
+
+    else {
+      showLoadingMessage('Please wait while your payment is processed...');
+      request.error = bind(this.instanceErrorHandler, this);
+      request.success = bind(this.successHandler, this);
+    }
 
     // TODO
     this.rzp = Razorpay(this.message.options);
@@ -775,11 +813,7 @@ CheckoutModal.prototype = {
     // onComplete defined in razorpay-submit.js, safe to expose now
     window.onComplete = bind(discreet.onComplete, this.rzp);
 
-    this.rzp.authorizePayment({
-      data: data,
-      error: bind(this.instanceErrorHandler, this),
-      success: bind(this.successHandler, this)
-    });
+    this.rzp.authorizePayment();
   },
 
   close: function(){
