@@ -10,13 +10,6 @@ function selectEmiBank(e){
   }
 }
 
-function onemicheck(){
-  $('#emi-container')
-    .css('display', 'block')
-    .reflow()
-    .addClass('shown');
-}
-
 function emiView(message){
   var opts = message.emiopts;
   opts.amount = message.options.amount;
@@ -27,8 +20,7 @@ function emiView(message){
 emiView.prototype = {
   render: function(opts) {
     this.unbind();
-    $('#emi-container').html(templates.emi(opts));
-    $('#emi-close').on('click', hideEmi);
+    $('#emi-wrap').html(templates.emi(opts));
     this.bind();
   },
 
@@ -43,7 +35,8 @@ emiView.prototype = {
 
   bind: function(){
     this.on('mousedown', '#emi-select', selectEmiBank);
-    this.on('click', '#view-emi-plans', onemicheck);
+    this.on('click', '#view-emi-plans', function(){showOverlay($('#emi-wrap'))});
+    this.on('click', '#emi-close', hideEmi);
   },
 
   unbind: function(){

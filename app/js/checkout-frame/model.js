@@ -175,17 +175,6 @@ function setEmiBank(data){
   }
 }
 
-function hideEmi(){
-  var emic = $('#emi-container');
-  if(emic[0]){
-    var wasShown = emic.hasClass('shown');
-    emic.removeClass('shown');
-    invoke(emic.hide, emic, null, 300)
-    gel('fd-in').style.display = '';
-    return wasShown;
-  }
-}
-
 function onSixDigits(e){
   var el = e.target;
   var val = el.value;
@@ -245,21 +234,63 @@ function noCvvToggle(e){
   $('#expiry-cvv').toggleClass('hidden', shouldHideExpiryCVV);
 }
 
-function toggleErrorMessage(message, className){
-  gel('fd-t').innerHTML = message || '';
-  gel('fd').className = className || '';
+function makeVisible(){
+  this
+    .css('display', 'block')
+    .reflow()
+    .addClass('shown');
+}
+
+function makeHidden(){
+  this.removeClass('shown');
+  invoke('hide', this, null, 200);
+}
+
+function showOverlay($with){
+  makeVisible.call($('#overlay'));
+  if($with){
+    makeVisible.call($with);
+  }
+}
+
+function hideOverlay($with){
+  makeHidden.call($('#overlay'));
+  if($with){
+    makeHidden.call($with);
+  }
+}
+
+function hideEmi(){
+  var emic = $('#emi-wrap');
+  var wasShown = emic.hasClass('shown');
+  if(wasShown){
+    hideOverlay(emic);
+  }
+  return wasShown;
+}
+
+function hideOverlayMessage(){
+  hideOverlay(
+    $('#error-message')
+  )
 }
 
 function errorMessageVisible(){
-  return $('#fd').hasClass('shown');
+  return $('#error-message').hasClass('shown');
 }
 
 function showErrorMessage(message){
-  toggleErrorMessage(message, 'shown')
+  $('#fd-t').html(message);
+  showOverlay(
+    $('#error-message').removeClass('loading')
+  );
 }
 
-function showLoadingMessage(message){
-  toggleErrorMessage(message, 'shown loading');
+function showLoadingMessage(){
+  $('#fd-t').html('Loading, please wait...');
+  showOverlay(
+    $('#error-message').addClass('loading')
+  );
 }
 
 function setDefaultError(){
@@ -432,7 +463,7 @@ CheckoutModal.prototype = {
 
   hideErrorMessage: function(){
     if(!this.rzp){
-      toggleErrorMessage();
+      hideOverlayMessage();
     }
   },
 
@@ -481,13 +512,8 @@ CheckoutModal.prototype = {
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
-
-    this.on('click', '#fd', function(e){
-      var id = e.target.id;
-      if(id === 'fd' || id === 'fd-hide') {
-        this.hideErrorMessage();
-      }
-    });
+    this.on('click', '#overlay', this.hideErrorMessage);
+    this.on('click', '#fd-hide', this.hideErrorMessage);
   },
 
   setCardFormatting: function(){
@@ -542,15 +568,31 @@ CheckoutModal.prototype = {
     if(!($el instanceof $)){
       $el = $($el.target);
     }
-    else if(!$el[0] || $el.hasClass('active')){
+
+    var el = $el[0];
+    if(!el){
       return;
     }
 
-    $('.tab-content.active').removeClass('active');
-    $('#' + $el.attr('data-target')).addClass('active');
+    var parent = $el.parent();
 
-    $('#tabs > .active').removeClass('active');
-    $el.addClass('active');
+    var index;
+    each(
+      parent.find('li'),
+      function(i, li){
+        if(li === $el[0]){
+          index = i;
+        }
+      }
+    )
+    var oldIndex = parent.attr('active');
+    parent.attr('active', index);
+
+    var dirs = ['ltr', 'rtl'];
+    var isLeft = oldIndex < index;
+
+    makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
+    makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
   },
 
   switchBank: function(e){
@@ -573,8 +615,8 @@ CheckoutModal.prototype = {
     this.smarty.input({target: select});
   },
 
-  checkInvalid: function(parentID) {
-    var invalids = $('#' + parentID).find('.invalid');
+  checkInvalid: function($parent) {
+    var invalids = $parent.find('.invalid');
     if(invalids[0]){
       this.shake();
       $(invalids[0]).find('.input')[0].focus();
@@ -589,7 +631,7 @@ CheckoutModal.prototype = {
   hide: function(){
     if(this.isOpen){
       $('#modal-inner').removeClass('shake');
-      toggleErrorMessage();
+      hideOverlayMessage();
       this.modal.hide();
     }
   },
@@ -666,12 +708,12 @@ CheckoutModal.prototype = {
       }
     }
 
-    if (this.checkInvalid('form-common')) {
+    if (this.checkInvalid($('#form-common'))) {
       return;
     }
 
-    var activeTab = $('#tabs > .active')[0];
-    if ( activeTab && this.checkInvalid(activeTab.getAttribute('data-target')) ) {
+    var activeTab = $('.tab-content.active');
+    if ( activeTab[0] && this.checkInvalid(activeTab) ) {
       return;
     }
     var data = getFormData();

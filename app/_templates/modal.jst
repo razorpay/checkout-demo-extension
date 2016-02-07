@@ -3,15 +3,16 @@
   <div id="modal" class="mchild">
     <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
     <div id="modal-inner">
-      <div id="emi-wrap"><div id="emi-container" class="mfix"></div></div>
-      <div id="fd">
-        <div id="fd-in">
-          <div class="spin"><div></div></div>
-          <div class="spin" id="spin2"><div></div></div>
-          <div id="fd-t"></div>
-          <button id="fd-hide">Retry</button>
-        </div>
+
+      <div id="overlay" class="showable"></div>
+      <div id="emi-wrap" class="showable mfix"></div>
+      <div id="error-message" class="showable">
+        <div class="spin"><div></div></div>
+        <div class="spin" id="spin2"><div></div></div>
+        <div id="fd-t"></div>
+        <button id="fd-hide">Retry</button>
       </div>
+
       <div id="modal-content">
         <div id="header">
           <div id="modal-close">×</div>
@@ -50,20 +51,20 @@
               <div id="methods-specific-fields">
                 <div>
                   {{ var tabCount = 0; it.options.method.card && tabCount++; it.options.method.netbanking && tabCount++; it.options.method.wallet.length && tabCount++; }}
-                  <ul id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
+                  <ul active="0" id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
                     {{? it.options.method.card }}
-                      <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
+                      <li id="method-card-tab" data-target="tab-card">Card</li>
                     {{?}}
                     {{? it.options.method.netbanking }}
                       <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.options.method.card}} class="active"{{?}}>Net Banking</li>
                     {{?}}
-                    <div id="tab-bar"></div>
                     {{? it.options.method.wallet.length }}
                       <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.options.method.card && !it.options.method.netbanking }} class="active"{{?}}>Wallet</li>
                     {{?}}
+                    <div id="tab-bar"></div>
                   </ul>
                   {{? it.options.method.card }}
-                    <div class="fieldset tab-content active" id="tab-card">
+                    <div class="fieldset tab-content showable shown" id="tab-card">
                       <input type="hidden" name="method" value="card">
                       <div class="elem-wrap"><div class="elem elem-name">
                         <i class="i">&#xe602;</i>
@@ -113,7 +114,7 @@
                     </div>
                   {{?}}
                   {{? it.options.method.netbanking }}
-                    <div class="fieldset tab-content{{? !it.options.method.card }} active{{?}}" id="tab-netbanking">
+                    <div class="fieldset showable tab-content{{? !it.options.method.card }} shown{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
                       <div id="netb-banks" class="clear">
                         {{for(var b in it.netbanks){}}
@@ -139,7 +140,7 @@
                     </div>
                   {{?}}
                   {{? it.options.method.wallet.length }}
-                    <div class="fieldset wallets-{{=it.options.method.wallet.length}} tab-content{{? !it.options.method.card && !it.options.method.netbanking }} active{{?}}" id="tab-wallet">
+                    <div class="fieldset wallets-{{=it.options.method.wallet.length}} showable tab-content{{? !it.options.method.card && !it.options.method.netbanking }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
                       {{~it.options.method.wallet :w:i}}
                         <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>

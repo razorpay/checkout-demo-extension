@@ -243,7 +243,10 @@ input[type=radio]{
     margin-right: 6px;
   }
 }
-
+#tab-netbanking,
+#tab-wallet{
+  padding-top: 8px;
+}
 #tab-wallet{
   text-align: center;
   label{
@@ -311,113 +314,5 @@ input[type=checkbox]:checked + .checkbox
     border-top: none;
     border-right: none;
     transform: rotate(-45deg);
-  }
-}
-
-#elem-emi{
-  display: none;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  position: relative;
-
-  &.hidden{
-    display: none!important;
-  }
-
-  select{
-    position: absolute;
-    display: block;
-    width: 100%;
-    left: 0;
-    height: 100%;
-    top: 0;
-    .opacity(0);
-    &[disabled]{
-      pointer-events: none;
-    }
-  }
-  .help-text{
-    margin-bottom: 2px;
-    white-space: normal;
-    width: 275px;
-    right: auto;
-    padding-right: 2px;
-  }
-  .elem-wrap {
-    outline: none;
-    white-space: nowrap;
-    cursor: pointer;
-    box-sizing: border-box;
-    padding: 10px 0 4px 7px;
-
-    &.last{
-      &:before{
-        border-radius: 50%;
-        content: '?';
-        color: #fff;
-        background: #616161;
-        display: inline-block;
-        height: 14px;
-        line-height: 14px;
-        width: 14px;
-        font-size: 12px;
-        text-align: center;
-        margin: 0 4px 0 2px;
-        top: -1px;
-        position: relative;
-      }
-    }
-  }
-}
-
-#emi-check-label{
-  .select{
-    background: #fff;
-    position: absolute;
-    line-height: 20px;
-    bottom: 100%;
-    z-index: 2;
-    border: 1px solid #dedede;
-    border-radius: 2px;
-    left: -10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.12);
-    color: #333;
-
-    &:after, &:before {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-width: 6px;
-      border-style: solid;
-      border-color: #fff transparent transparent;
-      bottom: 0;
-      left: 25px;
-      margin: 0 0 -10px -7px;
-      margin-bottom: -12px;
-    }
-    &:before{
-      border-width: 7px;
-      border-color: #ddd transparent transparent;
-      margin-bottom: -14px;
-      margin-left: -8px;
-    }
-  }
-  .option{
-    line-height: 38px;
-    padding: 0 16px;
-    cursor: pointer;
-    border-bottom: 1px solid #dedede;
-  }
-  .help-text{
-    display: none!important;
-  }
-  &.disabled{
-    .help-text{
-      display: block!important;
-    }
-    .select{
-      display: none;
-    }
   }
 }

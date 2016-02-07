@@ -83,10 +83,12 @@ function preventDefault(e){
 
 function invoke(handler, thisArg, param , timeout){
   if(typeof timeout === 'number'){
-    setTimeout(function(){
-      invoke(handler, thisArg, param)
-    }, timeout)
-    return;
+    return setTimeout(
+      function(){
+        invoke(handler, thisArg, param)
+      },
+      timeout
+    )
   }
   if(typeof handler === 'string'){
     handler = thisArg[handler];
