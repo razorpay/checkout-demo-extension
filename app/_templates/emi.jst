@@ -1,7 +1,7 @@
 <div id="emi-inner" class="mchild">
   <div class="row em">
     <div class="col">Select Bank:</div>
-    <select id="emi_select">
+    <select id="emi-bank-select">
       {{ for(var bank in it.banks){ }}
         <option value="{{=bank}}"{{?bank===it.selected}} selected{{?}}>{{=it.banks[bank].name}}</option>
       {{}}}
