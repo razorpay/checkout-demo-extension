@@ -43,14 +43,28 @@ body {
   }
 }
 
-#error-message {
-  height: 150px;
-  padding-top: 20px;
+#powerwallet,
+#error-message{
+  background: #fff;
   bottom: 0;
   position: absolute;
   width: 100%;
-  background: #fff;
   z-index: 9;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.16);
+}
+
+#powerwallet{
+  height: 220px;
+
+  &.shown{
+    height: 250px;
+    display: block;
+  }
+}
+
+#error-message {
+  height: 150px;
+  padding-top: 20px;
 
   &.shown{
     height: 180px;

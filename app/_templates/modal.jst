@@ -1,4 +1,4 @@
-{{ var o = it.options; }}
+{{ var o = it.options, wallet = o.method.wallet; }}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
   <div id="modal" class="mchild">
@@ -13,12 +13,15 @@
         <div id="fd-t"></div>
         <button id="fd-hide">Retry</button>
       </div>
-      {{ if(o.method.wallet){ }}
-        <div id="powerwallet" class="showable">
+      {{ if(wallet && wallet.mobikwik){ }}
+        <div id="powerwallet" class="showable shown">
+          <div class="power-head">
+            <div class="power-title"></div>
+            <img src="{{=wallet.mobikwik.col}}" height="{{=wallet.mobikwik.h}}">
+          </div>
+          <div class="power-desc">sfdn</div>
           <div class="spin"><div></div></div>
           <div class="spin spin2"><div></div></div>
-          <div class="power-head"></div>
-          <img src="">
         </div>
       {{ } }}
       <div id="modal-content">
@@ -147,7 +150,7 @@
                       </div></div>
                     </div>
                   {{?}}
-                  {{ var wallet = o.method.wallet; if(wallet){ }}
+                  {{ if(wallet){ }}
                     <div class="fieldset showable tab-content{{? !o.method.card && !o.method.netbanking }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
                       {{ for (var w in wallet){ }}

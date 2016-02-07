@@ -4,6 +4,10 @@ function raise(message){
 }
 
 var discreet = {
+  shouldAjax: function(data){
+    return discreet.isFrame && data.wallet === 'mobikwik'
+  },
+
   supported: function(showAlert){
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
     var alertMessage;
