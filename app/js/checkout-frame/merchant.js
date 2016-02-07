@@ -316,6 +316,14 @@ Razorpay.sendMessage = function(message){
   }
 }
 
+window.handleOTP = function(otp){
+  var session = getSession();
+  var otpEl = gel('powerotp');
+  if(session && session.rzp && otpEl){
+    otpEl.value = otp;
+  }
+}
+
 window.handleMessage = function(message) {
   if(isIframe && !CheckoutBridge){
     if(typeof message.id !== 'string' || message.id.length < 14 || !/[0-9a-z]/i.test(message.id)){
