@@ -510,6 +510,10 @@ CheckoutModal.prototype = {
       this.on('change', '#nocvv-check', noCvvToggle);
     }
 
+    if(enabledMethods.wallet){
+      this.on('submit', '#powerwallet', this.onOtpSubmit);
+    }
+
     this.on('click', '#backdrop', this.hideErrorMessage);
     this.on('click', '#overlay', this.hideErrorMessage);
     this.on('click', '#fd-hide', this.hideErrorMessage);
@@ -635,9 +639,34 @@ CheckoutModal.prototype = {
     }
   },
 
+  showOtpView: function(nextRequest){
+    this.rzp._request.nextRequest = nextRequest;
+    makeHidden.call($('#error-message'));
+    $('.power-number').html(gel('contact').value);
+    makeVisible.call($('#powerwallet'));
+  },
+
+  onOtpSubmit: function(e){
+    preventDefault(e);
+    makeHidden.call($('#powerwallet'));
+    makeVisible.call($('#error-message'));
+
+    $.post({
+      url: this.rzp._request.nextRequest.url,
+      data: {
+        type: 'otp',
+        otp: $('#powerotp').val()
+      },
+      callback: bind(discreet.onComplete, this.rzp)
+    })
+  },
+
   successHandler: function(response){
     if(!this.rzp){
       return;
+    }
+    if(response.type === 'otp'){
+      return this.showOtpView(response.request);
     }
     track.call(this.rzp, 'success', response);
     this.rzp = null;

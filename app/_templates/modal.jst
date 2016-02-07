@@ -14,15 +14,15 @@
         <button id="fd-hide">Retry</button>
       </div>
       {{ if(wallet && wallet.mobikwik){ }}
-        <div id="powerwallet" class="showable shown">
+        <form id="powerwallet" class="showable" onsubmit="return false">
           <div class="power-head">
-            <div class="power-title"></div>
+            <div class="power-title">Enter OTP</div>
             <img src="{{=wallet.mobikwik.col}}" height="{{=wallet.mobikwik.h}}">
           </div>
-          <div class="power-desc">sfdn</div>
-          <div class="spin"><div></div></div>
-          <div class="spin spin2"><div></div></div>
-        </div>
+          <div class="power-desc">An OTP has been sent to <span class="power-number"></span></div>
+          <input id="powerotp" type="tel" placeholder="Enter OTP">
+          <button id="powerbutton" type="submit">SUBMIT</button>
+        </form>
       {{ } }}
       <div id="modal-content">
         <div id="header">

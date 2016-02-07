@@ -237,7 +237,7 @@ function setupAjax(rzp, callback){
       var result;
 
       if(response.version === 1){
-        result = response.request;
+        result = response;
       }
 
       else {
@@ -276,9 +276,7 @@ Razorpay.prototype.authorizePayment = function(request){
   this._request = request;
 
   if(discreet.shouldAjax(request.data)){
-    return setupAjax(this, function(nextRequest){
-
-    })
+    return setupAjax(this, request.success);
   }
 
   if(!discreet.supported(true)){
@@ -302,8 +300,8 @@ Razorpay.prototype.authorizePayment = function(request){
 
   if(name){
     submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
-    setupAjax(this, function(result){
-      result = _btoa(stringify(result));
+    setupAjax(this, function(response){
+      result = _btoa(stringify(response.request));
       if(communicator.contentWindow === window){
         setCookie('nextRequest', result);
       } else {
