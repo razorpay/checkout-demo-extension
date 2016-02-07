@@ -212,15 +212,14 @@ input[type=radio]{
   margin: 0;
 }
 .radio-label:hover, input[type=radio]:checked + label{
-  border: 1px solid @primary;
-  padding: 0 7px;
+  border-color: @primary;
   background: #fff;
 }
 #netb-banks{
   margin: 0 -4px;
-  font-size: 0;
 }
 .radio-label{
+  white-space: nowrap;
   cursor: pointer;
   margin: 10px 3px 0;
   padding: 1px 8px;
@@ -228,14 +227,13 @@ input[type=radio]{
   line-height: 36px;
   display: block;
   border-radius: 2px;
+  border: 1px solid transparent;
 }
 .netb-bank{
   position: relative;
   cursor: pointer;
   width: 33.33%;
   float: left;
-  clear: none;
-  font-size: 14px;
   img{
     vertical-align: middle;
     width: 20px;
@@ -256,6 +254,7 @@ input[type=radio]{
     height: 38px;
     line-height: 34px;
     padding: 1px 16px;
+
     &:after{
       display: inline-block;
       margin-left: 10px;
@@ -267,9 +266,6 @@ input[type=radio]{
   }
   img{
     vertical-align: middle;
-  }
-  input:checked+label, label:hover{
-    padding: 0 15px;
   }
   input:checked+label{
     &:after{
