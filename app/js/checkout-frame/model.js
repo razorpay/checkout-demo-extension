@@ -495,7 +495,7 @@ CheckoutModal.prototype = {
       }
     }
     else if(this.nextRequest && confirm('Cancel Payment?')){
-      this.cleanupRequest();
+      this.cleanupPowerRequest();
     }
   },
 
@@ -681,6 +681,24 @@ CheckoutModal.prototype = {
     }
   },
 
+  ajaxCallback: function(response){
+    if(response.error){
+      this.powerErrorHandler(response);
+    }
+    else {
+      this.showOtpView(response);
+    }
+  },
+
+  otpSubmitCallback: function(response){
+    if(response.error){
+      this.reenterOtpView(response);
+    }
+    else {
+      this.successHandler(response);
+    }
+  },
+
   showOtpView: function(response){
     if(this.rzp){
       this.nextRequest = response.request;
@@ -740,16 +758,13 @@ CheckoutModal.prototype = {
         text: 'Please wait...'
       })
 
-      this.rzp._request.success = bind(this.successHandler, this);
-      this.rzp._request.error = bind(this.reenterOtpView, this);
-
       $.post({
         url: this.nextRequest.url,
         data: {
           type: 'otp',
           otp: gel('powerotp').value
         },
-        callback: bind(discreet.onComplete, this.rzp)
+        callback: bind(this.otpSubmitCallback, this)
       })
     }
   },
@@ -879,8 +894,7 @@ CheckoutModal.prototype = {
 
     if(shouldAjax){
       request.ajax = true;
-      request.error = bind(this.powerErrorHandler, this);
-      request.success = bind(this.showOtpView, this);
+      request.success = bind(this.ajaxCallback, this);
 
       showPowerScreen({
         className: 'loading',

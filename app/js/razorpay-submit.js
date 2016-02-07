@@ -234,20 +234,7 @@ function setupAjax(rzp, callback){
     url: discreet.makeUrl() + 'payments/create/ajax',
     data: request.data,
     callback: function(response){
-      var result;
-
-      if(response.version === 1){
-        result = response;
-      }
-
-      else {
-        discreet.onComplete.call(rzp, response);
-        result = {
-          result: response.razorpay_payment_id ? 'Payment Successful.' : response.error && response.error.description || 'Payment Failed.'
-        }
-      }
-
-      invoke(callback, rzp, result);
+      invoke(callback, rzp, response);
     }
   })
 }
