@@ -110,9 +110,9 @@ function formatCvvHelp(el_cvv, cvvlen){
   $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
 }
 
-function getFormFields(containerID, returnObj) {
+function getFormFields($container, returnObj) {
   each(
-    $('#' + containerID).find('input[name],select[name]'),
+    $container.find('input[name],select[name]'),
     function(i, el){
       if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
@@ -125,16 +125,15 @@ function getFormFields(containerID, returnObj) {
 }
 
 function getFormData() {
-  var activeTab = $('#tabs > .active')[0];
-  if(!activeTab) { return }
+  var activeTab = $('.tab-content.shown');
+  if(!activeTab[0]) { return }
 
   var data = {};
-  getFormFields('form-common', data);
+  getFormFields($('form-common'), data);
 
-  var targetTab = activeTab.getAttribute('data-target');
-  getFormFields(targetTab, data);
+  getFormFields(activeTab, data);
 
-  if(targetTab === 'tab-card'){
+  if(activeTab.id === 'tab-card'){
     data['card[number]'] = data['card[number]'].replace(/\ /g, '');
 
     if(!data['card[expiry]']){
@@ -712,7 +711,7 @@ CheckoutModal.prototype = {
       return;
     }
 
-    var activeTab = $('.tab-content.active');
+    var activeTab = $('.tab-content.shown');
     if ( activeTab[0] && this.checkInvalid(activeTab) ) {
       return;
     }
