@@ -490,6 +490,9 @@ CheckoutModal.prototype = {
     if(!this.rzp){
       hideOverlayMessage();
     }
+    else if(this.nextRequest && confirm('Cancel Payment?')){
+      this.cleanupRequest();
+    }
   },
 
   shake: function(){
@@ -538,6 +541,7 @@ CheckoutModal.prototype = {
 
     if(enabledMethods.wallet){
       this.on('submit', '#powerwallet', this.onOtpSubmit);
+      this.on('click', '#powercancel', this.cleanupPowerRequest);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -666,67 +670,85 @@ CheckoutModal.prototype = {
   },
 
   showOtpView: function(response){
-    this.nextRequest = response.request;
+    if(this.rzp){
+      this.nextRequest = response.request;
 
-    showPowerScreen({
-      title: 'Sending OTP',
-      text: 'Sending OTP to',
-      number: true
-    })
-    invoke(
-      showPowerScreen,
-      null,
-      {
-        className: 'otp',
-        title: 'Enter OTP',
-        text: 'An OTP has been sent to',
+      showPowerScreen({
+        title: 'Sending OTP',
+        text: 'Sending OTP to',
         number: true
-      },
-      750
-    )
+      })
+      invoke(
+        showPowerScreen,
+        null,
+        {
+          className: 'otp',
+          title: 'Enter OTP',
+          text: 'An OTP has been sent to',
+          number: true
+        },
+        750
+      )
+    }
   },
 
   reenterOtpView: function(response){
-    gel('powerotp').placeholder = 'Reenter OTP';
-    showPowerScreen({
-      className: 're enterotp',
-      title: 'Wrong OTP',
-      text: 'Entered OTP is incorrect'
-    })
+    if(this.rzp){
+      gel('powerotp').placeholder = 'Reenter OTP';
+      showPowerScreen({
+        className: 're otp',
+        title: 'Wrong OTP',
+        text: 'Entered OTP is incorrect. Please Reenter.'
+      })
+    }
   },
 
   powerErrorHandler: function(response){
-    invoke(
-      showPowerScreen,
-      null,
-      {
-        className: 'signup',
-        text: 'There is no account associated with',
-        title: 'Error',
-        number: true
-      },
-      200
-    )
+    if(this.rzp){
+      invoke(
+        showPowerScreen,
+        null,
+        {
+          className: 'signup',
+          text: 'There is no account associated with',
+          title: 'Error',
+          number: true
+        },
+        200
+      )
+    }
   },
 
   onOtpSubmit: function(e){
-    preventDefault(e);
-    showPowerScreen({
-      className: 'loading',
-      title: 'Verifying OTP'
-    })
+    if(this.rzp){
+      preventDefault(e);
+      showPowerScreen({
+        className: 'loading',
+        title: 'Verifying OTP'
+      })
 
-    this.rzp._request.success = bind(this.successHandler, this);
-    this.rzp._request.success = bind(this.reenterOtpView, this);
+      this.rzp._request.success = bind(this.successHandler, this);
+      this.rzp._request.error = bind(this.reenterOtpView, this);
 
-    $.post({
-      url: this.nextRequest.url,
-      data: {
-        type: 'otp',
-        otp: $('#powerotp').val()
-      },
-      callback: bind(discreet.onComplete, this.rzp)
-    })
+      $.post({
+        url: this.nextRequest.url,
+        data: {
+          type: 'otp',
+          otp: gel('powerotp').value
+        },
+        callback: bind(discreet.onComplete, this.rzp)
+      })
+    }
+  },
+
+  cleanupRequest: function(){
+    this.rzp = window.onComplete = null;
+  },
+
+  cleanupPowerRequest: function(){
+    this.cleanupRequest();
+    this.nextRequest = null;
+    hideOverlay($('#powerwallet'));
   },
 
   successHandler: function(response){
@@ -735,7 +757,7 @@ CheckoutModal.prototype = {
     }
 
     track.call(this.rzp, 'success', response);
-    this.rzp = null;
+    this.cleanupPowerRequest();
     // prevent dismiss event
     this.modal.options.onhide = noop;
 
@@ -747,7 +769,7 @@ CheckoutModal.prototype = {
     if(!this.rzp || !response){
       return;
     }
-    this.rzp = window.onComplete = null;
+    this.cleanupRequest();
     this.errorHandler(response);
   },
 
