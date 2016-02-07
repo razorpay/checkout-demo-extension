@@ -69,7 +69,7 @@
               </div>
               <div id="methods-specific-fields">
                 <div>
-                  {{ var tabCount = 0; o.method.card && tabCount++; o.method.netbanking && tabCount++; o.method.wallet && tabCount++; }}
+                  {{ var tabCount = 0; o.method.card && tabCount++; o.method.netbanking && tabCount++; wallet && tabCount++; }}
                   <ul active="0" id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
                     {{? o.method.card }}
                       <li id="method-card-tab" data-target="tab-card">Card</li>
@@ -77,7 +77,7 @@
                     {{? o.method.netbanking }}
                       <li id="method-netbanking-tab" data-target="tab-netbanking">Net Banking</li>
                     {{?}}
-                    {{? o.method.wallet }}
+                    {{? wallet }}
                       <li id="method-wallet-tab" data-target="tab-wallet">Wallet</li>
                     {{?}}
                     <div id="tab-bar"></div>
@@ -161,8 +161,8 @@
                   {{ if(wallet){ }}
                     <div class="fieldset showable tab-content{{? !o.method.card && !o.method.netbanking }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
-                      {{ for (var w in wallet){ }}
-                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}">
+                      {{ var firstWallet; for (var w in wallet){ }}
+                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
                         <label for="wallet-radio-{{=w}}" class="radio-label">
                           <img class="wallet-button colored" style="height:{{=wallet[w].h}}px" src="{{=wallet[w].col}}">
                         </label>
