@@ -301,7 +301,7 @@ Razorpay.prototype.authorizePayment = function(request){
   if(name){
     submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
     setupAjax(this, function(response){
-      result = _btoa(stringify(response.request));
+      var result = _btoa(stringify(response.request));
       if(communicator.contentWindow === window){
         setCookie('nextRequest', result);
       } else {

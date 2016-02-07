@@ -432,7 +432,7 @@ describe('Razorpay card tab submit', function(){
         addAllCC();
         spyCalled();
 
-        data = getFormData(jQuery('#modal form'), true);
+        data = getFormData();
       });
 
       it('contact', function(){

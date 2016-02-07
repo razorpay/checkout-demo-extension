@@ -241,8 +241,10 @@ function makeVisible(){
 }
 
 function makeHidden(){
-  this.removeClass('shown');
-  invoke('hide', this, null, 200);
+  if(this[0]){
+    this.removeClass('shown');
+    invoke('hide', this, null, 200);
+  }
 }
 
 function showOverlay($with){
@@ -539,7 +541,7 @@ CheckoutModal.prototype = {
       this.on('change', '#nocvv-check', noCvvToggle);
     }
 
-    if(enabledMethods.wallet){
+    if(enabledMethods.wallet && enabledMethods.wallet.mobikwik){
       this.on('submit', '#powerwallet', this.onOtpSubmit);
       this.on('click', '#powercancel', this.cleanupPowerRequest);
     }
@@ -618,7 +620,7 @@ CheckoutModal.prototype = {
         }
       }
     )
-    var oldIndex = parseInt(parent.attr('active'));
+    var oldIndex = parseInt(parent.attr('active'), 10);
 
     if(oldIndex !== index){
       parent.attr('active', index);
