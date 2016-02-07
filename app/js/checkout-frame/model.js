@@ -110,9 +110,9 @@ function formatCvvHelp(el_cvv, cvvlen){
   $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
 }
 
-function getFormFields(containerID, returnObj) {
+function getFormFields($container, returnObj) {
   each(
-    $('#' + containerID).find('input[name],select[name]'),
+    $container.find('input[name],select[name]'),
     function(i, el){
       if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
@@ -125,16 +125,15 @@ function getFormFields(containerID, returnObj) {
 }
 
 function getFormData() {
-  var activeTab = $('#tabs > .active')[0];
-  if(!activeTab) { return }
+  var activeTab = $('.tab-content.shown');
+  if(!activeTab[0]) { return }
 
   var data = {};
-  getFormFields('form-common', data);
+  getFormFields($('#form-common'), data);
 
-  var targetTab = activeTab.getAttribute('data-target');
-  getFormFields(targetTab, data);
+  getFormFields(activeTab, data);
 
-  if(targetTab === 'tab-card'){
+  if(activeTab.prop('id') === 'tab-card'){
     data['card[number]'] = data['card[number]'].replace(/\ /g, '');
 
     if(!data['card[expiry]']){
@@ -242,8 +241,10 @@ function makeVisible(){
 }
 
 function makeHidden(){
-  this.removeClass('shown');
-  invoke('hide', this, null, 200);
+  if(this[0]){
+    this.removeClass('shown');
+    invoke('hide', this, null, 200);
+  }
 }
 
 function showOverlay($with){
@@ -291,6 +292,32 @@ function showLoadingMessage(){
   showOverlay(
     $('#error-message').addClass('loading')
   );
+}
+
+function showPowerScreen(state){
+
+  gel('power-title').innerHTML = state.title;
+
+  var text = state.text;
+  if(text){
+    if(state.number){
+      text += ' <strong>' + gel('contact').value + '</strong>'
+    }
+    gel('power-desc').innerHTML = text;
+  }
+
+  var className = state.className;
+  if(className){
+    if(className === 'otp'){
+      gel('powerotp').placeholder = 'Enter OTP';
+    }
+    gel('power-var').className = state.className;
+  }
+
+  var powerwallet = $('#powerwallet');
+  if(!powerwallet.hasClass('shown')){
+    showOverlay(powerwallet);
+  }
 }
 
 function setDefaultError(){
@@ -465,6 +492,9 @@ CheckoutModal.prototype = {
     if(!this.rzp){
       hideOverlayMessage();
     }
+    else if(this.nextRequest && confirm('Cancel Payment?')){
+      this.cleanupRequest();
+    }
   },
 
   shake: function(){
@@ -509,6 +539,11 @@ CheckoutModal.prototype = {
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv-check', noCvvToggle);
+    }
+
+    if(enabledMethods.wallet && enabledMethods.wallet.mobikwik){
+      this.on('submit', '#powerwallet', this.onOtpSubmit);
+      this.on('click', '#powercancel', this.cleanupPowerRequest);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -585,14 +620,17 @@ CheckoutModal.prototype = {
         }
       }
     )
-    var oldIndex = parent.attr('active');
-    parent.attr('active', index);
+    var oldIndex = parseInt(parent.attr('active'), 10);
 
-    var dirs = ['ltr', 'rtl'];
-    var isLeft = oldIndex < index;
+    if(oldIndex !== index){
+      parent.attr('active', index);
 
-    makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
-    makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
+      var dirs = ['ltr', 'rtl'];
+      var isLeft = oldIndex < index;
+
+      makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
+      makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
+    }
   },
 
   switchBank: function(e){
@@ -636,12 +674,95 @@ CheckoutModal.prototype = {
     }
   },
 
+  showOtpView: function(response){
+    if(this.rzp){
+      this.nextRequest = response.request;
+
+      showPowerScreen({
+        title: 'Sending OTP',
+        text: 'Sending OTP to',
+        number: true
+      })
+      invoke(
+        showPowerScreen,
+        null,
+        {
+          className: 'otp',
+          title: 'Enter OTP',
+          text: 'An OTP has been sent to',
+          number: true
+        },
+        750
+      )
+    }
+  },
+
+  reenterOtpView: function(response){
+    if(this.rzp){
+      gel('powerotp').placeholder = 'Reenter OTP';
+      showPowerScreen({
+        className: 're otp',
+        title: 'Wrong OTP',
+        text: 'Entered OTP is incorrect. Please Reenter.'
+      })
+    }
+  },
+
+  powerErrorHandler: function(response){
+    if(this.rzp){
+      invoke(
+        showPowerScreen,
+        null,
+        {
+          className: 'signup',
+          text: 'There is no account associated with',
+          title: 'Error',
+          number: true
+        },
+        200
+      )
+    }
+  },
+
+  onOtpSubmit: function(e){
+    if(this.rzp){
+      preventDefault(e);
+      showPowerScreen({
+        className: 'loading',
+        title: 'Verifying OTP'
+      })
+
+      this.rzp._request.success = bind(this.successHandler, this);
+      this.rzp._request.error = bind(this.reenterOtpView, this);
+
+      $.post({
+        url: this.nextRequest.url,
+        data: {
+          type: 'otp',
+          otp: gel('powerotp').value
+        },
+        callback: bind(discreet.onComplete, this.rzp)
+      })
+    }
+  },
+
+  cleanupRequest: function(){
+    this.rzp = window.onComplete = null;
+  },
+
+  cleanupPowerRequest: function(){
+    this.cleanupRequest();
+    this.nextRequest = null;
+    hideOverlay($('#powerwallet'));
+  },
+
   successHandler: function(response){
     if(!this.rzp){
       return;
     }
+
     track.call(this.rzp, 'success', response);
-    this.rzp = null;
+    this.cleanupPowerRequest();
     // prevent dismiss event
     this.modal.options.onhide = noop;
 
@@ -653,7 +774,7 @@ CheckoutModal.prototype = {
     if(!this.rzp || !response){
       return;
     }
-    this.rzp = window.onComplete = null;
+    this.cleanupRequest();
     this.errorHandler(response);
   },
 
@@ -712,7 +833,7 @@ CheckoutModal.prototype = {
       return;
     }
 
-    var activeTab = $('.tab-content.active');
+    var activeTab = $('.tab-content.shown');
     if ( activeTab[0] && this.checkInvalid(activeTab) ) {
       return;
     }
@@ -739,7 +860,29 @@ CheckoutModal.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    showLoadingMessage('Please wait while your payment is processed...');
+    var request = {
+      data: data
+    };
+    var shouldAjax = discreet.shouldAjax(data);
+
+    if(shouldAjax){
+      request.ajax = true;
+      request.error = bind(this.powerErrorHandler, this);
+      request.success = bind(this.showOtpView, this);
+
+      showPowerScreen({
+        className: 'loading',
+        title: 'Verifying Account',
+        number: true,
+        text: 'Checking for a mobikwik account associated with'
+      })
+    }
+
+    else {
+      showLoadingMessage('Please wait while your payment is processed...');
+      request.error = bind(this.instanceErrorHandler, this);
+      request.success = bind(this.successHandler, this);
+    }
 
     // TODO
     this.rzp = Razorpay(this.message.options);
@@ -747,11 +890,7 @@ CheckoutModal.prototype = {
     // onComplete defined in razorpay-submit.js, safe to expose now
     window.onComplete = bind(discreet.onComplete, this.rzp);
 
-    this.rzp.authorizePayment({
-      data: data,
-      error: bind(this.instanceErrorHandler, this),
-      success: bind(this.successHandler, this)
-    });
+    this.rzp.authorizePayment(request);
   },
 
   close: function(){

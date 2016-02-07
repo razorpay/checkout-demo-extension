@@ -1,3 +1,4 @@
+{{ var o = it.options, wallet = o.method.wallet; }}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
   <div id="modal" class="mchild">
@@ -8,74 +9,92 @@
       <div id="emi-wrap" class="showable mfix"></div>
       <div id="error-message" class="showable">
         <div class="spin"><div></div></div>
-        <div class="spin" id="spin2"><div></div></div>
+        <div class="spin spin2"><div></div></div>
         <div id="fd-t"></div>
         <button id="fd-hide">Retry</button>
       </div>
-
+      {{ if(wallet && wallet.mobikwik){ }}
+        <form id="powerwallet" class="showable" onsubmit="return false">
+          <div id="power-head">
+            <div id="power-title"></div>
+            <img src="{{=wallet.mobikwik.col}}" height="{{=wallet.mobikwik.h}}">
+          </div>
+          <div id="power-var">
+            <div id="power-desc"></div>
+            <div class="spin"><div></div></div>
+            <div class="spin spin2"><div></div></div>
+            <input id="powerotp" type="tel" autocomplete="off" required pattern="^[0-9]+$">
+            <div id="powersignup-wrap">
+              <a class="btn" id="powersignup" href="https://www.mobikwik.com/" target="_blank">Create Mobikwik Wallet</a>
+            </div>
+            <div id="powercancel">Cancel Payment</div>
+            <button id="powerbutton" type="submit">SUBMIT</button>
+          </div>
+        </form>
+      {{ } }}
       <div id="modal-content">
         <div id="header">
           <div id="modal-close">×</div>
-          {{?it.options.image}}
+          {{?o.image}}
             <div class="merchant-image">
-              <img src="{{=it.options.image}}">
+              <img src="{{=o.image}}">
             </div>
           {{?}}
           <div class="merchant">
-            {{?it.options.name}}
-              <div class="merchant-title">{{=it.options.name}}</div>
+            {{?o.name}}
+              <div class="merchant-title">{{=o.name}}</div>
             {{?}}
-            <div class="merchant-desc">{{=it.options.description}}</div>
+            <div class="merchant-desc">{{=o.description}}</div>
           </div>
         </div>
         <div id="body">
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
-                {{for(var note in it.options.notes){}}
-                  <input type="hidden" name="notes[{{=note}}]" value="{{=it.options.notes[note]}}">
+                {{for(var note in o.notes){}}
+                  <input type="hidden" name="notes[{{=note}}]" value="{{=o.notes[note]}}">
                 {{}}}
                 <div class="fieldset">
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
                     <span class="help-text">Please enter a valid email. Example:<br> you@example.com</span>
-                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=it.options.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=o.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <span class="help-text">Please enter 10-12 digit contact number</span>
                     <i class="i">&#xe607;</i>
-                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=it.options.prefill.contact}}" pattern="^\+?[0-9]{10,12}$" maxlength="13">
+                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=o.prefill.contact}}" pattern="^\+?[0-9]{10,12}$" maxlength="13">
                   </div></div>
                 </div>
               </div>
               <div id="methods-specific-fields">
                 <div>
-                  {{ var tabCount = 0; it.options.method.card && tabCount++; it.options.method.netbanking && tabCount++; it.options.method.wallet.length && tabCount++; }}
+                  {{ var tabCount = 0; o.method.card && tabCount++; o.method.netbanking && tabCount++; o.method.wallet && tabCount++; }}
                   <ul active="0" id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
-                    {{? it.options.method.card }}
+                    {{? o.method.card }}
                       <li id="method-card-tab" data-target="tab-card">Card</li>
                     {{?}}
-                    {{? it.options.method.netbanking }}
-                      <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !it.options.method.card}} class="active"{{?}}>Net Banking</li>
+                    {{? o.method.netbanking }}
+                      <li id="method-netbanking-tab" data-target="tab-netbanking">Net Banking</li>
                     {{?}}
-                    {{? it.options.method.wallet.length }}
-                      <li id="method-wallet-tab" data-target="tab-wallet"{{? !it.options.method.card && !it.options.method.netbanking }} class="active"{{?}}>Wallet</li>
+                    {{? o.method.wallet }}
+                      <li id="method-wallet-tab" data-target="tab-wallet">Wallet</li>
                     {{?}}
                     <div id="tab-bar"></div>
                   </ul>
-                  {{? it.options.method.card }}
+                  {{? o.method.card }}
                     <div class="fieldset tab-content showable shown" id="tab-card">
                       <input type="hidden" name="method" value="card">
                       <div class="elem-wrap"><div class="elem elem-name">
                         <i class="i">&#xe602;</i>
                         <span class="help-text">Please enter your name</span>
-                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=it.options.prefill.name}}">
+                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=o.prefill.name}}">
                       </div></div>
                       <div class="elem-wrap"><div class="elem" id="elem-card">
                         <i class="i">&#xe605;</i>
                         <div class="card-image"></div>
                         <span class="help-text">Please enter a valid card number</span>
-                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=it.options.prefill.card.number}}">
+                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=o.prefill.card.number}}">
                         <label id="nocvv" for="nocvv-check">
                           <input type="checkbox" id="nocvv-check" checked disabled>
                           <span class="checkbox"></span>
@@ -86,7 +105,7 @@
                         <div class="elem-wrap first"><div class="elem elem-expiry">
                           <i class="i">&#xe606;</i>
                           <span class="help-text">Please enter card expiry date in MM / YY format.</span>
-                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=it.options.prefill.card.expiry}}">
+                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=o.prefill.card.expiry}}">
                         </div></div>
                         <div class="elem-wrap last"><div class="elem elem-cvv">
                           <i class="i">&#xe604;</i>
@@ -113,8 +132,8 @@
                       </label>
                     </div>
                   {{?}}
-                  {{? it.options.method.netbanking }}
-                    <div class="fieldset showable tab-content{{? !it.options.method.card }} shown{{?}}" id="tab-netbanking">
+                  {{? o.method.netbanking }}
+                    <div class="fieldset showable tab-content{{? !o.method.card }} shown{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
                       <div id="netb-banks" class="clear">
                         {{for(var b in it.netbanks){}}
@@ -132,24 +151,24 @@
                         <i class="i">&#xe601;</i>
                         <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                           <option selected="selected" value="">Other Banks</option>
-                          {{for(var i in it.options.method.netbanking){}}
-                            <option value="{{=i}}">{{=it.options.method.netbanking[i]}}</option>
+                          {{for(var i in o.method.netbanking){}}
+                            <option value="{{=i}}">{{=o.method.netbanking[i]}}</option>
                           {{}}}
                         </select>
                       </div></div>
                     </div>
                   {{?}}
-                  {{? it.options.method.wallet.length }}
-                    <div class="fieldset wallets-{{=it.options.method.wallet.length}} showable tab-content{{? !it.options.method.card && !it.options.method.netbanking }} shown{{?}}" id="tab-wallet">
+                  {{ if(wallet){ }}
+                    <div class="fieldset showable tab-content{{? !o.method.card && !o.method.netbanking }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
-                      {{~it.options.method.wallet :w:i}}
-                        <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=i}}"{{?!i}} checked{{?}}>
-                        <label for="wallet-radio-{{=i}}" class="radio-label">
-                          <img class="wallet-button colored" {{?w.h}}style="height:{{=w.h}}px" {{?}}src="{{=w.col}}"/>
+                      {{ for (var w in wallet){ }}
+                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}">
+                        <label for="wallet-radio-{{=w}}" class="radio-label">
+                          <img class="wallet-button colored" style="height:{{=wallet[w].h}}px" src="{{=wallet[w].col}}">
                         </label>
-                      {{~}}
+                      {{}}}
                     </div>
-                  {{?}}
+                  {{}}}
                 </div>
               </div>
             </div>
@@ -158,12 +177,12 @@
                 <span class="ring"></span>
                 <span class="text">
                   Pay
-                  {{if(it.options.display_currency){}}
-                    ${{=it.options.display_amount}}
+                  {{if(o.display_currency){}}
+                    ${{=o.display_amount}}
                   {{} else {}}
                      <i>&#xe600;</i>
                      <u>₹</u>
-                     {{=it.options.amount/100}}
+                     {{=o.amount/100}}
                   {{}}}
                 </span>
               </button>

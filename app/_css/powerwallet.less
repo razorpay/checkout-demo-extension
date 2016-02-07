@@ -1,0 +1,73 @@
+@import "common";
+
+#powerotp {
+  display: none;
+  width: 110px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 24px;
+  border-bottom: 1px solid @border-color;
+  padding-bottom: 6px;
+  margin-top: 20px;
+}
+
+#powerbutton{
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+#power-desc{
+  padding: 18px 20px 0;
+  line-height: 22px;
+}
+
+#power-head{
+  padding: 0 20px;
+  text-align: right;
+  line-height: 46px;
+  border-bottom: 1px solid @border-color;
+
+  img{
+    vertical-align: middle;
+    position: relative;
+    top: -3px;
+  }
+}
+
+#power-title{
+  float: left;
+  line-height: inherit;
+  font-weight: bold;
+}
+
+#power-var{
+  &.otp{
+    #powerbutton,
+    #powerotp{
+      display: inline-block;
+    }
+  }
+  &.signup #powersignup-wrap,
+  &.signup #powercancel,
+  &.re #powercancel,
+  &.loading .spin{
+    display: block;
+  }
+}
+#powersignup-wrap{
+  display: none;
+}
+#powersignup {
+  display: inline-block;
+  margin-top: 30px;
+}
+
+#powercancel{
+  margin-top: 30px;
+  display: none;
+  color: @danger;
+  cursor: pointer;
+}

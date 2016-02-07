@@ -134,19 +134,21 @@ function setPaymentMethods(payment_methods, methodOptions){
         }
       }
     )
-    var wallets = [];
+    var wallets = false;
     if( methodOptions.wallet ) {
       each(
-        payment_methods['wallet'],
+        payment_methods.wallet,
         function(wallet, enabled){
           if(enabled){
             var logos = freqWallets[wallet];
             if(logos){
-              wallets.push({
-                'name': wallet,
+              if(!wallets){
+                wallets = {};
+              }
+              wallets[wallet] = {
                 'col': logos.col,
                 'h': logos.h
-              });
+              };
             }
           }
         }

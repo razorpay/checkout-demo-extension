@@ -149,6 +149,9 @@ function formatRequest(request){
     rdata['_[id]'] = _uid;
     rdata['_[medium]'] = discreet.medium;
     rdata['_[context]'] = discreet.context;
+    if(discreet.isFrame){
+      rdata['_[source]'] = 'checkoutjs';
+    }
   }
 
   return Razorpay.payment.validate(rdata);
@@ -224,9 +227,8 @@ discreet.onComplete = function(data){
   invoke(request.error, null, data, 0);
 }
 
-function setupAjax(rzp){
+function setupAjax(rzp, callback){
   var request = rzp._request;
-  var options = request.options;
 
   $.post({
     url: discreet.makeUrl() + 'payments/create/ajax',
@@ -235,7 +237,7 @@ function setupAjax(rzp){
       var result;
 
       if(response.version === 1){
-        result = response.request;
+        result = response;
       }
 
       else {
@@ -245,12 +247,7 @@ function setupAjax(rzp){
         }
       }
 
-      result = _btoa(stringify(result));
-      if(communicator.contentWindow === window){
-        setCookie('nextRequest', result);
-      } else {
-        communicator.src = getCommuniactorSrc(options) + '#' + result;
-      }
+      invoke(callback, rzp, result);
     }
   })
 }
@@ -275,6 +272,13 @@ Razorpay.prototype.authorizePayment = function(request){
   }
   // prevent callback_url from being submitted if not redirecting
   delete rdata.callback_url;
+  trackSubmit(this, rdata);
+  this._request = request;
+
+  if(request.ajax){
+    return setupAjax(this, request.success);
+  }
+
   if(!discreet.supported(true)){
     return false;
   }
@@ -293,13 +297,17 @@ Razorpay.prototype.authorizePayment = function(request){
     }
   }
 
-  trackSubmit(this, rdata);
-
-  this._request = request;
 
   if(name){
     submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
-    setupAjax(this);
+    setupAjax(this, function(response){
+      var result = _btoa(stringify(response.request));
+      if(communicator.contentWindow === window){
+        setCookie('nextRequest', result);
+      } else {
+        communicator.src = getCommuniactorSrc(options) + '#' + result;
+      }
+    });
   }
 
   request.listener = $(window).on('message', onMessage, null, this);

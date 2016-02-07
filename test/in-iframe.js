@@ -10,7 +10,6 @@ var orig_methods = window.payment_methods = {
 function expectVisibleTab(tab){
   return function(){
     expect(jQuery('#tab-' + tab)).toBeVisible();
-    expect(jQuery('#method-'+tab+'-tab').hasClass('active')).toBe(true);
   }
 }
 
@@ -132,7 +131,7 @@ describe('payment authorization', function(){
 
     it('display default error discription', function(){
       getSession().instanceErrorHandler(response);
-      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#error-message')).toBeVisible();
       expect(jQuery('#fd-t').html().length > 0).toBe(true);
     })
 
@@ -140,7 +139,7 @@ describe('payment authorization', function(){
       var str = 'hello error';
       response.error.description = str;
       getSession().instanceErrorHandler(response);
-      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#error-message')).toBeVisible();
       expect(jQuery('#fd-t').html()).toBe(str);
     })
 
@@ -148,7 +147,7 @@ describe('payment authorization', function(){
       var field_el = jQuery('input[name]:not([type=hidden]):eq(1)');
       response.error.field = field_el.prop('name');
       getSession().instanceErrorHandler(response);
-      expect(jQuery('#fd')).toBeVisible();
+      expect(jQuery('#error-message')).toBeVisible();
       expect(field_el[0]).toBe(document.activeElement);
       expect(field_el.parent().hasClass('invalid')).toBe(true);
     })
@@ -187,16 +186,9 @@ describe('init options.method', function(){
       expect(jQuery('#tab-' + meth).length).toBe(0);
     })
 
-    var active;
     for(var m2 in window.payment_methods){
       if(disable.indexOf(m2) < 0){
         expect(jQuery('#tab-' + m2)).toBeVisible();
-
-        // depends on payment_methods order, should be same as order of visible tabs
-        if(!active){
-          active = jQuery('#tabs li.active').attr('data-target');
-          expect(active).toBe('tab-' + m2);
-        }
       }
     }
 
@@ -440,7 +432,7 @@ describe('Razorpay card tab submit', function(){
         addAllCC();
         spyCalled();
 
-        data = getFormData(jQuery('#modal form'), true);
+        data = getFormData();
       });
 
       it('contact', function(){
@@ -512,9 +504,7 @@ describe("Razorpay open netbanking page and submit method", function(){
 
     it("should show netbanking form on clicking", function(){
       launch(operation);
-      var active = jQuery('li.active');
-      expect(active.length).toBe(1);
-      expect(active.attr('data-target')).toBe('tab-netbanking');
+      expect(jQuery('#tab-netbanking').hasClass('shown')).toBe(true);
       spyCalled();
     });
 

@@ -262,6 +262,9 @@ $.prototype = {
   },
 
   val: function(value){
+    if(!arguments.length){
+      return this[0].value;
+    }
     this[0].value = value;
     return this;
   },
