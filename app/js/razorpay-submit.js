@@ -149,7 +149,7 @@ function formatRequest(request){
     rdata['_[id]'] = _uid;
     rdata['_[medium]'] = discreet.medium;
     rdata['_[context]'] = discreet.context;
-    if(discreet.isFrame){
+    if(discreet.shouldAjax(rdata)){
       rdata['_[source]'] = 'checkoutjs';
     }
   }
