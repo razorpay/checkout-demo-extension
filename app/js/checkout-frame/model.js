@@ -129,11 +129,11 @@ function getFormData() {
   if(!activeTab[0]) { return }
 
   var data = {};
-  getFormFields($('form-common'), data);
+  getFormFields($('#form-common'), data);
 
   getFormFields(activeTab, data);
 
-  if(activeTab.id === 'tab-card'){
+  if(activeTab.prop('id') === 'tab-card'){
     data['card[number]'] = data['card[number]'].replace(/\ /g, '');
 
     if(!data['card[expiry]']){
