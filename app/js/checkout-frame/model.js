@@ -437,7 +437,7 @@ CheckoutModal.prototype = {
     if(!this.modal) { this.modal = new window.Modal(this.el, options.modal) }
 
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
-    this.setCardFormatting()
+    this.setCardFormatting();
     this.bindEvents();
 
     this.errorHandler(message.params);
@@ -593,6 +593,11 @@ CheckoutModal.prototype = {
     card.formatCardExpiry(el_expiry);
     card.ensureNumeric(el_cvv);
     card.ensurePhone(el_contact);
+
+    var otpEl = gel('powerotp')
+    if(otpEl){
+      card.ensureNumeric(otpEl);
+    }
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle

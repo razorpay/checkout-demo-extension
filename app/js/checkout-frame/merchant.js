@@ -319,7 +319,7 @@ Razorpay.sendMessage = function(message){
 window.handleOTP = function(otp){
   var session = getSession();
   var otpEl = gel('powerotp');
-  if(session && session.rzp && otpEl){
+  if(session && session.rzp && otpEl && !otpEl.value){
     otpEl.value = otp;
   }
 }
