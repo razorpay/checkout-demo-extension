@@ -618,14 +618,17 @@ CheckoutModal.prototype = {
         }
       }
     )
-    var oldIndex = parent.attr('active');
-    parent.attr('active', index);
+    var oldIndex = parseInt(parent.attr('active'));
 
-    var dirs = ['ltr', 'rtl'];
-    var isLeft = oldIndex < index;
+    if(oldIndex !== index){
+      parent.attr('active', index);
 
-    makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
-    makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
+      var dirs = ['ltr', 'rtl'];
+      var isLeft = oldIndex < index;
+
+      makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
+      makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
+    }
   },
 
   switchBank: function(e){
