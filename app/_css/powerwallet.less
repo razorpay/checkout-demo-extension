@@ -1,0 +1,35 @@
+@import "common";
+
+#powerwallet{
+  .spin{
+    display: block;
+  }
+  &.otp{
+    .spin{
+      display: none;
+    }
+  }
+}
+
+.power-head{
+  padding: 0 20px;
+  text-align: right;
+  line-height: 46px;
+  border-bottom: 1px solid @border-color;
+
+  img{
+    vertical-align: middle;
+    position: relative;
+    top: -3px;
+  }
+}
+
+.power-title{
+  float: left;
+  line-height: inherit;
+  font-weight: bold;
+}
+
+.power-desc{
+  margin: 20px 0;
+}
