@@ -442,7 +442,7 @@ CheckoutModal.prototype = {
 
     this.errorHandler(message.params);
 
-    if(this.emi){
+    if(this.emi && gel('elem-emi')){
       this.emiView = new emiView(message);
     }
 
