@@ -729,7 +729,8 @@ CheckoutModal.prototype = {
       preventDefault(e);
       showPowerScreen({
         className: 'loading',
-        title: 'Verifying OTP'
+        title: 'Verifying OTP',
+        text: 'Please wait...'
       })
 
       this.rzp._request.success = bind(this.successHandler, this);
