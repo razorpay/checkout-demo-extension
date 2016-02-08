@@ -664,7 +664,10 @@ CheckoutModal.prototype = {
     var invalids = $parent.find('.invalid');
     if(invalids[0]){
       this.shake();
-      $(invalids[0]).find('.input')[0].focus();
+      var invalidInput = $(invalids[0]).find('.input')[0];
+      if(invalidInput){
+        invalidInput.focus();
+      }
 
       each( invalids, function(i, field){
         $(field).addClass('mature');
@@ -691,12 +694,10 @@ CheckoutModal.prototype = {
   },
 
   otpSubmitCallback: function(response){
-    if(response.error){
-      this.reenterOtpView(response);
+    if (response.razorpay_payment_id) {
+      return this.successHandler(response);
     }
-    else {
-      this.successHandler(response);
-    }
+    this.reenterOtpView(response);
   },
 
   showOtpView: function(response){
@@ -723,12 +724,20 @@ CheckoutModal.prototype = {
   },
 
   reenterOtpView: function(response){
+    var errorMessage;
+    try{
+      errorMessage = response.error.description;
+    }
+    catch(e){
+      errorMessage = 'Entered OTP could not be verified.';
+      roll('powerwallet response', e);
+    }
     if(this.rzp){
       gel('powerotp').placeholder = 'Reenter OTP';
       showPowerScreen({
         className: 're otp',
-        title: 'Wrong OTP',
-        text: 'Entered OTP is incorrect. Please Reenter.'
+        title: 'Error',
+        text: errorMessage
       })
     }
   },
@@ -740,9 +749,8 @@ CheckoutModal.prototype = {
         null,
         {
           className: 'signup',
-          text: 'There is no account associated with',
-          title: 'Error',
-          number: true
+          text: response.error.description,
+          title: 'Error'
         },
         200
       )
