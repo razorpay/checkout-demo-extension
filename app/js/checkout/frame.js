@@ -129,6 +129,14 @@ function setBackdropColor(value){
   catch(e){}
 }
 
+function setTestRibbonVisible(){
+  testRibbon.style.opacity = 1.0;
+}
+
+function setTestRibbonInvisible(){
+  testRibbon.style.opacity = 0.0;
+}
+
 function CheckoutFrame(rzp){
   if(rzp){
     this.getEl(rzp.options);
@@ -187,12 +195,14 @@ CheckoutFrame.prototype = {
     else {
       $parent.css('display', 'block').reflow();
       setBackdropColor(rzp.options.theme.backdrop_color);
+      setTestRibbonVisible();
       this.setMetaAndOverflow();
     }
   },
 
   close: function(){
     setBackdropColor('');
+    setTestRibbonInvisible();
     restoreMeta(this.$meta);
     restoreOverflow();
   },
