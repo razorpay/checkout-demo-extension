@@ -131,7 +131,7 @@
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
-            if(!hideEmi() && !errorMessageVisible()){
+            if(!hideEmi() && !overlayVisible()){
               this.hide();
             }
           }

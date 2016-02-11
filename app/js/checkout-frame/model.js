@@ -276,8 +276,8 @@ function hideOverlayMessage(){
   )
 }
 
-function errorMessageVisible(){
-  return $('#error-message').hasClass('shown');
+function overlayVisible(){
+  return $('#overlay').hasClass('shown');
 }
 
 function showErrorMessage(message){
@@ -308,9 +308,6 @@ function showPowerScreen(state){
 
   var className = state.className;
   if(className){
-    if(className === 'otp'){
-      $('#powerotp').val('');//.attr('placeholder', 'Enter OTP');
-    }
     gel('power-var').className = state.className;
   }
 
@@ -784,6 +781,10 @@ CheckoutModal.prototype = {
   cleanupPowerRequest: function(){
     this.cleanupRequest();
     this.nextRequest = null;
+    var powerotp = gel('powerotp');
+    if(powerotp){
+      gel('powerotp').value = '';
+    }
     hideOverlay($('#powerwallet'));
   },
 
