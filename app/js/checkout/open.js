@@ -140,39 +140,41 @@ function createFrameBackdrop(){
 }
 
 function createTestRibbon(){
-  var ribbon = document.createElement('div');
-  ribbon.className = 'razorpay-test-ribbon';
-  ribbon.innerHTML = "Test Mode";
+  var ribbon = document.createElement('a');
+  ribbon.target = '_blank';
+  ribbon.href = '';
+  ribbon.innerHTML = 'Test Mode';
   var style = ribbon.style;
+  var animRule = 'opacity 0.3s ease-in';
+  var rotateRule = 'rotate(45deg)';
   each(
     {
-      "background": "#D64444",
-      "border": "1px dashed white",
-      "padding": "3px",
-      "opacity": "0",
-      "-webkit-transform": "rotate(45deg)",
-      "-moz-transform": "rotate(45deg)",
-      "-ms-transform": "rotate(45deg)",
-      "-o-transform": "rotate(45deg)",
-      "transform": "rotate(45deg)",
-      "-webkit-transition": "opacity 0.3s ease-out",
-      "-moz-transition": "opacity 0.3s ease-out",
-      "-ms-transition": "opacity 0.3s ease-out",
-      "-o-transition": "opacity 0.3s ease-out",
-      "transition": "opacity 0.3s ease-out",
-      "font-family": "lato,ubuntu,helvetica,sans-serif",
-      "color": "white",
-      "position": "fixed",
-      "width": "200px",
-      "text-align": "center",
-      "right": "-50px",
-      "margin-top": "50px"
+      'text-decoration': 'none',
+      'background': '#D64444',
+      'border': '1px dashed white',
+      'padding': '3px',
+      'opacity': '0',
+      '-webkit-transform': rotateRule,
+      '-moz-transform': rotateRule,
+      '-ms-transform': rotateRule,
+      '-o-transform': rotateRule,
+      'transform': rotateRule,
+      '-webkit-transition': animRule,
+      '-moz-transition': animRule,
+      'transition': animRule,
+      'font-family': 'lato,ubuntu,helvetica,sans-serif',
+      'color': 'white',
+      'position': 'absolute',
+      'width': '200px',
+      'text-align': 'center',
+      'right': '-50px',
+      'top': '50px'
     },
     function(ruleKey, value){
       style[ruleKey] = value;
     }
   )
-
+  frameBackdrop.appendChild(ribbon);
   return ribbon;
 }
 
@@ -218,10 +220,6 @@ Razorpay.prototype.open = function() {
     frame.close();
     frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
-  }
-
-  if(this.options.key && /^rzp_test/.test(this.options.key)){
-    frameBackdrop.appendChild(testRibbon);
   }
 
   return this;

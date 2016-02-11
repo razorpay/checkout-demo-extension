@@ -167,7 +167,8 @@ CheckoutFrame.prototype = {
   openRzp: function(rzp){
     var el = this.el;
     this.bind();
-    var parent = rzp.options.parent;
+    var options = rzp.options;
+    var parent = options.parent;
     var $parent = $(parent || frameContainer);
     var message;
 
@@ -194,8 +195,10 @@ CheckoutFrame.prototype = {
     }
     else {
       $parent.css('display', 'block').reflow();
-      setBackdropColor(rzp.options.theme.backdrop_color);
-      setTestRibbonVisible();
+      setBackdropColor(options.theme.backdrop_color);
+      if(/^rzp_t/.test(options.key)){
+        setTestRibbonVisible();
+      }
       this.setMetaAndOverflow();
     }
   },
