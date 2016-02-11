@@ -309,7 +309,7 @@ function showPowerScreen(state){
   var className = state.className;
   if(className){
     if(className === 'otp'){
-      gel('powerotp').placeholder = 'Enter OTP';
+      $('#powerotp').val('');//.attr('placeholder', 'Enter OTP');
     }
     gel('power-var').className = state.className;
   }
