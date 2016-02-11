@@ -143,7 +143,7 @@ function testFromStack(counter, allOptions, done){
     } else if(allOptions.release){
       done();
     } else {
-      createCoverageReport();
+      // createCoverageReport();
       testRelease(done);
     }
   }).start();
