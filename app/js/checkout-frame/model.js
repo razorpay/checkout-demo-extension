@@ -494,9 +494,9 @@ CheckoutModal.prototype = {
         hideOverlayMessage();
       }
     }
-    else if(this.nextRequest && confirm('Cancel Payment?')){
-      this.cleanupPowerRequest();
-    }
+    // else if(this.nextRequest && confirm('Cancel Payment?')){
+    //   this.cleanupPowerRequest();
+    // }
   },
 
   shake: function(){
@@ -697,7 +697,7 @@ CheckoutModal.prototype = {
     if (response.razorpay_payment_id) {
       return this.successHandler(response);
     }
-    this.reenterOtpView(response);
+    this.powerErrorHandler(response);
   },
 
   showOtpView: function(response){
@@ -736,8 +736,8 @@ CheckoutModal.prototype = {
       gel('powerotp').placeholder = 'Reenter OTP';
       showPowerScreen({
         className: 're otp',
-        title: 'Error',
-        text: errorMessage
+        text: errorMessage,
+        title: 'Error'
       })
     }
   },
@@ -748,7 +748,7 @@ CheckoutModal.prototype = {
         showPowerScreen,
         null,
         {
-          className: 'signup',
+          className: 'error',
           text: response.error.description,
           title: 'Error'
         },

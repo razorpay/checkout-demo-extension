@@ -44,30 +44,19 @@
 }
 
 #power-var{
-  &.otp{
-    #powerbutton,
-    #powerotp{
-      display: inline-block;
-    }
-  }
-  &.signup #powersignup-wrap,
-  &.signup #powercancel,
+  &.error #powercancel,
   &.re #powercancel,
-  &.loading .spin{
+  &.otp #powerbutton,
+  &.otp #powerotp {
+    display: inline-block;
+  }
+  &.loading .spin {
     display: block;
   }
 }
-#powersignup-wrap{
-  display: none;
-}
-#powersignup {
-  display: inline-block;
-  margin-top: 30px;
-}
 
 #powercancel{
-  margin-top: 15px;
+  margin-top: 20px;
   display: none;
-  color: @danger;
   cursor: pointer;
 }
