@@ -920,12 +920,17 @@ CheckoutModal.prototype = {
     }
 
     // TODO
-    this.rzp = Razorpay(this.message.options);
+    var rzp = this.rzp = Razorpay(this.message.options);
 
     // onComplete defined in razorpay-submit.js, safe to expose now
-    window.onComplete = bind(discreet.onComplete, this.rzp);
+    window.onComplete = bind(discreet.onComplete, rzp);
 
-    this.rzp.authorizePayment(request);
+    // setPaymentID to be used by payment cancel API
+    window.setPaymentID = function(payment_id){
+      rzp.request.payment_id = payment_id;
+    }
+
+    rzp.authorizePayment(request);
   },
 
   close: function(){

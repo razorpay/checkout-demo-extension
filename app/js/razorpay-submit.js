@@ -181,6 +181,18 @@ function trackSubmit(rzp, data){
   track.call(rzp, 'submit', trackingPayload);
 }
 
+function onPopupClose(){
+  try {
+    $.post({
+      url: discreet.makeUrl() + 'payments/' + this._request.payment_id + '/cancel',
+      data: {
+        key_id: this.options.key
+      }
+    })
+  } catch(e){}
+  this.cancelPayment();
+}
+
 function onMessage(e){
   var request = this._request;
   if(e.origin) {
@@ -277,7 +289,7 @@ Razorpay.prototype.authorizePayment = function(request){
     name = '_blank'
 
   } else {
-    request.popup.onClose = bind(this.cancelPayment, this);
+    request.popup.onClose = bind(onPopupClose, this);
 
     if(request.popup.cc){
       name = request.popup.name;
