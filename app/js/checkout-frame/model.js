@@ -775,7 +775,7 @@ CheckoutModal.prototype = {
   },
 
   cleanupRequest: function(){
-    this.rzp = window.onComplete = null;
+    this.rzp = window.onComplete = window.setPaymentID = null;
   },
 
   cleanupPowerRequest: function(){
@@ -927,7 +927,7 @@ CheckoutModal.prototype = {
 
     // setPaymentID to be used by payment cancel API
     window.setPaymentID = function(payment_id){
-      rzp.request.payment_id = payment_id;
+      rzp._request.payment_id = payment_id;
     }
 
     rzp.authorizePayment(request);

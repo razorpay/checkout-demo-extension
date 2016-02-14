@@ -303,9 +303,33 @@ $.clone = function(target){
 };
 
 $.post = function(opts){
+  opts.method = 'post';
+
+  if(!opts.headers){
+    opts.headers = {};
+  }
+  opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
+  var payload = [];
+  each(opts.data, function(key, val){
+    payload.push(key + '=' + val)
+  })
+  opts.data = payload.join('&');
+  $.ajax(opts);
+}
+
+$.ajax = function(opts){
   var xhr = new XMLHttpRequest();
-  xhr.open('post', opts.url, true);
-  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  if(!opts.method){
+    opts.method = 'get';
+  }
+  xhr.open(opts.method, opts.url, true);
+
+  each(
+    opts.headers,
+    function(header, value){
+      xhr.setRequestHeader(header, value);
+    }
+  )
 
   if(opts.callback){
     xhr.onreadystatechange = function(){
@@ -317,10 +341,5 @@ $.post = function(opts){
       opts.callback({error: {description: 'Network error'}});
     }
   }
-
-  var payload = [];
-  each(opts.data, function(key, val){
-    payload.push(key + '=' + val)
-  })
-  xhr.send(payload.join('&'));
+  xhr.send(opts.data || null);
 }

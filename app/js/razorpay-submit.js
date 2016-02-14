@@ -182,14 +182,18 @@ function trackSubmit(rzp, data){
 }
 
 function onPopupClose(){
+  var request_id;
   try {
-    $.post({
-      url: discreet.makeUrl() + 'payments/' + this._request.payment_id + '/cancel',
-      data: {
-        key_id: this.options.key
+    request_id = this._request.payment_id;
+  } catch(e){}
+  if(request_id){
+    $.ajax({
+      url: discreet.makeUrl() + 'payments/' + request_id + '/cancel',
+      headers: {
+        Authorization: 'Basic ' + _btoa(this.options.key + ':')
       }
     })
-  } catch(e){}
+  }
   this.cancelPayment();
 }
 
