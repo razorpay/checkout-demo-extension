@@ -13,8 +13,9 @@ var ua = navigator.userAgent;
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
 var RazorpayConfig;
-if(typeof window.Razorpay === 'object' && Razorpay && typeof Razorpay.config === 'object'){
-  RazorpayConfig = Razorpay.config;
+var global_Razorpay = window.Razorpay;
+if(typeof global_Razorpay === 'object' && global_Razorpay && typeof global_Razorpay.config === 'object'){
+  RazorpayConfig = global_Razorpay.config;
 }
 else {
   RazorpayConfig = {
