@@ -80,14 +80,15 @@ function formatMessage(message){
       var val = message[key];
       if(typeof val === 'string'){
         try{
-          message[key] = JSON.parse(val);
+          val = JSON.parse(val);
         } catch(e){
           // TODO roll()
         }
       }
-      if(typeof val !== 'object'){
-        message[key] = {};
+      if(!val || typeof val !== 'object'){
+        val = {};
       }
+      message[key] = val;
     }
   )
 }
