@@ -88,11 +88,6 @@ function createPopup(data, url, options) {
 
   try{
     writePopup(popup, templateVars);
-    if(/FxiOS/.test(ua)){
-      setTimeout(function(){
-        writePopup(popup, templateVars);
-      }, 1000)
-    }
   }
   catch(e){
     popup.cc = true;
@@ -186,6 +181,7 @@ function onPopupClose(){
   try {
     request_id = this._request.payment_id;
   } catch(e){}
+
   if(request_id){
     $.ajax({
       url: discreet.makeUrl() + 'payments/' + request_id + '/cancel',
@@ -193,6 +189,7 @@ function onPopupClose(){
         Authorization: 'Basic ' + _btoa(this.options.key + ':')
       }
     })
+    track.call(this, 'cancel');
   }
   this.cancelPayment();
 }

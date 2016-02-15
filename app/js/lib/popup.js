@@ -74,7 +74,7 @@ var Popup = function(src, name) {
 
   this.window.focus();
 
-  this.interval = setInterval(_popCheckClose(this), 500);
+  this.interval = setInterval(_popCheckClose(this), 300);
 
   $(window).on('unload', this.close, false, this);
 }
@@ -109,7 +109,7 @@ Popup.prototype = {
   _checkClose: function (forceClosed) {
     try {
       if (forceClosed || this.window.closed !== false ) { // UC browser makes it undefined instead of true
-        invoke(this.onClose, this, null, 0);
+        invoke('onClose', this, null, 300);
         this.close();
       }
     }

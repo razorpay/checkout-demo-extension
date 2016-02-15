@@ -843,6 +843,7 @@ CheckoutModal.prototype = {
 
     showErrorMessage(message || 'There was an error in handling your request');
     $('#fd-hide').focus();
+    track.call(this, 'error', response);
   },
 
   submit: function(e) {
