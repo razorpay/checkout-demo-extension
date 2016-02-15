@@ -84,8 +84,8 @@ var emi_options = {
         18: 15,
         24: 15
       }
-    }
-/*
+    },
+
     HDFC: {
       patt: /3608(25|26|86|87)|4(05028|18136|3(467(7|8)|6(306|520)|7546)|5(11|77)04|6178(6|7)|8(549(8|9)|9377))|5(176(35|52)|22852|24(111|181|216|368|931)|28945|33744|45(226|964)|5(2(088|2(60|74)|3(44|85))|6042|8818|9300|(358|515|898)3))/,
       name: 'HDFC Bank',
@@ -98,7 +98,6 @@ var emi_options = {
         24: 15
       }
     }
-    */
   }
 }
 
@@ -132,7 +131,7 @@ function notifyBridge(message){
     invoke(bridgeMethod, CheckoutBridge, data);
   }
 }
-  
+
 function setPaymentMethods(payment_methods, methodOptions){
 
   if( !payment_methods.error ) {
