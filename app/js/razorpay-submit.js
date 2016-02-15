@@ -264,6 +264,10 @@ Razorpay.prototype.authorizePayment = function(request){
   var rdata = request.data;
 
   var url = discreet.makeUrl() + 'payments/create/checkout';
+  this._request = request;
+  if(request.ajax){
+    return setupAjax(this, request.success);
+  }
 
   if(options.redirect()) {
     discreet.nextRequestRedirect({
@@ -276,11 +280,7 @@ Razorpay.prototype.authorizePayment = function(request){
   // prevent callback_url from being submitted if not redirecting
   delete rdata.callback_url;
   trackSubmit(this, rdata);
-  this._request = request;
 
-  if(request.ajax){
-    return setupAjax(this, request.success);
-  }
 
   if(!discreet.supported(true)){
     return false;
