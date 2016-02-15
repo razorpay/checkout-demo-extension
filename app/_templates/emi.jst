@@ -1,12 +1,12 @@
 <div id="emi-inner" class="mchild">
   <div class="row em">
     <div class="col">Select Bank:</div>
+    <i class="i">&#xe601;</i>
     <select id="emi-bank-select">
       {{ for(var bank in it.banks){ }}
         <option value="{{=bank}}"{{?bank===it.selected}} selected{{?}}>{{=it.banks[bank].name}}</option>
       {{}}}
     </select>
-    <i class="i">&#xe601;</i>
   </div>
   <strong class="row lh-34">
     <div class="col">EMI Tenure</div>

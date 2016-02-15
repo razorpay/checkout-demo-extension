@@ -56,10 +56,10 @@ body {
 }
 
 #powerwallet{
-  height: 200px;
+  height: 220px;
 
   &.shown{
-    height: 230px;
+    height: 250px;
     display: block;
   }
 }
@@ -234,12 +234,11 @@ iframe{
 .merchant-title, .merchant-desc{
   font-size: 18px;
   line-height: 22px;
-  color: #555;
 }
 .merchant-title + .merchant-desc{
   font-size: 14px;
   line-height: 17px;
-  color: #999;
+  color: #888;
   text-transform: none;
   margin-top: 5px;
   max-height: 34px;
@@ -256,7 +255,7 @@ iframe{
   z-index: 7;
   text-align: center;
   &:hover{
-    color: #333;
+    color: #222;
   }
 }
 .rupee-icon:before{
@@ -277,7 +276,7 @@ iframe{
   left: 7px;
   margin-top: 10px;
   opacity: 0;
-  color: #666;
+  color: @color;
   line-height: 20px;
   overflow: hidden;
   display: block;
@@ -452,10 +451,9 @@ button[type="submit"]{
     display: inline-block;
     vertical-align: top;
     position: relative;
-    color: #555;
 
     &:hover{
-      color: #333;
+      color: #222;
     }
   }
 

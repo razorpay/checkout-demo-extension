@@ -4,7 +4,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  color: #999;
+  color: #7f7f7f;
 }
 button, input, select {
   display: inline-block;
@@ -97,18 +97,18 @@ input[disabled]{
     margin-bottom: -3px;
     line-height: 0;
     font-size: @icon-size;
-    color: #999;
+    color: #7f7f7f;
   }
   &.focused{
     i{
-      color: #333;
+      color: #222;
     }
   }
   &.mature.invalid:not(.focused){
     color: @danger;
   }
   &.filled, &.focused{
-    color: #333;
+    color: #222;
     .placeholder{
       display: none;
     }
@@ -215,6 +215,7 @@ input[type=radio]{
 .radio-label:hover, input[type=radio]:checked + label{
   border-color: @primary;
   background: #fff;
+  color: #111;
 }
 #netb-banks{
   margin: 0 -4px;
