@@ -246,7 +246,7 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
         expect(this).toBe(cf);
         spyCalled();
       })
-      message('success', {foo: 4});
+      message('complete', {foo: 4});
     })
 
     it('failure', function(){

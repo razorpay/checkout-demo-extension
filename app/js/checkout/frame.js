@@ -323,7 +323,8 @@ CheckoutFrame.prototype = {
     invoke(this.rzp.options.modal.onhidden);
   },
 
-  onsuccess: function(data){
+  // this is onsuccess method
+  oncomplete: function(data){
     this.close();
     invoke('handler', this.rzp.options, data, 200);
   },

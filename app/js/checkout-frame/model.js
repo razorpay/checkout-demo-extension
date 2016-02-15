@@ -799,7 +799,8 @@ CheckoutModal.prototype = {
     // prevent dismiss event
     this.modal.options.onhide = noop;
 
-    Razorpay.sendMessage({ event: 'success', data: response });
+    // sending oncomplete event because CheckoutBridge.oncomplete
+    Razorpay.sendMessage({ event: 'complete', data: response });
     this.hide();
   },
 
