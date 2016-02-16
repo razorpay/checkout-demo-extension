@@ -270,6 +270,10 @@ var platformSpecific = {
         var val = this.map[this.index];
         delete this.map[this.index];
         return val;
+      },
+
+      getUID: function(){
+        return _uid;
       }
     };
 
