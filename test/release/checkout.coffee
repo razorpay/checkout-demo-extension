@@ -1,4 +1,5 @@
 require './parts/common'
+require './parts/open'
 
 describe 'private vars should not leak:', ->
 	it '', ->
@@ -24,6 +25,7 @@ describe 'new Razorpay should throw if', ->
       options.display_currency = 'INR'
       options.display_amount = '300'
 
+  ###
   it 'display_currency without display_amount', ->
     execution = ->
       options.display_currency = 'USD'
@@ -37,3 +39,4 @@ describe 'new Razorpay should throw if', ->
     execution = ->
       options.display_currency = 'USD'
       options.display_amount = 'asdf'
+  ###
