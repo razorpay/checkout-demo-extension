@@ -106,7 +106,7 @@ var karmaLibs = [
 ];
 
 var karmaOptions = {
-  frameworks: ['jasmine'],
+  frameworks: ['browserify', 'jasmine'],
   reporters: ['progress', 'coverage'],
   port: 9876,
   colors: true,
@@ -115,6 +115,14 @@ var karmaOptions = {
   singleRun: true,
   coverageReporter: {
     type : 'json'
+  },
+  preprocessors: {
+    'test/**/*.coffee': [ 'browserify' ]
+  },
+  browserify: {
+    debug: true,
+    transform: ['coffeeify'],
+    extensions: ['.coffee']
   }
 };
 
@@ -122,14 +130,13 @@ gulp.task('test', ['usemin'], function(done){
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
-    o.preprocessors = {};
     getJSPaths(html, '<!--coverage-->').forEach(function(path){
       o.preprocessors[path] = ['coverage'];
     })
     o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
     return o;
   });
-  // return testRelease(done);
+  return testRelease(done);
   testFromStack(0, allOptions, done);
 })
 
@@ -175,7 +182,7 @@ function testRelease(done){
     stream.on('finish', function(){
       allOptions = glob.sync(jsGlob).map(function(released){
         var o = JSON.parse(JSON.stringify(karmaOptions));
-        o.files = karmaLibs.concat([released, released.replace('app/dist/v1', 'test/release')]);
+        o.files = karmaLibs.concat([released, released.replace('app/dist/v1', 'test/release').replace('.js', '.coffee')]);
         return o;
       });
       allOptions.release = true;
