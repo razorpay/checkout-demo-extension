@@ -130,6 +130,13 @@ gulp.task('test', ['usemin'], function(done){
   allOptions = glob.sync(assetPath('index.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
+
+    // adding paths to cover
+    getJSPaths(html, '<!--coverage-->').forEach(function(path){
+      o.preprocessors[path] = ['coverage'];
+    })
+    o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
+
     return o;
   });
   testFromStack(0, allOptions, done);
