@@ -185,11 +185,17 @@ function testRelease(done){
         .pipe(mocha({
           reporter: 'nyan',
           timeout: 20000
-        }))
-      }).on('finish', function(){
-        done();
-        process.exit(0);
-      });
+        })).once('error', function(){
+          setTimeout(function(){
+            process.exit(1);
+          }, 1000)
+        })
+        .once('end', function(){
+          setTimeout(function(){
+            process.exit();
+          }, 1000)
+        });
+      })
   })
 }
 
