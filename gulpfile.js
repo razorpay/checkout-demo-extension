@@ -179,7 +179,10 @@ function testRelease(done){
           reporter: 'nyan',
           timeout: 20000
         }))
-      })
+      }).on('finish', function(){
+        done();
+        process.exit(0);
+      });
   })
 }
 

@@ -19,18 +19,11 @@ options =
 describe 'hello', ->
   it 'foo', -> 
     browser
-    .get url
-    .title()
-    .should.become 'Razorpay Checkout'
+      .get url
+      .title()
+      .should.become 'Razorpay Checkout'
 
-    # driver.executeScript -> document.querySelector '#container'
-    #   .then (result) ->
-    #     expect(1).to.equal(2)
-    #     done()
-    #     driver.executeScript -> 'typeof Window'#"handleMessage({\"options\": #{JSON.stringify options}})"
-    #       .then ->
-    #         driver.executeScript -> document.querySelector '#container'
-    #           .then ->
-    #             # expect(result).to.be.null
-    #             # expect(result).not.to.be.null
-    #             done()
+  after ->
+    browser
+      .fin -> browser.quit()
+      .done()
