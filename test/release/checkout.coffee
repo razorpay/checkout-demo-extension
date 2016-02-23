@@ -1,42 +1,36 @@
-require './parts/common'
-require './parts/open'
+wd = require 'wd'
+chai = require 'chai'
+chaiAsPromised = require 'chai-as-promised'
+chai.use chaiAsPromised
+do chai.should
 
-describe 'private vars should not leak:', ->
-	it '', ->
-		['track', '$', 'discreet'].forEach (val, index) ->
-			expect typeof window[val]
-				.toBe 'undefined'
+url = "file://#{process.env.PWD}/app/dist/v1/checkout.html"
+browser = wd.promiseChainRemote()
+  .init {browserName: 'chrome'}
+  .get url
 
-describe 'new Razorpay should throw if', ->
-  options = execution = null
+options =
+  key: 'rzp_test_1DP5mmOlF5G5ag'
+  amount: '30000'
+  prefill:
+    email: 'pra@nav.gupta'
+    contact: '8879524924'
 
-  beforeEach ->
-    options =
-      key: 'key'
-      amount: 100
-    execution = null
-  
-  afterEach ->
-    do execution
-    expect(-> new Razorpay(options)).toThrow()
+describe 'hello', ->
+  it 'foo', -> 
+    browser
+    .get url
+    .title()
+    .should.become 'Razorpay Checkout'
 
-  it 'invalid display_currency', ->
-    execution = ->
-      options.display_currency = 'INR'
-      options.display_amount = '300'
-
-  ###
-  it 'display_currency without display_amount', ->
-    execution = ->
-      options.display_currency = 'USD'
-
-  it 'NaN display_amount', ->
-    execution = ->
-      options.display_currency = 'USD'
-      options.display_amount = NaN
-
-  it 'string display_amount', ->
-    execution = ->
-      options.display_currency = 'USD'
-      options.display_amount = 'asdf'
-  ###
+    # driver.executeScript -> document.querySelector '#container'
+    #   .then (result) ->
+    #     expect(1).to.equal(2)
+    #     done()
+    #     driver.executeScript -> 'typeof Window'#"handleMessage({\"options\": #{JSON.stringify options}})"
+    #       .then ->
+    #         driver.executeScript -> document.querySelector '#container'
+    #           .then ->
+    #             # expect(result).to.be.null
+    #             # expect(result).not.to.be.null
+    #             done()

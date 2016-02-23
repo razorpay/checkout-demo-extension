@@ -7,3 +7,7 @@ function sendclick(el){
   e.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
   el.dispatchEvent(e);
 }
+
+function clone(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
