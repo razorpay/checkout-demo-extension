@@ -147,13 +147,6 @@ var optionValidations = {
     }
   },
 
-  display_amount: function(amount){
-    amount = String(amount).replace(/([^0-9\. ])/g,'');
-    if(!amount && amount !== Razorpay.defaults.display_amount){
-      return '';
-    }
-  },
-
   parent: function(parent){
     if(!(parent && parent.nodeName || typeof parent === 'string' || parent === Razorpay.defaults.parent)){
       return 'Invalid parent';

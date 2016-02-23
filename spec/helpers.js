@@ -11,3 +11,6 @@ function sendclick(el){
 function clone(obj){
   return JSON.parse(JSON.stringify(obj));
 }
+
+var log = console.log.bind(console);
+alert = console.log = console.error = jQuery.noop;

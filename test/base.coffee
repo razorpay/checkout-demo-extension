@@ -2,7 +2,7 @@ options =
   key: 'key'
   amount: 100
 
-describe 'new Razorpay', ->
+describe 'base_configure', ->
   describe 'should throw if', ->
     it 'no options', ->
       expect(Razorpay).to.throw()
@@ -52,6 +52,15 @@ describe 'new Razorpay', ->
         arg.notes = {}
         arg.notes[note] = note for note in [1..16]
 
+      it 'invalid currency', ->
+        arg.currency = 'USD'
+
+      it 'invalid display_currency', ->
+        arg.display_currency = 'YEN'
+
+      it 'invalid parent', ->
+        arg.parent = 2
+
 describe 'discreet', ->
   it 'setNotes should copy notes into first argument from second', ->
     options = {}
@@ -59,6 +68,8 @@ describe 'discreet', ->
       notes:
         foo: 'bar'
         baz: 2
+        hello: true
+        world: {}
 
     discreet.setNotes options, overrides
 
@@ -67,4 +78,8 @@ describe 'discreet', ->
       .to.not.be overrides.notes
 
     expect options.notes
-      .to.eql overrides.notes
+      .to.eql {
+        foo: 'bar'
+        baz: 2
+        hello: true
+      }
