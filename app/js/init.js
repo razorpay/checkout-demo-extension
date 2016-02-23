@@ -43,6 +43,7 @@ Razorpay.defaults = {
   },
   'notes': {},
   'callback_url': '',
+
   'redirect': function(){
     return this.callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)
   },
