@@ -51,3 +51,20 @@ describe 'new Razorpay', ->
       it 'notes having > 15 fields', ->
         arg.notes = {}
         arg.notes[note] = note for note in [1..16]
+
+describe 'discreet', ->
+  it 'setNotes should copy notes into first argument from second', ->
+    options = {}
+    overrides =
+      notes:
+        foo: 'bar'
+        baz: 2
+
+    discreet.setNotes options, overrides
+
+    # no ref copy
+    expect options.notes
+      .to.not.be overrides.notes
+
+    expect options.notes
+      .to.eql overrides.notes
