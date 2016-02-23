@@ -128,7 +128,9 @@ var karmaOptions = {
   }
 };
 
-gulp.task('test', ['usemin'], function(done){
+var allOptions;
+
+gulp.task('makeKarmaOptions', ['usemin'], function(){
   allOptions = glob.sync(assetPath('index.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
@@ -141,6 +143,10 @@ gulp.task('test', ['usemin'], function(done){
 
     return o;
   });
+})
+
+// unit tests + coverage
+gulp.task('test:unit', ['makeKarmaOptions'], function(done){
   testFromStack(0, allOptions, done);
 })
 
@@ -151,11 +157,10 @@ function testFromStack(counter, allOptions, done){
     }
     if(allOptions[++counter]){
       testFromStack(counter, allOptions, done);
-    } else if(allOptions.release){
-      done();
     } else {
+      allOptions = null;
       createCoverageReport();
-      testRelease(done);
+      done();
     }
   }).start();
 }
@@ -173,7 +178,8 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-function testRelease(done){
+// blackbox tests
+gulp.task('test', ['test:unit'], function(){
   var jsGlob = assetPath('dist/v1/*.js');
   var jsHint = gulp.src(jsGlob)
     .pipe(wrap('(function(){"use strict";', '})()'))
@@ -199,7 +205,7 @@ function testRelease(done){
         });
       })
   })
-}
+})
 
 gulp.task('fontUpload', function(){
   var target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
