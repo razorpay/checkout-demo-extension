@@ -13,7 +13,6 @@ const sourcemaps = require('gulp-sourcemaps')
 const replace = require('gulp-replace')
 
 require('coffee-script/register')
-const rm = require( 'gulp-rm' )
 const mocha = require('gulp-mocha')
 
 const execSync = require('child_process').execSync
@@ -123,6 +122,9 @@ var karmaOptions = {
   },
   preprocessors: {
     '**/*.coffee': ['coffee']
+  },
+  nyanReporter: {
+    suppressErrorHighlighting: true
   }
 };
 
