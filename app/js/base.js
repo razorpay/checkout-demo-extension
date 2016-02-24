@@ -5,7 +5,7 @@ function raise(message){
 
 var discreet = {
   shouldAjax: function(data){
-    return data.key_id === 'rzp_live_ILgsfZCZoFIKMb' && discreet.isFrame && data.wallet === 'mobikwik'
+    return discreet.isFrame && data.wallet === 'mobikwik'
   },
 
   supported: function(showAlert){
