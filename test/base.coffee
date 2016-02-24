@@ -2,10 +2,43 @@ options =
   key: 'key'
   amount: 100
 
-describe 'base_configure', ->
-  describe 'should throw if', ->
+describe 'validateRequiredFields should check', ->
+  arg = null
+  key = null
+
+  beforeEach ->
+    arg = clone options
+    key = null
+
+  afterEach ->
+    expect key
+      .to.be.a 'string'
+
+    expect validateRequiredFields
+      .withArgs arg
+      .to.throw key
+
+  it 'missing key', ->
+    key = 'key'
+    delete arg[key]
+
+  it 'empty key', ->
+    key = 'key'
+    arg[key] = ''
+
+  it 'missing amount', ->
+    key = 'amount'
+    delete arg[key]
+
+  it 'empty amount', ->
+    key = 'amount'
+    arg[key] = ''
+
+describe 'base_configure should', ->
+  describe 'throw if', ->
     it 'no options', ->
-      expect(Razorpay).to.throw()
+      expect base_configure
+        .to.throw()
 
     describe 'invalid options', ->
       arg = null
@@ -14,7 +47,7 @@ describe 'base_configure', ->
         arg = clone options
 
       afterEach ->
-        expect Razorpay
+        expect base_configure
           .withArgs arg
           .to.throw()
 
@@ -24,15 +57,6 @@ describe 'base_configure', ->
       it 'primitive string', ->
         arg = 'hello'
 
-      it 'missing key', ->
-        delete arg.key
-
-      it 'empty key', ->
-        arg.key = ''
-
-      it 'missing amount', ->
-        delete arg.amount
-
       it 'NaN amount', ->
         arg.amount = NaN
 
@@ -41,9 +65,6 @@ describe 'base_configure', ->
 
       it 'dot containing amount', ->
         arg.amount = 100.5
-
-      it 'empty amount', ->
-        arg.amount = ''
 
       it 'NaN string amount', ->
         arg.amount = 'asdf'
@@ -61,9 +82,43 @@ describe 'base_configure', ->
       it 'invalid parent', ->
         arg.parent = 2
 
+  describe 'return options object based on overrides:', ->
+    opts = null
+
+    beforeEach ->
+      opts = clone options
+
+    it 'basic options', ->
+      expect base_configure(opts).key = options.key
+      expect base_configure(opts).amount = options.amount
+
+      # check if no extra keys are appended to overrides
+      expect opts
+        .to.eql options
+
+    it 'backdropClose', ->
+      opts.modal =
+        backdropClose: true
+      expect base_configure(opts).modal.backdropclose
+        .to.be true
+
+    it 'redirect', ->
+      opts.redirect = true
+      expect base_configure(opts).redirect()
+        .to.be(true)
+
+      opts.redirect = false
+      expect base_configure(opts).redirect()
+        .to.be(false)
+
+    it 'parent', ->
+      opts.parent = document.body
+      expect base_configure(opts).parent
+        .to.be document.body
+
 describe 'discreet', ->
   it 'setNotes should copy notes into first argument from second', ->
-    options = {}
+    opts = {}
     overrides =
       notes:
         foo: 'bar'
@@ -71,15 +126,31 @@ describe 'discreet', ->
         hello: true
         world: {}
 
-    discreet.setNotes options, overrides
+    discreet.setNotes opts, overrides
 
     # no ref copy
-    expect options.notes
+    expect opts.notes
       .to.not.be overrides.notes
 
-    expect options.notes
+    expect opts.notes
       .to.eql {
         foo: 'bar'
         baz: 2
         hello: true
       }
+
+describe 'new Razorpay', ->
+  it 'should call base_configure', ->
+    spy = sinon.spy window, 'base_configure'
+    rzp = new Razorpay options
+
+    log spy.callCount
+    expect spy.calledOnce
+      .to.be true
+
+    expect spy.calledWith options
+      .to.be true
+
+    expect spy.returnValues[0]
+      .to.be rzp.options
+

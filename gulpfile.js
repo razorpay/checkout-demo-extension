@@ -105,8 +105,9 @@ function getJSPaths(html, pattern){
 var karmaLibs = [
   'spec/jquery-1.11.1.js',
   'spec/sendkeys.js',
-  'spec/helpers.js',
-  'spec/expect.js'
+  'spec/sinon-1.17.3.js',
+  'spec/expect.js',
+  'spec/helpers.js'
 ];
 
 var karmaOptions = {
