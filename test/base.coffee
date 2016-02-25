@@ -117,6 +117,104 @@ describe 'base_configure should', ->
         .to.be document.body
 
 describe 'discreet', ->
+  describe 'support check', ->
+    origUa = window.ua
+    stub = null
+
+    beforeEach ->
+      stub = sinon.stub window, 'alert'
+
+    afterEach ->
+      window.ua = origUa
+      stub.restore()
+
+    it 'shouldnt alert supported browser', ->
+      discreet.supported true
+      expect stub.callCount
+        .to.be 0
+
+    it 'should alert unsupported browser', ->
+      window.ua = 'Opera Mini/'
+      expect discreet.supported true
+        .to.be false
+      expect stub.callCount
+        .to.be 1
+
+    it 'shouldnt alert unsupported browser if no showAlert flag', ->
+      window.ua = 'Opera Mini/'
+      expect discreet.supported()
+        .to.be false
+      expect stub.callCount
+        .to.be 0
+
+  describe 'defaultError', ->
+    it 'should provide minimal error object', ->
+      errorObj = discreet.defaultError()
+      expect errorObj
+        .to.only.have.key 'error'
+
+      expect errorObj.error
+        .to.only.have.key 'description'
+
+      expect errorObj.error.description
+        .to.be.a 'string'
+
+  describe 'makeUrl', ->
+    origVal = null
+    before ->
+      origVal = window.RazorpayConfig
+      window.RazorpayConfig =
+        protocol: 'foo'
+        hostname: 'bar'
+        version: 'baz'
+
+    after ->
+      window.RazorpayConfig = origVal
+
+    it 'should return api url', ->
+      expect discreet.makeUrl()
+        .to.be 'foo://bar/baz'
+
+    it 'should return unversioned api url', ->
+      expect discreet.makeUrl true
+        .to.be 'foo://bar/'
+
+
+  describe 'isBase64Image', ->
+    result = image = null
+
+    afterEach ->
+      expect discreet.isBase64Image image
+        .to.be result
+
+    it 'should determine base64 png', ->
+      image = 'data:image/png;base64,R0lGOD'
+      result = true
+
+    it 'should determine base64 jpg', ->
+      image = 'data:image/jpeg;base64,R0lGOD'
+      result = true
+
+    it 'should determine base64 gif', ->
+      image = 'data:image/gif;base64,R0lGOD'
+      result = true
+
+    it 'should determine image path', ->
+      image = 'http://image'
+      result = false
+
+    it 'should determine relative path', ->
+      image = 'asdnk'
+      result = false
+
+  describe 'shouldAjax', ->
+    it 'should return true for mobikwik in case of iframe', ->
+      expect discreet.shouldAjax {wallet: 'mobikwik'}
+        .to.be discreet.isFrame
+
+      expect discreet.shouldAjax {wallet: 'paytm'}
+        .to.not.be.ok()
+
   describe 'setNotes', ->
     it 'should copy notes into first argument from second', ->
       opts = {}
