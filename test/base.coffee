@@ -117,36 +117,83 @@ describe 'base_configure should', ->
         .to.be document.body
 
 describe 'discreet', ->
-  it 'setNotes should copy notes into first argument from second', ->
-    opts = {}
-    overrides =
-      notes:
-        foo: 'bar'
-        baz: 2
-        hello: true
-        world: {}
+  describe 'setNotes', ->
+    it 'should copy notes into first argument from second', ->
+      opts = {}
+      overrides =
+        notes:
+          foo: 'bar'
+          baz: 2
+          hello: true
+          world: {}
 
-    discreet.setNotes opts, overrides
+      discreet.setNotes opts, overrides
 
-    # no ref copy
-    expect opts.notes
-      .to.not.be overrides.notes
+      # no ref copy
+      expect opts.notes
+        .to.not.be overrides.notes
 
-    expect opts.notes
-      .to.eql {
-        foo: 'bar'
-        baz: 2
-        hello: true
-      }
+      expect opts.notes
+        .to.eql
+          foo: 'bar'
+          baz: 2
+          hello: true
+
+  describe 'nextRequestRedirect', ->
+    submitSpy = msgSpy = null
+    request =
+      url: 'url'
+      content: 'content'
+      method: 'method'
+
+    beforeEach ->
+      submitSpy = sinon.stub window, 'submitForm'
+      Razorpay.sendMessage = jQuery.noop unless 'sendMessage' in Razorpay
+      msgSpy = sinon.stub Razorpay, 'sendMessage'
+
+    afterEach ->
+      # cleanup
+      submitSpy.restore()
+      msgSpy.restore()
+
+    it 'should send redirection message if in iframe', ->
+      window.parent = null
+      discreet.nextRequestRedirect request
+
+      expect submitSpy.callCount
+        .to.be 0
+
+      expect msgSpy.callCount
+        .to.be 1
+
+      expect msgSpy.args[0][0]
+        .to.eql
+          event: 'redirect'
+          data: request
+
+      # cleanup
+      window.parent = window
+
+    it 'should submitForm if in parent', ->
+      discreet.nextRequestRedirect request
+
+      expect submitSpy.callCount
+        .to.be 1
+
+      expect msgSpy.callCount
+        .to.be 0
+
+      expect submitSpy.args[0]
+        .to.eql [request.url, request.content, request.method]
+
 
 describe 'new Razorpay', ->
   it 'should call base_configure', ->
     spy = sinon.spy window, 'base_configure'
-    rzp = new Razorpay options
+    rzp = Razorpay options
 
-    log spy.callCount
-    expect spy.calledOnce
-      .to.be true
+    expect spy.callCount
+      .to.be 1
 
     expect spy.calledWith options
       .to.be true
@@ -154,3 +201,35 @@ describe 'new Razorpay', ->
     expect spy.returnValues[0]
       .to.be rzp.options
 
+    # cleanup
+    spy.restore()
+
+  it 'should throw if invalid options', ->
+    stub = sinon.stub window, 'base_configure'
+      .throws()
+
+    expect Razorpay
+      .withArgs options
+      .to.throw()
+
+    # cleanup
+    stub.restore()
+
+describe 'Razorpay.configure', ->
+  it 'should set Razorpay.defaults', ->
+    origDefaults = Razorpay.defaults
+    spy = sinon.spy window, 'base_configure'
+    Razorpay.configure options
+
+    expect spy.callCount
+      .to.be 1
+
+    expect spy.calledWith options
+      .to.be true
+
+    expect spy.returnValues[0]
+      .to.be Razorpay.defaults
+
+    # cleanup
+    spy.restore()
+    Razorpay.defaults = origDefaults
