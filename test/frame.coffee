@@ -37,6 +37,19 @@ describe 'restoreMeta', ->
 
     spy.restore()
 
+describe 'getEncodedMessage', ->
+  it 'should return base64 encoded message', ->
+    message = foo: 'bar'
+    spy = sinon.stub window, 'makeCheckoutMessage'
+      .returns message
+
+    expect getEncodedMessage 2
+      .to.be btoa JSON.stringify message
+    expect spy.getCall(0).args[0]
+      .to.be 2
+
+    spy.restore()
+
 describe 'normalize image option if', ->
   baseUrl = location.protocol + '//' + location.hostname + (if location.port then ':' + location.port else '')
   opts = image = result = null
@@ -296,6 +309,29 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
     it 'fault', ->
       spy = sinon.stub rzp, 'close'
       message 'fault'
+
+describe 'checkoutFrame.close', ->
+  it 'should restore merchantMarkup', ->
+    spy = sinon.stub window, 'setBackdropColor'
+    spy2 = sinon.stub window, 'restoreMeta'
+    spy3 = sinon.stub window, 'restoreOverflow'
+
+    rzp = Razorpay options
+    cf = new CheckoutFrame rzp
+    cf.close()
+
+    expect spy.called
+      .to.be true
+
+    expect spy2.called
+      .to.be true
+
+    expect spy3.called
+      .to.be true
+
+    expect spy2.getCall(0).args[0]
+      .to.be cf.$meta
+
 
 describe 'afterClose should', ->
   rzp = cf = null
