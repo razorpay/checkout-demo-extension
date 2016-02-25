@@ -1,0 +1,352 @@
+options =
+  key: 'key'
+  amount: 100
+
+base64image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL4AAAC+CAIAAAAEFiLKAAAAA3NCSVQICAjb4U/'
+
+describe 'doc', ->
+  it 'should be documentElement', ->
+    expect doc
+      .to.be document.body
+
+    expect docStyle
+      .to.be doc.style
+
+describe 'restoreOverflow', ->
+  it 'should set body overflow to merchant stored overflow', ->
+    docStyle.overflow = 'inherit'
+    merchantMarkup.overflow = 'visible'
+    do restoreOverflow
+    expect docStyle.overflow
+      .to.be merchantMarkup.overflow
+
+describe 'restoreMeta', ->
+  it 'should append old meta to <head>', ->
+    $meta =
+      remove: sinon.stub()
+
+    div = document.createElement 'div'
+    spy = sinon.stub window, 'getMeta'
+      .returns div
+
+    restoreMeta $meta
+    expect document.head.contains div
+      .to.be true
+    expect $meta.remove.callCount
+      .to.be 1
+
+    spy.restore()
+
+describe 'normalize image option if', ->
+  baseUrl = location.protocol + '//' + location.hostname + (if location.port then ':' + location.port else '')
+  opts = image = result = null
+
+  afterEach ->
+    opts = image: image
+    sanitizeImage opts
+    expect opts.image
+      .to.be result
+
+  it 'path relative url', ->
+    image = 'abcdef'
+    result = baseUrl + '/abcdef'
+
+  it 'server relative url', ->
+    image = '/hello/world'
+    result = baseUrl + '/hello/world'
+
+  it 'absolute url', ->
+    image = 'https://hello/world'
+    result = 'https://hello/world'
+
+  it 'base64', ->
+    image = base64image
+    result = base64image
+
+describe 'makeCheckoutUrl should', ->
+  it 'compose default checkout url without key', ->
+    expect makeCheckoutUrl {}
+      .to.be RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/checkout.php'
+
+  it 'compose checkout view url with key', ->
+    expect makeCheckoutUrl key: 'foo'
+      .to.be RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/v1/checkout?key_id=foo'
+
+describe 'makeCheckoutMessage should', ->
+  rzp =
+    id: 'someid'
+    options:
+      redirect: noop
+      image: 'abcdef'
+      hello: 'world'
+      nested: key: 'value'
+      modal: {}
+      func: noop
+    modal: options: dismiss: 'hidden'
+
+  it 'set options and modal.options to options.modal', ->
+    message = makeCheckoutMessage rzp
+    expect rzp.options.modal.dismiss
+      .to.be rzp.modal.options.dismiss
+
+    # checking general options
+    expect message.options
+      .to.not.have.property 'func'
+
+    expect message.options.nested.key
+      .to.be 'value'
+
+    expect message.options.hello
+      .to.be 'world'
+
+    # checking image, as absolute url
+    imageOption = image: rzp.options.image
+    sanitizeImage imageOption
+
+    expect message.options.image
+      .to.be imageOption.image
+
+    expect message.context
+      .to.be location.href
+
+    expect message.config
+      .to.be RazorpayConfig
+
+    expect message.id
+      .to.be rzp.id
+
+  it 'set redirect option', ->
+    message = makeCheckoutMessage rzp
+    expect message.options.redirect
+      .to.be false
+
+    rzp.options.redirect = ->
+      true
+
+    message = makeCheckoutMessage rzp
+    expect message.options.redirect
+      .to.be true
+
+  it 'delete parent option', ->
+    rzp.options.parent = 'x'
+    message = makeCheckoutMessage rzp
+
+    expect 'parent' of message.options
+      .to.be false
+
+    expect message.embedded
+      .to.be true
+
+describe 'checkoutFrame on receiveing message from frame contentWindow', ->
+  rzp = Razorpay options
+  cf = new CheckoutFrame rzp
+  src = makeCheckoutUrl rzp.options
+
+  describe 'return if source isnt valid:', ->
+    spyNotCalled = event = null
+
+    afterEach ->
+      spyNotCalled = sinon.stub cf, 'onredirect'
+      cf.onmessage event
+      expect spyNotCalled.called
+        .to.be false
+      spyNotCalled.restore()
+
+    it 'invalid origin', ->
+      event =
+        origin: 'asd'
+        data: JSON.stringify(
+          source: 'frame'
+          event: 'redirect'
+          id: rzp.id)
+
+    it 'invalid source', ->
+      event =
+        origin: src
+        data: JSON.stringify(
+          source: 'frame2'
+          event: 'redirect'
+          id: rzp.id)
+
+    it 'invalid id', ->
+      event =
+        origin: src
+        data: JSON.stringify(
+          source: 'frame'
+          event: 'redirect'
+          id: 11)
+
+  describe 'invoke onevent methods: ', ->
+    spy = null
+
+    message = (event, data) ->
+      cf.onmessage
+        source: cf.el.contentWindow
+        origin: src
+        data: JSON.stringify(
+          source: 'frame'
+          event: event
+          id: rzp.id
+          data: data)
+
+    afterEach ->
+      if spy
+        expect spy.callCount
+          .to.be 1
+
+        spy.restore() if 'restore' of spy
+
+    it 'generic', ->
+      spy = cf.onevent = sinon.spy()
+      message 'event'
+      delete cf.onevent
+
+    it 'load', ->
+      cf.loadedCallback = jQuery.noop unless cf.loadedCallback
+      expect cf.hasLoaded
+        .to.not.be.ok()
+
+      spy = sinon.spy cf, 'loadedCallback'
+      message 'load'
+
+      expect cf.hasLoaded
+        .to.be true
+
+      expect spy.callCount
+        .to.be 1
+
+      expect spy.getCall(0).thisValue
+        .to.be cf
+
+    it 'redirect', ->
+      spy = sinon.stub discreet, 'nextRequestRedirect'
+      message 'redirect', foo: 2
+      expect spy.getCall(0).args[0]
+        .to.eql foo: 2
+
+    it 'submit', ->
+      window.CheckoutBridge = {}
+      spy = window.CheckoutBridge.onsubmit = sinon.stub()
+      message 'submit', foo: 3
+      
+      expect spy.callCount
+        .to.be 1
+
+      spyCall = spy.getCall(0)
+      expect spyCall.thisValue
+        .to.be window.CheckoutBridge
+      
+      expect JSON.parse spyCall.args[0]
+        .to.eql foo: 3
+      delete window.CheckoutBridge
+
+    it 'dismiss', ->
+      spy = rzp.options.modal.ondismiss = sinon.stub()
+      spy2 = sinon.stub cf, 'close'
+      message 'dismiss'
+      
+      expect spy2.callCount
+        .to.be 1
+      expect spy2.getCall(0).thisValue
+        .to.be cf
+
+      spy2.restore()
+
+    it 'hidden', ->
+      spy = rzp.options.modal.onhidden = sinon.stub()
+      spy2 = sinon.stub cf, 'afterClose'
+      message 'hidden'
+
+
+      expect spy2.callCount
+        .to.be 1
+
+      expect spy2.getCall(0).thisValue
+        .to.be cf
+
+      spy2.restore()
+
+    it 'success', (done) ->
+      rzp.options.handler = (data) ->
+        expect data
+          .to.eql foo: 4
+        done()
+
+      spy = sinon.stub cf, 'close'
+      message 'complete', foo: 4
+      expect spy.callCount
+        .to.be 1
+
+      expect spy.getCall(0).thisValue
+        .to.be cf
+
+    it 'failure', ->
+      spy = sinon.stub cf, 'ondismiss'
+      spy2 = sinon.stub cf, 'onhidden'
+      message 'failure', error: ''
+      
+      expect spy2.callCount
+        .to.be 1
+
+      expect spy2.getCall(0).thisValue
+        .to.be cf
+
+      spy2.restore()
+
+    it 'fault', ->
+      spy = sinon.stub rzp, 'close'
+      message 'fault'
+
+describe 'afterClose should', ->
+  rzp = cf = null
+
+  beforeEach ->
+    rzp = Razorpay options
+    cf = new CheckoutFrame rzp
+
+  it 'hide container and unbind', ->
+    expect jQuery(frameContainer).is(':visible')
+      .to.be true
+
+    spy = sinon.stub cf, 'unbind'
+    cf.afterClose()
+    expect jQuery(frameContainer).is(':visible')
+      .to.be false
+    
+    expect spy.callCount
+      .to.be 1
+
+    spy.restore()
+
+describe 'if shouldFixFixed,', ->
+  cf = null
+
+  beforeEach ->
+    cf = new CheckoutFrame
+
+  it 'scroll, orientationchange listener should be bound', ->
+    scrollspy = sinon.stub merchantMarkup, 'scroll'
+    rotatespy = sinon.stub merchantMarkup, 'orientationchange'
+    cf.bind()
+
+    expect cf.listeners.scroll
+      .to.be undefined
+    cf.unbind()
+
+    window.shouldFixFixed = true
+    cf.bind()
+
+    expect cf.listeners.scroll
+      .to.be.ok()
+
+    cf.listeners.scroll target: window
+    cf.listeners.orientationchange target: window
+
+    expect scrollspy.called
+      .to.be true
+    expect rotatespy.called
+      .to.be true
+
+    window.shouldFixFixed = false
+    scrollspy.restore()
+    rotatespy.restore()
