@@ -132,7 +132,7 @@ var karmaOptions = {
 var allOptions;
 
 gulp.task('makeKarmaOptions', ['usemin'], function(){
-  allOptions = glob.sync(assetPath('index.html')).map(function(html){
+  allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
 
