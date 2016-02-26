@@ -118,6 +118,7 @@ function track(event, props) {
           props.medium = discreet.medium;
           props.context = discreet.context;
           props.ua = ua;
+          props.id = id;
         }
         data.properties = props;
       }

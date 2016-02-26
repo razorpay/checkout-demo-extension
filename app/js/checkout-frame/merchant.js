@@ -345,6 +345,9 @@ window.handleMessage = function(message) {
   if(!message.id){
     message.id = _uid;
   }
+  if(message.context){
+    discreet.context = message.context;
+  }
   if(message.embedded){
     // $(doc).addClass('embedded');
   }
