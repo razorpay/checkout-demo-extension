@@ -129,7 +129,7 @@ function formatRequest(request){
   var options = request.options;
 
   each(
-    ['amount', 'currency', 'callback_url', 'signature', 'description'],
+    ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
     function(i, field){
       if(!(field in rdata) && options[field]){
         rdata[field] = options[field];
@@ -166,7 +166,8 @@ function trackSubmit(rzp, data){
       'wallet',
       'emi_duration',
       'callback_url',
-      'description'
+      'description',
+      'order_id'
     ],
     function(i, key){
       if(key in data){
