@@ -246,7 +246,7 @@ describe 'discreet', ->
 
     beforeEach ->
       submitSpy = sinon.stub window, 'submitForm'
-      Razorpay.sendMessage = jQuery.noop unless 'sendMessage' in Razorpay
+      Razorpay.sendMessage = jQuery.noop unless 'sendMessage' of Razorpay
       msgSpy = sinon.stub Razorpay, 'sendMessage'
 
     afterEach ->
