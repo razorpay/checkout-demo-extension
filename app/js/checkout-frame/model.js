@@ -2,7 +2,7 @@
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 // iphone/ipad restrict non user initiated focus on input fields
-var shouldFocusNextField = false;//!/iPhone|iPad/.test(ua);
+var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
 var fontTimeout;
 
