@@ -9,15 +9,9 @@
     <style>@font-face{font-family:'lato';src:url("fonts/lato.eot?#iefix") format('embedded-opentype'),url("fonts/lato.woff2") format('woff2'),url("fonts/lato.woff") format('woff'),url("fonts/lato.ttf") format('truetype'),url("fonts/lato.svg#lato") format('svg');font-weight:normal;font-style:normal}</style>
     <link href="css/checkout.css" type="text/css" rel="stylesheet">
  </head>
+  <script src="config.js"></script>
   <body style='background: rgba(0, 0, 0, 0.7)'>
     <script>
-      Razorpay = {
-        config: {
-          protocol: 'http',
-          hostname: 'api.pronav.in',
-          version: 'v1/'
-        }
-      }
       var payment_methods = {
         "entity":"methods",
         "card":true,
