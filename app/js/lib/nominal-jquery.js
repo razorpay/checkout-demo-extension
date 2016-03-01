@@ -311,7 +311,7 @@ $.post = function(opts){
   opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
   var payload = [];
   each(opts.data, function(key, val){
-    payload.push(key + '=' + val)
+    payload.push(key + '=' + encodeURIComponent(val))
   })
   opts.data = payload.join('&');
   $.ajax(opts);
