@@ -1,7 +1,8 @@
 describe 'sanitizeContent', ->
   obj = result = null
 
-  fields = ['key1', 'key2', 'key3','key4', 'key5', 'key5', 'key6', 'key7']
+  fields = ['key1', 'key2', 'key3','key4',
+    'key5', 'key5', 'key6', 'key7']
 
   afterEach ->
     sanitizeContent obj, fields
@@ -47,7 +48,8 @@ describe 'sanitizeValue', ->
       key7: '""""'
       key8: '"<hel"lo>"'
 
-    fields = ['key1', 'key2', 'key3','key4', 'key5', 'key5', 'key6', 'key7']
+    fields = ['key1', 'key2', 'key3','key4', 'key5',
+      'key5', 'key6', 'key7']
 
     result =
       key1: 'hello'
@@ -78,6 +80,29 @@ describe 'sanitizeValue', ->
         a: 'hello'
         b:
           c: 'hello'
+
+describe 'sanitizeContact', ->
+  phone=result=expected=null
+  afterEach ->
+    result = sanitizeContact phone
+    expect result
+      .to.eql expected
+
+  it "should not take alphabets", ->
+    phone = 'absdsad'
+    expected = ''
+  it "should not take alphabets", ->
+    phone = '+absdsad'
+    expected = '+'
+  it "should not take alphanumerics", ->
+    phone = '987654321a'
+    expected = '987654321'
+  it "starts with + then plus should reflect", ->
+    phone = '+919876543210'
+    expected = '+919876543210'
+  it "should remove the hyphens and spcaes", ->
+    phone = '+91-98765 43210'
+    expected = '+919876543210'
 
 
 describe 'sanitize', ->

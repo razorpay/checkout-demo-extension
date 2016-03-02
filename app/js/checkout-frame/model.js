@@ -56,7 +56,7 @@ function sanitizeValue(obj, key){
     each(
       attr,
       function(attrKey, attrObj){
-        sanitizeValue(attrObj, attrKey);
+        sanitizeValue(obj[key], attrKey);
       }
     )
   }
@@ -74,6 +74,7 @@ function sanitizeContact(contactPrefill){
 
 // add missing keys with empty object values to message object
 function formatMessage(message){
+  console.log(message);
   each(
     ['data', 'params'],
     function(i, key){
