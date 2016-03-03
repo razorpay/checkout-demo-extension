@@ -147,10 +147,10 @@ function setTrackingProps(data, options, event){
     data.options = getInitOptions(options);
   }
   else {
-    [
-      'key',
-      'amount'
-    ]
+    data.options = {
+      key: options.key,
+      amount: options.amount
+    }
   }
 }
 
@@ -189,10 +189,6 @@ function getInitOptions(options){
 
   if(overrides.amount){
     overrides.amount = parseInt(overrides.amount, 10);
-  }
-
-  if(options.handler !== Razorpay.defaults.handler && (typeof defaultAutoPostHandler !== 'function' || options.handler !== defaultAutoPostHandler)){
-    overrides.handler = options.handler.toString();
   }
   return overrides;
 }
