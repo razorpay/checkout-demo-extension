@@ -660,10 +660,7 @@ CheckoutModal.prototype = {
   },
 
   showPowerScreen: function(state){
-    try{
-      this.rzp._request.ajax;
-    }
-    catch(e){
+    if(!this.rzp){
       return;
     }
     gel('power-title').innerHTML = state.title;
@@ -907,6 +904,8 @@ CheckoutModal.prototype = {
       this.modal.options.backdropclose = false;
     }
 
+    var rzp = this.rzp = Razorpay(this.message.options);
+
     var request = {
       data: data
     };
@@ -929,9 +928,6 @@ CheckoutModal.prototype = {
       request.error = bind(this.instanceErrorHandler, this);
       request.success = bind(this.successHandler, this);
     }
-
-    // TODO
-    var rzp = this.rzp = Razorpay(this.message.options);
 
     // onComplete defined in razorpay-submit.js, safe to expose now
     window.onComplete = bind(discreet.onComplete, rzp);
