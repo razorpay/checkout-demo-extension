@@ -879,7 +879,8 @@ CheckoutModal.prototype = {
 
     setEmiBank(data);
 
-    var options = this.message.options;
+    var message = this.message;
+    var options = message.options;
 
     if(nocvv_dummy_values){
       data['card[cvv]'] = '000';
@@ -902,7 +903,8 @@ CheckoutModal.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    var rzp = this.rzp = Razorpay(this.message.options);
+    var rzp = this.rzp = Razorpay(options);
+    rzp.id = message.id;
 
     var request = {
       data: data
