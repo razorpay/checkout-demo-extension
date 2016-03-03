@@ -99,28 +99,35 @@ function generateUID(){
 }
 
 var _uid = generateUID();
+var trackingOverrides;
 
 function track(event, props) {
   var id = this.id;
-  if(id && /^rzp_l/.test(this.options.key)){
+  var options = this.options;
+  if(id && /^rzp_l/.test(options.key)){
     setTimeout(function(){
-      var data = {
+      var payload = {
         context: {
           direct: true
         },
         anonymousId: id,
         event: event
       };
+      var data = payload.properties = {}
       if(props){
-        props = $.clone(props);
-        if(event === 'init') {
-          props = formInitProps(props);
-          props.medium = discreet.medium;
-          props.context = discreet.context;
-          props.ua = ua;
-          props.id = id;
-        }
-        data.properties = props;
+        data.extra = props;
+      }
+      if(trackingOverrides && trackingOverrides.key !== options.key){
+        trackingOverrides = null;
+      }
+      if(!trackingOverrides){
+        trackingOverrides = getInitOptions(options);
+      }
+      data.options = trackingOverrides;
+      data.medium = discreet.medium;
+      data.user_agent = ua;
+      if(discreet.context){
+        data.page_url = discreet.context;
       }
 
       var xhr = new XMLHttpRequest();
@@ -131,7 +138,7 @@ function track(event, props) {
       );
       xhr.setRequestHeader('Content-type', 'application/json');
       xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
-      xhr.send(JSON.stringify(data));
+      xhr.send(JSON.stringify(payload));
     })
   }
 }
@@ -166,7 +173,7 @@ function getOverrides(options, defaults){
   }
 }
 
-function formInitProps(overrides){
+function getInitOptions(overrides){
   overrides = getOverrides(overrides);
 
   delete overrides.method;
@@ -178,8 +185,5 @@ function formInitProps(overrides){
   if(overrides.amount){
     overrides.amount = parseInt(overrides.amount, 10);
   }
-
-  return {
-    options: overrides
-  }
+  return overrides;
 }
