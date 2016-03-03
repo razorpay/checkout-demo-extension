@@ -256,6 +256,10 @@ function setupAjax(rzp, callback){
   })
 }
 
+function createUrl(request) {
+  return discreet.makeUrl() + 'payments/create/' + request.fees ? 'fees' : 'checkout';
+}
+
 Razorpay.prototype.authorizePayment = function(request){
   var options = request.options = this.options;
   var error = formatRequest(request);
@@ -264,7 +268,7 @@ Razorpay.prototype.authorizePayment = function(request){
   }
   var rdata = request.data;
 
-  var url = discreet.makeUrl() + 'payments/create/checkout';
+  var url = createUrl(request);
   this._request = request;
   if(request.ajax){
     return setupAjax(this, request.success);
