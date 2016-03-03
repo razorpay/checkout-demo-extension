@@ -393,8 +393,7 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
 
 function trackInit(message){
   if(CheckoutBridge){
-    discreet.context = qpmap.platform || 'app';
-    track.call(message, 'init', message.options);
+    track.call(message, 'init');
   }
   else {
     track.call(message, 'open');
@@ -409,7 +408,6 @@ if(location.search){
 
 if(CheckoutBridge){
   discreet.medium = qpmap.platform || 'app';
-  discreet.context = qpmap.context || null;
 }
 
 Razorpay.sendMessage({event: 'load'});
