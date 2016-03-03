@@ -99,12 +99,11 @@ function generateUID(){
 }
 
 var _uid = generateUID();
-var trackingOverrides;
 
 function track(event, props) {
   var id = this.id;
   var options = this.options;
-  if(id && /^rzp_l/.test(options.key)){
+  if(id && /^rzp_t/.test(options.key)){
     setTimeout(function(){
       var payload = {
         context: {
@@ -113,17 +112,17 @@ function track(event, props) {
         anonymousId: id,
         event: event
       };
-      var data = payload.properties = {}
+      var data = payload.properties = {};
       if(props){
-        data.extra = props;
+        each(
+          props,
+          function(propKey, propVal){
+            data[propKey] = propVal;
+          }
+        )
       }
-      if(trackingOverrides && trackingOverrides.key !== options.key){
-        trackingOverrides = null;
-      }
-      if(!trackingOverrides){
-        trackingOverrides = getInitOptions(options);
-      }
-      data.options = trackingOverrides;
+
+      setTrackingProps(data, options, event);
       data.medium = discreet.medium;
       data.user_agent = ua;
       if(discreet.context){
@@ -143,6 +142,18 @@ function track(event, props) {
   }
 }
 
+function setTrackingProps(data, options, event){
+  if(event === 'init'){
+    data.options = getInitOptions(options);
+  }
+  else {
+    [
+      'key',
+      'amount'
+    ]
+  }
+}
+
 function getOverrides(options, defaults){
   var overrodeOnce = false;
   var overrides = {};
@@ -150,17 +161,13 @@ function getOverrides(options, defaults){
     defaults || Razorpay.defaults,
     function(key, defaultValue){
       var val = options[key];
-      var defaultType = typeof defaultValue;
       var valType = typeof val;
-
-      if(valType === defaultType){
-        if(val && valType === 'object'){
-          val = getOverrides(val, defaultValue) || defaultValue;
-        }
-        if(val !== defaultValue){
-          overrodeOnce = true;
-          overrides[key] = val;
-        }
+      if(val && valType === 'object'){
+        val = getOverrides(val, defaultValue) || defaultValue;
+      }
+      if(val !== defaultValue && valType !== 'function'){
+        overrodeOnce = true;
+        overrides[key] = val;
       }
     }
   )
@@ -173,10 +180,8 @@ function getOverrides(options, defaults){
   }
 }
 
-function getInitOptions(overrides){
-  overrides = getOverrides(overrides);
-
-  delete overrides.method;
+function getInitOptions(options){
+  var overrides = getOverrides(options);
 
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
@@ -184,6 +189,10 @@ function getInitOptions(overrides){
 
   if(overrides.amount){
     overrides.amount = parseInt(overrides.amount, 10);
+  }
+
+  if(options.handler !== Razorpay.defaults.handler && (typeof defaultAutoPostHandler !== 'function' || options.handler !== defaultAutoPostHandler)){
+    overrides.handler = options.handler.toString();
   }
   return overrides;
 }

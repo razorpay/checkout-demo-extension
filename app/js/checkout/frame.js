@@ -293,7 +293,7 @@ CheckoutFrame.prototype = {
     invoke('on' + event, this, data);
 
     if(event === 'dismiss' || event === 'fault'){
-      track.call(this.rzp, event, data);
+      track.call(this.rzp, event);
     }
   },
 

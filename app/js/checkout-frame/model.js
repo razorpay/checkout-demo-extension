@@ -799,7 +799,6 @@ CheckoutModal.prototype = {
       return;
     }
 
-    track.call(this.rzp, 'success', response);
     this.cleanupPowerRequest();
     // prevent dismiss event
     this.modal.options.onhide = noop;
@@ -849,7 +848,6 @@ CheckoutModal.prototype = {
 
     showErrorMessage(message || 'There was an error in handling your request');
     $('#fd-hide').focus();
-    track.call(this, 'error', response);
   },
 
   submit: function(e) {
