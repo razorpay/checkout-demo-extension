@@ -282,6 +282,7 @@ var platformSpecific = {
     each(bridgeMethods, function(i, prop){
       CheckoutBridge['on'+prop] = iosMethod(prop)
     })
+    CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
   }
 }
 

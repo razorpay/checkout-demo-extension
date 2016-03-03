@@ -113,7 +113,7 @@ function track(event, props) {
         anonymousId: id,
         event: event
       };
-      payload.properties = data = {}
+      var data = payload.properties = {}
       if(props){
         data.extra = props;
       }
