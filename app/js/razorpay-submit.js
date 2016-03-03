@@ -156,18 +156,13 @@ function trackSubmit(rzp, data){
   var trackingPayload = {};
   each(
     [
-      'key_id',
-      'amount',
       'email',
       'contact',
       'method',
       'card[name]',
       'bank',
       'wallet',
-      'emi_duration',
-      'callback_url',
-      'description',
-      'order_id'
+      'emi_duration'
     ],
     function(i, key){
       if(key in data){
