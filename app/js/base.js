@@ -232,7 +232,9 @@ Razorpay.prototype.configure = function(overrides){
   if(this instanceof Razorpay){
     this.id = generateUID();
     this.modal = {options: {}};
-    track.call( this, 'init' );
+    if(!discreet.isFrame){
+      track.call( this, 'init' );
+    }
 
     if(options.parent){
       this.open();

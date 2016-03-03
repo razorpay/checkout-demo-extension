@@ -170,7 +170,8 @@ function trackSubmit(rzp, data){
       }
     }
   )
-  track.call(rzp, 'submit', trackingPayload);
+  rzp._request.orig = trackingPayload;
+  track.call(rzp, 'submit', {data: trackingPayload});
 }
 
 function onPopupClose(){
@@ -211,7 +212,6 @@ discreet.onComplete = function(data){
   if(!request || !data) { return }
 
   clearRequest(this);
-
   try {
     if(typeof data !== 'object') {
       data = JSON.parse(data);
@@ -220,21 +220,24 @@ discreet.onComplete = function(data){
   catch(e) {
     return roll('unexpected api response', data);
   }
+
   if (
     typeof request.success === 'function' &&
     typeof data.razorpay_payment_id === 'string' &&
     data.razorpay_payment_id
   ) {
     var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    return setTimeout(function(){
+    setTimeout(function(){
       request.success.call(null, returnObj); // dont expose request as this
     })
+    return track.call(this, 'success', {response: returnObj, data: request.orig});
   }
 
   if(!data.error || typeof data.error !== 'object' || !data.error.description){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
   }
   invoke(request.error, null, data, 0);
+  track.call(this, 'failure', {response: data, data: request.orig});
 }
 
 function setupAjax(rzp, callback){
