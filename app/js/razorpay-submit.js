@@ -199,7 +199,7 @@ function onMessage(e){
       (!request.popup || e.source !== request.popup.window && e.source !== communicator.contentWindow) ||
       discreet.makeUrl().indexOf(e.origin)
     ){
-      return roll('message received from origin', e.origin, 'info');
+      return;
     }
     discreet.onComplete.call(this, e.data);
   }

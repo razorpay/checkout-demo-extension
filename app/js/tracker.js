@@ -103,7 +103,7 @@ var _uid = generateUID();
 function track(event, props) {
   var id = this.id;
   var options = this.options;
-  if(id && /^rzp_t/.test(options.key)){
+  if(id && /^rzp_l/.test(options.key)){
     setTimeout(function(){
       var payload = {
         context: {
