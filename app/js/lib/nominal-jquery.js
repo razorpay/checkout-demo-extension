@@ -314,7 +314,7 @@ $.post = function(opts){
     payload.push(key + '=' + encodeURIComponent(val))
   })
   opts.data = payload.join('&');
-  $.ajax(opts);
+  return $.ajax(opts);
 }
 
 $.ajax = function(opts){
@@ -342,4 +342,5 @@ $.ajax = function(opts){
     }
   }
   xhr.send(opts.data || null);
+  return xhr;
 }
