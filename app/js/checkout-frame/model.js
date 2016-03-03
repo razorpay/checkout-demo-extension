@@ -295,29 +295,6 @@ function showLoadingMessage(){
   );
 }
 
-function showPowerScreen(state){
-
-  gel('power-title').innerHTML = state.title;
-
-  var text = state.text;
-  if(text){
-    if(state.number){
-      text += ' <strong>' + gel('contact').value + '</strong>'
-    }
-    gel('power-desc').innerHTML = text;
-  }
-
-  var className = state.className;
-  if(className){
-    gel('power-var').className = state.className;
-  }
-
-  var powerwallet = $('#powerwallet');
-  if(!powerwallet.hasClass('shown')){
-    showOverlay(powerwallet);
-  }
-}
-
 function setDefaultError(){
   var msg = discreet.defaultError();
   msg.id = _uid;
@@ -492,9 +469,9 @@ CheckoutModal.prototype = {
         hideOverlayMessage();
       }
     }
-    // else if(this.nextRequest && confirm('Cancel Payment?')){
-    //   this.cleanupPowerRequest();
-    // }
+    else if(this.nextRequest && confirm('Cancel Payment?')){
+      this.cleanupPowerRequest();
+    }
   },
 
   shake: function(){
@@ -682,6 +659,34 @@ CheckoutModal.prototype = {
     }
   },
 
+  showPowerScreen: function(state){
+    try{
+      this.rzp._request.ajax;
+    }
+    catch(e){
+      return;
+    }
+    gel('power-title').innerHTML = state.title;
+
+    var text = state.text;
+    if(text){
+      if(state.number){
+        text += ' <strong>' + gel('contact').value + '</strong>'
+      }
+      gel('power-desc').innerHTML = text;
+    }
+
+    var className = state.className;
+    if(className){
+      gel('power-var').className = state.className;
+    }
+
+    var powerwallet = $('#powerwallet');
+    if(!powerwallet.hasClass('shown')){
+      showOverlay(powerwallet);
+    }
+  },
+
   ajaxCallback: function(response){
     if(response.error){
       this.powerErrorHandler(response);
@@ -702,14 +707,14 @@ CheckoutModal.prototype = {
     if(this.rzp){
       this.nextRequest = response.request;
 
-      showPowerScreen({
+      this.showPowerScreen({
         title: 'Sending OTP',
         text: 'Sending OTP to',
         number: true
       })
       invoke(
-        showPowerScreen,
-        null,
+        'showPowerScreen',
+        this,
         {
           className: 'otp',
           title: 'Enter OTP',
@@ -732,7 +737,7 @@ CheckoutModal.prototype = {
     }
     if(this.rzp){
       gel('powerotp').placeholder = 'Reenter OTP';
-      showPowerScreen({
+      this.showPowerScreen({
         className: 're otp',
         text: errorMessage,
         title: 'Error'
@@ -743,7 +748,7 @@ CheckoutModal.prototype = {
   powerErrorHandler: function(response){
     if(this.rzp){
       invoke(
-        showPowerScreen,
+        this.showPowerScreen,
         null,
         {
           className: 'error',
@@ -758,13 +763,12 @@ CheckoutModal.prototype = {
   onOtpSubmit: function(e){
     if(this.rzp){
       preventDefault(e);
-      showPowerScreen({
+      this.showPowerScreen({
         className: 'loading',
         title: 'Verifying OTP',
         text: 'Please wait...'
       })
-
-      $.post({
+      this.rzp._request.ajax = $.post({
         url: this.nextRequest.url,
         data: {
           type: 'otp',
@@ -780,6 +784,10 @@ CheckoutModal.prototype = {
   },
 
   cleanupPowerRequest: function(){
+    try{
+      this.rzp._request.ajax.abort();
+    } catch(e){}
+
     this.cleanupRequest();
     this.nextRequest = null;
     var powerotp = gel('powerotp');
@@ -908,7 +916,7 @@ CheckoutModal.prototype = {
       request.ajax = true;
       request.success = bind(this.ajaxCallback, this);
 
-      showPowerScreen({
+      this.showPowerScreen({
         className: 'loading',
         title: 'Verifying Account',
         number: true,

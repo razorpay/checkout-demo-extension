@@ -240,7 +240,7 @@ discreet.onComplete = function(data){
 function setupAjax(rzp, callback){
   var request = rzp._request;
 
-  $.post({
+  request.ajax = $.post({
     url: discreet.makeUrl() + 'payments/create/ajax',
     data: request.data,
     callback: function(response){
