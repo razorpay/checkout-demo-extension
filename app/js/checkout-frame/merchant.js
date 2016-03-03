@@ -199,6 +199,7 @@ function showModal(message) {
       window.payment_methods = response;
       showModalWithMessage(message);
     })
+    Razorpay.defaults.key = '';
     return;
   }
   else {
