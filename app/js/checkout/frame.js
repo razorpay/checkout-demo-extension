@@ -326,7 +326,20 @@ CheckoutFrame.prototype = {
   // this is onsuccess method
   oncomplete: function(data){
     this.close();
-    invoke('handler', this.rzp.options, data, 200);
+    track.call(this.rzp, 'checkout_success', data);
+    invoke(
+      function(){
+        try{
+          this.options.handler(data);
+        }
+        catch(e){
+          track.call(this, 'js_error', {message: e.message, stack: e.stack});
+        }
+      },
+      this.rzp,
+      null,
+      200
+    );
   },
 
   onfailure: function(data){
