@@ -128,6 +128,7 @@ function track(event, props) {
       if(discreet.context){
         data.page_url = discreet.context;
       }
+      data.lib = discreet.isFrame ? 'checkoutjs' : 'razorpayjs';
 
       var xhr = new XMLHttpRequest();
       xhr.open(
