@@ -140,7 +140,7 @@ function createFrameBackdrop(){
 }
 
 function createTestRibbon(){
-  var ribbon = document.createElement('a');
+  var ribbon = document.createElement('span');
   ribbon.target = '_blank';
   ribbon.href = '';
   ribbon.innerHTML = 'Test Mode';
