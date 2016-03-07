@@ -361,28 +361,14 @@ describe 'if shouldFixFixed,', ->
     cf = new CheckoutFrame
 
   it 'scroll, orientationchange listener should be bound', ->
-    scrollspy = sinon.stub merchantMarkup, 'scroll'
-    rotatespy = sinon.stub merchantMarkup, 'orientationchange'
     cf.bind()
-
-    expect cf.listeners.scroll
-      .to.be undefined
+    oldlen = cf.listeners.length
     cf.unbind()
 
     window.shouldFixFixed = true
     cf.bind()
 
-    expect cf.listeners.scroll
-      .to.be.ok()
-
-    cf.listeners.scroll target: window
-    cf.listeners.orientationchange target: window
-
-    expect scrollspy.called
-      .to.be true
-    expect rotatespy.called
+    expect cf.listeners.length > oldlen
       .to.be true
 
     window.shouldFixFixed = false
-    scrollspy.restore()
-    rotatespy.restore()
