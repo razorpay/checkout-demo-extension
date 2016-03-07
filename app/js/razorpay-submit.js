@@ -205,6 +205,10 @@ function onMessage(e){
   }
 }
 
+if(!discreet.isFrame){
+  discreet.lib = 'razorpayjs';
+}
+
 discreet.onComplete = function(data){
   // this === rzp
   var request = this._request;
