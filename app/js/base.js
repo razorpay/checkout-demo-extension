@@ -4,6 +4,7 @@ function raise(message){
 }
 
 var discreet = {
+  lib: 'checkoutjs',
   shouldAjax: function(data){
     return discreet.isFrame && data.wallet === 'mobikwik'
   },

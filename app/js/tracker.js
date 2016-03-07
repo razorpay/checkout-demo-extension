@@ -112,7 +112,9 @@ function track(event, props) {
         anonymousId: id,
         event: event
       };
-      var data = payload.properties = {};
+      var data = payload.properties = {
+        id: id
+      };
       if(props){
         each(
           props,
@@ -128,6 +130,7 @@ function track(event, props) {
       if(discreet.context){
         data.page_url = discreet.context;
       }
+      data.library = discreet.lib;
 
       var xhr = new XMLHttpRequest();
       xhr.open(

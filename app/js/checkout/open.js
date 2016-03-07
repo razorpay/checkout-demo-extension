@@ -139,8 +139,48 @@ function createFrameBackdrop(){
   return backdrop;
 }
 
+function createTestRibbon(){
+  var ribbon = document.createElement('span');
+  ribbon.target = '_blank';
+  ribbon.href = '';
+  ribbon.innerHTML = 'Test Mode';
+  var style = ribbon.style;
+  var animRule = 'opacity 0.3s ease-in';
+  var rotateRule = 'rotate(45deg)';
+  each(
+    {
+      'text-decoration': 'none',
+      'background': '#D64444',
+      'border': '1px dashed white',
+      'padding': '3px',
+      'opacity': '0',
+      '-webkit-transform': rotateRule,
+      '-moz-transform': rotateRule,
+      '-ms-transform': rotateRule,
+      '-o-transform': rotateRule,
+      'transform': rotateRule,
+      '-webkit-transition': animRule,
+      '-moz-transition': animRule,
+      'transition': animRule,
+      'font-family': 'lato,ubuntu,helvetica,sans-serif',
+      'color': 'white',
+      'position': 'absolute',
+      'width': '200px',
+      'text-align': 'center',
+      'right': '-50px',
+      'top': '50px'
+    },
+    function(ruleKey, value){
+      style[ruleKey] = value;
+    }
+  )
+  frameBackdrop.appendChild(ribbon);
+  return ribbon;
+}
+
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
+var testRibbon = createTestRibbon();
 var preloadedFrame = getPreloadedFrame();
 
 function getPreloadedFrame(){

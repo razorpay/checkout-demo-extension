@@ -282,25 +282,17 @@ var Card;
       each(
         eventListeners,
         function(event, listener){
-          eventListeners[event] = $el.on(event, listener, null, this);
+          this.listeners.push(
+            $el.on(event, listener, null, this)
+          )
         },
         this
       )
-      this.listeners.push([$el, eventListeners])
     },
 
     unbind: function(){
-      each(
-        this.listeners,
-        function(i, L){
-          each(
-            L[1],
-            function(j, listenerRef){
-              L[0].off(j, listenerRef);
-            }
-          )
-        }
-      )
+      invokeEach(this.listeners)
+      this.listeners = [];
     },
 
     formatCardNumber: function(el){

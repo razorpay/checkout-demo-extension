@@ -26,27 +26,23 @@
 
   Smarty.prototype = {
     on: function(eventName, targetClass, eventHandler, useCapture){
-      var listenerRef = this.parent.on(
-        eventName,
-        function(e){
-          if(!targetClass || e.target.className.match(targetClass)){
-            eventHandler.call(this, e);
-          }
-        },
-        useCapture,
-        this
-      );
-      this.listeners.push([eventName, listenerRef, useCapture]);
+      this.listeners.push(
+        this.parent.on(
+          eventName,
+          function(e){
+            if(!targetClass || e.target.className.match(targetClass)){
+              eventHandler.call(this, e);
+            }
+          },
+          useCapture,
+          this
+        )
+      )
     },
 
     off: function(){
-      each(
-        this.listeners,
-        function(i, listener){
-          this.parent.off(listener[0], listener[1], listener[2]);
-        },
-        this
-      )
+      invokeEach(this.listeners);
+      this.listeners = [];
     },
 
     common_events: function(){

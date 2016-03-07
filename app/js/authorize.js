@@ -112,7 +112,7 @@ function clearRequest(rzp){
     roll('error closing popup: ' + e.message, null, 'warn');
   }
 
-  $(window).off('message', rzp._request.listener);
+  invoke('listener', rzp._request);
   rzp._request = null;
   clearCookieInterval();
 }
@@ -203,6 +203,10 @@ function onMessage(e){
     }
     discreet.onComplete.call(this, e.data);
   }
+}
+
+if(!discreet.isFrame){
+  discreet.lib = 'razorpayjs';
 }
 
 discreet.onComplete = function(data){
