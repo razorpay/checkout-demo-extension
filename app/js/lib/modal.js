@@ -143,12 +143,7 @@
     },
 
     destroy: function(){
-      each(
-        this.listeners,
-        function(i, L){
-          L();
-        }
-      )
+      invokeEach(this.listeners);
       this.listeners = [];
     }
   };

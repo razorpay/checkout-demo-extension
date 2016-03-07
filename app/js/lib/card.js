@@ -291,12 +291,7 @@ var Card;
     },
 
     unbind: function(){
-      each(
-        this.listeners,
-        function(i, L){
-          L();
-        }
-      )
+      invokeEach(this.listeners)
       this.listeners = [];
     },
 

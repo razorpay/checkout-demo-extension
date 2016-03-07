@@ -99,12 +99,7 @@ Popup.prototype = {
 
   close: function () {
     clearInterval(this.interval);
-    each(
-      this.listeners,
-      function(i, listener){
-        listener();
-      }
-    )
+    invokeEach(this.listeners);
     this.listeners = [];
 
     try{

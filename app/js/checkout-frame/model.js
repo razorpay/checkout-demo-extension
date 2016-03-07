@@ -948,12 +948,7 @@ CheckoutModal.prototype = {
       }
       this.isOpen = false;
       clearTimeout(fontTimeout);
-      each(
-        this.listeners,
-        function(i, listener){
-          listener();
-        }
-      )
+      invokeEach(this.listeners);
       this.listeners = [];
       this.modal.destroy();
       this.smarty.off();

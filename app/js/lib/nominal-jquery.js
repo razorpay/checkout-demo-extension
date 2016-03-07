@@ -36,6 +36,16 @@ function each( iteratee, eachFunc, thisArg ) {
   }
 }
 
+function invokeEach(iteratee, thisArg){
+  each(
+    iteratee,
+    function(key, func){
+      func.call(thisArg);
+    },
+    thisArg
+  )
+}
+
 function map( iteratee, mapFunc ) {
   var result = iteratee instanceof Array ? [] : {};
   each(iteratee, function(i, val){

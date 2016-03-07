@@ -233,12 +233,7 @@ CheckoutFrame.prototype = {
   },
 
   unbind: function(){
-    each(
-      this.listeners,
-      function(i, listener){
-        listener();
-      }
-    )
+    invokeEach(this.listeners);
     this.listeners = null;
   },
 
