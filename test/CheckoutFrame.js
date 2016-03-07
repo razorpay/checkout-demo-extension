@@ -296,22 +296,13 @@ describe('if shouldFixFixed,', function(){
   })
 
   it('scroll, orientationchange listener should be bound', function(){
-    var spy = jasmine.createSpy('scroll');
-    var spy2 = jasmine.createSpy('orientationchange');
-    merchantMarkup.scroll = spy;
-    merchantMarkup.orientationchange = spy2;
-
     cf.bind();
-    expect(cf.listeners.scroll).not.toBeDefined();
+    oldlen = cf.listeners.length;
     cf.unbind();
 
     shouldFixFixed = true;
     cf.bind();
-    expect(cf.listeners.scroll).toBeDefined();
-    cf.listeners.scroll({target: window});
-    cf.listeners.orientationchange({target: window});
-    expect(spy).toHaveBeenCalled();
-    expect(spy2).toHaveBeenCalled();
+    expect(cf.listeners.length > oldlen)
 
     shouldFixFixed = false;
   })
