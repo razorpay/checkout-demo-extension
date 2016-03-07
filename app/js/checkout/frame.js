@@ -212,7 +212,7 @@ CheckoutFrame.prototype = {
 
   bind: function(){
     if(!this.listeners){
-      this.listeners = {};
+      this.listeners = [];
       var eventPairs = { message: this.onmessage };
 
       if(shouldFixFixed){
@@ -223,7 +223,9 @@ CheckoutFrame.prototype = {
       each(
         eventPairs,
         function(event, listener){
-          this.listeners[event] = $(window).on(event, listener, null, this);
+          this.listeners.push(
+            $(window).on(event, listener, null, this)
+          )
         },
         this
       )
@@ -233,8 +235,8 @@ CheckoutFrame.prototype = {
   unbind: function(){
     each(
       this.listeners,
-      function(event, listener){
-        $(window).off(event, listener);
+      function(i, listener){
+        listener();
       }
     )
     this.listeners = null;

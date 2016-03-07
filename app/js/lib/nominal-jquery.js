@@ -137,9 +137,12 @@ $.prototype = {
         }
       }
     )
-    return function(){
-      this.off(event, ref, capture);
-    };
+    return bind(
+      function(){
+        this.off(event, ref, capture);
+      },
+      this
+    )
   },
 
   off: function(event, callback, capture){

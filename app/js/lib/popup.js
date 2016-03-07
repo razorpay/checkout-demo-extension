@@ -83,7 +83,9 @@ var Popup = function(src, name) {
 Popup.prototype = {
 
   on: function(event, func){
-    this.listeners.push([event, $(window).on(event, func, false, this)]);
+    this.listeners.push(
+      $(window).on(event, func, false, this)
+    );
   },
 
   beforeunload: function(e){
@@ -99,10 +101,9 @@ Popup.prototype = {
     clearInterval(this.interval);
     each(
       this.listeners,
-      function(i, listenerArray){
-        $(window).off(listenerArray[0], listenerArray[1], false, this);
-      },
-      this
+      function(i, listener){
+        listener();
+      }
     )
     this.listeners = [];
 

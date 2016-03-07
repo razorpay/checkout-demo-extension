@@ -32,11 +32,7 @@ emiView.prototype = {
 
   on: function(event, sel, listener){
     var $el = $(sel);
-    this.listeners.push([
-      $el,
-      event,
-      $el.on(event, listener)
-    ])
+    this.listeners.push($el.on(event, listener));
   },
 
   bind: function(){
@@ -49,8 +45,8 @@ emiView.prototype = {
   unbind: function(){
     each(
       this.listeners,
-      function(i, listenerMap){
-        listenerMap[0].off(listenerMap[1], listenerMap[2]);
+      function(i, listener){
+        listener();
       }
     )
     this.listeners = [];

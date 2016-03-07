@@ -100,9 +100,9 @@
     },
 
     on: function(event, target, callback){
-      var $target = $(target)
-      var attachedListener = $target.on(event, callback, false, this);
-      this.listeners.push([$target, event, attachedListener]);
+      this.listeners.push(
+        $(target).on(event, callback, false, this)
+      );
     },
 
     steal_focus: function(e) {
@@ -146,9 +146,10 @@
       each(
         this.listeners,
         function(i, L){
-          L[0].off( L[1], L[2] );
+          L();
         }
       )
+      this.listeners = [];
     }
   };
 })();

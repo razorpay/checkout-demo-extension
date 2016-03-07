@@ -488,9 +488,9 @@ CheckoutModal.prototype = {
     each(
       elements,
       function(i, element){
-        var $el = $(element);
-        listener = $el.on(event, listener, useCapture, this)
-        this.listeners.push([$el, event, listener, useCapture]);
+        this.listeners.push(
+          $(element).on(event, listener, useCapture, this)
+        );
       },
       this
     )
@@ -951,7 +951,7 @@ CheckoutModal.prototype = {
       each(
         this.listeners,
         function(i, listener){
-          listener[0].off(listener[1], listener[2], listener[3]);
+          listener();
         }
       )
       this.listeners = [];
