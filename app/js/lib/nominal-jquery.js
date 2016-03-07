@@ -137,7 +137,9 @@ $.prototype = {
         }
       }
     )
-    return ref;
+    return function(){
+      this.off(event, ref, capture);
+    };
   },
 
   off: function(event, callback, capture){

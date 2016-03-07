@@ -112,7 +112,7 @@ function clearRequest(rzp){
     roll('error closing popup: ' + e.message, null, 'warn');
   }
 
-  $(window).off('message', rzp._request.listener);
+  rzp._request.listener();
   rzp._request = null;
   clearCookieInterval();
 }
