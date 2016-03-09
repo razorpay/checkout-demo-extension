@@ -257,7 +257,7 @@ function setupAjax(rzp, callback){
 }
 
 function createUrl(request) {
-  return discreet.makeUrl() + 'payments/create/' + request.fees ? 'fees' : 'checkout';
+  return discreet.makeUrl() + 'payments/create/' + (request.fees ? 'fees' : 'checkout');
 }
 
 Razorpay.prototype.authorizePayment = function(request){
@@ -366,7 +366,7 @@ Razorpay.payment = {
 
   getPrefs: function(callback){
     return $.jsonp({
-      url: discreet.makeUrl() + 'methods',
+      url: discreet.makeUrl() + 'preferences',
       data: {key_id: Razorpay.defaults.key},
       timeout: 30000,
       success: function(response){
@@ -376,7 +376,7 @@ Razorpay.payment = {
   },
 
   getMethods: function(callback){
-    Razorpay.payment.getPrefs(function(response){
+    return Razorpay.payment.getPrefs(function(response){
       callback(response.methods);
     })
   }

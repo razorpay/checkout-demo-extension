@@ -745,8 +745,8 @@ CheckoutModal.prototype = {
   powerErrorHandler: function(response){
     if(this.rzp){
       invoke(
-        this.showPowerScreen,
-        null,
+        'showPowerScreen',
+        this,
         {
           className: 'error',
           text: response.error.description,
@@ -938,7 +938,7 @@ CheckoutModal.prototype = {
     }
 
     if(window.fee_bearer){
-      request.fee_bearer = true;
+      request.fees = true;
     }
     rzp.authorizePayment(request);
   },
