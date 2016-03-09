@@ -364,7 +364,7 @@ Razorpay.payment = {
     return err(errors);
   },
 
-  getMethods: function(callback){
+  getPrefs: function(callback){
     return $.jsonp({
       url: discreet.makeUrl() + 'methods',
       data: {key_id: Razorpay.defaults.key},
@@ -373,5 +373,11 @@ Razorpay.payment = {
         invoke(callback, null, response);
       }
     });
+  },
+
+  getMethods: function(callback){
+    Razorpay.payment.getPrefs(function(response){
+      callback(response.methods);
+    })
   }
 };

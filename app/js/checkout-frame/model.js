@@ -937,6 +937,9 @@ CheckoutModal.prototype = {
       rzp._request.payment_id = payment_id;
     }
 
+    if(window.fee_bearer){
+      request.fee_bearer = true;
+    }
     rzp.authorizePayment(request);
   },
 

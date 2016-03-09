@@ -196,7 +196,8 @@ function showModal(message) {
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
-      window.payment_methods = response;
+      window.payment_methods = response.methods;
+      window.fee_bearer = response.fee_bearer;
       showModalWithMessage(message);
     })
     Razorpay.defaults.key = '';
