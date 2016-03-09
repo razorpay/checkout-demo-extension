@@ -115,6 +115,9 @@ function track(event, props) {
       var data = payload.properties = {
         id: id
       };
+      if(props && event === 'js_error'){
+        props = {message: props.message, stack: props.stack}
+      }
       if(props){
         each(
           props,

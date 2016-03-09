@@ -79,6 +79,10 @@ Razorpay.defaults = {
     'animation': true,
     'backdropclose': false
   },
+  external: {
+    wallets: [],
+    handler: noop
+  },
   'theme': {
     'color': '#00BCD4',
     'backdrop_color': 'rgba(0,0,0,0.6)',

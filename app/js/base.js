@@ -86,6 +86,11 @@ function base_set(baseval, override) {
     if( !override || typeof override !== 'object' ){
       override = {};
     }
+
+    if(baseval instanceof Array && override instanceof Array){
+      return override;
+    }
+
     return map(
       baseval,
       function(val, i){

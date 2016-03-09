@@ -59,6 +59,10 @@ var freqWallets = {
   payzapp: {
     h: '24',
     col: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAAAlCAMAAACtfZ09AAAAY1BMVEXuQEGBmb/+7+9BZZ/AzN/839/2n6DrICLpEBLxYGH7z9DsMDHvUFH4r7Dv8vf1j5Df5e/ycHHQ2edhf68iTI+gss8SP4dxjLcxWZewv9eQpcdRcqf5v8DzgIEDM3/oAQP///+4CVglAAAAIXRSTlP//////////////////////////////////////////wCfwdAhAAADRUlEQVR4Ab2Ue3PiOBDEZflh/DAG8whhpXV//095jKYlqyp1x20C239ESE755+6ZkcELZacaz/QyYN907Trg7wCdN7tV5N4PrJvjsEYZvBfo5rFdc9XvA9rJmzWJ6vAeYD93ubGknX0LsJ49RaUSelDv7VK7I6+1/x8YP3JGTKcHDoXqfoDoIr8vqGQBsJd1AeBXqgEmcdxwUlSNBVBzM9cKtCvVu5WyQPE7SgCH8KvU0wNweiznPVBHgwPNcjbGVNkGaNaoYwAmTPrcFsCv30kL8EFgJUul/E8A3Uo5miWwzXvpuCY5w1Q0jEYWNvh5AxbYXwncK/AUNkCdZp4GCbRrxkglE448NtsdwXfM4JuXjwCUJK+3wBDyfWGwm8Fag2v5qhAaplGB8nfqjwm4k2yTJikm8CnvBBCAYvBUBmAp+/AnL0anKY5GOAxt4HPn2BUR2AsfKEUXSOA7aM/cwJrdpZAC1POSHQOT6qQGpwiUtWO32FmsM/7G6GnNNrwwYHXyger2WK44C1xO6Jwdkwx6NdgiAqWcDZwsJnTsiHoIdAPUzjngEvvxsauhtaIKeXYhcNGzMp/f1ircE6hmKJc6Vv8DlPY9opaNdxKD1z2B0MMDsvFqGGJNIJ/wWdaxI2BgtStLfrcEDjFMnS/4DNQILIPpfNYGpjsiAtPgDS4LvvUQ4KRTy4GTwAcaLquqWog4FcWZwNgxyYajwdH7VsrEnmFttGMfmx4iE/bY1GqPx8YHG5XihXDKb23zpWjgIlL6EWn3Zey1JLERyY7a64Vwz29tsdHlQLh4jNSxGZDunbXy1+vYV/p28Nq+FoVGWnEwM4NdNOgfagOQgyfis34D9rLnfKp2AO5SKASdGCHKQLoz2WOaeRocY3xu2yKWGkkmYoYUy0jKLxrU8YxAXtupaB50O23AgecAv8xkwIjpUpd7dkaRDN6wAW/hBkKXzTw8IyTQfukZnwF7p6rhKAugekhLuDx+HdKvPaqw7/OZR5+avk/NgCh9eZLBt2RSon+i6dtAt/6ZBuN9GvwfGXwmM/omBfp94PQUtDOdn5wF9VNg+1/hHRke9Qpg8y/hzSm81wJt+zy8lwL98/BeCxwZ3vf0D5XUzxaJRoO1AAAAAElFTkSuQmCC'
+  },
+  payumoney: {
+    h: '20',
+    col: '/wallet/payumoney.png'
   }
 }
 
@@ -132,7 +136,8 @@ function notifyBridge(message){
   }
 }
 
-function setPaymentMethods(payment_methods, methodOptions){
+function setPaymentMethods(payment_methods, options){
+  methodOptions = options.method;
 
   if( !payment_methods.error ) {
     each(
@@ -148,7 +153,19 @@ function setPaymentMethods(payment_methods, methodOptions){
       }
     )
     var wallets = false;
-    if( methodOptions.wallet ) {
+    if(methodOptions.wallet){
+      var externalWallets = options.external.wallets;
+      if(externalWallets.length){
+        each(
+          externalWallets,
+          function(i, externalWallet){
+            if(externalWallet in freqWallets){
+              payment_methods.wallet[externalWallet] = true;
+              freqWallets[externalWallet].custom = true;
+            }
+          }
+        )
+      }
       each(
         payment_methods.wallet,
         function(wallet, enabled){
@@ -175,7 +192,6 @@ function setPaymentMethods(payment_methods, methodOptions){
   if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
     methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
   }
-  // methodOptions.emi = true;
 }
 
 function showModal(message) {
@@ -209,7 +225,9 @@ function showModal(message) {
 
 function showModalWithMessage(message){
   var session = getSession();
-  setPaymentMethods(window.payment_methods, message.options.method);
+
+  // rewrites message.options.method
+  setPaymentMethods(window.payment_methods, message.options);
   session.render(message);
   session.modal.show();
   trackInit(message);

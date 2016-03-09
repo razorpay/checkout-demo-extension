@@ -898,6 +898,9 @@ CheckoutModal.prototype = {
       event: 'submit',
       data: data
     });
+    if(data.method === 'wallet' && freqWallets[data.wallet].custom){
+      return;
+    }
 
     if(this.modal){
       this.modal.options.backdropclose = false;
