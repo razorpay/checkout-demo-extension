@@ -4,6 +4,7 @@ function raise(message){
 }
 
 var discreet = {
+  lib: 'checkoutjs',
   shouldAjax: function(data){
     return discreet.isFrame && data.wallet === 'mobikwik'
   },
@@ -232,7 +233,9 @@ Razorpay.prototype.configure = function(overrides){
   if(this instanceof Razorpay){
     this.id = generateUID();
     this.modal = {options: {}};
-    track.call( this, 'init', overrides );
+    if(!discreet.isFrame){
+      track.call( this, 'init' );
+    }
 
     if(options.parent){
       this.open();

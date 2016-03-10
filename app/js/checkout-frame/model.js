@@ -2,7 +2,7 @@
 var shouldShakeOnError = !/Android|iPhone/.test(ua);
 
 // iphone/ipad restrict non user initiated focus on input fields
-var shouldFocusNextField = false;//!/iPhone|iPad/.test(ua);
+var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
 var fontTimeout;
 
@@ -296,29 +296,6 @@ function showLoadingMessage(){
   );
 }
 
-function showPowerScreen(state){
-
-  gel('power-title').innerHTML = state.title;
-
-  var text = state.text;
-  if(text){
-    if(state.number){
-      text += ' <strong>' + gel('contact').value + '</strong>'
-    }
-    gel('power-desc').innerHTML = text;
-  }
-
-  var className = state.className;
-  if(className){
-    gel('power-var').className = state.className;
-  }
-
-  var powerwallet = $('#powerwallet');
-  if(!powerwallet.hasClass('shown')){
-    showOverlay(powerwallet);
-  }
-}
-
 function setDefaultError(){
   var msg = discreet.defaultError();
   msg.id = _uid;
@@ -493,9 +470,9 @@ CheckoutModal.prototype = {
         hideOverlayMessage();
       }
     }
-    // else if(this.nextRequest && confirm('Cancel Payment?')){
-    //   this.cleanupPowerRequest();
-    // }
+    else if(this.nextRequest && confirm('Cancel Payment?')){
+      this.cleanupPowerRequest();
+    }
   },
 
   shake: function(){
@@ -512,9 +489,9 @@ CheckoutModal.prototype = {
     each(
       elements,
       function(i, element){
-        var $el = $(element);
-        listener = $el.on(event, listener, useCapture, this)
-        this.listeners.push([$el, event, listener, useCapture]);
+        this.listeners.push(
+          $(element).on(event, listener, useCapture, this)
+        );
       },
       this
     )
@@ -683,6 +660,31 @@ CheckoutModal.prototype = {
     }
   },
 
+  showPowerScreen: function(state){
+    if(!this.rzp){
+      return;
+    }
+    gel('power-title').innerHTML = state.title;
+
+    var text = state.text;
+    if(text){
+      if(state.number){
+        text += ' <strong>' + gel('contact').value + '</strong>'
+      }
+      gel('power-desc').innerHTML = text;
+    }
+
+    var className = state.className;
+    if(className){
+      gel('power-var').className = state.className;
+    }
+
+    var powerwallet = $('#powerwallet');
+    if(!powerwallet.hasClass('shown')){
+      showOverlay(powerwallet);
+    }
+  },
+
   ajaxCallback: function(response){
     if(response.error){
       this.powerErrorHandler(response);
@@ -703,14 +705,14 @@ CheckoutModal.prototype = {
     if(this.rzp){
       this.nextRequest = response.request;
 
-      showPowerScreen({
+      this.showPowerScreen({
         title: 'Sending OTP',
         text: 'Sending OTP to',
         number: true
       })
       invoke(
-        showPowerScreen,
-        null,
+        'showPowerScreen',
+        this,
         {
           className: 'otp',
           title: 'Enter OTP',
@@ -733,7 +735,7 @@ CheckoutModal.prototype = {
     }
     if(this.rzp){
       gel('powerotp').placeholder = 'Reenter OTP';
-      showPowerScreen({
+      this.showPowerScreen({
         className: 're otp',
         text: errorMessage,
         title: 'Error'
@@ -744,7 +746,7 @@ CheckoutModal.prototype = {
   powerErrorHandler: function(response){
     if(this.rzp){
       invoke(
-        showPowerScreen,
+        this.showPowerScreen,
         null,
         {
           className: 'error',
@@ -759,13 +761,12 @@ CheckoutModal.prototype = {
   onOtpSubmit: function(e){
     if(this.rzp){
       preventDefault(e);
-      showPowerScreen({
+      this.showPowerScreen({
         className: 'loading',
         title: 'Verifying OTP',
         text: 'Please wait...'
       })
-
-      $.post({
+      this.rzp._request.ajax = $.post({
         url: this.nextRequest.url,
         data: {
           type: 'otp',
@@ -781,6 +782,10 @@ CheckoutModal.prototype = {
   },
 
   cleanupPowerRequest: function(){
+    try{
+      this.rzp._request.ajax.abort();
+    } catch(e){}
+
     this.cleanupRequest();
     this.nextRequest = null;
     var powerotp = gel('powerotp');
@@ -795,7 +800,6 @@ CheckoutModal.prototype = {
       return;
     }
 
-    track.call(this.rzp, 'success', response);
     this.cleanupPowerRequest();
     // prevent dismiss event
     this.modal.options.onhide = noop;
@@ -845,7 +849,6 @@ CheckoutModal.prototype = {
 
     showErrorMessage(message || 'There was an error in handling your request');
     $('#fd-hide').focus();
-    track.call(this, 'error', response);
   },
 
   submit: function(e) {
@@ -877,7 +880,8 @@ CheckoutModal.prototype = {
 
     setEmiBank(data);
 
-    var options = this.message.options;
+    var message = this.message;
+    var options = message.options;
 
     if(nocvv_dummy_values){
       data['card[cvv]'] = '000';
@@ -900,6 +904,9 @@ CheckoutModal.prototype = {
       this.modal.options.backdropclose = false;
     }
 
+    var rzp = this.rzp = Razorpay(options);
+    rzp.id = message.id;
+
     var request = {
       data: data
     };
@@ -909,7 +916,7 @@ CheckoutModal.prototype = {
       request.ajax = true;
       request.success = bind(this.ajaxCallback, this);
 
-      showPowerScreen({
+      this.showPowerScreen({
         className: 'loading',
         title: 'Verifying Account',
         number: true,
@@ -922,9 +929,6 @@ CheckoutModal.prototype = {
       request.error = bind(this.instanceErrorHandler, this);
       request.success = bind(this.successHandler, this);
     }
-
-    // TODO
-    var rzp = this.rzp = Razorpay(this.message.options);
 
     // onComplete defined in razorpay-submit.js, safe to expose now
     window.onComplete = bind(discreet.onComplete, rzp);
@@ -945,12 +949,7 @@ CheckoutModal.prototype = {
       }
       this.isOpen = false;
       clearTimeout(fontTimeout);
-      each(
-        this.listeners,
-        function(i, listener){
-          listener[0].off(listener[1], listener[2], listener[3]);
-        }
-      )
+      invokeEach(this.listeners);
       this.listeners = [];
       this.modal.destroy();
       this.smarty.off();

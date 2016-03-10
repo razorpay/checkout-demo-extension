@@ -112,7 +112,7 @@ function clearRequest(rzp){
     roll('error closing popup: ' + e.message, null, 'warn');
   }
 
-  $(window).off('message', rzp._request.listener);
+  invoke('listener', rzp._request);
   rzp._request = null;
   clearCookieInterval();
 }
@@ -156,18 +156,13 @@ function trackSubmit(rzp, data){
   var trackingPayload = {};
   each(
     [
-      'key_id',
-      'amount',
       'email',
       'contact',
       'method',
       'card[name]',
       'bank',
       'wallet',
-      'emi_duration',
-      'callback_url',
-      'description',
-      'order_id'
+      'emi_duration'
     ],
     function(i, key){
       if(key in data){
@@ -175,7 +170,8 @@ function trackSubmit(rzp, data){
       }
     }
   )
-  track.call(rzp, 'submit', trackingPayload);
+  rzp._request.orig = trackingPayload;
+  track.call(rzp, 'submit', {data: trackingPayload});
 }
 
 function onPopupClose(){
@@ -203,10 +199,14 @@ function onMessage(e){
       (!request.popup || e.source !== request.popup.window && e.source !== communicator.contentWindow) ||
       discreet.makeUrl().indexOf(e.origin)
     ){
-      return roll('message received from origin', e.origin, 'info');
+      return;
     }
     discreet.onComplete.call(this, e.data);
   }
+}
+
+if(!discreet.isFrame){
+  discreet.lib = 'razorpayjs';
 }
 
 discreet.onComplete = function(data){
@@ -216,7 +216,6 @@ discreet.onComplete = function(data){
   if(!request || !data) { return }
 
   clearRequest(this);
-
   try {
     if(typeof data !== 'object') {
       data = JSON.parse(data);
@@ -225,27 +224,30 @@ discreet.onComplete = function(data){
   catch(e) {
     return roll('unexpected api response', data);
   }
+
   if (
     typeof request.success === 'function' &&
     typeof data.razorpay_payment_id === 'string' &&
     data.razorpay_payment_id
   ) {
     var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    return setTimeout(function(){
+    setTimeout(function(){
       request.success.call(null, returnObj); // dont expose request as this
     })
+    return track.call(this, 'success', {response: returnObj, data: request.orig});
   }
 
   if(!data.error || typeof data.error !== 'object' || !data.error.description){
     data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
   }
   invoke(request.error, null, data, 0);
+  track.call(this, 'failure', {response: data, data: request.orig});
 }
 
 function setupAjax(rzp, callback){
   var request = rzp._request;
 
-  $.post({
+  request.ajax = $.post({
     url: discreet.makeUrl() + 'payments/create/ajax',
     data: request.data,
     callback: function(response){

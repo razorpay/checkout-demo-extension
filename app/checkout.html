@@ -33,7 +33,7 @@
   <script src="js/base.js"></script>
   <script src="js/lib/popup.js"></script>
   <script src="js/lib/jsonp.js"></script>
-  <script src="js/razorpay-submit.js"></script>
+  <script src="js/authorize.js"></script><!--coverage-->
 
   <!-- This is the iframe specific part -->
   <script src="templates/theme.js"></script>
@@ -49,11 +49,11 @@
   <!-- endbuild -->
   <!-- test scripts
   <script src="../test/base.coffee"></script>
-  <script src="../test/merchant.coffee"></script>
   <script src="../test/checkout-model.coffee"></script>
+  <script src="../test/in-iframe.coffee"></script>
   -->
 
 </html>
 <script>
-// handleMessage({options: {key: 'rzp_test_1DP5mmOlF5G5ag', amount: '30000', prefill: {email: 'pra@nav.gupta', contact: '8879524924'}}});
+handleMessage({options: {key: 'rzp_test_1DP5mmOlF5G5ag', amount: '30000', prefill: {email: 'pra@nav.gupta', contact: '8879524924'}}});
 </script>

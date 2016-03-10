@@ -102,26 +102,35 @@ var _uid = generateUID();
 
 function track(event, props) {
   var id = this.id;
-  if(id && /^rzp_l/.test(this.options.key)){
+  var options = this.options;
+  if(id && /^rzp_l/.test(options.key)){
     setTimeout(function(){
-      var data = {
+      var payload = {
         context: {
           direct: true
         },
         anonymousId: id,
         event: event
       };
+      var data = payload.properties = {
+        id: id
+      };
       if(props){
-        props = $.clone(props);
-        if(event === 'init') {
-          props = formInitProps(props);
-          props.medium = discreet.medium;
-          props.context = discreet.context;
-          props.ua = ua;
-          props.id = id;
-        }
-        data.properties = props;
+        each(
+          props,
+          function(propKey, propVal){
+            data[propKey] = propVal;
+          }
+        )
       }
+
+      setTrackingProps(data, options, event);
+      data.medium = discreet.medium;
+      data.user_agent = ua;
+      if(discreet.context){
+        data.page_url = discreet.context;
+      }
+      data.library = discreet.lib;
 
       var xhr = new XMLHttpRequest();
       xhr.open(
@@ -131,8 +140,20 @@ function track(event, props) {
       );
       xhr.setRequestHeader('Content-type', 'application/json');
       xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
-      xhr.send(JSON.stringify(data));
+      xhr.send(JSON.stringify(payload));
     })
+  }
+}
+
+function setTrackingProps(data, options, event){
+  if(event === 'init'){
+    data.options = getInitOptions(options);
+  }
+  else {
+    data.options = {
+      key: options.key,
+      amount: options.amount
+    }
   }
 }
 
@@ -143,17 +164,13 @@ function getOverrides(options, defaults){
     defaults || Razorpay.defaults,
     function(key, defaultValue){
       var val = options[key];
-      var defaultType = typeof defaultValue;
       var valType = typeof val;
-
-      if(valType === defaultType){
-        if(val && valType === 'object'){
-          val = getOverrides(val, defaultValue) || defaultValue;
-        }
-        if(val !== defaultValue){
-          overrodeOnce = true;
-          overrides[key] = val;
-        }
+      if(val && valType === 'object'){
+        val = getOverrides(val, defaultValue) || defaultValue;
+      }
+      if(val !== defaultValue && valType !== 'function'){
+        overrodeOnce = true;
+        overrides[key] = val;
       }
     }
   )
@@ -166,10 +183,8 @@ function getOverrides(options, defaults){
   }
 }
 
-function formInitProps(overrides){
-  overrides = getOverrides(overrides);
-
-  delete overrides.method;
+function getInitOptions(options){
+  var overrides = getOverrides(options);
 
   if(discreet.isBase64Image(overrides.image)){
     overrides.image = 'base64';
@@ -178,8 +193,5 @@ function formInitProps(overrides){
   if(overrides.amount){
     overrides.amount = parseInt(overrides.amount, 10);
   }
-
-  return {
-    options: overrides
-  }
+  return overrides;
 }

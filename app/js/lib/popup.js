@@ -73,16 +73,24 @@ var Popup = function(src, name) {
   }
 
   this.window.focus();
-
+  this.listeners = [];
   this.interval = setInterval(_popCheckClose(this), 300);
 
-  $(window).on('unload', this.close, false, this);
+  this.on('beforeunload', this.beforeunload);
+  this.on('unload', this.close);
 }
 
 Popup.prototype = {
 
-  unload: function(){
-    this.close();
+  on: function(event, func){
+    this.listeners.push(
+      $(window).on(event, func, false, this)
+    );
+  },
+
+  beforeunload: function(e){
+    e.returnValue = 'Your payment is incomplete.';
+    return e.returnValue;
   },
 
 /**
@@ -91,8 +99,8 @@ Popup.prototype = {
 
   close: function () {
     clearInterval(this.interval);
-    $(window).off('unload', this.unload);
-    $(window).off('beforeunload', this.beforeunload);
+    invokeEach(this.listeners);
+    this.listeners = [];
 
     try{
       this.window.close();

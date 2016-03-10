@@ -129,6 +129,14 @@ function setBackdropColor(value){
   catch(e){}
 }
 
+function setTestRibbonVisible(){
+  testRibbon.style.opacity = 1.0;
+}
+
+function setTestRibbonInvisible(){
+  testRibbon.style.opacity = 0.0;
+}
+
 function CheckoutFrame(rzp){
   if(rzp){
     this.getEl(rzp.options);
@@ -159,7 +167,8 @@ CheckoutFrame.prototype = {
   openRzp: function(rzp){
     var el = this.el;
     this.bind();
-    var parent = rzp.options.parent;
+    var options = rzp.options;
+    var parent = options.parent;
     var $parent = $(parent || frameContainer);
     var message;
 
@@ -186,20 +195,24 @@ CheckoutFrame.prototype = {
     }
     else {
       $parent.css('display', 'block').reflow();
-      setBackdropColor(rzp.options.theme.backdrop_color);
+      setBackdropColor(options.theme.backdrop_color);
+      if(/^rzp_t/.test(options.key)){
+        setTestRibbonVisible();
+      }
       this.setMetaAndOverflow();
     }
   },
 
   close: function(){
     setBackdropColor('');
+    setTestRibbonInvisible();
     restoreMeta(this.$meta);
     restoreOverflow();
   },
 
   bind: function(){
     if(!this.listeners){
-      this.listeners = {};
+      this.listeners = [];
       var eventPairs = { message: this.onmessage };
 
       if(shouldFixFixed){
@@ -210,7 +223,9 @@ CheckoutFrame.prototype = {
       each(
         eventPairs,
         function(event, listener){
-          this.listeners[event] = $(window).on(event, listener, null, this);
+          this.listeners.push(
+            $(window).on(event, listener, null, this)
+          )
         },
         this
       )
@@ -218,12 +233,7 @@ CheckoutFrame.prototype = {
   },
 
   unbind: function(){
-    each(
-      this.listeners,
-      function(event, listener){
-        $(window).off(event, listener);
-      }
-    )
+    invokeEach(this.listeners);
     this.listeners = null;
   },
 
@@ -293,7 +303,7 @@ CheckoutFrame.prototype = {
     invoke('on' + event, this, data);
 
     if(event === 'dismiss' || event === 'fault'){
-      track.call(this.rzp, event, data);
+      track.call(this.rzp, event);
     }
   },
 
@@ -326,7 +336,20 @@ CheckoutFrame.prototype = {
   // this is onsuccess method
   oncomplete: function(data){
     this.close();
-    invoke('handler', this.rzp.options, data, 200);
+    track.call(this.rzp, 'checkout_success', data);
+    invoke(
+      function(){
+        try{
+          this.options.handler(data);
+        }
+        catch(e){
+          track.call(this, 'js_error', {message: e.message, stack: e.stack});
+        }
+      },
+      this.rzp,
+      null,
+      200
+    );
   },
 
   onfailure: function(data){
