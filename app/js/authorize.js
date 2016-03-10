@@ -256,6 +256,10 @@ function setupAjax(rzp, callback){
   })
 }
 
+function createUrl(request) {
+  return discreet.makeUrl() + 'payments/create/' + (request.fees ? 'fees' : 'checkout');
+}
+
 Razorpay.prototype.authorizePayment = function(request){
   var options = request.options = this.options;
   var error = formatRequest(request);
@@ -264,7 +268,7 @@ Razorpay.prototype.authorizePayment = function(request){
   }
   var rdata = request.data;
 
-  var url = discreet.makeUrl() + 'payments/create/checkout';
+  var url = createUrl(request);
   this._request = request;
   if(request.ajax){
     return setupAjax(this, request.success);
@@ -360,14 +364,20 @@ Razorpay.payment = {
     return err(errors);
   },
 
-  getMethods: function(callback){
+  getPrefs: function(callback){
     return $.jsonp({
-      url: discreet.makeUrl() + 'methods',
+      url: discreet.makeUrl() + 'preferences',
       data: {key_id: Razorpay.defaults.key},
       timeout: 30000,
       success: function(response){
         invoke(callback, null, response);
       }
     });
+  },
+
+  getMethods: function(callback){
+    return Razorpay.payment.getPrefs(function(response){
+      callback(response.methods);
+    })
   }
 };

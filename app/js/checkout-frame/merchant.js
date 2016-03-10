@@ -192,11 +192,12 @@ function showModal(message) {
   if(!window.payment_methods){
     // TODO remove this
     Razorpay.defaults.key = message.options.key;
-    Razorpay.payment.getMethods(function(response){
+    Razorpay.payment.getPrefs(function(response){
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
-      window.payment_methods = response;
+      window.payment_methods = response.methods;
+      window.fee_bearer = response.fee_bearer;
       showModalWithMessage(message);
     })
     Razorpay.defaults.key = '';
