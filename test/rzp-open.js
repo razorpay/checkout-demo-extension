@@ -191,29 +191,3 @@ describe("automatic checkout:", function(){
     })
   })
 })
-
-describe('validateCheckout should', function(){
-
-  it('pass if options are not invalid', function(){
-    expect(discreet.validateCheckout({})).not.toBeDefined();
-  })
-
-  it('fail if display_currency is USD, but no display_amount', function(){
-    expect(discreet.validateCheckout({display_currency: 'USD'})).toBe('display_amount');
-
-    expect(discreet.validateCheckout({display_currency: 'USD', display_amount: 'qwer'}))
-      .toBe('display_amount');
-  })
-
-  it('pass if display_currency is USD', function(){
-    expect(discreet.validateCheckout({display_currency: 'USD', display_amount: '300'}))
-      .not.toBeDefined();
-  })
-
-  it('fail if display_currency is YEN', function(){
-    expect(discreet.validateCheckout({display_currency: 'YEN'})).toBe('display_currency');
-    expect(discreet.validateCheckout({display_currency: 'YEN', display_amount: '300'}))
-      .toBe('display_currency');
-  })
-
-})

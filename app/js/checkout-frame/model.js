@@ -74,6 +74,7 @@ function sanitizeContact(contactPrefill){
 
 // add missing keys with empty object values to message object
 function formatMessage(message){
+  message.currencies = discreet.currencies;
   each(
     ['data', 'params'],
     function(i, key){

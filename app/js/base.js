@@ -4,6 +4,24 @@ function raise(message){
 }
 
 var discreet = {
+  currencies: {
+    'USD': '$',
+    'AUD': 'A$',
+    'CAD': 'C$',
+    'HKD': 'HK$',
+    'NZD': 'NZ$',
+    'SGD': 'SG$',
+    'CZK': 'Kč',
+    'NOK': 'kr',
+    'DKK': 'kr',
+    'SEK': 'kr',
+    'EUR': '€',
+    'GBP': '£',
+    'HUF': 'Ft',
+    'JPY': '¥',
+    'PLN': 'zł',
+    'SFR': 'Fr'
+  },
   lib: 'checkoutjs',
   shouldAjax: function(data){
     return discreet.isFrame && data.wallet === 'mobikwik'
@@ -143,8 +161,15 @@ var optionValidations = {
   },
 
   display_currency: function(currency){
-    if(currency !== 'USD' && currency !== Razorpay.defaults.display_currency){
-      return 'Only USD is supported';
+    if(!(currency in discreet.currencies) && currency !== Razorpay.defaults.display_currency){
+      return 'This dislpay currency is not supported';
+    }
+  },
+
+  display_amount: function(amount){
+    amount = String(amount).replace(/([^0-9\.])/g,'');
+    if(!amount && amount !== Razorpay.defaults.display_amount){
+      return '';
     }
   },
 
