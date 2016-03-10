@@ -190,32 +190,3 @@ describe 'automatic checkout:', ->
 
       expect stub.getCall(0).args[0]
         .to.be.a Razorpay
-
-describe 'validateCheckout should', ->
-  it 'pass if options are not invalid', ->
-    expect discreet.validateCheckout {}
-      .to.not.be.ok()
-
-  it 'fail if display_currency is USD, but no display_amount', ->
-    expect  discreet.validateCheckout display_currency: 'USD'
-      .to.be 'display_amount'
-
-    expect discreet.validateCheckout
-      display_currency: 'USD'
-      display_amount: 'qwer'
-    .to.be 'display_amount'
-
-  it 'pass if display_currency is USD', ->
-    expect discreet.validateCheckout
-      display_currency: 'USD'
-      display_amount: '300'
-    .to.not.be.ok()
-
-  it 'fail if display_currency is YEN', ->
-    expect discreet.validateCheckout display_currency: 'YEN'
-      .to.be 'display_currency'
-
-    expect discreet.validateCheckout
-      display_currency: 'YEN'
-      display_amount: '300'
-    .to.be 'display_currency'
