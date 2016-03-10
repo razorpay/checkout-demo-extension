@@ -74,7 +74,6 @@ function sanitizeContact(contactPrefill){
 
 // add missing keys with empty object values to message object
 function formatMessage(message){
-  console.log(message);
   each(
     ['data', 'params'],
     function(i, key){
