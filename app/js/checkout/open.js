@@ -232,16 +232,5 @@ Razorpay.prototype.close = function(){
   }
 };
 
-discreet.validateCheckout = function(options){
-  if(options.display_currency in discreet.display_currency){
-    options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
-    if(!options.display_amount){
-      return 'display_amount';
-    }
-  } else if (options.display_currency) {
-    return 'display_currency';
-  }
-};
-
 // Get the ball rolling in case we are in manual mode
 initAutomaticCheckout();
