@@ -175,7 +175,7 @@
                 <span class="text">
                   Pay
                   {{if(o.display_currency){}}
-                    ${{=o.display_amount}}
+                    {{=it.currencies[o.display_currency]}}{{=o.display_amount}}
                   {{} else {}}
                      <i>&#xe600;</i>
                      <u>₹</u>

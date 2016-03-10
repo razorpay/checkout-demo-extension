@@ -233,12 +233,12 @@ Razorpay.prototype.close = function(){
 };
 
 discreet.validateCheckout = function(options){
-  if( options.display_currency === 'USD' ){
+  if(options.display_currency in discreet.display_currency){
     options.display_amount = String(options.display_amount).replace(/([^0-9\. ])/g,'');
     if(!options.display_amount){
       return 'display_amount';
     }
-  } else if ( options.display_currency ) {
+  } else if (options.display_currency) {
     return 'display_currency';
   }
 };
