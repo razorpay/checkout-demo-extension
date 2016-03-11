@@ -196,11 +196,11 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       cf.onmessage
         source: cf.el.contentWindow
         origin: src
-        data: JSON.stringify(
+        data: JSON.stringify
           source: 'frame'
           event: event
           id: rzp.id
-          data: data)
+          data: data
 
     afterEach ->
       if spy
@@ -238,20 +238,24 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
         .to.eql foo: 2
 
     it 'submit', ->
-      window.CheckoutBridge = {}
-      spy = window.CheckoutBridge.onsubmit = sinon.stub()
-      message 'submit', foo: 3
-      
+      spy = sinon.stub()
+      rzp.options.external =
+        wallets: ['payu'],
+        handler: spy
+
+      message 'submit', {method: 'wallet', wallet: 'paytm'}
+      expect spy.callCount
+        .to.be 0
+      message 'submit', wallet: 'payu'
+      expect spy.callCount
+        .to.be 0
+
+      message 'submit', {method: 'wallet', wallet: 'payu'}
       expect spy.callCount
         .to.be 1
 
-      spyCall = spy.getCall(0)
-      expect spyCall.thisValue
-        .to.be window.CheckoutBridge
-      
-      expect JSON.parse spyCall.args[0]
-        .to.eql foo: 3
-      delete window.CheckoutBridge
+      expect spy.getCall(0).thisValue
+        .to.be rzp
 
     it 'dismiss', ->
       spy = rzp.options.modal.ondismiss = sinon.stub()
