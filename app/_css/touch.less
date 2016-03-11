@@ -146,8 +146,32 @@
   }
 }
 
-body.ios{
-  #error-message.loading{
-    display: none!important;
+body{
+  &.android, &.noanim{
+    #modal{
+      transition: none!important;
+    }
+  }
+  &.noanim{
+    #tab-bar{
+      display: none;
+    }
+    #tabs{
+      bottom: -1px;
+      li.active{
+        border-bottom: 3px solid @primary;
+      }
+    }
+
+    .tab-content{
+      position: relative;
+      display: none!important;
+      transform: none;
+      left: auto;
+      right: auto;
+      &.shown{
+        display: block!important;
+      }
+    }
   }
 }

@@ -608,6 +608,11 @@ CheckoutModal.prototype = {
       parent.find('li'),
       function(i, li){
         if(li === $el[0]){
+          var activeTab = parent[0].querySelector('li.active');
+          if(activeTab){
+            $(activeTab).removeClass('active');
+          }
+          $(li).addClass('active');
           index = i;
         }
       }

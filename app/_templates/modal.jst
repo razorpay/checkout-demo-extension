@@ -1,4 +1,4 @@
-{{ var o = it.options, wallet = o.method.wallet; }}
+{{ var o = it.options, method = o.method, wallet = method.wallet; }}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
   <div id="modal" class="mchild">
@@ -66,20 +66,20 @@
               </div>
               <div id="methods-specific-fields">
                 <div>
-                  {{ var tabCount = 0; o.method.card && tabCount++; o.method.netbanking && tabCount++; wallet && tabCount++; }}
+                  {{ var tabCount = 0; method.card && tabCount++; method.netbanking && tabCount++; wallet && tabCount++; }}
                   <ul active="0" id="tabs"{{if(tabCount){}} class="tabs-{{=tabCount}}"{{}}}>
-                    {{? o.method.card }}
-                      <li id="method-card-tab" data-target="tab-card">Card</li>
+                    {{? method.card }}
+                      <li id="method-card-tab" data-target="tab-card" class="active">Card</li>
                     {{?}}
-                    {{? o.method.netbanking }}
-                      <li id="method-netbanking-tab" data-target="tab-netbanking">Net Banking</li>
+                    {{? method.netbanking }}
+                      <li id="method-netbanking-tab" data-target="tab-netbanking"{{? !method.card }} class="active"{{?}}>Net Banking</li>
                     {{?}}
                     {{? wallet }}
-                      <li id="method-wallet-tab" data-target="tab-wallet">Wallet</li>
+                      <li id="method-wallet-tab" data-target="tab-wallet"{{? !(method.card || method.wallet) }} class="active"{{?}}>Wallet</li>
                     {{?}}
                     <div id="tab-bar"></div>
                   </ul>
-                  {{? o.method.card }}
+                  {{? method.card }}
                     <div class="fieldset tab-content showable shown" id="tab-card">
                       <input type="hidden" name="method" value="card">
                       <div class="elem-wrap"><div class="elem elem-name">
@@ -129,8 +129,8 @@
                       </label>
                     </div>
                   {{?}}
-                  {{? o.method.netbanking }}
-                    <div class="fieldset showable tab-content{{? !o.method.card }} shown{{?}}" id="tab-netbanking">
+                  {{? method.netbanking }}
+                    <div class="fieldset showable tab-content{{? !method.card }} shown{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
                       <div id="netb-banks" class="clear">
                         {{for(var b in it.netbanks){}}
@@ -148,15 +148,15 @@
                         <i class="i">&#xe601;</i>
                         <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                           <option selected="selected" value="">Other Banks</option>
-                          {{for(var i in o.method.netbanking){}}
-                            <option value="{{=i}}">{{=o.method.netbanking[i]}}</option>
+                          {{for(var i in method.netbanking){}}
+                            <option value="{{=i}}">{{=method.netbanking[i]}}</option>
                           {{}}}
                         </select>
                       </div></div>
                     </div>
                   {{?}}
                   {{ if(wallet){ }}
-                    <div class="fieldset showable tab-content{{? !o.method.card && !o.method.netbanking }} shown{{?}}" id="tab-wallet">
+                    <div class="fieldset showable tab-content{{? !(method.card || method.netbanking) }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
                       {{ var firstWallet; for (var w in wallet){ }}
                         <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
