@@ -318,6 +318,7 @@ CheckoutFrame.prototype = {
 
   onsubmit: function(data){
     if(data.method === 'wallet'){
+      // check if it was one of the external wallets
       var rzp = this.rzp;
       var external = rzp.options.external;
       each(

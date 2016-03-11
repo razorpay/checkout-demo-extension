@@ -230,7 +230,7 @@ function showModal(message) {
 function showModalWithMessage(message){
   var session = getSession();
 
-  // rewrites message.options.method
+  // rewrites message.options.method, adds custom wallets
   setPaymentMethods(window.payment_methods, message.options);
   session.render(message);
   session.modal.show();
