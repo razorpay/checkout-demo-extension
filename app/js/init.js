@@ -64,6 +64,7 @@ Razorpay.defaults = {
     'emi': null
   },
   'prefill': {
+    'method': '',
     'name': '',
     'contact': '',
     'email': '',

@@ -1,4 +1,3 @@
-
 // flag for checkout-frame.js
 discreet.isFrame = true;
 var CheckoutBridge = window.CheckoutBridge;
@@ -14,6 +13,10 @@ function getSession(methodToCall) {
     session[methodToCall]();
   }
   return session;
+}
+
+function addBodyClass(className){
+  $(doc).addClass(className);
 }
 
 // initial error (helps in case of redirection flow)
@@ -208,11 +211,12 @@ function showModal(message) {
   if(!window.payment_methods){
     // TODO remove this
     Razorpay.defaults.key = message.options.key;
-    Razorpay.payment.getMethods(function(response){
+    Razorpay.payment.getPrefs(function(response){
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
-      window.payment_methods = response;
+      window.payment_methods = response.methods;
+      window.fee_bearer = response.fee_bearer;
       showModalWithMessage(message);
     })
     Razorpay.defaults.key = '';
@@ -277,9 +281,6 @@ function iosMethod(method){
 
 var platformSpecific = {
   ios: function(){
-    // set ios specific css
-    $(doc).addClass('ios');
-
     // setting up js -> ios communication by loading custom protocol inside hidden iframe
     CheckoutBridge = window.CheckoutBridge = {
       // unique id for ios to retieve resources
@@ -322,7 +323,11 @@ function setQueryParams(search){
     }
   )
 
-  invoke(platformSpecific[qpmap.platform]);
+  var platform = qpmap.platform;
+  if(platform){
+    addBodyClass(platform);
+    invoke(platformSpecific[platform]);
+  }
 }
 
 Razorpay.sendMessage = function(message){
@@ -369,7 +374,7 @@ window.handleMessage = function(message) {
     discreet.context = message.context;
   }
   if(message.embedded){
-    // $(doc).addClass('embedded');
+    // addBodyClass('embedded');
   }
   if(message.config){
     RazorpayConfig = message.config;
@@ -419,17 +424,29 @@ function trackInit(message){
   }
 }
 
-$(window).on('message', parseMessage);
-
-if(location.search){
-  setQueryParams(location.search);
+function applyUAClasses(){
+  if(/Android [2-4]/.test(ua)){
+    addBodyClass('noanim');
+  }
 }
 
-if(CheckoutBridge){
-  discreet.medium = qpmap.platform || 'app';
+function initIframe(){
+  $(window).on('message', parseMessage);
+
+  if(location.search){
+    setQueryParams(location.search);
+  }
+
+  if(CheckoutBridge){
+    discreet.medium = qpmap.platform || 'app';
+  }
+
+  Razorpay.sendMessage({event: 'load'});
+  if(qpmap.message){
+    parseMessage({data: atob(qpmap.message)});
+  }
+
+  applyUAClasses();
 }
 
-Razorpay.sendMessage({event: 'load'});
-if(qpmap.message){
-  parseMessage({data: atob(qpmap.message)});
-}
+initIframe();

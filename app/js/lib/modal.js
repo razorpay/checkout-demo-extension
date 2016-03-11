@@ -27,7 +27,7 @@
   }
 
   var getDuration = function(modal){
-    return (modal.options.animation && transitionProperty) ? 250 : 0;
+    return (modal.options.animation && transitionProperty) ? 300 : 0;
   }
 
   var Modal = window.Modal = function(element, options) {
@@ -37,13 +37,8 @@
       }
     })
     this.options = options;
-    this.container = $('#container');
-    this.modalElement = element;
+    this.container = $(element);
     this.animationDuration = getDuration(this);
-
-    if(this.animationDuration){
-      $(this.modalElement).addClass('animate')
-    }
 
     this.listeners = [];
     this.show();
@@ -54,8 +49,7 @@
     show: function() {
       if(this.isShown) { return }
       this.isShown = true;
-      $(this.modalElement).reflow();
-      this.container.addClass('shown');
+      this.container.reflow().addClass('shown');
       clearTimeout();
       timeout = setTimeout(this.shown, this.animationDuration);
       this.container.focus();
@@ -69,9 +63,6 @@
       if(!this.isShown) { return }
       this.isShown = false;
 
-      if(this.animationDuration){
-        $(this.modalElement).addClass('animate');
-      }
       this.container.removeClass('shown');
       
       clearTimeout();

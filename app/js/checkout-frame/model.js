@@ -91,6 +91,16 @@ function formatMessage(message){
       message[key] = val;
     }
   )
+
+  // setting all possible display_currency
+  message.currencies = discreet.currencies;
+
+  // prechosen method
+  var pre_method = message.options.prefill.method;
+  // if data.method isn't already existing
+  if(pre_method && !('method' in message.data)){
+    message.data.method = pre_method;
+  }
 }
 
 function validateCardNumber(el){
@@ -598,6 +608,11 @@ CheckoutModal.prototype = {
       parent.find('li'),
       function(i, li){
         if(li === $el[0]){
+          var activeTab = parent[0].querySelector('li.active');
+          if(activeTab){
+            $(activeTab).removeClass('active');
+          }
+          $(li).addClass('active');
           index = i;
         }
       }
@@ -745,8 +760,8 @@ CheckoutModal.prototype = {
   powerErrorHandler: function(response){
     if(this.rzp){
       invoke(
-        this.showPowerScreen,
-        null,
+        'showPowerScreen',
+        this,
         {
           className: 'error',
           text: response.error.description,
@@ -940,6 +955,9 @@ CheckoutModal.prototype = {
       rzp._request.payment_id = payment_id;
     }
 
+    if(window.fee_bearer){
+      request.fees = true;
+    }
     rzp.authorizePayment(request);
   },
 

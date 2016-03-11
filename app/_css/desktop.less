@@ -140,13 +140,11 @@ iframe{
   height: 100%;
   outline: none;
   text-align: center;
-  transition: 0.25s ease-out opacity;
+  transition: 0.3s ease-out opacity;
   z-index: 19999;
 
-  &.animate{
-    #modal{
-      transition: 0.25s ease-in;
-    }
+  #modal{
+    transition: 0.3s ease-in;
   }
 
   &.shown{
@@ -157,7 +155,7 @@ iframe{
     #modal{
       opacity: 1;
       transform: none;
-      transition: 0.25s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
+      transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
   }
 }
@@ -370,6 +368,9 @@ button[type="submit"]{
   line-height: @submit-height;
   width: 100%;
 }
+#container:not(.font-loaded) .tab-content{
+  transition: none;
+}
 .tab-content{
   background: @background-color;
   position: absolute;
@@ -407,7 +408,7 @@ button[type="submit"]{
 
   &.tabs-1{
     #tab-bar{
-      left: 25%;
+      transform: translateX(50%);
     }
     #method-card-tab{
       &:before{
@@ -428,19 +429,14 @@ button[type="submit"]{
     li, #tab-bar{
       width: 33.33%;
     }
-    &[active="1"] #tab-bar{
-      left: 33.33%;
-    }
-    &[active="2"] #tab-bar{
-      left: 66.66%;
-    }
+  }
+  &[active="1"] #tab-bar{
+    transform: translateX(100%);
+  }
+  &[active="2"] #tab-bar{
+    transform: translateX(200%);
   }
 
-  &.tabs-2{
-    &[active="1"] #tab-bar{
-      left: 50%;
-    }
-  }
   li{
     list-style: none;
     margin: 0;
