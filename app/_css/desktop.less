@@ -140,13 +140,11 @@ iframe{
   height: 100%;
   outline: none;
   text-align: center;
-  transition: 0.25s ease-out opacity;
+  transition: 0.3s ease-out opacity;
   z-index: 19999;
 
-  &.animate{
-    #modal{
-      transition: 0.25s ease-in;
-    }
+  #modal{
+    transition: 0.3s ease-in;
   }
 
   &.shown{
@@ -157,7 +155,7 @@ iframe{
     #modal{
       opacity: 1;
       transform: none;
-      transition: 0.25s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
+      transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
   }
 }
