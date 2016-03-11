@@ -4,13 +4,16 @@
 
 1. Install gulp globally `npm install -g gulp`
 1. Install npm supporting packages `npm install`
-1. `gulp watch`
-1. Open `app` directory via any web server in your browser
+1. copy over `app/config.sample.js` -> `app/config.js` to specify API URL
+1. Point local API to checkout in `public/checkout.php` and `app/views/checkout.php`
+1. `gulp watch` in checkout root dir
+1. Open `app/index.html` via any web server in your browser
 
 Testing:
-1. `gulp test` for running tests
+1. `gulp test:unit` to run unit tests
+1. `gulp test` for all tests
 1. tests are located in `test` folder
-1. `test/release` folder contains blackbox tests
+1. `test/release` folder contains blackbox tests`
 
 #Gulp Commands
 
@@ -18,8 +21,8 @@ Testing:
 
 #Development Instructions
 - All source code is kept inside the `app` directory
-- All unit tests are in `test` directory.
-- Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/js/base.js`
+- All tests are in `test` directory.
+- Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/js/init.js`
 
 #Deployment and Branches
 
@@ -27,14 +30,11 @@ Testing:
 `beta`: [https://betacheckout.razorpay.com/](https://betacheckout.razorpay.com/) | Tested via [https://beta.razorpay.com/test/layout.php](https://beta.razorpay.com/test/layout.php) and [https://beta.razorpay.com/test/checkout.php](https://beta.razorpay.com/test/checkout.php)
 
 - For each new feature/bug fix/enhancement etc, make a new branch.
-- *Always branch out from `development`*.
+- Always branch out from `master`.
 - Write code in your new branch. Deploy the branch to `beta` (until we get staging servers) when you need to test it on server. `beta` = `staging` server for now.
 
 Once you have thoroughly tested your code
-- merge `development` into your branch and fix any merge conflicts
-- merge your branch into `development` and push.
+- merge `master` into your branch and fix any merge conflicts
+- merge your branch into `master` and push.
 
-Some developer with write access to `master` will merge it and deploy to `production` in next cycle.
-
-- `development`: This branch will contain all the code that is ready to be shipped. This branch should always be shippable. No merging partial code.
-- `master`: Only few devs will have write access to master. This will always contain code that is deployed to `production`.
+- `master` should always be shippable. No merging partial code.
