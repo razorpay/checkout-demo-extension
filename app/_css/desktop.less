@@ -370,6 +370,9 @@ button[type="submit"]{
   line-height: @submit-height;
   width: 100%;
 }
+#container:not(.font-loaded) .tab-content{
+  transition: none;
+}
 .tab-content{
   background: @background-color;
   position: absolute;
@@ -407,7 +410,7 @@ button[type="submit"]{
 
   &.tabs-1{
     #tab-bar{
-      left: 25%;
+      transform: translateX(50%);
     }
     #method-card-tab{
       &:before{
@@ -428,19 +431,14 @@ button[type="submit"]{
     li, #tab-bar{
       width: 33.33%;
     }
-    &[active="1"] #tab-bar{
-      left: 33.33%;
-    }
-    &[active="2"] #tab-bar{
-      left: 66.66%;
-    }
+  }
+  &[active="1"] #tab-bar{
+    transform: translateX(100%);
+  }
+  &[active="2"] #tab-bar{
+    transform: translateX(200%);
   }
 
-  &.tabs-2{
-    &[active="1"] #tab-bar{
-      left: 50%;
-    }
-  }
   li{
     list-style: none;
     margin: 0;
