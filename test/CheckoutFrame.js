@@ -202,18 +202,6 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
       message('redirect', {foo: 2});
     })
 
-    it('submit', function(){
-      window.CheckoutBridge = {
-        onsubmit: function(data){
-          expect(this).toBe(window.CheckoutBridge);
-          expect(JSON.parse(data).foo).toBe(3);
-          spyCalled();
-        }
-      }
-      message('submit', {foo: 3});
-      delete window.CheckoutBridge;
-    })
-
     it('dismiss', function(){
       rzp.options.modal.ondismiss = spyCalled;
       var spy2 = jasmine.createSpy();
