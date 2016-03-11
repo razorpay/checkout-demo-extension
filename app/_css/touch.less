@@ -57,7 +57,7 @@
     min-height: 100%;
     margin: 0 auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    transform: translateY(10%) scale(0.9);
+    transform: translateY(7%) scale(0.92);
   }
   #modal-inner{
     position: static;
@@ -146,8 +146,34 @@
   }
 }
 
-body.ios{
-  #error-message.loading{
-    display: none!important;
+body{
+  &.android, &.noanim{
+    #modal{
+      transition: none!important;
+    }
+  }
+  &.noanim{
+    #tab-bar{
+      display: none;
+    }
+    #tabs{
+      li{
+        bottom: -1px;
+        &.active{
+          border-bottom: 3px solid @primary;
+        }
+      }
+    }
+
+    .tab-content{
+      position: relative;
+      display: none!important;
+      transform: none;
+      left: auto;
+      right: auto;
+      &.shown{
+        display: block!important;
+      }
+    }
   }
 }
