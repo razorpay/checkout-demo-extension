@@ -6,7 +6,7 @@ build:
             code: npm install --no-optional
         - script:
             name: Test
-            code: gulp test:unit
+            code: selenium-standalone start & gulp test
 
     after-steps:
         - williamli/slack-notify-no-owner-info:

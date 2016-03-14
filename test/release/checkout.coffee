@@ -6,7 +6,7 @@ do chai.should
 
 url = "file://#{process.env.PWD}/app/dist/v1/checkout.html"
 browser = wd.promiseChainRemote()
-  .init {browserName: 'firefox'}
+  .init {browserName: 'phantomjs'}
   .get url
 
 options =

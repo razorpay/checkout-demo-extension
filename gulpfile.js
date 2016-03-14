@@ -112,7 +112,7 @@ var karmaLibs = [
 
 var karmaOptions = {
   frameworks: ['mocha'],
-  reporters: ['nyan', 'coverage'],
+  reporters: ['coverage'],
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
@@ -128,6 +128,12 @@ var karmaOptions = {
     suppressErrorHighlighting: true
   }
 };
+
+var reporter = 'dots';
+if(!process.env.WERCKER){
+  reporter = 'nyan';
+}
+karmaOptions.reporters.push(reporter);
 
 var allOptions;
 

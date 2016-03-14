@@ -140,7 +140,7 @@ function notifyBridge(message){
 }
 
 function setPaymentMethods(payment_methods, options){
-  methodOptions = options.method;
+  var methodOptions = options.method;
 
   if( !payment_methods.error ) {
     each(
