@@ -317,9 +317,22 @@ CheckoutFrame.prototype = {
   },
 
   onsubmit: function(data){
-    var cb = window.CheckoutBridge;
-    if(typeof cb === 'object'){
-      invoke('onsubmit', cb, stringify(data));
+    if(data.method === 'wallet'){
+      // check if it was one of the external wallets
+      var rzp = this.rzp;
+      var external = rzp.options.external;
+      each(
+        external.wallets,
+        function(i, walletName){
+          if(walletName === data.wallet){
+            try{
+              external.handler.call(rzp, data);
+            } catch(e){
+              track.call(rzp, 'js_error', e);
+            }
+          }
+        }
+      )
     }
   },
 
@@ -343,7 +356,7 @@ CheckoutFrame.prototype = {
           this.options.handler(data);
         }
         catch(e){
-          track.call(this, 'js_error', {message: e.message, stack: e.stack});
+          track.call(this, 'js_error', e);
         }
       },
       this.rzp,

@@ -53,6 +53,12 @@
         card: 1
         // , wallet: false
       },
+      external: {
+        wallets: ['payumoney'],
+        handler: function(data){
+          console.log(this, data);
+        }
+      },
       // callback_url: 'http://google.com',
       // redirect: true,
       // display_amount: '12.23',
