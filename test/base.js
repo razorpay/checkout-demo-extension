@@ -1,3 +1,8 @@
+describe('karma tests with chai', function(){
+  it('hello', function(){
+    assert.ok('everything', 'everything is ok');
+  })
+})
 
 var options = {
   'key': 'key_id',

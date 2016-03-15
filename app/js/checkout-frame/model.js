@@ -56,7 +56,7 @@ function sanitizeValue(obj, key){
     each(
       attr,
       function(attrKey, attrObj){
-        sanitizeValue(attrObj, attrKey);
+        sanitizeValue(obj[key], attrKey);
       }
     )
   }

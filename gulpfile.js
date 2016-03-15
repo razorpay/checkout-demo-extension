@@ -1,24 +1,27 @@
-var fs = require('fs')
-var glob = require('glob')
-var gulp = require('gulp')
-var dot = require('dot')
-var less = require('gulp-less')
-var minifyCSS = require('gulp-minify-css')
-var concat = require('gulp-concat')
-var autoprefixer = require('gulp-autoprefixer')
-var usemin = require('gulp-usemin')
-var wrap = require('gulp-insert').wrap
-var uglify = require('gulp-uglify')
-var sourcemaps = require('gulp-sourcemaps')
-var replace = require('gulp-replace')
+const fs = require('fs')
+const glob = require('glob')
+const gulp = require('gulp')
+const dot = require('dot')
+const less = require('gulp-less')
+const minifyCSS = require('gulp-minify-css')
+const concat = require('gulp-concat')
+const autoprefixer = require('gulp-autoprefixer')
+const usemin = require('gulp-usemin')
+const wrap = require('gulp-insert').wrap
+const uglify = require('gulp-uglify')
+const sourcemaps = require('gulp-sourcemaps')
+const replace = require('gulp-replace')
 
-var execSync = require('child_process').execSync
-var karmaServer = require('karma').Server
-var istanbul = require('istanbul')
-var jshint = require('gulp-jshint')
-var stylish = require('jshint-stylish')
+require('coffee-script/register')
+const mocha = require('gulp-mocha')
 
-var awspublish = require('gulp-awspublish')
+const execSync = require('child_process').execSync
+const karmaServer = require('karma').Server
+const istanbul = require('istanbul')
+const jshint = require('gulp-jshint')
+const stylish = require('jshint-stylish')
+
+const awspublish = require('gulp-awspublish')
 
 function assetPath(path){
   return 'app/' + path;
@@ -94,20 +97,22 @@ function getJSPaths(html, pattern){
         return assetPath(path);
       });
   } catch(e){
+    console.log(e.message);
     return [];
   }
 }
 
 var karmaLibs = [
   'spec/jquery-1.11.1.js',
-  'spec/jasmine-jquery.js',
   'spec/sendkeys.js',
+  'spec/sinon-1.17.3.js',
+  'spec/expect.js',
   'spec/helpers.js'
 ];
 
 var karmaOptions = {
-  frameworks: ['jasmine'],
-  reporters: ['progress', 'coverage'],
+  frameworks: ['mocha'],
+  reporters: ['coverage'],
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
@@ -115,21 +120,40 @@ var karmaOptions = {
   singleRun: true,
   coverageReporter: {
     type : 'json'
+  },
+  preprocessors: {
+    '**/*.coffee': ['coffee']
+  },
+  nyanReporter: {
+    suppressErrorHighlighting: true
   }
 };
 
-gulp.task('test', ['usemin'], function(done){
+var reporter = 'dots';
+if(!process.env.WERCKER){
+  reporter = 'nyan';
+}
+karmaOptions.reporters.push(reporter);
+
+var allOptions;
+
+gulp.task('makeKarmaOptions', ['usemin'], function(){
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
-    o.preprocessors = {};
+
+    // adding paths to cover
     getJSPaths(html, '<!--coverage-->').forEach(function(path){
       o.preprocessors[path] = ['coverage'];
     })
     o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
+
     return o;
   });
-  // return testRelease(done);
+})
+
+// unit tests + coverage
+gulp.task('test:unit', ['makeKarmaOptions'], function(done){
   testFromStack(0, allOptions, done);
 })
 
@@ -140,11 +164,10 @@ function testFromStack(counter, allOptions, done){
     }
     if(allOptions[++counter]){
       testFromStack(counter, allOptions, done);
-    } else if(allOptions.release){
-      done();
     } else {
-      // createCoverageReport();
-      testRelease(done);
+      allOptions = null;
+      createCoverageReport();
+      done();
     }
   }).start();
 }
@@ -162,7 +185,8 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-function testRelease(done){
+// blackbox tests
+gulp.task('test', ['test:unit'], function(){
   var jsGlob = assetPath('dist/v1/*.js');
   var jsHint = gulp.src(jsGlob)
     .pipe(wrap('(function(){"use strict";', '})()'))
@@ -171,18 +195,24 @@ function testRelease(done){
     .pipe(jshint.reporter('fail'))
 
   jsHint.on('finish', function(){
-    var stream = buildProd();
-    stream.on('finish', function(){
-      allOptions = glob.sync(jsGlob).map(function(released){
-        var o = JSON.parse(JSON.stringify(karmaOptions));
-        o.files = karmaLibs.concat([released, released.replace('app/dist/v1', 'test/release')]);
-        return o;
-      });
-      allOptions.release = true;
-      testFromStack(0, allOptions, done);  
-    })
+    buildProd().on('finish', function(){
+      gulp.src('test/release/checkout.coffee')
+        .pipe(mocha({
+          reporter: 'nyan',
+          timeout: 20000
+        })).once('error', function(){
+          setTimeout(function(){
+            process.exit(1);
+          }, 1000)
+        })
+        .once('end', function(){
+          setTimeout(function(){
+            process.exit();
+          }, 1000)
+        });
+      })
   })
-}
+})
 
 gulp.task('fontUpload', function(){
   var target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();

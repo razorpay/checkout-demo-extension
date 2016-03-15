@@ -6,7 +6,7 @@ build:
             code: npm install --no-optional
         - script:
             name: Test
-            code: gulp test
+            code: selenium-standalone start & gulp test
 
     after-steps:
         - williamli/slack-notify-no-owner-info:
@@ -15,10 +15,6 @@ build:
             channel: tech_bots
 deploy:
     steps:
-        - script:
-            name: npm install
-            code: npm install
-
         - script:
             name: Insert git commit id into rollbar version
             code: sed -i -e "s/VERSIONSTRING/$WERCKER_GIT_COMMIT/" app/js/rollbar.js
