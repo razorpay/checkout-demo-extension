@@ -85,7 +85,7 @@ function makeCheckoutUrl(options){
 }
 
 function makeCheckoutMessage(rzp){
-  var options = rzp.options;
+  var options = rzp.options.get();
   var response = {
     context: location.href,
     options: options,

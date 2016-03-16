@@ -183,7 +183,7 @@ function showModal(message) {
 
   if(!window.payment_methods){
     // TODO remove this
-    Razorpay.defaults.key = message.options.key;
+    Razorpay.defaults.key = message.options.get('key');
     Razorpay.payment.getPrefs(function(response){
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
@@ -219,7 +219,7 @@ function showModalWithMessage(message){
   session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
 }
 
-function configureRollbar(message){
+function configureRollbar(id){
   if(Rollbar){
     invoke(
       Rollbar.configure,
@@ -227,7 +227,7 @@ function configureRollbar(message){
       {
         payload: {
           person: {
-            id: message.id
+            id: id
           },
           context: discreet.context
         }
@@ -326,23 +326,39 @@ window.handleOTP = function(otp){
   }
 }
 
-window.handleMessage = function(message) {
+function validUID(id){
   if(isIframe && !CheckoutBridge){
-    if(typeof message.id !== 'string' || message.id.length < 14 || !/[0-9a-z]/i.test(message.id)){
-      var keys = [];
-      each(
-        message,
-        function(key){
-          keys.push(key);
-        }
-      )
-      return;
+    if(typeof id !== 'string' || id.length < 14 || !/[0-9a-z]/i.test(id)){
+      return false;
     }
   }
+  return true;
+}
 
-  if(!message.id){
-    message.id = _uid;
+window.handleMessage = function(message) {
+  if(!validUID(message.id)){
+    return;
   }
+
+  var session, sessionMessage;
+  if('options' in message){
+    try{
+      sessionMessage = Options(message.options);
+    } catch(e){
+      Razorpay.sendMessage({event: 'fault', data: e.message});
+      return roll('fault ' + e.message, message, 'warn');
+    }
+    sessionMessage.id = message.id || _uid;
+    configureRollbar(sessionMessage.id);
+  } else {
+    session = getSession();
+    if(!session){
+      return;
+    }
+    sessionMessage = session.message;
+  }
+
+
   if(message.context){
     discreet.context = message.context;
   }
@@ -352,23 +368,10 @@ window.handleMessage = function(message) {
   if(message.config){
     RazorpayConfig = message.config;
   }
-  if ( message.options ) {
-    try{
-      configureRollbar(message);
-      // validate and sanitize message.options
-      Razorpay.prototype.configure.call(message, message.options);
-    } catch(e){
-      Razorpay.sendMessage({event: 'fault', data: e.message});
-      roll('fault ' + e.message, message, 'warn');
-      return;
-    }
+  if (message.event === 'open' || message.options) {
+    showModal(sessionMessage);
   }
-
-  if ( message.event === 'open' || message.options ) {
-    showModal(message);
-  }
-
-  else if ( message.event === 'close' ) {
+  else if (message.event === 'close') {
     getSession().hide();
   }
 }

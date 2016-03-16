@@ -1,46 +1,13 @@
-function base_set(flatObj, objKey, objVal){
-  objKey = objKey.toLowerCase();
-  var defaultVal = Razorpay.defaults[objKey];
-  if(typeof objVal === 'number'){
-    objVal = String(objVal);
-  }
-  if(typeof defaultVal === typeof objVal){
-    flatObj[objKey] = objVal;
-  }
-}
-
-function flatten(obj){
-  var flatObj = {};
-  each(
-    obj,
-    function(objKey, objVal){
-      if(objKey in flatKeys){
-        each(
-          objVal,
-          function(objSubKey, objSubVal){
-            base_set(flatObj, objKey + '.' + objSubKey, objSubVal);
-          }
-        )
-      } else {
-        base_set(flatObj, objKey, objVal);
-      }
-    }
-  )
-  return flatObj;
-}
-
-function setNotes(options, notesObj){
-  if(!notesObj){
-    notesObj = options.notes;
-  } else {
-    options.notes = {};
-  }
-  each(notesObj, function(key, val){
+function setNotes(options){
+  var oldNotes = options.get('notes');
+  var notes = {};
+  each(oldNotes, function(key, val){
     var valType = typeof val;
     if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
-      options.notes[key] = val;
+      notes[key] = val;
     }
   })
+  options.set('notes', notes);
 }
 
 flatKeys = {};
@@ -205,7 +172,7 @@ function validateRequiredFields(options){
   each(
     ['key', 'amount'],
     function(index, key){
-      if(!options[key]){
+      if(!options.get(key)){
         raise('No ' + key + ' passed.');
       }
     }
@@ -216,15 +183,11 @@ function validateOverrides(options) {
   var errorMessage;
 
   each(
-    options,
-    function(i, option){
-      errorMessage = invoke(
-        optionValidations[i],
-        null,
-        option
-      )
+    optionValidations,
+    function(key, validFunc){
+      errorMessage = validFunc(options.get(key));
       if(typeof errorMessage === 'string'){
-        raise('Invalid ' + i + ' (' + errorMessage + ')');
+        raise('Invalid ' + key + ' (' + errorMessage + ')');
       }
     }
   )
@@ -235,12 +198,12 @@ function base_configure(overrides){
     raise('Invalid options');
   }
 
-  validateOverrides(overrides);
-  var options = flatten(overrides);
+  var options = Options(overrides, Razorpay.defaults);
+  validateOverrides(options);
   setNotes(options);
 
   if(overrides.parent){
-    options.parent = overrides.parent;
+    options.set('parent', overrides.parent);
   }
 
   discreet.setCommunicator(options);
@@ -248,7 +211,7 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype.get = function(key){
-  return key in this.options ? this.options[key] : Razorpay.defaults[key];
+  return this.options.get(key);
 }
 
 Razorpay.prototype.configure = function(overrides){
