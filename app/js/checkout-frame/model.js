@@ -34,7 +34,7 @@ function sanitize(message){ // warning: modifies message;
     ['image', 'prefill', 'notes']
   )
 
-  data.contact = sanitizeContact(data.contact || options.prefill.contact);
+  data.contact = sanitizeContact(data.contact || options['prefill.contact']);
 }
 
 // sanitizes attribute values by removing double quote character.
@@ -96,7 +96,7 @@ function formatMessage(message){
   message.currencies = discreet.currencies;
 
   // prechosen method
-  var pre_method = message.options.prefill.method;
+  var pre_method = message.options['prefill.method'];
   // if data.method isn't already existing
   if(pre_method && !('method' in message.data)){
     message.data.method = pre_method;
@@ -312,16 +312,16 @@ function setDefaultError(){
 }
 
 function processModalMethods(session){
-  var modal = session.message.options.modal;
+  var options = session.message.options;
 
-  modal.onhide = function(){
+  options['modal.onhide'] = function(){
     Razorpay.sendMessage({event: 'dismiss'});
   };
-  modal.onhidden = function(){
+  options['modal.onhidden'] = function(){
     session.saveAndClose();
     Razorpay.sendMessage({event: 'hidden'});
   }
-  delete modal.ondismiss;
+  delete options['modal.ondismiss'];
 }
 
 function CheckoutModal(){
@@ -411,7 +411,7 @@ CheckoutModal.prototype = {
     formatMessage(message);
     sanitize(message);
 
-    if(options.method.emi && options.amount > emi_options.min){
+    if(options['method.emi'] && options.amount > emi_options.min){
       this.emi = true;
     }
 
@@ -419,7 +419,7 @@ CheckoutModal.prototype = {
     this.fillData(message.data);
 
     processModalMethods(this);
-    if(!this.modal) { this.modal = new window.Modal(this.el, options.modal) }
+    if(!this.modal) { this.modal = new window.Modal(this.el, options) }
 
     if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
     this.setCardFormatting();
@@ -438,13 +438,13 @@ CheckoutModal.prototype = {
 
   renderCss: function(){
     var div = this.el;
-    var theme = this.message.options.theme;
+    var options = this.message.options;
     var style = document.createElement('style');
     style.type = 'text/css';
     try{
-      div.style.color = theme.color;
+      div.style.color = options['theme.color'];
       if(div.style.color){
-        var rules = templates.theme(theme);
+        var rules = templates.theme(options);
         if (style.styleSheet) {
           style.styleSheet.cssText = rules;
         } else {
@@ -512,7 +512,7 @@ CheckoutModal.prototype = {
     this.on('submit', '#form', this.submit);
 
     var options = this.message.options;
-    var enabledMethods = options.method;
+    var enabledMethods = this.message.methods;
 
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);

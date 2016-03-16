@@ -85,7 +85,7 @@ function makeCheckoutUrl(options){
 }
 
 function makeCheckoutMessage(rzp){
-  var options = {};
+  var options = rzp.options;
   var response = {
     context: location.href,
     options: options,
@@ -94,26 +94,16 @@ function makeCheckoutMessage(rzp){
   }
 
   each(
-    rzp.options, function(i, value){
-      if(typeof value !== 'function'){
-        options[i] = value;
-      }
-    }
-  )
-
-  each(
     rzp.modal.options,
     function(i, option){
-      rzp.options.modal[i] = option;
+      options['modal.' + i] = option;
     }
   )
-
-  options.redirect = !!rzp.options.redirect();
 
   if(options.parent){
     response.embedded = true;
+    options.parent = true;
   }
-  delete options.parent;
 
   sanitizeImage(options);
   return response;
@@ -195,7 +185,7 @@ CheckoutFrame.prototype = {
     }
     else {
       $parent.css('display', 'block').reflow();
-      setBackdropColor(options.theme.backdrop_color);
+      setBackdropColor(rzp.get('theme.backdrop_color'));
       if(/^rzp_t/.test(options.key)){
         setTestRibbonVisible();
       }
@@ -320,13 +310,12 @@ CheckoutFrame.prototype = {
     if(data.method === 'wallet'){
       // check if it was one of the external wallets
       var rzp = this.rzp;
-      var external = rzp.options.external;
       each(
-        external.wallets,
+        rzp.get('external.wallets'),
         function(i, walletName){
           if(walletName === data.wallet){
             try{
-              external.handler.call(rzp, data);
+              rzp.get('external.handler').call(rzp, data);
             } catch(e){
               track.call(rzp, 'js_error', e);
             }
@@ -338,12 +327,12 @@ CheckoutFrame.prototype = {
 
   ondismiss: function(){
     this.close();
-    invoke(this.rzp.options.modal.ondismiss);
+    invoke(this.rzp.get('modal.ondismiss'));
   },
 
   onhidden: function(){
     this.afterClose();
-    invoke(this.rzp.options.modal.onhidden);
+    invoke(this.rzp.get('modal.onhidden'));
   },
 
   // this is onsuccess method

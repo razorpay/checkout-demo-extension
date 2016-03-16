@@ -274,7 +274,7 @@ Razorpay.prototype.authorizePayment = function(request){
     return setupAjax(this, request.success);
   }
 
-  if(options.redirect()) {
+  if(options.redirect) {
     discreet.nextRequestRedirect({
       url: url,
       content: rdata,

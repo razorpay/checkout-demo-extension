@@ -239,11 +239,6 @@ function base_configure(overrides){
   var options = flatten(overrides);
   setNotes(options);
 
-  if( typeof overrides.redirect === 'boolean' ) {
-    var redirectValue = overrides.redirect;
-    options.redirect = function(){return redirectValue};
-  }
-
   if(overrides.parent){
     options.parent = overrides.parent;
   }

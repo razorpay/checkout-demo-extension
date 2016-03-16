@@ -139,62 +139,35 @@ function notifyBridge(message){
   }
 }
 
-function setPaymentMethods(payment_methods, options){
-  var methodOptions = options.method;
+function setPaymentMethods(message){
+  var availMethods = window.payment_methods;
+  var options = message.options;
+  var methods = message.methods = {};
 
-  if( !payment_methods.error ) {
-    each(
-      methodOptions,
-      function(method, enabled){
-        var printed = payment_methods[method];
-        if ( !printed || enabled === false ) {
-          methodOptions[method] = false;
-        }
-        else {
-          methodOptions[method] = printed;
-        }
+  each(
+    availMethods,
+    function(method, enabled){
+      if(enabled && options['method.' + method] !== false){
+        methods[method] = enabled;
       }
-    )
-    var wallets = false;
-    if(methodOptions.wallet){
-      var externalWallets = options.external.wallets;
-      if(externalWallets.length){
-        each(
-          externalWallets,
-          function(i, externalWallet){
-            if(externalWallet in freqWallets){
-              payment_methods.wallet[externalWallet] = true;
-              freqWallets[externalWallet].custom = true;
-            }
-          }
-        )
-      }
-      each(
-        payment_methods.wallet,
-        function(wallet, enabled){
-          if(enabled){
-            var logos = freqWallets[wallet];
-            if(logos){
-              if(!wallets){
-                wallets = {};
-              }
-              wallets[wallet] = {
-                'col': logos.col,
-                'h': logos.h
-              };
-            }
-          }
-        }
-      )
     }
-    methodOptions.wallet = wallets;
-  } else {
-    methodOptions.card = false;
-    methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
+  )
+
+  if(availMethods.wallet instanceof Array){ // php encodes blank object as blank array
+    methods.wallet = {};
   }
-  if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
-    methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
-  }
+
+  each(
+    options['external.wallets'],
+    function(i, externalWallet){
+      if(externalWallet in freqWallets){
+        methods.wallet[externalWallet] = true;
+        freqWallets[externalWallet].custom = true;
+      }
+    }
+  )
+
+  message.walletData = freqWallets;
 }
 
 function showModal(message) {
@@ -231,7 +204,7 @@ function showModalWithMessage(message){
   var session = getSession();
 
   // rewrites message.options.method, adds custom wallets
-  setPaymentMethods(window.payment_methods, message.options);
+  setPaymentMethods(message);
   session.render(message);
   session.modal.show();
   trackInit(message);

@@ -45,9 +45,7 @@ Razorpay.defaults = {
   'notes': {},
   'callback_url': '',
 
-  'redirect': function(){
-    return this.callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)
-  },
+  'redirect': false,
   'description': '',
 
   // automatic checkout only
@@ -59,10 +57,10 @@ Razorpay.defaults = {
   'display_amount': '',
 
   'method': {
-    'netbanking': false,
-    'card': false,
-    'wallet': false,
-    'emi': false
+    'netbanking': true,
+    'card': true,
+    'wallet': true,
+    'emi': true
   },
   'prefill': {
     'method': '',
