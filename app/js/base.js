@@ -1,3 +1,64 @@
+function base_set(flatObj, objKey, objVal){
+  objKey = objKey.toLowerCase();
+  var defaultVal = Razorpay.defaults[objKey];
+  if(typeof objVal === 'number'){
+    objVal = String(objVal);
+  }
+  if(typeof defaultVal === typeof objVal){
+    flatObj[objKey] = objVal;
+  }
+}
+
+function flatten(obj){
+  var flatObj = {};
+  each(
+    obj,
+    function(objKey, objVal){
+      if(objKey in flatKeys){
+        each(
+          objVal,
+          function(objSubKey, objSubVal){
+            base_set(flatObj, objKey + '.' + objSubKey, objSubVal);
+          }
+        )
+      } else {
+        base_set(flatObj, objKey, objVal);
+      }
+    }
+  )
+  return flatObj;
+}
+
+function setNotes(options, notesObj){
+  if(!notesObj){
+    notesObj = options.notes;
+  } else {
+    options.notes = {};
+  }
+  each(notesObj, function(key, val){
+    var valType = typeof val;
+    if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
+      options.notes[key] = val;
+    }
+  })
+}
+
+flatKeys = {};
+each(
+  Razorpay.defaults,
+  function(key, val){
+    if(key !== 'notes' && val && typeof val === 'object'){
+      flatKeys[key] = true;
+      each(
+        val,
+        function(subKey, subVal){
+          Razorpay.defaults[key + '.' + subKey] = subVal;
+        }
+      )
+      delete Razorpay.defaults[key];
+    }
+  }
+)
 
 function raise(message){
   throw new Error(message);
@@ -80,52 +141,7 @@ var discreet = {
       return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
     }
     submitForm(data.url, data.content, data.method);
-  },
-
-  setNotes: function(options, overrides){
-    each(overrides.notes, function(key, val){
-      var valType = typeof val;
-      if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
-        if(!('notes' in options)){
-          options.notes = {};
-        }
-        options.notes[key] = val;
-      }
-    })
   }
-}
-
-function base_set(baseval, override) {
-  if ( typeof baseval === 'object' ) {
-    if( !baseval ){
-      return typeof override === 'boolean' ? override : baseval;
-    }
-
-    if( !override || typeof override !== 'object' ){
-      override = {};
-    }
-
-    if(baseval instanceof Array && override instanceof Array){
-      return override;
-    }
-
-    return map(
-      baseval,
-      function(val, i){
-        return base_set( val, override[i] );
-      }
-    )
-  }
-
-  if ( typeof baseval === 'string' && typeof override !== 'undefined' ) {
-    return String(override);
-  }
-
-  if ( typeof baseval === typeof override ) {
-    return override;
-  }
-
-  return baseval;
 }
 
 var optionValidations = {
@@ -220,18 +236,8 @@ function base_configure(overrides){
   }
 
   validateOverrides(overrides);
-
-  var options = base_set( Razorpay.defaults, overrides );
-
-  try{
-    var backdropClose = overrides.modal.backdropClose;
-    if(typeof backdropClose === 'boolean'){
-      options.modal.backdropclose = backdropClose;
-    }
-  }
-  catch(e){}
-
-  discreet.setNotes(options, overrides);
+  var options = flatten(overrides);
+  setNotes(options);
 
   if( typeof overrides.redirect === 'boolean' ) {
     var redirectValue = overrides.redirect;
@@ -244,6 +250,10 @@ function base_configure(overrides){
 
   discreet.setCommunicator(options);
   return options;
+}
+
+Razorpay.prototype.get = function(key){
+  return key in this.options ? this.options[key] : Razorpay.defaults[key];
 }
 
 Razorpay.prototype.configure = function(overrides){
@@ -267,7 +277,7 @@ Razorpay.prototype.configure = function(overrides){
       track.call( this, 'init' );
     }
 
-    if(options.parent){
+    if(this.get('parent')){
       this.open();
     }
   }

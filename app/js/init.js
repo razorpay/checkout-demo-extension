@@ -59,20 +59,18 @@ Razorpay.defaults = {
   'display_amount': '',
 
   'method': {
-    'netbanking': null,
-    'card': null,
-    'wallet': null,
-    'emi': null
+    'netbanking': false,
+    'card': false,
+    'wallet': false,
+    'emi': false
   },
   'prefill': {
     'method': '',
     'name': '',
     'contact': '',
     'email': '',
-    'card': {
-      'number': '',
-      'expiry': ''
-    }
+    'card[number]': '',
+    'card[expiry]': ''
   },
   'modal': {
     'ondismiss': noop,
