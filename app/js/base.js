@@ -156,11 +156,13 @@ function validateRequiredFields(rzp){
 
 function validateOverrides(options) {
   var errorMessage;
-
+  options = options.get();
   each(
-    optionValidations,
-    function(key, validFunc){
-      errorMessage = validFunc(options.get(key));
+    options,
+    function(key, val){
+      if(key in optionValidations){
+        errorMessage = optionValidations[key](val);
+      }
       if(typeof errorMessage === 'string'){
         raise('Invalid ' + key + ' (' + errorMessage + ')');
       }
@@ -212,6 +214,14 @@ Razorpay.prototype.configure = function(overrides){
   }
 };
 
-Razorpay.configure = function(overrides) {
-  Razorpay.defaults = base_configure(overrides);
+Razorpay.configure = function(overrides){
+  each(
+    overrides,
+    function(key, val){
+      var defaultValue = Razorpay.defaults[key];
+      if(typeof defaultValue === typeof val){
+        Razorpay.defaults[key] = val;
+      }
+    }
+  )
 }

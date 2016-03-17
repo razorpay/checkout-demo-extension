@@ -318,19 +318,11 @@ describe 'new Razorpay', ->
 describe 'Razorpay.configure', ->
   it 'should set Razorpay.defaults', ->
     origDefaults = Razorpay.defaults
-    spy = sinon.spy window, 'base_configure'
     options = do getOptions
     Razorpay.configure options
 
-    expect spy.callCount
-      .to.be 1
-
-    expect spy.calledWith options
-      .to.be true
-
-    expect spy.returnValues[0]
-      .to.be Razorpay.defaults
+    expect Razorpay.defaults.key
+      .to.be options.key
 
     # cleanup
-    spy.restore()
     Razorpay.defaults = origDefaults

@@ -80,33 +80,6 @@ describe 'automatic checkout:', ->
 
     delete currentScript.parentNode.submit
 
-  describe 'parse options from attributes', ->
-    opts = 
-      key: 'val'
-      foo: 'bar'
-      'nested.key1': 'value1'
-      'nested.key2': 'value2'
-      'one.two.three': 'four'
-      'method.wallet.paytm': 'false'
-      'one.hello': 'true'
-
-    parseScriptOptions opts
-
-    it 'should form composite options object', ->
-      expect opts
-        .to.eql
-          key: 'val'
-          foo: 'bar'
-          nested:
-            key1: 'value1'
-            key2: 'value2'
-          one:
-            hello: true
-            'two.three': 'four'
-          method:
-            wallet:
-              paytm: false
-
   describe 'addAutoCheckoutButton method: ', ->
     init_options = clone options
     init_options.buttontext = 'Dont pay'
@@ -145,7 +118,8 @@ describe 'automatic checkout:', ->
   describe 'init', ->
     stub = null
     beforeEach ->
-      currentScript.setAttribute 'data-' + opt, options[opt] for opt of options
+      for opt, val of options
+        currentScript.setAttribute 'data-' + opt, val
 
     afterEach ->
       stub.restore()
@@ -160,26 +134,6 @@ describe 'automatic checkout:', ->
       expect stub.called
         .to.be false
       stub.restore()
-
-    it 'should parse attributes', ->
-      stub = sinon.stub window, 'addAutoCheckoutButton'
-      stub2 = sinon.stub window, 'parseScriptOptions'
-      initAutomaticCheckout()
-
-      expect stub2.called
-        .to.be true
-
-      parsed_options = stub2.getCall(0).args[0]
-      expect parsed_options.key
-        .to.be options.key
-
-      expect parsed_options.amount
-        .to.eql options.amount
-
-      expect parsed_options.handler
-        .to.be.a 'function'
-
-      stub2.restore()
 
     it 'add button', ->
       stub = sinon.spy window, 'addAutoCheckoutButton'

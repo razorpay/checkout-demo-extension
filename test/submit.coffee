@@ -1,4 +1,4 @@
-options = 
+options =
   'key': 'key_id'
   'amount': '40000'
   'name': 'Merchant Name'

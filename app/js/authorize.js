@@ -81,7 +81,7 @@ function createPopup(request, url) {
     return null;
   }
   var templateVars = {
-    get: request.session.get,
+    get: request.get,
     url: url,
     formHTML: deserialize(request.data)
   }
@@ -126,12 +126,16 @@ function formatRequest(request){
   each(
     ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
     function(i, field){
-      var defaultValue = request.session.get(field);
+      var defaultValue = request.get(field);
       if(defaultValue && !(field in rdata)){
         rdata[field] = defaultValue;
       }
     }
   )
+
+  if(!rdata.key_id){
+    rdata.key_id = Razorpay.defaults.key;
+  }
 
   if(_uid){
     rdata['_[id]'] = _uid;
@@ -266,7 +270,7 @@ Razorpay.prototype.authorizePayment = function(request){
     return setupAjax(this, request.success);
   }
 
-  if(request.session.get('redirect')){
+  if(request.get('redirect')){
     discreet.nextRequestRedirect({
       url: url,
       content: rdata,
@@ -325,8 +329,11 @@ Razorpay.prototype.cancelPayment = function(errorObj){
 
 Razorpay.payment = {
   authorize: function(request){
-    var amount = request.data.amount || Razorpay.defaults.amount;
-    return Razorpay(request.session.get()).authorizePayment(request);
+    var options = request.session ? request.session.get() : Razorpay.defaults;
+    options.amount = request.data.amount || Razorpay.defaults.amount;
+    var rzp = Razorpay(options);
+    request.get = rzp.get;
+    return rzp.authorizePayment(request);
   },
   validate: function(data){
     var errors = [];
