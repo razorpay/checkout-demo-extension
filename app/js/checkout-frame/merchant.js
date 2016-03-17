@@ -148,8 +148,12 @@ function setPaymentMethods(session){
 
 function showModal(session) {
   if(_uid !== session.id){
-    invoke('saveAndClose', getSession());
+    var oldSession = getSession();
+    if(oldSession){
+      invoke('saveAndClose', oldSession);
+    }
     _uid = session.id;
+    sessions[_uid] = session;
   }
 
   if(!window.payment_methods){
@@ -301,7 +305,6 @@ function validUID(id){
 }
 
 window.handleMessage = function(message){
-  debugger
   if('id' in message && !validUID(message.id)){
     return;
   }

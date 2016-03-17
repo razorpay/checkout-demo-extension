@@ -72,37 +72,6 @@ function sanitizeContact(contactPrefill){
   return contactPrefill;
 }
 
-// add missing keys with empty object values to message object
-function formatMessage(message){
-  each(
-    ['data', 'params'],
-    function(i, key){
-      var val = message[key];
-      if(typeof val === 'string'){
-        try{
-          val = JSON.parse(val);
-        } catch(e){
-          // TODO roll()
-        }
-      }
-      if(!val || typeof val !== 'object'){
-        val = {};
-      }
-      message[key] = val;
-    }
-  )
-
-  // setting all possible display_currency
-  message.currencies = discreet.currencies;
-
-  // prechosen method
-  var pre_method = message.options['prefill.method'];
-  // if data.method isn't already existing
-  if(pre_method && !('method' in message.data)){
-    message.data.method = pre_method;
-  }
-}
-
 function validateCardNumber(el){
   if(el){
     if(!(el instanceof Element)){
@@ -311,26 +280,14 @@ function setDefaultError(){
   setCookie('onComplete', stringify(msg));
 }
 
-function processModalMethods(session){
-  var options = session.message.options;
-
-  options['modal.onhide'] = function(){
-    Razorpay.sendMessage({event: 'dismiss'});
-  };
-  options['modal.onhidden'] = function(){
-    session.saveAndClose();
-    Razorpay.sendMessage({event: 'hidden'});
-  }
-  delete options['modal.ondismiss'];
-}
-
 function Session(options){
   this.get = Options(options, Razorpay.defaults).get;
   this.listeners = [];
 }
 
 Session.prototype = {
-
+  data: {},
+  params: {},
   getClasses: function(){
     var classes = [];
     if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
@@ -341,7 +298,7 @@ Session.prototype = {
       classes.push('emi');
     }
 
-    if(!this.message.options.image){
+    if(!this.get('image')){
       classes.push('noimage');
     }
 
@@ -364,39 +321,48 @@ Session.prototype = {
     return this.el;
   },
 
-  fillData: function(data){
-
-    if(data.method){
-      this.switchTab($('#method-' + data.method + '-tab'));
-    }
-
-    var exp_m = data['card[expiry_month]'];
-    var exp_y = data['card[expiry_year]']
-    if(exp_m && exp_y) {
-      data['card[expiry]'] = exp_m + ' / ' + exp_y;
-    }
-
-    each(
-      {
-        'contact': 'contact',
-        'email': 'email',
-        'bank': 'bank-select',
-        'card[name]': 'card_name',
-        'card[number]': 'card_number',
-        'card[expiry]': 'card_expiry',
-        'card[cvv]': 'card_cvv'
-      },
-      function(name, id){
-        var el = gel(id);
-        var val = data[name];
-        if(el && val) {
-          el.value = val;
-        }
+  fillData: function(){
+    var method = this.get('prefill.method');
+    if(method){
+      if(!this.hasOwnProperty('data')){
+        this.data = {};
       }
-    )
+      this.data.method = method;
+    }
+    if(this.hasOwnProperty('data')){
+      var data = this.data;
+      if(data.method){
+        this.switchTab($('#method-' + data.method + '-tab'));
+      }
+
+      var exp_m = data['card[expiry_month]'];
+      var exp_y = data['card[expiry_year]']
+      if(exp_m && exp_y) {
+        data['card[expiry]'] = exp_m + ' / ' + exp_y;
+      }
+
+      each(
+        {
+          'contact': 'contact',
+          'email': 'email',
+          'bank': 'bank-select',
+          'card[name]': 'card_name',
+          'card[number]': 'card_number',
+          'card[expiry]': 'card_expiry',
+          'card[cvv]': 'card_cvv'
+        },
+        function(name, id){
+          var el = gel(id);
+          var val = data[name];
+          if(el && val) {
+            el.value = val;
+          }
+        }
+      )
+    }
   },
 
-  render: function(message){
+  render: function(){
     if(this.isOpen){
       this.saveAndClose();
     }
@@ -404,48 +370,55 @@ Session.prototype = {
       this.isOpen = true;
     }
 
-    if(!message.data && this.message){
-      message.data = this.message.data;
-    }
-    this.message = message;
-    var options = message.options;
-    formatMessage(message);
-    sanitize(message);
+    // sanitize(message);
 
-    if(options['method.emi'] && options.amount > emi_options.min){
-      this.emi = true;
-    }
+    // if(options['method.emi'] && options.amount > emi_options.min){
+    //   this.emi = true;
+    // }
 
     this.getEl();
-    this.fillData(message.data);
-
-    processModalMethods(this);
-    if(!this.modal) { this.modal = new window.Modal(this.el, options) }
-
-    if(!this.smarty) { this.smarty = new window.Smarty(this.el) }
-    this.setCardFormatting();
+    this.fillData();
+    this.setModal();
+    this.setSmarty();
+    this.setCard();
     this.bindEvents();
+    this.errorHandler(this.params);
 
-    this.errorHandler(message.params);
+    // if(this.emi && gel('elem-emi')){
+    //   this.emiView = new emiView(message);
+    // }
 
-    if(this.emi && gel('elem-emi')){
-      this.emiView = new emiView(message);
+    // if(options.key === 'rzp_live_kfAFSfgtztVo28' || options.key === 'rzp_test_s9cT6UE4Mit7zL'){
+    //   $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
+    // }
+  },
+
+  setModal: function(){
+    if(!this.modal){
+      this.modal = new window.Modal(this.el, {
+        onhide: function(){
+          Razorpay.sendMessage({event: 'dismiss'});
+        },
+        onhidden: function(){
+          session.saveAndClose();
+          Razorpay.sendMessage({event: 'hidden'});
+        }
+      })
     }
+  },
 
-    if( options.key === 'rzp_live_kfAFSfgtztVo28' || options.key === 'rzp_test_s9cT6UE4Mit7zL' ) {
-      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
-    }
+  setSmarty: function(){
+    this.smarty = new window.Smarty(this.el);
   },
 
   renderCss: function(){
     var div = this.el;
-    var options = this.message.options;
     var style = document.createElement('style');
     style.type = 'text/css';
     try{
-      div.style.color = options['theme.color'];
+      div.style.color = this.get('theme.color');
       if(div.style.color){
-        var rules = templates.theme(options);
+        var rules = templates.theme(this.get);
         if (style.styleSheet) {
           style.styleSheet.cssText = rules;
         } else {
@@ -512,8 +485,7 @@ Session.prototype = {
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
-    var options = this.message.options;
-    var enabledMethods = this.message.methods;
+    var enabledMethods = this.methods;
 
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
@@ -539,7 +511,7 @@ Session.prototype = {
     this.on('click', '#fd-hide', this.hideErrorMessage);
   },
 
-  setCardFormatting: function(){
+  setCard: function(){
     if(!this.card){
       this.card = new Card();
     }
