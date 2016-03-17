@@ -100,7 +100,8 @@ function generateUID(){
 
 var _uid = generateUID();
 
-function track(event, props) {
+function track(event, props){
+  return
   var id = this.id;
   setTimeout(function(){
     if(id && /^rzp_l/.test(this.get('key'))){

@@ -176,7 +176,7 @@ function showModalWithSession(session){
   session.render();
   return;
   session.modal.show();
-  trackInit(message);
+  trackInit(session);
 
   if ( CheckoutBridge ) {
     $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');

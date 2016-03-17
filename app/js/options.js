@@ -1,4 +1,4 @@
-flatKeys = {};
+var flatKeys = {};
 each(
   Razorpay.defaults,
   function(key, val){
@@ -46,11 +46,14 @@ function flatten(obj, defObj){
   return flatObj;
 }
 
-function Options(options, defaults){
+function Options(options){
   if(!(this instanceof Options)){
     return new Options(options, defaults);
   }
+
+  var defaults = Razorpay.defaults;
   options = flatten(options, defaults);
+
   this.get = function(key){
     if(!arguments.length){
       return options;

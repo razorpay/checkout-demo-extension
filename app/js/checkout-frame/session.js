@@ -281,7 +281,7 @@ function setDefaultError(){
 }
 
 function Session(options){
-  this.get = Options(options, Razorpay.defaults).get;
+  this.get = Options(options).get;
   this.listeners = [];
 }
 

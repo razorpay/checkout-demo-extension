@@ -1,13 +1,14 @@
-options =
+getOptions = ->
   key: 'key'
   amount: 100
+
 
 describe 'validateRequiredFields should check', ->
   arg = null
   key = null
 
   beforeEach ->
-    arg = clone options
+    arg = do getOptions
     key = null
 
   afterEach ->
@@ -44,7 +45,7 @@ describe 'base_configure should', ->
       arg = null
 
       beforeEach ->
-        arg = clone options
+        arg = do getOptions
 
       afterEach ->
         expect base_configure
@@ -79,41 +80,44 @@ describe 'base_configure should', ->
       it 'invalid display_currency', ->
         arg.display_currency = 'YEN'
 
-      it 'invalid parent', ->
-        arg.parent = 2
-
   describe 'return options object based on overrides:', ->
     opts = null
 
     beforeEach ->
-      opts = clone options
+      opts = do getOptions
 
     it 'basic options', ->
-      expect base_configure(opts).key = options.key
-      expect base_configure(opts).amount = options.amount
+      optsObj = base_configure opts
+      expect optsObj.get 'key'
+        .to.eql opts.key
+      expect optsObj.get 'amount'
+        .to.eql opts.amount
 
       # check if no extra keys are appended to overrides
-      expect opts
-        .to.eql options
+      expect do optsObj.get
+        .to.eql opts
+
+      expect do optsObj.get
+        .to.not.be opts
 
     it 'backdropClose', ->
       opts.modal =
         backdropClose: true
-      expect base_configure(opts).modal.backdropclose
+      expect base_configure(opts).get 'modal.backdropclose'
         .to.be true
 
     it 'redirect', ->
       opts.redirect = true
-      expect base_configure(opts).redirect()
-        .to.be(true)
+      expect base_configure(opts).get 'redirect'
+        .to.be true
 
       opts.redirect = false
-      expect base_configure(opts).redirect()
-        .to.be(false)
+      expect base_configure(opts).get 'redirect'
+        .to.be false
 
     it 'parent', ->
       opts.parent = document.body
-      expect base_configure(opts).parent
+      expect base_configure(opts).get 'parent'
         .to.be document.body
 
 describe 'discreet', ->
@@ -215,27 +219,6 @@ describe 'discreet', ->
       expect discreet.shouldAjax {wallet: 'paytm'}
         .to.not.be.ok()
 
-  describe 'setNotes', ->
-    it 'should copy notes into first argument from second', ->
-      opts = {}
-      overrides =
-        notes:
-          foo: 'bar'
-          baz: 2
-          hello: true
-          world: {}
-
-      discreet.setNotes opts, overrides
-
-      # no ref copy
-      expect opts.notes
-        .to.not.be overrides.notes
-
-      expect opts.notes
-        .to.eql
-          foo: 'bar'
-          baz: 2
-          hello: true
 
   describe 'nextRequestRedirect', ->
     submitSpy = msgSpy = null
@@ -284,10 +267,28 @@ describe 'discreet', ->
       expect submitSpy.args[0]
         .to.eql [request.url, request.content, request.method]
 
+describe 'setNotes', ->
+  it 'should strip invalid types', ->
+    opts = Options
+      notes:
+        foo: 'bar'
+        baz: 2
+        hello: true
+        world: {}
+        abc: jQuery.noop
+
+    setNotes opts
+
+    expect opts.get 'notes'
+      .to.eql
+        foo: 'bar'
+        baz: 2
+        hello: true
 
 describe 'new Razorpay', ->
   it 'should call base_configure', ->
     spy = sinon.spy window, 'base_configure'
+    options = do getOptions
     rzp = Razorpay options
 
     expect spy.callCount
@@ -297,12 +298,13 @@ describe 'new Razorpay', ->
       .to.be true
 
     expect spy.returnValues[0]
-      .to.be rzp.options
+      .to.be.an Options
 
     # cleanup
     spy.restore()
 
   it 'should throw if invalid options', ->
+    options = {}
     stub = sinon.stub window, 'base_configure'
       .throws()
 
@@ -317,6 +319,7 @@ describe 'Razorpay.configure', ->
   it 'should set Razorpay.defaults', ->
     origDefaults = Razorpay.defaults
     spy = sinon.spy window, 'base_configure'
+    options = do getOptions
     Razorpay.configure options
 
     expect spy.callCount

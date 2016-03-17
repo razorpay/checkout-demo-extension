@@ -1,13 +1,11 @@
 function setNotes(options){
-  var oldNotes = options.get('notes');
-  var notes = {};
-  each(oldNotes, function(key, val){
+  var notes = options.get('notes');
+  each(notes, function(key, val){
     var valType = typeof val;
-    if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
-      notes[key] = val;
+    if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
+      delete notes[key];
     }
   })
-  options.set('notes', notes);
 }
 
 function raise(message){
@@ -142,12 +140,6 @@ var optionValidations = {
     if(!amount && amount !== Razorpay.defaults.display_amount){
       return '';
     }
-  },
-
-  parent: function(parent){
-    if(!(parent && parent.nodeName || typeof parent === 'string' || parent === Razorpay.defaults.parent)){
-      return 'Invalid parent';
-    }
   }
 }
 
@@ -181,7 +173,7 @@ function base_configure(overrides){
     raise('Invalid options');
   }
 
-  var options = Options(overrides, Razorpay.defaults);
+  var options = Options(overrides);
   validateOverrides(options);
   setNotes(options);
 
@@ -197,7 +189,7 @@ Razorpay.prototype.configure = function(overrides){
   var key, options;
   try{
     this.get = base_configure(overrides).get;
-    var key = this.get('key');
+    key = this.get('key');
     validateRequiredFields(this);
   } catch(e){
     var message = e.message;
