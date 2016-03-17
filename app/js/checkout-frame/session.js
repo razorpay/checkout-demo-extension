@@ -104,7 +104,7 @@ function getFormFields($container, returnObj) {
   )
 }
 
-function getFormData() {
+function getFormData(){
   var activeTab = $('.tab-content.shown');
   if(!activeTab[0]) { return }
 
@@ -396,13 +396,17 @@ Session.prototype = {
   setModal: function(){
     if(!this.modal){
       this.modal = new window.Modal(this.el, {
+        backdropclose: this.get('modal.backdropclose'),
         onhide: function(){
           Razorpay.sendMessage({event: 'dismiss'});
         },
-        onhidden: function(){
-          session.saveAndClose();
-          Razorpay.sendMessage({event: 'hidden'});
-        }
+        onhidden: bind(
+          function(){
+            this.saveAndClose();
+            Razorpay.sendMessage({event: 'hidden'});
+          },
+          this
+        )
       })
     }
   },
@@ -810,7 +814,7 @@ Session.prototype = {
     }
     var message;
     this.shake();
-    this.modal.options.backdropclose = this.message.options.modal.backdropclose;
+    this.modal.options.backdropclose = this.get('modal.backdropclose');
 
     message = response.error.description;
     var err_field = response.error.field;
@@ -868,7 +872,6 @@ Session.prototype = {
     setEmiBank(data);
 
     var message = this.message;
-    var options = message.options;
 
     if(nocvv_dummy_values){
       data['card[cvv]'] = '000';
@@ -877,10 +880,10 @@ Session.prototype = {
     }
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
-    data.amount = options.amount;
+    data.amount = this.get('amount');
 
     // data.key_id needed by discreet.shouldAjax
-    data.key_id = options.key;
+    data.key_id = this.get('key');
 
     Razorpay.sendMessage({
       event: 'submit',
@@ -894,11 +897,9 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    var rzp = this.rzp = Razorpay(options);
-    rzp.id = message.id;
-
     var request = {
-      data: data
+      data: data,
+      session: this
     };
     var shouldAjax = discreet.shouldAjax(data);
 
@@ -921,17 +922,18 @@ Session.prototype = {
     }
 
     // onComplete defined in razorpay-submit.js, safe to expose now
-    window.onComplete = bind(discreet.onComplete, rzp);
+    window.onComplete = bind(discreet.onComplete, this);
 
     // setPaymentID to be used by payment cancel API
     window.setPaymentID = function(payment_id){
-      rzp._request.payment_id = payment_id;
+      request.payment_id = payment_id;
+      delete window.setPaymentID;
     }
 
     if(window.fee_bearer){
       request.fees = true;
     }
-    rzp.authorizePayment(request);
+    this.rzp = Razorpay.payment.authorize(request);
   },
 
   close: function(){
@@ -963,9 +965,7 @@ Session.prototype = {
   },
 
   saveAndClose: function(){
-    if(this.message){
-      this.message.data = getFormData();
-    }
+    this.data = getFormData();
     this.close();
   }
 }

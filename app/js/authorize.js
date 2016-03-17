@@ -47,7 +47,7 @@ discreet.setCommunicator = function(opts){
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
     document.documentElement.appendChild(communicator);
-    communicator.src = getCommuniactorSrc(opts);
+    communicator.src = getCommuniactorSrc();
   } else {
     communicator = {contentWindow: window};
   }
@@ -67,7 +67,7 @@ function cookiePoll(rzp){
   }, 150)
 }
 
-function createPopup(data, url, options) {
+function createPopup(request, url) {
   if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
     return null;
   }
@@ -81,9 +81,9 @@ function createPopup(data, url, options) {
     return null;
   }
   var templateVars = {
-    options: options,
+    get: request.session.get,
     url: url,
-    formHTML: deserialize(data)
+    formHTML: deserialize(request.data)
   }
 
   try{
@@ -123,22 +123,15 @@ function formatRequest(request){
   }
   var rdata = request.data;
 
-  if(!request.options){
-    request.options = Razorpay.defaults;
-  }
-  var options = request.options;
-
   each(
     ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
     function(i, field){
-      if(!(field in rdata) && options[field]){
-        rdata[field] = options[field];
+      var defaultValue = request.session.get(field);
+      if(defaultValue && !(field in rdata)){
+        rdata[field] = defaultValue;
       }
     }
   )
-  if(!rdata.key_id){
-    rdata.key_id = options.key;
-  }
 
   if(_uid){
     rdata['_[id]'] = _uid;
@@ -184,7 +177,7 @@ function onPopupClose(){
     $.ajax({
       url: discreet.makeUrl() + 'payments/' + request_id + '/cancel',
       headers: {
-        Authorization: 'Basic ' + _btoa(this.options.key + ':')
+        Authorization: 'Basic ' + _btoa(this.get('key') + ':')
       }
     })
     track.call(this, 'cancel');
@@ -261,7 +254,6 @@ function createUrl(request) {
 }
 
 Razorpay.prototype.authorizePayment = function(request){
-  var options = request.options = this.options;
   var error = formatRequest(request);
   if(error){
     return error;
@@ -274,7 +266,7 @@ Razorpay.prototype.authorizePayment = function(request){
     return setupAjax(this, request.success);
   }
 
-  if(options.redirect) {
+  if(request.session.get('redirect')){
     discreet.nextRequestRedirect({
       url: url,
       content: rdata,
@@ -292,7 +284,7 @@ Razorpay.prototype.authorizePayment = function(request){
   }
 
   var name;
-  request.popup = createPopup(rdata, url, options);
+  request.popup = createPopup(request, url);
 
   if(!request.popup){
     name = '_blank'
@@ -313,7 +305,7 @@ Razorpay.prototype.authorizePayment = function(request){
       if(communicator.contentWindow === window){
         setCookie('nextRequest', result);
       } else {
-        communicator.src = getCommuniactorSrc(options) + '#' + result;
+        communicator.src = getCommuniactorSrc() + '#' + result;
       }
     });
   }
@@ -334,7 +326,7 @@ Razorpay.prototype.cancelPayment = function(errorObj){
 Razorpay.payment = {
   authorize: function(request){
     var amount = request.data.amount || Razorpay.defaults.amount;
-    return Razorpay({amount: amount}).authorizePayment(request);
+    return Razorpay(request.session.get()).authorizePayment(request);
   },
   validate: function(data){
     var errors = [];
