@@ -76,44 +76,47 @@ describe 'normalize image option if', ->
     image = base64image
     result = base64image
 
-describe 'makeCheckoutUrl should', ->
-  it 'compose default checkout url without key', ->
-    expect makeCheckoutUrl {}
-      .to.be RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/checkout.php'
+# describe 'makeCheckoutUrl should', ->
+#   it 'compose default checkout url without key', ->
+#     expect makeCheckoutUrl {}
+#       .to.be RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/checkout.php'
 
-  it 'compose checkout view url with key', ->
-    expect makeCheckoutUrl key: 'foo'
-      .to.be RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/v1/checkout?key_id=foo'
+#   it 'compose checkout view url with key', ->
+#     expect makeCheckoutUrl key: 'foo'
+#       .to.be RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/v1/checkout?key_id=foo'
 
 describe 'makeCheckoutMessage should', ->
-  rzp =
-    id: 'someid'
-    options:
-      redirect: noop
-      image: 'abcdef'
-      hello: 'world'
-      nested: key: 'value'
-      modal: {}
-      func: noop
-    modal: options: dismiss: 'hidden'
+  opts =
+    key: 'key'
+    amount: '1000'
+    redirect: noop
+    image: 'abcdef'
+    hello: 'world'
+    nested: key: 'value'
+    modal: {}
+    func: noop
+  rzp = Razorpay opts
+  rzp.id = 'someid'
+  rzp.modal = options: dismiss: 'hidden'
 
   it 'set options and modal.options to options.modal', ->
     message = makeCheckoutMessage rzp
-    expect rzp.options.modal.dismiss
+    expect rzp.get 'modal.dismiss'
       .to.be rzp.modal.options.dismiss
 
     # checking general options
     expect message.options
       .to.not.have.property 'func'
 
-    expect message.options.nested.key
-      .to.be 'value'
-
-    expect message.options.hello
-      .to.be 'world'
+    expect 'nested' in message.options
+      .to.be false
+    expect 'nested.key' in message.options
+      .to.be false
+    expect 'hello' in message.options
+      .to.be false
 
     # checking image, as absolute url
-    imageOption = image: rzp.options.image
+    imageOption = image: rzp.get 'image'
     sanitizeImage imageOption
 
     expect message.options.image
@@ -131,29 +134,18 @@ describe 'makeCheckoutMessage should', ->
   it 'set redirect option', ->
     message = makeCheckoutMessage rzp
     expect message.options.redirect
-      .to.be false
+      .to.not.be.ok()
 
-    rzp.options.redirect = ->
-      true
+    rzp.get().redirect = true
 
     message = makeCheckoutMessage rzp
     expect message.options.redirect
       .to.be true
 
-  it 'delete parent option', ->
-    rzp.options.parent = 'x'
-    message = makeCheckoutMessage rzp
-
-    expect 'parent' of message.options
-      .to.be false
-
-    expect message.embedded
-      .to.be true
-
 describe 'checkoutFrame on receiveing message from frame contentWindow', ->
   rzp = Razorpay options
   cf = new CheckoutFrame rzp
-  src = makeCheckoutUrl rzp.options
+  src = makeCheckoutUrl rzp.get 'key'
 
   describe 'return if source isnt valid:', ->
     spyNotCalled = event = null
@@ -239,9 +231,9 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
 
     it 'submit', ->
       spy = sinon.stub()
-      rzp.options.external =
-        wallets: ['payu'],
-        handler: spy
+      opts = rzp.get()
+      opts['external.wallets'] = ['payu']
+      opts['external.handler'] = spy
 
       message 'submit', {method: 'wallet', wallet: 'paytm'}
       expect spy.callCount
@@ -258,7 +250,7 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
         .to.be rzp
 
     it 'dismiss', ->
-      spy = rzp.options.modal.ondismiss = sinon.stub()
+      spy = rzp.get()['modal.ondismiss'] = sinon.stub()
       spy2 = sinon.stub cf, 'close'
       message 'dismiss'
       
@@ -270,7 +262,7 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       spy2.restore()
 
     it 'hidden', ->
-      spy = rzp.options.modal.onhidden = sinon.stub()
+      spy = rzp.get()['modal.onhidden'] = sinon.stub()
       spy2 = sinon.stub cf, 'afterClose'
       message 'hidden'
 
@@ -284,7 +276,7 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       spy2.restore()
 
     it 'success', (done) ->
-      rzp.options.handler = (data) ->
+      rzp.get().handler = (data) ->
         expect data
           .to.eql foo: 4
         done()
