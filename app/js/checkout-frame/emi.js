@@ -10,9 +10,9 @@ function selectEmiBank(e){
   }
 }
 
-function emiView(message){
-  var opts = message.emiopts;
-  opts.amount = message.options.amount;
+function emiView(session){
+  var opts = session.emi_options;
+  opts.amount = session.get('amount');
   this.opts = opts;
   this.listeners = [];
   this.render();

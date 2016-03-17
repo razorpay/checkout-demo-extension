@@ -177,18 +177,14 @@ function showModal(session) {
 function showModalWithSession(session){
   setPaymentMethods(session);
   session.render();
-  return;
-  session.modal.show();
   trackInit(session);
-
-  if ( CheckoutBridge ) {
-    $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-  }
 
   if(qpmap.error){
     session.errorHandler(qpmap);
   }
-  session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
+  if(qpmap.tab){
+    session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
+  }
 }
 
 function configureRollbar(id){
@@ -248,6 +244,10 @@ var platformSpecific = {
       CheckoutBridge['on'+prop] = iosMethod(prop)
     })
     CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
+  },
+
+  android: function(){
+    doc.css('background', 'rgba(0, 0, 0, 0.6)');
   }
 }
 
@@ -376,6 +376,7 @@ function applyUAClasses(){
 
 function initIframe(){
   $(window).on('message', parseMessage);
+  Razorpay.sendMessage({event: 'load'});
 
   if(location.search){
     setQueryParams(location.search);
@@ -385,7 +386,6 @@ function initIframe(){
     discreet.medium = qpmap.platform || 'app';
   }
 
-  Razorpay.sendMessage({event: 'load'});
   if(qpmap.message){
     parseMessage({data: atob(qpmap.message)});
   }

@@ -294,10 +294,6 @@ Session.prototype = {
       classes.push('mobile');
     }
 
-    if(this.emi){
-      classes.push('emi');
-    }
-
     if(!this.get('image')){
       classes.push('noimage');
     }
@@ -367,25 +363,26 @@ Session.prototype = {
 
     // sanitize(message);
 
-    // if(options['method.emi'] && options.amount > emi_options.min){
-    //   this.emi = true;
-    // }
-
     this.getEl();
     this.fillData();
+    this.setEMI();
     this.setModal();
     this.setSmarty();
     this.setCard();
     this.bindEvents();
     this.errorHandler(this.params);
 
-    // if(this.emi && gel('elem-emi')){
-    //   this.emiView = new emiView(message);
-    // }
+    var key = this.get('key');
+    if(key === 'rzp_live_kfAFSfgtztVo28' || key === 'rzp_test_s9cT6UE4Mit7zL'){
+      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
+    }
+  },
 
-    // if(options.key === 'rzp_live_kfAFSfgtztVo28' || options.key === 'rzp_test_s9cT6UE4Mit7zL'){
-    //   $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
-    // }
+  setEMI: function(){
+    if(!this.emi && this.methods.emi && this.get('amount') > emi_options.min){
+      $(this.el).addClass('emi');
+      this.emi = new emiView(this);
+    }
   },
 
   setModal: function(){
@@ -946,14 +943,14 @@ Session.prototype = {
       this.card.unbind();
       $(this.el).remove();
 
-      if(this.emiView){
-        this.emiView.unbind();
+      if(this.emi){
+        this.emi.unbind();
       }
 
       this.modal =
       this.smarty =
       this.card =
-      this.emiView =
+      this.emi =
       this.el =
       window.setPaymentID =
       window.onComplete = null;
