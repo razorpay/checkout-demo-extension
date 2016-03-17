@@ -7,12 +7,8 @@ var sessions = {};
 var isIframe = window !== parent;
 var ownerWindow = isIframe ? parent : opener;
 
-function getSession(methodToCall) {
-  var session = sessions[_uid];
-  if(session && methodToCall){
-    session[methodToCall]();
-  }
-  return session;
+function getSession(id){
+  return sessions[id || _uid];
 }
 
 function addBodyClass(className){
@@ -23,7 +19,7 @@ function addBodyClass(className){
 var qpmap = {};
 
 var gifBase64Prefix = 'data:image/gif;base64,';
-var freqBanks = {
+var freqBanks = Session.prototype.netbanks = {
   SBIN: {
     image: 'R0lGODlhKAAoAMQQAPD2/EGI2sTa86fI7m2k4l6b3+Lt+dPk9nyt5SR21Hut5cXb9Jm/61CS3f///xVt0f///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXyICSO5GgMRPCsbEAMRinPslCweL4WAu2PgoZumGv0fiUAgsjMIQBIEUDVrK4C0N8hYe0+EgcfgOvtJrJJarmLlS3XZURJAIcfRcJ6uQHU20U3fmUFEAaCcCeHayiKZSlwCgsLCnBqXgcOmQ4HjUwKmpqUnToLoJkLo6SmDqipOJ+moq4smJqca5ZdDJkMlQRwDZl5jgPAwnAwxg7DXjGBXsHLa4QQdHvHZXfMVdHbTXx90NhddyJvVt1ecmld6VZtMmPo40xnPlvc9ENgSFPf+jng9Tunw92QJ1FIBBliEIeRhDNsFNHHA+KPE4/SuYCRMAQAOw==',
     title: 'SBI'
@@ -50,7 +46,7 @@ var freqBanks = {
   }
 };
 
-var freqWallets = {
+var freqWallets = Session.prototype.walletData = {
   paytm: {
     h: '16',
     col: gifBase64Prefix + 'R0lGODlhUAAYANUgAD/L9UJik+/y9oGWtzJVihM6dw++8+/7/mJ8pV/U9+Dl7dDY5M/y/S/H9JGjwCNHgZ/l+r/u/B/C9K/p+9/2/bC90lJvnKGwyW/Y+HGJrsLu/I/h+cDL23/c+AC68gQub////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACAALAAAAABQABgAAAb/QJBwSCwaj8gkEiJhKJ/QqHQKgng8Hap2yy1ar9nuUMEpm8uLI/nMSRMFg7hb6JAXGZPE9ZqIHEAUERFOIBEdHRFDBxAdEH9CBR+Sk5MPHEWRlJIPFUMWkwUKQgigokITe6lXDRoGewkSqRITGK57YZq5BXMguZSdIAGUl73DQx2qqnrJzKpZvpoIRNCSBELCk8SaxCDIzR7L398U1JVEBOUCIA/GxdnH4uHizBvlk29xcZnv20L9QgcaNEvgbZ4Bgak6aKKzEMmAfv/+ESmIRQhFDxRAxNpjwAmAhA05NBTCAUGAk7kuoXvnThI3eLcspgIgcw/NbiApkRxJqtwl7WySgEmECabmlZsUkea8B6In0wv2PvykVCDASpYTExr1oNTmVoVRhVylNtXey69bux79GtVaS7IgHEQ9izNm3bV3ubK1l8EfJQsCFPQTMNYXXYphkqbdS42Aurfa2gkAatgI4sV51WKhVgDBY8h+sYJYUCHOp3ZZ7SrOzFiSEk0ORktcU0YuaqIVWetGPPJIrgD7XApREDylZa27Z7b+oISd2Z3pjqtWnvxWbyMPn4MQSU2a9KLV8fLWmYSwvcfcfTk+cjm83rwdrhaAcuGk/fsXhpjXFMDB5zu2NPBIQHtgIAQDthgwgRAUBHhAEAA7'
@@ -69,7 +65,7 @@ var freqWallets = {
   }
 }
 
-var emi_options = {
+var emi_options = Session.prototype.emi_options = {
   // minimum amount to enable emi
   min: 3000*100-1,
   installment: function(length, rate, principle){
@@ -108,23 +104,6 @@ var emi_options = {
   }
 }
 
-function processMessage(message) {
-  message.netbanks = freqBanks;
-  message.emiopts = emi_options;
-  var opts = message.options;
-  if(!opts){
-    var session = getSession();
-    if(session){
-      message.options = session.message.options;
-    }
-    return;
-  }
-
-  if(opts.amount >= 100*10000){
-    opts.method.wallet = false;
-  }
-}
-
 function notifyBridge(message){
   if( message && message.event ){
     var bridgeMethod = CheckoutBridge['on' + message.event];
@@ -139,26 +118,25 @@ function notifyBridge(message){
   }
 }
 
-function setPaymentMethods(message){
+function setPaymentMethods(session){
   var availMethods = window.payment_methods;
-  var options = message.options;
-  var methods = message.methods = {};
+  var methods = session.methods = {};
 
   each(
     availMethods,
     function(method, enabled){
-      if(enabled && options['method.' + method] !== false){
+      if(enabled && session.get('method.' + method) !== false){
         methods[method] = enabled;
       }
     }
   )
 
-  if(availMethods.wallet instanceof Array){ // php encodes blank object as blank array
+  if(session.get('amount') >= 100*10000 || availMethods.wallet instanceof Array){ // php encodes blank object as blank array
     methods.wallet = {};
   }
 
   each(
-    options['external.wallets'],
+    session.get('external.wallets'),
     function(i, externalWallet){
       if(externalWallet in freqWallets){
         methods.wallet[externalWallet] = true;
@@ -166,46 +144,33 @@ function setPaymentMethods(message){
       }
     }
   )
-
-  message.walletData = freqWallets;
 }
 
-function showModal(message) {
-  if(_uid !== message.id){
-    getSession('saveAndClose');
-    _uid = message.id;
+function showModal(session) {
+  if(_uid !== session.id){
+    invoke('saveAndClose', getSession());
+    _uid = session.id;
   }
-  var session = getSession();
-  if(!session){
-    session = sessions[_uid] = new CheckoutModal();
-  }
-  processMessage(message);
 
   if(!window.payment_methods){
-    // TODO remove this
-    Razorpay.defaults.key = message.options.get('key');
-    Razorpay.payment.getPrefs(function(response){
+    Razorpay.payment.getPrefs(session.get('key'), function(response){
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
       window.payment_methods = response.methods;
       window.fee_bearer = response.fee_bearer;
-      showModalWithMessage(message);
+      showModalWithSession(session);
     })
-    Razorpay.defaults.key = '';
     return;
-  }
-  else {
-    showModalWithMessage(message);
+  } else {
+    showModalWithSession(session);
   }
 }
 
-function showModalWithMessage(message){
-  var session = getSession();
-
-  // rewrites message.options.method, adds custom wallets
-  setPaymentMethods(message);
-  session.render(message);
+function showModalWithSession(session){
+  setPaymentMethods(session);
+  session.render();
+  return;
   session.modal.show();
   trackInit(message);
 
@@ -335,29 +300,26 @@ function validUID(id){
   return true;
 }
 
-window.handleMessage = function(message) {
-  if(!validUID(message.id)){
+window.handleMessage = function(message){
+  debugger
+  if('id' in message && !validUID(message.id)){
     return;
   }
-
-  var session, sessionMessage;
-  if('options' in message){
+  var id = message.id || _uid;
+  var session = getSession(id)
+  if(!session){
+    if(!message.options){
+      return;
+    }
     try{
-      sessionMessage = Options(message.options);
+      session = new Session(message.options);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
       return roll('fault ' + e.message, message, 'warn');
     }
-    sessionMessage.id = message.id || _uid;
-    configureRollbar(sessionMessage.id);
-  } else {
-    session = getSession();
-    if(!session){
-      return;
-    }
-    sessionMessage = session.message;
+    configureRollbar(id);
+    session.id = id;
   }
-
 
   if(message.context){
     discreet.context = message.context;
@@ -368,11 +330,11 @@ window.handleMessage = function(message) {
   if(message.config){
     RazorpayConfig = message.config;
   }
-  if (message.event === 'open' || message.options) {
-    showModal(sessionMessage);
+  if(message.event === 'open' || message.options){
+    showModal(session);
   }
-  else if (message.event === 'close') {
-    getSession().hide();
+  else if(message.event === 'close'){
+    session.hide();
   }
 }
 

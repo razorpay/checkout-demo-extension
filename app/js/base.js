@@ -10,23 +10,6 @@ function setNotes(options){
   options.set('notes', notes);
 }
 
-flatKeys = {};
-each(
-  Razorpay.defaults,
-  function(key, val){
-    if(key !== 'notes' && val && typeof val === 'object'){
-      flatKeys[key] = true;
-      each(
-        val,
-        function(subKey, subVal){
-          Razorpay.defaults[key + '.' + subKey] = subVal;
-        }
-      )
-      delete Razorpay.defaults[key];
-    }
-  }
-)
-
 function raise(message){
   throw new Error(message);
 }

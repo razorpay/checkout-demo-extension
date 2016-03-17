@@ -324,11 +324,12 @@ function processModalMethods(session){
   delete options['modal.ondismiss'];
 }
 
-function CheckoutModal(){
+function Session(options){
+  this.get = Options(options, Razorpay.defaults).get;
   this.listeners = [];
 }
 
-CheckoutModal.prototype = {
+Session.prototype = {
 
   getClasses: function(){
     var classes = [];
@@ -353,7 +354,7 @@ CheckoutModal.prototype = {
   getEl: function(){
     if(!this.el){
       var div = document.createElement('div');
-      div.innerHTML = templates.modal(this.message);
+      div.innerHTML = templates.modal(this);
       this.el = div.firstChild;
       this.el.appendChild(this.renderCss());
       this.applyFont(this.el.querySelector('#powered-link'));
