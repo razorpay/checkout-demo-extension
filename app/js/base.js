@@ -151,11 +151,11 @@ var optionValidations = {
   }
 }
 
-function validateRequiredFields(options){
+function validateRequiredFields(rzp){
   each(
     ['key', 'amount'],
     function(index, key){
-      if(!options.get(key)){
+      if(!rzp.get(key)){
         raise('No ' + key + ' passed.');
       }
     }
@@ -193,16 +193,12 @@ function base_configure(overrides){
   return options;
 }
 
-Razorpay.prototype.get = function(key){
-  return this.options.get(key);
-}
-
 Razorpay.prototype.configure = function(overrides){
   var key, options;
   try{
-    options = this.options = base_configure(overrides);
-    key = options.key;
-    validateRequiredFields(options);
+    this.get = base_configure(overrides).get;
+    var key = this.get('key');
+    validateRequiredFields(this);
   } catch(e){
     var message = e.message;
     if(!/^rzp_l/.test(key || overrides.key || '')){

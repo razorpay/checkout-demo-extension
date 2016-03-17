@@ -77,15 +77,15 @@ function sanitizeImage(options){
   }
 }
 
-function makeCheckoutUrl(options){
-  if(options.key){
-    return discreet.makeUrl() + 'checkout?key_id=' + options.key;
+function makeCheckoutUrl(key){
+  if(key){
+    return discreet.makeUrl() + 'checkout?key_id=' + key;
   }
   return discreet.makeUrl(true) + 'checkout.php';
 }
 
 function makeCheckoutMessage(rzp){
-  var options = rzp.options.get();
+  var options = rzp.get();
   var response = {
     context: location.href,
     options: options,
@@ -129,16 +129,16 @@ function setTestRibbonInvisible(){
 
 function CheckoutFrame(rzp){
   if(rzp){
-    this.getEl(rzp.options);
+    this.getEl(rzp);
     return this.openRzp(rzp);
   }
-  this.getEl(Razorpay.defaults);
+  this.getEl();
 }
 
 CheckoutFrame.prototype = {
-
-  getEl: function(options){
+  getEl: function(rzp){
     if(!this.el){
+      var key = rzp && rzp.get('key');
       this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
@@ -147,7 +147,7 @@ CheckoutFrame.prototype = {
           frameborder: 0,
           width: '100%',
           height: '100%',
-          src: makeCheckoutUrl(options)
+          src: makeCheckoutUrl(key)
         }
       )[0]
     }
@@ -157,8 +157,7 @@ CheckoutFrame.prototype = {
   openRzp: function(rzp){
     var el = this.el;
     this.bind();
-    var options = rzp.options;
-    var parent = options.parent;
+    var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     var message;
 
@@ -186,7 +185,7 @@ CheckoutFrame.prototype = {
     else {
       $parent.css('display', 'block').reflow();
       setBackdropColor(rzp.get('theme.backdrop_color'));
-      if(/^rzp_t/.test(options.key)){
+      if(/^rzp_t/.test(rzp.get('key'))){
         setTestRibbonVisible();
       }
       this.setMetaAndOverflow();
@@ -342,7 +341,7 @@ CheckoutFrame.prototype = {
     invoke(
       function(){
         try{
-          this.options.handler(data);
+          this.get('handler')(data);
         }
         catch(e){
           track.call(this, 'js_error', e);

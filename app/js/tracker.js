@@ -102,9 +102,8 @@ var _uid = generateUID();
 
 function track(event, props) {
   var id = this.id;
-  var options = this.options;
-  if(id && /^rzp_l/.test(options.key)){
-    setTimeout(function(){
+  setTimeout(function(){
+    if(id && /^rzp_l/.test(this.get('key'))){
       var payload = {
         context: {
           direct: true
@@ -145,8 +144,8 @@ function track(event, props) {
       xhr.setRequestHeader('Content-type', 'application/json');
       xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
       xhr.send(JSON.stringify(payload));
-    })
-  }
+    }
+  })
 }
 
 function setTrackingProps(data, options, event){

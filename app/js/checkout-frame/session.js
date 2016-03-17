@@ -286,8 +286,8 @@ function Session(options){
 }
 
 Session.prototype = {
-  data: {},
-  params: {},
+  data: emo,
+  params: emo,
   getClasses: function(){
     var classes = [];
     if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
@@ -322,18 +322,13 @@ Session.prototype = {
   },
 
   fillData: function(){
-    var method = this.get('prefill.method');
+    var method = this.data.method || this.get('prefill.method');
     if(method){
-      if(!this.hasOwnProperty('data')){
-        this.data = {};
-      }
-      this.data.method = method;
+      this.switchTab($('#method-' + method + '-tab'));
     }
+
     if(this.hasOwnProperty('data')){
       var data = this.data;
-      if(data.method){
-        this.switchTab($('#method-' + data.method + '-tab'));
-      }
 
       var exp_m = data['card[expiry_month]'];
       var exp_y = data['card[expiry_year]']
@@ -960,6 +955,7 @@ Session.prototype = {
       this.card =
       this.emiView =
       this.el =
+      window.setPaymentID =
       window.onComplete = null;
     }
   },

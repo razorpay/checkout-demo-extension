@@ -26,7 +26,7 @@ var addAutoCheckoutButton = function(rzp){
   var button = document.createElement('input');
   var form = currentScript.parentElement;
   button.type = 'submit';
-  button.value = rzp.options.buttontext;
+  button.value = rzp.get('buttontext');
   button.className = 'razorpay-payment-button';
   form.appendChild(button);
   form.onsubmit = function(e){
