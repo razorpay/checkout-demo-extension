@@ -132,13 +132,16 @@ function setPaymentMethods(session){
   )
 
   if(session.get('amount') >= 100*10000 || availMethods.wallet instanceof Array){ // php encodes blank object as blank array
-    methods.wallet = {};
+    methods.wallet = false;
   }
 
   each(
     session.get('external.wallets'),
     function(i, externalWallet){
       if(externalWallet in freqWallets){
+        if(!methods.wallet){
+          methods.wallet = {};
+        }
         methods.wallet[externalWallet] = true;
         freqWallets[externalWallet].custom = true;
       }

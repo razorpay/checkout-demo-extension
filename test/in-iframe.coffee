@@ -213,18 +213,20 @@ describe 'init options.method', ->
     # disable 1 tab, m is disabled one
     it 'should hide ' + m + ' if specified false', do (m) ->
       ->
-        disableVal = if m is 'wallet' then {} else false
+        disableVal = if m is 'wallet' then [] else false
         window.payment_methods[m] = disableVal
         disable = [m]
 
     # disable 2 tabs, m is enabled one
-    it 'should hide ' + m + ' if specified false', do (m) ->
+    it 'should show only ' + m + ' if rest specified false', do (m) ->
       ->
-        disable = Object.keys window.payment_methods
-        disable.splice disable.indexOf(m), 1
-        disable.forEach (disabledTab) ->
-          disableVal = if disabledTab is 'wallet' then {} else false
-          window.payment_methods[disabledTab] = disableVal
+        disable = []
+        all_methods = Object.keys window.payment_methods
+        all_methods.forEach (disabledTab) ->
+          unless disabledTab is m
+            disable.push disabledTab
+            disableVal = if disabledTab is 'wallet' then [] else false
+            window.payment_methods[disabledTab] = disableVal
 
 # Tests on Credit Card page
 describe 'Razorpay card tab', ->
