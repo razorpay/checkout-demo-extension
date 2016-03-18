@@ -779,11 +779,7 @@ Session.prototype = {
   },
 
   successHandler: function(response){
-    if(!this.rzp){
-      return;
-    }
-
-    this.cleanupPowerRequest();
+    // this.cleanupPowerRequest();
     // prevent dismiss event
     this.modal.options.onhide = noop;
 
@@ -875,7 +871,10 @@ Session.prototype = {
     each(
       ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
       function(i, field){
-        data[field] = this.get(field);
+        var val = this.get(field);
+        if(val){
+          data[field] = this.get(field);
+        }
       },
       this
     )
@@ -885,10 +884,7 @@ Session.prototype = {
 
     Razorpay.sendMessage({
       event: 'submit',
-      data: data,
-      options: {
-        image: this.get('image')
-      }
+      data: data
     });
     if(data.method === 'wallet' && freqWallets[data.wallet].custom){
       return;
@@ -900,10 +896,13 @@ Session.prototype = {
 
     var request = {
       data: data,
-      redirect: this.get('redirect')
+      options: {
+        image: this.get('image'),
+        redirect: this.get('redirect')
+      }
     };
 
-    var shouldAjax = discreet.shouldAjax(data);
+    var shouldAjax = false//discreet.shouldAjax(data);
 
     if(shouldAjax){
       request.ajax = true;

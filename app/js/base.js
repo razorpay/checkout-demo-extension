@@ -32,9 +32,6 @@ var discreet = {
     'SFR': 'Fr'
   },
   lib: 'checkoutjs',
-  shouldAjax: function(data){
-    return discreet.isFrame && data.wallet === 'mobikwik'
-  },
 
   supported: function(showAlert){
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);

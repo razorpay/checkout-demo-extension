@@ -21,6 +21,18 @@ var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
 var stringify = bind(JSON.stringify, JSON);
 
+function fill(target, props, source){
+  if(arguments.length === 2){
+    source = target;
+  }
+  each(
+    props,
+    function(i, prop){
+      target[prop] = source[prop] || noop;
+    }
+  )
+}
+
 function each( iteratee, eachFunc, thisArg ) {
   var i;
   if(arguments.length < 3){

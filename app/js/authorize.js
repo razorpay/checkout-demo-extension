@@ -67,22 +67,6 @@ function cookiePoll(rzp){
   }, 150)
 }
 
-function clearRequest(rzp){
-  var request = rzp._request;
-  try{
-    if(request.popup){
-      request.popup.onClose = null;
-      request.popup.close();
-    }
-  } catch(e){
-    roll('error closing popup: ' + e.message, null, 'warn');
-  }
-
-  invoke('listener', rzp._request);
-  rzp._request = null;
-  clearCookieInterval();
-}
-
 function onPopupClose(){
   var request_id;
   try {
@@ -118,53 +102,6 @@ if(!discreet.isFrame){
   discreet.lib = 'razorpayjs';
 }
 
-discreet.onComplete = function(data){
-  // this === rzp
-  var request = this._request;
-
-  if(!request || !data) { return }
-
-  clearRequest(this);
-  try {
-    if(typeof data !== 'object') {
-      data = JSON.parse(data);
-    }
-  }
-  catch(e) {
-    return roll('unexpected api response', data);
-  }
-
-  if (
-    typeof request.success === 'function' &&
-    typeof data.razorpay_payment_id === 'string' &&
-    data.razorpay_payment_id
-  ) {
-    var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-    setTimeout(function(){
-      request.success.call(null, returnObj); // dont expose request as this
-    })
-    return track.call(this, 'success', {response: returnObj, data: request.orig});
-  }
-
-  if(!data.error || typeof data.error !== 'object' || !data.error.description){
-    data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
-  }
-  invoke(request.error, null, data, 0);
-  track.call(this, 'failure', {response: data, data: request.orig});
-}
-
-function setupAjax(rzp, callback){
-  var request = rzp._request;
-
-  request.ajax = $.post({
-    url: discreet.makeUrl() + 'payments/create/ajax',
-    data: request.data,
-    callback: function(response){
-      invoke(callback, rzp, response);
-    }
-  })
-}
-
 function Request(params){
   if(!(this instanceof Request)){
     return new Request(params);
@@ -174,53 +111,23 @@ function Request(params){
     return errors;
   }
 
-  var data = this.data;
-  var url = this.makeUrl(params.fees);
+  this.params = params;
+  var data = params.data;
 
-  if(params.ajax){
-    return setupAjax(this, params.success);
+  if(this.shouldPopup()){
+    if(!(this.popup = this.makePopup())){
+      return this.postSubmit();
+    }
   }
 
-  if(params.redirect){
-    discreet.nextRequestRedirect({
-      url: url,
-      content: data,
-      method: 'post'
-    });
-    return false;
-  }
+  return this.makeAjax();
+
   // prevent callback_url from being submitted if not redirecting
   delete data.callback_url;
   this.track();
 
   if(!discreet.supported(true)){
     return true;
-  }
-
-  var name;
-  var popup = this.popup = this.createPopup(url, params);
-
-  if(!popup){
-    name = '_blank'
-  } else {
-    // popup.onClose = bind(onPopupClose, this);
-
-    if(popup.cc){
-      name = popup.name;
-    }
-  }
-
-
-  if(name){
-    submitForm(discreet.makeUrl(true) + 'processing.php', null, null, name);
-    setupAjax(this, function(response){
-      var result = _btoa(stringify(response.request));
-      if(communicator.contentWindow === window){
-        setCookie('nextRequest', result);
-      } else {
-        communicator.src = getCommuniactorSrc() + '#' + result;
-      }
-    });
   }
 
   this.listener = $(window).on('message', onMessage, null, this);
@@ -235,23 +142,17 @@ Request.prototype = {
     if(typeof params !== 'object' || typeof params.data !== 'object'){
       return err('malformed payment request object');
     }
-    var data = this.data = params.data;
+    fill(params, ['success', 'error', 'secondfactor', 'options']);
+    var data = params.data;
 
     if(!data.key_id){
       data.key_id = Razorpay.defaults.key;
-    }
-
-    if(!params.options){
-      params.options = emo;
     }
 
     if(_uid){
       data['_[id]'] = _uid;
       data['_[medium]'] = discreet.medium;
       data['_[context]'] = discreet.context;
-      if(discreet.shouldAjax(data)){
-        data['_[source]'] = 'checkoutjs';
-      }
     }
 
     return Razorpay.payment.validate(data);
@@ -265,35 +166,111 @@ Request.prototype = {
     return discreet.makeUrl() + 'payments/create/' + (fees ? 'fees' : 'checkout');
   },
 
-  createPopup: function(url, params){
+  makeAjax: function(){
+    this.ajax = $.post({
+      url: discreet.makeUrl() + 'payments/create/ajax',
+      data: this.params.data,
+      callback: bind(this.ajaxCallback, this)
+    })
+  },
+
+  ajaxCallback: function(response){
+    if(response.razorpay_payment_id || response.error){
+      this.complete(response);
+    } else {
+      var nextRequest = response.request;
+      if(response.type === 'otp'){
+        this.secondfactor(nextRequest);
+      } else {
+        window.onComplete = bind(this.complete, this);
+        this.nextRequest(nextRequest);
+      }
+    }
+  },
+
+  nextRequest: function(request){
+    if(this.params.options.redirect){
+      discreet.nextRequestRedirect({
+        url: request.url,
+        content: request.content,
+        method: request.method
+      });
+    } else if(this.popup){
+      submitForm(
+        request.url,
+        request.content,
+        request.method,
+        this.popup.name
+      )
+    } else {
+      // TODO
+      var result = _btoa(stringify(request));
+      if(communicator.contentWindow === window){
+        setCookie('nextRequest', result);
+      } else {
+        communicator.src = getCommuniactorSrc() + '#' + result;
+      }
+    }
+  },
+
+  postSubmit: function(){
+
+  },
+
+  shouldPopup: function(){
+    var params = this.params;
+    return params.options.redirect || params.data.wallet !== 'mobikwik';
+  },
+
+  makePopup: function(){
     if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
       return null;
     }
-
-    var popup;
-    var name = 'popup_'// + _uid;
     try{
-      popup = new Popup('', name);
-    }
-    catch(e){
+      var popup = new Popup('', 'popup_' + _uid);
+    } catch(e){
       return null;
     }
-    var templateVars = {
-      params: params,
-      url: url,
-      formHTML: deserialize(params.data)
-    }
-
     try{
       var pdoc = popup.window.document;
-      pdoc.write(templates.popup(templateVars));
+      pdoc.write(templates.popup(this.params));
       pdoc.close();
-    }
-    catch(e){
-      popup.cc = true;
-    }
+    } catch(e){}
 
     return popup;
+  },
+
+  complete: function(data){
+    this.clear();
+    try {
+      if(typeof data !== 'object') {
+        data = JSON.parse(data);
+      }
+    }
+    catch(e) {
+      return roll('unexpected api response', data);
+    }
+
+    var payment_id = data.razorpay_payment_id;
+    if(typeof payment_id === 'string' && payment_id){
+      var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
+      return invoke(this.params.success, null, returnObj, 0); // dont expose request as this
+    }
+
+    if(!data.error || typeof data.error !== 'object' || !data.error.description){
+      data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
+    }
+    invoke(this.params.error, null, data, 0);
+    // track.call(this, 'failure', {response: data, data: request.orig});
+  },
+
+  clear: function(){
+    try{
+      this.popup.onClose = null;
+      this.popup.close();
+    } catch(e){}
+
+    // clearCookieInterval();
   },
 
   track: function(){
