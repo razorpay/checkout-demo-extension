@@ -67,40 +67,6 @@ function cookiePoll(rzp){
   }, 150)
 }
 
-function createPopup(request, url) {
-  if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
-    return null;
-  }
-
-  var popup;
-  var name = 'popup_'// + _uid;
-  try{
-    popup = new Popup('', name);
-  }
-  catch(e){
-    return null;
-  }
-  var templateVars = {
-    get: request.get,
-    url: url,
-    formHTML: deserialize(request.data)
-  }
-
-  try{
-    writePopup(popup, templateVars);
-  }
-  catch(e){
-    popup.cc = true;
-  }
-
-  return popup;
-}
-
-function writePopup(popup, templateVars){
-  popup.window.document.write(templates.popup(templateVars));
-  popup.window.document.close();
-}
-
 function clearRequest(rzp){
   var request = rzp._request;
   try{
@@ -115,60 +81,6 @@ function clearRequest(rzp){
   invoke('listener', rzp._request);
   rzp._request = null;
   clearCookieInterval();
-}
-
-function formatRequest(request){
-  if(typeof request !== 'object' || typeof request.data !== 'object'){
-    return err('malformed payment request object');
-  }
-  var rdata = request.data;
-
-  each(
-    ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
-    function(i, field){
-      var defaultValue = request.get(field);
-      if(defaultValue && !(field in rdata)){
-        rdata[field] = defaultValue;
-      }
-    }
-  )
-
-  if(!rdata.key_id){
-    rdata.key_id = Razorpay.defaults.key;
-  }
-
-  if(_uid){
-    rdata['_[id]'] = _uid;
-    rdata['_[medium]'] = discreet.medium;
-    rdata['_[context]'] = discreet.context;
-    if(discreet.shouldAjax(rdata)){
-      rdata['_[source]'] = 'checkoutjs';
-    }
-  }
-
-  return Razorpay.payment.validate(rdata);
-}
-
-function trackSubmit(rzp, data){
-  var trackingPayload = {};
-  each(
-    [
-      'email',
-      'contact',
-      'method',
-      'card[name]',
-      'bank',
-      'wallet',
-      'emi_duration'
-    ],
-    function(i, key){
-      if(key in data){
-        trackingPayload[key] = data[key];
-      }
-    }
-  )
-  rzp._request.orig = trackingPayload;
-  track.call(rzp, 'submit', {data: trackingPayload});
 }
 
 function onPopupClose(){
@@ -253,51 +165,48 @@ function setupAjax(rzp, callback){
   })
 }
 
-function createUrl(request) {
-  return discreet.makeUrl() + 'payments/create/' + (request.fees ? 'fees' : 'checkout');
-}
-
-Razorpay.prototype.authorizePayment = function(request){
-  var error = formatRequest(request);
-  if(error){
-    return error;
+function Request(params){
+  if(!(this instanceof Request)){
+    return new Request(params);
   }
-  var rdata = request.data;
-
-  var url = createUrl(request);
-  this._request = request;
-  if(request.ajax){
-    return setupAjax(this, request.success);
+  var errors = this.format(params);
+  if(errors){
+    return errors;
   }
 
-  if(request.get('redirect')){
+  var data = this.data;
+  var url = this.makeUrl(params.fees);
+
+  if(params.ajax){
+    return setupAjax(this, params.success);
+  }
+
+  if(params.redirect){
     discreet.nextRequestRedirect({
       url: url,
-      content: rdata,
+      content: data,
       method: 'post'
     });
     return false;
   }
   // prevent callback_url from being submitted if not redirecting
-  delete rdata.callback_url;
-  trackSubmit(this, rdata);
-
+  delete data.callback_url;
+  this.track();
 
   if(!discreet.supported(true)){
-    return false;
+    return true;
   }
 
   var name;
-  request.popup = createPopup(request, url);
+  var popup = this.popup = this.createPopup(url, params);
 
-  if(!request.popup){
+  if(!popup){
     name = '_blank'
-
   } else {
-    request.popup.onClose = bind(onPopupClose, this);
+    // popup.onClose = bind(onPopupClose, this);
 
-    if(request.popup.cc){
-      name = request.popup.name;
+    if(popup.cc){
+      name = popup.name;
     }
   }
 
@@ -314,27 +223,104 @@ Razorpay.prototype.authorizePayment = function(request){
     });
   }
 
-  request.listener = $(window).on('message', onMessage, null, this);
+  this.listener = $(window).on('message', onMessage, null, this);
 
   if(discreet.isFrame){
     cookiePoll(this);
   }
-
-  return this;
 }
 
-Razorpay.prototype.cancelPayment = function(errorObj){
-  discreet.onComplete.call(this, errorObj || discreet.defaultError());
+Request.prototype = {
+  format: function(params){
+    if(typeof params !== 'object' || typeof params.data !== 'object'){
+      return err('malformed payment request object');
+    }
+    var data = this.data = params.data;
+
+    if(!data.key_id){
+      data.key_id = Razorpay.defaults.key;
+    }
+
+    if(!params.options){
+      params.options = emo;
+    }
+
+    if(_uid){
+      data['_[id]'] = _uid;
+      data['_[medium]'] = discreet.medium;
+      data['_[context]'] = discreet.context;
+      if(discreet.shouldAjax(data)){
+        data['_[source]'] = 'checkoutjs';
+      }
+    }
+
+    return Razorpay.payment.validate(data);
+  },
+
+  cancel: function(errorObj){
+    discreet.onComplete.call(this, errorObj || discreet.defaultError());
+  },
+
+  makeUrl: function(fees){
+    return discreet.makeUrl() + 'payments/create/' + (fees ? 'fees' : 'checkout');
+  },
+
+  createPopup: function(url, params){
+    if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
+      return null;
+    }
+
+    var popup;
+    var name = 'popup_'// + _uid;
+    try{
+      popup = new Popup('', name);
+    }
+    catch(e){
+      return null;
+    }
+    var templateVars = {
+      params: params,
+      url: url,
+      formHTML: deserialize(params.data)
+    }
+
+    try{
+      var pdoc = popup.window.document;
+      pdoc.write(templates.popup(templateVars));
+      pdoc.close();
+    }
+    catch(e){
+      popup.cc = true;
+    }
+
+    return popup;
+  },
+
+  track: function(){
+    var data = this.data;
+    var trackingPayload = this.trackingPayload = {};
+    each(
+      [
+        'email',
+        'contact',
+        'method',
+        'card[name]',
+        'bank',
+        'wallet',
+        'emi_duration'
+      ],
+      function(i, key){
+        if(key in data){
+          trackingPayload[key] = data[key];
+        }
+      }
+    )
+    // track.call(rzp, 'submit', {data: trackingPayload});
+  }
 }
 
 Razorpay.payment = {
-  authorize: function(request){
-    var options = request.session ? request.session.get() : Razorpay.defaults;
-    options.amount = request.data.amount || Razorpay.defaults.amount;
-    var rzp = Razorpay(options);
-    request.get = rzp.get;
-    return rzp.authorizePayment(request);
-  },
+  authorize: Request,
   validate: function(data){
     var errors = [];
 

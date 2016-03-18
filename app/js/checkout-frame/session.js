@@ -872,14 +872,23 @@ Session.prototype = {
     }
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
-    data.amount = this.get('amount');
+    each(
+      ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
+      function(i, field){
+        data[field] = this.get(field);
+      },
+      this
+    )
 
     // data.key_id needed by discreet.shouldAjax
     data.key_id = this.get('key');
 
     Razorpay.sendMessage({
       event: 'submit',
-      data: data
+      data: data,
+      options: {
+        image: this.get('image')
+      }
     });
     if(data.method === 'wallet' && freqWallets[data.wallet].custom){
       return;
@@ -891,8 +900,9 @@ Session.prototype = {
 
     var request = {
       data: data,
-      session: this
+      redirect: this.get('redirect')
     };
+
     var shouldAjax = discreet.shouldAjax(data);
 
     if(shouldAjax){

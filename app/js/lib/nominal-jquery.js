@@ -12,6 +12,10 @@ function bind(func, thisArg){
   }
 }
 
+function clone(target){
+  return JSON.parse(stringify(target));
+}
+
 var qs = bind(document.querySelector, document);
 var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
@@ -312,10 +316,6 @@ $.prototype = {
     return this;
   }
 }
-
-$.clone = function(target){
-  return JSON.parse(stringify(target));
-};
 
 $.post = function(opts){
   opts.method = 'post';
