@@ -6,72 +6,6 @@ var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
 var fontTimeout;
 
-// sanitizes innerHTML, by removing angle brackets
-function sanitizeContent(obj, fieldsArr){
-  each(
-    fieldsArr,
-    function(i, key){
-      if(typeof obj[key] === 'string'){
-        obj[key] = obj[key].replace(/<[^>]*>?/g, "");
-      }
-    }
-  )
-}
-
-// higher level sanitize function
-function sanitize(message){ // warning: modifies message;
-  var options = message.options;
-  var data = message.data;
-  // sanitize options affecting innerHTML
-  sanitizeContent(
-    options,
-    ['name', 'description', 'amount', 'currency', 'display_amount']
-  )
-
-
-  sanitizeValue(
-    options,
-    ['image', 'prefill']
-  )
-
-  data.contact = sanitizeContact(data.contact || options['prefill.contact']);
-}
-
-// sanitizes attribute values by removing double quote character.
-function sanitizeValue(obj, key){
-  if(key instanceof Array){
-    return each(
-      key,
-      function(i, field){
-        sanitizeValue(obj, field);
-      }
-    )
-  }
-  var attr = obj[key];
-
-  if(typeof attr === 'string'){
-    obj[key] = attr.replace(/"/g,'');
-  }
-  else if(typeof attr === 'object'){
-    each(
-      attr,
-      function(attrKey, attrObj){
-        sanitizeValue(obj[key], attrKey);
-      }
-    )
-  }
-}
-
-// enforces numerical value with optional plus at start
-function sanitizeContact(contactPrefill){
-  var contactFirstChar = contactPrefill[0];
-  contactPrefill = contactPrefill.replace(/[^0-9]/g,'');
-  if ( contactFirstChar === '+' ) {
-    contactPrefill = '+' + contactPrefill;
-  }
-  return contactPrefill;
-}
-
 function validateCardNumber(el){
   if(el){
     if(!(el instanceof Element)){
@@ -447,8 +381,6 @@ Session.prototype = {
     else {
       this.isOpen = true;
     }
-
-    // sanitize(message);
 
     this.getEl();
     this.fillData();
