@@ -645,9 +645,6 @@ Session.prototype = {
   },
 
   showPowerScreen: function(state){
-    if(!this.rzp){
-      return;
-    }
     gel('power-title').innerHTML = state.title;
 
     var text = state.text;
@@ -669,43 +666,24 @@ Session.prototype = {
     }
   },
 
-  ajaxCallback: function(response){
-    if(response.error){
-      this.powerErrorHandler(response);
-    }
-    else {
-      this.showOtpView(response);
-    }
-  },
-
-  otpSubmitCallback: function(response){
-    if (response.razorpay_payment_id) {
-      return this.successHandler(response);
-    }
-    this.powerErrorHandler(response);
-  },
-
-  showOtpView: function(response){
-    if(this.rzp){
-      this.nextRequest = response.request;
-
-      this.showPowerScreen({
-        title: 'Sending OTP',
-        text: 'Sending OTP to',
+  secondfactor: function(done){
+    this.secondfactorCallback = done;
+    this.showPowerScreen({
+      title: 'Sending OTP',
+      text: 'Sending OTP to',
+      number: true
+    })
+    invoke(
+      'showPowerScreen',
+      this,
+      {
+        className: 'otp',
+        title: 'Enter OTP',
+        text: 'An OTP has been sent to',
         number: true
-      })
-      invoke(
-        'showPowerScreen',
-        this,
-        {
-          className: 'otp',
-          title: 'Enter OTP',
-          text: 'An OTP has been sent to',
-          number: true
-        },
-        750
-      )
-    }
+      },
+      750
+    )
   },
 
   reenterOtpView: function(response){
@@ -743,34 +721,16 @@ Session.prototype = {
   },
 
   onOtpSubmit: function(e){
-    if(this.rzp){
-      preventDefault(e);
-      this.showPowerScreen({
-        className: 'loading',
-        title: 'Verifying OTP',
-        text: 'Please wait...'
-      })
-      this.rzp._request.ajax = $.post({
-        url: this.nextRequest.url,
-        data: {
-          type: 'otp',
-          otp: gel('powerotp').value
-        },
-        callback: bind(this.otpSubmitCallback, this)
-      })
-    }
-  },
-
-  cleanupRequest: function(){
-    this.rzp = window.onComplete = window.setPaymentID = null;
+    preventDefault(e);
+    this.showPowerScreen({
+      className: 'loading',
+      title: 'Verifying OTP',
+      text: 'Please wait...'
+    })
+    this.secondfactorCallback(gel('powerotp').value);
   },
 
   cleanupPowerRequest: function(){
-    try{
-      this.rzp._request.ajax.abort();
-    } catch(e){}
-
-    this.cleanupRequest();
     this.nextRequest = null;
     var powerotp = gel('powerotp');
     if(powerotp){
@@ -902,32 +862,29 @@ Session.prototype = {
         image: this.get('image'),
         redirect: this.get('redirect')
       },
+      secondfactor: bind(this.secondfactor, this),
       success: bind(this.successHandler, this),
       error: bind(this.instanceErrorHandler, this)
     };
 
-    showLoadingMessage('Please wait while your payment is processed...');
-    this.request = Razorpay.payment.authorize(request);
-    return;
-    var shouldAjax = request.shouldAjax();
-
-    if(shouldAjax){
-      request.success = bind(this.ajaxCallback, this);
-
+    if(data.wallet === 'mobikwik' && !request.fees){
       this.showPowerScreen({
         className: 'loading',
         title: 'Verifying Account',
         number: true,
         text: 'Checking for a mobikwik account associated with'
       })
+    } else {
+      showLoadingMessage('Please wait while your payment is processed...');
     }
+    this.request = Razorpay.payment.authorize(request);
   },
 
   close: function(){
     if(this.isOpen){
-      if(this.rzp){
-        this.rzp.cancelPayment();
-        this.rzp = null;
+      if(this.request){
+        this.request.cancel();
+        this.request = null;
       }
       this.isOpen = false;
       clearTimeout(fontTimeout);

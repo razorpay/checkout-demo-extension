@@ -105,6 +105,36 @@ if(!discreet.isFrame){
   discreet.lib = 'razorpayjs';
 }
 
+// this === request
+function ajaxCallback(response){
+  this.payment_id = response.payment_id;
+
+  if(response.razorpay_payment_id || response.error){
+    this.complete(response);
+  } else {
+    var nextRequest = response.request;
+    if(response.type === 'otp'){
+      this.secondfactor(makeSecondfactorCallback(this, nextRequest));
+    } else {
+      window.onComplete = bind(this.complete, this);
+      this.nextRequest(nextRequest);
+    }
+  }
+}
+
+function makeSecondfactorCallback(request, nextRequest){
+  return function(factor){
+    $.post({
+      url: nextRequest.url,
+      data: {
+        type: 'otp',
+        otp: factor
+      },
+      callback: request.ajaxCallback
+    })
+  }
+}
+
 function Request(params){
   if(!(this instanceof Request)){
     return new Request(params);
@@ -115,9 +145,10 @@ function Request(params){
     return errors;
   }
   var options = this.options;
+  var data = this.data;
   if(options.redirect){
     // add callback_url if redirecting
-    this.data.callback_url = options.callback_url;
+    data.callback_url = options.callback_url;
     return this.submit();
   }
 
@@ -128,12 +159,14 @@ function Request(params){
       localStorage.removeItem('payload');
       submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
     }
+  } else {
+    data['_[source]'] = 'checkoutjs';
   }
 
   if(this.shouldAjax()){
     this.makeAjax();
   } else {
-    localStorage.setItem('payload', makeFormHtml64(this.makeUrl(), this.data));
+    localStorage.setItem('payload', makeFormHtml64(this.makeUrl(), data));
     this.submit(popup.name);
   }
 
@@ -202,27 +235,12 @@ Request.prototype = {
   },
 
   makeAjax: function(){
+    var cb = this.ajaxCallback = bind(ajaxCallback, this);
     this.ajax = $.post({
       url: this.makeUrl(),
       data: this.data,
-      callback: bind(this.ajaxCallback, this)
+      callback: cb
     })
-  },
-
-  ajaxCallback: function(response){
-    this.payment_id = response.payment_id;
-
-    if(response.razorpay_payment_id || response.error){
-      this.complete(response);
-    } else {
-      var nextRequest = response.request;
-      if(response.type === 'otp'){
-        this.secondfactor(nextRequest);
-      } else {
-        window.onComplete = bind(this.complete, this);
-        this.nextRequest(nextRequest);
-      }
-    }
   },
 
   nextRequest: function(request){
