@@ -21,18 +21,6 @@ var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
 var stringify = bind(JSON.stringify, JSON);
 
-function fill(target, props, source){
-  if(arguments.length === 2){
-    source = target;
-  }
-  each(
-    props,
-    function(i, prop){
-      target[prop] = source[prop] || noop;
-    }
-  )
-}
-
 function each( iteratee, eachFunc, thisArg ) {
   var i;
   if(arguments.length < 3){
@@ -75,13 +63,12 @@ function submitForm(action, data, method, target) {
   form.setAttribute('action', action);
 
   if(method){ form.setAttribute('method', method) }
-  if(target) { form.setAttribute('target', target) }
-
+  if(target){ form.setAttribute('target', target) }
   if(data){ form.innerHTML = deserialize(data) }
 
-  document.documentElement.appendChild(form);
+  doc.appendChild(form);
   form.submit();
-  form.parentNode.removeChild(form);
+  doc.removeChild(form);
 }
 
 function deserialize(data, key){

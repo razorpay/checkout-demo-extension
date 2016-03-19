@@ -286,6 +286,7 @@ function Session(options){
 }
 
 Session.prototype = {
+  // accessing this.data would not produce error
   data: emo,
   params: emo,
   getClasses: function(){
@@ -869,7 +870,7 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     each(
-      ['amount', 'currency', 'callback_url', 'signature', 'description', 'order_id'],
+      ['amount', 'currency', 'signature', 'description', 'order_id'],
       function(i, field){
         var val = this.get(field);
         if(val){
@@ -896,16 +897,21 @@ Session.prototype = {
 
     var request = {
       data: data,
+      fees: window.fee_bearer,
       options: {
         image: this.get('image'),
         redirect: this.get('redirect')
-      }
+      },
+      success: bind(this.successHandler, this),
+      error: bind(this.instanceErrorHandler, this)
     };
 
-    var shouldAjax = false//discreet.shouldAjax(data);
+    showLoadingMessage('Please wait while your payment is processed...');
+    this.request = Razorpay.payment.authorize(request);
+    return;
+    var shouldAjax = request.shouldAjax();
 
     if(shouldAjax){
-      request.ajax = true;
       request.success = bind(this.ajaxCallback, this);
 
       this.showPowerScreen({
@@ -915,26 +921,6 @@ Session.prototype = {
         text: 'Checking for a mobikwik account associated with'
       })
     }
-
-    else {
-      showLoadingMessage('Please wait while your payment is processed...');
-      request.error = bind(this.instanceErrorHandler, this);
-      request.success = bind(this.successHandler, this);
-    }
-
-    // onComplete defined in razorpay-submit.js, safe to expose now
-    window.onComplete = bind(discreet.onComplete, this);
-
-    // setPaymentID to be used by payment cancel API
-    window.setPaymentID = function(payment_id){
-      request.payment_id = payment_id;
-      delete window.setPaymentID;
-    }
-
-    if(window.fee_bearer){
-      request.fees = true;
-    }
-    this.rzp = Razorpay.payment.authorize(request);
   },
 
   close: function(){

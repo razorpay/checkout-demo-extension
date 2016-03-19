@@ -1,6 +1,10 @@
 var templates = {};
 var cookieInterval, communicator;
 
+function makeFormHtml64(url, data){
+  return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form>');
+}
+
 function clearCookieInterval(){
   if(cookieInterval){
     deleteCookie('onComplete');
@@ -86,15 +90,14 @@ function onPopupClose(){
 }
 
 function onMessage(e){
-  var request = this._request;
   if(e.origin) {
     if (
-      (!request.popup || e.source !== request.popup.window && e.source !== communicator.contentWindow) ||
+      (!this.popup || e.source !== this.popup.window && e.source !== communicator.contentWindow) ||
       discreet.makeUrl().indexOf(e.origin)
     ){
       return;
     }
-    discreet.onComplete.call(this, e.data);
+    this.complete(e.data);
   }
 }
 
@@ -106,47 +109,76 @@ function Request(params){
   if(!(this instanceof Request)){
     return new Request(params);
   }
+
   var errors = this.format(params);
   if(errors){
     return errors;
   }
-
-  this.params = params;
-  var data = params.data;
+  var options = this.options;
+  if(options.redirect){
+    // add callback_url if redirecting
+    this.data.callback_url = options.callback_url;
+    return this.submit();
+  }
 
   if(this.shouldPopup()){
-    if(!(this.popup = this.makePopup())){
-      return this.postSubmit();
+    var popup = this.popup = this.makePopup();
+    // open new tab
+    if(!popup){
+      localStorage.removeItem('payload');
+      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
     }
   }
 
-  return this.makeAjax();
-
-  // prevent callback_url from being submitted if not redirecting
-  delete data.callback_url;
-  this.track();
-
-  if(!discreet.supported(true)){
-    return true;
+  if(this.shouldAjax()){
+    this.makeAjax();
+  } else {
+    localStorage.setItem('payload', makeFormHtml64(this.makeUrl(), this.data));
+    this.submit(popup.name);
   }
 
-  this.listener = $(window).on('message', onMessage, null, this);
+  // this.track();
 
-  if(discreet.isFrame){
-    cookiePoll(this);
-  }
+  // if(!discreet.supported(true)){
+  //   return true;
+  // }
+
+  this.listener = $(window).on('message', bind(onMessage, this));
+
+  // if(discreet.isFrame){
+  //   cookiePoll(this);
+  // }
 }
 
 Request.prototype = {
+  submit: function(name){
+    return submitForm(
+      this.makeUrl(),
+      this.data,
+      'post',
+      name
+    )
+  },
+
   format: function(params){
     if(typeof params !== 'object' || typeof params.data !== 'object'){
       return err('malformed payment request object');
     }
-    fill(params, ['success', 'error', 'secondfactor', 'options']);
-    var data = params.data;
+
+    var data = this.data = params.data;
+    this.options = params.options || emo;
+    this.fees = params.fees;
+    this.success = params.success || noop;
+    this.error = params.error || noop;
+    if(params.secondfactor){
+      this.secondfactor = params.secondfactor;
+    }
 
     if(!data.key_id){
       data.key_id = Razorpay.defaults.key;
+    }
+    if(!data.currency){
+      data.currency = Razorpay.defaults.currency;
     }
 
     if(_uid){
@@ -158,23 +190,28 @@ Request.prototype = {
     return Razorpay.payment.validate(data);
   },
 
-  cancel: function(errorObj){
-    discreet.onComplete.call(this, errorObj || discreet.defaultError());
-  },
-
-  makeUrl: function(fees){
-    return discreet.makeUrl() + 'payments/create/' + (fees ? 'fees' : 'checkout');
+  makeUrl: function(){
+    if(this.fees){
+      urlType = 'fees';
+    } else if(this.options.redirect){
+      urlType = 'checkout';
+    } else {
+      urlType = 'ajax';
+    }
+    return discreet.makeUrl() + 'payments/create/' + urlType;
   },
 
   makeAjax: function(){
     this.ajax = $.post({
-      url: discreet.makeUrl() + 'payments/create/ajax',
-      data: this.params.data,
+      url: this.makeUrl(),
+      data: this.data,
       callback: bind(this.ajaxCallback, this)
     })
   },
 
   ajaxCallback: function(response){
+    this.payment_id = response.payment_id;
+
     if(response.razorpay_payment_id || response.error){
       this.complete(response);
     } else {
@@ -189,13 +226,7 @@ Request.prototype = {
   },
 
   nextRequest: function(request){
-    if(this.params.options.redirect){
-      discreet.nextRequestRedirect({
-        url: request.url,
-        content: request.content,
-        method: request.method
-      });
-    } else if(this.popup){
+    if(this.popup){
       submitForm(
         request.url,
         request.content,
@@ -203,23 +234,20 @@ Request.prototype = {
         this.popup.name
       )
     } else {
-      // TODO
-      var result = _btoa(stringify(request));
-      if(communicator.contentWindow === window){
-        setCookie('nextRequest', result);
-      } else {
-        communicator.src = getCommuniactorSrc() + '#' + result;
-      }
+      localStorage.setItem('payload', makeFormHtml64(request.url, request.content));
     }
   },
 
-  postSubmit: function(){
-
+  shouldPopup: function(){
+    return this.data.wallet !== 'mobikwik' || this.fees;
   },
 
-  shouldPopup: function(){
-    var params = this.params;
-    return params.options.redirect || params.data.wallet !== 'mobikwik';
+  shouldAjax: function(){
+    return !this.fees;
+  },
+
+  shouldPost: function(){
+    return (this.shouldPopup() && !this.popup) || !this.shouldAjax();
   },
 
   makePopup: function(){
@@ -233,11 +261,25 @@ Request.prototype = {
     }
     try{
       var pdoc = popup.window.document;
-      pdoc.write(templates.popup(this.params));
+      pdoc.write(templates.popup(this));
       pdoc.close();
     } catch(e){}
 
+    popup.onClose = bind(this.cancel, this);
     return popup;
+  },
+
+  cancel: function(errorObj){
+    var payment_id = this.payment_id;
+    if(payment_id){
+      $.ajax({
+        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel',
+        headers: {
+          Authorization: 'Basic ' + _btoa(this.options.key + ':')
+        }
+      })
+    }
+    this.complete(errorObj || discreet.defaultError());
   },
 
   complete: function(data){
@@ -254,13 +296,13 @@ Request.prototype = {
     var payment_id = data.razorpay_payment_id;
     if(typeof payment_id === 'string' && payment_id){
       var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-      return invoke(this.params.success, null, returnObj, 0); // dont expose request as this
+      return invoke(this.success, null, returnObj, 0); // dont expose request as this
     }
 
     if(!data.error || typeof data.error !== 'object' || !data.error.description){
       data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
     }
-    invoke(this.params.error, null, data, 0);
+    invoke(this.error, null, data, 0);
     // track.call(this, 'failure', {response: data, data: request.orig});
   },
 
@@ -270,6 +312,7 @@ Request.prototype = {
       this.popup.close();
     } catch(e){}
 
+    invoke('listener', this);
     // clearCookieInterval();
   },
 
