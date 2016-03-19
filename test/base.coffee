@@ -211,15 +211,6 @@ describe 'discreet', ->
       image = 'asdnk'
       result = false
 
-  describe 'shouldAjax', ->
-    it 'should return true for mobikwik in case of iframe', ->
-      expect discreet.shouldAjax {wallet: 'mobikwik'}
-        .to.be discreet.isFrame
-
-      expect discreet.shouldAjax {wallet: 'paytm'}
-        .to.not.be.ok()
-
-
   describe 'nextRequestRedirect', ->
     submitSpy = msgSpy = null
     request =

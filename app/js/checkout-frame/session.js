@@ -290,7 +290,9 @@ function errorHandler(response){
   var message;
   this.shake();
   this.clearRequest();
-  this.modal.options.backdropclose = this.get('modal.backdropclose');
+  if(this.modal){
+    this.modal.options.backdropclose = this.get('modal.backdropclose');
+  }
 
   message = response.error.description;
   var err_field = response.error.field;

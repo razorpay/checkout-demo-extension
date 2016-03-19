@@ -1,3 +1,4 @@
+sinon.stub $, 'ajax'
 orig_methods = window.payment_methods =
   'card': true
   'netbanking':
@@ -142,7 +143,7 @@ describe 'payment authorization', ->
         amount: 100
 
     it 'display default error discription', ->
-      getSession().instanceErrorHandler response
+      errorHandler.call getSession(), response
       expect jQuery '#error-message:visible'
         .to.have.length 1
       expect jQuery('#fd-t').html().length
@@ -151,7 +152,7 @@ describe 'payment authorization', ->
     it 'display custom error description', ->
       str = 'hello error'
       response.error.description = str
-      getSession().instanceErrorHandler response
+      errorHandler.call getSession(), response
       expect jQuery '#error-message:visible'
         .to.have.length 1
       expect jQuery('#fd-t').html()
@@ -160,7 +161,7 @@ describe 'payment authorization', ->
     it 'focus related field and apply invalid', ->
       field_el = jQuery 'input[name]:not([type=hidden]):eq(1)'
       response.error.field = field_el.prop 'name'
-      getSession().instanceErrorHandler response
+      errorHandler.call getSession(), response
       expect jQuery '#error-message:visible'
         .to.have.length 1
       expect field_el[0]
@@ -176,7 +177,7 @@ describe 'payment authorization', ->
     session = getSession()
 
     stub = sinon.stub session.modal, 'hide'
-    session.successHandler()
+    successHandler.call session
     expect stub.callCount
       .to.be 1
     stub.restore()
@@ -299,7 +300,7 @@ describe 'Razorpay card tab submit', ->
       afterEach ->
         launch()
         do addAllCC
-        stub = sinon.stub Razorpay::, 'authorizePayment'
+        stub = sinon.stub Razorpay.payment, 'authorize'
         if field
           extra = ->
             expect stub.getCall(0).args[0].data[field]
@@ -342,7 +343,7 @@ describe 'Razorpay card tab submit', ->
 
     describe 'validation error', ->
       afterEach ->
-        nostub = sinon.stub Razorpay::, 'authorizePayment'
+        nostub = sinon.stub Razorpay.payment, 'authorize'
 
       it 'should not submit without cc card', ->
         launch()
@@ -458,20 +459,20 @@ describe 'Razorpay open netbanking page and submit method', ->
 
     it 'should submit with all details in place', ->
       $nbBank.val 'SBIN'
-      stub = sinon.stub Razorpay::, 'authorizePayment'
+      stub = sinon.stub Razorpay.payment, 'authorize'
 
     it 'should not submit without bank selected', ->
-      nostub = sinon.stub Razorpay::, 'authorizePayment'
+      nostub = sinon.stub Razorpay.payment, 'authorize'
 
     it 'should not submit without email', ->
       $nbBank.val 'SBIN'
       jQuery('.input[name="email"]').val ''
-      nostub = sinon.stub Razorpay::, 'authorizePayment'
+      nostub = sinon.stub Razorpay.payment, 'authorize'
 
     it 'should not submit without contact', ->
       $nbBank.val 'SBIN'
       jQuery('.input[name="contact"]').val ''
-      nostub = sinon.stub Razorpay::, 'authorizePayment'
+      nostub = sinon.stub Razorpay.payment, 'authorize'
 
 describe 'Razorpay netbanking getFormData method', ->
   opts = data = null
