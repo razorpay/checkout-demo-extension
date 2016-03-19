@@ -59,14 +59,14 @@ discreet.setCommunicator = function(opts){
 
 discreet.setCommunicator(Razorpay.defaults);
 
-function cookiePoll(rzp){
+function cookiePoll(request){
   deleteCookie('onComplete');
 
   cookieInterval = setInterval(function(){
     var cookie = getCookie('onComplete');
     if(cookie){
       clearCookieInterval();
-      discreet.onComplete.call(rzp, cookie);
+      request.complete(cookie);
     }
   }, 150)
 }
@@ -160,9 +160,9 @@ function Request(params){
 
   this.listener = $(window).on('message', bind(onMessage, this));
 
-  // if(discreet.isFrame){
-  //   cookiePoll(this);
-  // }
+  if(discreet.isFrame){
+    cookiePoll(this);
+  }
 }
 
 Request.prototype = {

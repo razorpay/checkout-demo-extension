@@ -30,12 +30,12 @@ describe 'Razorpay.payment.authorize should', ->
     Razorpay.defaults.key = ''
     Razorpay.defaults.amount = ''
 
-  it 'return razorpay object', ->
+  it 'return request object', ->
     expect Razorpay.payment.authorize data: amount: 1000
-      .to.be.a Razorpay
+      .to.be.a Request
 
-  it 'should invoke rzp.authorizePayment', ->
-    spy = sinon.stub Razorpay::, 'authorizePayment'
+  it 'should invoke Request object', ->
+    spy = sinon.stub window, 'Request'
     Razorpay.payment.authorize data: amount: 2000
     expect spy.called
       .to.be true
@@ -54,10 +54,3 @@ describe 'getMethods', ->
       .to.be true
 
     spy.restore()
-    
-describe 'onMessage should invoke onComplete,', ->
-  it 'but not if on origin', ->
-    spy = sinon.stub discreet, 'onComplete'
-    onMessage {}
-    expect spy.called
-      .to.be false

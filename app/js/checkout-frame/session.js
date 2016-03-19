@@ -321,6 +321,7 @@ function errorHandler(response){
 
 // this === Session
 function powerErrorHandler(response){
+  this.clearRequest();
   this.requestTimeout = invoke(
     'showPowerScreen',
     this,
@@ -585,7 +586,7 @@ Session.prototype = {
 
     if(enabledMethods.wallet.mobikwik){
       this.on('submit', '#powerwallet', this.onOtpSubmit);
-      this.on('click', '#powercancel', this.bind(function(){this.request.cancel()}));
+      this.on('click', '#powercancel', this.hideErrorMessage);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
