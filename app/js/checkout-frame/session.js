@@ -251,9 +251,11 @@ function hideEmi(){
 }
 
 function hideOverlayMessage(){
-  hideOverlay(
-    $('#error-message')
-  )
+  var errEl = $('#error-message');
+  if(!errEl.hasClass('shown')){
+    errEl = $('#powerwallet');
+  }
+  hideOverlay(errEl);
 }
 
 function overlayVisible(){
@@ -278,6 +280,87 @@ function setDefaultError(){
   var msg = discreet.defaultError();
   msg.id = _uid;
   setCookie('onComplete', stringify(msg));
+}
+
+// this === Session
+function errorHandler(response){
+  if(!response || !response.error){
+    return;
+  }
+  var message;
+  this.shake();
+  this.clearRequest();
+  this.modal.options.backdropclose = this.get('modal.backdropclose');
+
+  message = response.error.description;
+  var err_field = response.error.field;
+  if (err_field){
+    if(!err_field.indexOf('expiry')){
+      err_field = 'card[expiry]';
+    }
+    var error_el = document.getElementsByName(err_field)[0];
+    if (error_el && error_el.type !== 'hidden'){
+      var help = $(error_el)
+        .focus()
+        .parent()
+        .addClass('invalid')
+        .find('help-text')[0];
+
+      if(help){
+        $(help).html(message);
+      }
+      return hideOverlayMessage();
+    }
+  }
+
+  showErrorMessage(message || 'There was an error in handling your request');
+  $('#fd-hide').focus();
+}
+
+// this === Session
+function powerErrorHandler(response){
+  this.requestTimeout = invoke(
+    'showPowerScreen',
+    this,
+    {
+      className: 'error',
+      text: response.error.description,
+      title: 'Error'
+    },
+    200
+  )
+}
+
+// this === Session
+function successHandler(response){
+  this.clearRequest();
+  // prevent dismiss event
+  this.modal.options.onhide = noop;
+
+  // sending oncomplete event because CheckoutBridge.oncomplete
+  Razorpay.sendMessage({ event: 'complete', data: response });
+  this.hide();
+}
+
+// this === Session
+function secondfactorHandler(done){
+  this.secondfactorCallback = done;
+  this.showPowerScreen({
+    title: 'Sending OTP',
+    text: 'Sending OTP to',
+    number: true
+  })
+  this.requestTimeout = invoke(
+    'showPowerScreen',
+    this,
+    {
+      className: 'otp',
+      title: 'Enter OTP',
+      text: 'An OTP has been sent to',
+      number: true
+    },
+    750
+  )
 }
 
 function Session(options){
@@ -371,7 +454,7 @@ Session.prototype = {
     this.setSmarty();
     this.setCard();
     this.bindEvents();
-    this.errorHandler(this.params);
+    errorHandler.call(this, this.params);
 
     var key = this.get('key');
     if(key === 'rzp_live_kfAFSfgtztVo28' || key === 'rzp_test_s9cT6UE4Mit7zL'){
@@ -445,14 +528,14 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(){
-    if(!this.rzp){
-      if(!$('#emi-wrap').hasClass('shown')){
-        hideOverlayMessage();
+    if(this.request){
+      if(confirm('Cancel Payment?')){
+        this.clearRequest();
+      } else {
+        return;
       }
     }
-    else if(this.nextRequest && confirm('Cancel Payment?')){
-      this.cleanupPowerRequest();
-    }
+    hideOverlayMessage();
   },
 
   shake: function(){
@@ -498,9 +581,9 @@ Session.prototype = {
       this.on('change', '#nocvv-check', noCvvToggle);
     }
 
-    if(enabledMethods.wallet && enabledMethods.wallet.mobikwik){
+    if(enabledMethods.wallet.mobikwik){
       this.on('submit', '#powerwallet', this.onOtpSubmit);
-      this.on('click', '#powercancel', this.cleanupPowerRequest);
+      this.on('click', '#powercancel', this.bind(function(){this.request.cancel()}));
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -666,60 +749,6 @@ Session.prototype = {
     }
   },
 
-  secondfactor: function(done){
-    this.secondfactorCallback = done;
-    this.showPowerScreen({
-      title: 'Sending OTP',
-      text: 'Sending OTP to',
-      number: true
-    })
-    invoke(
-      'showPowerScreen',
-      this,
-      {
-        className: 'otp',
-        title: 'Enter OTP',
-        text: 'An OTP has been sent to',
-        number: true
-      },
-      750
-    )
-  },
-
-  reenterOtpView: function(response){
-    var errorMessage;
-    try{
-      errorMessage = response.error.description;
-    }
-    catch(e){
-      errorMessage = 'Entered OTP could not be verified.';
-      roll('powerwallet response', e);
-    }
-    if(this.rzp){
-      gel('powerotp').placeholder = 'Reenter OTP';
-      this.showPowerScreen({
-        className: 're otp',
-        text: errorMessage,
-        title: 'Error'
-      })
-    }
-  },
-
-  powerErrorHandler: function(response){
-    if(this.rzp){
-      invoke(
-        'showPowerScreen',
-        this,
-        {
-          className: 'error',
-          text: response.error.description,
-          title: 'Error'
-        },
-        200
-      )
-    }
-  },
-
   onOtpSubmit: function(e){
     preventDefault(e);
     this.showPowerScreen({
@@ -730,65 +759,23 @@ Session.prototype = {
     this.secondfactorCallback(gel('powerotp').value);
   },
 
-  cleanupPowerRequest: function(){
-    this.nextRequest = null;
+  clearRequest: function(){
     var powerotp = gel('powerotp');
     if(powerotp){
-      gel('powerotp').value = '';
+      powerotp.value = '';
     }
-    hideOverlay($('#powerwallet'));
-  },
-
-  successHandler: function(response){
-    // this.cleanupPowerRequest();
-    // prevent dismiss event
-    this.modal.options.onhide = noop;
-
-    // sending oncomplete event because CheckoutBridge.oncomplete
-    Razorpay.sendMessage({ event: 'complete', data: response });
-    this.hide();
-  },
-
-  instanceErrorHandler: function(response){
-    if(!this.rzp || !response){
-      return;
-    }
-    this.cleanupRequest();
-    this.errorHandler(response);
-  },
-
-  errorHandler: function(response){
-    if(!response || !response.error){
-      return;
-    }
-    var message;
-    this.shake();
-    this.modal.options.backdropclose = this.get('modal.backdropclose');
-
-    message = response.error.description;
-    var err_field = response.error.field;
-    if (err_field){
-      if(!err_field.indexOf('expiry')){
-        err_field = 'card[expiry]';
+    if(this.request){
+      if(this.request.ajax){
+        this.request.ajax.abort();
       }
-      var error_el = document.getElementsByName(err_field)[0];
-      if (error_el && error_el.type !== 'hidden'){
-        var help = $(error_el)
-          .focus()
-          .parent()
-          .addClass('invalid')
-          .find('help-text')[0];
-
-        if(help){
-          $(help).html(message);
-        }
-        this.hideErrorMessage();
-        return;
-      }
+      this.request = null;
     }
+    clearTimeout(this.requestTimeout);
+    this.requestTimeout = null;
+  },
 
-    showErrorMessage(message || 'There was an error in handling your request');
-    $('#fd-hide').focus();
+  bind: function(func){
+    return bind(func, this);
   },
 
   submit: function(e) {
@@ -862,12 +849,12 @@ Session.prototype = {
         image: this.get('image'),
         redirect: this.get('redirect')
       },
-      secondfactor: bind(this.secondfactor, this),
-      success: bind(this.successHandler, this),
-      error: bind(this.instanceErrorHandler, this)
+      success: this.bind(successHandler),
     };
 
     if(data.wallet === 'mobikwik' && !request.fees){
+      request.error = this.bind(powerErrorHandler);
+      request.secondfactor = this.bind(secondfactorHandler);
       this.showPowerScreen({
         className: 'loading',
         title: 'Verifying Account',
@@ -875,6 +862,7 @@ Session.prototype = {
         text: 'Checking for a mobikwik account associated with'
       })
     } else {
+      request.error = this.bind(errorHandler);
       showLoadingMessage('Please wait while your payment is processed...');
     }
     this.request = Razorpay.payment.authorize(request);

@@ -71,24 +71,6 @@ function cookiePoll(rzp){
   }, 150)
 }
 
-function onPopupClose(){
-  var request_id;
-  try {
-    request_id = this._request.payment_id;
-  } catch(e){}
-
-  if(request_id){
-    $.ajax({
-      url: discreet.makeUrl() + 'payments/' + request_id + '/cancel',
-      headers: {
-        Authorization: 'Basic ' + _btoa(this.get('key') + ':')
-      }
-    })
-    track.call(this, 'cancel');
-  }
-  this.cancelPayment();
-}
-
 function onMessage(e){
   if(e.origin) {
     if (
@@ -288,16 +270,18 @@ Request.prototype = {
   },
 
   cancel: function(errorObj){
-    var payment_id = this.payment_id;
-    if(payment_id){
-      $.ajax({
-        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel',
-        headers: {
-          Authorization: 'Basic ' + _btoa(this.options.key + ':')
-        }
-      })
+    if(!this.done){
+      var payment_id = this.payment_id;
+      if(payment_id){
+        $.ajax({
+          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel',
+          headers: {
+            Authorization: 'Basic ' + _btoa(this.options.key + ':')
+          }
+        })
+      }
+      this.complete(errorObj || discreet.defaultError());
     }
-    this.complete(errorObj || discreet.defaultError());
   },
 
   complete: function(data){
@@ -330,6 +314,8 @@ Request.prototype = {
       this.popup.close();
     } catch(e){}
 
+    this.done = true;
+    // unbind listener
     invoke('listener', this);
     // clearCookieInterval();
   },
