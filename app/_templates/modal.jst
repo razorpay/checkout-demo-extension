@@ -1,4 +1,4 @@
-{{ var o = it.get, method = it.methods, wallet = method.wallet, wd = it.walletData, notes = o('notes'); }}
+{{ var o = it.get, method = it.methods, wallet = method.wallet, wd = it.walletData; }}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
   <div id="modal" class="mchild">
@@ -48,9 +48,6 @@
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
-                {{for(var note in notes){}}
-                  <input type="hidden" name="notes[{{=note}}]" value="{{=notes[note]}}">
-                {{}}}
                 <div class="fieldset">
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>

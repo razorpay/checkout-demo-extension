@@ -31,7 +31,7 @@ function sanitize(message){ // warning: modifies message;
 
   sanitizeValue(
     options,
-    ['image', 'prefill', 'notes']
+    ['image', 'prefill']
   )
 
   data.contact = sanitizeContact(data.contact || options['prefill.contact']);
@@ -798,40 +798,17 @@ Session.prototype = {
       }
     }
 
-    if (this.checkInvalid($('#form-common'))) {
+    if(this.checkInvalid($('#form-common'))){
       return;
     }
 
     var activeTab = $('.tab-content.shown');
-    if ( activeTab[0] && this.checkInvalid(activeTab) ) {
+    if (activeTab[0] && this.checkInvalid(activeTab)){
       return;
     }
-    var data = getFormData();
 
-    setEmiBank(data);
-
+    var data = this.getPayload(nocvv_dummy_values);
     var message = this.message;
-
-    if(nocvv_dummy_values){
-      data['card[cvv]'] = '000';
-      data['card[expiry_month]'] = '12';
-      data['card[expiry_year]'] = '21';
-    }
-
-    // data.amount needed by external libraries relying on `onsubmit` postMessage
-    each(
-      ['amount', 'currency', 'signature', 'description', 'order_id'],
-      function(i, field){
-        var val = this.get(field);
-        if(val){
-          data[field] = this.get(field);
-        }
-      },
-      this
-    )
-
-    // data.key_id needed by discreet.shouldAjax
-    data.key_id = this.get('key');
 
     Razorpay.sendMessage({
       event: 'submit',
@@ -869,6 +846,39 @@ Session.prototype = {
       showLoadingMessage('Please wait while your payment is processed...');
     }
     this.request = Razorpay.payment.authorize(request);
+  },
+
+  getPayload: function(nocvv_dummy_values){
+    var data = getFormData();
+    setEmiBank(data);
+
+    if(nocvv_dummy_values){
+      data['card[cvv]'] = '000';
+      data['card[expiry_month]'] = '12';
+      data['card[expiry_year]'] = '21';
+    }
+    // data.amount needed by external libraries relying on `onsubmit` postMessage
+    each(
+      ['amount', 'currency', 'signature', 'description', 'order_id'],
+      function(i, field){
+        var val = this.get(field);
+        if(val){
+          data[field] = this.get(field);
+        }
+      },
+      this
+    )
+
+    // data.key_id needed by discreet.shouldAjax
+    data.key_id = this.get('key');
+
+    each(
+      this.get('notes'),
+      function(noteKey, noteVal){
+        data['notes[' + noteKey + ']'] = noteVal;
+      }
+    )
+    return data;
   },
 
   close: function(){
