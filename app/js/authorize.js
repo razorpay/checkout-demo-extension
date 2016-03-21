@@ -40,7 +40,7 @@ function getCommuniactorSrc(){
   return discreet.makeUrl(true) + 'communicator.php';
 }
 
-discreet.setCommunicator = function(opts){
+discreet.setCommunicator = function(){
   if(communicator && communicator.parentNode){
     communicator.parentNode.removeChild(communicator);
   }
@@ -57,7 +57,7 @@ discreet.setCommunicator = function(opts){
   }
 }
 
-discreet.setCommunicator(Razorpay.defaults);
+discreet.setCommunicator();
 
 function cookiePoll(request){
   deleteCookie('onComplete');
@@ -155,9 +155,9 @@ function Request(params){
     this.submit(popup.name);
   }
 
-  // if(!discreet.supported(true)){
-  //   return true;
-  // }
+  if(!discreet.supported(true)){
+    return true;
+  }
 
   this.listener = $(window).on('message', bind(onMessage, this));
 
@@ -298,13 +298,16 @@ Request.prototype = {
   },
 
   complete: function(data){
+    if(this.done){
+      return;
+    }
     this.clear();
-    try {
+    try{
       if(typeof data !== 'object') {
         data = JSON.parse(data);
       }
     }
-    catch(e) {
+    catch(e){
       return roll('unexpected api response', data);
     }
 
@@ -329,7 +332,7 @@ Request.prototype = {
     this.done = true;
     // unbind listener
     invoke('listener', this);
-    // clearCookieInterval();
+    clearCookieInterval();
   },
 
   track: function(){
