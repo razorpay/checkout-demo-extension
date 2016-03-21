@@ -756,7 +756,7 @@ Session.prototype = {
 
     var request = {
       data: data,
-      fees: window.fee_bearer,
+      fees: preferences.fee_bearer,
       options: {
         image: this.get('image'),
         redirect: this.get('redirect')

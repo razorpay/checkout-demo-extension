@@ -1,12 +1,15 @@
 sinon.stub $, 'ajax'
-orig_methods = window.payment_methods =
-  'card': true
-  'netbanking':
-    'HDFC': 'HDFC Bank'
-    'UTIB': 'Axis Bank'
-    'BARB': 'Bank of Baroda'
-    'SBIN': 'State Bank of India'
-  'wallet': 'paytm': true
+window.preferences =
+  methods:
+    card: true
+    netbanking:
+      HDFC: 'HDFC Bank'
+      UTIB: 'Axis Bank'
+      BARB: 'Bank of Baroda'
+      SBIN: 'State Bank of India'
+    wallet: 'paytm': true
+
+orig_methods = window.preferences.methods
 
 cc = 
   number: '4111111111111111'

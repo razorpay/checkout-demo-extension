@@ -1,11 +1,11 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
-var CheckoutBridge = window.CheckoutBridge;
 
-var sessions = {};
-
-var isIframe = window !== parent;
-var ownerWindow = isIframe ? parent : opener;
+var preferences = window.preferences,
+  CheckoutBridge = window.CheckoutBridge,
+  sessions = {},
+  isIframe = window !== parent,
+  ownerWindow = isIframe ? parent : opener;
 
 function getSession(id){
   return sessions[id || _uid];
@@ -119,7 +119,7 @@ function notifyBridge(message){
 }
 
 function setPaymentMethods(session){
-  var availMethods = window.payment_methods;
+  var availMethods = preferences.methods;
   var methods = session.methods = {};
 
   each(
@@ -150,19 +150,17 @@ function setPaymentMethods(session){
 }
 
 function showModal(session) {
-  if(!window.payment_methods){
+  if(!preferences){
     Razorpay.payment.getPrefs(session.get('key'), function(response){
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
-      window.payment_methods = response.methods;
-      window.fee_bearer = response.fee_bearer;
+      preferences = response;
       showModalWithSession(session);
     })
     return;
-  } else {
-    showModalWithSession(session);
   }
+  showModalWithSession(session);
 }
 
 function showModalWithSession(session){
