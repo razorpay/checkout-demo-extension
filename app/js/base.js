@@ -184,32 +184,39 @@ function base_configure(overrides){
   return options;
 }
 
-Razorpay.prototype.configure = function(overrides){
-  var key, options;
-  try{
-    this.get = base_configure(overrides).get;
-    key = this.get('key');
-    validateRequiredFields(this);
-  } catch(e){
-    var message = e.message;
-    if(!/^rzp_l/.test(key || overrides.key || '')){
-      alert(message);
+Razorpay.prototype = {
+  track: function(event){
+    var options = this.get();
+    if(/^rzp_l/.test(options.key)){
+      track(this.id, event, options);
     }
-    raise(message);
-  }
+  },
+  configure: function(overrides){
+    var key, options;
+    try{
+      this.get = base_configure(overrides).get;
+      key = this.get('key');
+      validateRequiredFields(this);
+    } catch(e){
+      var message = e.message;
+      if(!/^rzp_l/.test(key || overrides.key || '')){
+        alert(message);
+      }
+      raise(message);
+    }
 
-  if(this instanceof Razorpay){
-    this.id = generateUID();
-    this.modal = {options: {}};
-    if(!discreet.isFrame){
-      track.call( this, 'init' );
-    }
+    if(this instanceof Razorpay){
+      this.id = generateUID();
+      this.modal = {options: emo};
+      this.options = emo;
+      this.track('init');
 
-    if(this.get('parent')){
-      this.open();
+      if(this.get('parent')){
+        this.open();
+      }
     }
   }
-};
+}
 
 Razorpay.configure = function(overrides){
   each(
