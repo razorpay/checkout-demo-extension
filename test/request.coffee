@@ -38,14 +38,16 @@ describe 'Request::', ->
 
 
 describe 'ajax callback', ->
-  request = Request data: payload
+  request = Request
+    data: payload
+    secondfactor: jQuery.noop
   complete = secondfactor = next = null
 
   beforeEach ->
     window.onComplete = null
     complete = sinon.stub Request::, 'complete'
-    secondfactor = sinon.stub Request::, 'secondfactor'
     next = sinon.stub Request::, 'nextRequest'
+    secondfactor = sinon.stub request, 'secondfactor'
 
   afterEach ->
     do complete.restore
@@ -54,12 +56,15 @@ describe 'ajax callback', ->
 
   describe 'immediate', ->
     result = null
+
     it 'success', ->
       result = {razorpay_payment_id: 'abc'}
+
     it 'error', ->
       result = {error: 2}
+
     afterEach ->
-      ajaxCallback.call request, 
+      ajaxCallback.call request, result
       expect complete.callCount
         .to.be 1
       expect complete.getCall(0).args[0]
