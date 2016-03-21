@@ -761,7 +761,7 @@ Session.prototype = {
         image: this.get('image'),
         redirect: this.get('redirect')
       },
-      success: this.bind(successHandler),
+      success: this.bind(successHandler)
     };
 
     if(data.wallet === 'mobikwik' && !request.fees){

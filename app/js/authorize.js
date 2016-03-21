@@ -126,8 +126,11 @@ function Request(params){
   if(errors){
     return errors;
   }
-  var options = this.options;
-  var data = this.data;
+
+  var popup,
+    options = this.options,
+    data = this.data;
+
   if(options.redirect){
     // add callback_url if redirecting
     data.callback_url = options.callback_url;
@@ -135,7 +138,7 @@ function Request(params){
   }
 
   if(this.shouldPopup()){
-    var popup = this.makePopup();
+    popup = this.makePopup();
     // open new tab
     if(!popup){
       localStorage.removeItem('payload');
@@ -203,6 +206,7 @@ Request.prototype = {
   },
 
   makeUrl: function(){
+    var urlType;
     if(this.fees){
       urlType = 'fees';
     } else if(this.options.redirect){
@@ -258,8 +262,9 @@ Request.prototype = {
     if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
       return null;
     }
+    var popup;
     try{
-      var popup = this.popup = new Popup('', 'popup_' + _uid);
+      popup = this.popup = new Popup('', 'popup_' + _uid);
     } catch(e){
       return null;
     }

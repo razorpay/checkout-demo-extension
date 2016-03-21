@@ -1,3 +1,5 @@
+sinon.stub HTMLFormElement::, 'submit'
+
 options =
   'key': 'key_id'
   'amount': '40000'
