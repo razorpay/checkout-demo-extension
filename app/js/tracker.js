@@ -69,6 +69,7 @@ function _toBase62(number){
   return result;
 }
 
+var _uid = generateUID();
 
 function generateUID(){
   var num = _toBase62(
@@ -98,9 +99,13 @@ function generateUID(){
   return num.slice(0, 13) + tempdigit
 }
 
-var _uid = generateUID();
-
 function track(id, event, props){
+  if(id instanceof Razorpay){
+    if(!id.isLiveMode()){
+      return;
+    }
+    id = id.id;
+  }
   setTimeout(function(){
     var payload = {
       context: {

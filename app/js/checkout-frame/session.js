@@ -73,7 +73,7 @@ function makeEmiDropdown(emiObj, session){
     function(length, rate){
       h += '<div class="option" value="'+length+'">'
         + length + ' month EMI @ ' + rate + '% (&#xe600; '
-        + emi_options.installment(length, rate, session.message.options.amount)/100
+        + emi_options.installment(length, rate, session.get('amount'))/100
         + ' per month)</div>';
     }
   )

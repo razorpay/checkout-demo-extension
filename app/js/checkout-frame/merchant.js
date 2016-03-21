@@ -359,12 +359,10 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
   }
 }
 
-function trackInit(message){
-  if(CheckoutBridge){
-    track.call(message, 'init');
-  }
-  else {
-    track.call(message, 'open');
+function trackInit(session){
+  var options = session.get();
+  if(/^rzp_l/.test(options.key)){
+    track(session.id, 'init', options);
   }
 }
 

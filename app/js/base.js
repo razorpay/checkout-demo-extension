@@ -53,7 +53,7 @@ var discreet = {
 
     if(alertMessage){
       if(showAlert){
-        track('unsupported', {message: alertMessage, ua: ua});
+        // TODO track
         alert(alertMessage + ' choose another browser.');
       }
       return false;
@@ -185,11 +185,8 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype = {
-  track: function(event){
-    var options = this.get();
-    if(/^rzp_l/.test(options.key)){
-      track(this.id, event, options);
-    }
+  isLiveMode: function(){
+    return /^rzp_l/.test(this.get('key'));
   },
   configure: function(overrides){
     var key, options;
@@ -199,7 +196,7 @@ Razorpay.prototype = {
       validateRequiredFields(this);
     } catch(e){
       var message = e.message;
-      if(!/^rzp_l/.test(key || overrides.key || '')){
+      if(!this.isLiveMode()){
         alert(message);
       }
       raise(message);
@@ -209,7 +206,6 @@ Razorpay.prototype = {
       this.id = generateUID();
       this.modal = {options: emo};
       this.options = emo;
-      this.track('init');
 
       if(this.get('parent')){
         this.open();

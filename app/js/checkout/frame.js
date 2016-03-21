@@ -278,11 +278,12 @@ CheckoutFrame.prototype = {
     }
 
     var event = data.event;
+    var rzp = this.rzp;
     // source check
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && this.rzp && this.rzp.id !== data.id) ||
+      (event !== 'load' && rzp && rzp.id !== data.id) ||
       e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
@@ -291,8 +292,8 @@ CheckoutFrame.prototype = {
     data = data.data;
     invoke('on' + event, this, data);
 
-    if(event === 'dismiss' || event === 'fault'){
-      track.call(this.rzp, event);
+    if(event === 'dismiss' || event === 'fault' && rzp.isLiveMode()){
+      track(rzp, event);
     }
   },
 
@@ -316,7 +317,7 @@ CheckoutFrame.prototype = {
             try{
               rzp.get('external.handler').call(rzp, data);
             } catch(e){
-              track.call(rzp, 'js_error', e);
+              track(rzp, 'js_error', e);
             }
           }
         }
@@ -337,17 +338,18 @@ CheckoutFrame.prototype = {
   // this is onsuccess method
   oncomplete: function(data){
     this.close();
-    track.call(this.rzp, 'checkout_success', data);
+    var rzp = this.rzp;
+    track(rzp, 'checkout_success', data);
     invoke(
       function(){
         try{
           this.get('handler')(data);
         }
         catch(e){
-          track.call(this, 'js_error', e);
+          track(rzp, 'js_error', e);
         }
       },
-      this.rzp,
+      rzp,
       null,
       200
     );

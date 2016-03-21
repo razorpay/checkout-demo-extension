@@ -152,8 +152,6 @@ function Request(params){
     this.submit(popup.name);
   }
 
-  // this.track();
-
   // if(!discreet.supported(true)){
   //   return true;
   // }
@@ -196,11 +194,10 @@ Request.prototype = {
       data.currency = Razorpay.defaults.currency;
     }
 
-    if(_uid){
-      data['_[id]'] = _uid;
-      data['_[medium]'] = discreet.medium;
-      data['_[context]'] = discreet.context;
-    }
+    data['_[id]'] = _uid;
+    data['_[medium]'] = discreet.medium;
+    data['_[context]'] = discreet.context;
+    data['_[library]'] = discreet.lib;
 
     return Razorpay.payment.validate(data);
   },
@@ -305,7 +302,6 @@ Request.prototype = {
       data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
     }
     invoke(this.error, null, data, 0);
-    // track.call(this, 'failure', {response: data, data: request.orig});
   },
 
   clear: function(){
@@ -339,7 +335,6 @@ Request.prototype = {
         }
       }
     )
-    // track.call(rzp, 'submit', {data: trackingPayload});
   }
 }
 
