@@ -150,15 +150,6 @@ function setPaymentMethods(session){
 }
 
 function showModal(session) {
-  if(_uid !== session.id){
-    var oldSession = getSession();
-    if(oldSession){
-      invoke('saveAndClose', oldSession);
-    }
-    _uid = session.id;
-    sessions[_uid] = session;
-  }
-
   if(!window.payment_methods){
     Razorpay.payment.getPrefs(session.get('key'), function(response){
       if(response.error){
@@ -324,7 +315,12 @@ window.handleMessage = function(message){
       return roll('fault ' + e.message, message, 'warn');
     }
     configureRollbar(id);
-    session.id = id;
+    var oldSession = getSession();
+    if(oldSession){
+      invoke('saveAndClose', oldSession);
+    }
+    session.id = _uid = id;
+    sessions[_uid] = session;
   }
 
   if(message.context){

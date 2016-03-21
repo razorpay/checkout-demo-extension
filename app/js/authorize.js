@@ -2,7 +2,7 @@ var templates = {};
 var cookieInterval, communicator;
 
 function makeFormHtml64(url, data){
-  return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form>');
+  return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>');
 }
 
 function clearCookieInterval(){
@@ -135,7 +135,7 @@ function Request(params){
   }
 
   if(this.shouldPopup()){
-    var popup = this.popup = this.makePopup();
+    var popup = this.makePopup();
     // open new tab
     if(!popup){
       localStorage.removeItem('payload');
@@ -223,15 +223,22 @@ Request.prototype = {
   },
 
   nextRequest: function(request){
+    var direct = request.method === 'direct';
+    var content = request.content;
     if(this.popup){
-      submitForm(
-        request.url,
-        request.content,
-        request.method,
-        this.popup.name
-      )
+      if(direct){
+        this.writePopup(content);
+      } else {
+        submitForm(
+          request.url,
+          request.content,
+          request.method,
+          this.popup.name
+        )
+      }
     } else {
-      localStorage.setItem('payload', makeFormHtml64(request.url, request.content));
+      var payload = direct ? _btoa(content) : makeFormHtml64(request.url, content);
+      localStorage.setItem('payload', payload);
     }
   },
 
@@ -252,18 +259,22 @@ Request.prototype = {
       return null;
     }
     try{
-      var popup = new Popup('', 'popup_' + _uid);
+      var popup = this.popup = new Popup('', 'popup_' + _uid);
     } catch(e){
       return null;
     }
     try{
-      var pdoc = popup.window.document;
-      pdoc.write(templates.popup(this));
-      pdoc.close();
+      this.writePopup();
     } catch(e){}
 
     popup.onClose = bind(this.cancel, this);
     return popup;
+  },
+
+  writePopup: function(html){
+    var pdoc = this.popup.window.document;
+    pdoc.write(html || templates.popup(this));
+    pdoc.close();
   },
 
   cancel: function(errorObj){
