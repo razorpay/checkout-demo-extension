@@ -160,6 +160,7 @@ function showModal(session) {
     })
     return;
   }
+  Razorpay.configure(preferences.options);
   showModalWithSession(session);
 }
 

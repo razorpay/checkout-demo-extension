@@ -216,7 +216,7 @@ Razorpay.prototype = {
 
 Razorpay.configure = function(overrides){
   each(
-    overrides,
+    flatten(overrides, Razorpay.defaults),
     function(key, val){
       var defaultValue = Razorpay.defaults[key];
       if(typeof defaultValue === typeof val){
