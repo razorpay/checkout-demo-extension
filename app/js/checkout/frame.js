@@ -303,7 +303,7 @@ CheckoutFrame.prototype = {
   },
 
   onredirect: function(data){
-    discreet.nextRequestRedirect(data);
+    discreet.redirect(data);
   },
 
   onsubmit: function(data){

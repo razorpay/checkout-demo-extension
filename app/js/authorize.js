@@ -129,14 +129,24 @@ function Request(params){
 
   var popup,
     options = this.options,
-    data = this.data;
+    data = this.data,
+    url = this.makeUrl();
 
   if(options.redirect){
     // add callback_url if redirecting
-    data.callback_url = options.callback_url;
-    return this.submit();
+    if(options.callback_url){
+      data.callback_url = options.callback_url;
+    }
+    return discreet.redirect({
+      url: url,
+      content: data,
+      method: 'post'
+    });
   }
 
+  if(!discreet.supported(true)){
+    return true;
+  }
   if(this.shouldPopup()){
     popup = this.makePopup();
     // open new tab
@@ -151,12 +161,8 @@ function Request(params){
   if(this.shouldAjax()){
     this.makeAjax();
   } else {
-    localStorage.setItem('payload', makeFormHtml64(this.makeUrl(), data));
-    this.submit(popup.name);
-  }
-
-  if(!discreet.supported(true)){
-    return true;
+    localStorage.setItem('payload', makeFormHtml64(url, data));
+    submitForm(url, data, 'post', popup.name);
   }
 
   this.listener = $(window).on('message', bind(onMessage, this));
@@ -167,14 +173,6 @@ function Request(params){
 }
 
 Request.prototype = {
-  submit: function(name){
-    return submitForm(
-      this.makeUrl(),
-      this.data,
-      'post',
-      name
-    )
-  },
 
   format: function(params){
     if(typeof params !== 'object' || typeof params.data !== 'object'){

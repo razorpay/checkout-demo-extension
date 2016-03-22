@@ -224,7 +224,7 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
         .to.be cf
 
     it 'redirect', ->
-      spy = sinon.stub discreet, 'nextRequestRedirect'
+      spy = sinon.stub discreet, 'redirect'
       message 'redirect', foo: 2
       expect spy.getCall(0).args[0]
         .to.eql foo: 2

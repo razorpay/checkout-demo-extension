@@ -230,7 +230,7 @@ describe 'discreet', ->
 
     it 'should send redirection message if in iframe', ->
       window.parent = null
-      discreet.nextRequestRedirect request
+      discreet.redirect request
 
       expect submitSpy.callCount
         .to.be 0
@@ -247,7 +247,7 @@ describe 'discreet', ->
       window.parent = window
 
     it 'should submitForm if in parent', ->
-      discreet.nextRequestRedirect request
+      discreet.redirect request
 
       expect submitSpy.callCount
         .to.be 1
