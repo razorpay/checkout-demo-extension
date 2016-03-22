@@ -9,7 +9,62 @@ baseUrl = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/' + Razo
 
 describe 'Request::', ->
   stub = sinon.stub $, 'ajax'
-  
+
+  describe 'nextRequest', ->
+    describe 'write popup, if present', ->
+      writestub = submitstub = null
+      request = Request data: payload
+      nextRequest =
+        content: {}
+        url: 'abc'
+
+      beforeEach ->
+        writestub = sinon.stub request, 'writePopup'
+        submitstub = sinon.stub window, 'submitForm'
+
+      afterEach ->
+        writestub.restore()
+        submitstub.restore()
+
+      it 'direct', ->
+        nextRequest.method = 'direct'
+        request.nextRequest nextRequest
+        expect writestub.getCall(0).args
+          .to.eql [nextRequest.content]
+        expect submitstub.called
+          .to.be false
+
+      it 'post', ->
+        nextRequest.method = 'foobar'
+        request.nextRequest nextRequest
+        expect submitstub.getCall(0).args
+          .to.eql [nextRequest.url, nextRequest.content, nextRequest.method, request.popup.name]
+        expect writestub.called
+          .to.be false
+
+    describe 'write localStorage, if popup absent', ->
+      request = Request data: payload
+      request.popup = null
+      writestub = sinon.stub request, 'writePopup'
+      submitstub = sinon.stub window, 'submitForm'
+      localStorage.removeItem 'payload'
+
+      nextRequest =
+        content: {}
+        url: 'abc'
+      request.nextRequest nextRequest
+
+      expect writestub.called
+        .to.be false
+      expect submitstub.called
+        .to.be false
+
+      expect localStorage.getItem 'payload'
+        .to.be.ok()
+
+      writestub.restore()
+      submitstub.restore()
+
   it 'make ajax url', ->
     request = Request data: payload
     expect request.makeUrl()
@@ -102,7 +157,7 @@ describe 'Request::', ->
     data = successStub = failStub = null
 
     it 'blank string object', ->
-      data = "{}"
+      data = '{}'
 
     it 'blank object', ->
       data = {}
