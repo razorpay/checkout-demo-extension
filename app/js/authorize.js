@@ -98,7 +98,9 @@ function ajaxCallback(response){
     if(response.type === 'otp'){
       this.secondfactor(makeSecondfactorCallback(this, nextRequest));
     } else {
-      window.onComplete = bind(this.complete, this);
+      if(discreet.isFrame){
+        window.onComplete = bind(this.complete, this);
+      }
       this.nextRequest(nextRequest);
     }
   }

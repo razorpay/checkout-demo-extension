@@ -116,7 +116,7 @@ describe 'nextRequestRedirect', ->
     window.parent = postMessage: jQuery.noop
     nextRequestData = {}
     stub = sinon.stub Razorpay, 'sendMessage'
-    discreet.nextRequestRedirect nextRequestData
+    discreet.redirect nextRequestData
 
     msg = stub.getCall(0).args[0]
     expect stub.callCount
