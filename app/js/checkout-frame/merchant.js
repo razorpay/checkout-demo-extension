@@ -241,6 +241,7 @@ function showModalWithMessage(message){
   setPaymentMethods(window.payment_methods, message.options);
   session.render(message);
   session.modal.show();
+  Razorpay.sendMessage({event: 'render'});
   trackInit(message);
 
   if ( CheckoutBridge ) {

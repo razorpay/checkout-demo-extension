@@ -507,11 +507,13 @@ CheckoutModal.prototype = {
   },
 
   bindEvents: function(){
-    this.on('click', '#modal-close', this.hide);
+    var options = this.message.options;
+    if(options.theme.close_button){
+      this.on('click', '#modal-close', this.hide);
+    }
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
-    var options = this.message.options;
     var enabledMethods = options.method;
 
     if(enabledMethods.netbanking){
