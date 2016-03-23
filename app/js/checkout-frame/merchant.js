@@ -100,10 +100,35 @@ var emi_options = Session.prototype.emi_options = {
         18: 15,
         24: 15
       }
+    },
+
+    AXIS: {
+      patt: /(436560|46111[6-8]|464118|524240|405995|55934[0-2]|(45(050|145)6)|(5245(08|12)))00|40743(903|(8|9)00)|524178(00|10|11)|5305620(0|2)|4111460(0|1)|45145(700|604)|4111460[2-5]|4182120(1|2)|47186(00(0|1|3)|10[0-2]|30[0-2]|400)/,
+      name: 'Axis Bank'
     }
   }
 }
 
+emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
+
+function processMessage(message) {
+  message.netbanks = freqBanks;
+  message.emiopts = emi_options;
+  var opts = message.options;
+  if(!opts){
+    var session = getSession();
+    if(session){
+      message.options = session.message.options;
+    }
+    return;
+  }
+
+  if(opts.amount >= 100*10000){
+    opts.method.wallet = false;
+  }
+}
+
+>>>>>>> master
 function notifyBridge(message){
   if( message && message.event ){
     var bridgeMethod = CheckoutBridge['on' + message.event];
