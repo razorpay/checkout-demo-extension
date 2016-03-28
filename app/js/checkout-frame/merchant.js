@@ -207,7 +207,6 @@ function showModal(message) {
     session = sessions[_uid] = new CheckoutModal();
   }
   processMessage(message);
-
   if(!window.payment_methods){
     // TODO remove this
     Razorpay.defaults.key = message.options.key;
@@ -215,6 +214,7 @@ function showModal(message) {
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
+      window.preferences = response;
       window.payment_methods = response.methods;
       window.fee_bearer = response.fee_bearer;
       showModalWithMessage(message);
@@ -228,6 +228,13 @@ function showModal(message) {
 }
 
 function showModalWithMessage(message){
+  try{
+    var theme_color = window.preferences.options.theme.color;
+    var old_color = message.options.theme.color;
+    if(theme_color && (!old_color || old_color === '#00BCD4')){
+      message.options.theme.color = '#' + theme_color;
+    }
+  } catch(e){}
   var session = getSession();
 
   // rewrites message.options.method, adds custom wallets
