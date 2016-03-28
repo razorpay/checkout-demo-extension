@@ -128,7 +128,6 @@ function processMessage(message) {
   }
 }
 
->>>>>>> master
 function notifyBridge(message){
   if( message && message.event ){
     var bridgeMethod = CheckoutBridge['on' + message.event];
@@ -193,6 +192,11 @@ function showModalWithSession(session){
   setPaymentMethods(session);
   session.render();
   trackInit(session);
+  Razorpay.sendMessage({event: 'render'});
+
+  if (CheckoutBridge) {
+    $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+  }
 
   if(qpmap.error){
     session.errorHandler(qpmap);

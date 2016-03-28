@@ -496,7 +496,9 @@ Session.prototype = {
   },
 
   bindEvents: function(){
-    this.on('click', '#modal-close', this.hide);
+    if(this.get('theme.close_button')){
+      this.on('click', '#modal-close', this.hide);
+    }
     this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
