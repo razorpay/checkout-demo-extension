@@ -83,10 +83,6 @@ function onMessage(e){
   }
 }
 
-if(!discreet.isFrame){
-  discreet.lib = 'razorpayjs';
-}
-
 // this === request
 function ajaxCallback(response){
   this.payment_id = response.payment_id;
@@ -200,7 +196,7 @@ Request.prototype = {
     data['_[id]'] = _uid;
     data['_[medium]'] = discreet.medium;
     data['_[context]'] = discreet.context;
-    data['_[library]'] = discreet.lib;
+    data['_[checkout]'] = !!discreet.isFrame;
 
     return Razorpay.payment.validate(data);
   },

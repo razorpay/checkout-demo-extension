@@ -31,7 +31,6 @@ var discreet = {
     'PLN': 'zł',
     'SFR': 'Fr'
   },
-  lib: 'checkoutjs',
 
   supported: function(showAlert){
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);

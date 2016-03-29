@@ -138,7 +138,7 @@ function track(id, event, props){
     if(discreet.context){
       data.page_url = discreet.context;
     }
-    data.library = discreet.lib;
+    data.checkout = !!discreet.isFrame;
 
     var xhr = new XMLHttpRequest();
     xhr.open(
