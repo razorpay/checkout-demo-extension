@@ -214,16 +214,8 @@ describe 'ajax callback', ->
     requestData = {}
     fn = jQuery.noop
 
-    bindstub = sinon.stub window, 'bind'
-      .returns fn
-
     ajaxCallback.call request, {request: requestData}
 
-    expect bindstub.getCall(0).args
-      .to.eql [request.complete, request]
-
-    expect window.onComplete
-      .to.be fn
     expect complete.called
       .to.be false
     expect secondfactor.called
@@ -233,15 +225,12 @@ describe 'ajax callback', ->
       .to.eql [requestData]
 
     discreet.isFrame = false
-    bindstub.restore()
 
   it 'next request (razorpayjs)', ->
     requestData = {}
     fn = jQuery.noop
 
     ajaxCallback.call request, {request: requestData}
-    expect window.onComplete
-      .to.not.be.ok()
     expect complete.called
       .to.be false
     expect secondfactor.called
@@ -257,8 +246,6 @@ describe 'ajax callback', ->
       .returns fn
 
     ajaxCallback.call request, {type: 'otp', request: requestData}
-    expect window.onComplete
-        .to.not.be.ok()
     expect complete.called
       .to.be false
     expect next.called

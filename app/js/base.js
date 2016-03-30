@@ -62,7 +62,6 @@ var discreet = {
 
   medium: 'web',
   context: location.href.replace(/^https?:\/\//,''),
-  setCommunicator: noop,
 
   isBase64Image: function(image){
     return /data:image\/[^;]+;base64/.test(image);
@@ -179,7 +178,6 @@ function base_configure(overrides){
     options.set('parent', overrides.parent);
   }
 
-  discreet.setCommunicator(options);
   return options;
 }
 
