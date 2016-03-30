@@ -44,9 +44,10 @@ discreet.setCommunicator = function(){
   if(communicator && communicator.parentNode){
     communicator.parentNode.removeChild(communicator);
   }
-  if(
-    location.href.indexOf(discreet.makeUrl(true)) &&
-    (/MSIE |Windows Phone|Trident\//.test(ua))
+  if (
+    true
+    || location.href.indexOf(discreet.makeUrl(true))
+    && (/MSIE |Windows Phone|Trident\//.test(ua))
   ) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
@@ -165,7 +166,7 @@ function Request(params){
 
   this.listener = $(window).on('message', bind(onMessage, this));
 
-  if(discreet.isFrame){
+  if(!discreet.isFrame){
     cookiePoll(this);
   }
 }
@@ -215,9 +216,13 @@ Request.prototype = {
 
   makeAjax: function(){
     var cb = this.ajaxCallback = bind(ajaxCallback, this);
-    this.ajax = $.post({
-      url: this.makeUrl(),
-      data: this.data,
+    var data = this.data;
+    var url = this.makeUrl() + '?key_id=' + data.key_id;
+    delete data.key_id;
+
+    $.post({
+      url: url,
+      data: data,
       callback: cb
     })
   },
