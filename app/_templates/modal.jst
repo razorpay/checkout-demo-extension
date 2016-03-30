@@ -52,15 +52,15 @@
                   <input type="hidden" name="notes[{{=note}}]" value="{{=o.notes[note]}}">
                 {{}}}
                 <div class="fieldset">
+                  <div class="elem-wrap"><div class="elem elem-contact">
+                    <span class="help-text">Please enter 10-12 digit contact number</span>
+                    <i class="i">&#xe607;</i>
+                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=o.prefill.contact||'+91 '}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
+                  </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
                     <span class="help-text">Please enter a valid email. Example:<br> you@example.com</span>
                     <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=o.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
-                  </div></div>
-                  <div class="elem-wrap"><div class="elem elem-contact">
-                    <span class="help-text">Please enter 10-12 digit contact number</span>
-                    <i class="i">&#xe607;</i>
-                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=o.prefill.contact}}" pattern="^\+?[0-9]{10,13}$" maxlength="14">
                   </div></div>
                 </div>
               </div>
