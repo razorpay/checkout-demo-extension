@@ -45,8 +45,7 @@ discreet.setCommunicator = function(){
     communicator.parentNode.removeChild(communicator);
   }
   if (
-    true
-    || location.href.indexOf(discreet.makeUrl(true))
+    location.href.indexOf(discreet.makeUrl(true))
     && (/MSIE |Windows Phone|Trident\//.test(ua))
   ) {
     communicator = document.createElement('iframe');
