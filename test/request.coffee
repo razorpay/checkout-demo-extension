@@ -66,9 +66,12 @@ describe 'Request::', ->
       submitstub.restore()
 
   it 'make ajax url', ->
+    isFrame = discreet.isFrame
+    discreet.isFrame = true
     request = Request data: payload
     expect request.makeUrl()
       .to.be baseUrl + 'payments/create/ajax'
+    discreet.isFrame = isFrame
 
   it 'make fees url', ->
     request = Request

@@ -236,7 +236,7 @@ Request.prototype = {
   },
 
   shouldAjax: function(){
-    return !this.fees && !communicator;
+    return discreet.isFrame && !this.fees && !communicator;
   },
 
   shouldPost: function(){
