@@ -347,25 +347,31 @@ Razorpay.payment = {
   validate: function(data){
     var errors = [];
 
-    var amount = parseInt(data.amount, 10);
-    if (!amount || typeof amount !== 'number' || amount < 0 || String(amount).indexOf('.') !== -1) {
+    if (!isValidAmount(data.amount)) {
       errors.push({
-        why: 'Invalid amount specified',
-        culprit: 'amount'
+        description: 'Invalid amount specified',
+        field: 'amount'
+      });
+    }
+
+    if (!data.method){
+      errors.push({
+        description: 'Payment Method not specified',
+        field: 'method'
       });
     }
 
     if (typeof data.key_id === 'undefined') {
       errors.push({
-        why: 'No merchant key specified',
-        culprit: 'key'
+        description: 'No merchant key specified',
+        field: 'key'
       });
     }
 
     if (data.key_id === '') {
       errors.push({
-        why: 'Merchant key cannot be empty',
-        culprit: 'key'
+        description: 'Merchant key cannot be empty',
+        field: 'key'
       });
     }
 

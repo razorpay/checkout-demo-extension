@@ -12,6 +12,15 @@ function raise(message){
   throw new Error(message);
 }
 
+function isValidAmount(amt){
+  if (/[^0-9]/.test(amt)){
+    return false;
+  }
+  amt = parseInt(amt, 10);
+
+  return amt >= 100;
+}
+
 var discreet = {
   currencies: {
     'USD': '$',
@@ -108,10 +117,7 @@ var optionValidations = {
   },
 
   amount: function(amount){
-    var intAmount = parseInt(amount, 10);
-    var strAmount = String(amount);
-
-    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100 || /\./.test(strAmount)) {
+    if (!isValidAmount(amount)) {
       var errorMessage = 'should be passed in paise. Minimum value is 100';
       alert('Invalid amount. It ' + errorMessage);
       return errorMessage;
@@ -185,6 +191,7 @@ Razorpay.prototype = {
   isLiveMode: function(){
     return /^rzp_l/.test(this.get('key'));
   },
+
   configure: function(overrides){
     var key, options;
     try{
