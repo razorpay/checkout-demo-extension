@@ -33,11 +33,11 @@ attr = function(attr){return attr.replace(/"/g,'')};
           </div>
         </form>
       {{ } }}
-      <div id="modal-content">
+      <div id="content">
         <div id="header">
-          <div id="modal-close" class="close-btn">×</div>
+          <div id="close" class="close">×</div>
           {{?o('image')}}
-            <div class="merchant-image">
+            <div id="logo">
               <img src="{{=attr(o('image'))}}">
             </div>
           {{?}}
