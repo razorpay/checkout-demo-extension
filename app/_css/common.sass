@@ -1,0 +1,35 @@
+$font: ubuntu, helvetica, sans-serif
+$lato: 'lato', $font
+
+$col: #333
+$pri: rgb(128, 88, 165)
+$danger: #f46060
+$bc: #e6e7e8
+$bg: #fcfbfa
+
+$br: 2px
+
+$padh: 20px
+$size: 14px
+
+=opacity($fraction)
+  opacity: $fraction;
+  $percent: $fraction * 100;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$percent}";
+  filter: alpha(opacity=#{$percent});
+
+=clearfix
+  &:after
+    content: '';
+    clear: both;
+    display: block;
+
+=mfix
+  white-space: nowrap;
+
+  &:after
+    content: '';
+    height: 96%;
+    display: inline-block;
+    width: 0;
+    vertical-align: middle;

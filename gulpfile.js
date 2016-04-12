@@ -2,7 +2,7 @@ const fs = require('fs')
 const glob = require('glob')
 const gulp = require('gulp')
 const dot = require('dot')
-const less = require('gulp-less')
+const sass = require('gulp-sass')
 const minifyCSS = require('gulp-minify-css')
 const concat = require('gulp-concat')
 const autoprefixer = require('gulp-autoprefixer')
@@ -30,7 +30,7 @@ function assetPath(path){
 var distDir = 'app/dist/v1';
 
 gulp.task('watch', ['usemin'], function() {
-  gulp.watch(assetPath('_css/*.less'), ['compileStyles'])
+  gulp.watch(assetPath('_css/*.sass'), ['compileStyles'])
   gulp.watch(assetPath('_templates/*.jst'), ['compileTemplates', 'makemin'])
   gulp.watch([assetPath('js/**'), assetPath('*.html')], ['makemin'])
 });
@@ -50,8 +50,8 @@ gulp.task('compileTemplates', function(){
 });
 
 gulp.task('compileStyles', function(){
-  return gulp.src(assetPath('_css/*.less'))
-    .pipe(less())
+  return gulp.src(assetPath('_css/*.sass'))
+    .pipe(sass())
     .pipe(minifyCSS())
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({
