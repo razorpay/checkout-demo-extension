@@ -56,12 +56,14 @@ attr = function(attr){return attr.replace(/"/g,'')};
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <span class="help-text">Please enter 10-12 digit contact number</span>
                     <i class="i">&#xe607;</i>
-                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=attr(o('prefill.contact'))||'+91 '}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
+                    <label>Phone</label>
+                    <input class="input" id="contact" name="contact" type="tel" required value="{{=attr(o('prefill.contact'))||'+91 '}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
+                    <label>Email</label>
                     <span class="help-text">Please enter a valid email. Example:<br> you@example.com</span>
-                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                 </div>
               </div>
@@ -83,21 +85,23 @@ attr = function(attr){return attr.replace(/"/g,'')};
                   {{? method.card }}
                     <div class="fieldset tab-content showable shown" id="tab-card">
                       <input type="hidden" name="method" value="card">
-                      <div class="elem-wrap"><div class="elem elem-name">
-                        <i class="i">&#xe602;</i>
-                        <span class="help-text">Please enter your name</span>
-                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=attr(o('prefill.name'))}}">
-                      </div></div>
                       <div class="elem-wrap"><div class="elem" id="elem-card">
+                        <label>Card Number</label>
                         <i class="i">&#xe605;</i>
                         <div class="card-image"></div>
                         <span class="help-text">Please enter a valid card number</span>
-                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
+                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
                         <label id="nocvv" for="nocvv-check">
                           <input type="checkbox" id="nocvv-check" checked disabled>
                           <span class="checkbox"></span>
                           My card doesn't have expiry/CVV
                         </label>
+                      </div></div>
+                      <div class="elem-wrap"><div class="elem elem-name">
+                        <label>Card Holder's Name</label>
+                        <i class="i">&#xe602;</i>
+                        <span class="help-text">Please enter your name</span>
+                        <input class="input" type="text" id="card_name" name="card[name]" required value="{{=attr(o('prefill.name'))}}">
                       </div></div>
                       <div class="double" id="expiry-cvv">
                         <div class="elem-wrap first"><div class="elem elem-expiry">
