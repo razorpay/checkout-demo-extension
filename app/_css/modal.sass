@@ -1,0 +1,188 @@
+@import common
+
+.clear
+  &:after
+    content: '';
+    clear: both;
+    display: block;
+
+.mfix
+  white-space: nowrap;
+
+  &:after
+    content: '';
+    height: 96%;
+    display: inline-block;
+    width: 0;
+    vertical-align: middle;
+
+body, html
+  margin: 0;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+
+.mchild
+  vertical-align: middle;
+  display: inline-block;
+  white-space: normal;
+
+a
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+
+u
+  text-decoration: none;
+
+i
+  font-style: normal;
+  display: none;
+
+#container
+  height: 100%;
+  outline: none;
+  text-align: center;
+  transition: 0.3s ease-out opacity;
+  z-index: 19999;
+
+  &.shown
+    opacity: 1;
+
+    #powered-by
+      opacity: 1;
+
+    #modal
+      opacity: 1;
+      transform: none;
+      transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
+
+.font-loaded
+  #modal, button, input, select
+    font-family: $lato;
+    font-feature-settings: 'liga' 0;
+
+  #powered-by
+    visibility: visible;
+    opacity: 1;
+
+  i
+    display: inline-block;
+
+  u
+    display: none;
+
+#modal
+  display: inline-block;
+  transition: 0.3s ease-in;
+  z-index: 1;
+  perspective: 300;
+  outline: none;
+  position: relative;
+  opacity: 0;
+  transform: scale(0.9);
+  color: $col;
+  font-size: $size;
+  width: 344px;
+  font-family: $font;
+  box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
+
+#error-message, #powerwallet
+  display: none;
+
+#content
+  text-align: left;
+  position: relative;
+  white-space: normal;
+
+$p: 18px;
+#header
+  border-radius: $br $br 0 0;
+  background: $pri;
+  color: #fff;
+  padding: $p;
+  position: relative;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.11) inset;
+
+  &:before
+    content: '';
+    +cover();
+    background: linear-gradient(135deg, transparent, rgba(0, 0, 0, 0.16));
+
+#close
+  position: absolute;
+  right: 10px;
+  top: 5px;
+
+.close
+  font-size: 18px;
+  opacity: 0.6;
+
+#logo
+  text-align: center;
+  position: relative;
+  padding: 10px;
+  width: 64px;
+  height: 64px;
+  background: #fff;
+  border-radius: $br;
+  line-height: 62px;
+  float: left;
+  margin-right: $p;
+  box-shadow: $bs;
+
+  img
+    vertical-align: middle;
+    max-height: 100%;
+    max-width: 100%;
+
+#merchant
+  position: relative;
+
+#merchant-name
+  font-size: 20px;
+
+#merchant-desc
+  opacity: 0.8;
+
+#amount
+  font-size: 24px;
+  margin-top: 14px;
+
+#powered-by
+  display: none;
+
+#body
+  background: #fff;
+  padding: $p;
+  border-radius: 0 0 $br $br;
+
+.legend
+  text-transform: uppercase;
+  font-size: 12px;
+  text-align: center;
+  padding: 10px 0;
+
+#payment-options
+  margin: 20px (-$p);
+  text-align: center;
+  i
+    font-size: 40px;
+    display: block;
+    color: $pri;
+    margin-top: 20px;
+
+.payment-option
+  border-top: 1px solid $bc;
+  border-bottom: 1px solid $bc;
+  padding-bottom: 20px;
+  float: left;
+  width: 33.33%;
+  box-sizing: border-box;
+  &+.payment-option
+    border-left: 1px solid $bc;
+
+#methods-specific-fields
+  display: none;
+
+#footer
+  display: none;

@@ -1,0 +1,38 @@
+@import common
+
+$top: 28px;
+$left: 34px;
+$bottom: 6px;
+
+.elem
+  border-bottom: 1px solid $bc;
+  position: relative;
+
+  i
+    position: absolute;
+    font-size: 34px;
+    top: 2px;
+
+  &.filled, &.focused
+    label
+      transform: scale(0.86) translateY(-12px);
+
+label
+  transform-origin: 0 0;
+  transition: 0.3s;
+  color: #666;
+  position: absolute;
+  top: 20px;
+  left: $left;
+
+.input
+  border: none;
+  outline: none;
+  background: none;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: $top 0 $bottom $left;
+
+.help
+  display: none;
