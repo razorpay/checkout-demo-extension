@@ -161,7 +161,7 @@
                       {{ var firstWallet; for (var w in wallet){ }}
                         <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
                         <label for="wallet-radio-{{=w}}" class="radio-label">
-                          <img class="wallet-button colored" style="height:{{=wallet[w].h}}px" src="{{=wallet[w].col}}">
+                          <img class="wallet-button-{{=w}} colored" style="height:{{=wallet[w].h}}px" src="{{=wallet[w].col}}">
                         </label>
                       {{}}}
                     </div>

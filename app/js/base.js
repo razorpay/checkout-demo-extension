@@ -24,7 +24,7 @@ var discreet = {
   },
   lib: 'checkoutjs',
   shouldAjax: function(data){
-    return discreet.isFrame && data.wallet === 'mobikwik'
+    return discreet.isFrame && (data.wallet === 'mobikwik' || data.wallet === 'payumoney')
   },
 
   supported: function(showAlert){
