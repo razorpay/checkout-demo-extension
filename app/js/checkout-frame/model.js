@@ -913,6 +913,16 @@ CheckoutModal.prototype = {
       event: 'submit',
       data: data
     });
+
+    var wallet = data.wallet;
+    var wOptions = options.method.wallet;
+    if (data.method === 'wallet' &&
+      (wallet === 'mobikwik' || wallet === 'payumoney')){
+      $("#power-head img")
+        .attr('src', wOptions[data.wallet].col)
+        .attr('height', wOptions[data.wallet].h);
+    }
+
     if(data.method === 'wallet' && freqWallets[data.wallet].custom){
       return;
     }
@@ -937,7 +947,7 @@ CheckoutModal.prototype = {
         className: 'loading',
         title: 'Verifying Account',
         number: true,
-        text: 'Checking for a mobikwik account associated with'
+        text: 'Checking for a ' + wallet + ' account associated with'
       })
     }
 
