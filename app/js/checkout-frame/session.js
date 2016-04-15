@@ -497,9 +497,9 @@ Session.prototype = {
 
   bindEvents: function(){
     if(this.get('theme.close_button')){
-      this.on('click', '#modal-close', this.hide);
+      this.on('click', '#close', this.hide);
     }
-    this.on('click', '#tabs li', this.switchTab);
+    // this.on('click', '#tabs li', this.switchTab);
     this.on('submit', '#form', this.submit);
 
     var enabledMethods = this.methods;
@@ -518,10 +518,10 @@ Session.prototype = {
       this.on('change', '#nocvv-check', noCvvToggle);
     }
 
-    if(enabledMethods.wallet.mobikwik){
-      this.on('submit', '#powerwallet', this.onOtpSubmit);
-      this.on('click', '#powercancel', this.hideErrorMessage);
-    }
+    // if(enabledMethods.wallet.mobikwik){
+    //   this.on('submit', '#powerwallet', this.onOtpSubmit);
+    //   this.on('click', '#powercancel', this.hideErrorMessage);
+    // }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
     this.on('click', '#overlay', this.hideErrorMessage);
