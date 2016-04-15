@@ -21,6 +21,21 @@ body, html
   height: 100%;
   -webkit-overflow-scrolling: touch;
 
+.double
+  width: 100%;
+  .first
+    float: left;
+  .second
+    float: right;
+  .first, .second
+    width: 50%;
+    display: inline-block;
+
+.link
+  color: #3594E2;
+  text-decoration: underline;
+  cursor: pointer
+
 .mchild
   vertical-align: middle;
   display: inline-block;
@@ -86,7 +101,7 @@ i
   font-family: $font;
   box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
 
-#error-message, #powerwallet
+#error-message
   display: none;
 
 #content
@@ -155,6 +170,58 @@ $p: 18px;
   background: #fff;
   padding: $p;
   border-radius: 0 0 $br $br;
+  position: relative;
+  overflow: hidden;
+  padding-top: $p+50px;
+
+#form
+  display: none;
+
+.prompt
+  text-align: center;
+  width: 240px;
+  display: block;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 20px;
+
+#topbar
+  position: absolute;
+  width: 100%;
+  background: white;
+  left: 0px;
+  top: -50px;
+  padding: 15px 20px;
+  box-sizing: border-box;
+  z-index: 9999999;
+  border-bottom: 1px solid #d2d2d2;
+  transition: .3s;
+  #heading
+    float: left;
+    font-size: 16px;
+  #contact
+    float: right;
+    font-size: 12px;
+    line-height: 19px;
+
+#topbar.shown
+  top: 0;
+
+#otp_form
+  margin-top: 20px;
+  #otp
+    font-size: 18px;
+    line-height: 24px;
+    letter-spacing: 10px;
+    font-family: monospace;
+    width: 136.8px;
+    text-indent: 10px;
+    margin: 30px auto;
+    padding: 10px 0;
+    display: block;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid #adadad;
 
 .legend
   text-transform: uppercase;

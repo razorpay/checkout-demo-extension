@@ -17,7 +17,14 @@ input[type=radio]:checked + label,
   color: {{=c}};
 }
 
-{{?frame}}
+#header{
+  background: {{=c}}
+}
+
+.link{
+  color: {{=c}}
+}
+
 .merchant-image{
   width: 60px;
   height: 60px;
@@ -25,7 +32,6 @@ input[type=radio]:checked + label,
   border: 1px solid #eaeaea;
   background: #fff;
 }
-{{?}}
 
 .option.active,
 .checked .checkbox,

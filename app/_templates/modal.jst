@@ -23,22 +23,6 @@ else
         <div id="fd-t"></div>
         <button id="fd-hide">Retry</button>
       </div>
-      {{ if(wallet && wallet.mobikwik){ }}
-        <form id="powerwallet" class="showable" onsubmit="return false">
-          <div id="power-head">
-            <div id="power-title"></div>
-            <img src="{{=wd.mobikwik.col}}" height="{{=wd.mobikwik.h}}">
-          </div>
-          <div id="power-var">
-            <div id="power-desc"></div>
-            <div class="spin"><div></div></div>
-            <div class="spin spin2"><div></div></div>
-            <input id="powerotp" type="tel" autocomplete="off" required pattern="^[0-9]+$" maxlength="6" placeholder="Enter OTP">
-            <div><span id="powercancel" class="btn">Retry Payment</span></div>
-            <button id="powerbutton" type="submit">SUBMIT</button>
-          </div>
-        </form>
-      {{ } }}
       <div id="content">
         <div id="header">
           <div id="close" class="close">×</div>
@@ -57,6 +41,10 @@ else
           <div class="clear"></div>
         </div>
         <div id="body">
+          <section id='topbar' class='shown'>
+            <div id='heading'>Cards/EMI</div>
+            <div id='contact'>9876543210</div>
+          </section>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
@@ -191,6 +179,20 @@ else
             </div>
             <div id="footer">
               <button id="submitbtn" type="submit">Pay</button>
+            </div>
+          </form>
+          <form id='otp_form'>
+            <strong class='prompt'>Enter the OTP for accessing your card saved with Razorpay</strong>
+            <input type='tel' pattern='^[0-9]{6}$' name='otp' id='otp' maxlength='6' autofocus>
+            <div class="double clear">
+              <label for='rememberme' class="first">
+                <input type='checkbox' id='rememberme' name='rememberme'>
+                <span class='checkbox mchild'></span>
+                Remember me
+              </label>
+              <div class="second">
+                <span class='link'>Skip using Saved cards</span>
+              </div>
             </div>
           </form>
         </div>

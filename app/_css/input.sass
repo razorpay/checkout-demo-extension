@@ -1,8 +1,12 @@
 @import common
 
 $top: 28px;
-$left: 34px;
-$bottom: 6px;
+$left: 0px;
+$bottom: 7px;
+
+
+.elem-wrap
+  height: 72px;
 
 .elem
   border-bottom: 1px solid $bc;
@@ -10,20 +14,22 @@ $bottom: 6px;
 
   i
     position: absolute;
-    font-size: 34px;
-    top: 2px;
+    font-size: 24px;
+    bottom: 4px;
+    right: 0px;
 
   &.filled, &.focused
     label
-      transform: scale(0.86) translateY(-12px);
+      transform: scale(0.63) translateY(-32px);
 
-label
-  transform-origin: 0 0;
-  transition: 0.3s;
-  color: #666;
-  position: absolute;
-  top: 20px;
-  left: $left;
+  label
+    transform-origin: 0 0;
+    transition: 0.3s;
+    color: #666;
+    font-size: 16px;
+    position: absolute;
+    top: $top;
+    left: $left;
 
 .input
   border: none;
@@ -31,8 +37,43 @@ label
   background: none;
   display: block;
   width: 100%;
+  font-size: 16px;
+  line-height: 19px;
   box-sizing: border-box;
   padding: $top 0 $bottom $left;
 
 .help
   display: none;
+
+[type=checkbox]
+  display: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearence: none;
+
+:checked + .checkbox:after
+  content: '';
+  width: 7px;
+  height: 3px;
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  border: 3px solid #fff;
+  border-top: none;
+  border-right: none;
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+
+.checkbox
+  display: inline-block;
+  position: relative;
+  top: -1px;
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #ccc;
+  -webkit-transition: .2s;
+  transition: .2s;
