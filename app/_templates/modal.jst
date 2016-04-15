@@ -144,9 +144,11 @@ else
                         {{for(var b in it.netbanks){}}
                           <div class="netb-bank item">
                             <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
-                            <label for="bank-radio-{{=b}}" class="radio-label">
-                              <img src="data:image/png;base64,{{=it.netbanks[b].image}}">
-                              <div>{{=it.netbanks[b].title}}</div>
+                            <label for="bank-radio-{{=b}}" class="radio-label mfix">
+                              <div class="mchild">
+                                <img src="data:image/png;base64,{{=it.netbanks[b].image}}">
+                                <div>{{=it.netbanks[b].title}}</div>
+                              </div>
                             </label>
                           </div>
                         {{}}}
@@ -168,12 +170,16 @@ else
                   {{ if(wallet){ }}
                     <div class="fieldset showable tab-content{{? !(method.card || method.netbanking) }} shown{{?}}" id="tab-wallet">
                       <input type="hidden" name="method" value="wallet">
-                      {{ var firstWallet; for (var w in wallet){ }}
-                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
-                        <label for="wallet-radio-{{=w}}" class="radio-label">
-                          <img class="wallet-button colored" style="height:{{=wd[w].h}}px" src="{{=wd[w].col}}">
-                        </label>
-                      {{}}}
+                      <div id="wallets" class="clear grid">
+                        {{ var firstWallet; for (var w in wallet){ }}
+                          <div class="wallet item">
+                            <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
+                            <label for="wallet-radio-{{=w}}" class="radio-label mfix">
+                              <img class="wallet-button colored mchild" style="height:{{=wd[w].h}}px" src="{{=wd[w].col}}">
+                            </label>
+                          </div>
+                        {{}}}
+                      </div>
                     </div>
                   {{}}}
                 </div>

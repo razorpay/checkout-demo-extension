@@ -35,6 +35,10 @@ body, html
   padding: 24px;
 
 .grid
+  text-align: center;
+  font-size: 14px;
+  line-height: 17px;
+
   [type=radio]
     display: none;
 
@@ -42,16 +46,15 @@ body, html
     background: #f0f0f0;
 
   .item
-    width: 33%;
+    width: 33.3333%;
+    height: 86px;
     float: left;
+    display: inline-block;
     box-sizing: border-box;
     border: 1px solid #f0f0f0;
-    text-align: center;
-    height: 86px;
-    overflow: hidden;
 
   label
-    padding: 18px 10px;
+    height: 100%;
     transition: .2s;
     display: block;
     cursor: pointer;
@@ -62,10 +65,6 @@ body, html
   img
     height: 24px;
     margin-bottom: 5px;
-
-  div
-    font-size: 14px;
-    line-height: 17px;
 
 
 .link
@@ -295,5 +294,5 @@ $p: 18px;
 #methods-specific-fields
   display: block;
 
-#otp-form, #form-common, #footer, #tabs, #tab-card, #tab-wallet
+#otp-form, #form-common, #footer, #tabs, #tab-card, #tab-netbanking
   display: none;
