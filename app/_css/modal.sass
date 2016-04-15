@@ -31,8 +31,44 @@ body, html
     width: 50%;
     display: inline-block;
 
+.pad
+  padding: 24px;
+
+.grid
+  [type=radio]
+    display: none;
+
+  [type=radio]:checked+label
+    background: #f0f0f0;
+
+  .item
+    width: 33%;
+    float: left;
+    box-sizing: border-box;
+    border: 1px solid #f0f0f0;
+    text-align: center;
+    height: 86px;
+    overflow: hidden;
+
+  label
+    padding: 18px 10px;
+    transition: .2s;
+    display: block;
+    cursor: pointer;
+
+  label:hover
+    background: #f9f9f9;
+
+  img
+    height: 24px;
+    margin-bottom: 5px;
+
+  div
+    font-size: 14px;
+    line-height: 17px;
+
+
 .link
-  color: #3594E2;
   text-decoration: underline;
   cursor: pointer
 
@@ -112,7 +148,6 @@ i
 $p: 18px;
 #header
   border-radius: $br $br 0 0;
-  background: $pri;
   color: #fff;
   padding: $p;
   position: relative;
@@ -168,14 +203,11 @@ $p: 18px;
 
 #body
   background: #fff;
-  padding: $p;
+  padding: 50px 0 $p;
   border-radius: 0 0 $br $br;
   position: relative;
   overflow: hidden;
-  padding-top: $p+50px;
 
-#form
-  display: none;
 
 .prompt
   text-align: center;
@@ -188,13 +220,13 @@ $p: 18px;
 #topbar
   position: absolute;
   width: 100%;
-  background: white;
+  background: #FAFAFA;
   left: 0px;
   top: -50px;
   padding: 15px 20px;
   box-sizing: border-box;
   z-index: 9999999;
-  border-bottom: 1px solid #d2d2d2;
+  border-bottom: 1px solid #f0f0f0;
   transition: .3s;
   #heading
     float: left;
@@ -207,21 +239,24 @@ $p: 18px;
 #topbar.shown
   top: 0;
 
-#otp_form
+#otp-form
   margin-top: 20px;
-  #otp
-    font-size: 18px;
-    line-height: 24px;
-    letter-spacing: 10px;
-    font-family: monospace;
-    width: 136.8px;
-    text-indent: 10px;
-    margin: 30px auto;
-    padding: 10px 0;
-    display: block;
-    border: none;
-    outline: none;
-    border-bottom: 2px solid #adadad;
+
+#otp
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: 13px;
+  font-family: monospace;
+  width: 151px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 30px auto;
+  text-indent: 7px;
+  padding: 11px 0;
+  display: block;
+  border: none;
+  outline: none;
+  background: url(/images/otp_bg.png)
 
 .legend
   text-transform: uppercase;
@@ -248,8 +283,17 @@ $p: 18px;
   &+.payment-option
     border-left: 1px solid $bc;
 
-#methods-specific-fields
-  display: none;
 
-#footer
+
+
+
+
+
+
+
+
+#methods-specific-fields
+  display: block;
+
+#otp-form, #form-common, #footer, #tabs, #tab-card, #tab-wallet
   display: none;

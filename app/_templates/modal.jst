@@ -140,27 +140,29 @@ else
                   {{? method.netbanking }}
                     <div class="fieldset showable tab-content{{? !method.card }} shown{{?}}" id="tab-netbanking">
                       <input type="hidden" name="method" value="netbanking">
-                      <div id="netb-banks" class="clear">
+                      <div id="netb-banks" class="clear grid">
                         {{for(var b in it.netbanks){}}
-                          <div class="netb-bank">
+                          <div class="netb-bank item">
                             <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
                             <label for="bank-radio-{{=b}}" class="radio-label">
                               <img src="data:image/png;base64,{{=it.netbanks[b].image}}">
-                              {{=it.netbanks[b].title}}
+                              <div>{{=it.netbanks[b].title}}</div>
                             </label>
                           </div>
                         {{}}}
                       </div>
-                      <div class="elem-wrap"><div id="nb-elem" class="elem select">
-                        <span class="help">Please select a bank from the list</span>
-                        <i>&#xe601;</i>
-                        <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
-                          <option selected="selected" value="">Other Banks</option>
-                          {{for(var i in method.netbanking){}}
-                            <option value="{{=i}}">{{=method.netbanking[i]}}</option>
-                          {{}}}
-                        </select>
-                      </div></div>
+                      <div class='pad'>
+                        <div class="elem-wrap"><div id="nb-elem" class="elem select">
+                          <span class="help">Please select a bank from the list</span>
+                          <i class="select-arrow">&#xe601;</i>
+                          <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
+                            <option selected="selected" value="">Other Banks</option>
+                            {{for(var i in method.netbanking){}}
+                              <option value="{{=i}}">{{=method.netbanking[i]}}</option>
+                            {{}}}
+                          </select>
+                        </div></div>
+                      </div>
                     </div>
                   {{?}}
                   {{ if(wallet){ }}
@@ -181,7 +183,7 @@ else
               <button id="submitbtn" type="submit">Pay</button>
             </div>
           </form>
-          <form id='otp_form'>
+          <form id='otp-form'>
             <strong class='prompt'>Enter the OTP for accessing your card saved with Razorpay</strong>
             <input type='tel' pattern='^[0-9]{6}$' name='otp' id='otp' maxlength='6' autofocus>
             <div class="double clear">
