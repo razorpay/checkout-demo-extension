@@ -479,6 +479,7 @@ Session.prototype = {
     this.on('click', '#topbar', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
+    this.on('submit', '#otp-form', this.onOtpSubmit);
 
     var enabledMethods = this.methods;
 
@@ -675,7 +676,10 @@ Session.prototype = {
       title: 'Verifying OTP',
       text: 'Please wait...'
     })
-    this.secondfactorCallback(gel('powerotp').value);
+    // this.secondfactorCallback(gel('powerotp').value);
+
+    console.log(gel('otp').value);
+
   },
 
   clearRequest: function(){
