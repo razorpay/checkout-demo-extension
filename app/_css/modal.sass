@@ -37,23 +37,27 @@ body, html
 .grid
   text-align: center;
   font-size: 0;
+  margin-left: -1px;
+  margin-right: -2px;
 
   .item
+    cursor: pointer;
     width: 33.33%;
     height: 86px;
     display: inline-block;
     box-sizing: border-box;
     border: 1px solid $bc;
     margin: -1px 0 0 -1px;
+    font-size: $size;
+    transition: .2s;
+    vertical-align: top;
+    &:hover
+      background: $bg;
 
   label
+    cursor: inherit;
     height: 100%;
-    transition: .2s;
     display: block;
-    cursor: pointer;
-
-  label:hover
-    background: $bg;
 
   img
     height: 24px;
@@ -268,23 +272,14 @@ i
   padding: 10px 0;
 
 #payment-options
-  margin: 20px 0;
-  text-align: center;
   i
     font-size: 40px;
     display: block;
     color: $pri;
-    margin-top: 20px;
+    margin: 12px 0 -4px;
 
-.payment-option
-  border-top: 1px solid $bc;
-  border-bottom: 1px solid $bc;
-  padding-bottom: 20px;
-  float: left;
-  width: 33.33%;
-  box-sizing: border-box;
-  &+.payment-option
-    border-left: 1px solid $bc;
+  .payment-option
+    height: 106px;
 
 #footer
   display: none;

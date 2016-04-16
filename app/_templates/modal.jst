@@ -61,11 +61,11 @@ else
                     <input class="input" name="email" type="email" id="email" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                 </div>
-                <div id="payment-options">
-                  <div class="legend">Select payment method</div>
-                  <div class="payment-option" tab="card"><i>&#xe609;</i>{{=it.tab_titles.card}}</div>
-                  <div class="payment-option" tab="netbanking"><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</div>
-                  <div class="payment-option" tab="wallet"><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</div>
+                <div class="legend">Select payment method</div>
+                <div id="payment-options" class="grid">
+                  <div class="payment-option item" tab="card"><i>&#xe609;</i>{{=it.tab_titles.card}}</div>
+                  <div class="payment-option item" tab="netbanking"><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</div>
+                  <div class="payment-option item" tab="wallet"><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</div>
                 </div>
                 <div class="clear"></div>
               </div>
