@@ -303,6 +303,7 @@ function secondfactorHandler(done){
 function Session(options){
   this.get = Options(options).get;
   this.listeners = [];
+  this.method = '';
 }
 
 Session.prototype = {

@@ -145,7 +145,6 @@ i
   position: relative;
   white-space: normal;
 
-$p: 18px;
 #header
   border-radius: $br $br 0 0;
   color: #fff;
@@ -203,11 +202,10 @@ $p: 18px;
 
 #body
   background: #fff;
-  padding: 50px 0 $p;
+  padding: 0 0 $p;
   border-radius: 0 0 $br $br;
   position: relative;
   overflow: hidden;
-
 
 .prompt
   text-align: center;
@@ -219,25 +217,24 @@ $p: 18px;
 
 #topbar
   position: absolute;
-  width: 100%;
-  background: #FAFAFA;
-  left: 0px;
-  top: -50px;
-  padding: 15px 20px;
-  box-sizing: border-box;
-  z-index: 9999999;
-  border-bottom: 1px solid #f0f0f0;
+  background: $bg;
+  left: 0;
+  right: 0;
+  top: -$topbarh;
+  padding: 0 $p;
+  line-height: $topbarh;
+  border-bottom: 1px solid $bc;
   transition: .3s;
   #heading
-    float: left;
     font-size: 16px;
   #contact
     float: right;
     font-size: 12px;
-    line-height: 19px;
 
-#topbar.shown
-  top: 0;
+#body.tab
+  padding-top: $topbarh;
+  #topbar
+    top: 0;
 
 #otp-form
   margin-top: 20px;
@@ -303,11 +300,6 @@ $p: 18px;
 
   &:active
     box-shadow: 0 2px 10px -5px #000 inset;
-
-
-
-
-
 
 #methods-specific-fields
   display: block;

@@ -4,6 +4,8 @@ $top: 28px;
 $left: 0px;
 $bottom: 7px;
 
+.fieldset
+  padding: 0 $p;
 
 .elem-wrap
   height: 72px;
@@ -14,38 +16,36 @@ $bottom: 7px;
 
   i
     position: absolute;
-    font-size: 24px;
-    bottom: 4px;
+    font-size: 20px;
+    bottom: 6px;
     right: 0px;
+    opacity: 0.7;
 
   &.filled, &.focused
     label
-      transform: scale(0.63) translateY(-32px);
+      transform: scale(0.86) translateY(-18px);
 
   label
     transform-origin: 0 0;
     transition: 0.3s;
     color: #666;
-    font-size: 16px;
     position: absolute;
     top: $top;
     left: $left;
 
 .input
+  font-size: inherit;
   border: none;
   outline: none;
   background: none;
   display: block;
   width: 100%;
-  font-size: 16px;
   line-height: 19px;
   box-sizing: border-box;
   padding: $top 0 $bottom $left;
 
 .elem select
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearence: none;
+  appearance: none;
   text-indent: 1px;
   text-overflow: '';
   padding: 10px;
@@ -59,11 +59,9 @@ select option
 .help
   display: none;
 
-[type=checkbox]
+input[type=checkbox]
   display: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearence: none;
+  appearance: none;
 
 :checked + .checkbox:after
   content: '';
@@ -75,8 +73,6 @@ select option
   border: 3px solid #fff;
   border-top: none;
   border-right: none;
-  -webkit-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
   transform: rotate(-45deg);
 
 .checkbox
@@ -89,5 +85,4 @@ select option
   cursor: pointer;
   background: #fff;
   border: 1px solid #ccc;
-  -webkit-transition: .2s;
   transition: .2s;
