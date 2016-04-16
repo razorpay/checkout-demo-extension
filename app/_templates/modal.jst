@@ -40,9 +40,9 @@ else
           <div class="clear"></div>
         </div>
         <div id="body">
-          <section id='topbar'>
-            <div id='contact'>9876543210</div>
-            <div id='heading'>Cards/EMI</div>
+          <section id="topbar">
+            <div id="user">9876543210</div>
+            <div id="tab-title"></div>
           </section>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
@@ -63,9 +63,9 @@ else
                 </div>
                 <div id="payment-options">
                   <div class="legend">Select payment method</div>
-                  <div class="payment-option" tab="card"><i>&#xe609;</i>Card</div>
-                  <div class="payment-option" tab="netbanking"><i>&#xe60a;</i>Netbanking</div>
-                  <div class="payment-option" tab="wallet"><i>&#xe60b;</i>Wallet</div>
+                  <div class="payment-option" tab="card"><i>&#xe609;</i>{{=it.tab_titles.card}}</div>
+                  <div class="payment-option" tab="netbanking"><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</div>
+                  <div class="payment-option" tab="wallet"><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</div>
                 </div>
                 <div class="clear"></div>
               </div>
@@ -154,7 +154,7 @@ else
                 </div>
               {{?}}
               {{ if(wallet){ }}
-                <div class="fieldset tab-content" id="tab-wallet">
+                <div class="tab-content" id="tab-wallet">
                   <input type="hidden" name="method" value="wallet">
                   <div id="wallets" class="clear grid">
                     {{ var firstWallet; for (var w in wallet){ }}

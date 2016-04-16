@@ -567,6 +567,7 @@ Session.prototype = {
     this.tab = tab;
     $('#body').toggleClass('tab', tab);
     if(tab){
+      $('#tab-title').html(tab_titles[tab]);
       getTab(tab).addClass('shown');
     } else {
       $('.tab-content.shown').removeClass('shown');

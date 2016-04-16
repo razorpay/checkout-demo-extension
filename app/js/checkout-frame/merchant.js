@@ -19,7 +19,8 @@ function addBodyClass(className){
 var qpmap = {};
 
 var gifBase64Prefix = 'data:image/gif;base64,';
-var freqBanks = Session.prototype.netbanks = {
+var sessProto = Session.prototype;
+sessProto.netbanks = {
   SBIN: {
     image: 'R0lGODlhKAAoAMQQAPD2/EGI2sTa86fI7m2k4l6b3+Lt+dPk9nyt5SR21Hut5cXb9Jm/61CS3f///xVt0f///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXyICSO5GgMRPCsbEAMRinPslCweL4WAu2PgoZumGv0fiUAgsjMIQBIEUDVrK4C0N8hYe0+EgcfgOvtJrJJarmLlS3XZURJAIcfRcJ6uQHU20U3fmUFEAaCcCeHayiKZSlwCgsLCnBqXgcOmQ4HjUwKmpqUnToLoJkLo6SmDqipOJ+moq4smJqca5ZdDJkMlQRwDZl5jgPAwnAwxg7DXjGBXsHLa4QQdHvHZXfMVdHbTXx90NhddyJvVt1ecmld6VZtMmPo40xnPlvc9ENgSFPf+jng9Tunw92QJ1FIBBliEIeRhDNsFNHHA+KPE4/SuYCRMAQAOw==',
     title: 'SBI'
@@ -46,7 +47,7 @@ var freqBanks = Session.prototype.netbanks = {
   }
 };
 
-var freqWallets = Session.prototype.walletData = {
+var freqWallets = sessProto.walletData = {
   paytm: {
     h: '16',
     col: gifBase64Prefix + 'R0lGODlhUAAYANUgAD/L9UJik+/y9oGWtzJVihM6dw++8+/7/mJ8pV/U9+Dl7dDY5M/y/S/H9JGjwCNHgZ/l+r/u/B/C9K/p+9/2/bC90lJvnKGwyW/Y+HGJrsLu/I/h+cDL23/c+AC68gQub////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACAALAAAAABQABgAAAb/QJBwSCwaj8gkEiJhKJ/QqHQKgng8Hap2yy1ar9nuUMEpm8uLI/nMSRMFg7hb6JAXGZPE9ZqIHEAUERFOIBEdHRFDBxAdEH9CBR+Sk5MPHEWRlJIPFUMWkwUKQgigokITe6lXDRoGewkSqRITGK57YZq5BXMguZSdIAGUl73DQx2qqnrJzKpZvpoIRNCSBELCk8SaxCDIzR7L398U1JVEBOUCIA/GxdnH4uHizBvlk29xcZnv20L9QgcaNEvgbZ4Bgak6aKKzEMmAfv/+ESmIRQhFDxRAxNpjwAmAhA05NBTCAUGAk7kuoXvnThI3eLcspgIgcw/NbiApkRxJqtwl7WySgEmECabmlZsUkea8B6In0wv2PvykVCDASpYTExr1oNTmVoVRhVylNtXey69bux79GtVaS7IgHEQ9izNm3bV3ubK1l8EfJQsCFPQTMNYXXYphkqbdS42Aurfa2gkAatgI4sV51WKhVgDBY8h+sYJYUCHOp3ZZ7SrOzFiSEk0ORktcU0YuaqIVWetGPPJIrgD7XApREDylZa27Z7b+oISd2Z3pjqtWnvxWbyMPn4MQSU2a9KLV8fLWmYSwvcfcfTk+cjm83rwdrhaAcuGk/fsXhpjXFMDB5zu2NPBIQHtgIAQDthgwgRAUBHhAEAA7'
@@ -65,7 +66,7 @@ var freqWallets = Session.prototype.walletData = {
   }
 }
 
-var emi_options = Session.prototype.emi_options = {
+var emi_options = sessProto.emi_options = {
   // minimum amount to enable emi
   min: 3000*100-1,
   installment: function(length, rate, principle){
@@ -111,21 +112,10 @@ var emi_options = Session.prototype.emi_options = {
 
 emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
 
-function processMessage(message) {
-  message.netbanks = freqBanks;
-  message.emiopts = emi_options;
-  var opts = message.options;
-  if(!opts){
-    var session = getSession();
-    if(session){
-      message.options = session.message.options;
-    }
-    return;
-  }
-
-  if(opts.amount >= 100*10000){
-    opts.method.wallet = false;
-  }
+var tab_titles = sessProto.tab_titles = {
+  card: 'Card/EMI',
+  netbanking: 'Netbanking',
+  wallet: 'Wallet'
 }
 
 function notifyBridge(message){

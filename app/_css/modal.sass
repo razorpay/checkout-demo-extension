@@ -36,23 +36,15 @@ body, html
 
 .grid
   text-align: center;
-  font-size: 14px;
-  line-height: 14px;
-
-  [type=radio]
-    display: none;
-
-  [type=radio]:checked+label
-    background: #f0f0f0;
+  font-size: 0;
 
   .item
-    width: 33.3333%;
+    width: 33.33%;
     height: 86px;
-    float: left;
     display: inline-block;
     box-sizing: border-box;
-    border-right: 1px solid #f0f0f0;
-    border-bottom: 1px solid #f0f0f0;
+    border: 1px solid $bc;
+    margin: -1px 0 0 -1px;
 
   label
     height: 100%;
@@ -61,12 +53,11 @@ body, html
     cursor: pointer;
 
   label:hover
-    background: #f9f9f9;
+    background: $bg;
 
   img
     height: 24px;
-    margin-bottom: 5px;
-
+    margin-bottom: 3px;
 
 .link
   text-decoration: underline;
@@ -202,7 +193,7 @@ i
 
 #body
   background: #fff;
-  padding: 50px 0 100px;
+  padding: 0 0 100px;
   border-radius: 0 0 $br $br;
   position: relative;
   overflow: hidden;
@@ -225,11 +216,13 @@ i
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
   transition: .3s;
-  #heading
-    font-size: 16px;
-  #contact
-    float: right;
-    font-size: 12px;
+
+#tab-title
+  font-size: 16px;
+
+#user
+  float: right;
+  font-size: 12px;
 
 #otp-form, .tab-content
   display: none;
@@ -242,6 +235,9 @@ i
 
   #form-common
     display: none;
+
+  #footer
+    display: block;
 
   #topbar
     top: 0;
@@ -272,7 +268,7 @@ i
   padding: 10px 0;
 
 #payment-options
-  margin: 20px (-$p);
+  margin: 20px 0;
   text-align: center;
   i
     font-size: 40px;
@@ -291,6 +287,7 @@ i
     border-left: 1px solid $bc;
 
 #footer
+  display: none;
   position: absolute;
   bottom: 0;
   width: 100%;
