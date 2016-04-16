@@ -303,7 +303,7 @@ function secondfactorHandler(done){
 function Session(options){
   this.get = Options(options).get;
   this.listeners = [];
-  this.method = '';
+  this.tab = '';
 }
 
 Session.prototype = {
@@ -340,9 +340,9 @@ Session.prototype = {
   },
 
   fillData: function(){
-    var method = this.data.method || this.get('prefill.method');
-    if(method){
-      this.switchTab($('#method-' + method + '-tab'));
+    var tab = this.data.method || this.get('prefill.method');
+    if(tab){
+      this.switchTab(tab);
     }
 
     if(this.hasOwnProperty('data')){
@@ -500,7 +500,7 @@ Session.prototype = {
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
-    // this.on('click', '#tabs li', this.switchTab);
+    this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
 
     var enabledMethods = this.methods;
@@ -582,42 +582,15 @@ Session.prototype = {
     }
   },
 
-  switchTab: function($el){
-    if(!($el instanceof $)){
-      $el = $($el.target);
+  switchTab: function(tab){
+    if(typeof tab !== 'string'){
+      tab = tab.currentTarget.getAttribute('tab');
     }
-
-    var el = $el[0];
-    if(!el){
-      return;
-    }
-
-    var parent = $el.parent();
-
-    var index;
-    each(
-      parent.find('li'),
-      function(i, li){
-        if(li === $el[0]){
-          var activeTab = parent[0].querySelector('li.active');
-          if(activeTab){
-            $(activeTab).removeClass('active');
-          }
-          $(li).addClass('active');
-          index = i;
-        }
-      }
-    )
-    var oldIndex = parseInt(parent.attr('active'), 10);
-
-    if(oldIndex !== index){
-      parent.attr('active', index);
-
-      var dirs = ['ltr', 'rtl'];
-      var isLeft = oldIndex < index;
-
-      makeHidden.call($('.tab-content.shown').attr('animdir', dirs[1-isLeft]));
-      makeVisible.call($('#' + $el.attr('data-target')).attr('animdir', dirs[isLeft | 0]));
+    $('#body').toggleClass('tab', tab);
+    if(tab){
+      $('#tab-' + tab).addClass('shown');
+    } else {
+      $('.tab-content.shown').removeClass('shown');
     }
   },
 

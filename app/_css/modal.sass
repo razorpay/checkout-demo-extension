@@ -231,8 +231,18 @@ i
     float: right;
     font-size: 12px;
 
+#otp-form, .tab-content
+  display: none;
+
+.tab-content.shown
+  display: block;
+
 #body.tab
   padding-top: $topbarh;
+
+  #form-common
+    display: none;
+
   #topbar
     top: 0;
 
@@ -300,9 +310,3 @@ i
 
   &:active
     box-shadow: 0 2px 10px -5px #000 inset;
-
-#methods-specific-fields
-  display: block;
-
-#otp-form, #form-common, #tabs, #tab-card, #tab-wallet
-  display: none;
