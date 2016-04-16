@@ -283,9 +283,26 @@ $p: 18px;
   &+.payment-option
     border-left: 1px solid $bc;
 
+#footer
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 
+#submitbtn
+  display: block;
+  border: none;
+  width: 100%;
+  border-radius: 0 0 $br $br;
+  font-size: 18px;
+  padding: 0;
+  line-height: 54px;
+  width: 100%;
+  color: #fff;
+  transition: .2s;
+  font-weight: bold
 
-
+  &:active
+    box-shadow: 0 2px 10px -5px #000 inset;
 
 
 
@@ -295,5 +312,5 @@ $p: 18px;
 #methods-specific-fields
   display: block;
 
-#otp-form, #form-common, #footer, #tabs, #tab-card, #tab-wallet
+#otp-form, #form-common, #tabs, #tab-card, #tab-wallet
   display: none;
