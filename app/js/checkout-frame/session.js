@@ -24,7 +24,7 @@ function formatCvvHelp(el_cvv, cvvlen){
   $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
 }
 
-function getFormFields($container, returnObj) {
+function fillData($container, returnObj) {
   each(
     $container.find('input[name],select[name]'),
     function(i, el){
@@ -36,34 +36,6 @@ function getFormFields($container, returnObj) {
       }
     }
   )
-}
-
-function getFormData(){
-  var activeTab = $('.tab-content.shown');
-  if(!activeTab[0]) { return }
-
-  var data = {};
-  getFormFields($('#form-common'), data);
-
-  getFormFields(activeTab, data);
-
-  if(activeTab.prop('id') === 'tab-card'){
-    data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-
-    if(!data['card[expiry]']){
-      data['card[expiry]'] = '';
-    }
-
-    if(!data['card[cvv]']){
-      data['card[cvv]'] = '';
-    }
-
-    var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
-    data['card[expiry_month]'] = expiry[0];
-    data['card[expiry_year]'] = expiry[1];
-    delete data['card[expiry]'];
-  }
-  return data;
 }
 
 function makeEmiDropdown(emiObj, session){
@@ -266,6 +238,10 @@ function powerErrorHandler(response){
     },
     200
   )
+}
+
+function getTab(tab){
+  return $('#tab-' + tab);
 }
 
 // this === Session
@@ -500,6 +476,7 @@ Session.prototype = {
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
+    this.on('click', '#topbar', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
 
@@ -516,7 +493,7 @@ Session.prototype = {
     if(enabledMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
-      this.on('change', '#nocvv-check', noCvvToggle);
+      // this.on('change', '#nocvv-check', noCvvToggle);
     }
 
     // if(enabledMethods.wallet.mobikwik){
@@ -584,11 +561,12 @@ Session.prototype = {
 
   switchTab: function(tab){
     if(typeof tab !== 'string'){
-      tab = tab.currentTarget.getAttribute('tab');
+      tab = tab.currentTarget.getAttribute('tab') || '';
     }
+    this.tab = tab;
     $('#body').toggleClass('tab', tab);
     if(tab){
-      $('#tab-' + tab).addClass('shown');
+      getTab(tab).addClass('shown');
     } else {
       $('.tab-content.shown').removeClass('shown');
     }
@@ -628,6 +606,36 @@ Session.prototype = {
       })
       return true;
     }
+  },
+
+  getFormData: function(){
+    var tab = this.tab;
+    if(!tab) { return }
+    var activeTab = getTab(tab);
+
+    var data = {
+      method: tab
+    };
+    fillData($('#form-common'), data);
+    fillData(activeTab, data);
+
+    if(tab === 'card'){
+      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+
+      if(!data['card[expiry]']){
+        data['card[expiry]'] = '';
+      }
+
+      if(!data['card[cvv]']){
+        data['card[cvv]'] = '';
+      }
+
+      var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
+      data['card[expiry_month]'] = expiry[0];
+      data['card[expiry_year]'] = expiry[1];
+      delete data['card[expiry]'];
+    }
+    return data;
   },
 
   hide: function(){
@@ -757,7 +765,7 @@ Session.prototype = {
   },
 
   getPayload: function(nocvv_dummy_values){
-    var data = getFormData();
+    var data = this.getFormData();
     setEmiBank(data);
 
     if(nocvv_dummy_values){
@@ -819,7 +827,7 @@ Session.prototype = {
   },
 
   saveAndClose: function(){
-    this.data = getFormData();
+    this.data = this.getFormData();
     this.close();
   }
 }
