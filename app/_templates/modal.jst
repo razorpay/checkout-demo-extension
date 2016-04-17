@@ -41,13 +41,13 @@ else
         </div>
         <div id="body">
           <section id="topbar">
-            <div id="user">9876543210</div>
+            <div id="user"></div>
             <div id="tab-title"></div>
           </section>
-          <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
+          <form id="form" class="shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
-                <div class="fieldset">
+                <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <span class="help">Please enter 10-12 digit contact number</span>
                     <i>&#xe607;</i>
@@ -70,7 +70,7 @@ else
                 <div class="clear"></div>
               </div>
               {{? method.card }}
-                <div class="fieldset tab-content" id="tab-card">
+                <div class="pad tab-content" id="tab-card">
                   <input type="hidden" name="method" value="card">
                   <div class="elem-wrap"><div class="elem" id="elem-card">
                     <label>Card Number</label>
@@ -174,17 +174,19 @@ else
             </div>
           </form>
           <form id='otp-form'>
-            <strong class='prompt'>Enter the OTP for accessing your card saved with Razorpay</strong>
-            <input type='tel' pattern='^[0-9]{6}$' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus>
-            <div class="double clear pad">
-              <label for='rememberme' class="first">
-                <input type='checkbox' id='rememberme' name='rememberme'>
-                <span class='checkbox mchild'></span>
-                Remember me
-              </label>
-              <div class="second">
-                <span class='link'>Skip using Saved cards</span>
+            <strong id='otp-prompt'></strong>
+            <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
+            <div class="spinners">
+              <div class="spin">
+                <div></div>
               </div>
+              <div class="spin spin2">
+                <div></div>
+              </div>
+            </div>
+            <div class="double clear pad">
+              <span class='link first'></span>
+              <span class='link grey second'></span>
             </div>
             <div id="footer">
               <button id="otpbtn" class="button" type="submit">VERIFY</button>

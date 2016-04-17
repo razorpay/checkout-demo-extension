@@ -258,19 +258,19 @@ function successHandler(response){
 // this === Session
 function secondfactorHandler(done){
   this.secondfactorCallback = done;
-  this.showPowerScreen({
-    title: 'Sending OTP',
+  this.showOTPScreen({
     text: 'Sending OTP to',
+    loading: true,
     number: true
   })
   this.requestTimeout = invoke(
-    'showPowerScreen',
+    'showOTPScreen',
     this,
     {
       className: 'otp',
-      title: 'Enter OTP',
       text: 'An OTP has been sent to',
-      number: true
+      number: true,
+      otp: true
     },
     750
   )
@@ -479,6 +479,8 @@ Session.prototype = {
     this.on('click', '#topbar', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
+
+    this.on('keypress', '#otp', this.onOtpEnter);
     this.on('submit', '#otp-form', this.onOtpSubmit);
 
     var enabledMethods = this.methods;
@@ -568,6 +570,7 @@ Session.prototype = {
     $('#body').toggleClass('tab', tab);
     if(tab){
       $('#tab-title').html(tab_titles[tab]);
+      $('#user').html(gel("contact").value);
       getTab(tab).addClass('shown');
     } else {
       $('.tab-content.shown').removeClass('shown');
@@ -648,39 +651,40 @@ Session.prototype = {
     }
   },
 
-  showPowerScreen: function(state){
-    gel('power-title').innerHTML = state.title;
+  showOTPScreen: function(state){
+    $('#otp-form').addClass('shown');
+    $('#form').removeClass('shown');
 
-    var text = state.text;
-    if(text){
-      if(state.number){
-        text += ' <strong>' + gel('contact').value + '</strong>'
-      }
-      gel('power-desc').innerHTML = text;
+    if(state.loading){
+      $('#otp-form').addClass('loading');
+    } else {
+      $('#otp-form').removeClass('loading');
     }
 
-    var className = state.className;
-    if(className){
-      gel('power-var').className = state.className;
+    if(state.number){
+      state.text += ' '+ gel('contact').value;
     }
+    gel('otp-prompt').innerHTML = state.text;
+    if (state.otp){
+      $('#otp').addClass('shown');
+    } else {
+      $('#otp').removeClass('shown');
+    }
+  },
 
-    var powerwallet = $('#powerwallet');
-    if(!powerwallet.hasClass('shown')){
-      showOverlay(powerwallet);
-    }
+  onOtpEnter: function(e){
+    if(!ensureNumeric(e)) { return }
   },
 
   onOtpSubmit: function(e){
     preventDefault(e);
-    this.showPowerScreen({
-      className: 'loading',
-      title: 'Verifying OTP',
-      text: 'Please wait...'
+    this.showOTPScreen({
+      loading: true,
+      otpField: true,
+      wallet: true,
+      text: 'Verifying OTP...'
     })
-    // this.secondfactorCallback(gel('powerotp').value);
-
-    console.log(gel('otp').value);
-
+    this.secondfactorCallback(gel('otp').value);
   },
 
   clearRequest: function(){
@@ -756,9 +760,8 @@ Session.prototype = {
     if(data.wallet === 'mobikwik' && !request.fees){
       request.error = this.bind(powerErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
-      this.showPowerScreen({
+      this.showOTPScreen({
         className: 'loading',
-        title: 'Verifying Account',
         number: true,
         text: 'Checking for a mobikwik account associated with'
       })
