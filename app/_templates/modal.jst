@@ -72,7 +72,7 @@ else
               {{? method.card }}
                 <div class="pad tab-content" id="tab-card">
                   <input type="hidden" name="method" value="card">
-                  <div class="elem-wrap"><div class="elem" id="elem-card">
+                  <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                     <label>Card Number</label>
                     <i>&#xe605;</i>
                     <div class="card-image"></div>
@@ -86,24 +86,24 @@ else
                     </label>
                     -->
                   </div></div>
-                  <div class="elem-wrap"><div class="elem elem-name">
+                  <div class="elem-wrap third filled"><div class="elem elem-expiry">
+                    <label>Expiry</label>
+                    <i>&#xe606;</i>
+                    <span class="help">Please enter card expiry date in MM / YY format.</span>
+                    <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
+                  </div></div>
+                  <div class="elem-wrap two-third"><div class="elem elem-name">
                     <label>Card Holder's Name</label>
                     <i>&#xe602;</i>
                     <span class="help">Please enter your name</span>
                     <input class="input" type="text" id="card_name" name="card[name]" required value="{{=attr(o('prefill.name'))}}">
                   </div></div>
-                  <div class="double" id="expiry-cvv">
-                    <div class="elem-wrap first"><div class="elem elem-expiry">
-                      <i>&#xe606;</i>
-                      <span class="help">Please enter card expiry date in MM / YY format.</span>
-                      <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
-                    </div></div>
-                    <div class="elem-wrap last"><div class="elem elem-cvv">
-                      <i>&#xe604;</i>
-                      <span class="help">Please enter valid cvv number. It is a 3 digit number at the back of your card.</span>
-                      <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" placeholder="CVV" maxlength="3" required pattern="[0-9]{3}">
-                    </div></div>
-                  </div>
+                  <div class="elem-wrap third"><div class="elem elem-cvv">
+                    <label>CVV</label>
+                    <i>&#xe604;</i>
+                    <span class="help">Please enter valid cvv number. It is a 3 digit number at the back of your card.</span>
+                    <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
+                  </div></div>
                   <div id="elem-emi" class="double">
                     <div class="elem-wrap first disabled" for="emi" tabIndex="0" id="emi-check-label">
                       <span class="checkbox"></span>

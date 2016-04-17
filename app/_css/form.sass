@@ -9,6 +9,16 @@ $bottom: 7px;
 
 .elem-wrap
   height: 72px;
+  &.third
+    float: left;
+    width: 33.33%;
+  &.two-third
+    float: left;
+    width: 66.66%;
+
+.filled, .focused
+  label
+    transform: scale(0.86) translateY(-18px);
 
 .elem
   border-bottom: 1px solid $bc;
@@ -20,10 +30,6 @@ $bottom: 7px;
     bottom: 6px;
     right: 0px;
     opacity: 0.7;
-
-  &.filled, &.focused
-    label
-      transform: scale(0.86) translateY(-18px);
 
   label
     transform-origin: 0 0;
