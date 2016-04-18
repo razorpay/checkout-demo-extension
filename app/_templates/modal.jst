@@ -106,7 +106,7 @@ else
                         <div class="option" value="">Pay without EMI</div>
                       </div>
                     </div>
-                    <div class="elem-wrap last" id="view-emi-plans">
+                    <div class="elem-wrap second" id="view-emi-plans">
                       View EMI Plans
                     </div>
                   </div>
@@ -134,6 +134,7 @@ else
                   <div class='pad'>
                     <div class="elem-wrap"><div id="nb-elem" class="elem select">
                       <i class="select-arrow">&#xe601;</i>
+                      <div class="help">Please select a bank</div>
                       <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                         <option selected="selected" value="">Other Banks</option>
                         {{for(var i in method.netbanking){}}
