@@ -237,7 +237,27 @@ i
   margin-top: 14px;
 
 #powered-by
-  display: none;
+  left: 0;
+  visibility: hidden;
+  opacity: 0;
+  width: 100%;
+  bottom: -60px;
+  display: block;
+  font-size: 36px;
+  transition: 0.3s;
+  position: absolute;
+  transition-delay: 0.2s;
+  font-family: $lato;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+
+  a
+    color: #bbb;
+    outline: none;
+    line-height: 36px;
+    transition: 0.3s;
+    text-decoration: none;
+    &:hover
+      color: #ddd;
 
 #body
   overflow: hidden;

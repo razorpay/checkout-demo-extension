@@ -369,9 +369,6 @@ Session.prototype = {
     errorHandler.call(this, this.params);
 
     var key = this.get('key');
-    if(key === 'rzp_live_kfAFSfgtztVo28' || key === 'rzp_test_s9cT6UE4Mit7zL'){
-      $('#powered-link').css('visibility', 'hidden').css('pointerEvents', 'none');
-    }
   },
 
   setEMI: function(){
