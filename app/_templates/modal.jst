@@ -78,13 +78,11 @@ else
                     <div class="card-image"></div>
                     <span class="help">Please enter a valid card number</span>
                     <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
-                    <!--
                     <label id="nocvv" for="nocvv-check">
                       <input type="checkbox" id="nocvv-check" checked disabled>
                       <span class="checkbox"></span>
                       My card doesn't have expiry/CVV
                     </label>
-                    -->
                   </div></div>
                   <div class="elem-wrap third filled"><div class="elem elem-expiry">
                     <label>Expiry</label>
@@ -104,8 +102,8 @@ else
                     <span class="help">Please enter valid cvv number. It is a 3 digit number at the back of your card.</span>
                     <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                   </div></div>
-                  <div id="elem-emi" class="clear">
-                    <div class="elem-wrap first disabled" for="emi" tabIndex="0" id="emi-check-label">
+                  <div id="elem-emi" class="double clear">
+                    <div class="elem-wrap first disabled dropdown-parent" for="emi" tabIndex="0" id="emi-check-label">
                       <span class="checkbox"></span>
                       Pay with EMI
                       <div id="emi-select" class="select dropdown">
