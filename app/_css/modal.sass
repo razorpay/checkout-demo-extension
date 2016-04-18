@@ -265,7 +265,7 @@ i
   border-radius: 0 0 $br $br;
   position: relative;
   overflow: hidden;
-  min-height: 375px;
+  min-height: 364px;
   box-sizing: border-box;
 
 #otp-prompt
@@ -308,6 +308,11 @@ i
 #modal .shown
   display: block;
 
+#form-common
+  padding: 20px 0 0;
+  .legend
+    margin-top: 10px;
+
 #body.tab
   padding-top: $topbarh;
 
@@ -316,9 +321,9 @@ i
 
   .footer
     button
-      z-index: 2;
       opacity: 1;
       transition-delay: 0.2s;
+      pointer-events: auto;
     .footer-desc
       color: #fff;
       opacity: 0;
@@ -342,6 +347,8 @@ i
   color: #777;
   transition: 0.3s;
   button
+    cursor: pointer;
+    pointer-events: none;
     position: relative;
     opacity: 0;
     transition: 0.2s;
