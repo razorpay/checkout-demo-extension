@@ -20,12 +20,11 @@ body, html
 
 .double
   width: 100%;
-  .first
-    float: left;
+  font-size: 0;
   .second
-    float: right;
     text-align: right;
   .first, .second
+    font-size: $size;
     width: 50%;
     display: inline-block;
 
@@ -225,6 +224,7 @@ i
 
 #merchant
   position: relative;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.12);
 
 #merchant-name
   font-size: 20px;

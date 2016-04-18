@@ -69,6 +69,11 @@
   margin-bottom: 8px;
   position: relative;
 
+  > div
+    padding: 10px 0;
+    outline: none;
+    cursor: pointer;
+
   &.hidden
     display: none!important;
 
@@ -83,28 +88,21 @@
     &[disabled]
       pointer-events: none;
 
-  .elem-wrap
-    outline: none;
-    white-space: nowrap;
-    cursor: pointer;
-    box-sizing: border-box;
-    padding: 10px 0;
-
-    &.second
-      &:before
-        border-radius: 50%;
-        content: '?';
-        color: #fff;
-        background: #616161;
-        display: inline-block;
-        height: 14px;
-        line-height: 14px;
-        width: 14px;
-        font-size: 12px;
-        text-align: center;
-        margin: 0 4px 0 2px;
-        top: -1px;
-        position: relative;
+#view-emi-plans
+  &:before
+    border-radius: 50%;
+    content: '?';
+    color: #fff;
+    background: #616161;
+    display: inline-block;
+    height: 14px;
+    line-height: 14px;
+    width: 14px;
+    font-size: 12px;
+    text-align: center;
+    margin: 0 4px 0 2px;
+    top: -1px;
+    position: relative;
 
 #emi-check-label
   .select
