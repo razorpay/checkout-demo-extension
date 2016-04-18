@@ -22,6 +22,10 @@ $bottom: 7px;
   border-bottom: 1px solid $bc;
   position: relative;
 
+  &.invalid.mature:not(.focused)
+    .input
+      color: $danger;
+
   input
     opacity: 0;
 

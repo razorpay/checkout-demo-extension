@@ -17,8 +17,6 @@ function validateCardNumber(el){
 
 // switches cvv help text between 3-4 characters for amex and non-amex cards
 function formatCvvHelp(el_cvv, cvvlen){
-  var cvv_help = $('.elem-cvv .help-text');
-  cvv_help.html(cvv_help.html().replace(/3|4/, cvvlen));
   el_cvv.maxLength = cvvlen;
   el_cvv.pattern = '[0-9]{'+cvvlen+'}';
   $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
@@ -511,10 +509,11 @@ Session.prototype = {
       this.card = new Card();
     }
     var card = this.card;
-    var $el_number = $('#card_number');
+    var el_number = gel('card_number');
     var el_expiry = gel('card_expiry');
     var el_cvv = gel('card_cvv');
     var el_contact = gel('contact');
+    var el_name = gel('card_name');
 
     card.setType = function(e){
       var el = e.target;
@@ -536,13 +535,25 @@ Session.prototype = {
 
     if(shouldFocusNextField){
       card.filled = function(el){
-        if(!$(el.parentNode).hasClass('invalid')){
-          (el === el_expiry ? el_cvv : el_expiry).focus();
+        if (el === el_expiry) {
+          if(!$(el.parentNode).hasClass('invalid')){
+            var next = $('.elem-name.filled input')[0];
+            if (next) {
+              next = el_cvv;
+            } else {
+              next = card_name;
+            }
+          }
+        } else if (el === el_number) {
+          next = el_expiry;
+        }
+        if(next){
+          next.focus();
         }
       }
     }
 
-    card.formatCardNumber($el_number[0]);
+    card.formatCardNumber(el_number);
     card.formatCardExpiry(el_expiry);
     card.ensureNumeric(el_cvv);
     card.ensurePhone(el_contact);
