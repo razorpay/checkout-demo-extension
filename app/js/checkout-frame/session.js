@@ -224,15 +224,14 @@ function errorHandler(response){
 }
 
 // this === Session
-function powerErrorHandler(response){
+function otpErrorHandler(response){
   this.clearRequest();
   this.requestTimeout = invoke(
-    'showPowerScreen',
+    'showOTPScreen',
     this,
     {
-      className: 'error',
+      error: true,
       text: response.error.description,
-      title: 'Error'
     },
     200
   )
@@ -265,7 +264,6 @@ function secondfactorHandler(done){
     'showOTPScreen',
     this,
     {
-      className: 'otp',
       text: 'An OTP has been sent to',
       number: true,
       otp: true
@@ -575,12 +573,18 @@ Session.prototype = {
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
     this.tab = tab;
-    $('#body').toggleClass('tab', tab);
     if(tab){
+      $('#body').addClass('tab');
       $('#tab-title').html(tab_titles[tab]);
       $('#user').html(gel("contact").value);
       getTab(tab).addClass('shown');
     } else {
+      if(this.otp_form) {
+        $('#otp-form').removeClass('shown');
+        $('#form').addClass('shown');
+        this.otp_form = false;
+      }
+      $('#body').removeClass('tab');
       $('.tab-content.shown').removeClass('shown');
     }
   },
@@ -661,7 +665,13 @@ Session.prototype = {
 
   showOTPScreen: function(state){
     $('#otp-form').addClass('shown');
+    this.otp_form = true;
     $('#form').removeClass('shown');
+    if(state.img){
+      var title = gel('tab-title');
+      title.innerHTML = '';
+      title.appendChild(state.img);
+    }
 
     if(state.loading){
       $('#otp-form').addClass('loading');
@@ -741,7 +751,6 @@ Session.prototype = {
     }
 
     var data = this.getPayload(nocvv_dummy_values);
-    var message = this.message;
 
     Razorpay.sendMessage({
       event: 'submit',
@@ -765,14 +774,23 @@ Session.prototype = {
       success: this.bind(successHandler)
     };
 
-    if(data.wallet === 'mobikwik' && !request.fees){
-      request.error = this.bind(powerErrorHandler);
+    var wallet = data.wallet;
+
+    if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
+      request.error = this.bind(otpErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
+
+      var img = new Image();
+      img.src = freqWallets[wallet].col;
+      img.height = freqWallets[wallet].h;
+
       this.showOTPScreen({
         className: 'loading',
         number: true,
-        text: 'Checking for a mobikwik account associated with'
+        text: 'Checking for a mobikwik account associated with',
+        img: img
       })
+
     } else {
       request.error = this.bind(errorHandler);
       showLoadingMessage('Please wait while your payment is processed...');
