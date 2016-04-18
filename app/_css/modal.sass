@@ -270,6 +270,11 @@ i
   border-bottom: 1px solid $bc;
   transition: .3s;
 
+.back
+  float: left;
+  margin-right: 6px;
+  font-size: 12px;
+
 #tab-title
   font-size: 16px;
 
@@ -290,11 +295,68 @@ i
   #form-common
     display: none;
 
-  #footer
-    display: block;
+  .footer
+    button
+      z-index: 2;
+      opacity: 1;
+      transition-delay: 0.2s;
+    .footer-desc
+      color: #fff;
+      opacity: 0;
+      transition-delay: 0s;
 
   #topbar
     top: 0;
+
+.footer
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  font-size: 16px;
+  line-height: 56px;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 0 0 $br $br;
+  background: #fafbfc;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.14) inset;
+  color: #777;
+  transition: 0.3s;
+  button
+    opacity: 0;
+    transition: 0.2s;
+
+.footer-desc
+  transition: 0.2s;
+  transition-delay: 0.2s;
+  position: absolute;
+  width: 100%;
+
+#modal .loading .footer
+  display: none;
+
+.button
+  display: block;
+  border: none;
+  width: 100%;
+  border-radius: 0 0 $br $br;
+  font-size: 18px;
+  padding: 0;
+  line-height: 54px;
+  width: 100%;
+  color: #fff;
+  transition: .2s;
+  font-weight: bold
+
+  &:active
+    box-shadow: 0 2px 10px -5px #000 inset;
+
+#tab-card
+  i
+    display: none;
+
+#nocvv
+  display: none;
 
 #otp-form
   margin-top: 20px;
@@ -331,36 +393,3 @@ i
 
   .payment-option
     height: 106px;
-
-#footer
-  display: none;
-  transition: 0.3s;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-
-#modal .loading #footer
-  display: none;
-
-.button
-  display: block;
-  border: none;
-  width: 100%;
-  border-radius: 0 0 $br $br;
-  font-size: 18px;
-  padding: 0;
-  line-height: 54px;
-  width: 100%;
-  color: #fff;
-  transition: .2s;
-  font-weight: bold
-
-  &:active
-    box-shadow: 0 2px 10px -5px #000 inset;
-
-#tab-card
-  i
-    display: none;
-
-#nocvv
-  display: none;

@@ -21,6 +21,8 @@ $bottom: 7px;
 .filled, .focused
   label
     transform: scale(0.86) translateY(-18px);
+  .input
+    opacity: 1;
 
 .elem
   border-bottom: 1px solid $bc;
@@ -42,6 +44,8 @@ $bottom: 7px;
     left: $left;
 
 .input
+  transition: 0.3s;
+  opacity: 0;
   font-size: inherit;
   border: none;
   outline: none;
@@ -102,54 +106,15 @@ input[type=radio]
 input[type=radio]:checked+label
   background: $bgd;
 
+button
+  background: none;
+  border: none;
+  outline: none;
 
-.dropdown-parent:focus .dropdown,
-.focused.invalid.mature .help
+
+.dropdown-parent:focus .dropdown
   pointer-events: auto;
   display: block; // helps when pointer-events is not supported
   opacity: 1;
   transform: none;
   transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
-
-
-// ie9, 10
-@media screen and (min-width:0\0)
-  .help
-    display: none;
-  .focused.invalid.mature .help
-    display: block;
-
-.help
-  color: #fff;
-  font-weight: bold;
-  position: absolute;
-  line-height: 16px;
-  padding: 8px 12px;
-  font-size: 12px;
-  background: #555;
-  box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
-  z-index: 3;
-  left: -5px;
-  bottom: 100%;
-  margin-bottom: -10px;
-  pointer-events: none!important;
-  transition: 0.3s;
-
-  &:after
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-width: 6px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-    bottom: 0;
-    left: 21.5px;
-    margin: 0 0 -10px -7px;
-
-.dropdown, .help
-  display: none\9; // <ie9
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: 0.25s ease-in transform, 0.16s ease-in opacity;

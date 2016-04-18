@@ -42,6 +42,7 @@ else
         <div id="body">
           <section id="topbar">
             <div id="user"></div>
+            <i class="back">&#xe604;</i>
             <div id="tab-title"></div>
           </section>
           <form id="form" class="shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
@@ -49,7 +50,6 @@ else
               <div id="form-common">
                 <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
-                    <span class="help">Please enter 10-12 digit contact number</span>
                     <i>&#xe607;</i>
                     <label>Phone</label>
                     <input class="input" id="contact" name="contact" type="tel" required value="{{=attr(o('prefill.contact'))||'+91 '}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
@@ -57,7 +57,6 @@ else
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
                     <label>Email</label>
-                    <span class="help">Please enter a valid email. Example:<br> you@example.com</span>
                     <input class="input" name="email" type="email" id="email" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                 </div>
@@ -76,7 +75,6 @@ else
                     <label>Card Number</label>
                     <i>&#xe605;</i>
                     <div class="card-image"></div>
-                    <span class="help">Please enter a valid card number</span>
                     <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
                     <label id="nocvv" for="nocvv-check">
                       <input type="checkbox" id="nocvv-check" checked disabled>
@@ -84,22 +82,19 @@ else
                       My card doesn't have expiry/CVV
                     </label>
                   </div></div>
-                  <div class="elem-wrap third filled"><div class="elem elem-expiry">
+                  <div class="elem-wrap third"><div class="elem elem-expiry">
                     <label>Expiry</label>
                     <i>&#xe606;</i>
-                    <span class="help">Please enter card expiry date in MM / YY format.</span>
                     <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
                   </div></div>
                   <div class="elem-wrap two-third"><div class="elem elem-name">
                     <label>Card Holder's Name</label>
                     <i>&#xe602;</i>
-                    <span class="help">Please enter your name</span>
                     <input class="input" type="text" id="card_name" name="card[name]" required value="{{=attr(o('prefill.name'))}}">
                   </div></div>
                   <div class="elem-wrap third"><div class="elem elem-cvv">
                     <label>CVV</label>
                     <i>&#xe604;</i>
-                    <span class="help">Please enter valid cvv number. It is a 3 digit number at the back of your card.</span>
                     <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                   </div></div>
                   <div id="elem-emi" class="double clear">
@@ -110,7 +105,6 @@ else
                         <div id="emi-plans-wrap"></div>
                         <div class="option" value="">Pay without EMI</div>
                       </div>
-                      <span class="help dropdown">EMI is available on Axis, HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
                     </div>
                     <div class="elem-wrap last" id="view-emi-plans">
                       View EMI Plans
@@ -139,7 +133,6 @@ else
                   </div>
                   <div class='pad'>
                     <div class="elem-wrap"><div id="nb-elem" class="elem select">
-                      <span class="help">Please select a bank from the list</span>
                       <i class="select-arrow">&#xe601;</i>
                       <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                         <option selected="selected" value="">Other Banks</option>
@@ -167,8 +160,9 @@ else
                 </div>
               {{}}}
             </div>
-            <div id="footer">
-              <button id="submitbtn" class="button" type="submit">PAY ₹7650</button>
+            <div class="footer">
+              <div class="footer-desc">Amount to pay: {{=amount}}</div>
+              <button id="submitbtn" class="button" type="submit">PAY {{=amount}}</button>
             </div>
           </form>
           <form id='otp-form'>
@@ -186,8 +180,8 @@ else
               <span class='link first'></span>
               <span class='link grey second'></span>
             </div>
-            <div id="footer">
-              <button id="otpbtn" class="button" type="submit">VERIFY</button>
+            <div class="footer">
+              <button id="otpbtn" class="button" type="submit">Verify</button>
             </div>
           </form>
         </div>
