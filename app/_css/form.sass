@@ -18,13 +18,12 @@ $bottom: 7px;
     float: left;
     width: 66.66%;
 
-.filled, .focused
-  label
-    transform: scale(0.86) translateY(-18px);
-
 .elem
   border-bottom: 1px solid $bc;
   position: relative;
+
+  input
+    opacity: 0;
 
   i
     position: absolute;
@@ -41,7 +40,14 @@ $bottom: 7px;
     top: $top;
     left: $left;
 
+.filled, .focused
+  label
+    transform: scale(0.86) translateY(-18px);
+  input
+    opacity: 1;
+
 .input
+  transition: 0.3s;
   font-size: inherit;
   border: none;
   outline: none;
@@ -51,6 +57,7 @@ $bottom: 7px;
   line-height: 19px;
   box-sizing: border-box;
   padding: $top 0 $bottom $left;
+  position: relative;
 
 .elem select
   appearance: none;
@@ -67,14 +74,11 @@ $bottom: 7px;
 select option
   width: inherit;
 
-.help
-  display: none;
-
 input[type=checkbox]
   display: none;
   appearance: none;
 
-:checked + .checkbox:after
+.checked .checkbox:after, :checked + .checkbox:after
   content: '';
   width: 7px;
   height: 3px;
@@ -103,3 +107,16 @@ input[type=radio]
 
 input[type=radio]:checked+label
   background: $bgd;
+
+button
+  background: none;
+  border: none;
+  outline: none;
+
+
+.dropdown-parent:focus .dropdown
+  pointer-events: auto;
+  display: block; // helps when pointer-events is not supported
+  opacity: 1;
+  transform: none;
+  transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
