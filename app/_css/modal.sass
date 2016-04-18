@@ -259,12 +259,13 @@ i
   line-height: 20px;
 
 #topbar
+  top: 0;
   cursor: pointer;
   position: absolute;
   background: $bg;
+  display: none;
   left: 0;
-  right: 0;
-  top: -$topbarh;
+  width: 100%;
   padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
@@ -306,7 +307,7 @@ i
       transition-delay: 0s;
 
   #topbar
-    top: 0;
+    display: block;
 
 .footer
   position: absolute;

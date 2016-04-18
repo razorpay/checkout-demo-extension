@@ -18,15 +18,12 @@ $bottom: 7px;
     float: left;
     width: 66.66%;
 
-.filled, .focused
-  label
-    transform: scale(0.86) translateY(-18px);
-  .input
-    opacity: 1;
-
 .elem
   border-bottom: 1px solid $bc;
   position: relative;
+
+  input
+    opacity: 0;
 
   i
     position: absolute;
@@ -43,9 +40,14 @@ $bottom: 7px;
     top: $top;
     left: $left;
 
+.filled, .focused
+  label
+    transform: scale(0.86) translateY(-18px);
+  input
+    opacity: 1;
+
 .input
   transition: 0.3s;
-  opacity: 0;
   font-size: inherit;
   border: none;
   outline: none;
