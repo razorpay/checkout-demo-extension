@@ -8,10 +8,10 @@
       {{}}}
     </select>
   </div>
-  <strong class="row lh-34">
+  <strong class="row">
     <div class="col">EMI Tenure</div>
     <div class="col">Interest Rate</div>
-    <div class="col lh-17">Monthly Installments</div>
+    <div class="col">Monthly Installments</div>
     <div class="col">Total Money</div>
   </strong>
   {{ var plans = it.banks[it.selected].plans; for(var plan in it.banks[it.selected].plans){}}
@@ -23,5 +23,5 @@
       <div class="col">₹ {{=inst*plan/100}}</div>
     </div>
   {{}}}
-  <div id="emi-close" class="close-btn">×</div>
+  <div id="emi-close" class="close">×</div>
 </div>

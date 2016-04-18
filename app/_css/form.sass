@@ -115,6 +115,12 @@ button
   border: none;
   outline: none;
 
+.dropdown
+  display: none\9; // <ie9
+  pointer-events: none;
+  +opacity(0);
+  transform: translateY(10px);
+  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
 
 .dropdown-parent:focus .dropdown
   pointer-events: auto;
