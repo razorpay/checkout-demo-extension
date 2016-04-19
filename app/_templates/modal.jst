@@ -45,7 +45,7 @@ else
             <i class="back">&#xe604;</i>
             <div id="tab-title"></div>
           </section>
-          <form id="form" class="shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
+          <form id="form" class="showable shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
                 <div class="pad">
@@ -167,7 +167,7 @@ else
               <button id="submitbtn" class="button" type="submit">PAY {{=amount}}</button>
             </div>
           </form>
-          <form id='otp-form'>
+          <form id='otp-form' class="showable">
             <strong id='otp-prompt'></strong>
             <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
             <div class="spinners">

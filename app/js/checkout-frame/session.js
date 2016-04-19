@@ -469,7 +469,7 @@ Session.prototype = {
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
-    this.on('click', '#topbar', this.switchTab);
+    this.on('click', '#tab-title', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
 
@@ -572,19 +572,24 @@ Session.prototype = {
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
-    this.tab = tab;
+
+    if (this.sub_tab) {
+      $('#otp-form').removeClass('shown');
+      $('#form').addClass('shown');
+      tab = this.tab;
+      this.sub_tab = false;
+    } else {
+      this.tab = tab;
+    }
+
+
+    $('#body').toggleClass('tab', tab);
+
     if(tab){
-      $('#body').addClass('tab');
       $('#tab-title').html(tab_titles[tab]);
       $('#user').html(gel("contact").value);
       getTab(tab).addClass('shown');
     } else {
-      if(this.otp_form) {
-        $('#otp-form').removeClass('shown');
-        $('#form').addClass('shown');
-        this.otp_form = false;
-      }
-      $('#body').removeClass('tab');
       $('.tab-content.shown').removeClass('shown');
     }
   },
@@ -663,10 +668,7 @@ Session.prototype = {
     }
   },
 
-  showOTPScreen: function(state){
-    $('#otp-form').addClass('shown');
-    this.otp_form = true;
-    $('#form').removeClass('shown');
+  showOTPScreen: function(state, enforce){
     if(state.img){
       var title = gel('tab-title');
       title.innerHTML = '';
@@ -687,6 +689,12 @@ Session.prototype = {
       $('#otp').addClass('shown');
     } else {
       $('#otp').removeClass('shown');
+    }
+
+    if (enforce) {
+      $('#otp-form').addClass('shown');
+      $('#form').removeClass('shown');
+      this.sub_tab = true;
     }
   },
 
@@ -785,11 +793,11 @@ Session.prototype = {
       img.height = freqWallets[wallet].h;
 
       this.showOTPScreen({
-        className: 'loading',
+        loading: true,
         number: true,
-        text: 'Checking for a mobikwik account associated with',
+        text: 'Checking for a ' + wallet + ' account associated with',
         img: img
-      })
+      }, true)
 
     } else {
       request.error = this.bind(errorHandler);
