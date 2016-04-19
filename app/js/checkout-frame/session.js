@@ -595,9 +595,10 @@ Session.prototype = {
     if(tab){
       if (tab === 'card') {
         var user = this.user;
-        if( typeof user.exists !== 'boolean') {
+        user.setPhone(getPhone());
+        if( typeof user.saved !== 'boolean') {
           return this.lookupUser();
-        } else if (user.exists && !user.logged_in && user.wants_login) {
+        } else if (user.saved && !user.logged_in && !user.wants_skip) {
           return this.loginUser();
         }
       }
@@ -611,17 +612,18 @@ Session.prototype = {
   },
 
   loginUser: function(){
-    $.ajax({
-      url: 'http://api.pronav.in/sendotp'
+    this.user.login();
+    invoke(secondfactorHandler, this, function(data){
+      this.user.verify(
+        data,
+        bind(
+          function(){
+            this.switchTab('card');
+          },
+          this
+        )
+      )
     });
-    invoke(
-      secondfactorHandler,
-      this,
-      function(){
-        this.user.logged_in = true;
-        this.switchTab('card');
-      }
-    )
   },
 
   lookupUser: function(){
@@ -629,16 +631,14 @@ Session.prototype = {
       text: '<strong>Looking for saved cards with Razorpay</strong>',
       loading: true
     })
-    $.ajax({
-      url: 'http://api.razorpay.com',
-      callback: bind(
-        function(ifExists){
-          this.user.exists = !!ifExists;
+    this.user.lookup(
+      bind(
+        function(){
           this.switchTab('card');
         },
         this
       )
-    })
+    )
   },
 
   showOtpView: function(state) {
@@ -650,6 +650,7 @@ Session.prototype = {
   setUser: function(){
     var userOptions = preferences.user ? preferences.user : emo;
     this.user = new User(userOptions);
+    this.user.key = this.get('key');
   },
 
   switchBank: function(e){
