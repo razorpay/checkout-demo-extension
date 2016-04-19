@@ -7,7 +7,7 @@ var amount;
 if(o('display_currency'))
   amount = it.currencies[o('display_currency')] + html(o('display_amount'));
 else
-  amount = "<i>&#xe600;</i><u>₹</u>" + (o('amount')/100).toFixed(2).replace(".00", "");
+  amount = "<i>&#xe600;</i><span class='iph'>₹</span>" + (o('amount')/100).toFixed(2).replace(".00", "");
 }}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
@@ -62,9 +62,9 @@ else
                 </div>
                 <div class="legend">Select payment method</div>
                 <div id="payment-options" class="grid">
-                  <div class="payment-option item" tab="card"><div class="payment-icon"><i>&#xe609;</i></div>{{=it.tab_titles.card}}</div>
-                  <div class="payment-option item" tab="netbanking"><div class="payment-icon"><i>&#xe60a;</i></div>{{=it.tab_titles.netbanking}}</div>
-                  <div class="payment-option item" tab="wallet"><div class="payment-icon"><i>&#xe60b;</i></div>{{=it.tab_titles.wallet}}</div>
+                  <div class="payment-option item" tab="card"><i>&#xe609;</i>{{=it.tab_titles.card}}</div>
+                  <div class="payment-option item" tab="netbanking"><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</div>
+                  <div class="payment-option item" tab="wallet"><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</div>
                 </div>
                 <div class="clear"></div>
               </div>
@@ -167,8 +167,8 @@ else
               <button id="submitbtn" class="button" type="submit">PAY {{=amount}}</button>
             </div>
           </form>
-          <form id='otp-form'>
-            <strong id='otp-prompt'></strong>
+          <form id="otp-form">
+            <div id='otp-prompt'></div>
             <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
             <div class="spinners">
               <div class="spin">
@@ -183,7 +183,7 @@ else
               <span class='link grey second'></span>
             </div>
             <div class="footer">
-              <button id="otpbtn" class="button" type="submit">VERIFY</button>
+              <button id="otpbtn" class="button" type="submit">Verify</button>
             </div>
           </form>
         </div>

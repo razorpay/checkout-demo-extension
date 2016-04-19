@@ -78,12 +78,10 @@ a
   cursor: pointer;
   text-decoration: none;
 
-u
-  text-decoration: none;
-
 i
   font-style: normal;
-  display: none;
+  opacity: 0;
+  transition: 0.3s;
 
 .spin
   width: 60px;
@@ -156,10 +154,13 @@ i
     opacity: 1;
 
   i
-    display: inline-block;
+    opacity: 1;
 
-  u
+  .iph
     display: none;
+
+  #amount i
+    position: static;
 
 #modal
   display: inline-block;
@@ -235,6 +236,8 @@ i
 #amount
   font-size: 24px;
   margin-top: 14px;
+  i
+    position: absolute;
 
 #powered-by
   left: 0;
@@ -265,14 +268,6 @@ i
   position: relative;
   min-height: 372px;
   box-sizing: border-box;
-
-#otp-prompt
-  text-align: center;
-  width: 240px;
-  display: block;
-  margin: 0 auto;
-  font-size: 14px;
-  line-height: 20px;
 
 #topbar
   top: 0;
@@ -385,26 +380,6 @@ i
 #nocvv
   display: none;
 
-#otp-form
-  margin-top: 20px;
-
-#otp
-  font-size: 18px;
-  line-height: 24px;
-  letter-spacing: 13px;
-  font-family: monospace;
-  width: 151px;
-  border-radius: 6px;
-  overflow: hidden;
-  margin: 30px auto;
-  text-indent: 7px;
-  padding: 11px 0;
-  display: block;
-  border: none;
-  outline: none;
-  background: url(/images/otp_bg.png);
-  display: none;
-
 .legend
   text-transform: uppercase;
   font-size: 12px;
@@ -413,6 +388,7 @@ i
 
 #payment-options
   i
+    display: block;
     font-size: 40px;
     color: $pri;
     margin: 12px 0 -4px;
