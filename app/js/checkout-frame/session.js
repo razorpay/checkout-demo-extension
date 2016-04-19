@@ -241,6 +241,10 @@ function getTab(tab){
   return $('#tab-' + tab);
 }
 
+function getPhone(){
+  return gel('contact').value;
+}
+
 // this === Session
 function successHandler(response){
   this.clearRequest();
@@ -253,13 +257,14 @@ function successHandler(response){
 }
 
 // this === Session
-function secondfactorHandler(done){
+function secondfactorHandler(done, tab){
   this.secondfactorCallback = done;
   this.showOTPScreen({
     text: 'Sending OTP to',
     loading: true,
     number: true
   })
+  $('#otp').val('');
   this.requestTimeout = invoke(
     'showOTPScreen',
     this,
@@ -272,14 +277,14 @@ function secondfactorHandler(done){
   )
 }
 
-function Session(options){
+function Session (options) {
   this.get = Options(options).get;
   this.listeners = [];
   this.tab = '';
 }
 
 Session.prototype = {
-  // accessing this.data would not produce error
+  // so that accessing this.data would not produce error
   data: emo,
   params: emo,
   getClasses: function(){
@@ -357,6 +362,7 @@ Session.prototype = {
 
     this.getEl();
     this.fillData();
+    this.setUser();
     this.setEMI();
     this.setModal();
     this.setSmarty();
@@ -473,7 +479,6 @@ Session.prototype = {
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
 
-    this.on('keypress', '#otp', this.onOtpEnter);
     this.on('submit', '#otp-form', this.onOtpSubmit);
 
     var enabledMethods = this.methods;
@@ -568,30 +573,104 @@ Session.prototype = {
     }
   },
 
+  setTopbar: function(tab){
+    var $body = $('#body');
+    if (tab) {
+      $body.addClass('tab');
+      if (tab !== this.tab) {
+        $('#tab-title').html(tab_titles[tab]);
+      }
+    } else {
+      $body.removeClass('tab');
+      $('.tab-content.shown').removeClass('shown');
+    }
+  },
+
   switchTab: function(tab){
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
+    // if (this.sub_tab) {
+    //   $('#otp-form').removeClass('shown');
+    //   $('#form').addClass('shown');
+    //   tab = this.tab;
+    //   this.sub_tab = false;
+    // } else {
+    //   this.tab = tab;
+    // }
 
-    if (this.sub_tab) {
-      $('#otp-form').removeClass('shown');
-      $('#form').addClass('shown');
-      tab = this.tab;
-      this.sub_tab = false;
-    } else {
-      this.tab = tab;
-    }
 
+    // $('#body').toggleClass('tab', tab);
 
-    $('#body').toggleClass('tab', tab);
-
+    // if(tab){
+    //   $('#tab-title').html(tab_titles[tab]);
+    //   $('#user').html(gel("contact").value);
+    //   getTab(tab).addClass('shown');
+    // } else {
+    //   $('.tab-content.shown').removeClass('shown');
+    this.setTopbar(tab);
+    this.tab = tab;
     if(tab){
-      $('#tab-title').html(tab_titles[tab]);
-      $('#user').html(gel("contact").value);
+      if (tab === 'card') {
+        var user = this.user;
+        user.setPhone(getPhone());
+        if( typeof user.saved !== 'boolean') {
+          return this.lookupUser();
+        } else if (user.saved && !user.logged_in && !user.wants_skip) {
+          return this.loginUser();
+        } else {
+          // preferences.tokens
+        }
+      }
       getTab(tab).addClass('shown');
-    } else {
-      $('.tab-content.shown').removeClass('shown');
     }
+    if(this.otpview) {
+      gel('otp-form').className = '';
+      $('#form').addClass('shown');
+      this.otpview = false;
+    }
+  },
+
+  loginUser: function(){
+    this.user.login();
+    invoke(secondfactorHandler, this, function(data){
+      this.user.verify(
+        data,
+        bind(
+          function(){
+            this.switchTab('card');
+          },
+          this
+        )
+      )
+    });
+  },
+
+  lookupUser: function(){
+    this.showOTPScreen({
+      text: '<strong>Looking for saved cards with Razorpay</strong>',
+      loading: true
+    })
+    this.user.lookup(
+      bind(
+        function(){
+          this.switchTab('card');
+        },
+        this
+      )
+    )
+  },
+
+  showOtpView: function(state) {
+    $('#otp-prompt').html(state.title || '');
+    gel('otp-form').className = state.className || '';
+    this.otpview = true;
+  },
+
+  setUser: function(){
+    var userOptions = preferences.user ? preferences.user : emo;
+    this.user = new User(userOptions);
+    this.user.key = this.get('key');
   },
 
   switchBank: function(e){
@@ -669,6 +748,10 @@ Session.prototype = {
   },
 
   showOTPScreen: function(state, enforce){
+    $('#otp-form').addClass('shown');
+    this.otpview = true;
+    $('#form').removeClass('shown');
+
     if(state.img){
       var title = gel('tab-title');
       title.innerHTML = '';
@@ -682,31 +765,26 @@ Session.prototype = {
     }
 
     if(state.number){
-      state.text += ' '+ gel('contact').value;
+      state.text += ' '+ getPhone();
     }
     gel('otp-prompt').innerHTML = state.text;
-    if (state.otp){
+    if (state.otp) {
       $('#otp').addClass('shown');
     } else {
       $('#otp').removeClass('shown');
     }
 
-    if (enforce) {
-      $('#otp-form').addClass('shown');
-      $('#form').removeClass('shown');
-      this.sub_tab = true;
-    }
-  },
-
-  onOtpEnter: function(e){
-    if(!ensureNumeric(e)) { return }
+    // if (enforce) {
+    //   $('#otp-form').addClass('shown');
+    //   $('#form').removeClass('shown');
+    //   this.sub_tab = true;
+    // }
   },
 
   onOtpSubmit: function(e){
     preventDefault(e);
     this.showOTPScreen({
       loading: true,
-      otpField: true,
       wallet: true,
       text: 'Verifying OTP...'
     })

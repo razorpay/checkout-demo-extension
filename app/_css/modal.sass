@@ -78,12 +78,10 @@ a
   cursor: pointer;
   text-decoration: none;
 
-u
-  text-decoration: none;
-
 i
   font-style: normal;
-  display: none;
+  opacity: 0;
+  transition: 0.3s;
 
 .spin
   width: 60px;
@@ -156,10 +154,13 @@ i
     opacity: 1;
 
   i
-    display: inline-block;
+    opacity: 1;
 
-  u
+  .iph
     display: none;
+
+  #amount i
+    position: static;
 
 #modal
   display: inline-block;
@@ -235,6 +236,8 @@ i
 #amount
   font-size: 24px;
   margin-top: 14px;
+  i
+    position: absolute;
 
 #powered-by
   left: 0;
@@ -260,21 +263,11 @@ i
       color: #ddd;
 
 #body
-  overflow: hidden;
   background: #fff;
   border-radius: 0 0 $br $br;
   position: relative;
-  overflow: hidden;
   min-height: 372px;
   box-sizing: border-box;
-
-#otp-prompt
-  text-align: center;
-  width: 240px;
-  display: block;
-  margin: 0 auto;
-  font-size: 14px;
-  line-height: 20px;
 
 #topbar
   top: 0;
@@ -323,7 +316,7 @@ i
   .footer
     button
       opacity: 1;
-      transition-delay: 0.2s;
+      transition-delay: 0.15s;
       pointer-events: auto;
     .footer-desc
       color: #fff;
@@ -356,7 +349,7 @@ i
 
 .footer-desc
   transition: 0.2s;
-  transition-delay: 0.2s;
+  transition-delay: 0.15s;
   position: absolute;
   pointer-events: none;
   width: 100%;
@@ -388,26 +381,6 @@ i
 #nocvv
   display: none;
 
-#otp-form
-  margin-top: 20px;
-
-#otp
-  font-size: 18px;
-  line-height: 24px;
-  letter-spacing: 13px;
-  font-family: monospace;
-  width: 151px;
-  border-radius: 6px;
-  overflow: hidden;
-  margin: 30px auto;
-  text-indent: 7px;
-  padding: 11px 0;
-  display: block;
-  border: none;
-  outline: none;
-  background: url(/images/otp_bg.png);
-  display: none;
-
 .legend
   text-transform: uppercase;
   font-size: 12px;
@@ -416,8 +389,8 @@ i
 
 #payment-options
   i
-    font-size: 40px;
     display: block;
+    font-size: 40px;
     color: $pri;
     margin: 12px 0 -4px;
 

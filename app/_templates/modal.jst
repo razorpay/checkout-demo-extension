@@ -7,7 +7,7 @@ var amount;
 if(o('display_currency'))
   amount = it.currencies[o('display_currency')] + html(o('display_amount'));
 else
-  amount = "<i>&#xe600;</i><u>₹</u>" + (o('amount')/100).toFixed(2).replace(".00", "");
+  amount = "<i>&#xe600;</i><span class='iph'>₹</span>" + (o('amount')/100).toFixed(2).replace(".00", "");
 }}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
@@ -105,7 +105,7 @@ else
                         <div id="emi-plans-wrap"></div>
                         <div class="option" value="">Pay without EMI</div>
                       </div>
-                      <span class="help dropdown">EMI is available on HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
+                      <span class="help">EMI is available on HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
                     </div>
                     <div class="second" id="view-emi-plans">
                       View EMI Plans
@@ -167,7 +167,7 @@ else
               <button id="submitbtn" class="button" type="submit">PAY {{=amount}}</button>
             </div>
           </form>
-          <form id='otp-form' class="showable">
+          <form id='otp-form'>
             <strong id='otp-prompt'></strong>
             <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
             <div class="spinners">
@@ -183,7 +183,7 @@ else
               <span class='link grey second'></span>
             </div>
             <div class="footer">
-              <button id="otpbtn" class="button" type="submit">VERIFY</button>
+              <button id="otpbtn" class="button" type="submit">Verify</button>
             </div>
           </form>
         </div>
