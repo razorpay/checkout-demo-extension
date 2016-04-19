@@ -66,7 +66,6 @@
 #elem-emi
   display: none;
   margin-top: 8px;
-  margin-bottom: 8px;
   position: relative;
 
   > div
@@ -113,7 +112,7 @@
     z-index: 2;
     border: 1px solid #dedede;
     border-radius: 2px;
-    left: -10px;
+    left: -17px;
     box-shadow: 0 0 10px rgba(0,0,0,0.12);
     color: #333;
 
@@ -135,6 +134,15 @@
       border-color: #ddd transparent transparent;
       margin-bottom: -14px;
       margin-left: -8px;
+
+    .help
+      display: none!important;
+
+    &.disabled
+      .help
+        display: block!important;
+      .select
+        display: none!important;
 
   .option
     line-height: 38px;

@@ -78,7 +78,7 @@ Razorpay.defaults = {
     'animation': true,
     'backdropclose': false
   },
-  external: {
+  'external': {
     wallets: [],
     handler: noop
   },
@@ -88,6 +88,7 @@ Razorpay.defaults = {
     'image_padding': true,
     'close_button': true
   },
+  'customer_id': '',
   'signature': '',
   'name': '', // of merchant
   'image': ''
