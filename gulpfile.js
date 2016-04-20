@@ -75,18 +75,23 @@ gulp.task('sourcemaps', function() {
     .pipe(gulp.dest(distDir));
 });
 
-gulp.task('compileHtml', function() {
+gulp.task('compileHTML', function() {
   runSequence('usemin', 'sourcemaps');
 });
 
+gulp.task('staticAssets', function() {
+  return gulp.src(paths.images)
+    .pipe(gulp.dest(`${distDir}/images`));
+});
+
 gulp.task('build', function() {
-  runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHtml', 'sourcemaps');
+  runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
 gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
-  gulp.watch(assetPath('*.html'), ['compileHtml']).on('change', browserSync.reload);
+  gulp.watch(assetPath('*.html'), ['compileHTML']).on('change', browserSync.reload);
   // gulp.watch([paths.templates, paths.js, assetPath('*.html')], ['compileScripts']).on('change', browserSync.reload);
 
   browserSync.init({
