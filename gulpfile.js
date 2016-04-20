@@ -91,8 +91,8 @@ gulp.task('compileHTML', function() {
 });
 
 gulp.task('staticAssets', function() {
-  return gulp.src(paths.images)
-    .pipe(gulp.dest(`${distDir}/images`));
+  return gulp.src([paths.images, paths.fonts], { base: 'app' })
+    .pipe(gulp.dest(`${distDir}`));
 });
 
 gulp.task('build', function() {
@@ -103,7 +103,7 @@ gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
   gulp.watch(assetPath('*.html'), ['compileHTML']).on('change', browserSync.reload);
-  
+
   browserSync.init({
     server: './dist/v1'
   });
