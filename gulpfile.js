@@ -15,12 +15,22 @@ const usemin = require('gulp-usemin');
 const del = require('del');
 const browserSync = require('browser-sync').create();
 const runSequence = require('run-sequence');
+const gulpif = require('gulp-if');
+const minimist = require('minimist');
 
 const distDir = 'dist/v1/';
 
 function assetPath(path) {
   return `app/${path}`;
 }
+
+let knownOptions = {
+  string: 'env',
+  default: { env: process.env.NODE_ENV || 'development' }
+};
+
+let options = minimist(process.argv.slice(2), knownOptions);
+let isProduction = options.env === 'production';
 
 let paths = {
   js: assetPath('js/**/*.js'),
@@ -51,7 +61,7 @@ gulp.task('compileTemplates', function() {
 gulp.task('compileStyles', function(){
   return gulp.src(paths.css)
     .pipe(less())
-    .pipe(minifyCSS())
+    .pipe(gulpif(isProduction, minifyCSS()))
     .pipe(concat('checkout.css'))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
@@ -69,6 +79,7 @@ gulp.task('usemin', function() {
 gulp.task('sourcemaps', function() {
   return gulp.src(`${distDir}/**/*.js`)
     .pipe(sourcemaps.init())
+    .pipe(gulpif(isProduction, uglify()))
     .pipe(sourcemaps.write('./', {
       debug: true
     }))
@@ -92,8 +103,7 @@ gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
   gulp.watch(assetPath('*.html'), ['compileHTML']).on('change', browserSync.reload);
-  // gulp.watch([paths.templates, paths.js, assetPath('*.html')], ['compileScripts']).on('change', browserSync.reload);
-
+  
   browserSync.init({
     server: './dist/v1'
   });
