@@ -1,12 +1,16 @@
-#outputs
+# outputs
 /app/dist
 /dist
 /app/templates
 
-#dependencies
+# dependencies
 /node_modules
 
-#others
+# misc
+.orig
+.DS_Store
+
+# others
 aws-keys.json
 coverage
 /app/config.js
