@@ -21,7 +21,7 @@ deploy:
 
         - script:
             name: build
-            code: gulp
+            code: gulp --env=production
 
         - script:
             name: 'Upload source maps'
@@ -29,7 +29,7 @@ deploy:
 
         - script:
             name: 'Remove map files'
-            code: rm app/dist/v1/*.map
+            code: rm dist/v1/*.map
 
         - script:
             name: 'Upload fonts'

@@ -84,6 +84,7 @@ gulp.task('usemin', function() {
 
 gulp.task('sourcemaps', function() {
   return gulp.src(`${distDir}/**/*.js`)
+    .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(sourcemaps.init())
     .pipe(gulpif(isProduction, uglify()))
     .pipe(sourcemaps.write('./', {
@@ -114,6 +115,10 @@ gulp.task('serve', ['build'], function() {
     server: './dist/v1'
   });
 });
+
+gulp.task('default', ['build']);
+
+/** Font Upload to static **/
 
 gulp.task('fontUpload', function(){
   let target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
