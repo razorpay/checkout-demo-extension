@@ -7,6 +7,7 @@ const dot = require('dot');
 const glob = require('glob')
 const less = require('gulp-less');
 const minifyCSS = require('gulp-minify-css');
+const stylelint = require('gulp-stylelint');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
 const uglify = require('gulp-uglify');
@@ -43,7 +44,7 @@ let isProduction = options.env === 'production';
 let paths = {
   js: assetPath('js/**/*.js'),
   templates: assetPath('_templates/**/*.jst'),
-  css: assetPath('css/**/*.less'),
+  css: assetPath('_css/**/*.less'),
   images: assetPath('images/**/*'),
   fonts: assetPath('fonts/**/*')
 };
@@ -53,6 +54,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('compileTemplates', function() {
+  execSync('mkdir -p app/templates');
   dot.process({
     path: 'app/_templates',
     destination: assetPath('templates'),
@@ -68,6 +70,15 @@ gulp.task('compileTemplates', function() {
 
 gulp.task('compileStyles', function(){
   return gulp.src(paths.css)
+    .pipe(stylelint({
+      failAfterError: false,
+      reporters: [
+        {
+          formatter: 'string',
+          console: true
+        }
+      ]
+    }))
     .pipe(less())
     .pipe(gulpif(isProduction, minifyCSS()))
     .pipe(concat('checkout.css'))
@@ -140,19 +151,19 @@ gulp.task('fontUpload', function(){
     'Cache-Control': 'max-age=315360000, no-transform, public'
   };
 
-  return gulp.src(distDir + '/fonts/*')
-   // gzip, Set Content-Encoding headers and add .gz extension
-  .pipe(awspublish.gzip({ ext: '' }))
+  return gulp.src(`${distDir}/fonts/*`)
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '' }))
 
-  // publisher will add Content-Length, Content-Type and headers specified above
-  // If not specified it will set x-amz-acl to public-read by default
-  .pipe(publisher.publish(headers))
+    // publisher will add Content-Length, Content-Type and headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers))
 
-  // create a cache file to speed up consecutive uploads
-  .pipe(publisher.cache())
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
 
-   // print upload updates to console
-  .pipe(awspublish.reporter());
+     // print upload updates to console
+    .pipe(awspublish.reporter());
 });
 
 
