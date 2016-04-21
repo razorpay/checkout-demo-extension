@@ -220,7 +220,7 @@ let karmaLibs = [
   'spec/helpers.js'
 ];
 
-gulp.task('makeKarmaOptions', ['build'], function(){
+gulp.task('makeKarmaOptions', ['build'], function() {
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     let o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
@@ -233,12 +233,14 @@ gulp.task('makeKarmaOptions', ['build'], function(){
 
     return o;
   });
-})
+});
 
 // unit tests + coverage
 gulp.task('test:unit', ['makeKarmaOptions'], function(done){
-  testFromStack(0, allOptions, done);
-})
+  setTimeout(function() {
+    testFromStack(0, allOptions, done);
+  }, 1000);
+});
 
 function testFromStack(counter, allOptions, done){
   new KarmaServer(allOptions[counter], function(exitCode) {
