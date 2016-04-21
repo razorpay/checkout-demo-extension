@@ -137,7 +137,11 @@ karmaOptions.reporters.push(reporter);
 
 var allOptions;
 
+<<<<<<< 594eeab7bdc59797d5f71273f62751e1b006bfae
 gulp.task('makeKarmaOptions', ['usemin'], function(){
+=======
+gulp.task('makeKarmaOptions', ['build'], function() {
+>>>>>>> Hack & pass the test
   allOptions = glob.sync(assetPath('*.html')).map(function(html){
     var o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
@@ -150,12 +154,14 @@ gulp.task('makeKarmaOptions', ['usemin'], function(){
 
     return o;
   });
-})
+});
 
 // unit tests + coverage
 gulp.task('test:unit', ['makeKarmaOptions'], function(done){
-  testFromStack(0, allOptions, done);
-})
+  setTimeout(function() {
+    testFromStack(0, allOptions, done);
+  }, 1000);
+});
 
 function testFromStack(counter, allOptions, done){
   new karmaServer(allOptions[counter], function(exitCode) {
