@@ -19,10 +19,12 @@ const browserSync = require('browser-sync').create();
 const runSequence = require('run-sequence');
 const gulpif = require('gulp-if');
 const minimist = require('minimist');
-const execSync = require('child_process').execSync
+const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
-const istanbul = require('istanbul')
-const awspublish = require('gulp-awspublish')
+const istanbul = require('istanbul');
+const awspublish = require('gulp-awspublish');
+const jshint = require('gulp-jshint');
+const stylish = require('jshint-stylish');
 
 const distDir = 'dist/v1/';
 
@@ -254,3 +256,10 @@ function createCoverageReport(){
   reporter.write(collector, true, function(){});
   console.log('Report created in coverage/final');
 }
+
+gulp.task('test', ['test:unit'], function() {
+  return gulp.src('dist/v1/**/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+    .pipe(jshint.reporter('fail'));
+});
