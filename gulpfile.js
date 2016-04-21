@@ -1,8 +1,10 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
 const dot = require('dot');
+const glob = require('glob')
 const less = require('gulp-less');
 const minifyCSS = require('gulp-minify-css');
 const concat = require('gulp-concat');
@@ -17,6 +19,10 @@ const browserSync = require('browser-sync').create();
 const runSequence = require('run-sequence');
 const gulpif = require('gulp-if');
 const minimist = require('minimist');
+const execSync = require('child_process').execSync
+const KarmaServer = require('karma').Server;
+const istanbul = require('istanbul')
+const awspublish = require('gulp-awspublish')
 
 const distDir = 'dist/v1/';
 
@@ -108,3 +114,138 @@ gulp.task('serve', ['build'], function() {
     server: './dist/v1'
   });
 });
+
+gulp.task('fontUpload', function(){
+  let target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
+  if(target === 'production') target = 'live';
+
+  let publisher = awspublish.create({
+    accessKeyId: process.env.AWS_KEY,
+    secretAccessKey: process.env.AWS_SECRET,
+    region: 'us-east-1',
+    params: {
+      Bucket: 'checkout-' + target
+    }
+  });
+
+  // define custom headers
+  let headers = {
+    'Cache-Control': 'max-age=315360000, no-transform, public'
+  };
+
+  return gulp.src(distDir + '/fonts/*')
+   // gzip, Set Content-Encoding headers and add .gz extension
+  .pipe(awspublish.gzip({ ext: '' }))
+
+  // publisher will add Content-Length, Content-Type and headers specified above
+  // If not specified it will set x-amz-acl to public-read by default
+  .pipe(publisher.publish(headers))
+
+  // create a cache file to speed up consecutive uploads
+  .pipe(publisher.cache())
+
+   // print upload updates to console
+  .pipe(awspublish.reporter());
+});
+
+
+/**  Tests  **/
+
+function getJSPaths(html, pattern){
+  try{
+    return execSync(
+        'cat ' + html + ' | grep -F "' + pattern + '" | cut -d\'"\' -f2',
+        {encoding: 'utf-8'}
+      )
+      .split('\n')
+      .filter(function(path){return !!path})
+      .map(function(path){
+        return assetPath(path);
+      });
+  } catch(e){
+    console.log(e.message);
+    return [];
+  }
+}
+
+let allOptions;
+let karmaOptions = {
+  frameworks: ['mocha'],
+  reporters: ['coverage'],
+  port: 9876,
+  colors: true,
+  logLevel: 'ERROR',
+  browsers: ['PhantomJS'],
+  singleRun: true,
+  coverageReporter: {
+    type : 'json'
+  },
+  preprocessors: {
+    '**/*.coffee': ['coffee']
+  },
+  nyanReporter: {
+    suppressErrorHighlighting: true
+  }
+};
+
+let reporter = 'dots';
+if(!process.env.WERCKER){
+  reporter = 'nyan';
+}
+karmaOptions.reporters.push(reporter);
+
+let karmaLibs = [
+  'spec/jquery-1.11.1.js',
+  'spec/sendkeys.js',
+  'spec/sinon-1.17.3.js',
+  'spec/expect.js',
+  'spec/helpers.js'
+];
+
+gulp.task('makeKarmaOptions', ['build'], function(){
+  allOptions = glob.sync(assetPath('*.html')).map(function(html){
+    let o = JSON.parse(JSON.stringify(karmaOptions));
+    o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
+
+    // adding paths to cover
+    getJSPaths(html, '<!--coverage-->').forEach(function(path){
+      o.preprocessors[path] = ['coverage'];
+    })
+    o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
+
+    return o;
+  });
+})
+
+// unit tests + coverage
+gulp.task('test:unit', ['makeKarmaOptions'], function(done){
+  testFromStack(0, allOptions, done);
+})
+
+function testFromStack(counter, allOptions, done){
+  new KarmaServer(allOptions[counter], function(exitCode) {
+    if(exitCode !== 0){
+      process.exit(1);
+    }
+    if(allOptions[++counter]){
+      testFromStack(counter, allOptions, done);
+    } else {
+      allOptions = null;
+      createCoverageReport();
+      done();
+    }
+  }).start();
+}
+
+function createCoverageReport(){
+  let collector = new istanbul.Collector();
+  let reporter = new istanbul.Reporter(false, 'coverage/final');
+
+  glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile){
+    collector.add(JSON.parse(fs.readFileSync(jsonFile, 'utf8')));
+  })
+
+  reporter.add('html');
+  reporter.write(collector, true, function(){});
+  console.log('Report created in coverage/final');
+}
