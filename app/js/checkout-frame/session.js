@@ -611,17 +611,17 @@ Session.prototype = {
     this.setTopbar(tab);
     this.tab = tab;
     if(tab){
-      if (tab === 'card') {
-        var user = this.user;
-        user.setPhone(getPhone());
-        if( typeof user.saved !== 'boolean') {
-          return this.lookupUser();
-        } else if (user.saved && !user.logged_in && !user.wants_skip) {
-          return this.loginUser();
-        } else {
-          // preferences.tokens
-        }
-      }
+      // if (tab === 'card') {
+      //   var user = this.user;
+      //   user.setPhone(getPhone());
+      //   if( typeof user.saved !== 'boolean') {
+      //     return this.lookupUser();
+      //   } else if (user.saved && !user.logged_in && !user.wants_skip) {
+      //     return this.loginUser();
+      //   } else {
+      //     // preferences.tokens
+      //   }
+      // }
       getTab(tab).addClass('shown');
     }
     if(this.otpview) {
