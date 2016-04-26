@@ -12,6 +12,22 @@ $max-height: 659px;
   // .shake
   //   animation: none;
 
+  #powered-by
+    display: none;
+
+  #modal-inner, #body
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+
+  #body
+    top: $headerh;
+
+  #content
+    height: 100%;
+
   #emi-wrap
     width: 100%;
     left: 0;
@@ -37,6 +53,7 @@ $max-height: 659px;
 
   #header
     padding-top: 10px;
+    max-height: 112px;
 
   #modal
     background: #fff;
@@ -58,7 +75,7 @@ $max-height: 659px;
     z-index: -1;
     pointer-events: none;
 
-@media (max-device-height: 450px),(max-device-width: 450px)
+@media (max-device-height: 450px), (max-device-width: 450px)
   +mobile-view();
 
 @media(max-height: $max-height)
