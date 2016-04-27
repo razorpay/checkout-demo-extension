@@ -122,6 +122,22 @@ var Card;
     return false;
   }
 
+  var expLen = 0;
+  var ReFormatExpiry = function(e){
+    var el = e.target;
+    var val = el.value;
+    if(val.length >= expLen){
+      if (/^[2-9]$/.test(val)) {
+        val = '0' + val;
+      }
+      if (val.length === 2) {
+        val += ' / ';
+      }
+      el.value = val;
+    }
+    expLen = el.value.length;
+  }
+
   var FormatExpiry = function(e) {
     var el = e.target;
     var character = ensureExpiry(e);
@@ -309,6 +325,7 @@ var Card;
 
     formatCardExpiry: function(el){
       this.bind(el, {
+        input: ReFormatExpiry,
         keypress: FormatExpiry,
         keydown: FormatExpiryBack
       })
