@@ -232,7 +232,7 @@ Request.prototype = {
   },
 
   shouldPopup: function(){
-    return this.data.wallet !== 'mobikwik' || this.fees;
+    return (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney') || this.fees;
   },
 
   shouldAjax: function(){
