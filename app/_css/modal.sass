@@ -60,6 +60,8 @@ body, html
       position: relative;
 
   img
+    // IE not accepting click as click on parent label
+    pointer-events: none;
     height: 24px;
     margin-bottom: 3px;
 
@@ -85,6 +87,7 @@ i
   opacity: 0;
 
 .spin
+  display: none;
   width: 60px;
   height: 60px;
   margin: 0 auto;
@@ -121,13 +124,11 @@ i
     transform: scale(1);
     opacity: 0;
 
-.spinners
-  display: none;
-
-.loading .spinners
+.loading .spin
   display: block;
 
 #container
+  margin: 0 auto;
   height: 100%;
   outline: none;
   text-align: center;
@@ -183,7 +184,6 @@ i
 
 #content
   text-align: left;
-  position: relative;
   white-space: normal;
 
 #header
@@ -267,18 +267,12 @@ i
 #body
   background: #fff;
   border-radius: 0 0 $br $br;
-  position: relative;
   min-height: 372px;
-  box-sizing: border-box;
 
 #topbar
-  top: 0;
   cursor: pointer;
-  position: absolute;
   background: $bg;
   display: none;
-  left: 0;
-  right: 0;
   padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
@@ -295,6 +289,9 @@ i
 
 #tab-title
   font-size: 16px;
+  img
+    position: relative;
+    top: 2px;
 
 #user
   display: none;
@@ -328,20 +325,18 @@ i
       border-radius: 0 0 0 $br;
 
 #body.tab
-  padding-top: $topbarh;
-
   #form-common
     display: none;
 
   .footer
     display: block;
     button
-      opacity: 1;
+      +opacity(1);
       transition-delay: 0.15s;
       pointer-events: auto;
     .footer-desc
       color: #fff;
-      opacity: 0;
+      +opacity(0);
       transition-delay: 0s;
 
   #topbar
@@ -370,7 +365,7 @@ i
     cursor: pointer;
     pointer-events: none;
     position: relative;
-    opacity: 0;
+    +opacity(0);
     transition: 0.2s;
     box-shadow: 0 1px 8px rgba(0,0,0,0.14) inset;
 
@@ -424,4 +419,4 @@ i
     transition: 0.3s;
 
   label
-    height: 106px;
+    height: 98px;

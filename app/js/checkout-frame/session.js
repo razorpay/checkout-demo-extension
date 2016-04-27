@@ -231,7 +231,7 @@ function otpErrorHandler(response){
     this,
     {
       error: true,
-      text: response.error.description,
+      text: response.error.description
     },
     200
   )
@@ -538,13 +538,14 @@ Session.prototype = {
 
     if(shouldFocusNextField){
       card.filled = function(el){
+        var next;
         if (el === el_expiry) {
           if(!$(el.parentNode).hasClass('invalid')){
-            var next = $('.elem-name.filled input')[0];
+            next = $('.elem-name.filled input')[0];
             if (next) {
               next = el_cvv;
             } else {
-              next = card_name;
+              next = el_name;
             }
           }
         } else if (el === el_number) {
@@ -588,6 +589,9 @@ Session.prototype = {
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
+    if (!this.tab && this.checkInvalid($('#form-common'))) {
+      return;
+    }
     if (this.sub_tab) {
       gel('otp-form').className = '';
       $('#form').addClass('shown');
@@ -605,7 +609,7 @@ Session.prototype = {
     //   $('.tab-content.shown').removeClass('shown');
     this.setTopbar(tab);
     this.tab = tab;
-    if(tab){
+    if (tab) {
       // if (tab === 'card') {
       //   var user = this.user;
       //   user.setPhone(getPhone());
@@ -732,7 +736,7 @@ Session.prototype = {
   },
 
   showOTPScreen: function(state){
-    if(!this.sub_tab){
+    if (!this.sub_tab || !this.isOpen) {
       return;
     }
     $('#otp-form').addClass('shown');
@@ -742,7 +746,7 @@ Session.prototype = {
 
     var wallet = state.wallet;
     if(wallet){
-      walletObj = freqWallets[wallet];
+      var walletObj = freqWallets[wallet];
       gel('tab-title').innerHTML = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
     }
 
@@ -813,8 +817,14 @@ Session.prototype = {
       event: 'submit',
       data: data
     });
-    if(data.method === 'wallet' && freqWallets[data.wallet].custom){
-      return;
+
+    var wallet = data.wallet;
+    if (data.method === 'wallet') {
+      var walletObj = freqWallets[wallet];
+
+      if (!walletObj || walletObj.custom) {
+        return;
+      }
     }
 
     if(this.modal){
@@ -831,8 +841,6 @@ Session.prototype = {
       success: this.bind(successHandler)
     };
 
-    var wallet = data.wallet;
-
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       request.error = this.bind(otpErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
@@ -843,8 +851,7 @@ Session.prototype = {
         number: true,
         text: 'Checking for a ' + wallet + ' account associated with',
         wallet: wallet
-      }, true)
-
+      })
     } else {
       request.error = this.bind(errorHandler);
       showLoadingMessage('Please wait while your payment is processed...');
