@@ -847,7 +847,8 @@ Session.prototype = {
       this.showOTPScreen({
         loading: true,
         number: true,
-        text: 'Checking for a ' + wallet + ' account associated with'
+        text: 'Checking for a ' + wallet + ' account associated with',
+        wallet: wallet
       })
     } else {
       request.error = this.bind(errorHandler);
