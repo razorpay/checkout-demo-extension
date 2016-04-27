@@ -698,15 +698,17 @@ Session.prototype = {
   },
 
   getFormData: function(){
-    var tab = this.tab;
-    if(!tab) { return }
-    var activeTab = getTab(tab);
+    var tab = this.tab || '';
+    var data = {};
+    var activeTab;
 
-    var data = {
-      method: tab
-    };
     fillData($('#form-common'), data);
-    fillData(activeTab, data);
+
+    if(tab){
+      activeTab = getTab(tab);
+      data.method = tab;
+      fillData(activeTab, data);
+    }
 
     if(tab === 'card'){
       data['card[number]'] = data['card[number]'].replace(/\ /g, '');

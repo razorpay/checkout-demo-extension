@@ -347,7 +347,7 @@ window.handleMessage = function(message){
     return;
   }
   var id = message.id || _uid;
-  var session = getSession(id)
+  var session = getSession(id);
   if(!session){
     if(!message.options){
       return;
