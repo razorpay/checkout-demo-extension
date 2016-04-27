@@ -357,6 +357,7 @@ CheckoutFrame.prototype = {
         }
         catch(e){
           track.call(this, 'js_error', e);
+          throw e;
         }
       },
       this.rzp,
