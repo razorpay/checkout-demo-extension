@@ -1,4 +1,8 @@
-{{ var o = it.options, method = o.method, wallet = method.wallet; }}
+{{
+var o = it.get, method = it.methods, wallet = method.wallet, wd = it.walletData,
+html = function(html){return html.replace(/<[^>]*>?/g, "")},
+attr = function(attr){return attr.replace(/"/g,'')};
+}}
 <div id="container" class="mfix" tabIndex="0">
   <div id="backdrop"></div>
   <div id="modal" class="mchild">
@@ -13,52 +17,51 @@
         <div id="fd-t"></div>
         <button id="fd-hide">Retry</button>
       </div>
-      <form id="powerwallet" class="showable" onsubmit="return false">
-        <div id="power-head">
-          <div id="power-title"></div>
-          <img>
-        </div>
-        <div id="power-var">
-          <div id="power-desc"></div>
-          <div class="spin"><div></div></div>
-          <div class="spin spin2"><div></div></div>
-          <input id="powerotp" type="tel" autocomplete="off" required pattern="^[0-9]+$" maxlength="6" placeholder="Enter OTP">
-          <div><span id="powercancel" class="btn">Retry Payment</span></div>
-          <button id="powerbutton" type="submit">SUBMIT</button>
-        </div>
-      </form>
+      {{ if(wallet && wallet.mobikwik){ }}
+        <form id="powerwallet" class="showable" onsubmit="return false">
+          <div id="power-head">
+            <div id="power-title"></div>
+            <img src="{{=wd.mobikwik.col}}" height="{{=wd.mobikwik.h}}">
+          </div>
+          <div id="power-var">
+            <div id="power-desc"></div>
+            <div class="spin"><div></div></div>
+            <div class="spin spin2"><div></div></div>
+            <input id="powerotp" type="tel" autocomplete="off" required pattern="^[0-9]+$" maxlength="6" placeholder="Enter OTP">
+            <div><span id="powercancel" class="btn">Retry Payment</span></div>
+            <button id="powerbutton" type="submit">SUBMIT</button>
+          </div>
+        </form>
+      {{ } }}
       <div id="modal-content">
         <div id="header">
           <div id="modal-close" class="close-btn">×</div>
-          {{?o.image}}
+          {{?o('image')}}
             <div class="merchant-image">
-              <img src="{{=o.image}}">
+              <img src="{{=attr(o('image'))}}">
             </div>
           {{?}}
           <div class="merchant">
-            {{?o.name}}
-              <div class="merchant-title">{{=o.name}}</div>
+            {{?o('name')}}
+              <div class="merchant-title">{{=html(o('name'))}}</div>
             {{?}}
-            <div class="merchant-desc">{{=o.description}}</div>
+            <div class="merchant-desc">{{=html(o('description'))}}</div>
           </div>
         </div>
         <div id="body">
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common">
-                {{for(var note in o.notes){}}
-                  <input type="hidden" name="notes[{{=note}}]" value="{{=o.notes[note]}}">
-                {{}}}
                 <div class="fieldset">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <span class="help-text">Please enter 10-12 digit contact number</span>
                     <i class="i">&#xe607;</i>
-                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=o.prefill.contact||'+91 '}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
+                    <input class="input" id="contact" name="contact" type="tel" placeholder="Contact Number" required value="{{=attr(o('prefill.contact'))||'+91 '}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i class="i">&#xe603;</i>
                     <span class="help-text">Please enter a valid email. Example:<br> you@example.com</span>
-                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=o.prefill.email}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" placeholder="Email Address" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                 </div>
               </div>
@@ -83,13 +86,13 @@
                       <div class="elem-wrap"><div class="elem elem-name">
                         <i class="i">&#xe602;</i>
                         <span class="help-text">Please enter your name</span>
-                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=o.prefill.name}}">
+                        <input class="input" type="text" id="card_name" name="card[name]" placeholder="Card Holder's Name" required value="{{=attr(o('prefill.name'))}}">
                       </div></div>
                       <div class="elem-wrap"><div class="elem" id="elem-card">
                         <i class="i">&#xe605;</i>
                         <div class="card-image"></div>
                         <span class="help-text">Please enter a valid card number</span>
-                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=o.prefill.card.number}}">
+                        <input class="input" ignore-input type="tel" id="card_number" name="card[number]" placeholder="Card Number" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
                         <label id="nocvv" for="nocvv-check">
                           <input type="checkbox" id="nocvv-check" checked disabled>
                           <span class="checkbox"></span>
@@ -100,7 +103,7 @@
                         <div class="elem-wrap first"><div class="elem elem-expiry">
                           <i class="i">&#xe606;</i>
                           <span class="help-text">Please enter card expiry date in MM / YY format.</span>
-                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=o.prefill.card.expiry}}">
+                          <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
                         </div></div>
                         <div class="elem-wrap last"><div class="elem elem-cvv">
                           <i class="i">&#xe604;</i>
@@ -116,7 +119,7 @@
                             <div id="emi-plans-wrap"></div>
                             <div class="option" value="">Pay without EMI</div>
                           </div>
-                          <span class="help-text dropdown">EMI is available on HDFC, Axis & Kotak Credit Cards. Enter your credit card to avail.</span>
+                          <span class="help-text dropdown">EMI is available on Axis, HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
                         </div>
                         <div class="elem-wrap last" id="view-emi-plans">
                           View EMI Plans
@@ -159,7 +162,7 @@
                       {{ var firstWallet; for (var w in wallet){ }}
                         <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
                         <label for="wallet-radio-{{=w}}" class="radio-label">
-                          <img class="wallet-button-{{=w}} colored" style="height:{{=wallet[w].h}}px" src="{{=wallet[w].col}}">
+                          <img class="wallet-button colored" style="height:{{=wd[w].h}}px" src="{{=wd[w].col}}">
                         </label>
                       {{}}}
                     </div>
@@ -172,12 +175,12 @@
                 <span class="ring"></span>
                 <span class="text">
                   Pay
-                  {{if(o.display_currency){}}
-                    {{=it.currencies[o.display_currency]}}{{=o.display_amount}}
+                  {{if(o('display_currency')){}}
+                    {{=it.currencies[o('display_currency')]}}{{=html(o('display_amount'))}}
                   {{} else {}}
                      <i>&#xe600;</i>
                      <u>₹</u>
-                     {{=o.amount/100}}
+                     {{=(o('amount')/100).toFixed(2).replace(".00", "")}}
                   {{}}}
                 </span>
               </button>

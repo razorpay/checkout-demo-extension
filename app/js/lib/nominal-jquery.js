@@ -12,6 +12,10 @@ function bind(func, thisArg){
   }
 }
 
+function clone(target){
+  return JSON.parse(stringify(target));
+}
+
 var qs = bind(document.querySelector, document);
 var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
@@ -59,13 +63,12 @@ function submitForm(action, data, method, target) {
   form.setAttribute('action', action);
 
   if(method){ form.setAttribute('method', method) }
-  if(target) { form.setAttribute('target', target) }
-
+  if(target){ form.setAttribute('target', target) }
   if(data){ form.innerHTML = deserialize(data) }
 
-  document.documentElement.appendChild(form);
+  doc.appendChild(form);
   form.submit();
-  form.parentNode.removeChild(form);
+  doc.removeChild(form);
 }
 
 function deserialize(data, key){
@@ -313,15 +316,11 @@ $.prototype = {
   }
 }
 
-$.clone = function(target){
-  return JSON.parse(stringify(target));
-};
-
 $.post = function(opts){
   opts.method = 'post';
 
   if(!opts.headers){
-    opts.headers = {};
+    opts.headers = emo;
   }
   opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
   var payload = [];

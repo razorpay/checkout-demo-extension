@@ -10,14 +10,16 @@
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/init.js"></script>
+  <script src="js/options.js"></script><!--coverage-->
   <script src="js/lib/jsonp.js"></script>
   <script src="js/lib/popup.js"></script>
-  <script src="js/base.js"></script>
+  <script src="js/base.js"></script><!--coverage-->
   <script src="js/authorize.js"></script><!--coverage-->
   <script src="templates/popup.js"></script>
   <!-- test scripts
   <script src="../test/base.coffee"></script>
   <script src="../test/submit.coffee"></script>
+  <script src="../test/request.coffee"></script>
   -->
   <!-- endbuild -->
 
@@ -70,14 +72,14 @@
             amount: val('amount').replace(/[^0-9]+/,'')*100,
             email: val('customer_email'),
             contact: val('customer_phone'),
-            // method: 'netbanking',
-            // bank: 'HDFC'
-            method: 'card',
-            'card[name]': val('card_name'),
-            'card[number]': val('card_number'),
-            'card[expiry_month]': val('card_month'),
-            'card[expiry_year]': val('card_year'),
-            'card[cvv]': val('card_cvv')
+            method: 'netbanking',
+            bank: 'SBIN'
+            // method: 'card',
+            // 'card[name]': val('card_name'),
+            // 'card[number]': val('card_number'),
+            // 'card[expiry_month]': val('card_month'),
+            // 'card[expiry_year]': val('card_year'),
+            // 'card[cvv]': val('card_cvv')
           },
           error: function(response){
             alert(JSON.stringify(response)); // focus invalid inputs using returned 'field';

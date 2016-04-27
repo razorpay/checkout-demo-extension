@@ -122,6 +122,15 @@ var Card;
     return false;
   }
 
+  var expLen = 0;
+  var ReFormatExpiry = function(e){
+    var el = e.target;
+    if(el.value.length === 2 && el.value.length >= expLen){
+      el.value += ' / ';
+    }
+    expLen = el.value.length;
+  }
+
   var FormatExpiry = function(e) {
     var el = e.target;
     var character = ensureExpiry(e);
@@ -174,13 +183,12 @@ var Card;
   };
 
   var FormatExpiryBack = function(e){
-    var el = e.target;
     if((e.which || e.keyCode) !== 8) { return }
+    var el = e.target;
     var pos = CheckSelection(el);
-
     if(pos === 5 && el.value.slice(2, 5) === ' / '){
       preventDefault(e);
-      el.value = el.value.slice(0, 2);
+      el.value = el.value.slice(0, 1);
     }
   }
 
@@ -309,6 +317,7 @@ var Card;
 
     formatCardExpiry: function(el){
       this.bind(el, {
+        input: ReFormatExpiry,
         keypress: FormatExpiry,
         keydown: FormatExpiryBack
       })

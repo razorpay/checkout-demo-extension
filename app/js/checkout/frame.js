@@ -77,15 +77,15 @@ function sanitizeImage(options){
   }
 }
 
-function makeCheckoutUrl(options){
-  if(options.key){
-    return discreet.makeUrl() + 'checkout?key_id=' + options.key;
+function makeCheckoutUrl(key){
+  if(key){
+    return discreet.makeUrl() + 'checkout?key_id=' + key;
   }
   return discreet.makeUrl(true) + 'checkout.php';
 }
 
 function makeCheckoutMessage(rzp){
-  var options = {};
+  var options = rzp.get();
   var response = {
     context: location.href,
     options: options,
@@ -94,26 +94,16 @@ function makeCheckoutMessage(rzp){
   }
 
   each(
-    rzp.options, function(i, value){
-      if(typeof value !== 'function'){
-        options[i] = value;
-      }
-    }
-  )
-
-  each(
     rzp.modal.options,
     function(i, option){
-      rzp.options.modal[i] = option;
+      options['modal.' + i] = option;
     }
   )
-
-  options.redirect = !!rzp.options.redirect();
 
   if(options.parent){
     response.embedded = true;
+    options.parent = true;
   }
-  delete options.parent;
 
   sanitizeImage(options);
   return response;
@@ -139,16 +129,16 @@ function setTestRibbonInvisible(){
 
 function CheckoutFrame(rzp){
   if(rzp){
-    this.getEl(rzp.options);
+    this.getEl(rzp);
     return this.openRzp(rzp);
   }
-  this.getEl(Razorpay.defaults);
+  this.getEl();
 }
 
 CheckoutFrame.prototype = {
-
-  getEl: function(options){
+  getEl: function(rzp){
     if(!this.el){
+      var key = rzp && rzp.get('key');
       this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
@@ -157,7 +147,7 @@ CheckoutFrame.prototype = {
           frameborder: 0,
           width: '100%',
           height: '100%',
-          src: makeCheckoutUrl(options)
+          src: makeCheckoutUrl(key)
         }
       )[0]
     }
@@ -167,8 +157,7 @@ CheckoutFrame.prototype = {
   openRzp: function(rzp){
     var el = this.el;
     this.bind();
-    var options = rzp.options;
-    var parent = options.parent;
+    var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     var message;
 
@@ -195,8 +184,8 @@ CheckoutFrame.prototype = {
     }
     else {
       $parent.css('display', 'block').reflow();
-      setBackdropColor(options.theme.backdrop_color);
-      if(/^rzp_t/.test(options.key)){
+      setBackdropColor(rzp.get('theme.backdrop_color'));
+      if(/^rzp_t/.test(rzp.get('key'))){
         setTestRibbonVisible();
       }
       this.setMetaAndOverflow();
@@ -289,11 +278,12 @@ CheckoutFrame.prototype = {
     }
 
     var event = data.event;
+    var rzp = this.rzp;
     // source check
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && this.rzp && this.rzp.id !== data.id) ||
+      (event !== 'load' && rzp && rzp.id !== data.id) ||
       e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
@@ -302,8 +292,8 @@ CheckoutFrame.prototype = {
     data = data.data;
     invoke('on' + event, this, data);
 
-    if(event === 'dismiss' || event === 'fault'){
-      track.call(this.rzp, event);
+    if(event === 'dismiss' || event === 'fault' && rzp.isLiveMode()){
+      track(rzp, event);
     }
   },
 
@@ -313,22 +303,21 @@ CheckoutFrame.prototype = {
   },
 
   onredirect: function(data){
-    discreet.nextRequestRedirect(data);
+    discreet.redirect(data);
   },
 
   onsubmit: function(data){
     if(data.method === 'wallet'){
       // check if it was one of the external wallets
       var rzp = this.rzp;
-      var external = rzp.options.external;
       each(
-        external.wallets,
+        rzp.get('external.wallets'),
         function(i, walletName){
           if(walletName === data.wallet){
             try{
-              external.handler.call(rzp, data);
+              rzp.get('external.handler').call(rzp, data);
             } catch(e){
-              track.call(rzp, 'js_error', e);
+              track(rzp, 'js_error', e);
             }
           }
         }
@@ -338,29 +327,30 @@ CheckoutFrame.prototype = {
 
   ondismiss: function(){
     this.close();
-    invoke(this.rzp.options.modal.ondismiss);
+    invoke(this.rzp.get('modal.ondismiss'));
   },
 
   onhidden: function(){
     this.afterClose();
-    invoke(this.rzp.options.modal.onhidden);
+    invoke(this.rzp.get('modal.onhidden'));
   },
 
   // this is onsuccess method
   oncomplete: function(data){
     this.close();
-    track.call(this.rzp, 'checkout_success', data);
+    var rzp = this.rzp;
+    track(rzp, 'checkout_success', data);
     invoke(
       function(){
         try{
-          this.options.handler(data);
+          this.get('handler')(data);
         }
         catch(e){
-          track.call(this, 'js_error', e);
+          track(rzp, 'js_error', e);
           throw e;
         }
       },
-      this.rzp,
+      rzp,
       null,
       200
     );
