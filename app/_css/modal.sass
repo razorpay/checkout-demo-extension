@@ -128,6 +128,7 @@ i
   display: block;
 
 #container
+  margin: 0 auto;
   height: 100%;
   outline: none;
   text-align: center;
@@ -183,7 +184,6 @@ i
 
 #content
   text-align: left;
-  position: relative;
   white-space: normal;
 
 #header
@@ -268,18 +268,12 @@ i
 #body
   background: #fff;
   border-radius: 0 0 $br $br;
-  position: relative;
   min-height: 372px;
-  box-sizing: border-box;
 
 #topbar
-  top: 0;
   cursor: pointer;
-  position: absolute;
   background: $bg;
   display: none;
-  left: 0;
-  right: 0;
   padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
@@ -313,8 +307,6 @@ i
     margin: 10px 0;
 
 #body.tab
-  padding-top: $topbarh;
-
   #form-common
     display: none;
 
@@ -401,4 +393,4 @@ i
     transition: 0.3s;
 
   label
-    height: 106px;
+    height: 98px;
