@@ -732,7 +732,7 @@ Session.prototype = {
   },
 
   showOTPScreen: function(state){
-    if(!this.sub_tab){
+    if (!this.sub_tab || !this.isOpen) {
       return;
     }
     $('#otp-form').addClass('shown');
