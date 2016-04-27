@@ -577,9 +577,7 @@ Session.prototype = {
     var $body = $('#body');
     if (tab) {
       $body.addClass('tab');
-      if (tab !== this.tab) {
-        $('#tab-title').html(tab_titles[tab]);
-      }
+      $('#tab-title').html(tab_titles[tab]);
     } else {
       $body.removeClass('tab');
       $('.tab-content.shown').removeClass('shown');
@@ -590,15 +588,12 @@ Session.prototype = {
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
-    // if (this.sub_tab) {
-    //   $('#otp-form').removeClass('shown');
-    //   $('#form').addClass('shown');
-    //   tab = this.tab;
-    //   this.sub_tab = false;
-    // } else {
-    //   this.tab = tab;
-    // }
-
+    if (this.sub_tab) {
+      gel('otp-form').className = '';
+      $('#form').addClass('shown');
+      this.sub_tab = null;
+      tab = 'wallet';
+    }
 
     // $('#body').toggleClass('tab', tab);
 
@@ -623,11 +618,6 @@ Session.prototype = {
       //   }
       // }
       getTab(tab).addClass('shown');
-    }
-    if(this.otpview) {
-      gel('otp-form').className = '';
-      $('#form').addClass('shown');
-      this.otpview = false;
     }
   },
 
@@ -659,12 +649,6 @@ Session.prototype = {
         this
       )
     )
-  },
-
-  showOtpView: function(state) {
-    $('#otp-prompt').html(state.title || '');
-    gel('otp-form').className = state.className || '';
-    this.otpview = true;
   },
 
   setUser: function(){
@@ -747,45 +731,31 @@ Session.prototype = {
     }
   },
 
-  showOTPScreen: function(state, enforce){
-    $('#otp-form').addClass('shown');
-    this.otpview = true;
-    $('#form').removeClass('shown');
-
-    if(state.img){
-      var title = gel('tab-title');
-      title.innerHTML = '';
-      title.appendChild(state.img);
+  showOTPScreen: function(state){
+    if(!this.sub_tab){
+      return;
     }
+    $('#otp-form').addClass('shown');
+    $('#form').removeClass('shown');
+    $('#otp-form').toggleClass('loading', state.loading);
+    $('#otp').toggleClass('shown', state.otp);
+    gel('otp-prompt').innerHTML = state.text;
 
-    if(state.loading){
-      $('#otp-form').addClass('loading');
-    } else {
-      $('#otp-form').removeClass('loading');
+    var wallet = state.wallet;
+    if(wallet){
+      walletObj = freqWallets[wallet];
+      gel('tab-title').innerHTML = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
     }
 
     if(state.number){
-      state.text += ' '+ getPhone();
+      state.text += ' ' + getPhone();
     }
-    gel('otp-prompt').innerHTML = state.text;
-    if (state.otp) {
-      $('#otp').addClass('shown');
-    } else {
-      $('#otp').removeClass('shown');
-    }
-
-    // if (enforce) {
-    //   $('#otp-form').addClass('shown');
-    //   $('#form').removeClass('shown');
-    //   this.sub_tab = true;
-    // }
   },
 
   onOtpSubmit: function(e){
     preventDefault(e);
     this.showOTPScreen({
       loading: true,
-      wallet: true,
       text: 'Verifying OTP...'
     })
     this.secondfactorCallback(gel('otp').value);
@@ -866,15 +836,12 @@ Session.prototype = {
       request.error = this.bind(otpErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
 
-      var img = new Image();
-      img.src = freqWallets[wallet].col;
-      img.height = freqWallets[wallet].h;
-
+      this.sub_tab = wallet;
       this.showOTPScreen({
         loading: true,
         number: true,
         text: 'Checking for a ' + wallet + ' account associated with',
-        img: img
+        wallet: wallet
       }, true)
 
     } else {

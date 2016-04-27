@@ -44,7 +44,8 @@ body, html
     transition: .2s;
     vertical-align: top;
     margin-top: -1px;
-    &:nth-child(3n-1)
+    // middle item   , last item if 4 items
+    &:nth-child(3n-1), &:last-child:nth-child(3n+1)
       label
         margin-left: -1px;
         margin-right: -1px;
