@@ -475,7 +475,7 @@ Session.prototype = {
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
-    this.on('click', '#tab-title', this.switchTab);
+    this.on('click', '#tab-title, #topbar .back', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
 
@@ -739,7 +739,6 @@ Session.prototype = {
     $('#form').removeClass('shown');
     $('#otp-form').toggleClass('loading', state.loading);
     $('#otp').toggleClass('shown', state.otp);
-    gel('otp-prompt').innerHTML = state.text;
 
     var wallet = state.wallet;
     if(wallet){
@@ -750,6 +749,8 @@ Session.prototype = {
     if(state.number){
       state.text += ' ' + getPhone();
     }
+
+    gel('otp-prompt').innerHTML = state.text;
   },
 
   onOtpSubmit: function(e){

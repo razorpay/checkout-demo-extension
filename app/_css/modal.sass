@@ -191,7 +191,6 @@ i
   color: #fff;
   padding: $p;
   position: relative;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.11) inset;
   overflow: hidden;
   max-height: $headerh
 
@@ -285,9 +284,13 @@ i
   border-bottom: 1px solid $bc;
   transition: .3s;
 
+  img
+    vertical-align: middle;
+    margin-bottom: 6px;
+
 .back
   float: left;
-  margin: -1px 6px 0 0;
+  margin: 0px 6px 0 0;
   font-size: 12px;
 
 #tab-title
@@ -301,13 +304,28 @@ i
 #otp-form, .tab-content, #form
   display: none;
 
+#tab-card
+  padding-top: 10px
+
 #modal .shown
   display: block;
 
 #form-common
   padding: 20px 0 0;
-  .legend
+
+  .elem-wrap
     margin: 10px 0;
+
+  .legend
+    margin: 15px 0;
+    margin-top: 30px;
+  .item:first-child
+    label
+      border-radius: 0 0 0 $br;
+
+  .item:last-child
+    label
+      border-radius: 0 0 0 $br;
 
 #body.tab
   padding-top: $topbarh;
@@ -316,6 +334,7 @@ i
     display: none;
 
   .footer
+    display: block;
     button
       opacity: 1;
       transition-delay: 0.15s;
@@ -328,7 +347,13 @@ i
   #topbar
     display: block;
 
+#tab-wallet .item
+  width: 50%;
+  label
+    margin-right: 0;
+
 .footer
+  display: none;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -339,7 +364,6 @@ i
   text-transform: uppercase;
   border-radius: 0 0 $br $br;
   background: #fafbfc;
-  box-shadow: 0 1px 8px rgba(0,0,0,0.14) inset;
   color: #777;
   transition: 0.3s;
   button
@@ -348,8 +372,10 @@ i
     position: relative;
     opacity: 0;
     transition: 0.2s;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.14) inset;
 
 .footer-desc
+  display: none;
   transition: 0.2s;
   transition-delay: 0.15s;
   position: absolute;
@@ -394,7 +420,7 @@ i
     display: block;
     font-size: 40px;
     color: $pri;
-    margin: 12px 0 -4px;
+    margin: 20px 0 -4px;
     transition: 0.3s;
 
   label
