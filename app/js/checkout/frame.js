@@ -347,6 +347,7 @@ CheckoutFrame.prototype = {
         }
         catch(e){
           track(rzp, 'js_error', e);
+          throw e;
         }
       },
       rzp,

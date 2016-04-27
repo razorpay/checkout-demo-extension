@@ -815,8 +815,14 @@ Session.prototype = {
       event: 'submit',
       data: data
     });
-    if(data.method === 'wallet' && freqWallets[data.wallet].custom){
-      return;
+
+    var wallet = data.wallet;
+    if (data.method === 'wallet') {
+      var walletObj = freqWallets[wallet];
+
+      if (!walletObj || walletObj.custom) {
+        return;
+      }
     }
 
     if(this.modal){
@@ -833,8 +839,6 @@ Session.prototype = {
       success: this.bind(successHandler)
     };
 
-    var wallet = data.wallet;
-
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       request.error = this.bind(otpErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
@@ -843,10 +847,8 @@ Session.prototype = {
       this.showOTPScreen({
         loading: true,
         number: true,
-        text: 'Checking for a ' + wallet + ' account associated with',
-        wallet: wallet
-      }, true)
-
+        text: 'Checking for a ' + wallet + ' account associated with'
+      })
     } else {
       request.error = this.bind(errorHandler);
       showLoadingMessage('Please wait while your payment is processed...');
