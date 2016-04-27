@@ -106,8 +106,17 @@ gulp.task('sourcemaps', function() {
     .pipe(gulp.dest(distDir));
 });
 
+gulp.task('copyConfig', function() {
+  return gulp.src(assetPath('config.js'))
+    .pipe(gulp.dest(distDir));
+});
+
 gulp.task('compileHTML', function() {
-  runSequence('usemin', 'sourcemaps');
+  if (isProduction) {
+    runSequence('usemin', 'sourcemaps');
+  } else {
+    runSequence('usemin', 'sourcemaps', 'copyConfig');
+  }
 });
 
 gulp.task('staticAssets', function() {
