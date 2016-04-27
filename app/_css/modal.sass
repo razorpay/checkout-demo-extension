@@ -39,21 +39,24 @@ body, html
   .item
     cursor: pointer;
     width: 33.33%;
-    height: 86px;
     display: inline-block;
-    box-sizing: border-box;
-    border: 1px solid $bc;
-    margin: -1px 0 0 -1px;
     font-size: $size;
     transition: .2s;
     vertical-align: top;
-    &:hover
-      background: $bg;
+    margin-top: -1px;
+    &:nth-child(3n-1)
+      label
+        margin-left: -1px;
+        margin-right: -1px;
 
   label
     cursor: inherit;
-    height: 100%;
+    height: 86px;
     display: block;
+    border: 1px solid $bc;
+    &:hover
+      background: $bg;
+      position: relative;
 
   img
     height: 24px;
@@ -393,5 +396,5 @@ i
     margin: 12px 0 -4px;
     transition: 0.3s;
 
-  .payment-option
+  label
     height: 106px;
