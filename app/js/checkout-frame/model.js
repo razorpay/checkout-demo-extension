@@ -560,7 +560,7 @@ CheckoutModal.prototype = {
 
       parent.setAttribute('cardtype', type);
       validateCardNumber(el);
-      
+
       if(type === 'amex' || oldType === 'amex'){
         formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
       }
