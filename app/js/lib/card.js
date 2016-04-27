@@ -256,7 +256,7 @@ var Card;
     var pos = CheckSelection(el);
     var val = el.value;
     var len = val.length;
-    
+
     if(pos === len && val[len-1] === ' '){
       preventDefault(e);
       el.value = el.value.slice(0, len-2);
