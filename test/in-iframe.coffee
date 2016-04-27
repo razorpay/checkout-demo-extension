@@ -33,8 +33,6 @@ coOptions =
     'contact': '9999999999'
   notes: 'address': 'Hello World'
 
-expectVisibleTab = (tab) -> -> expect(jQuery('#tab-' + tab)).toBeVisible()
-
 clearSession = ->
   session = getSession()
   if session
@@ -184,53 +182,6 @@ describe 'payment authorization', ->
     expect stub.callCount
       .to.be 1
     stub.restore()
-
-describe 'init options.method', ->
-  opts = disable = null
-
-  beforeEach ->
-    opts = clone coOptions
-    delete opts.method
-    window.payment_methods = clone orig_methods
-
-  afterEach ->
-    openCheckoutForm opts
-    countVisible = 3 - disable.length
-    expect jQuery('#tabs').hasClass('tabs-' + countVisible)
-      .to.be true
-    expect(jQuery('#tabs li').length)
-      .to.be countVisible
-    disable.forEach (meth) ->
-      expect jQuery '#tab-' + meth
-        .to.be.empty()
-
-    for m2 of window.payment_methods
-      if disable.indexOf(m2) < 0
-        expect jQuery('#tab-' + m2 + ':visible')
-          .to.have.length 1
-    window.payment_methods = orig_methods
-
-  it 'should enable all options by default and show card initially', ->
-    disable = []
-
-  for m of window.payment_methods
-    # disable 1 tab, m is disabled one
-    it 'should hide ' + m + ' if specified false', do (m) ->
-      ->
-        disableVal = if m is 'wallet' then [] else false
-        window.payment_methods[m] = disableVal
-        disable = [m]
-
-    # disable 2 tabs, m is enabled one
-    it 'should show only ' + m + ' if rest specified false', do (m) ->
-      ->
-        disable = []
-        all_methods = Object.keys window.payment_methods
-        all_methods.forEach (disabledTab) ->
-          unless disabledTab is m
-            disable.push disabledTab
-            disableVal = if disabledTab is 'wallet' then [] else false
-            window.payment_methods[disabledTab] = disableVal
 
 # Tests on Credit Card page
 describe 'Razorpay card tab', ->

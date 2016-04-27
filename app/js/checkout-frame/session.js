@@ -588,6 +588,9 @@ Session.prototype = {
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
+    if (!this.tab && this.checkInvalid($('#form-common'))) {
+      return;
+    }
     if (this.sub_tab) {
       gel('otp-form').className = '';
       $('#form').addClass('shown');
@@ -605,7 +608,7 @@ Session.prototype = {
     //   $('.tab-content.shown').removeClass('shown');
     this.setTopbar(tab);
     this.tab = tab;
-    if(tab){
+    if (tab) {
       // if (tab === 'card') {
       //   var user = this.user;
       //   user.setPhone(getPhone());
