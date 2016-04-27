@@ -231,7 +231,7 @@ function otpErrorHandler(response){
     this,
     {
       error: true,
-      text: response.error.description,
+      text: response.error.description
     },
     200
   )
@@ -538,13 +538,14 @@ Session.prototype = {
 
     if(shouldFocusNextField){
       card.filled = function(el){
+        var next;
         if (el === el_expiry) {
           if(!$(el.parentNode).hasClass('invalid')){
-            var next = $('.elem-name.filled input')[0];
+            next = $('.elem-name.filled input')[0];
             if (next) {
               next = el_cvv;
             } else {
-              next = card_name;
+              next = el_name;
             }
           }
         } else if (el === el_number) {
@@ -746,7 +747,7 @@ Session.prototype = {
 
     var wallet = state.wallet;
     if(wallet){
-      walletObj = freqWallets[wallet];
+      var walletObj = freqWallets[wallet];
       gel('tab-title').innerHTML = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
     }
 

@@ -190,9 +190,9 @@ function showModal(session) {
             "token": "ofakjdflka;sdfj",
             "method": "card",
             "card": {
-              "last4": 7890,
+              "last4": 7890
             }
-          },
+          }
         ]
       };
       preferences = response;
