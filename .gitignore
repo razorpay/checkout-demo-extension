@@ -1,16 +1,8 @@
-# outputs
-/app/dist
-/dist
-/app/templates
-
-# dependencies
 /node_modules
-
-# misc
-.orig
-.DS_Store
-
-# others
 aws-keys.json
+/app/css
+/app/templates
+/app/dist/v1/*.*
+/app/dist/v1/css
 coverage
 /app/config.js
