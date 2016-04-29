@@ -1,4 +1,4 @@
-window.Razorpay = {
+Razorpay = {
   config: {
     protocol: 'http',
     hostname: 'api.pronav.in',
