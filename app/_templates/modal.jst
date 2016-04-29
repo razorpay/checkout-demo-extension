@@ -152,7 +152,7 @@ else
                   <div id="wallets" class="clear grid">
                     {{ var firstWallet; for (var w in wallet){ }}
                       <div class="wallet item">
-                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}"{{ if(!firstWallet){firstWallet = true; }}checked{{}}}>
+                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}">
                         <label for="wallet-radio-{{=w}}" class="radio-label mfix">
                           <img class="wallet-button colored mchild" style="height:{{=wd[w].h}}px" src="{{=wd[w].col}}">
                         </label>
