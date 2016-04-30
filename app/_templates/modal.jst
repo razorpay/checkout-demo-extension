@@ -9,7 +9,7 @@ if(o('display_currency'))
 else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span>" + (o('amount')/100).toFixed(2).replace(".00", "");
 }}
-<div id="container" class="mfix" tabIndex="0">
+<div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
   <div id="modal" class="mchild">
     <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
@@ -40,14 +40,16 @@ else
           <div class="clear"></div>
         </div>
         <div id="body">
-          <section id="topbar">
-            <div id="user"></div>
-            <i class="back">&#xe604;</i>
-            <div id="tab-title"></div>
+          <section id="topbar-wrap">
+            <div id="topbar" class="stackable">
+              <div id="user"></div>
+              <i class="back">&#xe604;</i>
+              <div id="tab-title"></div>
+            </div>
           </section>
           <form id="form" class="showable shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              <div id="form-common">
+              <div id="form-common" class="stackable">
                 <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
@@ -69,7 +71,7 @@ else
                 <div class="clear"></div>
               </div>
               {{? method.card }}
-                <div class="pad tab-content" id="tab-card">
+                <div class="pad tab-content stackable showable" id="tab-card">
                   <input type="hidden" name="method" value="card">
                   <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                     <label>Card Number</label>
@@ -117,7 +119,7 @@ else
                 </div>
               {{?}}
               {{? method.netbanking }}
-                <div class="tab-content" id="tab-netbanking">
+                <div class="tab-content stackable showable" id="tab-netbanking">
                   <input type="hidden" name="method" value="netbanking">
                   <div id="netb-banks" class="clear grid">
                     {{for(var b in it.netbanks){}}
@@ -147,7 +149,7 @@ else
                 </div>
               {{?}}
               {{ if(wallet){ }}
-                <div class="tab-content" id="tab-wallet">
+                <div class="tab-content stackable showable" id="tab-wallet">
                   <input type="hidden" name="method" value="wallet">
                   <div id="wallets" class="clear grid">
                     {{ var firstWallet; for (var w in wallet){ }}

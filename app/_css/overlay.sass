@@ -2,20 +2,13 @@
 
 #overlay
   position: absolute;
+  display: none;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 8;
   border-radius: $br;
-
-.showable
-  transition: 0.2s ease-out;
-  display: none;
-  opacity: 0;
-
-  &.shown
-    opacity: 1;
 
 #overlay
   background: rgba(0, 0, 0, 0.3);
@@ -29,7 +22,7 @@
   z-index: 9;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.16);
 
-#error-message 
+#error-message
   height: 150px;
   padding-top: 20px;
 

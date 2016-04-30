@@ -1,0 +1,148 @@
+@import common
+
+
+@keyframes spring
+  0%
+    margin-top: 0px
+  4.7%
+    margin-top: 22.485px
+  9.41%
+    margin-top: 44.173px
+  14.11%
+    margin-top: 57.045px
+  18.72%
+    margin-top: 60.605px
+  24.32%
+    margin-top: 57.527px
+  29.93%
+    margin-top: 52.379px
+  35.54%
+    margin-top: 48.971px
+  41.04%
+    margin-top: 48.041px
+  52.15%
+    margin-top: 49.56px
+  63.26%
+    margin-top: 50.362px
+  85.49%
+    margin-top: 49.933px
+  100%
+    margin-top: 50px
+
+@keyframes springFormCommon
+  0%
+    margin-top: -100px
+  4.7%
+    margin-top: -55.031px
+  9.41%
+    margin-top: -11.654px
+  14.11%
+    margin-top: 14.091px
+  18.72%
+    margin-top: 21.211px
+  24.32%
+    margin-top: 15.055px
+  29.93%
+    margin-top: 4.759px
+  35.54%
+    margin-top: -2.057px
+  41.04%
+    margin-top: -3.918px
+  52.15%
+    margin-top: -0.879px
+  63.26%
+    margin-top: 0.724px
+  85.49%
+    margin-top: -0.134px
+  100%
+    margin-top: 0px
+
+
+$first: .2s;
+$second: .5s;
+$delay: .2s;
+
+.showable
+  +opacity(0);
+  transition-delay: 0s;
+
+  &.shown
+    +opacity(1);
+
+.tab-content
+  margin-top: $topbarh;
+  transition-delay: .5s;
+
+  &.shown .item .mchild
+    transform: scale(0);
+    transition: .2s;
+    transition-delay: 0s;
+
+#tab-netbanking .select
+  +opacity(0);
+  transition: .2s;
+
+#otp-form, .tab-content
+  +opacity(0);
+  transition: $first;
+  transition-delay: 0s;
+  pointer-events: none;
+
+.footer
+  bottom: -55px;
+  +opacity(0);
+  transition: 0.3s;
+
+#form-common
+  .pad
+    transition: $first;
+    transition-delay: $second;
+
+  .legend, #payment-options
+    transition: $first;
+    transition-delay: $second + $first;
+
+
+
+#body.tab
+  #form-common
+    .pad
+      +opacity(0);
+      margin-top: -100px;
+      transition-delay: $first;
+
+    .legend, #payment-options
+      +opacity(0);
+      transition-delay: 0s;
+
+  .footer
+    bottom: 0;
+    +opacity(1);
+    transition-delay: $second;
+
+  #topbar
+    top: 0;
+    transition: .2s top ease-out $first, .1s color;
+
+  .shown
+    opacity: 1;
+    transition-delay: $second;
+    pointer-events: all;
+
+  #tab-card.shown
+    transition: .2s;
+    transition-delay: .5s;
+    animation: 1.25s spring;
+    animation-delay: $second;
+
+  .grid .scale
+    transition: .2s;
+    transition-delay: .5s;
+    transform: scale(1);
+
+  #tab-netbanking .select
+    transition: .2s;
+    transition-delay: .85s;
+    +opacity(1);
+
+

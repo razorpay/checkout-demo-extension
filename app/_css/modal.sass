@@ -51,6 +51,7 @@ body, html
         margin-right: -1px;
 
   label
+    position: relative;
     cursor: inherit;
     height: 86px;
     display: block;
@@ -268,15 +269,29 @@ i
   background: #fff;
   border-radius: 0 0 $br $br;
   min-height: 372px;
+  position: relative;
+  overflow: hidden;
+
+#topbar-wrap
+  position: relative;
+  height: $topbarh + 1px;
+  overflow: hidden;
+  z-index: 7;
+
 
 #topbar
   cursor: pointer;
   background: $bg;
-  display: none;
   padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
-  transition: .3s;
+  transition: .2s top ease-out 0s, .1s color;
+  bottom: auto;
+  top: -$topbarh;
+  color: #757575;
+
+  &:hover
+    color: #404040;
 
   img
     vertical-align: middle;
@@ -298,9 +313,6 @@ i
   float: right;
   font-size: 12px;
 
-#otp-form, .tab-content, #form
-  display: none;
-
 #tab-card
   padding-top: 10px
 
@@ -310,12 +322,9 @@ i
 #form-common
   padding: 20px 0 0;
 
-  .elem-wrap
-    margin: 15px 0;
-
   .legend
     margin: 15px 0;
-    margin-top: 28px;
+    margin-top: 59px;
 
   .item:first-child
     label
@@ -325,33 +334,13 @@ i
     label
       border-radius: 0 0 0 $br;
 
-#body.tab
-  #form-common
-    display: none;
-
-  .footer
-    display: block;
-    button
-      +opacity(1);
-      transition-delay: 0.15s;
-      pointer-events: auto;
-    .footer-desc
-      color: #fff;
-      +opacity(0);
-      transition-delay: 0s;
-
-  #topbar
-    display: block;
-
 #tab-wallet .item
   width: 50%;
   label
     margin-right: 0;
 
 .footer
-  display: none;
   position: absolute;
-  bottom: 0;
   left: 0;
   width: 100%;
   font-size: 16px;
@@ -361,13 +350,10 @@ i
   border-radius: 0 0 $br $br;
   background: #fafbfc;
   color: #777;
-  transition: 0.3s;
   button
     cursor: pointer;
-    pointer-events: none;
+    // pointer-events: none;
     position: relative;
-    +opacity(0);
-    transition: 0.2s;
     box-shadow: 0 1px 8px rgba(0,0,0,0.14) inset;
 
 .footer-desc
@@ -421,3 +407,11 @@ i
 
   label
     height: 98px;
+
+
+.stackable
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
