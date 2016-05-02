@@ -624,24 +624,6 @@ Session.prototype = {
       //   }
       // }
       getTab(tab).addClass('shown');
-
-      if(tab !== 'card'){
-        each(
-          $$(".tab-content.shown .item .mchild"),
-          function(k,v){
-            window.setTimeout(function(){
-              $(v).addClass('scale');
-            }, 50*k)
-          }
-        )
-      }
-    } else {
-      each(
-        $$(".tab-content .mchild.scale"),
-        function(k,v){
-          $(v).removeClass('scale');
-        }
-      );
     }
   },
 
