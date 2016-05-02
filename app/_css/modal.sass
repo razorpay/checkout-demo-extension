@@ -36,6 +36,16 @@ body, html
   text-align: center;
   font-size: 0;
 
+  &.double .item
+    width: 50%;
+    label
+      margin-right: 0;
+
+  &.single .item
+    width: 100%;
+    label
+      margin-right: 0;
+
   .item
     cursor: pointer;
     width: 33.33%;
@@ -334,11 +344,6 @@ i
     label
       border-radius: 0 0 0 $br;
 
-#tab-wallet .item
-  width: 50%;
-  label
-    margin-right: 0;
-
 .footer
   position: absolute;
   left: 0;
@@ -350,6 +355,7 @@ i
   border-radius: 0 0 $br $br;
   background: #fafbfc;
   color: #777;
+  z-index: 13;
   button
     cursor: pointer;
     // pointer-events: none;
@@ -415,3 +421,4 @@ i
   bottom: 0;
   left: 0;
   right: 0;
+  background: #fff;

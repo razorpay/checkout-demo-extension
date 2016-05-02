@@ -63,11 +63,13 @@ $second: .5s;
 $delay: .2s;
 
 .showable
+  z-index: 4;
   +opacity(0);
   transition-delay: 0s;
 
   &.shown
     +opacity(1);
+    z-index: 6;
 
 .tab-content
   margin-top: $topbarh;
@@ -92,6 +94,7 @@ $delay: .2s;
   bottom: -55px;
   +opacity(0);
   transition: 0.3s;
+  z-index: 9;
 
 #form-common
   .pad
@@ -122,6 +125,7 @@ $delay: .2s;
 
   #topbar
     top: 0;
+    z-index: 9;
     transition: .2s top ease-out $first, .1s color;
 
   .shown

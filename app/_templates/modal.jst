@@ -8,6 +8,18 @@ if(o('display_currency'))
   amount = it.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span>" + (o('amount')/100).toFixed(2).replace(".00", "");
+
+var i = 0;
+var gridClasses = ['single','double',''];
+var methods = ['card', 'netbanking', 'wallet'];
+
+for(var m in methods) {
+  console.log(m);
+  if(method[methods[m]])
+    i++;
+}
+
+var gridClass = gridClasses[i-1];
 }}
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -49,7 +61,7 @@ else
           </section>
           <form id="form" class="showable shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              <div id="form-common" class="stackable">
+              <div id="form-common" class="stackable showable shown">
                 <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
@@ -63,10 +75,16 @@ else
                   </div></div>
                 </div>
                 <div class="legend">Select payment method</div>
-                <div id="payment-options" class="grid">
+                <div id="payment-options" class="grid {{=gridClass}}">
+                  {{? method.card }}
                   <div class="payment-option item" tab="card"><label><i>&#xe609;</i>{{=it.tab_titles.card}}</label></div>
+                  {{?}}
+                  {{? method.netbanking }}
                   <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</label></div>
+                  {{?}}
+                  {{? method.wallet }}
                   <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
+                  {{?}}
                 </div>
                 <div class="clear"></div>
               </div>
@@ -151,7 +169,7 @@ else
               {{ if(wallet){ }}
                 <div class="tab-content stackable showable" id="tab-wallet">
                   <input type="hidden" name="method" value="wallet">
-                  <div id="wallets" class="clear grid">
+                  <div id="wallets" class="clear grid double">
                     {{ var firstWallet; for (var w in wallet){ }}
                       <div class="wallet item">
                         <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}">
