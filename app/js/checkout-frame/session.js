@@ -814,6 +814,10 @@ Session.prototype = {
     var nocvv_el = gel('nocvv-check');
     var nocvv_dummy_values;
 
+    if(!this.tab){
+      return;
+    }
+
     // if card tab exists
     if(nocvv_el){
       validateCardNumber(gel('card_number'));
