@@ -73,16 +73,16 @@ $delay: .2s;
 
 .tab-content
   margin-top: $topbarh;
-  transition-delay: .5s;
+  transition-delay: $second;
 
   &.shown .item .mchild
     transform: scale(0);
-    transition: .2s;
+    transition: $first;
     transition-delay: 0s;
 
 #tab-netbanking .select
   +opacity(0);
-  transition: .2s;
+  transition: $first;
 
 #otp-form, .tab-content
   +opacity(0);
@@ -134,19 +134,19 @@ $delay: .2s;
     pointer-events: all;
 
   #tab-card.shown
-    transition: .2s;
-    transition-delay: .5s;
+    transition: $first;
+    transition-delay: first;
     animation: 1.25s spring;
     animation-delay: $second;
 
   .grid .scale
-    transition: .2s;
-    transition-delay: .5s;
+    transition: $first;
+    transition-delay: $second;
     transform: scale(1);
 
   #tab-netbanking .select
-    transition: .2s;
-    transition-delay: .85s;
+    transition: $first;
+    transition-delay: $second + .05*6 +.05;
     +opacity(1);
 
 
