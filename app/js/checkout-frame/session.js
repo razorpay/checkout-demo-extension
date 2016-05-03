@@ -471,6 +471,12 @@ Session.prototype = {
     )
   },
 
+  onOtpEnter: function(e){
+    if (!ensureNumeric(e)) {
+      return;
+    }
+  },
+
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
@@ -478,6 +484,7 @@ Session.prototype = {
     this.on('click', '#tab-title, #topbar .back', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
+    this.on('keypress', '#otp', this.onOtpEnter);
 
     this.on('submit', '#otp-form', this.onOtpSubmit);
 
@@ -564,7 +571,7 @@ Session.prototype = {
 
     var otpEl = gel('powerotp')
     if(otpEl){
-      card.ensureNumeric(otpEl);
+      ensureNumeric(otpEl);
     }
 
     // check if we're in webkit
