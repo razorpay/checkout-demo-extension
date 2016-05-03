@@ -79,9 +79,9 @@ function sanitizeImage(options){
 
 function makeCheckoutUrl(key){
   if(key){
-    return discreet.makeUrl() + 'checkout?key_id=' + key;
+    return discreet.makeUrl() + 'checkout?new=1&key_id=' + key;
   }
-  return discreet.makeUrl(true) + 'checkout.php?new=1';
+  return discreet.makeUrl() + 'checkout/public?new=1';
 }
 
 function makeCheckoutMessage(rzp){
