@@ -136,7 +136,7 @@ $.prototype = {
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
-        if(!e.currentTarget) { e.currentTarget = e.target }
+        if(!e.currentTarget) { e.currentTarget = el }
         callback.call(thisArg || el, e);
       }
     }
@@ -992,7 +992,7 @@ function makeCheckoutUrl(key){
   if(key){
     return discreet.makeUrl() + 'checkout?key_id=' + key;
   }
-  return discreet.makeUrl(true) + 'checkout.php?new=1';
+  return discreet.makeUrl() + 'checkout/public?new=1';
 }
 
 function makeCheckoutMessage(rzp){
