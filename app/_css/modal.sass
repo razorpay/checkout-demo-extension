@@ -357,7 +357,7 @@ i
   border-radius: 0 0 $br $br;
   background: #fafbfc;
   color: #777;
-  z-index: 90;
+  z-index: 89;
   box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
   button
     cursor: pointer;
@@ -376,6 +376,9 @@ i
 
   &:hover:before
     +opacity(0);
+
+#form.shown .footer
+  z-index: 90;
 
 .footer-desc
   display: none;

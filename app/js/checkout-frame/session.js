@@ -593,7 +593,7 @@ Session.prototype = {
       return;
     }
     if (this.sub_tab) {
-      gel('otp-form').className = '';
+      $('#otp-form').removeClass('shown');
       $('#form').addClass('shown');
       this.sub_tab = null;
       tab = 'wallet';
