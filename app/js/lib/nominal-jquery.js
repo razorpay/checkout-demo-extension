@@ -136,7 +136,7 @@ $.prototype = {
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
-        if(!e.currentTarget) { e.currentTarget = e.target }
+        if(!e.currentTarget) { e.currentTarget = el }
         callback.call(thisArg || el, e);
       }
     }
