@@ -91,20 +91,18 @@ $delay: .2s;
   pointer-events: none;
 
 .footer
-  bottom: -55px;
+  bottom: 0;
   +opacity(0);
   transition: 0.3s;
 
 #form-common
   .pad
     transition: $first;
-    transition-delay: $second;
+    transition-delay: 0s;
 
   .legend, #payment-options
     transition: $first;
-    transition-delay: $second + $first;
-
-
+    transition-delay: $first;
 
 #body.tab
   #form-common
@@ -118,9 +116,9 @@ $delay: .2s;
       transition-delay: 0s;
 
   .footer
-    bottom: 0;
+    bottom: - $footerh + 1px;
     +opacity(1);
-    transition-delay: $second;
+    transition-delay: $first;
 
   #topbar
     top: 0;
