@@ -83,6 +83,7 @@ function createPopup(data, url, options) {
   var templateVars = {
     options: options,
     url: url,
+    currencies: discreet.currencies,
     formHTML: deserialize(data)
   }
 
