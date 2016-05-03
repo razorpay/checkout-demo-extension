@@ -535,7 +535,7 @@ if(typeof global_Razorpay === 'object' && global_Razorpay && typeof global_Razor
 else {
   RazorpayConfig = {
     protocol: 'https',
-    hostname: 'beta.razorpay.com',
+    hostname: 'api.razorpay.com',
     version: 'v1/'
   }
 }
