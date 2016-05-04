@@ -187,8 +187,7 @@ function createCoverageReport(){
 
 // blackbox tests
 gulp.task('test', ['test:unit'], function(){
-  var jsGlob = assetPath('dist/v1/*.js');
-  var jsHint = gulp.src(jsGlob)
+  var jsHint = gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/*-new.js')])
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))

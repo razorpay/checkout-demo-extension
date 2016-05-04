@@ -81,6 +81,7 @@ function makeCheckoutUrl(key){
   if(key){
     return discreet.makeUrl() + 'checkout?new=1&key_id=' + key;
   }
+  // return discreet.makeUrl(true) + 'checkout.php';
   return discreet.makeUrl() + 'checkout/public?new=1';
 }
 
