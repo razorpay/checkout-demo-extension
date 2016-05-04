@@ -57,7 +57,7 @@
       <div id="top">
         <span style="font-size:44px;float:right;line-height:52px;color:#666">
         {{if(it.options.display_currency){}}
-          {{=it.currencies[it.options.display_currency]}}{{=it.options.display_amount}}
+          {{=discreet.currencies[it.options.display_currency]}}{{=it.options.display_amount}}
         {{} else {}}
           ₹{{=it.options.amount/100}}
         {{}}}
