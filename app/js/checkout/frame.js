@@ -78,11 +78,27 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(key){
-  if(key){
-    return discreet.makeUrl() + 'checkout?new=1&key_id=' + key;
+  var params = [];
+  var url = discreet.makeUrl() + 'checkout';
+
+  params.push('new=1')
+
+  if(RazorpayConfig.jspath){
+    params.push('checkout=' + RazorpayConfig.jspath);
   }
-  // return discreet.makeUrl(true) + 'checkout.php';
-  return discreet.makeUrl() + 'checkout/public?new=1';
+
+  if(key){
+    params.push('key_id='+key);
+  } else {
+    url += '/public';
+  }
+
+  if(params.length){
+    params = '?' + params.join('&');
+  } else {
+    params = '';
+  }
+  return url + params;
 }
 
 function makeCheckoutMessage(rzp){

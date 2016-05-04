@@ -125,15 +125,6 @@ var Card;
   var expLen = 0;
   var ReFormatExpiry = function(e){
     var el = e.target;
-    if(el.value.length === 2 && el.value.length >= expLen){
-      el.value += ' / ';
-    }
-    expLen = el.value.length;
-  }
-
-  var expLen = 0;
-  var ReFormatExpiry = function(e){
-    var el = e.target;
     var val = el.value;
     if(val.length >= expLen){
       if (/^[2-9]$/.test(val)) {
