@@ -65,6 +65,7 @@ $delay: .2s;
 .showable
   z-index: 90;
   +opacity(0);
+  transition: .2s;
   transition-delay: 0s;
   backface-visibility: none;
   // transform: translate3d(0,0,0);
@@ -127,7 +128,6 @@ $delay: .2s;
 
   #topbar
     top: 0;
-    z-index: 9;
     transition: $first top ease-out $first, .1s color;
 
   .shown

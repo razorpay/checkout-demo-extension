@@ -291,13 +291,6 @@ i
   transform: translate3d(0,0,0);
   backface-visibility: none;
 
-#topbar-wrap
-  position: relative;
-  height: $topbarh + 1px;
-  overflow: hidden;
-  z-index: 97;
-
-
 #topbar
   cursor: pointer;
   background: $bg;
@@ -305,9 +298,13 @@ i
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
   transition: .3s top ease-in 0s, .1s color;
-  bottom: auto;
   top: -$topbarh;
   color: #757575;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: $topbarh;
+  z-index: 97;
 
   &:hover
     color: #404040;
