@@ -99,22 +99,24 @@ $delay: .2s;
 
 #form-common
   .pad
-    transition: $first;
+    transition: $first + .2s;
     transition-delay: 0s;
 
   .legend, #payment-options
-    transition: $first;
-    transition-delay: $first;
+    transition: $first + .2s;
+    transition-delay: $first + .2s;
 
 #body.tab
   #form-common
     .pad
       +opacity(0);
       margin-top: -100px;
+      transition: $first;
       transition-delay: $first;
 
     .legend, #payment-options
       +opacity(0);
+      transition: $first;
       transition-delay: 0s;
 
   #form.shown, #otp-form.shown
@@ -126,7 +128,7 @@ $delay: .2s;
   #topbar
     top: 0;
     z-index: 9;
-    transition: .2s top ease-out $first, .1s color;
+    transition: $first top ease-out $first, .1s color;
 
   .shown
     opacity: 1;
