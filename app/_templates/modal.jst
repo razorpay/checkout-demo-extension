@@ -176,7 +176,7 @@ attr = function(attr){return attr.replace(/"/g,'')};
                 <span class="text">
                   Pay
                   {{if(o('display_currency')){}}
-                    {{=it.currencies[o('display_currency')]}}{{=html(o('display_amount'))}}
+                    {{=discreet.currencies[o('display_currency')]}}{{=html(o('display_amount'))}}
                   {{} else {}}
                      <i>&#xe600;</i>
                      <u>₹</u>

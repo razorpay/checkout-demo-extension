@@ -750,16 +750,12 @@ Session.prototype = {
     });
 
     var wallet = data.wallet;
-    var wOptions = options.method.wallet;
-    if (data.method === 'wallet' &&
-      (wallet === 'mobikwik' || wallet === 'payumoney')){
-      $("#power-head img")
-        .attr('src', wOptions[data.wallet].col)
-        .attr('height', wOptions[data.wallet].h);
-    }
+    if (data.method === 'wallet') {
+      var walletObj = freqWallets[wallet];
 
-    if(data.method === 'wallet' && freqWallets[data.wallet].custom){
-      return;
+      if (!walletObj || walletObj.custom) {
+        return;
+      }
     }
 
     if(this.modal){
@@ -769,14 +765,11 @@ Session.prototype = {
     var request = {
       data: data,
       fees: preferences.fee_bearer,
-      options: {
-        image: this.get('image'),
-        redirect: this.get('redirect')
-      },
+      options: this.get(),
       success: this.bind(successHandler)
     };
 
-    if(data.wallet === 'mobikwik' && !request.fees){
+    if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       request.error = this.bind(powerErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
       this.showPowerScreen({
