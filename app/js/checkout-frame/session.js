@@ -269,6 +269,7 @@ function secondfactorHandler(done, tab){
     'showOTPScreen',
     this,
     {
+      verify: true,
       text: 'An OTP has been sent to',
       number: true,
       otp: true
@@ -485,6 +486,7 @@ Session.prototype = {
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
     this.on('keypress', '#otp', this.onOtpEnter);
+    this.on('click', '#otp-action', this.switchTab);
 
     this.on('submit', '#otp-form', this.onOtpSubmit);
 
@@ -753,6 +755,8 @@ Session.prototype = {
     $('#otp-form').addClass('shown');
     $('#form').removeClass('shown');
     $('#otp-form').toggleClass('loading', state.loading);
+    $('#otp-form').toggleClass('verify', state.verify);
+    $('#otp-form').toggleClass('error', state.error);
     $('#otp').toggleClass('shown', state.otp);
 
     var wallet = state.wallet;
