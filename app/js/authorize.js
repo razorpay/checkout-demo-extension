@@ -57,13 +57,22 @@ discreet.setCommunicator(Razorpay.defaults);
 
 function pollPaymentData(rzp) {
   deleteCookie('onComplete');
-  localStorage.removeItem('onComplete');
+  try {
+    localStorage.removeItem('onComplete');
+  } catch(e) {}
 
   cookieInterval = setInterval(function(){
-    var paymentData = localStorage.getItem('onComplete') || getCookie('onComplete');
+    var paymentData;
+    try {
+      paymentData = localStorage.getItem('onComplete');
+    } catch(e) {}
+    paymentData = paymentData || getCookie('onComplete');
+
     if(paymentData) {
       clearCookieInterval();
-      localStorage.removeItem('onComplete');
+      try {
+        localStorage.removeItem('onComplete');
+      } catch(e) {}
       discreet.onComplete.call(rzp, paymentData);
     }
   }, 150)
