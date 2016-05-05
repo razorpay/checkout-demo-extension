@@ -79,11 +79,6 @@ $delay: .2s;
   margin-top: $topbarh;
   transition-delay: $second;
 
-  .item .mchild
-    transform: scale(0);
-    transition: $first;
-    transition-delay: 0s;
-
 #tab-netbanking .select
   +opacity(0);
   transition: $first;
@@ -150,9 +145,14 @@ $delay: .2s;
     transition-delay: $second + .05*6 +.05;
     +opacity(1);
 
-  @for $i from 1 through 4
-    .tab-content label .l-#{$i}
-      transform: scale(1);
-      transition: .2s;
-      transition-delay: .05*$i + $second ;
+.item-inner
+  transition: .2s;
+  transform: scale(0);
+
+.tab-content.shown .item-inner
+  transform: scale(1);
+
+@for $i from 1 through 4
+  .l-#{$i}
+    transition-delay: .05*$i + $second ;
 
