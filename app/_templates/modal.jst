@@ -208,19 +208,21 @@ var gridClass = gridClasses[i-1];
               <button id="submitbtn" class="button" type="submit">PAY &nbsp;{{=amount}}</button>
             </div>
           </form>
-          <form id='otp-form' class="stackable showable">
-            <strong id='otp-prompt'></strong>
-            <div id="otp-action" class="btn">Retry</div>
-            <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
-            <div class="spin">
-              <div></div>
-            </div>
-            <div class="spin spin2">
-              <div></div>
-            </div>
-            <div class="double clear pad">
-              <span class='link first'></span>
-              <span class='link grey second'></span>
+          <form id="otp-form" class="stackable showable">
+            <div id="otp-form-inner">
+              <strong id='otp-prompt'></strong>
+              <div id="otp-action" class="btn">Retry</div>
+              <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
+              <div class="spin">
+                <div></div>
+              </div>
+              <div class="spin spin2">
+                <div></div>
+              </div>
+              <div class="double clear pad">
+                <span class='link first'></span>
+                <span class='link grey second'></span>
+              </div>
             </div>
             <div class="footer">
               <button id="otpbtn" class="button" type="submit">Verify</button>
