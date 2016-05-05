@@ -89,7 +89,7 @@ function ajaxCallback(response){
 function makeSecondfactorCallback(request, nextRequest){
   return function(factor){
     $.post({
-      url: 'http://google.com',
+      url: nextRequest.url,
       data: {
         type: 'otp',
         otp: factor
