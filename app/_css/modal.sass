@@ -2,6 +2,7 @@
 
 .clear
   clear: both;
+  overflow: auto;
 
 .mfix
   white-space: nowrap;
@@ -34,38 +35,32 @@ body, html
 
 .grid
   text-align: center;
-  font-size: 0;
 
   &.double .item
     width: 50%;
-    label
-      margin-right: 0;
+    border-right: none;
+    &:nth-child(2n)
+      border-left: 1px solid $bc;
 
   &.single .item
     width: 100%;
-    label
-      margin-right: 0;
 
   .item
     cursor: pointer;
     width: 33.33%;
-    display: inline-block;
-    font-size: $size;
+    float: left;
     transition: .2s;
-    vertical-align: top;
-    margin-top: -1px;
-    // middle item   , last item if 4 items
-    &:nth-child(3n-1), &:last-child:nth-child(3n+1)
-      label
-        margin-left: -1px;
-        margin-right: -1px;
+    border-bottom: 1px solid $bc;
+    border-right: 1px solid $bc;
+    box-sizing: border-box;
+    &:nth-child(3n)
+      border-right: none;
 
   label
     position: relative;
     cursor: inherit;
     height: 86px;
     display: block;
-    border: 1px solid $bc;
     &:hover
       background: $bg;
       position: relative;
@@ -75,12 +70,6 @@ body, html
     pointer-events: none;
     height: 24px;
     margin-bottom: 3px;
-
-#tab-wallet .grid
-  .item
-    &:nth-child(3n-1), &:last-child:nth-child(3n+1)
-      label
-        margin-right: 0px;
 
 .link
   text-decoration: underline;
@@ -425,6 +414,7 @@ i
   padding: 10px 0;
 
 #payment-options
+  border-top: 1px solid $bc;
   i
     display: block;
     font-size: 40px;
@@ -433,7 +423,10 @@ i
     transition: 0.3s;
 
   label
-    height: 98px;
+    height: 77px;
+
+  .item
+    border-bottom: none!important;
 
 
 .stackable
