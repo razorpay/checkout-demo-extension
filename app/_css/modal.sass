@@ -100,6 +100,11 @@ i
   margin-bottom: -60px;
   position: relative;
   top: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -30px;
+  margin-left: -30px;
 
 .spin div
   width: 100%;
@@ -287,8 +292,8 @@ i
   padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
-  transition: .3s top ease-in 0s, .1s color;
-  top: -$topbarh;
+  transition: .3s transform ease-in 0s, .3s opacity ease-in 0s, .1s color;
+  +opacity(0);
   color: #757575;
   position: absolute;
   left: 0;
@@ -352,7 +357,7 @@ i
   border-radius: 0 0 $br $br;
   background: #fafbfc;
   color: #777;
-  z-index: 89;
+  z-index: 88;
   box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
   button
     cursor: pointer;
@@ -373,7 +378,7 @@ i
     +opacity(0);
 
 #form.shown .footer
-  z-index: 90;
+  z-index: 89;
 
 .footer-desc
   display: none;
@@ -435,5 +440,8 @@ i
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
   border-radius: 0 0 $br $br;
+
+.stackable.white
+  background: #fff;
+  z-index: 90;

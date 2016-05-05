@@ -78,10 +78,21 @@ $max-height: 659px;
   #payment-options
     border-bottom: 1px solid $bc;
 
+
+  .item-inner
+    transform: none;
+    opacity: 0;
+
+  .tab-content.shown .item-inner
+    opacity: 1;
+
+  .footer
+    transform: translateY($footerh + 1px);
+
   #body.tab
    #form, #otp-form
     .footer
-      bottom: 0;
+      transform: translateY(0);
       z-index: 91;
 
 @media (max-device-height: 450px), (max-device-width: 450px)

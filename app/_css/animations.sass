@@ -3,64 +3,37 @@
 
 @keyframes spring
   0%
-    margin-top: 0px
+    transform: translateY(-70px)
   4.7%
-    margin-top: 22.485px
+    transform: translateY(-38.522px)
   9.41%
-    margin-top: 44.173px
+    transform: translateY(-8.158px)
   14.11%
-    margin-top: 57.045px
+    transform: translateY(9.864px)
   18.72%
-    margin-top: 60.605px
+    transform: translateY(14.848px)
   24.32%
-    margin-top: 57.527px
+    transform: translateY(10.538px)
   29.93%
-    margin-top: 52.379px
+    transform: translateY(3.331px)
   35.54%
-    margin-top: 48.971px
+    transform: translateY(-1.44px)
   41.04%
-    margin-top: 48.041px
+    transform: translateY(-2.742px)
   52.15%
-    margin-top: 49.56px
+    transform: translateY(-0.615px)
   63.26%
-    margin-top: 50.362px
+    transform: translateY(0.507px)
   85.49%
-    margin-top: 49.933px
+    transform: translateY(-0.094px)
   100%
-    margin-top: 50px
-
-@keyframes springFormCommon
-  0%
-    margin-top: -100px
-  4.7%
-    margin-top: -55.031px
-  9.41%
-    margin-top: -11.654px
-  14.11%
-    margin-top: 14.091px
-  18.72%
-    margin-top: 21.211px
-  24.32%
-    margin-top: 15.055px
-  29.93%
-    margin-top: 4.759px
-  35.54%
-    margin-top: -2.057px
-  41.04%
-    margin-top: -3.918px
-  52.15%
-    margin-top: -0.879px
-  63.26%
-    margin-top: 0.724px
-  85.49%
-    margin-top: -0.134px
-  100%
-    margin-top: 0px
-
+    transform: translateY(0px)
 
 $first: .2s;
-$second: .5s;
-$delay: .2s;
+$second: .2s;
+$springTime: 1s;
+$gridStagger: .05s;
+
 
 .showable
   z-index: 90;
@@ -68,16 +41,15 @@ $delay: .2s;
   transition: .2s;
   transition-delay: 0s;
   backface-visibility: none;
-  // transform: translate3d(0,0,0);
-  // transform: rotateZ(0)
 
   &.shown
     +opacity(1);
     z-index: 91;
 
 .tab-content.stackable
-    transition-delay: $second;
+    transition-delay: 0s;
     top: 50px;
+    transform: translateY(0);
 
 #tab-netbanking .select
   +opacity(0);
@@ -89,26 +61,30 @@ $delay: .2s;
   transition-delay: 0s;
 
 .footer
-  bottom: 0;
   +opacity(0);
   transition: 0.3s;
+  transform: translateY(0);
 
-#form-common
+#topbar
+  transform: translateY(-$topbarh);
+
+#form-common.not-first
   .pad
-    transition: $first + .2s;
-    transition-delay: 0s;
+    +opacity(1);
+    animation: $springTime spring;
+    transform: none;
+    transition: none;
 
   .legend, #payment-options
-    transition: $first + .2s;
-    transition-delay: $first + .2s;
+    transition: $springTime;
 
 #body.tab
   #form-common
     .pad
       +opacity(0);
-      margin-top: -100px;
+      animation: none;
+      // transform: translateY(-100px);
       transition: $first;
-      transition-delay: $first;
 
     .legend, #payment-options
       +opacity(0);
@@ -117,17 +93,18 @@ $delay: .2s;
 
   #form.shown, #otp-form.shown.verify
     .footer
-      bottom: - $footerh + 1px;
+      transform: translateY($footerh - 1px);
       +opacity(1);
       transition-delay: $first;
 
   #otp-form.error .footer
-    bottom: 0;
+    transform: translateY(-$footerh + 1px);
     opacity: 0;
 
   #topbar
-    top: 0;
-    transition: $first top ease-out $first, .1s color;
+    transform: translateY(0);
+    +opacity(1);
+    transition: $first transform ease-out $first, $first opacity ease-out $first, .1s color;
 
   .shown
     opacity: 1;
@@ -137,22 +114,22 @@ $delay: .2s;
   #tab-card.shown
     transition: $first;
     transition-delay: $second;
-    animation: 1.25s spring;
+    animation: $springTime spring;
     animation-delay: $second;
 
   #tab-netbanking .select
     transition: $first;
-    transition-delay: $second + .05*6 +.05;
+    transition-delay: $second + $gridStagger*6 +$gridStagger;
     +opacity(1);
 
 .item-inner
   transition: .2s;
-  transform: scale(0);
+  transform: scale(0)
 
 .tab-content.shown .item-inner
-  transform: scale(1);
+  transform: scale(1)
 
 @for $i from 1 through 4
   .l-#{$i}
-    transition-delay: .05*$i + $second ;
+    transition-delay: $gridStagger*$i + $second;
 
