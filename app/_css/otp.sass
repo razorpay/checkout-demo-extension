@@ -3,9 +3,17 @@
 #otp-form
   margin-top: $topbarh;
   padding-top: 30px;
+  text-align: center;
   &.otp
     #otp
       display: block;
+  &.error
+    #otp-action
+      display: inline-block;
+
+#otp-action
+  margin-top: 20px;
+  display: none;
 
 #otp-prompt
   text-align: center;
