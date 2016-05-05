@@ -55,14 +55,16 @@ discreet.setCommunicator = function(opts){
 
 discreet.setCommunicator(Razorpay.defaults);
 
-function cookiePoll(rzp){
+function pollPaymentData(rzp) {
   deleteCookie('onComplete');
+  localStorage.removeItem('onComplete');
 
   cookieInterval = setInterval(function(){
-    var cookie = getCookie('onComplete');
-    if(cookie){
+    var paymentData = localStorage.getItem('onComplete') || getCookie('onComplete');
+    if(paymentData) {
       clearCookieInterval();
-      discreet.onComplete.call(rzp, cookie);
+      localStorage.removeItem('onComplete');
+      discreet.onComplete.call(rzp, paymentData);
     }
   }, 150)
 }
@@ -322,7 +324,7 @@ Razorpay.prototype.authorizePayment = function(request){
   request.listener = $(window).on('message', onMessage, null, this);
 
   if(discreet.isFrame){
-    cookiePoll(this);
+    pollPaymentData(this);
   }
 
   return this;
