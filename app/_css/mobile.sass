@@ -22,6 +22,9 @@ $max-height: 659px;
     bottom: 0;
     top: 0;
 
+  #body
+    min-height: $bodyhMobile;
+
   #content #body
     top: $headerh;
     position: absolute;
@@ -81,7 +84,6 @@ $max-height: 659px;
 @media (max-device-height: 450px), (max-device-width: 450px)
   +mobile-view();
 
-@media(max-height: $max-height)
   .mobile
     +mobile-view();
 
