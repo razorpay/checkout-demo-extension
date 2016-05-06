@@ -55,13 +55,13 @@ body, html
       border-right: none;
 
   label
+    box-sizing: border-box;
     position: relative;
     cursor: inherit;
     height: 86px;
     display: block;
     &:hover
       background: $bg;
-      position: relative;
 
   img
     // IE not accepting click as click on parent label
@@ -418,17 +418,17 @@ i
 
 #payment-options
   border-top: 1px solid $bc;
+
   label
     padding-top: 20px;
+    height: 97px;
+
   i
     display: block;
     font-size: 40px;
     color: $pri;
     margin: 0 0 -4px;
     transition: 0.3s;
-
-  label
-    height: 77px;
 
   .item
     border-bottom: none!important;
