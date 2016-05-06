@@ -21,13 +21,11 @@ body, html
 
 .double
   width: 100%;
-  font-size: 0;
   .second
     text-align: right;
   .first, .second
-    font-size: $size;
+    float: left;
     width: 50%;
-    display: inline-block;
 
 .pad
   padding: 0 24px;
@@ -57,6 +55,7 @@ body, html
       border-right: none;
 
   label
+    box-sizing: border-box;
     position: relative;
     cursor: inherit;
     height: 86px;
@@ -64,7 +63,6 @@ body, html
     font-size: 14px;
     &:hover
       background: $bg;
-      position: relative;
 
   img
     // IE not accepting click as click on parent label
@@ -97,29 +95,24 @@ i
   display: none;
   width: 60px;
   height: 60px;
-  margin: 0 auto;
-  margin-bottom: -60px;
-  position: relative;
-  top: 20px;
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -30px;
+  margin-top: -45px;
   margin-left: -30px;
 
-.spin div
-  width: 100%;
-  height: 100%;
-  vertical-align: middle;
-  display: inline-block;
-  border-radius: 50%;
-  border: 4px solid #29b7d6;
-  animation: spin 1.3s linear infinite;
-  box-sizing: border-box;
-  opacity: 0
+  div
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    display: inline-block;
+    border-radius: 50%;
+    border: 4px solid #29b7d6;
+    animation: spin 1.3s linear infinite;
+    box-sizing: border-box;
+    opacity: 0;
 
 .spin2
-  margin-bottom: 10px;
   div
     animation-delay: 0.65s;
 
@@ -421,17 +414,17 @@ i
 
 #payment-options
   border-top: 1px solid $bc;
+
   label
     padding-top: 20px;
+    height: 97px;
+
   i
     display: block;
     font-size: 40px;
     color: $pri;
     margin: 0 0 -4px;
     transition: 0.3s;
-
-  label
-    height: 77px;
 
   .item
     border-bottom: none!important;
