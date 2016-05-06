@@ -1,11 +1,14 @@
 var templates = {};
-var cookieInterval, communicator;
+var pollingInterval, communicator;
 
-function clearCookieInterval(){
-  if(cookieInterval){
+function clearPollingInterval(force){
+  if(force || pollingInterval){
+    try {
+      localStorage.removeItem('onComplete');
+    } catch(e) {}
     deleteCookie('onComplete');
-    clearInterval(cookieInterval);
-    cookieInterval = null;
+    clearInterval(pollingInterval);
+    pollingInterval = null;
   }
 }
 
@@ -55,14 +58,20 @@ discreet.setCommunicator = function(opts){
 
 discreet.setCommunicator(Razorpay.defaults);
 
-function cookiePoll(rzp){
-  deleteCookie('onComplete');
+function pollPaymentData(rzp) {
+  clearPollingInterval(true);
+  pollingInterval = setInterval(function(){
+    var paymentData;
+    try {
+      paymentData = localStorage.getItem('onComplete');
+    } catch(e) {}
+    if(!paymentData){
+      paymentData = getCookie('onComplete');
+    }
 
-  cookieInterval = setInterval(function(){
-    var cookie = getCookie('onComplete');
-    if(cookie){
-      clearCookieInterval();
-      discreet.onComplete.call(rzp, cookie);
+    if(paymentData) {
+      clearPollingInterval();
+      discreet.onComplete.call(rzp, paymentData);
     }
   }, 150)
 }
@@ -115,7 +124,7 @@ function clearRequest(rzp){
 
   invoke('listener', rzp._request);
   rzp._request = null;
-  clearCookieInterval();
+  clearPollingInterval();
 }
 
 function formatRequest(request){
@@ -322,7 +331,7 @@ Razorpay.prototype.authorizePayment = function(request){
   request.listener = $(window).on('message', onMessage, null, this);
 
   if(discreet.isFrame){
-    cookiePoll(this);
+    pollPaymentData(this);
   }
 
   return this;
