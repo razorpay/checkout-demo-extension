@@ -1,15 +1,19 @@
 var templates = {};
-var cookieInterval;
 
 function makeFormHtml64(url, data){
   return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>');
 }
 
-function clearCookieInterval(){
-  if(cookieInterval){
+var pollingInterval, communicator;
+
+function clearPollingInterval(force){
+  if(force || pollingInterval){
+    try {
+      localStorage.removeItem('onComplete');
+    } catch(e) {}
     deleteCookie('onComplete');
-    clearInterval(cookieInterval);
-    cookieInterval = null;
+    clearInterval(pollingInterval);
+    pollingInterval = null;
   }
 }
 
@@ -48,14 +52,20 @@ function setCommunicator(){
 }
 setCommunicator();
 
-function cookiePoll(request){
-  deleteCookie('onComplete');
+function pollPaymentData(request) {
+  clearPollingInterval(true);
+  pollingInterval = setInterval(function(){
+    var paymentData;
+    try {
+      paymentData = localStorage.getItem('onComplete');
+    } catch(e) {}
+    if(!paymentData){
+      paymentData = getCookie('onComplete');
+    }
 
-  cookieInterval = setInterval(function(){
-    var cookie = getCookie('onComplete');
-    if(cookie){
-      clearCookieInterval();
-      request.complete(cookie);
+    if(paymentData) {
+      clearPollingInterval();
+      request.complete(paymentData);
     }
   }, 150)
 }
@@ -150,9 +160,9 @@ function Request(params){
   // adding listeners
   if(discreet.isFrame){
     window.onComplete = bind(this.complete, this);
+    pollPaymentData(this);
   }
   this.listener = $(window).on('message', bind(onMessage, this));
-  cookiePoll(this);
 }
 
 Request.prototype = {
@@ -317,7 +327,7 @@ Request.prototype = {
     this.done = true;
     // unbind listener
     invoke('listener', this);
-    clearCookieInterval();
+    clearPollingInterval();
   },
 
   track: function(){
