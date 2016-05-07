@@ -239,7 +239,7 @@ function showModalWithMessage(message){
     var theme_color = window.preferences.options.theme.color;
     var old_color = message.options.theme.color;
     if(theme_color && (!old_color || old_color === '#00BCD4')){
-      message.options.theme.color = '#' + theme_color;
+      message.options.theme.color = '#' + theme_color.slice(-6);
     }
   } catch(e){}
   var session = getSession();
