@@ -133,16 +133,16 @@ function makeHidden(subject){
 }
 
 function showOverlay($with){
-  makeVisible.call('#overlay');
+  makeVisible('#overlay');
   if($with){
-    makeVisible.call($with);
+    makeVisible($with);
   }
 }
 
 function hideOverlay($with){
-  makeHidden.call($('#overlay'));
+  makeHidden($('#overlay'));
   if($with){
-    makeHidden.call($with);
+    makeHidden($with);
   }
 }
 
@@ -595,8 +595,8 @@ Session.prototype = {
     } else {
       $body.removeClass('tab');
       makeHidden('.tab-content.shown');
-      makeVisible('#form-common');
       makeHidden('#topbar');
+      makeVisible('#form-common');
     }
   },
 

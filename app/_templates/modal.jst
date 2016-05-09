@@ -50,12 +50,12 @@ var gridClass = gridClasses[i-1];
           </div>
           <div class="clear"></div>
         </div>
+        <div id="topbar">
+          <div id="user"></div>
+          <i class="back">&#xe604;</i>
+          <div id="tab-title"></div>
+        </div>
         <div id="body">
-          <div id="topbar">
-            <div id="user"></div>
-            <i class="back">&#xe604;</i>
-            <div id="tab-title"></div>
-          </div>
           <form id="form" class="showable shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common" class="showable shown">
@@ -211,6 +211,7 @@ var gridClass = gridClasses[i-1];
               <div class="footer-desc">Amount to pay: {{=amount}}</div>
               <button id="submitbtn" class="button" type="submit">PAY &nbsp;{{=amount}}</button>
             </div>
+            <div class="footer-mask"></div>
           </form>
           <form id="otp-form" class="showable">
             <div>
@@ -231,8 +232,8 @@ var gridClass = gridClasses[i-1];
             <div class="footer">
               <button id="otpbtn" class="button" type="submit">Verify</button>
             </div>
+            <div class="footer-mask"></div>
           </form>
-          <div id="footer-mask"></div>
         </div>
       </div>
     </div>
