@@ -120,14 +120,14 @@ function Request(params){
   }
 
   var popup,
-    options = this.options,
     data = this.data,
     url = this.makeUrl();
 
-  if(options.redirect){
+  if(this.get('redirect')){
     // add callback_url if redirecting
-    if(options.callback_url){
-      data.callback_url = options.callback_url;
+    var callback_url = this.get('callback_url');
+    if(callback_url){
+      data.callback_url = callback_url;
     }
     return discreet.redirect({
       url: url,
@@ -173,7 +173,7 @@ Request.prototype = {
     }
 
     var data = this.data = params.data;
-    this.options = params.options || emo;
+    this.get = new Options(params.options).get;
     this.fees = params.fees;
     this.success = params.success || noop;
     this.error = params.error || noop;
@@ -200,7 +200,7 @@ Request.prototype = {
     var urlType;
     if(this.fees){
       urlType = 'fees';
-    } else if(!this.options.redirect && this.shouldAjax()){
+    } else if(!this.get('redirect') && this.shouldAjax()){
       urlType = 'ajax';
     } else {
       urlType = 'checkout';
@@ -242,11 +242,11 @@ Request.prototype = {
   },
 
   shouldPopup: function(){
-    return this.data.wallet !== 'mobikwik' || this.fees;
+    return !discreet.isFrame || this.data.wallet !== 'mobikwik' || this.fees;
   },
 
   shouldAjax: function(){
-    return !this.fees && !communicator;
+    return !this.fees;
   },
 
   shouldPost: function(){
@@ -284,7 +284,7 @@ Request.prototype = {
         $.ajax({
           url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel',
           headers: {
-            Authorization: 'Basic ' + _btoa(this.options.key + ':')
+            Authorization: 'Basic ' + _btoa(this.get('key') + ':')
           }
         })
       }
