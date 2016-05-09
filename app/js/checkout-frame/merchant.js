@@ -185,9 +185,6 @@ function showModal(session) {
     return;
   }
   var options = preferences.options;
-  try{
-    options.theme.color = '#' + options.theme.color;
-  } catch(e){}
   Razorpay.configure(options);
   showModalWithSession(session);
 }
