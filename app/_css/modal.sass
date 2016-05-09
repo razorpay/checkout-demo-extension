@@ -182,7 +182,6 @@ i
   font-size: $size;
   width: 344px;
   font-family: $font;
-  padding-bottom: $footerh;
 
 #content
   text-align: left;
@@ -196,7 +195,7 @@ i
   position: relative;
   overflow: hidden;
   max-height: $headerh;
-  z-index: 98;
+  z-index: 1;
 
   &:before
     content: "";
@@ -286,13 +285,12 @@ i
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
   transition: .3s transform ease-in 0s, .3s opacity ease-in 0s, .1s color;
-  +opacity(0);
   color: #757575;
   position: absolute;
   left: 0;
   right: 0;
   height: $topbarh;
-  z-index: 97;
+  z-index: 1;
 
   &:hover
     color: #404040;
@@ -317,11 +315,14 @@ i
   float: right;
   font-size: 12px;
 
-#tab-card
-  padding-top: 10px
+.tab-content
+  top: 50px;
 
 #modal .shown
   display: block;
+
+#form
+  position: static;
 
 #form-common
   padding: 20px 0 0;
@@ -338,21 +339,26 @@ i
     label
       border-radius: 0 0 0 $br;
 
-.footer
+#footer-mask, .footer
+  display: none;
+  background: #fff;
   position: absolute;
   left: 0;
-  bottom: -$footerh + 1px;
+  bottom: $footerh;
   width: 100%;
-  font-size: 16px;
-  line-height: 56px;
+  border-radius: 0 0 $br $br;
+  line-height: $footerh + 1px;
+  height: $footerh;
+
+.footer
+  bottom: 0;
   text-align: center;
   text-transform: uppercase;
-  border-radius: 0 0 $br $br;
-  background: #fafbfc;
+  font-size: 16px;
   color: #777;
-  z-index: 88;
-  opacity: 1;
   box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
+  transform: translateY(-100%);
+  opacity: 0;
   button
     cursor: pointer;
     position: relative;
@@ -371,8 +377,6 @@ i
   &:hover:before
     +opacity(0);
 
-#form.shown .footer
-  z-index: 89;
 
 .footer-desc
   display: none;

@@ -117,22 +117,23 @@ function noCvvToggle(e){
   $('#expiry-cvv').toggleClass('hidden', shouldHideExpiryCVV);
 }
 
-function makeVisible(){
-  this
+function makeVisible(subject){
+  $(subject)
     .css('display', 'block')
     .reflow()
     .addClass('shown');
 }
 
-function makeHidden(){
-  if(this[0]){
-    this.removeClass('shown');
-    invoke('hide', this, null, 200);
+function makeHidden(subject){
+  subject = $(subject);
+  if(subject[0]){
+    subject.removeClass('shown');
+    invoke('hide', subject, null, 200);
   }
 }
 
 function showOverlay($with){
-  makeVisible.call($('#overlay'));
+  makeVisible.call('#overlay');
   if($with){
     makeVisible.call($with);
   }
@@ -588,9 +589,14 @@ Session.prototype = {
     if (tab) {
       $body.addClass('tab');
       $('#tab-title').html(tab_titles[tab]);
+      makeHidden('#form-common');
+      makeVisible('#topbar');
+      makeVisible('#tab-' + tab);
     } else {
       $body.removeClass('tab');
-      $('.tab-content.shown').removeClass('shown');
+      makeHidden('.tab-content.shown');
+      makeVisible('#form-common');
+      makeHidden('#topbar');
     }
   },
 
@@ -610,14 +616,6 @@ Session.prototype = {
 
     $('#form-common').addClass('not-first');
 
-    // $('#body').toggleClass('tab', tab);
-
-    // if(tab){
-    //   $('#tab-title').html(tab_titles[tab]);
-    //   $('#user').html(gel("contact").value);
-    //   getTab(tab).addClass('shown');
-    // } else {
-    //   $('.tab-content.shown').removeClass('shown');
     this.setTopbar(tab);
     this.tab = tab;
     if (tab) {
