@@ -1,8 +1,13 @@
 var $ = function(el){
-  if(typeof el === 'string') {
-    return $(document.querySelector(el))
+  if (typeof el === 'string') {
+    return $(document.querySelector(el));
   }
-  if(!(this instanceof $)) { return new $(el) }
+  if (!(this instanceof $)) {
+    return new $(el);
+  }
+  if (el instanceof $) {
+    return el;
+  }
   this[0] = el;
 };
 
