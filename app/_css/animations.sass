@@ -50,11 +50,6 @@ $gridStagger: .05s;
   opacity: 0;
   transition: $first;
 
-.footer
-  opacity: 0;
-  transition: 0.3s transform;
-  transform: translateY(-$footerh);
-
 #topbar
   transform: translateY(-$topbarh);
   &.shown
@@ -76,12 +71,6 @@ $gridStagger: .05s;
   transition-delay: $second;
 
 #body.tab
-  #footer-mask, .footer
-    display: block;
-
-  #footer
-    transform: none;
-
   #form-common
     .pad
       transition: $first;
@@ -92,13 +81,8 @@ $gridStagger: .05s;
 
   #form.shown, #otp-form.shown.verify
     .footer
-      +opacity(1);
-      transform: translateY(0px);
-      transition-delay: $first;
-
-  #otp-form.error .footer
-    transform: translateY(-$footerh + 1px);
-    opacity: 0;
+      transition-delay: $second;
+      transform: none;
 
   #tab-card.shown .pad
     animation: $springTime spring;

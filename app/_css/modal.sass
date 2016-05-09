@@ -170,6 +170,7 @@ i
     position: static;
 
 #modal
+  padding-bottom: $footerh;
   box-sizing: border-box;
   display: inline-block;
   transition: 0.3s ease-in;
@@ -185,6 +186,8 @@ i
   font-family: $font;
 
 #content
+  border-radius: $br;
+  background: #fff;
   text-align: left;
   white-space: normal;
 
@@ -193,9 +196,9 @@ i
   color: #fff;
   background: #fff;
   padding: $p;
-  position: relative;
   overflow: hidden;
   max-height: $headerh;
+  position: relative;
   z-index: 1;
 
   &:before
@@ -271,11 +274,11 @@ i
       color: #ddd;
 
 #body
-  background: #fff;
+  z-index: 3;
+  margin-top: $topbarh;
   border-radius: 0 0 $br $br;
   min-height: $bodyh;
   position: relative;
-  box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
   transform: translate3d(0,0,0);
   backface-visibility: none;
 
@@ -291,7 +294,6 @@ i
   left: 0;
   right: 0;
   height: $topbarh;
-  z-index: 1;
 
   &:hover
     color: #404040;
@@ -316,8 +318,10 @@ i
   float: right;
   font-size: 12px;
 
-.tab-content
-  top: 50px;
+#form-common, .tab-content
+  z-index: 2;
+  top: 1px;
+  position: absolute!important;
 
 #modal .shown
   display: block;
@@ -326,7 +330,10 @@ i
   position: static;
 
 #form-common
+  position: relative;
+  margin-top: -50px;
   padding: 20px 0 0;
+  z-index: 2;
 
   .legend
     margin: 9px 0;
@@ -340,26 +347,28 @@ i
     label
       border-radius: 0 0 0 $br;
 
-#footer-mask, .footer
-  display: none;
+.footer-mask
+  height: $footerh+10px;
   background: #fff;
+
+.footer-mask, .footer
   position: absolute;
   left: 0;
-  bottom: $footerh;
+  bottom: 0;
   width: 100%;
   border-radius: 0 0 $br $br;
-  line-height: $footerh + 1px;
-  height: $footerh;
 
 .footer
-  bottom: 0;
+  height: $footerh;
+  line-height: $footerh + 1px;
+  transition: 0.3s;
+  transform: translateY(-100%);
+  bottom: -$footerh;
   text-align: center;
   text-transform: uppercase;
   font-size: 16px;
   color: #777;
   box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
-  transform: translateY(-100%);
-  opacity: 0;
   button
     cursor: pointer;
     position: relative;
@@ -418,6 +427,7 @@ i
   padding: 10px 0;
 
 #payment-options
+  background: #fff;
   border-top: 1px solid $bc;
 
   label
