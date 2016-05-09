@@ -4,7 +4,7 @@ function makeFormHtml64(url, data){
   return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>');
 }
 
-var pollingInterval, communicator;
+var pollingInterval;
 
 function clearPollingInterval(force){
   if(force || pollingInterval){
