@@ -120,14 +120,14 @@ function Request(params){
   }
 
   var popup,
-    options = this.options,
     data = this.data,
     url = this.makeUrl();
 
-  if(options.redirect){
+  if(this.get('redirect')){
     // add callback_url if redirecting
-    if(options.callback_url){
-      data.callback_url = options.callback_url;
+    var callback_url = this.get('callback_url');
+    if(callback_url){
+      data.callback_url = callback_url;
     }
     return discreet.redirect({
       url: url,
@@ -142,10 +142,10 @@ function Request(params){
   if(this.shouldPopup()){
     popup = this.makePopup();
     // open new tab
-    if(!popup){
-      localStorage.removeItem('payload');
-      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
-    }
+    // if(!popup) {
+      // localStorage.removeItem('payload');
+      // submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
+    // }
   } else {
     data['_[source]'] = 'checkoutjs';
   }
@@ -153,7 +153,7 @@ function Request(params){
   if(this.shouldAjax()){
     this.makeAjax();
   } else {
-    localStorage.setItem('payload', makeFormHtml64(url, data));
+    // localStorage.setItem('payload', makeFormHtml64(url, data));
     submitForm(url, data, 'post', popup.name);
   }
 
@@ -173,7 +173,7 @@ Request.prototype = {
     }
 
     var data = this.data = params.data;
-    this.options = params.options || emo;
+    this.get = new Options(params.options).get;
     this.fees = params.fees;
     this.success = params.success || noop;
     this.error = params.error || noop;
@@ -200,7 +200,7 @@ Request.prototype = {
     var urlType;
     if(this.fees){
       urlType = 'fees';
-    } else if(!this.options.redirect && this.shouldAjax()){
+    } else if(!this.get('redirect') && this.shouldAjax()){
       urlType = 'ajax';
     } else {
       urlType = 'checkout';
@@ -246,7 +246,7 @@ Request.prototype = {
   },
 
   shouldAjax: function(){
-    return discreet.isFrame && !this.fees && !communicator;
+    return !this.fees;
   },
 
   shouldPost: function(){
@@ -284,7 +284,7 @@ Request.prototype = {
         $.ajax({
           url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel',
           headers: {
-            Authorization: 'Basic ' + _btoa(this.options.key + ':')
+            Authorization: 'Basic ' + _btoa(this.get('key') + ':')
           }
         })
       }
