@@ -200,7 +200,8 @@ function showModal(session) {
     })
     return;
   }
-  Razorpay.configure(preferences.options);
+  var options = preferences.options;
+  Razorpay.configure(options);
   showModalWithSession(session);
 }
 

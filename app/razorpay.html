@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
-  <script src="config.js"></script>
+  <!-- <script src="config.js"></script> -->
   <!-- build:js razorpay.js -->
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
@@ -50,7 +50,8 @@
   </div>
   <script>
       Razorpay.configure({
-        key: 'rzp_test_1DP5mmOlF5G5ag'
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        callback_url: 'https://google.com'
       });
 
       function updateAmount(el) {
@@ -72,8 +73,8 @@
             amount: val('amount').replace(/[^0-9]+/,'')*100,
             email: val('customer_email'),
             contact: val('customer_phone'),
-            method: 'netbanking',
-            bank: 'SBIN'
+            method: 'wallet',
+            wallet: 'mobikwik'
             // method: 'card',
             // 'card[name]': val('card_name'),
             // 'card[number]': val('card_number'),
