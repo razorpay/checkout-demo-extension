@@ -5,7 +5,7 @@ attr = function(attr){return attr.replace(/"/g,'')};
 
 var amount;
 if(o('display_currency'))
-  amount = it.currencies[o('display_currency')] + html(o('display_amount'));
+  amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + (o('amount')/100).toFixed(2).replace(".00", "");
 

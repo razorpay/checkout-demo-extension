@@ -39,4 +39,4 @@ describe 'display_currency', ->
   openCheckoutForm opts
 
   expect jQuery('#form [type=submit]').text().trim()
-    .to.be 'Pay  $' + opts.display_amount
+    .to.be 'PAY \u00A0$' + opts.display_amount
