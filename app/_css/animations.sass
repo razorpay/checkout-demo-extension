@@ -70,6 +70,10 @@ $gridStagger: .05s;
 .tab-content.shown
   transition-delay: $second;
 
+#footer.shown
+  transition-delay: $second;
+  transform: none;
+
 #body.tab
   #form-common
     .pad
@@ -78,11 +82,6 @@ $gridStagger: .05s;
     .legend, #payment-options
       opacity: 0;
       transition: $first;
-
-  #form.shown, #otp-form.shown.verify
-    .footer
-      transition-delay: $second;
-      transform: none;
 
   #tab-card.shown .pad
     animation: $springTime spring;

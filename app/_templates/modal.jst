@@ -48,17 +48,16 @@ var gridClass = gridClasses[i-1];
             <div id="merchant-desc">{{=html(o('description'))}}</div>
             <div id="amount">{{=amount}}</div>
           </div>
-          <div class="clear"></div>
-        </div>
-        <div id="topbar">
-          <div id="user"></div>
-          <i class="back">&#xe604;</i>
-          <div id="tab-title"></div>
         </div>
         <div id="body">
-          <form id="form" class="showable shown" method="POST" novalidate autocomplete="off" onsubmit="return false">
+          <div id="topbar">
+            <div id="user"></div>
+            <i class="back">&#xe604;</i>
+            <div id="tab-title"></div>
+          </div>
+          <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              <div id="form-common" class="showable shown">
+              <div id="form-common" class="showable shown screen">
                 <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
@@ -88,7 +87,7 @@ var gridClass = gridClasses[i-1];
                 <div class="clear"></div>
               </div>
               {{? method.card }}
-                <div class="tab-content showable" id="tab-card">
+                <div class="tab-content showable screen" id="tab-card">
                   <div class="pad">
                     <input type="hidden" name="method" value="card">
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
@@ -142,7 +141,7 @@ var gridClass = gridClasses[i-1];
                 </div>
               {{?}}
               {{? method.netbanking }}
-                <div class="tab-content showable" id="tab-netbanking">
+                <div class="tab-content showable screen" id="tab-netbanking">
                   <input type="hidden" name="method" value="netbanking">
                   {{ var count = 0, max = 3; }}
                   <div id="netb-banks" class="clear grid">
@@ -182,7 +181,7 @@ var gridClass = gridClasses[i-1];
                 </div>
               {{?}}
               {{ if(wallet){ }}
-                <div class="tab-content showable" id="tab-wallet">
+                <div class="tab-content showable screen" id="tab-wallet">
                   <input type="hidden" name="method" value="wallet">
                   {{ var count = 0, max = 2; }}
                   <div id="wallets" class="clear grid double">
@@ -206,33 +205,26 @@ var gridClass = gridClasses[i-1];
                   </div>
                 </div>
               {{}}}
-            </div>
-            <div class="footer">
-              <div class="footer-desc">Amount to pay: {{=amount}}</div>
-              <button id="submitbtn" class="button" type="submit">PAY &nbsp;{{=amount}}</button>
-            </div>
-            <div class="footer-mask"></div>
-          </form>
-          <form id="otp-form" class="showable">
-            <div>
-              <strong id='otp-prompt'></strong>
-              <div id="otp-action" class="btn">Retry</div>
-              <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
-              <div class="spin">
-                <div></div>
-              </div>
-              <div class="spin spin2">
-                <div></div>
-              </div>
-              <div class="double clear pad">
-                <span class='link first'></span>
-                <span class='link grey second'></span>
+              <div id="tab-otp" class="tab-content showable screen">
+                <strong id='otp-prompt'></strong>
+                <div id="otp-action" class="btn">Retry</div>
+                <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
+                <div class="spin">
+                  <div></div>
+                </div>
+                <div class="spin spin2">
+                  <div></div>
+                </div>
+                <div class="double clear pad">
+                  <span class='link first'></span>
+                  <span class='link grey second'></span>
+                </div>
               </div>
             </div>
-            <div class="footer">
-              <button id="otpbtn" class="button" type="submit">Verify</button>
-            </div>
-            <div class="footer-mask"></div>
+            <button id="footer" type="submit" class="button">
+              <span class="pay-btn">PAY &nbsp;{{=amount}}</span>
+              <span class="otp-btn">Verify</span>
+            </button>
           </form>
         </div>
       </div>

@@ -489,8 +489,6 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
 
-    this.on('submit', '#otp-form', this.onOtpSubmit);
-
     var enabledMethods = this.methods;
 
     if(enabledMethods.netbanking){
@@ -584,19 +582,23 @@ Session.prototype = {
     }
   },
 
-  setTopbar: function(tab){
+  setScreen: function(screen){
     var $body = $('#body');
-    if (tab) {
-      $body.addClass('tab');
-      $('#tab-title').html(tab_titles[tab]);
-      makeHidden('#form-common');
+    makeHidden('.screen.shown');
+    $body.toggleClass('tab', screen);
+    $('#footer').toggleClass('shown', screen);
+
+    if (screen) {
+      $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
-      makeVisible('#tab-' + tab);
+      makeVisible('#tab-' + screen);
     } else {
-      $body.removeClass('tab');
-      makeHidden('.tab-content.shown');
       makeHidden('#topbar');
       makeVisible('#form-common');
+    }
+
+    if (screen !== 'otp'){
+      $('#footer').removeClass('otp');
     }
   },
 
@@ -608,15 +610,13 @@ Session.prototype = {
       return;
     }
     if (this.sub_tab) {
-      $('#otp-form').removeClass('shown');
-      $('#form').addClass('shown');
       this.sub_tab = null;
       tab = 'wallet';
     }
 
     $('#form-common').addClass('not-first');
 
-    this.setTopbar(tab);
+    this.setScreen(tab);
     this.tab = tab;
     if (tab) {
       // if (tab === 'card') {
@@ -750,17 +750,17 @@ Session.prototype = {
     if (!this.sub_tab || !this.isOpen) {
       return;
     }
-    $('#otp-form').addClass('shown');
-    $('#form').removeClass('shown');
-    $('#otp-form').toggleClass('loading', state.loading);
-    $('#otp-form').toggleClass('verify', state.verify);
-    $('#otp-form').toggleClass('error', state.error);
+    $('#tab-otp').toggleClass('loading', state.loading);
+    $('#footer').toggleClass('shown', state.verify);
+    $('#tab-otp').toggleClass('error', state.error);
     $('#otp').toggleClass('shown', state.otp);
 
     var wallet = state.wallet;
     if(wallet){
       var walletObj = freqWallets[wallet];
-      gel('tab-title').innerHTML = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
+      tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
+      this.setScreen('otp');
+      invoke('addClass', $('#footer'), 'otp', 300);
     }
 
     if(state.number){
@@ -799,6 +799,9 @@ Session.prototype = {
   },
 
   submit: function(e) {
+    if (this.sub_tab) {
+      return this.onOtpSubmit(e);
+    }
     preventDefault(e);
     this.smarty.refresh();
 

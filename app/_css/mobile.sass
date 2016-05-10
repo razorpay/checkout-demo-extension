@@ -11,7 +11,7 @@ $max-height: 659px;
     -webkit-text-size-adjust: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 
-  #header, .footer, .button
+  #header, #footer, .button
     border-radius: 0;
 
   &:after
@@ -28,7 +28,7 @@ $max-height: 659px;
     top: 0;
 
   #body
-    min-height: $bodyhMobile;
+    min-height: 311px;
 
   #content #body
     top: $headerh;
@@ -66,7 +66,7 @@ $max-height: 659px;
     min-height: 100%;
     margin: 0 auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    transform: translateY(7%) scale(0.92);
+    transform: translateY(7%);
 
   &.shown #modal
     transition: 0.3s ease-out all;
@@ -90,14 +90,8 @@ $max-height: 659px;
   .tab-content.shown .item-inner
     opacity: 1;
 
-  .footer
-    bottom: 0;
-    transform: translateY(0);
-
-  #body.tab
-   #form, #otp-form
-    .footer
-      z-index: 92;
+  #footer
+    transform: translateY(100%);
 
 @media (max-device-height: 450px), (max-device-width: 450px)
   +mobile-view();
