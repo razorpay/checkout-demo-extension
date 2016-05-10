@@ -20,19 +20,10 @@ $max-height: 659px;
   .shake
     animation: none;
 
-  #modal-inner, #body
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-
   #body
     min-height: 311px;
-
-  #content #body
-    top: $headerh;
-    position: absolute;
+    &.tab
+      padding-bottom: $footerh;
 
   #content
     height: 100%;
@@ -57,10 +48,8 @@ $max-height: 659px;
       font-size: 14px;
       margin-left: 10px;
 
-  #backdrop
-    background: none!important;
-
   #modal
+    overflow: hidden;
     background: #fff;
     width: 100%;
     min-height: 100%;
@@ -91,6 +80,9 @@ $max-height: 659px;
     opacity: 1;
 
   #footer
+    top: auto;
+    bottom: 0;
+    z-index: 10;
     transform: translateY(100%);
 
 @media (max-device-height: 450px), (max-device-width: 450px)
