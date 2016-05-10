@@ -36,6 +36,12 @@ emiView.prototype = {
   },
 
   bind: function(){
+    this.on('focus', '#emi-check-label', function(){
+      $('#body').addClass('emi-focus');
+    })
+    this.on('blur', '#emi-check-label', function(){
+      $('#body').removeClass('emi-focus');
+    })
     this.on('mousedown', '#emi-select', selectEmiBank);
     this.on('click', '#view-emi-plans', function(){showOverlay($('#emi-wrap'))});
     this.on('click', '#emi-close', hideEmi);
