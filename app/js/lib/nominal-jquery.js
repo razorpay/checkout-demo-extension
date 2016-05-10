@@ -5,9 +5,6 @@ var $ = function(el){
   if (!(this instanceof $)) {
     return new $(el);
   }
-  if (el instanceof $) {
-    return el;
-  }
   this[0] = el;
 };
 

@@ -135,14 +135,14 @@ function makeHidden(subject){
 function showOverlay($with){
   makeVisible('#overlay');
   if($with){
-    makeVisible($with);
+    makeVisible($with[0]);
   }
 }
 
 function hideOverlay($with){
   makeHidden($('#overlay'));
   if($with){
-    makeHidden($with);
+    makeHidden($with[0]);
   }
 }
 
@@ -494,9 +494,9 @@ Session.prototype = {
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
-      if(!window.addEventListener){
-        this.on('click', '#netb-banks .bank-radio', this.selectBankRadio);
-      }
+    }
+    if(!window.addEventListener){
+      this.on('click', '.radio-item', this.selectRadio);
     }
 
     if(enabledMethods.card){
@@ -682,6 +682,19 @@ Session.prototype = {
         }
       }
     )
+  },
+
+  // for ie8 only, which has problems with label[for]
+  selectRadio: function(e) {
+    var target = e.currentTarget;
+    var input = target.querySelector('input');
+    var ieActiveClass = 'ie-active';
+    $('.' + ieActiveClass).removeClass(ieActiveClass);
+    $(target).addClass(ieActiveClass);
+    input.checked = true;
+    if (this.tab === 'netbanking') {
+      this.selectBankRadio({target: input});
+    }
   },
 
   selectBankRadio: function(e){
