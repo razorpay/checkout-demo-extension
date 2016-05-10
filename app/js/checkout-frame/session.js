@@ -52,7 +52,7 @@ function makeEmiDropdown(emiObj, session){
 
 function setEmiBank(data){
   var activeEmiPlan = $('#emi-plans-wrap .active')[0];
-  if(activeEmiPlan){
+  if(getSession().tab === 'card' && activeEmiPlan){
     data.method = 'emi';
     data.emi_duration = activeEmiPlan.getAttribute('value');
   }
