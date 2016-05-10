@@ -104,7 +104,7 @@ describe 'init options.method', ->
     opts.method[disableTab] = false
     openCheckoutForm opts
     expect jQuery('.tab-content').length
-      .to.be 2
+      .to.be 3
     expect jQuery('#tab-' + disableTab).length
       .to.be 0
 

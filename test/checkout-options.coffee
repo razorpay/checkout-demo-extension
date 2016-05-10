@@ -38,5 +38,5 @@ describe 'display_currency', ->
   opts.display_amount = '123.435'
   openCheckoutForm opts
 
-  expect jQuery('#form [type=submit]').text().trim()
+  expect jQuery('#form [type=submit] .pay-btn').text().trim()
     .to.be 'PAY \u00A0$' + opts.display_amount
