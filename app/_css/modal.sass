@@ -274,10 +274,11 @@ i
 
 #body
   z-index: 3;
-  margin-top: $topbarh;
+  margin-top: $topbarh + 1px;
   border-radius: 0 0 $br $br;
   min-height: $bodyh;
   position: relative;
+  background: #fff;
   transform: translate3d(0,0,0);
   backface-visibility: none;
 
@@ -320,7 +321,7 @@ i
 #form-common, .tab-content
   background: #fff;
   z-index: 2;
-  top: 1px;
+  top: 0;
   bottom: 0;
   position: absolute!important;
 
