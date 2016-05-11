@@ -584,7 +584,6 @@ Session.prototype = {
     var $body = $('#body');
     makeHidden('.screen.shown');
     $body.toggleClass('tab', screen);
-    $('#modal').toggleClass('sub', screen);
 
     if (screen) {
       $('#tab-title').html(tab_titles[screen]);
@@ -596,6 +595,13 @@ Session.prototype = {
     }
 
     if (screen !== 'otp'){
+      var $modal = $('#modal');
+      if (this.tab === screen && screen === 'wallet') {
+        // otp field doesn't animate and gets displayed as soon as sub class is applied
+        invoke('addClass', $modal, 'sub', 300);
+      } else {
+        $modal.toggleClass('sub', screen);
+      }
       $('#footer').removeClass('otp');
     }
   },
