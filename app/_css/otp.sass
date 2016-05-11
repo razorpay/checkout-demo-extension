@@ -1,9 +1,7 @@
 @import common
 
 #tab-otp
-  position: static;
-  margin-top: $topbarh;
-  padding-top: 30px;
+  padding-top: 40px;
   text-align: center;
   &.otp
     #otp
@@ -13,7 +11,7 @@
       display: inline-block;
 
   .spin
-    top: 60px;
+    top: 90px;
 
 #otp-action
   margin-top: 20px;
@@ -33,16 +31,19 @@
   .pay-btn
     display: none;
 
+#otp-elem
+  position: relative;
+  margin: 30px auto;
+  width: 150px;
+
 #otp
   display: none;
   font-size: 18px;
   line-height: 24px;
   letter-spacing: 13px;
   font-family: monospace;
-  width: 150px;
   border-radius: 6px;
   overflow: hidden;
-  margin: 30px auto;
   text-indent: 7px;
   padding: 11px 0;
   border: none;

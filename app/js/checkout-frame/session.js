@@ -812,10 +812,16 @@ Session.prototype = {
   },
 
   submit: function(e) {
+    preventDefault(e);
+
+    var activeTab = $('.tab-content.shown');
+    if (activeTab[0] && this.checkInvalid(activeTab)){
+      return;
+    }
+
     if (this.sub_tab) {
       return this.onOtpSubmit(e);
     }
-    preventDefault(e);
     this.smarty.refresh();
 
     var nocvv_el = gel('nocvv-check');
@@ -836,11 +842,6 @@ Session.prototype = {
     }
 
     if(this.checkInvalid($('#form-common'))){
-      return;
-    }
-
-    var activeTab = $('.tab-content.shown');
-    if (activeTab[0] && this.checkInvalid(activeTab)){
       return;
     }
 

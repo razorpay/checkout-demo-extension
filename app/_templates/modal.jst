@@ -208,16 +208,15 @@ var gridClass = gridClasses[i-1];
               <div id="tab-otp" class="tab-content showable screen">
                 <strong id='otp-prompt'></strong>
                 <div id="otp-action" class="btn">Retry</div>
-                <input type='tel' pattern='^[0-9]{6}$' title='Please enter a valid OTP' name='otp' id='otp' maxlength='6' autocomplete="off" autofocus required>
+                <div id="otp-elem">
+                  <div class="help">Please enter 6 digit OTP</div>
+                  <input type="tel" class="input" pattern="^[0-9]{6}$" name="otp" id="otp" maxlength="6" autocomplete="off" required>
+                </div>
                 <div class="spin">
                   <div></div>
                 </div>
                 <div class="spin spin2">
                   <div></div>
-                </div>
-                <div class="double clear pad">
-                  <span class='link first'></span>
-                  <span class='link grey second'></span>
                 </div>
               </div>
             </div>

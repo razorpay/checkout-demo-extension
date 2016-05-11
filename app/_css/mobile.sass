@@ -11,7 +11,7 @@ $max-height: 659px;
     -webkit-text-size-adjust: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 
-  #header, #footer, .button
+  #header, #footer, .button, #emi-inner
     border-radius: 0;
 
   &:after
@@ -55,7 +55,6 @@ $max-height: 659px;
       margin-left: 10px;
 
   #modal
-    overflow: hidden;
     background: #fff;
     width: 100%;
     min-height: 100%;
@@ -65,7 +64,6 @@ $max-height: 659px;
 
   &.shown #modal
     transition: 0.3s ease-out all;
-    transform: none;
 
   #powered-by
     position: absolute;
@@ -86,7 +84,6 @@ $max-height: 659px;
     opacity: 1;
 
   #footer
-    top: auto;
     bottom: 0;
     z-index: 10;
     transform: translateY(100%);
