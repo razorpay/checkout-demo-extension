@@ -138,10 +138,10 @@ function Request(params){
     }
     popup = this.makePopup();
     // open new tab
-    // if(!popup) {
-      // localStorage.removeItem('payload');
-      // submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
-    // }
+    if(!popup) {
+      localStorage.removeItem('payload');
+      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
+    }
   } else {
     this.powerwallet = true;
     data['_[source]'] = 'checkoutjs';
@@ -153,9 +153,6 @@ function Request(params){
 
   if(this.shouldAjax()){
     this.makeAjax();
-  } else {
-    // localStorage.setItem('payload', makeFormHtml64(url, data));
-    submitForm(url, data, 'post', popup.name);
   }
 
   // adding listeners
