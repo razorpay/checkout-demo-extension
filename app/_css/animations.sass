@@ -1,6 +1,5 @@
 @import common
 
-
 @keyframes spring
   0%
     transform: translateY(-70px)
@@ -102,3 +101,23 @@ $gridStagger: .05s;
   .l-#{$i}
     transition-delay: $gridStagger*$i + $second;
 
+.shake
+  transform-origin: center;
+  animation-name: shake;
+  animation-duration: 400ms;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+
+@keyframes shake
+  0
+    transform: none
+  12.5%
+    transform: translateX(-6px) rotateY(-5deg)
+  37.5%
+    transform: translateX(5px) rotateY(4deg)
+  62.5%
+    transform: translateX(-3px) rotateY(-3deg)
+  87.5%
+    transform: translateX(2px) rotateY(2deg)
+  100%
+    transform: none
