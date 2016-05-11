@@ -123,23 +123,19 @@ function Request(params){
     data = this.data,
     url = this.makeUrl();
 
-  if(this.get('redirect')){
-    // add callback_url if redirecting
-    var callback_url = this.get('callback_url');
-    if(callback_url){
-      data.callback_url = callback_url;
-    }
-    return discreet.redirect({
-      url: url,
-      content: data,
-      method: 'post'
-    });
-  }
-
-  if(!discreet.supported(true)){
-    return true;
-  }
   if(this.shouldPopup()){
+    if(this.get('redirect')){
+      // add callback_url if redirecting
+      var callback_url = this.get('callback_url');
+      if(callback_url){
+        data.callback_url = callback_url;
+      }
+      return discreet.redirect({
+        url: url,
+        content: data,
+        method: 'post'
+      });
+    }
     popup = this.makePopup();
     // open new tab
     // if(!popup) {
@@ -148,6 +144,10 @@ function Request(params){
     // }
   } else {
     data['_[source]'] = 'checkoutjs';
+  }
+
+  if(!discreet.supported(true)){
+    return true;
   }
 
   if(this.shouldAjax()){
@@ -200,7 +200,7 @@ Request.prototype = {
     var urlType;
     if(this.fees){
       urlType = 'fees';
-    } else if(!this.get('redirect') && this.shouldAjax()){
+    } else if(this.shouldAjax()){
       urlType = 'ajax';
     } else {
       urlType = 'checkout';
@@ -241,10 +241,12 @@ Request.prototype = {
     }
   },
 
+  // checks whether to use powerwallet or not
   shouldPopup: function(){
     return !discreet.isFrame || this.fees || (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney');
   },
 
+  // virtually all the time, unless there isn't an ajax based route
   shouldAjax: function(){
     return !this.fees;
   },

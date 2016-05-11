@@ -1,27 +1,24 @@
 @import common
 
+#modal.sub
+  #otp-elem
+      display: block;
+
 #tab-otp
   padding-top: 40px;
   text-align: center;
-  &.otp
-    #otp
-      display: block;
   &.error
     #otp-action
       display: inline-block;
 
-  .spin
-    top: 90px;
-
 #otp-action
-  margin-top: 20px;
   display: none;
 
 #otp-prompt
   text-align: center;
   width: 240px;
   display: block;
-  margin: 0 auto;
+  margin: 0 auto 30px;
   font-size: 14px;
   line-height: 20px;
 
@@ -32,12 +29,12 @@
     display: none;
 
 #otp-elem
+  display: none;
   position: relative;
-  margin: 30px auto;
+  margin: 0 auto;
   width: 150px;
 
 #otp
-  display: none;
   font-size: 18px;
   line-height: 24px;
   letter-spacing: 13px;
