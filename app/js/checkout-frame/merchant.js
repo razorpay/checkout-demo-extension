@@ -371,11 +371,11 @@ window.handleMessage = function(message){
   if(message.context){
     discreet.context = message.context;
   }
-  if(message.embedded){
-    // addBodyClass('embedded');
-  }
   if(message.config){
     RazorpayConfig = message.config;
+  }
+  if(message.data){
+    session.data = message.data;
   }
   if(message.event === 'open' || message.options){
     showModal(session);
