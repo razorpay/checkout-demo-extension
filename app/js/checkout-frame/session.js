@@ -140,7 +140,7 @@ function showOverlay($with){
 }
 
 function hideOverlay($with){
-  makeHidden($('#overlay'));
+  makeHidden('#overlay');
   if($with){
     makeHidden($with[0]);
   }
@@ -156,11 +156,9 @@ function hideEmi(){
 }
 
 function hideOverlayMessage(){
-  var errEl = $('#error-message');
-  if(!errEl.hasClass('shown')){
-    errEl = $('#powerwallet');
+  if(!hideEmi()){
+    hideOverlay($('#error-message'));
   }
-  hideOverlay(errEl);
 }
 
 function overlayVisible(){
@@ -586,7 +584,7 @@ Session.prototype = {
     var $body = $('#body');
     makeHidden('.screen.shown');
     $body.toggleClass('tab', screen);
-    $('#footer').toggleClass('shown', screen);
+    $('#modal').toggleClass('sub', screen);
 
     if (screen) {
       $('#tab-title').html(tab_titles[screen]);
@@ -764,7 +762,7 @@ Session.prototype = {
       return;
     }
     $('#tab-otp').toggleClass('loading', state.loading);
-    $('#footer').toggleClass('shown', state.verify);
+    $('#modal').toggleClass('sub', state.verify);
     $('#tab-otp').toggleClass('error', state.error);
     $('#otp').toggleClass('shown', state.otp);
 
@@ -797,10 +795,12 @@ Session.prototype = {
     if(powerotp){
       powerotp.value = '';
     }
-    if(this.request){
-      if(this.request.ajax){
-        this.request.ajax.abort();
+    var request = this.request;
+    if(request){
+      if(request.ajax){
+        request.ajax.abort();
       }
+      request.cancel();
       this.request = null;
     }
     clearTimeout(this.requestTimeout);

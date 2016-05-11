@@ -45,8 +45,10 @@ $gridStagger: .05s;
   transition: $first;
 
 #topbar
+  opacity: 0;
   transform: translateY(-$topbarh);
   &.shown
+    opacity: 1;
     transform: translateY(0);
     transition: $first transform ease-out $first, $first opacity ease-out $first, .1s color;
 
@@ -64,27 +66,30 @@ $gridStagger: .05s;
 .tab-content.shown
   transition-delay: $second;
 
-#footer.shown
-  transition-delay: $second;
-  transform: none!important;
+#modal
+  &.sub
+    #footer
+      transition-delay: $second;
+      transform: none;
 
-#body.tab
-  #form-common
-    .pad
+#body
+  &.tab
+    #form-common
+      .pad
+        transition: $first;
+
+      .legend, #payment-options
+        opacity: 0;
+        transition: $first;
+
+    #tab-card.shown .pad
+      animation: $springTime spring;
+      animation-delay: $second;
+
+    #tab-netbanking .select
       transition: $first;
-
-    .legend, #payment-options
-      opacity: 0;
-      transition: $first;
-
-  #tab-card.shown .pad
-    animation: $springTime spring;
-    animation-delay: $second;
-
-  #tab-netbanking .select
-    transition: $first;
-    transition-delay: $second + $gridStagger*6 +$gridStagger;
-    opacity: 1;
+      transition-delay: $second + $gridStagger*6 +$gridStagger;
+      opacity: 1;
 
 .item-inner
   position: relative;
