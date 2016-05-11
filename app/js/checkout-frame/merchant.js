@@ -216,10 +216,10 @@ function showModalWithSession(session){
   }
 
   if(qpmap.error){
-    session.errorHandler(qpmap);
+    errorHandler.call(session, qpmap);
   }
   if(qpmap.tab){
-    session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
+    session.switchTab(qpmap.tab);
   }
 }
 

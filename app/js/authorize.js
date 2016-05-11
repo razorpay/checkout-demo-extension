@@ -143,6 +143,7 @@ function Request(params){
       // submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
     // }
   } else {
+    this.powerwallet = true;
     data['_[source]'] = 'checkoutjs';
   }
 
@@ -200,10 +201,10 @@ Request.prototype = {
     var urlType;
     if(this.fees){
       urlType = 'fees';
-    } else if(this.shouldAjax()){
-      urlType = 'ajax';
-    } else {
+    } else if(this.get('redirect') && !this.powerwallet){
       urlType = 'checkout';
+    } else {
+      urlType = 'ajax';
     }
     return discreet.makeUrl() + 'payments/create/' + urlType;
   },
