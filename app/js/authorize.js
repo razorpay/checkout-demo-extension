@@ -82,10 +82,16 @@ function onMessage(e){
 
 // this === request
 function ajaxCallback(response){
-  this.payment_id = response.payment_id;
+  if (response.payment_id) {
+    this.payment_id = response.payment_id;
+  }
 
   if(response.razorpay_payment_id || response.error){
-    this.complete(response);
+    if (response.error.action === 'TOPUP') {
+      this.insufficientFundsHandler();
+    } else {
+      this.complete(response);
+    }
   } else {
     var nextRequest = response.request;
     if(response.type === 'otp'){
@@ -95,6 +101,7 @@ function ajaxCallback(response){
     }
   }
 }
+
 
 function makeSecondfactorCallback(request, nextRequest){
   return function(factor){
@@ -175,10 +182,16 @@ Request.prototype = {
     var data = this.data = params.data;
     this.get = new Options(params.options).get;
     this.fees = params.fees;
+    this.overridePowerWallet = params.overridePowerWallet;
     this.success = params.success || noop;
     this.error = params.error || noop;
+    this.payment_id = params.payment_id;
     if(params.secondfactor){
       this.secondfactor = params.secondfactor;
+    }
+
+    if (params.insufficientFundsHandler) {
+      this.insufficientFundsHandler = params.insufficientFundsHandler;
     }
 
     if(!data.key_id){
@@ -197,6 +210,10 @@ Request.prototype = {
   },
 
   makeUrl: function(){
+    if (this.overridePowerWallet && this.payment_id) {
+      return discreet.makeUrl() + 'payments/' + this.payment_id + '/topup';
+    }
+
     var urlType;
     if(this.fees){
       urlType = 'fees';
@@ -243,7 +260,7 @@ Request.prototype = {
 
   // checks whether to use powerwallet or not
   shouldPopup: function(){
-    return !discreet.isFrame || this.fees || (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney');
+    return !discreet.isFrame || this.fees || this.overridePowerWallet || (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney');
   },
 
   // virtually all the time, unless there isn't an ajax based route
