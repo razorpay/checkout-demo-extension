@@ -1,3 +1,33 @@
+function ensureNumeric(e){
+  return ensureRegex(e, /[0-9]/);
+}
+
+function ensurePhone(e){
+  return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
+}
+
+function ensureExpiry(e){
+  var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
+  return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
+}
+
+function ensureRegex(e, regex){
+  if(!e) { return '' }
+
+  var which = e.which;
+  if(typeof which !== 'number'){
+    which = e.keyCode;
+  }
+
+  if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
+  var character = String.fromCharCode(which);
+  if(regex.test(character)){
+    return character;
+  }
+  preventDefault(e);
+  return false;
+}
+
 var Card;
 (function(){
 
@@ -91,36 +121,6 @@ var Card;
     return el.value.length;
   }
 
-  function ensureNumeric(e){
-    return ensureRegex(e, /[0-9]/);
-  }
-
-  function ensurePhone(e){
-    return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
-  }
-
-  function ensureExpiry(e){
-    var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
-    return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
-  }
-
-  function ensureRegex(e, regex){
-    if(!e) { return '' }
-
-    var which = e.which;
-    if(typeof which !== 'number'){
-      which = e.keyCode;
-    }
-
-    if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
-    var character = String.fromCharCode(which);
-    if(regex.test(character)){
-      return character;
-    }
-    preventDefault(e);
-    return false;
-  }
-
   var expLen = 0;
   var ReFormatExpiry = function(e){
     var el = e.target;
@@ -189,13 +189,12 @@ var Card;
   };
 
   var FormatExpiryBack = function(e){
-    var el = e.target;
     if((e.which || e.keyCode) !== 8) { return }
+    var el = e.target;
     var pos = CheckSelection(el);
-
     if(pos === 5 && el.value.slice(2, 5) === ' / '){
       preventDefault(e);
-      el.value = el.value.slice(0, 2);
+      el.value = el.value.slice(0, 1);
     }
   }
 

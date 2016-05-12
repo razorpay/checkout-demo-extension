@@ -1,0 +1,434 @@
+@import common
+
+.clear
+  clear: both;
+  overflow: auto;
+
+.mfix
+  white-space: nowrap;
+
+  &:after
+    content: '';
+    height: 96%;
+    display: inline-block;
+    width: 0;
+    vertical-align: middle;
+
+body, html
+  margin: 0;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+
+.double
+  width: 100%;
+  .second
+    text-align: right;
+  .first, .second
+    float: left;
+    width: 50%;
+
+.pad
+  padding: 0 24px;
+  box-sizing: border-box;
+
+.grid
+  text-align: center;
+
+  &.double .item
+    width: 50%;
+    border-right: none;
+    &:nth-child(2n)
+      border-left: 1px solid $bc;
+
+  &.single .item
+    width: 100%;
+
+  .item
+    cursor: pointer;
+    width: 33.33%;
+    float: left;
+    transition: .2s;
+    border-bottom: 1px solid $bc;
+    border-right: 1px solid $bc;
+    box-sizing: border-box;
+    &:nth-child(3n)
+      border-right: none;
+
+  label
+    box-sizing: border-box;
+    position: relative;
+    cursor: inherit;
+    height: 86px;
+    display: block;
+    font-size: 14px;
+    &:hover
+      background: $bg;
+
+  img
+    // IE not accepting click as click on parent label
+    pointer-events: none;
+    height: 24px;
+    margin-bottom: 3px;
+
+.link
+  text-decoration: underline;
+  cursor: pointer
+
+.mchild
+  vertical-align: middle;
+  display: inline-block;
+  white-space: normal;
+
+a
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+
+i
+  font-style: normal;
+  opacity: 0;
+
+.spin
+  display: none;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto -60px;
+
+  div
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    display: inline-block;
+    border-radius: 50%;
+    border: 4px solid #29b7d6;
+    animation: spin 1.3s linear infinite;
+    box-sizing: border-box;
+    opacity: 0;
+
+.spin2
+  div
+    animation-delay: 0.65s;
+
+@keyframes spin
+  0%
+    transform: scale(0.5);
+    opacity: 0;
+    border-width: 8px;
+  20%
+    transform: scale(0.6);
+    opacity: 0.8;
+    border-width: 4px;
+  90%
+    transform: scale(1);
+    opacity: 0;
+
+.loading .spin
+  display: block;
+
+#container
+  margin: 0 auto;
+  height: 100%;
+  outline: none;
+  text-align: center;
+  transition: 0.3s ease-out opacity;
+  transform: translate3d(0,0,0);
+  z-index: 19999;
+
+  &.shown
+    opacity: 1;
+
+    #powered-by
+      opacity: 1;
+
+    #modal
+      opacity: 1;
+      transform: none;
+      transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
+
+.font-loaded
+  #modal, button, input, select
+    font-family: $lato;
+    font-feature-settings: 'liga' 0;
+
+  #powered-by
+    visibility: visible;
+    opacity: 1;
+
+  i
+    opacity: 1;
+
+  .iph
+    display: none;
+
+  #amount i
+    position: static;
+
+#modal
+  box-sizing: border-box;
+  display: inline-block;
+  transition: 0.3s ease-in;
+  z-index: 1;
+  perspective: 300;
+  outline: none;
+  position: relative;
+  opacity: 0;
+  transform: scale(0.9);
+  color: $col;
+  font-size: $size;
+  width: 344px;
+  font-family: $font;
+
+#content
+  text-align: left;
+  white-space: normal;
+
+#header
+  border-radius: $br $br 0 0;
+  color: #fff;
+  background: #fff;
+  padding: $p;
+  overflow: hidden;
+  max-height: $headerh;
+  position: relative;
+  z-index: 3;
+
+  &:before
+    content: "";
+    left: 0; right: 0;
+    bottom: 0; top: 0;
+    position: absolute;
+    background-image: linear-gradient(to bottom right, rgba(255,255,255,.2), rgba(0,0,0,.2));
+
+.close
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.6;
+
+#logo
+  text-align: center;
+  position: relative;
+  padding: 8px;
+  width: 64px;
+  height: 64px;
+  background: #fff;
+  border-radius: $br;
+  line-height: 62px;
+  float: left;
+  margin-right: $p;
+  box-shadow: $bs;
+
+  img
+    vertical-align: middle;
+    max-height: 100%;
+    max-width: 100%;
+
+#merchant
+  white-space: nowrap;
+  position: relative;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.12);
+
+#merchant-name
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 20px;
+
+#merchant-desc
+  text-overflow: ellipsis;
+  overflow: hidden;
+  opacity: 0.8;
+
+#amount
+  font-size: 24px;
+  margin-top: 10px;
+  i
+    position: absolute;
+
+#powered-by
+  left: 0;
+  visibility: hidden;
+  opacity: 0;
+  width: 100%;
+  bottom: -60px;
+  display: block;
+  font-size: 36px;
+  transition: 0.3s;
+  position: absolute;
+  transition-delay: 0.2s;
+  font-family: $lato;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+
+  a
+    color: #bbb;
+    outline: none;
+    line-height: 36px;
+    transition: 0.3s;
+    text-decoration: none;
+    &:hover
+      color: #ddd;
+
+#body
+  border-radius: 0 0 $br $br;
+  height: 317px;
+  background: #fff;
+  backface-visibility: none;
+  &.emi-focus
+    position: relative;
+    z-index: 10;
+    #form-fields
+      z-index: 2;
+      background: transparent;
+
+#form, #form-fields
+  height: 100%;
+
+#form-fields
+  position: relative;
+  z-index: 1;
+  border-radius: 0 0 $br $br;
+  background: #fff;
+
+#topbar
+  display: none;
+  cursor: pointer;
+  background: $bg;
+  padding: 0 $p;
+  line-height: $topbarh;
+  border-bottom: 1px solid $bc;
+  transition: .3s transform ease-in 0s, .3s opacity ease-in 0s, .1s color;
+  color: #757575;
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  height: $topbarh;
+  z-index: 2;
+
+  &:hover
+    color: #404040;
+
+  img
+    display: block;
+    margin-top: 15px;
+
+#tab-title
+  font-size: 16px;
+  line-height: $topbarh;
+
+.back
+  float: left;
+  margin: 0px 6px 0 0;
+  font-size: 12px;
+
+#user
+  display: none;
+  float: right;
+  font-size: 12px;
+
+#modal .shown
+  display: block;
+
+.tab-content
+  top: $topbarh+1px;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  background: #fff;
+  z-index: 4;
+
+#form-common
+  padding: 20px 0 0;
+
+  .legend
+    margin: 9px 0;
+    margin-top: 10px;
+
+.otp-btn
+  display: none;
+
+#footer
+  position: absolute;
+  left: 0;
+  bottom: -$footerh;
+  width: 100%;
+  border-radius: 0 0 $br $br;
+  height: $footerh;
+  line-height: $footerh + 1px;
+  transition: 0.3s;
+  transform: translateY(-100%);
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 16px;
+  box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
+  &:before
+    content: "";
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transition: .2s;
+    opacity: 1;
+    background: linear-gradient(180deg, rgba(255,255,255,.1), rgba(0,0,0,.1));
+    pointer-events: none;
+
+  &:hover:before
+    opacity: 0;
+
+.button
+  display: block;
+  border: none;
+  width: 100%;
+  border-radius: 0 0 $br $br;
+  font-size: 18px;
+  padding: 0;
+  line-height: 54px;
+  width: 100%;
+  color: #fff;
+  transition: .2s;
+  font-weight: bold
+  position: relative;
+
+  &:active
+    box-shadow: 0 2px 10px -5px #000 inset;
+
+#tab-card
+  i
+    display: none;
+
+#nocvv
+  display: none;
+
+.legend
+  text-transform: uppercase;
+  font-size: 12px;
+  text-align: center;
+  padding: 10px 0;
+
+#payment-options
+  border-top: 1px solid $bc;
+  background: #fff;
+
+  label
+    padding-top: 20px;
+    height: 97px;
+
+  i
+    display: block;
+    font-size: 40px;
+    color: $pri;
+    margin: 0 0 -4px;
+    transition: 0.3s;
+
+  .item
+    border-bottom: none!important;
+
+
+.stackable
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 $br $br;
+  background: #fff;

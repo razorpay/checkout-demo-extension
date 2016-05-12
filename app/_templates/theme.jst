@@ -1,26 +1,29 @@
-button,
-.btn,
-#tab-bar
+{{ var c = it('theme.color'), frame = it('theme.image_padding'), close = it('theme.close_btn'); }}
+
+.button, .btn
 {
-  background: {{=it.color}};
+  background: {{=c}};
 }
 
-.radio-label:hover,
-input[type=radio]:checked + label,
-#tabs li.active
+.spin div
 {
-  border-color: {{=it.color}}!important;
+  border-color: {{=c}}!important;
 }
 
-#tab-wallet input:checked+label:after{
-  color: {{=it.color}};
+#tab-wallet input:checked+label:after,
+#payment-options i
+{
+  color: {{=c}};
 }
 
-.spin div {
-  border-color: {{=it.color}}!important;
+#header{
+  background: {{=c}};
 }
 
-{{?it.image_padding}}
+.link{
+  color: {{=c}}
+}
+
 .merchant-image{
   width: 60px;
   height: 60px;
@@ -28,19 +31,22 @@ input[type=radio]:checked + label,
   border: 1px solid #eaeaea;
   background: #fff;
 }
-{{?}}
 
 .option.active,
 .checked .checkbox,
 input[type=checkbox]:checked + .checkbox
 {
   color: #fff;
-  background: {{=it.color}};
-  border-color: {{=it.color}};
+  background: {{=c}};
+  border-color: {{=c}};
 }
 
-{{?!it.close_button}}
+{{?close}}
 #modal-close{
   display: none;
 }
 {{?}}
+
+.grid :checked+label {
+  border-bottom: 2px solid {{=c}};
+}

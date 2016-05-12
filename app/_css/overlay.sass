@@ -1,0 +1,45 @@
+@import common
+
+#overlay
+  position: absolute;
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  bottom: -$footerh;
+  z-index: 99;
+  border-radius: $br;
+
+#overlay
+  background: rgba(0, 0, 0, 0.3);
+
+#error-message
+  border-radius: 0 0 $br $br;
+  background: #fff;
+  bottom: -$footerh;
+  position: absolute;
+  width: 100%;
+  z-index: 20;
+  display: none;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.16);
+  height: 150px;
+  transition: 0.2s;
+  padding-top: 20px;
+  z-index: 99;
+
+  &.shown
+    height: 180px;
+
+  &.loading
+    .spin
+      display: block;
+    #fd-hide
+      display: none;
+
+#fd-t
+  white-space: normal;
+  padding: 20px 30px;
+  line-height: 22px;
+
+#fd-hide
+  border-radius: $br;

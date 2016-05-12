@@ -69,6 +69,7 @@ function _toBase62(number){
   return result;
 }
 
+var _uid = generateUID();
 
 function generateUID(){
   var num = _toBase62(
@@ -98,104 +99,55 @@ function generateUID(){
   return num.slice(0, 13) + tempdigit
 }
 
-var _uid = generateUID();
-
-function track(event, props) {
-  var id = this.id;
-  var options = this.options;
-  if(id && /^rzp_l/.test(options.key)){
-    setTimeout(function(){
-      var payload = {
-        context: {
-          direct: true
-        },
-        anonymousId: id,
-        event: event
-      };
-      var data = payload.properties = {
-        id: id
-      };
-      if(props && event === 'js_error' && props instanceof Error){
-        // if props is error object, extract relevant properties
-        props = {message: props.message, stack: props.stack}
-      }
-      if(props){
-        each(
-          props,
-          function(propKey, propVal){
+function track(id, event, props){
+  if(id instanceof Razorpay){
+    if(!id.isLiveMode()){
+      return;
+    }
+    id = id.id;
+  }
+  setTimeout(function(){
+    var payload = {
+      context: {
+        direct: true
+      },
+      anonymousId: id,
+      event: event
+    };
+    var data = payload.properties = {
+      id: id
+    };
+    if(props && event === 'js_error' && props instanceof Error){
+      // if props is error object, extract relevant properties
+      props = {message: props.message, stack: props.stack}
+    }
+    if(props){
+      each(
+        props,
+        function(propKey, propVal){
+          var valType = typeof propVal;
+          if(valType === 'string' || valType === 'number' || valType === 'boolean'){
             data[propKey] = propVal;
           }
-        )
-      }
-
-      setTrackingProps(data, options, event);
-      data.medium = discreet.medium;
-      data.user_agent = ua;
-      if(discreet.context){
-        data.page_url = discreet.context;
-      }
-      data.library = discreet.lib;
-
-      var xhr = new XMLHttpRequest();
-      xhr.open(
-        'post',
-        'https://api.segment.io/v1/track',
-        true
-      );
-      xhr.setRequestHeader('Content-type', 'application/json');
-      xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
-      xhr.send(JSON.stringify(payload));
-    })
-  }
-}
-
-function setTrackingProps(data, options, event){
-  if(event === 'init'){
-    data.options = getInitOptions(options);
-  }
-  else {
-    data.options = {
-      key: options.key,
-      amount: options.amount
+        }
+      )
     }
-  }
-}
 
-function getOverrides(options, defaults){
-  var overrodeOnce = false;
-  var overrides = {};
-  each(
-    defaults || Razorpay.defaults,
-    function(key, defaultValue){
-      var val = options[key];
-      var valType = typeof val;
-      if(val && valType === 'object'){
-        val = getOverrides(val, defaultValue) || defaultValue;
-      }
-      if(val !== defaultValue && valType !== 'function'){
-        overrodeOnce = true;
-        overrides[key] = val;
-      }
+    data.medium = discreet.medium;
+    data.user_agent = ua;
+    if(discreet.context){
+      data.page_url = discreet.context;
     }
-  )
-  if(arguments.length === 1){
-    overrodeOnce = true;
-    discreet.setNotes(overrides, options);
-  }
-  if(overrodeOnce){
-    return overrides;
-  }
-}
+    data.checkout = !!discreet.isFrame;
 
-function getInitOptions(options){
-  var overrides = getOverrides(options);
-
-  if(discreet.isBase64Image(overrides.image)){
-    overrides.image = 'base64';
-  }
-
-  if(overrides.amount){
-    overrides.amount = parseInt(overrides.amount, 10);
-  }
-  return overrides;
+    var xhr = new XMLHttpRequest();
+    xhr.open(
+      'post',
+      'https://api.segment.io/v1/track',
+      true
+    );
+    xhr.setRequestHeader('Content-type', 'application/json');
+    xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
+    xhr.send(JSON.stringify(payload));
+  })
 }

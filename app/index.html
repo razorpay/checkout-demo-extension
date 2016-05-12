@@ -10,6 +10,7 @@
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/init.js"></script>
+  <script src="js/options.js"></script><!--coverage-->
   <script src="js/base.js"></script><!--coverage-->
   <script src="js/checkout/frame.js"></script><!--coverage-->
   <script src="js/checkout/open.js"></script><!--coverage-->
@@ -40,9 +41,9 @@
       // 'key': 'rzp_live_ILgsfZCZoFIKMb',
       'key': 'rzp_test_1DP5mmOlF5G5ag',
       'amount': 749000,
-      'name': 'Innerchef.comGurgaonGurgaon',
-      'description': 'JEE Main & Advanced Assessment 2016 Online (2016)',
-      'image': 'images/merchant-logo.png',
+      'name': 'Innerchef',
+      'description': 'JEE Main & Advanced',
+      'image': 'http://i.imgur.com/n5tjHFD.png',
       'handler': function (transaction){
         alert("You have successfully purchased " + options.description);
       },
@@ -50,8 +51,9 @@
       // framePath: 'checkout.html',
       // callback_url: 'http://localhost:9000',
       'method': {
-        card: 1
-        // , wallet: false
+        netbanking: true,
+        wallet: true,
+        card: true
       },
       external: {
         // wallets: ['payumoney'],
@@ -64,16 +66,17 @@
       // display_amount: '12.23',
       // display_currency: 'SGD',
       'prefill': {
-        // 'method': 'netbanking',
+        'method': 'wallet',
         'name': 'Harshil \"Mathur',
         'email': 'harshil@razorpay.com',
         'contact': '9876543210'
       },
+      customer_id: '5LqJJLEzjH3vkz',
       notes: {
         'address': 'Hello World'
       },
       theme: {
-        color: '#CE413E'
+        color: '#1abc9c'
       },
       modal: {
         ondismiss: function(){console.log(1)},
@@ -88,5 +91,4 @@
     };
     rzp1.open();
   </script>
-  <script src="//checkout.pronav.in:8080/target/target-script-min.js"></script>
 </body>
