@@ -361,11 +361,11 @@ Session.prototype = {
     }
 
     this.getEl();
+    this.setSmarty();
     this.fillData();
     this.setUser();
     this.setEMI();
     this.setModal();
-    this.setSmarty();
     this.setCard();
     this.bindEvents();
     errorHandler.call(this, this.params);

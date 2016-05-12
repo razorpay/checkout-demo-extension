@@ -226,13 +226,18 @@ i
     max-width: 100%;
 
 #merchant
+  white-space: nowrap;
   position: relative;
   text-shadow: 0 1px 3px rgba(0,0,0,0.12);
 
 #merchant-name
+  text-overflow: ellipsis;
+  overflow: hidden;
   font-size: 20px;
 
 #merchant-desc
+  text-overflow: ellipsis;
+  overflow: hidden;
   opacity: 0.8;
 
 #amount
