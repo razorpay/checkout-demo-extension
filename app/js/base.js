@@ -188,6 +188,25 @@ function base_configure(overrides){
 }
 
 Razorpay.prototype = {
+  on: function(event, callback){
+    var events = this._events;
+    if (!(event in events)) {
+      events[event] = [callback];
+    } else {
+      events[event].push(callback);
+    }
+  },
+
+  off: function(){
+    this._events = [];
+  },
+
+  trigger: function(event, args){
+    each(this._events[event], function(i, listener){
+      listener(args);
+    })
+  },
+
   isLiveMode: function(){
     return /^rzp_l/.test(this.get('key'));
   },

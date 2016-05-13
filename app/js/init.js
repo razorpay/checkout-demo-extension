@@ -30,6 +30,7 @@ var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
     return new Razorpay(options);
   }
+  this._events = {};
   invoke(this.configure, this, options);
 };
 

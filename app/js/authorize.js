@@ -21,10 +21,6 @@ function deleteCookie(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 }
 
-function setCookie(name, value){
-  document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
-}
-
 function getCookie(name){
   var nameEQ = name + "=";
   var ca = document.cookie.split(';');
@@ -351,6 +347,16 @@ Request.prototype = {
     )
   }
 }
+
+var razorpayProto = Razorpay.prototype;
+razorpayProto.createPayment = function(data){
+  this._request = new Request({
+    data: data,
+    options: this.get()
+  })
+}
+
+razorpayProto.createPopup = function(){}
 
 Razorpay.payment = {
   authorize: Request,
