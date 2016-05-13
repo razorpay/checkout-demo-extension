@@ -3,6 +3,8 @@ aws-keys.json
 /app/css
 /app/templates
 /app/dist/v1/*.*
-/app/dist/v1/css
+!/app/dist/v1/checkout-frame.js
+/app/dist/v1/css/*.*
+!/app/dist/v1/css/checkout.css
 coverage
 /app/config.js
