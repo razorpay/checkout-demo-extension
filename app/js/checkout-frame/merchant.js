@@ -374,6 +374,9 @@ window.handleMessage = function(message){
   if(message.config){
     RazorpayConfig = message.config;
   }
+  if(message.embedded){
+    $(doc).addClass('embedded');
+  }
   if(message.data){
     session.data = message.data;
   }
