@@ -183,15 +183,15 @@ Razorpay.prototype.open = function() {
 
   var frame = this.checkoutFrame;
   if(!frame){
-    if(this.get('parent')){
+    // if(this.get('parent')){
       frame = new CheckoutFrame(this);
-    }
-    else {
-      frame = getPreloadedFrame();
-    }
+    // }
+    // else {
+    //   frame = getPreloadedFrame();
+    // }
     this.checkoutFrame = frame;
   }
-  frame.openRzp(this);
+  // frame.openRzp(this);
 
   if(!frame.el.contentWindow){
     frame.close();
