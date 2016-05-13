@@ -53,7 +53,7 @@ gulp.task('compileStyles', function(){
   return gulp.src(assetPath('_css/*.sass'))
     .pipe(sass())
     .pipe(minifyCSS())
-    .pipe(concat('checkout.css'))
+    .pipe(concat('checkout-new.css'))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
       cascade: false
@@ -79,9 +79,9 @@ gulp.task('default', ['usemin'], buildProd);
 function buildProd(){
   return gulp.src(distDir + '/*.js')
     .pipe(wrap('(function(){"use strict";', '})()'))
-    .pipe(sourcemaps.init())
+    // .pipe(sourcemaps.init())
     .pipe(uglify())
-    .pipe(sourcemaps.write('./'))
+    // .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(distDir));
 }
 
