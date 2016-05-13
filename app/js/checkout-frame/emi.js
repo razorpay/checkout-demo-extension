@@ -10,9 +10,9 @@ function selectEmiBank(e){
   }
 }
 
-function emiView(message){
-  var opts = message.emiopts;
-  opts.amount = message.options.amount;
+function emiView(session){
+  var opts = session.emi_options;
+  opts.amount = session.get('amount');
   this.opts = opts;
   this.listeners = [];
   this.render();
@@ -36,6 +36,12 @@ emiView.prototype = {
   },
 
   bind: function(){
+    this.on('focus', '#emi-check-label', function(){
+      $('#body').addClass('emi-focus');
+    })
+    this.on('blur', '#emi-check-label', function(){
+      $('#body').removeClass('emi-focus');
+    })
     this.on('mousedown', '#emi-select', selectEmiBank);
     this.on('click', '#view-emi-plans', function(){showOverlay($('#emi-wrap'))});
     this.on('click', '#emi-close', hideEmi);

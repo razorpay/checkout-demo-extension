@@ -1,8 +1,6 @@
 (function(){
 
   var inputClass = 'input';
-  var interceptClass = /elem|card-image|i|help-text/;
-
   var focusEvent = 'focus';
   var blurEvent = 'blur';
   var shim_placeholder = document.createElement('input').placeholder === undefined;
@@ -49,7 +47,6 @@
       this.on(focusEvent, inputClass, this.focus, true);
       this.on(blurEvent, inputClass, this.blur, true);
       this.on('input', inputClass, this.input, true);
-      this.on('click', interceptClass, this.intercept);
     },
 
     focus: function(e){

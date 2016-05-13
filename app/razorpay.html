@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
-  <script src="config.js"></script>
+  <!-- <script src="config.js"></script> -->
   <!-- build:js razorpay.js -->
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/init.js"></script>
+  <script src="js/options.js"></script><!--coverage-->
   <script src="js/lib/jsonp.js"></script>
   <script src="js/lib/popup.js"></script>
-  <script src="js/base.js"></script>
+  <script src="js/base.js"></script><!--coverage-->
   <script src="js/authorize.js"></script><!--coverage-->
   <script src="templates/popup.js"></script>
   <!-- test scripts
   <script src="../test/base.coffee"></script>
   <script src="../test/submit.coffee"></script>
+  <script src="../test/request.coffee"></script>
   -->
   <!-- endbuild -->
 
@@ -48,7 +50,8 @@
   </div>
   <script>
       Razorpay.configure({
-        key: 'rzp_test_1DP5mmOlF5G5ag'
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        callback_url: 'https://google.com'
       });
 
       function updateAmount(el) {
@@ -66,18 +69,19 @@
       gel('submit').onclick = function(e){
         this.setAttribute('disabled', 'disabled'); // add loading animation here
         Razorpay.payment.authorize({
+          fees: true,
           data: {
             amount: val('amount').replace(/[^0-9]+/,'')*100,
             email: val('customer_email'),
             contact: val('customer_phone'),
-            // method: 'netbanking',
-            // bank: 'HDFC'
-            method: 'card',
-            'card[name]': val('card_name'),
-            'card[number]': val('card_number'),
-            'card[expiry_month]': val('card_month'),
-            'card[expiry_year]': val('card_year'),
-            'card[cvv]': val('card_cvv')
+            method: 'wallet',
+            wallet: 'mobikwik'
+            // method: 'card',
+            // 'card[name]': val('card_name'),
+            // 'card[number]': val('card_number'),
+            // 'card[expiry_month]': val('card_month'),
+            // 'card[expiry_year]': val('card_year'),
+            // 'card[cvv]': val('card_cvv')
           },
           error: function(response){
             alert(JSON.stringify(response)); // focus invalid inputs using returned 'field';

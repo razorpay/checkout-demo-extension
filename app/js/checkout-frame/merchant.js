@@ -1,18 +1,14 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
-var CheckoutBridge = window.CheckoutBridge;
 
-var sessions = {};
+var preferences = window.preferences,
+  CheckoutBridge = window.CheckoutBridge,
+  sessions = {},
+  isIframe = window !== parent,
+  ownerWindow = isIframe ? parent : opener;
 
-var isIframe = window !== parent;
-var ownerWindow = isIframe ? parent : opener;
-
-function getSession(methodToCall) {
-  var session = sessions[_uid];
-  if(session && methodToCall){
-    session[methodToCall]();
-  }
-  return session;
+function getSession(id){
+  return sessions[id || _uid];
 }
 
 function addBodyClass(className){
@@ -23,7 +19,8 @@ function addBodyClass(className){
 var qpmap = {};
 
 var gifBase64Prefix = 'data:image/gif;base64,';
-var freqBanks = {
+var sessProto = Session.prototype;
+sessProto.netbanks = {
   SBIN: {
     image: 'R0lGODlhKAAoAMQQAPD2/EGI2sTa86fI7m2k4l6b3+Lt+dPk9nyt5SR21Hut5cXb9Jm/61CS3f///xVt0f///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXyICSO5GgMRPCsbEAMRinPslCweL4WAu2PgoZumGv0fiUAgsjMIQBIEUDVrK4C0N8hYe0+EgcfgOvtJrJJarmLlS3XZURJAIcfRcJ6uQHU20U3fmUFEAaCcCeHayiKZSlwCgsLCnBqXgcOmQ4HjUwKmpqUnToLoJkLo6SmDqipOJ+moq4smJqca5ZdDJkMlQRwDZl5jgPAwnAwxg7DXjGBXsHLa4QQdHvHZXfMVdHbTXx90NhddyJvVt1ecmld6VZtMmPo40xnPlvc9ENgSFPf+jng9Tunw92QJ1FIBBliEIeRhDNsFNHHA+KPE4/SuYCRMAQAOw==',
     title: 'SBI'
@@ -32,9 +29,9 @@ var freqBanks = {
     image: 'R0lGODlhKAAoAKIAAL/S4+4xN/WDh+/0+PJaXwBMj////+0jKiH5BAAAAAAALAAAAAAoACgAAAOqeLrca9C4SauL0uqtMP+VB46MSJLmCaZqh71wHBGcbNv0du9vrvFAg88S5A1DxduRklTWYIWodBoFwJaTGHVbsPaeLy7Vi8FeoGIpeXbmpdXN27sat827ddl9jSP4/1pzfAYCf39ZaG+DZg2BildgGHuQOjAAl5iZlwOUP3lflZ9soaJCkaKMJaUQqQ+rphuGsn5ls4YBLaoQuSsRvB8sv0y+wp67xUTEIwkAOw==',
     title: 'HDFC'
   },
-  PUNB_R: {
-    image: 'R0lGODlhKAAoAKIHAP/56P3oqP7vxf3TXvzLP/3dhPu8Cf///yH5BAEAAAcALAAAAAAoACgAAAP5eLrc/pCJSSmI+ATCey9GKIZEFoHjCKSjYD4oaxyEbBSvE7PHPpYNQKDAKQR0tpkgyQD4SMfFU3RY2RaAWnIgZR682aQI1/NqeWWxyDUNKc6pqvqXlr2vbZvTyxzMW3kKTHBzBYFfeoRqhnw2An5/IY9mNgEBkSFWVzQ2A5pzA0tekDJ7f2FeeVykSUNqCqKVAKwslnMLiiM4GyyeeSMLl2IEAQACQ0bGuXa4fwOGBQPLmwrCmNduDL/YzAy03GIP3+DdDdvkEQLT6Bi8mBxeGQHjI88XhznH0IYCF9rxOV7gC2hiIEEMBg9CSKgQCbWGCwFCdLDBg4cEADs=',
-    title: 'PNB'
+  ICIC: {
+    image: 'R0lGODlhKAAoAOZGAP/58evKy/ry8vzOk/qpQsRfZMJHLvqvUP7t1uGvsbUxL79SV9iVmPmjNbpFSueAKbU3PctVLfCPKPvCeP7z5PDX2PzIhvSWKNVkLOa8vsltcfu2Xc56frk4L850cNeUl/Xk5f3myd5yKtOHi+uHKfzUoMdOLf3arr5MSf/58r5ALv3gu9+EU9yipLo/PPXe1/rs5eCjlvTYytybl+qxle/FsMRZVvu8a+J5Kuq9sNlrK/7nyeOAN+Wee/3gvNyWifWcNeGopOuONvmdJ////7AqMP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAEYALAAAAAAoACgAAAf/gEaCg4SFhoICCR4oRY1FLh45h5OUgwEejpmZNi+VnoIBBZqjjhAVn5MwmJkQDAJEAgujKACohTUumgsVRL1EGaQztoIAPQqaECC+vcCjDsMALKQJy70cpEWnnwg8pBDVRCDYRUHbQsejBdWx4x+eCEDoowvLILLtlQANBuNFDAEBGEDoV8TdJAAHMBBcmMngoQkS+hVoESCDBoYxJpUYwo+UgwDVLhKUcYhCgwfYRryqxoCggVqGNnB0BhIckWv9WBw6MQSlpgIrwQkg2MGCIX1DTGjiYNNXAoIiEBgaMOSCJmpNe4nE1oHA0QZDRGQakbXX0H4PThjaOCRCpgAC+xg4KEKvWot+JhrAJERgyJAO/XgtE8X1wgBDCPwOIVjTbD8SXg1Z8EuCYLWn2EQMWXGob0/Ly7ZqwjBkQ0nFPrGpWzZwVIQhDSgcCqE44jimvgKQer15ElXF8kZh7dVSkw6/Eyj99qsUmzJfhBspwOH3QKXlnz1Wy6SCRPW9h7DPHEXWVwXppP0SAB9esd8LKkZlWKY7ggTFBKR6Yuv+gltHDlRDw32KHcDeJIm5VxsGBhjwQzXYbXAgJZ4p6B4F1figmFHDGMGThYrdYNMEE4TQ4SAHgOjXDlmdOAgFFbpnQVMuFgKATO4dkAI4NU4SwgQHEDDAjsv0OEggADs=',
+    title: 'ICICI'
   },
   UTIB: {
     image: 'R0lGODlhKAAoAMQQAOvJ1vry9bM1Z7hDcfXk68JehtaTrvDX4eGuwsdrkNKGpMx5mr1Qe+a8zNuhuK4oXf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXdICSOZGmeaKqubIsGgSunyjLf5PE8B44Xu4Jv1tjtEMNWYGB8DGJJlaG5M0RTBAF1R7ieEttdwlsChI0A8ohx3g3UEEfb2PMGtPMxWTHnknV9VmRAcwJQVwh9D0h2THNvZFN9aV4EikJkYH1dXmZ9CmqObQJ4bZArknMOqW0OK3d9kKJnhioLipRFnymeeSSEc3UmwG2cIpZ9mCWJgSZ8fYwjsI+H0qVnTySsZ9HLioIQyHPKJ2yFnMRnwie9bWO6czYrt5OzYbUrWX0MAP3+//3WqTgAsCAlOAivhAAAOw==',
@@ -50,7 +47,7 @@ var freqBanks = {
   }
 };
 
-var freqWallets = {
+var freqWallets = sessProto.walletData = {
   paytm: {
     h: '16',
     col: gifBase64Prefix + 'R0lGODlhUAAYANUgAD/L9UJik+/y9oGWtzJVihM6dw++8+/7/mJ8pV/U9+Dl7dDY5M/y/S/H9JGjwCNHgZ/l+r/u/B/C9K/p+9/2/bC90lJvnKGwyW/Y+HGJrsLu/I/h+cDL23/c+AC68gQub////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACAALAAAAABQABgAAAb/QJBwSCwaj8gkEiJhKJ/QqHQKgng8Hap2yy1ar9nuUMEpm8uLI/nMSRMFg7hb6JAXGZPE9ZqIHEAUERFOIBEdHRFDBxAdEH9CBR+Sk5MPHEWRlJIPFUMWkwUKQgigokITe6lXDRoGewkSqRITGK57YZq5BXMguZSdIAGUl73DQx2qqnrJzKpZvpoIRNCSBELCk8SaxCDIzR7L398U1JVEBOUCIA/GxdnH4uHizBvlk29xcZnv20L9QgcaNEvgbZ4Bgak6aKKzEMmAfv/+ESmIRQhFDxRAxNpjwAmAhA05NBTCAUGAk7kuoXvnThI3eLcspgIgcw/NbiApkRxJqtwl7WySgEmECabmlZsUkea8B6In0wv2PvykVCDASpYTExr1oNTmVoVRhVylNtXey69bux79GtVaS7IgHEQ9izNm3bV3ubK1l8EfJQsCFPQTMNYXXYphkqbdS42Aurfa2gkAatgI4sV51WKhVgDBY8h+sYJYUCHOp3ZZ7SrOzFiSEk0ORktcU0YuaqIVWetGPPJIrgD7XApREDylZa27Z7b+oISd2Z3pjqtWnvxWbyMPn4MQSU2a9KLV8fLWmYSwvcfcfTk+cjm83rwdrhaAcuGk/fsXhpjXFMDB5zu2NPBIQHtgIAQDthgwgRAUBHhAEAA7'
@@ -69,7 +66,7 @@ var freqWallets = {
   }
 }
 
-var emi_options = {
+var emi_options = sessProto.emi_options = {
   // minimum amount to enable emi
   min: 3000*100-1,
   installment: function(length, rate, principle){
@@ -115,21 +112,10 @@ var emi_options = {
 
 emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
 
-function processMessage(message) {
-  message.netbanks = freqBanks;
-  message.emiopts = emi_options;
-  var opts = message.options;
-  if(!opts){
-    var session = getSession();
-    if(session){
-      message.options = session.message.options;
-    }
-    return;
-  }
-
-  if(opts.amount >= 100*10000){
-    opts.method.wallet = false;
-  }
+var tab_titles = sessProto.tab_titles = {
+  card: 'Card/EMI',
+  netbanking: 'Netbanking',
+  wallet: 'Wallet'
 }
 
 function notifyBridge(message){
@@ -146,121 +132,98 @@ function notifyBridge(message){
   }
 }
 
-function setPaymentMethods(payment_methods, options){
-  var methodOptions = options.method;
+function setPaymentMethods(session){
+  var availMethods = preferences.methods;
+  var methods = session.methods = {};
 
-  if( !payment_methods.error ) {
-    each(
-      methodOptions,
-      function(method, enabled){
-        var printed = payment_methods[method];
-        if ( !printed || enabled === false ) {
-          methodOptions[method] = false;
-        }
-        else {
-          methodOptions[method] = printed;
-        }
+  each(
+    availMethods,
+    function(method, enabled){
+      if(enabled && session.get('method.' + method) !== false){
+        methods[method] = enabled;
       }
-    )
-    var wallets = false;
-    if(methodOptions.wallet){
-      var externalWallets = options.external.wallets;
-      if(externalWallets.length){
-        each(
-          externalWallets,
-          function(i, externalWallet){
-            if(externalWallet in freqWallets){
-              payment_methods.wallet[externalWallet] = true;
-              freqWallets[externalWallet].custom = true;
-            }
-          }
-        )
-      }
-      each(
-        payment_methods.wallet,
-        function(wallet, enabled){
-          if(enabled){
-            var logos = freqWallets[wallet];
-            if(logos){
-              if(!wallets){
-                wallets = {};
-              }
-              wallets[wallet] = {
-                'col': logos.col,
-                'h': logos.h
-              };
-            }
-          }
-        }
-      )
     }
-    methodOptions.wallet = wallets;
-  } else {
-    methodOptions.card = false;
-    methodOptions.netbanking = {error: {description: payment_methods.error.description || "Payments not available right now."}};
+  )
+
+  if(session.get('amount') >= 100*10000 || availMethods.wallet instanceof Array){ // php encodes blank object as blank array
+    methods.wallet = false;
   }
-  if(methodOptions.netbanking !== false && typeof methodOptions.netbanking !== 'object'){
-    methodOptions.netbanking = {error: {description: "Netbanking not available right now."}}
-  }
+
+  each(
+    session.get('external.wallets'),
+    function(i, externalWallet){
+      if(externalWallet in freqWallets){
+        if(!methods.wallet){
+          methods.wallet = {};
+        }
+        methods.wallet[externalWallet] = true;
+        freqWallets[externalWallet].custom = true;
+      }
+    }
+  )
 }
 
-function showModal(message) {
-  if(_uid !== message.id){
-    getSession('saveAndClose');
-    _uid = message.id;
-  }
-  var session = getSession();
-  if(!session){
-    session = sessions[_uid] = new CheckoutModal();
-  }
-  processMessage(message);
-  if(!window.payment_methods){
-    // TODO remove this
-    Razorpay.defaults.key = message.options.key;
-    Razorpay.payment.getPrefs(function(response){
+function showModal(session) {
+  if(!preferences){
+    Razorpay.payment.getPrefs(session.get('key'), function(response){
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
-      window.preferences = response;
-      window.payment_methods = response.methods;
-      window.fee_bearer = response.fee_bearer;
-      showModalWithMessage(message);
+      response.user = null;
+      response.tokens = {
+        "entity": "collection",
+        "count": 2,
+        "items": [
+          {
+            "entity": "token",
+            "token": "aslkdjflaksdjf",
+            "method": "card",
+            "card": {
+              "last4": 1234,
+              "network": "MasterCard",
+              "emi": true,
+              "bank": "HDFC"
+            }
+          },
+          {
+            "entity": "token",
+            "token": "ofakjdflka;sdfj",
+            "method": "card",
+            "card": {
+              "last4": 7890
+            }
+          }
+        ]
+      };
+      preferences = response;
+      showModalWithSession(session);
     })
-    Razorpay.defaults.key = '';
     return;
   }
-  else {
-    showModalWithMessage(message);
-  }
+  var options = preferences.options;
+  Razorpay.configure(options);
+  showModalWithSession(session);
 }
 
-function showModalWithMessage(message){
-  try{
-    var theme_color = window.preferences.options.theme.color;
-    var old_color = message.options.theme.color;
-    if(theme_color && (!old_color || old_color === '#00BCD4')){
-      message.options.theme.color = '#' + theme_color.slice(-6);
-    }
-  } catch(e){}
-  var session = getSession();
+function showModalWithSession(session){
+  setPaymentMethods(session);
+  session.render();
+  trackInit(session);
+  Razorpay.sendMessage({event: 'render'});
 
-  // rewrites message.options.method, adds custom wallets
-  setPaymentMethods(window.payment_methods, message.options);
-  session.render(message);
-  session.modal.show();
-  trackInit(message);
-
-  if ( CheckoutBridge ) {
+  if (CheckoutBridge) {
     $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
   }
 
   if(qpmap.error){
-    session.errorHandler(qpmap);
+    errorHandler.call(session, qpmap);
   }
-  session.switchTab($('#tabs > li[data-target=tab-' + qpmap.tab + ']'));
+  if(qpmap.tab){
+    session.switchTab(qpmap.tab);
+  }
 }
 
-function configureRollbar(message){
+function configureRollbar(id){
   if(Rollbar){
     invoke(
       Rollbar.configure,
@@ -268,7 +231,7 @@ function configureRollbar(message){
       {
         payload: {
           person: {
-            id: message.id
+            id: id
           },
           context: discreet.context
         }
@@ -317,6 +280,10 @@ var platformSpecific = {
       CheckoutBridge['on'+prop] = iosMethod(prop)
     })
     CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
+  },
+
+  android: function(){
+    doc.css('background', 'rgba(0, 0, 0, 0.6)');
   }
 }
 
@@ -361,56 +328,60 @@ Razorpay.sendMessage = function(message){
 
 window.handleOTP = function(otp){
   var session = getSession();
-  var otpEl = gel('powerotp');
+  var otpEl = gel('otp');
   if(session && session.rzp && otpEl && !otpEl.value){
     otpEl.value = otp;
   }
 }
 
-window.handleMessage = function(message) {
+function validUID(id){
   if(isIframe && !CheckoutBridge){
-    if(typeof message.id !== 'string' || message.id.length < 14 || !/[0-9a-z]/i.test(message.id)){
-      var keys = [];
-      each(
-        message,
-        function(key){
-          keys.push(key);
-        }
-      )
-      return;
+    if(typeof id !== 'string' || id.length < 14 || !/[0-9a-z]/i.test(id)){
+      return false;
     }
   }
+  return true;
+}
 
-  if(!message.id){
-    message.id = _uid;
+window.handleMessage = function(message){
+  if('id' in message && !validUID(message.id)){
+    return;
   }
+  var id = message.id || _uid;
+  var session = getSession(id);
+  if(!session){
+    if(!message.options){
+      return;
+    }
+    try{
+      session = new Session(message.options);
+    } catch(e){
+      Razorpay.sendMessage({event: 'fault', data: e.message});
+      return roll('fault ' + e.message, message, 'warn');
+    }
+    configureRollbar(id);
+    var oldSession = getSession();
+    if(oldSession){
+      invoke('saveAndClose', oldSession);
+    }
+    session.id = _uid = id;
+    sessions[_uid] = session;
+  }
+
   if(message.context){
     discreet.context = message.context;
-  }
-  if(message.embedded){
-    // addBodyClass('embedded');
   }
   if(message.config){
     RazorpayConfig = message.config;
   }
-  if ( message.options ) {
-    try{
-      configureRollbar(message);
-      // validate and sanitize message.options
-      Razorpay.prototype.configure.call(message, message.options);
-    } catch(e){
-      Razorpay.sendMessage({event: 'fault', data: e.message});
-      roll('fault ' + e.message, message, 'warn');
-      return;
-    }
+  if(message.data){
+    session.data = message.data;
   }
-
-  if ( message.event === 'open' || message.options ) {
-    showModal(message);
+  if(message.event === 'open' || message.options){
+    showModal(session);
   }
-
-  else if ( message.event === 'close' ) {
-    getSession().hide();
+  else if(message.event === 'close'){
+    session.hide();
   }
 }
 
@@ -429,12 +400,10 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
   }
 }
 
-function trackInit(message){
-  if(CheckoutBridge){
-    track.call(message, 'init');
-  }
-  else {
-    track.call(message, 'open');
+function trackInit(session){
+  var options = session.get();
+  if(/^rzp_l/.test(options.key)){
+    track(session.id, 'init', options);
   }
 }
 
@@ -446,6 +415,7 @@ function applyUAClasses(){
 
 function initIframe(){
   $(window).on('message', parseMessage);
+  Razorpay.sendMessage({event: 'load'});
 
   if(location.search){
     setQueryParams(location.search);
@@ -455,7 +425,6 @@ function initIframe(){
     discreet.medium = qpmap.platform || 'app';
   }
 
-  Razorpay.sendMessage({event: 'load'});
   if(qpmap.message){
     parseMessage({data: atob(qpmap.message)});
   }

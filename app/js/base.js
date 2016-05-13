@@ -1,6 +1,24 @@
+function setNotes(options){
+  var notes = options.get('notes');
+  each(notes, function(key, val){
+    var valType = typeof val;
+    if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
+      delete notes[key];
+    }
+  })
+}
 
 function raise(message){
   throw new Error(message);
+}
+
+function isValidAmount(amt){
+  if (/[^0-9]/.test(amt)){
+    return false;
+  }
+  amt = parseInt(amt, 10);
+
+  return amt >= 100;
 }
 
 var discreet = {
@@ -21,10 +39,6 @@ var discreet = {
     'JPY': '¥',
     'PLN': 'zł',
     'SFR': 'Fr'
-  },
-  lib: 'checkoutjs',
-  shouldAjax: function(data){
-    return discreet.isFrame && (data.wallet === 'mobikwik' || data.wallet === 'payumoney')
   },
 
   supported: function(showAlert){
@@ -47,7 +61,7 @@ var discreet = {
 
     if(alertMessage){
       if(showAlert){
-        track('unsupported', {message: alertMessage, ua: ua});
+        // TODO track
         alert(alertMessage + ' choose another browser.');
       }
       return false;
@@ -57,7 +71,6 @@ var discreet = {
 
   medium: 'web',
   context: location.href.replace(/^https?:\/\//,''),
-  setCommunicator: noop,
 
   isBase64Image: function(image){
     return /data:image\/[^;]+;base64/.test(image);
@@ -75,57 +88,12 @@ var discreet = {
     return url;
   },
 
-  nextRequestRedirect: function(data){
+  redirect: function(data){
     if(window !== window.parent){
       return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
     }
     submitForm(data.url, data.content, data.method);
-  },
-
-  setNotes: function(options, overrides){
-    each(overrides.notes, function(key, val){
-      var valType = typeof val;
-      if ( valType === 'string' || valType === 'number' || valType === 'boolean' ) {
-        if(!('notes' in options)){
-          options.notes = {};
-        }
-        options.notes[key] = val;
-      }
-    })
   }
-}
-
-function base_set(baseval, override) {
-  if ( typeof baseval === 'object' ) {
-    if( !baseval ){
-      return typeof override === 'boolean' ? override : baseval;
-    }
-
-    if( !override || typeof override !== 'object' ){
-      override = {};
-    }
-
-    if(baseval instanceof Array && override instanceof Array){
-      return override;
-    }
-
-    return map(
-      baseval,
-      function(val, i){
-        return base_set( val, override[i] );
-      }
-    )
-  }
-
-  if ( typeof baseval === 'string' && typeof override !== 'undefined' ) {
-    return String(override);
-  }
-
-  if ( typeof baseval === typeof override ) {
-    return override;
-  }
-
-  return baseval;
 }
 
 var optionValidations = {
@@ -149,10 +117,7 @@ var optionValidations = {
   },
 
   amount: function(amount){
-    var intAmount = parseInt(amount, 10);
-    var strAmount = String(amount);
-
-    if (!intAmount || typeof intAmount !== 'number' || intAmount < 100 || /\./.test(strAmount)) {
+    if (!isValidAmount(amount)) {
       var errorMessage = 'should be passed in paise. Minimum value is 100';
       alert('Invalid amount. It ' + errorMessage);
       return errorMessage;
@@ -176,20 +141,14 @@ var optionValidations = {
     if(!amount && amount !== Razorpay.defaults.display_amount){
       return '';
     }
-  },
-
-  parent: function(parent){
-    if(!(parent && parent.nodeName || typeof parent === 'string' || parent === Razorpay.defaults.parent)){
-      return 'Invalid parent';
-    }
   }
 }
 
-function validateRequiredFields(options){
+function validateRequiredFields(rzp){
   each(
     ['key', 'amount'],
     function(index, key){
-      if(!options[key]){
+      if(!rzp.get(key)){
         raise('No ' + key + ' passed.');
       }
     }
@@ -198,17 +157,15 @@ function validateRequiredFields(options){
 
 function validateOverrides(options) {
   var errorMessage;
-
+  options = options.get();
   each(
     options,
-    function(i, option){
-      errorMessage = invoke(
-        optionValidations[i],
-        null,
-        option
-      )
+    function(key, val){
+      if(key in optionValidations){
+        errorMessage = optionValidations[key](val);
+      }
       if(typeof errorMessage === 'string'){
-        raise('Invalid ' + i + ' (' + errorMessage + ')');
+        raise('Invalid ' + key + ' (' + errorMessage + ')');
       }
     }
   )
@@ -219,60 +176,56 @@ function base_configure(overrides){
     raise('Invalid options');
   }
 
-  validateOverrides(overrides);
-
-  var options = base_set( Razorpay.defaults, overrides );
-
-  try{
-    var backdropClose = overrides.modal.backdropClose;
-    if(typeof backdropClose === 'boolean'){
-      options.modal.backdropclose = backdropClose;
-    }
-  }
-  catch(e){}
-
-  discreet.setNotes(options, overrides);
-
-  if( typeof overrides.redirect === 'boolean' ) {
-    var redirectValue = overrides.redirect;
-    options.redirect = function(){return redirectValue};
-  }
+  var options = Options(overrides);
+  validateOverrides(options);
+  setNotes(options);
 
   if(overrides.parent){
-    options.parent = overrides.parent;
+    options.set('parent', overrides.parent);
   }
 
-  discreet.setCommunicator(options);
   return options;
 }
 
-Razorpay.prototype.configure = function(overrides){
-  var key, options;
-  try{
-    options = this.options = base_configure(overrides);
-    key = options.key;
-    validateRequiredFields(options);
-  } catch(e){
-    var message = e.message;
-    if(!/^rzp_l/.test(key || overrides.key || '')){
-      alert(message);
+Razorpay.prototype = {
+  isLiveMode: function(){
+    return /^rzp_l/.test(this.get('key'));
+  },
+
+  configure: function(overrides){
+    var key, options;
+    try{
+      this.get = base_configure(overrides).get;
+      key = this.get('key');
+      validateRequiredFields(this);
+    } catch(e){
+      var message = e.message;
+      if(!this.isLiveMode()){
+        alert(message);
+      }
+      raise(message);
     }
-    raise(message);
+
+    if(this instanceof Razorpay){
+      this.id = generateUID();
+      this.modal = {options: emo};
+      this.options = emo;
+
+      if(this.get('parent')){
+        this.open();
+      }
+    }
   }
+}
 
-  if(this instanceof Razorpay){
-    this.id = generateUID();
-    this.modal = {options: {}};
-    if(!discreet.isFrame){
-      track.call( this, 'init' );
+Razorpay.configure = function(overrides){
+  each(
+    flatten(overrides, Razorpay.defaults),
+    function(key, val){
+      var defaultValue = Razorpay.defaults[key];
+      if(typeof defaultValue === typeof val){
+        Razorpay.defaults[key] = val;
+      }
     }
-
-    if(options.parent){
-      this.open();
-    }
-  }
-};
-
-Razorpay.configure = function(overrides) {
-  Razorpay.defaults = base_configure(overrides);
+  )
 }

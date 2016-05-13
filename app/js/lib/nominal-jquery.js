@@ -1,8 +1,10 @@
 var $ = function(el){
-  if(typeof el === 'string') {
-    return $(document.querySelector(el))
+  if (typeof el === 'string') {
+    return $(document.querySelector(el));
   }
-  if(!(this instanceof $)) { return new $(el) }
+  if (!(this instanceof $)) {
+    return new $(el);
+  }
   this[0] = el;
 };
 
@@ -10,6 +12,10 @@ function bind(func, thisArg){
   return function(){
     return func.apply(thisArg, arguments);
   }
+}
+
+function clone(target){
+  return JSON.parse(stringify(target));
 }
 
 var qs = bind(document.querySelector, document);
@@ -59,13 +65,12 @@ function submitForm(action, data, method, target) {
   form.setAttribute('action', action);
 
   if(method){ form.setAttribute('method', method) }
-  if(target) { form.setAttribute('target', target) }
-
+  if(target){ form.setAttribute('target', target) }
   if(data){ form.innerHTML = deserialize(data) }
 
-  document.documentElement.appendChild(form);
+  doc.appendChild(form);
   form.submit();
-  form.parentNode.removeChild(form);
+  doc.removeChild(form);
 }
 
 function deserialize(data, key){
@@ -133,6 +138,7 @@ $.prototype = {
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
+        if(!e.currentTarget) { e.currentTarget = el }
         callback.call(thisArg || el, e);
       }
     }
@@ -313,15 +319,11 @@ $.prototype = {
   }
 }
 
-$.clone = function(target){
-  return JSON.parse(stringify(target));
-};
-
 $.post = function(opts){
   opts.method = 'post';
 
   if(!opts.headers){
-    opts.headers = {};
+    opts.headers = emo;
   }
   opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
   var payload = [];

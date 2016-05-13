@@ -22,36 +22,11 @@ var defaultAutoPostHandler = function(data){
   RazorPayForm.submit();
 }
 
-var parseScriptOptions = function(options){
-  var category, dotPosition, ix, property;
-  each( options, function(i, opt){
-    ix = i.indexOf(".");
-    if (ix > -1) {
-      dotPosition = ix;
-      category = i.substr(0, dotPosition);
-      property = i.substr(dotPosition + 1);
-      options[category] = options[category] || {};
-      if(opt === 'true'){
-        opt = true;
-      }
-      else if(opt === 'false'){
-        opt = false;
-      }
-      options[category][property] = opt;
-      delete options[i];
-    }
-  })
-
-  if(options.method){
-    parseScriptOptions(options.method);
-  }
-}
-
 var addAutoCheckoutButton = function(rzp){
   var button = document.createElement('input');
   var form = currentScript.parentElement;
   button.type = 'submit';
-  button.value = rzp.options.buttontext;
+  button.value = rzp.get('buttontext');
   button.className = 'razorpay-payment-button';
   form.appendChild(button);
   form.onsubmit = function(e){
@@ -73,14 +48,18 @@ function initAutomaticCheckout(){
       var name = attr.name
       if(/^data-/.test(name)){
         name = name.replace(/^data-/,'');
-        opts[name] = attr.value;
+        var val = attr.value;
+        if(val === 'true'){
+          val = true;
+        } else if (val === 'false'){
+          val = false;
+        }
+        opts[name] = val;
       }
     }
   )
 
-  parseScriptOptions(opts);
   var amount = currentScript.getAttribute('data-amount');
-
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
@@ -198,13 +177,13 @@ Razorpay.open = function(options) {
 }
 
 Razorpay.prototype.open = function() {
-  if(!this.options.redirect() && !discreet.supported(true)){
+  if(!this.get('redirect') && !discreet.supported(true)){
     return;
   }
 
   var frame = this.checkoutFrame;
   if(!frame){
-    if(this.options.parent){
+    if(this.get('parent')){
       frame = new CheckoutFrame(this);
     }
     else {

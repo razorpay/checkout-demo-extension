@@ -1,5 +1,6 @@
 var roll = function(){};
 var noop = roll;
+var emo = {};
 
 function err(errors){
   if(errors instanceof Array && !errors.length){
@@ -45,9 +46,7 @@ Razorpay.defaults = {
   'notes': {},
   'callback_url': '',
 
-  'redirect': function(){
-    return this.callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)
-  },
+  'redirect': false,
   'description': '',
 
   // automatic checkout only
@@ -59,20 +58,18 @@ Razorpay.defaults = {
   'display_amount': '',
 
   'method': {
-    'netbanking': null,
-    'card': null,
-    'wallet': null,
-    'emi': null
+    'netbanking': true,
+    'card': true,
+    'wallet': true,
+    'emi': true
   },
   'prefill': {
     'method': '',
     'name': '',
     'contact': '',
     'email': '',
-    'card': {
-      'number': '',
-      'expiry': ''
-    }
+    'card[number]': '',
+    'card[expiry]': ''
   },
   'modal': {
     'ondismiss': noop,
@@ -81,7 +78,7 @@ Razorpay.defaults = {
     'animation': true,
     'backdropclose': false
   },
-  external: {
+  'external': {
     wallets: [],
     handler: noop
   },
@@ -91,6 +88,7 @@ Razorpay.defaults = {
     'image_padding': true,
     'close_button': true
   },
+  'customer_id': '',
   'signature': '',
   'name': '', // of merchant
   'image': ''
