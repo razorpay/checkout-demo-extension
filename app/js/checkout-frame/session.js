@@ -487,11 +487,27 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    this.request.secondfactor();
+    var self = this;
+    this.showOTPScreen({
+      text: 'Sending OTP to',
+      loading: true,
+      number: true
+    })
+    $('#otp').val('');
+
     $.post({
       url: discreet.makeUrl() + 'payments/' + this.request.payment_id + '/otp_resend',
       headers: {
         Authorization: 'Basic ' + _btoa(this.get('key') + ':')
+      },
+      callback: function(response) {
+        self.showOTPScreen({
+          verify: true,
+          text: 'An OTP has been sent to',
+          number: true,
+          otp: true
+        });
+        makeSecondfactorCallback(self.request, response.request)
       }
     });
   },
@@ -786,6 +802,10 @@ Session.prototype = {
   addFunds: function(event) {
     this.request.data.key_id = this.get('key');
     this.request.overridePowerWallet = true;
+    this.showOTPScreen({
+      text: 'Loading...',
+      loading: true
+    });
     Razorpay.payment.authorize(this.request);
   },
 
@@ -793,6 +813,8 @@ Session.prototype = {
     if (!this.sub_tab || !this.isOpen) {
       return;
     }
+    $('#add-funds').removeClass('shown');
+    $('#tab-otp').css('display', 'block');
     $('#tab-otp').toggleClass('loading', state.loading);
     $('#modal').toggleClass('sub', state.verify);
     $('#tab-otp').toggleClass('error', state.error);

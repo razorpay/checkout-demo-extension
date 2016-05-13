@@ -86,8 +86,8 @@ function ajaxCallback(response){
     this.payment_id = response.payment_id;
   }
 
-  if(response.razorpay_payment_id || response.error){
-    if (response.error.action === 'TOPUP') {
+  if(response.razorpay_payment_id || response.error) {
+    if (response.error && response.error.action === 'TOPUP') {
       this.insufficientFundsHandler();
     } else {
       this.complete(response);
@@ -211,7 +211,7 @@ Request.prototype = {
 
   makeUrl: function(){
     if (this.overridePowerWallet && this.payment_id) {
-      return discreet.makeUrl() + 'payments/' + this.payment_id + '/topup';
+      return discreet.makeUrl() + 'payments/' + this.payment_id + '/topup/ajax';
     }
 
     var urlType;
