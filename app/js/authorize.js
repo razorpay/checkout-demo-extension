@@ -153,6 +153,8 @@ function Request(params){
 
   if(this.shouldAjax()){
     this.makeAjax();
+  } else {
+    submitForm(url, data, 'post', popup.name);
   }
 
   // adding listeners
