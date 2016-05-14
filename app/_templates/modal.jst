@@ -1,5 +1,5 @@
 {{
-var o = it.get, method = it.methods, wallet = method.wallet, wd = it.walletData,
+var o = it.get, method = it.methods, wallet = method.wallet,
 html = function(html){return html.replace(/<[^>]*>?/g, "")},
 attr = function(attr){return attr.replace(/"/g,'')};
 
@@ -73,14 +73,14 @@ var gridClass = gridClasses[i-1];
                   </div></div>
                 </div>
                 <div class="legend">Select payment method</div>
-                <div id="payment-options" class="grid {{=gridClass}} clear">
+                <div id="payment-options" class="grid clear count-{{=method.count}}">
                   {{? method.card }}
                   <div class="payment-option item" tab="card"><label><i>&#xe609;</i>{{=it.tab_titles.card}}</label></div>
                   {{?}}
                   {{? method.netbanking }}
                   <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</label></div>
                   {{?}}
-                  {{? method.wallet }}
+                  {{? wallet.length }}
                   <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
                   {{?}}
                 </div>
@@ -144,7 +144,7 @@ var gridClass = gridClasses[i-1];
                 <div class="tab-content showable screen" id="tab-netbanking">
                   <input type="hidden" name="method" value="netbanking">
                   {{ var count = 0, max = 3; }}
-                  <div id="netb-banks" class="clear grid">
+                  <div id="netb-banks" class="clear grid count-3">
                     {{
                     for(var b in it.netbanks){
                       if(count === 0){
@@ -180,28 +180,18 @@ var gridClass = gridClasses[i-1];
                   </div>
                 </div>
               {{?}}
-              {{ if(wallet){ }}
+              {{ if(wallet.length){ }}
                 <div class="tab-content showable screen" id="tab-wallet">
                   <input type="hidden" name="method" value="wallet">
-                  {{ var count = 0, max = 2; }}
-                  <div id="wallets" class="clear grid double">
-                    {{
-                      for (var w in wallet){
-                      if(count === 0){
-                        count = max - 2 + 1;
-                        max++;
-                      }
-                    }}
+                  <div id="wallets" class="clear grid count-{{=wallet.length}}">
+                    {{~wallet :w:i}}
                       <div class="wallet item radio-item">
-                        <input type="radio" name="wallet" value="{{=w}}" id="wallet-radio-{{=w}}">
-                        <label for="wallet-radio-{{=w}}" class="radio-label mfix">
-                          <img class="wallet-button colored mchild l-{{=count}} item-inner" style="height:{{=wd[w].h}}px" src="{{=wd[w].col}}">
+                        <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=w.name}}">
+                        <label for="wallet-radio-{{=w.name}}" class="radio-label mfix">
+                          <img class="wallet-button colored mchild item-inner l-1" style="height:{{=w.h}}px" src="{{=w.col}}">
                         </label>
                       </div>
-                    {{
-                    count = (count + 1) % max;
-                    }
-                    }}
+                    {{~}}
                   </div>
                 </div>
               {{}}}
