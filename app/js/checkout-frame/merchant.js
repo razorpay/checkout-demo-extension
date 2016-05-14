@@ -134,7 +134,9 @@ function notifyBridge(message){
 
 function setPaymentMethods(session){
   var availMethods = preferences.methods;
-  var methods = session.methods = {};
+  var methods = session.methods = {
+    count: 0
+  };
 
   each(
     availMethods,
@@ -146,21 +148,42 @@ function setPaymentMethods(session){
   )
 
   if(session.get('amount') >= 100*10000 || availMethods.wallet instanceof Array){ // php encodes blank object as blank array
-    methods.wallet = false;
+    methods.wallet = {};
+  }
+
+  if(availMethods.netbanking instanceof Array){
+    methods.netbanking = false;
+  } else {
+    methods.count = 1;
+  }
+
+  if(availMethods.card){
+    methods.count++;
   }
 
   each(
     session.get('external.wallets'),
     function(i, externalWallet){
       if(externalWallet in freqWallets){
-        if(!methods.wallet){
-          methods.wallet = {};
-        }
         methods.wallet[externalWallet] = true;
         freqWallets[externalWallet].custom = true;
       }
     }
   )
+  var wallets = [];
+  each(
+    methods.wallet,
+    function(walletName){
+      var freqWallet = freqWallets[walletName];
+      freqWallet.name = walletName;
+      wallets.push(freqWallet);
+    }
+  )
+
+  if(wallets.length){
+    methods.count++;
+  }
+  methods.wallet = wallets;
 }
 
 function showModal(session) {
