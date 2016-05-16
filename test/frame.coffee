@@ -281,12 +281,13 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
           .to.eql foo: 4
         done()
 
-      spy = sinon.stub cf, 'close'
+      spy = null
+      spy3 = sinon.stub cf, 'close'
       message 'complete', foo: 4
-      expect spy.callCount
-        .to.be 1
 
-      expect spy.getCall(0).thisValue
+      expect spy3.callCount
+        .to.be 1
+      expect spy3.getCall(0).thisValue
         .to.be cf
 
     it 'failure', ->
