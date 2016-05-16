@@ -149,7 +149,6 @@ function Request(params){
       submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
     }
   }
-
   if(this.powerwallet){
     data['_[source]'] = 'checkoutjs';
   }
@@ -182,6 +181,7 @@ Request.prototype = {
     var data = this.data = params.data;
     this.get = new Options(params.options).get;
     this.fees = params.fees;
+    this.powerwallet = params.powerwallet;
     this.success = params.success || noop;
     this.error = params.error || noop;
     this.payment_id = params.payment_id;
@@ -243,7 +243,7 @@ Request.prototype = {
 
   // checks whether to use powerwallet or not
   shouldPopup: function(){
-    return !discreet.isFrame || payment.data.fees || !payment.powerwallet;
+    return !discreet.isFrame || this.fees || !this.powerwallet;
   },
 
   // virtually all the time, unless there isn't an ajax based route
