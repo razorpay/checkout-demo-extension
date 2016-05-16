@@ -182,24 +182,23 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  var frame = this.checkoutFrame;
-  if(!frame){
+  if(!preloadedFrame){
     // if(this.get('parent')){
-      frame = new CheckoutFrame(this);
+      preloadedFrame = new CheckoutFrame(this);
     // }
     // else {
     //   frame = getPreloadedFrame();
     // }
-    this.checkoutFrame = frame;
+  }
+  this.checkoutFrame = preloadedFrame;
+
+  if(preloadedFrame.hasLoaded){
+    preloadedFrame.openRzp(this);
   }
 
-  if(frame.hasLoaded){
-    frame.openRzp(this);
-  }
-
-  if(!frame.el.contentWindow){
-    frame.close();
-    frame.afterClose();
+  if(!preloadedFrame.el.contentWindow){
+    preloadedFrame.close();
+    preloadedFrame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
 

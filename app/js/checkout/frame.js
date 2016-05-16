@@ -302,7 +302,7 @@ CheckoutFrame.prototype = {
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && rzp && rzp.id !== data.id) ||
+      // (event !== 'load' && rzp && rzp.id !== data.id) ||
       e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){
