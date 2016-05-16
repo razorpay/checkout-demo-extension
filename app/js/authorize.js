@@ -89,6 +89,8 @@ function ajaxCallback(response){
   if(response.razorpay_payment_id || response.error) {
     if (response.error && response.error.action === 'TOPUP') {
       this.insufficientFundsHandler();
+    } else if (response.error && response.error.action === 'RETRY') {
+      invoke(this.error, null, response, 0);
     } else {
       this.complete(response);
     }

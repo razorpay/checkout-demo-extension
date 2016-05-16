@@ -223,7 +223,19 @@ function errorHandler(response){
 }
 
 // this === Session
-function otpErrorHandler(response){
+function otpErrorHandler(response) {
+  if (response.error.action === 'RETRY') {
+    $('#otp').val('');
+    this.requestTimeout = invoke('showOTPScreen', this, {
+      incorrectOTP: true,
+      otp: true,
+      verify: true,
+      text: 'OTP entered was incorrect'
+    }, 200);
+
+    return;
+  }
+
   this.clearRequest();
   this.requestTimeout = invoke(
     'showOTPScreen',
@@ -497,6 +509,9 @@ Session.prototype = {
 
     $.post({
       url: discreet.makeUrl() + 'payments/' + this.request.payment_id + '/otp_resend',
+      data: {
+        '_[source]': 'checkoutjs'
+      },
       headers: {
         Authorization: 'Basic ' + _btoa(this.get('key') + ':')
       },
@@ -818,7 +833,7 @@ Session.prototype = {
     $('#tab-otp').toggleClass('loading', state.loading);
     $('#modal').toggleClass('sub', state.verify);
     $('#tab-otp').toggleClass('error', state.error);
-    $('#otp').toggleClass('shown', state.otp);
+    $('#otp-elem').toggleClass('shown', state.otp);
     $('#resend-action').toggleClass('shown', state.otp);
 
     var wallet = state.wallet;
@@ -833,6 +848,7 @@ Session.prototype = {
       state.text += ' ' + getPhone();
     }
 
+    $('#otp-prompt').toggleClass('incorrect-otp', state.incorrectOTP);
     gel('otp-prompt').innerHTML = state.text;
   },
 
