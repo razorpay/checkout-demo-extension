@@ -62,22 +62,6 @@ function pollPaymentData(onComplete) {
   }, 150)
 }
 
-// this === request
-function ajaxCallback(response){
-  this.payment_id = response.payment_id;
-
-  if(response.razorpay_payment_id || response.error){
-    this.complete(response);
-  } else {
-    var nextRequest = response.request;
-    if(response.type === 'otp'){
-      this.secondfactor(makeSecondfactorCallback(this, nextRequest));
-    } else {
-      this.nextRequest(nextRequest);
-    }
-  }
-}
-
 function makeSecondfactorCallback(request, nextRequest){
   return function(factor){
     $.post({
@@ -91,80 +75,13 @@ function makeSecondfactorCallback(request, nextRequest){
   }
 }
 
-function Request(params){
-  if(!(this instanceof Request)){
-    return new Request(params);
-  }
-
-  var errors = this.format(params);
-  if(errors){
-    return errors;
-  }
-
-  var popup,
-    data = this.data,
-    url = this.makeUrl();
-
-  if(this.shouldPopup()){
-    popup = this.makePopup();
-    // open new tab
-    if(!popup) {
-      localStorage.removeItem('payload');
-      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
-    }
-  }
-
-  if(this.powerwallet){
-    data['_[source]'] = 'checkoutjs';
-  }
-
-  if(!discreet.supported(true)){
-    return true;
-  }
-
-  if(this.shouldAjax()){
-    this.makeAjax();
-  } else {
-    submitForm(url, data, 'post', popup.name);
-  }
-}
-
 Request.prototype = {
 
   format: function(params){
-    if(typeof params !== 'object' || typeof params.data !== 'object'){
-      return err('malformed payment request object');
-    }
-
-    var data = this.data = params.data;
-    this.get = new Options(params.options).get;
-    this.fees = params.fees;
-    this.success = params.success || noop;
-    this.error = params.error || noop;
     if(params.secondfactor){
       this.secondfactor = params.secondfactor;
     }
-
-    if(!data.key_id){
-      data.key_id = Razorpay.defaults.key;
-    }
-    if(!data.currency){
-      data.currency = Razorpay.defaults.currency;
-    }
-
     return Razorpay.payment.validate(data);
-  },
-
-  cancel: function(errorObj){
-    if(!this.done){
-      var payment_id = this.payment_id;
-      if(payment_id){
-        $.ajax({
-          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.get('key')
-        })
-      }
-      this.complete(errorObj || discreet.defaultError());
-    }
   },
 
   complete: function(data){
@@ -409,8 +326,16 @@ function makeOnComplete(payment){
 var razorpayProto = Razorpay.prototype;
 razorpayProto.createPayment = function(data, params) {
   var payment = this._payment = formatPayment(data, params, this.get);
-  this.one('payment.cancel', function(){
-    clearPayment(payment);
+  this.on('payment.cancel', function(){
+    if(!payment.done){
+      var payment_id = payment.payment_id;
+      if(payment_id){
+        $.ajax({
+          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + payment.data.key_id
+        })
+      }
+      makeOnComplete(payment)(errorObj || discreet.defaultError());
+    }
   });
 
   payment.off = bind(this.off, this);
