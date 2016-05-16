@@ -1,9 +1,5 @@
 var templates = {};
 
-function makeFormHtml64(url, data){
-  return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>');
-}
-
 var pollingInterval;
 
 function clearPollingInterval(force){
@@ -227,6 +223,16 @@ Request.prototype = {
   }
 }
 
+function makeAutoSubmitForm(url, data){
+  return '<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>';
+}
+
+function setPayloadStorage(payload){
+  try{
+    localStorage.setItem(_btoa(payload));
+  } catch(e){}
+}
+
 responseTypes: {
   // this === payment
   first: function(request){
@@ -235,6 +241,7 @@ responseTypes: {
     var popup = this.popup;
     if(popup){
       if(direct){
+        // direct is true for payzapp
         popup.write(content);
       } else {
         submitForm(
@@ -245,8 +252,8 @@ responseTypes: {
         )
       }
     } else {
-      var payload = direct ? _btoa(content) : makeFormHtml64(request.url, content);
-      localStorage.setItem('payload', payload);
+      // set in localStorage for lumia
+      setPayloadStorage(direct ? content : makeAutoSubmitForm(request.url, content));
     }
   },
 
@@ -298,8 +305,8 @@ function formatPayment(data, params, options) {
   }
 
   return = {
+    options: options,
     data: data,
-    paused: params.paused,
     fees: params.fees,
     powerwallet: params.powerwallet
   };
@@ -312,6 +319,12 @@ function shouldPopup(payment) {
 // virtually all the time, unless there isn't an ajax based route
 function shouldAjax(payment){
   return !payment.fees;
+}
+
+function writePopup(popup, content){
+  if(popup){
+    popup.write(content);
+  }
 }
 
 function makePopup() {
@@ -338,7 +351,7 @@ function makeAjax(payment){
   })
 }
 
-makeAjaxCallback(payment){
+function makeAjaxCallback(payment){
   return function(response){
     var payment_id = response.payment_id;
     if (payment_id) {
@@ -353,6 +366,26 @@ makeAjaxCallback(payment){
   }
 }
 
+function generatePayment(payment){
+  var popup = payment.popup;
+
+  // show loading screen in popup
+  writePopup(templates.popup(payment));
+
+  if (shouldAjax(payment)) {
+    makeAjax(payment);
+  } else if (popup) {
+    submitForm(
+      makeRedirectUrl(payment.fees),
+      payment.data,
+      'post',
+      popup.name
+    );
+  } else {
+    setPayloadStorage(payment.message);
+  }
+}
+
 var razorpayProto = Razorpay.prototype;
 razorpayProto.createPayment = function(data, params) {
   var payment = this._payment = formatPayment(data, params, this.get());
@@ -364,14 +397,20 @@ razorpayProto.createPayment = function(data, params) {
   )
 
   if (shouldPopup(payment)) {
-    var popup = payment.popup = makePopup(params.content);
+    var popup = payment.popup = makePopup();
     if (popup) {
       popup.onClose = this.emitter('payment.cancel');
+    } else {
+      localStorage.removeItem('payload');
+      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
     }
   }
 
-  if (!params.paused) {
-    makeAjax(payment);
+  if (params.paused) {
+    writePopup(popup, params.message);
+    this.one('unpause', generatePayment, payment);
+  } else {
+    generatePayment(payment);
   }
 }
 
