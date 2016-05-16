@@ -284,10 +284,7 @@ Request.prototype = {
       var payment_id = this.payment_id;
       if(payment_id){
         $.ajax({
-          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel',
-          headers: {
-            Authorization: 'Basic ' + _btoa(this.get('key') + ':')
-          }
+          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.get('key'),
         })
       }
       this.complete(errorObj || discreet.defaultError());
