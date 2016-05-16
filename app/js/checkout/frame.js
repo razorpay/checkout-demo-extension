@@ -317,6 +317,7 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
+    $('.razorpay-backdrop.anim').removeClass('anim');
     invoke('loadedCallback', this);
     this.hasLoaded = true;
   },

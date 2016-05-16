@@ -69,7 +69,7 @@
       gel('submit').onclick = function(e){
         this.setAttribute('disabled', 'disabled'); // add loading animation here
         Razorpay.payment.authorize({
-          fees: true,
+          // fees: true,
           data: {
             amount: val('amount').replace(/[^0-9]+/,'')*100,
             email: val('customer_email'),

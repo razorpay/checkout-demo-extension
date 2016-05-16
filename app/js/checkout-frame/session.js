@@ -918,14 +918,18 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
+    var options = this.get();
+
     var request = {
       data: data,
       fees: preferences.fee_bearer,
-      options: this.get(),
+      options: options,
       success: this.bind(successHandler)
     };
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
+      options.redirect = false;
+      request.powerwallet = true;
       request.error = this.bind(otpErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
 

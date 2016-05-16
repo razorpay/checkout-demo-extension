@@ -126,31 +126,30 @@ function Request(params){
     return errors;
   }
 
-  var popup,
-    data = this.data,
-    url = this.makeUrl();
+  var popup;
+  var data = this.data;
 
-  if(this.shouldPopup()){
-    if(this.get('redirect')){
-      // add callback_url if redirecting
-      var callback_url = this.get('callback_url');
-      if(callback_url){
-        data.callback_url = callback_url;
-      }
-      return discreet.redirect({
-        url: url,
-        content: data,
-        method: 'post'
-      });
+  if(this.get('redirect')){
+    // add callback_url if redirecting
+    var callback_url = this.get('callback_url');
+    if(callback_url){
+      data.callback_url = callback_url;
     }
+    return discreet.redirect({
+      url: this.makeRedirectUrl(),
+      content: data,
+      method: 'post'
+    });
+  }
+  if(this.shouldPopup()){
     popup = this.makePopup();
     // open new tab
     if(!popup) {
       localStorage.removeItem('payload');
       submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
     }
-  } else {
-    this.powerwallet = true;
+  }
+  if(this.powerwallet){
     data['_[source]'] = 'checkoutjs';
   }
 
@@ -161,7 +160,7 @@ function Request(params){
   if(this.shouldAjax()){
     this.makeAjax();
   } else {
-    submitForm(url, data, 'post', popup.name);
+    submitForm(this.makeRedirectUrl(), data, 'post', popup.name);
   }
 
   // adding listeners
@@ -182,6 +181,7 @@ Request.prototype = {
     var data = this.data = params.data;
     this.get = new Options(params.options).get;
     this.fees = params.fees;
+    this.powerwallet = params.powerwallet;
     this.success = params.success || noop;
     this.error = params.error || noop;
     this.payment_id = params.payment_id;
@@ -204,22 +204,14 @@ Request.prototype = {
     return Razorpay.payment.validate(data);
   },
 
-  makeUrl: function(){
-    var urlType;
-    if(this.fees){
-      urlType = 'fees';
-    } else if(this.get('redirect') && !this.powerwallet){
-      urlType = 'checkout';
-    } else {
-      urlType = 'ajax';
-    }
-    return discreet.makeUrl() + 'payments/create/' + urlType;
+  makeRedirectUrl: function(){
+    return discreet.makeUrl() + 'payments/create/' + (this.fees ? 'fees' : 'checkout');
   },
 
   makeAjax: function(){
     var cb = this.ajaxCallback = bind(ajaxCallback, this);
     var data = this.data;
-    var url = this.makeUrl() + '?key_id=' + data.key_id;
+    var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
     delete data.key_id;
 
     $.post({
@@ -251,16 +243,12 @@ Request.prototype = {
 
   // checks whether to use powerwallet or not
   shouldPopup: function(){
-    return !discreet.isFrame || this.fees || (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney');
+    return !discreet.isFrame || this.fees || !this.powerwallet;
   },
 
   // virtually all the time, unless there isn't an ajax based route
   shouldAjax: function(){
     return !this.fees;
-  },
-
-  shouldPost: function(){
-    return (this.shouldPopup() && !this.popup) || !this.shouldAjax();
   },
 
   makePopup: function(){
