@@ -75,31 +75,6 @@ function makeSecondfactorCallback(request, nextRequest){
   }
 }
 
-Request.prototype = {
-
-  format: function(params){
-    if(params.secondfactor){
-      this.secondfactor = params.secondfactor;
-    }
-    return Razorpay.payment.validate(data);
-  },
-
-  complete: function(data){
-  },
-
-  clear: function(){
-    try{
-      this.popup.onClose = null;
-      this.popup.close();
-    } catch(e){}
-
-    this.done = true;
-    // unbind listener
-    invoke('listener', this);
-    clearPollingInterval();
-  }
-}
-
 function makeAutoSubmitForm(url, data){
   return '<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>';
 }
