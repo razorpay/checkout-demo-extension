@@ -87,9 +87,7 @@ function ajaxCallback(response){
   }
 
   if(response.razorpay_payment_id || response.error) {
-    if (response.error && response.error.action === 'TOPUP') {
-      this.insufficientFundsHandler();
-    } else if (response.error && response.error.action === 'RETRY') {
+    if (response.error && response.error.action === 'RETRY') {
       invoke(this.error, null, response, 0);
     } else {
       this.complete(response);
@@ -190,10 +188,6 @@ Request.prototype = {
     this.payment_id = params.payment_id;
     if(params.secondfactor){
       this.secondfactor = params.secondfactor;
-    }
-
-    if (params.insufficientFundsHandler) {
-      this.insufficientFundsHandler = params.insufficientFundsHandler;
     }
 
     if(!data.key_id){
@@ -303,7 +297,7 @@ Request.prototype = {
       var payment_id = this.payment_id;
       if(payment_id){
         $.ajax({
-          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.get('key'),
+          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.get('key')
         })
       }
       this.complete(errorObj || discreet.defaultError());

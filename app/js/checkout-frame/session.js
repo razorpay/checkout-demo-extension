@@ -242,7 +242,6 @@ function otpErrorHandler(response) {
     this,
     {
       error: true,
-      actionText: 'Retry',
       text: response.error.description
     },
     200
@@ -266,13 +265,6 @@ function successHandler(response){
   // sending oncomplete event because CheckoutBridge.oncomplete
   Razorpay.sendMessage({ event: 'complete', data: response });
   this.hide();
-}
-
-function insufficientFundsHandler() {
-  $('#tab-otp').css('display', 'none');
-  $('#add-funds').toggleClass('shown');
-
-  gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
 }
 
 // this === Session
@@ -536,7 +528,6 @@ Session.prototype = {
     this.on('submit', '#form', this.submit);
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
-    this.on('click', '#add-funds-action', this.addFunds);
     this.on('click', '#resend-action > a', this.resendOTP);
     var enabledMethods = this.methods;
 
@@ -814,21 +805,10 @@ Session.prototype = {
     }
   },
 
-  addFunds: function(event) {
-    this.request.data.key_id = this.get('key');
-    this.request.overridePowerWallet = true;
-    this.showOTPScreen({
-      text: 'Loading...',
-      loading: true
-    });
-    Razorpay.payment.authorize(this.request);
-  },
-
   showOTPScreen: function(state){
     if (!this.sub_tab || !this.isOpen) {
       return;
     }
-    $('#add-funds').removeClass('shown');
     $('#tab-otp').css('display', 'block');
     $('#tab-otp').toggleClass('loading', state.loading);
     $('#modal').toggleClass('sub', state.verify);
@@ -946,7 +926,6 @@ Session.prototype = {
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       request.error = this.bind(otpErrorHandler);
       request.secondfactor = this.bind(secondfactorHandler);
-      request.insufficientFundsHandler = this.bind(insufficientFundsHandler);
 
       this.sub_tab = wallet;
       this.showOTPScreen({
