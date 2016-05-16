@@ -187,23 +187,28 @@ function base_configure(overrides){
   return options;
 }
 
+listenerNumber = 0;
+
 Razorpay.prototype = {
   on: function(event, callback){
     var events = this._events;
     if (!(event in events)) {
-      events[event] = [callback];
-    } else {
-      events[event].push(callback);
+      var eventMap = events[event] = {};
     }
+    eventMap[listenerNumber] = callback;
+    return this;
   },
 
   one: function(event, callback){
-    this.on(event, bind(
-      function(arg){
-        this.off(event, callback);
-        callback(arg);
-      }),
-      this
+    return this.on(
+      event,
+      bind(
+        function(arg){
+          this.off(event, callback);
+          callback(arg);
+        },
+        this
+      )
     )
   },
 
@@ -217,12 +222,14 @@ Razorpay.prototype = {
       eventMap = this._events[event];
       eventMap.splice(indexOf(eventMap, callback), 1);
     }
+    return this;
   },
 
   emit: function(event, arg){
     each(this._events[event], function(i, listener){
       listener(arg);
     })
+    return this;
   },
 
   emitter: function(event, args){

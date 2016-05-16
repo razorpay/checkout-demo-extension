@@ -442,7 +442,7 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(){
-    if(this.request){
+    if(this.rzp){
       if(confirm('Ongoing payment. Press OK to abort payment.')){
         this.clearRequest();
       } else {
@@ -804,13 +804,10 @@ Session.prototype = {
     if(powerotp){
       powerotp.value = '';
     }
-    var request = this.request;
-    if(request){
-      if(request.ajax){
-        request.ajax.abort();
-      }
-      request.cancel();
-      this.request = null;
+    var rzp = this.rzp;
+    if(rzp){
+      rzp.emit('payment.cancel');
+      this.rzp = null;
     }
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
@@ -877,17 +874,14 @@ Session.prototype = {
     var options = this.get();
 
     var request = {
-      fees: preferences.fee_bearer,
-      options: options,
-      success: this.bind(successHandler)
+      fees: preferences.fee_bearer
     };
 
+    var errorCallback;
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       options.redirect = false;
       request.powerwallet = true;
-      request.error = this.bind(otpErrorHandler);
-      request.secondfactor = this.bind(secondfactorHandler);
-
+      errorCallback = otpErrorHandler;
       this.sub_tab = wallet;
       this.showOTPScreen({
         loading: true,
@@ -896,10 +890,12 @@ Session.prototype = {
         wallet: wallet
       })
     } else {
-      request.error = this.bind(errorHandler);
+      errorCallback = errorHandler;
       showLoadingMessage(loadingMessage);
     }
-    this.request = Razorpay(options).createPayment(data, request);
+    this.rzp = Razorpay(options).createPayment(data, request)
+      .on('payment.success', this.bind(successHandler))
+      .on('payment.failure', this.bind(errorCallback));
   },
 
   getPayload: function(nocvv_dummy_values){
@@ -937,10 +933,7 @@ Session.prototype = {
 
   close: function(){
     if(this.isOpen){
-      if(this.request){
-        this.request.cancel();
-        this.request = null;
-      }
+      this.clearRequest();
       this.isOpen = false;
       clearTimeout(fontTimeout);
       invokeEach(this.listeners);

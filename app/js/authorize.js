@@ -279,6 +279,10 @@ function clearPayment(payment){
   } catch(e){}
 
   payment.done = true;
+
+  // remove all razorpay events
+  payment.off();
+
   // unbind listener
   payment.offmessage();
   clearPollingInterval();
@@ -405,6 +409,11 @@ function makeOnComplete(payment){
 var razorpayProto = Razorpay.prototype;
 razorpayProto.createPayment = function(data, params) {
   var payment = this._payment = formatPayment(data, params, this.get);
+  this.one('payment.cancel', function(){
+    clearPayment(payment);
+  });
+
+  payment.off = bind(this.off, this);
   payment.emit = bind(
     function(event, arg){
       this.emit('payment.' + event, arg);
@@ -428,6 +437,7 @@ razorpayProto.createPayment = function(data, params) {
   } else {
     generatePayment(payment);
   }
+  return this;
 }
 
 Razorpay.payment = {
