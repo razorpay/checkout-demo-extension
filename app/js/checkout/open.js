@@ -95,7 +95,8 @@ function createFrameContainer(){
 
 function createFrameBackdrop(){
   var backdrop = document.createElement('div');
-  backdrop.className = 'razorpay-backdrop';
+  backdrop.className = 'razorpay-backdrop anim';
+  backdrop.innerHTML = "<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}.razorpay-backdrop.anim:after{content:'';position:absolute;left:50%;top:50%;margin:-1.5em 0 0 -1.5em;height:3em;width:3em;animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;}</style>";
   var style = backdrop.style;
   each(
     {
