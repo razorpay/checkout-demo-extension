@@ -42,6 +42,28 @@ function each( iteratee, eachFunc, thisArg ) {
   }
 }
 
+function indexOf(arr, item) {
+  if (Array.prototype.indexOf) {
+    return arr.indexOf(item);
+  } else {
+    var len = arr.length >>> 0;
+    var from = Number(arguments[1]) || 0;
+    from = (from < 0)
+         ? Math.ceil(from)
+         : Math.floor(from);
+    if (from < 0) {
+      from += len;
+    }
+
+    for (; from < len; from++)
+    {
+      if (from in arr && arr[from] === item)
+        return from;
+    }
+    return -1;
+  };
+}
+
 function invokeEach(iteratee, thisArg){
   each(
     iteratee,

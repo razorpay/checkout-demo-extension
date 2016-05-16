@@ -877,7 +877,6 @@ Session.prototype = {
     var options = this.get();
 
     var request = {
-      data: data,
       fees: preferences.fee_bearer,
       options: options,
       success: this.bind(successHandler)
@@ -900,7 +899,7 @@ Session.prototype = {
       request.error = this.bind(errorHandler);
       showLoadingMessage(loadingMessage);
     }
-    this.request = Razorpay.payment.authorize(request);
+    this.request = Razorpay(options).createPayment(data, request);
   },
 
   getPayload: function(nocvv_dummy_values){

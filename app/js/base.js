@@ -197,13 +197,31 @@ Razorpay.prototype = {
     }
   },
 
-  off: function(){
-    this._events = [];
+  one: function(event, callback){
+    this.on(event, bind(
+      function(arg){
+        this.off(event, callback);
+        callback(arg);
+      }),
+      this
+    )
   },
 
-  emit: function(event, args){
+  off: function(event, callback){
+    var argLen = arguments.length;
+    if(argLen === 1){
+      delete this._events[event]
+    } else if (!argLen) {
+      this._events = [];
+    } else {
+      eventMap = this._events[event];
+      eventMap.splice(indexOf(eventMap, callback), 1);
+    }
+  },
+
+  emit: function(event, arg){
     each(this._events[event], function(i, listener){
-      listener(args);
+      listener(arg);
     })
   },
 
