@@ -182,7 +182,6 @@ Request.prototype = {
     var data = this.data = params.data;
     this.get = new Options(params.options).get;
     this.fees = params.fees;
-    this.overridePowerWallet = params.overridePowerWallet;
     this.success = params.success || noop;
     this.error = params.error || noop;
     this.payment_id = params.payment_id;
@@ -206,10 +205,6 @@ Request.prototype = {
   },
 
   makeUrl: function(){
-    if (this.overridePowerWallet && this.payment_id) {
-      return discreet.makeUrl() + 'payments/' + this.payment_id + '/topup/ajax';
-    }
-
     var urlType;
     if(this.fees){
       urlType = 'fees';
@@ -256,7 +251,7 @@ Request.prototype = {
 
   // checks whether to use powerwallet or not
   shouldPopup: function(){
-    return !discreet.isFrame || this.fees || this.overridePowerWallet || (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney');
+    return !discreet.isFrame || this.fees || (this.data.wallet !== 'mobikwik' && this.data.wallet !== 'payumoney');
   },
 
   // virtually all the time, unless there isn't an ajax based route
