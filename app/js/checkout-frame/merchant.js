@@ -175,8 +175,10 @@ function setPaymentMethods(session){
     methods.wallet,
     function(walletName){
       var freqWallet = freqWallets[walletName];
-      freqWallet.name = walletName;
-      wallets.push(freqWallet);
+      if(freqWallet){
+        freqWallet.name = walletName;
+        wallets.push(freqWallet);
+      }
     }
   )
 
