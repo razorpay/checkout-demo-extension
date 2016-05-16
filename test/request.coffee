@@ -65,35 +65,6 @@ describe 'Request::', ->
       writestub.restore()
       submitstub.restore()
 
-  it 'make ajax url', ->
-    isFrame = discreet.isFrame
-    discreet.isFrame = true
-    request = Request data: payload
-    expect request.makeUrl()
-      .to.be baseUrl + 'payments/create/ajax'
-    discreet.isFrame = isFrame
-
-  it 'make fees url', ->
-    request = Request
-      data: payload
-      fees: true
-    expect request.makeUrl()
-      .to.be baseUrl + 'payments/create/fees'
-
-    request = Request
-      data: payload
-      fees: true
-      redirect: true
-    expect request.makeUrl()
-      .to.be baseUrl + 'payments/create/fees'
-
-  it 'make redirect url', ->
-    request = Request
-      data: payload
-      options: redirect: true
-    expect request.makeUrl()
-      .to.be baseUrl + 'payments/create/checkout'
-
   describe 'oncomplete callback', ->
     request = null
     response = {}
