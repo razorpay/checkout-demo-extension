@@ -225,7 +225,19 @@ function errorHandler(response){
 }
 
 // this === Session
-function otpErrorHandler(response){
+function otpErrorHandler(response) {
+  if (response.error.action === 'RETRY') {
+    $('#otp').val('');
+    this.requestTimeout = invoke('showOTPScreen', this, {
+      incorrectOTP: true,
+      otp: true,
+      verify: true,
+      text: 'OTP entered was incorrect'
+    }, 200);
+
+    return;
+  }
+
   this.clearRequest();
   this.requestTimeout = invoke(
     'showOTPScreen',
@@ -480,6 +492,35 @@ Session.prototype = {
     }
   },
 
+  resendOTP: function() {
+    var self = this;
+    this.showOTPScreen({
+      text: 'Sending OTP to',
+      loading: true,
+      number: true
+    })
+    $('#otp').val('');
+
+    $.post({
+      url: discreet.makeUrl() + 'payments/' + this.request.payment_id + '/otp_resend',
+      data: {
+        '_[source]': 'checkoutjs'
+      },
+      headers: {
+        Authorization: 'Basic ' + _btoa(this.get('key') + ':')
+      },
+      callback: function(response) {
+        self.showOTPScreen({
+          verify: true,
+          text: 'An OTP has been sent to',
+          number: true,
+          otp: true
+        });
+        makeSecondfactorCallback(self.request, response.request)
+      }
+    });
+  },
+
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
@@ -489,7 +530,7 @@ Session.prototype = {
     this.on('submit', '#form', this.submit);
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
-
+    this.on('click', '#resend-action > a', this.resendOTP);
     var enabledMethods = this.methods;
 
     if(enabledMethods.netbanking){
@@ -539,7 +580,7 @@ Session.prototype = {
 
       parent.setAttribute('cardtype', type);
       validateCardNumber(el);
-      
+
       if(type === 'amex' || oldType === 'amex'){
         formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
       }
@@ -770,10 +811,12 @@ Session.prototype = {
     if (!this.sub_tab || !this.isOpen) {
       return;
     }
+    $('#tab-otp').css('display', 'block');
     $('#tab-otp').toggleClass('loading', state.loading);
     $('#modal').toggleClass('sub', state.verify);
     $('#tab-otp').toggleClass('error', state.error);
-    $('#otp').toggleClass('shown', state.otp);
+    $('#otp-elem').toggleClass('shown', state.otp);
+    $('#resend-action').toggleClass('shown', state.otp);
 
     var wallet = state.wallet;
     if(wallet){
@@ -787,6 +830,7 @@ Session.prototype = {
       state.text += ' ' + getPhone();
     }
 
+    $('#otp-prompt').toggleClass('incorrect-otp', state.incorrectOTP);
     gel('otp-prompt').innerHTML = state.text;
   },
 

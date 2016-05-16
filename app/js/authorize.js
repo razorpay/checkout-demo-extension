@@ -82,10 +82,16 @@ function onMessage(e){
 
 // this === request
 function ajaxCallback(response){
-  this.payment_id = response.payment_id;
+  if (response.payment_id) {
+    this.payment_id = response.payment_id;
+  }
 
-  if(response.razorpay_payment_id || response.error){
-    this.complete(response);
+  if(response.razorpay_payment_id || response.error) {
+    if (response.error && response.error.action === 'RETRY') {
+      invoke(this.error, null, response, 0);
+    } else {
+      this.complete(response);
+    }
   } else {
     var nextRequest = response.request;
     if(response.type === 'otp'){
@@ -95,6 +101,7 @@ function ajaxCallback(response){
     }
   }
 }
+
 
 function makeSecondfactorCallback(request, nextRequest){
   return function(factor){
@@ -177,6 +184,7 @@ Request.prototype = {
     this.fees = params.fees;
     this.success = params.success || noop;
     this.error = params.error || noop;
+    this.payment_id = params.payment_id;
     if(params.secondfactor){
       this.secondfactor = params.secondfactor;
     }
