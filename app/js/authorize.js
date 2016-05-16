@@ -126,9 +126,8 @@ function Request(params){
     return errors;
   }
 
-  var popup,
-    data = this.data,
-    url = this.makeUrl();
+  var popup;
+  var data = this.data;
 
   if(this.get('redirect')){
     // add callback_url if redirecting
@@ -137,7 +136,7 @@ function Request(params){
       data.callback_url = callback_url;
     }
     return discreet.redirect({
-      url: url,
+      url: this.makeRedirectUrl(),
       content: data,
       method: 'post'
     });
@@ -162,7 +161,7 @@ function Request(params){
   if(this.shouldAjax()){
     this.makeAjax();
   } else {
-    submitForm(url, data, 'post', popup.name);
+    submitForm(this.makeRedirectUrl(), data, 'post', popup.name);
   }
 
   // adding listeners
@@ -205,22 +204,14 @@ Request.prototype = {
     return Razorpay.payment.validate(data);
   },
 
-  makeUrl: function(){
-    var urlType;
-    if(this.fees){
-      urlType = 'fees';
-    } else if(this.get('redirect') && !this.powerwallet){
-      urlType = 'checkout';
-    } else {
-      urlType = 'ajax';
-    }
-    return discreet.makeUrl() + 'payments/create/' + urlType;
+  makeRedirectUrl: function(){
+    return discreet.makeUrl() + 'payments/create/' + (this.fees ? 'fees' : 'checkout');
   },
 
   makeAjax: function(){
     var cb = this.ajaxCallback = bind(ajaxCallback, this);
     var data = this.data;
-    var url = this.makeUrl() + '?key_id=' + data.key_id;
+    var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
     delete data.key_id;
 
     $.post({
