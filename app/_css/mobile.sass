@@ -3,6 +3,15 @@
 $max-width: 414px;
 $max-height: 659px;
 
+=hidePowered
+  #powered-by
+    position: absolute;
+    top: 40px;
+    visibility: hidden!important;
+    bottom: auto;
+    z-index: -1;
+    pointer-events: none;
+
 =mobile-view
   max-width: $max-width;
 
@@ -10,6 +19,8 @@ $max-height: 659px;
     -webkit-touch-callout: none;
     -webkit-text-size-adjust: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+  +hidePowered();
 
   #header, #footer, .button, #emi-inner
     border-radius: 0;
@@ -51,6 +62,9 @@ $max-height: 659px;
       font-size: 14px;
       margin-left: 10px;
 
+  #backdrop
+    display: none;
+
   #modal
     background: #fff;
     width: 100%;
@@ -62,14 +76,6 @@ $max-height: 659px;
 
   &.shown #modal
     transition: 0.3s ease-out all;
-
-  #powered-by
-    position: absolute;
-    top: 40px;
-    visibility: hidden!important;
-    bottom: auto;
-    z-index: -1;
-    pointer-events: none;
 
   #payment-options
     border-bottom: 1px solid $bc;
@@ -96,3 +102,7 @@ body
   &.android, &.noanim
     #modal
       transition: none!important;
+  &.embedded
+    +hidePowered();
+    #close
+      display: none;

@@ -4,6 +4,8 @@ var shouldShakeOnError = !/Android|iPhone/.test(ua);
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
+var loadingMessage = 'Your payment is being processed';
+
 var fontTimeout;
 
 function validateCardNumber(el){
@@ -173,7 +175,7 @@ function showErrorMessage(message){
 }
 
 function showLoadingMessage(){
-  $('#fd-t').html('Loading, please wait...');
+  $('#fd-t').html(loadingMessage);
   showOverlay(
     $('#error-message').addClass('loading')
   );
@@ -383,6 +385,7 @@ Session.prototype = {
   setModal: function(){
     if(!this.modal){
       this.modal = new window.Modal(this.el, {
+        escape: this.get('parent'),
         backdropclose: this.get('modal.backdropclose'),
         onhide: function(){
           Razorpay.sendMessage({event: 'dismiss'});
@@ -440,7 +443,7 @@ Session.prototype = {
 
   hideErrorMessage: function(){
     if(this.request){
-      if(confirm('Cancel Payment?')){
+      if(confirm('Ongoing payment. Press OK to abort payment.')){
         this.clearRequest();
       } else {
         return;
@@ -895,7 +898,7 @@ Session.prototype = {
       })
     } else {
       request.error = this.bind(errorHandler);
-      showLoadingMessage('Please wait while your payment is processed...');
+      showLoadingMessage(loadingMessage);
     }
     this.request = Razorpay.payment.authorize(request);
   },

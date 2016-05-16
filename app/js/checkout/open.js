@@ -160,7 +160,7 @@ function createTestRibbon(){
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
 var testRibbon = createTestRibbon();
-// var preloadedFrame = getPreloadedFrame();
+var preloadedFrame;// = getPreloadedFrame();
 
 function getPreloadedFrame(){
 
@@ -191,7 +191,10 @@ Razorpay.prototype.open = function() {
     // }
     this.checkoutFrame = frame;
   }
-  // frame.openRzp(this);
+
+  if(frame.hasLoaded){
+    frame.openRzp(this);
+  }
 
   if(!frame.el.contentWindow){
     frame.close();
