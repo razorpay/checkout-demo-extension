@@ -10,19 +10,19 @@ describe 'events', ->
 
     # one listener
     rzp.on 'a', spy
-    rzp.trigger 'a'
+    rzp.emit 'a'
     expect spy.callCount
       .to.be 1
 
     # 2 listeners
     rzp.on 'a', spy
-    rzp.trigger 'a'
+    rzp.emit 'a'
     expect spy.callCount
       .to.be 3
 
     # unbind
     rzp.off()
-    rzp.trigger 'a'
+    rzp.emit 'a'
     expect spy.callCount
       .to.be 3
 

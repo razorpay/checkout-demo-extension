@@ -201,10 +201,14 @@ Razorpay.prototype = {
     this._events = [];
   },
 
-  trigger: function(event, args){
+  emit: function(event, args){
     each(this._events[event], function(i, listener){
       listener(args);
     })
+  },
+
+  emitter: function(event, args){
+    return bind(function(){ this.emit(event, args) }, this);
   },
 
   isLiveMode: function(){
