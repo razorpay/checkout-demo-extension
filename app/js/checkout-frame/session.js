@@ -258,23 +258,28 @@ function successHandler(response){
 }
 
 // this === Session
-function secondfactorHandler(){
-  this.showOTPScreen({
-    text: 'Sending OTP to',
-    loading: true,
-    number: true
-  })
+function secondfactorHandler(text){
+  var timeout;
+  if(!text){
+    this.showOTPScreen({
+      text: 'Sending OTP to',
+      loading: true,
+      number: true
+    })
+    text = 'An OTP has been sent to';
+    timeout = 750;
+  }
   $('#otp').val('');
   this.requestTimeout = invoke(
     'showOTPScreen',
     this,
     {
       verify: true,
-      text: 'An OTP has been sent to',
-      number: true,
+      text: text,
+      number: timeout,
       otp: true
     },
-    750
+    timeout
   )
 }
 

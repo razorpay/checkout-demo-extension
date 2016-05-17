@@ -338,7 +338,7 @@ razorpayProto.submitOTP = function(otp){
     callback: function(response){
       var error = response.error;
       if(error && error.action === 'RETRY'){
-        return payment.emit('otp.required');
+        return payment.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
       }
       payment.complete(response);
     }
