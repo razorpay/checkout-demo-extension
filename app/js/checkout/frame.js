@@ -172,7 +172,7 @@ CheckoutFrame.prototype = {
 
       setTimeout(function() {
         iframe.attr({
-          style: 'min-height: 550px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;'
+          style: 'min-height: 530px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;'
         });
       });
     }
