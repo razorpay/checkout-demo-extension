@@ -485,7 +485,7 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    var self = this;
+    var rzp = this.rzp;
     this.showOTPScreen({
       text: 'Sending OTP to',
       loading: true,
@@ -493,21 +493,9 @@ Session.prototype = {
     })
     $('#otp').val('');
 
-    $.post({
-      url: discreet.makeUrl() + 'payments/' + this.rzp._payment.payment_id + '/otp_resend?key_id=' + this.get('key'),
-      data: {
-        '_[source]': 'checkoutjs'
-      },
-      callback: function(response) {
-        self.showOTPScreen({
-          verify: true,
-          text: 'An OTP has been sent to',
-          number: true,
-          otp: true
-        });
-        makeSecondfactorCallback(self.request, response.request)
-      }
-    });
+    rzp.resendOTP(function() {
+      rzp.emit('payment.otp.required');
+    })
   },
 
   bindEvents: function(){
