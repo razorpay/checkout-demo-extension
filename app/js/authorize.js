@@ -96,8 +96,21 @@ var responseTypes = {
     }
   },
 
-  otp: function(response, payment){
-
+  otp: function(request){
+    var payment = this;
+    this.emit('otp.required', function(otp){
+      $.post({
+        url: request.url,
+        data: {
+          type: 'otp',
+          otp: otp
+        },
+        callback: function(response){
+          if(response.error){
+            payment.emit()
+          }
+        }
+    });
   }
 }
 
@@ -277,7 +290,7 @@ function makeOnComplete(payment){
       if(!data.error || typeof data.error !== 'object' || !data.error.description){
         data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
       }
-      payment.emit('failure', data);
+      payment.emit('error', data);
     }
 
     payment.off();

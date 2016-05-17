@@ -939,7 +939,7 @@ Session.prototype = {
     }
     this.rzp = Razorpay(options).createPayment(data, request)
       .on('payment.success', this.bind(successHandler))
-      .on('payment.failure', this.bind(errorCallback));
+      .on('payment.error', this.bind(errorCallback));
   },
 
   getPayload: function(nocvv_dummy_values){
