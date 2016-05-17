@@ -47,19 +47,27 @@ function initAutomaticCheckout(){
     function(i, attr){
       var name = attr.name
       if(/^data-/.test(name)){
-        name = name.replace(/^data-/,'').replace(/^notes\.(.+)$/,'notes[$1]');
+        var rootObj = opts;
+        name = name.replace(/^data-/,'');
         var val = attr.value;
         if(val === 'true'){
           val = true;
         } else if (val === 'false'){
           val = false;
         }
-        opts[name] = val;
+        if(/^notes\./.test(name)){
+          if(!opts.notes){
+            opts.notes = {}
+          }
+          rootObj = opts.notes;
+          name = name.replace(/^notes\./,'');
+        }
+        rootObj[name] = val;
       }
     }
   )
 
-  var amount = currentScript.getAttribute('data-amount');
+  var amount = opts.amount;
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
