@@ -192,7 +192,7 @@ listenerNumber = 0;
 Razorpay.prototype = {
   on: function(event, callback){
     var events = this._events;
-    if (!(event in events)) {
+    if (!(events[event] instanceof Array)) {
       var eventMap = events[event] = {};
     }
     eventMap[listenerNumber] = callback;
@@ -226,9 +226,16 @@ Razorpay.prototype = {
   },
 
   emit: function(event, arg){
-    each(this._events[event], function(i, listener){
-      listener(arg);
-    })
+    var eventMap = this._events[event];
+    if(eventMap instanceof Array){
+      // .on('event') based callback
+      each(this._events[event], function(i, listener){
+        listener(arg);
+      })
+    } else {
+      // onEvent based callback
+      eventMap(arg);
+    }
     return this;
   },
 
