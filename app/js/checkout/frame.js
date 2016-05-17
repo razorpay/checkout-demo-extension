@@ -121,7 +121,6 @@ function makeCheckoutMessage(rzp){
 
   if(options.parent){
     response.embedded = true;
-    options.parent = true;
   }
 
   sanitizeImage(options);

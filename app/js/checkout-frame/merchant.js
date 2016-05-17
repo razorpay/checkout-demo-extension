@@ -400,6 +400,7 @@ window.handleMessage = function(message){
     RazorpayConfig = message.config;
   }
   if(message.embedded){
+    session.embedded = true;
     $(doc).addClass('embedded');
   }
   if(message.data){
