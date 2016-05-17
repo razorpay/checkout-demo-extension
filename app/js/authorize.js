@@ -97,20 +97,8 @@ var responseTypes = {
   },
 
   otp: function(request){
-    var payment = this;
-    this.emit('otp.required', function(otp){
-      $.post({
-        url: request.url,
-        data: {
-          type: 'otp',
-          otp: otp
-        },
-        callback: function(response){
-          if(response.error){
-            payment.emit()
-          }
-        }
-    });
+    this.otpurl = request.url;
+    this.emit('otp.required');
   }
 }
 
@@ -259,7 +247,7 @@ function generatePayment(payment){
 
   // adding listeners
   if(discreet.isFrame){
-    var completeCallback = window.onComplete = makeOnComplete(payment);
+    var completeCallback = payment.complete = window.onComplete = makeOnComplete(payment);
     pollPaymentData(completeCallback);
   }
   payment.offmessage = $(window).on('message', makeOnMessage(popup, completeCallback));
@@ -337,6 +325,24 @@ razorpayProto.createPayment = function(data, params) {
     generatePayment(payment);
   }
   return this;
+}
+
+razorpayProto.submitOTP = function(otp){
+  var payment = this._payment;
+  $.post({
+    url: payment.otpurl,
+    data: {
+      type: 'otp',
+      otp: otp
+    },
+    callback: function(response){
+      var error = response.error;
+      if(error && error.action === 'RETRY'){
+        return payment.emit('otp.required');
+      }
+      payment.complete(response);
+    }
+  })
 }
 
 Razorpay.payment = {

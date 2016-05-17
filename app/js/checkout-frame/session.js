@@ -226,18 +226,6 @@ function errorHandler(response){
 
 // this === Session
 function otpErrorHandler(response) {
-  if (response.error.action === 'RETRY') {
-    $('#otp').val('');
-    this.requestTimeout = invoke('showOTPScreen', this, {
-      incorrectOTP: true,
-      otp: true,
-      verify: true,
-      text: 'OTP entered was incorrect'
-    }, 200);
-
-    return;
-  }
-
   this.clearRequest();
   this.requestTimeout = invoke(
     'showOTPScreen',
@@ -270,8 +258,7 @@ function successHandler(response){
 }
 
 // this === Session
-function secondfactorHandler(done, tab){
-  this.secondfactorCallback = done;
+function secondfactorHandler(){
   this.showOTPScreen({
     text: 'Sending OTP to',
     loading: true,
@@ -502,12 +489,9 @@ Session.prototype = {
     $('#otp').val('');
 
     $.post({
-      url: discreet.makeUrl() + 'payments/' + this.request.payment_id + '/otp_resend',
+      url: discreet.makeUrl() + 'payments/' + this.rzp._payment.payment_id + '/otp_resend?key_id=' + this.get('key'),
       data: {
         '_[source]': 'checkoutjs'
-      },
-      headers: {
-        Authorization: 'Basic ' + _btoa(this.get('key') + ':')
       },
       callback: function(response) {
         self.showOTPScreen({
@@ -840,7 +824,7 @@ Session.prototype = {
       loading: true,
       text: 'Verifying OTP...'
     })
-    this.secondfactorCallback(gel('otp').value);
+    this.rzp.submitOTP(gel('otp').value);
   },
 
   clearRequest: function(){
@@ -940,6 +924,10 @@ Session.prototype = {
     this.rzp = Razorpay(options).createPayment(data, request)
       .on('payment.success', this.bind(successHandler))
       .on('payment.error', this.bind(errorCallback));
+
+    if(request.powerwallet){
+      this.rzp.on('payment.otp.required', this.bind(secondfactorHandler));
+    }
   },
 
   getPayload: function(nocvv_dummy_values){
