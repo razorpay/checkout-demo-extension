@@ -103,13 +103,13 @@ describe 'automatic checkout:', ->
           handler: defaultAutoPostHandler
         }
 
-describe 'automatic parsing for nested options', ->
+describe 'automatic parsing for nested or uppercase options', ->
   it '', ->
     opts =
-      'key': 'key',
+      'KEY': 'key',
       'amount': 1000,
       'theme.color': 'red',
-      'notes.foo': 'bar',
+      'notes.FOO': 'bar',
       'notes.hello': 'world'
 
     for opt, val of opts
