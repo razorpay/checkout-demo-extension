@@ -95,6 +95,10 @@ Payment.prototype = {
     this.r.emit('payment.' + event, arg);
   },
 
+  off: function(){
+    this.r.off('payment');
+  },
+
   checkRedirect: function(){
     var getOption = this.r.get;
     if(getOption('redirect')){
@@ -144,7 +148,7 @@ Payment.prototype = {
     writePopup(popup, templates.popup(this));
 
     if (shouldAjax(this)) {
-      makeAjax(this);
+      this.ajax();
     } else if (popup) {
       submitForm(
         makeRedirectUrl(this.fees),
@@ -182,15 +186,15 @@ Payment.prototype = {
     var payment_id = data.razorpay_payment_id;
     if(typeof payment_id === 'string' && payment_id){
       var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-      payment.emit('success', returnObj);
+      this.emit('success', returnObj);
     } else {
       if(!data.error || typeof data.error !== 'object' || !data.error.description){
         data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
       }
-      payment.emit('error', data);
+      this.emit('error', data);
     }
 
-    payment.off();
+    this.off();
   },
 
   clear: function(){
