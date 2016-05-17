@@ -47,7 +47,7 @@ function initAutomaticCheckout(){
     function(i, attr){
       var name = attr.name
       if(/^data-/.test(name)){
-        name = name.replace(/^data-/,'');
+        name = name.replace(/^data-/,'').replace(/^notes\.(.+)$/,'notes[$1]');
         var val = attr.value;
         if(val === 'true'){
           val = true;
