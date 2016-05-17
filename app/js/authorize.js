@@ -62,19 +62,6 @@ function pollPaymentData(onComplete) {
   }, 150)
 }
 
-function makeSecondfactorCallback(request, nextRequest){
-  return function(factor){
-    $.post({
-      url: nextRequest.url,
-      data: {
-        type: 'otp',
-        otp: factor
-      },
-      callback: request.ajaxCallback
-    })
-  }
-}
-
 function makeAutoSubmitForm(url, data){
   return '<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>';
 }
@@ -169,11 +156,7 @@ function clearPayment(payment){
     payment.popup.onClose = null;
     payment.popup.close();
   } catch(e){}
-
   payment.done = true;
-
-  // remove all razorpay events
-  payment.off();
 
   // unbind listener
   payment.offmessage();
@@ -236,7 +219,7 @@ function makeAjaxCallback(payment){
 
 function makeOnMessage(popup, onComplete){
   return function(e){
-    if (popup && popup.window === e.source || e.source === communicator.contentWindow) {
+    if (popup && popup.window === e.source || communicator && communicator.contentWindow === e.source) {
       onComplete(e.data);
     }
   }
@@ -274,6 +257,7 @@ function makeOnComplete(payment){
     if(payment.done){
       return;
     }
+
     clearPayment(payment);
 
     try{
@@ -288,20 +272,22 @@ function makeOnComplete(payment){
     var payment_id = data.razorpay_payment_id;
     if(typeof payment_id === 'string' && payment_id){
       var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-      return payment.emit('success', returnObj);
+      payment.emit('success', returnObj);
+    } else {
+      if(!data.error || typeof data.error !== 'object' || !data.error.description){
+        data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
+      }
+      payment.emit('failure', data);
     }
 
-    if(!data.error || typeof data.error !== 'object' || !data.error.description){
-      data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
-    }
-    payment.emit('failure', data);
+    payment.off();
   }
 }
 
 var razorpayProto = Razorpay.prototype;
 razorpayProto.createPayment = function(data, params) {
   var payment = this._payment = formatPayment(data, params, this.get);
-  this.on('payment.cancel', function(){
+  this.on('payment.cancel', function(errorObj){
     if(!payment.done){
       var payment_id = payment.payment_id;
       if(payment_id){
