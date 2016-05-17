@@ -266,7 +266,6 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       spy2 = sinon.stub cf, 'afterClose'
       message 'hidden'
 
-
       expect spy2.callCount
         .to.be 1
 

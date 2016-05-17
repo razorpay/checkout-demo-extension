@@ -195,6 +195,16 @@ Request.prototype = {
     if(!data.currency){
       data.currency = Razorpay.defaults.currency;
     }
+    each(
+      data.notes,
+      function(key, val){
+        var valType = typeof val;
+        if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
+          data['notes' + key] = val;
+        }
+      }
+    )
+    delete data.notes;
 
     data['_[id]'] = _uid;
     data['_[medium]'] = discreet.medium;
