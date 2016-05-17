@@ -187,7 +187,11 @@ function base_configure(overrides){
   return options;
 }
 
-listenerNumber = 0;
+function addListener(rzp, event, listener){
+  if(!(event in rzp._events)){
+    rzp._events[event] = listener;
+  }
+}
 
 Razorpay.prototype = {
   on: function(event, callback){
@@ -199,7 +203,7 @@ Razorpay.prototype = {
     return this;
   },
 
-  one: function(event, callback){
+  once: function(event, callback){
     return this.on(
       event,
       bind(
@@ -227,14 +231,16 @@ Razorpay.prototype = {
 
   emit: function(event, arg){
     var eventMap = this._events[event];
-    if(eventMap instanceof Array){
-      // .on('event') based callback
-      each(this._events[event], function(i, listener){
-        listener(arg);
-      })
-    } else {
-      // onEvent based callback
-      eventMap(arg);
+    if(eventMap){
+      if(eventMap instanceof Array){
+        // .on('event') based callback
+        each(this._events[event], function(i, listener){
+          listener(arg);
+        })
+      } else {
+        // onEvent based callback
+        eventMap(arg);
+      }      
     }
     return this;
   },
