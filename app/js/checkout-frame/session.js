@@ -916,7 +916,13 @@ Session.prototype = {
     }
     this.rzp = Razorpay(options).createPayment(data, request)
       .on('payment.success', this.bind(successHandler))
-      .on('payment.error', this.bind(errorCallback));
+      .on('payment.error', this.bind(errorCallback))
+      .on('payment.error', function(response){
+        Razorpay.sendMessage({
+          event: 'event',
+          data: JSON.stringify()
+        });
+      });
 
     if(request.powerwallet){
       this.rzp.on('payment.otp.required', this.bind(secondfactorHandler));
