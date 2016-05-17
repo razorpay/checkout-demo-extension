@@ -161,7 +161,7 @@ CheckoutFrame.prototype = {
       this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
-          style: 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
+          style: 'min-height: 501px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
           allowtransparency: true,
           frameborder: 0,
           width: '100%',
