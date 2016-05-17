@@ -196,10 +196,11 @@ function addListener(rzp, event, listener){
 Razorpay.prototype = {
   on: function(event, callback){
     var events = this._events;
-    if (!(events[event] instanceof Array)) {
-      var eventMap = events[event] = {};
+    var eventMap = events[event];
+    if (!(eventMap instanceof Array)) {
+      eventMap = events[event] = [];
     }
-    eventMap[listenerNumber] = callback;
+    eventMap.push(callback);
     return this;
   },
 
@@ -221,7 +222,7 @@ Razorpay.prototype = {
     if(argLen === 1){
       delete this._events[event]
     } else if (!argLen) {
-      this._events = [];
+      this._events = {};
     } else {
       eventMap = this._events[event];
       eventMap.splice(indexOf(eventMap, callback), 1);
