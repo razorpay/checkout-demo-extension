@@ -1,39 +1,52 @@
-@import common
+@import "common";
 
 $max-width: 414px;
 $max-height: 659px;
 
-=mobile-view
+@mixin mobile-view {
   max-width: $max-width;
 
-  *
+  * {
     -webkit-touch-callout: none;
     -webkit-text-size-adjust: none;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
 
-  +hidePowered();
+  @include hidePowered;
 
-  #header, #footer, .button, #emi-inner
+  #header,
+  #footer,
+  .button,
+  #emi-inner {
     border-radius: 0;
+  }
 
-  &:after
+  &::after {
     content: none;
+  }
 
-  .shake
+  .shake {
     animation: none;
+  }
 
-  #body
-    &.emi-focus
-      #footer
+  #body {
+    &.emi-focus {
+      #footer {
         position: fixed;
+      }
+    }
+  }
 
-  #overlay, #error-message
+  #overlay,
+  #error-message {
     bottom: 0;
+  }
 
-  #content
+  #content {
     height: 100%;
+  }
 
-  #emi-wrap
+  #emi-wrap {
     width: 100%;
     left: 0;
     margin-left: 0;
@@ -43,53 +56,71 @@ $max-height: 659px;
     top: auto;
     transform: translateY(15px);
 
-    &:after
+    &::after {
       height: auto;
+    }
 
-    .col
+    .col {
       white-space: normal;
+    }
 
-    .em
+    .em {
       font-size: 14px;
       margin-left: 10px;
+    }
+  }
 
-  #backdrop
+  #backdrop {
     display: none;
+  }
 
-  #modal
+  #modal {
     background: #fff;
     width: 100%;
     min-height: 100%;
     margin: 0 auto;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     transform: translateY(7%);
     overflow: hidden;
+  }
 
-  &.shown #modal
+  &.shown #modal {
     transition: 0.3s ease-out all;
+  }
 
-  #payment-options
+  #payment-options {
     border-bottom: 1px solid $bc;
+  }
 
-  .item-inner
+  .item-inner {
     transform: none;
     opacity: 0;
+  }
 
-  .tab-content.shown .item-inner
+  .tab-content.shown .item-inner {
     opacity: 1;
+  }
 
-  #footer
+  #footer {
     bottom: 0;
     z-index: 10;
     transform: translateY(100%);
+  }
+}
 
-@media (max-device-height: 450px), (max-device-width: 450px)
-  +mobile-view();
+@media (max-device-height: 450px), (max-device-width: 450px) {
+  @include mobile-view;
 
-  .mobile
-    +mobile-view();
+  .mobile {
+    @include mobile-view;
+  }
+}
 
-body
-  &.android, &.noanim
-    #modal
-      transition: none!important;
+body {
+  &.android,
+  &.noanim {
+    #modal {
+      transition: none !important;
+    }
+  }
+}

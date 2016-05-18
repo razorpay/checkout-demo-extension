@@ -1,43 +1,49 @@
-$font: ubuntu, helvetica, sans-serif
-$lato: 'lato', $font
+$font: ubuntu, helvetica, sans-serif;
+$lato: "lato", $font;
 
-$headerh: 128px
+$headerh: 128px;
 
-$col: #333
-$pri: #e67e22
-$pri: #29B7D8
-$danger: #f46060
-$bc: #e6e7e8
-$bg: #fcfbfa
-$bgd: #f0f0f0
+$col: #333;
+$pri: #e67e22;
+$pri: #29b7d8;
+$danger: #f46060;
+$bc: #e6e7e8;
+$bg: #fcfbfa;
+$bgd: #f0f0f0;
 
-$br: 3px
+$br: 3px;
 $bs: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-$padh: 20px
-$size: 14px
-$p: 24px
-$topbarh: 50px
+$padh: 20px;
+$size: 14px;
+$p: 24px;
+$topbarh: 50px;
 $footerh: 55px;
 
-=opacity($fraction)
+@mixin opacity($fraction) {
   opacity: $fraction;
+
   $percent: $fraction * 100;
+
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$percent}";
   filter: alpha(opacity=#{$percent});
+}
 
-=cover
+@mixin cover {
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   position: absolute;
+}
 
-=hidePowered
-  #powered-by
+@mixin hidePowered {
+  #powered-by {
     position: absolute;
     top: 40px;
-    visibility: hidden!important;
+    visibility: hidden !important;
     bottom: auto;
     z-index: -1;
     pointer-events: none;
+  }
+}

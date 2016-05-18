@@ -1,45 +1,58 @@
-@import common
+@import "common";
 
 $top: 28px;
-$left: 0px;
+$left: 0;
 $bottom: 7px;
 
-.fieldset
+.fieldset {
   padding: 0 $p;
+}
 
-.elem-wrap
+.elem-wrap {
   height: 72px;
-  &.third
+
+  &.third {
     float: left;
     width: 33.33%;
-    .elem
+
+    .elem {
       margin-left: 20px;
-  &.two-third
+    }
+  }
+
+  &.two-third {
     float: left;
     width: 66.66%;
+  }
+}
 
-.elem
+.elem {
   border-bottom: 1px solid $bc;
   position: relative;
 
-  &.invalid.mature:not(.focused)
-    .input
+  &.invalid.mature:not(.focused) {
+    .input {
       color: $danger;
+    }
+  }
 
-  input
+  input {
     opacity: 0;
+  }
 
-  input:focus
-    color: #000000;
+  input:focus {
+    color: #000;
+  }
 
-  i
+  i {
     position: absolute;
     font-size: 20px;
     bottom: 6px;
-    right: 0px;
-    color: #8F8F8F;
+    right: 0;
+    color: #8f8f8f;
+  }
 
-  label
+  label {
     transform-origin: 0 0;
     color: #757575;
     position: absolute;
@@ -47,17 +60,25 @@ $bottom: 7px;
     left: $left;
     z-index: 1;
     pointer-events: none;
+  }
+}
 
-.font-loaded .elem label
+.font-loaded .elem label {
   transition: 0.3s;
+}
 
-.filled, .focused
-  label
+.filled,
+.focused {
+  label {
     transform: scale(0.86) translateY(-20px);
-  input
-    opacity: 1;
+  }
 
-.input
+  input {
+    opacity: 1;
+  }
+}
+
+.input {
   transition: 0.3s;
   font-size: inherit;
   border: none;
@@ -71,28 +92,35 @@ $bottom: 7px;
   margin: 0;
   position: relative;
   color: #424242;
+}
 
-.select
+.select {
   padding: 28px 0 0;
+}
 
-.select select
+.select select {
   appearance: none;
   text-indent: 1px;
   text-overflow: ellipsis;
   padding: 7px 0;
+}
 
-select option
+select option {
   width: inherit;
+}
 
-.select-arrow
+.select-arrow {
   pointer-events: none;
+}
 
-input[type=checkbox]
+input[type=checkbox] {
   display: none;
   appearance: none;
+}
 
-.checked .checkbox:after, :checked + .checkbox:after
-  content: '';
+.checked .checkbox::after,
+:checked + .checkbox::after {
+  content: "";
   width: 7px;
   height: 3px;
   position: absolute;
@@ -102,8 +130,9 @@ input[type=checkbox]
   border-top: none;
   border-right: none;
   transform: rotate(-45deg);
+}
 
-.checkbox
+.checkbox {
   vertical-align: middle;
   display: inline-block;
   position: relative;
@@ -114,48 +143,64 @@ input[type=checkbox]
   cursor: pointer;
   background: #fff;
   border: 1px solid #ccc;
-  transition: .2s;
+  transition: 0.2s;
   border-radius: $br;
+}
 
-input[type=radio]
+input[type=radio] {
   display: none;
+}
 
-input[type=radio]:checked+label
+input[type=radio]:checked + label {
   background: $bgd;
-  .item-inner
-    top: 1px;
 
-button
+  .item-inner {
+    top: 1px;
+  }
+}
+
+button {
   cursor: pointer;
   background: none;
   border: none;
   outline: none;
+}
 
-@media screen and (min-width:0\0)
-  .help
+@media screen and (min-width: 0\0) {
+  .help {
     display: none;
-  .focused.invalid.mature .help
-    display: block;
+  }
 
-.dropdown, .help
-  display: none\9; // <ie9
+  .focused.invalid.mature .help {
+    display: block;
+  }
+}
+
+.dropdown,
+.help {
+  display: none\9;
   pointer-events: none;
-  +opacity(0);
+
+  @include opacity(0);
+
   transform: translateY(10px);
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+}
 
-.help
+.help {
   transform: translateY(-10px);
+}
 
 .dropdown-parent:focus .dropdown,
-.focused.invalid.mature .help
+.focused.invalid.mature .help {
   pointer-events: auto;
-  display: block; // helps when pointer-events is not supported
+  display: block;
   opacity: 1;
   transform: none;
   transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
+}
 
-.help
+.help {
   color: #fff;
   font-weight: bold;
   position: absolute;
@@ -163,15 +208,15 @@ button
   padding: 8px 12px;
   font-size: 12px;
   background: #555;
-  box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
+  box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
   z-index: 3;
   border-radius: $br;
   top: 100%;
   margin-top: 10px;
-  pointer-events: none!important;
+  pointer-events: none !important;
 
-  &:after
-    content: '';
+  &::after {
+    content: "";
     position: absolute;
     width: 0;
     height: 0;
@@ -181,8 +226,10 @@ button
     bottom: 100%;
     left: 20px;
     margin: 0 0 -1px -10px;
+  }
+}
 
-.btn
+.btn {
   cursor: pointer;
   border-radius: $br;
   background: $pri;
@@ -191,6 +238,8 @@ button
   padding: 0 16px;
   font-weight: bold;
   text-transform: uppercase;
+}
 
-#card_cvv
+#card_cvv {
   -webkit-text-security: disc;
+}

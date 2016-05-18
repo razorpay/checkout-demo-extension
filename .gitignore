@@ -1,12 +1,19 @@
-/node_modules
-aws-keys.json
-/app/css
-/app/templates
-/app/dist/v1/*.*
+# outputs
+/app/dist/
 !/app/dist/v1/checkout-frame.js
 !/app/dist/v1/razorpay.js
 !/app/dist/v1/checkout-new.js
-/app/dist/v1/css/*.*
 !/app/dist/v1/css/checkout.css
+/app/templates
+
+# dependencies
+/node_modules
+
+# misc
+.orig
+.DS_Store
+
+# others
+aws-keys.json
 coverage
 /app/config.js
