@@ -68,14 +68,10 @@ function Payment(data, params, r){
 
   this.on('cancel', onPaymentCancel);
 
-  if (shouldPopup(this)) {
-    var popup = this.popup = makePopup();
-    if (popup) {
-      popup.onClose = r.emitter('payment.cancel');
-    } else {
-      localStorage.removeItem('payload');
-      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
-    }
+  if (!this.tryPopup()) {
+    // popup creation failed
+    localStorage.removeItem('payload');
+    submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
   }
 
   if (params.paused) {
@@ -147,22 +143,23 @@ Payment.prototype = {
     // show loading screen in popup
     writePopup(popup, templates.popup(this));
 
-    if (shouldAjax(this)) {
-      this.ajax();
-    } else if (popup) {
-      submitForm(
-        makeRedirectUrl(this.fees),
-        this.data,
-        'post',
-        popup.name
-      );
-    } else {
-      setPayloadStorage(this.message);
+    if (!this.tryAjax()) {
+      // no ajax route was available
+      if (popup) {
+        submitForm(
+          makeRedirectUrl(this.fees),
+          this.data,
+          'post',
+          popup.name
+        )
+      } else {
+        setPayloadStorage(this.message);
+      }
     }
 
     // adding listeners
     if(discreet.isFrame){
-      var complete = window.onComplete = bind(complete, this);
+      var complete = window.onComplete = bind(this.complete, this);
       pollPaymentData(complete);
     }
     this.offmessage = $(window).on('message', bind(onMessage, this));
@@ -209,15 +206,42 @@ Payment.prototype = {
     clearPollingInterval();
   },
 
-  ajax: function(){
+  tryAjax: function(){
+    // virtually all the time, unless there isn't an ajax based route
+    // shouldAjax = !this.fees;
+    if(this.fees){
+      return false;
+    }
+
+    // else make ajax request
     var data = this.data;
     var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
     delete data.key_id;
-    $.post({
+
+    // return xhr object
+    return $.post({
       url: url,
       data: data,
       callback: bind(ajaxCallback, this)
     })
+  },
+
+  tryPopup: function(){
+    var noPopup = discreet.isFrame && !this.data.fees && this.powerwallet;
+    noPopup = noPopup || /(Windows Phone|\(iP.+UCBrowser\/)/.test(ua);
+
+    if(noPopup){
+      return null;
+    }
+
+    var popup;
+    try{
+      popup = this.popup = new Popup('', 'popup_' + _uid);
+    } catch(e){
+      return null;
+    }
+    popup.onClose = this.r.emitter('payment.cancel');
+    return popup;
   }
 }
 
@@ -272,15 +296,6 @@ function makeRedirectUrl(fees){
   return discreet.makeUrl() + 'payments/create/' + (fees ? 'fees' : 'checkout');
 }
 
-function shouldPopup(payment) {
-  return !discreet.isFrame || payment.data.fees || !payment.powerwallet;
-}
-
-// virtually all the time, unless there isn't an ajax based route
-function shouldAjax(payment){
-  return !payment.fees;
-}
-
 var responseTypes = {
   // this === payment
   first: function(request){
@@ -315,19 +330,6 @@ function writePopup(popup, content){
   if(popup){
     popup.write(content);
   }
-}
-
-function makePopup() {
-  if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
-    return null;
-  }
-  var popup;
-  try{
-    popup = new Popup('', 'popup_' + _uid);
-  } catch(e){
-    return null;
-  }
-  return popup;
 }
 
 var razorpayProto = Razorpay.prototype;
