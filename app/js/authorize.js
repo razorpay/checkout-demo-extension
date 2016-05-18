@@ -127,7 +127,7 @@ Payment.prototype = {
     var getOption = this.r.get;
 
     each(
-      ['amount', 'currency', 'signature', 'description', 'order_id'],
+      ['amount', 'currency', 'signature', 'description', 'order_id', 'notes'],
       function(i, field){
         if(!(field in data)){
           var val = getOption(field);

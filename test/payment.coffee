@@ -193,6 +193,9 @@ describe 'Payment::', ->
       options.description = 'zxcv'
       options.order_id = '1911'
       options.name = 'name'
+      options.notes =
+        yolo: 'swag'
+        '1': 2
 
       r2 = Razorpay options
       options = r2.get()
@@ -219,6 +222,15 @@ describe 'Payment::', ->
 
       expect 'name' of data
         .to.be false
+
+      expect 'notes' of data
+        .to.be false
+
+      expect data['notes[yolo]']
+        .to.be 'swag'
+
+      expect data['notes[1]']
+        .to.be 2
 
   describe 'generate', ->
     pollSpy = payment = onSpy = null
