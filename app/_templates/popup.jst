@@ -60,7 +60,7 @@
         {{?get('display_currency')}}
           {{=discreet.currencies[get('display_currency')]}}{{=get('display_amount')}}
         {{??}}
-          ₹{{=it.data.amount/100}}
+          ₹{{=(it.data.amount/100).toFixed(2).replace(".00", "")}}
         {{?}}
         </span>
         <img src="{{=get('image')}}" height="52px">
