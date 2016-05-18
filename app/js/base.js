@@ -195,6 +195,9 @@ function addListener(rzp, event, listener){
 
 Razorpay.prototype = {
   on: function(event, callback, namespace){
+    if(typeof callback !== 'function'){
+      return;
+    }
     var events = this._events;
     if(namespace){
       if(!(namespace in events)){

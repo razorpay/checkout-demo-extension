@@ -403,8 +403,11 @@ razorpayProto.resendOTP = function(callback){
 }
 
 Razorpay.payment = {
-  authorize: function(data){
-    return new Razorpay({amount: data.data.amount}).createPayment(data.data);
+  authorize: function(options){
+    var r = Razorpay({amount: options.data.amount}).createPayment(options.data);
+    r.on('payment.success', options.success);
+    r.on('payment.error', options.error);
+    return r;
   },
   validate: function(data){
     var errors = [];

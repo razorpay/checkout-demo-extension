@@ -67,5 +67,9 @@
     "run-sequence": "^1.1.5",
     "stylelint-config-standard": "^6.0.0"
   },
-  "private": "true"
+  "private": "true",
+  "dependencies": {
+    "aws-sdk": "^2.3.12",
+    "glob": "^7.0.3"
+  }
 }
