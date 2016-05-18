@@ -3,15 +3,6 @@
 $max-width: 414px;
 $max-height: 659px;
 
-=hidePowered
-  #powered-by
-    position: absolute;
-    top: 40px;
-    visibility: hidden!important;
-    bottom: auto;
-    z-index: -1;
-    pointer-events: none;
-
 =mobile-view
   max-width: $max-width;
 
@@ -102,7 +93,3 @@ body
   &.android, &.noanim
     #modal
       transition: none!important;
-  &.embedded
-    +hidePowered();
-    #close
-      display: none;

@@ -130,6 +130,17 @@ Payment.prototype = {
       data.currency = getOption('currency');
     }
 
+    each(
+      data.notes,
+      function(key, val){
+        var valType = typeof val;
+        if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
+          data['notes' + key] = val;
+        }
+      }
+    )
+    delete data.notes;
+
     this.data = data;
     this.fees = params.fees;
     this.powerwallet = params.powerwallet;

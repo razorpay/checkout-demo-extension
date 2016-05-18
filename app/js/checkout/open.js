@@ -47,6 +47,7 @@ function initAutomaticCheckout(){
     function(i, attr){
       var name = attr.name
       if(/^data-/.test(name)){
+        var rootObj = opts;
         name = name.replace(/^data-/,'');
         var val = attr.value;
         if(val === 'true'){
@@ -54,12 +55,19 @@ function initAutomaticCheckout(){
         } else if (val === 'false'){
           val = false;
         }
-        opts[name] = val;
+        if(/^notes\./.test(name)){
+          if(!opts.notes){
+            opts.notes = {}
+          }
+          rootObj = opts.notes;
+          name = name.replace(/^notes\./,'');
+        }
+        rootObj[name] = val;
       }
     }
   )
 
-  var amount = currentScript.getAttribute('data-amount');
+  var amount = opts.amount;
   if (amount && amount.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
@@ -182,24 +190,23 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  var frame = this.checkoutFrame;
-  if(!frame){
+  if(!preloadedFrame){
     // if(this.get('parent')){
-      frame = new CheckoutFrame(this);
+      preloadedFrame = new CheckoutFrame(this);
     // }
     // else {
     //   frame = getPreloadedFrame();
     // }
-    this.checkoutFrame = frame;
+  }
+  this.checkoutFrame = preloadedFrame;
+
+  if(preloadedFrame.hasLoaded){
+    preloadedFrame.openRzp(this);
   }
 
-  if(frame.hasLoaded){
-    frame.openRzp(this);
-  }
-
-  if(!frame.el.contentWindow){
-    frame.close();
-    frame.afterClose();
+  if(!preloadedFrame.el.contentWindow){
+    preloadedFrame.close();
+    preloadedFrame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
 

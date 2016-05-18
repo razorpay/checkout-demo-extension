@@ -121,7 +121,6 @@ function makeCheckoutMessage(rzp){
 
   if(options.parent){
     response.embedded = true;
-    options.parent = true;
   }
 
   sanitizeImage(options);
@@ -161,14 +160,14 @@ CheckoutFrame.prototype = {
       this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
-          style: 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
+          style: 'min-height: 530px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
           allowtransparency: true,
           frameborder: 0,
           width: '100%',
           height: '100%',
           src: makeCheckoutUrl(key)
         }
-      )[0]
+      )[0];
     }
     return this.el;
   },
@@ -197,7 +196,6 @@ CheckoutFrame.prototype = {
     })
 
     if(parent){
-      this.el.removeAttribute('style');
       this.embedded = true;
       this.afterClose = noop;
     }
@@ -302,7 +300,7 @@ CheckoutFrame.prototype = {
     if(
       !e.origin ||
       data.source !== 'frame' ||
-      (event !== 'load' && rzp && rzp.id !== data.id) ||
+      // (event !== 'load' && rzp && rzp.id !== data.id) ||
       e.source !== this.el.contentWindow ||
       this.el.getAttribute('src').indexOf(e.origin)
     ){

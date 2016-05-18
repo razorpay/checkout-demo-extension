@@ -2,56 +2,6 @@ options =
   key: 'key'
   amount: 100
 
-describe 'Razorpay.open', ->
-  it 'should open new Razorpay instance', ->
-    spy = sinon.spy Razorpay::, 'open'
-    expect Razorpay.open options
-      .to.be.a Razorpay
-
-    expect spy.called
-      .to.be true
-
-    spy.restore()
-
-describe 'Razorpay close method should', ->
-  cf = rzp = spy = null
-  beforeEach ->
-    rzp = Razorpay.open options
-    cf = rzp.checkoutFrame
-
-  afterEach ->
-    spy.restore()
-
-  it 'send close message to frame', ->
-    spy = sinon.stub cf, 'postMessage'
-    rzp.close()
-
-    expect spy.callCount
-      .to.be 1
-
-    spyCall = spy.getCall(0)
-    expect spyCall.thisValue
-      .to.be cf
-
-    expect spyCall.args[0]
-      .to.eql event: 'close'
-
-  it 'be followable by re-open', ->
-    rzp.close()
-    rzp.checkoutFrame.hasLoaded = true
-    spy = sinon.stub cf, 'postMessage'
-    rzp.open()
-
-    expect spy.callCount
-      .to.be 1
-
-    spyCall = spy.getCall(0)
-    expect spyCall.thisValue
-      .to.be cf
-
-    expect spyCall.args[0]
-      .to.eql event: 'open'
-
 describe 'automatic checkout:', ->
   it 'submit handler should submit with all fields', ->
     submitSpy = currentScript.parentNode.submit = sinon.stub()
@@ -135,12 +85,54 @@ describe 'automatic checkout:', ->
         .to.be false
       stub.restore()
 
-    it 'add button', ->
+    it 'add button for default options', ->
       stub = sinon.spy window, 'addAutoCheckoutButton'
       initAutomaticCheckout()
 
       expect stub.called
         .to.be true
 
-      expect stub.getCall(0).args[0]
+      rzp = stub.getCall(0).args[0]
+      expect rzp
         .to.be.a Razorpay
+
+      expect rzp.get()
+        .to.eql {
+          key: 'key',
+          amount: 100,
+          handler: defaultAutoPostHandler
+        }
+
+describe 'automatic parsing for nested or uppercase options', ->
+  it '', ->
+    opts =
+      'KEY': 'key',
+      'amount': 1000,
+      'theme.color': 'red',
+      'notes.FOO': 'bar',
+      'notes.hello': 'world'
+
+    for opt, val of opts
+      currentScript.setAttribute 'data-' + opt, val
+
+    stub = sinon.spy window, 'addAutoCheckoutButton'
+    initAutomaticCheckout()
+
+    expect stub.called
+      .to.be true
+
+    rzp = stub.getCall(0).args[0]
+    expect rzp
+      .to.be.a Razorpay
+
+    expect rzp.get()
+      .to.eql {
+        key: 'key',
+        amount: 1000,
+        handler: defaultAutoPostHandler,
+        'theme.color': 'red',
+        notes: {
+          foo: 'bar',
+          hello: 'world'
+        }
+      }
