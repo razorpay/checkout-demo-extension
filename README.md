@@ -1,15 +1,15 @@
 [![wercker status](https://app.wercker.com/status/1f8380cb72c916c46521d02d52e0174d/m "wercker status")](https://app.wercker.com/project/bykey/1f8380cb72c916c46521d02d52e0174d)
 
-#Setup Instructions
+# Setup Instructions
 
 1. Install gulp globally `npm install -g gulp`
 1. Install npm supporting packages `npm install`
 1. copy over `app/config.sample.js` -> `app/config.js` to specify API URL
 1. Point local API to checkout in `public/checkout.php` and `app/views/checkout.php`
-1. `gulp watch` in checkout root dir
-1. Open `app/index.html` via any web server in your browser
+1. `gulp serve` in checkout root dir
 
-Testing:
+# Testing
+
 1. Install `jre` and `phantomjs`
 1. `npm install -g selenium-standalone && selenium-standalone install`
 1. `gulp test:unit` to run unit tests
@@ -17,16 +17,16 @@ Testing:
 1. tests are located in `test` folder
 1. `test/release` folder contains blackbox tests`
 
-#Gulp Commands
+# Gulp Commands
 
-* `gulp` creates production build
+* `gulp --env=production` creates production build
 
-#Development Instructions
+# Development Instructions
 - All source code is kept inside the `app` directory
 - All tests are in `test` directory.
 - Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/js/init.js`
 
-#Deployment and Branches
+# Deployment and Branches
 
 `production`: [https://checkout.razorpay.com/](https://checkout.razorpay.com/) | Tested via [https://api.razorpay.com/test/livedemo.php](https://api.razorpay.com/test/livedemo.php) and [https://api.razorpay.com/test/checkout.php](https://api.razorpay.com/test/checkout.php)
 `beta`: [https://betacheckout.razorpay.com/](https://betacheckout.razorpay.com/) | Tested via [https://beta.razorpay.com/test/layout.php](https://beta.razorpay.com/test/layout.php) and [https://beta.razorpay.com/test/checkout.php](https://beta.razorpay.com/test/checkout.php)
