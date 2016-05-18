@@ -56,13 +56,33 @@ describe 'Payment::', ->
     bindStub.restore()
     stub.restore()
 
-  # describe 'emit', ->
-  #   payment = do mockPayment
-  #   stub = sinon.stub payment.r, 'emit'
+  describe 'emit', ->
+    payment = do mockPayment
+    stub = sinon.stub payment.r, 'emit'
 
-  #   Payment::emit.call payment, 'some', noop
+    Payment::emit.call payment, 'some', noop
 
+    expect stub.callCount
+      .to.be 1
 
+    expect stub.args[0]
+      .to.eql ['payment.some', noop]
+
+    stub.restore()
+
+  describe 'off', ->
+    payment = do mockPayment
+    stub = sinon.stub payment.r, 'off'
+
+    Payment::off.call payment
+
+    expect stub.callCount
+      .to.be 1
+
+    expect stub.args[0]
+      .to.eql ['payment']
+
+    stub.restore()
 
   describe 'format', ->
     beforeEach ->
