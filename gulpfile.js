@@ -27,7 +27,7 @@ const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 
-const distDir = 'dist/v1/';
+const distDir = 'app/dist/v1/';
 
 function assetPath(path) {
   return `app/${path}`;
@@ -134,7 +134,8 @@ gulp.task('serve', ['build'], function() {
   gulp.watch([assetPath('**/*.js'), assetPath('*.html')], ['compileHTML']).on('change', browserSync.reload);
 
   browserSync.init({
-    server: './dist/v1'
+    server: './app/dist',
+    startPath: 'v1/index.html'
   });
 });
 
@@ -280,7 +281,7 @@ function createCoverageReport(){
 }
 
 gulp.task('test', ['test:unit'], function() {
-  return gulp.src('dist/v1/**/*.js')
+  return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
