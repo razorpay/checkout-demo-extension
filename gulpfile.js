@@ -281,7 +281,7 @@ function createCoverageReport(){
 }
 
 gulp.task('test', ['test:unit'], function() {
-  return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js')])
+  return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
