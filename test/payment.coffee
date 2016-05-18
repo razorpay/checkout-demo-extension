@@ -84,6 +84,54 @@ describe 'Payment::', ->
 
     stub.restore()
 
+  describe 'redirect', ->
+    baseRedirectUrl = discreet.makeUrl() + 'payments/create/'
+    payment = redirectStub = options = null
+
+    beforeEach ->
+      payment = do mockPayment
+      options = payment.r.get()
+      options.redirect = true
+      redirectStub = sinon.stub discreet, 'redirect'
+
+    afterEach ->
+      do redirectStub.restore
+
+    it 'if redirect: false', ->
+      options.redirect = false
+      Payment::checkRedirect.call payment
+      expect redirectStub.called
+        .to.be false
+
+    it 'if redirect: true', ->
+      Payment::checkRedirect.call payment
+
+      expect 'callback_url' in payment.data
+        .to.be false
+
+      expect redirectStub.callCount
+        .to.be 1
+      expect redirectStub.args[0][0]
+        .to.eql
+          url: baseRedirectUrl + 'checkout'
+          content: payment.data
+          method: 'post'
+
+    it 'if redirect: true, and callback_url specified', ->
+      options.callback_url = 'abc'
+      Payment::checkRedirect.call payment
+      expect payment.data.callback_url
+        .to.be 'abc'
+
+    it 'with fees: true', ->
+      payment.fees = true
+      Payment::checkRedirect.call payment
+      expect redirectStub.args[0][0]
+        .to.eql
+          url: baseRedirectUrl + 'fees'
+          content: payment.data
+          method: 'post'
+
   describe 'format', ->
     beforeEach ->
       data = clone payload
@@ -171,3 +219,8 @@ describe 'Payment::', ->
 
       expect 'name' in data
         .to.be false
+
+  describe 'generate', ->
+    payment = null
+    beforeEach ->
+      payment = do mockPayment

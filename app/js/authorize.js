@@ -106,7 +106,7 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
       discreet.redirect({
-        url: makeRedirectUrl(params.fees),
+        url: makeRedirectUrl(this.fees),
         content: data,
         method: 'post'
       });
