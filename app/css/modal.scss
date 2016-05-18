@@ -1,94 +1,117 @@
-@import common
+@import "common";
 
-.clear
+.clear {
   clear: both;
   overflow: auto;
+}
 
-.mfix
+.mfix {
   white-space: nowrap;
 
-  &:after
-    content: '';
+  &:after {
+    content: "";
     height: 96%;
     display: inline-block;
     width: 0;
     vertical-align: middle;
+  }
+}
 
-.mchild
+.mchild {
   vertical-align: middle;
   display: inline-block;
   white-space: normal;
+}
 
-body, html
+body, html {
   margin: 0;
   height: 100%;
   -webkit-overflow-scrolling: touch;
+}
 
-.double
+.double {
   width: 100%;
-  .second
+
+  .second {
     text-align: right;
-  .first, .second
+  }
+
+  .first, .second {
     float: left;
     width: 50%;
+  }
+}
 
-.pad
+.pad {
   padding: 0 24px;
   box-sizing: border-box;
+}
 
-.grid
+.grid {
   text-align: center;
 
-  &.count-1 .item
+  &.count-1 .item {
     width: 100%;
-  &.count-3 .item
-    width: 33.33%;
+  }
 
-  .item
+  &.count-3 .item {
+    width: 33.33%;
+  }
+
+  .item {
     cursor: pointer;
     width: 50%;
     float: left;
-    transition: .2s;
+    transition: 0.2s;
     border-bottom: 1px solid $bc;
     border-right: 1px solid $bc;
     box-sizing: border-box;
+  }
 
-  label
+  label {
     box-sizing: border-box;
     position: relative;
     cursor: inherit;
     height: 86px;
     display: block;
     font-size: 14px;
-    &:hover
-      background: $bg;
 
-  img
+    &:hover {
+      background: $bg;
+    }
+  }
+
+  img {
     // IE not accepting click as click on parent label
     pointer-events: none;
     height: 24px;
     margin-bottom: 3px;
+  }
+}
 
-.link
+.link {
   text-decoration: underline;
-  cursor: pointer
+  cursor: pointer;
+}
 
-a
+a {
   color: inherit;
   cursor: pointer;
   text-decoration: none;
+}
 
-i
+i {
   font-style: normal;
   opacity: 0;
+}
 
-.spin
+.spin {
   display: none;
   width: 60px;
   height: 60px;
   margin: 0 auto -60px;
 
-  div
+  div {
     width: 100%;
     height: 100%;
     vertical-align: middle;
@@ -98,73 +121,95 @@ i
     animation: spin 1.3s linear infinite;
     box-sizing: border-box;
     opacity: 0;
+  }
+}
 
-.spin2
-  div
+.spin2 {
+  div {
     animation-delay: 0.65s;
+  }
+}
 
-@keyframes spin
-  0%
+@keyframes spin {
+  0% {
     transform: scale(0.5);
     opacity: 0;
     border-width: 8px;
-  20%
+  }
+
+  20% {
     transform: scale(0.6);
     opacity: 0.8;
     border-width: 4px;
-  90%
+  }
+
+  90% {
     transform: scale(1);
     opacity: 0;
+  }
+}
 
-.loading .spin
+.loading .spin {
   display: block;
+}
 
-#container
+#container {
   margin: 0 auto;
   height: 100%;
   outline: none;
   text-align: center;
   transition: 0.3s ease-out opacity;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   z-index: 19999;
 
-  &.shown
+  &.shown {
     opacity: 1;
 
-    #powered-by
+    #powered-by {
       opacity: 1;
+    }
 
-    #modal
+    #modal {
       opacity: 1;
       transform: none;
       transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
+    }
+  }
+}
 
-#backdrop
+#backdrop {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+}
 
-.font-loaded
-  #modal, button, input, select
+.font-loaded {
+  #modal, button, input, select {
     font-family: $lato;
-    font-feature-settings: 'liga' 0;
+    font-feature-settings: "liga" 0;
+  }
 
-  #powered-by
+  #powered-by {
     visibility: visible;
     opacity: 1;
+  }
 
-  i
+  i {
     opacity: 1;
+  }
 
-  .iph
+  .iph {
     display: none;
+  }
 
-  #amount i
+  #amount i {
     position: static;
+  }
+}
 
-#modal
+#modal {
   box-sizing: border-box;
   display: inline-block;
   transition: 0.3s ease-in;
@@ -178,12 +223,14 @@ i
   font-size: $size;
   width: 344px;
   font-family: $font;
+}
 
-#content
+#content {
   text-align: left;
   white-space: normal;
+}
 
-#header
+#header {
   border-radius: $br $br 0 0;
   color: #fff;
   background: #fff;
@@ -193,22 +240,27 @@ i
   position: relative;
   z-index: 3;
 
-  &:before
+  &:before {
     content: "";
-    left: 0; right: 0;
-    bottom: 0; top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
     position: absolute;
-    background-image: linear-gradient(to bottom right, rgba(255,255,255,.2), rgba(0,0,0,.2));
+    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2));
+  }
+}
 
-.close
+.close {
   position: absolute;
   right: 10px;
   top: 5px;
   cursor: pointer;
   font-size: 18px;
   opacity: 0.6;
+}
 
-#logo
+#logo {
   text-align: center;
   position: relative;
   padding: 8px;
@@ -221,33 +273,41 @@ i
   margin-right: $p;
   box-shadow: $bs;
 
-  img
+  img {
     vertical-align: middle;
     max-height: 100%;
     max-width: 100%;
+  }
+}
 
-#merchant
+#merchant {
   white-space: nowrap;
   position: relative;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
 
-#merchant-name
+#merchant-name {
   text-overflow: ellipsis;
   overflow: hidden;
   font-size: 20px;
+}
 
-#merchant-desc
+#merchant-desc {
   text-overflow: ellipsis;
   overflow: hidden;
   opacity: 0.8;
+}
 
-#amount
+#amount {
   font-size: 24px;
   margin-top: 10px;
-  i
-    position: absolute;
 
-#powered-by
+  i {
+    position: absolute;
+  }
+}
+
+#powered-by {
   left: 0;
   visibility: hidden;
   opacity: 0;
@@ -261,44 +321,55 @@ i
   font-family: $lato;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
 
-  a
+  a {
     color: #bbb;
     outline: none;
     line-height: 36px;
     transition: 0.3s;
     text-decoration: none;
-    &:hover
-      color: #ddd;
 
-#body
+    &:hover {
+      color: #ddd;
+    }
+  }
+}
+
+#body {
   border-radius: 0 0 $br $br;
   height: 317px;
   background: #fff;
   backface-visibility: none;
-  &.emi-focus
+
+  &.emi-focus {
     position: relative;
     z-index: 10;
-    #form-fields
+
+    #form-fields {
       z-index: 2;
       background: transparent;
+    }
+  }
+}
 
-#form, #form-fields
+#form, #form-fields {
   height: 100%;
+}
 
-#form-fields
+#form-fields {
   position: relative;
   z-index: 1;
   border-radius: 0 0 $br $br;
   background: #fff;
+}
 
-#topbar
+#topbar {
   display: none;
   cursor: pointer;
   background: $bg;
   padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
-  transition: .3s transform ease-in 0s, .3s opacity ease-in 0s, .1s color;
+  transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
   color: #757575;
   position: absolute;
   left: 1px;
@@ -306,49 +377,60 @@ i
   height: $topbarh;
   z-index: 2;
 
-  &:hover
+  &:hover {
     color: #404040;
+  }
 
-  img
+  img {
     display: block;
     margin-top: 15px;
+  }
+}
 
-#tab-title
+#tab-title {
   font-size: 16px;
   line-height: $topbarh;
+}
 
-.back
+.back {
   float: left;
   margin: 0px 6px 0 0;
   font-size: 12px;
+}
 
-#user
+#user {
   display: none;
   float: right;
   font-size: 12px;
+}
 
-#modal .shown
+#modal .shown {
   display: block;
+}
 
-.tab-content
-  top: $topbarh+1px;
+.tab-content {
+  top: $topbarh + 1px;
   left: 0;
   width: 100%;
   bottom: 0;
   background: #fff;
   z-index: 4;
+}
 
-#form-common
+#form-common {
   padding: 20px 0 0;
 
-  .legend
+  .legend {
     margin: 9px 0;
     margin-top: 10px;
+  }
+}
 
-.otp-btn
+.otp-btn {
   display: none;
+}
 
-#footer
+#footer {
   position: absolute;
   left: 0;
   bottom: -$footerh;
@@ -361,22 +443,26 @@ i
   text-align: center;
   text-transform: uppercase;
   font-size: 16px;
-  box-shadow: 0 4px 14px 0 rgba(0,0,0,.24);
-  &:before
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.24);
+
+  &:before {
     content: "";
     left: 0;
     width: 100%;
     height: 100%;
     position: absolute;
-    transition: .2s;
+    transition: 0.2s;
     opacity: 1;
-    background: linear-gradient(180deg, rgba(255,255,255,.1), rgba(0,0,0,.1));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
     pointer-events: none;
+  }
 
-  &:hover:before
+  &:hover:before {
     opacity: 0;
+  }
+}
 
-.button
+.button {
   display: block;
   border: none;
   width: 100%;
@@ -386,46 +472,55 @@ i
   line-height: 54px;
   width: 100%;
   color: #fff;
-  transition: .2s;
-  font-weight: bold
+  transition: 0.2s;
+  font-weight: bold;
   position: relative;
 
-  &:active
+  &:active {
     box-shadow: 0 2px 10px -5px #000 inset;
+  }
+}
 
-#tab-card
-  i
+#tab-card {
+  i {
     display: none;
+  }
+}
 
-#nocvv
+#nocvv {
   display: none;
+}
 
-.legend
+.legend {
   text-transform: uppercase;
   font-size: 12px;
   text-align: center;
   padding: 10px 0;
+}
 
-#payment-options
+#payment-options {
   border-top: 1px solid $bc;
   background: #fff;
 
-  label
+  label {
     padding-top: 20px;
     height: 97px;
+  }
 
-  i
+  i {
     display: block;
     font-size: 40px;
     color: $pri;
     margin: 0 0 -4px;
     transition: 0.3s;
+  }
 
-  .item
-    border-bottom: none!important;
+  .item {
+    border-bottom: none !important;
+  }
+}
 
-
-.stackable
+.stackable {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -433,3 +528,4 @@ i
   right: 0;
   border-radius: 0 0 $br $br;
   background: #fff;
+}

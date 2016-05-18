@@ -1,6 +1,6 @@
-@import common
+@import "common";
 
-#overlay
+#overlay {
   position: absolute;
   display: none;
   top: 0;
@@ -9,11 +9,13 @@
   bottom: -$footerh;
   z-index: 99;
   border-radius: $br;
+}
 
-#overlay
+#overlay {
   background: rgba(0, 0, 0, 0.3);
+}
 
-#error-message
+#error-message {
   border-radius: 0 0 $br $br;
   background: #fff;
   bottom: -$footerh;
@@ -21,25 +23,33 @@
   width: 100%;
   z-index: 20;
   display: none;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.16);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
   height: 150px;
   transition: 0.2s;
   padding-top: 20px;
   z-index: 99;
 
-  &.shown
+  &.shown {
     height: 180px;
+  }
 
-  &.loading
-    .spin
+  &.loading {
+    .spin {
       display: block;
-    #fd-hide
-      display: none;
+    }
 
-#fd-t
+    #fd-hide {
+      display: none;
+    }
+  }
+}
+
+#fd-t {
   white-space: normal;
   padding: 20px 30px;
   line-height: 22px;
+}
 
-#fd-hide
+#fd-hide {
   border-radius: $br;
+}

@@ -1,0 +1,21 @@
+@import "common";
+
+body.embedded {
+  @include hidePowered;
+
+  #close {
+    display: none;
+  }
+
+  #modal {
+    transform: none;
+  }
+
+  #footer {
+    box-shadow: none;
+  }
+
+  #container:after {
+    content: none;
+  }
+}

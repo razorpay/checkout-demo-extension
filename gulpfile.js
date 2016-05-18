@@ -44,7 +44,7 @@ let isProduction = options.env === 'production';
 let paths = {
   js: assetPath('js/**/*.js'),
   templates: assetPath('_templates/**/*.jst'),
-  css: assetPath('_css/**/*.sass'),
+  css: assetPath('css/**/*.scss'),
   images: assetPath('images/**/*'),
   fonts: assetPath('fonts/**/*')
 };
