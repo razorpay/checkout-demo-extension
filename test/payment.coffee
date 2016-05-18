@@ -31,6 +31,39 @@ mockPayment = (payment) ->
 describe 'Payment::', ->
   payment = data = r2 = null
 
+  describe 'on', ->
+    payment = do mockPayment
+    stub = sinon.stub payment.r, 'on'
+
+    mockListener = ->
+    bindStub = sinon.stub window, 'bind'
+    bindStub.returns mockListener
+
+    Payment::on.call payment, 'some', noop
+
+    expect stub.callCount
+      .to.be 1
+
+    expect stub.args[0]
+      .to.eql ['some', mockListener, 'payment']
+
+    expect bindStub.callCount
+      .to.be 1
+
+    expect bindStub.args[0]
+      .to.eql [noop, payment]
+
+    bindStub.restore()
+    stub.restore()
+
+  # describe 'emit', ->
+  #   payment = do mockPayment
+  #   stub = sinon.stub payment.r, 'emit'
+
+  #   Payment::emit.call payment, 'some', noop
+
+
+
   describe 'format', ->
     beforeEach ->
       data = clone payload
