@@ -194,8 +194,19 @@ function addListener(rzp, event, listener){
 }
 
 Razorpay.prototype = {
-  on: function(event, callback){
+  on: function(event, callback, namespace){
     var events = this._events;
+    if(namespace){
+      if(!(namespace in events)){
+        events[namespace] = {};
+      }
+      events = events[namespace];
+    } else {
+      var eventSplit = event.split('.');
+      if (eventSplit.length > 1){
+        return this.on(eventSplit[1], callback, eventSplit[0]);
+      }
+    }
     var eventMap = events[event];
     if (!(eventMap instanceof Array)) {
       eventMap = events[event] = [];
@@ -224,18 +235,26 @@ Razorpay.prototype = {
     } else if (!argLen) {
       this._events = {};
     } else {
-      eventMap = this._events[event];
+      var eventSplit = event.split('.');
+      eventMap = this._events[eventSplit[0]];
+      if (eventSplit.length > 1){
+        eventMap = eventMap[eventSplit[1]];
+      }
       eventMap.splice(indexOf(eventMap, callback), 1);
     }
     return this;
   },
 
   emit: function(event, arg){
-    var eventMap = this._events[event];
+    var eventSplit = event.split('.');
+    var eventMap = this._events[eventSplit[0]];
+    if (eventMap && eventSplit.length > 1) {
+      eventMap = eventMap[eventSplit[1]];
+    }
     if(eventMap){
       if(eventMap instanceof Array){
         // .on('event') based callback
-        each(this._events[event], function(i, listener){
+        each(eventMap, function(i, listener){
           listener(arg);
         })
       } else {

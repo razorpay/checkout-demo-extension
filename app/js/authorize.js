@@ -86,7 +86,7 @@ function Payment(data, params, r){
 
 Payment.prototype = {
   on: function(event, handler){
-    this.r.on('payment.' + event, bind(handler, this));
+    this.r.on(event, bind(handler, this), 'payment');
   },
 
   emit: function(event, arg){
