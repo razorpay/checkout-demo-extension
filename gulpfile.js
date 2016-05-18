@@ -81,7 +81,7 @@ gulp.task('compileStyles', function(){
     }))
     .pipe(sass())
     .pipe(gulpif(isProduction, minifyCSS()))
-    .pipe(concat('checkout.css'))
+    .pipe(concat('checkout-new.css'))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
       cascade: false
