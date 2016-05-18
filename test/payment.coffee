@@ -336,3 +336,22 @@ describe 'Payment::', ->
       discreet.isFrame = false
 
   describe 'complete', ->
+    payment = null
+    beforeEach ->
+      payment = do mockPayment
+
+    it 'success', ->
+      Payment::complete.call payment, {razorpay_payment_id: 'payid'}
+      expect payment.emit.callCount
+        .to.be 1
+
+      expect payment.emit.args[0]
+        .to.eql ['success', {razorpay_payment_id: 'payid'}]
+
+    it 'error', ->
+      Payment::complete.call payment, {error: {description: 'desc'}}
+      expect payment.emit.callCount
+        .to.be 1
+
+      expect payment.emit.args[0]
+        .to.eql ['error', {error: {description: 'desc'}}]
