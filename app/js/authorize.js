@@ -114,24 +114,37 @@ Payment.prototype = {
   },
 
   format: function(data, params){
+    // add tracking data
     data['_[id]'] = _uid;
     data['_[medium]'] = discreet.medium;
     data['_[context]'] = discreet.context;
     data['_[checkout]'] = !!discreet.isFrame;
-
-    var getOption = this.r.get;
-
-    // add tracking data
     if(params.powerwallet){
       data['_[source]'] = 'checkoutjs';
     }
 
+    // fill data from options if empty
+    var getOption = this.r.get;
+
+    each(
+      ['amount', 'currency', 'signature', 'description', 'order_id'],
+      function(i, field){
+        if(!(field in data)){
+          var val = getOption(field);
+          if(val){
+            data[field] = val;
+          }          
+        }
+      },
+      this
+    )
+
     if(!data.key_id){
       data.key_id = getOption('key');
     }
-    if(!data.currency){
-      data.currency = getOption('currency');
-    }
+
+    // flatten notes
+    // notes.abc -> notes[abc]
     each(
       data.notes,
       function(key, val){
