@@ -131,7 +131,7 @@ gulp.task('build', function() {
 gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
-  gulp.watch([assetPath('**/*.js'), assetPath('*.html')], ['compileHTML']).on('change', browserSync.reload);
+  gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
 
   browserSync.init({
     server: './app/dist',
