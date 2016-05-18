@@ -5,6 +5,7 @@ payload =
   wallet: 'paytm'
 
 baseUrl = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/' + RazorpayConfig.version;
+baseRedirectUrl = baseUrl + 'payments/create/'
 
 r = Razorpay
   key: 'key'
@@ -85,7 +86,6 @@ describe 'Payment::', ->
     stub.restore()
 
   describe 'redirect', ->
-    baseRedirectUrl = discreet.makeUrl() + 'payments/create/'
     payment = redirectStub = options = null
 
     beforeEach ->
@@ -106,7 +106,7 @@ describe 'Payment::', ->
     it 'if redirect: true', ->
       Payment::checkRedirect.call payment
 
-      expect 'callback_url' in payment.data
+      expect 'callback_url' of payment.data
         .to.be false
 
       expect redirectStub.callCount
@@ -180,7 +180,7 @@ describe 'Payment::', ->
           'notes[bar]': 2
 
       log 'set data._.source to checkoutjs if powerwallet specified'
-      expect '_[source]' in data
+      expect '_[source]' of data
         .to.be false
 
     it 'fill data from options', ->
@@ -217,10 +217,122 @@ describe 'Payment::', ->
       expect data.order_id
         .to.be options.order_id
 
-      expect 'name' in data
+      expect 'name' of data
         .to.be false
 
   describe 'generate', ->
-    payment = null
+    pollSpy = payment = onSpy = null
+
     beforeEach ->
       payment = do mockPayment
+      pollSpy = sinon.stub window, 'pollPaymentData'
+      onSpy = sinon.stub $::, 'on'
+      onSpy.returns 'xyz'
+
+    afterEach ->
+      expect payment.offmessage
+        .to.be 'xyz'
+
+      do pollSpy.restore
+      do onSpy.restore
+
+    it 'write popup with popup template', ->
+      payment.tryAjax = -> true
+
+      templateStub = sinon.stub templates, 'popup'
+      templateStub.returns 123
+
+      Payment::generate.call payment
+      expect templateStub.called
+        .to.be false
+
+      payment.popup =
+        write: sinon.stub()
+      Payment::generate.call payment
+
+      expect payment.popup.write.callCount
+        .to.be 1
+
+      expect payment.popup.write.args[0][0]
+        .to.be 123
+
+      expect templateStub.callCount
+        .to.be 1
+
+      expect templateStub.args[0][0]
+        .to.be payment
+
+      expect pollSpy.called
+        .to.be false
+
+      do templateStub.restore
+
+    it 'tryAjax', ->
+      payment.message = 'qwer'
+      payloadStub = sinon.stub window, 'setPayloadStorage'
+      submitStub = sinon.stub window, 'submitForm'
+
+      Payment::generate.call payment
+      expect payloadStub.callCount
+        .to.be 1
+
+      expect payloadStub.args[0][0]
+        .to.be 'qwer'
+
+      expect submitStub.called
+        .to.be false
+
+      payment.popup =
+        write: noop
+        name: 345
+
+      Payment::generate.call payment
+      expect payloadStub.callCount
+        .to.be 1
+
+      expect submitStub.callCount
+        .to.be 1
+
+      expect submitStub.args[0]
+        .to.eql [
+          baseRedirectUrl + 'checkout',
+          payment.data
+          'post'
+          345
+        ]
+
+      expect pollSpy.called
+        .to.be false
+
+      expect 'onComplete' of window
+        .to.be false
+
+    it 'discreet.isFrame', ->
+      discreet.isFrame = true
+      expect 'onComplete' of window
+        .to.be false
+      Payment::generate.call payment
+
+      expect pollSpy.callCount
+        .to.be 1
+
+      expect pollSpy.args[0]
+        .to.eql [window.onComplete]
+
+      expect payment.complete.called
+        .to.be false
+
+      window.onComplete 2
+
+      expect payment.complete.callCount
+        .to.be 1
+
+      expect payment.complete.args[0]
+        .to.eql [2]
+
+      expect payment.complete.calledOn payment
+        .to.be true
+
+      discreet.isFrame = false
+
+  describe 'complete', ->
