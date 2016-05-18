@@ -75,7 +75,9 @@ function Payment(data, params, r){
   }
 
   if (params.paused) {
-    writePopup(popup, params.message);
+    if (popup) {
+      popup.write(params.message);
+    }
     this.on('resume', this.generate);
   } else {
     this.generate();
@@ -141,7 +143,9 @@ Payment.prototype = {
     var popup = this.popup;
 
     // show loading screen in popup
-    writePopup(popup, templates.popup(this));
+    if (popup) {
+      popup.write(templates.popup(this));
+    }
 
     if (!this.tryAjax()) {
       // no ajax route was available
@@ -204,6 +208,9 @@ Payment.prototype = {
     // unbind listener
     this.offmessage();
     clearPollingInterval();
+    if(this.ajax){
+      this.ajax = abort();
+    }
   },
 
   tryAjax: function(){
@@ -219,15 +226,18 @@ Payment.prototype = {
     delete data.key_id;
 
     // return xhr object
-    return $.post({
+    this.ajax = $.post({
       url: url,
       data: data,
       callback: bind(ajaxCallback, this)
     })
+    return this.ajax;
   },
 
   tryPopup: function(){
     var noPopup = discreet.isFrame && !this.data.fees && this.powerwallet;
+
+    // unsupported browsers
     noPopup = noPopup || /(Windows Phone|\(iP.+UCBrowser\/)/.test(ua);
 
     if(noPopup){
@@ -326,18 +336,6 @@ var responseTypes = {
   }
 }
 
-function writePopup(popup, content){
-  if(popup){
-    popup.write(content);
-  }
-}
-
-var razorpayProto = Razorpay.prototype;
-razorpayProto.createPayment = function(data, params) {
-  this._payment = new Payment(data, params, this);
-  return this;
-}
-
 function makeOtpCallback(payment){
   return function(response){
     var error = response.error;
@@ -348,9 +346,15 @@ function makeOtpCallback(payment){
   }
 }
 
+var razorpayProto = Razorpay.prototype;
+razorpayProto.createPayment = function(data, params) {
+  this._payment = new Payment(data, params, this);
+  return this;
+}
+
 razorpayProto.submitOTP = function(otp){
   var payment = this._payment;
-  $.post({
+  payment.ajax = $.post({
     url: payment.otpurl,
     data: {
       type: 'otp',
@@ -361,12 +365,13 @@ razorpayProto.submitOTP = function(otp){
 }
 
 razorpayProto.resendOTP = function(callback){
-  $.post({
-    url: discreet.makeUrl() + 'payments/' + this._payment.payment_id + '/otp_resend?key_id=' + this.get('key'),
+  var payment = this._payment;
+  payment.ajax = $.post({
+    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/otp_resend?key_id=' + this.get('key'),
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: makeOtpCallback(this._payment)
+    callback: makeOtpCallback(payment)
   });
 }
 
