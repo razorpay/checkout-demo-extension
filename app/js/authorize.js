@@ -57,6 +57,9 @@ function onPaymentCancel(errorObj){
 }
 
 function Payment(data, params, r){
+  if(!params || typeof params !== 'object'){
+    params = emo;
+  }
   // saving razorpay instance
   this.r = r;
 
@@ -129,13 +132,12 @@ Payment.prototype = {
     if(!data.currency){
       data.currency = getOption('currency');
     }
-
     each(
       data.notes,
       function(key, val){
         var valType = typeof val;
-        if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
-          data['notes' + key] = val;
+        if (valType === 'string' || valType === 'number' || valType === 'boolean'){
+          data['notes[' + key + ']'] = val;
         }
       }
     )
@@ -388,7 +390,9 @@ razorpayProto.resendOTP = function(callback){
 }
 
 Razorpay.payment = {
-  authorize: Payment,
+  authorize: function(data){
+    return new Razorpay({amount: data.data.amount}).createPayment(data.data);
+  },
   validate: function(data){
     var errors = [];
 
