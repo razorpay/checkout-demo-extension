@@ -289,7 +289,7 @@ function ajaxCallback(response){
   }
 
   if (response.razorpay_payment_id || response.error) {
-    this.emit('success');
+    this.complete(response);
   } else {
     invoke(responseTypes[response.type], this, response.request);
   }

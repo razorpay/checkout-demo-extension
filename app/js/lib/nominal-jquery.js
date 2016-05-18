@@ -374,7 +374,13 @@ $.ajax = function(opts){
   if(opts.callback){
     xhr.onreadystatechange = function(){
       if(xhr.readyState === 4){
-        opts.callback(JSON.parse(xhr.responseText));
+        var json;
+        try{
+          json = JSON.parse(xhr.responseText);
+        } catch(e){
+          json = {error: {description: 'Parsing error'}};
+        }
+        opts.callback(json);
       }
     }
     xhr.onerror = function(){
