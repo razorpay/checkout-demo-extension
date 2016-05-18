@@ -14,11 +14,14 @@ $max-height: 659px;
 
   @include hidePowered;
 
-  #header, #footer, .button, #emi-inner {
+  #header,
+  #footer,
+  .button,
+  #emi-inner {
     border-radius: 0;
   }
 
-  &:after {
+  &::after {
     content: none;
   }
 
@@ -34,7 +37,8 @@ $max-height: 659px;
     }
   }
 
-  #overlay, #error-message {
+  #overlay,
+  #error-message {
     bottom: 0;
   }
 
@@ -52,7 +56,7 @@ $max-height: 659px;
     top: auto;
     transform: translateY(15px);
 
-    &:after {
+    &::after {
       height: auto;
     }
 
@@ -113,7 +117,8 @@ $max-height: 659px;
 }
 
 body {
-  &.android, &.noanim {
+  &.android,
+  &.noanim {
     #modal {
       transition: none !important;
     }

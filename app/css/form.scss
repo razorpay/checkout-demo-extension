@@ -1,7 +1,7 @@
 @import "common";
 
 $top: 28px;
-$left: 0px;
+$left: 0;
 $bottom: 7px;
 
 .fieldset {
@@ -41,15 +41,15 @@ $bottom: 7px;
   }
 
   input:focus {
-    color: #000000;
+    color: #000;
   }
 
   i {
     position: absolute;
     font-size: 20px;
     bottom: 6px;
-    right: 0px;
-    color: #8F8F8F;
+    right: 0;
+    color: #8f8f8f;
   }
 
   label {
@@ -67,7 +67,8 @@ $bottom: 7px;
   transition: 0.3s;
 }
 
-.filled, .focused {
+.filled,
+.focused {
   label {
     transform: scale(0.86) translateY(-20px);
   }
@@ -117,7 +118,8 @@ input[type=checkbox] {
   appearance: none;
 }
 
-.checked .checkbox:after, :checked + .checkbox:after {
+.checked .checkbox::after,
+:checked + .checkbox::after {
   content: "";
   width: 7px;
   height: 3px;
@@ -174,7 +176,8 @@ button {
   }
 }
 
-.dropdown, .help {
+.dropdown,
+.help {
   display: none\9;
   pointer-events: none;
 
@@ -205,14 +208,14 @@ button {
   padding: 8px 12px;
   font-size: 12px;
   background: #555;
-  box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0px;
+  box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
   z-index: 3;
   border-radius: $br;
   top: 100%;
   margin-top: 10px;
   pointer-events: none !important;
 
-  &:after {
+  &::after {
     content: "";
     position: absolute;
     width: 0;

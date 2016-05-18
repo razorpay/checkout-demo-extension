@@ -15,7 +15,7 @@ body.embedded {
     box-shadow: none;
   }
 
-  #container:after {
+  #container::after {
     content: none;
   }
 }

@@ -71,7 +71,7 @@ gulp.task('compileTemplates', function() {
 gulp.task('compileStyles', function(){
   return gulp.src(paths.css)
     .pipe(stylelint({
-      failAfterError: false,
+      syntax: 'scss',
       reporters: [
         {
           formatter: 'string',

@@ -8,7 +8,7 @@
 .mfix {
   white-space: nowrap;
 
-  &:after {
+  &::after {
     content: "";
     height: 96%;
     display: inline-block;
@@ -23,7 +23,8 @@
   white-space: normal;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   height: 100%;
   -webkit-overflow-scrolling: touch;
@@ -36,7 +37,8 @@ body, html {
     text-align: right;
   }
 
-  .first, .second {
+  .first,
+  .second {
     float: left;
     width: 50%;
   }
@@ -82,7 +84,7 @@ body, html {
   }
 
   img {
-    // IE not accepting click as click on parent label
+    /* IE not accepting click as click on parent label */
     pointer-events: none;
     height: 24px;
     margin-bottom: 3px;
@@ -186,7 +188,10 @@ i {
 }
 
 .font-loaded {
-  #modal, button, input, select {
+  #modal,
+  button,
+  input,
+  select {
     font-family: $lato;
     font-feature-settings: "liga" 0;
   }
@@ -240,7 +245,7 @@ i {
   position: relative;
   z-index: 3;
 
-  &:before {
+  &::before {
     content: "";
     left: 0;
     right: 0;
@@ -351,7 +356,8 @@ i {
   }
 }
 
-#form, #form-fields {
+#form,
+#form-fields {
   height: 100%;
 }
 
@@ -394,7 +400,7 @@ i {
 
 .back {
   float: left;
-  margin: 0px 6px 0 0;
+  margin: 0 6px 0 0;
   font-size: 12px;
 }
 
@@ -445,7 +451,7 @@ i {
   font-size: 16px;
   box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.24);
 
-  &:before {
+  &::before {
     content: "";
     left: 0;
     width: 100%;
@@ -457,7 +463,7 @@ i {
     pointer-events: none;
   }
 
-  &:hover:before {
+  &:hover::before {
     opacity: 0;
   }
 }

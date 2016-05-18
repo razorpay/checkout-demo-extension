@@ -26,7 +26,7 @@
   left: 50%;
   transform: rotateX(-2deg) translateY(10px) scale(0.98);
 
-  &:after {
+  &::after {
     height: 100%;
   }
 
@@ -106,7 +106,7 @@
 }
 
 #view-emi-plans {
-  &:before {
+  &::before {
     border-radius: 50%;
     content: "?";
     color: #fff;
@@ -137,7 +137,8 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
     color: #333;
 
-    &:after, &:before {
+    &::after,
+    &::before {
       content: "";
       position: absolute;
       width: 0;
@@ -151,7 +152,7 @@
       margin-bottom: -12px;
     }
 
-    &:before {
+    &::before {
       border-width: 7px;
       border-color: #ddd transparent transparent;
       margin-bottom: -14px;

@@ -1,5 +1,7 @@
 @import "common";
 
+/* stylelint-disable */
+
 @keyframes spring {
   0% {
     transform: translateY(-70px);
@@ -38,7 +40,7 @@
   }
 
   100% {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
 }
 
@@ -82,7 +84,8 @@ $gridStagger: 0.05s;
     transition: none;
   }
 
-  .legend, #payment-options {
+  .legend,
+  #payment-options {
     transition: $springTime;
   }
 }
@@ -111,7 +114,8 @@ $gridStagger: 0.05s;
         transition: $first;
       }
 
-      .legend, #payment-options {
+      .legend,
+      #payment-options {
         opacity: 0;
         transition: $first;
       }
@@ -179,3 +183,4 @@ $gridStagger: 0.05s;
     transform: none;
   }
 }
+/* stylelint-enable */
