@@ -157,23 +157,17 @@ CheckoutFrame.prototype = {
   getEl: function(rzp){
     if(!this.el){
       var key = rzp && rzp.get('key');
-      var iframe = $(document.createElement('iframe'))
+      this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
+          style: 'min-height: 530px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
           allowtransparency: true,
           frameborder: 0,
           width: '100%',
           height: '100%',
           src: makeCheckoutUrl(key)
         }
-      )
-      this.el = iframe[0];
-
-      setTimeout(function() {
-        iframe.attr({
-          style: 'min-height: 530px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;'
-        });
-      });
+      )[0];
     }
     return this.el;
   },
@@ -202,7 +196,6 @@ CheckoutFrame.prototype = {
     })
 
     if(parent){
-      this.el.removeAttribute('style');
       this.embedded = true;
       this.afterClose = noop;
     }
