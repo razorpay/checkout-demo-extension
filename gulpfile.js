@@ -81,7 +81,7 @@ gulp.task('compileStyles', function(){
     }))
     .pipe(sass())
     .pipe(gulpif(isProduction, minifyCSS()))
-    .pipe(concat('checkout.css'))
+    .pipe(concat('checkout-new.css'))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
       cascade: false
@@ -131,7 +131,7 @@ gulp.task('build', function() {
 gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
-  gulp.watch([assetPath('**/*.js'), assetPath('*.html')], ['compileHTML']).on('change', browserSync.reload);
+  gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
 
   browserSync.init({
     server: './app/dist',

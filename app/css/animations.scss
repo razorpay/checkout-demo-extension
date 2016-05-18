@@ -1,7 +1,5 @@
 @import "common";
 
-/* stylelint-disable */
-
 @keyframes spring {
   0% {
     transform: translateY(-70px);
@@ -183,4 +181,3 @@ $gridStagger: 0.05s;
     transform: none;
   }
 }
-/* stylelint-enable */
