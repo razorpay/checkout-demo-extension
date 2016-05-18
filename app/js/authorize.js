@@ -199,8 +199,8 @@ Request.prototype = {
       data.notes,
       function(key, val){
         var valType = typeof val;
-        if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
-          data['notes' + key] = val;
+        if (valType === 'string' || valType === 'number' || valType === 'boolean'){
+          data['notes[' + key + ']'] = val;
         }
       }
     )
