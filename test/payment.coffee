@@ -1,33 +1,49 @@
 payload =
+  key_id: 'key',
   amount: 1000
   method: 'wallet'
   wallet: 'paytm'
 
 baseUrl = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/' + RazorpayConfig.version;
 
-describe 'Payment::', ->
-  data = clone payload
-  ajaxstub = sinon.stub $, 'ajax'
-  r = Razorpay
-    key: 'key'
-    amount: 1000
+r = Razorpay
+  key: 'key'
+  amount: 1000
 
-  payment = new Payment data, {paused: true}, r
+mockPayment = (payment) ->
+  unless payment
+    payment =
+      data: clone payload
+      r: r
+      ajax: null
+      done: false
+      fees: false
+      powerwallet: false
+      popup: null
+      payment_id: ''
+
+  for methodName, methodFunc of Payment::
+    if typeof methodFunc is 'function'
+      payment[methodName] = sinon.stub()
+
+  payment
+
+describe 'Payment::', ->
+  payment = data = r2 = null
 
   describe 'format', ->
-    data2 = null
-
     beforeEach ->
-      data2 = clone payload
+      data = clone payload
+      payment = do mockPayment
 
     it 'basic keys', ->
       params =
         fees: 'abc'
         powerwallet: 'def'
-      payment.format data2, params, r
+      Payment::format.call payment, data, params
 
       expect payment.data
-        .to.be data2
+        .to.be data
 
       expect payment.fees
         .to.be 'abc'
@@ -36,15 +52,15 @@ describe 'Payment::', ->
         .to.be 'def'
 
     it 'notes', ->
-      data2.notes =
+      data.notes =
         foo: 1
         bar: 2
 
-      payment.format data2, {}, r
+      Payment::format.call payment, data, {}
 
       expectedNotes = {}
 
-      for key, val of data2
+      for key, val of data
         if /^notes/.test key
           expectedNotes[key] = val
 
