@@ -828,10 +828,6 @@ Session.prototype = {
     this.requestTimeout = null;
   },
 
-  bind: function(func){
-    return bind(func, this);
-  },
-
   submit: function(e) {
     preventDefault(e);
 
@@ -909,8 +905,8 @@ Session.prototype = {
       showLoadingMessage(loadingMessage);
     }
     this.rzp = Razorpay(options).createPayment(data, request)
-      .on('payment.success', this.bind(successHandler))
-      .on('payment.error', this.bind(errorCallback))
+      .on('payment.success', bind(successHandler, this))
+      .on('payment.error', bind(errorCallback, this))
       .on('payment.error', function(response){
         Razorpay.sendMessage({
           event: 'event',
@@ -919,7 +915,7 @@ Session.prototype = {
       });
 
     if(request.powerwallet){
-      this.rzp.on('payment.otp.required', this.bind(secondfactorHandler));
+      this.rzp.on('payment.otp.required', bind(secondfactorHandler, this));
     }
   },
 
@@ -932,27 +928,9 @@ Session.prototype = {
       data['card[expiry_month]'] = '12';
       data['card[expiry_year]'] = '21';
     }
+
     // data.amount needed by external libraries relying on `onsubmit` postMessage
-    each(
-      ['amount', 'currency', 'signature', 'description', 'order_id'],
-      function(i, field){
-        var val = this.get(field);
-        if(val){
-          data[field] = this.get(field);
-        }
-      },
-      this
-    )
-
-    // data.key_id needed by discreet.shouldAjax
-    data.key_id = this.get('key');
-
-    each(
-      this.get('notes'),
-      function(noteKey, noteVal){
-        data['notes[' + noteKey + ']'] = noteVal;
-      }
-    )
+    data.amount = this.get('amount');
     return data;
   },
 
