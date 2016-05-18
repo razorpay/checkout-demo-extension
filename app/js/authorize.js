@@ -68,11 +68,7 @@ function Payment(data, params, r){
 
   this.on('cancel', onPaymentCancel);
 
-  if (!this.tryPopup()) {
-    // popup creation failed
-    localStorage.removeItem('payload');
-    submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
-  }
+  var popup = this.tryPopup();
 
   if (params.paused) {
     if (popup) {
@@ -209,7 +205,7 @@ Payment.prototype = {
     this.offmessage();
     clearPollingInterval();
     if(this.ajax){
-      this.ajax = abort();
+      this.ajax.abort();
     }
   },
 
@@ -235,22 +231,27 @@ Payment.prototype = {
   },
 
   tryPopup: function(){
-    var noPopup = discreet.isFrame && !this.data.fees && this.powerwallet;
-
-    // unsupported browsers
-    noPopup = noPopup || /(Windows Phone|\(iP.+UCBrowser\/)/.test(ua);
-
-    if(noPopup){
+    if(this.powerwallet){
       return null;
     }
 
     var popup;
-    try{
-      popup = this.popup = new Popup('', 'popup_' + _uid);
-    } catch(e){
-      return null;
+    // unsupported browsers
+    if(!/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)){
+      try{
+        popup = this.popup = new Popup('', 'popup_' + _uid);
+      } catch(e){
+        return null;
+      }
     }
-    popup.onClose = this.r.emitter('payment.cancel');
+
+    if (popup) {
+      popup.onClose = this.r.emitter('payment.cancel');
+    } else {
+      // popup creation failed
+      localStorage.removeItem('payload');
+      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
+    }
     return popup;
   }
 }
@@ -376,7 +377,7 @@ razorpayProto.resendOTP = function(callback){
 }
 
 Razorpay.payment = {
-  authorize: Request,
+  authorize: Payment,
   validate: function(data){
     var errors = [];
 

@@ -236,7 +236,7 @@ Razorpay.prototype = {
       this._events = {};
     } else {
       var eventSplit = event.split('.');
-      eventMap = this._events[eventSplit[0]];
+      var eventMap = this._events[eventSplit[0]];
       if (eventSplit.length > 1){
         eventMap = eventMap[eventSplit[1]];
       }

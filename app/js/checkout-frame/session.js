@@ -181,12 +181,6 @@ function showLoadingMessage(){
   );
 }
 
-function setDefaultError(){
-  var msg = discreet.defaultError();
-  msg.id = _uid;
-  setCookie('onComplete', stringify(msg));
-}
-
 // this === Session
 function errorHandler(response){
   if(!response || !response.error){

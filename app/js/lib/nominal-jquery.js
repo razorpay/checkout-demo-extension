@@ -57,11 +57,12 @@ function indexOf(arr, item) {
 
     for (; from < len; from++)
     {
-      if (from in arr && arr[from] === item)
+      if (from in arr && arr[from] === item){
         return from;
+      }
     }
     return -1;
-  };
+  }
 }
 
 function invokeEach(iteratee, thisArg){
