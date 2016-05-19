@@ -1,9 +1,5 @@
 var templates = {};
 
-function makeFormHtml64(url, data){
-  return _btoa('<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>');
-}
-
 var pollingInterval;
 
 function clearPollingInterval(force){
@@ -19,10 +15,6 @@ function clearPollingInterval(force){
 
 function deleteCookie(name){
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
-}
-
-function setCookie(name, value){
-  document.cookie = name + "=" + value + ";expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/";
 }
 
 function getCookie(name){
@@ -52,149 +44,107 @@ function setCommunicator(){
 }
 setCommunicator();
 
-function pollPaymentData(request) {
-  clearPollingInterval(true);
-  pollingInterval = setInterval(function(){
-    var paymentData;
-    try {
-      paymentData = localStorage.getItem('onComplete');
-    } catch(e) {}
-    if(!paymentData){
-      paymentData = getCookie('onComplete');
+function onPaymentCancel(errorObj){
+  if(!this.done){
+    var payment_id = this.payment_id;
+    if(payment_id){
+      $.ajax({
+        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.data.key_id
+      })
     }
-
-    if(paymentData) {
-      clearPollingInterval();
-      request.complete(paymentData);
-    }
-  }, 150)
-}
-
-function onMessage(e){
-  if (
-    e.origin
-    && this.popup
-    && (e.source === this.popup.window || e.source === communicator.contentWindow)
-  ) {
-    this.complete(e.data);
+    this.complete(errorObj || discreet.defaultError());
   }
 }
 
-// this === request
-function ajaxCallback(response){
-  if (response.payment_id) {
-    this.payment_id = response.payment_id;
+function Payment(data, params, r){
+  if(!params || typeof params !== 'object'){
+    params = emo;
   }
+  // saving razorpay instance
+  this.r = r;
 
-  if(response.razorpay_payment_id || response.error) {
-    if (response.error && response.error.action === 'RETRY') {
-      invoke(this.error, null, response, 0);
-    } else {
-      this.complete(response);
+  // sanitize this.data, set fee, powerwallet flags
+  this.format(data, params);
+
+  // redirect if specified
+  this.checkRedirect();
+
+  this.on('cancel', onPaymentCancel);
+
+  var popup = this.tryPopup();
+
+  if (params.paused) {
+    if (popup) {
+      popup.write(params.message);
     }
+    this.on('resume', this.generate);
   } else {
-    var nextRequest = response.request;
-    if(response.type === 'otp'){
-      this.secondfactor(makeSecondfactorCallback(this, nextRequest));
-    } else {
-      this.nextRequest(nextRequest);
-    }
+    this.generate();
   }
 }
 
+Payment.prototype = {
+  on: function(event, handler){
+    this.r.on(event, bind(handler, this), 'payment');
+  },
 
-function makeSecondfactorCallback(request, nextRequest){
-  return function(factor){
-    $.post({
-      url: nextRequest.url,
-      data: {
-        type: 'otp',
-        otp: factor
+  emit: function(event, arg){
+    this.r.emit('payment.' + event, arg);
+  },
+
+  off: function(){
+    this.r.off('payment');
+  },
+
+  checkRedirect: function(){
+    var getOption = this.r.get;
+    if(getOption('redirect')){
+      var data = this.data;
+      // add callback_url if redirecting
+      var callback_url = getOption('callback_url');
+      if(callback_url){
+        data.callback_url = callback_url;
+      }
+      discreet.redirect({
+        url: makeRedirectUrl(this.fees),
+        content: data,
+        method: 'post'
+      });
+    }
+  },
+
+  format: function(data, params){
+    // add tracking data
+    data['_[id]'] = _uid;
+    data['_[medium]'] = discreet.medium;
+    data['_[context]'] = discreet.context;
+    data['_[checkout]'] = !!discreet.isFrame;
+    if(params.powerwallet){
+      data['_[source]'] = 'checkoutjs';
+    }
+
+    // fill data from options if empty
+    var getOption = this.r.get;
+
+    each(
+      ['amount', 'currency', 'signature', 'description', 'order_id', 'notes'],
+      function(i, field){
+        if(!(field in data)){
+          var val = getOption(field);
+          if(val){
+            data[field] = val;
+          }          
+        }
       },
-      callback: request.ajaxCallback
-    })
-  }
-}
-
-function Request(params){
-  if(!(this instanceof Request)){
-    return new Request(params);
-  }
-
-  var errors = this.format(params);
-  if(errors){
-    return errors;
-  }
-
-  var popup;
-  var data = this.data;
-
-  if(this.get('redirect')){
-    // add callback_url if redirecting
-    var callback_url = this.get('callback_url');
-    if(callback_url){
-      data.callback_url = callback_url;
-    }
-    return discreet.redirect({
-      url: this.makeRedirectUrl(),
-      content: data,
-      method: 'post'
-    });
-  }
-  if(this.shouldPopup()){
-    popup = this.makePopup();
-    // open new tab
-    if(!popup) {
-      localStorage.removeItem('payload');
-      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
-    }
-  }
-  if(this.powerwallet){
-    data['_[source]'] = 'checkoutjs';
-  }
-
-  if(!discreet.supported(true)){
-    return true;
-  }
-
-  if(this.shouldAjax()){
-    this.makeAjax();
-  } else {
-    submitForm(this.makeRedirectUrl(), data, 'post', popup.name);
-  }
-
-  // adding listeners
-  if(discreet.isFrame){
-    window.onComplete = bind(this.complete, this);
-    pollPaymentData(this);
-  }
-  this.listener = $(window).on('message', bind(onMessage, this));
-}
-
-Request.prototype = {
-
-  format: function(params){
-    if(typeof params !== 'object' || typeof params.data !== 'object'){
-      return err('malformed payment request object');
-    }
-
-    var data = this.data = params.data;
-    this.get = new Options(params.options).get;
-    this.fees = params.fees;
-    this.powerwallet = params.powerwallet;
-    this.success = params.success || noop;
-    this.error = params.error || noop;
-    this.payment_id = params.payment_id;
-    if(params.secondfactor){
-      this.secondfactor = params.secondfactor;
-    }
+      this
+    )
 
     if(!data.key_id){
-      data.key_id = Razorpay.defaults.key;
+      data.key_id = getOption('key');
     }
-    if(!data.currency){
-      data.currency = Razorpay.defaults.currency;
-    }
+
+    // flatten notes
+    // notes.abc -> notes[abc]
     each(
       data.notes,
       function(key, val){
@@ -206,95 +156,39 @@ Request.prototype = {
     )
     delete data.notes;
 
-    data['_[id]'] = _uid;
-    data['_[medium]'] = discreet.medium;
-    data['_[context]'] = discreet.context;
-    data['_[checkout]'] = !!discreet.isFrame;
-
-    return Razorpay.payment.validate(data);
+    this.data = data;
+    this.fees = params.fees;
+    this.powerwallet = params.powerwallet;
   },
 
-  makeRedirectUrl: function(){
-    return discreet.makeUrl() + 'payments/create/' + (this.fees ? 'fees' : 'checkout');
-  },
+  generate: function(){
+    var popup = this.popup;
 
-  makeAjax: function(){
-    var cb = this.ajaxCallback = bind(ajaxCallback, this);
-    var data = this.data;
-    var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
-    delete data.key_id;
+    // show loading screen in popup
+    if (popup) {
+      popup.write(templates.popup(this));
+    }
 
-    $.post({
-      url: url,
-      data: data,
-      callback: cb
-    })
-  },
-
-  nextRequest: function(request){
-    var direct = request.method === 'direct';
-    var content = request.content;
-    if(this.popup){
-      if(direct){
-        this.writePopup(content);
-      } else {
+    if (!this.tryAjax()) {
+      // no ajax route was available
+      if (popup) {
         submitForm(
-          request.url,
-          request.content,
-          request.method,
-          this.popup.name
+          makeRedirectUrl(this.fees),
+          this.data,
+          'post',
+          popup.name
         )
+      } else {
+        setPayloadStorage(this.message);
       }
-    } else {
-      var payload = direct ? _btoa(content) : makeFormHtml64(request.url, content);
-      localStorage.setItem('payload', payload);
     }
-  },
 
-  // checks whether to use powerwallet or not
-  shouldPopup: function(){
-    return !discreet.isFrame || this.fees || !this.powerwallet;
-  },
-
-  // virtually all the time, unless there isn't an ajax based route
-  shouldAjax: function(){
-    return !this.fees;
-  },
-
-  makePopup: function(){
-    if(/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)) {
-      return null;
+    // adding listeners
+    if(discreet.isFrame){
+      var complete = window.onComplete = bind(this.complete, this);
+      pollPaymentData(complete);
     }
-    var popup;
-    try{
-      popup = this.popup = new Popup('', 'popup_' + _uid);
-    } catch(e){
-      return null;
-    }
-    try{
-      this.writePopup();
-    } catch(e){}
-
-    popup.onClose = bind(this.cancel, this);
-    return popup;
-  },
-
-  writePopup: function(html){
-    var pdoc = this.popup.window.document;
-    pdoc.write(html || templates.popup(this));
-    pdoc.close();
-  },
-
-  cancel: function(errorObj){
-    if(!this.done){
-      var payment_id = this.payment_id;
-      if(payment_id){
-        $.ajax({
-          url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.get('key')
-        })
-      }
-      this.complete(errorObj || discreet.defaultError());
-    }
+    this.offmessage = $(window).on('message', bind(onMessage, this));
   },
 
   complete: function(data){
@@ -302,6 +196,7 @@ Request.prototype = {
       return;
     }
     this.clear();
+
     try{
       if(typeof data !== 'object') {
         data = JSON.parse(data);
@@ -314,13 +209,15 @@ Request.prototype = {
     var payment_id = data.razorpay_payment_id;
     if(typeof payment_id === 'string' && payment_id){
       var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-      return invoke(this.success, null, returnObj, 0); // dont expose request as this
+      this.emit('success', returnObj);
+    } else {
+      if(!data.error || typeof data.error !== 'object' || !data.error.description){
+        data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
+      }
+      this.emit('error', data);
     }
 
-    if(!data.error || typeof data.error !== 'object' || !data.error.description){
-      data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
-    }
-    invoke(this.error, null, data, 0);
+    this.off();
   },
 
   clear: function(){
@@ -328,37 +225,188 @@ Request.prototype = {
       this.popup.onClose = null;
       this.popup.close();
     } catch(e){}
-
     this.done = true;
+
     // unbind listener
-    invoke('listener', this);
+    this.offmessage();
     clearPollingInterval();
+    if(this.ajax){
+      this.ajax.abort();
+    }
   },
 
-  track: function(){
+  tryAjax: function(){
+    // virtually all the time, unless there isn't an ajax based route
+    // shouldAjax = !this.fees;
+    if(this.fees){
+      return false;
+    }
+
+    // else make ajax request
     var data = this.data;
-    var trackingPayload = this.trackingPayload = {};
-    each(
-      [
-        'email',
-        'contact',
-        'method',
-        'card[name]',
-        'bank',
-        'wallet',
-        'emi_duration'
-      ],
-      function(i, key){
-        if(key in data){
-          trackingPayload[key] = data[key];
-        }
+    var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
+    delete data.key_id;
+
+    // return xhr object
+    this.ajax = $.post({
+      url: url,
+      data: data,
+      callback: bind(ajaxCallback, this)
+    })
+    return this.ajax;
+  },
+
+  tryPopup: function(){
+    if(this.powerwallet){
+      return null;
+    }
+
+    var popup;
+    // unsupported browsers
+    if(!/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)){
+      try{
+        popup = this.popup = new Popup('', 'popup_' + _uid);
+      } catch(e){
+        return null;
       }
-    )
+    }
+
+    if (popup) {
+      popup.onClose = this.r.emitter('payment.cancel');
+    } else {
+      // popup creation failed
+      localStorage.removeItem('payload');
+      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
+    }
+    return popup;
   }
 }
 
+function ajaxCallback(response){
+  var payment_id = response.payment_id;
+  if (payment_id) {
+    this.payment_id = payment_id;
+  }
+
+  if (response.razorpay_payment_id || response.error) {
+    this.complete(response);
+  } else {
+    invoke(responseTypes[response.type], this, response.request);
+  }
+}
+
+function pollPaymentData(onComplete) {
+  clearPollingInterval(true);
+  pollingInterval = setInterval(function(){
+    var paymentData;
+    try {
+      paymentData = localStorage.getItem('onComplete');
+    } catch(e) {}
+    if(!paymentData){
+      paymentData = getCookie('onComplete');
+    }
+
+    if(paymentData) {
+      clearPollingInterval();
+      onComplete(paymentData);
+    }
+  }, 150)
+}
+
+function onMessage(e){
+  if (this.popup && this.popup.window === e.source || communicator && communicator.contentWindow === e.source) {
+    this.complete(e.data);
+  }
+}
+
+function makeAutoSubmitForm(url, data){
+  return '<form action="'+url+'" method="post">'+deserialize(data)+'</form><script>document.forms[0].submit()</script>';
+}
+
+function setPayloadStorage(payload){
+  try{
+    localStorage.setItem('payload', _btoa(payload));
+  } catch(e){}
+}
+
+function makeRedirectUrl(fees){
+  return discreet.makeUrl() + 'payments/create/' + (fees ? 'fees' : 'checkout');
+}
+
+var responseTypes = {
+  // this === payment
+  first: function(request){
+    var direct = request.method === 'direct';
+    var content = request.content;
+    var popup = this.popup;
+    if(popup){
+      if(direct){
+        // direct is true for payzapp
+        popup.write(content);
+      } else {
+        submitForm(
+          request.url,
+          request.content,
+          request.method,
+          popup.name
+        )
+      }
+    } else {
+      // set in localStorage for lumia
+      setPayloadStorage(direct ? content : makeAutoSubmitForm(request.url, content));
+    }
+  },
+
+  otp: function(request){
+    this.otpurl = request.url;
+    this.emit('otp.required');
+  }
+}
+
+function otpCallback(response){
+  var error = response.error;
+  if(error && error.action === 'RETRY'){
+    return this.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
+  }
+  this.complete(response);
+}
+
+var razorpayProto = Razorpay.prototype;
+razorpayProto.createPayment = function(data, params) {
+  this._payment = new Payment(data, params, this);
+  return this;
+}
+
+razorpayProto.submitOTP = function(otp){
+  var payment = this._payment;
+  payment.ajax = $.post({
+    url: payment.otpurl,
+    data: {
+      type: 'otp',
+      otp: otp
+    },
+    callback: bind(otpCallback, this)
+  })
+}
+
+razorpayProto.resendOTP = function(callback){
+  var payment = this._payment;
+  payment.ajax = $.post({
+    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/otp_resend?key_id=' + this.get('key'),
+    data: {
+      '_[source]': 'checkoutjs'
+    },
+    callback: bind(ajaxCallback, this)
+  });
+}
+
 Razorpay.payment = {
-  authorize: Request,
+  authorize: function(options){
+    var r = Razorpay({amount: options.data.amount}).createPayment(options.data);
+    r.on('payment.success', options.success);
+    r.on('payment.error', options.error);
+    return r;
+  },
   validate: function(data){
     var errors = [];
 

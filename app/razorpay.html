@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
-  <!-- <script src="config.js"></script> -->
+  <script src="config.js"></script>
   <!-- build:js razorpay-new.js -->
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
@@ -18,8 +18,7 @@
   <script src="templates/popup.js"></script>
   <!-- test scripts
   <script src="../test/base.coffee"></script>
-  <script src="../test/submit.coffee"></script>
-  <script src="../test/request.coffee"></script>
+  <script src="../test/payment.coffee"></script>
   -->
   <!-- endbuild -->
 
@@ -68,7 +67,7 @@
 
       gel('submit').onclick = function(e){
         this.setAttribute('disabled', 'disabled'); // add loading animation here
-        Razorpay.payment.authorize({
+        window.r = Razorpay.payment.authorize({
           // fees: true,
           data: {
             amount: val('amount').replace(/[^0-9]+/,'')*100,

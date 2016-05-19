@@ -13,6 +13,6 @@ function clone(obj){
 }
 
 var log = console.log.bind(console);
-alert = console.log = console.error = jQuery.noop;
+var noop = window.alert = console.log = console.error = jQuery.noop;
 
 var spyOn = sinon.spy

@@ -42,6 +42,29 @@ function each( iteratee, eachFunc, thisArg ) {
   }
 }
 
+function indexOf(arr, item) {
+  if (Array.prototype.indexOf) {
+    return arr.indexOf(item);
+  } else {
+    var len = arr.length >>> 0;
+    var from = Number(arguments[1]) || 0;
+    from = (from < 0)
+         ? Math.ceil(from)
+         : Math.floor(from);
+    if (from < 0) {
+      from += len;
+    }
+
+    for (; from < len; from++)
+    {
+      if (from in arr && arr[from] === item){
+        return from;
+      }
+    }
+    return -1;
+  }
+}
+
 function invokeEach(iteratee, thisArg){
   each(
     iteratee,
@@ -112,7 +135,7 @@ function invoke(handler, thisArg, param , timeout){
     if(!thisArg){
       thisArg = this;
     }
-    if(arguments.length === 3){
+    if(arguments.length >= 3){
       return handler.call(thisArg, param);
     }
     return handler.call(thisArg);
@@ -351,7 +374,13 @@ $.ajax = function(opts){
   if(opts.callback){
     xhr.onreadystatechange = function(){
       if(xhr.readyState === 4){
-        opts.callback(JSON.parse(xhr.responseText));
+        var json;
+        try{
+          json = JSON.parse(xhr.responseText);
+        } catch(e){
+          json = {error: {description: 'Parsing error'}};
+        }
+        opts.callback(json);
       }
     }
     xhr.onerror = function(){

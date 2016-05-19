@@ -3,6 +3,29 @@ getOptions = ->
   amount: 100
 
 
+describe 'events', ->
+  rzp = Razorpay getOptions()
+  describe 'attach event listener', ->
+    spy = sinon.spy()
+
+    # one listener
+    rzp.on 'a', spy
+    rzp.emit 'a'
+    expect spy.callCount
+      .to.be 1
+
+    # 2 listeners
+    rzp.on 'a', spy
+    rzp.emit 'a'
+    expect spy.callCount
+      .to.be 3
+
+    # unbind
+    rzp.off()
+    rzp.emit 'a'
+    expect spy.callCount
+      .to.be 3
+
 describe 'validateRequiredFields should check', ->
   arg = null
   key = null

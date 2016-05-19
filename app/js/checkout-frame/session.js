@@ -181,12 +181,6 @@ function showLoadingMessage(){
   );
 }
 
-function setDefaultError(){
-  var msg = discreet.defaultError();
-  msg.id = _uid;
-  setCookie('onComplete', stringify(msg));
-}
-
 // this === Session
 function errorHandler(response){
   if(!response || !response.error){
@@ -226,18 +220,6 @@ function errorHandler(response){
 
 // this === Session
 function otpErrorHandler(response) {
-  if (response.error.action === 'RETRY') {
-    $('#otp').val('');
-    this.requestTimeout = invoke('showOTPScreen', this, {
-      incorrectOTP: true,
-      otp: true,
-      verify: true,
-      text: 'OTP entered was incorrect'
-    }, 200);
-
-    return;
-  }
-
   this.clearRequest();
   this.requestTimeout = invoke(
     'showOTPScreen',
@@ -270,24 +252,28 @@ function successHandler(response){
 }
 
 // this === Session
-function secondfactorHandler(done, tab){
-  this.secondfactorCallback = done;
-  this.showOTPScreen({
-    text: 'Sending OTP to',
-    loading: true,
-    number: true
-  })
+function secondfactorHandler(text){
+  var timeout;
+  if(!text){
+    this.showOTPScreen({
+      text: 'Sending OTP to',
+      loading: true,
+      number: true
+    })
+    text = 'An OTP has been sent to';
+    timeout = 750;
+  }
   $('#otp').val('');
   this.requestTimeout = invoke(
     'showOTPScreen',
     this,
     {
       verify: true,
-      text: 'An OTP has been sent to',
-      number: true,
+      text: text,
+      number: timeout,
       otp: true
     },
-    750
+    timeout
   )
 }
 
@@ -454,7 +440,7 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(){
-    if(this.request){
+    if(this.rzp){
       if(confirm('Ongoing payment. Press OK to abort payment.')){
         this.clearRequest();
       } else {
@@ -493,7 +479,7 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    var self = this;
+    var rzp = this.rzp;
     this.showOTPScreen({
       text: 'Sending OTP to',
       loading: true,
@@ -501,24 +487,9 @@ Session.prototype = {
     })
     $('#otp').val('');
 
-    $.post({
-      url: discreet.makeUrl() + 'payments/' + this.request.payment_id + '/otp_resend',
-      data: {
-        '_[source]': 'checkoutjs'
-      },
-      headers: {
-        Authorization: 'Basic ' + _btoa(this.get('key') + ':')
-      },
-      callback: function(response) {
-        self.showOTPScreen({
-          verify: true,
-          text: 'An OTP has been sent to',
-          number: true,
-          otp: true
-        });
-        makeSecondfactorCallback(self.request, response.request)
-      }
-    });
+    rzp.resendOTP(function() {
+      rzp.emit('payment.otp.required');
+    })
   },
 
   bindEvents: function(){
@@ -840,7 +811,7 @@ Session.prototype = {
       loading: true,
       text: 'Verifying OTP...'
     })
-    this.secondfactorCallback(gel('otp').value);
+    this.rzp.submitOTP(gel('otp').value);
   },
 
   clearRequest: function(){
@@ -848,20 +819,13 @@ Session.prototype = {
     if(powerotp){
       powerotp.value = '';
     }
-    var request = this.request;
-    if(request){
-      if(request.ajax){
-        request.ajax.abort();
-      }
-      request.cancel();
-      this.request = null;
+    var rzp = this.rzp;
+    if(rzp){
+      rzp.emit('payment.cancel');
+      this.rzp = null;
     }
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
-  },
-
-  bind: function(func){
-    return bind(func, this);
   },
 
   submit: function(e) {
@@ -921,18 +885,14 @@ Session.prototype = {
     var options = this.get();
 
     var request = {
-      data: data,
-      fees: preferences.fee_bearer,
-      options: options,
-      success: this.bind(successHandler)
+      fees: preferences.fee_bearer
     };
 
+    var errorCallback;
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       options.redirect = false;
       request.powerwallet = true;
-      request.error = this.bind(otpErrorHandler);
-      request.secondfactor = this.bind(secondfactorHandler);
-
+      errorCallback = otpErrorHandler;
       this.sub_tab = wallet;
       this.showOTPScreen({
         loading: true,
@@ -941,10 +901,22 @@ Session.prototype = {
         wallet: wallet
       })
     } else {
-      request.error = this.bind(errorHandler);
+      errorCallback = errorHandler;
       showLoadingMessage(loadingMessage);
     }
-    this.request = Razorpay.payment.authorize(request);
+    this.rzp = Razorpay(options).createPayment(data, request)
+      .on('payment.success', bind(successHandler, this))
+      .on('payment.error', bind(errorCallback, this))
+      .on('payment.error', function(response){
+        Razorpay.sendMessage({
+          event: 'event',
+          data: JSON.stringify()
+        });
+      });
+
+    if(request.powerwallet){
+      this.rzp.on('payment.otp.required', bind(secondfactorHandler, this));
+    }
   },
 
   getPayload: function(nocvv_dummy_values){
@@ -956,36 +928,15 @@ Session.prototype = {
       data['card[expiry_month]'] = '12';
       data['card[expiry_year]'] = '21';
     }
+
     // data.amount needed by external libraries relying on `onsubmit` postMessage
-    each(
-      ['amount', 'currency', 'signature', 'description', 'order_id'],
-      function(i, field){
-        var val = this.get(field);
-        if(val){
-          data[field] = this.get(field);
-        }
-      },
-      this
-    )
-
-    // data.key_id needed by discreet.shouldAjax
-    data.key_id = this.get('key');
-
-    each(
-      this.get('notes'),
-      function(noteKey, noteVal){
-        data['notes[' + noteKey + ']'] = noteVal;
-      }
-    )
+    data.amount = this.get('amount');
     return data;
   },
 
   close: function(){
     if(this.isOpen){
-      if(this.request){
-        this.request.cancel();
-        this.request = null;
-      }
+      this.clearRequest();
       this.isOpen = false;
       clearTimeout(fontTimeout);
       invokeEach(this.listeners);
