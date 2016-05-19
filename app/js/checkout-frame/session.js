@@ -278,7 +278,8 @@ function secondfactorHandler(text){
 }
 
 function Session (options) {
-  this.get = Options(options).get;
+  this.r = Razorpay(options);
+  this.get = this.r.get;
   this.listeners = [];
   this.tab = '';
 }
@@ -440,7 +441,7 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(){
-    if(this.rzp){
+    if(this.r._payment){
       if(confirm('Ongoing payment. Press OK to abort payment.')){
         this.clearRequest();
       } else {
@@ -479,7 +480,6 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    var rzp = this.rzp;
     this.showOTPScreen({
       text: 'Sending OTP to',
       loading: true,
@@ -487,8 +487,9 @@ Session.prototype = {
     })
     $('#otp').val('');
 
-    rzp.resendOTP(function() {
-      rzp.emit('payment.otp.required');
+    var r = this.r;
+    r.resendOTP(function() {
+      r.emit('payment.otp.required');
     })
   },
 
@@ -811,7 +812,7 @@ Session.prototype = {
       loading: true,
       text: 'Verifying OTP...'
     })
-    this.rzp.submitOTP(gel('otp').value);
+    this.r.submitOTP(gel('otp').value);
   },
 
   clearRequest: function(){
@@ -819,11 +820,7 @@ Session.prototype = {
     if(powerotp){
       powerotp.value = '';
     }
-    var rzp = this.rzp;
-    if(rzp){
-      rzp.emit('payment.cancel');
-      this.rzp = null;
-    }
+    this.r.emit('payment.cancel');
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
   },
@@ -904,18 +901,12 @@ Session.prototype = {
       errorCallback = errorHandler;
       showLoadingMessage(loadingMessage);
     }
-    this.rzp = Razorpay(options).createPayment(data, request)
+    this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorCallback, this))
-      .on('payment.error', function(response){
-        Razorpay.sendMessage({
-          event: 'event',
-          data: JSON.stringify()
-        });
-      });
 
     if(request.powerwallet){
-      this.rzp.on('payment.otp.required', bind(secondfactorHandler, this));
+      this.r.on('payment.otp.required', bind(secondfactorHandler, this));
     }
   },
 

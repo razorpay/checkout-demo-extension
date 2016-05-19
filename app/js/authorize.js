@@ -235,6 +235,7 @@ Payment.prototype = {
     if(this.ajax){
       this.ajax.abort();
     }
+    this.r._payment = null;
   },
 
   tryAjax: function(){
