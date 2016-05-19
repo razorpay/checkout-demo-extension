@@ -385,7 +385,7 @@ razorpayProto.submitOTP = function(otp){
       type: 'otp',
       otp: otp
     },
-    callback: bind(otpCallback, this)
+    callback: bind(otpCallback, payment)
   })
 }
 
