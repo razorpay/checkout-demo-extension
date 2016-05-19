@@ -363,14 +363,12 @@ var responseTypes = {
   }
 }
 
-function makeOtpCallback(payment){
-  return function(response){
-    var error = response.error;
-    if(error && error.action === 'RETRY'){
-      return payment.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
-    }
-    payment.complete(response);
+function otpCallback(response){
+  var error = response.error;
+  if(error && error.action === 'RETRY'){
+    return this.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
   }
+  this.complete(response);
 }
 
 var razorpayProto = Razorpay.prototype;
@@ -387,7 +385,7 @@ razorpayProto.submitOTP = function(otp){
       type: 'otp',
       otp: otp
     },
-    callback: makeOtpCallback(payment)
+    callback: bind(otpCallback, this)
   })
 }
 
@@ -398,7 +396,7 @@ razorpayProto.resendOTP = function(callback){
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: makeOtpCallback(payment)
+    callback: bind(ajaxCallback, this)
   });
 }
 
