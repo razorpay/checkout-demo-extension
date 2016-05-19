@@ -27,7 +27,7 @@
   },
   "scripts": {
     "test": "gulp test",
-    "build": "gulp --env=production"
+    "build": "gulp"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
