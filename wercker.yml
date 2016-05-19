@@ -21,7 +21,7 @@ deploy:
 
         - script:
             name: build
-            code: gulp --env=production
+            code: npm run build
 
         # - script:
         #     name: 'Upload source maps'
