@@ -28,6 +28,13 @@ const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 
 const distDir = 'app/dist/v1/';
+let browserSyncOptions = {};
+
+try {
+  browserSyncOptions = require('./browsersync-config');
+} catch(e) {
+  // do nothing
+}
 
 function assetPath(path) {
   return `app/${path}`;
