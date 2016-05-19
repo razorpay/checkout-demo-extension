@@ -103,7 +103,7 @@ gulp.task('usemin', function() {
 });
 
 gulp.task('sourcemaps', function() {
-  return gulp.src(`${distDir}/**/*.js`)
+  return gulp.src([`${distDir}/**/*.js`, `!${distDir}/checkout-frame.js`, `!${distDir}/checkout-new.js`, `!${distDir}/razorpay.js`])
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(sourcemaps.init())
     .pipe(gulpif(isProduction, uglify()))
