@@ -124,6 +124,9 @@ function makeCheckoutMessage(rzp){
     netbanking: get('method.netbanking'),
     wallet: get('method.wallet')
   }
+  options.external = {
+    wallets: get('external.wallets')
+  }
 
   var response = {
     context: location.href,
