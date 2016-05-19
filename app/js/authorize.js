@@ -396,7 +396,7 @@ razorpayProto.resendOTP = function(callback){
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: bind(ajaxCallback, this)
+    callback: bind(ajaxCallback, payment)
   });
 }
 

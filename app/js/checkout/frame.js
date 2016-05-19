@@ -104,7 +104,27 @@ function makeCheckoutUrl(key){
 }
 
 function makeCheckoutMessage(rzp){
-  var options = rzp.get();
+  var get = rzp.get;
+  var options = get();
+  options.theme = {
+    color: get('theme.color'),
+    image_padding: get('theme.image_padding'),
+    close_button: get('theme.close_button'),
+  };
+  options.prefill = {
+    method: get('prefill.method'),
+    name: get('prefill.name'),
+    contact: get('prefill.contact'),
+    email: get('prefill.email'),
+    'card[number]': get('prefill.card[number]'),
+    'card[expiry]': get('prefill.card[expiry]'),
+  }
+  options.method = {
+    card: get('method.card'),
+    netbanking: get('method.netbanking'),
+    wallet: get('method.wallet')
+  }
+
   var response = {
     context: location.href,
     options: options,
