@@ -444,13 +444,11 @@ Razorpay.payment = {
   },
 
   getPrefs: function(data, callback){
-    debugger;
     return $.jsonp({
       url: discreet.makeUrl() + 'preferences',
       data: data,
       timeout: 30000,
       success: function(response){
-        debugger;
         invoke(callback, null, response);
       }
     });
