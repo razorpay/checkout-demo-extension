@@ -360,10 +360,10 @@ Session.prototype = {
       this.isOpen = true;
     }
 
+    this.setUser();
     this.getEl();
     this.setSmarty();
     this.fillData();
-    this.setUser();
     this.setEMI();
     this.setModal();
     this.setCard();
@@ -628,44 +628,52 @@ Session.prototype = {
     if (!this.tab && this.checkInvalid($('#form-common'))) {
       return;
     }
-    if (this.sub_tab) {
-      this.sub_tab = null;
-      tab = 'wallet';
+    if (this.otpscreen) {
+      this.otpscreen = false;
+      if (this.sub_tab){
+        this.sub_tab = null;
+        tab = 'wallet';
+      } else {
+        tab = '';
+      }
     }
 
     $('#form-common').addClass('not-first');
 
-    this.setScreen(tab);
-    this.tab = tab;
+    this.user.setPhone(getPhone());
     if (tab) {
-      // if (tab === 'card') {
-      //   var user = this.user;
-      //   user.setPhone(getPhone());
-      //   if( typeof user.saved !== 'boolean') {
-      //     return this.lookupUser();
-      //   } else if (user.saved && !user.logged_in && !user.wants_skip) {
-      //     return this.loginUser();
-      //   } else {
-      //     // preferences.tokens
-      //   }
-      // }
+      if (tab === 'card') {
+        if(!this.showCardTab()){
+          return;
+        }
+      }
       getTab(tab).addClass('shown');
     }
+    this.tab = tab;
+    this.setScreen(tab);
+  },
+
+  showCardTab: function(){
+    var user = this.user;
+    this.otpscreen = true;
+    if( typeof user.saved !== 'boolean') {
+      this.showOTPScreen({
+        text: 'Looking for saved cards associated with',
+        loading: true,
+        number: true
+      });
+      return this.lookupUser();
+    } else if (user.saved && !user.logged_in && !user.wants_skip) {
+      secondfactorHandler.call(this);
+      return this.loginUser();
+    }
+    this.otpscreen = false;
+    return true
+      // preferences.tokens
   },
 
   loginUser: function(){
     this.user.login();
-    invoke(secondfactorHandler, this, function(data){
-      this.user.verify(
-        data,
-        bind(
-          function(){
-            this.switchTab('card');
-          },
-          this
-        )
-      )
-    });
   },
 
   lookupUser: function(){
@@ -673,14 +681,7 @@ Session.prototype = {
       text: '<strong>Looking for saved cards with Razorpay</strong>',
       loading: true
     })
-    this.user.lookup(
-      bind(
-        function(){
-          this.switchTab('card');
-        },
-        this
-      )
-    )
+    this.user.lookup(bind(this.showCardTab,this));
   },
 
   setUser: function(){
@@ -779,7 +780,7 @@ Session.prototype = {
   },
 
   showOTPScreen: function(state){
-    if (!this.sub_tab || !this.isOpen) {
+    if (!this.otpscreen || !this.isOpen) {
       return;
     }
     $('#tab-otp').css('display', 'block');
@@ -894,6 +895,7 @@ Session.prototype = {
       request.powerwallet = true;
       errorCallback = otpErrorHandler;
       this.sub_tab = wallet;
+      this.otpscreen = true;
       this.showOTPScreen({
         loading: true,
         number: true,
@@ -912,11 +914,8 @@ Session.prototype = {
           event: 'event',
           data: JSON.stringify()
         });
-      });
-
-    if(request.powerwallet){
-      this.rzp.on('payment.otp.required', bind(secondfactorHandler, this));
-    }
+      })
+      .on('payment.otp.required', bind(secondfactorHandler, this));
   },
 
   getPayload: function(nocvv_dummy_values){

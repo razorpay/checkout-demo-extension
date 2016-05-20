@@ -425,7 +425,7 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
     }
     window.handleMessage(data);
   } catch(err){
-    roll('invalid message', data, 'warn');
+    roll('invalid message', err.message, 'warn');
   }
 }
 
