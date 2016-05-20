@@ -21,8 +21,7 @@ User.prototype = {
     $.post({
       url: discreet.makeUrl() + 'otp/create?key_id=' + this.key,
       data: {
-        contact: this.phone,
-        key_id: this.key
+        contact: this.phone
       }
     })
   },
@@ -33,7 +32,6 @@ User.prototype = {
       url: discreet.makeUrl() + 'otp/verify?key_id=' + this.key,
       data: {
         contact: this.phone,
-        key_id: this.key,
         otp: otp
       },
       callback: function(data){
