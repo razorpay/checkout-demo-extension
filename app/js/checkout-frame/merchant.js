@@ -1,7 +1,6 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
 
-debugger;
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
   sessions = {},
@@ -190,7 +189,6 @@ function setPaymentMethods(session){
 }
 
 function showModal(session) {
-  debugger;
   if(!preferences){
     var data = {
       key_id: session.get('key')

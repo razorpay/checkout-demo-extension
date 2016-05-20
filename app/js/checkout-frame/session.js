@@ -281,7 +281,6 @@ Session.prototype = {
   },
 
   getEl: function(){
-    debugger;
     if(!this.el){
       var div = document.createElement('div');
       div.innerHTML = templates.modal(this);
@@ -297,7 +296,7 @@ Session.prototype = {
   fillData: function(){
     var tab = this.data.method || this.get('prefill.method');
 
-    if(tab && !this.get('order_id')) {
+    if(tab && !this.order) {
       this.switchTab(tab);
     }
 
@@ -430,7 +429,6 @@ Session.prototype = {
   },
 
   shake: function(){
-    debugger;
     if ( this.el ) {
       $(this.el.querySelector('#modal-inner'))
         .removeClass('shake')
@@ -818,7 +816,7 @@ Session.prototype = {
     var nocvv_el = gel('nocvv-check');
     var nocvv_dummy_values;
 
-    if(!this.tab){
+    if(!this.tab && !this.order) {
       return;
     }
 
@@ -845,6 +843,9 @@ Session.prototype = {
       } else {
 
       }
+    } else if (this.order) {
+      data.method = 'netbanking';
+      data.bank = this.order.bank;
     }
 
     Razorpay.sendMessage({
