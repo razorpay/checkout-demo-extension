@@ -281,6 +281,7 @@ Session.prototype = {
   },
 
   getEl: function(){
+    debugger;
     if(!this.el){
       var div = document.createElement('div');
       div.innerHTML = templates.modal(this);
@@ -295,7 +296,8 @@ Session.prototype = {
 
   fillData: function(){
     var tab = this.data.method || this.get('prefill.method');
-    if(tab){
+
+    if(tab && !this.get('order_id')) {
       this.switchTab(tab);
     }
 
@@ -428,6 +430,7 @@ Session.prototype = {
   },
 
   shake: function(){
+    debugger;
     if ( this.el ) {
       $(this.el.querySelector('#modal-inner'))
         .removeClass('shake')
