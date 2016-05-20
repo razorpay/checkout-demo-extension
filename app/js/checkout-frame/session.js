@@ -658,25 +658,17 @@ Session.prototype = {
         loading: true,
         number: true
       });
-      this.lookupUser();
+      this.user.lookup(bind(this.showCardTab,this));
       return;
     } else if (user.saved && !user.logged_in && !user.wants_skip) {
       this.setScreen('otp');
       secondfactorHandler.call(this);
-      this.loginUser();
+      this.user.login();
       return;
     }
     this.setScreen('card');
     return true
       // preferences.tokens
-  },
-
-  loginUser: function(){
-    this.user.login();
-  },
-
-  lookupUser: function(){
-    this.user.lookup(bind(this.showCardTab,this));
   },
 
   setUser: function(){
@@ -806,7 +798,12 @@ Session.prototype = {
       loading: true,
       text: 'Verifying OTP...'
     })
-    this.r.submitOTP(gel('otp').value);
+    var otp = gel('otp').value;
+    if(this.tab === 'wallet'){
+      this.r.submitOTP(otp);
+    } else {
+      this.user.verify(otp, bind(this.showCardTab,this));
+    }
   },
 
   clearRequest: function(){

@@ -9,12 +9,9 @@ User.prototype = {
   lookup: function(callback){
     var user = this;
     $.post({
-      url: discreet.makeUrl() + 'customer/status/' + this.phone,
-      data: {
-        key_id: this.key
-      },
+      url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' + this.key,
       callback: function(data){
-        user.saved = true//!!data.saved;
+        user.saved = !!data.saved;
         invoke(callback, null, data, 600);
       }
     })
@@ -22,7 +19,7 @@ User.prototype = {
 
   login: function(){
     $.post({
-      url: discreet.makeUrl() + 'otp/create',
+      url: discreet.makeUrl() + 'otp/create?key_id=' + this.key,
       data: {
         contact: this.phone,
         key_id: this.key
@@ -33,14 +30,14 @@ User.prototype = {
   verify: function(otp, callback){
     var user = this;
     $.post({
-      url: discreet.makeUrl() + 'otp/verify',
+      url: discreet.makeUrl() + 'otp/verify?key_id=' + this.key,
       data: {
         contact: this.phone,
         key_id: this.key,
         otp: otp
       },
       callback: function(data){
-        user.logged_in = user.saved = true//!!data.success;
+        user.logged_in = !!data.success;
         callback();
       }
     })
