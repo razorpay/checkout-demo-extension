@@ -22,10 +22,9 @@ User.prototype = {
 
   login: function(){
     $.post({
-      url: discreet.makeUrl() + 'otp/create',
+      url: discreet.makeUrl() + 'otp/create?key_id=' + this.key,
       data: {
-        contact: this.phone,
-        key_id: this.key
+        contact: this.phone
       }
     })
   },
@@ -33,10 +32,9 @@ User.prototype = {
   verify: function(otp, callback){
     var user = this;
     $.post({
-      url: discreet.makeUrl() + 'otp/verify',
+      url: discreet.makeUrl() + 'otp/verify?key_id=' + this.key,
       data: {
         contact: this.phone,
-        key_id: this.key,
         otp: otp
       },
       callback: function(data){
