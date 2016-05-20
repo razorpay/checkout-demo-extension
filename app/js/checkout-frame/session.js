@@ -479,30 +479,34 @@ Session.prototype = {
     }
   },
 
-  resendOTP: function() {
-    this.showOTPScreen({
-      text: 'Sending OTP to',
-      loading: true,
-      number: true
-    })
-    $('#otp').val('');
-
-    var r = this.r;
-    r.resendOTP(function() {
-      r.emit('payment.otp.required');
-    })
+  secAction: function() {
+    if(this.tab === 'wallet'){
+      this.showOTPScreen({
+        text: 'Sending OTP to',
+        loading: true,
+        number: true
+      })
+      $('#otp').val('');
+      var r = this.r;
+      r.submitOTP(function() {
+        r.emit('payment.otp.required');
+      })
+    } else {
+      this.user.wants_skip = true;
+      this.showCardTab();
+    }
   },
 
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
-    this.on('click', '#tab-title, #topbar .back', this.switchTab);
+    this.on('click', '#topbar', this.switchTab);
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
-    this.on('click', '#resend-action > a', this.resendOTP);
+    this.on('click', '#otp-sec', this.secAction);
     var enabledMethods = this.methods;
 
     if(enabledMethods.netbanking){
@@ -518,11 +522,6 @@ Session.prototype = {
       this.on('keyup', '#card_number', onSixDigits);
       // this.on('change', '#nocvv-check', noCvvToggle);
     }
-
-    // if(enabledMethods.wallet.mobikwik){
-    //   this.on('submit', '#powerwallet', this.onOtpSubmit);
-    //   this.on('click', '#powercancel', this.hideErrorMessage);
-    // }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
     this.on('click', '#overlay', this.hideErrorMessage);
@@ -632,13 +631,15 @@ Session.prototype = {
     }
 
     // initial screen
-    if (!this.tab && this.checkInvalid($('#form-common'))) {
-      return;
+    if (!this.tab){
+      if (this.checkInvalid($('#form-common'))) {
+        return;
+      }
+      this.user.setPhone(getPhone());
     } else if (this.screen === 'otp' && this.tab === 'wallet') {
       tab = 'wallet';
     }
 
-    this.user.setPhone(getPhone());
     this.tab = tab;
 
     if (tab === 'card') {
@@ -651,6 +652,7 @@ Session.prototype = {
   showCardTab: function(){
     var user = this.user;
     tab_titles.otp = tab_titles.card;
+
     if( typeof user.saved !== 'boolean') {
       this.setScreen('otp');
       this.showOTPScreen({
@@ -659,16 +661,15 @@ Session.prototype = {
         number: true
       });
       this.user.lookup(bind(this.showCardTab,this));
-      return;
     } else if (user.saved && !user.logged_in && !user.wants_skip) {
       this.setScreen('otp');
       secondfactorHandler.call(this);
       this.user.login();
-      return;
+    } else {
+      this.setScreen('card');
+      return true;
     }
-    this.setScreen('card');
-    return true
-      // preferences.tokens
+    $('#otp-sec').html('Skip saved cards');
   },
 
   setUser: function(){
@@ -775,8 +776,7 @@ Session.prototype = {
     $('#modal').toggleClass('sub', state.verify);
     $('#tab-otp').toggleClass('error', state.error);
     $('#otp-elem').toggleClass('shown', state.otp);
-    $('#resend-action').toggleClass('shown', state.otp);
-    this.setScreen('otp');
+    $('#otp-sec').toggleClass('shown', state.otp);
 
     var wallet = state.wallet;
     if(wallet){
@@ -881,6 +881,7 @@ Session.prototype = {
       options.redirect = false;
       request.powerwallet = true;
       errorCallback = otpErrorHandler;
+      $('#otp-sec').html('Resend OTP');
       this.setScreen('otp');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
       this.showOTPScreen({
