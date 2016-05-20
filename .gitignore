@@ -18,4 +18,4 @@ npm-debug.log
 aws-keys.json
 coverage
 /app/config.js
-browsersync-config.js
+/browsersync-config.js
