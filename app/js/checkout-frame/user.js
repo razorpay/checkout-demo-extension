@@ -1,4 +1,5 @@
 function User (o) {
+  this.id = o.id || '';
   this.phone = o.phone || '';
   this.logged_in = o.logged_in || null;
   this.saved = o.saved || null;
@@ -35,7 +36,7 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.logged_in = false //user.saved = true//!!data.success;
+        user.id = 'capp_5YU7zYYgxEuxqA';
         callback();
       }
     })
@@ -43,7 +44,7 @@ User.prototype = {
 
   setPhone: function(phone){
     if (this.phone !== phone) {
-      this.logged_in = this.saved = this.wants_skip = null;
+      this.id = this.saved = this.wants_skip = null;
       this.phone = phone;
     }
   }

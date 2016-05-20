@@ -54,7 +54,7 @@ function makeEmiDropdown(emiObj, session){
 
 function setEmiBank(data){
   var activeEmiPlan = $('#emi-plans-wrap .active')[0];
-  if(getSession().tab === 'card' && activeEmiPlan){
+  if(activeEmiPlan){
     data.method = 'emi';
     data.emi_duration = activeEmiPlan.getAttribute('value');
   }
@@ -905,13 +905,23 @@ Session.prototype = {
 
   getPayload: function(nocvv_dummy_values){
     var data = this.getFormData();
-    setEmiBank(data);
 
-    if(nocvv_dummy_values){
-      data['card[cvv]'] = '000';
-      data['card[expiry_month]'] = '12';
-      data['card[expiry_year]'] = '21';
+    if(this.tab === 'card'){
+      setEmiBank(data);
+
+      var userId = this.user.id;
+      if(userId){
+        data.app_id = userId;
+        data.save = true;
+      }
+
+      if(nocvv_dummy_values){
+        data['card[cvv]'] = '000';
+        data['card[expiry_month]'] = '12';
+        data['card[expiry_year]'] = '21';
+      }
     }
+
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
