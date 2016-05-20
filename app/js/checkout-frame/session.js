@@ -596,6 +596,10 @@ Session.prototype = {
   },
 
   setScreen: function(screen){
+    if(screen === this.screen) {
+      return;
+    }
+    this.screen = screen;
     var $body = $('#body');
     makeHidden('.screen.shown');
     $body.toggleClass('tab', screen);
@@ -625,49 +629,43 @@ Session.prototype = {
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
+
+    // initial screen
     if (!this.tab && this.checkInvalid($('#form-common'))) {
       return;
+    } else if (this.screen === 'otp' && this.tab === 'wallet') {
+      tab = 'wallet';
     }
-    if (this.otpscreen) {
-      this.otpscreen = false;
-      if (this.sub_tab){
-        this.sub_tab = null;
-        tab = 'wallet';
-      } else {
-        tab = '';
-      }
-    }
-
-    $('#form-common').addClass('not-first');
 
     this.user.setPhone(getPhone());
-    if (tab) {
-      if (tab === 'card') {
-        if(!this.showCardTab()){
-          return;
-        }
-      }
-      getTab(tab).addClass('shown');
-    }
     this.tab = tab;
-    this.setScreen(tab);
+
+    if (tab === 'card') {
+      this.showCardTab();
+    } else {
+      this.setScreen(tab);
+    }
   },
 
   showCardTab: function(){
     var user = this.user;
-    this.otpscreen = true;
+    tab_titles.otp = tab_titles.card;
     if( typeof user.saved !== 'boolean') {
+      this.setScreen('otp');
       this.showOTPScreen({
         text: 'Looking for saved cards associated with',
         loading: true,
         number: true
       });
-      return this.lookupUser();
+      this.lookupUser();
+      return;
     } else if (user.saved && !user.logged_in && !user.wants_skip) {
+      this.setScreen('otp');
       secondfactorHandler.call(this);
-      return this.loginUser();
+      this.loginUser();
+      return;
     }
-    this.otpscreen = false;
+    this.setScreen('card');
     return true
       // preferences.tokens
   },
@@ -677,10 +675,6 @@ Session.prototype = {
   },
 
   lookupUser: function(){
-    this.showOTPScreen({
-      text: '<strong>Looking for saved cards with Razorpay</strong>',
-      loading: true
-    })
     this.user.lookup(bind(this.showCardTab,this));
   },
 
@@ -780,7 +774,7 @@ Session.prototype = {
   },
 
   showOTPScreen: function(state){
-    if (!this.otpscreen || !this.isOpen) {
+    if (this.screen !== 'otp' || !this.isOpen) {
       return;
     }
     $('#tab-otp').css('display', 'block');
@@ -789,12 +783,11 @@ Session.prototype = {
     $('#tab-otp').toggleClass('error', state.error);
     $('#otp-elem').toggleClass('shown', state.otp);
     $('#resend-action').toggleClass('shown', state.otp);
+    this.setScreen('otp');
 
     var wallet = state.wallet;
     if(wallet){
       var walletObj = freqWallets[wallet];
-      tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
-      this.setScreen('otp');
       invoke('addClass', $('#footer'), 'otp', 300);
     }
 
@@ -837,7 +830,7 @@ Session.prototype = {
       return;
     }
 
-    if (this.sub_tab) {
+    if (this.screen === 'otp') {
       return this.onOtpSubmit(e);
     }
     this.smarty.refresh();
@@ -894,8 +887,8 @@ Session.prototype = {
       options.redirect = false;
       request.powerwallet = true;
       errorCallback = otpErrorHandler;
-      this.sub_tab = wallet;
-      this.otpscreen = true;
+      this.setScreen('otp');
+      tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
       this.showOTPScreen({
         loading: true,
         number: true,
