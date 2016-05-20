@@ -228,7 +228,9 @@ Payment.prototype = {
     this.done = true;
 
     // unbind listener
-    this.offmessage();
+    if(this.offmessage){
+      this.offmessage();
+    }
     clearPollingInterval();
     if(this.ajax){
       this.ajax.abort();
