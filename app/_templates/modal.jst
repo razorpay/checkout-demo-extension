@@ -1,9 +1,15 @@
 {{
-var o = it.get, method = it.methods, wallet = method.wallet,
-html = function(html){return html.replace(/<[^>]*>?/g, "")},
-attr = function(attr){return attr.replace(/"/g,'')};
-
+var o = it.get;
+var method = it.methods;
+var wallet = method.wallet;
+var html = function(html){return html.replace(/<[^>]*>?/g, "")};
+var attr = function(attr){return attr.replace(/"/g,'')};
+var order = it.order || {};
+var customerBankName = method.netbanking[order.bank];;
+var bankLogo = it.netbanks[customerBankName] || {};
 var amount;
+debugger;
+
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
@@ -22,7 +28,7 @@ var gridClass = gridClasses[i-1];
 }}
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
-  <div id="modal" class="mchild">
+  <div id="modal" class="mchild {{? customerBankName}} sub {{?}}">
     <i id="powered-by"><a id="powered-link" href="https://razorpay.com" target="_blank">&#xe608;</a></i>
     <div id="modal-inner">
       <div id="overlay" class="showable"></div>
@@ -71,21 +77,40 @@ var gridClass = gridClasses[i-1];
                     <label>Email</label>
                     <input class="input" name="email" type="email" id="email" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
+
+                  {{? customerBankName}}
+                    <div class="customer-bank-details">
+                      <div class="bank-name">
+                        {{? bankLogo.image}}
+                          <img src="data:image/png;base64,{{=bankLogo.image}}">
+                        {{?}}
+                        {{=customerBankName}}
+                      </div>
+                      <div class="account-details clearfix">
+                        <div class="float-left">Account</div>
+                        <div class="float-left text-uppercase">{{=order.account_number}}</div>
+                      </div>
+                    </div>
+                  {{?}}
                 </div>
-                <div class="legend">Select payment method</div>
-                <div id="payment-options" class="grid clear count-{{=method.count}}">
-                  {{? method.card }}
-                  <div class="payment-option item" tab="card"><label><i>&#xe609;</i>{{=it.tab_titles.card}}</label></div>
-                  {{?}}
-                  {{? method.netbanking }}
-                  <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</label></div>
-                  {{?}}
-                  {{? wallet.length }}
-                  <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
-                  {{?}}
-                </div>
-                <div class="clear"></div>
+
+                {{? !customerBankName}}
+                  <div class="legend">Select payment method</div>
+                  <div id="payment-options" class="grid clear count-{{=method.count}}">
+                    {{? method.card }}
+                    <div class="payment-option item" tab="card"><label><i>&#xe609;</i>{{=it.tab_titles.card}}</label></div>
+                    {{?}}
+                    {{? method.netbanking }}
+                    <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</label></div>
+                    {{?}}
+                    {{? wallet.length }}
+                    <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
+                    {{?}}
+                  </div>
+                  <div class="clear"></div>
+                {{?}}
               </div>
+
               {{? method.card }}
                 <div class="tab-content showable screen" id="tab-card">
                   <div class="pad">
