@@ -42,7 +42,7 @@ function assetPath(path) {
 
 let knownOptions = {
   string: 'env',
-  default: { env: process.env.NODE_ENV || 'production' }
+  default: { env: process.env.NODE_ENV || 'development' }
 };
 
 let options = minimist(process.argv.slice(2), knownOptions);
@@ -135,19 +135,15 @@ gulp.task('build', function() {
   runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
-gulp.task('setENV', function() {
-  isProduction = false;
-});
-
-gulp.task('serve', ['setENV', 'build'], function() {
+gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
   gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
 
-  browserSync.init({
-    server: './app/dist',
-    startPath: 'v1/index.html'
-  });
+  browserSyncOptions.server = './app/dist';
+  browserSyncOptions.startPath = 'v1/index.html';
+
+  browserSync.init(browserSyncOptions);
 });
 
 gulp.task('default', ['build']);
@@ -291,7 +287,7 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-gulp.task('test', ['setENV', 'test:unit'], function() {
+gulp.task('test', ['test:unit'], function() {
   return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))

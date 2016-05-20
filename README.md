@@ -10,7 +10,7 @@
 
 # Gulp Commands
 
-* Run `npm run build` or `gulp` to generate production build
+* Run `npm run build` or `gulp --env=production` to generate production build
 
 # Testing
 
