@@ -1,18 +1,20 @@
 @import "common";
 
-#modal.sub {
-  #otp-elem {
-    display: block;
-  }
-}
-
 #tab-otp {
   padding-top: 40px;
   text-align: center;
 
-  &.error {
+  &.action {
     #otp-action {
       display: inline-block;
+    }
+  }
+
+  &.action,
+  &.loading {
+    #otp-elem,
+    #otp-sec {
+      display: none;
     }
   }
 }
@@ -41,7 +43,6 @@
 }
 
 #otp-elem {
-  display: none;
   margin: 0 auto;
   width: 150px;
   position: relative;
@@ -63,12 +64,9 @@
 }
 
 #otp-sec {
-  display: none;
+  display: inline-block;
   margin-top: 5px;
   padding-bottom: 3px;
-  &.shown {
-    display: inline-block;
-  }
 }
 
 .incorrect-otp {

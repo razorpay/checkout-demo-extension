@@ -222,12 +222,9 @@ function errorHandler(response){
 function otpErrorHandler(response) {
   this.clearRequest();
   this.requestTimeout = invoke(
-    'showOTPScreen',
+    'sendOTP',
     this,
-    {
-      error: true,
-      text: response.error.description
-    },
+    response.error.description,
     200
   )
 }
@@ -240,6 +237,18 @@ function getPhone(){
   return gel('contact').value;
 }
 
+function setOtpText(text){
+  gel('otp-prompt').innerHTML = text;
+}
+
+function askOTP(text){
+  $('#modal').addClass('sub');
+  $('#otp-elem').addClass('shown');
+  $('#otp-sec').addClass('shown');
+  $('#tab-otp').removeClass('loading');
+  setOtpText(text);
+}
+
 // this === Session
 function successHandler(response){
   this.clearRequest();
@@ -249,32 +258,6 @@ function successHandler(response){
   // sending oncomplete event because CheckoutBridge.oncomplete
   Razorpay.sendMessage({ event: 'complete', data: response });
   this.hide();
-}
-
-// this === Session
-function secondfactorHandler(text){
-  var timeout;
-  if(!text){
-    this.showOTPScreen({
-      text: 'Sending OTP to',
-      loading: true,
-      number: true
-    })
-    text = 'An OTP has been sent to';
-    timeout = 750;
-  }
-  $('#otp').val('');
-  this.requestTimeout = invoke(
-    'showOTPScreen',
-    this,
-    {
-      verify: true,
-      text: text,
-      number: timeout,
-      otp: true
-    },
-    timeout
-  )
 }
 
 function Session (options) {
@@ -481,13 +464,7 @@ Session.prototype = {
 
   secAction: function() {
     if(this.tab === 'wallet'){
-      this.showOTPScreen({
-        text: 'Sending OTP to',
-        loading: true,
-        number: true
-      })
-      $('#otp').val('');
-      this.r.submitOTP(this.r.emitter('payment.otp.required'));
+      this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
       this.showCardTab();
@@ -619,6 +596,7 @@ Session.prototype = {
         $modal.toggleClass('sub', screen);
       }
       $('#footer').removeClass('otp');
+      $('#tab-otp').removeClass('action');
     }
   },
 
@@ -651,12 +629,7 @@ Session.prototype = {
     tab_titles.otp = tab_titles.card;
 
     if( !user.id && typeof user.saved !== 'boolean' ) {
-      this.setScreen('otp');
-      this.showOTPScreen({
-        text: 'Looking for saved cards associated with',
-        loading: true,
-        number: true
-      });
+      this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab,this));
     } else if ( user.saved && !user.id && !user.wants_skip ) {
       this.verifyUser();
@@ -668,8 +641,7 @@ Session.prototype = {
   },
 
   verifyUser: function(){
-    this.setScreen('otp');
-    secondfactorHandler.call(this);
+    this.commenceOTP();
     this.user.login();
   },
 
@@ -768,74 +740,42 @@ Session.prototype = {
     }
   },
 
-  askOTP: function(){
+  commenceOTP: function(shouldLookup, otpText){
+    this.setScreen('otp');
     $('#tab-otp').css('display', 'block');
     $('#tab-otp').addClass('loading');
     $('#modal').removeClass('sub');
-    $('#otp-elem').addClass('shown');
-    $('#otp-sec').addClass('shown');
-    // $('#tab-otp').toggleClass('error', state.error);
-
     invoke('addClass', $('#footer'), 'otp', 300);
 
-    // $('#otp-prompt').toggleClass('incorrect-otp', state.incorrectOTP);
-    gel('otp-prompt').innerHTML = 'Looking for ' + state.targetText + ' associated with' + getPhone();
-
-    var timeout;
-    if(!text){
-      this.showOTPScreen({
-        text: 'Sending OTP to',
-        loading: true,
-        number: true
-      })
-      text = 'An OTP has been sent to';
-      timeout = 750;
+    if(shouldLookup){
+      setOtpText('Looking for ' + shouldLookup + ' associated with ' + getPhone());
+    } else {
+      this.sendOTP(otpText);
     }
-    $('#otp').val('');
-    this.requestTimeout = invoke(
-      'showOTPScreen',
-      this,
-      {
-        verify: true,
-        text: text,
-        number: timeout,
-        otp: true
-      },
-      timeout
-    )
   },
 
-  showOTPScreen: function(state){
-    if (this.screen !== 'otp' || !this.isOpen) {
-      return;
+  sendOTP: function(text){
+    $('#otp').val('');
+    var timeout;
+    if(!text){
+      var phone = getPhone();
+      $('#tab-otp').addClass('loading');
+      setOtpText('Sending OTP to ' + phone);
+      timeout = 750;
+      text = 'An OTP has been sent to ' + phone;
+      this.requestTimeout = setTimeout(function(){
+        askOTP(text);
+      }, 750);
+    } else {
+      $('#tab-otp').addClass('action');
+      askOTP(text);
     }
-    $('#tab-otp').css('display', 'block');
-    $('#tab-otp').toggleClass('loading', state.loading);
-    $('#modal').toggleClass('sub', state.verify);
-    $('#tab-otp').toggleClass('error', state.error);
-    $('#otp-elem').toggleClass('shown', state.otp);
-    $('#otp-sec').toggleClass('shown', state.otp);
-
-    var wallet = state.wallet;
-    if(wallet){
-      var walletObj = freqWallets[wallet];
-      invoke('addClass', $('#footer'), 'otp', 300);
-    }
-
-    if(state.number){
-      state.text += ' ' + getPhone();
-    }
-
-    $('#otp-prompt').toggleClass('incorrect-otp', state.incorrectOTP);
-    gel('otp-prompt').innerHTML = state.text;
   },
 
   onOtpSubmit: function(e){
     preventDefault(e);
-    this.showOTPScreen({
-      loading: true,
-      text: 'Verifying OTP...'
-    })
+    $('#tab-otp').addClass('loading');
+    setOtpText('Verifying OTP');
     var otp = gel('otp').value;
     if(this.tab === 'wallet'){
       this.r.submitOTP(otp);
@@ -924,14 +864,8 @@ Session.prototype = {
       request.powerwallet = true;
       errorCallback = otpErrorHandler;
       $('#otp-sec').html('Resend OTP');
-      this.setScreen('otp');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
-      this.showOTPScreen({
-        loading: true,
-        number: true,
-        text: 'Checking for a ' + wallet + ' account associated with',
-        wallet: wallet
-      })
+      this.commenceOTP(wallet + ' account');
     } else {
       errorCallback = errorHandler;
       showLoadingMessage(loadingMessage);
@@ -941,7 +875,7 @@ Session.prototype = {
       .on('payment.error', bind(errorCallback, this));
 
     if(request.powerwallet){
-      this.r.on('payment.otp.required', bind(secondfactorHandler, this));
+      this.r.on('payment.otp.required', bind(this.sendOTP, this));
     }
   },
 

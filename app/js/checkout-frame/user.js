@@ -35,7 +35,7 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.id = '';
+        user.id = 'capp_5YU7zYYgxEuxqA';
         callback();
       }
     })
@@ -45,7 +45,6 @@ User.prototype = {
     if (this.phone !== phone) {
       this.id = this.saved = this.wants_skip = null;
       this.phone = phone;
-      this.id = 'capp_5YU7zYYgxEuxqA'
     }
   }
 }
