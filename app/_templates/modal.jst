@@ -6,7 +6,8 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = it.order || {};
 var bankName = method.netbanking[order.bank];;
-var bankLogo = it.netbanks[bankName] || {};
+var bank = it.netbanks[order.bank] || {};
+bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;
 
 if(o('display_currency'))
@@ -80,11 +81,17 @@ var gridClass = gridClasses[i-1];
                   {{? order.bank}}
                     <div class="customer-bank-details">
                       <div class="bank-name">
-                        {{? bankLogo.image}}
-                          <img src="data:image/png;base64,{{=bankLogo.image}}">
-                        {{?}}
-                        {{? bankName}} {{=bankName}} {{?}}
-                        {{? !bankName}} Bank Details {{?}}
+                        {{ if(bank.image) { }}
+                          <img src="data:image/png;base64,{{=bank.image}}">
+                        {{ } else { }}
+                          <img src="{{=bank.logoURL}}" />
+                        {{ } }}
+
+                        {{ if(bankName) { }}
+                          {{=bankName}}
+                        {{ } else { }}
+                          Bank Details
+                        {{ } }}
                       </div>
                       <div class="account-details clearfix">
                         <div class="float-left">Account</div>

@@ -153,7 +153,7 @@ gulp.task('default', ['build']);
 
 /** Font Upload to static **/
 
-gulp.task('fontUpload', function(){
+gulp.task('uploadStaticAssetsToCDN', function(){
   let target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
   if(target === 'production') target = 'live';
 
@@ -171,7 +171,7 @@ gulp.task('fontUpload', function(){
     'Cache-Control': 'max-age=315360000, no-transform, public'
   };
 
-  return gulp.src(`${distDir}/fonts/*`)
+  return gulp.src([`${distDir}/fonts/*`, `${distDir}/images/*`])
      // gzip, Set Content-Encoding headers and add .gz extension
     .pipe(awspublish.gzip({ ext: '' }))
 
