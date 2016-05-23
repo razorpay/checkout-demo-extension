@@ -144,6 +144,7 @@ function makeCheckoutMessage(rzp){
 
   if(options.parent){
     response.embedded = true;
+    delete options.parent;
   }
 
   sanitizeImage(options);
