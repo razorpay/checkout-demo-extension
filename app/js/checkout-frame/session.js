@@ -180,9 +180,6 @@ function errorHandler(response){
   }
 
   message = response.error.description;
-  if (this.screen === 'otp') {
-    return this.sendOTP(message);
-  }
 
   var err_field = response.error.field;
   if (err_field){
@@ -222,9 +219,7 @@ function setOtpText(text){
 
 function askOTP(text){
   $('#modal').addClass('sub');
-  $('#otp-elem').addClass('shown');
-  $('#otp-sec').addClass('shown');
-  $('#tab-otp').removeClass('loading');
+  $('#tab-otp').removeClass('loading').removeClass('action');
   setOtpText(text);
 }
 
@@ -736,7 +731,8 @@ Session.prototype = {
   },
 
   showLoadError: function(error, text){
-    var yesClass, noClass = 'addClass';
+    var yesClass, noClass;
+    yesClass = noClass = 'addClass';
     if(error){
       noClass = 'removeClass';
     } else {
@@ -748,6 +744,7 @@ Session.prototype = {
     }
 
     if(this.isOTP()){
+      $('#modal').removeClass('sub');
       setOtpText(text);
       $('#tab-otp')[yesClass]('action')[noClass]('loading');
     } else {
@@ -761,12 +758,10 @@ Session.prototype = {
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
     $('#tab-otp').css('display', 'block');
-    $('#tab-otp').addClass('loading');
-    $('#modal').removeClass('sub');
     invoke('addClass', $('#footer'), 'otp', 300);
 
     if(shouldLookup){
-      setOtpText('Looking for ' + shouldLookup + ' associated with ' + getPhone());
+      this.showLoadError(false, 'Looking for ' + shouldLookup + ' associated with ' + getPhone());
     } else {
       this.sendOTP(otpText);
     }
@@ -790,8 +785,7 @@ Session.prototype = {
 
   onOtpSubmit: function(e){
     preventDefault(e);
-    $('#tab-otp').addClass('loading');
-    setOtpText('Verifying OTP');
+    this.showLoadError(false, 'Verifying OTP');
     var otp = gel('otp').value;
     if(this.tab === 'wallet'){
       this.r.submitOTP(otp);
