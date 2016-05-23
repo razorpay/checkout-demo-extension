@@ -11,14 +11,14 @@ window.preferences =
 
 orig_methods = window.preferences.methods
 
-cc = 
+cc =
   number: '4111111111111111'
   expiry: '11 / 23'
   cvv: '456'
   expiry_month: '11'
   expiry_year: '23'
 
-coOptions = 
+coOptions =
   'key': 'key_id'
   'amount': '5100'
   'name': 'Daft Punk'
@@ -79,7 +79,7 @@ describe 'CheckoutBridge should', ->
 
     expect spy.called
       .to.be true
-    
+
     expect spy.getCall(0).args[0]
       .to.be JSON.stringify message.data
 
@@ -119,7 +119,7 @@ describe 'nextRequestRedirect', ->
     msg = stub.getCall(0).args[0]
     expect stub.callCount
       .to.be 1
-    
+
     expect msg.event
       .to.be 'redirect'
     expect msg.data
