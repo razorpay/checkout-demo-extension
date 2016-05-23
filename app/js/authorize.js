@@ -52,7 +52,7 @@ function onPaymentCancel(errorObj){
         url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.data.key_id
       })
     }
-    this.complete(errorObj || discreet.defaultError());
+    this.complete(errorObj || discreet.error());
   }
 }
 
@@ -75,7 +75,7 @@ function Payment(data, params, r){
 
   if (params.paused) {
     if (popup) {
-      popup.write(params.message);
+      popup.write(templates.popup(this));
     }
     this.on('resume', this.generate);
   } else {
@@ -159,6 +159,7 @@ Payment.prototype = {
     this.data = data;
     this.fees = params.fees;
     this.powerwallet = params.powerwallet;
+    this.message = params.message;
   },
 
   generate: function(){
@@ -166,6 +167,7 @@ Payment.prototype = {
 
     // show loading screen in popup
     if (popup) {
+      this.message = null;
       popup.write(templates.popup(this));
     }
 

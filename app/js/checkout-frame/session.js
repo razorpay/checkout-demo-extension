@@ -194,6 +194,10 @@ function errorHandler(response){
   }
 
   message = response.error.description;
+  if (this.screen === 'otp') {
+    return this.sendOTP(message);
+  }
+
   var err_field = response.error.field;
   if (err_field){
     if(!err_field.indexOf('expiry')){
@@ -216,17 +220,6 @@ function errorHandler(response){
 
   showErrorMessage(message || 'There was an error in handling your request');
   $('#fd-hide').focus();
-}
-
-// this === Session
-function otpErrorHandler(response) {
-  this.clearRequest();
-  this.requestTimeout = invoke(
-    'sendOTP',
-    this,
-    response.error.description,
-    200
-  )
 }
 
 function getTab(tab){
@@ -592,6 +585,7 @@ Session.prototype = {
     }
 
     if (screen !== 'otp'){
+      this.saving_card = null;
       var $modal = $('#modal');
       if (this.tab === screen && screen === 'wallet') {
         // otp field doesn't animate and gets displayed as soon as sub class is applied
@@ -616,8 +610,8 @@ Session.prototype = {
       }
       this.user.setPhone(getPhone());
     } else {
-      if (this.screen === 'otp' && this.tab === 'wallet') {
-        tab = 'wallet';
+      if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
+        tab = this.tab;
       }
     }
 
@@ -790,7 +784,8 @@ Session.prototype = {
     if(this.tab === 'wallet'){
       this.r.submitOTP(otp);
     } else {
-      this.user.verify(otp, bind(this.showCardTab,this));
+      var user = this.user;
+      user.verify(otp, bind(this.showCardTab,this));
     }
   },
 
@@ -812,7 +807,7 @@ Session.prototype = {
       return;
     }
 
-    if (this.screen === 'otp') {
+    if (this.screen === 'otp' && !this.saving_card) {
       return this.onOtpSubmit(e);
     }
     this.smarty.refresh();
@@ -841,7 +836,12 @@ Session.prototype = {
     var data = this.getPayload(nocvv_dummy_values);
 
     if(data.save && !data.app_id){
-      return this.verifyUser();
+      if(!this.saving_card){
+        this.saving_card = true;
+        return this.verifyUser();
+      } else {
+
+      }
     }
 
     Razorpay.sendMessage({
@@ -868,21 +868,45 @@ Session.prototype = {
       fees: preferences.fee_bearer
     };
 
-    var errorCallback;
+    if (this.saving_card) {
+      request.paused = true;
+      request.message = 'Verifying OTP';
+      var user = this.user;
+      user.verify(
+        gel('otp').value,
+        bind(
+          function(){
+            if(user.id){
+              data.app_id = user.id;
+              this.setScreen('card');
+              this.r.emit('payment.resume');
+              this.setScreen('card');
+              showLoadingMessage();
+            } else {
+              this.r.emit('payment.error', discreet.error('Invalid OTP. Re-enter to proceed.'));
+              $('#tab-otp').removeClass('action');
+            }
+          },
+          this
+        )
+      );
+    }
+
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       options.redirect = false;
       request.powerwallet = true;
-      errorCallback = otpErrorHandler;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
       this.commenceOTP(wallet + ' account');
+    } else if (this.screen === 'otp') {
+      $('#tab-otp').addClass('loading');
+      setOtpText('Processing, please wait');
     } else {
-      errorCallback = errorHandler;
-      showLoadingMessage(loadingMessage);
+      showLoadingMessage();
     }
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorCallback, this));
+      .on('payment.error', bind(errorHandler, this));
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
