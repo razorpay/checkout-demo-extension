@@ -161,6 +161,7 @@ $.prototype = {
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
+        if(!e.stopPropagation) { e.stopPropagation = e.preventDefault }
         if(!e.currentTarget) { e.currentTarget = el }
         callback.call(thisArg || el, e);
       }

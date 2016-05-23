@@ -414,9 +414,25 @@ i {
 }
 
 #user {
+  padding: 0 20px;
+  margin: 0 -20px;
   display: none;
   float: right;
   font-size: 12px;
+  white-space: nowrap;
+  line-height: 46px;
+  height: $topbarh;
+
+  &::before {
+    content: '\e602';
+    font-size: 20px;
+    margin-right: 6px;
+  }
+  &::after {
+    content: '\e601';
+    font-size: 20px;
+    margin-left: 6px;
+  }
 }
 
 .tab-content {

@@ -11,7 +11,7 @@ User.prototype = {
     $.post({
       url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' + this.key,
       callback: function(data){
-        user.saved = true//!!data.saved;
+        user.saved = false//!!data.saved;
         invoke(callback, null, data, 600);
       }
     })
@@ -35,7 +35,7 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.id = 'capp_5YU7zYYgxEuxqA';
+        user.id = '';
         callback();
       }
     })

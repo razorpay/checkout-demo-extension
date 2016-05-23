@@ -107,6 +107,9 @@ $gridStagger: 0.05s;
 
 #body {
   &.tab {
+    #user {
+      display: block;
+    }
     #form-common {
       .pad {
         transition: $first;

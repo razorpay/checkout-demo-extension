@@ -476,6 +476,10 @@ Session.prototype = {
       this.on('click', '#close', this.hide);
     }
     this.on('click', '#topbar', this.switchTab);
+    this.on('click', '#user', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    })
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
     this.on('keypress', '#otp', this.onOtpEnter);
@@ -611,8 +615,14 @@ Session.prototype = {
         return;
       }
       this.user.setPhone(getPhone());
-    } else if (this.screen === 'otp' && this.tab === 'wallet') {
-      tab = 'wallet';
+    } else {
+      if (this.screen === 'otp' && this.tab === 'wallet') {
+        tab = 'wallet';
+      }
+    }
+
+    if (tab) {
+      $('#user').html(getPhone());
     }
 
     this.tab = tab;
@@ -831,7 +841,7 @@ Session.prototype = {
     var data = this.getPayload(nocvv_dummy_values);
 
     if(data.save && !data.app_id){
-      return this.user.verifyUser();
+      return this.verifyUser();
     }
 
     Razorpay.sendMessage({
