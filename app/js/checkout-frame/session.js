@@ -167,20 +167,6 @@ function overlayVisible(){
   return $('#overlay').hasClass('shown');
 }
 
-function showErrorMessage(message){
-  $('#fd-t').html(message);
-  showOverlay(
-    $('#error-message').removeClass('loading')
-  );
-}
-
-function showLoadingMessage(){
-  $('#fd-t').html(loadingMessage);
-  showOverlay(
-    $('#error-message').addClass('loading')
-  );
-}
-
 // this === Session
 function errorHandler(response){
   if(!response || !response.error){
@@ -218,7 +204,7 @@ function errorHandler(response){
     }
   }
 
-  showErrorMessage(message || 'There was an error in handling your request');
+  this.showLoadError(true, message || 'There was an error in handling your request');
   $('#fd-hide').focus();
 }
 
@@ -567,6 +553,11 @@ Session.prototype = {
     }
   },
 
+  // if current screen is otp
+  isOTP: function(){
+    return this.screen === 'otp';
+  },
+
   setScreen: function(screen){
     if(screen === this.screen) {
       return;
@@ -595,7 +586,6 @@ Session.prototype = {
         $modal.toggleClass('sub', screen);
       }
       $('#footer').removeClass('otp');
-      $('#tab-otp').removeClass('action');
     }
   },
 
@@ -745,6 +735,29 @@ Session.prototype = {
     }
   },
 
+  showLoadError: function(error, text){
+    var yesClass, noClass = 'addClass';
+    if(error){
+      noClass = 'removeClass';
+    } else {
+      yesClass = 'removeClass';
+    }
+
+    if(!text){
+      text = loadingMessage;
+    }
+
+    if(this.isOTP()){
+      setOtpText(text);
+      $('#tab-otp')[yesClass]('action')[noClass]('loading');
+    } else {
+      $('#fd-t').html(text);
+      showOverlay(
+        $('#error-message')[noClass]('loading')
+      );
+    }
+  },
+
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
     $('#tab-otp').css('display', 'block');
@@ -764,15 +777,13 @@ Session.prototype = {
     var timeout;
     if(!text){
       var phone = getPhone();
-      $('#tab-otp').addClass('loading');
-      setOtpText('Sending OTP to ' + phone);
+      this.showLoadError(false, 'Sending OTP to ' + phone);
       timeout = 750;
       text = 'An OTP has been sent to ' + phone;
       this.requestTimeout = setTimeout(function(){
         askOTP(text);
       }, 750);
     } else {
-      $('#tab-otp').addClass('action');
       askOTP(text);
     }
   },
@@ -885,10 +896,9 @@ Session.prototype = {
               this.setScreen('card');
               this.r.emit('payment.resume');
               this.setScreen('card');
-              showLoadingMessage();
+              this.showLoadError();
             } else {
               this.r.emit('payment.error', discreet.error('Invalid OTP. Re-enter to proceed.'));
-              $('#tab-otp').removeClass('action');
             }
           },
           this
@@ -902,11 +912,8 @@ Session.prototype = {
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
       this.commenceOTP(wallet + ' account');
-    } else if (this.screen === 'otp') {
-      $('#tab-otp').addClass('loading');
-      setOtpText('Processing, please wait');
     } else {
-      showLoadingMessage();
+      this.showLoadError();
     }
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
