@@ -133,7 +133,7 @@ Payment.prototype = {
           var val = getOption(field);
           if(val){
             data[field] = val;
-          }          
+          }
         }
       },
       this
@@ -444,10 +444,10 @@ Razorpay.payment = {
     return err(errors);
   },
 
-  getPrefs: function(key, callback){
+  getPrefs: function(data, callback){
     return $.jsonp({
       url: discreet.makeUrl() + 'preferences',
-      data: {key_id: key},
+      data: data,
       timeout: 30000,
       success: function(response){
         invoke(callback, null, response);
@@ -456,8 +456,10 @@ Razorpay.payment = {
   },
 
   getMethods: function(callback){
-    return Razorpay.payment.getPrefs(Razorpay.defaults.key, function(response){
+    return Razorpay.payment.getPrefs({
+      key_id: Razorpay.defaults.key
+    }, function(response){
       callback(response.methods);
-    })
+    });
   }
 };
