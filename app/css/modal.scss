@@ -512,6 +512,11 @@ i {
   i {
     display: none;
   }
+
+  i.info {
+    display: initial;
+    font-size: 16px;
+  }
 }
 
 .saved-cards-btn {
