@@ -119,8 +119,20 @@ var gridClass = gridClasses[i-1];
                       <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                     </div></div>
                     <div class="clear"></div>
-                    <div id="elem-emi" class="double">
-                      <div class="first disabled dropdown-parent" for="emi" tabIndex="0" id="emi-check-label">
+                    <div id="should-save-card" class="double clear gapv">
+                      <label class="first" for="save" tabIndex="0">
+                        <input type="checkbox" id="save" name="save" checked value="1">
+                        <span class="checkbox"></span>
+                        Remember Card
+                      </label>
+                      <div class="second">
+                        <a class="link" href="https://razorpay.com/card-saving" target="_blank">
+                          More Info
+                        </a>
+                      </div>
+                    </div>
+                    <div id="elem-emi" class="double gapv">
+                      <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
                         <span class="checkbox"></span>
                         Pay with EMI
                         <div id="emi-select" class="select dropdown">
@@ -129,14 +141,11 @@ var gridClass = gridClasses[i-1];
                         </div>
                         <span class="help dropdown">EMI is available on HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
                       </div>
-                      <div class="second" id="view-emi-plans">
-                        View EMI Plans
+                      <div class="second">
+                        <a id="view-emi-plans" class="link">View EMI Plans</a>
                       </div>
                       <div class="clear"></div>
                     </div>
-                    <label class="elem" for="cardsave" style="display: none">
-                      <input type="checkbox" id="cardsave"> Remember Me
-                    </label>
                   </div>
                 </div>
               {{?}}
@@ -203,7 +212,7 @@ var gridClass = gridClasses[i-1];
                   <div class="help">Please enter 6 digit OTP</div>
                   <input type="tel" class="input" pattern="^[0-9]{6}$" name="otp" id="otp" maxlength="6" autocomplete="off" required>
                 </div>
-                <a id="otp-sec"></a>
+                <a id="otp-sec" class="link"></a>
                 <div class="spin">
                   <div></div>
                 </div>

@@ -1,7 +1,6 @@
 function User (o) {
-  this.id = o.id || '';
+  this.id = o.id || null;
   this.phone = o.phone || '';
-  this.logged_in = o.logged_in || null;
   this.saved = o.saved || null;
   this.wants_skip = o.wants_skip || null;
 }
@@ -36,7 +35,7 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.id = 'capp_5YU7zYYgxEuxqA';
+        user.id = '';
         callback();
       }
     })
@@ -46,6 +45,7 @@ User.prototype = {
     if (this.phone !== phone) {
       this.id = this.saved = this.wants_skip = null;
       this.phone = phone;
+      this.id = 'capp_5YU7zYYgxEuxqA'
     }
   }
 }

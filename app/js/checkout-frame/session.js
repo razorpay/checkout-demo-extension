@@ -487,10 +487,7 @@ Session.prototype = {
         number: true
       })
       $('#otp').val('');
-      var r = this.r;
-      r.submitOTP(function() {
-        r.emit('payment.otp.required');
-      })
+      this.r.submitOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
       this.showCardTab();
@@ -653,7 +650,7 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
-    if( typeof user.saved !== 'boolean') {
+    if( !user.id && typeof user.saved !== 'boolean' ) {
       this.setScreen('otp');
       this.showOTPScreen({
         text: 'Looking for saved cards associated with',
@@ -661,15 +658,19 @@ Session.prototype = {
         number: true
       });
       this.user.lookup(bind(this.showCardTab,this));
-    } else if (user.saved && !user.logged_in && !user.wants_skip) {
-      this.setScreen('otp');
-      secondfactorHandler.call(this);
-      this.user.login();
+    } else if ( user.saved && !user.id && !user.wants_skip ) {
+      this.verifyUser();
     } else {
       this.setScreen('card');
       return true;
     }
     $('#otp-sec').html('Skip saved cards');
+  },
+
+  verifyUser: function(){
+    this.setScreen('otp');
+    secondfactorHandler.call(this);
+    this.user.login();
   },
 
   setUser: function(){
@@ -767,6 +768,43 @@ Session.prototype = {
     }
   },
 
+  askOTP: function(){
+    $('#tab-otp').css('display', 'block');
+    $('#tab-otp').addClass('loading');
+    $('#modal').removeClass('sub');
+    $('#otp-elem').addClass('shown');
+    $('#otp-sec').addClass('shown');
+    // $('#tab-otp').toggleClass('error', state.error);
+
+    invoke('addClass', $('#footer'), 'otp', 300);
+
+    // $('#otp-prompt').toggleClass('incorrect-otp', state.incorrectOTP);
+    gel('otp-prompt').innerHTML = 'Looking for ' + state.targetText + ' associated with' + getPhone();
+
+    var timeout;
+    if(!text){
+      this.showOTPScreen({
+        text: 'Sending OTP to',
+        loading: true,
+        number: true
+      })
+      text = 'An OTP has been sent to';
+      timeout = 750;
+    }
+    $('#otp').val('');
+    this.requestTimeout = invoke(
+      'showOTPScreen',
+      this,
+      {
+        verify: true,
+        text: text,
+        number: timeout,
+        otp: true
+      },
+      timeout
+    )
+  },
+
   showOTPScreen: function(state){
     if (this.screen !== 'otp' || !this.isOpen) {
       return;
@@ -852,6 +890,10 @@ Session.prototype = {
 
     var data = this.getPayload(nocvv_dummy_values);
 
+    if(data.save && !data.app_id){
+      return this.user.verifyUser();
+    }
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data
@@ -910,9 +952,8 @@ Session.prototype = {
       setEmiBank(data);
 
       var userId = this.user.id;
-      if(userId){
+      if(data.save){
         data.app_id = userId;
-        data.save = true;
       }
 
       if(nocvv_dummy_values){
