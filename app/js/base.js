@@ -298,8 +298,7 @@ Razorpay.prototype = {
       this.id = generateUID();
       this.modal = {options: emo};
       this.options = emo;
-
-      if(this.get('parent')){
+      if(this.get('parent') && this.open){
         this.open();
       }
     }
