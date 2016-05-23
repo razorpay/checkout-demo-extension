@@ -90,6 +90,10 @@ var gridClass = gridClasses[i-1];
                 <div class="tab-content showable screen" id="tab-card">
                   <div class="pad">
                     <input type="hidden" name="method" value="card">
+                    <div class="mfix saved-cards-btn">
+                      <span class="saved-cards-ico mchild"></span>
+                      <span class="saved-cards-txt mchild">USE SAVED CARDS</span>
+                    </div>
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                       <label>Card Number</label>
                       <i>&#xe605;</i>
@@ -192,15 +196,26 @@ var gridClass = gridClasses[i-1];
               {{ if(wallet.length){ }}
                 <div class="tab-content showable screen" id="tab-wallet">
                   <input type="hidden" name="method" value="wallet">
+                  {{ var count = 0, max = 3; }}
                   <div id="wallets" class="clear grid count-{{=wallet.length}}">
-                    {{~wallet :w:i}}
+                    {{
+                    for (var w in wallet){
+                      if(count === 0){
+                        count = max - 3 + 1;
+                        max++;
+                      }
+                      w = wallet[w];
+                    }}
                       <div class="wallet item radio-item">
                         <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=w.name}}">
                         <label for="wallet-radio-{{=w.name}}" class="radio-label mfix">
-                          <img class="wallet-button colored mchild item-inner l-1" style="height:{{=w.h}}px" src="{{=w.col}}">
+                          <img class="wallet-button colored mchild item-inner l-{{=count}}" style="height:{{=w.h}}px" src="{{=w.col}}">
                         </label>
                       </div>
-                    {{~}}
+                    {{
+                      count = (count + 1) % max;
+                    }
+                    }}
                   </div>
                 </div>
               {{}}}
