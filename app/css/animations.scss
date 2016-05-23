@@ -57,6 +57,7 @@ $gridStagger: 0.05s;
 
   &.shown {
     opacity: 1;
+    display: block;
   }
 }
 
@@ -98,6 +99,9 @@ $gridStagger: 0.05s;
 
 #modal {
   &.sub {
+    #powered-by {
+      display: none;
+    }
     #footer {
       transition-delay: $second;
       transform: none;
