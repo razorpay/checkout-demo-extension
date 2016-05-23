@@ -5,7 +5,7 @@ var wallet = method.wallet;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = it.order || {};
-var bankName = method.netbanking[order.bank];;
+var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = it.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;

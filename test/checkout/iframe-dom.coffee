@@ -145,7 +145,7 @@ describe 'makeCheckoutMessage should', ->
 describe 'checkoutFrame on receiveing message from frame contentWindow', ->
   rzp = Razorpay options
   cf = new CheckoutFrame rzp
-  src = makeCheckoutUrl rzp.get 'key'
+  src = makeCheckoutUrl rzp
 
   describe 'return if source isnt valid:', ->
     spyNotCalled = event = null
@@ -253,7 +253,7 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       spy = rzp.get()['modal.ondismiss'] = sinon.stub()
       spy2 = sinon.stub cf, 'close'
       message 'dismiss'
-      
+
       expect spy2.callCount
         .to.be 1
       expect spy2.getCall(0).thisValue
@@ -293,7 +293,7 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       spy = sinon.stub cf, 'ondismiss'
       spy2 = sinon.stub cf, 'onhidden'
       message 'failure', error: ''
-      
+
       expect spy2.callCount
         .to.be 1
 
@@ -344,7 +344,7 @@ describe 'afterClose should', ->
     cf.afterClose()
     expect jQuery(frameContainer).is(':visible')
       .to.be false
-    
+
     expect spy.callCount
       .to.be 1
 

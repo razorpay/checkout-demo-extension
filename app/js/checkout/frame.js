@@ -80,8 +80,12 @@ function sanitizeImage(options){
 function makeCheckoutUrl(rzp){
   var params = [];
   var url = discreet.makeUrl() + 'checkout';
-  var key = rzp.get('key');
-  var order_id = rzp.get('order_id');
+  var key, order_id;
+
+  if (rzp) {
+    key = rzp.get('key');
+    order_id = rzp.get('order_id');
+  }
 
   if(/^rzp_t/.test(key)){
     params.push('new=1')
