@@ -102,6 +102,9 @@ $gridStagger: 0.05s;
       transition-delay: $second;
       transform: none;
     }
+    #form-fields {
+      border-radius: 0;
+    }
   }
 }
 
