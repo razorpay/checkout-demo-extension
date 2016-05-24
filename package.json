@@ -70,6 +70,10 @@
   "private": "true",
   "dependencies": {
     "aws-sdk": "^2.3.12",
-    "glob": "^7.0.3"
+    "expect.js": "^0.3.1",
+    "glob": "^7.0.3",
+    "gulp-webdriver": "^2.0.1",
+    "wdio-mocha-framework": "^0.2.13",
+    "webdriverio": "^4.0.7"
   }
 }
