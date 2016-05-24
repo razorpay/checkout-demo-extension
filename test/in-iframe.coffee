@@ -104,7 +104,7 @@ describe 'init options.method', ->
     opts.method[disableTab] = false
     openCheckoutForm opts
     expect jQuery('.tab-content').length
-      .to.be 3
+      .to.be 4
     expect jQuery('#tab-' + disableTab).length
       .to.be 0
 
@@ -131,4 +131,3 @@ describe 'nextRequestRedirect', ->
 # shouldn't move to next tabs w/o phone,email validation
 # submission payload validation -> reconcile with authorize.js
 # powerwallets
-# success/error tests
