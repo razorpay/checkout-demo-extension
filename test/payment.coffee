@@ -387,3 +387,66 @@ describe 'Payment::', ->
 
       expect payment.emit.args[0]
         .to.eql ['error', {error: {description: 'desc'}}]
+
+    it 'nothing if already done', ->
+      payment.done = true
+      Payment::complete.call payment, {error: {description: 'desc'}}
+      expect payment.emit.called
+        .to.be false
+      expect payment.clear.called
+        .to.be false
+
+      payment.done = false
+
+  describe 'clear', ->
+    payment = null
+    beforeEach ->
+      payment = do mockPayment
+
+    it 'unbind and cleanup', ->
+      payment.popup =
+        close: sinon.stub()
+
+      payment.ajax =
+        abort: sinon.stub()
+
+      payment.offmessage = sinon.stub()
+      clearPollingStub = sinon.stub window, 'clearPollingInterval'
+
+      Payment::clear.call payment
+      expect payment.popup.onClose
+        .to.not.be.ok()
+
+      expect payment.popup.close.callCount
+        .to.be 1
+
+      expect payment.ajax.abort.callCount
+        .to.be 1
+
+      expect payment.done
+        .to.be true
+
+      expect payment.offmessage.callCount
+        .to.be 1
+
+      expect clearPollingStub.callCount
+        .to.be 1
+
+      expect payment.r._payment
+        .to.be null
+
+      clearPollingStub.restore()
+
+    it 'not throw if popup, offmessage and ajax arent set', ->
+      clearPollingStub = sinon.stub window, 'clearPollingInterval'
+
+      expect -> Payment::clear.call payment
+        .to.not.throw()
+
+      expect clearPollingStub.callCount
+        .to.be 1
+
+      expect payment.done
+        .to.be true
+
+      clearPollingStub.restore()
