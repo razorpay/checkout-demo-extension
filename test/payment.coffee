@@ -97,14 +97,32 @@ describe 'Payment::', ->
     afterEach ->
       do redirectStub.restore
 
+    it 'popup shouldn\'t open', ->
+      payment.checkRedirect.returns true
+      Payment.call payment
+      expect payment.tryPopup.called
+        .to.be false
+
+      # restore spy
+      payment.checkRedirect.returns null
+
     it 'if redirect: false', ->
       options.redirect = false
-      Payment::checkRedirect.call payment
+      expect Payment::checkRedirect.call payment
+        .to.not.be.ok()
+      expect redirectStub.called
+        .to.be false
+
+    it 'if redirect: false', ->
+      options.redirect = false
+      expect Payment::checkRedirect.call payment
+        .to.not.be.ok()
       expect redirectStub.called
         .to.be false
 
     it 'if redirect: true', ->
-      Payment::checkRedirect.call payment
+      expect Payment::checkRedirect.call payment
+        .to.be(true)
 
       expect 'callback_url' of payment.data
         .to.be false
@@ -119,13 +137,15 @@ describe 'Payment::', ->
 
     it 'if redirect: true, and callback_url specified', ->
       options.callback_url = 'abc'
-      Payment::checkRedirect.call payment
+      expect Payment::checkRedirect.call payment
+        .to.be(true)
       expect payment.data.callback_url
         .to.be 'abc'
 
     it 'with fees: true', ->
       payment.fees = true
-      Payment::checkRedirect.call payment
+      expect Payment::checkRedirect.call payment
+        .to.be(true)
       expect redirectStub.args[0][0]
         .to.eql
           url: baseRedirectUrl + 'fees'
