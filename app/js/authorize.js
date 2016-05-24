@@ -264,7 +264,7 @@ Payment.prototype = {
   },
 
   tryPopup: function(){
-    if(this.powerwallet){
+    if(this.powerwallet && !this.add_funds) {
       return null;
     }
 
@@ -377,6 +377,8 @@ function otpCallback(response){
   var error = response.error;
   if(error && error.action === 'RETRY'){
     return this.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
+  } else if (error && error.action === 'TOPUP') {
+    return this.emit('wallet.topup', error.description);
   }
   this.complete(response);
 }
@@ -408,6 +410,23 @@ razorpayProto.resendOTP = function(callback){
     },
     callback: bind(ajaxCallback, payment)
   });
+}
+
+razorpayProto.topupWallet = function() {
+  var payment = this._payment;
+  payment.add_funds = true;
+  payment.tryPopup();
+
+  payment.ajax = $.post({
+    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
+    data: {
+      '_[source]': 'checkoutjs'
+    },
+    callback: function(response) {
+      ajaxCallback.call(payment, response);
+      payment.add_funds = false;
+    }
+  })
 }
 
 Razorpay.payment = {

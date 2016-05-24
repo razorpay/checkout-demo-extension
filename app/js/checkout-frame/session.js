@@ -449,6 +449,15 @@ Session.prototype = {
     }
   },
 
+  addFunds: function(event) {
+    this.showOTPScreen({
+      text: 'Loading...',
+      loading: true
+    });
+
+    this.r.topupWallet();
+  },
+
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
@@ -463,6 +472,7 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
+    this.on('click', '#add-funds-action', this.addFunds);
     var enabledMethods = this.methods;
 
     if(enabledMethods.card){
@@ -981,6 +991,11 @@ Session.prototype = {
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
+      this.r.on('payment.wallet.topup', function() {
+        $('#tab-otp').css('display', 'none');
+        $('#add-funds').toggleClass('shown');
+        gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
+      });
     }
   },
 
