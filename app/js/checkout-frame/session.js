@@ -319,7 +319,8 @@ Session.prototype = {
 
   fillData: function(){
     var tab = this.data.method || this.get('prefill.method');
-    if(tab){
+
+    if(tab && !this.order) {
       this.switchTab(tab);
     }
 
@@ -841,7 +842,7 @@ Session.prototype = {
     var nocvv_el = gel('nocvv-check');
     var nocvv_dummy_values;
 
-    if(!this.tab){
+    if(!this.tab && !this.order) {
       return;
     }
 
@@ -860,6 +861,11 @@ Session.prototype = {
     }
 
     var data = this.getPayload(nocvv_dummy_values);
+
+    if (this.order) {
+      data.method = 'netbanking';
+      data.bank = this.order.bank;
+    }
 
     Razorpay.sendMessage({
       event: 'submit',

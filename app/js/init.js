@@ -84,7 +84,7 @@ Razorpay.defaults = {
     handler: noop
   },
   'theme': {
-    'color': '#00BCD4',
+    'color': '#3594E2',
     'backdrop_color': 'rgba(0,0,0,0.6)',
     'image_padding': true,
     'close_button': true

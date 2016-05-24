@@ -21,7 +21,7 @@ deploy:
 
         - script:
             name: build
-            code: gulp --env=production
+            code: gulp
 
         # - script:
         #     name: 'Upload source maps'
@@ -32,8 +32,8 @@ deploy:
             code: rm app/dist/v1/*.map
 
         - script:
-            name: 'Upload fonts'
-            code: gulp fontUpload --target=$WERCKER_DEPLOYTARGET_NAME
+            name: 'Upload Fonts & Images to CDN'
+            code: gulp uploadStaticAssetsToCDN --target=$WERCKER_DEPLOYTARGET_NAME
 
         - nhuray/aws-code-deploy:
             key: $AWS_KEY

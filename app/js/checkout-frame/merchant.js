@@ -190,7 +190,15 @@ function setPaymentMethods(session){
 
 function showModal(session) {
   if(!preferences){
-    Razorpay.payment.getPrefs(session.get('key'), function(response){
+    var data = {
+      key_id: session.get('key')
+    };
+
+    if (session.get('order_id')) {
+      data.order_id = session.get('order_id');
+    }
+
+    Razorpay.payment.getPrefs(data, function(response) {
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
@@ -232,6 +240,7 @@ function showModal(session) {
 
 function showModalWithSession(session){
   setPaymentMethods(session);
+  session.order = preferences.order;
   session.render();
   trackInit(session);
   Razorpay.sendMessage({event: 'render'});
@@ -425,7 +434,7 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
     }
     window.handleMessage(data);
   } catch(err){
-    roll('invalid message', data, 'warn');
+    roll('invalid message - ' + err, data, 'warn');
   }
 }
 
@@ -444,7 +453,6 @@ function applyUAClasses(){
 
 function initIframe(){
   $(window).on('message', parseMessage);
-  Razorpay.sendMessage({event: 'load'});
 
   if(location.search){
     setQueryParams(location.search);
@@ -459,6 +467,7 @@ function initIframe(){
   }
 
   applyUAClasses();
+  Razorpay.sendMessage({event: 'load'});
 }
 
 initIframe();

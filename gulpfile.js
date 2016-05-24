@@ -28,6 +28,13 @@ const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 
 const distDir = 'app/dist/v1/';
+let browserSyncOptions = {};
+
+try {
+  browserSyncOptions = require('./browsersync-config');
+} catch(e) {
+  // do nothing
+}
 
 function assetPath(path) {
   return `app/${path}`;
@@ -35,7 +42,7 @@ function assetPath(path) {
 
 let knownOptions = {
   string: 'env',
-  default: { env: process.env.NODE_ENV || 'development' }
+  default: { env: process.env.NODE_ENV || 'production' }
 };
 
 let options = minimist(process.argv.slice(2), knownOptions);
@@ -96,7 +103,7 @@ gulp.task('usemin', function() {
 });
 
 gulp.task('sourcemaps', function() {
-  return gulp.src(`${distDir}/**/*.js`)
+  return gulp.src([`${distDir}/**/*.js`, `!${distDir}/checkout-frame.js`, `!${distDir}/checkout-new.js`, `!${distDir}/razorpay.js`])
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(sourcemaps.init())
     .pipe(gulpif(isProduction, uglify()))
@@ -128,22 +135,25 @@ gulp.task('build', function() {
   runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
-gulp.task('serve', ['build'], function() {
+gulp.task('setENV', function() {
+  isProduction = false;
+});
+
+gulp.task('serve', ['setENV', 'build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
   gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
 
-  browserSync.init({
-    server: './app/dist',
-    startPath: 'v1/index.html'
-  });
+  browserSyncOptions.server = './app/dist';
+  browserSyncOptions.startPath = 'v1/index.html';
+  browserSync.init(browserSyncOptions);
 });
 
 gulp.task('default', ['build']);
 
 /** Font Upload to static **/
 
-gulp.task('fontUpload', function(){
+gulp.task('uploadStaticAssetsToCDN', function(){
   let target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
   if(target === 'production') target = 'live';
 
@@ -161,7 +171,7 @@ gulp.task('fontUpload', function(){
     'Cache-Control': 'max-age=315360000, no-transform, public'
   };
 
-  return gulp.src(`${distDir}/fonts/*`)
+  return gulp.src([`${distDir}/fonts/*`, `${distDir}/images/*`])
      // gzip, Set Content-Encoding headers and add .gz extension
     .pipe(awspublish.gzip({ ext: '' }))
 
@@ -280,7 +290,7 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-gulp.task('test', ['test:unit'], function() {
+gulp.task('test', ['setENV', 'test:unit'], function() {
   return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))

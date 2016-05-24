@@ -67,7 +67,9 @@ function Payment(data, params, r){
   this.format(data, params);
 
   // redirect if specified
-  this.checkRedirect();
+  if(this.checkRedirect()){
+    return;
+  }
 
   this.on('cancel', onPaymentCancel);
 
@@ -110,6 +112,7 @@ Payment.prototype = {
         content: data,
         method: 'post'
       });
+      return true;
     }
   },
 
@@ -133,7 +136,7 @@ Payment.prototype = {
           var val = getOption(field);
           if(val){
             data[field] = val;
-          }          
+          }
         }
       },
       this
@@ -228,7 +231,9 @@ Payment.prototype = {
     this.done = true;
 
     // unbind listener
-    this.offmessage();
+    if(this.offmessage){
+      this.offmessage();
+    }
     clearPollingInterval();
     if(this.ajax){
       this.ajax.abort();
@@ -442,10 +447,10 @@ Razorpay.payment = {
     return err(errors);
   },
 
-  getPrefs: function(key, callback){
+  getPrefs: function(data, callback){
     return $.jsonp({
       url: discreet.makeUrl() + 'preferences',
-      data: {key_id: key},
+      data: data,
       timeout: 30000,
       success: function(response){
         invoke(callback, null, response);
@@ -454,8 +459,10 @@ Razorpay.payment = {
   },
 
   getMethods: function(callback){
-    return Razorpay.payment.getPrefs(Razorpay.defaults.key, function(response){
+    return Razorpay.payment.getPrefs({
+      key_id: Razorpay.defaults.key
+    }, function(response){
       callback(response.methods);
-    })
+    });
   }
 };

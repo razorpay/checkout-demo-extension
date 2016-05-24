@@ -8,6 +8,10 @@
 1. Point local API to checkout in `public/checkout.php` and `app/views/checkout.php`
 1. `gulp serve` in checkout root dir
 
+# Gulp Commands
+
+* Run `npm run build` or `gulp` to generate production build
+
 # Testing
 
 1. Install `jre` and `phantomjs`
@@ -16,10 +20,6 @@
 1. `selenium-server start && gulp test` for all tests
 1. tests are located in `test` folder
 1. `test/release` folder contains blackbox tests`
-
-# Gulp Commands
-
-* `gulp --env=production` creates production build
 
 # Development Instructions
 - All source code is kept inside the `app` directory

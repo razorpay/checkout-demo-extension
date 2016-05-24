@@ -77,9 +77,15 @@ function sanitizeImage(options){
   }
 }
 
-function makeCheckoutUrl(key){
+function makeCheckoutUrl(rzp){
   var params = [];
   var url = discreet.makeUrl() + 'checkout';
+  var key, order_id;
+
+  if (rzp) {
+    key = rzp.get('key');
+    order_id = rzp.get('order_id');
+  }
 
   if(/^rzp_t/.test(key)){
     params.push('new=1')
@@ -89,7 +95,11 @@ function makeCheckoutUrl(key){
     params.push('checkout=' + RazorpayConfig.jspath);
   }
 
-  if(key){
+  if (order_id) {
+    params.push('order_id=' + order_id);
+  }
+
+  if(key) {
     params.push('key_id='+key);
   } else {
     url += '/public';
@@ -124,6 +134,9 @@ function makeCheckoutMessage(rzp){
     netbanking: get('method.netbanking'),
     wallet: get('method.wallet')
   }
+  options.external = {
+    wallets: get('external.wallets')
+  }
 
   var response = {
     context: location.href,
@@ -141,6 +154,7 @@ function makeCheckoutMessage(rzp){
 
   if(options.parent){
     response.embedded = true;
+    delete options.parent;
   }
 
   sanitizeImage(options);
@@ -185,7 +199,7 @@ CheckoutFrame.prototype = {
           frameborder: 0,
           width: '100%',
           height: '100%',
-          src: makeCheckoutUrl(key)
+          src: makeCheckoutUrl(rzp)
         }
       )[0];
     }
