@@ -460,6 +460,7 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
+    this.on('click', '#saved-cards-btn', this.showSavedCards);
     var enabledMethods = this.methods;
 
     if(enabledMethods.netbanking){
@@ -624,10 +625,25 @@ Session.prototype = {
     } else if ( user.saved && !user.id && !user.wants_skip ) {
       this.verifyUser();
     } else {
+      this.setSavedCards(user);
       this.setScreen('card');
       return true;
     }
     $('#otp-sec').html('Skip saved cards');
+  },
+
+  setSavedCards: function(user){
+    if (user && user.tokens) {
+      new savedCards(user.tokens);
+    } else if(preferences.tokens) {
+      new savedCards(preferences.tokens);
+    }
+  },
+
+  showSavedCards: function(){
+    gel('tab-card').setAttribute('screen', 'saved-cards');
+    makeHidden("#add-card");
+    makeVisible("#saved-cards");
   },
 
   verifyUser: function(){
@@ -694,30 +710,42 @@ Session.prototype = {
     var tab = this.tab || '';
     var data = {};
     var activeTab;
+    var screen = '';
 
     fillData($('#form-common'), data);
 
     if(tab){
       activeTab = getTab(tab);
       data.method = tab;
-      fillData(activeTab, data);
+
+      if (tab !== 'card') {
+        fillData(activeTab, data);
+      }
     }
 
     if(tab === 'card'){
-      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+      var screen = gel('tab-card').getAttribute('screen');
 
-      if(!data['card[expiry]']){
-        data['card[expiry]'] = '';
+      if(screen === 'add-card'){
+        fillData($("#"+screen), data);
+
+        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+
+        if(!data['card[expiry]']){
+          data['card[expiry]'] = '';
+        }
+
+        if(!data['card[cvv]']){
+          data['card[cvv]'] = '';
+        }
+
+        var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
+        data['card[expiry_month]'] = expiry[0];
+        data['card[expiry_year]'] = expiry[1];
+        delete data['card[expiry]'];
+      } else {
+        // TODO: get form data for saved cards
       }
-
-      if(!data['card[cvv]']){
-        data['card[cvv]'] = '';
-      }
-
-      var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
-      data['card[expiry_month]'] = expiry[0];
-      data['card[expiry_year]'] = expiry[1];
-      delete data['card[expiry]'];
     }
     return data;
   },

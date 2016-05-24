@@ -1,0 +1,95 @@
+@import "common";
+
+$padding-left: 5px;
+
+#saved-cards {
+  right: 0;
+  left: 0;
+  bottom: 0;
+  top: 0;
+
+  label {
+    display: inline-block;
+  }
+
+  .cards {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 77px;
+    overflow: auto;
+  }
+
+  .collapser {
+    height: 1000px;
+    overflow: hidden;
+    max-height: $collapsedCardh;
+    display: block;
+    transition: 0.2s;
+    padding: 10px 19px;
+  }
+
+  :checked + .collapser {
+    max-height: $openCardh;
+    background: #f5f5f5;
+  }
+
+  .details {
+    padding: $padding-left;
+  }
+
+  .card {
+    font-size: 16px;
+    line-height: 16px;
+  }
+
+  .card-ico {
+    width: 30px;
+    height: 20px;
+    background: orange;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+
+  .next {
+    padding: 10px;
+    padding-left: $padding-left + 30px + 13px;
+  }
+
+  .cvv-wrap {
+    border-bottom: 1px solid #e6e7e8;
+
+    .input {
+      padding: 5px 10px !important;
+      width: 52px;
+    }
+  }
+
+  .options {
+    padding: 10px 24px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+
+  .plus {
+    background: #efefef;
+    padding: 0 10px;
+    color: #aeaeae;
+    font-size: 18px;
+    border-radius: 2px;
+  }
+
+  #new-card-btn {
+    cursor: pointer;
+    padding: 6px 0;
+
+    .txt {
+      padding-left: 10px;
+      font-size: 14px;
+    }
+  }
+}

@@ -3,6 +3,7 @@ function User (o) {
   this.phone = o.phone || '';
   this.saved = o.saved || null;
   this.wants_skip = o.wants_skip || null;
+  this.tokens = o.tokens || null;
 }
 
 User.prototype = {
@@ -36,6 +37,7 @@ User.prototype = {
       },
       callback: function(data){
         user.id = data.app_id;
+        user.tokens = data.tokens;
         callback();
       }
     })

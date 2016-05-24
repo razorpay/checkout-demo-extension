@@ -121,12 +121,14 @@ var gridClass = gridClasses[i-1];
               </div>
 
               {{? method.card }}
-                <div class="tab-content showable screen" id="tab-card">
-                  <div class="pad">
+                <div class="tab-content showable screen" id="tab-card" screen='add-card'>
+                  <div id='add-card' class="pad showable shown">
                     <input type="hidden" name="method" value="card">
                     <div class="mfix saved-cards-btn">
-                      <span class="saved-cards-ico mchild"></span>
-                      <span class="saved-cards-txt mchild">USE SAVED CARDS</span>
+                      <span id='saved-cards-btn'>
+                        <span class="saved-cards-ico mchild"></span>
+                        <span class="saved-cards-txt mchild">USE SAVED CARDS</span>
+                      </span>
                     </div>
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                       <label>Card Number</label>
@@ -188,6 +190,7 @@ var gridClass = gridClasses[i-1];
                       <div class="clear"></div>
                     </div>
                   </div>
+                  <div id="saved-cards" class='showable'></div>
                 </div>
               {{?}}
               {{? method.netbanking }}
