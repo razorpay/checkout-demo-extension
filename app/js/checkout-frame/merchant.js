@@ -317,7 +317,9 @@ var platformSpecific = {
   },
 
   android: function(){
-    doc.css('background', 'rgba(0, 0, 0, 0.6)');
+    try{
+      $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
+    } catch(e){}
   }
 }
 
