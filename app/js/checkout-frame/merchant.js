@@ -453,7 +453,6 @@ function applyUAClasses(){
 
 function initIframe(){
   $(window).on('message', parseMessage);
-  Razorpay.sendMessage({event: 'load'});
 
   if(location.search){
     setQueryParams(location.search);
@@ -468,6 +467,7 @@ function initIframe(){
   }
 
   applyUAClasses();
+  Razorpay.sendMessage({event: 'load'});
 }
 
 initIframe();
