@@ -67,7 +67,9 @@ function Payment(data, params, r){
   this.format(data, params);
 
   // redirect if specified
-  this.checkRedirect();
+  if(this.checkRedirect()){
+    return;
+  }
 
   this.on('cancel', onPaymentCancel);
 
@@ -110,6 +112,7 @@ Payment.prototype = {
         content: data,
         method: 'post'
       });
+      return true;
     }
   },
 
