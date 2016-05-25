@@ -6,7 +6,7 @@ const gulp = require('gulp');
 const dot = require('dot');
 const glob = require('glob')
 const sass = require('gulp-sass');
-const minifyCSS = require('gulp-minify-css');
+const cleanCSS = require('gulp-clean-css');
 const stylelint = require('gulp-stylelint');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
@@ -26,6 +26,7 @@ const istanbul = require('istanbul');
 const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
+const webdriver = require('gulp-webdriver');
 
 const distDir = 'app/dist/v1/';
 let browserSyncOptions = {};
@@ -87,8 +88,8 @@ gulp.task('compileStyles', function(){
       ]
     }))
     .pipe(sass())
-    .pipe(gulpif(isProduction, minifyCSS()))
     .pipe(concat('checkout-new.css'))
+    .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
       cascade: false
@@ -235,7 +236,7 @@ karmaOptions.reporters.push(reporter);
 let karmaLibs = [
   'spec/jquery-1.11.1.js',
   'spec/sendkeys.js',
-  'spec/sinon-1.17.3.js',
+  'spec/sinon.js',
   'spec/expect.js',
   'spec/helpers.js'
 ];
@@ -290,9 +291,17 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-gulp.task('test', ['setENV', 'test:unit'], function() {
+gulp.task('test:release', function(){
+  return gulp.src('wdio.conf.js').pipe(webdriver());
+})
+
+gulp.task('hint', function(){
   return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
+})
+
+gulp.task('test', function() {
+  runSequence('setENV', 'test:unit', 'hint', 'test:release');
 });

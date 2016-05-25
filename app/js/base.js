@@ -288,7 +288,7 @@ Razorpay.prototype = {
       validateRequiredFields(this);
     } catch(e){
       var message = e.message;
-      if(!this.isLiveMode()){
+      if(!this.get || !this.isLiveMode()){
         alert(message);
       }
       raise(message);

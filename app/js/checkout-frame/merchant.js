@@ -284,7 +284,7 @@ function iosMethod(method){
       CheckoutBridge.map[++CheckoutBridge.index] = data;
     }
     iF.setAttribute('src', src);
-    document.documentElement.appendChild(iF);
+    doc.appendChild(iF);
     iF.parentNode.removeChild(iF);
     iF = null;
   }
@@ -317,7 +317,7 @@ var platformSpecific = {
   },
 
   android: function(){
-    doc.css('background', 'rgba(0, 0, 0, 0.6)');
+    $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
   }
 }
 
