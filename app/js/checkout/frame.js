@@ -78,6 +78,9 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(rzp){
+  if (RazorpayConfig.jspath) {
+    return RazorpayConfig.jspath;
+  }
   var params = [];
   var url = discreet.makeUrl() + 'checkout';
   var key, order_id;
