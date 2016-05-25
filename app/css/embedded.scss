@@ -3,6 +3,16 @@
 body.embedded {
   @include hidePowered;
 
+  #body {
+    border: 1px solid $bc;
+    border-top: none;
+  }
+
+  .grid {
+    background: #fff;
+    margin-left: -1px;
+  }
+
   #close {
     display: none;
   }
@@ -12,6 +22,8 @@ body.embedded {
   }
 
   #footer {
+    border-left: 1px solid $bc;
+    border-right: 1px solid $bc;
     box-shadow: none;
   }
 

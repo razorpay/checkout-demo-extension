@@ -99,6 +99,7 @@ $gridStagger: 0.05s;
 #modal {
   &.sub {
     #footer {
+      opacity: 1;
       transition-delay: $second;
       transform: none;
     }
