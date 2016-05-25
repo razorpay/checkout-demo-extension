@@ -34,18 +34,15 @@ describe 'page load', ->
       handleMessage message
     , message
 
-    payload =
-      contact: '18002700323'
-      email: 'pranav@razorpay.com'
-      method: 'netbanking'
-      bank: 'SBIN'
-      amount: '300'
-
     browser.click '.payment-option[tab=netbanking]'
     browser.click 'label[for=bank-radio-SBIN]'
     browser.submitForm 'form'
 
-    exec (payload) ->
-      expect CheckoutBridge.get CB.onsubmit.args[0][0]
-        .to.eql payload
-    , payload
+    exec ->
+      expect JSON.parse CheckoutBridge.get CB.onsubmit.args[0][0]
+        .to.eql
+          contact: '18002700323'
+          email: 'pranav@razorpay.com'
+          method: 'netbanking'
+          bank: 'SBIN'
+          amount: '300'

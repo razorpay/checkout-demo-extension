@@ -302,6 +302,6 @@ gulp.task('hint', function(){
     .pipe(jshint.reporter('fail'));
 })
 
-gulp.task('test', ['setENV', 'test:unit', 'test:release'], function() {
-  runSequence('setENV', 'test:unit', 'test:release');
+gulp.task('test', function() {
+  runSequence('setENV', 'test:unit', 'hint', 'test:release');
 });
