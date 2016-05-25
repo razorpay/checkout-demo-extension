@@ -64,7 +64,7 @@ exports.config = {
     // https://docs.saucelabs.com/reference/platforms-configurator
     //
     capabilities: [{
-        browserName: 'chrome'
+        browserName: 'phantomjs'
     }],
     // , {
         // maxInstances can get overwritten per capability. So if you have an in house Selenium
