@@ -1,11 +1,12 @@
 checkoutPostUrl = 'https://api.razorpay.com/v1/payments/create/checkout'
-androidUrl = '/test/fixtures/android-checkout.html?platform=android&key=key'
+androidUrl = '/test/fixtures/app.html?platform=android&key=key'
 message =
   id: 'mehta'
   data: {}
   options:
     key: 'key'
     amount: '300'
+    description: 'hello'
     prefill:
       contact: '18002700323'
       email: 'pranav@razorpay.com'
@@ -73,5 +74,6 @@ describe 'redirect on submit with valid payload', ->
           email: message.options.prefill.email
           currency: 'INR'
           bank: 'SBIN'
+          description: 'hello'
           method: 'netbanking'
     , message, checkoutPostUrl

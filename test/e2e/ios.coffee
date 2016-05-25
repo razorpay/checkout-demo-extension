@@ -1,4 +1,4 @@
-iosUrl = '/test/fixtures/ios-checkout.html?platform=ios&key=key'
+iosUrl = '/test/fixtures/app.html?platform=ios&key=key'
 message =
   id: 'mehta'
   data: {}
@@ -26,7 +26,7 @@ describe 'page load', ->
 
   it 'should call onload by appending iframe', ->
     exec ->
-      expect CB.onload.callCount
+      expect iosCB.onload.callCount
         .to.be 1
 
   it 'submit should pass payload', ->
@@ -39,7 +39,7 @@ describe 'page load', ->
     browser.submitForm 'form'
 
     exec ->
-      expect JSON.parse CheckoutBridge.get CB.onsubmit.args[0][0]
+      expect JSON.parse CheckoutBridge.get iosCB.onsubmit.args[0][0]
         .to.eql
           contact: '18002700323'
           email: 'pranav@razorpay.com'
