@@ -36,22 +36,24 @@
     "browser-sync": "^2.12.3",
     "del": "^2.2.0",
     "dot": "^1.0.3",
+    "expect.js": "^0.3.1",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-awspublish": "^3.0.1",
+    "gulp-clean-css": "^2.0.8",
     "gulp-concat": "^2.6.0",
     "gulp-if": "^2.0.0",
     "gulp-insert": "^0.5.0",
     "gulp-jshint": "^2.0.0",
     "gulp-sass": "^2.2.0",
-    "gulp-minify-css": "^1.2.4",
     "gulp-mocha": "^2.2.0",
     "gulp-replace": "^0.5.4",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-stylelint": "^2.0.0",
     "gulp-uglify": "^1.5.3",
     "gulp-usemin": "^0.3.22",
+    "gulp-webdriver": "^2.0.1",
     "istanbul": "^0.4.3",
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.1.0",
@@ -65,15 +67,13 @@
     "mocha": "^2.4.5",
     "phantomjs-prebuilt": "^2.1.7",
     "run-sequence": "^1.1.5",
-    "stylelint-config-standard": "^6.0.0"
+    "stylelint-config-standard": "^6.0.0",
+    "wdio-mocha-framework": "^0.2.13",
+    "webdriverio": "^4.0.7"
   },
   "private": "true",
   "dependencies": {
     "aws-sdk": "^2.3.12",
-    "expect.js": "^0.3.1",
-    "glob": "^7.0.3",
-    "gulp-webdriver": "^2.0.1",
-    "wdio-mocha-framework": "^0.2.13",
-    "webdriverio": "^4.0.7"
+    "glob": "^7.0.3"
   }
 }

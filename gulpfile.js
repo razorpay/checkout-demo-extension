@@ -6,7 +6,7 @@ const gulp = require('gulp');
 const dot = require('dot');
 const glob = require('glob')
 const sass = require('gulp-sass');
-const minifyCSS = require('gulp-minify-css');
+const cleanCSS = require('gulp-clean-css');
 const stylelint = require('gulp-stylelint');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
@@ -88,8 +88,8 @@ gulp.task('compileStyles', function(){
       ]
     }))
     .pipe(sass())
-    .pipe(gulpif(isProduction, minifyCSS()))
     .pipe(concat('checkout-new.css'))
+    .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
       cascade: false
