@@ -236,7 +236,7 @@ karmaOptions.reporters.push(reporter);
 let karmaLibs = [
   'spec/jquery-1.11.1.js',
   'spec/sendkeys.js',
-  'spec/sinon-1.17.3.js',
+  'spec/sinon.js',
   'spec/expect.js',
   'spec/helpers.js'
 ];
@@ -295,9 +295,13 @@ gulp.task('test:release', function(){
   return gulp.src('wdio.conf.js').pipe(webdriver());
 })
 
-gulp.task('test', ['setENV', 'test:unit'], function() {
+gulp.task('hint', function(){
   return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
+})
+
+gulp.task('test', ['setENV', 'test:unit', 'test:release'], function() {
+  runSequence('setENV', 'test:unit', 'test:release');
 });

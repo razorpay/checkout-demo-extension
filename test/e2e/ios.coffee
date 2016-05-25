@@ -16,8 +16,3 @@ describe 'page load', ->
     exec ->
       expect typeof Razorpay
         .to.be 'function'
-
-  it 'should have ios bridge defined', ->
-    exec ->
-      expect CheckoutBridge.onload.callCount
-        .to.be 1
