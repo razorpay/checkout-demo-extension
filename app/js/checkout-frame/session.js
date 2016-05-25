@@ -712,6 +712,8 @@ Session.prototype = {
     var activeTab;
     var screen = '';
 
+    // TODO: Refactor this code
+
     fillData($('#form-common'), data);
 
     if(tab){
@@ -744,7 +746,9 @@ Session.prototype = {
         data['card[expiry_year]'] = expiry[1];
         delete data['card[expiry]'];
       } else {
-        // TODO: get form data for saved cards
+        var selectedCard = $('#saved-cards .card :checked').parent();
+        fillData(selectedCard, data);
+        data.app_id = this.user.id;
       }
     }
     return data;
@@ -837,6 +841,11 @@ Session.prototype = {
     preventDefault(e);
 
     var activeTab = $('.tab-content.shown');
+
+    if(activeTab.attr('id') === 'tab-card') {
+      activeTab = $("#"+activeTab.attr('screen'));
+    }
+
     if (activeTab[0] && this.checkInvalid(activeTab)){
       return;
     }
