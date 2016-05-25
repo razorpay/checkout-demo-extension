@@ -179,6 +179,23 @@ function setTestRibbonInvisible(){
   testRibbon.style.opacity = 0.0;
 }
 
+var loader;
+function appendLoader($parent, parent){
+  if(!loader){
+    try{
+      loader = document.createElement('div');
+      var style = "margin:-25px 0 0 -25px;height:50px;width:50px;animation:rzp-rot 1s infinite linear;-webkit-animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;"
+      if(parent){
+        style += 'margin: 100px auto -150px;border: 1px solid rgba(0, 0, 0, 0.2);border-top-color: rgba(0, 0, 0, 0.7);';
+      } else {
+        style += 'position:absolute;left:50%;top:50%;';
+      }
+      loader.setAttribute('style', style);
+      $parent.append(loader);
+    } catch(e){}
+  }
+}
+
 function CheckoutFrame(rzp){
   if(rzp){
     this.getEl(rzp);
@@ -211,6 +228,7 @@ CheckoutFrame.prototype = {
     this.bind();
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
+    appendLoader($parent, parent);
     var message;
 
     if(rzp !== this.rzp){
@@ -349,7 +367,11 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    $('.razorpay-backdrop.anim').removeClass('anim');
+    if(loader){
+      $(loader).remove();
+      // show it only once.
+      loader = true;
+    }
     invoke('loadedCallback', this);
     this.hasLoaded = true;
   },
