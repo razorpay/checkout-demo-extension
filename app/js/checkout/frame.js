@@ -78,11 +78,8 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(rzp){
-  if (RazorpayConfig.jspath) {
-    return RazorpayConfig.jspath;
-  }
   var params = [];
-  var url = discreet.makeUrl() + 'checkout';
+  var url = RazorpayConfig.framepath || discreet.makeUrl() + 'checkout';
   var key, order_id;
 
   if (rzp) {
@@ -348,7 +345,6 @@ CheckoutFrame.prototype = {
     catch(err){
       return;
     }
-
     var event = data.event;
     var rzp = this.rzp;
     // source check
@@ -357,7 +353,7 @@ CheckoutFrame.prototype = {
       data.source !== 'frame' ||
       // (event !== 'load' && rzp && rzp.id !== data.id) ||
       e.source !== this.el.contentWindow ||
-      this.el.getAttribute('src').indexOf(e.origin)
+      this.el.src.indexOf(e.origin)
     ){
       return;
     }

@@ -6,7 +6,18 @@
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
-    <style>@font-face{font-family:'lato';src:url("fonts/lato.eot?#iefix") format('embedded-opentype'),url("https://cdn.razorpay.com/lato3.woff2") format('woff2'),url("fonts/lato.woff") format('woff'),url("fonts/lato.ttf") format('truetype'),url("fonts/lato.svg#lato") format('svg');font-weight:normal;font-style:normal}</style>
+    <style>
+      @font-face {
+        font-family:'lato';
+        src:url("fonts/lato.eot?#iefix") format('embedded-opentype'),
+          url("fonts/lato3.woff2") format('woff2'),
+          url("fonts/lato.woff") format('woff'),
+          url("fonts/lato.ttf") format('truetype'),
+          url("fonts/lato.svg#lato") format('svg');
+        font-weight:normal;
+        font-style:normal
+      }
+    </style>
     <link href="dist/v1/css/checkout-new.css" type="text/css" rel="stylesheet">
  </head>
   <script src="config.js"></script>
@@ -93,50 +104,49 @@
 
 </html>
 <script>
-handleMessage({
-  options: {
-    // 'key': 'rzp_live_ILgsfZCZoFIKMb',
-    'key': 'rzp_test_1DP5mmOlF5G5ag',
-    'amount': 749090,
-    'name': 'Innerchef',
-    'description': 'JEE Main & Advanced',
-    'image': 'http://i.imgur.com/n5tjHFD.png',
-    'handler': function (transaction){
-      alert("You have successfully purchased " + options.description);
-    },
-    'method': {
-      netbanking: true,
-      wallet: true,
-      card: true
-    },
-    // parent: '#x',
-    external: {
-      // wallets: ['payumoney'],
-      handler: function(data){
-        console.log(this, data);
-      }
-    },
-    // callback_url: 'http://google.com',
-    // redirect: true,
-    // display_amount: '12.23',
-    // display_currency: 'SGD',
-    'prefill': {
-      'method': 'card',
-      'name': 'Harshil \"Mathur',
-      'email': 'harshil@razorpay.com',
-      'contact': '9876543210'
-    },
-    customer_id: '5LqJJLEzjH3vkz',
-    notes: {
-      'address': 'Hello World'
-    },
-    theme: {
-      color: '#1abc9c'
-    },
-    modal: {
-      ondismiss: function(){console.log(1)},
-      onhidden: function(){console.log(2)}
+var options = {
+  // 'key': 'rzp_live_ILgsfZCZoFIKMb',
+  'key': 'rzp_test_1DP5mmOlF5G5ag',
+  'amount': 749090,
+  'name': 'Innerchef',
+  'description': 'JEE Main & Advanced',
+  'image': 'http://i.imgur.com/n5tjHFD.png',
+  'handler': function (transaction){
+    alert("You have successfully purchased " + options.description);
+  },
+  'method': {
+    netbanking: true,
+    wallet: true,
+    card: true
+  },
+  // parent: '#x',
+  external: {
+    // wallets: ['payumoney'],
+    handler: function(data){
+      console.log(this, data);
     }
+  },
+  // callback_url: 'http://google.com',
+  // redirect: true,
+  // display_amount: '12.23',
+  // display_currency: 'SGD',
+  'prefill': {
+    'method': 'card',
+    'name': 'Harshil \"Mathur',
+    'email': 'harshil@razorpay.com',
+    'contact': '9876543210'
+  },
+  customer_id: '5LqJJLEzjH3vkz',
+  notes: {
+    'address': 'Hello World'
+  },
+  theme: {
+    color: '#1abc9c'
+  },
+  modal: {
+    ondismiss: function(){console.log(1)},
+    onhidden: function(){console.log(2)}
   }
-});
+}
+// handleMessage(options);
 </script>
