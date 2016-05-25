@@ -249,7 +249,6 @@ Payment.prototype = {
     if(this.fees || !discreet.isFrame){
       return false;
     }
-
     // else make ajax request
     var data = this.data;
     var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
@@ -295,11 +294,14 @@ function ajaxCallback(response){
   if (payment_id) {
     this.payment_id = payment_id;
   }
-
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
-    invoke(responseTypes[response.type], this, response.request);
+    var request = response.request;
+    if(request && request.url && RazorpayConfig.framepath){
+      request.url = request.url.replace(/^.+v1\//, discreet.makeUrl());
+    }
+    invoke(responseTypes[response.type], this, request);
   }
 }
 
