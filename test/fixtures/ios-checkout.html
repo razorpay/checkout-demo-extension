@@ -26,6 +26,40 @@
         }
       }
     }
+    var CB;
+    function setCheckoutBridge(){
+      CB = {};
+      [
+        'onload',
+        'onrender',
+        'setPaymentID',
+        'onsubmit',
+        'ondismiss',
+        'onerror',
+        'onfault',
+        'oncomplete'
+      ].forEach(function(method){
+        CB[method] = sinon.stub();
+      })
+    }
+    setCheckoutBridge();
+
+    var appendChild = Node.prototype.appendChild;
+    Node.prototype.appendChild = function(childNode){
+      if(childNode.nodeName === 'IFRAME'){
+        var src = childNode.src;
+        srcSplit = src.split('razorpay://');
+        if(srcSplit.length > 1){
+          var methodSplit = srcSplit[1].split('?');
+          var bridgeMethod = CB[methodSplit[0]];
+          if(typeof bridgeMethod === 'function'){
+            return bridgeMethod(methodSplit[1]);
+          }
+        }
+      }
+      appendChild.apply(this, arguments);
+    }
+    sinon.stub(HTMLFormElement.prototype, 'submit');
   </script>
   <script src='../../app/dist/v1/checkout-frame-new.js'></script>
 </html>

@@ -27,7 +27,7 @@
           'oncomplete'
         ].forEach(function(method){
           CheckoutBridge[method] = sinon.stub();
-        })        
+        })
       }
       setCheckoutBridge();
       sinon.stub(HTMLFormElement.prototype, 'submit');
