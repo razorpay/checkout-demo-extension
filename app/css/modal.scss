@@ -531,6 +531,11 @@ i {
 
 .saved-cards-btn {
   margin-top: 10px;
+  display: none;
+}
+
+.saved-cards-btn.shown {
+  display: block;
 }
 
 .saved-cards-ico {

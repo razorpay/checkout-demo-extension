@@ -45,7 +45,7 @@ User.prototype = {
 
   setPhone: function(phone){
     if (this.phone !== phone) {
-      this.id = this.saved = this.wants_skip = null;
+      this.id = this.saved = this.wants_skip = this.tokens = null;
       this.phone = phone;
     }
   }

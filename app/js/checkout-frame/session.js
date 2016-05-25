@@ -633,14 +633,31 @@ Session.prototype = {
   },
 
   setSavedCards: function(user){
+
+    if(user && user.saved) {
+      $('.saved-cards-btn').addClass('shown');
+    } else {
+      $('.saved-cards-btn').removeClass('shown');
+    }
+
     if (user && user.tokens) {
       new savedCards(user.tokens);
-    } else if(preferences.tokens) {
+    } else if(user.saved && preferences.tokens) {
       new savedCards(preferences.tokens);
+    } else {
+      new savedCards({count: 0});
+      showCardForm();
     }
   },
 
   showSavedCards: function(){
+    var user = this.user;
+
+    if(user.wants_skip) {
+      user.wants_skip = false;
+      this.showCardTab();
+    }
+
     gel('tab-card').setAttribute('screen', 'saved-cards');
     makeHidden("#add-card");
     makeVisible("#saved-cards");
