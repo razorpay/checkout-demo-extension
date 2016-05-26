@@ -208,10 +208,14 @@ CheckoutFrame.prototype = {
   getEl: function(rzp){
     if(!this.el){
       var key = rzp && rzp.get('key');
+      var style = 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
+      if(rzp.get('parent')){
+        style += 'min-height: 530px;';
+      }
       this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
-          style: 'min-height: 530px; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;',
+          style: style,
           allowtransparency: true,
           frameborder: 0,
           width: '100%',
