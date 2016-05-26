@@ -14,7 +14,12 @@
     for(var i = 0; i < tokens.count; i++) {
       var item = tokens.items[i];
       var card = item.card;
+      var cvv_digits = 3;
       var network = networks[card.network];
+
+      if(network === 'amex') {
+        cvv_digits = 4;
+      }
   }}
   <div class='card'>
     <input type='radio' id='saved-card-{{=item.token}}' name='token' value='{{=item.token}}'/>
@@ -24,7 +29,7 @@
         <span class='mchild'>XXXX XXXX XXXX {{=item.card.last4}}</span>
       </div>
       <div class='next mfix'>
-        <span class='cvv-wrap mchild'><input class='input card-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' name='card[cvv]' maxlength='3' required pattern='[0-9]{3}'></span>
+        <span class='cvv-wrap mchild'><input class='input card-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' name='card[cvv]' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3}'></span>
       </div>
     </label>
   </div>
