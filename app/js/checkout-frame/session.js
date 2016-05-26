@@ -460,9 +460,11 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
-    this.on('click', '#saved-cards-btn', this.showSavedCards);
     var enabledMethods = this.methods;
 
+    if(enabledMethods.card){
+      this.on('click', '#saved-cards-btn', this.showSavedCards);
+    }
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
