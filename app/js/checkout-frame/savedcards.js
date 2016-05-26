@@ -11,6 +11,22 @@ function savedCards(tokens){
   this.render();
 }
 
+function deleteCard(e) {
+  var target = $(e.target);
+  if (!target.hasClass('delete')) {
+    return;
+  }
+  var parent = target.parent().parent();
+  var user = window.getSession().user;
+  if(confirm("Press OK to delete card.")){
+    user.deleteCard(
+      parent.find('[type=radio]')[0].value,
+      function(){
+        parent.remove();
+    });
+  }
+}
+
 savedCards.prototype = {
   render: function() {
     this.unbind();
@@ -29,6 +45,7 @@ savedCards.prototype = {
 
   bind: function(){
     this.on('click', '#new-card-btn', showCardForm);
+    this.on('click', '.cards', deleteCard);
   },
 
   unbind: function(){

@@ -21,7 +21,21 @@ $padding-left: 5px;
     overflow: auto;
   }
 
+  .delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transform: scale(0);
+    transition: 0.2s;
+  }
+
+  .delete:hover {
+    color: #000;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+
   .collapser {
+    position: relative;
     height: 1000px;
     overflow: hidden;
     max-height: $collapsedCardh;
@@ -33,6 +47,10 @@ $padding-left: 5px;
   :checked + .collapser {
     max-height: $openCardh;
     background: #f5f5f5;
+  }
+
+  :checked + .collapser .delete {
+    transform: scale(1);
   }
 
   .details {

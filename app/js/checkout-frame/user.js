@@ -48,5 +48,20 @@ User.prototype = {
       this.id = this.saved = this.wants_skip = this.tokens = null;
       this.phone = phone;
     }
+  },
+
+  deleteCard: function(token, callback){
+    if (!this.id) {
+      return;
+    }
+
+    $.ajax({
+      url: discreet.makeUrl() + 'apps/' + this.id + '/tokens/' + token +
+        '?key_id=' + this.key,
+      method: 'delete',
+      callback: function(){
+        callback();
+      }
+    })
   }
 }
