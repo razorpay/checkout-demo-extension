@@ -399,7 +399,7 @@ i {
 
 #tab-title {
   font-size: 16px;
-  line-height: $topbarh;
+  line-height: $topbarh + 1px;
 }
 
 .back {
