@@ -1,4 +1,4 @@
-// Copy this file to `browsersync.config.js` and enable/disable any browser sync option
+// Copy this file to `browsersync.config.js` to enable/disable any browser sync option
 // For more options check, https://www.browsersync.io/docs/options/
 
 module.exports = {
