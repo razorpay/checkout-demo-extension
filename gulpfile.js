@@ -31,6 +31,13 @@ const webdriver = require('gulp-webdriver');
 const distDir = 'app/dist/v1/';
 let browserSyncOptions = {};
 
+let defaultBrowserSyncOptions = {
+  ui: false,
+  ghostMode: false,
+  open: false,
+  codeSync: false
+};
+
 try {
   browserSyncOptions = require('./browsersync-config');
 } catch(e) {
@@ -137,16 +144,22 @@ gulp.task('build', function() {
   runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
-gulp.task('setENV', function() {
+gulp.task('setServeENV', function() {
   isProduction = false;
   styleLintOptions.failAfterError = false;
 });
 
-gulp.task('serve', ['setENV', 'build'], function() {
+gulp.task('setTestENV', function() {
+  isProduction = false;
+  styleLintOptions.failAfterError = true;
+});
+
+gulp.task('serve', ['setServeENV', 'build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
   gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
 
+  browserSyncOptions = merge(defaultBrowserSyncOptions, browserSyncOptions);
   browserSyncOptions.server = './app/dist';
   browserSyncOptions.startPath = 'v1/index.html';
   browserSync.init(browserSyncOptions);
@@ -305,5 +318,26 @@ gulp.task('hint', function(){
 })
 
 gulp.task('test', function() {
-  runSequence('setENV', 'test:unit', 'hint', 'test:release');
+  runSequence('setTestENV', 'test:unit', 'hint', 'test:release');
 });
+
+
+
+/* Util functions */
+
+// Merge the contents of two objects together into the first object.
+function merge(original, updates) {
+  if (!updates || typeof updates !== 'object') {
+    return original;
+  }
+
+  var props = Object.keys(updates);
+  var prop;
+
+  for (var i = 0; i < props.length; i++) {
+    prop = props[i];
+    original[prop] = updates[prop];
+  }
+
+  return original;
+}
