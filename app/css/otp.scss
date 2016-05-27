@@ -1,18 +1,20 @@
 @import "common";
 
-#modal.sub {
-  #otp-elem {
-    display: block;
-  }
-}
-
 #tab-otp {
   padding-top: 40px;
   text-align: center;
 
-  &.error {
+  &.action {
     #otp-action {
       display: inline-block;
+    }
+  }
+
+  &.action,
+  &.loading {
+    #otp-elem,
+    #otp-sec {
+      display: none;
     }
   }
 }
@@ -41,9 +43,8 @@
 }
 
 #otp-elem {
-  display: none;
   margin: 0 auto;
-  width: 150px;
+  width: 151px;
   position: relative;
 }
 
@@ -62,16 +63,10 @@
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=");
 }
 
-#resend-action {
-  display: none;
-
-  a {
-    font-size: 12px;
-    color: #0fa5dc;
-    margin-top: 5px;
-    border-bottom: 1px solid;
-    padding-bottom: 3px;
-  }
+#otp-sec {
+  display: inline-block;
+  margin-top: 5px;
+  padding-bottom: 3px;
 }
 
 .incorrect-otp {

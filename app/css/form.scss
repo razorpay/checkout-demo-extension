@@ -8,6 +8,10 @@ $bottom: 7px;
   padding: 0 $p;
 }
 
+label[for] {
+  cursor: pointer;
+}
+
 .elem-wrap {
   height: 72px;
 

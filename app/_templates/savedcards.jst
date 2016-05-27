@@ -1,0 +1,59 @@
+{{
+  var tokens = it;
+  var networks = {
+    'American Express': 'amex',
+    'Diners Club': 'diners',
+    'Maestro': 'maestro',
+    'MasterCard': 'mastercard',
+    'RuPay': 'rupay',
+    'Visa': 'visa'
+  };
+}}
+<div class="cards">
+  {{
+    for(var i = 0; i < tokens.count; i++) {
+      var item = tokens.items[i];
+      var card = item.card;
+      var cvv_digits = 3;
+      var network = networks[card.network];
+
+      if(network === 'amex') {
+        cvv_digits = 4;
+      }
+  }}
+  <div class='card'>
+    <input type='radio' id='saved-card-{{=item.token}}' name='token' value='{{=item.token}}'/>
+    <label class='collapser' for='saved-card-{{=item.token}}'>
+      <div class="delete">×</div>
+      <div class='details mfix'>
+        <span class='card-ico mchild {{=network}}'></span>
+        <span class='mchild'>XXXX XXXX XXXX {{=item.card.last4}}</span>
+      </div>
+      <div class='next mfix'>
+        <span class='cvv-wrap mchild'><input class='input card-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' name='card[cvv]' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3}'></span>
+      </div>
+    </label>
+  </div>
+  {{}}}
+</div>
+<div class='options'>
+  <span id='new-card-btn' class="mfix"><span class='plus mchild'>+</span><span class="txt mchild">Add a new card</span></span>
+  <div id="elem-emi" class="double gapv">
+    <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
+      <span class="checkbox"></span>
+      Pay with EMI
+      <div id="emi-select" class="select dropdown">
+        <div id="emi-plans-wrap"></div>
+        <div class="option" value="">Pay without EMI</div>
+      </div>
+      <span class="help dropdown">EMI is available on HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
+    </div>
+    <div class="second">
+      <span id="view-emi-plans">
+        <i class="info">&#xe606;</i>
+        <a>View EMI Plans</a>
+      </span>
+    </div>
+    <div class="clear"></div>
+  </div>
+</div>

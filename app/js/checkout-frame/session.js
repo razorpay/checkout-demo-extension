@@ -54,7 +54,7 @@ function makeEmiDropdown(emiObj, session){
 
 function setEmiBank(data){
   var activeEmiPlan = $('#emi-plans-wrap .active')[0];
-  if(getSession().tab === 'card' && activeEmiPlan){
+  if(activeEmiPlan){
     data.method = 'emi';
     data.emi_duration = activeEmiPlan.getAttribute('value');
   }
@@ -169,20 +169,6 @@ function overlayVisible(){
   return $('#overlay').hasClass('shown');
 }
 
-function showErrorMessage(message){
-  $('#fd-t').html(message);
-  showOverlay(
-    $('#error-message').removeClass('loading')
-  );
-}
-
-function showLoadingMessage(){
-  $('#fd-t').html(loadingMessage);
-  showOverlay(
-    $('#error-message').addClass('loading')
-  );
-}
-
 // this === Session
 function errorHandler(response){
   if(!response || !response.error){
@@ -196,6 +182,7 @@ function errorHandler(response){
   }
 
   message = response.error.description;
+
   var err_field = response.error.field;
   if (err_field){
     if(!err_field.indexOf('expiry')){
@@ -216,22 +203,8 @@ function errorHandler(response){
     }
   }
 
-  showErrorMessage(message || 'There was an error in handling your request');
+  this.showLoadError(true, message || 'There was an error in handling your request');
   $('#fd-hide').focus();
-}
-
-// this === Session
-function otpErrorHandler(response) {
-  this.clearRequest();
-  this.requestTimeout = invoke(
-    'showOTPScreen',
-    this,
-    {
-      error: true,
-      text: response.error.description
-    },
-    200
-  )
 }
 
 function getTab(tab){
@@ -240,6 +213,16 @@ function getTab(tab){
 
 function getPhone(){
   return gel('contact').value;
+}
+
+function setOtpText(text){
+  gel('otp-prompt').innerHTML = text;
+}
+
+function askOTP(text){
+  $('#modal').addClass('sub');
+  $('#tab-otp').removeClass('loading').removeClass('action');
+  setOtpText(text);
 }
 
 // this === Session
@@ -251,32 +234,6 @@ function successHandler(response){
   // sending oncomplete event because CheckoutBridge.oncomplete
   Razorpay.sendMessage({ event: 'complete', data: response });
   this.hide();
-}
-
-// this === Session
-function secondfactorHandler(text){
-  var timeout;
-  if(!text){
-    this.showOTPScreen({
-      text: 'Sending OTP to',
-      loading: true,
-      number: true
-    })
-    text = 'An OTP has been sent to';
-    timeout = 750;
-  }
-  $('#otp').val('');
-  this.requestTimeout = invoke(
-    'showOTPScreen',
-    this,
-    {
-      verify: true,
-      text: text,
-      number: timeout,
-      otp: true
-    },
-    timeout
-  )
 }
 
 function Session (options) {
@@ -364,10 +321,10 @@ Session.prototype = {
       this.isOpen = true;
     }
 
+    this.setUser();
     this.getEl();
     this.setSmarty();
     this.fillData();
-    this.setUser();
     this.setEMI();
     this.setModal();
     this.setCard();
@@ -482,32 +439,34 @@ Session.prototype = {
     }
   },
 
-  resendOTP: function() {
-    this.showOTPScreen({
-      text: 'Sending OTP to',
-      loading: true,
-      number: true
-    })
-    $('#otp').val('');
-
-    var r = this.r;
-    r.resendOTP(function() {
-      r.emit('payment.otp.required');
-    })
+  secAction: function() {
+    if(this.tab === 'wallet'){
+      this.r.resendOTP(this.r.emitter('payment.otp.required'));
+    } else {
+      this.user.wants_skip = true;
+      this.showCardTab();
+    }
   },
 
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
-    this.on('click', '#tab-title, #topbar .back', this.switchTab);
+    this.on('click', '#topbar', this.switchTab);
+    this.on('click', '#user', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    })
     this.on('click', '.payment-option', this.switchTab);
     this.on('submit', '#form', this.submit);
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
-    this.on('click', '#resend-action > a', this.resendOTP);
+    this.on('click', '#otp-sec', this.secAction);
     var enabledMethods = this.methods;
 
+    if(enabledMethods.card){
+      this.on('click', '#saved-cards-btn', this.showSavedCards);
+    }
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -521,11 +480,6 @@ Session.prototype = {
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
     }
-
-    // if(enabledMethods.wallet.mobikwik){
-    //   this.on('submit', '#powerwallet', this.onOtpSubmit);
-    //   this.on('click', '#powercancel', this.hideErrorMessage);
-    // }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
     this.on('click', '#overlay', this.hideErrorMessage);
@@ -599,7 +553,16 @@ Session.prototype = {
     }
   },
 
+  // if current screen is otp
+  isOTP: function(){
+    return this.screen === 'otp';
+  },
+
   setScreen: function(screen){
+    if(screen === this.screen) {
+      return;
+    }
+    this.screen = screen;
     var $body = $('#body');
     makeHidden('.screen.shown');
     $body.toggleClass('tab', screen);
@@ -614,6 +577,7 @@ Session.prototype = {
     }
 
     if (screen !== 'otp'){
+      this.saving_card = null;
       var $modal = $('#modal');
       if (this.tab === screen && screen === 'wallet') {
         // otp field doesn't animate and gets displayed as soon as sub class is applied
@@ -629,62 +593,83 @@ Session.prototype = {
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
-    if (!this.tab && this.checkInvalid($('#form-common'))) {
-      return;
-    }
-    if (this.sub_tab) {
-      this.sub_tab = null;
-      tab = 'wallet';
+
+    // initial screen
+    if (!this.tab){
+      if (this.checkInvalid($('#form-common'))) {
+        return;
+      }
+      this.user.setPhone(getPhone());
+    } else {
+      if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
+        tab = this.tab;
+      }
     }
 
-    $('#form-common').addClass('not-first');
-
-    this.setScreen(tab);
-    this.tab = tab;
     if (tab) {
-      // if (tab === 'card') {
-      //   var user = this.user;
-      //   user.setPhone(getPhone());
-      //   if( typeof user.saved !== 'boolean') {
-      //     return this.lookupUser();
-      //   } else if (user.saved && !user.logged_in && !user.wants_skip) {
-      //     return this.loginUser();
-      //   } else {
-      //     // preferences.tokens
-      //   }
-      // }
-      getTab(tab).addClass('shown');
+      $('#user').html(getPhone());
+    }
+
+    this.tab = tab;
+
+    if (tab === 'card') {
+      this.showCardTab();
+    } else {
+      this.setScreen(tab);
     }
   },
 
-  loginUser: function(){
-    this.user.login();
-    invoke(secondfactorHandler, this, function(data){
-      this.user.verify(
-        data,
-        bind(
-          function(){
-            this.switchTab('card');
-          },
-          this
-        )
-      )
-    });
+  showCardTab: function(){
+    var user = this.user;
+    tab_titles.otp = tab_titles.card;
+
+    // if( !user.id && typeof user.saved !== 'boolean' ) {
+    //   this.commenceOTP('saved cards');
+    //   this.user.lookup(bind(this.showCardTab,this));
+    // } else if ( user.saved && !user.id && !user.wants_skip ) {
+    //   this.verifyUser();
+    // } else {
+      this.setSavedCards(user);
+      this.setScreen('card');
+    //   return true;
+    // }
+    $('#otp-sec').html('Skip saved cards');
   },
 
-  lookupUser: function(){
-    this.showOTPScreen({
-      text: '<strong>Looking for saved cards with Razorpay</strong>',
-      loading: true
-    })
-    this.user.lookup(
-      bind(
-        function(){
-          this.switchTab('card');
-        },
-        this
-      )
-    )
+  setSavedCards: function(user){
+
+    if(user && user.saved) {
+      $('.saved-cards-btn').addClass('shown');
+    } else {
+      $('.saved-cards-btn').removeClass('shown');
+    }
+
+    if (user && user.tokens) {
+      new savedCards(user.tokens);
+    } else if(user.saved && preferences.tokens) {
+      new savedCards(preferences.tokens);
+    } else {
+      new savedCards({count: 0});
+      showCardForm();
+    }
+  },
+
+  showSavedCards: function(){
+    var user = this.user;
+
+    if(user.wants_skip) {
+      user.wants_skip = false;
+      this.showCardTab();
+    }
+
+    gel('tab-card').setAttribute('screen', 'saved-cards');
+    makeHidden("#add-card");
+    makeVisible("#saved-cards");
+  },
+
+  verifyUser: function(){
+    this.commenceOTP();
+    this.user.login();
   },
 
   setUser: function(){
@@ -746,30 +731,46 @@ Session.prototype = {
     var tab = this.tab || '';
     var data = {};
     var activeTab;
+    var screen = '';
+
+    // TODO: Refactor this code
 
     fillData($('#form-common'), data);
 
     if(tab){
       activeTab = getTab(tab);
       data.method = tab;
-      fillData(activeTab, data);
+
+      if (tab !== 'card') {
+        fillData(activeTab, data);
+      }
     }
 
     if(tab === 'card'){
-      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+      var screen = gel('tab-card').getAttribute('screen');
 
-      if(!data['card[expiry]']){
-        data['card[expiry]'] = '';
+      if(screen === 'add-card'){
+        fillData($("#"+screen), data);
+
+        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+
+        if(!data['card[expiry]']){
+          data['card[expiry]'] = '';
+        }
+
+        if(!data['card[cvv]']){
+          data['card[cvv]'] = '';
+        }
+
+        var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
+        data['card[expiry_month]'] = expiry[0];
+        data['card[expiry_year]'] = expiry[1];
+        delete data['card[expiry]'];
+      } else {
+        var selectedCard = $('#saved-cards .card :checked').parent();
+        fillData(selectedCard, data);
+        data.app_id = this.user.id;
       }
-
-      if(!data['card[cvv]']){
-        data['card[cvv]'] = '';
-      }
-
-      var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
-      data['card[expiry_month]'] = expiry[0];
-      data['card[expiry_year]'] = expiry[1];
-      delete data['card[expiry]'];
     }
     return data;
   },
@@ -782,40 +783,69 @@ Session.prototype = {
     }
   },
 
-  showOTPScreen: function(state){
-    if (!this.sub_tab || !this.isOpen) {
-      return;
+  showLoadError: function(error, text){
+    var yesClass, noClass;
+    yesClass = noClass = 'addClass';
+    if(error){
+      noClass = 'removeClass';
+    } else {
+      yesClass = 'removeClass';
     }
+
+    if(!text){
+      text = loadingMessage;
+    }
+
+    if(this.isOTP()){
+      $('#modal').removeClass('sub');
+      setOtpText(text);
+      $('#tab-otp')[yesClass]('action')[noClass]('loading');
+    } else {
+      $('#fd-t').html(text);
+      showOverlay(
+        $('#error-message')[noClass]('loading')
+      );
+    }
+  },
+
+  commenceOTP: function(shouldLookup, otpText){
+    this.setScreen('otp');
     $('#tab-otp').css('display', 'block');
-    $('#tab-otp').toggleClass('loading', state.loading);
-    $('#modal').toggleClass('sub', state.verify);
-    $('#tab-otp').toggleClass('error', state.error);
-    $('#otp-elem').toggleClass('shown', state.otp);
-    $('#resend-action').toggleClass('shown', state.otp);
+    invoke('addClass', $('#footer'), 'otp', 300);
 
-    var wallet = state.wallet;
-    if(wallet){
-      var walletObj = freqWallets[wallet];
-      tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
-      this.setScreen('otp');
-      invoke('addClass', $('#footer'), 'otp', 300);
+    if(shouldLookup){
+      this.showLoadError(false, 'Looking for ' + shouldLookup + ' associated with ' + getPhone());
+    } else {
+      this.sendOTP(otpText);
     }
+  },
 
-    if(state.number){
-      state.text += ' ' + getPhone();
+  sendOTP: function(text){
+    $('#otp').val('');
+    var timeout;
+    if(!text){
+      var phone = getPhone();
+      this.showLoadError(false, 'Sending OTP to ' + phone);
+      timeout = 750;
+      text = 'An OTP has been sent to ' + phone;
+      this.requestTimeout = setTimeout(function(){
+        askOTP(text);
+      }, 750);
+    } else {
+      askOTP(text);
     }
-
-    $('#otp-prompt').toggleClass('incorrect-otp', state.incorrectOTP);
-    gel('otp-prompt').innerHTML = state.text;
   },
 
   onOtpSubmit: function(e){
     preventDefault(e);
-    this.showOTPScreen({
-      loading: true,
-      text: 'Verifying OTP...'
-    })
-    this.r.submitOTP(gel('otp').value);
+    this.showLoadError(false, 'Verifying OTP');
+    var otp = gel('otp').value;
+    if(this.tab === 'wallet'){
+      this.r.submitOTP(otp);
+    } else {
+      var user = this.user;
+      user.verify(otp, bind(this.showCardTab,this));
+    }
   },
 
   clearRequest: function(){
@@ -844,11 +874,16 @@ Session.prototype = {
     }
 
     var activeTab = $('.tab-content.shown');
+
+    if(activeTab.attr('id') === 'tab-card') {
+      activeTab = $("#"+activeTab.attr('screen'));
+    }
+
     if (activeTab[0] && this.checkInvalid(activeTab)){
       return;
     }
 
-    if (this.sub_tab) {
+    if (this.screen === 'otp' && !this.saving_card) {
       return this.onOtpSubmit(e);
     }
     this.smarty.refresh();
@@ -866,7 +901,14 @@ Session.prototype = {
 
     var data = this.getPayload(nocvv_dummy_values);
 
-    if (this.order) {
+    if(data.save && !data.app_id){
+      if(!this.saving_card){
+        this.saving_card = true;
+        return this.verifyUser();
+      } else {
+
+      }
+    } else if (this.order) {
       data.method = 'netbanking';
       data.bank = this.order.bank;
     }
@@ -895,40 +937,65 @@ Session.prototype = {
       fees: preferences.fee_bearer
     };
 
-    var errorCallback;
+    if (this.saving_card) {
+      request.paused = true;
+      request.message = 'Verifying OTP';
+      var user = this.user;
+      user.verify(
+        gel('otp').value,
+        bind(
+          function(){
+            if(user.id){
+              data.app_id = user.id;
+              this.setScreen('card');
+              this.r.emit('payment.resume');
+              this.setScreen('card');
+              this.showLoadError();
+            } else {
+              this.r.emit('payment.error', discreet.error('Invalid OTP. Re-enter to proceed.'));
+            }
+          },
+          this
+        )
+      );
+    }
+
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
       options.redirect = false;
       request.powerwallet = true;
-      errorCallback = otpErrorHandler;
-      this.sub_tab = wallet;
-      this.showOTPScreen({
-        loading: true,
-        number: true,
-        text: 'Checking for a ' + wallet + ' account associated with',
-        wallet: wallet
-      })
+      $('#otp-sec').html('Resend OTP');
+      tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
+      this.commenceOTP(wallet + ' account');
     } else {
-      errorCallback = errorHandler;
-      showLoadingMessage(loadingMessage);
+      this.showLoadError();
     }
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorCallback, this))
+      .on('payment.error', bind(errorHandler, this));
 
     if(request.powerwallet){
-      this.r.on('payment.otp.required', bind(secondfactorHandler, this));
+      this.r.on('payment.otp.required', bind(this.sendOTP, this));
     }
   },
 
   getPayload: function(nocvv_dummy_values){
     var data = this.getFormData();
-    setEmiBank(data);
 
-    if(nocvv_dummy_values){
-      data['card[cvv]'] = '000';
-      data['card[expiry_month]'] = '12';
-      data['card[expiry_year]'] = '21';
+    if(this.tab === 'card'){
+      setEmiBank(data);
+
+      var userId = this.user.id;
+      if(data.save){
+        data.app_id = userId;
+      }
+
+      if(nocvv_dummy_values){
+        data['card[cvv]'] = '000';
+        data['card[expiry_month]'] = '12';
+        data['card[expiry_year]'] = '21';
+      }
     }
+
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');

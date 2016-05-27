@@ -76,8 +76,12 @@ var discreet = {
     return /data:image\/[^;]+;base64/.test(image);
   },
 
-  defaultError: function(){
-    return {error:{description:'Payment cancelled'}};
+  error: function(message){
+    return {
+      error:{
+        description: message || 'Payment cancelled'
+      }
+    };
   },
 
   makeUrl: function(unversioned){
