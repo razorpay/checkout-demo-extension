@@ -91,7 +91,7 @@ function submitForm(action, data, method, target) {
       }
       target.location = action;
       return;
-    } else {
+    } else if (target) {
       target = target.name;
     }
   }
