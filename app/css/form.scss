@@ -281,6 +281,21 @@ button {
 
 #nocvv-check {
   height: 0;
+  display: block;
   overflow: hidden;
   transition: 0.2s;
+  line-height: 20px;
+  cursor: pointer;
+  &.shown {
+    height: 20px;
+  }
+}
+
+#tab-card.nocvv {
+  .elem-wrap.third {
+    display: none;
+  }
+  .elem-wrap.two-third {
+    width: 100%;
+  }
 }

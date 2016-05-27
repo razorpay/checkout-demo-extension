@@ -68,11 +68,12 @@ function onSixDigits(e){
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
 
-  var nocvvCheck = gel('nocvv-check');
+  var nocvvCheck = gel('nocvv');
 
   if(sixDigits){
     if(isMaestro){
       if(nocvvCheck.disabled){
+        $('#nocvv-check').addClass('shown');
         nocvvCheck.disabled = false;
       }
     }
@@ -88,6 +89,7 @@ function onSixDigits(e){
     }
   }
   else {
+    $('#nocvv-check').removeClass('shown');
     nocvvCheck.disabled = true;
   }
 
@@ -116,7 +118,7 @@ function onSixDigits(e){
 function noCvvToggle(e){
   var nocvvCheck = e.target;
   var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-  $('#expiry-cvv').toggleClass('hidden', shouldHideExpiryCVV);
+  $('#tab-card').toggleClass('nocvv', shouldHideExpiryCVV);
 }
 
 function makeVisible(subject){
@@ -517,7 +519,7 @@ Session.prototype = {
     if(enabledMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
-      // this.on('change', '#nocvv-check', noCvvToggle);
+      this.on('change', '#nocvv', noCvvToggle);
     }
 
     // if(enabledMethods.wallet.mobikwik){
@@ -829,6 +831,18 @@ Session.prototype = {
   submit: function(e) {
     preventDefault(e);
 
+    var nocvv_el = gel('nocvv');
+    var nocvv_dummy_values;
+
+    if(nocvv_el){
+      validateCardNumber(gel('card_number'));
+      if(nocvv_el.checked && !nocvv_el.disabled){
+        nocvv_dummy_values = true;
+        $('.elem-expiry').removeClass('invalid');
+        $('.elem-cvv').removeClass('invalid');
+      }
+    }
+
     var activeTab = $('.tab-content.shown');
     if (activeTab[0] && this.checkInvalid(activeTab)){
       return;
@@ -839,22 +853,12 @@ Session.prototype = {
     }
     this.smarty.refresh();
 
-    var nocvv_el = gel('nocvv-check');
-    var nocvv_dummy_values;
 
     if(!this.tab && !this.order) {
       return;
     }
 
     // if card tab exists
-    if(nocvv_el){
-      validateCardNumber(gel('card_number'));
-      if(nocvv_el.checked && !nocvv_el.disabled){
-        nocvv_dummy_values = true;
-        $('.elem-expiry').removeClass('invalid');
-        $('.elem-cvv').removeClass('invalid');
-      }
-    }
 
     if(this.checkInvalid($('#form-common'))){
       return;
