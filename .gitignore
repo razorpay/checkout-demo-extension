@@ -19,3 +19,4 @@ aws-keys.json
 coverage
 /app/config.js
 /browsersync-config.js
+/httpd.conf
