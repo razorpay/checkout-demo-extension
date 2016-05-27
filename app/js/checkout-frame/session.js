@@ -631,9 +631,9 @@ Session.prototype = {
     // } else {
       this.setSavedCards(user);
       this.setScreen('card');
-    //   return true;
+      return true;
     // }
-    $('#otp-sec').html('Skip saved cards');
+    // $('#otp-sec').html('Skip saved cards');
   },
 
   setSavedCards: function(user){
@@ -747,7 +747,7 @@ Session.prototype = {
     }
 
     if(tab === 'card'){
-      var screen = gel('tab-card').getAttribute('screen');
+      screen = gel('tab-card').getAttribute('screen');
 
       if(screen === 'add-card'){
         fillData($("#"+screen), data);
@@ -919,8 +919,9 @@ Session.prototype = {
     });
 
     var wallet = data.wallet;
+    var walletObj;
     if (data.method === 'wallet') {
-      var walletObj = freqWallets[wallet];
+      walletObj = freqWallets[wallet];
 
       if (!walletObj || walletObj.custom) {
         return;

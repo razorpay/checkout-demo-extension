@@ -84,12 +84,16 @@ function map( iteratee, mapFunc ) {
 }
 
 function submitForm(action, data, method, target) {
-  if (method === 'get' && typeof target !== 'string') {
-    if (!target) {
-      target = window;
+  if (typeof target !== 'string') {
+    if (method === 'get' && !(data instanceof Array)) {
+      if (!target) {
+        target = window;
+      }
+      target.location = action;
+      return;
+    } else {
+      target = target.name;
     }
-    target.location = action;
-    return;
   }
   var form = document.createElement('form');
   form.setAttribute('action', action);
