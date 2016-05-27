@@ -1,3 +1,14 @@
+function deleteToken(user, token){
+  var tokens = user.tokens;
+  for (var i = 0; i < tokens.count; i++){
+    if(tokens.items[i].token === token){
+      tokens.items.splice(i, 1 );
+      tokens.count--;
+      return;
+    }
+  }
+}
+
 function User (o) {
   this.id = o.id || null;
   this.phone = o.phone || '';
@@ -10,7 +21,8 @@ User.prototype = {
   lookup: function(callback){
     var user = this;
     $.ajax({
-      url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' + this.key,
+      url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' +
+      this.key,
       callback: function(data){
         user.saved = !!data.saved;
         invoke(callback, null, data, 600);
@@ -51,16 +63,19 @@ User.prototype = {
   },
 
   deleteCard: function(token, callback){
+    var user = this;
+
     if (!this.id) {
       return;
     }
 
     $.ajax({
-      url: discreet.makeUrl() + 'apps/' + this.id + '/tokens/' + token +
-        '?key_id=' + this.key,
+      url: discreet.makeUrl() + 'apps/' + user.id + '/tokens/' + token +
+        '?key_id=' + user.key,
       method: 'delete',
       callback: function(){
         callback();
+        deleteToken(user, token);
       }
     })
   }
