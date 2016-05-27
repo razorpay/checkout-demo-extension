@@ -75,18 +75,19 @@ gulp.task('compileTemplates', function() {
     .pipe(gulp.dest(assetPath('templates')));
 });
 
+let styleLintOptions = {
+  syntax: 'scss',
+  reporters: [
+    {
+      formatter: 'string',
+      console: true
+    }
+  ]
+};
 
-gulp.task('compileStyles', function(){
+gulp.task('compileStyles', function() {
   return gulp.src(paths.css)
-    .pipe(stylelint({
-      syntax: 'scss',
-      reporters: [
-        {
-          formatter: 'string',
-          console: true
-        }
-      ]
-    }))
+    .pipe(stylelint(styleLintOptions))
     .pipe(sass())
     .pipe(concat('checkout-new.css'))
     .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
@@ -138,6 +139,7 @@ gulp.task('build', function() {
 
 gulp.task('setENV', function() {
   isProduction = false;
+  styleLintOptions.failAfterError = false;
 });
 
 gulp.task('serve', ['setENV', 'build'], function() {
