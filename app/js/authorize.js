@@ -354,7 +354,7 @@ var responseTypes = {
           request.url,
           request.content,
           request.method,
-          popup.name
+          popup.window
         )
       }
     } else {
