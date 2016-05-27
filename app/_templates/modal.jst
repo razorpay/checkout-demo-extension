@@ -128,11 +128,6 @@ var gridClass = gridClasses[i-1];
                       <span class="help">Please enter a valid card number</span>
                       <div class="card-image"></div>
                       <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
-                      <label id="nocvv" for="nocvv-check">
-                        <input type="checkbox" id="nocvv-check" checked disabled>
-                        <span class="checkbox"></span>
-                        My card doesn't have expiry/CVV
-                      </label>
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
                       <label>Expiry</label>
@@ -150,9 +145,13 @@ var gridClass = gridClasses[i-1];
                       <i>&#xe604;</i>
                       <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                     </div></div>
-                    <div class="clear"></div>
+                    <label id="nocvv-check" class="clear" for="nocvv">
+                      <input type="checkbox" id="nocvv">
+                      <span class="checkbox"></span>
+                      My Maestro Card doesn't have Expiry/CVV
+                    </label>
                     <div id="elem-emi" class="double">
-                      <div class="first disabled dropdown-parent" for="emi" tabIndex="0" id="emi-check-label">
+                      <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
                         <span class="checkbox"></span>
                         Pay with EMI
                         <div id="emi-select" class="select dropdown">
@@ -166,9 +165,6 @@ var gridClass = gridClasses[i-1];
                       </div>
                       <div class="clear"></div>
                     </div>
-                    <label class="elem" for="cardsave" style="display: none">
-                      <input type="checkbox" id="cardsave"> Remember Me
-                    </label>
                   </div>
                 </div>
               {{?}}
