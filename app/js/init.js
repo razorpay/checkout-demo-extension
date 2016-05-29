@@ -44,7 +44,7 @@ Razorpay.defaults = {
       submitForm(this.callback_url, data, 'post');
     }
   },
-  'notes': {},
+  'notes': null,
   'callback_url': '',
 
   'redirect': false,
