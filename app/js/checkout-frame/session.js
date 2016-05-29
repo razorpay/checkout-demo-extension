@@ -629,7 +629,7 @@ Session.prototype = {
     // } else if ( user.saved && !user.id && !user.wants_skip ) {
     //   this.verifyUser();
     // } else {
-      this.setSavedCards(user);
+      // this.setSavedCards(user);
       this.setScreen('card');
       return true;
     // }

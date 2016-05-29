@@ -284,14 +284,11 @@ button {
 }
 
 #nocvv-check {
-  height: 0;
-  display: block;
-  overflow: hidden;
-  transition: 0.2s;
+  display: none;
   line-height: 20px;
   cursor: pointer;
   &.shown {
-    height: 20px;
+    display: block;
   }
 }
 

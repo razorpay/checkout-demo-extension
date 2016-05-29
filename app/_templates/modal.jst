@@ -153,12 +153,13 @@ var gridClass = gridClasses[i-1];
                       <i>&#xe604;</i>
                       <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                     </div></div>
-                    <label id="nocvv-check" class="clear" for="nocvv">
+                    <div class="clear"></div>
+                    <label id="nocvv-check" for="nocvv" class="gapv">
                       <input type="checkbox" id="nocvv" disabled>
                       <span class="checkbox"></span>
                       My Maestro Card doesn't have Expiry/CVV
                     </label>
-                    <div id="should-save-card" class="double clear gapv">
+                    <div id="should-save-card" class="double gapv">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1">
                         <span class="checkbox"></span>
