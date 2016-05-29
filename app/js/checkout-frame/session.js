@@ -240,7 +240,7 @@ function Session (options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.listeners = [];
-  this.tab = '';
+  this.tab = this.screen = '';
 }
 
 Session.prototype = {
@@ -592,6 +592,10 @@ Session.prototype = {
   switchTab: function(tab){
     if(typeof tab !== 'string'){
       tab = tab.currentTarget.getAttribute('tab') || '';
+    }
+
+    if(!(tab in tab_titles)){
+      tab = '';
     }
 
     // initial screen
