@@ -147,17 +147,17 @@ function setPaymentMethods(session){
     }
   )
 
-  if(session.get('amount') >= 100*10000 || availMethods.wallet instanceof Array){ // php encodes blank object as blank array
+  if(session.get('amount') >= 100*10000 || methods.wallet instanceof Array){ // php encodes blank object as blank array
     methods.wallet = {};
   }
 
-  if(availMethods.netbanking instanceof Array){
+  if(methods.netbanking instanceof Array){
     methods.netbanking = false;
   } else {
     methods.count = 1;
   }
 
-  if(availMethods.card){
+  if(methods.card){
     methods.count++;
   }
 
