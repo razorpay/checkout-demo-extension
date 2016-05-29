@@ -45,7 +45,7 @@ function initAutomaticCheckout(){
   each(
     currentScript.attributes,
     function(i, attr){
-      var name = attr.name
+      var name = attr.name.toLowerCase();
       if(/^data-/.test(name)){
         var rootObj = opts;
         name = name.replace(/^data-/,'');
@@ -67,8 +67,8 @@ function initAutomaticCheckout(){
     }
   )
 
-  var amount = opts.amount;
-  if (amount && amount.length > 0){
+  var key = opts.key;
+  if (key && key.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
   }

@@ -16,7 +16,6 @@ each(
 )
 
 function base_set(flatObj, defObj, objKey, objVal){
-  objKey = objKey.toLowerCase();
   var defaultVal = defObj[objKey];
   if(typeof objVal === 'number'){
     objVal = String(objVal);
