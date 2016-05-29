@@ -184,10 +184,6 @@ function base_configure(overrides){
   validateOverrides(options);
   setNotes(options);
 
-  if(overrides.parent){
-    options.set('parent', overrides.parent);
-  }
-
   return options;
 }
 
