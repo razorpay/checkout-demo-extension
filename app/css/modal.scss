@@ -172,7 +172,7 @@ i {
   height: 100%;
   text-align: center;
   transition: 0.3s ease-out opacity;
-  transform: translate3d(0, 0, 0);
+  // transform: translate3d(0, 0, 0);
   z-index: 19999;
 
   &.shown {

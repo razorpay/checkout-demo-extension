@@ -80,6 +80,10 @@
     }
     var rzp1 = new Razorpay(options);
 
+    // rzp1.on('payment.error', function(data){
+    //   console.log(data);
+    // });
+
     document.getElementById('rzp-button1').onclick = function(e) {
       rzp1.open();
       e.preventDefault();

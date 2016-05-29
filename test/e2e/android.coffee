@@ -53,10 +53,10 @@ describe 'redirect on submit with valid payload', ->
 
     exec (message, checkoutPostUrl) ->
       form = HTMLFormElement.prototype.submit.thisValues[0]
-      expect form.getAttribute('method')
+      expect form.getAttribute 'method'
         .to.be 'post'
 
-      expect form.getAttribute('action')
+      expect form.getAttribute 'action'
         .to.be checkoutPostUrl
 
       payload = {}

@@ -433,6 +433,14 @@ CheckoutFrame.prototype = {
     );
   },
 
+  onerror: function(data){
+    try{
+      if (data.error.description !== 'Payment cancelled') {
+        this.rzp.emit('payment.error', data);
+      }
+    } catch(e){}
+  },
+
   onfailure: function(data){
     this.ondismiss();
     alert('Payment Failed.\n' + data.error.description);

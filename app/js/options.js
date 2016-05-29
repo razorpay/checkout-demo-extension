@@ -53,7 +53,7 @@ function Options(options){
 
   var defaults = Razorpay.defaults;
   options = flatten(options, defaults);
-
+debugger
   this.get = function(key){
     if(!arguments.length){
       return options;
