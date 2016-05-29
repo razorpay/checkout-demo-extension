@@ -116,11 +116,9 @@ $max-height: 659px;
   }
 }
 
-body {
-  &.android,
-  &.noanim {
-    #modal {
-      transition: none !important;
-    }
+.noanim {
+  #modal {
+    transition: none !important;
+    animation: none !important;
   }
 }
