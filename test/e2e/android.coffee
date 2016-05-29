@@ -11,6 +11,8 @@ message =
       contact: '18002700323'
       email: 'pranav@razorpay.com'
     redirect: true
+    notes:
+      sooji: 'hai'
 
 describe 'page load', ->
   browser.url androidUrl
@@ -76,4 +78,5 @@ describe 'redirect on submit with valid payload', ->
           bank: 'SBIN'
           description: 'hello'
           method: 'netbanking'
+          'notes[sooji]': 'hai'
     , message, checkoutPostUrl
