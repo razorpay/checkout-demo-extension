@@ -207,10 +207,6 @@ function errorHandler(response){
   $('#fd-hide').focus();
 }
 
-function getTab(tab){
-  return $('#tab-' + tab);
-}
-
 function getPhone(){
   return gel('contact').value;
 }
@@ -600,7 +596,7 @@ Session.prototype = {
 
     // initial screen
     if (!this.tab){
-      if (this.checkInvalid($('#form-common'))) {
+      if (this.checkInvalid('#form-common')) {
         return;
       }
       this.user.setPhone(getPhone());
@@ -653,7 +649,10 @@ Session.prototype = {
   },
 
   toggleSavedCards: function(){
-    $('#tab-card').toggleClass('saved-cards');
+    var tabCard = $('#tab-card');
+    var saveClass = 'saved-cards';
+    var saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
+    tabCard.toggleClass(saveClass, this.savedCardScreen);
     // var user = this.user;
 
     // if(user.wants_skip) {
@@ -710,8 +709,8 @@ Session.prototype = {
     this.smarty.input({target: select});
   },
 
-  checkInvalid: function($parent) {
-    var invalids = $parent.find('.invalid');
+  checkInvalid: function(parent) {
+    var invalids = $(parent).find('.invalid');
     if(invalids[0]){
       this.shake();
       var invalidInput = $(invalids[0]).find('.input')[0];
@@ -726,41 +725,42 @@ Session.prototype = {
     }
   },
 
-  getFormData: function(){
-    var tab = this.tab || '';
-    var data = {};
-    var activeTab;
-    var screen = '';
+  getActiveForm: function(tab){
+    if (tab === 'card') {
+      var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
+      return $('#' + whichCardTab + '-container');
+    }
+    return $('#tab-' + tab);
+  },
 
-    // TODO: Refactor this code
+  getFormData: function(){
+    var tab = this.tab;
+    var data = {};
 
     fillData($('#form-common'), data);
 
-    if(tab){
-      activeTab = getTab(tab);
+    if (tab) {
       data.method = tab;
-      fillData(activeTab, data);
-    }
+      fillData(this.getActiveForm(tab), data);
 
-    var cardNumberKey = 'card[number]';
-    var cardExpiryKey = 'card[expiry]';
-    var cardCvvKey = 'card[cvv]';
-
-    if (tab === 'card') {
-      if (data.token) {
-        delete data[cardNumberKey];
-        delete data['card[name]'];
-        var cvvEl = gel('card-cvv-' + data.token);
-        if (cvvEl) {
-          data['card[cvv]'] = cvvEl.value;
+      if (tab === 'card') {
+        var cardNumberKey = 'card[number]';
+        var cardExpiryKey = 'card[expiry]';
+        if (this.savedCardScreen) {
+          if (data.token) {
+            var cvvEl = gel('card-cvv-' + data.token);
+            if (cvvEl) {
+              data['card[cvv]'] = cvvEl.value;
+            }
+          }
+        } else {
+          data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
+          var expiry = data[cardExpiryKey].replace(/[^0-9\/]/g, '').split('/');
+          data['card[expiry_month]'] = expiry[0];
+          data['card[expiry_year]'] = expiry[1];
+          delete data[cardExpiryKey];
         }
-      } else {
-        data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
-        var expiry = data[cardExpiryKey].replace(/[^0-9\/]/g, '').split('/');
-        data['card[expiry_month]'] = expiry[0];
-        data['card[expiry_year]'] = expiry[1];
       }
-      delete data[cardExpiryKey];
     }
     return data;
   },
@@ -850,53 +850,54 @@ Session.prototype = {
 
   submit: function(e) {
     preventDefault(e);
-
-    var nocvv_el = gel('nocvv');
-    var nocvv_dummy_values;
-
-    if(nocvv_el){
-      validateCardNumber(gel('card_number'));
-      if(nocvv_el.checked && !nocvv_el.disabled){
-        nocvv_dummy_values = true;
-        $('.elem-expiry').removeClass('invalid');
-        $('.elem-cvv').removeClass('invalid');
-      }
-    }
-
-    var activeTab = $('.tab-content.shown');
-
-    if (activeTab[0] && this.checkInvalid(activeTab)){
-      return;
-    }
-
-    if (this.screen === 'otp' && !this.saving_card) {
-      return this.onOtpSubmit(e);
-    }
     this.smarty.refresh();
 
-
-    if(!this.tab && !this.order) {
+    if (this.checkInvalid('#form-common')) {
       return;
     }
 
-    // if card tab exists
+    var tab = this.tab;
+    var data = this.getPayload();
 
-    if(this.checkInvalid($('#form-common'))){
-      return;
-    }
-
-    var data = this.getPayload(nocvv_dummy_values);
-
-    if(data.save && !data.app_id){
-      if(!this.saving_card){
-        this.saving_card = true;
-        return this.verifyUser();
-      } else {
-
-      }
-    } else if (this.order) {
+    if (this.order) {
       data.method = 'netbanking';
       data.bank = this.order.bank;
+    } else if (tab) {
+      var activeForm = this.getActiveForm(tab);
+      if (!activeForm) {
+        return;
+      }
+
+      if (tab === card && !this.savedCardScreen) {
+        // handling add new card screen
+        validateCardNumber(gel('card_number'));
+        var nocvv_el = gel('nocvv-check');
+
+        // if maestro card is active
+        if (nocvv_el.checked && !nocvv_el.disabled) {
+          $('.elem-expiry').removeClass('invalid');
+          $('.elem-cvv').removeClass('invalid');
+          data['card[cvv]'] = '000';
+          data['card[expiry_month]'] = '12';
+          data['card[expiry_year]'] = '21';
+        }
+
+        // ask user to verify phone number if not logged in and wants to save card
+        if (data.save && !data.app_id && !this.saving_card) {
+          this.saving_card = true;
+          return this.verifyUser();
+        }
+      }
+
+      if (this.checkInvalid(activeForm)) {
+        return;
+      }
+
+      if (this.screen === 'otp' && !this.saving_card) {
+        return this.onOtpSubmit(e);
+      }
+    } else {
+      return;
     }
 
     Razorpay.sendMessage({
@@ -934,7 +935,6 @@ Session.prototype = {
           function(){
             if(user.id){
               data.app_id = user.id;
-              this.setScreen('card');
               this.r.emit('payment.resume');
               this.setScreen('card');
               this.showLoadError();
@@ -965,7 +965,7 @@ Session.prototype = {
     }
   },
 
-  getPayload: function(nocvv_dummy_values){
+  getPayload: function(){
     var data = this.getFormData();
 
     if(this.tab === 'card'){
@@ -975,14 +975,7 @@ Session.prototype = {
       if(data.save){
         data.app_id = userId;
       }
-
-      if(nocvv_dummy_values){
-        data['card[cvv]'] = '000';
-        data['card[expiry_month]'] = '12';
-        data['card[expiry_year]'] = '21';
-      }
     }
-
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
