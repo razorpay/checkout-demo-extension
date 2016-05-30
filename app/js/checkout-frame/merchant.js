@@ -113,7 +113,7 @@ var emi_options = sessProto.emi_options = {
 emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
 
 var tab_titles = sessProto.tab_titles = {
-  card: 'Card/EMI',
+  card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet'
 }
@@ -147,6 +147,11 @@ function setPaymentMethods(session){
       }
     }
   )
+
+  if (methods.emi) {
+    tab_titles.card += '/EMI';
+    sessProto = tab_titles;
+  }
 
   if (session.get('amount') >= 100*10000 || methods.wallet instanceof Array) { // php encodes blank object as blank array
     methods.wallet = {};
