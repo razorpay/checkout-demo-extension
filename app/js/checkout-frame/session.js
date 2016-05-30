@@ -24,9 +24,9 @@ function formatCvvHelp(el_cvv, cvvlen){
   $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
 }
 
-function fillData($container, returnObj) {
+function fillData(container, returnObj) {
   each(
-    $container.find('input[name],select[name]'),
+    $(container).find('input[name],select[name]'),
     function(i, el){
       if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
@@ -728,16 +728,16 @@ Session.prototype = {
   getActiveForm: function(tab){
     if (tab === 'card') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
-      return $('#' + whichCardTab + '-container');
+      return '#' + whichCardTab + '-container';
     }
-    return $('#tab-' + tab);
+    return '#tab-' + tab;
   },
 
   getFormData: function(){
     var tab = this.tab;
     var data = {};
 
-    fillData($('#form-common'), data);
+    fillData('#form-common', data);
 
     if (tab) {
       data.method = tab;
@@ -863,12 +863,10 @@ Session.prototype = {
       data.method = 'netbanking';
       data.bank = this.order.bank;
     } else if (tab) {
-      var activeForm = this.getActiveForm(tab);
-      if (!activeForm) {
-        return;
+      if (this.screen === 'otp' && !this.saving_card) {
+        return this.onOtpSubmit(e);
       }
-
-      if (tab === card && !this.savedCardScreen) {
+      if (tab === 'card' && !this.savedCardScreen) {
         // handling add new card screen
         validateCardNumber(gel('card_number'));
         var nocvv_el = gel('nocvv-check');
@@ -881,20 +879,16 @@ Session.prototype = {
           data['card[expiry_month]'] = '12';
           data['card[expiry_year]'] = '21';
         }
-
-        // ask user to verify phone number if not logged in and wants to save card
-        if (data.save && !data.app_id && !this.saving_card) {
-          this.saving_card = true;
-          return this.verifyUser();
-        }
       }
 
-      if (this.checkInvalid(activeForm)) {
+      if (this.checkInvalid(this.getActiveForm(tab))) {
         return;
       }
 
-      if (this.screen === 'otp' && !this.saving_card) {
-        return this.onOtpSubmit(e);
+      // ask user to verify phone number if not logged in and wants to save card
+      if (data.save && !data.app_id && !this.saving_card) {
+        this.saving_card = true;
+        return this.verifyUser();
       }
     } else {
       return;
