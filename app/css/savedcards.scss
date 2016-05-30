@@ -1,8 +1,44 @@
 @import "common";
 
-$padding-left: 5px;
+#toggle-saved-cards {
+  padding: 6px 0;
+  cursor: pointer;
+  margin: 8px 0 2px;
+  display: none;
+  &.shown {
+    display: block;
+  }
+}
 
-#saved-cards {
+#show-saved-cards {
+  background: left center no-repeat url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAgCAYAAABpRpp6AAAAAXNSR0IArs4c6QAAA9FJREFUWAnVlz1rVEEUhmfuboIa0kiKIKuIjTYWWon6B2Iv6awkQrSy0dI/oI1aJAjaCIJg4R+wsAnEFIIJFguK2UJQYqKkiLkz43nPmXM/du9qNpC964TsmTnzcZ77zpm5u9YMWGZm78wEZxaDCa1Acy39w+6l6FhYlO75ljoCOWG5P9bZZ2wnaZi5pnTt/dOlfjGE0OIZMQBTqyPDgKOMhMAYy7anV0D7AdPwVvB2cXBg71o2EhI41SwBgKSilHlZueALCsYp2exAa+EhyWopLu2Mbw0MHLxn3XhB2rtQIqBguq9ZRK0UlM0IZQ90hLrVqj+ztPbgwASYPTWEwOpREFHbs+oIwjvADyUI+iywUsoLQF1eQyXRteMTYF4l8L0Qko23mze99xdNYhqGtpEsl62PqzmkLoieYl2G5r7uPm2rjfNd+ttsfnhvttc/xRWIkNWRJ5QU1MULdv7N91sE+xAuG+WoylP0qR/DepTfx/zgUtN++sjs/tzitUsxSP9KhdPd9BLnPRTQ7WGimKLsFnkUNHbn1LkDo7OJubvPfIIan5o2O5s/aBIlSQ5CrT7AzvlGsLJgLhuHlXzlLkiKXOkq2RPAX5Q9jsPu/mM+dk0Odzmnkd+VChMwpW08PBwgwmuwGBs8ElysHhp0Z/V9zKd0NB5iAFwFwJpUF+DZFxeMc8cRCGV1tdM6dHgsBoVH7kc9wbCCJIIX+zEafbkP7d75RybGzdTUJK+U9Uc4AENhLtnBoBbVm+bq8/vGpbelVz6Xl9vF5oHVT585Zs6dPymvYjwjFRjv6RVBwCouLApShS6rcEOaw/9st78aT+mXps6kzhmHVEA6QmFKCdTVct1D4WAmho8qEel7CYOiVTwO3gWGZScyIyrc99DJcsP5dKSsng0l8/R1kJApNyKspjM1K2+J4aBKFKjJcNwUnTktKB26C14izW8LV7r9Q21fe90hYLlvNbDkMI6f3DZicehGQGHc+WUwK4eObooyrjxO7SmBG4KvL+LRg6cKAxhFLSSuHdiRknro5IVk5HrD1UZ/2gfwxCTb9QPHw6XqQk4ojH9oC2TV2FuzMBLAjIQTRbmB+tj0iQe7n9eWqEpFEiKE5vrayqulEQB2wgRSFOJLTp1dWns8/1Ic5c8RAKath4gZMJQuQxZbtQPrLZFDW5MkCcleXWoHlsMlcPg2Rm+znYYde1eNOxovjixX6cxt2xCerdy9/KUfsP315Kgcw34jDtg/eX3jLxnbGzz+eO/tGFXP/wdMV3WnLjUpZ9cHjZ1Ym8zVAY2Y1jQG/nn2B0uZJHj8vheMAAAAAElFTkSuQmCC');
+  background-size: 22px 16px;
+  padding-left: 30px;
+}
+
+#show-add-card {
+  display: none;
+  &::before {
+    content: '+';
+    background: $bgd;
+    padding: 3px 12px;
+    display: inline-block;
+  }
+}
+
+#tab-card.saved-cards {
+  #show-add-card,
+  #saved-cards-container {
+    display: block;
+  }
+  #show-saved-cards,
+  #new-card-container {
+    display: none;
+  }
+}
+
+#saved-cards-container {
+  display: none;
   right: 0;
   left: 0;
   bottom: 0;
@@ -41,7 +77,7 @@ $padding-left: 5px;
     max-height: $collapsedCardh;
     display: block;
     transition: 0.2s;
-    padding: 10px 19px;
+    padding: 10px 0;
   }
 
   :checked + .collapser {
@@ -53,11 +89,7 @@ $padding-left: 5px;
     transform: scale(1);
   }
 
-  .details {
-    padding: $padding-left;
-  }
-
-  .card {
+  .saved-card {
     font-size: 16px;
     line-height: 16px;
   }
@@ -74,7 +106,6 @@ $padding-left: 5px;
 
   .next {
     padding: 10px;
-    padding-left: $padding-left + 30px + 13px;
   }
 
   .cvv-wrap {

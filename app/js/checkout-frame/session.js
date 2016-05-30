@@ -241,7 +241,6 @@ function Session (options) {
   this.get = this.r.get;
   this.listeners = [];
   this.tab = this.screen = '';
-  this.cardScreen = 'add-card';
 }
 
 Session.prototype = {
@@ -466,7 +465,7 @@ Session.prototype = {
     var enabledMethods = this.methods;
 
     if(enabledMethods.card){
-      this.on('click', '#saved-cards-btn', this.showSavedCards);
+      this.on('click', '#toggle-saved-cards', this.toggleSavedCards);
     }
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
@@ -642,34 +641,29 @@ Session.prototype = {
   },
 
   setSavedCards: function(user){
-
-    if(user && user.saved) {
-      $('.saved-cards-btn').addClass('shown');
-    } else {
-      $('.saved-cards-btn').removeClass('shown');
+    var userTokens = user && user.tokens;
+    var cardTab = $('#tab-card');
+    if (userTokens) {
+      if ($$('.saved-card').length !== userTokens.length) {
+        $('#saved-cards-container').html(templates.savedcards(userTokens));
+      }
     }
-
-    if (user && user.tokens) {
-      new savedCards(user.tokens);
-    } else if(user.saved && preferences.tokens) {
-      new savedCards(preferences.tokens);
-    } else {
-      new savedCards({count: 0});
-      showCardForm();
-    }
+    $('#toggle-saved-cards').toggleClass('shown', userTokens);
+    cardTab.toggleClass('saved-cards', userTokens);
   },
 
-  showSavedCards: function(){
-    var user = this.user;
+  toggleSavedCards: function(){
+    $('#tab-card').toggleClass('saved-cards');
+    // var user = this.user;
 
-    if(user.wants_skip) {
-      user.wants_skip = false;
-      this.showCardTab();
-    }
+    // if(user.wants_skip) {
+    //   user.wants_skip = false;
+    //   this.showCardTab();
+    // }
 
-    this.cardScreen = 'saved-cards';
-    makeHidden("#add-card");
-    makeVisible("#saved-cards");
+    // this.cardScreen = 'saved-cards';
+    // makeHidden("#add-card");
+    // makeVisible("#saved-cards");
   },
 
   verifyUser: function(){
@@ -745,37 +739,28 @@ Session.prototype = {
     if(tab){
       activeTab = getTab(tab);
       data.method = tab;
-
-      if (tab !== 'card') {
-        fillData(activeTab, data);
-      }
+      fillData(activeTab, data);
     }
 
-    if(tab === 'card'){
-      screen = this.cardScreen;
+    var cardNumberKey = 'card[number]';
+    var cardExpiryKey = 'card[expiry]';
+    var cardCvvKey = 'card[cvv]';
 
-      if(screen === 'add-card'){
-        fillData($("#"+screen), data);
-
-        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
-
-        if(!data['card[expiry]']){
-          data['card[expiry]'] = '';
+    if (tab === 'card') {
+      if (data.token) {
+        delete data[cardNumberKey];
+        delete data['card[name]'];
+        var cvvEl = gel('card-cvv-' + data.token);
+        if (cvvEl) {
+          data['card[cvv]'] = cvvEl.value;
         }
-
-        if(!data['card[cvv]']){
-          data['card[cvv]'] = '';
-        }
-
-        var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
+      } else {
+        data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
+        var expiry = data[cardExpiryKey].replace(/[^0-9\/]/g, '').split('/');
         data['card[expiry_month]'] = expiry[0];
         data['card[expiry_year]'] = expiry[1];
-        delete data['card[expiry]'];
-      } else {
-        var selectedCard = $('#saved-cards .card :checked').parent();
-        fillData(selectedCard, data);
-        data.app_id = this.user.id;
       }
+      delete data[cardExpiryKey];
     }
     return data;
   },
@@ -879,10 +864,6 @@ Session.prototype = {
     }
 
     var activeTab = $('.tab-content.shown');
-
-    if (activeTab[0] && activeTab.attr('id') === 'tab-card') {
-      activeTab = $("#"+this.cardScreen);
-    }
 
     if (activeTab[0] && this.checkInvalid(activeTab)){
       return;

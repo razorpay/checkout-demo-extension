@@ -30,7 +30,7 @@ function deleteCard(e) {
 savedCards.prototype = {
   render: function() {
     this.unbind();
-    $('#saved-cards').html(templates.savedcards(this.tokens));
+    $('#saved-cards-container').html(templates.savedcards(this.tokens));
     this.bind();
   },
 
