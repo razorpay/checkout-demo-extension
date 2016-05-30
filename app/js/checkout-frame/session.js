@@ -241,6 +241,7 @@ function Session (options) {
   this.get = this.r.get;
   this.listeners = [];
   this.tab = this.screen = '';
+  this.cardScreen = 'add-card';
 }
 
 Session.prototype = {
@@ -627,17 +628,17 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
-    // if( !user.id && typeof user.saved !== 'boolean' ) {
-    //   this.commenceOTP('saved cards');
-    //   this.user.lookup(bind(this.showCardTab,this));
-    // } else if ( user.saved && !user.id && !user.wants_skip ) {
-    //   this.verifyUser();
-    // } else {
-      // this.setSavedCards(user);
+    if( !user.id && typeof user.saved !== 'boolean' ) {
+      this.commenceOTP('saved cards');
+      this.user.lookup(bind(this.showCardTab,this));
+    } else if ( user.saved && !user.id && !user.wants_skip ) {
+      this.verifyUser();
+    } else {
+      this.setSavedCards(user);
       this.setScreen('card');
       return true;
-    // }
-    // $('#otp-sec').html('Skip saved cards');
+    }
+    $('#otp-sec').html('Skip saved cards');
   },
 
   setSavedCards: function(user){
@@ -666,7 +667,7 @@ Session.prototype = {
       this.showCardTab();
     }
 
-    gel('tab-card').setAttribute('screen', 'saved-cards');
+    this.cardScreen = 'saved-cards';
     makeHidden("#add-card");
     makeVisible("#saved-cards");
   },
@@ -751,7 +752,7 @@ Session.prototype = {
     }
 
     if(tab === 'card'){
-      screen = gel('tab-card').getAttribute('screen');
+      screen = this.cardScreen;
 
       if(screen === 'add-card'){
         fillData($("#"+screen), data);
@@ -880,7 +881,7 @@ Session.prototype = {
     var activeTab = $('.tab-content.shown');
 
     if (activeTab[0] && activeTab.attr('id') === 'tab-card') {
-      activeTab = $("#"+activeTab.attr('screen'));
+      activeTab = $("#"+this.cardScreen);
     }
 
     if (activeTab[0] && this.checkInvalid(activeTab)){

@@ -1,6 +1,6 @@
 
 function showCardForm() {
-  gel('tab-card').setAttribute('screen', 'add-card');
+  getSession().cardScreen = 'add-card';
   makeHidden("#saved-cards");
   makeVisible("#add-card");
 }
