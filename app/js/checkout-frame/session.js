@@ -879,7 +879,7 @@ Session.prototype = {
 
     var activeTab = $('.tab-content.shown');
 
-    if(activeTab.attr('id') === 'tab-card') {
+    if(activeTab && activeTab.attr('id') === 'tab-card') {
       activeTab = $("#"+activeTab.attr('screen'));
     }
 

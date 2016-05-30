@@ -83,15 +83,25 @@ function map( iteratee, mapFunc ) {
   return result;
 }
 
+function isNonEmpty(obj){
+  if (obj instanceof Array) {
+    return obj.length;
+  }
+  var i;
+  if (i in obj) {
+    return true;
+  }
+}
+
 function submitForm(action, data, method, target) {
   if (typeof target !== 'string') {
-    if (method === 'get') {
+    if (method === 'get' && !isNonEmpty(data)) {
       if (!target) {
         target = window;
       }
       target.location = action;
       return;
-    } else {
+    } else if (target) {
       target = target.name;
     }
   }
