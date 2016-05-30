@@ -85,13 +85,13 @@ function map( iteratee, mapFunc ) {
 
 function submitForm(action, data, method, target) {
   if (typeof target !== 'string') {
-    if (method === 'get' && !(data instanceof Array)) {
+    if (method === 'get') {
       if (!target) {
         target = window;
       }
       target.location = action;
       return;
-    } else if (target) {
+    } else {
       target = target.name;
     }
   }
