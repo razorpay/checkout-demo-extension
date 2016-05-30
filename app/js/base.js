@@ -184,6 +184,11 @@ function base_configure(overrides){
   validateOverrides(options);
   setNotes(options);
 
+  var callback_url = options.get('callback_url');
+  if (callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)) {
+    options.set('redirect', true);
+  }
+
   return options;
 }
 

@@ -420,7 +420,7 @@ CheckoutFrame.prototype = {
     invoke(
       function(){
         try{
-          this.get('handler')(data);
+          invoke(this.get('handler'), this, data);
         }
         catch(e){
           track(rzp, 'js_error', e);

@@ -40,8 +40,11 @@ Razorpay.defaults = {
   'currency': 'INR',
   'order_id': '',
   'handler': function(data){
-    if(this.callback_url){
-      submitForm(this.callback_url, data, 'post');
+    if (this instanceof Razorpay) {
+      var callback_url = this.get('callback_url');
+      if(callback_url){
+        submitForm(callback_url, data, 'post');
+      }
     }
   },
   'notes': null,
