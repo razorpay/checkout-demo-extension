@@ -1024,6 +1024,7 @@ Session.prototype = {
         this.emi.unbind();
       }
 
+      this.tab = this.screen = '';
       this.modal =
       this.smarty =
       this.card =
