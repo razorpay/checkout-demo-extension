@@ -240,10 +240,12 @@ $.prototype = {
       return this;
     }
     var el = this[0];
-    if(arguments.length === 1){
-      return el.getAttribute(attr);
+    if (el) {
+      if(arguments.length === 1){
+        return el.getAttribute(attr);
+      }
+      el.setAttribute(attr, val);
     }
-    el.setAttribute(attr, val);
     return this;
   },
 
