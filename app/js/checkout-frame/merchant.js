@@ -149,7 +149,7 @@ function setPaymentMethods(session){
   )
 
   if (methods.emi) {
-    tab_titles.card += '/EMI';
+    tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   }
 
