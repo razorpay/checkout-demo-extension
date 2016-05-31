@@ -450,10 +450,9 @@ Session.prototype = {
   },
 
   addFunds: function(event) {
-    this.showOTPScreen({
-      text: 'Loading...',
-      loading: true
-    });
+    setOtpText('Loading...');
+    $('#add-funds').toggleClass('shown');
+    $('#tab-otp').removeClass('action').addClass('loading').css('display', 'block');
 
     this.r.topupWallet();
   },
