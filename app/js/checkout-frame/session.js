@@ -451,7 +451,7 @@ Session.prototype = {
 
   addFunds: function(event) {
     setOtpText('Loading...');
-    $('#add-funds').toggleClass('shown');
+    $('#add-funds').removeClass('shown').css('display', 'none');
     $('#tab-otp').removeClass('action').addClass('loading').css('display', 'block');
 
     this.r.topupWallet();
@@ -472,6 +472,7 @@ Session.prototype = {
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
     this.on('click', '#add-funds-action', this.addFunds);
+    this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
     var enabledMethods = this.methods;
 
     if(enabledMethods.card){
@@ -992,7 +993,7 @@ Session.prototype = {
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
       this.r.on('payment.wallet.topup', function() {
         $('#tab-otp').css('display', 'none');
-        $('#add-funds').toggleClass('shown');
+        $('#add-funds').addClass('shown').css('display', 'block');
         gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
       });
     }
