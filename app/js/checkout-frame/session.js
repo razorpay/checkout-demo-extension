@@ -1020,6 +1020,8 @@ Session.prototype = {
       this.card.unbind();
       $(this.el).remove();
 
+      this.tab = this.screen = '';
+
       if(this.emi){
         this.emi.unbind();
       }

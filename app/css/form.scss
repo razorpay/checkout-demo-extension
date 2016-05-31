@@ -64,6 +64,7 @@ label[for] {
     left: $left;
     z-index: 1;
     pointer-events: none;
+    white-space: nowrap;
   }
 }
 
