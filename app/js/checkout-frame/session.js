@@ -636,6 +636,22 @@ Session.prototype = {
     $('#otp-sec').html('Skip saved cards');
   },
 
+  deleteCard: function(e) {
+    var target = $(e.target);
+    if (!target.hasClass('delete')) {
+      return;
+    }
+    var parent = target.parent().parent();
+    var user = this.user;
+    if(confirm("Press OK to delete card.")){
+      user.deleteCard(
+        parent.find('[type=radio]')[0].value,
+        function(){
+          parent.remove();
+      });
+    }
+  },
+
   setSavedCards: function(user){
     var userTokens = user && user.tokens;
     var cardTab = $('#tab-card');
@@ -644,6 +660,8 @@ Session.prototype = {
         $('#saved-cards-container').html(templates.savedcards(userTokens));
       }
     }
+
+    this.on('click', '.saved-card', this.deleteCard);
     $('#toggle-saved-cards').toggleClass('shown', userTokens);
     cardTab.toggleClass('saved-cards', userTokens);
   },
