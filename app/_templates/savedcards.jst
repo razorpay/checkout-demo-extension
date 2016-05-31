@@ -17,17 +17,12 @@
       cvv_digits = 4;
     }
   }}
-  <div class='saved-card'>
+  <div class='saved-card' cardtype="{{=network}}">
     <input type='radio' id='saved-card-{{=i}}' name='token' value='{{=item.token}}'/>
     <label class='collapser' for='saved-card-{{=i}}'>
-      <div class="delete">×</div>
-      <div class='details mfix'>
-        <span class='card-ico mchild {{=network}}'></span>
-        <span class='mchild'>XXXX XXXX XXXX {{=item.card.last4}}</span>
-      </div>
-      <div class='next mfix'>
-        <span class='cvv-wrap mchild'><input class='input card-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' name='card[cvv]' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3}'></span>
-      </div>
+      <div class="card-delete">×</div>
+      XXXX XXXX XXXX {{=item.card.last4}}</span>
+      <input class='saved-card-cvv' type='password' placeholder='Enter CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3,4}'></span>
     </label>
   </div>
 {{~}}

@@ -644,8 +644,10 @@ Session.prototype = {
         $('#saved-cards-container').html(templates.savedcards(userTokens));
       }
     }
-    $('#toggle-saved-cards').toggleClass('shown', userTokens);
-    cardTab.toggleClass('saved-cards', userTokens);
+    if (userTokens) {
+      $('#toggle-saved-cards').addClass('shown');
+      this.toggleSavedCards();
+    }
   },
 
   toggleSavedCards: function(){
@@ -653,16 +655,6 @@ Session.prototype = {
     var saveClass = 'saved-cards';
     var saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
     tabCard.toggleClass(saveClass, this.savedCardScreen);
-    // var user = this.user;
-
-    // if(user.wants_skip) {
-    //   user.wants_skip = false;
-    //   this.showCardTab();
-    // }
-
-    // this.cardScreen = 'saved-cards';
-    // makeHidden("#add-card");
-    // makeVisible("#saved-cards");
   },
 
   verifyUser: function(){
