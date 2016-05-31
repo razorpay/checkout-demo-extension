@@ -441,6 +441,7 @@ Session.prototype = {
 
   secAction: function() {
     if(this.tab === 'wallet'){
+      this.showLoadError(false, 'Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
