@@ -397,14 +397,87 @@ i {
   height: $topbarh;
   z-index: 2;
 
-  &:hover {
-    color: #404040;
-  }
-
   img {
     display: block;
     margin-top: 15px;
   }
+}
+
+#top-right,
+#top-left {
+  transition: 0.2s;
+}
+
+#top-right:hover,
+#top-left:hover {
+  color: #404040;
+}
+
+$arrow-height: 10px;
+$outline: #ddd;
+
+#profile {
+  position: absolute;
+  background: #fff;
+  border-radius: 2px;
+  border: 1px solid $outline;
+  top: $topbarh;
+  right: 5px;
+  margin-top: $arrow-height;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    padding: 10px;
+    font-size: 14px;
+    line-height: 19px;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+
+  li:first-child::before,
+  li:first-child::after {
+    content: '';
+    top: -$arrow-height;
+    right: 15px;
+    position: absolute;
+    border-width: 0 $arrow-height $arrow-height $arrow-height;
+    border-color: transparent transparent $outline transparent;
+    border-style: solid;
+  }
+
+  li:first-child::after {
+    margin-top: 1.5px;
+    border-color: transparent transparent #fff transparent;
+  }
+
+  li:first-child:hover::after {
+    border-color: transparent transparent #f5f5f5 transparent;
+  }
+}
+
+#profile {
+  display: none\9;
+  pointer-events: none;
+
+  @include opacity(0);
+  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+  transform: translateY(-10px);
+}
+
+#top-right:focus #profile {
+  pointer-events: auto;
+  display: block;
+
+  @include opacity(1);
+  transform: none;
+  transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
 }
 
 #tab-title {

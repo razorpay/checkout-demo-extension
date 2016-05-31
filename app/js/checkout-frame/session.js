@@ -453,7 +453,7 @@ Session.prototype = {
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
     }
-    this.on('click', '#topbar', this.switchTab);
+    this.on('click', '#top-left', this.switchTab);
     this.on('click', '#user', function(e){
       e.preventDefault();
       e.stopPropagation();
