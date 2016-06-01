@@ -847,8 +847,14 @@ Session.prototype = {
 
   onOtpSubmit: function(e){
     preventDefault(e);
+
+    if (this.checkInvalid('#tab-otp')) {
+      return;
+    }
+
     this.showLoadError(false, 'Verifying OTP');
     var otp = gel('otp').value;
+
     if(this.tab === 'wallet'){
       this.r.submitOTP(otp);
     } else {
