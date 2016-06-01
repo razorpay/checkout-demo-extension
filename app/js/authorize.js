@@ -263,8 +263,8 @@ Payment.prototype = {
     return this.ajax;
   },
 
-  tryPopup: function(){
-    if(this.powerwallet && !this.add_funds) {
+  tryPopup: function(forced){
+    if(this.powerwallet && !forced) {
       return null;
     }
 
@@ -414,19 +414,15 @@ razorpayProto.resendOTP = function(callback){
 
 razorpayProto.topupWallet = function() {
   var payment = this._payment;
-  payment.add_funds = true;
-  payment.tryPopup();
+  payment.tryPopup(true);
 
   payment.ajax = $.post({
     url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: function(response) {
-      ajaxCallback.call(payment, response);
-      payment.add_funds = false;
-    }
-  })
+    callback: bind(ajaxCallback, payment)
+  });
 }
 
 Razorpay.payment = {

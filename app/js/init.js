@@ -24,10 +24,6 @@ else {
     hostname: 'api.razorpay.com',
     version: 'v1/'
   }
-
-  if (new RegExp(/razorpay\.com\/betademo/).test(window.location.href)) {
-    RazorpayConfig.hostname = 'beta.razorpay.com';
-  }
 }
 
 var Razorpay = window.Razorpay = function(options){

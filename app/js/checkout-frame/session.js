@@ -451,7 +451,7 @@ Session.prototype = {
 
   addFunds: function(event) {
     setOtpText('Loading...');
-    $('#add-funds').removeClass('shown').css('display', 'none');
+    $('#add-funds').removeClass('show');
     $('#tab-otp').removeClass('action').addClass('loading').css('display', 'block');
 
     this.r.topupWallet();
@@ -825,6 +825,7 @@ Session.prototype = {
 
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
+    $('#add-funds').removeClass('show');
     $('#tab-otp').css('display', 'block');
     invoke('addClass', $('#footer'), 'otp', 300);
 
@@ -992,8 +993,8 @@ Session.prototype = {
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
       this.r.on('payment.wallet.topup', function() {
-        $('#tab-otp').removeClass('shown').css('display', 'none');
-        $('#add-funds').addClass('shown').css('display', 'block');
+        $('#tab-otp').removeClass('loading');
+        $('#add-funds').addClass('show');
         gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
       });
     }
