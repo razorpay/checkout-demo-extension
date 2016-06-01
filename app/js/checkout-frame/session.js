@@ -986,6 +986,10 @@ Session.prototype = {
   },
 
   getPayload: function(){
+    if(this.screen === 'otp') {
+      return;
+    }
+
     var data = this.getFormData();
 
     if(this.tab === 'card'){
