@@ -131,16 +131,13 @@ var gridClass = gridClasses[i-1];
               {{? method.card }}
                 <div class="tab-content showable screen pad" id="form-card">
                   <div id="saved-cards-container"></div>
-                  <div id="toggle-saved-cards">
-                    <span id="show-saved-cards">Use saved cards</span>
-                    <span id="show-add-card">Add new card</span>
-                  </div>
+                  <span id="show-add-card">Add another card</span>
                   <div id="add-card-container">
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
+                      <div class="cardtype"></div>
                       <label>Card Number</label>
                       <i>&#xe605;</i>
                       <span class="help">Please enter a valid card number</span>
-                      <div class="card-image"></div>
                       <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
@@ -160,12 +157,12 @@ var gridClass = gridClasses[i-1];
                       <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                     </div></div>
                     <div class="clear"></div>
-                    <label id="nocvv-check" for="nocvv" class="gapv">
+                    <label id="nocvv-check" for="nocvv">
                       <input type="checkbox" id="nocvv" disabled>
                       <span class="checkbox"></span>
                       My Maestro Card doesn't have Expiry/CVV
                     </label>
-                    <div id="should-save-card" class="double gapv">
+                    <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>
                         <span class="checkbox"></span>
@@ -179,7 +176,7 @@ var gridClass = gridClasses[i-1];
                       <div class="clear"></div>
                     </div>
                   </div>
-                  <div id="elem-emi" class="double gapv">
+                  <div id="elem-emi" class="double">
                     <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
                       <span class="checkbox"></span>
                       Pay with EMI

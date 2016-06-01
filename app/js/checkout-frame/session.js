@@ -136,6 +136,10 @@ function makeHidden(subject){
   }
 }
 
+function toggle(subject, showOrHide){
+  (showOrHide ? makeVisible : makeHidden)(subject);
+}
+
 function showOverlay($with){
   makeVisible('#overlay');
   if($with){
@@ -460,10 +464,6 @@ Session.prototype = {
     this.on('click', '#otp-sec', this.secAction);
     var enabledMethods = this.methods;
 
-    if(enabledMethods.card){
-      this.on('click', '#toggle-saved-cards', this.toggleSavedCards);
-    }
-
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -497,14 +497,16 @@ Session.prototype = {
     card.setType = function(e){
       var el = e.target;
       var type = card.getType(el.value) || 'unknown';
-      var parent = el.parentNode;
 
-      var oldType = parent.getAttribute('cardtype');
+      // card icon element
+      var iconEl = el.parentNode.querySelector('.cardtype');
+
+      var oldType = iconEl.getAttribute('cardtype');
       if(type === oldType){
         return;
       }
 
-      parent.setAttribute('cardtype', type);
+      iconEl.setAttribute('cardtype', type);
       validateCardNumber(el);
 
       if(type === 'amex' || oldType === 'amex'){
@@ -666,7 +668,9 @@ Session.prototype = {
     // runs one time only
     if (saveScreen === undefined) {
       // important to bind just once
-      // this.on('click', '.saved-card', this.deleteCard);
+      var self = this;
+      this.on('click', '#show-add-card', function(){ self.toggleSavedCards(false) });
+      this.on('click', '#show-saved-cards', function(){ self.toggleSavedCards(true) });
       saveScreen = this.savedCardScreen = !!userTokens;
     }
     this.toggleSavedCards(saveScreen);
