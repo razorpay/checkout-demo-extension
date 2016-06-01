@@ -754,9 +754,12 @@ Session.prototype = {
       if (tab === 'card') {
         var cardNumberKey = 'card[number]';
         var cardExpiryKey = 'card[expiry]';
+
+        // TODO: add fill data with emi field here
+
         if (this.savedCardScreen) {
           if (data.token) {
-            var cvvEl = gel('card-cvv-' + data.token);
+            var cvvEl = gel('card_cvv-' + data.token);
             if (cvvEl) {
               data['card[cvv]'] = cvvEl.value;
             }
@@ -880,22 +883,33 @@ Session.prototype = {
       if (this.screen === 'otp' && !this.saving_card) {
         return this.onOtpSubmit(e);
       }
-      if (tab === 'card' && !this.savedCardScreen) {
-        // handling add new card screen
-        validateCardNumber(gel('card_number'));
-        var nocvv_el = gel('nocvv-check');
+      if (tab === 'card') {
+        if (!this.savedCardScreen) {
+          // handling add new card screen
+          validateCardNumber(gel('card_number'));
+          var nocvv_el = gel('nocvv-check');
 
-        // if maestro card is active
-        if (nocvv_el.checked && !nocvv_el.disabled) {
-          $('.elem-expiry').removeClass('invalid');
-          $('.elem-cvv').removeClass('invalid');
-          data['card[cvv]'] = '000';
-          data['card[expiry_month]'] = '12';
-          data['card[expiry_year]'] = '21';
+          // if maestro card is active
+          if (nocvv_el.checked && !nocvv_el.disabled) {
+            $('.elem-expiry').removeClass('invalid');
+            $('.elem-cvv').removeClass('invalid');
+            data['card[cvv]'] = '000';
+            data['card[expiry_month]'] = '12';
+            data['card[expiry_year]'] = '21';
+          }
+        } else {
+          // TODO: improve this code
+          if (!$('.saved-card :checked')[0]) {
+            this.shake();
+            return;
+          }
+          if (this.checkInvalid('.saved-card :checked')){
+            return;
+          }
         }
       }
 
-      if (this.checkInvalid(this.getActiveForm(tab))) {
+      if (!this.savedCardScreen && this.checkInvalid(this.getActiveForm(tab))) {
         return;
       }
 
@@ -984,7 +998,7 @@ Session.prototype = {
       setEmiBank(data);
 
       var userId = this.user.id;
-      if(data.save){
+      if(data.save || this.savedCardScreen){
         data.app_id = userId;
       }
     }
