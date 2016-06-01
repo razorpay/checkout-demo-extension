@@ -636,6 +636,22 @@ Session.prototype = {
     $('#otp-sec').html('Skip saved cards');
   },
 
+  deleteCard: function(e) {
+    var target = $(e.target);
+    if (!target.hasClass('delete')) {
+      return;
+    }
+    var parent = target.parent().parent();
+    var user = this.user;
+    if(confirm("Press OK to delete card.")){
+      user.deleteCard(
+        parent.find('[type=radio]')[0].value,
+        function(){
+          parent.remove();
+      });
+    }
+  },
+
   setSavedCards: function(user){
     var userTokens = user && user.tokens;
     var cardTab = $('#tab-card');
@@ -643,8 +659,8 @@ Session.prototype = {
       if ($$('.saved-card').length !== userTokens.length) {
         $('#saved-cards-container').html(templates.savedcards(userTokens));
       }
-    }
-    if (userTokens) {
+
+      this.on('click', '.saved-card', this.deleteCard);
       $('#toggle-saved-cards').addClass('shown');
       this.toggleSavedCards();
     }
@@ -654,7 +670,7 @@ Session.prototype = {
     var tabCard = $('#tab-card');
     var saveClass = 'saved-cards';
     var saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
-    tabCard.toggleClass(saveClass, this.savedCardScreen);
+    tabCard.toggleClass(saveClass, saveScreen);
   },
 
   verifyUser: function(){
@@ -820,8 +836,14 @@ Session.prototype = {
 
   onOtpSubmit: function(e){
     preventDefault(e);
+
+    if (this.checkInvalid('#tab-otp')) {
+      return;
+    }
+
     this.showLoadError(false, 'Verifying OTP');
     var otp = gel('otp').value;
+
     if(this.tab === 'wallet'){
       this.r.submitOTP(otp);
     } else {
@@ -952,6 +974,10 @@ Session.prototype = {
   },
 
   getPayload: function(){
+    if(this.screen === 'otp') {
+      return;
+    }
+
     var data = this.getFormData();
 
     if(this.tab === 'card'){
