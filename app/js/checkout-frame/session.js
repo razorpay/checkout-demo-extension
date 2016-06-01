@@ -659,9 +659,10 @@ Session.prototype = {
       if ($$('.saved-card').length !== userTokens.length) {
         $('#saved-cards-container').html(templates.savedcards(userTokens));
       }
+
+      this.on('click', '.saved-card', this.deleteCard);
     }
 
-    this.on('click', '.saved-card', this.deleteCard);
     $('#toggle-saved-cards').toggleClass('shown', userTokens);
     cardTab.toggleClass('saved-cards', userTokens);
   },
