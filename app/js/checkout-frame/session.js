@@ -661,10 +661,11 @@ Session.prototype = {
       }
 
       this.on('click', '.saved-card', this.deleteCard);
-    }
 
-    $('#toggle-saved-cards').toggleClass('shown', userTokens);
-    cardTab.toggleClass('saved-cards', userTokens);
+      $('#toggle-saved-cards').addClass('shown');
+      cardTab.toggleClass('saved-cards');
+      this.savedCardScreen = true;
+    }
   },
 
   toggleSavedCards: function(){
