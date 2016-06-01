@@ -32,6 +32,7 @@
   #saved-cards-container {
     display: block;
   }
+
   #show-saved-cards,
   #add-card-container {
     display: none;
@@ -40,25 +41,9 @@
 
 #saved-cards-container {
   display: none;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  top: 0;
 
-  label {
-    display: inline-block;
-  }
-
-  .cards {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 77px;
-    overflow: auto;
-  }
-
-  .delete {
+  .card-delete {
+    display: none;
     position: absolute;
     top: 10px;
     right: 10px;
@@ -66,14 +51,9 @@
     transition: 0.2s;
   }
 
-  .delete:hover {
-    color: #000;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-  }
-
   .collapser {
     position: relative;
-    height: 1000px;
+    height: 200px;
     overflow: hidden;
     max-height: $collapsedCardh;
     display: block;
@@ -95,53 +75,9 @@
     line-height: 16px;
   }
 
-  .card-ico {
-    width: 30px;
-    height: 20px;
-    background: orange;
-    background-size: 30px 20px;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 10px;
-  }
-
-  .next {
-    padding: 10px;
-  }
-
-  .cvv-wrap {
-    border-bottom: 1px solid #e6e7e8;
-
-    .input {
-      padding: 5px 10px !important;
-      width: 52px;
-    }
-  }
-
-  .options {
-    padding: 10px 24px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-  }
-
-  .plus {
-    background: #efefef;
-    padding: 0 10px;
-    color: #aeaeae;
-    font-size: 18px;
-    border-radius: 2px;
-  }
-
-  #new-card-btn {
-    cursor: pointer;
-    padding: 6px 0;
-
-    .txt {
-      padding-left: 10px;
-      font-size: 14px;
-    }
+  .saved-cvv {
+    padding: 5px 10px;
+    width: 52px;
   }
 
   .amex {

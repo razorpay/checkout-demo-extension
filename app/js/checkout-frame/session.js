@@ -666,7 +666,7 @@ Session.prototype = {
     // runs one time only
     if (saveScreen === undefined) {
       // important to bind just once
-      this.on('click', '.saved-card', this.deleteCard);
+      // this.on('click', '.saved-card', this.deleteCard);
       saveScreen = this.savedCardScreen = !!userTokens;
     }
     this.toggleSavedCards(saveScreen);
@@ -920,7 +920,7 @@ Session.prototype = {
         return this.onOtpSubmit(e);
       }
       // ask user to verify phone number if not logged in and wants to save card
-      if ((app_id in data) && !data.app_id) {
+      if (('app_id' in data) && !data.app_id) {
         this.saving_card = true;
         return this.verifyUser();
       }
