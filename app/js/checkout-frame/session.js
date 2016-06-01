@@ -118,7 +118,7 @@ function onSixDigits(e){
 function noCvvToggle(e){
   var nocvvCheck = e.target;
   var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-  $('#tab-card').toggleClass('nocvv', shouldHideExpiryCVV);
+  $('#form-card').toggleClass('nocvv', shouldHideExpiryCVV);
 }
 
 function makeVisible(subject){
@@ -217,7 +217,7 @@ function setOtpText(text){
 
 function askOTP(text){
   $('#modal').addClass('sub');
-  $('#tab-otp').removeClass('loading').removeClass('action');
+  $('#form-otp').removeClass('loading').removeClass('action');
   setOtpText(text);
 }
 
@@ -463,6 +463,7 @@ Session.prototype = {
     if(enabledMethods.card){
       this.on('click', '#toggle-saved-cards', this.toggleSavedCards);
     }
+
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -566,7 +567,7 @@ Session.prototype = {
     if (screen) {
       $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
-      makeVisible('#tab-' + screen);
+      makeVisible('#form-' + screen);
     } else {
       makeHidden('#topbar');
       makeVisible('#form-common');
@@ -654,22 +655,30 @@ Session.prototype = {
 
   setSavedCards: function(user){
     var userTokens = user && user.tokens;
-    var cardTab = $('#tab-card');
+    var cardTab = $('#form-card');
     if (userTokens) {
       if ($$('.saved-card').length !== userTokens.length) {
         $('#saved-cards-container').html(templates.savedcards(userTokens));
       }
-
-      this.on('click', '.saved-card', this.deleteCard);
-      $('#toggle-saved-cards').addClass('shown');
-      this.toggleSavedCards();
     }
+    var saveScreen = this.savedCardScreen;
+
+    // runs one time only
+    if (saveScreen === undefined) {
+      // important to bind just once
+      this.on('click', '.saved-card', this.deleteCard);
+      saveScreen = this.savedCardScreen = !!userTokens;
+    }
+    this.toggleSavedCards(saveScreen);
+    $('#toggle-saved-cards').toggleClass('shown', userTokens);
   },
 
-  toggleSavedCards: function(){
-    var tabCard = $('#tab-card');
+  toggleSavedCards: function(saveScreen){
+    var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
-    var saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
+    if (typeof saveScreen !== 'boolean') {
+      saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
+    }
     tabCard.toggleClass(saveClass, saveScreen);
   },
 
@@ -733,12 +742,13 @@ Session.prototype = {
     }
   },
 
-  getActiveForm: function(tab){
-    if (tab === 'card') {
+  getActiveForm: function(){
+    var form = this.screen;
+    if (form === 'card') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
     }
-    return '#tab-' + tab;
+    return '#form-' + form;
   },
 
   getFormData: function(){
@@ -749,14 +759,10 @@ Session.prototype = {
 
     if (tab) {
       data.method = tab;
-      fillData(this.getActiveForm(tab), data);
+      fillData(this.getActiveForm(), data);
 
-      if (tab === 'card') {
-        var cardNumberKey = 'card[number]';
-        var cardExpiryKey = 'card[expiry]';
-
+      if (this.screen === 'card') {
         // TODO: add fill data with emi field here
-
         if (this.savedCardScreen) {
           if (data.token) {
             var cvvEl = gel('card_cvv-' + data.token);
@@ -765,6 +771,8 @@ Session.prototype = {
             }
           }
         } else {
+          var cardNumberKey = 'card[number]';
+          var cardExpiryKey = 'card[expiry]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
           var expiry = data[cardExpiryKey].replace(/[^0-9\/]/g, '').split('/');
           data['card[expiry_month]'] = expiry[0];
@@ -800,7 +808,7 @@ Session.prototype = {
     if(this.isOTP()){
       $('#modal').removeClass('sub');
       setOtpText(text);
-      $('#tab-otp')[yesClass]('action')[noClass]('loading');
+      $('#form-otp')[yesClass]('action')[noClass]('loading');
     } else {
       $('#fd-t').html(text);
       showOverlay(
@@ -811,7 +819,7 @@ Session.prototype = {
 
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
-    $('#tab-otp').css('display', 'block');
+    $('#form-otp').css('display', 'block');
     invoke('addClass', $('#footer'), 'otp', 300);
 
     if(shouldLookup){
@@ -839,10 +847,6 @@ Session.prototype = {
 
   onOtpSubmit: function(e){
     preventDefault(e);
-
-    if (this.checkInvalid('#tab-otp')) {
-      return;
-    }
 
     this.showLoadError(false, 'Verifying OTP');
     var otp = gel('otp').value;
@@ -873,17 +877,15 @@ Session.prototype = {
       return;
     }
 
-    var tab = this.tab;
+    // var tab = this.tab;
+    var screen = this.screen;
     var data = this.getPayload();
 
     if (this.order) {
       data.method = 'netbanking';
       data.bank = this.order.bank;
-    } else if (tab) {
-      if (this.screen === 'otp' && !this.saving_card) {
-        return this.onOtpSubmit(e);
-      }
-      if (tab === 'card') {
+    } else if (screen) {
+      if (screen === 'card') {
         if (!this.savedCardScreen) {
           // handling add new card screen
           validateCardNumber(gel('card_number'));
@@ -909,12 +911,16 @@ Session.prototype = {
         }
       }
 
-      if (!this.savedCardScreen && this.checkInvalid(this.getActiveForm(tab))) {
+      if (this.checkInvalid(this.getActiveForm())) {
         return;
       }
 
+      // after checking validity, delegate to onOtpSubmit
+      if (screen === 'otp' && !this.saving_card) {
+        return this.onOtpSubmit(e);
+      }
       // ask user to verify phone number if not logged in and wants to save card
-      if (data.save && !data.app_id && !this.saving_card) {
+      if ((app_id in data) && !data.app_id) {
         this.saving_card = true;
         return this.verifyUser();
       }
@@ -988,17 +994,15 @@ Session.prototype = {
   },
 
   getPayload: function(){
-    if(this.screen === 'otp') {
-      return;
-    }
-
     var data = this.getFormData();
 
-    if(this.tab === 'card'){
+    if(this.screen === 'card'){
       setEmiBank(data);
 
       var userId = this.user.id;
-      if(data.save || this.savedCardScreen){
+
+      // set app_id if either new card or saved card (might be blank)
+      if (data.save || data.token) {
         data.app_id = userId;
       }
     }

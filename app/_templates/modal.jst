@@ -129,7 +129,7 @@ var gridClass = gridClasses[i-1];
               </div>
 
               {{? method.card }}
-                <div class="tab-content showable screen pad" id="tab-card">
+                <div class="tab-content showable screen pad" id="form-card">
                   <div id="saved-cards-container"></div>
                   <div id="toggle-saved-cards">
                     <span id="show-saved-cards">Use saved cards</span>
@@ -199,7 +199,7 @@ var gridClass = gridClasses[i-1];
                 </div>
               {{?}}
               {{? method.netbanking }}
-                <div class="tab-content showable screen" id="tab-netbanking">
+                <div class="tab-content showable screen" id="form-netbanking">
                   {{ var count = 0, max = 3; }}
                   <div id="netb-banks" class="clear grid count-3">
                     {{
@@ -236,7 +236,7 @@ var gridClass = gridClasses[i-1];
                 </div>
               {{?}}
               {{ if(wallet.length){ }}
-                <div class="tab-content showable screen" id="tab-wallet">
+                <div class="tab-content showable screen" id="form-wallet">
                   {{ var count = 0, max = 3; }}
                   <div id="wallets" class="clear grid count-{{=wallet.length}}">
                     {{
@@ -261,7 +261,7 @@ var gridClass = gridClasses[i-1];
                 </div>
               {{}}}
 
-              <div id="tab-otp" class="tab-content showable screen">
+              <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>
                 <div id="otp-action" class="btn">Retry</div>
                 <div id="otp-elem">
