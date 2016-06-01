@@ -661,10 +661,8 @@ Session.prototype = {
       }
 
       this.on('click', '.saved-card', this.deleteCard);
-
       $('#toggle-saved-cards').addClass('shown');
-      cardTab.toggleClass('saved-cards');
-      this.savedCardScreen = true;
+      this.toggleSavedCards();
     }
   },
 
@@ -672,17 +670,7 @@ Session.prototype = {
     var tabCard = $('#tab-card');
     var saveClass = 'saved-cards';
     var saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
-    tabCard.toggleClass(saveClass, this.savedCardScreen);
-    // var user = this.user;
-
-    // if(user.wants_skip) {
-    //   user.wants_skip = false;
-    //   this.showCardTab();
-    // }
-
-    // this.cardScreen = 'saved-cards';
-    // makeHidden("#add-card");
-    // makeVisible("#saved-cards");
+    tabCard.toggleClass(saveClass, saveScreen);
   },
 
   verifyUser: function(){
