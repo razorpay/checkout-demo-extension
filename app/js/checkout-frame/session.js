@@ -903,7 +903,7 @@ Session.prototype = {
             this.shake();
             return;
           }
-          if (this.checkInvalid('.saved-card :checked')){
+          if (this.checkInvalid('.saved-card :checked + label')){
             return;
           }
         }

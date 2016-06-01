@@ -25,8 +25,8 @@
         <span class='card-ico mchild {{=network}}'></span>
         <span class='mchild'>XXXX XXXX XXXX {{=item.card.last4}}</span>
       </div>
-      <div class='next mfix invalid'>
-        <span class='cvv-wrap mchild'><input class='input card-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' name='card[cvv]' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3,4}'></span>
+      <div class='next mfix'>
+        <span class='cvv-wrap mchild invalid'><input class='input card-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' name='card[cvv]' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3,4}'></span>
       </div>
     </label>
   </div>
