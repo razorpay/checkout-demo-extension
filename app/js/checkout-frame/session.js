@@ -992,7 +992,7 @@ Session.prototype = {
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
       this.r.on('payment.wallet.topup', function() {
-        $('#tab-otp').css('display', 'none');
+        $('#tab-otp').removeClass('shown').css('display', 'none');
         $('#add-funds').addClass('shown').css('display', 'block');
         gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
       });
