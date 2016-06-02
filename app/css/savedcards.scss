@@ -109,15 +109,15 @@
   .cardtype {
     top: 0;
     transition: 0.2s;
-  }
 
-  [cardtype=amex] {
-    border-color: #0189CF;
-    background: linear-gradient(to bottom, #53AEF5, #0167A9);
-  }
-  [cardtype=maestro] {
-    background: linear-gradient(to bottom, #FBD51F, #EFA010);
-    border-color: #DAB608;
+    &[cardtype=amex] {
+      border-color: #0189CF;
+      background: linear-gradient(to bottom, #53AEF5, #0167A9);
+    }
+    &[cardtype=maestro] {
+      background: linear-gradient(to bottom, #FBD51F, #EFA010);
+      border-color: #DAB608;
+    }
   }
 }
 
