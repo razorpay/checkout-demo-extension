@@ -978,7 +978,6 @@ Session.prototype = {
     }
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
-      options.redirect = false;
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';

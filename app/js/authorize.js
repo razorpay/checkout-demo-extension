@@ -100,7 +100,7 @@ Payment.prototype = {
 
   checkRedirect: function(){
     var getOption = this.r.get;
-    if(getOption('redirect')){
+    if(getOption('redirect') && !this.powerwallet){
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
@@ -414,14 +414,24 @@ razorpayProto.resendOTP = function(callback){
 
 razorpayProto.topupWallet = function() {
   var payment = this._payment;
-  payment.tryPopup(true);
+  var forcePopup = !payment.r.get('redirect');
+  payment.tryPopup(forcePopup);
 
   payment.ajax = $.post({
     url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: bind(ajaxCallback, payment)
+    callback: function(response) {
+      ajaxCallback.call(payment, response);
+      if (!forcePopup) {
+        discreet.redirect({
+          url: response.request.url,
+          content: response.request.content,
+          method: 'post'
+        });
+      }
+    }
   });
 }
 
