@@ -138,6 +138,7 @@ function setPaymentMethods(session){
     count: 0
   };
 
+  var passedWallets = session.get('method.wallet');
   each(
     availMethods,
     function(method, enabled){
@@ -147,17 +148,26 @@ function setPaymentMethods(session){
     }
   )
 
-  if(session.get('amount') >= 100*10000 || availMethods.wallet instanceof Array){ // php encodes blank object as blank array
+  if (session.get('amount') >= 100*10000 || methods.wallet instanceof Array) { // php encodes blank object as blank array
     methods.wallet = {};
+  } else if (typeof passedWallets === 'object') {
+    each(
+      passedWallets,
+      function(wallet, enabled){
+        if (enabled === false) {
+          delete methods.wallet[wallet];
+        }
+      }
+    )
   }
 
-  if(availMethods.netbanking instanceof Array){
+  if (!methods.netbanking || methods.netbanking instanceof Array) {
     methods.netbanking = false;
   } else {
     methods.count = 1;
   }
 
-  if(availMethods.card){
+  if (methods.card) {
     methods.count++;
   }
 
@@ -284,7 +294,7 @@ function iosMethod(method){
       CheckoutBridge.map[++CheckoutBridge.index] = data;
     }
     iF.setAttribute('src', src);
-    document.documentElement.appendChild(iF);
+    doc.appendChild(iF);
     iF.parentNode.removeChild(iF);
     iF = null;
   }
@@ -317,7 +327,7 @@ var platformSpecific = {
   },
 
   android: function(){
-    doc.css('background', 'rgba(0, 0, 0, 0.6)');
+    $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
   }
 }
 

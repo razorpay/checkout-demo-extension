@@ -83,7 +83,28 @@ function map( iteratee, mapFunc ) {
   return result;
 }
 
+function isNonEmpty(obj){
+  if (obj instanceof Array) {
+    return obj.length;
+  }
+  var i;
+  if (i in obj) {
+    return true;
+  }
+}
+
 function submitForm(action, data, method, target) {
+  if (typeof target !== 'string') {
+    if (method === 'get' && !isNonEmpty(data)) {
+      if (!target) {
+        target = window;
+      }
+      target.location = action;
+      return;
+    } else if (target) {
+      target = target.name;
+    }
+  }
   var form = document.createElement('form');
   form.setAttribute('action', action);
 
@@ -219,10 +240,12 @@ $.prototype = {
       return this;
     }
     var el = this[0];
-    if(arguments.length === 1){
-      return el.getAttribute(attr);
+    if (el) {
+      if(arguments.length === 1){
+        return el.getAttribute(attr);
+      }
+      el.setAttribute(attr, val);
     }
-    el.setAttribute(attr, val);
     return this;
   },
 

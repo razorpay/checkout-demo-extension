@@ -64,6 +64,7 @@ label[for] {
     left: $left;
     z-index: 1;
     pointer-events: none;
+    white-space: nowrap;
   }
 }
 
@@ -280,5 +281,23 @@ button {
         text-align: right;
       }
     }
+  }
+}
+
+#nocvv-check {
+  display: none;
+  line-height: 20px;
+  cursor: pointer;
+  &.shown {
+    display: block;
+  }
+}
+
+#tab-card.nocvv {
+  .elem-wrap.third {
+    display: none;
+  }
+  .elem-wrap.two-third {
+    width: 100%;
   }
 }

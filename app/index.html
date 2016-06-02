@@ -24,7 +24,7 @@
 
 </head>
 <body>
-  <div id="x" style='height: 90vh; background: #1abc9c; color: #fff'>
+  <div id="x" style='height: 90vh; background: #fff; color: #fff'>
     <h1>Checkout test page</h1>
   </div>
   <div id="side">
@@ -34,7 +34,7 @@
     var options = {
       // 'key': 'rzp_live_ILgsfZCZoFIKMb',
       'key': 'rzp_test_1DP5mmOlF5G5ag',
-      'amount': 10000,
+      'amount': 600000,
       'name': 'Innerchef',
       'description': 'JEE Main & Advanced',
       'image': 'http://i.imgur.com/n5tjHFD.png',
@@ -43,7 +43,9 @@
       },
       'method': {
         netbanking: true,
-        wallet: true,
+        // wallet: {
+        //   paytm: false
+        // },
         card: true
       },
       // parent: '#x',
@@ -58,10 +60,12 @@
       // display_amount: '12.23',
       // display_currency: 'SGD',
       'prefill': {
-        'method': 'wallet',
+        'method': '',
         'name': 'Harshil \"Mathur',
         'email': 'harshil@razorpay.com',
-        'contact': '9876543210'
+        'contact': '9876543210',
+        'card[number]': '4111 1111 1111 1111',
+        'card[expiry]': '11 / 23'
       },
       customer_id: '5LqJJLEzjH3vkz',
       // order_id: 'order_5ZfJcdMfBYoZ3n',
@@ -77,6 +81,10 @@
       }
     }
     var rzp1 = new Razorpay(options);
+
+    // rzp1.on('payment.error', function(data){
+    //   console.log(data);
+    // });
 
     document.getElementById('rzp-button1').onclick = function(e) {
       rzp1.open();

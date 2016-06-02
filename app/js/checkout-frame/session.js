@@ -68,11 +68,12 @@ function onSixDigits(e){
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
 
-  var nocvvCheck = gel('nocvv-check');
+  var nocvvCheck = gel('nocvv');
 
   if(sixDigits){
     if(isMaestro){
       if(nocvvCheck.disabled){
+        $('#nocvv-check').addClass('shown');
         nocvvCheck.disabled = false;
       }
     }
@@ -88,6 +89,7 @@ function onSixDigits(e){
     }
   }
   else {
+    $('#nocvv-check').removeClass('shown');
     nocvvCheck.disabled = true;
   }
 
@@ -116,7 +118,7 @@ function onSixDigits(e){
 function noCvvToggle(e){
   var nocvvCheck = e.target;
   var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-  $('#expiry-cvv').toggleClass('hidden', shouldHideExpiryCVV);
+  $('#tab-card').toggleClass('nocvv', shouldHideExpiryCVV);
 }
 
 function makeVisible(subject){
@@ -238,7 +240,7 @@ function Session (options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.listeners = [];
-  this.tab = '';
+  this.tab = this.screen = '';
 }
 
 Session.prototype = {
@@ -439,11 +441,20 @@ Session.prototype = {
 
   secAction: function() {
     if(this.tab === 'wallet'){
+      this.showLoadError(false, 'Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
       this.showCardTab();
     }
+  },
+
+  addFunds: function(event) {
+    setOtpText('Loading...');
+    $('#add-funds').removeClass('show');
+    $('#tab-otp').removeClass('action').addClass('loading').css('display', 'block');
+
+    this.r.topupWallet();
   },
 
   bindEvents: function(){
@@ -460,8 +471,13 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
+    this.on('click', '#add-funds-action', this.addFunds);
+    this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
     var enabledMethods = this.methods;
 
+    if(enabledMethods.card){
+      this.on('click', '#saved-cards-btn', this.showSavedCards);
+    }
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
@@ -473,7 +489,7 @@ Session.prototype = {
     if(enabledMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
-      // this.on('change', '#nocvv-check', noCvvToggle);
+      this.on('change', '#nocvv', noCvvToggle);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -589,6 +605,10 @@ Session.prototype = {
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
 
+    if(!(tab in tab_titles)){
+      tab = '';
+    }
+
     // initial screen
     if (!this.tab){
       if (this.checkInvalid($('#form-common'))) {
@@ -618,16 +638,48 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
-    if( !user.id && typeof user.saved !== 'boolean' ) {
-      this.commenceOTP('saved cards');
-      this.user.lookup(bind(this.showCardTab,this));
-    } else if ( user.saved && !user.id && !user.wants_skip ) {
-      this.verifyUser();
-    } else {
+    // if( !user.id && typeof user.saved !== 'boolean' ) {
+    //   this.commenceOTP('saved cards');
+    //   this.user.lookup(bind(this.showCardTab,this));
+    // } else if ( user.saved && !user.id && !user.wants_skip ) {
+    //   this.verifyUser();
+    // } else {
+      // this.setSavedCards(user);
       this.setScreen('card');
       return true;
+    // }
+    // $('#otp-sec').html('Skip saved cards');
+  },
+
+  setSavedCards: function(user){
+
+    if(user && user.saved) {
+      $('.saved-cards-btn').addClass('shown');
+    } else {
+      $('.saved-cards-btn').removeClass('shown');
     }
-    $('#otp-sec').html('Skip saved cards');
+
+    if (user && user.tokens) {
+      new savedCards(user.tokens);
+    } else if(user.saved && preferences.tokens) {
+      new savedCards(preferences.tokens);
+    } else {
+      new savedCards({count: 0});
+      showCardForm();
+    }
+  },
+
+  showSavedCards: function(){
+    var user = this.user;
+
+    if(user.wants_skip) {
+      user.wants_skip = false;
+      this.showCardTab();
+    }
+
+    gel('tab-card').setAttribute('screen', 'saved-cards');
+    makeHidden("#add-card");
+    makeVisible("#saved-cards");
   },
 
   verifyUser: function(){
@@ -694,30 +746,46 @@ Session.prototype = {
     var tab = this.tab || '';
     var data = {};
     var activeTab;
+    var screen = '';
+
+    // TODO: Refactor this code
 
     fillData($('#form-common'), data);
 
     if(tab){
       activeTab = getTab(tab);
       data.method = tab;
-      fillData(activeTab, data);
+
+      if (tab !== 'card') {
+        fillData(activeTab, data);
+      }
     }
 
     if(tab === 'card'){
-      data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+      screen = gel('tab-card').getAttribute('screen');
 
-      if(!data['card[expiry]']){
-        data['card[expiry]'] = '';
+      if(screen === 'add-card'){
+        fillData($("#"+screen), data);
+
+        data['card[number]'] = data['card[number]'].replace(/\ /g, '');
+
+        if(!data['card[expiry]']){
+          data['card[expiry]'] = '';
+        }
+
+        if(!data['card[cvv]']){
+          data['card[cvv]'] = '';
+        }
+
+        var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
+        data['card[expiry_month]'] = expiry[0];
+        data['card[expiry_year]'] = expiry[1];
+        delete data['card[expiry]'];
+      } else {
+        var selectedCard = $('#saved-cards .card :checked').parent();
+        fillData(selectedCard, data);
+        data.app_id = this.user.id;
       }
-
-      if(!data['card[cvv]']){
-        data['card[cvv]'] = '';
-      }
-
-      var expiry = data['card[expiry]'].replace(/[^0-9\/]/g, '').split('/');
-      data['card[expiry_month]'] = expiry[0];
-      data['card[expiry_year]'] = expiry[1];
-      delete data['card[expiry]'];
     }
     return data;
   },
@@ -757,6 +825,7 @@ Session.prototype = {
 
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
+    $('#add-funds').removeClass('show');
     $('#tab-otp').css('display', 'block');
     invoke('addClass', $('#footer'), 'otp', 300);
 
@@ -808,7 +877,24 @@ Session.prototype = {
   submit: function(e) {
     preventDefault(e);
 
+    var nocvv_el = gel('nocvv');
+    var nocvv_dummy_values;
+
+    if(nocvv_el){
+      validateCardNumber(gel('card_number'));
+      if(nocvv_el.checked && !nocvv_el.disabled){
+        nocvv_dummy_values = true;
+        $('.elem-expiry').removeClass('invalid');
+        $('.elem-cvv').removeClass('invalid');
+      }
+    }
+
     var activeTab = $('.tab-content.shown');
+
+    if (activeTab[0] && activeTab.attr('id') === 'tab-card') {
+      activeTab = $("#"+activeTab.attr('screen'));
+    }
+
     if (activeTab[0] && this.checkInvalid(activeTab)){
       return;
     }
@@ -818,22 +904,12 @@ Session.prototype = {
     }
     this.smarty.refresh();
 
-    var nocvv_el = gel('nocvv-check');
-    var nocvv_dummy_values;
 
     if(!this.tab && !this.order) {
       return;
     }
 
     // if card tab exists
-    if(nocvv_el){
-      validateCardNumber(gel('card_number'));
-      if(nocvv_el.checked && !nocvv_el.disabled){
-        nocvv_dummy_values = true;
-        $('.elem-expiry').removeClass('invalid');
-        $('.elem-cvv').removeClass('invalid');
-      }
-    }
 
     if(this.checkInvalid($('#form-common'))){
       return;
@@ -859,8 +935,9 @@ Session.prototype = {
     });
 
     var wallet = data.wallet;
+    var walletObj;
     if (data.method === 'wallet') {
-      var walletObj = freqWallets[wallet];
+      walletObj = freqWallets[wallet];
 
       if (!walletObj || walletObj.custom) {
         return;
@@ -901,7 +978,6 @@ Session.prototype = {
     }
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
-      options.redirect = false;
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
@@ -915,6 +991,11 @@ Session.prototype = {
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
+      this.r.on('payment.wallet.topup', function() {
+        $('#tab-otp').removeClass('loading');
+        $('#add-funds').addClass('show');
+        gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
+      });
     }
   },
 
@@ -953,6 +1034,8 @@ Session.prototype = {
       this.smarty.off();
       this.card.unbind();
       $(this.el).remove();
+
+      this.tab = this.screen = '';
 
       if(this.emi){
         this.emi.unbind();

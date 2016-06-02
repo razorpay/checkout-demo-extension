@@ -49,7 +49,7 @@ function onPaymentCancel(errorObj){
     var payment_id = this.payment_id;
     if(payment_id){
       $.ajax({
-        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.data.key_id
+        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key')
       })
     }
     this.complete(errorObj || discreet.error());
@@ -100,19 +100,24 @@ Payment.prototype = {
 
   checkRedirect: function(){
     var getOption = this.r.get;
-    if(getOption('redirect')){
+    if(getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
       if(callback_url){
         data.callback_url = callback_url;
       }
-      discreet.redirect({
-        url: makeRedirectUrl(this.fees),
-        content: data,
-        method: 'post'
-      });
-      return true;
+
+      if (this.powerwallet) {
+        return false;
+      } else {
+        discreet.redirect({
+          url: makeRedirectUrl(this.fees),
+          content: data,
+          method: 'post'
+        });
+        return true;
+      }
     }
   },
 
@@ -245,11 +250,10 @@ Payment.prototype = {
 
   tryAjax: function(){
     // virtually all the time, unless there isn't an ajax based route
-    // shouldAjax = !this.fees;
-    if(this.fees){
+    // or its cross domain ajax. in that case, let popup redirect for sake of IE
+    if(this.fees || !discreet.isFrame){
       return false;
     }
-
     // else make ajax request
     var data = this.data;
     var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
@@ -264,8 +268,8 @@ Payment.prototype = {
     return this.ajax;
   },
 
-  tryPopup: function(){
-    if(this.powerwallet){
+  tryPopup: function(forced){
+    if(this.powerwallet && !forced) {
       return null;
     }
 
@@ -295,11 +299,14 @@ function ajaxCallback(response){
   if (payment_id) {
     this.payment_id = payment_id;
   }
-
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
-    invoke(responseTypes[response.type], this, response.request);
+    var request = response.request;
+    if(request && request.url && RazorpayConfig.framepath){
+      request.url = request.url.replace(/^.+v1\//, discreet.makeUrl());
+    }
+    invoke(responseTypes[response.type], this, request);
   }
 }
 
@@ -356,7 +363,7 @@ var responseTypes = {
           request.url,
           request.content,
           request.method,
-          popup.name
+          popup.window
         )
       }
     } else {
@@ -375,6 +382,8 @@ function otpCallback(response){
   var error = response.error;
   if(error && error.action === 'RETRY'){
     return this.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
+  } else if (error && error.action === 'TOPUP') {
+    return this.emit('wallet.topup', error.description);
   }
   this.complete(response);
 }
@@ -405,6 +414,29 @@ razorpayProto.resendOTP = function(callback){
       '_[source]': 'checkoutjs'
     },
     callback: bind(ajaxCallback, payment)
+  });
+}
+
+razorpayProto.topupWallet = function() {
+  var payment = this._payment;
+  var forcePopup = !payment.r.get('redirect');
+  payment.tryPopup(forcePopup);
+
+  payment.ajax = $.post({
+    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
+    data: {
+      '_[source]': 'checkoutjs'
+    },
+    callback: function(response) {
+      ajaxCallback.call(payment, response);
+      if (!forcePopup) {
+        discreet.redirect({
+          url: response.request.url,
+          content: response.request.content,
+          method: 'post'
+        });
+      }
+    }
   });
 }
 

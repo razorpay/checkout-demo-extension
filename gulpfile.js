@@ -6,7 +6,7 @@ const gulp = require('gulp');
 const dot = require('dot');
 const glob = require('glob')
 const sass = require('gulp-sass');
-const minifyCSS = require('gulp-minify-css');
+const cleanCSS = require('gulp-clean-css');
 const stylelint = require('gulp-stylelint');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
@@ -26,9 +26,17 @@ const istanbul = require('istanbul');
 const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
+const webdriver = require('gulp-webdriver');
 
 const distDir = 'app/dist/v1/';
 let browserSyncOptions = {};
+
+let defaultBrowserSyncOptions = {
+  ui: false,
+  ghostMode: false,
+  open: false,
+  codeSync: false
+};
 
 try {
   browserSyncOptions = require('./browsersync-config');
@@ -74,21 +82,22 @@ gulp.task('compileTemplates', function() {
     .pipe(gulp.dest(assetPath('templates')));
 });
 
+let styleLintOptions = {
+  syntax: 'scss',
+  reporters: [
+    {
+      formatter: 'string',
+      console: true
+    }
+  ]
+};
 
-gulp.task('compileStyles', function(){
+gulp.task('compileStyles', function() {
   return gulp.src(paths.css)
-    .pipe(stylelint({
-      syntax: 'scss',
-      reporters: [
-        {
-          formatter: 'string',
-          console: true
-        }
-      ]
-    }))
+    .pipe(stylelint(styleLintOptions))
     .pipe(sass())
-    .pipe(gulpif(isProduction, minifyCSS()))
     .pipe(concat('checkout-new.css'))
+    .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
       cascade: false
@@ -135,15 +144,22 @@ gulp.task('build', function() {
   runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
-gulp.task('setENV', function() {
+gulp.task('setServeENV', function() {
   isProduction = false;
+  styleLintOptions.failAfterError = false;
 });
 
-gulp.task('serve', ['setENV', 'build'], function() {
+gulp.task('setTestENV', function() {
+  isProduction = false;
+  styleLintOptions.failAfterError = true;
+});
+
+gulp.task('serve', ['setServeENV', 'build'], function() {
   gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
   gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
   gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
 
+  browserSyncOptions = merge(defaultBrowserSyncOptions, browserSyncOptions);
   browserSyncOptions.server = './app/dist';
   browserSyncOptions.startPath = 'v1/index.html';
   browserSync.init(browserSyncOptions);
@@ -235,7 +251,7 @@ karmaOptions.reporters.push(reporter);
 let karmaLibs = [
   'spec/jquery-1.11.1.js',
   'spec/sendkeys.js',
-  'spec/sinon-1.17.3.js',
+  'spec/sinon.js',
   'spec/expect.js',
   'spec/helpers.js'
 ];
@@ -290,9 +306,38 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-gulp.task('test', ['setENV', 'test:unit'], function() {
+gulp.task('test:release', function(){
+  return gulp.src('wdio.conf.js').pipe(webdriver());
+})
+
+gulp.task('hint', function(){
   return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
+})
+
+gulp.task('test', function() {
+  runSequence('setTestENV', 'test:unit', 'hint', 'test:release');
 });
+
+
+
+/* Util functions */
+
+// Merge the contents of two objects together into the first object.
+function merge(original, updates) {
+  if (!updates || typeof updates !== 'object') {
+    return original;
+  }
+
+  var props = Object.keys(updates);
+  var prop;
+
+  for (var i = 0; i < props.length; i++) {
+    prop = props[i];
+    original[prop] = updates[prop];
+  }
+
+  return original;
+}

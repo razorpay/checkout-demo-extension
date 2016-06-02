@@ -76,8 +76,8 @@ describe 'automatic checkout:', ->
       for i of options
         currentScript.removeAttribute i
 
-    it 'should do nothing if data-amount attribute is not present', ->
-      currentScript.removeAttribute 'data-amount'
+    it 'should do nothing if data-key attribute is not present', ->
+      currentScript.removeAttribute 'data-key'
       stub = sinon.stub window, 'addAutoCheckoutButton'
       initAutomaticCheckout()
 

@@ -176,7 +176,7 @@ describe 'discreet', ->
 
   describe 'defaultError', ->
     it 'should provide minimal error object', ->
-      errorObj = discreet.defaultError()
+      errorObj = discreet.error()
       expect errorObj
         .to.only.have.key 'error'
 

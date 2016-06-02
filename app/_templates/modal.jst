@@ -121,12 +121,14 @@ var gridClass = gridClasses[i-1];
               </div>
 
               {{? method.card }}
-                <div class="tab-content showable screen" id="tab-card">
-                  <div class="pad">
+                <div class="tab-content showable screen" id="tab-card" screen='add-card'>
+                  <div id='add-card' class="pad showable shown">
                     <input type="hidden" name="method" value="card">
                     <div class="mfix saved-cards-btn">
-                      <span class="saved-cards-ico mchild"></span>
-                      <span class="saved-cards-txt mchild">USE SAVED CARDS</span>
+                      <span id='saved-cards-btn'>
+                        <span class="saved-cards-ico mchild"></span>
+                        <span class="saved-cards-txt mchild">USE SAVED CARDS</span>
+                      </span>
                     </div>
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                       <label>Card Number</label>
@@ -134,11 +136,6 @@ var gridClass = gridClasses[i-1];
                       <span class="help">Please enter a valid card number</span>
                       <div class="card-image"></div>
                       <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
-                      <label id="nocvv" for="nocvv-check">
-                        <input type="checkbox" id="nocvv-check" checked disabled>
-                        <span class="checkbox"></span>
-                        My card doesn't have expiry/CVV
-                      </label>
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
                       <label>Expiry</label>
@@ -157,9 +154,14 @@ var gridClass = gridClasses[i-1];
                       <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                     </div></div>
                     <div class="clear"></div>
-                    <div id="should-save-card" class="double clear gapv">
+                    <label id="nocvv-check" for="nocvv" class="gapv">
+                      <input type="checkbox" id="nocvv" disabled>
+                      <span class="checkbox"></span>
+                      My Maestro Card doesn't have Expiry/CVV
+                    </label>
+                    <div id="should-save-card" class="double gapv">
                       <label class="first" for="save" tabIndex="0">
-                        <input type="checkbox" id="save" name="save" checked value="1">
+                        <input type="checkbox" id="save" name="save" value="1">
                         <span class="checkbox"></span>
                         Remember Card
                       </label>
@@ -180,14 +182,14 @@ var gridClass = gridClasses[i-1];
                         <span class="help dropdown">EMI is available on HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
                       </div>
                       <div class="second">
-                        <span id="view-emi-plans">
-                          <i class="info">&#xe606;</i>
+                        <span id="view-emi-plans" class="link">
                           <a>View EMI Plans</a>
                         </span>
                       </div>
                       <div class="clear"></div>
                     </div>
                   </div>
+                  <div id="saved-cards" class='showable'></div>
                 </div>
               {{?}}
               {{? method.netbanking }}
@@ -258,13 +260,25 @@ var gridClass = gridClasses[i-1];
               {{}}}
 
               <div id="tab-otp" class="tab-content showable screen">
-                <div id='otp-prompt'></div>
-                <div id="otp-action" class="btn">Retry</div>
-                <div id="otp-elem">
-                  <div class="help">Please enter 6 digit OTP</div>
-                  <input type="tel" class="input" pattern="^[0-9]{6}$" name="otp" id="otp" maxlength="6" autocomplete="off" required>
+                <div id="add-funds" class="add-funds">
+                  <div id="add-funds-desc"></div>
+                  <div id="add-funds-action" class="btn">Add Funds</div>
+
+                  <div class="text-center" style="margin-top: 20px;">
+                    <a id="choose-payment-method" class="link">Try different payment method</a>
+                  </div>
                 </div>
-                <a id="otp-sec" class="link"></a>
+
+                <div id="otp-section">
+                  <div id='otp-prompt'></div>
+                  <div id="otp-action" class="btn">Retry</div>
+                  <div id="otp-elem">
+                    <div class="help">Please enter 6 digit OTP</div>
+                    <input type="tel" class="input" pattern="^[0-9]{6}$" name="otp" id="otp" maxlength="6" autocomplete="off" required>
+                  </div>
+                  <a id="otp-sec" class="link"></a>
+                </div>
+
                 <div class="spin">
                   <div></div>
                 </div>

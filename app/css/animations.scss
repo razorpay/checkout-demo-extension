@@ -97,12 +97,16 @@ $gridStagger: 0.05s;
   transition-delay: $second;
 }
 
+.font-loaded #modal.sub {
+  #powered-by {
+    display: none;
+  }
+}
+
 #modal {
   &.sub {
-    #powered-by {
-      display: none;
-    }
     #footer {
+      opacity: 1;
       transition-delay: $second;
       transform: none;
     }

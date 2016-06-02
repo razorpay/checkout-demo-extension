@@ -45,7 +45,7 @@ function initAutomaticCheckout(){
   each(
     currentScript.attributes,
     function(i, attr){
-      var name = attr.name
+      var name = attr.name.toLowerCase();
       if(/^data-/.test(name)){
         var rootObj = opts;
         name = name.replace(/^data-/,'');
@@ -67,8 +67,8 @@ function initAutomaticCheckout(){
     }
   )
 
-  var amount = opts.amount;
-  if (amount && amount.length > 0){
+  var key = opts.key;
+  if (key && key.length > 0){
     opts.handler = defaultAutoPostHandler;
     addAutoCheckoutButton(Razorpay(opts));
   }
@@ -77,6 +77,7 @@ function initAutomaticCheckout(){
 function createFrameContainer(){
   var div = document.createElement('div');
   div.className = 'razorpay-container';
+  div.innerHTML = "<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>";
   var style = div.style;
   var rules = {
     'zIndex': '99999',
@@ -103,8 +104,7 @@ function createFrameContainer(){
 
 function createFrameBackdrop(){
   var backdrop = document.createElement('div');
-  backdrop.className = 'razorpay-backdrop anim';
-  backdrop.innerHTML = "<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}.razorpay-backdrop.anim:after{content:'';position:absolute;left:50%;top:50%;margin:-1.5em 0 0 -1.5em;height:3em;width:3em;animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;}</style>";
+  backdrop.className = 'razorpay-backdrop';
   var style = backdrop.style;
   each(
     {
@@ -209,7 +209,6 @@ Razorpay.prototype.open = function() {
     preloadedFrame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
-
   return this;
 };
 

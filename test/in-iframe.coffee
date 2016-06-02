@@ -127,62 +127,6 @@ describe 'nextRequestRedirect', ->
     window.parent = parent
     stub.restore()
 
-describe 'payment authorization', ->
-  opts = null
-
-  beforeEach ->
-    opts = clone coOptions
-
-  describe 'error handler should', ->
-    response = error: {}
-
-    beforeEach ->
-      openCheckoutForm opts
-      session = getSession()
-      session.rzp = Razorpay
-        key: 'key'
-        amount: 100
-
-    it 'display default error discription', ->
-      errorHandler.call getSession(), response
-      expect jQuery '#error-message:visible'
-        .to.have.length 1
-      expect jQuery('#fd-t').html().length
-        .to.be.ok()
-
-    it 'display custom error description', ->
-      str = 'hello error'
-      response.error.description = str
-      errorHandler.call getSession(), response
-      expect jQuery '#error-message:visible'
-        .to.have.length 1
-      expect jQuery('#fd-t').html()
-        .to.be str
-
-    it 'focus related field and apply invalid', ->
-      field_el = jQuery 'input[name]:not([type=hidden]):eq(1)'
-      response.error.field = field_el.prop 'name'
-      errorHandler.call getSession(), response
-      expect jQuery '#error-message:visible'
-        .to.have.length 1
-      expect field_el[0]
-        .to.be document.activeElement
-      expect field_el.parent().hasClass 'invalid'
-        .to.be true
-
-  it 'success handler should hide form', ->
-    openCheckoutForm opts
-    getSession().rzp = Razorpay
-      key: 'key'
-      amount: 100
-    session = getSession()
-
-    stub = sinon.stub session.modal, 'hide'
-    successHandler.call session
-    expect stub.callCount
-      .to.be 1
-    stub.restore()
-
 # TODO
 # shouldn't move to next tabs w/o phone,email validation
 # submission payload validation -> reconcile with authorize.js

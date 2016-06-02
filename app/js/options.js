@@ -2,7 +2,7 @@ var flatKeys = {};
 each(
   Razorpay.defaults,
   function(key, val){
-    if(key !== 'notes' && val && typeof val === 'object'){
+    if(val && typeof val === 'object'){
       flatKeys[key] = true;
       each(
         val,
@@ -21,7 +21,7 @@ function base_set(flatObj, defObj, objKey, objVal){
   if(typeof objVal === 'number'){
     objVal = String(objVal);
   }
-  if(typeof defaultVal === typeof objVal){
+  if(defaultVal === null || typeof defaultVal === typeof objVal){
     flatObj[objKey] = objVal;
   }
 }
@@ -53,7 +53,6 @@ function Options(options){
 
   var defaults = Razorpay.defaults;
   options = flatten(options, defaults);
-
   this.get = function(key){
     if(!arguments.length){
       return options;

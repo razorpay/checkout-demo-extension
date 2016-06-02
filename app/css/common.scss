@@ -20,6 +20,9 @@ $p: 24px;
 $topbarh: 50px;
 $footerh: 55px;
 
+$collapsedCardh: 30px;
+$openCardh: 68px;
+
 @mixin opacity($fraction) {
   opacity: $fraction;
 
@@ -61,4 +64,8 @@ $footerh: 55px;
   content: '';
   display: table;
   clear: both;
+}
+
+.show {
+  display: block;
 }

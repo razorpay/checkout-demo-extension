@@ -77,7 +77,6 @@
 
 #elem-emi {
   display: none;
-  top: 8px;
   position: relative;
 
   &.hidden {
@@ -100,6 +99,7 @@
 }
 
 #emi-check-label {
+  cursor: pointer;
   .select {
     padding-top: 0;
     background: #fff;

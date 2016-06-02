@@ -184,8 +184,9 @@ function base_configure(overrides){
   validateOverrides(options);
   setNotes(options);
 
-  if(overrides.parent){
-    options.set('parent', overrides.parent);
+  var callback_url = options.get('callback_url');
+  if (callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)) {
+    options.set('redirect', true);
   }
 
   return options;
@@ -288,7 +289,7 @@ Razorpay.prototype = {
       validateRequiredFields(this);
     } catch(e){
       var message = e.message;
-      if(!this.isLiveMode()){
+      if(!this.get || !this.isLiveMode()){
         alert(message);
       }
       raise(message);

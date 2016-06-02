@@ -44,7 +44,7 @@
 
 #otp-elem {
   margin: 0 auto;
-  width: 150px;
+  width: 151px;
   position: relative;
 }
 
@@ -71,4 +71,21 @@
 
 .incorrect-otp {
   color: #e46e6e;
+}
+
+.add-funds {
+  display: none;
+  text-align: center;
+
+  #add-funds-desc {
+    margin-bottom: 15px;
+  }
+
+  .btn {
+    display: inline-block;
+  }
+
+  &.show + #otp-section {
+    display: none;
+  }
 }

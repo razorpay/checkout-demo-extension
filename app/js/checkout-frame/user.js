@@ -3,6 +3,7 @@ function User (o) {
   this.phone = o.phone || '';
   this.saved = o.saved || null;
   this.wants_skip = o.wants_skip || null;
+  this.tokens = o.tokens || null;
 }
 
 User.prototype = {
@@ -36,6 +37,7 @@ User.prototype = {
       },
       callback: function(data){
         user.id = data.app_id;
+        user.tokens = data.tokens;
         callback();
       }
     })
@@ -43,8 +45,23 @@ User.prototype = {
 
   setPhone: function(phone){
     if (this.phone !== phone) {
-      this.id = this.saved = this.wants_skip = null;
+      this.id = this.saved = this.wants_skip = this.tokens = null;
       this.phone = phone;
     }
+  },
+
+  deleteCard: function(token, callback){
+    if (!this.id) {
+      return;
+    }
+
+    $.ajax({
+      url: discreet.makeUrl() + 'apps/' + this.id + '/tokens/' + token +
+        '?key_id=' + this.key,
+      method: 'delete',
+      callback: function(){
+        callback();
+      }
+    })
   }
 }

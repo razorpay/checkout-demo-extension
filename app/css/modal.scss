@@ -75,7 +75,7 @@ html {
     float: left;
     transition: 0.2s;
     border-bottom: 1px solid $bc;
-    border-right: 1px solid $bc;
+    border-left: 1px solid $bc;
     box-sizing: border-box;
   }
 
@@ -172,7 +172,7 @@ i {
   height: 100%;
   text-align: center;
   transition: 0.3s ease-out opacity;
-  transform: translate3d(0, 0, 0);
+  // transform: translate3d(0, 0, 0);
   z-index: 19999;
 
   &.shown {
@@ -409,7 +409,7 @@ i {
 
 #tab-title {
   font-size: 16px;
-  line-height: $topbarh;
+  line-height: $topbarh + 1px;
 }
 
 .back {
@@ -463,9 +463,10 @@ i {
 }
 
 #footer {
+  opacity: 0;
   position: absolute;
   left: 0;
-  bottom: -$footerh;
+  bottom: -$footerh + 1px;
   width: 100%;
   border-radius: 0 0 $br $br;
   height: $footerh;
@@ -524,10 +525,18 @@ i {
   }
 }
 
-.saved-cards-btn {
+#saved-cards-btn {
   padding: 5px 0;
   cursor: pointer;
+}
+
+.saved-cards-btn {
   margin-top: 10px;
+  display: none;
+}
+
+.saved-cards-btn.shown {
+  display: block;
 }
 
 .saved-cards-ico {
