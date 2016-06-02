@@ -145,6 +145,13 @@ var optionValidations = {
     if(!amount && amount !== Razorpay.defaults.display_amount){
       return '';
     }
+  },
+
+  parent: function(parent){
+    if (!$(parent)[0]) {
+      return 'The parent element provided for the ' +
+        'embedded checkout doesn\'t exist';
+    }
   }
 }
 
