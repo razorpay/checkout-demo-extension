@@ -676,7 +676,7 @@ Session.prototype = {
       }
     }
     this.toggleSavedCards(saveScreen);
-    $('#toggle-saved-cards').toggleClass('shown', userTokens);
+    $('#form-card').toggleClass('has-cards', userTokens);
   },
 
   toggleSavedCards: function(saveScreen){
