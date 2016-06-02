@@ -1,7 +1,7 @@
 Razorpay = {
   config: {
-    protocol: 'https',
-    hostname: 'api.razorpay.com',
+    protocol: 'http',
+    hostname: 'api.razorpay.dev',
     version: 'v1/',
     // path for iframe, if set
     framepath: '/checkout.html',
