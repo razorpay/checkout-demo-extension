@@ -419,8 +419,11 @@ razorpayProto.resendOTP = function(callback){
 
 razorpayProto.topupWallet = function() {
   var payment = this._payment;
-  var forcePopup = !payment.r.get('redirect');
-  payment.tryPopup(forcePopup);
+  var isRedirect = payment.r.get('redirect');
+  if (!isRedirect) {
+    // passing true to force opening popup
+    payment.tryPopup(true);
+  }
 
   payment.ajax = $.post({
     url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
@@ -428,13 +431,14 @@ razorpayProto.topupWallet = function() {
       '_[source]': 'checkoutjs'
     },
     callback: function(response) {
-      ajaxCallback.call(payment, response);
-      if (!forcePopup) {
+      if (isRedirect) {
         discreet.redirect({
           url: response.request.url,
           content: response.request.content,
           method: 'post'
         });
+      } else {
+        ajaxCallback.call(payment, response);
       }
     }
   });

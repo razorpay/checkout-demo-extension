@@ -994,7 +994,7 @@ Session.prototype = {
       this.r.on('payment.wallet.topup', function() {
         $('#tab-otp').removeClass('loading');
         $('#add-funds').addClass('show');
-        gel('add-funds-desc').innerHTML = 'Insufficient balance in your wallet';
+        setOtpText('Insufficient balance in your wallet');
       });
     }
   },
