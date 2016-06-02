@@ -768,7 +768,6 @@ Session.prototype = {
       fillData(this.getActiveForm(), data);
 
       if (this.screen === 'card') {
-        // TODO: add fill data with emi field here
         if (this.savedCardScreen) {
           if (data.token) {
             var cvvEl = gel('card_cvv-' + data.token);
