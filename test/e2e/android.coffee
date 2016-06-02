@@ -77,3 +77,15 @@ describe 'redirect on submit with valid payload', ->
           description: 'hello'
           method: 'netbanking'
     , message, checkoutPostUrl
+
+  it 'wallet submit', ->
+    browser.url androidUrl
+    exec (message) ->
+      handleMessage message
+    , message
+    browser.click '.payment-option[tab=wallet]'
+    browser.click 'label[for=wallet-radio-payumoney]'
+    browser.submitForm 'form'
+
+    exec () ->
+      form = HTMLFormElement.prototype.submit.thisValues[0]
