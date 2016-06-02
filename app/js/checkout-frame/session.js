@@ -323,8 +323,8 @@ Session.prototype = {
 
     this.setUser();
     this.getEl();
-    this.setSmarty();
     this.fillData();
+    this.setSmarty();
     this.setEMI();
     this.setModal();
     this.setCard();
