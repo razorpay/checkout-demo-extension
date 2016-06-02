@@ -433,7 +433,7 @@ CheckoutFrame.prototype = {
     );
   },
 
-  onerror: function(data){
+  onpaymenterror: function(data){
     try{
       if (data.error.description !== 'Payment cancelled') {
         this.rzp.emit('payment.error', data);
