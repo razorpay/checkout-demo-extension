@@ -98,8 +98,15 @@ html {
 .link {
   cursor: pointer;
   font-size: 12px;
-  color: #0fa5dc;
   border-bottom: 1px solid;
+}
+
+.text-btn {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
 }
 
 a {
