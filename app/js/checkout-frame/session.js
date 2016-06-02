@@ -663,12 +663,15 @@ Session.prototype = {
         $('#saved-cards-container').html(templates.savedcards(userTokens));
       }
     }
+
+    // now that we've rendered the template, convert userTokens to boolean-y
+    userTokens = isNonEmpty(userTokens);
     var saveScreen = this.savedCardScreen;
 
     // runs one time only
     if (saveScreen === undefined) {
       // important to bind just once
-      saveScreen = this.savedCardScreen = !!userTokens;
+      saveScreen = this.savedCardScreen = userTokens;
       if (saveScreen) {
         var self = this;
         this.on('click', '#show-add-card', function(){ self.toggleSavedCards(false) });

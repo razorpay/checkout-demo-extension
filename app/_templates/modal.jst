@@ -131,7 +131,7 @@ var gridClass = gridClasses[i-1];
               {{? method.card }}
                 <div class="tab-content showable screen pad" id="form-card">
                   <div id="saved-cards-container"></div>
-                  <span id="show-add-card" class="text-btn">Add another card</span>
+                  <div id="show-add-card" class="text-btn left-card">Add another card</div>
                   <div id="add-card-container">
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                       <div class="cardtype"></div>
@@ -175,23 +175,23 @@ var gridClass = gridClasses[i-1];
                       </div>
                       <div class="clear"></div>
                     </div>
-                    <div id="elem-emi" class="double">
-                      <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
-                        <span class="checkbox"></span>
-                        Pay with EMI
-                        <div id="emi-select" class="select dropdown">
-                          <div id="emi-plans-wrap"></div>
-                          <div class="option" value="">Pay without EMI</div>
-                        </div>
-                        <span class="help dropdown">EMI is available on HDFC, Kotak & Axis Bank Credit Cards. Enter your credit card to avail.</span>
+                  </div>
+                  <div id="elem-emi" class="double">
+                    <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
+                      <span class="checkbox"></span>
+                      Pay with EMI
+                      <div id="emi-select" class="select dropdown">
+                        <div id="emi-plans-wrap"></div>
+                        <div class="option" value="">Pay without EMI</div>
                       </div>
-                      <div class="second">
-                        <span id="view-emi-plans" class="link">
-                          <a>View EMI Plans</a>
-                        </span>
-                      </div>
-                      <div class="clear"></div>
+                      <span class="help dropdown">EMI is available on HDFC, Kotak & Axis Bank Credit Cards. Enter your credit card to avail.</span>
                     </div>
+                    <div class="second">
+                      <span id="view-emi-plans" class="link">
+                        <a>View EMI Plans</a>
+                      </span>
+                    </div>
+                    <div class="clear"></div>
                   </div>
                 </div>
               {{?}}

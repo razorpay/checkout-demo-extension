@@ -74,6 +74,7 @@ User.prototype = {
             }
           ]
         };data.tokens;
+        // user.tokens = [];
         callback();
       }
     })
