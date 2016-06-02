@@ -668,10 +668,12 @@ Session.prototype = {
     // runs one time only
     if (saveScreen === undefined) {
       // important to bind just once
-      var self = this;
-      this.on('click', '#show-add-card', function(){ self.toggleSavedCards(false) });
-      this.on('click', '#show-saved-cards', function(){ self.toggleSavedCards(true) });
       saveScreen = this.savedCardScreen = !!userTokens;
+      if (saveScreen) {
+        var self = this;
+        this.on('click', '#show-add-card', function(){ self.toggleSavedCards(false) });
+        this.on('click', '#show-saved-cards', function(){ self.toggleSavedCards(true) });
+      }
     }
     this.toggleSavedCards(saveScreen);
     $('#toggle-saved-cards').toggleClass('shown', userTokens);
