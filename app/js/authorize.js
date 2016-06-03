@@ -56,7 +56,8 @@ function onPaymentCancel(errorObj){
               razorpay_payment_id: payment_id
             });
           } else {
-            this.complete(errorObj || discreet.error());
+            var errorMsg = response.error? 'Payment Failed' : '';
+            this.complete(errorObj || discreet.error(errorMsg));
           }
         }, this)
       });
