@@ -48,33 +48,8 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.id = 'asdf';data.app_id;
-        user.tokens = {
-          items: [
-            {
-              token: 'lol123',
-              card: {
-                network: 'Visa',
-                last4: '4242'
-              }
-            },
-            {
-              token: 'lol124',
-              card: {
-                network: 'American Express',
-                last4: '1111'
-              }
-            },
-            {
-              token: 'lol125',
-              card: {
-                network: 'Mastercard',
-                last4: '3791'
-              }
-            }
-          ]
-        };data.tokens;
-        // user.tokens = [];
+        user.id = data.app_id;
+        user.tokens = data.tokens;
         callback();
       }
     })
