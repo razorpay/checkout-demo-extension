@@ -24,6 +24,12 @@ $cardpl: 46px;
 }
 
 #form-card {
+  .saved-card {
+    pointer-events: none;
+  }
+}
+
+#form-card {
   &.saved-cards {
     #show-saved-cards {
       transition-delay: 0s;
@@ -35,6 +41,7 @@ $cardpl: 46px;
     .saved-card {
       height: $cardh;
       z-index: 2;
+      pointer-events: all;
     }
     .cardtype {
       transform: none;
