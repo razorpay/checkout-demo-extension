@@ -51,7 +51,11 @@ $cardh: 42px;
     :checked + .collapser {
       background: $bgd;
       .saved-cvv {
-        display: block;
+        display: inline;
+        display: inline-block;
+        opacity: 1;
+        pointer-events: all;
+        margin-left: 15px;
       }
     }
   }
@@ -105,9 +109,13 @@ $cardh: 42px;
   }
 
   .saved-cvv {
-    display: none;
+    display: none\9;
+    pointer-events: none;
+    opacity: 0;
+    transition: .2s;
     padding: 5px 10px;
-    width: 52px;
+    width: 31px;
+    border: 1px solid #ddd;
   }
 
   .cardtype {
