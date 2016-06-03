@@ -778,7 +778,7 @@ Session.prototype = {
       if (this.isCardForm()) {
         if (this.savedCardScreen) {
           if (data.token) {
-            var cvvEl = gel('card_cvv-' + data.token);
+            var cvvEl = gel('cvv-' + data.token);
             if (cvvEl) {
               data['card[cvv]'] = cvvEl.value;
             }
