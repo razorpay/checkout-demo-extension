@@ -46,6 +46,13 @@ $cardh: 42px;
       height: 55px;
       opacity: 0;
       transform: translateY(-10px);
+      z-index: 0;
+    }
+    :checked + .collapser {
+      background: $bgd;
+      .saved-cvv {
+        display: block;
+      }
     }
   }
   &.has-cards {
@@ -63,6 +70,8 @@ $cardh: 42px;
   overflow: hidden;
   transition: 0.2s;
   height: 168px;
+  z-index: 2;
+  position: relative;
 }
 
 .saved-card {
@@ -95,13 +104,6 @@ $cardh: 42px;
     transition: 0.2s;
   }
 
-  :checked + .collapser {
-    background: #f5f5f5;
-    .saved-cvv {
-      display: block;
-    }
-  }
-
   .saved-cvv {
     display: none;
     padding: 5px 10px;
@@ -126,6 +128,7 @@ $cardh: 42px;
 #saved-cards-container .cardtype,
 #show-add-card::before {
   position: absolute;
+  z-index: 1;
   content: '';
   border: 1px solid #ccc;
   border-radius: 2px;

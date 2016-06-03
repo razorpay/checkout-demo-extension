@@ -15,10 +15,10 @@
     var cvv_digits = network === 'amex' ? 4 : 3;
     var network = networks[card.network];
   }}
-  <div class='saved-card left-card'>
+  <div class='saved-card'>
     <div class='cardtype' cardtype='{{=network}}'></div>
-    <label class='collapser' for='saved-card-{{=i}}'>
-      <input type='radio' id='saved-card-{{=i}}' name='token' value='{{=item.token}}'/>
+    <input type='radio' id='saved-card-{{=i}}' name='token' value='{{=item.token}}'/>
+    <label class='collapser left-card' for='saved-card-{{=i}}'>
       <div class='card-delete'>-</div>
       <span class='saved-number'>{{=card.last4}}</span>
       <input class='saved-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3,4}'>
