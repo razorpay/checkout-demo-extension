@@ -917,7 +917,11 @@ Session.prototype = {
             this.shake();
             return;
           }
-          if (this.checkInvalid('.saved-card :checked + label')){
+          if (!data['card[cvv]']) {
+            cvvEl = qs('.saved-card :checked + .collapser input');
+            if (cvvEl) {
+              cvvEl.focus();
+            }
             return;
           }
         }
