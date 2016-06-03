@@ -686,8 +686,9 @@ Session.prototype = {
     var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
     if (typeof saveScreen !== 'boolean') {
-      saveScreen = this.savedCardScreen = !tabCard.hasClass(saveClass);
+      saveScreen = !tabCard.hasClass(saveClass);
     }
+    this.savedCardScreen = saveScreen;
     tabCard.toggleClass(saveClass, saveScreen);
   },
 
