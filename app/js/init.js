@@ -90,7 +90,8 @@ Razorpay.defaults = {
     'color': '#3594E2',
     'backdrop_color': 'rgba(0,0,0,0.6)',
     'image_padding': true,
-    'close_button': true
+    'close_button': true,
+    'header': true
   },
   'customer_id': '',
   'signature': '',
