@@ -912,17 +912,12 @@ Session.prototype = {
             data['card[expiry_year]'] = '21';
           }
         } else {
-          // TODO: improve this code
-          if (!$('.saved-card :checked')[0]) {
-            this.shake();
-            return;
+          // no saved card was selected
+          if (!data.token) {
+            return this.shake();
           }
           if (!data['card[cvv]']) {
-            cvvEl = qs('.saved-card :checked + .collapser input');
-            if (cvvEl) {
-              cvvEl.focus();
-            }
-            return;
+            return $('#cvv-' + data.token).focus();
           }
         }
       }

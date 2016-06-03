@@ -21,7 +21,7 @@
     <label class='collapser left-card' for='saved-card-{{=i}}'>
       <div class='card-delete'>-</div>
       <span class='saved-number'>{{=card.last4}}</span>
-      <input class='saved-cvv' type='password' placeholder='CVV' id='card_cvv-{{=item.token}}' inputmode='numeric' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3,4}'>
+      <input class='saved-cvv' type='password' placeholder='CVV' id='cvv-{{=item.token}}' inputmode='numeric' maxlength='{{=cvv_digits}}' required pattern='[0-9]{3,4}'>
     </label>
   </div>
 {{~}}
