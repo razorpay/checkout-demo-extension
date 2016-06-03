@@ -753,12 +753,16 @@ Session.prototype = {
   },
 
   getActiveForm: function(){
-    var form = this.screen;
+    var form = this.saving_card ? 'card' : this.screen;
     if (form === 'card') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
     }
     return '#form-' + form;
+  },
+
+  isCardForm: function(){
+    return this.screen === 'card' || this.saving_card;
   },
 
   getFormData: function(){
@@ -771,7 +775,7 @@ Session.prototype = {
       data.method = tab;
       fillData(this.getActiveForm(), data);
 
-      if (this.screen === 'card') {
+      if (this.isCardForm()) {
         if (this.savedCardScreen) {
           if (data.token) {
             var cvvEl = gel('card_cvv-' + data.token);
@@ -889,7 +893,6 @@ Session.prototype = {
     // var tab = this.tab;
     var screen = this.screen;
     var data = this.getPayload();
-
     if (this.order) {
       data.method = 'netbanking';
       data.bank = this.order.bank;
