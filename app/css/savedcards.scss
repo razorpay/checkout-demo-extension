@@ -186,7 +186,7 @@ $cardpl: 46px;
   display: none\9;
 }
 
-[cardtype=undefined]::before {
+[cardtype=unknown]::before {
   content: none;
 }
 
