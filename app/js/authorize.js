@@ -47,12 +47,22 @@ setCommunicator();
 function onPaymentCancel(errorObj){
   if(!this.done){
     var payment_id = this.payment_id;
-    if(payment_id){
+    if(payment_id) {
       $.ajax({
-        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key')
-      })
+        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key'),
+        callback: bind(function(response) {
+          if (response.status === 'authorized') {
+            this.complete({
+              razorpay_payment_id: payment_id
+            });
+          } else {
+            this.complete(errorObj || discreet.error());
+          }
+        }, this)
+      });
+    } else {
+      this.complete(errorObj || discreet.error());
     }
-    this.complete(errorObj || discreet.error());
   }
 }
 
