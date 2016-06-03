@@ -449,6 +449,14 @@ Session.prototype = {
     }
   },
 
+  addFunds: function(event) {
+    setOtpText('Loading...');
+    $('#add-funds').removeClass('show');
+    $('#tab-otp').removeClass('action').addClass('loading').css('display', 'block');
+
+    this.r.topupWallet();
+  },
+
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#close', this.hide);
@@ -463,6 +471,8 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
+    this.on('click', '#add-funds-action', this.addFunds);
+    this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
     var enabledMethods = this.methods;
 
     if(enabledMethods.card){
@@ -815,6 +825,7 @@ Session.prototype = {
 
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
+    $('#add-funds').removeClass('show');
     $('#tab-otp').css('display', 'block');
     invoke('addClass', $('#footer'), 'otp', 300);
 
@@ -967,7 +978,6 @@ Session.prototype = {
     }
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
-      options.redirect = false;
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
@@ -981,6 +991,11 @@ Session.prototype = {
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
+      this.r.on('payment.wallet.topup', function() {
+        $('#tab-otp').removeClass('loading');
+        $('#add-funds').addClass('show');
+        setOtpText('Insufficient balance in your wallet');
+      });
     }
   },
 

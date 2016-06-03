@@ -131,4 +131,3 @@ describe 'nextRequestRedirect', ->
 # shouldn't move to next tabs w/o phone,email validation
 # submission payload validation -> reconcile with authorize.js
 # powerwallets
-# success/error tests

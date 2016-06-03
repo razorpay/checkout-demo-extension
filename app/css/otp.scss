@@ -72,3 +72,16 @@
 .incorrect-otp {
   color: #e46e6e;
 }
+
+.add-funds {
+  display: none;
+  text-align: center;
+
+  .btn {
+    display: inline-block;
+  }
+
+  &.show + #otp-section {
+    display: none;
+  }
+}

@@ -100,19 +100,24 @@ Payment.prototype = {
 
   checkRedirect: function(){
     var getOption = this.r.get;
-    if(getOption('redirect')){
+    if(getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
       if(callback_url){
         data.callback_url = callback_url;
       }
-      discreet.redirect({
-        url: makeRedirectUrl(this.fees),
-        content: data,
-        method: 'post'
-      });
-      return true;
+
+      if (this.powerwallet) {
+        return false;
+      } else {
+        discreet.redirect({
+          url: makeRedirectUrl(this.fees),
+          content: data,
+          method: 'post'
+        });
+        return true;
+      }
     }
   },
 
@@ -263,8 +268,8 @@ Payment.prototype = {
     return this.ajax;
   },
 
-  tryPopup: function(){
-    if(this.powerwallet){
+  tryPopup: function(forced){
+    if(this.powerwallet && !forced) {
       return null;
     }
 
@@ -377,6 +382,8 @@ function otpCallback(response){
   var error = response.error;
   if(error && error.action === 'RETRY'){
     return this.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
+  } else if (error && error.action === 'TOPUP') {
+    return this.emit('wallet.topup', error.description);
   }
   this.complete(response);
 }
@@ -407,6 +414,33 @@ razorpayProto.resendOTP = function(callback){
       '_[source]': 'checkoutjs'
     },
     callback: bind(ajaxCallback, payment)
+  });
+}
+
+razorpayProto.topupWallet = function() {
+  var payment = this._payment;
+  var isRedirect = payment.r.get('redirect');
+  if (!isRedirect) {
+    // passing true to force opening popup
+    payment.tryPopup(true);
+  }
+
+  payment.ajax = $.post({
+    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
+    data: {
+      '_[source]': 'checkoutjs'
+    },
+    callback: function(response) {
+      if (isRedirect) {
+        discreet.redirect({
+          url: response.request.url,
+          content: response.request.content,
+          method: 'post'
+        });
+      } else {
+        ajaxCallback.call(payment, response);
+      }
+    }
   });
 }
 
