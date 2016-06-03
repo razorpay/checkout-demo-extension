@@ -32,9 +32,10 @@ function setCheckoutBridge(cbName){
 }
 var cbName = /platform=ios/.test(location.href) ? 'iosCB' : 'CheckoutBridge';
 setCheckoutBridge(cbName);
-sinon.stub(HTMLFormElement.prototype, 'submit');
-var appendChild = Node.prototype.appendChild;
 
+sinon.stub(HTMLFormElement.prototype, 'submit');
+
+var appendChild = Node.prototype.appendChild;
 Node.prototype.appendChild = function(childNode){
   if(childNode.nodeName === 'IFRAME'){
     var src = childNode.src;

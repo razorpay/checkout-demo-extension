@@ -12,6 +12,17 @@ message =
       email: 'pranav@razorpay.com'
     redirect: true
 
+commonSubmitData =
+  '_[id]': message.id
+  '_[checkout]': 'true'
+  '_[medium]': 'android'
+  key_id: message.options.key
+  amount: message.options.amount
+  contact: message.options.prefill.contact
+  email: message.options.prefill.email
+  currency: 'INR'
+  description: 'hello'
+
 describe 'page load', ->
   browser.url androidUrl
   it 'should define Razorpay', ->
@@ -44,15 +55,15 @@ describe 'redirect on submit with valid payload', ->
     browser.url androidUrl
     exec (message) ->
       handleMessage message
-      expect HTMLFormElement.prototype.submit.called
+      expect HTMLFormElement::submit.called
         .to.be false
     , message
     browser.click '.payment-option[tab=netbanking]'
     browser.click 'label[for=bank-radio-SBIN]'
     browser.submitForm 'form'
 
-    exec (message, checkoutPostUrl) ->
-      form = HTMLFormElement.prototype.submit.thisValues[0]
+    exec (message, checkoutPostUrl, commonSubmitData) ->
+      form = HTMLFormElement::submit.thisValues[0]
       expect form.getAttribute 'method'
         .to.be 'post'
 
@@ -62,30 +73,64 @@ describe 'redirect on submit with valid payload', ->
       payload = {}
       Array::forEach.call form.querySelectorAll('input'), (input) -> payload[input.name] = input.value
 
-      expect payload
-        .to.eql
-          '_[id]': message.id
-          '_[context]': location.href
-          '_[checkout]': 'true'
-          '_[medium]': 'android'
-          key_id: message.options.key
-          amount: message.options.amount
-          contact: message.options.prefill.contact
-          email: message.options.prefill.email
-          currency: 'INR'
-          bank: 'SBIN'
-          description: 'hello'
-          method: 'netbanking'
-    , message, checkoutPostUrl
+      submitData = JSON.parse JSON.stringify commonSubmitData
+      submitData.bank = 'SBIN'
+      submitData.method = 'netbanking'
+      submitData['_[context]'] = location.href
 
-  it 'wallet submit', ->
+      expect payload
+        .to.eql submitData
+    , message, checkoutPostUrl, commonSubmitData
+
+  it 'wallet submit: otp needed', ->
     browser.url androidUrl
     exec (message) ->
       handleMessage message
     , message
     browser.click '.payment-option[tab=wallet]'
     browser.click 'label[for=wallet-radio-payumoney]'
-    browser.submitForm 'form'
 
-    exec () ->
-      form = HTMLFormElement.prototype.submit.thisValues[0]
+    expect browser.isVisible '#tab-otp'
+     .to.be false
+
+    exec ->
+      window.fakeXHR = sinon.useFakeXMLHttpRequest()
+      fakeXHR.onCreate = (request) ->
+        window.fakeRequest = request
+
+    browser.submitForm 'form'
+    console.log exec (commonSubmitData) ->
+      expect HTMLFormElement::submit.called
+        .to.be false
+
+      expect window.fakeRequest.url
+        .to.be 'https://api.razorpay.com/v1/payments/create/ajax?key_id=key'
+
+      expect window.fakeRequest.method
+        .to.be 'post'
+
+      payload = {}
+
+      submitData = JSON.parse JSON.stringify commonSubmitData
+      submitData.method = 'wallet'
+      submitData.wallet = 'payumoney'
+      submitData['_[context]'] = location.href
+      submitData['_[source]'] = 'checkoutjs'
+      delete submitData.key_id
+
+      window.fakeRequest.requestBody.split('&').forEach (val) ->
+        val = val.split '='
+        payload[val[0]] = decodeURIComponent val[1]
+
+      expect submitData
+        .to.eql payload
+
+      window.fakeRequest.respond 200, {}, JSON.stringify
+        payment_id: 'pay'
+        type: 'otp'
+        request:
+          url: 'topupurl'
+
+      expect document.querySelector('#tab-otp').getBoundingClientRect().width
+        .to.be.ok()
+    , commonSubmitData
