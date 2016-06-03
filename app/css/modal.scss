@@ -474,6 +474,7 @@ $outline: #ddd;
 }
 
 #top-right:focus #profile {
+  display: none;
   pointer-events: auto;
   display: block;
 
@@ -509,7 +510,7 @@ $outline: #ddd;
     margin-right: 6px;
   }
   &::after {
-    content: '\e601';
+    // content: '\e601';
     font-size: 20px;
     margin-left: 6px;
   }

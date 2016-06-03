@@ -622,15 +622,15 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function(){
+  showCardTab: function(message){
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
     if( !user.id && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
-      this.user.lookup(bind(this.showCardTab,this));
+      this.user.lookup(bind(this.showCardTab, this));
     } else if ( user.saved && !user.id && !user.wants_skip ) {
-      this.verifyUser();
+      this.verifyUser(message);
     } else {
       this.setSavedCards(user);
       this.setScreen('card');
@@ -692,8 +692,8 @@ Session.prototype = {
     tabCard.toggleClass(saveClass, saveScreen);
   },
 
-  verifyUser: function(){
-    this.commenceOTP();
+  verifyUser: function(msg){
+    this.commenceOTP(null, msg);
     this.user.login();
   },
 

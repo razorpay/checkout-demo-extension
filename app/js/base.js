@@ -41,6 +41,10 @@ var discreet = {
     'SFR': 'Fr'
   },
 
+  msg: {
+    wrongotp: 'Entered OTP was incorrect. Re-enter to proceed.'
+  },
+
   supported: function(showAlert){
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
     var alertMessage;

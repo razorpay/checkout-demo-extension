@@ -24,8 +24,8 @@ User.prototype = {
       url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' +
       this.key,
       callback: function(data){
-        user.saved = true//!!data.saved;
-        invoke(callback, null, data, 600);
+        user.saved = true;
+        callback();
       }
     })
   },
@@ -50,7 +50,11 @@ User.prototype = {
       callback: function(data){
         user.id = data.app_id;
         user.tokens = data.tokens;
-        callback();
+        if (data.error) {
+          callback(discreet.msg.wrongotp);
+        } else {
+          callback();
+        }
       }
     })
   },

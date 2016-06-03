@@ -376,7 +376,7 @@ var responseTypes = {
 function otpCallback(response){
   var error = response.error;
   if(error && error.action === 'RETRY'){
-    return this.emit('otp.required', 'Entered OTP was incorrect. Re-enter to proceed.');
+    return this.emit('otp.required', discreet.msg.wrongotp);
   }
   this.complete(response);
 }
