@@ -16,6 +16,9 @@ $cardpl: 46px;
 }
 
 #show-saved-cards {
+  line-height: $cardh;
+  margin-top: 8px;
+  display: none;
   cursor: pointer;
   position: absolute;
   transition: 0.2s;
@@ -64,7 +67,8 @@ $cardpl: 46px;
     }
   }
   &.has-cards {
-    #saved-cards-container {
+    #saved-cards-container,
+    #show-saved-cards {
       display: block;
     }
   }
