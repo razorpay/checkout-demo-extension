@@ -207,7 +207,7 @@ function errorHandler(response){
     }
   }
 
-  this.showLoadError(true, message || 'There was an error in handling your request');
+  this.showLoadError(message || 'There was an error in handling your request', true);
   $('#fd-hide').focus();
 }
 
@@ -441,7 +441,7 @@ Session.prototype = {
 
   secAction: function() {
     if(this.tab === 'wallet'){
-      this.showLoadError(false, 'Sending OTP to ' + getPhone());
+      this.showLoadError('Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
@@ -467,7 +467,7 @@ Session.prototype = {
       e.stopPropagation();
     })
     this.on('click', '.payment-option', this.switchTab);
-    this.on('submit', '#form', this.submit);
+    this.on('submit', '#form', this.preSubmit);
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
@@ -563,11 +563,6 @@ Session.prototype = {
     }
   },
 
-  // if current screen is otp
-  isOTP: function(){
-    return this.screen === 'otp';
-  },
-
   setScreen: function(screen){
     if(screen === this.screen) {
       return;
@@ -622,6 +617,8 @@ Session.prototype = {
 
     if (tab) {
       $('#user').html(getPhone());
+    } else {
+      this.payload = null;
     }
 
     this.tab = tab;
@@ -704,7 +701,7 @@ Session.prototype = {
   },
 
   verifyUser: function(msg){
-    this.commenceOTP(null, msg);
+    this.commenceOTP(msg, true);
     this.user.login();
   },
 
@@ -816,41 +813,42 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function(error, text){
-    var yesClass, noClass;
-    yesClass = noClass = 'addClass';
-    if(error){
-      noClass = 'removeClass';
+  showLoadError: function(text, error){
+    var actionState;
+    var loadingState = 'addClass';
+    if (error) {
+      actionState = loadingState;
+      loadingState = 'removeClass'
     } else {
-      yesClass = 'removeClass';
+      actionState = 'removeClass';
     }
 
     if(!text){
       text = loadingMessage;
     }
 
-    if(this.isOTP()){
+    if(this.screen === 'otp'){
       $('#modal').removeClass('sub');
       setOtpText(text);
-      $('#form-otp')[yesClass]('action')[noClass]('loading');
+      $('#form-otp')[actionState]('action')[loadingState]('loading');
     } else {
       $('#fd-t').html(text);
       showOverlay(
-        $('#error-message')[noClass]('loading')
+        $('#error-message')[loadingState]('loading')
       );
     }
   },
 
-  commenceOTP: function(shouldLookup, otpText){
+  commenceOTP: function(text, immediately){
     this.setScreen('otp');
     $('#form-otp').css('display', 'block');
     $('#add-funds').removeClass('show');
     invoke('addClass', $('#footer'), 'otp', 300);
 
-    if(shouldLookup){
-      this.showLoadError(false, 'Looking for ' + shouldLookup + ' associated with ' + getPhone());
+    if(immediately){
+      this.sendOTP(text);
     } else {
-      this.sendOTP(otpText);
+      this.showLoadError('Looking for ' + text + ' associated with ' + getPhone());
     }
   },
 
@@ -859,7 +857,7 @@ Session.prototype = {
     var timeout;
     if(!text){
       var phone = getPhone();
-      this.showLoadError(false, 'Sending OTP to ' + phone);
+      this.showLoadError('Sending OTP to ' + phone);
       timeout = 750;
       text = 'An OTP has been sent to ' + phone;
       this.requestTimeout = setTimeout(function(){
@@ -870,18 +868,28 @@ Session.prototype = {
     }
   },
 
-  onOtpSubmit: function(e){
-    preventDefault(e);
-
-    this.showLoadError(false, 'Verifying OTP');
+  onOtpSubmit: function(){
+    var self = this;
+    if (self.checkInvalid('#form-otp')){
+      return;
+    }
+    self.showLoadError('Verifying OTP...');
     var otp = gel('otp').value;
 
-    if(this.tab === 'wallet'){
-      this.r.submitOTP(otp);
-    } else {
-      var user = this.user;
-      user.verify(otp, bind(this.showCardTab,this));
+    if(self.tab === 'wallet'){
+      return self.r.submitOTP(otp);
     }
+    var callback;
+    // card filled by logged out user + remember me
+    // wallet screen otp
+    if (self.payload) {
+      this.submit();
+
+    // before shouing cardtab
+    } else {
+      callback = bind(self.showCardTab, self);
+    }
+    self.user.verify(otp, callback);
   },
 
   clearRequest: function(){
@@ -894,17 +902,16 @@ Session.prototype = {
     this.requestTimeout = null;
   },
 
-  submit: function(e) {
+  preSubmit: function(e) {
     preventDefault(e);
-    this.smarty.refresh();
+    var screen = this.screen;
 
-    if (this.checkInvalid('#form-common')) {
-      return;
+    if (screen === 'otp') {
+      return this.onOtpSubmit();
     }
 
-    // var tab = this.tab;
-    var screen = this.screen;
-    var data = this.getPayload();
+    this.smarty.refresh();
+    var data = this.payload = this.getPayload();
     if (this.order) {
       data.method = 'netbanking';
       data.bank = this.order.bank;
@@ -925,10 +932,8 @@ Session.prototype = {
           }
         } else {
           // no saved card was selected
-          if (!data.token) {
-            return this.shake();
-          }
           if (!data['card[cvv]']) {
+            this.shake();
             return $('#cvv-' + data.token).focus();
           }
         }
@@ -938,18 +943,16 @@ Session.prototype = {
         return;
       }
 
-      // after checking validity, delegate to onOtpSubmit
-      if (screen === 'otp' && !this.saving_card) {
-        return this.onOtpSubmit(e);
-      }
       // ask user to verify phone number if not logged in and wants to save card
       if (('app_id' in data) && !data.app_id) {
-        this.saving_card = true;
         return this.verifyUser();
       }
-    } else {
-      return;
+      this.submit();
     }
+  },
+
+  submit: function(){
+    var data = this.payload;
 
     Razorpay.sendMessage({
       event: 'submit',
@@ -970,15 +973,13 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    var options = this.get();
-
     var request = {
       fees: preferences.fee_bearer
     };
 
-    if (this.saving_card) {
-      request.paused = true;
-      request.message = 'Verifying OTP';
+    if (this.tab === 'card') {
+      var isRedirect = this.get('redirect');
+      request.message = 'Verifying OTP...';
       var user = this.user;
       user.verify(
         gel('otp').value,
@@ -986,8 +987,12 @@ Session.prototype = {
           function(){
             if(user.id){
               data.app_id = user.id;
-              this.r.emit('payment.resume');
               this.setScreen('card');
+              if (!isRedirect) {
+                this.r.emit('payment.resume');
+              } else {
+                this.submit();
+              }
               this.showLoadError();
             } else {
               this.r.emit('payment.error', discreet.error('Invalid OTP. Re-enter to proceed.'));
@@ -996,6 +1001,11 @@ Session.prototype = {
           this
         )
       );
+      if (isRedirect) {
+        return;
+      } else {
+        request.paused = true;
+      }
     }
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
