@@ -445,7 +445,14 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
-      this.showCardTab();
+      var payload = this.payload;
+      if (payload) {
+        delete payload.save;
+        delete payload.app_id;
+        this.submit();
+      } else {
+        this.showCardTab();
+      }
     }
   },
 
@@ -761,7 +768,7 @@ Session.prototype = {
   },
 
   getActiveForm: function(){
-    var form = this.saving_card ? 'card' : this.screen;
+    var form = this.tab;
     if (form === 'card') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
@@ -869,27 +876,44 @@ Session.prototype = {
   },
 
   onOtpSubmit: function(){
-    var self = this;
-    if (self.checkInvalid('#form-otp')){
+    if (this.checkInvalid('#form-otp')){
       return;
     }
-    self.showLoadError('Verifying OTP...');
+    this.showLoadError('Verifying OTP...');
     var otp = gel('otp').value;
 
-    if(self.tab === 'wallet'){
-      return self.r.submitOTP(otp);
+    if(this.tab === 'wallet'){
+      return this.r.submitOTP(otp);
     }
+
+    // card tab only past this
     var callback;
     // card filled by logged out user + remember me
-    // wallet screen otp
-    if (self.payload) {
-      this.submit();
-
-    // before shouing cardtab
+    if (this.payload) {
+      var isRedirect = this.get('redirect');
+      if (!isRedirect) {
+        this.submit();
+      }
+      callback = function(msg){
+        var id = this.user.id
+        if(id){
+          this.payload.app_id = id;
+          this.setScreen('card');
+          if (isRedirect) {
+            this.submit();
+          } else {
+            this.r.emit('payment.resume');
+          }
+          this.showLoadError();
+        } else {
+          this.r.emit('payment.error', discreet.error(msg));
+          this.sendOTP(msg);
+        }
+      }
     } else {
-      callback = bind(self.showCardTab, self);
+      callback = this.showCardTab;
     }
-    self.user.verify(otp, callback);
+    this.user.verify(otp, bind(callback, this));
   },
 
   clearRequest: function(){
@@ -943,16 +967,26 @@ Session.prototype = {
         return;
       }
 
-      // ask user to verify phone number if not logged in and wants to save card
-      if (('app_id' in data) && !data.app_id) {
-        return this.verifyUser();
-      }
       this.submit();
     }
   },
 
   submit: function(){
     var data = this.payload;
+    var request = {
+      fees: preferences.fee_bearer
+    };
+
+    // ask user to verify phone number if not logged in and wants to save card
+    if (('app_id' in data) && !data.app_id) {
+      if (this.screen === 'card') {
+        $('#otp-sec').html('Skip saving card');
+        return this.verifyUser();
+      } else {
+        request.message = 'Verifying OTP...';
+        request.paused = true;
+      }
+    }
 
     Razorpay.sendMessage({
       event: 'submit',
@@ -971,41 +1005,6 @@ Session.prototype = {
 
     if(this.modal){
       this.modal.options.backdropclose = false;
-    }
-
-    var request = {
-      fees: preferences.fee_bearer
-    };
-
-    if (this.tab === 'card') {
-      var isRedirect = this.get('redirect');
-      request.message = 'Verifying OTP...';
-      var user = this.user;
-      user.verify(
-        gel('otp').value,
-        bind(
-          function(){
-            if(user.id){
-              data.app_id = user.id;
-              this.setScreen('card');
-              if (!isRedirect) {
-                this.r.emit('payment.resume');
-              } else {
-                this.submit();
-              }
-              this.showLoadError();
-            } else {
-              this.r.emit('payment.error', discreet.error('Invalid OTP. Re-enter to proceed.'));
-            }
-          },
-          this
-        )
-      );
-      if (isRedirect) {
-        return;
-      } else {
-        request.paused = true;
-      }
     }
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
