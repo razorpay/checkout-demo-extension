@@ -323,8 +323,8 @@ Session.prototype = {
 
     this.setUser();
     this.getEl();
-    this.setSmarty();
     this.fillData();
+    this.setSmarty();
     this.setEMI();
     this.setModal();
     this.setCard();
@@ -441,11 +441,20 @@ Session.prototype = {
 
   secAction: function() {
     if(this.tab === 'wallet'){
+      this.showLoadError(false, 'Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       this.user.wants_skip = true;
       this.showCardTab();
     }
+  },
+
+  addFunds: function(event) {
+    setOtpText('Loading...');
+    $('#add-funds').removeClass('show');
+    $('#tab-otp').removeClass('action').addClass('loading').css('display', 'block');
+
+    this.r.topupWallet();
   },
 
   bindEvents: function(){
@@ -462,6 +471,8 @@ Session.prototype = {
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
     this.on('click', '#otp-sec', this.secAction);
+    this.on('click', '#add-funds-action', this.addFunds);
+    this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
     var enabledMethods = this.methods;
 
     if(enabledMethods.netbanking){
@@ -833,6 +844,7 @@ Session.prototype = {
   commenceOTP: function(shouldLookup, otpText){
     this.setScreen('otp');
     $('#form-otp').css('display', 'block');
+    $('#add-funds').removeClass('show');
     invoke('addClass', $('#footer'), 'otp', 300);
 
     if(shouldLookup){
@@ -987,7 +999,6 @@ Session.prototype = {
     }
 
     if((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees){
-      options.redirect = false;
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
@@ -1001,6 +1012,11 @@ Session.prototype = {
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
+      this.r.on('payment.wallet.topup', function() {
+        $('#tab-otp').removeClass('loading');
+        $('#add-funds').addClass('show');
+        setOtpText('Insufficient balance in your wallet');
+      });
     }
   },
 
@@ -1034,6 +1050,8 @@ Session.prototype = {
       this.smarty.off();
       this.card.unbind();
       $(this.el).remove();
+
+      this.tab = this.screen = '';
 
       if(this.emi){
         this.emi.unbind();

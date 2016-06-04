@@ -38,7 +38,8 @@ var discreet = {
     'HUF': 'Ft',
     'JPY': '¥',
     'PLN': 'zł',
-    'SFR': 'Fr'
+    'SFR': 'Fr',
+    'CHF': 'Fr'
   },
 
   msg: {
