@@ -419,7 +419,7 @@ razorpayProto.resendOTP = function(callback){
 
 razorpayProto.topupWallet = function() {
   var payment = this._payment;
-  var isRedirect = payment.r.get('redirect');
+  var isRedirect = this.get('redirect');
   if (!isRedirect) {
     // passing true to force opening popup
     payment.tryPopup(true);
