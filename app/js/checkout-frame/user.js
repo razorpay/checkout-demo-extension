@@ -24,7 +24,7 @@ User.prototype = {
       url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' +
       this.key,
       callback: function(data){
-        user.saved = true;
+        user.saved = !!data.saved;
         callback();
       }
     })
