@@ -249,7 +249,8 @@ button {
   text-transform: uppercase;
 }
 
-#card_cvv {
+#card_cvv,
+.saved-cvv {
   -webkit-text-security: disc;
 }
 

@@ -20,6 +20,9 @@ $p: 24px;
 $topbarh: 50px;
 $footerh: 55px;
 
+$bodyh: 317px;
+$bodyhmobile: 317px + $footerh;
+
 @mixin opacity($fraction) {
   opacity: $fraction;
 

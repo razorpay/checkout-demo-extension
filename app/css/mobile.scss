@@ -30,6 +30,8 @@ $max-height: 659px;
   }
 
   #body {
+    height: $bodyhmobile;
+    min-height: $bodyhmobile;
     &.emi-focus {
       #footer {
         position: fixed;
