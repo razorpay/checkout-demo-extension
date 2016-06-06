@@ -71,7 +71,7 @@ var discreet = {
   },
 
   medium: 'web',
-  context: location.href.replace(/^https?:\/\//,''),
+  context: location.href,
 
   isBase64Image: function(image){
     return /data:image\/[^;]+;base64/.test(image);

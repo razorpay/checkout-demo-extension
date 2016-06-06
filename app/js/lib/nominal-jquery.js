@@ -84,6 +84,9 @@ function map( iteratee, mapFunc ) {
 }
 
 function isNonEmpty(obj){
+  if (!obj) {
+    return false;
+  }
   if (obj instanceof Array) {
     return obj.length;
   }
