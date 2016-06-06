@@ -47,12 +47,23 @@ setCommunicator();
 function onPaymentCancel(errorObj){
   if(!this.done){
     var payment_id = this.payment_id;
-    if(payment_id){
+    if(payment_id) {
       $.ajax({
-        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key')
-      })
+        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key'),
+        callback: bind(function(response) {
+          if (response.status === 'authorized') {
+            this.complete({
+              razorpay_payment_id: payment_id
+            });
+          } else {
+            var errorMsg = response.error? 'Payment Failed' : '';
+            this.complete(errorObj || discreet.error(errorMsg));
+          }
+        }, this)
+      });
+    } else {
+      this.complete(errorObj || discreet.error());
     }
-    this.complete(errorObj || discreet.error());
   }
 }
 
@@ -251,7 +262,7 @@ Payment.prototype = {
   tryAjax: function(){
     // virtually all the time, unless there isn't an ajax based route
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if(this.fees || !discreet.isFrame){
+    if(this.fees || !discreet.isFrame && /MSIE /.test(ua)){
       return false;
     }
     // else make ajax request

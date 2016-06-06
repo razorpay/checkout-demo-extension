@@ -866,10 +866,13 @@ Session.prototype = {
 
   clearRequest: function(){
     var powerotp = gel('powerotp');
-    if(powerotp){
+    if (powerotp) {
       powerotp.value = '';
     }
-    this.r.emit('payment.cancel');
+    if (this.r._payment) {
+      this.r.emit('payment.cancel');
+    }
+
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
   },
@@ -985,9 +988,13 @@ Session.prototype = {
     } else {
       this.showLoadError();
     }
+
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this));
+      .on('payment.error', bind(errorHandler, this))
+      .on('payment.cancel', bind(function() {
+        this.showLoadError(false, 'Checking payment');
+      }, this));
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
@@ -1016,7 +1023,6 @@ Session.prototype = {
         data['card[expiry_year]'] = '21';
       }
     }
-
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
