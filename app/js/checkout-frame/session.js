@@ -448,7 +448,7 @@ Session.prototype = {
       var payload = this.payload;
       if (payload) {
         delete payload.save;
-        delete payload.app_id;
+        delete payload.app_token;
         this.submit();
       } else {
         this.showCardTab();
@@ -641,10 +641,10 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
-    if( !user.id && typeof user.saved !== 'boolean' ) {
+    if( !user.app_token && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab, this));
-    } else if ( user.saved && !user.id && !user.wants_skip ) {
+    } else if ( user.saved && !user.app_token && !user.wants_skip ) {
       this.verifyUser(message);
     } else {
       this.setSavedCards(user);
@@ -895,9 +895,9 @@ Session.prototype = {
         this.submit();
       }
       callback = function(msg){
-        var id = this.user.id
+        var id = this.user.app_token;
         if(id){
-          this.payload.app_id = id;
+          this.payload.app_token = id;
           this.setScreen('card');
           if (isRedirect) {
             this.submit();
@@ -978,7 +978,7 @@ Session.prototype = {
     };
 
     // ask user to verify phone number if not logged in and wants to save card
-    if (('app_id' in data) && !data.app_id) {
+    if (('app_token' in data) && !data.app_token) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         return this.verifyUser();
@@ -1035,11 +1035,11 @@ Session.prototype = {
     if(this.screen === 'card'){
       setEmiBank(data);
 
-      var userId = this.user.id;
+      var userId = this.user.app_token;
 
-      // set app_id if either new card or saved card (might be blank)
+      // set app_token if either new card or saved card (might be blank)
       if (data.save || data.token) {
-        data.app_id = userId;
+        data.app_token = userId;
       }
     }
 

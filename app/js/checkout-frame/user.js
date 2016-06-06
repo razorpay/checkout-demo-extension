@@ -10,7 +10,8 @@ function deleteToken(user, token){
 }
 
 function User (o) {
-  this.id = o.id || null;
+  this.app_token = o.app_token || null;
+  this.device_token = o.device_token || null;
   this.phone = o.phone || '';
   this.saved = o.saved || null;
   this.wants_skip = o.wants_skip || null;
@@ -48,8 +49,9 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.id = data.app_token;
+        user.app_token = data.app_token;
         user.tokens = data.tokens;
+        user.device_token = data.device_token;
         if (data.error) {
           callback(discreet.msg.wrongotp);
         } else {
@@ -61,7 +63,7 @@ User.prototype = {
 
   setPhone: function(phone){
     if (this.phone !== phone) {
-      this.id = this.saved = this.wants_skip = this.tokens = null;
+      this.app_token = this.saved = this.wants_skip = this.tokens = null;
       this.phone = phone;
     }
   },
@@ -69,12 +71,12 @@ User.prototype = {
   deleteCard: function(token, callback){
     var user = this;
 
-    if (!this.id) {
+    if (!this.app_token) {
       return;
     }
 
     $.ajax({
-      url: discreet.makeUrl() + 'apps/' + user.id + '/tokens/' + token +
+      url: discreet.makeUrl() + 'apps/' + user.app_token + '/tokens/' + token +
         '?key_id=' + user.key,
       method: 'delete',
       callback: function(){
