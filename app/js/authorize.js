@@ -262,7 +262,7 @@ Payment.prototype = {
   tryAjax: function(){
     // virtually all the time, unless there isn't an ajax based route
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if(this.fees || !discreet.isFrame){
+    if(this.fees || !discreet.isFrame && /MSIE /.test(ua)){
       return false;
     }
     // else make ajax request
