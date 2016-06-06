@@ -48,7 +48,7 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.id = data.app_id;
+        user.id = data.app_token;
         user.tokens = data.tokens;
         if (data.error) {
           callback(discreet.msg.wrongotp);
