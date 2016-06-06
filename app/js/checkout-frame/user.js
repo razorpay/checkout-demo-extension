@@ -52,6 +52,16 @@ User.prototype = {
         user.app_token = data.app_token;
         user.tokens = data.tokens;
         user.device_token = data.device_token;
+
+        if (CheckoutBridge) {
+          if(CheckoutBridge.setAppToken) {
+            CheckoutBridge.setAppToken(user.app_token);
+          }
+          if(CheckoutBridge.setDeviceToken) {
+            CheckoutBridge.setDeviceToken(user.device_token);
+          }
+        }
+
         if (data.error) {
           callback(discreet.msg.wrongotp);
         } else {
