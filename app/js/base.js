@@ -85,14 +85,6 @@ var discreet = {
     };
   },
 
-  makeUrl: function(unversioned){
-    var url = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/';
-    if(!unversioned){
-      url += RazorpayConfig.version;
-    }
-    return url;
-  },
-
   redirect: function(data){
     if(window !== window.parent){
       return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});

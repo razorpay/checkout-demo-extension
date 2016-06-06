@@ -79,7 +79,7 @@ function sanitizeImage(options){
 
 function makeCheckoutUrl(rzp){
   var params = [];
-  var url = RazorpayConfig.framepath || discreet.makeUrl() + 'checkout';
+  var url = RazorpayConfig.framepath || makeUrl('checkout');
   var key, order_id;
 
   if (rzp) {
@@ -141,7 +141,6 @@ function makeCheckoutMessage(rzp){
   var response = {
     context: location.href,
     options: options,
-    config: RazorpayConfig,
     id: rzp.id
   }
 

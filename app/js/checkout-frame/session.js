@@ -689,8 +689,7 @@ Session.prototype = {
 
   setUser: function(){
     var userOptions = preferences.user ? preferences.user : emo;
-    this.user = new User(userOptions);
-    this.user.key = this.get('key');
+    this.user = new User(userOptions, this.get('key'));
   },
 
   switchBank: function(e){

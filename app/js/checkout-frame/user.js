@@ -1,16 +1,17 @@
-function User (o) {
+function User (o, key) {
   this.id = o.id || null;
   this.phone = o.phone || '';
   this.saved = o.saved || null;
   this.wants_skip = o.wants_skip || null;
   this.tokens = o.tokens || null;
+  this.key = key;
 }
 
 User.prototype = {
   lookup: function(callback){
     var user = this;
     $.ajax({
-      url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' + this.key,
+      url: makeAuthUrl(this, 'customer/status/' + this.phone),
       callback: function(data){
         user.saved = !!data.saved;
         invoke(callback, null, data, 600);
@@ -20,7 +21,7 @@ User.prototype = {
 
   login: function(){
     $.post({
-      url: discreet.makeUrl() + 'otp/create?key_id=' + this.key,
+      url: makeAuthUrl(this, 'otp/create'),
       data: {
         contact: this.phone
       }
@@ -30,7 +31,7 @@ User.prototype = {
   verify: function(otp, callback){
     var user = this;
     $.post({
-      url: discreet.makeUrl() + 'otp/verify?key_id=' + this.key,
+      url: makeAuthUrl(this, 'otp/verify'),
       data: {
         contact: this.phone,
         otp: otp
@@ -54,10 +55,8 @@ User.prototype = {
     if (!this.id) {
       return;
     }
-
     $.ajax({
-      url: discreet.makeUrl() + 'apps/' + this.id + '/tokens/' + token +
-        '?key_id=' + this.key,
+      url: makeAuthUrl(this, 'apps/' + this.id + '/tokens/' + token),
       method: 'delete',
       callback: function(){
         callback();
