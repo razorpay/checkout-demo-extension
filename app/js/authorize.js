@@ -48,13 +48,14 @@ function onPaymentCancel(errorObj){
   if(!this.done){
     var payment_id = this.payment_id;
     if(payment_id) {
+      var successObj = {razorpay_payment_id: payment_id};
+      track(this.r, 'cancel', successObj);
       $.ajax({
         url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key'),
         callback: bind(function(response) {
           if (response.status === 'authorized') {
-            this.complete({
-              razorpay_payment_id: payment_id
-            });
+            track(this.r, 'cancel_authorized', successObj);
+            this.complete(successObj);
           } else {
             var errorMsg = response.error? 'Payment Failed' : '';
             this.complete(errorObj || discreet.error(errorMsg));
