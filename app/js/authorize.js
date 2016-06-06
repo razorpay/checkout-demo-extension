@@ -111,7 +111,7 @@ Payment.prototype = {
 
   checkRedirect: function(){
     var getOption = this.r.get;
-    if(getOption('redirect')) {
+    if(getOption('redirect') && !this.powerwallet) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
@@ -119,16 +119,12 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (this.powerwallet) {
-        return false;
-      } else {
-        discreet.redirect({
-          url: makeRedirectUrl(this.fees),
-          content: data,
-          method: 'post'
-        });
-        return true;
-      }
+      discreet.redirect({
+        url: makeRedirectUrl(this.fees),
+        content: data,
+        method: 'post'
+      });
+      return true;
     }
   },
 
@@ -386,6 +382,10 @@ var responseTypes = {
   otp: function(request){
     this.otpurl = request.url;
     this.emit('otp.required');
+  },
+
+  return: function(request){
+    discreet.redirect(request);
   }
 }
 
