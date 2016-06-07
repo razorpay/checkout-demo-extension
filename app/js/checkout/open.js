@@ -70,7 +70,10 @@ function initAutomaticCheckout(){
   var key = opts.key;
   if (key && key.length > 0){
     opts.handler = defaultAutoPostHandler;
-    addAutoCheckoutButton(Razorpay(opts));
+    var rzp = Razorpay(opts);
+    if (!opts.parent) {
+      addAutoCheckoutButton(rzp);
+    }
   }
 }
 
