@@ -239,7 +239,7 @@ function showModal(session) {
         ]
       };
       preferences = response;
-      showModalWithSession(session);
+      showModal(session);
     })
     return;
   }
