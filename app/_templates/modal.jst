@@ -163,6 +163,7 @@ var gridClass = gridClasses[i-1];
                       <span class="checkbox"></span>
                       My Maestro Card doesn't have Expiry/CVV
                     </label>
+                    {{? o('cardsaving')}}
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>
@@ -176,6 +177,7 @@ var gridClass = gridClasses[i-1];
                       </div>
                       <div class="clear"></div>
                     </div>
+                    {{?}}
                   </div>
                   <div id="elem-emi" class="double">
                     <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
