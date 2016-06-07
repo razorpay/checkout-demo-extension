@@ -9,21 +9,21 @@ function deleteToken(user, token){
   }
 }
 
-function User (o) {
+function User (o, key) {
   this.app_token = o.app_token || null;
   this.device_token = o.device_token || null;
   this.phone = o.phone || '';
   this.saved = o.saved || null;
   this.wants_skip = o.wants_skip || null;
   this.tokens = o.tokens || null;
+  this.key = key;
 }
 
 User.prototype = {
   lookup: function(callback){
     var user = this;
     $.ajax({
-      url: discreet.makeUrl() + 'customer/status/' + this.phone + '?key_id=' +
-      this.key,
+      url: makeAuthUrl(this.key, 'customer/status/' + this.phone),
       callback: function(data){
         user.saved = !!data.saved;
         callback();
@@ -33,7 +33,7 @@ User.prototype = {
 
   login: function(){
     $.post({
-      url: discreet.makeUrl() + 'otp/create?key_id=' + this.key,
+      url: makeAuthUrl(this.key, 'otp/create'),
       data: {
         contact: this.phone
       }
@@ -43,7 +43,7 @@ User.prototype = {
   verify: function(otp, callback){
     var user = this;
     $.post({
-      url: discreet.makeUrl() + 'otp/verify?key_id=' + this.key,
+      url: makeAuthUrl(this.key, 'otp/verify'),
       data: {
         contact: this.phone,
         otp: otp
@@ -74,10 +74,8 @@ User.prototype = {
     if (!this.app_token) {
       return;
     }
-
     $.ajax({
-      url: discreet.makeUrl() + 'apps/' + user.app_token + '/tokens/' + token +
-        '?key_id=' + user.key,
+      url: makeAuthUrl(this.key, 'apps/' + this.app_token + '/tokens/' + token),
       method: 'delete',
       callback: function(){
         callback();

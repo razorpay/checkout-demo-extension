@@ -13,17 +13,31 @@ var doc = document.body || document.documentElement;
 var ua = navigator.userAgent;
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
-var RazorpayConfig;
-var global_Razorpay = window.Razorpay;
-if(typeof global_Razorpay === 'object' && global_Razorpay && typeof global_Razorpay.config === 'object'){
-  RazorpayConfig = global_Razorpay.config;
+var RazorpayConfig = {
+  api: 'https://api.razorpay.com/',
+  version: 'v1/',
+  frameApi: '/'
 }
-else {
-  RazorpayConfig = {
-    protocol: 'https',
-    hostname: 'api.razorpay.com',
-    version: 'v1/'
+
+try {
+  var config = window.Razorpay.config;
+  for (var i in config) {
+    RazorpayConfig[i] = config[i];
   }
+} catch(e){}
+
+function makeUrl(path){
+  if (!path) {
+    path = '';
+  }
+  return RazorpayConfig.api + RazorpayConfig.version + path;
+}
+
+function makeAuthUrl(key, path){
+  if (typeof key === 'object') {
+    key = key.get('key');
+  }
+  return makeUrl(path) + '?key_id=' + key;
 }
 
 var Razorpay = window.Razorpay = function(options){

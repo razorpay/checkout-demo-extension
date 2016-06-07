@@ -1,11 +1,12 @@
 Razorpay = {
   config: {
-    protocol: 'http',
-    hostname: 'api.razorpay.dev',
-    version: 'v1/',
+    api: 'https://checkout.razorpay.com/',
+    frameApi: '/',
+
     // path for iframe, if set
-    framepath: '/checkout.html',
-    // passed to api/v1/checkout as checkout=jspath
-    jspath: '/dist/v1/'
+    frame: '/checkout.html',
+
+    // path for view/checkout to load js from
+    js: 'http://checkout.pronav.in/dist/'
   }
 }
