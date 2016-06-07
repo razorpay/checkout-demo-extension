@@ -644,7 +644,7 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
-    if (!options.cardsaving) {
+    if (!this.get('cardsaving')) {
       $('#should-save-card [type=checkbox]')[0].checked =false;
       $('#should-save-card [type=checkbox]')[0].value =0;
       return this.setScreen('card');

@@ -186,27 +186,6 @@ describe 'discreet', ->
       expect errorObj.error.description
         .to.be.a 'string'
 
-  describe 'makeUrl', ->
-    origVal = null
-    before ->
-      origVal = window.RazorpayConfig
-      window.RazorpayConfig =
-        protocol: 'foo'
-        hostname: 'bar'
-        version: 'baz'
-
-    after ->
-      window.RazorpayConfig = origVal
-
-    it 'should return api url', ->
-      expect discreet.makeUrl()
-        .to.be 'foo://bar/baz'
-
-    it 'should return unversioned api url', ->
-      expect discreet.makeUrl true
-        .to.be 'foo://bar/'
-
-
   describe 'isBase64Image', ->
     result = image = null
 
@@ -280,6 +259,48 @@ describe 'discreet', ->
 
       expect submitSpy.args[0]
         .to.eql [request.url, request.content, request.method]
+
+describe 'makeUrl', ->
+  origVal = null
+  before ->
+    origVal = window.RazorpayConfig
+    window.RazorpayConfig =
+      api: 'foo/'
+      frameApi: 'bar/'
+      frame: 'baz'
+      version: 'v1/'
+      js: 'boogie'
+
+  after ->
+    window.RazorpayConfig = origVal
+
+  it 'should work when path not provided', ->
+    expect makeUrl()
+      .to.be 'foo/v1/'
+
+  it 'should work when path is provided', ->
+    expect makeUrl 'path/'
+      .to.be 'foo/v1/path/'
+
+describe 'makeAuthUrl', ->
+  stub = null
+  session =
+    get: ->
+      return 'xyz'
+  before ->
+    stub = sinon.stub window, 'makeUrl'
+    stub.withArgs('abc/').returns('foo/abc/')
+
+  after ->
+    stub.restore()
+
+  it 'should be able to make auth url if key is passed', ->
+    expect makeAuthUrl 'xyz', 'abc/'
+      .to.be 'foo/abc/?key_id=xyz'
+
+  it 'should be able to make auth url if session object is passed', ->
+    expect makeAuthUrl session, 'abc/'
+      .to.be 'foo/abc/?key_id=xyz'
 
 describe 'setNotes', ->
   it 'should strip invalid types', ->
