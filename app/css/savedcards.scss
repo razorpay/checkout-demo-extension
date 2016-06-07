@@ -32,6 +32,10 @@ $cardpl: 46px;
   }
 }
 
+#should-save-card {
+  display: none;
+}
+
 #form-card {
   &.saved-cards {
     #show-saved-cards {
@@ -81,7 +85,7 @@ $cardpl: 46px;
 #add-card-container {
   overflow: hidden;
   transition: 0.2s;
-  height: 168px;
+  height: 142px;
   z-index: 2;
   position: relative;
 }
@@ -183,6 +187,16 @@ $cardpl: 46px;
     position: absolute;
     right: 0;
     bottom: 10px;
+  }
+}
+
+.cardsaving {
+  #should-save-card {
+    display: block;
+  }
+
+  #add-card-container {
+    height: 168px;
   }
 }
 

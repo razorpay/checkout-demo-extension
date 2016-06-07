@@ -644,6 +644,14 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
+    if (!options.cardsaving) {
+      $('#should-save-card [type=checkbox]')[0].checked =false;
+      $('#should-save-card [type=checkbox]')[0].value =0;
+      return this.setScreen('card');
+    }
+
+    $(this.el).addClass('cardsaving');
+
     if( !user.app_token && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab, this));
