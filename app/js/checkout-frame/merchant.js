@@ -218,7 +218,7 @@ function showModal(session) {
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
       preferences = response;
-      showModalWithSession(session);
+      showModal(session);
     })
     return;
   }

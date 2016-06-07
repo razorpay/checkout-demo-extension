@@ -47,12 +47,24 @@ setCommunicator();
 function onPaymentCancel(errorObj){
   if(!this.done){
     var payment_id = this.payment_id;
-    if(payment_id){
+    if(payment_id) {
+      var successObj = {razorpay_payment_id: payment_id};
+      track(this.r, 'cancel', successObj);
       $.ajax({
-        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key')
-      })
+        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key'),
+        callback: bind(function(response) {
+          if (response.status === 'authorized') {
+            track(this.r, 'cancel_authorized', successObj);
+            this.complete(successObj);
+          } else {
+            var errorMsg = response.error? 'Payment Failed' : '';
+            this.complete(errorObj || discreet.error(errorMsg));
+          }
+        }, this)
+      });
+    } else {
+      this.complete(errorObj || discreet.error());
     }
-    this.complete(errorObj || discreet.error());
   }
 }
 
@@ -100,7 +112,7 @@ Payment.prototype = {
 
   checkRedirect: function(){
     var getOption = this.r.get;
-    if(getOption('redirect')) {
+    if(getOption('redirect') && !this.powerwallet) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
@@ -108,16 +120,12 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (this.powerwallet) {
-        return false;
-      } else {
-        discreet.redirect({
-          url: makeRedirectUrl(this.fees),
-          content: data,
-          method: 'post'
-        });
-        return true;
-      }
+      discreet.redirect({
+        url: makeRedirectUrl(this.fees),
+        content: data,
+        method: 'post'
+      });
+      return true;
     }
   },
 
@@ -251,7 +259,7 @@ Payment.prototype = {
   tryAjax: function(){
     // virtually all the time, unless there isn't an ajax based route
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if(this.fees || !discreet.isFrame){
+    if(this.fees || !discreet.isFrame && /MSIE /.test(ua)){
       return false;
     }
     // else make ajax request
@@ -375,6 +383,10 @@ var responseTypes = {
   otp: function(request){
     this.otpurl = request.url;
     this.emit('otp.required');
+  },
+
+  'return': function(request){
+    discreet.redirect(request);
   }
 }
 

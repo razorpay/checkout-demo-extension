@@ -237,6 +237,9 @@ function successHandler(response){
 }
 
 function Session (options) {
+  if (typeof options.theme === 'object' && options.theme.color === '#3594E2') {
+    delete options.theme.color;
+  }
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.listeners = [];
@@ -918,10 +921,13 @@ Session.prototype = {
 
   clearRequest: function(){
     var powerotp = gel('powerotp');
-    if(powerotp){
+    if (powerotp) {
       powerotp.value = '';
     }
-    this.r.emit('payment.cancel');
+    if (this.r._payment) {
+      this.r.emit('payment.cancel');
+    }
+
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
   },
@@ -1015,9 +1021,13 @@ Session.prototype = {
     } else {
       this.showLoadError();
     }
+
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this));
+      .on('payment.error', bind(errorHandler, this))
+      .on('payment.cancel', bind(function() {
+        this.showLoadError(false, 'Checking payment');
+      }, this));
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(this.sendOTP, this));
