@@ -1,4 +1,4 @@
-checkoutPostUrl = 'https://api.razorpay.com/v1/payments/create/checkout'
+checkoutPostUrl = '/v1/payments/create/checkout'
 androidUrl = '/test/fixtures/app.html?platform=android&key=key'
 message =
   id: 'mehta'
