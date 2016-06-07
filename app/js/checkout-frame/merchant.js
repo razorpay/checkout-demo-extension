@@ -1,6 +1,3 @@
-// flag for checkout-frame.js
-discreet.isFrame = true;
-
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
   sessions = {},
