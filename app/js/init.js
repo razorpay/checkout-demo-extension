@@ -35,7 +35,7 @@ function makeUrl(path){
 
 function makeAuthUrl(key, path){
   if (typeof key !== 'string') {
-    key = this.get('key');
+    key = key.get('key');
   }
   return makeUrl(path) + '?key_id=' + key;
 }
@@ -74,7 +74,7 @@ Razorpay.defaults = {
   'parent': null,
   'display_currency': '',
   'display_amount': '',
-
+  'cardsaving': false,
   'method': {
     'netbanking': true,
     'card': true,

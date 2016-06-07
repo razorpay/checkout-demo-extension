@@ -125,9 +125,6 @@ describe 'makeCheckoutMessage should', ->
     expect message.context
       .to.be location.href
 
-    expect message.config
-      .to.be RazorpayConfig
-
     expect message.id
       .to.be rzp.id
 

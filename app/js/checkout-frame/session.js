@@ -637,7 +637,7 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function(){
+  showCardTab: function(message){
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
@@ -648,10 +648,24 @@ Session.prototype = {
     //   this.verifyUser();
     // } else {
       // this.setSavedCards(user);
+    gel('save').disabled = !this.get('cardsaving');
+    if (!this.get('cardsaving')) {
+      return this.setScreen('card');
+    }
+
+    $(this.el).addClass('cardsaving');
+
+    if( !user.app_token && typeof user.saved !== 'boolean' ) {
+      this.commenceOTP('saved cards');
+      this.user.lookup(bind(this.showCardTab, this));
+    } else if ( user.saved && !user.app_token && !user.wants_skip ) {
+      this.verifyUser(message);
+    } else {
+      this.setSavedCards(user);
       this.setScreen('card');
       return true;
-    // }
-    // $('#otp-sec').html('Skip saved cards');
+    }
+    $('#otp-sec').html('Skip saved cards');
   },
 
   setSavedCards: function(user){
