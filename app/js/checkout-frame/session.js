@@ -644,6 +644,12 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
+    if (!this.get('cardsaving')) {
+      return this.setScreen('card');
+    }
+
+    $(this.el).addClass('cardsaving');
+
     if( !user.app_token && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab, this));
