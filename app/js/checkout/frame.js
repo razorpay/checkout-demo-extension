@@ -79,7 +79,7 @@ function sanitizeImage(options){
 
 function makeCheckoutUrl(rzp){
   var params = [];
-  var url = RazorpayConfig.framepath || makeUrl('checkout');
+  var url = RazorpayConfig.frame || makeUrl('checkout');
   var key, order_id;
 
   if (rzp) {
@@ -91,8 +91,8 @@ function makeCheckoutUrl(rzp){
     params.push('new=1')
   }
 
-  if(RazorpayConfig.jspath){
-    params.push('checkout=' + RazorpayConfig.jspath);
+  if(RazorpayConfig.js){
+    params.push('checkout=' + RazorpayConfig.js);
   }
 
   if (order_id) {
