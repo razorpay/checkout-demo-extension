@@ -34,12 +34,11 @@ function getCookie(name){
 
 var communicator;
 function setCommunicator(){
-  var baseCommUrl = RazorpayConfig.api;
-  if (location.href.indexOf(baseCommUrl) && (/MSIE |Windows Phone|Trident\//.test(ua))) {
+  if (!discreet.isFrame && (/MSIE |Windows Phone|Trident\//.test(ua))) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
     doc.appendChild(communicator);
-    communicator.src = baseCommUrl + 'communicator.php';
+    communicator.src = RazorpayConfig.api + 'communicator.php';
   }
 }
 setCommunicator();
