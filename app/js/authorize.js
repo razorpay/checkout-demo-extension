@@ -48,10 +48,11 @@ function onPaymentCancel(errorObj){
   if(!this.done){
     var payment_id = this.payment_id;
     if(payment_id) {
+      var razorpay = this.r;
       var successObj = {razorpay_payment_id: payment_id};
-      track(this.r, 'cancel', successObj);
+      track(razorpay, 'cancel', successObj);
       $.ajax({
-        url: makeAuthUrl(this, 'payments/' + payment_id + '/cancel'),
+        url: makeAuthUrl(razorpay.get('key'), 'payments/' + payment_id + '/cancel'),
         callback: bind(function(response) {
           if (response.status === 'authorized') {
             track(this.r, 'cancel_authorized', successObj);
@@ -264,7 +265,7 @@ Payment.prototype = {
     }
     // else make ajax request
     var data = this.data;
-    var url = makeAuthUrl('payments/create/ajax');
+    var url = makeAuthUrl(data.key_id, 'payments/create/ajax');
     delete data.key_id;
 
     // return xhr object

@@ -33,11 +33,8 @@ function makeUrl(path){
   return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
-function makeAuthUrl(path){
-  var key;
-  if (typeof this === 'string') {
-    key = this;
-  } else {
+function makeAuthUrl(key, path){
+  if (typeof key !== 'string') {
     key = this.get('key');
   }
   return makeUrl(path) + '?key_id=' + key;
