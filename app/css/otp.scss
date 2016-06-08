@@ -46,6 +46,16 @@
   margin: 0 auto;
   width: 151px;
   position: relative;
+  &::after {
+    content: '';
+    background: #fff;
+    height: 100%;
+    width: 10px;
+    right: -5px;
+    top: 0;
+    display: block;
+    position: absolute;
+  }
 }
 
 #otp {
