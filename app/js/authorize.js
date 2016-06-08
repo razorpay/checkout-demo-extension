@@ -34,12 +34,12 @@ function getCookie(name){
 
 var communicator;
 function setCommunicator(){
-  var baseCommUrl = discreet.makeUrl(true);
+  var baseCommUrl = RazorpayConfig.api;
   if (location.href.indexOf(baseCommUrl) && (/MSIE |Windows Phone|Trident\//.test(ua))) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
     doc.appendChild(communicator);
-    communicator.src = discreet.makeUrl(true) + 'communicator.php';
+    communicator.src = baseCommUrl + 'communicator.php';
   }
 }
 setCommunicator();
@@ -51,7 +51,7 @@ function onPaymentCancel(errorObj){
       var successObj = {razorpay_payment_id: payment_id};
       track(this.r, 'cancel', successObj);
       $.ajax({
-        url: discreet.makeUrl() + 'payments/' + payment_id + '/cancel?key_id=' + this.r.get('key'),
+        url: makeAuthUrl(this, 'payments/' + payment_id + '/cancel'),
         callback: bind(function(response) {
           if (response.status === 'authorized') {
             track(this.r, 'cancel_authorized', successObj);
@@ -264,7 +264,7 @@ Payment.prototype = {
     }
     // else make ajax request
     var data = this.data;
-    var url = discreet.makeUrl() + 'payments/create/ajax?key_id=' + data.key_id;
+    var url = makeAuthUrl('payments/create/ajax');
     delete data.key_id;
 
     // return xhr object
@@ -296,7 +296,7 @@ Payment.prototype = {
     } else {
       // popup creation failed
       localStorage.removeItem('payload');
-      submitForm(discreet.makeUrl(true) + 'submitPayload.php', null, null, '_blank');
+      submitForm(RazorpayConfig.api + 'submitPayload.php', null, null, '_blank');
     }
     return popup;
   }
@@ -353,7 +353,7 @@ function setPayloadStorage(payload){
 }
 
 function makeRedirectUrl(fees){
-  return discreet.makeUrl() + 'payments/create/' + (fees ? 'fees' : 'checkout');
+  return makeUrl('payments/create/' + (fees ? 'fees' : 'checkout'));
 }
 
 var responseTypes = {
@@ -421,7 +421,7 @@ razorpayProto.submitOTP = function(otp){
 razorpayProto.resendOTP = function(callback){
   var payment = this._payment;
   payment.ajax = $.post({
-    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/otp_resend?key_id=' + this.get('key'),
+    url: makeAuthUrl.call(this, 'payments/' + payment.payment_id + '/otp_resend'),
     data: {
       '_[source]': 'checkoutjs'
     },
@@ -438,7 +438,7 @@ razorpayProto.topupWallet = function() {
   }
 
   payment.ajax = $.post({
-    url: discreet.makeUrl() + 'payments/' + payment.payment_id + '/topup/ajax?key_id=' + this.get('key'),
+    url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax'),
     data: {
       '_[source]': 'checkoutjs'
     },
@@ -499,7 +499,7 @@ Razorpay.payment = {
 
   getPrefs: function(data, callback){
     return $.jsonp({
-      url: discreet.makeUrl() + 'preferences',
+      url: makeUrl('preferences'),
       data: data,
       timeout: 30000,
       success: function(response){
