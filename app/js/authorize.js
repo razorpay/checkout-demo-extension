@@ -312,8 +312,8 @@ function ajaxCallback(response){
     this.complete(response);
   } else {
     var request = response.request;
-    if(request && request.url && RazorpayConfig.framepath){
-      request.url = request.url.replace(/^.+v1\//, discreet.makeUrl());
+    if(request && request.url && RazorpayConfig.frame){
+      request.url = request.url.replace(/^.+v1\//, makeUrl());
     }
     invoke(responseTypes[response.type], this, request);
   }
