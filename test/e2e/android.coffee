@@ -99,12 +99,12 @@ describe 'redirect on submit with valid payload', ->
         window.fakeRequest = request
 
     browser.submitForm 'form'
-    console.log exec (commonSubmitData) ->
+    exec (commonSubmitData) ->
       expect HTMLFormElement::submit.called
         .to.be false
 
       expect window.fakeRequest.url
-        .to.be 'https://api.razorpay.com/v1/payments/create/ajax?key_id=key'
+        .to.be '/v1/payments/create/ajax?key_id=key'
 
       expect window.fakeRequest.method
         .to.be 'post'
