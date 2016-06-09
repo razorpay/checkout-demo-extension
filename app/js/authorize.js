@@ -51,10 +51,10 @@ function onPaymentCancel(errorObj){
       var successObj = {razorpay_payment_id: payment_id};
       track(razorpay, 'cancel', successObj);
       $.ajax({
-        url: makeAuthUrl(razorpay.get('key'), 'payments/' + payment_id + '/cancel'),
+        url: makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel'),
         callback: bind(function(response) {
           if (response.status === 'authorized') {
-            track(this.r, 'cancel_authorized', successObj);
+            track(razorpay, 'cancel_authorized', successObj);
             this.complete(successObj);
           } else {
             var errorMsg = response.error? 'Payment Failed' : '';

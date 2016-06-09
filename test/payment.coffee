@@ -4,7 +4,7 @@ payload =
   method: 'wallet'
   wallet: 'paytm'
 
-baseUrl = RazorpayConfig.protocol + '://' + RazorpayConfig.hostname + '/' + RazorpayConfig.version;
+baseUrl = RazorpayConfig.api + RazorpayConfig.version;
 baseRedirectUrl = baseUrl + 'payments/create/'
 
 r = Razorpay
@@ -120,20 +120,21 @@ describe 'Payment::', ->
       expect redirectStub.called
         .to.be false
 
-    # it 'if redirect: true', ->
-    #   expect Payment::checkRedirect.call payment
-    #     .to.be(true)
+    it 'if redirect: true', ->
+      expect Payment::checkRedirect.call payment
+        .to.be(true)
 
-    #   expect 'callback_url' of payment.data
-    #     .to.be false
+      expect 'callback_url' of payment.data
+        .to.be false
 
-    #   expect redirectStub.callCount
-    #     .to.be 1
-    #   expect redirectStub.args[0][0]
-    #     .to.eql
-    #       url: baseRedirectUrl + 'checkout'
-    #       content: payment.data
-    #       method: 'post'
+      expect redirectStub.callCount
+        .to.be 1
+
+      expect redirectStub.args[0][0]
+        .to.eql
+          url: baseRedirectUrl + 'checkout'
+          content: payment.data
+          method: 'post'
 
     it 'if redirect: true, and callback_url specified', ->
       options.callback_url = 'abc'
@@ -142,15 +143,15 @@ describe 'Payment::', ->
       expect payment.data.callback_url
         .to.be 'abc'
 
-    # it 'with fees: true', ->
-    #   payment.fees = true
-    #   expect Payment::checkRedirect.call payment
-    #     .to.be(true)
-    #   expect redirectStub.args[0][0]
-    #     .to.eql
-    #       url: baseRedirectUrl + 'fees'
-    #       content: payment.data
-    #       method: 'post'
+    it 'with fees: true', ->
+      payment.fees = true
+      expect Payment::checkRedirect.call payment
+        .to.be(true)
+      expect redirectStub.args[0][0]
+        .to.eql
+          url: baseRedirectUrl + 'fees'
+          content: payment.data
+          method: 'post'
 
   describe 'format', ->
     beforeEach ->
@@ -299,45 +300,45 @@ describe 'Payment::', ->
 
       do templateStub.restore
 
-    # it 'tryAjax', ->
-    #   payment.message = 'qwer'
-    #   payloadStub = sinon.stub window, 'setPayloadStorage'
-    #   submitStub = sinon.stub window, 'submitForm'
+    it 'tryAjax', ->
+      payment.message = 'qwer'
+      payloadStub = sinon.stub window, 'setPayloadStorage'
+      submitStub = sinon.stub window, 'submitForm'
 
-    #   Payment::generate.call payment
-    #   expect payloadStub.callCount
-    #     .to.be 1
+      Payment::generate.call payment
+      expect payloadStub.callCount
+        .to.be 1
 
-    #   expect payloadStub.args[0][0]
-    #     .to.be 'qwer'
+      expect payloadStub.args[0][0]
+        .to.be 'qwer'
 
-    #   expect submitStub.called
-    #     .to.be false
+      expect submitStub.called
+        .to.be false
 
-    #   payment.popup =
-    #     write: noop
-    #     name: 345
+      payment.popup =
+        write: noop
+        name: 345
 
-    #   Payment::generate.call payment
-    #   expect payloadStub.callCount
-    #     .to.be 1
+      Payment::generate.call payment
+      expect payloadStub.callCount
+        .to.be 1
 
-    #   expect submitStub.callCount
-    #     .to.be 1
+      expect submitStub.callCount
+        .to.be 1
 
-    #   expect submitStub.args[0]
-    #     .to.eql [
-    #       baseRedirectUrl + 'checkout',
-    #       payment.data
-    #       'post'
-    #       345
-    #     ]
+      expect submitStub.args[0]
+        .to.eql [
+          baseRedirectUrl + 'checkout',
+          payment.data
+          'post'
+          345
+        ]
 
-    #   expect pollSpy.called
-    #     .to.be false
+      expect pollSpy.called
+        .to.be false
 
-    #   expect 'onComplete' of window
-    #     .to.be false
+      expect 'onComplete' of window
+        .to.be false
 
     it 'discreet.isFrame', ->
       discreet.isFrame = true
