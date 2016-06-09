@@ -80,11 +80,26 @@ function sanitizeImage(options){
 function makeCheckoutUrl(rzp){
   var params = [];
   var url = RazorpayConfig.frame || makeUrl('checkout');
-  var key, order_id;
+  var key;
 
   if (rzp) {
-    key = rzp.get('key');
-    order_id = rzp.get('order_id');
+    var get = rzp.get;
+    key = get('key');
+    var order_id = get('order_id');
+    var contact = get('prefill.contact');
+    var customer_id = get('customer_id');
+
+    if (order_id) {
+      params.push('order_id=' + order_id);
+    }
+
+    if (contact) {
+      params.push('contact=' + contact);
+    }
+
+    if (customer_id) {
+      params.push('customer_id=' + customer_id);
+    }
   }
 
   if(/^rzp_t/.test(key)){
@@ -93,10 +108,6 @@ function makeCheckoutUrl(rzp){
 
   if(RazorpayConfig.js){
     params.push('checkout=' + RazorpayConfig.js);
-  }
-
-  if (order_id) {
-    params.push('order_id=' + order_id);
   }
 
   if(key) {
