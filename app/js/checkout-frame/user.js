@@ -15,9 +15,8 @@ function User (user, key) {
     this.email = user.email || '';
     this.phone = user.contact || '';
     this.tokens = user.tokens || null;
-  } else {
-    this.saved = false;
   }
+  this.saved = !!user;
   this.wants_skip = false;
   this.key = key;
 }
