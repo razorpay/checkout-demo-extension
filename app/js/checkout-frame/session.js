@@ -613,6 +613,7 @@ Session.prototype = {
       tab = '';
     }
 
+    $('#form').attr('tab', tab);
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {

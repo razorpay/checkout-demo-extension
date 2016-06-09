@@ -125,7 +125,7 @@ i {
   display: none;
   width: 60px;
   height: 60px;
-  margin: 0 auto -60px;
+  margin: 0 auto;
 
   div {
     width: 100%;
@@ -141,6 +141,7 @@ i {
 }
 
 .spin2 {
+  margin: -60px auto 20px;
   div {
     animation-delay: 0.65s;
   }

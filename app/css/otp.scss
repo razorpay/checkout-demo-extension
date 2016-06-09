@@ -12,7 +12,14 @@
 
   &.action,
   &.loading {
-    #otp-elem,
+    #otp-elem {
+      display: none;
+    }
+  }
+}
+
+#form[tab=wallet] {
+  #form-otp.loading {
     #otp-sec {
       display: none;
     }
@@ -71,6 +78,14 @@
   border: none;
   outline: none;
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=");
+}
+
+#otp-sec-outer {
+  position: absolute;
+  top: 160px;
+  width: 100%;
+  left: 0;
+  text-align: center;
 }
 
 #otp-sec {

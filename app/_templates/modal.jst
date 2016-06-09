@@ -277,14 +277,12 @@ var gridClass = gridClasses[i-1];
                     <div class="help">Please enter 6 digit OTP</div>
                     <input type="tel" class="input" pattern="^[0-9]{6}$" name="otp" id="otp" maxlength="6" autocomplete="off" required>
                   </div>
-                  <a id="otp-sec" class="link"></a>
                 </div>
 
-                <div class="spin">
-                  <div></div>
-                </div>
-                <div class="spin spin2">
-                  <div></div>
+                <div class="spin"><div></div></div>
+                <div class="spin spin2"><div></div></div>
+                <div id="otp-sec-outer">
+                  <a id="otp-sec" class="link"></a>
                 </div>
               </div>
             </div>
