@@ -1,5 +1,5 @@
 // dont shake in mobile devices. handled by css, this is just for fallback.
-var shouldShakeOnError = !/Android|iPhone/.test(ua);
+var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
