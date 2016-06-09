@@ -1,6 +1,5 @@
 # outputs
 /app/dist/
-!/app/dist/v1/razorpay.js
 !/app/dist/v1/checkout-new.js
 /app/templates
 
