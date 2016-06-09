@@ -14,6 +14,7 @@ const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 const wrap = require('gulp-insert').wrap;
 const replace = require('gulp-replace');
+const rename = require('gulp-rename');
 const usemin = require('gulp-usemin');
 const del = require('del');
 const browserSync = require('browser-sync').create();
@@ -96,7 +97,7 @@ gulp.task('compileStyles', function() {
   return gulp.src(paths.css)
     .pipe(stylelint(styleLintOptions))
     .pipe(sass())
-    .pipe(concat('checkout-new.css'))
+    .pipe(concat('checkout.css'))
     .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
@@ -112,7 +113,7 @@ gulp.task('usemin', function() {
 });
 
 gulp.task('sourcemaps', function() {
-  return gulp.src([`${distDir}/**/*.js`, `!${distDir}/checkout-frame.js`, `!${distDir}/checkout-new.js`, `!${distDir}/razorpay.js`])
+  return gulp.src([`${distDir}/**/*.js`, `!${distDir}/checkout-new.js`, `!${distDir}/razorpay.js`])
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(sourcemaps.init())
     .pipe(gulpif(isProduction, uglify()))
@@ -122,6 +123,20 @@ gulp.task('sourcemaps', function() {
     .pipe(gulp.dest(distDir));
 });
 
+gulp.task('copyLegacy', function(){
+  gulp.src(`${distDir}/checkout.js`)
+    .pipe(rename('checkout-new.js'))
+    .pipe(gulp.dest(distDir));
+
+  gulp.src(`${distDir}/checkout-frame.js`)
+    .pipe(rename('checkout-frame-new.js'))
+    .pipe(gulp.dest(distDir));
+
+  gulp.src(`${distDir}/css/checkout.css`)
+    .pipe(rename('css/checkout-new.css'))
+    .pipe(gulp.dest(distDir));
+})
+
 gulp.task('copyConfig', function() {
   return gulp.src(assetPath('config.js'))
     .pipe(gulp.dest(distDir));
@@ -129,7 +144,7 @@ gulp.task('copyConfig', function() {
 
 gulp.task('compileHTML', function() {
   if (isProduction) {
-    runSequence('usemin', 'sourcemaps');
+    runSequence('usemin', 'sourcemaps', 'copyLegacy');
   } else {
     runSequence('usemin', 'sourcemaps', 'copyConfig');
   }
