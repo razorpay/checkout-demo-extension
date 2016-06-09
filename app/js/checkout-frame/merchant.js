@@ -209,32 +209,6 @@ function showModal(session) {
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
-      response.user = null;
-      response.tokens = {
-        "entity": "collection",
-        "count": 2,
-        "items": [
-          {
-            "entity": "token",
-            "token": "aslkdjflaksdjf",
-            "method": "card",
-            "card": {
-              "last4": 1234,
-              "network": "MasterCard",
-              "emi": true,
-              "bank": "HDFC"
-            }
-          },
-          {
-            "entity": "token",
-            "token": "ofakjdflka;sdfj",
-            "method": "card",
-            "card": {
-              "last4": 7890
-            }
-          }
-        ]
-      };
       preferences = response;
       showModal(session);
     })

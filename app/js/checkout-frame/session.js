@@ -237,9 +237,6 @@ function successHandler(response){
 }
 
 function Session (options) {
-  if (typeof options.theme === 'object' && options.theme.color === '#3594E2') {
-    delete options.theme.color;
-  }
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.listeners = [];
