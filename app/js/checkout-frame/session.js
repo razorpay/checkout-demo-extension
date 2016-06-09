@@ -727,8 +727,14 @@ Session.prototype = {
   },
 
   setUser: function(){
-    var userOptions = preferences.user ? preferences.user : emo;
-    this.user = new User(userOptions, this.get('key'));
+    var options = this.get();
+    var user = this.user = new User(preferences.customer, options.key);
+    if (!options['prefill.contact']) {
+      options['prefill.contact'] = user.phone;
+    }
+    if (!options['prefill.email']) {
+      options['prefill.email'] = user.email;
+    }
   },
 
   switchBank: function(e){

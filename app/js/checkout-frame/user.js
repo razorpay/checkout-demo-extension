@@ -9,13 +9,16 @@ function deleteToken(user, token){
   }
 }
 
-function User (o, key) {
-  this.app_token = o.app_token || null;
-  this.device_token = o.device_token || null;
-  this.phone = o.phone || '';
-  this.saved = o.saved || null;
-  this.wants_skip = o.wants_skip || null;
-  this.tokens = o.tokens || null;
+function User (user, key) {
+  if (user) {
+    this.app_token = user.app_token || null;
+    this.email = user.email || '';
+    this.phone = user.contact || '';
+    this.tokens = user.tokens || null;
+  } else {
+    this.saved = false;
+  }
+  this.wants_skip = false;
   this.key = key;
 }
 
