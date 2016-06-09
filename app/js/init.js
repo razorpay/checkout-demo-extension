@@ -34,7 +34,7 @@ function makeUrl(path){
 }
 
 function makeAuthUrl(key, path){
-  if (typeof key === 'object') {
+  if (typeof key !== 'string') {
     key = key.get('key');
   }
   return makeUrl(path) + '?key_id=' + key;

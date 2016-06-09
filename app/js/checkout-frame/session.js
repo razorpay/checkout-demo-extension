@@ -648,6 +648,11 @@ Session.prototype = {
       return this.setScreen('card');
     }
 
+    gel('save').disabled = !this.get('cardsaving');
+    if (!this.get('cardsaving')) {
+      return this.setScreen('card');
+    }
+
     $(this.el).addClass('cardsaving');
 
     if( !user.app_token && typeof user.saved !== 'boolean' ) {

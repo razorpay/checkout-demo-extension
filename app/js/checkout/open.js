@@ -223,4 +223,6 @@ Razorpay.prototype.close = function(){
 };
 
 // Get the ball rolling in case we are in manual mode
-initAutomaticCheckout();
+try{
+  initAutomaticCheckout();
+} catch(e){}
