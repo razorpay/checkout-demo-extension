@@ -653,8 +653,6 @@ Session.prototype = {
       return this.setScreen('card');
     }
 
-    $(this.el).addClass('cardsaving');
-
     if( !user.app_token && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab, this));
@@ -699,6 +697,7 @@ Session.prototype = {
 
     // runs one time only
     if (saveScreen === undefined) {
+      $('#form-card').addClass('save-enabled');
       // important to bind just once
       saveScreen = this.savedCardScreen = userTokens;
       if (saveScreen) {
@@ -729,10 +728,10 @@ Session.prototype = {
   setUser: function(){
     var options = this.get();
     var user = this.user = new User(preferences.customer, options.key);
-    if (!options['prefill.contact']) {
-      options['prefill.contact'] = user.phone;
+    if (!options['prefill.contact'] && user.contact) {
+      options['prefill.contact'] = user.contact;
     }
-    if (!options['prefill.email']) {
+    if (!options['prefill.email'] && user.email) {
       options['prefill.email'] = user.email;
     }
   },

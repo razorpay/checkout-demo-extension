@@ -13,7 +13,7 @@ function User (user, key) {
   if (user) {
     this.app_token = user.app_token || null;
     this.email = user.email || '';
-    this.phone = user.contact || '';
+    this.contact = user.contact || '';
     this.tokens = user.tokens || null;
   }
   this.saved = !!user;
@@ -25,7 +25,7 @@ User.prototype = {
   lookup: function(callback){
     var user = this;
     $.ajax({
-      url: makeAuthUrl(this.key, 'customer/status/' + this.phone),
+      url: makeAuthUrl(this.key, 'customer/status/' + this.contact),
       callback: function(data){
         user.saved = !!data.saved;
         callback();
@@ -37,7 +37,7 @@ User.prototype = {
     $.post({
       url: makeAuthUrl(this.key, 'otp/create'),
       data: {
-        contact: this.phone
+        contact: this.contact
       }
     })
   },
@@ -47,7 +47,7 @@ User.prototype = {
     $.post({
       url: makeAuthUrl(this.key, 'otp/verify'),
       data: {
-        contact: this.phone,
+        contact: this.contact,
         otp: otp
       },
       callback: function(data){
@@ -74,15 +74,14 @@ User.prototype = {
   },
 
   setPhone: function(phone){
-    if (this.phone !== phone) {
+    if (this.contact !== phone) {
       this.app_token = this.saved = this.wants_skip = this.tokens = null;
-      this.phone = phone;
+      this.contact = phone;
     }
   },
 
   deleteCard: function(token, callback){
     var user = this;
-
     if (!this.app_token) {
       return;
     }
