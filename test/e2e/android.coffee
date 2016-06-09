@@ -93,7 +93,7 @@ describe 'redirect on submit with valid payload', ->
     browser.click '.payment-option[tab=wallet]'
     browser.click 'label[for=wallet-radio-payumoney]'
 
-    expect browser.isVisible '#tab-otp'
+    expect browser.isVisible '#form-otp'
      .to.be false
 
     exec ->
@@ -134,6 +134,6 @@ describe 'redirect on submit with valid payload', ->
         request:
           url: 'topupurl'
 
-      expect document.querySelector('#tab-otp').getBoundingClientRect().width
+      expect document.querySelector('#form-otp').getBoundingClientRect().width
         .to.be.ok()
     , commonSubmitData
