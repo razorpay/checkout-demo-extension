@@ -868,7 +868,12 @@ Session.prototype = {
     this.setScreen('otp');
     $('#form-otp').css('display', 'block');
     $('#add-funds').removeClass('show');
-    invoke('addClass', $('#footer'), 'otp', 300);
+
+    invoke(function(){
+      if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
+        $('#footer').addClass('otp');
+      }
+    }, this, null, 300);
 
     if(immediately){
       this.sendOTP(text);
