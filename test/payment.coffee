@@ -127,14 +127,14 @@ describe 'Payment::', ->
       expect 'callback_url' of payment.data
         .to.be false
 
-    expect redirectStub.callCount
-      .to.be 1
+      expect redirectStub.callCount
+        .to.be 1
 
-    expect redirectStub.args[0][0]
-      .to.eql
-        url: baseRedirectUrl + 'checkout'
-        content: payment.data
-        method: 'post'
+      expect redirectStub.args[0][0]
+        .to.eql
+          url: baseRedirectUrl + 'checkout'
+          content: payment.data
+          method: 'post'
 
     it 'if redirect: true, and callback_url specified', ->
       options.callback_url = 'abc'
