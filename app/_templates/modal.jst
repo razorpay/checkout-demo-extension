@@ -59,9 +59,17 @@ var gridClass = gridClasses[i-1];
           <div id="topbar">
             <div id="top-right">
               <div id="user"></div>
+              <div id='profile'>
+                <ul>
+                  <li>Log out</li>
+                  <li>Log out from all devices</li>
+                </ul>
+              </div>
             </div>
-            <i class="back">&#xe604;</i>
-            <div id="tab-title"></div>
+            <div id="top-left">
+              <i class="back">&#xe604;</i>
+              <div id="tab-title"></div>
+            </div>
           </div>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
@@ -121,20 +129,16 @@ var gridClass = gridClasses[i-1];
               </div>
 
               {{? method.card }}
-                <div class="tab-content showable screen" id="tab-card" screen='add-card'>
-                  <div id='add-card' class="pad showable shown">
-                    <input type="hidden" name="method" value="card">
-                    <div class="mfix saved-cards-btn">
-                      <span id='saved-cards-btn'>
-                        <span class="saved-cards-ico mchild"></span>
-                        <span class="saved-cards-txt mchild">USE SAVED CARDS</span>
-                      </span>
-                    </div>
+                <div class="tab-content showable screen pad" id="form-card">
+                  <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
+                  <div id="saved-cards-container"></div>
+                  <div id="show-add-card" class="text-btn left-card">Add another card</div>
+                  <div id="add-card-container">
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
+                      <div class="cardtype"></div>
                       <label>Card Number</label>
                       <i>&#xe605;</i>
                       <span class="help">Please enter a valid card number</span>
-                      <div class="card-image"></div>
                       <input class="input" ignore-input type="tel" id="card_number" name="card[number]" required autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
@@ -154,14 +158,15 @@ var gridClass = gridClasses[i-1];
                       <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
                     </div></div>
                     <div class="clear"></div>
-                    <label id="nocvv-check" for="nocvv" class="gapv">
+                    <label id="nocvv-check" for="nocvv">
                       <input type="checkbox" id="nocvv" disabled>
                       <span class="checkbox"></span>
                       My Maestro Card doesn't have Expiry/CVV
                     </label>
-                    <div id="should-save-card" class="double gapv">
+                    {{? o('cardsaving')}}
+                    <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
-                        <input type="checkbox" id="save" name="save" value="1">
+                        <input type="checkbox" id="save" name="save" value="1" checked>
                         <span class="checkbox"></span>
                         Remember Card
                       </label>
@@ -170,31 +175,31 @@ var gridClass = gridClasses[i-1];
                           More Info
                         </a>
                       </div>
-                    </div>
-                    <div id="elem-emi" class="double gapv">
-                      <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
-                        <span class="checkbox"></span>
-                        Pay with EMI
-                        <div id="emi-select" class="select dropdown">
-                          <div id="emi-plans-wrap"></div>
-                          <div class="option" value="">Pay without EMI</div>
-                        </div>
-                        <span class="help dropdown">EMI is available on HDFC & Kotak Credit Cards. Enter your credit card to avail.</span>
-                      </div>
-                      <div class="second">
-                        <span id="view-emi-plans" class="link">
-                          <a>View EMI Plans</a>
-                        </span>
-                      </div>
                       <div class="clear"></div>
                     </div>
+                    {{?}}
                   </div>
-                  <div id="saved-cards" class='showable'></div>
+                  <div id="elem-emi" class="double">
+                    <div class="first disabled dropdown-parent" tabIndex="0" id="emi-check-label">
+                      <span class="checkbox"></span>
+                      Pay with EMI
+                      <div id="emi-select" class="select dropdown">
+                        <div id="emi-plans-wrap"></div>
+                        <div class="option" value="">Pay without EMI</div>
+                      </div>
+                      <span class="help dropdown">EMI is available on HDFC, Kotak & Axis Bank Credit Cards. Enter your credit card to avail.</span>
+                    </div>
+                    <div class="second">
+                      <span id="view-emi-plans" class="link">
+                        <a>View EMI Plans</a>
+                      </span>
+                    </div>
+                    <div class="clear"></div>
+                  </div>
                 </div>
               {{?}}
               {{? method.netbanking }}
-                <div class="tab-content showable screen" id="tab-netbanking">
-                  <input type="hidden" name="method" value="netbanking">
+                <div class="tab-content showable screen" id="form-netbanking">
                   {{ var count = 0, max = 3; }}
                   <div id="netb-banks" class="clear grid count-3">
                     {{
@@ -218,8 +223,7 @@ var gridClass = gridClasses[i-1];
                     }
                     }}
                   </div>
-                  <div class='pad'>
-                    <div class="elem-wrap"><div id="nb-elem" class="elem select">
+                    <div class="elem-wrap pad"><div id="nb-elem" class="elem select">
                       <i class="select-arrow">&#xe601;</i>
                       <div class="help">Please select a bank</div>
                       <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
@@ -229,12 +233,10 @@ var gridClass = gridClasses[i-1];
                         {{}}}
                       </select>
                     </div></div>
-                  </div>
                 </div>
               {{?}}
               {{ if(wallet.length){ }}
-                <div class="tab-content showable screen" id="tab-wallet">
-                  <input type="hidden" name="method" value="wallet">
+                <div class="tab-content showable screen" id="form-wallet">
                   {{ var count = 0, max = 3; }}
                   <div id="wallets" class="clear grid count-{{=wallet.length}}">
                     {{
@@ -259,7 +261,7 @@ var gridClass = gridClasses[i-1];
                 </div>
               {{}}}
 
-              <div id="tab-otp" class="tab-content showable screen">
+              <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>
                 <div id="add-funds" class="add-funds">
                   <div id="add-funds-action" class="btn">Add Funds</div>
@@ -275,14 +277,12 @@ var gridClass = gridClasses[i-1];
                     <div class="help">Please enter 6 digit OTP</div>
                     <input type="tel" class="input" pattern="^[0-9]{6}$" name="otp" id="otp" maxlength="6" autocomplete="off" required>
                   </div>
-                  <a id="otp-sec" class="link"></a>
                 </div>
 
-                <div class="spin">
-                  <div></div>
-                </div>
-                <div class="spin spin2">
-                  <div></div>
+                <div class="spin"><div></div></div>
+                <div class="spin spin2"><div></div></div>
+                <div id="otp-sec-outer">
+                  <a id="otp-sec" class="link"></a>
                 </div>
               </div>
             </div>

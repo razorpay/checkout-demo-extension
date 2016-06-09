@@ -145,6 +145,11 @@ function setPaymentMethods(session){
     }
   )
 
+  if (methods.emi) {
+    tab_titles.card = 'Card/EMI';
+    sessProto = tab_titles;
+  }
+
   if (session.get('amount') >= 100*10000 || methods.wallet instanceof Array) { // php encodes blank object as blank array
     methods.wallet = {};
   } else if (typeof passedWallets === 'object') {
