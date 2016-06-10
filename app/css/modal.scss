@@ -243,11 +243,6 @@ i {
   font-family: $font;
 }
 
-/* safari rendering bug: error message becomes top aligned */
-#modal-inner {
-  position: relative;
-}
-
 #content {
   text-align: left;
   white-space: normal;
