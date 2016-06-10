@@ -90,7 +90,6 @@ function createFrameContainer(){
     'left': 0,
     'height': '100%',
     'width': '100%',
-    '-webkit-transition': '0.2s ease-out top',
     '-webkit-overflow-scrolling': 'touch',
     '-webkit-backface-visibility': 'hidden',
     'overflow-y': 'visible'
@@ -193,23 +192,12 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  if(!preloadedFrame){
-    // if(this.get('parent')){
-      preloadedFrame = new CheckoutFrame(this);
-    // }
-    // else {
-    //   frame = getPreloadedFrame();
-    // }
-  }
-  this.checkoutFrame = preloadedFrame;
+  var frame = this.checkoutFrame = getPreloadedFrame();
+  frame.openRzp(this);
 
-  if(preloadedFrame.hasLoaded){
-    preloadedFrame.openRzp(this);
-  }
-
-  if(!preloadedFrame.el.contentWindow){
-    preloadedFrame.close();
-    preloadedFrame.afterClose();
+  if(!frame.el.contentWindow){
+    frame.close();
+    frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
   return this;

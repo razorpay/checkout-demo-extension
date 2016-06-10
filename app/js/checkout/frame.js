@@ -112,7 +112,7 @@ function makeCheckoutUrl(rzp){
 
   if(key) {
     params.push('key_id='+key);
-  } else {
+  } else if (!RazorpayConfig.frame) {
     url += '/public';
   }
 
@@ -217,6 +217,13 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
+    var self = this;
+    if (!document.body) {
+      return setTimeout(function(){
+        self.openRzp(rzp);
+      }, 50)
+    }
+    // if (frameContainer.parentNode !== '')
     var el = this.el;
     this.bind();
     var parent = rzp.get('parent');

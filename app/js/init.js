@@ -9,7 +9,7 @@ function err(errors){
   return true;
 }
 
-var doc = document;
+var doc = document.body || document.getElementsByTagName('body')[0] || document.documentElement;
 var docEl = doc.documentElement;
 var body;
 
