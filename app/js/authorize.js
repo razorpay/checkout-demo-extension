@@ -512,7 +512,7 @@ Razorpay.payment = {
     return Razorpay.payment.getPrefs({
       key_id: Razorpay.defaults.key
     }, function(response){
-      callback(response.methods);
+      callback(response.methods || response);
     });
   }
 };
