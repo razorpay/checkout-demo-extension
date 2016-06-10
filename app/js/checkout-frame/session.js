@@ -990,9 +990,10 @@ Session.prototype = {
       if (this.checkInvalid(this.getActiveForm())) {
         return;
       }
-
-      this.submit();
+    } else {
+      return;
     }
+    this.submit();
   },
 
   submit: function(){
