@@ -243,6 +243,11 @@ CheckoutFrame.prototype = {
       message = {event: 'open'};
     }
     this.afterLoad(function(){
+      if(loader){
+        $(loader).remove();
+        // show it only once.
+        loader = true;
+      }
       this.postMessage(message);
     })
 
@@ -365,11 +370,6 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    if(loader){
-      $(loader).remove();
-      // show it only once.
-      loader = true;
-    }
     invoke('loadedCallback', this);
     this.hasLoaded = true;
   },
