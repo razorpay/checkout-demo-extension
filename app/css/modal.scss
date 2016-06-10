@@ -53,11 +53,6 @@ html {
   box-sizing: border-box;
 }
 
-.gapv {
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
 .grid {
   text-align: center;
 
@@ -103,8 +98,15 @@ html {
 .link {
   cursor: pointer;
   font-size: 12px;
-  color: #0fa5dc;
   border-bottom: 1px solid;
+}
+
+.text-btn {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
 }
 
 a {
@@ -123,7 +125,7 @@ i {
   display: none;
   width: 60px;
   height: 60px;
-  margin: 0 auto -60px;
+  margin: 0 auto;
 
   div {
     width: 100%;
@@ -139,6 +141,7 @@ i {
 }
 
 .spin2 {
+  margin: -60px auto 20px;
   div {
     animation-delay: 0.65s;
   }
@@ -238,11 +241,6 @@ i {
   font-size: $size;
   width: 344px;
   font-family: $font;
-}
-
-/* safari rendering bug: error message becomes top aligned */
-#modal-inner {
-  position: relative;
 }
 
 #content {
@@ -360,7 +358,7 @@ i {
 
 #body {
   border-radius: 0 0 $br $br;
-  height: 317px;
+  height: $bodyh;
   background: #fff;
   backface-visibility: none;
 
@@ -402,14 +400,88 @@ i {
   height: $topbarh;
   z-index: 2;
 
-  &:hover {
-    color: #404040;
-  }
-
   img {
     display: block;
-    margin-top: 15px;
+    padding-top: 15px;
   }
+}
+
+#top-right,
+#top-left {
+  transition: 0.2s;
+}
+
+#top-right:hover,
+#top-left:hover {
+  color: #404040;
+}
+
+$arrow-height: 10px;
+$outline: #ddd;
+
+#profile {
+  position: absolute;
+  background: #fff;
+  border-radius: 2px;
+  border: 1px solid $outline;
+  top: $topbarh;
+  right: 5px;
+  margin-top: $arrow-height;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    padding: 10px;
+    font-size: 14px;
+    line-height: 19px;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+
+  li:first-child::before,
+  li:first-child::after {
+    content: '';
+    top: -$arrow-height;
+    right: 15px;
+    position: absolute;
+    border-width: 0 $arrow-height $arrow-height $arrow-height;
+    border-color: transparent transparent $outline transparent;
+    border-style: solid;
+  }
+
+  li:first-child::after {
+    margin-top: 1.5px;
+    border-color: transparent transparent #fff transparent;
+  }
+
+  li:first-child:hover::after {
+    border-color: transparent transparent #f5f5f5 transparent;
+  }
+}
+
+#profile {
+  display: none\9;
+  pointer-events: none;
+
+  @include opacity(0);
+  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+  transform: translateY(-10px);
+}
+
+#top-right:focus #profile {
+  display: none;
+  pointer-events: auto;
+  display: block;
+
+  @include opacity(1);
+  transform: none;
+  transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
 }
 
 #tab-title {
@@ -439,7 +511,7 @@ i {
     margin-right: 6px;
   }
   &::after {
-    content: '\e601';
+    // content: '\e601';
     font-size: 20px;
     margin-left: 6px;
   }
@@ -519,7 +591,7 @@ i {
   }
 }
 
-#tab-card {
+#form-card {
   i {
     display: none;
   }
@@ -528,32 +600,6 @@ i {
     display: initial;
     font-size: 16px;
   }
-}
-
-#saved-cards-btn {
-  padding: 5px 0;
-  cursor: pointer;
-}
-
-.saved-cards-btn {
-  margin-top: 10px;
-  display: none;
-}
-
-.saved-cards-btn.shown {
-  display: block;
-}
-
-.saved-cards-ico {
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAgCAYAAABpRpp6AAAAAXNSR0IArs4c6QAAA9FJREFUWAnVlz1rVEEUhmfuboIa0kiKIKuIjTYWWon6B2Iv6awkQrSy0dI/oI1aJAjaCIJg4R+wsAnEFIIJFguK2UJQYqKkiLkz43nPmXM/du9qNpC964TsmTnzcZ77zpm5u9YMWGZm78wEZxaDCa1Acy39w+6l6FhYlO75ljoCOWG5P9bZZ2wnaZi5pnTt/dOlfjGE0OIZMQBTqyPDgKOMhMAYy7anV0D7AdPwVvB2cXBg71o2EhI41SwBgKSilHlZueALCsYp2exAa+EhyWopLu2Mbw0MHLxn3XhB2rtQIqBguq9ZRK0UlM0IZQ90hLrVqj+ztPbgwASYPTWEwOpREFHbs+oIwjvADyUI+iywUsoLQF1eQyXRteMTYF4l8L0Qko23mze99xdNYhqGtpEsl62PqzmkLoieYl2G5r7uPm2rjfNd+ttsfnhvttc/xRWIkNWRJ5QU1MULdv7N91sE+xAuG+WoylP0qR/DepTfx/zgUtN++sjs/tzitUsxSP9KhdPd9BLnPRTQ7WGimKLsFnkUNHbn1LkDo7OJubvPfIIan5o2O5s/aBIlSQ5CrT7AzvlGsLJgLhuHlXzlLkiKXOkq2RPAX5Q9jsPu/mM+dk0Odzmnkd+VChMwpW08PBwgwmuwGBs8ElysHhp0Z/V9zKd0NB5iAFwFwJpUF+DZFxeMc8cRCGV1tdM6dHgsBoVH7kc9wbCCJIIX+zEafbkP7d75RybGzdTUJK+U9Uc4AENhLtnBoBbVm+bq8/vGpbelVz6Xl9vF5oHVT585Zs6dPymvYjwjFRjv6RVBwCouLApShS6rcEOaw/9st78aT+mXps6kzhmHVEA6QmFKCdTVct1D4WAmho8qEel7CYOiVTwO3gWGZScyIyrc99DJcsP5dKSsng0l8/R1kJApNyKspjM1K2+J4aBKFKjJcNwUnTktKB26C14izW8LV7r9Q21fe90hYLlvNbDkMI6f3DZicehGQGHc+WUwK4eObooyrjxO7SmBG4KvL+LRg6cKAxhFLSSuHdiRknro5IVk5HrD1UZ/2gfwxCTb9QPHw6XqQk4ojH9oC2TV2FuzMBLAjIQTRbmB+tj0iQe7n9eWqEpFEiKE5vrayqulEQB2wgRSFOJLTp1dWns8/1Ic5c8RAKath4gZMJQuQxZbtQPrLZFDW5MkCcleXWoHlsMlcPg2Rm+znYYde1eNOxovjixX6cxt2xCerdy9/KUfsP315Kgcw34jDtg/eX3jLxnbGzz+eO/tGFXP/wdMV3WnLjUpZ9cHjZ1Ym8zVAY2Y1jQG/nn2B0uZJHj8vheMAAAAAElFTkSuQmCC');
-  width: 22px;
-  height: 16px;
-  display: inline-block;
-  background-size: 22px 16px;
-}
-
-.saved-cards-txt {
-  padding-left: 10px;
 }
 
 #nocvv {

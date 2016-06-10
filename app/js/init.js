@@ -9,14 +9,37 @@ function err(errors){
   return true;
 }
 
-var doc = document.body || document.documentElement;
+var doc = document.body || document.getElementsByTagName('body')[0] || document.documentElement;
+var docEl = doc.documentElement;
+var body;
+
+function setBody(){
+  body = document.body;
+  if (!body) {
+    setTimeout(setBody, 99);
+  }
+}
+
+function needBody(func){
+  return function bodyInsurance(){
+    var self = this;
+    if (!body) {
+      return setTimeout(function(){
+        func.apply(self, arguments);
+      }, 99);
+    }
+    func.apply(self, arguments);
+  }
+}
+
 var ua = navigator.userAgent;
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
 var RazorpayConfig = {
   api: 'https://api.razorpay.com/',
   version: 'v1/',
-  frameApi: '/'
+  frameApi: '/',
+  cdn: 'https://cdn.razorpay.com/'
 }
 
 try {

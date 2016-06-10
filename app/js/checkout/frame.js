@@ -78,65 +78,39 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(rzp){
-  var params = [];
-  var url = RazorpayConfig.frame || makeUrl('checkout');
-  var key, order_id;
+  var url = RazorpayConfig.frame;
 
-  if (rzp) {
-    key = rzp.get('key');
-    order_id = rzp.get('order_id');
-  }
+  if (!url) {
+    url = makeUrl('checkout');
 
-  if(/^rzp_t/.test(key)){
-    params.push('new=1')
-  }
+    var urlParams = rzp && makePrefParams(rzp.get);
+    if (!urlParams) {
+      urlParams = {};
+      url += '/public';
+    }
 
-  if(RazorpayConfig.js){
-    params.push('checkout=' + RazorpayConfig.js);
-  }
+    if(RazorpayConfig.js){
+      urlParams.checkout = RazorpayConfig.js;
+    }
 
-  if (order_id) {
-    params.push('order_id=' + order_id);
-  }
+    var paramsArray = [];
+    each(
+      urlParams,
+      function(key, val){
+        paramsArray.push(key + '=' + val);
+      }
+    )
 
-  if(key) {
-    params.push('key_id='+key);
-  } else {
-    url += '/public';
+    if(paramsArray.length){
+      url += '?' + paramsArray.join('&');
+    }
   }
-
-  if(params.length){
-    params = '?' + params.join('&');
-  } else {
-    params = '';
-  }
-  return url + params;
+  return url;
 }
 
 function makeCheckoutMessage(rzp){
   var get = rzp.get;
   var options = get();
-  options.theme = {
-    color: get('theme.color'),
-    image_padding: get('theme.image_padding'),
-    close_button: get('theme.close_button')
-  };
-  options.prefill = {
-    method: get('prefill.method'),
-    name: get('prefill.name'),
-    contact: get('prefill.contact'),
-    email: get('prefill.email'),
-    'card[number]': get('prefill.card[number]'),
-    'card[expiry]': get('prefill.card[expiry]')
-  }
-  options.method = {
-    card: get('method.card'),
-    netbanking: get('method.netbanking'),
-    wallet: get('method.wallet')
-  }
-  options.external = {
-    wallets: get('external.wallets')
-  }
 
   var response = {
     context: location.href,
@@ -227,6 +201,7 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
+    var self = this;
     var el = this.el;
     this.bind();
     var parent = rzp.get('parent');
@@ -247,6 +222,11 @@ CheckoutFrame.prototype = {
       message = {event: 'open'};
     }
     this.afterLoad(function(){
+      if(loader){
+        $(loader).remove();
+        // show it only once.
+        loader = true;
+      }
       this.postMessage(message);
     })
 
@@ -369,11 +349,6 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    if(loader){
-      $(loader).remove();
-      // show it only once.
-      loader = true;
-    }
     invoke('loadedCallback', this);
     this.hasLoaded = true;
   },

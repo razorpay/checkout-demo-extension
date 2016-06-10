@@ -90,7 +90,6 @@ function createFrameContainer(){
     'left': 0,
     'height': '100%',
     'width': '100%',
-    '-webkit-transition': '0.2s ease-out top',
     '-webkit-overflow-scrolling': 'touch',
     '-webkit-backface-visibility': 'hidden',
     'overflow-y': 'visible'
@@ -172,12 +171,16 @@ function createTestRibbon(){
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
 var testRibbon = createTestRibbon();
-var preloadedFrame;// = getPreloadedFrame();
+var preloadedFrame = getPreloadedFrame();
 
-function getPreloadedFrame(){
-
-  if(!preloadedFrame && discreet.supported()){
-    preloadedFrame = new CheckoutFrame();
+function getPreloadedFrame(rzp){
+  if (!discreet.supported()) {
+    return;
+  }
+  if (preloadedFrame) {
+    preloadedFrame.openRzp(rzp);
+  } else {
+    preloadedFrame = new CheckoutFrame(rzp);
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
   }
@@ -193,23 +196,11 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  if(!preloadedFrame){
-    // if(this.get('parent')){
-      preloadedFrame = new CheckoutFrame(this);
-    // }
-    // else {
-    //   frame = getPreloadedFrame();
-    // }
-  }
-  this.checkoutFrame = preloadedFrame;
+  var frame = this.checkoutFrame = getPreloadedFrame(this);
 
-  if(preloadedFrame.hasLoaded){
-    preloadedFrame.openRzp(this);
-  }
-
-  if(!preloadedFrame.el.contentWindow){
-    preloadedFrame.close();
-    preloadedFrame.afterClose();
+  if(!frame.el.contentWindow){
+    frame.close();
+    frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
   return this;

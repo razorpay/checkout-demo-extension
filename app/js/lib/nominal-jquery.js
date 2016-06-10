@@ -90,8 +90,7 @@ function isNonEmpty(obj){
   if (obj instanceof Array) {
     return obj.length;
   }
-  var i;
-  if (i in obj) {
+  for (var i in obj) {
     return true;
   }
 }

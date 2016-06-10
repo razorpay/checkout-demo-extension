@@ -74,6 +74,7 @@
   "private": "true",
   "dependencies": {
     "aws-sdk": "^2.3.12",
-    "glob": "^7.0.3"
+    "glob": "^7.0.3",
+    "gulp-rename": "^1.2.2"
   }
 }

@@ -300,45 +300,45 @@ describe 'Payment::', ->
 
       do templateStub.restore
 
-    it 'tryAjax', ->
-      payment.message = 'qwer'
-      payloadStub = sinon.stub window, 'setPayloadStorage'
-      submitStub = sinon.stub window, 'submitForm'
+    # it 'tryAjax', ->
+    #   payment.message = 'qwer'
+    #   payloadStub = sinon.stub window, 'setPayloadStorage'
+    #   submitStub = sinon.stub window, 'submitForm'
 
-      Payment::generate.call payment
-      expect payloadStub.callCount
-        .to.be 1
+    #   Payment::generate.call payment
+    #   expect payloadStub.callCount
+    #     .to.be 1
 
-      expect payloadStub.args[0][0]
-        .to.be 'qwer'
+    #   expect payloadStub.args[0][0]
+    #     .to.be 'qwer'
 
-      expect submitStub.called
-        .to.be false
+    #   expect submitStub.called
+    #     .to.be false
 
-      payment.popup =
-        write: noop
-        name: 345
+    #   payment.popup =
+    #     write: noop
+    #     name: 345
 
-      Payment::generate.call payment
-      expect payloadStub.callCount
-        .to.be 1
+    #   Payment::generate.call payment
+    #   expect payloadStub.callCount
+    #     .to.be 1
 
-      expect submitStub.callCount
-        .to.be 1
+    #   expect submitStub.callCount
+    #     .to.be 1
 
-      expect submitStub.args[0]
-        .to.eql [
-          baseRedirectUrl + 'checkout',
-          payment.data
-          'post'
-          345
-        ]
+    #   expect submitStub.args[0]
+    #     .to.eql [
+    #       baseRedirectUrl + 'checkout',
+    #       payment.data
+    #       'post'
+    #       345
+    #     ]
 
-      expect pollSpy.called
-        .to.be false
+    #   expect pollSpy.called
+    #     .to.be false
 
-      expect 'onComplete' of window
-        .to.be false
+    #   expect 'onComplete' of window
+    #     .to.be false
 
     it 'discreet.isFrame', ->
       discreet.isFrame = true
