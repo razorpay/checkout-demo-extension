@@ -9,7 +9,29 @@ function err(errors){
   return true;
 }
 
-var doc = document.body || document.documentElement;
+var doc = document;
+var docEl = doc.documentElement;
+var body;
+
+function setBody(){
+  body = document.body;
+  if (!body) {
+    setTimeout(setBody, 99);
+  }
+}
+
+function needBody(func){
+  return function bodyInsurance(){
+    var self = this;
+    if (!body) {
+      return setTimeout(function(){
+        func.apply(self, arguments);
+      }, 99);
+    }
+    func.apply(self, arguments);
+  }
+}
+
 var ua = navigator.userAgent;
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 
