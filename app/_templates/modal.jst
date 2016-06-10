@@ -92,7 +92,7 @@ var gridClass = gridClasses[i-1];
                     <div class="customer-bank-details">
                       <div class="bank-name">
                         {{ if(bank.image) { }}
-                          <img src="data:image/png;base64,{{=bank.image}}">
+                          <img src="{{=bank.image}}">
                         {{ } else { }}
                           <img src="{{=bank.logoURL}}" />
                         {{ } }}

@@ -38,7 +38,8 @@ var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 var RazorpayConfig = {
   api: 'https://api.razorpay.com/',
   version: 'v1/',
-  frameApi: '/'
+  frameApi: '/',
+  cdn: 'https://cdn.razorpay.com/'
 }
 
 try {
