@@ -202,14 +202,7 @@ function setPaymentMethods(session){
 
 function showModal(session) {
   if(!preferences){
-    var data = {
-      key_id: session.get('key')
-    };
-
-    if (session.get('order_id')) {
-      data.order_id = session.get('order_id');
-    }
-
+    var data = makePrefParams(session);
     Razorpay.payment.getPrefs(data, function(response) {
       if(response.error){
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});

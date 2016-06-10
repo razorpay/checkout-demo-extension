@@ -81,43 +81,28 @@ function makeCheckoutUrl(rzp){
   var url = RazorpayConfig.frame;
 
   if (!url) {
-    var params = [];
-    var key;
-
-    if (rzp) {
-      var get = rzp.get;
-      key = get('key');
-      var order_id = get('order_id');
-      var contact = get('prefill.contact');
-      var customer_id = get('customer_id');
-
-      if (order_id) {
-        params.push('order_id=' + order_id);
-      }
-
-      if (contact) {
-        params.push('contact=' + contact);
-      }
-
-      if (customer_id) {
-        params.push('customer_id=' + customer_id);
-      }
-    }
-
-    if(RazorpayConfig.js){
-      params.push('checkout=' + RazorpayConfig.js);
-    }
-
     url = makeUrl('checkout');
 
-    if(key) {
-      params.push('key_id='+key);
-    } else {
+    var urlParams = rzp && makePrefParams(rzp.get);
+    if (!urlParams) {
+      urlParams = {};
       url += '/public';
     }
 
-    if(params.length){
-      url += '?' + params.join('&');
+    if(RazorpayConfig.js){
+      urlParams.checkout = RazorpayConfig.js;
+    }
+
+    var paramsArray = [];
+    each(
+      urlParams,
+      function(key, val){
+        paramsArray.push(key + '=' + val);
+      }
+    )
+
+    if(paramsArray.length){
+      url += '?' + paramsArray.join('&');
     }
   }
   return url;
@@ -217,12 +202,6 @@ CheckoutFrame.prototype = {
 
   openRzp: function(rzp){
     var self = this;
-    if (!document.body) {
-      return setTimeout(function(){
-        self.openRzp(rzp);
-      }, 50)
-    }
-    // if (frameContainer.parentNode !== '')
     var el = this.el;
     this.bind();
     var parent = rzp.get('parent');

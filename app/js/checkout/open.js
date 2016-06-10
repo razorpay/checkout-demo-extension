@@ -173,10 +173,14 @@ var frameBackdrop = createFrameBackdrop();
 var testRibbon = createTestRibbon();
 var preloadedFrame = getPreloadedFrame();
 
-function getPreloadedFrame(){
-
-  if(!preloadedFrame && discreet.supported()){
-    preloadedFrame = new CheckoutFrame();
+function getPreloadedFrame(rzp){
+  if (!discreet.supported()) {
+    return;
+  }
+  if (preloadedFrame) {
+    preloadedFrame.openRzp(rzp);
+  } else {
+    preloadedFrame = new CheckoutFrame(rzp);
     preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
   }
@@ -192,8 +196,7 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  var frame = this.checkoutFrame = getPreloadedFrame();
-  frame.openRzp(this);
+  var frame = this.checkoutFrame = getPreloadedFrame(this);
 
   if(!frame.el.contentWindow){
     frame.close();

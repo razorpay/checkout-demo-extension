@@ -21,6 +21,30 @@ function isValidAmount(amt){
   return amt >= 100;
 }
 
+function makePrefParams(getter){
+  var params = {};
+  if (getter) {
+    params.key_id = getter('key');
+
+    var order_id = getter('order_id');
+    var contact = getter('prefill.contact');
+    var customer_id = getter('customer_id');
+
+    if (order_id) {
+      params.order_id = order_id;
+    }
+
+    if (contact) {
+      params.contact = contact;
+    }
+
+    if (customer_id) {
+      params.customer_id = customer_id;
+    }
+  }
+  return params;
+}
+
 var discreet = {
   currencies: {
     'USD': '$',
