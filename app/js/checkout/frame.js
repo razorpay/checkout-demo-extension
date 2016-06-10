@@ -78,50 +78,49 @@ function sanitizeImage(options){
 }
 
 function makeCheckoutUrl(rzp){
-  var params = [];
-  var url = RazorpayConfig.frame || makeUrl('checkout');
-  var key;
+  var url = RazorpayConfig.frame;
 
-  if (rzp) {
-    var get = rzp.get;
-    key = get('key');
-    var order_id = get('order_id');
-    var contact = get('prefill.contact');
-    var customer_id = get('customer_id');
+  if (!url) {
+    var params = [];
+    var key;
 
-    if (order_id) {
-      params.push('order_id=' + order_id);
+    if (rzp) {
+      var get = rzp.get;
+      key = get('key');
+      var order_id = get('order_id');
+      var contact = get('prefill.contact');
+      var customer_id = get('customer_id');
+
+      if (order_id) {
+        params.push('order_id=' + order_id);
+      }
+
+      if (contact) {
+        params.push('contact=' + contact);
+      }
+
+      if (customer_id) {
+        params.push('customer_id=' + customer_id);
+      }
     }
 
-    if (contact) {
-      params.push('contact=' + contact);
+    if(RazorpayConfig.js){
+      params.push('checkout=' + RazorpayConfig.js);
     }
 
-    if (customer_id) {
-      params.push('customer_id=' + customer_id);
+    url = makeUrl('checkout');
+
+    if(key) {
+      params.push('key_id='+key);
+    } else {
+      url += '/public';
+    }
+
+    if(params.length){
+      url += '?' + params.join('&');
     }
   }
-
-  if(/^rzp_t/.test(key)){
-    params.push('new=1')
-  }
-
-  if(RazorpayConfig.js){
-    params.push('checkout=' + RazorpayConfig.js);
-  }
-
-  if(key) {
-    params.push('key_id='+key);
-  } else if (!RazorpayConfig.frame) {
-    url += '/public';
-  }
-
-  if(params.length){
-    params = '?' + params.join('&');
-  } else {
-    params = '';
-  }
-  return url + params;
+  return url;
 }
 
 function makeCheckoutMessage(rzp){
