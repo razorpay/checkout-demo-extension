@@ -171,7 +171,7 @@ function createTestRibbon(){
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
 var testRibbon = createTestRibbon();
-var preloadedFrame;// = getPreloadedFrame();
+var preloadedFrame = getPreloadedFrame();
 
 function getPreloadedFrame(rzp){
   if (!discreet.supported()) {
@@ -181,7 +181,6 @@ function getPreloadedFrame(rzp){
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
-    preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
   }
   return preloadedFrame;
@@ -196,7 +195,20 @@ Razorpay.prototype.open = function() {
     return;
   }
 
-  var frame = this.checkoutFrame = getPreloadedFrame(this);
+  var frame;
+
+  if (this.get('parent')) {
+    if (preloadedFrame) {
+      preloadedFrame.unbind();
+      $(preloadedFrame).remove();
+      preloadedFrame = null;
+    }
+    frame = new CheckoutFrame(this);
+  } else {
+    frame = getPreloadedFrame(this);
+  }
+
+  this.checkoutFrame = frame;
 
   if(!frame.el.contentWindow){
     frame.close();
