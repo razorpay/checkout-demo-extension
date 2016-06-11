@@ -8,6 +8,9 @@
     #otp-action {
       display: inline-block;
     }
+    #otp-sec {
+      display: none;
+    }
   }
 
   &.action,
@@ -103,7 +106,12 @@
     display: inline-block;
   }
 
-  &.show + #otp-section {
-    display: none;
+  &.show {
+    & + #otp-section {
+      display: none;
+    }
+    & ~ #otp-sec-outer {
+      display: none;
+    }
   }
 }
