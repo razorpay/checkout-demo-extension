@@ -314,12 +314,8 @@ Session.prototype = {
   },
 
   render: function(){
-    if(this.isOpen){
-      this.saveAndClose();
-    }
-    else {
-      this.isOpen = true;
-    }
+    this.saveAndClose();
+    this.isOpen = true;
 
     this.setUser();
     this.getEl();
@@ -1107,7 +1103,9 @@ Session.prototype = {
   },
 
   saveAndClose: function(){
-    this.data = this.getFormData();
-    this.close();
+    if (this.isOpen) {
+      this.data = this.getFormData();
+      this.close();
+    }
   }
 }

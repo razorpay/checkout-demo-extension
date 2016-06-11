@@ -171,7 +171,7 @@ function createTestRibbon(){
 var frameContainer = createFrameContainer();
 var frameBackdrop = createFrameBackdrop();
 var testRibbon = createTestRibbon();
-var preloadedFrame = getPreloadedFrame();
+var preloadedFrame;// = getPreloadedFrame();
 
 function getPreloadedFrame(rzp){
   if (!discreet.supported()) {
