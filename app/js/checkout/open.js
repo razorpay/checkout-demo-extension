@@ -181,6 +181,7 @@ function getPreloadedFrame(rzp){
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
+    preloadedFrame.bind();
     frameContainer.appendChild(preloadedFrame.el);
   }
   return preloadedFrame;

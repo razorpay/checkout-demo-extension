@@ -201,7 +201,6 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
-    var self = this;
     var el = this.el;
     this.bind();
     var parent = rzp.get('parent');
