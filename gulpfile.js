@@ -66,7 +66,7 @@ let paths = {
 };
 
 gulp.task('clean', function () {
-  return del(distDir, {dryRun: true});
+  return del(distDir, {force: true});
 });
 
 gulp.task('compileTemplates', function() {
@@ -113,8 +113,7 @@ gulp.task('usemin', function() {
 });
 
 gulp.task('uglify', function() {
-  return gulp.src([`${distDir}/**/*.js`, `!${distDir}/checkout-new.js`])
-    .pipe(wrap('(function(){"use strict";', '})()'))
+  return gulp.src([`${distDir}/**/*.js`])
     // .pipe(sourcemaps.init())
     .pipe(gulpif(isProduction, uglify()))
     // .pipe(sourcemaps.write('./', {
@@ -144,7 +143,7 @@ gulp.task('copyConfig', function() {
 
 gulp.task('compileHTML', function() {
   if (isProduction) {
-    runSequence('usemin', 'uglify', 'copyLegacy');
+    runSequence('usemin', 'hint', 'uglify', 'copyLegacy');
   } else {
     runSequence('usemin');
   }
@@ -326,14 +325,16 @@ gulp.task('test:release', function(){
 })
 
 gulp.task('hint', function(){
-  return gulp.src([assetPath('dist/v1/*.js'), '!' + assetPath('dist/v1/checkout-frame.js'), '!' + assetPath('dist/v1/checkout-new.js'), '!' + assetPath('dist/v1/razorpay.js')])
+  return gulp.src([assetPath('dist/v1/*.js')])
+    .pipe(wrap('(function(){"use strict";', '})()'))
+    .pipe(gulp.dest(distDir))
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
 })
 
 gulp.task('test', function() {
-  runSequence('setTestENV', 'test:unit', 'hint', 'test:release');
+  runSequence('setTestENV', 'test:unit', 'test:release');
 });
 
 

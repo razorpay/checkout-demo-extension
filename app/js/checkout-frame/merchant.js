@@ -47,7 +47,7 @@ sessProto.netbanks = {
 var freqWallets = sessProto.walletData = {
   paytm: {
     h: 16,
-    col: RazorpayConfig.cdn + 'paytm.gif',
+    col: RazorpayConfig.cdn + 'paytm.gif'
   },
   mobikwik: {
     h: 19,
