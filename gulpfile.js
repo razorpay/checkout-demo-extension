@@ -112,14 +112,14 @@ gulp.task('usemin', function() {
     .pipe(gulp.dest(distDir));
 });
 
-gulp.task('sourcemaps', function() {
+gulp.task('uglify', function() {
   return gulp.src([`${distDir}/**/*.js`, `!${distDir}/checkout-new.js`])
     .pipe(wrap('(function(){"use strict";', '})()'))
-    .pipe(sourcemaps.init())
+    // .pipe(sourcemaps.init())
     .pipe(gulpif(isProduction, uglify()))
-    .pipe(sourcemaps.write('./', {
-      debug: true
-    }))
+    // .pipe(sourcemaps.write('./', {
+      // debug: true
+    // }))
     .pipe(gulp.dest(distDir));
 });
 
@@ -144,9 +144,9 @@ gulp.task('copyConfig', function() {
 
 gulp.task('compileHTML', function() {
   if (isProduction) {
-    runSequence('usemin', 'sourcemaps', 'copyLegacy');
+    runSequence('usemin', 'uglify', 'copyLegacy');
   } else {
-    runSequence('usemin', 'sourcemaps', 'copyConfig');
+    runSequence('usemin');
   }
 });
 
