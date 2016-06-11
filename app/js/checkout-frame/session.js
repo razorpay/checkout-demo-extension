@@ -641,11 +641,6 @@ Session.prototype = {
       return this.setScreen('card');
     }
 
-    gel('save').disabled = !this.get('cardsaving');
-    if (!this.get('cardsaving')) {
-      return this.setScreen('card');
-    }
-
     if( !user.app_token && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab, this));
