@@ -83,7 +83,7 @@ function makeCheckoutUrl(rzp){
   if (!url) {
     url = makeUrl('checkout');
 
-    var urlParams = rzp && makePrefParams(rzp.get);
+    var urlParams = makePrefParams(rzp);
     if (!urlParams) {
       urlParams = {};
       url += '/public';

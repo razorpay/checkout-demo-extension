@@ -21,9 +21,10 @@ function isValidAmount(amt){
   return amt >= 100;
 }
 
-function makePrefParams(getter){
-  var params = {};
-  if (getter) {
+function makePrefParams(rzp){
+  if (rzp) {
+    var getter = rzp.get;
+    var params = {};
     params.key_id = getter('key');
 
     var order_id = getter('order_id');
@@ -41,8 +42,8 @@ function makePrefParams(getter){
     if (customer_id) {
       params.customer_id = customer_id;
     }
+    return params;
   }
-  return params;
 }
 
 var discreet = {
