@@ -8,9 +8,6 @@
     #otp-action {
       display: inline-block;
     }
-    #otp-sec {
-      display: none;
-    }
   }
 
   &.action,
@@ -18,16 +15,19 @@
     #otp-elem {
       display: none;
     }
-  }
-}
-
-#form[tab=wallet] {
-  #form-otp.loading {
     #otp-sec {
       display: none;
     }
   }
 }
+
+// #form[tab=wallet] {
+//   #form-otp.loading {
+//     #otp-sec {
+//       display: none;
+//     }
+//   }
+// }
 
 #otp-action {
   display: none;
