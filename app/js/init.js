@@ -9,17 +9,16 @@ function err(errors){
   return true;
 }
 
-var doc = document.body || document.getElementsByTagName('body')[0] || document.documentElement;
-var docEl = doc.documentElement;
 var body;
 
 function setBody(){
-  body = document.body;
+  body = document.body || document.getElementsByTagName('body')[0];
   if (!body) {
     setTimeout(setBody, 99);
   }
 }
 setBody();
+var doc = body || document.documentElement;
 
 function needBody(func){
   return function bodyInsurance(){
