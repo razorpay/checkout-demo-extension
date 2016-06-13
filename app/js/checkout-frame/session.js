@@ -340,7 +340,7 @@ Session.prototype = {
   setModal: function(){
     if(!this.modal){
       this.modal = new window.Modal(this.el, {
-        escape: !this.embedded,
+        escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
         onhide: function(){
           Razorpay.sendMessage({event: 'dismiss'});
