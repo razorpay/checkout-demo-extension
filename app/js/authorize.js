@@ -213,7 +213,6 @@ Payment.prototype = {
     if(this.done){
       return;
     }
-    this.clear();
 
     try{
       if(typeof data !== 'object') {
@@ -221,8 +220,9 @@ Payment.prototype = {
       }
     }
     catch(e){
-      return roll('unexpected api response', data);
+      return roll('unexpected api response', {e: e, msg: data});
     }
+    this.clear();
 
     var payment_id = data.razorpay_payment_id;
     if(typeof payment_id === 'string' && payment_id){
