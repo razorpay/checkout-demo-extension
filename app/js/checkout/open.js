@@ -100,7 +100,7 @@ function createFrameContainer(){
       style[i] = rule;
     }
   )
-  doc.appendChild(div);
+  body.appendChild(div);
   return div;
 }
 
@@ -168,10 +168,7 @@ function createTestRibbon(){
   return ribbon;
 }
 
-var frameContainer = createFrameContainer();
-var frameBackdrop = createFrameBackdrop();
-var testRibbon = createTestRibbon();
-var preloadedFrame = getPreloadedFrame();
+var frameContainer, frameBackdrop, testRibbon, preloadedFrame;
 
 function getPreloadedFrame(rzp){
   if (!discreet.supported()) {
@@ -191,7 +188,7 @@ Razorpay.open = function(options) {
   return Razorpay(options).open();
 }
 
-Razorpay.prototype.open = function() {
+Razorpay.prototype.open = needBody(function() {
   if(!this.get('redirect') && !discreet.supported(true)){
     return;
   }
@@ -217,7 +214,7 @@ Razorpay.prototype.open = function() {
     alert('This browser is not supported.\nPlease try payment in another browser.');
   }
   return this;
-};
+});
 
 Razorpay.prototype.close = function(){
   var frame = this.checkoutFrame;
@@ -226,7 +223,14 @@ Razorpay.prototype.close = function(){
   }
 };
 
-// Get the ball rolling in case we are in manual mode
-try{
-  initAutomaticCheckout();
-} catch(e){}
+var initRazorpayCheckout = needBody(function(){
+  frameContainer = createFrameContainer();
+  frameBackdrop = createFrameBackdrop();
+  testRibbon = createTestRibbon();
+  preloadedFrame = getPreloadedFrame();
+  // Get the ball rolling in case we are in manual mode
+  try{
+    initAutomaticCheckout();
+  } catch(e){}
+});
+initRazorpayCheckout();
