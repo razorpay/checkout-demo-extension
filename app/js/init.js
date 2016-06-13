@@ -19,16 +19,14 @@ function setBody(){
     setTimeout(setBody, 99);
   }
 }
+setBody();
 
 function needBody(func){
   return function bodyInsurance(){
-    var self = this;
     if (!body) {
-      return setTimeout(function(){
-        func.apply(self, arguments);
-      }, 99);
+      return invoke(bodyInsurance, this, null, 99)
     }
-    func.apply(self, arguments);
+    func.call(this);
   }
 }
 
