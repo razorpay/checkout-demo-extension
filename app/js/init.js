@@ -24,9 +24,10 @@ setBody();
 function needBody(func){
   return function bodyInsurance(){
     if (!body) {
-      return invoke(bodyInsurance, this, null, 99)
+      invoke(bodyInsurance, this, null, 99);
+      return this;
     }
-    func.call(this);
+    return func.call(this);
   }
 }
 
