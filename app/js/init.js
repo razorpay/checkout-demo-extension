@@ -111,6 +111,7 @@ Razorpay.defaults = {
     'card[expiry]': ''
   },
   'modal': {
+    'confirm_close': false,
     'ondismiss': noop,
     'onhidden': noop,
     'escape': true,

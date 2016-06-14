@@ -461,7 +461,12 @@ Session.prototype = {
 
   bindEvents: function(){
     if(this.get('theme.close_button')){
-      this.on('click', '#modal-close', this.hide);
+      this.on('click', '#modal-close', function(){
+        if (this.get('modal.confirm_close') && !confirm('Press OK to cancel the payment')) {
+          return;
+        }
+        this.hide();
+      });
     }
     this.on('click', '#top-left', this.switchTab);
     this.on('click', '#user', function(e){
