@@ -70,8 +70,8 @@ describe 'redirect on submit with valid payload', ->
       expect form.getAttribute 'method'
         .to.be 'post'
 
-      # expect form.getAttribute 'action'
-      #   .to.be checkoutPostUrl
+      expect form.getAttribute 'action'
+        .to.be checkoutPostUrl
 
       payload = {}
       Array::forEach.call form.querySelectorAll('input'), (input) -> payload[input.name] = input.value
@@ -106,8 +106,8 @@ describe 'redirect on submit with valid payload', ->
       expect HTMLFormElement::submit.called
         .to.be false
 
-      # expect window.fakeRequest.url
-      #   .to.be '/v1/payments/create/ajax?key_id=key'
+      expect window.fakeRequest.url
+        .to.be '/v1/payments/create/ajax?key_id=key'
 
       expect window.fakeRequest.method
         .to.be 'post'

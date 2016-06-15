@@ -384,9 +384,9 @@ window.handleMessage = function(message){
   if(message.context){
     discreet.context = message.context;
   }
-  if(message.config){
-    RazorpayConfig = message.config;
-  }
+  // if(message.config){
+  //   RazorpayConfig = message.config;
+  // }
   if(message.embedded){
     session.embedded = true;
     $(doc).addClass('embedded');
