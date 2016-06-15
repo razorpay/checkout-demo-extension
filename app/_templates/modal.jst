@@ -77,9 +77,9 @@ var gridClass = gridClasses[i-1];
                 <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
-                    <div class="help">Please enter 10-12 digit contact number</div>
+                    <div class="help">Please enter 8-15 digit contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" required value="{{=attr(o('prefill.contact'))}}" pattern="^\+?(91 )?[0-9]{10,14}$" maxlength="15">
+                    <input class="input" id="contact" name="contact" type="tel" required value="{{=attr(o('prefill.contact'))}}" pattern="^\+?(91 )?[0-9]{8,15}$" maxlength="15">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
