@@ -1,4 +1,8 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
-// RazorpayConfig.api = 'https://api.razorpay.com/';
-RazorpayConfig.api = RazorpayConfig.frameApi;
+
+(function(){
+  var a = document.createElement('a');
+  a.href = RazorpayConfig.frameApi;
+  RazorpayConfig.api = a.href;
+})();

@@ -1,4 +1,4 @@
-checkoutPostUrl = '/v1/payments/create/checkout'
+checkoutPostUrl = 'file:///v1/payments/create/checkout'
 androidUrl = '/test/fixtures/app.html?platform=android&key=key'
 message =
   id: 'mehta'
@@ -107,7 +107,7 @@ describe 'redirect on submit with valid payload', ->
         .to.be false
 
       expect window.fakeRequest.url
-        .to.be '/v1/payments/create/ajax?key_id=key'
+        .to.be 'file:///v1/payments/create/ajax?key_id=key'
 
       expect window.fakeRequest.method
         .to.be 'post'
