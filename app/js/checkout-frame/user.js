@@ -9,16 +9,17 @@ function deleteToken(user, token){
   }
 }
 
-function User (user, key) {
+function User (user, options) {
   if (user) {
-    this.app_token = user.app_token || null;
+    this.id = options.customer_id || user.app_token || null;
+    this.id_key = options.customer_id ? 'customer_id' : 'app_token';
     this.email = user.email || '';
     this.contact = user.contact || '';
     this.tokens = user.tokens || null;
   }
   this.saved = !!user;
   this.wants_skip = false;
-  this.key = key;
+  this.key = options.key;
 }
 
 User.prototype = {
@@ -51,13 +52,13 @@ User.prototype = {
         otp: otp
       },
       callback: function(data){
-        user.app_token = data.app_token;
+        user.id = data.app_token;
         user.tokens = data.tokens;
         user.device_token = data.device_token;
 
         if (CheckoutBridge) {
           if(CheckoutBridge.setAppToken) {
-            CheckoutBridge.setAppToken(user.app_token);
+            CheckoutBridge.setAppToken(user.id);
           }
           if(CheckoutBridge.setDeviceToken) {
             CheckoutBridge.setDeviceToken(user.device_token);
@@ -75,18 +76,19 @@ User.prototype = {
 
   setPhone: function(phone){
     if (this.contact !== phone) {
-      this.app_token = this.saved = this.wants_skip = this.tokens = null;
+      this.id = this.saved = this.wants_skip = this.tokens = null;
+      this.id_key = 'app_token';
       this.contact = phone;
     }
   },
 
   deleteCard: function(token, callback){
     var user = this;
-    if (!this.app_token) {
+    if (!this.id) {
       return;
     }
     $.ajax({
-      url: makeAuthUrl(this.key, 'apps/' + this.app_token + '/tokens/' + token),
+      url: makeAuthUrl(this.key, 'apps/' + this.id + '/tokens/' + token),
       method: 'delete',
       callback: function(){
         callback();

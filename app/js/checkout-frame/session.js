@@ -646,10 +646,10 @@ Session.prototype = {
       return this.setScreen('card');
     }
 
-    if( !user.app_token && typeof user.saved !== 'boolean' ) {
+    if( !user.id && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
       this.user.lookup(bind(this.showCardTab, this));
-    } else if ( user.saved && !user.app_token && !user.wants_skip ) {
+    } else if ( user.saved && !user.id && !user.wants_skip ) {
       this.verifyUser(message);
     } else {
       this.setSavedCards(user);
@@ -720,7 +720,7 @@ Session.prototype = {
 
   setUser: function(){
     var options = this.get();
-    var user = this.user = new User(preferences.customer, options.key);
+    var user = this.user = new User(preferences.customer, options);
     if (!options['prefill.contact'] && user.contact) {
       options['prefill.contact'] = user.contact;
     }
@@ -911,9 +911,10 @@ Session.prototype = {
         this.submit();
       }
       callback = function(msg){
-        var id = this.user.app_token;
+        var id = this.user.id;
+        var idKey = this.user.id;
         if(id){
-          this.payload.app_token = id;
+          this.payload[idKey] = id;
           this.setScreen('card');
           if (isRedirect) {
             this.submit();
@@ -998,7 +999,7 @@ Session.prototype = {
     };
 
     // ask user to verify phone number if not logged in and wants to save card
-    if (('app_token' in data) && !data.app_token) {
+    if (('app_token' in data) && !data.id) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         return this.verifyUser();
@@ -1059,11 +1060,12 @@ Session.prototype = {
     if(this.screen === 'card'){
       setEmiBank(data);
 
-      var userId = this.user.app_token;
+      var userId = this.user.id;
+      var userIdKey = this.user.id_key;
 
       // set app_token if either new card or saved card (might be blank)
       if (data.save || data.token) {
-        data.app_token = userId;
+        data[userIdKey] = userId;
       }
     }
 
