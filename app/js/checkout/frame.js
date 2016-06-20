@@ -408,9 +408,7 @@ CheckoutFrame.prototype = {
 
   onpaymenterror: function(data){
     try{
-      if (data.error.description !== 'Payment cancelled') {
-        this.rzp.emit('payment.error', data);
-      }
+      this.rzp.emit('payment.error', data);
     } catch(e){}
   },
 

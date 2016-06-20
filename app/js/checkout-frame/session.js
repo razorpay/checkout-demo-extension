@@ -178,16 +178,17 @@ function errorHandler(response){
   if(!response || !response.error){
     return;
   }
-  var message;
+  var error = response.error;
+  var message = error.description;
   this.shake();
   this.clearRequest();
+  Razorpay.sendMessage({event: 'paymenterror', data: {error: error}});
+
   if(this.modal){
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
 
-  message = response.error.description;
-
-  var err_field = response.error.field;
+  var err_field = error.field;
   if (err_field){
     if(!err_field.indexOf('expiry')){
       err_field = 'card[expiry]';
