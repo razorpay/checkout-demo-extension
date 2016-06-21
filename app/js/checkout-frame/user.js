@@ -26,7 +26,7 @@ User.prototype = {
   lookup: function(callback){
     var user = this;
     $.ajax({
-      url: makeAuthUrl(this.key, 'customer/status/' + this.contact),
+      url: makeAuthUrl(this.key, 'customers/status/' + this.contact),
       callback: function(data){
         user.saved = !!data.saved;
         callback();
