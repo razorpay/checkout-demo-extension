@@ -953,7 +953,7 @@ Session.prototype = {
       }
       callback = function(msg){
         var id = this.user.id;
-        var idKey = this.user.id;
+        var idKey = this.user.id_key;
         if(id){
           this.payload[idKey] = id;
           this.setScreen('card');
