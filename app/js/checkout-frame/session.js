@@ -63,7 +63,7 @@ function setEmiBank(data){
 function onSixDigits(e){
   var el = e.target;
   var val = el.value;
-  var isMaestro = gel('elem-card').getAttribute('cardtype') === 'maestro';
+  var isMaestro = $('#elem-card .cardtype').attr('cardtype') === 'maestro';
   var sixDigits = val.length > 5;
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
@@ -73,8 +73,7 @@ function onSixDigits(e){
   if(sixDigits){
     if(isMaestro){
       if(nocvvCheck.disabled){
-        $('#nocvv-check').addClass('shown');
-        nocvvCheck.disabled = false;
+        toggleNoCvv(true);
       }
     }
     else {
@@ -85,12 +84,13 @@ function onSixDigits(e){
             emiObj = emiObjInner;
           }
         }
-      )
+      );
+
+      toggleNoCvv(false);
     }
   }
   else {
-    $('#nocvv-check').removeClass('shown');
-    nocvvCheck.disabled = true;
+    toggleNoCvv(false);
   }
 
   var emi_parent = $('#emi-check-label')[emiObj ? 'removeClass' : 'addClass']('disabled');
@@ -119,6 +119,12 @@ function noCvvToggle(e){
   var nocvvCheck = e.target;
   var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
   $('#form-card').toggleClass('nocvv', shouldHideExpiryCVV);
+}
+
+function toggleNoCvv(show){
+  // Display or hide the nocvv checkbox
+  $('#nocvv-check')[show ? 'addClass' : 'removeClass']('shown');
+  gel('nocvv').disabled = !show;
 }
 
 function makeVisible(subject){
@@ -676,6 +682,23 @@ Session.prototype = {
     }
   },
 
+  setSavedCard: function (e) {
+    var input = e.target;
+    if(input.type !== 'radio') {
+      return
+    }
+
+    var $savedcard = $(input.parentNode);
+    var cardtype = $savedcard.find('.cardtype')[0].getAttribute('cardtype');
+    var nocvvCheck = gel('nocvv');
+    var isMaestro = cardtype === 'maestro';
+
+    input.checked = true;
+    $('#form-card').removeClass('nocvv');
+    nocvvCheck.checked = false;
+    toggleNoCvv(isMaestro);
+  },
+
   setSavedCards: function(user){
     var userTokens = user && user.tokens;
     var cardTab = $('#form-card');
@@ -688,6 +711,9 @@ Session.prototype = {
     // now that we've rendered the template, convert userTokens to boolean-y
     userTokens = isNonEmpty(userTokens);
     var saveScreen = this.savedCardScreen;
+    if (userTokens) {
+      this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
+    }
 
     // runs one time only
     if (saveScreen === undefined) {
@@ -700,6 +726,10 @@ Session.prototype = {
         this.on('click', '#show-saved-cards', function(){ self.toggleSavedCards(true) });
       }
     }
+
+    if (saveScreen) {
+        this.on('change', '#saved-cards-container', this.setSavedCard, true);
+    }
     this.toggleSavedCards(saveScreen);
     $('#form-card').toggleClass('has-cards', userTokens);
   },
@@ -710,6 +740,15 @@ Session.prototype = {
     if (typeof saveScreen !== 'boolean') {
       saveScreen = !tabCard.hasClass(saveClass);
     }
+
+    $('#elem-emi').removeClass('hidden');
+
+    if (saveScreen) {
+      this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
+    } else {
+      onSixDigits({target: gel('card_number')});
+    }
+
     this.savedCardScreen = saveScreen;
     tabCard.toggleClass(saveClass, saveScreen);
   },
@@ -829,6 +868,7 @@ Session.prototype = {
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
+      this.savedCardScreen = undefined;
     }
   },
 
@@ -962,10 +1002,10 @@ Session.prototype = {
       data.bank = this.order.bank;
     } else if (screen) {
       if (screen === 'card') {
+        var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
           validateCardNumber(gel('card_number'));
-          var nocvv_el = gel('nocvv-check');
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {
@@ -976,8 +1016,8 @@ Session.prototype = {
             data['card[expiry_year]'] = '21';
           }
         } else {
-          // no saved card was selected
-          if (!data['card[cvv]']) {
+          if ((!nocvv_el.checked || nocvv_el.disabled) && !data['card[cvv]']) {
+            // no saved card was selected
             this.shake();
             return $('#cvv-' + data.token).focus();
           }
