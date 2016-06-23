@@ -106,10 +106,12 @@ var discreet = {
     return /data:image\/[^;]+;base64/.test(image);
   },
 
+  cancelMsg: 'Payment cancelled',
+
   error: function(message){
     return {
       error:{
-        description: message || 'Payment cancelled'
+        description: message || discreet.cancelMsg
       }
     };
   },
