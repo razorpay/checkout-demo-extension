@@ -78,6 +78,10 @@ $cardpl: 46px;
   }
 }
 
+#form-card.nocvv :checked + .collapser .saved-cvv {
+  display: none;
+}
+
 .saved-card:last-child .cardtype {
   transform: translateX(-3px) translateY(-1px) rotateZ(-10deg);
 }
@@ -190,13 +194,17 @@ $cardpl: 46px;
   }
 }
 
+#nocvv-check {
+  margin-top: 8px;
+}
+
 .save-enabled {
   #should-save-card {
     display: block;
   }
 
   #add-card-container {
-    height: 168px;
+    height: 165px;
   }
 }
 

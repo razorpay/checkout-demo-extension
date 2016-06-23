@@ -307,6 +307,14 @@ function ajaxCallback(response){
   if (payment_id) {
     this.payment_id = payment_id;
   }
+
+  // race between popup close poll and ajaxCallback
+  if (this.popup && this.popup.checkClose()) {
+
+    // return if it's already closed
+    return;
+  }
+
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
