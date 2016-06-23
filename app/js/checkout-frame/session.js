@@ -1082,7 +1082,7 @@ Session.prototype = {
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this))
       .on('payment.cancel', bind(function() {
-        this.showLoadError(false, 'Checking payment');
+        this.showLoadError(discreet.cancelMsg, true);
       }, this));
 
     if(request.powerwallet){
