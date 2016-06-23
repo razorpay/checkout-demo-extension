@@ -14,12 +14,6 @@
 * Default Popup options.
 */
 
-var _popCheckClose = function(popup) {
-  return function () {
-    popup._checkClose();
-  }
-};
-
 function getPopupDimension(varVal, minVal, maxVal){
   return Math.min(
     Math.max(
@@ -74,7 +68,7 @@ var Popup = function(src, name) {
 
   this.window.focus();
   this.listeners = [];
-  this.interval = setInterval(_popCheckClose(this), 300);
+  this.interval = setInterval(bind(this.checkClose, this), 200);
 
   this.on('beforeunload', this.beforeunload);
   this.on('unload', this.close);
@@ -120,15 +114,16 @@ Popup.prototype = {
 * Emits the "close" event.
 */
 
-  _checkClose: function (forceClosed) {
+  checkClose: function (forceClosed) {
     try {
       if (forceClosed || this.window.closed !== false ) { // UC browser makes it undefined instead of true
-        invoke('onClose', this, null, 300);
+        invoke('onClose', this, null, 100);
         this.close();
+        return true;
       }
     }
     catch(e){ // UC throws error on accessing window if other domain
-      this._checkClose(true);
+      this.checkClose(true);
       roll('Failure checking popup close', null, 'warn');
     }
   }
