@@ -131,8 +131,8 @@ Payment.prototype = {
 
   format: function(data, params){
     // add tracking data
-    data['_[id]'] = _uid;
-    data['_[medium]'] = discreet.medium;
+    data['_[checkoutid]'] = _uid;
+    data['_[platform]'] = discreet.medium;
     data['_[context]'] = discreet.context;
     data['_[checkout]'] = !!discreet.isFrame;
     if(params.powerwallet){
