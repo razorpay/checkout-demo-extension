@@ -649,7 +649,7 @@ Session.prototype = {
     var user = this.user;
     tab_titles.otp = tab_titles.card;
 
-    if (!this.get('cardsaving')) {
+    if (!this.get('remember_customer')) {
       return this.setScreen('card');
     }
 
