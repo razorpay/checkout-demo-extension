@@ -329,12 +329,12 @@ Session.prototype = {
     this.saveAndClose();
     this.isOpen = true;
 
-    this.setUser();
     this.getEl();
     this.fillData();
     this.setSmarty();
     this.setEMI();
     this.setModal();
+    this.setUser();
     this.setCard();
     this.bindEvents();
     errorHandler.call(this, this.params);
@@ -785,7 +785,17 @@ Session.prototype = {
 
   setUser: function(){
     var options = this.get();
-    var user = this.user = new User(preferences.customer, options);
+    var customer = preferences.customer || null;
+    var user;
+
+    if (customer && customer.contact === getPhone()) {
+      user = new User(customer, options);
+    } else {
+      user = new User({contact: getPhone()}, options);
+    }
+
+    this.user = user;
+
     if (!options['prefill.contact'] && user.contact) {
       options['prefill.contact'] = user.contact;
     }
@@ -1065,7 +1075,7 @@ Session.prototype = {
     };
 
     // ask user to verify phone number if not logged in and wants to save card
-    if (data.id_key === 'app_token' && !data.id) {
+    if (('app_token' in data) && !data.app_token) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         return this.verifyUser();
