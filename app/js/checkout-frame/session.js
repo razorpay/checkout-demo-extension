@@ -52,6 +52,11 @@ function makeEmiDropdown(emiObj, session){
   $('#emi-plans-wrap').html(h);
 }
 
+function unsetEmiBank() {
+  $('#emi-plans-wrap .active').removeClass('active');
+  $('#emi-check-label').removeClass('checked');
+}
+
 function setEmiBank(data){
   var activeEmiPlan = $('#emi-plans-wrap .active')[0];
   if(activeEmiPlan){
@@ -324,12 +329,12 @@ Session.prototype = {
     this.saveAndClose();
     this.isOpen = true;
 
-    this.setUser();
     this.getEl();
     this.fillData();
     this.setSmarty();
     this.setEMI();
     this.setModal();
+    this.setUser();
     this.setCard();
     this.bindEvents();
     errorHandler.call(this, this.params);
@@ -689,14 +694,33 @@ Session.prototype = {
     }
 
     var $savedcard = $(input.parentNode);
+    var $emiCheck = $('#emi-check-label');
     var cardtype = $savedcard.find('.cardtype')[0].getAttribute('cardtype');
     var nocvvCheck = gel('nocvv');
     var isMaestro = cardtype === 'maestro';
+    var emiEnabled = $savedcard.attr('emi');
+    var issuer = $savedcard.attr('bank') || '';
 
     input.checked = true;
     $('#form-card').removeClass('nocvv');
     nocvvCheck.checked = false;
     toggleNoCvv(isMaestro);
+
+    unsetEmiBank();
+
+    var elem_emi = $('#elem-emi');
+    var emiBank = emi_options.banks[issuer];
+    $emiCheck[emiBank ? 'removeClass' : 'addClass']('disabled');
+
+    if (emiBank) {
+      makeEmiDropdown(emiBank, this);
+    }
+
+    if(isMaestro){
+      elem_emi.addClass('hidden');
+    } else {
+      invoke('removeClass', elem_emi, 'hidden', 200);
+    }
   },
 
   setSavedCards: function(user){
@@ -742,11 +766,12 @@ Session.prototype = {
     }
 
     $('#elem-emi').removeClass('hidden');
+    unsetEmiBank();
 
     if (saveScreen) {
       this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
     } else {
-      onSixDigits({target: gel('card_number')});
+      invoke('onSixDigits', this, {target: gel('card_number')});
     }
 
     this.savedCardScreen = saveScreen;
@@ -760,7 +785,17 @@ Session.prototype = {
 
   setUser: function(){
     var options = this.get();
-    var user = this.user = new User(preferences.customer, options);
+    var customer = preferences.customer || null;
+    var user;
+
+    if (customer && customer.contact === getPhone()) {
+      user = new User(customer, options);
+    } else {
+      user = new User({contact: getPhone()}, options);
+    }
+
+    this.user = user;
+
     if (!options['prefill.contact'] && user.contact) {
       options['prefill.contact'] = user.contact;
     }
@@ -1040,7 +1075,7 @@ Session.prototype = {
     };
 
     // ask user to verify phone number if not logged in and wants to save card
-    if (('app_token' in data) && !data.id) {
+    if (('app_token' in data) && !data.app_token) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         return this.verifyUser();
