@@ -258,8 +258,9 @@ function successHandler(response){
 function Session (options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
-  this.listeners = [];
   this.tab = this.screen = '';
+  this.listeners = [];
+  this.users = {};
 }
 
 Session.prototype = {
@@ -332,7 +333,26 @@ Session.prototype = {
     }
   },
 
+  setUser: function() {
+    var options = this.get();
+    // we put saved customer contact, email into prefill
+    var customer = preferences.customer;
+    if (customer) {
+      if (!options['prefill.contact'] && customer.contact) {
+        options['prefill.contact'] = customer.contact;
+      }
+      if (!options['prefill.email'] && customer.email) {
+        options['prefill.email'] = customer.email;
+      }
+    } else {
+      // !!options.customer_id is indicative of global/local savemode
+      options.customer_id = '';
+    }
+    this.user = new User(customer, options);
+  },
+
   render: function(){
+    this.setUser();
     this.saveAndClose();
     this.isOpen = true;
 
@@ -341,7 +361,6 @@ Session.prototype = {
     this.setSmarty();
     this.setEMI();
     this.setModal();
-    this.setUser();
     this.setCard();
     this.bindEvents();
     errorHandler.call(this, this.params);
@@ -635,9 +654,7 @@ Session.prototype = {
       if (this.checkInvalid('#form-common')) {
         return;
       }
-      if (this.user) {
-        this.user.setPhone(getPhone());
-      }
+      this.setUser();
     } else {
       if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
         tab = this.tab;
@@ -790,27 +807,6 @@ Session.prototype = {
   verifyUser: function(msg){
     this.commenceOTP(msg, true);
     this.user.login();
-  },
-
-  setUser: function(){
-    var options = this.get();
-    var customer = preferences.customer || null;
-    var user;
-
-    if (customer && customer.contact === getPhone()) {
-      user = new User(customer, options);
-    } else {
-      user = new User({contact: getPhone()}, options);
-    }
-
-    this.user = user;
-
-    if (!options['prefill.contact'] && user.contact) {
-      options['prefill.contact'] = user.contact;
-    }
-    if (!options['prefill.email'] && user.email) {
-      options['prefill.email'] = user.email;
-    }
   },
 
   switchBank: function(e){

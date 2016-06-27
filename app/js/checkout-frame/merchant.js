@@ -1,6 +1,7 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
   sessions = {},
+  users = {},
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
 
@@ -200,6 +201,10 @@ function setPaymentMethods(session){
   methods.wallet = wallets;
 }
 
+function setUser(customer){
+
+}
+
 function showModal(session) {
   if(!preferences){
     var data = makePrefParams(session);
@@ -208,6 +213,7 @@ function showModal(session) {
         return Razorpay.sendMessage({event: 'fault', data: response.error.description});
       }
       preferences = response;
+      setUser(response.customer);
       showModal(session);
     })
     return;

@@ -13,7 +13,6 @@ function User (user, options) {
   if (user) {
     this.id = options.customer_id || user.app_token || null;
     this.id_key = options.customer_id ? 'customer_id' : 'app_token';
-    this.email = user.email || '';
     this.contact = user.contact || '';
     this.tokens = user.tokens || null;
   }
@@ -74,11 +73,11 @@ User.prototype = {
     })
   },
 
-  setPhone: function(phone){
-    if (this.contact !== phone) {
+  update: function(data){
+    if (this.contact !== data.contact) {
       this.id = this.saved = this.wants_skip = this.tokens = null;
       this.id_key = 'app_token';
-      this.contact = phone;
+      this.contact = data.contact;
     }
   },
 
