@@ -9,25 +9,35 @@ function deleteToken(user, token){
   }
 }
 
-function User (user, options) {
-  if (user) {
-    this.id = options.customer_id || user.app_token || null;
-    this.id_key = options.customer_id ? 'customer_id' : 'app_token';
-    this.contact = user.contact || '';
-    this.tokens = user.tokens || null;
+function Customer (key) {
+  this.key = key;
+
+  var saved_customer = preferences.customer;
+  if (saved_customer) {
+    if (saved_customer.customer_id) {
+      this.id = saved_customer.customer_id;
+      this.id_key = 'customer_id';
+      this.local = true;
+    } else {
+      this.id = saved_customer.app_token;
+      this.id_key = 'app_token';
+    }
+    this.contact = saved_customer.contact;
+    this.tokens = saved_customer.tokens;
+    this.saved = true;
+    // this.wants_skip = false;
+  } else {
+    this.saved = preferences.saved;
   }
-  this.saved = !!user;
-  this.wants_skip = false;
-  this.key = options.key;
 }
 
-User.prototype = {
+Customer.prototype = {
   lookup: function(callback){
-    var user = this;
+    var customer = this;
     $.ajax({
       url: makeAuthUrl(this.key, 'customers/status/' + this.contact),
       callback: function(data){
-        user.saved = !!data.saved;
+        customer.saved = !!data.saved;
         callback();
       }
     })
@@ -73,11 +83,10 @@ User.prototype = {
     })
   },
 
-  update: function(data){
-    if (this.contact !== data.contact) {
+  update: function(contact) {
+    if (!this.local && this.contact !== contact) {
       this.id = this.saved = this.wants_skip = this.tokens = null;
-      this.id_key = 'app_token';
-      this.contact = data.contact;
+      this.contact = contact;
     }
   },
 

@@ -348,11 +348,13 @@ Session.prototype = {
       // !!options.customer_id is indicative of global/local savemode
       options.customer_id = '';
     }
-    this.user = new User(customer, options);
+    this.user = new User(options.key);
   },
 
   render: function(){
-    this.setUser();
+    if (!this.user) {
+      this.setUser();
+    }
     this.saveAndClose();
     this.isOpen = true;
 
@@ -654,7 +656,7 @@ Session.prototype = {
       if (this.checkInvalid('#form-common')) {
         return;
       }
-      this.setUser();
+      this.user.update(getPhone());
     } else {
       if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
         tab = this.tab;
@@ -686,13 +688,18 @@ Session.prototype = {
 
     if( !user.id && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
-      user.lookup(bind(this.showCardTab, this));
+      user.lookup(bind(function(){
+        // customer status check also sends otp if customer exists
+        if (user.saved) {
+          this.commenceOTP(message, true);
+        } else {
+          this.setScreen('card');
+        }
+      }, this));
     } else if ( user.saved && !user.id && !user.wants_skip ) {
       this.verifyUser(message);
     } else {
       this.setSavedCards(user);
-      this.setScreen('card');
-      return true;
     }
     $('#otp-sec').html('Skip saved cards');
   },
