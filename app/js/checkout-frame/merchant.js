@@ -384,20 +384,23 @@ window.handleMessage = function(message){
   if(message.context){
     discreet.context = message.context;
   }
-  // if(message.config){
-  //   RazorpayConfig = message.config;
-  // }
+
   if(message.embedded){
     session.embedded = true;
     $(doc).addClass('embedded');
   }
+
   if(message.data){
     session.data = message.data;
   }
+
+  if(message.params){
+    session.params = message.params;
+  }
+
   if(message.event === 'open' || message.options){
     showModal(session);
-  }
-  else if(message.event === 'close'){
+  } else if(message.event === 'close'){
     session.hide();
   }
 }

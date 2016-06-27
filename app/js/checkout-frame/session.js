@@ -186,6 +186,13 @@ function overlayVisible(){
 
 // this === Session
 function errorHandler(response){
+  if (typeof response === 'string') {
+    try {
+      response = JSON.parse(response);
+    } catch(e){
+      return;
+    }
+  }
   if(!response || !response.error){
     return;
   }
@@ -628,7 +635,9 @@ Session.prototype = {
       if (this.checkInvalid('#form-common')) {
         return;
       }
-      this.user.setPhone(getPhone());
+      if (this.user) {
+        this.user.setPhone(getPhone());
+      }
     } else {
       if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
         tab = this.tab;
@@ -660,7 +669,7 @@ Session.prototype = {
 
     if( !user.id && typeof user.saved !== 'boolean' ) {
       this.commenceOTP('saved cards');
-      this.user.lookup(bind(this.showCardTab, this));
+      user.lookup(bind(this.showCardTab, this));
     } else if ( user.saved && !user.id && !user.wants_skip ) {
       this.verifyUser(message);
     } else {
