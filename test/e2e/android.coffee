@@ -3,6 +3,7 @@ androidUrl = '/test/fixtures/app.html?platform=android&key=key'
 message =
   id: 'mehta'
   data: {}
+  params: '{"error": {"description": "yolo"}}'
   options:
     key: 'key'
     amount: '300'
@@ -51,6 +52,12 @@ describe 'page load', ->
         .to.be.ok()
       expect CheckoutBridge.onrender.callCount
         .to.be 1
+      expect document.querySelector('#error-message').className
+        .to.contain 'shown'
+
+      expect document.querySelector('#fd-t').innerHTML
+        .to.be 'yolo'
+
     , message
 
 describe 'redirect on submit with valid payload', ->
