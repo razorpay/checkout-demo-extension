@@ -212,12 +212,19 @@ function showModal(session) {
     })
     return;
   }
-  var options = preferences.options;
-  Razorpay.configure(options);
-  Customer.prototype.key = Razorpay.defaults.key;
 
+  var options = preferences.options;
   var saved_customer = preferences.customer;
+
   if (saved_customer) {
+    // we put saved customer contact, email into default prefills
+    if (!options['prefill.contact'] && saved_customer.contact) {
+      options['prefill.contact'] = saved_customer.contact;
+    }
+    if (!options['prefill.email'] && saved_customer.email) {
+      options['prefill.email'] = saved_customer.email;
+    }
+
     var customer = getCustomer(saved_customer.contact);
     if (customer) {
       if (saved_customer.customer_id) {
@@ -228,6 +235,9 @@ function showModal(session) {
       customer.tokens = saved_customer.tokens;
     }
   }
+
+  Customer.prototype.key = session.get('key');
+  Razorpay.configure(options);
   showModalWithSession(session);
 }
 
@@ -376,12 +386,13 @@ window.handleMessage = function(message){
   }
   var id = message.id || _uid;
   var session = getSession(id);
+  var options = message.options;
   if(!session){
-    if(!message.options){
+    if(!options){
       return;
     }
     try{
-      session = new Session(message.options);
+      session = new Session(options);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
       return roll('fault ' + e.message, message, 'warn');
@@ -412,7 +423,7 @@ window.handleMessage = function(message){
     session.params = message.params;
   }
 
-  if(message.event === 'open' || message.options){
+  if(message.event === 'open' || options){
     showModal(session);
   } else if(message.event === 'close'){
     session.hide();

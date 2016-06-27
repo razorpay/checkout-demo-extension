@@ -333,28 +333,7 @@ Session.prototype = {
     }
   },
 
-  setUser: function() {
-    var options = this.get();
-    // we put saved customer contact, email into prefill
-    var customer = preferences.customer;
-    if (customer) {
-      if (!options['prefill.contact'] && customer.contact) {
-        options['prefill.contact'] = customer.contact;
-      }
-      if (!options['prefill.email'] && customer.email) {
-        options['prefill.email'] = customer.email;
-      }
-    } else {
-      // !!options.customer_id is indicative of global/local savemode
-      options.customer_id = '';
-    }
-    this.user = new User(options.key);
-  },
-
   render: function(){
-    if (!this.user) {
-      this.setUser();
-    }
     this.saveAndClose();
     this.isOpen = true;
 
@@ -656,7 +635,6 @@ Session.prototype = {
       if (this.checkInvalid('#form-common')) {
         return;
       }
-      this.user.update(getPhone());
     } else {
       if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
         tab = this.tab;
@@ -664,7 +642,9 @@ Session.prototype = {
     }
 
     if (tab) {
-      $('#user').html(getPhone());
+      var contact = getPhone();
+      this.customer = getCustomer(contact);
+      $('#user').html(contact);
     } else {
       this.payload = null;
     }
@@ -678,30 +658,35 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function(message){
-    var user = this.user;
+  showCardTab: function(message) {
+    var self = this;
+    var customer = self.customer;
+
+    if (self.get('customer_id') || !self.get('remember_customer')) {
+      return self.setScreen('card');
+    }
+
     tab_titles.otp = tab_titles.card;
-
-    if (!this.get('remember_customer')) {
-      return this.setScreen('card');
-    }
-
-    if( !user.id && typeof user.saved !== 'boolean' ) {
-      this.commenceOTP('saved cards');
-      user.lookup(bind(function(){
-        // customer status check also sends otp if customer exists
-        if (user.saved) {
-          this.commenceOTP(message, true);
-        } else {
-          this.setScreen('card');
-        }
-      }, this));
-    } else if ( user.saved && !user.id && !user.wants_skip ) {
-      this.verifyUser(message);
-    } else {
-      this.setSavedCards(user);
-    }
     $('#otp-sec').html('Skip saved cards');
+
+    if (!customer.id && !customer.wants_skip) {
+      self.commenceOTP('saved cards');
+      customer.lookup(function(){
+        // customer status check also sends otp if customer exists
+        if (customer.saved) {
+          self.commenceOTP(message, true);
+        } else {
+          self.showCards();
+        }
+      });
+    } else {
+      self.showCards();
+    }
+  },
+
+  showCards: function(){
+    this.setSavedCards();
+    this.setScreen('card');
   },
 
   deleteCard: function(e) {
@@ -756,19 +741,20 @@ Session.prototype = {
     }
   },
 
-  setSavedCards: function(user){
-    var userTokens = user && user.tokens;
+  setSavedCards: function(){
+    var customer = this.customer;
+    var tokens = customer && customer.tokens;
     var cardTab = $('#form-card');
-    if (userTokens) {
-      if ($$('.saved-card').length !== userTokens.length) {
-        $('#saved-cards-container').html(templates.savedcards(userTokens));
+    if (tokens) {
+      if ($$('.saved-card').length !== tokens.length) {
+        $('#saved-cards-container').html(templates.savedcards(tokens));
       }
     }
 
     // now that we've rendered the template, convert userTokens to boolean-y
-    userTokens = isNonEmpty(userTokens);
+    tokens = isNonEmpty(tokens);
     var saveScreen = this.savedCardScreen;
-    if (userTokens) {
+    if (tokens) {
       this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
     }
 
@@ -776,7 +762,7 @@ Session.prototype = {
     if (saveScreen === undefined) {
       $('#form-card').addClass('save-enabled');
       // important to bind just once
-      saveScreen = this.savedCardScreen = userTokens;
+      saveScreen = this.savedCardScreen = tokens;
       if (saveScreen) {
         var self = this;
         this.on('click', '#show-add-card', function(){ self.toggleSavedCards(false) });
@@ -785,10 +771,10 @@ Session.prototype = {
     }
 
     if (saveScreen) {
-        this.on('change', '#saved-cards-container', this.setSavedCard, true);
+      this.on('change', '#saved-cards-container', this.setSavedCard, true);
     }
     this.toggleSavedCards(saveScreen);
-    $('#form-card').toggleClass('has-cards', userTokens);
+    $('#form-card').toggleClass('has-cards', tokens);
   },
 
   toggleSavedCards: function(saveScreen){
