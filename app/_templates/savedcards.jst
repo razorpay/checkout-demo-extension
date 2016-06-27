@@ -18,7 +18,7 @@
     var cvv_digits = network === 'amex' ? 4 : 3;
     var network = networks[card.network];
   }}
-  <div class='saved-card'>
+  <div class='saved-card' emi='{{=card.emi}}'{{if (card.emi) {}} bank='{{=card.issuer}}'{{}}}>
     <div class='cardtype' cardtype='{{=network}}'></div>
     <input type='radio' id='saved-card-{{=i}}' name='token' value='{{=item.token}}'{{=!i? ' checked':''}}/>
     <label class='collapser left-card' for='saved-card-{{=i}}'>
