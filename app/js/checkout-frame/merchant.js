@@ -1,7 +1,6 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
   sessions = {},
-  users = {},
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
 
@@ -215,6 +214,20 @@ function showModal(session) {
   }
   var options = preferences.options;
   Razorpay.configure(options);
+  Customer.prototype.key = Razorpay.defaults.key;
+
+  var saved_customer = preferences.customer;
+  if (saved_customer) {
+    var customer = getCustomer(saved_customer.contact);
+    if (customer) {
+      if (saved_customer.customer_id) {
+        customer.id_key = 'customer_id';
+        customer.local = true;
+      }
+      customer.id = saved_customer[customer.id_key];
+      customer.tokens = saved_customer.tokens;
+    }
+  }
   showModalWithSession(session);
 }
 

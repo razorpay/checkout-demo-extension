@@ -1,37 +1,30 @@
-function deleteToken(user, token){
-  var tokens = user.tokens;
-  for (var i = 0; i < tokens.count; i++){
-    if(tokens.items[i].token === token){
-      tokens.items.splice(i, 1 );
-      tokens.count--;
-      return;
-    }
-  }
+var customers = {};
+
+function setSavedCustomer(preferences) {
+  new Customer(preferences.customer);
 }
 
-function Customer (key) {
-  this.key = key;
-
-  var saved_customer = preferences.customer;
-  if (saved_customer) {
-    if (saved_customer.customer_id) {
-      this.id = saved_customer.customer_id;
-      this.id_key = 'customer_id';
-      this.local = true;
-    } else {
-      this.id = saved_customer.app_token;
-      this.id_key = 'app_token';
-    }
-    this.contact = saved_customer.contact;
-    this.tokens = saved_customer.tokens;
-    this.saved = true;
-    // this.wants_skip = false;
-  } else {
-    this.saved = preferences.saved;
+function getCustomer(contact) {
+  if (contact && !(contact in customers)) {
+    customers[contact] = new Customer(contact);
   }
+  return customers[contact];
+}
+
+function Customer(contact) {
+  this.contact = contact;
 }
 
 Customer.prototype = {
+  key: '',
+  id_key: 'app_token',
+  wants_skip: false,
+  saved: false,
+  local: false,
+
+  // NOTE: status check api also sends otp if customer exists
+  // for otp creation, we're using status check api only
+
   lookup: function(callback){
     var customer = this;
     $.ajax({
@@ -83,13 +76,6 @@ Customer.prototype = {
     })
   },
 
-  update: function(contact) {
-    if (!this.local && this.contact !== contact) {
-      this.id = this.saved = this.wants_skip = this.tokens = null;
-      this.contact = contact;
-    }
-  },
-
   deleteCard: function(token, callback){
     var user = this;
     if (!this.id) {
@@ -103,5 +89,16 @@ Customer.prototype = {
         deleteToken(user, token);
       }
     })
+  }
+}
+
+function deleteToken(user, token){
+  var tokens = user.tokens;
+  for (var i = 0; i < tokens.count; i++){
+    if(tokens.items[i].token === token){
+      tokens.items.splice(i, 1 );
+      tokens.count--;
+      return;
+    }
   }
 }
