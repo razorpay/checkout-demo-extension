@@ -116,10 +116,10 @@ function track(r, event, extra){
       extra = {message: props.message, stack: props.stack}
     }
 
-    // payload is format prescribed by segment
-    var payload = {
+    // data is of format prescribed by segment
+    var data = {
       // mandatory
-      event: event
+      event: event,
 
       // unique identifier needs to be named "anonymousId"
       anonymousId: r.id,
@@ -145,9 +145,12 @@ function track(r, event, extra){
       }
     };
 
+    // return console.log(event, data.properties);
+
     $.ajax({
       url: 'https://api.segment.io/v1/track',
       method: 'post',
+      data: JSON.stringify(data),
       headers: {
         'Content-type': 'application/json',
         'Authorization': 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:')

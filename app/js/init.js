@@ -66,7 +66,7 @@ var Razorpay = window.Razorpay = function(options){
     return new Razorpay(options);
   }
   this._events = {};
-  invoke(this.configure, this, options);
+  invoke('configure', this, options);
 };
 
 Razorpay.defaults = {

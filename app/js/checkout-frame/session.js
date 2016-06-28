@@ -260,7 +260,6 @@ function successHandler(response){
 function Session (options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
-  this.track('init', this.get());
   this.listeners = [];
   this.tab = this.screen = '';
 }

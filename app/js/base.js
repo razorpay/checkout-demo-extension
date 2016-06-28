@@ -323,8 +323,15 @@ Razorpay.prototype = {
       raise(message);
     }
 
-    if(this instanceof Razorpay){
+    if (this instanceof Razorpay) {
       this.id = generateUID();
+
+      // init for checkoutjs is tracked from iframe
+      // we've open event to track parent side of options
+      if (!discreet.isCheckout) {
+        track(this, 'init', this.get());
+      }
+
       this.modal = {options: emo};
       this.options = emo;
       if(this.get('parent') && this.open){

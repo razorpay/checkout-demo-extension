@@ -1,3 +1,6 @@
+// flag for checkout-js
+discreet.isCheckout = true;
+
 var currentScript = document.currentScript || (function() {
   var scripts = document.getElementsByTagName('script');
   return scripts[scripts.length - 1];
@@ -191,8 +194,6 @@ Razorpay.prototype.open = needBody(function() {
     return;
   }
 
-  var frame;
-
   if (this.get('parent')) {
     if (preloadedFrame) {
       preloadedFrame.unbind();
@@ -204,6 +205,7 @@ Razorpay.prototype.open = needBody(function() {
     frame = getPreloadedFrame(this);
   }
 
+  track(this, 'open', frame.loadTime);
   this.checkoutFrame = frame;
 
   if(!frame.el.contentWindow){
