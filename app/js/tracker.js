@@ -98,7 +98,6 @@ function generateUID(){
 }
 
 var _uid = generateUID();
-
 var trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',

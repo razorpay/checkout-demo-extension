@@ -342,7 +342,7 @@ CheckoutFrame.prototype = {
     data = data.data;
     invoke('on' + event, this, data);
 
-    if(event === 'dismiss' || event === 'fault' && rzp.isLiveMode()){
+    if (event === 'dismiss' || event === 'fault') {
       track(rzp, event);
     }
   },

@@ -1,5 +1,3 @@
-// flag for checkout-js
-discreet.isCheckout = true;
 var currentScript = document.currentScript || (function() {
   var scripts = document.getElementsByTagName('script');
   return scripts[scripts.length - 1];
