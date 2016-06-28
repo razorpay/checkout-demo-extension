@@ -99,6 +99,12 @@ function generateUID(){
 
 var _uid = generateUID();
 
+var trackingProps = {
+  library: 'checkoutjs',
+  platform: 'browser',
+  context: location.href
+}
+
 function track(id, event, props){
   if(typeof Razorpay === 'function' && id instanceof Razorpay){
     if(!id.isLiveMode()){
@@ -114,11 +120,8 @@ function track(id, event, props){
       anonymousId: id,
       event: event
     };
-    var data = payload.properties = {
-      id: id
-    };
-    if(props && event === 'js_error' && props instanceof Error){
-      // if props is error object, extract relevant properties
+    var data = payload.properties = {};
+    if(props instanceof Error){
       props = {message: props.message, stack: props.stack}
     }
     if(props){
@@ -133,7 +136,7 @@ function track(id, event, props){
       )
     }
 
-    data.medium = discreet.medium;
+    data.platform = discreet.platform;
     data.user_agent = ua;
     if(discreet.context){
       data.page_url = discreet.context;
@@ -151,5 +154,3 @@ function track(id, event, props){
     xhr.send(JSON.stringify(payload));
   })
 }
-
-track(_uid, 'script_loaded');

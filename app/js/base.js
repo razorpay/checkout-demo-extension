@@ -99,9 +99,6 @@ var discreet = {
     return true;
   },
 
-  medium: 'web',
-  context: location.href,
-
   isBase64Image: function(image){
     return /data:image\/[^;]+;base64/.test(image);
   },

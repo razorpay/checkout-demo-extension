@@ -1,5 +1,9 @@
 var templates = {};
 
+if (!discreet.isFrame) {
+  trackingProps.library = 'razorpayjs';
+}
+
 var pollingInterval;
 
 function clearPollingInterval(force){
@@ -134,7 +138,6 @@ Payment.prototype = {
     data['_[checkout_id]'] = _uid;
     data['_[platform]'] = discreet.medium;
     data['_[context]'] = discreet.context;
-    data['_[checkout]'] = !!discreet.isFrame;
     if(params.powerwallet){
       data['_[source]'] = 'checkoutjs';
     }
