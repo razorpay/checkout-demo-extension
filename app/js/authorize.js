@@ -1,5 +1,9 @@
 var templates = {};
 
+if (!discreet.isFrame) {
+  trackingProps.library = 'razorpayjs';
+}
+
 var pollingInterval;
 
 function clearPollingInterval(force){
@@ -130,15 +134,6 @@ Payment.prototype = {
   },
 
   format: function(data, params){
-    // add tracking data
-    data['_[checkout_id]'] = _uid;
-    data['_[platform]'] = discreet.medium;
-    data['_[context]'] = discreet.context;
-    data['_[checkout]'] = !!discreet.isFrame;
-    if(params.powerwallet){
-      data['_[source]'] = 'checkoutjs';
-    }
-
     // fill data from options if empty
     var getOption = this.r.get;
 
@@ -159,6 +154,16 @@ Payment.prototype = {
       data.key_id = getOption('key');
     }
 
+    track(this.r, 'submit', {data: clone(data), params: params});
+
+    // add tracking data
+    data['_[checkout_id]'] = _uid;
+    data['_[platform]'] = trackingProps.platform;
+    data['_[library]'] = trackingProps.library;
+    data['_[context]'] = trackingProps.context;
+    if(params.powerwallet){
+      data['_[source]'] = 'checkoutjs';
+    }
     // flatten notes
     // notes.abc -> notes[abc]
     each(

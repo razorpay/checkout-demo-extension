@@ -98,58 +98,78 @@ function generateUID(){
 }
 
 var _uid = generateUID();
-
-function track(id, event, props){
-  if(typeof Razorpay === 'function' && id instanceof Razorpay){
-    if(!id.isLiveMode()){
-      return;
-    }
-    id = id.id;
-  }
-  setTimeout(function(){
-    var payload = {
-      context: {
-        direct: true
-      },
-      anonymousId: id,
-      event: event
-    };
-    var data = payload.properties = {
-      id: id
-    };
-    if(props && event === 'js_error' && props instanceof Error){
-      // if props is error object, extract relevant properties
-      props = {message: props.message, stack: props.stack}
-    }
-    if(props){
-      each(
-        props,
-        function(propKey, propVal){
-          var valType = typeof propVal;
-          if(valType === 'string' || valType === 'number' || valType === 'boolean'){
-            data[propKey] = propVal;
-          }
-        }
-      )
-    }
-
-    data.medium = discreet.medium;
-    data.user_agent = ua;
-    if(discreet.context){
-      data.page_url = discreet.context;
-    }
-    data.checkout = !!discreet.isFrame;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open(
-      'post',
-      'https://api.segment.io/v1/track',
-      true
-    );
-    xhr.setRequestHeader('Content-type', 'application/json');
-    xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
-    xhr.send(JSON.stringify(payload));
-  })
+var trackingProps = {
+  library: 'checkoutjs',
+  platform: 'browser',
+  context: location.href
 }
 
-track(_uid, 'script_loaded');
+// we keep {event, timestamp} everytime something is tracked, and send it in next track
+var trackStack = {};
+
+function track(r, event, extra){
+  if (!r.isLiveMode()) {
+    return;
+  }
+
+  // invoke makes tracking async
+  invoke(function(){
+    // convert error to plain object
+    if (extra instanceof Error) {
+      extra = {message: extra.message, stack: extra.stack}
+    }
+
+    // data is of format prescribed by segment
+    var data = {
+      // mandatory
+      event: event,
+
+      // unique identifier needs to be named "anonymousId"
+      anonymousId: r.id,
+      properties: {
+        // can be checkoutjs or razorpayjs, depending on discreet.isFrame
+        library: trackingProps.library,
+
+        // whether web or app
+        platform: trackingProps.platform,
+
+        // for auto parsing of url, property name has to be "page_url".
+        // this is specific to segment + keen
+        page_url: trackingProps.context,
+
+        // for auto parsing of ua, property name has to be "user_agent".
+        user_agent: ua,
+        extra: extra,
+      },
+
+      // in order to force segment pass original IP to mixpanel & keen
+      context: {
+        direct: true
+      }
+    };
+
+    if (isNonEmpty(trackStack)) {
+      var prev = {};
+      each(
+        trackStack,
+        function(event, time){
+          prev[event] = new Date() - time;
+        }
+      )
+      data.properties.prev = prev;
+    }
+    trackStack[event] = new Date().getTime();
+
+    // return console.log(event, data.properties);
+
+    $.ajax({
+      url: 'https://api.segment.io/v1/track',
+      method: 'post',
+      data: JSON.stringify(data),
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:')
+      }
+    })
+  })
+}

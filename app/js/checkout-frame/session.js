@@ -200,6 +200,8 @@ function errorHandler(response){
   var message = error.description;
   this.shake();
   this.clearRequest();
+
+  this.track('error', response);
   Razorpay.sendMessage({event: 'paymenterror', data: {error: error}});
 
   if(this.modal){
@@ -266,6 +268,10 @@ Session.prototype = {
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
+  track: function(event, extra) {
+    track(this.r, event, extra);
+  },
+
   getClasses: function(){
     var classes = [];
     if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
