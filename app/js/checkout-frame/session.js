@@ -1007,7 +1007,11 @@ Session.prototype = {
     } else {
       var self = this;
       callback = function(msg){
-        self.sendOTP(msg);
+        if (self.customer.id) {
+          self.showCardTab();
+        } else {
+          self.sendOTP(msg);
+        }
       };
     }
     this.customer.submitOTP(otp, bind(callback, this));

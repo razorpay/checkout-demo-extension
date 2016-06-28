@@ -87,14 +87,8 @@
   }
 }
 
-#otp-sec {
+#form[tab=wallet] #otp-sec {
   display: none;
-}
-
-#form-card {
-  #otp-sec {
-    display: inline-block;
-  }
 }
 
 .incorrect-otp {
