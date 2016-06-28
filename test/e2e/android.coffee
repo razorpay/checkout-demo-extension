@@ -16,8 +16,7 @@ message =
       sooji: 'hai'
 
 commonSubmitData =
-  '_[checkoutid]': message.id
-  '_[checkout]': 'true'
+  '_[checkout_id]': message.id
   '_[platform]': 'android'
   key_id: message.options.key
   amount: message.options.amount

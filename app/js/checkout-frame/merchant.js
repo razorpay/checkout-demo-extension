@@ -245,7 +245,6 @@ function showModalWithSession(session){
   setPaymentMethods(session);
   session.order = preferences.order;
   session.render();
-  trackInit(session);
   Razorpay.sendMessage({event: 'render'});
 
   if (CheckoutBridge) {
@@ -270,7 +269,7 @@ function configureRollbar(id){
           person: {
             id: id
           },
-          context: discreet.context
+          context: trackingProps.context
         }
       }
     );
@@ -407,7 +406,7 @@ window.handleMessage = function(message){
   }
 
   if(message.context){
-    discreet.context = message.context;
+    trackingProps.context = message.context;
   }
 
   if(message.embedded){
@@ -445,13 +444,6 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
   }
 }
 
-function trackInit(session){
-  var options = session.get();
-  if(/^rzp_l/.test(options.key)){
-    track(session.id, 'init', options);
-  }
-}
-
 function applyUAClasses(){
   if(/Android [2-4]/.test(ua)){
     addBodyClass('noanim');
@@ -466,7 +458,7 @@ function initIframe(){
   }
 
   if(CheckoutBridge){
-    discreet.medium = qpmap.platform || 'app';
+    trackingProps.platform = qpmap.platform || 'app';
   }
 
   if(qpmap.message){

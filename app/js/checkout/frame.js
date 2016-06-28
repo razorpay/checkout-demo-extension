@@ -175,6 +175,7 @@ function CheckoutFrame(rzp){
     return this.openRzp(rzp);
   }
   this.getEl();
+  this.time = new Date().getTime();
 }
 
 CheckoutFrame.prototype = {
@@ -342,7 +343,7 @@ CheckoutFrame.prototype = {
     data = data.data;
     invoke('on' + event, this, data);
 
-    if(event === 'dismiss' || event === 'fault' && rzp.isLiveMode()){
+    if (event === 'dismiss' || event === 'fault') {
       track(rzp, event);
     }
   },
@@ -350,6 +351,7 @@ CheckoutFrame.prototype = {
   onload: function() {
     invoke('loadedCallback', this);
     this.hasLoaded = true;
+    this.loadTime = new Date() - this.time;
   },
 
   onredirect: function(data){
