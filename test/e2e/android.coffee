@@ -18,6 +18,7 @@ message =
 commonSubmitData =
   '_[checkout_id]': message.id
   '_[platform]': 'android'
+  '_[library]': 'checkoutjs'
   key_id: message.options.key
   amount: message.options.amount
   contact: message.options.prefill.contact

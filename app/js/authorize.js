@@ -137,6 +137,7 @@ Payment.prototype = {
     // add tracking data
     data['_[checkout_id]'] = _uid;
     data['_[platform]'] = trackingProps.platform;
+    data['_[library]'] = trackingProps.library;
     data['_[context]'] = trackingProps.context;
     if(params.powerwallet){
       data['_[source]'] = 'checkoutjs';
