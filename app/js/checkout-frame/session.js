@@ -454,11 +454,12 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    this.showLoadError('Sending OTP to ' + getPhone());
-    if (this.tab === 'wallet'){
+    if (this.tab === 'wallet') {
+      this.showLoadError('Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
-
+      this.customer.createOTP();
+      this.sendOTP();
     }
   },
 
