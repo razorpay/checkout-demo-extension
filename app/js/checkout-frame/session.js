@@ -260,7 +260,6 @@ function Session (options) {
   this.get = this.r.get;
   this.tab = this.screen = '';
   this.listeners = [];
-  this.users = {};
 }
 
 Session.prototype = {
@@ -454,20 +453,24 @@ Session.prototype = {
     }
   },
 
-  secAction: function() {
-    if(this.tab === 'wallet'){
-      this.showLoadError('Sending OTP to ' + getPhone());
+  resendOTP: function() {
+    this.showLoadError('Sending OTP to ' + getPhone());
+    if (this.tab === 'wallet'){
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
-      this.user.wants_skip = true;
-      var payload = this.payload;
-      if (payload) {
-        delete payload.save;
-        delete payload.app_token;
-        this.submit();
-      } else {
-        this.showCardTab();
-      }
+
+    }
+  },
+
+  secAction: function(){
+    this.customer.wants_skip = true;
+    var payload = this.payload;
+    if (payload) {
+      delete payload.save;
+      delete payload.app_token;
+      this.submit();
+    } else {
+      this.showCardTab();
     }
   },
 
@@ -496,6 +499,7 @@ Session.prototype = {
     this.on('submit', '#form', this.preSubmit);
     this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.switchTab);
+    this.on('click', '#otp-resend', this.resendOTP);
     this.on('click', '#otp-sec', this.secAction);
     this.on('click', '#add-funds-action', this.addFunds);
     this.on('click', '#choose-payment-method', function() { this.setScreen(''); });

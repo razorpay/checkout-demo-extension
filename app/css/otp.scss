@@ -15,19 +15,11 @@
     #otp-elem {
       display: none;
     }
-    #otp-sec {
+    #otp-sec-outer {
       display: none;
     }
   }
 }
-
-// #form[tab=wallet] {
-//   #form-otp.loading {
-//     #otp-sec {
-//       display: none;
-//     }
-//   }
-// }
 
 #otp-action {
   display: none;
@@ -83,16 +75,26 @@
 
 #otp-sec-outer {
   position: absolute;
-  top: 160px;
+  top: 200px;
   width: 100%;
   left: 0;
   text-align: center;
+  a {
+    display: inline-block;
+    & + a {
+      margin-left: 90px;
+    }
+  }
 }
 
 #otp-sec {
-  display: inline-block;
-  margin-top: 5px;
-  padding-bottom: 3px;
+  display: none;
+}
+
+#form-card {
+  #otp-sec {
+    display: inline-block;
+  }
 }
 
 .incorrect-otp {
