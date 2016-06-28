@@ -139,7 +139,7 @@ function track(r, event, extra){
 
         // for auto parsing of ua, property name has to be "user_agent".
         user_agent: ua,
-        extra: extra,
+        extra: extra
       },
 
       // in order to force segment pass original IP to mixpanel & keen
