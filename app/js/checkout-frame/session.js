@@ -607,9 +607,8 @@ Session.prototype = {
       return;
     }
     this.screen = screen;
-    var $body = $('#body');
+    $('#body').attr('screen', screen);
     makeHidden('.screen.shown');
-    $body.toggleClass('tab', screen);
 
     if (screen) {
       $('#tab-title').html(tab_titles[screen]);
@@ -642,7 +641,7 @@ Session.prototype = {
       tab = '';
     }
 
-    $('#form').attr('tab', tab);
+    $('#body').attr('tab', tab);
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
@@ -687,7 +686,7 @@ Session.prototype = {
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
         if (customer.saved) {
-          self.commenceOTP(null, true);
+          this.sendOTP();
         } else {
           self.showCards();
         }
@@ -808,11 +807,6 @@ Session.prototype = {
 
     this.savedCardScreen = saveScreen;
     tabCard.toggleClass(saveClass, saveScreen);
-  },
-
-  verifyUser: function(msg){
-    this.commenceOTP(msg, true);
-    this.customer.createOTP();
   },
 
   switchBank: function(e){
@@ -944,9 +938,8 @@ Session.prototype = {
     }
   },
 
-  commenceOTP: function(text, immediately){
+  commenceOTP: function(text){
     this.setScreen('otp');
-    $('#form-otp').css('display', 'block');
     $('#add-funds').removeClass('show');
 
     invoke(function(){
@@ -955,9 +948,7 @@ Session.prototype = {
       }
     }, this, null, 300);
 
-    if(immediately){
-      this.sendOTP(text);
-    } else {
+    if (text) {
       this.showLoadError('Looking for ' + text + ' associated with ' + getPhone());
     }
   },
@@ -1095,7 +1086,9 @@ Session.prototype = {
     if (('app_token' in data) && !data.app_token) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
-        return this.verifyUser();
+        this.commenceOTP();
+        this.sendOTP();
+        return this.customer.createOTP();
       } else {
         request.message = 'Verifying OTP...';
         request.paused = true;

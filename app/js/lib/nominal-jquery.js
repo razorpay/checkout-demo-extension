@@ -246,7 +246,11 @@ $.prototype = {
       if(arguments.length === 1){
         return el.getAttribute(attr);
       }
-      el.setAttribute(attr, val);
+      if (val) {
+        el.setAttribute(attr, val);
+      } else {
+        el.removeAttribute(attr);
+      }
     }
     return this;
   },

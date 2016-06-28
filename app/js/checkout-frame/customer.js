@@ -18,9 +18,7 @@ Customer.prototype = {
   saved: false,
   local: false,
 
-  // NOTE: status check api also sends otp if customer exists
-  // for otp creation, we're using status check api only
-
+  // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback){
     var customer = this;
     $.ajax({
