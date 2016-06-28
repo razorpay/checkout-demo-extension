@@ -154,7 +154,12 @@ Payment.prototype = {
       data.key_id = getOption('key');
     }
 
-    track(this.r, 'submit', {data: clone(data), params: params});
+    var trackingData = clone(data);
+    delete trackingData['card[number]'];
+    delete trackingData['card[cvv]'];
+    delete trackingData['card[expiry_month]'];
+    delete trackingData['card[expiry_year]'];
+    track(this.r, 'submit', {data: trackingData, params: params});
 
     // add tracking data
     data['_[checkout_id]'] = _uid;
