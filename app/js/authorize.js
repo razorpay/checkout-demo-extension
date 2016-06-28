@@ -131,7 +131,7 @@ Payment.prototype = {
 
   format: function(data, params){
     // add tracking data
-    data['_[checkoutid]'] = _uid;
+    data['_[checkout_id]'] = _uid;
     data['_[platform]'] = discreet.medium;
     data['_[context]'] = discreet.context;
     data['_[checkout]'] = !!discreet.isFrame;
