@@ -17,7 +17,6 @@ message =
 
 commonSubmitData =
   '_[checkout_id]': message.id
-  '_[checkout]': 'true'
   '_[platform]': 'android'
   key_id: message.options.key
   amount: message.options.amount

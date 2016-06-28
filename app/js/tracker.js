@@ -104,6 +104,9 @@ var trackingProps = {
   context: location.href
 }
 
+// we keep {event, timestamp} everytime something is tracked, and send it in next track
+var trackStack = {};
+
 function track(r, event, extra){
   if (!r.isLiveMode()) {
     return;
@@ -136,7 +139,7 @@ function track(r, event, extra){
 
         // for auto parsing of ua, property name has to be "user_agent".
         user_agent: ua,
-        extra: extra
+        extra: extra,
       },
 
       // in order to force segment pass original IP to mixpanel & keen
@@ -144,6 +147,18 @@ function track(r, event, extra){
         direct: true
       }
     };
+
+    if (isNonEmpty(trackStack)) {
+      var prev = {};
+      each(
+        trackStack,
+        function(event, time){
+          prev[event] = new Date() - time;
+        }
+      )
+      data.properties.prev = prev;
+    }
+    trackStack[event] = new Date().getTime();
 
     // return console.log(event, data.properties);
 
