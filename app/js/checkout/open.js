@@ -194,6 +194,8 @@ Razorpay.prototype.open = needBody(function() {
     return;
   }
 
+  var frame;
+
   if (this.get('parent')) {
     if (preloadedFrame) {
       preloadedFrame.unbind();

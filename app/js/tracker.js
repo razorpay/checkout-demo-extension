@@ -113,7 +113,7 @@ function track(r, event, extra){
   invoke(function(){
     // convert error to plain object
     if (extra instanceof Error) {
-      extra = {message: props.message, stack: props.stack}
+      extra = {message: extra.message, stack: extra.stack}
     }
 
     // data is of format prescribed by segment
