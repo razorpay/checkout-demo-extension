@@ -662,7 +662,7 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function(message) {
+  showCardTab: function() {
     var self = this;
     var customer = self.customer;
 
@@ -675,10 +675,10 @@ Session.prototype = {
 
     if (!customer.id && !customer.wants_skip) {
       self.commenceOTP('saved cards');
-      customer.lookup(function(){
+      customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
         if (customer.saved) {
-          self.commenceOTP(message, true);
+          self.commenceOTP(null, true);
         } else {
           self.showCards();
         }
@@ -699,13 +699,13 @@ Session.prototype = {
       return;
     }
     var parent = target.parent().parent();
-    var user = this.user;
-    if(confirm("Press OK to delete card.")){
-      user.deleteCard(
+    if (confirm('Press OK to delete card.')) {
+      this.customer.deleteCard(
         parent.find('[type=radio]')[0].value,
         function(){
           parent.remove();
-      });
+        }
+      );
     }
   },
 
@@ -803,7 +803,7 @@ Session.prototype = {
 
   verifyUser: function(msg){
     this.commenceOTP(msg, true);
-    this.user.login();
+    this.customer.createOTP();
   },
 
   switchBank: function(e){
@@ -989,10 +989,9 @@ Session.prototype = {
         this.submit();
       }
       callback = function(msg){
-        var id = this.user.id;
-        var idKey = this.user.id_key;
+        var id = this.customer.id;
         if(id){
-          this.payload[idKey] = id;
+          this.payload[this.customer.id_key] = id;
           this.setScreen('card');
           if (isRedirect) {
             this.submit();
@@ -1006,9 +1005,12 @@ Session.prototype = {
         }
       }
     } else {
-      callback = this.showCardTab;
+      var self = this;
+      callback = function(msg){
+        self.sendOTP(msg);
+      };
     }
-    this.user.verify(otp, bind(callback, this));
+    this.customer.submitOTP(otp, bind(callback, this));
   },
 
   clearRequest: function(){
@@ -1138,8 +1140,8 @@ Session.prototype = {
     if(this.screen === 'card'){
       setEmiBank(data);
 
-      var userId = this.user.id;
-      var userIdKey = this.user.id_key;
+      var userId = this.customer.id;
+      var userIdKey = this.customer.id_key;
 
       // set app_token if either new card or saved card (might be blank)
       if (data.save || data.token) {

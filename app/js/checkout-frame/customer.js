@@ -1,9 +1,5 @@
 var customers = {};
 
-function setSavedCustomer(preferences) {
-  new Customer(preferences.customer);
-}
-
 function getCustomer(contact) {
   if (contact && !(contact in customers)) {
     customers[contact] = new Customer(contact);
@@ -25,7 +21,7 @@ Customer.prototype = {
   // NOTE: status check api also sends otp if customer exists
   // for otp creation, we're using status check api only
 
-  lookup: function(callback){
+  checkStatus: function(callback){
     var customer = this;
     $.ajax({
       url: makeAuthUrl(this.key, 'customers/status/' + this.contact),
@@ -36,7 +32,7 @@ Customer.prototype = {
     })
   },
 
-  login: function(){
+  createOTP: function(){
     $.post({
       url: makeAuthUrl(this.key, 'otp/create'),
       data: {
@@ -45,7 +41,7 @@ Customer.prototype = {
     })
   },
 
-  verify: function(otp, callback){
+  submitOTP: function(otp, callback){
     var user = this;
     $.post({
       url: makeAuthUrl(this.key, 'otp/verify'),
