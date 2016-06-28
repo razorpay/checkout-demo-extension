@@ -105,52 +105,54 @@ var trackingProps = {
   context: location.href
 }
 
-function track(id, event, props){
-  if(typeof Razorpay === 'function' && id instanceof Razorpay){
-    if(!id.isLiveMode()){
-      return;
-    }
-    id = id.id;
+function track(r, event, extra){
+  if (!r.isLiveMode()) {
+    return;
   }
-  setTimeout(function(){
+
+  // invoke makes tracking async
+  invoke(function(){
+    // convert error to plain object
+    if (extra instanceof Error) {
+      extra = {message: props.message, stack: props.stack}
+    }
+
+    // payload is format prescribed by segment
     var payload = {
+      // mandatory
+      event: event
+
+      // unique identifier needs to be named "anonymousId"
+      anonymousId: r.id,
+      properties: {
+        // can be checkoutjs or razorpayjs, depending on discreet.isFrame
+        library: trackingProps.library,
+
+        // whether web or app
+        platform: trackingProps.platform,
+
+        // for auto parsing of url, property name has to be "page_url".
+        // this is specific to segment + keen
+        page_url: trackingProps.context,
+
+        // for auto parsing of ua, property name has to be "user_agent".
+        user_agent: ua,
+        extra: extra
+      },
+
+      // in order to force segment pass original IP to mixpanel & keen
       context: {
         direct: true
-      },
-      anonymousId: id,
-      event: event
+      }
     };
-    var data = payload.properties = {};
-    if(props instanceof Error){
-      props = {message: props.message, stack: props.stack}
-    }
-    if(props){
-      each(
-        props,
-        function(propKey, propVal){
-          var valType = typeof propVal;
-          if(valType === 'string' || valType === 'number' || valType === 'boolean'){
-            data[propKey] = propVal;
-          }
-        }
-      )
-    }
 
-    data.platform = discreet.platform;
-    data.user_agent = ua;
-    if(discreet.context){
-      data.page_url = discreet.context;
-    }
-    data.checkout = !!discreet.isFrame;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open(
-      'post',
-      'https://api.segment.io/v1/track',
-      true
-    );
-    xhr.setRequestHeader('Content-type', 'application/json');
-    xhr.setRequestHeader('Authorization', 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:'));
-    xhr.send(JSON.stringify(payload));
+    $.ajax({
+      url: 'https://api.segment.io/v1/track',
+      method: 'post',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:')
+      }
+    })
   })
 }
