@@ -30,12 +30,13 @@ Customer.prototype = {
     })
   },
 
-  createOTP: function(){
+  createOTP: function(callback){
     $.post({
       url: makeAuthUrl(this.key, 'otp/create'),
       data: {
         contact: this.contact
-      }
+      },
+      callback: callback
     })
   },
 

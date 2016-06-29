@@ -175,7 +175,7 @@ function CheckoutFrame(rzp){
     return this.openRzp(rzp);
   }
   this.getEl();
-  this.time = new Date().getTime();
+  this.time = now();
 }
 
 CheckoutFrame.prototype = {

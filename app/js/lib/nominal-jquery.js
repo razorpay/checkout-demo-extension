@@ -8,6 +8,10 @@ var $ = function(el){
   this[0] = el;
 };
 
+var now = Date.now || function() {
+  return new Date().getTime();
+};
+
 function bind(func, thisArg){
   return function(){
     return func.apply(thisArg, arguments);
@@ -164,6 +168,29 @@ function invoke(handler, thisArg, param , timeout){
     return handler.call(thisArg);
   }
 }
+
+function debounce(func, wait, condition) {
+  var baseTime = now();
+
+  return function(){
+    var args = arguments;
+
+    function later(){
+      // if condition is passed and is false, don't execute
+      if (invoke(condition) === false) {
+        return;
+      }
+      func.apply(this, args)
+    }
+
+    // how much time has passed since debounced version was created
+    var since = now() - baseTime;
+    if (since < 0) {
+      since = null;
+    }
+    invoke(later, this, null, since);
+  }
+};
 
 $.prototype = {
   on: function(event, callback, capture, thisArg){
