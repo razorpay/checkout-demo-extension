@@ -111,7 +111,7 @@ function nest(options){
   if (typeof options !== 'object') {
     return options;
   }
-  result = {};
+  var result = {};
   each(
     options,
     function(key, val){
