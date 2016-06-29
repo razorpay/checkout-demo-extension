@@ -1,49 +1,46 @@
-function deleteToken(user, token){
-  var tokens = user.tokens;
-  for (var i = 0; i < tokens.count; i++){
-    if(tokens.items[i].token === token){
-      tokens.items.splice(i, 1 );
-      tokens.count--;
-      return;
-    }
+var customers = {};
+
+function getCustomer(contact) {
+  if (contact && !(contact in customers)) {
+    customers[contact] = new Customer(contact);
   }
+  return customers[contact];
 }
 
-function User (user, options) {
-  if (user) {
-    this.id = options.customer_id || user.app_token || null;
-    this.id_key = options.customer_id ? 'customer_id' : 'app_token';
-    this.email = user.email || '';
-    this.contact = user.contact || '';
-    this.tokens = user.tokens || null;
-  }
-  this.saved = !!user;
-  this.wants_skip = false;
-  this.key = options.key;
+function Customer(contact) {
+  this.contact = contact;
 }
 
-User.prototype = {
-  lookup: function(callback){
-    var user = this;
+Customer.prototype = {
+  key: '',
+  id_key: 'app_token',
+  wants_skip: false,
+  saved: false,
+  local: false,
+
+  // NOTE: status check api also sends otp if customer exist
+  checkStatus: function(callback){
+    var customer = this;
     $.ajax({
       url: makeAuthUrl(this.key, 'customers/status/' + this.contact),
       callback: function(data){
-        user.saved = !!data.saved;
+        customer.saved = !!data.saved;
         callback();
       }
     })
   },
 
-  login: function(){
+  createOTP: function(callback){
     $.post({
       url: makeAuthUrl(this.key, 'otp/create'),
       data: {
         contact: this.contact
-      }
+      },
+      callback: callback
     })
   },
 
-  verify: function(otp, callback){
+  submitOTP: function(otp, callback){
     var user = this;
     $.post({
       url: makeAuthUrl(this.key, 'otp/verify'),
@@ -74,14 +71,6 @@ User.prototype = {
     })
   },
 
-  setPhone: function(phone){
-    if (this.contact !== phone) {
-      this.id = this.saved = this.wants_skip = this.tokens = null;
-      this.id_key = 'app_token';
-      this.contact = phone;
-    }
-  },
-
   deleteCard: function(token, callback){
     var user = this;
     if (!this.id) {
@@ -95,5 +84,16 @@ User.prototype = {
         deleteToken(user, token);
       }
     })
+  }
+}
+
+function deleteToken(user, token){
+  var tokens = user.tokens;
+  for (var i = 0; i < tokens.count; i++){
+    if(tokens.items[i].token === token){
+      tokens.items.splice(i, 1 );
+      tokens.count--;
+      return;
+    }
   }
 }

@@ -21,7 +21,7 @@
     <link href="dist/v1/css/checkout.css" type="text/css" rel="stylesheet">
  </head>
   <script src="config.js"></script>
-  <body>
+  <body style="background: #555">
     <script>
     window.preferences = {
       methods: {
@@ -62,13 +62,13 @@
   <script src="templates/popup.js"></script>
   <script src="templates/emi.js"></script>
   <script src="templates/savedcards.js"></script>
-  <script src="js/lib/card.js"></script>
-  <script src="js/lib/smarty.js"></script>
-  <script src="js/lib/modal.js"></script>
-  <script src="js/checkout-frame/user.js"></script>
-  <script src="js/checkout-frame/emi.js"></script>
-  <script src="js/checkout-frame/session.js"></script><!--coverage-->
-  <script src="js/checkout-frame/merchant.js"></script><!--coverage-->
+  <script src="/js/lib/card.js"></script>
+  <script src="/js/lib/smarty.js"></script>
+  <script src="/js/lib/modal.js"></script>
+  <script src="/js/checkout-frame/customer.js"></script>
+  <script src="/js/checkout-frame/emi.js"></script>
+  <script src="/js/checkout-frame/session.js"></script><!--coverage-->
+  <script src="/js/checkout-frame/merchant.js"></script><!--coverage-->
   <!-- endbuild -->
   <!-- test scripts
   <script src="../test/base.coffee"></script>
@@ -81,7 +81,8 @@
 <script>
 var options = {
   // 'key': 'rzp_live_ILgsfZCZoFIKMb',
-  'key': 'rzp_test_1DP5mmOlF5G5ag',
+  // 'key': 'rzp_test_1DP5mmOlF5G5ag',
+  key: 'rzp_live_gC8obGlwaRlyui',
   'amount': 749090,
   'name': 'Innerchef',
   'description': 'JEE Main & Advanced',
@@ -110,9 +111,9 @@ var options = {
     'method': 'card',
     'name': 'Harshil \"Mathur',
     'email': 'harshil@razorpay.com',
-    'contact': '9876543210'
+    'contact': '+918879524924'
   },
-  customer_id: '5LqJJLEzjH3vkz',
+  // customer_id: '5LqJJLEzjH3vkz',
   notes: {
     'address': 'Hello World'
   },
@@ -124,5 +125,5 @@ var options = {
     onhidden: function(){console.log(2)}
   }
 }
-// handleMessage({options: options});
+handleMessage({options: options});
 </script>

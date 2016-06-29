@@ -71,7 +71,7 @@ function _toBase62(number){
 
 function generateUID(){
   var num = _toBase62(
-    (new Date().getTime() - 1388534400000).toString() +
+    (now() - 1388534400000).toString() +
     ('000000' + Math.floor(1000000*Math.random())).slice(-6)
   ) +
   _toBase62(Math.floor(238328*Math.random())) + '0';
