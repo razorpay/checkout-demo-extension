@@ -11,6 +11,10 @@ var strings = {
 
 var fontTimeout;
 
+function confirmClose(){
+  return confirm('Ongoing payment. Press OK to abort payment.');
+}
+
 function validateCardNumber(el){
   if(el){
     if(!(el instanceof Element)){
@@ -101,7 +105,7 @@ function onSixDigits(e){
     toggleNoCvv(false);
   }
 
-  var emi_parent = $('#emi-check-label')[emiObj ? 'removeClass' : 'addClass']('disabled');
+  var emi_parent = $('#emi-check-label').toggleClass('disabled', !emiObj);
   if(emiObj){
     $('#expiry-cvv').removeClass('hidden');
     makeEmiDropdown(emiObj, this);
@@ -131,7 +135,7 @@ function noCvvToggle(e){
 
 function toggleNoCvv(show){
   // Display or hide the nocvv checkbox
-  $('#nocvv-check')[show ? 'addClass' : 'removeClass']('shown');
+  $('#nocvv-check').toggleClass('shown', show);
   gel('nocvv').disabled = !show;
 }
 
@@ -433,7 +437,7 @@ Session.prototype = {
 
   hideErrorMessage: function(){
     if(this.r._payment){
-      if(confirm('Ongoing payment. Press OK to abort payment.')){
+      if(confirmClose()){
         this.clearRequest();
       } else {
         return;
@@ -503,7 +507,7 @@ Session.prototype = {
   bindEvents: function(){
     if(this.get('theme.close_button')){
       this.on('click', '#modal-close', function(){
-        if (this.get('modal.confirm_close') && !confirm('Press OK to cancel the payment')) {
+        if (this.get('modal.confirm_close') && !confirmClose()) {
           return;
         }
         this.hide();
