@@ -107,6 +107,28 @@ var trackingProps = {
 // we keep {event, timestamp} everytime something is tracked, and send it in next track
 var trackStack = {};
 
+function nest(options){
+  if (typeof options !== 'object') {
+    return options;
+  }
+  result = {};
+  each(
+    options,
+    function(key, val){
+      if (/\./.test(key)) {
+        var keySplit = key.split('.');
+        if (!(keySplit[0] in result)) {
+          result[keySplit[0]] = {};
+        }
+        result[keySplit[0]][keySplit[1]] = val;
+      } else {
+        result[key] = val;
+      }
+    }
+  )
+  return result;
+}
+
 function track(r, event, extra){
   if (!r.isLiveMode()) {
     return;
@@ -139,7 +161,10 @@ function track(r, event, extra){
 
         // for auto parsing of ua, property name has to be "user_agent".
         user_agent: ua,
-        extra: extra
+
+        // keen doesnt allow "." in property name, as it conflicts with automatic expansion
+        // so we un-flatten the options
+        extra: nest(extra)
       },
 
       // in order to force segment pass original IP to mixpanel & keen
