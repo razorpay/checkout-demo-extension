@@ -241,9 +241,13 @@ function setOtpText(text){
 }
 
 function askOTP(text){
+  if (typeof text === 'object') {
+    text = text.error && text.error.description;
+  }
+  $('#otp').val('');
   $('#modal').addClass('sub');
   $('#form-otp').removeClass('loading').removeClass('action');
-  setOtpText(text);
+  setOtpText(text || 'An OTP has been sent to ' + getPhone());
 }
 
 // this === Session
@@ -464,8 +468,7 @@ Session.prototype = {
       this.showLoadError('Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
-      this.customer.createOTP();
-      this.sendOTP();
+      this.customer.createOTP(this.otpSender());
     }
   },
 
@@ -686,7 +689,7 @@ Session.prototype = {
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
         if (customer.saved) {
-          this.sendOTP();
+          askOTP();
         } else {
           self.showCards();
         }
@@ -953,20 +956,10 @@ Session.prototype = {
     }
   },
 
-  sendOTP: function(text){
-    $('#otp').val('');
-    var timeout;
-    if(!text){
-      var phone = getPhone();
-      this.showLoadError('Sending OTP to ' + phone);
-      timeout = 750;
-      text = 'An OTP has been sent to ' + phone;
-      this.requestTimeout = setTimeout(function(){
-        askOTP(text);
-      }, 750);
-    } else {
-      askOTP(text);
-    }
+  // prepares otp screen
+  otpSender: function() {
+    this.showLoadError('Sending OTP to ' + getPhone());
+    return debounce(askOTP, 750);
   },
 
   onOtpSubmit: function(){
@@ -1001,7 +994,7 @@ Session.prototype = {
           this.showLoadError();
         } else {
           this.r.emit('payment.error', discreet.error(msg));
-          this.sendOTP(msg);
+          askOTP(msg);
         }
       }
     } else {
@@ -1010,7 +1003,7 @@ Session.prototype = {
         if (self.customer.id) {
           self.showCardTab();
         } else {
-          self.sendOTP(msg);
+          askOTP(msg);
         }
       };
     }
@@ -1087,7 +1080,7 @@ Session.prototype = {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         this.commenceOTP();
-        this.sendOTP();
+        this.otpSender()();
         return this.customer.createOTP();
       } else {
         request.message = 'Verifying OTP...';
@@ -1131,7 +1124,9 @@ Session.prototype = {
       }, this));
 
     if(request.powerwallet){
-      this.r.on('payment.otp.required', bind(this.sendOTP, this));
+      this.r.on('payment.otp.required', bind(function(){
+        this.otpSender()();
+      }, this));
       this.r.on('payment.wallet.topup', function() {
         $('#form-otp').removeClass('loading');
         $('#add-funds').addClass('show');

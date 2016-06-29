@@ -170,9 +170,12 @@ function invoke(handler, thisArg, param , timeout){
 }
 
 function debounce(func, wait, condition) {
-  var baseTime = now();
+  if (!wait) {
+    return func;
+  }
+  var basetime = now();
 
-  return function(){
+  return function() {
     var args = arguments;
 
     function later(){
@@ -183,12 +186,12 @@ function debounce(func, wait, condition) {
       func.apply(this, args)
     }
 
-    // how much time has passed since debounced version was created
-    var since = now() - baseTime;
-    if (since < 0) {
+    // is current timestamp > basetime + waiting duration
+    var since = basetime + wait - now();
+    if (since >= 0) {
       since = null;
     }
-    invoke(later, this, null, since);
+    return invoke(later, this, null, since);
   }
 };
 
