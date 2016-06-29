@@ -4,7 +4,10 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
-var loadingMessage = 'Your payment is being processed';
+var strings = {
+  otpsend: 'Sending OTP to ',
+  process: 'Your payment is being processed'
+}
 
 var fontTimeout;
 
@@ -250,6 +253,10 @@ function askOTP(text){
   setOtpText(text || 'An OTP has been sent to ' + getPhone());
 }
 
+function debounceAskOTP(){
+  debounce(askOTP, 750)();
+}
+
 // this === Session
 function successHandler(response){
   this.clearRequest();
@@ -464,11 +471,11 @@ Session.prototype = {
   },
 
   resendOTP: function() {
+    this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'wallet') {
-      this.showLoadError('Sending OTP to ' + getPhone());
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
-      this.customer.createOTP(this.otpSender());
+      this.customer.createOTP(debounceAskOTP);
     }
   },
 
@@ -685,7 +692,7 @@ Session.prototype = {
     $('#otp-sec').html('Skip saved cards');
 
     if (!customer.id && !customer.wants_skip) {
-      self.commenceOTP('saved cards');
+      self.commenceOTP('saved cards', true);
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
         if (customer.saved) {
@@ -926,7 +933,7 @@ Session.prototype = {
     }
 
     if(!text){
-      text = loadingMessage;
+      text = strings.process;
     }
 
     if(this.screen === 'otp'){
@@ -941,7 +948,7 @@ Session.prototype = {
     }
   },
 
-  commenceOTP: function(text){
+  commenceOTP: function(text, partial){
     this.setScreen('otp');
     $('#add-funds').removeClass('show');
 
@@ -952,14 +959,11 @@ Session.prototype = {
     }, this, null, 300);
 
     if (text) {
-      this.showLoadError('Looking for ' + text + ' associated with ' + getPhone());
+      if (partial) {
+        text = 'Looking for ' + text + ' associated with ';
+      }
+      this.showLoadError(text + getPhone());
     }
-  },
-
-  // prepares otp screen
-  otpSender: function() {
-    this.showLoadError('Sending OTP to ' + getPhone());
-    return debounce(askOTP, 750);
   },
 
   onOtpSubmit: function(){
@@ -1079,8 +1083,8 @@ Session.prototype = {
     if (('app_token' in data) && !data.app_token) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
-        this.commenceOTP();
-        this.otpSender()();
+        this.commenceOTP(strings.otpsend);
+        debounceAskOTP();
         return this.customer.createOTP();
       } else {
         request.message = 'Verifying OTP...';
@@ -1111,7 +1115,7 @@ Session.prototype = {
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
-      this.commenceOTP(wallet + ' account');
+      this.commenceOTP(wallet + ' account', true);
     } else {
       this.showLoadError();
     }
@@ -1125,7 +1129,8 @@ Session.prototype = {
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(function(){
-        this.otpSender()();
+        this.showLoadError(strings.otpsend + getPhone());
+        debounceAskOTP();
       }, this));
       this.r.on('payment.wallet.topup', function() {
         $('#form-otp').removeClass('loading');
