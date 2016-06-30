@@ -1150,12 +1150,14 @@ Session.prototype = {
     if(this.screen === 'card'){
       setEmiBank(data);
 
-      var userId = this.customer.id;
-      var userIdKey = this.customer.id_key;
+      if (this.customer) {
+        var userId = this.customer.id;
+        var userIdKey = this.customer.id_key;
 
-      // set app_token if either new card or saved card (might be blank)
-      if (data.save || data.token) {
-        data[userIdKey] = userId;
+        // set app_token if either new card or saved card (might be blank)
+        if (data.save || data.token) {
+          data[userIdKey] = userId;
+        }
       }
     }
 
