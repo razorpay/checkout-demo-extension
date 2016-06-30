@@ -162,10 +162,14 @@ function invoke(handler, thisArg, param , timeout){
     if(!thisArg){
       thisArg = this;
     }
-    if(arguments.length >= 3){
-      return handler.call(thisArg, param);
+    try {
+      if(arguments.length >= 3){
+        return handler.call(thisArg, param);
+      }
+      return handler.call(thisArg);      
+    } catch(e){
+      roll('invoke error', e);
     }
-    return handler.call(thisArg);
   }
 }
 
