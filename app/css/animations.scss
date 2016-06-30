@@ -120,12 +120,6 @@ $gridStagger: 0.05s;
       .pad {
         transition: $first;
       }
-
-      .legend,
-      #payment-options {
-        opacity: 0;
-        transition: $first;
-      }
     }
 
     #form-card.shown .pad {
