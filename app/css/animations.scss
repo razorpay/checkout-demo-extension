@@ -61,11 +61,6 @@ $gridStagger: 0.05s;
   }
 }
 
-#form-netbanking .select {
-  opacity: 0;
-  transition: $first;
-}
-
 #topbar {
   opacity: 0;
   transform: translateY(-$topbarh);
@@ -136,12 +131,6 @@ $gridStagger: 0.05s;
     #form-card.shown .pad {
       animation: $springTime spring;
       animation-delay: $second;
-    }
-
-    #form-netbanking .select {
-      transition: $first;
-      transition-delay: $second + $gridStagger * 6 + $gridStagger;
-      opacity: 1;
     }
   }
 }
