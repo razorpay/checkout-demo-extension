@@ -458,6 +458,7 @@ function initIframe(){
   }
 
   if(CheckoutBridge){
+    delete trackingProps.context;
     trackingProps.platform = qpmap.platform || 'app';
   }
 
