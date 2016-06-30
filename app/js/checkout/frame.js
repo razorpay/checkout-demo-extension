@@ -344,7 +344,7 @@ CheckoutFrame.prototype = {
     invoke('on' + event, this, data);
 
     if (event === 'dismiss' || event === 'fault') {
-      track(rzp, event);
+      track(rzp, event, data);
     }
   },
 
