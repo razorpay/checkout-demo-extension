@@ -86,7 +86,6 @@ describe 'redirect on submit with valid payload', ->
       submitData = JSON.parse JSON.stringify commonSubmitData
       submitData.bank = 'SBIN'
       submitData.method = 'netbanking'
-      submitData['_[context]'] = location.href
 
       expect payload
         .to.eql submitData
@@ -124,7 +123,6 @@ describe 'redirect on submit with valid payload', ->
       submitData = JSON.parse JSON.stringify commonSubmitData
       submitData.method = 'wallet'
       submitData.wallet = 'payumoney'
-      submitData['_[context]'] = location.href
       submitData['_[source]'] = 'checkoutjs'
       delete submitData.key_id
 

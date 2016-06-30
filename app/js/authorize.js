@@ -165,7 +165,11 @@ Payment.prototype = {
     data['_[checkout_id]'] = _uid;
     data['_[platform]'] = trackingProps.platform;
     data['_[library]'] = trackingProps.library;
-    data['_[context]'] = trackingProps.context;
+
+    var context = trackingProps.context;
+    if (context) {
+      data['_[context]'] = context;
+    }
     if(params.powerwallet){
       data['_[source]'] = 'checkoutjs';
     }
