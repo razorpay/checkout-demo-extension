@@ -112,7 +112,7 @@ $gridStagger: 0.05s;
 }
 
 #body {
-  &.tab {
+  &[tab] {
     #user {
       display: block;
     }
