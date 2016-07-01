@@ -38,7 +38,17 @@ var EvtHandler;
 
   EvtHandler.prototype = {
     on: function(event, el, callback) {
-      if (arguments.length === 2) {
+      var argLen = arguments.length;
+      if (argLen === 1) {
+        return each(
+          event,
+          function(event, callback){
+            this.on(event, callback);
+          },
+          this
+        )
+      }
+      else if (argLen === 2) {
         callback = el;
         el = this.el;
       }

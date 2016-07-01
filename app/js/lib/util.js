@@ -97,7 +97,7 @@ function defer(func, timeout) {
   }
 }
 
-function invoke(handler, thisArg, args, timeout) {
+function invoke(handler, thisArg, param, timeout) {
   if (isNumber(timeout)) {
     return setTimeout(
       function(){
@@ -113,14 +113,14 @@ function invoke(handler, thisArg, args, timeout) {
     if (!thisArg) {
       thisArg = this;
     }
-    try {
+    // try {
       if (arguments.length >= 3) {
         return handler.call(thisArg, param);
       }
       return handler.call(thisArg);      
-    } catch(e) {
-      roll('invoke error', e);
-    }
+    // } catch(e) {
+    //   roll('invoke error', e);
+    // }
   }
 }
 
@@ -232,4 +232,99 @@ function preventDefault(e){
   if(e && e.preventDefault){
     e.preventDefault();
   }
+}
+
+/* Formatting */
+
+function getChar(e) {
+  return String.fromCharCode(e.which);
+}
+
+function getSelection(el) {
+  var value = el.value;
+  var length = value.length;
+  var caretPosition = el.selectionStart;
+  var text = '';
+  if (typeof caretPosition === 'number') {
+    if (caretPosition !== el.selectionEnd) {
+      text = value.slice(caretPosition, el.selectionEnd);
+    }
+  } else if (document.selection) {
+    var range = document.selection.createRange();
+    text = range.text;
+    var textInputRange = el.createTextRange();
+    textInputRange.moveToBookmark(range.getBookmark());
+    caretPosition = -textInputRange.moveStart('character', -length);
+  }
+  return {
+    start: caretPosition,
+    end: caretPosition + text.length
+  };
+};
+
+function setCaret(el, position) {
+  if (typeof el.selectionStart === 'number') {
+    return el.selectionStart = el.selectionEnd = position;
+  } else {
+    var range = el.createTextRange();
+    range.collapse(true);
+    range.moveEnd('character', position);
+    range.moveStart('character', position);
+    return range.select();
+  }
+};
+
+function getParts(e) {
+  var el;
+  var newCharacter = '';
+  if (e instanceof Node) {
+    el = e;
+  } else {
+    newCharacter = getChar(e)
+    e.preventDefault();
+    el = e.target;
+  }
+
+  var selection = getSelection(el);
+  var value = el.value
+
+  var pre = value.slice(0, selection.start) + newCharacter;
+  return {
+    pre: pre,
+    val: pre + value.slice(selection.end)
+  };
+}
+
+function stripNonDigit(str) {
+  return str.replace(/\D/g, '')
+}
+
+function ensureNumeric(e){
+  return ensureRegex(e, /[0-9]/);
+}
+
+function ensurePhone(e){
+  return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
+}
+
+function ensureExpiry(e){
+  var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
+  return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
+}
+
+function ensureRegex(e, regex){
+  if(!e) { return '' }
+
+  var which = e.which;
+  if(typeof which !== 'number'){
+    which = e.keyCode;
+  }
+
+  if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
+  var character = String.fromCharCode(which);
+  if(regex.test(character)){
+    return character;
+  }
+  preventDefault(e);
+  return false;
 }

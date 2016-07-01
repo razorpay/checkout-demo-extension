@@ -1,348 +1,237 @@
-function ensureNumeric(e){
-  return ensureRegex(e, /[0-9]/);
-}
-
-function ensurePhone(e){
-  return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
-}
-
-function ensureExpiry(e){
-  var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
-  return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
-}
-
-function ensureRegex(e, regex){
-  if(!e) { return '' }
-
-  var which = e.which;
-  if(typeof which !== 'number'){
-    which = e.keyCode;
-  }
-
-  if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
-  var character = String.fromCharCode(which);
-  if(regex.test(character)){
-    return character;
-  }
-  preventDefault(e);
-  return false;
-}
-
 var Card;
 (function(){
 
-  var patterns = {
-    maestro16: /^(508125|508126|508159|508192|508227|504437|504681)/,
-    maestro: /^(50[1-7,9]|508[0-4]|63|66|6[8-9]|600[0-9]|6010|601[2-9]|60[2-5]|6060|609|61|620|621|6220|6221[0-1])[0-9]/,
+  var cardPatterns = {
+    maestro16: /^50(81(25|26|59|92)|8227)|4(437|681)/,
+    discover: /^6(4[4-9]|5|011(0|9|[234]|7(4|[789])|8[6-9]))/,
+    maestro: /^(6|5(0|[6-9]))/,
     mastercard: /^(5[1-5]|2[2-7])/,
     visa: /^4/,
     amex: /^3[47]/,
     diners: /^3[0689]/,
-    rupay: /^(508[5-9][0-9][0-9]|60698[5-9]|60699[0-9]|60738[4-9]|60739[0-9]|607[0-8][0-9][0-9]|6079[0-7][0-9]|60798[0-4]|608[0-4][0-9][0-9]|608500|6521[5-9][0-9]|652[2-9][0-9][0-9]|6530[0-9][0-9]|6531[0-4][0-9]|6070(66|90|32|74|94|27|93|02|76)|6071(26|05|65)|607243)[0-9]/
-    // jcb: /^35/,
-    // discover: /^6([045]|22)/
-  }
-
-  var space_14 = /(.{4})(.{0,6})/;
-  var sub_14 = function( match, $1, $2 ){
-
-    if ( $2.length === 6 ){
-      $2 += ' ';
-    }
-    return $1 + ' ' + $2;
-  }
-
-  var card_formats = {
-    amex: {
-      space: space_14,
-      subs: sub_14,
-      length: 15
-    },
-    diners: {
-      space: space_14,
-      subs: sub_14,
-      length: 14
-    },
-    maestro: {
-      space: /[^0-9]/g,
-      subs: '',
-      length: 19
-    }
-  }
-  card_formats.unknown = card_formats.maestro;
-
-  each(patterns, function(c){
-    if(!(c in card_formats)){
-      card_formats[c] = {
-        space: /(.{4}(?=.))/g,
-        subs: '$1 ',
-        length: 16
-      }
-    }
-  })
-
-  var CardType = function(num){
-    for( var t in patterns ) {
-      if( patterns[t].test(num.replace(/[^0-9]/g,'')) ) {
-        return t;
-      }
-    }
-  }
-
-  var SetCaret = function(el, pos){
-    if(navigator.userAgent.indexOf('Android')){
-      return;
-    }
-    if(typeof el.selectionStart === 'number'){
-      el.selectionStart = el.selectionEnd = pos;
-    }
-    else {
-      var range = el.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', pos);
-      range.moveStart('character', pos);
-      range.select();
-    }
-  }
-
-  var CheckSelection = function(el){
-    if(typeof el.selectionStart === 'number'){
-      if(el.selectionStart !== el.selectionEnd) { return true }
-      return el.selectionStart;
-    } else if (document.selection) {
-      var range = document.selection.createRange();
-      if(range.text) { return true }
-
-      // get caret position in IE8
-      var textInputRange = el.createTextRange();
-      textInputRange.moveToBookmark(range.getBookmark());
-      return -textInputRange.moveStart('character', -el.value.length);
-    }
-    return el.value.length;
-  }
-
-  var expLen = 0;
-  var ReFormatExpiry = function(e){
-    var el = e.target;
-    var val = el.value;
-    if(val.length >= expLen){
-      if (/^[2-9]$/.test(val)) {
-        val = '0' + val;
-      }
-      if (val.length === 2) {
-        val += ' / ';
-      }
-      el.value = val;
-    }
-    expLen = el.value.length;
-  }
-
-  var FormatExpiry = function(e) {
-    var el = e.target;
-    var character = ensureExpiry(e);
-    if (character === false) { return }
-
-    var pos = CheckSelection(el);
-    if (pos === true) { return }
-
-    var value = el.value;
-    var prefix = value.slice(0, pos);
-    var prenums = prefix.replace(/[^\/0-9]/g,'');
-    var suffix = value.slice(pos);
-    var sufnums = suffix.replace(/[^\/0-9]/g,'');
-
-    if (pos === 0) {
-      if(/0|1/.test(character)) { return }
-      character = '0' + character;
-      pos++;
-    }
-
-    if (pos === 1) {
-      if( parseInt(prefix + character, 10) > 12 ) { return preventDefault(e) }
-      character += ' / ';
-    }
-    else if ( pos === 2 ) {
-      if(character === '/'){
-        character = ' ' + character + ' ';
-      }
-      else {
-        character = ' / ' + character;
-      }
-    }
-    else {
-      if(!/^(0[1-9]|1[012])($| \/ )($|[0-9]){2}$/.test(prefix + character + suffix) && e){
-        preventDefault(e);
-      }
-      if(pos === 6){
-        var card = this;
-        setTimeout(function(){card.filled(el)}, 200);
-      }
-      return;
-    }
-    preventDefault(e);
-
-    setTimeout(function() {
-      el.value = (prenums + character + sufnums).slice(0, 7);
-      pos = (prefix + character).length;
-      SetCaret(el, pos);
-    })
+    jcb: /^35/
   };
 
-  var FormatExpiryBack = function(e){
-    if((e.which || e.keyCode) !== 8) { return }
-    var el = e.target;
-    var pos = CheckSelection(el);
-    if(pos === 5 && el.value.slice(2, 5) === ' / '){
-      preventDefault(e);
-      el.value = el.value.slice(0, 1);
+  var cardLengths = {
+    amex: 15,
+    diners: 14,
+    maestro: 19,
+    '': 19
+  };
+
+  function getCardSpacing(maxLen) {
+    if (maxLen !== 19) {
+      if (maxLen < 16) {
+        return /(^.{4}|.{6})/;
+      } else {
+        return /(.{4})/g;
+      }
     }
+  };
+
+  function CardFormatter(el, options) {
+    if (typeof options !== 'object') {
+      options = emo;
+    }
+    this.el = el;
+    this.oninput()
+    this.type = Card.getCardType(this.value);
+    this.onfilled = options.onfilled || noop;
+    this.onidentify = options.onidentify || noop;
+
+    var eventListeners = {
+      keypress: this.format,
+      keydown: this.formatBack,
+      input: this.oninput,
+      change: this.oninput,
+      paste: this.oninput
+    };
+
+    this.on(eventListeners);
+    return this;
+  };
+
+  CardFormatter.prototype = new EvtHandler;
+
+  CardFormatter.prototype.substitute = function(value, spacing) {
+    return value.replace(spacing, '$1 ').slice(0, this.maxLength);
   }
 
-  var FormatNumber = function(e){
-    var character = ensureNumeric(e);
-    if(character === false) { return }
+  CardFormatter.prototype.format = function(e) {
+    this.input(getParts(e));
+  };
 
-    var el = e.target;
+  CardFormatter.prototype.oninput = function(e) {
+    this.input(getParts(this.el));
+  };
 
-    var pos = CheckSelection(el);
-    if(pos === true) { return }
+  CardFormatter.prototype.input = function(parts) {
+    var el = this.el;
+    parts.pre = stripNonDigit(parts.pre);
+    parts.val = stripNonDigit(parts.val);
+    var newValue = this.value = parts.val;
+    var precursor = parts.pre;
+    var type = Card.getCardType(newValue);
+    if(type !== this.type){
+      this.type = type;
+      invoke('onidentify', this, type);
+    }
+    var maxLen = Card.getLength(this.type);
+    var spacing = getCardSpacing(maxLen);
 
-    var value = el.value;
-    var prefix = value.slice(0, pos).replace(/[^0-9]/g,'');
-    var suffix = value.slice(pos).replace(/[^0-9]/g,'');
-    value = prefix + character + suffix;
-
-    var type = CardType(value) || 'unknown';
-    var cardobj = card_formats[type];
-
-    if(prefix.length + suffix.length >= cardobj.length) { return }
-
-    var card = this;
-    preventDefault(e);
-
-    if(e) {
-      setTimeout(function(){
-        el.value = value.replace(cardobj.space, cardobj.subs);
-
-        if(suffix){
-          pos = prefix.length;
-          var prespace = prefix.replace(cardobj.space, cardobj.subs).match(/ /g);
-          pos += prespace && ++prespace.length || 1;
-          SetCaret(el, pos);
-        }
-        if(value.length === cardobj.length){
-          card.filled(el);
-        }
-      })
+    if (spacing) {
+      newValue = this.substitute(newValue, spacing);
+      if (parts.val.length >= maxLen) {
+        newValue = newValue.replace(/\ $/, '');
+      }
+      var caretPosition = this.substitute(precursor, spacing).length;
+      if (caretPosition > newValue.length) {
+        caretPosition = newValue.length;
+      }
     } else {
-      el.value = value.replace(cardobj.space, cardobj.subs);
+      caretPosition = precursor.length;
+    }
+
+    el.value = newValue;
+    setCaret(el, caretPosition);
+    if (precursor.length === maxLen) {
+      this.onfilled(el);
     }
   };
 
-  var FormatNumberBack = function(e){
-    if((e.which || e.keyCode) !== 8) { return }
-
-    var el = e.target;
-    var pos = CheckSelection(el);
-    var val = el.value;
-    var len = val.length;
-    
-    if(pos === len && val[len-1] === ' '){
-      preventDefault(e);
-      el.value = el.value.slice(0, len-2);
+  CardFormatter.prototype.formatBack = function(e) {
+    var caretPosition, el, value;
+    if (e.which !== 8) {
+      return;
+    }
+    el = this.el;
+    caretPosition = (getSelection(el)).start;
+    value = el.value;
+    if (' ' === value.charAt(caretPosition - 1)) {
+      e.preventDefault();
+      el.value = value.slice(0, caretPosition - 2) + value.slice(caretPosition);
+      setCaret(el, caretPosition - 2);
+      return this.oninput();
     }
   };
 
-  Card = function(){
-    this.listeners = [];
+  function ExpiryFormatter(el, options) {
+    if (typeof options !== 'object') {
+      options = emo;
+    }
+    this.maxLength = 7;
+    this.el = el;
+    this.onfilled = options.onfilled || noop;
+    var eventListeners = {
+      keypress: this.format,
+      keydown: this.formatBack,
+      input: this.oninput,
+      change: this.oninput,
+      paste: this.oninput
+    };
+    this.on(eventListeners);
+  };
+
+  ExpiryFormatter.prototype = new EvtHandler;
+
+  ExpiryFormatter.prototype.substitute = function(value){
+    return value.replace(/(.{2})/, '$1 / ').slice(0, this.maxLength);
   }
 
-  Card.luhn = function(num){
+  ExpiryFormatter.prototype.input = function(parts) {
+    var el = this.el;
+    parts.pre = stripNonDigit(parts.pre);
+    parts.val = stripNonDigit(parts.val);
+    var precursor = parts.pre;
+    var value = parts.val;
+    if(/^[2-9]$/.test(value)){
+      precursor = value = 0 + value;
+    }
+    el.value = this.substitute(value);
+    precursor = this.substitute(precursor);
+    if(precursor.length === this.maxLength){
+      this.onfilled(el);
+    }
+    setCaret(el, precursor.length);
+  };
+
+  ExpiryFormatter.prototype.format = function(e) {
+    this.input(getParts(e));
+  };
+
+  ExpiryFormatter.prototype.oninput = function(e) {
+    this.input(getParts(this.el));
+  };
+
+  ExpiryFormatter.prototype.formatBack = function(e) {
+    if (e.which !== 8) {
+      return;
+    }
+    if ((getSelection(this.el)).start === 5) {
+      this.el.value = this.el.value.charAt(0);
+      return e.preventDefault();
+    }
+  };
+
+  Card = function() {
+    this.fields = [];
+  };
+
+  Card.prototype = {
+    numberField: function(el, options) {
+      this.fields.push(new CardFormatter(el, options));
+    },
+    expiryField: function(el, options){
+      this.fields.push(new ExpiryFormatter(el, options));
+    }
+  }
+
+  Card.getCardType = function(cardNumber) {
+    for (var type in cardPatterns) {
+      var pattern = cardPatterns[type];
+      if (pattern.test(cardNumber.replace(/\ /g, ''))) {
+        return type;
+      }
+    }
+    return '';
+  };
+
+  Card.luhn = function(num) {
     var odd = true;
     var sum = 0;
     var digits = (num + '').split('').reverse();
-
-    for(var i=0; i<digits.length; i++){
+    for (var i = 0; i < digits.length; i++) {
       var digit = digits[i];
       digit = parseInt(digit, 10);
-      if(odd = !odd){
+      if ((odd = !odd)) {
         digit *= 2;
       }
-      if(digit > 9){
+      if (digit > 9) {
         digit -= 9;
       }
       sum += digit;
     }
     return sum % 10 === 0;
-  }
+  };
 
-  Card.validateCardNumber = function(num, type){
-    num = (num + '').replace(/\s|-/g,'');
-    if(/^[0-9]+$/.test(num)){
+  Card.getLength = function(type){
+    return cardLengths[type] || 16;
+  },
+
+  Card.validateCardNumber = function(number, type) {
+    number = String(number).replace(/\ /g, '');
+    if (!/\D/.test(number)) {
       if (!type) {
-        type = CardType(num);
+        type = Card.getCardType(number);
       }
-      if (!type && num.length > 13 || type && card_formats[type].length === num.length) {
-        return Card.luhn(num);
+      if (type) {
+        if (Card.getLength(type) !== number.length) {
+          return;
+        }
       }
+      return Card.luhn(number);
     }
     return false;
-  }
-
-  Card.prototype = {
-    bind: function(el, eventListeners){
-      if( !el ) { return }
-      var $el = $(el);
-      each(
-        eventListeners,
-        function(event, listener){
-          this.listeners.push(
-            $el.on(event, listener, null, this)
-          )
-        },
-        this
-      )
-    },
-
-    unbind: function(){
-      invokeEach(this.listeners)
-      this.listeners = [];
-    },
-
-    formatCardNumber: function(el){
-      this.bind(el, {
-        keypress: FormatNumber,
-        keydown: FormatNumberBack,
-        keyup: this.setType
-      })
-      if(el){
-        this.setType({target: el});
-        FormatNumber.call(this, {target: el});
-      }
-    },
-
-    formatCardExpiry: function(el){
-      this.bind(el, {
-        input: ReFormatExpiry,
-        keypress: FormatExpiry,
-        keydown: FormatExpiryBack
-      })
-    },
-
-    ensureNumeric: function(el){
-      this.bind(el, {
-        keypress: ensureNumeric
-      })
-    },
-
-    ensurePhone: function(el){
-      this.bind(el, {
-        keypress: ensurePhone
-      })
-    },
-    getType: CardType,
-    setType: noop,
-    filled: noop
   };
 
 })();

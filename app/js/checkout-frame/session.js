@@ -557,29 +557,10 @@ Session.prototype = {
     var el_cvv = gel('card_cvv');
     var el_contact = gel('contact');
     var el_name = gel('card_name');
+    var onfilled;
 
-    card.setType = function(e){
-      var el = e.target;
-      var type = card.getType(el.value) || 'unknown';
-
-      // card icon element
-      var iconEl = el.parentNode.querySelector('.cardtype');
-
-      var oldType = iconEl.getAttribute('cardtype');
-      if(type === oldType){
-        return;
-      }
-
-      iconEl.setAttribute('cardtype', type);
-      validateCardNumber(el);
-
-      if(type === 'amex' || oldType === 'amex'){
-        formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
-      }
-    }
-
-    if(shouldFocusNextField){
-      card.filled = function(el){
+    if (shouldFocusNextField) {
+      onfilled = function(el){
         var next;
         if (el === el_expiry) {
           if(!$(el.parentNode).hasClass('invalid')){
@@ -599,19 +580,48 @@ Session.prototype = {
       }
     }
 
-    card.formatCardNumber(el_number);
-    card.formatCardExpiry(el_expiry);
-    card.ensureNumeric(el_cvv);
-    card.ensurePhone(el_contact);
+    card.numberField(el_number, {
+      onfilled: onfilled,
+      onidentify: function(type){
+        var el = this.el;
+        if (!type) {
+          type = 'unknown';
+        }
 
-    var otpEl = gel('powerotp')
-    if(otpEl){
-      ensureNumeric(otpEl);
-    }
+        // card icon element
+        var iconEl = el.parentNode.querySelector('.cardtype');
+
+        var oldType = iconEl.getAttribute('cardtype');
+        if(type === oldType){
+          return;
+        }
+
+        iconEl.setAttribute('cardtype', type);
+        validateCardNumber(el);
+
+        if(type === 'amex' || oldType === 'amex'){
+          formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
+        }
+      }
+    });
+
+    card.expiryField(el_expiry, {
+      onfilled: onfilled
+    })
+
+    // card.formatCardNumber(el_number);
+    // card.formatCardExpiry(el_expiry);
+    // card.ensureNumeric(el_cvv);
+    // card.ensurePhone(el_contact);
+
+    // var otpEl = gel('powerotp')
+    // if(otpEl){
+    //   ensureNumeric(otpEl);
+    // }
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-    if ( el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string' ) {
+    if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
       el_cvv.type = 'tel';
     }
   },

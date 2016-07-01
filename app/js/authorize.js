@@ -72,7 +72,7 @@ function onPaymentCancel(errorObj){
   }
 }
 
-function Payment(data, params, r){
+function Payment(data, params, r) {
   if(!params || typeof params !== 'object'){
     params = emo;
   }
