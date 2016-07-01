@@ -28,7 +28,7 @@ var merchantMarkup = {
         top = pageYOffset;
       }
     }
-    if(typeof top === 'number'){
+    if (isNumber(top)) {
       frameContainer.style.top = Math.max(0, top) + 'px';
     }
     ch_PageY = pageYOffset;

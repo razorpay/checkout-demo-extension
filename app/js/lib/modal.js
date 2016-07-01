@@ -72,9 +72,7 @@
         self.hidden();
       }, this.animationDuration);
 
-      if(typeof this.options.onhide === 'function') {
-        this.options.onhide();
-      }
+      invoke(this.options.onhide);
     },
 
     backdropHide: function(){
@@ -85,9 +83,7 @@
 
     hidden: function() {
       clearTimeout();
-      if(typeof this.options.onhidden === 'function') {
-        this.options.onhidden();
-      }
+      invoke(this.options.onhidden);
     },
 
     on: function(event, target, callback){

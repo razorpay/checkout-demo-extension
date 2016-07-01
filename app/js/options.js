@@ -2,7 +2,7 @@ var flatKeys = {};
 each(
   Razorpay.defaults,
   function(key, val){
-    if(val && typeof val === 'object'){
+    if (isNonNullObject(val)) {
       flatKeys[key] = true;
       each(
         val,
@@ -18,10 +18,10 @@ each(
 function base_set(flatObj, defObj, objKey, objVal){
   objKey = objKey.toLowerCase();
   var defaultVal = defObj[objKey];
-  if(typeof objVal === 'number'){
+  if (isNumber(objVal)) {
     objVal = String(objVal);
   }
-  if(defaultVal === null || typeof defaultVal === typeof objVal){
+  if (defaultVal === null || typeof defaultVal === typeof objVal) {
     flatObj[objKey] = objVal;
   }
 }

@@ -1,5 +1,5 @@
 var $ = function(el){
-  if (typeof el === 'string') {
+  if (isString(el)) {
     return $(document.querySelector(el));
   }
   if (!(this instanceof $)) {
@@ -74,7 +74,7 @@ $.prototype = {
   },
 
   attr: function(attr, val){
-    if(typeof attr === 'object'){
+    if (isNonNullObject(attr)) {
       each(
         attr,
         function(key, val){

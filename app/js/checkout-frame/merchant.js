@@ -119,8 +119,8 @@ function notifyBridge(message){
   if( message && message.event ){
     var bridgeMethod = CheckoutBridge['on' + message.event];
     var data = message.data;
-    if(typeof data !== 'string'){
-      if(!data){
+    if (isString(data)) {
+      if (!data) {
         return invoke(bridgeMethod, CheckoutBridge);
       }
       data = stringify(data);

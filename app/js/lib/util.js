@@ -2,21 +2,42 @@ var now = Date.now || function() {
   return new Date().getTime();
 };
 
+/* simple checks */
+
+function isBoolean(x) {
+  return typeof x === 'boolean';
+}
+
+function isNumber(x) {
+  return typeof x === 'number';
+}
+
+function isString(x) {
+  return typeof x === 'string';
+}
+
+function isNonNullObject(x) {
+  return x && typeof x === 'object';
+}
+
+function isArray(x) {
+  return x instanceof Array;
+}
+
 /* Collections */
 
 function each(iteratee, eachFunc, thisArg) {
   var i;
-  if(arguments.length < 3){
+  if (arguments.length < 3) {
     thisArg = this;
   }
-  if( iteratee ) {
-    if ( iteratee.length ) { // not using instanceof Array, to iterate over nodeList
-      for ( i = 0; i < iteratee.length; i++ ) {
+  if (iteratee) {
+    if (iteratee.length) { // not using instanceof Array, to iterate over nodeList
+      for (i = 0; i < iteratee.length; i++) {
         eachFunc.call(thisArg, i, iteratee[i]);
       }
-    }
-    else {
-      for ( i in iteratee ) {
+    } else {
+      for (i in iteratee) {
         eachFunc.call(thisArg, i, iteratee[i]);
       }
     }
@@ -77,7 +98,7 @@ function defer(func, timeout) {
 }
 
 function invoke(handler, thisArg, args, timeout) {
-  if(typeof timeout === 'number'){
+  if (isNumber(timeout)) {
     return setTimeout(
       function(){
         invoke(handler, thisArg, param)
@@ -85,19 +106,19 @@ function invoke(handler, thisArg, args, timeout) {
       timeout
     )
   }
-  if(typeof handler === 'string'){
+  if (isString(handler)) {
     handler = thisArg[handler];
   }
-  if(typeof handler === 'function'){
-    if(!thisArg){
+  if (typeof handler === 'function') {
+    if (!thisArg) {
       thisArg = this;
     }
     try {
-      if(arguments.length >= 3){
+      if (arguments.length >= 3) {
         return handler.call(thisArg, param);
       }
       return handler.call(thisArg);      
-    } catch(e){
+    } catch(e) {
       roll('invoke error', e);
     }
   }
@@ -167,7 +188,7 @@ var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
 
 function submitForm(action, data, method, target) {
-  if (typeof target !== 'string') {
+  if (isString(target)) {
     if (method === 'get' && !isNonEmpty(data)) {
       if (!target) {
         target = window;
@@ -190,8 +211,8 @@ function submitForm(action, data, method, target) {
   doc.removeChild(form);
 }
 
-function deserialize(data, key){
-  if(typeof data === 'object'){
+function deserialize(data, key) {
+  if (isNonNullObject(data)) {
     var str = '';
     each(
       data,
