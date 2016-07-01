@@ -655,7 +655,6 @@ Session.prototype = {
       tab = '';
     }
 
-    $('#body').attr('tab', tab);
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
@@ -675,6 +674,7 @@ Session.prototype = {
       this.payload = null;
     }
 
+    $('#body').attr('tab', tab);
     this.tab = tab;
 
     if (tab === 'card') {
