@@ -290,8 +290,8 @@ Payment.prototype = {
     return this.ajax;
   },
 
-  tryPopup: function(forced){
-    if(this.powerwallet && !forced) {
+  tryPopup: function(isTopup){
+    if(this.powerwallet && !isTopup) {
       return null;
     }
 
@@ -300,6 +300,9 @@ Payment.prototype = {
     if(!/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)){
       try{
         popup = this.popup = new Popup('', 'popup_' + _uid);
+        if (isTopup) {
+          popup.write(templates.popup(this));
+        }
       } catch(e){
         return null;
       }
@@ -455,7 +458,7 @@ razorpayProto.topupWallet = function() {
   var payment = this._payment;
   var isRedirect = this.get('redirect');
   if (!isRedirect) {
-    // passing true to force opening popup
+    // passing true to indicate topup
     payment.tryPopup(true);
   }
 
