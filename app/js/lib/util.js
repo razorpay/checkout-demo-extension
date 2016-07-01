@@ -4,7 +4,7 @@ var now = Date.now || function() {
 
 /* Collections */
 
-function each( iteratee, eachFunc, thisArg ) {
+function each(iteratee, eachFunc, thisArg) {
   var i;
   if(arguments.length < 3){
     thisArg = this;
@@ -23,7 +23,7 @@ function each( iteratee, eachFunc, thisArg ) {
   }
 }
 
-function map( iteratee, mapFunc ) {
+function map(iteratee, mapFunc) {
   var result = iteratee instanceof Array ? [] : {};
   each(iteratee, function(i, val){
     result[i] = mapFunc(val, i);
@@ -56,13 +56,27 @@ function indexOf(arr, item) {
 
 /* Functions */
 
-function bind(func, thisArg){
+function bind(func, thisArg) {
   return function(){
     return func.apply(thisArg, arguments);
   }
 }
 
-function invoke(handler, thisArg, param , timeout){
+function defer(func, timeout) {
+  if (arguments.length === 1) {
+    timeout = 0;
+  }
+  if (arguments.length < 3) {
+    setTimeout(func, timeout);
+  } else {
+    var args = arguments;
+    setTimeout(function(){
+      func.apply(null, Array.prototype.slice.call(args, 2));
+    }, timeout);
+  }
+}
+
+function invoke(handler, thisArg, args, timeout) {
   if(typeof timeout === 'number'){
     return setTimeout(
       function(){
