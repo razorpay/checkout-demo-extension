@@ -299,20 +299,20 @@ function stripNonDigit(str) {
   return str.replace(/\D/g, '')
 }
 
-function ensureNumeric(e){
+function ensureNumeric(e) {
   return ensureRegex(e, /[0-9]/);
 }
 
-function ensurePhone(e){
+function ensurePhone(e) {
   return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
 }
 
-function ensureExpiry(e){
+function ensureExpiry(e) {
   var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
   return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
 }
 
-function ensureRegex(e, regex){
+function ensureRegex(e, regex) {
   if(!e) { return '' }
 
   var which = e.which;

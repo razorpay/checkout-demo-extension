@@ -362,7 +362,7 @@ Session.prototype = {
     this.setSmarty();
     this.setEMI();
     this.setModal();
-    this.setCard();
+    this.setFormatting();
     this.bindEvents();
     errorHandler.call(this, this.params);
 
@@ -547,7 +547,7 @@ Session.prototype = {
     this.on('click', '#fd-hide', this.hideErrorMessage);
   },
 
-  setCard: function(){
+  setFormatting: function(){
     if(!this.card){
       this.card = new Card();
     }
@@ -608,16 +608,6 @@ Session.prototype = {
     card.expiryField(el_expiry, {
       onfilled: onfilled
     })
-
-    // card.formatCardNumber(el_number);
-    // card.formatCardExpiry(el_expiry);
-    // card.ensureNumeric(el_cvv);
-    // card.ensurePhone(el_contact);
-
-    // var otpEl = gel('powerotp')
-    // if(otpEl){
-    //   ensureNumeric(otpEl);
-    // }
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle

@@ -144,8 +144,10 @@ var Card;
     parts.val = stripNonDigit(parts.val);
     var precursor = parts.pre;
     var value = parts.val;
-    if(/^[2-9]$/.test(value)){
+    if (/^[2-9]$/.test(value)) {
       precursor = value = 0 + value;
+    } else if (/^1[3-9]$/.test(value)) {
+      return;
     }
     el.value = this.substitute(value);
     precursor = this.substitute(precursor);
