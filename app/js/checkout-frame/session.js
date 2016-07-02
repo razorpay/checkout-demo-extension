@@ -511,15 +511,17 @@ Session.prototype = {
         this.hide();
       });
     }
-    this.on('click', '#top-left', this.switchTab);
+    this.on('click', '#top-left', this.back);
     this.on('click', '#user', function(e){
       e.preventDefault();
       e.stopPropagation();
     })
-    this.on('click', '.payment-option', this.switchTab);
+    this.on('click', '.payment-option', function(e){
+      this.switchTab(e.currentTarget.getAttribute('tab') || '');
+    });
     this.on('submit', '#form', this.preSubmit);
     this.on('keypress', '#otp', this.onOtpEnter);
-    this.on('click', '#otp-action', this.switchTab);
+    this.on('click', '#otp-action', this.back);
     this.on('click', '#otp-resend', this.resendOTP);
     this.on('click', '#otp-sec', this.secAction);
     this.on('click', '#add-funds-action', this.addFunds);
@@ -630,36 +632,23 @@ Session.prototype = {
       makeHidden('#topbar');
       makeVisible('#form-common');
     }
+  },
 
-    if (screen !== 'otp'){
-      var $modal = $('#modal');
-      if (this.tab === screen && screen === 'wallet') {
-        // otp field doesn't animate and gets displayed as soon as sub class is applied
-        invoke('addClass', $modal, 'sub', 300);
-      } else {
-        $modal.toggleClass('sub', screen);
-      }
-      $('#footer').removeClass('otp');
+  back: function(){
+    var tab;
+    if (this.screen === 'otp' && this.tab !== 'card') {
+      tab = this.tab;
+    } else {
+      tab = '';
     }
+    this.switchTab(tab);
   },
 
   switchTab: function(tab){
-    if (typeof tab !== 'string') {
-      tab = tab.currentTarget.getAttribute('tab') || '';
-    }
-
-    if (!(tab in tab_titles)) {
-      tab = '';
-    }
-
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
         return;
-      }
-    } else {
-      if (this.screen === 'otp' && this.tab !== 'card') {
-        tab = this.tab;
       }
     }
 
@@ -669,6 +658,7 @@ Session.prototype = {
       $('#user').html(contact);
     } else {
       this.payload = null;
+      this.clearRequest();
     }
 
     $('#body').attr('tab', tab);

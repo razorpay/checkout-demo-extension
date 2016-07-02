@@ -92,13 +92,7 @@ $gridStagger: 0.05s;
   transition-delay: $second;
 }
 
-.font-loaded #modal.sub {
-  #powered-by {
-    display: none;
-  }
-}
-
-#modal {
+#body {
   &.sub {
     #footer {
       opacity: 1;
@@ -109,9 +103,6 @@ $gridStagger: 0.05s;
       border-radius: 0;
     }
   }
-}
-
-#body {
   &[tab] {
     #user {
       display: block;
@@ -121,7 +112,6 @@ $gridStagger: 0.05s;
         transition: $first;
       }
     }
-
     #form-card.shown .pad {
       animation: $springTime spring;
       animation-delay: $second;
