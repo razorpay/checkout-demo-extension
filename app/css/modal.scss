@@ -369,12 +369,19 @@ i {
   }
 
   &[screen=otp] {
+    .otp-btn {
+      opacity: 1;
+    }
+    .pay-btn {
+      opacity: 0;
+    }
+  }
+  &.sub {
     #footer {
-      font-size: 0;
-      &::before {
-        content: 'Verify';
-        font-size: 16px;
-      }
+      transform: none;
+    }
+    #form-fields {
+      border-radius: 0;
     }
   }
 }
@@ -541,12 +548,7 @@ $outline: #ddd;
   }
 }
 
-.otp-btn {
-  display: none;
-}
-
 #footer {
-  opacity: 0;
   position: absolute;
   left: 0;
   bottom: -$footerh + 1px;
@@ -554,7 +556,7 @@ $outline: #ddd;
   border-radius: 0 0 $br $br;
   height: $footerh;
   line-height: $footerh + 1px;
-  transition: 0.3s;
+  transition: 0.3s transform;
   transform: translateY(-100%);
   text-align: center;
   text-transform: uppercase;
@@ -562,6 +564,7 @@ $outline: #ddd;
   box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.24);
 
   &::after {
+    top: 0;
     content: '';
     left: 0;
     width: 100%;
@@ -577,8 +580,17 @@ $outline: #ddd;
     opacity: 0;
   }
 
-  &::before {
-    content: 'Pay \00a0';
+  span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: 0.3s;
+  }
+
+  .otp-btn {
+    opacity: 0;
   }
 }
 

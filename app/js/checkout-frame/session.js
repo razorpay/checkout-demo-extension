@@ -251,6 +251,7 @@ function askOTP(text){
   }
   $('#otp').val('');
   $('#form-otp').removeClass('loading').removeClass('action');
+  $('#body').addClass('sub');
   setOtpText(text || 'An OTP has been sent to ' + getPhone());
 }
 
@@ -632,6 +633,7 @@ Session.prototype = {
       makeHidden('#topbar');
       makeVisible('#form-common');
     }
+    this.body.toggleClass('sub', screen);
   },
 
   back: function(){
@@ -924,6 +926,7 @@ Session.prototype = {
     }
 
     if(this.screen === 'otp'){
+      this.body.removeClass('sub');
       setOtpText(text);
       $('#form-otp')[actionState]('action')[loadingState]('loading');
     } else {
