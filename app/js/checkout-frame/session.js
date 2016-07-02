@@ -250,7 +250,6 @@ function askOTP(text){
     text = text.error && text.error.description;
   }
   $('#otp').val('');
-  $('#modal').addClass('sub');
   $('#form-otp').removeClass('loading').removeClass('action');
   setOtpText(text || 'An OTP has been sent to ' + getPhone());
 }
@@ -629,10 +628,6 @@ Session.prototype = {
       $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
       makeVisible('#form-' + screen);
-
-      if (screen === 'card') {
-        this.body.addClass('sub');
-      }
     } else {
       makeHidden('#topbar');
       makeVisible('#form-common');
@@ -929,7 +924,6 @@ Session.prototype = {
     }
 
     if(this.screen === 'otp'){
-      $('#modal').removeClass('sub');
       setOtpText(text);
       $('#form-otp')[actionState]('action')[loadingState]('loading');
     } else {
