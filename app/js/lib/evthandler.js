@@ -47,8 +47,7 @@ var EvtHandler;
           },
           this
         )
-      }
-      else if (argLen === 2) {
+      } else if (argLen === 2) {
         callback = el;
         el = this.el;
       }

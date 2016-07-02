@@ -100,17 +100,16 @@ function onSixDigits(e){
 
       toggleNoCvv(false);
     }
-  }
-  else {
+  } else {
     toggleNoCvv(false);
   }
 
   var emi_parent = $('#emi-check-label').toggleClass('disabled', !emiObj);
-  if(emiObj){
+
+  if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
     makeEmiDropdown(emiObj, this);
-  }
-  else {
+  } else {
     emi_parent.removeClass('checked');
     $(emi_parent.find('.active')[0]).removeClass('active');
   }
@@ -119,10 +118,9 @@ function onSixDigits(e){
   var elem_emi = $('#elem-emi');
   var hiddenClass = 'hidden';
 
-  if(isMaestro && sixDigits){
+  if (isMaestro && sixDigits) {
     elem_emi.addClass(hiddenClass);
-  }
-  else if(elem_emi.hasClass(hiddenClass)) {
+  } else if(elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
   }
 }
@@ -248,7 +246,7 @@ function setOtpText(text){
 }
 
 function askOTP(text){
-  if (typeof text === 'object') {
+  if (isNonNullObject(text)) {
     text = text.error && text.error.description;
   }
   $('#otp').val('');
@@ -634,7 +632,6 @@ Session.prototype = {
     }
 
     if (screen !== 'otp'){
-      this.saving_card = null;
       var $modal = $('#modal');
       if (this.tab === screen && screen === 'wallet') {
         // otp field doesn't animate and gets displayed as soon as sub class is applied
@@ -647,11 +644,11 @@ Session.prototype = {
   },
 
   switchTab: function(tab){
-    if(typeof tab !== 'string'){
+    if (typeof tab !== 'string') {
       tab = tab.currentTarget.getAttribute('tab') || '';
     }
 
-    if(!(tab in tab_titles)){
+    if (!(tab in tab_titles)) {
       tab = '';
     }
 
@@ -661,7 +658,7 @@ Session.prototype = {
         return;
       }
     } else {
-      if (this.screen === 'otp' && this.tab !== 'card' || this.saving_card) {
+      if (this.screen === 'otp' && this.tab !== 'card') {
         tab = this.tab;
       }
     }
@@ -881,10 +878,6 @@ Session.prototype = {
     return '#form-' + form;
   },
 
-  isCardForm: function(){
-    return this.screen === 'card' || this.saving_card;
-  },
-
   getFormData: function(){
     var tab = this.tab;
     var data = {};
@@ -895,7 +888,7 @@ Session.prototype = {
       data.method = tab;
       fillData(this.getActiveForm(), data);
 
-      if (this.isCardForm()) {
+      if (this.screen === 'card') {
         if (this.savedCardScreen) {
           if (data.token) {
             var cvvEl = gel('cvv-' + data.token);
@@ -1126,10 +1119,7 @@ Session.prototype = {
 
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this))
-      .on('payment.cancel', bind(function() {
-        this.showLoadError(discreet.cancelMsg, true);
-      }, this));
+      .on('payment.error', bind(errorHandler, this));
 
     if(request.powerwallet){
       this.r.on('payment.otp.required', bind(function(){
@@ -1141,6 +1131,10 @@ Session.prototype = {
         $('#add-funds').addClass('show');
         setOtpText('Insufficient balance in your wallet');
       });
+    } else {
+      this.r.on('payment.cancel', bind(function() {
+        this.showLoadError(discreet.cancelMsg, true);
+      }, this))
     }
   },
 
