@@ -404,14 +404,16 @@ Session.prototype = {
     var style = document.createElement('style');
     style.type = 'text/css';
     try{
-      div.style.color = this.get('theme.color');
-      if(div.style.color){
-        var rules = templates.theme(this.get);
-        if (style.styleSheet) {
-          style.styleSheet.cssText = rules;
-        } else {
-          style.appendChild(document.createTextNode(rules));
-        }
+      var getter = this.get;
+      div.style.color = getter('theme.color');
+      if(!div.style.color){
+        getter()['theme.color'] = '';
+      }
+      var rules = templates.theme(getter);
+      if (style.styleSheet) {
+        style.styleSheet.cssText = rules;
+      } else {
+        style.appendChild(document.createTextNode(rules));
       }
       div.style.color = '';
     } catch(e){
@@ -1131,7 +1133,7 @@ Session.prototype = {
         this.showLoadError(discreet.cancelMsg, true);
       }, this));
 
-    if(request.powerwallet){
+    if(request.powerwallet) {
       this.r.on('payment.otp.required', bind(function(){
         this.showLoadError(strings.otpsend + getPhone());
         debounceAskOTP();
