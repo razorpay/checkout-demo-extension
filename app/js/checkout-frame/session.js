@@ -309,6 +309,7 @@ Session.prototype = {
       this.el.appendChild(this.renderCss());
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
+      this.body = $('#body');
       $(this.el).addClass(this.getClasses());
     }
     return this.el;
@@ -422,7 +423,7 @@ Session.prototype = {
     if(!retryCount) {
       retryCount = 0;
     }
-    if(anchor.offsetWidth/anchor.offsetHeight > 5) {
+    if(anchor.offsetWidth/anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
     }
     else if(retryCount < 25) {
@@ -628,6 +629,10 @@ Session.prototype = {
       $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
       makeVisible('#form-' + screen);
+
+      if (screen === 'card') {
+        this.body.addClass('sub');
+      }
     } else {
       makeHidden('#topbar');
       makeVisible('#form-common');
@@ -661,7 +666,7 @@ Session.prototype = {
       this.clearRequest();
     }
 
-    $('#body').attr('tab', tab);
+    this.body.attr('tab', tab);
     this.tab = tab;
 
     if (tab === 'card') {
