@@ -50,20 +50,6 @@ function formatPhone(phone) {
   return phone;
 }
 
-function pastePhone(e) {
-  var cbData, pasted;
-
-  e.stopPropagation();
-  e.preventDefault();
-
-  cbData = e.clipboardData || window.clipboardData;
-  pasted = cbData.getData('Text');
-
-  pasted = formatPhone(pasted.replace(/\ /g, ''));
-
-  e.target.value = pasted;
-}
-
 function ensurePhone(e){
   var el = e.target;
   var char = ensureNumeric(e);
@@ -388,8 +374,7 @@ var Card;
 
     ensurePhone: function(el){
       this.bind(el, {
-        keypress: ensurePhone,
-        paste: pastePhone
+        keypress: ensurePhone
       })
     },
     getType: CardType,
