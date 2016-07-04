@@ -6,7 +6,7 @@ message =
     key: 'key'
     amount: 300
     prefill:
-      contact: '18002700323'
+      contact: '9414494144'
       email: 'pranav@razorpay.com'
     redirect: true
 
@@ -41,7 +41,7 @@ describe 'page load', ->
     exec ->
       expect JSON.parse CheckoutBridge.get iosCB.onsubmit.args[0][0]
         .to.eql
-          contact: '18002700323'
+          contact: '+919414494144'
           email: 'pranav@razorpay.com'
           method: 'netbanking'
           bank: 'SBIN'
