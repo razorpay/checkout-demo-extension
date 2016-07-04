@@ -95,7 +95,7 @@ var gridClass = gridClasses[i-1];
                     <div class="help">Please enter a valid contact number with country code</div>
                     <label>Phone</label>
                     <span id='contact-prefix'>+</span>
-                    <input class="input" id="contact" name="contact" type="tel" required value="{{=contact}}" pattern="^(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543211]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\s[0-9]{8,15}$" maxlength="15">
+                    <input class="input" id="contact" name="contact" type="tel" required value="{{=contact}}" pattern="^(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543211]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\s[0-9\ ]{8,15}$" maxlength="15">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
