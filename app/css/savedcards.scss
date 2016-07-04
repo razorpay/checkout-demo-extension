@@ -215,12 +215,12 @@ $cardpl: 46px;
   width: 35px;
   background-size: 600%;
   margin: 5px 0 0 -2px;
+  background-position: -20%;
   display: block;
-  display: none\9;
 }
 
-[cardtype=unknown]::before {
-  content: none;
+[cardtype=visa]::before {
+  background-position: 0;
 }
 
 [cardtype=amex]::before {
