@@ -563,9 +563,11 @@ Session.prototype = {
     var onfilled;
 
     if (shouldFocusNextField) {
-      onfilled = function(el){
+      var smarty = this.smarty;
+      onfilled = function(el) {
         var next;
         if (el === el_expiry) {
+          smarty.input({target: el_expiry});
           if(!$(el.parentNode).hasClass('invalid')){
             next = $('.elem-name.filled input')[0];
             if (next) {
@@ -578,7 +580,7 @@ Session.prototype = {
           next = el_expiry;
         }
         if(next){
-          next.focus();
+          invoke('focus', next, null, 0);
         }
       }
     }
