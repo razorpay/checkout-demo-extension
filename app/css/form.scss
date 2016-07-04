@@ -45,7 +45,7 @@ label[for] {
   }
 
   input:focus {
-    color: #000;
+    color: $input-focused;
   }
 
   i {
@@ -95,7 +95,7 @@ label[for] {
   padding: $top 0 $bottom $left;
   margin: 0;
   position: relative;
-  color: #424242;
+  color: $input-unfocused;
 }
 
 .select {
@@ -251,6 +251,31 @@ button {
 #card_cvv,
 .saved-cvv {
   -webkit-text-security: disc;
+}
+
+#contact {
+  padding-left: 8px;
+}
+
+#contact-prefix {
+  position: absolute;
+  bottom: 8px;
+  opacity: 0;
+  color: $input-unfocused;
+  transition: 0.3s;
+}
+
+.elem.focused #contact-prefix,
+.elem.filled #contact-prefix {
+  opacity: 1;
+}
+
+.elem.invalid.mature #contact-prefix {
+  color: $danger;
+}
+
+#modal .elem.focused #contact-prefix {
+  color: $input-focused;
 }
 
 .customer-bank-details {

@@ -2,24 +2,77 @@ function ensureNumeric(e){
   return ensureRegex(e, /[0-9]/);
 }
 
+function SetCaret(el, pos){
+  if(navigator.userAgent.indexOf('Android')){
+    return;
+  }
+  if(typeof el.selectionStart === 'number'){
+    el.selectionStart = el.selectionEnd = pos;
+  }
+  else {
+    var range = el.createTextRange();
+    range.collapse(true);
+    range.moveEnd('character', pos);
+    range.moveStart('character', pos);
+    range.select();
+  }
+}
+
+function CheckSelection(el){
+  if(typeof el.selectionStart === 'number'){
+    if(el.selectionStart !== el.selectionEnd) { return true }
+    return el.selectionStart;
+  } else if (document.selection) {
+    var range = document.selection.createRange();
+    if(range.text) { return true }
+
+    // get caret position in IE8
+    var textInputRange = el.createTextRange();
+    textInputRange.moveToBookmark(range.getBookmark());
+    return -textInputRange.moveStart('character', -el.value.length);
+  }
+  return el.value.length;
+}
+
 function formatPhone(phone) {
   if(typeof phone != 'string') {
     return;
   }
-  var matches = phone.match(/^\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543211]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)/);
+  var matches = phone.match(/^(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543211]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)/);
 
   if (!matches) {
     return phone;
   }
 
-  if(phone.indexOf(matches[0]+' ') < 0){
+  if (phone.indexOf(matches[0] + ' ') < 0){
     phone = phone.replace(matches[0], matches[0]+" ");
   }
   return phone;
 }
 
 function ensurePhone(e){
-  return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
+  var el = e.target;
+  var char = ensureNumeric(e);
+
+  if(char === false) {
+    return false
+  }
+
+  var pos = CheckSelection(el);
+  if(pos === true) { return false}
+
+  var value = el.value;
+  var prefix = value.slice(0, pos).replace(/[^0-9]/g,'');
+  var suffix = value.slice(pos).replace(/[^0-9]/g,'');
+  value = prefix + char + suffix;
+
+  if(prefix.length + suffix.length >= el.getAttribute('maxlength')) {
+    return
+  }
+
+  preventDefault(e);
+
+  el.value = formatPhone(value);
 }
 
 function ensureExpiry(e){
@@ -103,38 +156,6 @@ var Card;
         return t;
       }
     }
-  }
-
-  var SetCaret = function(el, pos){
-    if(navigator.userAgent.indexOf('Android')){
-      return;
-    }
-    if(typeof el.selectionStart === 'number'){
-      el.selectionStart = el.selectionEnd = pos;
-    }
-    else {
-      var range = el.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', pos);
-      range.moveStart('character', pos);
-      range.select();
-    }
-  }
-
-  var CheckSelection = function(el){
-    if(typeof el.selectionStart === 'number'){
-      if(el.selectionStart !== el.selectionEnd) { return true }
-      return el.selectionStart;
-    } else if (document.selection) {
-      var range = document.selection.createRange();
-      if(range.text) { return true }
-
-      // get caret position in IE8
-      var textInputRange = el.createTextRange();
-      textInputRange.moveToBookmark(range.getBookmark());
-      return -textInputRange.moveStart('character', -el.value.length);
-    }
-    return el.value.length;
   }
 
   var expLen = 0;
