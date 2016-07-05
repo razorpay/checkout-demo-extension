@@ -238,7 +238,7 @@ function errorHandler(response){
 }
 
 function getPhone(){
-  return gel('contact').value;
+  return '+' + gel('contact').value.replace(/\ /g, '');
 }
 
 function setOtpText(text){
@@ -879,6 +879,7 @@ Session.prototype = {
     var data = {};
 
     fillData('#form-common', data);
+    data['contact'] = '+' + data['contact'].replace(/\ /g, '');
 
     if (tab) {
       data.method = tab;
@@ -1023,6 +1024,10 @@ Session.prototype = {
   preSubmit: function(e) {
     preventDefault(e);
     var screen = this.screen;
+
+    if (!this.tab) {
+      return;
+    }
 
     if (screen === 'otp') {
       return this.onOtpSubmit();

@@ -21,7 +21,7 @@ commonSubmitData =
   '_[library]': 'checkoutjs'
   key_id: message.options.key
   amount: message.options.amount
-  contact: message.options.prefill.contact
+  contact: '+91'+message.options.prefill.contact
   email: message.options.prefill.email
   currency: 'INR'
   description: 'hello'

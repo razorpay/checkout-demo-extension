@@ -8,8 +8,10 @@ var order = it.order || {};
 var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = it.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
-var amount;
 
+var contact = o('prefill.contact').replace(/^[0+]*|\D/g, '');
+
+var amount;
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
@@ -77,9 +79,10 @@ var gridClass = gridClasses[i-1];
                 <div class="pad">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
-                    <div class="help">Please enter a valid contact number</div>
+                    <div class="help">Please enter a valid contact number with country code</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" required value="{{=attr(o('prefill.contact'))}}" pattern="^\+?(91 )?[0-9]{8,15}$" maxlength="15">
+                    <span id='contact-prefix'>+</span>
+                    <input class="input" id="contact" name="contact" type="tel" required value="{{=contact}}" maxlength="15">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
