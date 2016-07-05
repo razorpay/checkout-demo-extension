@@ -5,19 +5,10 @@ var EvtHandler;
     this.listeners = [];
   }
 
-  function getListener(el, event, callback) {
-    var remover,
-      adder = 'addEventListener';
-    if (adder in window) {
-      remover = 'removeEventListener';
-    } else {
-      adder = 'attachEvent';
-      remover = 'detachEvent';
-      event = 'on' + event;
-    }
-    el[adder](event, callback);
+  function getListener(el, event, callback, useCapture) {
+    el.addEventListener(event, callback, useCapture);
     return function() {
-      el[remover](event, callback);
+      el[remover](event, callback, useCapture);
     };
   }
 
@@ -37,25 +28,23 @@ var EvtHandler;
   }
 
   EvtHandler.prototype = {
-    on: function(event, el, callback) {
-      var argLen = arguments.length;
-      if (argLen === 1) {
-        return each(
-          event,
-          function(event, callback){
-            this.on(event, callback);
-          },
-          this
-        )
-      } else if (argLen === 2) {
-        callback = el;
+    on: function(event, callback, el, useCapture) {
+
+      // event can be string or a map {event: callback}
+      if (isNonNullObject(event)) {
+        // args = assuming eventMap, el, useCapture
+        return invokeEachWith(event, 'on', this, callback, el);
+      }
+      if (!isNode(el)) {
+        useCapture = el;
         el = this.el;
       }
       this.listeners.push(
         getListener(
           el,
           event,
-          binder(callback, this)
+          binder(callback, this),
+          useCapture
         )
       )
       return this;

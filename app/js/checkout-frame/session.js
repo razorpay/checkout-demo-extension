@@ -395,7 +395,7 @@ Session.prototype = {
   },
 
   setSmarty: function(){
-    this.smarty = new window.Smarty(this.el);
+    this.smarty = new InputEvtHandler(this.el, $$('.input'));
   },
 
   renderCss: function(){

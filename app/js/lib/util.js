@@ -12,6 +12,10 @@ function isNumber(x) {
   return typeof x === 'number';
 }
 
+function isFunction(x) {
+  return typeof x === 'function';
+}
+
 function isString(x) {
   return typeof x === 'string';
 }
@@ -22,6 +26,22 @@ function isNonNullObject(x) {
 
 function isArray(x) {
   return x instanceof Array;
+}
+
+function isNode(x) {
+  return x instanceof Node;
+}
+
+function isNonEmpty(obj){
+  if (!obj) {
+    return false;
+  }
+  if (isArray(obj)) {
+    return obj.length;
+  }
+  for (var i in obj) {
+    return true;
+  }
 }
 
 /* Collections */
@@ -161,22 +181,40 @@ function invokeEach(iteratee, thisArg){
 }
 
 
+// possible values
+// {}, this, function
+// {}, this, 'func'
+// {}, function
+// {}, 'func'
+// e.g. invokeEachWith(event, this, 'on', el, useCapture);
+
+function invokeEachWith(map, func) {
+  var args = arguments;
+  var thisArg = this;
+  var declaredArgs = 2;
+  if (!isFunction(func)) {
+    declaredArgs = 3;
+    thisArg = arguments[2];
+  }
+  if (isString(func)) {
+    func = thisArg[func];
+  }
+  each(
+    map,
+    function(key, val){
+      func.apply(
+        thisArg,
+        [key, val].concat(Array.prototype.slice.call(args, declaredArgs))
+      );
+    }
+  )
+}
+
+
 /* Objects */
 
 function clone(target){
   return JSON.parse(stringify(target));
-}
-
-function isNonEmpty(obj){
-  if (!obj) {
-    return false;
-  }
-  if (obj instanceof Array) {
-    return obj.length;
-  }
-  for (var i in obj) {
-    return true;
-  }
 }
 
 var stringify = bind(JSON.stringify, JSON);
