@@ -16,9 +16,9 @@ function confirmClose(){
 }
 
 function validateCardNumber(){
-  var el = gel('card_number');
+  var el = gel(card_number);
   var isValid = CardFormatter.validate(el.value, el.getAttribute('cardtype'));
-  $(el.parentNode).toggleClass('invalid', !isValid);
+  toggleInvalid($(el.parentNode), isValid);
 }
 
 function fillData(container, returnObj) {

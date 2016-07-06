@@ -377,3 +377,7 @@ function ensureRegex(e, regex) {
   preventDefault(e);
   return false;
 }
+
+function toggleInvalid($el, isValid) {
+  $el.toggleClass('invalid', !isValid)
+}

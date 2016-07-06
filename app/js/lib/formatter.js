@@ -225,7 +225,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     } else {
       valid = val.length > 8;
     }
-    $(el.parentNode).toggleClass('invalid', !valid);
+    toggleInvalid($(el.parentNode), valid);
 
     el.value = this.substitute(val);
     setCaret(el, this.substitute(stripNonDigit(parts.pre)).length);

@@ -33,20 +33,22 @@ var InputHandler;
     var value = el.value;
     var required = isString(el.getAttribute('required'));
     var pattern = el.getAttribute('pattern');
+    var $parent = $(el.parentNode);
 
+    $parent.toggleClass('filled', value);
+
+    // validity check past this
     if (!(required || pattern)) {
       return;
     }
     var valid = true;
-
     if (required && !value) {
       valid = false;
     }
     if (valid && pattern) {
       valid = new RegExp(pattern).test(value);
     }
-    $(el.parentNode).toggleClass('invalid', !valid)
-      .toggleClass('filled', value);
+    toggleInvalid($parent, valid);
   }
 
   iproto.refresh = function(){
