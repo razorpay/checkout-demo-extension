@@ -51,9 +51,7 @@ var EvtHandler;
     },
 
     off: function() {
-      for (var i = 0; i < this.listeners.length; i++) {
-        this.listeners[i]();
-      }
+      invokeEach(this.listeners);
       this.listeners = [];
       return this;
     }

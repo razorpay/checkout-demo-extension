@@ -130,7 +130,7 @@ var optionValidations = {
 
   notes: function(notes){
     var errorMessage = '';
-    if(typeof notes === 'object'){
+    if (isNonNullObject(notes)) {
       var notesCount = 0;
       each(notes, function() {
         notesCount++;
@@ -196,7 +196,7 @@ function validateOverrides(options) {
       if(key in optionValidations){
         errorMessage = optionValidations[key](val);
       }
-      if(typeof errorMessage === 'string'){
+      if (isString(errorMessage)) {
         raise('Invalid ' + key + ' (' + errorMessage + ')');
       }
     }
@@ -228,7 +228,7 @@ function addListener(rzp, event, listener){
 
 Razorpay.prototype = {
   on: function(event, callback, namespace){
-    if(typeof callback !== 'function'){
+    if (!isFunction(callback)) {
       return;
     }
     var events = this._events;

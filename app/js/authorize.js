@@ -73,7 +73,7 @@ function onPaymentCancel(errorObj){
 }
 
 function Payment(data, params, r) {
-  if(!params || typeof params !== 'object'){
+  if (!isNonNullObject(params)) {
     params = emo;
   }
   // saving razorpay instance
@@ -243,7 +243,8 @@ Payment.prototype = {
       var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
       this.emit('success', returnObj);
     } else {
-      if(!data.error || typeof data.error !== 'object' || !data.error.description){
+      var errorObj = data.error;
+      if (!isNonNullObject(errorObj) || !errorObj.description) {
         data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
       }
       this.emit('error', data);

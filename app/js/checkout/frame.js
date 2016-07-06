@@ -59,20 +59,21 @@ function restoreOverflow(){
 
 // to handle absolute/relative url of options.image
 function sanitizeImage(options){
-  if(options.image && typeof options.image === 'string'){
-    if(discreet.isBase64Image(options.image)){
+  var image = options.image;
+  if (image && isString(image)) {
+    if(discreet.isBase64Image(image)){
       return;
     }
-    if(options.image.indexOf('http')){ // not 0
+    if(image.indexOf('http')){ // not 0
       var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
       var relUrl = '';
-      if(options.image[0] !== '/'){
+      if(image[0] !== '/'){
         relUrl += location.pathname.replace(/[^\/]*$/g,'');
         if(relUrl[0] !== '/'){
           relUrl = '/' + relUrl;
         }
       }
-      options.image = baseUrl + relUrl + options.image;
+      options.image = baseUrl + relUrl + image;
     }
   }
 }

@@ -181,7 +181,7 @@ function overlayVisible(){
 
 // this === Session
 function errorHandler(response){
-  if (typeof response === 'string') {
+  if (isString(response)) {
     try {
       response = JSON.parse(response);
     } catch(e){

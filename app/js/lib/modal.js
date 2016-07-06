@@ -19,7 +19,7 @@
 
   if(Array.prototype.some){
     ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
-      if (typeof document.documentElement.style[i] === 'string') {
+      if (isString(document.documentElement.style[i])) {
         transitionProperty = i + 'Duration';
         return true;
       }

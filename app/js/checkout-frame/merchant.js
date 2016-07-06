@@ -348,14 +348,14 @@ function setQueryParams(search){
 }
 
 Razorpay.sendMessage = function(message){
-  if ( CheckoutBridge && typeof CheckoutBridge === 'object' ) {
+  if (isNonNullObject(CheckoutBridge)) {
     return notifyBridge(message);
   }
 
   if(ownerWindow){
     message.source = 'frame';
     message.id = _uid;
-    if ( typeof message !== 'string' ) {
+    if (isNonNullObject(message)) {
       message = stringify(message);
     }
     ownerWindow.postMessage(message, '*');
@@ -372,7 +372,7 @@ window.handleOTP = function(otp){
 
 function validUID(id){
   if(isIframe && !CheckoutBridge){
-    if(typeof id !== 'string' || id.length < 14 || !/[0-9a-z]/i.test(id)){
+    if(!isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)){
       return false;
     }
   }

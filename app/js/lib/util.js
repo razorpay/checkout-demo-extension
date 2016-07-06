@@ -129,7 +129,7 @@ function invoke(handler, thisArg, param, timeout) {
   if (isString(handler)) {
     handler = thisArg[handler];
   }
-  if (typeof handler === 'function') {
+  if (isFunction(handler)) {
     if (!thisArg) {
       thisArg = this;
     }
@@ -294,7 +294,7 @@ function getSelection(el) {
   var length = value.length;
   var caretPosition = el.selectionStart;
   var text = '';
-  if (typeof caretPosition === 'number') {
+  if (isNumber(caretPosition)) {
     if (caretPosition !== el.selectionEnd) {
       text = value.slice(caretPosition, el.selectionEnd);
     }
@@ -312,7 +312,7 @@ function getSelection(el) {
 };
 
 function setCaret(el, position) {
-  if (typeof el.selectionStart === 'number') {
+  if (isNumber(el.selectionStart)) {
     return el.selectionStart = el.selectionEnd = position;
   } else {
     var range = el.createTextRange();
@@ -365,7 +365,7 @@ function ensureRegex(e, regex) {
   if(!e) { return '' }
 
   var which = e.which;
-  if(typeof which !== 'number'){
+  if (!isNumber(which)) {
     which = e.keyCode;
   }
 
