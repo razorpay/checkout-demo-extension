@@ -16,7 +16,7 @@ function confirmClose(){
 }
 
 function validateCardNumber(){
-  var el = gel(card_number);
+  var el = gel('card_number');
   var isValid = CardFormatter.validate(el.value, el.getAttribute('cardtype'));
   toggleInvalid($(el.parentNode), isValid);
 }
@@ -228,7 +228,7 @@ function errorHandler(response){
 }
 
 function getPhone(){
-  return '+' + gel('contact').value.replace(/\ /g, '');
+  return '+' + gel('contact').value;
 }
 
 function setOtpText(text){

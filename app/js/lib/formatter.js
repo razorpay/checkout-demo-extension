@@ -114,7 +114,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   }
 
   cardFormatterProto.substitute = function(value, spacing) {
-    return value.replace(spacing, '$1 ').slice(0, this.maxLen);
+    return value.replace(spacing, '$1 ');
   }
 
   cardFormatterProto.handler = function(parts) {
@@ -153,26 +153,22 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   }
 
   ExpiryFormatter = function(el, options){
-    this.maxLen = 7;
     this.init(el, options);
   }
   var expiryFormatterProto = ExpiryFormatter.prototype = new Formatter();
 
-  expiryFormatterProto.substitute = function(value){
-    return value.replace(/(.{2})/, '$1 / ').slice(0, this.maxLen);
+  expiryFormatterProto.substitute = function(val){
+    return val
+      .replace(/^([2-9])$/, '0$1')
+      .replace(/^1[3-9]$/, '1')
+      .replace(/(.{2})/, '$1 / ')
+      .slice(0, 7);
   }
   expiryFormatterProto.handler = function(parts) {
     var el = this.el;
-    var pre = stripNonDigit(parts.pre);
-    var val = stripNonDigit(parts.val);
-    if (/^[2-9]$/.test(val)) {
-      pre = val = 0 + val;
-    } else if (/^1[3-9]$/.test(val)) {
-      return;
-    }
-    el.value = this.substitute(val);
-    pre = this.substitute(pre);
-    if(pre.length === this.maxLen){
+    el.value = this.substitute(stripNonDigit(parts.val));
+    pre = this.substitute(stripNonDigit(parts.pre));
+    if (pre.length === 7) {
       this.onfilled(el);
     }
     setCaret(el, pre.length);
@@ -198,19 +194,19 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     }
     el.value = value;
     this.init(el, emo);
-    el.focus();
   }
   var contactFormatterProto = ContactFormatter.prototype = new Formatter();
   contactFormatterProto.substitute = function(value) {
     // Indian formatting
     if (value.slice(0, 2) === '91') {
       return '91 ' + value.slice(2, 12).replace(/(.{5})/, '$1 ');
-    // US formatting
+    // North American formatting
     } else if (value[0] === '1') {
       return '1 ' + value.slice(1, 11).replace(/(.{3})/, '$1 ').replace(/( .{3})/, '$1 ');
     }
     return value.replace(/^(7|2[0,7]|3[0-4,6,9]|4[0,1,3-9]|5[1-8]|6[0-6]|8[1,2,4,6]|9[0-5,8]|.{3})/, '$1 ');
   }
+
   contactFormatterProto.handler = function(parts) {
     var el = this.el;
     var val = stripNonDigit(parts.val).slice(0, 14);
@@ -218,7 +214,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     // checking validity
     var valid;
 
-    // if US/India number, local number length should be 10
+    // if North American/Indian number, local number length should be 10
     var matches = val.match(/^(9?1)(.{10}$)?/);
     if (matches) {
       valid = matches[2];
