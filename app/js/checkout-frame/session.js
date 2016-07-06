@@ -1141,7 +1141,7 @@ Session.prototype = {
       clearTimeout(fontTimeout);
 
       invokeEach(this.listeners);
-      invokeOnEach('on', this.bits);
+      invokeOnEach('off', this.bits);
       this.listeners = [];
       this.bits = [];
 

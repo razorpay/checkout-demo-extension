@@ -36,7 +36,11 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     this.onfilled = options.onfilled || noop;
     this.on({
       keypress: this.format,
-      keydown: this.backHandler,
+      keydown: bind(function(e){
+        if (e.which === 8) {
+          this.backHandler(e);
+        }
+      }, this),
       input: this.oninput,
       change: this.oninput,
       paste: this.oninput
@@ -44,7 +48,18 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     this.oninput();
   }
 
-  formatterProto.substitute = formatterProto.backHandler = formatterProto.handler = noop;
+  formatterProto.substitute = formatterProto.handler = noop;
+  formatterProto.backHandler = function(e) {
+    var el = this.el;
+    var caretPosition = (getSelection(el)).start;
+    var value = el.value;
+    if (value.charAt(caretPosition - 1) === ' ') {
+      e.preventDefault();
+      el.value = value.slice(0, caretPosition - 2) + value.slice(caretPosition);
+      setCaret(el, caretPosition - 2);
+    }
+    this.oninput();
+  };
 
   formatterProto.format = function(e){
     this.handler(getParts(e));
@@ -135,21 +150,6 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
       this.onfilled(el);
     }
   }
-  cardFormatterProto.backHandler = function(e) {
-    var caretPosition, el, value;
-    if (e.which !== 8) {
-      return;
-    }
-    el = this.el;
-    caretPosition = (getSelection(el)).start;
-    value = el.value;
-    if (' ' === value.charAt(caretPosition - 1)) {
-      e.preventDefault();
-      el.value = value.slice(0, caretPosition - 2) + value.slice(caretPosition);
-      setCaret(el, caretPosition - 2);
-      return this.oninput();
-    }
-  };
 
   ExpiryFormatter = function(el, options){
     this.maxLength = 7;
@@ -162,27 +162,40 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   }
   expiryFormatterProto.handler = function(parts) {
     var el = this.el;
-    var precursor = stripNonDigit(parts.pre);
-    var value = stripNonDigit(parts.val);
-    if (/^[2-9]$/.test(value)) {
-      precursor = value = 0 + value;
-    } else if (/^1[3-9]$/.test(value)) {
+    var pre = stripNonDigit(parts.pre);
+    var val = stripNonDigit(parts.val);
+    if (/^[2-9]$/.test(val)) {
+      pre = val = 0 + val;
+    } else if (/^1[3-9]$/.test(val)) {
       return;
     }
-    el.value = this.substitute(value);
-    precursor = this.substitute(precursor);
-    if(precursor.length === this.maxLength){
+    el.value = this.substitute(val);
+    pre = this.substitute(pre);
+    if(pre.length === this.maxLength){
       this.onfilled(el);
     }
-    setCaret(el, precursor.length);
+    setCaret(el, pre.length);
   };
   expiryFormatterProto.backHandler = function(e) {
-    if (e.which !== 8) {
-      return;
-    }
     if ((getSelection(this.el)).start === 5) {
       this.el.value = this.el.value.charAt(0);
       return e.preventDefault();
     }
   };
+
+  ContactFormatter = function(el) {
+    this.init(el, emo);
+  }
+  contactFormatterProto = ContactFormatter.prototype = new Formatter;
+  contactFormatterProto.substitute = function(value) {
+    if (value.slice(0, 2) === '91') {
+      return '91 ' + value.slice(2).replace(/(.{5})/, '$1 ');
+    }
+    return value.replace(/^(1|7|2[0,7]|3[0-4,6,9]|4[0,1,3-9]|5[1-8]|6[0-6]|8[1,2,4,6]|9[0-5,8])/, '$1 ');
+  }
+  contactFormatterProto.handler = function(parts) {
+    var el = this.el;
+    el.value = this.substitute(stripNonDigit(parts.val));
+    setCaret(el, this.substitute(stripNonDigit(parts.pre)).length);
+  }
 })();

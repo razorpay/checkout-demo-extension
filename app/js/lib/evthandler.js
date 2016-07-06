@@ -8,7 +8,7 @@ var EvtHandler;
   function getListener(el, event, callback, useCapture) {
     el.addEventListener(event, callback, useCapture);
     return function() {
-      el[remover](event, callback, useCapture);
+      el.removeEventListener(event, callback, useCapture);
     };
   }
 
