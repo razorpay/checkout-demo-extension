@@ -27,10 +27,10 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
         return /(.{4})/g;
       }
     }
-  };
+  }
 
   function Formatter(el) {}
-  var formatterProto = Formatter.prototype = new EvtHandler;
+  var formatterProto = Formatter.prototype = new EvtHandler();
   formatterProto.init = function(el, options){
     this.el = el;
     this.onfilled = options.onfilled || noop;
@@ -101,7 +101,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     return CardFormatter.luhn(number);
   }
 
-  CardFormatter.prototype = cardFormatterProto = new Formatter;
+  var cardFormatterProto = CardFormatter.prototype = new Formatter();
 
   cardFormatterProto.getType = function(cardNumber) {
     for (var type in cardPatterns) {
@@ -131,12 +131,13 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     var maxLen = CardFormatter.getMaxLen(type);
     var spacing = getCardSpacing(maxLen);
 
+    var caretPosition;
     if (spacing) {
       newValue = this.substitute(newValue, spacing);
       if (parts.val.length >= maxLen) {
         newValue = newValue.replace(/\ $/, '');
       }
-      var caretPosition = this.substitute(precursor, spacing).length;
+      caretPosition = this.substitute(precursor, spacing).length;
       if (caretPosition > newValue.length) {
         caretPosition = newValue.length;
       }
@@ -155,7 +156,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     this.maxLength = 7;
     this.init(el, options);
   }
-  ExpiryFormatter.prototype = expiryFormatterProto = new Formatter;
+  var expiryFormatterProto = ExpiryFormatter.prototype = new Formatter();
 
   expiryFormatterProto.substitute = function(value){
     return value.replace(/(.{2})/, '$1 / ').slice(0, this.maxLength);
@@ -186,7 +187,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   ContactFormatter = function(el) {
     this.init(el, emo);
   }
-  contactFormatterProto = ContactFormatter.prototype = new Formatter;
+  var contactFormatterProto = ContactFormatter.prototype = new Formatter();
   contactFormatterProto.substitute = function(value) {
     if (value.slice(0, 2) === '91') {
       return '91 ' + value.slice(2).replace(/(.{5})/, '$1 ');

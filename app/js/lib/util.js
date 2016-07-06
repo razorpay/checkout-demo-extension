@@ -309,7 +309,7 @@ function getSelection(el) {
     start: caretPosition,
     end: caretPosition + text.length
   };
-};
+}
 
 function setCaret(el, position) {
   if (isNumber(el.selectionStart)) {
@@ -321,7 +321,7 @@ function setCaret(el, position) {
     range.moveStart('character', position);
     return range.select();
   }
-};
+}
 
 function getParts(e) {
   var el;

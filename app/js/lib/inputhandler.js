@@ -16,7 +16,7 @@ var InputHandler;
       this
     )
   }
-  var iproto = InputHandler.prototype = new EvtHandler;
+  var iproto = InputHandler.prototype = new EvtHandler();
 
   iproto.focus = function(e) {
     $(e.target.parentNode).addClass('focused');

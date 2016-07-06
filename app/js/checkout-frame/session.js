@@ -515,16 +515,12 @@ Session.prototype = {
     this.on('click', '#otp-sec', this.secAction);
     this.on('click', '#add-funds-action', this.addFunds);
     this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
-    var enabledMethods = this.methods;
 
+    var enabledMethods = this.methods;
     if(enabledMethods.netbanking){
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
     }
-    if(!window.addEventListener){
-      this.on('click', '.radio-item', this.selectRadio);
-    }
-
     if(enabledMethods.card){
       this.on('blur', '#card_number', validateCardNumber);
       this.on('keyup', '#card_number', onSixDigits);
@@ -543,6 +539,7 @@ Session.prototype = {
 
     var el_expiry = gel('card_expiry');
     var el_cvv = gel('card_cvv');
+
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
     if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
@@ -801,19 +798,6 @@ Session.prototype = {
         }
       }
     )
-  },
-
-  // for ie8 only, which has problems with label[for]
-  selectRadio: function(e) {
-    var target = e.currentTarget;
-    var input = target.querySelector('input');
-    var ieActiveClass = 'ie-active';
-    $('.' + ieActiveClass).removeClass(ieActiveClass);
-    $(target).addClass(ieActiveClass);
-    input.checked = true;
-    if (this.tab === 'netbanking') {
-      this.selectBankRadio({target: input});
-    }
   },
 
   selectBankRadio: function(e){
