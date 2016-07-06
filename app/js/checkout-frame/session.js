@@ -268,6 +268,7 @@ function Session (options) {
   this.get = this.r.get;
   this.tab = this.screen = '';
   this.listeners = [];
+  this.bits = [];
 }
 
 Session.prototype = {
@@ -351,7 +352,6 @@ Session.prototype = {
 
     this.getEl();
     this.fillData();
-    this.setSmarty();
     this.setEMI();
     this.setModal();
     this.setFormatting();
@@ -385,10 +385,6 @@ Session.prototype = {
         )
       })
     }
-  },
-
-  setSmarty: function(){
-    this.smarty = new InputEvtHandler(this.el, $$('.input'));
   },
 
   renderCss: function(){
@@ -544,9 +540,18 @@ Session.prototype = {
   },
 
   setFormatting: function(){
-    var smarty = this.smarty;
-    var el_cvv = gel('card_cvv');
+    var inputHandler = new InputHandler(this.el, $$('.input'));
+    var bits = this.bits;
+    bits.push(inputHandler);
+
     var el_expiry = gel('card_expiry');
+    var el_cvv = gel('card_cvv');
+    // check if we're in webkit
+    // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
+    if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
+      el_cvv.type = 'tel';
+    }
+
     var cardOptions = {
       onidentify: function(type){
         var el = this.el;
@@ -564,7 +569,7 @@ Session.prototype = {
         }
         el_cvv.maxLength = cvvlen;
         el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-        smarty.input({target: el_cvv});
+        inputHandler.input({target: el_cvv});
       }
     }
 
@@ -574,7 +579,7 @@ Session.prototype = {
         invoke('focus', el_expiry, null, 0);
       }
       expiryOptions.onfilled = function(){
-        smarty.input({target: el_expiry});
+        inputHandler.input({target: el_expiry});
         if(!$(el_expiry.parentNode).hasClass('invalid')){
           invoke(
             'focus',
@@ -586,15 +591,13 @@ Session.prototype = {
       }
     }
 
-    new CardFormatter(gel('card_number'), cardOptions);
-    new ExpiryFormatter(el_expiry, expiryOptions);
-    var el_contact = gel('contact');
+    bits.push(new CardFormatter(gel('card_number'), cardOptions));
+    bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
 
-    // check if we're in webkit
-    // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-    if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
-      el_cvv.type = 'tel';
-    }
+    var email = gel('email');
+    bits.push(new ContactFormatter(gel('contact')), {
+      onfilled: bind(email.focus, email)
+    });
   },
 
   setScreen: function(screen){
@@ -1142,11 +1145,13 @@ Session.prototype = {
       this.clearRequest();
       this.isOpen = false;
       clearTimeout(fontTimeout);
+
       invokeEach(this.listeners);
+      invokeOnEach('on', this.bits);
       this.listeners = [];
+      this.bits = [];
+
       this.modal.destroy();
-      this.smarty.off();
-      this.card.unbind();
       $(this.el).remove();
 
       this.tab = this.screen = '';
@@ -1157,8 +1162,6 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.modal =
-      this.smarty =
-      this.card =
       this.emi =
       this.el =
       window.setPaymentID =

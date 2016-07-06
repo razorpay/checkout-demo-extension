@@ -180,6 +180,17 @@ function invokeEach(iteratee, thisArg){
   )
 }
 
+function invokeOnEach(func, map) {
+  each(
+    map,
+    function(key, val){
+      if (isString(func)) {
+        func = val[func];
+      }
+      func.call(val);
+    }
+  )
+}
 
 // possible values
 // {}, this, function

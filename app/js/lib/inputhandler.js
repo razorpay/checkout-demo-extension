@@ -1,6 +1,6 @@
-var InputEvtHandler;
+var InputHandler;
 (function(){
-  InputEvtHandler = function(parent, targets) {
+  InputHandler = function(parent, targets) {
     this.el = parent;
     this.targets = parent.querySelectorAll('.input');
     this.refresh();
@@ -16,7 +16,7 @@ var InputEvtHandler;
       this
     )
   }
-  var iproto = InputEvtHandler.prototype = new EvtHandler;
+  var iproto = InputHandler.prototype = new EvtHandler;
 
   iproto.focus = function(e) {
     $(e.target.parentNode).addClass('focused');
