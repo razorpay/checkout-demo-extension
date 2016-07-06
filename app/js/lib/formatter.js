@@ -1,4 +1,4 @@
-var Card, CardFormatter, ExpiryFormatter, ContactFormatter;
+var CardFormatter, ExpiryFormatter, ContactFormatter;
 (function(){
 
   var cardPatterns = {
@@ -59,22 +59,61 @@ var Card, CardFormatter, ExpiryFormatter, ContactFormatter;
     this.init(el, options);
   }
 
+  CardFormatter.luhn = function(num) {
+    var odd = true;
+    var sum = 0;
+    var digits = (num + '').split('').reverse();
+    for (var i = 0; i < digits.length; i++) {
+      var digit = digits[i];
+      digit = parseInt(digit, 10);
+      if ((odd = !odd)) {
+        digit *= 2;
+      }
+      if (digit > 9) {
+        digit -= 9;
+      }
+      sum += digit;
+    }
+    return sum % 10 === 0;
+  }
+  CardFormatter.getMaxLen = function(type) {
+    return cardLengths[type] || 16;
+  }
+  CardFormatter.validate = function(number, type) {
+    if (CardFormatter.getMaxLen(type) !== number.length) {
+      return;
+    }
+    return CardFormatter.luhn(number);
+  }
+
   CardFormatter.prototype = cardFormatterProto = new Formatter;
+
+  cardFormatterProto.getType = function(cardNumber) {
+    for (var type in cardPatterns) {
+      var pattern = cardPatterns[type];
+      if (pattern.test(cardNumber.replace(/\ /g, ''))) {
+        return type;
+      }
+    }
+    return '';
+  }
+
   cardFormatterProto.substitute = function(value, spacing) {
     return value.replace(spacing, '$1 ').slice(0, this.maxLength);
   }
+
   cardFormatterProto.handler = function(parts) {
     var el = this.el;
     parts.pre = stripNonDigit(parts.pre);
     parts.val = stripNonDigit(parts.val);
     var newValue = this.value = parts.val;
     var precursor = parts.pre;
-    var type = Card.getCardType(newValue);
+    var type = this.getType(newValue);
     if(type !== this.type){
       this.type = type;
       this.onidentify(type);
     }
-    var maxLen = Card.getLength(this.type);
+    var maxLen = CardFormatter.getMaxLen(type);
     var spacing = getCardSpacing(maxLen);
 
     if (spacing) {
@@ -146,54 +185,4 @@ var Card, CardFormatter, ExpiryFormatter, ContactFormatter;
       return e.preventDefault();
     }
   };
-
-  Card = {
-    getCardType: function(cardNumber) {
-      for (var type in cardPatterns) {
-        var pattern = cardPatterns[type];
-        if (pattern.test(cardNumber.replace(/\ /g, ''))) {
-          return type;
-        }
-      }
-      return '';
-    },
-
-    luhn: function(num) {
-      var odd = true;
-      var sum = 0;
-      var digits = (num + '').split('').reverse();
-      for (var i = 0; i < digits.length; i++) {
-        var digit = digits[i];
-        digit = parseInt(digit, 10);
-        if ((odd = !odd)) {
-          digit *= 2;
-        }
-        if (digit > 9) {
-          digit -= 9;
-        }
-        sum += digit;
-      }
-      return sum % 10 === 0;
-    },
-
-    getLength: function(type){
-      return cardLengths[type] || 16;
-    },
-
-    validateCardNumber: function(number, type) {
-      number = String(number).replace(/\ /g, '');
-      if (!/\D/.test(number)) {
-        if (!type) {
-          type = Card.getCardType(number);
-        }
-        if (type) {
-          if (Card.getLength(type) !== number.length) {
-            return;
-          }
-        }
-        return Card.luhn(number);
-      }
-      return false;
-    }
-  }
 })();

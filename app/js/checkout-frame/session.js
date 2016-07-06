@@ -15,13 +15,10 @@ function confirmClose(){
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
 
-function validateCardNumber(el){
-  if(el){
-    if(!(el instanceof Element)){
-      el = el.target;
-    }
-    $(el.parentNode)[Card.validateCardNumber(el.value, el.getAttribute('cardtype')) ? 'removeClass' : 'addClass']('invalid');
-  }
+function validateCardNumber(){
+  var el = gel('card_number');
+  var isValid = CardFormatter.validate(el.value, el.getAttribute('cardtype'));
+  $(el.parentNode).toggleClass('invalid', !isValid);
 }
 
 function fillData(container, returnObj) {
@@ -557,19 +554,16 @@ Session.prototype = {
         var el = this.el;
         var cvvlen = 3;
         if (!type) {
-          cvvlen = 4;
           type = 'unknown';
+          cvvlen = 4;
+        } else if (type === 'amex') {
+          cvvlen = 4;
         }
         // card icon element
-        el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
-        validateCardNumber(el);
-
-        if (type === 'amex') {
-          cvvlen = 4;
-        }
         el_cvv.maxLength = cvvlen;
         el_cvv.pattern = '[0-9]{'+cvvlen+'}';
         inputHandler.input({target: el_cvv});
+        el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
       }
     }
 
@@ -1022,7 +1016,7 @@ Session.prototype = {
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          validateCardNumber(gel('card_number'));
+          validateCardNumber();
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {
