@@ -31,21 +31,19 @@ label[for] {
 }
 
 .elem {
+  color: $input-unfocused;
   border-bottom: 1px solid $bc;
   position: relative;
 
+  &.focused {
+    color: $input-focused;
+  }
   &.invalid.mature:not(.focused) {
-    .input {
-      color: $danger;
-    }
+    color: $danger;
   }
 
   input {
     opacity: 0;
-  }
-
-  input:focus {
-    color: $input-focused;
   }
 
   i {
@@ -78,7 +76,7 @@ label[for] {
     transform: scale(0.86) translateY(-20px);
   }
 
-  input {
+  input, .input-prefix {
     opacity: 1;
   }
 }
@@ -95,7 +93,7 @@ label[for] {
   padding: $top 0 $bottom $left;
   margin: 0;
   position: relative;
-  color: $input-unfocused;
+  color: inherit;
 }
 
 .select {
@@ -253,29 +251,14 @@ button {
   -webkit-text-security: disc;
 }
 
-#contact {
-  padding-left: 8px;
-}
-
-#contact-prefix {
+.input-prefix {
   position: absolute;
   bottom: 8px;
   opacity: 0;
-  color: $input-unfocused;
   transition: 0.3s;
-}
-
-.elem.focused #contact-prefix,
-.elem.filled #contact-prefix {
-  opacity: 1;
-}
-
-.elem.invalid.mature #contact-prefix {
-  color: $danger;
-}
-
-#modal .elem.focused #contact-prefix {
-  color: $input-focused;
+  & + .input {
+    padding-left: 10px;
+  }
 }
 
 .customer-bank-details {

@@ -53,7 +53,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     var el = this.el;
     var caretPosition = (getSelection(el)).start;
     var value = el.value;
-    if (value.charAt(caretPosition - 1) === ' ') {
+    if (/ |-/.test(value.charAt(caretPosition - 1))) {
       e.preventDefault();
       el.value = value.slice(0, caretPosition - 2) + value.slice(caretPosition);
       setCaret(el, caretPosition - 2);
@@ -114,7 +114,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   }
 
   cardFormatterProto.substitute = function(value, spacing) {
-    return value.replace(spacing, '$1 ').slice(0, this.maxLength);
+    return value.replace(spacing, '$1 ').slice(0, this.maxLen);
   }
 
   cardFormatterProto.handler = function(parts) {
@@ -153,13 +153,13 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   }
 
   ExpiryFormatter = function(el, options){
-    this.maxLength = 7;
+    this.maxLen = 7;
     this.init(el, options);
   }
   var expiryFormatterProto = ExpiryFormatter.prototype = new Formatter();
 
   expiryFormatterProto.substitute = function(value){
-    return value.replace(/(.{2})/, '$1 / ').slice(0, this.maxLength);
+    return value.replace(/(.{2})/, '$1 / ').slice(0, this.maxLen);
   }
   expiryFormatterProto.handler = function(parts) {
     var el = this.el;
@@ -172,7 +172,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     }
     el.value = this.substitute(val);
     pre = this.substitute(pre);
-    if(pre.length === this.maxLength){
+    if(pre.length === this.maxLen){
       this.onfilled(el);
     }
     setCaret(el, pre.length);
@@ -185,18 +185,49 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   };
 
   ContactFormatter = function(el) {
+    var value = el.value;
+    var numValue = stripNonDigit(value);
+
+    // no country code specified, and 10 digit number
+    // prepending india (91) in that case
+    if (!/^(00|\+)/.test(value) && numValue.length === 10) {
+      value = '91' + numValue;
+    // else country code is assumed to be present
+    } else {
+      value = numValue;
+    }
+    el.value = value;
     this.init(el, emo);
+    el.focus();
   }
   var contactFormatterProto = ContactFormatter.prototype = new Formatter();
   contactFormatterProto.substitute = function(value) {
+    // Indian formatting
     if (value.slice(0, 2) === '91') {
-      return '91 ' + value.slice(2).replace(/(.{5})/, '$1 ');
+      return '91 ' + value.slice(2, 12).replace(/(.{5})/, '$1 ');
+    // US formatting
+    } else if (value[0] === '1') {
+      return '1 ' + value.slice(1, 11).replace(/(.{3})/, '$1 ').replace(/( .{3})/, '$1 ');
     }
-    return value.replace(/^(1|7|2[0,7]|3[0-4,6,9]|4[0,1,3-9]|5[1-8]|6[0-6]|8[1,2,4,6]|9[0-5,8])/, '$1 ');
+    return value.replace(/^(7|2[0,7]|3[0-4,6,9]|4[0,1,3-9]|5[1-8]|6[0-6]|8[1,2,4,6]|9[0-5,8]|.{3})/, '$1 ');
   }
   contactFormatterProto.handler = function(parts) {
     var el = this.el;
-    el.value = this.substitute(stripNonDigit(parts.val));
+    var val = stripNonDigit(parts.val).slice(0, 14);
+
+    // checking validity
+    var valid;
+
+    // if US/India number, local number length should be 10
+    var matches = val.match(/^(9?1)(.{10}$)?/);
+    if (matches) {
+      valid = matches[2];
+    } else {
+      valid = val.length > 8;
+    }
+    $(el.parentNode).toggleClass('invalid', !valid);
+
+    el.value = this.substitute(val);
     setCaret(el, this.substitute(stripNonDigit(parts.pre)).length);
   }
 })();
