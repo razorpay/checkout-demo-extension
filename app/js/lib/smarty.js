@@ -7,7 +7,11 @@ var InputEvtHandler;
     each(
       ['focus', 'blur', 'input'],
       function(i, prop) {
-        this.on(prop, this[prop], true);
+        this.on(prop, function(e){
+          if (/input/.test(e.target.className)) {
+            this[prop](e);
+          }
+        }, true);
       },
       this
     )
@@ -29,6 +33,10 @@ var InputEvtHandler;
     var value = el.value;
     var required = isString(el.getAttribute('required'));
     var pattern = el.getAttribute('pattern');
+
+    if (!(required || pattern)) {
+      return;
+    }
     var valid = true;
 
     if (required && !value) {

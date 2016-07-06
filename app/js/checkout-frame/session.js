@@ -24,13 +24,6 @@ function validateCardNumber(el){
   }
 }
 
-// switches cvv help text between 3-4 characters for amex and non-amex cards
-function formatCvvHelp(el_cvv, cvvlen){
-  el_cvv.maxLength = cvvlen;
-  el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-  $(el_cvv.parentNode)[el_cvv.value.length === cvvlen ? 'removeClass' : 'addClass']('invalid');
-}
-
 function fillData(container, returnObj) {
   each(
     $(container).find('input[name],select[name]'),
@@ -551,68 +544,51 @@ Session.prototype = {
   },
 
   setFormatting: function(){
-    if(!this.card){
-      this.card = new Card();
-    }
-    var card = this.card;
-    var el_number = gel('card_number');
-    var el_expiry = gel('card_expiry');
+    var smarty = this.smarty;
     var el_cvv = gel('card_cvv');
-    var el_contact = gel('contact');
-    var el_name = gel('card_name');
-    var onfilled;
-
-    if (shouldFocusNextField) {
-      var smarty = this.smarty;
-      onfilled = function(el) {
-        var next;
-        if (el === el_expiry) {
-          smarty.input({target: el_expiry});
-          if(!$(el.parentNode).hasClass('invalid')){
-            next = $('.elem-name.filled input')[0];
-            if (next) {
-              next = el_cvv;
-            } else {
-              next = el_name;
-            }
-          }
-        } else if (el === el_number) {
-          next = el_expiry;
-        }
-        if(next){
-          invoke('focus', next, null, 0);
-        }
-      }
-    }
-
-    card.numberField(el_number, {
-      onfilled: onfilled,
+    var el_expiry = gel('card_expiry');
+    var cardOptions = {
       onidentify: function(type){
         var el = this.el;
+        var cvvlen = 3;
         if (!type) {
+          cvvlen = 4;
           type = 'unknown';
         }
-
         // card icon element
-        var iconEl = el.parentNode.querySelector('.cardtype');
-
-        var oldType = iconEl.getAttribute('cardtype');
-        if(type === oldType){
-          return;
-        }
-
-        iconEl.setAttribute('cardtype', type);
+        el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
         validateCardNumber(el);
 
-        if(type === 'amex' || oldType === 'amex'){
-          formatCvvHelp(el_cvv, type === 'amex' ? 4 : 3)
+        if (type === 'amex') {
+          cvvlen = 4;
+        }
+        el_cvv.maxLength = cvvlen;
+        el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+        smarty.input({target: el_cvv});
+      }
+    }
+
+    var expiryOptions = {};
+    if (shouldFocusNextField) {
+      cardOptions.onfilled = function(){
+        invoke('focus', el_expiry, null, 0);
+      }
+      expiryOptions.onfilled = function(){
+        smarty.input({target: el_expiry});
+        if(!$(el_expiry.parentNode).hasClass('invalid')){
+          invoke(
+            'focus',
+            $('.elem-name').hasClass('filled') ? el_cvv : gel('card_name'),
+            null,
+            0
+          )
         }
       }
-    });
+    }
 
-    card.expiryField(el_expiry, {
-      onfilled: onfilled
-    })
+    new CardFormatter(gel('card_number'), cardOptions);
+    new ExpiryFormatter(el_expiry, expiryOptions);
+    var el_contact = gel('contact');
 
     // check if we're in webkit
     // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
