@@ -452,17 +452,17 @@ $outline: #ddd;
     right: 15px;
     position: absolute;
     border-width: 0 $arrow-height $arrow-height $arrow-height;
-    border-color: transparent transparent $outline transparent;
+    border-color: transparent transparent $outline;
     border-style: solid;
   }
 
   li:first-child::after {
     margin-top: 1.5px;
-    border-color: transparent transparent #fff transparent;
+    border-color: transparent transparent #fff;
   }
 
   li:first-child:hover::after {
-    border-color: transparent transparent #f5f5f5 transparent;
+    border-color: transparent transparent #f5f5f5;
   }
 }
 
