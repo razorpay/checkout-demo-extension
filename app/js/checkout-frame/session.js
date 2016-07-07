@@ -354,6 +354,9 @@ Session.prototype = {
   },
 
   render: function(){
+    if (this.isOpen) {
+      return;
+    }
     this.saveAndClose();
     this.isOpen = true;
 
