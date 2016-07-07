@@ -232,7 +232,6 @@ function showModal(session) {
         return local_customer;
       }
       local_customer.id_key = 'customer_id';
-      local_customer.local = true;
       if (saved_customer.tokens && saved_customer.tokens.count === 0) {
         delete saved_customer.tokens;
       }

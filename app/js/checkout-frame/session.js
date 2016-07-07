@@ -690,10 +690,6 @@ Session.prototype = {
     var self = this;
     var customer = self.customer;
 
-    if (self.get('customer_id')) {
-      return this.showCards();
-    }
-
     if (!self.get('remember_customer')) {
       return self.setScreen('card');
     }

@@ -16,7 +16,6 @@ Customer.prototype = {
   id_key: 'app_token',
   wants_skip: false,
   saved: false,
-  local: false,
 
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback){
