@@ -43,6 +43,12 @@ input[type=checkbox]:checked + .checkbox
 }
 {{?}}
 
+{{?!it('theme.header')}}
+.embedded #header{
+  display: none;
+}
+{{?}}
+
 .grid :checked+label {
   border-bottom: 2px solid {{=c}};
 }
