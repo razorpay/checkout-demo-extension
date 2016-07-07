@@ -240,7 +240,7 @@ function errorHandler(response){
 }
 
 function getPhone(){
-  return gel('contact').value;
+  return '<span class="phone-print">' + gel('contact').value + '</span>';
 }
 
 function setOtpText(text){
@@ -690,7 +690,11 @@ Session.prototype = {
     var self = this;
     var customer = self.customer;
 
-    if (self.get('customer_id') || !self.get('remember_customer')) {
+    if (self.get('customer_id')) {
+      return this.showCards();
+    }
+
+    if (!self.get('remember_customer')) {
       return self.setScreen('card');
     }
 
@@ -735,8 +739,11 @@ Session.prototype = {
 
   setSavedCard: function (e) {
     var input = e.target;
+    if (!input) {
+      return;
+    }
     if(input.type !== 'radio') {
-      return
+      return;
     }
 
     var $savedcard = $(input.parentNode);
@@ -1084,9 +1091,8 @@ Session.prototype = {
     var request = {
       fees: preferences.fee_bearer
     };
-
     // ask user to verify phone number if not logged in and wants to save card
-    if (('app_token' in data) && !data.app_token) {
+    if ((this.customer.id_key in data) && !data[this.customer.id_key]) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         this.commenceOTP(strings.otpsend);
