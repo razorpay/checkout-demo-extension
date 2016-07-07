@@ -167,11 +167,11 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   expiryFormatterProto.handler = function(parts) {
     var el = this.el;
     el.value = this.substitute(stripNonDigit(parts.val));
-    pre = this.substitute(stripNonDigit(parts.pre));
-    if (pre.length === 7) {
+    var preLength = this.substitute(stripNonDigit(parts.pre)).length;
+    if (preLength === 7) {
       this.onfilled(el);
     }
-    setCaret(el, pre.length);
+    setCaret(el, preLength);
   };
   expiryFormatterProto.backHandler = function(e) {
     if ((getSelection(this.el)).start === 5) {
