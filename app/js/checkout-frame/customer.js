@@ -1,6 +1,6 @@
 var customers = {};
 
-function getCustomer(contact) {
+var getCustomer = function(contact) {
   if (contact && !(contact in customers)) {
     customers[contact] = new Customer(contact);
   }
