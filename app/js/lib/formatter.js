@@ -51,9 +51,15 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   formatterProto.substitute = formatterProto.handler = noop;
   formatterProto.backHandler = function(e) {
     var el = this.el;
-    var caretPosition = (getSelection(el)).start;
+    var selection = getSelection(el);
+    var caretPosition = selection.start;
     var value = el.value;
-    if (/ |-/.test(value.charAt(caretPosition - 1))) {
+
+    if (selection.start !== selection.end) {
+      e.preventDefault();
+      el.value = value.slice(0, selection.start) + value.slice(selection.end);
+      setCaret(el, caretPosition);
+    } else if (/ |-/.test(value.charAt(caretPosition - 1))) {
       e.preventDefault();
       el.value = value.slice(0, caretPosition - 2) + value.slice(caretPosition);
       setCaret(el, caretPosition - 2);
