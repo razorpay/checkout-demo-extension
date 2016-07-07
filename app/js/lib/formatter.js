@@ -221,7 +221,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     var valid;
 
     // if North American/Indian number, local number length should be 10
-    var matches = val.match(/^(9?1)(.{10}$)?/);
+    var matches = val.match(/^(9?1)(.{10})?/);
     if (matches) {
       valid = matches[2];
     } else {
