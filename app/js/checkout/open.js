@@ -194,23 +194,10 @@ Razorpay.prototype.open = needBody(function() {
     return;
   }
 
-  var frame;
-
-  if (this.get('parent')) {
-    if (preloadedFrame) {
-      preloadedFrame.unbind();
-      $(preloadedFrame).remove();
-      preloadedFrame = null;
-    }
-    frame = new CheckoutFrame(this);
-  } else {
-    frame = getPreloadedFrame(this);
-  }
-
+  var frame = this.checkoutFrame = getPreloadedFrame(this);
   track(this, 'open', frame.loadTime);
-  this.checkoutFrame = frame;
 
-  if(!frame.el.contentWindow){
+  if (!frame.el.contentWindow) {
     frame.close();
     frame.afterClose();
     alert('This browser is not supported.\nPlease try payment in another browser.');
