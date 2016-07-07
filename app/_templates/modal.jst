@@ -8,9 +8,6 @@ var order = it.order || {};
 var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = it.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
-
-var contact = o('prefill.contact').replace(/^[0+]*|\D/g, '');
-
 var amount;
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));

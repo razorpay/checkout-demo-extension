@@ -547,15 +547,10 @@ Session.prototype = {
     }
 
     var cardOptions = {
-      onidentify: function(type){
+      onidentify: function(type) {
         var el = this.el;
-        var cvvlen = 3;
-        if (!type) {
-          type = 'unknown';
-          cvvlen = 4;
-        } else if (type === 'amex') {
-          cvvlen = 4;
-        }
+        var cvvlen = type && type !== 'amex' ? 3 : 4;
+
         // card icon element
         el_cvv.maxLength = cvvlen;
         el_cvv.pattern = '[0-9]{'+cvvlen+'}';
