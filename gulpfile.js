@@ -17,7 +17,6 @@ const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 const usemin = require('gulp-usemin');
 const del = require('del');
-const browserSync = require('browser-sync').create();
 const runSequence = require('run-sequence');
 const gulpif = require('gulp-if');
 const minimist = require('minimist');
@@ -30,20 +29,6 @@ const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
 
 const distDir = 'app/dist/v1/';
-let browserSyncOptions = {};
-
-let defaultBrowserSyncOptions = {
-  ui: false,
-  ghostMode: false,
-  open: false,
-  codeSync: false
-};
-
-try {
-  browserSyncOptions = require('./browsersync-config');
-} catch(e) {
-  // do nothing
-}
 
 function assetPath(path) {
   return `app/${path}`;
@@ -169,15 +154,12 @@ gulp.task('setTestENV', function() {
 });
 
 gulp.task('serve', ['setServeENV', 'build'], function() {
-  gulp.watch(paths.css, ['compileStyles']).on('change', browserSync.reload);
-  gulp.watch([paths.templates], ['compileTemplates']).on('change', browserSync.reload);
-  gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']).on('change', browserSync.reload);
-
-  browserSyncOptions = merge(defaultBrowserSyncOptions, browserSyncOptions);
-  browserSyncOptions.server = './app/dist';
-  browserSyncOptions.startPath = 'v1/index.html';
-  browserSync.init(browserSyncOptions);
+  gulp.watch(paths.css, ['compileStyles']);
+  gulp.watch([paths.templates], ['compileTemplates']);
+  gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']);
 });
+
+gulp.task('watch', ['serve']);
 
 gulp.task('default', ['build']);
 
