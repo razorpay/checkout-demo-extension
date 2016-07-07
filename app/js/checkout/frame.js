@@ -108,32 +108,6 @@ function makeCheckoutUrl(rzp){
   return url;
 }
 
-function makeCheckoutMessage(rzp){
-  var get = rzp.get;
-  var options = get();
-
-  var response = {
-    context: location.href,
-    options: options,
-    id: rzp.id
-  }
-
-  each(
-    rzp.modal.options,
-    function(i, option){
-      options['modal.' + i] = option;
-    }
-  )
-
-  if(options.parent){
-    response.embedded = true;
-    delete options.parent;
-  }
-
-  sanitizeImage(options);
-  return response;
-}
-
 function getEncodedMessage(rzp){
   return _btoa(stringify(makeCheckoutMessage(rzp)));
 }
@@ -208,34 +182,17 @@ CheckoutFrame.prototype = {
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     appendLoader($parent, parent);
-    var message;
 
-    if(rzp !== this.rzp){
-      message = makeCheckoutMessage(rzp);
-
-      if(!this.rzp && this.el.parentNode !== $parent[0]){
+    if (rzp !== this.rzp) {
+      if(this.el.parentNode !== $parent[0]) {
         $parent.append(this.el);
       }
-
       this.rzp = rzp;
     }
-    else {
-      message = {event: 'open'};
-    }
-    this.afterLoad(function(){
-      if(loader){
-        $(loader).remove();
-        // show it only once.
-        loader = true;
-      }
-      this.postMessage(message);
-    })
 
-    if(parent){
+    if (parent) {
       this.embedded = true;
-      this.afterClose = noop;
-    }
-    else {
+    } else {
       $parent.css('display', 'block').reflow();
       setBackdropColor(rzp.get('theme.backdrop_color'));
       if(/^rzp_t/.test(rzp.get('key'))){
@@ -243,6 +200,33 @@ CheckoutFrame.prototype = {
       }
       this.setMetaAndOverflow();
     }
+    this.onload();
+  },
+
+  makeMessage: function(){
+    var rzp = this.rzp;
+    var options = rzp.get();
+
+    var response = {
+      context: location.href,
+      options: options,
+      id: rzp.id
+    }
+
+    each(
+      rzp.modal.options,
+      function(i, option){
+        options['modal.' + i] = option;
+      }
+    )
+
+    if(this.embedded){
+      delete options.parent;
+      response.embedded = true;
+    }
+
+    sanitizeImage(options);
+    return response;
   },
 
   close: function(){
@@ -313,14 +297,6 @@ CheckoutFrame.prototype = {
     this.el.contentWindow.postMessage(response, '*');
   },
 
-  afterLoad: function(handler){
-    if(this.hasLoaded === true){
-      handler.call(this);
-    } else {
-      this.loadedCallback = handler;
-    }
-  },
-
   onmessage: function(e){
     var data;
     try{
@@ -350,9 +326,12 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    invoke('loadedCallback', this);
-    this.hasLoaded = true;
-    this.loadTime = new Date() - this.time;
+    if(loader){
+      $(loader).remove();
+      // show it only once.
+      loader = true;
+    }
+    this.postMessage(this.makeMessage());
   },
 
   onredirect: function(data){

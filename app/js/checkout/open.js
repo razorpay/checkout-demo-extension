@@ -195,7 +195,7 @@ Razorpay.prototype.open = needBody(function() {
   }
 
   var frame = this.checkoutFrame = getPreloadedFrame(this);
-  track(this, 'open', frame.loadTime);
+  track(this, 'open');
 
   if (!frame.el.contentWindow) {
     frame.close();
