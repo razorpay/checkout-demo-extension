@@ -37,19 +37,6 @@ describe 'restoreMeta', ->
 
     spy.restore()
 
-describe 'getEncodedMessage', ->
-  it 'should return base64 encoded message', ->
-    message = foo: 'bar'
-    spy = sinon.stub window, 'makeCheckoutMessage'
-      .returns message
-
-    expect getEncodedMessage 2
-      .to.be btoa JSON.stringify message
-    expect spy.getCall(0).args[0]
-      .to.be 2
-
-    spy.restore()
-
 describe 'normalize image option if', ->
   baseUrl = location.protocol + '//' + location.hostname + (if location.port then ':' + location.port else '')
   opts = image = result = null
@@ -100,7 +87,7 @@ describe 'makeCheckoutMessage should', ->
   rzp.modal = options: dismiss: 'hidden'
 
   it 'set options and modal.options to options.modal', ->
-    message = makeCheckoutMessage rzp
+    message = CheckoutFrame::makeMessage.call {rzp: rzp}
     expect rzp.get 'modal.dismiss'
       .to.be rzp.modal.options.dismiss
 
@@ -129,13 +116,13 @@ describe 'makeCheckoutMessage should', ->
       .to.be rzp.id
 
   it 'set redirect option', ->
-    message = makeCheckoutMessage rzp
+    message = CheckoutFrame::makeMessage.call {rzp: rzp}
     expect message.options.redirect
       .to.not.be.ok()
 
     rzp.get().redirect = true
 
-    message = makeCheckoutMessage rzp
+    message = CheckoutFrame::makeMessage.call {rzp: rzp}
     expect message.options.redirect
       .to.be true
 
@@ -204,19 +191,17 @@ describe 'checkoutFrame on receiveing message from frame contentWindow', ->
       delete cf.onevent
 
     it 'load', ->
-      cf.loadedCallback = jQuery.noop unless cf.loadedCallback
-      expect cf.hasLoaded
-        .to.not.be.ok()
+      spy = sinon.stub cf, 'postMessage'
+      spy2 = sinon.stub cf, 'makeMessage'
+      spy2.returns 2
 
-      spy = sinon.spy cf, 'loadedCallback'
       message 'load'
 
-      expect cf.hasLoaded
-        .to.be true
-
-      expect spy.callCount
+      expect spy2.callCount
         .to.be 1
 
+      expect spy.getCall(0).args[0]
+        .to.be 2
       expect spy.getCall(0).thisValue
         .to.be cf
 

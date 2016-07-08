@@ -108,10 +108,6 @@ function makeCheckoutUrl(rzp){
   return url;
 }
 
-function getEncodedMessage(rzp){
-  return _btoa(stringify(makeCheckoutMessage(rzp)));
-}
-
 function setBackdropColor(value){
   // setting unsupported value throws error in IE
   try{ frameBackdrop.style.background = value; }
