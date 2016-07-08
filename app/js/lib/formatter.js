@@ -36,7 +36,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     this.onfilled = options.onfilled || noop;
     this.on({
       keypress: this.format,
-      keydown: bind(function(e){
+      keydown: bind(function(e) {
         if (e.which === 8) {
           this.backHandler(e);
         }
@@ -54,7 +54,6 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     var selection = getSelection(el);
     var caretPosition = selection.start;
     var value = el.value;
-
     if (selection.start !== selection.end) {
       e.preventDefault();
       el.value = value.slice(0, selection.start) + value.slice(selection.end);
@@ -71,7 +70,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     this.handler(getParts(e));
   }
 
-  formatterProto.oninput = function(){
+  formatterProto.oninput = function(e){
     this.handler(getParts(this.el));
   }
 
@@ -216,12 +215,16 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   contactFormatterProto.handler = function(parts) {
     var el = this.el;
     var val = stripNonDigit(parts.val).slice(0, 14);
+    if (this.value === val) {
+      return;
+    }
+    this.value = val;
 
     // checking validity
     var valid;
 
     // if North American/Indian number, local number length should be 10
-    var matches = val.match(/^(9?1)(.{10})?/);
+    var matches = val.match(/^(9?1)(.{10})/);
     if (matches) {
       valid = matches[2];
     } else {
