@@ -152,11 +152,7 @@ function CheckoutFrame(rzp){
 CheckoutFrame.prototype = {
   getEl: function(rzp){
     if(!this.el){
-      // var key = rzp && rzp.get('key');
       var style = 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
-      if(rzp && rzp.get('parent')){
-        style += 'min-height: 530px;';
-      }
       this.el = $(document.createElement('iframe'))
         .attr({
           'class': 'razorpay-checkout-frame', // quotes needed for ie
@@ -187,6 +183,7 @@ CheckoutFrame.prototype = {
     }
 
     if (parent) {
+      this.el.style.minHeight = '530px';
       this.embedded = true;
     } else {
       $parent.css('display', 'block').reflow();
