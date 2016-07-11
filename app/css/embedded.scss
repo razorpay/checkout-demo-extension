@@ -30,4 +30,8 @@ body.embedded {
   #container::after {
     content: none;
   }
+
+  #topbar {
+    transition: none;
+  }
 }

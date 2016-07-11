@@ -38,7 +38,6 @@ function makePrefParams(rzp){
     // if (contact) {
     //   params.contact = contact;
     // }
-
     if (customer_id) {
       params.customer_id = customer_id;
     }

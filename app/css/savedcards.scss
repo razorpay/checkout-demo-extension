@@ -30,6 +30,11 @@ $cardpl: 46px;
   .saved-card {
     pointer-events: none;
   }
+  &:not(.saved-cards) {
+    #saved-cards-container {
+      margin-bottom: -8px;
+    }
+  }
 }
 
 #should-save-card {
@@ -82,7 +87,7 @@ $cardpl: 46px;
   display: none;
 }
 
-.saved-card:last-child .cardtype {
+.saved-card:last-child:not(:first-child) .cardtype {
   transform: translateX(-3px) translateY(-1px) rotateZ(-10deg);
 }
 
@@ -204,7 +209,7 @@ $cardpl: 46px;
   }
 
   #add-card-container {
-    height: 165px;
+    height: 169px;
   }
 }
 

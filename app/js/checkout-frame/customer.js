@@ -1,6 +1,6 @@
 var customers = {};
 
-function getCustomer(contact) {
+var getCustomer = function(contact) {
   if (contact && !(contact in customers)) {
     customers[contact] = new Customer(contact);
   }
@@ -16,7 +16,6 @@ Customer.prototype = {
   id_key: 'app_token',
   wants_skip: false,
   saved: false,
-  local: false,
 
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback){
@@ -40,14 +39,12 @@ Customer.prototype = {
     })
   },
 
-  submitOTP: function(otp, callback){
+  submitOTP: function(data, callback){
     var user = this;
+    data.contact = this.contact;
     $.post({
       url: makeAuthUrl(this.key, 'otp/verify'),
-      data: {
-        contact: this.contact,
-        otp: otp
-      },
+      data: data,
       callback: function(data){
         user.id = data.app_token;
         user.tokens = data.tokens;
