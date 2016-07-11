@@ -1142,8 +1142,8 @@ Session.prototype = {
       }, this));
 
     if(request.powerwallet) {
-      this.r.on('payment.otp.required', bind(function(){
-        this.showLoadError(strings.otpsend + getPhone());
+      this.r.on('payment.otp.required', bind(function(message){
+        this.showLoadError(message || strings.otpsend + getPhone());
         debounceAskOTP();
       }, this));
       this.r.on('payment.wallet.topup', function() {
