@@ -835,7 +835,7 @@ Session.prototype = {
     var data = {};
 
     fillData('#form-common', data);
-    data['contact'] = '+' + data['contact'].replace(/\ /g, '');
+    data['contact'] = data['contact'].replace(/\ /g, '');
 
     if (tab) {
       data.method = tab;
