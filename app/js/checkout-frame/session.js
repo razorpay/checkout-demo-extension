@@ -542,49 +542,51 @@ Session.prototype = {
     var bits = this.bits;
     bits.push(inputHandler);
 
-    var el_expiry = gel('card_expiry');
-    var el_cvv = gel('card_cvv');
+    if (this.methods.card) {
+      var el_expiry = gel('card_expiry');
+      var el_cvv = gel('card_cvv');
 
-    // check if we're in webkit
-    // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-    if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
-      el_cvv.type = 'tel';
-    }
-
-    var cardOptions = {
-      onidentify: function(type) {
-        var el = this.el;
-        var cvvlen = type && type !== 'amex' ? 3 : 4;
-
-        // card icon element
-        el_cvv.maxLength = cvvlen;
-        el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-        inputHandler.input({target: el_cvv});
-        el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
+      // check if we're in webkit
+      // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
+      if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
+        el_cvv.type = 'tel';
       }
-    }
 
-    var expiryOptions = {};
-    if (shouldFocusNextField) {
-      cardOptions.onfilled = function(){
-        invoke('focus', el_expiry, null, 0);
-      }
-      expiryOptions.onfilled = function(){
-        inputHandler.input({target: el_expiry});
-        if(!$(el_expiry.parentNode).hasClass('invalid')){
-          invoke(
-            'focus',
-            $('.elem-name').hasClass('filled') ? el_cvv : gel('card_name'),
-            null,
-            0
-          )
+      var cardOptions = {
+        onidentify: function(type) {
+          var el = this.el;
+          var cvvlen = type && type !== 'amex' ? 3 : 4;
+
+          // card icon element
+          el_cvv.maxLength = cvvlen;
+          el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+          inputHandler.input({target: el_cvv});
+          el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
         }
       }
-    }
 
-    this.card = new CardFormatter(gel('card_number'), cardOptions);
-    bits.push(this.card);
-    bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
+      var expiryOptions = {};
+      if (shouldFocusNextField) {
+        cardOptions.onfilled = function(){
+          invoke('focus', el_expiry, null, 0);
+        }
+        expiryOptions.onfilled = function(){
+          inputHandler.input({target: el_expiry});
+          if(!$(el_expiry.parentNode).hasClass('invalid')){
+            invoke(
+              'focus',
+              $('.elem-name').hasClass('filled') ? el_cvv : gel('card_name'),
+              null,
+              0
+            )
+          }
+        }
+      }
+
+      this.card = new CardFormatter(gel('card_number'), cardOptions);
+      bits.push(this.card);
+      bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
+    }
 
     var email = gel('email');
     bits.push(new ContactFormatter(gel('contact')), {
