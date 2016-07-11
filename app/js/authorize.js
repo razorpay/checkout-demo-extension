@@ -116,20 +116,21 @@ Payment.prototype = {
 
   checkRedirect: function(){
     var getOption = this.r.get;
-    if(getOption('redirect') && !this.powerwallet) {
+    if(getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
       if(callback_url){
         data.callback_url = callback_url;
       }
-
-      discreet.redirect({
-        url: makeRedirectUrl(this.fees),
-        content: data,
-        method: 'post'
-      });
-      return true;
+      if (!this.powerwallet) {
+        discreet.redirect({
+          url: makeRedirectUrl(this.fees),
+          content: data,
+          method: 'post'
+        });
+        return true;
+      }
     }
   },
 
@@ -423,7 +424,7 @@ function otpCallback(response){
   } else if (error && error.action === 'TOPUP') {
     return this.emit('wallet.topup', error.description);
   }
-  this.complete(response);
+  ajaxCallback.call(this, response);
 }
 
 var razorpayProto = Razorpay.prototype;
