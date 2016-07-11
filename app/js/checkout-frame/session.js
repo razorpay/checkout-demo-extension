@@ -1094,7 +1094,7 @@ Session.prototype = {
       fees: preferences.fee_bearer
     };
     // ask user to verify phone number if not logged in and wants to save card
-    if ((this.customer.id_key in data) && !data[this.customer.id_key]) {
+    if (this.customer && (this.customer.id_key in data) && !data[this.customer.id_key]) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         this.commenceOTP(strings.otpsend);
