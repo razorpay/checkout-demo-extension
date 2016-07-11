@@ -221,8 +221,8 @@ function errorHandler(response){
   $('#fd-hide').focus();
 }
 
-function getPhone(){
-  return '+' + gel('contact').value;
+function getPhone() {
+  return gel('contact').value;
 }
 
 function setOtpText(text){
@@ -509,6 +509,7 @@ Session.prototype = {
     this.on('click', '.payment-option', function(e){
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
+    this.on('keypress', '#contact', ensurePhone);
     this.on('submit', '#form', this.preSubmit);
     this.on('click', '#otp-action', this.back);
     this.on('click', '#otp-resend', this.resendOTP);
@@ -588,10 +589,10 @@ Session.prototype = {
       bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
     }
 
-    var email = gel('email');
-    bits.push(new ContactFormatter(gel('contact')), {
-      onfilled: bind(email.focus, email)
-    });
+    // var email = gel('email');
+    // bits.push(new ContactFormatter(gel('contact')), {
+    //   onfilled: bind(email.focus, email)
+    // });
     bits.push(new OtpFormatter(gel('otp')));
   },
 
@@ -759,9 +760,8 @@ Session.prototype = {
       this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
     }
 
-    $('#form-card').addClass('save-enabled');
     this.savedCardScreen = tokens;
-    this.toggleSavedCards(tokens);
+    this.toggleSavedCards(!!tokens);
     $('#form-card').toggleClass('has-cards', tokens);
   },
 
