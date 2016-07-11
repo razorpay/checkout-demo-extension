@@ -127,7 +127,7 @@ function invoke(handler, thisArg, param, timeout) {
     )
   }
   if (isString(handler)) {
-    handler = thisArg[handler];
+    handler = thisArg && thisArg[handler];
   }
   if (isFunction(handler)) {
     if (!thisArg) {

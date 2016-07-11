@@ -600,11 +600,13 @@ Session.prototype = {
     if (screen) {
       $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
-      makeVisible('#form-' + screen);
     } else {
       makeHidden('#topbar');
-      makeVisible('#form-common');
     }
+
+    var screenEl = '#form-' + (screen || 'common');
+    makeVisible(screenEl)
+    invoke('focus', qs(screenEl + ' input'));
     this.body.toggleClass('sub', screen);
   },
 
