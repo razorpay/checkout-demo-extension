@@ -39,14 +39,12 @@ Customer.prototype = {
     })
   },
 
-  submitOTP: function(otp, callback){
+  submitOTP: function(data, callback){
     var user = this;
+    data.contact = this.contact;
     $.post({
       url: makeAuthUrl(this.key, 'otp/verify'),
-      data: {
-        contact: this.contact,
-        otp: otp
-      },
+      data: data,
       callback: function(data){
         user.id = data.app_token;
         user.tokens = data.tokens;

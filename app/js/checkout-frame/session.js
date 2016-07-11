@@ -1023,7 +1023,10 @@ Session.prototype = {
         }
       };
     }
-    this.customer.submitOTP(otp, bind(callback, this));
+    this.customer.submitOTP({
+      otp: otp,
+      email: gel('email').value
+    }, bind(callback, this));
   },
 
   clearRequest: function(){
