@@ -256,5 +256,6 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     }
     this.value = val;
     el.value = val.replace(/(.)(?=.)/g, '$1 ');
+    toggleInvalid($(el.parentNode), val.length === 6);
   }
 })();
