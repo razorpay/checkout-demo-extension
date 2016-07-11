@@ -242,7 +242,7 @@ function askOTP(text){
   $('#otp').val('');
   $('#form-otp').removeClass('loading').removeClass('action');
   $('#body').addClass('sub');
-  setOtpText(text || 'An OTP has been sent to ' + getPhone());
+  setOtpText(text || 'An OTP has been sent to <br>' + getPhone());
 }
 
 function debounceAskOTP(){
