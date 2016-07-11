@@ -15,9 +15,9 @@ function Customer(contact) {
 
 Customer.prototype = {
   key: '',
-  id_key: 'app_token',
   wants_skip: false,
   saved: false,
+  logged: false,
 
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback){
@@ -48,7 +48,7 @@ Customer.prototype = {
       url: makeAuthUrl(this.key, 'otp/verify'),
       data: data,
       callback: function(data){
-        user.id = data.success;
+        user.logged = data.success;
         user.tokens = data.tokens;
         user.device_token = data.device_token;
 

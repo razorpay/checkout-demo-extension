@@ -525,6 +525,11 @@ Session.prototype = {
       this.on('blur', '#card_number', this.validateCard);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
+
+      // saved cards events
+      this.on('click', '#show-add-card', this.toggleSavedCards);
+      this.on('click', '#show-saved-cards', this.toggleSavedCards);
+      this.on('change', '#saved-cards-container', this.setSavedCard, true);
     }
 
     this.on('click', '#backdrop', this.hideErrorMessage);
@@ -653,8 +658,10 @@ Session.prototype = {
   showCardTab: function() {
     var self = this;
     var customer = self.customer;
+    var remember = self.get('remember_customer');
+    $('#form-card').toggleClass('save-enabled', remember);
 
-    if (!self.get('remember_customer')) {
+    if (!remember) {
       return self.setScreen('card');
     }
 
@@ -738,37 +745,21 @@ Session.prototype = {
 
   setSavedCards: function(){
     var customer = this.customer;
-    var tokens = customer && customer.tokens;
+    var tokens = customer && customer.tokens && customer.tokens.count;
     var cardTab = $('#form-card');
     if (tokens) {
-      if ($$('.saved-card').length !== tokens.length) {
-        $('#saved-cards-container').html(templates.savedcards(tokens));
+      if ($$('.saved-card').length !== customer.tokens.items.length) {
+        $('#saved-cards-container').html(templates.savedcards(customer.tokens));
       }
     }
 
-    // now that we've rendered the template, convert userTokens to boolean-y
-    tokens = isNonEmpty(tokens);
-    var saveScreen = this.savedCardScreen;
     if (tokens) {
       this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
     }
 
-    // runs one time only
-    if (saveScreen === undefined) {
-      $('#form-card').addClass('save-enabled');
-      // important to bind just once
-      saveScreen = this.savedCardScreen = tokens;
-      if (saveScreen) {
-        var self = this;
-        this.on('click', '#show-add-card', function(){ self.toggleSavedCards(false) });
-        this.on('click', '#show-saved-cards', function(){ self.toggleSavedCards(true) });
-      }
-    }
-
-    if (saveScreen) {
-      this.on('change', '#saved-cards-container', this.setSavedCard, true);
-    }
-    this.toggleSavedCards(saveScreen);
+    $('#form-card').addClass('save-enabled');
+    this.savedCardScreen = tokens;
+    this.toggleSavedCards(tokens);
     $('#form-card').toggleClass('has-cards', tokens);
   },
 
@@ -967,7 +958,7 @@ Session.prototype = {
       };
     }
     this.customer.submitOTP({
-      otp: otp,
+      otp: otp.replace(/\D/g, ''),
       email: gel('email').value
     }, bind(callback, this));
   },

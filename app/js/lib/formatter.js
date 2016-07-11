@@ -207,6 +207,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     el.value = value;
     this.init(el, emo);
   }
+
   var contactFormatterProto = ContactFormatter.prototype = new Formatter();
   contactFormatterProto.substitute = function(value) {
     // Indian formatting
