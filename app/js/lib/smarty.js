@@ -17,7 +17,7 @@
     this.parent = $(parent);
     this.options = options;
     this.listeners = [];
-    detectSupport();
+    // detectSupport();
     this.common_events();
     this.init();
   }
