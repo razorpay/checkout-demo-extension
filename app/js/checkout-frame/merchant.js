@@ -201,7 +201,7 @@ function setPaymentMethods(session){
 }
 
 function showModal(session) {
-  if(!preferences){
+  if (!preferences || preferences.customer && preferences.customer.customer_id !== session.get('customer_id')) {
     var data = makePrefParams(session);
     Razorpay.payment.getPrefs(data, function(response) {
       if(response.error){
