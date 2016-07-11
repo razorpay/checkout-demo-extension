@@ -15,12 +15,6 @@ function confirmClose(){
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
 
-function validateCardNumber(){
-  var el = gel('card_number');
-  var isValid = CardFormatter.validate(el.value, el.getAttribute('cardtype'));
-  toggleInvalid($(el.parentNode), isValid);
-}
-
 function fillData(container, returnObj) {
   each(
     $(container).find('input[name],select[name]'),
@@ -525,7 +519,7 @@ Session.prototype = {
       this.on('change', '#netb-banks', this.selectBankRadio, true);
     }
     if(enabledMethods.card){
-      this.on('blur', '#card_number', validateCardNumber);
+      this.on('blur', '#card_number', this.validateCard);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
     }
@@ -536,7 +530,7 @@ Session.prototype = {
   },
 
   setFormatting: function(){
-    var inputHandler = new InputHandler(this.el, $$('.input'));
+    var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
     var bits = this.bits;
     bits.push(inputHandler);
 
@@ -580,13 +574,18 @@ Session.prototype = {
       }
     }
 
-    bits.push(new CardFormatter(gel('card_number'), cardOptions));
+    this.card = new CardFormatter(gel('card_number'), cardOptions);
+    bits.push(this.card);
     bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
 
     var email = gel('email');
     bits.push(new ContactFormatter(gel('contact')), {
       onfilled: bind(email.focus, email)
     });
+  },
+
+  validateCard: function(){
+    toggleInvalid($(gel('card_number').parentNode), this.card.isValid());
   },
 
   setScreen: function(screen){
@@ -806,7 +805,7 @@ Session.prototype = {
   selectBankRadio: function(e){
     var select = gel('bank-select');
     select.value = e.target.value;
-    this.smarty.input({target: select});
+    this.ihandler.input({target: select});
   },
 
   checkInvalid: function(parent) {
@@ -996,7 +995,7 @@ Session.prototype = {
       return this.onOtpSubmit();
     }
 
-    this.smarty.refresh();
+    this.ihandler.refresh();
     var data = this.payload = this.getPayload();
     if (this.order) {
       data.method = 'netbanking';
@@ -1006,7 +1005,7 @@ Session.prototype = {
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          validateCardNumber();
+          this.validateCard();
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {
@@ -1147,6 +1146,7 @@ Session.prototype = {
       this.modal =
       this.emi =
       this.el =
+      this.card = this.ihandler =
       window.setPaymentID =
       window.onComplete = null;
     }

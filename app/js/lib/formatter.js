@@ -118,6 +118,10 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
     return '';
   }
 
+  cardFormatterProto.isValid = function(){
+    return CardFormatter.validate(this.value || '', this.type);
+  }
+
   cardFormatterProto.substitute = function(value, spacing) {
     return value.replace(spacing, '$1 ');
   }
@@ -125,8 +129,11 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
   cardFormatterProto.handler = function(parts) {
     var el = this.el;
     parts.pre = stripNonDigit(parts.pre);
-    parts.val = stripNonDigit(parts.val);
-    var newValue = this.value = parts.val;
+    var newValue = parts.val = stripNonDigit(parts.val);
+    if (newValue === this.value) {
+      return;
+    }
+    this.value = newValue;
     var precursor = parts.pre;
     var type = this.getType(newValue);
     if(type !== this.type){

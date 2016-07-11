@@ -8,7 +8,9 @@ var getCustomer = function(contact) {
 }
 
 function Customer(contact) {
-  this.contact = contact;
+  if (contact) {
+    this.contact = contact.replace(/\D/g, '');
+  }
 }
 
 Customer.prototype = {
@@ -46,7 +48,7 @@ Customer.prototype = {
       url: makeAuthUrl(this.key, 'otp/verify'),
       data: data,
       callback: function(data){
-        user.id = data.app_token;
+        user.id = data.success;
         user.tokens = data.tokens;
         user.device_token = data.device_token;
 
