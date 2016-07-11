@@ -240,7 +240,7 @@ function errorHandler(response){
 }
 
 function getPhone(){
-  return '<span class="phone-print">' + gel('contact').value + '</span>';
+  return gel('contact').value;
 }
 
 function setOtpText(text){
