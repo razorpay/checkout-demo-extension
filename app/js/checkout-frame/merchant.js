@@ -119,7 +119,7 @@ function notifyBridge(message){
   if( message && message.event ){
     var bridgeMethod = CheckoutBridge['on' + message.event];
     var data = message.data;
-    if (isString(data)) {
+    if (!isString(data)) {
       if (!data) {
         return invoke(bridgeMethod, CheckoutBridge);
       }
@@ -226,7 +226,15 @@ function showModal(session) {
     }
     options.remember_customer = true;
 
-    var customer = getCustomer(saved_customer.contact);
+    var customer;
+    if (saved_customer.customer_id) {
+      customer = new Customer('');
+      getCustomer = function(){
+        return customer;
+      }
+    }
+
+    customer = getCustomer(saved_customer.contact);
     customer.tokens = saved_customer.tokens;
     customer.logged = true;
     customer.customer_id = saved_customer.customer_id;
@@ -460,13 +468,6 @@ function initIframe(){
 
   if (qpmap.message) {
     parseMessage({data: atob(qpmap.message)});
-  }
-
-  if (qpmap.customer_id) {
-    var customer = new Customer('');
-    getCustomer = function(){
-      return customer;
-    }
   }
 
   applyUAClasses();

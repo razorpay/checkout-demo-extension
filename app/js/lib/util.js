@@ -237,7 +237,7 @@ var $$ =  bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
 
 function submitForm(action, data, method, target) {
-  if (isString(target)) {
+  if (!isString(target)) {
     if (method === 'get' && !isNonEmpty(data)) {
       if (!target) {
         target = window;
