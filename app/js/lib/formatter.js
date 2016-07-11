@@ -1,4 +1,4 @@
-var CardFormatter, ExpiryFormatter, ContactFormatter;
+var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
 (function(){
 
   var cardPatterns = {
@@ -241,5 +241,20 @@ var CardFormatter, ExpiryFormatter, ContactFormatter;
 
     el.value = this.substitute(val);
     setCaret(el, this.substitute(stripNonDigit(parts.pre)).length);
+  }
+
+  OtpFormatter = function(el){
+    el.value = stripNonDigit(el.value);
+    this.init(el, emo);
+  }
+  var otpProto = OtpFormatter.prototype = new Formatter();
+  otpProto.handler = function(parts){
+    var el = this.el;
+    var val = stripNonDigit(parts.val).slice(0, 6);
+    if (this.value === val) {
+      return;
+    }
+    this.value = val;
+    el.value = val.replace(/(.)(?=.)/g, '$1 ');
   }
 })();

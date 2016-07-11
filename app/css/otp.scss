@@ -38,6 +38,8 @@
   margin: 0 auto;
   width: 151px;
   position: relative;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=");
+  background-size: contain;
   &::after {
     content: '';
     background: #fff;
@@ -53,14 +55,10 @@
 #otp {
   font-size: 18px;
   line-height: 24px;
-  letter-spacing: 13px;
-  font-family: monospace;
-  text-indent: 7px;
-  padding: 11px 0;
+  padding: 11px 7px;
+  letter-spacing: 5px;
   border: none;
   outline: none;
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=");
-  background-size: contain;
 }
 
 #otp-sec-outer {

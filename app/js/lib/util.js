@@ -286,7 +286,11 @@ function preventDefault(e){
 /* Formatting */
 
 function getChar(e) {
-  return String.fromCharCode(e.which);
+  var code = String.fromCharCode(e.which);
+  if (code === '\r') {
+    code = '';
+  }
+  return code;
 }
 
 function getSelection(el) {
@@ -329,8 +333,10 @@ function getParts(e) {
   if (e instanceof Node) {
     el = e;
   } else {
-    newCharacter = getChar(e)
-    e.preventDefault();
+    newCharacter = getChar(e);
+    if (newCharacter) {
+      e.preventDefault();
+    }
     el = e.target;
   }
 

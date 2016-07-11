@@ -462,12 +462,6 @@ Session.prototype = {
     )
   },
 
-  onOtpEnter: function(e){
-    if (!ensureNumeric(e)) {
-      return;
-    }
-  },
-
   resendOTP: function() {
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'wallet') {
@@ -516,7 +510,6 @@ Session.prototype = {
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
     this.on('submit', '#form', this.preSubmit);
-    this.on('keypress', '#otp', this.onOtpEnter);
     this.on('click', '#otp-action', this.back);
     this.on('click', '#otp-resend', this.resendOTP);
     this.on('click', '#otp-sec', this.secAction);
@@ -592,6 +585,7 @@ Session.prototype = {
     bits.push(new ContactFormatter(gel('contact')), {
       onfilled: bind(email.focus, email)
     });
+    bits.push(new OtpFormatter(gel('otp')));
   },
 
   validateCard: function(){
