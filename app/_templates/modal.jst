@@ -129,10 +129,11 @@ var gridClass = gridClasses[i-1];
               </div>
 
               {{? method.card }}
-                <div class="tab-content showable screen pad" id="form-card">
+                <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
                   <div id="saved-cards-container"></div>
                   <div id="show-add-card" class="text-btn left-card">Add another card</div>
+                  <div class="pad">
                   <div id="add-card-container">
                     <div class="elem-wrap two-third"><div class="elem" id="elem-card">
                       <div class="cardtype"></div>
@@ -194,6 +195,7 @@ var gridClass = gridClasses[i-1];
                       </span>
                     </div>
                     <div class="clear"></div>
+                  </div>
                   </div>
                 </div>
               {{?}}

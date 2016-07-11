@@ -1,7 +1,7 @@
 @import "common";
 
-$cardh: 42px;
-$cardpl: 46px;
+$cardh: 46px;
+$cardpl: 70px;
 
 .left-card {
   padding: 0 20px 0 $cardpl;
@@ -11,13 +11,12 @@ $cardpl: 46px;
 #toggle-saved-cards {
   padding: 6px 0;
   cursor: pointer;
-  margin: 8px 0 2px;
+  margin: 0 0 2px;
   display: none;
 }
 
 #show-saved-cards {
   line-height: $cardh;
-  margin-top: 8px;
   display: none;
   cursor: pointer;
   position: absolute;
@@ -69,6 +68,7 @@ $cardpl: 46px;
     }
     :checked + .collapser {
       background: $bgd;
+      border-color: $bc;
       .saved-cvv {
         opacity: 1;
         pointer-events: auto;
@@ -106,13 +106,14 @@ $cardpl: 46px;
 }
 
 .collapser {
-  margin: 0 -10px;
-  padding-left: $cardpl + 10px;
+  border-bottom: 1px solid transparent;
   opacity: 0;
   display: block;
   transition: 0.2s;
   &::before {
-    content: 'XXXX XXXX XXXX ';
+    content: 'Card ending with';
+    color: #777;
+    margin-right: 4px;
   }
 }
 
@@ -121,7 +122,6 @@ $cardpl: 46px;
   position: relative;
   line-height: $cardh;
   min-height: $cardh;
-  margin-top: 8px;
 
   .card-delete {
     display: none;
@@ -134,7 +134,7 @@ $cardpl: 46px;
   .saved-cvv {
     opacity: 0;
     position: absolute;
-    right: 0;
+    right: 24px;
     top: 8px;
     pointer-events: none;
     transition: 0.3s;
@@ -167,9 +167,9 @@ $cardpl: 46px;
   border-radius: 2px;
   width: 32px;
   height: 21px;
-  margin-top: 10px;
+  margin-top: 12px;
   background: linear-gradient(to bottom, white, #eee);
-  left: 0;
+  left: 24px;
   text-align: center;
   line-height: 20px;
   font-size: 20px;

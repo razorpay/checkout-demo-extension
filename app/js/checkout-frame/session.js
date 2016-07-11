@@ -266,8 +266,18 @@ Session.prototype = {
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
+
   track: function(event, extra) {
     track(this.r, event, extra);
+  },
+
+  ajax: function(xhr){
+    if (this.xhr) {
+      this.xhr.abort();
+    }
+    if (xhr instanceof XMLHttpRequest) {
+      this.xhr = xhr;
+    }
   },
 
   getClasses: function(){
@@ -657,7 +667,7 @@ Session.prototype = {
     tab_titles.otp = tab_titles.card;
     $('#otp-sec').html('Skip saved cards');
 
-    if (!customer.id && !customer.wants_skip) {
+    if (!customer.logged && !customer.wants_skip) {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
@@ -939,9 +949,7 @@ Session.prototype = {
         this.submit();
       }
       callback = function(msg){
-        var id = this.customer.id;
-        if(id){
-          this.payload[this.customer.id_key] = id;
+        if(this.customer.logged){
           this.setScreen('card');
           if (isRedirect) {
             this.submit();
@@ -957,7 +965,7 @@ Session.prototype = {
     } else {
       var self = this;
       callback = function(msg){
-        if (self.customer.id) {
+        if (self.customer.logged) {
           self.showCardTab();
         } else {
           askOTP(msg);
@@ -1039,7 +1047,7 @@ Session.prototype = {
       fees: preferences.fee_bearer
     };
     // ask user to verify phone number if not logged in and wants to save card
-    if (this.customer && (this.customer.id_key in data) && !data[this.customer.id_key]) {
+    if (data.save && !this.customer.logged) {
       if (this.screen === 'card') {
         $('#otp-sec').html('Skip saving card');
         this.commenceOTP(strings.otpsend);
@@ -1106,14 +1114,10 @@ Session.prototype = {
     if(this.screen === 'card'){
       setEmiBank(data);
 
-      if (this.customer) {
-        var userId = this.customer.id;
-        var userIdKey = this.customer.id_key;
-
-        // set app_token if either new card or saved card (might be blank)
-        if (data.save || data.token) {
-          data[userIdKey] = userId;
-        }
+      var customer = this.customer;
+      // set app_token if either new card or saved card (might be blank)
+      if (customer.customer_id && (data.save || data.token)) {
+        data.customer_id = customer.customer_id;
       }
     }
 

@@ -224,26 +224,12 @@ function showModal(session) {
     if (!options['prefill.email'] && saved_customer.email) {
       options['prefill.email'] = saved_customer.email;
     }
-
-    if (saved_customer.customer_id) {
-      options.remember_customer = true;
-      var local_customer = new Customer('');
-      getCustomer = function(){
-        return local_customer;
-      }
-      local_customer.id_key = 'customer_id';
-      if (saved_customer.tokens && saved_customer.tokens.count === 0) {
-        delete saved_customer.tokens;
-      }
-    } else {
-      delete session.r.get().customer_id;
-    }
+    options.remember_customer = true;
 
     var customer = getCustomer(saved_customer.contact);
-    if (customer) {
-      customer.id = saved_customer[customer.id_key];
-      customer.tokens = saved_customer.tokens;
-    }
+    customer.tokens = saved_customer.tokens;
+    customer.logged = true;
+    customer.customer_id = saved_customer.customer_id;
   }
 
   Customer.prototype.key = session.get('key');
@@ -463,17 +449,24 @@ function applyUAClasses(){
 function initIframe(){
   $(window).on('message', parseMessage);
 
-  if(location.search){
+  if (location.search) {
     setQueryParams(location.search);
   }
 
-  if(CheckoutBridge){
+  if (CheckoutBridge) {
     delete trackingProps.context;
     trackingProps.platform = qpmap.platform || 'app';
   }
 
-  if(qpmap.message){
+  if (qpmap.message) {
     parseMessage({data: atob(qpmap.message)});
+  }
+
+  if (qpmap.customer_id) {
+    var customer = new Customer('');
+    getCustomer = function(){
+      return customer;
+    }
   }
 
   applyUAClasses();
