@@ -41,14 +41,13 @@
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=");
   background-size: contain;
   &::after {
-    content: '';
-    background: #fff;
-    height: 100%;
-    width: 10px;
-    right: -5px;
-    top: 0;
-    display: block;
     position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background: #fff;
+    width: 14px;
+    content: '';
   }
 }
 
