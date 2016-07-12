@@ -30,9 +30,6 @@ function needBody(func){
   }
 }
 
-var ua = navigator.userAgent;
-var shouldFixFixed = /iPhone|Android 2\./.test(ua);
-
 var RazorpayConfig = {
   api: 'https://api.razorpay.com/',
   version: 'v1/',

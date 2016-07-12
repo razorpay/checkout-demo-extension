@@ -1,3 +1,8 @@
+// iphone/ipad restrict non user initiated focus on input fields
+var ua = navigator.userAgent;
+var shouldFixFixed = /iPhone|Android 2\./.test(ua);
+var shouldFocusNextField = !/iPhone|iPad/.test(navigator.userAgent);
+
 var now = Date.now || function() {
   return new Date().getTime();
 };

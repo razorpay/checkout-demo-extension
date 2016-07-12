@@ -1,9 +1,6 @@
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 
-// iphone/ipad restrict non user initiated focus on input fields
-var shouldFocusNextField = !/iPhone|iPad/.test(ua);
-
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -567,15 +564,15 @@ Session.prototype = {
           el_cvv.pattern = '[0-9]{'+cvvlen+'}';
           inputHandler.input({target: el_cvv});
           el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
+        },
+
+        onfilled: function(){
+          invoke('focus', el_expiry, null, 0);
         }
       }
 
-      var expiryOptions = {};
-      if (shouldFocusNextField) {
-        cardOptions.onfilled = function(){
-          invoke('focus', el_expiry, null, 0);
-        }
-        expiryOptions.onfilled = function(){
+      var expiryOptions = {
+        onfilled: function(){
           inputHandler.input({target: el_expiry});
           if(!$(el_expiry.parentNode).hasClass('invalid')){
             invoke(
