@@ -968,7 +968,7 @@ Session.prototype = {
       };
     }
     this.customer.submitOTP({
-      otp: otp.replace(/\D/g, ''),
+      otp: otp,
       email: gel('email').value
     }, bind(callback, this));
   },

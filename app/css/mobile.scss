@@ -124,6 +124,6 @@ $max-height: 659px;
   }
 }
 
-@media (max-height: 799px) {
+@media (max-height: 767px) {
   @include hidePowered;
 }

@@ -199,9 +199,6 @@ CheckoutFrame.prototype = {
 
   makeMessage: function(){
     var rzp = this.rzp;
-    if (!rzp) {
-      return;
-    }
     var options = rzp.get();
 
     var response = {
@@ -328,7 +325,9 @@ CheckoutFrame.prototype = {
       // show it only once.
       loader = true;
     }
-    this.postMessage(this.makeMessage());
+    if (this.rzp) {
+      this.postMessage(this.makeMessage());
+    }
   },
 
   onredirect: function(data){
