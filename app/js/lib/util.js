@@ -342,6 +342,7 @@ function getParts(e) {
       val: value
     }
   } else {
+    e.preventDefault();
     var pre = value.slice(0, selection.start) + newCharacter;
     return {
       pre: pre,

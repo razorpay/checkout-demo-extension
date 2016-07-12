@@ -222,7 +222,8 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
 
   contactFormatterProto.handler = function(parts) {
     var el = this.el;
-    var val = stripNonDigit(parts.val).slice(0, 14);
+    var val = parts.val.slice(0, 1).replace(/[^+\d]/, '') + stripNonDigit(parts.val.slice(1, 15));
+
     if (this.value === val) {
       return;
     }
@@ -240,8 +241,9 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     }
     toggleInvalid($(el.parentNode), valid);
 
-    // el.value = this.substitute(val);
-    setCaret(el, this.substitute(stripNonDigit(parts.pre)).length);
+    el.value = val;
+    var pre = parts.pre.slice(0, 1).replace(/[^+\d]/, '') + stripNonDigit(parts.pre.slice(1, 15));
+    setCaret(el, pre.length);
   }
 
   OtpFormatter = function(el){
