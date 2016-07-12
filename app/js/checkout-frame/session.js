@@ -188,7 +188,6 @@ function errorHandler(response){
   }
   var error = response.error;
   var message = error.description;
-  this.shake();
   this.clearRequest();
 
   this.track('error', response);
@@ -214,11 +213,14 @@ function errorHandler(response){
       if(help){
         $(help).html(message);
       }
+      this.shake();
       return hideOverlayMessage();
     }
   }
 
-  this.showLoadError(message || 'There was an error in handling your request', true);
+  if (this.tab || message !== 'Payment cancelled') {
+    this.showLoadError(message || 'There was an error in handling your request', true);
+  }
   $('#fd-hide').focus();
 }
 
