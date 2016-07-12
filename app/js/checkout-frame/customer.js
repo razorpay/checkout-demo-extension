@@ -46,7 +46,7 @@ Customer.prototype = {
       url: makeAuthUrl(this.key, 'otp/verify'),
       data: data,
       callback: function(data){
-        user.id = data.app_token;
+        user.id = data.success;
         user.tokens = data.tokens;
         user.device_token = data.device_token;
 

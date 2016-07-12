@@ -1105,6 +1105,7 @@ Session.prototype = {
         request.paused = true;
       }
     }
+    delete data.app_token;
 
     Razorpay.sendMessage({
       event: 'submit',
