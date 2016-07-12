@@ -45,10 +45,7 @@ $bodyhmobile: 317px + $footerh;
 
 @mixin hidePowered {
   #powered-by {
-    position: absolute;
-    top: 40px;
     visibility: hidden !important;
-    bottom: auto;
     z-index: -1;
     pointer-events: none;
   }
