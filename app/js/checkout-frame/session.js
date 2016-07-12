@@ -245,8 +245,8 @@ function askOTP(text){
   setOtpText(text || 'An OTP has been sent to <br>' + getPhone());
 }
 
-function debounceAskOTP(){
-  debounce(askOTP, 750)();
+function debounceAskOTP(msg){
+  debounce(askOTP, 750)(msg);
 }
 
 // this === Session
@@ -1088,10 +1088,8 @@ Session.prototype = {
       .on('payment.error', bind(errorHandler, this));
 
     if(request.powerwallet) {
-      this.r.on('payment.otp.required', bind(function(message){
-        this.showLoadError(message || strings.otpsend + getPhone());
-        debounceAskOTP();
-      }, this));
+      this.showLoadError(strings.otpsend + getPhone());
+      this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on('payment.wallet.topup', function() {
         $('#form-otp').removeClass('loading');
         $('#add-funds').addClass('show');
