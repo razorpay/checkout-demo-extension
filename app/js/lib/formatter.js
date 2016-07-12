@@ -194,8 +194,8 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
   };
 
   ContactFormatter = function(el) {
-    var value = el.value;
-    var numValue = stripNonDigit(value);
+    // var value = el.value;
+    // var numValue = stripNonDigit(value);
 
     // no country code specified, and 10 digit number
     // prepending india (91) in that case
@@ -205,7 +205,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     // } else {
     //   value = numValue;
     // }
-    el.value = numValue;
+    // el.value = numValue;
     this.init(el, emo);
   }
 
@@ -221,30 +221,21 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     return value.replace(/^(7|2[0,7]|3[0-4,6,9]|4[0,1,3-9]|5[1-8]|6[0-6]|8[1,2,4,6]|9[0-5,8]|.{3})/, '$1 ');
   }
 
+  contactFormatterProto.filter = function(val){
+    return val.slice(0, 1).replace(/[^+\d]/, '') + stripNonDigit(val.slice(1)).slice(0, 14);
+  }
+
   contactFormatterProto.handler = function(parts) {
     var el = this.el;
-    var val = parts.val.slice(0, 1).replace(/[^+\d]/, '') + stripNonDigit(parts.val.slice(1, 15));
+    var val = this.filter(parts.val);
 
     if (this.value === val) {
       return;
     }
-    this.value = val;
 
-    // checking validity
-    var valid;
-
-    // if North American/Indian number, local number length should be 10
-    var matches = val.match(/^(9?1)(.{10})/);
-    if (matches) {
-      valid = matches[2];
-    } else {
-      valid = val.length > 8;
-    }
-    toggleInvalid($(el.parentNode), valid);
-
-    el.value = val;
-    var pre = parts.pre.slice(0, 1).replace(/[^+\d]/, '') + stripNonDigit(parts.pre.slice(1, 15));
-    setCaret(el, pre.length);
+    this.value = el.value = val;
+    toggleInvalid($(el.parentNode), val.length > 8);
+    setCaret(el, this.filter(parts.pre).length);
   }
 
   OtpFormatter = function(el){
