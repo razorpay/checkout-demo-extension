@@ -2,12 +2,12 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
 (function(){
 
   var cardPatterns = {
+    visa: /^4/,
     maestro16: /^50(81(25|26|59|92)|8227)|4(437|681)/,
-    discover: /^6(4[4-9]|5|011(0|9|[234]|7(4|[789])|8[6-9]))/,
     maestro: /^(6|5(0|[6-9]))/,
     mastercard: /^(5[1-5]|2[2-7])/,
-    visa: /^4/,
     amex: /^3[47]/,
+    discover: /^6(4[4-9]|5|011(0|9|[234]|7(4|[789])|8[6-9]))/,
     diners: /^3[0689]/,
     jcb: /^35/
   };
@@ -240,7 +240,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     }
     toggleInvalid($(el.parentNode), valid);
 
-    el.value = this.substitute(val);
+    // el.value = this.substitute(val);
     setCaret(el, this.substitute(stripNonDigit(parts.pre)).length);
   }
 

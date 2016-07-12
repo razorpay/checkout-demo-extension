@@ -589,10 +589,10 @@ Session.prototype = {
       bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
     }
 
-    // var email = gel('email');
-    // bits.push(new ContactFormatter(gel('contact')), {
-    //   onfilled: bind(email.focus, email)
-    // });
+    var email = gel('email');
+    bits.push(new ContactFormatter(gel('contact')), {
+      onfilled: bind(email.focus, email)
+    });
     bits.push(new OtpFormatter(gel('otp')));
   },
 
@@ -638,9 +638,11 @@ Session.prototype = {
         return;
       }
     }
-
     if (tab) {
       var contact = getPhone();
+      if (!contact) {
+        return;
+      }
       this.customer = getCustomer(contact);
       $('#user').html(contact);
     } else {
@@ -822,7 +824,7 @@ Session.prototype = {
   },
 
   getActiveForm: function(){
-    var form = this.tab;
+    var form = this.tab || 'common';
     if (form === 'card') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';

@@ -1,7 +1,7 @@
 var customers = {};
 
 var getCustomer = function(contact) {
-  if (contact && !(contact in customers)) {
+  if (!(contact in customers)) {
     customers[contact] = new Customer(contact);
   }
   return customers[contact];

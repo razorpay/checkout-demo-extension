@@ -286,11 +286,7 @@ function preventDefault(e){
 /* Formatting */
 
 function getChar(e) {
-  var code = String.fromCharCode(e.which);
-  if (code === '\r') {
-    code = '';
-  }
-  return code;
+  return String.fromCharCode(e.which).replace(/[^\x20-\x7E]/, '');
 }
 
 function getSelection(el) {
@@ -334,20 +330,24 @@ function getParts(e) {
     el = e;
   } else {
     newCharacter = getChar(e);
-    if (newCharacter) {
-      e.preventDefault();
-    }
     el = e.target;
   }
 
   var selection = getSelection(el);
   var value = el.value
 
-  var pre = value.slice(0, selection.start) + newCharacter;
-  return {
-    pre: pre,
-    val: pre + value.slice(selection.end)
-  };
+  if (!newCharacter) {
+    return {
+      pre: value.slice(0, selection.start),
+      val: value
+    }
+  } else {
+    var pre = value.slice(0, selection.start) + newCharacter;
+    return {
+      pre: pre,
+      val: pre + value.slice(selection.end)
+    }
+  }
 }
 
 function stripNonDigit(str) {
