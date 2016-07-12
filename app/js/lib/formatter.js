@@ -128,40 +128,41 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
 
   cardFormatterProto.handler = function(parts) {
     var el = this.el;
-    parts.pre = stripNonDigit(parts.pre);
-    var newValue = parts.val = stripNonDigit(parts.val);
-    if (newValue === this.value) {
+    var pre = stripNonDigit(parts.pre);
+    var val = stripNonDigit(parts.val);
+    var type = this.getType(val);
+    var maxLen = CardFormatter.getMaxLen(type);
+    val = val.slice(0, maxLen);
+    pre = pre.slice(0, maxLen);
+
+    if (val === this.value) {
       return;
     }
-    this.value = newValue;
-    var precursor = parts.pre;
-    var type = this.getType(newValue);
+    this.value = val;
+
     if(type !== this.type){
       this.type = type;
       this.onidentify(type);
     }
-    var maxLen = CardFormatter.getMaxLen(type);
+
     var spacing = getCardSpacing(maxLen);
-
-    var caretPosition;
+    var caretPosition, newVal;
     if (spacing) {
-      newValue = this.substitute(newValue, spacing);
-      if (parts.val.length >= maxLen) {
-        newValue = newValue.replace(/\ $/, '');
+      newVal = this.substitute(val, spacing);
+      if (val.length >= maxLen) {
+        newVal = newVal.replace(/\ $/, '');
       }
-      caretPosition = this.substitute(precursor, spacing).length;
-      if (caretPosition > newValue.length) {
-        caretPosition = newValue.length;
+      val = newVal;
+      if (pre.length === maxLen) {
+        invoke('onfilled', this, el, 0);
       }
+      caretPosition = this.substitute(pre, spacing).length;
     } else {
-      caretPosition = precursor.length;
+      caretPosition = pre.length;
     }
 
-    el.value = newValue;
+    el.value = val;
     setCaret(el, caretPosition);
-    if (precursor.length === maxLen) {
-      this.onfilled(el);
-    }
   }
 
   ExpiryFormatter = function(el, options){
@@ -204,7 +205,7 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
     } else {
       value = numValue;
     }
-    el.value = value;
+    el.value = numValue;
     this.init(el, emo);
   }
 
