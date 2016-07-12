@@ -213,6 +213,9 @@ function errorHandler(response){
       if(help){
         $(help).html(message);
       }
+      if (err_field === 'contact' || err_field === 'email') {
+        this.switchTab();
+      }
       this.shake();
       return hideOverlayMessage();
     }
