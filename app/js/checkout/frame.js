@@ -199,6 +199,9 @@ CheckoutFrame.prototype = {
 
   makeMessage: function(){
     var rzp = this.rzp;
+    if (!rzp) {
+      return;
+    }
     var options = rzp.get();
 
     var response = {
