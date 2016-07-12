@@ -623,7 +623,7 @@ Session.prototype = {
 
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl)
-    invoke('focus', qs(screenEl + ' input'));
+    invoke('focus', qs(screenEl + ' .invalid input'));
     this.body.toggleClass('sub', screen);
   },
 

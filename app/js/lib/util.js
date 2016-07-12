@@ -291,6 +291,9 @@ function preventDefault(e){
 /* Formatting */
 
 function getChar(e) {
+  if (e.ctrlKey) {
+    return '';
+  }
   return String.fromCharCode(e.which).replace(/[^\x20-\x7E]/, '');
 }
 
