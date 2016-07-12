@@ -4,6 +4,10 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 // iphone/ipad restrict non user initiated focus on input fields
 var shouldFocusNextField = !/iPhone|iPad/.test(ua);
 
+// .shown has display: none from iOS ad-blocker
+// using दृश्य, which will never be seen by tim cook
+var shownClass = 'drishy';
+
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed'
@@ -117,7 +121,7 @@ function noCvvToggle(e){
 
 function toggleNoCvv(show){
   // Display or hide the nocvv checkbox
-  $('#nocvv-check').toggleClass('shown', show);
+  $('#nocvv-check').toggleClass(shownClass, show);
   gel('nocvv').disabled = !show;
 }
 
@@ -125,13 +129,13 @@ function makeVisible(subject){
   $(subject)
     .css('display', 'block')
     .reflow()
-    .addClass('shown');
+    .addClass(shownClass);
 }
 
 function makeHidden(subject){
   subject = $(subject);
   if(subject[0]){
-    subject.removeClass('shown');
+    subject.removeClass(shownClass);
     invoke('hide', subject, null, 200);
   }
 }
@@ -156,7 +160,7 @@ function hideOverlay($with){
 
 function hideEmi(){
   var emic = $('#emi-wrap');
-  var wasShown = emic.hasClass('shown');
+  var wasShown = emic.hasClass(shownClass);
   if(wasShown){
     hideOverlay(emic);
   }
@@ -170,7 +174,7 @@ function hideOverlayMessage(){
 }
 
 function overlayVisible(){
-  return $('#overlay').hasClass('shown');
+  return $('#overlay').hasClass(shownClass);
 }
 
 // this === Session
@@ -606,7 +610,7 @@ Session.prototype = {
     }
     this.screen = screen;
     $('#body').attr('screen', screen);
-    makeHidden('.screen.shown');
+    makeHidden('.screen.' + shownClass);
 
     if (screen) {
       $('#tab-title').html(tab_titles[screen]);

@@ -55,7 +55,7 @@ $gridStagger: 0.05s;
   backface-visibility: none;
   width: 100%;
 
-  &.shown {
+  &.drishy {
     opacity: 1;
     display: block;
   }
@@ -65,7 +65,7 @@ $gridStagger: 0.05s;
   opacity: 0;
   transform: translateY(-$topbarh);
 
-  &.shown {
+  &.drishy {
     opacity: 1;
     transform: translateY(0);
     transition: $first transform ease-out $first, $first opacity ease-out $first, 0.1s color;
@@ -88,7 +88,7 @@ $gridStagger: 0.05s;
   animation: $springTime spring;
 }
 
-.tab-content.shown {
+.tab-content.drishy {
   transition-delay: $second;
 }
 
@@ -102,7 +102,7 @@ $gridStagger: 0.05s;
         transition: $first;
       }
     }
-    #form-card.shown .pad {
+    #form-card.drishy .pad {
       animation: $springTime spring;
       animation-delay: $second;
     }
@@ -115,7 +115,7 @@ $gridStagger: 0.05s;
   transform: scale(0);
 }
 
-.tab-content.shown .item-inner {
+.tab-content.drishy .item-inner {
   transform: scale(1);
 }
 

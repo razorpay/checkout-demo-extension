@@ -86,7 +86,7 @@ $max-height: 659px;
     overflow: hidden;
   }
 
-  &.shown #modal {
+  &.drishy #modal {
     transition: 0.3s ease-out all;
   }
 
@@ -99,7 +99,7 @@ $max-height: 659px;
     opacity: 0;
   }
 
-  .tab-content.shown .item-inner {
+  .tab-content.drishy .item-inner {
     opacity: 1;
   }
 

@@ -49,7 +49,7 @@
     show: function() {
       if(this.isShown) { return }
       this.isShown = true;
-      this.container.reflow().addClass('shown');
+      this.container.reflow().addClass('drishy');
       clearTimeout();
       timeout = setTimeout(this.shown, this.animationDuration);
       this.container.focus();
@@ -63,7 +63,7 @@
       if(!this.isShown) { return }
       this.isShown = false;
 
-      this.container.removeClass('shown');
+      this.container.removeClass('drishy');
       
       clearTimeout();
       var self = this;
