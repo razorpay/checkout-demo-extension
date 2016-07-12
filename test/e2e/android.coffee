@@ -53,7 +53,7 @@ describe 'page load', ->
       expect CheckoutBridge.onrender.callCount
         .to.be 1
       expect document.querySelector('#error-message').className
-        .to.contain 'shown'
+        .to.contain 'drishy'
 
       expect document.querySelector('#fd-t').innerHTML
         .to.be 'yolo'

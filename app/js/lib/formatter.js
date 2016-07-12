@@ -199,12 +199,12 @@ var CardFormatter, ExpiryFormatter, ContactFormatter, OtpFormatter;
 
     // no country code specified, and 10 digit number
     // prepending india (91) in that case
-    if (!/^(00|\+)/.test(value) && numValue.length === 10) {
-      value = '91' + numValue;
+    // if (!/^(00|\+)/.test(value) && numValue.length === 10) {
+    //   value = '91' + numValue;
     // else country code is assumed to be present
-    } else {
-      value = numValue;
-    }
+    // } else {
+    //   value = numValue;
+    // }
     el.value = numValue;
     this.init(el, emo);
   }
