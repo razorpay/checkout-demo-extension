@@ -929,7 +929,7 @@ Session.prototype = {
       return;
     }
     this.showLoadError('Verifying OTP...');
-    var otp = gel('otp').value;
+    var otp = gel('otp').value.replace(/\D/g, '');
 
     if(this.tab === 'wallet'){
       return this.r.submitOTP(otp);
