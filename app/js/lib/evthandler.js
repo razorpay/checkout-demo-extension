@@ -16,7 +16,7 @@ var EvtHandler;
     return function(e) {
       if (!e) { e = window.event }
       if (!e.target) { e.target = e.srcElement }
-      if (!e.which) { try { e.which = e.charCode || e.keyCode } catch(e){}}
+      if (!e.which) { try { e.which = e.charCode || e.keyCode } catch(err){}}
       if (e.target.nodeType === 3) { e.target = e.target.parentNode }
       if (!e.preventDefault) {
         e.preventDefault = function() {

@@ -272,11 +272,17 @@ i {
 
 .close {
   position: absolute;
-  right: 10px;
-  top: 5px;
+  right: 0;
+  top: 0;
   cursor: pointer;
   font-size: 18px;
   opacity: 0.6;
+  width: 24px;
+  text-align: center;
+  line-height: 26px;
+  &:hover {
+    opacity: 1;
+  }
 }
 
 #logo {
@@ -402,7 +408,6 @@ i {
   display: none;
   cursor: pointer;
   background: $bg;
-  padding: 0 $p;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
   transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
@@ -421,6 +426,7 @@ i {
 
 #top-right,
 #top-left {
+  padding: 0 $p;
   transition: 0.2s;
 }
 
@@ -500,6 +506,7 @@ $outline: #ddd;
 #tab-title {
   font-size: 16px;
   line-height: $topbarh + 1px;
+  height: $topbarh + 1px;
 }
 
 .back {
