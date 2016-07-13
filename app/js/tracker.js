@@ -134,8 +134,8 @@ function track(r, event, extra){
     return;
   }
 
-  // invoke makes tracking async
-  invoke(function(){
+  // defer makes tracking async
+  defer(function(){
     // convert error to plain object
     if (extra instanceof Error) {
       extra = {message: extra.message, stack: extra.stack}
