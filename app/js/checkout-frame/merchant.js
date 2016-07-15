@@ -224,10 +224,10 @@ function showModal(session) {
     if (!options['prefill.email'] && saved_customer.email) {
       options['prefill.email'] = saved_customer.email;
     }
-    options.remember_customer = true;
 
     var customer;
     if (saved_customer.customer_id) {
+      options.remember_customer = true;
       customer = new Customer('');
       getCustomer = function(){
         return customer;
