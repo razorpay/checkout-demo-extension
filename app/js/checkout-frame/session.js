@@ -243,10 +243,16 @@ function askOTP(text){
   $('#form-otp').removeClass('loading').removeClass('action');
   $('#body').addClass('sub');
   if (!text) {
-    if (getSession().tab === 'card') {
-      text = 'Enter OTP sent on ' + getPhone() + '<br>to access Saved Cards';
+    var thisSession = getSession();
+    if (thisSession.tab === 'card') {
+      text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
+      if (thisSession.payload) {
+        text += 'save your card'
+      } else {
+        text += 'access Saved Cards';
+      }
     } else {
-      text = 'An OTP has been sent to<br>' + getPhone();
+      text = 'An OTP has been sent on<br>' + getPhone();
     }
   }
   setOtpText(text);
