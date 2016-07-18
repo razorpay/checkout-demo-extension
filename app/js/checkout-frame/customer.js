@@ -13,6 +13,22 @@ function Customer(contact) {
   }
 }
 
+function sanitizeTokens(tokens){
+  if (tokens) {
+    var items = [];
+    each(
+      tokens.items,
+      function(index, item) {
+        if (item.method === 'card') {
+          items.push(item);
+        }
+      }
+    )
+    tokens.items = items;
+    tokens.count = items.count;
+  }
+}
+
 Customer.prototype = {
   key: '',
   wants_skip: false,
@@ -49,19 +65,7 @@ Customer.prototype = {
       data: data,
       callback: function(data){
         user.logged = data.success;
-        if (data.tokens) {
-          var items = [];
-          each(
-            data.tokens.items,
-            function(index, item) {
-              if (item.method === 'card') {
-                items.push(item);
-              }
-            }
-          )
-          data.tokens.items = items;
-          data.tokens.count = items.count;
-        }
+        sanitizeTokens(data.tokens);
         user.tokens = data.tokens;
         user.device_token = data.device_token;
 

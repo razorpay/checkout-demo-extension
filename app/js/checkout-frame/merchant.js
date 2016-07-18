@@ -235,6 +235,7 @@ function showModal(session) {
     }
 
     customer = getCustomer(saved_customer.contact);
+    sanitizeTokens(saved_customer.tokens);
     customer.tokens = saved_customer.tokens;
     customer.logged = true;
     customer.customer_id = saved_customer.customer_id;
