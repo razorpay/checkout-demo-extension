@@ -217,12 +217,13 @@ function showModal(session) {
   var saved_customer = preferences.customer;
 
   if (saved_customer) {
+    var session_options = session.get();
     // we put saved customer contact, email into default prefills
-    if (!options['prefill.contact'] && saved_customer.contact) {
-      options['prefill.contact'] = saved_customer.contact;
+    if (saved_customer.contact) {
+      session_options['prefill.contact'] = saved_customer.contact;
     }
-    if (!options['prefill.email'] && saved_customer.email) {
-      options['prefill.email'] = saved_customer.email;
+    if (saved_customer.email) {
+      session_options['prefill.email'] = saved_customer.email;
     }
 
     var customer;
