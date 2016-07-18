@@ -49,6 +49,19 @@ Customer.prototype = {
       data: data,
       callback: function(data){
         user.logged = data.success;
+        if (data.tokens) {
+          var items = [];
+          each(
+            data.tokens.items,
+            function(index, item) {
+              if (item.method === 'card') {
+                items.push(item);
+              }
+            }
+          )
+          data.tokens.items = items;
+          data.tokens.count = items.count;
+        }
         user.tokens = data.tokens;
         user.device_token = data.device_token;
 
