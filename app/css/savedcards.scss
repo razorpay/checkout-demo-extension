@@ -1,6 +1,7 @@
 @import "common";
 
 $cardh: 46px;
+$savedcontainerh: 220px;
 $cardpl: 70px;
 
 .left-card {
@@ -126,6 +127,9 @@ $cardpl: 70px;
   position: relative;
   line-height: $cardh;
   min-height: $cardh;
+  padding-bottom: 1px;
+  max-height: $savedcontainerh;
+  overflow-y: auto;
 
   .card-delete {
     display: none;
