@@ -68,7 +68,7 @@ $cardpl: 70px;
       z-index: 0;
     }
     :checked + .collapser {
-      background: $bgd;
+      background: #eff0f1;
       border-color: $bc;
       .saved-cvv {
         opacity: 1;
@@ -115,6 +115,9 @@ $cardpl: 70px;
     content: 'Card ending with';
     color: #777;
     margin-right: 4px;
+  }
+  &:hover {
+    background: #f7f8f9;
   }
 }
 

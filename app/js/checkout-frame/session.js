@@ -242,7 +242,14 @@ function askOTP(text){
   $('#otp').val('');
   $('#form-otp').removeClass('loading').removeClass('action');
   $('#body').addClass('sub');
-  setOtpText(text || 'An OTP has been sent to <br>' + getPhone());
+  if (!text) {
+    if (getSession().tab === 'card') {
+      text = 'Enter OTP sent on ' + getPhone() + '<br>to access Saved Cards';
+    } else {
+      text = 'An OTP has been sent to<br>' + getPhone();
+    }
+  }
+  setOtpText(text);
 }
 
 function debounceAskOTP(msg){
@@ -928,7 +935,7 @@ Session.prototype = {
     if (this.checkInvalid('#form-otp')){
       return;
     }
-    this.showLoadError('Verifying OTP...');
+    this.showLoadError('Verifying OTP');
     var otp = gel('otp').value.replace(/\D/g, '');
 
     if(this.tab === 'wallet'){
