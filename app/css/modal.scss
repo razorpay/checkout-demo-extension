@@ -384,6 +384,7 @@ i {
   }
   &.sub {
     #footer {
+      opacity: 1;
       transform: none;
     }
     #form-fields {
@@ -556,6 +557,7 @@ $outline: #ddd;
 }
 
 #footer {
+  opacity: 0;
   position: absolute;
   left: 0;
   bottom: -$footerh + 1px;
@@ -563,7 +565,7 @@ $outline: #ddd;
   border-radius: 0 0 $br $br;
   height: $footerh;
   line-height: $footerh + 1px;
-  transition: 0.3s transform;
+  transition: 0.3s transform, 0.3s opacity;
   transform: translateY(-100%);
   text-align: center;
   text-transform: uppercase;
