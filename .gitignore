@@ -12,6 +12,7 @@
 
 # others
 npm-debug.log
+phantomjsdriver.log
 aws-keys.json
 coverage
 /app/config.js
