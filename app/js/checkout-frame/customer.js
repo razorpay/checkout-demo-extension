@@ -25,7 +25,7 @@ function sanitizeTokens(tokens){
       }
     )
     tokens.items = items;
-    tokens.count = items.count;
+    tokens.count = items.length;
   }
 }
 
