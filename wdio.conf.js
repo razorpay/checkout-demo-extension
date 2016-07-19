@@ -1,4 +1,5 @@
 exports.config = {
+  //debug: true,
 
     // =====================
     // Server Configurations
@@ -12,7 +13,6 @@ exports.config = {
     //
     host: '0.0.0.0',
     port: 4444,
-    path: '/wd/hub',
     //
     // =================
     // Service Providers
@@ -25,7 +25,7 @@ exports.config = {
     // key:  'xxxxxxxxxxxxxxxx-xxxxxx-xxxxx-xxxxxxxxx',
     //
     // ==================
-    // Specify Test Files
+    //// Specify Test Files
     // ==================
     // Define which test specs should run. The pattern is relative to the directory
     // from which `wdio` was called. Notice that, if you are calling `wdio` from an
@@ -33,7 +33,8 @@ exports.config = {
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
     specs: [
-        'test/e2e/*.coffee'
+      //'test/e2e/*.coffee'
+      'test/e2e/basic-form.spec.js'
     ],
     // Patterns to exclude.
     // exclude: [
@@ -57,14 +58,14 @@ exports.config = {
     // from the same test should run tests.
     //
     //
-    maxInstances: 10,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://docs.saucelabs.com/reference/platforms-configurator
     //
     capabilities: [{
-        browserName: 'phantomjs'
+      browserName: 'chrome'
     }],
     // , {
         // maxInstances can get overwritten per capability. So if you have an in house Selenium
@@ -95,7 +96,7 @@ exports.config = {
     sync: true,
     //
     // Level of logging verbosity: silent | verbose | command | data | result | error
-    logLevel: 'silent',
+    logLevel: 'verbose',
     //
     // Enables colors for log output.
     coloredLogs: true,
@@ -202,14 +203,14 @@ exports.config = {
     //
     // Gets executed once before all workers get launched.
     onPrepare: function (config, capabilities) {
+      console.log('let\'s go');
     },
     //
     // Gets executed before test execution begins. At this point you can access to all global
     // variables like `browser`. It is the perfect place to define custom commands.
     before: function (capabilities, specs) {
-        require('coffee-script/register');
-        global.expect = require('expect.js');
-        global.exec = function(){ return browser.execute.apply(browser, arguments).value };
+      debugger;
+        //require('1coffee-script/register');
     },
     //
     // Hook that gets executed before the suite starts
@@ -254,6 +255,7 @@ exports.config = {
     // Gets executed after all workers got shut down and the process is about to exit. It is not
     // possible to defer the end of the process using a promise.
     onComplete: function (exitCode) {
+      console.log('That\'s it', exitCode);
     },
     //
     // Cucumber specific hooks

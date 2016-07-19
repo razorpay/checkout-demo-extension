@@ -303,7 +303,7 @@ function createCoverageReport(){
 }
 
 gulp.task('test:release', function(){
-  return gulp.src('wdio.conf.js').pipe(webdriver());
+  return gulp.src('./wdio.conf.js').pipe(webdriver());
 })
 
 gulp.task('hint', function(){
