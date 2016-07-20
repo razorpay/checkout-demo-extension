@@ -213,17 +213,14 @@ exports.config = {
     global.expect = chai.expect;
     global.assert = chai.assert;
 
-    browser.addCommand('$', function(selector) {
-      return browser.element(selector).value;
-    });
-
-    // http://webdriver.io/api/protocol/execute.html
-    global.exec = function() {
-      return browser.execute.apply(browser, arguments).value;
+    var browserCommands = require('./test/e2e/helpers/browser-commands');
+    for (var command in browserCommands) {
+      browser.addCommand(command, browserCommands[command]);
     }
 
+    // http://webdriver.io/api/protocol/execute.html
     global.execOnFrame = function() {
-      browser.frame(browser.$('iframe.razorpay-checkout-frame'));
+      browser.checkoutFrame();
       return browser.execute.apply(browser, arguments).value;
     }
   },
