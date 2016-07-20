@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   checkoutFrame() {
     return browser.frame(browser.$('iframe.razorpay-checkout-frame'));
@@ -20,5 +22,10 @@ module.exports = {
     return browser.exec((selector) => {
       return jQuery(selector).clone().children().remove().end().text().trim();
     }, selector).value;
+  },
+
+  hasClass(selector, className) {
+    let classes = browser.getAttribute(selector, 'class') || '';
+    return classes.split(' ').indexOf(className) !== -1;
   }
 }

@@ -134,3 +134,42 @@ describe('Modal should close', () => {
     checkFromFrame();
   });
 });
+
+describe('Validate required fields', () => {
+  before(() => {
+    browser.url(manualCheckoutURL);
+    browser.click('#rzp-button');
+  });
+
+  it('Show error, when phone number is missing', () => {
+    browser.checkoutFrame();
+    browser.click('#payment-options > [tab=card]');
+
+    assert.isOk(
+      browser.hasClass('#form-common .elem-contact', 'invalid'),
+      'Empty phone field is invalid'
+    );
+
+    assert.isOk(
+      browser.hasClass('#form-common .elem-contact', 'focused'),
+      'Empty phone field is focused on error'
+    );
+
+    assert.isOk(
+      browser.getCssProperty('.elem-contact .help', 'opacity'),
+      'Empty phone help text is shown'
+    );
+
+    browser.setValue('#contact', '9884251048');
+    assert.isNotOk(
+      browser.hasClass('#form-common .elem-contact', 'invalid'),
+      'When phone no. is entered, the `invalid` class is removed'
+    );
+
+    browser.pause(3000);
+    assert.isNotOk(
+      browser.getCssProperty('.elem-contact .help', 'opacity').value,
+      'When phone is entered, help text is removed'
+    );
+  });
+});

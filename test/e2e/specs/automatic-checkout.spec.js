@@ -70,7 +70,7 @@ describe('prefills & data attrs', () => {
     );
 
     assert.equal(
-      browser.getText('#merchant-desc'),
+      browser.getText('#merchat-desc'),
       data.description,
       'Description is shown correctly'
     );
