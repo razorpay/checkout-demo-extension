@@ -135,7 +135,7 @@ describe('Modal should close', () => {
   });
 });
 
-describe('Validate required fields', () => {
+describe('Validate email & phone fields', () => {
   before(() => {
     browser.url(manualCheckoutURL);
     browser.click('#rzp-button');
@@ -166,10 +166,74 @@ describe('Validate required fields', () => {
       'When phone no. is entered, the `invalid` class is removed'
     );
 
-    browser.pause(3000);
+    browser.pause(300);
     assert.isNotOk(
       browser.getCssProperty('.elem-contact .help', 'opacity').value,
       'When phone is entered, help text is removed'
+    );
+  });
+
+  it('Show error, when email is missing', () => {
+    browser.checkoutFrame();
+    browser.setValue('#email', '');
+
+    browser.click('#payment-options > [tab=card]');
+
+    assert.isOk(
+      browser.hasClass('#form-common .elem-email', 'invalid'),
+      'Empty email field is invalid'
+    );
+
+    assert.isOk(
+      browser.hasClass('#form-common .elem-email', 'focused'),
+      'Empty email field is focused on error'
+    );
+
+    assert.isOk(
+      browser.getCssProperty('.elem-email .help', 'opacity'),
+      'Empty email help text is shown'
+    );
+
+    browser.setValue('#email', 'harshil@razorpay.com');
+    assert.isNotOk(
+      browser.hasClass('#form-common .elem-email', 'invalid'),
+      'When email is entered, the `invalid` class is removed'
+    );
+
+    browser.pause(300);
+    assert.isNotOk(
+      browser.getCssProperty('.elem-email .help', 'opacity').value,
+      'When email is entered, help text is removed'
+    );
+  });
+});
+
+describe('Home Screen', () => {
+  it('Make sure home screen is shown', () => {
+    browser.checkoutFrame();
+
+    assert.isNotOk(
+      browser.hasClass('#body', 'sub'),
+      'Home screen is shown - `sub` class is not added'
+    );
+
+    assert.isNotOk(
+      browser.getAttribute('#body', 'tab'),
+      'Home screen is shown - no `tab` attribute'
+    );
+  });
+
+  it('PAY button should be hidden on home screen', () => {
+    browser.checkoutFrame();
+    assert.notEqual(
+      browser.getCssProperty('#footer', 'transform').value,
+      'none',
+      'Button is hidden - negative transform is set'
+    );
+
+    assert.isNotOk(
+      browser.getCssProperty('#footer', 'opacity').value,
+      'Button is hidden - with zero opacity'
     );
   });
 });
