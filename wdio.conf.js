@@ -219,7 +219,12 @@ exports.config = {
 
     // http://webdriver.io/api/protocol/execute.html
     global.exec = function() {
-      return browser.execute.apply(browser, arguments).value
+      return browser.execute.apply(browser, arguments).value;
+    }
+
+    global.execOnFrame = function() {
+      browser.frame(browser.$('iframe.razorpay-checkout-frame'));
+      return browser.execute.apply(browser, arguments).value;
     }
   },
   //

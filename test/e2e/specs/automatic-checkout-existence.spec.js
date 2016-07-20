@@ -28,14 +28,77 @@ describe('Loads RZP Modal', () => {
       console.log(`Should be main ${document.body.getAttribute('id')}`);
     });
 
-    browser.frame(browser.$('iframe.razorpay-checkout-frame'));
+    // browser.frame(browser.$('iframe.razorpay-checkout-frame'));
     // Runs on `checkout-iframe.html`
-    exec(() => {
+    execOnFrame(() => {
       console.log(`Should be iframe ${document.body.getAttribute('id')}`);
-      expect($$('#container')).to.have.length(1);
-      expect($$('#modal')).to.have.length(1);
-      expect($$('#powered-by')).to.have.length(1);
-      expect($$('#backdrop')).to.have.length(1);
+      expect(jQuery('#container')).to.have.length(1);
+      expect(jQuery('#modal')).to.have.length(1);
+      expect(jQuery('#powered-by')).to.have.length(1);
+      expect(jQuery('#backdrop')).to.have.length(1);
     });
+  });
+});
+
+describe('prefills & data attrs', () => {
+  it('`script` data-attributes should load correctly', () => {
+    browser.url(automaticCheckoutURL);
+    browser.click('.razorpay-payment-button');
+
+    let data = exec(() => {
+      return jQuery('form#checkout-form > script').data();
+    });
+
+    exec((data) => {
+      assert.equal(
+        jQuery('.razorpay-payment-button').val(),
+        data.buttontext,
+        'Button text is set correctly'
+      );
+    }, data);
+
+
+    execOnFrame((data) => {
+      assert.equal(
+        jQuery('#logo > img').attr('src'),
+        data.image,
+        'Image loaded correctly'
+      );
+
+      assert.equal(
+        Number(jQuery('#amount').clone().children().remove().end().text().trim()),
+        Number(data.amount)/100,
+        'Amount is shown correctly'
+      );
+
+      assert.equal(
+        jQuery('#merchant-name').text(),
+        data.name,
+        'Merchant name is shown correctly'
+      );
+
+      assert.equal(
+        jQuery('#merchant-desc').text(),
+        data.description,
+        'Description is shown correctly'
+      );
+
+      assert.equal(
+        jQuery('#email').val(),
+        data['prefill.email'],
+        'Email is prefilled'
+      );
+
+      assert.isNotTrue(
+        jQuery('#contact').val(),
+        'Phone field is left empty, when prefill is not provided'
+      );
+
+      assert.equal(
+        rgb2hex(jQuery('#header').css('background-color')),
+        (data['theme.color'] || '').toLowerCase(),
+        'Theme color is set'
+      );
+    }, data);
   });
 });

@@ -8,7 +8,12 @@
     <meta http-equiv="cache-control" content="no-cache">
     <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
     <link rel="stylesheet" type="text/css" href="./dist/v1/css/checkout.css">
+    <script src='../../spec/chai.js'></script>
+    <script src='../../spec/jquery-1.11.1.js'></script>
     <script>
+      var expect = chai.expect;
+      var assert = chai.assert;
+
       Razorpay = {
         config: {
           frame: './checkout-frame.html',
@@ -26,7 +31,7 @@
         data-buttontext="Pay with Razorpay"
         data-name="Merchant Name"
         data-description="Purchase Description"
-        data-image="https://your-awesome-site.com/your_logo.jpg"
+        data-image="https://razorpay.com/images/brand/glyph-rounded-square.svg"
         data-prefill.name="Harshil Mathur"
         data-prefill.email="support@razorpay.com"
         data-theme.color="#F37254"
