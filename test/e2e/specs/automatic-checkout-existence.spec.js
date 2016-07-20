@@ -11,15 +11,17 @@ describe('Index Page loaded', () => {
 });
 
 describe('Loads RZP Modal', () => {
-  it('Clicking on the `Pay Now` button should open RZP iframe', () => {
+  it('Should append `razorpay-payment-button` inside the form', () => {
     browser.url(automaticCheckoutURL);
-    expect(browser.$('.razorpay-payment-button')).to.exist;
-    browser.click('.razorpay-payment-button');
+    expect(browser.$('form#checkout-form > .razorpay-payment-button')).to.exist;
+  });
 
+  it('Clicking on `razorpay-payment-button` button should open RZP iframe', () => {
+    browser.url(automaticCheckoutURL);
+    browser.click('.razorpay-payment-button');
     expect(browser.$('.razorpay-container')).to.exist;
     expect(browser.$('.razorpay-backdrop')).to.exist;
     expect(browser.$('.razorpay-container .razorpay-checkout-frame')).to.exist;
-
 
     // Runs on `index.html`
     exec(() => {
