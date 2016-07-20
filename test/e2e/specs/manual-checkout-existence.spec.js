@@ -1,16 +1,17 @@
 'use strict';
+let manualCheckoutURL = '/manual-checkout.html';
 
 describe('Index Page loaded', () => {
   it('Test page should have the right title - Everything is good to go now', () => {
-    browser.url('/');
+    browser.url(manualCheckoutURL);
     let title = browser.getTitle();
-    assert.equal(title, 'Razorpay Checkout');
+    assert.equal(title, 'Razorpay Manual Checkout');
   });
 });
 
 describe('Loads RZP Modal', () => {
   it('Clicking on the `Pay Now` button should open RZP iframe', () => {
-    browser.url('/');
+    browser.url(manualCheckoutURL);
     browser.click('#rzp-button');
     expect(browser.$('.razorpay-container')).to.exist;
     expect(browser.$('.razorpay-backdrop')).to.exist;

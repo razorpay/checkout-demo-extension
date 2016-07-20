@@ -33,7 +33,7 @@ exports.config = {
   //
   specs: [
     //'test/e2e/*.coffee'
-    'test/e2e/*.spec.js'
+    'test/e2e/specs/**'
   ],
   // Patterns to exclude.
   // exclude: [
