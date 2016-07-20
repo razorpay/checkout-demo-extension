@@ -7,19 +7,52 @@
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
-    <link rel="stylesheet" type="text/css" href="/app/dist/v1/css/checkout.css">
-    <script src='../../spec/expect.js'></script>
-    <script src='../../spec/sinon.js'></script>
-    <script src='../../spec/mock.js'></script>
+    <link rel="stylesheet" type="text/css" href="./dist/v1/css/checkout.css">
   </head>
-  <body>
+  <body id="index">
     <button id="rzp-button">Click Me</button>
-
     <script>
+      Razorpay = {
+        config: {
+          frame: './checkout-frame.html',
+          //frameApi: 'http://192.168.0.23:8080/',
+
+          // path for iframe, if set
+          //frame: '/checkout.html',
+
+          // path for view/checkout to load js from
+          // js: 'http://192.168.0.23:8080'
+        }
+      }
+    </script>
+
+    <script src='./dist/v1/checkout.js'></script>
+    <script>
+      var options = {
+        "key": "rzp_live_ILgsfZCZoFIKMb",
+        "amount": "2000", // 2000 paise = INR 20
+        "name": "Merchant Name",
+        "description": "Purchase Description",
+        "image": "/your_logo.png",
+        "handler": function (response){
+          alert(response.razorpay_payment_id);
+        },
+        "prefill": {
+          "name": "Harshil Mathur",
+          "email": "harshil@razorpay.com"
+        },
+        "notes": {
+          "address": "Hello World"
+        },
+        "theme": {
+          "color": "#F37254"
+        }
+      };
+      var rzp1 = new Razorpay(options);
+
       $('#rzp-button').on('click', function() {
-        debugger;
+        rzp1.open();
       });
     </script>
   </body>
-  <script src='app/dist/v1/checkout.js'></script>
 </html>
