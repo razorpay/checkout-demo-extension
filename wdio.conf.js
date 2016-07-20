@@ -33,7 +33,7 @@ exports.config = {
   //
   specs: [
     //'test/e2e/*.coffee'
-    'test/e2e/basic-form.spec.js'
+    'test/e2e/*.spec.js'
   ],
   // Patterns to exclude.
   // exclude: [
@@ -151,7 +151,8 @@ exports.config = {
   // Options to be passed to Mocha.
   // See the full list at http://mochajs.org/
   mochaOpts: {
-    ui: 'bdd'
+    ui: 'bdd',
+    timeout: 72000000
   },
   //
   // Options to be passed to Jasmine.

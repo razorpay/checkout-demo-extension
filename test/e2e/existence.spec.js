@@ -1,13 +1,15 @@
-describe('Index Page loaded', function() {
-  it('Test page should have the right title - Everything is good to go now', function () {
+'use strict';
+
+describe('Index Page loaded', () => {
+  it('Test page should have the right title - Everything is good to go now', () => {
     browser.url('/');
-    var title = browser.getTitle();
+    let title = browser.getTitle();
     assert.equal(title, 'Razorpay Checkout');
   });
 });
 
-describe('Loads RZP Modal', function() {
-  it('Clicking on the `Pay Now` button should open RZP iframe', function() {
+describe('Loads RZP Modal', () => {
+  it('Clicking on the `Pay Now` button should open RZP iframe', () => {
     browser.url('/');
     browser.click('#rzp-button');
     expect(browser.$('.razorpay-container')).to.exist;
@@ -23,6 +25,11 @@ describe('Loads RZP Modal', function() {
     // Runs on `checkout-iframe.html`
     exec(() => {
       console.log(`Should be iframe ${document.body.getAttribute('id')}`);
+
+      expect($$('#container')).to.have.length(1);
+      expect($$('#modal')).to.have.length(1);
+      expect($$('#powered-by')).to.have.length(1);
+      expect($$('#backdrop')).to.have.length(1);
     });
   });
 });
