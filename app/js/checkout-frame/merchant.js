@@ -265,23 +265,6 @@ function showModalWithSession(session){
   }
 }
 
-function configureRollbar(id){
-  if(Rollbar){
-    invoke(
-      Rollbar.configure,
-      Rollbar,
-      {
-        payload: {
-          person: {
-            id: id
-          },
-          context: trackingProps.context
-        }
-      }
-    );
-  }
-}
-
 // generates ios event handling functions, like onload
 function iosMethod(method){
   return function(data){
@@ -400,9 +383,8 @@ window.handleMessage = function(message){
       session = new Session(options);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
-      return roll('fault ' + e.message, message, 'warn');
+      return roll('fault ' + e.message, e, 'warn');
     }
-    configureRollbar(id);
     var oldSession = getSession();
     if(oldSession){
       invoke('saveAndClose', oldSession);

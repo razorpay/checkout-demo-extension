@@ -279,6 +279,7 @@ function Session (options) {
   this.tab = this.screen = '';
   this.listeners = [];
   this.bits = [];
+  lol;
 }
 
 Session.prototype = {
