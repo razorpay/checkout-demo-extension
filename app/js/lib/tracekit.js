@@ -263,7 +263,7 @@ TraceKit.report = (function reportModuleWrapper() {
         // slow slow IE to see if onerror occurs or not before reporting
         // this exception; otherwise, we will end up with an incomplete
         // stack trace
-        window.setTimeout(function () {
+        setTimeout(function () {
             if (lastException === ex) {
                 processLastException();
             }
@@ -379,13 +379,8 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
         }
         try {
             var getXHR = function() {
-                try {
-                    return new window.XMLHttpRequest();
-                } catch (e) {
-                    // explicitly bubble up the exception if not found
-                    return new window.ActiveXObject('Microsoft.XMLHTTP');
-                }
-            };
+                return new XMLHttpRequest();
+            }
 
             var request = getXHR();
             request.open('GET', url, false);
@@ -420,7 +415,7 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
             */
             var source = '';
             var domain = '';
-            try { domain = window.document.domain; } catch (e) { }
+            try { domain = document.domain; } catch (e) { }
             var match = /(.*)\:\/\/([^:\/]+)([:\d]*)\/{0,1}([\s\S]*)/.exec(url);
             if (match && match[2] === domain) {
                 source = loadSource(url);
@@ -591,12 +586,8 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
      * @memberof TraceKit.computeStackTrace
      */
     function findSourceByFunctionBody(func) {
-        if (_isUndefined(window && window.document)) {
-            return;
-        }
-
-        var urls = [window.location.href],
-            scripts = window.document.getElementsByTagName('script'),
+        var urls = [location.href],
+            scripts = document.getElementsByTagName('script'),
             body,
             code = '' + func,
             codeRE = /^function(?:\s+([\w$]+))?\s*\(([\w\s,]*)\)\s*\{\s*(\S[\s\S]*\S)\s*\}\s*$/,
@@ -881,7 +872,7 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
             lineRE2 = /^\s*Line (\d+) of inline#(\d+) script in ((?:file|https?|blob)\S+)(?:: in function (\S+))?\s*$/i,
             lineRE3 = /^\s*Line (\d+) of function script\s*$/i,
             stack = [],
-            scripts = (window && window.document && window.document.getElementsByTagName('script')),
+            scripts = document.getElementsByTagName('script'),
             inlineScriptBlocks = [],
             parts;
 
@@ -922,7 +913,7 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
                     }
                 }
             } else if ((parts = lineRE3.exec(lines[line]))) {
-                var url = window.location.href.replace(/#.*$/, '');
+                var url = location.href.replace(/#.*$/, '');
                 var re = new RegExp(escapeCodeAsRegExpForMatchingInsideHTML(lines[line + 1]));
                 var src = findSourceInUrls(re, [url]);
                 item = {

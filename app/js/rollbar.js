@@ -1,4 +1,4 @@
-function roll(msg, e, level) {
+roll = function(msg, e, level) {
   if (e instanceof Error) {
     TraceKit.report(e, {
       level: level || 'error',
@@ -7,7 +7,7 @@ function roll(msg, e, level) {
   } else {
     postRollbar(msg, e, level);
   }
-};
+}
 
 TraceKit.report.subscribe(function(errorReport) {
   postRollbar(errorReport.extra.msg, errorReport, errorReport.extra.level, true);
