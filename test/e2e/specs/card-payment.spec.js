@@ -176,15 +176,9 @@ describe('Card Payment', () => {
 
   it('CVV field validation', () => {
     browser.click('#footer');
-    browser.debug();
     assert.isOk(
       browser.hasClass('.elem-cvv', 'invalid'),
       'CVV is invalid - `invalid` class is added'
-    );
-
-    assert.isOk(
-      browser.hasClass('.elem-cvv', 'focused'),
-      'CVV is focused - `focused` class is added'
     );
 
     browser.setValue('#card_cvv', cardCVV);
