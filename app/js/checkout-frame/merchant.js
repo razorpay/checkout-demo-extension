@@ -383,7 +383,7 @@ window.handleMessage = function(message){
       session = new Session(options);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
-      return roll('fault ' + e.message, e, 'warn');
+      return roll('fault', e, 'warn');
     }
     var oldSession = getSession();
     if(oldSession){
@@ -428,7 +428,7 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
     }
     window.handleMessage(data);
   } catch(err){
-    roll('invalid message - ' + err, data, 'warn');
+    roll('message: ' + data, err, 'warn');
   }
 }
 

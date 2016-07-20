@@ -1,4 +1,5 @@
 var $ = function(el){
+  lol;
   if (isString(el)) {
     return $(document.querySelector(el));
   }

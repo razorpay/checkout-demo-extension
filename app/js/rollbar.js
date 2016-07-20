@@ -1,7 +1,7 @@
 roll = function(msg, e, level) {
   if (e instanceof Error) {
     TraceKit.report(e, {
-      level: level || 'error',
+      level: level,
       msg: msg
     });
   } else {
@@ -10,7 +10,8 @@ roll = function(msg, e, level) {
 }
 
 TraceKit.report.subscribe(function(errorReport) {
-  postRollbar(errorReport.extra.msg, errorReport, errorReport.extra.level, true);
+  var extra = errorReport.extra || emo;
+  postRollbar(extra.msg, errorReport, extra.level, true);
 });
 
 function postRollbar(msg, trace, level, isStack) {
@@ -21,10 +22,12 @@ function postRollbar(msg, trace, level, isStack) {
         frames: trace.stack,
         exception: {
           'class': trace.name,
-          message: trace.message,
-          description: msg
+          message: trace.message
         }
       }
+    }
+    if (msg) {
+      body.trace.exception.description = msg;
     }
   } else {
     body = {
@@ -53,7 +56,7 @@ function postRollbar(msg, trace, level, isStack) {
           id: _uid
         },
         body: body,
-        level: level
+        level: level || 'error'
       }
     }
   }
