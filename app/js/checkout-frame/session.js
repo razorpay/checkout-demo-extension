@@ -1003,7 +1003,7 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
 
-    if (!this.tab) {
+    if (!this.tab && !this.order) {
       return;
     }
 
