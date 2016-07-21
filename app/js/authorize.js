@@ -163,7 +163,7 @@ Payment.prototype = {
     track(this.r, 'submit', {data: trackingData, params: params});
 
     // add tracking data
-    data['_[checkout_id]'] = _uid;
+    data['_[checkout_id]'] = this.r.id;
     data['_[platform]'] = trackingProps.platform;
     data['_[library]'] = trackingProps.library;
 
@@ -300,7 +300,7 @@ Payment.prototype = {
     // unsupported browsers
     if(!/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)){
       try{
-        popup = this.popup = new Popup('', 'popup_' + _uid);
+        popup = this.popup = new Popup('', 'popup_' + this.r.id);
         if (isTopup) {
           popup.write(templates.popup(this));
         }
