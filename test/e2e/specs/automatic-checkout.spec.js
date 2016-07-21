@@ -50,7 +50,6 @@ describe('prefills & data attrs', () => {
     );
 
     browser.checkoutFrame();
-
     assert.equal(
       browser.getAttribute('#logo > img', 'src'),
       data.image,
@@ -70,7 +69,7 @@ describe('prefills & data attrs', () => {
     );
 
     assert.equal(
-      browser.getText('#merchat-desc'),
+      browser.getText('#merchant-desc'),
       data.description,
       'Description is shown correctly'
     );

@@ -306,8 +306,12 @@ function createCoverageReport(){
 
 /***** E2E/Acceptance tests *****/
 
-gulp.task('e2e:run', function(){
-  return gulp.src('./wdio.conf.js').pipe(webdriver());
+gulp.task('e2e:run', function(done){
+  return gulp.src('./wdio.conf.js')
+    .pipe(webdriver())
+    .on('error', function(){
+      done();
+    });
 })
 
 gulp.task('symlinkDist', () => {
