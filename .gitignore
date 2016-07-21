@@ -2,9 +2,11 @@
 /app/dist/
 !/app/dist/v1/checkout-new.js
 /app/templates
+/test/e2e/dist
 
 # dependencies
 /node_modules
+/test/e2e/lib/
 
 # misc
 .orig

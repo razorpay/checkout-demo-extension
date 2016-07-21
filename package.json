@@ -54,6 +54,7 @@
     "gulp-usemin": "^0.3.23",
     "gulp-webdriver": "^2.0.2",
     "istanbul": "^0.4.4",
+    "jquery": "^3.1.0",
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.2.0",
     "karma": "^0.13.22",
@@ -73,7 +74,9 @@
   "private": "true",
   "dependencies": {
     "aws-sdk": "^2.4.5",
+    "express": "^4.14.0",
     "glob": "^7.0.5",
-    "gulp-rename": "^1.2.2"
+    "gulp-rename": "^1.2.2",
+    "vinyl-fs": "^2.4.3"
   }
 }

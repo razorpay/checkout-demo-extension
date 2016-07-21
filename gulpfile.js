@@ -27,6 +27,8 @@ const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
+const vfs = require('vinyl-fs');
+const testServer = require('./test/e2e/server.js');
 
 const distDir = 'app/dist/v1/';
 
@@ -302,9 +304,42 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-gulp.task('test:release', function(){
+/***** E2E/Acceptance tests *****/
+
+gulp.task('e2e:run', function(){
   return gulp.src('./wdio.conf.js').pipe(webdriver());
 })
+
+gulp.task('symlinkDist', () => {
+  return vfs.src(distDir, { followSymlinks: false })
+    .pipe(vfs.symlink('test/e2e/dist/v1'));
+});
+
+gulp.task('symlinkJquery', () => {
+  return vfs.src('node_modules/jquery/dist/jquery.js', { followSymlinks: false })
+    .pipe(vfs.symlink('test/e2e/lib/'));
+});
+
+let testServerInstance;
+
+gulp.task('testserver:start', () => {
+  testServerInstance = testServer.listen(3000, function(error) {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      process.exit(1);
+    }
+  });
+});
+
+gulp.task('testserver:stop', () => {
+  testServerInstance.close();
+});
+
+gulp.task('test:e2e', () => {
+  runSequence(['symlinkDist', 'symlinkJquery'], 'testserver:start', 'e2e:run', 'testserver:stop');
+});
+
+/***** --- *****/
 
 gulp.task('hint', function(){
   return gulp.src([assetPath('dist/v1/*.js')])
@@ -316,7 +351,7 @@ gulp.task('hint', function(){
 })
 
 gulp.task('test', function() {
-  runSequence('setTestENV', 'test:unit', 'test:release');
+  runSequence('setTestENV', 'test:unit', 'test:e2e');
 });
 
 

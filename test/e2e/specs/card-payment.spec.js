@@ -1,4 +1,5 @@
 'use strict';
+
 let manualCheckoutURL = '/manual-checkout.html';
 let phoneNumber = '9884251048';
 let cardNumber = '4111 1111 1111 1111';
