@@ -7,7 +7,7 @@ var ua = navigator.userAgent;
 var ua_iOS = /iPhone|iPad/.test(ua);
 var ua_prefer_redirect = /Windows Phone|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/;
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
-var shouldFocusNextField = !us_iOS;
+var shouldFocusNextField = !ua_iOS;
 
 /* simple checks */
 function isBoolean(x) {
