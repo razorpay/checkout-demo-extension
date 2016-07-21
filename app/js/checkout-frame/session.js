@@ -796,10 +796,14 @@ Session.prototype = {
     $('#elem-emi').removeClass('hidden');
     unsetEmiBank();
 
+    var $savedContainer = $('#saved-cards-container');
+
     if (saveScreen) {
       this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
+      invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
       invoke('onSixDigits', this, {target: gel('card_number')});
+      $savedContainer.removeClass('scroll');
     }
 
     this.savedCardScreen = saveScreen;
@@ -1003,7 +1007,7 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
 
-    if (!this.tab) {
+    if (!this.tab && !this.order) {
       return;
     }
 

@@ -1,14 +1,15 @@
-// iphone/ipad restrict non user initiated focus on input fields
-var ua = navigator.userAgent;
-var shouldFixFixed = /iPhone|Android 2\./.test(ua);
-var shouldFocusNextField = !/iPhone|iPad/.test(navigator.userAgent);
-
 var now = Date.now || function() {
   return new Date().getTime();
 };
 
-/* simple checks */
+// iphone/ipad restrict non user initiated focus on input fields
+var ua = navigator.userAgent;
+var ua_iOS = /iPhone|iPad/.test(ua);
+var ua_prefer_redirect = /Windows Phone|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/;
+var shouldFixFixed = /iPhone|Android 2\./.test(ua);
+var shouldFocusNextField = !ua_iOS;
 
+/* simple checks */
 function isBoolean(x) {
   return typeof x === 'boolean';
 }

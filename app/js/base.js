@@ -212,7 +212,7 @@ function base_configure(overrides){
   setNotes(options);
 
   var callback_url = options.get('callback_url');
-  if (callback_url && /FBAN|\(iP.+((Cr|Fx)iOS|UCBrowser)/.test(ua)) {
+  if (callback_url && ua_prefer_redirect) {
     options.set('redirect', true);
   }
 

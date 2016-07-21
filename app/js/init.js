@@ -23,7 +23,7 @@ var doc = body || document.documentElement;
 function needBody(func){
   return function bodyInsurance(){
     if (!body) {
-      invoke(bodyInsurance, this, null, 99);
+      defer(bodyInsurance, this, 99);
       return this;
     }
     return func.call(this);
@@ -105,7 +105,8 @@ Razorpay.defaults = {
     'contact': '',
     'email': '',
     'card[number]': '',
-    'card[expiry]': ''
+    'card[expiry]': '',
+    'card[cvv]': ''
   },
   'modal': {
     'confirm_close': false,

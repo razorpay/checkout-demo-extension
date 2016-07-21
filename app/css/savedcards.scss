@@ -8,6 +8,8 @@ $cardpl: 70px;
   display: none;
   padding: 0 20px 0 $cardpl;
   height: $cardh;
+  left: 0;
+  right: 0;
 }
 
 #toggle-saved-cards {
@@ -129,7 +131,10 @@ $cardpl: 70px;
   min-height: $cardh;
   padding-bottom: 1px;
   max-height: $savedcontainerh;
-  overflow-y: auto;
+
+  &.scroll {
+    overflow-y: auto;
+  }
 
   .card-delete {
     display: none;
