@@ -14,7 +14,8 @@
     <script>
       Razorpay = {
         config: {
-          api: 'http://api.razorpay.dev',
+          api: 'http://0.0.0.0:3000',
+          frameApi: 'http://0.0.0.0:3000',
           frame: './checkout-frame.html',
         }
       }
@@ -29,7 +30,7 @@
         "description": "Purchase Description",
         "image": "https://razorpay.com/images/brand/glyph-rounded-square.svg",
         "handler": function (response){
-          alert(response.razorpay_payment_id);
+          alert(JSON.stringify(response));
         },
         "prefill": {
           "name": "Harshil Mathur",

@@ -5,10 +5,17 @@ let phoneNumber = '9884251048';
 let cardNumber = '4111 1111 1111 1111';
 let cardExpiry = '11/21';
 let cardCVV = '121';
+let currentTabId;
+let data;
 
 before(() => {
   browser.url(manualCheckoutURL);
   browser.click('#rzp-button');
+  currentTabId = browser.getCurrentTabId();
+  browser.frameParent();
+  data = browser.exec(() => {
+    return options;
+  }).value;
 });
 
 describe('Card Payment', () => {
@@ -101,12 +108,6 @@ describe('Card Payment', () => {
   });
 
   it('Card holder\'s name is prefilled as expected', () => {
-    browser.frameParent();
-    let data = browser.exec(() => {
-      return options;
-    }).value;
-
-    browser.checkoutFrame();
     assert.equal(
       browser.getAttribute('#card_name', 'value'),
       data.prefill.name,
@@ -196,6 +197,40 @@ describe('Card Payment', () => {
   });
 
   it('PAY via card', () => {
+    browser.click('#footer');
+    browser.waitUntil(() => {
+      return (browser.getTabIds() || []).length === 2;
+    }, 1000);
 
+    let allTabs = browser.getTabIds();
+    allTabs.splice(allTabs.indexOf(currentTabId), 1);
+    let popup = allTabs[0];
+    browser.switchTab(popup);
+
+    assert.equal(
+      browser.getAttribute('#top > img', 'src'),
+      data.image,
+      'Image loaded in the popup'
+    );
+
+    assert.equal(
+      browser.getText('#top > span'),
+      `₹${Number(data.amount)/100}`,
+      'Amount is shown in the popup'
+    );
+
+    browser.waitUntil(() => {
+      return (browser.getTabIds() || []).length === 1;
+    });
+
+    browser.switchTab(currentTabId);
+    let response = JSON.parse(browser.alertText());
+
+    assert.isOk(
+      response.razorpay_payment_id,
+      'Handler function is passed with `razorpay_payment_id`'
+    );
+
+    browser.alertAccept();
   });
 });

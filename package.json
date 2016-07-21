@@ -33,6 +33,7 @@
     "url": "https://github.com/razorpay/checkout/issues"
   },
   "devDependencies": {
+    "body-parser": "^1.15.2",
     "chai": "^3.5.0",
     "del": "^2.2.1",
     "dot": "^1.0.3",
