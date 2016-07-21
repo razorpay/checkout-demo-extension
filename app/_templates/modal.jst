@@ -154,7 +154,7 @@ var gridClass = gridClasses[i-1];
                     <div class="elem-wrap third"><div class="elem elem-cvv">
                       <label>CVV</label>
                       <i>&#xe604;</i>
-                      <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}">
+                      <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}" value="{{=attr(o('prefill.card[cvv]'))}}">
                     </div></div>
                     <div class="clear"></div>
                     {{? o('remember_customer')}}
