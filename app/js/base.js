@@ -323,7 +323,7 @@ Razorpay.prototype = {
     }
 
     if (this instanceof Razorpay) {
-      this.id = _uid = generateUID();
+      this.id = generateUID();
 
       // init for checkoutjs is tracked from iframe
       // we've open event to track parent side of options

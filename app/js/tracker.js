@@ -97,7 +97,7 @@ function generateUID(){
   return num.slice(0, 13) + tempdigit
 }
 
-var _uid;
+var _uid = generateUID();
 var trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
