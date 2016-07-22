@@ -23,7 +23,7 @@ var doc = body || document.documentElement;
 function needBody(func){
   return function bodyInsurance(){
     if (!body) {
-      defer(bodyInsurance, this, 99);
+      defer(bind(bodyInsurance, this), 99);
       return this;
     }
     return func.call(this);
