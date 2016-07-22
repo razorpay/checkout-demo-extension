@@ -76,7 +76,7 @@ describe('Options & prefills', () => {
     );
 
     assert.equal(
-      utils.rgb2hex(browser.getCssProperty('#header', 'background-color').value),
+      utils.rgb2hex(browser.css('#header', 'background-color')),
       (data.theme.color || '').toLowerCase(),
       'Theme color is set'
     );
@@ -89,13 +89,13 @@ describe('Modal should close', () => {
     // Uncomment below cases once the issue is fixed in dev
 
     // assert.equal(
-    //   browser.getCssProperty('.razorpay-container', 'display').value,
+    //   browser.css('.razorpay-container', 'display'),
     //   'none',
     //   'RZP container is removed on escape press'
     // );
     //
     // assert.equal(
-    //   browser.getCssProperty('.razorpay-backdrop', 'background-color').value,
+    //   browser.css('.razorpay-backdrop', 'background-color'),
     //   '',
     //   'Backdrop is removed on escape press'
     // );
@@ -144,6 +144,7 @@ describe('Validate email & phone fields', () => {
   it('Show error, when phone number is missing', () => {
     browser.checkoutFrame();
     browser.click('#payment-options > [tab=card]');
+    browser.pause(300);
 
     assert.isOk(
       browser.hasClass('#form-common .elem-contact', 'invalid'),
@@ -156,7 +157,7 @@ describe('Validate email & phone fields', () => {
     );
 
     assert.isOk(
-      browser.getCssProperty('.elem-contact .help', 'opacity'),
+      browser.css('.elem-contact .help', 'opacity'),
       'Empty phone help text is shown'
     );
 
@@ -166,9 +167,12 @@ describe('Validate email & phone fields', () => {
       'When phone no. is entered, the `invalid` class is removed'
     );
 
-    browser.pause(300);
+    browser.waitUntil(() => {
+      return !browser.css('.elem-contact .help', 'opacity');
+    });
+
     assert.isNotOk(
-      browser.getCssProperty('.elem-contact .help', 'opacity').value,
+      browser.css('.elem-contact .help', 'opacity'),
       'When phone is entered, help text is removed'
     );
   });
@@ -176,8 +180,8 @@ describe('Validate email & phone fields', () => {
   it('Show error, when email is missing', () => {
     browser.checkoutFrame();
     browser.setValue('#email', '');
-
     browser.click('#payment-options > [tab=card]');
+    browser.pause(300);
 
     assert.isOk(
       browser.hasClass('#form-common .elem-email', 'invalid'),
@@ -190,7 +194,7 @@ describe('Validate email & phone fields', () => {
     );
 
     assert.isOk(
-      browser.getCssProperty('.elem-email .help', 'opacity'),
+      browser.css('.elem-email .help', 'opacity'),
       'Empty email help text is shown'
     );
 
@@ -200,9 +204,12 @@ describe('Validate email & phone fields', () => {
       'When email is entered, the `invalid` class is removed'
     );
 
-    browser.pause(300);
+    browser.waitUntil(() => {
+      return !browser.css('.elem-email .help', 'opacity');
+    });
+
     assert.isNotOk(
-      browser.getCssProperty('.elem-email .help', 'opacity').value,
+      browser.css('.elem-email .help', 'opacity'),
       'When email is entered, help text is removed'
     );
   });
@@ -226,13 +233,13 @@ describe('Home Screen', () => {
   it('PAY button should be hidden on home screen', () => {
     browser.checkoutFrame();
     assert.notEqual(
-      browser.getCssProperty('#footer', 'transform').value,
+      browser.css('#footer', 'transform'),
       'none',
       'Button is hidden - negative transform is set'
     );
 
     assert.isNotOk(
-      browser.getCssProperty('#footer', 'opacity').value,
+      browser.css('#footer', 'opacity'),
       'Button is hidden - with zero opacity'
     );
   });

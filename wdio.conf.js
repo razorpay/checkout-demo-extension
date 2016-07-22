@@ -33,7 +33,8 @@ exports.config = {
   //
   specs: [
     //'test/e2e/*.coffee'
-    'test/e2e/specs/**'
+    'test/e2e/specs/**',
+    // 'test/e2e/specs/manual-checkout.spec.js'
   ],
   // Patterns to exclude.
   // exclude: [
@@ -57,16 +58,18 @@ exports.config = {
   // from the same test should run tests.
   //
   //
-  maxInstances: 10,
+  // maxInstances: 1,
   //
   // If you have trouble getting all important capabilities together, check out the
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://docs.saucelabs.com/reference/platforms-configurator
   //
   capabilities: [{
-    browserName: 'chrome'
+    browserName: 'chrome',
+    maxInstances: 5
   }, {
-    browserName: 'firefox'
+    browserName: 'firefox',
+    maxInstances: 1
   }],
   // , {
   // maxInstances can get overwritten per capability. So if you have an in house Selenium
@@ -97,7 +100,7 @@ exports.config = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'verbose',
+  logLevel: 'error',
   //
   // Enables colors for log output.
   coloredLogs: true,

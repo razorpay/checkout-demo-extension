@@ -22,7 +22,7 @@ describe('Card Payment', () => {
   describe('Fill Card details', () => {
     it('Switch tab when card payment tab is clicked', () => {
       browser.checkoutFrame();
-      CheckoutForm.fillCommonFields();
+      browser.setValue('#contact', phoneNumber);
       browser.click('#payment-options > [tab=card]');
 
       assert.equal(
@@ -272,8 +272,6 @@ describe('Card Payment', () => {
         response.razorpay_payment_id,
         'Handler function is passed with `razorpay_payment_id`'
       );
-
-      browser.alertAccept();
     });
   });
 });

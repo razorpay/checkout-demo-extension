@@ -86,7 +86,7 @@ describe('prefills & data attrs', () => {
     );
 
     assert.equal(
-      utils.rgb2hex(browser.getCssProperty('#header', 'background-color').value),
+      utils.rgb2hex(browser.css('#header', 'background-color')),
       (data['theme.color'] || '').toLowerCase(),
       'Theme color is set'
     );
