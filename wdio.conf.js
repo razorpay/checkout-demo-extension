@@ -57,7 +57,7 @@ exports.config = {
   // from the same test should run tests.
   //
   //
-  maxInstances: 1,
+  maxInstances: 10,
   //
   // If you have trouble getting all important capabilities together, check out the
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -65,6 +65,8 @@ exports.config = {
   //
   capabilities: [{
     browserName: 'chrome'
+  }, {
+    browserName: 'firefox'
   }],
   // , {
   // maxInstances can get overwritten per capability. So if you have an in house Selenium
@@ -95,7 +97,7 @@ exports.config = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'error',
+  logLevel: 'verbose',
   //
   // Enables colors for log output.
   coloredLogs: true,

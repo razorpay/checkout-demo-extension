@@ -9,6 +9,10 @@ module.exports = {
     return browser.element(selector).value;
   },
 
+  css(selector, property) {
+    return browser.getCssProperty(selector, property).value;
+  },
+
   exec() {
     return browser.execute.apply(browser, arguments);
   },
