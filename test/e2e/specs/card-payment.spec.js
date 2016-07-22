@@ -1,5 +1,8 @@
 'use strict';
 
+const CheckoutForm = require('../pageobjects/checkout-form');
+const checkoutForm = new CheckoutForm();
+
 let manualCheckoutURL = '/manual-checkout.html';
 let phoneNumber = '18002700323';
 let cardNumber = '4111 1111 1111 1111';
@@ -18,11 +21,18 @@ before(() => {
   }).value;
 });
 
+function switchToPopup() {
+  let allTabs = browser.getTabIds();
+  allTabs.splice(allTabs.indexOf(currentTabId), 1);
+  let popup = allTabs[0];
+  browser.switchTab(popup);
+}
+
 describe('Card Payment', () => {
   describe('Fill Card details', () => {
     it('Switch tab when card payment tab is clicked', () => {
       browser.checkoutFrame();
-      browser.setValue('#contact', phoneNumber);
+      checkoutForm.fillCommonFields();
       browser.click('#payment-options > [tab=card]');
 
       assert.equal(
@@ -236,11 +246,7 @@ describe('Card Payment', () => {
     });
 
     it('Check the info displayed in the popup', () => {
-      let allTabs = browser.getTabIds();
-      allTabs.splice(allTabs.indexOf(currentTabId), 1);
-      let popup = allTabs[0];
-      browser.switchTab(popup);
-
+      switchToPopup();
       assert.equal(
         browser.getAttribute('#top > img', 'src'),
         data.image,
@@ -262,16 +268,14 @@ describe('Card Payment', () => {
       assert.equal(browser.getTabIds().length, 1, 'Popup is closed');
 
       browser.switchTab(currentTabId);
-
-      browser.waitUntil(() => {
-        return !!browser.alertText();
-      });
-
+      browser.pause(300);
       let response = JSON.parse(browser.alertText());
       assert.isOk(
         response.razorpay_payment_id,
         'Handler function is passed with `razorpay_payment_id`'
       );
+
+      browser.alertAccept();
     });
   });
 });
