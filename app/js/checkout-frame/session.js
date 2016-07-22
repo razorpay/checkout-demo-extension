@@ -491,6 +491,7 @@ Session.prototype = {
   },
 
   secAction: function(){
+    this.track('skipped_save', {while_submitting: !!payload});
     this.customer.wants_skip = true;
     var payload = this.payload;
     if (payload) {
@@ -545,6 +546,13 @@ Session.prototype = {
       this.on('blur', '#card_number', this.validateCard);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
+
+      var saveTick = qs('#save');
+      if (saveTick) {
+        this.on('change', '#save', function(e){
+          this.track('change_save', {active: e.target.checked});
+        })        
+      }
 
       // saved cards events
       this.on('click', '#show-add-card', this.toggleSavedCards);
