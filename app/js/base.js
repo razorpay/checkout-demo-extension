@@ -28,16 +28,11 @@ function makePrefParams(rzp){
     params.key_id = getter('key');
 
     var order_id = getter('order_id');
-    // var contact = getter('prefill.contact');
     var customer_id = getter('customer_id');
 
     if (order_id) {
       params.order_id = order_id;
     }
-
-    // if (contact) {
-    //   params.contact = contact;
-    // }
     if (customer_id) {
       params.customer_id = customer_id;
     }
