@@ -12,6 +12,7 @@ exports.config = {
   //
   host: '0.0.0.0',
   port: 4444,
+  path: '/wd/hub',
   //
   // =================
   // Service Providers
@@ -33,7 +34,7 @@ exports.config = {
   //
   specs: [
     // 'test/e2e/specs/netbanking.spec.js'
-    //'test/e2e/*.coffee'
+    // 'test/e2e/*.coffee'
     'test/e2e/specs/**.spec.js',
     // 'test/e2e/specs/automatic-checkout.spec.js'
   ],
@@ -68,9 +69,9 @@ exports.config = {
   capabilities: [{
     browserName: 'chrome',
     maxInstances: 5
-  }, {
-    browserName: 'firefox',
-    maxInstances: 1
+  // }, {
+  //   browserName: 'firefox',
+  //   maxInstances: 1
   }],
   // , {
   // maxInstances can get overwritten per capability. So if you have an in house Selenium
@@ -101,7 +102,7 @@ exports.config = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'error',
+  logLevel: 'verbose',
   //
   // Enables colors for log output.
   coloredLogs: true,
@@ -111,7 +112,7 @@ exports.config = {
   //
   // Set a base URL in order to shorten url command calls. If your url parameter starts
   //  with "/", the base url gets prepended.
-  baseUrl: "http://0.0.0.0:3000",
+  // baseUrl: "http://192.168.0.23:3000",
   //
   // Default timeout for all waitForXXX commands.
   waitforTimeout: 10000,

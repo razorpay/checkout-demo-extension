@@ -29,6 +29,7 @@ const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
 const vfs = require('vinyl-fs');
 const testServer = require('./test/e2e/server/index.js');
+const internalIp = require('internal-ip');
 
 const distDir = 'app/dist/v1/';
 
@@ -306,9 +307,12 @@ function createCoverageReport(){
 
 /***** E2E/Acceptance tests *****/
 
+
 gulp.task('e2e:run', function(done){
   return gulp.src('./wdio.conf.js')
-    .pipe(webdriver())
+    .pipe(webdriver({
+      baseUrl: `http://${internalIp.v4()}:3000`
+    }))
     .on('error', function(){
       done();
     });
