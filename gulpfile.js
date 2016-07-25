@@ -28,7 +28,7 @@ const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
 const vfs = require('vinyl-fs');
-const testServer = require('./test/e2e/server.js');
+const testServer = require('./test/e2e/server/index.js');
 
 const distDir = 'app/dist/v1/';
 
@@ -316,12 +316,12 @@ gulp.task('e2e:run', function(done){
 
 gulp.task('symlinkDist', () => {
   return vfs.src(distDir, { followSymlinks: false })
-    .pipe(vfs.symlink('test/e2e/dist/v1'));
+    .pipe(vfs.symlink('test/e2e/server/dist/v1'));
 });
 
 gulp.task('symlinkJquery', () => {
   return vfs.src('node_modules/jquery/dist/jquery.js', { followSymlinks: false })
-    .pipe(vfs.symlink('test/e2e/lib/'));
+    .pipe(vfs.symlink('test/e2e/server/lib/'));
 });
 
 let testServerInstance;

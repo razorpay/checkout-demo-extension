@@ -1,5 +1,6 @@
 'use strict';
 
+const utils = require('../helpers/utils');
 const CheckoutForm = require('../pageobjects/checkout-form');
 const checkoutForm = new CheckoutForm();
 
@@ -138,7 +139,19 @@ describe('Net Banking', () => {
     });
 
     it('Should select correct bank tile, when bank is selected from the select box', () => {
+      browser.selectByValue('#bank-select', 'YESB');
+      assert.isOk(browser.getAttribute('#bank-radio-YESB', 'checked'), 'Yes bank radio button is checked');
 
+      assert.equal(
+        utils.rgb2hex(browser.css('#bank-radio-YESB+label', 'background-color')),
+        '#f0f0f0',
+        'Label for selected bank tile is styled'
+      );
+    });
+
+    it('Should not select any bank tile, when popular bank is not chosen', () => {
+      browser.selectByValue('#bank-select', 'VIJB');
+      assert.isNotOk(browser.$('input[type=radio]:checked'), 'None of the popular bank is selected');
     });
   });
 });
