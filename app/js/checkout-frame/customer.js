@@ -68,9 +68,9 @@ Customer.prototype = {
     var url = makeAuthUrl(this.key, 'otp/verify');
 
     if (qpmap.platform === 'android' && qpmap.version && qpmap.library) {
-      data.platform = 'android';
-      data.version = qpmap.version;
-      data.library = qpmap.library;
+      data['_[platform]'] = 'android';
+      data['_[version]'] = qpmap.version;
+      data['_[library]'] = qpmap.library;
     }
 
     $.post({
