@@ -41,7 +41,7 @@ Customer.prototype = {
     var url = makeAuthUrl(this.key, 'customers/status/' + this.contact);
     var device_token = qpmap.device_token;
     if (device_token) {
-      url += '&device_token=' + device_token + '&version=' + qpmap.version + '&platform=' + qpmap.platform;
+      url += '&device_token=' + device_token;
     }
     $.ajax({
       url: url,
@@ -65,8 +65,14 @@ Customer.prototype = {
   submitOTP: function(data, callback){
     var user = this;
     data.contact = this.contact;
+    var url = makeAuthUrl(this.key, 'otp/verify');
+
+    if (qpmap.platform === 'android' && qpmap.version) {
+      url += '&platform=android&version=' + qpmap.version;
+    }
+
     $.post({
-      url: makeAuthUrl(this.key, 'otp/verify'),
+      url: url,
       data: data,
       callback: function(data){
         user.logged = data.success;
