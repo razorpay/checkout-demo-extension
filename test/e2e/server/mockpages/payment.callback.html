@@ -78,8 +78,6 @@
     You can safely close this tab
   </div>
   <script>
-    debugger;
-
     // Do not remove the below 'callback data' comments because they help
     // during tests for extracting callback data from js
 
@@ -138,8 +136,9 @@
         }
         opener.postMessage(data, '*')
       }
-      if (/\(iP.+(Cr|Fx)iOS/.test(navigator.userAgent))
+      if (/\(iP.+(Cr|Fx)iOS/.test(navigator.userAgent)) {
         setTimeout(close, 1000);
+      }
     }
   </script>
 </body>

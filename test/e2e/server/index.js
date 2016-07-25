@@ -49,7 +49,7 @@ app.post('/v1/payments/create/ajax', (req, res, next) => {
 });
 
 app.post('/v1/gateway/mock/netbanking/hdfc', (req, res, next) => {
-  debugger;
+  res.redirect('/mockpages/payment.callback.html');
 });
 
 // app.listen(3000, function(error) {

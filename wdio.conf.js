@@ -32,9 +32,10 @@ exports.config = {
   // directory is where your package.json resides, so `wdio` will be called from there.
   //
   specs: [
+    // 'test/e2e/specs/netbanking.spec.js'
     //'test/e2e/*.coffee'
-    'test/e2e/specs/**',
-    // 'test/e2e/specs/manual-checkout.spec.js'
+    'test/e2e/specs/**.spec.js',
+    // 'test/e2e/specs/automatic-checkout.spec.js'
   ],
   // Patterns to exclude.
   // exclude: [

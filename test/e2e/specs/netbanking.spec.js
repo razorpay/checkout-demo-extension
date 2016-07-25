@@ -8,7 +8,6 @@ before(() => {
   checkoutForm.open();
 });
 
-
 describe('Net Banking', () => {
   describe('Fill Commonfields & switch to net banking', () => {
     it('Verify tab switching', () => {
@@ -153,5 +152,9 @@ describe('Net Banking', () => {
       browser.selectByValue('#bank-select', 'VIJB');
       assert.isNotOk(browser.$('input[type=radio]:checked'), 'None of the popular bank is selected');
     });
+  });
+
+  describe('PAY via netbanking', () => {
+    require('./partials/direct-pay');
   });
 });
