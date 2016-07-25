@@ -216,6 +216,11 @@ function showModal(session) {
   var options = preferences.options;
   var saved_customer = preferences.customer;
 
+  // pass preferences options to app
+  if (CheckoutBridge) {
+    invoke('setMerchantOptions', CheckoutBridge, JSON.stringify(options));
+  }
+
   if (saved_customer) {
     var session_options = session.get();
     // we put saved customer contact, email into default prefills
