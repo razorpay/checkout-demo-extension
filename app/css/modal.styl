@@ -1,4 +1,4 @@
-@import "common";
+@require 'common'
 
 .clear {
   clear: both;
@@ -436,8 +436,8 @@ i {
   color: #404040;
 }
 
-$arrow-height: 10px;
-$outline: #ddd;
+$arrow-height = 10px;
+$outline = #ddd;
 
 #profile {
   position: absolute;
@@ -488,8 +488,7 @@ $outline: #ddd;
 #profile {
   display: none\9;
   pointer-events: none;
-
-  @include opacity(0);
+  opacity: 0;
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
   transform: translateY(-10px);
 }
@@ -499,7 +498,7 @@ $outline: #ddd;
   pointer-events: auto;
   display: block;
 
-  @include opacity(1);
+  opacity: 1;
   transform: none;
   transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
 }

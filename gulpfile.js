@@ -5,9 +5,9 @@ const path = require('path');
 const gulp = require('gulp');
 const dot = require('./scripts/dot/index');
 const glob = require('glob')
-const sass = require('gulp-sass');
+const stylus = require('gulp-stylus');
 const cleanCSS = require('gulp-clean-css');
-const stylelint = require('gulp-stylelint');
+const stylint = require('gulp-stylint');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
 const uglify = require('gulp-uglify');
@@ -45,7 +45,7 @@ let isProduction = options.env === 'production';
 let paths = {
   js: assetPath('js/**/*.js'),
   templates: assetPath('_templates/**/*.jst'),
-  css: assetPath('css/**/*.scss'),
+  css: assetPath('css/**/*.styl'),
   images: assetPath('images/**/*'),
   fonts: assetPath('fonts/**/*')
 };
@@ -68,20 +68,10 @@ gulp.task('compileTemplates', function() {
     .pipe(gulp.dest(assetPath('templates')));
 });
 
-let styleLintOptions = {
-  syntax: 'scss',
-  reporters: [
-    {
-      formatter: 'string',
-      console: true
-    }
-  ]
-};
-
 gulp.task('compileStyles', function() {
   return gulp.src(paths.css)
-    .pipe(stylelint(styleLintOptions))
-    .pipe(sass())
+    // .pipe(stylint(styleLintOptions))
+    .pipe(stylus())
     .pipe(concat('checkout.css'))
     .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
     .pipe(autoprefixer({
