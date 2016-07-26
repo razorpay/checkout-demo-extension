@@ -5,6 +5,7 @@ const path = require('path');
 const gulp = require('gulp');
 const dot = require('./scripts/dot/index');
 const glob = require('glob')
+const plumber = require('gulp-plumber')
 const stylus = require('gulp-stylus');
 const cleanCSS = require('gulp-clean-css');
 const stylint = require('gulp-stylint');
@@ -70,7 +71,8 @@ gulp.task('compileTemplates', function() {
 
 gulp.task('compileStyles', function() {
   return gulp.src(paths.css)
-    // .pipe(stylint(styleLintOptions))
+    .pipe(plumber())
+    .pipe(stylint())
     .pipe(stylus())
     .pipe(concat('checkout.css'))
     .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
@@ -133,17 +135,7 @@ gulp.task('build', function() {
   runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
-gulp.task('setServeENV', function() {
-  isProduction = false;
-  styleLintOptions.failAfterError = false;
-});
-
-gulp.task('setTestENV', function() {
-  isProduction = false;
-  styleLintOptions.failAfterError = true;
-});
-
-gulp.task('serve', ['setServeENV', 'build'], function() {
+gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['compileStyles']);
   gulp.watch([paths.templates], ['compileTemplates']);
   gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']);
