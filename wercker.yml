@@ -1,15 +1,12 @@
-box: pronav/checkout
+box: selvagsz/checkout
 build:
     steps:
-        - script:
-            name: Install xvfb, chrome
-            code: apt-get install xvfb chrome
         - script:
             name: npm install
             code: npm install --no-optional
         - script:
             name: Test
-            code: xvfb-run selenium-standalone start > /dev/null & gulp test
+            code: gulp test
 
     after-steps:
         - slack-notifier:

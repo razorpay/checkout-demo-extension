@@ -68,7 +68,7 @@ exports.config = {
   //
   capabilities: [{
     browserName: 'chrome',
-    maxInstances: 5
+    maxInstances: 1
   // }, {
   //   browserName: 'firefox',
   //   maxInstances: 1
@@ -115,7 +115,7 @@ exports.config = {
   // baseUrl: "http://192.168.0.23:3000",
   //
   // Default timeout for all waitForXXX commands.
-  waitforTimeout: 10000,
+  waitforTimeout: 20000,
   //
   // Initialize the browser instance with a WebdriverIO plugin. The object should have the
   // plugin name as key and the desired plugin options as property. Make sure you have

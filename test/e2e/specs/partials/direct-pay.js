@@ -73,7 +73,7 @@ describe('Direct pay', () => {
   it('Popup is closed & handler function is called', () => {
     browser.waitUntil(() => {
       return (browser.getTabIds() || []).length === 1;
-    });
+    }, 5000, 'Awaiting for server\'s response', 1000);
 
     assert.equal(browser.getTabIds().length, 1, 'Popup is closed');
 
