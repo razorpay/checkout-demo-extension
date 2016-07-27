@@ -47,6 +47,11 @@ Customer.prototype = {
       url: url,
       callback: function(data){
         customer.saved = !!data.saved;
+        if (data.tokens) {
+          customer.logged = true;
+          sanitizeTokens(data.tokens);
+          customer.tokens = data.tokens;
+        }
         callback();
       }
     })

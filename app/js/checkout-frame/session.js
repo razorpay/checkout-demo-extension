@@ -704,7 +704,7 @@ Session.prototype = {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
-        if (customer.saved) {
+        if (customer.saved && !customer.logged) {
           askOTP();
         } else {
           self.showCards();
