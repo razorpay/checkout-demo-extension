@@ -22,12 +22,6 @@ module.exports = {
     return browser.execute.apply(browser, arguments);
   },
 
-  getDirectText(selector) {
-    return browser.exec((selector) => {
-      return jQuery(selector).clone().children().remove().end().text().trim();
-    }, selector).value;
-  },
-
   hasClass(selector, className) {
     let classes = browser.getAttribute(selector, 'class') || '';
     return classes.split(' ').indexOf(className) !== -1;

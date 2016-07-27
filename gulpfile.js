@@ -142,8 +142,8 @@ gulp.task('staticAssets', function() {
     .pipe(gulp.dest(`${distDir}`));
 });
 
-gulp.task('build', function() {
-  runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
+gulp.task('build', function(cb) {
+  runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets', cb);
 });
 
 gulp.task('setServeENV', function() {
@@ -323,11 +323,6 @@ gulp.task('symlinkDist', () => {
     .pipe(vfs.symlink('test/e2e/server/dist/v1'));
 });
 
-gulp.task('symlinkJquery', () => {
-  return vfs.src('node_modules/jquery/dist/jquery.js', { followSymlinks: false })
-    .pipe(vfs.symlink('test/e2e/server/lib/'));
-});
-
 let testServerInstance;
 
 gulp.task('testserver:start', () => {
@@ -344,7 +339,7 @@ gulp.task('testserver:stop', () => {
 });
 
 gulp.task('test:e2e', () => {
-  runSequence('build', ['symlinkDist', 'symlinkJquery'], 'testserver:start', 'e2e:run', 'testserver:stop');
+  runSequence('build', 'symlinkDist', 'testserver:start', 'e2e:run', 'testserver:stop');
 });
 
 /***** --- *****/

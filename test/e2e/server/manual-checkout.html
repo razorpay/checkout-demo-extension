@@ -45,9 +45,10 @@
       };
       var rzp1 = new Razorpay(options);
 
-      $('#rzp-button').on('click', function() {
+      document.getElementById('rzp-button').addEventListener('click', function(event) {
+        event.preventDefault();
         rzp1.open();
-      });
+      }, false);
     </script>
   </body>
 </html>

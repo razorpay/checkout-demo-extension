@@ -40,7 +40,7 @@ describe('Loads RZP Modal', () => {
 describe('prefills & data attrs', () => {
   it('`script` data-attributes should load correctly', () => {
     let data = browser.execute(() => {
-      return jQuery('form#checkout-form > script').data();
+      return document.querySelector('form#checkout-form > script').dataset;
     }).value;
 
     assert.equal(
