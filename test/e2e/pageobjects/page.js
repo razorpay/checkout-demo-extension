@@ -6,4 +6,4 @@ Page.prototype.open = function(path) {
   browser.url(`/${path}`)
 }
 
-module.exports = Page;
+module.exports = Page

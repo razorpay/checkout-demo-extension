@@ -42,9 +42,9 @@
       }
 
       if (window.location.search) {
-        var frameOptions = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
-        if (frameOptions) {
-          merge(window.preferences, frameOptions);
+        var passedPreferences = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
+        if (passedPreferences) {
+          merge(window.preferences, passedPreferences);
         }
       }
 

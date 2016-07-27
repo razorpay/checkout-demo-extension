@@ -58,8 +58,8 @@
       if (typeof passedOptions === 'object') {
         merge(options, passedOptions.rzpOptions);
 
-        if (passedOptions.frameOptions) {
-          Razorpay.config.frame = Razorpay.config.frame + '?' + encodeURIComponent(JSON.stringify(passedOptions.frameOptions));
+        if (passedOptions.preferences) {
+          Razorpay.config.frame = Razorpay.config.frame + '?' + encodeURIComponent(JSON.stringify(passedOptions.preferences));
         }
       }
 
