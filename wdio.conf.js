@@ -68,7 +68,7 @@ exports.config = {
   //
   capabilities: [{
     browserName: 'chrome',
-    maxInstances: 1
+    maxInstances: 5
   // }, {
   //   browserName: 'firefox',
   //   maxInstances: 1
@@ -102,7 +102,7 @@ exports.config = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'error',
+  logLevel: 'verbose',
   //
   // Enables colors for log output.
   coloredLogs: true,
