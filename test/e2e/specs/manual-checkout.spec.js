@@ -1,11 +1,11 @@
 'use strict';
 
 const utils = require('../helpers/utils');
-let manualCheckoutURL = '/manual-checkout.html';
+const CheckoutForm = require('../pageobjects/checkout-form');
+const checkoutForm = new CheckoutForm();
 
 before(() => {
-  browser.url(manualCheckoutURL);
-  browser.click('#rzp-button');
+  checkoutForm.open();
 });
 
 beforeEach(() => {
@@ -110,8 +110,7 @@ describe('Modal should close', () => {
   }
 
   beforeEach(() => {
-    browser.url(manualCheckoutURL);
-    browser.click('#rzp-button');
+    checkoutForm.open();
   });
 
   it('Close on escape press, which parent window is focused', () => {
@@ -137,8 +136,7 @@ describe('Modal should close', () => {
 
 describe('Validate email & phone fields', () => {
   before(() => {
-    browser.url(manualCheckoutURL);
-    browser.click('#rzp-button');
+    checkoutForm.open();
   });
 
   it('Show error, when phone number is missing', () => {
@@ -242,5 +240,115 @@ describe('Home Screen', () => {
       browser.css('#footer', 'opacity'),
       'Button is hidden - with zero opacity'
     );
+  });
+
+  describe('Payment tabs should be shown based on passed payment options', () => {
+    it('Initially, all payment options are shown', () => {
+      checkoutForm.open();
+      browser.checkoutFrame();
+      assert.equal(
+        browser.elements('#payment-options > .payment-option').value.length,
+        3,
+        'All payment options are shown'
+      );
+    });
+
+    it('Hide card tab, if `card` is false', () => {
+      checkoutForm.open({
+        frameOptions: {
+          methods: {
+            card: false
+          }
+        }
+      });
+      browser.checkoutFrame();
+      assert.equal(
+        browser.elements('#payment-options > .payment-option').value.length,
+        2,
+        'Two payment options are shown'
+      );
+
+      assert.isNotOk(
+        browser.$('#payment-options > [tab=card]'),
+        'Card tab is hidden'
+      );
+    });
+
+    it('Hide Netbanking, if `netbanking` is set to false', () => {
+      checkoutForm.open({
+        frameOptions: {
+          methods: {
+            card: false,
+            netbanking: false
+          }
+        }
+      });
+
+      browser.checkoutFrame();
+      assert.equal(
+        browser.elements('#payment-options > .payment-option').value.length,
+        1,
+        'Only one payment option is shown'
+      );
+
+      assert.isNotOk(
+        browser.$('#payment-options > [tab=card]'),
+        'Card tab is hidden'
+      );
+
+      assert.isNotOk(
+        browser.$('#payment-options > [tab=netbanking]'),
+        'Netbanking is hidden'
+      );
+    });
+
+    it('Hide Wallet, if `wallet` is set to false', () => {
+      checkoutForm.open({
+        frameOptions: {
+          methods: {
+            card: true,
+            netbanking: false,
+            wallet: false
+          }
+        }
+      });
+
+      browser.checkoutFrame();
+      assert.equal(
+        browser.elements('#payment-options > .payment-option').value.length,
+        1,
+        'Only one payment option is shown'
+      );
+
+      assert.isNotOk(
+        browser.$('#payment-options > [tab=wallet]'),
+        'Wallet is hidden'
+      );
+
+      assert.isNotOk(
+        browser.$('#payment-options > [tab=netbanking]'),
+        'Netbanking is hidden'
+      );
+
+      assert.isOk(
+        browser.$('#payment-options > [tab=card]'),
+        'Only Card tab is shown'
+      );
+    });
+  });
+
+  describe('Wallets are shown based on the passed options', () => {
+    it('All wallets are shown', () => {
+      checkoutForm.open();
+      browser.checkoutFrame();
+      checkoutForm.fillCommonFields();
+      browser.click('#payment-options > [tab=wallet]');
+
+      assert.equal(
+        browser.elements('#Wallets > .wallet').value.length,
+        3,
+        'All wallets are shown'
+      );
+    });
   });
 });

@@ -45,8 +45,9 @@ CheckoutForm.prototype = {
     });
   },
 
-  open() {
-    browser.url('/manual-checkout.html')
+  open(options) {
+    options = options || {};
+    browser.url(`/manual-checkout.html?${encodeURIComponent(JSON.stringify(options))}`);
     browser.click('#rzp-button');
   }
 }

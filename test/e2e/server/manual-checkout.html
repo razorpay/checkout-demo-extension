@@ -12,6 +12,18 @@
   <body id="index">
     <button id="rzp-button">Click Me</button>
     <script>
+      function merge(source, obj) {
+        for (i in obj) {
+          if (obj.hasOwnProperty(i)) {
+            if (typeof obj[i] === 'object') {
+              merge(source[i], obj[i]);
+            } else {
+              source[i] = obj[i];
+            }
+          }
+        }
+      }
+
       Razorpay = {
         config: {
           api: 'http://0.0.0.0:3000',
@@ -19,10 +31,7 @@
           frame: './checkout-frame.html',
         }
       }
-    </script>
 
-    <script src='./dist/v1/checkout.js'></script>
-    <script>
       var options = {
         "key": "rzp_test_GGdPE9eCDHkMTk",
         "amount": "2000", // 2000 paise = INR 20
@@ -43,12 +52,26 @@
           "color": "#F37254"
         }
       };
-      var rzp1 = new Razorpay(options);
 
-      document.getElementById('rzp-button').addEventListener('click', function(event) {
-        event.preventDefault();
-        rzp1.open();
-      }, false);
+
+      var passedOptions = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
+      if (typeof passedOptions === 'object') {
+        merge(options, passedOptions.rzpOptions);
+
+        if (passedOptions.frameOptions) {
+          Razorpay.config.frame = Razorpay.config.frame + '?' + encodeURIComponent(JSON.stringify(passedOptions.frameOptions));
+        }
+      }
+
+      </script>
+
+      <script src='./dist/v1/checkout.js'></script>
+      <script>
+        var rzp1 = new Razorpay(options);
+        document.getElementById('rzp-button').addEventListener('click', function(event) {
+          event.preventDefault();
+          rzp1.open();
+        }, false);
     </script>
   </body>
 </html>

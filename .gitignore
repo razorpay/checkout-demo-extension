@@ -7,7 +7,6 @@
 
 # dependencies
 /node_modules
-/test/e2e/server/lib/
 
 # misc
 .orig
