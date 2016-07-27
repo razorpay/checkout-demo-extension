@@ -14,7 +14,7 @@ before(() => {
       order
     }
   })
-  browser.checkoutFrame()
+  browser.checkoutFrame();
   preferences = browser.exec(() => {
     return window.preferences
   }).value
@@ -109,5 +109,31 @@ describe('Know Your Customer. Shows account details of the customer in the upfro
         'Account number is displayed'
       )
     })
+  })
+
+  describe('Check error states', () => {
+    it('Show error when common fields are not filled', () => {
+      browser.click('#footer');
+
+      assert.isOk(
+        browser.hasClass('#form-common .elem-contact', 'invalid'),
+        'Empty phone field is invalid'
+      )
+
+      assert.isOk(
+        browser.hasClass('#form-common .elem-contact', 'focused'),
+        'Empty phone field is focused on error'
+      )
+
+      assert.isOk(
+        browser.css('.elem-contact .help', 'opacity'),
+        'Empty phone help text is shown'
+      )
+      checkoutForm.fillCommonFields();
+    })
+  })
+
+  describe('PAY', () => {
+    require('./partials/direct-pay')
   })
 })
