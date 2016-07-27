@@ -6,7 +6,7 @@ build:
             code: npm install --no-optional
         - script:
             name: Test
-            code: gulp test
+            code: gulp build && selenium-standalone start && gulp test
 
     after-steps:
         - slack-notifier:
