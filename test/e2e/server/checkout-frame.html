@@ -15,12 +15,13 @@
         for (i in obj) {
           if (obj.hasOwnProperty(i)) {
             if (typeof obj[i] === 'object') {
-              merge(source[i], obj[i]);
+              source[i] = merge(source[i] || {}, obj[i]);
             } else {
               source[i] = obj[i];
             }
           }
         }
+        return source;
       }
 
       window.preferences = {
