@@ -344,7 +344,7 @@ gulp.task('testserver:stop', () => {
 });
 
 gulp.task('test:e2e', () => {
-  runSequence(['symlinkDist', 'symlinkJquery'], 'testserver:start', 'e2e:run', 'testserver:stop');
+  runSequence('build', ['symlinkDist', 'symlinkJquery'], 'testserver:start', 'e2e:run', 'testserver:stop');
 });
 
 /***** --- *****/
