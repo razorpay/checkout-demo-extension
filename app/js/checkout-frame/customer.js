@@ -9,7 +9,7 @@ var getCustomer = function(contact) {
 
 function Customer(contact) {
   if (contact) {
-    this.contact = contact.replace(/\D/g, '');
+    this.contact = contact.replace(/[^+\d]/g, '');
   }
 }
 
