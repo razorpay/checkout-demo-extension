@@ -320,7 +320,7 @@ gulp.task('e2e:run', function(done){
 
 gulp.task('symlinkDist', () => {
   return vfs.src(distDir, { followSymlinks: false })
-    .pipe(vfs.symlink('test/e2e/server/dist/v1'));
+    .pipe(vfs.symlink('test/e2e/server/public/dist/v1'));
 });
 
 let testServerInstance;

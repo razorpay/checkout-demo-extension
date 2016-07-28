@@ -78,13 +78,20 @@
     You can safely close this tab
   </div>
   <script>
+    function getCookie(sKey) {
+      if (!sKey) { return null; }
+      return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+    }
+    var data = {};
     // Do not remove the below 'callback data' comments because they help
     // during tests for extracting callback data from js
 
     // Callback data //
-    var data = {
-      "razorpay_payment_id": "pay_5yVyYXUVQ0Blo7"
-    };
+    if (getCookie('status') === 'S') {
+      data = {
+        "razorpay_payment_id": "pay_5yVyYXUVQ0Blo7"
+      };
+    }
     // Callback data //
 
     var s = 'razorpay_payment_id' in data;

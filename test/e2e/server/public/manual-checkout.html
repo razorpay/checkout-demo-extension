@@ -12,6 +12,11 @@
   <body id="index">
     <button id="rzp-button">Click Me</button>
     <script>
+      function getCookie(sKey) {
+        if (!sKey) { return null; }
+        return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+      }
+
       function merge(source, obj) {
         for (i in obj) {
           if (obj.hasOwnProperty(i)) {
@@ -25,20 +30,24 @@
         return source;
       }
 
-      Razorpay = {
-        config: {
-          api: 'http://0.0.0.0:3000',
-          frameApi: 'http://0.0.0.0:3000',
-          frame: './checkout-frame.html',
+      var isSoakTesting = getCookie('soakTesting') === 'true';
+
+      if (!isSoakTesting) {
+        Razorpay = {
+          config: {
+            api: 'http://0.0.0.0:3000',
+            frameApi: 'http://0.0.0.0:3000',
+            frame: './checkout-frame.html',
+          }
         }
       }
 
       var options = {
-        "key": "rzp_test_GGdPE9eCDHkMTk",
+        "key": "rzp_test_n7LBSmN4pm3dqe",
         "amount": "2000", // 2000 paise = INR 20
         "name": "Merchant Name",
         "description": "Purchase Description",
-        "image": "https://razorpay.com/images/brand/glyph-rounded-square.svg",
+        "image": "images/glyph-rounded-square.svg",
         "handler": function (response){
           alert(JSON.stringify(response));
         },
@@ -55,15 +64,16 @@
       };
 
 
-      var passedOptions = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
-      if (typeof passedOptions === 'object') {
-        merge(options, passedOptions.rzpOptions);
+      if (window.location.search) {
+        var passedOptions = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
+        if (typeof passedOptions === 'object') {
+          merge(options, passedOptions.rzpOptions);
 
-        if (passedOptions.preferences) {
-          Razorpay.config.frame = Razorpay.config.frame + '?' + encodeURIComponent(JSON.stringify(passedOptions.preferences));
+          if (passedOptions.preferences) {
+            Razorpay.config.frame = Razorpay.config.frame + '?' + encodeURIComponent(JSON.stringify(passedOptions.preferences));
+          }
         }
       }
-
       </script>
 
       <script src='./dist/v1/checkout.js'></script>

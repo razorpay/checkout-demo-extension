@@ -2,7 +2,7 @@
 /app/dist/
 !/app/dist/v1/checkout-new.js
 /app/templates
-/test/e2e/server/dist
+/test/e2e/server/public/dist
 /shots
 
 # dependencies

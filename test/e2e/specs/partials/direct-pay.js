@@ -57,9 +57,8 @@ describe('Direct pay', () => {
 
   it('Check the info displayed in the popup', () => {
     switchToPopup()
-    assert.equal(
+    assert.isOk(
       browser.getAttribute('#top > img', 'src'),
-      data.image,
       'Image loaded in the popup'
     )
 
@@ -70,21 +69,77 @@ describe('Direct pay', () => {
     )
   })
 
-  it('Popup is closed & handler function is called', () => {
-    browser.waitUntil(() => {
-      return (browser.getTabIds() || []).length === 1
-    }, 15000, 'Awaiting for server\'s response', 1000)
+  describe('Error Payment', () => {
+    it('Popup is closed & Retry is shown on error', () => {
+      browser.waitForExist('form input[data-value=F]', 15000)
+      browser.click('form input[data-value=F]')
+      browser.waitUntil(() => {
+        return (browser.getTabIds() || []).length === 1
+      }, 15000, 'Awaiting for server\'s response', 1000)
 
-    assert.equal(browser.getTabIds().length, 1, 'Popup is closed')
+      assert.equal(browser.getTabIds().length, 1, 'Popup is closed')
+      browser.switchTab(currentTabId)
+      browser.checkoutFrame()
+      browser.pause(300)
 
-    browser.switchTab(currentTabId)
-    browser.pause(300)
-    let response = JSON.parse(browser.alertText())
-    assert.isOk(
-      response.razorpay_payment_id,
-      'Handler function is passed with `razorpay_payment_id`'
-    )
+      assert.equal(
+        browser.css('#error-message', 'display'),
+        'block',
+        'Error container is shown'
+      )
 
-    browser.alertAccept()
+      assert.equal(
+        browser.getText('#fd-t'),
+        'Unexpected error. This incident has been reported to admins.',
+        'Error text is shown'
+      )
+
+      assert.equal(
+        browser.getText('#error-message #fd-hide'),
+        'RETRY',
+        'RETRY button is shown'
+      )
+    })
+
+    it('Error container should hide on clicking Retry', () => {
+      browser.click('#error-message #fd-hide')
+      browser.waitUntil(() => {
+        return browser.css('#error-message', 'display') === 'none'
+      })
+      assert.equal(
+        browser.css('#error-message', 'display'),
+        'none',
+        'Error container is removed'
+      )
+    })
+  })
+
+  describe('Success Payment', () => {
+    it('Popup is closed & handler function is called on success', () => {
+      browser.click('#footer')
+      browser.waitUntil(() => {
+        return (browser.getTabIds() || []).length === 2
+      }, 1000)
+      switchToPopup()
+
+      browser.waitForExist('form input[data-value=S]', 15000)
+      browser.click('form input[data-value=S]')
+
+      browser.waitUntil(() => {
+        return (browser.getTabIds() || []).length === 1
+      }, 15000, 'Awaiting for server\'s response', 1000)
+
+      assert.equal(browser.getTabIds().length, 1, 'Popup is closed')
+
+      browser.switchTab(currentTabId)
+      browser.pause(300)
+      let response = JSON.parse(browser.alertText())
+      assert.isOk(
+        response.razorpay_payment_id,
+        'Handler function is passed with `razorpay_payment_id`'
+      )
+
+      browser.alertAccept()
+    })
   })
 })
