@@ -99,13 +99,13 @@ label[for] {
 
 .select {
   padding: 28px 0 0;
-}
 
-.select select {
-  appearance: none;
-  text-indent: 1px;
-  text-overflow: ellipsis;
-  padding: 7px 0;
+  select {
+    appearance: none;
+    text-indent: 1px;
+    text-overflow: ellipsis;
+    padding: 7px 0;
+  }
 }
 
 select option {
@@ -194,10 +194,6 @@ button {
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
 }
 
-.help {
-  transform: translateY(-10px);
-}
-
 .dropdown-parent:focus .dropdown,
 .focused.invalid.mature .help {
   pointer-events: auto;
@@ -208,6 +204,7 @@ button {
 }
 
 .help {
+  transform: translateY(-10px);
   color: #fff;
   font-weight: bold;
   position: absolute;

@@ -447,6 +447,11 @@ $outline = #ddd;
   top: $topbarh;
   right: 5px;
   margin-top: $arrow-height;
+  display: none\9;
+  pointer-events: none;
+  opacity: 0;
+  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+  transform: translateY(-10px);
 
   ul {
     list-style: none;
@@ -485,19 +490,9 @@ $outline = #ddd;
   }
 }
 
-#profile {
-  display: none\9;
-  pointer-events: none;
-  opacity: 0;
-  transition: 0.25s ease-in transform, 0.16s ease-in opacity;
-  transform: translateY(-10px);
-}
-
 #top-right:focus #profile {
-  display: none;
   pointer-events: auto;
   display: block;
-
   opacity: 1;
   transform: none;
   transition: 0.2s cubic-bezier(0.6, 1.6, 0.8, 1) transform, 0.2s ease-out opacity;
@@ -610,7 +605,6 @@ $outline = #ddd;
   font-size: 18px;
   padding: 0;
   line-height: 54px;
-  width: 100%;
   color: #fff;
   transition: 0.2s;
   font-weight: bold;

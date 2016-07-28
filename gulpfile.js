@@ -68,6 +68,7 @@ gulp.task('compileStyles', function() {
   return gulp.src(paths.css)
     .pipe(plumber())
     .pipe(stylint())
+    .pipe(stylint.reporter())
     .pipe(stylus())
     .pipe(concat('checkout.css'))
     .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))

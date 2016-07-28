@@ -90,6 +90,9 @@ $gridStagger = 0.05s;
 
 .tab-content.drishy {
   transition-delay: $second;
+  .item-inner {
+    transform: scale(1);
+  }
 }
 
 #body {
@@ -113,10 +116,6 @@ $gridStagger = 0.05s;
   position: relative;
   transition: 0.2s;
   transform: scale(0);
-}
-
-.tab-content.drishy .item-inner {
-  transform: scale(1);
 }
 
 for $i in (1..4) {
