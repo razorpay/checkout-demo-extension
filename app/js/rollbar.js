@@ -18,12 +18,12 @@ TraceKit.report.subscribe(function(errorReport) {
 
 function postRollbar(msg, trace, level, isStack) {
   var body;
-  if (isStack) {
+  if (isStack && trace.message) {
     body = {
       trace: {
         frames: trace.stack,
         exception: {
-          'class': trace.name,
+          'class': trace.name || '(unknown)',
           message: trace.message
         }
       }
