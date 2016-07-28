@@ -62,11 +62,6 @@ gulp.task('compileTemplates', function() {
     destination: assetPath('templates'),
     global: 'templates'
   });
-
-  return gulp.src(assetPath('templates/*.js'))
-    .pipe(replace('\n/**/', ''))
-    .pipe(wrap('/* jshint ignore:start */\n\n', '\n\n/* jshint ignore:end */'))
-    .pipe(gulp.dest(assetPath('templates')));
 });
 
 gulp.task('compileStyles', function() {
@@ -292,6 +287,7 @@ gulp.task('hint', function(){
   return gulp.src([assetPath('dist/v1/*.js')])
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(gulp.dest(distDir))
+    .pipe(plumber())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(jshint.reporter('fail'));
