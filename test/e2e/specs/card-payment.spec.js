@@ -202,6 +202,6 @@ describe('Card Payment', () => {
   })
 
   describe('PAY via card', () => {
-    require('./partials/direct-pay')
+    require('./partials/direct-pay')()
   })
 })

@@ -27,10 +27,6 @@ app.post('/v1/payments/create/ajax', (req, res, next) => {
 
   switch (body.method) {
     case 'card':
-      res.json({
-        "razorpay_payment_id": "pay_5x6vI0WYRykH9W"
-      })
-      break
     case 'netbanking':
       res.json({
         "type": "first",

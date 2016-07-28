@@ -155,6 +155,6 @@ describe('Net Banking', () => {
   })
 
   describe('PAY via netbanking', () => {
-    require('./partials/direct-pay')
+    require('./partials/direct-pay')()
   })
 })

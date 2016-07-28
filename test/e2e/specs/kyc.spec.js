@@ -134,6 +134,6 @@ describe('Know Your Customer. Shows account details of the customer in the upfro
   })
 
   describe('PAY', () => {
-    require('./partials/direct-pay')
+    require('./partials/direct-pay')()
   })
 })

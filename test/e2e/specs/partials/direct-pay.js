@@ -1,5 +1,5 @@
 'use strict'
-
+module.exports = function() {
 let currentTabId, data
 
 before(() => {
@@ -143,3 +143,4 @@ describe('Direct pay', () => {
     })
   })
 })
+}
