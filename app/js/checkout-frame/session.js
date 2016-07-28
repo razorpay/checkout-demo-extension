@@ -414,7 +414,7 @@ Session.prototype = {
     var div = this.el;
     var style = document.createElement('style');
     style.type = 'text/css';
-    try{
+    try {
       var getter = this.get;
       div.style.color = getter('theme.color');
       if(!div.style.color){
@@ -428,7 +428,7 @@ Session.prototype = {
       }
       div.style.color = '';
     } catch(e){
-      roll(e.message);
+      roll('renderCss', e);
     }
     return style;
   },

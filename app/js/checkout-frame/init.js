@@ -1,5 +1,6 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
+TraceKit.collectWindowErrors = true;
 
 (function(){
   var a = document.createElement('a');

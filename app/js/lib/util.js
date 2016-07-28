@@ -139,14 +139,14 @@ function invoke(handler, thisArg, param, timeout) {
     if (!thisArg) {
       thisArg = this;
     }
-    // try {
+    try {
       if (arguments.length >= 3) {
         return handler.call(thisArg, param);
       }
       return handler.call(thisArg);      
-    // } catch(e) {
-    //   roll('invoke error', e);
-    // }
+    } catch(e) {
+      roll('invoke', e);
+    }
   }
 }
 
