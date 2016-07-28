@@ -5,7 +5,7 @@ var now = Date.now || function() {
 // iphone/ipad restrict non user initiated focus on input fields
 var ua = navigator.userAgent;
 var ua_iOS = /iPhone|iPad/.test(ua);
-var ua_prefer_redirect = /Windows Phone|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/;
+var ua_prefer_redirect = /Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 var shouldFocusNextField = !ua_iOS;
 
@@ -139,14 +139,14 @@ function invoke(handler, thisArg, param, timeout) {
     if (!thisArg) {
       thisArg = this;
     }
-    // try {
+    try {
       if (arguments.length >= 3) {
         return handler.call(thisArg, param);
       }
       return handler.call(thisArg);      
-    // } catch(e) {
-    //   roll('invoke error', e);
-    // }
+    } catch(e) {
+      roll('invoke', e);
+    }
   }
 }
 

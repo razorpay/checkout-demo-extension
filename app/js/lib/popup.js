@@ -104,9 +104,8 @@ Popup.prototype = {
 
     try{
       this.window.close();
-    }
-    catch(e){
-      roll('Failure closing popup window', null, 'warn');
+    } catch(e){
+      roll('tried popup.close', e, 'warn');
     }
   },
 

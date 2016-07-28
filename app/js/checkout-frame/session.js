@@ -414,7 +414,7 @@ Session.prototype = {
     var div = this.el;
     var style = document.createElement('style');
     style.type = 'text/css';
-    try{
+    try {
       var getter = this.get;
       div.style.color = getter('theme.color');
       if(!div.style.color){
@@ -428,7 +428,7 @@ Session.prototype = {
       }
       div.style.color = '';
     } catch(e){
-      roll(e.message);
+      roll('renderCss', e);
     }
     return style;
   },
@@ -704,7 +704,7 @@ Session.prototype = {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
-        if (customer.saved) {
+        if (customer.saved && !customer.logged) {
           askOTP();
         } else {
           self.showCards();

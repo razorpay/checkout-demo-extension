@@ -345,7 +345,7 @@ CheckoutFrame.prototype = {
             try{
               rzp.get('external.handler').call(rzp, data);
             } catch(e){
-              track(rzp, 'js_error', e);
+              roll('merc', e);
             }
           }
         }
@@ -374,7 +374,7 @@ CheckoutFrame.prototype = {
           invoke(this.get('handler'), this, data);
         }
         catch(e){
-          track(rzp, 'js_error', e);
+          roll('merc', e);
           throw e;
         }
       },

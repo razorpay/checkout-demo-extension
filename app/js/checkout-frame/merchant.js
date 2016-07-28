@@ -200,19 +200,18 @@ function setPaymentMethods(session){
   methods.wallet = wallets;
 }
 
-function showModal(session) {
-  if (!preferences) {
-    var data = makePrefParams(session);
-    Razorpay.payment.getPrefs(data, function(response) {
-      if(response.error){
-        return Razorpay.sendMessage({event: 'fault', data: response.error.description});
-      }
-      preferences = response;
-      showModal(session);
-    })
-    return;
-  }
+function fetchPrefsAndShowModal(session){
+  var data = makePrefParams(session);
+  Razorpay.payment.getPrefs(data, function(response) {
+    if(response.error){
+      return Razorpay.sendMessage({event: 'fault', data: response.error.description});
+    }
+    preferences = response;
+    showModal(session);
+  })
+}
 
+function showModal(session) {
   var options = preferences.options;
   var saved_customer = preferences.customer;
 
@@ -271,23 +270,6 @@ function showModalWithSession(session){
   }
   if(qpmap.tab){
     session.switchTab(qpmap.tab);
-  }
-}
-
-function configureRollbar(id){
-  if(Rollbar){
-    invoke(
-      Rollbar.configure,
-      Rollbar,
-      {
-        payload: {
-          person: {
-            id: id
-          },
-          context: trackingProps.context
-        }
-      }
-    );
   }
 }
 
@@ -409,9 +391,8 @@ window.handleMessage = function(message){
       session = new Session(options);
     } catch(e){
       Razorpay.sendMessage({event: 'fault', data: e.message});
-      return roll('fault ' + e.message, message, 'warn');
+      return roll('fault', e, 'warn');
     }
-    configureRollbar(id);
     var oldSession = getSession();
     if(oldSession){
       invoke('saveAndClose', oldSession);
@@ -437,9 +418,13 @@ window.handleMessage = function(message){
     session.params = message.params;
   }
 
-  if(message.event === 'open' || options){
-    showModal(session);
-  } else if(message.event === 'close'){
+  if(message.event === 'open' || options) {
+    if (!preferences || session.get('remember_customer')) {
+      fetchPrefsAndShowModal(session);
+    } else {
+      showModal(session);
+    }
+  } else if(message.event === 'close') {
     session.hide();
   }
 }
@@ -455,7 +440,7 @@ function parseMessage(e){ // not concerned about adding/removeing listeners, ifr
     }
     window.handleMessage(data);
   } catch(err){
-    roll('invalid message - ' + err, data, 'warn');
+    roll('message: ' + data, err, 'warn');
   }
 }
 

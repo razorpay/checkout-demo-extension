@@ -9,7 +9,7 @@ var getCustomer = function(contact) {
 
 function Customer(contact) {
   if (contact) {
-    this.contact = contact.replace(/\D/g, '');
+    this.contact = contact.replace(/[^+\d]/g, '');
   }
 }
 
@@ -47,6 +47,11 @@ Customer.prototype = {
       url: url,
       callback: function(data){
         customer.saved = !!data.saved;
+        if (data.tokens) {
+          customer.logged = true;
+          sanitizeTokens(data.tokens);
+          customer.tokens = data.tokens;
+        }
         callback();
       }
     })

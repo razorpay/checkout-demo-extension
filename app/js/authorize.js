@@ -233,9 +233,8 @@ Payment.prototype = {
       if(typeof data !== 'object') {
         data = JSON.parse(data);
       }
-    }
-    catch(e){
-      return roll('unexpected api response', {e: e, msg: data});
+    } catch(e) {
+      return roll('completed with ' + data, e);
     }
     this.clear();
 
@@ -431,6 +430,12 @@ var razorpayProto = Razorpay.prototype;
 razorpayProto.createPayment = function(data, params) {
   this._payment = new Payment(data, params, this);
   return this;
+}
+
+razorpayProto.focus = function() {
+  try {
+    this._payment.popup.window.focus();
+  } catch(e) {}
 }
 
 razorpayProto.submitOTP = function(otp){
