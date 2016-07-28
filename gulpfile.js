@@ -17,7 +17,6 @@ const wrap = require('gulp-insert').wrap;
 const usemin = require('gulp-usemin');
 const del = require('del');
 const runSequence = require('run-sequence');
-const gulpif = require('gulp-if');
 const minimist = require('minimist');
 const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
@@ -32,14 +31,6 @@ const distDir = 'app/dist/v1/';
 function assetPath(path) {
   return `app/${path}`;
 }
-
-let knownOptions = {
-  string: 'env',
-  default: { env: process.env.NODE_ENV || 'production' }
-};
-
-let options = minimist(process.argv.slice(2), knownOptions);
-let isProduction = options.env === 'production';
 
 let paths = {
   js: assetPath('js/**/*.js'),
@@ -62,20 +53,24 @@ gulp.task('compileTemplates', function() {
   });
 });
 
-gulp.task('compileStyles', function() {
+gulp.task('concatCss', function() {
   return gulp.src(paths.css)
     .pipe(plumber())
     .pipe(stylint())
     .pipe(stylint.reporter())
     .pipe(stylus())
     .pipe(concat('checkout.css'))
-    .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
+    .pipe(gulp.dest(`${distDir}/css`));
+});
+
+gulp.task('cleanCSS', ['concatCss'], function() {
+  return gulp.src(`${distDir}/css`)
+    .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
       cascade: false
     }))
-    .pipe(gulp.dest(`${distDir}/css`));
-});
+})
 
 gulp.task('usemin', function() {
   return gulp.src(assetPath('*.html'))
@@ -86,7 +81,7 @@ gulp.task('usemin', function() {
 gulp.task('uglify', function() {
   return gulp.src([`${distDir}/**/*.js`])
     // .pipe(sourcemaps.init())
-    .pipe(gulpif(isProduction, uglify()))
+    .pipe(uglify())
     // .pipe(sourcemaps.write('./', {
       // debug: true
     // }))
@@ -103,11 +98,7 @@ gulp.task('copyConfig', function() {
 });
 
 gulp.task('compileHTML', function() {
-  if (isProduction) {
-    runSequence('usemin', 'hint', 'uglify', 'copyLegacy');
-  } else {
-    runSequence('usemin');
-  }
+  runSequence('usemin', 'hint', 'uglify', 'copyLegacy');
 });
 
 gulp.task('staticAssets', function() {
@@ -116,13 +107,13 @@ gulp.task('staticAssets', function() {
 });
 
 gulp.task('build', function() {
-  runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets');
+  runSequence('clean', ['cleanCSS', 'compileTemplates'], 'compileHTML', 'staticAssets');
 });
 
 gulp.task('serve', ['build'], function() {
-  gulp.watch(paths.css, ['compileStyles']);
+  gulp.watch(paths.css, ['concatCss']);
   gulp.watch([paths.templates], ['compileTemplates']);
-  gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']);
+  gulp.watch([assetPath('js/**/*.js'), assetPath('*.html')], ['usemin']);
 });
 
 gulp.task('watch', ['serve']);
@@ -276,14 +267,12 @@ gulp.task('hint', function(){
   return gulp.src([assetPath('dist/v1/*.js')])
     .pipe(wrap('(function(){"use strict";', '})()'))
     .pipe(gulp.dest(distDir))
-    .pipe(plumber())
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
-    .pipe(jshint.reporter('fail'));
 })
 
 gulp.task('test', function() {
-  runSequence('setTestENV', 'test:unit', 'test:release');
+  runSequence('test:unit', 'test:release');
 });
 
 
