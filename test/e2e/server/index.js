@@ -9,9 +9,6 @@ const internalIp = require('internal-ip')
 const argv = minimist(process.argv.slice(2));
 const isSoakTesting = argv.soak;
 
-console.log(isSoakTesting);
-console.log(__dirname);
-
 app.set('port', 3000)
 app.use((req,res,next) => {
   res.cookie('soakTesting', !!isSoakTesting)
@@ -74,5 +71,5 @@ app.post('/v1/gateway/mocksharp/payment/submit', (req, res, next) => {
 //     process.exit(1)
 //   }
 // })
-
+//
 module.exports = app
