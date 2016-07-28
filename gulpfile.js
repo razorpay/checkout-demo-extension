@@ -14,8 +14,6 @@ const autoprefixer = require('gulp-autoprefixer');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 const wrap = require('gulp-insert').wrap;
-const replace = require('gulp-replace');
-const rename = require('gulp-rename');
 const usemin = require('gulp-usemin');
 const del = require('del');
 const runSequence = require('run-sequence');
@@ -96,17 +94,7 @@ gulp.task('uglify', function() {
 });
 
 gulp.task('copyLegacy', function(){
-  gulp.src(`${distDir}/checkout.js`)
-    .pipe(rename('checkout-new.js'))
-    .pipe(gulp.dest(distDir));
-
-  gulp.src(`${distDir}/checkout-frame.js`)
-    .pipe(rename('checkout-frame-new.js'))
-    .pipe(gulp.dest(distDir));
-
-  gulp.src(`${distDir}/css/checkout.css`)
-    .pipe(rename('css/checkout-new.css'))
-    .pipe(gulp.dest(distDir));
+  execSync(`cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`);
 })
 
 gulp.task('copyConfig', function() {
