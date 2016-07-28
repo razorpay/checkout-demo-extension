@@ -85,7 +85,7 @@ gulp.task('compileStyles', function() {
     .pipe(concat('checkout.css'))
     .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
     .pipe(autoprefixer({
-      browsers: ['ie 8', 'android 2.2', 'last 10 versions'],
+      browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
       cascade: false
     }))
     .pipe(gulp.dest(`${distDir}/css`));

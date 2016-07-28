@@ -9,7 +9,7 @@ var getCustomer = function(contact) {
 
 function Customer(contact) {
   if (contact) {
-    this.contact = contact.replace(/\D/g, '');
+    this.contact = contact.replace(/[^+\d]/g, '');
   }
 }
 
@@ -38,10 +38,20 @@ Customer.prototype = {
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback){
     var customer = this;
+    var url = makeAuthUrl(this.key, 'customers/status/' + this.contact);
+    var device_token = qpmap.device_token;
+    if (device_token) {
+      url += '&device_token=' + device_token;
+    }
     $.ajax({
-      url: makeAuthUrl(this.key, 'customers/status/' + this.contact),
+      url: url,
       callback: function(data){
         customer.saved = !!data.saved;
+        if (data.tokens) {
+          customer.logged = true;
+          sanitizeTokens(data.tokens);
+          customer.tokens = data.tokens;
+        }
         callback();
       }
     })
@@ -60,22 +70,25 @@ Customer.prototype = {
   submitOTP: function(data, callback){
     var user = this;
     data.contact = this.contact;
+    var url = makeAuthUrl(this.key, 'otp/verify');
+
+    if (qpmap.platform === 'android' && qpmap.version && qpmap.library) {
+      data['_[platform]'] = 'android';
+      data['_[version]'] = qpmap.version;
+      data['_[library]'] = qpmap.library;
+    }
+
     $.post({
-      url: makeAuthUrl(this.key, 'otp/verify'),
+      url: url,
       data: data,
       callback: function(data){
         user.logged = data.success;
         sanitizeTokens(data.tokens);
         user.tokens = data.tokens;
-        user.device_token = data.device_token;
+        qpmap.device_token = data.device_token;
 
-        if (CheckoutBridge) {
-          if(CheckoutBridge.setAppToken) {
-            CheckoutBridge.setAppToken(user.id);
-          }
-          if(CheckoutBridge.setDeviceToken) {
-            CheckoutBridge.setDeviceToken(user.device_token);
-          }
+        if (qpmap.device_token) {
+          invoke('setDeviceToken', CheckoutBridge, qpmap.device_token);
         }
 
         if (data.error) {

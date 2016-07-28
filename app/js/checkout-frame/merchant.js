@@ -200,21 +200,25 @@ function setPaymentMethods(session){
   methods.wallet = wallets;
 }
 
-function showModal(session) {
-  if (!preferences) {
-    var data = makePrefParams(session);
-    Razorpay.payment.getPrefs(data, function(response) {
-      if(response.error){
-        return Razorpay.sendMessage({event: 'fault', data: response.error.description});
-      }
-      preferences = response;
-      showModal(session);
-    })
-    return;
-  }
+function fetchPrefsAndShowModal(session){
+  var data = makePrefParams(session);
+  Razorpay.payment.getPrefs(data, function(response) {
+    if(response.error){
+      return Razorpay.sendMessage({event: 'fault', data: response.error.description});
+    }
+    preferences = response;
+    showModal(session);
+  })
+}
 
+function showModal(session) {
   var options = preferences.options;
   var saved_customer = preferences.customer;
+
+  // pass preferences options to app
+  if (CheckoutBridge) {
+    invoke('setMerchantOptions', CheckoutBridge, JSON.stringify(options));
+  }
 
   if (saved_customer) {
     var session_options = session.get();
@@ -238,7 +242,11 @@ function showModal(session) {
     customer = getCustomer(saved_customer.contact);
     sanitizeTokens(saved_customer.tokens);
     customer.tokens = saved_customer.tokens;
-    customer.logged = true;
+
+    if (saved_customer.saved !== true) {
+      customer.logged = true;
+    }
+
     customer.customer_id = saved_customer.customer_id;
   }
 
@@ -410,9 +418,13 @@ window.handleMessage = function(message){
     session.params = message.params;
   }
 
-  if(message.event === 'open' || options){
-    showModal(session);
-  } else if(message.event === 'close'){
+  if(message.event === 'open' || options) {
+    if (!preferences || session.get('remember_customer')) {
+      fetchPrefsAndShowModal(session);
+    } else {
+      showModal(session);
+    }
+  } else if(message.event === 'close') {
     session.hide();
   }
 }

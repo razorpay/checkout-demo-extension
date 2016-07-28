@@ -5,7 +5,7 @@ var now = Date.now || function() {
 // iphone/ipad restrict non user initiated focus on input fields
 var ua = navigator.userAgent;
 var ua_iOS = /iPhone|iPad/.test(ua);
-var ua_prefer_redirect = /Windows Phone|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/;
+var ua_prefer_redirect = /Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/.test(ua);
 var shouldFixFixed = /iPhone|Android 2\./.test(ua);
 var shouldFocusNextField = !ua_iOS;
 
