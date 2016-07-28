@@ -433,6 +433,12 @@ razorpayProto.createPayment = function(data, params) {
   return this;
 }
 
+razorpayProto.focus = function() {
+  try {
+    this._payment.popup.window.focus();
+  } catch(e) {}
+}
+
 razorpayProto.submitOTP = function(otp){
   var payment = this._payment;
   payment.ajax = $.post({
