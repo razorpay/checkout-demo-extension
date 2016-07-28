@@ -323,7 +323,7 @@ Razorpay.prototype = {
       // init for checkoutjs is tracked from iframe
       // we've open event to track parent side of options
       if (!discreet.isCheckout) {
-        track(this, 'init', this.get());
+        track(this, 'init');
       }
 
       this.modal = {options: emo};

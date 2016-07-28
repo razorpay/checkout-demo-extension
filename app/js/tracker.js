@@ -164,7 +164,10 @@ function track(r, event, extra){
 
         // keen doesnt allow "." in property name, as it conflicts with automatic expansion
         // so we un-flatten the options
-        extra: nest(extra)
+        extra: nest(extra),
+
+        // options
+        options: nest(r.get())
       },
 
       // in order to force segment pass original IP to mixpanel & keen
