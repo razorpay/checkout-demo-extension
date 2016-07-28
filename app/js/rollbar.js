@@ -1,12 +1,14 @@
 roll = function(msg, e, level) {
-  if (e instanceof Error) {
-    TraceKit.report(e, {
-      level: level,
-      msg: msg
-    });
-  } else {
-    postRollbar(msg, e, level);
-  }
+  defer(function(){
+    if (e instanceof Error) {
+      TraceKit.report(e, {
+        level: level,
+        msg: msg
+      });
+    } else {
+      postRollbar(msg, e, level);
+    }    
+  })
 }
 
 TraceKit.report.subscribe(function(errorReport) {
