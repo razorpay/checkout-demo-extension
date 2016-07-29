@@ -560,6 +560,9 @@ Session.prototype = {
       this.on('change', '#saved-cards-container', this.setSavedCard, true);
     }
 
+    this.on('click', '#error-message .link', function(){
+      this.r.focus();
+    })
     this.on('click', '#backdrop', this.hideErrorMessage);
     this.on('click', '#overlay', this.hideErrorMessage);
     this.on('click', '#fd-hide', this.hideErrorMessage);
