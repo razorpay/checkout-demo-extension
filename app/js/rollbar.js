@@ -2,6 +2,7 @@ roll = function(msg, e, level) {
   defer(function(){
     if (e instanceof Error) {
       TraceKit.report(e, {
+        e: e,
         level: level,
         msg: msg
       });
@@ -13,7 +14,7 @@ roll = function(msg, e, level) {
 
 TraceKit.report.subscribe(function(errorReport) {
   var extra = errorReport.extra || emo;
-  postRollbar(extra.msg, errorReport, extra.level, true);
+  postRollbar(extra.msg || errorReport.e.message, errorReport, extra.level, true);
 });
 
 function postRollbar(msg, trace, level, isStack) {
