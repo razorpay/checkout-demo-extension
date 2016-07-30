@@ -15,9 +15,7 @@ const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 const usemin = require('gulp-usemin');
 const through = require('through');
-const del = require('del');
 const runSequence = require('run-sequence');
-const minimist = require('minimist');
 const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
 const istanbul = require('istanbul');
@@ -41,9 +39,7 @@ let paths = {
   fonts: assetPath('fonts/**/*')
 };
 
-gulp.task('clean', function () {
-  return del(distDir, {force: true});
-});
+gulp.task('clean', ()=> execSync(`rm -rf ${distDir}`))
 
 gulp.task('compileTemplates', function() {
   execSync('mkdir -p app/templates');
@@ -107,13 +103,10 @@ gulp.task('copyLegacy', function(){
   execSync(`cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`);
 })
 
-gulp.task('copyConfig', function() {
-  return gulp.src(assetPath('config.js'))
-    .pipe(gulp.dest(distDir));
-})
+gulp.task('copyConfig', ()=> execSync(`cp ${assetPath('config.js')} ${distDir}`))
 
 gulp.task('compileHTML', function() {
-  runSequence('usemin', 'hint', 'uglify', 'copyLegacy');
+  runSequence('usemin', 'uglify', 'copyLegacy');
 })
 
 gulp.task('staticAssets', function() {
