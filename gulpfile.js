@@ -25,6 +25,7 @@ const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
+const lazypipe = require('lazypipe');
 
 const distDir = 'app/dist/v1/';
 
@@ -53,23 +54,29 @@ gulp.task('compileTemplates', function() {
   });
 });
 
+var concatCss = lazypipe()
+  .pipe(stylint())
+  .pipe(stylint.reporter())
+  .pipe(stylus())
+  .pipe(concat('checkout.css'))
+
 gulp.task('concatCss', function() {
   return gulp.src(paths.css)
     .pipe(plumber())
-    .pipe(stylint())
-    .pipe(stylint.reporter())
-    .pipe(stylus())
-    .pipe(concat('checkout.css'))
+    .pipe(concatCss())
     .pipe(gulp.dest(`${distDir}/css`));
 });
 
-gulp.task('cleanCSS', ['concatCss'], function() {
-  return gulp.src(`${distDir}/css`)
+gulp.task('cleanCSS', function() {
+  return gulp.src(paths.css)
+    .pipe(concatCss())
+    .pipe(stylint.reporter('fail', { failOnWarning: true }))
     .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
       cascade: false
     }))
+    .pipe(gulp.dest(`${distDir}/css`));
 })
 
 gulp.task('usemin', function() {
@@ -117,7 +124,6 @@ gulp.task('serve', ['build'], function() {
 });
 
 gulp.task('watch', ['serve']);
-
 gulp.task('default', ['build']);
 
 /** Font Upload to static **/
