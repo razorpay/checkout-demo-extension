@@ -13,8 +13,8 @@ const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
-const wrap = require('gulp-insert').wrap;
 const usemin = require('gulp-usemin');
+const through = require('through');
 const del = require('del');
 const runSequence = require('run-sequence');
 const minimist = require('minimist');
@@ -55,10 +55,10 @@ gulp.task('compileTemplates', function() {
 });
 
 var concatCss = lazypipe()
-  .pipe(stylint())
-  .pipe(stylint.reporter())
-  .pipe(stylus())
-  .pipe(concat('checkout.css'))
+  .pipe(stylint)
+  .pipe(stylint.reporter)
+  .pipe(stylus)
+  .pipe(concat, 'checkout.css')
 
 gulp.task('concatCss', function() {
   return gulp.src(paths.css)
@@ -79,21 +79,29 @@ gulp.task('cleanCSS', function() {
     .pipe(gulp.dest(`${distDir}/css`));
 })
 
-gulp.task('usemin', function() {
+gulp.task('usemin', ()=> {
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
-    .pipe(gulp.dest(distDir));
-});
+    .pipe(gulp.dest(distDir))
+})
 
-gulp.task('uglify', function() {
+gulp.task('uglify', ()=> {
   return gulp.src([`${distDir}/**/*.js`])
+
+    // wrap between iife and user strict
+    .pipe(through(function(file){
+      file.contents = new Buffer(`(function(){"use strict";${String(file.contents)}})()`)
+      this.emit('data', file)
+    }))
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
     // .pipe(sourcemaps.init())
     .pipe(uglify())
     // .pipe(sourcemaps.write('./', {
       // debug: true
     // }))
-    .pipe(gulp.dest(distDir));
-});
+    .pipe(gulp.dest(distDir))
+})
 
 gulp.task('copyLegacy', function(){
   execSync(`cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`);
@@ -102,26 +110,27 @@ gulp.task('copyLegacy', function(){
 gulp.task('copyConfig', function() {
   return gulp.src(assetPath('config.js'))
     .pipe(gulp.dest(distDir));
-});
+})
 
 gulp.task('compileHTML', function() {
   runSequence('usemin', 'hint', 'uglify', 'copyLegacy');
-});
+})
 
 gulp.task('staticAssets', function() {
   return gulp.src([paths.images, paths.fonts], { base: 'app' })
     .pipe(gulp.dest(`${distDir}`));
-});
+})
 
 gulp.task('build', function() {
   runSequence('clean', ['cleanCSS', 'compileTemplates'], 'compileHTML', 'staticAssets');
-});
+})
 
 gulp.task('serve', ['build'], function() {
-  gulp.watch(paths.css, ['concatCss']);
-  gulp.watch([paths.templates], ['compileTemplates']);
-  gulp.watch([assetPath('js/**/*.js'), assetPath('*.html')], ['usemin']);
-});
+  gulp.watch(paths.css, ['concatCss'])
+  gulp.watch(paths.templates, ['compileTemplates'])
+  gulp.watch(paths.js, [/*'hint',*/ 'usemin'])
+  gulp.watch(assetPath('*.html'), ['usemin'])
+})
 
 gulp.task('watch', ['serve']);
 gulp.task('default', ['build']);
@@ -269,19 +278,9 @@ gulp.task('test:release', function(){
   return gulp.src('wdio.conf.js').pipe(webdriver());
 })
 
-gulp.task('hint', function(){
-  return gulp.src([assetPath('dist/v1/*.js')])
-    .pipe(wrap('(function(){"use strict";', '})()'))
-    .pipe(gulp.dest(distDir))
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish))
-})
-
 gulp.task('test', function() {
   runSequence('test:unit', 'test:release');
 });
-
-
 
 /* Util functions */
 
