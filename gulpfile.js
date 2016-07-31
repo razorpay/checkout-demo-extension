@@ -23,7 +23,6 @@ const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
-const vfs = require('vinyl-fs');
 const testServer = require('./test/e2e/server/index.js');
 const internalIp = require('internal-ip');
 const lazypipe = require('lazypipe');
@@ -284,8 +283,9 @@ gulp.task('e2e:run', function(done){
 })
 
 gulp.task('symlinkDist', () => {
-  return vfs.src(distDir, { followSymlinks: false })
-    .pipe(vfs.symlink('test/e2e/server/public/dist/v1'));
+  var target = 'test/e2e/server/public/dist/'
+  var dist = Array(target.split('/').length).join('../') + distDir
+  execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`)
 });
 
 let testServerInstance;

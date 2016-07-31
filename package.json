@@ -72,6 +72,7 @@
     "aws-sdk": "^2.4.5",
     "express": "^4.14.0",
     "glob": "^7.0.5",
-    "gulp-stylus": "^2.5.0"
+    "gulp-stylus": "^2.5.0",
+    "minimist": "^1.2.0"
   }
 }
