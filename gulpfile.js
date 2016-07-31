@@ -273,23 +273,4 @@ gulp.task('test:release', function(){
 
 gulp.task('test', function() {
   runSequence('test:unit', 'test:release');
-});
-
-/* Util functions */
-
-// Merge the contents of two objects together into the first object.
-function merge(original, updates) {
-  if (!updates || typeof updates !== 'object') {
-    return original;
-  }
-
-  var props = Object.keys(updates);
-  var prop;
-
-  for (var i = 0; i < props.length; i++) {
-    prop = props[i];
-    original[prop] = updates[prop];
-  }
-
-  return original;
-}
+})
