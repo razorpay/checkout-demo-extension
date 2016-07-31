@@ -1,8 +1,8 @@
-@import "common";
+@require 'common';
 
-$cardh: 46px;
-$savedcontainerh: 220px;
-$cardpl: 70px;
+$cardh = 46px;
+$savedcontainerh = 220px;
+$cardpl = 70px;
 
 .left-card {
   display: none;
@@ -29,6 +29,10 @@ $cardpl: 70px;
   z-index: 1;
 }
 
+#should-save-card {
+  display: none;
+}
+
 #form-card {
   .saved-card {
     pointer-events: none;
@@ -38,13 +42,6 @@ $cardpl: 70px;
       margin-bottom: -8px;
     }
   }
-}
-
-#should-save-card {
-  display: none;
-}
-
-#form-card {
   &.saved-cards {
     #show-saved-cards {
       transition-delay: 0s;

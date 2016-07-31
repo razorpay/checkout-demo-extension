@@ -1,9 +1,9 @@
-@import "common";
+@require 'common';
 
-$max-width: 414px;
-$max-height: 659px;
+$max-width = 414px;
+$max-height = 659px;
 
-@mixin mobile-view {
+$mobile-view() {
   max-width: $max-width;
 
   * {
@@ -12,7 +12,7 @@ $max-height: 659px;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 
-  @include hidePowered;
+  $hidePowered();
 
   #header,
   #footer,
@@ -111,11 +111,11 @@ $max-height: 659px;
 }
 
 @media (max-device-height: 450px), (max-device-width: 450px) {
-  @include mobile-view;
+  $mobile-view();
+}
 
-  .mobile {
-    @include mobile-view;
-  }
+.mobile {
+  $mobile-view();
 }
 
 .noanim {
@@ -125,5 +125,5 @@ $max-height: 659px;
 }
 
 @media (max-height: 767px) {
-  @include hidePowered;
+  $hidePowered();
 }

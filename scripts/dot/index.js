@@ -74,11 +74,11 @@ InstallDots.prototype.compileToFile = function(path, template, def) {
 			}
 		}
 	}
-	compiled += defaultcompiled.toString().replace('anonymous', modulename);
-	fs.writeFileSync(path, "(function(){" + compiled
+	compiled += defaultcompiled.toString().replace('anonymous', modulename).replace('\n/**/', '')
+	fs.writeFileSync(path, "/* jshint ignore:start */\n\n(function(){" + compiled
 		+ "var itself=" + modulename + ", _encodeHTML=(" + doT.encodeHTMLSource.toString() + "(" + (settings.doNotSkipEncoded || '') + "));"
 		+ addexports(exports)
-		+ this.__global + "['" + modulename + "']=itself;}());");
+		+ this.__global + "['" + modulename + "']=itself;}());\n\n/* jshint ignore:end */");
 };
 
 function addexports(exports) {

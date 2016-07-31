@@ -1,4 +1,4 @@
-@import "common";
+@require 'common';
 
 @keyframes spring {
   0% {
@@ -42,10 +42,10 @@
   }
 }
 
-$first: 0.2s;
-$second: 0.2s;
-$springTime: 0.8s;
-$gridStagger: 0.05s;
+$first = 0.2s;
+$second = 0.2s;
+$springTime = 0.8s;
+$gridStagger = 0.05s;
 
 .showable {
   position: absolute;
@@ -90,6 +90,9 @@ $gridStagger: 0.05s;
 
 .tab-content.drishy {
   transition-delay: $second;
+  .item-inner {
+    transform: scale(1);
+  }
 }
 
 #body {
@@ -115,11 +118,7 @@ $gridStagger: 0.05s;
   transform: scale(0);
 }
 
-.tab-content.drishy .item-inner {
-  transform: scale(1);
-}
-
-@for $i from 1 through 4 {
+for $i in (1..4) {
   .l-#{$i} {
     transition-delay: $gridStagger * $i + $second;
   }
