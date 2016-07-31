@@ -19,5 +19,5 @@
 	"eqnull": true,
 	"browser": true,
 	"strict": true,
-	"validthis":true
+	"validthis": true
 }

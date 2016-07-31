@@ -1,7 +1,7 @@
-@import "common";
+@require 'common';
 
 body.embedded {
-  @include hidePowered;
+  $hidePowered();
 
   #body {
     border: 1px solid $bc;

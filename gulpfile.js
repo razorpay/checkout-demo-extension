@@ -5,21 +5,17 @@ const path = require('path');
 const gulp = require('gulp');
 const dot = require('./scripts/dot/index');
 const glob = require('glob')
-const sass = require('gulp-sass');
+const plumber = require('gulp-plumber')
+const stylus = require('gulp-stylus');
 const cleanCSS = require('gulp-clean-css');
-const stylelint = require('gulp-stylelint');
+const stylint = require('gulp-stylint');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
-const wrap = require('gulp-insert').wrap;
-const replace = require('gulp-replace');
-const rename = require('gulp-rename');
 const usemin = require('gulp-usemin');
-const del = require('del');
+const through = require('through');
 const runSequence = require('run-sequence');
-const gulpif = require('gulp-if');
-const minimist = require('minimist');
 const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
 const istanbul = require('istanbul');
@@ -30,6 +26,7 @@ const webdriver = require('gulp-webdriver');
 const vfs = require('vinyl-fs');
 const testServer = require('./test/e2e/server/index.js');
 const internalIp = require('internal-ip');
+const lazypipe = require('lazypipe');
 
 const distDir = 'app/dist/v1/';
 
@@ -37,25 +34,15 @@ function assetPath(path) {
   return `app/${path}`;
 }
 
-let knownOptions = {
-  string: 'env',
-  default: { env: process.env.NODE_ENV || 'production' }
-};
-
-let options = minimist(process.argv.slice(2), knownOptions);
-let isProduction = options.env === 'production';
-
 let paths = {
   js: assetPath('js/**/*.js'),
   templates: assetPath('_templates/**/*.jst'),
-  css: assetPath('css/**/*.scss'),
+  css: assetPath('css/**/*.styl'),
   images: assetPath('images/**/*'),
   fonts: assetPath('fonts/**/*')
 };
 
-gulp.task('clean', function () {
-  return del(distDir, {force: true});
-});
+gulp.task('clean', ()=> execSync(`rm -rf ${distDir}`))
 
 gulp.task('compileTemplates', function() {
   execSync('mkdir -p app/templates');
@@ -64,106 +51,84 @@ gulp.task('compileTemplates', function() {
     destination: assetPath('templates'),
     global: 'templates'
   });
-
-  return gulp.src(assetPath('templates/*.js'))
-    .pipe(replace('\n/**/', ''))
-    .pipe(wrap('/* jshint ignore:start */\n\n', '\n\n/* jshint ignore:end */'))
-    .pipe(gulp.dest(assetPath('templates')));
 });
 
-let styleLintOptions = {
-  syntax: 'scss',
-  reporters: [
-    {
-      formatter: 'string',
-      console: true
-    }
-  ]
-};
+var concatCss = lazypipe()
+  .pipe(stylint)
+  .pipe(stylint.reporter)
+  .pipe(stylus)
+  .pipe(concat, 'checkout.css')
 
-gulp.task('compileStyles', function() {
+gulp.task('concatCss', function() {
   return gulp.src(paths.css)
-    .pipe(stylelint(styleLintOptions))
-    .pipe(sass())
-    .pipe(concat('checkout.css'))
-    .pipe(gulpif(isProduction, cleanCSS({compatibility: 'ie8'})))
+    .pipe(plumber())
+    .pipe(concatCss())
+    .pipe(gulp.dest(`${distDir}/css`));
+});
+
+gulp.task('cleanCSS', function() {
+  return gulp.src(paths.css)
+    .pipe(concatCss())
+    .pipe(stylint.reporter('fail', { failOnWarning: true }))
+    .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(autoprefixer({
       browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
       cascade: false
     }))
     .pipe(gulp.dest(`${distDir}/css`));
-});
+})
 
-gulp.task('usemin', function() {
+gulp.task('usemin', ()=> {
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
-    .pipe(gulp.dest(distDir));
-});
+    .pipe(gulp.dest(distDir))
+})
 
-gulp.task('uglify', function() {
+gulp.task('uglify', ()=> {
   return gulp.src([`${distDir}/**/*.js`])
+
+    // wrap between iife and user strict
+    .pipe(through(function(file){
+      file.contents = new Buffer(`(function(){"use strict";${String(file.contents)}})()`)
+      this.emit('data', file)
+    }))
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
     // .pipe(sourcemaps.init())
-    .pipe(gulpif(isProduction, uglify()))
+    .pipe(uglify())
     // .pipe(sourcemaps.write('./', {
       // debug: true
     // }))
-    .pipe(gulp.dest(distDir));
-});
-
-gulp.task('copyLegacy', function(){
-  gulp.src(`${distDir}/checkout.js`)
-    .pipe(rename('checkout-new.js'))
-    .pipe(gulp.dest(distDir));
-
-  gulp.src(`${distDir}/checkout-frame.js`)
-    .pipe(rename('checkout-frame-new.js'))
-    .pipe(gulp.dest(distDir));
-
-  gulp.src(`${distDir}/css/checkout.css`)
-    .pipe(rename('css/checkout-new.css'))
-    .pipe(gulp.dest(distDir));
+    .pipe(gulp.dest(distDir))
 })
 
-gulp.task('copyConfig', function() {
-  return gulp.src(assetPath('config.js'))
-    .pipe(gulp.dest(distDir));
-});
+gulp.task('copyLegacy', function(){
+  execSync(`cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`);
+})
+
+gulp.task('copyConfig', ()=> execSync(`cp ${assetPath('config.js')} ${distDir}`))
 
 gulp.task('compileHTML', function() {
-  if (isProduction) {
-    runSequence('usemin', 'hint', 'uglify', 'copyLegacy');
-  } else {
-    runSequence('usemin');
-  }
-});
+  runSequence('usemin', 'uglify', 'copyLegacy');
+})
 
 gulp.task('staticAssets', function() {
   return gulp.src([paths.images, paths.fonts], { base: 'app' })
     .pipe(gulp.dest(`${distDir}`));
-});
+})
 
-gulp.task('build', function(cb) {
-  runSequence('clean', ['compileStyles', 'compileTemplates'], 'compileHTML', 'staticAssets', cb);
-});
+gulp.task('build', function() {
+  runSequence('clean', ['cleanCSS', 'compileTemplates'], 'compileHTML', 'staticAssets');
+})
 
-gulp.task('setServeENV', function() {
-  isProduction = false;
-  styleLintOptions.failAfterError = false;
-});
-
-gulp.task('setTestENV', function() {
-  isProduction = false;
-  styleLintOptions.failAfterError = true;
-});
-
-gulp.task('serve', ['setServeENV', 'build'], function() {
-  gulp.watch(paths.css, ['compileStyles']);
-  gulp.watch([paths.templates], ['compileTemplates']);
-  gulp.watch([assetPath('**/*.js'), assetPath('*.html'), '!app/dist/**/*'], ['compileHTML']);
-});
+gulp.task('serve', ['build'], function() {
+  gulp.watch(paths.css, ['concatCss'])
+  gulp.watch(paths.templates, ['compileTemplates'])
+  gulp.watch(paths.js, [/*'hint',*/ 'usemin'])
+  gulp.watch(assetPath('*.html'), ['usemin'])
+})
 
 gulp.task('watch', ['serve']);
-
 gulp.task('default', ['build']);
 
 /** Font Upload to static **/
@@ -344,20 +309,9 @@ gulp.task('test:e2e', () => {
 
 /***** --- *****/
 
-gulp.task('hint', function(){
-  return gulp.src([assetPath('dist/v1/*.js')])
-    .pipe(wrap('(function(){"use strict";', '})()'))
-    .pipe(gulp.dest(distDir))
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish))
-    .pipe(jshint.reporter('fail'));
-})
-
 gulp.task('test', function() {
-  runSequence('setTestENV', 'test:unit', 'test:e2e');
+  runSequence('test:unit', 'test:e2e');
 });
-
-
 
 /* Util functions */
 
