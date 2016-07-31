@@ -1,4 +1,4 @@
-box: selvagsz/checkout
+box: pronav/checkout
 build:
     steps:
         - script:
