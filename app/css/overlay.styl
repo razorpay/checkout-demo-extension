@@ -26,10 +26,17 @@
   z-index: 99;
 
   &.drishy {
-    height: 180px;
+    height: 200px;
+  }
+
+  .link {
+    display: none;
   }
 
   &.loading {
+    .link {
+      display: inline-block;
+    }
     .spin {
       display: block;
     }
@@ -47,5 +54,6 @@
 }
 
 #fd-hide {
+  margin-top: 10px;
   border-radius: $br;
 }

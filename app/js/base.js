@@ -137,7 +137,7 @@ var optionValidations = {
 
   amount: function(amount){
     if (!isValidAmount(amount)) {
-      var errorMessage = 'should be passed in paise. Minimum value is 100';
+      var errorMessage = 'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
       alert('Invalid amount. It ' + errorMessage);
       return errorMessage;
     }
@@ -323,7 +323,7 @@ Razorpay.prototype = {
       // init for checkoutjs is tracked from iframe
       // we've open event to track parent side of options
       if (!discreet.isCheckout) {
-        track(this, 'init', this.get());
+        track(this, 'init');
       }
 
       this.modal = {options: emo};

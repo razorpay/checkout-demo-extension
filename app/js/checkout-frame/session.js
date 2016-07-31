@@ -560,6 +560,14 @@ Session.prototype = {
       this.on('change', '#saved-cards-container', this.setSavedCard, true);
     }
 
+    var goto_payment = '#error-message .link';
+    if (this.get('redirect')) {
+      $(goto_payment).hide();
+    } else {
+      this.on('click', goto_payment, function(){
+        this.r.focus();
+      })
+    }
     this.on('click', '#backdrop', this.hideErrorMessage);
     this.on('click', '#overlay', this.hideErrorMessage);
     this.on('click', '#fd-hide', this.hideErrorMessage);
