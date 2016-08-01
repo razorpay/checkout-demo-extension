@@ -317,6 +317,13 @@ var platformSpecific = {
 
   android: function(){
     $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
+    window.OTPElf = {
+      showOTP: function(otp, sender){
+        if (sender.indexOf('RZRPAY') !== -1) {
+          handleOTP(otp);
+        }
+      }
+    }
   }
 }
 
