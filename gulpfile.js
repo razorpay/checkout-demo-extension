@@ -286,7 +286,7 @@ gulp.task('symlinkDist', () => {
   var target = 'test/e2e/server/public/dist/'
   var dist = Array(target.split('/').length).join('../') + distDir
   execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`)
-});
+})
 
 let testServerInstance;
 
@@ -296,38 +296,15 @@ gulp.task('testserver:start', () => {
       console.error(`exec error: ${error}`);
       process.exit(1);
     }
-  });
-});
+  })
+})
 
 gulp.task('testserver:stop', () => {
   testServerInstance.close();
-});
+})
 
 gulp.task('test:e2e', () => {
   runSequence('build', 'symlinkDist', 'testserver:start', 'e2e:run', 'testserver:stop');
-});
+})
 
-/***** --- *****/
-
-gulp.task('test', function() {
-  runSequence('test:unit', 'test:e2e');
-});
-
-/* Util functions */
-
-// Merge the contents of two objects together into the first object.
-function merge(original, updates) {
-  if (!updates || typeof updates !== 'object') {
-    return original;
-  }
-
-  var props = Object.keys(updates);
-  var prop;
-
-  for (var i = 0; i < props.length; i++) {
-    prop = props[i];
-    original[prop] = updates[prop];
-  }
-
-  return original;
-}
+gulp.task('test', ()=> runSequence('test:unit', 'test:e2e'))

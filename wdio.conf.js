@@ -72,7 +72,6 @@ exports.config = {
     browserName: 'chrome',
     maxInstances: 10,
     chromeOptions: {
-      binary: '/usr/bin/chromium',
       args: [
         'no-sandbox',
         'no-gpu'

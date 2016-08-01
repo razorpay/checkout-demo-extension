@@ -6,7 +6,7 @@ build:
             code: npm install --no-optional
         - script:
             name: Test
-            code: selenium & gulp test:e2e
+            code: /selenium & gulp test:e2e
 
     after-steps:
         - slack-notifier:
