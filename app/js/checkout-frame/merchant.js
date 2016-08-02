@@ -320,7 +320,7 @@ var platformSpecific = {
     window.OTPElf = {
       showOTP: function(otp, sender){
         if (sender.indexOf('RZRPAY') !== -1) {
-          handleOTP(otp);
+          window.handleOTP(otp);
         }
       }
     }
