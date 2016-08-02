@@ -1,4 +1,4 @@
-box: pronav/checkout
+box: selvagsz/checkout
 build:
     steps:
         - script:
@@ -6,7 +6,7 @@ build:
             code: npm install --no-optional
         - script:
             name: Test
-            code: selenium-standalone start & gulp test
+            code: xvfb-run selenium-standalone start & gulp test:e2e
 
     after-steps:
         - slack-notifier:

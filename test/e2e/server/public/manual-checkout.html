@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Razorpay Manual Checkout</title>
+    <link rel="icon" href="data:;base64,=">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="./dist/v1/css/checkout.css">
+  </head>
+  <body id="index">
+    <button id="rzp-button">Click Me</button>
+    <script>
+      function getCookie(sKey) {
+        if (!sKey) { return null; }
+        return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+      }
+
+      function merge(source, obj) {
+        for (i in obj) {
+          if (obj.hasOwnProperty(i)) {
+            if (typeof obj[i] === 'object') {
+              source[i] = merge(source[i] || {}, obj[i]);
+            } else {
+              source[i] = obj[i];
+            }
+          }
+        }
+        return source;
+      }
+
+      var isSoakTesting = getCookie('soakTesting') === 'true';
+
+      if (!isSoakTesting) {
+        Razorpay = {
+          config: {
+            api: 'http://0.0.0.0:3000',
+            frameApi: 'http://0.0.0.0:3000',
+            frame: './checkout-frame.html',
+          }
+        }
+      }
+
+      var options = {
+        "key": "rzp_test_n7LBSmN4pm3dqe",
+        "amount": "2000", // 2000 paise = INR 20
+        "name": "Merchant Name",
+        "description": "Purchase Description",
+        "image": "images/glyph-rounded-square.svg",
+        "handler": function (response){
+          alert(JSON.stringify(response));
+        },
+        "prefill": {
+          "name": "Harshil Mathur",
+          "email": "harshil@razorpay.com"
+        },
+        "notes": {
+          "address": "Hello World"
+        },
+        "theme": {
+          "color": "#F37254"
+        }
+      };
+
+
+      if (window.location.search) {
+        var passedOptions = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
+        if (typeof passedOptions === 'object') {
+          merge(options, passedOptions.rzpOptions);
+
+          if (passedOptions.preferences) {
+            Razorpay.config.frame = Razorpay.config.frame + '?' + encodeURIComponent(JSON.stringify(passedOptions.preferences));
+          }
+        }
+      }
+      </script>
+
+      <script src='./dist/v1/checkout.js'></script>
+      <script>
+        var rzp1 = new Razorpay(options);
+        document.getElementById('rzp-button').addEventListener('click', function(event) {
+          event.preventDefault();
+          rzp1.open();
+        }, false);
+    </script>
+  </body>
+</html>

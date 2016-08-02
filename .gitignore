@@ -2,6 +2,8 @@
 /app/dist/
 !/app/dist/v1/checkout-new.js
 /app/templates
+/test/e2e/server/public/dist
+/shots
 
 # dependencies
 /node_modules
@@ -12,6 +14,7 @@
 
 # others
 npm-debug.log
+phantomjsdriver.log
 aws-keys.json
 coverage
 /app/config.js

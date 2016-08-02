@@ -14,12 +14,15 @@
 
 # Testing
 
-1. Install `jre` and `phantomjs`
-1. `npm install -g selenium-standalone && selenium-standalone install`
-1. `gulp test:unit` to run unit tests
-1. `selenium-server start && gulp test` for all tests
-1. tests are located in `test` folder
-1. `test/release` folder contains blackbox tests`
+- Install `jre` and `phantomjs`
+- `npm install -g selenium-standalone && selenium-standalone install`
+- `selenium-standalone start`
+- `gulp test` to run all tests
+  - `gulp test:unit` to run unit tests
+  - `gulp test:release` to run e2e tests
+
+Tests are located in `test` folder. `test/release` folder contains blackbox tests`.
+
 
 # Development Instructions
 - All source code is kept inside the `app` directory

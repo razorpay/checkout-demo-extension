@@ -1034,6 +1034,10 @@ Session.prototype = {
     this.ihandler.refresh();
     var data = this.payload = this.getPayload();
     if (this.order) {
+      if (this.checkInvalid('#form-common')) {
+        return;
+      }
+
       data.method = 'netbanking';
       data.bank = this.order.bank;
     } else if (screen) {

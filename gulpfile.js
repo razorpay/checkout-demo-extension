@@ -23,6 +23,8 @@ const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
+const testServer = require('./test/e2e/server/index.js');
+const internalIp = require('internal-ip');
 const lazypipe = require('lazypipe');
 
 const distDir = 'app/dist/v1/';
@@ -91,6 +93,7 @@ gulp.task('uglify', ()=> {
     }))
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+    .pipe(jshint.reporter('fail'))
     // .pipe(sourcemaps.init())
     .pipe(uglify())
     // .pipe(sourcemaps.write('./', {
@@ -267,10 +270,42 @@ function createCoverageReport(){
   console.log('Report created in coverage/final');
 }
 
-gulp.task('test:release', function(){
-  return gulp.src('wdio.conf.js').pipe(webdriver());
+/***** E2E/Acceptance tests *****/
+
+
+gulp.task('e2e:run', function(done){
+  return gulp.src('./wdio.conf.js')
+    .pipe(webdriver({
+      baseUrl: `http://${internalIp.v4()}:3000`
+    }))
+    .on('error', function(){
+      done();
+    });
 })
 
-gulp.task('test', function() {
-  runSequence('test:unit', 'test:release');
+gulp.task('symlinkDist', () => {
+  var target = 'test/e2e/server/public/dist/'
+  var dist = Array(target.split('/').length).join('../') + distDir
+  execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`)
 })
+
+let testServerInstance;
+
+gulp.task('testserver:start', () => {
+  testServerInstance = testServer.listen(3000, function(error) {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      process.exit(1);
+    }
+  })
+})
+
+gulp.task('testserver:stop', () => {
+  testServerInstance.close();
+})
+
+gulp.task('test:e2e', () => {
+  runSequence('build', 'symlinkDist', 'testserver:start', 'e2e:run', 'testserver:stop');
+})
+
+gulp.task('test', ()=> runSequence('test:unit', 'test:e2e'))
