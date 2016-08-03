@@ -9,12 +9,11 @@ let order = {
 let preferences
 
 before(() => {
-  checkoutForm.open({
+  checkoutForm.loadFrame({
     preferences: {
       order
     }
   })
-  browser.checkoutFrame();
   preferences = browser.exec(() => {
     return window.preferences
   }).value

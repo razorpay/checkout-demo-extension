@@ -45,6 +45,11 @@ CheckoutForm.prototype = {
     })
   },
 
+  loadFrame(options) {
+    options = options || {}
+    browser.url(`/checkout-frame.html?${encodeURIComponent(JSON.stringify(options))}`)
+  },
+
   open(options) {
     options = options || {}
     browser.url(`/manual-checkout.html?${encodeURIComponent(JSON.stringify(options))}`)

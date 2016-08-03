@@ -129,16 +129,6 @@ module.exports = function() {
         }, 15000, 'Awaiting for server\'s response', 1000)
 
         assert.equal(browser.getTabIds().length, 1, 'Popup is closed')
-
-        browser.switchTab(currentTabId)
-        browser.pause(500)
-        let response = JSON.parse(browser.alertText())
-        assert.isOk(
-          response.razorpay_payment_id,
-          'Handler function is passed with `razorpay_payment_id`'
-        )
-
-        browser.alertAccept()
       })
     })
   })
