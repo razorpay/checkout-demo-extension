@@ -70,13 +70,7 @@ exports.config = {
   //
   capabilities: [{
     browserName: 'chrome',
-    maxInstances: 10,
-    chromeOptions: {
-      args: [
-        'no-sandbox',
-        'no-gpu'
-      ]
-    }
+    maxInstances: 10
   // }, {
   //   browserName: 'firefox',
   //   maxInstances: 1

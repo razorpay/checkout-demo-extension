@@ -9,7 +9,7 @@
 /node_modules
 
 # misc
-.orig
+*.orig
 .DS_Store
 
 # others
