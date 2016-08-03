@@ -1,15 +1,16 @@
 'use strict'
 
-const utils = require('../helpers/utils')
+const utils = require('../../helpers/utils')
 let automaticCheckoutURL = '/automatic-checkout.html'
+let data
 
 before(() => {
   browser.url(automaticCheckoutURL)
   browser.click('.razorpay-payment-button')
-})
-
-beforeEach(() => {
   browser.frameParent()
+  data = browser.execute(() => {
+    return document.querySelector('form#checkout-form > script').dataset
+  }).value
 })
 
 describe('Index Page loaded', () => {
@@ -39,10 +40,7 @@ describe('Loads RZP Modal', () => {
 
 describe('prefills & data attrs', () => {
   it('`script` data-attributes should load correctly', () => {
-    let data = browser.execute(() => {
-      return document.querySelector('form#checkout-form > script').dataset
-    }).value
-
+    browser.frameParent()
     assert.equal(
       browser.getAttribute('.razorpay-payment-button', 'value'),
       data.buttontext,

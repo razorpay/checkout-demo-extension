@@ -304,8 +304,8 @@ gulp.task('testserver:stop', () => {
   testServerInstance.close();
 })
 
-gulp.task('test:e2e', () => {
-  runSequence('build', 'symlinkDist', 'testserver:start', 'e2e:run', 'testserver:stop');
+gulp.task('test:e2e', (cb) => {
+  runSequence('build', 'symlinkDist', 'testserver:start', 'e2e:run', 'testserver:stop', cb);
 })
 
 gulp.task('test', ()=> runSequence('test:unit', 'test:e2e'))
