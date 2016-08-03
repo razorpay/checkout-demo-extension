@@ -3,13 +3,10 @@
 const CheckoutForm = require('../pageobjects/checkout-form')
 const checkoutForm = new CheckoutForm()
 
-let manualCheckoutURL = '/manual-checkout.html'
-let currentTabId
 let data
 
 before(() => {
   checkoutForm.loadFrame()
-  currentTabId = browser.getCurrentTabId()
   data = browser.exec(() => {
     return options
   }).value
@@ -70,7 +67,10 @@ describe('Card Payment', () => {
     })
 
     it('PAY button is shown', () => {
-      browser.pause(300)
+      browser.waitUntil(() => {
+        return browser.css('#footer', 'transform') === 'none'
+      })
+
       assert.equal(
         browser.css('#footer', 'transform'),
         'none',
