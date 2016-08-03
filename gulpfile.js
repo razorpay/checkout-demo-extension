@@ -117,8 +117,8 @@ gulp.task('staticAssets', function() {
     .pipe(gulp.dest(`${distDir}`));
 })
 
-gulp.task('build', function() {
-  runSequence('clean', ['cleanCSS', 'compileTemplates'], 'compileHTML', 'staticAssets');
+gulp.task('build', function(cb) {
+  runSequence('clean', ['cleanCSS', 'compileTemplates'], 'compileHTML', 'staticAssets', cb);
 })
 
 gulp.task('serve', ['build'], function() {
