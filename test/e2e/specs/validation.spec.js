@@ -7,7 +7,7 @@ before(() => {
   checkoutForm.loadFrame()
 })
 
-describe('Validate email & phone fields', () => {
+describe('Commonfields validation', () => {
   it('Show error, when phone number is missing', () => {
     browser.click('#payment-options > [tab=card]')
     browser.pause(300)
@@ -76,6 +76,90 @@ describe('Validate email & phone fields', () => {
     assert.isNotOk(
       browser.css('.elem-email .help', 'opacity'),
       'When email is entered, help text is removed'
+    )
+  })
+})
+
+describe('Card fields validation', () => {
+  it('Card Number field validation', () => {
+    browser.click('#payment-options > [tab=card]')
+    browser.click('#footer')
+    assert.isOk(
+      browser.hasClass('#elem-card', 'invalid'),
+      'Card Number is invalid - `invalid` class is added'
+    )
+
+    assert.isOk(
+      browser.hasClass('#elem-card', 'focused'),
+      'Empty Card Number is focused - `focused` class is added'
+    )
+
+    assert.isOk(
+      browser.css('#elem-card .help', 'opacity'),
+      'Empty card number help text is shown'
+    )
+
+    browser.setValue('#card_number', '4111 1111 1111 1111')
+    browser.pause(300)
+
+    assert.isOk(
+      browser.hasClass('#elem-card', 'filled'),
+      'Card Number is filled - `filled` class is added'
+    )
+
+    assert.isNotOk(
+      browser.hasClass('#elem-card', 'invalid'),
+      'Card Number is valid - `invalid` class is removed'
+    )
+
+    assert.isNotOk(
+      browser.css('#elem-card .help', 'opacity'),
+      'Empty card number help text is hidden'
+    )
+  })
+
+  it('Card Expiry field validation', () => {
+    browser.click('#footer')
+    assert.isOk(
+      browser.hasClass('.elem-expiry', 'invalid'),
+      'Card Expiry is invalid - `invalid` class is added'
+    )
+
+    assert.isOk(
+      browser.hasClass('.elem-expiry', 'focused'),
+      'Empty Card Expiry is focused - `focused` class is added'
+    )
+
+    browser.setValue('#card_expiry', '11/21')
+
+    assert.isNotOk(
+      browser.hasClass('#elem-card', 'invalid'),
+      'Card Expiry is valid - `invalid` class is removed'
+    )
+
+    assert.isOk(
+      browser.hasClass('.elem-expiry', 'filled'),
+      'Card Expiry is filled - `filled` class is added'
+    )
+  })
+
+  it('CVV field validation', () => {
+    browser.click('#footer')
+    assert.isOk(
+      browser.hasClass('.elem-cvv', 'invalid'),
+      'CVV is invalid - `invalid` class is added'
+    )
+
+    browser.setValue('#card_cvv', '121')
+
+    assert.isNotOk(
+      browser.hasClass('.elem-cvv', 'invalid'),
+      'CVV is valid - `invalid` class is removed'
+    )
+
+    assert.isOk(
+      browser.hasClass('.elem-cvv', 'filled'),
+      'CVV is filled - `filled` class is added'
     )
   })
 })

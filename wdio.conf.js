@@ -3,7 +3,6 @@ const minimist = require('minimist')
 
 const argv = minimist(process.argv.slice(1));
 const isProduction = argv.env === 'production';
-console.log(isProduction);
 
 exports.config = {
   debug: isProduction ? false : true,
