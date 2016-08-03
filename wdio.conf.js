@@ -1,4 +1,3 @@
-const chalk = require('chalk')
 const minimist = require('minimist')
 
 const argv = minimist(process.argv.slice(1));
@@ -225,7 +224,7 @@ exports.config = {
   //
   // Gets executed once before all workers get launched.
   onPrepare: function(config, capabilities) {
-    console.log(chalk.bgYellow.bold('let\'s go'));
+    console.log('LET\'S GO')
   },
   //
   // Gets executed before test execution begins. At this point you can access to all global
@@ -281,9 +280,9 @@ exports.config = {
   // possible to defer the end of the process using a promise.
   onComplete: function(exitCode) {
     if (exitCode === 0) {
-      console.log(chalk.bgGreen.bold('All Is Well'));
+      console.log('ALL IS WELL')
     } else {
-      console.log(chalk.bgRed.bold(`${exitCode} :- Something is fishy`))
+      console.log(`${exitCode} :-| SOMETHING IS FISHY`)
     }
   },
   //
