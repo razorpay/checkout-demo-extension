@@ -1,15 +1,16 @@
 'use strict'
 
-const utils = require('../helpers/utils')
-const CheckoutForm = require('../pageobjects/checkout-form')
+const utils = require('../../helpers/utils')
+const CheckoutForm = require('../../pageobjects/checkout-form')
 const checkoutForm = new CheckoutForm()
+let data
 
 before(() => {
   checkoutForm.open()
-})
-
-beforeEach(() => {
-  browser.frameParent()
+  browser.debug()
+  data = browser.execute(() => {
+    return options
+  }).value
 })
 
 describe('Index Page loaded', () => {
@@ -35,11 +36,6 @@ describe('Loads RZP Modal', () => {
 
 describe('Options & prefills', () => {
   it('rzp options should load correctly', () => {
-    let data = browser.exec(() => {
-      return options
-    }).value
-
-    browser.checkoutFrame()
     assert.isOk(
       browser.getAttribute('#logo > img', 'src'),
       'Image loaded correctly'
@@ -82,140 +78,8 @@ describe('Options & prefills', () => {
   })
 })
 
-describe('Modal should close', () => {
-  function checkFromParent() {
-    browser.frameParent()
-    // Uncomment below cases once the issue is fixed in dev
-
-    // assert.equal(
-    //   browser.css('.razorpay-container', 'display'),
-    //   'none',
-    //   'RZP container is removed on escape press'
-    // )
-    //
-    // assert.equal(
-    //   browser.css('.razorpay-backdrop', 'background-color'),
-    //   '',
-    //   'Backdrop is removed on escape press'
-    // )
-  }
-
-  function checkFromFrame() {
-    browser.checkoutFrame()
-    browser.waitUntil(() => {
-      return !browser.element('#container').value
-    }, 3000)
-    assert.isNotOk(browser.$('#container'), 'Iframe container is removed')
-  }
-
-  beforeEach(() => {
-    checkoutForm.open()
-  })
-
-  it('Close on escape press, which parent window is focused', () => {
-    browser.keys('\uE00C')
-    checkFromParent()
-    checkFromFrame()
-  })
-
-  it('Close on escape press, which iframe is focused', () => {
-    browser.checkoutFrame()
-    browser.keys('\uE00C')
-    checkFromParent()
-    checkFromFrame()
-  })
-
-  it('Close on closs button click', () => {
-    browser.checkoutFrame()
-    browser.click('#modal-close')
-    checkFromParent()
-    checkFromFrame()
-  })
-})
-
-describe('Validate email & phone fields', () => {
-  before(() => {
-    checkoutForm.open()
-  })
-
-  it('Show error, when phone number is missing', () => {
-    browser.checkoutFrame()
-    browser.click('#payment-options > [tab=card]')
-    browser.pause(300)
-
-    assert.isOk(
-      browser.hasClass('#form-common .elem-contact', 'invalid'),
-      'Empty phone field is invalid'
-    )
-
-    assert.isOk(
-      browser.hasClass('#form-common .elem-contact', 'focused'),
-      'Empty phone field is focused on error'
-    )
-
-    assert.isOk(
-      browser.css('.elem-contact .help', 'opacity'),
-      'Empty phone help text is shown'
-    )
-
-    browser.setValue('#contact', '9884251048')
-    assert.isNotOk(
-      browser.hasClass('#form-common .elem-contact', 'invalid'),
-      'When phone no. is entered, the `invalid` class is removed'
-    )
-
-    browser.waitUntil(() => {
-      return !browser.css('.elem-contact .help', 'opacity')
-    })
-
-    assert.isNotOk(
-      browser.css('.elem-contact .help', 'opacity'),
-      'When phone is entered, help text is removed'
-    )
-  })
-
-  it('Show error, when email is missing', () => {
-    browser.checkoutFrame()
-    browser.setValue('#email', '')
-    browser.click('#payment-options > [tab=card]')
-    browser.pause(300)
-
-    assert.isOk(
-      browser.hasClass('#form-common .elem-email', 'invalid'),
-      'Empty email field is invalid'
-    )
-
-    assert.isOk(
-      browser.hasClass('#form-common .elem-email', 'focused'),
-      'Empty email field is focused on error'
-    )
-
-    assert.isOk(
-      browser.css('.elem-email .help', 'opacity'),
-      'Empty email help text is shown'
-    )
-
-    browser.setValue('#email', 'harshil@razorpay.com')
-    assert.isNotOk(
-      browser.hasClass('#form-common .elem-email', 'invalid'),
-      'When email is entered, the `invalid` class is removed'
-    )
-
-    browser.waitUntil(() => {
-      return !browser.css('.elem-email .help', 'opacity')
-    })
-
-    assert.isNotOk(
-      browser.css('.elem-email .help', 'opacity'),
-      'When email is entered, help text is removed'
-    )
-  })
-})
-
 describe('Home Screen', () => {
   it('Make sure home screen is shown', () => {
-    browser.checkoutFrame()
-
     assert.isNotOk(
       browser.hasClass('#body', 'sub'),
       'Home screen is shown - `sub` class is not added'
@@ -228,7 +92,6 @@ describe('Home Screen', () => {
   })
 
   it('PAY button should be hidden on home screen', () => {
-    browser.checkoutFrame()
     assert.notEqual(
       browser.css('#footer', 'transform'),
       'none',
@@ -349,5 +212,56 @@ describe('Home Screen', () => {
         'All wallets are shown'
       )
     })
+  })
+})
+
+describe('Modal should close', () => {
+  function checkFromParent() {
+    browser.frameParent()
+    // Uncomment below cases once the issue is fixed in dev
+
+    // assert.equal(
+    //   browser.css('.razorpay-container', 'display'),
+    //   'none',
+    //   'RZP container is removed on escape press'
+    // )
+    //
+    // assert.equal(
+    //   browser.css('.razorpay-backdrop', 'background-color'),
+    //   '',
+    //   'Backdrop is removed on escape press'
+    // )
+  }
+
+  function checkFromFrame() {
+    browser.checkoutFrame()
+    browser.waitUntil(() => {
+      return !browser.element('#container').value
+    }, 3000)
+    assert.isNotOk(browser.$('#container'), 'Iframe container is removed')
+  }
+
+  beforeEach(() => {
+    checkoutForm.open()
+  })
+
+  it('Close on escape press, which parent window is focused', () => {
+    browser.keys('\uE00C')
+    checkFromParent()
+    checkFromFrame()
+  })
+
+  it('Close on escape press, which iframe is focused', () => {
+    browser.checkoutFrame()
+    browser.keys('\uE00C')
+    checkFromParent()
+    checkFromFrame()
+  })
+
+  it('Close on closs button click', () => {
+    browser.checkoutFrame()
+    browser.click('#modal-close')
+    checkFromParent()
+    checkFromFrame()
   })
 })
