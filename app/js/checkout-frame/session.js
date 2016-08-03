@@ -563,6 +563,10 @@ Session.prototype = {
     var goto_payment = '#error-message .link';
     if (this.get('redirect')) {
       $(goto_payment).hide();
+      var moreinfo = gel('moreinfo');
+      if (moreinfo) {
+        $('#moreinfo').hide();
+      }
     } else {
       this.on('click', goto_payment, function(){
         this.r.focus();
