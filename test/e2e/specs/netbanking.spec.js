@@ -5,13 +5,12 @@ const CheckoutForm = require('../pageobjects/checkout-form')
 const checkoutForm = new CheckoutForm()
 
 before(() => {
-  checkoutForm.open()
+  checkoutForm.loadFrame()
 })
 
 describe('Net Banking', () => {
   describe('Fill Commonfields & switch to net banking', () => {
     it('Verify tab switching', () => {
-      browser.checkoutFrame()
       checkoutForm.fillCommonFields()
       browser.click('#payment-options > [tab=netbanking]')
 

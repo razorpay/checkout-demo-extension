@@ -12,10 +12,8 @@ let currentTabId
 let data
 
 before(() => {
-  browser.url(manualCheckoutURL)
-  browser.click('#rzp-button')
+  checkoutForm.loadFrame()
   currentTabId = browser.getCurrentTabId()
-  browser.frameParent()
   data = browser.exec(() => {
     return options
   }).value
@@ -24,7 +22,6 @@ before(() => {
 describe('Card Payment', () => {
   describe('Fill Card details', () => {
     it('Switch tab when card payment tab is clicked', () => {
-      browser.checkoutFrame()
       checkoutForm.fillCommonFields()
       browser.click('#payment-options > [tab=card]')
 

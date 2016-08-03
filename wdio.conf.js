@@ -44,8 +44,8 @@ exports.config = {
     // 'test/e2e/specs/netbanking.spec.js',
     // 'test/e2e/specs/kyc.spec.js',
     // 'test/e2e/*.coffee'
-    // 'test/e2e/specs/**/**.spec.js',
-    'test/e2e/specs/web-integration/automatic-checkout.spec.js'
+    'test/e2e/specs/**/**.spec.js',
+    // 'test/e2e/specs/web-integration/automatic-checkout.spec.js'
   ],
   // Patterns to exclude.
   // exclude: [
