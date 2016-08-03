@@ -114,7 +114,7 @@ module.exports = function() {
     })
 
     describe('Success Payment', () => {
-      it('Popup is closed & handler function is called on success', () => {
+      it('Popup is closed on success', () => {
         browser.click('#footer')
         browser.waitUntil(() => {
           return (browser.getTabIds() || []).length === 2

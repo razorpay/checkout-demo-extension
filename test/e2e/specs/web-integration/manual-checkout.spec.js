@@ -7,7 +7,6 @@ let data
 
 before(() => {
   checkoutForm.open()
-  browser.debug()
   data = browser.execute(() => {
     return options
   }).value

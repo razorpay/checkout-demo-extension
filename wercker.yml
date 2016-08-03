@@ -6,7 +6,7 @@ build:
             code: npm install --no-optional
         - script:
             name: Test
-            code: xvfb-run selenium-standalone start & npm run test:prod
+            code: xvfb-run selenium-standalone start > /dev/null & npm run test:prod
 
     after-steps:
         - slack-notifier:
