@@ -83,6 +83,7 @@ describe('Commonfields validation', () => {
 describe('Card fields validation', () => {
   it('Card Number field validation', () => {
     browser.click('#payment-options > [tab=card]')
+    browser.pause(300)
     browser.click('#footer')
     assert.isOk(
       browser.hasClass('#elem-card', 'invalid'),

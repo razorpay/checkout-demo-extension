@@ -17,7 +17,7 @@ app.use((req,res,next) => {
 
 app.use(express.static(__dirname + '/public'))
 app.use(bodyParser.urlencoded())
-app.use((req,res,next) => setTimeout(next, 3000))
+app.use((req,res,next) => setTimeout(next, 2000))
 
 app.post('/v1/payments/create/ajax', (req, res, next) => {
   let body = req.body

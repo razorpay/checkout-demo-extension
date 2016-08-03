@@ -77,7 +77,13 @@ exports.config = {
   //
   capabilities: [{
     browserName: 'chrome',
-    maxInstances: isProduction ? 10 : 1
+    maxInstances: isProduction ? 10 : 1,
+    chromeOptions: {
+      args: [
+        'no-sandbox',
+        'no-gpu'
+      ]
+    }
   // }, {
   //   browserName: 'firefox',
   //   maxInstances: 1
@@ -154,7 +160,7 @@ exports.config = {
   // Test reporter for stdout.
   // The only one supported by default is 'dot'
   // see also: http://webdriver.io/guide/testrunner/reporters.html
-  reporters: ['spec'],
+  reporters: ['dot', 'spec'],
   //
   // Some reporter require additional information which should get defined here
   reporterOptions: {
