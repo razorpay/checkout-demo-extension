@@ -27,7 +27,7 @@
   },
   "scripts": {
     "test:prod": "gulp test:e2e --env=production",
-    "test:soak": "gulp test:e2e --env=soaktesting",
+    "test:soak": "gulp test:e2e --env=production --soaktesting",
     "build": "gulp"
   },
   "bugs": {
