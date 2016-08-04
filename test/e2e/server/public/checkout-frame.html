@@ -37,6 +37,15 @@
           merge(window.preferences, passedOptions.preferences || {});
         }
       }
+
+      var isSoakTesting = getCookie('soakTesting') === 'true';
+      if (isSoakTesting) {
+        Razorpay = {
+          config: {
+            frameApi: 'https://api.razorpay.com'
+          }
+        }
+      }
     </script>
     <script src='./dist/v1/checkout-frame.js'></script>
     <script>

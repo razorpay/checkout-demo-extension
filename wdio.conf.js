@@ -280,13 +280,13 @@ exports.config = {
   // possible to defer the end of the process using a promise.
   onComplete: function(exitCode) {
     if (exitCode === 0) {
-      console.log('
+      console.log(`
               _/_/    _/        _/            _/_/_/    _/_/_/      _/          _/  _/_/_/_/  _/        _/
            _/    _/  _/        _/              _/    _/            _/          _/  _/        _/        _/
           _/_/_/_/  _/        _/              _/      _/_/        _/    _/    _/  _/_/_/    _/        _/
          _/    _/  _/        _/              _/          _/        _/  _/  _/    _/        _/        _/
         _/    _/  _/_/_/_/  _/_/_/_/      _/_/_/  _/_/_/            _/  _/      _/_/_/_/  _/_/_/_/  _/_/_/_/
-      ')
+      `)
     } else {
       console.log(`${exitCode} :-|
         ()
