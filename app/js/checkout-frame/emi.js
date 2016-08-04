@@ -10,9 +10,25 @@ function selectEmiBank(e){
   }
 }
 
-function emiView(session){
+function emiView(session) {
   var opts = session.emi_options;
-  opts.amount = session.get('amount');
+  var amount = opts.amount = session.get('amount');
+  if (amount >= 5000*100) {
+    opts.banks.AMEX = {
+      patt: /37(693|9397|98(6[1-3,7-9]|7[0-2,6-8]))/,
+      name: 'American Express',
+      plans: {
+        3: 15,
+        6: 15,
+        9: 15,
+        12: 15
+      }
+    }
+    var $help = $('#elem-emi .help');
+    $help.html($help.html().replace(' &amp; Axis Bank', ', Axis & AMEX'));
+  } else {
+    delete opts.banks.AMEX;
+  }
   this.opts = opts;
   this.listeners = [];
   this.render();
