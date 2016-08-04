@@ -53,7 +53,8 @@
   <script>
       Razorpay.configure({
         key: 'rzp_test_1DP5mmOlF5G5ag',
-        redirect: true
+        key: 'rzp_live_gC8obGlwaRlyui',
+        // redirect: true
         // callback_url: 'https://google.com'
       });
 
@@ -78,7 +79,7 @@
             email: val('customer_email'),
             contact: val('customer_phone'),
             method: 'wallet',
-            wallet: 'mobikwik',
+            wallet: 'payumoney',
             notes: {
               abc: 'def'
             }
