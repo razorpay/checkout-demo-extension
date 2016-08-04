@@ -165,7 +165,6 @@ describe('Wallet Payment', () => {
   describe('Wallet OTP', () => {
     it('Prompt for OTP', () => {
       browser.click('#footer')
-
       assert.equal(
         browser.css('#form-otp', 'display'),
         'block',

@@ -9,7 +9,7 @@ const payment = require('./routes/payment')
 const mockgateway = require('./routes/mockgateway')
 
 const argv = minimist(process.argv.slice(2));
-const isSoakTesting = argv.soak;
+const isSoakTesting = argv.soaktesting;
 
 app.set('port', 3000)
 app.use((req,res,next) => {

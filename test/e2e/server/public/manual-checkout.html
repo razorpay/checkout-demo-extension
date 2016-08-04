@@ -14,15 +14,15 @@
     <button id="rzp-button">Click Me</button>
     <script>
       var isSoakTesting = getCookie('soakTesting') === 'true';
+      Razorpay = {
+        config: {
+          frame: './checkout-frame.html'
+        }
+      }
 
       if (!isSoakTesting) {
-        Razorpay = {
-          config: {
-            api: 'http://0.0.0.0:3000',
-            frameApi: 'http://0.0.0.0:3000',
-            frame: './checkout-frame.html',
-          }
-        }
+        Razorpay.config.api = 'http://0.0.0.0:3000'
+        Razorpay.config.frameApi = 'http://0.0.0.0:3000'
       }
 
       if (window.location.search) {
