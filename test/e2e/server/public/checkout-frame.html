@@ -7,23 +7,11 @@
     <meta http-equiv="cache-control" content="no-cache">
     <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
     <link rel="stylesheet" type="text/css" href="./dist/v1/css/checkout.css">
+    <script type="text/javascript" src="./js/helpers.js"></script>
   </head>
 
   <body id="checkout-frame">
     <script>
-      function merge(source, obj) {
-        for (i in obj) {
-          if (obj.hasOwnProperty(i)) {
-            if (typeof obj[i] === 'object') {
-              source[i] = merge(source[i] || {}, obj[i]);
-            } else {
-              source[i] = obj[i];
-            }
-          }
-        }
-        return source;
-      }
-
       window.preferences = {
         methods: {
           "entity":"methods",
@@ -42,14 +30,22 @@
         }
       }
 
+      var passedOptions
       if (window.location.search) {
-        var passedPreferences = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
-        if (passedPreferences) {
-          merge(window.preferences, passedPreferences);
+        passedOptions = JSON.parse(decodeURIComponent(window.location.search.substring(1)));
+        if (typeof passedOptions === 'object') {
+          merge(window.preferences, passedOptions.preferences || {});
         }
       }
-
     </script>
     <script src='./dist/v1/checkout-frame.js'></script>
+    <script>
+      if (typeof passedOptions === 'object' && !passedOptions.loadInsideIFrame) {
+        merge(window.options, passedOptions.rzpOptions || {});
+        handleMessage({
+          options: options
+        })
+      }
+    </script>
   </body>
 </html>

@@ -1,5 +1,10 @@
+const minimist = require('minimist')
+
+const argv = minimist(process.argv.slice(1));
+const isProduction = argv.env === 'production';
+
 exports.config = {
-  debug: true,
+  debug: isProduction ? false : true,
   // =====================
   // Server Configurations
   // =====================
@@ -33,12 +38,13 @@ exports.config = {
   // directory is where your package.json resides, so `wdio` will be called from there.
   //
   specs: [
+    'test/e2e/specs/**/**.spec.js',
+    // 'test/e2e/specs/web-integration/manual-checkout.spec.js'
+    // 'test/e2e/specs/web-integration/automatic-checkout.spec.js',
     // 'test/e2e/specs/card-payment.spec.js',
     // 'test/e2e/specs/netbanking.spec.js',
     // 'test/e2e/specs/kyc.spec.js',
-    // 'test/e2e/*.coffee'
-    'test/e2e/specs/**.spec.js',
-    // 'test/e2e/specs/automatic-checkout.spec.js'
+    // 'test/e2e/specs/validation.spec.js',
   ],
   // Patterns to exclude.
   // exclude: [
@@ -70,7 +76,7 @@ exports.config = {
   //
   capabilities: [{
     browserName: 'chrome',
-    maxInstances: 10,
+    maxInstances: isProduction ? 10 : 1,
     chromeOptions: {
       args: [
         'no-sandbox',
@@ -110,7 +116,7 @@ exports.config = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'verbose',
+  logLevel: isProduction ? 'error' : 'verbose',
   //
   // Enables colors for log output.
   coloredLogs: true,
@@ -153,7 +159,7 @@ exports.config = {
   // Test reporter for stdout.
   // The only one supported by default is 'dot'
   // see also: http://webdriver.io/guide/testrunner/reporters.html
-  reporters: ['dot'],
+  reporters: ['dot', 'spec'],
   //
   // Some reporter require additional information which should get defined here
   reporterOptions: {
@@ -218,7 +224,7 @@ exports.config = {
   //
   // Gets executed once before all workers get launched.
   onPrepare: function(config, capabilities) {
-    console.log('let\'s go');
+    console.log('LET\'S GO')
   },
   //
   // Gets executed before test execution begins. At this point you can access to all global
@@ -273,7 +279,11 @@ exports.config = {
   // Gets executed after all workers got shut down and the process is about to exit. It is not
   // possible to defer the end of the process using a promise.
   onComplete: function(exitCode) {
-    console.log('That\'s it', exitCode);
+    if (exitCode === 0) {
+      console.log('ALL IS WELL')
+    } else {
+      console.log(`${exitCode} :-| SOMETHING IS FISHY`)
+    }
   },
   //
   // Cucumber specific hooks

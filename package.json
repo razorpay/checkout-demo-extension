@@ -26,7 +26,7 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "test": "gulp test",
+    "test:prod": "gulp test:e2e --env=production",
     "build": "gulp"
   },
   "bugs": {
@@ -65,6 +65,7 @@
     "run-sequence": "^1.2.2",
     "through": "^2.3.8",
     "wdio-mocha-framework": "^0.3.5",
+    "wdio-spec-reporter": "0.0.3",
     "webdriverio": "^4.1.1"
   },
   "private": "true",
