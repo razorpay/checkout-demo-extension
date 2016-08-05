@@ -128,11 +128,13 @@ describe('Know Your Customer. Shows account details of the customer in the upfro
         browser.css('.elem-contact .help', 'opacity'),
         'Empty phone help text is shown'
       )
-      checkoutForm.fillCommonFields();
     })
   })
 
   describe('PAY', () => {
+    before(() => {
+      checkoutForm.fillCommonFields()
+    })
     require('./partials/direct-pay')()
   })
 })

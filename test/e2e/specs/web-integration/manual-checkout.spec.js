@@ -236,7 +236,7 @@ describe('Modal should close', () => {
     browser.checkoutFrame()
     browser.waitUntil(() => {
       return !browser.element('#container').value
-    }, 3000)
+    })
     assert.isNotOk(browser.$('#container'), 'Iframe container is removed')
   }
 
