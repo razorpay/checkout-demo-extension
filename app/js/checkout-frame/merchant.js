@@ -315,14 +315,17 @@ var platformSpecific = {
     CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
   },
 
-  android: function(){
+  android: function() {
     $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
-    window.OTPElf = {
-      showOTP: function(otp, sender){
-        if (sender.indexOf('RZRPAY') !== -1) {
-          window.handleOTP(otp);
+    var elf = window.OTPElf;
+    if (elf) {
+      defer(function() {
+        elf.showOTP = function(otp, sender){
+          if (sender.indexOf('RZRPAY') !== -1) {
+            window.handleOTP(otp);
+          }
         }
-      }
+      })
     }
   }
 }
@@ -366,10 +369,10 @@ Razorpay.sendMessage = function(message){
   }
 }
 
-window.handleOTP = function(otp){
+window.handleOTP = function(otp) {
   var session = getSession();
   var otpEl = gel('otp');
-  if(session && session.rzp && otpEl && !otpEl.value){
+  if(session && otpEl && !otpEl.value){
     otpEl.value = otp;
   }
 }
