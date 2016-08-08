@@ -116,11 +116,11 @@ Payment.prototype = {
   },
 
   checkRedirect: function(paused) {
-    if (paused) {
-      return this.on('resume', this.checkRedirect);
-    }
     var getOption = this.r.get;
     if(getOption('redirect')) {
+      if (paused) {
+        return this.on('resume', this.checkRedirect);
+      }
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
