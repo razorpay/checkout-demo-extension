@@ -26,135 +26,39 @@
   <!-- endbuild -->
 
 </head>
-<body>
-  <h1>Demo Razorpay.js Payment Page</h1>
-  <div id="container" onsubmit="return false" class="pure-form">
-      <div class="section">
-          <label>Email* </label><input id="customer_email" type="email" placeholder="Email" required value="pranav@razorpay.com">
-          <label>Phone </label><input id="customer_phone" type="tel" placeholder="Phone" required value="8888899999">
-          <label>How many? </label><select id="item_quantity" required onchange="updateAmount(this)">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-          </select>
-          <label>Amount</label><input disabled id="amount" value="₹ 200">
-      </div>
-      <div class="section">
-          <label>Name on card</label><input required id="card_name" value="Pranav">
-          <label>Card Number</label><input required id="card_number" value="4111111111111111">
-          <label>Expiry Month</label><input required id="card_month" value="05">
-          <label>Expiry Year</label><input required id="card_year" value="34">
-          <label>CVV</label><input required id="card_cvv" value="300">
-      </div>
-      <div style="clear: both"></div>
-      <input id="submit" type="button" value="Purchase" class="pure-button pure-button-primary">
-  </div>
+<body style="text-align: center">
+  <button id="click">Pay</button>
   <script>
-      Razorpay.configure({
+    var data = {
+      email: 'some@customer.com',
+      contact: '1234565432',
+      method: 'netbanking',
+      bank: 'HDFC'
+    };
+    document.querySelector('#click').onclick = function(){
+      var rp = new Razorpay({
         key: 'rzp_test_1DP5mmOlF5G5ag',
-        key: 'rzp_live_gC8obGlwaRlyui',
-        // redirect: true
-        // callback_url: 'https://google.com'
+        amount: 1000,
+        redirect: true,
+        callback_url: 'http://google.com'
+      });
+      rp.createPayment(data, {
+        paused: true,
+        message: 'Generating order'  // your custom message
       });
 
-      function updateAmount(el) {
-        gel('amount').value = '₹ ' + parseInt(el.value)*200;
-      }
-
-      function gel(id) {
-        return document.getElementById(id);
-      }
-
-      function val(id) {
-        return gel(id).value;
-      }
-
-      gel('submit').onclick = function(e){
-        this.setAttribute('disabled', 'disabled'); // add loading animation here
-        window.r = Razorpay.payment.authorize({
-          // fees: true,
-          data: {
-            amount: val('amount').replace(/[^0-9]+/,'')*100,
-            email: val('customer_email'),
-            contact: val('customer_phone'),
-            method: 'wallet',
-            wallet: 'payumoney',
-            notes: {
-              abc: 'def'
-            }
-            // method: 'card',
-            // 'card[name]': val('card_name'),
-            // 'card[number]': val('card_number'),
-            // 'card[expiry_month]': val('card_month'),
-            // 'card[expiry_year]': val('card_year'),
-            // 'card[cvv]': val('card_cvv')
-          },
-          error: function(response){
-            alert(JSON.stringify(response)); // focus invalid inputs using returned 'field';
-            gel('submit').removeAttribute('disabled'); // re-enable pay button
-          },
-          success: function(response){
-            alert(JSON.stringify(response)); // focus invalid inputs using returned 'field';
-          }
-        })
-      }
+      // setTimeout is async, equivalent to ajax
+      setTimeout(function() {
+        var ajax_success = true;
+        if (ajax_success) {
+          data['notes[some_id]'] = '1234';
+          rp.emit('payment.resume');
+        } else {
+          rp.emit('payment.cancel');
+        }
+      }, 2000);
+    }
   </script>
 </body>
-<style>
-/*!
-Pure v0.6.0
-Copyright 2014 Yahoo! Inc. All rights reserved.
-Licensed under the BSD License.
-https://github.com/yahoo/pure/blob/master/LICENSE.md
-*/
-/*!
-normalize.css v^3.0 | MIT License | git.io/normalize
-Copyright (c) Nicolas Gallagher and Jonathan Neal
-*/
-body{
-    font-family: sans-serif;
-    background: #eee;
-    color: #414141;
-}
-#container{
-    background: #fff;
-    position: relative;
-    top: 20px;
-    border: 2px solid #ccc;
-    border-radius: 2px;
-    padding: 30px 0;
-    width: 600px;
-    margin: 0 auto;
-}
-.section{
-    float: left;
-    width: 50%;
-    padding: 0 30px;
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
-.section:first-child{
-    border-right: 1px solid #eee;
-    margin-right: -3px;
-}
-label{
-    line-height: 28px;
-}
-input, select{
-    display: block;
-    width: 240px;
-    margin: 5px 0;
-}
-input[type=submit]{
-    width: 140px;
-    margin: 30px auto 0;
-    display: block;
-}
-h1{
-    text-align: center;
-}
-</style>
 </body>
 </html>

@@ -82,16 +82,17 @@ function Payment(data, params, r) {
   // sanitize this.data, set fee, powerwallet flags
   this.format(data, params);
 
+  var paused = params.paused;
+  this.on('cancel', onPaymentCancel);
+
   // redirect if specified
-  if(this.checkRedirect()){
+  if(this.checkRedirect(paused)){
     return;
   }
 
-  this.on('cancel', onPaymentCancel);
-
   var popup = this.tryPopup();
 
-  if (params.paused) {
+  if (paused) {
     if (popup) {
       popup.write(templates.popup(this));
     }
@@ -103,7 +104,7 @@ function Payment(data, params, r) {
 
 Payment.prototype = {
   on: function(event, handler){
-    this.r.on(event, bind(handler, this), 'payment');
+    return this.r.on(event, bind(handler, this), 'payment');
   },
 
   emit: function(event, arg){
@@ -114,7 +115,10 @@ Payment.prototype = {
     this.r.off('payment');
   },
 
-  checkRedirect: function(){
+  checkRedirect: function(paused) {
+    if (paused) {
+      return this.on('resume', this.checkRedirect);
+    }
     var getOption = this.r.get;
     if(getOption('redirect')) {
       var data = this.data;
