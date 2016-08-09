@@ -117,7 +117,7 @@ Payment.prototype = {
 
   checkRedirect: function(paused) {
     var getOption = this.r.get;
-    if(getOption('redirect')) {
+    if (getOption('redirect')) {
       if (paused) {
         return this.on('resume', this.checkRedirect);
       }
@@ -278,8 +278,15 @@ Payment.prototype = {
   tryAjax: function(){
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
+    if (this.fees) {
+      return false;
+    }
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if (/iP(hone|pad).+Version\/[4-7]/.test(ua) || this.fees || !discreet.isFrame && (/MSIE /.test(ua)) || data.wallet === 'payumoney') {
+    if (!discreet.isFrame && (/MSIE /.test(ua) || data.wallet === 'payumoney')) {
+      return false;
+    }
+    // iphone background ajax route
+    if (!this.powerwallet && /iP(hone|ad)/.test(ua)) {
       return false;
     }
     // else make ajax request
