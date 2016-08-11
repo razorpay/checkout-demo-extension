@@ -235,7 +235,22 @@ function setOtpText(text){
   gel('otp-prompt').innerHTML = text;
 }
 
-function askOTP(text){
+function elfShowOTP(otp, sender) {
+  if (sender.indexOf('RZRPAY') !== -1) {
+    window.handleOTP(otp);
+  }
+}
+
+function askOTP(text) {
+  if (qpmap.platform === 'android') {
+    if (window.OTPElf) {
+      window.OTPElf.showOTP = elfShowOTP;
+    } else {
+      window.OTPElf = {
+        showOTP: elfShowOTP
+      }
+    }
+  }
   if (isNonNullObject(text)) {
     text = text.error && text.error.description;
   }

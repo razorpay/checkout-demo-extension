@@ -317,16 +317,6 @@ var platformSpecific = {
 
   android: function() {
     $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
-    var elf = window.OTPElf;
-    if (elf) {
-      defer(function() {
-        elf.showOTP = function(otp, sender){
-          if (sender.indexOf('RZRPAY') !== -1) {
-            window.handleOTP(otp);
-          }
-        }
-      }, 500)
-    }
   }
 }
 
@@ -370,6 +360,7 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleOTP = function(otp) {
+  otp = String(otp).replace(/\D/g, '').split('').join(' ');
   var session = getSession();
   var otpEl = gel('otp');
   if(session && otpEl && !otpEl.value){
