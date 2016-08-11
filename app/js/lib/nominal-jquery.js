@@ -254,7 +254,7 @@ $.ajax = function(opts){
         try{
           json = JSON.parse(xhr.responseText);
         } catch(e){
-          json = {error: {description: 'Parsing error'}};
+          json = {error: {description: 'Parsing error'}, extra: xhr.responseText};
         }
         opts.callback(json);
       }
