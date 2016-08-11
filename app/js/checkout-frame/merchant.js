@@ -325,7 +325,7 @@ var platformSpecific = {
             window.handleOTP(otp);
           }
         }
-      })
+      }, 500)
     }
   }
 }
