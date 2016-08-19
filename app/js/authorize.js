@@ -72,30 +72,44 @@ function onPaymentCancel(errorObj){
   }
 }
 
-function Payment(data, params, r) {
-  if (!isNonNullObject(params)) {
-    params = emo;
+function trackNewPayment(data, params, r) {
+  var trackingData = clone(data);
+
+  // first 6 digits of card number
+  var numberField = 'card[number]';
+  if (numberField in trackingData) {
+    trackingData[numberField] = trackingData[numberField].slice(0, 6);
   }
+  delete trackingData['card[cvv]'];
+  delete trackingData['card[expiry_month]'];
+  delete trackingData['card[expiry_year]'];
+
+  track(r, 'submit', {
+    data: trackingData,
+    params: params
+  });
+}
+
+function Payment(data, params, r) {
+  // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
+  trackNewPayment(data, params, r);
+
   // saving razorpay instance
   this.r = r;
 
-  // sanitize this.data, set fee, powerwallet flags
-  this.format(data, params);
-
-  var paused = params.paused;
+  // payment will be validated when resumed. So it's possible to have invalid arguments till it's paused
   this.on('cancel', onPaymentCancel);
 
-  // redirect if specified
-  if(this.checkRedirect(paused)){
-    return;
-  }
+  this.data = clone(data);
+  this.fees = params.fees;
+  this.powerwallet = params.powerwallet;
+  this.message = params.message;
 
-  var popup = this.tryPopup();
+  this.tryPopup();
 
-  if (paused) {
-    if (popup) {
-      popup.write(templates.popup(this));
-    }
+  var popup = this.popup;
+  if (params.paused) {
+    this.writePopup();
     this.on('resume', this.generate);
   } else {
     this.generate();
@@ -115,12 +129,9 @@ Payment.prototype = {
     this.r.off('payment');
   },
 
-  checkRedirect: function(paused) {
+  checkRedirect: function(pause) {
     var getOption = this.r.get;
     if (getOption('redirect')) {
-      if (paused) {
-        return this.on('resume', this.checkRedirect);
-      }
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
@@ -138,33 +149,26 @@ Payment.prototype = {
     }
   },
 
-  format: function(data, params){
+  format: function() {
+    var data = this.data;
+
     // fill data from options if empty
     var getOption = this.r.get;
-
     each(
       ['amount', 'currency', 'signature', 'description', 'order_id', 'notes'],
-      function(i, field){
-        if(!(field in data)){
+      function(i, field) {
+        if(!(field in data)) {
           var val = getOption(field);
-          if(val){
+          if (val) {
             data[field] = val;
           }
         }
-      },
-      this
+      }
     )
 
-    if(!data.key_id){
+    if (!data.key_id) {
       data.key_id = getOption('key');
     }
-
-    var trackingData = clone(data);
-    delete trackingData['card[number]'];
-    delete trackingData['card[cvv]'];
-    delete trackingData['card[expiry_month]'];
-    delete trackingData['card[expiry_year]'];
-    track(this.r, 'submit', {data: trackingData, params: params});
 
     // add tracking data
     data['_[checkout_id]'] = _uid;
@@ -175,36 +179,27 @@ Payment.prototype = {
     if (context) {
       data['_[context]'] = context;
     }
-    if(params.powerwallet){
+    if(this.powerwallet){
       data['_[source]'] = 'checkoutjs';
     }
     // flatten notes
     // notes.abc -> notes[abc]
-    each(
-      data.notes,
-      function(key, val){
-        var valType = typeof val;
-        if (valType === 'string' || valType === 'number' || valType === 'boolean'){
-          data['notes[' + key + ']'] = val;
-        }
-      }
-    )
-    delete data.notes;
-
-    this.data = data;
-    this.fees = params.fees;
-    this.powerwallet = params.powerwallet;
-    this.message = params.message;
+    flattenProp(data, 'notes', '[]');
+    flattenProp(data, 'card', '[]');
   },
 
-  generate: function(){
+  generate: function() {
+    this.format();
+
+    // redirect if specified
+    if(this.checkRedirect()){
+      return;
+    }
+
     var popup = this.popup;
 
     // show loading screen in popup
-    if (popup) {
-      this.message = null;
-      popup.write(templates.popup(this));
-    }
+    this.writePopup();
 
     if (!this.tryAjax()) {
       // no ajax route was available
@@ -302,32 +297,38 @@ Payment.prototype = {
     return this.ajax;
   },
 
-  tryPopup: function(isTopup){
-    if(this.powerwallet && !isTopup) {
-      return null;
-    }
-
-    var popup;
-    // unsupported browsers
-    if(!/(Windows Phone|\(iP.+UCBrowser\/)/.test(ua)){
-      try{
-        popup = this.popup = new Popup('', 'popup_' + _uid);
-        if (isTopup) {
-          popup.write(templates.popup(this));
-        }
-      } catch(e){
-        return null;
-      }
-    }
-
+  makePopup: function() {
+    var popup = this.popup = new Popup('', 'popup_' + _uid);
     if (popup) {
       popup.onClose = this.r.emitter('payment.cancel');
-    } else {
-      // popup creation failed
-      localStorage.removeItem('payload');
-      submitForm(RazorpayConfig.api + 'submitPayload.php', null, null, '_blank');
     }
     return popup;
+  },
+
+  writePopup: function() {
+    var popup = this.popup;
+    if (popup) {
+      popup.write(templates.popup(this));
+    }
+  },
+
+  tryPopup: function() {
+    var getOption = this.r.get;
+    if (getOption('redirect') || this.powerwallet) {
+      return;
+    }
+
+    if (!this.makePopup()) {
+      // popup creation failed
+      // check if we've callback_url to rescue, and move to redirect mode
+      if (getOption('callback_url')) {
+        getOption().redirect = true;
+      } else {
+        // if no callback_url, try to open a new tab
+        localStorage.removeItem('payload');
+        submitForm(RazorpayConfig.api + 'submitPayload.php', null, null, '_blank');
+      }
+    }
   }
 }
 
@@ -439,6 +440,13 @@ function otpCallback(response){
 
 var razorpayProto = Razorpay.prototype;
 razorpayProto.createPayment = function(data, params) {
+  if ('data' in data) {
+    data = data.data;
+    params = data;
+  }
+  if (!isNonNullObject(params)) {
+    params = emo;
+  }
   this._payment = new Payment(data, params, this);
   return this;
 }
@@ -476,8 +484,8 @@ razorpayProto.topupWallet = function() {
   var payment = this._payment;
   var isRedirect = this.get('redirect');
   if (!isRedirect) {
-    // passing true to indicate topup
-    payment.tryPopup(true);
+    payment.makePopup();
+    payment.writePopup();
   }
 
   payment.ajax = $.post({
