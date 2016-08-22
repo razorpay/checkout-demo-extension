@@ -247,14 +247,22 @@ $.ajax = function(opts){
     }
   )
 
-  if(opts.callback){
-    xhr.onreadystatechange = function(){
-      if(xhr.readyState === 4){
+  if(opts.callback) {
+    xhr.onreadystatechange = function() {
+      if(xhr.readyState === 4) {
         var json;
-        try{
+        try {
           json = JSON.parse(xhr.responseText);
-        } catch(e){
-          json = {error: {description: 'Parsing error'}, extra: {text: xhr.responseText, status: xhr.status}};
+        } catch(e) {
+          json = {
+            xhr: {
+              status: xhr.status,
+              text: xhr.responseText
+            },
+            error: {
+              description: 'Parsing error'
+            }
+          };
         }
         opts.callback(json);
       }
