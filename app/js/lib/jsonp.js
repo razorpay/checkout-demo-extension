@@ -23,10 +23,9 @@ var _$getAjaxParams = function(options){
   return params;
 };
 
-$.jsonp = function(options){
+$.jsonp = function(options) {
   if(!options.data) { options.data = {} }
-
-  var callback = options.data.callback = 'jsonp_' + Math.random().toString(36).slice(-14);
+  var callback = options.data.callback = 'jsonp_' + Math.random().toString(36).slice(2, 15);
   var params = _$getAjaxParams(options);
   var done = false;
   

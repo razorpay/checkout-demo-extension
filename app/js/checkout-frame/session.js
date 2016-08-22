@@ -603,9 +603,12 @@ Session.prototype = {
 
       // check if we're in webkit
       // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-      if (el_cvv && window.getComputedStyle && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
-        el_cvv.type = 'tel';
-      }
+      try {
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+        if (el_cvv && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
+          el_cvv.type = 'tel';
+        }
+      } catch(e){}
 
       var cardOptions = {
         onidentify: function(type) {
