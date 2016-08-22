@@ -12,7 +12,7 @@ var _$getAjaxParams = function(options){
     data: options.data || {},
     error: options.error || noop,
     success: options.success || noop,
-    complete: options.complete || noop,
+    callback: options.callback || noop,
     url: options.url || ''
   }
 
@@ -23,22 +23,16 @@ var _$getAjaxParams = function(options){
   return params;
 };
 
-var _$randomString = function(length) {
-  var str = '';
-  while(str.length < length) { str += Math.random().toString(36)[2] }
-  return str
-};
-
 $.jsonp = function(options){
   if(!options.data) { options.data = {} }
 
-  var callback = options.data.callback = 'jsonp_' + _$randomString(15);
+  var callback = options.data.callback = 'jsonp_' + Math.random().toString(36).slice(-14);
   var params = _$getAjaxParams(options);
   var done = false;
   
-  window[callback] = function(data){
+  window[callback] = function(data) {
     params.success(data, params);
-    params.complete(data, params);
+    params.callback(data, params);
     try {
       delete window[callback]
     }
@@ -53,7 +47,7 @@ $.jsonp = function(options){
 
   script.onerror = function(e){
     params.error({ error: true, url: script.src, event: e });
-    params.complete({ error: true, url: script.src, event: e }, params);
+    params.callback({ error: true, url: script.src, event: e }, params);
   }
 
   script.onload = script.onreadystatechange = function(){
@@ -66,4 +60,11 @@ $.jsonp = function(options){
   }
   var head = document.documentElement;
   head.appendChild(script);
+  return {
+    abort: function(){
+      if (window[callback]) {
+        window[callback] = noop;
+      }
+    }
+  }
 };

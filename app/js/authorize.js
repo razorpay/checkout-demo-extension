@@ -295,10 +295,16 @@ Payment.prototype = {
       return false;
     }
     // else make ajax request
+
+    var ajaxFn = $.post;
     var url = makeUrl('payments/create/ajax');
 
-    // return xhr object
-    this.ajax = $.post({
+    if (this.mode === 'jsonp') {
+      ajaxFn = $.jsonp;
+      url = url.replace('ajax', 'jsonp');
+    }
+
+    this.ajax = ajaxFn({
       url: url,
       data: data,
       callback: bind(ajaxCallback, this)
@@ -335,25 +341,30 @@ Payment.prototype = {
   }
 }
 
-function ajaxCallback(response){
+function ajaxCallback(response) {
   var payment_id = response.payment_id;
   if (payment_id) {
     this.payment_id = payment_id;
   }
 
   var errorResponse = response.error;
-  if (this.popup) {
-    // race between popup close poll and ajaxCallback. don't continue if payment has been canceled
-    if (this.popup.checkClose()) {
+  var popup = this.popup;
 
-      // return if it's already closed
-      return;
-    }
+  // race between popup close poll and ajaxCallback. don't continue if payment has been canceled
+  if (popup && popup.checkClose()) {
+    return; // return if it's already closed
+  }
 
-    // if ajax call is blocked by ghostery or some other reason, fall back to redirection in popup
-    if (errorResponse && response.xhr && response.xhr.status === 0) {
-      return submitPopup(this);
+  // if ajax call is blocked by ghostery or some other reason, fall back to redirection in popup
+  if (errorResponse && response.xhr && response.xhr.status === 0) {
+    if (popup) {
+      submitPopup(this);
+    } else {
+      // this won't cause infinite loop of ajax, because jsonp won't add xhr.status key
+      this.mode = 'jsonp';
+      this.tryAjax();
     }
+    return;
   }
 
   if (response.razorpay_payment_id || errorResponse) {
