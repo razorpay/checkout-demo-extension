@@ -47,6 +47,21 @@ function setCommunicator(){
 }
 setCommunicator();
 
+function submitPopup(payment) {
+  var popup = payment.popup;
+  // no ajax route was available
+  if (popup) {
+    submitForm(
+      makeRedirectUrl(payment.fees),
+      payment.data,
+      'post',
+      popup.name
+    )
+  } else {
+    setPayloadStorage(payment.message);
+  }
+}
+
 function onPaymentCancel(errorObj){
   if(!this.done){
     var payment_id = this.payment_id;
@@ -202,17 +217,7 @@ Payment.prototype = {
     this.writePopup();
 
     if (!this.tryAjax()) {
-      // no ajax route was available
-      if (popup) {
-        submitForm(
-          makeRedirectUrl(this.fees),
-          this.data,
-          'post',
-          popup.name
-        )
-      } else {
-        setPayloadStorage(this.message);
-      }
+      submitPopup(this);
     }
 
     // adding listeners
@@ -285,8 +290,7 @@ Payment.prototype = {
       return false;
     }
     // else make ajax request
-    var url = makeAuthUrl(data.key_id, 'payments/create/ajax');
-    delete data.key_id;
+    var url = makeUrl('payments/create/ajax');
 
     // return xhr object
     this.ajax = $.post({
@@ -338,14 +342,22 @@ function ajaxCallback(response){
     this.payment_id = payment_id;
   }
 
-  // race between popup close poll and ajaxCallback
-  if (this.popup && this.popup.checkClose()) {
+  var errorResponse = response.error;
+  if (this.popup) {
+    // race between popup close poll and ajaxCallback. don't continue if payment has been canceled
+    if (this.popup.checkClose()) {
 
-    // return if it's already closed
-    return;
+      // return if it's already closed
+      return;
+    }
+
+    // if ajax call is blocked by ghostery or some other reason, fall back to redirection in popup
+    if (errorResponse && response.xhr && response.xhr.status === 0) {
+      return submitPopup(this);
+    }
   }
 
-  if (response.razorpay_payment_id || response.error) {
+  if (response.razorpay_payment_id || errorResponse) {
     this.complete(response);
   } else {
     var request = response.request;
