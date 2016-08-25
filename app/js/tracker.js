@@ -133,14 +133,11 @@ function getCommonTrackingData(r) {
   var props = {
     ua: ua,
     checkout_id: r ? r.id : _uid,
-    platform: 'web',
-    library: trackingProps.library,
-    context: trackingProps.context,
-    integration: trackingProps.integration
+    platform: 'web'
   }
   each(['integration', 'context', 'library'], function(i, propName){
     if (trackingProps[propName]) {
-      props[propName] = trackingProps[propName]''
+      props[propName] = trackingProps[propName]
     }
   })
   return props;

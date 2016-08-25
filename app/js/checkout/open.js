@@ -69,7 +69,8 @@ function initAutomaticCheckout(){
   )
 
   var key = opts.key;
-  if (key && key.length > 0){
+  if (key && key.length > 0) {
+    trackingProps.integration = 'auto';
     opts.handler = defaultAutoPostHandler;
     var rzp = Razorpay(opts);
     if (!opts.parent) {
