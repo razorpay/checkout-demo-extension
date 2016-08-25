@@ -130,14 +130,20 @@ function nest(options){
 }
 
 function getCommonTrackingData(r) {
-  return {
+  var props = {
     ua: ua,
-    checkout_id: r.id,
+    checkout_id: r ? r.id : _uid,
     platform: 'web',
     library: trackingProps.library,
     context: trackingProps.context,
     integration: trackingProps.integration
   }
+  each(['integration', 'context', 'library'], function(i, propName){
+    if (trackingProps[propName]) {
+      props[propName] = trackingProps[propName]''
+    }
+  })
+  return props;
 }
 
 function track(r, event, data) {
