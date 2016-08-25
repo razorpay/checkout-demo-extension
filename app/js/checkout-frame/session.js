@@ -507,6 +507,7 @@ Session.prototype = {
 
   secAction: function(){
     this.track('skipped_save', {while_submitting: !!payload});
+    $('#save').attr('checked', 0);
     this.customer.wants_skip = true;
     var payload = this.payload;
     if (payload) {
