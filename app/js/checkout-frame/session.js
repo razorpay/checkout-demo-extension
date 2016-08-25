@@ -199,11 +199,11 @@ function errorHandler(response){
 
   var err_field = error.field;
   if (err_field){
-    if(!err_field.indexOf('expiry')){
+    if(!err_field.indexOf('expiry')) {
       err_field = 'card[expiry]';
     }
     var error_el = document.getElementsByName(err_field)[0];
-    if (error_el && error_el.type !== 'hidden'){
+    if (error_el && error_el.type !== 'hidden') {
       var help = $(error_el)
         .focus()
         .parent()
@@ -553,11 +553,7 @@ Session.prototype = {
     this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
 
     var enabledMethods = this.methods;
-    if(enabledMethods.netbanking){
-      this.on('change', '#bank-select', this.switchBank);
-      this.on('change', '#netb-banks', this.selectBankRadio, true);
-    }
-    if(enabledMethods.card){
+    if (enabledMethods.card) {
       this.on('blur', '#card_number', this.validateCard);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
@@ -573,6 +569,15 @@ Session.prototype = {
       this.on('click', '#show-add-card', this.toggleSavedCards);
       this.on('click', '#show-saved-cards', this.toggleSavedCards);
       this.on('change', '#saved-cards-container', this.setSavedCard, true);
+    }
+    if (enabledMethods.netbanking) {
+      this.on('change', '#bank-select', this.switchBank);
+      this.on('change', '#netb-banks', this.selectBankRadio, true);
+    }
+    if (enabledMethods.wallet) {
+      this.on('change', '#wallets', function() {
+        $('#wallets').removeClass('invalid');
+      }, true);
     }
 
     var goto_payment = '#error-message .link';
@@ -869,6 +874,13 @@ Session.prototype = {
   },
 
   checkInvalid: function(parent) {
+    if (!parent) {
+      parent = this.getActiveForm();
+      var payload = this.payload;
+      if (payload.method === 'wallet' && !payload.wallet) {
+        return $('#wallets').addClass('invalid');
+      }
+    }
     var invalids = $(parent).find('.invalid');
     if(invalids[0]){
       this.shake();
@@ -1086,7 +1098,7 @@ Session.prototype = {
         }
       }
 
-      if (this.checkInvalid(this.getActiveForm())) {
+      if (this.checkInvalid()) {
         return;
       }
     } else {
