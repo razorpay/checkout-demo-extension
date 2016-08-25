@@ -202,6 +202,7 @@ CheckoutFrame.prototype = {
     var options = rzp.get();
 
     var response = {
+      integration: trackingProps.integration,
       context: location.href,
       options: options,
       id: rzp.id

@@ -406,8 +406,12 @@ window.handleMessage = function(message){
     sessions[_uid] = session;
   }
 
-  if(message.context){
+  if (message.context) {
     trackingProps.context = message.context;
+  }
+
+  if (message.integration) {
+    trackingProps.integration = message.integration;
   }
 
   if(message.embedded){

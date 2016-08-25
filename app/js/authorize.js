@@ -185,22 +185,18 @@ Payment.prototype = {
       data.key_id = getOption('key');
     }
 
-    // add tracking data
-    data['_[checkout_id]'] = _uid;
-    data['_[platform]'] = trackingProps.platform;
-    data['_[library]'] = trackingProps.library;
-
-    var context = trackingProps.context;
-    if (context) {
-      data['_[context]'] = context;
-    }
     if(this.powerwallet){
       data['_[source]'] = 'checkoutjs';
     }
-    // flatten notes
+    // flatten notes, card
     // notes.abc -> notes[abc]
     flattenProp(data, 'notes', '[]');
     flattenProp(data, 'card', '[]');
+
+    // add tracking data
+    data._ = getCommonTrackingData();
+    // make it flat
+    flattenProp(data, '_', '[]');
   },
 
   generate: function() {
