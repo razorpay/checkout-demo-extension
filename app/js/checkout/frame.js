@@ -170,21 +170,21 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp){
-    var el = this.el;
+    var $el = $(this.el);
     this.bind();
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     appendLoader($parent, parent);
 
     if (rzp !== this.rzp) {
-      if(this.el.parentNode !== $parent[0]) {
-        $parent.append(this.el);
+      if($el.parent() !== $parent[0]) {
+        $parent.append($el[0]);
       }
       this.rzp = rzp;
     }
 
     if (parent) {
-      this.el.style.minHeight = '530px';
+      $el.css('minHeight', '530px');
       this.embedded = true;
     } else {
       $parent.css('display', 'block').reflow();

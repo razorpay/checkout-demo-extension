@@ -122,7 +122,6 @@ function Payment(data, params, r) {
 
   this.tryPopup();
 
-  var popup = this.popup;
   if (params.paused) {
     this.writePopup();
     this.on('resume', this.generate);
@@ -206,8 +205,6 @@ Payment.prototype = {
     if(this.checkRedirect()){
       return;
     }
-
-    var popup = this.popup;
 
     // show loading screen in popup
     this.writePopup();

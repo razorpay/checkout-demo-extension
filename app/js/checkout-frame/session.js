@@ -395,8 +395,6 @@ Session.prototype = {
     this.setFormatting();
     this.bindEvents();
     errorHandler.call(this, this.params);
-
-    var key = this.get('key');
   },
 
   setEMI: function(){
@@ -786,7 +784,6 @@ Session.prototype = {
     var cardtype = $savedcard.find('.cardtype')[0].getAttribute('cardtype');
     var nocvvCheck = gel('nocvv');
     var isMaestro = cardtype === 'maestro';
-    var emiEnabled = $savedcard.attr('emi');
     var issuer = $savedcard.attr('bank') || '';
 
     input.checked = true;

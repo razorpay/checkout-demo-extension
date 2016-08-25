@@ -290,7 +290,7 @@ Razorpay.prototype = {
       } else {
         // onEvent based callback
         eventMap(arg);
-      }      
+      }
     }
     return this;
   },
@@ -304,7 +304,7 @@ Razorpay.prototype = {
   },
 
   configure: function(overrides){
-    var key, options;
+    var key;
     try{
       this.get = base_configure(overrides).get;
       key = this.get('key');
