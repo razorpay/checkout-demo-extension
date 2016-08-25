@@ -4,9 +4,14 @@ var now = Date.now || function() {
 
 // iphone/ipad restrict non user initiated focus on input fields
 var ua = navigator.userAgent;
-var ua_iOS = /iPhone|iPad/.test(ua);
-var ua_prefer_redirect = /Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/.test(ua);
-var shouldFixFixed = /iPhone|Android 2\./.test(ua);
+function isua(ua_regex) {
+  return ua_regex.test(ua);
+}
+
+var ua_iOS = isua(/iPhone|iPad/);
+var ua_prefer_redirect = isua(/Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/);
+var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
+var shouldFixFixed = isua(/iPhone|Android 2\./);
 var shouldFocusNextField = !ua_iOS;
 
 /* simple checks */
