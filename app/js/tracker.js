@@ -202,7 +202,7 @@ function track(r, event, data) {
     $.ajax({
       url: 'https://api.keen.io/3.0/projects/56dfed2446f9a70e39ec3a24/events/' + event,
       method: 'post',
-      data: JSON.stringify(trackingPayloadgst),
+      data: JSON.stringify(trackingPayload),
       headers: {
         'Content-type': 'application/json',
         'Authorization': '856f246bc03088ac2390ad0d637a6e57d4637fc2cd088ff264650774022e7e6fec07a110d8256fca72b1362a569078c9371ee3ecfc67fc09fc9469d3c7b56744d4cfa9f2f4d466e24408ec77260288a7cb0741fe06f2399cb9d05456c479a737'

@@ -68,7 +68,7 @@ var Razorpay = window.Razorpay = function(options){
 
 Razorpay.defaults = {
   'key': '',
-  'amount': '',
+  'amount': 0,
   'currency': 'INR',
   'order_id': '',
   'handler': function(data){
