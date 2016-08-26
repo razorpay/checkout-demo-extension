@@ -1,7 +1,9 @@
 var Eventer;
 
 !function() {
-  Eventer = function(){};
+  Eventer = function(){
+    this._events = {}
+  };
   Eventer.prototype = {
     on: function(event, callback, namespace) {
       if (typeof callback !== 'function') {

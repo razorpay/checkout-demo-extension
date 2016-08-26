@@ -65,6 +65,16 @@ var cardFormatter, dateFormatter;
     return sum % 10 === 0;
   }
 
+  function cardType(value) {
+    for (var type in cardPatterns) {
+      var pattern = cardPatterns[type];
+      if (pattern.test(value)) {
+        return type;
+      }
+    }
+    return '';
+  }
+
   cardFormatter = {
     raw: function(value) {
       return value.replace(/\D/g, '');
@@ -80,21 +90,17 @@ var cardFormatter, dateFormatter;
     },
 
     oninput: function(value) {
-      var cardType = '';
-      for (var type in cardPatterns) {
-        var pattern = cardPatterns[type];
-        if (pattern.test(cardNumber)) {
-          cardType = type;
-        }
-      }
-
-      this.maxLen = getMaxLen(cardType);
+      var type = cardType(value);
+      this.maxLen = getMaxLen(type);
 
       this.emit('change', {
-        type: cardType,
-        maxLen: this.maxLen,
-        valid: this.valid(value)
+        type: type,
+        maxLen: this.maxLen
       });
+    },
+
+    valid: function(value) {
+      return value.length === this.maxLen && luhnCheck(value);
     }
   }
 

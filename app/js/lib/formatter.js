@@ -33,7 +33,7 @@ var Formatter;
     })
   }
 
-  proto.pretty = proto.raw = noop;
+  proto.pretty = proto.raw = proto.oninput = noop;
   proto.prettyValue = proto.rawValue = '';
 
   proto.format = function(e) {
@@ -50,8 +50,31 @@ var Formatter;
     })
   }
 
+  proto.bind = function() {
+    this.evtHandler = new EvtHandler(this.el, this)
+      .on({
+        keypress: this.format,
+        input: this.format,
+        keydown: this.backFormat
+      })
+  }
+
+  proto.unbind = function() {
+    var evtHandler = this.evtHandler;
+    if (evtHandler) {
+      evtHandler.off();
+      this.evtHandler = null;
+    }
+    this._events = {};
+  }
+
   proto.run = function(values) {
-    var pretty = this.pretty(this.raw(values.value, true), values.trim);
+    var rawValue = this.raw(values.value);
+    if (rawValue !== this.rawValue) {
+      this.rawValue = rawValue;
+      this.oninput(rawValue);
+    }
+    var pretty = this.pretty(rawValue, values.trim);
     if (pretty !== values.value) {
       prevent(values.e);
       this.el.value = pretty;
