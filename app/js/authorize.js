@@ -90,14 +90,12 @@ function onPaymentCancel(errorObj){
 function trackNewPayment(data, params, r) {
   var trackingData = clone(data);
 
-  // first 6 digits of card number
-  var numberField = 'card[number]';
-  if (numberField in trackingData) {
-    trackingData[numberField] = trackingData[numberField].slice(0, 6);
-  }
-  delete trackingData['card[cvv]'];
-  delete trackingData['card[expiry_month]'];
-  delete trackingData['card[expiry_year]'];
+  // donottrack card number, token, cvv
+  each(trackingData, function(field) {
+    if (field.slice(0, 4) === 'card') {
+      delete trackingData[field];
+    }
+  })
 
   track(r, 'submit', {
     data: trackingData,
@@ -143,7 +141,7 @@ Payment.prototype = {
     this.r.off('payment');
   },
 
-  checkRedirect: function(pause) {
+  checkRedirect: function() {
     var getOption = this.r.get;
     if (getOption('redirect')) {
       var data = this.data;
