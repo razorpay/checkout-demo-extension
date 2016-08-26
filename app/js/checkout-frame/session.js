@@ -345,7 +345,11 @@ Session.prototype = {
   },
 
   fillData: function(){
-    var tab = this.data.method || this.get('prefill.method');
+    var oldMethod = this.data.method;
+    if (oldMethod) {
+      this.wants_skip = true;
+    }
+    var tab = oldMethod || this.get('prefill.method');
 
     if(tab && !this.order) {
       this.switchTab(tab);
@@ -508,7 +512,7 @@ Session.prototype = {
   secAction: function(){
     this.track('skipped_save', {while_submitting: !!payload});
     $('#save').attr('checked', 0);
-    this.customer.wants_skip = true;
+    this.wants_skip = true;
     var payload = this.payload;
     if (payload) {
       delete payload.save;
@@ -736,7 +740,7 @@ Session.prototype = {
     tab_titles.otp = tab_titles.card;
     $('#otp-sec').html('Skip saved cards');
 
-    if (!customer.logged && !customer.wants_skip) {
+    if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function(){
         // customer status check also sends otp if customer exists
