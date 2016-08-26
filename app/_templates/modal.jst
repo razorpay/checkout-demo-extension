@@ -239,7 +239,7 @@ var gridClass = gridClasses[i-1];
               {{ if(wallet.length){ }}
                 <div class="tab-content showable screen" id="form-wallet">
                   {{ var count = 0, max = 3; }}
-                  <div id="wallets" tabIndex class="grid count-{{=wallet.length}}">
+                  <div id="wallets" class="grid count-{{=wallet.length}}">
                     {{
                     for (var w in wallet){
                       if(count === 0){

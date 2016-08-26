@@ -882,7 +882,7 @@ Session.prototype = {
     if (!parent) {
       parent = this.getActiveForm();
       var payload = this.payload;
-      if (payload.method === 'wallet' && !payload.wallet) {
+      if (payload && payload.method === 'wallet' && !payload.wallet) {
         return $('#wallets').addClass('invalid');
       }
     }
