@@ -220,117 +220,39 @@ function addListener(rzp, event, listener){
   }
 }
 
-Razorpay.prototype = {
-  on: function(event, callback, namespace){
-    if (!isFunction(callback)) {
-      return;
-    }
-    var events = this._events;
-    if(namespace){
-      if(!(namespace in events)){
-        events[namespace] = {};
-      }
-      events = events[namespace];
-    } else {
-      var eventSplit = event.split('.');
-      if (eventSplit.length > 1){
-        return this.on(eventSplit[1], callback, eventSplit[0]);
-      }
-    }
-    var eventMap = events[event];
-    if (!(eventMap instanceof Array)) {
-      eventMap = events[event] = [];
-    }
-    eventMap.push(callback);
-    return this;
-  },
+var RazorProto = Razorpay.prototype = new Eventer;
 
-  once: function(event, callback){
-    return this.on(
-      event,
-      bind(
-        function(arg){
-          this.off(event, callback);
-          callback(arg);
-        },
-        this
-      )
-    )
-  },
+RazorProto.isLiveMode = function() {
+  return /^rzp_l/.test(this.get('key'));
+}
 
-  off: function(event, callback){
-    var argLen = arguments.length;
-    if(argLen === 1){
-      delete this._events[event]
-    } else if (!argLen) {
-      this._events = {};
-    } else {
-      var eventSplit = event.split('.');
-      var eventMap = this._events[eventSplit[0]];
-      if (eventSplit.length > 1){
-        eventMap = eventMap[eventSplit[1]];
-      }
-      eventMap.splice(indexOf(eventMap, callback), 1);
+RazorProto.configure = function(overrides) {
+  var key;
+  try{
+    this.get = base_configure(overrides).get;
+    key = this.get('key');
+    validateRequiredFields(this);
+  } catch(e){
+    var message = e.message;
+    if(!this.get || !this.isLiveMode()){
+      alert(message);
     }
-    return this;
-  },
+    raise(message);
+  }
 
-  emit: function(event, arg){
-    var eventSplit = event.split('.');
-    var eventMap = this._events[eventSplit[0]];
-    if (eventMap && eventSplit.length > 1) {
-      eventMap = eventMap[eventSplit[1]];
-    }
-    if(eventMap){
-      if(eventMap instanceof Array){
-        // .on('event') based callback
-        each(eventMap, function(i, listener){
-          listener(arg);
-        })
-      } else {
-        // onEvent based callback
-        eventMap(arg);
-      }
-    }
-    return this;
-  },
+  if (this instanceof Razorpay) {
+    this.id = generateUID();
 
-  emitter: function(event, args){
-    return bind(function(){ this.emit(event, args) }, this);
-  },
-
-  isLiveMode: function(){
-    return /^rzp_l/.test(this.get('key'));
-  },
-
-  configure: function(overrides){
-    var key;
-    try{
-      this.get = base_configure(overrides).get;
-      key = this.get('key');
-      validateRequiredFields(this);
-    } catch(e){
-      var message = e.message;
-      if(!this.get || !this.isLiveMode()){
-        alert(message);
-      }
-      raise(message);
+    // init for checkoutjs is tracked from iframe
+    // we've open event to track parent side of options
+    if (!discreet.isCheckout) {
+      track(this, 'init');
     }
 
-    if (this instanceof Razorpay) {
-      this.id = generateUID();
-
-      // init for checkoutjs is tracked from iframe
-      // we've open event to track parent side of options
-      if (!discreet.isCheckout) {
-        track(this, 'init');
-      }
-
-      this.modal = {options: emo};
-      this.options = emo;
-      if(this.get('parent') && this.open){
-        this.open();
-      }
+    this.modal = {options: emo};
+    this.options = emo;
+    if(this.get('parent') && this.open){
+      this.open();
     }
   }
 }

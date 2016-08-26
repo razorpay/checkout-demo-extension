@@ -1,6 +1,8 @@
 var EvtHandler;
-(function(){
-  EvtHandler = function(el) {
+
+!function(){
+  EvtHandler = function(el, thisArg) {
+    this.thisArg = arguments.length > 1 ? thisArg : this;
     this.el = el;
     this.listeners = [];
   }
@@ -16,11 +18,10 @@ var EvtHandler;
     return function(e) {
       if (!e) { e = window.event }
       if (!e.target) { e.target = e.srcElement }
-      if (!e.which) { try { e.which = e.charCode || e.keyCode } catch(err){}}
       if (e.target.nodeType === 3) { e.target = e.target.parentNode }
       if (!e.preventDefault) {
         e.preventDefault = function() {
-          return this.returnValue = false;
+          return e.returnValue = false;
         }
       }
       callback.call(thisArg, e);
@@ -31,11 +32,15 @@ var EvtHandler;
     on: function(event, callback, el, useCapture) {
 
       // event can be string or a map {event: callback}
-      if (isNonNullObject(event)) {
-        // args = assuming eventMap, el, useCapture
-        return invokeEachWith(event, 'on', this, callback, el);
+      if (typeof event !== 'string') {
+        for (var eventName in event) {
+          this.on(eventName, event[eventName], callback, el);
+        }
+        return;
       }
-      if (!isNode(el)) {
+
+      // if el is not specified, i.e. number of args is 2 or 3
+      if (!(el instanceof Node)) {
         useCapture = el;
         el = this.el;
       }
@@ -43,7 +48,7 @@ var EvtHandler;
         getListener(
           el,
           event,
-          binder(callback, this),
+          binder(callback, this.thisArg),
           useCapture
         )
       )
@@ -51,9 +56,11 @@ var EvtHandler;
     },
 
     off: function() {
-      invokeEach(this.listeners);
+      this.listeners.forEach(function(listener){
+        listener();
+      })
       this.listeners = [];
       return this;
     }
   };
-})();
+}()

@@ -645,20 +645,20 @@ Session.prototype = {
         }
       }
 
-      this.card = new CardFormatter(gel('card_number'), cardOptions);
-      bits.push(this.card);
-      bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
+      // this.card = new CardFormatter(gel('card_number'), cardOptions);
+      // bits.push(this.card);
+      // bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
     }
 
-    var email = gel('email');
-    bits.push(new ContactFormatter(gel('contact')), {
-      onfilled: bind(email.focus, email)
-    });
-    bits.push(new OtpFormatter(gel('otp')));
+    // var email = gel('email');
+    // bits.push(new ContactFormatter(gel('contact')), {
+    //   onfilled: bind(email.focus, email)
+    // });
+    // bits.push(new OtpFormatter(gel('otp')));
   },
 
-  validateCard: function(){
-    toggleInvalid($(gel('card_number').parentNode), this.card.isValid());
+  validateCard: function() {
+    // toggleInvalid($(gel('card_number').parentNode), this.card.isValid());
   },
 
   setScreen: function(screen){
