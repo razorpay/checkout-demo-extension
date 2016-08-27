@@ -99,6 +99,9 @@
       },
 
       valid: function(value) {
+        if (!value) {
+          value = this.value;
+        }
         return value.length === this.maxLen && luhnCheck(value);
       }
     },

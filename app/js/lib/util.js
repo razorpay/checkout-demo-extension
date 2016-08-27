@@ -109,6 +109,9 @@ function indexOf(arr, item) {
 /* Functions */
 
 function bind(func, thisArg) {
+  if (isString(func)) {
+    func = thisArg[func];
+  }
   return function(){
     return func.apply(thisArg, arguments);
   }

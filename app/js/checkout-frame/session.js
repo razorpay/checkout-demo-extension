@@ -557,7 +557,7 @@ Session.prototype = {
 
     var enabledMethods = this.methods;
     if (enabledMethods.card) {
-      this.on('blur', '#card_number', this.validateCard);
+      this.on('blur', '#card_number', this.delegator.card.oninput);
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 
@@ -609,6 +609,7 @@ Session.prototype = {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
       var el_cvv = gel('card_cvv');
+      var el_name = gel('card_name');
 
       // check if we're in webkit
       // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
@@ -650,6 +651,12 @@ Session.prototype = {
 
       delegator.date.on('change', function(o) {
         inputHandler.input({target: el_expiry});
+
+        var isValid = this.valid();
+        toggleInvalid($(this.el.parentNode), isValid);
+        if (isValid) {
+          defer(bind('focus', el_name.value ? el_cvv : el_name));
+        }
       })
     }
 
