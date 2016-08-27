@@ -606,6 +606,7 @@ Session.prototype = {
     bits.push(inputHandler);
 
     if (this.methods.card) {
+      var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
       var el_cvv = gel('card_cvv');
 
@@ -618,40 +619,38 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var cardOptions = {
-        onidentify: function(type) {
-          var el = this.el;
-          var cvvlen = type && type !== 'amex' ? 3 : 4;
+      var delegator = new FormatDelegator(this.el, {
+        card: el_card,
+        date: el_expiry
+      })
+      delegator.card.on('change', function(o) {
+        var type = o.type;
+        var parent = this.el.parentNode;
 
-          // card icon element
+        if (type !== this.type) {
+          // update cvv element
+          var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
           el_cvv.pattern = '[0-9]{'+cvvlen+'}';
           inputHandler.input({target: el_cvv});
-          el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
-        },
 
-        onfilled: function(){
+          // card icon element
+          parent.querySelector('.cardtype').setAttribute('cardtype', type);
+        }
+
+        var isValid = this.valid();
+        // set validity classes
+        toggleInvalid($(parent), isValid);
+
+        // adding maxLen change because some cards may have multiple kind of valid lengths
+        if (isValid && this.value === this.maxLen) {
           invoke('focus', el_expiry, null, 0);
         }
-      }
+      })
 
-      var expiryOptions = {
-        onfilled: function(){
-          inputHandler.input({target: el_expiry});
-          if(!$(el_expiry.parentNode).hasClass('invalid')){
-            invoke(
-              'focus',
-              $('.elem-name').hasClass('filled') ? el_cvv : gel('card_name'),
-              null,
-              0
-            )
-          }
-        }
-      }
-
-      // this.card = new CardFormatter(gel('card_number'), cardOptions);
-      // bits.push(this.card);
-      // bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
+      delegator.date.on('change', function(o) {
+        inputHandler.input({target: el_expiry});
+      })
     }
 
     // var email = gel('email');
@@ -659,10 +658,6 @@ Session.prototype = {
     //   onfilled: bind(email.focus, email)
     // });
     // bits.push(new OtpFormatter(gel('otp')));
-  },
-
-  validateCard: function() {
-    // toggleInvalid($(gel('card_number').parentNode), this.card.isValid());
   },
 
   setScreen: function(screen){

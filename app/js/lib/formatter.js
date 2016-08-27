@@ -3,14 +3,36 @@ var Formatter;
 !function(){
   var noop = function(value) { return value }
 
-  Formatter = function(el, handlers) {
+  Formatter = function(el, handlers, noBind) {
     this.el = el;
-    for (var i in handlers) {
-      this[i] = handlers[i];
+
+    if (typeof handlers === 'string') {
+      handlers = Formatter.rules[handlers];
+    }
+
+    if (!handlers || !(el instanceof Node)) {
+      return false;
+    } else {
+      for (var i in handlers) {
+        this[i] = handlers[i];
+      }
+    }
+
+    if (noBind) {
+      el._formatter = this;
+    } else {
+      this.bind();
     }
   }
 
+  Formatter.events = {
+    keypress: 'format',
+    input: 'format',
+    keydown: 'backFormat'
+  }
+
   var proto = Formatter.prototype = new Eventer;
+
   proto.backFormat = function(e) {
     if (whichKey(e) !== 8) {
       return;
@@ -34,7 +56,7 @@ var Formatter;
   }
 
   proto.pretty = proto.raw = proto.oninput = noop;
-  proto.prettyValue = proto.rawValue = '';
+  proto.prettyValue = proto.value = '';
 
   proto.format = function(e) {
     var caret = this.getCaret();
@@ -52,11 +74,8 @@ var Formatter;
 
   proto.bind = function() {
     this.evtHandler = new EvtHandler(this.el, this)
-      .on({
-        keypress: this.format,
-        input: this.format,
-        keydown: this.backFormat
-      })
+      .on(Formatter.events)
+    return this;
   }
 
   proto.unbind = function() {
@@ -66,12 +85,13 @@ var Formatter;
       this.evtHandler = null;
     }
     this._events = {};
+    return this;
   }
 
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
-    if (rawValue !== this.rawValue) {
-      this.rawValue = rawValue;
+    if (rawValue !== this.value) {
+      this.value = rawValue;
       this.oninput(rawValue);
     }
     var pretty = this.pretty(rawValue, values.trim);

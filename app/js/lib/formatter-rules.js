@@ -1,5 +1,3 @@
-var cardFormatter, dateFormatter;
-
 (function(){
 
   var cardPatterns = {
@@ -75,51 +73,53 @@ var cardFormatter, dateFormatter;
     return '';
   }
 
-  cardFormatter = {
-    raw: function(value) {
-      return value.replace(/\D/g, '');
-    },
+  Formatter.rules = {
+    card: {
+      raw: function(value) {
+        return value.replace(/\D/g, '');
+      },
 
-    pretty: function(value, shouldTrim) {
-      var len = this.maxLen;
-      var prettyValue = value.slice(0, len).replace(getCardSpacing(len), '$1 ');
-      if (shouldTrim || value.length >= len) {
-        prettyValue = prettyValue.trim();
+      pretty: function(value, shouldTrim) {
+        var len = this.maxLen;
+        var prettyValue = value.slice(0, len).replace(getCardSpacing(len), '$1 ');
+        if (shouldTrim || value.length >= len) {
+          prettyValue = prettyValue.trim();
+        }
+        return prettyValue;
+      },
+
+      oninput: function(value) {
+        var type = cardType(value);
+        this.maxLen = getMaxLen(type);
+
+        this.emit('change', {
+          type: type,
+          maxLen: this.maxLen
+        });
+      },
+
+      valid: function(value) {
+        return value.length === this.maxLen && luhnCheck(value);
       }
-      return prettyValue;
     },
 
-    oninput: function(value) {
-      var type = cardType(value);
-      this.maxLen = getMaxLen(type);
+    date: {
+      raw: function(value) {
+        return value.replace(/\D/g, '');
+      },
 
-      this.emit('change', {
-        type: type,
-        maxLen: this.maxLen
-      });
-    },
+      pretty: function(value, shouldTrim) {
+        value = value
+          .replace(/^([2-9])$/, '0$1')
+          .replace(/^1[3-9]$/, '1')
+          .replace(/(.{2})/, '$1 / ')
+          .slice(0, 5 + this.yearLen);
 
-    valid: function(value) {
-      return value.length === this.maxLen && luhnCheck(value);
-    }
-  }
-
-  dateFormatter = {
-    raw: function(value) {
-      return value.replace(/\D/g, '');
-    },
-
-    pretty: function(value, shouldTrim) {
-      value = value
-        .replace(/^([2-9])$/, '0$1')
-        .replace(/^1[3-9]$/, '1')
-        .replace(/(.{2})/, '$1 / ')
-        .slice(0, 5 + this.yearLen);
-
-      if (shouldTrim) {
-        value = value.replace(/\D+$/, '');
+        if (shouldTrim) {
+          value = value.replace(/\D+$/, '');
+        }
+        return value;
       }
-      return value;
     }
   }
 })();

@@ -32,19 +32,19 @@
   <script>
     var data = {
       email: 'some@customer.com',
-      contact: '1234565432',
-      method: 'netbanking',
-      bank: 'HDFC'
+      contact: '8879524924',
+      method: 'wallet',
+      wallet: 'payumoney'
     };
     document.querySelector('#click').onclick = function(){
       var rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
+        key: 'rzp_live_ILgsfZCZoFIKMb',
         amount: 1000,
         redirect: true,
         callback_url: 'http://google.com'
       });
       rp.createPayment(data, {
-        paused: true,
+        // paused: true,
         message: 'Generating order'  // your custom message
       });
 

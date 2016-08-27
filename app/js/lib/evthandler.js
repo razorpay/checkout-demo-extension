@@ -24,7 +24,12 @@ var EvtHandler;
           return e.returnValue = false;
         }
       }
-      callback.call(thisArg, e);
+      if (typeof callback === 'string') {
+        callback = thisArg[callback];
+      }
+      if (typeof callback === 'function') {
+        callback.call(thisArg, e);
+      }
     }
   }
 
