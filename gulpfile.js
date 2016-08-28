@@ -26,6 +26,7 @@ const webdriver = require('gulp-webdriver');
 const testServer = require('./test/e2e/server/index.js');
 const internalIp = require('internal-ip');
 const lazypipe = require('lazypipe');
+const argv = require('minimist')(process.argv.slice(2));
 
 const distDir = 'app/dist/v1/';
 
@@ -274,10 +275,23 @@ function createCoverageReport(){
 
 
 gulp.task('e2e:run', function(done){
+  let wdioOptions = {
+    baseUrl: `http://${internalIp.v4()}:3000`
+  };
+
+  if (argv.type === 'crossbrowsertesting') {
+    Object.assign(wdioOptions, {
+      host: 'hub-cloud.browserstack.com',
+      port: 80,
+      services: ['browserstack'],
+      browserstackLocal: true,
+      user: process.env.BS_USER,
+      key: process.env.BS_KEY
+    });
+  }
+
   return gulp.src('./wdio.conf.js')
-    .pipe(webdriver({
-      baseUrl: `http://${internalIp.v4()}:3000`
-    }))
+    .pipe(webdriver(wdioOptions))
     .on('error', function(){
       done();
     });

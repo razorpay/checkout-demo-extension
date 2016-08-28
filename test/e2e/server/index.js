@@ -19,7 +19,7 @@ app.use((req,res,next) => {
 
 app.use(express.static(__dirname + '/public'))
 app.use(bodyParser.urlencoded())
-app.use((req,res,next) => setTimeout(next, 3000))
+app.use((req,res,next) => setTimeout(next, 5000))
 
 app.use('/v1/payments', payment)
 app.use('/v1/gateway/mocksharp/payment', mockgateway)
