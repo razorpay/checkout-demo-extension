@@ -547,7 +547,6 @@ Session.prototype = {
     this.on('click', '.payment-option', function(e){
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
-    this.on('keypress', '#contact', ensurePhone);
     this.on('submit', '#form', this.preSubmit);
     this.on('click', '#otp-action', this.back);
     this.on('click', '#otp-resend', this.resendOTP);
@@ -620,51 +619,49 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var delegator = this.delegator = new FormatDelegator(this.el, {
-        card: el_card,
-        date: el_expiry
-      })
-      delegator.card.on('change', function(o) {
-        var type = o.type;
-        var parent = this.el.parentNode;
+      var delegator = this.delegator = new FormatDelegator(this.el);
+      delegator.card = delegator.add('card', el_card)
+        .on('change', function(o) {
+          var type = o.type;
+          var parent = this.el.parentNode;
 
-        if (type !== this.type) {
-          // update cvv element
-          var cvvlen = type !== 'amex' ? 3 : 4;
-          el_cvv.maxLength = cvvlen;
-          el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-          inputHandler.input({target: el_cvv});
+          if (type !== this.type) {
+            // update cvv element
+            var cvvlen = type !== 'amex' ? 3 : 4;
+            el_cvv.maxLength = cvvlen;
+            el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+            inputHandler.input({target: el_cvv});
 
-          // card icon element
-          parent.querySelector('.cardtype').setAttribute('cardtype', type);
-        }
+            // card icon element
+            parent.querySelector('.cardtype').setAttribute('cardtype', type);
+          }
 
-        var isValid = this.valid();
-        // set validity classes
-        toggleInvalid($(parent), isValid);
+          var isValid = this.valid();
+          // set validity classes
+          toggleInvalid($(parent), isValid);
 
-        // adding maxLen change because some cards may have multiple kind of valid lengths
-        if (isValid && this.value.length === this.maxLen) {
-          invoke('focus', el_expiry, null, 0);
-        }
-      })
+          // adding maxLen change because some cards may have multiple kind of valid lengths
+          if (isValid && this.value.length === this.maxLen) {
+            invoke('focus', el_expiry, null, 0);
+          }
+        })
 
-      delegator.date.on('change', function(o) {
-        inputHandler.input({target: el_expiry});
+      delegator.expiry = delegator.add('date', el_expiry)
+        .on('change', function(o) {
+          inputHandler.input({target: el_expiry});
 
-        var isValid = this.valid();
-        toggleInvalid($(this.el.parentNode), isValid);
-        if (isValid) {
-          defer(bind('focus', el_name.value ? el_cvv : el_name));
-        }
-      })
+          var isValid = this.valid();
+          toggleInvalid($(this.el.parentNode), isValid);
+
+          if (isValid) {
+            defer(bind('focus', el_name.value ? el_cvv : el_name));
+          }
+        })
+
+      delegator.cvv = delegator.add('number', el_cvv);
+      delegator.contact = delegator.add('phone', gel('contact'));
+      delegator.otp = delegator.add('number', gel('otp'));
     }
-
-    // var email = gel('email');
-    // bits.push(new ContactFormatter(gel('contact')), {
-    //   onfilled: bind(email.focus, email)
-    // });
-    // bits.push(new OtpFormatter(gel('otp')));
   },
 
   setScreen: function(screen){
@@ -965,7 +962,7 @@ Session.prototype = {
       text = strings.process;
     }
 
-    if(this.screen === 'otp'){
+    if(this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
       $('#form-otp')[actionState]('action')[loadingState]('loading');

@@ -136,6 +136,22 @@
           return yearValue > currentYear;
         }
       }
+    },
+
+    number: {
+      raw: function(value) {
+        return value.replace(/\D/g, '');
+      }
+    },
+
+    phone: {
+      raw: function(value) {
+        var returnVal = value.slice(1, 15).replace(/\D/g, '');
+        if (value[0] === '+') {
+          returnVal = '+' + returnVal;
+        }
+        return returnVal;
+      }
     }
   }
 })();

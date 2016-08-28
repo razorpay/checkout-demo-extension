@@ -1,16 +1,9 @@
 var FormatDelegator;
 
 !function() {
-  FormatDelegator = function(el, elements) {
+  FormatDelegator = function(el) {
     EvtHandler.call(this, el);
     this.bits = [];
-
-    for (var ruleType in elements) {
-      if (Formatter.rules[ruleType]) {
-        this[ruleType] = new Formatter(elements[ruleType], ruleType, true);
-        this.bits.push(this[ruleType]);
-      }
-    }
 
     var events = Formatter.events;
     for (var event in events) {
@@ -24,6 +17,14 @@ var FormatDelegator;
   }
 
   var proto = FormatDelegator.prototype = new EvtHandler;
+
+  proto.add = function(ruleType, el) {
+    if (Formatter.rules[ruleType]) {
+      var formatter = new Formatter(el, ruleType, true);
+      this.bits.push(formatter);
+      return formatter;
+    }
+  }
 
   proto.destroy = function() {
     this.off();
