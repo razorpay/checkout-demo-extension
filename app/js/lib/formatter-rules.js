@@ -146,7 +146,7 @@
 
     phone: {
       raw: function(value) {
-        var returnVal = value.slice(1, 15).replace(/\D/g, '');
+        var returnVal = value.slice(0, 15).replace(/\D/g, '');
         if (value[0] === '+') {
           returnVal = '+' + returnVal;
         }

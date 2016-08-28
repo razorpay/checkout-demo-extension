@@ -1080,7 +1080,7 @@ Session.prototype = {
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          this.validateCard();
+          this.delegator.card.emit('change');
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {

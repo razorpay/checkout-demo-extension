@@ -76,7 +76,7 @@ for(var m in methods) {
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}">
+                    <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}" required pattern="^\+?[0-9]{8,15}$">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
