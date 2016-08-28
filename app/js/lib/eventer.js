@@ -101,10 +101,9 @@ var Eventer;
             // without further arguments
             if (argLen === 1) {
               if (!isFunction(args[event])) {
-                callback.call(self);
-                return this;
+                return callback.call(self);
               }
-              arg = args[event];
+              arg = args[event].call(self);
             }
             callback.call(self, arg);
           });

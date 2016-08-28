@@ -4,6 +4,7 @@ var Formatter;
   var noop = function(value) { return value }
 
   Formatter = function(el, handlers, noBind) {
+    Eventer.call(this);
     this.el = el;
 
     if (typeof handlers === 'string') {

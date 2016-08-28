@@ -117,7 +117,7 @@
           .replace(/^([2-9])$/, '0$1')
           .replace(/^1[3-9]$/, '1')
           .replace(/(.{2})/, '$1 / ')
-          .slice(0, 5 + this.yearLen);
+          .slice(0, 7);
 
         if (shouldTrim) {
           value = value.replace(/\D+$/, '');
@@ -126,7 +126,15 @@
       },
 
       valid: function() {
-        return true;
+        if (this.value.length === 4) {
+          var yearValue = parseInt(this.value.slice(2), 10);
+          var currentTime = new Date();
+          var currentYear = currentTime.getYear() - 100;
+          if (currentYear === yearValue) {
+            return parseInt(this.value.slice(0, 2), 10) >= currentTime.getMonth();
+          }
+          return yearValue > currentYear;
+        }
       }
     }
   }
