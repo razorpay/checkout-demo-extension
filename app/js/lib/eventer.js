@@ -1,6 +1,6 @@
 var Eventer;
 
-!function() {
+(function() {
   Eventer = function() {
     // constructor is also called for resetting
     this._evts = {};
@@ -119,4 +119,4 @@ var Eventer;
       }, this);
     }
   }
-}()
+})();

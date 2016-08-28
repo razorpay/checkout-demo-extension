@@ -1,6 +1,6 @@
 var EvtHandler;
 
-!function(){
+(function(){
   EvtHandler = function(el, thisArg) {
     this.thisArg = arguments.length > 1 ? thisArg : this;
     this.el = el;
@@ -68,4 +68,4 @@ var EvtHandler;
       return this;
     }
   };
-}()
+})();

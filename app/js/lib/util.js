@@ -245,7 +245,7 @@ var gel = bind(document.getElementById, document);
 
 function submitForm(action, data, method, target) {
   if (!isString(target)) {
-    if (method === 'get' && !isNonEmpty(data)) {
+    if (method === 'get' && isEmptyObject(data)) {
       if (!target) {
         target = window;
       }
@@ -291,109 +291,6 @@ function preventDefault(e){
 }
 
 /* Formatting */
-
-function getChar(e) {
-  if (e.ctrlKey) {
-    return '';
-  }
-  return String.fromCharCode(e.which).replace(/[^\x20-\x7E]/, '');
-}
-
-function getSelection(el) {
-  var value = el.value;
-  var length = value.length;
-  var caretPosition = el.selectionStart;
-  var text = '';
-  if (isNumber(caretPosition)) {
-    if (caretPosition !== el.selectionEnd) {
-      text = value.slice(caretPosition, el.selectionEnd);
-    }
-  } else if (document.selection) {
-    var range = document.selection.createRange();
-    text = range.text;
-    var textInputRange = el.createTextRange();
-    textInputRange.moveToBookmark(range.getBookmark());
-    caretPosition = -textInputRange.moveStart('character', -length);
-  }
-  return {
-    start: caretPosition,
-    end: caretPosition + text.length
-  };
-}
-
-function setCaret(el, position) {
-  if (isNumber(el.selectionStart)) {
-    return el.selectionStart = el.selectionEnd = position;
-  } else {
-    var range = el.createTextRange();
-    range.collapse(true);
-    range.moveEnd('character', position);
-    range.moveStart('character', position);
-    return range.select();
-  }
-}
-
-function getParts(e) {
-  var el;
-  var newCharacter = '';
-  if (e instanceof Node) {
-    el = e;
-  } else {
-    newCharacter = getChar(e);
-    el = e.target;
-  }
-
-  var selection = getSelection(el);
-  var value = el.value
-
-  if (!newCharacter) {
-    return {
-      pre: value.slice(0, selection.start),
-      val: value
-    }
-  } else {
-    e.preventDefault();
-    var pre = value.slice(0, selection.start) + newCharacter;
-    return {
-      pre: pre,
-      val: pre + value.slice(selection.end)
-    }
-  }
-}
-
-function stripNonDigit(str) {
-  return str.replace(/\D/g, '')
-}
-
-function ensureNumeric(e) {
-  return ensureRegex(e, /[0-9]/);
-}
-
-function ensurePhone(e) {
-  return ensureRegex(e, e.target.value.length ? /[0-9]/ : /[+0-9]/);
-}
-
-function ensureExpiry(e) {
-  var shouldSlashBeAllowed = /^\d{2} ?$/.test(e.target.value);
-  return ensureRegex(e, shouldSlashBeAllowed ? /[\/0-9]/ : /[0-9]/);
-}
-
-function ensureRegex(e, regex) {
-  if(!e) { return '' }
-
-  var which = e.which;
-  if (!isNumber(which)) {
-    which = e.keyCode;
-  }
-
-  if(e.metaKey || e.ctrlKey || e.altKey || which <= 18) { return false }
-  var character = String.fromCharCode(which);
-  if(regex.test(character)){
-    return character;
-  }
-  preventDefault(e);
-  return false;
-}
 
 function toggleInvalid($el, isValid) {
   $el.toggleClass('invalid', !isValid)

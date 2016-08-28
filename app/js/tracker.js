@@ -186,7 +186,7 @@ function track(r, event, data) {
       ]
     }
 
-    if (isNonEmpty(trackStack)) {
+    if (!isEmptyObject(trackStack)) {
       var prev = trackingPayload.prev = {};
       each(
         trackStack,

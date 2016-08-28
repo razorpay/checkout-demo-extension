@@ -1,6 +1,6 @@
 var Formatter;
 
-!function(){
+(function(){
   var noop = function(value) { return value }
 
   Formatter = function(el, handlers, noBind) {
@@ -34,7 +34,7 @@ var Formatter;
     keydown: 'backFormat'
   }
 
-  var proto = Formatter.prototype = new Eventer;
+  var proto = Formatter.prototype = new Eventer();
 
   proto.backFormat = function(e) {
     if (whichKey(e) !== 8) {
@@ -65,7 +65,7 @@ var Formatter;
     var caret = this.getCaret();
     var value = this.el.value;
     var left = value.slice(0, caret.start) + getChar(e);
-    var value = left + value.slice(caret.end);
+    value = left + value.slice(caret.end);
 
     this.run({
       e: e,
@@ -108,15 +108,39 @@ var Formatter;
 
   proto.moveCaret = function(position) {
     var el = this.el;
-    if (el.selectionStart !== position) {
-      el.selectionStart = el.selectionEnd = position;
+    if (isNumber(el.selectionStart)) {
+      if (el.selectionStart !== position) {
+        el.selectionStart = el.selectionEnd = position;
+      }
+    } else {
+      var range = el.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', position);
+      range.moveStart('character', position);
+      range.select();
     }
   }
 
   proto.getCaret = function() {
+    var el = this.el;
+    var value = el.value;
+    var length = value.length;
+    var caretPosition = el.selectionStart;
+    var caretEnd;
+    var text = '';
+    if (isNumber(caretPosition)) {
+      caretEnd = el.selectionEnd;
+    } else if (document.selection) {
+      var range = document.selection.createRange();
+      text = range.text;
+      var textInputRange = el.createTextRange();
+      textInputRange.moveToBookmark(range.getBookmark());
+      caretPosition = -textInputRange.moveStart('character', -length);
+      caretEnd = caretPosition + text.length;
+    }
     return {
-      start: this.el.selectionStart,
-      end: this.el.selectionEnd
+      start: caretPosition,
+      end: caretEnd
     }
   }
 
@@ -135,4 +159,4 @@ var Formatter;
       && String.fromCharCode(which).replace(/[^\x20-\x7E]/, '')
       || '';
   }
-}()
+})();

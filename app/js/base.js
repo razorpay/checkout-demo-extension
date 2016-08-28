@@ -220,7 +220,7 @@ function addListener(rzp, event, listener){
   }
 }
 
-var RazorProto = Razorpay.prototype = new Eventer;
+var RazorProto = Razorpay.prototype = new Eventer();
 
 RazorProto.isLiveMode = function() {
   return /^rzp_l/.test(this.get('key'));
