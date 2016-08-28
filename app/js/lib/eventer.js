@@ -1,88 +1,123 @@
 var Eventer;
 
 !function() {
-  Eventer = function(){
-    this._events = {}
+  Eventer = function() {
+    // constructor is also called for resetting
+    this._evts = {};
+    this._evtns = {};
+    this._evtargs = {};
+
+    // if called without `new` on Eventer instance
+    return this;
   };
+
   Eventer.prototype = {
-    on: function(event, callback, namespace) {
-      if (typeof callback !== 'function') {
-        return;
-      }
-      var events = this._events;
+    on: function(event, callback) {
+      if (typeof event === 'string' && typeof callback === 'function') {
+        var events = this._evts,
+          namespaces = this._evtns,
+          eventSplit = event.split('.', 2);
 
-      if(namespace){
-        if(!(namespace in events)) {
-          events[namespace] = {};
-        }
-        events = events[namespace];
-      } else {
-        var eventSplit = event.split('.');
+        // register event with namespace
         if (eventSplit.length > 1) {
-          return this.on(eventSplit[1], callback, eventSplit[0]);
+          var ns = eventSplit[1];
+
+          if (!namespaces[ns]) {
+            namespaces[ns] = {};
+          }
+          namespaces[ns][eventSplit[0]] = null;
+        }
+
+        if (events[event]) {
+          events[event].push(callback);
+        } else {
+          events[event] = [callback];
         }
       }
 
-      var eventMap = events[event];
-      if (!(eventMap instanceof Array)) {
-        eventMap = events[event] = [];
-      }
-      eventMap.push(callback);
       return this;
     },
 
     once: function(event, callback) {
-      var self = this;
-      return this.on(
-        event,
-        function(arg) {
-          self.off(event, callback);
-          callback(arg);
-        }
-      )
+      var everCallback = callback;
+      function onceCallback() {
+        everCallback.apply(this, arguments);
+        this.off(event, onceCallback);
+      }
+      callback = onceCallback;
+      return this.on(event, callback);
     },
 
     off: function(event, callback) {
       var argLen = arguments.length;
 
-      if(argLen === 1){
-        delete this._events[event];
-      } else if (!argLen) {
-        this._events = {};
-      } else {
-        var eventSplit = event.split('.');
-        var eventMap = this._events[eventSplit[0]];
-        if (eventSplit.length > 1){
-          eventMap = eventMap[eventSplit[1]];
-        }
-        eventMap.splice(indexOf(eventMap, callback), 1);
+      if(!argLen) {
+        return Eventer.call(this);
       }
+
+      var events = this._evts,
+        namespaces = this._evtns,
+        eventSplit = event.split('.', 2);
+
+      if (argLen === 2) {
+        var listenerArray = events[event];
+        if (listenerArray) {
+          listenerArray.splice(indexOf(listenerArray, callback), 1);
+          if (listenerArray.length) {
+            return this;
+          }
+        }
+      }
+
+      var ns = eventSplit[0];
+      var nsEvents = namespaces[ns];
+      if (nsEvents) {
+        each(
+          nsEvents,
+          function(eventName) {
+            delete events[ns + '.' + eventName];
+          }
+        )
+        if (isEmptyObject(nsEvents)) {
+          delete namespaces[ns];
+        }
+      }
+
+      delete events[event];
       return this;
     },
 
     emit: function(event, arg) {
-      var eventSplit = event.split('.');
-      var eventMap = this._events[eventSplit[0]];
-      if (eventMap && eventSplit.length > 1) {
-        eventMap = eventMap[eventSplit[1]];
-      }
-      if (eventMap) {
-        // .on('event') based callback
-        if(eventMap instanceof Array){
-          for (var i = 0; i < eventMap.length; i++) {
-            eventMap[i].call(this, arg);
-          }
-        // onEvent based callback
-        } else {
-          eventMap(arg);
-        }
+      var self = this;
+      var listenerArray = this._evts[event];
+
+      var args = this._evtargs;
+      var argLen = arguments.length;
+
+      if (listenerArray) {
+        each(listenerArray, function(i, callback) {
+          defer(function(){
+            // @emit('event');
+            // without further arguments
+            if (argLen === 1) {
+              if (!isFunction(args[event])) {
+                callback.call(self);
+                return this;
+              }
+              arg = args[event];
+            }
+            callback.call(self, arg);
+          });
+        })
       }
       return this;
     },
 
-    emitter: function(event, args) {
-      var self = this;
-      return function(){ self.emit(event, args) }
+    emitter: function() {
+      var args = arguments;
+      return bind(function() {
+        this.emit.apply(this, args);
+      }, this);
     }
   }
 }()

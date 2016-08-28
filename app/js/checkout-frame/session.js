@@ -557,7 +557,7 @@ Session.prototype = {
 
     var enabledMethods = this.methods;
     if (enabledMethods.card) {
-      this.on('blur', '#card_number', this.delegator.card.oninput);
+      this.on('blur', '#card_number', this.delegator.card.emitter('change'));
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 
@@ -620,7 +620,7 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var delegator = new FormatDelegator(this.el, {
+      var delegator = this.delegator = new FormatDelegator(this.el, {
         card: el_card,
         date: el_expiry
       })

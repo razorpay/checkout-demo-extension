@@ -88,14 +88,15 @@
         return prettyValue;
       },
 
-      oninput: function(value) {
-        var type = cardType(value);
-        this.maxLen = getMaxLen(type);
-
-        this.emit('change', {
-          type: type,
-          maxLen: this.maxLen
-        });
+      init: function() {
+        this._evtargs.change = function() {
+          var type = cardType(this.value);
+          this.maxLen = getMaxLen(type);
+          return {
+            type: type,
+            maxLen: this.maxLen
+          }
+        }
       },
 
       valid: function(value) {
@@ -122,6 +123,10 @@
           value = value.replace(/\D+$/, '');
         }
         return value;
+      },
+
+      valid: function() {
+        return true;
       }
     }
   }

@@ -43,14 +43,13 @@ function isNode(x) {
   return x instanceof Node;
 }
 
-function isNonEmpty(obj){
-  if (!obj) {
-    return false;
-  }
-  if (isArray(obj)) {
-    return obj.length;
-  }
-  for (var i in obj) {
+function isEmptyObject(obj) {
+  if (isNonNullObject(obj)) {
+    for (var i in obj) {
+      if (obj.hasOwnProperty(i)) {
+        return false;
+      }
+    }
     return true;
   }
 }
@@ -63,24 +62,18 @@ function each(iteratee, eachFunc, thisArg) {
     thisArg = this;
   }
   if (iteratee) {
-    if (iteratee.length) { // not using instanceof Array, to iterate over nodeList
+    if (iteratee.length) { // not using instanceof Array, to iterate over array-like objects
       for (i = 0; i < iteratee.length; i++) {
         eachFunc.call(thisArg, i, iteratee[i]);
       }
     } else {
       for (i in iteratee) {
-        eachFunc.call(thisArg, i, iteratee[i]);
+        if (iteratee.hasOwnProperty(i)) {
+          eachFunc.call(thisArg, i, iteratee[i]);
+        }
       }
     }
   }
-}
-
-function map(iteratee, mapFunc) {
-  var result = iteratee instanceof Array ? [] : {};
-  each(iteratee, function(i, val){
-    result[i] = mapFunc(val, i);
-  })
-  return result;
 }
 
 function indexOf(arr, item) {

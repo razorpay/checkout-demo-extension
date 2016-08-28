@@ -18,6 +18,8 @@ var Formatter;
       }
     }
 
+    this.init();
+
     if (noBind) {
       el._formatter = this;
     } else {
@@ -55,7 +57,7 @@ var Formatter;
     })
   }
 
-  proto.pretty = proto.raw = proto.oninput = noop;
+  proto.pretty = proto.raw = proto.init = noop;
   proto.prettyValue = proto.value = '';
 
   proto.format = function(e) {
@@ -92,7 +94,7 @@ var Formatter;
     var rawValue = this.raw(values.value);
     if (rawValue !== this.value) {
       this.value = rawValue;
-      this.oninput(rawValue);
+      this.emit('change');
     }
     var pretty = this.pretty(rawValue, values.trim);
     if (pretty !== values.value) {
