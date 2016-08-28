@@ -62,9 +62,20 @@ var Razorpay = window.Razorpay = function(options){
   if(!(this instanceof Razorpay)){
     return new Razorpay(options);
   }
-  this._events = {};
   this.configure(options);
+  Eventer.call(this);
+  this.id = generateUID();
+
+  // init for checkoutjs is tracked from iframe
+  // we've open event to track parent side of options
+  if (!discreet.isCheckout) {
+    track(this, 'init');
+  }
+
+  this.postInit();
 };
+
+var RazorProto = Razorpay.prototype = new Eventer();
 
 Razorpay.defaults = {
   'key': '',

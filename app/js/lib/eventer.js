@@ -6,6 +6,7 @@ var Eventer;
     this._evts = {};
     this._evtns = {};
     this._evtargs = {};
+    this._onNewListener = noop;
 
     // if called without `new` on Eventer instance
     return this;
@@ -33,6 +34,7 @@ var Eventer;
         } else {
           events[event] = [callback];
         }
+        this._onNewListener(event);
       }
 
       return this;

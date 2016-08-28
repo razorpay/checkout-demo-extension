@@ -21,7 +21,7 @@ function isValidAmount(amt){
   return amt >= 100;
 }
 
-function makePrefParams(rzp){
+function makePrefParams(rzp) {
   if (rzp) {
     var getter = rzp.get;
     var params = {};
@@ -220,8 +220,6 @@ function addListener(rzp, event, listener){
   }
 }
 
-var RazorProto = Razorpay.prototype = new Eventer();
-
 RazorProto.isLiveMode = function() {
   return /^rzp_l/.test(this.get('key'));
 }
@@ -238,22 +236,6 @@ RazorProto.configure = function(overrides) {
       alert(message);
     }
     raise(message);
-  }
-
-  if (this instanceof Razorpay) {
-    this.id = generateUID();
-
-    // init for checkoutjs is tracked from iframe
-    // we've open event to track parent side of options
-    if (!discreet.isCheckout) {
-      track(this, 'init');
-    }
-
-    this.modal = {options: emo};
-    this.options = emo;
-    if(this.get('parent') && this.open){
-      this.open();
-    }
   }
 }
 

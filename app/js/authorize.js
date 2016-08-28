@@ -521,6 +521,17 @@ razorpayProto.topupWallet = function() {
   });
 }
 
+RazorProto.postInit = function() {
+  this._onNewListener = function(event) {
+    var self = this;
+    if (event === 'ready') {
+      Razorpay.payment.getPrefs(makePrefParams(this), function(response) {
+        self.emit('ready', response);
+      })
+    }
+  }
+}
+
 Razorpay.payment = {
   authorize: function(options){
     var r = Razorpay({amount: options.data.amount}).createPayment(options.data);

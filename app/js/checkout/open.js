@@ -190,7 +190,16 @@ Razorpay.open = function(options) {
   return Razorpay(options).open();
 }
 
-Razorpay.prototype.open = needBody(function() {
+RazorProto.postInit = function() {
+  this.modal = {options: emo};
+  this.options = emo;
+
+  if (this.get('parent')) {
+    this.open();
+  }
+}
+
+RazorProto.open = needBody(function() {
   if(!this.get('redirect') && !discreet.supported(true)){
     return;
   }
@@ -206,7 +215,7 @@ Razorpay.prototype.open = needBody(function() {
   return this;
 });
 
-Razorpay.prototype.close = function(){
+RazorProto.close = function(){
   var frame = this.checkoutFrame;
   if(frame){
     frame.postMessage({event: 'close'});

@@ -205,8 +205,7 @@ function setPaymentMethods(session){
 }
 
 function fetchPrefsAndShowModal(session){
-  var data = makePrefParams(session);
-  Razorpay.payment.getPrefs(data, function(response) {
+  Razorpay.payment.getPrefs(makePrefParams(session), function(response) {
     if(response.error){
       return Razorpay.sendMessage({event: 'fault', data: response.error.description});
     }
