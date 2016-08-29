@@ -200,16 +200,10 @@ let karmaOptions = {
   },
   preprocessors: {
     '**/*.coffee': ['coffee']
-  },
-  nyanReporter: {
-    suppressErrorHighlighting: true
   }
 };
 
-let reporter = 'dots';
-if(!process.env.WERCKER){
-  reporter = 'nyan';
-}
+let reporter = 'mocha';
 karmaOptions.reporters.push(reporter);
 
 let karmaLibs = [
