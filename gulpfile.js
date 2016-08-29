@@ -193,14 +193,12 @@ let karmaOptions = {
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
-  browsers: ['PhantomJS'],
+  browsers: ['Chrome'],
   singleRun: true,
   coverageReporter: {
     type : 'json'
   },
-  preprocessors: {
-    '**/*.coffee': ['coffee']
-  }
+  preprocessors: {}
 };
 
 let reporter = 'mocha';
