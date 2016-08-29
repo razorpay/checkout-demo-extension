@@ -556,7 +556,7 @@ Session.prototype = {
 
     var enabledMethods = this.methods;
     if (enabledMethods.card) {
-      this.on('blur', '#card_number', this.delegator.card.emitter('change'));
+      this.on('blur', '#card_number', bind('format', this.delegator.card));
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 
@@ -830,7 +830,7 @@ Session.prototype = {
     $('#form-card').toggleClass('has-cards', tokens);
   },
 
-  toggleSavedCards: function(saveScreen){
+  toggleSavedCards: function(saveScreen) {
     var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
     if (typeof saveScreen !== 'boolean') {
@@ -1080,7 +1080,7 @@ Session.prototype = {
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          this.delegator.card.emit('change');
+          this.delegator.card.emit('format');
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {

@@ -26,6 +26,8 @@ var Formatter;
     } else {
       this.bind();
     }
+    // set initial formatting
+    this.format();
   }
 
   Formatter.events = {
