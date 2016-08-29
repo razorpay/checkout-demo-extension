@@ -193,7 +193,7 @@ let karmaOptions = {
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
-  browsers: ['Chrome'],
+  browsers: ['PhantomJS'],
   singleRun: true,
   coverageReporter: {
     type : 'json'
