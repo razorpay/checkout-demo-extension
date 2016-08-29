@@ -470,10 +470,10 @@ razorpayProto.setForm = function(form) {
         submitForm(
           $form.attr('action'),
           successObj,
-          $form.attr('method') || post
+          $form.attr('method') || 'post'
         )
       })
-      .createPayment(data);
+      // .createPayment(data);
     return preventDefault(e);
   })
 }

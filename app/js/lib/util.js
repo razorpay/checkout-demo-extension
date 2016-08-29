@@ -1,3 +1,7 @@
+function raise(message){
+  throw new Error(message);
+}
+
 var roll = function(){};
 var noop = roll;
 var emo = {};

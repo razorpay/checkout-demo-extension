@@ -380,7 +380,7 @@ function validUID(id){
   return true;
 }
 
-window.handleMessage = function(message){
+window.handleMessage = function(message) {
   if('id' in message && !validUID(message.id)){
     return;
   }
