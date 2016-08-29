@@ -29,7 +29,7 @@ var Formatter;
   }
 
   Formatter.events = {
-    keypress: 'format',
+    keypress: 'fwdFormat',
     input: 'format',
     keydown: 'backFormat'
   }
@@ -65,14 +65,30 @@ var Formatter;
     this.emit('change');
   }
 
-  proto.format = function(e) {
+  proto.fwdFormat = function(e) {
+    var newChar = getChar(e);
+    if (!newChar) {
+      return;
+    }
     var caret = this.getCaret();
     var value = this.el.value;
-    var left = value.slice(0, caret.start) + getChar(e);
+    var left = value.slice(0, caret.start) + newChar;
     value = left + value.slice(caret.end);
 
     this.run({
       e: e,
+      left: left,
+      value: value
+    })
+  }
+
+  proto.format = function() {
+    var caret = this.getCaret();
+    var value = this.el.value;
+    var left = value.slice(0, caret.start);
+    value = left + value.slice(caret.end);
+
+    this.run({
       left: left,
       value: value,
       trim: value.length <= this.prettyValue.length
