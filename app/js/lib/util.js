@@ -288,10 +288,12 @@ function deserialize(data, key) {
   return '<input type="hidden" name="' + key + '" value="' + data + '">';
 }
 
-function preventDefault(e){
-  if(e && e.preventDefault){
+function preventDefault(e) {
+  if (e instanceof Event) {
     e.preventDefault();
+    e.stopPropagation();
   }
+  return false;
 }
 
 /* Formatting */

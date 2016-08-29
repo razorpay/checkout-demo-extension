@@ -33,24 +33,26 @@
 </head>
 <body>
   <form>
-  <input type='radio' name='method' value='card' checked>Card
-  <input type='radio' name='method' value='netbanking'>Netbanking
-  <input type='radio' name='method' value='wallet'>Wallet
+    <input type='radio' name='method' value='card' checked>Card
+    <input type='radio' name='method' value='netbanking'>Netbanking
+    <input type='radio' name='method' value='wallet'>Wallet
 
-  <div id='card'>
-    <input type='tel' name='card[number]' placeholder='Enter card number'>
-    <input type='tel' name='card[expiry]' placeholder='Card Expiry'>
-    <input type='text' name='card[name]' placeholder="Cardholder's name">
-    <input type='tel' name='card[cvv]' placeholder='CVV'>
-    <input type='checkbox' name='method' value='emi'> EMI
-  </div>
+    <div id='card'>
+      <input type='tel' name='card[number]' placeholder='Enter card number'>
+      <input type='tel' name='card[expiry]' placeholder='Card Expiry'>
+      <input type='text' name='card[name]' placeholder="Cardholder's name">
+      <input type='tel' name='card[cvv]' placeholder='CVV'>
+      <input type='checkbox' name='method' value='emi'> EMI
+    </div>
+
+    <button type='submit'>Pay</button>
   </form>
   <script>
     var rp = new Razorpay({
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200
     })
-    rp.setForm(documents.forms[0]);
+    rp.setForm(document.forms[0]);
   </script>
 </body>
 <style>

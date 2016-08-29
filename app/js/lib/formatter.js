@@ -120,7 +120,7 @@ var Formatter;
 
     var pretty = this.pretty(rawValue, values.trim);
     if (pretty !== values.value) {
-      prevent(values.e);
+      preventDefault(values.e);
       this.el.value = pretty;
       this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
     }
@@ -167,10 +167,6 @@ var Formatter;
 
   function whichKey(e) {
     return (e instanceof Event) && (e.which || e.charCode || e.keyCode);
-  }
-
-  function prevent(e) {
-    return e && e.preventDefault() && e.stopPropagation();
   }
 
   function getChar(e) {

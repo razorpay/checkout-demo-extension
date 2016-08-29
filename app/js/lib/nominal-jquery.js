@@ -20,16 +20,16 @@ $.prototype = {
         if( e.target.nodeType === 3 ) {
           e.target = e.target.parentNode;// textNode target
         }
-        callback.call(thisArg || this, e);
+        return callback.call(thisArg || this, e);
       }
     } else {
-      ref = function(e){
+      ref = function(e) {
         if(!e) { e = window.event }
         if(!e.target) { e.target = e.srcElement || document }
         if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
         if(!e.stopPropagation) { e.stopPropagation = e.preventDefault }
         if(!e.currentTarget) { e.currentTarget = el }
-        callback.call(thisArg || el, e);
+        return callback.call(thisArg || el, e);
       }
     }
     each(
