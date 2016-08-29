@@ -150,6 +150,13 @@ $.prototype = {
     return this[(condition ? 'add' : 'remove') + 'Class'](className);
   },
 
+  qs: function(selector) {
+    var node = this[0];
+    if (node) {
+      return node.querySelector(selector);
+    }
+  },
+
   find: function(selector){
     var node = this[0];
     if(node){

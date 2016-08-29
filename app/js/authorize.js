@@ -453,6 +453,14 @@ function otpCallback(response){
 }
 
 var razorpayProto = Razorpay.prototype;
+
+razorpayProto.setForm = function(form) {
+  var $form = $(form);
+  if (!$form[0]) {
+    return;
+  }
+}
+
 razorpayProto.createPayment = function(data, params) {
   if ('data' in data) {
     data = data.data;

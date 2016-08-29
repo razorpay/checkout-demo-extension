@@ -11,6 +11,10 @@
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/lib/eventer.js"></script>
+  <script src="js/lib/evthandler.js"></script>
+  <script src="js/lib/formatter.js"></script>
+  <script src="js/lib/formatter-rules.js"></script>
+  <script src="js/lib/format-delegator.js"></script>
   <script src="js/init.js"></script>
   <script src="js/options.js"></script><!--coverage-->
   <script src="js/lib/tracekit.js"></script>
@@ -27,39 +31,34 @@
   <!-- endbuild -->
 
 </head>
-<body style="text-align: center">
-  <button id="click">Pay</button>
-  <script>
-    var data = {
-      email: 'some@customer.com',
-      contact: '8879524924',
-      method: 'wallet',
-      wallet: 'payumoney'
-    };
-    document.querySelector('#click').onclick = function(){
-      var rp = new Razorpay({
-        key: 'rzp_live_ILgsfZCZoFIKMb',
-        amount: 1000,
-        redirect: true,
-        callback_url: 'http://google.com'
-      });
-      rp.createPayment(data, {
-        // paused: true,
-        message: 'Generating order'  // your custom message
-      });
+<body>
+  <form>
+  <input type='radio' name='method' value='card' checked>Card
+  <input type='radio' name='method' value='netbanking'>Netbanking
+  <input type='radio' name='method' value='wallet'>Wallet
 
-      // setTimeout is async, equivalent to ajax
-      setTimeout(function() {
-        var ajax_success = true;
-        if (ajax_success) {
-          data['notes[some_id]'] = '1234';
-          rp.emit('payment.resume');
-        } else {
-          rp.emit('payment.cancel');
-        }
-      }, 2000);
-    }
+  <div id='card'>
+    <input type='tel' name='card[number]' placeholder='Enter card number'>
+    <input type='tel' name='card[expiry]' placeholder='Card Expiry'>
+    <input type='text' name='card[name]' placeholder="Cardholder's name">
+    <input type='tel' name='card[cvv]' placeholder='CVV'>
+    <input type='checkbox' name='method' value='emi'> EMI
+  </div>
+  </form>
+  <script>
+    var rp = new Razorpay({
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200
+    })
+    rp.setForm(documents.forms[0]);
   </script>
 </body>
-</body>
-</html>
+<style>
+  input[type=tel],
+  input[type=text],
+  input[type=email],
+  input[type=password]
+  {
+    display: block;
+  }
+</style>

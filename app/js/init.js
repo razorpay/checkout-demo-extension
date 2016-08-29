@@ -1,7 +1,3 @@
-var roll = function(){};
-var noop = roll;
-var emo = {};
-
 function err(errors){
   if(errors instanceof Array && !errors.length){
     return false;
