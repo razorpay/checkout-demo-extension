@@ -80,7 +80,7 @@
       },
 
       pretty: function(value, shouldTrim) {
-        var len = this.maxLen;
+        var len = this.maxLen || 16;
         var prettyValue = value.slice(0, len).replace(getCardSpacing(len), '$1 ');
         if (shouldTrim || value.length >= len) {
           prettyValue = prettyValue.trim();
@@ -88,15 +88,14 @@
         return prettyValue;
       },
 
-      init: function() {
-        this._evtargs.change = function() {
-          var type = cardType(this.value);
-          this.maxLen = getMaxLen(type);
-          return {
-            type: type,
-            maxLen: this.maxLen
-          }
-        }
+      oninput: function() {
+        var type = getType(this.value);
+        this.maxLen = getMaxLen(type);
+
+        this.emit('change',  {
+          type: type,
+          maxLen: this.maxLen
+        });
       },
 
       valid: function(value) {

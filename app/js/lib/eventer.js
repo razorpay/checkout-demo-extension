@@ -5,7 +5,6 @@ var Eventer;
     // constructor is also called for resetting
     this._evts = {};
     this._evtns = {};
-    this._evtargs = {};
     this._onNewListener = noop;
 
     // if called without `new` on Eventer instance
@@ -91,26 +90,13 @@ var Eventer;
 
     emit: function(event, arg) {
       var self = this;
-      var listenerArray = this._evts[event];
 
-      var args = this._evtargs;
-      var argLen = arguments.length;
-
-      if (listenerArray) {
-        each(listenerArray, function(i, callback) {
-          defer(function(){
-            // @emit('event');
-            // without further arguments
-            if (argLen === 1) {
-              if (!isFunction(args[event])) {
-                return callback.call(self);
-              }
-              arg = args[event].call(self);
-            }
-            callback.call(self, arg);
-          });
+      // defer even checking if listenerArray exists or not
+      defer(function() {
+        each(self._evts[event], function(i, callback) {
+          callback.call(self, arg);
         })
-      }
+      })
       return this;
     },
 

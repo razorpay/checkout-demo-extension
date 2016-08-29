@@ -647,7 +647,7 @@ Session.prototype = {
         })
 
       delegator.expiry = delegator.add('date', el_expiry)
-        .on('change', function(o) {
+        .on('change', function() {
           inputHandler.input({target: el_expiry});
 
           var isValid = this.valid();

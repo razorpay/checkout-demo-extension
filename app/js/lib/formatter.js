@@ -19,8 +19,6 @@ var Formatter;
       }
     }
 
-    this.init();
-
     if (noBind) {
       el._formatter = this;
     } else {
@@ -60,8 +58,12 @@ var Formatter;
     })
   }
 
-  proto.pretty = proto.raw = proto.init = noop;
+  proto.pretty = proto.raw = noop;
   proto.prettyValue = proto.value = '';
+
+  proto.oninput = function() {
+    this.emit('change');
+  }
 
   proto.format = function(e) {
     var caret = this.getCaret();
@@ -97,8 +99,9 @@ var Formatter;
     var rawValue = this.raw(values.value);
     if (rawValue !== this.value) {
       this.value = rawValue;
-      this.emit('change');
+      this.oninput();
     }
+
     var pretty = this.pretty(rawValue, values.trim);
     if (pretty !== values.value) {
       prevent(values.e);
