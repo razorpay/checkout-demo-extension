@@ -215,7 +215,7 @@ CheckoutFrame.prototype = {
       }
     )
 
-    if(this.embedded){
+    if (this.embedded) {
       delete options.parent;
       response.embedded = true;
     }

@@ -228,6 +228,20 @@ var optionValidations = {
       else { return }
     }
     return errorMessage;
+  },
+
+  amount: function(amount) {
+    if (!isValidAmount(amount)) {
+      var errorMessage = 'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
+      alert('Invalid amount. It ' + errorMessage);
+      return errorMessage;
+    }
+  },
+
+  currency: function(currency) {
+    if (currency !== 'INR') {
+      return 'INR is the only supported value.';
+    }
   }
 }
 
@@ -236,7 +250,7 @@ function validateOverrides(options) {
   options = options.get();
   each(
     optionValidations,
-    function(key, validation){
+    function(key, validation) {
       if (key in options) {
         errorMessage = validation(options[key]);
       }

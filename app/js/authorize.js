@@ -6,7 +6,7 @@ if (!discreet.isFrame) {
 
 var pollingInterval;
 
-function clearPollingInterval(force){
+function clearPollingInterval(force) {
   if(force || pollingInterval){
     try {
       localStorage.removeItem('onComplete');

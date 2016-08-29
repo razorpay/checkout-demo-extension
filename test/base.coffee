@@ -2,62 +2,6 @@ getOptions = ->
   key: 'key'
   amount: 100
 
-
-describe 'events', ->
-  rzp = Razorpay getOptions()
-  describe 'attach event listener', ->
-    spy = sinon.spy()
-
-    # one listener
-    rzp.on 'a', spy
-    rzp.emit 'a'
-    expect spy.callCount
-      .to.be 1
-
-    # 2 listeners
-    rzp.on 'a', spy
-    rzp.emit 'a'
-    expect spy.callCount
-      .to.be 3
-
-    # unbind
-    rzp.off()
-    rzp.emit 'a'
-    expect spy.callCount
-      .to.be 3
-
-describe 'validateRequiredFields should check', ->
-  arg = null
-  key = null
-
-  beforeEach ->
-    arg = do getOptions
-    key = null
-
-  afterEach ->
-    expect key
-      .to.be.a 'string'
-
-    expect validateRequiredFields
-      .withArgs arg
-      .to.throw key
-
-  it 'missing key', ->
-    key = 'key'
-    delete arg[key]
-
-  it 'empty key', ->
-    key = 'key'
-    arg[key] = ''
-
-  it 'missing amount', ->
-    key = 'amount'
-    delete arg[key]
-
-  it 'empty amount', ->
-    key = 'amount'
-    arg[key] = ''
-
 describe 'base_configure should', ->
   describe 'throw if', ->
     it 'no options', ->
@@ -100,9 +44,6 @@ describe 'base_configure should', ->
       it 'invalid currency', ->
         arg.currency = 'USD'
 
-      it 'invalid display_currency', ->
-        arg.display_currency = 'YEN'
-
   describe 'return options object based on overrides:', ->
     opts = null
 
@@ -123,12 +64,6 @@ describe 'base_configure should', ->
       expect do optsObj.get
         .to.not.be opts
 
-    it 'backdropClose', ->
-      opts.modal =
-        backdropClose: true
-      expect base_configure(opts).get 'modal.backdropclose'
-        .to.be true
-
     it 'redirect', ->
       opts.redirect = true
       expect base_configure(opts).get 'redirect'
@@ -137,11 +72,6 @@ describe 'base_configure should', ->
       opts.redirect = false
       expect base_configure(opts).get 'redirect'
         .to.be false
-
-    it 'parent', ->
-      opts.parent = document.body
-      expect base_configure(opts).get 'parent'
-        .to.be document.body
 
 describe 'discreet', ->
   describe 'support check', ->

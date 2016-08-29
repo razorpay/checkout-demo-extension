@@ -74,20 +74,6 @@ discreet.currencies = {
   'CHF': 'Fr'
 }
 
-optionValidations.amount = function(amount) {
-  if (!isValidAmount(amount)) {
-    var errorMessage = 'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
-    alert('Invalid amount. It ' + errorMessage);
-    return errorMessage;
-  }
-}
-
-optionValidations.currency = function(currency) {
-  if(currency !== 'INR'){
-    return 'INR is the only supported value.';
-  }
-}
-
 optionValidations.display_currency = function(currency) {
   if(!(currency in discreet.currencies) && currency !== Razorpay.defaults.display_currency){
     return 'This dislpay currency is not supported';
