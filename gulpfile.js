@@ -23,9 +23,10 @@ const awspublish = require('gulp-awspublish');
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
-const testServer = require('./test/e2e/server/index.js');
 const internalIp = require('internal-ip');
 const lazypipe = require('lazypipe');
+const testServer = require('./test/e2e/server/index.js');
+let testServerInstance;
 
 const distDir = 'app/dist/v1/';
 
@@ -276,7 +277,7 @@ function createCoverageReport(){
 gulp.task('e2e:run', function(done){
   return gulp.src('./wdio.conf.js')
     .pipe(webdriver({
-      baseUrl: `http://${internalIp.v4()}:3000`
+      baseUrl: `http://${internalIp.v4()}:${testServerInstance.address().port}`
     }))
     .on('error', function(){
       done();
@@ -289,10 +290,8 @@ gulp.task('symlinkDist', () => {
   execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`)
 })
 
-let testServerInstance;
-
 gulp.task('testserver:start', () => {
-  testServerInstance = testServer.listen(3000, function(error) {
+  testServerInstance = testServer.listen(function(error) {
     if (error) {
       console.error(`exec error: ${error}`);
       process.exit(1);
