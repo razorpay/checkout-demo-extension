@@ -509,7 +509,7 @@ razorpayProto.topupWallet = function() {
       '_[source]': 'checkoutjs'
     },
     callback: function(response) {
-      if (isRedirect) {
+      if (isRedirect && !response.error) {
         discreet.redirect({
           url: response.request.url,
           content: response.request.content,
