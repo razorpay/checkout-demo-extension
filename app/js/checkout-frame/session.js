@@ -577,9 +577,11 @@ Session.prototype = {
       this.on('change', '#netb-banks', this.selectBankRadio, true);
     }
     if (enabledMethods.wallet) {
-      this.on('change', '#wallets', function() {
-        $('#wallets').removeClass('invalid');
-      }, true);
+      try {
+        this.on('change', '#wallets', function() {
+          $('#wallets').removeClass('invalid');
+        }, true);
+      } catch(e) {}
     }
 
     var goto_payment = '#error-message .link';
