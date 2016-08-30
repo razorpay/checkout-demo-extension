@@ -2,8 +2,9 @@ const minimist = require('minimist')
 
 const argv = minimist(process.argv.slice(1));
 const isProduction = argv.env === 'production';
+const isCrossBrowserTesting = argv.type === 'crossbrowsertesting';
 
-exports.config = {
+const wdioConfig = {
   debug: isProduction ? false : true,
   // =====================
   // Server Configurations
@@ -307,3 +308,17 @@ exports.config = {
   afterScenario: function(scenario) {},
   afterFeature: function(feature) {}
 };
+
+if (isCrossBrowserTesting) {
+  Object.assign(wdioConfig, {
+    host: 'hub-cloud.browserstack.com',
+    port: 80,
+    services: ['browserstack'],
+    browserstackLocal: true,
+    user: process.env.BS_USER,
+    key: process.env.BS_KEY,
+    capabilities: require('./wdio-bs-capabilities')
+  });
+}
+
+exports.config = wdioConfig;
