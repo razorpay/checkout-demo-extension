@@ -208,20 +208,6 @@ describe('Payment.prototype', function() {
       pollSpy.restore();
       onSpy.restore();
     })
-
-    it('discreet.isFrame', function() {
-      discreet.isFrame = true;
-      expect('onComplete' in window).to.be(false);
-      Payment.prototype.generate.call(payment);
-      expect(pollSpy.callCount).to.be(1);
-      expect(pollSpy.args[0]).to.eql([window.onComplete]);
-      expect(payment.complete.called).to.be(false);
-      window.onComplete(2);
-      expect(payment.complete.callCount).to.be(1);
-      expect(payment.complete.args[0]).to.eql([2]);
-      expect(payment.complete.calledOn(payment)).to.be(true);
-      discreet.isFrame = false;
-    })
   })
 
   describe('complete', function() {
