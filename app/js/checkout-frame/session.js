@@ -344,7 +344,7 @@ Session.prototype = {
     return this.el;
   },
 
-  fillData: function(){
+  fillData: function() {
     var oldMethod = this.data.method;
     if (oldMethod) {
       this.wants_skip = true;

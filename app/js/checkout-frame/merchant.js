@@ -252,6 +252,9 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
+  if (!navigator.cookieEnabled) {
+    options.remember_customer = false;
+  }
 
   Customer.prototype.key = session.get('key');
   Razorpay.configure(options);
