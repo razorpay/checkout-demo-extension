@@ -51,8 +51,22 @@
     var rp = new Razorpay({
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200
+    }).on('payment.error', function(resp) {
+      console.log(resp);
     })
-    rp.setForm(document.forms[0]);
+    var data = {};
+
+    document.forms[0].onsubmit = function(e) {
+      e.preventDefault();
+      rp.createPayment(data, {paused: true, message: 'loading'});
+      setTimeout(function() {
+        data.method = 'netbanking';
+        data.bank = 'SBIN';
+        data.email = 'a@s.d';
+        data.contact = 9999922222;
+        rp.emit('payment.resume');
+      })
+    }
   </script>
 </body>
 <style>

@@ -113,7 +113,6 @@ function Payment(data, params, r) {
   // payment will be validated when resumed. So it's possible to have invalid arguments till it's paused
   this.on('cancel', onPaymentCancel);
 
-  this.data = clone(data);
   this.fees = params.fees;
   this.powerwallet = params.powerwallet;
   this.message = params.message;
@@ -122,15 +121,15 @@ function Payment(data, params, r) {
 
   if (params.paused) {
     this.writePopup();
-    this.on('resume', this.generate);
+    this.on('resume', bind('generate', this, data));
   } else {
-    this.generate();
+    this.generate(data);
   }
 }
 
 Payment.prototype = {
   on: function(event, handler){
-    return this.r.on(event, bind(handler, this), 'payment');
+    return this.r.on('payment.' + event, bind(handler, this));
   },
 
   emit: function(event, arg){
@@ -196,7 +195,8 @@ Payment.prototype = {
     flattenProp(data, '_', '[]');
   },
 
-  generate: function() {
+  generate: function(data) {
+    this.data = clone(data);
     this.format();
 
     // redirect if specified

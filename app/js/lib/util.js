@@ -109,11 +109,16 @@ function indexOf(arr, item) {
 
 /* Functions */
 
-function bind(func, thisArg) {
+function bind(func, thisArg, arg) {
   if (isString(func)) {
     func = thisArg[func];
   }
-  return function(){
+  if (arguments.length === 3) {
+    return function() {
+      func.call(this, arg);
+    }
+  }
+  return function() {
     return func.apply(thisArg, arguments);
   }
 }
