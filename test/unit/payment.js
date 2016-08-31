@@ -50,7 +50,7 @@ describe('Payment.prototype', function() {
 
     Payment.prototype.on.call(payment, 'some', noop);
     expect(stub.callCount).to.be(1);
-    expect(stub.args[0]).to.eql(['some', mockListener, 'payment']);
+    expect(stub.args[0]).to.eql(['payment.some', mockListener]);
     expect(bindStub.callCount).to.be(1);
     expect(bindStub.args[0]).to.eql([noop, payment]);
 
