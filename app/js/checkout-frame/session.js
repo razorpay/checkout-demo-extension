@@ -395,6 +395,7 @@ Session.prototype = {
     this.getEl();
     this.fillData();
     this.setEMI();
+    this.setTopbar();
     this.setModal();
     this.setFormatting();
     this.bindEvents();
@@ -407,6 +408,12 @@ Session.prototype = {
     if(!this.emi && this.methods.emi && this.get('amount') > emi_options.min){
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
+    }
+  },
+
+  setTopbar: function() {
+    if (this.hide_topbar) {
+      $(this.el).addClass('notopbar');
     }
   },
 

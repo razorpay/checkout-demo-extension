@@ -103,10 +103,12 @@ var gridClass = gridClasses[i-1];
                           Bank Details
                         {{ } }}
                       </div>
-                      <div class="account-details clearfix">
-                        <div class="float-left">Account</div>
-                        <div class="float-left text-uppercase">{{=order.account_number}}</div>
-                      </div>
+                      {{? order.account_number}}
+                        <div class="account-details clearfix">
+                          <div class="float-left">Account</div>
+                          <div class="float-left text-uppercase">{{=order.account_number}}</div>
+                        </div>
+                      {{?}}
                     </div>
                   {{?}}
                 </div>
