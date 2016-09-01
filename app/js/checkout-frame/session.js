@@ -411,8 +411,8 @@ Session.prototype = {
     }
   },
 
-  setTopbar: function(){
-    if(this.get('hide_topbar')){
+  setTopbar: function() {
+    if (this.hide_topbar) {
       $(this.el).addClass('notopbar');
     }
   },
@@ -676,7 +676,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen && this.get('hide_topbar')===false) {
+    if (screen) {
       $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
     } else {

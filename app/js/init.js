@@ -93,7 +93,6 @@ Razorpay.defaults = {
   'display_currency': '',
   'display_amount': '',
   'remember_customer': false,
-  'hide_topbar': false,
   'method': {
     'netbanking': true,
     'card': true,
