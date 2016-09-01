@@ -405,7 +405,7 @@ Session.prototype = {
   },
 
   setEMI: function(){
-    if(!this.emi && this.methods.emi && this.get('amount') > emi_options.min){
+    if(!this.emi && this.methods.emi){
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
     }
