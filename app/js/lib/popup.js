@@ -59,10 +59,15 @@ var Popup = function(src, name) {
   optsStr = optsStr.join(',');
 
   this.name = name;
-  // finally, open and return the popup window
-  this.window = window.open(src, (name || ''), optsStr); // might be null in IE9 if protected mode is turned on
 
-  if(!this.window){
+  // unsupported browsers
+  if (ua_popup_supported) {
+    try {
+      this.window = window.open(src, (name || ''), optsStr); // might be null in IE9 if protected mode is turned on
+    } catch(e) {}
+  }
+
+  if (!this.window) {
     return null;
   }
 

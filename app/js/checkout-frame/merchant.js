@@ -206,8 +206,7 @@ function setPaymentMethods(session){
 }
 
 function fetchPrefsAndShowModal(session){
-  var data = makePrefParams(session);
-  Razorpay.payment.getPrefs(data, function(response) {
+  Razorpay.payment.getPrefs(makePrefParams(session), function(response) {
     if(response.error){
       return Razorpay.sendMessage({event: 'fault', data: response.error.description});
     }
@@ -386,7 +385,7 @@ function validUID(id){
   return true;
 }
 
-window.handleMessage = function(message){
+window.handleMessage = function(message) {
   if('id' in message && !validUID(message.id)){
     return;
   }
@@ -411,8 +410,12 @@ window.handleMessage = function(message){
     sessions[_uid] = session;
   }
 
-  if(message.context){
+  if (message.context) {
     trackingProps.context = message.context;
+  }
+
+  if (message.integration) {
+    trackingProps.integration = message.integration;
   }
 
   if(message.embedded){

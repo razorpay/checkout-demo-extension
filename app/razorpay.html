@@ -10,55 +10,70 @@
   <script src="js/lib/util.js"></script>
   <script src="js/lib/nominal-jquery.js"></script>
   <script src="js/tracker.js"></script>
+  <script src="js/lib/eventer.js"></script>
+  <script src="js/lib/evthandler.js"></script>
+  <script src="js/lib/formatter.js"></script>
+  <script src="js/lib/formatter-rules.js"></script>
+  <script src="js/lib/format-delegator.js"></script>
   <script src="js/init.js"></script>
+  <script src="js/razorpay/init.js"></script>
   <script src="js/options.js"></script><!--coverage-->
   <script src="js/lib/tracekit.js"></script>
   <script src="js/rollbar.js"></script>
   <script src="js/lib/jsonp.js"></script>
   <script src="js/lib/popup.js"></script>
-  <script src="js/base.js"></script><!--coverage-->
   <script src="js/authorize.js"></script><!--coverage-->
   <script src="templates/popup.js"></script>
   <!-- test scripts
-  <script src="../test/base.coffee"></script>
-  <script src="../test/payment.coffee"></script>
+  <script src="../test/unit/payment.js"></script>
   -->
   <!-- endbuild -->
 
 </head>
-<body style="text-align: center">
-  <button id="click">Pay</button>
-  <script>
-    var data = {
-      email: 'some@customer.com',
-      contact: '1234565432',
-      method: 'netbanking',
-      bank: 'HDFC'
-    };
-    document.querySelector('#click').onclick = function(){
-      var rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-        amount: 1000,
-        redirect: true,
-        callback_url: 'http://google.com'
-      });
-      rp.createPayment(data, {
-        paused: true,
-        message: 'Generating order'  // your custom message
-      });
+<body>
+  <form>
+    <input type='radio' name='method' value='card' checked>Card
+    <input type='radio' name='method' value='netbanking'>Netbanking
+    <input type='radio' name='method' value='wallet'>Wallet
 
-      // setTimeout is async, equivalent to ajax
+    <div id='card'>
+      <input type='tel' name='card[number]' placeholder='Enter card number'>
+      <input type='tel' name='card[expiry]' placeholder='Card Expiry'>
+      <input type='text' name='card[name]' placeholder="Cardholder's name">
+      <input type='tel' name='card[cvv]' placeholder='CVV'>
+      <input type='checkbox' name='method' value='emi'> EMI
+    </div>
+
+    <button type='submit'>Pay</button>
+  </form>
+  <script>
+    var rp = new Razorpay({
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200
+    }).on('payment.error', function(resp) {
+      console.log(resp);
+    })
+    var data = {};
+
+    document.forms[0].onsubmit = function(e) {
+      e.preventDefault();
+      rp.createPayment(data, {paused: true, message: 'loading'});
       setTimeout(function() {
-        var ajax_success = true;
-        if (ajax_success) {
-          data['notes[some_id]'] = '1234';
-          rp.emit('payment.resume');
-        } else {
-          rp.emit('payment.cancel');
-        }
-      }, 2000);
+        data.method = 'netbanking';
+        data.bank = 'SBIN';
+        data.email = 'a@s.d';
+        data.contact = 9999922222;
+        rp.emit('payment.resume');
+      })
     }
   </script>
 </body>
-</body>
-</html>
+<style>
+  input[type=tel],
+  input[type=text],
+  input[type=email],
+  input[type=password]
+  {
+    display: block;
+  }
+</style>

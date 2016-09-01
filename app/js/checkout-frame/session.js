@@ -199,11 +199,11 @@ function errorHandler(response){
 
   var err_field = error.field;
   if (err_field){
-    if(!err_field.indexOf('expiry')){
+    if(!err_field.indexOf('expiry')) {
       err_field = 'card[expiry]';
     }
     var error_el = document.getElementsByName(err_field)[0];
-    if (error_el && error_el.type !== 'hidden'){
+    if (error_el && error_el.type !== 'hidden') {
       var help = $(error_el)
         .focus()
         .parent()
@@ -400,8 +400,6 @@ Session.prototype = {
     this.setFormatting();
     this.bindEvents();
     errorHandler.call(this, this.params);
-
-    var key = this.get('key');
   },
 
   setEMI: function(){
@@ -518,6 +516,7 @@ Session.prototype = {
 
   secAction: function(){
     this.track('skipped_save', {while_submitting: !!payload});
+    $('#save').attr('checked', 0);
     this.wants_skip = true;
     var payload = this.payload;
     if (payload) {
@@ -555,7 +554,6 @@ Session.prototype = {
     this.on('click', '.payment-option', function(e){
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
-    this.on('keypress', '#contact', ensurePhone);
     this.on('submit', '#form', this.preSubmit);
     this.on('click', '#otp-action', this.back);
     this.on('click', '#otp-resend', this.resendOTP);
@@ -564,12 +562,8 @@ Session.prototype = {
     this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
 
     var enabledMethods = this.methods;
-    if(enabledMethods.netbanking){
-      this.on('change', '#bank-select', this.switchBank);
-      this.on('change', '#netb-banks', this.selectBankRadio, true);
-    }
-    if(enabledMethods.card){
-      this.on('blur', '#card_number', this.validateCard);
+    if (enabledMethods.card) {
+      this.on('blur', '#card_number', bind('format', this.delegator.card));
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 
@@ -584,6 +578,17 @@ Session.prototype = {
       this.on('click', '#show-add-card', this.toggleSavedCards);
       this.on('click', '#show-saved-cards', this.toggleSavedCards);
       this.on('change', '#saved-cards-container', this.setSavedCard, true);
+    }
+    if (enabledMethods.netbanking) {
+      this.on('change', '#bank-select', this.switchBank);
+      this.on('change', '#netb-banks', this.selectBankRadio, true);
+    }
+    if (enabledMethods.wallet) {
+      try {
+        this.on('change', '#wallets', function() {
+          $('#wallets').removeClass('invalid');
+        }, true);
+      } catch(e) {}
     }
 
     var goto_payment = '#error-message .link';
@@ -609,8 +614,10 @@ Session.prototype = {
     bits.push(inputHandler);
 
     if (this.methods.card) {
+      var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
       var el_cvv = gel('card_cvv');
+      var el_name = gel('card_name');
 
       // check if we're in webkit
       // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
@@ -621,51 +628,49 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var cardOptions = {
-        onidentify: function(type) {
-          var el = this.el;
-          var cvvlen = type && type !== 'amex' ? 3 : 4;
+      var delegator = this.delegator = new FormatDelegator(this.el);
+      delegator.card = delegator.add('card', el_card)
+        .on('change', function(o) {
+          var type = o.type;
+          var parent = this.el.parentNode;
 
-          // card icon element
-          el_cvv.maxLength = cvvlen;
-          el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-          inputHandler.input({target: el_cvv});
-          el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
-        },
+          if (type !== this.type) {
+            // update cvv element
+            var cvvlen = type !== 'amex' ? 3 : 4;
+            el_cvv.maxLength = cvvlen;
+            el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+            inputHandler.input({target: el_cvv});
 
-        onfilled: function(){
-          invoke('focus', el_expiry, null, 0);
-        }
-      }
-
-      var expiryOptions = {
-        onfilled: function(){
-          inputHandler.input({target: el_expiry});
-          if(!$(el_expiry.parentNode).hasClass('invalid')){
-            invoke(
-              'focus',
-              $('.elem-name').hasClass('filled') ? el_cvv : gel('card_name'),
-              null,
-              0
-            )
+            // card icon element
+            parent.querySelector('.cardtype').setAttribute('cardtype', type);
           }
-        }
-      }
 
-      this.card = new CardFormatter(gel('card_number'), cardOptions);
-      bits.push(this.card);
-      bits.push(new ExpiryFormatter(el_expiry, expiryOptions));
+          var isValid = this.valid();
+          // set validity classes
+          toggleInvalid($(parent), isValid);
+
+          // adding maxLen change because some cards may have multiple kind of valid lengths
+          if (isValid && this.value.length === this.maxLen) {
+            invoke('focus', el_expiry, null, 0);
+          }
+        })
+
+      delegator.expiry = delegator.add('date', el_expiry)
+        .on('change', function() {
+          inputHandler.input({target: el_expiry});
+
+          var isValid = this.valid();
+          toggleInvalid($(this.el.parentNode), isValid);
+
+          if (isValid) {
+            defer(bind('focus', el_name.value ? el_cvv : el_name));
+          }
+        })
+
+      delegator.cvv = delegator.add('number', el_cvv);
+      delegator.contact = delegator.add('phone', gel('contact'));
+      delegator.otp = delegator.add('number', gel('otp'));
     }
-
-    var email = gel('email');
-    bits.push(new ContactFormatter(gel('contact')), {
-      onfilled: bind(email.focus, email)
-    });
-    bits.push(new OtpFormatter(gel('otp')));
-  },
-
-  validateCard: function(){
-    toggleInvalid($(gel('card_number').parentNode), this.card.isValid());
   },
 
   setScreen: function(screen){
@@ -791,7 +796,6 @@ Session.prototype = {
     var cardtype = $savedcard.find('.cardtype')[0].getAttribute('cardtype');
     var nocvvCheck = gel('nocvv');
     var isMaestro = cardtype === 'maestro';
-    var emiEnabled = $savedcard.attr('emi');
     var issuer = $savedcard.attr('bank') || '';
 
     input.checked = true;
@@ -835,7 +839,7 @@ Session.prototype = {
     $('#form-card').toggleClass('has-cards', tokens);
   },
 
-  toggleSavedCards: function(saveScreen){
+  toggleSavedCards: function(saveScreen) {
     var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
     if (typeof saveScreen !== 'boolean') {
@@ -880,6 +884,13 @@ Session.prototype = {
   },
 
   checkInvalid: function(parent) {
+    if (!parent) {
+      parent = this.getActiveForm();
+      var payload = this.payload;
+      if (payload && payload.method === 'wallet' && !payload.wallet) {
+        return $('#wallets').addClass('invalid');
+      }
+    }
     var invalids = $(parent).find('.invalid');
     if(invalids[0]){
       this.shake();
@@ -960,7 +971,7 @@ Session.prototype = {
       text = strings.process;
     }
 
-    if(this.screen === 'otp'){
+    if(this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
       $('#form-otp')[actionState]('action')[loadingState]('loading');
@@ -1078,7 +1089,7 @@ Session.prototype = {
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          this.validateCard();
+          this.delegator.card.emit('format');
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {
@@ -1097,7 +1108,7 @@ Session.prototype = {
         }
       }
 
-      if (this.checkInvalid(this.getActiveForm())) {
+      if (this.checkInvalid()) {
         return;
       }
     } else {

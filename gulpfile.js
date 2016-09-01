@@ -56,6 +56,10 @@ var concatCss = lazypipe()
   .pipe(stylint)
   .pipe(stylint.reporter)
   .pipe(stylus)
+  .pipe(autoprefixer, {
+    browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
+    cascade: false
+  })
   .pipe(concat, 'checkout.css')
 
 gulp.task('concatCss', function() {
@@ -70,10 +74,6 @@ gulp.task('cleanCSS', function() {
     .pipe(concatCss())
     .pipe(stylint.reporter('fail', { failOnWarning: true }))
     .pipe(cleanCSS({compatibility: 'ie8'}))
-    .pipe(autoprefixer({
-      browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
-      cascade: false
-    }))
     .pipe(gulp.dest(`${distDir}/css`));
 })
 
@@ -198,18 +198,10 @@ let karmaOptions = {
   coverageReporter: {
     type : 'json'
   },
-  preprocessors: {
-    '**/*.coffee': ['coffee']
-  },
-  nyanReporter: {
-    suppressErrorHighlighting: true
-  }
+  preprocessors: {}
 };
 
-let reporter = 'dots';
-if(!process.env.WERCKER){
-  reporter = 'nyan';
-}
+let reporter = 'mocha';
 karmaOptions.reporters.push(reporter);
 
 let karmaLibs = [

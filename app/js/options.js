@@ -18,12 +18,32 @@ each(
 function base_set(flatObj, defObj, objKey, objVal){
   objKey = objKey.toLowerCase();
   var defaultVal = defObj[objKey];
-  if (isNumber(objVal)) {
+  var defaultType = typeof defaultVal;
+  if (defaultType === 'string') {
     objVal = String(objVal);
+  } else if (defaultType === 'number') {
+    objVal = Number(objVal);
   }
-  if (defaultVal === null || typeof defaultVal === typeof objVal) {
+  if (defaultVal === null || defaultType === typeof objVal) {
     flatObj[objKey] = objVal;
   }
+}
+
+function flattenProp(obj, prop, type) {
+  each(
+    obj[prop],
+    function(key, val){
+      var valType = typeof val;
+      if (valType === 'string' || valType === 'number' || valType === 'boolean') {
+        key = prop + type[0] + key;
+        if (type.length > 1) {
+          key += type[1];
+        }
+        obj[key] = val;
+      }
+    }
+  )
+  delete obj[prop];
 }
 
 function flatten(obj, defObj){
