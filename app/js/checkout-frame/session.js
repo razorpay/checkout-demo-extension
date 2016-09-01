@@ -329,6 +329,8 @@ Session.prototype = {
         return 'count-4';
       })
       classes.push('emitab');
+    } else {
+      $('#tab-emi').remove();
     }
 
     if(!this.get('image')){
