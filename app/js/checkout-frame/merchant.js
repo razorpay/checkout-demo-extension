@@ -114,6 +114,7 @@ var emi_options = sessProto.emi_options = {
 emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
 
 var tab_titles = sessProto.tab_titles = {
+  emi: 'EMI',
   card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet'
