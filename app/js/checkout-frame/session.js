@@ -395,6 +395,7 @@ Session.prototype = {
     this.getEl();
     this.fillData();
     this.setEMI();
+    this.setTopbar();
     this.setModal();
     this.setFormatting();
     this.bindEvents();
@@ -407,6 +408,12 @@ Session.prototype = {
     if(!this.emi && this.methods.emi && this.get('amount') > emi_options.min){
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
+    }
+  },
+
+  setTopbar: function(){
+    if(this.get('hide_topbar')){
+      $(this.el).addClass('notopbar');
     }
   },
 
@@ -669,7 +676,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen) {
+    if (screen && this.get('hide_topbar')===false) {
       $('#tab-title').html(tab_titles[screen]);
       makeVisible('#topbar');
     } else {
