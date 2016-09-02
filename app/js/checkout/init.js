@@ -47,6 +47,7 @@ RazorpayDefaults.external = {
 }
 
 RazorpayDefaults.theme = {
+  emi_tab: false,
   color: '',
   backdrop_color: 'rgba(0,0,0,0.6)',
   image_padding: true,

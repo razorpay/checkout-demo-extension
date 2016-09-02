@@ -320,6 +320,19 @@ Session.prototype = {
       classes.push('mobile');
     }
 
+    if (this.hide_topbar) {
+      classes.push('notopbar');
+    }
+    if (this.get('theme.emi_tab')) {
+      var tabsEl = $('#payment-options')[0];
+      tabsEl.className = tabsEl.className.replace(/count-(.)$/, function() {
+        return 'count-4';
+      })
+      classes.push('emitab');
+    } else {
+      $('#tab-emi').remove();
+    }
+
     if(!this.get('image')){
       classes.push('noimage');
     }
@@ -395,7 +408,6 @@ Session.prototype = {
     this.getEl();
     this.fillData();
     this.setEMI();
-    this.setTopbar();
     this.setModal();
     this.setFormatting();
     this.bindEvents();
@@ -403,15 +415,9 @@ Session.prototype = {
   },
 
   setEMI: function(){
-    if(!this.emi && this.methods.emi && this.get('amount') > emi_options.min){
+    if(!this.emi && this.methods.emi){
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
-    }
-  },
-
-  setTopbar: function() {
-    if (this.hide_topbar) {
-      $(this.el).addClass('notopbar');
     }
   },
 
@@ -704,7 +710,15 @@ Session.prototype = {
     this.switchTab(tab);
   },
 
-  switchTab: function(tab){
+  switchTab: function(tab) {
+    if (this.get('theme.emi_tab')) {
+      if (tab === 'emi') {
+        $('#elem-emi').css('display', 'block');
+        tab = 'card';
+      } else if (tab === 'card') {
+        $('#elem-emi').hide();
+      }
+    }
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
