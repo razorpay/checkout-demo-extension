@@ -719,6 +719,11 @@ Session.prototype = {
         $('#elem-emi').hide();
       }
     }
+
+    if(tab && this.get('method.'+tab) === false) {
+      return
+    }
+
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
