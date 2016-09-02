@@ -15,15 +15,12 @@ else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
 
 var i = 0;
-var gridClasses = ['single','double',''];
 var methods = ['card', 'netbanking', 'wallet'];
 
 for(var m in methods) {
   if(method[methods[m]])
     i++;
 }
-
-var gridClass = gridClasses[i-1];
 }}
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -79,7 +76,7 @@ var gridClass = gridClasses[i-1];
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}">
+                    <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}" required pattern="^\+?[0-9]{8,15}$">
                   </div></div>
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
@@ -147,7 +144,7 @@ var gridClass = gridClasses[i-1];
                     <div class="elem-wrap third"><div class="elem elem-expiry">
                       <label>Expiry</label>
                       <i>&#xe606;</i>
-                      <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required pattern="(0[1-9]|1[0-2]) ?\/ ?(1[6-9]|[2-9][0-9])" maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
+                      <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" required maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
                     </div></div>
                     <div class="elem-wrap two-third"><div class="elem elem-name">
                       <label>Card Holder's Name</label>
@@ -241,7 +238,7 @@ var gridClass = gridClasses[i-1];
               {{ if(wallet.length){ }}
                 <div class="tab-content showable screen" id="form-wallet">
                   {{ var count = 0, max = 3; }}
-                  <div id="wallets" class="clear grid count-{{=wallet.length}}">
+                  <div id="wallets" class="grid count-{{=wallet.length}}">
                     {{
                     for (var w in wallet){
                       if(count === 0){
@@ -260,6 +257,8 @@ var gridClass = gridClasses[i-1];
                       count = (count + 1) % max;
                     }
                     }}
+                    <div class="clear"></div>
+                    <span class="help">Please select one of the wallets</span>
                   </div>
                 </div>
               {{}}}

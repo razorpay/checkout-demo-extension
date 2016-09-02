@@ -1,7 +1,3 @@
-var roll = function(){};
-var noop = roll;
-var emo = {};
-
 function err(errors){
   if(errors instanceof Array && !errors.length){
     return false;
@@ -58,77 +54,221 @@ function makeAuthUrl(key, path){
   return makeUrl(path) + '?key_id=' + key;
 }
 
-var Razorpay = window.Razorpay = function(options){
+var Razorpay = window.Razorpay = function(overrides){
   if(!(this instanceof Razorpay)){
-    return new Razorpay(options);
+    return new Razorpay(overrides);
   }
-  this._events = {};
-  this.configure(options);
+  Eventer.call(this);
+  this.id = generateUID();
+
+  try {
+    this.get = base_configure(overrides).get;
+  } catch(e) {
+    var message = e.message;
+    if (!this.get || !this.isLiveMode()) {
+      alert(message);
+    }
+    raise(message);
+  }
+
+  if (!this.get('key')) {
+    raise('No key passed');
+  }
+  discreet.validate(this);
+
+  // init for checkoutjs is tracked from iframe
+  // we've open event to track parent side of options
+  if (!discreet.isCheckout) {
+    track(this, 'init');
+  }
+
+  this.postInit();
 };
 
-Razorpay.defaults = {
+var RazorProto = Razorpay.prototype = new Eventer();
+
+var RazorpayDefaults = Razorpay.defaults = {
   'key': '',
-  'amount': '',
+  'amount': 0,
   'currency': 'INR',
   'order_id': '',
-  'handler': function(data){
-    if (this instanceof Razorpay) {
-      var callback_url = this.get('callback_url');
-      if(callback_url){
-        submitForm(callback_url, data, 'post');
-      }
-    }
-  },
   'notes': null,
   'callback_url': '',
-
   'redirect': false,
   'description': '',
-
-  // automatic checkout only
-  'buttontext': 'Pay Now',
-
-  // checkout fields, not needed for razorpay alone
-  'parent': null,
-  'display_currency': '',
-  'display_amount': '',
-  'remember_customer': false,
-  'method': {
-    'netbanking': true,
-    'card': true,
-    'wallet': null,
-    'emi': true
-  },
-  'prefill': {
-    'method': '',
-    'name': '',
-    'contact': '',
-    'email': '',
-    'card[number]': '',
-    'card[expiry]': '',
-    'card[cvv]': ''
-  },
-  'modal': {
-    'confirm_close': false,
-    'ondismiss': noop,
-    'onhidden': noop,
-    'escape': true,
-    'animation': true,
-    'backdropclose': false
-  },
-  'external': {
-    wallets: [],
-    handler: noop
-  },
-  'theme': {
-    'color': '',
-    'backdrop_color': 'rgba(0,0,0,0.6)',
-    'image_padding': true,
-    'close_button': true,
-    'header': true
-  },
   'customer_id': '',
-  'signature': '',
-  'name': '', // of merchant
-  'image': ''
+  'signature': ''
 };
+
+function base_configure(overrides) {
+  if( !overrides || typeof overrides !== 'object' ) {
+    raise('Invalid options');
+  }
+
+  var options = Options(overrides);
+  validateOverrides(options);
+  setNotes(options);
+
+  var callback_url = options.get('callback_url');
+  if (callback_url && ua_prefer_redirect) {
+    options.set('redirect', true);
+  }
+
+  return options;
+}
+
+function setNotes(options){
+  var notes = options.get('notes');
+  each(notes, function(key, val){
+    var valType = typeof val;
+    if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
+      delete notes[key];
+    }
+  })
+}
+
+RazorProto.isLiveMode = function() {
+  return /^rzp_l/.test(this.get('key'));
+}
+
+function isValidAmount(amt){
+  if (/[^0-9]/.test(amt)){
+    return false;
+  }
+  amt = parseInt(amt, 10);
+
+  return amt >= 100;
+}
+
+function makePrefParams(rzp) {
+  if (rzp) {
+    var getter = rzp.get;
+    var params = {};
+    params.key_id = getter('key');
+
+    var order_id = getter('order_id');
+    var customer_id = getter('customer_id');
+
+    if (order_id) {
+      params.order_id = order_id;
+    }
+    if (customer_id) {
+      params.customer_id = customer_id;
+    }
+    return params;
+  }
+}
+
+var discreet = {
+  validate: noop,
+
+  msg: {
+    wrongotp: 'Entered OTP was incorrect. Re-enter to proceed.'
+  },
+
+  supported: function(showAlert) {
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+    var alertMessage;
+
+    if(isIOS){
+      if(/CriOS/.test(ua)){
+        if(!window.indexedDB){
+          alertMessage = 'Please update your Chrome browser or';
+        }
+      }
+      else if(/FxiOS|UCBrowser/.test(ua)){
+        alertMessage = 'This browser is unsupported. Please';
+      }
+    }
+    else if (/Opera Mini\//.test(ua)) {
+      alertMessage = 'Opera Mini is unsupported. Please';
+    }
+
+    if(alertMessage){
+      if(showAlert){
+        // TODO track
+        alert(alertMessage + ' choose another browser.');
+      }
+      return false;
+    }
+    return true;
+  },
+
+  isBase64Image: function(image) {
+    return /data:image\/[^;]+;base64/.test(image);
+  },
+
+  cancelMsg: 'Payment cancelled',
+
+  error: function(message) {
+    return {
+      error:{
+        description: message || discreet.cancelMsg
+      }
+    };
+  },
+
+  redirect: function(data) {
+    if(window !== window.parent){
+      return invoke(Razorpay.sendMessage, null, {event: 'redirect', data: data});
+    }
+    submitForm(data.url, data.content, data.method);
+  }
+}
+
+var optionValidations = {
+  notes: function(notes) {
+    var errorMessage = '';
+    if (isNonNullObject(notes)) {
+      var notesCount = 0;
+      each(notes, function() {
+        notesCount++;
+      })
+      if(notesCount > 15) { errorMessage = 'At most 15 notes are allowed' }
+      else { return }
+    }
+    return errorMessage;
+  },
+
+  amount: function(amount) {
+    if (!isValidAmount(amount)) {
+      var errorMessage = 'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
+      alert('Invalid amount. It ' + errorMessage);
+      return errorMessage;
+    }
+  },
+
+  currency: function(currency) {
+    if (currency !== 'INR') {
+      return 'INR is the only supported value.';
+    }
+  }
+}
+
+function validateOverrides(options) {
+  var errorMessage;
+  options = options.get();
+  each(
+    optionValidations,
+    function(key, validation) {
+      if (key in options) {
+        errorMessage = validation(options[key]);
+      }
+      if (isString(errorMessage)) {
+        raise('Invalid ' + key + ' (' + errorMessage + ')');
+      }
+    }
+  )
+}
+
+Razorpay.configure = function(overrides){
+  each(
+    flatten(overrides, Razorpay.defaults),
+    function(key, val){
+      var defaultValue = Razorpay.defaults[key];
+      if(typeof defaultValue === typeof val){
+        Razorpay.defaults[key] = val;
+      }
+    }
+  )
+}

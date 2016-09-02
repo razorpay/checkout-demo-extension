@@ -7,7 +7,7 @@ var InputHandler;
     each(
       ['focus', 'blur', 'input'],
       function(i, prop) {
-        this.on(prop, function(e){
+        this.on(prop, function(e) {
           if (/input/.test(e.target.className)) {
             this[prop](e);
           }
