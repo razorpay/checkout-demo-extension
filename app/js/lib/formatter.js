@@ -25,7 +25,7 @@ var Formatter;
       this.bind();
     }
     // set initial formatting
-    this.format();
+    defer(bind('format', this));
   }
 
   Formatter.events = {
@@ -59,7 +59,7 @@ var Formatter;
   }
 
   proto.pretty = proto.raw = noop;
-  proto.prettyValue = proto.value = '';
+  proto.prettyValue = '';
 
   proto.oninput = function() {
     this.emit('change');
