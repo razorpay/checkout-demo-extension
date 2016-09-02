@@ -192,7 +192,7 @@ Razorpay.open = function(options) {
 
 RazorProto.postInit = function() {
   this.modal = {options: emo};
-  this.options = emo;
+  // this.options = emo;
 
   if (this.get('parent')) {
     this.open();

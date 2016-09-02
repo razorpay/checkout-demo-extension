@@ -151,7 +151,10 @@ function setPaymentMethods(session){
   )
 
   var amount = session.get('amount');
-  if (methods.emi && amount > emi_options.min) {
+  if (amount <= emi_options.min) {
+    methods.emi = false;
+  }
+  if (methods.emi) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   }
