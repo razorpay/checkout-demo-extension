@@ -720,10 +720,6 @@ Session.prototype = {
       }
     }
 
-    if(tab && this.get('method.'+tab) === false) {
-      return
-    }
-
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
@@ -732,7 +728,7 @@ Session.prototype = {
     }
     if (tab) {
       var contact = getPhone();
-      if (!contact) {
+      if (!contact || this.get('method.' + tab) === false) {
         return;
       }
       this.customer = getCustomer(contact);

@@ -66,8 +66,8 @@ function onPaymentCancel(errorObj) {
   if (!this.done) {
     var cancelError = discreet.error();
     var payment_id = this.payment_id;
+    var razorpay = this.r;
     if (payment_id) {
-      var razorpay = this.r;
       track(razorpay, 'cancel', {payment_id: payment_id});
       $.ajax({
         url: makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel'),
