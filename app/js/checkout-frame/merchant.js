@@ -237,6 +237,21 @@ function fetchPrefsAndShowModal(session){
   })
 }
 
+function isCookieEnabled() {
+  if (navigator.cookieEnabled) {
+    return true;
+  }
+
+  // set and read cookie
+  document.cookie = 'cookietest=1';
+  var ret = document.cookie.indexOf('cookietest=') != -1;
+
+  // delete cookie
+  deleteCookie('cookietest');
+
+  return ret;
+}
+
 function showModal(session) {
   var options = preferences.options;
   session.hide_topbar = preferences.hide_topbar;
@@ -276,7 +291,7 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
-  if (!navigator.cookieEnabled) {
+  if (!isCookieEnabled()) {
     options.remember_customer = false;
   }
 
