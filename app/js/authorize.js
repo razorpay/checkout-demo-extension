@@ -64,24 +64,25 @@ function submitPopup(payment) {
 
 function onPaymentCancel(errorObj) {
   if (!this.done) {
+    var cancelError = discreet.error();
     var payment_id = this.payment_id;
     if (payment_id) {
       var razorpay = this.r;
-      var successObj = {razorpay_payment_id: payment_id};
-      track(razorpay, 'cancel', successObj);
+      track(razorpay, 'cancel', {payment_id: payment_id});
       $.ajax({
         url: makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel'),
         callback: bind(function(response) {
-          if (response.status === 'authorized') {
-            track(razorpay, 'cancel_authorized', successObj);
-            this.complete(successObj);
+          if (response.razorpay_payment_id) {
+            track(razorpay, 'cancel_success', response);
           } else {
-            this.complete(response);
+            response = cancelError;
           }
+          this.complete(response);
         }, this)
       });
     } else {
-      this.complete(discreet.error());
+      track(razorpay, 'cancel');
+      this.complete(cancelError);
     }
   }
 }
