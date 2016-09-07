@@ -62,10 +62,10 @@ function submitPopup(payment) {
   }
 }
 
-function onPaymentCancel(errorObj){
-  if(!this.done){
+function onPaymentCancel(errorObj) {
+  if (!this.done) {
     var payment_id = this.payment_id;
-    if(payment_id) {
+    if (payment_id) {
       var razorpay = this.r;
       var successObj = {razorpay_payment_id: payment_id};
       track(razorpay, 'cancel', successObj);
@@ -76,13 +76,12 @@ function onPaymentCancel(errorObj){
             track(razorpay, 'cancel_authorized', successObj);
             this.complete(successObj);
           } else {
-            var errorMsg = response.error? 'Payment Failed' : '';
-            this.complete(errorObj || discreet.error(errorMsg));
+            this.complete(response);
           }
         }, this)
       });
     } else {
-      this.complete(errorObj || discreet.error());
+      this.complete(discreet.error());
     }
   }
 }
@@ -220,12 +219,12 @@ Payment.prototype = {
   },
 
   complete: function(data){
-    if(this.done){
+    if (this.done) {
       return;
     }
 
-    try{
-      if(typeof data !== 'object') {
+    try {
+      if (typeof data !== 'object') {
         data = JSON.parse(data);
       }
     } catch(e) {
@@ -233,14 +232,12 @@ Payment.prototype = {
     }
     this.clear();
 
-    var payment_id = data.razorpay_payment_id;
-    if(typeof payment_id === 'string' && payment_id){
-      var returnObj = 'signature' in data ? data : { razorpay_payment_id: data.razorpay_payment_id };
-      this.emit('success', returnObj);
+    if (data.razorpay_payment_id) {
+      this.emit('success', data);
     } else {
       var errorObj = data.error;
       if (!isNonNullObject(errorObj) || !errorObj.description) {
-        data = {error: {description: 'Unexpected error. This incident has been reported to admins.'}};
+        data = discreet.error('Payment failed');
       }
       this.emit('error', data);
     }
