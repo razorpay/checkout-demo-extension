@@ -452,30 +452,6 @@ function otpCallback(response){
 
 var razorpayProto = Razorpay.prototype;
 
-razorpayProto.setForm = function(form) {
-  var $form = $(form);
-  if (!$form[0]) {
-    return;
-  }
-  var delegator = this.delegator = new FormatDelegator($form[0]);
-  delegator.add('card', $form.qs('[name="card[number]"]'));
-  delegator.add('date', $form.qs('[name="card[expiry]"]'));
-  delegator.add('number', $form.qs('[name="card[cvv]"]'));
-
-  var rp = this;
-  $form.on('submit', function(e) {
-    this.on('payment.success', function(successObj) {
-        submitForm(
-          $form.attr('action'),
-          successObj,
-          $form.attr('method') || 'post'
-        )
-      })
-      // .createPayment(data);
-    return preventDefault(e);
-  })
-}
-
 razorpayProto.createPayment = function(data, params) {
   if ('data' in data) {
     data = data.data;

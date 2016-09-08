@@ -244,7 +244,7 @@ function isCookieEnabled() {
 
   // set and read cookie
   document.cookie = 'cookietest=1';
-  var ret = document.cookie.indexOf('cookietest=') != -1;
+  var ret = document.cookie.indexOf('cookietest=') !== -1;
 
   // delete cookie
   deleteCookie('cookietest');
