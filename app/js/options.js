@@ -19,7 +19,7 @@ function base_set(flatObj, defObj, objKey, objVal){
   objKey = objKey.toLowerCase();
   var defaultVal = defObj[objKey];
   var defaultType = typeof defaultVal;
-  if (defaultType === 'string') {
+  if (defaultType === 'string' && (isNumber(objVal) || isBoolean(objVal))) {
     objVal = String(objVal);
   } else if (defaultType === 'number') {
     objVal = Number(objVal);
