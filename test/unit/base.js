@@ -9,9 +9,17 @@ function getOptions() {
 
 describe('base_configure should', function() {
 
+  describe('not throw if', function() {
+    it('invalid option of different type', function() {
+      var arg = getOptions();
+      arg.currency = null;
+      expect(base_configure).withArgs(arg).to.not.throw();
+    })
+  })
+
   describe('throw if', function() {
     it('no options', function() {
-      return expect(base_configure).to["throw"]();
+      expect(base_configure).to.throw();
     })
 
     describe('invalid options', function() {
@@ -22,7 +30,7 @@ describe('base_configure should', function() {
       })
 
       afterEach(function() {
-        expect(base_configure).withArgs(arg).to["throw"]();
+        expect(base_configure).withArgs(arg).to.throw();
       })
 
       it('primitive', function() {
