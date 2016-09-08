@@ -954,9 +954,9 @@ Session.prototype = {
           var cardNumberKey = 'card[number]';
           var cardExpiryKey = 'card[expiry]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
-          var expiry = data[cardExpiryKey].replace(/[^0-9\/]/g, '').split('/');
-          data['card[expiry_month]'] = expiry[0];
-          data['card[expiry_year]'] = expiry[1];
+          var expiry = data[cardExpiryKey];
+          data['card[expiry_month]'] = expiry.slice(0, 2);
+          data['card[expiry_year]'] = expiry.slice(-2);
           delete data[cardExpiryKey];
         }
       }
@@ -1105,7 +1105,8 @@ Session.prototype = {
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          this.delegator.card.emit('format');
+          this.delegator.card.format();
+          this.delegator.expiry.format();
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {

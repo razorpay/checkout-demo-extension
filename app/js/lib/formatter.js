@@ -84,7 +84,10 @@ var Formatter;
     })
   }
 
-  proto.format = function() {
+  proto.format = function(e) {
+    if (!arguments.length) {
+      this.value = null;
+    }
     var caret = this.getCaret();
     var value = this.el.value;
     var left = value.slice(0, caret.start);

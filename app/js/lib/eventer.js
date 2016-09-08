@@ -89,14 +89,11 @@ var Eventer;
     },
 
     emit: function(event, arg) {
-      var self = this;
-
-      // defer even checking if listenerArray exists or not
-      defer(function() {
-        each(self._evts[event], function(i, callback) {
-          callback.call(self, arg);
-        })
-      })
+      each(this._evts[event], function(i, callback) {
+        try {
+          callback.call(this, arg);
+        } catch(e) {}
+      }, this)
       return this;
     },
 
