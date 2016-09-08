@@ -114,7 +114,6 @@ for(var m in methods) {
                   <div class="legend">Select payment method</div>
                   <div id="payment-options" class="grid clear count-{{=method.count}}">
                     {{? method.card }}
-                    <div id="tab-emi" class="payment-option item" tab="emi"><label><i>&#xe60b;</i>{{=it.tab_titles.emi}}</label></div>
                     <div class="payment-option item" tab="card"><label><i>&#xe609;</i>{{=it.tab_titles.card}}</label></div>
                     {{?}}
                     {{? method.netbanking }}
@@ -122,6 +121,9 @@ for(var m in methods) {
                     {{?}}
                     {{? wallet.length }}
                     <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
+                    {{?}}
+                    {{? method.card }}
+                    <div id="tab-emi" class="payment-option item" tab="emi"><label><i>&#xe60b;</i>{{=it.tab_titles.emi}}</label></div>
                     {{?}}
                   </div>
                   <div class="clear"></div>
