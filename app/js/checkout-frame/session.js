@@ -569,7 +569,6 @@ Session.prototype = {
 
     var enabledMethods = this.methods;
     if (enabledMethods.card) {
-      this.on('blur', '#card_number', bind('format', this.delegator.card));
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 

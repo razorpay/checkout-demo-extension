@@ -31,6 +31,8 @@ var Formatter;
   Formatter.events = {
     keypress: 'fwdFormat',
     input: 'format',
+    change: 'format',
+    blur: 'format',
     keydown: 'backFormat'
   }
 
