@@ -1222,7 +1222,9 @@ Session.prototype = {
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
-      invokeEach(this.listeners);
+      try {
+        invokeEach(this.listeners);
+      } catch(e) {}
       invokeOnEach('off', this.bits);
       this.listeners = [];
       this.bits = [];
