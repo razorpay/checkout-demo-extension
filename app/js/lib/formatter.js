@@ -149,18 +149,25 @@ var Formatter;
     var el = this.el;
     var value = el.value;
     var length = value.length;
-    var caretPosition = el.selectionStart;
-    var caretEnd;
     var text = '';
-    if (isNumber(caretPosition)) {
-      caretEnd = el.selectionEnd;
-    } else if (document.selection) {
-      var range = document.selection.createRange();
-      text = range.text;
-      var textInputRange = el.createTextRange();
-      textInputRange.moveToBookmark(range.getBookmark());
-      caretPosition = -textInputRange.moveStart('character', -length);
-      caretEnd = caretPosition + text.length;
+    var caretPosition, caretEnd;
+
+    try {
+      caretPosition = el.selectionStart;
+      if (isNumber(caretPosition)) {
+        caretEnd = el.selectionEnd;
+      } else if (document.selection) {
+        var range = document.selection.createRange();
+        text = range.text;
+        var textInputRange = el.createTextRange();
+        textInputRange.moveToBookmark(range.getBookmark());
+        caretPosition = -textInputRange.moveStart('character', -length);
+        caretEnd = caretPosition + text.length;
+      }
+    } catch(e) {}
+
+    if (!isNumber(caretPosition)) {
+      caretPosition = caretEnd = length;
     }
     return {
       start: caretPosition,
