@@ -1223,6 +1223,7 @@ Session.prototype = {
       clearTimeout(fontTimeout);
 
       try {
+        this.delegator.destroy();
         invokeEach(this.listeners);
       } catch(e) {}
       invokeOnEach('off', this.bits);
