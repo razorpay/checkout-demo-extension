@@ -88,13 +88,11 @@ var Formatter;
     if (!arguments.length) {
       this.value = null;
     }
-    var caret = this.getCaret();
+    var caretPosition = this.getCaret().start;
     var value = this.el.value;
-    var left = value.slice(0, caret.start);
-    value = left + value.slice(caret.end);
 
     this.run({
-      left: left,
+      left: value,
       value: value,
       trim: value.length <= this.prettyValue.length
     })
