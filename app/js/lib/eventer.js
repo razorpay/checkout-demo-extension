@@ -20,12 +20,12 @@ var Eventer;
 
         // register event with namespace
         if (eventSplit.length > 1) {
-          var ns = eventSplit[1];
+          var ns = eventSplit[0];
 
           if (!namespaces[ns]) {
             namespaces[ns] = {};
           }
-          namespaces[ns][eventSplit[0]] = null;
+          namespaces[ns][eventSplit[1]] = null;
         }
 
         if (events[event]) {
