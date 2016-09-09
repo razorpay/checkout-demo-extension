@@ -655,7 +655,7 @@ Session.prototype = {
           toggleInvalid($(parent), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.value.length === this.maxLen) {
+          if (shouldFocusNextField && isValid && this.value.length === this.maxLen) {
             invoke('focus', el_expiry, null, 0);
           }
         })
@@ -667,7 +667,7 @@ Session.prototype = {
           var isValid = this.valid();
           toggleInvalid($(this.el.parentNode), isValid);
 
-          if (isValid) {
+          if (shouldFocusNextField && isValid) {
             defer(bind('focus', el_name.value ? el_cvv : el_name));
           }
         })
