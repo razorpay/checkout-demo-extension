@@ -227,29 +227,20 @@ function setPaymentMethods(session){
   methods.wallet = wallets;
 }
 
-function fetchPrefsAndShowModal(session){
-  Razorpay.payment.getPrefs(makePrefParams(session), function(response) {
+function fetchPrefsAndShowModal(session) {
+  // set test cookie
+  // if it is not reflected at backend while fetching prefs, disable cardsaving
+  document.cookie = 'checkcookie=1';
+  var prefData = makePrefParams(session);
+  prefData.checkcookie = 1;
+
+  Razorpay.payment.getPrefs(prefData, function(response) {
     if(response.error){
       return Razorpay.sendMessage({event: 'fault', data: response.error.description});
     }
     preferences = response;
     showModal(session);
   })
-}
-
-function isCookieEnabled() {
-  if (navigator.cookieEnabled) {
-    return true;
-  }
-
-  // set and read cookie
-  document.cookie = 'cookietest=1';
-  var ret = document.cookie.indexOf('cookietest=') !== -1;
-
-  // delete cookie
-  deleteCookie('cookietest');
-
-  return ret;
 }
 
 function showModal(session) {
@@ -291,7 +282,7 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
-  if (!isCookieEnabled()) {
+  if (!navigator.cookieEnabled) {
     options.remember_customer = false;
   }
 
