@@ -39,7 +39,7 @@ const wdioConfig = {
   // directory is where your package.json resides, so `wdio` will be called from there.
   //
   specs: [
-    'test/e2e/specs/**/**.spec.js',
+    'test/e2e/specs/**/**.spec.js'
     // 'test/e2e/specs/web-integration/manual-checkout.spec.js'
     // 'test/e2e/specs/web-integration/automatic-checkout.spec.js',
     // 'test/e2e/specs/card-payment.spec.js',
@@ -78,7 +78,7 @@ const wdioConfig = {
   capabilities: [{
     browserName: isProduction ? 'firefox' : 'chrome',
     maxInstances: isProduction ? 10 : 1,
-    firefox_binary: `${process.cwd()}/scripts/firefox.sh`,
+    firefox_binary: 'scripts/firefox.sh',
     chromeOptions: {
       args: [
         'no-sandbox',
@@ -239,6 +239,10 @@ const wdioConfig = {
     var browserCommands = require('./test/e2e/helpers/browser-commands');
     for (var command in browserCommands) {
       browser.addCommand(command, browserCommands[command]);
+    }
+
+    global.$ = function(selector) {
+      return browser.element(selector).value
     }
 
     // http://webdriver.io/api/protocol/execute.html
