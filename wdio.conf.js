@@ -78,7 +78,7 @@ const wdioConfig = {
   capabilities: [{
     browserName: isProduction ? 'firefox' : 'chrome',
     maxInstances: isProduction ? 10 : 1,
-    firefox_binary: 'scripts/firefox.sh',
+    firefox_binary: `${process.cwd()}/scripts/firefox.sh`,
     chromeOptions: {
       args: [
         'no-sandbox',
