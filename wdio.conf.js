@@ -76,8 +76,9 @@ const wdioConfig = {
   // https://docs.saucelabs.com/reference/platforms-configurator
   //
   capabilities: [{
-    browserName: 'chrome',
+    browserName: isProduction ? 'firefox' : 'chrome',
     maxInstances: isProduction ? 10 : 1,
+    firefox_binary: 'scripts/firefox.sh',
     chromeOptions: {
       args: [
         'no-sandbox',
