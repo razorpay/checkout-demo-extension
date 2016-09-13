@@ -230,7 +230,7 @@ function setPaymentMethods(session){
 function fetchPrefsAndShowModal(session) {
   // set test cookie
   // if it is not reflected at backend while fetching prefs, disable cardsaving
-  document.cookie = 'checkcookie=1';
+  document.cookie = 'checkcookie=1;path=/';
   var prefData = makePrefParams(session);
   prefData.checkcookie = 1;
 
