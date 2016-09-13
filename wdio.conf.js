@@ -76,7 +76,7 @@ const wdioConfig = {
   // https://docs.saucelabs.com/reference/platforms-configurator
   //
   capabilities: [{
-    browserName: isProduction ? 'firefox' : 'chrome',
+    browserName: 'chrome',
     maxInstances: isProduction ? 10 : 1,
     chromeOptions: {
       args: [
@@ -84,7 +84,8 @@ const wdioConfig = {
         'no-gpu'
       ]
     },
-    firefox_binary: `${process.cwd()}/scripts/firefox.sh`,
+    // browserName: 'firefox',
+    firefox_binary: 'scripts/firefox.sh',
     firefox_profile: {
       'browser.startup.homepage_override.mstone': 'ignore',
       'startup.homepage_welcome_url.additional': 'about:blank'

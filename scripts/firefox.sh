@@ -14,5 +14,6 @@ DIS=$(( $DIS + 1 ))
 echo $DIS > /tmp/display_screen
 X='Xephyr -br -ac -noreset -screen 1280x720 :'$DIS
 $($X) &
+sleep 1
 DISPLAY=:$DIS /usr/bin/firefox
 exit 0
