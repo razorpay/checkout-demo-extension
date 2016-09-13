@@ -258,7 +258,7 @@ var gel = bind(document.getElementById, document);
 
 function submitForm(action, data, method, target) {
   if (!isString(target)) {
-    if (method === 'get' && isEmptyObject(data)) {
+    if (method === 'get') {
       if (!target) {
         target = window;
       }
