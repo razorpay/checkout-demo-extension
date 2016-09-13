@@ -500,7 +500,11 @@ function initIframe(){
 
   if (CheckoutBridge) {
     delete trackingProps.context;
-    trackingProps.platform = qpmap.platform || 'app';
+    trackingProps.platform = 'mobile_sdk';
+    var os = qpmap.platform;
+    if (os) {
+      trackingProps.os = os;
+    }
   }
 
   if (qpmap.message) {
