@@ -21,15 +21,15 @@ describe('Index Page loaded', () => {
 
 describe('Loads RZP Modal', () => {
   it('Clicking on the `Pay Now` button should open RZP iframe', () => {
-    expect(browser.$('.razorpay-container')).to.exist
-    expect(browser.$('.razorpay-backdrop')).to.exist
-    expect(browser.$('.razorpay-container .razorpay-checkout-frame')).to.exist
+    expect($('.razorpay-container')).to.exist
+    expect($('.razorpay-backdrop')).to.exist
+    expect($('.razorpay-container .razorpay-checkout-frame')).to.exist
 
     browser.checkoutFrame()
-    expect(browser.$('#container')).to.exist
-    expect(browser.$('#modal')).to.exist
-    expect(browser.$('#powered-by')).to.exist
-    expect(browser.$('#backdrop')).to.exist
+    expect($('#container')).to.exist
+    expect($('#modal')).to.exist
+    expect($('#powered-by')).to.exist
+    expect($('#backdrop')).to.exist
   })
 })
 
@@ -130,7 +130,7 @@ describe('Home Screen', () => {
       )
 
       assert.isNotOk(
-        browser.$('#payment-options > [tab=card]'),
+        $('#payment-options > [tab=card]'),
         'Card tab is hidden'
       )
     })
@@ -153,12 +153,12 @@ describe('Home Screen', () => {
       )
 
       assert.isNotOk(
-        browser.$('#payment-options > [tab=card]'),
+        $('#payment-options > [tab=card]'),
         'Card tab is hidden'
       )
 
       assert.isNotOk(
-        browser.$('#payment-options > [tab=netbanking]'),
+        $('#payment-options > [tab=netbanking]'),
         'Netbanking is hidden'
       )
     })
@@ -182,17 +182,17 @@ describe('Home Screen', () => {
       )
 
       assert.isNotOk(
-        browser.$('#payment-options > [tab=wallet]'),
+        $('#payment-options > [tab=wallet]'),
         'Wallet is hidden'
       )
 
       assert.isNotOk(
-        browser.$('#payment-options > [tab=netbanking]'),
+        $('#payment-options > [tab=netbanking]'),
         'Netbanking is hidden'
       )
 
       assert.isOk(
-        browser.$('#payment-options > [tab=card]'),
+        $('#payment-options > [tab=card]'),
         'Only Card tab is shown'
       )
     })
@@ -234,10 +234,10 @@ describe('Modal should close', () => {
 
   function checkFromFrame() {
     browser.checkoutFrame()
-    browser.waitUntil(() => {
-      return !browser.element('#container').value
-    })
-    assert.isNotOk(browser.$('#container'), 'Iframe container is removed')
+
+    // ~300ms is closing animation
+    browser.pause(400)
+    assert.isNotOk($('#container'), 'Iframe container is removed')
   }
 
   beforeEach(() => {

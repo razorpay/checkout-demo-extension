@@ -39,7 +39,7 @@ const wdioConfig = {
   // directory is where your package.json resides, so `wdio` will be called from there.
   //
   specs: [
-    'test/e2e/specs/**/**.spec.js',
+    'test/e2e/specs/**/**.spec.js'
     // 'test/e2e/specs/web-integration/manual-checkout.spec.js'
     // 'test/e2e/specs/web-integration/automatic-checkout.spec.js',
     // 'test/e2e/specs/card-payment.spec.js',
@@ -83,10 +83,13 @@ const wdioConfig = {
         'no-sandbox',
         'no-gpu'
       ]
+    },
+    // browserName: 'firefox',
+    firefox_binary: 'scripts/firefox.sh',
+    firefox_profile: {
+      'browser.startup.homepage_override.mstone': 'ignore',
+      'startup.homepage_welcome_url.additional': 'about:blank'
     }
-  // }, {
-  //   browserName: 'firefox',
-  //   maxInstances: 1
   }],
   // , {
   // maxInstances can get overwritten per capability. So if you have an in house Selenium
@@ -238,6 +241,10 @@ const wdioConfig = {
     var browserCommands = require('./test/e2e/helpers/browser-commands');
     for (var command in browserCommands) {
       browser.addCommand(command, browserCommands[command]);
+    }
+
+    global.$ = function(selector) {
+      return browser.element(selector).value
     }
 
     // http://webdriver.io/api/protocol/execute.html

@@ -22,19 +22,19 @@ describe('Index Page loaded', () => {
 
 describe('Loads RZP Modal', () => {
   it('Should append `razorpay-payment-button` inside the form', () => {
-    expect(browser.$('form#checkout-form > .razorpay-payment-button')).to.exist
+    expect($('form#checkout-form > .razorpay-payment-button')).to.exist
   })
 
   it('Clicking on `razorpay-payment-button` button should open RZP iframe', () => {
-    expect(browser.$('.razorpay-container')).to.exist
-    expect(browser.$('.razorpay-backdrop')).to.exist
-    expect(browser.$('.razorpay-container .razorpay-checkout-frame')).to.exist
+    expect($('.razorpay-container')).to.exist
+    expect($('.razorpay-backdrop')).to.exist
+    expect($('.razorpay-container .razorpay-checkout-frame')).to.exist
 
     browser.checkoutFrame()
-    expect(browser.$('#container')).to.exist
-    expect(browser.$('#modal')).to.exist
-    expect(browser.$('#powered-by')).to.exist
-    expect(browser.$('#backdrop')).to.exist
+    expect($('#container')).to.exist
+    expect($('#modal')).to.exist
+    expect($('#powered-by')).to.exist
+    expect($('#backdrop')).to.exist
   })
 })
 

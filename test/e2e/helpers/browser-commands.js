@@ -2,11 +2,7 @@
 
 module.exports = {
   checkoutFrame() {
-    return browser.frame(browser.$('iframe.razorpay-checkout-frame'))
-  },
-
-  $(selector) {
-    return browser.element(selector).value
+    return browser.frame(browser.element('iframe.razorpay-checkout-frame').value)
   },
 
   css(selector, property) {

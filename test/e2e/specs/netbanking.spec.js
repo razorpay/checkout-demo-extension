@@ -149,7 +149,7 @@ describe('Net Banking', () => {
 
     it('Should not select any bank tile, when popular bank is not chosen', () => {
       browser.selectByValue('#bank-select', 'VIJB')
-      assert.isNotOk(browser.$('input[type=radio]:checked'), 'None of the popular bank is selected')
+      assert.isNotOk($('input[type=radio]:checked'), 'None of the popular bank is selected')
     })
   })
 

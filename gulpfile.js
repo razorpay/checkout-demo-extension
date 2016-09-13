@@ -254,7 +254,7 @@ function createCoverageReport(){
   let reporter = new istanbul.Reporter(false, 'coverage/final');
 
   glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile){
-    collector.add(JSON.parse(fs.readFileSync(jsonFile, 'utf8')));
+    collector.add(require('./' + jsonFile));
   })
 
   reporter.add('html');
