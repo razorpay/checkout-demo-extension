@@ -234,9 +234,9 @@ describe('Modal should close', () => {
 
   function checkFromFrame() {
     browser.checkoutFrame()
-    browser.waitUntil(() => {
-      return !browser.element('#container').value
-    })
+
+    // ~300ms is closing animation
+    browser.pause(400)
     assert.isNotOk($('#container'), 'Iframe container is removed')
   }
 
@@ -244,18 +244,18 @@ describe('Modal should close', () => {
     checkoutForm.open()
   })
 
-  // it('Close on escape press, which parent window is focused', () => {
-  //   browser.keys('\uE00C')
-  //   checkFromParent()
-  //   checkFromFrame()
-  // })
+  it('Close on escape press, which parent window is focused', () => {
+    browser.keys('\uE00C')
+    checkFromParent()
+    checkFromFrame()
+  })
 
-  // it('Close on escape press, which iframe is focused', () => {
-  //   browser.checkoutFrame()
-  //   browser.keys('\uE00C')
-  //   checkFromParent()
-  //   checkFromFrame()
-  // })
+  it('Close on escape press, which iframe is focused', () => {
+    browser.checkoutFrame()
+    browser.keys('\uE00C')
+    checkFromParent()
+    checkFromFrame()
+  })
 
   it('Close on closs button click', () => {
     browser.checkoutFrame()

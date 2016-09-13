@@ -78,16 +78,17 @@ const wdioConfig = {
   capabilities: [{
     browserName: isProduction ? 'firefox' : 'chrome',
     maxInstances: isProduction ? 10 : 1,
-    firefox_binary: 'scripts/firefox.sh',
     chromeOptions: {
       args: [
         'no-sandbox',
         'no-gpu'
       ]
+    },
+    firefox_binary: `${process.cwd()}/scripts/firefox.sh`,
+    firefox_profile: {
+      'browser.startup.homepage_override.mstone': 'ignore',
+      'startup.homepage_welcome_url.additional': 'about:blank'
     }
-  // }, {
-  //   browserName: 'firefox',
-  //   maxInstances: 1
   }],
   // , {
   // maxInstances can get overwritten per capability. So if you have an in house Selenium
