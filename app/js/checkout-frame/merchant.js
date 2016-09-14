@@ -245,7 +245,6 @@ function fetchPrefsAndShowModal(session) {
 
 function showModal(session) {
   var options = preferences.options;
-  session.hide_topbar = preferences.hide_topbar;
   var saved_customer = preferences.customer;
 
   // pass preferences options to app
