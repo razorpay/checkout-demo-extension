@@ -439,6 +439,7 @@ var responseTypes = {
       self.ajax = this;
       return response && !response.status;
     })
+    self.emit('upi.pending');
   },
 
   otp: function(request){

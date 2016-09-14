@@ -597,7 +597,7 @@ Session.prototype = {
     }
 
     var goto_payment = '#error-message .link';
-    if (this.get('redirect')) {
+    if (this.get('redirect') || enabledMethods.upi) {
       $(goto_payment).hide();
       var moreinfo = gel('moreinfo');
       if (moreinfo) {
@@ -613,7 +613,7 @@ Session.prototype = {
     this.on('click', '#fd-hide', this.hideErrorMessage);
   },
 
-  setFormatting: function(){
+  setFormatting: function() {
     var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
     var bits = this.bits;
     bits.push(inputHandler);
@@ -1182,10 +1182,12 @@ Session.prototype = {
         $('#add-funds').addClass('show');
         setOtpText('Insufficient balance in your wallet');
       });
+    } else if (data.method === 'upi') {
+      this.r.on('payment.upi.pending', bind('showLoadError', this,
+        'Please accept collect request on app'
+      ));
     } else {
-      this.r.on('payment.cancel', bind(function() {
-        this.showLoadError(discreet.cancelMsg, true);
-      }, this))
+      this.r.on('payment.cancel', bind('showLoadError', this, discreet.cancelMsg, true));
     }
   },
 
