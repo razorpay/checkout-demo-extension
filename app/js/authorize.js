@@ -433,7 +433,7 @@ var responseTypes = {
 
   async: function(request) {
     var self = this;
-    recurseAjax(request.url, function(response) {
+    recurseAjax(request.url + '?key_id=' + self.r.get('key'), function(response) {
       self.complete(response);
     }, function(response) {
       self.ajax = this;
@@ -482,7 +482,7 @@ razorpayProto.focus = function() {
   } catch(e) {}
 }
 
-razorpayProto.submitOTP = function(otp){
+razorpayProto.submitOTP = function(otp) {
   var payment = this._payment;
   payment.ajax = $.post({
     url: payment.otpurl,
@@ -494,7 +494,7 @@ razorpayProto.submitOTP = function(otp){
   })
 }
 
-razorpayProto.resendOTP = function(callback){
+razorpayProto.resendOTP = function(callback) {
   var payment = this._payment;
   payment.ajax = $.post({
     url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend'),
