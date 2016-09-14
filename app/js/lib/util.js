@@ -310,3 +310,19 @@ function preventDefault(e) {
 function toggleInvalid($el, isValid) {
   $el.toggleClass('invalid', !isValid)
 }
+
+function recurseAjax(url, callback, continueUntil) {
+  defer(function() {
+    var xhr = $.ajax({
+      url: url,
+      callback: function(response) {
+        if (continueUntil.call(xhr, response)) {
+          recurseAjax(url, callback, continueUntil);
+        } else {
+          callback(response);
+        }
+      }
+    })
+    continueUntil.call(xhr);
+  }, 600)
+}

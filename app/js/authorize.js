@@ -114,7 +114,7 @@ function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   this.fees = params.fees;
-  this.powerwallet = params.powerwallet;
+  this.powerwallet = params.powerwallet || data.method === 'upi';
   this.message = params.message;
 
   this.tryPopup();
@@ -181,7 +181,8 @@ Payment.prototype = {
       data.key_id = getOption('key');
     }
 
-    if(this.powerwallet){
+    // api needs this flag to decide between redirect/otp
+    if (this.powerwallet && data.method === 'wallet') {
       data['_[source]'] = 'checkoutjs';
     }
     // flatten notes, card
@@ -212,14 +213,14 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if(discreet.isFrame){
+    if (discreet.isFrame && !this.powerwallet) {
       var complete = window.onComplete = bind(this.complete, this);
       pollPaymentData(complete);
     }
     this.offmessage = $(window).on('message', bind(onMessage, this));
   },
 
-  complete: function(data){
+  complete: function(data) {
     if (this.done) {
       return;
     }
@@ -264,7 +265,7 @@ Payment.prototype = {
     this.r._payment = null;
   },
 
-  tryAjax: function(){
+  tryAjax: function() {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.fees) {
@@ -428,6 +429,16 @@ var responseTypes = {
       // set in localStorage for lumia
       setPayloadStorage(direct ? content : makeAutoSubmitForm(request.url, content));
     }
+  },
+
+  async: function(request) {
+    var self = this;
+    recurseAjax(request.url, function(response) {
+      self.complete(response);
+    }, function(response) {
+      self.ajax = this;
+      return response && !response.status;
+    })
   },
 
   otp: function(request){

@@ -260,6 +260,7 @@ else
               {{?method.upi}}
                 <div class="tab-content showable screen pad" id="form-upi">
                   <div class="elem-wrap"><div class="elem">
+                    <div class="help">VPA should be of format abc@xyz</div>
                     <label>Virtual payment address</label>
                     <input class="input" id="vpa" name="vpa" placeholder="Enter VPA here" required pattern=".+@.+" value="{{=attr(o('prefill.vpa'))}}">
                   </div></div>

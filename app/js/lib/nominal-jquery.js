@@ -240,9 +240,9 @@ $.post = function(opts){
   return $.ajax(opts);
 }
 
-$.ajax = function(opts){
+$.ajax = function(opts) {
   var xhr = new XMLHttpRequest();
-  if(!opts.method){
+  if (!opts.method) {
     opts.method = 'get';
   }
   xhr.open(opts.method, opts.url, true);
@@ -256,7 +256,7 @@ $.ajax = function(opts){
 
   if(opts.callback) {
     xhr.onreadystatechange = function() {
-      if(xhr.readyState === 4) {
+      if(xhr.readyState === 4 && xhr.status) {
         var json;
         try {
           json = JSON.parse(xhr.responseText);
