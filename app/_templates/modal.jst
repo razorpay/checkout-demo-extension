@@ -13,14 +13,6 @@ if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
-
-var i = 0;
-var methods = ['card', 'netbanking', 'wallet'];
-
-for(var m in methods) {
-  if(method[methods[m]])
-    i++;
-}
 }}
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -121,6 +113,9 @@ for(var m in methods) {
                     {{?}}
                     {{? wallet.length }}
                     <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
+                    {{?}}
+                    {{? method.upi }}
+                    <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>{{=it.tab_titles.upi}}</label></div>
                     {{?}}
                   </div>
                   <div class="clear"></div>
@@ -235,7 +230,7 @@ for(var m in methods) {
                     </div></div>
                 </div>
               {{?}}
-              {{ if(wallet.length){ }}
+              {{? wallet.length }}
                 <div class="tab-content showable screen" id="form-wallet">
                   {{ var count = 0, max = 3; }}
                   <div id="wallets" class="grid count-{{=wallet.length}}">
@@ -261,7 +256,15 @@ for(var m in methods) {
                     <span class="help">Please select one of the wallets</span>
                   </div>
                 </div>
-              {{}}}
+              {{?}}
+              {{?method.upi}}
+                <div class="tab-content showable screen pad" id="form-upi">
+                  <div class="elem-wrap"><div class="elem">
+                    <label>Virtual payment address</label>
+                    <input class="input" id="vpa" name="vpa" placeholder="Enter VPA here" required pattern=".+@.+" value="{{=attr(o('prefill.vpa'))}}">
+                  </div></div>
+                </div>
+              {{?}}
 
               <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>

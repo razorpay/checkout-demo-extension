@@ -130,7 +130,8 @@ var tab_titles = sessProto.tab_titles = {
   emi: 'EMI',
   card: 'Card',
   netbanking: 'Netbanking',
-  wallet: 'Wallet'
+  wallet: 'Wallet',
+  upi: 'UPI'
 }
 
 function notifyBridge(message){

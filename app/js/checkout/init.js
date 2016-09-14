@@ -27,6 +27,7 @@ RazorpayDefaults.prefill = {
   name: '',
   contact: '',
   email: '',
+  vpa: '',
   'card[number]': '',
   'card[expiry]': '',
   'card[cvv]': ''
