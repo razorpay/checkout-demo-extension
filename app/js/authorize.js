@@ -437,7 +437,7 @@ var responseTypes = {
       self.complete(response);
     }, function(response) {
       self.ajax = this;
-      return response && !response.status;
+      return response && response.status;
     })
     self.emit('upi.pending');
   },
