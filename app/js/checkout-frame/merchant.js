@@ -1,5 +1,6 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
+  cookieDisabled = !navigator.cookieEnabled,
   sessions = {},
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
@@ -230,9 +231,13 @@ function setPaymentMethods(session){
 function fetchPrefsAndShowModal(session) {
   // set test cookie
   // if it is not reflected at backend while fetching prefs, disable cardsaving
-  document.cookie = 'checkcookie=1;path=/';
   var prefData = makePrefParams(session);
-  prefData.checkcookie = 1;
+  if (cookieDisabled) {
+    prefData.checkcookie = 0;
+  } else {
+    prefData.checkcookie = 1;
+    document.cookie = 'checkcookie=1;path=/';
+  }
 
   Razorpay.payment.getPrefs(prefData, function(response) {
     if(response.error){
@@ -281,7 +286,7 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
-  if (!navigator.cookieEnabled) {
+  if (cookieDisabled) {
     options.remember_customer = false;
   }
 
