@@ -201,6 +201,10 @@ function setPaymentMethods(session){
     methods.count++;
   }
 
+  if (methods.upi) {
+    methods.count++;
+  }
+
   each(
     session.get('external.wallets'),
     function(i, externalWallet){
