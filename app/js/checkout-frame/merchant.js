@@ -172,7 +172,7 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (methods.emi && !session.get('theme.emi_tab')) {
+  if (methods.emi) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   }

@@ -710,17 +710,6 @@ Session.prototype = {
   },
 
   switchTab: function(tab) {
-    if (this.get('theme.emi_tab')) {
-      if (tab === 'emi') {
-        tab_titles.card = 'EMI';
-        $('#elem-emi').css('display', 'block');
-        tab = 'card';
-      } else if (tab === 'card') {
-        tab_titles.card = 'Card';
-        $('#elem-emi').hide();
-      }
-    }
-
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
