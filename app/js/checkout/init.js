@@ -52,7 +52,7 @@ RazorpayDefaults.theme = {
   backdrop_color: 'rgba(0,0,0,0.6)',
   image_padding: true,
   close_button: true,
-  header: true
+  hide_topbar: false
 }
 
 discreet.currencies = {

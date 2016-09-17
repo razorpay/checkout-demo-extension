@@ -1,5 +1,6 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
+  cookieDisabled = !navigator.cookieEnabled,
   sessions = {},
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
@@ -45,6 +46,10 @@ sessProto.netbanks = {
 };
 
 var freqWallets = sessProto.walletData = {
+  airtelmoney: {
+    h: 32,
+    col: RazorpayConfig.cdn + 'airtelmoney.png'
+  },
   paytm: {
     h: 16,
     col: RazorpayConfig.cdn + 'paytm.gif'
@@ -235,9 +240,13 @@ function setPaymentMethods(session){
 function fetchPrefsAndShowModal(session) {
   // set test cookie
   // if it is not reflected at backend while fetching prefs, disable cardsaving
-  document.cookie = 'checkcookie=1;path=/';
   var prefData = makePrefParams(session);
-  prefData.checkcookie = 1;
+  if (cookieDisabled) {
+    prefData.checkcookie = 0;
+  } else {
+    prefData.checkcookie = 1;
+    document.cookie = 'checkcookie=1;path=/';
+  }
 
   Razorpay.payment.getPrefs(prefData, function(response) {
     if(response.error){
@@ -250,7 +259,6 @@ function fetchPrefsAndShowModal(session) {
 
 function showModal(session) {
   var options = preferences.options;
-  session.hide_topbar = preferences.hide_topbar;
   var saved_customer = preferences.customer;
 
   // pass preferences options to app
@@ -287,7 +295,7 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
-  if (!navigator.cookieEnabled) {
+  if (cookieDisabled) {
     options.remember_customer = false;
   }
 
@@ -443,8 +451,8 @@ window.handleMessage = function(message) {
     sessions[_uid] = session;
   }
 
-  if (message.context) {
-    trackingProps.context = message.context;
+  if (message.referrer) {
+    trackingProps.referrer = message.referrer;
   }
 
   if (message.integration) {
@@ -504,7 +512,7 @@ function initIframe(){
   }
 
   if (CheckoutBridge) {
-    delete trackingProps.context;
+    delete trackingProps.referrer;
     trackingProps.platform = 'mobile_sdk';
     var os = qpmap.platform;
     if (os) {

@@ -52,7 +52,7 @@ function postRollbar(msg, trace, level, isStack) {
         },
         environment: 'prod',
         request: {
-          url: trackingProps.context,
+          url: trackingProps.referrer,
           user_ip: '$remote_ip'
         },
         person: {

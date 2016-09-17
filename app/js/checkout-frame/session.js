@@ -320,17 +320,8 @@ Session.prototype = {
       classes.push('mobile');
     }
 
-    if (this.hide_topbar) {
+    if (this.get('theme.hide_topbar')) {
       classes.push('notopbar');
-    }
-    if (this.get('theme.emi_tab')) {
-      var tabsEl = $('#payment-options')[0];
-      tabsEl.className = tabsEl.className.replace(/count-(.)$/, function() {
-        return 'count-4';
-      })
-      classes.push('emitab');
-    } else {
-      $('#tab-emi').remove();
     }
 
     if(!this.get('image')){
