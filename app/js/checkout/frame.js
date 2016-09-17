@@ -203,7 +203,7 @@ CheckoutFrame.prototype = {
 
     var response = {
       integration: trackingProps.integration,
-      context: location.href,
+      referrer: location.href,
       options: options,
       id: rzp.id
     }

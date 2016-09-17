@@ -101,7 +101,7 @@ var _uid = generateUID();
 var trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
-  context: location.href
+  referrer: location.href
 }
 
 // we keep {event, timestamp} everytime something is tracked, and send it in next track
@@ -135,7 +135,7 @@ function getCommonTrackingData(r) {
     checkout_id: r ? r.id : _uid,
     platform: 'browser'
   }
-  each(['integration', 'context', 'library'], function(i, propName){
+  each(['integration', 'referrer', 'library'], function(i, propName){
     if (trackingProps[propName]) {
       props[propName] = trackingProps[propName]
     }
@@ -165,7 +165,7 @@ function track(r, event, data) {
         {
           name: 'keen:url_parser',
           input: {
-            url: 'context'
+            url: 'referrer'
           },
           output: 'url'
         },
