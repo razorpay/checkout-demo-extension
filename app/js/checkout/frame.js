@@ -125,8 +125,8 @@ function setTestRibbonInvisible(){
 
 var loader;
 function appendLoader($parent, parent){
-  if(!loader){
-    try{
+  if (!loader) {
+    try {
       loader = document.createElement('div');
       loader.className = 'razorpay-loader';
       var style = "margin:-25px 0 0 -25px;height:50px;width:50px;animation:rzp-rot 1s infinite linear;-webkit-animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;"
@@ -169,7 +169,7 @@ CheckoutFrame.prototype = {
     return this.el;
   },
 
-  openRzp: function(rzp){
+  openRzp: function(rzp) {
     var $el = $(this.el);
     this.bind();
     var parent = rzp.get('parent');
@@ -321,13 +321,15 @@ CheckoutFrame.prototype = {
   },
 
   onload: function() {
-    if(loader){
-      $(loader).remove();
-      // show it only once.
-      loader = true;
-    }
     if (this.rzp) {
       this.postMessage(this.makeMessage());
+    }
+  },
+
+  onrender: function() {
+    if (loader) {
+      $(loader).remove();
+      loader = null;
     }
   },
 
