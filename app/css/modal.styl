@@ -67,8 +67,14 @@ html {
     width: 100%;
   }
 
-  &.count-3 .item {
+  &.count-3 .item, &.count-6 .item {
     width: 33.33%;
+  }
+
+  &.count-5 .item:nth-child(5) {
+    border-right: 1px solid $bc;
+    box-sizing: content-box;
+    border-left: none;
   }
 
   .item {

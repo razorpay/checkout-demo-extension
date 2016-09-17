@@ -46,6 +46,10 @@ sessProto.netbanks = {
 };
 
 var freqWallets = sessProto.walletData = {
+  airtelmoney: {
+    h: 32,
+    col: RazorpayConfig.cdn + 'airtelmoney.png'
+  },
   paytm: {
     h: 16,
     col: RazorpayConfig.cdn + 'paytm.gif'
