@@ -176,26 +176,14 @@ function track(r, event, data) {
 
       // unique identifier needs to be named "anonymousId"
       anonymousId: r.id,
-      properties: {
-        // can be checkoutjs or razorpayjs, depending on discreet.isFrame
-        library: trackingProps.library,
-
-        // whether web or app
-        platform: trackingProps.platform,
-
-        // for auto parsing of url, property name has to be "page_url".
-        // this is specific to segment + keen
-        referrer: trackingProps.referrer,
-
-        // for auto parsing of ua, property name has to be "user_agent".
-        user_agent: ua
-      },
 
       // in order to force segment pass original IP to mixpanel & keen
       context: {
         direct: true
       }
     };
+
+    trackingPayload.properties = getCommonTrackingData(r);
 
     flattenProps(data, trackingPayload.properties, 'data');
     flattenProps(r.get(), trackingPayload.properties, 'options');
