@@ -25,8 +25,24 @@ else
         <div id="fd-t"></div>
         <div class="spin"><div></div></div>
         <div class="spin spin2"><div></div></div>
-        <span class="link">Go to payment</span>
+        <span class="link"></span>
         <button id="fd-hide" class="btn">Retry</button>
+        <div id="cancel_upi">
+          <p>Please specify the reason</p>
+          <label for="upi-1"><input id="upi-1" type="radio" name="_[reason]" value="collect_not_received">
+            Did not receive collect request
+          </label>
+          <label for="upi-2"><input id="upi-2" type="radio" name="_[reason]" value="failed_in_app">
+            Payment failed in UPI app
+          </label>
+          <label for="upi-3"><input id="upi-3" type="radio" name="_[reason]" value="money_deducted">
+            Money got deducted but payment is still processing
+          </label>
+          <label for="upi-4"><input id="upi-4" type="radio" name="_[reason]" value="other">
+            Other
+          </label>
+          <button class="btn">Submit</button>
+        </div>
       </div>
       <div id="content">
         <div id="header">

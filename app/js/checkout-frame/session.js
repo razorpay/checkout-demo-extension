@@ -288,6 +288,13 @@ function successHandler(response){
   this.hide();
 }
 
+function cancel_upi(session) {
+  $('#error-message').addClass('cancel_upi');
+  session.r.on('payment.error', function() {
+    $('#error-message').removeClass('cancel_upi');
+  })
+}
+
 function Session (options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
@@ -588,14 +595,17 @@ Session.prototype = {
     }
 
     var goto_payment = '#error-message .link';
-    if (this.get('redirect') || enabledMethods.upi) {
+    if (this.get('redirect')) {
       $(goto_payment).hide();
       var moreinfo = gel('moreinfo');
       if (moreinfo) {
         $('#moreinfo').hide();
       }
     } else {
-      this.on('click', goto_payment, function(){
+      this.on('click', goto_payment, function() {
+        if (this.payload && this.payload.method === 'upi') {
+          return cancel_upi(this);
+        }
         this.r.focus();
       })
     }
@@ -1165,7 +1175,8 @@ Session.prototype = {
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this));
 
-    if(request.powerwallet) {
+    var sub_link = $('#error-message .link');
+    if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on('payment.wallet.topup', function() {
@@ -1174,10 +1185,12 @@ Session.prototype = {
         setOtpText('Insufficient balance in your wallet');
       });
     } else if (data.method === 'upi') {
+      sub_link.html('Cancel Payment')
       this.r.on('payment.upi.pending', bind('showLoadError', this,
         'Please accept collect request on app'
       ));
     } else {
+      sub_link.html('Go to payment')
       this.r.on('payment.cancel', bind('showLoadError', this, discreet.cancelMsg, true));
     }
   },
