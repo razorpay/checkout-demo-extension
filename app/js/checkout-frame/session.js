@@ -476,9 +476,12 @@ Session.prototype = {
     }
   },
 
-  hideErrorMessage: function(){
-    if(this.r._payment){
-      if(confirmClose()){
+  hideErrorMessage: function() {
+    if(this.r._payment) {
+      if (this.payload.method === 'upi') {
+        return cancel_upi(this);
+      }
+      if(confirmClose()) {
         this.clearRequest();
       } else {
         return;
@@ -592,6 +595,15 @@ Session.prototype = {
           $('#wallets').removeClass('invalid');
         }, true);
       } catch(e) {}
+    }
+
+    if (enabledMethods.upi) {
+      this.on('click', '#cancel_upi .btn', function() {
+        var upi_radio = $('#upi-1');
+        var metaParam = {};
+        metaParam[upi_radio.prop('name')] = upi_radio.val();
+        this.clearRequest(metaParam);
+      })
     }
 
     var goto_payment = '#error-message .link';
@@ -1056,13 +1068,13 @@ Session.prototype = {
     }, bind(callback, this));
   },
 
-  clearRequest: function(){
+  clearRequest: function(extra){
     var powerotp = gel('powerotp');
     if (powerotp) {
       powerotp.value = '';
     }
     if (this.r._payment) {
-      this.r.emit('payment.cancel');
+      this.r.emit('payment.cancel', extra);
     }
 
     clearTimeout(this.requestTimeout);

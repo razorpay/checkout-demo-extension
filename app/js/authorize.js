@@ -62,14 +62,15 @@ function submitPopup(payment) {
   }
 }
 
-function onPaymentCancel(errorObj) {
+function onPaymentCancel(metaParam) {
   if (!this.done) {
     var cancelError = discreet.error();
     var payment_id = this.payment_id;
     var razorpay = this.r;
     if (payment_id) {
       track(razorpay, 'cancel', {payment_id: payment_id});
-      $.ajax({
+      var requestMethod = 'ajax';
+      var ajaxObj = {
         url: makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel'),
         callback: bind(function(response) {
           if (response.razorpay_payment_id) {
@@ -79,7 +80,12 @@ function onPaymentCancel(errorObj) {
           }
           this.complete(response);
         }, this)
-      });
+      }
+      if (isNonNullObject(metaParam)) {
+        requestMethod = 'post';
+        ajaxObj.data = metaParam;
+      }
+      $[requestMethod](ajaxObj);
     } else {
       track(razorpay, 'cancel');
       this.complete(cancelError);
