@@ -143,6 +143,21 @@ function getCommonTrackingData(r) {
   return props;
 }
 
+function flattenProps(obj, parentObj, parentKey) {
+  var returnObj = parentObj || {};
+  each(obj, function(key, val) {
+    if (isNonNullObject(val)) {
+      flattenProps(val, returnObj, key);
+    } else if (val && !isFunction(val) || val === 0 || val === '' || val === false) {
+      if (parentKey) {
+        key = parentKey + '.' + key;
+      }
+      returnObj[key] = val;
+    }
+  })
+  return returnObj;
+}
+
 function track(r, event, data) {
   if (!r.isLiveMode()) {
     return;
@@ -155,36 +170,36 @@ function track(r, event, data) {
       data = {message: data.message, stack: data.stack}
     }
 
-    // trackingPayload is of format prescribed by keen
-    var trackingPayload = getCommonTrackingData(r);
-    trackingPayload.data = nest(data);
-    trackingPayload.options = nest(r.get());
-    trackingPayload.ip = '${keen.ip}';
-    trackingPayload.keen = {
-      addons : [
-        {
-          name: 'keen:url_parser',
-          input: {
-            url: 'referrer'
-          },
-          output: 'url'
-        },
-        {
-          name : 'keen:ip_to_geo',
-          input : {
-            ip : 'ip'
-          },
-          output : 'geo'
-        },
-        {
-          name : 'keen:ua_parser',
-          input : {
-            ua_string : 'ua'
-          },
-          output : 'agent'
-        }
-      ]
-    }
+    var trackingPayload = {
+      // mandatory
+      event: event,
+
+      // unique identifier needs to be named "anonymousId"
+      anonymousId: r.id,
+      properties: {
+        // can be checkoutjs or razorpayjs, depending on discreet.isFrame
+        library: trackingProps.library,
+
+        // whether web or app
+        platform: trackingProps.platform,
+
+        // for auto parsing of url, property name has to be "page_url".
+        // this is specific to segment + keen
+        referrer: trackingProps.referrer,
+
+        // for auto parsing of ua, property name has to be "user_agent".
+        user_agent: ua
+      },
+
+      // in order to force segment pass original IP to mixpanel & keen
+      context: {
+        direct: true
+      }
+    };
+
+    flattenProps(data, trackingPayload.properties, 'data');
+    flattenProps(r.get(), trackingPayload.properties, 'options');
+
 
     if (!isEmptyObject(trackStack)) {
       var prev = trackingPayload.prev = {};
@@ -197,15 +212,15 @@ function track(r, event, data) {
     }
     trackStack[event] = new Date().getTime();
 
-    // return console.log(event, data.properties);
+    // return console.log(event, trackingPayload.properties);
 
     $.ajax({
-      url: 'https://api.keen.io/3.0/projects/56dfed2446f9a70e39ec3a24/events/' + event,
+      url: 'https://api.segment.io/v1/track',
       method: 'post',
       data: JSON.stringify(trackingPayload),
       headers: {
         'Content-type': 'application/json',
-        'Authorization': '856f246bc03088ac2390ad0d637a6e57d4637fc2cd088ff264650774022e7e6fec07a110d8256fca72b1362a569078c9371ee3ecfc67fc09fc9469d3c7b56744d4cfa9f2f4d466e24408ec77260288a7cb0741fe06f2399cb9d05456c479a737'
+        'Authorization': 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:')
       }
     })
   })
