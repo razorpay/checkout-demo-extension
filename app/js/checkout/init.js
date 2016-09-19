@@ -20,7 +20,8 @@ RazorpayDefaults.method = {
   netbanking: true,
   card: true,
   wallet: null,
-  emi: true
+  emi: true,
+  upi: false
 }
 RazorpayDefaults.prefill = {
   method: '',
@@ -48,6 +49,7 @@ RazorpayDefaults.external = {
 }
 
 RazorpayDefaults.theme = {
+  upi_only: false,
   color: '',
   backdrop_color: 'rgba(0,0,0,0.6)',
   image_padding: true,

@@ -3,6 +3,14 @@ var c = it('theme.color') || '#3594E2';
 var close = it('theme.close_button');
 }}
 
+{{?it('theme.upi_only')}}
+#payment-options div:nth-child(-n+3){
+  pointer-events: none;
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+}
+{{?}}
+
 .button, .btn
 {
   background: {{=c}};
