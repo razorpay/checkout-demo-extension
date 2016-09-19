@@ -16,7 +16,7 @@ var Eventer;
       if (typeof event === 'string' && typeof callback === 'function') {
         var events = this._evts,
           namespaces = this._evtns,
-          eventSplit = event.split('.', 2);
+          eventSplit = event.split('.');
 
         // register event with namespace
         if (eventSplit.length > 1) {
@@ -25,7 +25,7 @@ var Eventer;
           if (!namespaces[ns]) {
             namespaces[ns] = {};
           }
-          namespaces[ns][eventSplit[1]] = null;
+          namespaces[ns][eventSplit.slice(1).join('.')] = null;
         }
 
         if (events[event]) {
@@ -58,7 +58,7 @@ var Eventer;
 
       var events = this._evts,
         namespaces = this._evtns,
-        eventSplit = event.split('.', 2);
+        eventSplit = event.split('.');
 
       if (argLen === 2) {
         var listenerArray = events[event];
