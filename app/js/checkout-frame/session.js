@@ -221,7 +221,7 @@ function errorHandler(response){
     }
   }
 
-  if (this.tab || message !== 'Payment cancelled') {
+  if (this.tab || message !== discreet.cancelMsg) {
     this.showLoadError(message || 'There was an error in handling your request', true);
   }
   $('#fd-hide').focus();
@@ -975,17 +975,20 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function(text, error){
+  showLoadError: function(text, error) {
     var actionState;
     var loadingState = 'addClass';
     if (error) {
+      if (this.screen === 'upi' && text === discreet.cancelMsg) {
+        return this.hideErrorMessage();
+      }
       actionState = loadingState;
       loadingState = 'removeClass'
     } else {
       actionState = 'removeClass';
     }
 
-    if(!text){
+    if(!text) {
       text = strings.process;
     }
 

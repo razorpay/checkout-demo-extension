@@ -1,5 +1,21 @@
 @require 'common';
 
+#form-upi {
+  .input {
+    padding: 12px 0 12px 50px;
+    box-sizing: border-box;
+    opacity: 1;
+  }
+  .elem-wrap {
+    height: auto;
+  }
+  .elem {
+    background: #fafafa url('/images/checkout/vpa.svg') no-repeat 15px center;
+    border: 1px solid #eee;
+    background-size: 24px;
+  }
+}
+
 #cancel_upi {
   display: none;
   position: absolute;
@@ -11,13 +27,14 @@
   border-radius: inherit;
 
   p {
+    margin: 20px;
+    font-weight: bold;
     text-align: left;
-    padding-left: 50px;
   }
 
   label {
     text-align: left;
-    padding: 3px 0 3px 50px;
+    padding: 7px 0 7px 50px;
     display: block;
     position: relative;
   }
@@ -34,6 +51,9 @@
 }
 
 #error-message.cancel_upi {
+  height: 260px;
+  overflow: hidden;
+
   #cancel_upi {
     display: block;
   }

@@ -48,6 +48,7 @@ RazorpayDefaults.external = {
 }
 
 RazorpayDefaults.theme = {
+  upi_only: false,
   color: '',
   backdrop_color: 'rgba(0,0,0,0.6)',
   image_padding: true,
