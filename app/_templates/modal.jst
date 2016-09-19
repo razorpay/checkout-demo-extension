@@ -28,7 +28,7 @@ else
         <span class="link"></span>
         <button id="fd-hide" class="btn">Retry</button>
         <div id="cancel_upi">
-          <p>Please specify the reason</p>
+          <p>Please provide a reason and help us improve UPI</p>
           <label for="upi-1"><input id="upi-1" type="radio" name="_[reason]" value="collect_not_received">
             Did not receive collect request
           </label>
@@ -275,13 +275,12 @@ else
               {{?}}
               {{?method.upi}}
                 <div class="tab-content showable screen pad" id="form-upi">
+                  <p>Enter your virtual payment address</p>
                   <div class="elem-wrap"><div class="elem">
-                    <div class="help">VPA should be of format abc@xyz</div>
-                    <label>Virtual payment address</label>
-                    <input class="input" id="vpa" name="vpa" placeholder="Enter VPA here" required pattern=".+@.+" value="{{=attr(o('prefill.vpa'))}}">
+                    <input class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="{{=attr(o('prefill.vpa'))}}">
                   </div></div>
                   <p>
-                    You will receive a collect request in the UPI app you used to create your VPA
+                    You will receive a collect request in the UPI app you used to create your VPA.
                   </p>
                 </div>
               {{?}}
