@@ -478,7 +478,7 @@ Session.prototype = {
 
   hideErrorMessage: function() {
     if(this.r._payment) {
-      if (this.payload.method === 'upi') {
+      if (this.payload && this.payload.method === 'upi') {
         return cancel_upi(this);
       }
       if(confirmClose()) {
