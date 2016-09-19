@@ -151,7 +151,7 @@ gulp.task('uploadStaticAssetsToCDN', function(){
     'Cache-Control': 'max-age=315360000, no-transform, public'
   };
 
-  return gulp.src([`${distDir}/fonts/*`, `${distDir}/images/*`])
+  return gulp.src([`${distDir}/fonts/*`, `${distDir}/images/**/*`])
      // gzip, Set Content-Encoding headers and add .gz extension
     .pipe(awspublish.gzip({ ext: '' }))
 
