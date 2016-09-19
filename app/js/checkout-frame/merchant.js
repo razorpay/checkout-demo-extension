@@ -135,7 +135,8 @@ var tab_titles = sessProto.tab_titles = {
   emi: 'EMI',
   card: 'Card',
   netbanking: 'Netbanking',
-  wallet: 'Wallet'
+  wallet: 'Wallet',
+  upi: 'UPI'
 }
 
 function notifyBridge(message){
@@ -177,7 +178,7 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (methods.emi && !session.get('theme.emi_tab')) {
+  if (methods.emi) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   }
@@ -202,6 +203,10 @@ function setPaymentMethods(session){
   }
 
   if (methods.card) {
+    methods.count++;
+  }
+
+  if (methods.upi) {
     methods.count++;
   }
 

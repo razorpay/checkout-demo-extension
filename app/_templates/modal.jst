@@ -13,14 +13,6 @@ if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
-
-var i = 0;
-var methods = ['card', 'netbanking', 'wallet'];
-
-for(var m in methods) {
-  if(method[methods[m]])
-    i++;
-}
 }}
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -33,8 +25,24 @@ for(var m in methods) {
         <div id="fd-t"></div>
         <div class="spin"><div></div></div>
         <div class="spin spin2"><div></div></div>
-        <span class="link">Go to payment</span>
+        <span class="link"></span>
         <button id="fd-hide" class="btn">Retry</button>
+        <div id="cancel_upi">
+          <p>Please specify the reason</p>
+          <label for="upi-1"><input id="upi-1" type="radio" name="_[reason]" value="collect_not_received">
+            Did not receive collect request
+          </label>
+          <label for="upi-2"><input id="upi-2" type="radio" name="_[reason]" value="failed_in_app">
+            Payment failed in UPI app
+          </label>
+          <label for="upi-3"><input id="upi-3" type="radio" name="_[reason]" value="money_deducted">
+            Money got deducted but payment is still processing
+          </label>
+          <label for="upi-4"><input id="upi-4" type="radio" name="_[reason]" value="other">
+            Other
+          </label>
+          <button class="btn">Submit</button>
+        </div>
       </div>
       <div id="content">
         <div id="header">
@@ -121,6 +129,9 @@ for(var m in methods) {
                     {{?}}
                     {{? wallet.length }}
                     <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
+                    {{?}}
+                    {{? method.upi }}
+                    <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>{{=it.tab_titles.upi}}</label></div>
                     {{?}}
                   </div>
                   <div class="clear"></div>
@@ -235,7 +246,7 @@ for(var m in methods) {
                     </div></div>
                 </div>
               {{?}}
-              {{ if(wallet.length){ }}
+              {{? wallet.length }}
                 <div class="tab-content showable screen" id="form-wallet">
                   {{ var count = 0, max = 3; }}
                   <div id="wallets" class="grid count-{{=wallet.length}}">
@@ -261,7 +272,19 @@ for(var m in methods) {
                     <span class="help">Please select one of the wallets</span>
                   </div>
                 </div>
-              {{}}}
+              {{?}}
+              {{?method.upi}}
+                <div class="tab-content showable screen pad" id="form-upi">
+                  <div class="elem-wrap"><div class="elem">
+                    <div class="help">VPA should be of format abc@xyz</div>
+                    <label>Virtual payment address</label>
+                    <input class="input" id="vpa" name="vpa" placeholder="Enter VPA here" required pattern=".+@.+" value="{{=attr(o('prefill.vpa'))}}">
+                  </div></div>
+                  <p>
+                    You will receive a collect request in the UPI app you used to create your VPA
+                  </p>
+                </div>
+              {{?}}
 
               <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>

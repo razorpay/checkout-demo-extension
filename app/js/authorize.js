@@ -62,14 +62,15 @@ function submitPopup(payment) {
   }
 }
 
-function onPaymentCancel(errorObj) {
+function onPaymentCancel(metaParam) {
   if (!this.done) {
     var cancelError = discreet.error();
     var payment_id = this.payment_id;
     var razorpay = this.r;
     if (payment_id) {
       track(razorpay, 'cancel', {payment_id: payment_id});
-      $.ajax({
+      var requestMethod = 'ajax';
+      var ajaxObj = {
         url: makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel'),
         callback: bind(function(response) {
           if (response.razorpay_payment_id) {
@@ -79,7 +80,12 @@ function onPaymentCancel(errorObj) {
           }
           this.complete(response);
         }, this)
-      });
+      }
+      if (isNonNullObject(metaParam)) {
+        requestMethod = 'post';
+        ajaxObj.data = metaParam;
+      }
+      $[requestMethod](ajaxObj);
     } else {
       track(razorpay, 'cancel');
       this.complete(cancelError);
@@ -114,7 +120,7 @@ function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   this.fees = params.fees;
-  this.powerwallet = params.powerwallet;
+  this.powerwallet = params.powerwallet || data.method === 'upi';
   this.message = params.message;
 
   this.tryPopup();
@@ -181,7 +187,8 @@ Payment.prototype = {
       data.key_id = getOption('key');
     }
 
-    if(this.powerwallet){
+    // api needs this flag to decide between redirect/otp
+    if (this.powerwallet && data.method === 'wallet') {
       data['_[source]'] = 'checkoutjs';
     }
     // flatten notes, card
@@ -212,14 +219,14 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if(discreet.isFrame){
+    if (discreet.isFrame && !this.powerwallet) {
       var complete = window.onComplete = bind(this.complete, this);
       pollPaymentData(complete);
     }
     this.offmessage = $(window).on('message', bind(onMessage, this));
   },
 
-  complete: function(data){
+  complete: function(data) {
     if (this.done) {
       return;
     }
@@ -264,7 +271,7 @@ Payment.prototype = {
     this.r._payment = null;
   },
 
-  tryAjax: function(){
+  tryAjax: function() {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.fees) {
@@ -430,6 +437,17 @@ var responseTypes = {
     }
   },
 
+  async: function(request) {
+    var self = this;
+    recurseAjax(request.url + '?key_id=' + self.r.get('key'), function(response) {
+      self.complete(response);
+    }, function(response) {
+      self.ajax = this;
+      return response && response.status;
+    })
+    self.emit('upi.pending');
+  },
+
   otp: function(request){
     this.otpurl = request.url;
     this.emit('otp.required');
@@ -470,7 +488,7 @@ razorpayProto.focus = function() {
   } catch(e) {}
 }
 
-razorpayProto.submitOTP = function(otp){
+razorpayProto.submitOTP = function(otp) {
   var payment = this._payment;
   payment.ajax = $.post({
     url: payment.otpurl,
@@ -482,7 +500,7 @@ razorpayProto.submitOTP = function(otp){
   })
 }
 
-razorpayProto.resendOTP = function(callback){
+razorpayProto.resendOTP = function(callback) {
   var payment = this._payment;
   payment.ajax = $.post({
     url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend'),

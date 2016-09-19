@@ -288,6 +288,13 @@ function successHandler(response){
   this.hide();
 }
 
+function cancel_upi(session) {
+  $('#error-message').addClass('cancel_upi');
+  session.r.on('payment.error', function() {
+    $('#error-message').removeClass('cancel_upi');
+  })
+}
+
 function Session (options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
@@ -469,9 +476,12 @@ Session.prototype = {
     }
   },
 
-  hideErrorMessage: function(){
-    if(this.r._payment){
-      if(confirmClose()){
+  hideErrorMessage: function() {
+    if(this.r._payment) {
+      if (this.payload && this.payload.method === 'upi') {
+        return cancel_upi(this);
+      }
+      if(confirmClose()) {
         this.clearRequest();
       } else {
         return;
@@ -587,6 +597,15 @@ Session.prototype = {
       } catch(e) {}
     }
 
+    if (enabledMethods.upi) {
+      this.on('click', '#cancel_upi .btn', function() {
+        var upi_radio = $('#upi-1');
+        var metaParam = {};
+        metaParam[upi_radio.prop('name')] = upi_radio.val();
+        this.clearRequest(metaParam);
+      })
+    }
+
     var goto_payment = '#error-message .link';
     if (this.get('redirect')) {
       $(goto_payment).hide();
@@ -595,7 +614,10 @@ Session.prototype = {
         $('#moreinfo').hide();
       }
     } else {
-      this.on('click', goto_payment, function(){
+      this.on('click', goto_payment, function() {
+        if (this.payload && this.payload.method === 'upi') {
+          return cancel_upi(this);
+        }
         this.r.focus();
       })
     }
@@ -604,7 +626,7 @@ Session.prototype = {
     this.on('click', '#fd-hide', this.hideErrorMessage);
   },
 
-  setFormatting: function(){
+  setFormatting: function() {
     var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
     var bits = this.bits;
     bits.push(inputHandler);
@@ -701,17 +723,6 @@ Session.prototype = {
   },
 
   switchTab: function(tab) {
-    if (this.get('theme.emi_tab')) {
-      if (tab === 'emi') {
-        tab_titles.card = 'EMI';
-        $('#elem-emi').css('display', 'block');
-        tab = 'card';
-      } else if (tab === 'card') {
-        tab_titles.card = 'Card';
-        $('#elem-emi').hide();
-      }
-    }
-
     // initial screen
     if (!this.tab){
       if (this.checkInvalid('#form-common')) {
@@ -1057,13 +1068,13 @@ Session.prototype = {
     }, bind(callback, this));
   },
 
-  clearRequest: function(){
+  clearRequest: function(extra){
     var powerotp = gel('powerotp');
     if (powerotp) {
       powerotp.value = '';
     }
     if (this.r._payment) {
-      this.r.emit('payment.cancel');
+      this.r.emit('payment.cancel', extra);
     }
 
     clearTimeout(this.requestTimeout);
@@ -1176,7 +1187,8 @@ Session.prototype = {
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this));
 
-    if(request.powerwallet) {
+    var sub_link = $('#error-message .link');
+    if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on('payment.wallet.topup', function() {
@@ -1184,10 +1196,14 @@ Session.prototype = {
         $('#add-funds').addClass('show');
         setOtpText('Insufficient balance in your wallet');
       });
+    } else if (data.method === 'upi') {
+      sub_link.html('Cancel Payment')
+      this.r.on('payment.upi.pending', bind('showLoadError', this,
+        'Please accept collect request on app'
+      ));
     } else {
-      this.r.on('payment.cancel', bind(function() {
-        this.showLoadError(discreet.cancelMsg, true);
-      }, this))
+      sub_link.html('Go to payment')
+      this.r.on('payment.cancel', bind('showLoadError', this, discreet.cancelMsg, true));
     }
   },
 
