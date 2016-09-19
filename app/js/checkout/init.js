@@ -20,7 +20,8 @@ RazorpayDefaults.method = {
   netbanking: true,
   card: true,
   wallet: null,
-  emi: true
+  emi: true,
+  upi: false
 }
 RazorpayDefaults.prefill = {
   method: '',
