@@ -599,10 +599,16 @@ Session.prototype = {
 
     if (enabledMethods.upi) {
       this.on('click', '#cancel_upi .btn', function() {
-        var upi_radio = $('#upi-1');
+        var upi_radio = $('#cancel_upi input:checked');
+        if (!upi_radio[0]) {
+          return;
+        }
         var metaParam = {};
         metaParam[upi_radio.prop('name')] = upi_radio.val();
         this.clearRequest(metaParam);
+      })
+      this.on('click', '#cancel_upi .back-btn', function() {
+        $('#error-message').removeClass('cancel_upi');
       })
     }
 
