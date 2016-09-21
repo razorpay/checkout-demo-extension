@@ -21,7 +21,7 @@ RazorpayDefaults.method = {
   card: true,
   wallet: null,
   emi: true,
-  upi: false
+  upi: true
 }
 RazorpayDefaults.prefill = {
   method: '',
