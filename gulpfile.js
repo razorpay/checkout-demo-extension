@@ -322,4 +322,11 @@ gulp.task('custom', ()=> {
             sed -i '1i${prefix}' custom/*.js
             cp dist/v1/css/checkout.css custom
           `)
+
+  if (argv.host) {
+    execSync(`
+              scp -r app/custom ${argv.host}
+              rm -r app/custom
+            `)
+  }
 })
