@@ -1213,7 +1213,7 @@ Session.prototype = {
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment')
       this.r.on('payment.upi.pending', bind('showLoadError', this,
-        'Please accept collect request on app'
+        'Please accept collect request from <strong>razorpay@icici</strong> on your UPI app'
       ));
     } else {
       sub_link.html('Go to payment')
