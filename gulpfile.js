@@ -309,7 +309,7 @@ gulp.task('custom', ['build'], ()=> {
   var prefix = `
   Razorpay = {
     config: {
-      frame: document.currentScript.src.replace(/\\\\/[^\\\\/]+$/, "/checkout.html"),
+      frame: document.currentScript.src.replace(/\\\\/[^\\\\/]+$/, "/custom.html"),
       frameApi: "${api}"
     }
   }
@@ -321,6 +321,7 @@ gulp.task('custom', ['build'], ()=> {
             cp dist/v1/{checkout,checkout-frame}.js custom
             sed -i '1i${prefix}' custom/*.js
             cp dist/v1/css/checkout.css custom
+            cp custom.html custom/
           `)
   console.log('files generated at app/custom')
   if (argv.host) {
