@@ -304,7 +304,7 @@ gulp.task('test:e2e', (cb) => {
 gulp.task('test', ()=> runSequence('test:unit', 'test:e2e'))
 
 const argv = minimist(process.argv.slice(1));
-gulp.task('custom', ()=> {
+gulp.task('custom', ['build'], ()=> {
   var api = argv.api ? argv.api.replace(/(.)\/?$/, '$1/') : 'https://api.razorpay.com/';
   var prefix = `
   Razorpay = {
@@ -322,10 +322,11 @@ gulp.task('custom', ()=> {
             sed -i '1i${prefix}' custom/*.js
             cp dist/v1/css/checkout.css custom
           `)
-
+  console.log('files generated at app/custom')
   if (argv.host) {
+    console.log(`uploading to ${argv.host}`)
     execSync(`
-              scp -r app/custom ${argv.host}
+              rsync app/custom/* ${argv.host}
               rm -r app/custom
             `)
   }
