@@ -303,7 +303,6 @@ function showModal(session) {
   Razorpay.configure(options);
   showModalWithSession(session);
 }
-
 function showModalWithSession(session){
   setPaymentMethods(session);
   session.order = preferences.order;
@@ -311,6 +310,13 @@ function showModalWithSession(session){
   Razorpay.sendMessage({event: 'render'});
 
   if (CheckoutBridge) {
+    if (isFunction(CheckoutBridge.setDimensions)) {
+      var containerBox = $('#container')[0];
+      if (containerBox) {
+        var rect = containerBox.getBoundingClientRect();
+        CheckoutBridge.setDimensions(Math.floor(rect.width), Math.floor(rect.height));
+      }
+    }
     $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
   }
 
