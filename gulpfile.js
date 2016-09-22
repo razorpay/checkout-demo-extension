@@ -309,7 +309,7 @@ gulp.task('custom', ()=> {
   var prefix = `
   Razorpay = {
     config: {
-      frame: document.currentScript.src.replace(/\/[^\/]+$/, "/checkout.html"),
+      frame: document.currentScript.src.replace(/\\\\/[^\\\\/]+$/, "/checkout.html"),
       frameApi: "${api}"
     }
   }
