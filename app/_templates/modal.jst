@@ -59,7 +59,7 @@ else
             {{?o('name')}}
               <div id="merchant-name">{{=html(o('name'))}}</div>
             {{?}}
-            <div id="merchant-desc">{{=html(o('description'))}}</div>
+            <div id="merchant-desc">{{=html(o('description').trim())}}</div>
             <div id="amount">{{=amount}}</div>
           </div>
         </div>
