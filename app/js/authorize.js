@@ -69,9 +69,14 @@ function onPaymentCancel(metaParam) {
     var razorpay = this.r;
     if (payment_id) {
       track(razorpay, 'cancel', {payment_id: payment_id});
-      var requestMethod = 'ajax';
-      var ajaxObj = {
-        url: makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel'),
+      var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
+      if (isNonNullObject(metaParam)) {
+        each(metaParam, function(key, val) {
+          url += '&' + key + '=' + val;
+        })
+      }
+      $.ajax({
+        url: url,
         callback: bind(function(response) {
           if (response.razorpay_payment_id) {
             track(razorpay, 'cancel_success', response);
@@ -80,12 +85,7 @@ function onPaymentCancel(metaParam) {
           }
           this.complete(response);
         }, this)
-      }
-      if (isNonNullObject(metaParam)) {
-        requestMethod = 'post';
-        ajaxObj.data = metaParam;
-      }
-      $[requestMethod](ajaxObj);
+      });
     } else {
       track(razorpay, 'cancel');
       this.complete(cancelError);
