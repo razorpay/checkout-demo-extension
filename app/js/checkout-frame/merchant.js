@@ -305,7 +305,21 @@ function showModal(session) {
 }
 function showModalWithSession(session){
   setPaymentMethods(session);
-  session.order = preferences.order;
+
+  var order = session.order = preferences.order;
+  var get = session.get;
+  var contact = get('prefill.contact');
+  var email = get('prefill.email');
+
+  if (order && order.bank && get('callback_url') && contact && email) {
+    get().redirect = true;
+    return session.r.createPayment({
+      contact: contact,
+      email: email,
+      bank: order.bank,
+      method: 'netbanking'
+    })
+  }
   session.render();
   Razorpay.sendMessage({event: 'render'});
 
