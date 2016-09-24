@@ -653,22 +653,22 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var delegator = this.delegator = new FormatDelegator(this.el);
+      var delegator = this.delegator = Razorpay.setFormatter(this.el);
       delegator.card = delegator.add('card', el_card)
+        .on('network', function(o) {
+          var type = o.type;
+          // update cvv element
+          var cvvlen = type !== 'amex' ? 3 : 4;
+          el_cvv.maxLength = cvvlen;
+          el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+          inputHandler.input({target: el_cvv});
+
+          // card icon element
+          this.el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
+        })
         .on('change', function(o) {
           var type = o.type;
           var parent = this.el.parentNode;
-
-          if (type !== this.type) {
-            // update cvv element
-            var cvvlen = type !== 'amex' ? 3 : 4;
-            el_cvv.maxLength = cvvlen;
-            el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-            inputHandler.input({target: el_cvv});
-
-            // card icon element
-            parent.querySelector('.cardtype').setAttribute('cardtype', type);
-          }
 
           var isValid = this.valid();
           // set validity classes
@@ -680,7 +680,7 @@ Session.prototype = {
           }
         })
 
-      delegator.expiry = delegator.add('date', el_expiry)
+      delegator.expiry = delegator.add('expiry', el_expiry)
         .on('change', function() {
           inputHandler.input({target: el_expiry});
 

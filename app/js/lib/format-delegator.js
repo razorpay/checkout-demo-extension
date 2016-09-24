@@ -1,7 +1,10 @@
 var FormatDelegator;
 
 (function() {
-  FormatDelegator = function(el) {
+  Razorpay.setFormatter = FormatDelegator = function(el) {
+    if (!(this instanceof FormatDelegator)) {
+      return new FormatDelegator(el);
+    }
     EvtHandler.call(this, el);
     this.bits = [];
 

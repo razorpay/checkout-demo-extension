@@ -116,16 +116,16 @@ var Formatter;
 
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
-    if (rawValue !== this.value) {
-      this.value = rawValue;
-      this.oninput();
-    }
 
     var pretty = this.pretty(rawValue, values.trim);
     if (pretty !== values.value) {
       preventDefault(values.e);
       this.el.value = pretty;
       this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
+    }
+    if (rawValue !== this.value) {
+      this.value = rawValue;
+      this.oninput();
     }
     this.prettyValue = pretty;
   }

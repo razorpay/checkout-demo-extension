@@ -90,12 +90,23 @@
 
       oninput: function() {
         var type = getType(this.value);
-        this.maxLen = getMaxLen(type);
+        var networkChanged;
 
-        this.emit('change',  {
+        if (type !== this.type) {
+          this.type = type;
+          this.maxLen = getMaxLen(type);
+          networkChanged = true;
+        }
+
+        var eventObj = {
           type: type,
           maxLen: this.maxLen
-        });
+        }
+
+        this.emit('change', eventObj);
+        if (networkChanged) {
+          this.emit('network', eventObj);
+        }
       },
 
       valid: function(value) {
@@ -106,7 +117,7 @@
       }
     },
 
-    date: {
+    expiry: {
       raw: function(value) {
         return value.replace(/\D/g, '');
       },
