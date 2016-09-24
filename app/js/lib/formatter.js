@@ -60,7 +60,7 @@ var Formatter;
     })
   }
 
-  proto.pretty = proto.raw = noop;
+  proto.pretty = proto.raw = proto.preInput = noop;
   proto.prettyValue = '';
 
   proto.oninput = function() {
@@ -116,9 +116,11 @@ var Formatter;
 
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
-    if (rawValue !== this.value) {
+    var preInputResult;
+    var isChanged = rawValue !== this.value;
+    if (isChanged) {
       this.value = rawValue;
-      this.oninput();
+      preInputResult = this.preInput();
     }
 
     var pretty = this.pretty(rawValue, values.trim);
@@ -127,7 +129,11 @@ var Formatter;
       this.el.value = pretty;
       this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
     }
+
     this.prettyValue = pretty;
+    if (isChanged) {
+      this.oninput(preInputResult);
+    }
   }
 
   proto.moveCaret = function(position) {

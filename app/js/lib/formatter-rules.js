@@ -88,17 +88,27 @@
         return prettyValue;
       },
 
-      oninput: function() {
+      preInput: function() {
         var type = getType(this.value);
-        this.maxLen = getMaxLen(type);
-
-        this.emit('change',  {
+        if (type !== this.type) {
+          this.maxLen = getMaxLen(type);
+        }
+        return {
           type: type,
-          maxLen: this.maxLen
-        });
+          maxLen: this.maxLen,
+          valid: this.isValid()
+        }
       },
 
-      valid: function(value) {
+      oninput: function(o) {
+        this.emit('change', o);
+        if (o && o.type !== this.type) {
+          this.type = o.type;
+          this.emit('network', o);
+        }
+      },
+
+      isValid: function(value) {
         if (!value) {
           value = this.value;
         }
@@ -106,7 +116,7 @@
       }
     },
 
-    date: {
+    expiry: {
       raw: function(value) {
         return value.replace(/\D/g, '');
       },
@@ -124,7 +134,13 @@
         return value;
       },
 
-      valid: function() {
+      oninput: function() {
+        this.emit('change', {
+          valid: this.isValid()
+        });
+      },
+
+      isValid: function() {
         if (this.value.length === 4) {
           var yearValue = parseInt(this.value.slice(2), 10);
           var currentTime = new Date();

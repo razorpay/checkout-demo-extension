@@ -92,7 +92,11 @@ var Eventer;
       each(this._evts[event], function(i, callback) {
         try {
           callback.call(this, arg);
-        } catch(e) {}
+        } catch(e) {
+          if (console.error) {
+            console.error(e);
+          }
+        }
       }, this)
       return this;
     },
