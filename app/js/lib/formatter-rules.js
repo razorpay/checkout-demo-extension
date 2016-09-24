@@ -88,24 +88,23 @@
         return prettyValue;
       },
 
-      oninput: function() {
+      preInput: function() {
         var type = getType(this.value);
-        var networkChanged;
-
         if (type !== this.type) {
-          this.type = type;
           this.maxLen = getMaxLen(type);
           networkChanged = true;
         }
-
-        var eventObj = {
+        return eventObj = {
           type: type,
           maxLen: this.maxLen,
           valid: this.isValid()
         }
+      },
 
+      oninput: function(o) {
         this.emit('change', eventObj);
-        if (networkChanged) {
+        if (o && o.type !== this.type) {
+          this.type = o.type;
           this.emit('network', eventObj);
         }
       },
