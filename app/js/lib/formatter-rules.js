@@ -92,9 +92,8 @@
         var type = getType(this.value);
         if (type !== this.type) {
           this.maxLen = getMaxLen(type);
-          networkChanged = true;
         }
-        return eventObj = {
+        return {
           type: type,
           maxLen: this.maxLen,
           valid: this.isValid()
@@ -102,10 +101,10 @@
       },
 
       oninput: function(o) {
-        this.emit('change', eventObj);
+        this.emit('change', o);
         if (o && o.type !== this.type) {
           this.type = o.type;
-          this.emit('network', eventObj);
+          this.emit('network', o);
         }
       },
 
