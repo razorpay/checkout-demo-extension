@@ -661,18 +661,15 @@ Session.prototype = {
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
           el_cvv.pattern = '[0-9]{'+cvvlen+'}';
-          inputHandler.input({target: el_cvv});
 
           // card icon element
           this.el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
         })
         .on('change', function(o) {
-          var type = o.type;
-          var parent = this.el.parentNode;
-
+          inputHandler.input({target: el_cvv});
           var isValid = o.valid;
           // set validity classes
-          toggleInvalid($(parent), isValid);
+          toggleInvalid($(this.el.parentNode), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
           if (shouldFocusNextField && isValid && this.value.length === this.maxLen) {
