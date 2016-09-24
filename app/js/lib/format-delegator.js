@@ -1,7 +1,7 @@
 var FormatDelegator;
 
 (function() {
-  Razorpay.setFormatter = FormatDelegator = function(el) {
+  FormatDelegator = function(el) {
     if (!(this instanceof FormatDelegator)) {
       return new FormatDelegator(el);
     }
