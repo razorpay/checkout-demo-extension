@@ -117,7 +117,8 @@ var Formatter;
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
     var preInputResult;
-    if (rawValue !== this.value) {
+    var isChanged = rawValue !== this.value;
+    if (isChanged) {
       this.value = rawValue;
       preInputResult = this.preInput();
     }
@@ -130,7 +131,9 @@ var Formatter;
     }
 
     this.prettyValue = pretty;
-    this.oninput(preInputResult);
+    if (isChanged) {
+      this.oninput(preInputResult);
+    }
   }
 
   proto.moveCaret = function(position) {
