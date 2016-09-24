@@ -100,7 +100,8 @@
 
         var eventObj = {
           type: type,
-          maxLen: this.maxLen
+          maxLen: this.maxLen,
+          valid: this.isValid()
         }
 
         this.emit('change', eventObj);
@@ -109,7 +110,7 @@
         }
       },
 
-      valid: function(value) {
+      isValid: function(value) {
         if (!value) {
           value = this.value;
         }
@@ -135,7 +136,13 @@
         return value;
       },
 
-      valid: function() {
+      oninput: function() {
+        this.emit('change', {
+          valid: this.isValid()
+        });
+      },
+
+      isValid: function() {
         if (this.value.length === 4) {
           var yearValue = parseInt(this.value.slice(2), 10);
           var currentTime = new Date();

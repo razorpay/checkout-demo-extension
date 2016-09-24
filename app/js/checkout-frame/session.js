@@ -670,7 +670,7 @@ Session.prototype = {
           var type = o.type;
           var parent = this.el.parentNode;
 
-          var isValid = this.valid();
+          var isValid = o.valid;
           // set validity classes
           toggleInvalid($(parent), isValid);
 
@@ -681,10 +681,10 @@ Session.prototype = {
         })
 
       delegator.expiry = delegator.add('expiry', el_expiry)
-        .on('change', function() {
+        .on('change', function(o) {
           inputHandler.input({target: el_expiry});
 
-          var isValid = this.valid();
+          var isValid = o.valid;
           toggleInvalid($(this.el.parentNode), isValid);
 
           if (shouldFocusNextField && isValid) {
