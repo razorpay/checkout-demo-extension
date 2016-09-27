@@ -278,7 +278,7 @@ Payment.prototype = {
       return false;
     }
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if (!discreet.isFrame && (/MSIE /.test(ua) || data.wallet === 'payumoney')) {
+    if (!discreet.isFrame && (/MSIE /.test(ua) || data.wallet === 'payumoney' || data.wallet === 'olamoney')) {
       return false;
     }
     // iphone background ajax route
