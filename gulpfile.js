@@ -26,6 +26,7 @@ const webdriver = require('gulp-webdriver');
 const testServer = require('./test/e2e/server/index.js');
 const internalIp = require('internal-ip');
 const lazypipe = require('lazypipe');
+const minimist = require('minimist');
 
 const distDir = 'app/dist/v1/';
 
@@ -301,3 +302,33 @@ gulp.task('test:e2e', (cb) => {
 })
 
 gulp.task('test', ()=> runSequence('test:unit', 'test:e2e'))
+
+const argv = minimist(process.argv.slice(1));
+gulp.task('custom', ['build'], ()=> {
+  var api = argv.api ? argv.api.replace(/(.)\/?$/, '$1/') : 'https://api.razorpay.com/';
+  var prefix = `
+  Razorpay = {
+    config: {
+      frame: document.currentScript.src.replace(/\\\\/[^\\\\/]+$/, "/custom.html"),
+      frameApi: "${api}"
+    }
+  }
+  `.replace(/\s/g, '')
+
+  execSync(`
+            cd app
+            mkdir -p custom
+            cp dist/v1/{checkout,checkout-frame}.js custom
+            sed -i '1i${prefix}' custom/*.js
+            cp dist/v1/css/checkout.css custom
+            cp custom.html custom/
+          `)
+  console.log('files generated at app/custom')
+  if (argv.host) {
+    console.log(`uploading to ${argv.host}`)
+    execSync(`
+              rsync app/custom/* ${argv.host}
+              rm -r app/custom
+            `)
+  }
+})
