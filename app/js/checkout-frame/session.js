@@ -1200,8 +1200,10 @@ Session.prototype = {
       this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on('payment.wallet.topup', bind(function() {
         var insufficient_text = 'Insufficient balance in your wallet';
-        if (this.isMobile && this.payload && this.payload.wallet === 'payumoney' && this.r._payment) {
-          return this.r._payment.complete(discreet.error(insufficient_text));
+        if (this.payload && this.payload.wallet === 'payumoney' && this.r._payment) {
+          if (!window.localStorage) {
+            return this.r._payment.complete(discreet.error(insufficient_text));
+          }
         }
         $('#form-otp').removeClass('loading');
         $('#add-funds').addClass('show');
