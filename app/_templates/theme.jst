@@ -32,6 +32,7 @@ var close = it('theme.close_button');
   background: {{=c}};
 }
 
+{{?it.image_padding}}
 .merchant-image{
   width: 60px;
   height: 60px;
@@ -39,6 +40,7 @@ var close = it('theme.close_button');
   border: 1px solid #eaeaea;
   background: #fff;
 }
+{{?}}
 
 .option.active,
 .checked .checkbox,
