@@ -669,7 +669,7 @@ Session.prototype = {
           inputHandler.input({target: el_cvv});
           var isValid = o.valid;
           // set validity classes
-          toggleInvalid($(this.el.parentNode), isValid);
+          // toggleInvalid($(this.el.parentNode), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
           if (shouldFocusNextField && isValid && this.value.length === this.maxLen) {
@@ -682,7 +682,7 @@ Session.prototype = {
           inputHandler.input({target: el_expiry});
 
           var isValid = o.valid;
-          toggleInvalid($(this.el.parentNode), isValid);
+          // toggleInvalid($(this.el.parentNode), isValid);
 
           if (shouldFocusNextField && isValid) {
             defer(bind('focus', el_name.value ? el_cvv : el_name));
@@ -1181,7 +1181,7 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    if ((wallet === 'mobikwik' || wallet === 'payumoney' || wallet === 'olamoney') && !request.fees) {
+    if ((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees) {
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
