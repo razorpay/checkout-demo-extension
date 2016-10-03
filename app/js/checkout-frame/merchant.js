@@ -50,9 +50,9 @@ var freqWallets = sessProto.walletData = {
     h: 32,
     col: RazorpayConfig.cdn + 'airtelmoney.png'
   },
-  paytm: {
-    h: 16,
-    col: RazorpayConfig.cdn + 'paytm.gif'
+  freecharge: {
+    h: 18,
+    col: RazorpayConfig.cdn + 'freecharge.png'
   },
   mobikwik: {
     h: 19,
