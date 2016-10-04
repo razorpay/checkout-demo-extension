@@ -274,7 +274,7 @@ Payment.prototype = {
   tryAjax: function() {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
-    if (this.fees) {
+    if (this.fees || data.wallet === 'olamoney') {
       return false;
     }
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
