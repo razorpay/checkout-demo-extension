@@ -1181,7 +1181,7 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    if ((wallet === 'mobikwik' || wallet === 'payumoney') && !request.fees) {
+    if ((wallet === 'mobikwik' || wallet === 'payumoney' || wallet === 'freecharge') && !request.fees) {
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
