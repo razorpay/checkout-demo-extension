@@ -50,7 +50,7 @@ var walletPrefix = RazorpayConfig.cdn + 'wallet/';
 var freqWallets = sessProto.walletData = {
   paytm: {
     h: 18,
-    col: walletPrefix + 'paytm.gif'
+    col: walletPrefix + 'paytm.png'
   },
   airtelmoney: {
     h: 32,
