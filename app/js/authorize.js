@@ -274,11 +274,11 @@ Payment.prototype = {
   tryAjax: function() {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
-    if (this.fees || data.wallet === 'olamoney') {
+    if (this.fees) {
       return false;
     }
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if (!discreet.isFrame && (/MSIE /.test(ua) || data.wallet === 'payumoney' || data.wallet === 'freecharge')) {
+    if (!discreet.isFrame && (/MSIE /.test(ua) || data.wallet === 'payumoney' || data.wallet === 'freecharge' || data.wallet ==='olamoney')) {
       return false;
     }
     // iphone background ajax route
