@@ -323,14 +323,12 @@ function showModalWithSession(session){
 
   var order = session.order = preferences.order;
   var get = session.get;
-  var contact = get('prefill.contact');
-  var email = get('prefill.email');
 
-  if (order && order.bank && get('callback_url') && contact && email) {
+  if (order && order.bank && get('callback_url')) {
     get().redirect = true;
     return session.r.createPayment({
-      contact: contact,
-      email: email,
+      contact: get('prefill.contact') || '9999999999',
+      email: get('prefill.email') || 'void@razorpay.com',
       bank: order.bank,
       method: 'netbanking'
     })
