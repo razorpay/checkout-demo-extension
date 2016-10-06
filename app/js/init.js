@@ -97,6 +97,7 @@ var RazorpayDefaults = Razorpay.defaults = {
   'redirect': false,
   'description': '',
   'customer_id': '',
+  'recurring': null,
   'signature': ''
 };
 

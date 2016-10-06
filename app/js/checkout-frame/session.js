@@ -578,7 +578,7 @@ Session.prototype = {
       if (saveTick) {
         this.on('change', '#save', function(e){
           this.track('change_save', {active: e.target.checked});
-        })        
+        })
       }
 
       // saved cards events
@@ -1227,9 +1227,15 @@ Session.prototype = {
       setEmiBank(data);
 
       var customer = this.customer;
+      var recurring = this.get('recurring');
+
       // set app_token if either new card or saved card (might be blank)
-      if (customer.customer_id && (data.save || data.token)) {
+      if (customer.customer_id) {
         data.customer_id = customer.customer_id;
+
+        if (recurring !== null) {
+          data.recurring = recurring ? 1 : 0;
+        }
       }
     }
 
