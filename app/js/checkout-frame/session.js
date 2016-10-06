@@ -1239,7 +1239,7 @@ Session.prototype = {
         data.customer_id = customer.customer_id;
       }
 
-      if (recurring !== null) {
+      if (customer_id && recurring !== null) {
         data.recurring = this.get('recurring') ? 1 : 0;
       }
     }
