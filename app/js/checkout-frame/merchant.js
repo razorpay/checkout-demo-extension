@@ -285,12 +285,8 @@ function showModal(session) {
     invoke('setMerchantOptions', CheckoutBridge, JSON.stringify(options));
   }
 
-  var session_options = session.get();
-
-  session_options['customer_id'] = preferences.customer ?
-    preferences.customer.customer_id || '' : '';
-
   if (saved_customer) {
+    var session_options = session.get();
     // we put saved customer contact, email into default prefills
     if (saved_customer.contact) {
       session_options['prefill.contact'] = saved_customer.contact;

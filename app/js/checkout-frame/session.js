@@ -1222,7 +1222,6 @@ Session.prototype = {
 
   getPayload: function(){
     var data = this.getFormData();
-    var customer_id = this.get('customer_id');
 
     if(this.screen === 'card'){
       setEmiBank(data);
@@ -1231,21 +1230,13 @@ Session.prototype = {
       var recurring = this.get('recurring');
 
       // set app_token if either new card or saved card (might be blank)
-      /**
-       * TODO: remove this safely. data.customer_id is to be added to all the
-       * screens (if exist in options).
-       */
-      if (customer.customer_id && (data.save || data.token)) {
+      if (customer.customer_id) {
         data.customer_id = customer.customer_id;
-      }
 
-      if (customer_id && recurring !== null) {
-        data.recurring = this.get('recurring') ? 1 : 0;
+        if (recurring !== null) {
+          data.recurring = recurring ? 1 : 0;
+        }
       }
-    }
-
-    if (!data.customer_id && customer_id) {
-      data.customer_id = customer_id;
     }
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
