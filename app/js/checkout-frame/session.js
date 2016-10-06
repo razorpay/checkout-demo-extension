@@ -578,7 +578,7 @@ Session.prototype = {
       if (saveTick) {
         this.on('change', '#save', function(e){
           this.track('change_save', {active: e.target.checked});
-        })        
+        })
       }
 
       // saved cards events
@@ -1222,15 +1222,30 @@ Session.prototype = {
 
   getPayload: function(){
     var data = this.getFormData();
+    var customer_id = this.get('customer_id');
 
     if(this.screen === 'card'){
       setEmiBank(data);
 
       var customer = this.customer;
+      var recurring = this.get('recurring');
+
       // set app_token if either new card or saved card (might be blank)
+      /**
+       * TODO: remove this safely. data.customer_id is to be added to all the
+       * screens (if exist in options).
+       */
       if (customer.customer_id && (data.save || data.token)) {
         data.customer_id = customer.customer_id;
       }
+
+      if (recurring !== null) {
+        data.recurring = this.get('recurring');
+      }
+    }
+
+    if (!data.customer_id && customer_id) {
+      data.customer_id = customer_id;
     }
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
