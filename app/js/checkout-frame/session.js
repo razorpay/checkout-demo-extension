@@ -1240,7 +1240,7 @@ Session.prototype = {
       }
 
       if (recurring !== null) {
-        data.recurring = this.get('recurring');
+        data.recurring = this.get('recurring') ? 1 : 0;
       }
     }
 
