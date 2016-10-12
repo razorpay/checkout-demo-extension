@@ -1190,6 +1190,14 @@ Session.prototype = {
       this.showLoadError();
     }
 
+    if (wallet === 'freecharge') {
+      $('#otp-elem').addClass('fourdigit');
+      $('#otp').attr('maxlength', 4);
+    } else {
+      $('#otp-elem').removeClass('fourdigit');
+      $('#otp').attr('maxlength', 6);
+    }
+
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this));
