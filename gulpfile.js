@@ -140,14 +140,13 @@ gulp.task('default', ['build']);
 
 gulp.task('uploadStaticAssetsToCDN', function(){
   let target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
-  if(target === 'production') target = 'live';
 
   let publisher = awspublish.create({
     accessKeyId: process.env.AWS_KEY,
     secretAccessKey: process.env.AWS_SECRET,
     region: 'us-east-1',
     params: {
-      Bucket: 'checkout-' + target
+      Bucket: 'checkout-live'
     }
   });
 
