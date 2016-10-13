@@ -36,9 +36,10 @@ Customer.prototype = {
   logged: false,
 
   // NOTE: status check api also sends otp if customer exist
-  checkStatus: function(callback){
+  checkStatus: function(callback) {
     var customer = this;
     var url = makeAuthUrl(this.key, 'customers/status/' + this.contact);
+    url += '&_[platform]=' + trackingProps.platform;
     var device_token = qpmap.device_token;
     if (device_token) {
       url += '&device_token=' + device_token;

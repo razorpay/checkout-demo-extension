@@ -439,7 +439,11 @@ var responseTypes = {
 
   async: function(request) {
     var self = this;
-    recurseAjax(request.url + '?key_id=' + self.r.get('key'), function(response) {
+    var url = request.url;
+    if (url.indexOf('key_id') === -1) {
+      url += '?key_id=' + self.r.get('key');
+    }
+    recurseAjax(url, function(response) {
       self.complete(response);
     }, function(response) {
       self.ajax = this;
