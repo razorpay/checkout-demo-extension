@@ -66,7 +66,9 @@ var Razorpay = window.Razorpay = function(overrides){
   } catch(e) {
     var message = e.message;
     if (!this.get || !this.isLiveMode()) {
-      alert(message);
+      if (isNonNullObject(overrides) && !overrides.parent) {
+        alert(message);
+      }
     }
     raise(message);
   }
@@ -234,7 +236,6 @@ var optionValidations = {
   amount: function(amount) {
     if (!isValidAmount(amount)) {
       var errorMessage = 'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
-      alert('Invalid amount. It ' + errorMessage);
       return errorMessage;
     }
   },
