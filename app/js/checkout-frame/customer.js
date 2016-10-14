@@ -56,7 +56,7 @@ Customer.prototype = {
       callback: function(data){
         customer.saved = !!data.saved;
         if (data.tokens) {
-          mark_logged(data);
+          customer.mark_logged(data);
         }
         callback();
       }
