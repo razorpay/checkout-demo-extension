@@ -446,7 +446,7 @@ Razorpay.sendMessage = function(message){
 }
 
 window.handleOTP = function(otp) {
-  otp = String(otp).replace(/\D/g, '').split('').join(' ');
+  otp = String(otp).replace(/\D/g, '');
   var session = getSession();
   var otpEl = gel('otp');
   if(session && otpEl && !otpEl.value){
