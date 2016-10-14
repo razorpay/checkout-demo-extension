@@ -463,6 +463,11 @@ i {
   }
 }
 
+#top-right {
+  height: 100%;
+  float: right;
+}
+
 #top-right,
 #top-left {
   padding: 0 $p;
@@ -491,13 +496,8 @@ $outline = #ddd;
   transition: 0.25s ease-in transform, 0.16s ease-in opacity;
   transform: translateY(-10px);
 
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
   li {
+    list-style: none;
     padding: 10px;
     font-size: 14px;
     line-height: 19px;
@@ -528,7 +528,7 @@ $outline = #ddd;
   }
 }
 
-#top-right:focus #profile {
+#top-right.logged:focus #profile {
   pointer-events: auto;
   display: block;
   opacity: 1;

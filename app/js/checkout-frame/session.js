@@ -585,6 +585,18 @@ Session.prototype = {
       this.on('click', '#show-add-card', this.toggleSavedCards);
       this.on('click', '#show-saved-cards', this.toggleSavedCards);
       this.on('change', '#saved-cards-container', this.setSavedCard, true);
+      this.on('click', '#profile', function(e) {
+        if (e.target.tagName === 'LI') {
+          var self = this;
+          var customer = self.customer;
+          customer.logout(e.target.parentNode.firstChild === e.target, function() {
+            customer.logged = false;
+            customer.tokens = null;
+            self.setSavedCards();
+            $('#top-right').removeClass('logged');
+          });
+        }
+      })
     }
     if (enabledMethods.netbanking) {
       this.on('change', '#bank-select', this.switchBank);
@@ -739,6 +751,9 @@ Session.prototype = {
         return;
       }
       this.customer = getCustomer(contact);
+      if (this.customer.logged) {
+        $('#top-right').addClass('logged');
+      }
       $('#user').html(contact);
     } else {
       this.payload = null;

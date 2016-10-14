@@ -35,6 +35,13 @@ Customer.prototype = {
   saved: false,
   logged: false,
 
+  mark_logged: function(data) {
+    this.logged = true;
+    sanitizeTokens(data.tokens);
+    this.tokens = data.tokens;
+    $('#top-right').addClass('logged');
+  },
+
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback) {
     var customer = this;
@@ -49,9 +56,7 @@ Customer.prototype = {
       callback: function(data){
         customer.saved = !!data.saved;
         if (data.tokens) {
-          customer.logged = true;
-          sanitizeTokens(data.tokens);
-          customer.tokens = data.tokens;
+          mark_logged(data);
         }
         callback();
       }
@@ -83,9 +88,9 @@ Customer.prototype = {
       url: url,
       data: data,
       callback: function(data){
-        user.logged = data.success;
-        sanitizeTokens(data.tokens);
-        user.tokens = data.tokens;
+        if (data.success) {
+          user.mark_logged(data);
+        }
         qpmap.device_token = data.device_token;
 
         if (qpmap.device_token) {
@@ -101,7 +106,7 @@ Customer.prototype = {
     })
   },
 
-  deleteCard: function(token, callback){
+  deleteCard: function(token, callback) {
     var user = this;
     if (!this.id) {
       return;
@@ -114,6 +119,16 @@ Customer.prototype = {
         deleteToken(user, token);
       }
     })
+  },
+
+  logout: function(this_device, callback) {
+    var ajaxOpts = {
+      url: makeAuthUrl(this.key, 'apps/logout'),
+      method: 'delete',
+      callback: callback
+    }
+    ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
+    $.ajax(ajaxOpts);
   }
 }
 
