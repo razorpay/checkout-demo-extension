@@ -93,7 +93,7 @@ var Formatter;
 
     this.run({
       left: value,
-      value: value,
+      value: value.slice(0, caretPosition),
       trim: value.length <= this.prettyValue.length
     })
   }
@@ -116,23 +116,25 @@ var Formatter;
 
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
-    var preInputResult;
-    var isChanged = rawValue !== this.value;
-    if (isChanged) {
-      this.value = rawValue;
-      preInputResult = this.preInput();
-    }
-
     var pretty = this.pretty(rawValue, values.trim);
-    if (pretty !== values.value) {
-      preventDefault(values.e);
-      this.el.value = pretty;
-      this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
+    // iphone: character-in-waiting is not printed if input is blurred synchronously.
+    //    prevent by default all the time and set value manually.
+    preventDefault(values.e);
+
+    if (pretty !== this.el.value) {
+      this.prettyValue = pretty;
+
+      // windows phone: if keydown is prevented, and value is changed synchronously,
+      //    it ignores one subsequent input event. made value change async to counter.
+      defer(bind(function() {
+        this.el.value = pretty;
+        this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
+      }, this))
     }
 
-    this.prettyValue = pretty;
-    if (isChanged) {
-      this.oninput(preInputResult);
+    if (rawValue !== this.value) {
+      this.value = rawValue;
+      this.oninput();
     }
   }
 
