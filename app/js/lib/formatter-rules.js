@@ -88,7 +88,7 @@
         return prettyValue;
       },
 
-      onInput: function() {
+      oninput: function() {
         var type = getType(this.value);
 
         var networkChanged = type !== this.type;

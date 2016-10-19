@@ -92,8 +92,8 @@ var Formatter;
     var value = this.el.value;
 
     this.run({
-      left: value,
-      value: value.slice(0, caretPosition),
+      value: value,
+      left: value.slice(0, caretPosition),
       trim: value.length <= this.prettyValue.length
     })
   }
@@ -121,7 +121,7 @@ var Formatter;
     //    prevent by default all the time and set value manually.
     preventDefault(values.e);
 
-    if (pretty !== this.el.value) {
+    if (pretty !== this.prettyValue) {
       this.prettyValue = pretty;
 
       // windows phone: if keydown is prevented, and value is changed synchronously,
