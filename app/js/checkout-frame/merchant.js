@@ -90,7 +90,7 @@ var emi_options = sessProto.emi_options = {
   selected: 'KKBK',
   banks: {
     KKBK: {
-      patt: /4(04861|78006|34669|1(4767|664[3-6])|363(88|89|90))|5(24253|43705|47981)/,
+      patt: /4(62409|04861|78006|34668|1(4767|664[3-6])|363(88|89|90))|5(24253|43705|47981)/,
       name: 'Kotak Mahindra Bank',
       plans: {
         3: 12,
