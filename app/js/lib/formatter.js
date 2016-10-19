@@ -114,6 +114,11 @@ var Formatter;
     return this;
   }
 
+  function setPrettyValue(formatter, values, pretty) {
+    formatter.el.value = pretty;
+    formatter.moveCaret(formatter.pretty(formatter.raw(values.left), values.trim).length);
+  }
+
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
     var pretty = this.pretty(rawValue, values.trim);
@@ -126,10 +131,11 @@ var Formatter;
 
       // windows phone: if keydown is prevented, and value is changed synchronously,
       //    it ignores one subsequent input event. made value change async to counter.
-      defer(bind(function() {
-        this.el.value = pretty;
-        this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
-      }, this))
+      if (isWP) {
+        defer(setPrettyValue, 0, this, values, pretty);
+      } else {
+        setPrettyValue(this, values, pretty);
+      }
     }
 
     if (rawValue !== this.value) {

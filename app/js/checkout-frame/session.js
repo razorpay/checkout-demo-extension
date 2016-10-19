@@ -646,10 +646,11 @@ Session.prototype = {
   },
 
   setFormatting: function() {
-    var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
     var bits = this.bits;
+    var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
     bits.push(inputHandler);
 
+    var delegator = this.delegator = Razorpay.setFormatter(this.el);
     if (this.methods.card) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
@@ -665,7 +666,6 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var delegator = this.delegator = Razorpay.setFormatter(this.el);
       delegator.card = delegator.add('card', el_card)
         .on('network', function(o) {
           var type = o.type;
@@ -701,10 +701,19 @@ Session.prototype = {
           }
         })
 
-      delegator.cvv = delegator.add('number', el_cvv);
-      delegator.contact = delegator.add('phone', gel('contact'));
-      delegator.otp = delegator.add('number', gel('otp'));
+      delegator.cvv = delegator.add('number', el_cvv)
+        .on('change', function() {
+          inputHandler.input({target: this.el})
+        })
     }
+    delegator.contact = delegator.add('phone', gel('contact'))
+      .on('change', function() {
+        inputHandler.input({target: this.el})
+      })
+    delegator.otp = delegator.add('number', gel('otp'))
+      .on('change', function() {
+        inputHandler.input({target: this.el})
+      })
   },
 
   setScreen: function(screen){
