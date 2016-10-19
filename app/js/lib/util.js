@@ -20,7 +20,6 @@ var ua_iOS = isua(/iPhone|iPad/);
 var ua_prefer_redirect = isua(/Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/);
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
-var shouldFocusNextField = !ua_iOS;
 
 /* simple checks */
 function isBoolean(x) {
