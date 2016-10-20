@@ -81,6 +81,10 @@ gulp.task('cleanCSS', function() {
 gulp.task('usemin', ()=> {
   return gulp.src(assetPath('*.html'))
     .pipe(usemin())
+    .pipe(through(function(file){
+      file.contents = new Buffer(`(function(){${String(file.contents)}})()`)
+      this.emit('data', file)
+    }))
     .pipe(gulp.dest(distDir))
 })
 

@@ -29,17 +29,20 @@ var Formatter;
   }
 
   Formatter.events = {
-    keypress: 'fwdFormat',
+    // keypress: 'fwdFormat',
     input: 'format',
-    change: 'format',
-    blur: 'format',
-    keydown: 'backFormat'
+    // change: 'format',
+    // blur: 'format',
+    // keydown: 'backFormat'
   }
 
   var proto = Formatter.prototype = new Eventer();
 
   proto.backFormat = function(e) {
-    if (whichKey(e) !== 8) {
+    // windows phone: if keydown is prevented, and value is changed synchronously,
+    //    it ignores one subsequent input event.
+    //    hence no back formatting in WP
+    if (isWP || whichKey(e) !== 8) {
       return;
     }
 
@@ -55,13 +58,20 @@ var Formatter;
     this.run({
       e: e,
       left: left,
-      value: left + value.slice(caret.end),
-      trim: true
+      value: left + value.slice(caret.end)
     })
   }
 
-  proto.pretty = proto.raw = proto.preInput = noop;
+  proto.pretty = noop;
   proto.prettyValue = '';
+
+  proto.raw = function(value) {
+    return value.replace(/\D/g, '')
+  }
+
+  proto.setValue = function(value) {
+    this.value = value;
+  }
 
   proto.oninput = function() {
     this.emit('change');
@@ -85,16 +95,12 @@ var Formatter;
   }
 
   proto.format = function(e) {
-    if (!arguments.length) {
-      this.value = null;
-    }
     var caretPosition = this.getCaret().start;
     var value = this.el.value;
 
     this.run({
       value: value,
-      left: value.slice(0, caretPosition),
-      trim: value.length <= this.prettyValue.length
+      left: value.slice(0, caretPosition)
     })
   }
 
@@ -114,37 +120,39 @@ var Formatter;
     return this;
   }
 
-  function setPrettyValue(formatter, values, pretty) {
-    formatter.el.value = pretty;
-    formatter.moveCaret(formatter.pretty(formatter.raw(values.left), values.trim).length);
-  }
-
   proto.run = function(values) {
     var rawValue = this.raw(values.value);
-    var pretty = this.pretty(rawValue, values.trim);
+
+    var oldValue = this.value;
+    this.setValue(rawValue);
+
+    var left = values.left;
+    var caretPos = left.length;
+
+    // trim whitespaces/insignificant characters if cursor moved leftwards
+    var shouldTrim = caretPos < this.caretPos;
+    var pretty = this.pretty(this.value, shouldTrim);
+
     // iphone: character-in-waiting is not printed if input is blurred synchronously.
     //    prevent by default all the time and set value manually.
     preventDefault(values.e);
 
-    if (pretty !== this.prettyValue) {
+    if (shouldTrim || pretty !== this.prettyValue) {
       this.prettyValue = pretty;
-
-      // windows phone: if keydown is prevented, and value is changed synchronously,
-      //    it ignores one subsequent input event. made value change async to counter.
-      if (isWP) {
-        defer(setPrettyValue, 0, this, values, pretty);
-      } else {
-        setPrettyValue(this, values, pretty);
-      }
+      this.el.value = pretty;
     }
 
-    if (rawValue !== this.value) {
-      this.value = rawValue;
-      this.oninput();
+    caretPos = this.pretty(this.raw(left), shouldTrim).length;
+    this.caretPos = caretPos;
+    this.moveCaret(caretPos);
+
+    if (oldValue !== this.value) {
+      // this.oninput();
     }
   }
 
   proto.moveCaret = function(position) {
+    // console.log('moveCaret ' + position);
     var el = this.el;
     if (isNumber(el.selectionStart)) {
       if (el.selectionStart !== position) {

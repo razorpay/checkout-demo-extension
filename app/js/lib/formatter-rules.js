@@ -75,12 +75,17 @@
 
   Formatter.rules = {
     card: {
-      raw: function(value) {
-        return value.replace(/\D/g, '');
+      setValue: function(value) {
+        var currentType = this.currentType = getType(value);
+
+        if (currentType !== this.type) {
+          this.maxLen = getMaxLen(currentType);
+        }
+        this.value = value.slice(0, this.maxLen);
       },
 
       pretty: function(value, shouldTrim) {
-        var len = this.maxLen || 16;
+        var len = this.maxLen;
         var prettyValue = value.slice(0, len).replace(getCardSpacing(len), '$1 ');
         if (shouldTrim || value.length >= len) {
           prettyValue = prettyValue.trim();
@@ -89,22 +94,16 @@
       },
 
       oninput: function() {
-        var type = getType(this.value);
-
-        var networkChanged = type !== this.type;
-        if (networkChanged) {
-          this.maxLen = getMaxLen(type);
-        }
         var o = {
-          type: type,
+          type: this.currentType,
           maxLen: this.maxLen,
           valid: this.isValid()
         }
-        this.emit('change', o);
-        if (networkChanged) {
+        if (o.type !== this.type) {
           this.type = o.type;
           this.emit('network', o);
         }
+        this.emit('change', o);
       },
 
       isValid: function(value) {
@@ -116,9 +115,6 @@
     },
 
     expiry: {
-      raw: function(value) {
-        return value.replace(/\D/g, '');
-      },
 
       pretty: function(value, shouldTrim) {
         value = value
@@ -154,7 +150,11 @@
 
     number: {
       raw: function(value) {
-        return value.replace(/\D/g, '');
+        var returnVal = value.replace(/\D/g, '');
+        if (this.el.maxLength) {
+          returnVal = returnVal.slice(0, this.el.maxLength);
+        }
+        return returnVal;
       }
     },
 
