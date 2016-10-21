@@ -184,6 +184,7 @@ function notifyBridge(message){
 }
 
 function setPaymentMethods(session){
+  var recurring = session.get('recurring');
   var availMethods = preferences.methods;
   var methods = session.methods = {
     count: 0
@@ -213,7 +214,7 @@ function setPaymentMethods(session){
     sessProto = tab_titles;
   }
 
-  if (amount >= 100*10000 || methods.wallet instanceof Array) { // php encodes blank object as blank array
+  if (amount >= 100*10000 || methods.wallet instanceof Array || recurring) { // php encodes blank object as blank array
     methods.wallet = {};
   } else if (typeof passedWallets === 'object') {
     each(
@@ -226,7 +227,7 @@ function setPaymentMethods(session){
     )
   }
 
-  if (!methods.netbanking || methods.netbanking instanceof Array) {
+  if (!methods.netbanking || methods.netbanking instanceof Array || recurring) {
     methods.netbanking = false;
   } else {
     methods.count = 1;
