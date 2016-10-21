@@ -160,9 +160,20 @@ var Formatter;
     }
 
     // move caret only if cursor is not at rightmost end.
-    if (left !== pretty) {
+    // checking for shouldUpdateDOM because just setting el.value
+    //    might not update the caret position automatically, e.g. IE9
+    if (left !== pretty || shouldUpdateDOM) {
+      // example where shouldUpdateDOM is false but first condition is true:
+      // inserting character "4" at any position in "4444 4444 4444 4444"
+      //    that doesnt require dom value change, but does require caret to be moved
       caretPosition = this.pretty(this.raw(left), shouldTrim).length;
-      this.moveCaret(caretPos);
+      if (isWP) {
+        // following is necessary, else caret only blinks at intended position.
+        //    but its at the rightmost position in effect
+        invoke('moveCaret', this, caretPosition, 0);
+      } else {
+        this.moveCaret(caretPosition);
+      }
     } // else caretPosition is already pretty.length
 
     this.caretPosition = caretPosition;
