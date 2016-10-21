@@ -646,8 +646,8 @@ Session.prototype = {
   },
 
   setFormatting: function() {
-    var bits = this.bits;
     var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
+    var bits = this.bits;
     bits.push(inputHandler);
 
     var delegator = this.delegator = Razorpay.setFormatter(this.el);
@@ -684,7 +684,7 @@ Session.prototype = {
           toggleInvalid($(this.el.parentNode), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.value.length === this.maxLen) {
+          if (isValid && this.el.value.length === o.caretPosition) {
             invoke('focus', el_expiry, null, 0);
           }
         })
@@ -696,8 +696,8 @@ Session.prototype = {
           var isValid = o.valid;
           toggleInvalid($(this.el.parentNode), isValid);
 
-          if (isValid) {
-            defer(bind('focus', el_name.value ? el_cvv : el_name));
+          if (isValid && this.el.value.length === o.caretPosition) {
+            invoke('focus', el_name.value ? el_cvv : el_name);
           }
         })
 

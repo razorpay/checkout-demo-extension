@@ -29,11 +29,11 @@ var Formatter;
   }
 
   Formatter.events = {
-    // keypress: 'fwdFormat',
+    keypress: 'fwdFormat',
     input: 'format',
-    // change: 'format',
-    // blur: 'format',
-    // keydown: 'backFormat'
+    change: 'format',
+    blur: 'format',
+    keydown: 'backFormat'
   }
 
   var proto = Formatter.prototype = new Eventer();
@@ -135,6 +135,7 @@ var Formatter;
 
     // iphone: character-in-waiting is not printed if input is blurred synchronously.
     //    prevent by default all the time and set value manually.
+    //    this takes effect only for keypress event
     preventDefault(values.e);
 
     if (shouldTrim || pretty !== this.prettyValue) {
@@ -142,12 +143,17 @@ var Formatter;
       this.el.value = pretty;
     }
 
-    caretPos = this.pretty(this.raw(left), shouldTrim).length;
+    // move caret only if cursor is not at rightmost end.
+    if (left !== values.value) {
+      caretPos = this.pretty(this.raw(left), shouldTrim).length;
+      this.moveCaret(caretPos);
+    } else {
+      caretPos = pretty.length;
+    }
     this.caretPos = caretPos;
-    this.moveCaret(caretPos);
 
     if (oldValue !== this.value) {
-      // this.oninput();
+      this.oninput();
     }
   }
 
