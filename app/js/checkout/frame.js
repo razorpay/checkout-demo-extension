@@ -1,38 +1,33 @@
 var ch_PageY = 0;
 // there is no "position: fixed" in iphone
 var docStyle = doc.style;
+var containerHeight = 504;
 var merchantMarkup = {
   overflow: '',
   meta: null,
 
-  orientationchange: function(){
-    this.el.style.height = Math.max(window.innerHeight || 0, 480) + 'px';
+  orientationchange: function() {
+    merchantMarkup.resize.call(this);
+    merchantMarkup.scroll.call(this);
+  },
+
+  resize: function() {
+    this.el.style.height = Math.max(window.innerHeight || 0, containerHeight) + 'px';
   },
 
   // scroll manually in iPhone
-  scroll: function(){
-    if(typeof window.pageYOffset !== 'number'){
+  scroll: function() {
+    if(typeof window.pageYOffset !== 'number') {
       return;
     }
-
-    var top;
-    var offTop = frameContainer.offsetTop - pageYOffset;
-    var offBot = frameContainer.offsetHeight + offTop;
-    if(ch_PageY < pageYOffset){
-      if(offBot < 0.2*innerHeight && offTop < 0){
-        top = pageYOffset + innerHeight - frameContainer.offsetHeight;
+    if (innerHeight < containerHeight) {
+      var maxY = containerHeight - innerHeight;
+      if (pageYOffset > maxY) {
+        scrollTo(0, maxY);
       }
+    } else if (!this.isFocused) {
+      scrollTo(0, Math.max(0, pageYOffset) + 'px');
     }
-    else if(ch_PageY > pageYOffset){
-      if(offTop > 0.1*innerHeight && offBot > innerHeight){
-        top = pageYOffset;
-      }
-    }
-    if (isNumber(top)) {
-      frameContainer.style.top = Math.max(0, top) + 'px';
-    }
-    ch_PageY = pageYOffset;
-
   }
 }
 
@@ -239,6 +234,7 @@ CheckoutFrame.prototype = {
       if(shouldFixFixed){
         eventPairs.orientationchange = merchantMarkup.orientationchange;
         eventPairs.scroll = merchantMarkup.scroll;
+        eventPairs.resize = merchantMarkup.resize;
       }
 
       each(
@@ -279,7 +275,6 @@ CheckoutFrame.prototype = {
     if(shouldFixFixed){
       scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
-      merchantMarkup.scroll.call(this);
     }
   },
 
@@ -324,6 +319,15 @@ CheckoutFrame.prototype = {
     if (this.rzp) {
       this.postMessage(this.makeMessage());
     }
+  },
+
+  onfocus: function() {
+    this.isFocused = true;
+  },
+
+  onblur: function() {
+    this.isFocused = false;
+    merchantMarkup.orientationchange.call(this);
   },
 
   onrender: function() {
