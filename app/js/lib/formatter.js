@@ -121,36 +121,51 @@ var Formatter;
   }
 
   proto.run = function(values) {
-    var rawValue = this.raw(values.value);
+    // domValue is would-be value, if not prevented (keypress, keydown)
+    //    we prevent all the time in that case
+    //    for events with non-preventable character printing,
+    //    it is actual current value (input, change, blur)
+    var domValue = values.value;
+    var rawValue = this.raw(domValue);
 
+    // save for later use, to compare if it was changed
     var oldValue = this.value;
     this.setValue(rawValue);
 
+    // left is substring of domValue, but leftwards of caret position
     var left = values.left;
-    var caretPos = left.length;
+    var caretPosition = left.length;
 
-    // trim whitespaces/insignificant characters if cursor moved leftwards
-    var shouldTrim = caretPos < this.caretPosition;
+    // trim whitespaces/insignificant characters if cursor has moved leftwards
+    var shouldTrim = caretPosition < this.caretPosition;
     var pretty = this.pretty(this.value, shouldTrim);
 
-    // iphone: character-in-waiting is not printed if input is blurred synchronously.
-    //    prevent by default all the time and set value manually.
-    //    this takes effect only for keypress event
-    preventDefault(values.e);
+    var shouldUpdateDOM;
+    if (values.e) {
+      // iphone: character-in-waiting is not printed if input is blurred synchronously.
+      //    prevent by default all the time and set value manually.
+      //    this takes effect for keypress, keydown events
+      preventDefault(values.e);
 
-    if (shouldTrim || pretty !== this.prettyValue) {
-      this.prettyValue = pretty;
+      // check if value was changed at all
+      shouldUpdateDOM = pretty !== this.prettyValue;
+    } else {
+      // for non-preventable events, check if current value is correct
+      shouldUpdateDOM = pretty !== domValue;
+    }
+
+    this.prettyValue = pretty;
+    if (shouldUpdateDOM) {
       this.el.value = pretty;
     }
 
     // move caret only if cursor is not at rightmost end.
-    if (left !== values.value) {
-      caretPos = this.pretty(this.raw(left), shouldTrim).length;
+    if (left !== pretty) {
+      caretPosition = this.pretty(this.raw(left), shouldTrim).length;
       this.moveCaret(caretPos);
-    } else {
-      caretPos = pretty.length;
-    }
-    this.caretPosition = caretPos;
+    } // else caretPosition is already pretty.length
+
+    this.caretPosition = caretPosition;
 
     if (oldValue !== this.value) {
       this.oninput();
