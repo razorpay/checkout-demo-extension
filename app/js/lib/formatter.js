@@ -62,7 +62,7 @@ var Formatter;
     })
   }
 
-  proto.pretty = noop;
+  proto.pretty = proto.isValid = noop;
   proto.prettyValue = '';
 
   proto.raw = function(value) {
@@ -130,7 +130,7 @@ var Formatter;
     var caretPos = left.length;
 
     // trim whitespaces/insignificant characters if cursor moved leftwards
-    var shouldTrim = caretPos < this.caretPos;
+    var shouldTrim = caretPos < this.caretPosition;
     var pretty = this.pretty(this.value, shouldTrim);
 
     // iphone: character-in-waiting is not printed if input is blurred synchronously.
@@ -150,7 +150,7 @@ var Formatter;
     } else {
       caretPos = pretty.length;
     }
-    this.caretPos = caretPos;
+    this.caretPosition = caretPos;
 
     if (oldValue !== this.value) {
       this.oninput();

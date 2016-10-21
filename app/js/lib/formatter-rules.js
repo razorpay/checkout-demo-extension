@@ -97,8 +97,7 @@
         var o = {
           type: this.currentType,
           maxLen: this.maxLen,
-          valid: this.isValid(),
-          caretPosition: this.caretPos
+          valid: this.isValid()
         }
         if (o.type !== this.type) {
           this.type = o.type;

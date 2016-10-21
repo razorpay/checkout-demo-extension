@@ -667,8 +667,8 @@ Session.prototype = {
       } catch(e){}
 
       delegator.card = delegator.add('card', el_card)
-        .on('network', function(o) {
-          var type = o.type;
+        .on('network', function() {
+          var type = this.type;
           // update cvv element
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
@@ -678,25 +678,25 @@ Session.prototype = {
           // card icon element
           this.el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
         })
-        .on('change', function(o) {
-          var isValid = o.valid;
+        .on('change', function() {
+          var isValid = this.isValid();
           // set validity classes
           toggleInvalid($(this.el.parentNode), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.el.value.length === o.caretPosition) {
+          if (isValid && this.el.value.length === this.caretPosition) {
             invoke('focus', el_expiry, null, 0);
           }
         })
 
       delegator.expiry = delegator.add('expiry', el_expiry)
-        .on('change', function(o) {
+        .on('change', function() {
           inputHandler.input({target: el_expiry});
 
-          var isValid = o.valid;
+          var isValid = this.isValid();
           toggleInvalid($(this.el.parentNode), isValid);
 
-          if (isValid && this.el.value.length === o.caretPosition) {
+          if (isValid && this.el.value.length === this.caretPosition) {
             invoke('focus', el_name.value ? el_cvv : el_name);
           }
         })
