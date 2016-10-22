@@ -23,10 +23,10 @@ var merchantMarkup = {
     if (innerHeight < containerHeight) {
       var maxY = containerHeight - innerHeight;
       if (pageYOffset > maxY) {
-        scrollTo(0, maxY);
+        smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
-      scrollTo(0, Math.max(0, pageYOffset) + 'px');
+      smoothScrollTo(Math.max(0, pageYOffset) + 'px');
     }
   }
 }
@@ -225,7 +225,7 @@ CheckoutFrame.prototype = {
     restoreMeta(this.$meta);
     restoreOverflow();
     if (ua_iPhone) {
-      scrollTo(0, merchantMarkup.oldY);
+      smoothScrollTo(merchantMarkup.oldY);
     }
   },
 
@@ -277,7 +277,7 @@ CheckoutFrame.prototype = {
 
     if (ua_iPhone) {
       merchantMarkup.oldY = pageYOffset;
-      scrollTo(0, 0);
+      smoothScrollTo(0);
       merchantMarkup.orientationchange.call(this);
     }
   },

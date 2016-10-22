@@ -99,7 +99,7 @@ $.prototype = {
   },
 
   reflow: function(){
-    this.prop('offsetWidth');
+    this.height();
     return this;
   },
 
@@ -177,6 +177,12 @@ $.prototype = {
     return this;
   },
 
+  height: function() {
+    if (this[0]) {
+      return this.offsetHeight;
+    }
+  },
+
   hide: function(){
     return this.css('display', 'none');
   },
@@ -223,6 +229,32 @@ $.prototype = {
     }
     return this;
   }
+}
+
+function smoothScrollTo(y) {
+  smoothScrollBy(y - pageYOffset);
+}
+
+function smoothScrollBy(y) {
+  if (!window.requestAnimationFrame) {
+    return scrollBy(0, y);
+  }
+  var y0 = pageYOffset;
+  var target = Math.min(y0 + y, $(body).height());
+  var scrollCount = 0;
+  var oldTimestamp = performance.now();
+
+  function step (newTimestamp) {
+    scrollCount += (newTimestamp - oldTimestamp)/200;
+    if (scrollCount >= 1) {
+      return scrollTo(0, target);
+    }
+    var sin = Math.sin(pi*scrollCount/2);
+    scrollTo(0, y0 + Math.round(y*sin));
+    oldTimestamp = newTimestamp;
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 $.post = function(opts){

@@ -1,3 +1,5 @@
+var pi = Math.pi;
+
 function raise(message){
   throw new Error(message);
 }
