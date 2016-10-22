@@ -16,7 +16,8 @@ function isua(ua_regex) {
   return ua_regex.test(ua);
 }
 
-var ua_iOS = isua(/iPhone|iPad/);
+var ua_iPhone = isua(/iPhone/);
+var ua_iOS = ua_iPhone || isua(/iPad/);
 var ua_prefer_redirect = isua(/Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/);
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);

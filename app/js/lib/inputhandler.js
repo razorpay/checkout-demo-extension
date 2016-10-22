@@ -9,7 +9,7 @@ var InputHandler;
       function(i, prop) {
         this.on(prop, function(e) {
           if (/input/.test(e.target.className)) {
-            if (prop !== 'input') {
+            if (ua_iPhone && prop !== 'input') {
               Razorpay.sendMessage({event: prop});
             }
             this[prop](e);

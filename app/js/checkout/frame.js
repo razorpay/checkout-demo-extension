@@ -220,7 +220,7 @@ CheckoutFrame.prototype = {
     setTestRibbonInvisible();
     restoreMeta(this.$meta);
     docStyle.overflow = merchantMarkup.overflow;
-    if (shouldFixFixed) {
+    if (ua_iPhone) {
       scrollTo(0, merchantMarkup.oldY);
     }
   },
@@ -230,7 +230,7 @@ CheckoutFrame.prototype = {
       this.listeners = [];
       var eventPairs = { message: this.onmessage };
 
-      if(shouldFixFixed){
+      if(ua_iPhone){
         eventPairs.orientationchange = merchantMarkup.orientationchange;
         eventPairs.scroll = merchantMarkup.scroll;
         eventPairs.resize = merchantMarkup.resize;
@@ -271,7 +271,7 @@ CheckoutFrame.prototype = {
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
 
-    if (shouldFixFixed) {
+    if (ua_iPhone) {
       merchantMarkup.oldY = pageYOffset;
       scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
