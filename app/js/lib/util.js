@@ -1,4 +1,4 @@
-var pi = Math.pi;
+var pi = Math.PI;
 
 function raise(message){
   throw new Error(message);
@@ -18,7 +18,7 @@ function isua(ua_regex) {
   return ua_regex.test(ua);
 }
 
-var ua_iPhone = isua(/iPhone/);
+var ua_iPhone = true//isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
 var ua_prefer_redirect = isua(/Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/);
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
@@ -171,7 +171,7 @@ function invoke(handler, thisArg, param, timeout) {
   }
 }
 
-function debounce(func, wait, condition) {
+function debounce(func, wait) {
   if (!wait) {
     return func;
   }
@@ -180,11 +180,7 @@ function debounce(func, wait, condition) {
   return function() {
     var args = arguments;
 
-    function later(){
-      // if condition is passed and is false, don't execute
-      if (invoke(condition) === false) {
-        return;
-      }
+    function later() {
       func.apply(this, args)
     }
 

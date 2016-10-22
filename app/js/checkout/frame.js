@@ -26,7 +26,7 @@ var merchantMarkup = {
         smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
-      smoothScrollTo(Math.max(0, pageYOffset) + 'px');
+      smoothScrollTo(0);
     }
   }
 }
@@ -225,7 +225,7 @@ CheckoutFrame.prototype = {
     restoreMeta(this.$meta);
     restoreOverflow();
     if (ua_iPhone) {
-      smoothScrollTo(merchantMarkup.oldY);
+      scrollTo(0, merchantMarkup.oldY);
     }
   },
 
@@ -277,7 +277,7 @@ CheckoutFrame.prototype = {
 
     if (ua_iPhone) {
       merchantMarkup.oldY = pageYOffset;
-      smoothScrollTo(0);
+      scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
     }
   },
