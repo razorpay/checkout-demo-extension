@@ -48,6 +48,10 @@ function restoreMeta($meta){
   }
 }
 
+function restoreOverflow(){
+  docStyle.overflow = merchantMarkup.overflow;
+}
+
 // to handle absolute/relative url of options.image
 function sanitizeImage(options){
   var image = options.image;
@@ -219,7 +223,7 @@ CheckoutFrame.prototype = {
     setBackdropColor('');
     setTestRibbonInvisible();
     restoreMeta(this.$meta);
-    docStyle.overflow = merchantMarkup.overflow;
+    restoreOverflow();
     if (ua_iPhone) {
       scrollTo(0, merchantMarkup.oldY);
     }

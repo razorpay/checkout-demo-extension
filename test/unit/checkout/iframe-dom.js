@@ -333,7 +333,7 @@ describe('afterClose should', function() {
   })
 })
 
-describe('if shouldFixFixed,', function() {
+describe('if iPhone,', function() {
   var cf;
 
   beforeEach(function() {
@@ -344,9 +344,9 @@ describe('if shouldFixFixed,', function() {
     cf.bind();
     var oldlen = cf.listeners.length;
     cf.unbind();
-    window.shouldFixFixed = true;
+    window.ua_iPhone = true;
     cf.bind();
     expect(cf.listeners.length > oldlen).to.be(true);
-    window.shouldFixFixed = false;
+    window.ua_iPhone = false;
   })
 })
