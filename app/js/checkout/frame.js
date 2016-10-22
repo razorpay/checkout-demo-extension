@@ -232,7 +232,7 @@ CheckoutFrame.prototype = {
   bind: function(){
     if(!this.listeners){
       this.listeners = [];
-      var eventPairs = { message: this.onmessage };
+      var eventPairs = {};
 
       if(ua_iPhone){
         eventPairs.orientationchange = merchantMarkup.orientationchange;

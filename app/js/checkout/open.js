@@ -180,7 +180,7 @@ function getPreloadedFrame(rzp){
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
-    preloadedFrame.bind();
+    $(window).on('message', bind('onmessage', preloadedFrame));
     frameContainer.appendChild(preloadedFrame.el);
   }
   return preloadedFrame;
