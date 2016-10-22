@@ -259,7 +259,6 @@ function smoothScrollBy(y) {
 
     function step (newTimestamp) {
       scrollCount += (newTimestamp - oldTimestamp)/200;
-      console.log(scrollCount)
       if (scrollCount >= 1) {
         return scrollTo(0, target);
       }

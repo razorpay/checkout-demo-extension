@@ -166,7 +166,6 @@ CheckoutFrame.prototype = {
 
   openRzp: function(rzp) {
     var $el = $(this.el);
-    this.bind();
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     appendLoader($parent, parent);
@@ -189,6 +188,9 @@ CheckoutFrame.prototype = {
       }
       this.setMetaAndOverflow();
     }
+
+    // bind after setMetaAndOverflow, which might trigger scroll
+    this.bind();
     this.onload();
   },
 
@@ -224,6 +226,9 @@ CheckoutFrame.prototype = {
     setTestRibbonInvisible();
     restoreMeta(this.$meta);
     restoreOverflow();
+
+    // unbind before triggering scroll
+    this.unbind();
     if (ua_iPhone) {
       scrollTo(0, merchantMarkup.oldY);
     }
@@ -415,6 +420,5 @@ CheckoutFrame.prototype = {
 
   afterClose: function(){
     frameContainer.style.display = 'none';
-    this.unbind();
   }
 }
