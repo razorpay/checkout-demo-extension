@@ -109,8 +109,8 @@
             var rect = el.getBoundingClientRect();
             if(rect.bottom > innerHeight - 70){
               setTimeout(function(){
-                scrollTo(pageYOffset - innerHeight + rect.bottom + 60)
-              }, 500)
+                smoothScrollTo(pageYOffset - innerHeight + rect.bottom + 60)
+              }, 400)
             }
           }
         })
