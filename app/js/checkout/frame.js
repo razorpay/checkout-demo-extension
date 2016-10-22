@@ -48,10 +48,6 @@ function restoreMeta($meta){
   }
 }
 
-function restoreOverflow(){
-  docStyle.overflow = merchantMarkup.overflow;
-}
-
 // to handle absolute/relative url of options.image
 function sanitizeImage(options){
   var image = options.image;
@@ -223,7 +219,10 @@ CheckoutFrame.prototype = {
     setBackdropColor('');
     setTestRibbonInvisible();
     restoreMeta(this.$meta);
-    restoreOverflow();
+    docStyle.overflow = merchantMarkup.overflow;
+    if (shouldFixFixed) {
+      scrollTo(0, merchantMarkup.oldY);
+    }
   },
 
   bind: function(){
@@ -272,7 +271,8 @@ CheckoutFrame.prototype = {
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
 
-    if(shouldFixFixed){
+    if (shouldFixFixed) {
+      merchantMarkup.oldY = pageYOffset;
       scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
     }
