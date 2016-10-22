@@ -278,6 +278,14 @@ $.ajax = function(opts) {
       opts.callback({error: {description: 'Network error'}});
     }
   }
-  xhr.send(opts.data || null);
+
+  var data = opts.data || null;
+
+  // ghostery
+  if (chromeVersion <= 33) {
+    invoke('send', xhr, data, 1000);
+  } else {
+    xhr.send(data);
+  }
   return xhr;
 }

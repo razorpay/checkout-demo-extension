@@ -22,6 +22,10 @@ var ua_prefer_redirect = isua(/Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((C
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
 var shouldFocusNextField = !ua_iOS;
+var chromeVersion = ua.match(/Chrome\/(\d+)/);
+if (chromeVersion) {
+  chromeVersion = parseInt(chromeVersion[1], 10);
+}
 
 /* simple checks */
 function isBoolean(x) {

@@ -122,7 +122,6 @@ function Payment(data, params, r) {
   this.fees = params.fees;
   this.powerwallet = params.powerwallet || data.method === 'upi';
   this.message = params.message;
-
   this.tryPopup();
 
   if (params.paused) {
@@ -205,7 +204,6 @@ Payment.prototype = {
   generate: function(data) {
     this.data = clone(data);
     this.format();
-
     // redirect if specified
     if(this.checkRedirect()){
       return;
@@ -351,7 +349,6 @@ function ajaxCallback(response) {
   if (popup && popup.checkClose()) {
     return; // return if it's already closed
   }
-
   // if ajax call is blocked by ghostery or some other reason, fall back to redirection in popup
   if (errorResponse && response.xhr && response.xhr.status === 0) {
     if (popup) {
