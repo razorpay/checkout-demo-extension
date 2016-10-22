@@ -102,7 +102,7 @@
     },
 
     bind: function(){
-      if(typeof window.pageYOffset === 'number') { // doesn't exist <ie9. we're concerned about mobile here.
+      if (!ua_iOS && typeof window.pageYOffset === 'number') { // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function(){
           var el = document.activeElement;
           if(el){
