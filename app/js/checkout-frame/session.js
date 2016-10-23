@@ -901,6 +901,11 @@ Session.prototype = {
       this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
+      try {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      } catch(e){}
       invoke('onSixDigits', this, {target: gel('card_number')});
       $savedContainer.removeClass('scroll');
     }

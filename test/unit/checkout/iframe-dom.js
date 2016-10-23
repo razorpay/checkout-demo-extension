@@ -307,11 +307,14 @@ describe('checkoutFrame.close', function() {
     var spy3 = sinon.stub(window, 'restoreOverflow');
     var rzp = Razorpay(options);
     var cf = new CheckoutFrame(rzp);
+    var spy4 = sinon.stub(cf, 'unbind');
     cf.close();
     expect(spy.called).to.be(true);
     expect(spy2.called).to.be(true);
     expect(spy3.called).to.be(true);
     expect(spy2.getCall(0).args[0]).to.be(cf.$meta);
+    expect(spy4.callCount).to.be(1);
+    spy4.restore();
   })
 })
 
@@ -325,15 +328,12 @@ describe('afterClose should', function() {
 
   it('hide container and unbind', function() {
     expect(jQuery(frameContainer).is(':visible')).to.be(true);
-    var spy = sinon.stub(cf, 'unbind');
     cf.afterClose();
     expect(jQuery(frameContainer).is(':visible')).to.be(false);
-    expect(spy.callCount).to.be(1);
-    spy.restore();
   })
 })
 
-describe('if shouldFixFixed,', function() {
+describe('if iPhone,', function() {
   var cf;
 
   beforeEach(function() {
@@ -344,9 +344,9 @@ describe('if shouldFixFixed,', function() {
     cf.bind();
     var oldlen = cf.listeners.length;
     cf.unbind();
-    window.shouldFixFixed = true;
+    window.ua_iPhone = true;
     cf.bind();
     expect(cf.listeners.length > oldlen).to.be(true);
-    window.shouldFixFixed = false;
+    window.ua_iPhone = false;
   })
 })

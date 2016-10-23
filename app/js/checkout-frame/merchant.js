@@ -116,7 +116,7 @@ var emi_options = sessProto.emi_options = {
     },
 
     AXIS: {
-      patt: /(436560|46111[6-8]|464118|524240|405995|55934[0-2]|(45(050|145)6)|(5245(08|12)))00|40743(903|(8|9)00)|524178(00|10|11)|5305620(0|2)|4111460(0|1)|45145(700|604)|4111460[2-5]|4182120(1|2)|47186(00(0|1|3)|10[0-2]|30[0-2]|400)/,
+      patt: /(43083[2-4]|436560|46111[6-8]|464118|524240|405995|55934[0-2]|(45(050|145)6)|(5245(08|12)))00|40743(903|(8|9)00)|524178(00|10|11)|5305620(0|2|4)|4111460(0|1)|45145(700|604)|4111460[2-5]|4182120(1|2)|47186(00(0|1|3)|10[0-2]|30[0-2]|400)/,
       name: 'Axis Bank'
     },
 
@@ -184,6 +184,7 @@ function notifyBridge(message){
 }
 
 function setPaymentMethods(session){
+  var recurring = session.get('recurring');
   var availMethods = preferences.methods;
   var methods = session.methods = {
     count: 0
@@ -213,7 +214,7 @@ function setPaymentMethods(session){
     sessProto = tab_titles;
   }
 
-  if (amount >= 100*10000 || methods.wallet instanceof Array) { // php encodes blank object as blank array
+  if (amount >= 100*10000 || methods.wallet instanceof Array || recurring) { // php encodes blank object as blank array
     methods.wallet = {};
   } else if (typeof passedWallets === 'object') {
     each(
@@ -226,7 +227,7 @@ function setPaymentMethods(session){
     )
   }
 
-  if (!methods.netbanking || methods.netbanking instanceof Array) {
+  if (!methods.netbanking || methods.netbanking instanceof Array || recurring) {
     methods.netbanking = false;
   } else {
     methods.count = 1;

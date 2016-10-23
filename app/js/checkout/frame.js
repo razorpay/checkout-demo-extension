@@ -1,38 +1,33 @@
 var ch_PageY = 0;
 // there is no "position: fixed" in iphone
 var docStyle = doc.style;
+var containerHeight = 504;
 var merchantMarkup = {
   overflow: '',
   meta: null,
 
-  orientationchange: function(){
-    this.el.style.height = Math.max(window.innerHeight || 0, 480) + 'px';
+  orientationchange: function() {
+    merchantMarkup.resize.call(this);
+    merchantMarkup.scroll.call(this);
+  },
+
+  resize: function() {
+    this.el.style.height = Math.max(window.innerHeight || 0, containerHeight) + 'px';
   },
 
   // scroll manually in iPhone
-  scroll: function(){
-    if(typeof window.pageYOffset !== 'number'){
+  scroll: function() {
+    if(typeof window.pageYOffset !== 'number') {
       return;
     }
-
-    var top;
-    var offTop = frameContainer.offsetTop - pageYOffset;
-    var offBot = frameContainer.offsetHeight + offTop;
-    if(ch_PageY < pageYOffset){
-      if(offBot < 0.2*innerHeight && offTop < 0){
-        top = pageYOffset + innerHeight - frameContainer.offsetHeight;
+    if (innerHeight < containerHeight) {
+      var maxY = containerHeight - innerHeight;
+      if (pageYOffset > maxY) {
+        smoothScrollTo(maxY);
       }
+    } else if (!this.isFocused) {
+      smoothScrollTo(0);
     }
-    else if(ch_PageY > pageYOffset){
-      if(offTop > 0.1*innerHeight && offBot > innerHeight){
-        top = pageYOffset;
-      }
-    }
-    if (isNumber(top)) {
-      frameContainer.style.top = Math.max(0, top) + 'px';
-    }
-    ch_PageY = pageYOffset;
-
   }
 }
 
@@ -171,7 +166,6 @@ CheckoutFrame.prototype = {
 
   openRzp: function(rzp) {
     var $el = $(this.el);
-    this.bind();
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     appendLoader($parent, parent);
@@ -194,6 +188,9 @@ CheckoutFrame.prototype = {
       }
       this.setMetaAndOverflow();
     }
+
+    // bind after setMetaAndOverflow, which might trigger scroll
+    this.bind();
     this.onload();
   },
 
@@ -229,16 +226,23 @@ CheckoutFrame.prototype = {
     setTestRibbonInvisible();
     restoreMeta(this.$meta);
     restoreOverflow();
+
+    // unbind before triggering scroll
+    this.unbind();
+    if (ua_iPhone) {
+      scrollTo(0, merchantMarkup.oldY);
+    }
   },
 
   bind: function(){
     if(!this.listeners){
       this.listeners = [];
-      var eventPairs = { message: this.onmessage };
+      var eventPairs = {};
 
-      if(shouldFixFixed){
+      if(ua_iPhone){
         eventPairs.orientationchange = merchantMarkup.orientationchange;
         eventPairs.scroll = merchantMarkup.scroll;
+        eventPairs.resize = merchantMarkup.resize;
       }
 
       each(
@@ -276,10 +280,10 @@ CheckoutFrame.prototype = {
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
 
-    if(shouldFixFixed){
+    if (ua_iPhone) {
+      merchantMarkup.oldY = pageYOffset;
       scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
-      merchantMarkup.scroll.call(this);
     }
   },
 
@@ -324,6 +328,15 @@ CheckoutFrame.prototype = {
     if (this.rzp) {
       this.postMessage(this.makeMessage());
     }
+  },
+
+  onfocus: function() {
+    this.isFocused = true;
+  },
+
+  onblur: function() {
+    this.isFocused = false;
+    merchantMarkup.orientationchange.call(this);
   },
 
   onrender: function() {
@@ -407,6 +420,5 @@ CheckoutFrame.prototype = {
 
   afterClose: function(){
     frameContainer.style.display = 'none';
-    this.unbind();
   }
 }

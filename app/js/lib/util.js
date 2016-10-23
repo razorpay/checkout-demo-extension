@@ -1,3 +1,5 @@
+var pi = Math.PI;
+
 function raise(message){
   throw new Error(message);
 }
@@ -16,11 +18,16 @@ function isua(ua_regex) {
   return ua_regex.test(ua);
 }
 
-var ua_iOS = isua(/iPhone|iPad/);
+var ua_iPhone = isua(/iPhone/);
+var ua_iOS = ua_iPhone || isua(/iPad/);
 var ua_prefer_redirect = isua(/Windows Phone|Opera Mini|UCBrowser|FBAN|\(iP.+((Cr|Fx)iOS)/);
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
 var isWP = isua(/Windows Phone/);
+var chromeVersion = ua.match(/Chrome\/(\d+)/);
+if (chromeVersion) {
+  chromeVersion = parseInt(chromeVersion[1], 10);
+}
 
 /* simple checks */
 function isBoolean(x) {
@@ -164,7 +171,7 @@ function invoke(handler, thisArg, param, timeout) {
   }
 }
 
-function debounce(func, wait, condition) {
+function debounce(func, wait) {
   if (!wait) {
     return func;
   }
@@ -173,11 +180,7 @@ function debounce(func, wait, condition) {
   return function() {
     var args = arguments;
 
-    function later(){
-      // if condition is passed and is false, don't execute
-      if (invoke(condition) === false) {
-        return;
-      }
+    function later() {
       func.apply(this, args)
     }
 
