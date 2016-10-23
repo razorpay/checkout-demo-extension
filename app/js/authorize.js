@@ -37,8 +37,8 @@ function getCookie(name){
 }
 
 var communicator;
-function setCommunicator(){
-  if (!discreet.isFrame && (/MSIE |Windows Phone|Trident\//.test(ua))) {
+function setCommunicator() {
+  if (!discreet.isFrame && (isWP || /MSIE |Trident\//.test(ua))) {
     communicator = document.createElement('iframe');
     communicator.style.display = 'none';
     doc.appendChild(communicator);

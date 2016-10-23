@@ -650,6 +650,7 @@ Session.prototype = {
     var bits = this.bits;
     bits.push(inputHandler);
 
+    var delegator = this.delegator = Razorpay.setFormatter(this.el);
     if (this.methods.card) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
@@ -665,46 +666,54 @@ Session.prototype = {
         }
       } catch(e){}
 
-      var delegator = this.delegator = Razorpay.setFormatter(this.el);
       delegator.card = delegator.add('card', el_card)
-        .on('network', function(o) {
-          var type = o.type;
+        .on('network', function() {
+          var type = this.type;
           // update cvv element
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
-          el_cvv.pattern = '[0-9]{'+cvvlen+'}';
+          el_cvv.pattern = '^[0-9]{'+cvvlen+'}$';
+          inputHandler.input({target: el_cvv});
 
           // card icon element
           this.el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
         })
-        .on('change', function(o) {
-          inputHandler.input({target: el_cvv});
-          var isValid = o.valid;
+        .on('change', function() {
+          var isValid = this.isValid();
           // set validity classes
           toggleInvalid($(this.el.parentNode), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (shouldFocusNextField && isValid && this.value.length === this.maxLen) {
+          if (isValid && this.el.value.length === this.caretPosition) {
             invoke('focus', el_expiry, null, 0);
           }
         })
 
       delegator.expiry = delegator.add('expiry', el_expiry)
-        .on('change', function(o) {
+        .on('change', function() {
           inputHandler.input({target: el_expiry});
 
-          var isValid = o.valid;
+          var isValid = this.isValid();
           toggleInvalid($(this.el.parentNode), isValid);
 
-          if (shouldFocusNextField && isValid) {
-            defer(bind('focus', el_name.value ? el_cvv : el_name));
+          if (isValid && this.el.value.length === this.caretPosition) {
+            invoke('focus', el_name.value ? el_cvv : el_name);
           }
         })
 
-      delegator.cvv = delegator.add('number', el_cvv);
-      delegator.contact = delegator.add('phone', gel('contact'));
-      delegator.otp = delegator.add('number', gel('otp'));
+      delegator.cvv = delegator.add('number', el_cvv)
+        .on('change', function() {
+          inputHandler.input({target: this.el})
+        })
     }
+    delegator.contact = delegator.add('phone', gel('contact'))
+      .on('change', function() {
+        inputHandler.input({target: this.el})
+      })
+    delegator.otp = delegator.add('number', gel('otp'))
+      .on('change', function() {
+        inputHandler.input({target: this.el})
+      })
   },
 
   setScreen: function(screen){

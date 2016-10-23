@@ -215,9 +215,6 @@ $.prototype = {
   },
 
   focus: function(){
-    if (!shouldFocusNextField) {
-      return;
-    }
     if(this[0]){
       try{
         this[0].focus();

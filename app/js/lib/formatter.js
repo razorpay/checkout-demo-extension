@@ -39,7 +39,10 @@ var Formatter;
   var proto = Formatter.prototype = new Eventer();
 
   proto.backFormat = function(e) {
-    if (whichKey(e) !== 8) {
+    // windows phone: if keydown is prevented, and value is changed synchronously,
+    //    it ignores one subsequent input event.
+    //    hence no back formatting in WP
+    if (isWP || whichKey(e) !== 8) {
       return;
     }
 
@@ -55,13 +58,20 @@ var Formatter;
     this.run({
       e: e,
       left: left,
-      value: left + value.slice(caret.end),
-      trim: true
+      value: left + value.slice(caret.end)
     })
   }
 
-  proto.pretty = proto.raw = proto.preInput = noop;
+  proto.pretty = proto.isValid = noop;
   proto.prettyValue = '';
+
+  proto.raw = function(value) {
+    return value.replace(/\D/g, '')
+  }
+
+  proto.setValue = function(value) {
+    this.value = value;
+  }
 
   proto.oninput = function() {
     this.emit('change');
@@ -85,16 +95,12 @@ var Formatter;
   }
 
   proto.format = function(e) {
-    if (!arguments.length) {
-      this.value = null;
-    }
     var caretPosition = this.getCaret().start;
     var value = this.el.value;
 
     this.run({
-      left: value,
       value: value,
-      trim: value.length <= this.prettyValue.length
+      left: value.slice(0, caretPosition)
     })
   }
 
@@ -115,28 +121,70 @@ var Formatter;
   }
 
   proto.run = function(values) {
-    var rawValue = this.raw(values.value);
-    var preInputResult;
-    var isChanged = rawValue !== this.value;
-    if (isChanged) {
-      this.value = rawValue;
-      preInputResult = this.preInput();
-    }
+    // domValue is would-be value, if not prevented (keypress, keydown)
+    //    we prevent all the time in that case
+    //    for events with non-preventable character printing,
+    //    it is actual current value (input, change, blur)
+    var domValue = values.value;
+    var rawValue = this.raw(domValue);
 
-    var pretty = this.pretty(rawValue, values.trim);
-    if (pretty !== values.value) {
+    // save for later use, to compare if it was changed
+    var oldValue = this.value;
+    this.setValue(rawValue);
+
+    // left is substring of domValue, but leftwards of caret position
+    var left = values.left;
+    var caretPosition = left.length;
+
+    // trim whitespaces/insignificant characters if cursor has moved leftwards
+    var shouldTrim = caretPosition < this.caretPosition;
+    var pretty = this.pretty(this.value, shouldTrim);
+
+    var shouldUpdateDOM;
+    if (values.e) {
+      // iphone: character-in-waiting is not printed if input is blurred synchronously.
+      //    prevent by default all the time and set value manually.
+      //    this takes effect for keypress, keydown events
       preventDefault(values.e);
-      this.el.value = pretty;
-      this.moveCaret(this.pretty(this.raw(values.left), values.trim).length);
+
+      // check if value was changed at all
+      shouldUpdateDOM = pretty !== this.prettyValue;
+    } else {
+      // for non-preventable events, check if current value is correct
+      shouldUpdateDOM = pretty !== domValue;
     }
 
     this.prettyValue = pretty;
-    if (isChanged) {
-      this.oninput(preInputResult);
+    if (shouldUpdateDOM) {
+      this.el.value = pretty;
+    }
+
+    // move caret only if cursor is not at rightmost end.
+    // checking for shouldUpdateDOM because just setting el.value
+    //    might not update the caret position automatically, e.g. IE9
+    if (left !== pretty || shouldUpdateDOM) {
+      // example where shouldUpdateDOM is false but first condition is true:
+      // inserting character "4" at any position in "4444 4444 4444 4444"
+      //    that doesnt require dom value change, but does require caret to be moved
+      caretPosition = this.pretty(this.raw(left), shouldTrim).length;
+      if (isWP) {
+        // following is necessary, else caret only blinks at intended position.
+        //    but its at the rightmost position in effect
+        invoke('moveCaret', this, caretPosition, 0);
+      } else {
+        this.moveCaret(caretPosition);
+      }
+    } // else caretPosition is already pretty.length
+
+    this.caretPosition = caretPosition;
+
+    if (oldValue !== this.value) {
+      this.oninput();
     }
   }
 
   proto.moveCaret = function(position) {
+    // console.log('moveCaret ' + position);
     var el = this.el;
     if (isNumber(el.selectionStart)) {
       if (el.selectionStart !== position) {
