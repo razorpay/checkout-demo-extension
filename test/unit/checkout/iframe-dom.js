@@ -105,7 +105,7 @@ describe('makeCheckoutMessage should', function() {
     };
     sanitizeImage(imageOption);
     expect(message.options.image).to.be(imageOption.image);
-    expect(message.referrer).to.be(location.href);
+    expect(message.referer).to.be(location.href);
     expect(message.id).to.be(rzp.id);
   });
 

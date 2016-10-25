@@ -101,7 +101,7 @@ var _uid = generateUID();
 var trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
-  referrer: location.href
+  referer: location.href
 }
 
 // we keep {event, timestamp} everytime something is tracked, and send it in next track
@@ -135,7 +135,7 @@ function getCommonTrackingData(r) {
     checkout_id: r ? r.id : _uid,
     platform: 'browser'
   }
-  each(['integration', 'referrer', 'library'], function(i, propName){
+  each(['integration', 'referer', 'library'], function(i, propName){
     if (trackingProps[propName]) {
       props[propName] = trackingProps[propName]
     }

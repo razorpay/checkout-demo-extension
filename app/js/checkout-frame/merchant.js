@@ -500,8 +500,8 @@ window.handleMessage = function(message) {
     sessions[_uid] = session;
   }
 
-  if (message.referrer) {
-    trackingProps.referrer = message.referrer;
+  if (message.referer) {
+    trackingProps.referer = message.referer;
   }
 
   if (message.integration) {
@@ -561,7 +561,7 @@ function initIframe(){
   }
 
   if (CheckoutBridge) {
-    delete trackingProps.referrer;
+    delete trackingProps.referer;
     trackingProps.platform = 'mobile_sdk';
     var os = qpmap.platform;
     if (os) {
