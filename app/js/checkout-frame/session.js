@@ -363,11 +363,16 @@ Session.prototype = {
     }
     var tab = oldMethod || this.get('prefill.method');
 
-    if(tab && !this.order) {
+    if (tab && !this.order) {
       this.switchTab(tab);
     }
 
-    if(this.hasOwnProperty('data')){
+    var prefilledWallet = this.get('prefill.wallet');
+    if (prefilledWallet) {
+      $('#wallet-radio-' + prefilledWallet).prop('checked', true);
+    }
+
+    if (this.hasOwnProperty('data')) {
       var data = this.data;
 
       var exp_m = data['card[expiry_month]'];

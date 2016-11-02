@@ -62,7 +62,7 @@ $.prototype = {
   prop: function(prop, val){
     var el = this[0];
     if(arguments.length === 1){
-      return el[prop];
+      return el && el[prop];
     }
     if(el){
       if(el){

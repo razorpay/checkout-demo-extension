@@ -23,7 +23,9 @@ RazorpayDefaults.method = {
   emi: true,
   upi: true
 }
+
 RazorpayDefaults.prefill = {
+  wallet: '',
   method: '',
   name: '',
   contact: '',
