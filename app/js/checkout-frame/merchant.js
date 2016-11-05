@@ -81,12 +81,6 @@ var freqWallets = sessProto.walletData = {
 var emi_options = sessProto.emi_options = {
   // minimum amount to enable emi
   min: 3000*100-1,
-  installment: function(length, rate, principle){
-    rate /= 1200;
-    var multiplier = Math.pow(1+rate, length);
-    return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
-  },
-
   selected: 'KKBK',
   banks: {
     KKBK: {

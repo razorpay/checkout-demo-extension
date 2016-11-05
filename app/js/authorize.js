@@ -544,10 +544,15 @@ RazorProto.postInit = function() {
     var self = this;
     if (event === 'ready') {
       Razorpay.payment.getPrefs(makePrefParams(this), function(response) {
+        self.methods = response.methods;
         self.emit('ready', response);
       })
     }
   }
+}
+
+RazorProto.emi_calculator = function(length, rate) {
+  return Razorpay.emi.calculator(this.get('amount')/100, length, rate);
 }
 
 Razorpay.setFormatter = FormatDelegator;
@@ -612,3 +617,11 @@ Razorpay.payment = {
     });
   }
 };
+
+Razorpay.emi = {
+  calculator: function(principle, length, rate) {
+    rate /= 1200;
+    var multiplier = Math.pow(1+rate, length);
+    return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
+  }
+}

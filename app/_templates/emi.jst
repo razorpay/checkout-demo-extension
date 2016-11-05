@@ -17,7 +17,7 @@
   {{ var plans = it.banks[it.selected].plans; for(var plan in it.banks[it.selected].plans){}}
     <div class="row emi-option">
       <div class="col">{{=plan}} Months</div>
-      {{ var planObj = plans[plan]; var inst = it.installment(plan, planObj, it.amount); }}
+      {{ var planObj = plans[plan]; var inst = Razorpay.emi.calculator(plan, planObj, it.amount); }}
       <div class="col">{{=planObj}}%</div>
       <div class="col">₹ {{=inst/100}}</div>
       <div class="col">₹ {{=inst*plan/100}}</div>
