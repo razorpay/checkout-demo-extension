@@ -48,8 +48,12 @@ var InputHandler;
     if (required && !value) {
       valid = false;
     }
-    if (valid && pattern) {
-      valid = new RegExp(pattern).test(value);
+    if (!required && !value) {
+      valid = true;
+    } else {
+      if (valid && pattern) {
+        valid = new RegExp(pattern).test(value);
+      }
     }
     toggleInvalid($parent, valid);
   }
