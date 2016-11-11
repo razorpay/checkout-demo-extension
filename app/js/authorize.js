@@ -461,10 +461,13 @@ var responseTypes = {
 
 function otpCallback(response){
   var error = response.error;
-  if(error && error.action === 'RETRY'){
-    return this.emit('otp.required', discreet.msg.wrongotp);
-  } else if (error && error.action === 'TOPUP') {
-    return this.emit('wallet.topup', error.description);
+  if (error) {
+    if (error.action === 'RETRY') {
+      return this.emit('otp.required', discreet.msg.wrongotp);
+    } else if (error.action === 'TOPUP') {
+      return this.emit('wallet.topup', error.description);
+    }
+    this.complete(response);
   }
   ajaxCallback.call(this, response);
 }
@@ -624,4 +627,4 @@ Razorpay.emi = {
     var multiplier = Math.pow(1+rate, length);
     return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
   }
-}
+};

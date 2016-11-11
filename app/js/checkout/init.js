@@ -15,6 +15,8 @@ RazorpayDefaults.display_amount =
 RazorpayDefaults.name =
 RazorpayDefaults.image = '';
 
+RazorpayDefaults.ecod = false;
+
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {
   netbanking: true,

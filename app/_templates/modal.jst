@@ -1,10 +1,12 @@
 {{
 var o = it.get;
+var ecod = o('ecod');
 var method = it.methods;
 var wallet = method.wallet;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = it.order || {};
+var invoice = it.invoice;
 var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = it.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
@@ -77,20 +79,19 @@ else
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
-                <div class="pad">
+                <div class="pad" id="pad-common">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
                     <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}" required pattern="^\+?[0-9]{8,15}$">
                   </div></div>
-                  <div class="elem-wrap"><div class="elem elem-email">
+                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email</label>
-                    <input class="input" name="email" type="email" id="email" required value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" value="{{=attr(o('prefill.email'))}}" required pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
-
                   {{? order.bank}}
                     <div class="customer-bank-details">
                       <div class="bank-name">
@@ -135,7 +136,6 @@ else
                   <div class="clear"></div>
                 </div>
               </div>
-
               {{? method.card }}
                 <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
@@ -244,8 +244,11 @@ else
                     </div></div>
                 </div>
               {{?}}
-              {{? wallet.length }}
+              {{? wallet.length || ecod }}
                 <div class="tab-content showable screen" id="form-wallet">
+                  {{?ecod}}
+                  <div class="legend" id="ecod-label">Select payment method</div>
+                  {{?}}
                   {{ var count = 0, max = 3; }}
                   <div id="wallets" class="grid count-{{=wallet.length}}">
                     {{
@@ -266,6 +269,20 @@ else
                       count = (count + 1) % max;
                     }
                     }}
+                    {{?ecod}}
+                      {{?method.upi}}
+                        <div class="item radio-item" tab="upi">
+                          <input type="radio" name="wallet" id="ecod-radio-upi" tab="upi">
+                          <label id="ecod-label-upi" class="radio-label mfix" for="ecod-radio-upi"></label>
+                        </div>
+                      {{?}}
+                      {{?ecod && invoice}}
+                        <div class="item" tab="ecod">
+                          <input type="radio" name="wallet" id="ecod-radio-ecod" tab="ecod">
+                          <label id="ecod-label-ecod" class="radio-label mfix" for="ecod-radio-ecod"></label>
+                        </div>
+                      {{?}}
+                    {{?}}
                     <div class="clear"></div>
                     <span class="help">Please select one of the wallets</span>
                   </div>
@@ -282,7 +299,16 @@ else
                   </p>
                 </div>
               {{?}}
-
+              {{?ecod && invoice}}
+                <div class="tab-content showable screen pad" id="form-ecod">
+                  <img src="https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl={{=invoice.url}}">
+                  <p>An SMS with the payment link has also been sent to customer for initiating the payment.</p>
+                  <p>
+                    <div class='text-btn' id='ecod-resend' style='float: right'>Resend Link</div>
+                    <span style='border-bottom: 1px dashed #ddd'>{{=invoice.url}}</span>
+                  </p>
+                </div>
+              {{?}}
               <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>
                 <div id="add-funds" class="add-funds">

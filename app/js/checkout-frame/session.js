@@ -198,7 +198,7 @@ function errorHandler(response){
   }
 
   var err_field = error.field;
-  if (err_field){
+  if (err_field && !(this.screen === 'otp' && this.tab === 'wallet')) {
     if(!err_field.indexOf('expiry')) {
       err_field = 'card[expiry]';
     }
@@ -312,15 +312,6 @@ Session.prototype = {
     track(this.r, event, extra);
   },
 
-  ajax: function(xhr){
-    if (this.xhr) {
-      this.xhr.abort();
-    }
-    if (xhr instanceof XMLHttpRequest) {
-      this.xhr = xhr;
-    }
-  },
-
   getClasses: function(){
     var classes = [];
     if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
@@ -328,11 +319,16 @@ Session.prototype = {
       classes.push('mobile');
     }
 
-    if (this.get('theme.hide_topbar')) {
+    var getter = this.get;
+    if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
     }
 
-    if(!this.get('image')){
+    if (getter('ecod')) {
+      classes.push('ecod');
+    }
+
+    if (!getter('image')) {
       classes.push('noimage');
     }
 
@@ -342,7 +338,7 @@ Session.prototype = {
     return classes.join(' ');
   },
 
-  getEl: function(){
+  getEl: function() {
     if(!this.el){
       var div = document.createElement('div');
       div.innerHTML = templates.modal(this);
@@ -351,6 +347,19 @@ Session.prototype = {
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
       this.body = $('#body');
+
+      var r = this.r;
+      if (r.get('ecod')) {
+        if (!r.get('prefill.email')) {
+          r.set('prefill.email', 'void@razorpay.com');
+        }
+        if (this.invoice) {
+          r.set('order_id', this.invoice.order_id);
+        }
+        r.set('prefill.method', 'wallet');
+        r.set('theme.hide_topbar', true);
+        gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
+      }
       $(this.el).addClass(this.getClasses());
     }
     return this.el;
@@ -609,8 +618,23 @@ Session.prototype = {
     }
     if (enabledMethods.wallet) {
       try {
-        this.on('change', '#wallets', function() {
-          $('#wallets').removeClass('invalid');
+        this.on('change', '#wallets', function(e) {
+          if (this.get('ecod')) {
+            $(this.el).removeClass('notopbar');
+            var tab = $(e.target).attr('tab');
+            if (tab === 'ecod') {
+              commenceECOD(this);
+            } else {
+              $('#footer').css('display', 'block');
+            }
+            if (tab) {
+              this.switchTab(tab);
+            } else {
+              this.preSubmit();
+            }
+          } else {
+            $('#wallets').removeClass('invalid');
+          }
         }, true);
       } catch(e) {}
     }
@@ -627,6 +651,17 @@ Session.prototype = {
       })
       this.on('click', '#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
+      })
+    }
+
+    if (this.get('ecod')) {
+      this.on('click', '#ecod-resend', function() {
+        this.showLoadError('Sending link to ' + getPhone());
+        var r = this.r;
+        $.ajax({
+          url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
+          callback: debounce(hideOverlayMessage, 4000)
+        })
       })
     }
 
@@ -744,7 +779,12 @@ Session.prototype = {
 
   back: function(){
     var tab;
-    if (this.screen === 'otp' && this.tab !== 'card') {
+    if (this.get('ecod')) {
+      $('#footer').hide();
+      $('#wallets input:checked').prop('checked', false);
+      $(this.el).addClass('notopbar');
+      tab = 'wallet';
+    } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
     } else {
       tab = '';
@@ -755,7 +795,7 @@ Session.prototype = {
   switchTab: function(tab) {
     // initial screen
     if (!this.tab){
-      if (this.checkInvalid('#form-common')) {
+      if (this.checkInvalid('#pad-common')) {
         return;
       }
     }
@@ -975,7 +1015,7 @@ Session.prototype = {
     var tab = this.tab;
     var data = {};
 
-    fillData('#form-common', data);
+    fillData('#pad-common', data);
     data['contact'] = data['contact'].replace(/\ /g, '');
 
     if (tab) {
@@ -1117,6 +1157,10 @@ Session.prototype = {
     if (this.r._payment) {
       this.r.emit('payment.cancel', extra);
     }
+    if (this.ajax) {
+      this.ajax.abort();
+      this.ajax = null;
+    }
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
@@ -1137,7 +1181,7 @@ Session.prototype = {
     this.ihandler.refresh();
     var data = this.payload = this.getPayload();
     if (this.order) {
-      if (this.checkInvalid('#form-common')) {
+      if (this.checkInvalid('#pad-common')) {
         return;
       }
 
@@ -1325,4 +1369,20 @@ Session.prototype = {
       this.close();
     }
   }
+}
+
+function commenceECOD(session) {
+  var url = makeAuthUrl(session.r, 'invoices/' + session.get('invoice_id') + '/status');
+  setTimeout(function() {
+    recurseAjax(url, function(response) {
+      if (response.error) {
+        errorHandler.call(session, response);
+      } else if (response.success) {
+        successHandler.call(session, response);
+      }
+    }, function(response) {
+      session.ajax = this;
+      return response && response.status;
+    })
+  }, 15000)
 }

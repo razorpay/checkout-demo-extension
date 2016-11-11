@@ -62,7 +62,9 @@ var Razorpay = window.Razorpay = function(overrides){
   this.id = generateUID();
 
   try {
-    this.get = base_configure(overrides).get;
+    var options = base_configure(overrides);
+    this.get = options.get;
+    this.set = options.set;
   } catch(e) {
     var message = e.message;
     if (!this.get || !this.isLiveMode()) {
@@ -94,6 +96,7 @@ var RazorpayDefaults = Razorpay.defaults = {
   'amount': 0,
   'currency': 'INR',
   'order_id': '',
+  'invoice_id': '',
   'notes': null,
   'callback_url': '',
   'redirect': false,
@@ -149,15 +152,13 @@ function makePrefParams(rzp) {
     var params = {};
     params.key_id = getter('key');
 
-    var order_id = getter('order_id');
-    var customer_id = getter('customer_id');
+    each(['order_id', 'customer_id', 'invoice_id'], function(i, key) {
+      var value = getter(key);
+      if (value) {
+        params[key] = value;
+      }
+    })
 
-    if (order_id) {
-      params.order_id = order_id;
-    }
-    if (customer_id) {
-      params.customer_id = customer_id;
-    }
     return params;
   }
 }

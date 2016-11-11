@@ -160,7 +160,8 @@ var tab_titles = sessProto.tab_titles = {
   card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet',
-  upi: 'UPI'
+  upi: 'UPI',
+  ecod: 'Pay by Link'
 }
 
 function notifyBridge(message){
@@ -332,6 +333,7 @@ function showModalWithSession(session){
   setPaymentMethods(session);
 
   var order = session.order = preferences.order;
+  var invoice = session.invoice = preferences.invoice;
   var get = session.get;
 
   if (order && order.bank && get('callback_url')) {
