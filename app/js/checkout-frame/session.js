@@ -623,7 +623,7 @@ Session.prototype = {
             $(this.el).removeClass('notopbar');
             var tab = $(e.target).attr('tab');
             if (tab === 'ecod') {
-              commenceECOD();
+              commenceECOD(this);
             } else {
               $('#footer').css('display', 'block');
             }
@@ -651,6 +651,17 @@ Session.prototype = {
       })
       this.on('click', '#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
+      })
+    }
+
+    if (this.get('ecod')) {
+      this.on('click', '#ecod-resend', function() {
+        this.showLoadError('Sending link to ' + getPhone());
+        var r = this.r;
+        $.ajax({
+          url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
+          callback: debounce(hideOverlayMessage, 4000)
+        })
       })
     }
 
@@ -1361,17 +1372,16 @@ Session.prototype = {
 }
 
 function commenceECOD(session) {
-  var self = this;
-  var url = makeAuthUrl(session.r, 'invoices/' + self.get('invoice_id') + '/status');
+  var url = makeAuthUrl(session.r, 'invoices/' + session.get('invoice_id') + '/status');
   setTimeout(function() {
     recurseAjax(url, function(response) {
       if (response.error) {
-        errorHandler.call(self, response);
+        errorHandler.call(session, response);
       } else if (response.success) {
-        successHandler.call(self, response);
+        successHandler.call(session, response);
       }
     }, function(response) {
-      self.ajax = this;
+      session.ajax = this;
       return response && response.status;
     })
   }, 15000)
