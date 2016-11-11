@@ -62,7 +62,9 @@ var Razorpay = window.Razorpay = function(overrides){
   this.id = generateUID();
 
   try {
-    this.get = base_configure(overrides).get;
+    var options = base_configure(overrides);
+    this.get = options.get;
+    this.set = options.set;
   } catch(e) {
     var message = e.message;
     if (!this.get || !this.isLiveMode()) {

@@ -1,5 +1,6 @@
 {{
 var o = it.get;
+var ecod = o('ecod');
 var method = it.methods;
 var wallet = method.wallet;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
@@ -77,18 +78,18 @@ else
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
-                <div class="pad">
+                <div class="pad" id="pad-common">
                   <div class="elem-wrap"><div class="elem elem-contact">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
                     <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}" required pattern="^\+?[0-9]{8,15}$">
                   </div></div>
-                  <div class="elem-wrap"><div class="elem elem-email">
+                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
-                    <label>Email {{?o('ecod')}}(optional){{?}}</label>
-                    <input class="input" name="email" type="email" id="email"{{?!o('ecod')}} required{{?}} value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <label>Email</label>
+                    <input class="input" name="email" type="email" id="email" value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                   {{? order.bank}}
                     <div class="customer-bank-details">
@@ -245,8 +246,11 @@ else
                     </div></div>
                 </div>
               {{?}}
-              {{? wallet.length }}
+              {{? wallet.length || ecod }}
                 <div class="tab-content showable screen" id="form-wallet">
+                  {{?ecod}}
+                  <div class="legend" id="ecod-label">Select payment method</div>
+                  {{?}}
                   {{ var count = 0, max = 3; }}
                   <div id="wallets" class="grid count-{{=wallet.length}}">
                     {{
@@ -267,6 +271,24 @@ else
                       count = (count + 1) % max;
                     }
                     }}
+                    {{?ecod}}
+                      {{?method.upi}}
+                        <div class="item radio-item" tab="upi">
+                          <input type="radio" name="wallet" id="ecod-radio-upi" tab="upi">
+                          <label class="radio-label mfix" for="ecod-radio-upi">
+                            <i>&#xe609;</i>{{=it.tab_titles.upi}}
+                          </label>
+                        </div>
+                      {{?}}
+                      {{?ecod}}
+                        <div class="item" tab="ecod">
+                          <input type="radio" name="wallet" id="ecod-radio-ecod" tab="ecod">
+                          <label class="radio-label mfix" for="ecod-radio-ecod">
+
+                          </label>
+                        </div>
+                      {{?}}
+                    {{?}}
                     <div class="clear"></div>
                     <span class="help">Please select one of the wallets</span>
                   </div>

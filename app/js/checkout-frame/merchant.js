@@ -160,8 +160,7 @@ var tab_titles = sessProto.tab_titles = {
   card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet',
-  upi: 'UPI',
-  ecod: 'Pay on Delivery'
+  upi: 'UPI'
 }
 
 function notifyBridge(message){
@@ -179,7 +178,6 @@ function notifyBridge(message){
 }
 
 function setPaymentMethods(session){
-  var ecod = session.get('ecod');
   var recurring = session.get('recurring');
   var availMethods = preferences.methods;
   var methods = session.methods = {
@@ -223,17 +221,10 @@ function setPaymentMethods(session){
     )
   }
 
-  if (!methods.netbanking || methods.netbanking instanceof Array || recurring || ecod) {
+  if (!methods.netbanking || methods.netbanking instanceof Array || recurring) {
     methods.netbanking = false;
   } else {
     methods.count = 1;
-  }
-
-  if (ecod) {
-    methods.ecod = true;
-    methods.count++;
-    methods.emi = false;
-    methods.card = false;
   }
 
   if (methods.card) {
