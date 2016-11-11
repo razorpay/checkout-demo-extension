@@ -627,4 +627,4 @@ Razorpay.emi = {
     var multiplier = Math.pow(1+rate, length);
     return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
   }
-}
+};
