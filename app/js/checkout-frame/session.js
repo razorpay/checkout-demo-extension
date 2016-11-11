@@ -198,7 +198,7 @@ function errorHandler(response){
   }
 
   var err_field = error.field;
-  if (err_field){
+  if (err_field && !(this.screen === 'otp' && this.tab === 'wallet')) {
     if(!err_field.indexOf('expiry')) {
       err_field = 'card[expiry]';
     }
@@ -338,7 +338,7 @@ Session.prototype = {
     return classes.join(' ');
   },
 
-  getEl: function(){
+  getEl: function() {
     if(!this.el){
       var div = document.createElement('div');
       div.innerHTML = templates.modal(this);
@@ -352,6 +352,9 @@ Session.prototype = {
       if (r.get('ecod')) {
         if (!r.get('prefill.email')) {
           r.set('prefill.email', 'void@razorpay.com');
+        }
+        if (this.invoice) {
+          r.set('order_id', this.invoice.order_id);
         }
         r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
@@ -620,9 +623,7 @@ Session.prototype = {
             $(this.el).removeClass('notopbar');
             var tab = $(e.target).attr('tab');
             if (tab !== 'ecod') {
-              setTimeout(function() {
-                $('#footer').css('display', 'block');
-              }, 250)
+              $('#footer').css('display', 'block');
             }
             if (tab) {
               this.switchTab(tab);

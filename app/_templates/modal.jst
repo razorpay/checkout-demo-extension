@@ -6,6 +6,7 @@ var wallet = method.wallet;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = it.order || {};
+var invoice = it.invoice;
 var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = it.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
@@ -130,9 +131,6 @@ else
                     {{?}}
                     {{? method.upi }}
                     <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>{{=it.tab_titles.upi}}</label></div>
-                    {{?}}
-                    {{? method.ecod }}
-                    <div class="payment-option item" tab="ecod"><label><i>&#xe609;</i>{{=it.tab_titles.ecod}}</label></div>
                     {{?}}
                   </div>
                   <div class="clear"></div>
@@ -278,7 +276,7 @@ else
                           <label id="ecod-label-upi" class="radio-label mfix" for="ecod-radio-upi"></label>
                         </div>
                       {{?}}
-                      {{?ecod}}
+                      {{?ecod && invoice}}
                         <div class="item" tab="ecod">
                           <input type="radio" name="wallet" id="ecod-radio-ecod" tab="ecod">
                           <label id="ecod-label-ecod" class="radio-label mfix" for="ecod-radio-ecod"></label>
@@ -301,10 +299,12 @@ else
                   </p>
                 </div>
               {{?}}
-              {{?method.ecod}}
+              {{?ecod && invoice}}
                 <div class="tab-content showable screen pad" id="form-ecod">
-                  <p>You can pay online using following link</p>
-                  <p id="ecod-link"></p>
+                  <img src="https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl={{=invoice.url}}">
+                  <p>An SMS with the payment link has also been sent to customer for initiating the payment.</p>
+                  <div class='text-btn'>Resend Link</div>
+                  <p>{{=invoice.url}}</p>
                 </div>
               {{?}}
               <div id="form-otp" class="tab-content showable screen">

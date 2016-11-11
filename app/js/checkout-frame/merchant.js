@@ -333,6 +333,7 @@ function showModalWithSession(session){
   setPaymentMethods(session);
 
   var order = session.order = preferences.order;
+  var invoice = session.invoice = preferences.invoice;
   var get = session.get;
 
   if (order && order.bank && get('callback_url')) {
