@@ -457,8 +457,9 @@ window.handleOTP = function(otp) {
   otp = String(otp).replace(/\D/g, '');
   var session = getSession();
   var otpEl = gel('otp');
-  if(session && otpEl && !otpEl.value){
+  if (session && otpEl && !otpEl.value) {
     otpEl.value = otp;
+    $('#otp-elem').removeClass('invalid');
   }
 }
 
