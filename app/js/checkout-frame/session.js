@@ -622,7 +622,9 @@ Session.prototype = {
           if (this.get('ecod')) {
             $(this.el).removeClass('notopbar');
             var tab = $(e.target).attr('tab');
-            if (tab !== 'ecod') {
+            if (tab === 'ecod') {
+              commenceECOD();
+            } else {
               $('#footer').css('display', 'block');
             }
             if (tab) {
@@ -1360,7 +1362,7 @@ Session.prototype = {
 
 function commenceECOD(session) {
   var self = this;
-  var url = makeAuthUrl(session.r, 'invoice/status' + self.get('invoice_id'));
+  var url = makeAuthUrl(session.r, 'invoices/' + self.get('invoice_id') + '/status');
   setTimeout(function() {
     recurseAjax(url, function(response) {
       if (response.error) {
