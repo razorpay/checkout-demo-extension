@@ -160,7 +160,8 @@ var tab_titles = sessProto.tab_titles = {
   card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet',
-  upi: 'UPI'
+  upi: 'UPI',
+  ecod: 'Pay by Link'
 }
 
 function notifyBridge(message){
