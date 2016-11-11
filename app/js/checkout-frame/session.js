@@ -779,6 +779,8 @@ Session.prototype = {
 
     if (tab === 'card') {
       this.showCardTab();
+    } else if (tab === 'ecod') {
+
     } else {
       this.setScreen(tab);
     }

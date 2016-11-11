@@ -87,10 +87,9 @@ else
                   <div class="elem-wrap"><div class="elem elem-email">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
-                    <label>Email {{?!o('email')}}(optional){{?}}</label>
-                    <input class="input" name="email" type="email" id="email"{{?o('email')}} required{{?}} value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <label>Email {{?o('ecod')}}(optional){{?}}</label>
+                    <input class="input" name="email" type="email" id="email"{{?!o('ecod')}} required{{?}} value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
-
                   {{? order.bank}}
                     <div class="customer-bank-details">
                       <div class="bank-name">
@@ -131,11 +130,13 @@ else
                     {{? method.upi }}
                     <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>{{=it.tab_titles.upi}}</label></div>
                     {{?}}
+                    {{? method.ecod }}
+                    <div class="payment-option item" tab="ecod"><label><i>&#xe609;</i>{{=it.tab_titles.ecod}}</label></div>
+                    {{?}}
                   </div>
                   <div class="clear"></div>
                 </div>
               </div>
-
               {{? method.card }}
                 <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
@@ -282,7 +283,12 @@ else
                   </p>
                 </div>
               {{?}}
-
+              {{?method.ecod}}
+                <div class="tab-content showable screen pad" id="form-ecod">
+                  <p>You can pay online using following link</p>
+                  <p id="ecod-link"></p>
+                </div>
+              {{?}}
               <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>
                 <div id="add-funds" class="add-funds">

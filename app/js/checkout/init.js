@@ -16,7 +16,6 @@ RazorpayDefaults.name =
 RazorpayDefaults.image = '';
 
 RazorpayDefaults.ecod = false;
-RazorpayDefaults.email = true;
 
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {

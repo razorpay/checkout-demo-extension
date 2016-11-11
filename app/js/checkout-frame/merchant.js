@@ -160,7 +160,8 @@ var tab_titles = sessProto.tab_titles = {
   card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet',
-  upi: 'UPI'
+  upi: 'UPI',
+  ecod: 'Pay on Delivery'
 }
 
 function notifyBridge(message){
@@ -229,6 +230,8 @@ function setPaymentMethods(session){
   }
 
   if (ecod) {
+    methods.ecod = true;
+    methods.count++;
     methods.emi = false;
     methods.card = false;
   }
