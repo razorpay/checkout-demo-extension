@@ -780,7 +780,7 @@ Session.prototype = {
     if (tab === 'card') {
       this.showCardTab();
     } else if (tab === 'ecod') {
-
+      commenceECOD(this);
     } else {
       this.setScreen(tab);
     }
@@ -1119,6 +1119,10 @@ Session.prototype = {
     if (this.r._payment) {
       this.r.emit('payment.cancel', extra);
     }
+    if (this.ajax) {
+      this.ajax.abort();
+      this.ajax = null;
+    }
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
@@ -1327,4 +1331,21 @@ Session.prototype = {
       this.close();
     }
   }
+}
+
+function commenceECOD(session) {
+  var self = this;
+  var url = makeAuthUrl(session.r, 'invoice/status' + self.get('invoice_id'));
+  setTimeout(function() {
+    recurseAjax(url, function(response) {
+      if (response.error) {
+        errorHandler.call(self, response);
+      } else if (response.success) {
+        successHandler.call(self, response);
+      }
+    }, function(response) {
+      self.ajax = this;
+      return response && response.status;
+    })
+  }, 15000)
 }
