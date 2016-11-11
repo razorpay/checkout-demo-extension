@@ -90,7 +90,7 @@ else
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email</label>
-                    <input class="input" name="email" type="email" id="email" value="{{=attr(o('prefill.email'))}}" pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" value="{{=attr(o('prefill.email'))}}" required pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                   {{? order.bank}}
                     <div class="customer-bank-details">
