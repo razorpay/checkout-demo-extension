@@ -349,12 +349,12 @@ Session.prototype = {
       this.body = $('#body');
 
       var r = this.r;
+      if (this.invoice) {
+        r.set('order_id', this.invoice.order_id);
+      }
       if (r.get('ecod')) {
         if (!r.get('prefill.email')) {
           r.set('prefill.email', 'void@razorpay.com');
-        }
-        if (this.invoice) {
-          r.set('order_id', this.invoice.order_id);
         }
         r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
