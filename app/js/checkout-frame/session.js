@@ -37,7 +37,7 @@ function makeEmiDropdown(emiObj, session){
     function(length, rate){
       h += '<div class="option" value="'+length+'">'
         + length + ' month EMI @ ' + rate + '% (&#xe600; '
-        + Razorpay.emi.calculator(length, rate, session.get('amount'))/100
+        + Razorpay.emi.calculator(session.get('amount'), length, rate)/100
         + ' per month)</div>';
     }
   )
