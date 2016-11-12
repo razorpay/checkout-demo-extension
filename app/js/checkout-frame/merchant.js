@@ -54,7 +54,8 @@ var freqWallets = sessProto.walletData = {
   },
   airtelmoney: {
     h: 32,
-    col:  walletPrefix + 'airtelmoney.png'
+    col:  walletPrefix + 'airtelmoney.png',
+    offer: 5
   },
   freecharge: {
     h: 18,
@@ -74,7 +75,8 @@ var freqWallets = sessProto.walletData = {
   },
   olamoney: {
     h: 22,
-    col: walletPrefix + 'olamoney.png'
+    col: walletPrefix + 'olamoney.png',
+    offer: 15
   }
 }
 

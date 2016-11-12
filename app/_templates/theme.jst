@@ -11,9 +11,14 @@ var close = it('theme.close_button');
 }
 {{?}}
 
-.button, .btn
+.button, .btn, .offer
 {
   background: {{=c}};
+}
+
+.offer:before {
+  border-bottom-color: {{=c}};
+  border-right: 8px solid {{=c}};
 }
 
 .spin div, .link
@@ -23,7 +28,8 @@ var close = it('theme.close_button');
 
 #payment-options i,
 .text-btn,
-#cancel_upi .back-btn
+#cancel_upi .back-btn,
+.offer-info li:first-child
 {
   color: {{=c}};
 }

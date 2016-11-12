@@ -402,6 +402,10 @@ i {
   background: #fff;
   backface-visibility: none;
 
+  &[tab=wallet] {
+    min-height: 400px;
+  }
+
   &.emi-focus {
     position: relative;
     z-index: 10;
@@ -719,4 +723,43 @@ $outline = #ddd;
   right: 0;
   border-radius: 0 0 $br $br;
   background: #fff;
+}
+
+.offer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  line-height: 24px;
+  color: #fff;
+  padding: 0 6px;
+  &:before {
+    display: block;
+    border: 12px solid transparent;
+    border-left-width: 8px;
+    content: '';
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: -16px;
+  }
+}
+
+:checked + .radio-label .offer {
+  bottom: -2px;
+}
+
+.offer-info {
+  display: none;
+  line-height: 20px;
+  margin: 10px 0 0 20px;
+  &.active {
+    display: block;
+  }
+  li {
+    list-style: none;
+    &:first-child {
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+  }
 }

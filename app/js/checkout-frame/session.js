@@ -633,6 +633,11 @@ Session.prototype = {
               this.preSubmit();
             }
           } else {
+            var value = e.target.value;
+            if (value) {
+              $('.offer-info.active').removeClass('active');
+              $('#' + value + '-info').addClass('active');
+            }
             $('#wallets').removeClass('invalid');
           }
         }, true);
