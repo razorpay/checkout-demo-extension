@@ -440,7 +440,7 @@ function setQueryParams(search){
   }
 }
 
-Razorpay.sendMessage = function(message){
+Razorpay.sendMessage = function(message) {
   if (isNonNullObject(CheckoutBridge)) {
     return notifyBridge(message);
   }

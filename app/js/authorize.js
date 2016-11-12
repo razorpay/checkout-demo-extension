@@ -628,3 +628,10 @@ Razorpay.emi = {
     return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
   }
 };
+
+Razorpay.sendMessage = function(message) {
+  if (message && message.event === 'redirect') {
+    var data = message.data;
+    submitForm(data.url, data.content, data.method);
+  }
+};
