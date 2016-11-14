@@ -75,8 +75,7 @@ var freqWallets = sessProto.walletData = {
   },
   olamoney: {
     h: 22,
-    col: walletPrefix + 'olamoney.png',
-    offer: 15
+    col: walletPrefix + 'olamoney.png'
   }
 }
 
