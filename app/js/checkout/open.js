@@ -86,7 +86,7 @@ function createFrameContainer(){
   var style = div.style;
   var rules = {
     'zIndex': '99999',
-    'position': shouldFixFixed ? 'absolute' : 'fixed',
+    'position': 'fixed',
     'top': 0,
     'display': 'none',
     'left': 0,
