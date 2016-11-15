@@ -197,6 +197,13 @@ Payment.prototype = {
     flattenProp(data, 'notes', '[]');
     flattenProp(data, 'card', '[]');
 
+    var expiry = data['card[expiry]'];
+    if (isString(expiry)) {
+      data['card[expiry_month]'] = expiry.slice(0, 2);
+      data['card[expiry_year]'] = expiry.slice(-2);
+      delete data['card[expiry]'];
+    }
+
     // add tracking data
     data._ = getCommonTrackingData();
     // make it flat
