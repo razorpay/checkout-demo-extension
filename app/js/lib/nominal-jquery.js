@@ -304,21 +304,21 @@ $.ajax = function(opts) {
         try {
           json = JSON.parse(xhr.responseText);
         } catch(e) {
-          json = {
-            xhr: {
-              status: xhr.status,
-              text: xhr.responseText
-            },
-            error: {
-              description: 'Parsing error'
-            }
+          json = discreet.error('Parsing error');
+          json.xhr = {
+            status: xhr.status,
+            text: xhr.responseText
           };
         }
         opts.callback(json);
       }
     }
-    xhr.onerror = function(){
-      opts.callback({error: {description: 'Network error'}});
+    xhr.onerror = function() {
+      var resp = discreet.error('Network error');
+      resp.xhr = {
+        status: 0
+      }
+      opts.callback(resp);
     }
   }
 
