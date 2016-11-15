@@ -272,9 +272,7 @@ Payment.prototype = {
       this.offmessage();
     }
     clearPollingInterval();
-    if(this.ajax){
-      this.ajax.abort();
-    }
+    abortAjax(this.ajax);
     this.r._payment = null;
   },
 
@@ -460,10 +458,9 @@ var responseTypes = {
     if (url.indexOf('key_id') === -1) {
       url += '?key_id=' + self.r.get('key');
     }
-    recurseAjax(url, function(response) {
+    self.ajax = recurseAjax(url, function(response) {
       self.complete(response);
     }, function(response) {
-      self.ajax = this;
       return response && response.status;
     })
     self.emit('upi.pending');

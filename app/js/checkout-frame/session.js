@@ -791,10 +791,7 @@ Session.prototype = {
   back: function(){
     var tab;
     if (this.get('ecod')) {
-      if (this.ajax) {
-        this.ajax.abort();
-        this.ajax = null;
-      }
+      abortAjax(this.ajax);
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
       $(this.el).addClass('notopbar');
@@ -1172,10 +1169,7 @@ Session.prototype = {
     if (this.r._payment) {
       this.r.emit('payment.cancel', extra);
     }
-    if (this.ajax) {
-      this.ajax.abort();
-      this.ajax = null;
-    }
+    abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
@@ -1389,15 +1383,14 @@ Session.prototype = {
 function commenceECOD(session) {
   var url = makeAuthUrl(session.r, 'invoices/' + session.get('invoice_id') + '/status');
   setTimeout(function() {
-    recurseAjax(url, function(response) {
+    session.ajax = recurseAjax(url, function(response) {
       if (response.error) {
         errorHandler.call(session, response);
       } else if (response.razorpay_payment_id) {
         successHandler.call(session, response);
       }
     }, function(response) {
-      session.ajax = this;
       return response && response.status;
     })
-  }, 15000)
+  }, 10000)
 }
