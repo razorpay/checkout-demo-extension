@@ -267,15 +267,16 @@ describe('Payment.prototype', function() {
       payment.popup = {
         close: sinon.stub()
       };
-      payment.ajax = {
-        abort: sinon.stub()
-      };
+
+      var ajaxStub = sinon.stub();
+      payment.ajax = [{abort: ajaxStub}];
       payment.offmessage = sinon.stub();
       var clearPollingStub = sinon.stub(window, 'clearPollingInterval');
       Payment.prototype.clear.call(payment);
       expect(payment.popup.onClose).to.not.be.ok();
       expect(payment.popup.close.callCount).to.be(1);
-      expect(payment.ajax.abort.callCount).to.be(1);
+      expect(ajaxStub.callCount).to.be(1);
+      expect(payment.ajax[0]).to.be(null);
       expect(payment.done).to.be(true);
       expect(payment.offmessage.callCount).to.be(1);
       expect(clearPollingStub.callCount).to.be(1);

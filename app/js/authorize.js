@@ -261,7 +261,7 @@ Payment.prototype = {
   },
 
   clear: function(){
-    try{
+    try {
       this.popup.onClose = null;
       this.popup.close();
     } catch(e){}
