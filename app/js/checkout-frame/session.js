@@ -666,14 +666,7 @@ Session.prototype = {
     }
 
     if (this.get('ecod')) {
-      this.on('click', '#ecod-resend', function() {
-        this.showLoadError('Sending link to ' + getPhone());
-        var r = this.r;
-        $.ajax({
-          url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
-          callback: debounce(hideOverlayMessage, 4000)
-        })
-      })
+      this.on('click', '#ecod-resend', send_ecod_link);
     }
 
     var goto_payment = '#error-message .link';
@@ -831,6 +824,8 @@ Session.prototype = {
 
     if (tab === 'card') {
       this.showCardTab();
+    } else if (tab === 'ecod') {
+      send_ecod_link.call(this);
     } else {
       this.setScreen(tab);
     }
@@ -1393,4 +1388,14 @@ function commenceECOD(session) {
       return response && response.status;
     })
   }, 10000)
+}
+
+function send_ecod_link() {
+  // this == session
+  this.showLoadError('Sending link to ' + getPhone());
+  var r = this.r;
+  $.post({
+    url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
+    callback: debounce(hideOverlayMessage, 4000)
+  })
 }
