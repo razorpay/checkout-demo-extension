@@ -340,6 +340,16 @@ Session.prototype = {
 
   getEl: function() {
     if(!this.el){
+      var r = this.r;
+      var ecod = r.get('ecod');
+      if (ecod) {
+        if (!r.get('prefill.email')) {
+          r.set('prefill.email', 'void@razorpay.com');
+        }
+        if (!r.get('prefill.contact')) {
+          r.set('prefill.contact', '' + preferences.customer.contact);
+        }
+      }
       var div = document.createElement('div');
       div.innerHTML = templates.modal(this);
       this.el = div.firstChild;
@@ -348,14 +358,10 @@ Session.prototype = {
       document.body.appendChild(this.el);
       this.body = $('#body');
 
-      var r = this.r;
       if (this.invoice) {
         r.set('order_id', this.invoice.order_id);
       }
-      if (r.get('ecod')) {
-        if (!r.get('prefill.email')) {
-          r.set('prefill.email', 'void@razorpay.com');
-        }
+      if (ecod) {
         r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
         gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
