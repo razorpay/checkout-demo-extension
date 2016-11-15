@@ -332,5 +332,5 @@ function recurseAjax(url, callback, continueTill, mature) {
     if (!mature) {
       continueTill.call(xhr);
     }
-  }, 600)
+  }, 1500)
 }

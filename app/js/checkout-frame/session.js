@@ -791,6 +791,10 @@ Session.prototype = {
   back: function(){
     var tab;
     if (this.get('ecod')) {
+      if (this.ajax) {
+        this.ajax.abort();
+        this.ajax = null;
+      }
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
       $(this.el).addClass('notopbar');
@@ -1388,7 +1392,7 @@ function commenceECOD(session) {
     recurseAjax(url, function(response) {
       if (response.error) {
         errorHandler.call(session, response);
-      } else if (response.success) {
+      } else if (response.razorpay_payment_id) {
         successHandler.call(session, response);
       }
     }, function(response) {
