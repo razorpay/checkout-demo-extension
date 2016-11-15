@@ -125,7 +125,9 @@ function Payment(data, params, r) {
   this.tryPopup();
 
   if (params.paused) {
-    this.writePopup();
+    try {
+      this.writePopup();
+    } catch(e){}
     this.on('resume', bind('generate', this, data));
   } else {
     this.generate(data);
