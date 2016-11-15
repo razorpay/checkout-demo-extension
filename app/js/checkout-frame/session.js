@@ -822,10 +822,12 @@ Session.prototype = {
     this.body.attr('tab', tab);
     this.tab = tab;
 
+    if (tab === 'ecod') {
+      send_ecod_link.call(this);
+    }
+
     if (tab === 'card') {
       this.showCardTab();
-    } else if (tab === 'ecod') {
-      send_ecod_link.call(this);
     } else {
       this.setScreen(tab);
     }
