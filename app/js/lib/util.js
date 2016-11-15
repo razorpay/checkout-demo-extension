@@ -4,6 +4,8 @@ function raise(message){
   throw new Error(message);
 }
 
+var arrayProto = Array.prototype;
+var slice = arrayProto.slice;
 var roll = function(){};
 var noop = roll;
 var emo = {};
@@ -92,7 +94,7 @@ function each(iteratee, eachFunc, thisArg) {
 }
 
 function indexOf(arr, item) {
-  if (Array.prototype.indexOf) {
+  if (arrayProto.indexOf) {
     return arr.indexOf(item);
   } else {
     var len = arr.length >>> 0;
@@ -120,9 +122,10 @@ function bind(func, thisArg, arg) {
   if (isString(func)) {
     func = thisArg[func];
   }
-  if (arguments.length === 3) {
+  var args = arguments;
+  if (args.length >= 3) {
     return function() {
-      func.call(this, arg);
+      func.apply(thisArg, slice.call(args, 2));
     }
   }
   return function() {
@@ -139,7 +142,7 @@ function defer(func, timeout) {
   } else {
     var args = arguments;
     setTimeout(function(){
-      func.apply(null, Array.prototype.slice.call(args, 2));
+      func.apply(null, slice.call(args, 2));
     }, timeout);
   }
 }
@@ -238,7 +241,7 @@ function invokeEachWith(map, func) {
     function(key, val){
       func.apply(
         thisArg,
-        [key, val].concat(Array.prototype.slice.call(args, declaredArgs))
+        [key, val].concat(slice.call(args, declaredArgs))
       );
     }
   )

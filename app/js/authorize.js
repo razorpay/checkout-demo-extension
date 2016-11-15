@@ -428,6 +428,14 @@ var responseTypes = {
           popup.window
         )
       }
+      // popup blocking addons close popup once we set a url
+      var self = this;
+      setTimeout(function() {
+        if (popup.window.closed && self.r.get('callback_url')) {
+          self.r.set('redirect', true);
+          self.checkRedirect();
+        }
+      })
     } else {
       // set in localStorage for lumia
       setPayloadStorage(direct ? content : makeAutoSubmitForm(request.url, content));
