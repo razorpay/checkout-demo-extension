@@ -258,6 +258,9 @@ else
                         max++;
                       }
                       w = wallet[w];
+                      if (w.power === false && ecod) {
+                        continue;
+                      }
                     }}
                       <div class="wallet item radio-item">
                         <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=w.name}}">
