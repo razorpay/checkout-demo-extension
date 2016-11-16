@@ -213,11 +213,14 @@ Payment.prototype = {
   generate: function(data) {
     this.data = clone(data);
     this.format();
+
+    if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
+      this.r.set('redirect', true);
+    }
     // redirect if specified
     if(this.checkRedirect()){
       return;
     }
-
     // show loading screen in popup
     this.writePopup();
 
@@ -309,7 +312,7 @@ Payment.prototype = {
   },
 
   makePopup: function() {
-    var popup = this.popup = new Popup('', 'popup_' + _uid);
+    var popup = new Popup('', 'popup_' + _uid);
     if (popup && !popup.window || popup.window.closed !== false) {
       popup.close();
       popup = null;
@@ -317,6 +320,7 @@ Payment.prototype = {
     if (popup) {
       popup.onClose = this.r.emitter('payment.cancel');
     }
+    this.popup = popup;
     return popup;
   },
 
@@ -327,22 +331,13 @@ Payment.prototype = {
     }
   },
 
-  tryPopup: function() {
-    var getOption = this.r.get;
-    if (getOption('redirect') || this.powerwallet) {
-      return;
-    }
+  shouldPopup: function() {
+    return !(this.r.get('redirect') || this.powerwallet);
+  },
 
-    if (!this.makePopup()) {
-      // popup creation failed
-      // check if we've callback_url to rescue, and move to redirect mode
-      if (getOption('callback_url')) {
-        getOption().redirect = true;
-      } else {
-        // if no callback_url, try to open a new tab
-        localStorage.removeItem('payload');
-        submitForm(RazorpayConfig.api + 'submitPayload.php', null, null, '_blank');
-      }
+  tryPopup: function() {
+    if (this.shouldPopup()) {
+      this.makePopup();
     }
   }
 }
