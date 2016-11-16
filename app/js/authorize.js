@@ -559,7 +559,7 @@ RazorProto.postInit = function() {
   this._onNewListener = function(event) {
     var self = this;
     if (event === 'ready') {
-      Razorpay.payment.getPrefs(makePrefParams(this), function(response) {
+      Razorpay.payment.getPrefsJsonp(makePrefParams(this), function(response) {
         self.methods = response.methods;
         self.emit('ready', response);
       })
@@ -614,7 +614,7 @@ Razorpay.payment = {
     return err(errors);
   },
 
-  getPrefs: function(data, callback){
+  getPrefsJsonp: function(data, callback){
     return $.jsonp({
       url: makeUrl('preferences'),
       data: data,
@@ -625,8 +625,25 @@ Razorpay.payment = {
     });
   },
 
+  getPrefs: function(data, callback){
+    var url = makeUrl('preferences') + '?';
+    each(data, function(key, val) {
+      url += key + '=' + val + '&';
+    })
+    return $.ajax({
+      url: url.slice(0, -1),
+      timeout: 30000,
+      callback: function(response){
+        if (response.xhr && response.xhr.status === 0) {
+          return Razorpay.payment.getPrefsJsonp(data, callback);
+        }
+        invoke(callback, null, response);
+      }
+    });
+  },
+
   getMethods: function(callback){
-    return Razorpay.payment.getPrefs({
+    return Razorpay.payment.getPrefsJsonp({
       key_id: Razorpay.defaults.key
     }, function(response){
       callback(response.methods || response);
