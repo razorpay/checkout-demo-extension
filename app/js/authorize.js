@@ -310,12 +310,9 @@ Payment.prototype = {
 
   makePopup: function() {
     var popup = this.popup = new Popup('', 'popup_' + _uid);
-    if (popup) {
-      if (!popup.window) {
-        popup = null;
-      } else if (this.r.get('callback_url') && popup.window.closed !== false) {
-        popup = null;
-      }
+    if (popup && !popup.window || popup.window.closed !== false) {
+      popup.close();
+      popup = null;
     }
     if (popup) {
       popup.onClose = this.r.emitter('payment.cancel');
