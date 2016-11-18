@@ -1295,7 +1295,9 @@ Session.prototype = {
         if (this.get('ecod')) {
           this.back();
           this.clearRequest();
-          return this.showLoadError('Insufficient balance in your wallet', true);
+          defer(bind(function() {
+            this.showLoadError(insufficient_text, true);
+          }, this), 400);
         }
         if (this.payload && this.payload.wallet === 'payumoney' && this.r._payment) {
           if (!window.localStorage) {
