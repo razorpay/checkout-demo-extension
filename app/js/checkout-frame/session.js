@@ -1066,7 +1066,7 @@ Session.prototype = {
     var actionState;
     var loadingState = 'addClass';
     if (error) {
-      if (this.screen === 'upi' && text === discreet.cancelMsg) {
+      if ((this.screen === 'upi' || this.get('ecod')) && text === discreet.cancelMsg) {
         return this.hideErrorMessage();
       }
       actionState = loadingState;
@@ -1292,6 +1292,11 @@ Session.prototype = {
       this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on('payment.wallet.topup', bind(function() {
         var insufficient_text = 'Insufficient balance in your wallet';
+        if (this.get('ecod')) {
+          this.back();
+          this.clearRequest();
+          return this.showLoadError('Insufficient balance in your wallet', true);
+        }
         if (this.payload && this.payload.wallet === 'payumoney' && this.r._payment) {
           if (!window.localStorage) {
             return this.r._payment.complete(discreet.error(insufficient_text));
