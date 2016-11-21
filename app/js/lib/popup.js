@@ -33,8 +33,8 @@ var Popup = function(src, name) {
   var height = window.innerHeight || document.documentElement.clientHeight;
 
   var opts = {
-    width: getPopupDimension(width*0.6, 720, 1440),
-    height: getPopupDimension(height*0.75, 520, 1060),
+    width: getPopupDimension(width*0.7, 895, 1440),
+    height: getPopupDimension(height*0.8, 520, 1060),
     menubar: 'no',
     resizable: 'yes',
     location: 'no',
