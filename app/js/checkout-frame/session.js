@@ -360,6 +360,9 @@ Session.prototype = {
 
       if (this.invoice) {
         r.set('order_id', this.invoice.order_id);
+        if (ecod) {
+          commenceECOD(this);
+        }
       }
       if (ecod) {
         r.set('prefill.method', 'wallet');
@@ -628,9 +631,7 @@ Session.prototype = {
           if (this.get('ecod')) {
             $(this.el).removeClass('notopbar');
             var tab = $(e.target).attr('tab');
-            if (tab === 'ecod') {
-              commenceECOD(this);
-            } else {
+            if (tab !== 'ecod') {
               $('#footer').css('display', 'block');
             }
             if (tab) {
@@ -784,7 +785,6 @@ Session.prototype = {
   back: function(){
     var tab;
     if (this.get('ecod')) {
-      abortAjax(this.ajax);
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
       $(this.el).addClass('notopbar');
@@ -1345,6 +1345,7 @@ Session.prototype = {
 
   close: function(){
     if(this.isOpen){
+      abortAjax(this.ajax);
       this.clearRequest();
       this.isOpen = false;
       clearTimeout(fontTimeout);
@@ -1396,7 +1397,7 @@ function commenceECOD(session) {
     }, function(response) {
       return response && response.status;
     })
-  }, 10000)
+  }, 6000)
 }
 
 function send_ecod_link() {
