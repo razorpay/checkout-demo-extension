@@ -339,6 +339,9 @@ function showModalWithSession(session){
   var invoice = session.invoice = preferences.invoice;
   var get = session.get;
 
+  if (invoice && invoice.amount) {
+    get().amount = invoice.amount;
+  }
   if (order && order.bank && get('callback_url')) {
     get().redirect = true;
     return session.r.createPayment({
