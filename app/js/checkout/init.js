@@ -57,6 +57,7 @@ RazorpayDefaults.theme = {
   color: '',
   backdrop_color: 'rgba(0,0,0,0.6)',
   image_padding: true,
+  image_frame: true,
   close_button: true,
   hide_topbar: false
 }
