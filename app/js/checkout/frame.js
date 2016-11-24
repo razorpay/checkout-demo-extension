@@ -12,7 +12,8 @@ var merchantMarkup = {
   },
 
   resize: function() {
-    this.el.style.height = Math.max(window.innerHeight || 0, containerHeight) + 'px';
+    frameContainer.style.position = innerHeight < 450 ? 'absolute' : 'fixed';
+    this.el.style.height = Math.max(innerHeight, containerHeight) + 'px';
   },
 
   // scroll manually in iPhone
