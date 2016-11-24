@@ -320,6 +320,11 @@ Session.prototype = {
     }
 
     var getter = this.get;
+
+    if (!this.r.isLiveMode()) {
+      classes.push('test');
+    }
+
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
     }
