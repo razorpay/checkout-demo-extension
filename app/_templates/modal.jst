@@ -11,10 +11,11 @@ var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = it.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;
+var amount_figure = (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
-  amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
+  amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + amount_figure;
 }}
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -327,6 +328,10 @@ else
                   <div style="margin: 10px 0; padding: 10px 0">
                     <div id='ecod-resend' class='text-btn' style='float: right'>Resend Link</div>
                     <span style='border-bottom: 1px dashed #ddd'>{{=invoice.url}}</span>
+                    <a id="share-link" class="btn"
+                      href="rzp://rzp.io/invoice/share/{{=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)}}">
+                      Share Link
+                    </a>
                   </div>
                 </div>
               {{?}}
