@@ -328,10 +328,12 @@ else
                   <div style="margin: 10px 0; padding: 10px 0">
                     <div id='ecod-resend' class='text-btn' style='float: right'>Resend Link</div>
                     <span style='border-bottom: 1px dashed #ddd'>{{=invoice.url}}</span>
-                    <a id="share-link" class="btn"
-                      href="rzp://rzp.io/invoice/share/{{=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)}}">
-                      Share Link
-                    </a>
+                    {{?epos_share_link}}
+                      <a id="share-link" class="btn"
+                        href="rzp://rzp.io/invoice/share/{{=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)}}">
+                        Share Link
+                      </a>
+                    {{?}}
                   </div>
                 </div>
               {{?}}

@@ -478,6 +478,7 @@ function validUID(id){
   return true;
 }
 
+var epos_share_link;
 window.handleMessage = function(message) {
   if('id' in message && !validUID(message.id)){
     return;
@@ -485,6 +486,13 @@ window.handleMessage = function(message) {
   var id = message.id || _uid;
   var session = getSession(id);
   var options = message.options;
+
+  try {
+    if (options && options.epos_build_code >= 3) {
+      epos_share_link = true;
+    }
+  } catch(e) {}
+
   if(!session){
     if(!options){
       return;
