@@ -325,6 +325,10 @@ Session.prototype = {
       classes.push('test');
     }
 
+    if (getter('theme.branding')) {
+      classes.push('cob');
+    }
+
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
     }
