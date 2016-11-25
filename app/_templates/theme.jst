@@ -1,29 +1,29 @@
-{{
-var c = it('theme.color') || '#3594E2';
-var close = it('theme.close_button');
-}}
+`
+var c = _('theme.color') || '#3594E2';
+var close = _('theme.close_button');
+`
 
-{{?it('theme.upi_only')}}
+`?_('theme.upi_only')`
 #payment-options div:nth-child(-n+3){
   pointer-events: none;
   -webkit-filter: grayscale(100%);
   filter: grayscale(100%);
 }
-{{?}}
+`?`
 
 .button, .btn, .offer
 {
-  background: {{=c}};
+  background: `=c`;
 }
 
 .offer:before {
-  border-bottom-color: {{=c}};
-  border-right: 8px solid {{=c}};
+  border-bottom-color: `=c`;
+  border-right: 8px solid `=c`;
 }
 
 .spin div, .link
 {
-  border-color: {{=c}}!important;
+  border-color: `=c`!important;
 }
 
 #payment-options i,
@@ -32,14 +32,14 @@ var close = it('theme.close_button');
 .offer-info li:first-child,
 .ecod .item i
 {
-  color: {{=c}};
+  color: `=c`;
 }
 
 #header{
-  background: {{=c}};
+  background: `=c`;
 }
 
-{{?it.image_padding}}
+`?_.image_padding`
 .merchant-image{
   width: 60px;
   height: 60px;
@@ -47,9 +47,9 @@ var close = it('theme.close_button');
   border: 1px solid #eaeaea;
   background: #fff;
 }
-{{?}}
+`?`
 
-{{?!it('theme.image_frame')}}
+`?!_('theme.image_frame')`
 #logo {
   background: none;
   box-shadow: none;
@@ -57,23 +57,23 @@ var close = it('theme.close_button');
   width: 80px;
   height: 80px;
 }
-{{?}}
+`?`
 
 .option.active,
 .checked .checkbox,
 input[type=checkbox]:checked + .checkbox
 {
   color: #fff;
-  background: {{=c}};
-  border-color: {{=c}};
+  background: `=c`;
+  border-color: `=c`;
 }
 
-{{?!close}}
+`?!close`
 #modal-close{
   display: none;
 }
-{{?}}
+`?`
 
 .grid :checked+label {
-  border-bottom: 2px solid {{=c}};
+  border-bottom: 2px solid `=c`;
 }
