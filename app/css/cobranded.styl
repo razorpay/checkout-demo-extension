@@ -16,15 +16,19 @@
     top: 100%
     left: 50%
     background: no-repeat #fff center
-    background-size: 120px
+    background-size: 130px
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.14)
   #cob-rzp
-    position: fixed;
+    display: none
+    position: fixed
     bottom: 0;
     z-index: 9;
     width: 160px;
     left: 50%;
     margin-left: -76px;
+  &.mobile
+    #cob-rzp
+      display: block
 
   #topbar, #form
     padding-top: 30px
