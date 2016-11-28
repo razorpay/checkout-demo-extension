@@ -604,6 +604,11 @@ Session.prototype = {
   },
 
   bindEvents: function(){
+    this.on('focus', '#body', 'input', 'focus', true);
+    this.on('blur', '#body', 'input', 'blur', true);
+    this.on('input', '#body', 'input', function(e) {
+      this.input(e.target);
+    }, true);
     if(this.get('theme.close_button')){
       this.click('#modal-close', function(){
         if (this.get('modal.confirm_close') && !confirmClose()) {
@@ -613,10 +618,6 @@ Session.prototype = {
       });
     }
     this.click('#top-left', this.back);
-    this.click('#user', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-    })
     this.click('.payment-option', function(e){
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
@@ -725,13 +726,62 @@ Session.prototype = {
     this.click('#fd-hide', this.hideErrorMessage);
   },
 
-  setFormatting: function() {
-    var inputHandler = this.ihandler = new InputHandler(this.el, $$('.input'));
-    var bits = this.bits;
-    bits.push(inputHandler);
+  focus: function(e) {
+    $(e.target.parentNode).addClass('focused');
+    if (ua_iPhone) {
+      Razorpay.sendMessage({event: 'focus'});
+    }
+  },
 
-    var delegator = this.delegator = Razorpay.setFormatter(this.el);
-    if (this.methods.card) {
+  blur: function(e) {
+    $(e.target.parentNode)
+      .removeClass('focused')
+      .addClass('mature');
+    this.input(e.target);
+    if (ua_iPhone) {
+      Razorpay.sendMessage({event: 'blur'});
+    }
+  },
+
+  input: function(el) {
+    var value = el.value;
+    var required = isString(el.getAttribute('required'));
+    var pattern = el.getAttribute('pattern');
+    var $parent = $(el.parentNode);
+
+    $parent.toggleClass('filled', value);
+
+    // validity check past this
+    if (!(required || pattern)) {
+      return;
+    }
+    var valid = true;
+    if (required && !value) {
+      valid = false;
+    }
+    if (!required && !value) {
+      valid = true;
+    } else {
+      if (valid && pattern) {
+        valid = new RegExp(pattern).test(value);
+      }
+    }
+    toggleInvalid($parent, valid);
+  },
+
+  refresh: function() {
+    var self = this;
+    each($$('.input'), function(i, el) {
+      self.input(el);
+    });
+  },
+
+  setFormatting: function() {
+    var self = this;
+    self.refresh();
+    var bits = self.bits;
+    var delegator = self.delegator = Razorpay.setFormatter(self.el);
+    if (self.methods.card) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
       var el_cvv = gel('card_cvv');
@@ -753,7 +803,7 @@ Session.prototype = {
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
           el_cvv.pattern = '^[0-9]{'+cvvlen+'}$';
-          inputHandler.input({target: el_cvv});
+          self.input(el_cvv);
 
           // card icon element
           this.el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
@@ -771,7 +821,7 @@ Session.prototype = {
 
       delegator.expiry = delegator.add('expiry', el_expiry)
         .on('change', function() {
-          inputHandler.input({target: el_expiry});
+          self.input(el_expiry);
 
           var isValid = this.isValid();
           toggleInvalid($(this.el.parentNode), isValid);
@@ -783,16 +833,16 @@ Session.prototype = {
 
       delegator.cvv = delegator.add('number', el_cvv)
         .on('change', function() {
-          inputHandler.input({target: this.el})
+          self.input(this.el);
         })
     }
     delegator.contact = delegator.add('phone', gel('contact'))
       .on('change', function() {
-        inputHandler.input({target: this.el})
+        self.input(this.el);
       })
     delegator.otp = delegator.add('number', gel('otp'))
       .on('change', function() {
-        inputHandler.input({target: this.el})
+        self.input(this.el);
       })
   },
 
@@ -1020,7 +1070,7 @@ Session.prototype = {
   selectBankRadio: function(e){
     var select = gel('bank-select');
     select.value = e.target.value;
-    this.ihandler.input({target: select});
+    self.input(select);
   },
 
   checkInvalid: function(parent) {
@@ -1219,7 +1269,7 @@ Session.prototype = {
       return this.onOtpSubmit();
     }
 
-    this.ihandler.refresh();
+    this.refresh();
     var data = this.payload = this.getPayload();
     if (this.order) {
       if (this.checkInvalid('#pad-common')) {
@@ -1406,7 +1456,7 @@ Session.prototype = {
       this.modal =
       this.emi =
       this.el =
-      this.card = this.ihandler =
+      this.card =
       window.setPaymentID =
       window.onComplete = null;
     }
