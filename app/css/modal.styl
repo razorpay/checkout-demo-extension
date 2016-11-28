@@ -67,11 +67,11 @@ html {
     width: 100%;
   }
 
-  &.count-3 .item, &.count-6 .item {
-    width: 33.33%;
+  &.count-2 .item, &.count-4 .item {
+    width: 50%;
   }
 
-  &.count-5 .item:nth-child(5) {
+  &.count-5 .item:nth-child(5), &.count-7 .item:nth-child(7) {
     border-right: 1px solid $bc;
     box-sizing: content-box;
     border-left: none;
@@ -79,7 +79,7 @@ html {
 
   .item {
     cursor: pointer;
-    width: 50%;
+    width: 33.33%;
     float: left;
     transition: 0.2s;
     border-bottom: 1px solid $bc;
@@ -401,10 +401,6 @@ i {
   height: $bodyh;
   background: #fff;
   backface-visibility: none;
-
-  &[tab=wallet] {
-    min-height: 400px;
-  }
 
   &.emi-focus {
     position: relative;
@@ -770,6 +766,8 @@ $outline = #ddd;
   }
 }
 
-.count-7 .grid label {
-  height: 82px;
+.count-7 {
+  ~.offer-info {
+    display: none;
+  }
 }
