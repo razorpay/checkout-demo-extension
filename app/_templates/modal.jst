@@ -65,6 +65,9 @@ else
             <div id="merchant-desc">{{=html(o('description').trim())}}</div>
             <div id="amount">{{=amount}}</div>
           </div>
+          {{?o('theme.branding')}}
+            <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/brand/{{=o('theme.branding')}}.png')"></div>
+          {{?}}
         </div>
         <div id="body" class="{{? order.bank}}sub{{?}}">
           <div id="topbar">
@@ -367,6 +370,9 @@ else
               <span class="pay-btn">PAY &nbsp;{{=amount}}</span>
               <span class="otp-btn">Verify</span>
             </button>
+            {{?o('theme.branding')}}
+              <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">
+            {{?}}
           </form>
         </div>
       </div>
