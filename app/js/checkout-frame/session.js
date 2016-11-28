@@ -346,6 +346,11 @@ Session.prototype = {
     if(shouldFixFixed){
       classes.push('ip')
     }
+
+    if (/Android 4/.test(ua)) {
+      classes.push('android4');
+    }
+
     return classes.join(' ');
   },
 
