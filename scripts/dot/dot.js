@@ -8,16 +8,16 @@
 	var doT = {
 		version: "1.0.3",
 		templateSettings: {
-			evaluate:    /\{\{([\s\S]+?(\}?)+)\}\}/g,
-			interpolate: /\{\{=([\s\S]+?)\}\}/g,
-			encode:      /\{\{!([\s\S]+?)\}\}/g,
-			use:         /\{\{#([\s\S]+?)\}\}/g,
+			evaluate:    /`([\s\S]+?(\}?)+)`/g,
+			interpolate: /`=([\s\S]+?)`/g,
+			encode:      /`!([\s\S]+?)`/g,
+			use:         /`#([\s\S]+?)`/g,
 			useParams:   /(^|[^\w$])def(?:\.|\[[\'\"])([\w$\.]+)(?:[\'\"]\])?\s*\:\s*([\w$\.]+|\"[^\"]+\"|\'[^\']+\'|\{[^\}]+\})/g,
-			define:      /\{\{##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#\}\}/g,
+			define:      /`##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#`/g,
 			defineParams:/^\s*([\w$]+):([\s\S]+)/,
-			conditional: /\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g,
-			iterate:     /\{\{~\s*(?:\}\}|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*\}\})/g,
-			varname:	"it",
+			conditional: /`\?(\?)?\s*([\s\S]*?)\s*`/g,
+			iterate:     /`~\s*(?:`|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*`)/g,
+			varname:	"_",
 			strip:		true,
 			append:		true,
 			selfcontained: false,
@@ -106,11 +106,9 @@
 					(code ? "';}else if(" + unescape(code) + "){out+='" : "';}else{out+='") :
 					(code ? "';if(" + unescape(code) + "){out+='" : "';}out+='");
 			})
-			.replace(c.iterate || skip, function(m, iterate, vname, iname) {
-				if (!iterate) return "';} } out+='";
-				sid+=1; indv=iname || "i"+sid; iterate=unescape(iterate);
-				return "';var arr"+sid+"="+iterate+";if(arr"+sid+"){var "+vname+","+indv+"=-1,l"+sid+"=arr"+sid+".length-1;while("+indv+"<l"+sid+"){"
-					+vname+"=arr"+sid+"["+indv+"+=1];out+='";
+			.replace(c.iterate || skip, function(m, iterate, iname, vname) {
+				if (!iterate) return "';});out+='";
+				return "';each("+unescape(iterate)+",function("+iname+","+vname+"){out+='";
 			})
 			.replace(c.evaluate || skip, function(m, code) {
 				return "';" + unescape(code) + "out+='";

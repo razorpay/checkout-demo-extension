@@ -93,7 +93,9 @@ function onSixDigits(e){
 
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
-    makeEmiDropdown(emiObj, this);
+    if (!$('#emi-plans-wrap .option')[0]) {
+      makeEmiDropdown(emiObj, this);
+    }
   } else {
     emi_parent.removeClass('checked');
     $(emi_parent.find('.active')[0]).removeClass('active');

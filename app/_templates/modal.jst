@@ -1,14 +1,14 @@
-{{
-var o = it.get;
+`
+var o = _.get;
 var ecod = o('ecod');
-var method = it.methods;
+var method = _.methods;
 var wallet = method.wallet;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
-var order = it.order || {};
-var invoice = it.invoice;
+var order = _.order || {};
+var invoice = _.invoice;
 var bankName = method.netbanking && method.netbanking[order.bank];
-var bank = it.netbanks[order.bank] || {};
+var bank = _.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;
 var amount_figure = (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
@@ -16,7 +16,7 @@ if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = "<i>&#xe600;</i><span class='iph'>₹</span> " + amount_figure;
-}}
+`
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
   <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank">&#xe608;</a></i>
@@ -53,23 +53,23 @@ else
       <div id="content">
         <div id="header">
           <div id="modal-close" class="close">×</div>
-          {{?o('image')}}
+          `?o('image')`
             <div id="logo">
-              <img src="{{=attr(o('image'))}}">
+              <img src="`=attr(o('image'))`">
             </div>
-          {{?}}
+          `?`
           <div id="merchant">
-            {{?o('name')}}
-              <div id="merchant-name">{{=html(o('name'))}}</div>
-            {{?}}
-            <div id="merchant-desc">{{=html(o('description').trim())}}</div>
-            <div id="amount">{{=amount}}</div>
+            `?o('name')`
+              <div id="merchant-name">`=html(o('name'))`</div>
+            `?`
+            <div id="merchant-desc">`=html(o('description').trim())`</div>
+            <div id="amount">`=amount`</div>
           </div>
           {{?o('theme.branding')}}
             <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/brand/{{=o('theme.branding')}}.png')"></div>
           {{?}}
         </div>
-        <div id="body" class="{{? order.bank}}sub{{?}}">
+        <div id="body"`?order.bank` class="sub"`?`>
           <div id="topbar">
             <div id="top-right" tabIndex="0">
               <div id="user"></div>
@@ -88,59 +88,57 @@ else
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="{{=attr(o('prefill.contact'))}}" required pattern="^\+?[0-9]{8,15}$">
+                    <input class="input" id="contact" name="contact" type="tel" value="`=attr(o('prefill.contact'))`" required pattern="^\+?[0-9]{8,15}$">
                   </div></div>
                   <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email</label>
-                    <input class="input" name="email" type="email" id="email" value="{{=attr(o('prefill.email'))}}" required pattern="^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`" required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
-                  {{? order.bank}}
+                  `?order.bank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
-                        {{ if(bank.image) { }}
-                          <img src="{{=bank.image}}">
-                        {{ } else { }}
-                          <img src="{{=bank.logoURL}}" />
-                        {{ } }}
-
-                        {{ if(bankName) { }}
-                          {{=bankName}}
-                        {{ } else { }}
+                        `?bank.image`
+                          <img src="`=bank.image`">
+                        `??`
+                          <img src="`=bank.logoURL`" />
+                        `?`
+                        `?bankName`
+                          `=bankName`
+                        `??`
                           Bank Details
-                        {{ } }}
+                        `?`
                       </div>
-                      {{? order.account_number}}
+                      `?order.account_number`
                         <div class="account-details clearfix">
                           <div class="float-left">Account</div>
-                          <div class="float-left text-uppercase">{{=order.account_number}}</div>
+                          <div class="float-left text-uppercase">`=order.account_number`</div>
                         </div>
-                      {{?}}
+                      `?`
                     </div>
-                  {{?}}
+                  `?`
                 </div>
-
-                <div class="{{? order.bank}} showable {{?}}">
+                <div`?order.bank` class="showable"`?`>
                   <div class="legend">Select payment method</div>
-                  <div id="payment-options" class="grid clear count-{{=method.count}}">
-                    {{? method.card }}
-                    <div class="payment-option item" tab="card"><label><i>&#xe609;</i>{{=it.tab_titles.card}}</label></div>
-                    {{?}}
-                    {{? method.netbanking }}
-                    <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>{{=it.tab_titles.netbanking}}</label></div>
-                    {{?}}
-                    {{? wallet.length }}
-                    <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>{{=it.tab_titles.wallet}}</label></div>
-                    {{?}}
-                    {{? method.upi }}
-                    <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>{{=it.tab_titles.upi}}</label></div>
-                    {{?}}
+                  <div id="payment-options" class="grid clear count-`=method.count`">
+                    `?method.card`
+                    <div class="payment-option item" tab="card"><label><i>&#xe609;</i>`=_.tab_titles.card`</label></div>
+                    `?`
+                    `?method.netbanking`
+                    <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>`=_.tab_titles.netbanking`</label></div>
+                    `?`
+                    `?wallet.length`
+                    <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>`=_.tab_titles.wallet`</label></div>
+                    `?`
+                    `?method.upi`
+                    <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>`=_.tab_titles.upi`</label></div>
+                    `?`
                   </div>
                   <div class="clear"></div>
                 </div>
               </div>
-              {{? method.card }}
+              `?method.card`
                 <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
                   <div id="saved-cards-container"></div>
@@ -152,25 +150,25 @@ else
                       <label>Card Number</label>
                       <i>&#xe605;</i>
                       <span class="help">Please enter a valid card number</span>
-                      <input class="input" type="tel" id="card_number" name="card[number]" autocomplete="off" maxlength="19" value="{{=attr(o('prefill.card[number]'))}}">
+                      <input class="input" type="tel" id="card_number" name="card[number]" autocomplete="off" maxlength="19" value="`=attr(o('prefill.card[number]'))`">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
                       <label>Expiry</label>
                       <i>&#xe606;</i>
-                      <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="{{=attr(o('prefill.card[expiry]'))}}">
+                      <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
                     </div></div>
                     <div class="elem-wrap two-third"><div class="elem elem-name">
                       <label>Card Holder's Name</label>
                       <i>&#xe602;</i>
-                      <input class="input" type="text" id="card_name" name="card[name]" required value="{{=attr(o('prefill.name'))}}" pattern="^[a-zA-Z .]+$">
+                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z .]+$">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-cvv">
                       <label>CVV</label>
                       <i>&#xe604;</i>
-                      <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}" value="{{=attr(o('prefill.card[cvv]'))}}">
+                      <input class="input" type="password" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}" value="`=attr(o('prefill.card[cvv]'))`">
                     </div></div>
                     <div class="clear"></div>
-                    {{? o('remember_customer')}}
+                    `?o('remember_customer')`
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>
@@ -184,7 +182,7 @@ else
                       </div>
                       <div class="clear"></div>
                     </div>
-                    {{?}}
+                    `?`
                   </div>
                   <label id="nocvv-check" for="nocvv">
                     <input type="checkbox" id="nocvv" disabled>
@@ -210,52 +208,52 @@ else
                   </div>
                   </div>
                 </div>
-              {{?}}
-              {{? method.netbanking }}
+              `?`
+              `?method.netbanking`
                 <div class="tab-content showable screen" id="form-netbanking">
-                  {{ var count = 0, max = 3; }}
+                  `var count = 0, max = 3;`
                   <div id="netb-banks" class="clear grid count-3">
-                    {{
-                    for(var b in it.netbanks){
+                    `
+                    for(var b in _.netbanks){
                       if(count === 0){
                         count = max - 3 + 1;
                         max++;
                       }
-                    }}
+                    `
                       <div class="netb-bank item radio-item">
-                        <input class="bank-radio" id="bank-radio-{{=b}}" type="radio" name="bank" value="{{=b}}">
-                        <label for="bank-radio-{{=b}}" class="radio-label mfix">
-                          <div class="mchild l-{{=count}} item-inner">
-                            <img src="{{=it.netbanks[b].image}}">
-                            <div>{{=it.netbanks[b].title}}</div>
+                        <input class="bank-radio" id="bank-radio-`=b`" type="radio" name="bank" value="`=b`">
+                        <label for="bank-radio-`=b`" class="radio-label mfix">
+                          <div class="mchild l-`=count` item-inner">
+                            <img src="`=_.netbanks[b].image`">
+                            <div>`=_.netbanks[b].title`</div>
                           </div>
                         </label>
                       </div>
-                    {{
+                    `
                     count = (count + 1) % max;
                     }
-                    }}
+                    `
                   </div>
                     <div class="elem-wrap pad"><div id="nb-elem" class="elem select">
                       <i class="select-arrow">&#xe601;</i>
                       <div class="help">Please select a bank</div>
                       <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                         <option selected="selected" value="">Other Banks</option>
-                        {{for(var i in method.netbanking){}}
-                          <option value="{{=i}}">{{=method.netbanking[i]}}</option>
-                        {{}}}
+                        `~method.netbanking:bank:bankname`
+                          <option value="`=bank`">`=bankname`</option>
+                        `~`
                       </select>
                     </div></div>
                 </div>
-              {{?}}
-              {{? wallet.length || ecod }}
+              `?`
+              `?wallet.length || ecod`
                 <div class="tab-content showable screen" id="form-wallet">
-                  {{?ecod}}
+                  `?ecod`
                   <div class="legend" id="ecod-label">Select payment method</div>
-                  {{?}}
-                  {{ var count = 0, max = 3; }}
-                  <div id="wallets" class="grid count-{{=wallet.length}}">
-                    {{
+                  `?`
+                  `var count = 0, max = 3;`
+                  <div id="wallets" class="grid count-`=wallet.length`">
+                    `
                     for (var w in wallet){
                       if(count === 0){
                         count = max - 3 + 1;
@@ -265,28 +263,28 @@ else
                       if (w.power === false && ecod) {
                         continue;
                       }
-                    }}
+                    `
                       <div class="wallet item radio-item">
-                        <input type="radio" name="wallet" value="{{=w.name}}" id="wallet-radio-{{=w.name}}">
-                        <label for="wallet-radio-{{=w.name}}" class="radio-label mfix">
-                          <img class="wallet-button colored mchild item-inner l-{{=count}}" style="height:{{=w.h}}px" src="{{=w.col}}">
-                          {{?w.offer}}
-                            <span class="offer">{{=w.offer}}% Cashback</span>
-                          {{?}}
+                        <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
+                        <label for="wallet-radio-`=w.name`" class="radio-label mfix">
+                          <img class="wallet-button colored mchild item-inner l-`=count`" style="height:`=w.h`px" src="`=w.col`">
+                          `?w.offer`
+                            <span class="offer">`=w.offer`% Cashback</span>
+                          `?`
                         </label>
                       </div>
-                    {{
+                    `
                       count = (count + 1) % max;
                     }
-                    }}
-                    {{?ecod}}
-                      {{?method.upi}}
+                    `
+                    `?ecod`
+                      `?method.upi`
                         <div class="item radio-item" tab="upi">
                           <input type="radio" name="wallet" id="ecod-radio-upi" tab="upi">
                           <label id="ecod-label-upi" class="radio-label mfix" for="ecod-radio-upi"></label>
                         </div>
-                      {{?}}
-                      {{?ecod && invoice}}
+                      `?`
+                      `?ecod && invoice`
                         <div class="item" tab="ecod">
                           <input type="radio" name="wallet" id="ecod-radio-ecod" tab="ecod">
                           <label id="ecod-label-ecod" class="radio-label mfix" for="ecod-radio-ecod">
@@ -301,8 +299,8 @@ else
                             Netbanking (link)
                           </label>
                         </div>
-                      {{?}}
-                    {{?}}
+                      `?`
+                    `?`
                     <div class="clear"></div>
                     <span class="help">Please select one of the wallets</span>
                   </div>
@@ -312,34 +310,34 @@ else
                     <li>- Valid only on first time orders</li>
                   </div>
                 </div>
-              {{?}}
-              {{?method.upi}}
+              `?`
+              `?method.upi`
                 <div class="tab-content showable screen pad" id="form-upi">
                   <p>Enter your virtual payment address</p>
                   <div class="elem-wrap"><div class="elem">
-                    <input class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="{{=attr(o('prefill.vpa'))}}">
+                    <input class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
                   </div></div>
                   <p>
                     You will receive a collect request from <strong>razorpay@icici</strong> in the UPI app you used to create your VPA.
                   </p>
                 </div>
-              {{?}}
-              {{?ecod && invoice}}
+              `?`
+              `?ecod && invoice`
                 <div class="tab-content showable screen pad" id="form-ecod">
-                  <img src="https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl={{=invoice.url}}">
+                  <img src="https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl=`=invoice.url`">
                   <p>An SMS with the payment link has also been sent to customer for initiating the payment.</p>
                   <div style="margin: 10px 0; padding: 10px 0">
                     <div id='ecod-resend' class='text-btn' style='float: right'>Resend Link</div>
-                    <span style='border-bottom: 1px dashed #ddd'>{{=invoice.url}}</span>
-                    {{?epos_share_link}}
+                    <span style='border-bottom: 1px dashed #ddd'>`=invoice.url`</span>
+                    `?epos_share_link`
                       <a id="share-link" class="btn"
-                        href="rzp://rzp.io/invoice/share/{{=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)}}">
+                        href="rzp://rzp.io/invoice/share/`=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)`">
                         Share Link
                       </a>
-                    {{?}}
+                    `?`
                   </div>
                 </div>
-              {{?}}
+              `?`
               <div id="form-otp" class="tab-content showable screen">
                 <div id='otp-prompt'></div>
                 <div id="add-funds" class="add-funds">
@@ -367,7 +365,7 @@ else
               </div>
             </div>
             <button id="footer" type="submit" class="button">
-              <span class="pay-btn">PAY &nbsp;{{=amount}}</span>
+              <span class="pay-btn">PAY &nbsp;`=amount`</span>
               <span class="otp-btn">Verify</span>
             </button>
             {{?o('theme.branding')}}
