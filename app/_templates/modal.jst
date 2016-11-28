@@ -91,7 +91,7 @@ else
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email</label>
-                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`" required pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$">
+                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`" required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
                   </div></div>
                   `?order.bank`
                     <div class="customer-bank-details">
@@ -236,9 +236,9 @@ else
                       <div class="help">Please select a bank</div>
                       <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                         <option selected="selected" value="">Other Banks</option>
-                        `for(var i in method.netbanking){`
-                          <option value="`=i`">`=method.netbanking[i]`</option>
-                        `}`
+                        `~method.netbanking:bank:bankname`
+                          <option value="`=bank`">`=bankname`</option>
+                        `~`
                       </select>
                     </div></div>
                 </div>
