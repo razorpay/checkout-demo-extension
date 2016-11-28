@@ -539,17 +539,36 @@ Session.prototype = {
     }
   },
 
-  on: function(event, selector, listener, useCapture){
-    var elements = $$(selector);
-    each(
-      elements,
-      function(i, element){
-        this.listeners.push(
-          $(element).on(event, listener, useCapture, this)
-        );
-      },
-      this
-    )
+  click: function(selector, delegateClass, listener, useCapture) {
+    this.on('click', selector, delegateClass, listener, useCapture);
+  },
+
+  on: function(event, selector, delegateClass, listener, useCapture) {
+    var listeners = this.listeners;
+    if (isFunction(delegateClass)) {
+      each(
+        $$(selector),
+        function(i, element) {
+          listeners.push(
+            $(element).on(event, delegateClass, listener, this)
+          );
+        },
+        this
+      )
+    } else {
+      var self = this;
+      var $parent = $(selector);
+      return listeners.push($parent.on(event, function(e) {
+        var target = e.target;
+        while (target !== $parent[0]) {
+          if ($(target).hasClass(delegateClass)) {
+            invoke(listener, self, e);
+            break;
+          }
+          target = target.parentNode;
+        }
+      }, useCapture));
+    }
   },
 
   resendOTP: function() {
@@ -586,27 +605,27 @@ Session.prototype = {
 
   bindEvents: function(){
     if(this.get('theme.close_button')){
-      this.on('click', '#modal-close', function(){
+      this.click('#modal-close', function(){
         if (this.get('modal.confirm_close') && !confirmClose()) {
           return;
         }
         this.hide();
       });
     }
-    this.on('click', '#top-left', this.back);
-    this.on('click', '#user', function(e){
+    this.click('#top-left', this.back);
+    this.click('#user', function(e){
       e.preventDefault();
       e.stopPropagation();
     })
-    this.on('click', '.payment-option', function(e){
+    this.click('.payment-option', function(e){
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
     this.on('submit', '#form', this.preSubmit);
-    this.on('click', '#otp-action', this.back);
-    this.on('click', '#otp-resend', this.resendOTP);
-    this.on('click', '#otp-sec', this.secAction);
-    this.on('click', '#add-funds-action', this.addFunds);
-    this.on('click', '#choose-payment-method', function() { this.setScreen(''); });
+    this.click('#otp-action', this.back);
+    this.click('#otp-resend', this.resendOTP);
+    this.click('#otp-sec', this.secAction);
+    this.click('#add-funds-action', this.addFunds);
+    this.click('#choose-payment-method', function() { this.setScreen(''); });
 
     var enabledMethods = this.methods;
     if (enabledMethods.card) {
@@ -621,10 +640,10 @@ Session.prototype = {
       }
 
       // saved cards events
-      this.on('click', '#show-add-card', this.toggleSavedCards);
-      this.on('click', '#show-saved-cards', this.toggleSavedCards);
+      this.click('#show-add-card', this.toggleSavedCards);
+      this.click('#show-saved-cards', this.toggleSavedCards);
       this.on('change', '#saved-cards-container', this.setSavedCard, true);
-      this.on('click', '#profile', function(e) {
+      this.click('#profile', function(e) {
         if (e.target.tagName === 'LI') {
           var self = this;
           var customer = self.customer;
@@ -668,7 +687,7 @@ Session.prototype = {
     }
 
     if (enabledMethods.upi) {
-      this.on('click', '#cancel_upi .btn', function() {
+      this.click('#cancel_upi .btn', function() {
         var upi_radio = $('#cancel_upi input:checked');
         if (!upi_radio[0]) {
           return;
@@ -677,13 +696,13 @@ Session.prototype = {
         metaParam[upi_radio.prop('name')] = upi_radio.val();
         this.clearRequest(metaParam);
       })
-      this.on('click', '#cancel_upi .back-btn', function() {
+      this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
       })
     }
 
     if (this.get('ecod')) {
-      this.on('click', '#ecod-resend', send_ecod_link);
+      this.click('#ecod-resend', send_ecod_link);
     }
 
     var goto_payment = '#error-message .link';
@@ -694,16 +713,16 @@ Session.prototype = {
         $('#moreinfo').hide();
       }
     } else {
-      this.on('click', goto_payment, function() {
+      this.click(goto_payment, function() {
         if (this.payload && this.payload.method === 'upi') {
           return cancel_upi(this);
         }
         this.r.focus();
       })
     }
-    this.on('click', '#backdrop', this.hideErrorMessage);
-    this.on('click', '#overlay', this.hideErrorMessage);
-    this.on('click', '#fd-hide', this.hideErrorMessage);
+    this.click('#backdrop', this.hideErrorMessage);
+    this.click('#overlay', this.hideErrorMessage);
+    this.click('#fd-hide', this.hideErrorMessage);
   },
 
   setFormatting: function() {

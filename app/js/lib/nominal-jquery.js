@@ -14,6 +14,12 @@ $.prototype = {
     if(!el) { return }
 
     var ref;
+    if (isString(callback)) {
+      callback = thisArg[callback];
+    }
+    if (!isFunction(callback)) {
+      return;
+    }
     var shouldAddListener = window.addEventListener;
     if (shouldAddListener) {
       ref = function(e){
