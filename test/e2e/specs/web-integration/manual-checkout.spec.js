@@ -42,7 +42,7 @@ describe('Options & prefills', () => {
 
     assert.equal(
       browser.getText('#amount'),
-      `₹ ${Number(data.amount)/100}`,
+      `₹${Number(data.amount)/100}`,
       'Amount is shown correctly'
     )
 
