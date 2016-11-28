@@ -123,11 +123,14 @@ function base_configure(overrides) {
   return options;
 }
 
-function setNotes(options){
+function setNotes(options) {
   var notes = options.get('notes');
-  each(notes, function(key, val){
-    var valType = typeof val;
-    if (!(valType === 'string' || valType === 'number' || valType === 'boolean')){
+  each(notes, function(key, val) {
+    if (isString(val)) {
+      if (val.length > 254) {
+        notes[key] = val.slice(0, 254);
+      }
+    } else if (!(isNumber(val) || isBoolean(val))) {
       delete notes[key];
     }
   })

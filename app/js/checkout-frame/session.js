@@ -1070,7 +1070,7 @@ Session.prototype = {
   selectBankRadio: function(e){
     var select = gel('bank-select');
     select.value = e.target.value;
-    self.input(select);
+    this.input(select);
   },
 
   checkInvalid: function(parent) {
