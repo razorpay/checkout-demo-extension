@@ -982,8 +982,12 @@ Session.prototype = {
   },
 
   setSavedCard: function (e) {
+    var $savedCard = $(e.delegateTarget);
+    if (this.tab === 'emi' && !$savedCard.attr('emi')) {
+      return;
+    }
     $('#saved-cards-container .checked').removeClass('checked');
-    var $savedCard = $(e.delegateTarget).addClass('checked');
+    $savedCard.addClass('checked');
     var cardtype = $savedCard.$('.cardtype').attr('cardtype');
   },
 

@@ -79,6 +79,9 @@ $cardpl = 70px;
       transform: translateY(-10px);
       z-index: 0;
     }
+    #show-add-card + .pad {
+      pointer-events: none;
+    }
   }
   &.has-cards {
     #saved-cards-container,
@@ -90,9 +93,12 @@ $cardpl = 70px;
 
 #body[tab=emi] #form-card.saved-cards {
   .saved-card {
-    opacity: 0.3;
+    &:not([emi]) {
+      .saved-inner, .cardtype {
+        opacity: 0.3;
+      }
+    }
     &[emi] {
-      opacity: 1;
       &.checked {
         height: 92px;
         select {

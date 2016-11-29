@@ -672,9 +672,17 @@ $outline = #ddd;
   }
 }
 
-.emi-method #payment-options.count-4 .item {
-  width: 33.33%;
-  border-bottom: 1px solid $bc !important;
+.emi-method {
+  #payment-options.count-4 {
+    border-bottom: none;
+    .item {
+      width: 33.33%;
+      border-bottom: 1px solid $bc !important;
+    }
+  }
+  #powered-by {
+    bottom: 30px;
+  }
 }
 
 #body.long {
@@ -687,6 +695,7 @@ $outline = #ddd;
       margin: -12px 0 -6px;
     }
     .item:last-child {
+      width: calc(33.33% + 1px);
       border-right: 1px solid $bc;
     }
   }
@@ -694,6 +703,9 @@ $outline = #ddd;
 
 #body[tab=emi] {
   height: 374px;
+  &[screen=card] #footer {
+    z-index: 1000;
+  }
   #form-card {
     .elem-wrap {
       height: 62px;
@@ -721,6 +733,9 @@ $outline = #ddd;
   }
   .saved-cards #saved-cards-container {
     max-height: 277px;
+  }
+  .saved-card:focus .help {
+    opacity: 1;
   }
 }
 
