@@ -60,7 +60,8 @@ var freqWallets = sessProto.walletData = {
   },
   freecharge: {
     h: 18,
-    col: walletPrefix + 'freecharge.png'
+    col: walletPrefix + 'freecharge.png',
+    offer: 15
   },
   mobikwik: {
     h: 19,
