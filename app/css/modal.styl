@@ -687,8 +687,7 @@ $outline = #ddd;
       margin: -12px 0 -6px;
     }
     .item:last-child {
-      width: calc(33.33% + 1px);
-      border-right: 1px solid $bc;
+      width: calc(33.33% - 1px);
     }
   }
 }
@@ -729,7 +728,7 @@ $outline = #ddd;
   .saved-cards #saved-cards-container {
     max-height: 277px;
   }
-  .saved-card:focus .help {
+  .saved-card:focus:not([emi]) .help {
     opacity: 1;
   }
 }

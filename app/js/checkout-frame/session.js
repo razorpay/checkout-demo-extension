@@ -32,15 +32,17 @@ function fillData(container, returnObj) {
 
 function makeEmiDropdown(emiObj, session, isOption) {
   var h = isOption ? '<option value="" selected>Pay without EMI</option>' : '';
-  each(
-    emiObj.plans,
-    function(length, rate){
-      h += (isOption ? '<option' : '<div class="option"') + ' value="'+length+'">'
-        + length + ' month EMI @' + rate + '% (₹ '
-        + Razorpay.emi.calculator(session.get('amount'), length, rate)/100
-        + ' per month)</' + (isOption ? 'option>' : 'div>');
-    }
-  )
+  if (emiObj.plans) {
+    each(
+      emiObj.plans,
+      function(length, rate){
+        h += (isOption ? '<option' : '<div class="option"') + ' value="'+length+'">'
+          + length + ' month EMI @' + rate + '% (₹ '
+          + Razorpay.emi.calculator(session.get('amount'), length, rate)/100
+          + ' per month)</' + (isOption ? 'option>' : 'div>');
+      }
+    )
+  }
   return h;
 }
 
@@ -983,7 +985,7 @@ Session.prototype = {
 
   setSavedCard: function (e) {
     var $savedCard = $(e.delegateTarget);
-    if (this.tab === 'emi' && !$savedCard.attr('emi')) {
+    if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
     }
     $('#saved-cards-container .checked').removeClass('checked');
