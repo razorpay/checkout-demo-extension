@@ -79,7 +79,7 @@ $.prototype = {
     return '';
   },
 
-  attr: function(attr, val){
+  attr: function(attr, val) {
     if (isNonNullObject(attr)) {
       each(
         attr,
@@ -90,11 +90,13 @@ $.prototype = {
       )
       return this;
     }
+    var argLen = arguments.length;
     var el = this[0];
+
+    if (argLen === 1) {
+      return el && el.getAttribute(attr);
+    }
     if (el) {
-      if(arguments.length === 1){
-        return el.getAttribute(attr);
-      }
       if (val) {
         el.setAttribute(attr, val);
       } else {
@@ -174,6 +176,10 @@ $.prototype = {
     }
   },
 
+  $: function(selector) {
+    return $(this.qs(selector));
+  },
+
   css: function(prop, value){
     var style = this.prop('style');
     if(style){
@@ -194,14 +200,32 @@ $.prototype = {
     return emo;
   },
 
-  height: function() {
+  offht: function() {
+    return this.prop('offsetHeight');
+  },
+
+  height: function(height) {
+    if (isNumber(height)) {
+      height = height.toFixed(2) + 'px';
+    }
+    if (isString(height)) {
+      return this.css('height', height);
+    }
     if (this[0]) {
       return this.bbox().height;
     }
   },
 
-  hide: function(){
+  hide: function() {
     return this.css('display', 'none');
+  },
+
+  toggle: function(flag) {
+    invoke(flag ? 'show' : 'hide', this);
+  },
+
+  show: function() {
+    return this.css('display', 'block');
   },
 
   parent: function(){
@@ -259,13 +283,13 @@ function smoothScrollBy(y) {
   }
   scrollTimeout = setTimeout(function() {
     var y0 = pageYOffset;
-    var target = Math.min(y0 + y, $(body).height());
+    var target = Math.min(y0 + y, $(body).height() - innerHeight);
     y = target - y0;
     var scrollCount = 0;
     var oldTimestamp = performance.now();
 
     function step (newTimestamp) {
-      scrollCount += (newTimestamp - oldTimestamp)/200;
+      scrollCount += (newTimestamp - oldTimestamp)/300;
       if (scrollCount >= 1) {
         return scrollTo(0, target);
       }
