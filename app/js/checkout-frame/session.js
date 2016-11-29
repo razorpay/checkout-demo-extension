@@ -335,9 +335,13 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    if (getter('method.emi')) {
+    if (getter()['method.emi']) {
+      tab_titles.card = 'Card';
       this.emiMethod = true;
       classes.push('emi-method');
+      if (this.methods.count === 4) {
+        $('#body').addClass('long');
+      }
     }
 
     if (getter('ecod')) {

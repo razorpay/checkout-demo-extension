@@ -122,6 +122,9 @@ else
                 <div`?order.bank` class="showable"`?`>
                   <div class="legend">Select payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
+                    `?o()['method.emi']`
+                    <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
+                    `?`
                     `?method.card`
                     <div class="payment-option item" tab="card"><label><i>&#xe609;</i>`=_.tab_titles.card`</label></div>
                     `?`

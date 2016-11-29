@@ -672,7 +672,28 @@ $outline = #ddd;
   }
 }
 
+.emi-method #payment-options.count-4 .item {
+  width: 33.33%;
+  border-bottom: 1px solid $bc !important;
+}
+
+#body.long {
+  height: 374px;
+  #payment-options {
+    label {
+      height: 77px;
+    }
+    i {
+      margin: -12px 0 -6px;
+    }
+    .item:last-child {
+      border-right: 1px solid $bc;
+    }
+  }
+}
+
 #body[tab=emi] {
+  height: 374px;
   #form-card {
     .elem-wrap {
       height: 62px;
@@ -701,7 +722,6 @@ $outline = #ddd;
   .saved-cards #saved-cards-container {
     max-height: 277px;
   }
-  height: 374px;
 }
 
 .phone-print {
@@ -724,6 +744,7 @@ $outline = #ddd;
 }
 
 #payment-options {
+  border-radius: 0 0 $br $br;
   border-top: 1px solid $bc;
   background: #fff;
 
