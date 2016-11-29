@@ -36,7 +36,7 @@ function makeEmiDropdown(emiObj, session){
     emiObj.plans,
     function(length, rate){
       h += '<div class="option" value="'+length+'">'
-        + length + ' month EMI @ ' + rate + '% (&#xe600; '
+        + length + ' month EMI @' + rate + '% (₹ '
         + Razorpay.emi.calculator(session.get('amount'), length, rate)/100
         + ' per month)</div>';
     }
@@ -261,7 +261,7 @@ function askOTP(text) {
   $('#body').addClass('sub');
   if (!text) {
     var thisSession = getSession();
-    if (thisSession.tab === 'card') {
+    if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
       if (thisSession.payload) {
         text += 'save your card'
@@ -644,7 +644,7 @@ Session.prototype = {
       // saved cards events
       this.click('#show-add-card', this.toggleSavedCards);
       this.click('#show-saved-cards', this.toggleSavedCards);
-      this.on('change', '#saved-cards-container', this.setSavedCard, true);
+      this.on('click', '#saved-cards-container', 'saved-card', this.setSavedCard);
       this.click('#profile', function(e) {
         if (e.target.tagName === 'LI') {
           var self = this;
@@ -912,7 +912,7 @@ Session.prototype = {
       send_ecod_link.call(this);
     }
 
-    if (tab === 'card') {
+    if (tab === 'card' || tab === 'emi') {
       this.showCardTab();
     } else {
       this.setScreen(tab);
@@ -969,41 +969,9 @@ Session.prototype = {
   },
 
   setSavedCard: function (e) {
-    var input = e.target;
-    if (!input) {
-      return;
-    }
-    if(input.type !== 'radio') {
-      return;
-    }
-
-    var $savedcard = $(input.parentNode);
-    var $emiCheck = $('#emi-check-label');
-    var cardtype = $savedcard.find('.cardtype')[0].getAttribute('cardtype');
-    var nocvvCheck = gel('nocvv');
-    var isMaestro = cardtype === 'maestro';
-    var issuer = $savedcard.attr('bank') || '';
-
-    input.checked = true;
-    $('#form-card').removeClass('nocvv');
-    nocvvCheck.checked = false;
-    toggleNoCvv(isMaestro);
-
-    unsetEmiBank();
-
-    var elem_emi = $('#elem-emi');
-    var emiBank = emi_options.banks[issuer];
-    $emiCheck[emiBank ? 'removeClass' : 'addClass']('disabled');
-
-    if (emiBank) {
-      makeEmiDropdown(emiBank, this);
-    }
-
-    if(isMaestro){
-      elem_emi.addClass('hidden');
-    } else {
-      invoke('removeClass', elem_emi, 'hidden', 200);
-    }
+    $('#saved-cards-container .checked').removeClass('checked');
+    var $savedCard = $(e.delegateTarget).addClass('checked');
+    var cardtype = $savedCard.$('.cardtype').attr('cardtype');
   },
 
   setSavedCards: function(){
@@ -1012,12 +980,13 @@ Session.prototype = {
     var cardTab = $('#form-card');
     if (tokens) {
       if ($$('.saved-card').length !== customer.tokens.items.length) {
+        customer.tokens.amount = this.get('amount');
         $('#saved-cards-container').html(templates.savedcards(customer.tokens));
       }
     }
 
     if (tokens) {
-      this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
+      this.setSavedCard({delegateTarget: qs('.saved-card')});
     }
 
     this.savedCardScreen = tokens;
@@ -1038,7 +1007,7 @@ Session.prototype = {
     var $savedContainer = $('#saved-cards-container');
 
     if (saveScreen) {
-      this.setSavedCard({target: $('.saved-card [type=radio]')[0]});
+      this.setSavedCard({delegateTarget: qs('.saved-card')});
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
       try {
@@ -1099,7 +1068,7 @@ Session.prototype = {
 
   getActiveForm: function(){
     var form = this.tab || 'common';
-    if (form === 'card') {
+    if (form === 'card' || form === 'emi') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
     }
@@ -1119,20 +1088,16 @@ Session.prototype = {
 
       if (this.screen === 'card') {
         if (this.savedCardScreen) {
-          if (data.token) {
-            var cvvEl = gel('cvv-' + data.token);
-            if (cvvEl) {
-              data['card[cvv]'] = cvvEl.value;
-            }
+          if (!data.emi_duration) {
+            data.method = 'card';
+            delete data.emi_duration;
           }
+          var $checkedCard = $('.saved-card.checked');
+          data.token = $checkedCard.attr('token');
+          data['card[cvv]'] = $checkedCard.$('.saved-cvv').val();
         } else {
           var cardNumberKey = 'card[number]';
-          var cardExpiryKey = 'card[expiry]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
-          var expiry = data[cardExpiryKey];
-          data['card[expiry_month]'] = expiry.slice(0, 2);
-          data['card[expiry_year]'] = expiry.slice(-2);
-          delete data[cardExpiryKey];
         }
       }
     }
@@ -1296,10 +1261,13 @@ Session.prototype = {
             data['card[expiry_year]'] = '21';
           }
         } else {
-          if ((!nocvv_el.checked || nocvv_el.disabled) && !data['card[cvv]']) {
-            // no saved card was selected
-            this.shake();
-            return $('#cvv-' + data.token).focus();
+          if (!data['card[cvv]']) {
+            var checkedCard = $('.checked');
+            if (checkedCard.$('.cardtype').attr('cardtype') !== 'maestro') {
+              // no saved card was selected
+              this.shake();
+              return $('.checked .saved-cvv').focus();
+            }
           }
         }
       }
