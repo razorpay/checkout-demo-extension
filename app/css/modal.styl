@@ -37,14 +37,14 @@ html {
 .double {
   width: 100%;
 
-  .second {
-    text-align: right;
-  }
-
   .first,
   .second {
     float: left;
     width: 50%;
+  }
+  .second {
+    float: right;
+    text-align: right;
   }
 }
 
@@ -659,7 +659,7 @@ $outline = #ddd;
 }
 
 #form-card {
-  i {
+  i:not(.select-arrow) {
     display: none;
   }
 
@@ -667,6 +667,41 @@ $outline = #ddd;
     display: initial;
     font-size: 16px;
   }
+  .select {
+    display: none;
+  }
+}
+
+#body[tab=emi] {
+  #form-card {
+    .elem-wrap {
+      height: 62px;
+    }
+    .select {
+      display: block;
+      padding: 0;
+      margin-top: 14px;
+    }
+  }
+  #elem-emi {
+    margin: 19px 0;
+    .first {
+      display: none;
+    }
+    .select {
+      position: absolute;
+      margin-top: -13px;
+      left: 0;
+      right: 98px;
+    }
+  }
+  .save-enabled #add-card-container {
+    height: 248px;
+  }
+  .saved-cards #saved-cards-container {
+    max-height: 277px;
+  }
+  height: 374px;
 }
 
 .phone-print {
@@ -707,6 +742,9 @@ $outline = #ddd;
 
   .item {
     border-bottom: none !important;
+  }
+  &.count-4 .item {
+    width: 25%;
   }
 }
 

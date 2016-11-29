@@ -30,18 +30,18 @@ function fillData(container, returnObj) {
   )
 }
 
-function makeEmiDropdown(emiObj, session){
-  var h = '';
+function makeEmiDropdown(emiObj, session, isOption) {
+  var h = isOption ? '<option value="" selected>Pay without EMI</option>' : '';
   each(
     emiObj.plans,
     function(length, rate){
-      h += '<div class="option" value="'+length+'">'
+      h += (isOption ? '<option' : '<div class="option"') + ' value="'+length+'">'
         + length + ' month EMI @' + rate + '% (₹ '
         + Razorpay.emi.calculator(session.get('amount'), length, rate)/100
-        + ' per month)</div>';
+        + ' per month)</' + (isOption ? 'option>' : 'div>');
     }
   )
-  $('#emi-plans-wrap').html(h);
+  return h;
 }
 
 function unsetEmiBank() {
@@ -94,7 +94,7 @@ function onSixDigits(e){
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
     if (!$('#emi-plans-wrap .option')[0]) {
-      makeEmiDropdown(emiObj, this);
+      $('#emi-plans-wrap').html(makeEmiDropdown(emiObj, this));
     }
   } else {
     emi_parent.removeClass('checked');
@@ -314,7 +314,7 @@ Session.prototype = {
     track(this.r, event, extra);
   },
 
-  getClasses: function(){
+  getClasses: function() {
     var classes = [];
     if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
       this.isMobile = true;
@@ -333,6 +333,11 @@ Session.prototype = {
 
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
+    }
+
+    if (getter('method.emi')) {
+      this.emiMethod = true;
+      classes.push('emi-method');
     }
 
     if (getter('ecod')) {
@@ -640,6 +645,10 @@ Session.prototype = {
           this.track('change_save', {active: e.target.checked});
         })
       }
+
+      this.on('change', '#emi-bank', function(e) {
+        $('#elem-emi select').html(makeEmiDropdown(emi_options.banks[e.target.value], this, true));
+      })
 
       // saved cards events
       this.click('#show-add-card', this.toggleSavedCards);
@@ -981,6 +990,11 @@ Session.prototype = {
     if (tokens) {
       if ($$('.saved-card').length !== customer.tokens.items.length) {
         customer.tokens.amount = this.get('amount');
+        try {
+          customer.tokens.items.sort(function(a, b) {
+            return b.card && !!b.card.emi;
+          })
+        } catch(e){}
         $('#saved-cards-container').html(templates.savedcards(customer.tokens));
       }
     }
@@ -1088,16 +1102,19 @@ Session.prototype = {
 
       if (this.screen === 'card') {
         if (this.savedCardScreen) {
-          if (!data.emi_duration) {
-            data.method = 'card';
-            delete data.emi_duration;
-          }
           var $checkedCard = $('.saved-card.checked');
           data.token = $checkedCard.attr('token');
           data['card[cvv]'] = $checkedCard.$('.saved-cvv').val();
         } else {
+          if (tab === 'emi') {
+            data.emi_duration = $('#elem-emi .input').val();
+          }
           var cardNumberKey = 'card[number]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
+        }
+        if (!data.emi_duration) {
+          data.method = 'card';
+          delete data.emi_duration;
         }
       }
     }
