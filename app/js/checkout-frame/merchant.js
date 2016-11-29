@@ -208,7 +208,8 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (methods.emi && !session.get()['method.emi']) {
+  var emiMethod = session.get()['method.emi'];
+  if (methods.emi && !emiMethod) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   }
@@ -233,6 +234,10 @@ function setPaymentMethods(session){
   }
 
   if (methods.card) {
+    methods.count++;
+  }
+
+  if (emiMethod) {
     methods.count++;
   }
 

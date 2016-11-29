@@ -339,7 +339,7 @@ Session.prototype = {
       tab_titles.card = 'Card';
       this.emiMethod = true;
       classes.push('emi-method');
-      if (this.methods.count === 4) {
+      if (this.methods.count === 5) {
         $('#body').addClass('long');
       }
     }
@@ -639,7 +639,7 @@ Session.prototype = {
     this.click('#choose-payment-method', function() { this.setScreen(''); });
 
     var enabledMethods = this.methods;
-    if (enabledMethods.card) {
+    if (enabledMethods.card || this.get()['method.emi']) {
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 

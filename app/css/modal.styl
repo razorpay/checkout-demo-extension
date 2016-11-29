@@ -74,7 +74,6 @@ html {
   &.count-5 .item:nth-child(5), &.count-7 .item:nth-child(7) {
     border-right: 1px solid $bc;
     box-sizing: content-box;
-    border-left: none;
   }
 
   .item {
@@ -673,13 +672,6 @@ $outline = #ddd;
 }
 
 .emi-method {
-  #payment-options.count-4 {
-    border-bottom: none;
-    .item {
-      width: 33.33%;
-      border-bottom: 1px solid $bc !important;
-    }
-  }
   #powered-by {
     bottom: 30px;
   }
@@ -720,6 +712,7 @@ $outline = #ddd;
   }
   #elem-emi {
     margin: 19px 0;
+    display: block;
     .first {
       display: none;
     }
@@ -764,6 +757,14 @@ $outline = #ddd;
   border-radius: 0 0 $br $br;
   border-top: 1px solid $bc;
   background: #fff;
+
+  &.count-5 {
+    border-bottom: none;
+    .item {
+      width: 33.33%;
+      border-bottom: 1px solid $bc !important;
+    }
+  }
 
   label {
     padding-top: 20px;
