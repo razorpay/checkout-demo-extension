@@ -37,14 +37,14 @@ html {
 .double {
   width: 100%;
 
-  .second {
-    text-align: right;
-  }
-
   .first,
   .second {
     float: left;
     width: 50%;
+  }
+  .second {
+    float: right;
+    text-align: right;
   }
 }
 
@@ -659,13 +659,85 @@ $outline = #ddd;
 }
 
 #form-card {
-  i {
+  i:not(.select-arrow) {
     display: none;
   }
 
   i.info {
     display: initial;
     font-size: 16px;
+  }
+  .select {
+    display: none;
+  }
+}
+
+.emi-method {
+  #payment-options.count-4 {
+    border-bottom: none;
+    .item {
+      width: 33.33%;
+      border-bottom: 1px solid $bc !important;
+    }
+  }
+  #powered-by {
+    bottom: 30px;
+  }
+}
+
+#body.long {
+  height: 374px;
+  #payment-options {
+    label {
+      height: 77px;
+    }
+    i {
+      margin: -12px 0 -6px;
+    }
+    .item:last-child {
+      width: calc(33.33% + 1px);
+      border-right: 1px solid $bc;
+    }
+  }
+}
+
+#body[screen=card] #footer {
+  z-index: 98;
+}
+
+#body[tab=emi] {
+  height: 374px;
+
+  #form-card {
+    .elem-wrap {
+      height: 62px;
+    }
+    .select {
+      display: block;
+      padding: 0;
+      margin-top: 14px;
+    }
+  }
+  #elem-emi {
+    margin: 19px 0;
+    .first {
+      display: none;
+    }
+    .select {
+      position: absolute;
+      margin-top: -13px;
+      left: 0;
+      right: 98px;
+    }
+  }
+  .save-enabled #add-card-container {
+    height: 248px;
+  }
+  .saved-cards #saved-cards-container {
+    max-height: 277px;
+  }
+  .saved-card:focus .help {
+    opacity: 1;
   }
 }
 
@@ -689,14 +761,9 @@ $outline = #ddd;
 }
 
 #payment-options {
+  border-radius: 0 0 $br $br;
   border-top: 1px solid $bc;
   background: #fff;
-
-  &.count-4 {
-    .item {
-      width: 25%;
-    }
-  }
 
   label {
     padding-top: 20px;
@@ -713,6 +780,9 @@ $outline = #ddd;
 
   .item {
     border-bottom: none !important;
+  }
+  &.count-4 .item {
+    width: 25%;
   }
 }
 

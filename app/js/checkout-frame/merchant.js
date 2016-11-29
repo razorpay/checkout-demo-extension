@@ -60,7 +60,8 @@ var freqWallets = sessProto.walletData = {
   },
   freecharge: {
     h: 18,
-    col: walletPrefix + 'freecharge.png'
+    col: walletPrefix + 'freecharge.png',
+    offer: 15
   },
   mobikwik: {
     h: 19,
@@ -207,7 +208,7 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (methods.emi) {
+  if (methods.emi && !session.get()['method.emi']) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   }

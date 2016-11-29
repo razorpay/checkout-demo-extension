@@ -58,12 +58,20 @@ $cardpl = 70px;
       height: $cardh;
       z-index: 2;
       pointer-events: all;
+      &.checked {
+        background: #eff0f1;
+        border-color: $bc;
+        .saved-cvv {
+          pointer-events: auto;
+          opacity: 1;
+        }
+      }
+    }
+    .saved-inner{
+      opacity: 1;
     }
     .cardtype {
       transform: none;
-    }
-    .collapser {
-      opacity: 1;
     }
     #add-card-container {
       height: 55px;
@@ -71,13 +79,8 @@ $cardpl = 70px;
       transform: translateY(-10px);
       z-index: 0;
     }
-    :checked + .collapser {
-      background: #eff0f1;
-      border-color: $bc;
-      .saved-cvv {
-        opacity: 1;
-        pointer-events: auto;
-      }
+    #show-add-card + .pad {
+      pointer-events: none;
     }
   }
   &.has-cards {
@@ -88,8 +91,22 @@ $cardpl = 70px;
   }
 }
 
-#form-card.nocvv :checked + .collapser .saved-cvv {
-  display: none;
+#body[tab=emi] #form-card.saved-cards {
+  .saved-card {
+    &:not([emi]) {
+      .saved-inner, .cardtype {
+        opacity: 0.3;
+      }
+    }
+    &[emi] {
+      &.checked {
+        height: 92px;
+        select {
+          display: block;
+        }
+      }
+    }
+  }
 }
 
 .saved-card:last-child:not(:first-child) .cardtype {
@@ -97,31 +114,35 @@ $cardpl = 70px;
 }
 
 #add-card-container {
-  overflow: hidden;
   transition: 0.2s;
-  height: 142px;
+  height: 166px;
   z-index: 2;
   position: relative;
 }
 
 .saved-card {
+  cursor: pointer;
   height: 0;
   transition: 0.2s;
   position: relative;
+  select {
+    padding: 10px 0px;
+    margin-left: -44px;
+    width: calc(100% + 44px);
+    display: none;
+  }
 }
 
-.collapser {
-  border-bottom: 1px solid transparent;
+.saved-inner {
   opacity: 0;
-  display: block;
   transition: 0.2s;
+}
+
+.saved-number {
   &::before {
     content: 'Card ending with';
     color: #777;
     margin-right: 4px;
-  }
-  &:hover {
-    background: #f7f8f9;
   }
 }
 
@@ -224,7 +245,7 @@ $cardpl = 70px;
   }
 
   #add-card-container {
-    height: 169px;
+    height: 196px;
   }
 }
 

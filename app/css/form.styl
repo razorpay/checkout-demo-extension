@@ -101,6 +101,7 @@ label[for] {
   padding: 28px 0 0;
 
   select {
+    cursor: pointer;
     appearance: none;
     text-indent: 1px;
     text-overflow: ellipsis;
@@ -231,6 +232,17 @@ button {
     bottom: 100%;
     left: 20px;
     margin: 0 0 -1px -10px;
+  }
+
+  &.up {
+    top: auto;
+    bottom: 100%;
+    margin-bottom: -15px;
+
+    &::after {
+      border-color: #555 transparent transparent;
+      top: 100%;
+    }
   }
 }
 
