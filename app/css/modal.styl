@@ -701,11 +701,13 @@ $outline = #ddd;
   }
 }
 
+#body[screen=card] #footer {
+  z-index: 98;
+}
+
 #body[tab=emi] {
   height: 374px;
-  &[screen=card] #footer {
-    z-index: 1000;
-  }
+
   #form-card {
     .elem-wrap {
       height: 62px;

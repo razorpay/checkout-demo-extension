@@ -87,56 +87,60 @@
   }
 }
 
+#emi-select {
+  padding-top: 0;
+  background: #fff;
+  position: absolute;
+  line-height: 20px;
+  bottom: 100%;
+  z-index: 2;
+  border: 1px solid #dedede;
+  border-radius: $br;
+  left: -16px;
+  margin-bottom: 2px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
+  color: #333;
+
+  &::after,
+  &::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #fff transparent transparent;
+    bottom: 0;
+    left: 25px;
+    margin: 0 0 -10px -7px;
+    margin-bottom: -12px;
+  }
+
+  &::before {
+    border-width: 7px;
+    border-color: #ddd transparent transparent;
+    margin-bottom: -14px;
+    margin-left: -8px;
+  }
+}
+
 #emi-check-label {
   cursor: pointer;
-  .select {
-    padding-top: 0;
-    background: #fff;
-    position: absolute;
-    line-height: 20px;
-    bottom: 100%;
-    z-index: 2;
-    border: 1px solid #dedede;
-    border-radius: $br;
-    left: -17px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
-    color: #333;
-
-    &::after,
-    &::before {
-      content: "";
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-width: 6px;
-      border-style: solid;
-      border-color: #fff transparent transparent;
-      bottom: 0;
-      left: 25px;
-      margin: 0 0 -10px -7px;
-      margin-bottom: -12px;
-    }
-
-    &::before {
-      border-width: 7px;
-      border-color: #ddd transparent transparent;
-      margin-bottom: -14px;
-      margin-left: -8px;
-    }
-  }
 
   .help {
     display: none !important;
-    margin: 10px 0 0 -7px;
+    margin: 10px -16px 0 -16px;
+    &::after {
+      left: 30px;
+    }
   }
 
   &.disabled {
+    #emi-select {
+      display: none !important;
+    }
     .help {
       display: block !important;
-    }
-
-    .select {
-      display: none !important;
     }
   }
 
@@ -145,11 +149,5 @@
     padding: 0 16px;
     cursor: pointer;
     border-bottom: 1px solid #dedede;
-  }
-
-  &.disabled {
-    .select {
-      display: none !important;
-    }
   }
 }
