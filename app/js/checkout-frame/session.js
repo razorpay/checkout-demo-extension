@@ -545,7 +545,7 @@ Session.prototype = {
 
   on: function(event, selector, delegateClass, listener, useCapture) {
     var listeners = this.listeners;
-    if (isFunction(delegateClass)) {
+    if (!listener || listener === true) {
       each(
         $$(selector),
         function(i, element) {
@@ -562,6 +562,7 @@ Session.prototype = {
         var target = e.target;
         while (target !== $parent[0]) {
           if ($(target).hasClass(delegateClass)) {
+            e.delegateTarget = target;
             invoke(listener, self, e);
             break;
           }
