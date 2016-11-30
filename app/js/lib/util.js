@@ -118,10 +118,10 @@ function indexOf(arr, item) {
 
 function find(arr, predicate) {
   if(arrayProto.find) {
-    return arr.find(predicate)
+    return arr.find(predicate, arguments[2]);
   } else {
     var length = arr.length >>> 0;
-    var thisArg = arguments[1];
+    var thisArg = arguments[2];
     var value;
 
     for (var i = 0; i < length; i++) {
@@ -136,7 +136,7 @@ function find(arr, predicate) {
 
 function findBy(arr, prop, value) {
   return find(arr, function(item) {
-    return item[prop] === value
+    return item[prop] === value;
   })
 }
 
