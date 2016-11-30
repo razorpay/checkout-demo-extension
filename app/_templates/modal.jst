@@ -3,6 +3,7 @@ var o = _.get;
 var ecod = o('ecod');
 var method = _.methods;
 var wallet = method.wallet;
+var freechargeWallet = findBy(wallet, 'name', 'freecharge');
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
@@ -328,7 +329,7 @@ else
                     <li>- Valid only on first time orders</li>
                   </div>
                   <div id="freecharge-info" class="offer-info">
-                    <li>15% Cashback on Freecharge</li>
+                    <li>`=freechargeWallet.offer`% Cashback on Freecharge</li>
                     <li>- Cashback upto ₹50</li>
                     <li>- Valid only on first time orders</li>
                   </div>

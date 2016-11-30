@@ -116,6 +116,30 @@ function indexOf(arr, item) {
   }
 }
 
+function find(arr, predicate) {
+  if(arrayProto.find) {
+    return arr.find(predicate)
+  } else {
+    var length = arr.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+     value = arr[i];
+     if (predicate.call(thisArg, value, i, arr)) {
+       return value;
+     }
+    }
+    return undefined;
+  }
+}
+
+function findBy(arr, prop, value) {
+  return find(arr, function(item) {
+    return item[prop] === value
+  })
+}
+
 /* Functions */
 
 function bind(func, thisArg, arg) {
