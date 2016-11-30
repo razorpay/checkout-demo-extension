@@ -305,6 +305,11 @@ function Session (options) {
   this.tab = this.screen = '';
   this.listeners = [];
   this.bits = [];
+
+  var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX'
+  if (this.get('key') === INNER_CHEF_KEY_ID) {
+    this.walletData.freecharge.offer = 20
+  }
 }
 
 Session.prototype = {
