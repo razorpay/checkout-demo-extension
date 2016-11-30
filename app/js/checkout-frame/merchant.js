@@ -269,6 +269,11 @@ function setPaymentMethods(session){
   if(wallets.length){
     methods.count++;
   }
+
+  wallets.sort(function(walletA, walletB) {
+    return (walletB.offer || 0) - (walletA.offer || 0)
+  })
+
   methods.wallet = wallets;
 }
 
