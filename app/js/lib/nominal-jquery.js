@@ -158,10 +158,6 @@ $.prototype = {
     return this[(condition ? 'add' : 'remove') + 'Class'](className);
   },
 
-  $: function(selector) {
-    return $(this.qs(selector));
-  },
-
   qs: function(selector) {
     var node = this[0];
     if (node) {

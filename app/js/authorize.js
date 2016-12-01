@@ -156,7 +156,7 @@ Payment.prototype = {
       if(callback_url){
         data.callback_url = callback_url;
       }
-      if (!this.powerwallet) {
+      if (!this.powerwallet || (data.method === 'upi' && !discreet.isFrame)) {
         discreet.redirect({
           url: makeRedirectUrl(this.fees),
           content: data,
@@ -217,6 +217,7 @@ Payment.prototype = {
     if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
       this.r.set('redirect', true);
     }
+
     // redirect if specified
     if(this.checkRedirect()){
       return;
