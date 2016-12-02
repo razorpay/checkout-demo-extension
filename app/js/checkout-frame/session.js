@@ -308,7 +308,11 @@ function Session (options) {
 
   var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX'
   if (this.get('key') === INNER_CHEF_KEY_ID) {
-    this.walletData.freecharge.offer = 20
+    var freechargeWallet = this.walletData.freecharge;
+    freechargeWallet.offer = 20;
+    freechargeWallet.offerDesc = '20% Cashback on Freecharge';
+    freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
+    freechargeWallet.offerValidDesc = 'Valid 2 Times per user'
   }
 }
 

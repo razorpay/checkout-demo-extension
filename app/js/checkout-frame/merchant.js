@@ -56,12 +56,18 @@ var freqWallets = sessProto.walletData = {
     power: false,
     h: 32,
     col:  walletPrefix + 'airtelmoney.png',
-    offer: 5
+    offer: 5,
+    offerDesc: '5% Cashback on Airtel Money',
+    maxCBDesc: 'Cashback upto ₹50',
+    offerValidDesc: 'Valid only on first time orders'
   },
   freecharge: {
     h: 18,
     col: walletPrefix + 'freecharge.png',
-    offer: 15
+    offer: 15,
+    offerDesc: '15% Cashback on Freecharge',
+    maxCBDesc: 'Cashback upto ₹50',
+    offerValidDesc: 'Valid only on first time orders'
   },
   mobikwik: {
     h: 19,

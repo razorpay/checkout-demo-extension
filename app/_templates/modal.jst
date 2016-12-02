@@ -4,6 +4,7 @@ var ecod = o('ecod');
 var method = _.methods;
 var wallet = method.wallet;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
+var airtelmoneyWallet = findBy(wallet, 'name', 'airtelmoney') || {};
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
@@ -324,14 +325,14 @@ else
                     <span class="help">Please select one of the wallets</span>
                   </div>
                   <div id="airtelmoney-info" class="offer-info">
-                    <li>5% Cashback on Airtel Money</li>
-                    <li>- Cashback upto ₹50</li>
-                    <li>- Valid only on first time orders</li>
+                    <li>`=airtelmoneyWallet.offerDesc`</li>
+                    <li>- `=airtelmoneyWallet.maxCBDesc`</li>
+                    <li>- `=airtelmoneyWallet.offerValidDesc`</li>
                   </div>
                   <div id="freecharge-info" class="offer-info">
-                    <li>`=freechargeWallet.offer`% Cashback on Freecharge</li>
-                    <li>- Cashback upto ₹50</li>
-                    <li>- Valid only on first time orders</li>
+                    <li>`=freechargeWallet.offerDesc`</li>
+                    <li>- `=freechargeWallet.maxCBDesc`</li>
+                    <li>- `=freechargeWallet.offerValidDesc`</li>
                   </div>
                 </div>
               `?`
