@@ -306,13 +306,26 @@ function Session (options) {
   this.listeners = [];
   this.bits = [];
 
-  var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX'
-  if (this.get('key') === INNER_CHEF_KEY_ID) {
-    var freechargeWallet = this.walletData.freecharge;
-    freechargeWallet.offer = 20;
-    freechargeWallet.offerDesc = '20% Cashback on Freecharge';
-    freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
-    freechargeWallet.offerValidDesc = 'Valid 2 times per user';
+  var key = this.get('key')
+  var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
+  var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0'
+
+  switch (key) {
+    case INNER_CHEF_KEY_ID:
+      var freechargeWallet = this.walletData.freecharge;
+      freechargeWallet.offer = 20;
+      freechargeWallet.offerDesc = '20% Cashback on Freecharge';
+      freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
+      freechargeWallet.offerValidDesc = 'Valid 2 times per user';
+      break;
+
+    case MG_KEY_ID:
+      var mobikwikWallet = this.walletData.mobikwik
+      mobikwikWallet.offer = 10;
+      mobikwikWallet.offerDesc = '10% Cashback on Mobikwik';
+      mobikwikWallet.maxCBDesc = 'Cashback upto ₹200';
+      mobikwikWallet.offerValidDesc = 'Valid only once per user';
+      break;
   }
 }
 
