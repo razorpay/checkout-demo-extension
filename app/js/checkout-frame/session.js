@@ -312,7 +312,7 @@ function Session (options) {
     freechargeWallet.offer = 20;
     freechargeWallet.offerDesc = '20% Cashback on Freecharge';
     freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
-    freechargeWallet.offerValidDesc = 'Valid 2 Times per user'
+    freechargeWallet.offerValidDesc = 'Valid 2 times per user';
   }
 }
 
