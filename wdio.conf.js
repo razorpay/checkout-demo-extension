@@ -49,10 +49,9 @@ const wdioConfig = {
     // 'test/e2e/specs/validation.spec.js',
   ],
   // Patterns to exclude.
-  // exclude: [
-  //     'test/spec/multibrowser/**',
-  //     'test/spec/mobile/**'
-  // ],
+  exclude: [
+    'test/e2e/specs/beta-api.spec.js'
+  ],
   //
   // ============
   // Capabilities
@@ -333,6 +332,7 @@ if (isBetaApiTesting) {
   wdioConfig.specs = [
     'test/e2e/specs/beta-api.spec.js'
   ]
+  wdioConfig.exclude = []
 }
 
 exports.config = wdioConfig;
