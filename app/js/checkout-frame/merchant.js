@@ -220,7 +220,7 @@ function setPaymentMethods(session){
     sessProto = tab_titles;
   }
 
-  if (amount >= 100*10000 || methods.wallet instanceof Array || recurring) { // php encodes blank object as blank array
+  if (amount >= 100*20000 || methods.wallet instanceof Array || recurring) { // php encodes blank object as blank array
     methods.wallet = {};
   } else if (typeof passedWallets === 'object') {
     each(
