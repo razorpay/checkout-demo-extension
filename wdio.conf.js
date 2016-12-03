@@ -3,6 +3,7 @@ const minimist = require('minimist')
 const argv = minimist(process.argv.slice(1));
 const isProduction = argv.env === 'production';
 const isCrossBrowserTesting = argv.type === 'crossbrowsertesting';
+const isBetaApiTesting = argv.type === 'betatesting';
 
 const wdioConfig = {
   debug: isProduction ? false : true,
@@ -120,7 +121,7 @@ const wdioConfig = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: isProduction ? 'error' : 'verbose',
+  logLevel: 'verbose',
   //
   // Enables colors for log output.
   coloredLogs: true,
@@ -326,6 +327,12 @@ if (isCrossBrowserTesting) {
     key: process.env.BS_KEY,
     capabilities: require('./wdio-bs-capabilities')
   });
+}
+
+if (isBetaApiTesting) {
+  wdioConfig.specs = [
+    'test/e2e/specs/beta-api.spec.js'
+  ]
 }
 
 exports.config = wdioConfig;

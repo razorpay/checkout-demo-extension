@@ -29,6 +29,7 @@
     "test:debug": "gulp test:e2e",
     "test:prod": "gulp test:e2e --env=production",
     "test:soak": "gulp test:e2e --env=production --type=soaktesting",
+    "test:beta": "gulp test:e2e --env=production --type=betatesting",
     "test:crossbrowser": "gulp test:e2e --env=production --type=crossbrowsertesting",
     "build": "gulp"
   },
