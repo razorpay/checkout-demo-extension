@@ -112,7 +112,8 @@ function base_configure(overrides) {
   }
 
   /* Temporarily ignore decimals in amount */
-  if (overrides.amount) {
+  if (overrides.key && overrides.key === 'rzp_live_Mm3zJopYTYQoby' &&
+    overrides.amount) {
     overrides.amount = overrides.amount >> 0;
   }
 
