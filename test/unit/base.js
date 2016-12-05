@@ -49,9 +49,11 @@ describe('base_configure should', function() {
         arg.amount = 99;
       })
 
-      it('dot containing amount', function() {
-        arg.amount = 100.5;
-      })
+      /* TODO: uncomment below after we are done ignoring decimal amounts */
+
+      // it('dot containing amount', function() {
+      //   arg.amount = 100.5;
+      // })
 
       it('NaN string amount', function() {
         arg.amount = 'asdf';
