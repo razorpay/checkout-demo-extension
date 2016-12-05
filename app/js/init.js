@@ -111,6 +111,11 @@ function base_configure(overrides) {
     raise('Invalid options');
   }
 
+  /* Temporarily ignore decimals in amount */
+  if (overrides.amount) {
+    overrides.amount = overrides.amount >> 0;
+  }
+
   var options = Options(overrides);
   validateOverrides(options);
   setNotes(options);
