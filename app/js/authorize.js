@@ -249,6 +249,11 @@ Payment.prototype = {
     } catch(e) {
       return roll('completed with ' + data, e);
     }
+
+    if (data.action === 'TOPUP') {
+      return invoke(otpCallback, this, data);
+    }
+
     this.clear();
 
     if (data.razorpay_payment_id) {
