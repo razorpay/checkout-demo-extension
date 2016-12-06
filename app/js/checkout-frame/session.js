@@ -309,18 +309,25 @@ function Session (options) {
   var key = this.get('key')
   var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
   var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0'
+  var walletData = this.walletData
 
   switch (key) {
     case INNER_CHEF_KEY_ID:
-      var freechargeWallet = this.walletData.freecharge;
+      var freechargeWallet = walletData.freecharge;
       freechargeWallet.offer = 20;
       freechargeWallet.offerDesc = '20% Cashback on Freecharge';
       freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
       freechargeWallet.offerValidDesc = 'Valid 2 times per user';
+
+      var airtelMoneyWallet = walletData.airtelmoney;
+      airtelMoneyWallet.offer = 15;
+      airtelMoneyWallet.offerDesc = '15% Cashback on Airtel Money';
+      airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹75';
+      airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
       break;
 
     case MG_KEY_ID:
-      var mobikwikWallet = this.walletData.mobikwik
+      var mobikwikWallet = walletData.mobikwik
       mobikwikWallet.offer = 10;
       mobikwikWallet.offerDesc = '10% Cashback on Mobikwik';
       mobikwikWallet.maxCBDesc = 'Cashback upto ₹200';
