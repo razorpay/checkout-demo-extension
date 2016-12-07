@@ -222,7 +222,7 @@ function setPaymentMethods(session){
     methods.upi = false;
   }
 
-  var emiMethod = session.get()['method.emi'];
+  var emiMethod = session.get('theme.emi_mode');
   if (methods.emi && !emiMethod) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;

@@ -125,7 +125,7 @@ else
                 <div`?order.bank` class="showable"`?`>
                   <div class="legend">Select payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
-                    `?o()['method.emi']`
+                    `?o('theme.emi_mode')`
                     <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
                     `?`
                     `?method.card`
@@ -144,7 +144,7 @@ else
                   <div class="clear"></div>
                 </div>
               </div>
-              `?method.card || o()['method.emi']`
+              `?method.card || o('theme.emi_mode')`
                 <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
                   <div id="saved-cards-container"></div>
