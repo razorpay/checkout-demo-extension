@@ -214,7 +214,7 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (!methods.card) {
+  if (!methods.card || recurring) {
     methods.emi = false;
   }
 
