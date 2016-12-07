@@ -218,6 +218,10 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
+  if (recurring) {
+    methods.upi = false;
+  }
+
   var emiMethod = session.get()['method.emi'];
   if (methods.emi && !emiMethod) {
     tab_titles.card = 'Card/EMI';
