@@ -206,7 +206,11 @@ else
                       </div>
                       <div class="clear"></div>
                     </div>
-                    `?o('remember_customer')`
+                    `?o('recurring')`
+                    <div>
+                      <span class="theme">&#x2605;</span> This card will be saved and a recurring subscription will be applied to it.
+                    </div>
+                    `??o('remember_customer')`
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>

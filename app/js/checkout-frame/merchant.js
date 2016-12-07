@@ -58,7 +58,7 @@ var freqWallets = sessProto.walletData = {
     col:  walletPrefix + 'airtelmoney.png',
     offer: 5,
     offerDesc: '5% Cashback on Airtel Money',
-    maxCBDesc: 'Cashback upto ₹50',
+    maxCBDesc: 'Maximum upto ₹50',
     offerValidDesc: 'Valid only on first time orders'
   },
   freecharge: {
@@ -66,7 +66,7 @@ var freqWallets = sessProto.walletData = {
     col: walletPrefix + 'freecharge.png',
     offer: 15,
     offerDesc: '15% Cashback on Freecharge',
-    maxCBDesc: 'Cashback upto ₹50',
+    maxCBDesc: 'Maximum upto ₹50',
     offerValidDesc: 'Valid only on first time orders'
   },
   mobikwik: {
@@ -214,8 +214,12 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (!methods.card) {
+  if (!methods.card || recurring) {
     methods.emi = false;
+  }
+
+  if (recurring) {
+    methods.upi = false;
   }
 
   var emiMethod = session.get()['method.emi'];
