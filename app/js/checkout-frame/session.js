@@ -309,17 +309,19 @@ function Session (options) {
   var key = this.get('key')
   var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
   var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0'
+  var CHAIPOINT_KEY_ID = 'rzp_live_Zqmx92mExD1bHO'
   var walletData = this.walletData
+  var freechargeWallet, airtelMoneyWallet, mobikwikWallet;
 
   switch (key) {
     case INNER_CHEF_KEY_ID:
-      var freechargeWallet = walletData.freecharge;
+      freechargeWallet = walletData.freecharge;
       freechargeWallet.offer = 20;
       freechargeWallet.offerDesc = '20% Cashback on Freecharge';
       freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
       freechargeWallet.offerValidDesc = 'Valid 2 times per user';
 
-      var airtelMoneyWallet = walletData.airtelmoney;
+      airtelMoneyWallet = walletData.airtelmoney;
       airtelMoneyWallet.offer = 15;
       airtelMoneyWallet.offerDesc = '15% Cashback on Airtel Money';
       airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹75';
@@ -327,11 +329,19 @@ function Session (options) {
       break;
 
     case MG_KEY_ID:
-      var mobikwikWallet = walletData.mobikwik
+      mobikwikWallet = walletData.mobikwik
       mobikwikWallet.offer = 10;
       mobikwikWallet.offerDesc = '10% Cashback on Mobikwik';
       mobikwikWallet.maxCBDesc = 'Cashback upto ₹200';
       mobikwikWallet.offerValidDesc = 'Valid only once per user';
+      break;
+
+    case CHAIPOINT_KEY_ID:
+      airtelMoneyWallet = walletData.airtelmoney;
+      airtelMoneyWallet.offer = 10;
+      airtelMoneyWallet.offerDesc = '10% Cashback on Airtel Money';
+      airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹50';
+      airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
       break;
   }
 }
