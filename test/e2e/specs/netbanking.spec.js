@@ -115,8 +115,8 @@ describe('Net Banking', () => {
 
       assert.equal(
         browser.getText('#bank-select option:checked'),
-        'Other Banks',
-        'By default, `Other Banks` options is selected in the selectbox'
+        'Select a different Bank',
+        'By default, `Select a different Bank` options is selected in the selectbox'
       )
     })
 
