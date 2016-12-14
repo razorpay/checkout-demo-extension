@@ -12,8 +12,7 @@ RazorpayDefaults.parent = null;
 
 RazorpayDefaults.display_currency =
 RazorpayDefaults.display_amount =
-RazorpayDefaults.name =
-RazorpayDefaults.image = '';
+RazorpayDefaults.name = '';
 
 RazorpayDefaults.ecod = false;
 

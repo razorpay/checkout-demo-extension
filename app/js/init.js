@@ -93,6 +93,7 @@ var RazorProto = Razorpay.prototype = new Eventer();
 
 var RazorpayDefaults = Razorpay.defaults = {
   'key': '',
+  'image': '',
   'amount': 0,
   'currency': 'INR',
   'order_id': '',
