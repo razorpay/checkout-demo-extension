@@ -343,7 +343,7 @@ function showModal(session) {
     sanitizeTokens(saved_customer.tokens);
     customer.tokens = saved_customer.tokens;
 
-    if (saved_customer.saved !== true) {
+    if (saved_customer.tokens) {
       customer.logged = true;
     }
 
