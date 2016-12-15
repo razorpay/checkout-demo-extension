@@ -68,8 +68,11 @@ else
             <div id="merchant-desc">`=html(o('description').trim())`</div>
             <div id="amount">`=amount`</div>
           </div>
-          `?o('theme.branding')`
-            <div id="cob-image" style="background-image: url('`=o('theme.branding')`')"></div>
+          `? o('theme.branding') === 'payzapp'`
+            <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/images/brand/`=o('theme.branding')`.png')"></div>
+          `?? o('theme.branding')`
+            <div id="cob-image" style="background-image: url('`=o('theme.branding')`')">
+            </div>
           `?`
         </div>
         <div id="body"`?order.bank` class="sub"`?`>
