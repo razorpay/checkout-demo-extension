@@ -34,6 +34,19 @@ function emiView(session) {
   this.render();
 }
 
+
+function hideEmiDropdown () {
+  if ($('#body').hasClass('emi-focus')) {
+    $('#body').removeClass('emi-focus');
+    $('#emi-check-label').removeClass('focus');
+  }
+}
+
+function showEmiDropdown () {
+  $('#body').addClass('emi-focus');
+  $('#emi-check-label').addClass('focus');
+}
+
 emiView.prototype = {
   render: function() {
     this.unbind();
@@ -52,12 +65,19 @@ emiView.prototype = {
   },
 
   bind: function(){
-    this.on('focus', '#emi-check-label', function(){
-      $('#body').addClass('emi-focus');
-    })
-    this.on('blur', '#emi-check-label', function(){
-      $('#body').removeClass('emi-focus');
-    })
+    this.on('click', '#emi-check-label', function(e) {
+      showEmiDropdown();
+      return e.stopPropagation();
+    }, true)
+    this.on('click', '#container', function(e) {
+      if(e.target.id !== 'emi-check-label') {
+        hideEmiDropdown();
+      }
+    }, true)
+    this.on('click', '#emi-select', function(e){
+      hideEmiDropdown();
+      return e.stopPropagation();
+    });
     this.on('mousedown', '#emi-select', selectEmiBank);
     this.on('click', '#view-emi-plans', function(){showOverlay($('#emi-wrap'))});
     this.on('click', '#emi-close', hideEmi);
