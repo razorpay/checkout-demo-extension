@@ -112,12 +112,6 @@ function base_configure(overrides) {
     raise('Invalid options');
   }
 
-  /* Temporarily ignore decimals in amount */
-  if (overrides.key && overrides.key === 'rzp_live_Mm3zJopYTYQoby' &&
-    overrides.amount) {
-    overrides.amount = overrides.amount >> 0;
-  }
-
   var options = Options(overrides);
   validateOverrides(options);
   setNotes(options);
