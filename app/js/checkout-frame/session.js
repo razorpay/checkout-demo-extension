@@ -331,10 +331,16 @@ function Session (options) {
 
     case MG_KEY_ID:
       mobikwikWallet = walletData.mobikwik
-      mobikwikWallet.offer = 10;
-      mobikwikWallet.offerDesc = '10% Cashback on Mobikwik';
+      mobikwikWallet.offer = 100;
+      mobikwikWallet.offerDesc = 'Upto 100% Cashback on Mobikwik';
       mobikwikWallet.maxCBDesc = 'Cashback upto ₹200';
       mobikwikWallet.offerValidDesc = 'Valid only once per user';
+
+      airtelMoneyWallet = walletData.airtelmoney;
+      airtelMoneyWallet.offer = 15;
+      airtelMoneyWallet.offerDesc = '15% Cashback on Airtel Money';
+      airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹500';
+      airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
       break;
 
     case RAIL_YATRI_KEY_ID:
