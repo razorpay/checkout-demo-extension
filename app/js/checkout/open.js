@@ -23,7 +23,7 @@ var defaultAutoPostHandler = function(data){
   RazorPayForm.submit();
 }
 
-var addAutoCheckoutButton = function(rzp){
+var addAutoCheckoutButton = function(rzp) {
   var button = document.createElement('input');
   var form = currentScript.parentElement;
   button.type = 'submit';
@@ -34,6 +34,10 @@ var addAutoCheckoutButton = function(rzp){
     e.preventDefault();
     rzp.open();
     return false;
+  }
+  var formAction = form.getAttribute('action');
+  if (formAction) {
+    rzp.get().callback_url = formAction;
   }
 }
 
