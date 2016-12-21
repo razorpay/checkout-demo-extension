@@ -178,7 +178,7 @@ var discreet = {
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
     var alertMessage;
 
-    if(isIOS){
+    if (isIOS) {
       if(/CriOS/.test(ua)){
         if(!window.indexedDB){
           alertMessage = 'Please update your Chrome browser or';

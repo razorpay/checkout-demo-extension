@@ -149,11 +149,15 @@ Payment.prototype = {
 
   checkRedirect: function() {
     var getOption = this.r.get;
+    var callback_url = getOption('callback_url');
+
+    if (callback_url && (ua_iOS || ua_android_wv)) {
+      getOption().redirect = true;
+    }
     if (getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
-      var callback_url = getOption('callback_url');
-      if(callback_url){
+      if (callback_url) {
         data.callback_url = callback_url;
       }
       if (!this.powerwallet || (data.method === 'upi' && !discreet.isFrame)) {
