@@ -53,6 +53,11 @@ gulp.task('compileTemplates', function() {
   });
 });
 
+function handleError(err) {
+  console.log(err.toString());
+  this.emit('end');
+}
+
 var concatCss = lazypipe()
   .pipe(stylint)
   .pipe(stylint.reporter)
@@ -65,7 +70,7 @@ var concatCss = lazypipe()
 
 gulp.task('concatCss', function() {
   return gulp.src(paths.css)
-    .pipe(plumber())
+    .pipe(plumber({errorHandler: handleError}))
     .pipe(concatCss())
     .pipe(gulp.dest(`${distDir}/css`));
 });
