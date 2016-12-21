@@ -132,14 +132,16 @@ function nest(options){
 function getCommonTrackingData(r) {
   var props = {
     ua: ua,
-    checkout_id: r ? r.id : _uid,
-    platform: 'browser'
+    checkout_id: r ? r.id : _uid
   }
-  each(['integration', 'referer', 'library'], function(i, propName){
-    if (trackingProps[propName]) {
-      props[propName] = trackingProps[propName]
+  each(
+    ['integration', 'referer', 'library', 'platform', 'os'],
+    function(i, propName) {
+      if (trackingProps[propName]) {
+        props[propName] = trackingProps[propName]
+      }
     }
-  })
+  )
   return props;
 }
 
