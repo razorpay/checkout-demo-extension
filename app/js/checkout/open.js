@@ -35,10 +35,10 @@ var addAutoCheckoutButton = function(rzp) {
     rzp.open();
     return false;
   }
-  var formAction = form.getAttribute('action');
-  if (formAction && !rzp.get('callback_url')) {
-    rzp.get().callback_url = formAction;
-  }
+  // var formAction = form.action;
+  // if (formAction && !rzp.get('callback_url')) {
+  //   rzp.get().callback_url = formAction;
+  // }
 }
 
 /**
