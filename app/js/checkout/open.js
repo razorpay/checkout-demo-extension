@@ -36,7 +36,7 @@ var addAutoCheckoutButton = function(rzp) {
     return false;
   }
   var formAction = form.getAttribute('action');
-  if (formAction) {
+  if (formAction && !rzp.get('callback_url')) {
     rzp.get().callback_url = formAction;
   }
 }
@@ -51,7 +51,7 @@ function initAutomaticCheckout(){
     currentScript.attributes,
     function(i, attr){
       var name = attr.name.toLowerCase();
-      if(/^data-/.test(name)){
+      if(/^data-/.test(name)) {
         var rootObj = opts;
         name = name.replace(/^data-/,'');
         var val = attr.value;
