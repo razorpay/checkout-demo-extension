@@ -67,7 +67,7 @@ var freqWallets = sessProto.walletData = {
     offer: 5,
     offerDesc: '5% Cashback on Airtel Money',
     maxCBDesc: 'Maximum upto ₹50',
-    offerValidDesc: 'Valid only on first time orders'
+    offerValidDesc: 'Valid only on first order'
   },
   freecharge: {
     h: 18,

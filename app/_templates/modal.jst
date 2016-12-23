@@ -6,6 +6,7 @@ var wallet = method.wallet;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
 var airtelmoneyWallet = findBy(wallet, 'name', 'airtelmoney') || {};
 var mobikwikWallet = findBy(wallet, 'name', 'mobikwik') || {};
+var olamoneyWallet = freqWallets.olamoney || {};
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
@@ -348,6 +349,13 @@ else
                       <li>`=mobikwikWallet.offerDesc`</li>
                       <li>- `=mobikwikWallet.maxCBDesc`</li>
                       <li>- `=mobikwikWallet.offerValidDesc`</li>
+                    </div>
+                  `?`
+                  `?olamoneyWallet.offer`
+                    <div id="olamoney-info" class="offer-info">
+                      <li>`=olamoneyWallet.offerDesc`</li>
+                      <li>- `=olamoneyWallet.maxCBDesc`</li>
+                      <li>- `=olamoneyWallet.offerValidDesc`</li>
                     </div>
                   `?`
                 </div>
