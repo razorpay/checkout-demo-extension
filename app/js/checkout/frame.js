@@ -12,8 +12,9 @@ var merchantMarkup = {
   },
 
   resize: function() {
-    frameContainer.style.position = innerHeight < 450 ? 'absolute' : 'fixed';
-    this.el.style.height = Math.max(innerHeight, containerHeight) + 'px';
+    var height = innerHeight || screen.height;
+    frameContainer.style.position = height < 450 ? 'absolute' : 'fixed';
+    this.el.style.height = Math.max(height, containerHeight) + 'px';
   },
 
   // scroll manually in iPhone
@@ -235,12 +236,12 @@ CheckoutFrame.prototype = {
     }
   },
 
-  bind: function(){
+  bind: function() {
     if(!this.listeners){
       this.listeners = [];
       var eventPairs = {};
 
-      if(ua_iPhone){
+      if (ua_iPhone) {
         eventPairs.orientationchange = merchantMarkup.orientationchange;
         eventPairs.scroll = merchantMarkup.scroll;
         eventPairs.resize = merchantMarkup.resize;
