@@ -23,7 +23,7 @@ var merchantMarkup = {
     }
     if (innerHeight < containerHeight) {
       var maxY = containerHeight - innerHeight;
-      if (pageYOffset > maxY) {
+      if (pageYOffset > maxY + 120) {
         smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
