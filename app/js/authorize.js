@@ -49,11 +49,20 @@ setCommunicator();
 
 function submitPopup(payment) {
   var popup = payment.popup;
+  var data = payment.data;
+
+  // fix long notes
+  each(data, function(key, val) {
+    if (/^notes/.test(key) && val.length > 200) {
+      data[key] = val.replace(/\n/g, ' ');
+    }
+  })
+
   // no ajax route was available
   if (popup) {
     submitForm(
       makeRedirectUrl(payment.fees),
-      payment.data,
+      data,
       'post',
       popup.name
     )
