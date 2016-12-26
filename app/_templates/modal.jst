@@ -126,6 +126,11 @@ else
                     </div>
                   `?`
                 </div>
+                `?o('recurring')`
+                  <div class="pad recurring-message">
+                    <span>&#x2139;</span> ICICI bank debit cards and all credit cards are supported for this recurring subscription.
+                  </div>
+                `?`
                 <div`?order.bank` class="showable"`?`>
                   <div class="legend">Select payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
@@ -210,11 +215,7 @@ else
                       </div>
                       <div class="clear"></div>
                     </div>
-                    `?o('recurring')`
-                    <div>
-                      <span class="theme">&#x2605;</span> This card will be saved and a recurring subscription will be applied to it.
-                    </div>
-                    `??o('remember_customer')`
+                    `?!o('recurring') && o('remember_customer')`
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>
@@ -236,6 +237,14 @@ else
                     My Maestro Card doesn't have Expiry/CVV
                   </label>
                   </div>
+                  `?o('recurring')`
+                    <div id='savedcards-recurring-message' class="pad recurring-message">
+                      <span>&#x2139;</span> A recurring subscription will be applied to this card.
+                    </div>
+                    <div id='addcard-recurring-message' class="pad recurring-message">
+                      <span>&#x2139;</span> This card will be saved and a recurring subscription will be applied to it.
+                    </div>
+                  `?`
                 </div>
               `?`
               `?method.netbanking`

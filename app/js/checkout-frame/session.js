@@ -505,6 +505,7 @@ Session.prototype = {
     this.getEl();
     this.fillData();
     this.setEMI();
+    this.improvisePaymentOptions();
     this.setModal();
     this.setFormatting();
     this.bindEvents();
@@ -534,6 +535,13 @@ Session.prototype = {
           this
         )
       })
+    }
+  },
+
+  improvisePaymentOptions: function() {
+    if (this.methods.count === 1) {
+      $(this.el).addClass('one-method');
+      $('.payment-option').addClass('submit-button button');
     }
   },
 
