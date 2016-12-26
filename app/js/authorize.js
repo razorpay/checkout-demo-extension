@@ -562,6 +562,8 @@ razorpayProto.topupWallet = function() {
   });
 }
 
+razorpayProto.postInit = noop;
+
 RazorProto.onNew = function(event, callback) {
   if (event === 'ready') {
     var self = this;
