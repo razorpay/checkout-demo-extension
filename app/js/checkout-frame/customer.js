@@ -13,13 +13,17 @@ function Customer(contact) {
   }
 }
 
-function sanitizeTokens(tokens){
+function sanitizeTokens(tokens, filters) {
+  var _filters = filters || {};
+  var method = _filters.method || 'card',
+    recurring = _filters.recurring || false;
+
   if (tokens) {
     var items = [];
     each(
       tokens.items,
       function(index, item) {
-        if (item.method === 'card') {
+        if (item.method === method && (recurring ? item.recurring : true)) {
           items.push(item);
         }
       }
@@ -36,8 +40,11 @@ Customer.prototype = {
   logged: false,
 
   mark_logged: function(data) {
+    var recurring = window.getSession().get('recurring') || false;
     this.logged = true;
-    sanitizeTokens(data.tokens);
+    sanitizeTokens(data.tokens, {
+      recurring: recurring
+    });
     this.tokens = data.tokens;
     $('#top-right').addClass('logged');
   },
