@@ -4,38 +4,30 @@ var Eventer;
   Eventer = function() {
     // constructor is also called for resetting
     this._evts = {};
-    this._evtns = {};
-    this._onNewListener = noop;
 
+    // default listeners
+    this._defs = {};
     // if called without `new` on Eventer instance
     return this;
   };
 
   Eventer.prototype = {
+    onNew: noop,
+
+    def: function(event, callback) {
+      this._defs[event] = callback;
+    },
+
     on: function(event, callback) {
-      if (typeof event === 'string' && typeof callback === 'function') {
-        var events = this._evts,
-          namespaces = this._evtns,
-          eventSplit = event.split('.');
-
-        // register event with namespace
-        if (eventSplit.length > 1) {
-          var ns = eventSplit[0];
-
-          if (!namespaces[ns]) {
-            namespaces[ns] = {};
-          }
-          namespaces[ns][eventSplit.slice(1).join('.')] = null;
+      if (isString(event) && isFunction(callback)) {
+        var events = this._evts;
+        if (!events[event]) {
+          events[event] = [];
         }
-
-        if (events[event]) {
+        if (this.onNew(event, callback) !== false) {
           events[event].push(callback);
-        } else {
-          events[event] = [callback];
         }
-        this._onNewListener(event);
       }
-
       return this;
     },
 
@@ -51,40 +43,36 @@ var Eventer;
 
     off: function(event, callback) {
       var argLen = arguments.length;
-
-      if(!argLen) {
+      if (!argLen) {
         return Eventer.call(this);
       }
 
-      var events = this._evts,
-        namespaces = this._evtns,
-        eventSplit = event.split('.');
+      var events = this._evts;
 
       if (argLen === 2) {
-        var listenerArray = events[event];
-        if (listenerArray) {
-          listenerArray.splice(indexOf(listenerArray, callback), 1);
-          if (listenerArray.length) {
-            return this;
+        var listeners = events[event];
+        if (isFunction(callback) && isArray(listeners)) {
+          listeners.splice(indexOf(listeners, callback), 1);
+          if (listeners.length) {
+            return;
           }
+        } else {
+          return;
         }
       }
 
-      var ns = eventSplit[0];
-      var nsEvents = namespaces[ns];
-      if (nsEvents) {
-        each(
-          nsEvents,
-          function(eventName) {
-            delete events[ns + '.' + eventName];
+      if (events[event]) {
+        delete events[event];
+      } else {
+        // its a namespace
+        event += '.';
+        each(events, function(eventKey) {
+          if (!eventKey.indexOf(event)) {
+            delete events[eventKey];
           }
-        )
-        if (isEmptyObject(nsEvents)) {
-          delete namespaces[ns];
-        }
+        })
       }
 
-      delete events[event];
       return this;
     },
 
