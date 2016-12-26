@@ -562,13 +562,18 @@ razorpayProto.topupWallet = function() {
   });
 }
 
-RazorProto.postInit = function() {
-  this._onNewListener = function(event) {
+RazorProto.onNew = function(event, callback) {
+  if (event === 'ready') {
     var self = this;
-    if (event === 'ready') {
-      Razorpay.payment.getPrefsJsonp(makePrefParams(this), function(response) {
-        self.methods = response.methods;
-        self.emit('ready', response);
+    if (self.prefs) {
+      callback(event, self.prefs);
+    } else {
+      Razorpay.payment.getPrefsJsonp(makePrefParams(self), function(response) {
+        if (response.methods) {
+          self.prefs = response;
+          self.methods = response.methods;
+        }
+        callback(self.prefs);
       })
     }
   }
