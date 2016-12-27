@@ -326,6 +326,7 @@ function showModal(session) {
 
   if (saved_customer) {
     var session_options = session.get();
+    var filters = {};
     // we put saved customer contact, email into default prefills
     if (saved_customer.contact) {
       session_options['prefill.contact'] = saved_customer.contact;
@@ -343,8 +344,12 @@ function showModal(session) {
       }
     }
 
+    if (session_options['recurring']) {
+      filters.recurring = true;
+    }
+
     customer = getCustomer(saved_customer.contact);
-    sanitizeTokens(saved_customer.tokens);
+    sanitizeTokens(saved_customer.tokens, filters);
     customer.tokens = saved_customer.tokens;
 
     if (saved_customer.tokens) {
