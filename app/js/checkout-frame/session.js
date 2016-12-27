@@ -385,7 +385,7 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    if (getter()['method.emi']) {
+    if (getter('theme.emi_mode')) {
       tab_titles.card = 'Card';
       this.emiMethod = true;
       classes.push('emi-method');
@@ -689,7 +689,7 @@ Session.prototype = {
     this.click('#choose-payment-method', function() { this.setScreen(''); });
 
     var enabledMethods = this.methods;
-    if (enabledMethods.card || this.get()['method.emi']) {
+    if (enabledMethods.card || this.get('theme.emi_mode')) {
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 

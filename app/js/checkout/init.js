@@ -59,7 +59,8 @@ RazorpayDefaults.theme = {
   image_frame: true,
   close_button: true,
   hide_topbar: false,
-  branding: ''
+  branding: '',
+  emi_mode: false
 }
 
 discreet.currencies = {
