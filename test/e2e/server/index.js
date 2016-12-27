@@ -10,10 +10,12 @@ const mockgateway = require('./routes/mockgateway')
 
 const argv = minimist(process.argv.slice(2));
 const isSoakTesting = argv.type === 'soaktesting';
+const isBetaTesting = argv.type === 'betatesting';
 
 app.set('port', 3000)
 app.use((req,res,next) => {
   res.cookie('soakTesting', !!isSoakTesting)
+  res.cookie('betaTesting', !!isBetaTesting)
   next()
 })
 

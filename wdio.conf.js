@@ -3,6 +3,7 @@ const minimist = require('minimist')
 const argv = minimist(process.argv.slice(1));
 const isProduction = argv.env === 'production';
 const isCrossBrowserTesting = argv.type === 'crossbrowsertesting';
+const isBetaApiTesting = argv.type === 'betatesting';
 
 const wdioConfig = {
   debug: isProduction ? false : true,
@@ -48,10 +49,9 @@ const wdioConfig = {
     // 'test/e2e/specs/validation.spec.js',
   ],
   // Patterns to exclude.
-  // exclude: [
-  //     'test/spec/multibrowser/**',
-  //     'test/spec/mobile/**'
-  // ],
+  exclude: [
+    'test/e2e/specs/beta-api.spec.js'
+  ],
   //
   // ============
   // Capabilities
@@ -120,7 +120,7 @@ const wdioConfig = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: isProduction ? 'error' : 'verbose',
+  logLevel: 'verbose',
   //
   // Enables colors for log output.
   coloredLogs: true,
@@ -326,6 +326,13 @@ if (isCrossBrowserTesting) {
     key: process.env.BS_KEY,
     capabilities: require('./wdio-bs-capabilities')
   });
+}
+
+if (isBetaApiTesting) {
+  wdioConfig.specs = [
+    'test/e2e/specs/beta-api.spec.js'
+  ]
+  wdioConfig.exclude = []
 }
 
 exports.config = wdioConfig;

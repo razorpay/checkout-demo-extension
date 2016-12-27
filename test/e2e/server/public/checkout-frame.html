@@ -38,6 +38,17 @@
         }
       }
 
+      var isBetaTesting = getCookie('betaTesting') === 'true'
+
+      if (isBetaTesting) {
+        Razorpay = {
+          config: {
+            frameApi: 'https://beta-api.razorpay.com'
+          }
+        }
+        window.options.key = 'rzp_test_MV0lvSa76vjVsl'
+      }
+
       var isSoakTesting = getCookie('soakTesting') === 'true';
       if (isSoakTesting) {
         Razorpay = {

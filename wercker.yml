@@ -11,6 +11,10 @@ build:
             name: Test
             code: /selenium & npm run test:prod
 
+        - script:
+            name: Beta API Test
+            code: /selenium & npm run test:beta
+
     after-steps:
         - slack-notifier:
             url: $SLACK_URL
