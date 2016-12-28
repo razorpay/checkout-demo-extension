@@ -18,8 +18,10 @@ var amount;
 var amount_figure = (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
-else
+else if (o('currency')==='INR')
   amount = "₹" + amount_figure;
+else
+  amount = "$" + amount_figure;
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
