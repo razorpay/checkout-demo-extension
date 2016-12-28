@@ -198,6 +198,7 @@ function notifyBridge(message){
 
 function setPaymentMethods(session){
   var recurring = session.get('recurring');
+  var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
   var methods = session.methods = {
     count: 0
@@ -218,11 +219,11 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (!methods.card || recurring) {
+  if (!methods.card || recurring || international) {
     methods.emi = false;
   }
 
-  if (recurring) {
+  if (recurring || international) {
     methods.upi = false;
   }
 
@@ -232,7 +233,8 @@ function setPaymentMethods(session){
     sessProto = tab_titles;
   }
 
-  if (amount >= 100*20000 || methods.wallet instanceof Array || recurring) { // php encodes blank object as blank array
+  // php encodes blank object as blank array
+  if (amount >= 100*20000 || methods.wallet instanceof Array || recurring || international) {
     methods.wallet = {};
   } else if (typeof passedWallets === 'object') {
     each(
@@ -245,7 +247,7 @@ function setPaymentMethods(session){
     )
   }
 
-  if (!methods.netbanking || methods.netbanking instanceof Array || recurring) {
+  if (!methods.netbanking || methods.netbanking instanceof Array || recurring || international) {
     methods.netbanking = false;
   } else {
     methods.count = 1;
