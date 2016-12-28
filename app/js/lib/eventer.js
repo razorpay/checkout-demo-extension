@@ -33,9 +33,10 @@ var Eventer;
 
     once: function(event, callback) {
       var everCallback = callback;
+      var self = this;
       function onceCallback() {
-        everCallback.apply(this, arguments);
-        this.off(event, onceCallback);
+        everCallback.apply(self, arguments);
+        self.off(event, onceCallback);
       }
       callback = onceCallback;
       return this.on(event, callback);
