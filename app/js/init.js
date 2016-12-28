@@ -246,8 +246,8 @@ var optionValidations = {
   },
 
   currency: function(currency) {
-    if (currency !== 'INR') {
-      return 'INR is the only supported value.';
+    if (currency !== 'INR' && currency !== 'USD') {
+      return 'INR and USD are the only supported values for currency field.';
     }
   }
 }

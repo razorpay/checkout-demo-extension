@@ -68,7 +68,7 @@ describe('base_configure should', function() {
       })
 
       it('invalid currency', function() {
-        arg.currency = 'USD';
+        arg.currency = 'SGD';
       })
     })
   })
