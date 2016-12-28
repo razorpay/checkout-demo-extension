@@ -40,7 +40,7 @@ Customer.prototype = {
   logged: false,
 
   mark_logged: function(data) {
-    var recurring = window.getSession().get('recurring') || false;
+    var recurring = getSession().get('recurring') || false;
     this.logged = true;
     sanitizeTokens(data.tokens, {
       recurring: recurring
