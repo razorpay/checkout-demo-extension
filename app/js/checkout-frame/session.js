@@ -308,7 +308,6 @@ function Session (options) {
 
   var key = this.get('key')
   var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
-  var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0';
   var CHAIPOINT_KEY_ID = 'rzp_live_Zqmx92mExD1bHO';
   var RAIL_YATRI_KEY_ID = 'rzp_live_DpR4qRbfk9hGjd';
   var walletData = this.walletData
@@ -326,14 +325,6 @@ function Session (options) {
       airtelMoneyWallet.offer = 15;
       airtelMoneyWallet.offerDesc = '15% Cashback on Airtel Money';
       airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹75';
-      airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
-      break;
-
-    case MG_KEY_ID:
-      airtelMoneyWallet = walletData.airtelmoney;
-      airtelMoneyWallet.offer = 15;
-      airtelMoneyWallet.offerDesc = '15% Cashback on Airtel Money';
-      airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹500';
       airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
       break;
 
