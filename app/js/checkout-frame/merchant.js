@@ -54,11 +54,7 @@ var freqWallets = sessProto.walletData = {
   },
   olamoney: {
     h: 22,
-    col: walletPrefix + 'olamoney.png',
-    offer: 20,
-    offerDesc: '20% Cashback on Ola Money',
-    maxCBDesc: 'Maximum upto ₹50',
-    offerValidDesc: 'Valid only on first order'
+    col: walletPrefix + 'olamoney.png'
   },
   airtelmoney: {
     power: false,
