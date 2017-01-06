@@ -137,7 +137,8 @@ function Payment(data, params, r) {
     try {
       this.writePopup();
     } catch(e){}
-    this.on('resume', bind('generate', this, data));
+    this.data = data;
+    this.on('resume', bind('generate', this));
   } else {
     this.generate(data);
   }
@@ -221,7 +222,7 @@ Payment.prototype = {
   },
 
   generate: function(data) {
-    this.data = clone(data);
+    this.data = clone(data || this.data);
     this.format();
 
     if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
