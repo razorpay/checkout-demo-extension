@@ -53,11 +53,10 @@
     }).on('payment.error', function(resp) {
       console.log(resp);
     })
-    var data = {};
 
     document.forms[0].onsubmit = function(e) {
       e.preventDefault();
-      rp.createPayment(data, {paused: true, message: 'loading'});
+      rp.createPayment(null, {paused: true, message: 'loading'});
       setTimeout(function() {
         var data = {
           key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -67,7 +66,7 @@
         data.bank = 'SBIN';
         data.email = 'a@s.d';
         data.contact = 9999922222;
-        rp.emit('payment.resume');
+        rp.emit('payment.resume', data);
       })
     }
   </script>

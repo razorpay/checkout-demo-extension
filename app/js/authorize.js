@@ -129,7 +129,7 @@ function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   this.fees = params.fees;
-  this.powerwallet = params.powerwallet || data.method === 'upi';
+  this.powerwallet = params.powerwallet || data && data.method === 'upi';
   this.message = params.message;
   this.tryPopup();
 
@@ -505,7 +505,7 @@ function otpCallback(response){
 var razorpayProto = Razorpay.prototype;
 
 razorpayProto.createPayment = function(data, params) {
-  if ('data' in data) {
+  if (data && 'data' in data) {
     data = data.data;
     params = data;
   }
