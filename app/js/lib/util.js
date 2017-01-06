@@ -22,7 +22,9 @@ function isua(ua_regex) {
 
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
-var ua_prefer_redirect = isua(/; wv\) |Windows Phone|Opera Mini|UCBrowser|FBAN/);
+var ua_prefer_redirect = (ua_iOS && ua.indexOf(Safari) === -1)
+ || isua(/; wv\) |Windows Phone|Opera Mini|UCBrowser|FBAN/);
+
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
 var isWP = isua(/Windows Phone/);
