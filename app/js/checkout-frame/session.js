@@ -201,6 +201,10 @@ function errorHandler(response){
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
 
+  if (this.get('retry') === false) {
+    return this.modal.hide();
+  }
+
   var err_field = error.field;
   if (err_field && !(this.screen === 'otp' && this.tab === 'wallet')) {
     if(!err_field.indexOf('expiry')) {

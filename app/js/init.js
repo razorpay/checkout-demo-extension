@@ -104,7 +104,8 @@ var RazorpayDefaults = Razorpay.defaults = {
   'description': '',
   'customer_id': '',
   'recurring': null,
-  'signature': ''
+  'signature': '',
+  retry: true
 };
 
 function base_configure(overrides) {
