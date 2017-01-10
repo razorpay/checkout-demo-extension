@@ -572,104 +572,65 @@ razorpayProto.topupWallet = function() {
   });
 }
 
-razorpayProto.postInit = noop;
-
-RazorProto.onNew = function(event, callback) {
-  if (event === 'ready') {
-    var self = this;
-    if (self.prefs) {
-      callback(event, self.prefs);
-    } else {
-      Razorpay.payment.getPrefsJsonp(makePrefParams(self), function(response) {
-        if (response.methods) {
-          self.prefs = response;
-          self.methods = response.methods;
-        }
-        callback(self.prefs);
-      })
-    }
-  }
-}
-
 Razorpay.setFormatter = FormatDelegator;
 
-Razorpay.payment = {
-  authorize: function(options){
-    var r = Razorpay({amount: options.data.amount}).createPayment(options.data);
-    r.on('payment.success', options.success);
-    r.on('payment.error', options.error);
-    return r;
-  },
-  validate: function(data) {
-    var errors = [];
+razorpayPayment.authorize = function(options){
+  var r = Razorpay({amount: options.data.amount}).createPayment(options.data);
+  r.on('payment.success', options.success);
+  r.on('payment.error', options.error);
+  return r;
+}
 
-    if (!isValidAmount(data.amount)) {
-      errors.push({
-        description: 'Invalid amount specified',
-        field: 'amount'
-      });
-    }
+razorpayPayment.validate = function(data) {
+  var errors = [];
 
-    if (!data.method){
-      errors.push({
-        description: 'Payment Method not specified',
-        field: 'method'
-      });
-    }
-
-    if (typeof data.key_id === 'undefined') {
-      errors.push({
-        description: 'No merchant key specified',
-        field: 'key'
-      });
-    }
-
-    if (data.key_id === '') {
-      errors.push({
-        description: 'Merchant key cannot be empty',
-        field: 'key'
-      });
-    }
-
-    return err(errors);
-  },
-
-  getPrefsJsonp: function(data, callback){
-    return $.jsonp({
-      url: makeUrl('preferences'),
-      data: data,
-      timeout: 30000,
-      success: function(response){
-        invoke(callback, null, response);
-      }
-    });
-  },
-
-  getPrefs: function(data, callback){
-    var url = makeUrl('preferences') + '?';
-    each(data, function(key, val) {
-      url += key + '=' + val + '&';
-    })
-    return $.ajax({
-      url: url.slice(0, -1),
-      timeout: 30000,
-      callback: function(response){
-        if (response.xhr && response.xhr.status === 0) {
-          return Razorpay.payment.getPrefsJsonp(data, callback);
-        }
-        invoke(callback, null, response);
-      }
-    });
-  },
-
-  getMethods: function(callback){
-    return Razorpay.payment.getPrefsJsonp({
-      key_id: Razorpay.defaults.key
-    }, function(response){
-      callback(response.methods || response);
+  if (!isValidAmount(data.amount)) {
+    errors.push({
+      description: 'Invalid amount specified',
+      field: 'amount'
     });
   }
-};
+
+  if (!data.method){
+    errors.push({
+      description: 'Payment Method not specified',
+      field: 'method'
+    });
+  }
+
+  if (typeof data.key_id === 'undefined') {
+    errors.push({
+      description: 'No merchant key specified',
+      field: 'key'
+    });
+  }
+
+  if (data.key_id === '') {
+    errors.push({
+      description: 'Merchant key cannot be empty',
+      field: 'key'
+    });
+  }
+
+  return err(errors);
+}
+
+razorpayPayment.getPrefs = function(data, callback){
+  var url = makeUrl('preferences') + '?';
+  each(data, function(key, val) {
+    url += key + '=' + val + '&';
+  })
+  return $.ajax({
+    url: url.slice(0, -1),
+    timeout: 30000,
+    callback: function(response){
+      if (response.xhr && response.xhr.status === 0) {
+        return getPrefsJsonp(data, callback);
+      }
+      invoke(callback, null, response);
+    }
+  });
+}
 
 Razorpay.sendMessage = function(message) {
   if (message && message.event === 'redirect') {

@@ -91,6 +91,25 @@ var Razorpay = window.Razorpay = function(overrides){
 
 var RazorProto = Razorpay.prototype = new Eventer();
 
+RazorProto.postInit = noop;
+
+RazorProto.onNew = function(event, callback) {
+  if (event === 'ready') {
+    var self = this;
+    if (self.prefs) {
+      callback(event, self.prefs);
+    } else {
+      getPrefsJsonp(makePrefParams(self), function(response) {
+        if (response.methods) {
+          self.prefs = response;
+          self.methods = response.methods;
+        }
+        callback(self.prefs);
+      })
+    }
+  }
+}
+
 RazorProto.emi_calculator = function(length, rate) {
   return Razorpay.emi.calculator(this.get('amount')/100, length, rate);
 };
@@ -102,6 +121,27 @@ Razorpay.emi = {
     return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
   }
 };
+
+function getPrefsJsonp(data, callback) {
+  return $.jsonp({
+    url: makeUrl('preferences'),
+    data: data,
+    timeout: 30000,
+    success: function(response){
+      invoke(callback, null, response);
+    }
+  });
+}
+
+var razorpayPayment = Razorpay.payment = {
+  getMethods: function(callback){
+    return getPrefsJsonp({
+      key_id: Razorpay.defaults.key
+    }, function(response){
+      callback(response.methods || response);
+    });
+  }
+}
 
 var RazorpayDefaults = Razorpay.defaults = {
   'key': '',
