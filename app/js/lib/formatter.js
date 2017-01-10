@@ -30,7 +30,7 @@ var Formatter;
 
   Formatter.events = {
     keypress: 'fwdFormat',
-    input: 'format',
+    input: 'deferFormat',
     change: 'format',
     blur: 'format',
     keydown: 'backFormat'
@@ -93,6 +93,10 @@ var Formatter;
       value: value
     })
   }
+
+  proto.deferFormat = function(e) {
+    invoke('format', this, e, 0);
+  },
 
   proto.format = function(e) {
     var caretPosition = this.getCaret().start;
