@@ -91,6 +91,18 @@ var Razorpay = window.Razorpay = function(overrides){
 
 var RazorProto = Razorpay.prototype = new Eventer();
 
+RazorProto.emi_calculator = function(length, rate) {
+  return Razorpay.emi.calculator(this.get('amount')/100, length, rate);
+};
+
+Razorpay.emi = {
+  calculator: function(principle, length, rate) {
+    rate /= 1200;
+    var multiplier = Math.pow(1+rate, length);
+    return parseInt(principle*rate*multiplier/(multiplier - 1), 10);
+  }
+};
+
 var RazorpayDefaults = Razorpay.defaults = {
   'key': '',
   'image': '',
