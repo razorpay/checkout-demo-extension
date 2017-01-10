@@ -986,6 +986,9 @@ Session.prototype = {
   },
 
   showCardTab: function() {
+    $('#otp-elem').removeClass('fourdigit');
+    $('#otp').attr('maxlength', 6);
+
     var self = this;
     var customer = self.customer;
     var remember = self.get('remember_customer');
