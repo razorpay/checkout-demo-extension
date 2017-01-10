@@ -96,7 +96,7 @@ var Formatter;
 
   proto.deferFormat = function(e) {
     invoke('format', this, e, 0);
-  },
+  }
 
   proto.format = function(e) {
     var caretPosition = this.getCaret().start;
