@@ -344,7 +344,9 @@ function toggleInvalid($el, isValid) {
 
 function recurseAjax(url, callback, continueTill, holder) {
   var firstCall;
-  if (!holder) {
+  var ajaxFn = $.ajax;
+  if (isFunction(holder)) {
+    ajaxFn = holder;
     holder = {};
     firstCall = true;
   }
@@ -352,7 +354,7 @@ function recurseAjax(url, callback, continueTill, holder) {
     if (!firstCall && !holder[0]) {
       return;
     }
-    holder[0] = $.ajax({
+    holder[0] = ajaxFn({
       url: url,
       callback: function(response) {
         if (continueTill(response)) {

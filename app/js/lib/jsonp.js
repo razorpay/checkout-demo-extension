@@ -30,6 +30,8 @@ $.jsonp = function(options) {
   var done = false;
   
   window[callback] = function(data) {
+    delete data['http_status_code'];
+
     params.success(data, params);
     params.callback(data, params);
     try {
