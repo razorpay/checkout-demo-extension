@@ -1296,6 +1296,7 @@ Session.prototype = {
       powerotp.value = '';
     }
     if (this.r._payment) {
+      hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
     }
     abortAjax(this.ajax);
