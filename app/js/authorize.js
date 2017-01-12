@@ -475,7 +475,7 @@ var responseTypes = {
       self.complete(response);
     }, function(response) {
       return response && response.status;
-    }, $.jsonp)
+    }, null, $.jsonp);
     self.emit('upi.pending');
   },
 
