@@ -284,7 +284,7 @@ CheckoutFrame.prototype = {
 
     if (ua_iPhone) {
       merchantMarkup.oldY = pageYOffset;
-      scrollTo(0, 0);
+      window.scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
     }
   },
