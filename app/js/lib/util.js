@@ -80,7 +80,15 @@ function each(iteratee, eachFunc, thisArg) {
     thisArg = this;
   }
   if (iteratee) {
-    if (iteratee.length) { // not using instanceof Array, to iterate over array-like objects
+    /**
+     * 1. Not using instanceof Array, to iterate over array-like objects
+     * 2. Not using `iteratee.length` inside `if` because 0 length arrays will
+     *    then be considered as objects.
+     * 3. Some browsers like webview on kitkat iterate over the `length`
+     *    property of Arrays if iterated by `for-in` loop.
+     * http://stackoverflow.com/questions/500504/why-is-using-for-in-with-array-iteration-a-bad-idea#comment315981_500531
+     */
+    if (typeof iteratee.length !== 'undefined') {
       for (i = 0; i < iteratee.length; i++) {
         eachFunc.call(thisArg, i, iteratee[i]);
       }
