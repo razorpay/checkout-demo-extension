@@ -334,10 +334,11 @@ describe('afterClose should', function() {
 })
 
 describe('if iPhone,', function() {
-  var cf;
+  var cf, rzp;
 
   beforeEach(function() {
-    cf = new CheckoutFrame;
+    rzp = new Razorpay(options);
+    cf = new CheckoutFrame(rzp);
   })
 
   it('scroll, orientationchange listener should be bound', function() {
