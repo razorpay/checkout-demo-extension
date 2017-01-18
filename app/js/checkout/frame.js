@@ -243,8 +243,11 @@ CheckoutFrame.prototype = {
 
       if (ua_iPhone) {
         eventPairs.orientationchange = merchantMarkup.orientationchange;
-        eventPairs.scroll = merchantMarkup.scroll;
-        eventPairs.resize = merchantMarkup.resize;
+
+        if (!this.rzp.get('parent')) {
+          eventPairs.scroll = merchantMarkup.scroll;
+          eventPairs.resize = merchantMarkup.resize;
+        }
       }
 
       each(
