@@ -35,10 +35,6 @@ var addAutoCheckoutButton = function(rzp) {
     rzp.open();
     return false;
   }
-  var formAction = form.action;
-  if (formAction && !rzp.get('callback_url')) {
-    rzp.get().callback_url = formAction;
-  }
 }
 
 /**
@@ -75,6 +71,27 @@ function initAutomaticCheckout(){
   var key = opts.key;
   if (key && key.length > 0) {
     trackingProps.integration = 'auto';
+
+    // passing form action as callback_url
+    var form = currentScript.parentElement;
+    var formAction = form.action;
+
+    // if data-callback_url is not passed
+    if (formAction && !opts.callback_url) {
+      var params = {};
+      each(
+        $(form).find('[name]'),
+        function(index, el) {
+          params[el.name] = el.value;
+        }
+      )
+      opts.callback_url =  makeUrl('callback_params') +
+        '?params=' + encodeURIComponent(params) +
+        '&options=' + encodeURIComponent(opts) +
+        '&url=' + formAction +
+        '&back=' + location.href;
+    }
+
     opts.handler = defaultAutoPostHandler;
     var rzp = Razorpay(opts);
     if (!opts.parent) {
