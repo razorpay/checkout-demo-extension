@@ -27,7 +27,8 @@ var ua_iOS = ua_iPhone || isua(/iPad/);
 // ios non safari: ua_iOS && !isua(/Safari/)
 // note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
 var ua_prefer_redirect = isua(/; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/)
-  || (ua_iOS && !isua(/Safari/));
+  || (ua_iOS && !isua(/Safari/))
+  || (isua(/Android 4/) && !isua(/Chrome/));
 
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
