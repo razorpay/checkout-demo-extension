@@ -22,7 +22,12 @@ function isua(ua_regex) {
 
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
-var ua_prefer_redirect = isua(/; wv\) |Gecko\) Version\/[^ ]+ Chro|Windows Phone|Opera Mini|UCBrowser|FBAN/);
+
+// android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
+// ios non safari: ua_iOS && !isua(/Safari/)
+// note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
+var ua_prefer_redirect = isua(/; wv\) |Gecko\) Version\/[^ ]+ Chro|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/)
+  || (ua_iOS && !isua(/Safari/));
 
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
