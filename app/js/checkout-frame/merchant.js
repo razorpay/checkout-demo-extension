@@ -68,10 +68,6 @@ var freqWallets = sessProto.walletData = {
   freecharge: {
     h: 18,
     col: walletPrefix + 'freecharge.png',
-    offer: 15,
-    offerDesc: '15% Cashback on Freecharge',
-    maxCBDesc: 'Maximum upto ₹50',
-    offerValidDesc: 'Valid only on first time orders'
   },
   mobikwik: {
     h: 19,
