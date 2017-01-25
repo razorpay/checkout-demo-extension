@@ -86,8 +86,8 @@ function initAutomaticCheckout(){
         }
       )
       opts.callback_url =  makeUrl('callback_params') +
-        '?params=' + encodeURIComponent(params) +
-        '&options=' + encodeURIComponent(opts) +
+        '?params=' + encodeURIComponent(stringify(params)) +
+        '&options=' + encodeURIComponent(stringify(opts)) +
         '&url=' + formAction +
         '&back=' + location.href;
     }
