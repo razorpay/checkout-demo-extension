@@ -313,7 +313,6 @@ function Session (options) {
   var key = this.get('key')
   var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
   var CHAIPOINT_KEY_ID = 'rzp_live_Zqmx92mExD1bHO';
-  var RAIL_YATRI_KEY_ID = 'rzp_live_DpR4qRbfk9hGjd';
   var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0';
   var walletData = this.walletData
   var freechargeWallet, airtelMoneyWallet, mobikwikWallet;
@@ -339,14 +338,6 @@ function Session (options) {
       freechargeWallet.offerDesc = '15% Cashback on Freecharge';
       freechargeWallet.maxCBDesc = 'Cashback upto ₹50';
       freechargeWallet.offerValidDesc = 'Valid only on first time orders';
-      break;
-
-    case RAIL_YATRI_KEY_ID:
-      mobikwikWallet = walletData.mobikwik
-      mobikwikWallet.offer = 10;
-      mobikwikWallet.offerDesc = '10% Cashback on Mobikwik';
-      mobikwikWallet.maxCBDesc = 'Cashback upto ₹50';
-      mobikwikWallet.offerValidDesc = 'Offer valid on a minimum transaction of ₹250. Applicable only once per user';
       break;
 
     case CHAIPOINT_KEY_ID:
