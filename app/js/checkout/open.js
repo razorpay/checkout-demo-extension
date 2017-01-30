@@ -106,7 +106,7 @@ function createFrameContainer(){
   div.innerHTML = "<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>";
   var style = div.style;
   var rules = {
-    'zIndex': '99999',
+    'zIndex': 1e9,
     'position': 'fixed',
     'top': 0,
     'display': 'none',
