@@ -711,19 +711,24 @@ Session.prototype = {
       this.click('#show-add-card', this.toggleSavedCards);
       this.click('#show-saved-cards', this.toggleSavedCards);
       this.on('click', '#saved-cards-container', 'saved-card', this.setSavedCard);
-      this.click('#profile', function(e) {
-        if (e.target.tagName === 'LI') {
-          var self = this;
-          var customer = self.customer;
-          customer.logout(e.target.parentNode.firstChild === e.target, function() {
-            customer.logged = false;
-            customer.tokens = null;
-            self.setSavedCards();
-            $('#top-right').removeClass('logged');
-          });
-        }
-      })
     }
+    this.on('click', '#top-right', function() {
+      $('#top-right').addClass('focus');
+      var self = this;
+      var container_listener = $('#container').on('click', function(e) {
+        if (e.target.tagName === 'LI') {
+          var customer = self.customer;
+          customer.logged = false;
+          customer.tokens = null;
+          self.setSavedCards();
+          $('#top-right').removeClass('logged');
+          customer.logout(e.target.parentNode.firstChild === e.target);
+        }
+        container_listener();
+        $('#top-right').removeClass('focus');
+        return preventDefault(e);
+      }, true);
+    })
     if (enabledMethods.netbanking) {
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
