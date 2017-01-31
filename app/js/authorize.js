@@ -567,11 +567,12 @@ razorpayProto.topupWallet = function() {
       '_[source]': 'checkoutjs'
     },
     callback: function(response) {
-      if (isRedirect && !response.error) {
+      var request = response.request;
+      if (isRedirect && !response.error && request) {
         discreet.redirect({
-          url: response.request.url,
-          content: response.request.content,
-          method: 'post'
+          url: request.url,
+          content: request.content,
+          method: request.method || 'post'
         });
       } else {
         ajaxCallback.call(payment, response);
