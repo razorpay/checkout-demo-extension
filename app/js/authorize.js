@@ -111,6 +111,7 @@ function getTrackingData(data) {
       delete trackingData[field];
     }
   })
+  return trackingData;
 }
 
 function trackNewPayment(data, params, r) {
