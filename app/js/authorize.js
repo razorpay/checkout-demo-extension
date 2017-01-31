@@ -102,7 +102,7 @@ function onPaymentCancel(metaParam) {
   }
 }
 
-function trackNewPayment(data, params, r) {
+function getTrackingData(data) {
   var trackingData = clone(data);
 
   // donottrack card number, token, cvv
@@ -111,9 +111,11 @@ function trackNewPayment(data, params, r) {
       delete trackingData[field];
     }
   })
+}
 
+function trackNewPayment(data, params, r) {
   track(r, 'submit', {
-    data: trackingData,
+    data: getTrackingData(data),
     params: params
   });
 }
@@ -286,6 +288,7 @@ Payment.prototype = {
       this.popup.close();
     } catch(e){}
     this.done = true;
+    Razorpay.popup_delay = null;
 
     // unbind listener
     if(this.offmessage){
@@ -334,7 +337,12 @@ Payment.prototype = {
       popup.close();
       popup = null;
     }
+
     if (popup) {
+      var self = this;
+      Razorpay.popup_delay = function() {
+        track(this.r, 'popup_delay', getTrackingData(this.data));
+      }
       popup.onClose = this.r.emitter('payment.cancel');
     }
     this.popup = popup;
@@ -435,7 +443,7 @@ function makeRedirectUrl(fees){
 
 var responseTypes = {
   // this === payment
-  first: function(request){
+  first: function(request) {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;

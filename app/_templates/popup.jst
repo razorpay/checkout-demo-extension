@@ -48,6 +48,9 @@ opacity:0;border-radius:50%;border:4px solid #BC3726;
   <script>
     setTimeout(function() {
       document.querySelector('#message').innerHTML = 'Your bank servers are taking time to respond. We will continue trying for a while.';
+      try {
+        opener.Razorpay.popup_delay();
+      } catch(e){}
     }, 30000)
   </script>
 </body>
