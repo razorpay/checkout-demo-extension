@@ -1333,11 +1333,18 @@ Session.prototype = {
       data.bank = this.order.bank;
     } else if (screen) {
       if (screen === 'card') {
+        var formattingDelegator = this.delegator;
+
+        // Do not proceed with amex cards if amex is disabled for merchant
+        // also without this, cardsaving is triggered before API returning unsupported card error
+        if (!preferences.methods.amex && formattingDelegator.card.type === 'amex') {
+          return this.showLoadError('AMEX cards are not supported', true);
+        }
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
         if (!this.savedCardScreen) {
           // handling add new card screen
-          this.delegator.card.format();
-          this.delegator.expiry.format();
+          formattingDelegator.card.format();
+          formattingDelegator.expiry.format();
 
           // if maestro card is active
           if (nocvv_el.checked && !nocvv_el.disabled) {
