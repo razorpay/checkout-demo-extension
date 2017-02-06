@@ -32,6 +32,42 @@ var addAutoCheckoutButton = function(rzp) {
   form.appendChild(button);
   form.onsubmit = function(e){
     e.preventDefault();
+
+    var formAction = form.action;
+    var options = rzp.get();
+    // if data-callback_url is not passed
+    if (isString(formAction) && formAction && !options.callback_url && window.btoa) {
+      var content = {};
+      each(
+        $(form).find('[name]'),
+        function(index, el) {
+          content[el.name] = el.value;
+        }
+      )
+
+      var request = {
+        url: formAction
+      }
+      if (form.method === 'post') {
+        request.method = 'post';
+      }
+      var target = form.target;
+      if (target && isString(target)) {
+        request.target = form.target;
+      }
+
+      if (Object.keys(content).length) {
+        request.content = content;
+      }
+
+      var data = btoa(stringify({
+        request: request,
+        options: stringify(options),
+        back: location.href
+      }))
+
+      options.callback_url =  makeUrl('checkout/onyx') + '?data=' + data;
+    }
     rzp.open();
     return false;
   }
@@ -70,27 +106,10 @@ function initAutomaticCheckout(){
 
   var key = opts.key;
   if (key && key.length > 0) {
-    trackingProps.integration = 'auto';
 
     // passing form action as callback_url
     var form = currentScript.parentElement;
     var formAction = form.action;
-
-    // if data-callback_url is not passed
-    if (formAction && !opts.callback_url) {
-      var params = {};
-      each(
-        $(form).find('[name]'),
-        function(index, el) {
-          params[el.name] = el.value;
-        }
-      )
-      opts.callback_url =  makeUrl('callback_params') +
-        '?params=' + encodeURIComponent(stringify(params)) +
-        '&options=' + encodeURIComponent(stringify(opts)) +
-        '&url=' + formAction +
-        '&back=' + location.href;
-    }
 
     opts.handler = defaultAutoPostHandler;
     var rzp = Razorpay(opts);
