@@ -155,7 +155,7 @@ else
                   <div class="clear"></div>
                 </div>
               </div>
-              `?method.card || o('theme.emi_mode')`
+              `?method.card || method.emi`
                 <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
                   <div id="saved-cards-container"></div>
@@ -164,6 +164,7 @@ else
                   <div id="add-card-container">
                     <div class="elem select">
                       <i class="select-arrow">&#xe601;</i>
+                      <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
                         `~emi_options.banks:code:bank`
@@ -198,7 +199,7 @@ else
                       <div class="elem select">
                         <i class="select-arrow">&#xe601;</i>
                         <select class="input">
-                          <option value="" selected>Pay without EMI</option>
+                          <option value="" selected>Enter Plan</option>
                         </select>
                       </div>
                       <div class="first disabled dropdown-parent" id="emi-check-label">

@@ -31,7 +31,7 @@ function fillData(container, returnObj) {
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
-  var h = isOption ? '<option value="" selected>Pay without EMI</option>' : '';
+  var h = '';
   if (emiObj.plans) {
     each(
       emiObj.plans,
@@ -692,7 +692,7 @@ Session.prototype = {
     this.click('#choose-payment-method', function() { this.setScreen(''); });
 
     var enabledMethods = this.methods;
-    if (enabledMethods.card || this.get('theme.emi_mode')) {
+    if (enabledMethods.card || enabledMethods.emi) {
       this.on('keyup', '#card_number', onSixDigits);
       this.on('change', '#nocvv', noCvvToggle);
 
@@ -853,7 +853,7 @@ Session.prototype = {
     self.refresh();
     var bits = self.bits;
     var delegator = self.delegator = Razorpay.setFormatter(self.el);
-    if (self.methods.card) {
+    if (self.methods.card || self.methods.emi) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
       var el_cvv = gel('card_cvv');
@@ -927,7 +927,8 @@ Session.prototype = {
     makeHidden('.screen.' + shownClass);
 
     if (screen) {
-      $('#tab-title').html(tab_titles[screen]);
+      var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
+      $('#tab-title').html(screenTitle);
       makeVisible('#topbar');
     } else {
       makeHidden('#topbar');
@@ -984,13 +985,21 @@ Session.prototype = {
     }
 
     if (tab === 'card' || tab === 'emi') {
-      this.showCardTab();
+      this.showCardTab(tab);
     } else {
       this.setScreen(tab);
     }
   },
 
-  showCardTab: function() {
+  showCardTab: function(tab) {
+    var isEmiTab = tab === 'emi';
+    $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
+
+    if (!isEmiTab) {
+      $('#emi-bank').parent().removeClass('invalid');
+      $('#elem-emi .elem').removeClass('invalid');
+    }
+
     $('#otp-elem').removeClass('fourdigit');
     $('#otp').attr('maxlength', 6);
 

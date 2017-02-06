@@ -200,7 +200,8 @@ function setPaymentMethods(session){
     methods.emi = false;
   }
 
-  if (!methods.card || recurring || international) {
+  var emiMethod = session.get('theme.emi_mode');
+  if (!(emiMethod && methods.emi || methods.card) || recurring || international) {
     methods.emi = false;
   }
 
@@ -208,7 +209,6 @@ function setPaymentMethods(session){
     methods.upi = false;
   }
 
-  var emiMethod = session.get('theme.emi_mode');
   if (methods.emi && !emiMethod) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
