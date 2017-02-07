@@ -60,13 +60,15 @@ var addAutoCheckoutButton = function(rzp) {
         request.content = content;
       }
 
-      var data = btoa(stringify({
-        request: request,
-        options: stringify(options),
-        back: location.href
-      }))
+      try {
+        var data = btoa(stringify({
+          request: request,
+          options: stringify(options),
+          back: location.href
+        }))
 
-      options.callback_url =  makeUrl('checkout/onyx') + '?data=' + data;
+        options.callback_url =  makeUrl('checkout/onyx') + '?data=' + data;
+      } catch(err) {}
     }
     rzp.open();
     return false;
