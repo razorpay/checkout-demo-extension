@@ -314,6 +314,7 @@ function Session (options) {
   var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
   var CHAIPOINT_KEY_ID = 'rzp_live_Zqmx92mExD1bHO';
   var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0';
+  var PAPAJOHNS_KEY_ID = 'rzp_live_ink0QT5fHRA4fY';
   var walletData = this.walletData
   var freechargeWallet, airtelMoneyWallet, mobikwikWallet;
 
@@ -346,6 +347,14 @@ function Session (options) {
       airtelMoneyWallet.offerDesc = '10% Cashback on Airtel Money';
       airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹50';
       airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
+      break;
+
+    case PAPAJOHNS_KEY_ID:
+      freechargeWallet = walletData.freecharge;
+      freechargeWallet.offer = 20;
+      freechargeWallet.offerDesc = '20% Cashback on Freecharge';
+      freechargeWallet.maxCBDesc = 'Cashback upto ₹50';
+      freechargeWallet.offerValidDesc = 'Applicable one time per user';
       break;
   }
 }
