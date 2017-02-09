@@ -85,7 +85,7 @@ discreet.currencies = {
 
 optionValidations.display_currency = function(currency) {
   if(!(currency in discreet.currencies) && currency !== Razorpay.defaults.display_currency){
-    return 'This dislpay currency is not supported';
+    return 'This display currency is not supported';
   }
 }
 
