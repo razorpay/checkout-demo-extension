@@ -78,6 +78,8 @@ discreet.currencies = {
   'GBP': '£',
   'HUF': 'Ft',
   'JPY': '¥',
+  'CNY': '¥',
+  'AED': 'د.إ',
   'PLN': 'zł',
   'SFR': 'Fr',
   'CHF': 'Fr'
