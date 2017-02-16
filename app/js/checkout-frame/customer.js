@@ -1,8 +1,13 @@
 var customers = {};
 
 var getCustomer = function(contact) {
+  var indian = contact.length === 10 && contact[0] !== '+';
   if (!(contact in customers)) {
-    customers[contact] = new Customer(contact);
+    if (indian) {
+      return getCustomer('+91' + contact);
+    } else {
+      customers[contact] = new Customer(contact);
+    }
   }
   return customers[contact];
 }
