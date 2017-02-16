@@ -246,9 +246,7 @@ function setOtpText(text){
 }
 
 function elfShowOTP(otp, sender) {
-  if (sender.indexOf('RZRPAY') !== -1) {
     window.handleOTP(otp);
-  }
 }
 
 function askOTP(text) {
