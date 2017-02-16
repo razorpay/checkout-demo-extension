@@ -303,8 +303,17 @@ function showModal(session) {
     invoke('setMerchantOptions', CheckoutBridge, JSON.stringify(options));
   }
 
+  var offers = preferences.offers;
+  var session_options = session.get();
+  if (offers) {
+    each(RazorpayDefaults, function(optionName) {
+      if (/^method/.test(optionName) && offers.payment_method !== optionName.split('.')[1]) {
+        session_options[optionName] = false;
+      }
+    })
+  }
+
   if (saved_customer) {
-    var session_options = session.get();
     var filters = {};
     // we put saved customer contact, email into default prefills
     if (saved_customer.contact) {
