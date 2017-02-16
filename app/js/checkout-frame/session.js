@@ -62,7 +62,9 @@ function setEmiBank(data){
 function onSixDigits(e){
   var el = e.target;
   var val = el.value;
-  var isMaestro = $('#elem-card .cardtype').attr('cardtype') === 'maestro';
+
+  var cardType = $('#elem-card .cardtype').attr('cardtype');
+  var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
