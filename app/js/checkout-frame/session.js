@@ -333,14 +333,6 @@ function Session (options) {
       airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
       break;
 
-    case MG_KEY_ID:
-      freechargeWallet = walletData.freecharge;
-      freechargeWallet.offer = 15;
-      freechargeWallet.offerDesc = '15% Cashback on Freecharge';
-      freechargeWallet.maxCBDesc = 'Cashback upto ₹50';
-      freechargeWallet.offerValidDesc = 'Valid only on first time orders';
-      break;
-
     case CHAIPOINT_KEY_ID:
       airtelMoneyWallet = walletData.airtelmoney;
       airtelMoneyWallet.offer = 10;
