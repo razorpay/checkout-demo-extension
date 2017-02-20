@@ -1,14 +1,16 @@
 var customers = {};
 
 var getCustomer = function(contact) {
+  // indian contact without +91
+  var indianContact;
   if (contact) {
-    var indian = contact.length === 10 && contact[0] !== '+';
-    if (!(contact in customers)) {
-      if (indian) {
-        return getCustomer('+91' + contact);
-      } else {
-        customers[contact] = new Customer(contact);
-      }
+    indianContact = contact.length === 10 && contact[0] !== '+';
+  }
+  if (!(contact in customers)) {
+    if (indianContact) {
+      return getCustomer('+91' + contact);
+    } else {
+      customers[contact] = new Customer(contact);
     }
   }
   return customers[contact];
