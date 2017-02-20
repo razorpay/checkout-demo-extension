@@ -390,14 +390,8 @@ CheckoutFrame.prototype = {
     var rzp = this.rzp;
     track(rzp, 'checkout_success', data);
     invoke(
-      function(){
-        try{
-          invoke(this.get('handler'), this, data);
-        }
-        catch(e){
-          roll('merc', e);
-          throw e;
-        }
+      function() {
+        invoke(this.get('handler'), this, data);
       },
       rzp,
       null,
