@@ -491,7 +491,7 @@ window.backPressed = function(callback) {
   if (session.tab) {
     session.back();
   } else {
-    callback();
+    invoke(callback, CheckoutBridge);
   }
 }
 
