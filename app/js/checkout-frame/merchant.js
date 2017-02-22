@@ -486,6 +486,15 @@ window.handleOTP = function(otp) {
   }
 }
 
+window.backPressed = function(callback) {
+  var session = getSession();
+  if (session.tab) {
+    session.back();
+  } else {
+    invoke(callback, CheckoutBridge);
+  }
+}
+
 function validUID(id){
   if(isIframe && !CheckoutBridge){
     if(!isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)){
