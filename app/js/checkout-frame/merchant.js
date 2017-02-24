@@ -591,6 +591,11 @@ function initIframe(){
   if (CheckoutBridge) {
     delete trackingProps.referer;
     trackingProps.platform = 'mobile_sdk';
+
+    if (qpmap.platform_version) {
+      trackingProps.platform_version = qpmap.platform_version;
+    }
+
     var os = qpmap.platform;
     if (os) {
       trackingProps.os = os;
