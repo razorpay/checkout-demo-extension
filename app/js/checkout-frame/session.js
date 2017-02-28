@@ -333,6 +333,14 @@ function Session (options) {
       airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
       break;
 
+    case MG_KEY_ID:
+      freechargeWallet = walletData.mobikwik;
+      freechargeWallet.offer = 10;
+      freechargeWallet.offerDesc = '10% Cashback on Mobikwik';
+      freechargeWallet.maxCBDesc = 'Cashback upto ₹150';
+      freechargeWallet.offerValidDesc = 'Applicable one time per user';
+      break;
+
     case CHAIPOINT_KEY_ID:
       airtelMoneyWallet = walletData.airtelmoney;
       airtelMoneyWallet.offer = 10;
