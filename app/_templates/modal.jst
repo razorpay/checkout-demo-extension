@@ -134,9 +134,13 @@ else
                   </div>
                 `?`
                 `?preferences.offers`
-                  <div class="pad">
-                  <div><strong>`=preferences.offers.additional_details`</strong></div>
-                  `=preferences.offers.display_text`
+                  <div class="pad" style="position:absolute;bottom:20px;pointer-events:none;font-size:12px">
+                    `?preferences.offers.name`
+                      <div class="text-btn"><strong>`=preferences.offers.name`</strong></div>
+                    `?`
+                    `?preferences.offers.display_text`
+                      `=preferences.offers.display_text`
+                    `?`
                   </div>
                 `?`
                 <div`?order.bank` class="showable"`?`>
