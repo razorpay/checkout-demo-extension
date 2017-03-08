@@ -567,6 +567,18 @@ window.handleMessage = function(message) {
   } else if(message.event === 'close') {
     session.hide();
   }
+
+  try {
+    if (isNonNullObject(CheckoutBridge)) {
+      CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
+    }
+  }
+}
+
+parseAnalyticsData = function(data) {
+  each(data, function(key, val) {
+    trackingProps[key] = val;
+  })
 }
 
 function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
@@ -600,10 +612,6 @@ function initIframe(){
   if (CheckoutBridge) {
     delete trackingProps.referer;
     trackingProps.platform = 'mobile_sdk';
-
-    if (qpmap.platform_version) {
-      trackingProps.platform_version = qpmap.platform_version;
-    }
 
     var os = qpmap.platform;
     if (os) {
