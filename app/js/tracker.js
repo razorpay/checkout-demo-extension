@@ -131,11 +131,19 @@ function nest(options){
 
 function getCommonTrackingData(r) {
   var props = {
-    ua: ua,
     checkout_id: r ? r.id : _uid
   }
   each(
-    ['integration', 'referer', 'library', 'platform', 'os'],
+    [
+      'integration',
+      'referer',
+      'library',
+      'platform',
+      'platform_version',
+      'os',
+      'os_version',
+      'device'
+    ],
     function(i, propName) {
       if (trackingProps[propName]) {
         props[propName] = trackingProps[propName]
@@ -173,45 +181,29 @@ function track(r, event, data) {
     }
 
     var trackingPayload = {
-      // mandatory
-      event: event,
-
-      // unique identifier needs to be named "anonymousId"
-      anonymousId: r.id,
-
-      // in order to force segment pass original IP to mixpanel & keen
-      context: {
-        direct: true
-      }
+      event: event
     };
 
-    trackingPayload.properties = getCommonTrackingData(r);
+    var context = trackingPayload.context = getCommonTrackingData(r);
+    context.ip = null;
+    context.user_agent = null;
 
-    flattenProps(data, trackingPayload.properties, 'data');
-    flattenProps(r.get(), trackingPayload.properties, 'options');
-
-
-    if (!isEmptyObject(trackStack)) {
-      var prev = trackingPayload.prev = {};
-      each(
-        trackStack,
-        function(event, time){
-          prev[event] = new Date() - time;
-        }
-      )
+    var order_id = r.get('order_id');
+    if (order_id) {
+      context.order_id = order_id;
     }
-    trackStack[event] = new Date().getTime();
 
-    // return console.log(event, trackingPayload.properties);
+    var properties = trackingPayload.properties = {};
+    if (data) {
+      properties.data = data;
+    }
+
+    return console.log(event, trackingPayload);
 
     $.ajax({
-      url: 'https://api.segment.io/v1/track',
+      url: 'https://lumberjack.razorpay.com/v1/track',
       method: 'post',
-      data: JSON.stringify(trackingPayload),
-      headers: {
-        'Content-type': 'application/json',
-        'Authorization': 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:')
-      }
+      data: JSON.stringify(trackingPayload)
     })
   })
 }

@@ -572,7 +572,7 @@ window.handleMessage = function(message) {
     if (isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
     }
-  }
+  } catch(e){}
 }
 
 parseAnalyticsData = function(data) {
