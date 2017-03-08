@@ -193,12 +193,42 @@ function track(r, event, data) {
       context.order_id = order_id;
     }
 
-    var properties = trackingPayload.properties = {};
+    var trackingOptions = [
+      'key',
+      'amount',
+      'prefill',
+      'theme',
+      'image',
+      'description',
+      'name',
+      'method'
+    ];
+
+    var options = {};
+
+    each(
+      r.get(),
+      function(key, value) {
+        var keySplit = key.split('.');
+        var rootKey = keySplit[0];
+        if (trackingOptions.indexOf(rootKey) !== -1) {
+          if (keySplit.length > 1) {
+            if (!trackingOptions.hasOwnProperty(rootKey)) {
+              options[rootKey] = {};
+            }
+            options[rootKey][keySplit[1]] = value;
+          } else {
+            options[key] = value;
+          }
+        }
+      }
+    )
+    var properties = trackingPayload.properties = {
+      options: options
+    };
     if (data) {
       properties.data = data;
     }
-
-    return console.log(event, trackingPayload);
 
     $.ajax({
       url: 'https://lumberjack.razorpay.com/v1/track',
