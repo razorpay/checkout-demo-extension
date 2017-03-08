@@ -133,6 +133,16 @@ else
                     <span>&#x2139;</span> ICICI bank debit cards and all credit cards are supported for this recurring subscription.
                   </div>
                 `?`
+                `?preferences.offers`
+                  <div class="pad" style="position:absolute;bottom:20px;pointer-events:none;font-size:12px">
+                    `?preferences.offers.name`
+                      <div class="text-btn"><strong>`=preferences.offers.name`</strong></div>
+                    `?`
+                    `?preferences.offers.display_text`
+                      `=preferences.offers.display_text`
+                    `?`
+                  </div>
+                `?`
                 <div`?order.bank` class="showable"`?`>
                   <div class="legend">Select payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
