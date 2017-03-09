@@ -153,19 +153,24 @@ function getCommonTrackingData(r) {
   return props;
 }
 
-function flattenProps(obj, parentObj, parentKey) {
-  var returnObj = parentObj || {};
-  each(obj, function(key, val) {
-    if (isNonNullObject(val)) {
-      flattenProps(val, returnObj, key);
-    } else if (val && !isFunction(val) || val === 0 || val === '' || val === false) {
-      if (parentKey) {
-        key = parentKey + '.' + key;
+function flattenProps(obj, rootKey, target) {
+  if (!target) {
+    target = {};
+  }
+  each(
+    obj,
+    function(key, val) {
+      if (rootKey) {
+        key = rootKey + '[' + key + ']';
       }
-      returnObj[key] = val;
+      if (isNonNullObject(val)) {
+        flattenProps(val, key, target);
+      } else {
+        target[key] = val;
+      }
     }
-  })
-  return returnObj;
+  )
+  return target;
 }
 
 function track(r, event, data) {
@@ -180,17 +185,21 @@ function track(r, event, data) {
       data = {message: data.message, stack: data.stack}
     }
 
-    var trackingPayload = {
-      event: event
-    };
-
-    var context = trackingPayload.context = getCommonTrackingData(r);
-    context.ip = null;
+    var context = getCommonTrackingData(r);
     context.user_agent = null;
-
+    context.mode = 'live';
     var order_id = r.get('order_id');
     if (order_id) {
       context.order_id = order_id;
+    }
+
+    var options = {};
+    var properties = {
+      options: options
+    }
+
+    if (data) {
+      properties.data = data;
     }
 
     var trackingOptions = [
@@ -203,8 +212,6 @@ function track(r, event, data) {
       'name',
       'method'
     ];
-
-    var options = {};
 
     each(
       r.get(),
@@ -223,17 +230,23 @@ function track(r, event, data) {
         }
       }
     )
-    var properties = trackingPayload.properties = {
-      options: options
-    };
-    if (data) {
-      properties.data = data;
-    }
 
-    $.ajax({
+    var trackingPayload = {
+      key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
+      context: context,
+      events: [
+        {
+          event: event,
+          properties: properties,
+          timestamp: new Date() - - 0
+        }
+      ]
+    };
+
+    $.post({
       url: 'https://lumberjack.razorpay.com/v1/track',
       method: 'post',
-      data: JSON.stringify(trackingPayload)
+      data: flattenProps(trackingPayload)
     })
   })
 }

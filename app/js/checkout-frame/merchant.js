@@ -575,7 +575,7 @@ window.handleMessage = function(message) {
   } catch(e){}
 }
 
-parseAnalyticsData = function(data) {
+function parseAnalyticsData(data) {
   each(data, function(key, val) {
     trackingProps[key] = val;
   })
