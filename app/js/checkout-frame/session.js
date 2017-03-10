@@ -884,6 +884,7 @@ Session.prototype = {
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
           el_cvv.pattern = '^[0-9]{'+cvvlen+'}$';
+          $(el_cvv).toggleClass('amex', type === 'amex');
           self.input(el_cvv);
 
           // card icon element
