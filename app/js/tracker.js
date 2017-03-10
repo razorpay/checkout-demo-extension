@@ -131,11 +131,19 @@ function nest(options){
 
 function getCommonTrackingData(r) {
   var props = {
-    ua: ua,
     checkout_id: r ? r.id : _uid
   }
   each(
-    ['integration', 'referer', 'library', 'platform', 'os'],
+    [
+      'integration',
+      'referer',
+      'library',
+      'platform',
+      'platform_version',
+      'os',
+      'os_version',
+      'device'
+    ],
     function(i, propName) {
       if (trackingProps[propName]) {
         props[propName] = trackingProps[propName]
@@ -145,19 +153,24 @@ function getCommonTrackingData(r) {
   return props;
 }
 
-function flattenProps(obj, parentObj, parentKey) {
-  var returnObj = parentObj || {};
-  each(obj, function(key, val) {
-    if (isNonNullObject(val)) {
-      flattenProps(val, returnObj, key);
-    } else if (val && !isFunction(val) || val === 0 || val === '' || val === false) {
-      if (parentKey) {
-        key = parentKey + '.' + key;
+function flattenProps(obj, rootKey, target) {
+  if (!target) {
+    target = {};
+  }
+  each(
+    obj,
+    function(key, val) {
+      if (rootKey) {
+        key = rootKey + '[' + key + ']';
       }
-      returnObj[key] = val;
+      if (isNonNullObject(val)) {
+        flattenProps(val, key, target);
+      } else {
+        target[key] = val;
+      }
     }
-  })
-  return returnObj;
+  )
+  return target;
 }
 
 function track(r, event, data) {
@@ -172,46 +185,68 @@ function track(r, event, data) {
       data = {message: data.message, stack: data.stack}
     }
 
-    var trackingPayload = {
-      // mandatory
-      event: event,
+    var context = getCommonTrackingData(r);
+    context.user_agent = null;
+    context.mode = 'live';
+    var order_id = r.get('order_id');
+    if (order_id) {
+      context.order_id = order_id;
+    }
 
-      // unique identifier needs to be named "anonymousId"
-      anonymousId: r.id,
+    var options = {};
+    var properties = {
+      options: options
+    }
 
-      // in order to force segment pass original IP to mixpanel & keen
-      context: {
-        direct: true
+    if (data) {
+      properties.data = data;
+    }
+
+    var trackingOptions = [
+      'key',
+      'amount',
+      'prefill',
+      'theme',
+      'image',
+      'description',
+      'name',
+      'method'
+    ];
+
+    each(
+      r.get(),
+      function(key, value) {
+        var keySplit = key.split('.');
+        var rootKey = keySplit[0];
+        if (trackingOptions.indexOf(rootKey) !== -1) {
+          if (keySplit.length > 1) {
+            if (!trackingOptions.hasOwnProperty(rootKey)) {
+              options[rootKey] = {};
+            }
+            options[rootKey][keySplit[1]] = value;
+          } else {
+            options[key] = value;
+          }
+        }
       }
+    )
+
+    var trackingPayload = {
+      key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
+      context: context,
+      events: [
+        {
+          event: event,
+          properties: properties,
+          timestamp: new Date() - - 0
+        }
+      ]
     };
 
-    trackingPayload.properties = getCommonTrackingData(r);
-
-    flattenProps(data, trackingPayload.properties, 'data');
-    flattenProps(r.get(), trackingPayload.properties, 'options');
-
-
-    if (!isEmptyObject(trackStack)) {
-      var prev = trackingPayload.prev = {};
-      each(
-        trackStack,
-        function(event, time){
-          prev[event] = new Date() - time;
-        }
-      )
-    }
-    trackStack[event] = new Date().getTime();
-
-    // return console.log(event, trackingPayload.properties);
-
-    $.ajax({
-      url: 'https://api.segment.io/v1/track',
+    $.post({
+      url: 'https://lumberjack.razorpay.com/v1/track',
       method: 'post',
-      data: JSON.stringify(trackingPayload),
-      headers: {
-        'Content-type': 'application/json',
-        'Authorization': 'Basic ' + _btoa('vz3HFEpkvpzHh8F701RsuGDEHeVQnpSj:')
-      }
+      data: flattenProps(trackingPayload)
     })
   })
 }

@@ -302,7 +302,7 @@ $.post = function(opts){
   opts.method = 'post';
 
   if(!opts.headers){
-    opts.headers = emo;
+    opts.headers = {};
   }
   opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
   var payload = [];
