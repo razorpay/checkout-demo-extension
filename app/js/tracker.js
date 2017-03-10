@@ -238,7 +238,7 @@ function track(r, event, data) {
         {
           event: event,
           properties: properties,
-          timestamp: new Date() - - 0
+          timestamp: new Date().getTime()
         }
       ]
     };
