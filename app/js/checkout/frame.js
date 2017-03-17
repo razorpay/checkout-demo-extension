@@ -4,8 +4,7 @@ var docStyle = doc.style;
 var containerHeight = 460;
 var merchantMarkup = {
   overflow: '',
-  meta: null,
-
+  metas: null,
   orientationchange: function() {
     merchantMarkup.resize.call(this);
     merchantMarkup.scroll.call(this);
@@ -33,20 +32,26 @@ var merchantMarkup = {
   }
 }
 
-function getMeta(){
-  if(!merchantMarkup.meta){
-    merchantMarkup.meta = qs('head meta[name=viewport]');
+function getMetas() {
+  if (!merchantMarkup.metas) {
+    merchantMarkup.metas = $$('head meta[name=viewport],' +
+      'head meta[name="theme-color"]');
   }
-  return merchantMarkup.meta;
+
+  return merchantMarkup.metas;
 }
 
-function restoreMeta($meta){
-  if($meta){
-    $meta.remove();
+function restoreMetas($metas){
+  if($metas){
+    each($metas, function(i, meta){
+      $(meta[0]).remove();
+    })
   }
-  var oldMeta = getMeta();
+  var oldMeta = getMetas();
   if(oldMeta){
-    qs('head').appendChild(oldMeta);
+    each(oldMeta, function(i, meta){
+      qs('head').appendChild(meta);
+    })
   }
 }
 
@@ -226,7 +231,7 @@ CheckoutFrame.prototype = {
   close: function(){
     setBackdropColor('');
     setTestRibbonInvisible();
-    restoreMeta(this.$meta);
+    restoreMetas(this.$metas);
     restoreOverflow();
 
     // unbind before triggering scroll
@@ -272,15 +277,25 @@ CheckoutFrame.prototype = {
     if(!head){
       return;
     }
-    $(getMeta()).remove();
 
-    this.$meta = $(document.createElement('meta'))
-      .attr({
+    each(getMetas(), function(i, meta){
+      $(meta).remove();
+    })
+
+    this.$metas = [
+      $(document.createElement('meta')).attr({
         name: 'viewport',
         content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+      }),
+      $(document.createElement('meta')).attr({
+        name: 'theme-color',
+        content: this.rzp.get('theme.color')
       })
+    ];
 
-    head.appendChild(this.$meta[0]);
+    each(this.$metas, function(i, meta){
+      head.appendChild(meta[0]);
+    })
 
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
