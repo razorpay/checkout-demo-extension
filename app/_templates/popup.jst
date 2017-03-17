@@ -1,10 +1,13 @@
 <!doctype html>
 `var get = _.r.get;`
 `var method = _.data.method === 'wallet' ? 'wallet' : 'bank';`
+`var color = get('theme.color');`
 <html style="height:100%;width:100%;">
 <head>
 <title>Processing, Please Wait...</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="`=color`">
+
 <style>
 *{
   -webkit-box-sizing:border-box;
@@ -30,7 +33,7 @@ body{
   bottom:50%;
   width:100%;
   height:50%;
-  background:#22b02f;
+  background:`=color`;
   margin-bottom:90px;
 }
 #cntnt {
@@ -88,13 +91,13 @@ body{
 }
 
 #ldr::after {
-  background:#22b02f;
+  background:`=color`;
   width:0%;
   transition:20s cubic-bezier(0,0.1,0,1);
 }
 
 .loaded #ldr::after {
-  width:99%;
+  width:90%;
 }
 
 #logo {
@@ -156,11 +159,6 @@ body{
 #cncl {
   text-decoration:underline;
   cursor:pointer;
-  display:none;
-}
-
-.slow #cncl {
-  display:block;
 }
 
 #logo img {
@@ -174,7 +172,7 @@ body{
      display:none;
   }
   body {
-    background:#22b02f;
+    background:`=color`;
   }
 }
 
@@ -213,8 +211,7 @@ body{
     <div id="txt">
       <div style="display:inline-block;vertical-align:middle;white-space:normal;">
         <h2 id='title'>Loading `=method` page…</h2>
-        <p id='msg'>`=_.message||'Please wait while we redirect you to your ' + method + ' for authentication'`</p>
-        <p id='cncl'>Change Payment Mode</p>
+        <p id='msg'>`=_.message||'Please wait while we redirect you to your ' + method + ' page.'`</p>
       </div>
       <div style="display:inline-block;vertical-align:middle;height:100%"></div>
     </div>
@@ -232,16 +229,17 @@ body{
 
     setTimeout(function(){
       gel('title').innerHTML = 'Still trying to load...';
-      gel('msg').innerHTML = 'Either your connection or the `=method` servers are taking time.';
-      document.body.className = 'loaded slow';
+      gel('msg').innerHTML = 'The bank page is taking time to load. You can either wait or <span id="cncl">change the payment method</span>.';
+      gel('cncl').onclick = function () {
+        if (window.confirm("Do you want to cancel the ongoing payment?")) {
+          window.close();
+        }
+      };
       try {
         opener.Razorpay.popup_delay();
       } catch(e){}
     }, 10000);
 
-    gel('cncl').onclick = function () {
-      window.close()
-    }
   </script>
 </body>
 </html>
