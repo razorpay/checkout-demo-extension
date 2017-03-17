@@ -1,5 +1,6 @@
 <!doctype html>
 `var get = _.r.get;`
+`var method = _.data.method === 'wallet' ? 'wallet' : 'bank';`
 <html style="height:100%;width:100%;">
 <head>
 <title>Processing, Please Wait...</title>
@@ -211,8 +212,8 @@ body{
     <div id="ldr"></div>
     <div id="txt">
       <div style="display:inline-block;vertical-align:middle;white-space:normal;">
-        <h2 id='title'>Loading bank page…</h2>
-        <p id='msg'>Please wait while we redirect you to your bank page.</p>
+        <h2 id='title'>Loading `=method` page…</h2>
+        <p id='msg'>`=_.message||'Please wait while we redirect you to your ' + method + ' for authentication'`</p>
         <p id='cncl'>Change Payment Mode</p>
       </div>
       <div style="display:inline-block;vertical-align:middle;height:100%"></div>
@@ -231,7 +232,7 @@ body{
 
     setTimeout(function(){
       gel('title').innerHTML = 'Still trying to load...';
-      gel('msg').innerHTML = 'Either your connection or the bank servers are taking time.';
+      gel('msg').innerHTML = 'Either your connection or the `=method` servers are taking time.';
       document.body.className = 'loaded slow';
       try {
         opener.Razorpay.popup_delay();
