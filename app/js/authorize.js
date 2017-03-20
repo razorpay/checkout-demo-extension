@@ -324,6 +324,10 @@ Payment.prototype = {
       url = url.replace('ajax', 'jsonp');
     }
 
+    if (data.order_id) {
+      url += '?order_id=' + data.order_id;
+    }
+
     this.ajax = ajaxFn({
       url: url,
       data: data,
