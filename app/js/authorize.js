@@ -290,6 +290,7 @@ Payment.prototype = {
     } catch(e){}
     this.done = true;
     Razorpay.popup_delay = null;
+    clearInterval(Razorpay.popup_track);
 
     // unbind listener
     if(this.offmessage){
@@ -345,9 +346,22 @@ Payment.prototype = {
 
     if (popup) {
       var self = this;
+      var nowTime = now();
+      var trackingData = getTrackingData(self.data);
+
       Razorpay.popup_delay = function() {
-        track(this.r, 'popup_delay', getTrackingData(this.data));
+        trackingData.duration = new Date() - nowTime;
+        track(self.r, 'popup_delay', trackingData);
       }
+      Razorpay.popup_track = function() {
+        try {
+          noop(self.popup.window.document);
+        } catch(e) {
+          trackingData.duration = new Date() - nowTime;
+          track(self.r, 'popup_url', trackingData);
+        }
+      }
+      setInterval(Razorpay.popup_track, 99);
       popup.onClose = this.r.emitter('payment.cancel');
     }
     this.popup = popup;
