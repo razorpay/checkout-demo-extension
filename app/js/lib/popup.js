@@ -74,6 +74,7 @@ var Popup = function(src, name) {
   this.window.focus();
   this.listeners = [];
   this.acsPage = false;
+  this.startTime = new Date();
   this.interval = setInterval(bind(this.checkClose, this), 200);
   this.acsPageInterval = setInterval(bind(this.checkAcsPageOpen, this), 1000);
 
@@ -140,7 +141,9 @@ Popup.prototype = {
       var window_location = this.window.location.href;
     } catch (e) {
       if (!this.acsPage) {
-        track(window.getSession().r, 'popup_delay');
+        track(window.getSession().r, 'popup_delay', {
+          delay: new Date() - this.startTime
+        });
         this.acsPage = true;
       }
     }

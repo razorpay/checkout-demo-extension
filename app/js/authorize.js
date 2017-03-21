@@ -289,7 +289,6 @@ Payment.prototype = {
       this.popup.close();
     } catch(e){}
     this.done = true;
-    Razorpay.popup_delay = null;
 
     // unbind listener
     if(this.offmessage){
