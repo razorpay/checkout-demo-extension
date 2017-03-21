@@ -326,13 +326,6 @@ Payment.prototype = {
       url = url.replace('ajax', 'jsonp');
     }
 
-    if (_uid) {
-      url += '?_[checkout_id]=' + _uid;
-      if (data.order_id) {
-        url += '&order_id=' + data.order_id;
-      }
-    }
-
     var razorpayInstance = this.r;
     var ajax_delay_timeout = 1e4;
     this.ajax_delay = setTimeout(function() {
@@ -341,12 +334,23 @@ Payment.prototype = {
       })
     }, ajax_delay_timeout);
 
-    track(razorpayInstance, 'ajax');
-    this.ajax = ajaxFn({
+    var ajax_options = {
       url: url,
       data: data,
       callback: bind(ajaxCallback, this)
-    })
+    }
+
+    if (discreet.isFrame) {
+      ajax_options.headers = {
+        'x-checkout-id': _uid
+      }
+      if (data.order_id) {
+        ajax_options.headers['x-order-id'] = data.order_id;
+      }
+    }
+
+    track(razorpayInstance, 'ajax');
+    this.ajax = ajaxFn(ajax_options);
     return this.ajax;
   },
 
