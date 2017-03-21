@@ -335,15 +335,13 @@ Payment.prototype = {
 
     var razorpayInstance = this.r;
     var ajax_delay_timeout = 1e4;
-    var trackingData = getTrackingData(data);
     this.ajax_delay = setTimeout(function() {
       track(razorpayInstance, 'ajax_delay', {
-        delay: ajax_delay_timeout,
-        data: trackingData
+        delay: ajax_delay_timeout
       })
     }, ajax_delay_timeout);
 
-    track(razorpayInstance, 'ajax', trackingData);
+    track(razorpayInstance, 'ajax');
     this.ajax = ajaxFn({
       url: url,
       data: data,
