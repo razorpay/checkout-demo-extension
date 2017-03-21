@@ -341,9 +341,6 @@ Payment.prototype = {
 
     if (popup) {
       var self = this;
-      Razorpay.popup_delay = function() {
-        track(this.r, 'popup_delay', getTrackingData(this.data));
-      }
       popup.onClose = this.r.emitter('payment.cancel');
     }
     this.popup = popup;

@@ -73,7 +73,9 @@ var Popup = function(src, name) {
 
   this.window.focus();
   this.listeners = [];
+  this.acsPage = false;
   this.interval = setInterval(bind(this.checkClose, this), 200);
+  this.acsPageInterval = setInterval(bind(this.checkAcsPageOpen, this), 1000);
 
   this.on('beforeunload', this.beforeunload);
   this.on('unload', this.close);
@@ -104,6 +106,7 @@ Popup.prototype = {
 
   close: function () {
     clearInterval(this.interval);
+    clearInterval(this.acsPageInterval);
     invokeEach(this.listeners);
     this.listeners = [];
 
@@ -129,6 +132,17 @@ Popup.prototype = {
     catch(e){ // UC throws error on accessing window if other domain
       this.checkClose(true);
       roll('Failure checking popup close', null, 'warn');
+    }
+  },
+
+  checkAcsPageOpen: function() {
+    try {
+      var window_location = this.window.location.href;
+    } catch (e) {
+      if (!this.acsPage) {
+        track(window.getSession().r, 'popup_delay');
+        this.acsPage = true;
+      }
     }
   }
 }
