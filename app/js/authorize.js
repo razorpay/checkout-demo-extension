@@ -291,6 +291,7 @@ Payment.prototype = {
     this.done = true;
     Razorpay.popup_delay = null;
     clearInterval(Razorpay.popup_track);
+    clearTimeout(this.ajax_delay);
 
     // unbind listener
     if(this.offmessage){
