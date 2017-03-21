@@ -361,18 +361,19 @@ Payment.prototype = {
     if (popup) {
       var self = this;
       var nowTime = now();
-      var trackingData = getTrackingData(self.data);
 
       Razorpay.popup_delay = function() {
-        trackingData.duration = new Date() - nowTime;
-        track(self.r, 'popup_delay', trackingData);
+        track(self.r, 'popup_delay', {
+          duration: new Date() - nowTime
+        });
       }
       Razorpay.popup_track = function() {
         try {
           noop(self.popup.window.document);
         } catch(e) {
-          trackingData.duration = new Date() - nowTime;
-          track(self.r, 'popup_url', trackingData);
+          track(self.r, 'popup_redirect', {
+            duration: new Date() - nowTime
+          });
         }
       }
       setInterval(Razorpay.popup_track, 99);
