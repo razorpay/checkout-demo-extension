@@ -325,10 +325,24 @@ Payment.prototype = {
       url = url.replace('ajax', 'jsonp');
     }
 
-    if (data.order_id) {
-      url += '?order_id=' + data.order_id;
+    if (_uid) {
+      url += '?_[checkout_id]=' + _uid;
+      if (data.order_id) {
+        url += '&order_id=' + data.order_id;
+      }
     }
 
+    var razorpayInstance = this.r;
+    var ajax_delay_timeout = 1e4;
+    var trackingData = getTrackingData(data);
+    this.ajax_delay = setTimeout(function() {
+      track(razorpayInstance, 'ajax_delay', {
+        delay: ajax_delay_timeout,
+        data: trackingData
+      })
+    }, ajax_delay_timeout);
+
+    track(razorpayInstance, 'ajax', trackingData);
     this.ajax = ajaxFn({
       url: url,
       data: data,
@@ -387,6 +401,8 @@ Payment.prototype = {
 }
 
 function ajaxCallback(response) {
+  clearTimeout(this.ajax_delay);
+  track(this.r, 'ajax_response', response);
   var payment_id = response.payment_id;
   if (payment_id) {
     this.payment_id = payment_id;
