@@ -374,6 +374,7 @@ Payment.prototype = {
         try {
           noop(self.popup.window.document);
         } catch(e) {
+          clearInterval(Razorpay.popup_track);
           track(self.r, 'popup_redirect', {
             duration: new Date() - nowTime
           });
