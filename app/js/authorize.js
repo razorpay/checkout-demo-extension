@@ -290,6 +290,8 @@ Payment.prototype = {
     } catch(e){}
     this.done = true;
     Razorpay.popup_delay = null;
+    clearInterval(Razorpay.popup_track);
+    clearTimeout(this.ajax_delay);
 
     // unbind listener
     if(this.offmessage){
@@ -324,11 +326,31 @@ Payment.prototype = {
       url = url.replace('ajax', 'jsonp');
     }
 
-    this.ajax = ajaxFn({
+    var razorpayInstance = this.r;
+    var ajax_delay_timeout = 1e4;
+    this.ajax_delay = setTimeout(function() {
+      track(razorpayInstance, 'ajax_delay', {
+        delay: ajax_delay_timeout
+      })
+    }, ajax_delay_timeout);
+
+    var ajax_options = {
       url: url,
       data: data,
       callback: bind(ajaxCallback, this)
-    })
+    }
+
+    if (discreet.isFrame) {
+      ajax_options.headers = {
+        'x-checkout-id': _uid
+      }
+      if (data.order_id) {
+        ajax_options.headers['x-order-id'] = data.order_id;
+      }
+    }
+
+    track(razorpayInstance, 'ajax');
+    this.ajax = ajaxFn(ajax_options);
     return this.ajax;
   },
 
@@ -341,9 +363,23 @@ Payment.prototype = {
 
     if (popup) {
       var self = this;
+      var nowTime = now();
+
       Razorpay.popup_delay = function() {
-        track(this.r, 'popup_delay', getTrackingData(this.data));
+        track(self.r, 'popup_delay', {
+          duration: new Date() - nowTime
+        });
       }
+      Razorpay.popup_track = function() {
+        try {
+          noop(self.popup.window.document);
+        } catch(e) {
+          track(self.r, 'popup_redirect', {
+            duration: new Date() - nowTime
+          });
+        }
+      }
+      setInterval(Razorpay.popup_track, 99);
       popup.onClose = this.r.emitter('payment.cancel');
     }
     this.popup = popup;
@@ -369,6 +405,8 @@ Payment.prototype = {
 }
 
 function ajaxCallback(response) {
+  clearTimeout(this.ajax_delay);
+  track(this.r, 'ajax_response', response);
   var payment_id = response.payment_id;
   if (payment_id) {
     this.payment_id = payment_id;
