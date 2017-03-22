@@ -23,17 +23,24 @@ describe('restoreOverflow', function() {
   })
 })
 
-describe('restoreMeta', function() {
+describe('restoreMetas', function() {
   it('should append old meta to <head>', function() {
-    var $meta = {
-      remove: sinon.stub()
-    };
-    var div = document.createElement('div');
-    var spy = sinon.stub(window, 'getMeta').returns(div);
-    restoreMeta($meta);
-    expect(document.head.contains(div)).to.be(true);
-    expect($meta.remove.callCount).to.be(1);
+    var $metas = [
+      $(document.createElement('div')),
+      $(document.createElement('div'))
+    ];
+    var divs = [
+      document.createElement('div'),
+      document.createElement('div')
+    ];
+    var spy = sinon.stub(window, 'getMetas').returns(divs);
+    var spy1 = sinon.stub($.prototype, 'remove');
+    restoreMetas($metas);
+    expect(document.head.contains(divs[0])).to.be(true);
+    expect(document.head.contains(divs[1])).to.be(true);
+    expect(spy1.callCount).to.be(2);
     spy.restore();
+    spy1.restore();
   })
 })
 
@@ -303,7 +310,7 @@ describe('checkoutFrame on receiveing message from frame contentWindow', functio
 describe('checkoutFrame.close', function() {
   it('should restore merchantMarkup', function() {
     var spy = sinon.stub(window, 'setBackdropColor');
-    var spy2 = sinon.stub(window, 'restoreMeta');
+    var spy2 = sinon.stub(window, 'restoreMetas');
     var spy3 = sinon.stub(window, 'restoreOverflow');
     var rzp = Razorpay(options);
     var cf = new CheckoutFrame(rzp);
@@ -312,7 +319,7 @@ describe('checkoutFrame.close', function() {
     expect(spy.called).to.be(true);
     expect(spy2.called).to.be(true);
     expect(spy3.called).to.be(true);
-    expect(spy2.getCall(0).args[0]).to.be(cf.$meta);
+    expect(spy2.getCall(0).args[0]).to.be(cf.$metas);
     expect(spy4.callCount).to.be(1);
     spy4.restore();
   })
