@@ -283,14 +283,14 @@ Payment.prototype = {
     this.off();
   },
 
-  clear: function(){
+  clear: function() {
     try {
       this.popup.onClose = null;
       this.popup.close();
     } catch(e){}
     this.done = true;
     Razorpay.popup_delay = null;
-    clearInterval(Razorpay.popup_track);
+    clearInterval(this.popup_track_interval);
     clearTimeout(this.ajax_delay);
 
     // unbind listener
@@ -374,13 +374,13 @@ Payment.prototype = {
         try {
           noop(self.popup.window.document);
         } catch(e) {
-          clearInterval(Razorpay.popup_track);
-          track(self.r, 'popup_navigate', {
+          clearInterval(self.popup_track_interval);
+          track(self.r, 'popup_acs', {
             duration: new Date() - nowTime
           });
         }
       }
-      setInterval(Razorpay.popup_track, 99);
+      self.popup_track_interval = setInterval(Razorpay.popup_track, 99);
       popup.onClose = this.r.emitter('payment.cancel');
     }
     this.popup = popup;
