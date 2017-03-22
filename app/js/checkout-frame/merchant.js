@@ -52,6 +52,10 @@ var freqWallets = sessProto.walletData = {
     h: 18,
     col: walletPrefix + 'paytm.png'
   },
+  zeta: {
+    h: 25,
+    col: walletPrefix + 'zeta.png'
+  },
   freecharge: {
     h: 18,
     col: walletPrefix + 'freecharge.png'
