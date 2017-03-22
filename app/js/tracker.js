@@ -175,7 +175,7 @@ function flattenProps(obj, rootKey, target) {
 
 function track(r, event, data) {
   if (!r.isLiveMode()) {
-    return;
+    // return;
   }
 
   // defer makes tracking async

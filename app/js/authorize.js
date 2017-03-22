@@ -375,7 +375,7 @@ Payment.prototype = {
           noop(self.popup.window.document);
         } catch(e) {
           clearInterval(self.popup_track_interval);
-          track(self.r, 'popup_redirect', {
+          track(self.r, 'popup_test', {
             duration: new Date() - nowTime
           });
         }
