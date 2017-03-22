@@ -875,7 +875,9 @@ Session.prototype = {
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
           el_cvv.pattern = '^[0-9]{'+cvvlen+'}$';
-          $(el_cvv).toggleClass('amex', type === 'amex');
+          $(el_cvv)
+            .toggleClass('amex', type === 'amex')
+            .toggleClass('maestro', type === 'maestro');
           self.input(el_cvv);
 
           // card icon element
@@ -1361,6 +1363,9 @@ Session.prototype = {
             $('.elem-expiry').removeClass('invalid');
             $('.elem-cvv').removeClass('invalid');
             data['card[cvv]'] = '000';
+
+            // explicitly remove, else it'll override month/year later
+            delete data['card[expiry]'];
             data['card[expiry_month]'] = '12';
             data['card[expiry_year]'] = '21';
           }
