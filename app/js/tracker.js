@@ -230,6 +230,9 @@ function track(r, event, data) {
         }
       }
     )
+    if (options.image && discreet.isBase64Image(options.image)) {
+      options.image = 'base64';
+    }
 
     var trackingPayload = {
       key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
