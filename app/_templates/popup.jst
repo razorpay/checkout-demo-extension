@@ -132,12 +132,17 @@ body{
 }
 
 #name {
+  line-height:48px;
   margin-left:12px;
   font-size:16px;
   max-width:140px;
   overflow:hidden;
   text-overflow:ellipsis;
   color:#212121;
+}
+
+#logo+#name{
+  line-height:20px;
 }
 
 #txt {
@@ -198,7 +203,7 @@ body{
       `?image`
       <div id="logo"><img src="`=image`"/></div>
       `?`
-      <div id='name'>`=(get('name')||get('description')||'')`</div>
+      <div id='name'>`=(get('name')||get('description')||'Redirecting...')`</div>
       <div id="amt">
         <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">PAYING</div>
         <div style="font-size:20px;line-height:24px;">`?get('display_currency')`
