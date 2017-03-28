@@ -1,7 +1,10 @@
 <!doctype html>
-`var get = _.r.get;`
-`var method = _.data.method === 'wallet' ? 'wallet' : 'bank';`
-`var color = get('theme.color');`
+`
+var get = _.r.get;
+var method = _.data.method === 'wallet' ? 'wallet' : 'bank';
+var color = get('theme.color');
+var image = get('image');
+`
 <html style="height:100%;width:100%;">
 <head>
 <title>Processing, Please Wait...</title>
@@ -191,8 +194,10 @@ body{
   <div id='bg'></div>
   <div id='cntnt'>
     <div id="hdr">
-      <div id="logo"><img src="`=get('image')`"/></div>
-      <div id='name'>`=get('name')`</div>
+      `?image`
+      <div id="logo"><img src="`=image`"/></div>
+      `?`
+      <div id='name'>`=(get('name')||get('description')||'')`</div>
       <div id="amt">
         <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">PAYING</div>
         <div style="font-size:20px;line-height:24px;">`?get('display_currency')`
