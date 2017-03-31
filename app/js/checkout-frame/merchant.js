@@ -17,6 +17,7 @@ function addBodyClass(className){
 var qpmap = {};
 
 var pngBase64Prefix = 'data:image/png;base64,';
+var bankPrefix = RazorpayConfig.cdn + 'bank/';
 var sessProto = Session.prototype;
 sessProto.netbanks = {
   SBIN: {
@@ -42,6 +43,26 @@ sessProto.netbanks = {
   YESB: {
     image: pngBase64Prefix + 'R0lGODlhKAAoANUxAMg0KRBcmfTW1NNcVNdqY8tBOOmtqfvx8c9PRjBypyBnoPjk4sJ9gKGTpL9EP8ptajxvn9WVlFl3nuGSjfDJxrSruY16j2yQtK5la6qCj8dfXFyFrdp4cbCdq2mCpZSWq52FlixkmaZ1gHiNrL5wcqu7zrWAh3ybu1VqkXR/npGIncNRTc56eEB9rb/T5MQmGwBRkv///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAADEALAAAAAAoACgAAAb/wJhwSCwaj0bDAslsNgUTp3QaOyAO1CySYNB6iQbEdywAUMZeKwHt5byWR5d8Tq/b74YX6y6H+f+AgYKCKAAAEIOJioswIQ4vIoySkgEYLwUJk5qJFi8vFpuhgBIALysKoqIJjy8pqaGVng8Br5sgngAStZoepS8Mu5MJA54FiMGLAQyeLxnIjA3MCKjPiRe+LyrVicPMGrTbgcrMLyPhgtHMJODnftfMABvtfy0E5CbzfgER5AUt+TAqkHvRAeCJAuQGUGtXb+CHfPsGztrVoqLFiwLJAShxsaPHj0UOEBhAEpunKGyOlBlYDEtKlSY9dXmJZCWzATSfYDuTk8nKBzU9n7zpGQQAOw==',
     title: 'Yes'
+  },
+  SCBL: {
+    image: bankPrefix + 'SCBL.gif',
+    title: 'SCB'
+  },
+  IBKL: {
+    image: bankPrefix + 'IBKL.gif',
+    title: 'IDBI'
+  },
+  PUNB_R: {
+    image: bankPrefix + 'PUNB_R.gif',
+    title: 'PNB'
+  },
+  FDRL: {
+    image: bankPrefix + 'FDRL.gif',
+    title: 'Federal'
+  },
+  CORP: {
+    image: bankPrefix + 'CORP.gif',
+    title: 'Corporation'
   }
 };
 
