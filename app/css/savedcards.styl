@@ -1,6 +1,7 @@
 @require 'common';
 
 $cardh = 46px;
+$opencardh = 92px;
 $savedcontainerh = 220px;
 $cardpl = 70px;
 
@@ -58,9 +59,19 @@ $cardpl = 70px;
       opacity: 1;
     }
     .saved-card {
-      height: $cardh;
+      height: $opencardh;
+      max-height: $cardh;
       z-index: 2;
       pointer-events: all;
+
+      &[emi].checked {
+        max-height: $opencardh;
+
+        select {
+          display: block;
+        }
+      }
+
       &.checked {
         background: #eff0f1;
         border-color: $bc;
@@ -107,14 +118,6 @@ $cardpl = 70px;
         opacity: 0.3;
       }
     }
-    &[emi] {
-      &.checked {
-        height: 92px;
-        select {
-          display: block;
-        }
-      }
-    }
   }
 }
 
@@ -134,6 +137,7 @@ $cardpl = 70px;
   height: 0;
   transition: 0.2s;
   position: relative;
+  background: #fff;
   select {
     padding: 10px 0px;
     margin-left: -44px;

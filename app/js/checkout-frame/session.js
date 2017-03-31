@@ -51,11 +51,19 @@ function unsetEmiBank() {
   $('#emi-check-label').removeClass('checked');
 }
 
-function setEmiBank(data){
-  var activeEmiPlan = $('#emi-plans-wrap .active')[0];
-  if(activeEmiPlan){
-    data.method = 'emi';
-    data.emi_duration = activeEmiPlan.getAttribute('value');
+function setEmiBank(data, savedCardScreen) {
+  if (savedCardScreen) {
+    var savedEmi = $('#saved-cards-container .checked select[name=emi_duration]')[0];
+    if (savedEmi && savedEmi.value) {
+      data.method = 'emi';
+      data.emi_duration = savedEmi.value;
+    }
+  } else {
+    var activeEmiPlan = $('#emi-plans-wrap .active')[0];
+    if(activeEmiPlan){
+      data.method = 'emi';
+      data.emi_duration = activeEmiPlan.getAttribute('value');
+    }
   }
 }
 
@@ -1486,7 +1494,7 @@ Session.prototype = {
     var data = this.getFormData();
 
     if(this.screen === 'card'){
-      setEmiBank(data);
+      setEmiBank(data, this.savedCardScreen);
 
       var customer = this.customer;
       var recurring = this.get('recurring');
