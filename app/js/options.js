@@ -23,6 +23,12 @@ function base_set(flatObj, defObj, objKey, objVal){
     objVal = String(objVal);
   } else if (defaultType === 'number') {
     objVal = Number(objVal);
+  } else if (defaultType === 'boolean' && (isString(objVal))) {
+    if (objVal === 'true') {
+      objVal = true;
+    } else if (objVal === 'false') {
+      objVal = false;
+    }
   }
   if (defaultVal === null || defaultType === typeof objVal) {
     flatObj[objKey] = objVal;
