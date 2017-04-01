@@ -342,9 +342,9 @@ function Session (options) {
 
     case MG_KEY_ID:
       freechargeWallet = walletData.mobikwik;
-      freechargeWallet.offer = 10;
-      freechargeWallet.offerDesc = '10% Cashback on Mobikwik';
-      freechargeWallet.maxCBDesc = 'Cashback upto ₹150';
+      freechargeWallet.offer = 5;
+      freechargeWallet.offerDesc = '5% Cashback on Mobikwik';
+      freechargeWallet.maxCBDesc = 'Cashback upto ₹200';
       freechargeWallet.offerValidDesc = 'Applicable one time per user';
       break;
 
