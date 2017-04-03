@@ -153,26 +153,6 @@ function getCommonTrackingData(r) {
   return props;
 }
 
-function flattenProps(obj, rootKey, target) {
-  if (!target) {
-    target = {};
-  }
-  each(
-    obj,
-    function(key, val) {
-      if (rootKey) {
-        key = rootKey + '[' + key + ']';
-      }
-      if (isNonNullObject(val)) {
-        flattenProps(val, key, target);
-      } else {
-        target[key] = val;
-      }
-    }
-  )
-  return target;
-}
-
 function track(r, event, data) {
   if (!r.isLiveMode()) {
     return;
@@ -232,8 +212,6 @@ function track(r, event, data) {
     )
 
     var trackingPayload = {
-      key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
-      // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
       context: context,
       events: [
         {
@@ -247,7 +225,11 @@ function track(r, event, data) {
     $.post({
       url: 'https://lumberjack.razorpay.com/v1/track',
       method: 'post',
-      data: flattenProps(trackingPayload)
+      data: {
+        key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
+        // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
+        data: encodeURIComponent(btoa(stringify(trackingPayload)))
+      }
     })
   })
 }
