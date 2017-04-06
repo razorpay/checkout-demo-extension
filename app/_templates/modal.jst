@@ -1,7 +1,6 @@
 `
 var o = _.get;
 var ecod = o('ecod');
-var nophone = !o('theme.customer_details');
 var method = _.methods;
 var wallet = method.wallet;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
@@ -98,13 +97,13 @@ else
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=attr(o('prefill.contact'))`"`?!nophone` required pattern="^\+?[0-9]{8,15}$"`?`>
+                    <input class="input" id="contact" name="contact" type="tel" value="`=attr(o('prefill.contact'))`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`?`>
                   </div></div>
                   <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email</label>
-                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!nophone` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`?`>
+                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`?`>
                   </div></div>
                   `?order.bank`
                     <div class="customer-bank-details">

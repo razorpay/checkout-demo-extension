@@ -542,7 +542,7 @@ Session.prototype = {
   },
 
   improvisePaymentOptions: function() {
-    if (!this.get('theme.customer_details')) {
+    if (this.optional.contact && this.optional.email) {
       $(this.el).addClass('no-details');
     }
     if (this.methods.count === 1) {
@@ -978,7 +978,7 @@ Session.prototype = {
     }
     if (tab) {
       var contact = getPhone();
-      if ((!contact && this.get('theme.customer_details')) || this.get('method.' + tab) === false) {
+      if ((!contact && this.optional.contact) || this.get('method.' + tab) === false) {
         return;
       }
       this.customer = getCustomer(contact);

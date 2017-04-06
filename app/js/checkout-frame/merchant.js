@@ -386,7 +386,9 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
-  if (cookieDisabled || session_options['theme.customer_details']) {
+
+  session.optional = arr2obj(preferences.optional);
+  if (cookieDisabled || session.optional.contact) {
     options.remember_customer = false;
   }
 
