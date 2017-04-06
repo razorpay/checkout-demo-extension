@@ -1187,7 +1187,7 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
-    if (data[contact]) {
+    if (data['contact']) {
       data['contact'] = data['contact'].replace(/\ /g, '');
     }
 
