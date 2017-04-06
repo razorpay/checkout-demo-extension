@@ -1186,7 +1186,10 @@ Session.prototype = {
     var data = {};
 
     fillData('#pad-common', data);
-    data['contact'] = data['contact'].replace(/\ /g, '');
+
+    if (data[contact]) {
+      data['contact'] = data['contact'].replace(/\ /g, '');
+    }
 
     if (tab) {
       data.method = tab;
