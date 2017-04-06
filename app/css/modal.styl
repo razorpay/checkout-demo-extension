@@ -776,6 +776,10 @@ $outline = #ddd;
     }
   }
 
+  .desc {
+    display: none;
+  }
+
   label {
     padding-top: 20px;
     height: 97px;
@@ -897,6 +901,53 @@ $outline = #ddd;
 
       &::before {
         content: 'Pay with ';
+      }
+    }
+  }
+}
+
+#container.no-details {
+  #pad-common {
+    display: none;
+  }
+  #form-common {
+    padding-top: 0;
+    left: 20px;
+    right: 20px;
+    width: auto;
+  }
+  .desc {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .legend {
+    text-align: left;
+  }
+  #payment-options {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    background: #f9fafb;
+    label {
+      padding: 12px 0;
+      height: 56px;
+      line-height: 16px;
+    }
+    .payment-option.item {
+      width: auto;
+      float: none;
+      border: 0;
+      text-align: left;
+      i {
+        float: left;
+        font-size: 28px;
+        margin: 0 16px;
+        line-height: 30px;
+      }
+      &+.item {
+        border-top: 1px solid $bc;
       }
     }
   }

@@ -542,6 +542,9 @@ Session.prototype = {
   },
 
   improvisePaymentOptions: function() {
+    if (!this.get('theme.customer_details')) {
+      $(this.el).addClass('no-details');
+    }
     if (this.methods.count === 1) {
       $(this.el).addClass('one-method');
       $('.payment-option').addClass('submit-button button');

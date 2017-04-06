@@ -144,22 +144,46 @@ else
                   </div>
                 `?`
                 <div`?order.bank` class="showable"`?`>
-                  <div class="legend">Select payment method</div>
+                  <div class="legend">Select a payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
                     `?o('theme.emi_mode')`
                     <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
                     `?`
                     `?method.card`
-                    <div class="payment-option item" tab="card"><label><i>&#xe609;</i>`=_.tab_titles.card`</label></div>
+                    <div class="payment-option item" tab="card">
+                      <label>
+                        <i>&#xe609;</i>
+                        `=_.tab_titles.card`
+                        <span class="desc">Mastercard, Visa, RuPay, Maestro`?preferences.methods.amex`, AMEX`?`</span>
+                      </label>
+                    </div>
                     `?`
                     `?method.netbanking`
-                    <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>`=_.tab_titles.netbanking`</label></div>
+                    <div class="payment-option item" tab="netbanking">
+                      <label>
+                        <i>&#xe60a;</i>
+                        `=_.tab_titles.netbanking`
+                        <span class="desc">All Indian banks</span>
+                      </label>
+                    </div>
                     `?`
                     `?wallet.length`
-                    <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>`=_.tab_titles.wallet`</label></div>
+                    <div class="payment-option item" tab="wallet">
+                      <label>
+                        <i>&#xe60b;</i>
+                        `=_.tab_titles.wallet`
+                        <span class="desc">Freecharge, Mobikwik, Airtelmoney &amp; More</span>
+                      </label>
+                    </div>
                     `?`
                     `?method.upi`
-                    <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>`=_.tab_titles.upi`</label></div>
+                    <div class="payment-option item" tab="upi">
+                      <label>
+                        <i>&#xe60c;</i>
+                        `=_.tab_titles.upi`
+                        <span class="desc">Instant payment using UPI App</span>
+                      </label>
+                    </div>
                     `?`
                   </div>
                   <div class="clear"></div>
