@@ -23,7 +23,7 @@ function fillData(container, returnObj) {
       if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
       }
-      if(!el.disabled) {
+      if (!el.disabled && el.value) {
         returnObj[el.name] = el.value;
       }
     }
@@ -978,7 +978,7 @@ Session.prototype = {
     }
     if (tab) {
       var contact = getPhone();
-      if (!contact || this.get('method.' + tab) === false) {
+      if ((!contact && this.get('theme.customer_details')) || this.get('method.' + tab) === false) {
         return;
       }
       this.customer = getCustomer(contact);

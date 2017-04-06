@@ -367,7 +367,7 @@ function showModal(session) {
     if (saved_customer.customer_id) {
       options.remember_customer = true;
       customer = new Customer('');
-      getCustomer = function(){
+      getCustomer = function() {
         return customer;
       }
     }
@@ -386,7 +386,7 @@ function showModal(session) {
 
     customer.customer_id = saved_customer.customer_id;
   }
-  if (cookieDisabled) {
+  if (cookieDisabled || session_options['theme.customer_details']) {
     options.remember_customer = false;
   }
 
