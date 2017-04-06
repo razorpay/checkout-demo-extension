@@ -23,7 +23,7 @@ function fillData(container, returnObj) {
       if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
       }
-      if (!el.disabled && el.value) {
+      if (!el.disabled) {
         returnObj[el.name] = el.value;
       }
     }
@@ -1187,8 +1187,14 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
-    if (data['contact']) {
-      data['contact'] = data['contact'].replace(/\ /g, '');
+    if (this.optional.contact) {
+      delete data.contact;
+    } else {
+      data.contact = data.contact.replace(/\ /g, '');
+    }
+
+    if (this.optional.email) {
+      delete data.email;
     }
 
     if (tab) {
