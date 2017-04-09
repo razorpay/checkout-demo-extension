@@ -23,7 +23,7 @@ function fillData(container, returnObj) {
       if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
         return;
       }
-      if(!el.disabled) {
+      if (!el.disabled) {
         returnObj[el.name] = el.value;
       }
     }
@@ -542,6 +542,12 @@ Session.prototype = {
   },
 
   improvisePaymentOptions: function() {
+    if (this.optional.contact) {
+      if (this.optional.email) {
+        $(this.el).addClass('no-details');
+      }
+      $('#top-right').hide();
+    }
     if (this.methods.count === 1) {
       $(this.el).addClass('one-method');
       $('.payment-option').addClass('submit-button button');
@@ -975,7 +981,7 @@ Session.prototype = {
     }
     if (tab) {
       var contact = getPhone();
-      if (!contact || this.get('method.' + tab) === false) {
+      if ((!contact && !this.optional.contact) || this.get('method.' + tab) === false) {
         return;
       }
       this.customer = getCustomer(contact);
@@ -1183,7 +1189,16 @@ Session.prototype = {
     var data = {};
 
     fillData('#pad-common', data);
-    data['contact'] = data['contact'].replace(/\ /g, '');
+
+    if (this.optional.contact) {
+      delete data.contact;
+    } else {
+      data.contact = data.contact.replace(/\ /g, '');
+    }
+
+    if (this.optional.email) {
+      delete data.email;
+    }
 
     if (tab) {
       data.method = tab;

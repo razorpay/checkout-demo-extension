@@ -80,6 +80,14 @@ function isEmptyObject(obj) {
 
 /* Collections */
 
+function arr2obj(array) {
+  var obj = {};
+  return array && array.reduce(function(prev, next) {
+    prev[next] = 1;
+    return prev;
+  }, obj) || obj;
+}
+
 function each(iteratee, eachFunc, thisArg) {
   var i;
   if (arguments.length < 3) {
