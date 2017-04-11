@@ -439,6 +439,9 @@ function ajaxCallback(response) {
     if(request && request.url && RazorpayConfig.frame){
       request.url = request.url.replace(/^.+v1\//, makeUrl());
     }
+    if (request.data) {
+      this.emit('payment.data', request.data);
+    }
     invoke(responseTypes[response.type], this, request);
   }
 }

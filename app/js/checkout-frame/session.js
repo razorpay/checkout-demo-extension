@@ -1455,7 +1455,12 @@ Session.prototype = {
 
     this.r.createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this));
+      .on('payment.error', bind(errorHandler, this))
+      .on('payment.data', function(data) {
+        if (data && data.vpa) {
+          $('#rzp-vpa').html(data.vpa);
+        }
+      })
 
     var sub_link = $('#error-message .link');
     if (request.powerwallet) {
