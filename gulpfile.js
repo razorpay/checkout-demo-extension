@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
 const dot = require('./scripts/dot/index');
-const glob = require('glob')
-const plumber = require('gulp-plumber')
+const glob = require('glob');
+const plumber = require('gulp-plumber');
 const stylus = require('gulp-stylus');
 const cleanCSS = require('gulp-clean-css');
 const stylint = require('gulp-stylint');
@@ -42,7 +42,7 @@ let paths = {
   fonts: assetPath('fonts/**/*')
 };
 
-gulp.task('clean', ()=> execSync(`rm -rf ${distDir}`))
+gulp.task('clean', () => execSync(`rm -rf ${distDir}`));
 
 gulp.task('compileTemplates', function() {
   execSync('mkdir -p app/templates');
@@ -66,85 +66,107 @@ var concatCss = lazypipe()
     browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
     cascade: false
   })
-  .pipe(concat, 'checkout.css')
+  .pipe(concat, 'checkout.css');
 
 gulp.task('concatCss', function() {
-  return gulp.src(paths.css)
-    .pipe(plumber({errorHandler: handleError}))
+  return gulp
+    .src(paths.css)
+    .pipe(plumber({ errorHandler: handleError }))
     .pipe(concatCss())
     .pipe(gulp.dest(`${distDir}/css`));
 });
 
 gulp.task('cleanCSS', function() {
-  return gulp.src(paths.css)
+  return gulp
+    .src(paths.css)
     .pipe(concatCss())
     .pipe(stylint.reporter('fail', { failOnWarning: true }))
-    .pipe(cleanCSS({compatibility: 'ie8'}))
+    .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(gulp.dest(`${distDir}/css`));
-})
+});
 
-gulp.task('usemin', ()=> {
-  return gulp.src(assetPath('*.html'))
+gulp.task('usemin', () => {
+  return gulp
+    .src(assetPath('*.html'))
     .pipe(usemin())
-    .pipe(through(function(file){
-      file.contents = new Buffer(`(function(){${String(file.contents)}})()`)
-      this.emit('data', file)
-    }))
-    .pipe(gulp.dest(distDir))
-})
+    .pipe(
+      through(function(file) {
+        file.contents = new Buffer(`(function(){${String(file.contents)}})()`);
+        this.emit('data', file);
+      })
+    )
+    .pipe(gulp.dest(distDir));
+});
 
-gulp.task('uglify', ()=> {
-  return gulp.src([`${distDir}/**/*.js`])
-
-    // wrap between iife and user strict
-    .pipe(through(function(file){
-      file.contents = new Buffer(`(function(){"use strict";${String(file.contents)}})()`)
-      this.emit('data', file)
-    }))
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish))
-    .pipe(jshint.reporter('fail'))
-    // .pipe(sourcemaps.init())
-    .pipe(uglify())
-    // .pipe(sourcemaps.write('./', {
+gulp.task('uglify', () => {
+  return (
+    gulp
+      .src([`${distDir}/**/*.js`])
+      // wrap between iife and user strict
+      .pipe(
+        through(function(file) {
+          file.contents = new Buffer(
+            `(function(){"use strict";${String(file.contents)}})()`
+          );
+          this.emit('data', file);
+        })
+      )
+      .pipe(jshint())
+      .pipe(jshint.reporter(stylish))
+      .pipe(jshint.reporter('fail'))
+      // .pipe(sourcemaps.init())
+      .pipe(uglify())
+      // .pipe(sourcemaps.write('./', {
       // debug: true
-    // }))
-    .pipe(gulp.dest(distDir))
-})
+      // }))
+      .pipe(gulp.dest(distDir))
+  );
+});
 
-gulp.task('copyLegacy', function(){
-  execSync(`cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`);
-})
+gulp.task('copyLegacy', function() {
+  execSync(
+    `cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`
+  );
+});
 
-gulp.task('copyConfig', ()=> execSync(`cp ${assetPath('config.js')} ${distDir}`))
+gulp.task('copyConfig', () =>
+  execSync(`cp ${assetPath('config.js')} ${distDir}`)
+);
 
 gulp.task('compileHTML', function() {
   runSequence('usemin', 'uglify', 'copyLegacy');
-})
+});
 
 gulp.task('staticAssets', function() {
-  return gulp.src([paths.images, paths.fonts], { base: 'app' })
+  return gulp
+    .src([paths.images, paths.fonts], { base: 'app' })
     .pipe(gulp.dest(`${distDir}`));
-})
+});
 
 gulp.task('build', function(cb) {
-  runSequence('clean', ['cleanCSS', 'compileTemplates'], 'compileHTML', 'staticAssets', cb);
-})
+  runSequence(
+    'clean',
+    ['cleanCSS', 'compileTemplates'],
+    'compileHTML',
+    'staticAssets',
+    cb
+  );
+});
 
 gulp.task('serve', ['build'], function() {
-  gulp.watch(paths.css, ['concatCss'])
-  gulp.watch(paths.templates, ['compileTemplates'])
-  gulp.watch(paths.js, [/*'hint',*/ 'usemin'])
-  gulp.watch(assetPath('*.html'), ['usemin'])
-})
+  gulp.watch(paths.css, ['concatCss']);
+  gulp.watch(paths.templates, ['compileTemplates']);
+  gulp.watch(paths.js, [/*'hint',*/ 'usemin']);
+  gulp.watch(assetPath('*.html'), ['usemin']);
+});
 
 gulp.task('watch', ['serve']);
 gulp.task('default', ['build']);
 
 /** Font Upload to static **/
 
-gulp.task('uploadStaticAssetsToCDN', function(){
-  let target = process.argv.slice(3)[0].replace(/.+=/,'').toLowerCase().trim();
+gulp.task('uploadStaticAssetsToCDN', function() {
+  let target = process.argv.slice(3)[0].replace(/.+=/, '').toLowerCase().trim();
 
   let publisher = awspublish.create({
     accessKeyId: process.env.AWS_KEY,
@@ -160,36 +182,35 @@ gulp.task('uploadStaticAssetsToCDN', function(){
     'Cache-Control': 'max-age=315360000, no-transform, public'
   };
 
-  return gulp.src([`${distDir}/fonts/*`, `${distDir}/images/**/*`])
-     // gzip, Set Content-Encoding headers and add .gz extension
-    .pipe(awspublish.gzip({ ext: '' }))
-
-    // publisher will add Content-Length, Content-Type and headers specified above
-    // If not specified it will set x-amz-acl to public-read by default
-    .pipe(publisher.publish(headers))
-
-    // create a cache file to speed up consecutive uploads
-    .pipe(publisher.cache())
-
-     // print upload updates to console
-    .pipe(awspublish.reporter());
+  return (gulp
+      .src([`${distDir}/fonts/*`, `${distDir}/images/**/*`])
+      // gzip, Set Content-Encoding headers and add .gz extension
+      .pipe(awspublish.gzip({ ext: '' }))
+      // publisher will add Content-Length, Content-Type and headers specified above
+      // If not specified it will set x-amz-acl to public-read by default
+      .pipe(publisher.publish(headers))
+      // create a cache file to speed up consecutive uploads
+      .pipe(publisher.cache())
+      // print upload updates to console
+      .pipe(awspublish.reporter()) );
 });
-
 
 /**  Tests  **/
 
-function getJSPaths(html, pattern){
-  try{
+function getJSPaths(html, pattern) {
+  try {
     return execSync(
-        'cat ' + html + ' | grep -F "' + pattern + '" | cut -d\'"\' -f2',
-        {encoding: 'utf-8'}
-      )
+      'cat ' + html + ' | grep -F "' + pattern + '" | cut -d\'"\' -f2',
+      { encoding: 'utf-8' }
+    )
       .split('\n')
-      .filter(function(path){return !!path})
-      .map(function(path){
+      .filter(function(path) {
+        return !!path;
+      })
+      .map(function(path) {
         return assetPath(path);
       });
-  } catch(e){
+  } catch (e) {
     console.log(e.message);
     return [];
   }
@@ -205,7 +226,7 @@ let karmaOptions = {
   browsers: ['PhantomJS'],
   singleRun: true,
   coverageReporter: {
-    type : 'json'
+    type: 'json'
   },
   preprocessors: {}
 };
@@ -222,33 +243,34 @@ let karmaLibs = [
 ];
 
 gulp.task('makeKarmaOptions', ['build'], function() {
-  allOptions = glob.sync(assetPath('!(custom).html')).map(function(html){
+  allOptions = glob.sync(assetPath('!(custom).html')).map(function(html) {
     let o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));
 
     // adding paths to cover
-    getJSPaths(html, '<!--coverage-->').forEach(function(path){
+    getJSPaths(html, '<!--coverage-->').forEach(function(path) {
       o.preprocessors[path] = ['coverage'];
-    })
-    o.coverageReporter.dir = 'coverage' + html.replace((/^[^\/]+|\.[^\.]+$/g),'');
+    });
+    o.coverageReporter.dir =
+      'coverage' + html.replace(/^[^\/]+|\.[^\.]+$/g, '');
 
     return o;
   });
 });
 
 // unit tests + coverage
-gulp.task('test:unit', ['makeKarmaOptions'], function(done){
+gulp.task('test:unit', ['makeKarmaOptions'], function(done) {
   setTimeout(function() {
     testFromStack(0, allOptions, done);
   }, 1000);
 });
 
-function testFromStack(counter, allOptions, done){
+function testFromStack(counter, allOptions, done) {
   new KarmaServer(allOptions[counter], function(exitCode) {
-    if(exitCode !== 0){
+    if (exitCode !== 0) {
       process.exit(1);
     }
-    if(allOptions[++counter]){
+    if (allOptions[++counter]) {
       testFromStack(counter, allOptions, done);
     } else {
       allOptions = null;
@@ -258,37 +280,39 @@ function testFromStack(counter, allOptions, done){
   }).start();
 }
 
-function createCoverageReport(){
+function createCoverageReport() {
   let collector = new istanbul.Collector();
   let reporter = new istanbul.Reporter(false, 'coverage/final');
 
-  glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile){
+  glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile) {
     collector.add(require('./' + jsonFile));
-  })
+  });
 
   reporter.add('html');
-  reporter.write(collector, true, function(){});
+  reporter.write(collector, true, function() {});
   console.log('Report created in coverage/final');
 }
 
 /***** E2E/Acceptance tests *****/
 
-
-gulp.task('e2e:run', function(done){
-  return gulp.src('./wdio.conf.js')
-    .pipe(webdriver({
-      baseUrl: `http://${internalIp.v4()}:3000`
-    }))
-    .on('error', function(){
+gulp.task('e2e:run', function(done) {
+  return gulp
+    .src('./wdio.conf.js')
+    .pipe(
+      webdriver({
+        baseUrl: `http://${internalIp.v4()}:3000`
+      })
+    )
+    .on('error', function() {
       done();
     });
-})
+});
 
 gulp.task('symlinkDist', () => {
-  var target = 'test/e2e/server/public/dist/'
-  var dist = Array(target.split('/').length).join('../') + distDir
-  execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`)
-})
+  var target = 'test/e2e/server/public/dist/';
+  var dist = Array(target.split('/').length).join('../') + distDir;
+  execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`);
+});
 
 let testServerInstance;
 
@@ -298,22 +322,31 @@ gulp.task('testserver:start', () => {
       console.error(`exec error: ${error}`);
       process.exit(1);
     }
-  })
-})
+  });
+});
 
 gulp.task('testserver:stop', () => {
   testServerInstance.close();
-})
+});
 
-gulp.task('test:e2e', (cb) => {
-  runSequence('build', 'symlinkDist', 'testserver:start', 'e2e:run', 'testserver:stop', cb);
-})
+gulp.task('test:e2e', cb => {
+  runSequence(
+    'build',
+    'symlinkDist',
+    'testserver:start',
+    'e2e:run',
+    'testserver:stop',
+    cb
+  );
+});
 
-gulp.task('test', ()=> runSequence('test:unit', 'test:e2e'))
+gulp.task('test', () => runSequence('test:unit', 'test:e2e'));
 
 const argv = minimist(process.argv.slice(1));
-gulp.task('custom', ['build'], ()=> {
-  var api = argv.api ? argv.api.replace(/(.)\/?$/, '$1/') : 'https://api.razorpay.com/';
+gulp.task('custom', ['build'], () => {
+  var api = argv.api
+    ? argv.api.replace(/(.)\/?$/, '$1/')
+    : 'https://api.razorpay.com/';
   var prefix = `
   Razorpay = {
     config: {
@@ -321,22 +354,26 @@ gulp.task('custom', ['build'], ()=> {
       frameApi: "${api}"
     }
   }
-  `.replace(/\s/g, '')
+  `.replace(/\s/g, '');
 
-  execSync(`
+  execSync(
+    `
             cd app
             mkdir -p custom
             cp dist/v1/{checkout,checkout-frame}.js custom
             sed -i '1i${prefix}' custom/*.js
             cp dist/v1/css/checkout.css custom
             cp custom.html custom/
-          `)
-  console.log('files generated at app/custom')
+          `
+  );
+  console.log('files generated at app/custom');
   if (argv.host) {
-    console.log(`uploading to ${argv.host}`)
-    execSync(`
+    console.log(`uploading to ${argv.host}`);
+    execSync(
+      `
               rsync app/custom/* ${argv.host}
               rm -r app/custom
-            `)
+            `
+    );
   }
-})
+});

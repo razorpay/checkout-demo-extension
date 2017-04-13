@@ -1,5 +1,5 @@
 roll = function(msg, e, level) {
-  defer(function(){
+  defer(function() {
     if (e instanceof Error) {
       TraceKit.report(e, {
         e: e,
@@ -8,13 +8,18 @@ roll = function(msg, e, level) {
       });
     } else {
       postRollbar(msg, e, level);
-    }    
-  })
-}
+    }
+  });
+};
 
 TraceKit.report.subscribe(function(errorReport) {
   var extra = errorReport.extra || emo;
-  postRollbar(extra.msg || errorReport.e.message, errorReport, extra.level, true);
+  postRollbar(
+    extra.msg || errorReport.e.message,
+    errorReport,
+    extra.level,
+    true
+  );
 });
 
 function postRollbar(msg, trace, level, isStack) {
@@ -24,11 +29,11 @@ function postRollbar(msg, trace, level, isStack) {
       trace: {
         frames: trace.stack,
         exception: {
-          'class': trace.name || '(unknown)',
+          class: trace.name || '(unknown)',
           message: trace.message
         }
       }
-    }
+    };
     if (msg) {
       body.trace.exception.description = msg;
     }
@@ -38,7 +43,7 @@ function postRollbar(msg, trace, level, isStack) {
         body: msg,
         data: trace
       }
-    }
+    };
   }
   var rollbarPayload = {
     payload: {
@@ -62,11 +67,11 @@ function postRollbar(msg, trace, level, isStack) {
         level: level || 'error'
       }
     }
-  }
+  };
 
   $.ajax({
     url: 'https://api.rollbar.com/api/1/item/',
     data: stringify(rollbarPayload),
     method: 'post'
-  })
+  });
 }

@@ -8,17 +8,26 @@ var FormatDelegator;
     EvtHandler.call(this, el);
     this.bits = [];
 
-    each(Formatter.events, function(event, fn){
-      this.on(event, function(e) {
-        var formatter = e.target._formatter;
-        if (formatter) {
-          formatter[fn](e);
-        }
-      }, el, true);
-    }, this)
-  }
+    each(
+      Formatter.events,
+      function(event, fn) {
+        this.on(
+          event,
+          function(e) {
+            var formatter = e.target._formatter;
+            if (formatter) {
+              formatter[fn](e);
+            }
+          },
+          el,
+          true
+        );
+      },
+      this
+    );
+  };
 
-  var proto = FormatDelegator.prototype = new EvtHandler();
+  var proto = (FormatDelegator.prototype = new EvtHandler());
 
   proto.add = function(ruleType, el) {
     if (Formatter.rules[ruleType]) {
@@ -26,7 +35,7 @@ var FormatDelegator;
       this.bits.push(formatter);
       return formatter;
     }
-  }
+  };
 
   proto.destroy = function() {
     this.off();
@@ -34,5 +43,5 @@ var FormatDelegator;
       this.bits[bit].unbind();
     }
     this.bits = [];
-  }
+  };
 })();

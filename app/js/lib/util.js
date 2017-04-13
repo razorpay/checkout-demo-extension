@@ -1,18 +1,20 @@
 var pi = Math.PI;
 
-function raise(message){
+function raise(message) {
   throw new Error(message);
 }
 
 var arrayProto = Array.prototype;
 var slice = arrayProto.slice;
-var roll = function(){};
+var roll = function() {};
 var noop = roll;
 var emo = {};
 
-var now = Date.now || function() {
-  return new Date().getTime();
-};
+var now =
+  Date.now ||
+  function() {
+    return new Date().getTime();
+  };
 
 // iphone/ipad restrict non user initiated focus on input fields
 var ua = navigator.userAgent;
@@ -26,9 +28,12 @@ var ua_iOS = ua_iPhone || isua(/iPad/);
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !isua(/Safari/)
 // note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
-var ua_prefer_redirect = isua(/; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/)
-  || (ua_iOS && (isua(/ GSA\//) || !isua(/Safari/)))
-  || (isua(/Android [2-4]/) && !isua(/Chrome/));
+var ua_prefer_redirect =
+  isua(
+    /; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/
+  ) ||
+  (ua_iOS && (isua(/ GSA\//) || !isua(/Safari/))) ||
+  (isua(/Android [2-4]/) && !isua(/Chrome/));
 
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
@@ -82,10 +87,14 @@ function isEmptyObject(obj) {
 
 function arr2obj(array) {
   var obj = {};
-  return array && array.reduce(function(prev, next) {
-    prev[next] = 1;
-    return prev;
-  }, obj) || obj;
+  return (
+    (array &&
+      array.reduce(function(prev, next) {
+        prev[next] = 1;
+        return prev;
+      }, obj)) ||
+    obj
+  );
 }
 
 function each(iteratee, eachFunc, thisArg) {
@@ -122,16 +131,13 @@ function indexOf(arr, item) {
   } else {
     var len = arr.length >>> 0;
     var from = Number(arguments[1]) || 0;
-    from = (from < 0)
-         ? Math.ceil(from)
-         : Math.floor(from);
+    from = from < 0 ? Math.ceil(from) : Math.floor(from);
     if (from < 0) {
       from += len;
     }
 
-    for (; from < len; from++)
-    {
-      if (from in arr && arr[from] === item){
+    for (; from < len; from++) {
+      if (from in arr && arr[from] === item) {
         return from;
       }
     }
@@ -140,7 +146,7 @@ function indexOf(arr, item) {
 }
 
 function find(arr, predicate) {
-  if(arrayProto.find) {
+  if (arrayProto.find) {
     return arr.find(predicate, arguments[2]);
   } else {
     var length = arr.length >>> 0;
@@ -148,10 +154,10 @@ function find(arr, predicate) {
     var value;
 
     for (var i = 0; i < length; i++) {
-     value = arr[i];
-     if (predicate.call(thisArg, value, i, arr)) {
-       return value;
-     }
+      value = arr[i];
+      if (predicate.call(thisArg, value, i, arr)) {
+        return value;
+      }
     }
     return undefined;
   }
@@ -160,7 +166,7 @@ function find(arr, predicate) {
 function findBy(arr, prop, value) {
   return find(arr, function(item) {
     return item[prop] === value;
-  })
+  });
 }
 
 /* Functions */
@@ -173,11 +179,11 @@ function bind(func, thisArg, arg) {
   if (args.length >= 3) {
     return function() {
       func.apply(thisArg, slice.call(args, 2));
-    }
+    };
   }
   return function() {
     return func.apply(thisArg, arguments);
-  }
+  };
 }
 
 function defer(func, timeout) {
@@ -188,7 +194,7 @@ function defer(func, timeout) {
     setTimeout(func, timeout);
   } else {
     var args = arguments;
-    setTimeout(function(){
+    setTimeout(function() {
       func.apply(null, slice.call(args, 2));
     }, timeout);
   }
@@ -196,12 +202,9 @@ function defer(func, timeout) {
 
 function invoke(handler, thisArg, param, timeout) {
   if (isNumber(timeout)) {
-    return setTimeout(
-      function(){
-        invoke(handler, thisArg, param)
-      },
-      timeout
-    )
+    return setTimeout(function() {
+      invoke(handler, thisArg, param);
+    }, timeout);
   }
   if (isString(handler)) {
     handler = thisArg && thisArg[handler];
@@ -214,8 +217,8 @@ function invoke(handler, thisArg, param, timeout) {
       if (arguments.length >= 3) {
         return handler.call(thisArg, param);
       }
-      return handler.call(thisArg);      
-    } catch(e) {
+      return handler.call(thisArg);
+    } catch (e) {
       roll('invoke', e);
     }
   }
@@ -231,7 +234,7 @@ function debounce(func, wait) {
     var args = arguments;
 
     function later() {
-      func.apply(this, args)
+      func.apply(this, args);
     }
 
     // is current timestamp > basetime + waiting duration
@@ -240,29 +243,26 @@ function debounce(func, wait) {
       since = null;
     }
     return invoke(later, this, null, since);
-  }
+  };
 }
 
-function invokeEach(iteratee, thisArg){
+function invokeEach(iteratee, thisArg) {
   each(
     iteratee,
-    function(key, func){
+    function(key, func) {
       func.call(thisArg);
     },
     thisArg
-  )
+  );
 }
 
 function invokeOnEach(func, map) {
-  each(
-    map,
-    function(key, val){
-      if (isString(func)) {
-        func = val[func];
-      }
-      func.call(val);
+  each(map, function(key, val) {
+    if (isString(func)) {
+      func = val[func];
     }
-  )
+    func.call(val);
+  });
 }
 
 // possible values
@@ -283,21 +283,14 @@ function invokeEachWith(map, func) {
   if (isString(func)) {
     func = thisArg[func];
   }
-  each(
-    map,
-    function(key, val){
-      func.apply(
-        thisArg,
-        [key, val].concat(slice.call(args, declaredArgs))
-      );
-    }
-  )
+  each(map, function(key, val) {
+    func.apply(thisArg, [key, val].concat(slice.call(args, declaredArgs)));
+  });
 }
-
 
 /* Objects */
 
-function clone(target){
+function clone(target) {
   return JSON.parse(stringify(target));
 }
 
@@ -306,7 +299,7 @@ var stringify = bind(JSON.stringify, JSON);
 /* DOM */
 
 var qs = bind(document.querySelector, document);
-var $$ =  bind(document.querySelectorAll, document);
+var $$ = bind(document.querySelectorAll, document);
 var gel = bind(document.getElementById, document);
 
 function submitForm(action, data, method, target) {
@@ -324,9 +317,15 @@ function submitForm(action, data, method, target) {
   var form = document.createElement('form');
   form.setAttribute('action', action);
 
-  if(method){ form.setAttribute('method', method) }
-  if(target){ form.setAttribute('target', target) }
-  if(data){ form.innerHTML = deserialize(data) }
+  if (method) {
+    form.setAttribute('method', method);
+  }
+  if (target) {
+    form.setAttribute('target', target);
+  }
+  if (data) {
+    form.innerHTML = deserialize(data);
+  }
 
   doc.appendChild(form);
   form.submit();
@@ -336,15 +335,12 @@ function submitForm(action, data, method, target) {
 function deserialize(data, key) {
   if (isNonNullObject(data)) {
     var str = '';
-    each(
-      data,
-      function(name, value){
-        if(key){
-          name = key + '[' + name + ']';
-        }
-        str += deserialize(value, name);
+    each(data, function(name, value) {
+      if (key) {
+        name = key + '[' + name + ']';
       }
-    )
+      str += deserialize(value, name);
+    });
     return str;
   }
   return '<input type="hidden" name="' + key + '" value="' + data + '">';
@@ -361,7 +357,7 @@ function preventDefault(e) {
 /* Formatting */
 
 function toggleInvalid($el, isValid) {
-  $el.toggleClass('invalid', !isValid)
+  $el.toggleClass('invalid', !isValid);
 }
 
 function recurseAjax(url, callback, continueTill, holder, ajaxFn) {
@@ -386,8 +382,8 @@ function recurseAjax(url, callback, continueTill, holder, ajaxFn) {
           callback(response);
         }
       }
-    })
-  }, 1500)
+    });
+  }, 1500);
   return holder;
 }
 

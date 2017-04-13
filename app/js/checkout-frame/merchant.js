@@ -5,11 +5,11 @@ var preferences = window.preferences,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
 
-function getSession(id){
+function getSession(id) {
   return sessions[id || _uid];
 }
 
-function addBodyClass(className){
+function addBodyClass(className) {
   $(doc).addClass(className);
 }
 
@@ -21,27 +21,33 @@ var bankPrefix = RazorpayConfig.cdn + 'bank/';
 var sessProto = Session.prototype;
 sessProto.netbanks = {
   SBIN: {
-    image: pngBase64Prefix + 'R0lGODlhKAAoAMQQAPD2/EGI2sTa86fI7m2k4l6b3+Lt+dPk9nyt5SR21Hut5cXb9Jm/61CS3f///xVt0f///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXyICSO5GgMRPCsbEAMRinPslCweL4WAu2PgoZumGv0fiUAgsjMIQBIEUDVrK4C0N8hYe0+EgcfgOvtJrJJarmLlS3XZURJAIcfRcJ6uQHU20U3fmUFEAaCcCeHayiKZSlwCgsLCnBqXgcOmQ4HjUwKmpqUnToLoJkLo6SmDqipOJ+moq4smJqca5ZdDJkMlQRwDZl5jgPAwnAwxg7DXjGBXsHLa4QQdHvHZXfMVdHbTXx90NhddyJvVt1ecmld6VZtMmPo40xnPlvc9ENgSFPf+jng9Tunw92QJ1FIBBliEIeRhDNsFNHHA+KPE4/SuYCRMAQAOw==',
+    image: pngBase64Prefix +
+      'R0lGODlhKAAoAMQQAPD2/EGI2sTa86fI7m2k4l6b3+Lt+dPk9nyt5SR21Hut5cXb9Jm/61CS3f///xVt0f///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXyICSO5GgMRPCsbEAMRinPslCweL4WAu2PgoZumGv0fiUAgsjMIQBIEUDVrK4C0N8hYe0+EgcfgOvtJrJJarmLlS3XZURJAIcfRcJ6uQHU20U3fmUFEAaCcCeHayiKZSlwCgsLCnBqXgcOmQ4HjUwKmpqUnToLoJkLo6SmDqipOJ+moq4smJqca5ZdDJkMlQRwDZl5jgPAwnAwxg7DXjGBXsHLa4QQdHvHZXfMVdHbTXx90NhddyJvVt1ecmld6VZtMmPo40xnPlvc9ENgSFPf+jng9Tunw92QJ1FIBBliEIeRhDNsFNHHA+KPE4/SuYCRMAQAOw==',
     title: 'SBI'
   },
   HDFC: {
-    image: pngBase64Prefix + 'R0lGODlhKAAoAKIAAL/S4+4xN/WDh+/0+PJaXwBMj////+0jKiH5BAAAAAAALAAAAAAoACgAAAOqeLrca9C4SauL0uqtMP+VB46MSJLmCaZqh71wHBGcbNv0du9vrvFAg88S5A1DxduRklTWYIWodBoFwJaTGHVbsPaeLy7Vi8FeoGIpeXbmpdXN27sat827ddl9jSP4/1pzfAYCf39ZaG+DZg2BildgGHuQOjAAl5iZlwOUP3lflZ9soaJCkaKMJaUQqQ+rphuGsn5ls4YBLaoQuSsRvB8sv0y+wp67xUTEIwkAOw==',
+    image: pngBase64Prefix +
+      'R0lGODlhKAAoAKIAAL/S4+4xN/WDh+/0+PJaXwBMj////+0jKiH5BAAAAAAALAAAAAAoACgAAAOqeLrca9C4SauL0uqtMP+VB46MSJLmCaZqh71wHBGcbNv0du9vrvFAg88S5A1DxduRklTWYIWodBoFwJaTGHVbsPaeLy7Vi8FeoGIpeXbmpdXN27sat827ddl9jSP4/1pzfAYCf39ZaG+DZg2BildgGHuQOjAAl5iZlwOUP3lflZ9soaJCkaKMJaUQqQ+rphuGsn5ls4YBLaoQuSsRvB8sv0y+wp67xUTEIwkAOw==',
     title: 'HDFC'
   },
   ICIC: {
-    image: pngBase64Prefix + 'R0lGODlhKAAoAOZGAP/58evKy/ry8vzOk/qpQsRfZMJHLvqvUP7t1uGvsbUxL79SV9iVmPmjNbpFSueAKbU3PctVLfCPKPvCeP7z5PDX2PzIhvSWKNVkLOa8vsltcfu2Xc56frk4L850cNeUl/Xk5f3myd5yKtOHi+uHKfzUoMdOLf3arr5MSf/58r5ALv3gu9+EU9yipLo/PPXe1/rs5eCjlvTYytybl+qxle/FsMRZVvu8a+J5Kuq9sNlrK/7nyeOAN+Wee/3gvNyWifWcNeGopOuONvmdJ////7AqMP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAEYALAAAAAAoACgAAAf/gEaCg4SFhoICCR4oRY1FLh45h5OUgwEejpmZNi+VnoIBBZqjjhAVn5MwmJkQDAJEAgujKACohTUumgsVRL1EGaQztoIAPQqaECC+vcCjDsMALKQJy70cpEWnnwg8pBDVRCDYRUHbQsejBdWx4x+eCEDoowvLILLtlQANBuNFDAEBGEDoV8TdJAAHMBBcmMngoQkS+hVoESCDBoYxJpUYwo+UgwDVLhKUcYhCgwfYRryqxoCggVqGNnB0BhIckWv9WBw6MQSlpgIrwQkg2MGCIX1DTGjiYNNXAoIiEBgaMOSCJmpNe4nE1oHA0QZDRGQakbXX0H4PThjaOCRCpgAC+xg4KEKvWot+JhrAJERgyJAO/XgtE8X1wgBDCPwOIVjTbD8SXg1Z8EuCYLWn2EQMWXGob0/Ly7ZqwjBkQ0nFPrGpWzZwVIQhDSgcCqE44jimvgKQer15ElXF8kZh7dVSkw6/Eyj99qsUmzJfhBspwOH3QKXlnz1Wy6SCRPW9h7DPHEXWVwXppP0SAB9esd8LKkZlWKY7ggTFBKR6Yuv+gltHDlRDw32KHcDeJIm5VxsGBhjwQzXYbXAgJZ4p6B4F1figmFHDGMGThYrdYNMEE4TQ4SAHgOjXDlmdOAgFFbpnQVMuFgKATO4dkAI4NU4SwgQHEDDAjsv0OEggADs=',
+    image: pngBase64Prefix +
+      'R0lGODlhKAAoAOZGAP/58evKy/ry8vzOk/qpQsRfZMJHLvqvUP7t1uGvsbUxL79SV9iVmPmjNbpFSueAKbU3PctVLfCPKPvCeP7z5PDX2PzIhvSWKNVkLOa8vsltcfu2Xc56frk4L850cNeUl/Xk5f3myd5yKtOHi+uHKfzUoMdOLf3arr5MSf/58r5ALv3gu9+EU9yipLo/PPXe1/rs5eCjlvTYytybl+qxle/FsMRZVvu8a+J5Kuq9sNlrK/7nyeOAN+Wee/3gvNyWifWcNeGopOuONvmdJ////7AqMP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAEYALAAAAAAoACgAAAf/gEaCg4SFhoICCR4oRY1FLh45h5OUgwEejpmZNi+VnoIBBZqjjhAVn5MwmJkQDAJEAgujKACohTUumgsVRL1EGaQztoIAPQqaECC+vcCjDsMALKQJy70cpEWnnwg8pBDVRCDYRUHbQsejBdWx4x+eCEDoowvLILLtlQANBuNFDAEBGEDoV8TdJAAHMBBcmMngoQkS+hVoESCDBoYxJpUYwo+UgwDVLhKUcYhCgwfYRryqxoCggVqGNnB0BhIckWv9WBw6MQSlpgIrwQkg2MGCIX1DTGjiYNNXAoIiEBgaMOSCJmpNe4nE1oHA0QZDRGQakbXX0H4PThjaOCRCpgAC+xg4KEKvWot+JhrAJERgyJAO/XgtE8X1wgBDCPwOIVjTbD8SXg1Z8EuCYLWn2EQMWXGob0/Ly7ZqwjBkQ0nFPrGpWzZwVIQhDSgcCqE44jimvgKQer15ElXF8kZh7dVSkw6/Eyj99qsUmzJfhBspwOH3QKXlnz1Wy6SCRPW9h7DPHEXWVwXppP0SAB9esd8LKkZlWKY7ggTFBKR6Yuv+gltHDlRDw32KHcDeJIm5VxsGBhjwQzXYbXAgJZ4p6B4F1figmFHDGMGThYrdYNMEE4TQ4SAHgOjXDlmdOAgFFbpnQVMuFgKATO4dkAI4NU4SwgQHEDDAjsv0OEggADs=',
     title: 'ICICI'
   },
   UTIB: {
-    image: pngBase64Prefix + 'R0lGODlhKAAoAMQQAOvJ1vry9bM1Z7hDcfXk68JehtaTrvDX4eGuwsdrkNKGpMx5mr1Qe+a8zNuhuK4oXf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXdICSOZGmeaKqubIsGgSunyjLf5PE8B44Xu4Jv1tjtEMNWYGB8DGJJlaG5M0RTBAF1R7ieEttdwlsChI0A8ohx3g3UEEfb2PMGtPMxWTHnknV9VmRAcwJQVwh9D0h2THNvZFN9aV4EikJkYH1dXmZ9CmqObQJ4bZArknMOqW0OK3d9kKJnhioLipRFnymeeSSEc3UmwG2cIpZ9mCWJgSZ8fYwjsI+H0qVnTySsZ9HLioIQyHPKJ2yFnMRnwie9bWO6czYrt5OzYbUrWX0MAP3+//3WqTgAsCAlOAivhAAAOw==',
+    image: pngBase64Prefix +
+      'R0lGODlhKAAoAMQQAOvJ1vry9bM1Z7hDcfXk68JehtaTrvDX4eGuwsdrkNKGpMx5mr1Qe+a8zNuhuK4oXf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABAALAAAAAAoACgAAAXdICSOZGmeaKqubIsGgSunyjLf5PE8B44Xu4Jv1tjtEMNWYGB8DGJJlaG5M0RTBAF1R7ieEttdwlsChI0A8ohx3g3UEEfb2PMGtPMxWTHnknV9VmRAcwJQVwh9D0h2THNvZFN9aV4EikJkYH1dXmZ9CmqObQJ4bZArknMOqW0OK3d9kKJnhioLipRFnymeeSSEc3UmwG2cIpZ9mCWJgSZ8fYwjsI+H0qVnTySsZ9HLioIQyHPKJ2yFnMRnwie9bWO6czYrt5OzYbUrWX0MAP3+//3WqTgAsCAlOAivhAAAOw==',
     title: 'Axis'
   },
   KKBK: {
-    image: pngBase64Prefix + 'R0lGODlhKAAoANUtAL/N3O/z9s/a5d/m7kBqlyBRhTBdjjsxYFB2oI+owoCcup+0y3cqTK/B1HCPsVB2n2CDqPvGyB41avRxdkovW+4qMmgsUfBHTf7x8fm4u4tviw82b+idpNy8xf3j5PNjaI2Mp7dqfPaOkntjg5QnQsEhM4hFYks9ad4eKRBEfe0cJP///wA4dP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAC0ALAAAAAAoACgAAAb/wJZwSCwaj8ikcslsFgOAqDTgdA4SiBRry92mEIlB9bggdM9oFmExFgIK6fi5AHAGEPKuZCNHUJUCBnksEhYlKgd5BgJJAlp5FiqSiIMpjEaOgywMk5SVl0MBgmgFcFyck4maBn9CDmcEDSuzKwtwqJIHKQoDtAMKj1wOQwBnELTIKwq4KhoBybMDo1x1LXhcBNDIHJMT2rQBplsILQNnvd8rEZIX6bTFXVddD8lQyOsVGO60ZlwJ/VsWRIMQrAAEAOsiaGvg4EGCZysadCEQjEWvTGlMiIAWqIulFQE8npklDs0IjhW9EACYZoW5OCkg+kqpiYtLOQCgTat55tlOui4Ck72CqUBByYqyBByVlSwDCJoBZwVLwdLBrAALHjiUSctDBZBG5wmINjGBR67fMFxQgWxAlGRm/b3komDfig+SOuwrKYYli7HpJkw6AVibgi7kWsDjkiIntAAhOukqjGzBmWothnaBwHSFAGDMVPGi1cDvsFA/44SuyaoIxjyrPx15rVqybCQd5XBCQYLCoEVL7sg54FuTHydveJLCXKWMcjVs2hC5kgUmGDHSk0CREqVV9u/gwy8JAgA7',
+    image: pngBase64Prefix +
+      'R0lGODlhKAAoANUtAL/N3O/z9s/a5d/m7kBqlyBRhTBdjjsxYFB2oI+owoCcup+0y3cqTK/B1HCPsVB2n2CDqPvGyB41avRxdkovW+4qMmgsUfBHTf7x8fm4u4tviw82b+idpNy8xf3j5PNjaI2Mp7dqfPaOkntjg5QnQsEhM4hFYks9ad4eKRBEfe0cJP///wA4dP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAC0ALAAAAAAoACgAAAb/wJZwSCwaj8ikcslsFgOAqDTgdA4SiBRry92mEIlB9bggdM9oFmExFgIK6fi5AHAGEPKuZCNHUJUCBnksEhYlKgd5BgJJAlp5FiqSiIMpjEaOgywMk5SVl0MBgmgFcFyck4maBn9CDmcEDSuzKwtwqJIHKQoDtAMKj1wOQwBnELTIKwq4KhoBybMDo1x1LXhcBNDIHJMT2rQBplsILQNnvd8rEZIX6bTFXVddD8lQyOsVGO60ZlwJ/VsWRIMQrAAEAOsiaGvg4EGCZysadCEQjEWvTGlMiIAWqIulFQE8npklDs0IjhW9EACYZoW5OCkg+kqpiYtLOQCgTat55tlOui4Ck72CqUBByYqyBByVlSwDCJoBZwVLwdLBrAALHjiUSctDBZBG5wmINjGBR67fMFxQgWxAlGRm/b3komDfig+SOuwrKYYli7HpJkw6AVibgi7kWsDjkiIntAAhOukqjGzBmWothnaBwHSFAGDMVPGi1cDvsFA/44SuyaoIxjyrPx15rVqybCQd5XBCQYLCoEVL7sg54FuTHydveJLCXKWMcjVs2hC5kgUmGDHSk0CREqVV9u/gwy8JAgA7',
     title: 'Kotak'
   },
   YESB: {
-    image: pngBase64Prefix + 'R0lGODlhKAAoANUxAMg0KRBcmfTW1NNcVNdqY8tBOOmtqfvx8c9PRjBypyBnoPjk4sJ9gKGTpL9EP8ptajxvn9WVlFl3nuGSjfDJxrSruY16j2yQtK5la6qCj8dfXFyFrdp4cbCdq2mCpZSWq52FlixkmaZ1gHiNrL5wcqu7zrWAh3ybu1VqkXR/npGIncNRTc56eEB9rb/T5MQmGwBRkv///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAADEALAAAAAAoACgAAAb/wJhwSCwaj0bDAslsNgUTp3QaOyAO1CySYNB6iQbEdywAUMZeKwHt5byWR5d8Tq/b74YX6y6H+f+AgYKCKAAAEIOJioswIQ4vIoySkgEYLwUJk5qJFi8vFpuhgBIALysKoqIJjy8pqaGVng8Br5sgngAStZoepS8Mu5MJA54FiMGLAQyeLxnIjA3MCKjPiRe+LyrVicPMGrTbgcrMLyPhgtHMJODnftfMABvtfy0E5CbzfgER5AUt+TAqkHvRAeCJAuQGUGtXb+CHfPsGztrVoqLFiwLJAShxsaPHj0UOEBhAEpunKGyOlBlYDEtKlSY9dXmJZCWzATSfYDuTk8nKBzU9n7zpGQQAOw==',
+    image: pngBase64Prefix +
+      'R0lGODlhKAAoANUxAMg0KRBcmfTW1NNcVNdqY8tBOOmtqfvx8c9PRjBypyBnoPjk4sJ9gKGTpL9EP8ptajxvn9WVlFl3nuGSjfDJxrSruY16j2yQtK5la6qCj8dfXFyFrdp4cbCdq2mCpZSWq52FlixkmaZ1gHiNrL5wcqu7zrWAh3ybu1VqkXR/npGIncNRTc56eEB9rb/T5MQmGwBRkv///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAADEALAAAAAAoACgAAAb/wJhwSCwaj0bDAslsNgUTp3QaOyAO1CySYNB6iQbEdywAUMZeKwHt5byWR5d8Tq/b74YX6y6H+f+AgYKCKAAAEIOJioswIQ4vIoySkgEYLwUJk5qJFi8vFpuhgBIALysKoqIJjy8pqaGVng8Br5sgngAStZoepS8Mu5MJA54FiMGLAQyeLxnIjA3MCKjPiRe+LyrVicPMGrTbgcrMLyPhgtHMJODnftfMABvtfy0E5CbzfgER5AUt+TAqkHvRAeCJAuQGUGtXb+CHfPsGztrVoqLFiwLJAShxsaPHj0UOEBhAEpunKGyOlBlYDEtKlSY9dXmJZCWzATSfYDuTk8nKBzU9n7zpGQQAOw==',
     title: 'Yes'
   },
   SCBL: {
@@ -68,7 +74,7 @@ sessProto.netbanks = {
 
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
 
-var freqWallets = sessProto.walletData = {
+var freqWallets = (sessProto.walletData = {
   paytm: {
     h: 18,
     col: walletPrefix + 'paytm.png'
@@ -84,7 +90,7 @@ var freqWallets = sessProto.walletData = {
   airtelmoney: {
     power: false,
     h: 32,
-    col:  walletPrefix + 'airtelmoney.png'
+    col: walletPrefix + 'airtelmoney.png'
   },
   jiomoney: {
     h: 68,
@@ -100,22 +106,24 @@ var freqWallets = sessProto.walletData = {
   },
   payumoney: {
     h: 18,
-    col: pngBase64Prefix + 'iVBORw0KGgoAAAANSUhEUgAAAI0AAAAgCAMAAAAYAgunAAAAMFBMVEXT46mRuSr7/PeGsxakxk/I3JXz9+fr8ti30nTj7sqyzmqcwD+sy17d6b2+1oL///+7L4YrAAAAEHRSTlP///////////////////8A4CNdGQAAA+xJREFUeNrNV4tuIyEMNAbMw0D+/29vbEi2Fylt79RInSgrwMaeHWykpdv/gXMY5fbT+F82smL6PWyYtM42C/8KNkDTCH1+C5v5W9iwwdiMn2fDhm9QuIYyMxGt3rP8LBuW1or9yqeMuMBN9lBKTgG62I6fBZWujjTyZw3SBlyyO3BOqY/wlg7vMQYHXna+9ssRSC5OGVFXTm9hE6Jmw4L4/bU462LTjM16F5t+CqNHbSwFEGEs4GHw0ZM2oa6kXY7VN1wDB5/ZY+phr4iwupH54yLY1DOhEGZbfaAqcmMmPLal5Mx/s4lBFxU386xjjDVZch+jnk3csi0/nBqMsJLstHPdfTlj68m/8gc2DWxIQ0oaopL0MMo21KjyxCaGvGNIDdEQ1ogOJRgka9wYlotzONPeMPM9AX/NImon4mGR9YlNI5pz0kBR5BDOe2ocH7Vpnvf0l9VdXVWNUF81Wav5ahh72V6pJRh9GhY7N105d/hO7jGQhyJw/cAmgw0zu/oYTo10J51vL7RhhCQRbLC8IhN56SZIUZuIEPJDnIwkhWF1rmWY9MxlBUSBbcnpE7IqFkOhD13SNM6SYpVDeprvxebSRpDdF7FGNs/gaVqk5mRXgCPXGPbUG6XpCTQVGYxAMRsiNFe6A8NlBOM2J1YDSQ3J3VZUeaUN2KgPKmK5wIhyg0Kn5vzNuTtlAKEmm0I0gawgUhDBSl1AxKgdBF2F0VMJADPaJ4cECM23F3XzTTbhsKmHTdCEn0awuRdOwcTrzbWpawoShaB3NlOR8pTND2sTNdgvaBZzybBSRJpTN/uiYtRVna3Z+RHLgGmXzWGjnnDqxabc2fR/0kYzZTIUturpgo0W4OopwPIXT2L9BG6W3svG/IAOqtQxtM55rU17NIRVsXD9WxuNQ3hj50qNecDnmc1poxYCMWyWM8V+jgcweX3Qy2s2cMZToLU1/PSeurSBnqYsrCJWvlztIBoU4ovNvQOpiLRqnWjbOk+c57nmLsCNX7PBc99+y28/D1se2tgtAOtaq6Yxd+SUu1cnhv1iY7dVGkNBUZx1GHruCiF9JgOIHjYDItzZ4D323Y9HmmxsQrm04dJNZWCfd0mYRa9OSsbpojNcAmv2x/Eob9us6sag1n4bslJ1M+kQdxr+viUPS5ZqYzO60x6UyxrSKr4nYbarsyHyBS6TcqYmvGe0Lu1YmhtncetZK7JplXK2+MK+Re+e7nQGvHch1MMMXxztwJiYn78GBP/HjGKkZyN//7viU+uVxnvv6y+Yoqbgu+H1Kl+wYVoJ0vCbuRTqGtHZX7CRgVLLb5eGUvSL4EttKri8HS3pmOzDP+UnwTXbEK2hAAAAAElFTkSuQmCC'
+    col: pngBase64Prefix +
+      'iVBORw0KGgoAAAANSUhEUgAAAI0AAAAgCAMAAAAYAgunAAAAMFBMVEXT46mRuSr7/PeGsxakxk/I3JXz9+fr8ti30nTj7sqyzmqcwD+sy17d6b2+1oL///+7L4YrAAAAEHRSTlP///////////////////8A4CNdGQAAA+xJREFUeNrNV4tuIyEMNAbMw0D+/29vbEi2Fylt79RInSgrwMaeHWykpdv/gXMY5fbT+F82smL6PWyYtM42C/8KNkDTCH1+C5v5W9iwwdiMn2fDhm9QuIYyMxGt3rP8LBuW1or9yqeMuMBN9lBKTgG62I6fBZWujjTyZw3SBlyyO3BOqY/wlg7vMQYHXna+9ssRSC5OGVFXTm9hE6Jmw4L4/bU462LTjM16F5t+CqNHbSwFEGEs4GHw0ZM2oa6kXY7VN1wDB5/ZY+phr4iwupH54yLY1DOhEGZbfaAqcmMmPLal5Mx/s4lBFxU386xjjDVZch+jnk3csi0/nBqMsJLstHPdfTlj68m/8gc2DWxIQ0oaopL0MMo21KjyxCaGvGNIDdEQ1ogOJRgka9wYlotzONPeMPM9AX/NImon4mGR9YlNI5pz0kBR5BDOe2ocH7Vpnvf0l9VdXVWNUF81Wav5ahh72V6pJRh9GhY7N105d/hO7jGQhyJw/cAmgw0zu/oYTo10J51vL7RhhCQRbLC8IhN56SZIUZuIEPJDnIwkhWF1rmWY9MxlBUSBbcnpE7IqFkOhD13SNM6SYpVDeprvxebSRpDdF7FGNs/gaVqk5mRXgCPXGPbUG6XpCTQVGYxAMRsiNFe6A8NlBOM2J1YDSQ3J3VZUeaUN2KgPKmK5wIhyg0Kn5vzNuTtlAKEmm0I0gawgUhDBSl1AxKgdBF2F0VMJADPaJ4cECM23F3XzTTbhsKmHTdCEn0awuRdOwcTrzbWpawoShaB3NlOR8pTND2sTNdgvaBZzybBSRJpTN/uiYtRVna3Z+RHLgGmXzWGjnnDqxabc2fR/0kYzZTIUturpgo0W4OopwPIXT2L9BG6W3svG/IAOqtQxtM55rU17NIRVsXD9WxuNQ3hj50qNecDnmc1poxYCMWyWM8V+jgcweX3Qy2s2cMZToLU1/PSeurSBnqYsrCJWvlztIBoU4ovNvQOpiLRqnWjbOk+c57nmLsCNX7PBc99+y28/D1se2tgtAOtaq6Yxd+SUu1cnhv1iY7dVGkNBUZx1GHruCiF9JgOIHjYDItzZ4D323Y9HmmxsQrm04dJNZWCfd0mYRa9OSsbpojNcAmv2x/Eob9us6sag1n4bslJ1M+kQdxr+viUPS5ZqYzO60x6UyxrSKr4nYbarsyHyBS6TcqYmvGe0Lu1YmhtncetZK7JplXK2+MK+Re+e7nQGvHch1MMMXxztwJiYn78GBP/HjGKkZyN//7viU+uVxnvv6y+Yoqbgu+H1Kl+wYVoJ0vCbuRTqGtHZX7CRgVLLb5eGUvSL4EttKri8HS3pmOzDP+UnwTXbEK2hAAAAAElFTkSuQmCC'
   },
   payzapp: {
     power: false,
     h: 24,
-    col: pngBase64Prefix + 'iVBORw0KGgoAAAANSUhEUgAAAHAAAAAlCAMAAACtfZ09AAAAY1BMVEXuQEGBmb/+7+9BZZ/AzN/839/2n6DrICLpEBLxYGH7z9DsMDHvUFH4r7Dv8vf1j5Df5e/ycHHQ2edhf68iTI+gss8SP4dxjLcxWZewv9eQpcdRcqf5v8DzgIEDM3/oAQP///+4CVglAAAAIXRSTlP//////////////////////////////////////////wCfwdAhAAADRUlEQVR4Ab2Ue3PiOBDEZflh/DAG8whhpXV//095jKYlqyp1x20C239ESE755+6ZkcELZacaz/QyYN907Trg7wCdN7tV5N4PrJvjsEYZvBfo5rFdc9XvA9rJmzWJ6vAeYD93ubGknX0LsJ49RaUSelDv7VK7I6+1/x8YP3JGTKcHDoXqfoDoIr8vqGQBsJd1AeBXqgEmcdxwUlSNBVBzM9cKtCvVu5WyQPE7SgCH8KvU0wNweiznPVBHgwPNcjbGVNkGaNaoYwAmTPrcFsCv30kL8EFgJUul/E8A3Uo5miWwzXvpuCY5w1Q0jEYWNvh5AxbYXwncK/AUNkCdZp4GCbRrxkglE448NtsdwXfM4JuXjwCUJK+3wBDyfWGwm8Fag2v5qhAaplGB8nfqjwm4k2yTJikm8CnvBBCAYvBUBmAp+/AnL0anKY5GOAxt4HPn2BUR2AsfKEUXSOA7aM/cwJrdpZAC1POSHQOT6qQGpwiUtWO32FmsM/7G6GnNNrwwYHXyger2WK44C1xO6Jwdkwx6NdgiAqWcDZwsJnTsiHoIdAPUzjngEvvxsauhtaIKeXYhcNGzMp/f1ircE6hmKJc6Vv8DlPY9opaNdxKD1z2B0MMDsvFqGGJNIJ/wWdaxI2BgtStLfrcEDjFMnS/4DNQILIPpfNYGpjsiAtPgDS4LvvUQ4KRTy4GTwAcaLquqWog4FcWZwNgxyYajwdH7VsrEnmFttGMfmx4iE/bY1GqPx8YHG5XihXDKb23zpWjgIlL6EWn3Zey1JLERyY7a64Vwz29tsdHlQLh4jNSxGZDunbXy1+vYV/p28Nq+FoVGWnEwM4NdNOgfagOQgyfis34D9rLnfKp2AO5SKASdGCHKQLoz2WOaeRocY3xu2yKWGkkmYoYUy0jKLxrU8YxAXtupaB50O23AgecAv8xkwIjpUpd7dkaRDN6wAW/hBkKXzTw8IyTQfukZnwF7p6rhKAugekhLuDx+HdKvPaqw7/OZR5+avk/NgCh9eZLBt2RSon+i6dtAt/6ZBuN9GvwfGXwmM/omBfp94PQUtDOdn5wF9VNg+1/hHRke9Qpg8y/hzSm81wJt+zy8lwL98/BeCxwZ3vf0D5XUzxaJRoO1AAAAAElFTkSuQmCC'
+    col: pngBase64Prefix +
+      'iVBORw0KGgoAAAANSUhEUgAAAHAAAAAlCAMAAACtfZ09AAAAY1BMVEXuQEGBmb/+7+9BZZ/AzN/839/2n6DrICLpEBLxYGH7z9DsMDHvUFH4r7Dv8vf1j5Df5e/ycHHQ2edhf68iTI+gss8SP4dxjLcxWZewv9eQpcdRcqf5v8DzgIEDM3/oAQP///+4CVglAAAAIXRSTlP//////////////////////////////////////////wCfwdAhAAADRUlEQVR4Ab2Ue3PiOBDEZflh/DAG8whhpXV//095jKYlqyp1x20C239ESE755+6ZkcELZacaz/QyYN907Trg7wCdN7tV5N4PrJvjsEYZvBfo5rFdc9XvA9rJmzWJ6vAeYD93ubGknX0LsJ49RaUSelDv7VK7I6+1/x8YP3JGTKcHDoXqfoDoIr8vqGQBsJd1AeBXqgEmcdxwUlSNBVBzM9cKtCvVu5WyQPE7SgCH8KvU0wNweiznPVBHgwPNcjbGVNkGaNaoYwAmTPrcFsCv30kL8EFgJUul/E8A3Uo5miWwzXvpuCY5w1Q0jEYWNvh5AxbYXwncK/AUNkCdZp4GCbRrxkglE448NtsdwXfM4JuXjwCUJK+3wBDyfWGwm8Fag2v5qhAaplGB8nfqjwm4k2yTJikm8CnvBBCAYvBUBmAp+/AnL0anKY5GOAxt4HPn2BUR2AsfKEUXSOA7aM/cwJrdpZAC1POSHQOT6qQGpwiUtWO32FmsM/7G6GnNNrwwYHXyger2WK44C1xO6Jwdkwx6NdgiAqWcDZwsJnTsiHoIdAPUzjngEvvxsauhtaIKeXYhcNGzMp/f1ircE6hmKJc6Vv8DlPY9opaNdxKD1z2B0MMDsvFqGGJNIJ/wWdaxI2BgtStLfrcEDjFMnS/4DNQILIPpfNYGpjsiAtPgDS4LvvUQ4KRTy4GTwAcaLquqWog4FcWZwNgxyYajwdH7VsrEnmFttGMfmx4iE/bY1GqPx8YHG5XihXDKb23zpWjgIlL6EWn3Zey1JLERyY7a64Vwz29tsdHlQLh4jNSxGZDunbXy1+vYV/p28Nq+FoVGWnEwM4NdNOgfagOQgyfis34D9rLnfKp2AO5SKASdGCHKQLoz2WOaeRocY3xu2yKWGkkmYoYUy0jKLxrU8YxAXtupaB50O23AgecAv8xkwIjpUpd7dkaRDN6wAW/hBkKXzTw8IyTQfukZnwF7p6rhKAugekhLuDx+HdKvPaqw7/OZR5+avk/NgCh9eZLBt2RSon+i6dtAt/6ZBuN9GvwfGXwmM/omBfp94PQUtDOdn5wF9VNg+1/hHRke9Qpg8y/hzSm81wJt+zy8lwL98/BeCxwZ3vf0D5XUzxaJRoO1AAAAAElFTkSuQmCC'
   },
   citrus: {
     h: 32,
     col: walletPrefix + 'citrus.png'
   }
-}
+});
 
-var emi_options = sessProto.emi_options = {
+var emi_options = (sessProto.emi_options = {
   // minimum amount to enable emi
-  min: 3000*100-1,
+  min: 3000 * 100 - 1,
   selected: 'KKBK',
   banks: {
     KKBK: {
@@ -186,21 +194,21 @@ var emi_options = sessProto.emi_options = {
       }
     }
   }
-}
+});
 
 emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
 
-var tab_titles = sessProto.tab_titles = {
+var tab_titles = (sessProto.tab_titles = {
   emi: 'EMI',
   card: 'Card',
   netbanking: 'Netbanking',
   wallet: 'Wallet',
   upi: 'UPI',
   ecod: 'Pay by Link'
-}
+});
 
-function notifyBridge(message){
-  if( message && message.event ){
+function notifyBridge(message) {
+  if (message && message.event) {
     var bridgeMethod = CheckoutBridge['on' + message.event];
     var data = message.data;
     if (!isString(data)) {
@@ -213,23 +221,20 @@ function notifyBridge(message){
   }
 }
 
-function setPaymentMethods(session){
+function setPaymentMethods(session) {
   var recurring = session.get('recurring');
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
-  var methods = session.methods = {
+  var methods = (session.methods = {
     count: 0
-  };
+  });
 
   var passedWallets = session.get('method.wallet');
-  each(
-    availMethods,
-    function(method, enabled){
-      if(enabled && session.get('method.' + method) !== false){
-        methods[method] = enabled;
-      }
+  each(availMethods, function(method, enabled) {
+    if (enabled && session.get('method.' + method) !== false) {
+      methods[method] = enabled;
     }
-  )
+  });
 
   var amount = session.get('amount');
   if (amount <= emi_options.min) {
@@ -237,7 +242,9 @@ function setPaymentMethods(session){
   }
 
   var emiMethod = session.get('theme.emi_mode');
-  if (!(emiMethod && methods.emi || methods.card) || recurring || international) {
+  if (
+    !((emiMethod && methods.emi) || methods.card) || recurring || international
+  ) {
     methods.emi = false;
   }
 
@@ -251,20 +258,27 @@ function setPaymentMethods(session){
   }
 
   // php encodes blank object as blank array
-  if (amount >= 100*20000 || methods.wallet instanceof Array || recurring || international) {
+  if (
+    amount >= 100 * 20000 ||
+    methods.wallet instanceof Array ||
+    recurring ||
+    international
+  ) {
     methods.wallet = {};
   } else if (typeof passedWallets === 'object') {
-    each(
-      passedWallets,
-      function(wallet, enabled){
-        if (enabled === false) {
-          delete methods.wallet[wallet];
-        }
+    each(passedWallets, function(wallet, enabled) {
+      if (enabled === false) {
+        delete methods.wallet[wallet];
       }
-    )
+    });
   }
 
-  if (!methods.netbanking || methods.netbanking instanceof Array || recurring || international) {
+  if (
+    !methods.netbanking ||
+    methods.netbanking instanceof Array ||
+    recurring ||
+    international
+  ) {
     methods.netbanking = false;
   } else {
     methods.count = 1;
@@ -282,34 +296,28 @@ function setPaymentMethods(session){
     methods.count++;
   }
 
-  each(
-    session.get('external.wallets'),
-    function(i, externalWallet){
-      if(externalWallet in freqWallets){
-        methods.wallet[externalWallet] = true;
-        freqWallets[externalWallet].custom = true;
-      }
+  each(session.get('external.wallets'), function(i, externalWallet) {
+    if (externalWallet in freqWallets) {
+      methods.wallet[externalWallet] = true;
+      freqWallets[externalWallet].custom = true;
     }
-  )
+  });
   var wallets = [];
-  each(
-    methods.wallet,
-    function(walletName){
-      var freqWallet = freqWallets[walletName];
-      if(freqWallet){
-        freqWallet.name = walletName;
-        wallets.push(freqWallet);
-      }
+  each(methods.wallet, function(walletName) {
+    var freqWallet = freqWallets[walletName];
+    if (freqWallet) {
+      freqWallet.name = walletName;
+      wallets.push(freqWallet);
     }
-  )
+  });
 
-  if(wallets.length){
+  if (wallets.length) {
     methods.count++;
   }
 
   wallets.sort(function(walletA, walletB) {
     return !(walletA.offer || walletA.custom);
-  })
+  });
 
   methods.wallet = wallets;
 }
@@ -326,12 +334,15 @@ function fetchPrefsAndShowModal(session) {
   }
 
   Razorpay.payment.getPrefs(prefData, function(response) {
-    if(response.error){
-      return Razorpay.sendMessage({event: 'fault', data: response.error.description});
+    if (response.error) {
+      return Razorpay.sendMessage({
+        event: 'fault',
+        data: response.error.description
+      });
     }
     preferences = response;
     showModal(session);
-  })
+  });
 }
 
 function showModal(session) {
@@ -347,10 +358,13 @@ function showModal(session) {
   var session_options = session.get();
   if (offers) {
     each(RazorpayDefaults, function(optionName) {
-      if (/^method/.test(optionName) && offers.payment_method !== optionName.split('.')[1]) {
+      if (
+        /^method/.test(optionName) &&
+        offers.payment_method !== optionName.split('.')[1]
+      ) {
         session_options[optionName] = false;
       }
-    })
+    });
   }
 
   if (saved_customer) {
@@ -369,7 +383,7 @@ function showModal(session) {
       customer = new Customer('');
       getCustomer = function() {
         return customer;
-      }
+      };
     }
 
     if (session_options['recurring']) {
@@ -396,11 +410,11 @@ function showModal(session) {
   Razorpay.configure(options);
   showModalWithSession(session);
 }
-function showModalWithSession(session){
+function showModalWithSession(session) {
   setPaymentMethods(session);
 
-  var order = session.order = preferences.order;
-  var invoice = session.invoice = preferences.invoice;
+  var order = (session.order = preferences.order);
+  var invoice = (session.invoice = preferences.invoice);
   var get = session.get;
 
   if (invoice && invoice.amount) {
@@ -413,36 +427,39 @@ function showModalWithSession(session){
       email: get('prefill.email') || 'void@razorpay.com',
       bank: order.bank,
       method: 'netbanking'
-    })
+    });
   }
   session.render();
-  Razorpay.sendMessage({event: 'render'});
+  Razorpay.sendMessage({ event: 'render' });
 
   if (CheckoutBridge) {
     if (isFunction(CheckoutBridge.setDimensions)) {
       var containerBox = $('#container')[0];
       if (containerBox) {
         var rect = containerBox.getBoundingClientRect();
-        CheckoutBridge.setDimensions(Math.floor(rect.width), Math.floor(rect.height));
+        CheckoutBridge.setDimensions(
+          Math.floor(rect.width),
+          Math.floor(rect.height)
+        );
       }
     }
     $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
   }
 
-  if(qpmap.error){
+  if (qpmap.error) {
     errorHandler.call(session, qpmap);
   }
-  if(qpmap.tab){
+  if (qpmap.tab) {
     session.switchTab(qpmap.tab);
   }
 }
 
 // generates ios event handling functions, like onload
-function iosMethod(method){
-  return function(data){
+function iosMethod(method) {
+  return function(data) {
     var iF = document.createElement('iframe');
-    var src = 'razorpay://on'+method;
-    if(data){
+    var src = 'razorpay://on' + method;
+    if (data) {
       src += '?' + CheckoutBridge.index;
       CheckoutBridge.map[++CheckoutBridge.index] = data;
     }
@@ -450,59 +467,56 @@ function iosMethod(method){
     doc.appendChild(iF);
     iF.parentNode.removeChild(iF);
     iF = null;
-  }
+  };
 }
 
 var platformSpecific = {
-  ios: function(){
+  ios: function() {
     // setting up js -> ios communication by loading custom protocol inside hidden iframe
     CheckoutBridge = window.CheckoutBridge = {
       // unique id for ios to retieve resources
       index: 0,
       map: {},
-      get: function(index){
+      get: function(index) {
         var val = this.map[this.index];
         delete this.map[this.index];
         return val;
       },
 
-      getUID: function(){
+      getUID: function() {
         return _uid;
       }
     };
 
-    var bridgeMethods = ['load','dismiss','submit','fault','success'];
+    var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
 
-    each(bridgeMethods, function(i, prop){
-      CheckoutBridge['on'+prop] = iosMethod(prop)
-    })
+    each(bridgeMethods, function(i, prop) {
+      CheckoutBridge['on' + prop] = iosMethod(prop);
+    });
     CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
   },
 
   android: function() {
     $(doc).css('background', 'rgba(0, 0, 0, 0.6)');
   }
-}
+};
 
-function setQueryParams(search){
-  each(
-    search.replace(/^\?/,'').split('&'),
-    function(i, param){
-      var split = param.split('=', 2);
-      if( split[0].indexOf('.') !== -1 ) {
-        var dotsplit = split[0].split('.', 2);
-        if( !qpmap[dotsplit[0]] ) {
-          qpmap[dotsplit[0]] = {};
-        }
-        qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
-      } else {
-        qpmap[split[0]] = decodeURIComponent(split[1]);
+function setQueryParams(search) {
+  each(search.replace(/^\?/, '').split('&'), function(i, param) {
+    var split = param.split('=', 2);
+    if (split[0].indexOf('.') !== -1) {
+      var dotsplit = split[0].split('.', 2);
+      if (!qpmap[dotsplit[0]]) {
+        qpmap[dotsplit[0]] = {};
       }
+      qpmap[dotsplit[0]][dotsplit[1]] = decodeURIComponent(split[1]);
+    } else {
+      qpmap[split[0]] = decodeURIComponent(split[1]);
     }
-  )
+  });
 
   var platform = qpmap.platform;
-  if(platform){
+  if (platform) {
     addBodyClass(platform);
     invoke(platformSpecific[platform]);
   }
@@ -513,7 +527,7 @@ Razorpay.sendMessage = function(message) {
     return notifyBridge(message);
   }
 
-  if(ownerWindow){
+  if (ownerWindow) {
     message.source = 'frame';
     message.id = _uid;
     if (isNonNullObject(message)) {
@@ -521,7 +535,7 @@ Razorpay.sendMessage = function(message) {
     }
     ownerWindow.postMessage(message, '*');
   }
-}
+};
 
 window.handleOTP = function(otp) {
   otp = String(otp).replace(/\D/g, '');
@@ -531,7 +545,7 @@ window.handleOTP = function(otp) {
     otpEl.value = otp;
     $('#otp-elem').removeClass('invalid');
   }
-}
+};
 
 window.backPressed = function(callback) {
   var session = getSession();
@@ -540,11 +554,11 @@ window.backPressed = function(callback) {
   } else {
     invoke(callback, CheckoutBridge);
   }
-}
+};
 
-function validUID(id){
-  if(isIframe && !CheckoutBridge){
-    if(!isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)){
+function validUID(id) {
+  if (isIframe && !CheckoutBridge) {
+    if (!isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)) {
       return false;
     }
   }
@@ -553,7 +567,7 @@ function validUID(id){
 
 var epos_share_link;
 window.handleMessage = function(message) {
-  if('id' in message && !validUID(message.id)){
+  if ('id' in message && !validUID(message.id)) {
     return;
   }
   var id = message.id || _uid;
@@ -564,20 +578,20 @@ window.handleMessage = function(message) {
     if (options && options.epos_build_code >= 3) {
       epos_share_link = true;
     }
-  } catch(e) {}
+  } catch (e) {}
 
-  if(!session){
-    if(!options){
+  if (!session) {
+    if (!options) {
       return;
     }
-    try{
+    try {
       session = new Session(options);
-    } catch(e){
-      Razorpay.sendMessage({event: 'fault', data: e.message});
+    } catch (e) {
+      Razorpay.sendMessage({ event: 'fault', data: e.message });
       return roll('fault', e, 'warn');
     }
     var oldSession = getSession();
-    if(oldSession){
+    if (oldSession) {
       invoke('saveAndClose', oldSession);
     }
     session.id = _uid = id;
@@ -592,26 +606,26 @@ window.handleMessage = function(message) {
     trackingProps.integration = message.integration;
   }
 
-  if(message.embedded){
+  if (message.embedded) {
     session.embedded = true;
     $(doc).addClass('embedded');
   }
 
-  if(message.data){
+  if (message.data) {
     session.data = message.data;
   }
 
-  if(message.params){
+  if (message.params) {
     session.params = message.params;
   }
 
-  if(message.event === 'open' || options) {
+  if (message.event === 'open' || options) {
     if (!preferences || session.get('remember_customer')) {
       fetchPrefsAndShowModal(session);
     } else {
       showModal(session);
     }
-  } else if(message.event === 'close') {
+  } else if (message.event === 'close') {
     session.hide();
   }
 
@@ -619,37 +633,38 @@ window.handleMessage = function(message) {
     if (isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
     }
-  } catch(e){}
-}
+  } catch (e) {}
+};
 
 function parseAnalyticsData(data) {
   each(data, function(key, val) {
     trackingProps[key] = val;
-  })
+  });
 }
 
-function parseMessage(e){ // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
+function parseMessage(e) {
+  // not concerned about adding/removeing listeners, iframe is razorpay's fiefdom
   var data = e.data;
-  if(e.source && e.source !== ownerWindow){
+  if (e.source && e.source !== ownerWindow) {
     return;
   }
-  try{
-    if(typeof data === 'string') {
+  try {
+    if (typeof data === 'string') {
       data = JSON.parse(data);
     }
     window.handleMessage(data);
-  } catch(err){
+  } catch (err) {
     roll('message: ' + data, err, 'warn');
   }
 }
 
-function applyUAClasses(){
-  if(/Android [2-4]/.test(ua)){
+function applyUAClasses() {
+  if (/Android [2-4]/.test(ua)) {
     addBodyClass('noanim');
   }
 }
 
-function initIframe(){
+function initIframe() {
   $(window).on('message', parseMessage);
 
   if (location.search) {
@@ -667,11 +682,11 @@ function initIframe(){
   }
 
   if (qpmap.message) {
-    parseMessage({data: atob(qpmap.message)});
+    parseMessage({ data: atob(qpmap.message) });
   }
 
   applyUAClasses();
-  Razorpay.sendMessage({event: 'load'});
+  Razorpay.sendMessage({ event: 'load' });
 }
 
 initIframe();
