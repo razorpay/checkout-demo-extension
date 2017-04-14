@@ -355,18 +355,19 @@ function showModal(session) {
   }
 
   var offers = preferences.offers;
-  var session_options = session.get();
-  if (offers) {
-    each(RazorpayDefaults, function(optionName) {
-      if (
-        /^method/.test(optionName) &&
-        offers.payment_method !== optionName.split('.')[1]
-      ) {
-        session_options[optionName] = false;
-      }
-    });
-  }
+  session.offers = {
+    wallet: {}
+  };
+  each(offers, function(index, offer) {
+    var payment_method = offer.payment_method;
+    if (payment_method === 'card') {
+      session.offers.card = offer;
+    } else if (payment_method === 'wallet') {
+      session.offers.wallet[offer.payment_network] = offer;
+    }
+  });
 
+  var session_options = session.get();
   if (saved_customer) {
     var filters = {};
     // we put saved customer contact, email into default prefills
