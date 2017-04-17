@@ -7,14 +7,11 @@ const dot = require('./scripts/dot/index');
 const glob = require('glob');
 const plumber = require('gulp-plumber');
 const stylus = require('gulp-stylus');
-const cleanCSS = require('gulp-clean-css');
 const stylint = require('gulp-stylint');
-const concat = require('gulp-concat');
-const autoprefixer = require('gulp-autoprefixer');
+const autoprefixer = require('autoprefixer-stylus');
 const uglify = require('gulp-uglify');
-const sourcemaps = require('gulp-sourcemaps');
 const usemin = require('gulp-usemin');
-const through = require('through');
+const through = require('through2').obj;
 const runSequence = require('run-sequence');
 const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
@@ -29,6 +26,7 @@ const lazypipe = require('lazypipe');
 const minimist = require('minimist');
 
 const distDir = 'app/dist/v1/';
+const cssDistDir = distDir + 'css';
 
 function assetPath(path) {
   return `app/${path}`;
@@ -58,31 +56,26 @@ function handleError(err) {
   this.emit('end');
 }
 
-var concatCss = lazypipe()
-  .pipe(stylint)
-  .pipe(stylint.reporter)
-  .pipe(stylus)
-  .pipe(autoprefixer, {
-    browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
-    cascade: false
-  })
-  .pipe(concat, 'checkout.css');
+const stylusOptions = {
+  use: [autoprefixer('ie 8', 'android 2.2', 'last 10 versions', 'iOS 7')]
+};
 
-gulp.task('concatCss', function() {
+gulp.task('css', () => {
   return gulp
-    .src(paths.css)
+    .src('app/checkout.styl')
+    .pipe(stylint())
+    .pipe(stylint.reporter())
     .pipe(plumber({ errorHandler: handleError }))
-    .pipe(concatCss())
-    .pipe(gulp.dest(`${distDir}/css`));
+    .pipe(stylus(stylusOptions))
+    .pipe(gulp.dest(cssDistDir));
 });
 
-gulp.task('cleanCSS', function() {
+gulp.task('css:prod', () => {
   return gulp
-    .src(paths.css)
-    .pipe(concatCss())
-    .pipe(stylint.reporter('fail', { failOnWarning: true }))
-    .pipe(cleanCSS({ compatibility: 'ie8' }))
-    .pipe(gulp.dest(`${distDir}/css`));
+    .src('app/checkout.styl')
+    .pipe(stylint())
+    .pipe(stylus(Object.assign({}, stylusOptions, { compress: true })))
+    .pipe(gulp.dest(cssDistDir));
 });
 
 gulp.task('usemin', () => {
@@ -90,9 +83,10 @@ gulp.task('usemin', () => {
     .src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(
-      through(function(file) {
+      through(function(file, enc, cb) {
         file.contents = new Buffer(`(function(){${String(file.contents)}})()`);
-        this.emit('data', file);
+        this.push(file);
+        cb();
       })
     )
     .pipe(gulp.dest(distDir));
@@ -104,11 +98,12 @@ gulp.task('uglify', () => {
       .src([`${distDir}/**/*.js`])
       // wrap between iife and user strict
       .pipe(
-        through(function(file) {
+        through(function(file, enc, cb) {
           file.contents = new Buffer(
             `(function(){"use strict";${String(file.contents)}})()`
           );
-          this.emit('data', file);
+          this.push(file);
+          cb();
         })
       )
       .pipe(jshint())
@@ -146,7 +141,7 @@ gulp.task('staticAssets', function() {
 gulp.task('build', function(cb) {
   runSequence(
     'clean',
-    ['cleanCSS', 'compileTemplates'],
+    ['css:prod', 'compileTemplates'],
     'compileHTML',
     'staticAssets',
     cb
@@ -154,7 +149,7 @@ gulp.task('build', function(cb) {
 });
 
 gulp.task('serve', ['build'], function() {
-  gulp.watch(paths.css, ['concatCss']);
+  gulp.watch(paths.css, ['css']);
   gulp.watch(paths.templates, ['compileTemplates']);
   gulp.watch(paths.js, [/*'hint',*/ 'usemin']);
   gulp.watch(assetPath('*.html'), ['usemin']);
