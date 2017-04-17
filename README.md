@@ -1,9 +1,9 @@
-[![wercker status](https://app.wercker.com/status/1f8380cb72c916c46521d02d52e0174d/m "wercker status")](https://app.wercker.com/project/bykey/1f8380cb72c916c46521d02d52e0174d)
+[![wercker status](https://app.wercker.com/status/1f8380cb72c916c46521d02d52e0174d/m "wercker status")](https://app.wercker.com/project/bykey/1f8380cb72c916c46521d02d52e0174d) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 # Setup Instructions
 
 1. Install gulp globally `npm install -g gulp`
-1. Install npm supporting packages `npm install`
+1. Install supporting packages `npm install` (or `yarn install` if you prefer that).
 1. copy over `app/config.sample.js` -> `app/config.js` to specify API URL
 1. Point local API to checkout in `public/checkout.php` and `app/views/checkout.php`
 1. `gulp serve` in checkout root dir
@@ -28,6 +28,7 @@ Tests are located in `test` folder. `test/release` folder contains blackbox test
 - All source code is kept inside the `app` directory
 - All tests are in `test` directory.
 - Default options for `new Razorpay`: `https://github.com/razorpay/checkout/blob/master/app/js/init.js`
+- Please install an [editor integration](https://github.com/prettier/prettier#editor-integration) for prettier
 
 # Deployment and Branches
 

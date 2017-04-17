@@ -1,4 +1,4 @@
-const minimist = require('minimist')
+const minimist = require('minimist');
 
 const argv = minimist(process.argv.slice(1));
 const isProduction = argv.env === 'production';
@@ -49,9 +49,7 @@ const wdioConfig = {
     // 'test/e2e/specs/validation.spec.js',
   ],
   // Patterns to exclude.
-  exclude: [
-    'test/e2e/specs/beta-api.spec.js'
-  ],
+  exclude: ['test/e2e/specs/beta-api.spec.js'],
   //
   // ============
   // Capabilities
@@ -75,22 +73,21 @@ const wdioConfig = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://docs.saucelabs.com/reference/platforms-configurator
   //
-  capabilities: [{
-    browserName: 'chrome',
-    maxInstances: isProduction ? 10 : 1,
-    chromeOptions: {
-      args: [
-        'no-sandbox',
-        'no-gpu'
-      ]
-    },
-    // browserName: 'firefox',
-    firefox_binary: 'scripts/firefox.sh',
-    firefox_profile: {
-      'browser.startup.homepage_override.mstone': 'ignore',
-      'startup.homepage_welcome_url.additional': 'about:blank'
+  capabilities: [
+    {
+      browserName: 'chrome',
+      maxInstances: isProduction ? 10 : 1,
+      chromeOptions: {
+        args: ['no-sandbox', 'no-gpu']
+      },
+      // browserName: 'firefox',
+      firefox_binary: 'scripts/firefox.sh',
+      firefox_profile: {
+        'browser.startup.homepage_override.mstone': 'ignore',
+        'startup.homepage_welcome_url.additional': 'about:blank'
+      }
     }
-  }],
+  ],
   // , {
   // maxInstances can get overwritten per capability. So if you have an in house Selenium
   // grid with only 5 firefox instance available you can make sure that not more than
@@ -228,13 +225,13 @@ const wdioConfig = {
   //
   // Gets executed once before all workers get launched.
   onPrepare: function(config, capabilities) {
-    console.log('LET\'S GO')
+    console.log("LET'S GO");
   },
   //
   // Gets executed before test execution begins. At this point you can access to all global
   // variables like `browser`. It is the perfect place to define custom commands.
   before: function(capabilities, specs) {
-    var chai = global.chai = require('chai');
+    var chai = (global.chai = require('chai'));
     global.expect = chai.expect;
     global.assert = chai.assert;
 
@@ -244,14 +241,14 @@ const wdioConfig = {
     }
 
     global.$ = function(selector) {
-      return browser.element(selector).value
-    }
+      return browser.element(selector).value;
+    };
 
     // http://webdriver.io/api/protocol/execute.html
     global.execOnFrame = function() {
       browser.checkoutFrame();
       return browser.execute.apply(browser, arguments).value;
-    }
+    };
   },
   //
   // Hook that gets executed before the suite starts
@@ -288,22 +285,26 @@ const wdioConfig = {
   // possible to defer the end of the process using a promise.
   onComplete: function(exitCode) {
     if (exitCode === 0) {
-      console.log(`
+      console.log(
+        `
               _/_/    _/        _/            _/_/_/    _/_/_/      _/          _/  _/_/_/_/  _/        _/
            _/    _/  _/        _/              _/    _/            _/          _/  _/        _/        _/
           _/_/_/_/  _/        _/              _/      _/_/        _/    _/    _/  _/_/_/    _/        _/
          _/    _/  _/        _/              _/          _/        _/  _/  _/    _/        _/        _/
         _/    _/  _/_/_/_/  _/_/_/_/      _/_/_/  _/_/_/            _/  _/      _/_/_/_/  _/_/_/_/  _/_/_/_/
-      `)
+      `
+      );
     } else {
-      console.log(`${exitCode} :-|
+      console.log(
+        `${exitCode} :-|
         ()
         /\                 _/_ /                           /)       /
        /  )  __ ______  _  /  /_  o ____  _,    o _       // o _   /_  __  ,
       /__/__(_)/ / / <_</_<__/ /_<_/ / <_(_)_  <_/_)_    //_<_/_)_/ /_/ (_/_
                                           /|            />               /
                                          |/            </               '
-      `)
+      `
+      );
     }
   },
   //
@@ -329,10 +330,8 @@ if (isCrossBrowserTesting) {
 }
 
 if (isBetaApiTesting) {
-  wdioConfig.specs = [
-    'test/e2e/specs/beta-api.spec.js'
-  ]
-  wdioConfig.exclude = []
+  wdioConfig.specs = ['test/e2e/specs/beta-api.spec.js'];
+  wdioConfig.exclude = [];
 }
 
 exports.config = wdioConfig;

@@ -1,7 +1,9 @@
 var Formatter;
 
-(function(){
-  var noop = function(value) { return value }
+(function() {
+  var noop = function(value) {
+    return value;
+  };
 
   Formatter = function(el, handlers, noBind) {
     Eventer.call(this);
@@ -26,7 +28,7 @@ var Formatter;
     }
     // set initial formatting
     defer(bind('format', this));
-  }
+  };
 
   Formatter.events = {
     keypress: 'fwdFormat',
@@ -34,9 +36,9 @@ var Formatter;
     change: 'format',
     blur: 'format',
     keydown: 'backFormat'
-  }
+  };
 
-  var proto = Formatter.prototype = new Eventer();
+  var proto = (Formatter.prototype = new Eventer());
 
   proto.backFormat = function(e) {
     // windows phone: if keydown is prevented, and value is changed synchronously,
@@ -59,23 +61,23 @@ var Formatter;
       e: e,
       left: left,
       value: left + value.slice(caret.end)
-    })
-  }
+    });
+  };
 
   proto.pretty = proto.isValid = noop;
   proto.prettyValue = '';
 
   proto.raw = function(value) {
-    return value.replace(/\D/g, '')
-  }
+    return value.replace(/\D/g, '');
+  };
 
   proto.setValue = function(value) {
     this.value = value;
-  }
+  };
 
   proto.oninput = function() {
     this.emit('change');
-  }
+  };
 
   proto.fwdFormat = function(e) {
     var newChar = getChar(e);
@@ -91,12 +93,12 @@ var Formatter;
       e: e,
       left: left,
       value: value
-    })
-  }
+    });
+  };
 
   proto.deferFormat = function(e) {
     invoke('format', this, e, 0);
-  }
+  };
 
   proto.format = function(e) {
     var caretPosition = this.getCaret().start;
@@ -105,14 +107,13 @@ var Formatter;
     this.run({
       value: value,
       left: value.slice(0, caretPosition)
-    })
-  }
+    });
+  };
 
   proto.bind = function() {
-    this.evtHandler = new EvtHandler(this.el, this)
-      .on(Formatter.events)
+    this.evtHandler = new EvtHandler(this.el, this).on(Formatter.events);
     return this;
-  }
+  };
 
   proto.unbind = function() {
     var evtHandler = this.evtHandler;
@@ -122,7 +123,7 @@ var Formatter;
     }
     this._events = {};
     return this;
-  }
+  };
 
   proto.run = function(values) {
     // domValue is would-be value, if not prevented (keypress, keydown)
@@ -185,7 +186,7 @@ var Formatter;
     if (oldValue !== this.value) {
       this.oninput();
     }
-  }
+  };
 
   proto.moveCaret = function(position) {
     // console.log('moveCaret ' + position);
@@ -201,7 +202,7 @@ var Formatter;
       range.moveStart('character', position);
       range.select();
     }
-  }
+  };
 
   proto.getCaret = function() {
     var el = this.el;
@@ -222,7 +223,7 @@ var Formatter;
         caretPosition = -textInputRange.moveStart('character', -length);
         caretEnd = caretPosition + text.length;
       }
-    } catch(e) {}
+    } catch (e) {}
 
     if (!isNumber(caretPosition)) {
       caretPosition = caretEnd = length;
@@ -230,18 +231,20 @@ var Formatter;
     return {
       start: caretPosition,
       end: caretEnd
-    }
-  }
+    };
+  };
 
   function whichKey(e) {
-    return (e instanceof Event) && (e.which || e.charCode || e.keyCode);
+    return e instanceof Event && (e.which || e.charCode || e.keyCode);
   }
 
   function getChar(e) {
     var which = whichKey(e);
-    return which
-      && !e.ctrlKey 
-      && String.fromCharCode(which).replace(/[^\x20-\x7E]/, '')
-      || '';
+    return (
+      (which &&
+        !e.ctrlKey &&
+        String.fromCharCode(which).replace(/[^\x20-\x7E]/, '')) ||
+      ''
+    );
   }
 })();

@@ -18,7 +18,7 @@ var merchantMarkup = {
 
   // scroll manually in iPhone
   scroll: function() {
-    if(typeof window.pageYOffset !== 'number') {
+    if (typeof window.pageYOffset !== 'number') {
       return;
     }
     if (innerHeight < containerHeight) {
@@ -30,48 +30,54 @@ var merchantMarkup = {
       smoothScrollTo(0);
     }
   }
-}
+};
 
 function getMetas() {
   if (!merchantMarkup.metas) {
-    merchantMarkup.metas = $$('head meta[name=viewport],' +
-      'head meta[name="theme-color"]');
+    merchantMarkup.metas = $$(
+      'head meta[name=viewport],' + 'head meta[name="theme-color"]'
+    );
   }
 
   return merchantMarkup.metas;
 }
 
-function restoreMetas($metas){
-  if($metas){
-    each($metas, function(i, meta){
+function restoreMetas($metas) {
+  if ($metas) {
+    each($metas, function(i, meta) {
       $(meta[0]).remove();
-    })
+    });
   }
   var oldMeta = getMetas();
-  if(oldMeta){
-    each(oldMeta, function(i, meta){
+  if (oldMeta) {
+    each(oldMeta, function(i, meta) {
       qs('head').appendChild(meta);
-    })
+    });
   }
 }
 
-function restoreOverflow(){
+function restoreOverflow() {
   docStyle.overflow = merchantMarkup.overflow;
 }
 
 // to handle absolute/relative url of options.image
-function sanitizeImage(options){
+function sanitizeImage(options) {
   var image = options.image;
   if (image && isString(image)) {
-    if(discreet.isBase64Image(image)){
+    if (discreet.isBase64Image(image)) {
       return;
     }
-    if(image.indexOf('http')){ // not 0
-      var baseUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+    if (image.indexOf('http')) {
+      // not 0
+      var baseUrl =
+        location.protocol +
+        '//' +
+        location.hostname +
+        (location.port ? ':' + location.port : '');
       var relUrl = '';
-      if(image[0] !== '/'){
-        relUrl += location.pathname.replace(/[^\/]*$/g,'');
-        if(relUrl[0] !== '/'){
+      if (image[0] !== '/') {
+        relUrl += location.pathname.replace(/[^\/]*$/g, '');
+        if (relUrl[0] !== '/') {
           relUrl = '/' + relUrl;
         }
       }
@@ -80,7 +86,7 @@ function sanitizeImage(options){
   }
 }
 
-function makeCheckoutUrl(rzp){
+function makeCheckoutUrl(rzp) {
   var url = RazorpayConfig.frame;
 
   if (!url) {
@@ -92,59 +98,59 @@ function makeCheckoutUrl(rzp){
       url += '/public';
     }
 
-    if(RazorpayConfig.js){
+    if (RazorpayConfig.js) {
       urlParams.checkout = RazorpayConfig.js;
     }
 
     var paramsArray = [];
-    each(
-      urlParams,
-      function(key, val){
-        paramsArray.push(key + '=' + val);
-      }
-    )
+    each(urlParams, function(key, val) {
+      paramsArray.push(key + '=' + val);
+    });
 
-    if(paramsArray.length){
+    if (paramsArray.length) {
       url += '?' + paramsArray.join('&');
     }
   }
   return url;
 }
 
-function setBackdropColor(value){
+function setBackdropColor(value) {
   // setting unsupported value throws error in IE
-  try{ frameBackdrop.style.background = value; }
-  catch(e){}
+  try {
+    frameBackdrop.style.background = value;
+  } catch (e) {}
 }
 
-function setTestRibbonVisible(){
+function setTestRibbonVisible() {
   testRibbon.style.opacity = 1.0;
 }
 
-function setTestRibbonInvisible(){
+function setTestRibbonInvisible() {
   testRibbon.style.opacity = 0.0;
 }
 
 var loader;
-function appendLoader($parent, parent){
+function appendLoader($parent, parent) {
   if (!loader) {
     try {
       loader = document.createElement('div');
       loader.className = 'razorpay-loader';
-      var style = "margin:-25px 0 0 -25px;height:50px;width:50px;animation:rzp-rot 1s infinite linear;-webkit-animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;"
-      if(parent){
-        style += 'margin: 100px auto -150px;border: 1px solid rgba(0, 0, 0, 0.2);border-top-color: rgba(0, 0, 0, 0.7);';
+      var style =
+        'margin:-25px 0 0 -25px;height:50px;width:50px;animation:rzp-rot 1s infinite linear;-webkit-animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;';
+      if (parent) {
+        style +=
+          'margin: 100px auto -150px;border: 1px solid rgba(0, 0, 0, 0.2);border-top-color: rgba(0, 0, 0, 0.7);';
       } else {
         style += 'position:absolute;left:50%;top:50%;';
       }
       loader.setAttribute('style', style);
       $parent.append(loader);
-    } catch(e){}
+    } catch (e) {}
   }
 }
 
-function CheckoutFrame(rzp){
-  if(rzp){
+function CheckoutFrame(rzp) {
+  if (rzp) {
     this.getEl(rzp);
     return this.openRzp(rzp);
   }
@@ -153,20 +159,20 @@ function CheckoutFrame(rzp){
 }
 
 CheckoutFrame.prototype = {
-  getEl: function(rzp){
-    if(!this.el){
-      var style = 'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
-      this.el = $(document.createElement('iframe'))
-        .attr({
-          'class': 'razorpay-checkout-frame', // quotes needed for ie
-          style: style,
-          allowtransparency: true,
-          frameborder: 0,
-          width: '100%',
-          height: '100%',
-          src: makeCheckoutUrl(rzp)
-        }
-      )[0];
+  getEl: function(rzp) {
+    if (!this.el) {
+      var style =
+        'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
+      this.el = $(document.createElement('iframe')).attr({
+        // prettier-ignore
+        'class': 'razorpay-checkout-frame', // quotes needed for ie
+        style: style,
+        allowtransparency: true,
+        frameborder: 0,
+        width: '100%',
+        height: '100%',
+        src: makeCheckoutUrl(rzp)
+      })[0];
     }
     return this.el;
   },
@@ -178,7 +184,7 @@ CheckoutFrame.prototype = {
     appendLoader($parent, parent);
 
     if (rzp !== this.rzp) {
-      if($el.parent() !== $parent[0]) {
+      if ($el.parent() !== $parent[0]) {
         $parent.append($el[0]);
       }
       this.rzp = rzp;
@@ -190,7 +196,7 @@ CheckoutFrame.prototype = {
     } else {
       $parent.css('display', 'block').reflow();
       setBackdropColor(rzp.get('theme.backdrop_color'));
-      if(/^rzp_t/.test(rzp.get('key'))){
+      if (/^rzp_t/.test(rzp.get('key'))) {
         setTestRibbonVisible();
       }
       this.setMetaAndOverflow();
@@ -201,7 +207,7 @@ CheckoutFrame.prototype = {
     this.onload();
   },
 
-  makeMessage: function(){
+  makeMessage: function() {
     var rzp = this.rzp;
     var options = rzp.get();
 
@@ -210,14 +216,11 @@ CheckoutFrame.prototype = {
       referer: location.href,
       options: options,
       id: rzp.id
-    }
+    };
 
-    each(
-      rzp.modal.options,
-      function(i, option){
-        options['modal.' + i] = option;
-      }
-    )
+    each(rzp.modal.options, function(i, option) {
+      options['modal.' + i] = option;
+    });
 
     if (this.embedded) {
       delete options.parent;
@@ -228,7 +231,7 @@ CheckoutFrame.prototype = {
     return response;
   },
 
-  close: function(){
+  close: function() {
     setBackdropColor('');
     setTestRibbonInvisible();
     restoreMetas(this.$metas);
@@ -242,7 +245,7 @@ CheckoutFrame.prototype = {
   },
 
   bind: function() {
-    if(!this.listeners){
+    if (!this.listeners) {
       this.listeners = [];
       var eventPairs = {};
 
@@ -257,30 +260,28 @@ CheckoutFrame.prototype = {
 
       each(
         eventPairs,
-        function(event, listener){
-          this.listeners.push(
-            $(window).on(event, listener, null, this)
-          )
+        function(event, listener) {
+          this.listeners.push($(window).on(event, listener, null, this));
         },
         this
-      )
+      );
     }
   },
 
-  unbind: function(){
+  unbind: function() {
     invokeEach(this.listeners);
     this.listeners = null;
   },
 
-  setMetaAndOverflow: function(){
+  setMetaAndOverflow: function() {
     var head = qs('head');
-    if(!head){
+    if (!head) {
       return;
     }
 
-    each(getMetas(), function(i, meta){
+    each(getMetas(), function(i, meta) {
       $(meta).remove();
-    })
+    });
 
     this.$metas = [
       $(document.createElement('meta')).attr({
@@ -293,9 +294,9 @@ CheckoutFrame.prototype = {
       })
     ];
 
-    each(this.$metas, function(i, meta){
+    each(this.$metas, function(i, meta) {
       head.appendChild(meta[0]);
-    })
+    });
 
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
@@ -307,8 +308,8 @@ CheckoutFrame.prototype = {
     }
   },
 
-  postMessage: function(response){
-    if(typeof response !== 'object'){
+  postMessage: function(response) {
+    if (typeof response !== 'object') {
       // TODO roll
     }
     response.id = this.rzp.id;
@@ -316,24 +317,23 @@ CheckoutFrame.prototype = {
     this.el.contentWindow.postMessage(response, '*');
   },
 
-  onmessage: function(e){
+  onmessage: function(e) {
     var data;
-    try{
+    try {
       data = JSON.parse(e.data);
-    }
-    catch(err){
+    } catch (err) {
       return;
     }
     var event = data.event;
     var rzp = this.rzp;
     // source check
-    if(
+    if (
       !e.origin ||
       data.source !== 'frame' ||
       // (event !== 'load' && rzp && rzp.id !== data.id) ||
       e.source !== this.el.contentWindow
       // this.el.src.indexOf(e.origin)
-    ){
+    ) {
       return;
     }
     data = data.data;
@@ -366,41 +366,38 @@ CheckoutFrame.prototype = {
     }
   },
 
-  onredirect: function(data){
+  onredirect: function(data) {
     discreet.redirect(data);
   },
 
-  onsubmit: function(data){
-    if(data.method === 'wallet'){
+  onsubmit: function(data) {
+    if (data.method === 'wallet') {
       // check if it was one of the external wallets
       var rzp = this.rzp;
-      each(
-        rzp.get('external.wallets'),
-        function(i, walletName){
-          if(walletName === data.wallet){
-            try{
-              rzp.get('external.handler').call(rzp, data);
-            } catch(e){
-              roll('merc', e);
-            }
+      each(rzp.get('external.wallets'), function(i, walletName) {
+        if (walletName === data.wallet) {
+          try {
+            rzp.get('external.handler').call(rzp, data);
+          } catch (e) {
+            roll('merc', e);
           }
         }
-      )
+      });
     }
   },
 
-  ondismiss: function(){
+  ondismiss: function() {
     this.close();
     invoke(this.rzp.get('modal.ondismiss'));
   },
 
-  onhidden: function(){
+  onhidden: function() {
     this.afterClose();
     invoke(this.rzp.get('modal.onhidden'));
   },
 
   // this is onsuccess method
-  oncomplete: function(data){
+  oncomplete: function(data) {
     this.close();
     var rzp = this.rzp;
     track(rzp, 'checkout_success', data);
@@ -414,25 +411,25 @@ CheckoutFrame.prototype = {
     );
   },
 
-  onpaymenterror: function(data){
-    try{
+  onpaymenterror: function(data) {
+    try {
       this.rzp.emit('payment.error', data);
-    } catch(e){}
+    } catch (e) {}
   },
 
-  onfailure: function(data){
+  onfailure: function(data) {
     this.ondismiss();
     alert('Payment Failed.\n' + data.error.description);
     this.onhidden();
   },
 
-  onfault: function(message){
+  onfault: function(message) {
     this.rzp.close();
     alert('Oops! Something went wrong.\n' + message);
     this.afterClose();
   },
 
-  afterClose: function(){
+  afterClose: function() {
     frameContainer.style.display = 'none';
   }
-}
+};
