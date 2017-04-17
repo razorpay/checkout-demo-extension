@@ -69,7 +69,7 @@ function isArray(x) {
 }
 
 function isNode(x) {
-  return x instanceof Node;
+  return x instanceof Element;
 }
 
 function isEmptyObject(obj) {

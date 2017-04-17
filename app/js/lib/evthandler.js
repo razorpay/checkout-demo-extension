@@ -50,7 +50,7 @@ var EvtHandler;
       }
 
       // if el is not specified, i.e. number of args is 2 or 3
-      if (!(el instanceof Node)) {
+      if (!(el instanceof Element)) {
         useCapture = el;
         el = this.el;
       }
