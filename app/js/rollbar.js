@@ -29,7 +29,8 @@ function postRollbar(msg, trace, level, isStack) {
       trace: {
         frames: trace.stack,
         exception: {
-          class: trace.name || '(unknown)',
+          // prettier-ignore
+          'class': trace.name || '(unknown)',
           message: trace.message
         }
       }

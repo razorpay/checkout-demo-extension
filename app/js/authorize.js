@@ -545,7 +545,8 @@ var responseTypes = {
     this.emit('otp.required');
   },
 
-  return: function(request) {
+  // prettier-ignore
+  'return': function(request) {
     discreet.redirect(request);
   }
 };
