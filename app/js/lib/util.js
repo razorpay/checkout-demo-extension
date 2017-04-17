@@ -22,6 +22,7 @@ function isua(ua_regex) {
   return ua_regex.test(ua);
 }
 
+var is_ie8 = !window.addEventListener;
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
 

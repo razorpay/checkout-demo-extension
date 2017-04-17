@@ -54,9 +54,11 @@ var EvtHandler;
         useCapture = el;
         el = this.el;
       }
-      this.listeners.push(
-        getListener(el, event, binder(callback, this.thisArg), useCapture)
-      );
+      if (!is_ie8) {
+        this.listeners.push(
+          getListener(el, event, binder(callback, this.thisArg), useCapture)
+        );
+      }
       return this;
     },
 

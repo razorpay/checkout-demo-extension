@@ -420,6 +420,10 @@ Session.prototype = {
       classes.push('android4');
     }
 
+    if (is_ie8) {
+      classes.push('ie8');
+    }
+
     return classes.join(' ');
   },
 
