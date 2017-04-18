@@ -14,11 +14,23 @@
     `
       var card = item.card;
       var bank = card.issuer;
-      var plans = bank && card.emi && emi_options.banks[bank] && _.amount >= emi_options.min;
+      var banks = emi_options.banks;
       var network = networks[card.network];
+      var min_amount = emi_options.min;
+
+      if (network === 'amex') {
+        bank = 'AMEX';
+        banks = emi_options.other_banks;
+        min_amount = emi_options.amex_min;
+      }
+
+      var plans = bank &&
+        card.emi &&
+        _.amount > min_amount &&
+        banks[bank];
       var cvv_digits = network === 'amex' ? 4 : 3;
     `
-    <div tabIndex="0" class="saved-card left-card`?!i` checked`?`"`?plans` emi bank='`=card.issuer`'`?` token=`=item.token`>
+    <div tabIndex="0" class="saved-card left-card`?!i` checked`?`"`?plans` emi bank='`=bank`'`?` token=`=item.token`>
       <div class="help up">EMI is not available on this card</div>
       <div class='cardtype' cardtype='`=network`'></div>
       <div class="saved-inner">
