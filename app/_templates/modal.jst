@@ -1,6 +1,7 @@
 `
 var o = _.get;
 var ecod = o('ecod');
+var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
@@ -133,13 +134,13 @@ else
                     <span>&#x2139;</span> All credit cards are supported for this recurring subscription.
                   </div>
                 `?`
-                `?_.offers.card`
-                  <div class="pad" style="position:absolute;bottom:20px;pointer-events:none;font-size:12px">
-                    `?_.offers.name`
-                      <div class="text-btn"><strong>`=_.offers.name`</strong></div>
+                `?cardOffer`
+                  <div class="pad" id="card-offer">
+                    `?cardOffer.name`
+                      <div class="text-btn"><strong>`=cardOffer.name`</strong></div>
                     `?`
-                    `?_.offers.display_text`
-                      `=_.offers.display_text`
+                    `?cardOffer.display_text`
+                      `=cardOffer.display_text`
                     `?`
                   </div>
                 `?`
