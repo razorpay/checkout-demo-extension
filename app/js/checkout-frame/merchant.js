@@ -75,6 +75,10 @@ sessProto.netbanks = {
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
 
 var freqWallets = (sessProto.walletData = {
+  amazonpay: {
+    h: 28,
+    col: walletPrefix + 'amazonpay.png'
+  },
   paytm: {
     h: 18,
     col: walletPrefix + 'paytm.png'
