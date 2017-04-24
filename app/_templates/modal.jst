@@ -391,7 +391,9 @@ else
                   `~_.offers.wallet:i:w`
                     <div id="`=i`-info" class="offer-info">
                       <li>`=w.name`</li>
-                      `=w.terms`
+                      `?w.display_text`
+                        `=w.display_text`
+                      `?`
                     </div>
                   `~`
                 </div>
