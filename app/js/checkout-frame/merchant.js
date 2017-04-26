@@ -75,6 +75,10 @@ sessProto.netbanks = {
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
 
 var freqWallets = (sessProto.walletData = {
+  amazonpay: {
+    h: 28,
+    col: walletPrefix + 'amazonpay.png'
+  },
   paytm: {
     h: 18,
     col: walletPrefix + 'paytm.png'
@@ -124,6 +128,7 @@ var freqWallets = (sessProto.walletData = {
 var emi_options = (sessProto.emi_options = {
   // minimum amount to enable emi
   min: 3000 * 100 - 1,
+  amex_min: 5000 * 100 - 1,
   selected: 'KKBK',
   banks: {
     KKBK: {
@@ -191,6 +196,18 @@ var emi_options = (sessProto.emi_options = {
         6: 13,
         9: 13,
         12: 13
+      }
+    }
+  },
+  other_banks: {
+    AMEX: {
+      patt: /37(693|9397|98(6[1-3,7-9]|7[0-2,6-8]))/,
+      name: 'American Express',
+      plans: {
+        3: 15,
+        6: 15,
+        9: 15,
+        12: 15
       }
     }
   }
