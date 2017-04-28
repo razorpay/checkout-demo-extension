@@ -1,6 +1,7 @@
 `
 var o = _.get;
 var ecod = o('ecod');
+var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
@@ -133,13 +134,13 @@ else
                     <span>&#x2139;</span> All credit cards are supported for this recurring subscription.
                   </div>
                 `?`
-                `?preferences.offers`
-                  <div class="pad" style="position:absolute;bottom:20px;pointer-events:none;font-size:12px">
-                    `?preferences.offers.name`
-                      <div class="text-btn"><strong>`=preferences.offers.name`</strong></div>
+                `?cardOffer`
+                  <div class="pad" id="card-offer">
+                    `?cardOffer.name`
+                      <div class="text-btn"><strong>`=cardOffer.name`</strong></div>
                     `?`
-                    `?preferences.offers.display_text`
-                      `=preferences.offers.display_text`
+                    `?cardOffer.display_text`
+                      `=cardOffer.display_text`
                     `?`
                   </div>
                 `?`
@@ -351,8 +352,8 @@ else
                         <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
                         <label for="wallet-radio-`=w.name`" class="radio-label mfix">
                           <img class="wallet-button colored mchild item-inner l-`=count`" style="height:`=w.h`px" src="`=w.col`">
-                          `?w.offer`
-                            <span class="offer">`=w.offer`% Cashback</span>
+                          `?_.offers.wallet[w.name]`
+                            <span class="offer">`=_.offers.wallet[w.name].name`</span>
                           `?`
                         </label>
                       </div>
@@ -387,35 +388,13 @@ else
                     <div class="clear"></div>
                     <span class="help">Please select one of the wallets</span>
                   </div>
-                  `?airtelmoneyWallet.offer`
-                    <div id="airtelmoney-info" class="offer-info">
-                      <li>`=airtelmoneyWallet.offerDesc`</li>
-                      <li>- `=airtelmoneyWallet.maxCBDesc`</li>
-                      <li>- `=airtelmoneyWallet.offerValidDesc`</li>
+                  `~_.offers.wallet:i:w`
+                    <div id="`=i`-info" class="offer-info">
+                      `?w.display_text`
+                        `=w.display_text`
+                      `?`
                     </div>
-                  `?`
-                  `?freechargeWallet.offer`
-                  <div id="freecharge-info" class="offer-info">
-                    <li>`=freechargeWallet.offerDesc`</li>
-                    <li>- `=freechargeWallet.maxCBDesc`</li>
-                    <li>- `=freechargeWallet.offerValidDesc`</li>
-                  </div>
-                  `?`
-
-                  `?mobikwikWallet.offer`
-                    <div id="mobikwik-info" class="offer-info">
-                      <li>`=mobikwikWallet.offerDesc`</li>
-                      <li>- `=mobikwikWallet.maxCBDesc`</li>
-                      <li>- `=mobikwikWallet.offerValidDesc`</li>
-                    </div>
-                  `?`
-                  `?olamoneyWallet.offer`
-                    <div id="olamoney-info" class="offer-info">
-                      <li>`=olamoneyWallet.offerDesc`</li>
-                      <li>- `=olamoneyWallet.maxCBDesc`</li>
-                      <li>- `=olamoneyWallet.offerValidDesc`</li>
-                    </div>
-                  `?`
+                  `~`
                 </div>
               `?`
               `?method.upi`
