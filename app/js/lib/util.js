@@ -25,6 +25,8 @@ function isua(ua_regex) {
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
 
+var ua_old_android = isua(/Android [2-4]/);
+
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !isua(/Safari/)
 // note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
@@ -33,7 +35,7 @@ var ua_prefer_redirect =
     /; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/
   ) ||
   (ua_iOS && (isua(/ GSA\//) || !isua(/Safari/))) ||
-  (isua(/Android [2-4]/) && !isua(/Chrome/));
+  (ua_old_android && !isua(/Chrome/));
 
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
 var shouldFixFixed = isua(/iPhone|Android 2\./);
