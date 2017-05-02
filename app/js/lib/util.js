@@ -45,6 +45,8 @@ if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }
 
+var ua_ip7 = isua(/iPhone OS 7/);
+
 /* simple checks */
 function isBoolean(x) {
   return typeof x === 'boolean';
