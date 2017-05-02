@@ -386,6 +386,7 @@ Session.prototype = {
 
   getEl: function() {
     if (!this.el) {
+      var classes = this.getClasses();
       var r = this.r;
       var ecod = r.get('ecod');
       if (ecod) {
@@ -415,7 +416,7 @@ Session.prototype = {
         r.set('theme.hide_topbar', true);
         gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
       }
-      $(this.el).addClass(this.getClasses());
+      $(this.el).addClass(classes);
     }
     return this.el;
   },
