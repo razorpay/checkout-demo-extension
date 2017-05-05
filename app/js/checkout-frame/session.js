@@ -519,6 +519,18 @@ Session.prototype = {
       $('#top-right').hide();
     }
     if (this.methods.count === 1) {
+      var self = this;
+      /* Please don't change the order, this code is order senstive */
+      ['card', 'emi', 'netbanking', 'upi', 'wallet'].some(function(methodName) {
+        if (self.methods[methodName]) {
+          self.oneMethod = methodName;
+          var el = document.createElement('span');
+          el.className = 'proceed-btn';
+          el.innerHTML = 'Pay by ' + tab_titles[methodName];
+          $('#footer').append(el);
+          return true;
+        }
+      });
       $(this.el).addClass('one-method');
       $('.payment-option').addClass('submit-button button');
     }
@@ -1362,6 +1374,13 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    if (this.oneMethod && !this.tab) {
+      setTimeout(function() {
+        window.scrollTo(0, 100);
+      });
+      return this.switchTab(this.oneMethod);
+    }
+
     preventDefault(e);
     var screen = this.screen;
 

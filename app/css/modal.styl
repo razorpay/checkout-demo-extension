@@ -423,15 +423,16 @@ i {
       opacity: 0;
     }
   }
-  &.sub {
-    #footer {
-      pointer-events: auto;
-      opacity: 1;
-      transform: none;
-    }
-    #form-fields {
-      border-radius: 0;
-    }
+}
+
+#body.sub, #container.one-method {
+  #footer {
+    pointer-events: auto;
+    opacity: 1;
+    transform: none;
+  }
+  #form-fields {
+    border-radius: 0;
   }
 }
 
@@ -874,42 +875,23 @@ $outline = #ddd;
 }
 
 #container.one-method {
-  #form-fields .legend {
+  .pay-btn {
+    display: none;
+  }
+  #body.sub {
+    .pay-btn {
+      display: block;
+    }
+    .proceed-btn {
+      display: none;
+    }
+  }
+  #form-fields .legend, #payment-options {
     display: none;
   }
 
   #saved-cards-container {
     max-height: 156px;
-  }
-
-  #payment-options {
-    overflow: initial;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -50px;
-  }
-
-  .payment-option {
-    border: 0;
-    opacity: 1;
-    height: 100%;
-
-    i {
-      display: none;
-    }
-
-    label {
-      text-transform: uppercase;
-      padding: initial;
-      height: initial;
-      background: initial;
-      letter-spacing: 1px
-
-      &::before {
-        content: 'Pay with ';
-      }
-    }
   }
 }
 
