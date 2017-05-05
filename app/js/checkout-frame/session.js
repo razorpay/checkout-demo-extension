@@ -520,6 +520,7 @@ Session.prototype = {
     }
     if (this.methods.count === 1) {
       var self = this;
+      /* Please don't change the order, this code is order senstive */
       ['card', 'emi', 'netbanking', 'upi', 'wallet'].some(function(methodName) {
         if (self.methods[methodName]) {
           self.oneMethod = methodName;
