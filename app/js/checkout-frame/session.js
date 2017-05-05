@@ -1374,6 +1374,9 @@ Session.prototype = {
 
   preSubmit: function(e) {
     if (this.oneMethod && !this.tab) {
+      setTimeout(function() {
+        window.scrollTo(0, 100);
+      });
       return this.switchTab(this.oneMethod);
     }
 
