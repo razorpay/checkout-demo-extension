@@ -695,6 +695,10 @@ Session.prototype = {
   },
 
   bindEvents: function() {
+    if (is_ie8) {
+      this.bindIeEvents();
+    }
+
     this.on('focus', '#body', 'input', 'focus', true);
     this.on('blur', '#body', 'input', 'blur', true);
     this.on(
@@ -850,6 +854,23 @@ Session.prototype = {
     this.click('#fd-hide', this.hideErrorMessage);
   },
 
+  bindIeEvents: function() {
+    /* Binding IE8 events */
+    var self = this;
+
+    self.click('#body', 'radio-item', function(e) {
+      var target = $(e.delegateTarget);
+      var radio = target.find('input[type=radio]')[0];
+      each($$('.radio-item.active'), function(idx, item) {
+        $(item).removeClass('active');
+      });
+      target.addClass('active');
+      // debugger
+      radio.checked = true;
+      this.selectBankRadio({ target: radio });
+    });
+  },
+
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
     if (ua_iPhone) {
@@ -872,6 +893,10 @@ Session.prototype = {
     var $parent = $(el.parentNode);
 
     $parent.toggleClass('filled', value);
+
+    if (is_ie8) {
+      return toggleInvalid($parent, true);
+    }
 
     // validity check past this
     if (!(required || pattern)) {
@@ -1183,9 +1208,12 @@ Session.prototype = {
   switchBank: function(e) {
     var val = e.target.value;
     each($$('#netb-banks input'), function(i, radio) {
+      $(radio.parentNode).removeClass('active');
       if (radio.value === val) {
+        $(radio.parentNode).addClass('active');
         radio.checked = true;
       } else if (radio.checked) {
+        $(radio.parentNode).removeClass('active');
         radio.checked = false;
       }
     });
