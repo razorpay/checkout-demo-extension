@@ -1,0 +1,40 @@
+@require 'common';
+
+.ie8 {
+  .help,
+  #top-right
+  {
+    display: none;
+  }
+  #footer {
+    display: none;
+    .otp-btn {
+      display: none;
+    }
+  }
+  .sub #footer {
+    display: block;
+  }
+  .mchild {
+    top: 16px;
+  }
+
+  .elem {
+    label {
+      top: 8px;
+    }
+  }
+  .radio-item.active label {
+    background: $bgd;
+  }
+
+  #footer span {
+    position: relative;
+  }
+}
+
+@css {
+  .ie8 #overlay {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000);
+  }
+}

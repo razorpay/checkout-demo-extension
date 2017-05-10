@@ -420,7 +420,7 @@ function showModal(session) {
   }
 
   session.optional = arr2obj(preferences.optional);
-  if (cookieDisabled || session.optional.contact) {
+  if (cookieDisabled || session.optional.contact || is_ie8) {
     options.remember_customer = false;
   }
 

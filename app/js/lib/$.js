@@ -358,7 +358,7 @@ $.ajax = function(opts) {
   var data = opts.data || null;
 
   // ghostery
-  if (chromeVersion <= 33) {
+  if (chromeVersion && chromeVersion <= 33) {
     invoke('send', xhr, data, 1000);
   } else {
     xhr.send(data);

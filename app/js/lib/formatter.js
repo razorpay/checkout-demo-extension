@@ -13,7 +13,7 @@ var Formatter;
       handlers = Formatter.rules[handlers];
     }
 
-    if (!handlers || !(el instanceof Node)) {
+    if (!handlers || !(el instanceof Element)) {
       return false;
     } else {
       for (var i in handlers) {
