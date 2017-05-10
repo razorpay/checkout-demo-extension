@@ -153,6 +153,7 @@ var RazorpayDefaults = (Razorpay.defaults = {
   currency: 'INR',
   order_id: '',
   invoice_id: '',
+  subscription_id: '',
   notes: null,
   callback_url: '',
   redirect: false,
