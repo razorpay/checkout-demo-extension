@@ -314,9 +314,11 @@ function cancel_upi(session) {
 function Session(options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
+  this.set = this.r.set;
   this.tab = this.screen = '';
   this.listeners = [];
   this.bits = [];
+  this.UDACITY_KEY = 'rzp_test_1DP5mmOlF5G5ag';
 }
 
 Session.prototype = {
@@ -343,6 +345,7 @@ Session.prototype = {
     }
 
     var getter = this.get;
+    var setter = this.set;
 
     if (!this.r.isLiveMode()) {
       classes.push('test');
@@ -354,6 +357,11 @@ Session.prototype = {
 
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
+    }
+
+    if (getter('key') === this.UDACITY_KEY) {
+      classes.push('address');
+      setter('address', true);
     }
 
     if (getter('theme.emi_mode')) {
@@ -843,7 +851,6 @@ Session.prototype = {
         $(item).removeClass('active');
       });
       target.addClass('active');
-      // debugger
       radio.checked = true;
       this.selectBankRadio({ target: radio });
     });
@@ -1500,6 +1507,12 @@ Session.prototype = {
       }
     }
     delete data.app_token;
+
+    var $address = $('#address');
+
+    if ($address[0]) {
+      request.address = $address.val();
+    }
 
     Razorpay.sendMessage({
       event: 'submit',

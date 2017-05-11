@@ -1,0 +1,56 @@
+@require 'common';
+
+
+.address #form-common {
+  padding-top: 28px;
+
+  textarea {
+    width: 100%;
+    resize: none;
+  }
+
+  .elem {
+    textarea, input {
+      padding-top: 0;
+    }
+
+    label {
+      top: 0;
+    }
+  }
+
+  .elem-wrap {
+    height: 48px;
+  }
+
+  .elem-address textarea{
+    max-height: 45px;
+  }
+
+  .filled,
+  .focused {
+    label {
+      transform: scale(1) translateY(0);
+      opacity: 0;
+    }
+
+    textarea {
+      opacity: 1;
+    }
+  }
+
+  .pad {
+    padding-bottom: 4px
+  }
+
+  #payment-options {
+    i {
+      font-size: 32px;
+    }
+
+    label {
+      padding-top: 16px;
+      height: 86px;
+    }
+  }
+}

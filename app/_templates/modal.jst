@@ -1,6 +1,7 @@
 `
 var o = _.get;
 var ecod = o('ecod');
+var address = o('address');
 var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
@@ -106,6 +107,13 @@ else
                     <label>Email`?_.optional.email` (Optional)`?`</label>
                     <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?`>
                   </div></div>
+                  `?address`
+                  <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
+                    <div class="help">Address should be atleast 10 characters long</div>
+                    <label>Address</label>
+                    <textarea class="input" name="address" type="address" id="address" required pattern="[\s\S]{10}" rows='2'></textarea>
+                  </div></div>
+                  `?`
                   `?order.bank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
