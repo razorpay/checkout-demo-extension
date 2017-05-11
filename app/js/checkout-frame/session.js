@@ -318,7 +318,7 @@ function Session(options) {
   this.tab = this.screen = '';
   this.listeners = [];
   this.bits = [];
-  this.UDACITY_KEY = 'rzp_test_1DP5mmOlF5G5ag';
+  this.UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 }
 
 Session.prototype = {
