@@ -129,6 +129,7 @@ function Payment(data, params, r) {
   this.fees = params.fees;
   this.powerwallet = params.powerwallet || (data && data.method === 'upi');
   this.message = params.message;
+  this.address = params.address;
   this.tryPopup();
 
   if (params.paused) {
@@ -195,6 +196,11 @@ Payment.prototype = {
 
     if (!data.key_id) {
       data.key_id = getOption('key');
+    }
+
+    if (this.address) {
+      data.notes = data.notes || {};
+      data.notes.address = this.address;
     }
 
     // api needs this flag to decide between redirect/otp
