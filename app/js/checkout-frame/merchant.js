@@ -433,10 +433,14 @@ function showModalWithSession(session) {
 
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
+  var subscription = preferences.subscription;
   var get = session.get;
 
   if (invoice && invoice.amount) {
     get().amount = invoice.amount;
+  }
+  if (subscription && subscription.auth_amount) {
+    get().amount = subscription.auth_amount;
   }
   if (order && order.bank && get('callback_url')) {
     get().redirect = true;

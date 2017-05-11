@@ -153,6 +153,7 @@ var RazorpayDefaults = (Razorpay.defaults = {
   currency: 'INR',
   order_id: '',
   invoice_id: '',
+  subscription_id: '',
   notes: null,
   callback_url: '',
   redirect: false,
@@ -212,7 +213,7 @@ function makePrefParams(rzp) {
     var params = {};
     params.key_id = getter('key');
 
-    each(['order_id', 'customer_id', 'invoice_id'], function(i, key) {
+    each(['order_id', 'customer_id', 'invoice_id', 'subscription_id', 'recurring'], function(i, key) {
       var value = getter(key);
       if (value) {
         params[key] = value;
