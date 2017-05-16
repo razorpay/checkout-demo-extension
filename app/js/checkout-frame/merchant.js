@@ -204,10 +204,12 @@ var emi_options = (sessProto.emi_options = {
       patt: /37(693|9397|98(6[1-3,7-9]|7[0-2,6-8]))/,
       name: 'American Express',
       plans: {
-        3: 15,
-        6: 15,
-        9: 15,
-        12: 15
+        3: 12,
+        6: 12,
+        9: 12,
+        12: 12,
+        18: 12,
+        24: 12
       }
     }
   }
