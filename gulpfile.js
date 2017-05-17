@@ -57,7 +57,11 @@ function handleError(err) {
 }
 
 const stylusOptions = {
-  use: [autoprefixer('ie 8', 'android 2.2', 'last 10 versions', 'iOS 7')]
+  use: [
+    autoprefixer({
+      browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7']
+    })
+  ]
 };
 
 gulp.task('css', () => {
