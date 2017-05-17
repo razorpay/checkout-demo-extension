@@ -635,8 +635,16 @@ window.handleMessage = function(message) {
     $(doc).addClass('embedded');
   }
 
-  if (message.data) {
-    session.data = message.data;
+  var data = message.data;
+  if (data) {
+    if (isString(data)) {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {}
+    }
+    if (isNonNullObject(data)) {
+      session.data = data;
+    }
   }
 
   if (message.params) {
