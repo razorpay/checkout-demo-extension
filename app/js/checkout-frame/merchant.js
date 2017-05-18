@@ -5,6 +5,9 @@ var preferences = window.preferences,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
 
+var contactPattern = /^\+?[0-9]{8,15}$/;
+var emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+
 function getSession(id) {
   return sessions[id || _uid];
 }
