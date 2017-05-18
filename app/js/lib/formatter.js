@@ -1,6 +1,4 @@
 var Formatter;
-window.contactPattern = /^\+?[0-9]{8,15}$/;
-window.emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
 (function() {
   var noop = function(value) {
