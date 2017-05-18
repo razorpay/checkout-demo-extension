@@ -1248,13 +1248,22 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
-    if (this.optional.contact) {
+    var prefillEmail = this.get('prefill.email');
+    var prefillContact = this.get('prefill.contact');
+
+    if (
+      this.optional.contact &&
+      !(prefillContact && contactPattern.test(prefillContact))
+    ) {
       delete data.contact;
     } else {
       data.contact = data.contact.replace(/\ /g, '');
     }
 
-    if (this.optional.email) {
+    if (
+      this.optional.email &&
+      !(this.get('prefill.email') && emailPattern.test(data.email))
+    ) {
       delete data.email;
     }
 
