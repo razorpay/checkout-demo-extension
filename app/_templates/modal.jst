@@ -21,7 +21,7 @@ var amount_figure = (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else if (o('currency')==='INR')
-  amount = "₹" + amount_figure;
+  amount = "₹<span class='amount-figure'>" + amount_figure + "</span>";
 else
   amount = "$" + amount_figure;
 `
@@ -107,6 +107,12 @@ else
                     <label>Email`?_.optional.email` (Optional)`?`</label>
                     <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?`>
                   </div></div>
+                  <div class="elem-wrap" id="elem-wrap-amount"><div class="elem elem-amount">
+                    <div class="help">Please enter an amount between `=_.getDecimalAmount(_.order.min_amount)` and `=_.getDecimalAmount(_.order.amount)`</div>
+                    <label>Amount</label>
+                    <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
+                  </div></div>
+                  <div class="submit-button">Next</div>
                   `?address`
                   <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
                     <div class="help">Address should be atleast 10 characters long</div>

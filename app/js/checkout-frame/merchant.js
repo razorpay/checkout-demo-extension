@@ -447,6 +447,10 @@ function showModalWithSession(session) {
   if (subscription && subscription.auth_amount) {
     get().amount = subscription.auth_amount;
   }
+  if (order && order.amount) {
+    get().amount = order.amount;
+  }
+
   if (order && order.bank && get('callback_url')) {
     get().redirect = true;
     return session.r.createPayment({

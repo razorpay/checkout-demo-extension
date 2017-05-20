@@ -322,6 +322,8 @@ function Session(options) {
 }
 
 Session.prototype = {
+  getDecimalAmount: getDecimalAmount,
+
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -395,6 +397,10 @@ Session.prototype = {
 
     if (is_ie8) {
       classes.push('ie8');
+    }
+
+    if (this.extraFields) {
+      classes.push('extra');
     }
 
     return classes.join(' ');
@@ -680,7 +686,22 @@ Session.prototype = {
     this.r.topupWallet();
   },
 
+  extraNext: function() {
+    var commonInvalid = $('#pad-common .invalid');
+    if (commonInvalid[0]) {
+      return commonInvalid.addClass('mature').$('.input').focus();
+    }
+
+    var amountValue = gel('amount-value').value;
+    each($$('.amount-figure'), function(i, el) {
+      el.innerHTML = amountValue;
+    });
+    this.get().amount = 100 * amountValue;
+    $(this.el).addClass('show-methods');
+  },
+
   bindEvents: function() {
+    this.click('#pad-common .submit-button', 'extraNext');
     if (is_ie8) {
       this.bindIeEvents();
     }
@@ -913,6 +934,8 @@ Session.prototype = {
     self.refresh();
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
+
+    var el_amount = gel('amount-value');
     if (self.methods.card || self.methods.emi) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
@@ -977,6 +1000,19 @@ Session.prototype = {
       delegator.cvv = delegator.add('number', el_cvv).on('change', function() {
         self.input(this.el);
       });
+    }
+
+    if (el_amount) {
+      delegator.amount = delegator
+        .add('amount', el_amount)
+        .on('change', function() {
+          self.input(el_amount);
+          var value = this.value * 100;
+
+          var isValid =
+            self.order.min_amount <= value && value <= self.order.amount;
+          toggleInvalid($(this.el.parentNode), isValid);
+        });
     }
     delegator.contact = delegator
       .add('phone', gel('contact'))
@@ -1422,6 +1458,9 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    if (this.extraFields && !$(this.el).hasClass('show-methods')) {
+      return this.extraNext();
+    }
     if (this.oneMethod && !this.tab) {
       setTimeout(function() {
         window.scrollTo(0, 100);

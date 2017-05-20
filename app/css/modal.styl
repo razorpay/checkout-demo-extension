@@ -895,7 +895,24 @@ $outline = #ddd;
   }
 }
 
-#container.no-details {
+#container.extra {
+  #pad-common {
+    .submit-button {
+      opacity: 1;
+      color: #fff;
+      margin-bottom: -1px;
+      cursor: pointer;
+    }
+    & + div {
+      display: none;
+    }
+  }
+}
+
+#container.no-details, #container.extra.show-methods {
+  #pad-common + div {
+    display: block;
+  }
   #pad-common,
   #top-right {
     display: none;
