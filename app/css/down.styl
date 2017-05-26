@@ -1,13 +1,22 @@
 .down
-  margin: 2px 24px;
-  padding: 6px 0px 8px 10px;
-  background: #FFF4BB;
+  display: none;
+  padding: 10px;
+  background: #fafafa;
   border-radius: 2px;
   color: #345;
   font-size: 12px;
-  border: 1px solid #EEDDAB;
+  border: 1px solid #eaebec;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  &.vis
+    display: block
   svg
-    float: left;
-    margin-right: 9px;
-    stroke: #EEDDAB;
-    opacity: 0.6;
+    fill: #ED232A;
+    opacity: 0.8;
+    position: relative;
+    vertical-align: top;
+    left: -4px;
+    top: 1px;
