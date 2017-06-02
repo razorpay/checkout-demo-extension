@@ -943,6 +943,13 @@ Session.prototype = {
           $(el_cvv)
             .toggleClass('amex', type === 'amex')
             .toggleClass('maestro', type === 'maestro');
+
+          if (!preferences.methods.amex && type === 'amex') {
+            $('#elem-card').addClass('noamex');
+          } else {
+            $('#elem-card').removeClass('noamex');
+          }
+
           self.input(el_cvv);
 
           // card icon element
@@ -951,7 +958,12 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid();
+          var isValid = this.isValid(), type = this.type;
+
+          if (!preferences.methods.amex && type === 'amex') {
+            isValid = false;
+          }
+
           // set validity classes
           toggleInvalid($(this.el.parentNode), isValid);
 
