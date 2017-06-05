@@ -311,6 +311,8 @@ function cancel_upi(session) {
   });
 }
 
+var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
+
 function Session(options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
@@ -318,7 +320,6 @@ function Session(options) {
   this.tab = this.screen = '';
   this.listeners = [];
   this.bits = [];
-  this.UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 }
 
 Session.prototype = {
@@ -359,7 +360,7 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    if (getter('key') === this.UDACITY_KEY) {
+    if (getter('key') === UDACITY_KEY) {
       classes.push('address');
       setter('address', true);
     }
@@ -1192,6 +1193,7 @@ Session.prototype = {
 
   switchBank: function(e) {
     var val = e.target.value;
+    this.checkDown(val);
     each($$('#netb-banks input'), function(i, radio) {
       $(radio.parentNode).removeClass('active');
       if (radio.value === val) {
@@ -1204,9 +1206,18 @@ Session.prototype = {
     });
   },
 
+  checkDown: function(val) {
+    $('.down')
+      .toggleClass('vis', indexOf(this.down, val) !== -1)
+      .$('.text')
+      .html(this.methods.netbanking[val]);
+  },
+
   selectBankRadio: function(e) {
+    var val = e.target.value;
+    this.checkDown(val);
     var select = gel('bank-select');
-    select.value = e.target.value;
+    select.value = val;
     this.input(select);
   },
 
