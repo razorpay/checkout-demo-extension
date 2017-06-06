@@ -436,8 +436,6 @@ function showModal(session) {
   showModalWithSession(session);
 }
 function showModalWithSession(session) {
-  setPaymentMethods(session);
-
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
   var subscription = preferences.subscription;
@@ -462,6 +460,7 @@ function showModalWithSession(session) {
       method: 'netbanking'
     });
   }
+  setPaymentMethods(session);
   session.render();
   Razorpay.sendMessage({ event: 'render' });
 
