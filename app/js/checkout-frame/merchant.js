@@ -154,10 +154,7 @@ var emi_options = (sessProto.emi_options = {
       plans: {
         3: 12,
         6: 12,
-        9: 13,
-        12: 13,
-        18: 15,
-        24: 15
+        9: 13
       }
     },
 
