@@ -901,15 +901,18 @@ $outline = #ddd;
 
 #container.extra {
   #pad-common {
-    .submit-button {
-      opacity: 1;
-      color: #fff;
-      margin-bottom: -1px;
-      cursor: pointer;
-    }
     & + div {
       display: none;
     }
+  }
+
+  #next-button {
+    opacity: 1;
+    color: #fff;
+    margin-bottom: -1px;
+    cursor: pointer;
+    z-index: 1;
+    transform: translateY(0);
   }
 }
 
@@ -918,7 +921,8 @@ $outline = #ddd;
     display: block;
   }
   #pad-common,
-  #top-right {
+  #top-right,
+  #next-button  {
     display: none;
   }
   #form-common {

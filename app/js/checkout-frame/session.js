@@ -512,8 +512,8 @@ Session.prototype = {
         return;
       }
       this.saveAndClose();
-      this.isOpen = true;
     }
+    this.isOpen = true;
 
     this.getEl();
     this.fillData();
@@ -723,7 +723,7 @@ Session.prototype = {
   },
 
   bindEvents: function() {
-    this.click('#pad-common .submit-button', 'extraNext');
+    this.click('#next-button', 'extraNext');
     if (is_ie8) {
       this.bindIeEvents();
     }
@@ -1034,7 +1034,7 @@ Session.prototype = {
             ? self.order.amount_due
             : self.order.amount;
 
-          var isValid = 0 <= value && value <= maxAmount;
+          var isValid = 0 < value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
         });
     }
