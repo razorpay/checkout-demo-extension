@@ -107,11 +107,13 @@ else
                     <label>Email`?_.optional.email` (Optional)`?`</label>
                     <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?`>
                   </div></div>
+                  `?order.partial_payment`
                   <div class="elem-wrap" id="elem-wrap-amount"><div class="elem elem-amount">
-                    <div class="help">Please enter an amount between `=_.getDecimalAmount(_.order.min_amount)` and `=_.getDecimalAmount(_.order.amount)`</div>
+                    <div class="help">The amount can not be greater than `=_.getDecimalAmount(order.amount_due)`</div>
                     <label>Amount</label>
                     <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
                   </div></div>
+                  `?`
                   <div class="submit-button">Next</div>
                   `?address`
                   <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">

@@ -353,6 +353,14 @@ Session.prototype = {
       classes.push('test');
     }
 
+    if (this.forceRender) {
+      classes.push('rerender');
+    }
+
+    if (this.fontLoaded) {
+      classes.push('font-loaded');
+    }
+
     if (getter('theme.branding')) {
       classes.push('cob');
     }
@@ -408,6 +416,10 @@ Session.prototype = {
 
   getEl: function() {
     if (!this.el) {
+      if (this.order && this.order.partial_payment) {
+        this.extraFields = true;
+      }
+
       var classes = this.getClasses();
       var r = this.r;
       var ecod = r.get('ecod');
@@ -489,12 +501,19 @@ Session.prototype = {
     }
   },
 
-  render: function() {
-    if (this.isOpen) {
-      return;
+  render: function(options) {
+    options = options || {};
+
+    if (options.forceRender) {
+      this.forceRender = true;
+      this.close();
+    } else {
+      if (this.isOpen) {
+        return;
+      }
+      this.saveAndClose();
+      this.isOpen = true;
     }
-    this.saveAndClose();
-    this.isOpen = true;
 
     this.getEl();
     this.fillData();
@@ -583,6 +602,7 @@ Session.prototype = {
     }
     if (anchor.offsetWidth / anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
+      this.fontLoaded = true;
     } else if (retryCount < 25) {
       var self = this;
       fontTimeout = setTimeout(function() {
@@ -697,6 +717,8 @@ Session.prototype = {
       el.innerHTML = amountValue;
     });
     this.get().amount = 100 * amountValue;
+    setPaymentMethods(this);
+    this.render({ forceRender: true });
     $(this.el).addClass('show-methods');
   },
 
@@ -1008,9 +1030,11 @@ Session.prototype = {
         .on('change', function() {
           self.input(el_amount);
           var value = this.value * 100;
+          var maxAmount = self.order.partial_payment
+            ? self.order.amount_due
+            : self.order.amount;
 
-          var isValid =
-            self.order.min_amount <= value && value <= self.order.amount;
+          var isValid = 0 <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
         });
     }
@@ -1481,7 +1505,7 @@ Session.prototype = {
 
     this.refresh();
     var data = (this.payload = this.getPayload());
-    if (this.order) {
+    if (this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }

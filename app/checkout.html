@@ -29,15 +29,22 @@
           "paytm":true,
           "mobikwik":false,
           "payzapp":false
-        }
+        },
+        emi: true
       },
       options: {
         theme: {
           color: 'red'
         }
+      },
+      "order": {
+        "partial_payment": true,
+        "amount": 4000000,
+        "amount_paid": 0,
+        "amount_due": 3900000
       }
     }
-    window.preferences = null;
+    // window.preferences = null;
     </script>
   </body>
   <!-- build:js checkout-frame.js -->

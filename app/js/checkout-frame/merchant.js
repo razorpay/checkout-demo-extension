@@ -277,6 +277,8 @@ function setPaymentMethods(session) {
   if (methods.emi && !emiMethod) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
+  } else {
+    tab_titles.card = 'Card';
   }
 
   // php encodes blank object as blank array
@@ -448,7 +450,7 @@ function showModalWithSession(session) {
     get().amount = subscription.auth_amount;
   }
   if (order && order.amount) {
-    get().amount = order.amount;
+    get().amount = order.partial_payment ? order.amount_due : order.amount;
   }
 
   if (order && order.bank && get('callback_url')) {
