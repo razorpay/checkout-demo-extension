@@ -178,7 +178,11 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function(rzp) {
-    var $el = $(this.el);
+    var $el = $(this.el).css({
+      // by the time checkout opens, other plugins might resize iframe
+      width: '100%',
+      height: '100%'
+    });
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
     appendLoader($parent, parent);
