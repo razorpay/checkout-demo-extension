@@ -653,6 +653,10 @@ window.handleMessage = function(message) {
     $(doc).addClass('embedded');
   }
 
+  if (message.device_token) {
+    qpmap.device_token = message.device_token;
+  }
+
   var data = message.data;
   if (data) {
     if (isString(data)) {
