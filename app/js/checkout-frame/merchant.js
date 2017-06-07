@@ -444,8 +444,8 @@ function showModalWithSession(session) {
   if (invoice && invoice.amount) {
     get().amount = invoice.amount;
   }
-  if (subscription && subscription.auth_amount) {
-    get().amount = subscription.auth_amount;
+  if (subscription && subscription.amount) {
+    get().amount = subscription.amount;
   }
   if (order && order.amount) {
     get().amount = order.partial_payment ? order.amount_due : order.amount;
