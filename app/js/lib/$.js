@@ -188,11 +188,22 @@ $.prototype = {
     var style = this.prop('style');
     if (style) {
       if (arguments.length === 1) {
-        return style[prop];
+        if (isNonNullObject(prop)) {
+          each(
+            prop,
+            function(propName, value) {
+              this.css(propName, value);
+            },
+            this
+          );
+        } else {
+          return style[prop];
+        }
+      } else {
+        try {
+          style[prop] = value;
+        } catch (e) {} // IE can not set invalid css rules without throwing up.
       }
-      try {
-        style[prop] = value;
-      } catch (e) {} // IE can not set invalid css rules without throwing up.
     }
     return this;
   },
