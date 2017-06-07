@@ -324,6 +324,12 @@ function Session(options) {
 
 Session.prototype = {
   getDecimalAmount: getDecimalAmount,
+  formatAmount: function(amount) {
+    return (amount / 100)
+      .toFixed(2)
+      .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
+      .replace('.00', '');
+  },
 
   // so that accessing this.data would not produce error
   data: emo,
@@ -729,6 +735,15 @@ Session.prototype = {
       $(thisEl).removeClass('show-methods');
     });
 
+    this.on('change', '#partial-select-partial', function(e) {
+      if (!e.target.checked) {
+        var amount = this.order.amount_due;
+        $('#amount-value').val(this.getDecimalAmount(amount));
+        this.get().amount = amount;
+        $('#amount .amount-figure').html(this.formatAmount(amount));
+      }
+    });
+
     this.click('#next-button', 'extraNext');
     if (is_ie8) {
       this.bindIeEvents();
@@ -1054,6 +1069,10 @@ Session.prototype = {
 
           var isValid = 0 < value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
+
+          if (isValid) {
+            $('#amount .amount-figure').html(self.formatAmount(value));
+          }
         });
     }
     delegator.contact = delegator

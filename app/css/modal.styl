@@ -980,3 +980,13 @@ $outline = #ddd;
     }
   }
 }
+
+#partial-select-partial + .checkbox {
+  float: left;
+  top: 1px;
+  margin-right: 8px;
+}
+
+#partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {
+  display: none;
+}
