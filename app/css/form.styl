@@ -66,6 +66,19 @@ label[for] {
   }
 }
 
+#elem-card .amex-error {
+  display: none;
+}
+
+#elem-card.noamex {
+  .help {
+    display: none;
+  }
+  &.focused.invalid.mature .amex-error {
+    display: block;
+  }
+}
+
 .font-loaded .elem label {
   transition: 0.3s;
 }
@@ -98,7 +111,7 @@ label[for] {
 }
 
 .select {
-  padding: 28px 0 0;
+  padding: 20px 0 0;
 
   select {
     cursor: pointer;

@@ -75,6 +75,7 @@ sessProto.netbanks = {
   }
 };
 
+var downBanks = {};
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
 
 var freqWallets = (sessProto.walletData = {
@@ -153,10 +154,7 @@ var emi_options = (sessProto.emi_options = {
       plans: {
         3: 12,
         6: 12,
-        9: 13,
-        12: 13,
-        18: 15,
-        24: 15
+        9: 13
       }
     },
 
@@ -243,6 +241,17 @@ function notifyBridge(message) {
   }
 }
 
+function setDownBanks(session) {
+  var downObj = [];
+  var downtime = preferences.downtime;
+  if (downtime) {
+    each(downtime.netbanking, function(i, o) {
+      downObj = downObj.concat(o.issuer);
+    });
+  }
+  session.down = downObj;
+}
+
 function setPaymentMethods(session) {
   var recurring = session.get('recurring');
   var international = session.get('currency') !== 'INR';
@@ -306,6 +315,7 @@ function setPaymentMethods(session) {
     methods.netbanking = false;
   } else {
     methods.count = 1;
+    setDownBanks(session);
   }
 
   if (methods.card) {

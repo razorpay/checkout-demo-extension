@@ -170,7 +170,7 @@ else
                       <label>
                         <i>&#xe609;</i>
                         `=_.tab_titles.card`
-                        <span class="desc">Mastercard, Visa, RuPay, Maestro`?preferences.methods.amex`, AMEX`?`</span>
+                        <span class="desc">Mastercard, Visa, RuPay, Maestro`?preferences.methods.amex`, Amex`?`</span>
                       </label>
                     </div>
                     `?`
@@ -227,6 +227,7 @@ else
                       <label>Card Number</label>
                       <i>&#xe605;</i>
                       <span class="help">Please enter a valid card number</span>
+                      <span class="help amex-error">Amex cards are not supported for this transaction</span>
                       <input class="input" type="tel" id="card_number" name="card[number]" autocomplete="off" maxlength="19" value="`=attr(o('prefill.card[number]'))`">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
@@ -343,6 +344,12 @@ else
                         `~`
                       </select>
                     </div></div>
+                    <div class="down">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.351 6.493c-.08-.801.55-1.493 1.351-1.493s1.431.692 1.351 1.493l-.801 8.01c-.029.282-.266.497-.55.497s-.521-.215-.55-.498l-.801-8.009zm1.351 12.757c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+                      <span class="text">
+                      </span>
+                      is currently facing issues.
+                    </div>
                 </div>
               `?`
               `?wallet.length || ecod`
