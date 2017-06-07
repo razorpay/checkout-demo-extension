@@ -452,7 +452,11 @@ i {
   background: #fff;
 }
 
-#topbar {
+#partial-back {
+  padding: 0 24px;
+}
+
+#topbar, #partial-back {
   display: none;
   cursor: pointer;
   background: $bg;
@@ -900,6 +904,14 @@ $outline = #ddd;
 }
 
 #container.extra {
+  &.show-methods {
+    #partial-back {
+      display: block;
+    }
+    #form-common .legend {
+      padding-top: 50px;
+    }
+  }
   #pad-common {
     & + div {
       display: none;

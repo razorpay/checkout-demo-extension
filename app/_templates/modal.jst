@@ -81,6 +81,7 @@ else
           `?`
         </div>
         <div id="body"`?order.bank` class="sub"`?`>
+          <div id="partial-back"><i class="back">&#xe604;</i>Change Amount</div>
           <div id="topbar">
             <div id="top-right">
               <div id="user"></div>
@@ -109,7 +110,7 @@ else
                   </div></div>
                   `?order.partial_payment`
                   <div class="elem-wrap" id="elem-wrap-amount"><div class="elem elem-amount">
-                    <div class="help">The amount can not be greater than `=_.getDecimalAmount(order.amount_due)`</div>
+                    <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
                     <label>Amount</label>
                     <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
                   </div></div>

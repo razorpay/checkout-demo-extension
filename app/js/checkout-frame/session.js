@@ -724,6 +724,11 @@ Session.prototype = {
   },
 
   bindEvents: function() {
+    var thisEl = this.el;
+    this.click('#partial-back', function() {
+      $(thisEl).removeClass('show-methods');
+    });
+
     this.click('#next-button', 'extraNext');
     if (is_ie8) {
       this.bindIeEvents();
@@ -1505,7 +1510,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    if (this.extraFields && !$(this.el).hasClass('show-methods')) {
+    if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
       return this.extraNext();
     }
     if (this.oneMethod && !this.tab) {
