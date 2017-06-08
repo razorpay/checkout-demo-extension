@@ -1,3 +1,7 @@
+function getDecimalAmount(amount) {
+  return (amount / 100).toFixed(2).replace('.00', '');
+}
+
 (function() {
   var cardPatterns = {
     visa: /^4/,
@@ -157,6 +161,26 @@
           returnVal = returnVal.slice(0, this.el.maxLength);
         }
         return returnVal;
+      }
+    },
+
+    amount: {
+      raw: function(value) {
+        return value
+          .split('.')
+          .slice(0, 2)
+          .map(function(v, index) {
+            v = v.replace(/\D/g, '');
+            if (index) {
+              v = v.slice(0, 2);
+            }
+            return v;
+          })
+          .join('.');
+      },
+
+      pretty: function(value) {
+        return value;
       }
     },
 

@@ -207,6 +207,10 @@ i {
       transform: none;
       transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
+
+    &.rerender #modal {
+      transition: none;
+    }
   }
 
   &.notopbar {
@@ -246,6 +250,7 @@ i {
   #modal,
   button,
   input,
+  textarea,
   select {
     font-family: $lato;
     font-feature-settings: "liga" 0;
@@ -448,7 +453,11 @@ i {
   background: #fff;
 }
 
-#topbar {
+#partial-back {
+  padding: 0 24px;
+}
+
+#topbar, #partial-back {
   display: none;
   cursor: pointer;
   background: $bg;
@@ -637,7 +646,7 @@ $outline = #ddd;
     opacity: 0;
   }
 
-  span {
+  & > span {
     position: absolute;
     top: 0;
     left: 0;
@@ -895,9 +904,38 @@ $outline = #ddd;
   }
 }
 
-#container.no-details {
+#container.extra {
+  &.show-methods {
+    #partial-back {
+      display: block;
+    }
+    #form-common .legend {
+      padding-top: 50px;
+    }
+  }
+  #pad-common {
+    & + div {
+      display: none;
+    }
+  }
+
+  #next-button {
+    opacity: 1;
+    color: #fff;
+    margin-bottom: -1px;
+    cursor: pointer;
+    z-index: 1;
+    transform: translateY(0);
+  }
+}
+
+#container.no-details, #container.extra.show-methods {
+  #pad-common + div {
+    display: block;
+  }
   #pad-common,
-  #top-right {
+  #top-right,
+  #next-button  {
     display: none;
   }
   #form-common {
@@ -941,4 +979,14 @@ $outline = #ddd;
       }
     }
   }
+}
+
+#partial-select-partial + .checkbox {
+  float: left;
+  top: 1px;
+  margin-right: 8px;
+}
+
+#partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {
+  display: none;
 }

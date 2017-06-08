@@ -323,6 +323,14 @@ function Session(options) {
 }
 
 Session.prototype = {
+  getDecimalAmount: getDecimalAmount,
+  formatAmount: function(amount) {
+    return (amount / 100)
+      .toFixed(2)
+      .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
+      .replace('.00', '');
+  },
+
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -350,6 +358,14 @@ Session.prototype = {
 
     if (!this.r.isLiveMode()) {
       classes.push('test');
+    }
+
+    if (this.forceRender) {
+      classes.push('rerender');
+    }
+
+    if (this.fontLoaded) {
+      classes.push('font-loaded');
     }
 
     if (getter('theme.branding')) {
@@ -398,11 +414,19 @@ Session.prototype = {
       classes.push('ie8');
     }
 
+    if (this.extraFields) {
+      classes.push('extra');
+    }
+
     return classes.join(' ');
   },
 
   getEl: function() {
     if (!this.el) {
+      if (this.order && this.order.partial_payment) {
+        this.extraFields = true;
+      }
+
       var classes = this.getClasses();
       var r = this.r;
       var ecod = r.get('ecod');
@@ -484,11 +508,18 @@ Session.prototype = {
     }
   },
 
-  render: function() {
-    if (this.isOpen) {
-      return;
+  render: function(options) {
+    options = options || {};
+
+    if (options.forceRender) {
+      this.forceRender = true;
+      this.close();
+    } else {
+      if (this.isOpen) {
+        return;
+      }
+      this.saveAndClose();
     }
-    this.saveAndClose();
     this.isOpen = true;
 
     this.getEl();
@@ -578,6 +609,7 @@ Session.prototype = {
     }
     if (anchor.offsetWidth / anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
+      this.fontLoaded = true;
     } else if (retryCount < 25) {
       var self = this;
       fontTimeout = setTimeout(function() {
@@ -681,7 +713,38 @@ Session.prototype = {
     this.r.topupWallet();
   },
 
+  extraNext: function() {
+    var commonInvalid = $('#pad-common .invalid');
+    if (commonInvalid[0]) {
+      return commonInvalid.addClass('mature').$('.input').focus();
+    }
+
+    var amountValue = gel('amount-value').value;
+    each($$('.amount-figure'), function(i, el) {
+      el.innerHTML = amountValue;
+    });
+    this.get().amount = 100 * amountValue;
+    setPaymentMethods(this);
+    this.render({ forceRender: true });
+    $(this.el).addClass('show-methods');
+  },
+
   bindEvents: function() {
+    var thisEl = this.el;
+    this.click('#partial-back', function() {
+      $(thisEl).removeClass('show-methods');
+    });
+
+    this.on('change', '#partial-select-partial', function(e) {
+      if (!e.target.checked) {
+        var amount = this.order.amount_due;
+        $('#amount-value').val(this.getDecimalAmount(amount));
+        this.get().amount = amount;
+        $('#amount .amount-figure').html(this.formatAmount(amount));
+      }
+    });
+
+    this.click('#next-button', 'extraNext');
     if (is_ie8) {
       this.bindIeEvents();
     }
@@ -914,6 +977,8 @@ Session.prototype = {
     self.refresh();
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
+
+    var el_amount = gel('amount-value');
     if (self.methods.card || self.methods.emi) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
@@ -990,6 +1055,25 @@ Session.prototype = {
       delegator.cvv = delegator.add('number', el_cvv).on('change', function() {
         self.input(this.el);
       });
+    }
+
+    if (el_amount) {
+      delegator.amount = delegator
+        .add('amount', el_amount)
+        .on('change', function() {
+          self.input(el_amount);
+          var value = this.value * 100;
+          var maxAmount = self.order.partial_payment
+            ? self.order.amount_due
+            : self.order.amount;
+
+          var isValid = 0 < value && value <= maxAmount;
+          toggleInvalid($(this.el.parentNode), isValid);
+
+          if (isValid) {
+            $('#amount .amount-figure').html(self.formatAmount(value));
+          }
+        });
     }
     delegator.contact = delegator
       .add('phone', gel('contact'))
@@ -1445,6 +1529,9 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
+      return this.extraNext();
+    }
     if (this.oneMethod && !this.tab) {
       setTimeout(function() {
         window.scrollTo(0, 100);
@@ -1465,7 +1552,7 @@ Session.prototype = {
 
     this.refresh();
     var data = (this.payload = this.getPayload());
-    if (this.order) {
+    if (this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }

@@ -149,7 +149,7 @@ var razorpayPayment = (Razorpay.payment = {
 var RazorpayDefaults = (Razorpay.defaults = {
   key: '',
   image: '',
-  amount: 0,
+  amount: 100,
   currency: 'INR',
   order_id: '',
   invoice_id: '',
@@ -213,12 +213,15 @@ function makePrefParams(rzp) {
     var params = {};
     params.key_id = getter('key');
 
-    each(['order_id', 'customer_id', 'invoice_id', 'subscription_id', 'recurring'], function(i, key) {
-      var value = getter(key);
-      if (value) {
-        params[key] = value;
+    each(
+      ['order_id', 'customer_id', 'invoice_id', 'subscription_id', 'recurring'],
+      function(i, key) {
+        var value = getter(key);
+        if (value) {
+          params[key] = value;
+        }
       }
-    });
+    );
 
     return params;
   }

@@ -286,6 +286,8 @@ function setPaymentMethods(session) {
   if (methods.emi && !emiMethod) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
+  } else {
+    tab_titles.card = 'Card';
   }
 
   // php encodes blank object as blank array
@@ -444,8 +446,6 @@ function showModal(session) {
   showModalWithSession(session);
 }
 function showModalWithSession(session) {
-  setPaymentMethods(session);
-
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
   var subscription = preferences.subscription;
@@ -454,9 +454,13 @@ function showModalWithSession(session) {
   if (invoice && invoice.amount) {
     get().amount = invoice.amount;
   }
-  if (subscription && subscription.auth_amount) {
-    get().amount = subscription.auth_amount;
+  if (subscription && subscription.amount) {
+    get().amount = subscription.amount;
   }
+  if (order && order.amount) {
+    get().amount = order.partial_payment ? order.amount_due : order.amount;
+  }
+
   if (order && order.bank && get('callback_url')) {
     get().redirect = true;
     return session.r.createPayment({
@@ -466,6 +470,7 @@ function showModalWithSession(session) {
       method: 'netbanking'
     });
   }
+  setPaymentMethods(session);
   session.render();
   Razorpay.sendMessage({ event: 'render' });
 
@@ -646,6 +651,10 @@ window.handleMessage = function(message) {
   if (message.embedded) {
     session.embedded = true;
     $(doc).addClass('embedded');
+  }
+
+  if (message.device_token) {
+    qpmap.device_token = message.device_token;
   }
 
   var data = message.data;

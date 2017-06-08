@@ -184,6 +184,10 @@ $.prototype = {
     return $(this.qs(selector));
   },
 
+  $0: function() {
+    return $(this.firstElementChild);
+  },
+
   css: function(prop, value) {
     var style = this.prop('style');
     if (style) {

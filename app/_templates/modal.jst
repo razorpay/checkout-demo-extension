@@ -17,11 +17,11 @@ var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = _.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;
-var amount_figure = (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
+var amount_figure = _.formatAmount(o('amount'));
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else if (o('currency')==='INR')
-  amount = "₹" + amount_figure;
+  amount = "&#x20B9;<span class='amount-figure'>" + amount_figure + "</span>";
 else
   amount = "$" + amount_figure;
 `
@@ -81,6 +81,7 @@ else
           `?`
         </div>
         <div id="body"`?order.bank` class="sub"`?`>
+          <div id="partial-back"><i class="back">&#xe604;</i>Back to amount</div>
           <div id="topbar">
             <div id="top-right">
               <div id="user"></div>
@@ -107,6 +108,17 @@ else
                     <label>Email`?_.optional.email` (Optional)`?`</label>
                     <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?`>
                   </div></div>
+                  `?order.partial_payment`
+                  <br>
+                  <label class="partial-label" for="partial-select-partial">Change payment amount</label>
+                  <input type="checkbox" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
+                  <div class="checkbox"></div>
+                  <div class="elem-wrap" id="elem-wrap-amount"><div class="elem elem-amount">
+                    <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
+                    <label>Amount</label>
+                    <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
+                  </div></div>
+                  `?`
                   `?address`
                   <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
                     <div class="help">Address should be atleast 10 characters long</div>
@@ -465,6 +477,7 @@ else
                 </div>
               </div>
             </div>
+            <div id='next-button' class="submit-button">Next</div>
             <button id="footer" type="submit" class="button">
               <span class="pay-btn">PAY &nbsp;`=amount`</span>
               <span class="otp-btn">Verify</span>
