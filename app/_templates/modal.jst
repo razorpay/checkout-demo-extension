@@ -241,9 +241,10 @@ else
                       <input class="input"`?_.isMobile && !ua_old_android` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
                     </div></div>
                     <div class="elem-wrap two-third"><div class="elem elem-name">
+                      <span class="help">Please enter name on your card</span>
                       <label>Card Holder's Name</label>
                       <i>&#xe602;</i>
-                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z .]+$">
+                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-cvv mature">
                       <label>CVV</label>
