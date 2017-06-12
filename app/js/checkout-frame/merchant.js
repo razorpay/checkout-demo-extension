@@ -591,7 +591,10 @@ window.handleOTP = function(otp) {
 
 window.backPressed = function(callback) {
   var session = getSession();
-  if (session.tab) {
+  if (
+    session.tab &&
+    !(session.get('prefill.method') && session.get('theme.hide_topbar'))
+  ) {
     session.back();
   } else {
     invoke(callback, CheckoutBridge);
