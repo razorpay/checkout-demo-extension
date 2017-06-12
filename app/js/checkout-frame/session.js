@@ -469,7 +469,7 @@ Session.prototype = {
     }
     var tab = oldMethod || this.get('prefill.method');
 
-    if (tab && !this.order) {
+    if (tab && !(this.order && this.order.bank)) {
       this.switchTab(tab);
     }
 
