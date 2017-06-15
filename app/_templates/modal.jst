@@ -222,8 +222,10 @@ else
                       <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
-                        `~emi_options.banks:code:bank`
+                        `~emi_banks:code:bank`
+                          `?bank.plans`
                           <option value="`=code`">`=bank.name`</option>
+                          `?`
                         `~`
                       </select>
                     </div>

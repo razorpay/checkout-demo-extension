@@ -10,16 +10,7 @@ function selectEmiBank(e) {
 }
 
 function emiView(session) {
-  var opts = session.emi_options;
-  var amount = (opts.amount = session.get('amount'));
-  if (amount >= 5000 * 100) {
-    opts.banks.AMEX = opts.other_banks.AMEX;
-    var $help = $('#elem-emi .help');
-    $help.html($help.html().replace(' &amp; Axis Bank', ', Axis & AMEX'));
-  } else {
-    delete opts.banks.AMEX;
-  }
-  this.opts = opts;
+  this.amount = session.get('amount');
   this.listeners = [];
   this.render();
 }
@@ -39,12 +30,12 @@ function showEmiDropdown() {
 emiView.prototype = {
   render: function() {
     this.unbind();
-    $('#emi-wrap').html(templates.emi(this.opts));
+    $('#emi-wrap').html(templates.emi(this));
     this.bind();
   },
 
   onchange: function(e) {
-    this.opts.selected = e.target.value;
+    emi_banks.selected = e.target.value;
     this.render();
   },
 
