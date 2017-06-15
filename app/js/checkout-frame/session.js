@@ -74,7 +74,6 @@ function setEmiBank(data, savedCardScreen) {
 function onSixDigits(e) {
   var el = e.target;
   var val = el.value;
-  var amount = this.get('amount');
 
   var cardType = $('#elem-card .cardtype').attr('cardtype');
   var isMaestro = /^maestro/.test(cardType);

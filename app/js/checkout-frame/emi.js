@@ -12,6 +12,11 @@ function selectEmiBank(e) {
 function emiView(session) {
   this.amount = session.get('amount');
   this.listeners = [];
+
+  if (emi_banks.AMEX.plans) {
+    var $help = $('#elem-emi .help');
+    $help.html($help.html().replace(' &amp; Axis Bank', ', Axis & AMEX'));
+  }
   this.render();
 }
 

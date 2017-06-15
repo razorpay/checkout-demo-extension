@@ -16,7 +16,7 @@
       var bank = card.issuer;
       var network = networks[card.network];
 
-      var emi = emi_banks[network === 'amex' ? network : bank];
+      var emi = emi_banks[network === 'amex' ? 'AMEX' : bank];
       var plans = emi && emi.plans && card.emi;
       var cvv_digits = network === 'amex' ? 4 : 3;
     `
