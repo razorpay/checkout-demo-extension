@@ -16,7 +16,7 @@ function emiView(session) {
   var availBanks = [];
   each(emi_banks, function(code, bank) {
     if (bank.plans) {
-      availBanks.push(bank.short);
+      availBanks.push(bank.small);
     }
   });
   var lastBank = availBanks.pop();
