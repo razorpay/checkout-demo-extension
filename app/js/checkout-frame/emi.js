@@ -13,10 +13,21 @@ function emiView(session) {
   this.amount = session.get('amount');
   this.listeners = [];
 
-  if (emi_banks.AMEX.plans) {
-    var $help = $('#elem-emi .help');
-    $help.html($help.html().replace(' &amp; Axis Bank', ', Axis & AMEX'));
-  }
+  var availBanks = [];
+  each(emi_banks, function(code, bank) {
+    if (bank.plans) {
+      availBanks.push(bank.short);
+    }
+  });
+  var lastBank = availBanks.pop();
+  availBanks = availBanks.length ? availBanks.join(', ') + ' & ' : '';
+  $('#elem-emi .help').html(
+    'EMI is available on ' +
+      availBanks +
+      lastBank +
+      ' Credit Cards. Enter your credit card to avail.'
+  );
+
   this.render();
 }
 
