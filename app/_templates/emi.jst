@@ -3,11 +3,8 @@
     <div class="col">Select Bank:</div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select">
-      `~emi_banks:i:bank`
-        `?bank.plans`
-        `if(!emi_banks.selected)emi_banks.selected=i;`
-        <option value="`=i`"`?i===emi_banks.selected` selected`?`>`=bank.name`</option>
-        `?`
+      `~_.banks:i:bank`
+        <option value="`=i`"`?i===_.selected` selected`?`>`=bank.name`</option>
       `~`
     </select>
   </div>
@@ -17,7 +14,7 @@
     <div class="col">Monthly Installments</div>
     <div class="col">Total Money</div>
   </strong>
-  `~emi_banks[emi_banks.selected].plans:i:plan`
+  `~_.banks[_.selected].plans:i:plan`
     <div class="row emi-option">
       <div class="col">`=i` Months</div>
       `var inst = Razorpay.emi.calculator(_.amount, i, plan);`

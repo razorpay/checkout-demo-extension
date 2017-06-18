@@ -222,10 +222,11 @@ else
                       <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
-                        `~emi_banks:code:bank`
-                          `?bank.plans`
+                        `?o('amount')>emi_options.amex_min&&preferences.methods.amex`
+                          <option value="AMEX">American Express</option>
+                        `?`
+                        `~emi_options.banks:code:bank`
                           <option value="`=code`">`=bank.name`</option>
-                          `?`
                         `~`
                       </select>
                     </div>
@@ -269,7 +270,7 @@ else
                           <div id="emi-plans-wrap"></div>
                           <div class="option" value="">Pay without EMI</div>
                         </div>
-                        <span class="help dropdown"></span>
+                        <span class="help dropdown">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd & Axis Bank Credit Cards. Enter your credit card to avail.</span>
                       </div>
                       <div class="second">
                         <span id="view-emi-plans" class="link">
