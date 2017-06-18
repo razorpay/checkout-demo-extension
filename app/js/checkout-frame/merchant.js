@@ -160,7 +160,15 @@ var emi_options = (sessProto.emi_options = {
 
     AXIS: {
       patt: /4((07438|05995|50506|64118|71864|6111[678]|71863|51457|3083[2-4])00|074390[03]|111460[0-6]|182120[12]|365600[01]|514560[04]|7186(00[013]|10[012]|30[12]))|5(24((178|240|508|512)00|1781[01])|5934([12]00|00[01])|305620[024])/,
-      name: 'Axis Bank'
+      name: 'Axis Bank',
+      plans: {
+        3: 12,
+        6: 12,
+        9: 13,
+        12: 13,
+        18: 15,
+        24: 15
+      }
     },
 
     INDB: {
@@ -215,8 +223,6 @@ var emi_options = (sessProto.emi_options = {
     }
   }
 });
-
-emi_options.banks.AXIS.plans = emi_options.banks.HDFC.plans;
 
 var tab_titles = (sessProto.tab_titles = {
   emi: 'EMI',
