@@ -89,9 +89,9 @@ function onSixDigits(e) {
         toggleNoCvv(true);
       }
     } else {
-      each(emi_options.banks, function(bank, emiObjInner) {
-        if (emiObjInner.patt.test(val.replace(/ /g, ''))) {
-          emiObj = emiObjInner;
+      each(emi_banks, function(code, bank) {
+        if (bank.plans && bank.patt.test(val.replace(/ /g, ''))) {
+          emiObj = bank;
         }
       });
 
@@ -795,7 +795,7 @@ Session.prototype = {
 
       this.on('change', '#emi-bank', function(e) {
         $('#elem-emi select').html(
-          makeEmiDropdown(emi_options.banks[e.target.value], this, true)
+          makeEmiDropdown(emi_banks[e.target.value], this, true)
         );
       });
 
