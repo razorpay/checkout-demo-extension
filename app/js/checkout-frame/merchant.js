@@ -451,14 +451,12 @@ function showModalWithSession(session) {
   var subscription = preferences.subscription;
   var get = session.get;
 
-  if (invoice && invoice.amount) {
-    get().amount = invoice.amount;
-  }
-  if (subscription && subscription.amount) {
-    get().amount = subscription.amount;
-  }
   if (order && order.amount) {
     get().amount = order.partial_payment ? order.amount_due : order.amount;
+  } else if (invoice && invoice.amount) {
+    get().amount = invoice.amount;
+  } else if (subscription && subscription.amount) {
+    get().amount = subscription.amount;
   }
 
   if (order && order.bank && get('callback_url')) {
