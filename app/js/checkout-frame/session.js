@@ -723,7 +723,10 @@ Session.prototype = {
     each($$('.amount-figure'), function(i, el) {
       el.innerHTML = amountValue;
     });
-    this.get().amount = 100 * amountValue;
+    var options = this.get();
+    options.amount = 100 * amountValue;
+    options['prefill.contact'] = gel('contact').value;
+    options['prefill.email'] = gel('email').value;
     setPaymentMethods(this);
     this.render({ forceRender: true });
     $(this.el).addClass('show-methods');
