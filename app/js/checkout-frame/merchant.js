@@ -263,7 +263,7 @@ function setDownBanks(session) {
 }
 
 function setPaymentMethods(session) {
-  var recurring = session.get('recurring');
+  var recurring = session.recurring;
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
   var methods = (session.methods = {
@@ -423,7 +423,8 @@ function showModal(session) {
     }
 
     var customer;
-    if (saved_customer.customer_id) {
+    if (saved_customer.customer_id && preferences.global === false) {
+      session.local = true;
       options.remember_customer = true;
       customer = new Customer('');
       getCustomer = function() {
@@ -431,8 +432,8 @@ function showModal(session) {
       };
     }
 
-    if (session_options['recurring']) {
-      filters.recurring = true;
+    if (session_options['recurring'] || preferences.subscription) {
+      session.recurring = filters.recurring = true;
     }
 
     customer = getCustomer(saved_customer.contact);
@@ -458,19 +459,20 @@ function showModal(session) {
 function showModalWithSession(session) {
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
-  var subscription = preferences.subscription;
+  var subscription = (session.subscription = preferences.subscription);
   var get = session.get;
+  var options = get();
 
   if (order && order.amount) {
-    get().amount = order.partial_payment ? order.amount_due : order.amount;
+    options.amount = order.partial_payment ? order.amount_due : order.amount;
   } else if (invoice && invoice.amount) {
-    get().amount = invoice.amount;
+    options.amount = invoice.amount;
   } else if (subscription && subscription.amount) {
-    get().amount = subscription.amount;
+    options.amount = subscription.amount;
   }
 
   if (order && order.bank && get('callback_url')) {
-    get().redirect = true;
+    options.redirect = true;
     return session.r.createPayment({
       contact: get('prefill.contact') || '9999999999',
       email: get('prefill.email') || 'void@razorpay.com',

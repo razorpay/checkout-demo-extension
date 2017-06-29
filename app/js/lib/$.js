@@ -260,7 +260,7 @@ $.prototype = {
   },
 
   html: function(html) {
-    if (arguments.length) {
+    if (arguments.length && this[0]) {
       this[0].innerHTML = html;
       return this;
     }
