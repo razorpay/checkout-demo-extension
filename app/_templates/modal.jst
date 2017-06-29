@@ -24,6 +24,11 @@ else if (o('currency')==='INR')
   amount = "&#x20B9;<span class='amount-figure'>" + amount_figure + "</span>";
 else
   amount = "$" + amount_figure;
+
+var prefill_email = attr(o('prefill.email'));
+var prefill_contact = attr(o('prefill.contact'));
+var contact_readonly = o('readonly.contact') && prefill_contact;
+var email_readonly = o('readonly.email') && prefill_email;
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -96,17 +101,17 @@ else
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
                 <div class="pad" id="pad-common">
-                  <div class="elem-wrap"><div class="elem elem-contact">
+                  <div class="elem-wrap"><div class="elem elem-contact`?contact_readonly` readonly`?`">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=attr(o('prefill.contact'))`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?`>
+                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
                   </div></div>
-                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email">
+                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email`?_.optional.email` (Optional)`?`</label>
-                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?`>
+                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
                   </div></div>
                   `?order.partial_payment`
                   <br>

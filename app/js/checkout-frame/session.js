@@ -1087,11 +1087,13 @@ Session.prototype = {
           }
         });
     }
-    delegator.contact = delegator
-      .add('phone', gel('contact'))
-      .on('change', function() {
+
+    var contactEl = gel('contact');
+    if (contactEl && !contactEl.readOnly) {
+      delegator.contact = delegator.add('phone').on('change', function() {
         self.input(this.el);
       });
+    }
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {

@@ -36,6 +36,11 @@ RazorpayDefaults.prefill = {
   'card[cvv]': ''
 };
 
+RazorpayDefaults.readonly = {
+  contact: false,
+  email: false
+};
+
 RazorpayDefaults.modal = {
   confirm_close: false,
   ondismiss: noop,
