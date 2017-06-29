@@ -260,8 +260,10 @@ $.prototype = {
   },
 
   html: function(html) {
-    if (arguments.length && this[0]) {
-      this[0].innerHTML = html;
+    if (arguments.length) {
+      if (this[0]) {
+        this[0].innerHTML = html;
+      }
       return this;
     }
     return this[0].innerHTML;

@@ -425,6 +425,7 @@ function showModal(session) {
     var customer;
     if (saved_customer.customer_id && preferences.global === false) {
       session.local = true;
+      session_options.remember_customer = true;
       options.remember_customer = true;
       customer = new Customer('');
       getCustomer = function() {
