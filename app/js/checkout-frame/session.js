@@ -1768,17 +1768,8 @@ Session.prototype = {
 
     if (this.screen === 'card') {
       setEmiBank(data, this.savedCardScreen);
-
-      var customer = this.customer;
-      var recurring = this.get('recurring');
-
-      // set app_token if either new card or saved card (might be blank)
-      if (customer.customer_id) {
-        data.customer_id = customer.customer_id;
-
-        if (recurring !== null) {
-          data.recurring = recurring ? 1 : 0;
-        }
+      if (this.recurring) {
+        data.recurring = 1;
       }
     }
 
