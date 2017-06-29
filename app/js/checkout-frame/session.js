@@ -312,6 +312,7 @@ function cancel_upi(session) {
 }
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
+var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 
 function Session(options) {
   this.r = Razorpay(options);
@@ -376,8 +377,13 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    if (getter('key') === UDACITY_KEY) {
-      classes.push('address');
+    var key = getter('key');
+    if (key === UDACITY_KEY || key === EMBIBE_KEY) {
+      if (preferences.order && preferences.order.partial_payment) {
+        classes.push('extra');
+      } else {
+        classes.push('address extra');
+      }
       setter('address', true);
     }
 
@@ -719,16 +725,19 @@ Session.prototype = {
       return commonInvalid.addClass('mature').$('.input').focus();
     }
 
-    var amountValue = gel('amount-value').value;
-    each($$('.amount-figure'), function(i, el) {
-      el.innerHTML = amountValue;
-    });
-    var options = this.get();
-    options.amount = 100 * amountValue;
-    options['prefill.contact'] = gel('contact').value;
-    options['prefill.email'] = gel('email').value;
-    setPaymentMethods(this);
-    this.render({ forceRender: true });
+    var partialEl = gel('amount-value');
+    if (partialEl) {
+      var amountValue = partialEl.value;
+      each($$('.amount-figure'), function(i, el) {
+        el.innerHTML = amountValue;
+      });
+      var options = this.get();
+      options.amount = 100 * amountValue;
+      options['prefill.contact'] = gel('contact').value;
+      options['prefill.email'] = gel('email').value;
+      setPaymentMethods(this);
+      this.render({ forceRender: true });
+    }
     $(this.el).addClass('show-methods');
   },
 
@@ -1088,6 +1097,16 @@ Session.prototype = {
       .on('change', function() {
         self.input(this.el);
       });
+
+    var pinEl = gel('pincode');
+    if (pinEl) {
+      delegator.add('number', pinEl).on('change', function() {
+        self.input(this.el);
+        if (this.value.length === 6) {
+          $('#state').focus();
+        }
+      });
+    }
   },
 
   setScreen: function(screen) {
@@ -1633,7 +1652,12 @@ Session.prototype = {
     var $address = $('#address');
 
     if ($address[0]) {
-      request.address = $address.val();
+      if (!data.notes) {
+        data.notes = {};
+      }
+      data.notes.address = $address.val();
+      data.notes.pincode = $('#pincode').val();
+      data.notes.state = $('#state').val();
     }
 
     Razorpay.sendMessage({
