@@ -35,6 +35,12 @@ label[for] {
   border-bottom: 1px solid $bc;
   position: relative;
 
+  &.readonly {
+    border-bottom: 1px dashed #ccc;
+    .input {
+      opacity: .7;
+    }
+  }
   &.focused {
     color: $input-focused;
   }
