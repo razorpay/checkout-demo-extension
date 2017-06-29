@@ -86,7 +86,7 @@ var email_readonly = o('readonly.email') && prefill_email;
           `?`
         </div>
         <div id="body"`?order.bank` class="sub"`?`>
-          <div id="partial-back"><i class="back">&#xe604;</i>Back to amount</div>
+          <div id="partial-back"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar">
             <div id="top-right">
               <div id="user"></div>
@@ -124,11 +124,26 @@ var email_readonly = o('readonly.email') && prefill_email;
                     <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
                   </div></div>
                   `?`
-                  `?address`
+                  `?address&&!order.partial_payment`
                   <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
                     <div class="help">Address should be atleast 10 characters long</div>
                     <label>Address</label>
                     <textarea class="input" name="address" type="text" id="address" required pattern="[\s\S]{10}" maxlength="200" rows='2'></textarea>
+                  </div></div>
+                  <div class="elem-wrap"><div class="elem">
+                    <div class="help">Enter 6 digit pincode</div>
+                    <label>PIN Code</label>
+                    <input class="input" required pattern="^\d{6}$" maxlength="6" id="pincode">
+                  </div></div>
+                  <div class="elem-wrap"><div class="elem select elem-state">
+                    <div class="help">Select a value from list of states</div>
+                    <i class="select-arrow">&#xe601;</i>
+                    <select class="input" required id="state">
+                      <option value="">Select State</option>
+                      `~states:code:text`
+                        <option value="`=code`">`=text`</option>
+                      `~`
+                    </select>
                   </div></div>
                   `?`
                   `?order.bank`
