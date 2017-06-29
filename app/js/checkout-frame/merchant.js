@@ -391,7 +391,6 @@ function fetchPrefsAndShowModal(session) {
 
 function showModal(session) {
   var options = preferences.options;
-  var saved_customer = preferences.customer;
 
   // pass preferences options to app
   if (CheckoutBridge) {
@@ -411,30 +410,30 @@ function showModal(session) {
     }
   });
 
+  var customer;
   var session_options = session.get();
+  var saved_customer = preferences.customer;
+  var filters = {};
+
+  if (preferences.global === false) {
+    session.local = true;
+    customer = new Customer('');
+    getCustomer = function() {
+      return customer;
+    };
+  }
+
+  if (preferences.subscription || session_options.recurring) {
+    session.recurring = filters.recurring = true;
+  }
+
   if (saved_customer) {
-    var filters = {};
     // we put saved customer contact, email into default prefills
     if (saved_customer.contact) {
       session_options['prefill.contact'] = saved_customer.contact;
     }
     if (saved_customer.email) {
       session_options['prefill.email'] = saved_customer.email;
-    }
-
-    var customer;
-    if (saved_customer.customer_id && preferences.global === false) {
-      session.local = true;
-      session_options.remember_customer = true;
-      options.remember_customer = true;
-      customer = new Customer('');
-      getCustomer = function() {
-        return customer;
-      };
-    }
-
-    if (session_options['recurring'] || preferences.subscription) {
-      session.recurring = filters.recurring = true;
     }
 
     customer = getCustomer(saved_customer.contact);
@@ -446,6 +445,13 @@ function showModal(session) {
     }
 
     customer.customer_id = saved_customer.customer_id;
+  }
+
+  if (
+    preferences.subscription || (saved_customer && saved_customer.customer_id)
+  ) {
+    session_options.remember_customer = true;
+    options.remember_customer = true;
   }
 
   session.optional = arr2obj(preferences.optional);

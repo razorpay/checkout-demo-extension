@@ -497,7 +497,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                 <div class="spin spin2"><div></div></div>
                 <div id="otp-sec-outer">
                   <a id="otp-resend" class="link">Resend OTP</a>
-                  `?!(_.subscription&&_.local)`<a id="otp-sec" class="link">Skip Saved Cards</a>`?`
+                  `?!_.recurring`<a id="otp-sec" class="link">Skip Saved Cards</a>`?`
                 </div>
               </div>
             </div>
