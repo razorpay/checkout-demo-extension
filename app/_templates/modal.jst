@@ -105,13 +105,13 @@ var email_readonly = o('readonly.email') && prefill_email;
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` disabled`?`>
+                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
                   </div></div>
                   <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email`?_.optional.email` (Optional)`?`</label>
-                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` disabled`?`>
+                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
                   </div></div>
                   `?order.partial_payment`
                   <br>
