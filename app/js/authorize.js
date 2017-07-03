@@ -190,6 +190,7 @@ Payment.prototype = {
         'order_id',
         'notes',
         'subscription_id',
+        'customer_id',
         'recurring'
       ],
       function(i, field) {

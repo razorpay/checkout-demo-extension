@@ -263,7 +263,7 @@ function setDownBanks(session) {
 }
 
 function setPaymentMethods(session) {
-  var recurring = session.get('recurring');
+  var recurring = session.recurring;
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
   var methods = (session.methods = {
@@ -391,7 +391,6 @@ function fetchPrefsAndShowModal(session) {
 
 function showModal(session) {
   var options = preferences.options;
-  var saved_customer = preferences.customer;
 
   // pass preferences options to app
   if (CheckoutBridge) {
@@ -411,28 +410,30 @@ function showModal(session) {
     }
   });
 
+  var customer;
   var session_options = session.get();
+  var saved_customer = preferences.customer;
+  var filters = {};
+
+  if (preferences.global === false) {
+    session.local = true;
+    customer = new Customer('');
+    getCustomer = function() {
+      return customer;
+    };
+  }
+
+  if (preferences.subscription || session_options.recurring) {
+    session.recurring = filters.recurring = true;
+  }
+
   if (saved_customer) {
-    var filters = {};
     // we put saved customer contact, email into default prefills
     if (saved_customer.contact) {
       session_options['prefill.contact'] = saved_customer.contact;
     }
     if (saved_customer.email) {
       session_options['prefill.email'] = saved_customer.email;
-    }
-
-    var customer;
-    if (saved_customer.customer_id) {
-      options.remember_customer = true;
-      customer = new Customer('');
-      getCustomer = function() {
-        return customer;
-      };
-    }
-
-    if (session_options['recurring']) {
-      filters.recurring = true;
     }
 
     customer = getCustomer(saved_customer.contact);
@@ -444,6 +445,13 @@ function showModal(session) {
     }
 
     customer.customer_id = saved_customer.customer_id;
+  }
+
+  if (
+    preferences.subscription || (saved_customer && saved_customer.customer_id)
+  ) {
+    session_options.remember_customer = true;
+    options.remember_customer = true;
   }
 
   session.optional = arr2obj(preferences.optional);
@@ -458,19 +466,20 @@ function showModal(session) {
 function showModalWithSession(session) {
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
-  var subscription = preferences.subscription;
+  var subscription = (session.subscription = preferences.subscription);
   var get = session.get;
+  var options = get();
 
   if (order && order.amount) {
-    get().amount = order.partial_payment ? order.amount_due : order.amount;
+    options.amount = order.partial_payment ? order.amount_due : order.amount;
   } else if (invoice && invoice.amount) {
-    get().amount = invoice.amount;
+    options.amount = invoice.amount;
   } else if (subscription && subscription.amount) {
-    get().amount = subscription.amount;
+    options.amount = subscription.amount;
   }
 
   if (order && order.bank && get('callback_url')) {
-    get().redirect = true;
+    options.redirect = true;
     return session.r.createPayment({
       contact: get('prefill.contact') || '9999999999',
       email: get('prefill.email') || 'void@razorpay.com',

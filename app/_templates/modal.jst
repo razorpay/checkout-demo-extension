@@ -169,7 +169,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                     </div>
                   `?`
                 </div>
-                `?o('recurring')`
+                `?_.recurring`
                   <div class="pad recurring-message">
                     <span>&#x2139;</span> All credit cards are supported for this recurring subscription.
                   </div>
@@ -299,7 +299,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                       </div>
                       <div class="clear"></div>
                     </div>
-                    `?!o('recurring') && o('remember_customer')`
+                    `?!_.recurring && o('remember_customer')`
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>
@@ -321,7 +321,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                     My Maestro Card doesn't have Expiry/CVV
                   </label>
                   </div>
-                  `?o('recurring')`
+                  `?_.recurring`
                     <div id='savedcards-recurring-message' class="pad recurring-message">
                       <span>&#x2139;</span> A recurring subscription will be applied to this card.
                     </div>
@@ -497,7 +497,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                 <div class="spin spin2"><div></div></div>
                 <div id="otp-sec-outer">
                   <a id="otp-resend" class="link">Resend OTP</a>
-                  <a id="otp-sec" class="link">Skip Saved Cards</a>
+                  `?!_.recurring`<a id="otp-sec" class="link">Skip Saved Cards</a>`?`
                 </div>
               </div>
             </div>
