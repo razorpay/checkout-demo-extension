@@ -1658,12 +1658,15 @@ Session.prototype = {
     var $address = $('#address');
 
     if ($address[0]) {
-      if (!data.notes) {
-        data.notes = {};
+      var notes = (data.notes = clone(this.get('notes')) || {});
+      notes.address = $address.val();
+      notes.pincode = $('#pincode').val();
+      notes.state = $('#state').val();
+      if (Object.keys(notes).length > 15) {
+        delete notes.pincode;
+        delete notes.state;
+        notes.address += ', ' + states[notes.state] + ' - ' + notes.pincode;
       }
-      data.notes.address = $address.val();
-      data.notes.pincode = $('#pincode').val();
-      data.notes.state = $('#state').val();
     }
 
     Razorpay.sendMessage({
