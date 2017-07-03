@@ -106,7 +106,7 @@ function onSixDigits(e) {
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
     if (!$('#emi-plans-wrap .option')[0]) {
-      $('#emi-plans-wrap').html(makeEmiDropdown(emiObj, this));
+      gel('emi-plans-wrap').innerHTML = makeEmiDropdown(emiObj, this);
     }
   } else {
     emi_parent.removeClass('checked');
@@ -729,7 +729,7 @@ Session.prototype = {
     if (partialEl) {
       var amountValue = partialEl.value;
       each($$('.amount-figure'), function(i, el) {
-        el.innerHTML = amountValue;
+        $(el).html(amountValue);
       });
       var options = this.get();
       options.amount = 100 * amountValue;
@@ -806,8 +806,10 @@ Session.prototype = {
       }
 
       this.on('change', '#emi-bank', function(e) {
-        $('#elem-emi select').html(
-          makeEmiDropdown(emi_options.banks[e.target.value], this, true)
+        gel('elem-emi select').innerHTML = makeEmiDropdown(
+          emi_options.banks[e.target.value],
+          this,
+          true
         );
       });
 
@@ -1121,7 +1123,7 @@ Session.prototype = {
 
     if (screen) {
       var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
-      $('#tab-title').html(screenTitle);
+      gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
     } else {
       makeHidden('#topbar');
@@ -1269,7 +1271,9 @@ Session.prototype = {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
-        $('#saved-cards-container').html(templates.savedcards(customer.tokens));
+        gel('saved-cards-container').innerHTML = templates.savedcards(
+          customer.tokens
+        );
       }
     }
 

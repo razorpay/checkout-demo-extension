@@ -262,7 +262,7 @@ $.prototype = {
   html: function(html) {
     if (arguments.length) {
       if (this[0]) {
-        this[0].innerHTML = html;
+        this[0].innerHTML = escapeHtml(html);
       }
       return this;
     }
@@ -382,3 +382,10 @@ $.ajax = function(opts) {
   }
   return xhr;
 };
+
+var escapeDiv = document.createElement('div');
+function escapeHtml(str) {
+  escapeDiv.innerHTML = '';
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
+}

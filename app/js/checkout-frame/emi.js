@@ -15,7 +15,7 @@ function emiView(session) {
   if (amount >= 5000 * 100) {
     opts.banks.AMEX = opts.other_banks.AMEX;
     var $help = $('#elem-emi .help');
-    $help.html($help.html().replace(' &amp; Axis Bank', ', Axis & AMEX'));
+    $help.html($help.html().replace(' & Axis Bank', ', Axis & AMEX'));
   } else {
     delete opts.banks.AMEX;
   }
@@ -39,7 +39,7 @@ function showEmiDropdown() {
 emiView.prototype = {
   render: function() {
     this.unbind();
-    $('#emi-wrap').html(templates.emi(this.opts));
+    gel('emi-wrap').innerHTML = templates.emi(this.opts);
     this.bind();
   },
 
