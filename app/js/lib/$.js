@@ -261,7 +261,7 @@ $.prototype = {
 
   html: function(html) {
     if (arguments.length) {
-      this[0].innerHTML = html;
+      this[0].innerHTML = escapeHtml(html);
       return this;
     }
     return this[0].innerHTML;
@@ -380,3 +380,10 @@ $.ajax = function(opts) {
   }
   return xhr;
 };
+
+var escapeDiv = document.createElement('div');
+function escapeHtml(str) {
+  escapeDiv.innerHTML = '';
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
+}
