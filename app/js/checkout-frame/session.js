@@ -806,7 +806,7 @@ Session.prototype = {
       }
 
       this.on('change', '#emi-bank', function(e) {
-        gel('elem-emi select').innerHTML = makeEmiDropdown(
+        $('#elem-emi select')[0].innerHTML = makeEmiDropdown(
           emi_options.banks[e.target.value],
           this,
           true
