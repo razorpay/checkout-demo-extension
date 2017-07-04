@@ -1,6 +1,8 @@
 `
 var o = _.get;
 var ecod = o('ecod');
+var address = o('address');
+var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
@@ -15,13 +17,18 @@ var bankName = method.netbanking && method.netbanking[order.bank];
 var bank = _.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;
-var amount_figure = (o('amount')/100).toFixed(2).replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,').replace('.00', '');
+var amount_figure = _.formatAmount(o('amount'));
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else if (o('currency')==='INR')
-  amount = "₹" + amount_figure;
+  amount = "&#x20B9;<span class='amount-figure'>" + amount_figure + "</span>";
 else
   amount = "$" + amount_figure;
+
+var prefill_email = attr(o('prefill.email'));
+var prefill_contact = attr(o('prefill.contact'));
+var contact_readonly = o('readonly.contact') && prefill_contact;
+var email_readonly = o('readonly.email') && prefill_email;
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -79,6 +86,7 @@ else
           `?`
         </div>
         <div id="body"`?order.bank` class="sub"`?`>
+          <div id="partial-back"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar">
             <div id="top-right">
               <div id="user"></div>
@@ -93,18 +101,51 @@ else
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
                 <div class="pad" id="pad-common">
-                  <div class="elem-wrap"><div class="elem elem-contact">
+                  <div class="elem-wrap"><div class="elem elem-contact`?contact_readonly` readonly`?`">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=attr(o('prefill.contact'))`" required pattern="^\+?[0-9]{8,15}$">
+                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
                   </div></div>
-                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email">
+                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
-                    <label>Email</label>
-                    <input class="input" name="email" type="email" id="email" value="`=attr(o('prefill.email'))`" required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$">
+                    <label>Email`?_.optional.email` (Optional)`?`</label>
+                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
                   </div></div>
+                  `?order.partial_payment`
+                  <br>
+                  <label class="partial-label" for="partial-select-partial">Change payment amount</label>
+                  <input type="checkbox" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
+                  <div class="checkbox"></div>
+                  <div class="elem-wrap" id="elem-wrap-amount"><div class="elem elem-amount">
+                    <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
+                    <label>Amount</label>
+                    <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
+                  </div></div>
+                  `?`
+                  `?address&&!order.partial_payment`
+                  <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
+                    <div class="help">Address should be atleast 10 characters long</div>
+                    <label>Address</label>
+                    <textarea class="input" name="address" type="text" id="address" required pattern="[\s\S]{10}" maxlength="200" rows='2'></textarea>
+                  </div></div>
+                  <div class="elem-wrap"><div class="elem">
+                    <div class="help">Enter 6 digit pincode</div>
+                    <label>PIN Code</label>
+                    <input class="input" required pattern="^\d{6}$" maxlength="6" id="pincode">
+                  </div></div>
+                  <div class="elem-wrap"><div class="elem select elem-state">
+                    <div class="help">Select a value from list of states</div>
+                    <i class="select-arrow">&#xe601;</i>
+                    <select class="input" required id="state">
+                      <option value="">Select State</option>
+                      `~states:code:text`
+                        <option value="`=code`">`=text`</option>
+                      `~`
+                    </select>
+                  </div></div>
+                  `?`
                   `?order.bank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
@@ -128,38 +169,62 @@ else
                     </div>
                   `?`
                 </div>
-                `?o('recurring')`
+                `?_.recurring`
                   <div class="pad recurring-message">
                     <span>&#x2139;</span> All credit cards are supported for this recurring subscription.
                   </div>
                 `?`
-                `?preferences.offers`
-                  <div class="pad" style="position:absolute;bottom:20px;pointer-events:none;font-size:12px">
-                    `?preferences.offers.name`
-                      <div class="text-btn"><strong>`=preferences.offers.name`</strong></div>
+                `?cardOffer`
+                  <div class="pad" id="card-offer">
+                    `?cardOffer.name`
+                      <div class="text-btn"><strong>`=cardOffer.name`</strong></div>
                     `?`
-                    `?preferences.offers.display_text`
-                      `=preferences.offers.display_text`
+                    `?cardOffer.display_text`
+                      `=cardOffer.display_text`
                     `?`
                   </div>
                 `?`
                 <div`?order.bank` class="showable"`?`>
-                  <div class="legend">Select payment method</div>
+                  <div class="legend">Select a payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
                     `?o('theme.emi_mode')`
                     <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
                     `?`
                     `?method.card`
-                    <div class="payment-option item" tab="card"><label><i>&#xe609;</i>`=_.tab_titles.card`</label></div>
+                    <div class="payment-option item" tab="card">
+                      <label>
+                        <i>&#xe609;</i>
+                        `=_.tab_titles.card`
+                        <span class="desc">Mastercard, Visa, RuPay, Maestro`?preferences.methods.amex`, Amex`?`</span>
+                      </label>
+                    </div>
                     `?`
                     `?method.netbanking`
-                    <div class="payment-option item" tab="netbanking"><label><i>&#xe60a;</i>`=_.tab_titles.netbanking`</label></div>
+                    <div class="payment-option item" tab="netbanking">
+                      <label>
+                        <i>&#xe60a;</i>
+                        `=_.tab_titles.netbanking`
+                        <span class="desc">All Indian banks</span>
+                      </label>
+                    </div>
                     `?`
                     `?wallet.length`
-                    <div class="payment-option item" tab="wallet"><label><i>&#xe60b;</i>`=_.tab_titles.wallet`</label></div>
+                    <div class="payment-option item" tab="wallet">
+                      <label>
+                        <i>&#xe60b;</i>
+                        `=_.tab_titles.wallet`
+                        <span class="desc">Freecharge, Mobikwik, Airtelmoney &amp; More</span>
+                      </label>
+                    </div>
                     `?`
                     `?method.upi`
-                    <div class="payment-option item" tab="upi"><label><i>&#xe60c;</i>`=_.tab_titles.upi`</label></div>
+                    <div class="payment-option item" tab="upi">
+                      <label>
+                        <i>&#xe60c;</i>
+                        `=_.tab_titles.upi`
+                        <span class="desc">Instant payment using UPI App</span>
+                      </label>
+                    </div>
                     `?`
                   </div>
                   <div class="clear"></div>
@@ -177,6 +242,9 @@ else
                       <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
+                        `?o('amount')>emi_options.amex_min&&preferences.methods.amex`
+                          <option value="AMEX">American Express</option>
+                        `?`
                         `~emi_options.banks:code:bank`
                           <option value="`=code`">`=bank.name`</option>
                         `~`
@@ -187,17 +255,19 @@ else
                       <label>Card Number</label>
                       <i>&#xe605;</i>
                       <span class="help">Please enter a valid card number</span>
+                      <span class="help amex-error">Amex cards are not supported for this transaction</span>
                       <input class="input" type="tel" id="card_number" name="card[number]" autocomplete="off" maxlength="19" value="`=attr(o('prefill.card[number]'))`">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-expiry">
                       <label>Expiry</label>
                       <i>&#xe606;</i>
-                      <input class="input" type="tel" id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
+                      <input class="input"`?_.isMobile && !ua_old_android` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
                     </div></div>
                     <div class="elem-wrap two-third"><div class="elem elem-name">
+                      <span class="help">Please enter name on your card</span>
                       <label>Card Holder's Name</label>
                       <i>&#xe602;</i>
-                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z .]+$">
+                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$">
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-cvv mature">
                       <label>CVV</label>
@@ -229,7 +299,7 @@ else
                       </div>
                       <div class="clear"></div>
                     </div>
-                    `?!o('recurring') && o('remember_customer')`
+                    `?!_.recurring && o('remember_customer')`
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
                         <input type="checkbox" id="save" name="save" value="1" checked>
@@ -251,7 +321,7 @@ else
                     My Maestro Card doesn't have Expiry/CVV
                   </label>
                   </div>
-                  `?o('recurring')`
+                  `?_.recurring`
                     <div id='savedcards-recurring-message' class="pad recurring-message">
                       <span>&#x2139;</span> A recurring subscription will be applied to this card.
                     </div>
@@ -303,6 +373,12 @@ else
                         `~`
                       </select>
                     </div></div>
+                    <div class="down">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.351 6.493c-.08-.801.55-1.493 1.351-1.493s1.431.692 1.351 1.493l-.801 8.01c-.029.282-.266.497-.55.497s-.521-.215-.55-.498l-.801-8.009zm1.351 12.757c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+                      <span class="text">
+                      </span>
+                      is currently facing issues.
+                    </div>
                 </div>
               `?`
               `?wallet.length || ecod`
@@ -327,8 +403,8 @@ else
                         <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
                         <label for="wallet-radio-`=w.name`" class="radio-label mfix">
                           <img class="wallet-button colored mchild item-inner l-`=count`" style="height:`=w.h`px" src="`=w.col`">
-                          `?w.offer`
-                            <span class="offer">`=w.offer`% Cashback</span>
+                          `?_.offers.wallet[w.name]`
+                            <span class="offer">`=_.offers.wallet[w.name].name`</span>
                           `?`
                         </label>
                       </div>
@@ -363,35 +439,13 @@ else
                     <div class="clear"></div>
                     <span class="help">Please select one of the wallets</span>
                   </div>
-                  `?airtelmoneyWallet.offer`
-                    <div id="airtelmoney-info" class="offer-info">
-                      <li>`=airtelmoneyWallet.offerDesc`</li>
-                      <li>- `=airtelmoneyWallet.maxCBDesc`</li>
-                      <li>- `=airtelmoneyWallet.offerValidDesc`</li>
+                  `~_.offers.wallet:i:w`
+                    <div id="`=i`-info" class="offer-info">
+                      `?w.display_text`
+                        `=w.display_text`
+                      `?`
                     </div>
-                  `?`
-                  `?freechargeWallet.offer`
-                  <div id="freecharge-info" class="offer-info">
-                    <li>`=freechargeWallet.offerDesc`</li>
-                    <li>- `=freechargeWallet.maxCBDesc`</li>
-                    <li>- `=freechargeWallet.offerValidDesc`</li>
-                  </div>
-                  `?`
-
-                  `?mobikwikWallet.offer`
-                    <div id="mobikwik-info" class="offer-info">
-                      <li>`=mobikwikWallet.offerDesc`</li>
-                      <li>- `=mobikwikWallet.maxCBDesc`</li>
-                      <li>- `=mobikwikWallet.offerValidDesc`</li>
-                    </div>
-                  `?`
-                  `?olamoneyWallet.offer`
-                    <div id="olamoney-info" class="offer-info">
-                      <li>`=olamoneyWallet.offerDesc`</li>
-                      <li>- `=olamoneyWallet.maxCBDesc`</li>
-                      <li>- `=olamoneyWallet.offerValidDesc`</li>
-                    </div>
-                  `?`
+                  `~`
                 </div>
               `?`
               `?method.upi`
@@ -443,10 +497,11 @@ else
                 <div class="spin spin2"><div></div></div>
                 <div id="otp-sec-outer">
                   <a id="otp-resend" class="link">Resend OTP</a>
-                  <a id="otp-sec" class="link">Skip Saved Cards</a>
+                  `?!_.recurring`<a id="otp-sec" class="link">Skip Saved Cards</a>`?`
                 </div>
               </div>
             </div>
+            <div id='next-button' class="submit-button">Next</div>
             <button id="footer" type="submit" class="button">
               <span class="pay-btn">PAY &nbsp;`=amount`</span>
               <span class="otp-btn">Verify</span>

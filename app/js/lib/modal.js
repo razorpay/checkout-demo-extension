@@ -1,5 +1,4 @@
 (function() {
-
   var timeout, transitionProperty;
 
   var defaults = {
@@ -10,15 +9,20 @@
     onhidden: null
   };
 
-  var clearTimeout = function(){
+  var clearTimeout = function() {
     if (timeout) {
       window.clearTimeout(timeout);
     }
     timeout = null;
-  }
+  };
 
-  if(Array.prototype.some){
-    ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(function(i) {
+  if (Array.prototype.some) {
+    [
+      'transition',
+      'WebkitTransition',
+      'MozTransition',
+      'OTransition'
+    ].some(function(i) {
       if (isString(document.documentElement.style[i])) {
         transitionProperty = i + 'Duration';
         return true;
@@ -26,16 +30,16 @@
     });
   }
 
-  var getDuration = function(modal){
-    return (modal.options.animation && transitionProperty) ? 300 : 0;
-  }
+  var getDuration = function(modal) {
+    return modal.options.animation && transitionProperty ? 300 : 0;
+  };
 
-  var Modal = window.Modal = function(element, options) {
-    each(defaults, function(key, val){
-      if(!(key in options)){
+  var Modal = (window.Modal = function(element, options) {
+    each(defaults, function(key, val) {
+      if (!(key in options)) {
         options[key] = val;
       }
-    })
+    });
     this.options = options;
     this.container = $(element);
     this.animationDuration = getDuration(this);
@@ -43,11 +47,13 @@
     this.listeners = [];
     this.show();
     this.bind();
-  };
+  });
 
   Modal.prototype = {
     show: function() {
-      if(this.isShown) { return }
+      if (this.isShown) {
+        return;
+      }
       this.isShown = true;
       this.container.reflow().addClass('drishy');
       clearTimeout();
@@ -60,23 +66,25 @@
     },
 
     hide: function() {
-      if(!this.isShown) { return }
+      if (!this.isShown) {
+        return;
+      }
       this.isShown = false;
 
       this.container.removeClass('drishy');
-      
+
       clearTimeout();
       var self = this;
 
-      timeout = setTimeout(function(){
+      timeout = setTimeout(function() {
         self.hidden();
       }, this.animationDuration);
 
       invoke(this.options.onhide);
     },
 
-    backdropHide: function(){
-      if(this.options.backdropclose) {
+    backdropHide: function() {
+      if (this.options.backdropclose) {
         this.hide();
       }
     },
@@ -86,10 +94,8 @@
       invoke(this.options.onhidden);
     },
 
-    on: function(event, target, callback){
-      this.listeners.push(
-        $(target).on(event, callback, false, this)
-      );
+    on: function(event, target, callback) {
+      this.listeners.push($(target).on(event, callback, false, this));
     },
 
     steal_focus: function(e) {
@@ -101,35 +107,36 @@
       }
     },
 
-    bind: function(){
-      if (!ua_iOS && typeof window.pageYOffset === 'number') { // doesn't exist <ie9. we're concerned about mobile here.
-        this.on('resize', window, function(){
+    bind: function() {
+      if (!ua_iOS && typeof window.pageYOffset === 'number') {
+        // doesn't exist <ie9. we're concerned about mobile here.
+        this.on('resize', window, function() {
           var el = document.activeElement;
-          if(el){
+          if (el) {
             var rect = el.getBoundingClientRect();
-            if(rect.bottom > innerHeight - 70){
-              setTimeout(function(){
-                smoothScrollTo(pageYOffset - innerHeight + rect.bottom + 60)
-              }, 400)
+            if (rect.bottom > innerHeight - 70) {
+              setTimeout(function() {
+                smoothScrollTo(pageYOffset - innerHeight + rect.bottom + 60);
+              }, 400);
             }
           }
-        })
+        });
       }
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
-            if(!hideEmi() && !overlayVisible()){
+            if (!hideEmi() && !overlayVisible()) {
               this.hide();
             }
           }
-        })
+        });
       }
       if (this.options.backdropclose) {
-        this.on('click', gel('backdrop'), this.backdropHide)
+        this.on('click', gel('backdrop'), this.backdropHide);
       }
     },
 
-    destroy: function(){
+    destroy: function() {
       invokeEach(this.listeners);
       this.listeners = [];
     }

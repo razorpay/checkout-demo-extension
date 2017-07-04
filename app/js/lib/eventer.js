@@ -71,22 +71,26 @@ var Eventer;
           if (!eventKey.indexOf(event)) {
             delete events[eventKey];
           }
-        })
+        });
       }
 
       return this;
     },
 
     emit: function(event, arg) {
-      each(this._evts[event], function(i, callback) {
-        try {
-          callback.call(this, arg);
-        } catch(e) {
-          if (console.error) {
-            console.error(e);
+      each(
+        this._evts[event],
+        function(i, callback) {
+          try {
+            callback.call(this, arg);
+          } catch (e) {
+            if (console.error) {
+              console.error(e);
+            }
           }
-        }
-      }, this)
+        },
+        this
+      );
       return this;
     },
 
@@ -96,5 +100,5 @@ var Eventer;
         this.emit.apply(this, args);
       }, this);
     }
-  }
+  };
 })();

@@ -14,7 +14,7 @@ var getCustomer = function(contact) {
     }
   }
   return customers[contact];
-}
+};
 
 function Customer(contact) {
   if (contact) {
@@ -29,14 +29,11 @@ function sanitizeTokens(tokens, filters) {
 
   if (tokens) {
     var items = [];
-    each(
-      tokens.items,
-      function(index, item) {
-        if (item.method === method && (recurring ? item.recurring : true)) {
-          items.push(item);
-        }
+    each(tokens.items, function(index, item) {
+      if (item.method === method && (recurring ? item.recurring : true)) {
+        items.push(item);
       }
-    )
+    });
     tokens.items = items;
     tokens.count = items.length;
   }
@@ -49,7 +46,7 @@ Customer.prototype = {
   logged: false,
 
   mark_logged: function(data) {
-    var recurring = getSession().get('recurring') || false;
+    var recurring = getSession().recurring || false;
     this.logged = true;
     sanitizeTokens(data.tokens, {
       recurring: recurring
@@ -69,27 +66,27 @@ Customer.prototype = {
     }
     $.ajax({
       url: url,
-      callback: function(data){
+      callback: function(data) {
         customer.saved = !!data.saved;
         if (data.tokens) {
           customer.mark_logged(data);
         }
         callback();
       }
-    })
+    });
   },
 
-  createOTP: function(callback){
+  createOTP: function(callback) {
     $.post({
       url: makeAuthUrl(this.key, 'otp/create'),
       data: {
         contact: this.contact
       },
       callback: callback
-    })
+    });
   },
 
-  submitOTP: function(data, callback){
+  submitOTP: function(data, callback) {
     var user = this;
     data.contact = this.contact;
     var url = makeAuthUrl(this.key, 'otp/verify');
@@ -103,7 +100,7 @@ Customer.prototype = {
     $.post({
       url: url,
       data: data,
-      callback: function(data){
+      callback: function(data) {
         if (data.success) {
           user.mark_logged(data);
         }
@@ -119,7 +116,7 @@ Customer.prototype = {
           callback();
         }
       }
-    })
+    });
   },
 
   deleteCard: function(token, callback) {
@@ -130,11 +127,11 @@ Customer.prototype = {
     $.ajax({
       url: makeAuthUrl(this.key, 'apps/' + this.id + '/tokens/' + token),
       method: 'delete',
-      callback: function(){
+      callback: function() {
         callback();
         deleteToken(user, token);
       }
-    })
+    });
   },
 
   logout: function(this_device, callback) {
@@ -142,17 +139,17 @@ Customer.prototype = {
       url: makeAuthUrl(this.key, 'apps/logout'),
       method: 'delete',
       callback: callback
-    }
+    };
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
     $.ajax(ajaxOpts);
   }
-}
+};
 
-function deleteToken(user, token){
+function deleteToken(user, token) {
   var tokens = user.tokens;
-  for (var i = 0; i < tokens.count; i++){
-    if(tokens.items[i].token === token){
-      tokens.items.splice(i, 1 );
+  for (var i = 0; i < tokens.count; i++) {
+    if (tokens.items[i].token === token) {
+      tokens.items.splice(i, 1);
       tokens.count--;
       return;
     }

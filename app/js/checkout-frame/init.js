@@ -1,8 +1,8 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
-TraceKit.collectWindowErrors = true;
+// TraceKit.collectWindowErrors = true;
 
-(function(){
+(function() {
   var a = document.createElement('a');
   a.href = RazorpayConfig.frameApi;
   var href = a.href;

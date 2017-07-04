@@ -1,4 +1,4 @@
-var $ = function(el){
+var $ = function(el) {
   if (isString(el)) {
     return $(document.querySelector(el));
   }
@@ -9,9 +9,11 @@ var $ = function(el){
 };
 
 $.prototype = {
-  on: function(event, callback, capture, thisArg){
+  on: function(event, callback, capture, thisArg) {
     var el = this[0];
-    if(!el) { return }
+    if (!el) {
+      return;
+    }
 
     var ref;
     if (isString(callback)) {
@@ -22,56 +24,61 @@ $.prototype = {
     }
     var shouldAddListener = window.addEventListener;
     if (shouldAddListener) {
-      ref = function(e){
-        if( e.target.nodeType === 3 ) {
-          e.target = e.target.parentNode;// textNode target
+      ref = function(e) {
+        if (e.target.nodeType === 3) {
+          e.target = e.target.parentNode; // textNode target
         }
         return callback.call(thisArg || this, e);
-      }
+      };
     } else {
       ref = function(e) {
-        if(!e) { e = window.event }
-        if(!e.target) { e.target = e.srcElement || document }
-        if(!e.preventDefault) { e.preventDefault = function() { this.returnValue = false } }
-        if(!e.stopPropagation) { e.stopPropagation = e.preventDefault }
-        if(!e.currentTarget) { e.currentTarget = el }
+        if (!e) {
+          e = window.event;
+        }
+        if (!e.target) {
+          e.target = e.srcElement || document;
+        }
+        if (!e.preventDefault) {
+          e.preventDefault = function() {
+            this.returnValue = false;
+          };
+        }
+        if (!e.stopPropagation) {
+          e.stopPropagation = e.preventDefault;
+        }
+        if (!e.currentTarget) {
+          e.currentTarget = el;
+        }
         return callback.call(thisArg || el, e);
-      }
+      };
     }
-    each(
-      event.split(' '),
-      function(i, evt){
-        if( shouldAddListener ) {
-          el.addEventListener(evt, ref, !!capture)
-        }
-        else {
-          el.attachEvent('on' + evt, ref);
-        }
+    each(event.split(' '), function(i, evt) {
+      if (shouldAddListener) {
+        el.addEventListener(evt, ref, !!capture);
+      } else {
+        el.attachEvent('on' + evt, ref);
       }
-    )
-    return bind(
-      function(){
-        this.off(event, ref, capture);
-      },
-      this
-    )
+    });
+    return bind(function() {
+      this.off(event, ref, capture);
+    }, this);
   },
 
-  off: function(event, callback, capture){
+  off: function(event, callback, capture) {
     if (window.removeEventListener) {
       this[0].removeEventListener(event, callback, !!capture);
-    } else if(window.detachEvent){
+    } else if (window.detachEvent) {
       this[0].detachEvent('on' + event, callback);
     }
   },
 
-  prop: function(prop, val){
+  prop: function(prop, val) {
     var el = this[0];
-    if(arguments.length === 1){
+    if (arguments.length === 1) {
       return el && el[prop];
     }
-    if(el){
-      if(el){
+    if (el) {
+      if (el) {
         el[prop] = val;
       }
       return this;
@@ -83,11 +90,11 @@ $.prototype = {
     if (isNonNullObject(attr)) {
       each(
         attr,
-        function(key, val){
+        function(key, val) {
           this.attr(key, val);
         },
         this
-      )
+      );
       return this;
     }
     var argLen = arguments.length;
@@ -106,53 +113,54 @@ $.prototype = {
     return this;
   },
 
-  reflow: function(){
+  reflow: function() {
     this.prop('offsetHeight');
     return this;
   },
 
-  remove: function(){
-    try{
+  remove: function() {
+    try {
       var el = this[0];
       el.parentNode.removeChild(el);
-    } catch(e){}
+    } catch (e) {}
     return this;
   },
 
-  append: function(el){
+  append: function(el) {
     this[0].appendChild(el);
   },
 
-  hasClass: function(str){
+  hasClass: function(str) {
     return (' ' + this[0].className + ' ').indexOf(' ' + str + ' ') >= 0;
   },
 
-  addClass: function(str){
+  addClass: function(str) {
     var el = this[0];
-    if(str && el){
-      if(!el.className){
+    if (str && el) {
+      if (!el.className) {
         el.className = str;
-      }
-      else if(!this.hasClass(str)){
+      } else if (!this.hasClass(str)) {
         el.className += ' ' + str;
       }
     }
     return this;
   },
 
-  removeClass: function(str){
+  removeClass: function(str) {
     var el = this[0];
-    if(el){
-      var className = (' ' + el.className + ' ').replace(' ' + str + ' ', ' ').replace(/^ | $/g,'');
-      if( el.className !== className ){
+    if (el) {
+      var className = (' ' + el.className + ' ')
+        .replace(' ' + str + ' ', ' ')
+        .replace(/^ | $/g, '');
+      if (el.className !== className) {
         el.className = className;
       }
     }
     return this;
   },
 
-  toggleClass: function(className, condition){
-    if(arguments.length === 1){
+  toggleClass: function(className, condition) {
+    if (arguments.length === 1) {
       condition = !this.hasClass(className);
     }
     return this[(condition ? 'add' : 'remove') + 'Class'](className);
@@ -165,9 +173,9 @@ $.prototype = {
     }
   },
 
-  find: function(selector){
+  find: function(selector) {
     var node = this[0];
-    if(node){
+    if (node) {
       return node.querySelectorAll(selector);
     }
   },
@@ -176,15 +184,30 @@ $.prototype = {
     return $(this.qs(selector));
   },
 
-  css: function(prop, value){
+  $0: function() {
+    return $(this.firstElementChild);
+  },
+
+  css: function(prop, value) {
     var style = this.prop('style');
-    if(style){
-      if( arguments.length === 1 ) {
-        return style[prop];
+    if (style) {
+      if (arguments.length === 1) {
+        if (isNonNullObject(prop)) {
+          each(
+            prop,
+            function(propName, value) {
+              this.css(propName, value);
+            },
+            this
+          );
+        } else {
+          return style[prop];
+        }
+      } else {
+        try {
+          style[prop] = value;
+        } catch (e) {} // IE can not set invalid css rules without throwing up.
       }
-      try {
-        style[prop] = value;
-      } catch(e){} // IE can not set invalid css rules without throwing up.
     }
     return this;
   },
@@ -224,46 +247,46 @@ $.prototype = {
     return this.css('display', 'block');
   },
 
-  parent: function(){
+  parent: function() {
     return $(this.prop('parentNode'));
   },
 
-  val: function(value){
-    if(!arguments.length){
+  val: function(value) {
+    if (!arguments.length) {
       return this[0].value;
     }
     this[0].value = value;
     return this;
   },
 
-  html: function(html){
-    if(arguments.length){
-      this[0].innerHTML = html;
+  html: function(html) {
+    if (arguments.length) {
+      if (this[0]) {
+        this[0].innerHTML = escapeHtml(html);
+      }
       return this;
     }
     return this[0].innerHTML;
   },
 
-  focus: function(){
-    if(this[0]){
-      try{
+  focus: function() {
+    if (this[0]) {
+      try {
         this[0].focus();
-      }
-      catch(e){}
+      } catch (e) {}
     }
     return this;
   },
 
-  blur: function(){
-    if(this[0]){
-      try{
+  blur: function() {
+    if (this[0]) {
+      try {
         this[0].blur();
-      }
-      catch(e){}
+      } catch (e) {}
     }
     return this;
   }
-}
+};
 
 function smoothScrollTo(y) {
   smoothScrollBy(y - pageYOffset);
@@ -284,34 +307,34 @@ function smoothScrollBy(y) {
     var scrollCount = 0;
     var oldTimestamp = performance.now();
 
-    function step (newTimestamp) {
-      scrollCount += (newTimestamp - oldTimestamp)/300;
+    function step(newTimestamp) {
+      scrollCount += (newTimestamp - oldTimestamp) / 300;
       if (scrollCount >= 1) {
         return scrollTo(0, target);
       }
-      var sin = Math.sin(pi*scrollCount/2);
-      scrollTo(0, y0 + Math.round(y*sin));
+      var sin = Math.sin(pi * scrollCount / 2);
+      scrollTo(0, y0 + Math.round(y * sin));
       oldTimestamp = newTimestamp;
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
-  }, 100)
+  }, 100);
 }
 
-$.post = function(opts){
+$.post = function(opts) {
   opts.method = 'post';
 
-  if(!opts.headers){
+  if (!opts.headers) {
     opts.headers = {};
   }
   opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
   var payload = [];
-  each(opts.data, function(key, val){
-    payload.push(key + '=' + encodeURIComponent(val))
-  })
+  each(opts.data, function(key, val) {
+    payload.push(key + '=' + encodeURIComponent(val));
+  });
   opts.data = payload.join('&');
   return $.ajax(opts);
-}
+};
 
 $.ajax = function(opts) {
   var xhr = new XMLHttpRequest();
@@ -320,20 +343,17 @@ $.ajax = function(opts) {
   }
   xhr.open(opts.method, opts.url, true);
 
-  each(
-    opts.headers,
-    function(header, value){
-      xhr.setRequestHeader(header, value);
-    }
-  )
+  each(opts.headers, function(header, value) {
+    xhr.setRequestHeader(header, value);
+  });
 
-  if(opts.callback) {
+  if (opts.callback) {
     xhr.onreadystatechange = function() {
-      if(xhr.readyState === 4 && xhr.status) {
+      if (xhr.readyState === 4 && xhr.status) {
         var json;
         try {
           json = JSON.parse(xhr.responseText);
-        } catch(e) {
+        } catch (e) {
           json = discreet.error('Parsing error');
           json.xhr = {
             status: xhr.status,
@@ -342,23 +362,30 @@ $.ajax = function(opts) {
         }
         opts.callback(json);
       }
-    }
+    };
     xhr.onerror = function() {
       var resp = discreet.error('Network error');
       resp.xhr = {
         status: 0
-      }
+      };
       opts.callback(resp);
-    }
+    };
   }
 
   var data = opts.data || null;
 
   // ghostery
-  if (chromeVersion <= 33) {
+  if (chromeVersion && chromeVersion <= 33) {
     invoke('send', xhr, data, 1000);
   } else {
     xhr.send(data);
   }
   return xhr;
+};
+
+var escapeDiv = document.createElement('div');
+function escapeHtml(str) {
+  escapeDiv.innerHTML = '';
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
 }

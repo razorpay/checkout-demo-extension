@@ -207,6 +207,10 @@ i {
       transform: none;
       transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
+
+    &.rerender #modal {
+      transition: none;
+    }
   }
 
   &.notopbar {
@@ -246,6 +250,7 @@ i {
   #modal,
   button,
   input,
+  textarea,
   select {
     font-family: $lato;
     font-feature-settings: "liga" 0;
@@ -423,15 +428,16 @@ i {
       opacity: 0;
     }
   }
-  &.sub {
-    #footer {
-      pointer-events: auto;
-      opacity: 1;
-      transform: none;
-    }
-    #form-fields {
-      border-radius: 0;
-    }
+}
+
+#body.sub, #container.one-method #body:not([tab]) {
+  #footer {
+    pointer-events: auto;
+    opacity: 1;
+    transform: none;
+  }
+  #form-fields {
+    border-radius: 0;
   }
 }
 
@@ -447,7 +453,11 @@ i {
   background: #fff;
 }
 
-#topbar {
+#partial-back {
+  padding: 0 24px;
+}
+
+#topbar, #partial-back {
   display: none;
   cursor: pointer;
   background: $bg;
@@ -594,7 +604,7 @@ $outline = #ddd;
 
   .legend {
     margin: 9px 0;
-    margin-top: 10px;
+    margin-top: 20px;
   }
 }
 
@@ -636,7 +646,7 @@ $outline = #ddd;
     opacity: 0;
   }
 
-  span {
+  & > span {
     position: absolute;
     top: 0;
     left: 0;
@@ -776,6 +786,10 @@ $outline = #ddd;
     }
   }
 
+  .desc {
+    display: none;
+  }
+
   label {
     padding-top: 20px;
     height: 97px;
@@ -805,6 +819,13 @@ $outline = #ddd;
   right: 0;
   border-radius: 0 0 $br $br;
   background: #fff;
+}
+
+#card-offer {
+  position: absolute;
+  bottom: 20px;
+  pointer-events: none;
+  font-size:12px;
 }
 
 .offer {
@@ -863,41 +884,119 @@ $outline = #ddd;
 }
 
 #container.one-method {
-  #form-fields .legend {
+  .pay-btn {
+    display: none;
+  }
+  #body.sub {
+    .pay-btn {
+      display: block;
+    }
+    .proceed-btn {
+      display: none;
+    }
+  }
+  #form-fields .legend, #payment-options {
     display: none;
   }
 
   #saved-cards-container {
     max-height: 156px;
   }
+}
 
-  #payment-options {
-    overflow: initial;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -50px;
+#container.extra {
+  &.show-methods {
+    #partial-back {
+      display: block;
+    }
+    #form-common .legend {
+      padding: 48px 0 6px;
+    }
   }
-
-  .payment-option {
-    border: 0;
-    opacity: 1;
-    height: 100%;
-
-    i {
+  #pad-common {
+    & + div {
       display: none;
     }
+  }
 
+  #next-button {
+    opacity: 1;
+    color: #fff;
+    margin-bottom: -1px;
+    cursor: pointer;
+    z-index: 1;
+    transform: translateY(0);
+  }
+}
+
+.elem-state {
+  padding-top: 0;
+  select[disabled] {
+    opacity: .75;
+  }
+}
+#elem-wrap-address {
+  margin-bottom: 21px;
+}
+
+#container.no-details, #container.extra.show-methods {
+  #pad-common + div {
+    display: block;
+  }
+  #pad-common,
+  #top-right,
+  #next-button  {
+    display: none;
+  }
+  #form-common {
+    padding-top: 0;
+    left: 20px;
+    right: 20px;
+    width: auto;
+  }
+  .desc {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .legend {
+    text-align: left;
+  }
+  #payment-options {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    background: #f9fafb;
     label {
-      text-transform: uppercase;
-      padding: initial;
-      height: initial;
-      background: initial;
-      letter-spacing: 1px
-
-      &::before {
-        content: 'Pay with ';
+      padding: 12px 0;
+      height: 56px;
+      line-height: 16px;
+    }
+    .payment-option.item {
+      width: auto;
+      float: none;
+      border: 0;
+      text-align: left;
+      i {
+        float: left;
+        font-size: 28px;
+        margin: 0 16px;
+        line-height: 30px;
+      }
+      &+.item {
+        border-top: 1px solid $bc;
       }
     }
   }
+}
+
+#partial-select-partial + .checkbox {
+  float: left;
+  top: 1px;
+  margin-right: 8px;
+}
+
+#partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {
+  display: none;
 }

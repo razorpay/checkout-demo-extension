@@ -8,40 +8,42 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed'
-}
+};
 
 var fontTimeout;
 
-function confirmClose(){
+function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
 
 function fillData(container, returnObj) {
-  each(
-    $(container).find('input[name],select[name]'),
-    function(i, el){
-      if(/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
-        return;
-      }
-      if(!el.disabled) {
-        returnObj[el.name] = el.value;
-      }
+  each($(container).find('input[name],select[name]'), function(i, el) {
+    if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
+      return;
     }
-  )
+    if (!el.disabled) {
+      returnObj[el.name] = el.value;
+    }
+  });
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
   var h = '';
   if (emiObj.plans) {
-    each(
-      emiObj.plans,
-      function(length, rate){
-        h += (isOption ? '<option' : '<div class="option"') + ' value="'+length+'">'
-          + length + ' month EMI @' + rate + '% (₹ '
-          + Razorpay.emi.calculator(session.get('amount'), length, rate)/100
-          + ' per month)</' + (isOption ? 'option>' : 'div>');
-      }
-    )
+    each(emiObj.plans, function(length, rate) {
+      h +=
+        (isOption ? '<option' : '<div class="option"') +
+        ' value="' +
+        length +
+        '">' +
+        length +
+        ' month EMI @' +
+        rate +
+        '% (₹ ' +
+        Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
+        ' per month)</' +
+        (isOption ? 'option>' : 'div>');
+    });
   }
   return h;
 }
@@ -53,21 +55,23 @@ function unsetEmiBank() {
 
 function setEmiBank(data, savedCardScreen) {
   if (savedCardScreen) {
-    var savedEmi = $('#saved-cards-container .checked select[name=emi_duration]')[0];
+    var savedEmi = $(
+      '#saved-cards-container .checked select[name=emi_duration]'
+    )[0];
     if (savedEmi && savedEmi.value) {
       data.method = 'emi';
       data.emi_duration = savedEmi.value;
     }
   } else {
     var activeEmiPlan = $('#emi-plans-wrap .active')[0];
-    if(activeEmiPlan){
+    if (activeEmiPlan) {
       data.method = 'emi';
       data.emi_duration = activeEmiPlan.getAttribute('value');
     }
   }
 }
 
-function onSixDigits(e){
+function onSixDigits(e) {
   var el = e.target;
   var val = el.value;
 
@@ -79,21 +83,17 @@ function onSixDigits(e){
 
   var nocvvCheck = gel('nocvv');
 
-  if(sixDigits){
-    if(isMaestro){
-      if(nocvvCheck.disabled){
+  if (sixDigits) {
+    if (isMaestro) {
+      if (nocvvCheck.disabled) {
         toggleNoCvv(true);
       }
-    }
-    else {
-      each(
-        emi_options.banks,
-        function(bank, emiObjInner){
-          if(emiObjInner.patt.test(val.replace(/ /g,''))){
-            emiObj = emiObjInner;
-          }
+    } else {
+      each(emi_options.banks, function(bank, emiObjInner) {
+        if (emiObjInner.patt.test(val.replace(/ /g, ''))) {
+          emiObj = emiObjInner;
         }
-      );
+      });
 
       toggleNoCvv(false);
     }
@@ -106,98 +106,95 @@ function onSixDigits(e){
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
     if (!$('#emi-plans-wrap .option')[0]) {
-      $('#emi-plans-wrap').html(makeEmiDropdown(emiObj, this));
+      gel('emi-plans-wrap').innerHTML = makeEmiDropdown(emiObj, this);
     }
   } else {
     emi_parent.removeClass('checked');
     $(emi_parent.find('.active')[0]).removeClass('active');
   }
-  noCvvToggle({target: nocvvCheck});
+  noCvvToggle({ target: nocvvCheck });
 
   var elem_emi = $('#elem-emi');
   var hiddenClass = 'hidden';
 
   if (isMaestro && sixDigits) {
     elem_emi.addClass(hiddenClass);
-  } else if(elem_emi.hasClass(hiddenClass)) {
+  } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
   }
 }
 
-function noCvvToggle(e){
+function noCvvToggle(e) {
   var nocvvCheck = e.target;
   var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
   $('#form-card').toggleClass('nocvv', shouldHideExpiryCVV);
 }
 
-function toggleNoCvv(show){
+function toggleNoCvv(show) {
   // Display or hide the nocvv checkbox
   $('#nocvv-check').toggleClass(shownClass, show);
   gel('nocvv').disabled = !show;
 }
 
-function makeVisible(subject){
-  $(subject)
-    .css('display', 'block')
-    .reflow()
-    .addClass(shownClass);
+function makeVisible(subject) {
+  $(subject).css('display', 'block').reflow().addClass(shownClass);
 }
 
-function makeHidden(subject){
+function makeHidden(subject) {
   subject = $(subject);
-  if(subject[0]){
+  if (subject[0]) {
     subject.removeClass(shownClass);
     invoke('hide', subject, null, 200);
   }
 }
 
-function toggle(subject, showOrHide){
+function toggle(subject, showOrHide) {
   (showOrHide ? makeVisible : makeHidden)(subject);
 }
 
-function showOverlay($with){
+function showOverlay($with) {
   makeVisible('#overlay');
-  if($with){
+  if ($with) {
     makeVisible($with[0]);
   }
 }
 
-function hideOverlay($with){
+function hideOverlay($with) {
   makeHidden('#overlay');
-  if($with){
+  if ($with) {
     makeHidden($with[0]);
   }
 }
 
-function hideEmi(){
+function hideEmi() {
   var emic = $('#emi-wrap');
   var wasShown = emic.hasClass(shownClass);
-  if(wasShown){
+  if (wasShown) {
     hideOverlay(emic);
   }
   return wasShown;
 }
 
-function hideOverlayMessage(){
-  if(!hideEmi()){
+function hideOverlayMessage() {
+  if (!hideEmi()) {
     hideOverlay($('#error-message'));
   }
 }
 
-function overlayVisible(){
+function overlayVisible() {
   return $('#overlay').hasClass(shownClass);
 }
 
 // this === Session
-function errorHandler(response){
+function errorHandler(response) {
   if (isString(response)) {
     try {
       response = JSON.parse(response);
-    } catch(e){
+    } catch (e) {
       return;
     }
   }
-  if(!response || !response.error){
+  if (!response || !response.error) {
     return;
   }
   var error = response.error;
@@ -205,9 +202,9 @@ function errorHandler(response){
   this.clearRequest();
 
   this.track('error', response);
-  Razorpay.sendMessage({event: 'paymenterror', data: {error: error}});
+  Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
-  if(this.modal){
+  if (this.modal) {
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
 
@@ -217,7 +214,7 @@ function errorHandler(response){
 
   var err_field = error.field;
   if (err_field && !(this.screen === 'otp' && this.tab === 'wallet')) {
-    if(!err_field.indexOf('expiry')) {
+    if (!err_field.indexOf('expiry')) {
       err_field = 'card[expiry]';
     }
     var error_el = document.getElementsByName(err_field)[0];
@@ -228,7 +225,7 @@ function errorHandler(response){
         .addClass('invalid')
         .find('help-text')[0];
 
-      if(help){
+      if (help) {
         $(help).html(message);
       }
       if (err_field === 'contact' || err_field === 'email') {
@@ -240,7 +237,10 @@ function errorHandler(response){
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
-    this.showLoadError(message || 'There was an error in handling your request', true);
+    this.showLoadError(
+      message || 'There was an error in handling your request',
+      true
+    );
   }
   $('#fd-hide').focus();
 }
@@ -249,12 +249,12 @@ function getPhone() {
   return gel('contact').value;
 }
 
-function setOtpText(text){
+function setOtpText(text) {
   gel('otp-prompt').innerHTML = text;
 }
 
 function elfShowOTP(otp, sender) {
-    window.handleOTP(otp);
+  window.handleOTP(otp);
 }
 
 function askOTP(text) {
@@ -264,7 +264,7 @@ function askOTP(text) {
     } else {
       window.OTPElf = {
         showOTP: elfShowOTP
-      }
+      };
     }
   }
   if (isNonNullObject(text)) {
@@ -278,7 +278,7 @@ function askOTP(text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
       if (thisSession.payload) {
-        text += 'save your card'
+        text += 'save your card';
       } else {
         text += 'access Saved Cards';
       }
@@ -289,12 +289,12 @@ function askOTP(text) {
   setOtpText(text);
 }
 
-function debounceAskOTP(msg){
+function debounceAskOTP(msg) {
   debounce(askOTP, 750)(msg);
 }
 
 // this === Session
-function successHandler(response){
+function successHandler(response) {
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
@@ -308,57 +308,30 @@ function cancel_upi(session) {
   $('#error-message').addClass('cancel_upi');
   session.r.on('payment.error', function() {
     $('#error-message').removeClass('cancel_upi');
-  })
+  });
 }
 
-function Session (options) {
+var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
+var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
+
+function Session(options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
+  this.set = this.r.set;
   this.tab = this.screen = '';
   this.listeners = [];
   this.bits = [];
-
-  var key = this.get('key')
-  var INNER_CHEF_KEY_ID = 'rzp_live_xA0AumIJLxL8VX';
-  var CHAIPOINT_KEY_ID = 'rzp_live_Zqmx92mExD1bHO';
-  var MG_KEY_ID = 'rzp_live_vv7inDhmBFP0d0';
-  var walletData = this.walletData
-  var freechargeWallet, airtelMoneyWallet, mobikwikWallet;
-
-  switch (key) {
-    case INNER_CHEF_KEY_ID:
-      freechargeWallet = walletData.freecharge;
-      freechargeWallet.offer = 20;
-      freechargeWallet.offerDesc = '20% Cashback on Freecharge';
-      freechargeWallet.maxCBDesc = 'Cashback upto ₹75';
-      freechargeWallet.offerValidDesc = 'Valid 2 times per user';
-
-      airtelMoneyWallet = walletData.airtelmoney;
-      airtelMoneyWallet.offer = 15;
-      airtelMoneyWallet.offerDesc = '15% Cashback on Airtel Money';
-      airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹75';
-      airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
-      break;
-
-    case MG_KEY_ID:
-      freechargeWallet = walletData.mobikwik;
-      freechargeWallet.offer = 5;
-      freechargeWallet.offerDesc = '5% Cashback on Mobikwik';
-      freechargeWallet.maxCBDesc = 'Cashback upto ₹200';
-      freechargeWallet.offerValidDesc = 'Applicable one time per user';
-      break;
-
-    case CHAIPOINT_KEY_ID:
-      airtelMoneyWallet = walletData.airtelmoney;
-      airtelMoneyWallet.offer = 10;
-      airtelMoneyWallet.offerDesc = '10% Cashback on Airtel Money';
-      airtelMoneyWallet.maxCBDesc = 'Cashback upto ₹50';
-      airtelMoneyWallet.offerValidDesc = 'Applicable one time per user';
-      break;
-  }
 }
 
 Session.prototype = {
+  getDecimalAmount: getDecimalAmount,
+  formatAmount: function(amount) {
+    return (amount / 100)
+      .toFixed(2)
+      .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
+      .replace('.00', '');
+  },
+
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -369,15 +342,31 @@ Session.prototype = {
 
   getClasses: function() {
     var classes = [];
-    if(window.innerWidth < 450 || shouldFixFixed || (window.matchMedia && matchMedia('@media (max-device-height: 450px),(max-device-width: 450px)').matches)){
+    if (
+      window.innerWidth < 450 ||
+      shouldFixFixed ||
+      (window.matchMedia &&
+        matchMedia(
+          '@media (max-device-height: 450px),(max-device-width: 450px)'
+        ).matches)
+    ) {
       this.isMobile = true;
       classes.push('mobile');
     }
 
     var getter = this.get;
+    var setter = this.set;
 
     if (!this.r.isLiveMode()) {
       classes.push('test');
+    }
+
+    if (this.forceRender) {
+      classes.push('rerender');
+    }
+
+    if (this.fontLoaded) {
+      classes.push('font-loaded');
     }
 
     if (getter('theme.branding')) {
@@ -386,6 +375,16 @@ Session.prototype = {
 
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
+    }
+
+    var key = getter('key');
+    if (key === UDACITY_KEY || key === EMBIBE_KEY) {
+      if (preferences.order && preferences.order.partial_payment) {
+        classes.push('extra');
+      } else {
+        classes.push('address extra');
+      }
+      setter('address', true);
     }
 
     if (getter('theme.emi_mode')) {
@@ -405,19 +404,36 @@ Session.prototype = {
       classes.push('noimage');
     }
 
-    if(shouldFixFixed){
-      classes.push('ip')
+    if (shouldFixFixed) {
+      classes.push('ip');
+    }
+
+    if (ua_ip7) {
+      classes.push('ip7');
     }
 
     if (/Android 4/.test(ua)) {
       classes.push('android4');
     }
 
+    if (is_ie8) {
+      classes.push('ie8');
+    }
+
+    if (this.extraFields) {
+      classes.push('extra');
+    }
+
     return classes.join(' ');
   },
 
   getEl: function() {
-    if(!this.el){
+    if (!this.el) {
+      if (this.order && this.order.partial_payment) {
+        this.extraFields = true;
+      }
+
+      var classes = this.getClasses();
       var r = this.r;
       var ecod = r.get('ecod');
       if (ecod) {
@@ -447,7 +463,7 @@ Session.prototype = {
         r.set('theme.hide_topbar', true);
         gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
       }
-      $(this.el).addClass(this.getClasses());
+      $(this.el).addClass(classes);
     }
     return this.el;
   },
@@ -459,7 +475,7 @@ Session.prototype = {
     }
     var tab = oldMethod || this.get('prefill.method');
 
-    if (tab && !this.order) {
+    if (tab && !(this.order && this.order.bank)) {
       this.switchTab(tab);
     }
 
@@ -472,37 +488,44 @@ Session.prototype = {
       var data = this.data;
 
       var exp_m = data['card[expiry_month]'];
-      var exp_y = data['card[expiry_year]']
-      if(exp_m && exp_y) {
+      var exp_y = data['card[expiry_year]'];
+      if (exp_m && exp_y) {
         data['card[expiry]'] = exp_m + ' / ' + exp_y;
       }
 
       each(
         {
-          'contact': 'contact',
-          'email': 'email',
-          'bank': 'bank-select',
+          contact: 'contact',
+          email: 'email',
+          bank: 'bank-select',
           'card[name]': 'card_name',
           'card[number]': 'card_number',
           'card[expiry]': 'card_expiry',
           'card[cvv]': 'card_cvv'
         },
-        function(name, id){
+        function(name, id) {
           var el = gel(id);
           var val = data[name];
-          if(el && val) {
+          if (el && val) {
             el.value = val;
           }
         }
-      )
+      );
     }
   },
 
-  render: function(){
-    if (this.isOpen) {
-      return;
+  render: function(options) {
+    options = options || {};
+
+    if (options.forceRender) {
+      this.forceRender = true;
+      this.close();
+    } else {
+      if (this.isOpen) {
+        return;
+      }
+      this.saveAndClose();
     }
-    this.saveAndClose();
     this.isOpen = true;
 
     this.getEl();
@@ -515,47 +538,62 @@ Session.prototype = {
     errorHandler.call(this, this.params);
   },
 
-  setEMI: function(){
-    if(!this.emi && this.methods.emi){
+  setEMI: function() {
+    if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
     }
   },
 
-  setModal: function(){
-    if(!this.modal){
+  setModal: function() {
+    if (!this.modal) {
       this.modal = new window.Modal(this.el, {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
-        onhide: function(){
-          Razorpay.sendMessage({event: 'dismiss'});
+        onhide: function() {
+          Razorpay.sendMessage({ event: 'dismiss' });
         },
-        onhidden: bind(
-          function(){
-            this.saveAndClose();
-            Razorpay.sendMessage({event: 'hidden'});
-          },
-          this
-        )
-      })
+        onhidden: bind(function() {
+          this.saveAndClose();
+          Razorpay.sendMessage({ event: 'hidden' });
+        }, this)
+      });
     }
   },
 
   improvisePaymentOptions: function() {
+    if (this.optional.contact) {
+      if (this.optional.email) {
+        $(this.el).addClass('no-details');
+      }
+      $('#top-right').hide();
+    }
     if (this.methods.count === 1) {
+      var self = this;
+      /* Please don't change the order, this code is order senstive */
+      ['card', 'emi', 'netbanking', 'upi', 'wallet'].some(function(methodName) {
+        if (self.methods[methodName]) {
+          self.oneMethod = methodName;
+          var el = document.createElement('span');
+          el.className = 'proceed-btn';
+          el.innerHTML = 'Pay by ' + tab_titles[methodName];
+          $('#footer').append(el);
+          return true;
+        }
+      });
       $(this.el).addClass('one-method');
       $('.payment-option').addClass('submit-button button');
     }
   },
 
-  renderCss: function(){
+  renderCss: function() {
     var div = this.el;
     var style = document.createElement('style');
     style.type = 'text/css';
     try {
       var getter = this.get;
       div.style.color = getter('theme.color');
-      if(!div.style.color){
+      if (!div.style.color) {
         getter()['theme.color'] = '';
       }
       var rules = templates.theme(getter);
@@ -565,33 +603,33 @@ Session.prototype = {
         style.appendChild(document.createTextNode(rules));
       }
       div.style.color = '';
-    } catch(e){
+    } catch (e) {
       roll('renderCss', e);
     }
     return style;
   },
 
   applyFont: function(anchor, retryCount) {
-    if(!retryCount) {
+    if (!retryCount) {
       retryCount = 0;
     }
-    if(anchor.offsetWidth/anchor.offsetHeight > 3) {
+    if (anchor.offsetWidth / anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
-    }
-    else if(retryCount < 25) {
+      this.fontLoaded = true;
+    } else if (retryCount < 25) {
       var self = this;
-      fontTimeout = setTimeout(function(){
+      fontTimeout = setTimeout(function() {
         self.applyFont(anchor, ++retryCount);
-      }, 120 + retryCount*50);
+      }, 120 + retryCount * 50);
     }
   },
 
   hideErrorMessage: function() {
-    if(this.r._payment) {
+    if (this.r._payment) {
       if (this.payload && this.payload.method === 'upi') {
         return cancel_upi(this);
       }
-      if(confirmClose()) {
+      if (confirmClose()) {
         this.clearRequest();
       } else {
         return;
@@ -600,8 +638,8 @@ Session.prototype = {
     hideOverlayMessage();
   },
 
-  shake: function(){
-    if ( this.el ) {
+  shake: function() {
+    if (this.el) {
       $(this.el.querySelector('#modal-inner'))
         .removeClass('shake')
         .reflow()
@@ -619,26 +657,30 @@ Session.prototype = {
       each(
         $$(selector),
         function(i, element) {
-          listeners.push(
-            $(element).on(event, delegateClass, listener, this)
-          );
+          listeners.push($(element).on(event, delegateClass, listener, this));
         },
         this
-      )
+      );
     } else {
       var self = this;
       var $parent = $(selector);
-      return listeners.push($parent.on(event, function(e) {
-        var target = e.target;
-        while (target !== $parent[0]) {
-          if ($(target).hasClass(delegateClass)) {
-            e.delegateTarget = target;
-            invoke(listener, self, e);
-            break;
-          }
-          target = target.parentNode;
-        }
-      }, useCapture));
+      return listeners.push(
+        $parent.on(
+          event,
+          function(e) {
+            var target = e.target;
+            while (target !== $parent[0]) {
+              if ($(target).hasClass(delegateClass)) {
+                e.delegateTarget = target;
+                invoke(listener, self, e);
+                break;
+              }
+              target = target.parentNode;
+            }
+          },
+          useCapture
+        )
+      );
     }
   },
 
@@ -651,8 +693,8 @@ Session.prototype = {
     }
   },
 
-  secAction: function(){
-    this.track('skipped_save', {while_submitting: !!payload});
+  secAction: function() {
+    this.track('skipped_save', { while_submitting: !!payload });
     $('#save').attr('checked', 0);
     this.wants_skip = true;
     var payload = this.payload;
@@ -670,18 +712,68 @@ Session.prototype = {
   addFunds: function(event) {
     setOtpText('Loading...');
     $('#add-funds').removeClass('show');
-    $('#form-otp').removeClass('action').addClass('loading').css('display', 'block');
+    $('#form-otp')
+      .removeClass('action')
+      .addClass('loading')
+      .css('display', 'block');
     this.r.topupWallet();
   },
 
-  bindEvents: function(){
+  extraNext: function() {
+    var commonInvalid = $('#pad-common .invalid');
+    if (commonInvalid[0]) {
+      return commonInvalid.addClass('mature').$('.input').focus();
+    }
+
+    var partialEl = gel('amount-value');
+    if (partialEl) {
+      var amountValue = partialEl.value;
+      each($$('.amount-figure'), function(i, el) {
+        $(el).html(amountValue);
+      });
+      var options = this.get();
+      options.amount = 100 * amountValue;
+      options['prefill.contact'] = gel('contact').value;
+      options['prefill.email'] = gel('email').value;
+      setPaymentMethods(this);
+      this.render({ forceRender: true });
+    }
+    $(this.el).addClass('show-methods');
+  },
+
+  bindEvents: function() {
+    var thisEl = this.el;
+    this.click('#partial-back', function() {
+      $(thisEl).removeClass('show-methods');
+    });
+
+    this.on('change', '#partial-select-partial', function(e) {
+      if (!e.target.checked) {
+        var amount = this.order.amount_due;
+        $('#amount-value').val(this.getDecimalAmount(amount));
+        this.get().amount = amount;
+        $('#amount .amount-figure').html(this.formatAmount(amount));
+      }
+    });
+
+    this.click('#next-button', 'extraNext');
+    if (is_ie8) {
+      this.bindIeEvents();
+    }
+
     this.on('focus', '#body', 'input', 'focus', true);
     this.on('blur', '#body', 'input', 'blur', true);
-    this.on('input', '#body', 'input', function(e) {
-      this.input(e.target);
-    }, true);
-    if(this.get('theme.close_button')){
-      this.click('#modal-close', function(){
+    this.on(
+      'input',
+      '#body',
+      'input',
+      function(e) {
+        this.input(e.target);
+      },
+      true
+    );
+    if (this.get('theme.close_button')) {
+      this.click('#modal-close', function() {
         if (this.get('modal.confirm_close') && !confirmClose()) {
           return;
         }
@@ -689,7 +781,7 @@ Session.prototype = {
       });
     }
     this.click('#top-left', this.back);
-    this.click('.payment-option', function(e){
+    this.click('.payment-option', function(e) {
       this.switchTab(e.currentTarget.getAttribute('tab') || '');
     });
     this.on('submit', '#form', this.preSubmit);
@@ -697,7 +789,9 @@ Session.prototype = {
     this.click('#otp-resend', this.resendOTP);
     this.click('#otp-sec', this.secAction);
     this.click('#add-funds-action', this.addFunds);
-    this.click('#choose-payment-method', function() { this.setScreen(''); });
+    this.click('#choose-payment-method', function() {
+      this.setScreen('');
+    });
 
     var enabledMethods = this.methods;
     if (enabledMethods.card || enabledMethods.emi) {
@@ -706,65 +800,83 @@ Session.prototype = {
 
       var saveTick = qs('#save');
       if (saveTick) {
-        this.on('change', '#save', function(e){
-          this.track('change_save', {active: e.target.checked});
-        })
+        this.on('change', '#save', function(e) {
+          this.track('change_save', { active: e.target.checked });
+        });
       }
 
       this.on('change', '#emi-bank', function(e) {
-        $('#elem-emi select').html(makeEmiDropdown(emi_options.banks[e.target.value], this, true));
-      })
+        gel('elem-emi select').innerHTML = makeEmiDropdown(
+          emi_options.banks[e.target.value],
+          this,
+          true
+        );
+      });
 
       // saved cards events
       this.click('#show-add-card', this.toggleSavedCards);
       this.click('#show-saved-cards', this.toggleSavedCards);
-      this.on('click', '#saved-cards-container', 'saved-card', this.setSavedCard);
+      this.on(
+        'click',
+        '#saved-cards-container',
+        'saved-card',
+        this.setSavedCard
+      );
     }
     this.on('click', '#top-right', function() {
       $('#top-right').addClass('focus');
       var self = this;
-      var container_listener = $('#container').on('click', function(e) {
-        if (e.target.tagName === 'LI') {
-          var customer = self.customer;
-          customer.logged = false;
-          customer.tokens = null;
-          self.setSavedCards();
-          $('#top-right').removeClass('logged');
-          customer.logout(e.target.parentNode.firstChild === e.target);
-        }
-        container_listener();
-        $('#top-right').removeClass('focus');
-        return preventDefault(e);
-      }, true);
-    })
+      var container_listener = $('#container').on(
+        'click',
+        function(e) {
+          if (e.target.tagName === 'LI') {
+            var customer = self.customer;
+            customer.logged = false;
+            customer.tokens = null;
+            self.setSavedCards();
+            $('#top-right').removeClass('logged');
+            customer.logout(e.target.parentNode.firstChild === e.target);
+          }
+          container_listener();
+          $('#top-right').removeClass('focus');
+          return preventDefault(e);
+        },
+        true
+      );
+    });
     if (enabledMethods.netbanking) {
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
     }
     if (enabledMethods.wallet) {
       try {
-        this.on('change', '#wallets', function(e) {
-          if (this.get('ecod')) {
-            $(this.el).removeClass('notopbar');
-            var tab = $(e.target).attr('tab');
-            if (tab !== 'ecod') {
-              $('#footer').css('display', 'block');
-            }
-            if (tab) {
-              this.switchTab(tab);
+        this.on(
+          'change',
+          '#wallets',
+          function(e) {
+            if (this.get('ecod')) {
+              $(this.el).removeClass('notopbar');
+              var tab = $(e.target).attr('tab');
+              if (tab !== 'ecod') {
+                $('#footer').css('display', 'block');
+              }
+              if (tab) {
+                this.switchTab(tab);
+              } else {
+                this.preSubmit();
+              }
             } else {
-              this.preSubmit();
+              var value = e.target.value;
+              if (value) {
+                $('.offer-info.active').removeClass('active');
+                $('#' + value + '-info').addClass('active');
+              }
+              $('#wallets').removeClass('invalid');
             }
-          } else {
-            var value = e.target.value;
-            if (value) {
-              $('.offer-info.active').removeClass('active');
-              $('#' + value + '-info').addClass('active');
-            }
-            $('#wallets').removeClass('invalid');
-          }
-        }, true);
-      } catch(e) {}
+          },
+          true
+        );
+      } catch (e) {}
     }
 
     if (enabledMethods.upi) {
@@ -776,10 +888,10 @@ Session.prototype = {
         var metaParam = {};
         metaParam[upi_radio.prop('name')] = upi_radio.val();
         this.clearRequest(metaParam);
-      })
+      });
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
-      })
+      });
     }
 
     if (this.get('ecod')) {
@@ -799,27 +911,41 @@ Session.prototype = {
           return cancel_upi(this);
         }
         this.r.focus();
-      })
+      });
     }
     this.click('#backdrop', this.hideErrorMessage);
     this.click('#overlay', this.hideErrorMessage);
     this.click('#fd-hide', this.hideErrorMessage);
   },
 
+  bindIeEvents: function() {
+    /* Binding IE8 events */
+    var self = this;
+
+    self.click('#body', 'radio-item', function(e) {
+      var target = $(e.delegateTarget);
+      var radio = target.find('input[type=radio]')[0];
+      each($$('.radio-item.active'), function(idx, item) {
+        $(item).removeClass('active');
+      });
+      target.addClass('active');
+      radio.checked = true;
+      this.selectBankRadio({ target: radio });
+    });
+  },
+
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
     if (ua_iPhone) {
-      Razorpay.sendMessage({event: 'focus'});
+      Razorpay.sendMessage({ event: 'focus' });
     }
   },
 
   blur: function(e) {
-    $(e.target.parentNode)
-      .removeClass('focused')
-      .addClass('mature');
+    $(e.target.parentNode).removeClass('focused').addClass('mature');
     this.input(e.target);
     if (ua_iPhone) {
-      Razorpay.sendMessage({event: 'blur'});
+      Razorpay.sendMessage({ event: 'blur' });
     }
   },
 
@@ -830,6 +956,10 @@ Session.prototype = {
     var $parent = $(el.parentNode);
 
     $parent.toggleClass('filled', value);
+
+    if (is_ie8) {
+      return toggleInvalid($parent, true);
+    }
 
     // validity check past this
     if (!(required || pattern)) {
@@ -860,7 +990,9 @@ Session.prototype = {
     var self = this;
     self.refresh();
     var bits = self.bits;
-    var delegator = self.delegator = Razorpay.setFormatter(self.el);
+    var delegator = (self.delegator = Razorpay.setFormatter(self.el));
+
+    var el_amount = gel('amount-value');
     if (self.methods.card || self.methods.emi) {
       var el_card = gel('card_number');
       var el_expiry = gel('card_expiry');
@@ -871,28 +1003,47 @@ Session.prototype = {
       // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
       try {
         // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
-        if (el_cvv && typeof getComputedStyle(el_expiry)['-webkit-text-security'] === 'string') {
+        if (
+          el_cvv &&
+          typeof getComputedStyle(el_expiry)['-webkit-text-security'] ===
+            'string'
+        ) {
           el_cvv.type = 'tel';
         }
-      } catch(e){}
+      } catch (e) {}
 
-      delegator.card = delegator.add('card', el_card)
+      delegator.card = delegator
+        .add('card', el_card)
         .on('network', function() {
           var type = this.type;
           // update cvv element
           var cvvlen = type !== 'amex' ? 3 : 4;
           el_cvv.maxLength = cvvlen;
-          el_cvv.pattern = '^[0-9]{'+cvvlen+'}$';
+          el_cvv.pattern = '^[0-9]{' + cvvlen + '}$';
           $(el_cvv)
             .toggleClass('amex', type === 'amex')
             .toggleClass('maestro', type === 'maestro');
+
+          if (!preferences.methods.amex && type === 'amex') {
+            $('#elem-card').addClass('noamex');
+          } else {
+            $('#elem-card').removeClass('noamex');
+          }
+
           self.input(el_cvv);
 
           // card icon element
-          this.el.parentNode.querySelector('.cardtype').setAttribute('cardtype', type);
+          this.el.parentNode
+            .querySelector('.cardtype')
+            .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid();
+          var isValid = this.isValid(), type = this.type;
+
+          if (!preferences.methods.amex && type === 'amex') {
+            isValid = false;
+          }
+
           // set validity classes
           toggleInvalid($(this.el.parentNode), isValid);
 
@@ -900,9 +1051,10 @@ Session.prototype = {
           if (isValid && this.el.value.length === this.caretPosition) {
             invoke('focus', el_expiry, null, 0);
           }
-        })
+        });
 
-      delegator.expiry = delegator.add('expiry', el_expiry)
+      delegator.expiry = delegator
+        .add('expiry', el_expiry)
         .on('change', function() {
           self.input(el_expiry);
 
@@ -912,25 +1064,57 @@ Session.prototype = {
           if (isValid && this.el.value.length === this.caretPosition) {
             invoke('focus', el_name.value ? el_cvv : el_name);
           }
-        })
+        });
 
-      delegator.cvv = delegator.add('number', el_cvv)
-        .on('change', function() {
-          self.input(this.el);
-        })
+      delegator.cvv = delegator.add('number', el_cvv).on('change', function() {
+        self.input(this.el);
+      });
     }
-    delegator.contact = delegator.add('phone', gel('contact'))
+
+    if (el_amount) {
+      delegator.amount = delegator
+        .add('amount', el_amount)
+        .on('change', function() {
+          self.input(el_amount);
+          var value = this.value * 100;
+          var maxAmount = self.order.partial_payment
+            ? self.order.amount_due
+            : self.order.amount;
+
+          var isValid = 0 < value && value <= maxAmount;
+          toggleInvalid($(this.el.parentNode), isValid);
+
+          if (isValid) {
+            $('#amount .amount-figure').html(self.formatAmount(value));
+          }
+        });
+    }
+
+    var contactEl = gel('contact');
+    if (contactEl && !contactEl.readOnly) {
+      delegator.contact = delegator.add('phone').on('change', function() {
+        self.input(this.el);
+      });
+    }
+    delegator.otp = delegator
+      .add('number', gel('otp'))
       .on('change', function() {
         self.input(this.el);
-      })
-    delegator.otp = delegator.add('number', gel('otp'))
-      .on('change', function() {
+      });
+
+    var pinEl = gel('pincode');
+    if (pinEl) {
+      delegator.add('number', pinEl).on('change', function() {
         self.input(this.el);
-      })
+        if (this.value.length === 6) {
+          $('#state').focus();
+        }
+      });
+    }
   },
 
-  setScreen: function(screen){
-    if(screen === this.screen) {
+  setScreen: function(screen) {
+    if (screen === this.screen) {
       return;
     }
     this.screen = screen;
@@ -939,19 +1123,19 @@ Session.prototype = {
 
     if (screen) {
       var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
-      $('#tab-title').html(screenTitle);
+      gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
     } else {
       makeHidden('#topbar');
     }
 
     var screenEl = '#form-' + (screen || 'common');
-    makeVisible(screenEl)
+    makeVisible(screenEl);
     invoke('focus', qs(screenEl + ' .invalid input'));
     this.body.toggleClass('sub', screen);
   },
 
-  back: function(){
+  back: function() {
     var tab;
     if (this.get('ecod')) {
       $('#footer').hide();
@@ -968,14 +1152,17 @@ Session.prototype = {
 
   switchTab: function(tab) {
     // initial screen
-    if (!this.tab){
+    if (!this.tab) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
     }
     if (tab) {
       var contact = getPhone();
-      if (!contact || this.get('method.' + tab) === false) {
+      if (
+        (!contact && !this.optional.contact) ||
+        this.get('method.' + tab) === false
+      ) {
         return;
       }
       this.customer = getCustomer(contact);
@@ -1028,7 +1215,7 @@ Session.prototype = {
 
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true);
-      customer.checkStatus(function(){
+      customer.checkStatus(function() {
         // customer status check also sends otp if customer exists
         if (customer.saved && !customer.logged) {
           askOTP();
@@ -1041,7 +1228,7 @@ Session.prototype = {
     }
   },
 
-  showCards: function(){
+  showCards: function() {
     this.setSavedCards();
     this.setScreen('card');
   },
@@ -1055,14 +1242,14 @@ Session.prototype = {
     if (confirm('Press OK to delete card.')) {
       this.customer.deleteCard(
         parent.find('[type=radio]')[0].value,
-        function(){
+        function() {
           parent.remove();
         }
       );
     }
   },
 
-  setSavedCard: function (e) {
+  setSavedCard: function(e) {
     var $savedCard = $(e.delegateTarget);
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
@@ -1072,7 +1259,7 @@ Session.prototype = {
     var cardtype = $savedCard.$('.cardtype').attr('cardtype');
   },
 
-  setSavedCards: function(){
+  setSavedCards: function() {
     var customer = this.customer;
     var tokens = customer && customer.tokens && customer.tokens.count;
     var cardTab = $('#form-card');
@@ -1082,14 +1269,16 @@ Session.prototype = {
         try {
           customer.tokens.items.sort(function(a, b) {
             return b.card && !!b.card.emi;
-          })
-        } catch(e){}
-        $('#saved-cards-container').html(templates.savedcards(customer.tokens));
+          });
+        } catch (e) {}
+        gel('saved-cards-container').innerHTML = templates.savedcards(
+          customer.tokens
+        );
       }
     }
 
     if (tokens) {
-      this.setSavedCard({delegateTarget: qs('.saved-card')});
+      this.setSavedCard({ delegateTarget: qs('.saved-card') });
     }
 
     this.savedCardScreen = tokens;
@@ -1110,15 +1299,15 @@ Session.prototype = {
     var $savedContainer = $('#saved-cards-container');
 
     if (saveScreen) {
-      this.setSavedCard({delegateTarget: qs('.saved-card')});
+      this.setSavedCard({ delegateTarget: qs('.saved-card') });
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
       try {
         if (document.activeElement) {
           document.activeElement.blur();
         }
-      } catch(e){}
-      invoke('onSixDigits', this, {target: gel('card_number')});
+      } catch (e) {}
+      invoke('onSixDigits', this, { target: gel('card_number') });
       $savedContainer.removeClass('scroll');
     }
 
@@ -1126,23 +1315,33 @@ Session.prototype = {
     tabCard.toggleClass(saveClass, saveScreen);
   },
 
-  switchBank: function(e){
+  switchBank: function(e) {
     var val = e.target.value;
-    each(
-      $$('#netb-banks input'),
-      function(i, radio) {
-        if(radio.value === val){
-          radio.checked = true;
-        } else if(radio.checked){
-          radio.checked = false;
-        }
+    this.checkDown(val);
+    each($$('#netb-banks input'), function(i, radio) {
+      $(radio.parentNode).removeClass('active');
+      if (radio.value === val) {
+        $(radio.parentNode).addClass('active');
+        radio.checked = true;
+      } else if (radio.checked) {
+        $(radio.parentNode).removeClass('active');
+        radio.checked = false;
       }
-    )
+    });
   },
 
-  selectBankRadio: function(e){
+  checkDown: function(val) {
+    $('.down')
+      .toggleClass('vis', indexOf(this.down, val) !== -1)
+      .$('.text')
+      .html(this.methods.netbanking[val]);
+  },
+
+  selectBankRadio: function(e) {
+    var val = e.target.value;
+    this.checkDown(val);
     var select = gel('bank-select');
-    select.value = e.target.value;
+    select.value = val;
     this.input(select);
   },
 
@@ -1155,21 +1354,21 @@ Session.prototype = {
       }
     }
     var invalids = $(parent).find('.invalid');
-    if(invalids[0]){
+    if (invalids[0]) {
       this.shake();
       var invalidInput = $(invalids[0]).find('.input')[0];
-      if(invalidInput){
+      if (invalidInput) {
         invalidInput.focus();
       }
 
-      each( invalids, function(i, field){
+      each(invalids, function(i, field) {
         $(field).addClass('mature');
-      })
+      });
       return true;
     }
   },
 
-  getActiveForm: function(){
+  getActiveForm: function() {
     var form = this.tab || 'common';
     if (form === 'card' || form === 'emi') {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
@@ -1178,12 +1377,30 @@ Session.prototype = {
     return '#form-' + form;
   },
 
-  getFormData: function(){
+  getFormData: function() {
     var tab = this.tab;
     var data = {};
 
     fillData('#pad-common', data);
-    data['contact'] = data['contact'].replace(/\ /g, '');
+
+    var prefillEmail = this.get('prefill.email');
+    var prefillContact = this.get('prefill.contact');
+
+    if (
+      this.optional.contact &&
+      !(prefillContact && contactPattern.test(prefillContact))
+    ) {
+      delete data.contact;
+    } else {
+      data.contact = data.contact.replace(/\ /g, '');
+    }
+
+    if (
+      this.optional.email &&
+      !(this.get('prefill.email') && emailPattern.test(data.email))
+    ) {
+      delete data.email;
+    }
 
     if (tab) {
       data.method = tab;
@@ -1210,8 +1427,8 @@ Session.prototype = {
     return data;
   },
 
-  hide: function(){
-    if(this.isOpen){
+  hide: function() {
+    if (this.isOpen) {
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
@@ -1223,40 +1440,46 @@ Session.prototype = {
     var actionState;
     var loadingState = 'addClass';
     if (error) {
-      if ((this.screen === 'upi' || this.get('ecod')) && text === discreet.cancelMsg) {
+      if (
+        (this.screen === 'upi' || this.get('ecod')) &&
+        text === discreet.cancelMsg
+      ) {
         return this.hideErrorMessage();
       }
       actionState = loadingState;
-      loadingState = 'removeClass'
+      loadingState = 'removeClass';
     } else {
       actionState = 'removeClass';
     }
 
-    if(!text) {
+    if (!text) {
       text = strings.process;
     }
 
-    if(this.screen === 'otp') {
+    if (this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
       $('#form-otp')[actionState]('action')[loadingState]('loading');
     } else {
       $('#fd-t').html(text);
-      showOverlay(
-        $('#error-message')[loadingState]('loading')
-      );
+      showOverlay($('#error-message')[loadingState]('loading'));
     }
   },
 
-  commenceOTP: function(text, partial){
+  commenceOTP: function(text, partial) {
     this.setScreen('otp');
     $('#add-funds').removeClass('show');
 
-    invoke(function(){
-      if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
-        $('#footer').addClass('otp');
-      }
-    }, this, null, 300);
+    invoke(
+      function() {
+        if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
+          $('#footer').addClass('otp');
+        }
+      },
+      this,
+      null,
+      300
+    );
 
     if (text) {
       if (partial) {
@@ -1266,14 +1489,14 @@ Session.prototype = {
     }
   },
 
-  onOtpSubmit: function(){
-    if (this.checkInvalid('#form-otp')){
+  onOtpSubmit: function() {
+    if (this.checkInvalid('#form-otp')) {
       return;
     }
     this.showLoadError('Verifying OTP');
     var otp = gel('otp').value.replace(/\D/g, '');
 
-    if(this.tab === 'wallet'){
+    if (this.tab === 'wallet') {
       return this.r.submitOTP(otp);
     }
 
@@ -1285,8 +1508,8 @@ Session.prototype = {
       if (!isRedirect) {
         this.submit();
       }
-      callback = function(msg){
-        if(this.customer.logged){
+      callback = function(msg) {
+        if (this.customer.logged) {
           this.setScreen('card');
           if (isRedirect) {
             this.submit();
@@ -1298,10 +1521,10 @@ Session.prototype = {
           this.r.emit('payment.error', discreet.error(msg));
           askOTP(msg);
         }
-      }
+      };
     } else {
       var self = this;
-      callback = function(msg){
+      callback = function(msg) {
         if (self.customer.logged) {
           self.showCardTab();
         } else {
@@ -1309,13 +1532,16 @@ Session.prototype = {
         }
       };
     }
-    this.customer.submitOTP({
-      otp: otp,
-      email: gel('email').value
-    }, bind(callback, this));
+    this.customer.submitOTP(
+      {
+        otp: otp,
+        email: gel('email').value
+      },
+      bind(callback, this)
+    );
   },
 
-  clearRequest: function(extra){
+  clearRequest: function(extra) {
     var powerotp = gel('powerotp');
     if (powerotp) {
       powerotp.value = '';
@@ -1331,6 +1557,16 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
+      return this.extraNext();
+    }
+    if (this.oneMethod && !this.tab) {
+      setTimeout(function() {
+        window.scrollTo(0, 100);
+      });
+      return this.switchTab(this.oneMethod);
+    }
+
     preventDefault(e);
     var screen = this.screen;
 
@@ -1343,8 +1579,8 @@ Session.prototype = {
     }
 
     this.refresh();
-    var data = this.payload = this.getPayload();
-    if (this.order) {
+    var data = (this.payload = this.getPayload());
+    if (this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
@@ -1357,7 +1593,9 @@ Session.prototype = {
 
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
-        if (!preferences.methods.amex && formattingDelegator.card.type === 'amex') {
+        if (
+          !preferences.methods.amex && formattingDelegator.card.type === 'amex'
+        ) {
           return this.showLoadError('AMEX cards are not supported', true);
         }
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
@@ -1398,7 +1636,7 @@ Session.prototype = {
     this.submit();
   },
 
-  submit: function(){
+  submit: function() {
     var data = this.payload;
     var request = {
       fees: preferences.fee_bearer
@@ -1417,6 +1655,20 @@ Session.prototype = {
     }
     delete data.app_token;
 
+    var $address = $('#address');
+
+    if ($address[0]) {
+      var notes = (data.notes = clone(this.get('notes')) || {});
+      notes.address = $address.val();
+      notes.pincode = $('#pincode').val();
+      notes.state = $('#state').val();
+      if (Object.keys(notes).length > 15) {
+        delete notes.pincode;
+        delete notes.state;
+        notes.address += ', ' + states[notes.state] + ' - ' + notes.pincode;
+      }
+    }
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data
@@ -1432,14 +1684,21 @@ Session.prototype = {
       }
     }
 
-    if(this.modal){
+    if (this.modal) {
       this.modal.options.backdropclose = false;
     }
 
-    if ((wallet === 'mobikwik' || wallet === 'payumoney' || wallet === 'freecharge' || wallet ==='olamoney') && !request.fees) {
+    if (
+      (wallet === 'mobikwik' ||
+        wallet === 'payumoney' ||
+        wallet === 'freecharge' ||
+        wallet === 'olamoney') &&
+      !request.fees
+    ) {
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
-      tab_titles.otp = '<img src="'+walletObj.col+'" height="'+walletObj.h+'">';
+      tab_titles.otp =
+        '<img src="' + walletObj.col + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
     } else {
       this.showLoadError();
@@ -1453,7 +1712,8 @@ Session.prototype = {
       $('#otp').attr('maxlength', 6);
     }
 
-    this.r.createPayment(data, request)
+    this.r
+      .createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this))
       .on('payment.data', function(data) {
@@ -1466,51 +1726,62 @@ Session.prototype = {
     if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);
-      this.r.on('payment.wallet.topup', bind(function() {
-        var insufficient_text = 'Insufficient balance in your wallet';
-        if (this.get('ecod')) {
-          this.back();
-          this.clearRequest();
-          defer(bind(function() {
-            this.showLoadError(insufficient_text, true);
-          }, this), 400);
-        }
-        if (this.payload && this.payload.wallet === 'payumoney' && this.r._payment) {
-          if (!window.localStorage) {
-            return this.r._payment.complete(discreet.error(insufficient_text));
+      this.r.on(
+        'payment.wallet.topup',
+        bind(function() {
+          var insufficient_text = 'Insufficient balance in your wallet';
+          if (this.get('ecod')) {
+            this.back();
+            this.clearRequest();
+            defer(
+              bind(function() {
+                this.showLoadError(insufficient_text, true);
+              }, this),
+              400
+            );
           }
-        }
-        $('#form-otp').removeClass('loading');
-        $('#add-funds').addClass('show');
-        setOtpText(insufficient_text);
-      }, this));
+          if (
+            this.payload &&
+            this.payload.wallet === 'payumoney' &&
+            this.r._payment
+          ) {
+            if (!window.localStorage) {
+              return this.r._payment.complete(
+                discreet.error(insufficient_text)
+              );
+            }
+          }
+          $('#form-otp').removeClass('loading');
+          $('#add-funds').addClass('show');
+          setOtpText(insufficient_text);
+        }, this)
+      );
     } else if (data.method === 'upi') {
-      sub_link.html('Cancel Payment')
-      this.r.on('payment.upi.pending', bind('showLoadError', this,
-        'Please accept collect request from <strong>razorpay@icici</strong> on your UPI app'
-      ));
+      sub_link.html('Cancel Payment');
+      this.r.on(
+        'payment.upi.pending',
+        bind(
+          'showLoadError',
+          this,
+          'Please accept collect request from <strong>razorpay@icici</strong> on your UPI app'
+        )
+      );
     } else {
-      sub_link.html('Go to payment')
-      this.r.on('payment.cancel', bind('showLoadError', this, discreet.cancelMsg, true));
+      sub_link.html('Go to payment');
+      this.r.on(
+        'payment.cancel',
+        bind('showLoadError', this, discreet.cancelMsg, true)
+      );
     }
   },
 
-  getPayload: function(){
+  getPayload: function() {
     var data = this.getFormData();
 
-    if(this.screen === 'card'){
+    if (this.screen === 'card') {
       setEmiBank(data, this.savedCardScreen);
-
-      var customer = this.customer;
-      var recurring = this.get('recurring');
-
-      // set app_token if either new card or saved card (might be blank)
-      if (customer.customer_id) {
-        data.customer_id = customer.customer_id;
-
-        if (recurring !== null) {
-          data.recurring = recurring ? 1 : 0;
-        }
+      if (this.recurring) {
+        data.recurring = 1;
       }
     }
 
@@ -1519,8 +1790,8 @@ Session.prototype = {
     return data;
   },
 
-  close: function(){
-    if(this.isOpen){
+  close: function() {
+    if (this.isOpen) {
       abortAjax(this.ajax);
       this.clearRequest();
       this.isOpen = false;
@@ -1529,7 +1800,7 @@ Session.prototype = {
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
-      } catch(e) {}
+      } catch (e) {}
       invokeOnEach('off', this.bits);
       this.listeners = [];
       this.bits = [];
@@ -1539,41 +1810,44 @@ Session.prototype = {
 
       this.tab = this.screen = '';
 
-      if(this.emi){
+      if (this.emi) {
         this.emi.unbind();
       }
 
       this.tab = this.screen = '';
-      this.modal =
-      this.emi =
-      this.el =
-      this.card =
-      window.setPaymentID =
-      window.onComplete = null;
+      this.modal = this.emi = this.el = this
+        .card = window.setPaymentID = window.onComplete = null;
     }
   },
 
-  saveAndClose: function(){
+  saveAndClose: function() {
     if (this.isOpen) {
       this.data = this.getFormData();
       this.close();
     }
   }
-}
+};
 
 function commenceECOD(session) {
-  var url = makeAuthUrl(session.r, 'invoices/' + session.get('invoice_id') + '/status');
+  var url = makeAuthUrl(
+    session.r,
+    'invoices/' + session.get('invoice_id') + '/status'
+  );
   setTimeout(function() {
-    session.ajax = recurseAjax(url, function(response) {
-      if (response.error) {
-        errorHandler.call(session, response);
-      } else if (response.razorpay_payment_id) {
-        successHandler.call(session, response);
+    session.ajax = recurseAjax(
+      url,
+      function(response) {
+        if (response.error) {
+          errorHandler.call(session, response);
+        } else if (response.razorpay_payment_id) {
+          successHandler.call(session, response);
+        }
+      },
+      function(response) {
+        return response && response.status;
       }
-    }, function(response) {
-      return response && response.status;
-    })
-  }, 6000)
+    );
+  }, 6000);
 }
 
 function send_ecod_link() {
@@ -1583,5 +1857,5 @@ function send_ecod_link() {
   $.post({
     url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
     callback: debounce(hideOverlayMessage, 4000)
-  })
+  });
 }

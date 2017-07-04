@@ -9,7 +9,8 @@
     <style>
       @font-face {
         font-family:'lato';
-        src: url("fonts/lato.woff") format('woff');
+        src: url('fonts/lato.eot?#iefix') format('embedded-opentype'),
+          url('fonts/lato.woff') format('woff');
         font-weight:normal;
         font-style:normal
       }
@@ -28,21 +29,30 @@
           "paytm":true,
           "mobikwik":false,
           "payzapp":false
-        }
+        },
+        emi: true
       },
+      // optional: ['email', 'contact'],
       options: {
         theme: {
           color: 'red'
         }
+      },
+      "order": {
+        "partial_payment": true,
+        "amount": 4000000,
+        "amount_paid": 0,
+        "amount_due": 3900000
       }
     }
-    delete window.preferences;
+    window.preferences = null;
     </script>
   </body>
   <!-- build:js checkout-frame.js -->
   <!-- This is equivalent to razorpay.js -->
+  <script src="js/lib/polyfill.js"></script>
   <script src="js/lib/util.js"></script>
-  <script src="js/lib/nominal-jquery.js"></script>
+  <script src="js/lib/$.js"></script>
   <script src="js/lib/evthandler.js"></script>
   <script src="js/tracker.js"></script>
   <script src="js/lib/eventer.js"></script>
@@ -50,8 +60,6 @@
   <script src="js/checkout/init.js"></script>
   <script src="js/razorpay/init.js"></script>
   <script src="js/options.js"></script><!--coverage-->
-  <script src="js/lib/tracekit.js"></script>
-  <script src="js/rollbar.js"></script>
   <script src="js/checkout-frame/init.js"></script>
   <script src="js/lib/popup.js"></script>
   <script src="js/lib/jsonp.js"></script>
@@ -67,6 +75,7 @@
   <script src="templates/emi.js"></script>
   <script src="templates/savedcards.js"></script>
   <script src="/js/lib/modal.js"></script>
+  <script src="/js/checkout-frame/pincodes.js"></script>
   <script src="/js/checkout-frame/customer.js"></script>
   <script src="/js/checkout-frame/emi.js"></script>
   <script src="/js/checkout-frame/session.js"></script><!--coverage-->
@@ -83,7 +92,7 @@
 <script>
 var options = {
   // 'key': 'rzp_live_ILgsfZCZoFIKMb',
-  'key': 'rzp_test_1DP5mmOlF5G5ag',
+  'key': 'rzp_test_dsm4Fub8UjpkF7',
   // key: 'rzp_live_gC8obGlwaRlyui',
   'amount': 749090,
   'name': 'Innerchef',
@@ -97,6 +106,7 @@ var options = {
     wallet: true,
     card: true
   },
+  subscription_id: 'sub_7zaQ1XaLaJrmOZ',
   'remember_customer': false,
   // parent: '#x',
   external: {
@@ -122,6 +132,7 @@ var options = {
   },
   // order_id: 'order_7I0DqYTedcFfns',
   theme: {
+    // customer_details: false,
     color: '#1abc9c'
   },
   modal: {

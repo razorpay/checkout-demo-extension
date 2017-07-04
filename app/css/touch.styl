@@ -111,16 +111,21 @@ $mobile-view() {
   }
 
   #container.one-method {
-    #payment-options {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      left: 0;
-    }
     .recurring-message {
       position: fixed;
       bottom: 72px;
     }
+  }
+
+  #container.extra {
+    #next-button {
+      transform: translateY(-100%);
+    }
+  }
+
+  #card-offer {
+    position: fixed;
+    bottom: 70px;
   }
 }
 

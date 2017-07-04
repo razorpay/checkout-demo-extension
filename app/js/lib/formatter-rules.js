@@ -1,5 +1,8 @@
-(function(){
+function getDecimalAmount(amount) {
+  return (amount / 100).toFixed(2).replace('.00', '');
+}
 
+(function() {
   var cardPatterns = {
     visa: /^4/,
     mastercard: /^(5[1-5]|2[2-7])/,
@@ -76,7 +79,7 @@
   Formatter.rules = {
     card: {
       setValue: function(value) {
-        var currentType = this.currentType = getType(value);
+        var currentType = (this.currentType = getType(value));
 
         if (currentType !== this.type) {
           this.maxLen = getMaxLen(currentType);
@@ -86,7 +89,9 @@
 
       pretty: function(value, shouldTrim) {
         var len = this.maxLen;
-        var prettyValue = value.slice(0, len).replace(getCardSpacing(len), '$1 ');
+        var prettyValue = value
+          .slice(0, len)
+          .replace(getCardSpacing(len), '$1 ');
         if (shouldTrim || value.length >= len) {
           prettyValue = prettyValue.trim();
         }
@@ -98,7 +103,7 @@
           type: this.currentType,
           maxLen: this.maxLen,
           valid: this.isValid()
-        }
+        };
         if (o.type !== this.type) {
           this.type = o.type;
           this.emit('network', o);
@@ -115,7 +120,6 @@
     },
 
     expiry: {
-
       pretty: function(value, shouldTrim) {
         value = value
           .replace(/^([2-9])$/, '0$1')
@@ -141,7 +145,9 @@
           var currentTime = new Date();
           var currentYear = currentTime.getYear() - 100;
           if (currentYear === yearValue) {
-            return parseInt(this.value.slice(0, 2), 10) >= currentTime.getMonth();
+            return (
+              parseInt(this.value.slice(0, 2), 10) >= currentTime.getMonth()
+            );
           }
           return yearValue > currentYear;
         }
@@ -158,6 +164,26 @@
       }
     },
 
+    amount: {
+      raw: function(value) {
+        return value
+          .split('.')
+          .slice(0, 2)
+          .map(function(v, index) {
+            v = v.replace(/\D/g, '');
+            if (index) {
+              v = v.slice(0, 2);
+            }
+            return v;
+          })
+          .join('.');
+      },
+
+      pretty: function(value) {
+        return value;
+      }
+    },
+
     phone: {
       raw: function(value) {
         var returnVal = value.slice(0, 15).replace(/\D/g, '');
@@ -167,5 +193,5 @@
         return returnVal;
       }
     }
-  }
+  };
 })();
