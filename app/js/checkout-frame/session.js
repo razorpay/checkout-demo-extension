@@ -1038,7 +1038,8 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(), type = this.type;
+          var isValid = this.isValid(),
+            type = this.type;
 
           if (!preferences.methods.amex && type === 'amex') {
             isValid = false;
@@ -1594,7 +1595,8 @@ Session.prototype = {
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
         if (
-          !preferences.methods.amex && formattingDelegator.card.type === 'amex'
+          !preferences.methods.amex &&
+          formattingDelegator.card.type === 'amex'
         ) {
           return this.showLoadError('AMEX cards are not supported', true);
         }
@@ -1753,14 +1755,13 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
-      this.r.on(
-        'payment.upi.pending',
-        bind(
-          'showLoadError',
-          this,
-          'Please accept collect request from <strong>razorpay@icici</strong> on your UPI app'
-        )
-      );
+      var that = this;
+      this.r.on('payment.upi.pending', function(data) {
+        var vpa = data ? data.vpa : 'razorpay@icici';
+        that.showLoadError(
+          'Please accept collect request from ' + vpa + ' on your UPI app'
+        );
+      });
     } else {
       sub_link.html('Go to payment');
       this.r.on(
@@ -1810,8 +1811,7 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.modal = this.emi = this.el = this
-        .card = window.setPaymentID = window.onComplete = null;
+      this.modal = this.emi = this.el = this.card = window.setPaymentID = window.onComplete = null;
     }
   },
 
