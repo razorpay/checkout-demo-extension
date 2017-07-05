@@ -806,7 +806,7 @@ Session.prototype = {
       }
 
       this.on('change', '#emi-bank', function(e) {
-        gel('elem-emi select').innerHTML = makeEmiDropdown(
+        $('#elem-emi select')[0].innerHTML = makeEmiDropdown(
           emi_options.banks[e.target.value],
           this,
           true
@@ -1757,8 +1757,9 @@ Session.prototype = {
       sub_link.html('Cancel Payment');
       var that = this;
       this.r.on('payment.upi.pending', function(data) {
+        var vpa = data ? data.vpa : 'razorpay@icici';
         that.showLoadError(
-          'Please accept collect request from ' + data.vpa + ' on your UPI app'
+          'Please accept collect request from ' + vpa + ' on your UPI app'
         );
       });
     } else {
