@@ -1718,9 +1718,13 @@ Session.prototype = {
       .on('payment.error', bind(errorHandler, this))
       .on('payment.data', function(data) {
         if (data && data.vpa) {
-          $('#rzp-vpa').html(data.vpa);
+          $('#fd-t').html(
+            'Please accept collect request from ' +
+              data.vpa +
+              ' on your UPI app'
+          );
         }
-      })
+      });
 
     var sub_link = $('#error-message .link');
     if (request.powerwallet) {
@@ -1758,14 +1762,7 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
-      this.r.on(
-        'payment.upi.pending',
-        bind(
-          'showLoadError',
-          this,
-          'Please accept collect request from <strong>razorpay@icici</strong> on your UPI app'
-        )
-      );
+      this.r.on('payment.upi.pending', bind('showLoadError', this));
     } else {
       sub_link.html('Go to payment');
       this.r.on(
