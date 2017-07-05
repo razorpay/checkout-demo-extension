@@ -450,10 +450,10 @@ function ajaxCallback(response) {
     if (request && request.url && RazorpayConfig.frame) {
       request.url = request.url.replace(/^.+v1\//, makeUrl());
     }
-    if (request.data) {
-      this.emit('payment.data', request.data);
+    var func = responseTypes[response.type];
+    if (typeof func === 'function') {
+      func.call(this, request, response);
     }
-    invoke(responseTypes[response.type], this, request);
   }
 }
 
@@ -533,7 +533,7 @@ var responseTypes = {
     }
   },
 
-  async: function(request) {
+  async: function(request, fullResponse) {
     var self = this;
     var url = request.url;
     if (url.indexOf('key_id') === -1) {
@@ -550,7 +550,7 @@ var responseTypes = {
       null,
       $.jsonp
     );
-    self.emit('upi.pending');
+    self.emit('upi.pending', fullResponse.data);
   },
 
   otp: function(request) {
