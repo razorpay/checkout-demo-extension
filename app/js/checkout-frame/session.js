@@ -1038,8 +1038,7 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(),
-            type = this.type;
+          var isValid = this.isValid(), type = this.type;
 
           if (!preferences.methods.amex && type === 'amex') {
             isValid = false;
@@ -1146,6 +1145,9 @@ Session.prototype = {
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
     } else {
+      if (this.get('theme.close_method_back')) {
+        return this.modal.hide();
+      }
       tab = '';
     }
     this.switchTab(tab);
@@ -1595,8 +1597,7 @@ Session.prototype = {
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
         if (
-          !preferences.methods.amex &&
-          formattingDelegator.card.type === 'amex'
+          !preferences.methods.amex && formattingDelegator.card.type === 'amex'
         ) {
           return this.showLoadError('AMEX cards are not supported', true);
         }
@@ -1811,7 +1812,8 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.modal = this.emi = this.el = this.card = window.setPaymentID = window.onComplete = null;
+      this.modal = this.emi = this.el = this
+        .card = window.setPaymentID = window.onComplete = null;
     }
   },
 
