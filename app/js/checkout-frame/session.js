@@ -428,13 +428,15 @@ Session.prototype = {
   },
 
   getEl: function() {
+    var r = this.r;
     if (!this.el) {
-      if (this.order && this.order.partial_payment) {
+      if (
+        this.order && this.order.partial_payment && !r.get('prefill.amount')
+      ) {
         this.extraFields = true;
       }
 
       var classes = this.getClasses();
-      var r = this.r;
       var ecod = r.get('ecod');
       if (ecod) {
         if (!r.get('prefill.email')) {
