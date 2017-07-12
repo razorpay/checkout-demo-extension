@@ -1094,9 +1094,11 @@ Session.prototype = {
 
     var contactEl = gel('contact');
     if (contactEl && !contactEl.readOnly) {
-      delegator.contact = delegator.add('phone').on('change', function() {
-        self.input(this.el);
-      });
+      delegator.contact = delegator
+        .add('phone', contactEl)
+        .on('change', function() {
+          self.input(this.el);
+        });
     }
     delegator.otp = delegator
       .add('number', gel('otp'))
