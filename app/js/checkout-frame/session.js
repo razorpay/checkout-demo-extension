@@ -792,7 +792,7 @@ Session.prototype = {
     this.click('#otp-sec', this.secAction);
     this.click('#add-funds-action', this.addFunds);
     this.click('#choose-payment-method', function() {
-      this.setScreen('');
+      this.switchTab();
     });
 
     var enabledMethods = this.methods;
