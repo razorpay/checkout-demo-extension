@@ -25,6 +25,7 @@ RazorpayDefaults.method = {
 };
 
 RazorpayDefaults.prefill = {
+  amount: '',
   wallet: '',
   method: '',
   name: '',
@@ -62,6 +63,7 @@ RazorpayDefaults.theme = {
   image_padding: true,
   image_frame: true,
   close_button: true,
+  close_method_back: false,
   hide_topbar: false,
   branding: '',
   emi_mode: false
