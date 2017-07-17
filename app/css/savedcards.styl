@@ -67,7 +67,7 @@ $cardpl = 70px;
       &[emi].checked {
         max-height: $opencardh;
 
-        select {
+        .elem-savedcards-emi {
           display: block;
         }
       }
@@ -138,11 +138,23 @@ $cardpl = 70px;
   transition: 0.2s;
   position: relative;
   background: #fff;
-  select {
-    padding: 10px 0px;
+
+  .elem-wrap {
+    height: auto;
     margin-left: -44px;
-    width: calc(100% + 44px);
+  }
+
+  .elem-savedcards-emi {
+    padding: 0px;
     display: none;
+
+    i {
+      bottom: -5px;
+    }
+
+    .help.up {
+      margin-bottom: 0;
+    }
   }
 }
 

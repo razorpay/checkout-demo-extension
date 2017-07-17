@@ -8,8 +8,9 @@
     'Visa': 'visa',
     'unknown': 'unknown'
   };
+  var emiMode = _.emi_mode;
 `
-`~_.items:i:item`
+`~_.tokens.items:i:item`
   `?item.card`
     `
       var card = item.card;
@@ -37,12 +38,16 @@
         <span class='saved-number'>`=card.last4`</span>
         <input class='saved-cvv' type='tel' placeholder='CVV' inputmode='numeric' maxlength='`=cvv_digits`' required pattern='[0-9]{3,4}'>
         `?plans`
-          <select class="input" name="emi_duration">
-            <option selected value="">Select EMI Plan</option>
-            `~plans.plans:dur:rate`
-            <option value='`=dur`'>`=dur` month EMI @`=rate`% ( ₹`=Razorpay.emi.calculator(_.amount, dur, rate)/100` per month )</option>
-            `~`
-          </select>
+          <div class="elem-wrap"><div class="elem select elem-savedcards-emi">
+            <div class="help up">Please select the EMI duration</div>
+            <i class="select-arrow">&#xe601;</i>
+            <select class="input" name="emi_duration" `?emiMode`required`?`>
+              <option selected value="" >Select EMI Plan</option>
+              `~plans.plans:dur:rate`
+              <option value='`=dur`'>`=dur` month EMI @`=rate`% ( ₹`=Razorpay.emi.calculator(_.amount, dur, rate)/100` per month )</option>
+              `~`
+            </select>
+          </div></div>
         `?`
       </div>
     </div>
