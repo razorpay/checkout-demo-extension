@@ -1272,15 +1272,16 @@ Session.prototype = {
     var cardTab = $('#form-card');
     if (tokens) {
       if ($$('.saved-card').length !== customer.tokens.items.length) {
-        customer.tokens.amount = this.get('amount');
         try {
           customer.tokens.items.sort(function(a, b) {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
-        gel('saved-cards-container').innerHTML = templates.savedcards(
-          customer.tokens
-        );
+        gel('saved-cards-container').innerHTML = templates.savedcards({
+          tokens: customer.tokens,
+          emi_mode: this.get('theme.emi_mode'),
+          amount: this.get('amount')
+        });
       }
     }
 
