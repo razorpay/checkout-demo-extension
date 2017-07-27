@@ -856,6 +856,9 @@ Session.prototype = {
           'change',
           '#wallets',
           function(e) {
+            if (ua_iPhone) {
+              Razorpay.sendMessage({ event: 'blur' });
+            }
             if (this.get('ecod')) {
               $(this.el).removeClass('notopbar');
               var tab = $(e.target).attr('tab');
@@ -1193,6 +1196,9 @@ Session.prototype = {
       this.showCardTab(tab);
     } else {
       this.setScreen(tab);
+      if (ua_iPhone) {
+        Razorpay.sendMessage({ event: 'blur' });
+      }
     }
   },
 
@@ -1346,6 +1352,9 @@ Session.prototype = {
   },
 
   selectBankRadio: function(e) {
+    if (ua_iPhone) {
+      Razorpay.sendMessage({ event: 'blur' });
+    }
     var val = e.target.value;
     this.checkDown(val);
     var select = gel('bank-select');

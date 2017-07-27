@@ -117,6 +117,8 @@ function trackNewPayment(data, params, r) {
 }
 
 function Payment(data, params, r) {
+  this._time = new Date().getTime();
+
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
   trackNewPayment(data, params, r);
 
@@ -267,6 +269,13 @@ Payment.prototype = {
       }
     } catch (e) {
       return roll('completed with ' + data, e);
+    }
+
+    if (data._time) {
+      if (data._time < this._time) {
+        return;
+      }
+      delete data._time;
     }
 
     if (data.action === 'TOPUP') {
