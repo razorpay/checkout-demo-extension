@@ -162,7 +162,7 @@ CheckoutFrame.prototype = {
   getEl: function(rzp) {
     if (!this.el) {
       var style =
-        'height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
+        'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
       this.el = $(document.createElement('iframe')).attr({
         // prettier-ignore
         'class': 'razorpay-checkout-frame', // quotes needed for ie
@@ -290,7 +290,8 @@ CheckoutFrame.prototype = {
     this.$metas = [
       $(document.createElement('meta')).attr({
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+        content:
+          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
       }),
       $(document.createElement('meta')).attr({
         name: 'theme-color',
