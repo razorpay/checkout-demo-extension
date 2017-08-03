@@ -253,7 +253,7 @@ function setOtpText(text) {
   gel('otp-prompt').innerHTML = text;
 }
 
-function elfShowOTP(otp, sender) {
+function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
