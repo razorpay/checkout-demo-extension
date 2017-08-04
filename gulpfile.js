@@ -287,6 +287,8 @@ function createCoverageReport() {
     collector.add(require('./' + jsonFile));
   });
 
+  reporter.add('lcovonly');
+  reporter.addAll(['clover', 'cobertura']);
   reporter.add('html');
   reporter.write(collector, true, function() {});
   console.log('Report created in coverage/final');
