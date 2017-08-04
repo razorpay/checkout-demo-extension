@@ -143,7 +143,7 @@ function getDecimalAmount(amount) {
         if (this.value.length === 4) {
           var yearValue = parseInt(this.value.slice(2), 10);
           var currentTime = new Date();
-          var currentYear = currentTime.getYear() - 100;
+          var currentYear = currentTime.getFullYear() - 2000;
           if (currentYear === yearValue) {
             return (
               parseInt(this.value.slice(0, 2), 10) >= currentTime.getMonth()
