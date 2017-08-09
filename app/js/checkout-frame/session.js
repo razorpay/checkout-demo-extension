@@ -431,7 +431,9 @@ Session.prototype = {
     var r = this.r;
     if (!this.el) {
       if (
-        this.order && this.order.partial_payment && !r.get('prefill.amount')
+        this.order &&
+        this.order.partial_payment &&
+        !r.get('prefill.amount')
       ) {
         this.extraFields = true;
       }
@@ -1043,7 +1045,8 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(), type = this.type;
+          var isValid = this.isValid(),
+            type = this.type;
 
           if (!preferences.methods.amex && type === 'amex') {
             isValid = false;
@@ -1230,7 +1233,7 @@ Session.prototype = {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function() {
         // customer status check also sends otp if customer exists
-        if (customer.saved && !customer.logged) {
+        if (self.recurring || (customer.saved && !customer.logged)) {
           askOTP();
         } else {
           self.showCards();
@@ -1611,7 +1614,8 @@ Session.prototype = {
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
         if (
-          !preferences.methods.amex && formattingDelegator.card.type === 'amex'
+          !preferences.methods.amex &&
+          formattingDelegator.card.type === 'amex'
         ) {
           return this.showLoadError('AMEX cards are not supported', true);
         }
@@ -1826,8 +1830,7 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.modal = this.emi = this.el = this
-        .card = window.setPaymentID = window.onComplete = null;
+      this.modal = this.emi = this.el = this.card = window.setPaymentID = window.onComplete = null;
     }
   },
 
