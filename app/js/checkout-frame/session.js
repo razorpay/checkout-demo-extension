@@ -1056,8 +1056,10 @@ Session.prototype = {
           toggleInvalid($(this.el.parentNode), isValid);
 
           // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.maxLen === this.caretPosition) {
-            invoke('focus', el_expiry, null, 0);
+          if (isValid && this.el.value.length === this.caretPosition) {
+            if (this.type !== 'maestro') {
+              invoke('focus', el_expiry, null, 0);
+            }
           }
         });
 
