@@ -115,7 +115,13 @@ function getDecimalAmount(amount) {
         if (!value) {
           value = this.value;
         }
-        return value.length === this.maxLen && luhnCheck(value);
+        if (!luhnCheck(value)) {
+          return;
+        }
+        if (this.type === 'maestro' && value.length === 16) {
+          return true;
+        }
+        return value.length === this.maxLen;
       }
     },
 
