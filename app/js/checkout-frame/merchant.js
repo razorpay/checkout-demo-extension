@@ -128,6 +128,10 @@ var freqWallets = (sessProto.walletData = {
   mpesa: {
     h: 50,
     col: walletPrefix + 'mpesa.png'
+  },
+  sbibuddy: {
+    h: 22,
+    col: walletPrefix + 'sbibuddy.png'
   }
 });
 
