@@ -161,7 +161,8 @@ var RazorpayDefaults = (Razorpay.defaults = {
   customer_id: '',
   recurring: null,
   signature: '',
-  retry: true
+  retry: true,
+  target: ''
 });
 
 function base_configure(overrides) {
@@ -275,13 +276,13 @@ var discreet = {
   },
 
   redirect: function(data) {
-    if (window !== window.parent) {
+    if (!data.target && window !== window.parent) {
       return invoke(Razorpay.sendMessage, null, {
         event: 'redirect',
         data: data
       });
     }
-    submitForm(data.url, data.content, data.method);
+    submitForm(data.url, data.content, data.method, data.target);
   }
 };
 

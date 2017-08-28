@@ -171,7 +171,8 @@ Payment.prototype = {
         discreet.redirect({
           url: makeRedirectUrl(this.fees),
           content: data,
-          method: 'post'
+          method: 'post',
+          target: getOption('target')
         });
         return true;
       }
