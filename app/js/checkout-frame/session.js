@@ -1181,7 +1181,7 @@ Session.prototype = {
         return;
       }
       this.customer = getCustomer(contact);
-      if (this.customer.logged) {
+      if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
       }
       $('#user').html(contact);

@@ -52,7 +52,9 @@ Customer.prototype = {
       recurring: recurring
     });
     this.tokens = data.tokens;
-    $('#top-right').addClass('logged');
+    if (!getSession().local) {
+      $('#top-right').addClass('logged');
+    }
   },
 
   // NOTE: status check api also sends otp if customer exist
