@@ -36,7 +36,7 @@ function mockPayment(payment) {
     }
   }
   return payment;
-};
+}
 
 describe('Payment.prototype', function() {
   var data, payment, r2;
@@ -56,7 +56,7 @@ describe('Payment.prototype', function() {
 
     bindStub.restore();
     stub.restore();
-  })
+  });
 
   describe('emit', function() {
     payment = mockPayment();
@@ -65,7 +65,7 @@ describe('Payment.prototype', function() {
     expect(stub.callCount).to.be(1);
     expect(stub.args[0]).to.eql(['payment.some', noop]);
     stub.restore();
-  })
+  });
 
   describe('off', function() {
     payment = mockPayment();
@@ -73,8 +73,8 @@ describe('Payment.prototype', function() {
     Payment.prototype.off.call(payment);
     expect(stub.callCount).to.be(1);
     expect(stub.args[0]).to.eql(['payment']);
-    stub.restore()
-  })
+    stub.restore();
+  });
 
   describe('redirect', function() {
     var options, redirectStub;
@@ -85,23 +85,23 @@ describe('Payment.prototype', function() {
       options = payment.r.get();
       options.redirect = true;
       redirectStub = sinon.stub(discreet, 'redirect');
-    })
+    });
 
     afterEach(function() {
       redirectStub.restore();
-    })
+    });
 
     it('if redirect: false', function() {
       options.redirect = false;
       expect(Payment.prototype.checkRedirect.call(payment)).to.not.be.ok();
       expect(redirectStub.called).to.be(false);
-    })
+    });
 
     it('if redirect: false', function() {
       options.redirect = false;
       expect(Payment.prototype.checkRedirect.call(payment)).to.not.be.ok();
       expect(redirectStub.called).to.be(false);
-    })
+    });
 
     it('if redirect: true', function() {
       expect(Payment.prototype.checkRedirect.call(payment)).to.be(true);
@@ -110,15 +110,16 @@ describe('Payment.prototype', function() {
       expect(redirectStub.args[0][0]).to.eql({
         url: baseRedirectUrl + 'checkout',
         content: payment.data,
-        method: 'post'
-      })
-    })
+        method: 'post',
+        target: ''
+      });
+    });
 
     it('if redirect: true, and callback_url specified', function() {
       options.callback_url = 'abc';
       expect(Payment.prototype.checkRedirect.call(payment)).to.be(true);
       expect(payment.data.callback_url).to.be('abc');
-    })
+    });
 
     it('with fees: true', function() {
       payment.fees = true;
@@ -126,15 +127,16 @@ describe('Payment.prototype', function() {
       expect(redirectStub.args[0][0]).to.eql({
         url: baseRedirectUrl + 'fees',
         content: payment.data,
-        method: 'post'
-      })
-    })
-  })
+        method: 'post',
+        target: ''
+      });
+    });
+  });
 
   describe('format', function() {
     beforeEach(function() {
       payment = mockPayment();
-    })
+    });
 
     it('notes', function() {
       data = payment.data;
@@ -142,7 +144,7 @@ describe('Payment.prototype', function() {
         foo: 1,
         bar: 2,
         nested: {}
-      }
+      };
 
       Payment.prototype.format.call(payment, data, {});
       var expectedNotes = {};
@@ -159,7 +161,7 @@ describe('Payment.prototype', function() {
       });
       log('set data._.source to checkoutjs if powerwallet specified');
       expect('_[source]' in data).to.be(false);
-    })
+    });
 
     it('fill data from options', function() {
       data = payment.data = {
@@ -175,7 +177,7 @@ describe('Payment.prototype', function() {
         yolo: 'swag',
         '1': 2
       };
- 
+
       r2 = Razorpay(options);
       options = r2.get();
       Payment.prototype.format.call(payment);
@@ -189,8 +191,8 @@ describe('Payment.prototype', function() {
       expect('notes' in data).to.be(false);
       expect(data['notes[yolo]']).to.be('swag');
       expect(data['notes[1]']).to.be(2);
-    })
-  })
+    });
+  });
 
   describe('generate', function() {
     var onSpy, pollSpy;
@@ -201,20 +203,20 @@ describe('Payment.prototype', function() {
       pollSpy = sinon.stub(window, 'pollPaymentData');
       onSpy = sinon.stub($.prototype, 'on');
       onSpy.returns('xyz');
-    })
+    });
 
     afterEach(function() {
       expect(payment.offmessage).to.be('xyz');
       pollSpy.restore();
       onSpy.restore();
-    })
-  })
+    });
+  });
 
   describe('complete', function() {
     payment = null;
     beforeEach(function() {
       payment = mockPayment();
-    })
+    });
 
     it('success', function() {
       Payment.prototype.complete.call(payment, {
@@ -222,11 +224,12 @@ describe('Payment.prototype', function() {
       });
       expect(payment.emit.callCount).to.be(1);
       expect(payment.emit.args[0]).to.eql([
-        'success', {
+        'success',
+        {
           razorpay_payment_id: 'payid'
         }
-      ])
-    })
+      ]);
+    });
 
     it('error', function() {
       Payment.prototype.complete.call(payment, {
@@ -236,13 +239,14 @@ describe('Payment.prototype', function() {
       });
       expect(payment.emit.callCount).to.be(1);
       expect(payment.emit.args[0]).to.eql([
-        'error', {
+        'error',
+        {
           error: {
             description: 'desc'
           }
         }
-      ])
-    })
+      ]);
+    });
 
     it('nothing if already done', function() {
       payment.done = true;
@@ -250,18 +254,18 @@ describe('Payment.prototype', function() {
         error: {
           description: 'desc'
         }
-      })
+      });
       expect(payment.emit.called).to.be(false);
       expect(payment.clear.called).to.be(false);
       payment.done = false;
-    })
-  })
+    });
+  });
 
   describe('clear', function() {
     payment = null;
     beforeEach(function() {
       payment = mockPayment();
-    })
+    });
 
     it('unbind and cleanup', function() {
       payment.popup = {
@@ -269,7 +273,7 @@ describe('Payment.prototype', function() {
       };
 
       var ajaxStub = sinon.stub();
-      payment.ajax = [{abort: ajaxStub}];
+      payment.ajax = [{ abort: ajaxStub }];
       payment.offmessage = sinon.stub();
       var clearPollingStub = sinon.stub(window, 'clearPollingInterval');
       Payment.prototype.clear.call(payment);
@@ -282,17 +286,17 @@ describe('Payment.prototype', function() {
       expect(clearPollingStub.callCount).to.be(1);
       expect(payment.r._payment).to.be(null);
       clearPollingStub.restore();
-    })
+    });
 
     it('not throw if popup, offmessage and ajax arent set', function() {
       var clearPollingStub;
       clearPollingStub = sinon.stub(window, 'clearPollingInterval');
       expect(function() {
         Payment.prototype.clear.call(payment);
-      }).to.not["throw"]();
+      }).to.not['throw']();
       expect(clearPollingStub.callCount).to.be(1);
       expect(payment.done).to.be(true);
       clearPollingStub.restore();
-    })
-  })
-})
+    });
+  });
+});
