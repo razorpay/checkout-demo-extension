@@ -422,7 +422,7 @@ function showModal(session) {
     if (payment_method === 'card') {
       session.offers.card = offer;
     } else if (payment_method === 'wallet') {
-      session.offers.wallet[offer.payment_network] = offer;
+      session.offers.wallet[offer.issuer || offer.payment_network] = offer;
     }
   });
 
