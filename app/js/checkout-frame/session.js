@@ -1291,7 +1291,8 @@ Session.prototype = {
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
-          amount: this.get('amount')
+          amount: this.get('amount'),
+          emi: this.methods.emi
         });
       }
     }
