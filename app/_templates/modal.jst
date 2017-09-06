@@ -452,7 +452,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                 <div class="tab-content showable screen pad" id="form-upi">
                   <p>Enter your virtual payment address</p>
                   <div class="elem-wrap"><div class="elem">
-                    <input class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                    <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
                   </div></div>
                   <p>
                     You will receive a collect request from razorpay in the UPI app which was used to create your VPA.
