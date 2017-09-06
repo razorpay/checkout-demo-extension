@@ -327,6 +327,7 @@ i {
   width: 24px;
   text-align: center;
   line-height: 26px;
+  z-index: 1;
   &:hover {
     opacity: 1;
   }
@@ -1001,12 +1002,4 @@ $outline = #ddd;
 
 #partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {
   display: none;
-}
-
-@media (max-device-height: 450px), (max-device-width: 450px) {
-  .close {
-    font-size: 28px;
-    width: 34px;
-    line-height: 28px;
-  }
 }
