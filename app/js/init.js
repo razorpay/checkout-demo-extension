@@ -162,7 +162,8 @@ var RazorpayDefaults = (Razorpay.defaults = {
   recurring: null,
   signature: '',
   retry: true,
-  target: ''
+  target: '',
+  subscription_card_change: false
 });
 
 function base_configure(overrides) {
@@ -215,7 +216,14 @@ function makePrefParams(rzp) {
     params.key_id = getter('key');
 
     each(
-      ['order_id', 'customer_id', 'invoice_id', 'subscription_id', 'recurring'],
+      [
+        'order_id',
+        'customer_id',
+        'invoice_id',
+        'subscription_id',
+        'recurring',
+        'subscription_card_change'
+      ],
       function(i, key) {
         var value = getter(key);
         if (value) {

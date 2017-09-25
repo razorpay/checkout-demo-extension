@@ -194,7 +194,8 @@ Payment.prototype = {
         'notes',
         'subscription_id',
         'customer_id',
-        'recurring'
+        'recurring',
+        'subscription_card_change'
       ],
       function(i, field) {
         if (!(field in data)) {
