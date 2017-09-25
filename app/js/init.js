@@ -163,7 +163,7 @@ var RazorpayDefaults = (Razorpay.defaults = {
   signature: '',
   retry: true,
   target: '',
-  subscription_card_change: false
+  subscription_card_change: null
 });
 
 function base_configure(overrides) {
