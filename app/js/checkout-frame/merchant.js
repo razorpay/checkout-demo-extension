@@ -537,16 +537,23 @@ function showModalWithSession(session) {
 // generates ios event handling functions, like onload
 function iosMethod(method) {
   return function(data) {
-    var iF = document.createElement('iframe');
-    var src = 'razorpay://on' + method;
-    if (data) {
-      src += '?' + CheckoutBridge.index;
-      CheckoutBridge.map[++CheckoutBridge.index] = data;
+    if (window.webkit.messageHandlers.CheckoutBridge) {
+      window.webkit.messageHandlers.CheckoutBridge.postMessage({
+        action: method,
+        [method + '_body']: data
+      });
+    } else {
+      var iF = document.createElement('iframe');
+      var src = 'razorpay://on' + method;
+      if (data) {
+        src += '?' + CheckoutBridge.index;
+        CheckoutBridge.map[++CheckoutBridge.index] = data;
+      }
+      iF.setAttribute('src', src);
+      doc.appendChild(iF);
+      iF.parentNode.removeChild(iF);
+      iF = null;
     }
-    iF.setAttribute('src', src);
-    doc.appendChild(iF);
-    iF.parentNode.removeChild(iF);
-    iF = null;
   };
 }
 
@@ -562,14 +569,11 @@ var platformSpecific = {
         delete this.map[this.index];
         return val;
       },
-
       getUID: function() {
         return _uid;
       }
     };
-
     var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
-
     each(bridgeMethods, function(i, prop) {
       CheckoutBridge['on' + prop] = iosMethod(prop);
     });
@@ -603,10 +607,12 @@ function setQueryParams(search) {
 }
 
 Razorpay.sendMessage = function(message) {
-  if (isNonNullObject(CheckoutBridge)) {
+  if (
+    isNonNullObject(CheckoutBridge) ||
+    isNonNullObject(window.webkit.messageHandlers.CheckoutBridge)
+  ) {
     return notifyBridge(message);
   }
-
   if (ownerWindow) {
     message.source = 'frame';
     message.id = _uid;
@@ -619,7 +625,7 @@ Razorpay.sendMessage = function(message) {
 
 window.handleOTP = function(otp) {
   /* Old OTPelf will now send the whole body of the
-   * message instead of just OTP */
+ * message instead of just OTP */
   var matches = otp.match(/\b[0-9]{4}([0-9]{2})?\b/);
   otp = matches ? matches[0] : '';
   otp = String(otp).replace(/\D/g, '');
