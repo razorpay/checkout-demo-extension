@@ -1,5 +1,6 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
+  iosCheckoutBridgeNew = getNewIOSWebkitInstance(),
   cookieDisabled = !navigator.cookieEnabled,
   sessions = {},
   isIframe = window !== parent,
@@ -8,6 +9,10 @@ var preferences = window.preferences,
 var contactPattern = /^\+?[0-9]{8,15}$/;
 var emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
+function getNewIOSWebkitInstance() {
+  //Verify inner CheckoutBridge property for new iOS devices
+  return ((window.webkit || {}).messageHandlers || {}).CheckoutBridge;
+}
 function getSession(id) {
   return sessions[id || _uid];
 }
@@ -537,10 +542,10 @@ function showModalWithSession(session) {
 // generates ios event handling functions, like onload
 function iosMethod(method) {
   return function(data) {
-    if (window.webkit.messageHandlers.CheckoutBridge) {
-      window.webkit.messageHandlers.CheckoutBridge.postMessage({
+    if (iosCheckoutBridgeNew) {
+      iosCheckoutBridgeNew.postMessage({
         action: method,
-        [method + '_body']: data
+        body: data
       });
     } else {
       var iF = document.createElement('iframe');
@@ -608,8 +613,7 @@ function setQueryParams(search) {
 
 Razorpay.sendMessage = function(message) {
   if (
-    isNonNullObject(CheckoutBridge) ||
-    isNonNullObject(window.webkit.messageHandlers.CheckoutBridge)
+    isNonNullObject(CheckoutBridge) || isNonNullObject(iosCheckoutBridgeNew)
   ) {
     return notifyBridge(message);
   }
