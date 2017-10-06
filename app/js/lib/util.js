@@ -398,3 +398,16 @@ function abortAjax(ajax) {
     ajax[0] = null;
   }
 }
+
+//Return rgba value for hex color code
+function hexToRgb(hex, alpha) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        red: (parseInt(result[1], 16) / 255).toFixed(1),
+        green: (parseInt(result[2], 16) / 255).toFixed(1),
+        blue: (parseInt(result[3], 16) / 255).toFixed(1),
+        alpha: alpha || 1
+      }
+    : null;
+}
