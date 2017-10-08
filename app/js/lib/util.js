@@ -401,6 +401,9 @@ function abortAjax(ajax) {
 
 //Return rgba value for hex color code
 function hexToRgb(hex, alpha) {
+  if (!hex) {
+    return null;
+  }
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
