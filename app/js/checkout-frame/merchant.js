@@ -589,7 +589,7 @@ function handleNewIOSMethods(method, data) {
     case 'submit':
       var navData;
       dispatchNewIOSEvents(method, data); //send default submit
-      body = {
+      navData = {
         webview_background_color: color.navShow
       };
       dispatchNewIOSEvents('show_nav_bar', navData);
