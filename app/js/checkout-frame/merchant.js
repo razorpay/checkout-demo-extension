@@ -575,7 +575,7 @@ function handleNewIOSMethods(method, data) {
     navShow: { red: 0, green: 0, blue: 0, alpha: 0.5 },
     navHide: { red: 1, green: 1, blue: 1, alpha: 1 }
   };
-
+  data = data || {};
   switch (method) {
     case 'load':
       var navData = {
