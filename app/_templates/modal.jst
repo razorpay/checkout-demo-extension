@@ -29,6 +29,7 @@ var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
+var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -171,7 +172,7 @@ var email_readonly = o('readonly.email') && prefill_email;
                 </div>
                 `?_.recurring`
                   <div class="pad recurring-message">
-                    <span>&#x2139;</span> All credit cards are supported for this recurring subscription.
+                    <span>&#x2139;</span> Subscription payments are only supported on Mastercard and Visa credit cards.
                   </div>
                 `?`
                 `?cardOffer`
@@ -322,11 +323,12 @@ var email_readonly = o('readonly.email') && prefill_email;
                   </label>
                   </div>
                   `?_.recurring`
-                    <div id='savedcards-recurring-message' class="pad recurring-message">
-                      <span>&#x2139;</span> A recurring subscription will be applied to this card.
-                    </div>
-                    <div id='addcard-recurring-message' class="pad recurring-message">
-                      <span>&#x2139;</span> This card will be saved and a recurring subscription will be applied to it.
+                    <div id='recurring-message' class="pad recurring-message">
+                      <span>&#x2139;</span>
+                      `? !_.subscription` Future payments on this card will be charged automatically.
+                      `?? subscription_will_refund` The charge is to enable subscription on this card and it will be refunded.
+                      `??` This card will be linked to the subscription and future payments will be charged automatically.
+                      `?`
                     </div>
                   `?`
                 </div>
