@@ -29,17 +29,20 @@ function fillData(container, returnObj) {
 
 function makeEmiDropdown(emiObj, session, isOption) {
   var h = '';
+  var isSubvented =
+    preferences.methods.emi_subvention === 'merchant' ? true : false;
   if (emiObj.plans) {
     each(emiObj.plans, function(length, rate) {
+      rate = isSubvented ? 0 : rate;
       h +=
         (isOption ? '<option' : '<div class="option"') +
         ' value="' +
         length +
         '">' +
         length +
-        ' month EMI @' +
-        rate +
-        '% (₹ ' +
+        'month EMI ' +
+        (rate ? '@' + rate + '%' : '') +
+        ' (₹ ' +
         Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
         ' per month)</' +
         (isOption ? 'option>' : 'div>');
@@ -137,7 +140,10 @@ function toggleNoCvv(show) {
 }
 
 function makeVisible(subject) {
-  $(subject).css('display', 'block').reflow().addClass(shownClass);
+  $(subject)
+    .css('display', 'block')
+    .reflow()
+    .addClass(shownClass);
 }
 
 function makeHidden(subject) {
@@ -271,7 +277,9 @@ function askOTP(text) {
     text = text.error && text.error.description;
   }
   $('#otp').val('');
-  $('#form-otp').removeClass('loading').removeClass('action');
+  $('#form-otp')
+    .removeClass('loading')
+    .removeClass('action');
   $('#body').addClass('sub');
   if (!text) {
     var thisSession = getSession();
@@ -726,7 +734,10 @@ Session.prototype = {
   extraNext: function() {
     var commonInvalid = $('#pad-common .invalid');
     if (commonInvalid[0]) {
-      return commonInvalid.addClass('mature').$('.input').focus();
+      return commonInvalid
+        .addClass('mature')
+        .$('.input')
+        .focus();
     }
 
     var partialEl = gel('amount-value');
@@ -949,7 +960,9 @@ Session.prototype = {
   },
 
   blur: function(e) {
-    $(e.target.parentNode).removeClass('focused').addClass('mature');
+    $(e.target.parentNode)
+      .removeClass('focused')
+      .addClass('mature');
     this.input(e.target);
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
@@ -1212,7 +1225,9 @@ Session.prototype = {
     $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
 
     if (!isEmiTab) {
-      $('#emi-bank').parent().removeClass('invalid');
+      $('#emi-bank')
+        .parent()
+        .removeClass('invalid');
       $('#elem-emi .elem').removeClass('invalid');
     }
 
@@ -1482,7 +1497,9 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
-      $('#form-otp')[actionState]('action')[loadingState]('loading');
+      $('#form-otp')
+        [actionState]('action')
+        [loadingState]('loading');
     } else {
       $('#fd-t').html(text);
       showOverlay($('#error-message')[loadingState]('loading'));

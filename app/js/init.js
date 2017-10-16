@@ -116,6 +116,9 @@ RazorProto.emi_calculator = function(length, rate) {
 
 Razorpay.emi = {
   calculator: function(principle, length, rate) {
+    if (!rate) {
+      return Math.ceil(principle / length);
+    }
     rate /= 1200;
     var multiplier = Math.pow(1 + rate, length);
     return parseInt(principle * rate * multiplier / (multiplier - 1), 10);
