@@ -10,8 +10,7 @@ RazorpayDefaults.handler = function(data) {
 RazorpayDefaults.buttontext = 'Pay Now';
 RazorpayDefaults.parent = null;
 
-RazorpayDefaults.display_currency = RazorpayDefaults.display_amount = RazorpayDefaults.name =
-  '';
+RazorpayDefaults.name = '';
 
 RazorpayDefaults.ecod = false;
 
@@ -67,44 +66,6 @@ RazorpayDefaults.theme = {
   hide_topbar: false,
   branding: '',
   emi_mode: false
-};
-
-discreet.currencies = {
-  USD: '$',
-  AUD: 'A$',
-  CAD: 'C$',
-  HKD: 'HK$',
-  NZD: 'NZ$',
-  SGD: 'SG$',
-  CZK: 'Kč',
-  NOK: 'kr',
-  DKK: 'kr',
-  SEK: 'kr',
-  EUR: '€',
-  GBP: '£',
-  HUF: 'Ft',
-  JPY: '¥',
-  CNY: '¥',
-  AED: 'د.إ',
-  PLN: 'zł',
-  SFR: 'Fr',
-  CHF: 'Fr'
-};
-
-optionValidations.display_currency = function(currency) {
-  if (
-    !(currency in discreet.currencies) &&
-    currency !== Razorpay.defaults.display_currency
-  ) {
-    return 'This display currency is not supported';
-  }
-};
-
-optionValidations.display_amount = function(amount) {
-  amount = String(amount).replace(/([^0-9\.])/g, '');
-  if (!amount && amount !== Razorpay.defaults.display_amount) {
-    return '';
-  }
 };
 
 optionValidations.parent = function(parent) {
