@@ -338,6 +338,10 @@ Payment.prototype = {
     if (!this.powerwallet && /iP(hone|ad)/.test(ua)) {
       return false;
     }
+
+    if (data.method === 'wallet' && !(data.contact && data.email)) {
+      return false;
+    }
     // else make ajax request
 
     var ajaxFn = $.post;
