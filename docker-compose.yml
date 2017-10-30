@@ -1,0 +1,10 @@
+version: '2'
+services:
+  checkout:
+    build:
+      context: .
+    image: razorpay:checkout
+    ports:
+      - 28090:80
+    environment:
+      APP_MODE: dev

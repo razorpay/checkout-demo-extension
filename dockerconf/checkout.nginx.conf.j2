@@ -1,0 +1,28 @@
+server {
+    listen 80;
+    {% if env != 'prod' %}
+    server_name {{ env }}-checkout.razorpay.in;
+    {% else %}
+    server_name checkout.razorpay.com;
+    {% endif %}
+    root "/checkout";
+
+    index index.php;
+
+    charset utf-8;
+
+    location /v1 {
+        alias /app/dist/v1;
+    }
+
+    access_log /var/log/nginx/NGINX_HOST-{{ env }}-checkout-access.log combined;
+    error_log  /var/log/nginx/NGINX_HOST-{{ env }}-checkout-error.log error;
+
+    sendfile off;
+
+    client_max_body_size 100m;
+
+    #location ~ /\.ht {
+    #    deny all;
+    #}
+}

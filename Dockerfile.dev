@@ -1,0 +1,11 @@
+FROM pronav/node
+
+ENV GIT_COMMIT_HASH="dev-commit"
+
+VOLUME ['/checkout']
+
+ADD ./dockerconf /dockerconf
+
+WORKDIR /checkout
+
+ENTRYPOINT ["/dockerconf/build_entrypoint.sh"]
