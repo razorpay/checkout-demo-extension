@@ -317,7 +317,8 @@ var discreet = {
     AED: 'د.إ',
     PLN: 'zł',
     SFR: 'Fr',
-    CHF: 'Fr'
+    CHF: 'Fr',
+    QAR: 'ر.ق'
   }
 };
 
