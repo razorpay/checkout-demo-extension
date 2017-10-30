@@ -177,7 +177,13 @@ let karmaOptions = {
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
-  browsers: ['ChromiumHeadless'],
+  browsers: ['ChromeHeadlessNoSandbox'],
+  customLaunchers: {
+    ChromeHeadlessNoSandbox: {
+      base: 'ChromiumHeadless',
+      flags: ['--no-sandbox']
+    }
+  },
   singleRun: true,
   coverageReporter: {
     type: 'json'
