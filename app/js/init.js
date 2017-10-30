@@ -166,7 +166,9 @@ var RazorpayDefaults = (Razorpay.defaults = {
   signature: '',
   retry: true,
   target: '',
-  subscription_card_change: null
+  subscription_card_change: null,
+  display_currency: '',
+  display_amount: ''
 });
 
 function base_configure(overrides) {
@@ -294,6 +296,28 @@ var discreet = {
       });
     }
     submitForm(data.url, data.content, data.method, data.target);
+  },
+
+  currencies: {
+    USD: '$',
+    AUD: 'A$',
+    CAD: 'C$',
+    HKD: 'HK$',
+    NZD: 'NZ$',
+    SGD: 'SG$',
+    CZK: 'Kč',
+    NOK: 'kr',
+    DKK: 'kr',
+    SEK: 'kr',
+    EUR: '€',
+    GBP: '£',
+    HUF: 'Ft',
+    JPY: '¥',
+    CNY: '¥',
+    AED: 'د.إ',
+    PLN: 'zł',
+    SFR: 'Fr',
+    CHF: 'Fr'
   }
 };
 
@@ -325,6 +349,22 @@ var optionValidations = {
   currency: function(currency) {
     if (currency !== 'INR' && currency !== 'USD') {
       return 'INR and USD are the only supported values for currency field.';
+    }
+  },
+
+  display_currency: function(currency) {
+    if (
+      !(currency in discreet.currencies) &&
+      currency !== Razorpay.defaults.display_currency
+    ) {
+      return 'This display currency is not supported';
+    }
+  },
+
+  display_amount: function(amount) {
+    amount = String(amount).replace(/([^0-9\.])/g, '');
+    if (!amount && amount !== Razorpay.defaults.display_amount) {
+      return '';
     }
   }
 };

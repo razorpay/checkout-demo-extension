@@ -1734,7 +1734,9 @@ Session.prototype = {
         wallet === 'payumoney' ||
         wallet === 'freecharge' ||
         wallet === 'olamoney') &&
-      !request.fees
+      !request.fees &&
+      data.contact &&
+      data.email
     ) {
       request.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
