@@ -4,7 +4,12 @@ set -euo pipefail
 echo "Creating Log Files"
 mkdir -p /var/log/nginx
 
-echo $GIT_COMMIT_HASH > /checkout/app/dist/v1/commit.txt
+if [[ "${APP_MODE}" == "dev" ]]; then
+    echo $GIT_COMMIT_HASH > /checkout/app/dist/v1/commit.txt
+    chown -R nginx.nginx /checkout/app/dist
+else
+    echo $GIT_COMMIT_HASH > /app/dist/v1/commit.txt
+fi    
 
 ALOHOMORA_BIN=$(which alohomora)
 
@@ -14,5 +19,6 @@ cp /dockerconf/checkout.nginx.conf /etc/nginx/conf.d/checkout.conf
 
 mkdir /run/nginx
 touch /run/nginx/nginx.pid
+echo "starting nginx"
 nginx -g 'daemon off;'
 

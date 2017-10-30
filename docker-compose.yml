@@ -3,8 +3,7 @@ services:
   checkout:
     build:
       context: .
+      dockerfile: Dockerfile
     image: razorpay:checkout
     ports:
       - 28090:80
-    environment:
-      APP_MODE: dev

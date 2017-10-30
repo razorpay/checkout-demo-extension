@@ -8,6 +8,12 @@
 1. Point local API to checkout in `public/checkout.php` and `app/views/checkout.php`
 1. `gulp serve` in checkout root dir
 
+## Via docker
+1. Install npm and gulp locally using the above
+1. Run `npm install && npm install glob`
+1. Run `gulp test:unit` to create the `app/dist` folder
+1. Run `docker-compose -f docker-compose.dev.yml up -d --build` to get checkout running locally
+
 # Gulp Commands
 
 * Run `npm run build` or `gulp` to generate production build

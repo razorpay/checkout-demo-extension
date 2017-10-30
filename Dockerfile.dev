@@ -1,11 +1,13 @@
-FROM pronav/node
+FROM razorpay/containers:app-nginx
 
 ENV GIT_COMMIT_HASH="dev-commit"
 
-VOLUME ['/checkout']
-
 ADD ./dockerconf /dockerconf
+
+VOLUME ['/checkout']
 
 WORKDIR /checkout
 
-ENTRYPOINT ["/dockerconf/build_entrypoint.sh"]
+EXPOSE 80
+
+ENTRYPOINT ["/dockerconf/entrypoint.sh"]
