@@ -1,5 +1,3 @@
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
@@ -15,10 +13,6 @@ const through = require('through2').obj;
 const runSequence = require('run-sequence');
 const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
-const istanbul = require('istanbul');
-const awspublish = require('gulp-awspublish');
-const jshint = require('gulp-jshint');
-const stylish = require('jshint-stylish');
 const webdriver = require('gulp-webdriver');
 const testServer = require('./test/e2e/server/index.js');
 const internalIp = require('internal-ip');
@@ -110,14 +104,7 @@ gulp.task('uglify', () => {
           cb();
         })
       )
-      // .pipe(jshint())
-      // .pipe(jshint.reporter(stylish))
-      // .pipe(jshint.reporter('fail'))
-      // .pipe(sourcemaps.init())
       .pipe(uglify())
-      // .pipe(sourcemaps.write('./', {
-      // debug: true
-      // }))
       .pipe(gulp.dest(distDir))
   );
 });
@@ -162,38 +149,6 @@ gulp.task('serve', ['build'], function() {
 gulp.task('watch', ['serve']);
 gulp.task('default', ['build']);
 
-/** Font Upload to static **/
-
-gulp.task('uploadStaticAssetsToCDN', function() {
-  let target = process.argv.slice(3)[0].replace(/.+=/, '').toLowerCase().trim();
-
-  let publisher = awspublish.create({
-    accessKeyId: process.env.AWS_KEY,
-    secretAccessKey: process.env.AWS_SECRET,
-    region: 'us-east-1',
-    params: {
-      Bucket: 'checkout-live'
-    }
-  });
-
-  // define custom headers
-  let headers = {
-    'Cache-Control': 'max-age=315360000, no-transform, public'
-  };
-
-  return (gulp
-      .src([`${distDir}/fonts/*`, `${distDir}/images/**/*`])
-      // gzip, Set Content-Encoding headers and add .gz extension
-      .pipe(awspublish.gzip({ ext: '' }))
-      // publisher will add Content-Length, Content-Type and headers specified above
-      // If not specified it will set x-amz-acl to public-read by default
-      .pipe(publisher.publish(headers))
-      // create a cache file to speed up consecutive uploads
-      .pipe(publisher.cache())
-      // print upload updates to console
-      .pipe(awspublish.reporter()) );
-});
-
 /**  Tests  **/
 
 function getJSPaths(html, pattern) {
@@ -222,7 +177,7 @@ let karmaOptions = {
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
-  browsers: ['PhantomJS'],
+  browsers: ['ChromiumHeadless'],
   singleRun: true,
   coverageReporter: {
     type: 'json'
@@ -273,7 +228,7 @@ function testFromStack(counter, allOptions, done) {
       testFromStack(counter, allOptions, done);
     } else {
       allOptions = null;
-      createCoverageReport();
+      // createCoverageReport();
       done();
     }
   }).start();
