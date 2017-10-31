@@ -1,9 +1,0 @@
-version: '2'
-services:
-  checkout:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: razorpay:checkout
-    ports:
-      - 28090:80
