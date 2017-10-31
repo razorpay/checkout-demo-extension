@@ -1,0 +1,13 @@
+version: '2'
+services:
+  checkout:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: razorpay:checkout
+    volumes:
+      - .:/checkout
+    ports:
+      - 28090:80
+    environment:
+      APP_MODE: dev

@@ -21,3 +21,11 @@ coverage
 /app/config.js
 /browsersync-config.js
 /httpd.conf
+
+# Docker generated files
+commit.txt
+dockerconf/checkout.nginx.conf
+
+# k8s files
+secrets.yaml
+registry.yaml
