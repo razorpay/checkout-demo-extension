@@ -4,6 +4,7 @@ COPY . /checkout_build
 
 WORKDIR /checkout_build
 
+
 RUN cd /checkout_build \
     && npm install \
     && npm install glob \
