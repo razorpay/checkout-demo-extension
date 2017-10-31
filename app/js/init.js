@@ -318,7 +318,7 @@ var discreet = {
     PLN: 'zł',
     SFR: 'Fr',
     CHF: 'Fr',
-    QAR: 'ر.ق'
+    QAR: 'QAR '
   }
 };
 
