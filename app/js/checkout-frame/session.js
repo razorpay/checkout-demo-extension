@@ -321,6 +321,11 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
+var IRCTC_KEYS = [
+  'rzp_test_mZcDnA8WJMFQQD',
+  'rzp_live_ENneAQv5t7kTEQ',
+  'rzp_test_kD8QgcxVGzYSOU'
+];
 
 function Session(options) {
   this.r = Razorpay(options);
@@ -393,6 +398,10 @@ Session.prototype = {
         classes.push('address extra');
       }
       setter('address', true);
+    }
+
+    if (IRCTC_KEYS.indexOf(key) !== -1) {
+      tab_titles.upi = 'BHIM/UPI';
     }
 
     if (getter('theme.emi_mode')) {
