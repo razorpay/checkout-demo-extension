@@ -291,6 +291,12 @@ Payment.prototype = {
     } else {
       var errorObj = data.error;
       if (!isNonNullObject(errorObj) || !errorObj.description) {
+        if (data.request) {
+          var func = responseTypes[data.type];
+          if (typeof func === 'function') {
+            return func.call(this, data.request);
+          }
+        }
         data = discreet.error('Payment failed');
       }
       this.emit('error', data);
