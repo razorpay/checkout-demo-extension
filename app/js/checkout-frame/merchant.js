@@ -1,5 +1,6 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
+  iosCheckoutBridgeNew = getNewIOSWebkitInstance(),
   cookieDisabled = !navigator.cookieEnabled,
   sessions = {},
   isIframe = window !== parent,
@@ -8,6 +9,10 @@ var preferences = window.preferences,
 var contactPattern = /^\+?[0-9]{8,15}$/;
 var emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
+function getNewIOSWebkitInstance() {
+  //Verify inner CheckoutBridge property for new iOS devices
+  return ((window.webkit || {}).messageHandlers || {}).CheckoutBridge;
+}
 function getSession(id) {
   return sessions[id || _uid];
 }
@@ -537,17 +542,64 @@ function showModalWithSession(session) {
 // generates ios event handling functions, like onload
 function iosMethod(method) {
   return function(data) {
-    var iF = document.createElement('iframe');
-    var src = 'razorpay://on' + method;
-    if (data) {
-      src += '?' + CheckoutBridge.index;
-      CheckoutBridge.map[++CheckoutBridge.index] = data;
+    if (iosCheckoutBridgeNew) {
+      handleNewIOSMethods(method, data);
+    } else {
+      var iF = document.createElement('iframe');
+      var src = 'razorpay://on' + method;
+      if (data) {
+        src += '?' + CheckoutBridge.index;
+        CheckoutBridge.map[++CheckoutBridge.index] = data;
+      }
+      iF.setAttribute('src', src);
+      doc.appendChild(iF);
+      iF.parentNode.removeChild(iF);
+      iF = null;
     }
-    iF.setAttribute('src', src);
-    doc.appendChild(iF);
-    iF.parentNode.removeChild(iF);
-    iF = null;
   };
+}
+
+//handle methods for new IOS app
+function handleNewIOSMethods(method, data) {
+  var color = {
+    theme: hexToRgb(preferences.options.theme.color) || null,
+    navShow: { red: 0, green: 0, blue: 0, alpha: 0.5 },
+    navHide: { red: 1, green: 1, blue: 1, alpha: 1 }
+  };
+  try {
+    data = JSON.parse(data);
+  } catch (e) {}
+
+  data = data || {};
+
+  switch (method) {
+    case 'load':
+      var navData = {
+        webview_background_color: color.navHide
+      };
+      dispatchNewIOSEvents('hide_nav_bar', navData);
+      //add theme color
+      data.theme_color = color.theme;
+      dispatchNewIOSEvents(method, data); //default load
+      break;
+    case 'submit':
+      var navData;
+      dispatchNewIOSEvents(method, data); //send default submit
+      navData = {
+        webview_background_color: color.navShow
+      };
+      dispatchNewIOSEvents('show_nav_bar', navData);
+      break;
+    default:
+      dispatchNewIOSEvents(method, data);
+  }
+}
+
+function dispatchNewIOSEvents(method, data) {
+  iosCheckoutBridgeNew.postMessage({
+    action: method,
+    body: data
+  });
 }
 
 var platformSpecific = {
@@ -562,14 +614,11 @@ var platformSpecific = {
         delete this.map[this.index];
         return val;
       },
-
       getUID: function() {
         return _uid;
       }
     };
-
     var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
-
     each(bridgeMethods, function(i, prop) {
       CheckoutBridge['on' + prop] = iosMethod(prop);
     });
@@ -603,10 +652,11 @@ function setQueryParams(search) {
 }
 
 Razorpay.sendMessage = function(message) {
-  if (isNonNullObject(CheckoutBridge)) {
+  if (
+    isNonNullObject(CheckoutBridge) || isNonNullObject(iosCheckoutBridgeNew)
+  ) {
     return notifyBridge(message);
   }
-
   if (ownerWindow) {
     message.source = 'frame';
     message.id = _uid;
@@ -619,7 +669,7 @@ Razorpay.sendMessage = function(message) {
 
 window.handleOTP = function(otp) {
   /* Old OTPelf will now send the whole body of the
-   * message instead of just OTP */
+ * message instead of just OTP */
   var matches = otp.match(/\b[0-9]{4}([0-9]{2})?\b/);
   otp = matches ? matches[0] : '';
   otp = String(otp).replace(/\D/g, '');
