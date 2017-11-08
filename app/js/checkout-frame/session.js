@@ -399,6 +399,7 @@ Session.prototype = {
 
     if (IRCTC_KEYS.indexOf(key) !== -1) {
       tab_titles.upi = 'BHIM/UPI';
+      tab_titles.card = 'Debit/Credit Card';
       this.irctc = true;
       this.r.set('theme.image_frame', false);
     }
