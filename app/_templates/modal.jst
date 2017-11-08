@@ -196,7 +196,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                       <label>
                         <i>&#xe609;</i>
                         `=_.tab_titles.card`
-                        <span class="desc">Mastercard, Visa, `=_.hide_rupay? "" :"RuPay, "`Maestro`?preferences.methods.amex`, Amex`?`</span>
+                        <span class="desc">Mastercard, Visa, `=_.irctc? "" :"RuPay, "`Maestro`?preferences.methods.amex`, Amex`?`</span>
                       </label>
                     </div>
                     `?`
@@ -231,6 +231,11 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                   <div class="clear"></div>
                 </div>
               </div>
+              `?_.irctc`
+                <div class='recurring-message' style='right: 0;left: 0;border-radius:0 0 3px 3px'>
+                      <span>&#x2139;</span>
+                *Payment charges and taxes as applicable.</div>
+              `?`
               `?method.card || method.emi`
                 <div class="tab-content showable screen" id="form-card">
                   <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>

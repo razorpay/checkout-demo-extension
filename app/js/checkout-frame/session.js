@@ -399,7 +399,8 @@ Session.prototype = {
 
     if (IRCTC_KEYS.indexOf(key) !== -1) {
       tab_titles.upi = 'BHIM/UPI';
-      this.hide_rupay = true;
+      this.irctc = true;
+      this.r.set('theme.image_frame', false);
     }
 
     if (getter('theme.emi_mode')) {
