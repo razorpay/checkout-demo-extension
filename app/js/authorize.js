@@ -129,7 +129,8 @@ function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   this.fees = params.fees;
-  this.powerwallet = params.powerwallet || (data && data.method === 'upi');
+  this.powerwallet =
+    params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
   this.tryPopup();
 
