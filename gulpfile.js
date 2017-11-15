@@ -17,11 +17,9 @@ const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
 const istanbul = require('istanbul');
 const awspublish = require('gulp-awspublish');
-const jshint = require('gulp-jshint');
-const stylish = require('jshint-stylish');
-const webdriver = require('gulp-webdriver');
+// const webdriver = require('gulp-webdriver');
 const testServer = require('./test/e2e/server/index.js');
-const internalIp = require('internal-ip');
+// const internalIp = require('internal-ip');
 const lazypipe = require('lazypipe');
 const minimist = require('minimist');
 
@@ -124,7 +122,9 @@ gulp.task('uglify', () => {
 
 gulp.task('copyLegacy', function() {
   execSync(
-    `cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`
+    `cd ${
+      distDir
+    }; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`
   );
 });
 
@@ -152,6 +152,10 @@ gulp.task('build', function(cb) {
   );
 });
 
+gulp.task('build:test', function(cb) {
+  runSequence('clean', ['css:prod', 'compileTemplates'], 'usemin', cb);
+});
+
 gulp.task('serve', ['build'], function() {
   gulp.watch(paths.css, ['css']);
   gulp.watch(paths.templates, ['compileTemplates']);
@@ -165,7 +169,11 @@ gulp.task('default', ['build']);
 /** Font Upload to static **/
 
 gulp.task('uploadStaticAssetsToCDN', function() {
-  let target = process.argv.slice(3)[0].replace(/.+=/, '').toLowerCase().trim();
+  let target = process.argv
+    .slice(3)[0]
+    .replace(/.+=/, '')
+    .toLowerCase()
+    .trim();
 
   let publisher = awspublish.create({
     accessKeyId: process.env.AWS_KEY,
@@ -217,12 +225,22 @@ function getJSPaths(html, pattern) {
 
 let allOptions;
 let karmaOptions = {
+  customLaunchers: {
+    ChromeHeadlessNoSandbox: {
+      base: 'ChromiumHeadless',
+      flags: [
+        '--no-sandbox',
+        '--user-data-dir=/tmp/chrome-test-profile',
+        '--disable-web-security'
+      ]
+    }
+  },
   frameworks: ['mocha'],
   reporters: ['coverage'],
   port: 9876,
   colors: true,
   logLevel: 'ERROR',
-  browsers: ['PhantomJS'],
+  browsers: ['ChromeHeadlessNoSandbox'],
   singleRun: true,
   coverageReporter: {
     type: 'json'
@@ -241,7 +259,7 @@ let karmaLibs = [
   'spec/helpers.js'
 ];
 
-gulp.task('makeKarmaOptions', ['build'], function() {
+gulp.task('makeKarmaOptions', ['build:test'], function() {
   allOptions = glob.sync(assetPath('!(custom).html')).map(function(html) {
     let o = JSON.parse(JSON.stringify(karmaOptions));
     o.files = karmaLibs.concat(getJSPaths(html, '<script src='));

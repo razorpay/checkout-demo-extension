@@ -1,0 +1,17 @@
+FROM razorpay/containers:app-nginx
+
+ENV GIT_COMMIT_HASH="dev-commit"
+
+ADD ./dockerconf /dockerconf
+
+VOLUME ['/checkout']
+
+WORKDIR /checkout
+RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 \
+    && chmod +x /usr/local/bin/dumb-init 
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+
+CMD ["/dockerconf/entrypoint.sh"]
