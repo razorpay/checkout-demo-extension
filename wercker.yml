@@ -7,10 +7,6 @@ build:
             name: Unit Test
             code: gulp test:unit
 
-        - script:
-            name: Test
-            code: /selenium & npm run test:prod
-
     after-steps:
         - slack-notifier:
             url: $SLACK_URL
