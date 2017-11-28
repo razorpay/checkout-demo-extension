@@ -1,6 +1,7 @@
 `
 var c = _('theme.color') || '#3594E2';
 var close = _('theme.close_button');
+var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 `
 
 `?_('theme.upi_only')`
@@ -11,19 +12,9 @@ var close = _('theme.close_button');
 }
 `?`
 
-.button, .btn, .offer, .submit-button
+.button, .btn, .submit-button
 {
   background: `=c`;
-}
-
-.offer
-{
-  border-left: 1px solid `=c`;
-}
-
-.offer:before {
-  border-bottom-color: `=c`;
-  border-right: 8px solid `=c`;
 }
 
 .spin div, .link
@@ -85,4 +76,17 @@ input[type=checkbox]:checked + .checkbox
 
 .grid :checked+label {
   border-bottom: 2px solid `=c`;
+}
+
+.list :checked+label {
+  border-color: `=c` !important;
+}
+
+.list :checked+label .checkbox {
+  background: `=c`;
+  border-color: `=c`;
+}
+
+.mobile #body {
+  height: `=bodyHeight`px;
 }

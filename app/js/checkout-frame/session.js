@@ -472,9 +472,11 @@ Session.prototype = {
       var div = document.createElement('div');
       div.innerHTML = templates.modal(this);
       this.el = div.firstChild;
-      this.el.appendChild(this.renderCss());
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
+
+      this.el.appendChild(this.renderCss());
+
       this.body = $('#body');
 
       if (this.invoice) {

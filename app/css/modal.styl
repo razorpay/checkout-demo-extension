@@ -55,8 +55,109 @@ html {
 
 #wallets {
   position: relative;
+  padding: 12px 0;
+  padding-bottom: $footerh + 12px;
   .help {
     left: 12px;
+  }
+  .name {
+    color: #0C1753;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 600;
+  }
+  .logo {
+    width: 30px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 12px 0 5px;
+  }
+}
+
+.list {
+  margin-bottom: 12px;
+  .checkbox {
+    border-radius: 50%;
+    width: 16px;
+    height: @width;
+    position: relative;
+    background: #fff;
+    transition: 0.2s;
+
+    &::after {
+      content: '';
+      width: 4px;
+      height: 9px;
+      border: 1px solid #ccc;
+      transition: 0.2s;
+      border-left: 0;
+      border-top: 0;
+      position: absolute;
+      transform: rotate(40deg) translate(5px, -2px);
+    }
+  }
+
+  :checked + label .checkbox::after {
+    border-color: #fff
+  }
+
+  input[type=radio]:checked + label {
+    background: #fcfcfc;
+    max-height: 360px;
+  }
+
+  input[type=radio]:checked + label .offer-info {
+    opacity: 1;
+  }
+
+  .item {
+    display: block;
+    margin: 0px -12px;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      display: block;
+      left: 12px;
+      right: 12px;
+      bottom: 0;
+      border-bottom: 1px solid $bc;
+      z-index: -1;
+    }
+
+    &:first-child label {
+      border-radius: $br $br 0 0;
+      border-top-color: $bc;
+    }
+
+    &:last-child label {
+      border-bottom-color: $bc;
+      border-radius: 0 0 $br $br;
+    }
+
+    &.has-offer::after {
+      z-index: 0;
+    }
+  }
+
+  label {
+    display: block;
+    padding: 12px 14px;
+    transition: 0.2s;
+    border: 1px solid $bc;
+    border-top-color: transparent
+    border-bottom-color: transparent;
+    position: relative;
+    transition: 0.3s max-height;
+    height: 100%;
+    max-height: 30px;
+    overflow: hidden;
+    z-index: 1;
   }
 }
 
@@ -611,6 +712,10 @@ $outline = #ddd;
   }
 }
 
+#form-wallet {
+  overflow: auto;
+}
+
 #footer {
   pointer-events: none;
 }
@@ -833,47 +938,35 @@ $outline = #ddd;
 
 .offer {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  top: 16px;
+  right: 12px;
   line-height: 20px;
-  color: #fff;
   padding: 0 6px;
   font-size: 12px;
-  &:before {
-    display: block;
-    border: 10px solid transparent;
-    border-left-width: 8px;
-    content: '';
-    width: 0;
-    height: 0;
-    position: absolute;
-    left: -16px;
-  }
-}
-
-:checked + .radio-label .offer {
-  bottom: -2px;
+  color: #60B442;
+  background: rgba(112,190,83,0.06);
+  border: 1px solid #70BE53;
+  border-radius: 2px;
 }
 
 .offer-info {
-  display: none;
-  line-height: 20px;
-  margin: 10px 0 0 20px;
+  transition: 0.3s opacity;
+  opacity: 0;
   &.active {
     display: block;
   }
+
+  ul {
+    margin: 24px 0 0 0;
+    padding: 0 0 0 32px;
+  }
+
   li {
     list-style: none;
     &:first-child {
       margin-bottom: 4px;
       font-weight: bold;
     }
-  }
-}
-
-.count-7 {
-  ~.offer-info {
-    display: none;
   }
 }
 

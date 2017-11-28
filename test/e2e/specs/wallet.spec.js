@@ -143,7 +143,7 @@ describe('Wallet Payment', () => {
   describe('Wallets should be shown based on the passed option', () => {
     it('All wallets are loaded initially', () => {
       assert.equal(
-        browser.elements('#wallets > .wallet').value.length,
+        browser.elements('#wallets .wallet').value.length,
         3,
         'All Wallets loaded'
       )
@@ -156,7 +156,7 @@ describe('Wallet Payment', () => {
 
       assert.equal(
         utils.rgb2hex(browser.css('#wallet-radio-mobikwik+label', 'background-color')),
-        '#f0f0f0',
+        '#fcfcfc',
         'Label for selected wallet is styled'
       )
     })

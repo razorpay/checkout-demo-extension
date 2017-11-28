@@ -88,61 +88,88 @@ sessProto.netbanks = {
 
 var downBanks = {};
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
+var sqWalletPrefix = RazorpayConfig.cdn + 'wallet-sq/';
 
 var freqWallets = (sessProto.walletData = {
   amazonpay: {
     h: 28,
-    col: walletPrefix + 'amazonpay.png'
+    col: walletPrefix + 'amazonpay.png',
+    sq: sqWalletPrefix + 'amazonpay.png',
+    title: 'Amazon Pay'
   },
   paytm: {
     h: 18,
-    col: walletPrefix + 'paytm.png'
+    col: walletPrefix + 'paytm.png',
+    sq: sqWalletPrefix + 'paytm.png',
+    title: 'Paytm'
   },
   zeta: {
     h: 25,
-    col: walletPrefix + 'zeta.png'
+    col: walletPrefix + 'zeta.png',
+    sq: sqWalletPrefix + 'zeta.png',
+    title: 'Zeta'
   },
   freecharge: {
     h: 18,
-    col: walletPrefix + 'freecharge.png'
+    col: walletPrefix + 'freecharge.png',
+    sq: sqWalletPrefix + 'freecharge.png',
+    title: 'Freecharge'
   },
   airtelmoney: {
     power: false,
     h: 32,
-    col: walletPrefix + 'airtelmoney.png'
+    col: walletPrefix + 'airtelmoney.png',
+    sq: sqWalletPrefix + 'airtelmoney.png',
+    title: 'Airtel Money'
   },
   jiomoney: {
     h: 68,
-    col: walletPrefix + 'jiomoney.png'
+    col: walletPrefix + 'jiomoney.png',
+    sq: sqWalletPrefix + 'jiomoney.png',
+    title: 'JioMoney'
   },
   olamoney: {
     h: 22,
-    col: walletPrefix + 'olamoney.png'
+    col: walletPrefix + 'olamoney.png',
+    sq: sqWalletPrefix + 'olamoney.png',
+    title: 'Ola Money'
   },
   mobikwik: {
     h: 20,
-    col: walletPrefix + 'mobikwik.png'
+    col: walletPrefix + 'mobikwik.png',
+    sq: sqWalletPrefix + 'mobikwik.png',
+    title: 'Mobikwik'
   },
   payumoney: {
     h: 18,
-    col: walletPrefix + 'payumoney.png'
+    col: walletPrefix + 'payumoney.png',
+    sq: sqWalletPrefix + 'payumoney.png',
+    title: 'PayUMoney'
   },
   payzapp: {
     power: false,
     h: 24,
-    col: walletPrefix + 'payzapp.png'
+    col: walletPrefix + 'payzapp.png',
+    sq: sqWalletPrefix + 'payzapp.png',
+    title: 'PayZapp'
   },
   citrus: {
     h: 32,
-    col: walletPrefix + 'citrus.png'
+    col: walletPrefix + 'citrus.png',
+    sq: sqWalletPrefix + 'citrus.png',
+    title: 'Citrus Wallet'
   },
   mpesa: {
     h: 50,
-    col: walletPrefix + 'mpesa.png'
+    col: walletPrefix + 'mpesa.png',
+    sq: sqWalletPrefix + 'mpesa.png',
+    title: 'Vodafone mPesa'
   },
   sbibuddy: {
     h: 22,
-    col: walletPrefix + 'sbibuddy.png'
+    col: walletPrefix + 'sbibuddy.png',
+    sq: sqWalletPrefix + 'sbibuddy.png',
+    title: 'SBI Buddy'
   }
 });
 

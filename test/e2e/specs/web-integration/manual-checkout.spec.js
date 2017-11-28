@@ -206,7 +206,7 @@ describe('Home Screen', () => {
       browser.click('#payment-options > [tab=wallet]')
 
       assert.equal(
-        browser.elements('#Wallets > .wallet').value.length,
+        browser.elements('#Wallets .wallet').value.length,
         3,
         'All wallets are shown'
       )
