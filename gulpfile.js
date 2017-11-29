@@ -122,9 +122,7 @@ gulp.task('uglify', () => {
 
 gulp.task('copyLegacy', function() {
   execSync(
-    `cd ${
-      distDir
-    }; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`
+    `cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`
   );
 });
 
@@ -169,11 +167,7 @@ gulp.task('default', ['build']);
 /** Font Upload to static **/
 
 gulp.task('uploadStaticAssetsToCDN', function() {
-  let target = process.argv
-    .slice(3)[0]
-    .replace(/.+=/, '')
-    .toLowerCase()
-    .trim();
+  let target = process.argv.slice(3)[0].replace(/.+=/, '').toLowerCase().trim();
 
   let publisher = awspublish.create({
     accessKeyId: process.env.AWS_KEY,

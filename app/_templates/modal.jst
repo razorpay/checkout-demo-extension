@@ -431,11 +431,13 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                       `
                         var hasOffer = _.offers.wallet[w.name];
                       `
-                        <div class="wallet item radio-item`=hasOffer?' has-offer':''`">
+                        <div class="wallet item radio-item `=hasOffer?'has-offer':''`">
+
                           <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
                           <label for="wallet-radio-`=w.name`" class="radio-label">
                             <span class="checkbox"></span>
-                            <div class="logo" style="background-image: url(`=w.sq`)"></div>
+                            <img style="display: none" src="`=w.sq`" onload=" this.nextElementSibling.style = 'background-image:url('+this.src+')'">
+                            <div class="placeholder"></div>
                             <span class="name">`=w.title`</span>
                             `?hasOffer`
                               <span class="offer">`=hasOffer.name`</span>

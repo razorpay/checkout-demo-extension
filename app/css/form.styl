@@ -35,6 +35,19 @@ label[for] {
   border-bottom: 1px solid $bc;
   position: relative;
 
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid #ccc;
+    transform: scale(0, 1);
+    transition: 0.2s;
+    pointer-events: none
+    transform-origin: center;
+  }
+
   &.readonly {
     border-bottom: 1px dashed #ccc;
     .input {
@@ -44,6 +57,10 @@ label[for] {
   }
   &.focused {
     color: $input-focused;
+
+    &::after {
+      transform: scale(1);
+    }
   }
   &.invalid.mature:not(.focused) {
     color: $danger;
