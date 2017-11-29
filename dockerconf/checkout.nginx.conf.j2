@@ -1,34 +1,36 @@
-server {
-    listen 80;
-    {% if env != 'prod' %}
-    server_name {{ env }}-checkout.razorpay.in;
-    {% else %}
-    server_name checkout.razorpay.com;
-    {% endif %}
-    set $checkout_root_location "/app/dist/";
-    set $checkout_v1_location "/app/dist/v1";
-    {% if env == 'dev' %}
-    set $checkout_root_location "/checkout/app/dist/";
-    set $checkout_v1_location "/checkout/app/dist/v1";
-    {% endif %}
-    root "$checkout_root_location";
+worker_processes 1;
+events { worker_connections 1024; }
 
-    index index.php;
+http {
+    server {
+        listen 80;
 
-    charset utf-8;
+        {% if env != 'prod' %}
+        server_name {{ env }}-checkout.razorpay.in;
+        {% else %}
+        server_name checkout.razorpay.com;
+        {% endif %}
 
-    location / {
-        alias $checkout_root_location;
+        set $checkout_root_location "/app/dist/";
+        set $checkout_v1_location "/app/dist/v1";
+        {% if env == 'dev' %}
+        set $checkout_root_location "/checkout/app/dist/";
+        set $checkout_root_location "/checkout/app/dist/";
+        {% endif %}
+        root "$checkout_root_location";
+
+        gzip_static on;
+        brotli_static on;
+
+        charset utf-8;
+
+        location / {
+            alias $checkout_root_location;
+        }
+
+        sendfile off;
+        access_log  off;
+        error_log off;
+        client_max_body_size 100m;
     }
-
-    access_log /var/log/nginx/NGINX_HOST-{{ env }}-checkout-access.log combined;
-    error_log  /var/log/nginx/NGINX_HOST-{{ env }}-checkout-error.log error;
-
-    sendfile off;
-
-    client_max_body_size 100m;
-
-    #location ~ /\.ht {
-    #    deny all;
-    #}
 }
