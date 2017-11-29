@@ -433,7 +433,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                       `
                         <div class="wallet item radio-item`=hasOffer?' has-offer':''`">
                           <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
-                          <label for="wallet-radio-`=w.name`" class="radio-label mfix">
+                          <label for="wallet-radio-`=w.name`" class="radio-label">
                             <span class="checkbox"></span>
                             <div class="logo" style="background-image: url(`=w.sq`)"></div>
                             <span class="name">`=w.title`</span>
@@ -441,7 +441,6 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                               <span class="offer">`=hasOffer.name`</span>
                               <div class="offer-info">
                                 `=hasOffer.display_text`
-
                               </div>
                             `?`
                           </label>

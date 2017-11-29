@@ -35,7 +35,8 @@ var ua_prefer_redirect =
   isua(
     /; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/
   ) ||
-  (ua_iOS && (isua(/ GSA\//) || !isua(/Safari/))) ||
+  // can't detect webview reliably
+  ua_iOS ||
   (ua_old_android && !isua(/Chrome/));
 
 var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
