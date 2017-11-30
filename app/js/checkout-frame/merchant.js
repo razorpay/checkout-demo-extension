@@ -421,7 +421,7 @@ function setPaymentMethods(session) {
   }
 
   wallets.sort(function(walletA, walletB) {
-    return walletB.custom || session.offers.wallet[walletB];
+    return (walletB.custom || session.offers.wallet[walletB.name]) ? 1 : -1;
   });
 
   methods.wallet = wallets;
