@@ -1467,6 +1467,12 @@ Session.prototype = {
           delete data.emi_duration;
         }
       }
+
+      if (this.screen === 'upi') {
+        if (data.flow !== 'directpay') {
+          delete data.vpa;
+        }
+      }
     }
     return data;
   },

@@ -454,13 +454,28 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               `?`
               `?method.upi`
                 <div class="tab-content showable screen pad" id="form-upi">
-                  <p>Enter your virtual payment address</p>
-                  <div class="elem-wrap"><div class="elem">
-                    <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
-                  </div></div>
-                  <p>
-                    You will receive a collect request from razorpay in the UPI app which was used to create your VPA.
-                  </p>
+                  <div class="list">
+                    <div class="item">
+                      <input id="radio-directpay" type="radio" name="flow" value="directpay" checked />
+                      <label for="radio-directpay">
+                        <p>Enter your virtual payment address</p>
+                        <div class="elem-wrap"><div class="elem">
+                          <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                        </div></div>
+                        <p>
+                          You will receive a collect request from razorpay in the UPI app which was used to create your VPA.
+                        </p>
+                      </label>
+                    </div>
+                    `?_.upi_intent`
+                    <div class="item">
+                      <input id="radio-intent" type="radio" name="flow" value="intent" />
+                      <label for="radio-intent">
+                        Pay via other UPI apps
+                      </label>
+                    </div>
+                    `?`
+                  </div>
                 </div>
               `?`
               `?ecod && invoice`

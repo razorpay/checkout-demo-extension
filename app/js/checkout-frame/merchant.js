@@ -421,7 +421,7 @@ function setPaymentMethods(session) {
   }
 
   wallets.sort(function(walletA, walletB) {
-    return (walletB.custom || session.offers.wallet[walletB.name]) ? 1 : -1;
+    return walletB.custom || session.offers.wallet[walletB.name] ? 1 : -1;
   });
 
   methods.wallet = wallets;
@@ -721,6 +721,14 @@ window.handleOTP = function(otp) {
   }
 };
 
+window.upiIntentResponse = function(data) {
+  var session = getSession();
+
+  if (session.r._payment) {
+    session.r.emit('payment.upi.intent_response', data);
+  }
+};
+
 window.backPressed = function(callback) {
   var session = getSession();
   if (
@@ -786,6 +794,10 @@ window.handleMessage = function(message) {
   if (message.embedded) {
     session.embedded = true;
     $(doc).addClass('embedded');
+  }
+
+  if (message.is_upi_app_available) {
+    session.upi_intent = true;
   }
 
   if (message.device_token) {
