@@ -593,7 +593,7 @@ var responseTypes = {
     });
 
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
-      CheckoutBridge.callNativeIntent((fullResponse.data || {}).upi_deeplink);
+      CheckoutBridge.callNativeIntent((fullResponse.data || {}).intent_url);
     }
   },
 
