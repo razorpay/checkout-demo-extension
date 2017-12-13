@@ -169,6 +169,15 @@ $mobile-view() {
   }
 }
 
+/**
+ * Workaround for iOS Safari issue where window.innerHeight does not work as expected.
+ */
+.ip {
+  #body[screen="wallet"] {
+    height: calc(100vh - 180px);
+  }
+}
+
 .android4 {
   .elem {
     height: 54px;
