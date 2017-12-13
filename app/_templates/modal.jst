@@ -457,6 +457,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                   <p>Enter your virtual payment address</p>
                   <div class="elem-wrap"><div class="elem">
                     <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                    <span class="help">Please enter a valid VPA.</span>
                   </div></div>
                   <p>
                     You will receive a collect request from razorpay in the UPI app which was used to create your VPA.

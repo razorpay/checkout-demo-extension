@@ -11,3 +11,12 @@ discreet.isFrame = true;
   }
   RazorpayConfig.api = href;
 })();
+
+window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+  track(getSession().r, 'js_error', {
+    message: errorMsg,
+    line: lineNumber,
+    col: column,
+    stack: errorObj && errorObj.stack
+  });
+};
