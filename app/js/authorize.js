@@ -578,22 +578,34 @@ var responseTypes = {
   intent: function(request, fullResponse) {
     var self = this;
     var url = request.url;
-    this.on('upi.intent_response', function(response) {
-      self.ajax = recurseAjax(
-        url,
-        function(response) {
-          self.complete(response);
-        },
-        function(response) {
-          return response && response.status;
-        },
-        null,
-        $.jsonp
-      );
-    });
+    var session = getSession();
 
-    if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
-      CheckoutBridge.callNativeIntent((fullResponse.data || {}).intent_url);
+    var intent_url = (fullResponse.data || {}).intent_url;
+
+    if (session.upi_intents_data) {
+      this.on('upi.intent_response', function(data) {
+        if (isEmptyObject(data)) {
+          self.emit('error', {
+            error: 'UPI_INTENT_BACK_BUTTON',
+            description: 'Payment did not complete.'
+          });
+        }
+
+        self.ajax = recurseAjax(
+          url,
+          function(response) {
+            self.complete(response);
+          },
+          function(response) {
+            return response && response.status;
+          },
+          null,
+          $.jsonp
+        );
+      });
+      if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
+        CheckoutBridge.callNativeIntent(intent_url);
+      }
     }
   },
 

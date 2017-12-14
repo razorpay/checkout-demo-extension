@@ -29,9 +29,8 @@ function fillData(container, returnObj) {
 
 function makeEmiDropdown(emiObj, session, isOption) {
   var h = '';
-  var isSubvented = preferences.methods.emi_subvention === 'merchant'
-    ? true
-    : false;
+  var isSubvented =
+    preferences.methods.emi_subvention === 'merchant' ? true : false;
   if (emiObj.plans) {
     each(emiObj.plans, function(length, rate) {
       rate = isSubvented ? 0 : rate;
@@ -141,7 +140,10 @@ function toggleNoCvv(show) {
 }
 
 function makeVisible(subject) {
-  $(subject).css('display', 'block').reflow().addClass(shownClass);
+  $(subject)
+    .css('display', 'block')
+    .reflow()
+    .addClass(shownClass);
 }
 
 function makeHidden(subject) {
@@ -275,7 +277,9 @@ function askOTP(text) {
     text = text.error && text.error.description;
   }
   $('#otp').val('');
-  $('#form-otp').removeClass('loading').removeClass('action');
+  $('#form-otp')
+    .removeClass('loading')
+    .removeClass('action');
   $('#body').addClass('sub');
   if (!text) {
     var thisSession = getSession();
@@ -448,7 +452,9 @@ Session.prototype = {
     var r = this.r;
     if (!this.el) {
       if (
-        this.order && this.order.partial_payment && !r.get('prefill.amount')
+        this.order &&
+        this.order.partial_payment &&
+        !r.get('prefill.amount')
       ) {
         this.extraFields = true;
       }
@@ -651,7 +657,11 @@ Session.prototype = {
 
   hideErrorMessage: function() {
     if (this.r._payment) {
-      if (this.payload && this.payload.method === 'upi') {
+      if (
+        this.payload &&
+        this.payload.method === 'upi' &&
+        this.payload['_[flow]'] === 'directpay'
+      ) {
         return cancel_upi(this);
       }
       if (confirmClose()) {
@@ -747,7 +757,10 @@ Session.prototype = {
   extraNext: function() {
     var commonInvalid = $('#pad-common .invalid');
     if (commonInvalid[0]) {
-      return commonInvalid.addClass('mature').$('.input').focus();
+      return commonInvalid
+        .addClass('mature')
+        .$('.input')
+        .focus();
     }
 
     var partialEl = gel('amount-value');
@@ -917,6 +930,18 @@ Session.prototype = {
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
       });
+
+      this.on('click', '#upi-directpay', function() {
+        $('#vpa').focus();
+      });
+
+      this.on('click', '#vpa', function() {
+        $('#upi-directpay label')[0].dispatchEvent(new MouseEvent('click'));
+      });
+
+      this.on('change', '#form-upi', function(e) {
+        $('#body').toggleClass('sub', e.target.value);
+      });
     }
 
     if (this.get('ecod')) {
@@ -967,7 +992,9 @@ Session.prototype = {
   },
 
   blur: function(e) {
-    $(e.target.parentNode).removeClass('focused').addClass('mature');
+    $(e.target.parentNode)
+      .removeClass('focused')
+      .addClass('mature');
     this.input(e.target);
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
@@ -1063,7 +1090,8 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(), type = this.type;
+          var isValid = this.isValid(),
+            type = this.type;
 
           if (!preferences.methods.amex && type === 'amex') {
             isValid = false;
@@ -1160,11 +1188,21 @@ Session.prototype = {
 
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
-    invoke('focus', qs(screenEl + ' .invalid input'));
 
-    if (screen !== 'wallet' || $('.wallet :checked')[0]) {
-      this.body.toggleClass('sub', screen);
+    if (!(screen === 'upi' && this.upi_intents_data)) {
+      invoke('focus', qs(screenEl + ' .invalid input'));
     }
+
+    var showPaybtn = screen;
+    if (
+      (screen === 'wallet' && !$('.wallet :checked')[0]) ||
+      (screen === 'upi' &&
+        this.upi_intents_data &&
+        !$('#form-upi .item :checked')[0])
+    ) {
+      showPaybtn = false;
+    }
+    this.body.toggleClass('sub', showPaybtn);
   },
 
   back: function() {
@@ -1232,7 +1270,9 @@ Session.prototype = {
     $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
 
     if (!isEmiTab) {
-      $('#emi-bank').parent().removeClass('invalid');
+      $('#emi-bank')
+        .parent()
+        .removeClass('invalid');
       $('#elem-emi .elem').removeClass('invalid');
     }
 
@@ -1469,7 +1509,7 @@ Session.prototype = {
       }
 
       if (this.screen === 'upi') {
-        if (data.flow !== 'directpay') {
+        if (data['_[flow]'] !== 'directpay') {
           delete data.vpa;
         }
       }
@@ -1509,7 +1549,9 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
-      $('#form-otp')[actionState]('action')[loadingState]('loading');
+      $('#form-otp')
+        [actionState]('action')
+        [loadingState]('loading');
     } else {
       $('#fd-t').html(text);
       showOverlay($('#error-message')[loadingState]('loading'));
@@ -1644,7 +1686,8 @@ Session.prototype = {
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
         if (
-          !preferences.methods.amex && formattingDelegator.card.type === 'amex'
+          !preferences.methods.amex &&
+          formattingDelegator.card.type === 'amex'
         ) {
           return this.showLoadError('AMEX cards are not supported', true);
         }
@@ -1677,7 +1720,11 @@ Session.prototype = {
         }
       }
 
-      if (this.checkInvalid()) {
+      if (screen === 'upi') {
+        if (this.checkInvalid('#form-upi input:checked + label')) {
+          return;
+        }
+      } else if (this.checkInvalid()) {
         return;
       }
     } else {
@@ -1861,8 +1908,7 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.modal = this.emi = this.el = this
-        .card = window.setPaymentID = window.onComplete = null;
+      this.modal = this.emi = this.el = this.card = window.setPaymentID = window.onComplete = null;
     }
   },
 

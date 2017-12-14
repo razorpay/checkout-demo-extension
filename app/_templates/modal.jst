@@ -402,7 +402,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                             <label for="ecod-radio-upi" class="radio-label mfix">
                               <span class="checkbox"></span>
                               <div class="logo" style="background-image: url(https://cdn.razorpay.com/checkout/upi.svg)"></div>
-                              <span class="name">Pay using Upi</span>
+                              <span class="title">Pay using Upi</span>
                             </label>
                           </div>
                         `?`
@@ -412,7 +412,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                             <label for="ecod-radio-ecod" class="radio-label mfix">
                               <span class="checkbox"></span>
                               <div class="logo"><i>&#xe609;</i></div>
-                              <span class="name">Card (link)</span>
+                              <span class="title">Card (link)</span>
                             </label>
                           </div>
                           <div class="item radio-item wallet" tab="ecod">
@@ -420,13 +420,13 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                             <label for="ecod-radio-ecod2" class="radio-label mfix">
                               <span class="checkbox"></span>
                               <div class="logo"><i>&#xe60a;</i></div>
-                              <span class="name">Netbanking (link)</span>
+                              <span class="title">Netbanking (link)</span>
                             </label>
                           </div>
                         `?`
                       </div>
                     `?`
-                    <div class="list">
+                    <div class="list collapsable">
                       `~wallet:i:w`
                       `
                         var hasOffer = _.offers.wallet[w.name];
@@ -438,7 +438,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                             <span class="checkbox"></span>
                             <img style="display: none" src="`=w.sq`" onload=" this.nextElementSibling.style = 'background-image:url('+this.src+')'">
                             <div class="placeholder"></div>
-                            <span class="name">`=w.title`</span>
+                            <span class="title">`=w.title`</span>
                             `?hasOffer`
                               <span class="offer">`=hasOffer.name`</span>
                               <div class="offer-info">
@@ -454,27 +454,34 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               `?`
               `?method.upi`
                 <div class="tab-content showable screen pad" id="form-upi">
+                  <h3>Pay using</h3>
                   <div class="list">
+                    `?_.upi_intents_data`
                     <div class="item">
-                      <input id="radio-directpay" type="radio" name="flow" value="directpay" checked />
-                      <label for="radio-directpay">
-                        <p>Enter your virtual payment address</p>
-                        <div class="elem-wrap"><div class="elem">
-                          <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="yourname@bank" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
-                        </div></div>
-                        <p>
-                          You will receive a collect request from razorpay in the UPI app which was used to create your VPA.
-                        </p>
-                      </label>
-                    </div>
-                    `?_.upi_intent`
-                    <div class="item">
-                      <input id="radio-intent" type="radio" name="flow" value="intent" />
+                      <input id="radio-intent" type="radio" name="_[flow]" value="intent" />
                       <label for="radio-intent">
-                        Pay via other UPI apps
+                        <i class="theme">&#xe70e;</i>
+                        <div class="title">UPI App (installed on phone)</div>
+                        <div class="subtitle">Directly pay with a UPI App</div>
+                        <span class="checkbox"></span>
                       </label>
                     </div>
                     `?`
+                    <div id="upi-directpay" class="item">
+                      <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!_.upi_intents_data`checked`?`/>
+                      <label for="radio-directpay">
+                        <i class="theme">&#xe70d;</i>
+                        <div class="title">UPI Address</div>
+                        <div class="subtitle">You will receive a collect request</div>
+                        <div class="elem-wrap"><div class="elem">
+                          <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                          <div class="help">Please enter a valid VPA of the form username@bank</div>
+                        </div></div>
+                        `?_.upi_intents_data`
+                        <span class="checkbox"></span>
+                        `?`
+                      </label>
+                    </div>
                   </div>
                 </div>
               `?`
