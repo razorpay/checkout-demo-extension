@@ -251,6 +251,10 @@ function errorHandler(response) {
   $('#fd-hide').focus();
 }
 
+function cancelHandler(response) {
+  this.showLoadError('Payment did not complete.', true);
+}
+
 function getPhone() {
   return gel('contact').value;
 }
@@ -926,6 +930,7 @@ Session.prototype = {
         var metaParam = {};
         metaParam[upi_radio.prop('name')] = upi_radio.val();
         this.clearRequest(metaParam);
+        $('#error-message').removeClass('cancel_upi');
       });
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
@@ -957,7 +962,11 @@ Session.prototype = {
       }
     } else {
       this.click(goto_payment, function() {
-        if (this.payload && this.payload.method === 'upi') {
+        if (
+          this.payload &&
+          this.payload.method === 'upi' &&
+          this.payload['_[flow]'] === 'directpay'
+        ) {
           return cancel_upi(this);
         }
         this.r.focus();
@@ -1534,6 +1543,9 @@ Session.prototype = {
         (this.screen === 'upi' || this.get('ecod')) &&
         text === discreet.cancelMsg
       ) {
+        if (this.payload['_[flow]'] === 'intent') {
+          return;
+        }
         return this.hideErrorMessage();
       }
       actionState = loadingState;
@@ -1814,7 +1826,8 @@ Session.prototype = {
     this.r
       .createPayment(data, request)
       .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this));
+      .on('payment.error', bind(errorHandler, this))
+      .on('payment.cancel', bind(cancelHandler, this));
 
     var sub_link = $('#error-message .link');
     if (request.powerwallet) {
@@ -1854,6 +1867,11 @@ Session.prototype = {
       sub_link.html('Cancel Payment');
       var that = this;
       this.r.on('payment.upi.pending', function(data) {
+        if (data && data.flow === 'upi-intent') {
+          return that.showLoadError('Waiting for payment confirmation.');
+        }
+
+        /* Otherwise it's directpay */
         var vpa = data ? data.vpa : 'razorpay@icici';
         that.showLoadError(
           'Please accept collect request from ' + vpa + ' on your UPI app'

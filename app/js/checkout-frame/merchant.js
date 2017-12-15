@@ -734,7 +734,7 @@ window.handleOTP = function(otp) {
 window.upiIntentResponse = function(data) {
   var session = getSession();
 
-  if (session.r._payment) {
+  if (session.r._payment && session.upi_intents_data) {
     session.r.emit('payment.upi.intent_response', data);
   }
 };
