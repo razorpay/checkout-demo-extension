@@ -251,8 +251,15 @@ function errorHandler(response) {
   $('#fd-hide').focus();
 }
 
+/* bound with session */
 function cancelHandler(response) {
-  this.showLoadError('Payment did not complete.', true);
+  if (!this.payload) {
+    return;
+  }
+
+  if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
+    this.showLoadError('Payment did not complete.', true);
+  }
 }
 
 function getPhone() {
