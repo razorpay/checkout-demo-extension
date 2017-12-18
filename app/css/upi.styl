@@ -2,20 +2,45 @@
 
 #form-upi {
   .input {
-    padding: 12px 0 12px 50px;
+    padding: 12px 0 6px 0;
     box-sizing: border-box;
     opacity: 1;
   }
   .elem-wrap {
     height: auto;
   }
-  .elem {
-    background: #fafafa url('https://cdn.razorpay.com/checkout/vpa.png') no-repeat 15px center;
-    border: 1px solid #eee;
-    background-size: 20px;
-  }
   p {
     line-height: 1.75;
+  }
+
+  .list {
+    .item {
+      position: relative;
+      margin-bottom: 12px;
+      box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);
+      label {
+        border-radius: 2px;
+        border-color: $bc;
+        background: #fcfcfc;
+      }
+    }
+    .checkbox {
+      position: absolute;
+      top: 18px;
+      right: 6px;
+    }
+
+    i {
+      position: absolute;
+      display: block;
+      top: 18px;
+      left: 18px;
+      font-size: 18px;
+
+      & ~ div {
+        margin-left: 32px;
+      }
+    }
   }
 }
 

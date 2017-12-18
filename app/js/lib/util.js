@@ -25,6 +25,8 @@ function isua(ua_regex) {
 var is_ie8 = !window.addEventListener;
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
+var ua_Android = isua(/Android/);
+var ua_WP = isua(/Windows Phone/);
 
 var ua_old_android = isua(/Android [2-4]/);
 
@@ -46,6 +48,8 @@ var chromeVersion = ua.match(/Chrome\/(\d+)/);
 if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }
+
+var ua_mobile = isua(/Android/) || ua_iOS;
 
 var ua_ip7 = isua(/iPhone OS 7/);
 

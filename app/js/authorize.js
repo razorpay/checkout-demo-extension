@@ -575,6 +575,39 @@ var responseTypes = {
     self.emit('upi.pending', fullResponse.data);
   },
 
+  intent: function(request, fullResponse) {
+    var self = this;
+    var url = request.url;
+
+    var intent_url = (fullResponse.data || {}).intent_url;
+    this.on('upi.intent_response', function(data) {
+      if (isEmptyObject(data)) {
+        return self.emit('cancel', {
+          '_[method]': 'upi',
+          '_[flow]': 'intent',
+          '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+        });
+      } else {
+        self.emit('upi.pending', { flow: 'upi-intent', response: data });
+      }
+
+      self.ajax = recurseAjax(
+        url,
+        function(response) {
+          self.complete(response);
+        },
+        function(response) {
+          return response && response.status;
+        },
+        null,
+        $.jsonp
+      );
+    });
+    if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
+      CheckoutBridge.callNativeIntent(intent_url);
+    }
+  },
+
   otp: function(request) {
     this.otpurl = request.url;
     this.emit('otp.required');
