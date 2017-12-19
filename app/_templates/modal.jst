@@ -171,9 +171,14 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     </div>
                   `?`
                 </div>
-                `?_.recurring`
+                `?_.recurring && _.methods.count === 1`
                   <div class="pad recurring-message">
-                    <span>&#x2139;</span> Subscription payments are only supported on Mastercard and Visa credit cards.
+                    <span>&#x2139;</span>
+                    `?o('subscription_id')`
+                      Subscription payments are only supported on Mastercard and Visa credit cards.
+                    `??`
+                      Only MasterCard and Visa Credit Cards are supported for this payment.
+                    `?`
                   </div>
                 `?`
                 `?cardOffer`
@@ -349,7 +354,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                         continue;
                       }
                       total++;
-                      if (total > 6) {
+                      if (total > 6 || (_.recurring && total > 3)) {
                         break;
                       }
                       if(count === 0){
@@ -387,6 +392,12 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                       </span>
                       is currently facing issues.
                     </div>
+                    `?_.recurring`
+                      <div class="pad recurring-message">
+                        <span>&#x2139;</span>
+                        Future payments from your bank account will be charged automatically.
+                      </div>
+                    `?`
                 </div>
               `?`
               `?wallet.length || ecod`
