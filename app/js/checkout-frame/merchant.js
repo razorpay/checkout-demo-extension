@@ -343,6 +343,10 @@ function setPaymentMethods(session) {
       methods[method] = enabled;
     }
   });
+  if (recurring) {
+    methods.netbanking =
+      availMethods.recurring && availMethods.recurring.netbanking;
+  }
 
   var amount = session.get('amount');
   if (amount <= emi_options.min) {
@@ -388,7 +392,6 @@ function setPaymentMethods(session) {
   if (
     !methods.netbanking ||
     methods.netbanking instanceof Array ||
-    recurring ||
     international
   ) {
     methods.netbanking = false;
