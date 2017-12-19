@@ -1351,7 +1351,12 @@ Session.prototype = {
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
     var cardtype = $savedCard.$('.cardtype').attr('cardtype');
-    $savedCard.$('.saved-cvv').focus();
+    if (
+      !e.target ||
+      e.target !== $savedCard.find('select[name="emi_duration"]')[0]
+    ) {
+      $savedCard.$('.saved-cvv').focus();
+    }
   },
 
   setSavedCards: function() {
