@@ -27,7 +27,9 @@ var qpmap = {};
 var pngBase64Prefix = 'data:image/png;base64,';
 var bankPrefix = RazorpayConfig.cdn + 'bank/';
 var sessProto = Session.prototype;
-sessProto.netbanks = {
+var netbanks = (sessProto.netbanks = {
+  ICIC_C: {},
+  UTIB_C: {},
   SBIN: {
     image:
       pngBase64Prefix +
@@ -84,7 +86,12 @@ sessProto.netbanks = {
     image: bankPrefix + 'CORP.gif',
     title: 'Corporation'
   }
-};
+});
+
+netbanks.ICIC_C.image = netbanks.ICIC.image;
+netbanks.ICIC_C.title = 'ICICI Corporate';
+netbanks.UTIB_C = netbanks.UTIB.image;
+netbanks.UTIB_C.title = 'Axis Corporate';
 
 var downBanks = {};
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
@@ -318,6 +325,18 @@ function notifyBridge(message) {
   }
 }
 
+function setPreferredBanks(session) {
+  var bankObj = {};
+  var availBanks = session.methods.netbanking;
+
+  each(netbanks, function(bankCode, obj) {
+    if (availBanks[bankCode] && !availBanks[bankCode + '_C']) {
+      bankObj[bankCode] = obj;
+    }
+  });
+  session.netbanks = bankObj;
+}
+
 function setDownBanks(session) {
   var downObj = [];
   var downtime = preferences.downtime;
@@ -398,6 +417,7 @@ function setPaymentMethods(session) {
   } else {
     methods.count = 1;
     setDownBanks(session);
+    setPreferredBanks(session);
   }
 
   if (methods.card) {
