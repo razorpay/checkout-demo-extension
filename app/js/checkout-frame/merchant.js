@@ -90,7 +90,7 @@ var netbanks = (sessProto.netbanks = {
 
 netbanks.ICIC_C.image = netbanks.ICIC.image;
 netbanks.ICIC_C.title = 'ICICI Corporate';
-netbanks.UTIB_C = netbanks.UTIB.image;
+netbanks.UTIB_C.image = netbanks.UTIB.image;
 netbanks.UTIB_C.title = 'Axis Corporate';
 
 var downBanks = {};
