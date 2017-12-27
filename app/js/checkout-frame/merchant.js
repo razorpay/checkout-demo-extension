@@ -28,6 +28,8 @@ var pngBase64Prefix = 'data:image/png;base64,';
 var bankPrefix = RazorpayConfig.cdn + 'bank/';
 var sessProto = Session.prototype;
 var netbanks = (sessProto.netbanks = {
+  ICIC_C: {},
+  UTIB_C: {},
   SBIN: {
     image:
       pngBase64Prefix +
@@ -86,10 +88,10 @@ var netbanks = (sessProto.netbanks = {
   }
 });
 
-netbanks.ICIC_C = clone(netbanks.ICIC);
-netbanks.ICIC_C.title += ' Corporate';
-netbanks.UTIB_C = clone(netbanks.UTIB);
-netbanks.UTIB_C.title += ' Corporate';
+netbanks.ICIC_C.image = netbanks.ICIC.image;
+netbanks.ICIC_C.title = 'ICICI Corporate';
+netbanks.UTIB_C = netbanks.UTIB.image;
+netbanks.UTIB_C.title = 'Axis Corporate';
 
 var downBanks = {};
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
@@ -324,24 +326,15 @@ function notifyBridge(message) {
 }
 
 function setPreferredBanks(session) {
-  var pref_banks = preferences.methods.preferred_banks;
+  var bankObj = {};
+  var availBanks = session.methods.netbanking;
 
-  if (pref_banks) {
-    var bankObj = {};
-    each(pref_banks, function(i, bankCode) {
-      bankObj[bankCode] = netbanks[bankCode];
-    });
-
-    each(netbanks, function(bankCode, obj) {
-      if (netbanks[bankCode + '_C']) {
-        return;
-      }
-      if (session.methods.netbanking[bankCode]) {
-        bankObj[bankCode] = obj;
-      }
-    });
-    session.netbanks = bankObj;
-  }
+  each(netbanks, function(bankCode, obj) {
+    if (availBanks[bankCode] && !availBanks[bankCode + '_C']) {
+      bankObj[bankCode] = obj;
+    }
+  });
+  session.netbanks = bankObj;
 }
 
 function setDownBanks(session) {
