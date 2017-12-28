@@ -856,11 +856,8 @@ window.handleMessage = function(message) {
   }
 
   if (message.event === 'open' || options) {
-    if (!preferences || session.get('remember_customer')) {
-      fetchPrefsAndShowModal(session);
-    } else {
-      showModal(session);
-    }
+    // always fetch preferences, disregard backend printed one.
+    fetchPrefsAndShowModal(session);
   } else if (message.event === 'close') {
     session.hide();
   }
