@@ -1190,6 +1190,7 @@ Session.prototype = {
     if (screen === this.screen) {
       return;
     }
+
     this.screen = screen;
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
@@ -1760,7 +1761,8 @@ Session.prototype = {
   submit: function() {
     var data = this.payload;
     var request = {
-      fees: preferences.fee_bearer
+      fees: preferences.fee_bearer,
+      sdk_popup: this.magic
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {

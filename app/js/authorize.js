@@ -129,9 +129,11 @@ function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   this.fees = params.fees;
+  this.sdk_popup = params.sdk_popup;
   this.powerwallet =
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
+
   this.tryPopup();
 
   if (params.paused) {
@@ -156,6 +158,21 @@ Payment.prototype = {
 
   off: function() {
     this.r.off('payment');
+  },
+
+  checkSdkPopup: function() {
+    var data = this.data;
+
+    if (this.sdk_popup && /^(card|emi)$/.test(data.method)) {
+      CheckoutBridge.showPaymentPage();
+      CheckoutBridge.openPopup(
+        JSON.stringify({
+          content: templates.popup(this)
+        })
+      );
+
+      return true;
+    }
   },
 
   checkRedirect: function() {
@@ -243,9 +260,10 @@ Payment.prototype = {
     }
 
     // redirect if specified
-    if (this.checkRedirect()) {
+    if (!this.checkSdkPopup() && this.checkRedirect()) {
       return;
     }
+
     // show loading screen in popup
     this.writePopup();
 
@@ -532,7 +550,29 @@ var responseTypes = {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-    if (popup) {
+
+    if (this.sdk_popup) {
+      if (direct) {
+        CheckoutBridge.openPopup({
+          content: content
+        });
+      } else {
+        var url =
+          "javascript: submitForm('" +
+          request.url +
+          "', " +
+          JSON.stringify(request.content) +
+          ", '" +
+          request.method +
+          "')";
+        // CheckoutBridge.showPaymentPage();
+        CheckoutBridge.openPopup(
+          JSON.stringify({
+            url: url
+          })
+        );
+      }
+    } else if (popup) {
       if (direct) {
         // direct is true for payzapp
         popup.write(content);

@@ -813,6 +813,10 @@ window.handleMessage = function(message) {
     session.upi_intents_data = message.upi_intents_data;
   }
 
+  if (message.magic) {
+    session.magic = true;
+  }
+
   session.ua_Android = ua_Android;
 
   if (message.device_token) {

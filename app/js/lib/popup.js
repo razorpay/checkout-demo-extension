@@ -1,26 +1,26 @@
 /**
-* Simple wrapper component around `window.open()`.
-* https://github.com/component/popup
-*
-* Usage:
-*
-*     var win = new Popup('http://google.com', { width: 100, height: 100 });
-*     win.on('close', function () {
-*       console.log('popup window was closed');
-*     });
-*/
+ * Simple wrapper component around `window.open()`.
+ * https://github.com/component/popup
+ *
+ * Usage:
+ *
+ *     var win = new Popup('http://google.com', { width: 100, height: 100 });
+ *     win.on('close', function () {
+ *       console.log('popup window was closed');
+ *     });
+ */
 
 /**
-* Default Popup options.
-*/
+ * Default Popup options.
+ */
 
 function getPopupDimension(varVal, minVal, maxVal) {
   return Math.min(Math.max(Math.floor(varVal), minVal), maxVal);
 }
 
 /**
-* The "Popup" constructor.
-*/
+ * The "Popup" constructor.
+ */
 
 var Popup = function(src, name) {
   var width = window.innerWidth || document.documentElement.clientWidth;
@@ -39,12 +39,14 @@ var Popup = function(src, name) {
   // note: this "centering" logic borrowed from the Facebook JavaScript SDK
   var screenX = null === window.screenX ? window.screenLeft : window.screenX;
   var screenY = null === window.screenY ? window.screenTop : window.screenY;
-  var outerWidth = null === window.outerWidth
-    ? document.documentElement.clientWidth
-    : window.outerWidth;
-  var outerHeight = null === window.outerHeight
-    ? document.documentElement.clientHeight - 22
-    : window.outerHeight;
+  var outerWidth =
+    null === window.outerWidth
+      ? document.documentElement.clientWidth
+      : window.outerWidth;
+  var outerHeight =
+    null === window.outerHeight
+      ? document.documentElement.clientHeight - 22
+      : window.outerHeight;
 
   opts.left = parseInt(screenX + (outerWidth - opts.width) / 2, 10);
   opts.top = parseInt(screenY + (outerHeight - opts.height) / 2.5, 10);
@@ -94,8 +96,8 @@ Popup.prototype = {
   },
 
   /**
-* Closes the popup window.
-*/
+   * Closes the popup window.
+   */
 
   close: function() {
     clearInterval(this.interval);
@@ -110,8 +112,8 @@ Popup.prototype = {
   },
 
   /**
-* Emits the "close" event.
-*/
+   * Emits the "close" event.
+   */
 
   checkClose: function(forceClosed) {
     try {
