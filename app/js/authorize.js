@@ -553,9 +553,11 @@ var responseTypes = {
 
     if (this.sdk_popup) {
       if (direct) {
-        CheckoutBridge.openPopup({
-          content: content
-        });
+        CheckoutBridge.openPopup(
+          JSON.stringify({
+            content: content
+          })
+        );
       } else {
         var url =
           "javascript: submitForm('" +
