@@ -164,7 +164,8 @@ Payment.prototype = {
     var data = this.data;
 
     if (this.sdk_popup && /^(card|emi)$/.test(data.method)) {
-      CheckoutBridge.showPaymentPage();
+      window.onPaymentCancel = bind(onPaymentCancel, this);
+
       CheckoutBridge.openPopup(
         JSON.stringify({
           content: templates.popup(this)
@@ -338,6 +339,9 @@ Payment.prototype = {
     if (this.offmessage) {
       this.offmessage();
     }
+
+    delete window.onPaymentCancel;
+
     clearPollingInterval();
     abortAjax(this.ajax);
     this.r._payment = null;
@@ -552,6 +556,7 @@ var responseTypes = {
     var popup = this.popup;
 
     if (this.sdk_popup) {
+      CheckoutBridge.showPaymentPage();
       if (direct) {
         CheckoutBridge.openPopup(
           JSON.stringify({
