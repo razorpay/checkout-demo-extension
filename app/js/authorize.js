@@ -556,7 +556,7 @@ var responseTypes = {
     var popup = this.popup;
 
     if (this.sdk_popup) {
-      CheckoutBridge.showPaymentPage();
+      CheckoutBridge.showPaymentPage('{}');
       if (direct) {
         CheckoutBridge.openPopup(
           JSON.stringify({
@@ -572,7 +572,6 @@ var responseTypes = {
           ", '" +
           request.method +
           "')";
-        // CheckoutBridge.showPaymentPage();
         CheckoutBridge.openPopup(
           JSON.stringify({
             url: url

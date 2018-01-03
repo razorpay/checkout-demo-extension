@@ -1762,7 +1762,7 @@ Session.prototype = {
     var data = this.payload;
     var request = {
       fees: preferences.fee_bearer,
-      sdk_popup: this.magic
+      sdk_popup: this.sdk_popup
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
