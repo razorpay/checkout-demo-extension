@@ -130,6 +130,7 @@ function Payment(data, params, r) {
 
   this.fees = params.fees;
   this.sdk_popup = params.sdk_popup;
+  this.magic = params.magic;
   this.powerwallet =
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
@@ -341,6 +342,7 @@ Payment.prototype = {
     }
 
     delete window.onPaymentCancel;
+    delete window.handleRelay;
 
     clearPollingInterval();
     abortAjax(this.ajax);
@@ -555,8 +557,8 @@ var responseTypes = {
     var content = request.content;
     var popup = this.popup;
 
-    if (this.sdk_popup) {
-      CheckoutBridge.showPaymentPage('{}');
+    if (this.sdk_popup && this.magic) {
+      // CheckoutBridge.showPaymentPage('{}');
       if (direct) {
         CheckoutBridge.openPopup(
           JSON.stringify({
@@ -578,6 +580,8 @@ var responseTypes = {
           })
         );
       }
+
+      this.r.emit('magic.init');
     } else if (popup) {
       if (direct) {
         // direct is true for payzapp

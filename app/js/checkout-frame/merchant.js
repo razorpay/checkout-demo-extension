@@ -813,9 +813,9 @@ window.handleMessage = function(message) {
     session.upi_intents_data = message.upi_intents_data;
   }
 
-  if (message.sdk_popup) {
-    session.sdk_popup = true;
-  }
+  session.sdk_popup = message.sdk_popup;
+
+  session.magic = message.magic;
 
   session.ua_Android = ua_Android;
 

@@ -12,6 +12,29 @@ var strings = {
 
 var fontTimeout;
 
+/* this === session */
+function handleRelay(relayObj) {
+  var relayObj = JSON.parse(relayObj);
+
+  if (!(relayObj && relayObj.action) && this instanceof Session) {
+    return;
+  }
+
+  switch (relayObj.action) {
+    case 'otp':
+      this.magicView.showOtpView(relayObj.data);
+      break;
+
+    case 'proceed':
+      this.showLoadError('Fetching Bank details');
+      break;
+
+    case 'choice':
+      this.magicView.showChoiceView();
+      break;
+  }
+}
+
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
@@ -584,6 +607,13 @@ Session.prototype = {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
+    }
+  },
+
+  setMagic: function() {
+    if (!this.magicView && this.magic) {
+      $(this.el).addClass('magic');
+      this.magicView = new magicView(this);
     }
   },
 
@@ -1197,6 +1227,9 @@ Session.prototype = {
 
     if (screen) {
       var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
+
+      screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
+
       gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
     } else {
@@ -1695,6 +1728,13 @@ Session.prototype = {
       return this.onOtpSubmit();
     }
 
+    if (/^magic/.test(screen)) {
+      var magicData = {};
+      fillData('#form-' + screen, magicData);
+      this.magicView.submit(screen, magicData);
+      return;
+    }
+
     this.refresh();
     var data = (this.payload = this.getPayload());
     if (this.order && this.order.bank) {
@@ -1760,9 +1800,11 @@ Session.prototype = {
 
   submit: function() {
     var data = this.payload;
+    var that = this;
     var request = {
       fees: preferences.fee_bearer,
-      sdk_popup: this.sdk_popup
+      sdk_popup: this.sdk_popup,
+      magic: this.magic
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
@@ -1843,6 +1885,12 @@ Session.prototype = {
       .on('payment.error', bind(errorHandler, this))
       .on('payment.cancel', bind(cancelHandler, this));
 
+    this.r.on('magic.init', function() {
+      window.handleRelay = handleRelay.bind(that);
+      that.setMagic();
+      that.showLoadError('Please wait while we fetch your transaction details');
+    });
+
     var sub_link = $('#error-message .link');
     if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
@@ -1879,7 +1927,6 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
-      var that = this;
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError('Waiting for payment confirmation.');

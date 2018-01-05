@@ -1,0 +1,35 @@
+@require 'common';
+
+#form-magic-otp {
+
+  .item{
+    &:first-child label {
+      border-radius: 2px 2px 0 0 ;
+    }
+
+    .checkbox {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      margin-top: -9px;
+    }
+
+    .icon {
+      position: absolute;
+      display: block;
+      top: 18px;
+      left: 18px;
+      font-size: 18px;
+
+      width: 20px
+      height: 20px;
+      background: blue;
+
+      & ~ div {
+        margin-left: 32px;
+      }
+    }
+
+  }
+
+}
