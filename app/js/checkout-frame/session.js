@@ -558,11 +558,6 @@ Session.prototype = {
     if (options.forceRender) {
       this.forceRender = true;
       this.close();
-    } else {
-      if (this.isOpen) {
-        return;
-      }
-      this.saveAndClose();
     }
     this.isOpen = true;
 

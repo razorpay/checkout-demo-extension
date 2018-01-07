@@ -469,6 +469,11 @@ function fetchPrefsAndShowModal(session) {
     document.cookie = 'checkcookie=1;path=/';
   }
 
+  if (session.isOpen) {
+    return;
+  }
+  session.isOpen = true;
+
   Razorpay.payment.getPrefs(prefData, function(response) {
     if (response.error) {
       return Razorpay.sendMessage({
