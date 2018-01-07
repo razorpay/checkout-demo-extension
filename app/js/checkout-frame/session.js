@@ -1231,6 +1231,14 @@ Session.prototype = {
       }
       tab = '';
     }
+
+    var popup = this.r._payment && this.r._payment.popup;
+    if (tab === 'wallet' && this.screen === 'otp' && popup) {
+      if (confirmClose()) {
+        this.clearRequest();
+      }
+    }
+
     this.switchTab(tab);
   },
 
