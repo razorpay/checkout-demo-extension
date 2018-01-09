@@ -303,6 +303,7 @@ var emi_options = (sessProto.emi_options = {
 });
 
 var tab_titles = (sessProto.tab_titles = {
+  emandate: 'Bank Account',
   emi: 'EMI',
   card: 'Card',
   netbanking: 'Netbanking',
@@ -328,6 +329,9 @@ function notifyBridge(message) {
 function setPreferredBanks(session) {
   var bankObj = {};
   var availBanks = session.methods.netbanking;
+  if (!availBanks) {
+    return;
+  }
 
   each(netbanks, function(bankCode, obj) {
     if (availBanks[bankCode] && !availBanks[bankCode + '_C']) {
@@ -352,6 +356,32 @@ function setPaymentMethods(session) {
   var recurring = session.recurring;
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
+
+  if (recurring) {
+    availMethods = availMethods.recurring;
+    var emandate_method;
+    var banks = {};
+    if (session.get('customer_id')) {
+      if (availMethods.emandate) {
+        emandate_method = 'emandate';
+        each(availMethods[emandate_method], function(bankCode, bankObj) {
+          banks[bankCode] = bankObj.name;
+        });
+        availMethods[emandate_method] = banks;
+      } else if (availMethods.netbanking) {
+        emandate_method = 'netbanking';
+      }
+      if (emandate_method) {
+        session.emandate = true;
+      }
+    }
+    if (availMethods.card) {
+      if (availMethods.card.credit instanceof Array) {
+        session.recurring_card_text =
+          availMethods.card.credit.join(' and ') + ' credit cards';
+      }
+    }
+  }
   var methods = (session.methods = {
     count: 0
   });
@@ -362,10 +392,6 @@ function setPaymentMethods(session) {
       methods[method] = enabled;
     }
   });
-  if (recurring) {
-    methods.netbanking =
-      availMethods.recurring && availMethods.recurring.netbanking;
-  }
 
   var amount = session.get('amount');
   if (amount <= emi_options.min) {
@@ -408,12 +434,13 @@ function setPaymentMethods(session) {
     });
   }
 
+  var bankMethod = emandate_method || 'netbanking';
   if (
-    !methods.netbanking ||
-    methods.netbanking instanceof Array ||
+    !methods[bankMethod] ||
+    methods[bankMethod] instanceof Array ||
     international
   ) {
-    methods.netbanking = false;
+    methods[bankMethod] = false;
   } else {
     methods.count = 1;
     setDownBanks(session);
@@ -520,7 +547,11 @@ function showModal(session) {
     };
   }
 
-  if (preferences.subscription || session_options.recurring) {
+  if (
+    session_options['prefill.method'] === 'emandate' ||
+    preferences.subscription ||
+    session_options.recurring
+  ) {
     session.recurring = filters.recurring = true;
   }
 

@@ -5,6 +5,7 @@ var address = o('address');
 var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
+var banks = method.emandate || method.netbanking;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
 var airtelmoneyWallet = findBy(wallet, 'name', 'airtelmoney') || {};
 var mobikwikWallet = findBy(wallet, 'name', 'mobikwik') || {};
@@ -13,7 +14,7 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
 var invoice = _.invoice;
-var bankName = method.netbanking && method.netbanking[order.bank];
+var bankName = banks && banks[order.bank];
 var bank = _.netbanks[order.bank] || {};
 bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
 var amount;
@@ -171,7 +172,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     </div>
                   `?`
                 </div>
-                `?_.recurring && _.methods.count === 1`
+                `?_.recurring && _.methods.count === 1 && _.methods.card`
                   <div class="pad recurring-message">
                     <span>&#x2139;</span>
                     `?o('subscription_id')`
@@ -202,7 +203,13 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                       <label>
                         <i>&#xe609;</i>
                         `=_.tab_titles.card`
-                        <span class="desc">Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`</span>
+                        <span class="desc">
+                          `?_.recurring_card_text`
+                            `=_.recurring_card_text`
+                          `??`
+                            Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`
+                          `?`
+                        </span>
                       </label>
                     </div>
                     `?`
@@ -212,6 +219,15 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                         <i>&#xe60a;</i>
                         `=_.tab_titles.netbanking`
                         <span class="desc">All Indian banks</span>
+                      </label>
+                    </div>
+                    `?`
+                    `?method.emandate`
+                    <div class="payment-option item" tab="emandate">
+                      <label>
+                        <i>&#xe60a;</i>
+                        `=_.tab_titles.emandate`
+                        <span class="desc">Pay with Netbanking/Aadhar</span>
                       </label>
                     </div>
                     `?`
@@ -344,13 +360,13 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                   `?`
                 </div>
               `?`
-              `?method.netbanking`
+              `?banks`
                 <div class="tab-content showable screen" id="form-netbanking">
                   `var count = 0, max = 3, total = 0;`
                   <div id="netb-banks" class="clear grid count-3">
                     `
                     for(var b in _.netbanks){
-                      if (!method.netbanking[b]) {
+                      if (!banks[b]) {
                         continue;
                       }
                       total++;
@@ -381,7 +397,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                       <div class="help">Please select a bank</div>
                       <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
                         <option selected="selected" value="">Select a different Bank</option>
-                        `~method.netbanking:bank:bankname`
+                        `~banks:bank:bankname`
                           <option value="`=bank`">`=bankname`</option>
                         `~`
                       </select>

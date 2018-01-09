@@ -456,6 +456,10 @@ Session.prototype = {
       classes.push('extra');
     }
 
+    if (this.emandate) {
+      classes.push('emandate');
+    }
+
     return classes.join(' ');
   },
 
@@ -608,7 +612,9 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'upi', 'wallet'].some(function(methodName) {
+      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet'].some(function(
+        methodName
+      ) {
         if (self.methods[methodName]) {
           self.oneMethod = methodName;
           var el = document.createElement('span');
@@ -888,7 +894,7 @@ Session.prototype = {
         true
       );
     });
-    if (enabledMethods.netbanking) {
+    if (enabledMethods.netbanking || enabledMethods.emandate) {
       this.on('change', '#bank-select', this.switchBank);
       this.on('change', '#netb-banks', this.selectBankRadio, true);
     }
@@ -1185,6 +1191,7 @@ Session.prototype = {
     if (screen === this.screen) {
       return;
     }
+
     this.screen = screen;
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
@@ -1195,6 +1202,10 @@ Session.prototype = {
       makeVisible('#topbar');
     } else {
       makeHidden('#topbar');
+    }
+
+    if (screen === 'emandate') {
+      screen = 'netbanking';
     }
 
     var screenEl = '#form-' + (screen || 'common');
@@ -1439,7 +1450,7 @@ Session.prototype = {
     $('.down')
       .toggleClass('vis', indexOf(this.down, val) !== -1)
       .$('.text')
-      .html(this.methods.netbanking[val]);
+      .html((this.methods.netbanking || this.methods.emandate)[val]);
   },
 
   selectBankRadio: function(e) {
@@ -1745,9 +1756,11 @@ Session.prototype = {
             }
           }
         }
-      }
-
-      if (screen === 'upi') {
+      } else if (screen === 'emandate') {
+        screen = 'netbanking';
+        data.bank = $('#bank-select').val();
+        data.method = 'emandate';
+      } else if (screen === 'upi') {
         if (this.checkInvalid('#form-upi input:checked + label')) {
           return;
         }

@@ -329,7 +329,7 @@ Payment.prototype = {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.fees) {
-      return false;
+      return;
     }
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
     if (
@@ -339,15 +339,18 @@ Payment.prototype = {
         data.wallet === 'freecharge' ||
         data.wallet === 'olamoney')
     ) {
-      return false;
+      return;
+    }
+    if (data.method === 'emandate') {
+      return;
     }
     // iphone background ajax route
     if (!this.powerwallet && /iP(hone|ad)/.test(ua)) {
-      return false;
+      return;
     }
 
     if (data.method === 'wallet' && !(data.contact && data.email)) {
-      return false;
+      return;
     }
     // else make ajax request
 
