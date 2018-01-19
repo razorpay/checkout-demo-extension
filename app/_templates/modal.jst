@@ -227,7 +227,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                       <label>
                         <i>&#xe60a;</i>
                         `=_.tab_titles.emandate`
-                        <span class="desc">Pay with Netbanking/Aadhar</span>
+                        <span class="desc">Pay with Netbanking</span>
                       </label>
                     </div>
                     `?`
@@ -557,7 +557,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
             </div>
             <div id='next-button' class="submit-button">Next</div>
             <button id="footer" type="submit" class="button">
-              <span class="pay-btn">PAY &nbsp;`=amount`</span>
+              <span class="pay-btn">`?o('amount')`PAY &nbsp;`=amount``??`Authenticate`?`</span>
               <span class="otp-btn">Verify</span>
             </button>
             `?o('theme.branding')`

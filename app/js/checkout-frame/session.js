@@ -619,7 +619,11 @@ Session.prototype = {
           self.oneMethod = methodName;
           var el = document.createElement('span');
           el.className = 'proceed-btn';
-          el.innerHTML = 'Pay by ' + tab_titles[methodName];
+          if (self.get('amount')) {
+            el.innerHTML = 'Pay by ' + tab_titles[methodName];
+          } else {
+            el.innerHTML = 'Authenticate';
+          }
           $('#footer').append(el);
           return true;
         }

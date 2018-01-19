@@ -316,8 +316,8 @@ var optionValidations = {
     return errorMessage;
   },
 
-  amount: function(amount) {
-    if (!isValidAmount(amount)) {
+  amount: function(amount, options) {
+    if (!isValidAmount(amount) && !options.recurring) {
       var errorMessage =
         'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
       return errorMessage;
@@ -352,7 +352,7 @@ function validateOverrides(options) {
   options = options.get();
   each(optionValidations, function(key, validation) {
     if (key in options) {
-      errorMessage = validation(options[key]);
+      errorMessage = validation(options[key], options);
     }
     if (isString(errorMessage)) {
       raise('Invalid ' + key + ' (' + errorMessage + ')');

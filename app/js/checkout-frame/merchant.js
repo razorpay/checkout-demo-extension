@@ -356,10 +356,11 @@ function setPaymentMethods(session) {
   var recurring = session.recurring;
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
+  var amount = session.get('amount');
+  var emandate_method;
 
   if (recurring) {
     availMethods = availMethods.recurring;
-    var emandate_method;
     var banks = {};
     if (session.get('customer_id')) {
       if (availMethods.emandate) {
@@ -380,8 +381,12 @@ function setPaymentMethods(session) {
         session.recurring_card_text =
           availMethods.card.credit.join(' and ') + ' credit cards';
       }
+      if (!amount) {
+        delete availMethods.card;
+      }
     }
   }
+
   var methods = (session.methods = {
     count: 0
   });
@@ -393,7 +398,6 @@ function setPaymentMethods(session) {
     }
   });
 
-  var amount = session.get('amount');
   if (amount <= emi_options.min) {
     methods.emi = false;
   }
@@ -584,7 +588,11 @@ function showModal(session) {
   }
 
   session.optional = arr2obj(preferences.optional);
-  if (cookieDisabled || session.optional.contact || is_ie8) {
+  if (
+    cookieDisabled ||
+    is_ie8 ||
+    (session.optional.contact && !session_options['prefill.contact'])
+  ) {
     options.remember_customer = false;
   }
 
@@ -622,6 +630,13 @@ function showModalWithSession(session) {
     });
   }
   setPaymentMethods(session);
+  if (!session.methods.count) {
+    var message = 'No appropriate payment method found.';
+    if (session.recurring && !options.customer_id && session.methods.emandate) {
+      message += '\nMake sure to pass customer_id for e-mandate payments';
+    }
+    return Razorpay.sendMessage({ event: 'fault', data: message });
+  }
   session.render();
   Razorpay.sendMessage({ event: 'render' });
 
