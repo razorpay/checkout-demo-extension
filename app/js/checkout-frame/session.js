@@ -14,23 +14,17 @@ var fontTimeout;
 
 /* this === session */
 function handleRelay(relayObj) {
-  var relayObj = JSON.parse(relayObj);
-
   if (!(relayObj && relayObj.action) && this instanceof Session) {
     return;
   }
 
   switch (relayObj.action) {
-    case 'otp':
-      this.magicView.showOtpView(relayObj.data);
+    case 'page_resolved':
+      this.magicView.pageResolved(relayObj.data);
       break;
 
-    case 'proceed':
-      this.showLoadError('Fetching Bank details');
-      break;
-
-    case 'choice':
-      this.magicView.showChoiceView();
+    case 'otp_parsed':
+      this.magicView.otpParsed(relayObj.data);
       break;
   }
 }
@@ -1248,7 +1242,8 @@ Session.prototype = {
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
         this.upi_intents_data &&
-        !$('#form-upi .item :checked')[0])
+        !$('#form-upi .item :checked')[0]) ||
+      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
     ) {
       showPaybtn = false;
     }
@@ -1886,9 +1881,21 @@ Session.prototype = {
       .on('payment.cancel', bind(cancelHandler, this));
 
     this.r.on('magic.init', function() {
+      // debugger
       window.handleRelay = handleRelay.bind(that);
       that.setMagic();
       that.showLoadError('Please wait while we fetch your transaction details');
+
+      /* BLOCKER: remove */
+      /*handleRelay(
+        JSON.stringify({
+          action: 'page_resolved',
+          data: {
+            type: 'choice',
+            otp_permission: true
+          }
+        })
+      );*/
     });
 
     var sub_link = $('#error-message .link');

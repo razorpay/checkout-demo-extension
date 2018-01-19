@@ -1,11 +1,11 @@
 <div id="magic-inner">
-  <div id="form-magic-otp" class="tab-content showable screen pad">
+  <div id="form-magic-choice" class="tab-content showable screen pad">
     <h3>
       Pay using
     </h3>
     <div class="list">
       <div class="item">
-        <input type="radio" name="magic-choice" value="otp" id="magic-choice-otp">
+        <input type="radio" name="choice" value="otp" id="magic-choice-otp">
         <label for="magic-choice-otp">
           <span class="checkbox"></span>
           <span class="icon"></span>
@@ -14,18 +14,54 @@
         </label>
       </div>
       <div class="item">
-        <input type="radio" name="magic-choice" value="password"
+        <input type="radio" name="choice" value="password"
           id="magic-choice-password">
         <label for="magic-choice-password">
           <span class="checkbox"></span>
           <span class="icon"></span>
-          <div class="title">Password</span>
-          <div class="subtitle">Password for you ACS page</div>
+          <div class="title">Password</div>
+          <div class="subtitle">Password for your ACS page</div>
         </label>
       </div>
     </div>
   </div>
-  <div id="form-magic-choice" class="tab-content showable screen">
-    Choice page
+
+  <div id="form-magic-otp" class="tab-content showable screen pad">
+    <div id="otp-wait">
+      <div class="titlebar">
+        <h3>
+          Waiting for OTP
+        </h3>
+        <div class="link theme magic-resend-otp">Resend</div>
+      </div>
+      <div class="loader"></div>
+      <p>Please wait a moment while we read the One Time Password. <a class="theme" href="javascript: CheckoutBridge.showPaymentPage({magic: false})">View bank page.</a></p>
+      <h3 id="magic-manual-otp" class="text-btn">Enter otp manually</h3>
+    </div>
+    <div id='otp-confirm'>
+      <div class="titlebar">
+        <h3>
+          Confirm OTP
+        </h3>
+        <div class="link theme magic-resend-otp">Resend</div>
+      </div>
+      <div class="list">
+        <div class="item active">
+          <div class="icon"></div>
+          <div class="subtitle auto">Confirm the OTP to complete the card payment. <a class="theme" href="javascript: CheckoutBridge.showPaymentPage({magic: false})">View Bank Page.</a></div>
+          <div class="subtitle n-auto">Authenticate your card payment by entering the One Time Password. <a class="theme" href="javascript: CheckoutBridge.showPaymentPage({magic: false})">View Bank Page.</a></div>
+          <div class="elem-wrap n-auto"><div class="elem">
+            <div class="help">Please enter a valid OTP</div>
+            <input class="input" id="magic-otp" name="otp" type="tel" required pattern="^[0-9]{6,8}$" maxlength="8">
+          </div></div>
+          <div id="magic-otp-data" class="auto double clear">
+            <div id="magic-otp-placeholder" class="first"></div>
+            <div id="magic-bank" class="second"></div>
+          </div>
+        </div>
+        <h3 id='enter-otp' class="text-btn adjoined auto">Enter OTP manually</h3>
+        <h3 id="autoread-otp" class="text-btn adjoined n-auto">Auto read OTP</h3>
+      </div>
+    </div>
   </div>
 </div>

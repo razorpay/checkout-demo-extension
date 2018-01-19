@@ -135,7 +135,7 @@ function Payment(data, params, r) {
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
 
-  this.tryPopup();
+  // this.tryPopup();
 
   if (params.paused) {
     try {
@@ -556,8 +556,8 @@ var responseTypes = {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-
-    if (this.sdk_popup && this.magic) {
+    // debugger
+    if (this.sdk_popup && this.magic && this.data.method === 'card') {
       // CheckoutBridge.showPaymentPage('{}');
       if (direct) {
         CheckoutBridge.openPopup(
