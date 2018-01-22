@@ -105,6 +105,24 @@
 
 </html>
 <script>
+
+/*CheckoutBridge = {
+  openPopup: function(options) {
+    console.log('openPopup');
+  },
+  showPaymentPage: function(){
+    console.log('showPaymentPage');
+  },
+  relay: function(data){
+    console.log('relay')
+    console.log(data);
+  },
+  requestOtpPermission: function() {
+    console.log('requestOtpPermission')
+  }
+};*/
+
+
 var options = {
   // 'key': 'rzp_live_ILgsfZCZoFIKMb',
   'key': 'rzp_test_1DP5mmOlF5G5ag',
@@ -122,7 +140,7 @@ var options = {
     card: true
   },
   // ecod: true,
-  'remember_customer': false,
+  'remember_customer': true,
   // parent: '#x',
   external: {
     // wallets: ['payumoney'],
@@ -130,16 +148,17 @@ var options = {
       console.log(this, data);
     }
   },
-  // callback_url: 'http://google.com',
+  // callback_url: 'http://checkout.codeankit.me/checkout.html',
   // redirect: true,
   // display_amount: '12.23',
   // display_currency: 'SGD',
   'prefill': {
-    // 'method': 'wallet',
-    'card[number]': '405028',
-    'name': 'Harshil \"Mathur',
+    'method': 'card',
+    'card[number]': '4591500208862397',
+    'card[expiry]': '02/34',
+    'name': 'Ankit',
     'email': 'harshil@razorpay.com',
-    'contact': '8879524924'
+    'contact': '9858577847'
   },
   // customer_id: 'cust_5rZjWeKfUdrIfG',
   notes: {
@@ -155,5 +174,5 @@ var options = {
     onhidden: function(){console.log(2)}
   }
 }
-handleMessage({options: options , upi_intents_data: ['sda']});
+// handleMessage({options: options , upi_intents_data: ['sda'], sdk_popup: false, magic: true});
 </script>

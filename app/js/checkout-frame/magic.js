@@ -50,6 +50,14 @@ magicView.prototype = {
     this.listeners = [];
   },
 
+  resetLoader: function() {
+    $('#form-magic-otp .loader').removeClass('load');
+
+    setTimeout(function() {
+      $('#form-magic-otp .loader').addClass('load');
+    }, 100);
+  },
+
   showPaymentPage: function() {
     if (CheckoutBridge && CheckoutBridge.showPaymentPage) {
       CheckoutBridge.showPaymentPage("{'magic': false, 'otpelf': false}");
@@ -119,8 +127,27 @@ magicView.prototype = {
     }
   },
 
+  requestOtpPermission: function(callback) {
+    if (CheckoutBridge && CheckoutBridge.requestOtpPermission) {
+      window.otpPermissionCallback = callback.bind(this);
+
+      CheckoutBridge.requestOtpPermission();
+    }
+  },
+
   autoreadOtp: function() {
-    $('#form-magic-otp').addClass('waiting');
+    var self = this;
+
+    if (!this.otpPermission) {
+      this.requestOtpPermission(function(info) {
+        if (info.granted) {
+          self.showWaitingScreen();
+        }
+      });
+    } else {
+      self.showWaitingScreen();
+    }
+
     if (this.otpData) {
       this.otpParsed(this.otpData);
       delete this.otpData;
@@ -169,37 +196,45 @@ magicView.prototype = {
     hideOverlayMessage();
   },
 
-  showOtpView: function(data) {
+  showOtpView: function(data = {}) {
     var self = this;
+
     this.otpPermission =
       typeof data.otp_permission !== 'undefined'
         ? data.otp_permission
         : this.otpPermission;
 
     if (!this.otpPermission && !this.otpPermDenied) {
-      if (CheckoutBridge && CheckoutBridge.requestOtpPermission) {
-        /* TODO: create a common invoking function for CheckoutBridge */
+      return this.requestOtpPermission(function(info) {
+        if (info.granted) {
+          data.otp_permission = true;
+        } else {
+          self.otpPermDenied = true;
+        }
 
-        window.otpPermissionCallback = function(info) {
-          if (info.granted) {
-            data.otp_permission = true;
-          } else {
-            self.otpPermDenied = true;
-          }
-          self.showOtpView(data);
-          delete window.otpPermissionCallback;
-        };
-        CheckoutBridge.requestOtpPermission();
-      }
+        self.showOtpView(data);
 
-      return;
+        delete window.otpPermissionCallback;
+      });
     }
 
     this.showView('magic-otp');
-    $('#form-magic-otp').addClass('waiting');
-    $('#form-magic-otp .loader')
-      // .removeClass('load')
-      .addClass('load');
+    if (this.otpPermission) {
+      this.showWaitingScreen();
+    } else {
+      $('#form-magic-otp')
+        .removeClass('waiting')
+        .addClass('manual');
+    }
+
+    this.resetLoader();
+  },
+
+  showWaitingScreen: function() {
+    $('#form-magic-otp')
+      .removeClass('manual')
+      .addClass('waiting');
+    this.resetLoader();
   },
 
   showChoiceView: function(data) {

@@ -14,6 +14,7 @@ var fontTimeout;
 
 /* this === session */
 function handleRelay(relayObj) {
+  debugger;
   if (!(relayObj && relayObj.action) || !(this instanceof Session)) {
     return;
   }
