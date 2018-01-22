@@ -50,8 +50,10 @@ magicView.prototype = {
     this.listeners = [];
   },
 
-  openPaymentPage: function() {
-    CheckoutBridge.openPopup();
+  showPaymentPage: function() {
+    if (CheckoutBridge && CheckoutBridge.showPaymentPage) {
+      CheckoutBridge.showPaymentPage("{'magic': false, 'otpelf': false}");
+    }
   },
 
   pageResolved: function(data) {
@@ -177,7 +179,6 @@ magicView.prototype = {
     if (!this.otpPermission && !this.otpPermDenied) {
       if (CheckoutBridge && CheckoutBridge.requestOtpPermission) {
         /* TODO: create a common invoking function for CheckoutBridge */
-        CheckoutBridge.requestOtpPermission();
 
         window.otpPermissionCallback = function(info) {
           if (info.granted) {
@@ -188,6 +189,7 @@ magicView.prototype = {
           self.showOtpView(data);
           delete window.otpPermissionCallback;
         };
+        CheckoutBridge.requestOtpPermission();
       }
 
       return;

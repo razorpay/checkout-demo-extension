@@ -26,6 +26,15 @@ function handleRelay(relayObj) {
     case 'otp_parsed':
       this.magicView.otpParsed(relayObj.data);
       break;
+
+    case 'otp_resent':
+      if (relayObj.data) {
+        break;
+      }
+    case 'abort_magic':
+    case 'error_message':
+      this.magicView.showPaymentPage();
+      break;
   }
 }
 
