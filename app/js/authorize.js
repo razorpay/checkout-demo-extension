@@ -135,7 +135,7 @@ function Payment(data, params, r) {
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
 
-  // this.tryPopup();
+  this.tryPopup();
 
   if (params.paused) {
     try {

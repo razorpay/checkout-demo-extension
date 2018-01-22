@@ -139,7 +139,7 @@ magicView.prototype = {
       $('#magic-otp-placeholder').html(data.otp);
       $('#magic-bank')[0].innerHTML =
         "<img src='" +
-        this.session.netbanks[data.bank.toUpperCase()].image +
+        this.session.netbanks[data.bank].image +
         "' height='13px'> " +
         data.sender;
     }
@@ -203,11 +203,6 @@ magicView.prototype = {
     }
 
     console.log(relayData);
-
-    /* TODO: remove this */
-    if (relayData.data.otp) {
-      relayData.data = relayData.data.otp;
-    }
 
     if (CheckoutBridge && CheckoutBridge.relay) {
       CheckoutBridge.relay(JSON.stringify(relayData));
