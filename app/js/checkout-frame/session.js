@@ -609,6 +609,9 @@ Session.prototype = {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
     }
+
+    this.magicView.resendCount = 0;
+    $('#magic-wrapper').removeClass('hide-resend');
   },
 
   setModal: function() {

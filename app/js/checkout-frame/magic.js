@@ -4,6 +4,7 @@ function magicView(session) {
     session: session
   };
   this.render();
+  this.resendCount = 0;
   this.screenMap = {
     'magic-choice': 'select_choice',
     'magic-otp': 'submit_otp'
@@ -34,20 +35,7 @@ magicView.prototype = {
       $('#body').toggleClass('sub', e.target.value);
     });
 
-    this.on('click', '#form-magic-otp', function(e) {
-      if (!$(e.target).hasClass('magic-resend-otp')) {
-        return;
-      }
-
-      if (CheckoutBridge && CheckoutBridge.relay) {
-        CheckoutBridge.relay(
-          JSON.stringify({
-            action: 'resend_otp'
-          })
-        );
-      }
-    });
-
+    this.on('click', '#form-magic-otp', this.resendOtp.bind(this));
     this.on('click', '#autoread-otp', this.autoreadOtp.bind(this));
     this.on('click', '#enter-otp', this.enterOtp.bind(this));
     this.on('click', '#magic-manual-otp', this.enterOtp.bind(this));
@@ -98,6 +86,35 @@ magicView.prototype = {
     }
 
     this.magicTimeout = setTimeout(timeoutFn, timeout);*/
+  },
+
+  resendOtp: function(e) {
+    if (!$(e.target).hasClass('magic-resend-otp')) {
+      return;
+    }
+
+    if (CheckoutBridge && CheckoutBridge.relay) {
+      var resend = true;
+
+      if (this.resendCount === 1) {
+        if (window.confirm('This is your last attempt to generate OTP.')) {
+          $('#magic-wrapper').addClass('hide-resend');
+        } else {
+          resend = false;
+        }
+      } else if (this.resendCount > 2) {
+        resend = false;
+      }
+
+      if (resend) {
+        CheckoutBridge.relay(
+          JSON.stringify({
+            action: 'resend_otp'
+          })
+        );
+        this.resendCount++;
+      }
+    }
   },
 
   autoreadOtp: function() {
