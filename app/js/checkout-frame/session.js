@@ -14,7 +14,8 @@ var fontTimeout;
 
 /* this === session */
 function handleRelay(relayObj) {
-  debugger;
+  var self = this;
+
   if (!(relayObj && relayObj.action) || !(this instanceof Session)) {
     return;
   }
@@ -34,7 +35,10 @@ function handleRelay(relayObj) {
       }
     case 'abort_magic':
     case 'error_message':
-      this.magicView.showPaymentPage();
+      this.showLoadError('Redirecting to Bank page');
+      window.setTimeout(function() {
+        self.magicView.showPaymentPage();
+      }, 1000);
       break;
   }
 }
@@ -622,6 +626,13 @@ Session.prototype = {
 
     this.magicView.resendCount = 0;
     $('#magic-wrapper').removeClass('hide-resend');
+  },
+
+  destroyMagic: function() {
+    if (this.magicView) {
+      this.magicView.destroy();
+      delete this.magicView;
+    }
   },
 
   setModal: function() {
@@ -1272,6 +1283,13 @@ Session.prototype = {
       tab = 'wallet';
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
+    } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
+      if (confirmClose()) {
+        tab = 'card';
+        this.clearRequest();
+      } else {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -1706,6 +1724,7 @@ Session.prototype = {
     }
     if (this.r._payment) {
       hideOverlayMessage();
+      this.destroyMagic();
       this.r.emit('payment.cancel', extra);
     }
     abortAjax(this.ajax);

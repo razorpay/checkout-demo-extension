@@ -50,6 +50,10 @@ magicView.prototype = {
     this.listeners = [];
   },
 
+  destroy: function() {
+    this.unbind();
+  },
+
   resetLoader: function() {
     $('#form-magic-otp .loader').removeClass('load');
 
