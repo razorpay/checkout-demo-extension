@@ -14,7 +14,7 @@ var fontTimeout;
 
 /* this === session */
 function handleRelay(relayObj) {
-  if (!(relayObj && relayObj.action) && this instanceof Session) {
+  if (!(relayObj && relayObj.action) || !(this instanceof Session)) {
     return;
   }
 
@@ -1881,7 +1881,6 @@ Session.prototype = {
       .on('payment.cancel', bind(cancelHandler, this));
 
     this.r.on('magic.init', function() {
-      // debugger
       window.handleRelay = handleRelay.bind(that);
       that.setMagic();
       that.showLoadError('Please wait while we fetch your transaction details');

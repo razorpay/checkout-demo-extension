@@ -52,7 +52,7 @@ magicView.prototype = {
     this.on('click', '#enter-otp', this.enterOtp.bind(this));
     this.on('click', '#magic-manual-otp', this.enterOtp.bind(this));
 
-    var delegator = this.session.delegator; //Razorpay.setFormatter(gel('magic-wrapper'));
+    var delegator = this.session.delegator;
 
     delegator.otp = delegator.add('number', el_otp);
   },
@@ -138,9 +138,9 @@ magicView.prototype = {
         .dispatchEvent(new Event('blur'));
       $('#magic-otp-placeholder').html(data.otp);
       $('#magic-bank')[0].innerHTML =
-        "<img src='" +
-        this.session.netbanks[data.bank].image +
-        "' height='13px'> " +
+        "<img src='https://cdn.razorpay.com/bank/" +
+        data.bank +
+        ".gif' height='13px'> " +
         data.sender;
     }
   },

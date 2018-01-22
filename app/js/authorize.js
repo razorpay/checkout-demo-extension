@@ -135,7 +135,9 @@ function Payment(data, params, r) {
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
 
+  // if (!this.sdk_popup) {
   this.tryPopup();
+  // }
 
   if (params.paused) {
     try {
@@ -559,6 +561,8 @@ var responseTypes = {
     // debugger
     if (this.sdk_popup && this.magic && this.data.method === 'card') {
       // CheckoutBridge.showPaymentPage('{}');
+      this.r.emit('magic.init');
+
       if (direct) {
         CheckoutBridge.openPopup(
           JSON.stringify({
@@ -580,8 +584,6 @@ var responseTypes = {
           })
         );
       }
-
-      this.r.emit('magic.init');
     } else if (popup) {
       if (direct) {
         // direct is true for payzapp
