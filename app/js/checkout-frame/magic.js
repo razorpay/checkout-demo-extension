@@ -9,6 +9,8 @@ function magicView(session) {
     'magic-choice': 'select_choice',
     'magic-otp': 'submit_otp'
   };
+
+  this.supportedBanks = ['unknown', 'HDFC', 'ICIC'];
 }
 
 magicView.prototype = {
@@ -63,14 +65,44 @@ magicView.prototype = {
   },
 
   showPaymentPage: function() {
-    if (CheckoutBridge && CheckoutBridge.showPaymentPage) {
-      CheckoutBridge.showPaymentPage("{'magic': false, 'otpelf': false}");
+    var popupOptions = { magic: false, otpelf: false, focus: true };
+
+    if (CheckoutBridge && CheckoutBridge.invokePopup) {
+      CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
     }
+  },
+
+  setTimeout: function(timeout) {
+    var self = this;
+
+    var timeoutFn = function() {
+      console.log('timeout fn called', (new Date().getTime() / 1000) >> 0);
+      if (self.magicTimeout) {
+        clearTimeout(self.magicTimeout);
+        delete self.magicTimeout;
+
+        setTimeout(function() {
+          self.showPaymentPage();
+        }, 1000);
+
+        self.session.showLoadError(strings.redirect);
+        self.session.destroyMagic();
+      }
+    };
+
+    if (this.magicTimeout) {
+      clearTimeout(this.magicTimeout);
+      delete this.magicTimeout;
+    }
+
+    this.magicTimeout = setTimeout(timeoutFn, timeout);
   },
 
   pageResolved: function(data) {
     var timeout = 30000;
     var isUnkown = false;
+
+    console.log('pageResolved', (new Date().getTime() / 1000) >> 0);
 
     var self = this;
     switch (data.type) {
@@ -87,19 +119,16 @@ magicView.prototype = {
         break;
 
       case 'unknown':
-        timeout = 5000;
+        timeout = 3000;
         isUnkown = true;
         break;
     }
 
-    /*var timeoutFn = function() {
-      if(self.timeout) {
-        clearTimeout(timeout);
-        setTimeout(timeoutFn, timeout)
-      }
+    if (data.bank && indexOf(this.supportedBanks, data.bank) < 0) {
+      timeout = 0;
     }
 
-    this.magicTimeout = setTimeout(timeoutFn, timeout);*/
+    this.setTimeout(timeout);
   },
 
   resendOtp: function(e) {
@@ -192,6 +221,8 @@ magicView.prototype = {
         data.bank +
         ".gif' height='13px'> " +
         data.sender;
+
+      this.setTimeout(30000);
     }
   },
 

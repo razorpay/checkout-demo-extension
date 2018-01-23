@@ -7,7 +7,8 @@ var shownClass = 'drishy';
 
 var strings = {
   otpsend: 'Sending OTP to ',
-  process: 'Your payment is being processed'
+  process: 'Your payment is being processed',
+  redirect: 'Redirecting to Bank page'
 };
 
 var fontTimeout;
@@ -15,8 +16,13 @@ var fontTimeout;
 /* this === session */
 function handleRelay(relayObj) {
   var self = this;
+  console.log(relayObj);
+  console.log(this);
 
-  if (!(relayObj && relayObj.action) || !(this instanceof Session)) {
+  if (
+    !(relayObj && relayObj.action) ||
+    !(this instanceof Session && this.magicView)
+  ) {
     return;
   }
 
@@ -35,7 +41,7 @@ function handleRelay(relayObj) {
       }
     case 'abort_magic':
     case 'error_message':
-      this.showLoadError('Redirecting to Bank page');
+      this.showLoadError(strings.redirect);
       window.setTimeout(function() {
         self.magicView.showPaymentPage();
       }, 1000);
@@ -290,6 +296,8 @@ function cancelHandler(response) {
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
+  } else if (/^(card|emi)$/.test(this.payload.method)) {
+    this.switchTab('card');
   }
 }
 
@@ -622,6 +630,7 @@ Session.prototype = {
     if (!this.magicView && this.magic) {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
+      this.magicView.setTimeout(3000);
     }
 
     this.magicView.resendCount = 0;
@@ -1913,6 +1922,7 @@ Session.prototype = {
       .on('payment.cancel', bind(cancelHandler, this));
 
     this.r.on('magic.init', function() {
+      console.log('magic.init');
       window.handleRelay = handleRelay.bind(that);
       that.setMagic();
       that.showLoadError('Please wait while we fetch your transaction details');

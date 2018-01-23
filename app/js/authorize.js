@@ -131,6 +131,10 @@ function Payment(data, params, r) {
   this.fees = params.fees;
   this.sdk_popup = params.sdk_popup;
   this.magic = params.magic;
+
+  this.isMagicPayment =
+    this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
+
   this.powerwallet =
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
@@ -166,12 +170,13 @@ Payment.prototype = {
   checkSdkPopup: function() {
     var data = this.data;
 
-    if (this.sdk_popup && /^(card|emi)$/.test(data.method)) {
+    if (this.isMagicPayment) {
       window.onPaymentCancel = bind(onPaymentCancel, this);
 
-      CheckoutBridge.openPopup(
+      CheckoutBridge.invokePopup(
         JSON.stringify({
-          content: templates.popup(this)
+          content: templates.popup(this),
+          focus: false
         })
       );
 
@@ -276,7 +281,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if (discreet.isFrame && !this.powerwallet) {
+    if ((discreet.isFrame && !this.powerwallet) || this.isMagicPayment) {
       var complete = (window.onComplete = bind(this.complete, this));
       pollPaymentData(complete);
     }
@@ -333,6 +338,7 @@ Payment.prototype = {
       this.popup.onClose = null;
       this.popup.close();
     } catch (e) {}
+
     this.done = true;
     Razorpay.popup_delay = null;
     clearInterval(this.popup_track_interval);
@@ -558,18 +564,20 @@ var responseTypes = {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-    // debugger
-    if (this.sdk_popup && this.magic && this.data.method === 'card') {
-      // CheckoutBridge.showPaymentPage('{}');
+
+    if (this.isMagicPayment) {
       this.r.emit('magic.init');
 
+      var popupOptions = {
+        focus: false,
+        magic: true,
+        otelf: false
+      };
+
       if (direct) {
-        CheckoutBridge.openPopup(
-          JSON.stringify({
-            content: content
-          })
-        );
+        popupOptions.content = content;
       } else {
+        console.log('submitting form', request.url);
         var url =
           "javascript: submitForm('" +
           request.url +
@@ -578,12 +586,10 @@ var responseTypes = {
           ", '" +
           request.method +
           "')";
-        CheckoutBridge.openPopup(
-          JSON.stringify({
-            url: url
-          })
-        );
+        popupOptions.url = url;
       }
+
+      CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
     } else if (popup) {
       if (direct) {
         // direct is true for payzapp
