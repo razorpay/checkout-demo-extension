@@ -64,11 +64,17 @@ magicView.prototype = {
     }, 100);
   },
 
-  showPaymentPage: function() {
-    var popupOptions = { magic: false, otpelf: false, focus: true };
+  showPaymentPage: function(options) {
+    if (typeof options !== 'object') {
+      options = {};
+    }
+
+    options.focus = options.focus || true;
+    options.magic = options.magic || false;
+    options.otpelf = options.otpelf || false;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
-      CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
+      CheckoutBridge.invokePopup(JSON.stringify(options));
     }
   },
 
@@ -104,6 +110,14 @@ magicView.prototype = {
 
     console.log('pageResolved', (new Date().getTime() / 1000) >> 0);
 
+    if (data.bank && indexOf(this.supportedBanks, data.bank) < 0) {
+      this.bankNotSupported = true;
+      return this.showPaymentPage({
+        magic: false,
+        otpelf: true
+      });
+    }
+
     var self = this;
     switch (data.type) {
       case 'otp':
@@ -122,10 +136,6 @@ magicView.prototype = {
         timeout = 3000;
         isUnkown = true;
         break;
-    }
-
-    if (data.bank && indexOf(this.supportedBanks, data.bank) < 0) {
-      timeout = 0;
     }
 
     this.setTimeout(timeout);

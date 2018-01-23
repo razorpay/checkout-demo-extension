@@ -37,6 +37,7 @@ function handleRelay(relayObj) {
 
     case 'otp_resent':
       if (relayObj.data) {
+        self.magicView.setTimeout(30000);
         break;
       }
     case 'abort_magic':
@@ -293,6 +294,7 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
+  debugger;
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
