@@ -139,9 +139,7 @@ function Payment(data, params, r) {
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
 
-  // if (!this.sdk_popup) {
   this.tryPopup();
-  // }
 
   if (params.paused) {
     try {
@@ -169,9 +167,8 @@ Payment.prototype = {
 
   checkSdkPopup: function() {
     var data = this.data;
-
     if (this.isMagicPayment) {
-      window.onPaymentCancel = bind(onPaymentCancel, this);
+      window.onpaymentcancel = bind(onPaymentCancel, this);
 
       CheckoutBridge.invokePopup(
         JSON.stringify({
@@ -349,7 +346,7 @@ Payment.prototype = {
       this.offmessage();
     }
 
-    delete window.onPaymentCancel;
+    delete window.onpaymentcancel;
     delete window.handleRelay;
 
     clearPollingInterval();
