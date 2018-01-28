@@ -646,6 +646,10 @@ Session.prototype = {
       this.magicView.destroy();
       delete this.magicView;
     }
+
+    if (this.get('redirect')) {
+      $('#error-message .link').hide();
+    }
   },
 
   setModal: function() {
@@ -1927,13 +1931,26 @@ Session.prototype = {
       .on('payment.error', bind(errorHandler, this))
       .on('payment.cancel', bind(cancelHandler, this));
 
+    var sub_link = $('#error-message .link');
+
     this.r.on('magic.init', function() {
       window.handleRelay = handleRelay.bind(that);
       that.setMagic();
       that.showLoadError('Please wait while we fetch your transaction details');
+
+      if (that.r._payment && that.r._payment.isMagicPayment) {
+        sub_link[0].style = '';
+        sub_link.on('click', function() {
+          if (that.magicView) {
+            that.magicView.showPaymentPage({
+              otpelf: true,
+              magic: false
+            });
+          }
+        });
+      }
     });
 
-    var sub_link = $('#error-message .link');
     if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);

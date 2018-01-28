@@ -247,6 +247,14 @@ body{
       gel('cncl').onclick = function () {
         if (window.confirm("Do you want to cancel the ongoing payment?")) {
           window.close();
+
+          if (CheckoutBridge && CheckoutBridge.oncomplete) {
+            CheckoutBridge.oncomplete(JSON.stringify({
+              error: {
+                description: 'Payment Cancelled'
+              }
+            }));
+          }
         }
       };
 
