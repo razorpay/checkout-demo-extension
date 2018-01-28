@@ -487,6 +487,11 @@ function showModal(session) {
   var saved_customer = preferences.customer;
   var filters = {};
 
+  /* TODO: remove */
+  preferences.magic = true;
+
+  session.magic = session.magic && preferences.magic;
+
   if (preferences.global === false) {
     session.local = true;
     customer = new Customer('');

@@ -5,6 +5,7 @@ function magicView(session) {
   };
   this.render();
   this.resendCount = 0;
+  this.checkoutVisible = true;
   this.screenMap = {
     'magic-choice': 'select_choice',
     'magic-otp': 'submit_otp'
@@ -32,15 +33,28 @@ magicView.prototype = {
 
   bind: function() {
     var el_otp = gel('magic-otp');
+    var self = this;
 
     this.on('change', '#form-magic-choice', function(e) {
       $('#body').toggleClass('sub', e.target.value);
     });
 
-    this.on('click', '#form-magic-otp', this.resendOtp.bind(this));
-    this.on('click', '#autoread-otp', this.autoreadOtp.bind(this));
-    this.on('click', '#enter-otp', this.enterOtp.bind(this));
-    this.on('click', '#magic-manual-otp', this.enterOtp.bind(this));
+    this.on('click', '#form-magic-otp', bind(this.resendOtp, this));
+
+    this.on('click', '#form-magic-otp', function(e) {
+      if (!$(e.target).hasClass('show-payment-page')) {
+        return;
+      }
+      self.showPaymentPage({
+        magic: false,
+        otpelf: true,
+        focus: true
+      });
+    });
+
+    this.on('click', '#autoread-otp', bind(this.autoreadOtp, this));
+    this.on('click', '#enter-otp', bind(this.enterOtp, this));
+    this.on('click', '#magic-manual-otp', bind(this.enterOtp, this));
 
     var delegator = this.session.delegator;
 
@@ -74,15 +88,25 @@ magicView.prototype = {
     options.otpelf = options.otpelf || false;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
+      this.clearTimeout();
+      this.checkoutVisible = false;
       CheckoutBridge.invokePopup(JSON.stringify(options));
     }
+  },
+
+  clearTimeout: function() {
+    clearTimeout(this.magicTimeout);
+    delete this.magicTimeout;
   },
 
   setTimeout: function(timeout) {
     var self = this;
 
+    if (!this.checkoutVisible) {
+      return;
+    }
+
     var timeoutFn = function() {
-      console.log('timeout fn called', (new Date().getTime() / 1000) >> 0);
       if (self.magicTimeout) {
         clearTimeout(self.magicTimeout);
         delete self.magicTimeout;
@@ -97,8 +121,7 @@ magicView.prototype = {
     };
 
     if (this.magicTimeout) {
-      clearTimeout(this.magicTimeout);
-      delete this.magicTimeout;
+      this.clearTimeout();
     }
 
     this.magicTimeout = setTimeout(timeoutFn, timeout);
@@ -107,8 +130,6 @@ magicView.prototype = {
   pageResolved: function(data) {
     var timeout = 30000;
     var isUnkown = false;
-
-    console.log('pageResolved', (new Date().getTime() / 1000) >> 0);
 
     if (data.bank && indexOf(this.supportedBanks, data.bank) < 0) {
       this.bankNotSupported = true;
@@ -300,8 +321,6 @@ magicView.prototype = {
         otp_permission: this.otpPermission
       });
     }
-
-    console.log(relayData);
 
     if (CheckoutBridge && CheckoutBridge.relay) {
       CheckoutBridge.relay(JSON.stringify(relayData));

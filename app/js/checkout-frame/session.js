@@ -16,8 +16,6 @@ var fontTimeout;
 /* this === session */
 function handleRelay(relayObj) {
   var self = this;
-  console.log(relayObj);
-  console.log(this);
 
   if (
     !(relayObj && relayObj.action) ||
@@ -42,10 +40,8 @@ function handleRelay(relayObj) {
       }
     case 'abort_magic':
     case 'error_message':
-      this.showLoadError(strings.redirect);
-      window.setTimeout(function() {
-        self.magicView.showPaymentPage();
-      }, 1000);
+      this.magicView.showPaymentPage();
+
       break;
   }
 }
@@ -280,6 +276,10 @@ function errorHandler(response) {
     }
   }
 
+  if (/^magic*/.test(this.screen)) {
+    this.switchTab('card');
+  }
+
   if (this.tab || message !== discreet.cancelMsg) {
     this.showLoadError(
       message || 'There was an error in handling your request',
@@ -294,11 +294,13 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-  debugger;
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
-  } else if (/^(card|emi)$/.test(this.payload.method)) {
+  } else if (
+    /^(card|emi)$/.test(this.payload.method) &&
+    this.screen !== 'card'
+  ) {
     this.switchTab('card');
   }
 }
@@ -632,7 +634,7 @@ Session.prototype = {
     if (!this.magicView && this.magic) {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
-      this.magicView.setTimeout(3000);
+      this.magicView.setTimeout(10000);
     }
 
     this.magicView.resendCount = 0;
@@ -1733,11 +1735,13 @@ Session.prototype = {
     if (powerotp) {
       powerotp.value = '';
     }
+
     if (this.r._payment) {
       hideOverlayMessage();
-      this.destroyMagic();
       this.r.emit('payment.cancel', extra);
     }
+
+    this.destroyMagic();
     abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
@@ -1924,21 +1928,9 @@ Session.prototype = {
       .on('payment.cancel', bind(cancelHandler, this));
 
     this.r.on('magic.init', function() {
-      console.log('magic.init');
       window.handleRelay = handleRelay.bind(that);
       that.setMagic();
       that.showLoadError('Please wait while we fetch your transaction details');
-
-      /* BLOCKER: remove */
-      /*handleRelay(
-        JSON.stringify({
-          action: 'page_resolved',
-          data: {
-            type: 'choice',
-            otp_permission: true
-          }
-        })
-      );*/
     });
 
     var sub_link = $('#error-message .link');

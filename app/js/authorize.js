@@ -574,7 +574,6 @@ var responseTypes = {
       if (direct) {
         popupOptions.content = content;
       } else {
-        console.log('submitting form', request.url);
         var url =
           "javascript: submitForm('" +
           request.url +

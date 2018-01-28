@@ -35,7 +35,7 @@
         <div class="link theme magic-resend-otp">Resend</div>
       </div>
       <div class="loader"></div>
-      <p>Please wait a moment while we read the One Time Password. <a class="theme" href="javascript: CheckoutBridge.invokePopup({'focus': true})">View bank page.</a></p>
+      <p>Please wait a moment while we read the One Time Password. <a class="theme show-payment-page">View bank page.</a></p>
       <h3 id="magic-manual-otp" class="text-btn">Enter otp manually</h3>
     </div>
     <div id='otp-confirm'>
@@ -48,8 +48,8 @@
       <div class="list">
         <div class="item active">
           <div class="icon"></div>
-          <div class="subtitle auto">Confirm the OTP to complete the card payment. <a class="theme" href="javascript: CheckoutBridge.invokePopup({'focus': true})">View Bank Page.</a></div>
-          <div class="subtitle n-auto">Authenticate your card payment by entering the One Time Password. <a class="theme" href="javascript: CheckoutBridge.invokePopup({'focus': true})">View Bank Page.</a></div>
+          <div class="subtitle auto">Confirm the OTP to complete the card payment. <a class="theme show-payment-page" >View Bank Page.</a></div>
+          <div class="subtitle n-auto">Authenticate your card payment by entering the One Time Password. <a class="theme show-payment-page">View Bank Page.</a></div>
           <div class="elem-wrap n-auto"><div class="elem">
             <div class="help">Please enter a valid OTP</div>
             <input class="input" id="magic-otp" name="otp" type="tel" required pattern="^[0-9]{6,8}$" maxlength="8">
