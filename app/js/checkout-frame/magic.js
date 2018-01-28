@@ -262,8 +262,12 @@ magicView.prototype = {
     hideOverlayMessage();
   },
 
-  showOtpView: function(data = {}) {
+  showOtpView: function(data) {
     var self = this;
+
+    if (typeof data === 'undefined') {
+      data = {};
+    }
 
     this.otpPermission =
       typeof data.otp_permission !== 'undefined'
