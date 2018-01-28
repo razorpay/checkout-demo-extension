@@ -112,7 +112,7 @@ gulp.task('uglify', () => {
       // .pipe(jshint.reporter(stylish))
       // .pipe(jshint.reporter('fail'))
       // .pipe(sourcemaps.init())
-      // .pipe(uglify())
+      .pipe(uglify())
       // .pipe(sourcemaps.write('./', {
       // debug: true
       // }))
