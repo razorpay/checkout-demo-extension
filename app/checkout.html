@@ -5,7 +5,7 @@
     <title>Razorpay Checkout</title>
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
-    <meta name="viewport" content="user-scalable=no,width=device-width/1.0,initial-scale=1.0">
+    <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
     <style>
       @font-face {
         font-family:'lato';
@@ -105,24 +105,6 @@
 
 </html>
 <script>
-
-/*CheckoutBridge = {
-  openPopup: function(options) {
-    console.log('openPopup');
-  },
-  showPaymentPage: function(){
-    console.log('showPaymentPage');
-  },
-  relay: function(data){
-    console.log('relay')
-    console.log(data);
-  },
-  requestOtpPermission: function() {
-    console.log('requestOtpPermission')
-  }
-};*/
-
-
 var options = {
   // 'key': 'rzp_live_ILgsfZCZoFIKMb',
   'key': 'rzp_test_1DP5mmOlF5G5ag',
@@ -140,7 +122,7 @@ var options = {
     card: true
   },
   // ecod: true,
-  'remember_customer': true,
+  'remember_customer': false,
   // parent: '#x',
   external: {
     // wallets: ['payumoney'],
@@ -148,17 +130,16 @@ var options = {
       console.log(this, data);
     }
   },
-  // callback_url: 'http://checkout.codeankit.me/checkout.html',
+  // callback_url: 'http://google.com',
   // redirect: true,
   // display_amount: '12.23',
   // display_currency: 'SGD',
   'prefill': {
     'method': 'card',
-    'card[number]': '4591500208862397',
-    'card[expiry]': '02/34',
-    'name': 'Ankit',
+    'card[number]': '405028',
+    'name': 'Harshil \"Mathur',
     'email': 'harshil@razorpay.com',
-    'contact': '9858577847'
+    'contact': '8879524924'
   },
   // customer_id: 'cust_5rZjWeKfUdrIfG',
   notes: {
@@ -174,5 +155,5 @@ var options = {
     onhidden: function(){console.log(2)}
   }
 }
-// handleMessage({options: options , upi_intents_data: ['sda'], sdk_popup: false, magic: true});
+// handleMessage({options: options , upi_intents_data: ['sda'], sdk_popup: true, magic: true});
 </script>
