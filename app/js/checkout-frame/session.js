@@ -577,6 +577,24 @@ Session.prototype = {
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
     }
+
+    if (this.closeAt) {
+      var timeLeft = this.closeAt - now();
+      var timeoutEl = $('#timeout').show()[0];
+      var timerFn = updateTimer(timeoutEl, this.closeAt);
+      timerFn();
+      if (this.isMobile) {
+        var modalEl = gel('modal');
+        modalEl.insertBefore(timeoutEl, modalEl.firstChild);
+      }
+      var self = this;
+      this.closeTimer = setInterval(timerFn, 1000);
+      this.closeTimeout = setTimeout(function() {
+        clearInterval(self.closeTimer);
+        self.dismissReason = 'timeout';
+        self.modal.hide();
+      }, timeLeft);
+    }
   },
 
   setEMI: function() {
@@ -588,11 +606,12 @@ Session.prototype = {
 
   setModal: function() {
     if (!this.modal) {
+      var self = this;
       this.modal = new window.Modal(this.el, {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
         onhide: function() {
-          Razorpay.sendMessage({ event: 'dismiss' });
+          Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
         onhidden: bind(function() {
           this.saveAndClose();
@@ -1957,6 +1976,9 @@ Session.prototype = {
         this.emi.unbind();
       }
 
+      clearInterval(this.closeTimer);
+      clearTimeout(this.closeTimeout);
+
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = window.setPaymentID = window.onComplete = null;
     }
@@ -2000,4 +2022,16 @@ function send_ecod_link() {
     url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
     callback: debounce(hideOverlayMessage, 4000)
   });
+}
+
+function updateTimer(timeoutEl, closeAt) {
+  return function() {
+    var timeLeft = Math.floor((closeAt - now()) / 1000);
+    timeoutEl.innerHTML =
+      'Payment will expire in ' +
+      Math.floor(timeLeft / 60) +
+      ':' +
+      ('0' + timeLeft % 60).slice(-2) +
+      ' minutes';
+  };
 }
