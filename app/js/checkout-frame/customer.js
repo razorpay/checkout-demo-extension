@@ -113,7 +113,11 @@ Customer.prototype = {
         }
 
         if (data.error) {
-          callback(discreet.msg.wrongotp);
+          if (data.error.field) {
+            errorHandler.call(getSession(), data);
+          } else {
+            callback(discreet.msg.wrongotp);
+          }
         } else {
           callback();
         }

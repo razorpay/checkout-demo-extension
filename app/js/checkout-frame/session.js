@@ -225,18 +225,23 @@ function errorHandler(response) {
     }
     var error_el = document.getElementsByName(err_field)[0];
     if (error_el && error_el.type !== 'hidden') {
-      var help = $(error_el)
-        .focus()
-        .parent()
-        .addClass('invalid')
-        .find('help-text')[0];
+      setTimeout(
+        bind(function() {
+          var help = $(error_el)
+            .focus()
+            .parent()
+            .addClass('invalid')
+            .find('help-text')[0];
 
-      if (help) {
-        $(help).html(message);
-      }
-      if (err_field === 'contact' || err_field === 'email') {
-        this.switchTab();
-      }
+          if (help) {
+            $(help).html(message);
+          }
+          if (err_field === 'contact' || err_field === 'email') {
+            this.switchTab();
+          }
+        }, this),
+        0
+      );
       this.shake();
       return hideOverlayMessage();
     }
@@ -516,6 +521,31 @@ Session.prototype = {
       this.wants_skip = true;
     }
     var tab = oldMethod || this.get('prefill.method');
+
+    if (tab) {
+      var optional = this.optional;
+      var prefill = {
+        email: this.get('prefill.email'),
+        contact: this.get('prefill.contact')
+      };
+
+      var valid = true;
+      var fields = ['contact', 'email'];
+      each(fields, function(option) {
+        var option = fields[option];
+        if (valid && !prefill[option] && !optional[option]) {
+          valid = false;
+          errorHandler.call(getSession(), {
+            error: {
+              field: option
+            }
+          });
+        }
+      });
+      if (!valid) {
+        tab = '';
+      }
+    }
 
     if (tab && !(this.order && this.order.bank)) {
       this.switchTab(tab);
