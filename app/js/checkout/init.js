@@ -7,6 +7,8 @@ RazorpayDefaults.handler = function(data) {
   }
 };
 
+RazorpayDefaults.timeout = 0;
+
 RazorpayDefaults.buttontext = 'Pay Now';
 RazorpayDefaults.parent = null;
 

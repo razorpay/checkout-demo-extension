@@ -164,8 +164,7 @@ CheckoutFrame.prototype = {
       var style =
         'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
       this.el = $(document.createElement('iframe')).attr({
-        // prettier-ignore
-        'class': 'razorpay-checkout-frame', // quotes needed for ie
+        class: 'razorpay-checkout-frame',
         style: style,
         allowtransparency: true,
         frameborder: 0,
@@ -391,9 +390,9 @@ CheckoutFrame.prototype = {
     }
   },
 
-  ondismiss: function() {
+  ondismiss: function(data) {
     this.close();
-    invoke(this.rzp.get('modal.ondismiss'));
+    invoke(this.rzp.get('modal.ondismiss'), 0, data);
   },
 
   onhidden: function() {

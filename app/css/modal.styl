@@ -1,5 +1,13 @@
 @require 'common';
 
+#timeout {
+  display: none;
+  background: #F6E58D;
+  padding: 4px 0;
+  font-size: 13px;
+  color: #2D3436;
+}
+
 .clear {
   clear: both;
   overflow: auto;
@@ -365,6 +373,7 @@ i {
 
 .font-loaded {
   #modal,
+  #timeout,
   button,
   input,
   textarea,
@@ -1082,15 +1091,18 @@ $outline = #ddd;
     right: 20px;
     width: auto;
   }
+  .legend {
+    text-align: left;
+  }
+}
+
+#container.emandate, #container.no-details, #container.extra.show-methods {
   .desc {
     display: block;
     color: #777;
     font-size: 12px;
     white-space: nowrap;
     overflow: hidden;
-  }
-  .legend {
-    text-align: left;
   }
   #payment-options {
     border: 1px solid #eee;
@@ -1114,6 +1126,21 @@ $outline = #ddd;
       }
       &+.item {
         border-top: 1px solid $bc;
+      }
+    }
+  }
+}
+
+#container.emandate {
+  #payment-options {
+    label {
+      &:after {
+        content: '\e604';
+        position: absolute;
+        right: 16px;
+        top: 20px;
+        transform: scaleX(-1);
+        color: #777;
       }
     }
   }

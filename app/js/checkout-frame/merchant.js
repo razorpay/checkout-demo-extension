@@ -27,7 +27,9 @@ var qpmap = {};
 var pngBase64Prefix = 'data:image/png;base64,';
 var bankPrefix = RazorpayConfig.cdn + 'bank/';
 var sessProto = Session.prototype;
-sessProto.netbanks = {
+var netbanks = (sessProto.netbanks = {
+  ICIC_C: {},
+  UTIB_C: {},
   SBIN: {
     image:
       pngBase64Prefix +
@@ -84,7 +86,12 @@ sessProto.netbanks = {
     image: bankPrefix + 'CORP.gif',
     title: 'Corporation'
   }
-};
+});
+
+netbanks.ICIC_C.image = netbanks.ICIC.image;
+netbanks.ICIC_C.title = 'ICICI Corporate';
+netbanks.UTIB_C.image = netbanks.UTIB.image;
+netbanks.UTIB_C.title = 'Axis Corporate';
 
 var downBanks = {};
 var walletPrefix = RazorpayConfig.cdn + 'wallet/';
@@ -232,7 +239,7 @@ var emi_options = (sessProto.emi_options = {
     },
 
     RATN: {
-      patt: /5(23(6|9)50|36301|36907|24373|28028|31845|41538|42505|49489)/,
+      patt: /5(23(6|9)50|25611|36301|36907|24373|28028|31845|41538|42505|49489)/,
       name: 'RBL Bank',
       plans: {
         3: 13,
@@ -296,6 +303,7 @@ var emi_options = (sessProto.emi_options = {
 });
 
 var tab_titles = (sessProto.tab_titles = {
+  emandate: 'Bank Account',
   emi: 'EMI',
   card: 'Card',
   netbanking: 'Netbanking',
@@ -318,6 +326,21 @@ function notifyBridge(message) {
   }
 }
 
+function setPreferredBanks(session) {
+  var bankObj = {};
+  var availBanks = session.methods.netbanking;
+  if (!availBanks) {
+    return;
+  }
+
+  each(netbanks, function(bankCode, obj) {
+    if (availBanks[bankCode] && !availBanks[bankCode + '_C']) {
+      bankObj[bankCode] = obj;
+    }
+  });
+  session.netbanks = bankObj;
+}
+
 function setDownBanks(session) {
   var downObj = [];
   var downtime = preferences.downtime;
@@ -329,10 +352,66 @@ function setDownBanks(session) {
   session.down = downObj;
 }
 
+/**
+ * Method to get the minimum amount for EMI.
+ * @return {Integer|Null}
+ */
+function getMinimumAmountForEMI() {
+  var methods = preferences.methods;
+
+  // Return null if EMI is disabled or emi plans are absent.
+  if (!methods.emi || !methods.emi_plans) {
+    return null;
+  }
+
+  var emi_plans = methods.emi_plans;
+
+  var min_amt = null;
+  for (var bank in emi_plans) {
+    var plan = emi_plans[bank];
+    if (min_amt === null || plan.min_amount < min_amt) {
+      min_amt = plan.min_amount;
+    }
+  }
+
+  return min_amt;
+}
+
 function setPaymentMethods(session) {
   var recurring = session.recurring;
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
+  var amount = session.get('amount');
+  var emandate_method;
+
+  if (recurring) {
+    availMethods = availMethods.recurring;
+    var banks = {};
+    if (session.get('customer_id')) {
+      if (availMethods.emandate) {
+        emandate_method = 'emandate';
+        each(availMethods[emandate_method], function(bankCode, bankObj) {
+          banks[bankCode] = bankObj.name;
+        });
+        availMethods[emandate_method] = banks;
+      } else if (availMethods.netbanking) {
+        emandate_method = 'netbanking';
+      }
+      if (emandate_method) {
+        session.emandate = true;
+      }
+    }
+    if (availMethods.card) {
+      if (availMethods.card.credit instanceof Array) {
+        session.recurring_card_text =
+          availMethods.card.credit.join(' and ') + ' credit cards';
+      }
+      if (!amount) {
+        delete availMethods.card;
+      }
+    }
+  }
+
   var methods = (session.methods = {
     count: 0
   });
@@ -343,13 +422,9 @@ function setPaymentMethods(session) {
       methods[method] = enabled;
     }
   });
-  if (recurring) {
-    methods.netbanking =
-      availMethods.recurring && availMethods.recurring.netbanking;
-  }
 
-  var amount = session.get('amount');
-  if (amount <= emi_options.min) {
+  min_emi_amt = getMinimumAmountForEMI();
+  if (min_emi_amt === null || amount <= min_emi_amt) {
     methods.emi = false;
   }
 
@@ -389,15 +464,17 @@ function setPaymentMethods(session) {
     });
   }
 
+  var bankMethod = emandate_method || 'netbanking';
   if (
-    !methods.netbanking ||
-    methods.netbanking instanceof Array ||
+    !methods[bankMethod] ||
+    methods[bankMethod] instanceof Array ||
     international
   ) {
-    methods.netbanking = false;
+    methods[bankMethod] = false;
   } else {
     methods.count = 1;
     setDownBanks(session);
+    setPreferredBanks(session);
   }
 
   if (methods.card) {
@@ -447,6 +524,16 @@ function fetchPrefsAndShowModal(session) {
   } else {
     prefData.checkcookie = 1;
     document.cookie = 'checkcookie=1;path=/';
+  }
+
+  if (session.isOpen) {
+    return;
+  }
+  session.isOpen = true;
+
+  var timeout = session.get('timeout');
+  if (timeout) {
+    session.closeAt = now() + timeout * 1000;
   }
 
   Razorpay.payment.getPrefs(prefData, function(response) {
@@ -500,7 +587,11 @@ function showModal(session) {
     };
   }
 
-  if (preferences.subscription || session_options.recurring) {
+  if (
+    session_options['prefill.method'] === 'emandate' ||
+    preferences.subscription ||
+    session_options.recurring
+  ) {
     session.recurring = filters.recurring = true;
   }
 
@@ -533,7 +624,11 @@ function showModal(session) {
   }
 
   session.optional = arr2obj(preferences.optional);
-  if (cookieDisabled || session.optional.contact || is_ie8) {
+  if (
+    cookieDisabled ||
+    is_ie8 ||
+    (session.optional.contact && !session_options['prefill.contact'])
+  ) {
     options.remember_customer = false;
   }
 
@@ -571,6 +666,13 @@ function showModalWithSession(session) {
     });
   }
   setPaymentMethods(session);
+  if (!session.methods.count) {
+    var message = 'No appropriate payment method found.';
+    if (session.recurring && !options.customer_id && session.methods.emandate) {
+      message += '\nMake sure to pass customer_id for e-mandate payments';
+    }
+    return Razorpay.sendMessage({ event: 'fault', data: message });
+  }
   session.render();
   Razorpay.sendMessage({ event: 'render' });
 
@@ -845,11 +947,8 @@ window.handleMessage = function(message) {
   }
 
   if (message.event === 'open' || options) {
-    if (!preferences || session.get('remember_customer')) {
-      fetchPrefsAndShowModal(session);
-    } else {
-      showModal(session);
-    }
+    // always fetch preferences, disregard backend printed one.
+    fetchPrefsAndShowModal(session);
   } else if (message.event === 'close') {
     session.hide();
   }
