@@ -40,8 +40,8 @@ function handleRelay(relayObj) {
       }
     case 'abort_magic':
     case 'error_message':
+    default:
       this.magicView.showPaymentPage();
-
       break;
   }
 }
