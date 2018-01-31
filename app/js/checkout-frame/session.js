@@ -335,6 +335,21 @@ function cancel_upi(session) {
   });
 }
 
+/**
+ * Toggles EMI option
+ * @param {Boolean} show
+ */
+function toggleEMI(show) {
+  var container = $('#container'),
+    emiClass = 'emi';
+
+  if (show) {
+    container.addClass(emiClass);
+  } else {
+    container.removeClass(emiClass);
+  }
+}
+
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 var IRCTC_KEYS = [
@@ -1175,6 +1190,35 @@ Session.prototype = {
             if (this.type !== 'maestro') {
               invoke('focus', el_expiry, null, 0);
             }
+          }
+        })
+        .on('bank', function() {
+          // If EMI is disabled or if plans don't exist, do nothing.
+          if (!preferences.methods.emi || !preferences.methods.emi_plans) {
+            return;
+          }
+
+          var emi_plans = preferences.methods.emi_plans;
+
+          /**
+           * Continue if we found an issuing bank and there are plans for that bank.
+           */
+          if (this.bank && emi_plans[this.bank]) {
+            var emi_plan = emi_plans[this.bank],
+              session = getSession(),
+              amount = session.get('amount');
+
+            // Check for amount.
+            if (amount >= emi_plan.min_amount) {
+              // Enable EMI checkbox.
+              toggleEMI(true);
+            } else {
+              // Disable EMI checkbox.
+              toggleEMI(false);
+            }
+          } else {
+            // Disable EMI checkbox.
+            toggleEMI(false);
           }
         });
 
