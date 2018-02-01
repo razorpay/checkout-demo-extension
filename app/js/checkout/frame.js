@@ -163,15 +163,17 @@ CheckoutFrame.prototype = {
     if (!this.el) {
       var style =
         'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
-      this.el = $(document.createElement('iframe')).attr({
-        class: 'razorpay-checkout-frame',
+      var attribs = {
         style: style,
         allowtransparency: true,
         frameborder: 0,
         width: '100%',
         height: '100%',
         src: makeCheckoutUrl(rzp)
-      })[0];
+      };
+
+      attribs['class'] = 'razorpay-checkout-frame';
+      this.el = $(document.createElement('iframe')).attr(attribs)[0];
     }
     return this.el;
   },
@@ -418,6 +420,7 @@ CheckoutFrame.prototype = {
   onpaymenterror: function(data) {
     try {
       this.rzp.emit('payment.error', data);
+      this.rzp.emit('payment.failed', data);
     } catch (e) {}
   },
 
