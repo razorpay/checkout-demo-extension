@@ -167,9 +167,12 @@ Payment.prototype = {
 
   checkSdkPopup: function() {
     var data = this.data;
-    if (this.isMagicPayment) {
-      window.onpaymentcancel = bind(onPaymentCancel, this);
 
+    if (this.sdk_popup) {
+      window.onpaymentcancel = bind(onPaymentCancel, this);
+    }
+
+    if (this.isMagicPayment) {
       CheckoutBridge.invokePopup(
         JSON.stringify({
           content: templates.popup(this),

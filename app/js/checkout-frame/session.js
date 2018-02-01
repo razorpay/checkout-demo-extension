@@ -2045,8 +2045,11 @@ Session.prototype = {
 
     var sub_link = $('#error-message .link');
 
+    if (this.r._payment & this.r._payment.isMagicPayment) {
+      window.handleRelay = handleRelay.bind(this);
+    }
+
     this.r.on('magic.init', function() {
-      window.handleRelay = handleRelay.bind(that);
       that.setMagic();
       that.showLoadError('Please wait while we fetch your transaction details');
 
