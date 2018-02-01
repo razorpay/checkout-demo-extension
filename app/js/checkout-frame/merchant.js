@@ -352,31 +352,6 @@ function setDownBanks(session) {
   session.down = downObj;
 }
 
-/**
- * Method to get the minimum amount for EMI.
- * @return {Integer|Null}
- */
-function getMinimumAmountForEMI() {
-  var methods = preferences.methods;
-
-  // Return null if EMI is disabled or emi plans are absent.
-  if (!methods.emi || !methods.emi_plans) {
-    return null;
-  }
-
-  var emi_plans = methods.emi_plans;
-
-  var min_amt = null;
-  for (var bank in emi_plans) {
-    var plan = emi_plans[bank];
-    if (min_amt === null || plan.min_amount < min_amt) {
-      min_amt = plan.min_amount;
-    }
-  }
-
-  return min_amt;
-}
-
 function setPaymentMethods(session) {
   var recurring = session.recurring;
   var international = session.get('currency') !== 'INR';
@@ -423,8 +398,7 @@ function setPaymentMethods(session) {
     }
   });
 
-  min_emi_amt = getMinimumAmountForEMI();
-  if (min_emi_amt === null || amount <= min_emi_amt) {
+  if (amount <= emi_options.min) {
     methods.emi = false;
   }
 
