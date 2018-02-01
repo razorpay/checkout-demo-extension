@@ -402,6 +402,11 @@ function setPaymentMethods(session) {
     methods.emi = false;
   }
 
+  // disable upi if amount > 1 Lac
+  if (amount <= 1e7) {
+    methods.upi = false;
+  }
+
   var emiMethod = session.get('theme.emi_mode');
   if (
     !((emiMethod && methods.emi) || methods.card) ||
