@@ -531,8 +531,7 @@ Session.prototype = {
 
       var valid = true;
       var fields = ['contact', 'email'];
-      each(fields, function(option) {
-        var option = fields[option];
+      each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
           errorHandler.call(getSession(), {
@@ -1640,9 +1639,9 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
-      $('#form-otp')
-        [actionState]('action')
-        [loadingState]('loading');
+      var formOtp = $('#form-otp');
+      formOtp[actionState]('action');
+      formOtp[loadingState]('loading');
     } else {
       $('#fd-t').html(text);
       showOverlay($('#error-message')[loadingState]('loading'));

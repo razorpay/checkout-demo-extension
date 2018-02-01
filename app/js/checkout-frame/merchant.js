@@ -700,9 +700,11 @@ function handleNewIOSMethods(method, data) {
 
   data = data || {};
 
+  var navData;
+
   switch (method) {
     case 'load':
-      var navData = {
+      navData = {
         webview_background_color: color.navHide
       };
       dispatchNewIOSEvents('hide_nav_bar', navData);
@@ -711,7 +713,6 @@ function handleNewIOSMethods(method, data) {
       dispatchNewIOSEvents(method, data); //default load
       break;
     case 'submit':
-      var navData;
       dispatchNewIOSEvents(method, data); //send default submit
       navData = {
         webview_background_color: color.navShow

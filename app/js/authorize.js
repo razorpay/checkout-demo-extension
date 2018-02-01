@@ -606,6 +606,7 @@ var responseTypes = {
         $.jsonp
       );
     });
+    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       CheckoutBridge.callNativeIntent(intent_url);
     }
