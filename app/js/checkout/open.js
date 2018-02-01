@@ -248,7 +248,9 @@ RazorProto.onNew = function(event, callback) {
   if (event === 'payment.error') {
     track(this, 'event_paymenterror', location.href);
   }
-  onNew.call(this, event, callback);
+  if (isFunction(onNew)) {
+    onNew.call(this, event, callback);
+  }
 };
 
 RazorProto.open = needBody(function() {
