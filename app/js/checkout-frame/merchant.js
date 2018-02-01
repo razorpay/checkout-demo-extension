@@ -510,7 +510,8 @@ function fetchPrefsAndShowModal(session) {
     session.closeAt = now() + timeout * 1000;
   }
 
-  Razorpay.payment.getPrefs(prefData, function(response) {
+  session.prefCall = Razorpay.payment.getPrefs(prefData, function(response) {
+    session.prefCall = null;
     if (response.error) {
       return Razorpay.sendMessage({
         event: 'fault',

@@ -420,6 +420,7 @@ CheckoutFrame.prototype = {
   onpaymenterror: function(data) {
     try {
       this.rzp.emit('payment.error', data);
+      this.rzp.emit('payment.failed', data);
     } catch (e) {}
   },
 

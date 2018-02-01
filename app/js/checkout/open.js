@@ -39,7 +39,10 @@ var addAutoCheckoutButton = function(rzp) {
     var options = rzp.get();
     // if data-callback_url is not passed
     if (
-      isString(formAction) && formAction && !options.callback_url && window.btoa
+      isString(formAction) &&
+      formAction &&
+      !options.callback_url &&
+      window.btoa
     ) {
       var content = {};
       each($(form).find('[name]'), function(index, el) {
@@ -79,9 +82,9 @@ var addAutoCheckoutButton = function(rzp) {
 };
 
 /**
-* This checks whether we are in automatic mode
-* If yes, it puts in the button
-*/
+ * This checks whether we are in automatic mode
+ * If yes, it puts in the button
+ */
 function initAutomaticCheckout() {
   var opts = {};
   each(currentScript.attributes, function(i, attr) {
@@ -160,7 +163,8 @@ function createFrameBackdrop() {
       left: 0,
       width: '100%',
       height: '100%',
-      filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000)'
+      filter:
+        'progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000)'
     },
     function(ruleKey, value) {
       style[ruleKey] = value;
@@ -253,6 +257,11 @@ RazorProto.open = needBody(function() {
       'This browser is not supported.\nPlease try payment in another browser.'
     );
   }
+
+  if (currentScript.src.slice(-7) === '-new.js') {
+    track(this, 'oldscript', location.href);
+  }
+
   return this;
 });
 
