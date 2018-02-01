@@ -1568,7 +1568,10 @@ Session.prototype = {
         data.contact = data.contact.replace(/\ /g, '');
       }
 
-      if (!(this.get('prefill.email') && emailPattern.test(data.email))) {
+      if (
+        optional.email &&
+        !(this.get('prefill.email') && emailPattern.test(data.email))
+      ) {
         delete data.email;
       }
     }
