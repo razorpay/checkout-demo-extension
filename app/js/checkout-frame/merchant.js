@@ -403,7 +403,7 @@ function setPaymentMethods(session) {
   }
 
   // disable upi if amount > 1 Lac
-  if (amount <= 1e7) {
+  if (amount > 1e7) {
     methods.upi = false;
   }
 
