@@ -2003,7 +2003,7 @@ Session.prototype = {
 
     var sub_link = $('#error-message .link');
 
-    if (this.r._payment & this.r._payment.isMagicPayment) {
+    if (this.r._payment && this.r._payment.isMagicPayment) {
       window.handleRelay = handleRelay.bind(this);
     }
 
