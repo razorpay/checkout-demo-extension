@@ -402,6 +402,11 @@ function setPaymentMethods(session) {
     methods.emi = false;
   }
 
+  // disable upi if amount > 1 Lac
+  if (amount > 1e7) {
+    methods.upi = false;
+  }
+
   var emiMethod = session.get('theme.emi_mode');
   if (
     !((emiMethod && methods.emi) || methods.card) ||
@@ -510,7 +515,8 @@ function fetchPrefsAndShowModal(session) {
     session.closeAt = now() + timeout * 1000;
   }
 
-  Razorpay.payment.getPrefs(prefData, function(response) {
+  session.prefCall = Razorpay.payment.getPrefs(prefData, function(response) {
+    session.prefCall = null;
     if (response.error) {
       return Razorpay.sendMessage({
         event: 'fault',

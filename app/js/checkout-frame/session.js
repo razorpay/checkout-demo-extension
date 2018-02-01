@@ -1556,21 +1556,21 @@ Session.prototype = {
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
+    var optional = this.optional;
 
-    if (
-      this.optional.contact &&
-      !(prefillContact && contactPattern.test(prefillContact))
-    ) {
-      delete data.contact;
-    } else {
-      data.contact = data.contact.replace(/\ /g, '');
-    }
+    if (optional) {
+      if (
+        optional.contact &&
+        !(prefillContact && contactPattern.test(prefillContact))
+      ) {
+        delete data.contact;
+      } else if (data.contact) {
+        data.contact = data.contact.replace(/\ /g, '');
+      }
 
-    if (
-      this.optional.email &&
-      !(this.get('prefill.email') && emailPattern.test(data.email))
-    ) {
-      delete data.email;
+      if (optional.email && !(prefillEmail && emailPattern.test(data.email))) {
+        delete data.email;
+      }
     }
 
     if (tab) {
@@ -1982,6 +1982,10 @@ Session.prototype = {
   },
 
   close: function() {
+    if (this.prefCall) {
+      this.prefCall.abort();
+      this.prefCall = null;
+    }
     if (this.isOpen) {
       abortAjax(this.ajax);
       this.clearRequest();

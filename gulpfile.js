@@ -7,7 +7,6 @@ const dot = require('./scripts/dot/index');
 const glob = require('glob');
 const plumber = require('gulp-plumber');
 const stylus = require('gulp-stylus');
-const stylint = require('gulp-stylint');
 const autoprefixer = require('autoprefixer-stylus');
 const uglify = require('gulp-uglify');
 const usemin = require('gulp-usemin');
@@ -16,10 +15,7 @@ const runSequence = require('run-sequence');
 const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
 const istanbul = require('istanbul');
-const awspublish = require('gulp-awspublish');
-// const webdriver = require('gulp-webdriver');
-const testServer = require('./test/e2e/server/index.js');
-// const internalIp = require('internal-ip');
+// const testServer = require('./test/e2e/server/index.js');
 const lazypipe = require('lazypipe');
 const minimist = require('minimist');
 
@@ -68,8 +64,6 @@ const stylusOptions = {
 gulp.task('css', () => {
   return gulp
     .src('app/checkout.styl')
-    .pipe(stylint())
-    .pipe(stylint.reporter())
     .pipe(plumber({ errorHandler: handleError }))
     .pipe(stylus(stylusOptions))
     .pipe(gulp.dest(cssDistDir));
@@ -78,7 +72,6 @@ gulp.task('css', () => {
 gulp.task('css:prod', () => {
   return gulp
     .src('app/checkout.styl')
-    .pipe(stylint())
     .pipe(stylus(Object.assign({}, stylusOptions, { compress: true })))
     .pipe(gulp.dest(cssDistDir));
 });
@@ -171,42 +164,6 @@ gulp.task('serve', ['build'], function() {
 
 gulp.task('watch', ['serve']);
 gulp.task('default', ['build']);
-
-/** Font Upload to static **/
-
-gulp.task('uploadStaticAssetsToCDN', function() {
-  let target = process.argv
-    .slice(3)[0]
-    .replace(/.+=/, '')
-    .toLowerCase()
-    .trim();
-
-  let publisher = awspublish.create({
-    accessKeyId: process.env.AWS_KEY,
-    secretAccessKey: process.env.AWS_SECRET,
-    region: 'us-east-1',
-    params: {
-      Bucket: 'checkout-live'
-    }
-  });
-
-  // define custom headers
-  let headers = {
-    'Cache-Control': 'max-age=315360000, no-transform, public'
-  };
-
-  return (gulp
-      .src([`${distDir}/fonts/*`, `${distDir}/images/**/*`])
-      // gzip, Set Content-Encoding headers and add .gz extension
-      .pipe(awspublish.gzip({ ext: '' }))
-      // publisher will add Content-Length, Content-Type and headers specified above
-      // If not specified it will set x-amz-acl to public-read by default
-      .pipe(publisher.publish(headers))
-      // create a cache file to speed up consecutive uploads
-      .pipe(publisher.cache())
-      // print upload updates to console
-      .pipe(awspublish.reporter()) );
-});
 
 /**  Tests  **/
 
@@ -317,88 +274,3 @@ function createCoverageReport() {
   reporter.write(collector, true, function() {});
   console.log('Report created in coverage/final');
 }
-
-/***** E2E/Acceptance tests *****/
-
-gulp.task('e2e:run', function(done) {
-  return gulp
-    .src('./wdio.conf.js')
-    .pipe(
-      webdriver({
-        baseUrl: `http://${internalIp.v4()}:3000`
-      })
-    )
-    .on('error', function() {
-      done();
-    });
-});
-
-gulp.task('symlinkDist', () => {
-  var target = 'test/e2e/server/public/dist/';
-  var dist = Array(target.split('/').length).join('../') + distDir;
-  execSync(`rm -rf ${target}; mkdir ${target}; ln -s ${dist} ${target}/v1`);
-});
-
-let testServerInstance;
-
-gulp.task('testserver:start', () => {
-  testServerInstance = testServer.listen(3000, function(error) {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      process.exit(1);
-    }
-  });
-});
-
-gulp.task('testserver:stop', () => {
-  testServerInstance.close();
-});
-
-gulp.task('test:e2e', cb => {
-  runSequence(
-    'build',
-    'symlinkDist',
-    'testserver:start',
-    'e2e:run',
-    'testserver:stop',
-    cb
-  );
-});
-
-gulp.task('test', () => runSequence('test:unit', 'test:e2e'));
-
-const argv = minimist(process.argv.slice(1));
-gulp.task('custom', ['build'], () => {
-  var api = argv.api
-    ? argv.api.replace(/(.)\/?$/, '$1/')
-    : 'https://api.razorpay.com/';
-  var prefix = `
-  Razorpay = {
-    config: {
-      frame: document.currentScript.src.replace(/\\\\/[^\\\\/]+$/, "/custom.html"),
-      frameApi: "${api}"
-    }
-  }
-  `.replace(/\s/g, '');
-
-  execSync(
-    `
-            cd app
-            mkdir -p custom
-            cp dist/v1/{checkout,checkout-frame}.js custom
-            sed -i '1i${prefix}' custom/*.js
-            cp dist/v1/css/checkout.css custom
-            cp custom.html custom/
-          `
-  );
-  console.log('files generated at app/custom');
-  if (argv.host) {
-    console.log(`uploading to ${argv.host}`);
-    execSync(
-      `
-              rsync app/custom/* ${argv.host}
-              rm -r app/custom
-            `
-    );
-  }
-});
