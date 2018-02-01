@@ -1984,6 +1984,7 @@ Session.prototype = {
   close: function() {
     if (this.prefCall) {
       this.prefCall.abort();
+      this.prefCall = null;
     }
     if (this.isOpen) {
       abortAjax(this.ajax);
