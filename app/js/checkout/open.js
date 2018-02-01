@@ -242,6 +242,15 @@ RazorProto.postInit = function() {
   }
 };
 
+var onNew = RazorProto.onNew;
+
+RazorProto.onNew = function(event, callback) {
+  if (event === 'payment.error') {
+    track(this, 'event_paymenterror', location.href);
+  }
+  onNew.call(this, event, callback);
+};
+
 RazorProto.open = needBody(function() {
   if (!this.get('redirect') && !discreet.supported(true)) {
     return;
