@@ -23,6 +23,9 @@ const testServer = require('./test/e2e/server/index.js');
 const lazypipe = require('lazypipe');
 const minimist = require('minimist');
 
+const jshint = require('gulp-jshint');
+const stylish = require('jshint-stylish');
+
 const distDir = 'app/dist/v1/';
 const cssDistDir = distDir + 'css';
 
@@ -108,10 +111,9 @@ gulp.task('uglify', () => {
           cb();
         })
       )
-      // .pipe(jshint())
-      // .pipe(jshint.reporter(stylish))
-      // .pipe(jshint.reporter('fail'))
-      // .pipe(sourcemaps.init())
+      .pipe(jshint())
+      .pipe(jshint.reporter(stylish))
+      .pipe(jshint.reporter('fail'))
       .pipe(
         uglify({
           compress: {
@@ -122,9 +124,6 @@ gulp.task('uglify', () => {
       .on('error', function(e) {
         console.log(e);
       })
-      // .pipe(sourcemaps.write('./', {
-      // debug: true
-      // }))
       .pipe(gulp.dest(distDir))
   );
 });

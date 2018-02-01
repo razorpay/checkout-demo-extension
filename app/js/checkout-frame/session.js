@@ -378,21 +378,6 @@ function cancel_upi(session) {
   });
 }
 
-/**
- * Toggles EMI option
- * @param {Boolean} show
- */
-function toggleEMI(show) {
-  var container = $('#container'),
-    emiClass = 'emi';
-
-  if (show) {
-    container.addClass(emiClass);
-  } else {
-    container.removeClass(emiClass);
-  }
-}
-
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 var IRCTC_KEYS = [
@@ -589,8 +574,7 @@ Session.prototype = {
 
       var valid = true;
       var fields = ['contact', 'email'];
-      each(fields, function(option) {
-        var option = fields[option];
+      each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
           errorHandler.call(getSession(), {
@@ -1256,35 +1240,6 @@ Session.prototype = {
               invoke('focus', el_expiry, null, 0);
             }
           }
-        })
-        .on('bank', function() {
-          // If EMI is disabled or if plans don't exist, do nothing.
-          if (!preferences.methods.emi || !preferences.methods.emi_plans) {
-            return;
-          }
-
-          var emi_plans = preferences.methods.emi_plans;
-
-          /**
-           * Continue if we found an issuing bank and there are plans for that bank.
-           */
-          if (this.bank && emi_plans[this.bank]) {
-            var emi_plan = emi_plans[this.bank],
-              session = getSession(),
-              amount = session.get('amount');
-
-            // Check for amount.
-            if (amount >= emi_plan.min_amount) {
-              // Enable EMI checkbox.
-              toggleEMI(true);
-            } else {
-              // Disable EMI checkbox.
-              toggleEMI(false);
-            }
-          } else {
-            // Disable EMI checkbox.
-            toggleEMI(false);
-          }
         });
 
       delegator.expiry = delegator
@@ -1760,9 +1715,9 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(text);
-      $('#form-otp')
-        [actionState]('action')
-        [loadingState]('loading');
+      var formOtp = $('#form-otp');
+      formOtp[actionState]('action');
+      formOtp[loadingState]('loading');
     } else {
       $('#fd-t').html(text);
       showOverlay($('#error-message')[loadingState]('loading'));

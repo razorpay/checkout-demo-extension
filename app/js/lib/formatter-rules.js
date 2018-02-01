@@ -78,37 +78,10 @@ function getDecimalAmount(amount) {
     return '';
   }
 
-  /**
-   * Method to get the issuing bank.
-   * @param {String} value Card number
-   * @return {String|Null}
-   */
-  function getIssuingBank(value) {
-    var cardNum = value.replace(/\ /g, ''); // Remove spaces
-    var issuingBank = null;
-
-    // Loop through all bank patterns and see if the card number matches any bank.
-    for (var bank in emi_options.banks) {
-      if (emi_options.banks[bank].patt.test(cardNum)) {
-        issuingBank = bank;
-        break;
-      }
-    }
-    for (var bank in emi_options.other_banks) {
-      if (emi_options.other_banks[bank].patt.test(cardNum)) {
-        issuingBank = bank;
-        break;
-      }
-    }
-
-    return issuingBank;
-  }
-
   Formatter.rules = {
     card: {
       setValue: function(value) {
         var currentType = (this.currentType = getType(value));
-        var issuingBank = (this.issuingBank = getIssuingBank(value));
 
         if (currentType !== this.type) {
           this.maxLen = getMaxLen(currentType);
@@ -131,20 +104,12 @@ function getDecimalAmount(amount) {
         var o = {
           type: this.currentType,
           maxLen: this.maxLen,
-          valid: this.isValid(),
-          bank: this.issuingBank
+          valid: this.isValid()
         };
         if (o.type !== this.type) {
           this.type = o.type;
           this.emit('network', o);
         }
-
-        // If the bank has changed, emit an event.
-        if (o.bank !== this.bank) {
-          this.bank = o.bank;
-          this.emit('bank', o);
-        }
-
         this.emit('change', o);
       },
 
