@@ -4,6 +4,7 @@
 		"innerHeight": true,
 		"pageYOffset": true
 	},
+	"scripturl": true,
 	"laxbreak": true,
 	"asi": true,
 	"curly": true,

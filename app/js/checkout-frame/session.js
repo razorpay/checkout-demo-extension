@@ -38,8 +38,11 @@ function handleRelay(relayObj) {
         self.magicView.setTimeout(30000);
         break;
       }
+    /* falls through */
     case 'abort_magic':
+    /* falls through */
     case 'error_message':
+    /* falls through */
     default:
       this.magicView.showPaymentPage();
       break;

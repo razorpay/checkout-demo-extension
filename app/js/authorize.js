@@ -173,7 +173,7 @@ Payment.prototype = {
     }
 
     if (this.isMagicPayment) {
-      CheckoutBridge.invokePopup(
+      window.CheckoutBridge.invokePopup(
         JSON.stringify({
           content: templates.popup(this),
           focus: false
@@ -591,7 +591,7 @@ var responseTypes = {
         popupOptions.url = url;
       }
 
-      CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
+      window.CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
     } else if (popup) {
       if (direct) {
         // direct is true for payzapp
