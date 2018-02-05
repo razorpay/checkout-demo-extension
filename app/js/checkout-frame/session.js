@@ -7,10 +7,47 @@ var shownClass = 'drishy';
 
 var strings = {
   otpsend: 'Sending OTP to ',
-  process: 'Your payment is being processed'
+  process: 'Your payment is being processed',
+  redirect: 'Redirecting to Bank page'
 };
 
 var fontTimeout;
+
+/* this === session */
+function handleRelay(relayObj) {
+  var self = this;
+
+  if (
+    !(relayObj && relayObj.action) ||
+    !(this instanceof Session && this.magicView)
+  ) {
+    return;
+  }
+
+  switch (relayObj.action) {
+    case 'page_resolved':
+      this.magicView.pageResolved(relayObj.data);
+      break;
+
+    case 'otp_parsed':
+      this.magicView.otpParsed(relayObj.data);
+      break;
+
+    case 'otp_resent':
+      if (relayObj.data) {
+        self.magicView.setTimeout(30000);
+        break;
+      }
+    /* falls through */
+    case 'abort_magic':
+    /* falls through */
+    case 'error_message':
+    /* falls through */
+    default:
+      this.magicView.showPaymentPage();
+      break;
+  }
+}
 
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
@@ -247,6 +284,10 @@ function errorHandler(response) {
     }
   }
 
+  if (/^magic*/.test(this.screen)) {
+    this.switchTab('card');
+  }
+
   if (this.tab || message !== discreet.cancelMsg) {
     this.showLoadError(
       message || 'There was an error in handling your request',
@@ -264,6 +305,11 @@ function cancelHandler(response) {
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
+  } else if (
+    /^(card|emi)$/.test(this.payload.method) &&
+    this.screen !== 'card'
+  ) {
+    this.switchTab('card');
   }
 }
 
@@ -630,6 +676,28 @@ Session.prototype = {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
+    }
+  },
+
+  setMagic: function() {
+    if (!this.magicView && this.magic) {
+      $(this.el).addClass('magic');
+      this.magicView = new magicView(this);
+      this.magicView.setTimeout(10000);
+    }
+
+    this.magicView.resendCount = 0;
+    $('#magic-wrapper').removeClass('hide-resend');
+  },
+
+  destroyMagic: function() {
+    if (this.magicView) {
+      this.magicView.destroy();
+      delete this.magicView;
+    }
+
+    if (this.get('redirect')) {
+      $('#error-message .link').hide();
     }
   },
 
@@ -1250,6 +1318,9 @@ Session.prototype = {
 
     if (screen) {
       var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
+
+      screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
+
       gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
     } else {
@@ -1272,7 +1343,8 @@ Session.prototype = {
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
         this.upi_intents_data &&
-        !$('#form-upi .item :checked')[0])
+        !$('#form-upi .item :checked')[0]) ||
+      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
     ) {
       showPaybtn = false;
     }
@@ -1288,6 +1360,13 @@ Session.prototype = {
       tab = 'wallet';
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
+    } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
+      if (confirmClose()) {
+        tab = 'card';
+        this.clearRequest();
+      } else {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -1728,10 +1807,13 @@ Session.prototype = {
     if (powerotp) {
       powerotp.value = '';
     }
+
     if (this.r._payment) {
       hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
     }
+
+    this.destroyMagic();
     abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
@@ -1758,6 +1840,13 @@ Session.prototype = {
 
     if (screen === 'otp') {
       return this.onOtpSubmit();
+    }
+
+    if (/^magic/.test(screen)) {
+      var magicData = {};
+      fillData('#form-' + screen, magicData);
+      this.magicView.submit(screen, magicData);
+      return;
     }
 
     this.refresh();
@@ -1827,8 +1916,11 @@ Session.prototype = {
 
   submit: function() {
     var data = this.payload;
+    var that = this;
     var request = {
-      fees: preferences.fee_bearer
+      fees: preferences.fee_bearer,
+      sdk_popup: this.sdk_popup,
+      magic: this.magic
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
@@ -1910,6 +2002,28 @@ Session.prototype = {
       .on('payment.cancel', bind(cancelHandler, this));
 
     var sub_link = $('#error-message .link');
+
+    if (this.r._payment && this.r._payment.isMagicPayment) {
+      window.handleRelay = handleRelay.bind(this);
+    }
+
+    this.r.on('magic.init', function() {
+      that.setMagic();
+      that.showLoadError('Please wait while we fetch your transaction details');
+
+      if (that.r._payment && that.r._payment.isMagicPayment) {
+        sub_link[0].style = '';
+        sub_link.on('click', function() {
+          if (that.magicView) {
+            that.magicView.showPaymentPage({
+              otpelf: true,
+              magic: false
+            });
+          }
+        });
+      }
+    });
+
     if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);
@@ -1945,7 +2059,6 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
-      var that = this;
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError('Waiting for payment confirmation.');

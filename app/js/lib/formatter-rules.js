@@ -51,7 +51,9 @@ function getDecimalAmount(amount) {
   function luhnCheck(num) {
     var odd = true;
     var sum = 0;
-    var digits = String(num).split('').reverse();
+    var digits = String(num)
+      .split('')
+      .reverse();
     for (var i = 0; i < digits.length; i++) {
       var digit = digits[i];
       digit = parseInt(digit, 10);

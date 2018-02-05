@@ -12,7 +12,7 @@ var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 }
 `?`
 
-.button, .btn, .submit-button
+.button, .btn, .submit-button, .loader::after
 {
   background: `=c`;
 }
@@ -82,7 +82,7 @@ input[type=checkbox]:checked + .checkbox
   border-bottom: 2px solid `=c`;
 }
 
-.list :checked+label {
+.list :checked+label, .list .item.active {
   border-color: `=c` !important;
 }
 

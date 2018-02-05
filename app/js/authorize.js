@@ -129,9 +129,16 @@ function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   this.fees = params.fees;
+  this.sdk_popup = params.sdk_popup;
+  this.magic = params.magic;
+
+  this.isMagicPayment =
+    this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
+
   this.powerwallet =
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
+
   this.tryPopup();
 
   if (params.paused) {
@@ -156,6 +163,25 @@ Payment.prototype = {
 
   off: function() {
     this.r.off('payment');
+  },
+
+  checkSdkPopup: function() {
+    var data = this.data;
+
+    if (this.sdk_popup) {
+      window.onpaymentcancel = bind(onPaymentCancel, this);
+    }
+
+    if (this.isMagicPayment) {
+      window.CheckoutBridge.invokePopup(
+        JSON.stringify({
+          content: templates.popup(this),
+          focus: false
+        })
+      );
+
+      return true;
+    }
   },
 
   checkRedirect: function() {
@@ -243,9 +269,10 @@ Payment.prototype = {
     }
 
     // redirect if specified
-    if (this.checkRedirect()) {
+    if (!this.checkSdkPopup() && this.checkRedirect()) {
       return;
     }
+
     // show loading screen in popup
     this.writePopup();
 
@@ -254,7 +281,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if (discreet.isFrame && !this.powerwallet) {
+    if ((discreet.isFrame && !this.powerwallet) || this.isMagicPayment) {
       var complete = (window.onComplete = bind(this.complete, this));
       pollPaymentData(complete);
     }
@@ -311,6 +338,7 @@ Payment.prototype = {
       this.popup.onClose = null;
       this.popup.close();
     } catch (e) {}
+
     this.done = true;
     Razorpay.popup_delay = null;
     clearInterval(this.popup_track_interval);
@@ -320,6 +348,10 @@ Payment.prototype = {
     if (this.offmessage) {
       this.offmessage();
     }
+
+    delete window.onpaymentcancel;
+    delete window.handleRelay;
+
     clearPollingInterval();
     abortAjax(this.ajax);
     this.r._payment = null;
@@ -535,7 +567,32 @@ var responseTypes = {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-    if (popup) {
+
+    if (this.isMagicPayment) {
+      this.r.emit('magic.init');
+
+      var popupOptions = {
+        focus: false,
+        magic: true,
+        otelf: true
+      };
+
+      if (direct) {
+        popupOptions.content = content;
+      } else {
+        var url =
+          "javascript: submitForm('" +
+          request.url +
+          "', " +
+          JSON.stringify(request.content) +
+          ", '" +
+          request.method +
+          "')";
+        popupOptions.url = url;
+      }
+
+      window.CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
+    } else if (popup) {
       if (direct) {
         // direct is true for payzapp
         popup.write(content);

@@ -235,9 +235,10 @@ body{
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
   <script>
-    var gel = document.getElementById.bind(document);
+    var doc = document;
+    var gel = doc.getElementById.bind(doc);
     setTimeout(function() {
-      document.body.className = 'loaded';
+      doc.body.className = 'loaded';
     }, 10);
 
     setTimeout(function(){
@@ -246,6 +247,14 @@ body{
       gel('cncl').onclick = function () {
         if (window.confirm("Do you want to cancel the ongoing payment?")) {
           window.close();
+
+          if (CheckoutBridge && CheckoutBridge.oncomplete) {
+            CheckoutBridge.oncomplete(JSON.stringify({
+              error: {
+                description: 'Payment Cancelled'
+              }
+            }));
+          }
         }
       };
 
@@ -253,6 +262,48 @@ body{
         opener.Razorpay.popup_delay();
       } catch(e){}
     }, 10000);
+
+`?_.sdk_popup`
+    function submitForm(action, data, method) {
+      if (method === 'get') {
+        window.location = action;
+        return;
+      }
+
+      var form = document.createElement('form');
+      form.setAttribute('action', action);
+
+      if (method) {
+        form.setAttribute('method', method);
+      }
+      if (data) {
+        form.innerHTML = deserialize(data);
+      }
+
+      doc.body.appendChild(form);
+      form.submit();
+      doc.body.removeChild(form);
+    }
+
+    function deserialize(data, key) {
+      if (typeof data === 'object' && data !== null) {
+        var str = '';
+        for (name in data) {
+          if (!data.hasOwnProperty(name)) {
+            return;
+          }
+          value = data[name];
+          if (key) {
+            name = key + '[' + name + ']';
+          }
+          str += deserialize(value, name);
+        }
+
+        return str;
+      }
+      return '<input type="hidden" name="' + key + '" value="' + data + '">';
+    }
+`?`
   </script>
 </body>
 </html>

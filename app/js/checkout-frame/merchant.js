@@ -554,6 +554,11 @@ function showModal(session) {
   var saved_customer = preferences.customer;
   var filters = {};
 
+  /* TODO: remove */
+  preferences.magic = true;
+
+  session.magic = session.magic && preferences.magic;
+
   if (preferences.global === false) {
     session.local = true;
     customer = new Customer('');
@@ -895,6 +900,10 @@ window.handleMessage = function(message) {
   if (message.upi_intents_data && message.upi_intents_data.length) {
     session.upi_intents_data = message.upi_intents_data;
   }
+
+  session.sdk_popup = message.sdk_popup;
+
+  session.magic = message.magic;
 
   session.ua_Android = ua_Android;
 

@@ -116,6 +116,7 @@ html {
     font-size: 12px;
     line-height: 15px;
     margin-top: 4px;
+    line-height: 18px;
   }
 
   :checked + label .checkbox::after {
@@ -150,6 +151,12 @@ html {
 
     &.has-offer::after {
       z-index: 0;
+    }
+
+    &.active {
+      border: 1px solid $bc;
+      border-radius: $br;
+      padding: 12px 24px;
     }
   }
 
