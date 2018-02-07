@@ -1164,6 +1164,14 @@ Session.prototype = {
     this.click('#backdrop', this.hideErrorMessage);
     this.click('#overlay', this.hideErrorMessage);
     this.click('#fd-hide', this.hideErrorMessage);
+    this.click('#error-message .link', function() {
+      if (confirmClose()) {
+        this.clearRequest();
+        hideOverlayMessage();
+      } else {
+        return;
+      }
+    });
   },
 
   bindIeEvents: function() {
@@ -2178,6 +2186,8 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
+      var self = this;
+
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError('Waiting for payment confirmation.');
