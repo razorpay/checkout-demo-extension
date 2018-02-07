@@ -416,7 +416,6 @@ Payment.prototype = {
         ajax_options.headers['x-order-id'] = data.order_id;
       }
     }
-
     track(razorpayInstance, 'ajax');
     this.ajax = ajaxFn(ajax_options);
     return this.ajax;
@@ -640,6 +639,21 @@ var responseTypes = {
     var url = request.url;
 
     var intent_url = (fullResponse.data || {}).intent_url;
+
+    var ra = function() {
+      return recurseAjax(
+        url,
+        function(response) {
+          this.complete(response);
+        },
+        function(response) {
+          return response && response.status;
+        },
+        null,
+        $.jsonp
+      );
+    };
+
     this.on('upi.intent_response', function(data) {
       if (isEmptyObject(data)) {
         return self.emit('cancel', {
@@ -650,22 +664,43 @@ var responseTypes = {
       } else {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-
-      self.ajax = recurseAjax(
-        url,
-        function(response) {
-          self.complete(response);
-        },
-        function(response) {
-          return response && response.status;
-        },
-        null,
-        $.jsonp
-      );
+      self.ajax = ra();
     });
+
     var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       CheckoutBridge.callNativeIntent(intent_url);
+    } else if (ua_android_browser) {
+      // Start interval
+      var timer = 0,
+        intvl;
+      intvl = setInterval(function() {
+        timer++;
+        if (timer > 4) {
+          self.emit('upi.noapp');
+          clearInterval(intvl);
+        }
+      }, 1000);
+
+      var blurHandler = function() {
+        if (timer <= 4) {
+          clearInterval(intvl);
+        }
+        self.emit('upi.selectapp');
+      };
+
+      var focHandler = function() {
+        self.emit('upi.pending', { flow: 'upi-intent' });
+
+        window.removeEventListener('blur', blurHandler);
+        window.removeEventListener('focus', focHandler);
+        ra();
+      };
+
+      window.addEventListener('blur', blurHandler);
+      window.addEventListener('focus', focHandler);
+
+      window.location = fullResponse.data.intent_url;
     }
   },
 

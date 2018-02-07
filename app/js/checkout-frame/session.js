@@ -1075,6 +1075,15 @@ Session.prototype = {
       this.on('change', '#form-upi', function(e) {
         $('#body').toggleClass('sub', e.target.value);
       });
+
+      this.click('#error-message .link', function() {
+        if (confirmClose()) {
+          this.clearRequest();
+          hideOverlayMessage();
+        } else {
+          return;
+        }
+      });
     }
 
     if (this.get('ecod')) {
@@ -2059,6 +2068,18 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
+
+      this.r.on('payment.upi.noapp', function(data) {
+        that.showLoadError(
+          'No UPI App on this device. Select other UPI option to proceed.',
+          true
+        );
+      });
+
+      this.r.on('payment.upi.selectapp', function(data) {
+        that.showLoadError('Select UPI App in your device', false);
+      });
+
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError('Waiting for payment confirmation.');
