@@ -25,11 +25,6 @@ magicView.prototype = {
     this.bind();
   },
 
-  onchange: function(e) {
-    this.opts.selected = e.target.value;
-    this.render();
-  },
-
   on: function(event, sel, listener) {
     var $el = $(sel);
     this.listeners.push($el.on(event, listener));
@@ -72,6 +67,7 @@ magicView.prototype = {
 
   destroy: function() {
     this.unbind();
+    this.clearTimeout();
   },
 
   resetLoader: function() {
@@ -92,6 +88,8 @@ magicView.prototype = {
     options.focus = options.focus || true;
     options.magic = options.magic || false;
     options.otpelf = options.otpelf || false;
+
+    console.log('showPaymentPage', options);
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       this.clearTimeout();

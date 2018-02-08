@@ -1940,7 +1940,7 @@ Session.prototype = {
     var request = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
-      magic: this.magic
+      magic: this.magic && gel('quickpay-check').checked
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
