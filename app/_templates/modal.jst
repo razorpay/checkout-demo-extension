@@ -200,19 +200,34 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
                     `?`
                     `?method.card`
-                    <div class="payment-option item" tab="card">
-                      <label>
-                        <i>&#xe609;</i>
-                        `=_.tab_titles.card`
-                        <span class="desc">
-                          `?_.recurring_card_text`
-                            `=_.recurring_card_text`
-                          `??`
-                            Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`
-                          `?`
-                        </span>
-                      </label>
-                    </div>
+                      `?o('theme.debit_card')`
+                      <div class="payment-option item" tab="credit_card">
+                        <label>
+                          <i>&#xe609;</i>
+                          `=_.tab_titles.credit_card`
+                        </label>
+                      </div>
+                      <div class="payment-option item" tab="debit_card">
+                        <label>
+                          <i>&#xe609;</i>
+                          `=_.tab_titles.debit_card`
+                        </label>
+                      </div>
+                      `??`
+                      <div class="payment-option item" tab="card">
+                        <label>
+                          <i>&#xe609;</i>
+                          `=_.tab_titles.card`
+                          <span class="desc">
+                            `?_.recurring_card_text`
+                              `=_.recurring_card_text`
+                            `??`
+                              Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`
+                            `?`
+                          </span>
+                        </label>
+                      </div>
+                      `?`
                     `?`
                     `?method.netbanking`
                     <div class="payment-option item" tab="netbanking">

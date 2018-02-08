@@ -383,6 +383,11 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
+var BESCOM_KEYS = [
+  'rzp_test_4xCw30G54xtajT',
+  'rzp_live_WsP69jGXMvttYD',
+  'rzp_test_4xCw30G54xtajT'
+];
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -468,6 +473,8 @@ Session.prototype = {
       tab_titles.card = 'Debit/Credit Card';
       this.irctc = true;
       this.r.set('theme.image_frame', false);
+    } else if (BESCOM_KEYS.indexOf(key) !== -1) {
+      this.r.set('theme.debit_card', true);
     }
 
     if (getter('theme.emi_mode')) {
@@ -1317,7 +1324,8 @@ Session.prototype = {
     makeHidden('.screen.' + shownClass);
 
     if (screen) {
-      var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
+      var screenTitle =
+        this.tab === 'emi' ? 'EMI' : tab_titles[this.cardTab || screen];
 
       screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
 
@@ -1392,6 +1400,12 @@ Session.prototype = {
       }
     }
     if (tab) {
+      if (tab === 'credit_card' || tab === 'debit_card') {
+        this.cardTab = tab;
+        tab = 'card';
+      } else {
+        this.cardTab = null;
+      }
       var contact = getPhone();
       if (
         (!contact && !this.optional.contact) ||

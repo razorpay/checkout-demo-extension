@@ -303,6 +303,8 @@ var emi_options = (sessProto.emi_options = {
 });
 
 var tab_titles = (sessProto.tab_titles = {
+  debit_card: 'Debit Card',
+  credit_card: 'Credit Card',
   emandate: 'Bank Account',
   emi: 'EMI',
   card: 'Card',
