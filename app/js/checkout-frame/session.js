@@ -8,7 +8,8 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
-  redirect: 'Redirecting to Bank page'
+  redirect: 'Redirecting to Bank page',
+  acs_load_delay: 'Seems like your bank page is taking time to load.'
 };
 
 var fontTimeout;
@@ -24,6 +25,8 @@ function handleRelay(relayObj) {
     return;
   }
 
+  console.log(relayObj);
+
   switch (relayObj.action) {
     case 'page_resolved':
       this.magicView.pageResolved(relayObj.data);
@@ -33,9 +36,12 @@ function handleRelay(relayObj) {
       this.magicView.otpParsed(relayObj.data);
       break;
 
+    case 'page_unload':
+      this.magicView.pageUnload(relayObj.data);
+      break;
+
     case 'otp_resent':
       if (relayObj.data) {
-        self.magicView.setTimeout(30000);
         break;
       }
     /* falls through */
