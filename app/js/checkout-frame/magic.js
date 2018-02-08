@@ -91,13 +91,13 @@ magicView.prototype = {
 
     options.focus = options.focus || true;
     options.magic = options.magic || false;
-    options.otpelf = options.otpelf || true;
+    options.otpelf = options.otpelf || false;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       this.clearTimeout();
       this.checkoutVisible = false;
+      self.session.showLoadError(strings.redirect);
       window.setTimeout(function() {
-        self.session.showLoadError(strings.redirect);
         CheckoutBridge.invokePopup(JSON.stringify(options));
         self.session.destroyMagic();
       }, 1000);
