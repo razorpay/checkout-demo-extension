@@ -8,7 +8,8 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
-  redirect: 'Redirecting to Bank page'
+  redirect: 'Redirecting to Bank page',
+  acs_load_delay: 'Seems like your bank page is taking time to load.'
 };
 
 var fontTimeout;
@@ -33,9 +34,12 @@ function handleRelay(relayObj) {
       this.magicView.otpParsed(relayObj.data);
       break;
 
+    case 'page_unload':
+      this.magicView.pageUnload(relayObj.data);
+      break;
+
     case 'otp_resent':
       if (relayObj.data) {
-        self.magicView.setTimeout(30000);
         break;
       }
     /* falls through */
@@ -1938,7 +1942,7 @@ Session.prototype = {
     var request = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
-      magic: this.magic
+      magic: this.magic && gel('quickpay-check').checked
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {

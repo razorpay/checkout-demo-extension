@@ -574,7 +574,7 @@ var responseTypes = {
       var popupOptions = {
         focus: false,
         magic: true,
-        otelf: true
+        otpelf: true
       };
 
       if (direct) {

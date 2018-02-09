@@ -1,3 +1,7 @@
+var TIMEOUT_UNKNOWN = 3000;
+var TIMEOUT_REDIRECT = 20000;
+var TIMEOUT_NO_OTP = 30000;
+
 function magicView(session) {
   this.session = session;
   this.opts = {
@@ -19,11 +23,6 @@ magicView.prototype = {
     this.unbind();
     gel('magic-wrapper').innerHTML = templates.magic(this.opts);
     this.bind();
-  },
-
-  onchange: function(e) {
-    this.opts.selected = e.target.value;
-    this.render();
   },
 
   on: function(event, sel, listener) {
@@ -68,12 +67,13 @@ magicView.prototype = {
 
   destroy: function() {
     this.unbind();
+    this.clearTimeout();
   },
 
   resetLoader: function() {
     $('#form-magic-otp .loader').removeClass('load');
 
-    setTimeout(function() {
+    window.setTimeout(function() {
       $('#form-magic-otp .loader').addClass('load');
     }, 100);
   },
@@ -83,6 +83,8 @@ magicView.prototype = {
       options = {};
     }
 
+    var self = this;
+
     options.focus = options.focus || true;
     options.magic = options.magic || false;
     options.otpelf = options.otpelf || false;
@@ -90,12 +92,16 @@ magicView.prototype = {
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       this.clearTimeout();
       this.checkoutVisible = false;
-      CheckoutBridge.invokePopup(JSON.stringify(options));
+      self.session.showLoadError(strings.redirect);
+      window.setTimeout(function() {
+        CheckoutBridge.invokePopup(JSON.stringify(options));
+        self.session.destroyMagic();
+      }, 1000);
     }
   },
 
   clearTimeout: function() {
-    clearTimeout(this.magicTimeout);
+    window.clearTimeout(this.magicTimeout);
     delete this.magicTimeout;
   },
 
@@ -108,15 +114,9 @@ magicView.prototype = {
 
     var timeoutFn = function() {
       if (self.magicTimeout) {
-        clearTimeout(self.magicTimeout);
+        window.clearTimeout(self.magicTimeout);
         delete self.magicTimeout;
-
-        setTimeout(function() {
-          self.showPaymentPage();
-        }, 1000);
-
-        self.session.showLoadError(strings.redirect);
-        self.session.destroyMagic();
+        self.showPaymentPage();
       }
     };
 
@@ -128,7 +128,7 @@ magicView.prototype = {
   },
 
   pageResolved: function(data) {
-    var timeout = 30000;
+    var timeout = TIMEOUT_NO_OTP;
     var isUnkown = false;
 
     if (data.bank && indexOf(this.supportedBanks, data.bank) < 0) {
@@ -154,12 +154,19 @@ magicView.prototype = {
         break;
 
       case 'unknown':
-        timeout = 3000;
+        timeout = TIMEOUT_UNKNOWN;
         isUnkown = true;
         break;
     }
 
     this.setTimeout(timeout);
+  },
+
+  pageUnload: function(data) {
+    var self = this;
+    this.clearTimeout();
+
+    this.setTimeout(TIMEOUT_REDIRECT);
   },
 
   resendOtp: function(e) {
@@ -181,6 +188,8 @@ magicView.prototype = {
       }
 
       if (resend) {
+        delete this.otpData;
+
         CheckoutBridge.relay(
           JSON.stringify({
             action: 'resend_otp'
@@ -214,7 +223,6 @@ magicView.prototype = {
 
     if (this.otpData) {
       this.otpParsed(this.otpData);
-      delete this.otpData;
     }
   },
 
@@ -232,8 +240,13 @@ magicView.prototype = {
       this.showView('magic-otp');
     }
 
+    if (data.otp) {
+      this.clearTimeout();
+    }
+
+    this.otpData = data;
+
     if (!$('#form-magic-otp').hasClass('waiting')) {
-      this.otpData = data;
       return;
     }
 
@@ -252,8 +265,6 @@ magicView.prototype = {
         data.bank +
         ".gif' height='13px'> " +
         data.sender;
-
-      this.setTimeout(30000);
     }
   },
 

@@ -132,6 +132,17 @@ $mobile-view() {
     bottom: 70px;
   }
 
+  #quickpay-btn {
+    display: block;
+  }
+
+  [screen=card], [screen=emi] {
+    #quickpay-btn {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+
   .close {
     font-size: 28px;
     line-height: 28px;
