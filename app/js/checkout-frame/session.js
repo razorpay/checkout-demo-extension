@@ -384,10 +384,11 @@ function cancel_upi(session) {
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 var BESCOM_KEYS = [
-  'rzp_test_4xCw30G54xtajT',
-  'rzp_live_WsP69jGXMvttYD',
-  'rzp_test_4xCw30G54xtajT'
+  'rzp_live_mCgKHRcN7vtiJu',
+  'rzp_test_4KnWim0fbqG2Lr',
+  'rzp_live_WsP69jGXMvttYD'
 ];
+
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -474,7 +475,10 @@ Session.prototype = {
       this.irctc = true;
       this.r.set('theme.image_frame', false);
     } else if (BESCOM_KEYS.indexOf(key) !== -1) {
-      this.r.set('theme.debit_card', true);
+      if (this.methods.card) {
+        this.r.set('theme.debit_card', true);
+        this.methods.count = this.methods.count + 1;
+      }
     }
 
     if (getter('theme.emi_mode')) {
@@ -2079,9 +2083,8 @@ Session.prototype = {
         }
 
         /* Otherwise it's directpay */
-        var vpa = data ? data.vpa : 'razorpay@icici';
         that.showLoadError(
-          'Please accept collect request from ' + vpa + ' on your UPI app'
+          "Please accept request from razorpay's vpa on your UPI app"
         );
       });
     } else {
