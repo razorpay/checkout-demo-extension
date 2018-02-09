@@ -89,8 +89,6 @@ magicView.prototype = {
     options.magic = options.magic || false;
     options.otpelf = options.otpelf || false;
 
-    console.log('showPaymentPage', options);
-
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       this.clearTimeout();
       this.checkoutVisible = false;
@@ -114,11 +112,7 @@ magicView.prototype = {
       return;
     }
 
-    console.log('Timeout set:', (new Date().getTime() / 1000) >>> 0);
-
     var timeoutFn = function() {
-      console.log('Timeout cleared:', (new Date().getTime() / 1000) >>> 0);
-
       if (self.magicTimeout) {
         window.clearTimeout(self.magicTimeout);
         delete self.magicTimeout;
