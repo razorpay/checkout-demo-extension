@@ -607,7 +607,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(this.order && this.order.bank)) {
+    if (tab && !((this.order && this.order.bank) || this.emandateTpv)) {
       this.switchTab(tab);
     }
 
@@ -655,6 +655,8 @@ Session.prototype = {
     }
     this.isOpen = true;
 
+    this.setTpvBanks();
+
     this.getEl();
     this.fillData();
     this.setEMI();
@@ -684,6 +686,48 @@ Session.prototype = {
         self.dismissReason = 'timeout';
         self.modal.hide();
       }, timeLeft);
+    }
+  },
+
+  setTpvBanks: function() {
+    var options = this.get();
+    var bankCode, accountNumber;
+
+    if (options['prefill.bank']) {
+      if (
+        this.methods.emandate &&
+        (options['prefill.bank_account[account_number]'] ||
+          options['prefill.aadhaar[number]'])
+      ) {
+        this.emandateTpv = true;
+        this.tab = this.oneMethod = 'emandate';
+      } else {
+        this.prefillBank = options['prefill.bank'];
+      }
+    }
+
+    if (this.order && this.order.bank) {
+      bankCode = this.order.bank;
+      accountNumber = this.order.account_number;
+    } else if (this.emandateTpv) {
+      bankCode = options['prefill.bank'];
+      accountNumber = options['prefill.bank_account[account_number]'];
+    }
+
+    if (bankCode) {
+      var banks = this.methods.emandate || this.methods.netbanking;
+
+      this.tpvBank = {
+        name:
+          typeof banks[bankCode] === 'object'
+            ? banks[bankCode].name
+            : banks[bankCode],
+        code: bankCode,
+        account_number: accountNumber,
+        image:
+          this.netbanks[bankCode].image ||
+          'https://cdn.razorpay.com/' + bankCode + '.gif'
+      };
     }
   },
 
@@ -1856,7 +1900,7 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
 
-    if (!this.tab && !this.order) {
+    if (!this.tab && !(this.order || this.emandateTpv)) {
       return;
     }
 
@@ -1880,6 +1924,37 @@ Session.prototype = {
 
       data.method = 'netbanking';
       data.bank = this.order.bank;
+    } else if (this.emandateTpv) {
+      data.method = 'emandate';
+      var opts = this.get();
+
+      var emandateFields = [
+        'bank',
+        'bank_account[name]',
+        'bank_account[account_number]',
+        'bank_account[ifsc]',
+        'aadhaar[number]',
+        'auth_type'
+      ];
+
+      each(opts, function(key, val) {
+        if (/^prefill\./.test(key)) {
+          var keyString = key.replace(/^prefill\./, '');
+
+          if (keyString && indexOf(emandateFields, keyString) > -1) {
+            data[keyString] = val;
+          }
+        }
+      });
+
+      var emandatePref = this.methods.emandate;
+
+      try {
+        var auth_types = this.emandateBanks[data.bank].auth_types;
+        if (!data.auth_type && auth_types.length === 1) {
+          data.auth_type = auth_types[0];
+        }
+      } catch (err) {}
     } else if (screen) {
       if (screen === 'card') {
         var formattingDelegator = this.delegator;

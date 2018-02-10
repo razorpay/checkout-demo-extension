@@ -14,9 +14,11 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
 var invoice = _.invoice;
-var bankName = banks && banks[order.bank];
-var bank = _.netbanks[order.bank] || {};
-bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
+
+var bank = _.tpvBank || {};
+
+var aadhaarNumber = o('prefill.aadhaar[number]');
+
 var amount;
 var amount_figure = _.formatAmount(o('amount'));
 if(o('display_currency'))
@@ -89,7 +91,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
             </div>
           `?`
         </div>
-        <div id="body"`?order.bank` class="sub"`?`>
+        <div id="body"`?_.tpvBank` class="sub"`?`>
           <div id="partial-back"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar">
             <div id="top-right">
@@ -150,30 +152,40 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     </select>
                   </div></div>
                   `?`
-                  `?order.bank`
+                  `?_.tpvBank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
                         `?bank.image`
                           <img src="`=bank.image`">
-                        `??`
-                          <img src="`=bank.logoURL`" />
                         `?`
-                        `?bankName`
-                          `=bankName`
+                        `?bank.name`
+                          `=bank.name`
                         `??`
                           Bank Details
                         `?`
                       </div>
-                      `?order.account_number`
+                      `?bank.account_number`
                         <div class="account-details clearfix">
                           <div class="float-left">Account</div>
-                          <div class="float-left text-uppercase">`=order.account_number`</div>
+                          <div class="float-left text-uppercase">`=bank.account_number`</div>
+                        </div>
+                      `?`
+                      `?_.optional.contact && _.optional.email && bank.ifsc`
+                        <div class="account-details clearfix">
+                          <div class="float-left">IFSC code</div>
+                          <div class="float-left text-uppercase">`=bank.ifsc`</div>
+                        </div>
+                      `?`
+                      `?aadhaarNumber`
+                        <div class="account-details clearfix">
+                          <div class="float-left">Aadhaar</div>
+                          <div class="float-left text-uppercase">`=aadhaarNumber`</div>
                         </div>
                       `?`
                     </div>
                   `?`
                 </div>
-                `?_.recurring && _.methods.count === 1 && _.methods.card`
+                `?_.recurring && !_.tab === 'emandate' && _.methods.count === 1 && _.methods.card`
                   <div class="pad recurring-message">
                     <span>&#x2139;</span>
                     `?o('subscription_id')`
@@ -193,7 +205,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     `?`
                   </div>
                 `?`
-                <div`?order.bank` class="showable"`?`>
+                <div`?_.tpvBank` class="showable"`?`>
                   <div class="legend">Select a payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
                     `?o('theme.emi_mode')`

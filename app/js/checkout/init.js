@@ -36,7 +36,15 @@ RazorpayDefaults.prefill = {
   vpa: '',
   'card[number]': '',
   'card[expiry]': '',
-  'card[cvv]': ''
+  'card[cvv]': '',
+
+  /* eMandate options */
+  bank: '',
+  'bank_account[name]': '',
+  'bank_account[account_number]': '',
+  'bank_account[ifsc]': '',
+  'aadhaar[number]': '',
+  auth_type: ''
 };
 
 RazorpayDefaults.readonly = {

@@ -370,6 +370,7 @@ function setPaymentMethods(session) {
         each(availMethods[emandate_method], function(bankCode, bankObj) {
           banks[bankCode] = bankObj.name;
         });
+        session.emandateBanks = availMethods[emandate_method];
         availMethods[emandate_method] = banks;
       } else if (availMethods.netbanking) {
         emandate_method = 'netbanking';
