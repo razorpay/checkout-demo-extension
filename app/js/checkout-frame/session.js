@@ -742,7 +742,7 @@ Session.prototype = {
     if (!this.magicView && this.magic) {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
-      this.magicView.setTimeout(10000);
+      this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION);
     }
 
     this.magicView.resendCount = 0;
