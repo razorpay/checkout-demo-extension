@@ -88,7 +88,7 @@ magicView.prototype = {
 
     options.focus = options.focus || true;
     options.magic = options.magic || false;
-    options.otpelf = options.otpelf || false;
+    options.otpelf = options.otpelf || true;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       this.clearTimeout();
