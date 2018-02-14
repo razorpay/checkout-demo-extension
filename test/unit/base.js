@@ -12,7 +12,9 @@ describe('base_configure should', function() {
     it('invalid option of different type', function() {
       var arg = getOptions();
       arg.currency = null;
-      expect(base_configure).withArgs(arg).to.not.throw();
+      expect(base_configure)
+        .withArgs(arg)
+        .to.not.throw();
     });
   });
 
@@ -29,7 +31,9 @@ describe('base_configure should', function() {
       });
 
       afterEach(function() {
-        expect(base_configure).withArgs(arg).to.throw();
+        expect(base_configure)
+          .withArgs(arg)
+          .to.throw();
       });
 
       it('primitive', function() {
@@ -98,37 +102,6 @@ describe('base_configure should', function() {
 });
 
 describe('discreet', function() {
-  describe('support check', function() {
-    var stub;
-    var origUa = window.ua;
-
-    beforeEach(function() {
-      stub = sinon.stub(window, 'alert');
-    });
-
-    afterEach(function() {
-      window.ua = origUa;
-      stub.restore();
-    });
-
-    it('shouldnt alert supported browser', function() {
-      discreet.supported(true);
-      expect(stub.callCount).to.be(0);
-    });
-
-    it('should alert unsupported browser', function() {
-      window.ua = 'Opera Mini/';
-      expect(discreet.supported(true)).to.be(false);
-      expect(stub.callCount).to.be(1);
-    });
-
-    it('shouldnt alert unsupported browser if no showAlert flag', function() {
-      window.ua = 'Opera Mini/';
-      expect(discreet.supported()).to.be(false);
-      expect(stub.callCount).to.be(0);
-    });
-  });
-
   describe('defaultError', function() {
     it('should provide minimal error object', function() {
       var errorObj;
@@ -307,7 +280,9 @@ describe('new Razorpay', function() {
   it('should throw if invalid options', function() {
     var options = {};
     var stub = sinon.stub(window, 'base_configure').throws();
-    expect(Razorpay).withArgs(options).to['throw']();
+    expect(Razorpay)
+      .withArgs(options)
+      .to['throw']();
     stub.restore();
   });
 });
