@@ -254,23 +254,7 @@ function testFromStack(counter, allOptions, done) {
       testFromStack(counter, allOptions, done);
     } else {
       allOptions = null;
-      createCoverageReport();
       done();
     }
   }).start();
-}
-
-function createCoverageReport() {
-  let collector = new istanbul.Collector();
-  let reporter = new istanbul.Reporter(false, 'coverage/final');
-
-  glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile) {
-    collector.add(require('./' + jsonFile));
-  });
-
-  reporter.add('lcovonly');
-  reporter.addAll(['clover', 'cobertura']);
-  reporter.add('html');
-  reporter.write(collector, true, function() {});
-  console.log('Report created in coverage/final');
 }
