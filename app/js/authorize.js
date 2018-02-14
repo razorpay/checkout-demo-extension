@@ -222,13 +222,15 @@ Payment.prototype = {
         'subscription_id',
         'customer_id',
         'recurring',
-        'subscription_card_change'
+        'subscription_card_change',
+        'recurring_token.max_amount',
+        'recurring_token.expire_by'
       ],
       function(i, field) {
         if (!(field in data)) {
           var val = getOption(field);
           if (val) {
-            data[field] = val;
+            data[field.replace(/\.(\w+)/g, '[$1]')] = val;
           }
         }
       }

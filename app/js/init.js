@@ -168,7 +168,11 @@ var RazorpayDefaults = (Razorpay.defaults = {
   target: '',
   subscription_card_change: null,
   display_currency: '',
-  display_amount: ''
+  display_amount: '',
+  recurring_token: {
+    max_amount: 0,
+    expire_by: 0
+  }
 });
 
 function base_configure(overrides) {
