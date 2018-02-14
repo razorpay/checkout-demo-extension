@@ -216,9 +216,6 @@ function createTestRibbon() {
 var frameContainer, frameBackdrop, testRibbon, preloadedFrame;
 
 function getPreloadedFrame(rzp) {
-  if (!discreet.supported()) {
-    return;
-  }
   if (preloadedFrame) {
     preloadedFrame.openRzp(rzp);
   } else {
@@ -254,10 +251,6 @@ RazorProto.onNew = function(event, callback) {
 };
 
 RazorProto.open = needBody(function() {
-  if (!this.get('redirect') && !discreet.supported(true)) {
-    return;
-  }
-
   var frame = (this.checkoutFrame = getPreloadedFrame(this));
   track(this, 'open');
 
