@@ -1,7 +1,8 @@
 let plugins = require('./rollup.plugins');
 
 const modules = {
-  eventer: 'Eventer'
+  eventer: 'Eventer',
+  evthandler: 'EvtHandler'
 };
 
 function getOptions(module) {
