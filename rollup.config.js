@@ -1,14 +1,16 @@
 let plugins = require('./rollup.plugins');
 
-const files = ['eventer'];
+const modules = {
+  eventer: 'Eventer'
+};
 
-function getOptions(input, file) {
+function getOptions(module) {
   return {
-    input,
+    input: `app/modules/${module}.js`,
     output: {
-      file,
+      file: `app/js/generated/${module}.js`,
       format: 'iife',
-      name: 'self'
+      name: modules[module]
     },
     plugins,
 
@@ -19,6 +21,4 @@ function getOptions(input, file) {
   };
 }
 
-module.exports = files.map(file =>
-  getOptions(`app/modules/${file}.js`, `app/js/generated/${file}.js`)
-);
+module.exports = Object.keys(modules).map(m => getOptions(m));
