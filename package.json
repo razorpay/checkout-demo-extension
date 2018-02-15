@@ -42,8 +42,6 @@
   "dependencies": {
     "autoprefixer-stylus": "^0.14.0",
     "aws-sdk": "^2.186.0",
-    "body-parser": "^1.18.2",
-    "express": "^4.16.2",
     "glob": "^7.1.2",
     "gulp": "^3.9.1",
     "gulp-jshint": "^2.1.0",
