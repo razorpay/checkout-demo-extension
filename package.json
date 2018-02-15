@@ -26,7 +26,7 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "test": "gulp test:unit",
+    "test": "rollup -c && gulp test:unit",
     "build": "rollup -c --environment prod && gulp build",
     "precommit": "lint-staged"
   },

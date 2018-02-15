@@ -17,7 +17,7 @@ deploy:
     steps:
         - script:
             name: build
-            code: gulp
+            code: npm run build
 
         - nhuray/aws-code-deploy:
             key: $AWS_KEY
