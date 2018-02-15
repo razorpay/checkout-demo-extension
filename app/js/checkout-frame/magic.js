@@ -1,6 +1,7 @@
+var TIMEOUT_NO_OTP = 30000;
 var TIMEOUT_UNKNOWN = 3000;
 var TIMEOUT_REDIRECT = 20000;
-var TIMEOUT_NO_OTP = 30000;
+var TIMEOUT_MAGIC_NO_ACTION = 30000;
 
 function magicView(session) {
   this.session = session;
@@ -15,7 +16,7 @@ function magicView(session) {
     'magic-otp': 'submit_otp'
   };
 
-  this.supportedBanks = ['unknown', 'HDFC', 'ICIC'];
+  this.supportedBanks = ['unknown', 'HDFC'];
 }
 
 magicView.prototype = {
@@ -87,7 +88,7 @@ magicView.prototype = {
 
     options.focus = options.focus || true;
     options.magic = options.magic || false;
-    options.otpelf = options.otpelf || false;
+    options.otpelf = options.otpelf || true;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       this.clearTimeout();
