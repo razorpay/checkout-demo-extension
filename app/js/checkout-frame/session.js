@@ -693,7 +693,8 @@ Session.prototype = {
     var options = this.get();
     var bankCode, accountNumber;
 
-    if (options['prefill.bank']) {
+    var prefillBank = options['prefill.bank'];
+    if (prefillBank) {
       if (
         this.methods.emandate &&
         (options['prefill.bank_account[account_number]'] ||
@@ -702,15 +703,15 @@ Session.prototype = {
         this.emandateTpv = true;
         this.tab = this.oneMethod = 'emandate';
       } else {
-        this.prefillBank = options['prefill.bank'];
+        this.tab = this.oneMethod = 'netbanking';
       }
     }
 
     if (this.order && this.order.bank) {
       bankCode = this.order.bank;
       accountNumber = this.order.account_number;
-    } else if (this.emandateTpv) {
-      bankCode = options['prefill.bank'];
+    } else if (prefillBank) {
+      bankCode = prefillBank;
       accountNumber = options['prefill.bank_account[account_number]'];
     }
 
@@ -2001,6 +2002,8 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
+    } else if (this.oneMethod === 'netbanking') {
+      data.bank = this.get('prefill.bank');
     } else {
       return;
     }
