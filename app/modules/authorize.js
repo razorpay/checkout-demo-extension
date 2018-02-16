@@ -1,9 +1,3 @@
-var templates = {};
-
-if (!discreet.isFrame) {
-  trackingProps.library = 'razorpayjs';
-}
-
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -116,7 +110,7 @@ function trackNewPayment(data, params, r) {
   });
 }
 
-function Payment(data, params, r) {
+export default function Payment(data, params, r) {
   this._time = new Date().getTime();
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
@@ -351,12 +345,12 @@ Payment.prototype = {
       this.offmessage();
     }
 
-    delete window.onpaymentcancel;
-    delete window.handleRelay;
-
     clearPollingInterval();
     abortAjax(this.ajax);
     this.r._payment = null;
+
+    delete window.onpaymentcancel;
+    delete window.handleRelay;
   },
 
   tryAjax: function() {

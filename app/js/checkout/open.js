@@ -8,8 +8,6 @@ var currentScript =
     return scripts[scripts.length - 1];
   })();
 
-var communicator;
-
 /**
   default handler for success
   it just submits everything via the form

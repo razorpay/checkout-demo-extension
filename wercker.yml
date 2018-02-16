@@ -5,7 +5,7 @@ build:
 
         - script:
             name: Unit Test
-            code: gulp test:unit
+            code: npm run test
 
     after-steps:
         - slack-notifier:

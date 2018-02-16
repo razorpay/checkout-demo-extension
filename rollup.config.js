@@ -3,7 +3,8 @@ let plugins = require('./rollup.plugins');
 const modules = {
   eventer: 'Eventer',
   evthandler: 'EvtHandler',
-  popup: 'Popup'
+  popup: 'Popup',
+  authorize: 'Payment'
 };
 
 function getOptions(module) {
