@@ -27,10 +27,6 @@ deploy:
             deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
             s3-bucket: rzp-code-deploy
 
-        - script:
-            name: Cloudfront cache invalidate
-            code: node scripts/invalidate.js
-
     after-steps:
         - slack-notifier:
             url: $SLACK_URL
