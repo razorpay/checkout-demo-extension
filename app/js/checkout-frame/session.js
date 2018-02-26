@@ -15,7 +15,7 @@ var strings = {
 var fontTimeout;
 
 /* this === session */
-window.handleRelay = function(relayObj) {
+function handleRelay(relayObj) {
   var self = this;
 
   if (
@@ -51,7 +51,7 @@ window.handleRelay = function(relayObj) {
       this.magicView.showPaymentPage();
       break;
   }
-};
+}
 
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
