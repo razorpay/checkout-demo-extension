@@ -725,7 +725,7 @@ Session.prototype = {
         code: bankCode,
         account_number: accountNumber,
         image:
-          this.netbanks[bankCode].image ||
+          (this.netbanks[bankCode] && this.netbanks[bankCode].image) ||
           'https://cdn.razorpay.com/' + bankCode + '.gif'
       };
     }
