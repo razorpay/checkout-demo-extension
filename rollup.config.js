@@ -13,6 +13,7 @@ function getOptions(module) {
     output: {
       file: `app/js/generated/${module}.js`,
       format: 'iife',
+      strict: false,
       name: modules[module]
     },
     plugins,

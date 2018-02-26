@@ -107,9 +107,9 @@ gulp.task('uglify', () => {
           cb();
         })
       )
-      // .pipe(jshint())
-      // .pipe(jshint.reporter(stylish))
-      // .pipe(jshint.reporter('fail'))
+      .pipe(jshint())
+      .pipe(jshint.reporter(stylish))
+      .pipe(jshint.reporter('fail'))
       .pipe(
         uglify({
           compress: {
