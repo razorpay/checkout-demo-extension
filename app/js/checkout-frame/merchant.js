@@ -554,9 +554,6 @@ function showModal(session) {
   var saved_customer = preferences.customer;
   var filters = {};
 
-  /* TODO: remove */
-  preferences.magic = true;
-
   session.magic = session.magic && preferences.magic;
 
   if (preferences.global === false) {
@@ -937,6 +934,7 @@ window.handleMessage = function(message) {
   try {
     if (isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
+      CheckoutBridge.sendExtraAnalyticsData = noop;
     }
   } catch (e) {}
 };
