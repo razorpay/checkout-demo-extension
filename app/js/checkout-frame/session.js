@@ -9,7 +9,8 @@ var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
   redirect: 'Redirecting to Bank page',
-  acs_load_delay: 'Seems like your bank page is taking time to load.'
+  acs_load_delay: 'Seems like your bank page is taking time to load.',
+  otp_resent: 'OTP resent'
 };
 
 var fontTimeout;

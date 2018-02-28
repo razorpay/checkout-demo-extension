@@ -3,6 +3,9 @@ var TIMEOUT_UNKNOWN = 3000;
 var TIMEOUT_REDIRECT = 20000;
 var TIMEOUT_MAGIC_NO_ACTION = 30000;
 
+var TOAST_SHORT = 0;
+var TOAST_LONG = 1;
+
 function magicView(session) {
   this.session = session;
   this.opts = {
@@ -190,6 +193,9 @@ magicView.prototype = {
 
       if (resend) {
         delete this.otpData;
+        if (CheckoutBridge && CheckoutBridge.toast) {
+          CheckoutBridge.toast(strings.otp_resent, TOAST_SHORT);
+        }
 
         CheckoutBridge.relay(
           JSON.stringify({
