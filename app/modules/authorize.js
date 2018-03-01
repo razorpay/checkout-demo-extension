@@ -349,8 +349,12 @@ Payment.prototype = {
     abortAjax(this.ajax);
     this.r._payment = null;
 
-    delete window.onpaymentcancel;
-    delete window.handleRelay;
+    if (this.sdk_popup) {
+      window.onpaymentcancel = null;
+    }
+    if (this.isMagicPayment) {
+      window.handleRelay = null;
+    }
   },
 
   tryAjax: function() {

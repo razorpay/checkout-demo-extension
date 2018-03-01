@@ -1380,6 +1380,8 @@ Session.prototype = {
 
       gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
+      $('.elem-email').addClass('mature');
+      $('.elem-contact').addClass('mature');
     } else {
       makeHidden('#topbar');
     }
@@ -1687,6 +1689,9 @@ Session.prototype = {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
     }
+    if (form === 'emandate') {
+      form = 'netbanking';
+    }
     return '#form-' + form;
   },
 
@@ -1698,6 +1703,7 @@ Session.prototype = {
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
+
     var optional = this.optional;
 
     if (optional) {
@@ -1995,7 +2001,10 @@ Session.prototype = {
         screen = 'netbanking';
         data.bank = $('#bank-select').val();
         data.method = 'emandate';
-      } else if (screen === 'upi') {
+      }
+
+      // perform the actual validation
+      if (screen === 'upi') {
         if (this.checkInvalid('#form-upi input:checked + label')) {
           return;
         }
