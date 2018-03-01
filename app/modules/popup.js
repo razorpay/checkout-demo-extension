@@ -22,7 +22,7 @@ function getPopupDimension(varVal, minVal, maxVal) {
  * The "Popup" constructor.
  */
 
-var Popup = function(src, name) {
+export default function Popup(src, name) {
   var width = window.innerWidth || document.documentElement.clientWidth;
   var height = window.innerHeight || document.documentElement.clientHeight;
 
@@ -77,7 +77,7 @@ var Popup = function(src, name) {
 
   this.on('beforeunload', this.beforeunload);
   this.on('unload', this.close);
-};
+}
 
 Popup.prototype = {
   on: function(event, func) {

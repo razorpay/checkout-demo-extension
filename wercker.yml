@@ -5,7 +5,7 @@ build:
 
         - script:
             name: Unit Test
-            code: gulp test:unit
+            code: npm run test
 
     after-steps:
         - slack-notifier:
@@ -17,7 +17,7 @@ deploy:
     steps:
         - script:
             name: build
-            code: gulp
+            code: npm run build
 
         - nhuray/aws-code-deploy:
             key: $AWS_KEY
@@ -26,10 +26,6 @@ deploy:
             application-name: checkout
             deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
             s3-bucket: rzp-code-deploy
-
-        - script:
-            name: Cloudfront cache invalidate
-            code: node scripts/invalidate.js
 
     after-steps:
         - slack-notifier:

@@ -693,7 +693,8 @@ Session.prototype = {
     var options = this.get();
     var bankCode, accountNumber;
 
-    if (options['prefill.bank']) {
+    var prefillBank = options['prefill.bank'];
+    if (prefillBank) {
       if (
         this.methods.emandate &&
         (options['prefill.bank_account[account_number]'] ||
@@ -702,15 +703,15 @@ Session.prototype = {
         this.emandateTpv = true;
         this.tab = this.oneMethod = 'emandate';
       } else {
-        this.prefillBank = options['prefill.bank'];
+        this.tab = this.oneMethod = 'netbanking';
       }
     }
 
     if (this.order && this.order.bank) {
       bankCode = this.order.bank;
       accountNumber = this.order.account_number;
-    } else if (this.emandateTpv) {
-      bankCode = options['prefill.bank'];
+    } else if (prefillBank) {
+      bankCode = prefillBank;
       accountNumber = options['prefill.bank_account[account_number]'];
     }
 
@@ -1379,6 +1380,8 @@ Session.prototype = {
 
       gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
+      $('.elem-email').addClass('mature');
+      $('.elem-contact').addClass('mature');
     } else {
       makeHidden('#topbar');
     }
@@ -1686,6 +1689,9 @@ Session.prototype = {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
     }
+    if (form === 'emandate') {
+      form = 'netbanking';
+    }
     return '#form-' + form;
   },
 
@@ -1697,6 +1703,7 @@ Session.prototype = {
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
+
     var optional = this.optional;
 
     if (optional) {
@@ -1994,13 +2001,18 @@ Session.prototype = {
         screen = 'netbanking';
         data.bank = $('#bank-select').val();
         data.method = 'emandate';
-      } else if (screen === 'upi') {
+      }
+
+      // perform the actual validation
+      if (screen === 'upi') {
         if (this.checkInvalid('#form-upi input:checked + label')) {
           return;
         }
       } else if (this.checkInvalid()) {
         return;
       }
+    } else if (this.oneMethod === 'netbanking') {
+      data.bank = this.get('prefill.bank');
     } else {
       return;
     }
