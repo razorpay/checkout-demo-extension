@@ -1,3 +1,4 @@
+var TIMEOUT_CLEAR = -1;
 var TIMEOUT_NO_OTP = 30000;
 var TIMEOUT_UNKNOWN = 3000;
 var TIMEOUT_REDIRECT = 20000;
@@ -132,7 +133,7 @@ magicView.prototype = {
   },
 
   pageResolved: function(data) {
-    var timeout = TIMEOUT_NO_OTP;
+    var timeout = TIMEOUT_MAGIC_NO_ACTION;
     var isUnkown = false;
 
     if (data.bank && indexOf(this.supportedBanks, data.bank) < 0) {
@@ -147,6 +148,7 @@ magicView.prototype = {
     switch (data.type) {
       case 'otp':
         this.showOtpView(data);
+        timeout = TIMEOUT_CLEAR;
         break;
 
       case 'proceed':
@@ -163,7 +165,11 @@ magicView.prototype = {
         break;
     }
 
-    this.setTimeout(timeout);
+    if (timeout === TIMEOUT_CLEAR) {
+      this.clearTimeout();
+    } else {
+      this.setTimeout(timeout);
+    }
   },
 
   pageUnload: function(data) {
@@ -248,7 +254,7 @@ magicView.prototype = {
     }
 
     if (data.otp) {
-      this.clearTimeout();
+      window.clearTimeout(this.otpTimeout);
     }
 
     this.otpData = data;
@@ -309,10 +315,12 @@ magicView.prototype = {
     this.showView('magic-otp');
     if (this.otpPermission) {
       this.showWaitingScreen();
+
+      this.otpTimeout = window.setTimeout(function() {
+        self.enterOtp();
+      }, TIMEOUT_NO_OTP);
     } else {
-      $('#form-magic-otp')
-        .removeClass('waiting')
-        .addClass('manual');
+      this.enterOtp();
     }
 
     this.resetLoader();
