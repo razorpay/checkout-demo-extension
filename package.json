@@ -27,7 +27,7 @@
   },
   "scripts": {
     "test": "rollup -c && gulp test:unit",
-    "build": "rollup -c --environment prod && gulp build",
+    "build": "rollup -c --environment prod && gulp",
     "precommit": "lint-staged",
     "start": "rollup -c && gulp watch"
   },
