@@ -150,7 +150,10 @@ gulp.task('build', function(cb) {
     ['css:prod', 'compileTemplates'],
     'compileHTML',
     'staticAssets',
-    cb
+    function() {
+      console.log(String(execSync('ls -l app/dist/v1')));
+      cb();
+    }
   );
 });
 
