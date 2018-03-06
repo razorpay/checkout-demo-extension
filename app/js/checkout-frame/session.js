@@ -26,6 +26,8 @@ function handleRelay(relayObj) {
     return;
   }
 
+  this.track('magic_handle_relay', relayObj);
+
   switch (relayObj.action) {
     case 'page_resolved':
       this.magicView.pageResolved(relayObj.data);
