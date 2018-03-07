@@ -26,6 +26,7 @@ http {
 
         location / {
             alias $checkout_root_location;
+            include  /etc/nginx/mime.types;
         }
 
         sendfile off;
