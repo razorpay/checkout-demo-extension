@@ -66,5 +66,5 @@ spec:
       - name: nginx
         hostPath:
           path: /var/log/fluentd/splunk/checkout/nginx
-      dnsPolicy: ClusterFirst
+      dnsPolicy: default
       restartPolicy: Always
