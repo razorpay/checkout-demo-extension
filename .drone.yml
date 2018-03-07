@@ -1,0 +1,43 @@
+pipeline:
+  clone:
+    image: plugins/git
+    when:
+      event:
+        exclude: [deployment]
+        include: [push]
+  build:
+    image: plugins/docker
+    repo: razorpay/checkout
+    build_args:
+     - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
+    secrets: [docker_username, docker_password]
+    tags: ${DRONE_COMMIT_SHA}
+    when:
+      status: [success]
+      event:
+        exclude: [deployment, pull_request, tag]
+        include: [push]
+  build-notify:
+    image: plugins/slack
+    secrets: [slack_webhook]
+    channel: tech_distelli
+    username: drone
+    icon_url: https://avatars2.githubusercontent.com/u/2181346?s=200&v=4
+    template: >
+      {{#success build.status}}
+        Build succeeded.
+      {{else}}
+        Build failed.
+      {{/success}}
+        Repo: {{repo.name}}
+        Build No:{{build.number}}
+        Branch: {{build.branch}}
+        Commit: {{build.commit}}
+        Author: {{build.author}}
+        Started at: {{build.started}}
+        Time taken: {{since build.started}}
+        Link: {{build.link}}
+    when:
+      event:
+        exclude: [deployment]
+        include: [push]
