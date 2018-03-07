@@ -285,6 +285,15 @@ $.prototype = {
       } catch (e) {}
     }
     return this;
+  },
+
+  scrollTo: function(y) {
+    if (this[0]) {
+      try {
+        this[0].scrollTo(0, y);
+      } catch (e) {}
+    }
+    return this;
   }
 };
 

@@ -992,6 +992,20 @@ Session.prototype = {
       },
       true
     );
+
+    /**
+     * Listener used for UPI Intent flow.
+     * 1. Scrolls the App List to the bottom (to make the error tooltip visible)
+     * 2. Selects the VPA radio button
+     */
+    this.on('focus', '#vpa', function() {
+      $('#form-upi').scrollTo(window.innerHeight);
+      var directpayRadio = gel('upi_app-directpay');
+      if (directpayRadio) {
+        directpayRadio.checked = true;
+      }
+    });
+
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
         if (this.get('modal.confirm_close') && !confirmClose()) {
@@ -1734,6 +1748,10 @@ Session.prototype = {
       }
 
       if (this.screen === 'upi') {
+        if (data.upi_app && data.upi_app === 'directpay') {
+          data['_[flow]'] = 'directpay';
+          delete data.upi_app;
+        }
         if (data['_[flow]'] !== 'directpay') {
           delete data.vpa;
         }
@@ -2043,6 +2061,11 @@ Session.prototype = {
         delete notes.state;
         notes.address += ', ' + states[notes.state] + ' - ' + notes.pincode;
       }
+    }
+
+    // If there's a package name, the flow is intent.
+    if (data.upi_app) {
+      data['_[flow]'] = 'intent';
     }
 
     Razorpay.sendMessage({

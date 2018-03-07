@@ -122,6 +122,12 @@ export default function Payment(data, params, r) {
   // payment will be validated when resumed. So it's possible to have invalid arguments till it's paused
   this.on('cancel', onPaymentCancel);
 
+  // Set the UPI app to use.
+  if (data.upi_app) {
+    this.upi_app = data.upi_app;
+    delete data.upi_app;
+  }
+
   this.fees = params.fees;
   this.sdk_popup = params.sdk_popup;
   this.magic = params.magic;
@@ -639,14 +645,30 @@ var responseTypes = {
     var self = this;
     var url = request.url;
 
+    var upiBackCancel = {
+      '_[method]': 'upi',
+      '_[flow]': 'intent',
+      '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+    };
     var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
       if (isEmptyObject(data)) {
-        return self.emit('cancel', {
-          '_[method]': 'upi',
-          '_[flow]': 'intent',
-          '_[reason]': 'UPI_INTENT_BACK_BUTTON'
-        });
+        return self.emit('cancel', upiBackCancel);
+      } else if (data.response) {
+        var response = {};
+        // Convert the string response into a JSON object.
+        var split = data.response.split('&');
+        for (var i = 0; i < split.length; i++) {
+          var pair = split[i].split('=');
+          if (pair[1] === '' || pair[1] === 'undefined' || pair[1] === 'null') {
+            response[pair[0]] = null;
+          } else {
+            response[pair[0]] = pair[1];
+          }
+        }
+        if (!response.txnId) {
+          return self.emit('cancel', upiBackCancel);
+        }
       } else {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
@@ -665,7 +687,12 @@ var responseTypes = {
     });
     var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
-      CheckoutBridge.callNativeIntent(intent_url);
+      // If there's a UPI App specified, use it.
+      if (this.upi_app) {
+        CheckoutBridge.callNativeIntent(intent_url, this.upi_app);
+      } else {
+        CheckoutBridge.callNativeIntent(intent_url);
+      }
     }
   },
 

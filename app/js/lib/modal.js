@@ -17,17 +17,14 @@
   };
 
   if (Array.prototype.some) {
-    [
-      'transition',
-      'WebkitTransition',
-      'MozTransition',
-      'OTransition'
-    ].some(function(i) {
-      if (isString(document.documentElement.style[i])) {
-        transitionProperty = i + 'Duration';
-        return true;
+    ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(
+      function(i) {
+        if (isString(document.documentElement.style[i])) {
+          transitionProperty = i + 'Duration';
+          return true;
+        }
       }
-    });
+    );
   }
 
   var getDuration = function(modal) {
@@ -115,9 +112,29 @@
           if (el) {
             var rect = el.getBoundingClientRect();
             if (rect.bottom > innerHeight - 70) {
-              setTimeout(function() {
-                smoothScrollTo(pageYOffset - innerHeight + rect.bottom + 60);
-              }, 400);
+              /**
+               * Whenever an input element triggers the keyboard, the window's size changes and this method is invoked.
+               * We need to check if the reason for invokation is the trigger of a keyboard.
+               * However, this logic WILL FAIL if the window is resized for some other reason while an input element is focused on.
+               */
+              var keyboardInputTypes = [
+                  'text',
+                  'password',
+                  'number',
+                  'date',
+                  'email',
+                  'tel'
+                ],
+                inputType =
+                  (document.activeElement &&
+                    document.activeElement.type &&
+                    document.activeElement.type.toLowerCase()) ||
+                  '';
+              if (inputType && keyboardInputTypes.indexOf(inputType) < 0) {
+                setTimeout(function() {
+                  smoothScrollTo(pageYOffset - innerHeight + rect.bottom + 60);
+                }, 400);
+              }
             }
           }
         });

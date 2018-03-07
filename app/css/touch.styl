@@ -87,7 +87,7 @@ $mobile-view() {
     overflow: hidden;
   }
 
-  #wallets {
+  #wallets, #upi-apps {
     padding-bottom: $footerh + 12px;
   }
 
@@ -184,7 +184,8 @@ $mobile-view() {
  * Workaround for iOS Safari issue where window.innerHeight does not work as expected.
  */
 .ip {
-  #body[screen="wallet"] {
+  #body[screen="wallet"],
+  #body[screen="upi"] {
     height: calc(100vh - 180px);
   }
 }

@@ -34,6 +34,7 @@ var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 var upi_intent = _.upi_intents_data && _.methods.upi_intent;
+var upi_apps = _.upi_intents_data;
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -505,35 +506,59 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
               `?`
               `?method.upi`
                 <div class="tab-content showable screen pad" id="form-upi">
-                  <h3>Pay using</h3>
-                  <div class="list">
                     `?upi_intent`
-                    <div class="item">
-                      <input id="radio-intent" type="radio" name="_[flow]" value="intent" />
-                      <label for="radio-intent">
-                        <i class="theme">&#xe70d;</i>
-                        <div class="title">UPI App (installed on phone)</div>
-                        <div class="subtitle">Directly pay with a UPI App</div>
-                        <span class="checkbox"></span>
-                      </label>
+                    <div id="upi-apps">
+                      <div class="list">
+                        `~upi_apps:i:a`
+                          <div class="upi_app item radio-item">
+                            <input type="radio" name="upi_app" value="`=a.package_name`" id="upi_app-radio-`=a.package_name`">
+                            <label for="upi_app-radio-`=a.package_name`" class="radio-label">
+                              <span class="checkbox"></span>
+                              <img style="display: none" src="`=a.app_icon`" onload=" this.nextElementSibling.style = 'background-image:url('+this.src+')'">
+                              <div class="placeholder"></div>
+                              <span class="title">`=a.app_name`</span>
+                            </label>
+                          </div>
+                        `~`
+                        <div id="upi-directpay" class="item radio-item">
+                          <input type="radio" id="upi_app-directpay" name="upi_app" value="directpay">
+                          <label for="upi_app-directpay" class="radio-label">
+                            <span class="checkbox"></span>
+                            <div class="placeholder theme">&#xe711;</div>
+                            <span class="title">
+                              <div class="elem-wrap" style="display: inline-block;">
+                                <div class="elem">
+                                  <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Type your UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                                  <div class="help">Please enter a valid VPA of the form username@bank</div>
+                                </div>
+                              </div>
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    `??`
+                    <h3>Pay using</h3>
+                    <div id="upi-entry">
+                      <div class="list">
+                        <div id="upi-directpay" class="item">
+                          <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!upi_intent`checked`?`/>
+                          <label for="radio-directpay">
+                            <i class="theme">&#xe70e;</i>
+                            <div class="title">UPI Address</div>
+                            <div class="subtitle">You will receive a collect request</div>
+                            <div class="elem-wrap"><div class="elem">
+                              <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                              <div class="help">Please enter a valid VPA of the form username@bank</div>
+                            </div></div>
+                            `?upi_intent`
+                            <span class="checkbox"></span>
+                            `?`
+                          </label>
+                        </div>
+                      </div>
                     </div>
                     `?`
-                    <div id="upi-directpay" class="item">
-                      <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!upi_intent`checked`?`/>
-                      <label for="radio-directpay">
-                        <i class="theme">&#xe70e;</i>
-                        <div class="title">UPI Address</div>
-                        <div class="subtitle">You will receive a collect request</div>
-                        <div class="elem-wrap"><div class="elem">
-                          <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
-                          <div class="help">Please enter a valid VPA of the form username@bank</div>
-                        </div></div>
-                        `?upi_intent`
-                        <span class="checkbox"></span>
-                        `?`
-                      </label>
-                    </div>
-                  </div>
                 </div>
               `?`
               `?ecod && invoice`
