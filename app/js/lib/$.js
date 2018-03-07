@@ -8,6 +8,8 @@ var $ = function(el) {
   this[0] = el;
 };
 
+var _session_id;
+
 $.prototype = {
   on: function(event, callback, capture, thisArg) {
     var el = this[0];
@@ -346,6 +348,10 @@ $.ajax = function(opts) {
   each(opts.headers, function(header, value) {
     xhr.setRequestHeader(header, value);
   });
+
+  if (_session_id) {
+    xhr.setRequestHeader('x-session-id', _session_id);
+  }
 
   if (opts.callback) {
     xhr.onreadystatechange = function() {
