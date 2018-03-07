@@ -1,4 +1,4 @@
-ipipeline:
+pipeline:
   clone:
     image: plugins/git
     when:
