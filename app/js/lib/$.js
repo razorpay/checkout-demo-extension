@@ -350,7 +350,7 @@ $.ajax = function(opts) {
   });
 
   if (_session_id) {
-    xhr.setRequestHeader('x-session-id', _session_id);
+    xhr.setRequestHeader('X-Razorpay-SessionId', _session_id);
   }
 
   if (opts.callback) {
