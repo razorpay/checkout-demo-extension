@@ -4,7 +4,7 @@ metadata:
   name: checkout
   namespace: func
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,7 +19,7 @@ spec:
         name: checkout
     spec:
       nodeSelector:
-        node-role.kubernetes.io/node-services: ""
+        node-role.kubernetes.io/qa: ""
       imagePullSecrets:
       - name: registry
       containers:
@@ -30,7 +30,7 @@ spec:
               name: checkout
               key: APP_MODE
         name: checkout
-        image: razorpay/checkout:e3a52adc2ebac930179ba9bd9f5759d7c51aaa26
+        image: razorpay/checkout:0b6139f43051adc62389f39cefd26e6d58206fcf
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
@@ -66,5 +66,5 @@ spec:
       - name: nginx
         hostPath:
           path: /var/log/fluentd/splunk/checkout/nginx
-      dnsPolicy: default
+      dnsPolicy: Default
       restartPolicy: Always
