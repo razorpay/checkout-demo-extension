@@ -108,6 +108,8 @@ Customer.prototype = {
         }
         qpmap.device_token = data.device_token;
 
+        _session_id = data.session_id;
+
         if (qpmap.device_token) {
           invoke('setDeviceToken', CheckoutBridge, qpmap.device_token);
         }
@@ -147,6 +149,9 @@ Customer.prototype = {
       callback: callback
     };
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
+
+    _session_id = null;
+
     $.ajax(ajaxOpts);
   }
 };
