@@ -30,8 +30,12 @@ else
 
 var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
+var prefill_name = attr(o('prefill.name'));
+
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
+var name_readonly = o('readonly.name') && prefill_name;
+
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 var upi_intent = _.upi_intents_data && _.methods.upi_intent;
 var upi_apps = _.upi_intents_data;
@@ -320,11 +324,11 @@ var upi_apps = _.upi_intents_data;
                       <i>&#xe606;</i>
                       <input class="input"`?_.isMobile && !ua_old_android` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
                     </div></div>
-                    <div class="elem-wrap two-third"><div class="elem elem-name">
+                    <div class="elem-wrap two-third"><div class="elem elem-name `?name_readonly`readonly`?`">
                       <span class="help">Please enter name on your card</span>
                       <label>Card Holder's Name</label>
                       <i>&#xe602;</i>
-                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$">
+                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$" `?name_readonly`readonly`?`>
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-cvv mature">
                       <label>CVV</label>

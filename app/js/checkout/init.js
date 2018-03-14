@@ -49,7 +49,8 @@ RazorpayDefaults.prefill = {
 
 RazorpayDefaults.readonly = {
   contact: false,
-  email: false
+  email: false,
+  name: false
 };
 
 RazorpayDefaults.modal = {
