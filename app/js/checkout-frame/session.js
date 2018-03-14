@@ -1003,6 +1003,7 @@ Session.prototype = {
       var directpayRadio = gel('upi_app-directpay');
       if (directpayRadio) {
         directpayRadio.checked = true;
+        $('#body').addClass('sub');
       }
     });
 
