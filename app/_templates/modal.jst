@@ -18,6 +18,7 @@ var invoice = _.invoice;
 var bank = _.tpvBank || {};
 
 var aadhaarNumber = o('prefill.aadhaar[number]');
+var accountName = o('prefill.bank_account[name]');
 
 var amount;
 var amount_figure = _.formatAmount(o('amount'));
@@ -171,20 +172,26 @@ var upi_apps = _.upi_intents_data;
                       </div>
                       `?bank.account_number`
                         <div class="account-details clearfix">
-                          <div class="float-left">Account</div>
-                          <div class="float-left text-uppercase">`=bank.account_number`</div>
+                          <div>Account Number</div>
+                          <div>`=bank.account_number`</div>
+                        </div>
+                      `?`
+                      `?accountName`
+                        <div class="account-details clearfix">
+                          <div>Customer Name</div>
+                          <div>`=accountName`</div>
                         </div>
                       `?`
                       `?_.optional.contact && _.optional.email && bank.ifsc`
                         <div class="account-details clearfix">
-                          <div class="float-left">IFSC code</div>
-                          <div class="float-left text-uppercase">`=bank.ifsc`</div>
+                          <div>IFSC code</div>
+                          <div class="text-uppercase">`=bank.ifsc`</div>
                         </div>
                       `?`
                       `?aadhaarNumber`
                         <div class="account-details clearfix">
-                          <div class="float-left">Aadhaar</div>
-                          <div class="float-left text-uppercase">`=aadhaarNumber`</div>
+                          <div>Aadhaar</div>
+                          <div>`=aadhaarNumber`</div>
                         </div>
                       `?`
                     </div>
