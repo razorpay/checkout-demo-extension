@@ -716,6 +716,10 @@ var responseTypes = {
           if (timer > 4) {
             self.emit('upi.noapp');
             clearInterval(intvl);
+
+            setTimeout(function() {
+              self.emit('payment.cancel'); // Cancel payment if upi (intent flow) back btn pressed while drawer to select UPI apps is opened
+            }, 1000);
           }
         }, 1000);
 

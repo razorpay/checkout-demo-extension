@@ -1160,12 +1160,19 @@ Session.prototype = {
       $(goto_payment).hide();
     } else {
       this.click(goto_payment, function() {
-        if (
-          this.payload &&
-          this.payload.method === 'upi' &&
-          this.payload['_[flow]'] === 'directpay'
-        ) {
-          return cancel_upi(this);
+        if (this.payload && this.payload.method === 'upi') {
+          if (this.payload['_[flow]'] === 'directpay') {
+            return cancel_upi(this);
+          } else if (this.payload['_[flow]'] === 'intent') {
+            if (confirmClose()) {
+              this.clearRequest();
+              hideOverlayMessage();
+            } else {
+              return;
+            }
+          } else {
+            return;
+          }
         }
         this.r.focus();
       });
@@ -1173,14 +1180,6 @@ Session.prototype = {
     this.click('#backdrop', this.hideErrorMessage);
     this.click('#overlay', this.hideErrorMessage);
     this.click('#fd-hide', this.hideErrorMessage);
-    this.click('#error-message .link', function() {
-      if (confirmClose()) {
-        this.clearRequest();
-        hideOverlayMessage();
-      } else {
-        return;
-      }
-    });
   },
 
   bindIeEvents: function() {
