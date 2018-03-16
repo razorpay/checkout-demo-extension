@@ -145,6 +145,8 @@ magicView.prototype = {
     }
 
     var self = this;
+    self.resolvedPage = data.type;
+
     switch (data.type) {
       case 'otp':
         this.showOtpView(data);
@@ -249,6 +251,10 @@ magicView.prototype = {
   },
 
   otpParsed: function(data) {
+    if (this.resolvedPage !== 'otp') {
+      return (this.otpData = data);
+    }
+
     if (this.session.screen !== 'magic-otp') {
       this.showView('magic-otp');
     }
@@ -313,8 +319,13 @@ magicView.prototype = {
     }
 
     this.showView('magic-otp');
+
     if (this.otpPermission) {
       this.showWaitingScreen();
+
+      if (this.otpData) {
+        this.otpParsed(this.otpData);
+      }
 
       this.otpTimeout = window.setTimeout(function() {
         self.enterOtp();
