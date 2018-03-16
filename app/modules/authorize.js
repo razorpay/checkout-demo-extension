@@ -649,6 +649,21 @@ var responseTypes = {
       '_[flow]': 'intent',
       '_[reason]': 'UPI_INTENT_BACK_BUTTON'
     };
+
+    var ra = function() {
+      return recurseAjax(
+        url,
+        function(response) {
+          this.complete(response);
+        },
+        function(response) {
+          return response && response.status;
+        },
+        null,
+        $.jsonp
+      );
+    };
+
     var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
       if (isEmptyObject(data)) {
@@ -671,79 +686,53 @@ var responseTypes = {
       } else {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
+      self.ajax = ra();
+    });
 
-      var ra = function() {
-        return recurseAjax(
-          url,
-          function(response) {
-            this.complete(response);
-          },
-          function(response) {
-            return response && response.status;
-          },
-          null,
-          $.jsonp
-        );
+    var CheckoutBridge = window.CheckoutBridge;
+    if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
+      // If there's a UPI App specified, use it.
+      if (this.upi_app) {
+        CheckoutBridge.callNativeIntent(intent_url, this.upi_app);
+      } else {
+        CheckoutBridge.callNativeIntent(intent_url);
+      }
+    } else if (ua_android_browser) {
+      // Start interval
+      var timer = 0,
+        intvl;
+      intvl = setInterval(function() {
+        timer++;
+        if (timer > 4) {
+          self.emit('upi.noapp');
+          clearInterval(intvl);
+
+          setTimeout(function() {
+            self.emit('payment.cancel'); // Cancel payment if upi (intent flow) back btn pressed while drawer to select UPI apps is opened
+          }, 1000);
+        }
+      }, 1000);
+
+      var blurHandler = function() {
+        if (timer <= 4) {
+          clearInterval(intvl);
+        }
+        self.emit('upi.selectapp');
       };
 
-      this.on('upi.intent_response', function(data) {
-        if (isEmptyObject(data)) {
-          return self.emit('cancel', {
-            '_[method]': 'upi',
-            '_[flow]': 'intent',
-            '_[reason]': 'UPI_INTENT_BACK_BUTTON'
-          });
-        } else {
-          self.emit('upi.pending', { flow: 'upi-intent', response: data });
-        }
-        self.ajax = ra();
-      });
+      var focHandler = function() {
+        self.emit('upi.pending', { flow: 'upi-intent' });
 
-      var CheckoutBridge = window.CheckoutBridge;
-      if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
-        // If there's a UPI App specified, use it.
-        if (this.upi_app) {
-          CheckoutBridge.callNativeIntent(intent_url, this.upi_app);
-        } else {
-          CheckoutBridge.callNativeIntent(intent_url);
-        }
-      } else if (ua_android_browser) {
-        // Start interval
-        var timer = 0,
-          intvl;
-        intvl = setInterval(function() {
-          timer++;
-          if (timer > 4) {
-            self.emit('upi.noapp');
-            clearInterval(intvl);
+        window.removeEventListener('blur', blurHandler);
+        window.removeEventListener('focus', focHandler);
+        ra();
+      };
 
-            setTimeout(function() {
-              self.emit('payment.cancel'); // Cancel payment if upi (intent flow) back btn pressed while drawer to select UPI apps is opened
-            }, 1000);
-          }
-        }, 1000);
+      window.addEventListener('blur', blurHandler);
+      window.addEventListener('focus', focHandler);
 
-        var blurHandler = function() {
-          if (timer <= 4) {
-            clearInterval(intvl);
-          }
-          self.emit('upi.selectapp');
-        };
-
-        var focHandler = function() {
-          self.emit('upi.pending', { flow: 'upi-intent' });
-
-          window.removeEventListener('blur', blurHandler);
-          window.removeEventListener('focus', focHandler);
-          ra();
-        };
-
-        window.addEventListener('blur', blurHandler);
-        window.addEventListener('focus', focHandler);
-
-        window.location = fullResponse.data.intent_url;
-      }
-    });
+      window.location = fullResponse.data.intent_url;
+    }
   },
 
   otp: function(request) {

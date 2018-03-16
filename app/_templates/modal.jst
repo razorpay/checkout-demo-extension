@@ -545,6 +545,17 @@ var upi_apps = _.upi_intents_data;
                     <h3>Pay using</h3>
                     <div id="upi-entry">
                       <div class="list">
+                        `?_.isMobileBrowser`
+                        <div class="item">
+                          <input id="radio-intent" type="radio" name="_[flow]" value="intent" />
+                          <label for="radio-intent">
+                            <i class="theme">&#xe70d;</i>
+                            <div class="title">UPI App (installed on phone)</div>
+                            <div class="subtitle">Directly pay with a UPI App</div>
+                            <span class="checkbox"></span>
+                          </label>
+                        </div>
+                        `?`
                         <div id="upi-directpay" class="item">
                           <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!upi_intent`checked`?`/>
                           <label for="radio-directpay">

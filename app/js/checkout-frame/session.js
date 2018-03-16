@@ -638,6 +638,7 @@ Session.prototype = {
 
   render: function(options) {
     options = options || {};
+    this.isMobileBrowser = !!ua_android_browser;
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -1139,15 +1140,6 @@ Session.prototype = {
 
       this.on('change', '#form-upi', function(e) {
         $('#body').toggleClass('sub', e.target.value);
-      });
-
-      this.click('#error-message .link', function() {
-        if (confirmClose()) {
-          this.clearRequest();
-          hideOverlayMessage();
-        } else {
-          return;
-        }
       });
     }
 
