@@ -2,9 +2,9 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: checkout
-  namespace: pos
+  namespace: func
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,7 +19,7 @@ spec:
         name: checkout
     spec:
       nodeSelector:
-        node-role.kubernetes.io/node-services: ""
+        node-role.kubernetes.io/qa: ""
       imagePullSecrets:
       - name: registry
       containers:
@@ -30,18 +30,12 @@ spec:
               name: checkout
               key: APP_MODE
         name: checkout
-        image: razorpay/checkout:e3a52adc2ebac930179ba9bd9f5759d7c51aaa26
+        image: razorpay/checkout:0b6139f43051adc62389f39cefd26e6d58206fcf
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
           protocol: TCP
-        resources:
-          requests:
-            cpu: 100m
-            memory: 50Mi
-          limits:
-            cpu: 100m
-            memory: 50Mi
+        resources: {}
         volumeMounts:
           - name: nginx
             mountPath: /var/log/nginx/
@@ -51,7 +45,7 @@ spec:
             port: 80
             httpHeaders:
               - name: Host
-                value: stage-checkout.razorpay.in
+                value: func-checkout.razorpay.in
           initialDelaySeconds: 60
           periodSeconds: 120
         livenessProbe:
@@ -60,7 +54,7 @@ spec:
             port: 80
             httpHeaders:
               - name: Host
-                value: stage-checkout.razorpay.in
+                value: func-checkout.razorpay.in
           initialDelaySeconds: 60
           periodSeconds: 2
         lifecycle:
@@ -72,5 +66,5 @@ spec:
       - name: nginx
         hostPath:
           path: /var/log/fluentd/splunk/checkout/nginx
-      dnsPolicy: ClusterFirst
+      dnsPolicy: Default
       restartPolicy: Always

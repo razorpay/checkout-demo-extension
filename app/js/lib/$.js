@@ -8,6 +8,8 @@ var $ = function(el) {
   this[0] = el;
 };
 
+var _session_id;
+
 $.prototype = {
   on: function(event, callback, capture, thisArg) {
     var el = this[0];
@@ -285,6 +287,15 @@ $.prototype = {
       } catch (e) {}
     }
     return this;
+  },
+
+  scrollTo: function(y) {
+    if (this[0]) {
+      try {
+        this[0].scrollTo(0, y);
+      } catch (e) {}
+    }
+    return this;
   }
 };
 
@@ -346,6 +357,10 @@ $.ajax = function(opts) {
   each(opts.headers, function(header, value) {
     xhr.setRequestHeader(header, value);
   });
+
+  if (_session_id) {
+    xhr.setRequestHeader('X-Razorpay-SessionId', _session_id);
+  }
 
   if (opts.callback) {
     xhr.onreadystatechange = function() {

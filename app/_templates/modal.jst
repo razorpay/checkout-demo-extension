@@ -14,9 +14,11 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
 var invoice = _.invoice;
-var bankName = banks && banks[order.bank];
-var bank = _.netbanks[order.bank] || {};
-bank.logoURL = 'https://cdn.razorpay.com/' + order.bank + '.gif';
+
+var bank = _.tpvBank || {};
+
+var aadhaarNumber = o('prefill.aadhaar[number]');
+
 var amount;
 var amount_figure = _.formatAmount(o('amount'));
 if(o('display_currency'))
@@ -28,10 +30,15 @@ else
 
 var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
+var prefill_name = attr(o('prefill.name'));
+
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
+var name_readonly = o('readonly.name') && prefill_name;
+
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 var upi_intent = _.upi_intents_data && _.methods.upi_intent;
+var upi_apps = _.upi_intents_data;
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -89,7 +96,7 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
             </div>
           `?`
         </div>
-        <div id="body"`?order.bank` class="sub"`?`>
+        <div id="body"`?_.tpvBank` class="sub"`?`>
           <div id="partial-back"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar">
             <div id="top-right">
@@ -150,30 +157,40 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     </select>
                   </div></div>
                   `?`
-                  `?order.bank`
+                  `?_.tpvBank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
                         `?bank.image`
                           <img src="`=bank.image`">
-                        `??`
-                          <img src="`=bank.logoURL`" />
                         `?`
-                        `?bankName`
-                          `=bankName`
+                        `?bank.name`
+                          `=bank.name`
                         `??`
                           Bank Details
                         `?`
                       </div>
-                      `?order.account_number`
+                      `?bank.account_number`
                         <div class="account-details clearfix">
                           <div class="float-left">Account</div>
-                          <div class="float-left text-uppercase">`=order.account_number`</div>
+                          <div class="float-left text-uppercase">`=bank.account_number`</div>
+                        </div>
+                      `?`
+                      `?_.optional.contact && _.optional.email && bank.ifsc`
+                        <div class="account-details clearfix">
+                          <div class="float-left">IFSC code</div>
+                          <div class="float-left text-uppercase">`=bank.ifsc`</div>
+                        </div>
+                      `?`
+                      `?aadhaarNumber`
+                        <div class="account-details clearfix">
+                          <div class="float-left">Aadhaar</div>
+                          <div class="float-left text-uppercase">`=aadhaarNumber`</div>
                         </div>
                       `?`
                     </div>
                   `?`
                 </div>
-                `?_.recurring && _.methods.count === 1 && _.methods.card`
+                `?_.recurring && !_.tab === 'emandate' && _.methods.count === 1 && _.methods.card`
                   <div class="pad recurring-message">
                     <span>&#x2139;</span>
                     `?o('subscription_id')`
@@ -193,26 +210,41 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                     `?`
                   </div>
                 `?`
-                <div`?order.bank` class="showable"`?`>
+                <div`?_.tpvBank` class="showable"`?`>
                   <div class="legend">Select a payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
                     `?o('theme.emi_mode')`
                     <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
                     `?`
                     `?method.card`
-                    <div class="payment-option item" tab="card">
-                      <label>
-                        <i>&#xe609;</i>
-                        `=_.tab_titles.card`
-                        <span class="desc">
-                          `?_.recurring_card_text`
-                            `=_.recurring_card_text`
-                          `??`
-                            Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`
-                          `?`
-                        </span>
-                      </label>
-                    </div>
+                      `?o('theme.debit_card')`
+                      <div class="payment-option item" tab="credit_card">
+                        <label>
+                          <i>&#xe609;</i>
+                          `=_.tab_titles.credit_card`
+                        </label>
+                      </div>
+                      <div class="payment-option item" tab="debit_card">
+                        <label>
+                          <i>&#xe609;</i>
+                          `=_.tab_titles.debit_card`
+                        </label>
+                      </div>
+                      `??`
+                      <div class="payment-option item" tab="card">
+                        <label>
+                          <i>&#xe609;</i>
+                          `=_.tab_titles.card`
+                          <span class="desc">
+                            `?_.recurring_card_text`
+                              `=_.recurring_card_text`
+                            `??`
+                              Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`
+                            `?`
+                          </span>
+                        </label>
+                      </div>
+                      `?`
                     `?`
                     `?method.netbanking`
                     <div class="payment-option item" tab="netbanking">
@@ -292,11 +324,11 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                       <i>&#xe606;</i>
                       <input class="input"`?_.isMobile && !ua_old_android` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
                     </div></div>
-                    <div class="elem-wrap two-third"><div class="elem elem-name">
+                    <div class="elem-wrap two-third"><div class="elem elem-name `?name_readonly`readonly`?`">
                       <span class="help">Please enter name on your card</span>
                       <label>Card Holder's Name</label>
                       <i>&#xe602;</i>
-                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$">
+                      <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$" `?name_readonly`readonly`?`>
                     </div></div>
                     <div class="elem-wrap third"><div class="elem elem-cvv mature">
                       <label>CVV</label>
@@ -335,11 +367,6 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
                         <span class="checkbox"></span>
                         Remember Card
                       </label>
-                      <div class="second">
-                        <a id="moreinfo" class="link" href="https://razorpay.com/flashcheckout" target="_blank">
-                          More Info
-                        </a>
-                      </div>
                       <div class="clear"></div>
                     </div>
                     `?`
@@ -483,35 +510,59 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
               `?`
               `?method.upi`
                 <div class="tab-content showable screen pad" id="form-upi">
-                  <h3>Pay using</h3>
-                  <div class="list">
                     `?upi_intent`
-                    <div class="item">
-                      <input id="radio-intent" type="radio" name="_[flow]" value="intent" />
-                      <label for="radio-intent">
-                        <i class="theme">&#xe70d;</i>
-                        <div class="title">UPI App (installed on phone)</div>
-                        <div class="subtitle">Directly pay with a UPI App</div>
-                        <span class="checkbox"></span>
-                      </label>
+                    <div id="upi-apps">
+                      <div class="list">
+                        `~upi_apps:i:a`
+                          <div class="upi_app item radio-item">
+                            <input type="radio" name="upi_app" value="`=a.package_name`" id="upi_app-radio-`=a.package_name`">
+                            <label for="upi_app-radio-`=a.package_name`" class="radio-label">
+                              <span class="checkbox"></span>
+                              <img style="display: none" src="`=a.app_icon`" onload=" this.nextElementSibling.style = 'background-image:url('+this.src+')'">
+                              <div class="placeholder"></div>
+                              <span class="title">`=a.app_name`</span>
+                            </label>
+                          </div>
+                        `~`
+                        <div id="upi-directpay" class="item radio-item">
+                          <input type="radio" id="upi_app-directpay" name="upi_app" value="directpay">
+                          <label for="upi_app-directpay" class="radio-label">
+                            <span class="checkbox"></span>
+                            <div class="placeholder theme">&#xe711;</div>
+                            <span class="title">
+                              <div class="elem-wrap" style="display: inline-block;">
+                                <div class="elem">
+                                  <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Type your UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                                  <div class="help">Please enter a valid VPA of the form username@bank</div>
+                                </div>
+                              </div>
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    `??`
+                    <h3>Pay using</h3>
+                    <div id="upi-entry">
+                      <div class="list">
+                        <div id="upi-directpay" class="item">
+                          <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!upi_intent`checked`?`/>
+                          <label for="radio-directpay">
+                            <i class="theme">&#xe70e;</i>
+                            <div class="title">UPI Address</div>
+                            <div class="subtitle">You will receive a collect request</div>
+                            <div class="elem-wrap"><div class="elem">
+                              <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
+                              <div class="help">Please enter a valid VPA of the form username@bank</div>
+                            </div></div>
+                            `?upi_intent`
+                            <span class="checkbox"></span>
+                            `?`
+                          </label>
+                        </div>
+                      </div>
                     </div>
                     `?`
-                    <div id="upi-directpay" class="item">
-                      <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!upi_intent`checked`?`/>
-                      <label for="radio-directpay">
-                        <i class="theme">&#xe70e;</i>
-                        <div class="title">UPI Address</div>
-                        <div class="subtitle">You will receive a collect request</div>
-                        <div class="elem-wrap"><div class="elem">
-                          <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
-                          <div class="help">Please enter a valid VPA of the form username@bank</div>
-                        </div></div>
-                        `?upi_intent`
-                        <span class="checkbox"></span>
-                        `?`
-                      </label>
-                    </div>
-                  </div>
                 </div>
               `?`
               `?ecod && invoice`
@@ -562,6 +613,16 @@ var upi_intent = _.upi_intents_data && _.methods.upi_intent;
               `?`
             </div>
             <div id='next-button' class="submit-button">Next</div>
+            `?_.magic`
+            <div id='quickpay-btn' class="list">
+              <input type="checkbox" name="quickpay" id="quickpay-check" checked>
+              <label for="quickpay-check">
+                <div class="checkbox"></div>
+                <div><b>Quick Pay:</b> Experience faster payments. SMS permissions required. Tap allow when asked.
+                </div>
+              </label>
+            </div>
+            `?`
             <button id="footer" type="submit" class="button">
               <span class="pay-btn">`?o('amount')`PAY &nbsp;`=amount``??`Authenticate`?`</span>
               <span class="otp-btn">Verify</span>

@@ -36,12 +36,21 @@ RazorpayDefaults.prefill = {
   vpa: '',
   'card[number]': '',
   'card[expiry]': '',
-  'card[cvv]': ''
+  'card[cvv]': '',
+
+  /* eMandate options */
+  bank: '',
+  'bank_account[name]': '',
+  'bank_account[account_number]': '',
+  'bank_account[ifsc]': '',
+  'aadhaar[number]': '',
+  auth_type: ''
 };
 
 RazorpayDefaults.readonly = {
   contact: false,
-  email: false
+  email: false,
+  name: false
 };
 
 RazorpayDefaults.modal = {
@@ -68,7 +77,8 @@ RazorpayDefaults.theme = {
   close_method_back: false,
   hide_topbar: false,
   branding: '',
-  emi_mode: false
+  emi_mode: false,
+  debit_card: false
 };
 
 optionValidations.parent = function(parent) {

@@ -1,9 +1,3 @@
-var templates = {};
-
-if (!discreet.isFrame) {
-  trackingProps.library = 'razorpayjs';
-}
-
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -116,7 +110,7 @@ function trackNewPayment(data, params, r) {
   });
 }
 
-function Payment(data, params, r) {
+export default function Payment(data, params, r) {
   this._time = new Date().getTime();
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
@@ -127,6 +121,12 @@ function Payment(data, params, r) {
 
   // payment will be validated when resumed. So it's possible to have invalid arguments till it's paused
   this.on('cancel', onPaymentCancel);
+
+  // Set the UPI app to use.
+  if (data.upi_app) {
+    this.upi_app = data.upi_app;
+    delete data.upi_app;
+  }
 
   this.fees = params.fees;
   this.sdk_popup = params.sdk_popup;
@@ -222,13 +222,15 @@ Payment.prototype = {
         'subscription_id',
         'customer_id',
         'recurring',
-        'subscription_card_change'
+        'subscription_card_change',
+        'recurring_token.max_amount',
+        'recurring_token.expire_by'
       ],
       function(i, field) {
         if (!(field in data)) {
           var val = getOption(field);
           if (val) {
-            data[field] = val;
+            data[field.replace(/\.(\w+)/g, '[$1]')] = val;
           }
         }
       }
@@ -349,12 +351,16 @@ Payment.prototype = {
       this.offmessage();
     }
 
-    delete window.onpaymentcancel;
-    delete window.handleRelay;
-
     clearPollingInterval();
     abortAjax(this.ajax);
     this.r._payment = null;
+
+    if (this.sdk_popup) {
+      window.onpaymentcancel = null;
+    }
+    if (this.isMagicPayment) {
+      window.handleRelay = null;
+    }
   },
 
   tryAjax: function() {
@@ -573,7 +579,7 @@ var responseTypes = {
       var popupOptions = {
         focus: false,
         magic: true,
-        otelf: true
+        otpelf: true
       };
 
       if (direct) {
@@ -638,70 +644,102 @@ var responseTypes = {
     var self = this;
     var url = request.url;
 
-    var intent_url = (fullResponse.data || {}).intent_url;
-
-    var ra = function() {
-      return recurseAjax(
-        url,
-        function(response) {
-          this.complete(response);
-        },
-        function(response) {
-          return response && response.status;
-        },
-        null,
-        $.jsonp
-      );
+    var upiBackCancel = {
+      '_[method]': 'upi',
+      '_[flow]': 'intent',
+      '_[reason]': 'UPI_INTENT_BACK_BUTTON'
     };
-
+    var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
       if (isEmptyObject(data)) {
-        return self.emit('cancel', {
-          '_[method]': 'upi',
-          '_[flow]': 'intent',
-          '_[reason]': 'UPI_INTENT_BACK_BUTTON'
-        });
+        return self.emit('cancel', upiBackCancel);
+      } else if (data.response) {
+        var response = {};
+        // Convert the string response into a JSON object.
+        var split = data.response.split('&');
+        for (var i = 0; i < split.length; i++) {
+          var pair = split[i].split('=');
+          if (pair[1] === '' || pair[1] === 'undefined' || pair[1] === 'null') {
+            response[pair[0]] = null;
+          } else {
+            response[pair[0]] = pair[1];
+          }
+        }
+        if (!response.txnId) {
+          return self.emit('cancel', upiBackCancel);
+        }
       } else {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-      self.ajax = ra();
+
+      var ra = function() {
+        return recurseAjax(
+          url,
+          function(response) {
+            this.complete(response);
+          },
+          function(response) {
+            return response && response.status;
+          },
+          null,
+          $.jsonp
+        );
+      };
+
+      this.on('upi.intent_response', function(data) {
+        if (isEmptyObject(data)) {
+          return self.emit('cancel', {
+            '_[method]': 'upi',
+            '_[flow]': 'intent',
+            '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+          });
+        } else {
+          self.emit('upi.pending', { flow: 'upi-intent', response: data });
+        }
+        self.ajax = ra();
+      });
+
+      var CheckoutBridge = window.CheckoutBridge;
+      if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
+        // If there's a UPI App specified, use it.
+        if (this.upi_app) {
+          CheckoutBridge.callNativeIntent(intent_url, this.upi_app);
+        } else {
+          CheckoutBridge.callNativeIntent(intent_url);
+        }
+      } else if (ua_android_browser) {
+        // Start interval
+        var timer = 0,
+          intvl;
+        intvl = setInterval(function() {
+          timer++;
+          if (timer > 4) {
+            self.emit('upi.noapp');
+            clearInterval(intvl);
+          }
+        }, 1000);
+
+        var blurHandler = function() {
+          if (timer <= 4) {
+            clearInterval(intvl);
+          }
+          self.emit('upi.selectapp');
+        };
+
+        var focHandler = function() {
+          self.emit('upi.pending', { flow: 'upi-intent' });
+
+          window.removeEventListener('blur', blurHandler);
+          window.removeEventListener('focus', focHandler);
+          ra();
+        };
+
+        window.addEventListener('blur', blurHandler);
+        window.addEventListener('focus', focHandler);
+
+        window.location = fullResponse.data.intent_url;
+      }
     });
-
-    var CheckoutBridge = window.CheckoutBridge;
-    if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
-      CheckoutBridge.callNativeIntent(intent_url);
-    } else if (ua_android_browser) {
-      // Start interval
-      var timer = 0,
-        intvl;
-      intvl = setInterval(function() {
-        timer++;
-        if (timer > 4) {
-          self.emit('upi.noapp');
-          clearInterval(intvl);
-        }
-      }, 1000);
-
-      var blurHandler = function() {
-        if (timer <= 4) {
-          clearInterval(intvl);
-        }
-        self.emit('upi.selectapp');
-      };
-
-      var focHandler = function() {
-        self.emit('upi.pending', { flow: 'upi-intent' });
-
-        window.removeEventListener('blur', blurHandler);
-        window.removeEventListener('focus', focHandler);
-        ra();
-      };
-
-      window.addEventListener('blur', blurHandler);
-      window.addEventListener('focus', focHandler);
-
-      window.location = fullResponse.data.intent_url;
-    }
   },
 
   otp: function(request) {

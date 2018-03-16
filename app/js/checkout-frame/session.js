@@ -8,7 +8,8 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
-  redirect: 'Redirecting to Bank page'
+  redirect: 'Redirecting to Bank page',
+  acs_load_delay: 'Seems like your bank page is taking time to load.'
 };
 
 var fontTimeout;
@@ -33,9 +34,12 @@ function handleRelay(relayObj) {
       this.magicView.otpParsed(relayObj.data);
       break;
 
+    case 'page_unload':
+      this.magicView.pageUnload(relayObj.data);
+      break;
+
     case 'otp_resent':
       if (relayObj.data) {
-        self.magicView.setTimeout(30000);
         break;
       }
     /* falls through */
@@ -383,6 +387,7 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
+
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -592,7 +597,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(this.order && this.order.bank)) {
+    if (tab && !((this.order && this.order.bank) || this.emandateTpv)) {
       this.switchTab(tab);
     }
 
@@ -640,6 +645,8 @@ Session.prototype = {
     }
     this.isOpen = true;
 
+    this.setTpvBanks();
+
     this.getEl();
     this.fillData();
     this.setEMI();
@@ -672,6 +679,49 @@ Session.prototype = {
     }
   },
 
+  setTpvBanks: function() {
+    var options = this.get();
+    var bankCode, accountNumber;
+
+    var prefillBank = options['prefill.bank'];
+    if (prefillBank) {
+      if (
+        this.methods.emandate &&
+        (options['prefill.bank_account[account_number]'] ||
+          options['prefill.aadhaar[number]'])
+      ) {
+        this.emandateTpv = true;
+        this.tab = this.oneMethod = 'emandate';
+      } else {
+        this.tab = this.oneMethod = 'netbanking';
+      }
+    }
+
+    if (this.order && this.order.bank) {
+      bankCode = this.order.bank;
+      accountNumber = this.order.account_number;
+    } else if (prefillBank) {
+      bankCode = prefillBank;
+      accountNumber = options['prefill.bank_account[account_number]'];
+    }
+
+    if (bankCode) {
+      var banks = this.methods.emandate || this.methods.netbanking;
+
+      this.tpvBank = {
+        name:
+          typeof banks[bankCode] === 'object'
+            ? banks[bankCode].name
+            : banks[bankCode],
+        code: bankCode,
+        account_number: accountNumber,
+        image:
+          (this.netbanks[bankCode] && this.netbanks[bankCode].image) ||
+          'https://cdn.razorpay.com/' + bankCode + '.gif'
+      };
+    }
+  },
+
   setEMI: function() {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
@@ -683,7 +733,7 @@ Session.prototype = {
     if (!this.magicView && this.magic) {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
-      this.magicView.setTimeout(10000);
+      this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION);
     }
 
     this.magicView.resendCount = 0;
@@ -942,6 +992,21 @@ Session.prototype = {
       },
       true
     );
+
+    /**
+     * Listener used for UPI Intent flow.
+     * 1. Scrolls the App List to the bottom (to make the error tooltip visible)
+     * 2. Selects the VPA radio button
+     */
+    this.on('focus', '#vpa', function() {
+      $('#form-upi').scrollTo(window.innerHeight);
+      var directpayRadio = gel('upi_app-directpay');
+      if (directpayRadio) {
+        directpayRadio.checked = true;
+        $('#body').addClass('sub');
+      }
+    });
+
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
         if (this.get('modal.confirm_close') && !confirmClose()) {
@@ -1093,10 +1158,6 @@ Session.prototype = {
     var goto_payment = '#error-message .link';
     if (this.get('redirect')) {
       $(goto_payment).hide();
-      var moreinfo = gel('moreinfo');
-      if (moreinfo) {
-        $('#moreinfo').hide();
-      }
     } else {
       this.click(goto_payment, function() {
         if (
@@ -1112,6 +1173,14 @@ Session.prototype = {
     this.click('#backdrop', this.hideErrorMessage);
     this.click('#overlay', this.hideErrorMessage);
     this.click('#fd-hide', this.hideErrorMessage);
+    this.click('#error-message .link', function() {
+      if (confirmClose()) {
+        this.clearRequest();
+        hideOverlayMessage();
+      } else {
+        return;
+      }
+    });
   },
 
   bindIeEvents: function() {
@@ -1326,12 +1395,15 @@ Session.prototype = {
     makeHidden('.screen.' + shownClass);
 
     if (screen) {
-      var screenTitle = this.tab === 'emi' ? 'EMI' : tab_titles[screen];
+      var screenTitle =
+        this.tab === 'emi' ? 'EMI' : tab_titles[this.cardTab || screen];
 
       screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
 
       gel('tab-title').innerHTML = screenTitle;
       makeVisible('#topbar');
+      $('.elem-email').addClass('mature');
+      $('.elem-contact').addClass('mature');
     } else {
       makeHidden('#topbar');
     }
@@ -1401,6 +1473,12 @@ Session.prototype = {
       }
     }
     if (tab) {
+      if (tab === 'credit_card' || tab === 'debit_card') {
+        this.cardTab = tab;
+        tab = 'card';
+      } else {
+        this.cardTab = null;
+      }
       var contact = getPhone();
       if (
         (!contact && !this.optional.contact) ||
@@ -1633,6 +1711,9 @@ Session.prototype = {
       var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
       return '#' + whichCardTab + '-container';
     }
+    if (form === 'emandate') {
+      form = 'netbanking';
+    }
     return '#form-' + form;
   },
 
@@ -1644,6 +1725,7 @@ Session.prototype = {
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
+
     var optional = this.optional;
 
     if (optional) {
@@ -1684,6 +1766,10 @@ Session.prototype = {
       }
 
       if (this.screen === 'upi') {
+        if (data.upi_app && data.upi_app === 'directpay') {
+          data['_[flow]'] = 'directpay';
+          delete data.upi_app;
+        }
         if (data['_[flow]'] !== 'directpay') {
           delete data.vpa;
         }
@@ -1843,7 +1929,7 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
 
-    if (!this.tab && !this.order) {
+    if (!this.tab && !(this.order || this.emandateTpv)) {
       return;
     }
 
@@ -1867,6 +1953,37 @@ Session.prototype = {
 
       data.method = 'netbanking';
       data.bank = this.order.bank;
+    } else if (this.emandateTpv) {
+      data.method = 'emandate';
+      var opts = this.get();
+
+      var emandateFields = [
+        'bank',
+        'bank_account[name]',
+        'bank_account[account_number]',
+        'bank_account[ifsc]',
+        'aadhaar[number]',
+        'auth_type'
+      ];
+
+      each(opts, function(key, val) {
+        if (/^prefill\./.test(key)) {
+          var keyString = key.replace(/^prefill\./, '');
+
+          if (keyString && indexOf(emandateFields, keyString) > -1) {
+            data[keyString] = val;
+          }
+        }
+      });
+
+      var emandatePref = this.methods.emandate;
+
+      try {
+        var auth_types = this.emandateBanks[data.bank].auth_types;
+        if (!data.auth_type && auth_types.length === 1) {
+          data.auth_type = auth_types[0];
+        }
+      } catch (err) {}
     } else if (screen) {
       if (screen === 'card') {
         var formattingDelegator = this.delegator;
@@ -1910,13 +2027,18 @@ Session.prototype = {
         screen = 'netbanking';
         data.bank = $('#bank-select').val();
         data.method = 'emandate';
-      } else if (screen === 'upi') {
+      }
+
+      // perform the actual validation
+      if (screen === 'upi') {
         if (this.checkInvalid('#form-upi input:checked + label')) {
           return;
         }
       } else if (this.checkInvalid()) {
         return;
       }
+    } else if (this.oneMethod === 'netbanking') {
+      data.bank = this.get('prefill.bank');
     } else {
       return;
     }
@@ -1929,7 +2051,7 @@ Session.prototype = {
     var request = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
-      magic: this.magic
+      magic: this.magic && gel('quickpay-check').checked
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
@@ -1957,6 +2079,11 @@ Session.prototype = {
         delete notes.state;
         notes.address += ', ' + states[notes.state] + ' - ' + notes.pincode;
       }
+    }
+
+    // If there's a package name, the flow is intent.
+    if (data.upi_app) {
+      data['_[flow]'] = 'intent';
     }
 
     Razorpay.sendMessage({
@@ -2086,9 +2213,8 @@ Session.prototype = {
         }
 
         /* Otherwise it's directpay */
-        var vpa = data ? data.vpa : 'razorpay@icici';
         that.showLoadError(
-          'Please accept collect request from ' + vpa + ' on your UPI app'
+          "Please accept request from razorpay's vpa on your UPI app"
         );
       });
     } else {

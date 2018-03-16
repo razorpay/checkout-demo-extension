@@ -168,7 +168,11 @@ var RazorpayDefaults = (Razorpay.defaults = {
   target: '',
   subscription_card_change: null,
   display_currency: '',
-  display_amount: ''
+  display_amount: '',
+  recurring_token: {
+    max_amount: 0,
+    expire_by: 0
+  }
 });
 
 function base_configure(overrides) {
@@ -246,32 +250,6 @@ var discreet = {
 
   msg: {
     wrongotp: 'Entered OTP was incorrect. Re-enter to proceed.'
-  },
-
-  supported: function(showAlert) {
-    var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
-    var alertMessage;
-
-    if (isIOS) {
-      if (/CriOS/.test(ua)) {
-        if (!window.indexedDB) {
-          alertMessage = 'Please update your Chrome browser or';
-        }
-      } else if (/FxiOS|UCBrowser/.test(ua)) {
-        alertMessage = 'This browser is unsupported. Please';
-      }
-    } else if (/Opera Mini\//.test(ua)) {
-      alertMessage = 'Opera Mini is unsupported. Please';
-    }
-
-    if (alertMessage) {
-      if (showAlert) {
-        // TODO track
-        alert(alertMessage + ' choose another browser.');
-      }
-      return false;
-    }
-    return true;
   },
 
   isBase64Image: function(image) {

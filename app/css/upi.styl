@@ -14,16 +14,6 @@
   }
 
   .list {
-    .item {
-      position: relative;
-      margin-bottom: 12px;
-      box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);
-      label {
-        border-radius: 2px;
-        border-color: $bc;
-        background: #fcfcfc;
-      }
-    }
     .checkbox {
       position: absolute;
       top: 18px;
@@ -39,6 +29,46 @@
 
       & ~ div {
         margin-left: 32px;
+      }
+    }
+  }
+
+  /**
+   * Applied when there are no UPI apps available
+   * and the user needs to enter VPA
+   */
+  #upi-entry {
+    .list {
+      .item {
+        position: relative;
+        margin-bottom: 12px;
+        box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);
+        label {
+          border-radius: 2px;
+          border-color: $bc;
+          background: #fcfcfc;
+        }
+      }
+    }
+  }
+
+  /**
+   * Applied when UPI apps are available
+   */
+  #upi-apps {
+    .list {
+      #upi-directpay {
+        .elem.invalid.mature.focused {
+          margin-bottom: 60px;
+        }
+        input.input {
+          padding-top: 0px;
+        }
+        .placeholder {
+          font-size: 20px
+          text-align: center
+          background-image: none
+        }
       }
     }
   }

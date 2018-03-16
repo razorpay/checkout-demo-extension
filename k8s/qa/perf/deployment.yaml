@@ -2,7 +2,7 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: checkout
-  namespace: pos
+  namespace: perf
 spec:
   replicas: 2
   strategy:
@@ -19,7 +19,7 @@ spec:
         name: checkout
     spec:
       nodeSelector:
-        node-role.kubernetes.io/node-services: ""
+        node-role.kubernetes.io/qa: ""
       imagePullSecrets:
       - name: registry
       containers:
@@ -35,13 +35,7 @@ spec:
         ports:
         - containerPort: 80
           protocol: TCP
-        resources:
-          requests:
-            cpu: 100m
-            memory: 50Mi
-          limits:
-            cpu: 100m
-            memory: 50Mi
+        resources: {}
         volumeMounts:
           - name: nginx
             mountPath: /var/log/nginx/
@@ -51,7 +45,7 @@ spec:
             port: 80
             httpHeaders:
               - name: Host
-                value: stage-checkout.razorpay.in
+                value: perf-checkout.razorpay.in
           initialDelaySeconds: 60
           periodSeconds: 120
         livenessProbe:
@@ -60,7 +54,7 @@ spec:
             port: 80
             httpHeaders:
               - name: Host
-                value: stage-checkout.razorpay.in
+                value: perf-checkout.razorpay.in
           initialDelaySeconds: 60
           periodSeconds: 2
         lifecycle:
@@ -72,5 +66,5 @@ spec:
       - name: nginx
         hostPath:
           path: /var/log/fluentd/splunk/checkout/nginx
-      dnsPolicy: ClusterFirst
+      dnsPolicy: Default
       restartPolicy: Always

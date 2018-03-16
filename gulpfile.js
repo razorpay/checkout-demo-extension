@@ -16,8 +16,9 @@ const execSync = require('child_process').execSync;
 const KarmaServer = require('karma').Server;
 const istanbul = require('istanbul');
 // const testServer = require('./test/e2e/server/index.js');
-const lazypipe = require('lazypipe');
-const minimist = require('minimist');
+
+const rollup = require('rollup');
+const rollupConfig = require('./rollup.config.js');
 
 const jshint = require('gulp-jshint');
 const stylish = require('jshint-stylish');
@@ -76,7 +77,7 @@ gulp.task('css:prod', () => {
     .pipe(gulp.dest(cssDistDir));
 });
 
-gulp.task('usemin', () => {
+function joinJs() {
   return gulp
     .src(assetPath('*.html'))
     .pipe(usemin())
@@ -88,7 +89,9 @@ gulp.task('usemin', () => {
       })
     )
     .pipe(gulp.dest(distDir));
-});
+}
+
+gulp.task('usemin', joinJs);
 
 gulp.task('uglify', () => {
   return (
@@ -147,7 +150,10 @@ gulp.task('build', function(cb) {
     ['css:prod', 'compileTemplates'],
     'compileHTML',
     'staticAssets',
-    cb
+    function() {
+      console.log(String(execSync('ls -l app/dist/v1')));
+      cb();
+    }
   );
 });
 
@@ -155,14 +161,26 @@ gulp.task('build:test', function(cb) {
   runSequence('clean', ['css:prod', 'compileTemplates'], 'usemin', cb);
 });
 
-gulp.task('serve', ['build'], function() {
+gulp.task('watch', ['build'], function() {
   gulp.watch(paths.css, ['css']);
   gulp.watch(paths.templates, ['compileTemplates']);
   gulp.watch(paths.js, [/*'hint',*/ 'usemin']);
   gulp.watch(assetPath('*.html'), ['usemin']);
+
+  let watcher = rollup.watch(rollupConfig);
+  watcher.on('event', e => {
+    switch (e.code) {
+      case 'BUNDLE_END':
+        console.log(`${path.basename(e.input)}: ${e.duration}ms`);
+        joinJs();
+        break;
+      case 'ERROR':
+      case 'FATAL':
+        console.error('\x1b[31m', e.error.toString(), '\x1b[0m');
+    }
+  });
 });
 
-gulp.task('watch', ['serve']);
 gulp.task('default', ['build']);
 
 /**  Tests  **/
@@ -254,23 +272,7 @@ function testFromStack(counter, allOptions, done) {
       testFromStack(counter, allOptions, done);
     } else {
       allOptions = null;
-      createCoverageReport();
       done();
     }
   }).start();
-}
-
-function createCoverageReport() {
-  let collector = new istanbul.Collector();
-  let reporter = new istanbul.Reporter(false, 'coverage/final');
-
-  glob.sync('coverage/**/coverage-final.json').forEach(function(jsonFile) {
-    collector.add(require('./' + jsonFile));
-  });
-
-  reporter.add('lcovonly');
-  reporter.addAll(['clover', 'cobertura']);
-  reporter.add('html');
-  reporter.write(collector, true, function() {});
-  console.log('Report created in coverage/final');
 }

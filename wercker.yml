@@ -5,7 +5,15 @@ build:
 
         - script:
             name: Unit Test
-            code: gulp test:unit
+            code: npm run test
+
+        - script:
+            name: build
+            code: npm run build
+
+        - script:
+            name: remove heavy directories
+            code: rm -rf .git node_modules
 
     after-steps:
         - slack-notifier:
@@ -15,10 +23,6 @@ build:
             icon_url: https://cdn.rawgit.com/wantedly/step-pretty-slack-notify/master/icons/$WERCKER_RESULT.jpg
 deploy:
     steps:
-        - script:
-            name: build
-            code: gulp
-
         - nhuray/aws-code-deploy:
             key: $AWS_KEY
             secret: $AWS_SECRET
@@ -26,10 +30,6 @@ deploy:
             application-name: checkout
             deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
             s3-bucket: rzp-code-deploy
-
-        - script:
-            name: Cloudfront cache invalidate
-            code: node scripts/invalidate.js
 
     after-steps:
         - slack-notifier:

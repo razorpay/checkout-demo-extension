@@ -303,6 +303,8 @@ var emi_options = (sessProto.emi_options = {
 });
 
 var tab_titles = (sessProto.tab_titles = {
+  debit_card: 'Debit Card',
+  credit_card: 'Credit Card',
   emandate: 'Bank Account',
   emi: 'EMI',
   card: 'Card',
@@ -357,25 +359,24 @@ function setPaymentMethods(session) {
   var international = session.get('currency') !== 'INR';
   var availMethods = preferences.methods;
   var amount = session.get('amount');
-  var emandate_method;
+  var bankMethod = 'netbanking';
 
   if (recurring) {
     availMethods = availMethods.recurring;
     var banks = {};
-    if (session.get('customer_id')) {
-      if (availMethods.emandate) {
-        emandate_method = 'emandate';
-        each(availMethods[emandate_method], function(bankCode, bankObj) {
-          banks[bankCode] = bankObj.name;
-        });
-        availMethods[emandate_method] = banks;
-      } else if (availMethods.netbanking) {
-        emandate_method = 'netbanking';
-      }
-      if (emandate_method) {
-        session.emandate = true;
-      }
+
+    // emandate recurring
+    if (availMethods.emandate) {
+      bankMethod = 'emandate';
+      session.emandate = true;
+      each(availMethods[bankMethod], function(bankCode, bankObj) {
+        banks[bankCode] = bankObj.name;
+      });
+      session.emandateBanks = availMethods[bankMethod];
+      availMethods[bankMethod] = banks;
     }
+
+    // card recurring
     if (availMethods.card) {
       if (availMethods.card.credit instanceof Array) {
         session.recurring_card_text =
@@ -443,7 +444,6 @@ function setPaymentMethods(session) {
     });
   }
 
-  var bankMethod = emandate_method || 'netbanking';
   if (
     !methods[bankMethod] ||
     methods[bankMethod] instanceof Array ||
