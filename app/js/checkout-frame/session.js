@@ -9,7 +9,8 @@ var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
   redirect: 'Redirecting to Bank page',
-  acs_load_delay: 'Seems like your bank page is taking time to load.'
+  acs_load_delay: 'Seems like your bank page is taking time to load.',
+  otp_resent: 'OTP resent'
 };
 
 var fontTimeout;
@@ -24,6 +25,16 @@ function handleRelay(relayObj) {
   ) {
     return;
   }
+
+  var trackingObj = clone(relayObj);
+
+  if (trackingObj.action === 'otp_parsed' && trackingObj.data) {
+    if (typeof trackingObj.data.otp === 'string') {
+      trackingObj.data.otp = trackingObj.data.otp.replace(/\d/g, '0');
+    }
+  }
+
+  this.track('magic_handle_relay', trackingObj);
 
   switch (relayObj.action) {
     case 'page_resolved':
