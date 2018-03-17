@@ -26,7 +26,15 @@ function handleRelay(relayObj) {
     return;
   }
 
-  this.track('magic_handle_relay', relayObj);
+  var trackingObj = clone(relayObj);
+
+  if (trackingObj.action === 'otp_parsed' && trackingObj.data) {
+    if (typeof trackingObj.data.otp === 'string') {
+      trackingObj.data.otp = trackingObj.data.otp.replace(/\d/g, '0');
+    }
+  }
+
+  this.track('magic_handle_relay', trackingObj);
 
   switch (relayObj.action) {
     case 'page_resolved':
