@@ -47,6 +47,10 @@ RazorpayDefaults.prefill = {
   auth_type: ''
 };
 
+RazorpayDefaults.feature = {
+  cardsaving: true
+};
+
 RazorpayDefaults.readonly = {
   contact: false,
   email: false,

@@ -595,12 +595,12 @@ function showModal(session) {
     customer.customer_id = saved_customer.customer_id;
   }
 
-  if (
-    preferences.subscription ||
-    (saved_customer && saved_customer.customer_id)
-  ) {
+  if (session.recurring) {
     session_options.remember_customer = true;
-    options.remember_customer = true;
+  }
+
+  if (!session.r.get('feature.cardsaving')) {
+    session_options.remember_customer = false;
   }
 
   session.optional = arr2obj(preferences.optional);
