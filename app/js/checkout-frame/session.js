@@ -2192,6 +2192,8 @@ Session.prototype = {
           'No UPI App on this device. Select other UPI option to proceed.',
           true
         );
+
+        that.body.addClass('upi-noapp');
       });
 
       this.r.on('payment.upi.selectapp', function(data) {
