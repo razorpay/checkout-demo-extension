@@ -47,7 +47,7 @@ RazorpayDefaults.prefill = {
   auth_type: ''
 };
 
-RazorpayDefaults.feature = {
+RazorpayDefaults.features = {
   cardsaving: true
 };
 
