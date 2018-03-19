@@ -654,7 +654,7 @@ var responseTypes = {
       return recurseAjax(
         url,
         function(response) {
-          this.complete(response);
+          self.complete(response);
         },
         function(response) {
           return response && response.status;
@@ -707,9 +707,11 @@ var responseTypes = {
           self.emit('upi.noapp');
           clearInterval(intvl);
 
-          setTimeout(function() {
-            self.emit('payment.cancel'); // Cancel payment if upi (intent flow) back btn pressed while drawer to select UPI apps is opened
-          }, 1000);
+          /*
+           * Cancel payment if upi (intent flow) back btn pressed while
+           * drawer to select UPI apps is opened
+           */
+          self.emit('payment.cancel');
         }
       }, 1000);
 
