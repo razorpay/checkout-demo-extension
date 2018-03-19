@@ -596,7 +596,7 @@ function showModal(session) {
     session_options.remember_customer = true;
   }
 
-  if (!session.r.get('feature.cardsaving')) {
+  if (!session.r.get('features.cardsaving')) {
     session_options.remember_customer = false;
   }
 
