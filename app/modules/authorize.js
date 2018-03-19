@@ -698,27 +698,16 @@ var responseTypes = {
         CheckoutBridge.callNativeIntent(intent_url);
       }
     } else if (ua_android_browser) {
-      // Start interval
-      var timer = 0,
-        intvl;
-      intvl = setInterval(function() {
-        timer++;
-        if (timer > 4) {
-          self.emit('upi.noapp');
-          clearInterval(intvl);
-
-          /*
-           * Cancel payment if upi (intent flow) back btn pressed while
-           * drawer to select UPI apps is opened
-           */
-          self.emit('payment.cancel');
-        }
-      }, 1000);
+      // Start Timeout
+      var drawerTimeout = setTimeout(function() {
+        // If upi app selection drawer not happened (technically, checkout is not blurred until 3 sec)
+        clearTimeout(drawerTimeout);
+        self.emit('upi.noapp');
+        self.emit('payment.cancel');
+      }, 3000);
 
       var blurHandler = function() {
-        if (timer <= 4) {
-          clearInterval(intvl);
-        }
+        clearTimeout(drawerTimeout); // If upi app selection drawer opened before 3 sec, clear timeout
         self.emit('upi.selectapp');
       };
 
