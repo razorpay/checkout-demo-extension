@@ -1156,12 +1156,7 @@ Session.prototype = {
           if (this.payload['_[flow]'] === 'directpay') {
             return cancel_upi(this);
           } else if (this.payload['_[flow]'] === 'intent') {
-            if (confirmClose()) {
-              this.clearRequest();
-              hideOverlayMessage();
-            } else {
-              return;
-            }
+            this.hideErrorMessage();
           } else {
             return;
           }
