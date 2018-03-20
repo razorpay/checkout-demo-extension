@@ -422,7 +422,6 @@ Payment.prototype = {
         ajax_options.headers['x-order-id'] = data.order_id;
       }
     }
-
     track(razorpayInstance, 'ajax');
     this.ajax = ajaxFn(ajax_options);
     return this.ajax;
@@ -650,6 +649,21 @@ var responseTypes = {
       '_[flow]': 'intent',
       '_[reason]': 'UPI_INTENT_BACK_BUTTON'
     };
+
+    var ra = function() {
+      return recurseAjax(
+        url,
+        function(response) {
+          self.complete(response);
+        },
+        function(response) {
+          return response && response.status;
+        },
+        null,
+        $.jsonp
+      );
+    };
+
     var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
       if (isEmptyObject(data)) {
@@ -672,19 +686,9 @@ var responseTypes = {
       } else {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-
-      self.ajax = recurseAjax(
-        url,
-        function(response) {
-          self.complete(response);
-        },
-        function(response) {
-          return response && response.status;
-        },
-        null,
-        $.jsonp
-      );
+      self.ajax = ra();
     });
+
     var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
@@ -693,6 +697,41 @@ var responseTypes = {
       } else {
         CheckoutBridge.callNativeIntent(intent_url);
       }
+    } else if (ua_android_browser) {
+      // Start Timeout
+      var drawerTimeout = setTimeout(function() {
+        /**
+         * If upi app selection drawer not happened (technically,
+         * checkout is not blurred until 3 sec)
+         */
+        self.emit('cancel', {
+          '_[method]': 'upi',
+          '_[flow]': 'intent',
+          '_[reason]': 'UPI_INTENT_WEB_NO_APPS'
+        });
+        self.emit('upi.noapp');
+      }, 3000);
+
+      var blurHandler = function() {
+        /**
+         * If upi app selection drawer opened before 3 sec, clear timeout
+         */
+        clearTimeout(drawerTimeout);
+        self.emit('upi.selectapp');
+      };
+
+      var focHandler = function() {
+        self.emit('upi.pending', { flow: 'upi-intent' });
+
+        window.removeEventListener('blur', blurHandler);
+        window.removeEventListener('focus', focHandler);
+        ra();
+      };
+
+      window.addEventListener('blur', blurHandler);
+      window.addEventListener('focus', focHandler);
+
+      window.location = fullResponse.data.intent_url;
     }
   },
 

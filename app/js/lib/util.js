@@ -49,9 +49,11 @@ if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }
 
-var ua_mobile = isua(/Android/) || ua_iOS;
+var ua_mobile = ua_Android || ua_iOS;
 
 var ua_ip7 = isua(/iPhone OS 7/);
+
+var ua_android_browser = ua_Android && (chromeVersion || isua(/firefox/)); // Chrome or firefox on Android
 
 /* simple checks */
 function isBoolean(x) {
@@ -398,9 +400,14 @@ function recurseAjax(url, callback, continueTill, holder, ajaxFn) {
 }
 
 function abortAjax(ajax) {
-  if (ajax && ajax[0]) {
-    ajax[0].abort();
-    ajax[0] = null;
+  if (ajax) {
+    if (ajax.abort) {
+      ajax.abort();
+      ajax = null;
+    } else if (ajax[0]) {
+      ajax[0].abort();
+      ajax[0] = null;
+    }
   }
 }
 

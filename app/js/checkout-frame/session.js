@@ -649,6 +649,7 @@ Session.prototype = {
 
   render: function(options) {
     options = options || {};
+    this.isMobileBrowser = !!ua_android_browser;
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -1162,12 +1163,12 @@ Session.prototype = {
       $(goto_payment).hide();
     } else {
       this.click(goto_payment, function() {
-        if (
-          this.payload &&
-          this.payload.method === 'upi' &&
-          this.payload['_[flow]'] === 'directpay'
-        ) {
-          return cancel_upi(this);
+        if (this.payload && this.payload.method === 'upi') {
+          if (this.payload['_[flow]'] === 'directpay') {
+            return cancel_upi(this);
+          } else if (this.payload['_[flow]'] === 'intent') {
+            this.hideErrorMessage();
+          }
         }
         this.r.focus();
       });
@@ -2189,6 +2190,20 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
+
+      this.r.on('payment.upi.noapp', function(data) {
+        that.showLoadError(
+          'No UPI App on this device. Select other UPI option to proceed.',
+          true
+        );
+
+        that.body.addClass('upi-noapp');
+      });
+
+      this.r.on('payment.upi.selectapp', function(data) {
+        that.showLoadError('Select UPI App in your device', false);
+      });
+
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError('Waiting for payment confirmation.');

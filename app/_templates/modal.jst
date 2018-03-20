@@ -552,8 +552,19 @@ var upi_apps = _.upi_intents_data;
                     <h3>Pay using</h3>
                     <div id="upi-entry">
                       <div class="list">
+                        `?_.isMobileBrowser`
+                        <div id="upi-intent" class="item">
+                          <input id="radio-intent" type="radio" name="_[flow]" value="intent" `?_.isMobileBrowser`checked`?`/>
+                          <label for="radio-intent">
+                            <i class="theme">&#xe70d;</i>
+                            <div class="title">UPI App (installed on phone)</div>
+                            <div class="subtitle">Directly pay with a UPI App</div>
+                            <span class="checkbox"></span>
+                          </label>
+                        </div>
+                        `?`
                         <div id="upi-directpay" class="item">
-                          <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `?!upi_intent`checked`?`/>
+                          <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `? (!upi_intent && !_.isMobileBrowser)`checked`?`/>
                           <label for="radio-directpay">
                             <i class="theme">&#xe70e;</i>
                             <div class="title">UPI Address</div>
@@ -562,7 +573,7 @@ var upi_apps = _.upi_intents_data;
                               <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
                               <div class="help">Please enter a valid VPA of the form username@bank</div>
                             </div></div>
-                            `?upi_intent`
+                            `?_.isMobileBrowser`
                             <span class="checkbox"></span>
                             `?`
                           </label>
