@@ -1157,8 +1157,6 @@ Session.prototype = {
             return cancel_upi(this);
           } else if (this.payload['_[flow]'] === 'intent') {
             this.hideErrorMessage();
-          } else {
-            return;
           }
         }
         this.r.focus();
