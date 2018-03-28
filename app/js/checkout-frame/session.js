@@ -649,7 +649,8 @@ Session.prototype = {
 
   render: function(options) {
     options = options || {};
-    this.isMobileBrowser = !!ua_android_browser;
+    this.isMobileBrowser =
+      ua_android_browser && options.key === 'rzp_live_ILgsfZCZoFIKMb';
 
     if (options.forceRender) {
       this.forceRender = true;
