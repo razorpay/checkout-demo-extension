@@ -398,6 +398,7 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
+var MOTILAL_KEY = 'rzp_live_6hUVikZo4HAqRa';
 
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -477,6 +478,10 @@ Session.prototype = {
         classes.push('address extra');
       }
       setter('address', true);
+    }
+
+    if (key === MOTILAL_KEY) {
+      tab_titles.card = 'Debit Card';
     }
 
     if (IRCTC_KEYS.indexOf(key) !== -1) {
