@@ -121,12 +121,6 @@ $mobile-view() {
     }
   }
 
-  .extra #modal {
-    #next-button {
-      transform: translateY(-100%);
-    }
-  }
-
   #card-offer {
     position: fixed;
     bottom: 70px;
@@ -152,10 +146,21 @@ $mobile-view() {
 
 @media (max-device-height: 450px), (max-device-width: 450px) {
   $mobile-view();
+  .extra #modal {
+    #next-button {
+      transform: translateY(-100%);
+    }
+  }
 }
 
 .mobile {
   $mobile-view();
+}
+
+.mobile.extra #modal {
+  #next-button {
+    transform: translateY(-100%);
+  }
 }
 
 .noanim {
