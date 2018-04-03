@@ -12,6 +12,7 @@ function emandateView(session) {
   };
 
   this.banks = this.session.methods.emandate;
+  this.emandateBanks = this.session.emandateBanks;
 
   this.setTabTitles();
   this.render();
@@ -56,6 +57,17 @@ emandateView.prototype = {
     this.listeners = [];
   },
 
+  getAuthTypes: function(bankCode) {
+    var authTypes = [];
+    bankCode = bankCode || this.bank;
+
+    if (this.session.emandateBanks && this.session.emandateBanks[bankCode]) {
+      authTypes = this.session.emandateBanks[bankCode].auth_types;
+    }
+
+    return authTypes;
+  },
+
   setBank: function(bankCode) {
     var backgroundImage =
       'background-image: url(' +
@@ -63,6 +75,22 @@ emandateView.prototype = {
         ? netbanks[bankCode].image
         : 'https://cdn.razorpay.com/bank/' + bankCode + '.gif') +
       ')';
+
+    this.bank = bankCode;
+
+    var authTypes = this.getAuthTypes(bankCode);
+
+    $('#emandate-options .netbanking').addClass('disabled');
+    $('#emandate-options .aadhaar').addClass('disabled');
+
+    if (authTypes.indexOf('netbanking') > -1) {
+      $('#emandate-options .netbanking').removeClass('disabled');
+    }
+
+    if (authTypes.indexOf('aadhaar') > -1) {
+      $('#emandate-options .aadhaar').removeClass('disabled');
+    }
+
     each($$('#emandate-inner .bank-icon'), function(i, elem) {
       $(elem).attr('style', backgroundImage);
     });
@@ -99,6 +127,15 @@ emandateView.prototype = {
   },
 
   showTab: function(tab) {
+    var authTypes = this.getAuthTypes();
+
+    if (
+      (tab === 'emandate-netbanking' && authTypes.indexOf('netbanking') < 0) ||
+      (tab === 'emandate-aadhaar' && authTypes.indexOf('aadhaar') < 0)
+    ) {
+      return false;
+    }
+
     this.session.body.attr('tab', 'emandate');
     this.session.tab = 'emandate';
     this.history.push(tab);

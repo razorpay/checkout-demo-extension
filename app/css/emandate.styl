@@ -62,6 +62,34 @@
 
 #emandate-options {
   margin: 8px;
+
+  .payment-option.disabled {
+    color: #80859B;
+    background: #efefef;
+    cursor: not-allowed;
+
+    .desc {
+      display: none;
+    }
+
+    &:hover label {
+      background: #efefef;
+    }
+    .theme {
+      color: #80859B;
+    }
+  }
+}
+
+#container.emandate {
+  #emandate-options .payment-option.disabled label::after {
+      content: 'Not Available';
+      font-size: 12px;
+      line-height: 15px;
+      position: static;
+      transform: none;
+      display: block;
+    }
 }
 
 #form-emandate-bank {
