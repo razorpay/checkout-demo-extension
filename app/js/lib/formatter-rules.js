@@ -78,6 +78,16 @@ function getDecimalAmount(amount) {
     return '';
   }
 
+  function alphanumericRaw(value) {
+    var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
+
+    if (this.el.maxLength > 0) {
+      returnVal = returnVal.slice(0, this.el.maxLength);
+    }
+
+    return returnVal;
+  }
+
   Formatter.rules = {
     card: {
       setValue: function(value) {
@@ -124,6 +134,39 @@ function getDecimalAmount(amount) {
           return true;
         }
         return value.length === this.maxLen;
+      }
+    },
+
+    alphanumeric: {
+      raw: alphanumericRaw
+    },
+
+    aadhaar: {
+      pretty: function(value, shouldTrim) {
+        var len = 12;
+        var prettyValue = value.slice(0, len).replace(/(.{4})/g, '$1 ');
+        if (shouldTrim || value.length >= len) {
+          prettyValue = prettyValue.trim();
+        }
+        return prettyValue;
+      }
+    },
+
+    ifsc: {
+      raw: alphanumericRaw,
+      pretty: function(value, shouldTrim) {
+        var len = 11;
+        var prettyValue = value.slice(0, len).toUpperCase();
+        if (shouldTrim || value.length >= len) {
+          prettyValue = prettyValue.trim();
+        }
+        return prettyValue;
+      },
+      isValid: function() {
+        if (this.value.length === 11) {
+          return /^[a-zA-Z]{4}[0-9]{7}$/.test(this.value);
+        }
+        return false;
       }
     },
 

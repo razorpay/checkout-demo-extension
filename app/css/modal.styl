@@ -1055,7 +1055,9 @@ $outline = #ddd;
       display: none;
     }
   }
+}
 
+#container.extra, #container.emandate-extra {
   #next-button {
     opacity: 1;
     color: #fff;
@@ -1104,7 +1106,7 @@ $outline = #ddd;
     white-space: nowrap;
     overflow: hidden;
   }
-  #payment-options {
+  #payment-options, #emandate-options {
     border: 1px solid #eee;
     border-radius: 2px;
     background: #f9fafb;
@@ -1132,7 +1134,7 @@ $outline = #ddd;
 }
 
 #container.emandate {
-  #payment-options {
+  #payment-options, #emandate-options {
     label {
       &:after {
         content: '\e604';

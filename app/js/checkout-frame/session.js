@@ -666,11 +666,12 @@ Session.prototype = {
     this.setTpvBanks();
 
     this.getEl();
+    this.setFormatting();
+    this.setEmandate();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
     this.setModal();
-    this.setFormatting();
     this.bindEvents();
     errorHandler.call(this, this.params);
 
@@ -744,6 +745,12 @@ Session.prototype = {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
+    }
+  },
+
+  setEmandate: function() {
+    if (this.emandate && this.methods.emandate) {
+      this.emandateView = new emandateView(this);
     }
   },
 
@@ -955,6 +962,14 @@ Session.prototype = {
   },
 
   extraNext: function() {
+    if ($(this.el).hasClass('emandate') && this.emandateView) {
+      if (this.checkInvalid()) {
+        return;
+      }
+
+      return this.emandateView.showBankOptions($('#bank-select').val());
+    }
+
     var commonInvalid = $('#pad-common .invalid');
     if (commonInvalid[0]) {
       return commonInvalid
@@ -1449,6 +1464,10 @@ Session.prototype = {
       } else {
         return;
       }
+    } else if (/^emandate/.test(this.screen)) {
+      if (this.emandateView.back()) {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -1495,6 +1514,10 @@ Session.prototype = {
     } else {
       this.payload = null;
       this.clearRequest();
+    }
+
+    if (/^emandate/.test(tab)) {
+      return this.emandateView.showTab(tab);
     }
 
     this.body.attr('tab', tab);
@@ -2024,10 +2047,13 @@ Session.prototype = {
             }
           }
         }
-      } else if (screen === 'emandate') {
-        screen = 'netbanking';
-        data.bank = $('#bank-select').val();
-        data.method = 'emandate';
+      } else if (/^emandate/.test(screen)) {
+        if (this.screen === 'emandate') {
+          screen = 'netbanking';
+          data.bank = $('#bank-select').val();
+          data.method = 'emandate';
+        }
+        return this.emandateView.submit(data);
       }
 
       // perform the actual validation
