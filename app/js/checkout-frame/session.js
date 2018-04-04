@@ -1449,7 +1449,8 @@ Session.prototype = {
   },
 
   back: function() {
-    var tab;
+    var tab = '';
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
