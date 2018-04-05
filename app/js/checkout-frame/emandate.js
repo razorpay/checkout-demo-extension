@@ -45,10 +45,16 @@ emandateView.prototype = {
       .add('ifsc', gel('adhr-acc-ifsc'))
       .on('change', function() {
         if (this.isValid() && this.el.value.length === this.caretPosition) {
-          invoke('focus', gel('adhr-acc-aadhaar'), null, 0);
+          invoke('focus', gel('adhr-acc-name'), null, 0);
         }
       });
-    delegator.nb_ifsc = delegator.add('ifsc', gel('nb-acc-ifsc'));
+    delegator.nb_ifsc = delegator
+      .add('ifsc', gel('nb-acc-ifsc'))
+      .on('change', function() {
+        if (this.isValid() && this.el.value.length === this.caretPosition) {
+          invoke('focus', gel('nb-acc-name'), null, 0);
+        }
+      });
     delegator.aadhaar = delegator.add('aadhaar', gel('adhr-acc-aadhaar'));
   },
 
