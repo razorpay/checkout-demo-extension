@@ -180,8 +180,6 @@ emandateView.prototype = {
       data['auth_type'] = 'netbanking';
     }
 
-    console.log(data);
-
     this.session.submit();
   }
 };
