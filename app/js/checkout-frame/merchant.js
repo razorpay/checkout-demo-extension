@@ -449,8 +449,6 @@ function setPaymentMethods(session) {
     methods.emandate = false;
   }
 
-  // debugger
-
   if (
     !methods[bankMethod] ||
     methods[bankMethod] instanceof Array ||
