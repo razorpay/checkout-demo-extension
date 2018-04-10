@@ -724,9 +724,9 @@ Session.prototype = {
       accountNumber = options['prefill.bank_account[account_number]'];
     }
 
-    if (bankCode) {
-      var banks = this.methods.emandate || this.methods.netbanking;
+    var banks = this.methods.emandate || this.methods.netbanking;
 
+    if (bankCode && banks) {
       this.tpvBank = {
         name:
           typeof banks[bankCode] === 'object'
