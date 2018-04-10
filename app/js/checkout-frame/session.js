@@ -652,6 +652,19 @@ Session.prototype = {
     }
   },
 
+  setWhatsappIcon: function() {
+    var intentsData = this.upi_intents_data;
+    var whatsappObj;
+
+    if (isArray(intentsData)) {
+      whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
+    }
+
+    if (whatsappObj && !whatsappObj.app_icon) {
+      whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
+    }
+  },
+
   render: function(options) {
     options = options || {};
     this.isMobileBrowser =
@@ -661,6 +674,11 @@ Session.prototype = {
       this.forceRender = true;
       this.close();
     }
+
+    if (this.upi_intents_data) {
+      this.setWhatsappIcon();
+    }
+
     this.isOpen = true;
 
     this.setTpvBanks();
