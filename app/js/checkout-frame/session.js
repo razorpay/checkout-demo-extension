@@ -661,7 +661,7 @@ Session.prototype = {
     }
 
     if (whatsappObj && !whatsappObj.app_icon) {
-      whatsappObj.app_icon = 'http://cdn.razorpay.com/checkout/whatsapp.png';
+      whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
     }
   },
 
