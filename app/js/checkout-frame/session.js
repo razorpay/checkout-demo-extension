@@ -711,7 +711,7 @@ Session.prototype = {
       ) {
         this.emandateTpv = true;
         this.tab = this.oneMethod = 'emandate';
-      } else {
+      } else if (!options['recurring']) {
         this.tab = this.oneMethod = 'netbanking';
       }
     }
