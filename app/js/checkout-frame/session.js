@@ -279,17 +279,20 @@ function errorHandler(response) {
     if (error_el && error_el.type !== 'hidden') {
       setTimeout(
         bind(function() {
+          if (
+            this.screen &&
+            (err_field === 'contact' || err_field === 'email')
+          ) {
+            this.switchTab();
+          }
           var help = $(error_el)
             .focus()
             .parent()
-            .addClass('invalid')
-            .find('help-text')[0];
+            .addClass('mature invalid')
+            .find('.help')[0];
 
-          if (help) {
+          if (help && message) {
             $(help).html(message);
-          }
-          if (err_field === 'contact' || err_field === 'email') {
-            this.switchTab();
           }
         }, this),
         0
