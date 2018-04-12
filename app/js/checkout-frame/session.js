@@ -276,26 +276,30 @@ function errorHandler(response) {
       err_field = 'card[expiry]';
     }
     var error_el = document.getElementsByName(err_field)[0];
-    if (error_el && error_el.type !== 'hidden') {
-      setTimeout(
-        bind(function() {
-          var help = $(error_el)
-            .focus()
-            .parent()
-            .addClass('invalid')
-            .find('help-text')[0];
+    if (error_el) {
+      if (this.screen && (err_field === 'contact' || err_field === 'email')) {
+        this.switchTab();
+      }
+      error_el = $(error_el);
 
-          if (help) {
+      setTimeout(function() {
+        error_el.focus();
+      }, 100);
+
+      if (error_el.bbox().width) {
+        var help = error_el
+          .parent()
+          .addClass('mature invalid')
+          .find('.help')[0];
+
+        if (help) {
+          if (message) {
             $(help).html(message);
           }
-          if (err_field === 'contact' || err_field === 'email') {
-            this.switchTab();
-          }
-        }, this),
-        0
-      );
-      this.shake();
-      return hideOverlayMessage();
+          this.shake();
+          return hideOverlayMessage();
+        }
+      }
     }
   }
 
@@ -1973,6 +1977,9 @@ Session.prototype = {
       data.method = 'netbanking';
       data.bank = this.order.bank;
     } else if (this.emandateTpv) {
+      if (this.checkInvalid('#pad-common')) {
+        return;
+      }
       data.method = 'emandate';
       var opts = this.get();
 
