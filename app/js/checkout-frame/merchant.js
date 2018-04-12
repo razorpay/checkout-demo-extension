@@ -444,6 +444,11 @@ function setPaymentMethods(session) {
     });
   }
 
+  /* Emandate only works on amount of 0 as of now */
+  if (amount > 0 && methods.emandate) {
+    methods.emandate = false;
+  }
+
   if (
     !methods[bankMethod] ||
     methods[bankMethod] instanceof Array ||
