@@ -671,8 +671,9 @@ Session.prototype = {
 
   render: function(options) {
     options = options || {};
-    this.isMobileBrowser =
-      ua_android_browser && options.key === 'rzp_live_ILgsfZCZoFIKMb';
+
+    // make true to enable mweb-intent
+    this.isMobileBrowser = false;
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -1738,7 +1739,7 @@ Session.prototype = {
       }
     }
     var invalids = $(parent).find('.invalid');
-    if (invalids[0]) {
+    if (invalids && invalids[0]) {
       this.shake();
       var invalidInput = $(invalids[0]).find('.input')[0];
       if (invalidInput) {
