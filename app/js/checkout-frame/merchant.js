@@ -618,6 +618,7 @@ function showModal(session) {
   Razorpay.configure(options);
   showModalWithSession(session);
 }
+
 function showModalWithSession(session) {
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
