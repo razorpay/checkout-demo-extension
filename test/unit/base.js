@@ -220,32 +220,6 @@ describe('makeUrl', function() {
   });
 });
 
-describe('makeAuthUrl', function() {
-  var stub;
-  var session = {
-    get: function() {
-      return 'xyz';
-    }
-  };
-
-  before(function() {
-    stub = sinon.stub(window, 'makeUrl');
-    stub.withArgs('abc/').returns('foo/abc/');
-  });
-
-  after(function() {
-    stub.restore();
-  });
-
-  it('should be able to make auth url if key is passed', function() {
-    expect(makeAuthUrl('xyz', 'abc/')).to.be('foo/abc/?key_id=xyz');
-  });
-
-  it('should be able to make auth url if session object is passed', function() {
-    expect(makeAuthUrl(session, 'abc/')).to.be('foo/abc/?key_id=xyz');
-  });
-});
-
 describe('setNotes', function() {
   it('should strip invalid types', function() {
     var opts = Options({

@@ -236,8 +236,9 @@ Payment.prototype = {
       }
     );
 
-    if (!data.key_id) {
-      data.key_id = getOption('key');
+    var key_id = getOption('key');
+    if (!data.key_id && key_id) {
+      data.key_id = key_id;
     }
 
     // api needs this flag to decide between redirect/otp
@@ -622,10 +623,7 @@ var responseTypes = {
 
   async: function(request, fullResponse) {
     var self = this;
-    var url = request.url;
-    if (url.indexOf('key_id') === -1) {
-      url += '?key_id=' + self.r.get('key');
-    }
+    var url = makeUrl('payments/' + fullResponse.payment_id + '/status');
     self.ajax = recurseAjax(
       url,
       function(response) {
@@ -853,20 +851,6 @@ razorpayPayment.validate = function(data) {
     errors.push({
       description: 'Payment Method not specified',
       field: 'method'
-    });
-  }
-
-  if (typeof data.key_id === 'undefined') {
-    errors.push({
-      description: 'No merchant key specified',
-      field: 'key'
-    });
-  }
-
-  if (data.key_id === '') {
-    errors.push({
-      description: 'Merchant key cannot be empty',
-      field: 'key'
     });
   }
 

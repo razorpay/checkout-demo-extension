@@ -47,11 +47,22 @@ function makeUrl(path) {
   return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
-function makeAuthUrl(key, path) {
-  if (typeof key !== 'string') {
-    key = key.get('key');
+var ba_keys = ['key', 'order_id', 'invoice_id', 'subscription_id'];
+
+function makeAuthUrl(r, url) {
+  url = makeUrl(url);
+
+  for (var i = 0; i < ba_keys.length; i++) {
+    var prop = ba_keys[i];
+    var value = r.get(prop);
+    if (prop === 'key') {
+      prop = 'key_id';
+    }
+    if (value) {
+      return url + '?' + prop + '=' + value;
+    }
   }
-  return makeUrl(path) + '?key_id=' + key;
+  return url;
 }
 
 var Razorpay = (window.Razorpay = function(overrides) {
@@ -61,8 +72,9 @@ var Razorpay = (window.Razorpay = function(overrides) {
   Eventer.call(this);
   this.id = generateUID();
 
+  var options;
   try {
-    var options = base_configure(overrides);
+    options = base_configure(overrides);
     this.get = options.get;
     this.set = options.set;
   } catch (e) {
@@ -75,9 +87,14 @@ var Razorpay = (window.Razorpay = function(overrides) {
     raise(message);
   }
 
-  if (!this.get('key')) {
+  if (
+    ba_keys.every(function(prop) {
+      return !options.get(prop);
+    })
+  ) {
     raise('No key passed');
   }
+
   discreet.validate(this);
 
   // init for checkoutjs is tracked from iframe
@@ -222,7 +239,10 @@ function makePrefParams(rzp) {
   if (rzp) {
     var getter = rzp.get;
     var params = {};
-    params.key_id = getter('key');
+    var key_id = getter('key');
+    if (key_id) {
+      params.key_id = key_id;
+    }
 
     each(
       [

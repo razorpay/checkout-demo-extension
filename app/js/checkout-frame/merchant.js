@@ -614,7 +614,7 @@ function showModal(session) {
     options.remember_customer = false;
   }
 
-  Customer.prototype.key = session.get('key');
+  Customer.prototype.r = session.r;
   Razorpay.configure(options);
   showModalWithSession(session);
 }

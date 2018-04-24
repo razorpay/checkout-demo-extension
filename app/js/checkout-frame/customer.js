@@ -40,7 +40,6 @@ function sanitizeTokens(tokens, filters) {
 }
 
 Customer.prototype = {
-  key: '',
   wants_skip: false,
   saved: false,
   logged: false,
@@ -60,7 +59,7 @@ Customer.prototype = {
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback) {
     var customer = this;
-    var url = makeAuthUrl(this.key, 'customers/status/' + this.contact);
+    var url = makeAuthUrl(this.r, 'customers/status/' + this.contact);
     url += '&_[platform]=' + trackingProps.platform;
     var device_token = qpmap.device_token;
     if (device_token) {
@@ -80,7 +79,7 @@ Customer.prototype = {
 
   createOTP: function(callback) {
     $.post({
-      url: makeAuthUrl(this.key, 'otp/create'),
+      url: makeAuthUrl(this.r, 'otp/create'),
       data: {
         contact: this.contact
       },
@@ -91,7 +90,7 @@ Customer.prototype = {
   submitOTP: function(data, callback) {
     var user = this;
     data.contact = this.contact;
-    var url = makeAuthUrl(this.key, 'otp/verify');
+    var url = makeAuthUrl(this.r, 'otp/verify');
 
     if (qpmap.platform === 'android' && qpmap.version && qpmap.library) {
       data['_[platform]'] = 'android';
@@ -133,7 +132,7 @@ Customer.prototype = {
       return;
     }
     $.ajax({
-      url: makeAuthUrl(this.key, 'apps/' + this.id + '/tokens/' + token),
+      url: makeAuthUrl(this.r, 'apps/' + this.id + '/tokens/' + token),
       method: 'delete',
       callback: function() {
         callback();
@@ -144,7 +143,7 @@ Customer.prototype = {
 
   logout: function(this_device, callback) {
     var ajaxOpts = {
-      url: makeAuthUrl(this.key, 'apps/logout'),
+      url: makeAuthUrl(this.r, 'apps/logout'),
       method: 'delete',
       callback: callback
     };
