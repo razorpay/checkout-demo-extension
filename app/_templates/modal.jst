@@ -88,7 +88,9 @@ var upi_apps = _.upi_intents_data;
               <div id="merchant-name">`=html(o('name'))`</div>
             `?`
             <div id="merchant-desc">`=html(o('description').trim())`</div>
-            <div id="amount">`=amount`</div>
+            `?o('amount')`
+              <div id="amount">`=amount`</div>
+            `?`
           </div>
           `? o('theme.branding') === 'payzapp'`
             <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/brand/`=o('theme.branding')`.png')"></div>
@@ -627,6 +629,10 @@ var upi_apps = _.upi_intents_data;
 
               `?_.magic`
                 <div id="magic-wrapper">
+                </div>
+              `?`
+              `?method.emandate`
+                <div id="emandate-wrapper">
                 </div>
               `?`
             </div>

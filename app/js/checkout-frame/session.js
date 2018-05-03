@@ -278,26 +278,30 @@ function errorHandler(response) {
       err_field = 'card[expiry]';
     }
     var error_el = document.getElementsByName(err_field)[0];
-    if (error_el && error_el.type !== 'hidden') {
-      setTimeout(
-        bind(function() {
-          var help = $(error_el)
-            .focus()
-            .parent()
-            .addClass('invalid')
-            .find('help-text')[0];
+    if (error_el) {
+      if (this.screen && (err_field === 'contact' || err_field === 'email')) {
+        this.switchTab();
+      }
+      error_el = $(error_el);
 
-          if (help) {
+      setTimeout(function() {
+        error_el.focus();
+      }, 100);
+
+      if (error_el.bbox().width) {
+        var help = error_el
+          .parent()
+          .addClass('mature invalid')
+          .find('.help')[0];
+
+        if (help) {
+          if (message) {
             $(help).html(message);
           }
-          if (err_field === 'contact' || err_field === 'email') {
-            this.switchTab();
-          }
-        }, this),
-        0
-      );
-      this.shake();
-      return hideOverlayMessage();
+          this.shake();
+          return hideOverlayMessage();
+        }
+      }
     }
   }
 
@@ -693,25 +697,45 @@ Session.prototype = {
     } catch (e) {}
   },
 
+  setWhatsappIcon: function() {
+    var intentsData = this.upi_intents_data;
+    var whatsappObj;
+
+    if (isArray(intentsData)) {
+      whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
+    }
+
+    if (whatsappObj && !whatsappObj.app_icon) {
+      whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
+    }
+  },
+
   render: function(options) {
     options = options || {};
-    this.isMobileBrowser =
-      ua_android_browser && options.key === 'rzp_live_ILgsfZCZoFIKMb';
+
+    // make true to enable mweb-intent
+    this.isMobileBrowser = false;
 
     if (options.forceRender) {
       this.forceRender = true;
       this.close();
     }
+
+    if (this.upi_intents_data) {
+      this.setWhatsappIcon();
+    }
+
     this.isOpen = true;
 
     this.setTpvBanks();
 
     this.getEl();
+    this.setFormatting();
+    this.setEmandate();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
     this.setModal();
-    this.setFormatting();
     this.completePendingPayment();
     this.bindEvents();
     errorHandler.call(this, this.params);
@@ -752,7 +776,7 @@ Session.prototype = {
       ) {
         this.emandateTpv = true;
         this.tab = this.oneMethod = 'emandate';
-      } else {
+      } else if (!options['recurring']) {
         this.tab = this.oneMethod = 'netbanking';
       }
     }
@@ -765,9 +789,9 @@ Session.prototype = {
       accountNumber = options['prefill.bank_account[account_number]'];
     }
 
-    if (bankCode) {
-      var banks = this.methods.emandate || this.methods.netbanking;
+    var banks = this.methods.emandate || this.methods.netbanking;
 
+    if (bankCode && banks) {
       this.tpvBank = {
         name:
           typeof banks[bankCode] === 'object'
@@ -786,6 +810,12 @@ Session.prototype = {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
       this.emi = new emiView(this);
+    }
+  },
+
+  setEmandate: function() {
+    if (this.emandate && this.methods.emandate) {
+      this.emandateView = new emandateView(this);
     }
   },
 
@@ -1000,6 +1030,14 @@ Session.prototype = {
   },
 
   extraNext: function() {
+    if ($(this.el).hasClass('emandate') && this.emandateView) {
+      if (this.checkInvalid()) {
+        return;
+      }
+
+      return this.emandateView.showBankOptions($('#bank-select').val());
+    }
+
     var commonInvalid = $('#pad-common .invalid');
     if (commonInvalid[0]) {
       return commonInvalid
@@ -1479,7 +1517,8 @@ Session.prototype = {
   },
 
   back: function() {
-    var tab;
+    var tab = '';
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
@@ -1492,6 +1531,10 @@ Session.prototype = {
         tab = 'card';
         this.clearRequest();
       } else {
+        return;
+      }
+    } else if (/^emandate/.test(this.screen)) {
+      if (this.emandateView.back()) {
         return;
       }
     } else {
@@ -1540,6 +1583,10 @@ Session.prototype = {
     } else {
       this.payload = null;
       this.clearRequest();
+    }
+
+    if (/^emandate/.test(tab)) {
+      return this.emandateView.showTab(tab);
     }
 
     this.body.attr('tab', tab);
@@ -1737,7 +1784,7 @@ Session.prototype = {
       }
     }
     var invalids = $(parent).find('.invalid');
-    if (invalids[0]) {
+    if (invalids && invalids[0]) {
       this.shake();
       var invalidInput = $(invalids[0]).find('.input')[0];
       if (invalidInput) {
@@ -2002,6 +2049,9 @@ Session.prototype = {
       data.method = 'netbanking';
       data.bank = this.order.bank;
     } else if (this.emandateTpv) {
+      if (this.checkInvalid('#pad-common')) {
+        return;
+      }
       data.method = 'emandate';
       var opts = this.get();
 
@@ -2071,10 +2121,13 @@ Session.prototype = {
             }
           }
         }
-      } else if (screen === 'emandate') {
-        screen = 'netbanking';
-        data.bank = $('#bank-select').val();
-        data.method = 'emandate';
+      } else if (/^emandate/.test(screen)) {
+        if (this.screen === 'emandate') {
+          screen = 'netbanking';
+          data.bank = $('#bank-select').val();
+          data.method = 'emandate';
+        }
+        return this.emandateView.submit(data);
       }
 
       // perform the actual validation

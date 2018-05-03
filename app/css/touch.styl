@@ -146,9 +146,12 @@ $mobile-view() {
 
 @media (max-device-height: 450px), (max-device-width: 450px) {
   $mobile-view();
-  .extra #modal {
-    #next-button {
-      transform: translateY(-100%);
+  .emandate-extra,.extra {
+    #modal {
+      #next-button {
+        transform: translateY(-100%);
+        z-index: 11;
+      }
     }
   }
 }
@@ -157,9 +160,12 @@ $mobile-view() {
   $mobile-view();
 }
 
-.mobile.extra #modal {
-  #next-button {
-    transform: translateY(-100%);
+.mobile.extra, .mobile.emandate-extra {
+  #modal {
+    #next-button {
+      transform: translateY(-100%);
+      z-index: 11;
+    }
   }
 }
 

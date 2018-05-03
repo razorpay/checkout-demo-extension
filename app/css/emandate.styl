@@ -1,0 +1,106 @@
+@require 'common';
+
+#emandate-inner {
+  .bank-icon {
+    width: 18px;
+    height: @width;
+    margin-right: 10px;
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: translateY(-50%);
+  }
+}
+
+
+#emandate-bank {
+  border: 1px solid #E6E7E8;
+  padding: 14px 22px;
+  margin: 8px;
+  position: relative;
+
+  .bank-icon, .bank-name {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .bank-icon {
+    position: static;
+    transform: none;
+    width: 22px;
+    height: @width;
+  }
+
+  .bank-name, .btn-change-bank {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .btn-change-bank {
+    position: absolute;
+    line-height: 50px;
+    right: 0;
+    top: 0;
+    padding: 0 12px;
+    padding-right: 24px;
+    cursor: pointer;
+    background: #fff;
+
+    &:after{
+      content: "\e601";
+      position: absolute;
+      font-size: 22px;
+      right: 8px;
+      top: 0;
+      margin-top: -2px;
+    }
+  }
+}
+
+#emandate-options {
+  margin: 8px;
+
+  .payment-option.disabled {
+    color: #80859B;
+    background: #efefef;
+    cursor: not-allowed;
+
+    .desc {
+      display: none;
+    }
+
+    &:hover label {
+      background: #efefef;
+    }
+    .theme {
+      color: #80859B;
+    }
+  }
+}
+
+#container.emandate {
+  #emandate-options .payment-option.disabled label::after {
+      content: 'Not Available';
+      font-size: 12px;
+      line-height: 15px;
+      position: static;
+      transform: none;
+      display: block;
+    }
+}
+
+#container.one-method #form-fields #form-emandate-bank {
+  .legend {
+    margin-top: 43px;
+    display: block
+  }
+}
+
+#form-emandate-aadhaar {
+  .elem-wrap {
+    height: 64px;
+  }
+}

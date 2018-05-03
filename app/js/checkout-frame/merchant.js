@@ -445,6 +445,11 @@ function setPaymentMethods(session) {
     });
   }
 
+  /* Emandate only works on amount of 0 as of now */
+  if (amount > 0 && methods.emandate) {
+    methods.emandate = false;
+  }
+
   if (
     !methods[bankMethod] ||
     methods[bankMethod] instanceof Array ||
@@ -610,10 +615,11 @@ function showModal(session) {
     options.remember_customer = false;
   }
 
-  Customer.prototype.key = session.get('key');
+  Customer.prototype.r = session.r;
   Razorpay.configure(options);
   showModalWithSession(session);
 }
+
 function showModalWithSession(session) {
   var order = (session.order = preferences.order);
   var invoice = (session.invoice = preferences.invoice);
