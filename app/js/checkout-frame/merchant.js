@@ -1,5 +1,6 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
+  StorageBridge = window.StorageBridge,
   iosCheckoutBridgeNew = getNewIOSWebkitInstance(),
   cookieDisabled = !navigator.cookieEnabled,
   sessions = {},
