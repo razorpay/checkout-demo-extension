@@ -215,6 +215,7 @@ Payment.prototype = {
       [
         'amount',
         'currency',
+        'partner_token',
         'signature',
         'description',
         'order_id',

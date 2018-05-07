@@ -59,6 +59,10 @@ function makeAuthUrl(r, url) {
       prop = 'key_id';
     }
     if (value) {
+      var partner_token = r.get('partner_token');
+      if (partner_token) {
+        value += '&partner_token=' + partner_token;
+      }
       return url + '?' + prop + '=' + value;
     }
   }
@@ -168,6 +172,7 @@ var razorpayPayment = (Razorpay.payment = {
 
 var RazorpayDefaults = (Razorpay.defaults = {
   key: '',
+  partner_token: '',
   image: '',
   amount: 100,
   currency: 'INR',
@@ -251,7 +256,8 @@ function makePrefParams(rzp) {
         'invoice_id',
         'subscription_id',
         'recurring',
-        'subscription_card_change'
+        'subscription_card_change',
+        'partner_token'
       ],
       function(i, key) {
         var value = getter(key);
