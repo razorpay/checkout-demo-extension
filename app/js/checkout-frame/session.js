@@ -13,8 +13,6 @@ var strings = {
   otp_resent: 'OTP resent'
 };
 
-var UPI_POLL_URL = 'rzp_upi_payment_poll_url';
-
 var fontTimeout;
 
 /* this === session */
@@ -674,8 +672,6 @@ Session.prototype = {
         this.ajax = recurseAjax(
           pollUrl,
           function(response) {
-            StorageBridge.setString(UPI_POLL_URL, '');
-
             if (response.razorpay_payment_id) {
               invoke(successHandler, self, response);
             } else {
@@ -2004,6 +2000,11 @@ Session.prototype = {
     this.destroyMagic();
 
     this.isResumedPayment = false;
+
+    try {
+      StorageBridge.setString(UPI_POLL_URL, '');
+    } catch (e) {}
+
     abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
