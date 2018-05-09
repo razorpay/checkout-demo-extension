@@ -777,9 +777,9 @@ razorpayProto.createPayment = function(data, params) {
 
   data = {
     ...data,
-    '_[hash]': fingerprint,
-    '_[bmode]':
-      typeof isPrivateBrowsing !== 'undefined' ? isPrivateBrowsing : '',
+    '_[fhash]': fingerprint,
+    '_[pmode]':
+      typeof isPrivateBrowsing !== 'undefined' ? +isPrivateBrowsing : '',
     '_[tz]': new Date().getTimezoneOffset()
   };
 
