@@ -86,8 +86,3 @@ pipeline:
       event:
         exclude: [deployment]
         include: [push]
-services:
-  docker:
-    image: docker:17.12.0-ce-dind
-    privileged: true
-    command: [ '-H', 'unix:///drone/docker.sock' ]
