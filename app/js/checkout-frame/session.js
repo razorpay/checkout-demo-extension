@@ -673,7 +673,7 @@ Session.prototype = {
     options = options || {};
 
     // make true to enable mweb-intent
-    this.isMobileBrowser = false;
+    this.isMobileBrowser = ua_android_browser && this.get('key') === 'rzp_live_F3HsjNBLNxSrWu';
 
     if (options.forceRender) {
       this.forceRender = true;
