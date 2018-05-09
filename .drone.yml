@@ -6,19 +6,16 @@ pipeline:
         exclude: [deployment]
         include: [push]
   build:
-    image: docker:17.12.0-ce-dind
-    environment:
-     - DOCKER_HOST=unix:///drone/docker.sock
-     - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
+    image: plugins/docker
+    repo: razorpay/checkout
     secrets: [docker_username, docker_password]
-    commands:
-     - docker login -u $${DOCKER_USERNAME} -p $${DOCKER_PASSWORD}
-     - docker build --quiet=false -t razorpay/checkout:$${GIT_COMMIT_HASH} . --build-arg GIT_COMMIT_HASH=$${GIT_COMMIT_HASH}
-     - docker push razorpay/checkout:$${GIT_COMMIT_HASH}
+    build_args:
+    - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
+    tags: ${DRONE_COMMIT_SHA}
     when:
       status: [success]
       event:
-        exclude: [deployment, pull_request, tag]
+        exclude: [deployment]
         include: [push]
   deploy-stage:
     image: razorpay/drone-kubernetes
@@ -89,8 +86,3 @@ pipeline:
       event:
         exclude: [deployment]
         include: [push]
-services:
-  docker:
-    image: docker:17.12.0-ce-dind
-    privileged: true
-    command: [ '-H', 'unix:///drone/docker.sock' ]
