@@ -1,3 +1,6 @@
+import getFingerprint from './fingerprint';
+import getPrivateBrowsingMode from './browsingMode';
+
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -768,6 +771,18 @@ razorpayProto.createPayment = function(data, params) {
   if (!isNonNullObject(params)) {
     params = emo;
   }
+
+  const isPrivateBrowsing = getPrivateBrowsingMode(),
+    fingerprint = getFingerprint() || '';
+
+  data = {
+    ...data,
+    '_[hash]': fingerprint,
+    '_[bmode]':
+      typeof isPrivateBrowsing !== 'undefined' ? isPrivateBrowsing : '',
+    '_[tz]': new Date().getTimezoneOffset()
+  };
+
   this._payment = new Payment(data, params, this);
   return this;
 };
