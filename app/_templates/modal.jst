@@ -199,13 +199,26 @@ var upi_apps = _.upi_intents_data;
                     </div>
                   `?`
                 </div>
-                `?_.recurring && !_.tab === 'emandate' && _.methods.count === 1 && _.methods.card`
+                `?_.recurring && _.tab !== 'emandate' && _.methods.count === 1 && method.card`
                   <div class="pad recurring-message">
                     <span>&#x2139;</span>
                     `?o('subscription_id')`
+                      `?method.debit_card && method.credit_card`
+                        Subscription payments are supported on Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
+                      `??method.debit_card`
+                        Subscription payments are only supported on Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
+                      `??`
+                        Subscription payments are only supported on Mastercard and Visa Credit Cards.
+                      `?`
                       Subscription payments are only supported on Mastercard and Visa credit cards.
                     `??`
-                      Only MasterCard and Visa Credit Cards are supported for this payment.
+                      `?method.debit_card && method.credit_card`
+                        Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.
+                      `??method.debit_card`
+                        Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.
+                      `??`
+                        Only Visa and Mastercard Credit Cards are supported for this payment.
+                      `?`
                     `?`
                   </div>
                 `?`

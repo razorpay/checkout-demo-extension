@@ -382,6 +382,8 @@ function setPaymentMethods(session) {
         session.recurring_card_text =
           availMethods.card.credit.join(' and ') + ' credit cards';
       }
+      availMethods.debit_card = availMethods.card.debit;
+      availMethods.credit_card = availMethods.card.credit;
       if (!amount) {
         delete availMethods.card;
       }
