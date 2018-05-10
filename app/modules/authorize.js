@@ -1,3 +1,5 @@
+import getFingerprint from './fingerprint';
+
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -770,6 +772,13 @@ razorpayProto.createPayment = function(data, params) {
   if (!isNonNullObject(params)) {
     params = emo;
   }
+
+  let fingerprint = getFingerprint();
+  if (fingerprint) {
+    data['_[fhash]'] = fingerprint;
+  }
+  data['_[tz]'] = new Date().getTimezoneOffset();
+
   this._payment = new Payment(data, params, this);
   return this;
 };
