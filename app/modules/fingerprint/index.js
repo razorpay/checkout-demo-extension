@@ -24,10 +24,17 @@ function getFingerprint() {
     screen.colorDepth,
 
     // Device Memory:
-    navigator.deviceMemory
+    navigator.deviceMemory,
+
+    // screen.width and screen.height can be exchanged due to device rotation
+    screen.width + screen.height,
+
+    screen.width * screen.height,
+
+    window.devicePixelRatio
   ];
 
-  sha(components.join(''));
+  sha(components.join());
 }
 
 function sha(str) {

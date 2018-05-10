@@ -771,11 +771,11 @@ razorpayProto.createPayment = function(data, params) {
     params = emo;
   }
 
-  data = {
-    ...data,
-    '_[fhash]': getFingerprint(),
-    '_[tz]': new Date().getTimezoneOffset()
-  };
+  let fingerprint = getFingerprint();
+  if (fingerprint) {
+    data['_[fhash]'] = fingerprint;
+  }
+  data['_[tz]'] = new Date().getTimezoneOffset();
 
   this._payment = new Payment(data, params, this);
   return this;
