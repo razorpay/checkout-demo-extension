@@ -659,7 +659,20 @@ Session.prototype = {
   completePendingPayment: function() {
     var self = this;
     try {
-      var pollUrl = StorageBridge.getString(UPI_POLL_URL);
+      var pollUrl, pendingPaymentTimestamp;
+      pendingPaymentTimestamp = StorageBridge.getString(PENDING_PAYMENT_TS);
+      pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp) || 0;
+
+      if (pendingPaymentTimestamp) {
+        /* if pending payment is older than 15 minutes clear the polling url */
+        if (now() - pendingPaymentTimestamp > 900000) {
+          StorageBridge.setString(UPI_POLL_URL, '');
+          StorageBridge.setString(PENDING_PAYMENT_TS, '0');
+        } else {
+          pollUrl = StorageBridge.getString(UPI_POLL_URL);
+        }
+      }
+
       if (pollUrl) {
         this.switchTab('upi');
         this.showLoadError();
@@ -2002,6 +2015,7 @@ Session.prototype = {
     this.isResumedPayment = false;
 
     try {
+      StorageBridge.setString(PENDING_PAYMENT_TS, '0');
       StorageBridge.setString(UPI_POLL_URL, '');
     } catch (e) {}
 
@@ -2313,6 +2327,7 @@ Session.prototype = {
 
       this.r.on('payment.upi.coproto_response', function(request) {
         try {
+          StorageBridge.setString(PENDING_PAYMENT_TS, now() + '');
           StorageBridge.setString(UPI_POLL_URL, request.url);
         } catch (e) {}
       });
