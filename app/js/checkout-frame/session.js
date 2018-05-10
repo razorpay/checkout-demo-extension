@@ -656,6 +656,56 @@ Session.prototype = {
     }
   },
 
+  completePendingPayment: function() {
+    var self = this;
+    try {
+      var pollUrl, pendingPaymentTimestamp;
+      pendingPaymentTimestamp = StorageBridge.getString(PENDING_PAYMENT_TS);
+      pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
+
+      if (pendingPaymentTimestamp) {
+        /* if pending payment is older than 15 minutes clear the polling url */
+        if (now() - pendingPaymentTimestamp > 900000) {
+          StorageBridge.setString(UPI_POLL_URL, '');
+          StorageBridge.setString(PENDING_PAYMENT_TS, '0');
+        } else {
+          pollUrl = StorageBridge.getString(UPI_POLL_URL);
+        }
+      }
+
+      if (pollUrl) {
+        this.switchTab('upi');
+        this.showLoadError();
+        this.isResumedPayment = true;
+
+        /*
+         * TODO: fix this flow. We should not need to rewrite this entire thing
+         * We should be reusing Payment object.
+         */
+        this.ajax = recurseAjax(
+          pollUrl,
+          function(response) {
+            if (response.razorpay_payment_id) {
+              invoke(successHandler, self, response);
+            } else {
+              var errorObj = response.error;
+              if (!isNonNullObject(errorObj) && !errorObj.description) {
+                response = discreet.error('Payment failed');
+              }
+
+              invoke(errorHandler, self, response);
+            }
+          },
+          function(response) {
+            return response && response.status;
+          },
+          null,
+          $.jsonp
+        );
+      }
+    } catch (e) {}
+  },
+
   setWhatsappIcon: function() {
     var intentsData = this.upi_intents_data;
     var whatsappObj;
@@ -695,6 +745,7 @@ Session.prototype = {
     this.setEMI();
     this.improvisePaymentOptions();
     this.setModal();
+    this.completePendingPayment();
     this.bindEvents();
     errorHandler.call(this, this.params);
 
@@ -894,6 +945,9 @@ Session.prototype = {
       ) {
         return cancel_upi(this);
       }
+    }
+
+    if (this.r._payment || this.isResumedPayment) {
       if (confirmClose()) {
         this.clearRequest();
       } else {
@@ -1957,6 +2011,14 @@ Session.prototype = {
     }
 
     this.destroyMagic();
+
+    this.isResumedPayment = false;
+
+    try {
+      StorageBridge.setString(PENDING_PAYMENT_TS, '0');
+      StorageBridge.setString(UPI_POLL_URL, '');
+    } catch (e) {}
+
     abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
@@ -2261,6 +2323,13 @@ Session.prototype = {
 
       this.r.on('payment.upi.selectapp', function(data) {
         that.showLoadError('Select UPI App in your device', false);
+      });
+
+      this.r.on('payment.upi.coproto_response', function(request) {
+        try {
+          StorageBridge.setString(PENDING_PAYMENT_TS, now() + '');
+          StorageBridge.setString(UPI_POLL_URL, request.url);
+        } catch (e) {}
       });
 
       this.r.on('payment.upi.pending', function(data) {

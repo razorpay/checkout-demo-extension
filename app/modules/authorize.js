@@ -663,6 +663,8 @@ var responseTypes = {
       );
     };
 
+    this.emit('upi.coproto_response', request);
+
     var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
       if (isEmptyObject(data)) {

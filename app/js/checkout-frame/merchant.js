@@ -1,10 +1,14 @@
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
+  StorageBridge = window.StorageBridge,
   iosCheckoutBridgeNew = getNewIOSWebkitInstance(),
   cookieDisabled = !navigator.cookieEnabled,
   sessions = {},
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener;
+
+var UPI_POLL_URL = 'rzp_upi_payment_poll_url',
+  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
 
 var contactPattern = /^\+?[0-9]{8,15}$/;
 var emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
@@ -837,6 +841,17 @@ window.upiIntentResponse = function(data) {
 
 window.backPressed = function(callback) {
   var session = getSession();
+
+  var pollUrl;
+
+  try {
+    pollUrl = StorageBridge.getString(UPI_POLL_URL);
+  } catch (e) {}
+
+  if (pollUrl) {
+    session.hideErrorMessage();
+  }
+
   if (
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
