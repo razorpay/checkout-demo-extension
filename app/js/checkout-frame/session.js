@@ -661,7 +661,7 @@ Session.prototype = {
     try {
       var pollUrl, pendingPaymentTimestamp;
       pendingPaymentTimestamp = StorageBridge.getString(PENDING_PAYMENT_TS);
-      pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp) || 0;
+      pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
       if (pendingPaymentTimestamp) {
         /* if pending payment is older than 15 minutes clear the polling url */
