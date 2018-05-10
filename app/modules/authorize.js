@@ -1,5 +1,4 @@
 import getFingerprint from './fingerprint';
-import getPrivateBrowsingMode from './browsingMode';
 
 var pollingInterval;
 
@@ -772,14 +771,9 @@ razorpayProto.createPayment = function(data, params) {
     params = emo;
   }
 
-  const isPrivateBrowsing = getPrivateBrowsingMode(),
-    fingerprint = getFingerprint() || '';
-
   data = {
     ...data,
-    '_[fhash]': fingerprint,
-    '_[pmode]':
-      typeof isPrivateBrowsing !== 'undefined' ? +isPrivateBrowsing : '',
+    '_[fhash]': getFingerprint(),
     '_[tz]': new Date().getTimezoneOffset()
   };
 
