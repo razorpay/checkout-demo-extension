@@ -2339,7 +2339,7 @@ Session.prototype = {
 
         /* Otherwise it's directpay */
         that.showLoadError(
-          "Please accept request from razorpay's vpa on your UPI app"
+          "Please accept the request from Razorpay's VPA on your UPI app"
         );
       });
     } else {
