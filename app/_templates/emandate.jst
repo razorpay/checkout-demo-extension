@@ -3,6 +3,7 @@ var bank_account = _.prefill.bank_account,
     bank_name = _.prefill.bank_name,
     bank_ifsc = _.prefill.bank_ifsc,
     aadhaar = _.prefill.aadhaar,
+    aadhaar_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$',
     bank = _.prefill.bank;
 `
 <div id="emandate-inner">
@@ -44,7 +45,7 @@ var bank_account = _.prefill.bank_account,
     <div class="elem-wrap" id="elem-wrap-nb-acc-ifsc"><div class="elem elem-nb-acc-ifsc`?bank_ifsc` readonly`?`">
       <div class="help">Please enter a valid IFSC</div>
       <label>IFSC</label>
-      <input class="input" name="bank_account[ifsc]" type="text" id="nb-acc-ifsc" value="`=bank_ifsc`"`?bank_ifsc` readonly`?` required pattern="^[a-zA-Z]{4}[0-9]{7}$" maxlength="11" spellcheck="false" autocorrect="off" autocapitalize="off">
+      <input class="input" name="bank_account[ifsc]" type="text" id="nb-acc-ifsc" value="`=bank_ifsc`"`?bank_ifsc` readonly`?` required pattern="`=aadhaar_pattern`" maxlength="11" spellcheck="false" autocorrect="off" autocapitalize="off">
     </div></div>
     <div class="elem-wrap" id="elem-wrap-nb-acc-name"><div class="elem elem-nb-acc-name`?bank_name` readonly`?`">
       <div class="help">Please enter a valid Name as per your account</div>
@@ -63,7 +64,7 @@ var bank_account = _.prefill.bank_account,
     <div class="elem-wrap" id="elem-wrap-adhr-acc-ifsc"><div class="elem elem-adhr-acc-ifsc`?bank_ifsc` readonly`?`">
       <div class="help">Please enter a valid IFSC</div>
       <label>IFSC</label>
-      <input class="input" name="bank_account[ifsc]" type="text" id="adhr-acc-ifsc" value="`=bank_ifsc`"`?bank_ifsc` readonly`?` required pattern="^[a-zA-Z]{4}[0-9]{7}$" maxlength="11" spellcheck="false" autocorrect="off" autocapitalize="off">
+      <input class="input" name="bank_account[ifsc]" type="text" id="adhr-acc-ifsc" value="`=bank_ifsc`"`?bank_ifsc` readonly`?` required pattern="`=aadhaar_pattern`" maxlength="11" spellcheck="false" autocorrect="off" autocapitalize="off">
     </div></div>
     <div class="elem-wrap" id="elem-wrap-adhr-acc-name"><div class="elem elem-adhr-acc-name`?bank_name` readonly`?`">
       <div class="help">Please enter a valid Name as per your account</div>
