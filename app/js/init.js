@@ -63,7 +63,7 @@ function makeAuthUrl(r, url) {
       if (partner_token) {
         value += '&partner_token=' + partner_token;
       }
-      return url + '?' + prop + '=' + value;
+      return url + '?x_entity_id=' + value;
     }
   }
   return url;

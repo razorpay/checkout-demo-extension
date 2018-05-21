@@ -164,7 +164,7 @@ function getDecimalAmount(amount) {
       },
       isValid: function() {
         if (this.value.length === 11) {
-          return /^[a-zA-Z]{4}[0-9]{7}$/.test(this.value);
+          return /^[a-zA-Z]{4}[a-zA-Z0-9]{7}$/.test(this.value);
         }
         return false;
       }
