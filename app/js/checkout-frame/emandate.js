@@ -7,8 +7,26 @@ var emandateTabTitles = {
 function emandateView(session) {
   this.history = [];
   this.session = session;
+
+  /* Prefill */
+  this.prefill = {
+    /* bank is the bank code for a particular bank */
+    bank: session.get('prefill.bank'),
+    /* bank_account is the account number of user */
+    bank_account: session.get('prefill.bank_account[account_number]'),
+    /* bank_name is the name of the account holder */
+    bank_name: session.get('prefill.bank_account[name]'),
+    /* bank_ifsc is the ifsc code for user's bank account */
+    bank_ifsc: session.get('prefill.bank_account[ifsc]'),
+    /* auth_type that the merchant wants to enforce */
+    auth_type: session.get('prefill.auth_type'),
+    /* aadhaar is the 12 digit aadhaar number of the user */
+    aadhaar: session.get('prefill.aadhaar[number]')
+  };
+
   this.opts = {
-    session: session
+    session: session,
+    prefill: this.prefill
   };
 
   this.banks = this.session.methods.emandate;
@@ -22,6 +40,8 @@ emandateView.prototype = {
   render: function() {
     this.unbind();
     gel('emandate-wrapper').innerHTML = templates.emandate(this.opts);
+    this.el = gel('emandate-wrapper').firstChild;
+    this.input();
     this.bind();
   },
 
@@ -61,6 +81,28 @@ emandateView.prototype = {
   unbind: function() {
     invokeEach(this.listeners);
     this.listeners = [];
+  },
+
+  input: function() {
+    var self = this;
+    each($(this.el).find('input[name]'), function(i, el) {
+      self.session.input(el);
+    });
+  },
+
+  determineLandingScreen: function() {
+    if (this.prefill.bank && this.banks[this.prefill.bank]) {
+      var landingScreen = 'emandate-bank';
+      $('#bank-select').val(this.prefill.bank);
+      this.setBank(this.prefill.bank);
+
+      if (this.prefill.auth_type) {
+        landingScreen = 'emandate-' + this.prefill.auth_type;
+      }
+
+      return landingScreen;
+    }
+    return false;
   },
 
   getAuthTypes: function(bankCode) {
@@ -133,6 +175,11 @@ emandateView.prototype = {
   },
 
   showTab: function(tab) {
+    var landingScreen = this.determineLandingScreen();
+    if (tab === 'emandate' && landingScreen) {
+      tab = landingScreen;
+    }
+
     var authTypes = this.getAuthTypes();
 
     if (
@@ -145,13 +192,11 @@ emandateView.prototype = {
     this.session.body.attr('tab', 'emandate');
     this.session.tab = 'emandate';
     this.history.push(tab);
-
     this.setScreen(tab);
   },
 
   back: function() {
     this.history.pop();
-
     if (this.history.length === 0) {
       $('#container').removeClass('emandate-extra');
       return false;

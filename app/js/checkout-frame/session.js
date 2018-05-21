@@ -723,7 +723,8 @@ Session.prototype = {
     options = options || {};
 
     // make true to enable mweb-intent
-    this.isMobileBrowser = ua_android_browser && this.get('key') === 'rzp_live_F3HsjNBLNxSrWu';
+    this.isMobileBrowser =
+      ua_android_browser && this.get('key') === 'rzp_live_F3HsjNBLNxSrWu';
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -776,29 +777,16 @@ Session.prototype = {
     var options = this.get();
     var bankCode, accountNumber;
 
-    var prefillBank = options['prefill.bank'];
-    if (prefillBank) {
-      if (
-        this.methods.emandate &&
-        (options['prefill.bank_account[account_number]'] ||
-          options['prefill.aadhaar[number]'])
-      ) {
-        this.emandateTpv = true;
-        this.tab = this.oneMethod = 'emandate';
-      } else if (!options['recurring']) {
-        this.tab = this.oneMethod = 'netbanking';
-      }
+    if (options['prefill.bank'] && !options['recurring']) {
+      this.tab = this.oneMethod = 'netbanking';
     }
 
     if (this.order && this.order.bank) {
       bankCode = this.order.bank;
       accountNumber = this.order.account_number;
-    } else if (prefillBank) {
-      bankCode = prefillBank;
-      accountNumber = options['prefill.bank_account[account_number]'];
     }
 
-    var banks = this.methods.emandate || this.methods.netbanking;
+    var banks = this.methods.netbanking;
 
     if (bankCode && banks) {
       this.tpvBank = {
