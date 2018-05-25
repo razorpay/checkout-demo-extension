@@ -777,6 +777,11 @@ Session.prototype = {
     var options = this.get();
     var bankCode, accountNumber;
 
+    if (this.order && this.order.method === 'upi') {
+      this.upiTpv = true;
+      return;
+    }
+
     if (options['prefill.bank'] && !options['recurring']) {
       this.tab = this.oneMethod = 'netbanking';
     }
@@ -855,6 +860,21 @@ Session.prototype = {
     }
   },
 
+  setOneMethod: function(methodName) {
+    this.oneMethod = methodName;
+    var el = document.createElement('span');
+    el.className = 'proceed-btn';
+    if (this.get('amount')) {
+      el.innerHTML = 'Pay by ' + tab_titles[methodName];
+    } else {
+      el.innerHTML = 'Authenticate';
+    }
+    $('#footer').append(el);
+
+    $(this.el).addClass('one-method');
+    $('.payment-option').addClass('submit-button button');
+  },
+
   improvisePaymentOptions: function() {
     if (this.optional.contact) {
       if (this.optional.email) {
@@ -869,20 +889,14 @@ Session.prototype = {
         methodName
       ) {
         if (self.methods[methodName]) {
-          self.oneMethod = methodName;
-          var el = document.createElement('span');
-          el.className = 'proceed-btn';
-          if (self.get('amount')) {
-            el.innerHTML = 'Pay by ' + tab_titles[methodName];
-          } else {
-            el.innerHTML = 'Authenticate';
-          }
-          $('#footer').append(el);
+          self.setOneMethod(methodName);
           return true;
         }
       });
-      $(this.el).addClass('one-method');
-      $('.payment-option').addClass('submit-button button');
+    }
+
+    if (this.upiTpv) {
+      this.setOneMethod('upi');
     }
   },
 
