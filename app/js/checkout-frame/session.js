@@ -779,7 +779,6 @@ Session.prototype = {
 
     if (this.order && this.order.method === 'upi') {
       this.upiTpv = true;
-      return;
     }
 
     if (options['prefill.bank'] && !options['recurring']) {
