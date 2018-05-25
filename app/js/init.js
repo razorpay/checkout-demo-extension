@@ -57,6 +57,8 @@ function makeAuthUrl(r, url) {
     var value = r.get(prop);
     if (prop === 'key') {
       prop = 'key_id';
+    } else {
+      prop = 'x_entity_id';
     }
     if (value) {
       var partner_token = r.get('partner_token');
