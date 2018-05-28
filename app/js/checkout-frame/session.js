@@ -2062,7 +2062,7 @@ Session.prototype = {
         return;
       }
 
-      data.method = 'netbanking';
+      data.method = this.order.method || 'netbanking';
       data.bank = this.order.bank;
     } else if (this.emandateTpv) {
       if (this.checkInvalid('#pad-common')) {
