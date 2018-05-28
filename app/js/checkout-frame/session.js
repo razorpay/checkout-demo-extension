@@ -779,7 +779,6 @@ Session.prototype = {
 
     if (this.order && this.order.method === 'upi') {
       this.upiTpv = true;
-      return;
     }
 
     if (options['prefill.bank'] && !options['recurring']) {
@@ -2063,7 +2062,7 @@ Session.prototype = {
         return;
       }
 
-      data.method = 'netbanking';
+      data.method = this.order.method || 'netbanking';
       data.bank = this.order.bank;
     } else if (this.emandateTpv) {
       if (this.checkInvalid('#pad-common')) {
