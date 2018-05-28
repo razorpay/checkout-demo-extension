@@ -1105,6 +1105,8 @@ Session.prototype = {
         $('#amount-value').val(this.getDecimalAmount(amount));
         this.get().amount = amount;
         $('#amount .amount-figure').html(this.formatAmount(amount));
+      } else {
+        $('#amount-value').focus();
       }
     });
 

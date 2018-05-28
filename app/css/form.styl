@@ -177,8 +177,29 @@ input[type=checkbox] {
   appearance: none;
 }
 
+.list .checkbox, .checkbox--round + .checkbox {
+  border-radius: 50%;
+  width: 16px;
+  height: @width;
+  position: relative;
+  background: #fff;
+  transition: 0.2s;
+
+  &::after {
+    content: '';
+    width: 4px;
+    height: 9px;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+    border-left: 0;
+    border-top: 0;
+    position: absolute;
+    transform: rotate(40deg) translate(5px, -2px);
+  }
+}
+
 .checked .checkbox::after,
-:checked + .checkbox::after {
+:not(.checkbox--round):checked + .checkbox::after {
   content: "";
   width: 7px;
   height: 3px;
@@ -189,6 +210,10 @@ input[type=checkbox] {
   border-top: none;
   border-right: none;
   transform: rotate(-45deg);
+}
+
+.checkbox--round:checked + .checkbox::after {
+  border-color: #fff;
 }
 
 .checkbox {
