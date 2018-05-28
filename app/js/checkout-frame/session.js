@@ -1106,6 +1106,7 @@ Session.prototype = {
         this.get().amount = amount;
         $('#amount .amount-figure').html(this.formatAmount(amount));
       } else {
+        $('#amount-value').val(null);
         $('#amount-value').focus();
       }
     });
