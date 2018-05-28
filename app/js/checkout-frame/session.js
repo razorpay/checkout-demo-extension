@@ -719,12 +719,32 @@ Session.prototype = {
     }
   },
 
+  checkTez: function() {
+    if (!this.isMobileBrowser) {
+      return;
+    }
+
+    var self = this;
+
+    Tez.check(
+      function() {
+        /* This is success callback */
+        $('#upi-tez').css('display', 'block');
+      },
+      function(e) {
+        /* This is error callback */
+        self.track('tez_error', e);
+      }
+    );
+  },
+
   render: function(options) {
     options = options || {};
 
     // make true to enable mweb-intent
+
     this.isMobileBrowser =
-      ua_android_browser && this.get('key') === 'rzp_live_F3HsjNBLNxSrWu';
+      ua_android_browser && this.get('key') === 'rzp_live_izcpsDPjM13eLY';
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -742,6 +762,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.setEmandate();
+    this.checkTez();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
@@ -2200,6 +2221,11 @@ Session.prototype = {
 
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
+      data['_[flow]'] = 'intent';
+    }
+
+    if (data['_[flow]'] === 'tez') {
+      request.tez = true;
       data['_[flow]'] = 'intent';
     }
 

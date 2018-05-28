@@ -1,4 +1,5 @@
 import getFingerprint from './fingerprint';
+import * as Tez from './tez';
 
 var pollingInterval;
 
@@ -133,6 +134,7 @@ export default function Payment(data, params, r) {
   this.fees = params.fees;
   this.sdk_popup = params.sdk_popup;
   this.magic = params.magic;
+  this.tez = params.tez;
 
   this.isMagicPayment =
     this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
@@ -641,6 +643,24 @@ var responseTypes = {
     self.emit('upi.pending', fullResponse.data);
   },
 
+  tez: function(coprotoRequest, fullResponse) {
+    Tez.pay(
+      fullResponse.data,
+      instrument => {
+        this.emit('upi.intent_response', {
+          response: instrument.details
+        });
+      },
+      error => {
+        if (error.code && error.code === error.ABORT_ERR) {
+          this.emit('upi.intent_response', {});
+        }
+
+        track(this.r, 'tez_error', error);
+      }
+    );
+  },
+
   intent: function(request, fullResponse) {
     var self = this;
     var url = request.url;
@@ -673,16 +693,26 @@ var responseTypes = {
         return self.emit('cancel', upiBackCancel);
       } else if (data.response) {
         var response = {};
-        // Convert the string response into a JSON object.
-        var split = data.response.split('&');
-        for (var i = 0; i < split.length; i++) {
-          var pair = split[i].split('=');
-          if (pair[1] === '' || pair[1] === 'undefined' || pair[1] === 'null') {
-            response[pair[0]] = null;
-          } else {
-            response[pair[0]] = pair[1];
+
+        if (isNonNullObject(data.response)) {
+          response = data.response;
+        } else {
+          // Convert the string response into a JSON object.
+          var split = data.response.split('&');
+          for (var i = 0; i < split.length; i++) {
+            var pair = split[i].split('=');
+            if (
+              pair[1] === '' ||
+              pair[1] === 'undefined' ||
+              pair[1] === 'null'
+            ) {
+              response[pair[0]] = null;
+            } else {
+              response[pair[0]] = pair[1];
+            }
           }
         }
+
         if (!response.txnId) {
           return self.emit('cancel', upiBackCancel);
         }
@@ -701,6 +731,10 @@ var responseTypes = {
         CheckoutBridge.callNativeIntent(intent_url);
       }
     } else if (ua_android_browser) {
+      if (this.tez) {
+        return responseTypes['tez'].call(this, request, fullResponse);
+      }
+
       // Start Timeout
       var drawerTimeout = setTimeout(function() {
         /**

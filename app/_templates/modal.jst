@@ -40,6 +40,7 @@ var name_readonly = o('readonly.name') && prefill_name;
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 var upi_intent = _.upi_intents_data && _.methods.upi_intent;
 var upi_apps = _.upi_intents_data;
+
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -567,12 +568,21 @@ var upi_apps = _.upi_intents_data;
                     <div id="upi-entry">
                       <div class="list">
                         `?_.isMobileBrowser`
-                        <div id="upi-intent" class="item">
-                          <input id="radio-intent" type="radio" name="_[flow]" value="intent" `?_.isMobileBrowser`checked`?`/>
+                        <div id="upi-intent" class="item" style="display: none">
+                          <input id="radio-intent" type="radio" name="_[flow]" value="intent"/>
                           <label for="radio-intent">
                             <i class="theme">&#xe70d;</i>
                             <div class="title">UPI App (installed on phone)</div>
                             <div class="subtitle">Directly pay with a UPI App</div>
+                            <span class="checkbox"></span>
+                          </label>
+                        </div>
+                        <div id="upi-tez" class="item" checked>
+                          <input id="radio-tez" type="radio" name="_[flow]" value="tez"/>
+                          <label for="radio-tez">
+                            <i class="tez-icon"></i>
+                            <div class="title">Google Tez</div>
+                            <div class="subtitle">Installed on your device</div>
                             <span class="checkbox"></span>
                           </label>
                         </div>
