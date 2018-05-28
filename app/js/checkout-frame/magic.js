@@ -75,6 +75,10 @@ magicView.prototype = {
     this.clearTimeout();
   },
 
+  track: function(eventName, data) {
+    this.session.track(eventName, data);
+  },
+
   resetLoader: function() {
     $('#form-magic-otp .loader').removeClass('load');
 
@@ -110,7 +114,7 @@ magicView.prototype = {
     delete this.magicTimeout;
   },
 
-  setTimeout: function(timeout) {
+  setTimeout: function(timeout, timeoutMeta) {
     var self = this;
 
     if (!this.checkoutVisible) {
@@ -121,6 +125,7 @@ magicView.prototype = {
       if (self.magicTimeout) {
         window.clearTimeout(self.magicTimeout);
         delete self.magicTimeout;
+        self.track('magic_timeout', timeoutMeta);
         self.showPaymentPage();
       }
     };
@@ -170,7 +175,11 @@ magicView.prototype = {
     if (timeout === TIMEOUT_CLEAR) {
       this.clearTimeout();
     } else {
-      this.setTimeout(timeout);
+      this.setTimeout(timeout, {
+        timeout: timeout,
+        type: 'page',
+        screen: data.type
+      });
     }
   },
 
@@ -178,7 +187,10 @@ magicView.prototype = {
     var self = this;
     this.clearTimeout();
 
-    this.setTimeout(TIMEOUT_REDIRECT);
+    this.setTimeout(TIMEOUT_REDIRECT, {
+      timeout: TIMEOUT_REDIRECT,
+      type: 'redirect'
+    });
   },
 
   resendOtp: function(e) {
@@ -190,6 +202,10 @@ magicView.prototype = {
       var resend = true;
 
       if (this.resendCount === 1) {
+        this.track('magic_otp_resend', {
+          resend_count: this.resendCount
+        });
+
         if (window.confirm('This is your last attempt to generate OTP.')) {
           $('#magic-wrapper').addClass('hide-resend');
         } else {
@@ -328,6 +344,7 @@ magicView.prototype = {
       }
 
       this.otpTimeout = window.setTimeout(function() {
+        self.track('magic_otp_timeout');
         self.enterOtp();
       }, TIMEOUT_NO_OTP);
     } else {
@@ -361,6 +378,10 @@ magicView.prototype = {
       this.showOtpView({
         otp_permission: this.otpPermission
       });
+    }
+
+    if (screen === 'magic-otp') {
+      this.track('magic_submit_otp');
     }
 
     if (CheckoutBridge && CheckoutBridge.relay) {

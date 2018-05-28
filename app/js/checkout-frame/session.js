@@ -824,7 +824,10 @@ Session.prototype = {
     if (!this.magicView && this.magic) {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
-      this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION);
+      this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION, {
+        timeout: timeout,
+        type: 'magic_no_action'
+      });
     }
 
     this.magicView.resendCount = 0;
@@ -2267,6 +2270,7 @@ Session.prototype = {
       if (that.r._payment && that.r._payment.isMagicPayment) {
         sub_link[0].style = '';
         sub_link.on('click', function() {
+          that.track('magic_user_cancel');
           if (that.magicView) {
             that.magicView.showPaymentPage({
               otpelf: true,
