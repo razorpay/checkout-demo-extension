@@ -1,7 +1,7 @@
 var PaymentRequest = window.PaymentRequest;
 
 export const check = (successCallback, errorCallback) => {
-  let error;
+  errorCallback = errorCallback || (() => {});
   try {
     /**
      * PaymentRequest API is only available in the modern browsers which
@@ -21,19 +21,18 @@ export const check = (successCallback, errorCallback) => {
       })
       /* jshint ignore:start */
       .catch(e => {
-        error = e;
+        errorCallback(e);
       });
     /* jshint ignore:end */
   } catch (e) {
-    error = e;
-  }
-  if (error && isFunction(errorCallback)) {
-    errorCallback(error);
+    errorCallback(e);
   }
 };
 
 export const pay = (data, successCallback, errorCallback) => {
   var instrumentData = {};
+  errorCallback = errorCallback || (() => {});
+
   data.intent_url
     .replace(/^.*\?/, '')
     .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
@@ -57,8 +56,6 @@ export const pay = (data, successCallback, errorCallback) => {
     }
   };
 
-  let error;
-
   try {
     const request = new PaymentRequest(supportedInstruments, details);
     request
@@ -70,14 +67,10 @@ export const pay = (data, successCallback, errorCallback) => {
       })
       /* jshint ignore:start */
       .catch(e => {
-        error = e;
+        errorCallback(e);
       });
     /* jshint ignore:end */
   } catch (e) {
-    error = e;
-  }
-
-  if (error && isFunction(errorCallback)) {
-    errorCallback(error);
+    errorCallback(e);
   }
 };
