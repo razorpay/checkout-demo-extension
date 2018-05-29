@@ -825,7 +825,7 @@ Session.prototype = {
       $(this.el).addClass('magic');
       this.magicView = new magicView(this);
       this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION, {
-        timeout: timeout,
+        timeout: TIMEOUT_MAGIC_NO_ACTION,
         type: 'magic_no_action'
       });
     }

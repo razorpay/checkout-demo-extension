@@ -175,6 +175,7 @@ Payment.prototype = {
     }
 
     if (this.isMagicPayment) {
+      track(this.r, 'magic_open_popup');
       window.CheckoutBridge.invokePopup(
         JSON.stringify({
           content: templates.popup(this),
@@ -579,6 +580,7 @@ var responseTypes = {
 
     if (this.isMagicPayment) {
       this.r.emit('magic.init');
+      track(this.r, 'magic_init');
 
       var popupOptions = {
         focus: false,

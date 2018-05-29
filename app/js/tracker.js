@@ -71,7 +71,8 @@ function generateUID() {
     _toBase62(Math.floor(238328 * Math.random())) +
     '0';
 
-  var sum = 0, tempdigit;
+  var sum = 0,
+    tempdigit;
   each(num, function(i) {
     tempdigit = map62[num[num.length - 1 - i]];
     if ((num.length - i) % 2) {
@@ -198,6 +199,15 @@ function track(r, event, data) {
     });
     if (options.image && discreet.isBase64Image(options.image)) {
       options.image = 'base64';
+    }
+
+    var paymentId = (r._payment || {}).payment_id;
+    if (paymentId) {
+      properties.payment_id = paymentId;
+    }
+
+    if (_uid) {
+      properties.local_order_id = _uid;
     }
 
     var trackingPayload = {
