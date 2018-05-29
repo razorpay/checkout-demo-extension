@@ -514,7 +514,7 @@ var upi_apps = _.upi_intents_data;
                           <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
                           <label for="wallet-radio-`=w.name`" class="radio-label">
                             <span class="checkbox"></span>
-                            <img style="display: none" src="`=w.sq`" onload=" this.nextElementSibling.style = 'background-image:url('+this.src+')'">
+                            <img style="display:none" src="`=w.sq`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
                             <div class="placeholder"></div>
                             <span class="title">`=w.title`</span>
                             `?hasOffer`
@@ -540,7 +540,7 @@ var upi_apps = _.upi_intents_data;
                             <input type="radio" name="upi_app" value="`=a.package_name`" id="upi_app-radio-`=a.package_name`">
                             <label for="upi_app-radio-`=a.package_name`" class="radio-label">
                               <span class="checkbox"></span>
-                              <img style="display: none" src="`=a.app_icon`" onload=" this.nextElementSibling.style = 'background-image:url('+this.src+')'">
+                              <img style="display: none" src="`=a.app_icon`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
                               <div class="placeholder"></div>
                               <span class="title">`=a.app_name`</span>
                             </label>
