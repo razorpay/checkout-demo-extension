@@ -1105,9 +1105,20 @@ Session.prototype = {
         $('#amount-value').val(this.getDecimalAmount(amount));
         this.get().amount = amount;
         $('#amount .amount-figure').html(this.formatAmount(amount));
+
+        var infoEle = $('.partial-payment-block .subtitle--help');
+        /* Reset text in info element */
+        if (infoEle) {
+          infoEle.html('Pay some amount now and remaining later.');
+        }
       } else {
         $('#amount-value').val(null);
         $('#amount-value').focus();
+
+        var parentEle = $('#amount-value')[0].parentNode;
+        if (parentEle) {
+          $(parentEle).addClass('mature'); // mature class helps show tooltip if input is invalid
+        }
       }
     });
 
@@ -1469,11 +1480,48 @@ Session.prototype = {
             ? self.order.amount_due
             : self.order.amount;
 
-          var isValid = 0 < value && value <= maxAmount;
+          var isValid = 100 < value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
+
+          var amountDue = self.order.amount_due;
+          var amountDueFormatted = self.formatAmount(amountDue);
+
+          var infoEle = $('.partial-payment-block .subtitle--help');
 
           if (isValid) {
             $('#amount .amount-figure').html(self.formatAmount(value));
+
+            // Update the remaining amount being changed
+            if (value && gel('partial-select-partial').checked && infoEle) {
+              infoEle.html(
+                'Pay remaining ₹' +
+                  self.formatAmount(amountDue - value) +
+                  ' later.'
+              );
+            }
+          } else {
+            var helpEle = $('#amount-value + .help');
+
+            $('#amount .amount-figure').html(amountDueFormatted); // Update amount is header
+
+            /* Update tooltip error */
+            if (helpEle) {
+              if (!value) {
+                // Reset error on no value
+                helpEle.html(
+                  'Please enter a valid amount upto ₹' + amountDueFormatted
+                );
+              } else if (value > self.order.amount_due) {
+                helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
+              } else if (value < 100) {
+                helpEle.html('Minimum payable amount is ₹' + 1);
+              }
+            }
+
+            /* Reset text in info element */
+            if (infoEle) {
+              infoEle.html('Pay some amount now and remaining later.');
+            }
           }
         });
     }

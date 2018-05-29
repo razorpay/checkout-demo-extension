@@ -134,11 +134,10 @@ var upi_apps = _.upi_intents_data;
                   <input type="checkbox" class="checkbox--round" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
                   <label class="checkbox" for="partial-select-partial"></label>
                   <div class="elem-wrap" id="elem-wrap-amount" style="height: auto"><div class="elem elem-amount">
+                    <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
                     <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
-                    <label>Amount</label>
-                    <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
                   </div></div>
-                  <label class="subtitle" for="partial-select-partial">Pay some amount now and remaining later.</label>
+                  <label class="subtitle subtitle--help" for="partial-select-partial">Pay some amount now and remaining later.</label>
 
                   `?`
                   `?address&&!order.partial_payment`
