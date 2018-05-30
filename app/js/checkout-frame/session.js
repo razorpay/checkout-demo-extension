@@ -1094,15 +1094,20 @@ Session.prototype = {
   },
 
   bindEvents: function() {
+    var self = this;
     var thisEl = this.el;
     this.click('#partial-back', function() {
       $(thisEl).removeClass('show-methods');
     });
 
     this.on('change', '#partial-select-partial', function(e) {
+      var parentEle = $('#amount-value').parent();
+
       if (!e.target.checked) {
         var amount = this.order.amount_due;
         $('#amount-value').val(this.getDecimalAmount(amount));
+        toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
+
         this.get().amount = amount;
         $('#amount .amount-figure').html(this.formatAmount(amount));
 
@@ -1115,10 +1120,7 @@ Session.prototype = {
         $('#amount-value').val(null);
         $('#amount-value').focus();
 
-        var parentEle = $('#amount-value')[0].parentNode;
-        if (parentEle) {
-          $(parentEle).addClass('mature'); // mature class helps show tooltip if input is invalid
-        }
+        parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
       }
     });
 
