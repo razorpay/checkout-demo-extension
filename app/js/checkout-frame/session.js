@@ -1480,7 +1480,7 @@ Session.prototype = {
             ? self.order.amount_due
             : self.order.amount;
 
-          var isValid = 100 < value && value <= maxAmount;
+          var isValid = 100 <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
 
           var amountDue = self.order.amount_due;
