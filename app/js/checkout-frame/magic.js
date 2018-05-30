@@ -76,7 +76,33 @@ magicView.prototype = {
   },
 
   track: function(eventName, data) {
-    this.session.track(eventName, data);
+    data = isNonNullObject(data) ? clone(data) : {};
+
+    var payload = this.session.getPayload();
+
+    if (payload.token) {
+      /* Saved cards */
+      data.saved_card = true;
+    } else {
+      var cardNum = payload['card[number]'];
+      if (isString(cardNum)) {
+        data.iin = cardNum.replace(/[^0-9]/, '').substr(0, 6);
+      }
+    }
+
+    if (this.resolvedPage) {
+      data.latest_page = this.resolvedPage;
+    }
+
+    if (typeof this.session.attemptCount !== 'undefined') {
+      data.attempt_count = this.session.attemptCount;
+    }
+
+    if (this.currentBank) {
+      data.bank = this.currentBank;
+    }
+
+    this.session.track('magic_' + eventName, data);
   },
 
   resetLoader: function() {
@@ -125,7 +151,7 @@ magicView.prototype = {
       if (self.magicTimeout) {
         window.clearTimeout(self.magicTimeout);
         delete self.magicTimeout;
-        self.track('magic_timeout', timeoutMeta);
+        self.track('timeout', timeoutMeta);
         self.showPaymentPage();
       }
     };
@@ -151,6 +177,7 @@ magicView.prototype = {
 
     var self = this;
     self.resolvedPage = data.type;
+    self.currentBank = data.bank;
 
     switch (data.type) {
       case 'otp':
@@ -202,7 +229,7 @@ magicView.prototype = {
       var resend = true;
 
       if (this.resendCount === 1) {
-        this.track('magic_otp_resend', {
+        this.track('otp_resend', {
           resend_count: this.resendCount
         });
 
@@ -233,6 +260,7 @@ magicView.prototype = {
 
   requestOtpPermission: function(callback) {
     if (CheckoutBridge && CheckoutBridge.requestOtpPermission) {
+      this.track('request_otp_permission');
       window.otpPermissionCallback = callback.bind(this);
 
       CheckoutBridge.requestOtpPermission();
@@ -245,6 +273,7 @@ magicView.prototype = {
     if (!this.otpPermission) {
       this.requestOtpPermission(function(info) {
         if (info.granted) {
+          this.track('otp_permission_granted');
           self.showWaitingScreen();
         }
       });
@@ -344,7 +373,7 @@ magicView.prototype = {
       }
 
       this.otpTimeout = window.setTimeout(function() {
-        self.track('magic_otp_timeout');
+        self.track('otp_timeout');
         self.enterOtp();
       }, TIMEOUT_NO_OTP);
     } else {
@@ -374,14 +403,20 @@ magicView.prototype = {
 
     this.session.showLoadError(strings.process);
 
-    if (screen === 'magic-choice' && data['choice'] === 'otp') {
-      this.showOtpView({
-        otp_permission: this.otpPermission
+    if (screen === 'magic-choice') {
+      this.track('choice', {
+        choice: data['choice']
       });
+
+      if (data['choice'] === 'otp') {
+        this.showOtpView({
+          otp_permission: this.otpPermission
+        });
+      }
     }
 
     if (screen === 'magic-otp') {
-      this.track('magic_submit_otp');
+      this.track('submit_otp');
     }
 
     if (CheckoutBridge && CheckoutBridge.relay) {

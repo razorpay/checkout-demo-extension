@@ -16,7 +16,7 @@ var strings = {
 var fontTimeout;
 
 /* this === session */
-function handleRelay(relayObj) {
+function handleRelayFn(relayObj) {
   var self = this;
 
   if (
@@ -34,7 +34,7 @@ function handleRelay(relayObj) {
     }
   }
 
-  this.track('magic_handle_relay', trackingObj);
+  this.magicView.track(trackingObj.action, trackingObj);
 
   switch (relayObj.action) {
     case 'page_resolved':
@@ -416,6 +416,9 @@ function Session(options) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+
+  /* The count of payments attempted */
+  this.attemptCount = 0;
   this.listeners = [];
   this.bits = [];
 }
@@ -2251,27 +2254,30 @@ Session.prototype = {
       $('#otp').attr('maxlength', 6);
     }
 
-    this.r
-      .createPayment(data, request)
+    var payment = this.r.createPayment(data, request);
+    payment
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this))
       .on('payment.cancel', bind(cancelHandler, this));
 
+    this.attemptCount++;
+
     var sub_link = $('#error-message .link');
 
     if (this.r._payment && this.r._payment.isMagicPayment) {
-      window.handleRelay = handleRelay.bind(this);
+      window.handleRelay = handleRelayFn.bind(this);
     }
 
-    this.r.on('magic.init', function() {
+    payment.on('payment.magic.init', function() {
       that.setMagic();
+      that.magicView.track('init');
       that.showLoadError('Please wait while we fetch your transaction details');
 
       if (that.r._payment && that.r._payment.isMagicPayment) {
         sub_link[0].style = '';
         sub_link.on('click', function() {
-          that.track('magic_user_cancel');
           if (that.magicView) {
+            that.magicView.track('user_cancel');
             that.magicView.showPaymentPage({
               otpelf: true,
               magic: false
