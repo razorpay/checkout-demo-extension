@@ -623,7 +623,12 @@ Session.prototype = {
 
     var prefilledWallet = this.get('prefill.wallet');
     if (prefilledWallet) {
-      $('#wallet-radio-' + prefilledWallet).prop('checked', true);
+      var selectedWalletEl = $('#wallet-radio-' + prefilledWallet);
+
+      if (selectedWalletEl && selectedWalletEl[0]) {
+        selectedWalletEl.prop('checked', true);
+        $('#body').addClass('sub');
+      }
     }
 
     if (this.hasOwnProperty('data')) {
