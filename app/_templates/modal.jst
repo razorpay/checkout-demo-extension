@@ -115,7 +115,7 @@ var upi_apps = _.upi_intents_data;
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
-                <div class="pad" id="pad-common">
+                <div class="pad partial-payment-block" id="pad-common">
                   <div class="elem-wrap"><div class="elem elem-contact`?contact_readonly` readonly`?`">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
@@ -130,14 +130,15 @@ var upi_apps = _.upi_intents_data;
                   </div></div>
                   `?order.partial_payment`
                   <br>
-                  <label class="partial-label" for="partial-select-partial">Change payment amount</label>
-                  <input type="checkbox" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
-                  <div class="checkbox"></div>
-                  <div class="elem-wrap" id="elem-wrap-amount"><div class="elem elem-amount">
+                  <label class="partial-label" for="partial-select-partial">Make payment in parts</label>
+                  <input type="checkbox" class="checkbox--square" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
+                  <label class="checkbox" for="partial-select-partial"></label>
+                  <div class="elem-wrap" id="elem-wrap-amount" style="height: auto"><div class="elem elem-amount">
+                    <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
                     <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
-                    <label>Amount</label>
-                    <input class="input" name="amount" id="amount-value" value="`=_.getDecimalAmount(o('amount'))`">
                   </div></div>
+                  <label class="subtitle subtitle--help">Pay some amount now and remaining later.</label>
+
                   `?`
                   `?address&&!order.partial_payment`
                   <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
@@ -385,7 +386,7 @@ var upi_apps = _.upi_intents_data;
                     `?!_.recurring && o('remember_customer')`
                     <div id="should-save-card" class="double">
                       <label class="first" for="save" tabIndex="0">
-                        <input type="checkbox" id="save" name="save" value="1" checked>
+                        <input type="checkbox" class="checkbox--square" id="save" name="save" value="1" checked>
                         <span class="checkbox"></span>
                         Remember Card
                       </label>

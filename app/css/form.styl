@@ -177,8 +177,24 @@ input[type=checkbox] {
   appearance: none;
 }
 
+.list .checkbox, .checkbox--square + .checkbox {
+  width: 16px;
+  height: @width;
+  position: relative;
+  background: #fff;
+  transition: 0.2s;
+}
+
+.checkbox--square + .checkbox{
+  background: #f9f9f9;
+}
+
+.radio-label:hover .checkbox {
+  background: #f9f9f9;
+}
+
 .checked .checkbox::after,
-:checked + .checkbox::after {
+:not(.checkbox--square):checked + .checkbox::after {
   content: "";
   width: 7px;
   height: 3px;
@@ -189,6 +205,18 @@ input[type=checkbox] {
   border-top: none;
   border-right: none;
   transform: rotate(-45deg);
+}
+
+.checkbox--square:checked + .checkbox::after {
+    content: '';
+    width: 4px;
+    height: 9px;
+    border: 1px solid #fff;
+    transition: 0.2s;
+    border-left: 0;
+    border-top: 0;
+    position: absolute;
+    transform: rotate(40deg) translate(5px, -2px);
 }
 
 .checkbox {
