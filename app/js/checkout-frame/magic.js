@@ -83,10 +83,17 @@ magicView.prototype = {
     if (payload.token) {
       /* Saved cards */
       data.saved_card = true;
+      var tokens = ((this.session.customer || {}).tokens || {}).items;
+      if (payload.token && tokens) {
+        var currToken = findBy(tokens, 'token', payload.token);
+        if (currToken.card) {
+          data.iin = currToken.card.iin;
+        }
+      }
     } else {
       var cardNum = payload['card[number]'];
       if (isString(cardNum)) {
-        data.iin = cardNum.replace(/[^0-9]/, '').substr(0, 6);
+        data.iin = cardNum.replace(/[^0-9]/g, '').substr(0, 6);
       }
     }
 
