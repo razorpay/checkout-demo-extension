@@ -690,8 +690,8 @@ Session.prototype = {
       pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
       if (pendingPaymentTimestamp) {
-        /* if pending payment is older than 15 minutes clear the polling url */
-        if (now() - pendingPaymentTimestamp > 900000) {
+        /* if pending payment is older than 0 minutes clear the polling url */
+        if (now() - pendingPaymentTimestamp > 0) {
           StorageBridge.setString(UPI_POLL_URL, '');
           StorageBridge.setString(PENDING_PAYMENT_TS, '0');
         } else {
