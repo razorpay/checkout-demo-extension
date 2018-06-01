@@ -139,6 +139,8 @@ export default function Payment(data, params, r) {
   this.isMagicPayment =
     this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
 
+  trackingProps.magic_attempted = this.isMagicPayment;
+
   this.powerwallet =
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
   this.message = params.message;
@@ -177,6 +179,7 @@ Payment.prototype = {
     }
 
     if (this.isMagicPayment) {
+      track(this.r, 'magic_open_popup');
       window.CheckoutBridge.invokePopup(
         JSON.stringify({
           content: templates.popup(this),
@@ -580,7 +583,7 @@ var responseTypes = {
     var popup = this.popup;
 
     if (this.isMagicPayment) {
-      this.r.emit('magic.init');
+      this.r._payment.emit('magic.init');
 
       var popupOptions = {
         focus: false,
