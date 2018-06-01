@@ -294,6 +294,8 @@ magicView.prototype = {
   },
 
   enterOtp: function() {
+    this.track('enter_otp');
+
     $('#form-magic-otp')
       .removeClass('waiting')
       .addClass('manual');
@@ -360,6 +362,7 @@ magicView.prototype = {
       return this.requestOtpPermission(function(info) {
         if (info.granted) {
           data.otp_permission = true;
+          this.track('otp_permission_granted');
         } else {
           self.otpPermDenied = true;
         }
