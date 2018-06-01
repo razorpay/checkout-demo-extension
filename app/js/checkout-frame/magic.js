@@ -28,6 +28,7 @@ magicView.prototype = {
     this.unbind();
     gel('magic-wrapper').innerHTML = templates.magic(this.opts);
     this.bind();
+    this.session.input(gel('magic-otp'));
   },
 
   on: function(event, sel, listener) {
@@ -50,7 +51,7 @@ magicView.prototype = {
         return;
       }
 
-      this.track('show_payment_page');
+      self.track('show_payment_page');
 
       self.showPaymentPage({
         magic: false,
@@ -76,6 +77,7 @@ magicView.prototype = {
   destroy: function() {
     this.unbind();
     this.clearTimeout();
+    window.clearTimeout(this.otpTimeout);
   },
 
   track: function(eventName, data) {
@@ -280,6 +282,8 @@ magicView.prototype = {
   autoreadOtp: function() {
     var self = this;
 
+    this.track('autoread_otp');
+
     if (!this.otpPermission) {
       this.requestOtpPermission(function(info) {
         if (info.granted) {
@@ -291,6 +295,8 @@ magicView.prototype = {
       self.showWaitingScreen();
     }
 
+    $('#body').removeClass('sub');
+
     if (this.otpData) {
       this.otpParsed(this.otpData);
     }
@@ -298,6 +304,8 @@ magicView.prototype = {
 
   enterOtp: function() {
     this.track('enter_otp');
+
+    $('#body').addClass('sub');
 
     $('#form-magic-otp')
       .removeClass('waiting')
@@ -330,6 +338,8 @@ magicView.prototype = {
       .removeClass('waiting')
       .removeClass('manual');
     $('#magic-otp').attr('readonly', true);
+
+    $('#body').addClass('sub');
 
     if (data.otp) {
       $('#magic-otp')
@@ -377,6 +387,7 @@ magicView.prototype = {
     }
 
     this.showView('magic-otp');
+    $('#body').removeClass('sub');
 
     if (this.otpPermission) {
       this.showWaitingScreen();
@@ -387,7 +398,9 @@ magicView.prototype = {
 
       this.otpTimeout = window.setTimeout(function() {
         self.track('otp_timeout');
-        self.enterOtp();
+        if ($('#form-magic-otp').hasClass('waiting')) {
+          self.enterOtp();
+        }
       }, TIMEOUT_NO_OTP);
     } else {
       this.enterOtp();
@@ -414,6 +427,13 @@ magicView.prototype = {
       data: data
     };
 
+    if (screen === 'magic-otp') {
+      if (this.session.checkInvalid('#form-magic-otp')) {
+        return;
+      }
+      this.track('submit_otp');
+    }
+
     this.session.showLoadError(strings.process);
 
     if (screen === 'magic-choice') {
@@ -426,10 +446,6 @@ magicView.prototype = {
           otp_permission: this.otpPermission
         });
       }
-    }
-
-    if (screen === 'magic-otp') {
-      this.track('submit_otp');
     }
 
     if (CheckoutBridge && CheckoutBridge.relay) {
