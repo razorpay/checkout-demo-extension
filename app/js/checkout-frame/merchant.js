@@ -645,7 +645,7 @@ function showModalWithSession(session) {
     }
   }
 
-  if (order && order.bank && get('callback_url')) {
+  if (order && order.bank && get('callback_url') && order.method !== 'upi') {
     options.redirect = true;
     return session.r.createPayment({
       contact: get('prefill.contact') || '9999999999',

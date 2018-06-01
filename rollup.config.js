@@ -4,7 +4,8 @@ const modules = {
   eventer: 'Eventer',
   evthandler: 'EvtHandler',
   popup: 'Popup',
-  authorize: 'Payment'
+  authorize: 'Payment',
+  tez: 'Tez'
 };
 
 function getOptions(module) {

@@ -626,7 +626,30 @@ Session.prototype = {
 
     var prefilledWallet = this.get('prefill.wallet');
     if (prefilledWallet) {
-      $('#wallet-radio-' + prefilledWallet).prop('checked', true);
+      var selectedWalletEl = $('#wallet-radio-' + prefilledWallet);
+
+      if (selectedWalletEl && selectedWalletEl[0]) {
+        selectedWalletEl.prop('checked', true);
+        $('#body').addClass('sub');
+
+        var walletsEle = $('#wallets')[0].parentElement;
+
+        selectedWalletEl = selectedWalletEl[0].parentElement;
+
+        // TODO: hacky stuff , need to refactor
+        // setTimeout with 200ms - waiting for checkout animation to complete
+        window.setTimeout(function() {
+          // scrolling to the selected wallet when checkout is opened
+          var walletsEleBottom =
+              walletsEle.getBoundingClientRect().top + walletsEle.clientHeight,
+            selectedWalletElBottom =
+              selectedWalletEl.getBoundingClientRect().top +
+              selectedWalletEl.clientHeight;
+
+          walletsEle.scrollTop =
+            walletsEle.scrollTop + selectedWalletElBottom - walletsEleBottom;
+        }, 200);
+      }
     }
 
     if (this.hasOwnProperty('data')) {
@@ -722,12 +745,32 @@ Session.prototype = {
     }
   },
 
+  checkTez: function() {
+    if (!this.isMobileBrowser) {
+      return;
+    }
+
+    var self = this;
+
+    Tez.check(
+      function() {
+        /* This is success callback */
+        $('#upi-tez').css('display', 'block');
+      },
+      function(e) {
+        /* This is error callback */
+        self.track('tez_error', e);
+      }
+    );
+  },
+
   render: function(options) {
     options = options || {};
 
     // make true to enable mweb-intent
+
     this.isMobileBrowser =
-      ua_android_browser && this.get('key') === 'rzp_live_F3HsjNBLNxSrWu';
+      ua_android_browser && this.get('key') === 'rzp_live_izcpsDPjM13eLY';
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -745,6 +788,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.setEmandate();
+    this.checkTez();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
@@ -1079,17 +1123,33 @@ Session.prototype = {
   },
 
   bindEvents: function() {
+    var self = this;
     var thisEl = this.el;
     this.click('#partial-back', function() {
       $(thisEl).removeClass('show-methods');
     });
 
     this.on('change', '#partial-select-partial', function(e) {
+      var parentEle = $('#amount-value').parent();
+
       if (!e.target.checked) {
         var amount = this.order.amount_due;
         $('#amount-value').val(this.getDecimalAmount(amount));
+        toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
+
         this.get().amount = amount;
         $('#amount .amount-figure').html(this.formatAmount(amount));
+
+        var infoEle = $('.partial-payment-block .subtitle--help');
+        /* Reset text in info element */
+        if (infoEle) {
+          infoEle.html('Pay some amount now and remaining later.');
+        }
+      } else {
+        $('#amount-value').val(null);
+        $('#amount-value').focus();
+
+        parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
       }
     });
 
@@ -1451,11 +1511,48 @@ Session.prototype = {
             ? self.order.amount_due
             : self.order.amount;
 
-          var isValid = 0 < value && value <= maxAmount;
+          var isValid = 100 <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
+
+          var amountDue = self.order.amount_due;
+          var amountDueFormatted = self.formatAmount(amountDue);
+
+          var infoEle = $('.partial-payment-block .subtitle--help');
 
           if (isValid) {
             $('#amount .amount-figure').html(self.formatAmount(value));
+
+            // Update the remaining amount being changed
+            if (value && gel('partial-select-partial').checked && infoEle) {
+              infoEle.html(
+                'Pay remaining ₹' +
+                  self.formatAmount(amountDue - value) +
+                  ' later.'
+              );
+            }
+          } else {
+            var helpEle = $('#amount-value + .help');
+
+            $('#amount .amount-figure').html(amountDueFormatted); // Update amount is header
+
+            /* Update tooltip error */
+            if (helpEle) {
+              if (!value) {
+                // Reset error on no value
+                helpEle.html(
+                  'Please enter a valid amount upto ₹' + amountDueFormatted
+                );
+              } else if (value > self.order.amount_due) {
+                helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
+              } else if (value < 100) {
+                helpEle.html('Minimum payable amount is ₹' + 1);
+              }
+            }
+
+            /* Reset text in info element */
+            if (infoEle) {
+              infoEle.html('Pay some amount now and remaining later.');
+            }
           }
         });
     }
@@ -2206,6 +2303,11 @@ Session.prototype = {
 
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
+      data['_[flow]'] = 'intent';
+    }
+
+    if (data['_[flow]'] === 'tez') {
+      request.tez = true;
       data['_[flow]'] = 'intent';
     }
 

@@ -71,13 +71,9 @@ html {
 
 .list {
   margin-bottom: 12px;
-  .checkbox {
+
+  & .checkbox {
     border-radius: 50%;
-    width: 16px;
-    height: @width;
-    position: relative;
-    background: #fff;
-    transition: 0.2s;
 
     &::after {
       content: '';
@@ -109,14 +105,6 @@ html {
     font-size: 14px;
     line-height: 18px;
     font-weight: 600;
-  }
-
-  .subtitle {
-    color: rgba(64,70,101,0.7);
-    font-size: 12px;
-    line-height: 15px;
-    margin-top: 4px;
-    line-height: 18px;
   }
 
   :checked + label .checkbox::after {
@@ -181,6 +169,13 @@ html {
       max-height: 360px;
     }
   }
+}
+
+.subtitle {
+  color: rgba(64,70,101,0.7);
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 18px;
 }
 
 .grid {
@@ -1156,6 +1151,21 @@ $outline = #ddd;
 
 #partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {
   display: none;
+}
+
+.partial-payment-block {
+  .subtitle {
+    display: block;
+  }
+
+  #elem-wrap-amount, .subtitle {
+    margin-left: 26px;
+  }
+
+  #amount-value {
+    padding-top: 7px;
+    opacity: 1;
+  }
 }
 
 #quickpay-btn {
