@@ -11,6 +11,11 @@ http {
         server_name checkout.razorpay.com;
         {% endif %}
 
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Headers' 'origin';
+        add_header 'Access-Control-Allow-Methods' 'GET';
+        add_header 'Access-Control-Max-Age' '1000';
+
         set $checkout_root_location "/app/dist/";
         set $checkout_v1_location "/app/dist/v1";
         {% if env == 'dev' %}
