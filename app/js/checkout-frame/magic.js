@@ -137,8 +137,8 @@ magicView.prototype = {
     options.otpelf = options.otpelf || true;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
-      this.clearTimeout();
-      this.checkoutVisible = false;
+      self.clearTimeout();
+      self.checkoutVisible = false;
       self.session.showLoadError(strings.redirect);
       window.setTimeout(function() {
         CheckoutBridge.invokePopup(JSON.stringify(options));
@@ -446,9 +446,7 @@ magicView.prototype = {
       });
 
       if (data['choice'] === 'otp') {
-        this.showOtpView({
-          otp_permission: this.otpPermission
-        });
+        this.session.showLoadError();
       }
     }
 
