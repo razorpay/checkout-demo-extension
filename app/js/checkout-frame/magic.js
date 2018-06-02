@@ -316,6 +316,10 @@ magicView.prototype = {
   },
 
   otpParsed: function(data) {
+    /**
+     * In case of choice page, the magic will take us to the otp page
+     * and then call handleRelay `page_resolved` with `type` as `otp`
+     */
     if (this.resolvedPage !== 'otp') {
       return (this.otpData = data);
     }
