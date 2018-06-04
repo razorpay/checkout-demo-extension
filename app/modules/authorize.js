@@ -581,7 +581,9 @@ var responseTypes = {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-    var coprotoMagic = fullResponse.magic || false;
+    var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
+
+    trackingProps.magic_coproto = coprotoMagic;
 
     if (this.isMagicPayment) {
       this.r._payment.emit('magic.init');
