@@ -51,7 +51,7 @@ magicView.prototype = {
         return;
       }
 
-      self.track('show_payment_page');
+      self.track('user_cancel');
 
       self.showPaymentPage({
         magic: false,
@@ -138,6 +138,7 @@ magicView.prototype = {
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
       self.clearTimeout();
+      self.track('show_payment_page', options);
       self.checkoutVisible = false;
       self.session.showLoadError(strings.redirect);
       window.setTimeout(function() {
