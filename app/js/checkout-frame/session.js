@@ -1240,6 +1240,17 @@ Session.prototype = {
         'saved-card',
         this.setSavedCard
       );
+      this.on('click', '#saved-cards-container', 'nocvv-checkbox', function(e) {
+        var target = e.delegateTarget;
+        var checked = target.checked;
+        var cvvField = $(target.parentNode.parentNode).qs('input.saved-cvv');
+
+        if (checked) {
+          $(cvvField).css('display', 'none');
+        } else {
+          $(cvvField).css('display', 'block');
+        }
+      });
     }
     this.on('click', '#top-right', function() {
       $('#top-right').addClass('focus');

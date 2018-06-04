@@ -32,7 +32,7 @@
         banks[bank];
       var cvv_digits = network === 'amex' ? 4 : 3;
     `
-    <div tabIndex="0" class="saved-card left-card`?!i` checked`?`"`?plans` emi bank='`=bank`'`?` token=`=item.token`>
+    <div tabIndex="0" class="saved-card left-card`?!i` checked`?`"`?plans` emi bank='`=bank`'`?``?network==='maestro'` maestro`?` token=`=item.token`>
       <div class="help up">EMI is not available on this card</div>
       <div class='cardtype' cardtype='`=network`'></div>
       <div class="saved-inner">
@@ -49,6 +49,13 @@
               `~`
             </select>
           </div></div>
+        `?`
+        `?network === 'maestro'`
+          <label for="nocvv-`=item.token`" class="maestro-cvv">
+            <input class="nocvv-checkbox" type="checkbox" id="nocvv-`=item.token`">
+            <span class="checkbox"></span>
+            My Maestro Card doesn't have Expiry/CVV
+          </label>
         `?`
       </div>
     </div>

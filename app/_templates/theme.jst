@@ -60,7 +60,7 @@ var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 `?`
 
 .option.active,
-.checked .checkbox,
+:not(.saved-card).checked .checkbox,
 input[type=checkbox]:checked + .checkbox
 {
   color: #fff;

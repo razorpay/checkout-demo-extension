@@ -58,13 +58,21 @@ $cardpl = 70px;
     #show-add-card {
       opacity: 1;
     }
+
+    .maestro-cvv {
+      display: block;
+      margin-left: -46px;
+      font-size: 13px;
+      line-height: 32px;
+    }
+
     .saved-card {
       height: $opencardh;
       max-height: $cardh;
       z-index: 2;
       pointer-events: all;
 
-      &[emi].checked {
+      &[emi].checked, &[maestro].checked {
         max-height: $opencardh;
 
         .elem-savedcards-emi {
