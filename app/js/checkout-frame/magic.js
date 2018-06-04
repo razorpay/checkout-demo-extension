@@ -28,6 +28,7 @@ magicView.prototype = {
     this.unbind();
     gel('magic-wrapper').innerHTML = templates.magic(this.opts);
     this.bind();
+    this.session.input(gel('magic-otp'));
   },
 
   on: function(event, sel, listener) {
@@ -49,6 +50,9 @@ magicView.prototype = {
       if (!$(e.target).hasClass('show-payment-page')) {
         return;
       }
+
+      self.track('user_cancel');
+
       self.showPaymentPage({
         magic: false,
         otpelf: true,
@@ -73,6 +77,7 @@ magicView.prototype = {
   destroy: function() {
     this.unbind();
     this.clearTimeout();
+    window.clearTimeout(this.otpTimeout);
   },
 
   track: function(eventName, data) {
@@ -132,8 +137,9 @@ magicView.prototype = {
     options.otpelf = options.otpelf || true;
 
     if (CheckoutBridge && CheckoutBridge.invokePopup) {
-      this.clearTimeout();
-      this.checkoutVisible = false;
+      self.clearTimeout();
+      self.track('show_payment_page', options);
+      self.checkoutVisible = false;
       self.session.showLoadError(strings.redirect);
       window.setTimeout(function() {
         CheckoutBridge.invokePopup(JSON.stringify(options));
@@ -277,6 +283,8 @@ magicView.prototype = {
   autoreadOtp: function() {
     var self = this;
 
+    this.track('autoread_otp');
+
     if (!this.otpPermission) {
       this.requestOtpPermission(function(info) {
         if (info.granted) {
@@ -288,12 +296,18 @@ magicView.prototype = {
       self.showWaitingScreen();
     }
 
+    $('#body').removeClass('sub');
+
     if (this.otpData) {
       this.otpParsed(this.otpData);
     }
   },
 
   enterOtp: function() {
+    this.track('enter_otp');
+
+    $('#body').addClass('sub');
+
     $('#form-magic-otp')
       .removeClass('waiting')
       .addClass('manual');
@@ -303,6 +317,10 @@ magicView.prototype = {
   },
 
   otpParsed: function(data) {
+    /**
+     * In case of choice page, the magic will take us to the otp page
+     * and then call handleRelay `page_resolved` with `type` as `otp`
+     */
     if (this.resolvedPage !== 'otp') {
       return (this.otpData = data);
     }
@@ -325,6 +343,8 @@ magicView.prototype = {
       .removeClass('waiting')
       .removeClass('manual');
     $('#magic-otp').attr('readonly', true);
+
+    $('#body').addClass('sub');
 
     if (data.otp) {
       $('#magic-otp')
@@ -360,6 +380,7 @@ magicView.prototype = {
       return this.requestOtpPermission(function(info) {
         if (info.granted) {
           data.otp_permission = true;
+          this.track('otp_permission_granted');
         } else {
           self.otpPermDenied = true;
         }
@@ -371,6 +392,7 @@ magicView.prototype = {
     }
 
     this.showView('magic-otp');
+    $('#body').removeClass('sub');
 
     if (this.otpPermission) {
       this.showWaitingScreen();
@@ -381,7 +403,9 @@ magicView.prototype = {
 
       this.otpTimeout = window.setTimeout(function() {
         self.track('otp_timeout');
-        self.enterOtp();
+        if ($('#form-magic-otp').hasClass('waiting')) {
+          self.enterOtp();
+        }
       }, TIMEOUT_NO_OTP);
     } else {
       this.enterOtp();
@@ -408,6 +432,13 @@ magicView.prototype = {
       data: data
     };
 
+    if (screen === 'magic-otp') {
+      if (this.session.checkInvalid('#form-magic-otp')) {
+        return;
+      }
+      this.track('submit_otp');
+    }
+
     this.session.showLoadError(strings.process);
 
     if (screen === 'magic-choice') {
@@ -416,14 +447,8 @@ magicView.prototype = {
       });
 
       if (data['choice'] === 'otp') {
-        this.showOtpView({
-          otp_permission: this.otpPermission
-        });
+        this.session.showLoadError();
       }
-    }
-
-    if (screen === 'magic-otp') {
-      this.track('submit_otp');
     }
 
     if (CheckoutBridge && CheckoutBridge.relay) {
