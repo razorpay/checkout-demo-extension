@@ -259,6 +259,9 @@ function errorHandler(response) {
   var message = error.description;
   this.clearRequest();
 
+  /* don't attempt magic if failed for the first time */
+  this.magic = false;
+
   this.track('error', response);
   Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
@@ -321,6 +324,9 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
+
+  /* don't attempt magic if failed for the first time */
+  this.magic = false;
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
@@ -2271,7 +2277,7 @@ Session.prototype = {
     var request = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
-      magic: this.magic && gel('quickpay-check').checked
+      magic: this.magic
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
