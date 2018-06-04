@@ -137,7 +137,9 @@ export default function Payment(data, params, r) {
   this.tez = params.tez;
 
   this.isMagicPayment =
-    this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
+    this.sdk_popup &&
+    (this.magic && Math.random() < 0.1) &&
+    /^(card|emi)$/.test(data.method);
 
   trackingProps.magic_attempted = this.isMagicPayment;
 
