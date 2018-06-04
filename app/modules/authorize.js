@@ -577,17 +577,18 @@ function makeRedirectUrl(fees) {
 
 var responseTypes = {
   // this === payment
-  first: function(request) {
+  first: function(request, fullResponse) {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
+    var coprotoMagic = fullResponse.magic || false;
 
     if (this.isMagicPayment) {
       this.r._payment.emit('magic.init');
 
       var popupOptions = {
-        focus: false,
-        magic: true,
+        focus: !coprotoMagic,
+        magic: coprotoMagic,
         otpelf: true
       };
 
