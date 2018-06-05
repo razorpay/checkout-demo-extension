@@ -883,7 +883,9 @@ Session.prototype = {
       });
     }
 
-    this.magicView.resendCount = 0;
+    if (this.magicView) {
+      this.magicView.resendCount = 0;
+    }
     $('#magic-wrapper').removeClass('hide-resend');
   },
 
