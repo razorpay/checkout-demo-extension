@@ -201,9 +201,22 @@ function track(r, event, data) {
       options.image = 'base64';
     }
 
-    var paymentId = (r._payment || {}).payment_id;
+    var payment = r._payment || {};
+    var paymentId = payment.payment_id;
     if (paymentId) {
       properties.payment_id = paymentId;
+    }
+
+    if (typeof payment.magicPossible !== 'undefined') {
+      properties.magic_possible = payment.magicPossible;
+    }
+
+    if (typeof payment.isMagicPayment !== 'undefined') {
+      properties.magic_attempted = payment.isMagicPayment;
+    }
+
+    if (typeof payment.magicCoproto !== 'undefined') {
+      properties.magic_coproto = payment.magicCoproto;
     }
 
     if (_uid) {

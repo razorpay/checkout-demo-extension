@@ -116,6 +116,16 @@ function trackNewPayment(data, params, r) {
 export default function Payment(data, params, r) {
   this._time = new Date().getTime();
 
+  this.sdk_popup = params.sdk_popup;
+  this.magic = params.magic;
+
+  this.isMagicPayment =
+    this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
+
+  this.magicPossible = this.isMagicPayment;
+
+  this.isMagicPayment = this.isMagicPayment && Math.random() < 0.1;
+
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
   trackNewPayment(data, params, r);
 
@@ -132,16 +142,7 @@ export default function Payment(data, params, r) {
   }
 
   this.fees = params.fees;
-  this.sdk_popup = params.sdk_popup;
-  this.magic = params.magic;
   this.tez = params.tez;
-
-  this.isMagicPayment =
-    this.sdk_popup &&
-    (this.magic && Math.random() < 0.1) &&
-    /^(card|emi)$/.test(data.method);
-
-  trackingProps.magic_attempted = this.isMagicPayment;
 
   this.powerwallet =
     params.powerwallet || (data && data.method === 'upi' && !params.fees);
@@ -491,11 +492,11 @@ Payment.prototype = {
 
 function ajaxCallback(response) {
   clearTimeout(this.ajax_delay);
-  track(this.r, 'ajax_response', response);
   var payment_id = response.payment_id;
   if (payment_id) {
     this.payment_id = payment_id;
   }
+  track(this.r, 'ajax_response', response);
 
   var errorResponse = response.error;
   var popup = this.popup;
@@ -585,7 +586,7 @@ var responseTypes = {
     var popup = this.popup;
     var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
 
-    trackingProps.magic_coproto = coprotoMagic;
+    this.magicCoproto = coprotoMagic;
 
     if (this.isMagicPayment) {
       this.r._payment.emit('magic.init');
