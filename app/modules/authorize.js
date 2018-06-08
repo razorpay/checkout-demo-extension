@@ -124,7 +124,9 @@ export default function Payment(data, params, r) {
 
   this.magicPossible = this.isMagicPayment;
 
-  this.isMagicPayment = this.isMagicPayment && Math.random() < 0.1;
+  if (r.get('key') !== 'rzp_live_xUkZdEU9hYKLZX') {
+    this.isMagicPayment = this.isMagicPayment && Math.random() < 0.1;
+  }
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
   trackNewPayment(data, params, r);
