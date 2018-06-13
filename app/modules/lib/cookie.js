@@ -14,5 +14,4 @@ export function get(name) {
       return c.substring(nameEQ.length, c.length);
     }
   }
-  return null;
 }

@@ -1,36 +1,15 @@
 import getFingerprint from './fingerprint';
 import * as Tez from './tez';
+import * as cookie from 'lib/cookie';
 
 var pollingInterval;
 
 function clearPollingInterval(force) {
   if (force || pollingInterval) {
-    try {
-      localStorage.removeItem('onComplete');
-    } catch (e) {}
-    deleteCookie('onComplete');
+    cookie.unset('onComplete');
     clearInterval(pollingInterval);
     pollingInterval = null;
   }
-}
-
-function deleteCookie(name) {
-  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
-}
-
-function getCookie(name) {
-  var nameEQ = name + '=';
-  var ca = document.cookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) === ' ') {
-      c = c.substring(1, c.length);
-    }
-    if (c.indexOf(nameEQ) === 0) {
-      return c.substring(nameEQ.length, c.length);
-    }
-  }
-  return null;
 }
 
 var communicator;
@@ -58,8 +37,6 @@ function submitPopup(payment) {
   // no ajax route was available
   if (popup) {
     submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
-  } else {
-    setPayloadStorage(payment.message);
   }
 }
 
@@ -554,13 +531,7 @@ function ajaxCallback(response) {
 function pollPaymentData(onComplete) {
   clearPollingInterval(true);
   pollingInterval = setInterval(function() {
-    var paymentData;
-    try {
-      paymentData = localStorage.getItem('onComplete');
-    } catch (e) {}
-    if (!paymentData) {
-      paymentData = getCookie('onComplete');
-    }
+    var paymentData = cookie.get('onComplete');
 
     if (paymentData) {
       clearPollingInterval();
@@ -586,12 +557,6 @@ function makeAutoSubmitForm(url, data) {
     deserialize(data) +
     '</form><script>document.forms[0].submit()</script>'
   );
-}
-
-function setPayloadStorage(payload) {
-  try {
-    localStorage.setItem('payload', _btoa(payload));
-  } catch (e) {}
 }
 
 function makeRedirectUrl(fees) {
@@ -645,11 +610,6 @@ var responseTypes = {
           self.checkRedirect();
         }
       });
-    } else {
-      // set in localStorage for lumia
-      setPayloadStorage(
-        direct ? content : makeAutoSubmitForm(request.url, content)
-      );
     }
   },
 
