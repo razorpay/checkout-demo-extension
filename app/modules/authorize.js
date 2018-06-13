@@ -206,6 +206,7 @@ Payment.prototype = {
       if (callback_url) {
         data.callback_url = callback_url;
       }
+
       if (!this.powerwallet || (data.method === 'upi' && !discreet.isFrame)) {
         discreet.redirect({
           url: makeRedirectUrl(this.fees),
@@ -220,6 +221,11 @@ Payment.prototype = {
 
   format: function() {
     var data = this.data;
+
+    // Set view for fees.
+    if (this.fees) {
+      data.view = 'html';
+    }
 
     // fill data from options if empty
     var getOption = this.r.get;
