@@ -513,6 +513,9 @@ function ajaxCallback(response) {
   if (payment_id) {
     this.payment_id = payment_id;
   }
+
+  this.magicCoproto = response.magic || false;
+
   track(this.r, 'ajax_response', response);
 
   var errorResponse = response.error;
@@ -602,8 +605,6 @@ var responseTypes = {
     var content = request.content;
     var popup = this.popup;
     var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
-
-    this.magicCoproto = coprotoMagic;
 
     if (this.isMagicPayment) {
       this.r._payment.emit('magic.init');
