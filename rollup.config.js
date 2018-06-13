@@ -21,7 +21,8 @@ function getOptions(module) {
 
     // https://github.com/rollup/rollup-watch/issues/22
     watch: {
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      clearScreen: false
     }
   };
 }

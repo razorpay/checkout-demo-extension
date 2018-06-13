@@ -1,11 +1,11 @@
-box: pronav/checkout
+box: pronav/test
 build:
     steps:
         - npm-install
 
         - script:
             name: Unit Test
-            code: npm run test
+            code: npm test
 
         - script:
             name: build

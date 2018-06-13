@@ -1,11 +1,9 @@
 # outputs
 /app/dist
-/app/custom
 /app/js/generated
-!/app/dist/v1/checkout-new.js
+/app/modules/generated
 /app/templates
-/test/e2e/server/public/dist
-/shots
+/coverage
 
 # dependencies
 /node_modules
@@ -16,9 +14,5 @@
 
 # others
 npm-debug.log
-phantomjsdriver.log
-aws-keys.json
-coverage
 /app/config.js
-/browsersync-config.js
 /httpd.conf

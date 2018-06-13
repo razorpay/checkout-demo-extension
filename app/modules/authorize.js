@@ -138,7 +138,7 @@ export default function Payment(data, params, r) {
   this.on('cancel', onPaymentCancel);
 
   // Set the UPI app to use.
-  if (data.upi_app) {
+  if (data && data.upi_app) {
     this.upi_app = data.upi_app;
     delete data.upi_app;
   }
@@ -265,6 +265,14 @@ Payment.prototype = {
     if (this.powerwallet && data.method === 'wallet') {
       data['_[source]'] = 'checkoutjs';
     }
+
+    let fingerprint = getFingerprint();
+    if (fingerprint) {
+      data['_[fhash]'] = fingerprint;
+    }
+
+    data['_[tz]'] = new Date().getTimezoneOffset();
+
     // flatten notes, card
     // notes.abc -> notes[abc]
     flattenProp(data, 'notes', '[]');
@@ -824,12 +832,6 @@ razorpayProto.createPayment = function(data, params) {
   if (!isNonNullObject(params)) {
     params = emo;
   }
-
-  let fingerprint = getFingerprint();
-  if (fingerprint) {
-    data['_[fhash]'] = fingerprint;
-  }
-  data['_[tz]'] = new Date().getTimezoneOffset();
 
   this._payment = new Payment(data, params, this);
   return this;
