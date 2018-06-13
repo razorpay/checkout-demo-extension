@@ -47,7 +47,7 @@ function makeUrl(path) {
   return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
-var ba_keys = ['key', 'order_id', 'invoice_id', 'subscription_id'];
+var ba_keys = ['key', 'order_id', 'invoice_id', 'subscription_id', 'payment_link_id'];
 
 function makeAuthUrl(r, url) {
   url = makeUrl(url);
@@ -181,6 +181,7 @@ var RazorpayDefaults = (Razorpay.defaults = {
   order_id: '',
   invoice_id: '',
   subscription_id: '',
+  payment_link_id: '',
   notes: null,
   callback_url: '',
   redirect: false,

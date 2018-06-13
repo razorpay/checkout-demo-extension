@@ -233,6 +233,7 @@ Payment.prototype = {
         'order_id',
         'notes',
         'subscription_id',
+        'payment_link_id',
         'customer_id',
         'recurring',
         'subscription_card_change',
