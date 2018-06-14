@@ -89,7 +89,7 @@ function trackNewPayment(data, params, r) {
 }
 
 export default function Payment(data, params, r) {
-  this._time = new Date().getTime();
+  this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
   this.magic = params.magic;
@@ -422,25 +422,23 @@ Payment.prototype = {
     }
 
     if (popup) {
-      var self = this;
-      var nowTime = now();
+      var timer = _.timer();
 
-      Razorpay.popup_delay = function() {
-        track(self.r, 'popup_delay', {
-          duration: new Date() - nowTime
-        });
-      };
-      Razorpay.popup_track = function() {
+      Razorpay.popup_delay = ~track(this.r, 'popup_delay', {
+        duration: timer()
+      });
+
+      Razorpay.popup_track = () => {
         try {
-          noop(self.popup.window.document);
+          noop(this.popup.window.document);
         } catch (e) {
-          clearInterval(self.popup_track_interval);
-          track(self.r, 'popup_acs', {
-            duration: new Date() - nowTime
-          });
+          error: e;
+          clearInterval(this.popup_track_interval);
+          track(this.r, 'popup_acs', { duration: timer() });
         }
       };
-      self.popup_track_interval = setInterval(Razorpay.popup_track, 99);
+
+      this.popup_track_interval = setInterval(Razorpay.popup_track, 99);
       popup.onClose = this.r.emitter('payment.cancel');
     }
     this.popup = popup;
@@ -487,12 +485,8 @@ function ajaxCallback(response) {
   if (errorResponse && response.xhr && response.xhr.status === 0) {
     if (popup) {
       submitPopup(this);
-    } else {
-      // this won't cause infinite loop of ajax, because jsonp won't add xhr.status key
-      this.mode = 'jsonp';
-      this.tryAjax();
     }
-    return;
+    return track(this.r, 'no_popup');
   }
 
   if (response.razorpay_payment_id || errorResponse) {
