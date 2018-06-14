@@ -28,11 +28,12 @@ function submitPopup(payment) {
   var data = payment.data;
 
   // fix long notes
-  each(data, function(key, val) {
-    if (/^notes/.test(key) && val.length > 200) {
-      data[key] = val.replace(/\n/g, ' ');
-    }
-  });
+  data
+    |> obj.loop((val, key) => {
+      if (/^notes/.test(key) && _.lengthOf(val) > 200) {
+        data[key] = val.replace(/\n/g, ' ');
+      }
+    });
 
   // no ajax route was available
   if (popup) {
@@ -49,20 +50,18 @@ function onPaymentCancel(metaParam) {
       track(razorpay, 'cancel', { payment_id: payment_id });
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
       if (isNonNullObject(metaParam)) {
-        each(metaParam, function(key, val) {
-          url += '&' + key + '=' + val;
-        });
+        url += _.obj2query(metaParam);
       }
-      $.ajax({
+      fetch({
         url: url,
-        callback: bind(function(response) {
+        callback: response => {
           if (response.razorpay_payment_id) {
             track(razorpay, 'cancel_success', response);
           } else {
             response = cancelError;
           }
           this.complete(response);
-        }, this)
+        }
       });
     } else {
       track(razorpay, 'cancel');
@@ -72,15 +71,14 @@ function onPaymentCancel(metaParam) {
 }
 
 function getTrackingData(data) {
-  var trackingData = clone(data);
-
   // donottrack card number, token, cvv
-  each(trackingData, function(field) {
-    if (field.slice(0, 4) === 'card') {
-      delete trackingData[field];
-    }
-  });
-  return trackingData;
+  return (
+    data
+    |> obj.clone
+    |> obj.loop(
+      (val, key, o) => key.slice(0, 4) === 'card' && obj.unset(o, key)
+    )
+  );
 }
 
 function trackNewPayment(data, params, r) {
@@ -134,7 +132,7 @@ export default function Payment(data, params, r) {
       this.writePopup();
     } catch (e) {}
     this.data = data;
-    this.on('resume', bind('generate', this));
+    this.on('resume', func.bind('generate', this));
   } else {
     this.generate(data);
   }
@@ -142,7 +140,7 @@ export default function Payment(data, params, r) {
 
 Payment.prototype = {
   on: function(event, handler) {
-    return this.r.on('payment.' + event, bind(handler, this));
+    return this.r.on('payment.' + event, func.bind(handler, this));
   },
 
   emit: function(event, arg) {
@@ -163,7 +161,7 @@ Payment.prototype = {
     if (this.isMagicPayment) {
       track(this.r, 'magic_open_popup');
       window.CheckoutBridge.invokePopup(
-        JSON.stringify({
+        obj.stringify({
           content: templates.popup(this),
           focus: false
         })
@@ -398,39 +396,22 @@ Payment.prototype = {
     }
     // else make ajax request
 
-    var ajaxFn = $.post;
-    var url = makeUrl('payments/create/ajax');
-
-    if (this.mode === 'jsonp') {
-      ajaxFn = $.jsonp;
-      url = url.replace('ajax', 'jsonp');
-    }
-
     var razorpayInstance = this.r;
-    var ajax_delay_timeout = 1e4;
+    var ajax_delay_timeout = 1e4; // 10s
+
     this.ajax_delay = setTimeout(function() {
       track(razorpayInstance, 'ajax_delay', {
         delay: ajax_delay_timeout
       });
     }, ajax_delay_timeout);
 
-    var ajax_options = {
-      url: url,
-      data: data,
-      callback: bind(ajaxCallback, this)
-    };
-
-    if (discreet.isFrame) {
-      ajax_options.headers = {
-        'x-checkout-id': _uid
-      };
-      if (data.order_id) {
-        ajax_options.headers['x-order-id'] = data.order_id;
-      }
-    }
     track(razorpayInstance, 'ajax');
-    this.ajax = ajaxFn(ajax_options);
-    return this.ajax;
+    this.ajax = fetch.post({
+      url: makeUrl('payments/create/ajax'),
+      data,
+      callback: func.bind(ajaxCallback, this)
+    });
+    return 1;
   },
 
   makePopup: function() {
@@ -614,20 +595,12 @@ var responseTypes = {
   },
 
   async: function(request, fullResponse) {
-    var self = this;
-    var url = makeUrl('payments/' + fullResponse.payment_id + '/status');
-    self.ajax = recurseAjax(
-      url,
-      function(response) {
-        self.complete(response);
-      },
-      function(response) {
-        return response && response.status;
-      },
-      null,
-      $.jsonp
-    );
-    self.emit('upi.pending', fullResponse.data);
+    this.ajax = fetch({
+      url: request.url,
+      callback: response => this.complete(response)
+    }).till(response => response && response.status);
+
+    this.emit('upi.pending', fullResponse.data);
   },
 
   tez: function(coprotoRequest, fullResponse) {
@@ -658,19 +631,10 @@ var responseTypes = {
       '_[reason]': 'UPI_INTENT_BACK_BUTTON'
     };
 
-    var ra = function() {
-      return recurseAjax(
-        url,
-        function(response) {
-          self.complete(response);
-        },
-        function(response) {
-          return response && response.status;
-        },
-        null,
-        $.jsonp
-      );
-    };
+    var ra = ~fetch({
+      url: request.url,
+      callback: response => this.complete(response)
+    }).till(response => response && response.status);
 
     this.emit('upi.coproto_response', request);
 
@@ -806,24 +770,24 @@ razorpayProto.focus = function() {
 
 razorpayProto.submitOTP = function(otp) {
   var payment = this._payment;
-  payment.ajax = $.post({
+  payment.ajax = fetch.post({
     url: payment.otpurl,
     data: {
       type: 'otp',
       otp: otp
     },
-    callback: bind(otpCallback, payment)
+    callback: func.bind(otpCallback, payment)
   });
 };
 
 razorpayProto.resendOTP = function(callback) {
   var payment = this._payment;
-  payment.ajax = $.post({
+  payment.ajax = fetch.post({
     url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend'),
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: bind(ajaxCallback, payment)
+    callback: func.bind(ajaxCallback, payment)
   });
 };
 
@@ -835,7 +799,7 @@ razorpayProto.topupWallet = function() {
     payment.writePopup();
   }
 
-  payment.ajax = $.post({
+  payment.ajax = fetch.post({
     url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax'),
     data: {
       '_[source]': 'checkoutjs'
@@ -885,18 +849,17 @@ razorpayPayment.validate = function(data) {
 };
 
 razorpayPayment.getPrefs = function(data, callback) {
-  var url = makeUrl('preferences') + '?';
-  each(data, function(key, val) {
-    url += key + '=' + val + '&';
-  });
-  return $.ajax({
-    url: url.slice(0, -1),
-    timeout: 30000,
+  return fetch({
+    url: _.appendParamsToUrl(makeUrl('preferences'), data),
+
+    // 30s
+    timeout: 3e4,
+
     callback: function(response) {
       if (response.xhr && response.xhr.status === 0) {
         return getPrefsJsonp(data, callback);
       }
-      invoke(callback, null, response);
+      callback(response);
     }
   });
 };

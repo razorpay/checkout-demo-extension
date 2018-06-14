@@ -8,7 +8,14 @@ const fs = require('fs');
 require('child_process').execSync('mkdir -p app/modules/generated');
 
 let injects = {
-  global: ['generated/globals', 'global']
+  global: ['generated/globals', 'global'],
+  _: ['lib/_', '*'],
+  arr: ['lib/arr', '*'],
+  str: ['lib/str', '*'],
+  func: ['lib/func', '*'],
+  obj: ['lib/obj', '*'],
+  dom: ['lib/dom', '*'],
+  fetch: 'lib/fetch'
 };
 
 fs.writeFileSync(
@@ -39,8 +46,6 @@ fs.writeFileSync(
 );
 
 module.exports = [
-  inject(injects),
-
   {
     name: 'dot',
     transform(code, id) {
@@ -90,5 +95,7 @@ module.exports = [
         }
       ]
     ]
-  })
+  }),
+
+  inject(injects)
 ];
