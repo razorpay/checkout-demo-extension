@@ -15,7 +15,8 @@ var getAjaxParams = function(options) {
   params.data.callback = 'Razorpay.' + CALLBACK_KEY;
 
   return (
-    params |> set('computedUrl', _.appendParamsToUrl(params.url, params.data))
+    params
+    |> obj.set('computedUrl', _.appendParamsToUrl(params.url, params.data))
   );
 };
 
@@ -28,12 +29,12 @@ export default function(options) {
   var done = false;
 
   Razorpay[CALLBACK_KEY] = function(data) {
-    unset(data, 'http_status_code');
+    obj.unset(data, 'http_status_code');
 
     params.success(data, params);
     params.callback(data, params);
 
-    unset(Razorpay, CALLBACK_KEY);
+    obj.unset(Razorpay, CALLBACK_KEY);
   };
 
   var script = document.createElement('script');

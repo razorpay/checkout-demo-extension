@@ -79,7 +79,7 @@ function generateUID() {
       tempdigit *= 2;
     }
     if (tempdigit >= 62) {
-      tempdigit = tempdigit % 62 + 1;
+      tempdigit = (tempdigit % 62) + 1;
     }
     sum += tempdigit;
   });
@@ -235,7 +235,7 @@ function track(r, event, data) {
     };
 
     try {
-      $.post({
+      fetch.post({
         url: 'https://lumberjack.razorpay.com/v1/track',
         method: 'post',
         data: {

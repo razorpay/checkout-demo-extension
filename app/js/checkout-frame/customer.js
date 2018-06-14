@@ -65,7 +65,7 @@ Customer.prototype = {
     if (device_token) {
       url += '&device_token=' + device_token;
     }
-    $.ajax({
+    fetch({
       url: url,
       callback: function(data) {
         customer.saved = !!data.saved;
@@ -78,7 +78,7 @@ Customer.prototype = {
   },
 
   createOTP: function(callback) {
-    $.post({
+    fetch.post({
       url: makeAuthUrl(this.r, 'otp/create'),
       data: {
         contact: this.contact
@@ -98,7 +98,7 @@ Customer.prototype = {
       data['_[library]'] = qpmap.library;
     }
 
-    $.post({
+    fetch.post({
       url: url,
       data: data,
       callback: function(data) {
@@ -131,7 +131,7 @@ Customer.prototype = {
     if (!this.id) {
       return;
     }
-    $.ajax({
+    fetch({
       url: makeAuthUrl(this.r, 'apps/' + this.id + '/tokens/' + token),
       method: 'delete',
       callback: function() {

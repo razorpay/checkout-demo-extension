@@ -15,7 +15,8 @@ let injects = {
   func: ['lib/func', '*'],
   obj: ['lib/obj', '*'],
   dom: ['lib/dom', '*'],
-  fetch: 'lib/fetch'
+  fetch: 'lib/fetch',
+  jsonp: 'lib/jsonp'
 };
 
 fs.writeFileSync(
