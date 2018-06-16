@@ -8,7 +8,8 @@ var preferences = window.preferences,
   ownerWindow = isIframe ? parent : opener;
 
 var UPI_POLL_URL = 'rzp_upi_payment_poll_url',
-  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
+  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp',
+  MINUTES_TO_WAIT_FOR_PENDING_PAYMENT = 10;
 
 var contactPattern = /^\+?[0-9]{8,15}$/;
 var emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;

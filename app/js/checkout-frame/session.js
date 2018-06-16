@@ -695,13 +695,26 @@ Session.prototype = {
       pendingPaymentTimestamp = StorageBridge.getString(PENDING_PAYMENT_TS);
       pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
+      // "activity_recreated" was passed as true.
+      var isActivityRecreated = self.get('activity_recreated');
+
       if (pendingPaymentTimestamp) {
-        /* if pending payment is older than 0 minutes clear the polling url */
-        if (now() - pendingPaymentTimestamp > 0) {
+        /**
+         * If the payment is pending, and is NOT older than
+         * MINUTES_TO_WAIT_FOR_PENDING_PAYMENT number of minutes,
+         * AND, isActivityRecreated is true, get pollUrl.
+         *
+         * Otherwise, clear it.
+         */
+        if (
+          isActivityRecreated &&
+          now() - pendingPaymentTimestamp <=
+            MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
+        ) {
+          pollUrl = StorageBridge.getString(UPI_POLL_URL);
+        } else {
           StorageBridge.setString(UPI_POLL_URL, '');
           StorageBridge.setString(PENDING_PAYMENT_TS, '0');
-        } else {
-          pollUrl = StorageBridge.getString(UPI_POLL_URL);
         }
       }
 
@@ -2581,7 +2594,7 @@ function updateTimer(timeoutEl, closeAt) {
       'Payment will expire in ' +
       Math.floor(timeLeft / 60) +
       ':' +
-      ('0' + timeLeft % 60).slice(-2) +
+      ('0' + (timeLeft % 60)).slice(-2) +
       ' minutes';
   };
 }
