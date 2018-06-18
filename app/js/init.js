@@ -47,7 +47,13 @@ function makeUrl(path) {
   return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
-var ba_keys = ['key', 'order_id', 'invoice_id', 'subscription_id', 'payment_link_id'];
+var ba_keys = [
+  'key',
+  'order_id',
+  'invoice_id',
+  'subscription_id',
+  'payment_link_id'
+];
 
 function makeAuthUrl(r, url) {
   url = makeUrl(url);
@@ -144,7 +150,7 @@ Razorpay.emi = {
     }
     rate /= 1200;
     var multiplier = Math.pow(1 + rate, length);
-    return parseInt(principle * rate * multiplier / (multiplier - 1), 10);
+    return parseInt((principle * rate * multiplier) / (multiplier - 1), 10);
   }
 };
 
@@ -197,7 +203,8 @@ var RazorpayDefaults = (Razorpay.defaults = {
   recurring_token: {
     max_amount: 0,
     expire_by: 0
-  }
+  },
+  activity_recreated: false
 });
 
 function base_configure(overrides) {

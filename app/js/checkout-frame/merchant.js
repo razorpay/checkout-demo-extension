@@ -892,6 +892,9 @@ window.handleMessage = function(message) {
       return;
     }
     try {
+      if (!options.hasOwnProperty('activity_recreated')) {
+        options['activity_recreated'] = message.activity_recreated;
+      }
       session = new Session(options);
     } catch (e) {
       Razorpay.sendMessage({ event: 'fault', data: e.message });
