@@ -255,6 +255,12 @@ function errorHandler(response) {
   if (!response || !response.error) {
     return;
   }
+
+  if (this.powerwallet) {
+    this.powerwallet = null;
+    return;
+  }
+
   var error = response.error;
   var message = error.description;
   this.clearRequest();
@@ -1676,11 +1682,11 @@ Session.prototype = {
       tab = '';
     }
 
-    var popup = this.r._payment && this.r._payment.popup;
-    if (tab === 'wallet' && this.screen === 'otp' && popup) {
-      if (confirmClose()) {
-        this.clearRequest();
+    if (tab === 'wallet' && this.screen === 'otp') {
+      if (!confirmClose()) {
+        return;
       }
+      this.clearRequest();
     }
 
     this.switchTab(tab);
@@ -2285,6 +2291,10 @@ Session.prototype = {
   },
 
   submit: function() {
+    if (this.r._payment) {
+      return;
+    }
+
     var data = this.payload;
     var that = this;
     var request = {
@@ -2359,6 +2369,7 @@ Session.prototype = {
       data.email
     ) {
       request.powerwallet = true;
+      this.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp =
         '<img src="' + walletObj.col + '" height="' + walletObj.h + '">';
@@ -2581,7 +2592,7 @@ function updateTimer(timeoutEl, closeAt) {
       'Payment will expire in ' +
       Math.floor(timeLeft / 60) +
       ':' +
-      ('0' + timeLeft % 60).slice(-2) +
+      ('0' + (timeLeft % 60)).slice(-2) +
       ' minutes';
   };
 }

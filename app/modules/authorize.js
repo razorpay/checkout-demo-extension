@@ -794,7 +794,7 @@ razorpayProto.createPayment = function(data, params) {
     params = emo;
   }
 
-  this._payment = new Payment(data, params, this);
+  this._payment = this._payment || new Payment(data, params, this);
   return this;
 };
 
