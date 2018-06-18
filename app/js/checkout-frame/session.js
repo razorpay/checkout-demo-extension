@@ -414,7 +414,6 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
-var MOTILAL_KEY = 'rzp_live_6hUVikZo4HAqRa';
 
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -497,10 +496,6 @@ Session.prototype = {
         classes.push('address extra');
       }
       setter('address', true);
-    }
-
-    if (key === MOTILAL_KEY) {
-      tab_titles.card = 'Debit Card';
     }
 
     if (IRCTC_KEYS.indexOf(key) !== -1) {
@@ -2155,6 +2150,10 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    if (this.r._payment) {
+      return;
+    }
+
     if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
       return this.extraNext();
     }
@@ -2291,10 +2290,6 @@ Session.prototype = {
   },
 
   submit: function() {
-    if (this.r._payment) {
-      return;
-    }
-
     var data = this.payload;
     var that = this;
     var request = {
