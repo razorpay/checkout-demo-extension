@@ -47,12 +47,12 @@ export const floor = Math.floor;
 // function utils
 export const timeout = (func, delay) => {
   var timerId = setTimeout(func, delay || 0);
-  return ~clearTimeout(timerId);
+  return () => clearTimeout(timerId);
 };
 
 export const interval = (func, delay) => {
   var timerId = setInterval(func, delay || 0);
-  return ~clearInterval(timerId);
+  return () => clearInterval(timerId);
 };
 
 // returns a function which tells elapsed time at that point

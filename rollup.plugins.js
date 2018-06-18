@@ -87,8 +87,6 @@ module.exports = [
 
       '@babel/proposal-pipeline-operator',
 
-      'implicit-function',
-
       [
         './trace.js',
         {

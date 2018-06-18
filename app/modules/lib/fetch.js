@@ -41,7 +41,7 @@ func.setPrototype(fetch, {
   },
 
   defer: function() {
-    this.xhr = setTimeout(~this.call());
+    this.xhr = setTimeout(() => this.call());
   },
 
   call: function(callback = this.options.callback) {

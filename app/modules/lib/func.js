@@ -41,10 +41,13 @@ export function bindArgs(func) {
 
 // function, timeout, context, arg1, arg2...
 export const delay = (func, delay, context) =>
-  _.timeout(~apply(func, context, arr.sliceFrom(arguments, 3)), delay || 0);
+  _.timeout(
+    () => apply(func, context, arr.sliceFrom(arguments, 3)),
+    delay || 0
+  );
 
 export const delayArgs = (func, delay) =>
-  _.interval(~applyArgs(func, arr.sliceFrom(arguments, 2)), delay || 0);
+  _.interval(() => applyArgs(func, arr.sliceFrom(arguments, 2)), delay || 0);
 
 export const debounce = (func, wait) => {
   var timerId, args, context, timerFn, result;

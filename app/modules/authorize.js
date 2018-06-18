@@ -424,9 +424,10 @@ Payment.prototype = {
     if (popup) {
       var timer = _.timer();
 
-      Razorpay.popup_delay = ~track(this.r, 'popup_delay', {
-        duration: timer()
-      });
+      Razorpay.popup_delay = () =>
+        track(this.r, 'popup_delay', {
+          duration: timer()
+        });
 
       Razorpay.popup_track = () => {
         try {
@@ -625,10 +626,11 @@ var responseTypes = {
       '_[reason]': 'UPI_INTENT_BACK_BUTTON'
     };
 
-    var ra = ~fetch({
-      url: request.url,
-      callback: response => this.complete(response)
-    }).till(response => response && response.status);
+    var ra = () =>
+      fetch({
+        url: request.url,
+        callback: response => this.complete(response)
+      }).till(response => response && response.status);
 
     this.emit('upi.coproto_response', request);
 
