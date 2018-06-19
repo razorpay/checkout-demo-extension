@@ -2147,10 +2147,6 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    if (this.r._payment) {
-      return;
-    }
-
     if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
       return this.extraNext();
     }
@@ -2287,6 +2283,9 @@ Session.prototype = {
   },
 
   submit: function() {
+    if (this.r._payment) {
+      return;
+    }
     var data = this.payload;
     var that = this;
     var request = {
