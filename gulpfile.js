@@ -6,7 +6,8 @@ const gulp = require('gulp');
 const dot = require('./scripts/dot/index');
 const stylus = require('gulp-stylus');
 const autoprefixer = require('autoprefixer-stylus');
-const uglify = require('gulp-uglify');
+const glob = require('glob').sync;
+const uglify = require('uglify-js').minify;
 const usemin = require('gulp-usemin');
 const through = require('through2').obj;
 const runSequence = require('run-sequence');
@@ -17,8 +18,8 @@ const rollupConfig = require('./rollup.config');
 
 const { pure_funcs } = require('./scripts/console-commands');
 
-const jshint = require('gulp-jshint');
-const stylish = require('jshint-stylish');
+const jshint = require('jshint').JSHINT;
+const jshintStylish = require('jshint-stylish').reporter;
 
 const distDir = 'app/dist/v1/';
 const cssDistDir = distDir + 'css';
@@ -89,38 +90,39 @@ function joinJs() {
 
 gulp.task('usemin', joinJs);
 
-gulp.task('uglify', () => {
-  return (
-    gulp
-      .src([`${distDir}/**/*.js`])
-      // wrap between iife and user strict
-      .pipe(
-        through(function(file, enc, cb) {
-          file.contents = Buffer.from(
-            `(function(){"use strict";${String(file.contents)}})()`
-          );
-          this.push(file);
-          cb();
-        })
-      )
-      .pipe(jshint())
-      .pipe(jshint.reporter(stylish))
-      .pipe(jshint.reporter('fail'))
-      .pipe(
-        uglify({
-          compress: {
-            pure_funcs,
-            global_defs: {
-              DEBUG_ENV: process.env.NODE_ENV !== 'production'
-            }
-          }
-        })
-      )
-      .on('error', function(e) {
-        console.log(e);
-      })
-      .pipe(gulp.dest(distDir))
-  );
+gulp.task('uglify', done => {
+  const strictPrefix = '!function(){"use strict";';
+  const jshintOptions = JSON.parse(fs.readFileSync('.jshintrc').toString());
+
+  glob(`${distDir}/**/*.js`).forEach(file => {
+    let fileContents = fs.readFileSync(file).toString();
+    if (!fileContents.startsWith(strictPrefix)) {
+      fileContents = `${strictPrefix}${fileContents}}()`;
+    }
+
+    jshint(fileContents, jshintOptions);
+
+    if (jshint.errors.length > 0) {
+      jshintStylish(jshint.errors.map(error => ({ file, error })));
+      throw 'Jshint failed';
+    }
+
+    console.log('Jshint passed for ' + file);
+
+    fileContents = uglify(fileContents, {
+      compress: {
+        pure_funcs,
+        global_defs: {
+          DEBUG_ENV: process.env.NODE_ENV !== 'production'
+        }
+      }
+    }).code;
+
+    fs.writeFileSync(file, fileContents);
+
+    console.log('uglified ' + file);
+  });
+  done();
 });
 
 gulp.task('copyLegacy', cb => {

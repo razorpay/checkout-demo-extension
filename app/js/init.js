@@ -47,7 +47,13 @@ function makeUrl(path) {
   return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
-var ba_keys = ['key', 'order_id', 'invoice_id', 'subscription_id', 'payment_link_id'];
+var ba_keys = [
+  'key',
+  'order_id',
+  'invoice_id',
+  'subscription_id',
+  'payment_link_id'
+];
 
 function makeAuthUrl(r, url) {
   url = makeUrl(url);
@@ -144,12 +150,12 @@ Razorpay.emi = {
     }
     rate /= 1200;
     var multiplier = Math.pow(1 + rate, length);
-    return parseInt(principle * rate * multiplier / (multiplier - 1), 10);
+    return parseInt((principle * rate * multiplier) / (multiplier - 1), 10);
   }
 };
 
 function getPrefsJsonp(data, callback) {
-  return $.jsonp({
+  return jsonp({
     url: makeUrl('preferences'),
     data: data,
     timeout: 30000,

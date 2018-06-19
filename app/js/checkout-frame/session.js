@@ -715,9 +715,9 @@ Session.prototype = {
          * TODO: fix this flow. We should not need to rewrite this entire thing
          * We should be reusing Payment object.
          */
-        this.ajax = recurseAjax(
-          pollUrl,
-          function(response) {
+        this.ajax = fetch({
+          url: pollUrl,
+          callback: function(response) {
             if (response.razorpay_payment_id) {
               invoke(successHandler, self, response);
             } else {
@@ -728,13 +728,10 @@ Session.prototype = {
 
               invoke(errorHandler, self, response);
             }
-          },
-          function(response) {
-            return response && response.status;
-          },
-          null,
-          $.jsonp
-        );
+          }
+        }).till(function(response) {
+          return response && response.status;
+        });
       }
     } catch (e) {}
   },
@@ -2554,19 +2551,18 @@ function commenceECOD(session) {
     'invoices/' + session.get('invoice_id') + '/status'
   );
   setTimeout(function() {
-    session.ajax = recurseAjax(
-      url,
-      function(response) {
+    session.ajax = fetch({
+      url: url,
+      callback: function(response) {
         if (response.error) {
           errorHandler.call(session, response);
         } else if (response.razorpay_payment_id) {
           successHandler.call(session, response);
         }
-      },
-      function(response) {
-        return response && response.status;
       }
-    );
+    }).till(function(response) {
+      return response && response.status;
+    });
   }, 6000);
 }
 
@@ -2574,7 +2570,7 @@ function send_ecod_link() {
   // this == session
   this.showLoadError('Sending link to ' + getPhone());
   var r = this.r;
-  $.post({
+  fetch.post({
     url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
     callback: debounce(hideOverlayMessage, 4000)
   });
