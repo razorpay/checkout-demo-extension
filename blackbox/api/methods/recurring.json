@@ -1,0 +1,11 @@
+{
+    "card": {
+        "credit": ["MasterCard", "Visa"],
+        "debit": {
+            "CITI": "CITI Bank",
+            "CNRB": "Canara Bank",
+            "ICIC": "ICICI Bank",
+            "KKBK": "Kotak Mahindra Bank"
+        }
+    }
+}
