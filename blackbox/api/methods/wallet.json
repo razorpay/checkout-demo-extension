@@ -1,0 +1,11 @@
+{
+    "mobikwik": true,
+    "paytm": true,
+    "payzapp": true,
+    "olamoney": true,
+    "airtelmoney": true,
+    "freecharge": true,
+    "jiomoney": true,
+    "sbibuddy": true,
+    "openwallet": true
+}

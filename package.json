@@ -26,7 +26,7 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "test": "./rollup.test.js | tap-difflet",
+    "test": "./rollup.test.js | tap-difflet; npm run build && node ./blackbox",
     "build": "rollup -c --environment prod && gulp",
     "precommit": "lint-staged",
     "start": "rollup -c && gulp watch"
@@ -53,6 +53,7 @@
     "@babel/plugin-transform-template-literals": "^7.0.0-beta.51",
     "autoprefixer-stylus": "^0.14.0",
     "dot": "^1.1.2",
+    "fastify": "^1.6.0",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",

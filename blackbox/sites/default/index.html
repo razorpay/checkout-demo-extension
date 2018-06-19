@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test Page</title>
+  <script>
+    CheckoutBridge = {
+      oncomplete: completeHandler,
+      onrender: renderHandler
+    }
+    Razorpay = {
+      config: {
+        frameApi: 'http://localhost:3000',
+      }
+    }
+  </script>
+  <script src="../../../app/dist/v1/checkout-frame.js"></script>
+  <link rel="stylesheet" href="../../../app/dist/v1/css/checkout.css" />
+</head>
+<body>
+
+</body>
+</html>
+<script>
+  handleMessage({
+    options: {
+      key: 'm1key',
+      prefill: {
+        contact: '8879524924',
+        email: 'pranav@rzp.com',
+        method: 'wallet'
+      }
+    }
+  })
+</script>
