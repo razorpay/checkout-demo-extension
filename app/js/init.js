@@ -203,8 +203,7 @@ var RazorpayDefaults = (Razorpay.defaults = {
   recurring_token: {
     max_amount: 0,
     expire_by: 0
-  },
-  activity_recreated: false
+  }
 });
 
 function base_configure(overrides) {

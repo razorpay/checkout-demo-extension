@@ -696,7 +696,7 @@ Session.prototype = {
       pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
       // "activity_recreated" was passed as true.
-      var isActivityRecreated = self.get('activity_recreated');
+      var isActivityRecreated = self.activity_recreated;
 
       if (pendingPaymentTimestamp) {
         /**

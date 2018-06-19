@@ -892,9 +892,6 @@ window.handleMessage = function(message) {
       return;
     }
     try {
-      if (!options.hasOwnProperty('activity_recreated')) {
-        options['activity_recreated'] = message.activity_recreated;
-      }
       session = new Session(options);
     } catch (e) {
       Razorpay.sendMessage({ event: 'fault', data: e.message });
@@ -930,6 +927,8 @@ window.handleMessage = function(message) {
   session.magic = message.magic;
 
   session.ua_Android = ua_Android;
+
+  session.activity_recreated = message.activity_recreated;
 
   if (message.device_token) {
     qpmap.device_token = message.device_token;
