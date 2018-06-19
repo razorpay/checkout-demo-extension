@@ -3,6 +3,10 @@
  */
 import { isString } from 'lib/_';
 
+// rendering color on canvas as user may
+// give color like "red" or color with
+// alpha value. need to render on canvas to find
+// resultant color
 const canvas = document.createElement('canvas'),
   ctx = canvas.getContext('2d');
 
