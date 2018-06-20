@@ -6,6 +6,7 @@ const modules = {
   popup: 'Popup',
   authorize: 'Payment',
   tez: 'Tez',
+  'lib/color': '_Color',
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
   'lib/upi': 'UPIUtils',

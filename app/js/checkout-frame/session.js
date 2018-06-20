@@ -1106,12 +1106,17 @@ Session.prototype = {
     var style = document.createElement('style');
     style.type = 'text/css';
     try {
-      var getter = this.get;
-      div.style.color = getter('theme.color');
+      var getter = this.get,
+        themeColor = getter('theme.color');
+
+      div.style.color = themeColor;
+
+      var isThemeColorDark = _Color.isDark(themeColor);
+
       if (!div.style.color) {
         getter()['theme.color'] = '';
       }
-      var rules = templates.theme(getter);
+      var rules = templates.theme(getter, isThemeColorDark);
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {

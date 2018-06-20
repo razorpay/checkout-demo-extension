@@ -2,6 +2,7 @@
 var c = _('theme.color') || '#3594E2';
 var close = _('theme.close_button');
 var bodyHeight = window.innerHeight - gel('header').offsetHeight;
+var textColor = arguments[1] ? "#fff" : "rgba(0, 0, 0, 0.85)";
 `
 
 `?_('theme.upi_only')`
@@ -37,6 +38,7 @@ var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 
 #header{
   background: `=c`;
+  color: `=textColor`;
 }
 
 `?_.image_padding`
