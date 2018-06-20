@@ -372,33 +372,6 @@ function toggleInvalid($el, isValid) {
   $el.toggleClass('invalid', !isValid);
 }
 
-function recurseAjax(url, callback, continueTill, holder, ajaxFn) {
-  var firstCall;
-  if (!holder) {
-    holder = {};
-    firstCall = true;
-  }
-  if (!ajaxFn) {
-    ajaxFn = $.ajax;
-  }
-  defer(function() {
-    if (!firstCall && !holder[0]) {
-      return;
-    }
-    holder[0] = ajaxFn({
-      url: url,
-      callback: function(response) {
-        if (continueTill(response)) {
-          recurseAjax(url, callback, continueTill, holder, ajaxFn);
-        } else {
-          callback(response);
-        }
-      }
-    });
-  }, 1500);
-  return holder;
-}
-
 function abortAjax(ajax) {
   if (ajax) {
     if (ajax.abort) {

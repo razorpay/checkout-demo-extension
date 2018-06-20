@@ -5,7 +5,10 @@ const modules = {
   evthandler: 'EvtHandler',
   popup: 'Popup',
   authorize: 'Payment',
-  tez: 'Tez'
+  tez: 'Tez',
+  'lib/fetch': 'fetch',
+  'lib/dom': 'dom',
+  'lib/jsonp': 'jsonp'
 };
 
 function getOptions(module) {

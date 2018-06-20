@@ -155,7 +155,7 @@ Razorpay.emi = {
 };
 
 function getPrefsJsonp(data, callback) {
-  return $.jsonp({
+  return jsonp({
     url: makeUrl('preferences'),
     data: data,
     timeout: 30000,

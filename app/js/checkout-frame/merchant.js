@@ -432,7 +432,11 @@ function setPaymentMethods(session) {
     tab_titles.card = 'Card/EMI';
     sessProto = tab_titles;
   } else {
-    tab_titles.card = 'Card';
+    if (availMethods.debit_card && !availMethods.credit_card) {
+      tab_titles.card = tab_titles.debit_card;
+    } else {
+      tab_titles.card = 'Card';
+    }
   }
 
   // php encodes blank object as blank array

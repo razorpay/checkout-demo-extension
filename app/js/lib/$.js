@@ -323,7 +323,7 @@ function smoothScrollBy(y) {
       if (scrollCount >= 1) {
         return scrollTo(0, target);
       }
-      var sin = Math.sin(pi * scrollCount / 2);
+      var sin = Math.sin((pi * scrollCount) / 2);
       scrollTo(0, y0 + Math.round(y * sin));
       oldTimestamp = newTimestamp;
       requestAnimationFrame(step);
@@ -331,72 +331,6 @@ function smoothScrollBy(y) {
     requestAnimationFrame(step);
   }, 100);
 }
-
-$.post = function(opts) {
-  opts.method = 'post';
-
-  if (!opts.headers) {
-    opts.headers = {};
-  }
-  opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
-  var payload = [];
-  each(opts.data, function(key, val) {
-    payload.push(key + '=' + encodeURIComponent(val));
-  });
-  opts.data = payload.join('&');
-  return $.ajax(opts);
-};
-
-$.ajax = function(opts) {
-  var xhr = new XMLHttpRequest();
-  if (!opts.method) {
-    opts.method = 'get';
-  }
-  xhr.open(opts.method, opts.url, true);
-
-  each(opts.headers, function(header, value) {
-    xhr.setRequestHeader(header, value);
-  });
-
-  if (_session_id) {
-    xhr.setRequestHeader('X-Razorpay-SessionId', _session_id);
-  }
-
-  if (opts.callback) {
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4 && xhr.status) {
-        var json;
-        try {
-          json = JSON.parse(xhr.responseText);
-        } catch (e) {
-          json = discreet.error('Parsing error');
-          json.xhr = {
-            status: xhr.status,
-            text: xhr.responseText
-          };
-        }
-        opts.callback(json);
-      }
-    };
-    xhr.onerror = function() {
-      var resp = discreet.error('Network error');
-      resp.xhr = {
-        status: 0
-      };
-      opts.callback(resp);
-    };
-  }
-
-  var data = opts.data || null;
-
-  // ghostery
-  if (chromeVersion && chromeVersion <= 33) {
-    invoke('send', xhr, data, 1000);
-  } else {
-    xhr.send(data);
-  }
-  return xhr;
-};
 
 var escapeDiv = document.createElement('div');
 function escapeHtml(str) {

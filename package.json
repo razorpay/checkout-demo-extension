@@ -26,7 +26,7 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "test": "./rollup.test.js | tap-difflet",
+    "test": "./rollup.test.js | tap-difflet; npm run build && node ./blackbox",
     "build": "rollup -c --environment prod && gulp",
     "precommit": "lint-staged",
     "start": "rollup -c && gulp watch"
@@ -52,19 +52,17 @@
     "@babel/plugin-transform-shorthand-properties": "^7.0.0-beta.51",
     "@babel/plugin-transform-template-literals": "^7.0.0-beta.51",
     "autoprefixer-stylus": "^0.14.0",
-    "babel-plugin-implicit-function": "^0.1.1",
     "dot": "^1.1.2",
+    "fastify": "^1.6.0",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
-    "gulp-jshint": "^2.1.0",
     "gulp-stylus": "^2.7.0",
-    "gulp-uglify": "^3.0.0",
     "gulp-usemin": "^0.3.29",
     "istanbul": "^0.4.5",
     "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
     "puppeteer": "^1.5.0",
-    "rollup": "^0.60.4",
+    "rollup": "^0.60.7",
     "rollup-plugin-babel": "^4.0.0-beta.2",
     "rollup-plugin-coverage": "^0.1.4",
     "rollup-plugin-includepaths": "^0.2.2",
@@ -72,7 +70,8 @@
     "run-sequence": "^2.2.1",
     "tap-difflet": "^0.7.1",
     "through": "^2.3.8",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "uglify-js": "^3.4.0"
   },
   "private": "true",
   "devDependencies": {

@@ -255,6 +255,12 @@ function errorHandler(response) {
   if (!response || !response.error) {
     return;
   }
+
+  if (this.powerwallet) {
+    this.powerwallet = null;
+    return;
+  }
+
   var error = response.error;
   var message = error.description;
   this.clearRequest();
@@ -408,7 +414,6 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
-var MOTILAL_KEY = 'rzp_live_6hUVikZo4HAqRa';
 
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -491,10 +496,6 @@ Session.prototype = {
         classes.push('address extra');
       }
       setter('address', true);
-    }
-
-    if (key === MOTILAL_KEY) {
-      tab_titles.card = 'Debit Card';
     }
 
     if (IRCTC_KEYS.indexOf(key) !== -1) {
@@ -727,9 +728,9 @@ Session.prototype = {
          * TODO: fix this flow. We should not need to rewrite this entire thing
          * We should be reusing Payment object.
          */
-        this.ajax = recurseAjax(
-          pollUrl,
-          function(response) {
+        this.ajax = fetch({
+          url: pollUrl,
+          callback: function(response) {
             if (response.razorpay_payment_id) {
               invoke(successHandler, self, response);
             } else {
@@ -740,13 +741,10 @@ Session.prototype = {
 
               invoke(errorHandler, self, response);
             }
-          },
-          function(response) {
-            return response && response.status;
-          },
-          null,
-          $.jsonp
-        );
+          }
+        }).till(function(response) {
+          return response && response.status;
+        });
       }
     } catch (e) {}
   },
@@ -1689,11 +1687,11 @@ Session.prototype = {
       tab = '';
     }
 
-    var popup = this.r._payment && this.r._payment.popup;
-    if (tab === 'wallet' && this.screen === 'otp' && popup) {
-      if (confirmClose()) {
-        this.clearRequest();
+    if (tab === 'wallet' && this.screen === 'otp') {
+      if (!confirmClose()) {
+        return;
       }
+      this.clearRequest();
     }
 
     this.switchTab(tab);
@@ -2298,6 +2296,9 @@ Session.prototype = {
   },
 
   submit: function() {
+    if (this.r._payment) {
+      return;
+    }
     var data = this.payload;
     var that = this;
     var request = {
@@ -2372,6 +2373,7 @@ Session.prototype = {
       data.email
     ) {
       request.powerwallet = true;
+      this.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp =
         '<img src="' + walletObj.col + '" height="' + walletObj.h + '">';
@@ -2561,19 +2563,18 @@ function commenceECOD(session) {
     'invoices/' + session.get('invoice_id') + '/status'
   );
   setTimeout(function() {
-    session.ajax = recurseAjax(
-      url,
-      function(response) {
+    session.ajax = fetch({
+      url: url,
+      callback: function(response) {
         if (response.error) {
           errorHandler.call(session, response);
         } else if (response.razorpay_payment_id) {
           successHandler.call(session, response);
         }
-      },
-      function(response) {
-        return response && response.status;
       }
-    );
+    }).till(function(response) {
+      return response && response.status;
+    });
   }, 6000);
 }
 
@@ -2581,7 +2582,7 @@ function send_ecod_link() {
   // this == session
   this.showLoadError('Sending link to ' + getPhone());
   var r = this.r;
-  $.post({
+  fetch.post({
     url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
     callback: debounce(hideOverlayMessage, 4000)
   });
