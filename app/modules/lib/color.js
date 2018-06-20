@@ -1,7 +1,6 @@
 /*
  * All color inspection/manipulation functions go here
  */
-import { isString } from 'lib/_';
 
 // rendering color on canvas as user may
 // give color like "red" or color with
@@ -50,12 +49,12 @@ const getRelativeLuminanceWithWhite = color => {
 };
 
 export const isDark = color => {
-  if (!isString(color)) {
+  if (!_.isString(color)) {
     return;
   }
 
   const relativeLuminosity = getRelativeLuminanceWithWhite(color);
 
-  // tested , and found black text would look good on values < 0.4
-  return relativeLuminosity < 0.4;
+  // tested , and found black text would look good on values < 0.5
+  return relativeLuminosity < 0.5;
 };
