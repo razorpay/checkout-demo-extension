@@ -49,7 +49,7 @@ export const isElement = o => isNonNullObject(o) && o.nodeType === 1;
 export const isTruthy = o => o;
 
 export const isNonNullObject = o => o !== null && isObject(o);
-export const isEmptyObject = x => !lengthOf(keysOf(x));
+export const isEmptyObject = x => !lengthOf(Object.keys(x));
 
 // create getProperty function based on keys
 export const prop = curry2((obj, key) => obj && obj[key]);
