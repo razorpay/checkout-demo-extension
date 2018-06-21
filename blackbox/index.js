@@ -1,6 +1,10 @@
 require('./api');
 const glob = require('glob').sync;
 const puppeteer = require('puppeteer');
+const path = require('path');
+
+// wait this many seconds for each test
+const testTimeout = 20;
 
 // currently running tests;
 let running = 0;
@@ -25,12 +29,13 @@ const run = async site => {
   });
   const page = await browser.newPage();
   await page.goto('file://' + __dirname + '/index.html');
+
   let timeout = setTimeout(() => {
-    console.error('Payment not completed in 10s');
+    console.error(`${path.basename(site)} not completed in ${testTimeout}s`);
     if (!singleTest) {
       process.exit(1);
     }
-  }, 1e4);
+  }, testTimeout * 1000);
   await require(site)(page);
   clearTimeout(timeout);
   await browser.close();
