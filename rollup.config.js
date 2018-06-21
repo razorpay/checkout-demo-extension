@@ -7,7 +7,6 @@ const modules = {
   authorize: 'Payment',
   tez: 'Tez',
   'lib/fetch': 'fetch',
-  'lib/dom': 'dom',
   'lib/jsonp': 'jsonp'
 };
 
