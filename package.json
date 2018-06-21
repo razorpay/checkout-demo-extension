@@ -54,6 +54,7 @@
     "autoprefixer-stylus": "^0.14.0",
     "dot": "^1.1.2",
     "fastify": "^1.6.0",
+    "fastify-formbody": "^2.0.0",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
@@ -62,7 +63,7 @@
     "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
     "puppeteer": "^1.5.0",
-    "rollup": "^0.60.7",
+    "rollup": "^0.61.0",
     "rollup-plugin-babel": "^4.0.0-beta.2",
     "rollup-plugin-coverage": "^0.1.4",
     "rollup-plugin-includepaths": "^0.2.2",
@@ -71,7 +72,7 @@
     "tap-difflet": "^0.7.1",
     "through": "^2.3.8",
     "through2": "^2.0.3",
-    "uglify-js": "^3.4.0"
+    "uglify-js": "^3.4.1"
   },
   "private": "true",
   "devDependencies": {
