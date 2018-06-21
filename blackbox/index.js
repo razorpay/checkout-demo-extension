@@ -26,11 +26,11 @@ const run = async site => {
   const page = await browser.newPage();
   await page.goto('file://' + __dirname + '/index.html');
   let timeout = setTimeout(() => {
-    console.error('Payment not completed in 5s');
+    console.error('Payment not completed in 10s');
     if (!singleTest) {
       process.exit(1);
     }
-  }, 5000);
+  }, 1e4);
   await require(site)(page);
   clearTimeout(timeout);
   await browser.close();

@@ -1,13 +1,22 @@
 const baseUrl = 'http://localhost:3000/v1';
 
-module.exports = async request =>
-  methodHandlers[request.body.method](request.body);
+const allPayments = {};
 
-const createPaymentId = () => 'pay_' + Math.random();
+const payments = (module.exports = {
+  create: async request => methodHandlers[request.body.method](request.body),
+
+  createId: (paymentData = {}) => {
+    let id = 'pay_' + Math.random();
+    allPayments[id] = paymentData;
+    return id;
+  },
+
+  get: id => allPayments[id]
+});
 
 const methodHandlers = {
   card: body => {
-    let payment_id = createPaymentId();
+    let payment_id = payments.createId();
     return {
       type: 'first',
       request: {
@@ -21,7 +30,7 @@ const methodHandlers = {
   },
 
   wallet: body => {
-    let payment_id = createPaymentId();
+    let payment_id = payments.createId();
     return {
       type: 'otp',
       request: {
@@ -30,6 +39,16 @@ const methodHandlers = {
         content: []
       },
       payment_id
+    };
+  },
+
+  upi: body => {
+    let payment_id = payments.createId({ method: 'upi' });
+    return {
+      type: 'async',
+      request: {
+        url: `${baseUrl}/payments/${payment_id}/status`
+      }
     };
   }
 };

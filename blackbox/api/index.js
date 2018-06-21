@@ -1,7 +1,7 @@
 const fastify = require('fastify')();
 fastify.register(require('fastify-formbody'));
 const merchants = require('./merchants');
-const paymentHandler = require('./payments');
+const payments = require('./payments');
 
 fastify.listen(3000, err => {
   if (err) throw err;
@@ -23,10 +23,21 @@ fastify.get('/v1/preferences', async (request, reply) => {
   };
 });
 
-fastify.post('/v1/payments/create/ajax', paymentHandler);
+fastify.post('/v1/payments/create/ajax', payments.create);
 
 fastify.post('/v1/payments/:payment_id/otp_submit', async request => {
   return { razorpay_payment_id: request.params.payment_id };
+});
+
+fastify.get('/v1/payments/:payment_id/status', async request => {
+  let payment = payments.get(request.params.payment_id);
+  if (payment.method === 'upi') {
+    if (!payment.statusHit) {
+      payment.statusHit = 1;
+      return { status: 'created' };
+    }
+    return { razorpay_payment_id: request.params.payment_id };
+  }
 });
 
 fastify.get('/v1/gateway/mocksharp', async (request, reply) => {
