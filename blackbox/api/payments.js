@@ -42,6 +42,20 @@ const methodHandlers = {
     };
   },
 
+  netbanking: body => {
+    let payment_id = payments.createId();
+    return {
+      type: 'first',
+      request: {
+        url: `${baseUrl}/gateway/mocksharp`,
+        content: {
+          payment_id
+        }
+      },
+      payment_id
+    };
+  },
+
   upi: body => {
     let payment_id = payments.createId({ method: 'upi' });
     return {
