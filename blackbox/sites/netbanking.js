@@ -1,8 +1,11 @@
 const { delay, loadCheckoutFrame } = require('../util');
 
+const fillCustomerDetails = async page => {
+  await page.mainFrame().type('#contact', '9999999999');
+  await page.mainFrame().type('#email', 'void@razorpay.com');
+};
+
 const goToNetbanking = async page => {
-  await page.type('#contact', '9999999999');
-  await page.type('#email', 'void@razorpay.com');
   await page.click('.payment-option[tab=netbanking] label');
 };
 
@@ -35,24 +38,40 @@ const flowUsingDropdown = async page => {
 
 module.exports = async page =>
   new Promise(async (resolve, reject) => {
-    let step = 1;
+    let initalLoad = true;
 
     await page.exposeFunction('renderHandler', async () => {
-      await flowUsingButtons(page);
+      await fillCustomerDetails(page);
+
+      if (initalLoad) {
+        await flowUsingButtons(page);
+      } else {
+        await flowUsingDropdown(page);
+      }
 
       await delay(100);
 
       await page.click('.pay-btn');
     });
 
+    let firstStepResolve,
+      firstStepPromise = new Promise(resolve => (firstStepResolve = resolve));
+
     await page.exposeFunction('completeHandler', data => {
+      const title = initalLoad ? 'btn click' : 'dropdown';
+
       if (JSON.parse(data).razorpay_payment_id) {
-        console.log('netbanking payment through btn click passed');
-        resolve();
+        console.log('netbanking payment through ' + title + ' passed');
+
+        if (!initalLoad) {
+          return resolve();
+        }
       } else {
-        console.log('netbanking payment through btn click failed');
+        console.log('netbanking payment through ' + title + ' failed');
         reject();
       }
+
+      firstStepResolve();
     });
 
     await page.evaluate(`
@@ -62,6 +81,26 @@ module.exports = async page =>
       }
     `);
 
+    await loadCheckoutFrame(page);
+    await page.evaluate(`handleMessage({
+       options: {
+          key: 'm1key',
+          remember_customer: false
+        }
+     })`);
+
+    await firstStepPromise;
+
+    initalLoad = false;
+
+    await page.reload();
+
+    await page.evaluate(`
+      CheckoutBridge = {
+        oncomplete: completeHandler,
+        onrender: renderHandler
+      }
+    `);
     await loadCheckoutFrame(page);
     await page.evaluate(`handleMessage({
        options: {
