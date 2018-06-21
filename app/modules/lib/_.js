@@ -1,20 +1,6 @@
-const typeChecker = type => x => typeof x === type;
-export const isBoolean = typeChecker('boolean');
-export const isNumber = typeChecker('number');
-export const isString = typeChecker('string');
-export const isFunction = typeChecker('function');
-export const isObject = typeChecker('object');
-
-export const isArray = Array.isArray;
-
-// create getProperty function based on keys
-export const getter = key => obj => obj && obj[key];
-
-export const lengthOf = getter('length');
-export const prototypeOf = getter('prototype');
-
-export const isNonNullObject = o => o && isObject(o);
-export const isEmptyObject = x => !lengthOf(keysOf(x));
+function logError() {
+  console.error.apply(console, arguments);
+}
 
 // returns a partially applied function, awaiting for last parameter
 export const curry2 = func =>
@@ -34,6 +20,42 @@ export const curry3 = func =>
     }
     return func.call(null, arg1, arg2, arg3);
   };
+
+export function validateArgs(...validators) {
+  return func =>
+    function() {
+      let args = arguments;
+      if (validators.length !== lengthOf(args)) {
+        logError('arg length doesnt match');
+      } else if (
+        validators.every(
+          (v, i) => v(args[i]) || logError(`wrong ${i}th argtype`, args[i])
+        )
+      ) {
+        return func.apply(null, args);
+      }
+      return args[0];
+    };
+}
+
+export const isType = ((x, type) => typeof x === type) |> curry2;
+export const isBoolean = isType('boolean');
+export const isNumber = isType('number');
+export const isString = isType('string');
+export const isFunction = isType('function');
+export const isObject = isType('object');
+export const isArray = Array.isArray;
+export const isElement = o => isNonNullObject(o) && o.nodeType === 1;
+export const isTruthy = o => o;
+
+export const isNonNullObject = o => o !== null && isObject(o);
+export const isEmptyObject = x => !lengthOf(keysOf(x));
+
+// create getProperty function based on keys
+export const prop = curry2((obj, key) => obj && obj[key]);
+
+export const lengthOf = prop('length');
+export const prototypeOf = prop('prototype');
 
 export const isExact = curry2((x, y) => x && x.constructor === y);
 export const is = curry2((x, y) => x instanceof y);

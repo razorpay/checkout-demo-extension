@@ -10,11 +10,12 @@ require('child_process').execSync('mkdir -p app/modules/generated');
 let injects = {
   global: ['generated/globals', 'global'],
   _: ['lib/_', '*'],
-  arr: ['lib/arr', '*'],
-  str: ['lib/str', '*'],
-  func: ['lib/func', '*'],
-  obj: ['lib/obj', '*'],
-  dom: ['lib/dom', '*'],
+  _Arr: ['lib/_Arr', '*'],
+  _Str: ['lib/_Str', '*'],
+  _Func: ['lib/_Func', '*'],
+  _Obj: ['lib/_Obj', '*'],
+  _El: ['lib/_El', '*'],
+  _Doc: ['lib/_Doc', '*'],
   fetch: 'lib/fetch',
   jsonp: 'lib/jsonp'
 };
