@@ -810,7 +810,7 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-Razorpay.setFormatter = FormatDelegator;
+Razorpay.setFormatter = Formatter.FormatDelegator;
 
 razorpayPayment.authorize = function(options) {
   var r = Razorpay({ amount: options.data.amount }).createPayment(options.data);

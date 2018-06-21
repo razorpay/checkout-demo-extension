@@ -16,6 +16,8 @@ let injects = {
   _Obj: ['lib/_Obj', '*'],
   _El: ['lib/_El', '*'],
   _Doc: ['lib/_Doc', '*'],
+  _Card: ['lib/_Card', '*'],
+  _Amount: ['lib/_Amount', '*'],
   fetch: 'lib/fetch',
   jsonp: 'lib/jsonp'
 };

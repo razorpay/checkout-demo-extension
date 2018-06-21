@@ -68,16 +68,6 @@ function getDecimalAmount(amount) {
     return sum % 10 === 0;
   }
 
-  function cardType(value) {
-    for (var type in cardPatterns) {
-      var pattern = cardPatterns[type];
-      if (pattern.test(value)) {
-        return type;
-      }
-    }
-    return '';
-  }
-
   function alphanumericRaw(value) {
     var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
 
