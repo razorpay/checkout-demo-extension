@@ -836,6 +836,12 @@ window.handleOTP = function(otp) {
   }
 };
 
+function abortUPIPayment(session, upiBackEvnt) {
+  session.ajax.abort();
+  session.showLoadError.call(session, 'Payment did not complete.', true);
+  session.clearRequest.call(session, upiBackEvnt);
+}
+
 window.upiIntentResponse = function(data) {
   var session = getSession();
 
@@ -860,17 +866,13 @@ window.upiIntentResponse = function(data) {
         '_[reason]': 'UPI_INTENT_BACK_BUTTON'
       };
 
-      function abortUPIPayment() {
-        session.ajax.abort();
-        session.showLoadError.call(session, 'Payment did not complete.', true);
-        session.clearRequest.call(session, upiBackEvnt);
-      }
-
       // Show error and clear request when back is pressed from PSP UPI App.
       if (session.startedCompletingPendingPayment) {
-        abortUPIPayment();
+        abortUPIPayment(session, upiBackEvnt);
       } else {
-        session.r.on('pending_payment_retry_start', abortUPIPayment);
+        session.r.on('pending_payment_retry_start', function() {
+          abortUPIPayment(session, upiBackEvnt);
+        });
       }
     }
   }
