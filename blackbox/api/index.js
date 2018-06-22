@@ -1,5 +1,7 @@
 const fastify = require('fastify')();
+fastify.register(require('fastify-formbody'));
 const merchants = require('./merchants');
+const payments = require('./payments');
 
 fastify.listen(3000, err => {
   if (err) throw err;
@@ -9,13 +11,6 @@ fastify.listen(3000, err => {
 fastify.addHook('preHandler', async (request, reply) => {
   return reply.header('Access-Control-Allow-Origin', '*');
 });
-
-fastify.addContentTypeParser(
-  'application/x-www-form-urlencoded',
-  (req, done) => {
-    done();
-  }
-);
 
 fastify.get('/v1/preferences', async (request, reply) => {
   let m = merchants.find(m => m.key_id === request.query.key_id);
@@ -28,21 +23,26 @@ fastify.get('/v1/preferences', async (request, reply) => {
   };
 });
 
-fastify.post('/v1/payments/create/ajax', async (request, reply) => {
-  let payment_id = 'pay_' + Math.random();
-  return {
-    type: 'otp',
-    request: {
-      url: `http://localhost:3000/v1/payments/${payment_id}/otp_submit`,
-      method: 'post',
-      content: []
-    },
-    payment_id
-  };
+fastify.post('/v1/payments/create/ajax', payments.create);
+
+fastify.post('/v1/payments/:payment_id/otp_submit', async request => {
+  return { razorpay_payment_id: request.params.payment_id };
 });
 
-fastify.post('/v1/payments/:payment_id/otp_submit', async (request, reply) => {
-  return {
-    razorpay_payment_id: request.params.payment_id
-  };
+fastify.get('/v1/payments/:payment_id/status', async request => {
+  let payment = payments.get(request.params.payment_id);
+  if (payment.method === 'upi') {
+    if (!payment.statusHit) {
+      payment.statusHit = 1;
+      return { status: 'created' };
+    }
+    return { razorpay_payment_id: request.params.payment_id };
+  }
+});
+
+fastify.get('/v1/gateway/mocksharp/:payment_id', async (request, reply) => {
+  reply.header('content-type', 'text/html');
+  return `<script>opener.postMessage({razorpay_payment_id:'${
+    request.params.payment_id
+  }'},'*')</script>`;
 });
