@@ -7,5 +7,10 @@ module.exports = {
     await page.addStyleTag({
       url: 'file://' + __dirname + '/../app/dist/v1/css/checkout.css'
     });
+  },
+  loadRazorpayJs: async page => {
+    await page.addScriptTag({
+      url: 'file://' + __dirname + '/../app/dist/v1/razorpay.js'
+    });
   }
 };

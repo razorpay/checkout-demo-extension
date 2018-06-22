@@ -36,7 +36,7 @@ const run = async site => {
       process.exit(1);
     }
   }, testTimeout * 1000);
-  await require(site)(page);
+  await require(site)(page).catch(() => {});
   clearTimeout(timeout);
   await browser.close();
   fulfilled++;

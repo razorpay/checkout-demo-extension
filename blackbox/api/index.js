@@ -40,6 +40,10 @@ fastify.get('/v1/payments/:payment_id/status', async request => {
   }
 });
 
+fastify.post('/v1/payments/create/checkout', async (request, reply) => {
+  reply.redirect('/v1/gateway/mocksharp');
+});
+
 fastify.get('/v1/gateway/mocksharp', async (request, reply) => {
   reply.header('content-type', 'text/html');
   return `<script>opener.postMessage({razorpay_payment_id:'${
