@@ -43,13 +43,11 @@ puppeteer
 
       let test = suite.test(browser);
       return test
-        .then(result => {
-          result && console.log(chalk.green(result));
+        .then(() => {
           fulfilled++;
           clearTimeout(timeout);
         })
         .catch(error => {
-          console.log(chalk.white.bgRed(error));
           !singleTest && process.exit(1);
         });
     };

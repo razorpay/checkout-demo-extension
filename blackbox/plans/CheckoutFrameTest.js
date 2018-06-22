@@ -50,10 +50,12 @@ class CheckoutFrameTest {
   setCallbacks(resolve, reject) {
     this.pass = message => {
       this.page.close();
-      resolve(this.makeLog(message || '✔'));
+      console.log(chalk.green(this.makeLog(message || '✔')));
+      resolve();
     };
     this.fail = message => {
-      reject(this.makeLog(message || '✘'));
+      console.log(chalk.red(this.makeLog(message || '✘')));
+      reject();
     };
   }
 

@@ -15,7 +15,7 @@ const message = {
 
 module.exports = {
   test: browser =>
-    NetbankingDropdown.test(browser, message).then(result =>
+    NetbankingButton.test(browser, message).then(_ =>
       NetbankingDropdown.test(browser, message)
     )
 };
