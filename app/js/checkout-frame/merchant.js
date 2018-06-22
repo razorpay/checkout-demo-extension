@@ -860,12 +860,18 @@ window.upiIntentResponse = function(data) {
         '_[reason]': 'UPI_INTENT_BACK_BUTTON'
       };
 
-      // Show error and clear request when back is pressed from PSP UPI App.
-      session.r.on('pending_payment_retry_start', function() {
+      function abortUPIPayment() {
         session.ajax.abort();
         session.showLoadError.call(session, 'Payment did not complete.', true);
         session.clearRequest.call(session, upiBackEvnt);
-      });
+      }
+
+      // Show error and clear request when back is pressed from PSP UPI App.
+      if (session.startedCompletingPendingPayment) {
+        abortUPIPayment();
+      } else {
+        session.r.on('pending_payment_retry_start', abortUPIPayment);
+      }
     }
   }
 };

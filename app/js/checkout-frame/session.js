@@ -748,6 +748,8 @@ Session.prototype = {
 
         // Let listeners know that we have started to complete pending payment.
         this.r.emit('pending_payment_retry_start');
+        // Set a flag.
+        this.startedCompletingPendingPayment = true;
       }
     } catch (e) {}
   },
