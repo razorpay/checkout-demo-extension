@@ -3,9 +3,9 @@ const CALLBACK_KEY = 'jsonp_callback';
 var getAjaxParams = function(options) {
   var params = {
     data: options.data,
-    error: options.error || func.noop,
-    success: options.success || func.noop,
-    callback: options.callback || func.noop,
+    error: options.error || _Func.noop,
+    success: options.success || _Func.noop,
+    callback: options.callback || _Func.noop,
     url: options.url || ''
   };
 
@@ -14,9 +14,10 @@ var getAjaxParams = function(options) {
   }
   params.data.callback = 'Razorpay.' + CALLBACK_KEY;
 
-  return (
-    params
-    |> obj.set('computedUrl', _.appendParamsToUrl(params.url, params.data))
+  _Obj.setProp(
+    params,
+    'computedUrl',
+    _.appendParamsToUrl(params.url, params.data)
   );
 };
 
@@ -29,12 +30,12 @@ export default function(options) {
   var done = false;
 
   Razorpay[CALLBACK_KEY] = function(data) {
-    obj.unset(data, 'http_status_code');
+    _Obj.deleteProp(data, 'http_status_code');
 
     params.success(data, params);
     params.callback(data, params);
 
-    obj.unset(Razorpay, CALLBACK_KEY);
+    _Obj.deleteProp(Razorpay, CALLBACK_KEY);
   };
 
   var script = document.createElement('script');
@@ -64,7 +65,7 @@ export default function(options) {
   return {
     abort: function() {
       if (Razorpay[CALLBACK_KEY]) {
-        Razorpay[CALLBACK_KEY] = func.noop;
+        Razorpay[CALLBACK_KEY] = _Func.noop;
       }
     }
   };

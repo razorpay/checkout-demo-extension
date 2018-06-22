@@ -15,10 +15,10 @@ function clearPollingInterval(force) {
 var communicator;
 function setCommunicator() {
   if (!discreet.isFrame && (isWP || /MSIE |Trident\//.test(ua))) {
-    communicator = document.createElement('iframe');
-    communicator.style.display = 'none';
-    doc.appendChild(communicator);
-    communicator.src = RazorpayConfig.api + 'communicator.php';
+    _El.create('iframe')
+      |> _El.displayNone
+      |> _El.appendTo(_Doc.documentElement)
+      |> _Obj.setProp('src', RazorpayConfig.api + 'communicator.php');
   }
 }
 setCommunicator();
@@ -28,16 +28,15 @@ function submitPopup(payment) {
   var data = payment.data;
 
   // fix long notes
-  data
-    |> obj.loop((val, key) => {
-      if (/^notes/.test(key) && _.lengthOf(val) > 200) {
-        data[key] = val.replace(/\n/g, ' ');
-      }
-    });
+  _Obj.loop(data, (val, key) => {
+    if (/^notes/.test(key) && _.lengthOf(val) > 200) {
+      data[key] = val.replace(/\n/g, ' ');
+    }
+  });
 
   // no ajax route was available
   if (popup) {
-    submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
+    _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
   }
 }
 
@@ -49,7 +48,7 @@ function onPaymentCancel(metaParam) {
     if (payment_id) {
       track(razorpay, 'cancel', { payment_id: payment_id });
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
-      if (isNonNullObject(metaParam)) {
+      if (_.isNonNullObject(metaParam)) {
         url += _.obj2query(metaParam);
       }
       fetch({
@@ -74,9 +73,9 @@ function getTrackingData(data) {
   // donottrack card number, token, cvv
   return (
     data
-    |> obj.clone
-    |> obj.loop(
-      (val, key, o) => key.slice(0, 4) === 'card' && obj.unset(o, key)
+    |> _Obj.clone
+    |> _Obj.loop(
+      (val, key, o) => key.slice(0, 4) === 'card' && _Obj.deleteProp(o, key)
     )
   );
 }
@@ -132,7 +131,7 @@ export default function Payment(data, params, r) {
       this.writePopup();
     } catch (e) {}
     this.data = data;
-    this.on('resume', func.bind('generate', this));
+    this.on('resume', _Func.bind('generate', this));
   } else {
     this.generate(data);
   }
@@ -140,7 +139,7 @@ export default function Payment(data, params, r) {
 
 Payment.prototype = {
   on: function(event, handler) {
-    return this.r.on('payment.' + event, func.bind(handler, this));
+    return this.r.on('payment.' + event, _Func.bind(handler, this));
   },
 
   emit: function(event, arg) {
@@ -161,7 +160,7 @@ Payment.prototype = {
     if (this.isMagicPayment) {
       track(this.r, 'magic_open_popup');
       window.CheckoutBridge.invokePopup(
-        obj.stringify({
+        _Obj.stringify({
           content: templates.popup(this),
           focus: false
         })
@@ -288,10 +287,12 @@ Payment.prototype = {
 
     // adding listeners
     if ((discreet.isFrame && !this.powerwallet) || this.isMagicPayment) {
-      var complete = (window.onComplete = bind(this.complete, this));
-      pollPaymentData(complete);
+      this.complete
+        |> _Func.bind(this)
+        |> _Obj.setPropOf(window, 'onComplete')
+        |> pollPaymentData;
     }
-    this.offmessage = $(window).on('message', bind(onMessage, this));
+    this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
   },
 
   complete: function(data) {
@@ -324,7 +325,7 @@ Payment.prototype = {
       this.emit('success', data);
     } else {
       var errorObj = data.error;
-      if (!isNonNullObject(errorObj) || !errorObj.description) {
+      if (!_.isNonNullObject(errorObj) || !errorObj.description) {
         if (data.request) {
           var func = responseTypes[data.type];
           if (typeof func === 'function') {
@@ -409,7 +410,7 @@ Payment.prototype = {
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
       data,
-      callback: func.bind(ajaxCallback, this)
+      callback: _Func.bind(ajaxCallback, this)
     });
     return 1;
   },
@@ -525,16 +526,6 @@ function onMessage(e) {
   }
 }
 
-function makeAutoSubmitForm(url, data) {
-  return (
-    '<form action="' +
-    url +
-    '" method="post">' +
-    deserialize(data) +
-    '</form><script>document.forms[0].submit()</script>'
-  );
-}
-
 function makeRedirectUrl(fees) {
   return makeUrl('payments/create/' + (fees ? 'fees' : 'checkout'));
 }
@@ -563,27 +554,31 @@ var responseTypes = {
           "javascript: submitForm('" +
           request.url +
           "', " +
-          JSON.stringify(request.content) +
+          _Obj.stringify(request.content) +
           ", '" +
           request.method +
           "')";
         popupOptions.url = url;
       }
 
-      window.CheckoutBridge.invokePopup(JSON.stringify(popupOptions));
+      global.CheckoutBridge.invokePopup(_Obj.stringify(popupOptions));
     } else if (popup) {
       if (direct) {
         // direct is true for payzapp
         popup.write(content);
       } else {
-        submitForm(request.url, request.content, request.method, popup.window);
+        _Doc.submitForm(
+          request.url,
+          request.content,
+          request.method,
+          popup.window.name
+        );
       }
       // popup blocking addons close popup once we set a url
-      var self = this;
-      setTimeout(function() {
-        if (popup.window.closed && self.r.get('callback_url')) {
-          self.r.set('redirect', true);
-          self.checkRedirect();
+      setTimeout(() => {
+        if (popup.window.closed && this.r.get('callback_url')) {
+          this.r.set('redirect', true);
+          this.checkRedirect();
         }
       });
     }
@@ -641,7 +636,7 @@ var responseTypes = {
       } else if (data.response) {
         var response = {};
 
-        if (isNonNullObject(data.response)) {
+        if (_.isNonNullObject(data.response)) {
           response = data.response;
         } else {
           // Convert the string response into a JSON object.
@@ -750,7 +745,7 @@ razorpayProto.createPayment = function(data, params) {
     data = data.data;
     params = data;
   }
-  if (!isNonNullObject(params)) {
+  if (!_.isNonNullObject(params)) {
     params = emo;
   }
 
@@ -772,7 +767,7 @@ razorpayProto.submitOTP = function(otp) {
       type: 'otp',
       otp: otp
     },
-    callback: func.bind(otpCallback, payment)
+    callback: _Func.bind(otpCallback, payment)
   });
 };
 
@@ -783,7 +778,7 @@ razorpayProto.resendOTP = function(callback) {
     data: {
       '_[source]': 'checkoutjs'
     },
-    callback: func.bind(ajaxCallback, payment)
+    callback: _Func.bind(ajaxCallback, payment)
   });
 };
 
@@ -863,6 +858,6 @@ razorpayPayment.getPrefs = function(data, callback) {
 Razorpay.sendMessage = function(message) {
   if (message && message.event === 'redirect') {
     var data = message.data;
-    submitForm(data.url, data.content, data.method);
+    _Doc.submitForm(data.url, data.content, data.method);
   }
 };

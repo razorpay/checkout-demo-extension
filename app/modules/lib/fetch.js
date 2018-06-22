@@ -16,7 +16,7 @@ export default function fetch(options) {
   this.defer();
 }
 
-func.setPrototype(fetch, {
+_Func.setPrototype(fetch, {
   till: function(continueUntilFn) {
     this.abort();
     this.xhr = setTimeout(() => {
@@ -53,7 +53,7 @@ func.setPrototype(fetch, {
     if (_.isFunction(callback)) {
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status) {
-          var json = obj.parse(xhr.responseText);
+          var json = _Obj.parse(xhr.responseText);
           if (!json) {
             json = _.rzpError('Parsing error');
             json.xhr = {
@@ -74,8 +74,8 @@ func.setPrototype(fetch, {
     }
 
     headers
-      |> obj.setIf(sessionIdHeader, sessionId)
-      |> obj.loop((v, k) => xhr.setRequestHeader(k, v));
+      |> _Obj.setTruthyProp(sessionIdHeader, sessionId)
+      |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
 
     xhr.send(data);
   }
