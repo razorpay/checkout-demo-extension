@@ -7,7 +7,8 @@ const modules = {
   authorize: 'Payment',
   tez: 'Tez',
   'lib/fetch': 'fetch',
-  'lib/jsonp': 'jsonp'
+  'lib/jsonp': 'jsonp',
+  'lib/upi': 'UPIUtils'
 };
 
 function getOptions(module) {
