@@ -841,6 +841,31 @@ window.upiIntentResponse = function(data) {
 
   if (session.r._payment && session.upi_intents_data) {
     session.r.emit('payment.upi.intent_response', data);
+  } else if (session.activity_recreated) {
+    /**
+     * If the activity is recreated and UPI Intent flow was used,
+     * this method will be invoked when SDK wants to send Intent response.
+     *
+     * We parse the response, and if the txn did not suceed (user cancelled or other reasons),
+     * we tell the user that the payment was not completed.
+     */
+
+    var parsedResponse = UPIUtils.parseUPIIntentResponse(data);
+    var successfulTxn = UPIUtils.didUPIIntentTransactionSucceed(parsedResponse);
+
+    if (!successfulTxn) {
+      var upiBackEvnt = {
+        '_[method]': 'upi',
+        '_[flow]': 'intent',
+        '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+      };
+
+      // Show error and clear request when back is pressed from PSP UPI App.
+      session.r.on('pending_payment_retry_start', function() {
+        session.showLoadError.call(session, 'Payment did not complete.', true);
+        session.clearRequest.call(session, upiBackEvnt);
+      });
+    }
   }
 };
 

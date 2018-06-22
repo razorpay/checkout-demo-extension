@@ -724,6 +724,9 @@ Session.prototype = {
         this.showLoadError();
         this.isResumedPayment = true;
 
+        // Let listeners know that we have started to complete pending payment.
+        this.r.emit('pending_payment_retry_start');
+
         /*
          * TODO: fix this flow. We should not need to rewrite this entire thing
          * We should be reusing Payment object.
