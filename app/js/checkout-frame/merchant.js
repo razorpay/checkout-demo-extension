@@ -862,6 +862,7 @@ window.upiIntentResponse = function(data) {
 
       // Show error and clear request when back is pressed from PSP UPI App.
       session.r.on('pending_payment_retry_start', function() {
+        session.ajax.abort();
         session.showLoadError.call(session, 'Payment did not complete.', true);
         session.clearRequest.call(session, upiBackEvnt);
       });
