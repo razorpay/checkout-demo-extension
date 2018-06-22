@@ -1,111 +1,55 @@
-const { delay, loadCheckoutFrame } = require('../util');
+const { delay } = require('../util');
+const CheckoutFrameTest = require('../plans/CheckoutFrameTest');
 
-const fillCustomerDetails = async page => {
-  await page.mainFrame().type('#contact', '9999999999');
-  await page.mainFrame().type('#email', 'void@razorpay.com');
+const message = {
+  options: {
+    key: 'm1key',
+    remember_customer: false,
+    prefill: {
+      contact: '9999999999',
+      email: 'void@razorpay.com',
+      method: 'netbanking'
+    }
+  }
 };
 
-const goToNetbanking = async page => {
-  await page.click('.payment-option[tab=netbanking] label');
+module.exports = {
+  test: browser =>
+    NetbankingDropdown.test(browser, message).then(result =>
+      NetbankingDropdown.test(browser, message)
+    )
 };
 
-const flowUsingButtons = async page => {
-  await goToNetbanking(page);
+class NetbankingButton extends CheckoutFrameTest {
+  async render() {
+    let { page } = this;
 
-  const netbankingOptions = await page.$$('#netb-banks .radio-label'),
-    numNetbankingOptions = netbankingOptions.length;
+    await page.click('#netb-banks .radio-label');
+    await delay(100);
+    await page.click('.pay-btn');
 
-  await netbankingOptions[
-    Math.floor(Math.random(numNetbankingOptions) * 6)
-  ].click();
-};
+    let data = await this.paymentResult();
+    if (data.razorpay_payment_id) {
+      this.pass();
+    } else {
+      this.fail();
+    }
+  }
+}
 
-const flowUsingDropdown = async page => {
-  await goToNetbanking(page);
+class NetbankingDropdown extends CheckoutFrameTest {
+  async render() {
+    let { page } = this;
 
-  const netbankingSelect = await page.$('#bank-select'),
-    netbankingOptions = await netbankingSelect.$$eval('option', options => {
-      return options.map(option => option.value).slice(1);
-    }),
-    numNetbankingOptions = netbankingOptions.length,
-    randValue =
-      netbankingOptions[Math.floor(Math.random() * numNetbankingOptions)];
-  await page.evaluate(value => {
-    document.querySelector('#bank-select').value = value;
-    return Promise.resolve();
-  }, randValue);
-};
+    await page.select('#bank-select', 'HDFC');
+    await delay(100);
+    await page.click('.pay-btn');
 
-module.exports = async page =>
-  new Promise(async (resolve, reject) => {
-    let initalLoad = true;
-
-    await page.exposeFunction('renderHandler', async () => {
-      await fillCustomerDetails(page);
-
-      if (initalLoad) {
-        await flowUsingButtons(page);
-      } else {
-        await flowUsingDropdown(page);
-      }
-
-      await delay(100);
-
-      await page.click('.pay-btn');
-    });
-
-    let firstStepResolve,
-      firstStepPromise = new Promise(resolve => (firstStepResolve = resolve));
-
-    await page.exposeFunction('completeHandler', data => {
-      const title = initalLoad ? 'btn click' : 'dropdown';
-
-      if (JSON.parse(data).razorpay_payment_id) {
-        console.log('netbanking payment through ' + title + ' passed');
-
-        if (!initalLoad) {
-          return resolve();
-        }
-      } else {
-        console.log('netbanking payment through ' + title + ' failed');
-        reject();
-      }
-
-      firstStepResolve();
-    });
-
-    await page.evaluate(`
-      CheckoutBridge = {
-        oncomplete: completeHandler,
-        onrender: renderHandler
-      }
-    `);
-
-    await loadCheckoutFrame(page);
-    await page.evaluate(`handleMessage({
-       options: {
-          key: 'm1key',
-          remember_customer: false
-        }
-     })`);
-
-    await firstStepPromise;
-
-    initalLoad = false;
-
-    await page.reload();
-
-    await page.evaluate(`
-      CheckoutBridge = {
-        oncomplete: completeHandler,
-        onrender: renderHandler
-      }
-    `);
-    await loadCheckoutFrame(page);
-    await page.evaluate(`handleMessage({
-       options: {
-          key: 'm1key',
-          remember_customer: false
-        }
-     })`);
-  });
+    let data = await this.paymentResult();
+    if (data.razorpay_payment_id) {
+      this.pass();
+    } else {
+      this.fail();
+    }
+  }
+}

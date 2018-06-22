@@ -20,7 +20,7 @@ const methodHandlers = {
     return {
       type: 'first',
       request: {
-        url: `${baseUrl}/gateway/mocksharp`,
+        url: `${baseUrl}/gateway/mocksharp/${payment_id}`,
         content: {
           payment_id
         }
@@ -47,7 +47,7 @@ const methodHandlers = {
     return {
       type: 'first',
       request: {
-        url: `${baseUrl}/gateway/mocksharp`,
+        url: `${baseUrl}/gateway/mocksharp/${payment_id}`,
         content: {
           payment_id
         }

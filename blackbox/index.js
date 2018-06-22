@@ -2,9 +2,10 @@ require('./api');
 const glob = require('glob').sync;
 const puppeteer = require('puppeteer');
 const path = require('path');
+const chalk = require('chalk');
 
 // wait this many seconds for each test
-const testTimeout = 20;
+const globalTimeout = 5;
 
 // currently running tests;
 let running = 0;
@@ -20,38 +21,50 @@ if (singleTest) {
   tests = glob(__dirname + '/sites/*.js');
 }
 
-const run = async site => {
-  const browser = await puppeteer.launch({
+puppeteer
+  .launch({
     executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
     args: ['--no-sandbox'],
     headless: !singleTest
     // devtools: true,
-  });
-  const page = await browser.newPage();
-  await page.goto('file://' + __dirname + '/index.html');
+  })
+  .then(browser => {
+    const run = async site => {
+      let suite = require(site);
+      let testTimeout = suite.timeout || globalTimeout;
+      let timeout = setTimeout(() => {
+        console.error(
+          `${path.basename(site)} not completed in ${testTimeout}s`
+        );
+        if (!singleTest) {
+          process.exit(1);
+        }
+      }, testTimeout * 1000);
 
-  let timeout = setTimeout(() => {
-    console.error(`${path.basename(site)} not completed in ${testTimeout}s`);
-    if (!singleTest) {
-      process.exit(1);
+      let test = suite.test(browser);
+      return test
+        .then(result => {
+          result && console.log(chalk.green(result));
+          fulfilled++;
+          clearTimeout(timeout);
+        })
+        .catch(error => {
+          console.log(chalk.white.bgRed(error));
+          !singleTest && process.exit(1);
+        });
+    };
+
+    while (running < concurrency && running < tests.length) {
+      runNext();
     }
-  }, testTimeout * 1000);
-  await require(site)(page);
-  clearTimeout(timeout);
-  await browser.close();
-  fulfilled++;
-};
 
-while (running < concurrency && running < tests.length) {
-  runNext();
-}
-
-async function runNext() {
-  await run(tests[running++]);
-  if (running < tests.length) {
-    runNext();
-  }
-  if (fulfilled === tests.length) {
-    process.exit(0);
-  }
-}
+    async function runNext() {
+      await run(tests[running++]);
+      if (running < tests.length) {
+        runNext();
+      }
+      if (fulfilled === tests.length) {
+        process.exit(0);
+      }
+    }
+  });

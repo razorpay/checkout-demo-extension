@@ -40,7 +40,7 @@ fastify.get('/v1/payments/:payment_id/status', async request => {
   }
 });
 
-fastify.get('/v1/gateway/mocksharp', async (request, reply) => {
+fastify.get('/v1/gateway/mocksharp/:payment_id', async (request, reply) => {
   reply.header('content-type', 'text/html');
   return `<script>opener.postMessage({razorpay_payment_id:'${
     request.params.payment_id
