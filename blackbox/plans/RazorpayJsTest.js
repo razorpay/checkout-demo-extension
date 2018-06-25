@@ -43,11 +43,13 @@ class RazorpayJsTest extends TestBase {
         });
         document.body.onclick = function(){
           razorpay
-            .createPayment(${JSON.stringify(message.options)})
+            .createPayment(
+              ${JSON.stringify(message.options)}
+              ${message.params ? ', ' + JSON.stringify(message.params) : ''}
+            )
             .on('payment.success', __pptr_oncomplete)
             .on('payment.cancel', __pptr_oncomplete);
-        }
-        document.body.click();`
+        }`
       )
       .catch(e => {
         p.log(chalk.dim(e));
@@ -55,6 +57,7 @@ class RazorpayJsTest extends TestBase {
       });
 
     await delay(250);
+    await page.evaluate(`document.body.click()`);
 
     p.render();
 
