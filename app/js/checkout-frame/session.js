@@ -750,7 +750,7 @@ Session.prototype = {
         if (this.recievedUPIIntentResponse) {
           this.abortPaymentOnUPIIntentTxnFailure();
         } else {
-          this.r.on('activity_recreated_upi_intent_response', function() {
+          this.r.once('activity_recreated_upi_intent_response', function() {
             this.abortPaymentOnUPIIntentTxnFailure();
           });
         }
