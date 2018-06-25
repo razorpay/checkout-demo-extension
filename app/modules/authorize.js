@@ -6,6 +6,10 @@ import {
   didUPIIntentTransactionSucceed
 } from 'lib/upi';
 
+const StorageBridge = window.StorageBridge;
+const UPI_POLL_URL = 'rzp_upi_payment_poll_url',
+  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
+
 var pollingInterval;
 
 function clearPollingInterval(force) {
