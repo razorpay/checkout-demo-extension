@@ -5,7 +5,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 // wait this many seconds for each test
-const globalTimeout = 5;
+const globalTimeout = 10;
 
 // currently running tests;
 let running = 0;
