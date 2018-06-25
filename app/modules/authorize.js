@@ -589,6 +589,12 @@ var responseTypes = {
   },
 
   async: function(request, fullResponse) {
+    // Set URL in storage.
+    try {
+      StorageBridge.setString(PENDING_PAYMENT_TS, now() + '');
+      StorageBridge.setString(UPI_POLL_URL, request.url);
+    } catch (e) {}
+
     this.ajax = fetch({
       url: request.url,
       callback: response => this.complete(response)
