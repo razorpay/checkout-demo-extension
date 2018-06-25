@@ -1,36 +1,68 @@
 require('./api');
 const glob = require('glob').sync;
 const puppeteer = require('puppeteer');
+const path = require('path');
+const chalk = require('chalk');
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+// wait this many seconds for each test
+const globalTimeout = 5;
 
-glob(__dirname + '/sites/*/index.html').forEach(async site => {
-  const browser = await puppeteer.launch({
+// currently running tests;
+let running = 0;
+let fulfilled = 0;
+
+const concurrency = 10;
+
+let singleTest = process.argv[2];
+
+if (singleTest) {
+  tests = [__dirname + '/sites/' + singleTest + '.js'];
+} else {
+  tests = glob(__dirname + '/sites/*.js');
+}
+
+puppeteer
+  .launch({
     executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
-    args: ['--no-sandbox']
-    // headless: false,
+    args: ['--no-sandbox'],
+    headless: !singleTest
     // devtools: true,
-  });
-  const page = await browser.newPage();
-  await page.exposeFunction('completeHandler', data => {
-    if (JSON.parse(data).razorpay_payment_id) {
-      browser.close();
-      console.log('wallet payment passed');
-      process.exit();
+  })
+  .then(browser => {
+    const run = async site => {
+      let suite = require(site);
+      let testTimeout = suite.timeout || globalTimeout;
+      let timeout = setTimeout(() => {
+        console.error(
+          `${path.basename(site)} not completed in ${testTimeout}s`
+        );
+        if (!singleTest) {
+          process.exit(1);
+        }
+      }, testTimeout * 1000);
+
+      let test = suite.test(browser);
+      return test
+        .then(() => {
+          fulfilled++;
+          clearTimeout(timeout);
+        })
+        .catch(error => {
+          !singleTest && process.exit(1);
+        });
+    };
+
+    while (running < concurrency && running < tests.length) {
+      runNext();
+    }
+
+    async function runNext() {
+      await run(tests[running++]);
+      if (running < tests.length) {
+        runNext();
+      }
+      if (fulfilled === tests.length) {
+        process.exit(0);
+      }
     }
   });
-  await page.exposeFunction('renderHandler', async () => {
-    await page.click('label[for=wallet-radio-mobikwik]');
-    await delay(250);
-    await page.click('.pay-btn');
-    await delay(1000);
-    await page.click('#otp');
-    await page.keyboard.type('123456');
-    await page.click('.otp-btn');
-  });
-  await page.goto('file://' + site);
-  setTimeout(() => {
-    console.error('Payment not completed in 5s');
-    process.exit(1);
-  }, 5000);
-});
