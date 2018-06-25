@@ -8,7 +8,8 @@ const modules = {
   tez: 'Tez',
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
-  'lib/formatter': 'Formatter'
+  'lib/formatter': 'Formatter',
+  'lib/amount': 'Amount'
 };
 
 function getOptions(module) {

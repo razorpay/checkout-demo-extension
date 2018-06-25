@@ -1,3 +1,5 @@
+import * as Card from './card';
+
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
 
@@ -19,7 +21,7 @@ export const Formatter = function(el, handlers, noBind) {
   if (!handlers || !_.isElement(el)) {
     return false;
   } else {
-    _Obj.loop(handlers, key => {
+    _Obj.loop(handlers, (val, key) => {
       this[key] = handlers[key];
     });
   }
@@ -45,10 +47,10 @@ Formatter.events = {
 Formatter.rules = {
   card: {
     setValue: function(value) {
-      let currentType = (this.currentType = _Card.getCardType(value));
+      let currentType = (this.currentType = Card.getCardType(value));
 
       if (currentType !== this.type) {
-        this.maxLen = _Card.getCardMaxLen(currentType);
+        this.maxLen = Card.getCardMaxLen(currentType);
       }
       this.value = _Str.slice(value, 0, this.maxLen);
     },
@@ -57,7 +59,7 @@ Formatter.rules = {
       let len = this.maxLen;
       let prettyValue = value
         .slice(0, len)
-        .replace(_Card.getCardSpacing(len), '$1 ');
+        .replace(Card.getCardSpacing(len), '$1 ');
       if (shouldTrim || value.length >= len) {
         prettyValue = prettyValue.trim();
       }
@@ -81,7 +83,7 @@ Formatter.rules = {
       if (!value) {
         value = this.value;
       }
-      if (!_Card.luhnCheck(value)) {
+      if (!Card.luhnCheck(value)) {
         return;
       }
       if (this.type === 'maestro' && value.length === 16) {
@@ -399,7 +401,7 @@ export const FormatDelegator = function(el) {
   EvtHandler.call(this, el);
   this.bits = [];
 
-  _Obj.loop(Formatter.events, (evt, fn) => {
+  _Obj.loop(Formatter.events, (fn, evt) => {
     this.on(
       evt,
       e => {

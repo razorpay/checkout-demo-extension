@@ -1,6 +1,7 @@
 import getFingerprint from './fingerprint';
 import * as Tez from './tez';
 import * as cookie from 'lib/cookie';
+import * as Formatter from 'lib/formatter';
 
 var pollingInterval;
 

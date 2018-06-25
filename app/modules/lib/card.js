@@ -21,8 +21,7 @@ const cardLengths = {
 
 export const getCardType = cardNumber => {
   let cardType = '';
-  _Arr.loop(cardPatterns, type => {
-    let pattern = cardPatterns[type];
+  _Obj.loop(cardPatterns, (pattern, type) => {
     if (pattern.test(cardNumber)) {
       cardType = type;
     }
