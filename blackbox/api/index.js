@@ -41,7 +41,8 @@ fastify.get('/v1/payments/:payment_id/status', async request => {
 });
 
 fastify.post('/v1/payments/create/checkout', async (request, reply) => {
-  reply.redirect('/v1/gateway/mocksharp');
+  let payment = await payments.create(request);
+  reply.redirect('/v1/gateway/mocksharp/' + payment.payment_id);
 });
 
 fastify.get('/v1/gateway/mocksharp/:payment_id', async (request, reply) => {

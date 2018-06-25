@@ -1,6 +1,7 @@
 const chalk = require('chalk');
+const TestBase = require('./TestBase');
 
-class CheckoutFrameTest {
+class CheckoutFrameTest extends TestBase {
   static async test(browser, message) {
     const page = await browser.newPage();
     await page.goto('file://' + __dirname + '/../index.html');
@@ -47,42 +48,6 @@ class CheckoutFrameTest {
     return new Promise((resolve, reject) => p.setCallbacks(resolve, reject));
   }
 
-  setCallbacks(resolve, reject) {
-    this.pass = message => {
-      this.page.close();
-      console.log(chalk.green(this.makeLog(message || '✔')));
-      resolve();
-    };
-    this.fail = message => {
-      console.log(chalk.red(this.makeLog(message || '✘')));
-      reject();
-    };
-  }
-
-  makeLog(...messages) {
-    let name = this.constructor.name + ' ';
-    let prefix = chalk.bold(name);
-    let indent = Array(name.length + 1).join(' ');
-    messages = messages.map((m, i) => {
-      return i ? indent + m : prefix + m;
-    });
-    return messages.join('\n');
-  }
-
-  log(...messages) {
-    console.log(this.makeLog(...messages));
-  }
-
-  constructor(page) {
-    this.page = page;
-  }
-
-  paymentResult() {
-    return new Promise(resolve => {
-      this.awaitingPaymentResult = resolve;
-    });
-  }
-
   async loadScripts() {
     await this.page.addScriptTag({
       url: 'file://' + __dirname + '/../../app/dist/v1/checkout-frame.js'
@@ -92,5 +57,7 @@ class CheckoutFrameTest {
     });
   }
 }
+
+CheckoutFrameTest.TEST_PARENT = 'Checkout';
 
 module.exports = CheckoutFrameTest;
