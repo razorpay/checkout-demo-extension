@@ -746,12 +746,26 @@ Session.prototype = {
           return response && response.status;
         });
 
-        // Let listeners know that we have started to complete pending payment.
-        this.r.emit('pending_payment_retry_start');
-        // Set a flag.
-        this.startedCompletingPendingPayment = true;
+        // Show error and clear request when back is pressed from PSP UPI App
+        if (this.recievedUPIIntentResponse) {
+          this.abortPaymentOnUPIIntentTxnFailure();
+        } else {
+          this.r.on('activity_recreated_upi_intent_response', function() {
+            this.abortPaymentOnUPIIntentTxnFailure();
+          });
+        }
       }
     } catch (e) {}
+  },
+
+  abortPaymentOnUPIIntentTxnFailure: function() {
+    this.ajax.abort();
+    this.showLoadError('Payment did not complete.', true);
+    this.clearRequest({
+      '_[method]': 'upi',
+      '_[flow]': 'intent',
+      '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+    });
   },
 
   setWhatsappIcon: function() {
