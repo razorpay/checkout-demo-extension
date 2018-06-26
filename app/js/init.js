@@ -67,9 +67,9 @@ function makeAuthUrl(r, url) {
       prop = 'x_entity_id';
     }
     if (value) {
-      var partner_token = r.get('partner_token');
-      if (partner_token) {
-        value += '&partner_token=' + partner_token;
+      var account_id = r.get('account_id');
+      if (account_id) {
+        value += '&account_id=' + account_id;
       }
       return url + '?' + prop + '=' + value;
     }
@@ -180,7 +180,7 @@ var razorpayPayment = (Razorpay.payment = {
 
 var RazorpayDefaults = (Razorpay.defaults = {
   key: '',
-  partner_token: '',
+  account_id: '',
   image: '',
   amount: 100,
   currency: 'INR',
@@ -266,7 +266,7 @@ function makePrefParams(rzp) {
         'subscription_id',
         'recurring',
         'subscription_card_change',
-        'partner_token'
+        'account_id'
       ],
       function(i, key) {
         var value = getter(key);
