@@ -1,10 +1,7 @@
 import getFingerprint from './fingerprint';
 import * as Tez from './tez';
 import * as cookie from 'lib/cookie';
-import {
-  parseUPIIntentResponse,
-  didUPIIntentTransactionSucceed
-} from 'lib/upi';
+import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 
 var pollingInterval;
 
@@ -636,7 +633,7 @@ var responseTypes = {
     var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
       const didIntentSucceed =
-        data |> parseUPIIntentResponse |> didUPIIntentTransactionSucceed;
+        data |> parseUPIIntentResponse |> didUPIIntentSucceed;
 
       if (didIntentSucceed) {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });

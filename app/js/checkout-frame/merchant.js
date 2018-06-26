@@ -851,11 +851,11 @@ window.upiIntentResponse = function(data) {
      */
 
     var parsedResponse = UPIUtils.parseUPIIntentResponse(data);
-    var successfulTxn = UPIUtils.didUPIIntentTransactionSucceed(parsedResponse);
+    var successfulTxn = UPIUtils.didUPIIntentSucceed(parsedResponse);
 
     if (!successfulTxn) {
-      session.r.emit('activity_recreated_upi_intent_response');
-      session.recievedUPIIntentResponse = true;
+      session.r.emit('activity_recreated_upi_intent_back_btn');
+      session.recievedUPIIntentRespOnBackBtn = true;
     }
   }
 };

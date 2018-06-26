@@ -35,5 +35,5 @@ export const parseUPIIntentResponse = intentResponse => {
  *
  * @return {Boolean}
  */
-export const didUPIIntentTransactionSucceed = parsedResponse =>
+export const didUPIIntentSucceed = parsedResponse =>
   Boolean(parsedResponse.txnId);

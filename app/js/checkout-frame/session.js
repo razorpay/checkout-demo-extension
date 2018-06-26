@@ -748,26 +748,26 @@ Session.prototype = {
           return response && response.status;
         });
 
+        var abortPaymentOnUPIIntentFailure = function() {
+          self.ajax.abort();
+          self.showLoadError('Payment did not complete.', true);
+          self.clearRequest({
+            '_[method]': 'upi',
+            '_[flow]': 'intent',
+            '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+          });
+        };
+
         // Show error and clear request when back is pressed from PSP UPI App
-        if (this.recievedUPIIntentResponse) {
-          this.abortPaymentOnUPIIntentTxnFailure();
+        if (this.recievedUPIIntentRespOnBackBtn) {
+          abortPaymentOnUPIIntentFailure();
         } else {
-          this.r.once('activity_recreated_upi_intent_response', function() {
-            this.abortPaymentOnUPIIntentTxnFailure();
+          this.r.once('activity_recreated_upi_intent_back_btn', function() {
+            abortPaymentOnUPIIntentFailure();
           });
         }
       }
     } catch (e) {}
-  },
-
-  abortPaymentOnUPIIntentTxnFailure: function() {
-    this.ajax.abort();
-    this.showLoadError('Payment did not complete.', true);
-    this.clearRequest({
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_BACK_BUTTON'
-    });
   },
 
   setParamsInStorage: function(params) {
