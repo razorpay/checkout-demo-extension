@@ -23,6 +23,12 @@ fastify.get('/v1/preferences', async (request, reply) => {
   };
 });
 
+/**
+ * Callback handler, not there in actual API. It's just here to test
+ * redirect mode.
+ */
+fastify.post('/callback_url', payments.callback);
+
 fastify.post('/v1/payments/create/ajax', payments.create);
 
 fastify.post('/v1/payments/:payment_id/otp_submit', async request => {
@@ -42,7 +48,19 @@ fastify.get('/v1/payments/:payment_id/status', async request => {
 
 fastify.post('/v1/payments/create/checkout', async (request, reply) => {
   let payment = await payments.create(request);
-  reply.redirect('/v1/gateway/mocksharp/' + payment.payment_id);
+
+  if (request.body.callback_url) {
+    reply.header('content-type', 'text/html');
+    return `<body onload="document.forms[0].submit();">
+      <form action="${request.body.callback_url}" method="POST">
+        <input type='hidden' name='razorpay_payment_id' value='${
+          payment.payment_id
+        }'/>
+      </form>
+    </body>`;
+  } else {
+    reply.redirect('/v1/gateway/mocksharp/' + payment.payment_id);
+  }
 });
 
 fastify.get('/v1/gateway/mocksharp/:payment_id', async (request, reply) => {

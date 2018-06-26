@@ -11,7 +11,7 @@ class RazorpayJsTest extends TestBase {
     let p = new this(page);
     await p.loadScripts();
 
-    await page.exposeFunction('__pptr_oncomplete', (data, params) => {
+    await page.exposeFunction('__pptr_oncomplete', data => {
       var data = typeof data === 'object' ? data : JSON.parse(data);
 
       if (data.razorpay_payment_id) {
