@@ -27,6 +27,7 @@ const distDir = 'app/dist/test';
 execSync('mkdir -p ' + distDir);
 
 const template = _ => `<meta charset='utf-8'>
+<script src="../../../node_modules/testdouble/dist/testdouble.js"></script>
 <script src="../../../test/tape.js"></script>
 <script>test.onFinish(testDone)</script>
 <script src="${testCount}.js"></script>`;
