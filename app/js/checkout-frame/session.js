@@ -714,8 +714,10 @@ Session.prototype = {
         ) {
           pollUrl = StorageBridge.getString(UPI_POLL_URL);
         } else {
-          StorageBridge.setString(UPI_POLL_URL, '');
-          StorageBridge.setString(PENDING_PAYMENT_TS, '0');
+          var params = {};
+          params[UPI_POLL_URL] = '';
+          params[PENDING_PAYMENT_TS] = '0';
+          this.setParamsInStorage(params);
         }
       }
 
@@ -765,6 +767,14 @@ Session.prototype = {
       '_[method]': 'upi',
       '_[flow]': 'intent',
       '_[reason]': 'UPI_INTENT_BACK_BUTTON'
+    });
+  },
+
+  setParamsInStorage: function(params) {
+    each(params, function(key, val) {
+      try {
+        StorageBridge.setString(key, val);
+      } catch (e) {}
     });
   },
 
@@ -2167,10 +2177,10 @@ Session.prototype = {
 
     this.isResumedPayment = false;
 
-    try {
-      StorageBridge.setString(PENDING_PAYMENT_TS, '0');
-      StorageBridge.setString(UPI_POLL_URL, '');
-    } catch (e) {}
+    var params = {};
+    params[UPI_POLL_URL] = '';
+    params[PENDING_PAYMENT_TS] = '0';
+    this.setParamsInStorage(params);
 
     abortAjax(this.ajax);
 
@@ -2492,10 +2502,10 @@ Session.prototype = {
       });
 
       this.r.on('payment.upi.coproto_response', function(request) {
-        try {
-          StorageBridge.setString(PENDING_PAYMENT_TS, now() + '');
-          StorageBridge.setString(UPI_POLL_URL, request.url);
-        } catch (e) {}
+        var params = {};
+        params[UPI_POLL_URL] = request.url;
+        params[PENDING_PAYMENT_TS] = now() + '';
+        that.setParamsInStorage(params);
       });
 
       this.r.on('payment.upi.pending', function(data) {

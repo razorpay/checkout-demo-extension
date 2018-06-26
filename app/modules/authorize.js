@@ -6,10 +6,6 @@ import {
   didUPIIntentTransactionSucceed
 } from 'lib/upi';
 
-const StorageBridge = window.StorageBridge;
-const UPI_POLL_URL = 'rzp_upi_payment_poll_url',
-  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
-
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -593,18 +589,13 @@ var responseTypes = {
   },
 
   async: function(request, fullResponse) {
-    // Set URL in storage.
-    try {
-      StorageBridge.setString(PENDING_PAYMENT_TS, now() + '');
-      StorageBridge.setString(UPI_POLL_URL, request.url);
-    } catch (e) {}
-
     this.ajax = fetch({
       url: request.url,
       callback: response => this.complete(response)
     }).till(response => response && response.status);
 
     this.emit('upi.pending', fullResponse.data);
+    this.emit('upi.coproto_response', request);
   },
 
   tez: function(coprotoRequest, fullResponse) {
