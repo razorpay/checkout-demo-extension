@@ -1,4 +1,4 @@
-import * as Card from './card';
+import * as Card from 'common/card';
 
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');

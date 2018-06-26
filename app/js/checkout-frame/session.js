@@ -435,7 +435,7 @@ function Session(options) {
 }
 
 Session.prototype = {
-  getDecimalAmount: Amount.getDecimalAmount,
+  getDecimalAmount: Currency.getDecimalAmount,
   formatAmount: function(amount) {
     return (amount / 100)
       .toFixed(2)

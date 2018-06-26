@@ -199,3 +199,6 @@ export function displayAmount(razorpay) {
   }
   return formatAmount(get('amount'), get('currency'));
 }
+
+export const getDecimalAmount = amount =>
+  (amount / 100).toFixed(2).replace('.00', '');
