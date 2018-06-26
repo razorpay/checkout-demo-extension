@@ -11,7 +11,14 @@ const payments = (module.exports = {
     return id;
   },
 
-  get: id => allPayments[id]
+  get: id => allPayments[id],
+
+  callback: async (request, reply) => {
+    reply.header('content-type', 'text/html');
+    return `<script>__pptr_oncomplete({razorpay_payment_id:'${
+      request.body.razorpay_payment_id
+    }'})</script>`;
+  }
 });
 
 const methodHandlers = {

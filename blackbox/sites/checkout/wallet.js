@@ -1,28 +1,31 @@
-const { delay } = require('../util');
-const CheckoutFrameTest = require('../plans/CheckoutFrameTest');
+const { delay } = require('../../util');
+const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 module.exports = {
-  timeout: 10,
   test: browser =>
-    UpiCollect.test(browser, {
+    PowerWallet.test(browser, {
       options: {
         key: 'm1key',
-        remember_customer: false,
         prefill: {
           contact: '9999999999',
           email: 'void@razorpay.com',
-          method: 'upi'
+          method: 'wallet'
         }
       }
     })
 };
 
-class UpiCollect extends CheckoutFrameTest {
+class PowerWallet extends CheckoutFrameTest {
   async render() {
     let { page } = this;
-    await page.type('#vpa', 'pranav@razorpay');
-    await delay(100);
+
+    await page.click('label[for=wallet-radio-mobikwik]');
+    await delay(250);
     await page.click('.pay-btn');
+    await delay(1000);
+    await page.type('#otp', '123456');
+    await page.click('.otp-btn');
+
     let data = await this.paymentResult();
     if (data.razorpay_payment_id) {
       this.pass();
