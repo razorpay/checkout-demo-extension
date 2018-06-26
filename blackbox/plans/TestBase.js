@@ -33,6 +33,12 @@ class TestBase {
     this.page = page;
   }
 
+  async instantiateRazorpay(options) {
+    return await this.page.evaluate(
+      `var razorpay = new Razorpay(${JSON.stringify(options)})`
+    );
+  }
+
   paymentResult() {
     return new Promise(resolve => {
       this.awaitingPaymentResult = resolve;
