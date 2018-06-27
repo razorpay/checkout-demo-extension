@@ -149,3 +149,16 @@ function hex2rgb(hex) {
     alpha: 1
   };
 }
+
+export const getKeyFromEvent = e =>
+  is(e, Event) && (e.which || e.charCode || e.keyCode);
+
+export const getCharFromEvent = e => {
+  let which = getKeyFromEvent(e);
+  return (
+    (which &&
+      !e.ctrlKey &&
+      String.fromCharCode(which).replace(/[^\x20-\x7E]/, '')) ||
+    ''
+  );
+};

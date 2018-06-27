@@ -7,7 +7,9 @@ const modules = {
   authorize: 'Payment',
   tez: 'Tez',
   'lib/fetch': 'fetch',
-  'lib/jsonp': 'jsonp'
+  'lib/jsonp': 'jsonp',
+  formatter: 'Formatter',
+  'common/currency': 'Currency'
 };
 
 function getOptions(module) {

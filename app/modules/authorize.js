@@ -1,6 +1,7 @@
 import getFingerprint from './fingerprint';
 import * as Tez from './tez';
 import * as cookie from 'lib/cookie';
+import * as Formatter from './formatter';
 
 var pollingInterval;
 
@@ -810,7 +811,7 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-Razorpay.setFormatter = FormatDelegator;
+Razorpay.setFormatter = Formatter.FormatDelegator;
 
 razorpayPayment.authorize = function(options) {
   var r = Razorpay({ amount: options.data.amount }).createPayment(options.data);

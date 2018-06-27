@@ -10,6 +10,8 @@ export const querySelector = _Func.bind('querySelector', document);
 export const querySelectorAll = _Func.bind('querySelectorAll', document);
 export const getElementById = _Func.bind('getElementById', document);
 export const getComputedStyle = _Func.bind('getComputedStyle', global);
+export const EventConstructor = global.Event;
+export const isEvent = x => _.is(x, EventConstructor);
 
 var link;
 export function resolveUrl(relativeUrl) {
