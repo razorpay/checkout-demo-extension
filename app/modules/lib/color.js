@@ -151,11 +151,6 @@ export const getRelativeLuminanceWithWhite = color => {
 };
 
 export const isDark = color => {
-  /*
-   * if input is string , its considered as color,
-   * if inpit is number , its considered as relativeLuminosity
-   */
-
   const relativeLuminosity = getRelativeLuminanceWithWhite(color);
 
   // tested , and found black text would look good on values < 0.5

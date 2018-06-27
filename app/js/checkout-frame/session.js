@@ -1162,10 +1162,9 @@ Session.prototype = {
     var style = document.createElement('style');
     style.type = 'text/css';
     try {
-      var getter = this.get,
-        themeColor = getter('theme.color');
+      var getter = this.get;
 
-      div.style.color = themeColor;
+      div.style.color = getter('theme.color');
 
       if (!div.style.color) {
         getter()['theme.color'] = '';
