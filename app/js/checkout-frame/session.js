@@ -481,6 +481,45 @@ var IRCTC_KEYS = [
   'rzp_live_alEMh9FVT4XpwM',
 ];
 
+function getColorVariations(color, relativeLuminance) {
+  var bgColorBrightness = 0,
+    fgColorBrightness = 0;
+
+  if (relativeLuminance >= 0.9) {
+    fgColorBrightness = -50;
+    bgColorBrightness = -30;
+  } else if (relativeLuminance >= 0.7 && relativeLuminance < 0.9) {
+    fgColorBrightness = -55;
+    bgColorBrightness = -30;
+  } else if (relativeLuminance >= 0.6 && relativeLuminance < 0.7) {
+    fgColorBrightness = -50;
+    bgColorBrightness = -15;
+  } else if (relativeLuminance >= 0.5 && relativeLuminance < 0.6) {
+    fgColorBrightness = -45;
+    bgColorBrightness = -10;
+  } else if (relativeLuminance >= 0.4 && relativeLuminance < 0.5) {
+    fgColorBrightness = -40;
+    bgColorBrightness = -5;
+  } else if (relativeLuminance >= 0.3 && relativeLuminance < 0.4) {
+    fgColorBrightness = -35;
+    bgColorBrightness = 0;
+  } else if (relativeLuminance >= 0.2 && relativeLuminance < 0.3) {
+    fgColorBrightness = -30;
+    bgColorBrightness = 20;
+  } else if (relativeLuminance >= 0.1 && relativeLuminance < 0.2) {
+    fgColorBrightness = -20;
+    bgColorBrightness = 60;
+  } else if (relativeLuminance >= 0 && relativeLuminance < 0.1) {
+    fgColorBrightness = 0;
+    bgColorBrightness = 80;
+  }
+
+  return {
+    foregroundColor: _Color.brighten(color, fgColorBrightness),
+    backgroundColor: _Color.brighten(color, bgColorBrightness)
+  };
+}
+
 function Session(options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
@@ -491,6 +530,23 @@ function Session(options) {
   this.attemptCount = 0;
   this.listeners = [];
   this.bits = [];
+
+  var themeColor = this.get('theme.color') || '#528FF0',
+    relativeLuminance = _Color.getRelativeLuminanceWithWhite(themeColor),
+    isThemeColorDark = _Color.isDark(themeColor),
+    iconOptions = getColorVariations(themeColor, relativeLuminance);
+
+  this.themeMeta = {
+    color: themeColor,
+    textColor: isThemeColorDark ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
+    highlightColor: isThemeColorDark ? themeColor : iconOptions.foregroundColor,
+    icons: {
+      card: _PaymentMethodIcons('card', iconOptions),
+      netbanking: _PaymentMethodIcons('netbanking', iconOptions),
+      upi: _PaymentMethodIcons('upi', iconOptions),
+      wallet: _PaymentMethodIcons('wallet', iconOptions)
+    }
+  };
 }
 
 Session.prototype = {
@@ -1111,12 +1167,11 @@ Session.prototype = {
 
       div.style.color = themeColor;
 
-      var isThemeColorDark = _Color.isDark(themeColor);
-
       if (!div.style.color) {
         getter()['theme.color'] = '';
       }
-      var rules = templates.theme(getter, isThemeColorDark);
+
+      var rules = templates.theme(getter, this.themeMeta);
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {

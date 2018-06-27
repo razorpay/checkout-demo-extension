@@ -1,8 +1,10 @@
 `
-var c = _('theme.color') || '#3594E2';
 var close = _('theme.close_button');
 var bodyHeight = window.innerHeight - gel('header').offsetHeight;
-var textColor = arguments[1] ? "#fff" : "rgba(0, 0, 0, 0.85)";
+var themeMeta = arguments[1];
+var c = themeMeta.color;
+var textColor = themeMeta.textColor;
+var highlightColor = themeMeta.highlightColor;
 `
 
 `?_('theme.upi_only')`
@@ -16,10 +18,11 @@ var textColor = arguments[1] ? "#fff" : "rgba(0, 0, 0, 0.85)";
 .button, .btn, .submit-button, .loader::after
 {
   background: `=c`;
+  color: `=textColor`;
 }
 
 .elem::after {
-  border-bottom-color: `=c`;
+  border-bottom-color: `=highlightColor`;
 }
 
 .spin div, .link
@@ -34,6 +37,13 @@ var textColor = arguments[1] ? "#fff" : "rgba(0, 0, 0, 0.85)";
 .ecod .item i
 {
   color: `=c`;
+}
+
+#payment-options i > svg {
+  display: inline-block;
+  width: auto;
+  height: 0.75em;
+  vertical-align: top;
 }
 
 #header{
@@ -66,12 +76,16 @@ var textColor = arguments[1] ? "#fff" : "rgba(0, 0, 0, 0.85)";
 input[type=checkbox]:checked + .checkbox
 {
   color: #fff;
-  background: `=c`;
-  border-color: `=c`;
+  background: `=highlightColor`;
+  border-color: `=highlightColor`;
 }
 
 .theme {
-  color: `=c`;
+color: `=c`;
+}
+
+.theme-highlight {
+  color: `=highlightColor`;
 }
 
 `?!close`
@@ -81,16 +95,16 @@ input[type=checkbox]:checked + .checkbox
 `?`
 
 .grid :checked+label {
-  border-bottom: 2px solid `=c`;
+  border-bottom: 2px solid `=highlightColor`;
 }
 
 .list :checked+label, .list .item.active {
-  border-color: `=c` !important;
+  border-color: `=highlightColor` !important;
 }
 
 .list :checked+label .checkbox {
-  background: `=c`;
-  border-color: `=c`;
+  background: `=highlightColor`;
+  border-color: `=highlightColor`;
 }
 
 .mobile:not(.ip) #body[screen="wallet"],
