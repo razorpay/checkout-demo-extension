@@ -210,6 +210,7 @@ Payment.prototype = {
         'signature',
         'description',
         'order_id',
+        'account_id',
         'notes',
         'subscription_id',
         'payment_link_id',
