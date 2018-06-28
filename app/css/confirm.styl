@@ -1,0 +1,51 @@
+@require 'common';
+
+#confirmation-dialog.animate .confirm {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.confirm {
+  background: #fff;
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  left: 12px;
+  z-index: 999;
+  text-align: left;
+  font-size: 14px;
+  padding: 24px;
+  padding-bottom: 12px;
+  border-radius: 3px;
+  box-shadow: 0 15px 12px 0 rgba(0,0,0,0.22), 0 19px 38px 0 rgba(0,0,0,0.3);
+  transition: 0.2s;
+  transform: translateY(-24px);
+  opacity: 0;
+
+  .heading {
+    color: #717171;
+    letter-spacing: 1px;
+    line-height: 17px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #F3F3F3
+    padding: 0 0 8px 0;
+  }
+
+  .message {
+    margin-top: 12px;
+    color: rgba(0,0,0,0.56);
+    line-height: 20px;
+  }
+
+  .buttons {
+    margin-top: 8px;
+  }
+
+  .text-btn {
+    display: inline-block;
+    margin-right: 24px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    line-height: 40px;
+  }
+}

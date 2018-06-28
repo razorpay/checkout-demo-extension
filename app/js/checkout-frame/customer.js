@@ -151,7 +151,7 @@ Customer.prototype = {
 
     _session_id = null;
 
-    $.ajax(ajaxOpts);
+    fetch(ajaxOpts);
   }
 };
 

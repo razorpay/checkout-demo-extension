@@ -9,6 +9,7 @@ const modules = {
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
   formatter: 'Formatter',
+  confirm: 'Confirm',
   'common/currency': 'Currency'
 };
 

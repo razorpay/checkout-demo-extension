@@ -1646,8 +1646,9 @@ Session.prototype = {
     this.body.toggleClass('sub', showPaybtn);
   },
 
-  back: function() {
+  back: function(confirmedCancel) {
     var tab = '';
+    var self = this;
 
     if (this.get('ecod')) {
       $('#footer').hide();
@@ -1657,11 +1658,19 @@ Session.prototype = {
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
     } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
-      if (confirmClose()) {
+      if (confirmedCancel === true) {
         tab = 'card';
         this.clearRequest();
       } else {
-        return;
+        return Confirm.show({
+          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.back(true);
+          }
+        });
       }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {
@@ -2001,8 +2010,25 @@ Session.prototype = {
     return data;
   },
 
-  hide: function() {
+  hide: function(confirmedCancel) {
+    var self = this;
     if (this.isOpen) {
+      if (
+        confirmedCancel !== true &&
+        this.r._payment &&
+        this.r._payment.isMagicPayment
+      ) {
+        return Confirm.show({
+          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.close(true);
+          }
+        });
+      }
+
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
@@ -2505,6 +2531,7 @@ Session.prototype = {
       this.prefCall.abort();
       this.prefCall = null;
     }
+
     if (this.isOpen) {
       abortAjax(this.ajax);
       this.clearRequest();
