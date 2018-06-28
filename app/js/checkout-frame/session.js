@@ -993,7 +993,8 @@ Session.prototype = {
     }
   },
 
-  hideErrorMessage: function() {
+  hideErrorMessage: function(confirmedCancel) {
+    var self = this;
     if (this.r._payment) {
       if (
         this.payload &&
@@ -1005,6 +1006,20 @@ Session.prototype = {
     }
 
     if (this.r._payment || this.isResumedPayment) {
+      if (confirmedCancel === true) {
+        return this.clearRequest();
+      } else if (this.r._payment.isMagicPayment) {
+        return Confirm.show({
+          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.hideErrorMessage(true);
+          }
+        });
+      }
+
       if (confirmClose()) {
         this.clearRequest();
       } else {
