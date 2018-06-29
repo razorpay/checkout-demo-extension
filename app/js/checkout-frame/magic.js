@@ -140,6 +140,7 @@ magicView.prototype = {
       self.clearTimeout();
       self.track('show_payment_page', options);
       self.checkoutVisible = false;
+      Confirm.hide();
       self.session.showLoadError(strings.redirect);
       window.setTimeout(function() {
         CheckoutBridge.invokePopup(JSON.stringify(options));

@@ -235,7 +235,11 @@ function hideEmi() {
 
 function hideOverlayMessage() {
   if (!hideEmi()) {
-    hideOverlay($('#error-message'));
+    if ($('#confirmation-dialog').hasClass('animate')) {
+      makeHidden(gel('error-message'));
+    } else {
+      hideOverlay($('#error-message'));
+    }
   }
 }
 

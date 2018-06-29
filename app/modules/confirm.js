@@ -1,5 +1,4 @@
 var listeners = [];
-var overlayShown;
 
 function on(event, sel, listener) {
   var $el = $(sel);
@@ -12,7 +11,7 @@ function unbind() {
 }
 
 export function hide() {
-  if (overlayShown !== true) {
+  if (!$('#error-message').hasClass(shownClass)) {
     $('#overlay').removeClass(shownClass);
     setTimeout(() => {
       $('#overlay').css('display', '');
@@ -44,12 +43,8 @@ export function show(options) {
     options.onNegativeClick();
   });
 
-  if ($overlay.css('display') === 'block') {
-    overlayShown = true;
-  } else {
-    $overlay.css('display', 'block');
-    $overlay.addClass(shownClass);
-  }
+  $overlay.css('display', 'block');
+  $overlay.addClass(shownClass);
 
   $confirmationDialog.addClass(shownClass);
 
