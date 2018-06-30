@@ -1,2 +1,2 @@
 var templates = {};
-trackingProps.library = 'razorpayjs';
+Track.props.library = 'razorpayjs';

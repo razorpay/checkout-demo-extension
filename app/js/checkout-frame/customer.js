@@ -48,7 +48,7 @@ Customer.prototype = {
     var recurring = getSession().recurring || false;
     this.logged = true;
     sanitizeTokens(data.tokens, {
-      recurring: recurring
+      recurring: recurring,
     });
     this.tokens = data.tokens;
     if (!getSession().local) {
@@ -60,7 +60,7 @@ Customer.prototype = {
   checkStatus: function(callback) {
     var customer = this;
     var url = makeAuthUrl(this.r, 'customers/status/' + this.contact);
-    url += '&_[platform]=' + trackingProps.platform;
+    url += '&_[platform]=' + Track.props.platform;
     var device_token = qpmap.device_token;
     if (device_token) {
       url += '&device_token=' + device_token;
@@ -73,7 +73,7 @@ Customer.prototype = {
           customer.mark_logged(data);
         }
         callback();
-      }
+      },
     });
   },
 
@@ -81,9 +81,9 @@ Customer.prototype = {
     fetch.post({
       url: makeAuthUrl(this.r, 'otp/create'),
       data: {
-        contact: this.contact
+        contact: this.contact,
       },
-      callback: callback
+      callback: callback,
     });
   },
 
@@ -122,7 +122,7 @@ Customer.prototype = {
         } else {
           callback();
         }
-      }
+      },
     });
   },
 
@@ -137,7 +137,7 @@ Customer.prototype = {
       callback: function() {
         callback();
         deleteToken(user, token);
-      }
+      },
     });
   },
 
@@ -145,14 +145,14 @@ Customer.prototype = {
     var ajaxOpts = {
       url: makeAuthUrl(this.r, 'apps/logout'),
       method: 'delete',
-      callback: callback
+      callback: callback,
     };
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
 
     _session_id = null;
 
     $.ajax(ajaxOpts);
-  }
+  },
 };
 
 function deleteToken(user, token) {

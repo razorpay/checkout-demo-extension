@@ -18,8 +18,8 @@ fastify.get('/v1/preferences', async (request, reply) => {
   return {
     error: {
       code: 'BAD_REQUEST_ERROR',
-      description: 'The api key provided is invalid'
-    }
+      description: 'The api key provided is invalid',
+    },
   };
 });
 
@@ -63,9 +63,15 @@ fastify.post('/v1/payments/create/checkout', async (request, reply) => {
   }
 });
 
-fastify.get('/v1/gateway/mocksharp/:payment_id', async (request, reply) => {
-  reply.header('content-type', 'text/html');
-  return `<script>opener.postMessage({razorpay_payment_id:'${
-    request.params.payment_id
-  }'},'*')</script>`;
+fastify.get('/v1/gateway/mocksharp/:payment_id', (request, reply) => {
+  // take a little time to process payment.
+  // to avoid responding before js callbacks can be applied on client
+  setTimeout(() => {
+    reply.header('content-type', 'text/html');
+    reply.send(
+      `<script>opener.postMessage({razorpay_payment_id:'${
+        request.params.payment_id
+      }'},'*')</script>`
+    );
+  });
 });
