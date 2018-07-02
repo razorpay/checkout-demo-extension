@@ -286,6 +286,12 @@ magicView.prototype = {
 
     this.track('autoread_otp');
 
+    this.otpTimeout = window.setTimeout(function() {
+      if ($('#form-magic-otp').hasClass('waiting')) {
+        self.enterOtp();
+      }
+    }, TIMEOUT_NO_OTP);
+
     if (!this.otpPermission) {
       this.requestOtpPermission(function(info) {
         if (info.granted) {
