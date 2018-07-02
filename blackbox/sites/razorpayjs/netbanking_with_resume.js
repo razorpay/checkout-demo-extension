@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => NetbankingWithResume.test(browser)
+  test: browser => NetbankingWithResume.test(browser),
 };
 
 class NetbankingWithResume extends RazorpayJsTest {
@@ -12,17 +12,17 @@ class NetbankingWithResume extends RazorpayJsTest {
       contact: '9999999999',
       email: 'void@razorpay.com',
       key: 'm1key',
-      amount: 100
+      amount: 100,
     });
 
     await this.createPayment(
       {
         method: 'netbanking',
-        wallet: 'HDFC'
+        wallet: 'HDFC',
       },
       {
         paused: true,
-        message: 'Confirming order...'
+        message: 'Confirming order...',
       }
     );
 
@@ -30,7 +30,8 @@ class NetbankingWithResume extends RazorpayJsTest {
     await page.evaluate(`document.body.click()`);
 
     await delay(250);
-    await page.evaluate(`razorpay.emit('payment.resume')`);
+
+    page.evaluate(`razorpay.emit('payment.resume')`);
 
     await super.completePayment();
   }
