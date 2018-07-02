@@ -11,7 +11,14 @@ const payments = (module.exports = {
     return id;
   },
 
-  get: id => allPayments[id]
+  get: id => allPayments[id],
+
+  callback: async (request, reply) => {
+    reply.header('content-type', 'text/html');
+    return `<script>__pptr_oncomplete({razorpay_payment_id:'${
+      request.body.razorpay_payment_id
+    }'})</script>`;
+  },
 });
 
 const methodHandlers = {
@@ -22,10 +29,10 @@ const methodHandlers = {
       request: {
         url: `${baseUrl}/gateway/mocksharp/${payment_id}`,
         content: {
-          payment_id
-        }
+          payment_id,
+        },
       },
-      payment_id
+      payment_id,
     };
   },
 
@@ -36,9 +43,9 @@ const methodHandlers = {
       request: {
         url: `${baseUrl}/payments/${payment_id}/otp_submit`,
         method: 'post',
-        content: []
+        content: [],
       },
-      payment_id
+      payment_id,
     };
   },
 
@@ -49,10 +56,10 @@ const methodHandlers = {
       request: {
         url: `${baseUrl}/gateway/mocksharp/${payment_id}`,
         content: {
-          payment_id
-        }
+          payment_id,
+        },
       },
-      payment_id
+      payment_id,
     };
   },
 
@@ -61,8 +68,8 @@ const methodHandlers = {
     return {
       type: 'async',
       request: {
-        url: `${baseUrl}/payments/${payment_id}/status`
-      }
+        url: `${baseUrl}/payments/${payment_id}/status`,
+      },
     };
-  }
+  },
 };

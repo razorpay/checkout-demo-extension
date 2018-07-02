@@ -17,8 +17,8 @@ const coveragePlugin = coverage({
   noAutoWrap: true,
   include: 'app/modules/**/*.js',
   instrumenterConfig: {
-    embedSource: true
-  }
+    embedSource: true,
+  },
 });
 
 let testCount = 0;
@@ -27,6 +27,7 @@ const distDir = 'app/dist/test';
 execSync('mkdir -p ' + distDir);
 
 const template = _ => `<meta charset='utf-8'>
+<script src="../../../node_modules/testdouble/dist/testdouble.js"></script>
 <script src="../../../test/tape.js"></script>
 <script>test.onFinish(testDone)</script>
 <script src="${testCount}.js"></script>`;
@@ -41,7 +42,7 @@ Promise.all(
           .then(bundle =>
             bundle.generate({
               format: 'iife',
-              name: 'test'
+              name: 'test',
             })
           )
           .then(async ({ code }) => {
@@ -53,7 +54,7 @@ Promise.all(
 
             const browser = await puppeteer.launch({
               executablePath: env.CHROME_BIN || '/usr/bin/chromium',
-              args: ['--no-sandbox']
+              args: ['--no-sandbox'],
               // headless: false,
               // devtools: true,
             });

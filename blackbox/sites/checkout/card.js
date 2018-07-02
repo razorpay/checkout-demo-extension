@@ -1,14 +1,14 @@
-const { delay } = require('../util');
-const CheckoutFrameTest = require('../plans/CheckoutFrameTest');
+const { delay } = require('../../util');
+const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 module.exports = {
   test: browser =>
     NewCard.test(browser, {
       options: {
         key: 'm1key',
-        remember_customer: false
-      }
-    })
+        remember_customer: false,
+      },
+    }),
 };
 
 class NewCard extends CheckoutFrameTest {

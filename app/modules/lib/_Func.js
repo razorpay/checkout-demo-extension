@@ -13,11 +13,11 @@ export const setPrototype = (constructor, proto) => {
 const propToFunction = func =>
   function(prop, context) {
     let args = arguments;
-    if (isString(prop)) {
-      return func.apply(null, [context[prop], _Arr.sliceFrom(args, 1)]);
-    } else {
-      return func.apply(null, args);
+    if (_.isString(prop)) {
+      args = _Arr.sliceFrom(args, 0);
+      args[0] = context[prop];
     }
+    return func.apply(null, args);
   };
 
 const ensureFunction = func =>

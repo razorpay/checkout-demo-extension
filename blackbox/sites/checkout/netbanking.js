@@ -1,5 +1,5 @@
-const { delay } = require('../util');
-const CheckoutFrameTest = require('../plans/CheckoutFrameTest');
+const { delay } = require('../../util');
+const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 const message = {
   options: {
@@ -8,16 +8,16 @@ const message = {
     prefill: {
       contact: '9999999999',
       email: 'void@razorpay.com',
-      method: 'netbanking'
-    }
-  }
+      method: 'netbanking',
+    },
+  },
 };
 
 module.exports = {
   test: browser =>
     NetbankingButton.test(browser, message).then(_ =>
       NetbankingDropdown.test(browser, message)
-    )
+    ),
 };
 
 class NetbankingButton extends CheckoutFrameTest {

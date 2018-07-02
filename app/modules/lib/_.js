@@ -86,7 +86,7 @@ export const timer = x => {
 
 export function rawError(description, field) {
   var errorObj = {
-    description: String(description)
+    description: String(description),
   };
 
   if (field) {
@@ -146,6 +146,19 @@ function hex2rgb(hex) {
     red: colors[0],
     green: colors[1],
     blue: colors[2],
-    alpha: 1
+    alpha: 1,
   };
 }
+
+export const getKeyFromEvent = e =>
+  is(e, Event) && (e.which || e.charCode || e.keyCode);
+
+export const getCharFromEvent = e => {
+  let which = getKeyFromEvent(e);
+  return (
+    (which &&
+      !e.ctrlKey &&
+      String.fromCharCode(which).replace(/[^\x20-\x7E]/, '')) ||
+    ''
+  );
+};

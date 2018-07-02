@@ -1,5 +1,5 @@
-const { delay } = require('../util');
-const CheckoutFrameTest = require('../plans/CheckoutFrameTest');
+const { delay } = require('../../util');
+const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 module.exports = {
   timeout: 10,
@@ -11,10 +11,10 @@ module.exports = {
         prefill: {
           contact: '9999999999',
           email: 'void@razorpay.com',
-          method: 'upi'
-        }
-      }
-    })
+          method: 'upi',
+        },
+      },
+    }),
 };
 
 class UpiCollect extends CheckoutFrameTest {

@@ -1,5 +1,5 @@
-const { delay } = require('../util');
-const CheckoutFrameTest = require('../plans/CheckoutFrameTest');
+const { delay } = require('../../util');
+const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 module.exports = {
   test: browser =>
@@ -9,10 +9,10 @@ module.exports = {
         prefill: {
           contact: '9999999999',
           email: 'void@razorpay.com',
-          method: 'wallet'
-        }
-      }
-    })
+          method: 'wallet',
+        },
+      },
+    }),
 };
 
 class PowerWallet extends CheckoutFrameTest {

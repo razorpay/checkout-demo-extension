@@ -8,7 +8,10 @@ const modules = {
   tez: 'Tez',
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
-  'lib/upi': 'UPIUtils'
+  'lib/upi': 'UPIUtils',
+  formatter: 'Formatter',
+  'common/currency': 'Currency',
+  tracker: 'Track',
 };
 
 function getOptions(module) {
@@ -18,15 +21,15 @@ function getOptions(module) {
       file: `app/js/generated/${module}.js`,
       format: 'iife',
       strict: false,
-      name: modules[module]
+      name: modules[module],
     },
     plugins,
 
     // https://github.com/rollup/rollup-watch/issues/22
     watch: {
       exclude: 'node_modules/**',
-      clearScreen: false
-    }
+      clearScreen: false,
+    },
   };
 }
 

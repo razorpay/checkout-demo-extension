@@ -10,6 +10,8 @@ export const querySelector = _Func.bind('querySelector', document);
 export const querySelectorAll = _Func.bind('querySelectorAll', document);
 export const getElementById = _Func.bind('getElementById', document);
 export const getComputedStyle = _Func.bind('getComputedStyle', global);
+export const EventConstructor = global.Event;
+export const isEvent = x => _.is(x, EventConstructor);
 
 var link;
 export function resolveUrl(relativeUrl) {
@@ -19,24 +21,21 @@ export function resolveUrl(relativeUrl) {
 }
 
 export function submitForm(action, data, method, target) {
-  if (!action) {
-    return;
-  }
-
-  /* set target to _self in case of redirect mode */
-  target = target || '_self';
-
   if (method === 'get') {
     action = _.appendParamsToUrl(action, data);
-    return global.open(`javascript:global.location.href='${action}'`, target);
+    if (target) {
+      global.open(action, target);
+    } else {
+      global.location = action;
+    }
+  } else {
+    _El.create('form')
+      |> _El.setAttributes({ target, action, method })
+      |> _El.setContents(data |> obj2formhtml)
+      |> _El.appendTo(documentElement)
+      |> _El.submit
+      |> _El.detach;
   }
-
-  _El.create('form')
-    |> _El.setAttributes({ target, action, method })
-    |> _El.setContents(data |> obj2formhtml)
-    |> _El.appendTo(documentElement)
-    |> _El.submit
-    |> _El.detach;
 }
 
 export function obj2formhtml(data, key) {
