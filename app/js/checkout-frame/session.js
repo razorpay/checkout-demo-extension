@@ -893,6 +893,7 @@ Session.prototype = {
 
   destroyMagic: function() {
     if (this.magicView) {
+      $(this.el).removeClass('magic');
       this.magicView.destroy();
       delete this.magicView;
     }
