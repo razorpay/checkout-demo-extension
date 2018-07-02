@@ -1014,7 +1014,9 @@ Session.prototype = {
         return this.clearRequest();
       } else if (this.r._payment.isMagicPayment) {
         return Confirm.show({
-          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          message:
+            'Your payment is ongoing. ' +
+            'Are you sure that you want to cancel the payment?',
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
@@ -1682,7 +1684,9 @@ Session.prototype = {
         this.clearRequest();
       } else {
         return Confirm.show({
-          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          message:
+            'Your payment is ongoing. ' +
+            'Are you sure that you want to cancel the payment?',
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
