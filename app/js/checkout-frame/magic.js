@@ -239,24 +239,33 @@ magicView.prototype = {
     });
   },
 
-  resendOtp: function(e) {
+  resendOtp: function(e, confirmedCancel) {
     if (!$(e.target).hasClass('magic-resend-otp')) {
       return;
     }
 
     if (CheckoutBridge && CheckoutBridge.relay) {
       var resend = true;
+      var self = this;
 
       if (this.resendCount === 1) {
+        if (confirmedCancel === true) {
+          $('#magic-wrapper').addClass('hide-resend');
+        } else {
+          return Confirm.show({
+            message: 'This is your last attempt to generate OTP.',
+            heading: 'Resend OTP?',
+            positiveBtnTxt: 'Yes, resend',
+            negativeBtnTxt: 'No',
+            onPositiveClick: function() {
+              self.resendOtp(e, true);
+            }
+          });
+        }
+
         this.track('otp_resend', {
           resend_count: this.resendCount
         });
-
-        if (window.confirm('This is your last attempt to generate OTP.')) {
-          $('#magic-wrapper').addClass('hide-resend');
-        } else {
-          resend = false;
-        }
       } else if (this.resendCount > 2) {
         resend = false;
       }

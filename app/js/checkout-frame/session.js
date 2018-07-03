@@ -1378,7 +1378,13 @@ Session.prototype = {
       });
     }
     this.click('#backdrop', this.hideErrorMessage);
-    this.click('#overlay', this.hideErrorMessage);
+    this.click('#overlay', function(e) {
+      if ($('#confirmation-dialog').hasClass('animate')) {
+        return;
+      }
+
+      this.hideErrorMessage(e);
+    });
     this.click('#fd-hide', this.hideErrorMessage);
   },
 
