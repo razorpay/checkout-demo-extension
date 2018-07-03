@@ -10,6 +10,7 @@ const modules = {
   'lib/jsonp': 'jsonp',
   formatter: 'Formatter',
   confirm: 'Confirm',
+  callout: 'Callout',
   'common/currency': 'Currency'
 };
 

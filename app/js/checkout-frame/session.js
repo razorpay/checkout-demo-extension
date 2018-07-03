@@ -1017,7 +1017,7 @@ Session.prototype = {
         return Confirm.show({
           message:
             'Your payment is ongoing. ' +
-            'Are you sure that you want to cancel the payment?',
+            'Are you sure you want to cancel the payment?',
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
@@ -1687,7 +1687,7 @@ Session.prototype = {
         return Confirm.show({
           message:
             'Your payment is ongoing. ' +
-            'Are you sure that you want to cancel the payment?',
+            'Are you sure you want to cancel the payment?',
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',

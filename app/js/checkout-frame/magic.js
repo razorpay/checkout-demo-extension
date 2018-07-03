@@ -77,6 +77,11 @@ magicView.prototype = {
   destroy: function() {
     this.unbind();
     this.clearTimeout();
+    if (this.resendCallout) {
+      this.resendCallout.hide();
+      delete this.resendCallout;
+    }
+
     window.clearTimeout(this.otpTimeout);
   },
 
@@ -145,7 +150,7 @@ magicView.prototype = {
       window.setTimeout(function() {
         CheckoutBridge.invokePopup(JSON.stringify(options));
         self.session.destroyMagic();
-      }, 1000);
+      }, 2000);
     }
   },
 
@@ -258,9 +263,19 @@ magicView.prototype = {
 
       if (resend) {
         delete this.otpData;
-        if (CheckoutBridge && CheckoutBridge.toast) {
-          CheckoutBridge.toast(strings.otp_resent, TOAST_SHORT);
-        }
+        var callout =
+          this.resendCallout ||
+          new Callout({
+            message: 'OTP has been resent to your number'
+          });
+
+        this.resendCallout = callout.show();
+
+        window.setTimeout(function() {
+          callout.hide();
+        }, 5000);
+
+        this.autoreadOtp();
 
         CheckoutBridge.relay(
           JSON.stringify({
@@ -302,6 +317,8 @@ magicView.prototype = {
     } else {
       self.showWaitingScreen();
     }
+
+    this.resetLoader();
 
     $('#body').removeClass('sub');
 
@@ -417,11 +434,13 @@ magicView.prototype = {
     } else {
       this.enterOtp();
     }
-
-    this.resetLoader();
   },
 
   showWaitingScreen: function() {
+    if ($('#form-magic-otp').hasClass('waiting')) {
+      return;
+    }
+
     $('#form-magic-otp')
       .removeClass('manual')
       .addClass('waiting');
