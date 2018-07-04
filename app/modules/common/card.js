@@ -1,48 +1,48 @@
 const cardPatterns = [
   {
     name: 'visa',
-    regex: /^4/
+    regex: /^4/,
   },
   {
     name: 'mastercard',
-    regex: /^(5[1-5]|2[2-7])/
+    regex: /^(5[1-5]|2[2-7])/,
   },
   {
     name: 'maestro16',
-    regex: /^50(81(25|26|59|92)|8227)|4(437|681)/
+    regex: /^50(81(25|26|59|92)|8227)|4(437|681)/,
   },
   {
     name: 'amex',
-    regex: /^3[47]/
+    regex: /^3[47]/,
   },
   // keep more specific rupay above catchall maestro
   {
     name: 'rupay',
-    regex: /^(508[5-9]|60(80(0|)[^0]|8[1-4]|8500|698[5-9]|699|7[^9]|79[0-7]|798[0-4])|65(2(1[5-9]|[2-9])|30|31[0-4])|817[2-9]|81[89]|820[01])/
+    regex: /^(508[5-9]|60(80(0|)[^0]|8[1-4]|8500|698[5-9]|699|7[^9]|79[0-7]|798[0-4])|65(2(1[5-9]|[2-9])|30|31[0-4])|817[2-9]|81[89]|820[01])/,
   },
   {
     name: 'discover',
-    regex: /^(65[1,3-9]|6011)/
+    regex: /^(65[1,3-9]|6011)/,
   },
   {
     name: 'maestro',
-    regex: /^(6|5(0|[6-9])).{5}/
+    regex: /^(6|5(0|[6-9])).{5}/,
   },
   {
     name: 'diners',
-    regex: /^3[0689]/
+    regex: /^3[0689]/,
   },
   {
     name: 'jcb',
-    regex: /^35/
-  }
+    regex: /^35/,
+  },
 ];
 
 const cardLengths = {
   amex: 15,
   diners: 14,
   maestro: 19,
-  '': 19
+  '': 19,
 };
 
 export const getCardType = cardNumber => {

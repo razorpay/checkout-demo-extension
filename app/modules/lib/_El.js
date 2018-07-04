@@ -58,12 +58,10 @@ export const detach =
   (childNode => {
     var parentNode = parent(childNode);
     if (parentNode) {
-      parentNode.removeNode(childNode);
+      parentNode.removeChild(childNode);
     }
     return childNode;
-  })
-  |> element1
-  |> _.curry2;
+  }) |> element1;
 
 export const selectionStart = _.prop('selectionStart') |> element1;
 export const selectionEnd = _.prop('selectionEnd') |> element1;
@@ -164,6 +162,7 @@ export const displayInlineBlock = setDisplay('inline-block');
 export const offsetWidth = _.prop('offsetWidth');
 export const offsetHeight = _.prop('offsetHeight');
 export const bbox = (el => el.getBoundingClientRect()) |> element1;
+export const firstChild = (el => el.firstChild) |> element1;
 
 /* https://developer.mozilla.org/en/docs/Web/API/Element/matches */
 var elementProto = _.prototypeOf(ElementConstructor);

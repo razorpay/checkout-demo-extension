@@ -7,13 +7,13 @@ const testCards = {
   maestro: '6799990100000000019',
   diners: '36148900647913',
   discover: '6011000990139424',
-  jcb: '3528000700000000'
+  jcb: '3528000700000000',
 };
 
 const testCardsWithSpacing = {
   visa: '4242 4242 4242 4242',
   mastercard: '5555 5555 5555 4444',
-  amex: '3782 822463 10005'
+  amex: '3782 822463 10005',
 };
 
 test('getCardType', function(t) {

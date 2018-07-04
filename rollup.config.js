@@ -9,6 +9,8 @@ const modules = {
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
   formatter: 'Formatter',
+  confirm: 'Confirm',
+  callout: 'Callout',
   'common/currency': 'Currency',
   tracker: 'Track',
 };

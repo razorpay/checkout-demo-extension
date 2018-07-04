@@ -235,7 +235,11 @@ function hideEmi() {
 
 function hideOverlayMessage() {
   if (!hideEmi()) {
-    hideOverlay($('#error-message'));
+    if ($('#confirmation-dialog').hasClass('animate')) {
+      makeHidden(gel('error-message'));
+    } else {
+      hideOverlay($('#error-message'));
+    }
   }
 }
 
@@ -889,6 +893,7 @@ Session.prototype = {
 
   destroyMagic: function() {
     if (this.magicView) {
+      $(this.el).removeClass('magic');
       this.magicView.destroy();
       delete this.magicView;
     }
@@ -993,7 +998,8 @@ Session.prototype = {
     }
   },
 
-  hideErrorMessage: function() {
+  hideErrorMessage: function(confirmedCancel) {
+    var self = this;
     if (this.r._payment) {
       if (
         this.payload &&
@@ -1005,6 +1011,22 @@ Session.prototype = {
     }
 
     if (this.r._payment || this.isResumedPayment) {
+      if (confirmedCancel === true) {
+        return this.clearRequest();
+      } else if (this.r._payment.isMagicPayment) {
+        return Confirm.show({
+          message:
+            'Your payment is ongoing. ' +
+            'Are you sure you want to cancel the payment?',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.hideErrorMessage(true);
+          },
+        });
+      }
+
       if (confirmClose()) {
         this.clearRequest();
       } else {
@@ -1356,7 +1378,13 @@ Session.prototype = {
       });
     }
     this.click('#backdrop', this.hideErrorMessage);
-    this.click('#overlay', this.hideErrorMessage);
+    this.click('#overlay', function(e) {
+      if ($('#confirmation-dialog').hasClass('animate')) {
+        return;
+      }
+
+      this.hideErrorMessage(e);
+    });
     this.click('#fd-hide', this.hideErrorMessage);
   },
 
@@ -1646,8 +1674,9 @@ Session.prototype = {
     this.body.toggleClass('sub', showPaybtn);
   },
 
-  back: function() {
+  back: function(confirmedCancel) {
     var tab = '';
+    var self = this;
 
     if (this.get('ecod')) {
       $('#footer').hide();
@@ -1657,11 +1686,21 @@ Session.prototype = {
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
     } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
-      if (confirmClose()) {
+      if (confirmedCancel === true) {
         tab = 'card';
         this.clearRequest();
       } else {
-        return;
+        return Confirm.show({
+          message:
+            'Your payment is ongoing. ' +
+            'Are you sure you want to cancel the payment?',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.back(true);
+          },
+        });
       }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {
@@ -2001,8 +2040,25 @@ Session.prototype = {
     return data;
   },
 
-  hide: function() {
+  hide: function(confirmedCancel) {
+    var self = this;
     if (this.isOpen) {
+      if (
+        confirmedCancel !== true &&
+        this.r._payment &&
+        this.r._payment.isMagicPayment
+      ) {
+        return Confirm.show({
+          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.close(true);
+          },
+        });
+      }
+
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
@@ -2505,6 +2561,7 @@ Session.prototype = {
       this.prefCall.abort();
       this.prefCall = null;
     }
+
     if (this.isOpen) {
       abortAjax(this.ajax);
       this.clearRequest();
