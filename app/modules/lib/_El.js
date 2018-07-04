@@ -73,7 +73,11 @@ export const moveCaret =
   |> _.validateArgs(_.isElement, _.isNumber)
   |> _.curry2;
 
-export const submit = (el => el.submit()) |> element1;
+export const submit =
+  (el => {
+    el.submit();
+    return el;
+  }) |> element1;
 
 export const hasClass =
   ((el, className) => {
