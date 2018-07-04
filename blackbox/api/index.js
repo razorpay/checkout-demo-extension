@@ -66,12 +66,10 @@ fastify.post('/v1/payments/create/checkout', async (request, reply) => {
 fastify.get('/v1/gateway/mocksharp/:payment_id', (request, reply) => {
   // take a little time to process payment.
   // to avoid responding before js callbacks can be applied on client
-  setTimeout(() => {
-    reply.header('content-type', 'text/html');
-    reply.send(
-      `<script>opener.postMessage({razorpay_payment_id:'${
-        request.params.payment_id
-      }'},'*')</script>`
-    );
-  });
+  reply.header('content-type', 'text/html');
+  reply.send(
+    `<script>opener.postMessage({razorpay_payment_id:'${
+      request.params.payment_id
+    }'},'*')</script>`
+  );
 });

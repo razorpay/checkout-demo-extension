@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => WalletWithResume.test(browser)
+  test: browser => WalletWithResume.test(browser),
 };
 
 class WalletWithResume extends RazorpayJsTest {
@@ -12,17 +12,17 @@ class WalletWithResume extends RazorpayJsTest {
       contact: '9999999999',
       email: 'void@razorpay.com',
       key: 'm1key',
-      amount: 100
+      amount: 100,
     });
 
     await this.createPayment(
       {
         method: 'wallet',
-        wallet: 'mobikwik'
+        wallet: 'mobikwik',
       },
       {
         paused: true,
-        message: 'Confirming order...'
+        message: 'Confirming order...',
       }
     );
 
@@ -30,7 +30,8 @@ class WalletWithResume extends RazorpayJsTest {
     await page.evaluate(`document.body.click()`);
 
     await delay(250);
-    await page.evaluate(`razorpay.emit('payment.resume')`);
+
+    page.evaluate(`razorpay.emit('payment.resume')`);
 
     await super.completePayment();
   }

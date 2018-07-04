@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => CardWithResume.test(browser)
+  test: browser => CardWithResume.test(browser),
 };
 
 class CardWithResume extends RazorpayJsTest {
@@ -12,7 +12,7 @@ class CardWithResume extends RazorpayJsTest {
       contact: '9999999999',
       email: 'void@razorpay.com',
       key: 'm1key',
-      amount: 100
+      amount: 100,
     });
 
     await this.createPayment(
@@ -22,11 +22,11 @@ class CardWithResume extends RazorpayJsTest {
         'card[name]': 'test',
         'card[expiry_month]': '12',
         'card[expiry_year]': '32',
-        'card[expiry_cvv]': '000'
+        'card[expiry_cvv]': '000',
       },
       {
         paused: true,
-        message: 'Confirming order...'
+        message: 'Confirming order...',
       }
     );
 
@@ -34,7 +34,8 @@ class CardWithResume extends RazorpayJsTest {
     await page.evaluate(`document.body.click()`);
 
     await delay(250);
-    await page.evaluate(`razorpay.emit('payment.resume')`);
+
+    page.evaluate(`razorpay.emit('payment.resume')`);
 
     await super.completePayment();
   }
