@@ -2,6 +2,7 @@ var listeners = [];
 
 function on(event, sel, listener) {
   var $el = $(sel);
+  /* $el.on return a function to removeEventListener */
   listeners.push($el.on(event, listener));
 }
 
