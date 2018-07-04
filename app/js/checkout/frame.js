@@ -29,7 +29,7 @@ var merchantMarkup = {
     } else if (!this.isFocused) {
       smoothScrollTo(0);
     }
-  }
+  },
 };
 
 function getMetas() {
@@ -170,7 +170,7 @@ CheckoutFrame.prototype = {
         width: '100%',
         height: '100%',
         allowpaymentrequest: true,
-        src: makeCheckoutUrl(rzp)
+        src: makeCheckoutUrl(rzp),
       };
 
       attribs['class'] = 'razorpay-checkout-frame';
@@ -183,7 +183,7 @@ CheckoutFrame.prototype = {
     var $el = $(this.el).css({
       // by the time checkout opens, other plugins might resize iframe
       width: '100%',
-      height: '100%'
+      height: '100%',
     });
     var parent = rzp.get('parent');
     var $parent = $(parent || frameContainer);
@@ -218,10 +218,10 @@ CheckoutFrame.prototype = {
     var options = rzp.get();
 
     var response = {
-      integration: trackingProps.integration,
+      integration: Track.props.integration,
       referer: location.href,
       options: options,
-      id: rzp.id
+      id: rzp.id,
     };
 
     each(rzp.modal.options, function(i, option) {
@@ -293,12 +293,12 @@ CheckoutFrame.prototype = {
       $(document.createElement('meta')).attr({
         name: 'viewport',
         content:
-          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
       }),
       $(document.createElement('meta')).attr({
         name: 'theme-color',
-        content: this.rzp.get('theme.color')
-      })
+        content: this.rzp.get('theme.color'),
+      }),
     ];
 
     each(this.$metas, function(i, meta) {
@@ -347,7 +347,7 @@ CheckoutFrame.prototype = {
     invoke('on' + event, this, data);
 
     if (event === 'dismiss' || event === 'fault') {
-      track(rzp, event, data);
+      Track(rzp, event, data);
     }
   },
 
@@ -407,7 +407,7 @@ CheckoutFrame.prototype = {
   oncomplete: function(data) {
     this.close();
     var rzp = this.rzp;
-    track(rzp, 'checkout_success', data);
+    Track(rzp, 'checkout_success', data);
     invoke(
       function() {
         invoke(this.get('handler'), this, data);
@@ -439,5 +439,5 @@ CheckoutFrame.prototype = {
 
   afterClose: function() {
     frameContainer.style.display = 'none';
-  }
+  },
 };

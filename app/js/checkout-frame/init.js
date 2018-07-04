@@ -1,6 +1,6 @@
 // flag for checkout-frame.js
 discreet.isFrame = true;
-trackingProps.library = 'checkoutjs';
+Track.props.library = 'checkoutjs';
 
 (function() {
   var a = document.createElement('a');
@@ -13,10 +13,10 @@ trackingProps.library = 'checkoutjs';
 })();
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
-  track(getSession().r, 'js_error', {
+  Track(getSession().r, 'js_error', {
     message: errorMsg,
     line: lineNumber,
     col: column,
-    stack: errorObj && errorObj.stack
+    stack: errorObj && errorObj.stack,
   });
 };

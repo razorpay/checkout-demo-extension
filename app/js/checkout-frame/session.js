@@ -10,7 +10,7 @@ var strings = {
   process: 'Your payment is being processed',
   redirect: 'Redirecting to Bank page',
   acs_load_delay: 'Seems like your bank page is taking time to load.',
-  otp_resent: 'OTP resent'
+  otp_resent: 'OTP resent',
 };
 
 var fontTimeout;
@@ -366,7 +366,7 @@ function askOTP(text) {
       window.OTPElf.showOTP = elfShowOTP;
     } else {
       window.OTPElf = {
-        showOTP: elfShowOTP
+        showOTP: elfShowOTP,
       };
     }
   }
@@ -423,7 +423,7 @@ var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
   'rzp_test_kD8QgcxVGzYSOU',
-  'rzp_live_alEMh9FVT4XpwM'
+  'rzp_live_alEMh9FVT4XpwM',
 ];
 
 function Session(options) {
@@ -452,7 +452,7 @@ Session.prototype = {
   params: emo,
 
   track: function(event, extra) {
-    track(this.r, event, extra);
+    Track(this.r, event, extra);
   },
 
   getClasses: function() {
@@ -611,7 +611,7 @@ Session.prototype = {
       var optional = this.optional;
       var prefill = {
         email: this.get('prefill.email'),
-        contact: this.get('prefill.contact')
+        contact: this.get('prefill.contact'),
       };
 
       var valid = true;
@@ -621,8 +621,8 @@ Session.prototype = {
           valid = false;
           errorHandler.call(getSession(), {
             error: {
-              field: option
-            }
+              field: option,
+            },
           });
         }
       });
@@ -680,7 +680,7 @@ Session.prototype = {
           'card[name]': 'card_name',
           'card[number]': 'card_number',
           'card[expiry]': 'card_expiry',
-          'card[cvv]': 'card_cvv'
+          'card[cvv]': 'card_cvv',
         },
         function(name, id) {
           var el = gel(id);
@@ -732,7 +732,7 @@ Session.prototype = {
 
               invoke(errorHandler, self, response);
             }
-          }
+          },
         }).till(function(response) {
           return response && response.status;
         });
@@ -857,7 +857,7 @@ Session.prototype = {
         account_number: accountNumber,
         image:
           (this.netbanks[bankCode] && this.netbanks[bankCode].image) ||
-          'https://cdn.razorpay.com/' + bankCode + '.gif'
+          'https://cdn.razorpay.com/' + bankCode + '.gif',
       };
     }
   },
@@ -881,7 +881,7 @@ Session.prototype = {
       this.magicView = new magicView(this);
       this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION, {
         timeout: TIMEOUT_MAGIC_NO_ACTION,
-        type: 'magic_no_action'
+        type: 'magic_no_action',
       });
     }
 
@@ -915,7 +915,7 @@ Session.prototype = {
         onhidden: bind(function() {
           this.saveAndClose();
           Razorpay.sendMessage({ event: 'hidden' });
-        }, this)
+        }, this),
       });
     }
   },
@@ -1023,7 +1023,7 @@ Session.prototype = {
           negativeBtnTxt: 'No',
           onPositiveClick: function() {
             self.hideErrorMessage(true);
-          }
+          },
         });
       }
 
@@ -1699,7 +1699,7 @@ Session.prototype = {
           negativeBtnTxt: 'No',
           onPositiveClick: function() {
             self.back(true);
-          }
+          },
         });
       }
     } else if (/^emandate/.test(this.screen)) {
@@ -1868,7 +1868,7 @@ Session.prototype = {
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
-          emi: this.methods.emi
+          emi: this.methods.emi,
         });
       }
     }
@@ -2055,7 +2055,7 @@ Session.prototype = {
           negativeBtnTxt: 'No',
           onPositiveClick: function() {
             self.close(true);
-          }
+          },
         });
       }
 
@@ -2170,7 +2170,7 @@ Session.prototype = {
     this.customer.submitOTP(
       {
         otp: otp,
-        email: gel('email').value
+        email: gel('email').value,
       },
       bind(callback, this)
     );
@@ -2253,7 +2253,7 @@ Session.prototype = {
         'bank_account[account_number]',
         'bank_account[ifsc]',
         'aadhaar[number]',
-        'auth_type'
+        'auth_type',
       ];
 
       each(opts, function(key, val) {
@@ -2347,7 +2347,7 @@ Session.prototype = {
     var request = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
-      magic: this.magic
+      magic: this.magic,
     };
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
@@ -2389,7 +2389,7 @@ Session.prototype = {
 
     Razorpay.sendMessage({
       event: 'submit',
-      data: data
+      data: data,
     });
 
     var wallet = data.wallet;
@@ -2459,7 +2459,7 @@ Session.prototype = {
             that.magicView.track('user_cancel');
             that.magicView.showPaymentPage({
               otpelf: true,
-              magic: false
+              magic: false,
             });
           }
         });
@@ -2598,7 +2598,7 @@ Session.prototype = {
       this.data = this.getFormData();
       this.close();
     }
-  }
+  },
 };
 
 function commenceECOD(session) {
@@ -2615,7 +2615,7 @@ function commenceECOD(session) {
         } else if (response.razorpay_payment_id) {
           successHandler.call(session, response);
         }
-      }
+      },
     }).till(function(response) {
       return response && response.status;
     });
@@ -2628,7 +2628,7 @@ function send_ecod_link() {
   var r = this.r;
   fetch.post({
     url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
-    callback: debounce(hideOverlayMessage, 4000)
+    callback: debounce(hideOverlayMessage, 4000),
   });
 }
 

@@ -30,7 +30,7 @@ var RazorpayConfig = {
   api: 'https://api.razorpay.com/',
   version: 'v1/',
   frameApi: '/',
-  cdn: 'https://cdn.razorpay.com/'
+  cdn: 'https://cdn.razorpay.com/',
 };
 
 try {
@@ -52,7 +52,7 @@ var ba_keys = [
   'order_id',
   'invoice_id',
   'subscription_id',
-  'payment_link_id'
+  'payment_link_id',
 ];
 
 function makeAuthUrl(r, url) {
@@ -82,7 +82,7 @@ var Razorpay = (window.Razorpay = function(overrides) {
     return new Razorpay(overrides);
   }
   Eventer.call(this);
-  this.id = generateUID();
+  this.id = Track.makeUid();
 
   var options;
   try {
@@ -112,7 +112,7 @@ var Razorpay = (window.Razorpay = function(overrides) {
   // init for checkoutjs is tracked from iframe
   // we've open event to track parent side of options
   if (!discreet.isCheckout) {
-    track(this, 'init');
+    Track(this, 'init');
   }
 
   this.postInit();
@@ -151,7 +151,7 @@ Razorpay.emi = {
     rate /= 1200;
     var multiplier = Math.pow(1 + rate, length);
     return parseInt((principle * rate * multiplier) / (multiplier - 1), 10);
-  }
+  },
 };
 
 function getPrefsJsonp(data, callback) {
@@ -161,7 +161,7 @@ function getPrefsJsonp(data, callback) {
     timeout: 30000,
     success: function(response) {
       invoke(callback, null, response);
-    }
+    },
   });
 }
 
@@ -169,13 +169,13 @@ var razorpayPayment = (Razorpay.payment = {
   getMethods: function(callback) {
     return getPrefsJsonp(
       {
-        key_id: Razorpay.defaults.key
+        key_id: Razorpay.defaults.key,
       },
       function(response) {
         callback(response.methods || response);
       }
     );
-  }
+  },
 });
 
 var RazorpayDefaults = (Razorpay.defaults = {
@@ -202,8 +202,8 @@ var RazorpayDefaults = (Razorpay.defaults = {
   display_amount: '',
   recurring_token: {
     max_amount: 0,
-    expire_by: 0
-  }
+    expire_by: 0,
+  },
 });
 
 function base_configure(overrides) {
@@ -266,7 +266,7 @@ function makePrefParams(rzp) {
         'subscription_id',
         'recurring',
         'subscription_card_change',
-        'account_id'
+        'account_id',
       ],
       function(i, key) {
         var value = getter(key);
@@ -284,7 +284,7 @@ var discreet = {
   validate: noop,
 
   msg: {
-    wrongotp: 'Entered OTP was incorrect. Re-enter to proceed.'
+    wrongotp: 'Entered OTP was incorrect. Re-enter to proceed.',
   },
 
   isBase64Image: function(image) {
@@ -296,8 +296,8 @@ var discreet = {
   error: function(message) {
     return {
       error: {
-        description: message || discreet.cancelMsg
-      }
+        description: message || discreet.cancelMsg,
+      },
     };
   },
 
@@ -305,11 +305,11 @@ var discreet = {
     if (!data.target && window !== window.parent) {
       return invoke(Razorpay.sendMessage, null, {
         event: 'redirect',
-        data: data
+        data: data,
       });
     }
     submitForm(data.url, data.content, data.method, data.target);
-  }
+  },
 };
 
 var optionValidations = {
@@ -357,7 +357,7 @@ var optionValidations = {
     if (!amount && amount !== Razorpay.defaults.display_amount) {
       return '';
     }
-  }
+  },
 };
 
 function validateOverrides(options) {
@@ -540,5 +540,5 @@ discreet.currencies = {
   VND: '&#x20ab;',
   YER: '&#xfdfc;',
   ZMK: 'ZK',
-  ZWL: 'Z$'
+  ZWL: 'Z$',
 };

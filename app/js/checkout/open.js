@@ -48,7 +48,7 @@ var addAutoCheckoutButton = function(rzp) {
       });
 
       var request = {
-        url: formAction
+        url: formAction,
       };
       if (form.method === 'post') {
         request.method = 'post';
@@ -67,7 +67,7 @@ var addAutoCheckoutButton = function(rzp) {
           stringify({
             request: request,
             options: stringify(options),
-            back: location.href
+            back: location.href,
           })
         );
 
@@ -137,7 +137,7 @@ function createFrameContainer() {
     width: '100%',
     '-webkit-overflow-scrolling': 'touch',
     '-webkit-backface-visibility': 'hidden',
-    'overflow-y': 'visible'
+    'overflow-y': 'visible',
   };
   each(rules, function(i, rule) {
     style[i] = rule;
@@ -162,7 +162,7 @@ function createFrameBackdrop() {
       width: '100%',
       height: '100%',
       filter:
-        'progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000)'
+        'progid:DXImageTransform.Microsoft.gradient(startColorstr=#96000000, endColorstr=#96000000)',
     },
     function(ruleKey, value) {
       style[ruleKey] = value;
@@ -201,7 +201,7 @@ function createTestRibbon() {
       width: '200px',
       'text-align': 'center',
       right: '-50px',
-      top: '50px'
+      top: '50px',
     },
     function(ruleKey, value) {
       style[ruleKey] = value;
@@ -241,7 +241,7 @@ var onNew = RazorProto.onNew;
 
 RazorProto.onNew = function(event, callback) {
   if (event === 'payment.error') {
-    track(this, 'event_paymenterror', location.href);
+    Track(this, 'event_paymenterror', location.href);
   }
   if (isFunction(onNew)) {
     onNew.call(this, event, callback);
@@ -250,7 +250,7 @@ RazorProto.onNew = function(event, callback) {
 
 RazorProto.open = needBody(function() {
   var frame = (this.checkoutFrame = getPreloadedFrame(this));
-  track(this, 'open');
+  Track(this, 'open');
 
   if (!frame.el.contentWindow) {
     frame.close();
@@ -261,7 +261,7 @@ RazorProto.open = needBody(function() {
   }
 
   if (currentScript.src.slice(-7) === '-new.js') {
-    track(this, 'oldscript', location.href);
+    Track(this, 'oldscript', location.href);
   }
 
   return this;

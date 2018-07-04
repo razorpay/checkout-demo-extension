@@ -6,7 +6,7 @@ var getAjaxParams = function(options) {
     error: options.error || _Func.noop,
     success: options.success || _Func.noop,
     callback: options.callback || _Func.noop,
-    url: options.url || ''
+    url: options.url || '',
   };
 
   if (!params.data) {
@@ -14,7 +14,7 @@ var getAjaxParams = function(options) {
   }
   params.data.callback = 'Razorpay.' + CALLBACK_KEY;
 
-  _Obj.setProp(
+  return _Obj.setProp(
     params,
     'computedUrl',
     _.appendParamsToUrl(params.url, params.data)
@@ -67,6 +67,6 @@ export default function(options) {
       if (Razorpay[CALLBACK_KEY]) {
         Razorpay[CALLBACK_KEY] = _Func.noop;
       }
-    }
+    },
   };
 }
