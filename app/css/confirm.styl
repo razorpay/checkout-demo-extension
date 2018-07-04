@@ -1,11 +1,11 @@
 @require 'common';
 
-#confirmation-dialog.animate .confirm {
+#confirmation-dialog.animate .confirm-container {
   transform: translateY(0);
   opacity: 1;
 }
 
-.confirm {
+.confirm-container {
   background: #fff;
   position: absolute;
   top: 6px;
@@ -22,7 +22,7 @@
   transform: translateY(-24px);
   opacity: 0;
 
-  .heading {
+  .confirm-heading {
     color: #717171;
     letter-spacing: 1px;
     line-height: 17px;
@@ -31,19 +31,20 @@
     padding: 0 0 8px 0;
   }
 
-  .message {
+  .confirm-message {
     margin-top: 12px;
     color: rgba(0,0,0,0.56);
     line-height: 20px;
   }
 
-  .buttons {
+  .confirm-buttons {
     margin-top: 8px;
   }
 
   .text-btn {
     display: inline-block;
-    margin-right: 24px;
+    margin-right: 12px;
+    padding-right: 12px;
     font-size: 14px;
     letter-spacing: 1px;
     line-height: 40px;

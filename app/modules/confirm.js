@@ -34,11 +34,11 @@ export function show(options) {
   options.onPositiveClick = options.onPositiveClick || _Func.noop;
   options.onNegativeClick = options.onNegativeClick || _Func.noop;
 
-  on('click', '.confirm #positiveBtn', () => {
+  on('click', '.confirm-container #positiveBtn', () => {
     hide();
     options.onPositiveClick();
   });
-  on('click', '.confirm #negativeBtn', () => {
+  on('click', '.confirm-container #negativeBtn', () => {
     hide();
     options.onNegativeClick();
   });
