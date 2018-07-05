@@ -7,8 +7,8 @@ function on(event, sel, listener) {
 }
 
 function unbind() {
-  invokeEach(this.listeners);
-  this.listeners = [];
+  invokeEach(listeners);
+  listeners = [];
 }
 
 export function hide() {
