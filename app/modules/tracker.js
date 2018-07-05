@@ -170,7 +170,7 @@ function addMagicProps(r, properties) {
   var payment = r._payment;
 
   if (payment && payment.payment_id) {
-    properties.payment_id = payment.paymentId;
+    properties.payment_id = payment.payment_id;
     if (payment |> _Obj.hasOwnProp('magicPossible')) {
       properties.magic_possible = payment.magicPossible;
     }
