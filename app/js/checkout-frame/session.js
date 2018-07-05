@@ -2453,6 +2453,7 @@ Session.prototype = {
       that.showLoadError('Please wait while we fetch your transaction details');
 
       if (that.r._payment && that.r._payment.isMagicPayment) {
+        sub_link.html('View bank page');
         sub_link[0].style = '';
         sub_link.on('click', function() {
           if (that.magicView) {
