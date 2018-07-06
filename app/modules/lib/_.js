@@ -86,7 +86,7 @@ export const timer = x => {
 
 export function rawError(description, field) {
   var errorObj = {
-    description: String(description)
+    description: String(description),
   };
 
   if (field) {
@@ -107,6 +107,11 @@ export function throwMessage(message) {
 export const isBase64Image = src => /data:image\/[^;]+;base64/.test(src);
 
 export function obj2query(obj) {
+  // Sanity Check
+  if (!isNonNullObject(obj)) {
+    return '';
+  }
+
   const objKeys = Object.keys(obj);
   const serializedArray = Array(lengthOf(objKeys));
 
@@ -146,7 +151,7 @@ function hex2rgb(hex) {
     red: colors[0],
     green: colors[1],
     blue: colors[2],
-    alpha: 1
+    alpha: 1,
   };
 }
 
