@@ -15,6 +15,9 @@ var strings = {
 
 var fontTimeout;
 
+// Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
+var defaultAuthTypeRadioVal = '3ds';
+
 /* this === session */
 function handleRelayFn(relayObj) {
   var self = this;
@@ -133,6 +136,11 @@ function onSixDigits(e) {
   var cardType = $('#elem-card .cardtype').attr('cardtype');
   var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
+  var trimmedVal = val.replace(/[\ ]/g, '');
+  var exactSixDigits = trimmedVal.length === 6;
+  var lessThanSixDigits = trimmedVal.length < 6;
+  var moreThanSixDigits = trimmedVal.length > 6;
+
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
 
@@ -176,6 +184,44 @@ function onSixDigits(e) {
     elem_emi.addClass(hiddenClass);
   } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
+  }
+
+  // Debit + PIN stuff.
+  if (exactSixDigits || moreThanSixDigits) {
+    /**
+     * Don't check for flows if the card number
+     * was reduced from 7 digits to 6 digits.
+     */
+    if (trimmedVal.slice(0, 6) !== this.flowIIN) {
+      this.checkFlows(trimmedVal.slice(0, 6));
+    }
+  } else if (lessThanSixDigits) {
+    this.flowIIN = null;
+    showFlowRadioButtons(false);
+  }
+}
+
+/**
+ * Toggles the ATM radio buttons on new card screen.
+ * @param {Boolean} show
+ */
+function showFlowRadioButtons(show) {
+  if (show) {
+    // Unhide
+    $('#add-card-container .flow-selection-container').addClass('drishy');
+
+    // Check default
+    var radio = $('#add-card-container .flow.input-radio #flow-3ds');
+    radio.checked = true;
+  } else {
+    // Uncheck values
+    var checked = $('#add-card-container .flow.input-radio:checked');
+    if (checked) {
+      checked.checked = false;
+    }
+
+    // Hide
+    $('#add-card-container .flow-selection-container').removeClass('drishy');
   }
 }
 
@@ -452,6 +498,18 @@ Session.prototype = {
   params: emo,
 
   track: function(event, extra) {
+    Track(this.r, event, extra);
+  },
+
+  trackDebitPin: function(event, extra) {
+    if (extra) {
+      extra.default_auth_type = defaultAuthTypeRadioVal;
+    } else {
+      extra = {
+        default_auth_type: defaultAuthTypeRadioVal,
+      };
+    }
+
     Track(this.r, event, extra);
   },
 
@@ -825,6 +883,12 @@ Session.prototype = {
         self.dismissReason = 'timeout';
         self.modal.hide();
       }, timeLeft);
+    }
+
+    // Debit + PIN stuff
+    var cardNumber = this.get('prefill.card[number]');
+    if (cardNumber) {
+      this.checkFlows(cardNumber.replace(/\D/g, '').slice(0, 6), true);
     }
   },
 
@@ -1386,6 +1450,21 @@ Session.prototype = {
       this.hideErrorMessage(e);
     });
     this.click('#fd-hide', this.hideErrorMessage);
+
+    // Debit + PIN flow change.
+    this.on('change', '#body', 'auth_type_radio', function(e) {
+      var target = e.target;
+      if (!target) {
+        return;
+      }
+
+      // Check for name.
+      if (target.name && target.name.startsWith('auth_type')) {
+        self.trackDebitPin('flow_option_changed', {
+          flow: target.value || null,
+        });
+      }
+    });
   },
 
   bindIeEvents: function() {
@@ -1842,6 +1921,12 @@ Session.prototype = {
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
     }
+
+    // If it's the same card, do nothing.
+    if (e.delegateTarget === $('#saved-cards-container .checked')[0]) {
+      return;
+    }
+
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
     var cardtype = $savedCard.$('.cardtype').attr('cardtype');
@@ -1850,6 +1935,10 @@ Session.prototype = {
       e.target !== $savedCard.find('select[name="emi_duration"]')[0]
     ) {
       $savedCard.$('.saved-cvv').focus();
+    }
+
+    if ($savedCard.$('.flow-selection-container')[0]) {
+      this.trackDebitPin('saved_card_with_flows_selected');
     }
   },
 
@@ -2009,11 +2098,25 @@ Session.prototype = {
       data.method = tab;
       fillData(this.getActiveForm(), data);
 
+      // Delete all the auth_type-* keys
+      each(data, function(key, val) {
+        if (key.startsWith('auth_type-')) {
+          delete data[key];
+        }
+      });
+
       if (this.screen === 'card') {
         if (this.savedCardScreen) {
           var $checkedCard = $('.saved-card.checked');
           data.token = $checkedCard.attr('token');
           data['card[cvv]'] = $checkedCard.$('.saved-cvv').val();
+
+          // Set auth_type for Debit+PIN for saved cards.
+          var authType = $checkedCard.$('.flow.input-radio input:checked');
+          authType = authType[0] && authType.val();
+          if (authType) {
+            data['auth_type'] = authType;
+          }
         } else {
           if (tab === 'emi') {
             data.emi_duration = $('#elem-emi .input').val();
@@ -2599,6 +2702,37 @@ Session.prototype = {
       this.data = this.getFormData();
       this.close();
     }
+  },
+
+  checkFlows: function(iin, isPrefilledCardNumber) {
+    // Hide and uncheck checkboxes.
+    showFlowRadioButtons(false);
+
+    var self = this;
+
+    this.flowIIN = iin;
+
+    this.r.getCardFlows(iin, function(flows) {
+      self.trackDebitPin('flow_opts_fetched', {
+        iin: iin,
+        prefilled_card: isPrefilledCardNumber || null,
+      });
+
+      // Sanity-check
+      if (self.flowIIN !== iin) {
+        return;
+      }
+
+      if (flows && flows.pin) {
+        self.trackDebitPin('flow_opts_shown', {
+          iin: iin,
+          prefilled_card: isPrefilledCardNumber || null,
+        });
+        showFlowRadioButtons(true);
+      } else {
+        showFlowRadioButtons(false);
+      }
+    });
   },
 };
 

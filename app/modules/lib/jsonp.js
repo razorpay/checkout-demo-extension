@@ -1,6 +1,8 @@
-const CALLBACK_KEY = 'jsonp_callback';
+import Track from '../tracker';
 
-var getAjaxParams = function(options) {
+const CALLBACK_KEY = 'jsonp_cb';
+
+var getAjaxParams = function(options, callbackName) {
   var params = {
     data: options.data,
     error: options.error || _Func.noop,
@@ -12,7 +14,7 @@ var getAjaxParams = function(options) {
   if (!params.data) {
     params.data = {};
   }
-  params.data.callback = 'Razorpay.' + CALLBACK_KEY;
+  params.data.callback = 'Razorpay.' + callbackName;
 
   return _Obj.setProp(
     params,
@@ -26,16 +28,19 @@ export default function(options) {
     options.data = {};
   }
 
-  var params = getAjaxParams(options);
+  var uuid = Track.makeUid();
+  var callbackName = CALLBACK_KEY + '_' + uuid;
+
+  var params = getAjaxParams(options, callbackName);
   var done = false;
 
-  Razorpay[CALLBACK_KEY] = function(data) {
+  Razorpay[callbackName] = function(data) {
     _Obj.deleteProp(data, 'http_status_code');
 
     params.success(data, params);
     params.callback(data, params);
 
-    _Obj.deleteProp(Razorpay, CALLBACK_KEY);
+    _Obj.deleteProp(Razorpay, callbackName);
   };
 
   var script = document.createElement('script');
@@ -64,8 +69,8 @@ export default function(options) {
   head.appendChild(script);
   return {
     abort: function() {
-      if (Razorpay[CALLBACK_KEY]) {
-        Razorpay[CALLBACK_KEY] = _Func.noop;
+      if (Razorpay[callbackName]) {
+        Razorpay[callbackName] = _Func.noop;
       }
     },
   };

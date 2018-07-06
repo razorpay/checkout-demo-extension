@@ -96,6 +96,15 @@ input[type=checkbox]:checked + .checkbox
   height: `=bodyHeight`px;
 }
 
+.input-radio input[type=radio]:focus:not(:checked) + label .radio-display {
+  border-color: `=c`;
+}
+
+.input-radio input[type=radio]:checked + label .radio-display {
+  background-color: `=c`;
+  border-color: `=c`;
+}
+
 .confirm-container {
   border-top: 2px solid `=c`;
 }

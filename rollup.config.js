@@ -12,6 +12,7 @@ const modules = {
   confirm: 'Confirm',
   callout: 'Callout',
   'common/currency': 'Currency',
+  'lib/_': '_',
   tracker: 'Track',
 };
 

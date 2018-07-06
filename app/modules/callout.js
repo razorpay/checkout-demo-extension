@@ -26,5 +26,5 @@ Callout.prototype = {
       this.el |> _El.detach;
     }, 200);
     return this;
-  }
+  },
 };
