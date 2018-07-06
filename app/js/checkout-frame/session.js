@@ -1459,7 +1459,7 @@ Session.prototype = {
       }
 
       // Check for name.
-      if (target.name && target.name.startsWith('auth_type')) {
+      if (target.name && target.name.indexOf('auth_type') === 0) {
         self.trackDebitPin('flow_option_changed', {
           flow: target.value || null,
         });
@@ -2100,7 +2100,7 @@ Session.prototype = {
 
       // Delete all the auth_type-* keys
       each(data, function(key, val) {
-        if (key.startsWith('auth_type-')) {
+        if (key.indexOf('auth_type-') === 0) {
           delete data[key];
         }
       });
