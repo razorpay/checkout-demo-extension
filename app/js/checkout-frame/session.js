@@ -212,12 +212,18 @@ function showFlowRadioButtons(show) {
 
     // Check default
     var radio = $('#add-card-container .flow.input-radio #flow-3ds');
-    radio.checked = true;
+
+    if (radio[0]) {
+      radio[0].checked = true;
+    }
   } else {
     // Uncheck values
-    var checked = $('#add-card-container .flow.input-radio:checked');
-    if (checked) {
-      checked.checked = false;
+    var checked = $(
+      '#add-card-container .flow.input-radio input[type=radio]:checked'
+    );
+
+    if (checked[0]) {
+      checked[0].checked = false;
     }
 
     // Hide
