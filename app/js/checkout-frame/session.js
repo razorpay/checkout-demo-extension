@@ -1306,6 +1306,9 @@ Session.prototype = {
     var enabledMethods = this.methods;
     if (enabledMethods.card || enabledMethods.emi) {
       this.on('keyup', '#card_number', onSixDigits);
+      // Also listen for paste.
+      this.on('blur', '#card_number', onSixDigits);
+
       this.on('change', '#nocvv', noCvvToggle);
 
       var saveTick = qs('#save');
