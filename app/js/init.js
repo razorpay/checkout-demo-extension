@@ -263,6 +263,7 @@ function makePrefParams(rzp) {
         'order_id',
         'customer_id',
         'invoice_id',
+        'payment_link_id',
         'subscription_id',
         'recurring',
         'subscription_card_change',

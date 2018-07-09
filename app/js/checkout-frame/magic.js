@@ -10,14 +10,14 @@ var TOAST_LONG = 1;
 function magicView(session) {
   this.session = session;
   this.opts = {
-    session: session
+    session: session,
   };
   this.render();
   this.resendCount = 0;
   this.checkoutVisible = true;
   this.screenMap = {
     'magic-choice': 'select_choice',
-    'magic-otp': 'submit_otp'
+    'magic-otp': 'submit_otp',
   };
 
   this.supportedBanks = ['unknown', 'HDFC'];
@@ -56,7 +56,7 @@ magicView.prototype = {
       self.showPaymentPage({
         magic: false,
         otpelf: true,
-        focus: true
+        focus: true,
       });
     });
 
@@ -77,6 +77,11 @@ magicView.prototype = {
   destroy: function() {
     this.unbind();
     this.clearTimeout();
+    if (this.resendCallout) {
+      this.resendCallout.hide();
+      delete this.resendCallout;
+    }
+
     window.clearTimeout(this.otpTimeout);
   },
 
@@ -140,11 +145,12 @@ magicView.prototype = {
       self.clearTimeout();
       self.track('show_payment_page', options);
       self.checkoutVisible = false;
+      Confirm.hide();
       self.session.showLoadError(strings.redirect);
       window.setTimeout(function() {
         CheckoutBridge.invokePopup(JSON.stringify(options));
         self.session.destroyMagic();
-      }, 1000);
+      }, 2000);
     }
   },
 
@@ -184,7 +190,7 @@ magicView.prototype = {
       this.bankNotSupported = true;
       return this.showPaymentPage({
         magic: false,
-        otpelf: true
+        otpelf: true,
       });
     }
 
@@ -218,7 +224,7 @@ magicView.prototype = {
       this.setTimeout(timeout, {
         timeout: timeout,
         type: 'page',
-        screen: data.type
+        screen: data.type,
       });
     }
   },
@@ -229,41 +235,60 @@ magicView.prototype = {
 
     this.setTimeout(TIMEOUT_REDIRECT, {
       timeout: TIMEOUT_REDIRECT,
-      type: 'redirect'
+      type: 'redirect',
     });
   },
 
-  resendOtp: function(e) {
+  resendOtp: function(e, confirmedCancel) {
     if (!$(e.target).hasClass('magic-resend-otp')) {
       return;
     }
 
     if (CheckoutBridge && CheckoutBridge.relay) {
       var resend = true;
+      var self = this;
 
       if (this.resendCount === 1) {
-        this.track('otp_resend', {
-          resend_count: this.resendCount
-        });
-
-        if (window.confirm('This is your last attempt to generate OTP.')) {
+        if (confirmedCancel === true) {
           $('#magic-wrapper').addClass('hide-resend');
         } else {
-          resend = false;
+          return Confirm.show({
+            message: 'This is your last attempt to generate OTP.',
+            heading: 'Resend OTP?',
+            positiveBtnTxt: 'Yes, resend',
+            negativeBtnTxt: 'No',
+            onPositiveClick: function() {
+              self.resendOtp(e, true);
+            },
+          });
         }
+
+        this.track('otp_resend', {
+          resend_count: this.resendCount,
+        });
       } else if (this.resendCount > 2) {
         resend = false;
       }
 
       if (resend) {
         delete this.otpData;
-        if (CheckoutBridge && CheckoutBridge.toast) {
-          CheckoutBridge.toast(strings.otp_resent, TOAST_SHORT);
-        }
+        var callout =
+          this.resendCallout ||
+          new Callout({
+            message: 'OTP has been resent to your number',
+          });
+
+        this.resendCallout = callout.show();
+
+        window.setTimeout(function() {
+          callout.hide();
+        }, 5000);
+
+        this.autoreadOtp();
 
         CheckoutBridge.relay(
           JSON.stringify({
-            action: 'resend_otp'
+            action: 'resend_otp',
           })
         );
         this.resendCount++;
@@ -285,6 +310,17 @@ magicView.prototype = {
 
     this.track('autoread_otp');
 
+    if (this.otpTimeout) {
+      window.clearTimeout(this.otpTimeout);
+      delete this.otpTimeout;
+    }
+
+    this.otpTimeout = window.setTimeout(function() {
+      if ($('#form-magic-otp').hasClass('waiting')) {
+        self.enterOtp();
+      }
+    }, TIMEOUT_NO_OTP);
+
     if (!this.otpPermission) {
       this.requestOtpPermission(function(info) {
         if (info.granted) {
@@ -295,6 +331,8 @@ magicView.prototype = {
     } else {
       self.showWaitingScreen();
     }
+
+    this.resetLoader();
 
     $('#body').removeClass('sub');
 
@@ -401,6 +439,11 @@ magicView.prototype = {
         this.otpParsed(this.otpData);
       }
 
+      if (this.otpTimeout) {
+        window.clearTimeout(this.otpTimeout);
+        delete this.otpTimeout;
+      }
+
       this.otpTimeout = window.setTimeout(function() {
         self.track('otp_timeout');
         if ($('#form-magic-otp').hasClass('waiting')) {
@@ -410,11 +453,13 @@ magicView.prototype = {
     } else {
       this.enterOtp();
     }
-
-    this.resetLoader();
   },
 
   showWaitingScreen: function() {
+    if ($('#form-magic-otp').hasClass('waiting')) {
+      return;
+    }
+
     $('#form-magic-otp')
       .removeClass('manual')
       .addClass('waiting');
@@ -429,7 +474,7 @@ magicView.prototype = {
   submit: function(screen, data) {
     var relayData = {
       action: this.screenMap[screen],
-      data: data
+      data: data,
     };
 
     if (screen === 'magic-otp') {
@@ -443,7 +488,7 @@ magicView.prototype = {
 
     if (screen === 'magic-choice') {
       this.track('choice', {
-        choice: data['choice']
+        choice: data['choice'],
       });
 
       if (data['choice'] === 'otp') {
@@ -454,5 +499,5 @@ magicView.prototype = {
     if (CheckoutBridge && CheckoutBridge.relay) {
       CheckoutBridge.relay(JSON.stringify(relayData));
     }
-  }
+  },
 };

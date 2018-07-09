@@ -59,7 +59,7 @@ _Func.setPrototype(fetch, {
             json = _.rzpError('Parsing error');
             json.xhr = {
               status: xhr.status,
-              text: xhr.responseText
+              text: xhr.responseText,
             };
           }
           callback(json);
@@ -68,7 +68,7 @@ _Func.setPrototype(fetch, {
       xhr.onerror = function() {
         var resp = _.rzpError('Network error');
         resp.xhr = {
-          status: 0
+          status: 0,
         };
         callback(resp);
       };
@@ -79,13 +79,13 @@ _Func.setPrototype(fetch, {
       |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
 
     xhr.send(data);
-  }
+  },
 });
 
 function normalizeOptions(options) {
   if (_.isString(options)) {
     options = {
-      url: options
+      url: options,
     };
   }
 

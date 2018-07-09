@@ -30,7 +30,8 @@ class WalletWithResume extends RazorpayJsTest {
     await page.evaluate(`document.body.click()`);
 
     await delay(250);
-    await page.evaluate(`razorpay.emit('payment.resume')`);
+
+    page.evaluate(`razorpay.emit('payment.resume')`);
 
     await super.completePayment();
   }

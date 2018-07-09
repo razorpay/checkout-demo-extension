@@ -3,6 +3,7 @@ import * as Tez from './tez';
 import * as cookie from 'lib/cookie';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 import * as Formatter from './formatter';
+import jsonp from 'lib/jsonp';
 
 var pollingInterval;
 
@@ -47,8 +48,10 @@ function onPaymentCancel(metaParam) {
     var cancelError = discreet.error();
     var payment_id = this.payment_id;
     var razorpay = this.r;
+    var eventData = {};
+
     if (payment_id) {
-      Track(razorpay, 'cancel', { payment_id: payment_id });
+      eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
       if (_.isNonNullObject(metaParam)) {
         url += _.obj2query(metaParam);
@@ -65,9 +68,15 @@ function onPaymentCancel(metaParam) {
         },
       });
     } else {
-      Track(razorpay, 'cancel');
       this.complete(cancelError);
     }
+
+    // Set auth_type in case of Debit + PIN.
+    if (this.isDebitPin) {
+      eventData.auth_type = this.debitPinAuthType;
+    }
+
+    Track(razorpay, 'cancel', eventData);
   }
 }
 
@@ -102,6 +111,12 @@ export default function Payment(data, params, r) {
 
   if (r.get('key') !== 'rzp_live_ChO9QOhE7BH1aD') {
     this.isMagicPayment = this.isMagicPayment && Math.random() < 0.1;
+  }
+
+  this.isDebitPin =
+    data.auth_type && (data.auth_type === '3ds' || data.auth_type === 'pin');
+  if (this.isDebitPin) {
+    this.debitPinAuthType = data.auth_type;
   }
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
@@ -324,6 +339,12 @@ Payment.prototype = {
     this.clear();
 
     if (data.razorpay_payment_id) {
+      // Track
+      Track(
+        this.r,
+        'oncomplete',
+        _Obj.clone(data) |> _Obj.setProp('auth_type', this.debitPinAuthType)
+      );
       this.emit('success', data);
     } else {
       var errorObj = data.error;
@@ -841,4 +862,66 @@ Razorpay.sendMessage = function(message) {
     var data = message.data;
     _Doc.submitForm(data.url, data.content, data.method);
   }
+};
+
+/**
+ * JSONP for fetch flows.
+ *
+ * @param {Object} data
+ * @param {Function} callback
+ */
+function getFlowsJsonp(data, callback) {
+  return jsonp({
+    url: makeUrl('payment/flows'),
+    data: data,
+    timeout: 30000,
+    success: function(response) {
+      invoke(callback, null, response);
+    },
+  });
+}
+
+/**
+ * Cache store for flows.
+ */
+var flowCache = {
+  card: {},
+};
+
+/**
+ * Gets the flows associated with a card.
+ * @param {string} cardNumber
+ * @param {Function} callback
+ */
+razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
+  // Sanitize
+  cardNumber = cardNumber.replace(/\D/g, '');
+
+  if (cardNumber.length < 6) {
+    invoke(callback, null, []);
+    return;
+  }
+
+  var iin = cardNumber.slice(0, 6);
+
+  // Check cache.
+  if (typeof flowCache.card[iin] !== 'undefined') {
+    invoke(callback, null, flowCache.card[iin]);
+    return;
+  }
+
+  getFlowsJsonp(
+    {
+      iin: iin,
+      key_id: this.get('key'),
+      '_[source]': Track.props.library || 'razorpayjs',
+    },
+    function(flows) {
+      // Add to cache.
+      flowCache.card[iin] = flows;
+
+      // Invoke callback.
+      invoke(callback, this, flowCache.card[iin]);
+    }
+  );
 };

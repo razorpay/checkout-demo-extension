@@ -15,6 +15,9 @@ var strings = {
 
 var fontTimeout;
 
+// Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
+var defaultAuthTypeRadioVal = '3ds';
+
 /* this === session */
 function handleRelayFn(relayObj) {
   var self = this;
@@ -133,6 +136,11 @@ function onSixDigits(e) {
   var cardType = $('#elem-card .cardtype').attr('cardtype');
   var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
+  var trimmedVal = val.replace(/[\ ]/g, '');
+  var exactSixDigits = trimmedVal.length === 6;
+  var lessThanSixDigits = trimmedVal.length < 6;
+  var moreThanSixDigits = trimmedVal.length > 6;
+
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
 
@@ -176,6 +184,50 @@ function onSixDigits(e) {
     elem_emi.addClass(hiddenClass);
   } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
+  }
+
+  // Debit + PIN stuff.
+  if (exactSixDigits || moreThanSixDigits) {
+    /**
+     * Don't check for flows if the card number
+     * was reduced from 7 digits to 6 digits.
+     */
+    if (trimmedVal.slice(0, 6) !== this.flowIIN) {
+      this.checkFlows(trimmedVal.slice(0, 6));
+    }
+  } else if (lessThanSixDigits) {
+    this.flowIIN = null;
+    showFlowRadioButtons(false);
+  }
+}
+
+/**
+ * Toggles the ATM radio buttons on new card screen.
+ * @param {Boolean} show
+ */
+function showFlowRadioButtons(show) {
+  if (show) {
+    // Unhide
+    $('#add-card-container .flow-selection-container').addClass('drishy');
+
+    // Check default
+    var radio = $('#add-card-container .flow.input-radio #flow-3ds');
+
+    if (radio[0]) {
+      radio[0].checked = true;
+    }
+  } else {
+    // Uncheck values
+    var checked = $(
+      '#add-card-container .flow.input-radio input[type=radio]:checked'
+    );
+
+    if (checked[0]) {
+      checked[0].checked = false;
+    }
+
+    // Hide
+    $('#add-card-container .flow-selection-container').removeClass('drishy');
   }
 }
 
@@ -235,7 +287,11 @@ function hideEmi() {
 
 function hideOverlayMessage() {
   if (!hideEmi()) {
-    hideOverlay($('#error-message'));
+    if ($('#confirmation-dialog').hasClass('animate')) {
+      makeHidden(gel('error-message'));
+    } else {
+      hideOverlay($('#error-message'));
+    }
   }
 }
 
@@ -448,6 +504,18 @@ Session.prototype = {
   params: emo,
 
   track: function(event, extra) {
+    Track(this.r, event, extra);
+  },
+
+  trackDebitPin: function(event, extra) {
+    if (extra) {
+      extra.default_auth_type = defaultAuthTypeRadioVal;
+    } else {
+      extra = {
+        default_auth_type: defaultAuthTypeRadioVal,
+      };
+    }
+
     Track(this.r, event, extra);
   },
 
@@ -864,6 +932,12 @@ Session.prototype = {
         self.modal.hide();
       }, timeLeft);
     }
+
+    // Debit + PIN stuff
+    var cardNumber = this.get('prefill.card[number]');
+    if (cardNumber) {
+      this.checkFlows(cardNumber.replace(/\D/g, '').slice(0, 6), true);
+    }
   },
 
   setTpvBanks: function() {
@@ -931,6 +1005,7 @@ Session.prototype = {
 
   destroyMagic: function() {
     if (this.magicView) {
+      $(this.el).removeClass('magic');
       this.magicView.destroy();
       delete this.magicView;
     }
@@ -1035,7 +1110,8 @@ Session.prototype = {
     }
   },
 
-  hideErrorMessage: function() {
+  hideErrorMessage: function(confirmedCancel) {
+    var self = this;
     if (this.r._payment) {
       if (
         this.payload &&
@@ -1047,6 +1123,22 @@ Session.prototype = {
     }
 
     if (this.r._payment || this.isResumedPayment) {
+      if (confirmedCancel === true) {
+        return this.clearRequest();
+      } else if (this.r._payment.isMagicPayment) {
+        return Confirm.show({
+          message:
+            'Your payment is ongoing. ' +
+            'Are you sure you want to cancel the payment?',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.hideErrorMessage(true);
+          },
+        });
+      }
+
       if (confirmClose()) {
         this.clearRequest();
       } else {
@@ -1398,8 +1490,29 @@ Session.prototype = {
       });
     }
     this.click('#backdrop', this.hideErrorMessage);
-    this.click('#overlay', this.hideErrorMessage);
+    this.click('#overlay', function(e) {
+      if ($('#confirmation-dialog').hasClass('animate')) {
+        return;
+      }
+
+      this.hideErrorMessage(e);
+    });
     this.click('#fd-hide', this.hideErrorMessage);
+
+    // Debit + PIN flow change.
+    this.on('change', '#body', 'auth_type_radio', function(e) {
+      var target = e.target;
+      if (!target) {
+        return;
+      }
+
+      // Check for name.
+      if (target.name && target.name.indexOf('auth_type') === 0) {
+        self.trackDebitPin('flow_option_changed', {
+          flow: target.value || null,
+        });
+      }
+    });
   },
 
   bindIeEvents: function() {
@@ -1688,8 +1801,9 @@ Session.prototype = {
     this.body.toggleClass('sub', showPaybtn);
   },
 
-  back: function() {
+  back: function(confirmedCancel) {
     var tab = '';
+    var self = this;
 
     if (this.get('ecod')) {
       $('#footer').hide();
@@ -1699,11 +1813,21 @@ Session.prototype = {
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
     } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
-      if (confirmClose()) {
+      if (confirmedCancel === true) {
         tab = 'card';
         this.clearRequest();
       } else {
-        return;
+        return Confirm.show({
+          message:
+            'Your payment is ongoing. ' +
+            'Are you sure you want to cancel the payment?',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.back(true);
+          },
+        });
       }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {
@@ -1845,6 +1969,12 @@ Session.prototype = {
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
     }
+
+    // If it's the same card, do nothing.
+    if (e.delegateTarget === $('#saved-cards-container .checked')[0]) {
+      return;
+    }
+
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
     var cardtype = $savedCard.$('.cardtype').attr('cardtype');
@@ -1853,6 +1983,10 @@ Session.prototype = {
       e.target !== $savedCard.find('select[name="emi_duration"]')[0]
     ) {
       $savedCard.$('.saved-cvv').focus();
+    }
+
+    if ($savedCard.$('.flow-selection-container')[0]) {
+      this.trackDebitPin('saved_card_with_flows_selected');
     }
   },
 
@@ -2012,11 +2146,25 @@ Session.prototype = {
       data.method = tab;
       fillData(this.getActiveForm(), data);
 
+      // Delete all the auth_type-* keys
+      each(data, function(key, val) {
+        if (key.indexOf('auth_type-') === 0) {
+          delete data[key];
+        }
+      });
+
       if (this.screen === 'card') {
         if (this.savedCardScreen) {
           var $checkedCard = $('.saved-card.checked');
           data.token = $checkedCard.attr('token');
           data['card[cvv]'] = $checkedCard.$('.saved-cvv').val();
+
+          // Set auth_type for Debit+PIN for saved cards.
+          var authType = $checkedCard.$('.flow.input-radio input:checked');
+          authType = authType[0] && authType.val();
+          if (authType) {
+            data['auth_type'] = authType;
+          }
         } else {
           if (tab === 'emi') {
             data.emi_duration = $('#elem-emi .input').val();
@@ -2043,8 +2191,25 @@ Session.prototype = {
     return data;
   },
 
-  hide: function() {
+  hide: function(confirmedCancel) {
+    var self = this;
     if (this.isOpen) {
+      if (
+        confirmedCancel !== true &&
+        this.r._payment &&
+        this.r._payment.isMagicPayment
+      ) {
+        return Confirm.show({
+          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          heading: 'Cancel Payment?',
+          positiveBtnTxt: 'Yes, cancel',
+          negativeBtnTxt: 'No',
+          onPositiveClick: function() {
+            self.close(true);
+          },
+        });
+      }
+
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
@@ -2439,6 +2604,7 @@ Session.prototype = {
       that.showLoadError('Please wait while we fetch your transaction details');
 
       if (that.r._payment && that.r._payment.isMagicPayment) {
+        sub_link.html('View bank page');
         sub_link[0].style = '';
         sub_link.on('click', function() {
           if (that.magicView) {
@@ -2547,6 +2713,7 @@ Session.prototype = {
       this.prefCall.abort();
       this.prefCall = null;
     }
+
     if (this.isOpen) {
       abortAjax(this.ajax);
       this.clearRequest();
@@ -2583,6 +2750,37 @@ Session.prototype = {
       this.data = this.getFormData();
       this.close();
     }
+  },
+
+  checkFlows: function(iin, isPrefilledCardNumber) {
+    // Hide and uncheck checkboxes.
+    showFlowRadioButtons(false);
+
+    var self = this;
+
+    this.flowIIN = iin;
+
+    this.r.getCardFlows(iin, function(flows) {
+      self.trackDebitPin('flow_opts_fetched', {
+        iin: iin,
+        prefilled_card: isPrefilledCardNumber || null,
+      });
+
+      // Sanity-check
+      if (self.flowIIN !== iin) {
+        return;
+      }
+
+      if (flows && flows.pin) {
+        self.trackDebitPin('flow_opts_shown', {
+          iin: iin,
+          prefilled_card: isPrefilledCardNumber || null,
+        });
+        showFlowRadioButtons(true);
+      } else {
+        showFlowRadioButtons(false);
+      }
+    });
   },
 };
 

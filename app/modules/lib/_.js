@@ -107,6 +107,11 @@ export function throwMessage(message) {
 export const isBase64Image = src => /data:image\/[^;]+;base64/.test(src);
 
 export function obj2query(obj) {
+  // Sanity Check
+  if (!isNonNullObject(obj)) {
+    return '';
+  }
+
   const objKeys = Object.keys(obj);
   const serializedArray = Array(lengthOf(objKeys));
 

@@ -1,14 +1,18 @@
 @require 'common';
 
-$cardh = 46px;
-$opencardh = 92px;
+$cardHeights = {
+  default: 46px,
+  open: 92px,
+  debitPin: 110px,
+  debitPinMaestro: 142px
+};
 $savedcontainerh = 220px;
 $cardpl = 70px;
 
 .left-card {
   display: none;
   padding: 0 20px 0 $cardpl;
-  height: $cardh;
+  height: $cardHeights['default'];
   left: 0;
   right: 0;
 }
@@ -21,7 +25,7 @@ $cardpl = 70px;
 }
 
 #show-saved-cards {
-  line-height: $cardh;
+  line-height: $cardHeights['default'];
   display: none;
   cursor: pointer;
   position: absolute;
@@ -67,16 +71,33 @@ $cardpl = 70px;
     }
 
     .saved-card {
-      height: $opencardh;
-      max-height: $cardh;
+      height: $cardHeights['open'];
+      max-height: $cardHeights['default'];
+      overflow: hidden;
       z-index: 2;
       pointer-events: all;
 
       &[emi].checked, &[maestro].checked {
-        max-height: $opencardh;
+        max-height: $cardHeights['open'];
 
         .elem-savedcards-emi {
           display: block;
+        }
+      }
+
+      &[pin] {
+        &.checked {
+          height: $cardHeights['debitPin'];
+          max-height: $cardHeights['debitPin'];
+          overflow: hidden;
+          .flow-selection-container {
+            display: block;
+          }
+
+          &[maestro] {
+            height: $cardHeights['debitPinMaestro'];
+            max-height: $cardHeights['debitPinMaestro'];
+          }
         }
       }
 
@@ -138,6 +159,54 @@ $cardpl = 70px;
   height: 166px;
   z-index: 2;
   position: relative;
+
+  .card-fields {
+    .elem-wrap {
+      height: auto;
+      margin-bottom: 8px;
+
+      &:nth-last-child(1),
+      &:nth-last-child(2) {
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  .elem {
+    label {
+      top: 24px;
+    }
+    .input {
+      padding: 24px 0 4px 0;
+    }
+  }
+
+  .flow-selection-container {
+    &:not(.drishy) {
+      opacity: 0;
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    transition: all 0.15s ease-in;
+    width: 100%;
+    margin-top: 16px;
+
+    &>label {
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.64);
+      font-size: 12px;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .flow {
+      display: inline-block;
+      width: 49%;
+    }
+  }
 }
 
 .saved-card {
@@ -164,6 +233,19 @@ $cardpl = 70px;
       margin-bottom: 0;
     }
   }
+
+  .flow-selection-container {
+    display: none;
+    padding-bottom: 8px;
+    .flow {
+      &:not(:last-child) {
+        margin: 4px 0;
+      }
+      &:last-child {
+        margin-top: 4px
+      }
+    }
+  }
 }
 
 .saved-inner {
@@ -182,8 +264,8 @@ $cardpl = 70px;
 #saved-cards-container {
   display: none;
   position: relative;
-  line-height: $cardh;
-  min-height: $cardh;
+  line-height: $cardHeights['default'];
+  min-height: $cardHeights['default'];
   padding-bottom: 1px;
   max-height: $savedcontainerh;
 
@@ -249,7 +331,7 @@ $cardpl = 70px;
 #show-add-card {
   transition: 0.2s;
   cursor: pointer;
-  line-height: $cardh;
+  line-height: $cardHeights['default'];
   position: absolute;
   z-index: 1;
   opacity: 0;

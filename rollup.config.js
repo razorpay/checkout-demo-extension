@@ -10,7 +10,10 @@ const modules = {
   'lib/jsonp': 'jsonp',
   'lib/upi': 'UPIUtils',
   formatter: 'Formatter',
+  confirm: 'Confirm',
+  callout: 'Callout',
   'common/currency': 'Currency',
+  'lib/_': '_',
   tracker: 'Track',
 };
 

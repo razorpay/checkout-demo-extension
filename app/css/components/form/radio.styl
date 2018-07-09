@@ -1,0 +1,59 @@
+.input-radio
+  position: relative;
+
+  input[type="radio"]
+    position: absolute;
+    opacity: 0;
+    display: unset;
+
+    &:checked
+      &+ label
+        background: none !important;
+        .radio-display
+          &::after
+            border-color: #fff;
+  label
+    display: block;
+    position: relative;
+    cursor: pointer;
+
+    .radio-display
+      content: '';
+      display: inline-block;
+      vertical-align: middle;
+      position: absolute;
+      width: 16px;
+      height: @width;
+      cursor: pointer;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #ccc;
+      transition: 0.2s;
+
+      &::after
+        content: "";
+        position: absolute;
+        width: 4px;
+        height: 9px;
+        top: 2px
+        left: 6px;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-left: none;
+        transition: 0.2s;
+        transform: rotate(40deg);
+
+    .label-content
+      padding: 4px 0px 4px 24px;
+      line-height: 16px;
+
+  &.centered
+    label
+      .radio-display
+        top: 50%;
+        transform: translateY(-50%);
+
+  &:not(.centered)
+    label
+      .radio-display
+        top: 3px;
