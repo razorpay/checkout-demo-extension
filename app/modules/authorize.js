@@ -261,7 +261,7 @@ Payment.prototype = {
       data['_[shield][fhash]'] = fingerprint;
     }
 
-    data['_[shield][tz]'] = new Date().getTimezoneOffset();
+    data['_[shield][tz]'] = -(new Date().getTimezoneOffset());
 
     // flatten notes, card
     // notes.abc -> notes[abc]
