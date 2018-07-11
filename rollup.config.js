@@ -4,7 +4,7 @@ const modules = {
   eventer: 'Eventer',
   evthandler: 'EvtHandler',
   popup: 'Popup',
-  authorize: 'Payment',
+  'payment/index': 'Payment',
   tez: 'Tez',
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
