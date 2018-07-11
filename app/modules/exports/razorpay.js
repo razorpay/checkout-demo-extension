@@ -1,7 +1,3 @@
-import { FormatDelegator } from './formatter';
-
-Razorpay.setFormatter = FormatDelegator;
-
 razorpayPayment.authorize = function(options) {
   var r = Razorpay({ amount: options.data.amount }).createPayment(options.data);
   r.on('payment.success', options.success);

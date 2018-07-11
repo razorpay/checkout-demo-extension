@@ -1,12 +1,14 @@
-import * as cookie from 'lib/cookie';
 import {
   processPaymentCreate,
   processCoproto,
   processOtpResponse,
 } from 'payment/coproto';
+
+import * as cookie from 'lib/cookie';
 import Track from 'tracker';
 
 import { formatPayment } from 'payment/validator';
+import { FormatDelegator } from 'formatter';
 
 import jsonp from 'lib/jsonp';
 
@@ -416,6 +418,8 @@ function onMessage(e) {
 function makeRedirectUrl(fees) {
   return makeUrl('payments/create/' + (fees ? 'fees' : 'checkout'));
 }
+
+Razorpay.setFormatter = FormatDelegator;
 
 var razorpayProto = Razorpay.prototype;
 

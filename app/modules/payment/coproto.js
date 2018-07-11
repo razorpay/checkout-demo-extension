@@ -30,26 +30,26 @@ export const processPaymentCreate = function(response) {
   }
 
   // if ajax call is blocked by ghostery or some other reason, fall back to redirection in popup
-  var errorResponse = response.error;
-  if (errorResponse && response.xhr && response.xhr.status === 0) {
+  if (response.error && response.xhr && response.xhr.status === 0) {
     payment.trySubmit();
     return Track(payment.r, 'no_popup');
   }
 
-  if (response.razorpay_payment_id || errorResponse) {
-    payment.complete(response);
-  } else {
-    processCoproto.call(payment, response);
-  }
+  processCoproto.call(payment, response);
 };
 
+// returns true if coproto handled
 export const processCoproto = function(response) {
-  var func = responseTypes[response.type];
-  var isFunction = _.isFunction(func);
-  if (isFunction) {
-    func.call(this, response.request, response);
+  if (response.razorpay_payment_id || response.error) {
+    this.complete(response);
+  } else {
+    var func = responseTypes[response.type];
+    var isFunction = _.isFunction(func);
+    if (isFunction) {
+      func.call(this, response.request, response);
+    }
+    return isFunction;
   }
-  return isFunction;
 };
 
 var responseTypes = {
