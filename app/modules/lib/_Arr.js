@@ -20,6 +20,23 @@ export const contains = _.curry2(
   (array, member) => indexOf(array, member) >= 0
 );
 
+export const findIndex = _.curry2((arr, iteratee) => {
+  let arrayLen = _.lengthOf(arr);
+  for (let i = 0; i < arrayLen; i++) {
+    if (iteratee(arr[i], i, arr)) {
+      return i;
+    }
+  }
+  return -1;
+});
+
+export const find = _.curry2((arr, iteratee) => {
+  let index = findIndex(arr, iteratee);
+  if (index > 0) {
+    return arr[index];
+  }
+});
+
 export const prepend = _.curry2((array, member) => {
   const newArray = Array(_.lengthOf(array) + 1);
   newArray[0] = member;
