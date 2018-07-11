@@ -2,6 +2,19 @@ import * as Tez from './tez';
 import Track from 'tracker';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 
+export const processOtpResponse = function(response) {
+  var error = response.error;
+  if (error) {
+    if (error.action === 'RETRY') {
+      return this.emit('otp.required', discreet.msg.wrongotp);
+    } else if (error.action === 'TOPUP') {
+      return this.emit('wallet.topup', error.description);
+    }
+    this.complete(response);
+  }
+  processCoproto.call(this, response);
+};
+
 export const processPaymentCreate = function(response) {
   var payment = this;
 

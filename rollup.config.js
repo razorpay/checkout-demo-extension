@@ -15,6 +15,7 @@ const modules = {
   'common/currency': 'Currency',
   'lib/_': '_',
   tracker: 'Track',
+  'exports/razorpay': 'Razorpay',
 };
 
 function getOptions(module) {
