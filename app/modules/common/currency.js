@@ -1,6 +1,6 @@
 export const currencies = {
   INR: '₹',
-  USD: '$'
+  USD: '$',
 };
 
 export const displayCurrencies = {
@@ -161,7 +161,7 @@ export const displayCurrencies = {
   VND: '&#x20ab;',
   YER: '&#xfdfc;',
   ZMK: 'ZK',
-  ZWL: 'Z$'
+  ZWL: 'Z$',
 };
 
 const formats = {
@@ -174,7 +174,7 @@ const formats = {
 
   JPY: function(amount) {
     return String(amount).replace(/(.{1,3})(?=(...)+$)/g, '$1,');
-  }
+  },
 };
 
 const defaultFormat = function(amount) {

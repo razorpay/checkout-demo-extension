@@ -1,6 +1,7 @@
 import getFingerprint from './fingerprint';
 import * as Tez from './tez';
 import * as cookie from 'lib/cookie';
+import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 import * as Formatter from './formatter';
 import jsonp from 'lib/jsonp';
 
@@ -613,6 +614,7 @@ var responseTypes = {
     }).till(response => response && response.status);
 
     this.emit('upi.pending', fullResponse.data);
+    this.emit('upi.coproto_response', request);
   },
 
   tez: function(coprotoRequest, fullResponse) {
@@ -635,7 +637,6 @@ var responseTypes = {
 
   intent: function(request, fullResponse) {
     var self = this;
-    var url = request.url;
 
     var upiBackCancel = {
       '_[method]': 'upi',
@@ -653,36 +654,15 @@ var responseTypes = {
 
     var intent_url = (fullResponse.data || {}).intent_url;
     this.on('upi.intent_response', function(data) {
-      if (isEmptyObject(data)) {
-        return self.emit('cancel', upiBackCancel);
-      } else if (data.response) {
-        var response = {};
+      const didIntentSucceed =
+        data |> parseUPIIntentResponse |> didUPIIntentSucceed;
 
-        if (_.isNonNullObject(data.response)) {
-          response = data.response;
-        } else {
-          // Convert the string response into a JSON object.
-          var split = data.response.split('&');
-          for (var i = 0; i < split.length; i++) {
-            var pair = split[i].split('=');
-            if (
-              pair[1] === '' ||
-              pair[1] === 'undefined' ||
-              pair[1] === 'null'
-            ) {
-              response[pair[0]] = null;
-            } else {
-              response[pair[0]] = pair[1];
-            }
-          }
-        }
-
-        if (!response.txnId) {
-          return self.emit('cancel', upiBackCancel);
-        }
-      } else {
+      if (didIntentSucceed) {
         self.emit('upi.pending', { flow: 'upi-intent', response: data });
+      } else {
+        return self.emit('cancel', upiBackCancel);
       }
+
       self.ajax = ra();
     });
 

@@ -25,7 +25,7 @@ puppeteer
   .launch({
     executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
     args: ['--no-sandbox'],
-    headless: !singleTest
+    headless: !singleTest,
     // devtools: true,
   })
   .then(browser => {

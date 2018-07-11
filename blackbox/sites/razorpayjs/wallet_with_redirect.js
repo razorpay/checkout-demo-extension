@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => WalletWithRedirect.test(browser)
+  test: browser => WalletWithRedirect.test(browser),
 };
 
 class WalletWithRedirect extends RazorpayJsTest {
@@ -14,12 +14,12 @@ class WalletWithRedirect extends RazorpayJsTest {
       key: 'm1key',
       amount: 100,
       redirect: true,
-      callback_url: '/callback_url'
+      callback_url: '/callback_url',
     });
 
     await this.createPayment({
       method: 'wallet',
-      wallet: 'mobikwik'
+      wallet: 'mobikwik',
     });
 
     await delay(250);

@@ -6,9 +6,9 @@ module.exports = {
     NewCard.test(browser, {
       options: {
         key: 'm1key',
-        remember_customer: false
-      }
-    })
+        remember_customer: false,
+      },
+    }),
 };
 
 class NewCard extends CheckoutFrameTest {

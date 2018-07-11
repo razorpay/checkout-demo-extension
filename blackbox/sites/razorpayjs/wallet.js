@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => Wallet.test(browser)
+  test: browser => Wallet.test(browser),
 };
 
 class Wallet extends RazorpayJsTest {
@@ -13,12 +13,12 @@ class Wallet extends RazorpayJsTest {
       contact: '9999999999',
       email: 'void@razorpay.com',
       key: 'm1key',
-      amount: 100
+      amount: 100,
     });
 
     await this.createPayment({
       method: 'wallet',
-      wallet: 'mobikwik'
+      wallet: 'mobikwik',
     });
 
     await delay(250);

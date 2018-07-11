@@ -9,7 +9,8 @@ var preferences = window.preferences,
   _uid = Track.id;
 
 var UPI_POLL_URL = 'rzp_upi_payment_poll_url',
-  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
+  PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp',
+  MINUTES_TO_WAIT_FOR_PENDING_PAYMENT = 10;
 
 var contactPattern = /^\+?[0-9]{8,15}$/;
 var emailPattern = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
@@ -841,6 +842,22 @@ window.upiIntentResponse = function(data) {
 
   if (session.r._payment && session.upi_intents_data) {
     session.r.emit('payment.upi.intent_response', data);
+  } else if (session.activity_recreated) {
+    /**
+     * If the activity is recreated and UPI Intent flow was used,
+     * this method will be invoked when SDK wants to send Intent response.
+     *
+     * We parse the response, and if the txn did not suceed (user cancelled or other reasons),
+     * we tell the user that the payment was not completed.
+     */
+
+    var parsedResponse = UPIUtils.parseUPIIntentResponse(data);
+    var successfulTxn = UPIUtils.didUPIIntentSucceed(parsedResponse);
+
+    if (!successfulTxn) {
+      session.r.emit('activity_recreated_upi_intent_back_btn');
+      session.recievedUPIIntentRespOnBackBtn = true;
+    }
   }
 };
 
@@ -931,6 +948,8 @@ window.handleMessage = function(message) {
   session.magic = message.magic;
 
   session.ua_Android = ua_Android;
+
+  session.activity_recreated = message.activity_recreated;
 
   if (message.device_token) {
     qpmap.device_token = message.device_token;

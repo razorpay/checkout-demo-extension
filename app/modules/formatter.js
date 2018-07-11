@@ -41,7 +41,7 @@ Formatter.events = {
   input: 'deferFormat',
   change: 'format',
   blur: 'format',
-  keydown: 'backFormat'
+  keydown: 'backFormat',
 };
 
 Formatter.rules = {
@@ -70,7 +70,7 @@ Formatter.rules = {
       let o = {
         type: this.currentType,
         maxLen: this.maxLen,
-        valid: this.isValid()
+        valid: this.isValid(),
       };
       if (o.type !== this.type) {
         this.type = o.type;
@@ -90,11 +90,11 @@ Formatter.rules = {
         return true;
       }
       return value.length === this.maxLen;
-    }
+    },
   },
 
   alphanumeric: {
-    raw: alphanumericRaw
+    raw: alphanumericRaw,
   },
 
   aadhaar: {
@@ -105,7 +105,7 @@ Formatter.rules = {
         prettyValue = prettyValue.trim();
       }
       return prettyValue;
-    }
+    },
   },
 
   ifsc: {
@@ -123,7 +123,7 @@ Formatter.rules = {
         return /^[a-zA-Z]{4}[a-zA-Z0-9]{7}$/.test(this.value);
       }
       return false;
-    }
+    },
   },
 
   expiry: {
@@ -142,7 +142,7 @@ Formatter.rules = {
 
     oninput: function() {
       this.emit('change', {
-        valid: this.isValid()
+        valid: this.isValid(),
       });
     },
 
@@ -156,7 +156,7 @@ Formatter.rules = {
         }
         return yearValue > currentYear;
       }
-    }
+    },
   },
 
   number: {
@@ -166,7 +166,7 @@ Formatter.rules = {
         returnVal = _Str.slice(returnVal, 0, this.el.maxLength);
       }
       return returnVal;
-    }
+    },
   },
 
   amount: {
@@ -184,7 +184,7 @@ Formatter.rules = {
         .join('.');
     },
 
-    pretty: _Func.noop
+    pretty: _Func.noop,
   },
 
   phone: {
@@ -194,8 +194,8 @@ Formatter.rules = {
         returnVal = '+' + returnVal;
       }
       return returnVal;
-    }
-  }
+    },
+  },
 };
 
 let formatterProto = (Formatter.prototype = new Eventer());
@@ -220,7 +220,7 @@ formatterProto.backFormat = function(e) {
   this.run({
     e: e,
     left: left,
-    value: left + _Str.sliceFrom(value, caret.end)
+    value: left + _Str.sliceFrom(value, caret.end),
   });
 };
 
@@ -250,7 +250,7 @@ formatterProto.fwdFormat = function(e) {
   this.run({
     e: e,
     left: left,
-    value: value
+    value: value,
   });
 };
 
@@ -264,7 +264,7 @@ formatterProto.format = function(e) {
 
   this.run({
     value: value,
-    left: _Str.slice(value, 0, caretPosition)
+    left: _Str.slice(value, 0, caretPosition),
   });
 };
 
@@ -389,7 +389,7 @@ formatterProto.getCaret = function() {
   }
   return {
     start: caretPosition,
-    end: caretEnd
+    end: caretEnd,
   };
 };
 

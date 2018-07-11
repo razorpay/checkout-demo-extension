@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => Card.test(browser)
+  test: browser => Card.test(browser),
 };
 
 class Card extends RazorpayJsTest {
@@ -13,7 +13,7 @@ class Card extends RazorpayJsTest {
       contact: '9999999999',
       email: 'void@razorpay.com',
       key: 'm1key',
-      amount: 100
+      amount: 100,
     });
 
     await this.createPayment({
@@ -22,7 +22,7 @@ class Card extends RazorpayJsTest {
       'card[name]': 'test',
       'card[expiry_month]': '12',
       'card[expiry_year]': '32',
-      'card[expiry_cvv]': '000'
+      'card[expiry_cvv]': '000',
     });
 
     await delay(250);

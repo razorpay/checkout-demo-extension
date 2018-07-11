@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => NetbankingWithRedirect.test(browser)
+  test: browser => NetbankingWithRedirect.test(browser),
 };
 
 class NetbankingWithRedirect extends RazorpayJsTest {
@@ -14,12 +14,12 @@ class NetbankingWithRedirect extends RazorpayJsTest {
       key: 'm1key',
       amount: 100,
       redirect: true,
-      callback_url: '/callback_url'
+      callback_url: '/callback_url',
     });
 
     await this.createPayment({
       method: 'netbanking',
-      wallet: 'HDFC'
+      wallet: 'HDFC',
     });
 
     await delay(250);
