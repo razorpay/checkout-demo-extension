@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => CardWithRedirect.test(browser)
+  test: browser => CardWithRedirect.test(browser),
 };
 
 class CardWithRedirect extends RazorpayJsTest {
@@ -14,7 +14,7 @@ class CardWithRedirect extends RazorpayJsTest {
       key: 'm1key',
       amount: 100,
       redirect: true,
-      callback_url: '/callback_url'
+      callback_url: '/callback_url',
     });
 
     await this.createPayment({
@@ -23,7 +23,7 @@ class CardWithRedirect extends RazorpayJsTest {
       'card[name]': 'test',
       'card[expiry_month]': '12',
       'card[expiry_year]': '32',
-      'card[expiry_cvv]': '000'
+      'card[expiry_cvv]': '000',
     });
 
     await delay(250);

@@ -28,6 +28,7 @@ _Func.setPrototype(fetch, {
         }
       });
     }, 3e3);
+    return this;
   },
 
   abort: function() {

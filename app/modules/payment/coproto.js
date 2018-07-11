@@ -1,5 +1,6 @@
 import * as Tez from './tez';
 import Track from 'tracker';
+import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 
 export const processPaymentCreate = function(response) {
   var payment = this;
@@ -120,8 +121,6 @@ var responseTypes = {
   },
 
   intent: function(request, fullResponse) {
-    var url = request.url;
-
     var upiBackCancel = {
       '_[method]': 'upi',
       '_[flow]': 'intent',
@@ -139,36 +138,15 @@ var responseTypes = {
     var intent_url = (fullResponse.data || {}).intent_url;
 
     this.on('upi.intent_response', data => {
-      if (_Obj.isEmpty(data)) {
-        return this.emit('cancel', upiBackCancel);
-      } else if (data.response) {
-        var response = {};
+      const didIntentSucceed =
+        data |> parseUPIIntentResponse |> didUPIIntentSucceed;
 
-        if (_.isNonNullObject(data.response)) {
-          response = data.response;
-        } else {
-          // Convert the string response into a JSON object.
-          var split = data.response.split('&');
-          for (var i = 0; i < split.length; i++) {
-            var pair = split[i].split('=');
-            if (
-              pair[1] === '' ||
-              pair[1] === 'undefined' ||
-              pair[1] === 'null'
-            ) {
-              response[pair[0]] = null;
-            } else {
-              response[pair[0]] = pair[1];
-            }
-          }
-        }
-
-        if (!response.txnId) {
-          return this.emit('cancel', upiBackCancel);
-        }
-      } else {
+      if (didIntentSucceed) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
+      } else {
+        return this.emit('cancel', upiBackCancel);
       }
+
       this.ajax = ra();
     });
 

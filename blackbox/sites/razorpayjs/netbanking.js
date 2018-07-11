@@ -2,7 +2,7 @@ const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
-  test: browser => Netbanking.test(browser)
+  test: browser => Netbanking.test(browser),
 };
 
 class Netbanking extends RazorpayJsTest {
@@ -13,12 +13,12 @@ class Netbanking extends RazorpayJsTest {
       contact: '9999999999',
       email: 'void@razorpay.com',
       key: 'm1key',
-      amount: 100
+      amount: 100,
     });
 
     await this.createPayment({
       method: 'netbanking',
-      wallet: 'HDFC'
+      wallet: 'HDFC',
     });
 
     await delay(250);

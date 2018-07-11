@@ -17,8 +17,8 @@ const coveragePlugin = coverage({
   noAutoWrap: true,
   include: 'app/modules/**/*.js',
   instrumenterConfig: {
-    embedSource: true
-  }
+    embedSource: true,
+  },
 });
 
 let testCount = 0;
@@ -42,7 +42,7 @@ Promise.all(
           .then(bundle =>
             bundle.generate({
               format: 'iife',
-              name: 'test'
+              name: 'test',
             })
           )
           .then(async ({ code }) => {
@@ -54,7 +54,7 @@ Promise.all(
 
             const browser = await puppeteer.launch({
               executablePath: env.CHROME_BIN || '/usr/bin/chromium',
-              args: ['--no-sandbox']
+              args: ['--no-sandbox'],
               // headless: false,
               // devtools: true,
             });

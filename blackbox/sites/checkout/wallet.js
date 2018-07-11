@@ -9,10 +9,10 @@ module.exports = {
         prefill: {
           contact: '9999999999',
           email: 'void@razorpay.com',
-          method: 'wallet'
-        }
-      }
-    })
+          method: 'wallet',
+        },
+      },
+    }),
 };
 
 class PowerWallet extends CheckoutFrameTest {

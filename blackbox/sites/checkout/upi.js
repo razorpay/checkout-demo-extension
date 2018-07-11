@@ -11,10 +11,10 @@ module.exports = {
         prefill: {
           contact: '9999999999',
           email: 'void@razorpay.com',
-          method: 'upi'
-        }
-      }
-    })
+          method: 'upi',
+        },
+      },
+    }),
 };
 
 class UpiCollect extends CheckoutFrameTest {

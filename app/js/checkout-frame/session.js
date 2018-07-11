@@ -764,13 +764,28 @@ Session.prototype = {
       pendingPaymentTimestamp = StorageBridge.getString(PENDING_PAYMENT_TS);
       pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
+      // "activity_recreated" was passed as true.
+      var isActivityRecreated = self.activity_recreated;
+
       if (pendingPaymentTimestamp) {
-        /* if pending payment is older than 0 minutes clear the polling url */
-        if (now() - pendingPaymentTimestamp > 0) {
-          StorageBridge.setString(UPI_POLL_URL, '');
-          StorageBridge.setString(PENDING_PAYMENT_TS, '0');
-        } else {
+        /**
+         * If the payment is pending, and is NOT older than
+         * MINUTES_TO_WAIT_FOR_PENDING_PAYMENT number of minutes,
+         * AND, isActivityRecreated is true, get pollUrl.
+         *
+         * Otherwise, clear it.
+         */
+        if (
+          isActivityRecreated &&
+          now() - pendingPaymentTimestamp <=
+            MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
+        ) {
           pollUrl = StorageBridge.getString(UPI_POLL_URL);
+        } else {
+          var params = {};
+          params[UPI_POLL_URL] = '';
+          params[PENDING_PAYMENT_TS] = '0';
+          this.setParamsInStorage(params);
         }
       }
 
@@ -800,8 +815,35 @@ Session.prototype = {
         }).till(function(response) {
           return response && response.status;
         });
+
+        var abortPaymentOnUPIIntentFailure = function() {
+          self.ajax.abort();
+          self.showLoadError('Payment did not complete.', true);
+          self.clearRequest({
+            '_[method]': 'upi',
+            '_[flow]': 'intent',
+            '_[reason]': 'UPI_INTENT_BACK_BUTTON',
+          });
+        };
+
+        // Show error and clear request when back is pressed from PSP UPI App
+        if (this.recievedUPIIntentRespOnBackBtn) {
+          abortPaymentOnUPIIntentFailure();
+        } else {
+          this.r.once('activity_recreated_upi_intent_back_btn', function() {
+            abortPaymentOnUPIIntentFailure();
+          });
+        }
       }
     } catch (e) {}
+  },
+
+  setParamsInStorage: function(params) {
+    each(params, function(key, val) {
+      try {
+        StorageBridge.setString(key, val);
+      } catch (e) {}
+    });
   },
 
   setWhatsappIcon: function() {
@@ -1306,6 +1348,9 @@ Session.prototype = {
     var enabledMethods = this.methods;
     if (enabledMethods.card || enabledMethods.emi) {
       this.on('keyup', '#card_number', onSixDigits);
+      // Also listen for paste.
+      this.on('blur', '#card_number', onSixDigits);
+
       this.on('change', '#nocvv', noCvvToggle);
 
       var saveTick = qs('#save');
@@ -2300,10 +2345,10 @@ Session.prototype = {
 
     this.isResumedPayment = false;
 
-    try {
-      StorageBridge.setString(PENDING_PAYMENT_TS, '0');
-      StorageBridge.setString(UPI_POLL_URL, '');
-    } catch (e) {}
+    var params = {};
+    params[UPI_POLL_URL] = '';
+    params[PENDING_PAYMENT_TS] = '0';
+    this.setParamsInStorage(params);
 
     abortAjax(this.ajax);
 
@@ -2626,10 +2671,10 @@ Session.prototype = {
       });
 
       this.r.on('payment.upi.coproto_response', function(request) {
-        try {
-          StorageBridge.setString(PENDING_PAYMENT_TS, now() + '');
-          StorageBridge.setString(UPI_POLL_URL, request.url);
-        } catch (e) {}
+        var params = {};
+        params[UPI_POLL_URL] = request.url;
+        params[PENDING_PAYMENT_TS] = now() + '';
+        that.setParamsInStorage(params);
       });
 
       this.r.on('payment.upi.pending', function(data) {

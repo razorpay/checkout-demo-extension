@@ -50,10 +50,10 @@ class CheckoutFrameTest extends TestBase {
 
   async loadScripts() {
     await this.page.addScriptTag({
-      url: 'file://' + __dirname + '/../../app/dist/v1/checkout-frame.js'
+      url: 'file://' + __dirname + '/../../app/dist/v1/checkout-frame.js',
     });
     await this.page.addStyleTag({
-      url: 'file://' + __dirname + '/../../app/dist/v1/css/checkout.css'
+      url: 'file://' + __dirname + '/../../app/dist/v1/css/checkout.css',
     });
   }
 }
