@@ -848,14 +848,22 @@ Session.prototype = {
 
   setWhatsappIcon: function() {
     var intentsData = this.upi_intents_data;
-    var whatsappObj;
+    var whatsappObj, paytmObj;
 
     if (isArray(intentsData)) {
       whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
+      paytmObj = findBy(intentsData, 'package_name', 'net.one97.paytm');
     }
 
-    if (whatsappObj && !whatsappObj.app_icon) {
-      whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
+    if (whatsappObj) {
+      if (!whatsappObj.app_icon) {
+        whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
+      }
+      whatsappObj.app_name = 'WhatsApp UPI';
+    }
+
+    if (paytmObj) {
+      paytmObj.app_name = 'Paytm UPI';
     }
   },
 
