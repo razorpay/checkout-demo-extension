@@ -14,6 +14,7 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
 var invoice = _.invoice;
+var walletsDesc = _.walletsDesc;
 
 var bank = _.tpvBank || {};
 
@@ -294,7 +295,7 @@ var upi_apps = _.upi_intents_data;
                       <label>
                         <i>&#xe60b;</i>
                         `=_.tab_titles.wallet`
-                        <span class="desc">Freecharge, Mobikwik, Airtelmoney &amp; More</span>
+                        <span class="desc">`=walletsDesc`</span>
                       </label>
                     </div>
                     `?`
