@@ -615,7 +615,7 @@ function Session(options) {
     ),
     secondaryHighlightColor = hoverStateColor;
 
-  this.themeMeta = {
+  this.r.themeMeta = this.themeMeta = {
     color: themeColor,
     textColor: isThemeColorDark ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
     highlightColor: highlightColor,
