@@ -20,7 +20,7 @@ const canvas = document.createElement('canvas'),
  * @param   Number  b       The blue color value
  * @return  Array           The HSV representation
  */
-function rgbToHsb(r, g, b) {
+export const rgbToHsb = (r, g, b) => {
   (r /= 255), (g /= 255), (b /= 255);
 
   var max = Math.max(r, g, b),
@@ -51,7 +51,7 @@ function rgbToHsb(r, g, b) {
   }
 
   return { hue: h, saturation: s, brightness: v };
-}
+};
 
 /**
  * Converts an HSV color value to RGB. Conversion formula
@@ -122,10 +122,23 @@ export const getColorProperties = (colorCache => {
       red,
       green,
       blue,
-      alpha
+      alpha,
     };
 
     return (colorCache[color] = colorProps);
+  };
+})({});
+
+export const getHSB = (colorCache => {
+  return color => {
+    if (colorCache[color]) {
+      return colorCache[color];
+    }
+
+    const rgb = getColorProperties(color),
+      hsb = rgbToHsb(rgb.red, rgb.green, rgb.blue);
+
+    return (colorCache[color] = hsb);
   };
 })({});
 
@@ -155,6 +168,12 @@ export const isDark = color => {
 
   // tested , and found black text would look good on values < 0.5
   return relativeLuminosity < 0.5;
+};
+
+export const transparentify = (color, alphaPercentage = 0) => {
+  const { red, green, blue, alpha } = getColorProperties(color);
+
+  return `rgba(${red},${green},${blue},${alphaPercentage / 100})`;
 };
 
 export const brighten = (color, brightenPercentage) => {

@@ -5,6 +5,9 @@ var themeMeta = arguments[1];
 var c = themeMeta.color;
 var textColor = themeMeta.textColor;
 var highlightColor = themeMeta.highlightColor;
+var secondaryHighlightColor = themeMeta.secondaryHighlightColor;
+var hoverStateColor = themeMeta.hoverStateColor;
+var activeStateColor = themeMeta.activeStateColor;
 `
 
 `?_('theme.upi_only')`
@@ -27,7 +30,7 @@ var highlightColor = themeMeta.highlightColor;
 
 .spin div, .link
 {
-  border-color: `=c`!important;
+  border-color: `=highlightColor`!important;
 }
 
 #payment-options i,
@@ -88,6 +91,14 @@ color: `=c`;
   color: `=highlightColor`;
 }
 
+#topbar, #partial-back {
+  background-color: `=secondaryHighlightColor` !important;
+}
+
+.grid label:hover {
+  background-color: `=hoverStateColor` !important;
+}
+
 `?!close`
 #modal-close{
   display: none;
@@ -95,6 +106,7 @@ color: `=c`;
 `?`
 
 .grid :checked+label {
+  background-color: `=activeStateColor` !important;
   border-bottom: 2px solid `=highlightColor`;
 }
 

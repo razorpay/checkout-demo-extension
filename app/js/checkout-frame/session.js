@@ -13,6 +13,9 @@ var strings = {
   otp_resent: 'OTP resent',
 };
 
+var RAZORPAY_COLOR = '#528FF0',
+  RAZORPAY_HOVER_COLOR = '#626A74';
+
 var fontTimeout;
 
 // Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
@@ -516,8 +519,74 @@ function getColorVariations(color, relativeLuminance) {
 
   return {
     foregroundColor: _Color.brighten(color, fgColorBrightness),
-    backgroundColor: _Color.brighten(color, bgColorBrightness)
+    backgroundColor: _Color.brighten(color, bgColorBrightness),
   };
+}
+
+function getColorDistance(color) {
+  var rgb = _Color.getColorProperties(color),
+    hsb = _Color.rgbToHsb(rgb.red, rgb.green, rgb.blue),
+    saturation = hsb.saturation * 100,
+    brightness = hsb.brightness * 100;
+
+  return Math.sqrt(
+    Math.pow(100 - saturation, 2) + Math.pow(100 - brightness, 2)
+  );
+}
+
+function getHighlightColor(color, colorVariations) {
+  var colorDistance = getColorDistance(color);
+
+  if (colorDistance > 90) {
+    return RAZORPAY_COLOR;
+  }
+
+  var hsb = _Color.getHSB(color),
+    saturation = hsb.saturation * 100;
+
+  if (saturation <= 50) {
+    return colorVariations.backgroundColor;
+  }
+
+  return colorVariations.foregroundColor;
+}
+
+function getHoverStateColor(color, variation) {
+  var colorDistance = getColorDistance(color);
+
+  if (colorDistance > 90) {
+    return _Color.transparentify(RAZORPAY_HOVER_COLOR, 3);
+  }
+
+  var hsb = _Color.getHSB(color),
+    brightness = hsb.brightness * 100;
+
+  var opacity = 3;
+
+  if (brightness > 50) {
+    opacity = 6;
+  }
+
+  return _Color.transparentify(variation, opacity);
+}
+
+function getActiveStateColor(color, variation) {
+  var colorDistance = getColorDistance(color);
+
+  if (colorDistance > 90) {
+    return _Color.transparentify(RAZORPAY_HOVER_COLOR, 6);
+  }
+
+  var hsb = _Color.getHSB(color),
+    brightness = hsb.brightness * 100;
+
+  var opacity = 6;
+
+  if (brightness > 50) {
+    opacity = 9;
+  }
+
+  return _Color.transparentify(variation, opacity);
 }
 
 function Session(options) {
@@ -531,21 +600,34 @@ function Session(options) {
   this.listeners = [];
   this.bits = [];
 
-  var themeColor = this.get('theme.color') || '#528FF0',
+  var themeColor = this.get('theme.color') || RAZORPAY_COLOR,
     relativeLuminance = _Color.getRelativeLuminanceWithWhite(themeColor),
     isThemeColorDark = _Color.isDark(themeColor),
-    iconOptions = getColorVariations(themeColor, relativeLuminance);
+    colorVariations = getColorVariations(themeColor, relativeLuminance),
+    highlightColor = getHighlightColor(themeColor, colorVariations),
+    hoverStateColor = getHoverStateColor(
+      themeColor,
+      colorVariations.backgroundColor
+    ),
+    activeStateColor = getActiveStateColor(
+      themeColor,
+      colorVariations.backgroundColor
+    ),
+    secondaryHighlightColor = hoverStateColor;
 
   this.themeMeta = {
     color: themeColor,
     textColor: isThemeColorDark ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
-    highlightColor: isThemeColorDark ? themeColor : iconOptions.foregroundColor,
+    highlightColor: highlightColor,
+    secondaryHighlightColor: secondaryHighlightColor,
+    hoverStateColor: hoverStateColor,
+    activeStateColor: activeStateColor,
     icons: {
-      card: _PaymentMethodIcons('card', iconOptions),
-      netbanking: _PaymentMethodIcons('netbanking', iconOptions),
-      upi: _PaymentMethodIcons('upi', iconOptions),
-      wallet: _PaymentMethodIcons('wallet', iconOptions)
-    }
+      card: _PaymentMethodIcons('card', colorVariations),
+      netbanking: _PaymentMethodIcons('netbanking', colorVariations),
+      upi: _PaymentMethodIcons('upi', colorVariations),
+      wallet: _PaymentMethodIcons('wallet', colorVariations),
+    },
   };
 }
 
