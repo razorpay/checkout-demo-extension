@@ -573,6 +573,24 @@ Session.prototype = {
       this.r.set('theme.image_frame', false);
     }
 
+    if (isArray(this.methods.wallet) && this.methods.wallet.length > 0) {
+      var amazonPay = 'amazonpay';
+
+      this.methods.wallet.sort(function(item1, item2) {
+        return item1.name === amazonPay ? -1 : item2.name === amazonPay ? 1 : 0;
+      });
+
+      var walletsLen = this.methods.wallet.length,
+        walletNames = this.methods.wallet.slice(0, 2).map(function(item) {
+          return item.title;
+        });
+
+      this.walletsDesc =
+        walletsLen <= 2
+          ? walletNames.join(' and ')
+          : walletNames.join(', ') + ' & More';
+    }
+
     if (getter('theme.emi_mode')) {
       tab_titles.card = 'Card';
       this.emiMethod = true;
@@ -848,14 +866,22 @@ Session.prototype = {
 
   setWhatsappIcon: function() {
     var intentsData = this.upi_intents_data;
-    var whatsappObj;
+    var whatsappObj, paytmObj;
 
     if (isArray(intentsData)) {
       whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
+      paytmObj = findBy(intentsData, 'package_name', 'net.one97.paytm');
     }
 
-    if (whatsappObj && !whatsappObj.app_icon) {
-      whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
+    if (whatsappObj) {
+      if (!whatsappObj.app_icon) {
+        whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
+      }
+      whatsappObj.app_name = 'WhatsApp UPI';
+    }
+
+    if (paytmObj) {
+      paytmObj.app_name = 'Paytm UPI';
     }
   },
 
