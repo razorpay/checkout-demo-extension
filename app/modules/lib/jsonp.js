@@ -1,5 +1,3 @@
-import Track from '../tracker';
-
 const CALLBACK_KEY = 'jsonp_cb';
 
 var getAjaxParams = function(options, callbackName) {

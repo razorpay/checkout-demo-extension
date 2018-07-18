@@ -1,4 +1,3 @@
-import Track from 'tracker';
 import getFingerprint from './fingerprint';
 
 export const formatPayment = function(payment) {

@@ -5,7 +5,6 @@ import {
 } from 'payment/coproto';
 
 import * as cookie from 'lib/cookie';
-import Track from 'tracker';
 
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';

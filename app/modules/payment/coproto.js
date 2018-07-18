@@ -1,5 +1,4 @@
 import * as Tez from './tez';
-import Track from 'tracker';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 
 export const processOtpResponse = function(response) {
