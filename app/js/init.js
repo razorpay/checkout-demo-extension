@@ -121,8 +121,8 @@ var Razorpay = (window.Razorpay = function(overrides) {
 
   this.themeMeta = {
     color: themeColor,
-    textColor: _Color.isDark(themeColor) ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
-    highlightColor: _Color.getHighlightColor(themeColor, RAZORPAY_COLOR),
+    textColor: Color.isDark(themeColor) ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
+    highlightColor: Color.getHighlightColor(themeColor, RAZORPAY_COLOR),
   };
 
   this.postInit();

@@ -7,7 +7,7 @@ const modules = {
   authorize: 'Payment',
   tez: 'Tez',
   'templates/paymentMethodIcons/index': '_PaymentMethodIcons',
-  'lib/color': '_Color',
+  'lib/color': 'Color',
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
   'lib/upi': 'UPIUtils',

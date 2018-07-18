@@ -497,13 +497,13 @@ function Session(options) {
   var themeMeta = this.r.themeMeta;
 
   var themeColor = themeMeta.color,
-    colorVariations = _Color.getColorVariations(themeColor),
-    hoverStateColor = _Color.getHoverStateColor(
+    colorVariations = Color.getColorVariations(themeColor),
+    hoverStateColor = Color.getHoverStateColor(
       themeColor,
       colorVariations.backgroundColor,
       RAZORPAY_HOVER_COLOR
     ),
-    activeStateColor = _Color.getActiveStateColor(
+    activeStateColor = Color.getActiveStateColor(
       themeColor,
       colorVariations.backgroundColor,
       RAZORPAY_HOVER_COLOR
