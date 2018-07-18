@@ -352,10 +352,13 @@ function errorHandler(response) {
       }, 100);
 
       if (error_el.bbox().width) {
-        var help = error_el
-          .parent()
-          .addClass('mature invalid')
-          .find('.help')[0];
+        var parent = error_el.parent();
+        var help;
+
+        if (parent.hasClass('elem')) {
+          /* We don't want to add invalid to radio butons */
+          help = parent.addClass('mature invalid').find('.help')[0];
+        }
 
         if (help) {
           if (message) {
@@ -2788,6 +2791,10 @@ Session.prototype = {
     var self = this;
 
     this.flowIIN = iin;
+
+    if (this.get('recurring')) {
+      return;
+    }
 
     this.r.getCardFlows(iin, function(flows) {
       self.trackDebitPin('flow_opts_fetched', {
