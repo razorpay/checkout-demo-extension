@@ -2785,6 +2785,10 @@ Session.prototype = {
     // Hide and uncheck checkboxes.
     showFlowRadioButtons(false);
 
+    if (this.recurring) {
+      return;
+    }
+
     var self = this;
 
     this.flowIIN = iin;

@@ -103,7 +103,9 @@ export default function Payment(data, params, r) {
   }
 
   this.isDebitPin =
-    data.auth_type && (data.auth_type === '3ds' || data.auth_type === 'pin');
+    data &&
+    data.auth_type &&
+    (data.auth_type === '3ds' || data.auth_type === 'pin');
   if (this.isDebitPin) {
     this.debitPinAuthType = data.auth_type;
   }
