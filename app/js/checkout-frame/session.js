@@ -1,3 +1,5 @@
+var RAZORPAY_HOVER_COLOR = '#626A74';
+
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 
@@ -12,9 +14,6 @@ var strings = {
   acs_load_delay: 'Seems like your bank page is taking time to load.',
   otp_resent: 'OTP resent',
 };
-
-var RAZORPAY_COLOR = '#528FF0',
-  RAZORPAY_HOVER_COLOR = '#626A74';
 
 var fontTimeout;
 
@@ -484,111 +483,6 @@ var IRCTC_KEYS = [
   'rzp_live_alEMh9FVT4XpwM',
 ];
 
-function getColorVariations(color, relativeLuminance) {
-  var bgColorBrightness = 0,
-    fgColorBrightness = 0;
-
-  if (relativeLuminance >= 0.9) {
-    fgColorBrightness = -50;
-    bgColorBrightness = -30;
-  } else if (relativeLuminance >= 0.7 && relativeLuminance < 0.9) {
-    fgColorBrightness = -55;
-    bgColorBrightness = -30;
-  } else if (relativeLuminance >= 0.6 && relativeLuminance < 0.7) {
-    fgColorBrightness = -50;
-    bgColorBrightness = -15;
-  } else if (relativeLuminance >= 0.5 && relativeLuminance < 0.6) {
-    fgColorBrightness = -45;
-    bgColorBrightness = -10;
-  } else if (relativeLuminance >= 0.4 && relativeLuminance < 0.5) {
-    fgColorBrightness = -40;
-    bgColorBrightness = -5;
-  } else if (relativeLuminance >= 0.3 && relativeLuminance < 0.4) {
-    fgColorBrightness = -35;
-    bgColorBrightness = 0;
-  } else if (relativeLuminance >= 0.2 && relativeLuminance < 0.3) {
-    fgColorBrightness = -30;
-    bgColorBrightness = 20;
-  } else if (relativeLuminance >= 0.1 && relativeLuminance < 0.2) {
-    fgColorBrightness = -20;
-    bgColorBrightness = 60;
-  } else if (relativeLuminance >= 0 && relativeLuminance < 0.1) {
-    fgColorBrightness = 0;
-    bgColorBrightness = 80;
-  }
-
-  return {
-    foregroundColor: _Color.brighten(color, fgColorBrightness),
-    backgroundColor: _Color.brighten(color, bgColorBrightness),
-  };
-}
-
-function getColorDistance(color) {
-  var rgb = _Color.getColorProperties(color),
-    hsb = _Color.rgbToHsb(rgb.red, rgb.green, rgb.blue),
-    saturation = hsb.saturation * 100,
-    brightness = hsb.brightness * 100;
-
-  return Math.sqrt(
-    Math.pow(100 - saturation, 2) + Math.pow(100 - brightness, 2)
-  );
-}
-
-function getHighlightColor(color, colorVariations) {
-  var colorDistance = getColorDistance(color);
-
-  if (colorDistance > 90) {
-    return RAZORPAY_COLOR;
-  }
-
-  var hsb = _Color.getHSB(color),
-    saturation = hsb.saturation * 100;
-
-  if (saturation <= 50) {
-    return colorVariations.backgroundColor;
-  }
-
-  return colorVariations.foregroundColor;
-}
-
-function getHoverStateColor(color, variation) {
-  var colorDistance = getColorDistance(color);
-
-  if (colorDistance > 90) {
-    return _Color.transparentify(RAZORPAY_HOVER_COLOR, 3);
-  }
-
-  var hsb = _Color.getHSB(color),
-    brightness = hsb.brightness * 100;
-
-  var opacity = 3;
-
-  if (brightness > 50) {
-    opacity = 6;
-  }
-
-  return _Color.transparentify(variation, opacity);
-}
-
-function getActiveStateColor(color, variation) {
-  var colorDistance = getColorDistance(color);
-
-  if (colorDistance > 90) {
-    return _Color.transparentify(RAZORPAY_HOVER_COLOR, 6);
-  }
-
-  var hsb = _Color.getHSB(color),
-    brightness = hsb.brightness * 100;
-
-  var opacity = 6;
-
-  if (brightness > 50) {
-    opacity = 9;
-  }
-
-  return _Color.transparentify(variation, opacity);
-}
-
 function Session(options) {
   this.r = Razorpay(options);
   this.get = this.r.get;
@@ -600,34 +494,31 @@ function Session(options) {
   this.listeners = [];
   this.bits = [];
 
-  var themeColor = this.get('theme.color') || RAZORPAY_COLOR,
-    relativeLuminance = _Color.getRelativeLuminanceWithWhite(themeColor),
-    isThemeColorDark = _Color.isDark(themeColor),
-    colorVariations = getColorVariations(themeColor, relativeLuminance),
-    highlightColor = getHighlightColor(themeColor, colorVariations),
-    hoverStateColor = getHoverStateColor(
+  var themeMeta = this.r.themeMeta;
+
+  var themeColor = themeMeta.color,
+    colorVariations = _Color.getColorVariations(themeColor),
+    hoverStateColor = _Color.getHoverStateColor(
       themeColor,
-      colorVariations.backgroundColor
+      colorVariations.backgroundColor,
+      RAZORPAY_HOVER_COLOR
     ),
-    activeStateColor = getActiveStateColor(
+    activeStateColor = _Color.getActiveStateColor(
       themeColor,
-      colorVariations.backgroundColor
+      colorVariations.backgroundColor,
+      RAZORPAY_HOVER_COLOR
     ),
     secondaryHighlightColor = hoverStateColor;
 
-  this.r.themeMeta = this.themeMeta = {
-    color: themeColor,
-    textColor: isThemeColorDark ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
-    highlightColor: highlightColor,
-    secondaryHighlightColor: secondaryHighlightColor,
-    hoverStateColor: hoverStateColor,
-    activeStateColor: activeStateColor,
-    icons: {
-      card: _PaymentMethodIcons('card', colorVariations),
-      netbanking: _PaymentMethodIcons('netbanking', colorVariations),
-      upi: _PaymentMethodIcons('upi', colorVariations),
-      wallet: _PaymentMethodIcons('wallet', colorVariations),
-    },
+  this.themeMeta = Object.create(this.r.themeMeta);
+  this.themeMeta.secondaryHighlightColor = secondaryHighlightColor;
+  this.themeMeta.hoverStateColor = hoverStateColor;
+  this.themeMeta.activeStateColor = activeStateColor;
+  this.themeMeta.icons = {
+    card: _PaymentMethodIcons('card', colorVariations),
+    netbanking: _PaymentMethodIcons('netbanking', colorVariations),
+    upi: _PaymentMethodIcons('upi', colorVariations),
+    wallet: _PaymentMethodIcons('wallet', colorVariations),
   };
 }
 

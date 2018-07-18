@@ -151,17 +151,22 @@ const getColorChannelWithGamma = channelVal => {
 /*
  * ref: https://ux.stackexchange.com/questions/82056/how-to-measure-the-contrast-between-any-given-color-and-white
  */
-export const getRelativeLuminanceWithWhite = color => {
-  const { red, green, blue } = getColorProperties(color);
+export const getRelativeLuminanceWithWhite = (colorCache => {
+  return color => {
+    if (colorCache[color]) {
+      return colorCache[color];
+    }
 
-  const redWithGamma = getColorChannelWithGamma(red),
-    blueWithGamma = getColorChannelWithGamma(blue),
-    greenWithGamma = getColorChannelWithGamma(green);
+    const { red, green, blue } = getColorProperties(color);
 
-  return (
-    0.2126 * redWithGamma + 0.7152 * greenWithGamma + 0.0722 * blueWithGamma
-  );
-};
+    const redWithGamma = getColorChannelWithGamma(red),
+      blueWithGamma = getColorChannelWithGamma(blue),
+      greenWithGamma = getColorChannelWithGamma(green);
+
+    return (colorCache[color] =
+      0.2126 * redWithGamma + 0.7152 * greenWithGamma + 0.0722 * blueWithGamma);
+  };
+})({});
 
 export const isDark = color => {
   const relativeLuminosity = getRelativeLuminanceWithWhite(color);
@@ -187,3 +192,116 @@ export const brighten = (color, brightenPercentage) => {
 
   return `rgba(${rgb.red},${rgb.green},${rgb.blue},${alpha})`;
 };
+
+export const getColorVariations = (colorCache => {
+  return color => {
+    if (colorCache[color]) {
+      return colorCache[color];
+    }
+
+    var bgColorBrightness = 0,
+      fgColorBrightness = 0,
+      relativeLuminance = getRelativeLuminanceWithWhite(color);
+
+    if (relativeLuminance >= 0.9) {
+      fgColorBrightness = -50;
+      bgColorBrightness = -30;
+    } else if (relativeLuminance >= 0.7 && relativeLuminance < 0.9) {
+      fgColorBrightness = -55;
+      bgColorBrightness = -30;
+    } else if (relativeLuminance >= 0.6 && relativeLuminance < 0.7) {
+      fgColorBrightness = -50;
+      bgColorBrightness = -15;
+    } else if (relativeLuminance >= 0.5 && relativeLuminance < 0.6) {
+      fgColorBrightness = -45;
+      bgColorBrightness = -10;
+    } else if (relativeLuminance >= 0.4 && relativeLuminance < 0.5) {
+      fgColorBrightness = -40;
+      bgColorBrightness = -5;
+    } else if (relativeLuminance >= 0.3 && relativeLuminance < 0.4) {
+      fgColorBrightness = -35;
+      bgColorBrightness = 0;
+    } else if (relativeLuminance >= 0.2 && relativeLuminance < 0.3) {
+      fgColorBrightness = -30;
+      bgColorBrightness = 20;
+    } else if (relativeLuminance >= 0.1 && relativeLuminance < 0.2) {
+      fgColorBrightness = -20;
+      bgColorBrightness = 60;
+    } else if (relativeLuminance >= 0 && relativeLuminance < 0.1) {
+      fgColorBrightness = 0;
+      bgColorBrightness = 80;
+    }
+
+    return (colorCache[color] = {
+      foregroundColor: brighten(color, fgColorBrightness),
+      backgroundColor: brighten(color, bgColorBrightness),
+    });
+  };
+})({});
+
+export function getColorDistance(color) {
+  var rgb = getColorProperties(color),
+    hsb = rgbToHsb(rgb.red, rgb.green, rgb.blue),
+    saturation = hsb.saturation * 100,
+    brightness = hsb.brightness * 100;
+
+  return Math.sqrt(
+    Math.pow(100 - saturation, 2) + Math.pow(100 - brightness, 2)
+  );
+}
+
+export function getHighlightColor(color, defaultColor) {
+  var colorDistance = getColorDistance(color);
+
+  if (colorDistance > 90) {
+    return defaultColor;
+  }
+
+  var hsb = getHSB(color),
+    saturation = hsb.saturation * 100,
+    colorVariations = getColorVariations(color);
+
+  if (saturation <= 50) {
+    return colorVariations.backgroundColor;
+  }
+
+  return colorVariations.foregroundColor;
+}
+
+export function getHoverStateColor(color, variation, defaultColor) {
+  var colorDistance = getColorDistance(color);
+
+  if (colorDistance > 90) {
+    return transparentify(defaultColor, 3);
+  }
+
+  var hsb = getHSB(color),
+    brightness = hsb.brightness * 100;
+
+  var opacity = 3;
+
+  if (brightness > 50) {
+    opacity = 6;
+  }
+
+  return transparentify(variation, opacity);
+}
+
+export function getActiveStateColor(color, variation, defaultColor) {
+  var colorDistance = getColorDistance(color);
+
+  if (colorDistance > 90) {
+    return transparentify(defaultColor, 6);
+  }
+
+  var hsb = getHSB(color),
+    brightness = hsb.brightness * 100;
+
+  var opacity = 6;
+
+  if (brightness > 50) {
+    opacity = 9;
+  }
+
+  return transparentify(variation, opacity);
+}
