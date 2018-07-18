@@ -1,5 +1,5 @@
 import * as Tez from './tez';
-import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
+import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 
 export const processOtpResponse = function(response) {
   var error = response.error;

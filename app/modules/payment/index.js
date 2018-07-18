@@ -10,6 +10,7 @@ import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 
 import jsonp from 'lib/jsonp';
+import 'exports/razorpay';
 
 var pollingInterval;
 

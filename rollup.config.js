@@ -8,7 +8,7 @@ const modules = {
   tez: 'Tez',
   'lib/fetch': 'fetch',
   'lib/jsonp': 'jsonp',
-  'lib/upi': 'UPIUtils',
+  'common/upi': 'UPIUtils',
   formatter: 'Formatter',
   confirm: 'Confirm',
   callout: 'Callout',
