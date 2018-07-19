@@ -175,10 +175,16 @@ export const isDark = color => {
   return relativeLuminosity < 0.5;
 };
 
+const getColorString = (red, green, blue, alpha) => {
+  return `rgba(${Math.round(red)}, ${Math.round(green)}, ${Math.round(
+    blue
+  )}, ${alpha})`;
+};
+
 export const transparentify = (color, alphaPercentage = 0) => {
   const { red, green, blue, alpha } = getColorProperties(color);
 
-  return `rgba(${red},${green},${blue},${alphaPercentage / 100})`;
+  return getColorString(red, green, blue, alphaPercentage / 100);
 };
 
 export const brighten = (color, brightenPercentage) => {
@@ -190,7 +196,7 @@ export const brighten = (color, brightenPercentage) => {
 
   const rgb = hsbToRgb(hue, saturation, brightness);
 
-  return `rgba(${rgb.red},${rgb.green},${rgb.blue},${alpha})`;
+  return getColorString(rgb.red, rgb.green, rgb.blue, alpha);
 };
 
 export const getColorVariations = (colorCache => {
