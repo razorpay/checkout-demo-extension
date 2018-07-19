@@ -1,7 +1,11 @@
+import { reduce } from 'lib/_Arr';
+
 import card from './card';
 import netbanking from './netbanking';
 import upi from './upi';
 import wallet from './wallet';
+
+const availPaymentMethods = ['card', 'netbanking', 'upi', 'wallet'];
 
 function getIconFn(iconName) {
   switch (iconName) {
@@ -18,8 +22,8 @@ function getIconFn(iconName) {
       return wallet;
   }
 }
-
-export default (
+i;
+export const getIcon = (
   iconName,
   { foregroundColor = '#072654', backgroundColor = '#3F71D7' }
 ) => {
@@ -27,3 +31,13 @@ export default (
 
   return iconFn && iconFn(foregroundColor, backgroundColor);
 };
+
+export const getIcons = options =>
+  reduce(
+    availPaymentMethods,
+    (result, method) => {
+      result[method] = getIcon(method, options);
+      return result;
+    },
+    {}
+  );

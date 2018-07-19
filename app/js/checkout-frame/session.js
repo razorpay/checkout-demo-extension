@@ -510,16 +510,12 @@ function Session(options) {
     ),
     secondaryHighlightColor = hoverStateColor;
 
-  this.themeMeta = Object.create(this.r.themeMeta);
-  this.themeMeta.secondaryHighlightColor = secondaryHighlightColor;
-  this.themeMeta.hoverStateColor = hoverStateColor;
-  this.themeMeta.activeStateColor = activeStateColor;
-  this.themeMeta.icons = {
-    card: _PaymentMethodIcons('card', colorVariations),
-    netbanking: _PaymentMethodIcons('netbanking', colorVariations),
-    upi: _PaymentMethodIcons('upi', colorVariations),
-    wallet: _PaymentMethodIcons('wallet', colorVariations),
-  };
+  themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
+
+  themeMeta.secondaryHighlightColor = secondaryHighlightColor;
+  themeMeta.hoverStateColor = hoverStateColor;
+  themeMeta.activeStateColor = activeStateColor;
+  themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
 }
 
 Session.prototype = {
