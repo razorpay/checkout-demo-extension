@@ -37,8 +37,12 @@
   </div>
   <script>
 
-    var url = new URL(window.location.href),
-        searchParams = url.searchParams;
+    var searchParams = {
+      get: function(param) {}
+    }
+    if (window.URLSearchParams) {
+      searchParams = new URLSearchParams(location.search)
+    }
 
     var options = {
       // 'key': 'rzp_live_ILgsfZCZoFIKMb',
