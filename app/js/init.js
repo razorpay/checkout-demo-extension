@@ -1,5 +1,3 @@
-var RAZORPAY_COLOR = '#528FF0';
-
 function err(errors) {
   if (errors instanceof Array && !errors.length) {
     return false;
@@ -116,14 +114,6 @@ var Razorpay = (window.Razorpay = function(overrides) {
   if (!discreet.isCheckout) {
     Track(this, 'init');
   }
-
-  var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
-
-  this.themeMeta = {
-    color: themeColor,
-    textColor: Color.isDark(themeColor) ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
-    highlightColor: Color.getHighlightColor(themeColor, RAZORPAY_COLOR),
-  };
 
   this.postInit();
 });
