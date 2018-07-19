@@ -11,7 +11,9 @@ import { FormatDelegator } from 'formatter';
 
 import jsonp from 'lib/jsonp';
 import 'exports/razorpay';
+import * as Color from 'lib/color';
 
+var RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -424,6 +426,16 @@ function makeRedirectUrl(fees) {
 Razorpay.setFormatter = FormatDelegator;
 
 var razorpayProto = Razorpay.prototype;
+
+razorpayProto.postInit = function() {
+  var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
+
+  this.themeMeta = {
+    color: themeColor,
+    textColor: Color.isDark(themeColor) ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
+    highlightColor: Color.getHighlightColor(themeColor, RAZORPAY_COLOR),
+  };
+};
 
 razorpayProto.createPayment = function(data, params) {
   if (data && 'data' in data) {

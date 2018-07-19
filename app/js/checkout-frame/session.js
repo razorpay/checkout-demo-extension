@@ -1,3 +1,5 @@
+var RAZORPAY_HOVER_COLOR = '#626A74';
+
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 
@@ -352,10 +354,13 @@ function errorHandler(response) {
       }, 100);
 
       if (error_el.bbox().width) {
-        var help = error_el
-          .parent()
-          .addClass('mature invalid')
-          .find('.help')[0];
+        var parent = error_el.parent();
+        var help;
+
+        if (parent.hasClass('elem')) {
+          /* We don't want to add invalid to radio butons */
+          help = parent.addClass('mature invalid').find('.help')[0];
+        }
 
         if (help) {
           if (message) {
@@ -488,6 +493,29 @@ function Session(options) {
   this.attemptCount = 0;
   this.listeners = [];
   this.bits = [];
+
+  var themeMeta = this.r.themeMeta;
+
+  var themeColor = themeMeta.color,
+    colorVariations = Color.getColorVariations(themeColor),
+    hoverStateColor = Color.getHoverStateColor(
+      themeColor,
+      colorVariations.backgroundColor,
+      RAZORPAY_HOVER_COLOR
+    ),
+    activeStateColor = Color.getActiveStateColor(
+      themeColor,
+      colorVariations.backgroundColor,
+      RAZORPAY_HOVER_COLOR
+    ),
+    secondaryHighlightColor = hoverStateColor;
+
+  themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
+
+  themeMeta.secondaryHighlightColor = secondaryHighlightColor;
+  themeMeta.hoverStateColor = hoverStateColor;
+  themeMeta.activeStateColor = activeStateColor;
+  themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
 }
 
 Session.prototype = {
@@ -546,10 +574,6 @@ Session.prototype = {
 
     if (this.fontLoaded) {
       classes.push('font-loaded');
-    }
-
-    if (getter('theme.branding')) {
-      classes.push('cob');
     }
 
     if (getter('theme.hide_topbar')) {
@@ -1104,11 +1128,14 @@ Session.prototype = {
     style.type = 'text/css';
     try {
       var getter = this.get;
+
       div.style.color = getter('theme.color');
+
       if (!div.style.color) {
         getter()['theme.color'] = '';
       }
-      var rules = templates.theme(getter);
+
+      var rules = templates.theme(getter, this.themeMeta);
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {
@@ -2792,6 +2819,10 @@ Session.prototype = {
     var self = this;
 
     this.flowIIN = iin;
+
+    if (this.get('recurring')) {
+      return;
+    }
 
     this.r.getCardFlows(iin, function(flows) {
       self.trackDebitPin('flow_opts_fetched', {

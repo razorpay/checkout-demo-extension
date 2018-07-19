@@ -1,7 +1,13 @@
 `
-var c = _('theme.color') || '#3594E2';
 var close = _('theme.close_button');
 var bodyHeight = window.innerHeight - gel('header').offsetHeight;
+var themeMeta = arguments[1];
+var c = themeMeta.color;
+var textColor = themeMeta.textColor;
+var highlightColor = themeMeta.highlightColor;
+var secondaryHighlightColor = themeMeta.secondaryHighlightColor;
+var hoverStateColor = themeMeta.hoverStateColor;
+var activeStateColor = themeMeta.activeStateColor;
 `
 
 `?_('theme.upi_only')`
@@ -15,15 +21,16 @@ var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 .button, .btn, .submit-button, .loader::after
 {
   background: `=c`;
+  color: `=textColor`;
 }
 
 .elem::after {
-  border-bottom-color: `=c`;
+  border-bottom-color: `=highlightColor`;
 }
 
 .spin div, .link
 {
-  border-color: `=c`!important;
+  border-color: `=highlightColor`!important;
 }
 
 #payment-options i,
@@ -32,11 +39,18 @@ var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 .offer-info li:first-child,
 .ecod .item i
 {
-  color: `=c`;
+  color: `=highlightColor`;
+}
+
+#payment-options i svg {
+  display: inline-block;
+  height: 0.75em;
+  vertical-align: top;
 }
 
 #header{
   background: `=c`;
+  color: `=textColor`;
 }
 
 `?_.image_padding`
@@ -64,12 +78,24 @@ var bodyHeight = window.innerHeight - gel('header').offsetHeight;
 input[type=checkbox]:checked + .checkbox
 {
   color: #fff;
-  background: `=c`;
-  border-color: `=c`;
+  background: `=highlightColor`;
+  border-color: `=highlightColor`;
 }
 
 .theme {
-  color: `=c`;
+color: `=c`;
+}
+
+.theme-highlight {
+  color: `=highlightColor`;
+}
+
+#topbar, #partial-back {
+  background-color: `=secondaryHighlightColor` !important;
+}
+
+.grid label:hover {
+  background-color: `=hoverStateColor` !important;
 }
 
 `?!close`
@@ -79,16 +105,17 @@ input[type=checkbox]:checked + .checkbox
 `?`
 
 .grid :checked+label {
-  border-bottom: 2px solid `=c`;
+  background-color: `=activeStateColor` !important;
+  border-bottom: 2px solid `=highlightColor`;
 }
 
 .list :checked+label, .list .item.active {
-  border-color: `=c` !important;
+  border-color: `=highlightColor` !important;
 }
 
 .list :checked+label .checkbox {
-  background: `=c`;
-  border-color: `=c`;
+  background: `=highlightColor`;
+  border-color: `=highlightColor`;
 }
 
 .mobile:not(.ip) #body[screen="wallet"],
