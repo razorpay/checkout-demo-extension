@@ -35,13 +35,21 @@
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
   <script>
+
+    var searchParams = {
+      get: function(param) {}
+    }
+    if (window.URLSearchParams) {
+      searchParams = new URLSearchParams(location.search)
+    }
+
     var options = {
       // 'key': 'rzp_live_ILgsfZCZoFIKMb',
       'key': 'rzp_test_1DP5mmOlF5G5ag',
       // 'key': 'rzp_live_gC8obGlwaRlyui',
       'amount': 6000*100,
-      'name': 'Innerchef',
-      'description': 'JEE Main & Advanced',
+      'name': searchParams.get("name") || 'Innerchef',
+      'description': searchParams.get("description") || 'JEE Main & Advanced',
       'image': 'http://i.imgur.com/n5tjHFD.png',
       'handler': function (transaction){
         alert("You have successfully purchased " + options.description);
@@ -52,6 +60,9 @@
         //   paytm: false
         // },
         card: true
+      },
+      'theme': {
+        color: searchParams.get("color")
       },
       // parent: '#x',
       remember_customer: true,
@@ -77,9 +88,6 @@
       // order_id: 'order_5ZfJcdMfBYoZ3n',
       notes: {
         'address': 'Hello World'
-      },
-      theme: {
-        color: '#1abc9c'
       },
       modal: {
         ondismiss: function(){console.log(1)},

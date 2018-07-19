@@ -17,7 +17,8 @@ let injects = {
   _El: ['lib/_El', '*'],
   _Doc: ['lib/_Doc', '*'],
   fetch: 'lib/fetch',
-  jsonp: 'lib/jsonp'
+  jsonp: 'lib/jsonp',
+  Color: 'lib/color',
 };
 
 fs.writeFileSync(
@@ -38,7 +39,7 @@ fs.writeFileSync(
       'parseInt',
       'encodeURIComponent',
       'decodeURIComponent',
-      'btoa'
+      'btoa',
     ]
       .map(command => {
         injects[command] = ['generated/globals', command];
@@ -59,14 +60,14 @@ module.exports = [
         exportIndex += 15;
         return {
           code:
-            code.slice(0, exportIndex) + doT.template(code.slice(exportIndex))
+            code.slice(0, exportIndex) + doT.template(code.slice(exportIndex)),
         };
       }
-    }
+    },
   },
 
   include({
-    paths: ['app/modules']
+    paths: ['app/modules'],
   }),
 
   babel({
@@ -91,11 +92,11 @@ module.exports = [
       [
         './trace.js',
         {
-          aliases
-        }
-      ]
-    ]
+          aliases,
+        },
+      ],
+    ],
   }),
 
-  inject(injects)
+  inject(injects),
 ];

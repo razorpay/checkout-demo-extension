@@ -6,6 +6,7 @@ var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
 var banks = method.emandate || method.netbanking;
+var icons = _.themeMeta.icons;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
 var airtelmoneyWallet = findBy(wallet, 'name', 'airtelmoney') || {};
 var mobikwikWallet = findBy(wallet, 'name', 'mobikwik') || {};
@@ -104,8 +105,8 @@ var upi_apps = _.upi_intents_data;
         </div>
         <div id="body"`?_.tpvBank` class="sub"`?`>
           <div id="messages"></div>
-          <div id="partial-back"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
-          <div id="topbar">
+          <div id="partial-back" class="theme-secondary-highlight"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
+          <div id="topbar" class="theme-secondary-highlight">
             <div id="top-right">
               <div id="user"></div>
               <div id='profile'><li>Log out</li><li>Log out from all devices</li></div>
@@ -246,20 +247,20 @@ var upi_apps = _.upi_intents_data;
                       `?o('theme.debit_card')`
                       <div class="payment-option item" tab="credit_card">
                         <label>
-                          <i>&#xe609;</i>
+                          <i>`=icons.card`</i>
                           `=_.tab_titles.credit_card`
                         </label>
                       </div>
                       <div class="payment-option item" tab="debit_card">
                         <label>
-                          <i>&#xe609;</i>
+                          <i>`=icons.card`</i>
                           `=_.tab_titles.debit_card`
                         </label>
                       </div>
                       `??`
                       <div class="payment-option item" tab="card">
                         <label>
-                          <i>&#xe609;</i>
+                          <i>`=icons.card`</i>
                           `=_.tab_titles.card`
                           <span class="desc">
                             `?_.recurring_card_text`
@@ -275,7 +276,7 @@ var upi_apps = _.upi_intents_data;
                     `?method.netbanking`
                     <div class="payment-option item" tab="netbanking">
                       <label>
-                        <i>&#xe60a;</i>
+                        <i>`=icons.netbanking`</i>
                         `=_.tab_titles.netbanking`
                         <span class="desc">All Indian banks</span>
                       </label>
@@ -284,7 +285,7 @@ var upi_apps = _.upi_intents_data;
                     `?method.emandate`
                     <div class="payment-option item" tab="emandate">
                       <label>
-                        <i>&#xe60a;</i>
+                        <i>`=icons.netbanking`</i>
                         `=_.tab_titles.emandate`
                         <span class="desc">Pay with Netbanking</span>
                       </label>
@@ -293,7 +294,7 @@ var upi_apps = _.upi_intents_data;
                     `?wallet.length`
                     <div class="payment-option item" tab="wallet">
                       <label>
-                        <i>&#xe60b;</i>
+                        <i>`=icons.wallet`</i>
                         `=_.tab_titles.wallet`
                         <span class="desc">`=walletsDesc`</span>
                       </label>
@@ -302,7 +303,7 @@ var upi_apps = _.upi_intents_data;
                     `?method.upi`
                     <div class="payment-option item" tab="upi">
                       <label>
-                        <i>&#xe60c;</i>
+                        <i>`=icons.upi`</i>
                         `=_.tab_titles.upi`
                         <span class="desc">Instant payment using UPI App</span>
                       </label>
@@ -574,7 +575,7 @@ var upi_apps = _.upi_intents_data;
                           <input type="radio" id="upi_app-directpay" name="upi_app" value="directpay">
                           <label for="upi_app-directpay" class="radio-label">
                             <span class="checkbox"></span>
-                            <div class="placeholder theme">&#xe711;</div>
+                            <div class="placeholder theme-highlight">&#xe711;</div>
                             <span class="title">
                               <div class="elem-wrap" style="display: inline-block;">
                                 <div class="elem">
@@ -614,7 +615,7 @@ var upi_apps = _.upi_intents_data;
                         <div id="upi-directpay" class="item">
                           <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `? (!upi_intent && !_.isMobileBrowser)`checked`?`/>
                           <label for="radio-directpay">
-                            <i class="theme">&#xe70e;</i>
+                            <i class="theme-highlight">&#xe70e;</i>
                             <div class="title">UPI Address</div>
                             <div class="subtitle">You will receive a collect request</div>
                             <div class="elem-wrap"><div class="elem">

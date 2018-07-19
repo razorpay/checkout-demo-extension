@@ -4,7 +4,9 @@ import * as cookie from 'lib/cookie';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'lib/upi';
 import * as Formatter from './formatter';
 import jsonp from 'lib/jsonp';
+import * as Color from 'lib/color';
 
+var RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -262,7 +264,7 @@ Payment.prototype = {
       data['_[shield][fhash]'] = fingerprint;
     }
 
-    data['_[shield][tz]'] = -(new Date().getTimezoneOffset());
+    data['_[shield][tz]'] = -new Date().getTimezoneOffset();
 
     // flatten notes, card
     // notes.abc -> notes[abc]
@@ -741,6 +743,16 @@ function otpCallback(response) {
 }
 
 var razorpayProto = Razorpay.prototype;
+
+razorpayProto.postInit = function() {
+  var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
+
+  this.themeMeta = {
+    color: themeColor,
+    textColor: Color.isDark(themeColor) ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',
+    highlightColor: Color.getHighlightColor(themeColor, RAZORPAY_COLOR),
+  };
+};
 
 razorpayProto.createPayment = function(data, params) {
   if (data && 'data' in data) {
