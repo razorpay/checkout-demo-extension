@@ -2,6 +2,7 @@ const { delay } = require('../../util');
 const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 module.exports = {
+  timeout: 15,
   test: browser =>
     PowerWallet.test(browser, {
       options: {
