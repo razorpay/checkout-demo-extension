@@ -50,8 +50,6 @@ if (chromeVersion) {
 
 var ua_mobile = ua_Android || ua_iOS;
 
-var ua_ip7 = isua(/iPhone OS 7/);
-
 var ua_android_browser = ua_Android && (chromeVersion || isua(/firefox/)); // Chrome or firefox on Android
 
 /* simple checks */

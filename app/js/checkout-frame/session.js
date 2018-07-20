@@ -636,14 +636,6 @@ Session.prototype = {
       classes.push('ip');
     }
 
-    if (ua_ip7) {
-      classes.push('ip7');
-    }
-
-    if (/Android 4/.test(ua)) {
-      classes.push('android4');
-    }
-
     if (this.extraFields) {
       classes.push('extra');
     }
