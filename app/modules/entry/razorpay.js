@@ -5,25 +5,7 @@ razorpayPayment.authorize = function(options) {
   return r;
 };
 
-razorpayPayment.validate = function(data) {
-  var errors = [];
-
-  if (!isValidAmount(data.amount)) {
-    errors.push({
-      description: 'Invalid amount specified',
-      field: 'amount',
-    });
-  }
-
-  if (!data.method) {
-    errors.push({
-      description: 'Payment Method not specified',
-      field: 'method',
-    });
-  }
-
-  return err(errors);
-};
+razorpayPayment.validate = _Func.noop;
 
 Razorpay.sendMessage = function(message) {
   if (message && message.event === 'redirect') {

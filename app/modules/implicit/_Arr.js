@@ -70,7 +70,7 @@ export const sliceFrom = _.curry2((array, from) =>
 );
 
 export const reduce = _.curry3((array, reducer, initialValue) =>
-  arrayProto.reduce.call(array, reducer, initialValue)
+  proto.reduce.call(array, reducer, initialValue)
 );
 
 export const merge = _.curry2((arr1, arr2) => {

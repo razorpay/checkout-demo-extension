@@ -16,35 +16,6 @@ var now =
     return new Date().getTime();
   };
 
-// iphone/ipad restrict non user initiated focus on input fields
-var ua = navigator.userAgent;
-function isua(ua_regex) {
-  return ua_regex.test(ua);
-}
-
-var ua_iPhone = isua(/iPhone/);
-var ua_iOS = ua_iPhone || isua(/iPad/);
-var ua_Android = isua(/Android/);
-
-// android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
-// ios non safari: ua_iOS && !isua(/Safari/)
-// note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
-var ua_prefer_redirect =
-  isua(
-    /; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/
-  ) ||
-  // can't detect webview reliably
-  ua_iOS ||
-  isua(/Android 4/);
-
-var shouldFixFixed = isua(/iPhone/);
-var chromeVersion = ua.match(/Chrome\/(\d+)/);
-if (chromeVersion) {
-  chromeVersion = parseInt(chromeVersion[1], 10);
-}
-
-var ua_android_browser = ua_Android && (chromeVersion || isua(/firefox/)); // Chrome or firefox on Android
-
 /* simple checks */
 function isBoolean(x) {
   return typeof x === 'boolean';

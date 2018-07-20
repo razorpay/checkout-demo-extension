@@ -120,7 +120,7 @@ export const displayCurrencies = {
   PEN: 'S/.',
   PHP: '&#x20b1;',
   PLN: 'Zł',
-  QAR: 'ر.ق',
+  QAR: 'QAR',
   RON: 'L',
   RUB: 'руб',
   RWF: 'RF',

@@ -1,11 +1,12 @@
 import * as Tez from './tez';
+import * as text from 'common/text';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
   if (error) {
     if (error.action === 'RETRY') {
-      return this.emit('otp.required', discreet.msg.wrongotp);
+      return this.emit('otp.required', text.wrontOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }

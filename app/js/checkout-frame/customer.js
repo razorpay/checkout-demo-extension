@@ -117,7 +117,7 @@ Customer.prototype = {
           if (data.error.field) {
             errorHandler.call(getSession(), data);
           } else {
-            callback(discreet.msg.wrongotp);
+            callback('Entered OTP was incorrect. Re-enter to proceed.');
           }
         } else {
           callback();
