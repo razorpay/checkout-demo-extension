@@ -1,7 +1,6 @@
 let plugins = require('./rollup.plugins');
 
 const modules = {
-  'payment/index': 'Payment',
   tez: 'Tez',
   'templates/paymentMethodIcons/index': '_PaymentMethodIcons',
   'lib/color': 'Color',
@@ -10,9 +9,9 @@ const modules = {
   confirm: 'Confirm',
   callout: 'Callout',
   'common/currency': 'Currency',
-  'implicit/_': '_',
   tracker: 'Track',
   'entry/razorpay': 'Razorpay',
+  'entry/checkout': 'Checkout',
 };
 
 function getOptions(module) {

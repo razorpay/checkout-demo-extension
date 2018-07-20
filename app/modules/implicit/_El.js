@@ -185,8 +185,6 @@ export const matches =
   |> elementString
   |> _.curry2;
 
-export const resolve = el => (_.isString(el) ? _Dom.querySelector(el) : el);
-
 // always curried
 export const on = (event, callback, delegate, useCapture) => {
   if (event |> _.is(global.EventTarget)) {

@@ -234,7 +234,7 @@ var discreet = {
   },
 };
 
-var optionValidations = {
+export const optionValidations = {
   notes: function(notes) {
     if (_.isNonNullObject(notes) && _.lengthOf(_Obj.keys(notes)) > 15) {
       return 'At most 15 notes are allowed';

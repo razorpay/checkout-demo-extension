@@ -12,6 +12,7 @@ export const getElementById = _Func.bind('getElementById', document);
 export const getComputedStyle = _Func.bind('getComputedStyle', global);
 export const EventConstructor = global.Event;
 export const isEvent = x => _.is(x, EventConstructor);
+export const resolve = el => (_.isString(el) ? querySelector(el) : el);
 
 var link;
 export function resolveUrl(relativeUrl) {

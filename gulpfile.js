@@ -76,7 +76,7 @@ gulp.task('css:prod', () => {
 
 function joinJs() {
   return gulp
-    .src(assetPath('razorpay.html'))
+    .src(assetPath('index.html'))
     .pipe(usemin())
     .pipe(
       through(function(file, enc, cb) {
