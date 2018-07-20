@@ -37,13 +37,18 @@ fastify.post('/v1/payments/:payment_id/otp_submit', async request => {
 
 fastify.get('/v1/payments/:payment_id/status', async request => {
   let payment = payments.get(request.params.payment_id);
+  let result;
   if (payment.method === 'upi') {
     if (!payment.statusHit) {
       payment.statusHit = 1;
-      return { status: 'created' };
+      result = { status: 'created' };
     }
-    return { razorpay_payment_id: request.params.payment_id };
+    result = { razorpay_payment_id: request.params.payment_id };
   }
+  if (request.query.callback) {
+    return `${request.query.callback}(${JSON.stringify(result)})`;
+  }
+  return result;
 });
 
 fastify.post('/v1/payments/create/checkout', async (request, reply) => {

@@ -9,16 +9,13 @@ require('child_process').execSync('mkdir -p app/modules/generated');
 
 let injects = {
   global: ['generated/globals', 'global'],
-  _: ['lib/_', '*'],
-  _Arr: ['lib/_Arr', '*'],
-  _Str: ['lib/_Str', '*'],
-  _Func: ['lib/_Func', '*'],
-  _Obj: ['lib/_Obj', '*'],
-  _El: ['lib/_El', '*'],
-  _Doc: ['lib/_Doc', '*'],
-  fetch: 'lib/fetch',
-  jsonp: 'lib/jsonp',
-  Color: 'lib/color',
+  _: ['implicit/_', '*'],
+  _Arr: ['implicit/_Arr', '*'],
+  _Str: ['implicit/_Str', '*'],
+  _Func: ['implicit/_Func', '*'],
+  _Obj: ['implicit/_Obj', '*'],
+  _El: ['implicit/_El', '*'],
+  _Doc: ['implicit/_Doc', '*'],
 };
 
 fs.writeFileSync(

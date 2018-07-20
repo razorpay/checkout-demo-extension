@@ -48,6 +48,7 @@ puppeteer
           clearTimeout(timeout);
         })
         .catch(error => {
+          console.error(error);
           !singleTest && process.exit(1);
         });
     };

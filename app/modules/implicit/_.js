@@ -135,8 +135,13 @@ export function query2obj(string) {
 }
 
 export function appendParamsToUrl(url, params) {
-  url += url.indexOf('?') > 0 ? '&' : '?';
-  url += obj2query(params);
+  if (isNonNullObject(params)) {
+    params = obj2query(params);
+  }
+  if (params) {
+    url += url.indexOf('?') > 0 ? '&' : '?';
+    url += params;
+  }
   return url;
 }
 

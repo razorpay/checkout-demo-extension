@@ -32,7 +32,7 @@ export default function Popup(src, name) {
     menubar: 'no',
     resizable: 'yes',
     location: 'no',
-    scrollbars: 'yes'
+    scrollbars: 'yes',
   };
 
   // we try to place it at the center of the current window
@@ -81,7 +81,7 @@ export default function Popup(src, name) {
 
 Popup.prototype = {
   on: function(event, func) {
-    this.listeners.push($(window).on(event, func, false, this));
+    this.listeners.push(global |> _El.on(event, func));
   },
 
   write: function(html) {
@@ -128,5 +128,5 @@ Popup.prototype = {
       this.checkClose(true);
       roll('Failure checking popup close', null, 'warn');
     }
-  }
+  },
 };
