@@ -204,7 +204,7 @@ formatterProto.backFormat = function(e) {
   // windows phone: if keydown is prevented, and value is changed synchronously,
   //    it ignores one subsequent input event.
   //    hence no back formatting in WP
-  if (isWP || _.getKeyFromEvent(e) !== 8) {
+  if (_.getKeyFromEvent(e) !== 8) {
     return;
   }
 
@@ -331,13 +331,7 @@ formatterProto.run = function(values) {
     // inserting character "4" at any position in "4444 4444 4444 4444"
     //    that doesnt require dom value change, but does require caret to be moved
     caretPosition = this.pretty(this.raw(left), shouldTrim).length;
-    if (isWP) {
-      // following is necessary, else caret only blinks at intended position.
-      //    but its at the rightmost position in effect
-      invoke('moveCaret', this, caretPosition, 0);
-    } else {
-      this.moveCaret(caretPosition);
-    }
+    this.moveCaret(caretPosition);
   } // else caretPosition is already pretty.length
 
   this.caretPosition = caretPosition;

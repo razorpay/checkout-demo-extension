@@ -25,9 +25,6 @@ function isua(ua_regex) {
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
 var ua_Android = isua(/Android/);
-var ua_WP = isua(/Windows Phone/);
-
-var ua_old_android = isua(/Android [2-4]/);
 
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !isua(/Safari/)
@@ -38,17 +35,13 @@ var ua_prefer_redirect =
   ) ||
   // can't detect webview reliably
   ua_iOS ||
-  (ua_old_android && !isua(/Chrome/));
+  isua(/Android 4/);
 
-var ua_popup_supported = !isua(/(Windows Phone|\(iP.+UCBrowser\/)/);
-var shouldFixFixed = isua(/iPhone|Android 2\./);
-var isWP = isua(/Windows Phone/);
+var shouldFixFixed = isua(/iPhone/);
 var chromeVersion = ua.match(/Chrome\/(\d+)/);
 if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }
-
-var ua_mobile = ua_Android || ua_iOS;
 
 var ua_android_browser = ua_Android && (chromeVersion || isua(/firefox/)); // Chrome or firefox on Android
 

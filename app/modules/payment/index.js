@@ -25,7 +25,7 @@ function clearPollingInterval(force) {
 
 var communicator;
 function setCommunicator() {
-  if (!discreet.isFrame && (isWP || /MSIE |Trident\//.test(ua))) {
+  if (!discreet.isFrame && /MSIE |Trident\//.test(ua)) {
     _El.create('iframe')
       |> _El.displayNone
       |> _El.appendTo(_Doc.documentElement)

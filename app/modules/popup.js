@@ -60,12 +60,9 @@ export default function Popup(src, name) {
 
   this.name = name;
 
-  // unsupported browsers
-  if (ua_popup_supported) {
-    try {
-      this.window = window.open(src, name || '', optsStr); // might be null in IE9 if protected mode is turned on
-    } catch (e) {}
-  }
+  try {
+    this.window = window.open(src, name || '', optsStr); // might be null in IE9 if protected mode is turned on
+  } catch (e) {}
 
   if (!this.window) {
     return null;
