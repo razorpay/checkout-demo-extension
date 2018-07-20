@@ -1,3 +1,5 @@
+import { shouldRedirect } from 'common/useragent';
+
 export const RazorpayDefaults = {
   key: '',
   account_id: '',
@@ -89,7 +91,7 @@ export function flatten(obj, defObj) {
 export default function Options(options) {
   options = flatten(options, RazorpayDefaults);
   var callback_url = options.callback_url;
-  if (callback_url && ua_prefer_redirect) {
+  if (callback_url && shouldRedirect) {
     options.redirect = true;
   }
   this.get = function(key) {
