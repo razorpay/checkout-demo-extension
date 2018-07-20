@@ -2,7 +2,6 @@ const babel = require('rollup-plugin-babel');
 const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
-const doT = require('dot');
 const fs = require('fs');
 
 require('child_process').execSync('mkdir -p app/modules/generated');
@@ -46,25 +45,6 @@ fs.writeFileSync(
 );
 
 module.exports = [
-  {
-    name: 'dot',
-    transform(code, id) {
-      if (id.endsWith('.jst')) {
-        let exportIndex = code.indexOf('export default ');
-        if (exportIndex === -1) {
-          throw "Template does'nt export anything";
-        }
-        exportIndex += 15;
-        var a = doT.template(code.slice(exportIndex));
-        console.log(a({}));
-        return {
-          code:
-            code.slice(0, exportIndex) + doT.template(code.slice(exportIndex)),
-        };
-      }
-    },
-  },
-
   include({
     paths: ['app/modules'],
   }),
