@@ -1,4 +1,6 @@
 import * as Card from 'common/card';
+import Eventer from 'eventer';
+import EvtHandler from 'evthandler';
 
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -33,7 +35,7 @@ export const Formatter = function(el, handlers, noBind) {
   }
 
   // set initial formatting
-  defer(bind('format', this));
+  setTimeout(() => this.format());
 };
 
 Formatter.events = {
@@ -255,7 +257,9 @@ formatterProto.fwdFormat = function(e) {
 };
 
 formatterProto.deferFormat = function(e) {
-  invoke('format', this, e, 0);
+  setTimeout(() => {
+    this.format(e);
+  });
 };
 
 formatterProto.format = function(e) {

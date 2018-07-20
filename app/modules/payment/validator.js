@@ -1,5 +1,6 @@
 import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
+import Track from 'tracker';
 
 export const formatPayment = function(payment) {
   var data = payment.data;

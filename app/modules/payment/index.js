@@ -10,7 +10,8 @@ import * as Color from 'lib/color';
 import Track from 'tracker';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
-import { RazorpayConfig } from 'common/Razorpay';
+import { RazorpayConfig, makeAuthUrl, makeUrl } from 'common/Razorpay';
+import { internetExplorer, iOS } from 'common/useragent';
 
 const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
 const RAZORPAY_COLOR = '#528FF0';
@@ -26,7 +27,7 @@ function clearPollingInterval(force) {
 
 var communicator;
 function setCommunicator() {
-  if (!isRazorpayFrame && /MSIE |Trident\//.test(ua)) {
+  if (!isRazorpayFrame && internetExplorer) {
     _El.create('iframe')
       |> _El.displayNone
       |> _El.appendTo(_Doc.documentElement)
@@ -165,7 +166,7 @@ Payment.prototype = {
     var data = this.data;
 
     if (this.sdk_popup) {
-      window.onpaymentcancel = bind(onPaymentCancel, this);
+      window.onpaymentcancel = _Func.bind(onPaymentCancel, this);
     }
 
     if (this.isMagicPayment) {
@@ -205,7 +206,7 @@ Payment.prototype = {
   },
 
   generate: function(data) {
-    this.data = clone(data || this.data);
+    this.data = _Obj.clone(data || this.data);
     formatPayment(this);
 
     if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
@@ -239,12 +240,8 @@ Payment.prototype = {
       return;
     }
 
-    try {
-      if (typeof data !== 'object') {
-        data = JSON.parse(data);
-      }
-    } catch (e) {
-      return roll('completed with ' + data, e);
+    if (typeof data !== 'object') {
+      data = JSON.parse(data);
     }
 
     if (data._time) {
@@ -255,7 +252,7 @@ Payment.prototype = {
     }
 
     if (data.action === 'TOPUP') {
-      return invoke(processOtpResponse, this, data);
+      return processOtpResponse.call(this, data);
     }
 
     this.clear();
@@ -298,7 +295,7 @@ Payment.prototype = {
     }
 
     clearPollingInterval();
-    abortAjax(this.ajax);
+
     this.r._payment = null;
 
     if (this.sdk_popup) {
@@ -306,6 +303,9 @@ Payment.prototype = {
     }
     if (this.isMagicPayment) {
       window.handleRelay = null;
+    }
+    if (this.ajax) {
+      this.ajax.abort();
     }
   },
 
@@ -318,7 +318,7 @@ Payment.prototype = {
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
     if (
       !isRazorpayFrame &&
-      (/MSIE /.test(ua) ||
+      (internetExplorer ||
         data.wallet === 'payumoney' ||
         data.wallet === 'freecharge' ||
         data.wallet === 'olamoney')
@@ -329,7 +329,7 @@ Payment.prototype = {
       return;
     }
     // iphone background ajax route
-    if (!this.powerwallet && /iP(hone|ad)/.test(ua)) {
+    if (!this.powerwallet && iOS) {
       return;
     }
 
@@ -443,7 +443,7 @@ razorpayProto.createPayment = function(data, params) {
     params = data;
   }
   if (!_.isNonNullObject(params)) {
-    params = emo;
+    params = {};
   }
 
   this._payment = this._payment || new Payment(data, params, this);
@@ -507,22 +507,6 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-razorpayPayment.getPrefs = function(data, callback) {
-  return fetch({
-    url: _.appendParamsToUrl(makeUrl('preferences'), data),
-
-    // 30s
-    timeout: 3e4,
-
-    callback: function(response) {
-      if (response.xhr && response.xhr.status === 0) {
-        return getPrefsJsonp(data, callback);
-      }
-      callback(response);
-    },
-  });
-};
-
 /**
  * JSONP for fetch flows.
  *
@@ -554,30 +538,30 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
   cardNumber = cardNumber.replace(/\D/g, '');
 
   if (cardNumber.length < 6) {
-    invoke(callback, null, []);
+    callback([]);
     return;
   }
 
   var iin = cardNumber.slice(0, 6);
 
   // Check cache.
-  if (typeof flowCache.card[iin] !== 'undefined') {
-    invoke(callback, null, flowCache.card[iin]);
+  if (flowCache.card[iin]) {
+    callback(flowCache.card[iin]);
     return;
   }
 
   getFlowsJsonp(
     {
-      iin: iin,
+      iin,
       key_id: this.get('key'),
-      '_[source]': Track.props.library || 'razorpayjs',
+      '_[source]': Track.props.library,
     },
     function(flows) {
       // Add to cache.
       flowCache.card[iin] = flows;
 
       // Invoke callback.
-      invoke(callback, this, flowCache.card[iin]);
+      callback(flowCache.card[iin]);
     }
   );
 };

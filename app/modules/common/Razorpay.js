@@ -134,6 +134,19 @@ var razorpayPayment = (Razorpay.payment = {
       }
     );
   },
+
+  getPrefs: function(data, callback) {
+    return fetch({
+      url: _.appendParamsToUrl(makeUrl('preferences'), data),
+
+      callback: function(response) {
+        if (response.xhr && response.xhr.status === 0) {
+          return getPrefsJsonp(data, callback);
+        }
+        callback(response);
+      },
+    });
+  },
 });
 
 function base_configure(overrides) {

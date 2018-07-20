@@ -4,6 +4,7 @@ export function check(ua_regex) {
   return ua_regex.test(ua);
 }
 
+export const internetExplorer = check(/MSIE |Trident\//);
 export const iPhone = check(/iPhone/);
 export const iOS = iPhone || check(/iPad/);
 export const android = check(/Android/);
