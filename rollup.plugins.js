@@ -55,6 +55,8 @@ module.exports = [
           throw "Template does'nt export anything";
         }
         exportIndex += 15;
+        var a = doT.template(code.slice(exportIndex));
+        console.log(a({}));
         return {
           code:
             code.slice(0, exportIndex) + doT.template(code.slice(exportIndex)),

@@ -7,8 +7,9 @@ import {
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 
+import fetch from 'implicit/fetch';
 import Track from 'tracker';
-import popupTemplate from 'templates/popup.jst';
+import popupTemplate from 'payment/popupTemplate';
 import Popup from 'payment/popup';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
