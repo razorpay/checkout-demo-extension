@@ -1,16 +1,12 @@
 let plugins = require('./rollup.plugins');
 
 const modules = {
-  eventer: 'Eventer',
-  evthandler: 'EvtHandler',
-  popup: 'Popup',
   'payment/index': 'Payment',
   tez: 'Tez',
   'templates/paymentMethodIcons/index': '_PaymentMethodIcons',
   'lib/color': 'Color',
   'implicit/fetch': 'fetch',
   'common/upi': 'UPIUtils',
-  formatter: 'Formatter',
   confirm: 'Confirm',
   callout: 'Callout',
   'common/currency': 'Currency',

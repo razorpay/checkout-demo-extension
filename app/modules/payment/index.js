@@ -8,6 +8,8 @@ import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 
 import Track from 'tracker';
+import popupTemplate from 'templates/popup.jst';
+import Popup from 'payment/popup';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import { RazorpayConfig, makeAuthUrl, makeUrl } from 'common/Razorpay';
@@ -173,7 +175,7 @@ Payment.prototype = {
       Track(this.r, 'magic_open_popup');
       window.CheckoutBridge.invokePopup(
         _Obj.stringify({
-          content: templates.popup(this),
+          content: popupTemplate(this),
           focus: false,
         })
       );
@@ -383,7 +385,7 @@ Payment.prototype = {
   writePopup: function() {
     var popup = this.popup;
     if (popup) {
-      popup.write(templates.popup(this));
+      popup.write(popupTemplate(this));
     }
   },
 
