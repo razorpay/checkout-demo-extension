@@ -1,4 +1,5 @@
 export const keys = o => Object.keys(o);
+export const create = (obj, props) => Object.create(obj, props);
 export const isEmpty = o => !keys(o).length;
 export const hasProp = _.curry2((o, prop) => prop in o);
 export const hasOwnProp = _.curry2((o, prop) => o && o.hasOwnProperty(prop));

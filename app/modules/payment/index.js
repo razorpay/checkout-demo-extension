@@ -9,7 +9,6 @@ import * as cookie from 'lib/cookie';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 
-import jsonp from 'lib/jsonp';
 import 'exports/razorpay';
 import * as Color from 'lib/color';
 
@@ -530,13 +529,10 @@ razorpayPayment.getPrefs = function(data, callback) {
  * @param {Function} callback
  */
 function getFlowsJsonp(data, callback) {
-  return jsonp({
+  return fetch.jsonp({
     url: makeUrl('payment/flows'),
-    data: data,
-    timeout: 30000,
-    success: function(response) {
-      invoke(callback, null, response);
-    },
+    data,
+    callback,
   });
 }
 

@@ -106,10 +106,12 @@ var responseTypes = {
   },
 
   async: function(request, fullResponse) {
-    this.ajax = fetch({
-      url: request.url,
-      callback: response => this.complete(response),
-    }).till(response => response && response.status);
+    this.ajax = fetch
+      .jsonp({
+        url: request.url,
+        callback: response => this.complete(response),
+      })
+      .till(response => response && response.status);
 
     this.emit('upi.pending', fullResponse.data);
   },
