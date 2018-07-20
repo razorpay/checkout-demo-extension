@@ -22,7 +22,6 @@ function isua(ua_regex) {
   return ua_regex.test(ua);
 }
 
-var is_ie8 = !window.addEventListener;
 var ua_iPhone = isua(/iPhone/);
 var ua_iOS = ua_iPhone || isua(/iPad/);
 var ua_Android = isua(/Android/);
@@ -395,7 +394,7 @@ function hexToRgb(hex, alpha) {
         red: (parseInt(result[1], 16) / 255).toFixed(1),
         green: (parseInt(result[2], 16) / 255).toFixed(1),
         blue: (parseInt(result[3], 16) / 255).toFixed(1),
-        alpha: alpha || 1
+        alpha: alpha || 1,
       }
     : null;
 }

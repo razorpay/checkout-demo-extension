@@ -620,7 +620,6 @@ function showModal(session) {
   session.optional = arr2obj(preferences.optional);
   if (
     cookieDisabled ||
-    is_ie8 ||
     (session.optional.contact && !session_options['prefill.contact'])
   ) {
     options.remember_customer = false;

@@ -51,11 +51,9 @@ EvtHandler.prototype = {
       useCapture = el;
       el = this.el;
     }
-    if (!is_ie8) {
-      this.listeners.push(
-        getListener(el, event, binder(callback, this.thisArg), useCapture)
-      );
-    }
+    this.listeners.push(
+      getListener(el, event, binder(callback, this.thisArg), useCapture)
+    );
     return this;
   },
 
@@ -65,5 +63,5 @@ EvtHandler.prototype = {
     });
     this.listeners = [];
     return this;
-  }
+  },
 };
