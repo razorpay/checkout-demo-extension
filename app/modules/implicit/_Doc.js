@@ -20,6 +20,16 @@ export function resolveUrl(relativeUrl) {
   return link.src;
 }
 
+export function redirect(data) {
+  if (!data.target && window !== window.parent) {
+    return global.Razorpay.sendMessage({
+      event: 'redirect',
+      data,
+    });
+  }
+  submitForm(data.url, data.content, data.method, data.target);
+}
+
 export function submitForm(action, data, method, target) {
   if (method === 'get') {
     action = _.appendParamsToUrl(action, data);

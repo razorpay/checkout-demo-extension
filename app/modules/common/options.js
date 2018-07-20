@@ -60,7 +60,7 @@ function base_set(flatObj, defObj, objKey, objVal) {
   }
 }
 
-function flattenProp(obj, prop, type) {
+export function flattenProp(obj, prop, type) {
   _Obj.loop(obj[prop], function(val, key) {
     var valType = typeof val;
     if (valType === 'string' || valType === 'number' || valType === 'boolean') {

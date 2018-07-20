@@ -5,14 +5,15 @@ import {
 } from 'payment/coproto';
 
 import * as cookie from 'lib/cookie';
-
-import { formatPayment } from 'payment/validator';
-import { FormatDelegator } from 'formatter';
-
-import 'entry/razorpay';
 import * as Color from 'lib/color';
 
-var RAZORPAY_COLOR = '#528FF0';
+import Track from 'tracker';
+import { formatPayment } from 'payment/validator';
+import { FormatDelegator } from 'formatter';
+import { RazorpayConfig } from 'common/Razorpay';
+
+const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
+const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
 function clearPollingInterval(force) {
@@ -25,7 +26,7 @@ function clearPollingInterval(force) {
 
 var communicator;
 function setCommunicator() {
-  if (!discreet.isFrame && /MSIE |Trident\//.test(ua)) {
+  if (!isRazorpayFrame && /MSIE |Trident\//.test(ua)) {
     _El.create('iframe')
       |> _El.displayNone
       |> _El.appendTo(_Doc.documentElement)
@@ -36,7 +37,7 @@ setCommunicator();
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = discreet.error();
+    var cancelError = 'Payment canceled';
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};
@@ -191,8 +192,8 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (!this.powerwallet || (data.method === 'upi' && !discreet.isFrame)) {
-        discreet.redirect({
+      if (!this.powerwallet || (data.method === 'upi' && !isRazorpayFrame)) {
+        _Doc.redirect({
           url: makeRedirectUrl(this.fees),
           content: data,
           method: 'post',
@@ -224,7 +225,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if ((discreet.isFrame && !this.powerwallet) || this.isMagicPayment) {
+    if ((isRazorpayFrame && !this.powerwallet) || this.isMagicPayment) {
       this.complete
         |> _Func.bind(this)
         |> _Obj.setPropOf(window, 'onComplete')
@@ -275,7 +276,7 @@ Payment.prototype = {
             return;
           }
         }
-        data = discreet.error('Payment failed');
+        data = _.rzpError('Payment failed');
       }
       this.emit('error', data);
     }
@@ -316,7 +317,7 @@ Payment.prototype = {
     }
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
     if (
-      !discreet.isFrame &&
+      !isRazorpayFrame &&
       (/MSIE /.test(ua) ||
         data.wallet === 'payumoney' ||
         data.wallet === 'freecharge' ||
@@ -494,7 +495,7 @@ razorpayProto.topupWallet = function() {
     callback: function(response) {
       var request = response.request;
       if (isRedirect && !response.error && request) {
-        discreet.redirect({
+        _Doc.redirect({
           url: request.url,
           content: request.content,
           method: request.method || 'post',

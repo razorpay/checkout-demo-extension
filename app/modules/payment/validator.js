@@ -1,4 +1,5 @@
-import getFingerprint from './fingerprint';
+import getFingerprint from 'fingerprint';
+import { flattenProp } from 'common/options';
 
 export const formatPayment = function(payment) {
   var data = payment.data;

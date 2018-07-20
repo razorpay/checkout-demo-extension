@@ -3,7 +3,7 @@ import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
 import { displayCurrencies } from 'common/currency';
 
-const RazorpayConfig = {
+export const RazorpayConfig = {
   api: 'https://api.razorpay.com/',
   version: 'v1/',
   frameApi: '/',
@@ -218,16 +218,6 @@ var discreet = {
         description: message || discreet.cancelMsg,
       },
     };
-  },
-
-  redirect: function(data) {
-    if (!data.target && window !== window.parent) {
-      return Razorpay.sendMessage({
-        event: 'redirect',
-        data,
-      });
-    }
-    _Doc.submitForm(data.url, data.content, data.method, data.target);
   },
 };
 

@@ -25,4 +25,4 @@ if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }
 
-export const androidBrowser = ua_Android && (chromeVersion || check(/firefox/)); // Chrome or firefox on Android
+export const androidBrowser = android && (chromeVersion || check(/firefox/)); // Chrome or firefox on Android

@@ -1,6 +1,7 @@
-import * as Tez from './tez';
+import * as Tez from 'tez';
 import * as text from 'common/text';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
+import { androidBrowser } from 'common/useragent';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -173,7 +174,7 @@ var responseTypes = {
       } else {
         CheckoutBridge.callNativeIntent(intent_url);
       }
-    } else if (ua_android_browser) {
+    } else if (androidBrowser) {
       if (this.tez) {
         return responseTypes['tez'].call(this, request, fullResponse);
       }
@@ -222,6 +223,6 @@ var responseTypes = {
 
   // prettier-ignore
   'return': function(request) {
-    discreet.redirect(request);
+    _Doc.redirect(request);
   }
 };
