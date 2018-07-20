@@ -1,5 +1,3 @@
-import { reduce } from 'lib/_Arr';
-
 import card from './card';
 import netbanking from './netbanking';
 import upi from './upi';
@@ -33,7 +31,7 @@ export const getIcon = (
 };
 
 export const getIcons = options =>
-  reduce(
+  _Arr.reduce(
     availPaymentMethods,
     (result, method) => {
       result[method] = getIcon(method, options);

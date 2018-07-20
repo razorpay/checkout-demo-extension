@@ -9,7 +9,7 @@ import * as cookie from 'lib/cookie';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 
-import 'exports/razorpay';
+import 'entry/razorpay';
 import * as Color from 'lib/color';
 
 var RAZORPAY_COLOR = '#528FF0';

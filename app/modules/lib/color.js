@@ -6,7 +6,7 @@
 // give color like "red" or color with
 // alpha value. need to render on canvas to find
 // resultant color
-const canvas = document.createElement('canvas'),
+const canvas = _El.create('canvas'),
   ctx = canvas.getContext('2d');
 
 /**

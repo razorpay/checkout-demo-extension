@@ -8,15 +8,15 @@ const modules = {
   tez: 'Tez',
   'templates/paymentMethodIcons/index': '_PaymentMethodIcons',
   'lib/color': 'Color',
-  'lib/fetch': 'fetch',
+  'implicit/fetch': 'fetch',
   'common/upi': 'UPIUtils',
   formatter: 'Formatter',
   confirm: 'Confirm',
   callout: 'Callout',
   'common/currency': 'Currency',
-  'lib/_': '_',
+  'implicit/_': '_',
   tracker: 'Track',
-  'exports/razorpay': 'Razorpay',
+  'entry/razorpay': 'Razorpay',
 };
 
 function getOptions(module) {

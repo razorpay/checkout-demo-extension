@@ -158,7 +158,7 @@ function getPrefsJsonp(data, callback) {
   return fetch.jsonp({
     url: makeUrl('preferences'),
     data: data,
-    callback,
+    callback: callback,
   });
 }
 
