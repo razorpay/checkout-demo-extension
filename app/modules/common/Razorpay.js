@@ -186,7 +186,7 @@ function isValidAmount(amt) {
   return amt >= 100;
 }
 
-function makePrefParams(rzp) {
+export function makePrefParams(rzp) {
   if (rzp) {
     var getter = rzp.get;
     var params = {};

@@ -9,6 +9,8 @@ export const loop = _.curry2((array, iteratee) => {
   return array;
 });
 
+export const callAll = array => loop(a => a());
+
 const arrayCall = func => _.curry2((arr, arg) => proto[func].call(arr, arg));
 export const any = arrayCall('some');
 export const every = arrayCall('every');

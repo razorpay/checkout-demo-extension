@@ -1,5 +1,6 @@
 import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
+import 'checkoutjs/open';
 
 RazorpayDefaults.handler = function(data) {
   if (_.is(this, Razorpay)) {
