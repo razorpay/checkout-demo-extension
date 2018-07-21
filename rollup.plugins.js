@@ -8,6 +8,7 @@ require('child_process').execSync('mkdir -p app/modules/generated');
 
 let injects = {
   global: ['generated/globals', 'global'],
+  fetch: 'implicit/fetch',
   _: ['implicit/_', '*'],
   _Arr: ['implicit/_Arr', '*'],
   _Str: ['implicit/_Str', '*'],

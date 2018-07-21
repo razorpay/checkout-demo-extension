@@ -28,18 +28,6 @@ export const RazorpayDefaults = {
   },
 };
 
-const flatKeys = {};
-
-_Obj.loop(RazorpayDefaults, function(val, key) {
-  if (_.isNonNullObject(val)) {
-    flatKeys[key] = true;
-    _Obj.loop(val, function(subVal, subKey) {
-      RazorpayDefaults[key + '.' + subKey] = subVal;
-    });
-    delete RazorpayDefaults[key];
-  }
-});
-
 function base_set(flatObj, defObj, objKey, objVal) {
   objKey = objKey.toLowerCase();
   var defaultVal = defObj[objKey];
@@ -88,7 +76,17 @@ export function flatten(obj, defObj) {
   return flatObj;
 }
 
+const flatKeys = {};
 export default function Options(options) {
+  _Obj.loop(RazorpayDefaults, function(val, key) {
+    if (_.isNonNullObject(val)) {
+      flatKeys[key] = true;
+      _Obj.loop(val, function(subVal, subKey) {
+        RazorpayDefaults[key + '.' + subKey] = subVal;
+      });
+      delete RazorpayDefaults[key];
+    }
+  });
   options = flatten(options, RazorpayDefaults);
   var callback_url = options.callback_url;
   if (callback_url && shouldRedirect) {

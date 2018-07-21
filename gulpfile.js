@@ -76,7 +76,7 @@ gulp.task('css:prod', () => {
 
 function joinJs() {
   return gulp
-    .src(assetPath('index.html'))
+    .src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(
       through(function(file, enc, cb) {

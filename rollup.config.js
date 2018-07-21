@@ -4,14 +4,12 @@ const modules = {
   tez: 'Tez',
   'templates/paymentMethodIcons/index': '_PaymentMethodIcons',
   'lib/color': 'Color',
-  'implicit/fetch': 'fetch',
-  'common/upi': 'UPIUtils',
   confirm: 'Confirm',
   callout: 'Callout',
-  'common/currency': 'Currency',
-  tracker: 'Track',
   'entry/razorpay': 'Razorpay',
-  'entry/checkout': 'Checkout',
+  'entry/checkout': 'Razorpay',
+  'entry/checkout-frame': 'Razorpay',
+  'checkoutframe/discreet': 'discreet',
 };
 
 function getOptions(module) {

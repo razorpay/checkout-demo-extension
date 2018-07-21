@@ -6,7 +6,7 @@
     animation: true,
     backdropclose: true,
     onhide: null,
-    onhidden: null
+    onhidden: null,
   };
 
   var clearTimeout = function() {
@@ -105,7 +105,10 @@
     },
 
     bind: function() {
-      if (!ua_iOS && typeof window.pageYOffset === 'number') {
+      if (
+        !/iP[hone|ad]/.test(navigator.userAgent) &&
+        typeof window.pageYOffset === 'number'
+      ) {
         // doesn't exist <ie9. we're concerned about mobile here.
         this.on('resize', window, function() {
           var el = document.activeElement;
@@ -123,7 +126,7 @@
                   'number',
                   'date',
                   'email',
-                  'tel'
+                  'tel',
                 ],
                 inputType =
                   (document.activeElement &&
@@ -156,6 +159,6 @@
     destroy: function() {
       invokeEach(this.listeners);
       this.listeners = [];
-    }
+    },
   };
 })();

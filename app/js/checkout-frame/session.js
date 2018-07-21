@@ -1,7 +1,10 @@
 var RAZORPAY_HOVER_COLOR = '#626A74';
 
+var ua = navigator.userAgent;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
+var shouldFixFixed = /iPhone/.test(ua);
+var ua_iPhone = shouldFixFixed;
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -519,7 +522,7 @@ function Session(options) {
 }
 
 Session.prototype = {
-  getDecimalAmount: Currency.getDecimalAmount,
+  getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     return (amount / 100)
       .toFixed(2)

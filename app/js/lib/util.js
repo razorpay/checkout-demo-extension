@@ -1,4 +1,5 @@
 var pi = Math.PI;
+var doc = document.documentElement;
 
 function raise(message) {
   throw new Error(message);

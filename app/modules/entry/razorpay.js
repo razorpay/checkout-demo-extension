@@ -1,6 +1,9 @@
 import Razorpay from 'common/Razorpay';
 import 'payment';
 
+import Track from 'tracker';
+Track.props.library = 'razorpayjs';
+
 Razorpay.payment.authorize = function(options) {
   var r = Razorpay({ amount: options.data.amount }).createPayment(options.data);
   r.on('payment.success', options.success);

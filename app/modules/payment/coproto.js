@@ -1,5 +1,5 @@
 import * as Tez from 'tez';
-import * as text from 'common/text';
+import * as strings from 'common/strings';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
@@ -8,7 +8,7 @@ export const processOtpResponse = function(response) {
   var error = response.error;
   if (error) {
     if (error.action === 'RETRY') {
-      return this.emit('otp.required', text.wrontOtp);
+      return this.emit('otp.required', strings.wrontOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }

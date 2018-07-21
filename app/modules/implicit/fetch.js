@@ -69,6 +69,7 @@ _Func.setPrototype(fetch, {
 
     var xhr = new Xhr();
     this.setReq('ajax', xhr);
+
     xhr.open(method, url, true);
 
     xhr.onreadystatechange = function() {

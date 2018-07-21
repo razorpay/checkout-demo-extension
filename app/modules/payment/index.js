@@ -6,6 +6,7 @@ import {
 
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
+import * as strings from 'common/strings';
 
 import fetch from 'implicit/fetch';
 import Track from 'tracker';
@@ -41,7 +42,7 @@ setCommunicator();
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = 'Payment canceled';
+    var cancelError = strings.cancelMsg;
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};

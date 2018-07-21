@@ -133,27 +133,35 @@ function initAutomaticCheckout() {
 
 var frameContainer;
 function createFrameContainer() {
-  return (
-    _El.create()
-    |> _Obj.setProp('className', 'razorpay-container')
-    |> _Obj.setProp(
-      'innerHTML',
-      '<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>'
-    )
-    |> _El.setStyles({
-      zIndex: 1e9,
-      position: 'fixed',
-      top: 0,
-      display: 'none',
-      left: 0,
-      height: '100%',
-      width: '100%',
-      '-webkit-overflow-scrolling': 'touch',
-      '-webkit-backface-visibility': 'hidden',
-      'overflow-y': 'visible',
-    })
-    |> _El.appendTo(body)
-  );
+  if (!frameContainer) {
+    frameContainer =
+      _El.create()
+      |> _Obj.setProp('className', 'razorpay-container')
+      |> _Obj.setProp(
+        'innerHTML',
+        '<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>'
+      )
+      |> _El.setStyles({
+        zIndex: 1e9,
+        position: 'fixed',
+        top: 0,
+        display: 'none',
+        left: 0,
+        height: '100%',
+        width: '100%',
+        '-webkit-overflow-scrolling': 'touch',
+        '-webkit-backface-visibility': 'hidden',
+        'overflow-y': 'visible',
+      })
+      |> _El.appendTo(body);
+    CheckoutFrame.container = frameContainer;
+    var frameBackdrop = createFrameBackdrop(frameContainer);
+    CheckoutFrame.backdrop = frameBackdrop;
+    var testRibbon = createTestRibbon(frameBackdrop);
+    CheckoutFrame.ribbon = testRibbon;
+  }
+
+  return frameContainer;
 }
 
 function createFrameBackdrop(container) {
@@ -201,7 +209,7 @@ function createTestRibbon(parent) {
       right: '-50px',
       top: '50px',
     })
-    |> _El.append(parent)
+    |> _El.appendTo(parent)
   );
 }
 
@@ -267,12 +275,7 @@ RazorProto.close = function() {
 };
 
 var initRazorpayCheckout = needBody(function() {
-  frameContainer = createFrameContainer();
-  CheckoutFrame.container = frameContainer;
-  var frameBackdrop = createFrameBackdrop(frameContainer);
-  CheckoutFrame.backdrop = frameBackdrop;
-  var testRibbon = createTestRibbon(frameBackdrop);
-  CheckoutFrame.ribbon = testRibbon;
+  createFrameContainer();
   preloadedFrame = getPreloadedFrame();
   // Get the ball rolling in case we are in manual mode
   try {
