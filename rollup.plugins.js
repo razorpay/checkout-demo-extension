@@ -2,6 +2,7 @@ const babel = require('rollup-plugin-babel');
 const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
+const stylus = require('stylus');
 const fs = require('fs');
 
 require('child_process').execSync('mkdir -p app/modules/generated');
@@ -45,6 +46,30 @@ fs.writeFileSync(
       .join(';')
 );
 
+const stylusProcessor = (content, id) =>
+  new Promise((resolve, reject) => {
+    var stylusOptions = {
+      filename: id,
+      compress: true,
+    };
+
+    if (process.env.prod) {
+      stylusOptions.use = [
+        autoprefixer({
+          browsers: ['android 4.4', 'last 10 versions', 'iOS 7'],
+        }),
+      ];
+    }
+    const renderer = stylus(content, stylusOptions);
+    renderer.render((err, code) => {
+      if (err) {
+        return reject(err);
+      }
+      code = `export default ${JSON.stringify(code)};`;
+      resolve({ code, map: { mappings: '' } });
+    });
+  });
+
 module.exports = [
   include({
     paths: ['app/modules'],
@@ -79,4 +104,12 @@ module.exports = [
   }),
 
   inject(injects),
+
+  {
+    transform(content, id) {
+      if (id.endsWith('.styl')) {
+        return stylusProcessor(content, id);
+      }
+    },
+  },
 ];
