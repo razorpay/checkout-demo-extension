@@ -3,6 +3,7 @@ const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
 const stylus = require('stylus');
+const autoprefixer = require('autoprefixer-stylus');
 const fs = require('fs');
 
 require('child_process').execSync('mkdir -p app/modules/generated');

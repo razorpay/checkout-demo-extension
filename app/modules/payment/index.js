@@ -392,6 +392,7 @@ Payment.prototype = {
     var popup = this.popup;
     if (popup) {
       popup.write(popupTemplate(this));
+      popup.window.deserialize = _Doc.obj2formhtml;
     }
   },
 
