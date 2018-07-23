@@ -12,7 +12,7 @@ export const getElementById = _Func.bind('getElementById', document);
 export const getComputedStyle = _Func.bind('getComputedStyle', global);
 export const EventConstructor = global.Event;
 export const isEvent = x => _.is(x, EventConstructor);
-export const resolve = el => (_.isString(el) ? querySelector(el) : el);
+export const resolveElement = el => (_.isString(el) ? querySelector(el) : el);
 
 var link;
 export function resolveUrl(relativeUrl) {
@@ -32,7 +32,7 @@ export function redirect(data) {
 }
 
 export function submitForm(action, data, method, target) {
-  if (method === 'get') {
+  if (method && method.toLowerCase() === 'get') {
     action = _.appendParamsToUrl(action, data);
     if (target) {
       global.open(action, target);
@@ -40,8 +40,12 @@ export function submitForm(action, data, method, target) {
       global.location = action;
     }
   } else {
+    let attr = { action, method };
+    if (action) {
+      attr.target = target;
+    }
     _El.create('form')
-      |> _El.setAttributes({ target, action, method })
+      |> _El.setAttributes(attr)
       |> _El.setContents(data |> obj2formhtml)
       |> _El.appendTo(documentElement)
       |> _El.submit

@@ -1,3 +1,5 @@
+doc = document.body;
+
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,

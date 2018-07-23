@@ -54,7 +54,7 @@ function handleError(err) {
 const stylusOptions = {
   use: [
     autoprefixer({
-      browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
+      browsers: ['android 4.4', 'last 10 versions', 'iOS 7'],
     }),
   ],
 };

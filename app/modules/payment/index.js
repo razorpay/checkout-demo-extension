@@ -10,7 +10,7 @@ import * as strings from 'common/strings';
 
 import fetch from 'implicit/fetch';
 import Track from 'tracker';
-import popupTemplate from 'payment/popupTemplate';
+import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
@@ -46,7 +46,7 @@ setCommunicator();
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = strings.cancelMsg;
+    var cancelError = _.rzpError(strings.cancelMsg);
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};
@@ -392,6 +392,7 @@ Payment.prototype = {
     var popup = this.popup;
     if (popup) {
       popup.write(popupTemplate(this));
+      popup.window.deserialize = _Doc.obj2formhtml;
     }
   },
 

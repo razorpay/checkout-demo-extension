@@ -19,7 +19,7 @@ RazorpayDefaults.buttontext = 'Pay Now';
 RazorpayDefaults.parent = null;
 
 optionValidations.parent = function(parent) {
-  if (!_Doc.resolve(parent)) {
+  if (!_Doc.resolveElement(parent)) {
     return "parent provided for embedded mode doesn't exist";
   }
 };
