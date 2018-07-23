@@ -1,6 +1,12 @@
+import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
+import Track from 'tracker';
+import { iPhone } from 'common/useragent';
+
+const ua_iPhone = iPhone;
+var doc, head, docStyle;
+
 var ch_PageY = 0;
 // there is no "position: fixed" in iphone
-var docStyle = doc.style;
 var containerHeight = 460;
 var merchantMarkup = {
   overflow: '',
@@ -12,7 +18,8 @@ var merchantMarkup = {
 
   resize: function() {
     var height = innerHeight || screen.height;
-    frameContainer.style.position = height < 450 ? 'absolute' : 'fixed';
+    CheckoutFrame.container.style.position =
+      height < 450 ? 'absolute' : 'fixed';
     this.el.style.height = Math.max(height, containerHeight) + 'px';
   },
 
@@ -24,17 +31,17 @@ var merchantMarkup = {
     if (innerHeight < containerHeight) {
       var maxY = containerHeight - innerHeight;
       if (pageYOffset > maxY + 120) {
-        smoothScrollTo(maxY);
+        _Doc.smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
-      smoothScrollTo(0);
+      _Doc.smoothScrollTo(0);
     }
   },
 };
 
 function getMetas() {
   if (!merchantMarkup.metas) {
-    merchantMarkup.metas = $$(
+    merchantMarkup.metas = _Doc.querySelectorAll(
       'head meta[name=viewport],' + 'head meta[name="theme-color"]'
     );
   }
@@ -44,15 +51,11 @@ function getMetas() {
 
 function restoreMetas($metas) {
   if ($metas) {
-    each($metas, function(i, meta) {
-      $(meta[0]).remove();
-    });
+    _Arr.loop($metas, _El.detach);
   }
   var oldMeta = getMetas();
   if (oldMeta) {
-    each(oldMeta, function(i, meta) {
-      qs('head').appendChild(meta);
-    });
+    _Arr.loop(oldMeta, _El.appendTo(head));
   }
 }
 
@@ -63,8 +66,8 @@ function restoreOverflow() {
 // to handle absolute/relative url of options.image
 function sanitizeImage(options) {
   var image = options.image;
-  if (image && isString(image)) {
-    if (discreet.isBase64Image(image)) {
+  if (image && _.isString(image)) {
+    if (_.isBase64Image(image)) {
       return;
     }
     if (image.indexOf('http')) {
@@ -94,39 +97,32 @@ function makeCheckoutUrl(rzp) {
 
     var urlParams = makePrefParams(rzp);
     if (!urlParams) {
-      urlParams = {};
       url += '/public';
-    }
-
-    if (RazorpayConfig.js) {
-      urlParams.checkout = RazorpayConfig.js;
-    }
-
-    var paramsArray = [];
-    each(urlParams, function(key, val) {
-      paramsArray.push(key + '=' + val);
-    });
-
-    if (paramsArray.length) {
-      url += '?' + paramsArray.join('&');
+    } else {
+      url = _.appendParamsToUrl(url, urlParams);
     }
   }
+
   return url;
 }
 
 function setBackdropColor(value) {
   // setting unsupported value throws error in IE
   try {
-    frameBackdrop.style.background = value;
+    CheckoutFrame.backdrop.style.background = value;
   } catch (e) {}
 }
 
 function setTestRibbonVisible() {
-  testRibbon.style.opacity = 1.0;
+  if (CheckoutFrame.ribbon) {
+    CheckoutFrame.ribbon.style.opacity = 1;
+  }
 }
 
 function setTestRibbonInvisible() {
-  testRibbon.style.opacity = 0.0;
+  if (CheckoutFrame.ribbon) {
+    CheckoutFrame.ribbon.style.opacity = 0;
+  }
 }
 
 var loader;
@@ -144,18 +140,21 @@ function appendLoader($parent, parent) {
         style += 'position:absolute;left:50%;top:50%;';
       }
       loader.setAttribute('style', style);
-      $parent.append(loader);
+      loader |> _El.appendTo($parent);
     } catch (e) {}
   }
 }
 
-function CheckoutFrame(rzp) {
+export default function CheckoutFrame(rzp) {
+  doc = document.body;
+  head = document.head;
+  docStyle = doc.style;
   if (rzp) {
     this.getEl(rzp);
     return this.openRzp(rzp);
   }
   this.getEl();
-  this.time = now();
+  this.time = _.now();
 }
 
 CheckoutFrame.prototype = {
@@ -174,33 +173,35 @@ CheckoutFrame.prototype = {
       };
 
       attribs['class'] = 'razorpay-checkout-frame';
-      this.el = $(document.createElement('iframe')).attr(attribs)[0];
+      this.el = _El.create('iframe') |> _El.setAttributes(attribs);
     }
     return this.el;
   },
 
   openRzp: function(rzp) {
-    var $el = $(this.el).css({
-      // by the time checkout opens, other plugins might resize iframe
-      width: '100%',
-      height: '100%',
-    });
+    var el =
+      this.el
+      |> _El.setStyles({
+        // by the time checkout opens, other plugins might resize iframe
+        width: '100%',
+        height: '100%',
+      });
     var parent = rzp.get('parent');
-    var $parent = $(parent || frameContainer);
-    appendLoader($parent, parent);
+    var parent2 = parent || CheckoutFrame.container;
+    appendLoader(parent2, parent);
 
     if (rzp !== this.rzp) {
-      if ($el.parent() !== $parent[0]) {
-        $parent.append($el[0]);
+      if (_El.parent(el) !== parent2) {
+        parent2 |> _El.append(el);
       }
       this.rzp = rzp;
     }
 
     if (parent) {
-      $el.css('minHeight', '530px');
+      el |> _El.setStyle('minHeight', '530px');
       this.embedded = true;
     } else {
-      $parent.css('display', 'block').reflow();
+      parent2 |> _El.setStyle('display', 'block') |> _El.offsetWidth;
       setBackdropColor(rzp.get('theme.backdrop_color'));
       if (/^rzp_t/.test(rzp.get('key'))) {
         setTestRibbonVisible();
@@ -224,7 +225,7 @@ CheckoutFrame.prototype = {
       id: rzp.id,
     };
 
-    each(rzp.modal.options, function(i, option) {
+    _Obj.loop(rzp.modal.options, function(option, i) {
       options['modal.' + i] = option;
     });
 
@@ -264,53 +265,48 @@ CheckoutFrame.prototype = {
         }
       }
 
-      each(
-        eventPairs,
-        function(event, listener) {
-          this.listeners.push($(window).on(event, listener, null, this));
-        },
-        this
-      );
+      _Obj.loop(eventPairs, (listener, event) => {
+        this.listeners.push(
+          window |> _El.on(event, _Func.bind(listener, this))
+        );
+      });
     }
   },
 
   unbind: function() {
-    invokeEach(this.listeners);
+    this.listeners |> _Arr.callAll;
     this.listeners = null;
   },
 
   setMetaAndOverflow: function() {
-    var head = qs('head');
     if (!head) {
       return;
     }
 
-    each(getMetas(), function(i, meta) {
-      $(meta).remove();
-    });
+    _Arr.loop(getMetas(), meta => _El.detach(meta));
 
     this.$metas = [
-      $(document.createElement('meta')).attr({
-        name: 'viewport',
-        content:
-          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
-      }),
-      $(document.createElement('meta')).attr({
-        name: 'theme-color',
-        content: this.rzp.get('theme.color'),
-      }),
+      _El.create('meta')
+        |> _El.setAttributes({
+          name: 'viewport',
+          content:
+            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+        }),
+      _El.create('meta')
+        |> _El.setAttributes({
+          name: 'theme-color',
+          content: this.rzp.get('theme.color'),
+        }),
     ];
 
-    each(this.$metas, function(i, meta) {
-      head.appendChild(meta[0]);
-    });
+    _Arr.loop(this.$metas, _El.appendTo(head));
 
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
 
     if (ua_iPhone) {
       merchantMarkup.oldY = pageYOffset;
-      window.scrollTo(0, 0);
+      global.scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
     }
   },
@@ -320,14 +316,14 @@ CheckoutFrame.prototype = {
       // TODO roll
     }
     response.id = this.rzp.id;
-    response = stringify(response);
+    response = _Obj.stringify(response);
     this.el.contentWindow.postMessage(response, '*');
   },
 
   onmessage: function(e) {
     var data;
     try {
-      data = JSON.parse(e.data);
+      data = _Obj.parse(e.data);
     } catch (err) {
       return;
     }
@@ -344,7 +340,7 @@ CheckoutFrame.prototype = {
       return;
     }
     data = data.data;
-    invoke('on' + event, this, data);
+    this['on' + event](data);
 
     if (event === 'dismiss' || event === 'fault') {
       Track(rzp, event, data);
@@ -368,25 +364,25 @@ CheckoutFrame.prototype = {
 
   onrender: function() {
     if (loader) {
-      $(loader).remove();
+      loader |> _El.detach;
       loader = null;
     }
   },
 
   onredirect: function(data) {
-    discreet.redirect(data);
+    _Doc.redirect(data);
   },
 
   onsubmit: function(data) {
     if (data.method === 'wallet') {
       // check if it was one of the external wallets
       var rzp = this.rzp;
-      each(rzp.get('external.wallets'), function(i, walletName) {
+      _Arr.loop(rzp.get('external.wallets'), function(walletName) {
         if (walletName === data.wallet) {
           try {
             rzp.get('external.handler').call(rzp, data);
           } catch (e) {
-            roll('merc', e);
+            console.error(e);
           }
         }
       });
@@ -395,27 +391,31 @@ CheckoutFrame.prototype = {
 
   ondismiss: function(data) {
     this.close();
-    invoke(this.rzp.get('modal.ondismiss'), 0, data);
+    let dismiss = this.rzp.get('modal.ondismiss');
+    if (_.isFunction) {
+      setTimeout(() => dismiss(data));
+    }
   },
 
   onhidden: function() {
     this.afterClose();
-    invoke(this.rzp.get('modal.onhidden'));
+    let hidden = this.rzp.get('modal.onhidden');
+    if (_.isFunction(hidden)) {
+      hidden();
+    }
   },
 
   // this is onsuccess method
   oncomplete: function(data) {
     this.close();
     var rzp = this.rzp;
+    var handler = rzp.get('handler');
     Track(rzp, 'checkout_success', data);
-    invoke(
-      function() {
-        invoke(this.get('handler'), this, data);
-      },
-      rzp,
-      null,
-      200
-    );
+    if (_.isFunction(handler)) {
+      setTimeout(function() {
+        handler.call(rzp, data);
+      }, 200);
+    }
   },
 
   onpaymenterror: function(data) {
@@ -438,6 +438,6 @@ CheckoutFrame.prototype = {
   },
 
   afterClose: function() {
-    frameContainer.style.display = 'none';
+    CheckoutFrame.container.style.display = 'none';
   },
 };

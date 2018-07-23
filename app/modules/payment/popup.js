@@ -53,19 +53,16 @@ export default function Popup(src, name) {
 
   // turn the "opts" object into a window.open()-compatible String
   var optsStr = [];
-  each(opts, function(key, val) {
+  _Obj.loop(opts, function(val, key) {
     optsStr.push(key + '=' + val);
   });
   optsStr = optsStr.join(',');
 
   this.name = name;
 
-  // unsupported browsers
-  if (ua_popup_supported) {
-    try {
-      this.window = window.open(src, name || '', optsStr); // might be null in IE9 if protected mode is turned on
-    } catch (e) {}
-  }
+  try {
+    this.window = window.open(src, name || '', optsStr); // might be null in IE9 if protected mode is turned on
+  } catch (e) {}
 
   if (!this.window) {
     return null;
@@ -73,7 +70,7 @@ export default function Popup(src, name) {
 
   this.window.focus();
   this.listeners = [];
-  this.interval = setInterval(bind(this.checkClose, this), 200);
+  this.interval = setInterval(_Func.bind('checkClose', this), 200);
 
   this.on('beforeunload', this.beforeunload);
   this.on('unload', this.close);
@@ -101,14 +98,9 @@ Popup.prototype = {
 
   close: function() {
     clearInterval(this.interval);
-    invokeEach(this.listeners);
+    _Arr.loop(this.listeners, l => l());
     this.listeners = [];
-
-    try {
-      this.window.close();
-    } catch (e) {
-      roll('tried popup.close', e, 'warn');
-    }
+    this.window.close();
   },
 
   /**
@@ -119,14 +111,15 @@ Popup.prototype = {
     try {
       if (forceClosed || this.window.closed !== false) {
         // UC browser makes it undefined instead of true
-        invoke('onClose', this, null, 100);
+        setTimeout(() => {
+          this.onClose();
+        }, 100);
         this.close();
         return true;
       }
     } catch (e) {
       // UC throws error on accessing window if other domain
       this.checkClose(true);
-      roll('Failure checking popup close', null, 'warn');
     }
   },
 };

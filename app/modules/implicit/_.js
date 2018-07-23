@@ -25,9 +25,7 @@ export function validateArgs(...validators) {
   return func =>
     function() {
       let args = arguments;
-      if (validators.length !== lengthOf(args)) {
-        logError('arg length doesnt match');
-      } else if (
+      if (
         validators.every(
           (v, i) => v(args[i]) || logError(`wrong ${i}th argtype`, args[i])
         )

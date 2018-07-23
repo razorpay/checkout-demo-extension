@@ -1,7 +1,10 @@
 var RAZORPAY_HOVER_COLOR = '#626A74';
 
+var ua = navigator.userAgent;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
+var shouldFixFixed = /iPhone/.test(ua);
+var ua_iPhone = shouldFixFixed;
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -519,7 +522,7 @@ function Session(options) {
 }
 
 Session.prototype = {
-  getDecimalAmount: Currency.getDecimalAmount,
+  getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     return (amount / 100)
       .toFixed(2)
@@ -634,18 +637,6 @@ Session.prototype = {
 
     if (shouldFixFixed) {
       classes.push('ip');
-    }
-
-    if (ua_ip7) {
-      classes.push('ip7');
-    }
-
-    if (/Android 4/.test(ua)) {
-      classes.push('android4');
-    }
-
-    if (is_ie8) {
-      classes.push('ie8');
     }
 
     if (this.extraFields) {
@@ -1347,9 +1338,6 @@ Session.prototype = {
     });
 
     this.click('#next-button', 'extraNext');
-    if (is_ie8) {
-      this.bindIeEvents();
-    }
 
     this.on('focus', '#body', 'input', 'focus', true);
     this.on('blur', '#body', 'input', 'blur', true);
@@ -1571,22 +1559,6 @@ Session.prototype = {
     });
   },
 
-  bindIeEvents: function() {
-    /* Binding IE8 events */
-    var self = this;
-
-    self.click('#body', 'radio-item', function(e) {
-      var target = $(e.delegateTarget);
-      var radio = target.find('input[type=radio]')[0];
-      each($$('.radio-item.active'), function(idx, item) {
-        $(item).removeClass('active');
-      });
-      target.addClass('active');
-      radio.checked = true;
-      this.selectBankRadio({ target: radio });
-    });
-  },
-
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
     if (ua_iPhone) {
@@ -1611,10 +1583,6 @@ Session.prototype = {
     var $parent = $(el.parentNode);
 
     $parent.toggleClass('filled', value);
-
-    if (is_ie8) {
-      return toggleInvalid($parent, true);
-    }
 
     // validity check past this
     if (!(required || pattern)) {

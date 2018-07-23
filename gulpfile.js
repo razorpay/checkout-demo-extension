@@ -33,7 +33,7 @@ let paths = {
   templates: assetPath('_templates/**/*.jst'),
   css: assetPath('css/**/*.styl'),
   images: assetPath('images/**/*'),
-  fonts: assetPath('fonts/**/*')
+  fonts: assetPath('fonts/**/*'),
 };
 
 gulp.task('compileTemplates', function(cb) {
@@ -41,7 +41,7 @@ gulp.task('compileTemplates', function(cb) {
   dot.process({
     path: 'app/_templates',
     destination: assetPath('templates'),
-    global: 'templates'
+    global: 'templates',
   });
   cb();
 });
@@ -54,9 +54,9 @@ function handleError(err) {
 const stylusOptions = {
   use: [
     autoprefixer({
-      browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7']
-    })
-  ]
+      browsers: ['ie 8', 'android 2.2', 'last 10 versions', 'iOS 7'],
+    }),
+  ],
 };
 
 gulp.task('css', () => {
@@ -113,9 +113,9 @@ gulp.task('uglify', done => {
       compress: {
         pure_funcs,
         global_defs: {
-          DEBUG_ENV: process.env.NODE_ENV !== 'production'
-        }
-      }
+          DEBUG_ENV: process.env.NODE_ENV !== 'production',
+        },
+      },
     }).code;
 
     fs.writeFileSync(file, fileContents);

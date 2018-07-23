@@ -9,6 +9,8 @@ export const loop = _.curry2((array, iteratee) => {
   return array;
 });
 
+export const callAll = array => loop(a => a());
+
 const arrayCall = func => _.curry2((arr, arg) => proto[func].call(arr, arg));
 export const any = arrayCall('some');
 export const every = arrayCall('every');
@@ -70,7 +72,7 @@ export const sliceFrom = _.curry2((array, from) =>
 );
 
 export const reduce = _.curry3((array, reducer, initialValue) =>
-  arrayProto.reduce.call(array, reducer, initialValue)
+  proto.reduce.call(array, reducer, initialValue)
 );
 
 export const merge = _.curry2((arr1, arr2) => {

@@ -44,7 +44,7 @@ class CheckoutFrameTest extends TestBase {
 
     await p.loadScripts(page);
 
-    await page.evaluate(`handleMessage(${JSON.stringify(message)})`);
+    await page.evaluate(`window.handleMessage(${JSON.stringify(message)})`);
     return new Promise((resolve, reject) => p.setCallbacks(resolve, reject));
   }
 

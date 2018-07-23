@@ -1,11 +1,14 @@
-import * as Tez from './tez';
+import * as Tez from 'tez';
+import * as strings from 'common/strings';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
+import { androidBrowser } from 'common/useragent';
+import Track from 'tracker';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
   if (error) {
     if (error.action === 'RETRY') {
-      return this.emit('otp.required', discreet.msg.wrongotp);
+      return this.emit('otp.required', strings.wrontOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }
@@ -172,7 +175,7 @@ var responseTypes = {
       } else {
         CheckoutBridge.callNativeIntent(intent_url);
       }
-    } else if (ua_android_browser) {
+    } else if (androidBrowser) {
       if (this.tez) {
         return responseTypes['tez'].call(this, request, fullResponse);
       }
@@ -221,6 +224,6 @@ var responseTypes = {
 
   // prettier-ignore
   'return': function(request) {
-    discreet.redirect(request);
+    _Doc.redirect(request);
   }
 };

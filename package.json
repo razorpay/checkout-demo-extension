@@ -42,21 +42,20 @@
     "url": "https://github.com/razorpay/checkout/issues"
   },
   "dependencies": {
-    "@babel/core": "^7.0.0-beta.51",
-    "@babel/plugin-proposal-pipeline-operator": "^7.0.0-beta.51",
-    "@babel/plugin-transform-arrow-functions": "^7.0.0-beta.51",
-    "@babel/plugin-transform-block-scoped-functions": "^7.0.0-beta.51",
-    "@babel/plugin-transform-block-scoping": "^7.0.0-beta.51",
-    "@babel/plugin-transform-computed-properties": "^7.0.0-beta.51",
-    "@babel/plugin-transform-destructuring": "^7.0.0-beta.51",
-    "@babel/plugin-transform-parameters": "^7.0.0-beta.51",
-    "@babel/plugin-transform-shorthand-properties": "^7.0.0-beta.51",
-    "@babel/plugin-transform-template-literals": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.54",
+    "@babel/plugin-proposal-pipeline-operator": "^7.0.0-beta.54",
+    "@babel/plugin-transform-arrow-functions": "^7.0.0-beta.54",
+    "@babel/plugin-transform-block-scoped-functions": "^7.0.0-beta.54",
+    "@babel/plugin-transform-block-scoping": "^7.0.0-beta.54",
+    "@babel/plugin-transform-computed-properties": "^7.0.0-beta.54",
+    "@babel/plugin-transform-destructuring": "^7.0.0-beta.54",
+    "@babel/plugin-transform-parameters": "^7.0.0-beta.54",
+    "@babel/plugin-transform-shorthand-properties": "^7.0.0-beta.54",
+    "@babel/plugin-transform-template-literals": "^7.0.0-beta.54",
     "autoprefixer-stylus": "^0.14.0",
     "chalk": "^2.4.1",
-    "dot": "^1.1.2",
-    "fastify": "^1.7.0",
-    "fastify-formbody": "^2.0.0",
+    "fastify": "^1.8.0",
+    "fastify-formbody": "^2.0.1",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
@@ -64,8 +63,8 @@
     "istanbul": "^0.4.5",
     "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
-    "puppeteer": "^1.5.0",
-    "rollup": "^0.61.2",
+    "puppeteer": "1.5.0",
+    "rollup": "^0.63.2",
     "rollup-plugin-babel": "^4.0.0-beta.2",
     "rollup-plugin-coverage": "^0.1.4",
     "rollup-plugin-includepaths": "^0.2.3",
@@ -75,12 +74,12 @@
     "testdouble": "^3.8.1",
     "through": "^2.3.8",
     "through2": "^2.0.3",
-    "uglify-js": "^3.4.2"
+    "uglify-js": "^3.4.5"
   },
   "private": "true",
   "devDependencies": {
     "husky": "^0.14.3",
     "lint-staged": "^7.2.0",
-    "prettier": "^1.13.6"
+    "prettier": "^1.13.7"
   }
 }

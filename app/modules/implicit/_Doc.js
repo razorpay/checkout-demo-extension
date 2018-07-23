@@ -12,12 +12,23 @@ export const getElementById = _Func.bind('getElementById', document);
 export const getComputedStyle = _Func.bind('getComputedStyle', global);
 export const EventConstructor = global.Event;
 export const isEvent = x => _.is(x, EventConstructor);
+export const resolve = el => (_.isString(el) ? querySelector(el) : el);
 
 var link;
 export function resolveUrl(relativeUrl) {
   link = _El.create('a');
   link.src = relativeUrl;
   return link.src;
+}
+
+export function redirect(data) {
+  if (!data.target && global !== global.parent) {
+    return global.Razorpay.sendMessage({
+      event: 'redirect',
+      data,
+    });
+  }
+  submitForm(data.url, data.content, data.method, data.target);
 }
 
 export function submitForm(action, data, method, target) {
@@ -52,6 +63,17 @@ export function obj2formhtml(data, key) {
   return '<input type="hidden" name="' + key + '" value="' + data + '">';
 }
 
+export function form2obj(form) {
+  _Arr.reduce(
+    form.querySelectorAll('[name]'),
+    (obj, value, name) => {
+      obj[name] = value;
+      return obj;
+    },
+    {}
+  );
+}
+
 export function preventEvent(e) {
   if (isEvent(e)) {
     e.preventDefault();
@@ -75,7 +97,7 @@ export function smoothScrollBy(y) {
   }
   scrollTimeout = setTimeout(function() {
     var y0 = pageYOffset;
-    var target = Math.min(y0 + y, elementHeight(body) - innerHeight);
+    var target = Math.min(y0 + y, _El.offsetHeight(body) - innerHeight);
     y = target - y0;
     var scrollCount = 0;
     var oldTimestamp = global.performance.now();
