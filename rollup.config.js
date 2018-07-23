@@ -1,11 +1,6 @@
 let plugins = require('./rollup.plugins');
 
 const modules = {
-  tez: 'Tez',
-  'templates/paymentMethodIcons/index': '_PaymentMethodIcons',
-  'lib/color': 'Color',
-  confirm: 'Confirm',
-  callout: 'Callout',
   'entry/razorpay': 'Razorpay',
   'entry/checkout': 'Razorpay',
   'entry/checkout-frame': 'Razorpay',

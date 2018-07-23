@@ -14,3 +14,12 @@ var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var ua_android_browser = discreet.androidBrowser;
+
+window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+  Track(getSession().r, 'js_error', {
+    message: errorMsg,
+    line: lineNumber,
+    col: column,
+    stack: errorObj && errorObj.stack,
+  });
+};

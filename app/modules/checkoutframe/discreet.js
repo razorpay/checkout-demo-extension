@@ -28,4 +28,5 @@ export default {
   androidBrowser,
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
+  wrongOtpMsg: strings.wrontOtp,
 };
