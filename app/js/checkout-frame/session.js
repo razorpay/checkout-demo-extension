@@ -177,7 +177,7 @@ function onSixDigits(e) {
       gel('emi-plans-wrap').innerHTML = makeEmiDropdown(emiObj, this);
     }
   } else {
-    emi_parent.removeClass('checked');
+    emi_parent.find('input[type=checkbox]')[0].checked = false;
     $(emi_parent.find('.active')[0]).removeClass('active');
   }
   noCvvToggle({ target: nocvvCheck });
