@@ -67,7 +67,7 @@ module.exports = [
       '@babel/transform-shorthand-properties',
       ['@babel/transform-template-literals', { loose: true }],
 
-      '@babel/proposal-pipeline-operator',
+      ['@babel/proposal-pipeline-operator', { proposal: 'minimal' }],
 
       [
         './trace.js',
