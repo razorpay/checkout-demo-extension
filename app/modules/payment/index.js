@@ -46,7 +46,7 @@ setCommunicator();
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = strings.cancelMsg;
+    var cancelError = _.rzpError(strings.cancelMsg);
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};

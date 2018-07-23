@@ -1,5 +1,8 @@
 import { displayAmount } from 'common/currency';
 import css from './popup.styl';
+import { cancelMsg } from 'common/strings';
+
+const cancelError = _Obj.stringify(_.rzpError(cancelMsg));
 
 export default function popupTemplate(_) {
   var get = _.r.get;
@@ -57,19 +60,11 @@ setTimeout(function(){
     if(window.confirm("Do you want to cancel the ongoing payment?")){
       window.close();
       if (CheckoutBridge && CheckoutBridge.oncomplete) {
-        CheckoutBridge.oncomplete(JSON.stringify({
-          error: { description: 'Payment Cancelled' }
-      }))}}};
-
-${_.sdk_popup &&
-    `function submitForm(action, data, method) {
-  if (method === 'get') { return window.location = action }
-  var form = document.forms[0];
-  form.action = action;
-  form.method = method || 'get';
-  if (data) { form.innerHTML = deserialize(data) }
-  form.submit();
-}`}
+        CheckoutBridge.oncomplete('${cancelError}');
+      }
+    }
+  };
+},1e4)
 </script>
 <form></form>
 </body>
