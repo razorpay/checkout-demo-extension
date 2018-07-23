@@ -14,7 +14,11 @@ import popupTemplate from 'payment/popupTemplate';
 import Popup from 'payment/popup';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
-import { RazorpayConfig, makeAuthUrl, makeUrl } from 'common/Razorpay';
+import Razorpay, {
+  RazorpayConfig,
+  makeAuthUrl,
+  makeUrl,
+} from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
 
 const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
