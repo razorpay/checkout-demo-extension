@@ -187,6 +187,9 @@ CheckoutFrame.prototype = {
         height: '100%',
       });
     var parent = rzp.get('parent');
+    if (parent) {
+      parent = _Doc.resolveElement(parent);
+    }
     var parent2 = parent || CheckoutFrame.container;
     appendLoader(parent2, parent);
 
