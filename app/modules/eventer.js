@@ -75,19 +75,15 @@ Eventer.prototype = {
   },
 
   emit: function(event, arg) {
-    _Arr.loop(
-      this._evts[event],
-      function(callback) {
-        try {
-          callback.call(this, arg);
-        } catch (e) {
-          if (console.error) {
-            console.error(e);
-          }
+    _Arr.loop(this._evts[event], callback => {
+      try {
+        callback.call(this, arg);
+      } catch (e) {
+        if (console.error) {
+          console.error(e);
         }
-      },
-      this
-    );
+      }
+    });
     return this;
   },
 
