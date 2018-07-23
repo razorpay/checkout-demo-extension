@@ -8,7 +8,7 @@ import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
-import { getDecimalAmount } from 'common/currency';
+import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
 
@@ -25,6 +25,7 @@ export default {
   Confirm,
   Callout,
   getDecimalAmount,
+  currencies: displayCurrencies,
   androidBrowser,
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
