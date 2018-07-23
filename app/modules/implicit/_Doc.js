@@ -17,8 +17,8 @@ export const resolve = el => (_.isString(el) ? querySelector(el) : el);
 var link;
 export function resolveUrl(relativeUrl) {
   link = _El.create('a');
-  link.src = relativeUrl;
-  return link.src;
+  link.href = relativeUrl;
+  return link.href;
 }
 
 export function redirect(data) {
