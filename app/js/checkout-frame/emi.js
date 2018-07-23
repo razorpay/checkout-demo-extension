@@ -2,7 +2,9 @@ function selectEmiBank(e) {
   var $target = $(e.target);
   if ($target.hasClass('option')) {
     var duration = $target.attr('value');
-    var parent = $('#emi-check-label').toggleClass('checked', duration);
+    var parent = $('#emi-check-label');
+
+    $('#emi-check-label input[type=checkbox]')[0].checked = Boolean(duration);
     $(parent.find('.active')[0]).removeClass('active');
     $target.addClass('active');
     invoke('blur', parent, null, 100);
@@ -88,5 +90,5 @@ emiView.prototype = {
   unbind: function() {
     invokeEach(this.listeners);
     this.listeners = [];
-  }
+  },
 };

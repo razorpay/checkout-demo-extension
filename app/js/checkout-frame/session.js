@@ -113,7 +113,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
 
 function unsetEmiBank() {
   $('#emi-plans-wrap .active').removeClass('active');
-  $('#emi-check-label').removeClass('checked');
+  $('#emi-check-label input[type=checkbox]')[0].checked = false;
 }
 
 function setEmiBank(data, savedCardScreen) {
@@ -198,7 +198,7 @@ function onSixDigits(e) {
      * was reduced from 7 digits to 6 digits.
      */
     if (trimmedVal.slice(0, 6) !== this.flowIIN) {
-      this.checkFlows(trimmedVal.slice(0, 6));
+      this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
     }
   } else if (lessThanSixDigits) {
     this.flowIIN = null;
@@ -977,7 +977,10 @@ Session.prototype = {
     // Debit + PIN stuff
     var cardNumber = this.get('prefill.card[number]');
     if (cardNumber) {
-      this.checkFlows(cardNumber.replace(/\D/g, '').slice(0, 6), true);
+      onSixDigits.call(this, {
+        target: gel('card_number'),
+        isPrefilled: true,
+      });
     }
   },
 
@@ -2064,7 +2067,6 @@ Session.prototype = {
           document.activeElement.blur();
         }
       } catch (e) {}
-      invoke('onSixDigits', this, { target: gel('card_number') });
       $savedContainer.removeClass('scroll');
     }
 
