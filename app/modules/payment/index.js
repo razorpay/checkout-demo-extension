@@ -10,7 +10,7 @@ import * as strings from 'common/strings';
 
 import fetch from 'implicit/fetch';
 import Track from 'tracker';
-import popupTemplate from 'payment/popupTemplate';
+import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
