@@ -136,6 +136,12 @@ function setEmiBank(data, savedCardScreen) {
 
 function onSixDigits(e) {
   var el = e.target;
+
+  // Sanity check.
+  if (!el) {
+    return;
+  }
+
   var val = el.value;
 
   var cardType = $('#elem-card .cardtype').attr('cardtype');

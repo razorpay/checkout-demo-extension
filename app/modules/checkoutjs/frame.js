@@ -161,7 +161,7 @@ CheckoutFrame.prototype = {
   getEl: function(rzp) {
     if (!this.el) {
       var style =
-        'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px;';
+        'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px; z-index: 2;';
       var attribs = {
         style: style,
         allowtransparency: true,
