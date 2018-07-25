@@ -56,6 +56,7 @@
     "chalk": "^2.4.1",
     "fastify": "^1.8.0",
     "fastify-formbody": "^2.0.1",
+    "fastify-static": "^0.12.0",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
