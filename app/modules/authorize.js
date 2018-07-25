@@ -562,7 +562,9 @@ var responseTypes = {
     var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
 
     if (this.isMagicPayment) {
-      this.r._payment.emit('magic.init');
+      if (coprotoMagic) {
+        this.r._payment.emit('magic.init');
+      }
 
       var popupOptions = {
         focus: !coprotoMagic,
