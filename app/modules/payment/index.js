@@ -111,7 +111,7 @@ export default function Payment(data, params, r) {
   this.magicPossible = this.isMagicPayment;
 
   if (r.get('key') !== 'rzp_live_ChO9QOhE7BH1aD') {
-    this.isMagicPayment = this.isMagicPayment && Math.random() < 0.1;
+    this.isMagicPayment = this.isMagicPayment && Math.random() < 0.5;
   }
 
   this.isDebitPin =
