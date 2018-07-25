@@ -29,8 +29,9 @@ class TestBase {
     console.log(this.makeLog(...messages));
   }
 
-  constructor(page) {
+  constructor(page, options) {
     this.page = page;
+    this.options = options;
   }
 
   async instantiateRazorpay(options) {

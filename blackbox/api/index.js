@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const fastify = require('fastify')();
 fastify.register(require('fastify-formbody'));
 const merchants = require('./merchants');
@@ -12,7 +14,7 @@ fastify.addHook('preHandler', async (request, reply) => {
   return reply.header('Access-Control-Allow-Origin', '*');
 });
 
-fastify.get('/v1/preferences', async (request, reply) => {
+const handlePreferences = async (request, reply) => {
   let m = merchants.find(m => m.key_id === request.query.key_id);
   if (m) return m.preferences;
   return {
@@ -21,7 +23,10 @@ fastify.get('/v1/preferences', async (request, reply) => {
       description: 'The api key provided is invalid',
     },
   };
-});
+};
+
+fastify.get('/v1/preferences', handlePreferences);
+fastify.get('/api/v1/preferences', handlePreferences);
 
 /**
  * Callback handler, not there in actual API. It's just here to test
@@ -77,4 +82,13 @@ fastify.get('/v1/gateway/mocksharp/:payment_id', (request, reply) => {
       request.params.payment_id
     }'},'*')</script>`
   );
+});
+
+fastify.get('/index.html', (request, reply) => {
+  reply.header('content-type', 'text/html');
+  reply.send(fs.readFileSync(path.resolve(__dirname, '../index.html')));
+});
+
+fastify.register(require('fastify-static'), {
+  root: path.join(__dirname, '../../app/'),
 });
