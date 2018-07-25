@@ -192,3 +192,7 @@ Track.makeUid = makeUid;
 Track.common = getCommonTrackingData;
 Track.props = trackingProps;
 Track.id = _uid;
+Track.updateUid = uid => {
+  _uid = uid;
+  Track.id = uid;
+};

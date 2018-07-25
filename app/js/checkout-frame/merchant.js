@@ -922,7 +922,9 @@ window.handleMessage = function(message) {
     if (oldSession) {
       invoke('saveAndClose', oldSession);
     }
+
     session.id = _uid = id;
+    Track.updateUid(_uid);
     sessions[_uid] = session;
   }
 
