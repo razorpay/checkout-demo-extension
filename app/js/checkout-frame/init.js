@@ -16,6 +16,10 @@ var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var ua_android_browser = discreet.androidBrowser;
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+  if (isString(url) && url.indexOf('https://checkout.razorpay.com')) {
+    return;
+  }
+
   Track(getSession().r, 'js_error', {
     message: errorMsg,
     line: lineNumber,
