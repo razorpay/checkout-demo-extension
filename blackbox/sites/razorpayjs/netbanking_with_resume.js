@@ -26,11 +26,7 @@ class NetbankingWithResume extends RazorpayJsTest {
       }
     );
 
-    await delay(250);
-    await page.evaluate(`document.body.click()`);
-
-    await delay(250);
-
+    await page.click('button');
     page.evaluate(`razorpay.emit('payment.resume')`);
 
     await super.completePayment();

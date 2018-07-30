@@ -26,8 +26,7 @@ class CardWithRedirect extends RazorpayJsTest {
       'card[expiry_cvv]': '000',
     });
 
-    await delay(250);
-    await page.evaluate(`document.body.click()`);
+    await page.click('button');
 
     await super.completePayment();
   }
