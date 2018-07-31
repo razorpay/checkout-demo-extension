@@ -29,7 +29,10 @@ fastify.get('/v1/preferences', async (request, reply) => {
  */
 fastify.post('/callback_url', payments.callback);
 
-fastify.post('/v1/payments/create/ajax', payments.create);
+fastify.post(
+  '/v1/payments/create/ajax',
+  payments.targets.onReady(payments.create)
+);
 
 fastify.post('/v1/payments/:payment_id/otp_submit', async request => {
   return { razorpay_payment_id: request.params.payment_id };
@@ -71,10 +74,7 @@ fastify.post('/v1/payments/create/checkout', async (request, reply) => {
 fastify.get('/v1/gateway/mocksharp/:payment_id', (request, reply) => {
   // take a little time to process payment.
   // to avoid responding before js callbacks can be applied on client
+  console.log('mocksharp pptr', request.raw.headers['x-pptr-id']);
   reply.header('content-type', 'text/html');
-  reply.send(
-    `<script>opener.postMessage({razorpay_payment_id:'${
-      request.params.payment_id
-    }'},'*')</script>`
-  );
+  reply.send(``);
 });

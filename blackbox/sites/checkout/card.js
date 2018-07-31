@@ -22,12 +22,27 @@ class NewCard extends CheckoutFrameTest {
     await page.type('#card_name', 'test');
     await page.type('#card_cvv', '000');
     await delay(100);
+
+    let attempt = await this.newAttempt();
     await page.click('.pay-btn');
-    let data = await this.paymentResult();
-    if (data.razorpay_payment_id) {
-      this.pass();
-    } else {
-      this.fail();
-    }
+    // attempt.fail('Invalid card number', 'card[number]');
+
+    // await delay(100);
+
+    // let classList = Object.values(
+    //   await page.$eval('#elem-card', el => el.classList)
+    // );
+
+    // this.assert(
+    //   'card element has invalid, mature and focused class'
+    // ).includeMembers(classList, ['invalid', 'mature', 'focused']);
+
+    // await page.keyboard.press('Backspace');
+    // await page.keyboard.type('1');
+    // await delay(100);
+
+    // attempt = await this.newAttempt();
+    // await page.click('.pay-btn');
+    // await attempt.succeed();
   }
 }

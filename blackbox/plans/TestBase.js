@@ -1,6 +1,44 @@
 const chalk = require('chalk');
 const chai = require('chai');
 
+let attempts = 0;
+
+class Attempt {
+  constructor(test) {
+    this.id = String(attempts++);
+    this.test = test;
+  }
+
+  end(result) {
+    return new Promise(resolve => {
+      let test = this.test;
+      test.awaitingPaymentResult = resolve;
+      if (result) {
+        result = JSON.stringify(result);
+        test.page.evaluate(`window.onComplete && onComplete(${result})`);
+        test.page.evaluate(`__pptr_oncomplete(${result})`);
+      }
+    });
+  }
+
+  fail(description, field) {
+    let error = {
+      error: {
+        description,
+      },
+    };
+    if (field) {
+      error.field = field;
+    }
+    return this.end(error);
+  }
+
+  succeed() {
+    let paymentId = 'pay_' + Math.random();
+    return this.end({ razorpay_payment_id: paymentId });
+  }
+}
+
 class TestBase {
   static async test(browser, message) {
     const page = await browser.newPage();
@@ -29,6 +67,25 @@ class TestBase {
     await p.loadScripts(message);
 
     return new Promise((resolve, reject) => p.setCallbacks(resolve, reject));
+  }
+
+  async newAttempt() {
+    if (this.currentAttempt) {
+      return this.fail('New payment attempted while previous was in process');
+    }
+
+    let a = new Attempt(this);
+
+    this.currentAttempt = a;
+
+    // set reference to pass it to poup
+    this.page.target().__rzp_attempt_id = a.id;
+
+    this.page.setExtraHTTPHeaders({
+      'x-pptr-id': a.id,
+    });
+
+    return a;
   }
 
   setCallbacks(resolve, reject) {
@@ -65,26 +122,6 @@ class TestBase {
     return await this.page.evaluate(
       `var razorpay = new Razorpay(${JSON.stringify(options)})`
     );
-  }
-
-  paymentResult(result) {
-    return new Promise(resolve => {
-      this.awaitingPaymentResult = resolve;
-      if (result) {
-        result = JSON.stringify(result);
-        this.page.evaluate(`window.onComplete && onComplete(${result})`);
-        this.page.evaluate(`__pptr_oncomplete(${result})`);
-      }
-    });
-  }
-
-  paymentFailed(message) {
-    return this.paymentResult({ error: { description: message } });
-  }
-
-  paymentSuccessful() {
-    let paymentId = 'pay_' + Math.random();
-    return this.paymentResult({ razorpay_payment_id: paymentId });
   }
 
   assertMethod(message, method) {

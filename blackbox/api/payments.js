@@ -1,15 +1,39 @@
 const baseUrl = 'http://localhost:3000/v1';
 
+let newTargets = 0;
 const allPayments = {};
 
-const payments = (module.exports = {
-  create: async request => methodHandlers[request.body.method](request.body),
+const updateTargets = delta => {
+  newTargets = newTargets + delta;
+  console.log(newTargets);
+  if (!newTargets) {
+    payments.targets.currentResolve();
+    payments.targets.currentPromise = null;
+  } else if (newTargets === 1 && delta === 1) {
+    payments.targets.currentPromise = new Promise(resolve => {
+      payments.targets.currentResolve = resolve;
+    });
+  }
+};
 
-  createId: (paymentData = {}) => {
-    let id = 'pay_' + Math.random();
-    allPayments[id] = paymentData;
-    return id;
+const payments = (module.exports = {
+  // targets which do not have x-pptr-id header set
+  targets: {
+    currentPromise: null,
+    inc: () => updateTargets(1),
+    dec: () => updateTargets(-1),
+    onReady: callback => {
+      return async function() {
+        let currentPromise = payments.targets.currentPromise;
+        if (currentPromise) {
+          await currentPromise;
+        }
+        callback.apply(this, arguments);
+      };
+    },
   },
+
+  create: request => methodHandlers[request.body.method](request.body),
 
   get: id => allPayments[id],
 
@@ -23,7 +47,7 @@ const payments = (module.exports = {
 
 const methodHandlers = {
   card: body => {
-    let payment_id = payments.createId();
+    let payment_id = '123';
     return {
       type: 'first',
       request: {
