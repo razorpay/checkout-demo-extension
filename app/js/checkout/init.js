@@ -23,7 +23,7 @@ RazorpayDefaults.method = {
   wallet: null,
   emi: true,
   upi: true,
-  upi_intent: null
+  upi_intent: null,
 };
 
 RazorpayDefaults.prefill = {
@@ -43,18 +43,18 @@ RazorpayDefaults.prefill = {
   'bank_account[name]': '',
   'bank_account[account_number]': '',
   'bank_account[ifsc]': '',
-  'aadhaar[number]': '',
-  auth_type: ''
+  'aadhaar[vid]': '',
+  auth_type: '',
 };
 
 RazorpayDefaults.features = {
-  cardsaving: true
+  cardsaving: true,
 };
 
 RazorpayDefaults.readonly = {
   contact: false,
   email: false,
-  name: false
+  name: false,
 };
 
 RazorpayDefaults.modal = {
@@ -63,12 +63,12 @@ RazorpayDefaults.modal = {
   onhidden: noop,
   escape: true,
   animation: true,
-  backdropclose: false
+  backdropclose: false,
 };
 
 RazorpayDefaults.external = {
   wallets: [],
-  handler: noop
+  handler: noop,
 };
 
 RazorpayDefaults.theme = {
@@ -82,7 +82,7 @@ RazorpayDefaults.theme = {
   hide_topbar: false,
   branding: '',
   emi_mode: false,
-  debit_card: false
+  debit_card: false,
 };
 
 optionValidations.parent = function(parent) {

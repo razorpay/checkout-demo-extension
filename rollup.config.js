@@ -11,6 +11,7 @@ const modules = {
   'lib/upi': 'UPIUtils',
   formatter: 'Formatter',
   confirm: 'Confirm',
+  'components/curtain': 'Curtain',
   callout: 'Callout',
   'common/currency': 'Currency',
   'lib/_': '_',

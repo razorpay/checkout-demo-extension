@@ -840,6 +840,10 @@ window.handleOTP = function(otp) {
 window.upiIntentResponse = function(data) {
   var session = getSession();
 
+  if (session.recurring) {
+    return;
+  }
+
   if (session.r._payment && session.upi_intents_data) {
     session.r.emit('payment.upi.intent_response', data);
   } else if (session.activity_recreated) {

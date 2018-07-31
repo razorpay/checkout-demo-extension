@@ -82,6 +82,37 @@ function fillData(container, returnObj) {
   });
 }
 
+function selectElementText(el) {
+  var win = window;
+  var doc = win.document,
+    sel,
+    range;
+  if (win.getSelection && doc.createRange) {
+    sel = win.getSelection();
+    range = doc.createRange();
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if (doc.body.createTextRange) {
+    range = doc.body.createTextRange();
+    range.moveToElementText(el);
+    range.select();
+  }
+}
+
+function copyToClipboardListener(e) {
+  var btn = e.delegateTarget;
+  var parent = btn.parentNode;
+  var text = $(parent).find('.copytoclipboard--text')[0];
+
+  selectElementText(text);
+  try {
+    document.execCommand('copy');
+    $(parent).addClass('copied');
+    $(parent).find('.copytoclipboard--label')[0].innerHTML = 'Copied';
+  } catch (err) {}
+}
+
 function makeEmiDropdown(emiObj, session, isOption) {
   var h = '';
   var isSubvented =
@@ -1209,6 +1240,10 @@ Session.prototype = {
           function(e) {
             var target = e.target;
             while (target !== $parent[0]) {
+              if (!$(target)[0]) {
+                break;
+              }
+
               if ($(target).hasClass(delegateClass)) {
                 e.delegateTarget = target;
                 invoke(listener, self, e);
@@ -1259,14 +1294,6 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    if ($(this.el).hasClass('emandate') && this.emandateView) {
-      if (this.checkInvalid()) {
-        return;
-      }
-
-      return this.emandateView.showBankOptions($('#bank-select').val());
-    }
-
     var commonInvalid = $('#pad-common .invalid');
     if (commonInvalid[0]) {
       return commonInvalid
@@ -1545,6 +1572,19 @@ Session.prototype = {
         });
       }
     });
+
+    // Copy to clipboard text.
+    this.on('click', '#body', 'copytoclipboard--text', function(e) {
+      selectElementText(e.target);
+    });
+    this.on('click', '#body', 'copytoclipboard--btn', copyToClipboardListener);
+  },
+
+  /**
+   * Sets text of the Pay button.
+   */
+  setPayButtonText: function(text) {
+    $('.pay-btn').html(text);
   },
 
   bindIeEvents: function() {
@@ -2083,6 +2123,15 @@ Session.prototype = {
   switchBank: function(e) {
     var val = e.target.value;
     this.checkDown(val);
+    this.checkBankRadio(val);
+    this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  /**
+   * Checks the bank radio corresponding to the value.
+   * @param {String} val
+   */
+  checkBankRadio: function(val) {
     each($$('#netb-banks input'), function(i, radio) {
       $(radio.parentNode).removeClass('active');
       if (radio.value === val) {
@@ -2111,6 +2160,34 @@ Session.prototype = {
     var select = gel('bank-select');
     select.value = val;
     this.input(select);
+    this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  /**
+   * Deselects bank.
+   */
+  deselectBank: function(e) {
+    var select = gel('bank-select');
+
+    if (select) {
+      select.value = '';
+    }
+
+    this.checkBankRadio('');
+  },
+
+  /**
+   * Once the bank is selected in the banks list,
+   * proceed automatically if some conditions are met.
+   */
+  proceedAutomaticallyAfterSelectingBank: function() {
+    if ($(this.el).hasClass('emandate') && this.emandateView) {
+      if (this.checkInvalid()) {
+        return;
+      }
+
+      return this.emandateView.showBankOptions($('#bank-select').val());
+    }
   },
 
   checkInvalid: function(parent) {
@@ -2435,7 +2512,7 @@ Session.prototype = {
         'bank_account[name]',
         'bank_account[account_number]',
         'bank_account[ifsc]',
-        'aadhaar[number]',
+        'aadhaar[vid]',
         'auth_type',
       ];
 
