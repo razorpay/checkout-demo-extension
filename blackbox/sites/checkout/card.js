@@ -25,13 +25,14 @@ class NewCard extends CheckoutFrameTest {
 
     let attempt = await this.newAttempt();
     await page.click('.pay-btn');
-    // attempt.fail('Invalid card number', 'card[number]');
 
-    // await delay(100);
+    attempt.fail('Invalid card number', 'card[number]');
 
-    // let classList = Object.values(
-    //   await page.$eval('#elem-card', el => el.classList)
-    // );
+    await delay(100);
+
+    let classList = Object.values(
+      await page.$eval('#elem-card', el => el.classList)
+    );
 
     // this.assert(
     //   'card element has invalid, mature and focused class'

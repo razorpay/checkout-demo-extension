@@ -1,39 +1,7 @@
-const baseUrl = 'http://localhost:3000/v1';
-
-let newTargets = 0;
 const allPayments = {};
 
-const updateTargets = delta => {
-  newTargets = newTargets + delta;
-  console.log(newTargets);
-  if (!newTargets) {
-    payments.targets.currentResolve();
-    payments.targets.currentPromise = null;
-  } else if (newTargets === 1 && delta === 1) {
-    payments.targets.currentPromise = new Promise(resolve => {
-      payments.targets.currentResolve = resolve;
-    });
-  }
-};
-
 const payments = (module.exports = {
-  // targets which do not have x-pptr-id header set
-  targets: {
-    currentPromise: null,
-    inc: () => updateTargets(1),
-    dec: () => updateTargets(-1),
-    onReady: callback => {
-      return async function() {
-        let currentPromise = payments.targets.currentPromise;
-        if (currentPromise) {
-          await currentPromise;
-        }
-        callback.apply(this, arguments);
-      };
-    },
-  },
-
-  create: request => methodHandlers[request.body.method](request.body),
+  create: request => methodHandlers[request.body.method](request),
 
   get: id => allPayments[id],
 
@@ -46,17 +14,17 @@ const payments = (module.exports = {
 });
 
 const methodHandlers = {
-  card: body => {
-    let payment_id = '123';
+  card: request => {
+    let paymentId = request.paymentId;
     return {
       type: 'first',
       request: {
-        url: `${baseUrl}/gateway/mocksharp/${payment_id}`,
+        url: `${request.apiUrl}/gateway/mocksharp/${paymentId}`,
         content: {
-          payment_id,
+          paymentId,
         },
       },
-      payment_id,
+      paymentId,
     };
   },
 
@@ -65,7 +33,7 @@ const methodHandlers = {
     return {
       type: 'otp',
       request: {
-        url: `${baseUrl}/payments/${payment_id}/otp_submit`,
+        url: `${request.apiUrl}/payments/${payment_id}/otp_submit`,
         method: 'post',
         content: [],
       },

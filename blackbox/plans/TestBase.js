@@ -1,7 +1,8 @@
 const chalk = require('chalk');
-const chai = require('chai');
+const apiUrl = 'http://localhost:3000/api/';
 
 let attempts = 0;
+let visits = 0;
 
 class Attempt {
   constructor(test) {
@@ -10,6 +11,10 @@ class Attempt {
   }
 
   end(result) {
+    if (this.done) {
+      this.test.fail('Tried to end payment attempt more than once');
+    }
+    this.done = true;
     return new Promise(resolve => {
       let test = this.test;
       test.awaitingPaymentResult = resolve;
@@ -74,27 +79,23 @@ class TestBase {
       return this.fail('New payment attempted while previous was in process');
     }
 
-    let a = new Attempt(this);
-
-    this.currentAttempt = a;
-
-    // set reference to pass it to poup
-    this.page.target().__rzp_attempt_id = a.id;
-
-    this.page.setExtraHTTPHeaders({
-      'x-pptr-id': a.id,
-    });
-
-    return a;
+    return (this.currentAttempt = new Attempt(this));
   }
 
   setCallbacks(resolve, reject) {
     this.pass = message => {
+      if (this.currentAttempt) {
+        this.fail(
+          'Test ended before current payment attempt could be concluded'
+        );
+      }
+      this.destroy();
       this.page.close();
       console.log(chalk.green(this.makeLog(message || '✔')));
       resolve();
     };
     this.fail = message => {
+      this.destroy();
       console.log(chalk.red(this.makeLog(message || '✘')));
       reject();
     };
@@ -116,6 +117,18 @@ class TestBase {
 
   constructor(page) {
     this.page = page;
+    this.id = visits++;
+    TestBase.allTests[this.id] = this;
+    page.evaluate(`Razorpay = {
+      config: {
+        api: '${apiUrl}${this.id}/',
+        frameApi: '${apiUrl}${this.id}/',
+      }
+    }`);
+  }
+
+  destroy() {
+    delete TestBase.allTests[this.id];
   }
 
   async instantiateRazorpay(options) {
@@ -149,5 +162,6 @@ class TestBase {
 }
 
 TestBase.PARENT = '';
+TestBase.allTests = {};
 
 module.exports = TestBase;
