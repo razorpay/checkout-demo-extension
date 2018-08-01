@@ -185,30 +185,33 @@ export const matches =
   |> elementString
   |> _.curry2;
 
-export const resolve = el => (_.isString(el) ? _Dom.querySelector(el) : el);
-
 // always curried
-export const on = (event, callback, delegate, useCapture) => el => {
-  var attachedCallback = callback;
-  if (_.isString(delegate)) {
-    attachedCallback = function(e) {
-      var target = e.target;
-      while (!matches(target, delegate) && target !== el) {
-        target = target |> parent;
-      }
-      if (target !== el) {
-        e.delegateTarget = target;
-        callback(e);
-      }
-    };
-  } else {
-    useCapture = delegate;
+export const on = (event, callback, delegate, useCapture) => {
+  if (event |> _.is(global.EventTarget)) {
+    error: 'invalid syntax while attaching event listener';
   }
+  return el => {
+    var attachedCallback = callback;
+    if (_.isString(delegate)) {
+      attachedCallback = function(e) {
+        var target = e.target;
+        while (!matches(target, delegate) && target !== el) {
+          target = target |> parent;
+        }
+        if (target !== el) {
+          e.delegateTarget = target;
+          callback(e);
+        }
+      };
+    } else {
+      useCapture = delegate;
+    }
 
-  // cast to boolean
-  useCapture = !!useCapture;
-  el.addEventListener(event, attachedCallback, useCapture);
+    // cast to boolean
+    useCapture = !!useCapture;
+    el.addEventListener(event, attachedCallback, useCapture);
 
-  // return off-switch for this listener
-  return () => el.removeEventListener(event, attachedCallback, useCapture);
+    // return off-switch for this listener
+    return () => el.removeEventListener(event, attachedCallback, useCapture);
+  };
 };

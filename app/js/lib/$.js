@@ -296,7 +296,7 @@ $.prototype = {
       } catch (e) {}
     }
     return this;
-  }
+  },
 };
 
 function smoothScrollTo(y) {
@@ -313,7 +313,7 @@ function smoothScrollBy(y) {
   }
   scrollTimeout = setTimeout(function() {
     var y0 = pageYOffset;
-    var target = Math.min(y0 + y, $(body).height() - innerHeight);
+    var target = Math.min(y0 + y, $(document.body).height() - innerHeight);
     y = target - y0;
     var scrollCount = 0;
     var oldTimestamp = performance.now();

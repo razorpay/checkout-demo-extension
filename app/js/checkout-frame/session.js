@@ -1,5 +1,10 @@
+var RAZORPAY_HOVER_COLOR = '#626A74';
+
+var ua = navigator.userAgent;
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
+var shouldFixFixed = /iPhone/.test(ua);
+var ua_iPhone = shouldFixFixed;
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -139,7 +144,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
 
 function unsetEmiBank() {
   $('#emi-plans-wrap .active').removeClass('active');
-  $('#emi-check-label').removeClass('checked');
+  $('#emi-check-label input[type=checkbox]')[0].checked = false;
 }
 
 function setEmiBank(data, savedCardScreen) {
@@ -162,6 +167,12 @@ function setEmiBank(data, savedCardScreen) {
 
 function onSixDigits(e) {
   var el = e.target;
+
+  // Sanity check.
+  if (!el) {
+    return;
+  }
+
   var val = el.value;
 
   var cardType = $('#elem-card .cardtype').attr('cardtype');
@@ -203,7 +214,7 @@ function onSixDigits(e) {
       gel('emi-plans-wrap').innerHTML = makeEmiDropdown(emiObj, this);
     }
   } else {
-    emi_parent.removeClass('checked');
+    emi_parent.find('input[type=checkbox]')[0].checked = false;
     $(emi_parent.find('.active')[0]).removeClass('active');
   }
   noCvvToggle({ target: nocvvCheck });
@@ -224,7 +235,7 @@ function onSixDigits(e) {
      * was reduced from 7 digits to 6 digits.
      */
     if (trimmedVal.slice(0, 6) !== this.flowIIN) {
-      this.checkFlows(trimmedVal.slice(0, 6));
+      this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
     }
   } else if (lessThanSixDigits) {
     this.flowIIN = null;
@@ -522,10 +533,33 @@ function Session(options) {
   this.attemptCount = 0;
   this.listeners = [];
   this.bits = [];
+
+  var themeMeta = this.r.themeMeta;
+
+  var themeColor = themeMeta.color,
+    colorVariations = Color.getColorVariations(themeColor),
+    hoverStateColor = Color.getHoverStateColor(
+      themeColor,
+      colorVariations.backgroundColor,
+      RAZORPAY_HOVER_COLOR
+    ),
+    activeStateColor = Color.getActiveStateColor(
+      themeColor,
+      colorVariations.backgroundColor,
+      RAZORPAY_HOVER_COLOR
+    ),
+    secondaryHighlightColor = hoverStateColor;
+
+  themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
+
+  themeMeta.secondaryHighlightColor = secondaryHighlightColor;
+  themeMeta.hoverStateColor = hoverStateColor;
+  themeMeta.activeStateColor = activeStateColor;
+  themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
 }
 
 Session.prototype = {
-  getDecimalAmount: Currency.getDecimalAmount,
+  getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     return (amount / 100)
       .toFixed(2)
@@ -580,10 +614,6 @@ Session.prototype = {
 
     if (this.fontLoaded) {
       classes.push('font-loaded');
-    }
-
-    if (getter('theme.branding')) {
-      classes.push('cob');
     }
 
     if (getter('theme.hide_topbar')) {
@@ -644,18 +674,6 @@ Session.prototype = {
 
     if (shouldFixFixed) {
       classes.push('ip');
-    }
-
-    if (ua_ip7) {
-      classes.push('ip7');
-    }
-
-    if (/Android 4/.test(ua)) {
-      classes.push('android4');
-    }
-
-    if (is_ie8) {
-      classes.push('ie8');
     }
 
     if (this.extraFields) {
@@ -996,7 +1014,10 @@ Session.prototype = {
     // Debit + PIN stuff
     var cardNumber = this.get('prefill.card[number]');
     if (cardNumber) {
-      this.checkFlows(cardNumber.replace(/\D/g, '').slice(0, 6), true);
+      onSixDigits.call(this, {
+        target: gel('card_number'),
+        isPrefilled: true,
+      });
     }
   },
 
@@ -1138,11 +1159,14 @@ Session.prototype = {
     style.type = 'text/css';
     try {
       var getter = this.get;
+
       div.style.color = getter('theme.color');
+
       if (!div.style.color) {
         getter()['theme.color'] = '';
       }
-      var rules = templates.theme(getter);
+
+      var rules = templates.theme(getter, this.themeMeta);
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {
@@ -1350,9 +1374,6 @@ Session.prototype = {
     });
 
     this.click('#next-button', 'extraNext');
-    if (is_ie8) {
-      this.bindIeEvents();
-    }
 
     this.on('focus', '#body', 'input', 'focus', true);
     this.on('blur', '#body', 'input', 'blur', true);
@@ -1587,22 +1608,6 @@ Session.prototype = {
     $('.pay-btn').html(text);
   },
 
-  bindIeEvents: function() {
-    /* Binding IE8 events */
-    var self = this;
-
-    self.click('#body', 'radio-item', function(e) {
-      var target = $(e.delegateTarget);
-      var radio = target.find('input[type=radio]')[0];
-      each($$('.radio-item.active'), function(idx, item) {
-        $(item).removeClass('active');
-      });
-      target.addClass('active');
-      radio.checked = true;
-      this.selectBankRadio({ target: radio });
-    });
-  },
-
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
     if (ua_iPhone) {
@@ -1627,10 +1632,6 @@ Session.prototype = {
     var $parent = $(el.parentNode);
 
     $parent.toggleClass('filled', value);
-
-    if (is_ie8) {
-      return toggleInvalid($parent, true);
-    }
 
     // validity check past this
     if (!(required || pattern)) {
@@ -2112,7 +2113,6 @@ Session.prototype = {
           document.activeElement.blur();
         }
       } catch (e) {}
-      invoke('onSixDigits', this, { target: gel('card_number') });
       $savedContainer.removeClass('scroll');
     }
 
@@ -2864,6 +2864,10 @@ Session.prototype = {
   checkFlows: function(iin, isPrefilledCardNumber) {
     // Hide and uncheck checkboxes.
     showFlowRadioButtons(false);
+
+    if (this.recurring) {
+      return;
+    }
 
     var self = this;
 

@@ -1,3 +1,5 @@
+doc = document.body;
+
 var preferences = window.preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
@@ -620,7 +622,6 @@ function showModal(session) {
   session.optional = arr2obj(preferences.optional);
   if (
     cookieDisabled ||
-    is_ie8 ||
     (session.optional.contact && !session_options['prefill.contact'])
   ) {
     options.remember_customer = false;
@@ -953,8 +954,6 @@ window.handleMessage = function(message) {
 
   session.magic = message.magic;
 
-  session.ua_Android = ua_Android;
-
   session.activity_recreated = message.activity_recreated;
 
   if (message.device_token) {
@@ -1014,12 +1013,6 @@ function parseMessage(e) {
   }
 }
 
-function applyUAClasses() {
-  if (/Android [2-4]/.test(ua)) {
-    addBodyClass('noanim');
-  }
-}
-
 function initIframe() {
   $(window).on('message', parseMessage);
 
@@ -1041,7 +1034,6 @@ function initIframe() {
     parseMessage({ data: atob(qpmap.message) });
   }
 
-  applyUAClasses();
   Razorpay.sendMessage({ event: 'load' });
 }
 

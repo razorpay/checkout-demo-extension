@@ -2,22 +2,22 @@ const babel = require('rollup-plugin-babel');
 const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
-const doT = require('dot');
+const stylus = require('stylus');
+const autoprefixer = require('autoprefixer-stylus');
 const fs = require('fs');
 
 require('child_process').execSync('mkdir -p app/modules/generated');
 
 let injects = {
   global: ['generated/globals', 'global'],
-  _: ['lib/_', '*'],
-  _Arr: ['lib/_Arr', '*'],
-  _Str: ['lib/_Str', '*'],
-  _Func: ['lib/_Func', '*'],
-  _Obj: ['lib/_Obj', '*'],
-  _El: ['lib/_El', '*'],
-  _Doc: ['lib/_Doc', '*'],
-  fetch: 'lib/fetch',
-  jsonp: 'lib/jsonp',
+  fetch: 'implicit/fetch',
+  _: ['implicit/_', '*'],
+  _Arr: ['implicit/_Arr', '*'],
+  _Str: ['implicit/_Str', '*'],
+  _Func: ['implicit/_Func', '*'],
+  _Obj: ['implicit/_Obj', '*'],
+  _El: ['implicit/_El', '*'],
+  _Doc: ['implicit/_Doc', '*'],
 };
 
 fs.writeFileSync(
@@ -48,24 +48,31 @@ fs.writeFileSync(
       .join(';')
 );
 
-module.exports = [
-  {
-    name: 'dot',
-    transform(code, id) {
-      if (id.endsWith('.jst')) {
-        let exportIndex = code.indexOf('export default ');
-        if (exportIndex === -1) {
-          throw "Template does'nt export anything";
-        }
-        exportIndex += 15;
-        return {
-          code:
-            code.slice(0, exportIndex) + doT.template(code.slice(exportIndex)),
-        };
-      }
-    },
-  },
+const stylusProcessor = (content, id) =>
+  new Promise((resolve, reject) => {
+    var stylusOptions = {
+      filename: id,
+      compress: true,
+    };
 
+    if (process.env.prod) {
+      stylusOptions.use = [
+        autoprefixer({
+          browsers: ['android 4.4', 'last 10 versions', 'iOS 7'],
+        }),
+      ];
+    }
+    const renderer = stylus(content, stylusOptions);
+    renderer.render((err, code) => {
+      if (err) {
+        return reject(err);
+      }
+      code = `export default ${JSON.stringify(code)};`;
+      resolve({ code, map: { mappings: '' } });
+    });
+  });
+
+module.exports = [
   include({
     paths: ['app/modules'],
   }),
@@ -87,7 +94,7 @@ module.exports = [
       '@babel/transform-shorthand-properties',
       ['@babel/transform-template-literals', { loose: true }],
 
-      '@babel/proposal-pipeline-operator',
+      ['@babel/proposal-pipeline-operator', { proposal: 'minimal' }],
 
       [
         './trace.js',
@@ -99,4 +106,12 @@ module.exports = [
   }),
 
   inject(injects),
+
+  {
+    transform(content, id) {
+      if (id.endsWith('.styl')) {
+        return stylusProcessor(content, id);
+      }
+    },
+  },
 ];

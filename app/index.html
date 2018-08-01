@@ -7,17 +7,7 @@
   <meta http-equiv="cache-control" content="no-cache">
   <script src="config.js"></script>
   <!-- build:js checkout.js -->
-  <script src="js/lib/util.js"></script>
-  <script src="js/lib/$.js"></script>
-  <script src="js/generated/lib/jsonp.js"></script>
-  <script src="js/generated/lib/fetch.js"></script>
-  <script src="js/generated/tracker.js"></script>
-  <script src="js/generated/eventer.js"></script>
-  <script src="js/init.js"></script>
-  <script src="js/checkout/init.js"></script>
-  <script src="js/options.js"></script><!--coverage-->
-  <script src="js/checkout/frame.js"></script><!--coverage-->
-  <script src="js/checkout/open.js"></script><!--coverage-->
+  <script src="js/generated/entry/checkout.js"></script><!--coverage-->
   <!-- test scripts
   <script src="../test/unit/base.js"></script>
   <script src="../test/unit/checkout/open.js"></script>
@@ -35,13 +25,21 @@
     <button class="btn" id="rzp-button1">Fur Gauntlets</button>
   </div>
   <script>
+
+    var searchParams = {
+      get: function(param) {}
+    }
+    if (window.URLSearchParams) {
+      searchParams = new URLSearchParams(location.search)
+    }
+
     var options = {
       // 'key': 'rzp_live_ILgsfZCZoFIKMb',
       'key': 'rzp_test_1DP5mmOlF5G5ag',
       // 'key': 'rzp_live_gC8obGlwaRlyui',
       'amount': 6000*100,
-      'name': 'Innerchef',
-      'description': 'JEE Main & Advanced',
+      'name': searchParams.get("name") || 'Innerchef',
+      'description': searchParams.get("description") || 'JEE Main & Advanced',
       'image': 'http://i.imgur.com/n5tjHFD.png',
       'handler': function (transaction){
         alert("You have successfully purchased " + options.description);
@@ -52,6 +50,9 @@
         //   paytm: false
         // },
         card: true
+      },
+      'theme': {
+        color: searchParams.get("color")
       },
       // parent: '#x',
       remember_customer: true,
@@ -77,9 +78,6 @@
       // order_id: 'order_5ZfJcdMfBYoZ3n',
       notes: {
         'address': 'Hello World'
-      },
-      theme: {
-        color: '#1abc9c'
       },
       modal: {
         ondismiss: function(){console.log(1)},

@@ -25,9 +25,7 @@ export function validateArgs(...validators) {
   return func =>
     function() {
       let args = arguments;
-      if (validators.length !== lengthOf(args)) {
-        logError('arg length doesnt match');
-      } else if (
+      if (
         validators.every(
           (v, i) => v(args[i]) || logError(`wrong ${i}th argtype`, args[i])
         )
@@ -135,8 +133,13 @@ export function query2obj(string) {
 }
 
 export function appendParamsToUrl(url, params) {
-  url += url.indexOf('?') > 0 ? '&' : '?';
-  url += obj2query(params);
+  if (isNonNullObject(params)) {
+    params = obj2query(params);
+  }
+  if (params) {
+    url += url.indexOf('?') > 0 ? '&' : '?';
+    url += params;
+  }
   return url;
 }
 

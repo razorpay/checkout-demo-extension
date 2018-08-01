@@ -1,4 +1,6 @@
 import * as Card from 'common/card';
+import Eventer from 'eventer';
+import EvtHandler from 'evthandler';
 
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -33,7 +35,7 @@ export const Formatter = function(el, handlers, noBind) {
   }
 
   // set initial formatting
-  defer(bind('format', this));
+  setTimeout(() => this.format());
 };
 
 Formatter.events = {
@@ -204,7 +206,7 @@ formatterProto.backFormat = function(e) {
   // windows phone: if keydown is prevented, and value is changed synchronously,
   //    it ignores one subsequent input event.
   //    hence no back formatting in WP
-  if (isWP || _.getKeyFromEvent(e) !== 8) {
+  if (_.getKeyFromEvent(e) !== 8) {
     return;
   }
 
@@ -255,7 +257,9 @@ formatterProto.fwdFormat = function(e) {
 };
 
 formatterProto.deferFormat = function(e) {
-  invoke('format', this, e, 0);
+  setTimeout(() => {
+    this.format(e);
+  });
 };
 
 formatterProto.format = function(e) {
@@ -331,13 +335,7 @@ formatterProto.run = function(values) {
     // inserting character "4" at any position in "4444 4444 4444 4444"
     //    that doesnt require dom value change, but does require caret to be moved
     caretPosition = this.pretty(this.raw(left), shouldTrim).length;
-    if (isWP) {
-      // following is necessary, else caret only blinks at intended position.
-      //    but its at the rightmost position in effect
-      invoke('moveCaret', this, caretPosition, 0);
-    } else {
-      this.moveCaret(caretPosition);
-    }
+    this.moveCaret(caretPosition);
   } // else caretPosition is already pretty.length
 
   this.caretPosition = caretPosition;

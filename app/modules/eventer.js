@@ -9,14 +9,14 @@ export default function Eventer() {
 }
 
 Eventer.prototype = {
-  onNew: noop,
+  onNew: _Func.noop,
 
   def: function(event, callback) {
     this._defs[event] = callback;
   },
 
   on: function(event, callback) {
-    if (isString(event) && isFunction(callback)) {
+    if (_.isString(event) && _.isFunction(callback)) {
       var events = this._evts;
       if (!events[event]) {
         events[event] = [];
@@ -49,8 +49,8 @@ Eventer.prototype = {
 
     if (argLen === 2) {
       var listeners = events[event];
-      if (isFunction(callback) && isArray(listeners)) {
-        listeners.splice(indexOf(listeners, callback), 1);
+      if (_.isFunction(callback) && _.isArray(listeners)) {
+        listeners.splice(_Arr.indexOf(listeners, callback), 1);
         if (listeners.length) {
           return;
         }
@@ -64,7 +64,7 @@ Eventer.prototype = {
     } else {
       // its a namespace
       event += '.';
-      each(events, function(eventKey) {
+      _Obj.loop(events, function(val, eventKey) {
         if (!eventKey.indexOf(event)) {
           delete events[eventKey];
         }
@@ -75,19 +75,15 @@ Eventer.prototype = {
   },
 
   emit: function(event, arg) {
-    each(
-      this._evts[event],
-      function(i, callback) {
-        try {
-          callback.call(this, arg);
-        } catch (e) {
-          if (console.error) {
-            console.error(e);
-          }
+    _Arr.loop(this._evts[event], callback => {
+      try {
+        callback.call(this, arg);
+      } catch (e) {
+        if (console.error) {
+          console.error(e);
         }
-      },
-      this
-    );
+      }
+    });
     return this;
   },
 
@@ -95,5 +91,5 @@ Eventer.prototype = {
     return () => {
       this.emit.apply(this, arguments);
     };
-  }
+  },
 };

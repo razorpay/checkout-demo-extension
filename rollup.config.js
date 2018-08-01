@@ -1,21 +1,10 @@
 let plugins = require('./rollup.plugins');
 
 const modules = {
-  eventer: 'Eventer',
-  evthandler: 'EvtHandler',
-  popup: 'Popup',
-  authorize: 'Payment',
-  tez: 'Tez',
-  'lib/fetch': 'fetch',
-  'lib/jsonp': 'jsonp',
-  'lib/upi': 'UPIUtils',
-  formatter: 'Formatter',
-  confirm: 'Confirm',
-  'components/curtain': 'Curtain',
-  callout: 'Callout',
-  'common/currency': 'Currency',
-  'lib/_': '_',
-  tracker: 'Track',
+  'entry/razorpay': 'Razorpay',
+  'entry/checkout': 'Razorpay',
+  'entry/checkout-frame': 'Razorpay',
+  'checkoutframe/discreet': 'discreet',
 };
 
 function getOptions(module) {

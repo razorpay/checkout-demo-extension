@@ -69,6 +69,17 @@ html {
   }
 }
 
+#wallets {
+
+  .list .item {
+
+    > label:hover, input[type=radio]:checked + label {
+
+      background-color: transparent;
+    }
+  }
+}
+
 .list {
   margin-bottom: 12px;
 
@@ -1144,8 +1155,8 @@ $outline = #ddd;
       text-align: left;
       i {
         float: left;
-        font-size: 28px;
-        margin: 0 16px;
+        font-size: 32px;
+        margin: 2px 16px;
         line-height: 30px;
       }
       &+.item {

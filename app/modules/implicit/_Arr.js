@@ -9,6 +9,8 @@ export const loop = _.curry2((array, iteratee) => {
   return array;
 });
 
+export const callAll = array => loop(a => a());
+
 const arrayCall = func => _.curry2((arr, arg) => proto[func].call(arr, arg));
 export const any = arrayCall('some');
 export const every = arrayCall('every');
@@ -19,6 +21,23 @@ export const join = arrayCall('join');
 export const contains = _.curry2(
   (array, member) => indexOf(array, member) >= 0
 );
+
+export const findIndex = _.curry2((arr, iteratee) => {
+  let arrayLen = _.lengthOf(arr);
+  for (let i = 0; i < arrayLen; i++) {
+    if (iteratee(arr[i], i, arr)) {
+      return i;
+    }
+  }
+  return -1;
+});
+
+export const find = _.curry2((arr, iteratee) => {
+  let index = findIndex(arr, iteratee);
+  if (index > 0) {
+    return arr[index];
+  }
+});
 
 export const prepend = _.curry2((array, member) => {
   const newArray = Array(_.lengthOf(array) + 1);
@@ -53,7 +72,7 @@ export const sliceFrom = _.curry2((array, from) =>
 );
 
 export const reduce = _.curry3((array, reducer, initialValue) =>
-  arrayProto.reduce.call(array, reducer, initialValue)
+  proto.reduce.call(array, reducer, initialValue)
 );
 
 export const merge = _.curry2((arr1, arr2) => {

@@ -1,19 +1,7 @@
-RazorpayDefaults.handler = function(data) {
-  if (this instanceof Razorpay) {
-    var callback_url = this.get('callback_url');
-    if (callback_url) {
-      submitForm(callback_url, data, 'post');
-    }
-  }
-};
+import { RazorpayDefaults } from 'common/options';
 
 RazorpayDefaults.timeout = 0;
-
-RazorpayDefaults.buttontext = 'Pay Now';
-RazorpayDefaults.parent = null;
-
 RazorpayDefaults.name = '';
-
 RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.remember_customer = false;
@@ -59,8 +47,8 @@ RazorpayDefaults.readonly = {
 
 RazorpayDefaults.modal = {
   confirm_close: false,
-  ondismiss: noop,
-  onhidden: noop,
+  ondismiss: _Func.noop,
+  onhidden: _Func.noop,
   escape: true,
   animation: true,
   backdropclose: false,
@@ -68,7 +56,7 @@ RazorpayDefaults.modal = {
 
 RazorpayDefaults.external = {
   wallets: [],
-  handler: noop,
+  handler: _Func.noop,
 };
 
 RazorpayDefaults.theme = {
@@ -83,10 +71,4 @@ RazorpayDefaults.theme = {
   branding: '',
   emi_mode: false,
   debit_card: false,
-};
-
-optionValidations.parent = function(parent) {
-  if (!$(parent)[0]) {
-    return "parent provided for embedded mode doesn't exist";
-  }
 };
