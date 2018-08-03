@@ -14,6 +14,7 @@ var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var ua_android_browser = discreet.androidBrowser;
+var Curtain = discreet.Curtain;
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
   if (isString(url) && url.indexOf('https://checkout.razorpay.com')) {
