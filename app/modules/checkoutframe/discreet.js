@@ -11,6 +11,7 @@ import Callout from 'callout';
 import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
+import * as Curtain from 'components/curtain';
 
 export default {
   RazorpayConfig,
@@ -30,4 +31,5 @@ export default {
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrontOtp,
+  Curtain,
 };

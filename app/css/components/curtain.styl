@@ -1,0 +1,94 @@
+@require '../common';
+
+@keyframes curtain-appear
+  0%
+    transform: translateY(100%)
+    opacity: 0
+  50%
+    opacity: 0
+  100%
+    transform: translateY(0%)
+    opacity: 1
+
+@keyframes curtain-disappear
+  0%
+    transform: translateY(0%)
+    opacity: 1
+  10%
+    opacity: 0
+  100%
+    transform: translateY(100%)
+    opacity: 0
+
+#curtain
+  #curtain-overlay
+    z-index: -1
+    position: absolute;
+    top: 0
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    transition: all 0.15s ease-in-out;
+
+  #curtain-container-parent
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+    transform: translateY(100%);
+    transition: bottom 0.3s;
+
+    background: white;
+    text-align: left;
+
+    .curtain-container
+      padding: 20px;
+      padding-left: 24px;
+
+      .curtain-header-container
+        padding-right: 24px;
+        position: relative;
+
+        .curtain-header
+          text-transform: none;
+          color: #333333;
+          margin: 0;
+          font-size: 14px;
+          line-height: 20px;
+
+        .curtain-close
+          cursor: pointer;
+          position: absolute;
+          font-size: 14px;
+          line-height: 1em;
+          top: 0px;
+          right: 4px;
+
+      .curtain-content-container
+        .curtain-content
+          font-size: 13px;
+          line-height: 18px;
+          color: #757575;
+
+    &.curtain-hideclose
+      .curtain-close
+        display: none;
+
+    &.visible
+      z-index: 5;
+      pointer-events: auto
+      animation-name: curtain-appear
+      animation-duration: 0.4s
+      animation-iteration-count: 1
+      animation-fill-mode: forwards
+
+      &+ #curtain-overlay
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 4;
+
+    &.invisible
+      animation-name: curtain-disappear
+      animation-duration: 0.4s
+      animation-iteration-count: 1
