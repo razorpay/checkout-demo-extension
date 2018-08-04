@@ -31,29 +31,6 @@ const getPreferences = async (request, reply) => {
   };
 };
 
-const createPaymentRedirect = async (request, reply) => {
-  let payment = payments.create(request);
-
-  if (request.body.callback_url) {
-    reply.header('content-type', 'text/html');
-    return `<body onload="document.forms[0].submit();">
-      <form action="${request.body.callback_url}" method="POST">
-        <input type='hidden' name='razorpay_payment_id' value='${
-          payment.payment_id
-        }'/>
-      </form>
-    </body>`;
-  } else {
-    reply.redirect(
-      `/api/${request.params.visit}/v1/gateway/mocksharp/` + payment.payment_id
-    );
-  }
-};
-
-const submitOtp = request => {
-  return { razorpay_payment_id: request.params.payment_id };
-};
-
 const getStatus = async request => {
   if (payment.method === 'upi') {
     if (!payment.statusHit) {
@@ -105,7 +82,7 @@ const routes = [
   ['get', ':payment_id/status', getStatus],
   ['post', 'payments/create/ajax', wait],
   ['post', 'payments/create/checkout', waitHtml],
-  ['post', ':payment_id/otp_submit', submitOtp],
+  ['post', 'payments/:payment_id/otp_submit', wait],
   ['get', 'gateway/mocksharp/:payment_id', withNext(waitHtml)],
 ];
 

@@ -25,10 +25,10 @@ class PowerWallet extends CheckoutFrameTest {
     await page.click('label[for=wallet-radio-mobikwik]');
     await delay(250);
     await page.click('.pay-btn');
-    await delay(1000);
-    // await page.type('#otp', '123456');
+    await attempt.askOtp();
+    await page.type('#otp', '123456');
 
-    // await page.click('.pay-btn');
+    await page.click('.pay-btn');
     await attempt.succeed();
     attempt.assertSuccess();
   }

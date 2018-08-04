@@ -20,7 +20,7 @@ class Attempt {
       this.pending[action] = null;
       cb(data);
     } else {
-      this.warn(`No ${action} action to perform`);
+      this.fail(`No ${action} action to perform`);
     }
   }
 
@@ -91,6 +91,24 @@ class Attempt {
     });
 
     return this.promisePending('next');
+  }
+
+  async askOtp() {
+    await delay(100);
+
+    let paymentId = this.paymentId;
+
+    this.reply({
+      type: 'otp',
+      request: {
+        url: `${this.test.apiUrl}/payments/${paymentId}/otp_submit`,
+        method: 'post',
+        content: [],
+      },
+      paymentId,
+    });
+
+    await delay(1000);
   }
 
   assertSuccess() {
