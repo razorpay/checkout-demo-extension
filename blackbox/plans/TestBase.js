@@ -1,48 +1,9 @@
 const chalk = require('chalk');
-const apiUrl = 'http://localhost:3000/api/';
+const chai = require('chai');
+const Attempt = require('./Attempt');
+const { apiUrl } = require('../util');
 
-let attempts = 0;
 let visits = 0;
-
-class Attempt {
-  constructor(test) {
-    this.id = String(attempts++);
-    this.test = test;
-  }
-
-  end(result) {
-    if (this.done) {
-      this.test.fail('Tried to end payment attempt more than once');
-    }
-    this.done = true;
-    return new Promise(resolve => {
-      let test = this.test;
-      test.awaitingPaymentResult = resolve;
-      if (result) {
-        result = JSON.stringify(result);
-        test.page.evaluate(`window.onComplete && onComplete(${result})`);
-        test.page.evaluate(`__pptr_oncomplete(${result})`);
-      }
-    });
-  }
-
-  fail(description, field) {
-    let error = {
-      error: {
-        description,
-      },
-    };
-    if (field) {
-      error.field = field;
-    }
-    return this.end(error);
-  }
-
-  succeed() {
-    let paymentId = 'pay_' + Math.random();
-    return this.end({ razorpay_payment_id: paymentId });
-  }
-}
 
 class TestBase {
   static async test(browser, message) {
@@ -52,11 +13,17 @@ class TestBase {
     let p = new this(page);
 
     await page.exposeFunction('__pptr_oncomplete', data => {
+      if (!p.currentAttempt) {
+        return p.fail('Payment completed without attempt', data);
+      }
+
       var data = typeof data === 'object' ? data : JSON.parse(data);
 
       if (data.razorpay_payment_id) {
+        p.currentAttempt.setState(Attempt.states.PAYMENT_SUCCESS);
         p.log(chalk.dim('payment successful: ' + data.razorpay_payment_id));
       } else {
+        p.currentAttempt.setState(Attempt.states.PAYMENT_FAIL);
         let errorMessage = 'payment failed: ' + data.error.description;
         if (data.error.field) {
           errorMessage += ', field: ' + data.error.field;
@@ -64,9 +31,8 @@ class TestBase {
         p.log(chalk.dim(errorMessage));
       }
 
-      if (p.awaitingPaymentResult) {
-        p.awaitingPaymentResult(data);
-      }
+      p.currentAttempt.next();
+      p.currentAttempt = null;
     });
 
     await p.loadScripts(message);
@@ -74,7 +40,7 @@ class TestBase {
     return new Promise((resolve, reject) => p.setCallbacks(resolve, reject));
   }
 
-  async newAttempt() {
+  newAttempt() {
     if (this.currentAttempt) {
       return this.fail('New payment attempted while previous was in process');
     }
@@ -115,16 +81,22 @@ class TestBase {
     console.log(this.makeLog(...messages));
   }
 
+  logPass(message) {
+    this.log(chalk.green(message));
+  }
+
   constructor(page) {
     this.page = page;
     this.id = visits++;
     TestBase.allTests[this.id] = this;
+    this.apiUrl = `${apiUrl}${this.id}/`;
     page.evaluate(`Razorpay = {
       config: {
-        api: '${apiUrl}${this.id}/',
-        frameApi: '${apiUrl}${this.id}/',
+        api: '${this.apiUrl}',
+        frameApi: '${this.apiUrl}',
       }
     }`);
+    this.apiUrl += 'v1';
   }
 
   destroy() {
@@ -141,7 +113,7 @@ class TestBase {
     return (...args) => {
       try {
         method(...args);
-        this.log(chalk.green(message));
+        this.logPass(message);
       } catch (e) {
         this.fail(message + '\n\t' + e);
       }
@@ -163,5 +135,6 @@ class TestBase {
 
 TestBase.PARENT = '';
 TestBase.allTests = {};
+TestBase.apiUrl = apiUrl;
 
 module.exports = TestBase;

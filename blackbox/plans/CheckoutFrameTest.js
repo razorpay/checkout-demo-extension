@@ -6,14 +6,17 @@ class CheckoutFrameTest extends TestBase {
     let page = this.page;
 
     await page.exposeFunction('__pptr_onrender', () => {
-      this.render().catch(e => {
-        this.log(chalk.dim(e));
-        this.fail();
-      });
+      this.render()
+        .then(() => this.pass())
+        .catch(e => {
+          this.log(chalk.dim(e));
+          this.fail();
+        });
     });
 
     await page.evaluate(`
       CheckoutBridge = {
+        onpaymenterror: __pptr_oncomplete,
         oncomplete: __pptr_oncomplete,
         onrender: __pptr_onrender
       }

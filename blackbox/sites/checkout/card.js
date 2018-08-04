@@ -21,29 +21,24 @@ class NewCard extends CheckoutFrameTest {
     await page.type('#card_expiry', '1130');
     await page.type('#card_name', 'test');
     await page.type('#card_cvv', '000');
-    await delay(100);
 
     let attempt = await this.newAttempt();
     await page.click('.pay-btn');
 
-    attempt.fail('Invalid card number', 'card[number]');
+    await attempt.acs();
+    await attempt.fail('Invalid card number', 'card[number]');
 
+    await page.waitForSelector('#elem-card.invalid.mature.focused');
+
+    this.logPass('card element has invalid, mature and focused class');
+
+    await page.keyboard.press('Backspace');
+    await page.keyboard.type('1');
     await delay(100);
 
-    let classList = Object.values(
-      await page.$eval('#elem-card', el => el.classList)
-    );
-
-    // this.assert(
-    //   'card element has invalid, mature and focused class'
-    // ).includeMembers(classList, ['invalid', 'mature', 'focused']);
-
-    // await page.keyboard.press('Backspace');
-    // await page.keyboard.type('1');
-    // await delay(100);
-
-    // attempt = await this.newAttempt();
-    // await page.click('.pay-btn');
-    // await attempt.succeed();
+    attempt = this.newAttempt();
+    await page.click('.pay-btn');
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

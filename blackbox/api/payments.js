@@ -1,5 +1,11 @@
 const allPayments = {};
 
+class Payment {
+  constructor(id) {
+    allPayments[id] = this;
+  }
+}
+
 const payments = (module.exports = {
   create: request => methodHandlers[request.body.method](request),
 

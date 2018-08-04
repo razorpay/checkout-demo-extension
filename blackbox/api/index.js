@@ -9,15 +9,13 @@ fastify.listen(3000, err => {
   console.log(`api listening on ${fastify.server.address().port}`);
 });
 
-fastify.decorateRequest('paymentId', '');
+fastify.decorateRequest('attempt', '');
 
 fastify.addHook('preHandler', async (request, reply) => {
   if (request.params.visit) {
     request.apiUrl = `/api/${request.params.visit}/v1`;
     let test = allTests[request.params.visit];
-    if (test.currentAttempt) {
-      request.paymentId = 'pay_' + test.id + '_' + test.currentAttempt.id;
-    }
+    request.attempt = test.currentAttempt;
   }
   return reply.header('Access-Control-Allow-Origin', '*');
 });
@@ -63,8 +61,6 @@ const submitOtp = request => {
 };
 
 const getStatus = async request => {
-  let payment = payments.get(request.params.payment_id);
-  let result;
   if (payment.method === 'upi') {
     if (!payment.statusHit) {
       payment.statusHit = 1;
@@ -78,21 +74,42 @@ const getStatus = async request => {
   return result;
 };
 
-const mocksharp = (request, reply) => {
-  // take a little time to process payment.
-  // to avoid responding before js callbacks can be applied on client
-  console.log('mocksharp pptr', request.raw.headers['x-pptr-id']);
+const makeForm = request => `<body onload='document.forms[0].submit()'>
+  <form action='${request.url}' method='${request.method || 'get'}'>
+    ${request.content &&
+      Object.keys(request.content).map(
+        k => `<input name='${k}' value='${request.content[k]}'>`
+      )}
+  </form></body>`;
+
+const callbackHtml = data => {
+  data = JSON.stringify(data);
+  return `<script>opener.postMessage('${data}','*')</script>`;
+};
+
+const wait = request => request.attempt.promisePending('reply');
+
+const waitHtml = async (request, reply) => {
   reply.header('content-type', 'text/html');
-  reply.send(``);
+  return new Promise(resolve => {
+    request.attempt.setPending('reply', data =>
+      resolve(data.request ? makeForm(data.request) : callbackHtml(data))
+    );
+  });
+};
+
+const withNext = callback => (request, reply) => {
+  request.attempt.next();
+  return callback(request, reply);
 };
 
 const routes = [
   ['get', 'preferences', getPreferences],
   ['get', ':payment_id/status', getStatus],
-  ['post', 'payments/create/ajax', payments.create],
-  ['post', 'payments/create/checkout', createPaymentRedirect],
+  ['post', 'payments/create/ajax', wait],
+  ['post', 'payments/create/checkout', waitHtml],
   ['post', ':payment_id/otp_submit', submitOtp],
-  ['get', 'gateway/mocksharp/:payment_id', mocksharp],
+  ['get', 'gateway/mocksharp/:payment_id', withNext(waitHtml)],
 ];
 
 const prefix = '/api/:visit/v1/';

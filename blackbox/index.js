@@ -30,19 +30,6 @@ puppeteer
     // devtools: true,
   })
   .then(browser => {
-    browser.on('targetcreated', async target => {
-      let opener = target.opener();
-      if (opener) {
-        targets.inc();
-        let targetPage = await target.page();
-        if (!targetPage.isClosed()) {
-          await targetPage.setExtraHTTPHeaders({
-            'x-pptr-id': opener.__rzp_attempt_id,
-          });
-        }
-        targets.dec();
-      }
-    });
     const run = async site => {
       let suite = require(site);
       let testTimeout = suite.timeout || globalTimeout;
