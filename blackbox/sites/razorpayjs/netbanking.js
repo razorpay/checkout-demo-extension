@@ -21,8 +21,9 @@ class Netbanking extends RazorpayJsTest {
       wallet: 'HDFC',
     });
 
+    let attempt = this.newAttempt();
     await page.click('button');
-
-    await super.completePayment();
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

@@ -48,10 +48,11 @@ class Attempt {
     this.setState('new attempt ' + this.paymentId);
   }
 
-  end(result) {
+  async end(result) {
     if (this.done) {
       this.test.fail('Tried to end payment attempt more than once');
     }
+    await delay(100);
     this.done = true;
     this.reply(result);
 

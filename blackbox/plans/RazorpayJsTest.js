@@ -3,23 +3,17 @@ const { delay } = require('../util');
 const TestBase = require('./TestBase');
 
 class RazorpayJsTest extends TestBase {
-  async completePayment() {
-    /* default render for expected success scenario */
-    var data = await this.paymentResult();
-
-    if (data.razorpay_payment_id) {
-      this.pass();
-    } else {
-      this.fail();
-    }
-  }
-
   async loadScripts() {
     await this.page.addScriptTag({
       url: 'file://' + __dirname + '/../../app/dist/v1/razorpay.js',
     });
 
-    this.render();
+    this.render()
+      .then(() => this.pass())
+      .catch(e => {
+        this.log(chalk.dim(e));
+        this.fail();
+      });
   }
 
   async createPayment(options, params) {
@@ -33,6 +27,7 @@ class RazorpayJsTest extends TestBase {
             ${params ? ', ' + JSON.stringify(params) : ''}
           )
           .on('payment.success', __pptr_oncomplete)
+          .on('payment.error', __pptr_oncomplete)
           .on('payment.cancel', __pptr_oncomplete);
       }`);
   }

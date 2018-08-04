@@ -21,8 +21,9 @@ class Wallet extends RazorpayJsTest {
       wallet: 'mobikwik',
     });
 
+    let attempt = this.newAttempt();
     await page.click('button');
-
-    await super.completePayment();
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

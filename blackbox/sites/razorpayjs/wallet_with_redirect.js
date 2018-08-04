@@ -14,7 +14,7 @@ class WalletWithRedirect extends RazorpayJsTest {
       key: 'm1key',
       amount: 100,
       redirect: true,
-      callback_url: '/callback_url',
+      callback_url: `/${this.id}/callback_url`,
     });
 
     await this.createPayment({
@@ -22,8 +22,9 @@ class WalletWithRedirect extends RazorpayJsTest {
       wallet: 'mobikwik',
     });
 
+    let attempt = this.newAttempt();
     await page.click('button');
-
-    await super.completePayment();
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

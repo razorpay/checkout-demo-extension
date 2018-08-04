@@ -25,7 +25,6 @@ class UpiCollect extends CheckoutFrameTest {
 
     let attempt = this.newAttempt();
     await page.click('.pay-btn');
-    await delay(1000);
     await attempt.succeed();
     attempt.assertSuccess();
   }

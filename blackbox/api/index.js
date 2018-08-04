@@ -20,12 +20,6 @@ fastify.addHook('preHandler', async (request, reply) => {
   return reply.header('Access-Control-Allow-Origin', '*');
 });
 
-/**
- * Callback handler, not there in actual API. It's just here to test
- * redirect mode.
- */
-fastify.post('/callback_url', payments.callback);
-
 const getPreferences = async (request, reply) => {
   let m = merchants.find(m => m.key_id === request.query.key_id);
   if (m) return m.preferences;
@@ -90,6 +84,9 @@ const callbackHtml = data => {
 const wait = request => request.attempt.promisePending('reply');
 
 const waitHtml = async (request, reply) => {
+  if (request.body && request.body.callback_url) {
+    return reply.redirect(request.body.callback_url);
+  }
   reply.header('content-type', 'text/html');
   return new Promise(resolve => {
     request.attempt.setPending('reply', data =>
@@ -115,4 +112,13 @@ const routes = [
 const prefix = '/api/:visit/v1/';
 routes.forEach(([httpMethod, route, handler]) => {
   fastify[httpMethod](prefix + route, handler);
+});
+
+fastify.all('/:visit/callback_url', async (request, reply) => {
+  reply.header('content-type', 'text/html');
+  return new Promise(resolve => {
+    request.attempt.setPending('reply', data =>
+      resolve(`<script>__pptr_oncomplete(${JSON.stringify(data)})</script>`)
+    );
+  });
 });

@@ -30,10 +30,10 @@ class CardWithResume extends RazorpayJsTest {
       }
     );
 
+    let attempt = this.newAttempt();
     await page.click('button');
-
-    page.evaluate(`razorpay.emit('payment.resume')`);
-
-    await super.completePayment();
+    await page.evaluate(`razorpay.emit('payment.resume')`);
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

@@ -1,4 +1,3 @@
-const { delay } = require('../../util');
 const RazorpayJsTest = require('../../plans/RazorpayJsTest');
 
 module.exports = {
@@ -25,8 +24,9 @@ class Card extends RazorpayJsTest {
       'card[expiry_cvv]': '000',
     });
 
+    let attempt = this.newAttempt();
     await page.click('button');
-
-    await super.completePayment();
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }
