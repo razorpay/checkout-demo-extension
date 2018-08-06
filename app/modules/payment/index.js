@@ -33,17 +33,6 @@ function clearPollingInterval(force) {
   }
 }
 
-var communicator;
-function setCommunicator() {
-  if (!isRazorpayFrame && internetExplorer) {
-    _El.create('iframe')
-      |> _El.displayNone
-      |> _El.appendTo(_Doc.documentElement)
-      |> _Obj.setProp('src', RazorpayConfig.api + 'communicator.php');
-  }
-}
-setCommunicator();
-
 function onPaymentCancel(metaParam) {
   if (!this.done) {
     var cancelError = _.rzpError(strings.cancelMsg);
@@ -329,16 +318,6 @@ Payment.prototype = {
       return;
     }
 
-    // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if (
-      !isRazorpayFrame &&
-      (internetExplorer ||
-        data.wallet === 'payumoney' ||
-        data.wallet === 'freecharge' ||
-        data.wallet === 'olamoney')
-    ) {
-      return;
-    }
     if (data.method === 'emandate') {
       return;
     }
@@ -426,10 +405,7 @@ function pollPaymentData(onComplete) {
 }
 
 function onMessage(e) {
-  if (
-    (this.popup && this.popup.window === e.source) ||
-    (communicator && communicator.contentWindow === e.source)
-  ) {
+  if (this.popup && this.popup.window === e.source) {
     this.complete(e.data);
   }
 }
