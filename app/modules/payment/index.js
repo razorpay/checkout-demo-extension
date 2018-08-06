@@ -141,7 +141,8 @@ export default function Payment(data, params, r) {
   this.tez = params.tez;
 
   this.powerwallet =
-    params.powerwallet || (data && data.method === 'upi' && !params.fees);
+    params.powerwallet ||
+    (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
   this.message = params.message;
 
   this.tryPopup();
@@ -323,6 +324,11 @@ Payment.prototype = {
     if (this.fees) {
       return;
     }
+
+    if (!isRazorpayFrame && data.method === 'upi') {
+      return;
+    }
+
     // or its cross domain ajax. in that case, let popup redirect for sake of IE
     if (
       !isRazorpayFrame &&
