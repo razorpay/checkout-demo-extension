@@ -1,15 +1,13 @@
-const baseUrl = 'http://localhost:3000/v1';
-
 const allPayments = {};
 
-const payments = (module.exports = {
-  create: async request => methodHandlers[request.body.method](request.body),
+class Payment {
+  constructor(id) {
+    allPayments[id] = this;
+  }
+}
 
-  createId: (paymentData = {}) => {
-    let id = 'pay_' + Math.random();
-    allPayments[id] = paymentData;
-    return id;
-  },
+const payments = (module.exports = {
+  create: request => methodHandlers[request.body.method](request),
 
   get: id => allPayments[id],
 
@@ -22,17 +20,17 @@ const payments = (module.exports = {
 });
 
 const methodHandlers = {
-  card: body => {
-    let payment_id = payments.createId();
+  card: request => {
+    let paymentId = request.paymentId;
     return {
       type: 'first',
       request: {
-        url: `${baseUrl}/gateway/mocksharp/${payment_id}`,
+        url: `${request.apiUrl}/gateway/mocksharp/${paymentId}`,
         content: {
-          payment_id,
+          paymentId,
         },
       },
-      payment_id,
+      paymentId,
     };
   },
 
@@ -41,7 +39,7 @@ const methodHandlers = {
     return {
       type: 'otp',
       request: {
-        url: `${baseUrl}/payments/${payment_id}/otp_submit`,
+        url: `${request.apiUrl}/payments/${payment_id}/otp_submit`,
         method: 'post',
         content: [],
       },
