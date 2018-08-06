@@ -499,20 +499,6 @@ razorpayProto.topupWallet = function() {
 };
 
 /**
- * JSONP for fetch flows.
- *
- * @param {Object} data
- * @param {Function} callback
- */
-function getFlowsJsonp(data, callback) {
-  return fetch.jsonp({
-    url: makeUrl('payment/flows'),
-    data,
-    callback,
-  });
-}
-
-/**
  * Cache store for flows.
  */
 var flowCache = {
@@ -541,18 +527,22 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     return;
   }
 
-  getFlowsJsonp(
-    {
-      iin,
-      key_id: this.get('key'),
-      '_[source]': Track.props.library,
-    },
-    function(flows) {
+  let url = makeAuthUrl(this, 'payment/flows');
+
+  // append IIN and source as query to flows route
+  url = _.appendParamsToUrl(url, {
+    iin,
+    '_[source]': Track.props.library,
+  });
+
+  fetch.jsonp({
+    url,
+    callback: flows => {
       // Add to cache.
       flowCache.card[iin] = flows;
 
       // Invoke callback.
       callback(flowCache.card[iin]);
-    }
-  );
+    },
+  });
 };
