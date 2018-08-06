@@ -25,7 +25,6 @@ class NewCard extends CheckoutFrameTest {
     let attempt = await this.newAttempt();
     await page.click('.pay-btn');
 
-    await attempt.acs();
     await attempt.fail('Invalid card number', 'card[number]');
 
     await page.waitForSelector('#elem-card.invalid.mature.focused');

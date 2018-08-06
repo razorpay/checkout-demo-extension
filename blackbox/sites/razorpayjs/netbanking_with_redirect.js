@@ -23,7 +23,8 @@ class NetbankingWithRedirect extends RazorpayJsTest {
     });
 
     let attempt = this.newAttempt();
-    await page.click('button');
+    page.click('button');
+    await delay(500);
     await attempt.succeed();
     attempt.assertSuccess();
   }
