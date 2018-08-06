@@ -98,6 +98,7 @@ export default function Track(r, event, data) {
     var options = {};
     var properties = {
       options,
+      es6: true,
     };
 
     if (data) {
