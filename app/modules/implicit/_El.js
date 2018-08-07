@@ -187,8 +187,8 @@ export const matches =
 
 // always curried
 export const on = (event, callback, delegate, useCapture) => {
-  if (event |> _.is(global.EventTarget)) {
-    error: 'invalid syntax while attaching event listener';
+  if (_.is(event, ElementConstructor)) {
+    error: 'invalid arguments while attaching event listener';
   }
   return el => {
     var attachedCallback = callback;

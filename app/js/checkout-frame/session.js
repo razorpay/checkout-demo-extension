@@ -354,13 +354,15 @@ function errorHandler(response) {
     return;
   }
 
-  if (this.powerwallet) {
+  var error = response.error;
+  var message = error.description;
+
+  if (this.powerwallet && message === discreet.cancelMsg) {
+    // prevent payment canceled error
     this.powerwallet = null;
     return;
   }
 
-  var error = response.error;
-  var message = error.description;
   this.clearRequest();
 
   /* don't attempt magic if failed for the first time */
