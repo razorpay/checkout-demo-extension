@@ -1,7 +1,7 @@
 import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
 import 'checkoutjs/options';
-import 'checkoutjs/open';
+import initRazorpayCheckout from 'checkoutjs/open';
 
 import Track from 'tracker';
 Track.props.library = 'checkoutjs';
@@ -23,5 +23,7 @@ optionValidations.parent = function(parent) {
     return "parent provided for embedded mode doesn't exist";
   }
 };
+
+initRazorpayCheckout();
 
 export default Razorpay;

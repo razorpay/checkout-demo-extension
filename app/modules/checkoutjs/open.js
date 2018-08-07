@@ -282,4 +282,5 @@ var initRazorpayCheckout = needBody(function() {
     initAutomaticCheckout();
   } catch (e) {}
 });
-initRazorpayCheckout();
+
+export default initAutomaticCheckout;
