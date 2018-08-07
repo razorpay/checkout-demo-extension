@@ -1,7 +1,7 @@
 var emandateTabTitles = {
   'emandate-bank': 'Bank',
   'emandate-netbanking': 'Netbanking',
-  'emandate-aadhaar': 'Aadhaar'
+  'emandate-aadhaar': 'Aadhaar',
 };
 
 function emandateView(session) {
@@ -21,12 +21,12 @@ function emandateView(session) {
     /* auth_type that the merchant wants to enforce */
     auth_type: session.get('prefill.auth_type'),
     /* aadhaar is the 12 digit aadhaar number of the user */
-    aadhaar: session.get('prefill.aadhaar[number]')
+    aadhaar: session.get('prefill.aadhaar[number]'),
   };
 
   this.opts = {
     session: session,
-    prefill: this.prefill
+    prefill: this.prefill,
   };
 
   this.banks = this.session.methods.emandate;
@@ -117,10 +117,11 @@ emandateView.prototype = {
   },
 
   setBank: function(bankCode) {
+    var netbanks = this.session.netbanks;
     var backgroundImage =
       'background-image: url(' +
       (netbanks[bankCode]
-        ? netbanks[bankCode].image
+        ? netbanks[bankCode].logo
         : 'https://cdn.razorpay.com/bank/' + bankCode + '.gif') +
       ')';
 
@@ -226,5 +227,5 @@ emandateView.prototype = {
     }
 
     this.session.submit();
-  }
+  },
 };

@@ -1,8 +1,16 @@
-var customers = {};
+import { getSession } from 'sessionmanager';
+import { getQueryParams } from 'checkoutframe/index';
+import { makeAuthUrl } from 'common/Razorpay';
+import Track from 'tracker';
+import * as Bridge from 'bridge';
 
-var getCustomer = function(contact) {
+let customers = {};
+let qpmap = getQueryParams();
+
+export const getCustomer = contact => {
   // indian contact without +91
-  var indianContact;
+  let indianContact;
+
   if (contact) {
     indianContact = contact.length === 10 && contact[0] !== '+';
   }
@@ -16,28 +24,32 @@ var getCustomer = function(contact) {
   return customers[contact];
 };
 
-function Customer(contact) {
+export function Customer(contact) {
   if (contact) {
     this.contact = contact.replace(/[^+\d]/g, '');
   }
 }
 
-function sanitizeTokens(tokens, filters) {
-  var _filters = filters || {};
-  var method = _filters.method || 'card',
+export const sanitizeTokens = (tokens, filters) => {
+  let _filters = filters || {};
+  let method = _filters.method || 'card',
     recurring = _filters.recurring || false;
 
   if (tokens) {
-    var items = [];
-    each(tokens.items, function(index, item) {
-      if (item.method === method && (recurring ? item.recurring : true)) {
-        items.push(item);
-      }
-    });
-    tokens.items = items;
-    tokens.count = items.length;
+    let items = [];
+
+    tokens.items
+      |> _Obj.loop(item => {
+        if (item.method === method && (recurring ? item.recurring : true)) {
+          items.push(item);
+        }
+      });
+
+    tokens
+      |> _Obj.setProp('items', items)
+      |> _Obj.setProp('count', items.length);
   }
-}
+};
 
 Customer.prototype = {
   wants_skip: false,
@@ -45,27 +57,32 @@ Customer.prototype = {
   logged: false,
 
   mark_logged: function(data) {
-    var recurring = SessionManager.getSession().recurring || false;
+    var session = getSession();
+    let recurring = session.recurring || false;
     this.logged = true;
+
     sanitizeTokens(data.tokens, {
       recurring: recurring,
     });
+
     this.tokens = data.tokens;
-    if (!SessionManager.getSession().local) {
+
+    if (!session.local) {
       $('#top-right').addClass('logged');
     }
   },
 
   // NOTE: status check api also sends otp if customer exist
   checkStatus: function(callback) {
-    var qpmap = Checkout.getQueryParams();
-    var customer = this;
-    var url = makeAuthUrl(this.r, 'customers/status/' + this.contact);
+    let customer = this;
+    let url = makeAuthUrl(this.r, 'customers/status/' + this.contact);
     url += '&_[platform]=' + Track.props.platform;
+
     var device_token = qpmap.device_token;
     if (device_token) {
       url += '&device_token=' + device_token;
     }
+
     fetch({
       url: url,
       callback: function(data) {
@@ -89,11 +106,10 @@ Customer.prototype = {
   },
 
   submitOTP: function(data, callback) {
-    var user = this;
-    var qpmap = Checkout.getQueryParams();
+    let user = this;
 
     data.contact = this.contact;
-    var url = makeAuthUrl(this.r, 'otp/verify');
+    let url = makeAuthUrl(this.r, 'otp/verify');
 
     if (qpmap.platform === 'android' && qpmap.version && qpmap.library) {
       data['_[platform]'] = 'android';
@@ -113,12 +129,12 @@ Customer.prototype = {
         _session_id = data.session_id;
 
         if (qpmap.device_token) {
-          invoke('setDeviceToken', CheckoutBridge, qpmap.device_token);
+          Bridge.checkout.callAndroid('setDeviceToken', qpmap.device_token);
         }
 
         if (data.error) {
           if (data.error.field) {
-            errorHandler.call(SessionManager.getSession(), data);
+            errorHandler.call(getSession(), data);
           } else {
             callback(discreet.wrongOtpMsg);
           }
@@ -130,10 +146,12 @@ Customer.prototype = {
   },
 
   deleteCard: function(token, callback) {
-    var user = this;
+    let user = this;
+
     if (!this.id) {
       return;
     }
+
     fetch({
       url: makeAuthUrl(this.r, 'apps/' + this.id + '/tokens/' + token),
       method: 'delete',
@@ -145,11 +163,12 @@ Customer.prototype = {
   },
 
   logout: function(this_device, callback) {
-    var ajaxOpts = {
+    let ajaxOpts = {
       url: makeAuthUrl(this.r, 'apps/logout'),
       method: 'delete',
       callback: callback,
     };
+
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
 
     _session_id = null;
@@ -158,8 +177,8 @@ Customer.prototype = {
   },
 };
 
-function deleteToken(user, token) {
-  var tokens = user.tokens;
+export const deleteToken = (user, token) => {
+  let tokens = user.tokens;
   for (var i = 0; i < tokens.count; i++) {
     if (tokens.items[i].token === token) {
       tokens.items.splice(i, 1);
@@ -167,4 +186,4 @@ function deleteToken(user, token) {
       return;
     }
   }
-}
+};

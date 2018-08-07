@@ -12,6 +12,15 @@ import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
 
+/* Required for merchant.js migration */
+import * as Constants from 'common/constants';
+import * as Bank from 'common/bank';
+import * as Wallet from 'common/wallet';
+import * as SessionManager from 'sessionmanager';
+import * as Checkout from 'checkoutframe/index';
+import * as Bridge from 'bridge';
+import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -30,4 +39,15 @@ export default {
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrontOtp,
+
+  Constants,
+  Bank,
+  Wallet,
+  SessionManager,
+  Checkout,
+  Bridge,
+
+  Customer,
+  getCustomer,
+  sanitizeTokens,
 };

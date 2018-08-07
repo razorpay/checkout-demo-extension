@@ -1,5 +1,7 @@
-// const cdnUrl = RazorpayConfig.cdn
-const cdnUrl = '';
+import { RazorpayConfig } from 'common/Razorpay';
+
+// const cdnUrl = '';
+const cdnUrl = RazorpayConfig.cdn;
 const prefix = cdnUrl + 'bank/';
 
 export const getBankLogo = code => prefix + code.slice(0, 4) + '.gif';
@@ -27,7 +29,7 @@ export const commonBanks = _Arr.map(_commonBanks, banks => ({
   logo: getBankLogo(banks[0]),
 }));
 
-const emiBanks = [
+export const emiBanks = [
   {
     code: 'KKBK',
     name: 'Kotak Mahindra Bank',
@@ -84,4 +86,33 @@ export const getBankFromCard = cardNum => {
       logo: getBankLogo(bankObj.code),
     };
   }
+};
+
+export const getPreferredBanks = netbanks => {
+  var bankObj = {};
+  var availBanks = preferences.methods.netbanking;
+  if (!availBanks) {
+    return;
+  }
+
+  commonBanks
+    |> _Arr.reduce((accumulator, currBank) => {
+      if (availBanks[currBank.code] && !availBanks[`${currBank.code}_C`]) {
+        accumulator[currBank.code] = currBank;
+      }
+      return accumulator;
+    }, bankObj);
+
+  return bankObj;
+};
+
+export const getDownBanks = preferences => {
+  var downObj = [];
+  var downtime = preferences.downtime;
+  if (downtime) {
+    each(downtime.netbanking, function(i, o) {
+      downObj = downObj.concat(o.issuer);
+    });
+  }
+  return downObj;
 };

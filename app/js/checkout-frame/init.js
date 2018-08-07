@@ -14,9 +14,15 @@ var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var ua_android_browser = discreet.androidBrowser;
+var Constants = discreet.Constants;
+var Bank = discreet.Bank;
+var Wallet = discreet.Wallet;
+var SessionManager = discreet.SessionManager;
+var Checkout = discreet.Checkout;
+var Bridge = discreet.Bridge;
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
-  Track(getSession().r, 'js_error', {
+  Track(SessionManager.getSession().r, 'js_error', {
     message: errorMsg,
     line: lineNumber,
     col: column,

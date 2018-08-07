@@ -1,6 +1,28 @@
 var RAZORPAY_HOVER_COLOR = '#626A74';
 
 var ua = navigator.userAgent;
+
+var preferences = window.preferences,
+  CheckoutBridge = window.CheckoutBridge,
+  StorageBridge = window.StorageBridge,
+  isIframe = window !== parent,
+  ownerWindow = isIframe ? parent : opener,
+  _uid = Track.id,
+  tab_titles = Constants.TAB_TITLES,
+  getDownBanks = Bank.getDownBanks,
+  getPreferredBanks = Bank.getPreferredBanks,
+  freqWallets = Wallet.wallets,
+  contactPattern = Constants.contactPattern,
+  emailPattern = Constants.emailPattern,
+  ua_Android = discreet.androidBrowser,
+  cookieDisabled = !navigator.cookieEnabled,
+  getCustomer = discreet.getCustomer,
+  Customer = discreet.Customer,
+  sanitizeTokens = discreet.sanitizeTokens;
+
+/*TODO: customer module for ES6 */
+// getCustomer = noop;
+
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
@@ -136,6 +158,7 @@ function setEmiBank(data, savedCardScreen) {
 
 function onSixDigits(e) {
   var el = e.target;
+  var emi_options = this.emi_options;
 
   // Sanity check.
   if (!el) {
@@ -427,6 +450,7 @@ function elfShowOTP(otp, sender, bank) {
 }
 
 function askOTP(text) {
+  var qpmap = Checkout.getQueryParams();
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
@@ -445,7 +469,7 @@ function askOTP(text) {
     .removeClass('action');
   $('#body').addClass('sub');
   if (!text) {
-    var thisSession = getSession();
+    var thisSession = SessionManager.getSession();
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
       if (thisSession.payload) {
@@ -492,11 +516,26 @@ var IRCTC_KEYS = [
   'rzp_live_alEMh9FVT4XpwM',
 ];
 
-function Session(options) {
+function Session(message) {
+  var options = message.options;
+  var self = this;
+
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+
+  each(message, function(key, val) {
+    if (key !== 'options') {
+      self[key] = val;
+    }
+  });
+
+  this.ua_Android = ua_Android;
+
+  if (this.embedded) {
+    $(doc).addClass('embedded');
+  }
 
   /* The count of payments attempted */
   this.attemptCount = 0;
@@ -722,7 +761,7 @@ Session.prototype = {
       each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
-          errorHandler.call(getSession(), {
+          errorHandler.call(SessionManager.getSession(), {
             error: {
               field: option,
             },
@@ -800,7 +839,9 @@ Session.prototype = {
     var self = this;
     try {
       var pollUrl, pendingPaymentTimestamp;
-      pendingPaymentTimestamp = StorageBridge.getString(PENDING_PAYMENT_TS);
+      pendingPaymentTimestamp = StorageBridge.getString(
+        Checkout.PENDING_PAYMENT_TS
+      );
       pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
       // "activity_recreated" was passed as true.
@@ -817,13 +858,13 @@ Session.prototype = {
         if (
           isActivityRecreated &&
           now() - pendingPaymentTimestamp <=
-            MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
+            Checkout.MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
         ) {
-          pollUrl = StorageBridge.getString(UPI_POLL_URL);
+          pollUrl = StorageBridge.getString(Checkout.UPI_POLL_URL);
         } else {
           var params = {};
-          params[UPI_POLL_URL] = '';
-          params[PENDING_PAYMENT_TS] = '0';
+          params[Checkout.UPI_POLL_URL] = '';
+          params[Checkout.PENDING_PAYMENT_TS] = '0';
           this.setParamsInStorage(params);
         }
       }
@@ -1017,8 +1058,8 @@ Session.prototype = {
             : banks[bankCode],
         code: bankCode,
         account_number: accountNumber,
-        image:
-          (this.netbanks[bankCode] && this.netbanks[bankCode].image) ||
+        logo:
+          (this.netbanks[bankCode] && this.netbanks[bankCode].logo) ||
           'https://cdn.razorpay.com/' + bankCode + '.gif',
       };
     }
@@ -1309,7 +1350,8 @@ Session.prototype = {
       options.amount = 100 * amountValue;
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
-      setPaymentMethods(this);
+      /* TODO: Let session set payment methods once merchant.js is migrated */
+      /*setPaymentMethods(this);*/
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
@@ -1317,6 +1359,7 @@ Session.prototype = {
 
   bindEvents: function() {
     var self = this;
+    var emi_options = this.emi_options;
     var thisEl = this.el;
     this.click('#partial-back', function() {
       $(thisEl).removeClass('show-methods');
@@ -2039,6 +2082,7 @@ Session.prototype = {
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
           emi: this.methods.emi,
+          emi_options: this.emi_options,
         });
       }
     }
@@ -2375,8 +2419,8 @@ Session.prototype = {
     this.isResumedPayment = false;
 
     var params = {};
-    params[UPI_POLL_URL] = '';
-    params[PENDING_PAYMENT_TS] = '0';
+    params[Checkout.UPI_POLL_URL] = '';
+    params[Checkout.PENDING_PAYMENT_TS] = '0';
     this.setParamsInStorage(params);
 
     abortAjax(this.ajax);
@@ -2556,7 +2600,8 @@ Session.prototype = {
       if (Object.keys(notes).length > 15) {
         delete notes.pincode;
         delete notes.state;
-        notes.address += ', ' + states[notes.state] + ' - ' + notes.pincode;
+        notes.address +=
+          ', ' + Constants.STATES[notes.state] + ' - ' + notes.pincode;
       }
     }
 
@@ -2602,7 +2647,7 @@ Session.prototype = {
       this.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp =
-        '<img src="' + walletObj.col + '" height="' + walletObj.h + '">';
+        '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
     } else {
       this.showLoadError();
@@ -2701,8 +2746,8 @@ Session.prototype = {
 
       this.r.on('payment.upi.coproto_response', function(request) {
         var params = {};
-        params[UPI_POLL_URL] = request.url;
-        params[PENDING_PAYMENT_TS] = now() + '';
+        params[Checkout.UPI_POLL_URL] = request.url;
+        params[Checkout.PENDING_PAYMENT_TS] = now() + '';
         that.setParamsInStorage(params);
       });
 
@@ -2773,7 +2818,8 @@ Session.prototype = {
       clearTimeout(this.closeTimeout);
 
       this.tab = this.screen = '';
-      this.modal = this.emi = this.el = this.card = window.setPaymentID = window.onComplete = null;
+      this.modal = this.emi = this.el = this.card = null;
+      window.setPaymentID = window.onComplete = null;
     }
   },
 
@@ -2821,6 +2867,457 @@ Session.prototype = {
         showFlowRadioButtons(false);
       }
     });
+  },
+
+  setEmiOptions: function() {
+    var emiBanks = {};
+    var preferences = this.preferences;
+    var prefEmiOptions = preferences.methods.emi_options;
+
+    each(Bank.emiBanks, function(i, bank) {
+      var emiBank = {
+        name: bank.name,
+        patt: bank.patt,
+        plans: {},
+      };
+
+      if (prefEmiOptions) {
+        each(prefEmiOptions[bank.code], function(j, plan) {
+          emiBank.plans[plan.duration] = plan.interest;
+        });
+      }
+
+      if (prefEmiOptions[bank.code]) {
+        emiBanks[bank.code] = emiBank;
+      }
+    });
+
+    var emiOptions = {
+      banks: emiBanks,
+    };
+
+    /* TODO: remove common min and use bank specific min_amounts */
+    emiOptions.min = 3000 * 100 - 1; /* min 3k */
+    emiOptions.amex_min = 5000 * 100 - 1; /* min 5k */
+    emiOptions.selected = 'KKBK'; /* default bank to select in EMI plans view */
+
+    this.emi_options = emiOptions;
+  },
+
+  /*  setWallets: function () {
+    var preferences = this.preferences;
+    var prefWallets = this.preferences.methods.wallets || {};
+    var wallets = {}
+
+    each(Wallet.wallet, function(i, wallet){
+      if (prefWallets[wallet.code]) {
+        wallets[wallet.code] = wallet
+      }
+    })
+
+    this.methods.wallet = {};
+  },*/
+
+  setPaymentMethods: function(preferences) {
+    var recurring = this.recurring;
+    var international = this.get('currency') !== 'INR';
+    var availMethods = preferences.methods;
+    var amount = this.get('amount');
+    var bankMethod = 'netbanking';
+    var passedWallets = this.get('method.wallet');
+    var self = this;
+    var emi_options = this.emi_options;
+
+    var methods = (this.methods = {
+      count: 0,
+    });
+
+    /* Set recurring payment methods*/
+    if (recurring) {
+      availMethods = availMethods.recurring;
+      var banks = {};
+
+      /* emandate recurring */
+      if (availMethods.emandate) {
+        bankMethod = 'emandate';
+        this.emandate = true;
+        each(availMethods[bankMethod], function(bankCode, bankObj) {
+          banks[bankCode] = bankObj.name;
+        });
+        this.emandateBanks = availMethods[bankMethod];
+        availMethods[bankMethod] = banks;
+      }
+
+      /* card recurring */
+      if (availMethods.card) {
+        if (availMethods.card.credit instanceof Array) {
+          this.recurring_card_text =
+            availMethods.card.credit.join(' and ') + ' credit cards';
+        }
+        availMethods.debit_card = availMethods.card.debit;
+        availMethods.credit_card = availMethods.card.credit;
+        if (!amount) {
+          delete availMethods.card;
+        }
+      }
+    }
+
+    /* evaluate enabled methods form preferences and merchant options */
+    each(availMethods, function(method, enabled) {
+      if (enabled && self.get('method.' + method) !== false) {
+        methods[method] = enabled;
+      }
+    });
+
+    /**
+     * disable EMI if:
+     * - Non INR payment
+     * - Recurring payment
+     * - EMI not enabled
+     * - Card not enabled
+     * - amount is less than EMI threshold
+     */
+    var emiMethod = this.get('theme.emi_mode');
+    if (
+      !((emiMethod && methods.emi) || methods.card) ||
+      recurring ||
+      international ||
+      amount <= emi_options.min
+    ) {
+      methods.emi = false;
+    }
+
+    /* set tab_titles for card method */
+    if (methods.emi && !emiMethod) {
+      tab_titles.card = 'Card/EMI';
+    } else {
+      if (availMethods.debit_card && !availMethods.credit_card) {
+        tab_titles.card = tab_titles.debit_card;
+      } else {
+        tab_titles.card = 'Card';
+      }
+    }
+
+    /**
+     *  disable UPI if:
+     * - amount > 1 Lac
+     * - Recurring payment
+     * - Non INR payment
+     */
+    if (amount > 1e7 || recurring || international) {
+      methods.upi = false;
+    }
+
+    /**
+     * disable wallets if:
+     * - amount > 20k
+     * - Wallets not enabled by backend
+     * - Recurring payment
+     * - Non INR payment
+     *
+     * Also, enable/disable wallets on the basis of merchant options
+     */
+    if (
+      amount >= 100 * 20000 ||
+      /* php encodes blank object as blank array */
+      methods.wallet instanceof Array ||
+      recurring ||
+      international
+    ) {
+      methods.wallet = {};
+    } else if (typeof passedWallets === 'object') {
+      each(passedWallets, function(wallet, enabled) {
+        if (enabled === false) {
+          delete methods.wallet[wallet];
+        }
+      });
+    }
+
+    /* Emandate only works on amount of 0 as of now */
+    if (amount > 0 && methods.emandate) {
+      methods.emandate = false;
+    }
+
+    /* enable or disable netbanking tab on the basis of preferences */
+    if (
+      !methods[bankMethod] ||
+      methods[bankMethod] instanceof Array ||
+      international
+    ) {
+      methods[bankMethod] = false;
+    } else {
+      methods.count = 1;
+      this.down = getDownBanks(preferences);
+      this.netbanks = getPreferredBanks(this.methods.netbanking);
+    }
+
+    if (methods.card) {
+      methods.count++;
+    }
+
+    if (emiMethod) {
+      methods.count++;
+    }
+
+    if (methods.upi) {
+      methods.count++;
+    }
+
+    /* set external wallets */
+    each(this.get('external.wallets'), function(i, externalWallet) {
+      if (externalWallet in freqWallets) {
+        methods.wallet[externalWallet] = true;
+        freqWallets[externalWallet].custom = true;
+      }
+    });
+
+    /* set other wallets */
+    var wallets = [];
+    each(methods.wallet, function(code) {
+      var freqWallet = freqWallets[code];
+      if (freqWallet) {
+        wallets.push(freqWallet);
+      }
+    });
+
+    if (wallets.length) {
+      methods.count++;
+    }
+
+    wallets.sort(function(walletA, walletB) {
+      return walletB.custom || self.offers.wallet[walletB.name] ? 1 : -1;
+    });
+
+    methods.wallet = wallets;
+  },
+
+  setOffers: function(preferences) {
+    var offers = preferences.offers;
+
+    /* we restructure offers object for checkout */
+    var modifiedOffers = {
+      wallet: {},
+    };
+
+    each(offers, function(index, offer) {
+      var payment_method = offer.payment_method;
+      if (payment_method === 'card') {
+        modifiedOffers.card = offer;
+      } else if (payment_method === 'wallet') {
+        modifiedOffers.wallet[offer.issuer || offer.payment_network] = offer;
+      }
+    });
+
+    this.offers = modifiedOffers;
+  },
+
+  setPreferences: function(prefs) {
+    this.preferences = prefs;
+    preferences = prefs;
+
+    this.tab_titles = tab_titles;
+
+    this.setEmiOptions();
+
+    var self = this,
+      customer,
+      saved_customer = preferences.customer,
+      filters = {},
+      session_options = this.get(),
+      order = (this.order = preferences.order),
+      invoice = (this.invoice = preferences.invoice),
+      subscription = (this.subscription = preferences.subscription),
+      options = preferences.options;
+
+    this.setOffers(preferences);
+
+    /* Set magic from preferences */
+    this.magic = this.magic && preferences.magic;
+
+    /* set empty customer in case of local card saving */
+    if (preferences.global === false) {
+      this.local = true;
+      customer = new Customer('');
+      getCustomer = function() {
+        return customer;
+      };
+    }
+
+    /* In case of recurring set recurring as filter in saved cards */
+    if (
+      session_options['prefill.method'] === 'emandate' ||
+      preferences.subscription ||
+      session_options.recurring
+    ) {
+      this.recurring = filters.recurring = true;
+    }
+
+    /* Used previously logged in customer details and saved card tokens */
+    if (saved_customer) {
+      /* saved card details take priority over prefill */
+      if (saved_customer.contact) {
+        session_options['prefill.contact'] = saved_customer.contact;
+      }
+
+      if (saved_customer.email) {
+        session_options['prefill.email'] = saved_customer.email;
+      }
+
+      customer = getCustomer(saved_customer.contact);
+      sanitizeTokens(saved_customer.tokens, filters);
+      customer.tokens = saved_customer.tokens;
+
+      if (saved_customer.tokens) {
+        customer.logged = true;
+      }
+
+      customer.customer_id = saved_customer.customer_id;
+    }
+
+    /* enable card saving if recurring payment */
+    if (this.recurring) {
+      session_options.remember_customer = true;
+    }
+
+    /* disable card saving if merchant disables it in options */
+    if (!this.r.get('features.cardsaving')) {
+      session_options.remember_customer = false;
+    }
+
+    /* set optional fields */
+    this.optional = arr2obj(preferences.optional);
+
+    /* disable cardsaving if cookies disabled or optional contact with no
+     * prefill */
+    if (
+      cookieDisabled ||
+      (this.optional.contact && !session_options['prefill.contact'])
+    ) {
+      options.remember_customer = false;
+    }
+
+    /* set Razorpay instance for customer */
+    Customer.prototype.r = this.r;
+
+    /* Apply options overrides from preferences */
+    Razorpay.configure(options);
+
+    /* Amount in case of partial payments */
+    var prefillAmount = session_options['prefill.amount'];
+    if (prefillAmount) {
+      session_options.amount = Number(Math.floor(prefillAmount));
+    } else {
+      if (order && order.amount) {
+        session_options.amount = order.partial_payment
+          ? order.amount_due
+          : order.amount;
+      } else if (invoice && invoice.amount) {
+        session_options.amount = invoice.amount;
+      } else if (subscription && subscription.amount) {
+        session_options.amount = subscription.amount;
+      }
+    }
+
+    /* Set redirect mode if TPV and callback_url exists */
+    if (
+      order &&
+      order.bank &&
+      this.get('callback_url') &&
+      order.method !== 'upi'
+    ) {
+      session_options.redirect = true;
+      return this.r.createPayment({
+        contact: this.get('prefill.contact') || '9999999999',
+        email: this.get('prefill.email') || 'void@razorpay.com',
+        bank: order.bank,
+        method: 'netbanking',
+      });
+    }
+
+    /* set payment methods on the basis of preferences */
+    this.setPaymentMethods(preferences);
+  },
+
+  showModal: function(preferences) {
+    var qpmap = Checkout.getQueryParams();
+
+    if (!this.methods.count) {
+      var message = 'No appropriate payment method found.';
+      if (this.recurring && !this.get('customer_id') && this.methods.emandate) {
+        message += '\nMake sure to pass customer_id for e-mandate payments';
+      }
+      return Razorpay.sendMessage({ event: 'fault', data: message });
+    }
+
+    this.render();
+
+    Razorpay.sendMessage({ event: 'render' });
+
+    if (CheckoutBridge) {
+      var containerBox = $('#container')[0];
+      if (containerBox) {
+        var rect = containerBox.getBoundingClientRect();
+        Bridge.checkout.callAndroid(
+          'setDimensions',
+          Math.floor(rect.width),
+          Math.floor(rect.height)
+        );
+      }
+
+      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+    }
+
+    if (qpmap.error) {
+      errorHandler.call(this, qpmap);
+    }
+
+    if (qpmap.tab) {
+      this.switchTab(qpmap.tab);
+    }
+  },
+
+  fetchPrefs: function(callback) {
+    var prefData = makePrefParams(this);
+    var self = this;
+
+    if (cookieDisabled) {
+      prefData.checkcookie = 0;
+    } else {
+      prefData.checkcookie = 1;
+      document.cookie = 'checkcookie=1;path=/';
+    }
+
+    if (this.isOpen) {
+      return;
+    }
+
+    this.isOpen = true;
+
+    var timeout = this.get('timeout');
+    if (timeout) {
+      this.closeAt = now() + timeout * 1000;
+    }
+
+    this.prefCall = Razorpay.payment.getPrefs(prefData, function(response) {
+      self.prefCall = null;
+      if (response.error) {
+        return Razorpay.sendMessage({
+          event: 'fault',
+          data: response.error.description,
+        });
+      }
+      var preferences = response;
+      self.setPreferences(preferences);
+
+      // pass preferences options to SDK
+      Bridge.checkout.callAndroid(
+        'setMerchantOptions',
+        JSON.stringify(preferences.options)
+      );
+      callback(preferences);
+    });
+
+    return this.prefCall;
   },
 };
 

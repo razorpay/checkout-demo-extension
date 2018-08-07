@@ -14,8 +14,7 @@ function selectEmiBank(e) {
 function emiView(session) {
   var opts = session.emi_options;
   var amount = (opts.amount = session.get('amount'));
-  if (amount >= 5000 * 100) {
-    opts.banks.AMEX = opts.other_banks.AMEX;
+  if (amount > opts.amex_min) {
     var $help = $('#elem-emi .help');
     $help.html($help.html().replace(' & Axis Bank', ', Axis & AMEX'));
   } else {

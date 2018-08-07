@@ -1,23 +1,24 @@
-// const cdnUrl = RazorpayConfig.cdn
-const cdnUrl = '';
+import { RazorpayConfig } from 'common/Razorpay';
+
+const cdnUrl = RazorpayConfig.cdn;
 
 const prefix = cdnUrl + 'wallet/';
 const sqPrefix = cdnUrl + 'wallet-sq/';
 
-const names = {
-  amazonpay: 'Amazon Pay',
-  paytm: 'Paytm',
-  zeta: 'Zeta',
-  freecharge: 'Freecharge',
-  airtelmoney: 'Airtel Money',
-  jiomoney: 'JioMoney',
-  olamoney: 'Ola Money',
-  mobikwik: 'Mobikwik',
-  payumoney: 'PayUMoney',
-  payzapp: 'PayZapp',
-  citrus: 'Citrus Wallet',
-  mpesa: 'Vodafone mPesa',
-  sbibuddy: 'SBI Buddy',
+const list = {
+  amazonpay: ['Amazon Pay', 28],
+  paytm: ['Paytm', 18],
+  zeta: ['Zeta', 25],
+  freecharge: ['Freecharge', 18],
+  airtelmoney: ['Airtel Money', 32],
+  jiomoney: ['JioMoney', 68],
+  olamoney: ['Ola Money', 22],
+  mobikwik: ['Mobikwik', 20],
+  payumoney: ['PayUMoney', 18],
+  payzapp: ['PayZapp', 24],
+  citrus: ['Citrus Wallet', 32],
+  mpesa: ['Vodafone mPesa', 50],
+  sbibuddy: ['SBI Buddy', 22],
 };
 
 const otpLengths = {
@@ -26,9 +27,11 @@ const otpLengths = {
 
 const powerWallets = ['mobikwik', 'freecharge', 'olamoney'];
 
-const wallets = _Obj.map(names, (name, code) => ({
-  power: powerWallets.indexOf(walletCode) !== -1,
-  name,
+export const wallets = _Obj.map(list, (details, code) => ({
+  power: powerWallets.indexOf(code) !== -1,
+  name: details[0],
+  h: details[1],
+  code,
   logo: prefix + code + '.png',
   sqLogo: sqPrefix + code + '.png',
 }));
