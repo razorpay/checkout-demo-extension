@@ -28,7 +28,7 @@ var bank_account = _.prefill.bank_account,
       <div class="payment-option item aadhaar" tab="emandate-aadhaar">
         <label>
           <i class="theme">&#xe60a;</i>
-          Aadhaar Virtual ID
+          Aadhaar
           <span class="desc">via Aadhaar linked mobile OTP</span>
         </label>
       </div>
@@ -71,7 +71,7 @@ var bank_account = _.prefill.bank_account,
       <label>Name on Bank Account</label>
       <input class="input" name="bank_account[name]" type="text" id="adhr-acc-name" value="`=bank_name`"`?bank_name` readonly`?` required pattern="^[a-zA-Z. 0-9\']{1,100}$" maxlength="100" spellcheck="false" autocorrect="off" autocapitalize="off">
     </div></div>
-    `?aadhaar`
+    `?aadhaar && false`
       <div class="elem-wrap" id="elem-wrap-adhr-acc-aadhaar"><div class="elem elem-adhr-acc-aadhaar readonly">
         <div class="help">Please enter a valid Aadhaar VID</div>
         <label>Aadhaar Virtual ID</label>

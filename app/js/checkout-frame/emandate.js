@@ -178,17 +178,17 @@ emandateView.prototype = {
       this.session.body.addClass('sub');
     }
 
-    if (screen === 'emandate-aadhaar') {
-      this.originalPayBtnText = $('.pay-btn').html();
+    // if (screen === 'emandate-aadhaar') {
+    //   this.originalPayBtnText = $('.pay-btn').html();
 
-      if (this.session.get('prefill.aadhaar[vid]')) {
-        this.session.setPayButtonText('Proceed');
-      } else {
-        this.session.setPayButtonText('Next');
-      }
-    } else if (this.originalPayBtnText) {
-      this.session.setPayButtonText(this.originalPayBtnText);
-    }
+    //   if (this.session.get('prefill.aadhaar[vid]')) {
+    //     this.session.setPayButtonText('Proceed');
+    //   } else {
+    //     this.session.setPayButtonText('Next');
+    //   }
+    // } else if (this.originalPayBtnText) {
+    //   this.session.setPayButtonText(this.originalPayBtnText);
+    // }
   },
 
   showTab: function(tab) {
@@ -237,22 +237,22 @@ emandateView.prototype = {
       return;
     }
 
-    if (screen === 'emandate-aadhaar') {
-      if (!this.session.get('prefill.aadhaar[vid]')) {
-        if (this.curtainVisible && gel('emandate-aadhaar-radio-no')) {
-          if (gel('emandate-aadhaar-radio-no').checked) {
-            this.openUIDAI();
-            gel('emandate-aadhaar-radio-no').checked = false;
-            gel('emandate-aadhaar-radio-yes').checked = true;
-            this.session.setPayButtonText('Proceed');
-            return;
-          }
-        } else if (!this.curtainVisible) {
-          this.showCurtain();
-          return;
-        }
-      }
-    }
+    // if (screen === 'emandate-aadhaar') {
+    //   if (!this.session.get('prefill.aadhaar[vid]')) {
+    //     if (this.curtainVisible && gel('emandate-aadhaar-radio-no')) {
+    //       if (gel('emandate-aadhaar-radio-no').checked) {
+    //         this.openUIDAI();
+    //         gel('emandate-aadhaar-radio-no').checked = false;
+    //         gel('emandate-aadhaar-radio-yes').checked = true;
+    //         this.session.setPayButtonText('Proceed');
+    //         return;
+    //       }
+    //     } else if (!this.curtainVisible) {
+    //       this.showCurtain();
+    //       return;
+    //     }
+    //   }
+    // }
 
     fillData(formSelector, data);
 
