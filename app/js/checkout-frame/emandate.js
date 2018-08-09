@@ -1,7 +1,7 @@
 var emandateTabTitles = {
   'emandate-bank': 'Bank',
   'emandate-netbanking': 'Netbanking',
-  'emandate-aadhaar': 'Aadhaar'
+  'emandate-aadhaar': 'Aadhaar',
 };
 
 function emandateView(session) {
@@ -21,12 +21,12 @@ function emandateView(session) {
     /* auth_type that the merchant wants to enforce */
     auth_type: session.get('prefill.auth_type'),
     /* aadhaar is the 12 digit aadhaar number of the user */
-    aadhaar: session.get('prefill.aadhaar[number]')
+    aadhaar: session.get('prefill.aadhaar[vid]'),
   };
 
   this.opts = {
     session: session,
-    prefill: this.prefill
+    prefill: this.prefill,
   };
 
   this.banks = this.session.methods.emandate;
@@ -45,15 +45,26 @@ emandateView.prototype = {
     this.bind();
   },
 
-  on: function(event, sel, listener) {
+  on: function(event, sel, listener, capture) {
     var $el = $(sel);
-    this.listeners.push($el.on(event, listener));
+    this.listeners.push($el.on(event, listener, capture));
+  },
+
+  inputRadioChanged: function(e) {
+    var val = e.target.value;
+
+    if (val === 'yes') {
+      this.session.setPayButtonText('Proceed');
+    } else if (val === 'no') {
+      this.session.setPayButtonText('Create Aadhaar VID');
+    }
   },
 
   bind: function() {
     var self = this;
 
     this.on('click', '#emandate-bank .btn-change-bank', function() {
+      self.session.deselectBank();
       self.setScreen('emandate');
       self.history = ['emandate'];
     });
@@ -161,17 +172,23 @@ emandateView.prototype = {
   setScreen: function(screen) {
     this.session.setScreen(screen);
 
-    if (screen === 'emandate-bank') {
+    if (screen === 'emandate-bank' || screen === 'emandate') {
       this.session.body.removeClass('sub');
     } else {
       this.session.body.addClass('sub');
     }
 
-    if (screen === 'emandate') {
-      $('#container').addClass('emandate-extra');
-    } else {
-      $('#container').removeClass('emandate-extra');
-    }
+    // if (screen === 'emandate-aadhaar') {
+    //   this.originalPayBtnText = $('.pay-btn').html();
+
+    //   if (this.session.get('prefill.aadhaar[vid]')) {
+    //     this.session.setPayButtonText('Proceed');
+    //   } else {
+    //     this.session.setPayButtonText('Next');
+    //   }
+    // } else if (this.originalPayBtnText) {
+    //   this.session.setPayButtonText(this.originalPayBtnText);
+    // }
   },
 
   showTab: function(tab) {
@@ -202,21 +219,47 @@ emandateView.prototype = {
       return false;
     }
 
-    this.setScreen(this.history[this.history.length - 1]);
+    var newScreen = this.history[this.history.length - 1];
+    this.setScreen(newScreen);
+
+    if (newScreen === 'emandate') {
+      this.session.deselectBank();
+    }
+
     return true;
   },
 
   submit: function(data) {
     var screen = this.session.screen;
     var formSelector = '#form-' + screen;
-    fillData(formSelector, data);
 
     if (this.session.checkInvalid(formSelector)) {
       return;
     }
 
-    if (data['aadhaar[number]']) {
-      data['aadhaar[number]'] = data['aadhaar[number]'].replace(/ /g, '');
+    // if (screen === 'emandate-aadhaar') {
+    //   if (!this.session.get('prefill.aadhaar[vid]')) {
+    //     if (this.curtainVisible && gel('emandate-aadhaar-radio-no')) {
+    //       if (gel('emandate-aadhaar-radio-no').checked) {
+    //         this.openUIDAI();
+    //         gel('emandate-aadhaar-radio-no').checked = false;
+    //         gel('emandate-aadhaar-radio-yes').checked = true;
+    //         this.session.setPayButtonText('Proceed');
+    //         return;
+    //       }
+    //     } else if (!this.curtainVisible) {
+    //       this.showCurtain();
+    //       return;
+    //     }
+    //   }
+    // }
+
+    fillData(formSelector, data);
+
+    delete data['emandate-aadhaar-radio'];
+
+    if (data['aadhaar[vid]']) {
+      data['aadhaar[vid]'] = data['aadhaar[vid]'].replace(/ /g, '');
     }
 
     if (screen === 'emandate-aadhaar') {
@@ -226,5 +269,95 @@ emandateView.prototype = {
     }
 
     this.session.submit();
-  }
+  },
+
+  openUIDAI: function() {
+    var isSupportedSDK = qpmap.platform && !isUnsupportedSDK();
+
+    if (isSupportedSDK) {
+      Track(this.session.r, 'emandate_aadhaar_uidai_link_intent');
+      CheckoutBridge.callNativeIntent(gel('aadhaar_vid_link').href);
+    } else {
+      Track(this.session.r, 'emandate_aadhaar_uidai_link_native');
+      gel('aadhaar_vid_link').click();
+    }
+  },
+
+  showCurtain: function() {
+    var self = this;
+
+    var showSDKView = isUnsupportedSDK();
+
+    Curtain.show({
+      content: templates.contents_aadhaar_vid({
+        showSDKView: showSDKView,
+      }),
+      onClose: function() {
+        self.hideCurtain();
+      },
+      onShow: function() {
+        self.curtainVisible = true;
+
+        if (showSDKView) {
+          self.session.setPayButtonText('Proceed');
+          gel('emandate-uidai-copy').innerHTML = templates.copytoclipboard({
+            content: 'https://resident.uidai.gov.in/web/resident/vidgeneration',
+            btnText: 'Copy Link',
+          });
+
+          self.on(
+            'click',
+            '#emandate-uidai-copy .copytoclipboard--btn',
+            function(e) {
+              Track(self.session.r, 'aadhar_vid_link_copied');
+            }
+          );
+        } else {
+          self.session.setPayButtonText('Create Aadhaar VID');
+
+          self.on(
+            'change',
+            '#emandate-aadhaar-radios',
+            bind(self.inputRadioChanged, self),
+            true
+          );
+        }
+
+        self.on('mouseover', '.emandate-education-text .has-tooltip', function(
+          e
+        ) {
+          Track(self.session.r, 'emandate_aadhaar_tooltip_viewed');
+        });
+
+        self.on('click', '#emandate-aadhaar-radios', function(e) {
+          if (e.target.nodeName.toLowerCase() === 'input') {
+            Track(self.session.r, 'emandate_aadhaar_radio_change', {
+              value: e.target.value,
+            });
+          }
+        });
+      },
+    });
+  },
+
+  hideCurtain: function() {
+    this.curtainVisible = false;
+
+    this.session.setPayButtonText('Next');
+
+    Track(this.session.r, 'emandate_aadhaar_curtain_closed');
+  },
 };
+
+/**
+ * Unsupported SDKs are
+ * all iOS SDKs and
+ * Android SDKs without callNativeIntent
+ */
+function isUnsupportedSDK() {
+  if (qpmap.platform) {
+    return !(CheckoutBridge && CheckoutBridge.callNativeIntent);
+  }
+
+  return false;
+}

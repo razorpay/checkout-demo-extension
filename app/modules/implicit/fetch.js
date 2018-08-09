@@ -183,5 +183,5 @@ function jsonp(options) {
 }
 
 fetch.post = post;
-fetch.setSessionId = sessionId;
+fetch.setSessionId = setSessionId;
 fetch.jsonp = jsonp;

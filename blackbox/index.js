@@ -3,6 +3,7 @@ const glob = require('glob').sync;
 const puppeteer = require('puppeteer');
 const path = require('path');
 const chalk = require('chalk');
+const { targets } = require('./api/payments');
 
 // wait this many seconds for each test
 const globalTimeout = 10;

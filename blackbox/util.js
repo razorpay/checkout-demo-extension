@@ -7,4 +7,5 @@ module.exports = {
       return width && height;
     },
   },
+  apiUrl: 'http://localhost:3000/api/',
 };

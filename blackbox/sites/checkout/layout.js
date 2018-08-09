@@ -19,7 +19,10 @@ module.exports = {
 
 class Layout extends CheckoutTest {
   async render() {
-    const { page, options } = this;
+    const { page } = this;
+
+    // let iframe get loaded
+    await delay(200);
 
     let $iframe = await page.$('iframe');
 
@@ -72,29 +75,5 @@ class Layout extends CheckoutTest {
     // Body tests
 
     const $body = await $container.$('#body');
-
-    // Form tests
-
-    const $form = await $body.$('#form');
-
-    if (options.prefill) {
-      if (options.prefill.contact) {
-        const phone = await $form.$eval('#contact', node => node.value);
-
-        assert(
-          options.prefill.contact === phone,
-          'Given and rendered phone numbers are different'
-        );
-      }
-
-      if (options.prefill.email) {
-        const email = await $form.$eval('#email', node => node.value);
-
-        assert(
-          options.prefill.email === email,
-          'Given and rendered emails are differnt'
-        );
-      }
-    }
   }
 }

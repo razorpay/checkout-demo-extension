@@ -4,17 +4,25 @@ const fastify = require('fastify')();
 fastify.register(require('fastify-formbody'));
 const merchants = require('./merchants');
 const payments = require('./payments');
+const { allTests } = require('../plans/TestBase');
 
 fastify.listen(3000, err => {
   if (err) throw err;
   console.log(`api listening on ${fastify.server.address().port}`);
 });
 
+fastify.decorateRequest('attempt', '');
+
 fastify.addHook('preHandler', async (request, reply) => {
+  if (request.params.visit) {
+    request.apiUrl = `/api/${request.params.visit}/v1`;
+    let test = allTests[request.params.visit];
+    request.attempt = test && test.currentAttempt;
+  }
   return reply.header('Access-Control-Allow-Origin', '*');
 });
 
-const handlePreferences = async (request, reply) => {
+const getPreferences = async (request, reply) => {
   let m = merchants.find(m => m.key_id === request.query.key_id);
   if (m) return m.preferences;
   return {
@@ -25,24 +33,7 @@ const handlePreferences = async (request, reply) => {
   };
 };
 
-fastify.get('/v1/preferences', handlePreferences);
-fastify.get('/api/v1/preferences', handlePreferences);
-
-/**
- * Callback handler, not there in actual API. It's just here to test
- * redirect mode.
- */
-fastify.post('/callback_url', payments.callback);
-
-fastify.post('/v1/payments/create/ajax', payments.create);
-
-fastify.post('/v1/payments/:payment_id/otp_submit', async request => {
-  return { razorpay_payment_id: request.params.payment_id };
-});
-
-fastify.get('/v1/payments/:payment_id/status', async request => {
-  let payment = payments.get(request.params.payment_id);
-  let result;
+const getStatus = async request => {
   if (payment.method === 'upi') {
     if (!payment.statusHit) {
       payment.statusHit = 1;
@@ -54,41 +45,64 @@ fastify.get('/v1/payments/:payment_id/status', async request => {
     return `${request.query.callback}(${JSON.stringify(result)})`;
   }
   return result;
-});
+};
 
-fastify.post('/v1/payments/create/checkout', async (request, reply) => {
-  let payment = await payments.create(request);
+const makeForm = request => `<body onload='document.forms[0].submit()'>
+  <form action='${request.url}' method='${request.method || 'get'}'>
+    ${request.content &&
+      Object.keys(request.content).map(
+        k => `<input name='${k}' value='${request.content[k]}'>`
+      )}
+  </form></body>`;
 
-  if (request.body.callback_url) {
-    reply.header('content-type', 'text/html');
-    return `<body onload="document.forms[0].submit();">
-      <form action="${request.body.callback_url}" method="POST">
-        <input type='hidden' name='razorpay_payment_id' value='${
-          payment.payment_id
-        }'/>
-      </form>
-    </body>`;
-  } else {
-    reply.redirect('/v1/gateway/mocksharp/' + payment.payment_id);
+const callbackHtml = data => {
+  data = JSON.stringify(data);
+  return `<script>opener.postMessage('${data}','*')</script>`;
+};
+
+const wait = request => request.attempt.promisePending('reply');
+
+const waitHtml = async (request, reply) => {
+  if (request.body && request.body.callback_url) {
+    return reply.redirect(request.body.callback_url);
   }
+  reply.header('content-type', 'text/html');
+  return new Promise(resolve => {
+    request.attempt.setPending('reply', data =>
+      resolve(data.request ? makeForm(data.request) : callbackHtml(data))
+    );
+  });
+};
+
+const withNext = callback => (request, reply) => {
+  request.attempt.next();
+  return callback(request, reply);
+};
+
+const routes = [
+  ['get', 'preferences', getPreferences],
+  ['get', ':payment_id/status', getStatus],
+  ['post', 'payments/create/ajax', wait],
+  ['post', 'payments/create/checkout', waitHtml],
+  ['post', 'payments/:payment_id/otp_submit', wait],
+  ['get', 'gateway/mocksharp/:payment_id', withNext(waitHtml)],
+];
+
+const prefix = '/api/:visit/v1/';
+routes.forEach(([httpMethod, route, handler]) => {
+  fastify[httpMethod](prefix + route, handler);
 });
 
-fastify.get('/v1/gateway/mocksharp/:payment_id', (request, reply) => {
-  // take a little time to process payment.
-  // to avoid responding before js callbacks can be applied on client
+fastify.all('/:visit/callback_url', async (request, reply) => {
   reply.header('content-type', 'text/html');
-  reply.send(
-    `<script>opener.postMessage({razorpay_payment_id:'${
-      request.params.payment_id
-    }'},'*')</script>`
-  );
-});
-
-fastify.get('/index.html', (request, reply) => {
-  reply.header('content-type', 'text/html');
-  reply.send(fs.readFileSync(path.resolve(__dirname, '../index.html')));
+  return new Promise(resolve => {
+    request.attempt.setPending('reply', data =>
+      resolve(`<script>__pptr_oncomplete(${JSON.stringify(data)})</script>`)
+    );
+  });
 });
 
 fastify.register(require('fastify-static'), {
-  root: path.join(__dirname, '../../app/'),
+  root: path.join(__dirname, '../static/'),
+  prefix: '/static/',
 });

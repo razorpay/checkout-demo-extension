@@ -39,6 +39,7 @@ fs.writeFileSync(
       'encodeURIComponent',
       'decodeURIComponent',
       'btoa',
+      'unescape',
     ]
       .map(command => {
         injects[command] = ['generated/globals', command];

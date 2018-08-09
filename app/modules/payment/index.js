@@ -33,17 +33,6 @@ function clearPollingInterval(force) {
   }
 }
 
-var communicator;
-function setCommunicator() {
-  if (!isRazorpayFrame && internetExplorer) {
-    _El.create('iframe')
-      |> _El.displayNone
-      |> _El.appendTo(_Doc.documentElement)
-      |> _Obj.setProp('src', RazorpayConfig.api + 'communicator.php');
-  }
-}
-setCommunicator();
-
 function onPaymentCancel(metaParam) {
   if (!this.done) {
     var cancelError = _.rzpError(strings.cancelMsg);
@@ -111,7 +100,7 @@ export default function Payment(data, params, r) {
   this.magicPossible = this.isMagicPayment;
 
   if (r.get('key') !== 'rzp_live_ChO9QOhE7BH1aD') {
-    this.isMagicPayment = this.isMagicPayment && Math.random() < 0.1;
+    this.isMagicPayment = this.isMagicPayment && Math.random() < 0.5;
   }
 
   this.isDebitPin =
@@ -141,7 +130,8 @@ export default function Payment(data, params, r) {
   this.tez = params.tez;
 
   this.powerwallet =
-    params.powerwallet || (data && data.method === 'upi' && !params.fees);
+    params.powerwallet ||
+    (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
   this.message = params.message;
 
   this.tryPopup();
@@ -323,16 +313,11 @@ Payment.prototype = {
     if (this.fees) {
       return;
     }
-    // or its cross domain ajax. in that case, let popup redirect for sake of IE
-    if (
-      !isRazorpayFrame &&
-      (internetExplorer ||
-        data.wallet === 'payumoney' ||
-        data.wallet === 'freecharge' ||
-        data.wallet === 'olamoney')
-    ) {
+
+    if (!isRazorpayFrame && data.method === 'upi') {
       return;
     }
+
     if (data.method === 'emandate') {
       return;
     }
@@ -420,10 +405,7 @@ function pollPaymentData(onComplete) {
 }
 
 function onMessage(e) {
-  if (
-    (this.popup && this.popup.window === e.source) ||
-    (communicator && communicator.contentWindow === e.source)
-  ) {
+  if (this.popup && this.popup.window === e.source) {
     this.complete(e.data);
   }
 }
@@ -517,20 +499,6 @@ razorpayProto.topupWallet = function() {
 };
 
 /**
- * JSONP for fetch flows.
- *
- * @param {Object} data
- * @param {Function} callback
- */
-function getFlowsJsonp(data, callback) {
-  return fetch.jsonp({
-    url: makeUrl('payment/flows'),
-    data,
-    callback,
-  });
-}
-
-/**
  * Cache store for flows.
  */
 var flowCache = {
@@ -559,18 +527,22 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     return;
   }
 
-  getFlowsJsonp(
-    {
-      iin,
-      key_id: this.get('key'),
-      '_[source]': Track.props.library,
-    },
-    function(flows) {
+  let url = makeAuthUrl(this, 'payment/flows');
+
+  // append IIN and source as query to flows route
+  url = _.appendParamsToUrl(url, {
+    iin,
+    '_[source]': Track.props.library,
+  });
+
+  fetch.jsonp({
+    url,
+    callback: flows => {
       // Add to cache.
       flowCache.card[iin] = flows;
 
       // Invoke callback.
       callback(flowCache.card[iin]);
-    }
-  );
+    },
+  });
 };

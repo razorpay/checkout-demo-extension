@@ -20,18 +20,16 @@ class PowerWallet extends CheckoutFrameTest {
   async render() {
     let { page } = this;
 
+    let attempt = this.newAttempt();
+
     await page.click('label[for=wallet-radio-mobikwik]');
     await delay(250);
     await page.click('.pay-btn');
-    await delay(1000);
+    await attempt.askOtp();
     await page.type('#otp', '123456');
-    await page.click('.otp-btn');
 
-    let data = await this.paymentResult();
-    if (data.razorpay_payment_id) {
-      this.pass();
-    } else {
-      this.fail();
-    }
+    await page.click('.pay-btn');
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }
