@@ -5,7 +5,7 @@ const TestBase = require('./TestBase');
 class RazorpayJsTest extends TestBase {
   async loadScripts() {
     await this.page.addScriptTag({
-      url: 'file://' + __dirname + '/../../app/dist/v1/razorpay.js',
+      url: '/static/dist/razorpay.js',
     });
 
     this.render()

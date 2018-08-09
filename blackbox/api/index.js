@@ -1,3 +1,4 @@
+const path = require('path');
 const fastify = require('fastify')();
 fastify.register(require('fastify-formbody'));
 const merchants = require('./merchants');
@@ -15,7 +16,7 @@ fastify.addHook('preHandler', async (request, reply) => {
   if (request.params.visit) {
     request.apiUrl = `/api/${request.params.visit}/v1`;
     let test = allTests[request.params.visit];
-    request.attempt = test.currentAttempt;
+    request.attempt = test && test.currentAttempt;
   }
   return reply.header('Access-Control-Allow-Origin', '*');
 });
@@ -98,4 +99,9 @@ fastify.all('/:visit/callback_url', async (request, reply) => {
       resolve(`<script>__pptr_oncomplete(${JSON.stringify(data)})</script>`)
     );
   });
+});
+
+fastify.register(require('fastify-static'), {
+  root: path.join(__dirname, '../static/'),
+  prefix: '/static/',
 });

@@ -8,7 +8,7 @@ let visits = 0;
 class TestBase {
   static async test(browser, message) {
     const page = await browser.newPage();
-    await page.goto('file://' + __dirname + '/../index.html');
+    await page.goto(apiUrl + '../static/index.html');
 
     let p = new this(page);
 
@@ -94,6 +94,7 @@ class TestBase {
       config: {
         api: '${this.apiUrl}',
         frameApi: '${this.apiUrl}',
+        frame: '/static/checkout.html'
       }
     }`);
     this.apiUrl += 'v1';

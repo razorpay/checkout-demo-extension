@@ -23,17 +23,17 @@ class CheckoutFrameTest extends TestBase {
     `);
 
     await page.addScriptTag({
-      url: 'file://' + __dirname + '/../../app/dist/v1/checkout-frame.js',
+      url: '/static/dist/checkout-frame.js',
     });
 
     await page.addStyleTag({
-      url: 'file://' + __dirname + '/../../app/dist/v1/css/checkout.css',
+      url: '/static/dist/css/checkout.css',
     });
 
     await page.evaluate(`handleMessage(${JSON.stringify(message)})`);
   }
 }
 
-CheckoutFrameTest.TEST_PARENT = 'Checkout';
+CheckoutFrameTest.TEST_PARENT = 'CheckoutFrame';
 
 module.exports = CheckoutFrameTest;
