@@ -68,10 +68,10 @@ export function obj2formhtml(data, key) {
 }
 
 export function form2obj(form) {
-  _Arr.reduce(
+  return _Arr.reduce(
     form.querySelectorAll('[name]'),
-    (obj, value, name) => {
-      obj[name] = value;
+    (obj, el) => {
+      obj[el.name] = el.value;
       return obj;
     },
     {}
