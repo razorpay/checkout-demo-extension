@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const fastify = require('fastify')();
 fastify.register(require('fastify-formbody'));

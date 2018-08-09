@@ -34,6 +34,6 @@ class CheckoutFrameTest extends TestBase {
   }
 }
 
-CheckoutFrameTest.TEST_PARENT = 'Checkout Frame';
+CheckoutFrameTest.TEST_PARENT = 'CheckoutFrame';
 
 module.exports = CheckoutFrameTest;
