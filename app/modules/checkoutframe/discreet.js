@@ -18,8 +18,11 @@ import * as Bank from 'common/bank';
 import * as Wallet from 'common/wallet';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
+import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+
+initIframe();
 
 export default {
   RazorpayConfig,
@@ -46,6 +49,8 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+
+  getQueryParams: _.getQueryParams,
 
   Customer,
   getCustomer,

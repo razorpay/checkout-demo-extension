@@ -18,7 +18,8 @@ var preferences = window.preferences,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
-  sanitizeTokens = discreet.sanitizeTokens;
+  sanitizeTokens = discreet.sanitizeTokens,
+  getQueryParams = discreet.getQueryParams;
 
 /*TODO: customer module for ES6 */
 // getCustomer = noop;
@@ -450,7 +451,7 @@ function elfShowOTP(otp, sender, bank) {
 }
 
 function askOTP(text) {
-  var qpmap = Checkout.getQueryParams();
+  var qpmap = getQueryParams();
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
@@ -3239,7 +3240,7 @@ Session.prototype = {
   },
 
   showModal: function(preferences) {
-    var qpmap = Checkout.getQueryParams();
+    var qpmap = getQueryParams();
 
     if (!this.methods.count) {
       var message = 'No appropriate payment method found.';
@@ -3283,6 +3284,9 @@ Session.prototype = {
     if (cookieDisabled) {
       prefData.checkcookie = 0;
     } else {
+      /* set test cookie
+       * if it is not reflected at backend while fetching prefs, disable
+       * cardsaving */
       prefData.checkcookie = 1;
       document.cookie = 'checkcookie=1;path=/';
     }
@@ -3309,7 +3313,7 @@ Session.prototype = {
       var preferences = response;
       self.setPreferences(preferences);
 
-      // pass preferences options to SDK
+      /* pass preferences options to SDK */
       Bridge.checkout.callAndroid(
         'setMerchantOptions',
         JSON.stringify(preferences.options)

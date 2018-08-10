@@ -1,11 +1,10 @@
 import { getSession } from 'sessionmanager';
-import { getQueryParams } from 'checkoutframe/index';
 import { makeAuthUrl } from 'common/Razorpay';
 import Track from 'tracker';
 import * as Bridge from 'bridge';
 
 let customers = {};
-let qpmap = getQueryParams();
+let qpmap = _.getQueryParams();
 
 export const getCustomer = contact => {
   // indian contact without +91

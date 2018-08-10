@@ -1,16 +1,63 @@
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
+import Track from 'tracker';
 
-/* This is the Android CheckoutBridge */
-export const CheckoutBridge = window.CheckoutBridge;
+/* Our primary bridge is CheckoutBridge */
+export const defineIosBridge = () => {
+  let CB = {
+    /* unique id for ios to retieve resources */
+    index: 0,
+    map: {},
+    get: function(index) {
+      var val = this.map[this.index];
+      delete this.map[this.index];
+      return val;
+    },
+    getUID: function() {
+      return Track.id;
+    },
+  };
 
-/* This is the iOS CheckoutBridge */
-export const iCheckoutBridge = ((window.webkit || {}).messageHandlers || {})
-  .CheckoutBridge;
+  return (window.CheckoutBridge = CB);
+};
+
+export const getNewIosBridge = () => {
+  return ((window.webkit || {}).messageHandlers || {}).CheckoutBridge;
+};
+
+export const hasNewIosBridge = () => {
+  return Boolean(getNewIosBridge());
+};
+
+export const getCheckoutBridge = () => {
+  return window.CheckoutBridge;
+};
+
+export const hasCheckoutBridge = () => {
+  return Boolean(getCheckoutBridge());
+};
+
+export const iosLegacyMethod = method => {
+  return function(data) {
+    /* setting up js → ios communication by loading custom protocol inside
+     * hidden iframe */
+    var iF = document.createElement('iframe');
+    var src = 'razorpay://on' + method;
+    if (data) {
+      src += '?' + CheckoutBridge.index;
+      CheckoutBridge.map[++CheckoutBridge.index] = data;
+    }
+    iF.setAttribute('src', src);
+    doc.appendChild(iF);
+    iF.parentNode.removeChild(iF);
+    iF = null;
+  };
+};
 
 /**
- * Generic Bridge interface for all the bridges and platforms
+ * Generic Bridge interface for all the bridges and platforms.
+ * Bridge interface is not to be used for legacy iOS SDKs
  * @param {String} bridgeName is taken as input
  */
 function Bridge(bridgeName) {
@@ -24,25 +71,22 @@ function Bridge(bridgeName) {
 Bridge.prototype = {
   init: function() {
     const bridgeName = this.name;
+    /* A little misleading because CheckoutBridge can exist for iOS as well */
     const androidBridge = window[bridgeName];
     const iosBridge = ((window.webkit || {}).messageHandlers || {})[bridgeName];
 
-    if (androidBridge) {
+    if (iosBridge) {
       this._exists = true;
-      this.platform = 'android';
-      this.bridge = androidBridge;
-    } else if (iosBridge) {
-      this._exists = true;
-      this.platform = 'ios';
       this.bridge = iosBridge;
+      this.platform = 'ios';
+    } else if (androidBridge) {
+      this._exists = true;
+      this.bridge = androidBridge;
+      this.platform = 'android';
     }
   },
 
   exists: function() {
-    if (!this._exists) {
-      this.init();
-    }
-
     return this._exists;
   },
 
@@ -86,7 +130,7 @@ Bridge.prototype = {
       try {
         return method.apply(this.bridge, {
           action: methodName,
-          data: params[0],
+          body: params[0],
         });
       } catch (e) {}
     }
@@ -105,13 +149,21 @@ Bridge.prototype = {
 export const checkout = new Bridge('CheckoutBridge');
 export const storage = new Bridge('StorageBridge');
 
+/**
+ * This method is used to notify events to the SDK bridges
+ * This function is only called if CheckoutBridgeExists
+ * @param  {object} message to be sent to bridge
+ */
 export const notifyBridge = message => {
+  let CheckoutBridge = getCheckoutBridge();
+
   if (message && message.event) {
-    var bridgeMethod = 'on' + message.event;
-    var data = message.data;
+    let bridgeMethod = `on${message.event}`;
+    let data = message.data;
     if (!isString(data)) {
       if (!data) {
-        return checkout.callAndroid(bridgeMethod);
+        /* TODO: replace invoke */
+        return invoke(bridgeMethod, CheckoutBridge);
       }
       data = stringify(data);
     }

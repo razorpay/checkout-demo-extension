@@ -1,22 +1,13 @@
-import { getQueryParams, handleMessage } from 'checkoutframe/index';
+import { handleMessage } from 'checkoutframe/index';
 import * as Bridge from 'bridge';
 import { ownerWindow } from 'common/constants';
+import Track from 'tracker';
 
-/* Move this to Bridge */
-
-function getNewIOSWebkitInstance() {
-  //Verify inner CheckoutBridge property for new iOS devices
-  return ((window.webkit || {}).messageHandlers || {}).CheckoutBridge;
-}
-
-function dispatchNewIOSEvents(method, data) {
-  iosCheckoutBridgeNew.postMessage({
-    action: method,
-    body: data,
-  });
-}
-
-//handle methods for new IOS app
+/**
+ * This handles methods of the new iOS SDK Bridge.
+ * @param  {String} method name of iOS bridge method to be invoked
+ * @param  {Any}    data   Extra data to be sent to the method
+ */
 function handleNewIOSMethods(method, data) {
   var color = {
     theme: hexToRgb(preferences.options.theme.color) || null,
@@ -36,65 +27,45 @@ function handleNewIOSMethods(method, data) {
       navData = {
         webview_background_color: color.navHide,
       };
-      dispatchNewIOSEvents('hide_nav_bar', navData);
+      Bridge.checkout.callIos('hide_nav_bar', navData);
       //add theme color
       data.theme_color = color.theme;
-      dispatchNewIOSEvents(method, data); //default load
+      Bridge.checkout.callIos(method, data); //default load
       break;
     case 'submit':
-      dispatchNewIOSEvents(method, data); //send default submit
+      Bridge.checkout.callIos(method, data); //send default submit
       navData = {
         webview_background_color: color.navShow,
       };
-      dispatchNewIOSEvents('show_nav_bar', navData);
+      Bridge.checkout.callIos('show_nav_bar', navData);
       break;
     default:
-      dispatchNewIOSEvents(method, data);
+      Bridge.checkout.callIos(method, data);
   }
-}
-
-const iosCheckoutBridgeNew = getNewIOSWebkitInstance();
-
-// generates ios event handling functions, like onload
-function iosMethod(method) {
-  return function(data) {
-    if (iosCheckoutBridgeNew) {
-      handleNewIOSMethods(method, data);
-    } else {
-      var iF = document.createElement('iframe');
-      var src = 'razorpay://on' + method;
-      if (data) {
-        src += '?' + CheckoutBridge.index;
-        CheckoutBridge.map[++CheckoutBridge.index] = data;
-      }
-      iF.setAttribute('src', src);
-      doc.appendChild(iF);
-      iF.parentNode.removeChild(iF);
-      iF = null;
-    }
-  };
 }
 
 const platformSpecific = {
   ios: () => {
-    // setting up js -> ios communication by loading custom protocol inside hidden iframe
-    let CheckoutBridge = (window.CheckoutBridge = {
-      // unique id for ios to retieve resources
-      index: 0,
-      map: {},
-      get: function(index) {
-        var val = this.map[this.index];
-        delete this.map[this.index];
-        return val;
-      },
-      getUID: function() {
-        return _uid;
-      },
-    });
+    /* TODO: define this only in older iOS SDKs, directly call new iOS Bridge
+     * from notify Bridge for newer SDKs */
+    let CheckoutBridge = Bridge.defineIosBridge();
     var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
-    each(bridgeMethods, function(i, prop) {
-      CheckoutBridge['on' + prop] = iosMethod(prop);
-    });
+
+    bridgeMethods
+      |> _Arr.loop(prop => {
+        let method;
+
+        if (Bridge.hasNewIosBridge()) {
+          method = data => {
+            handleNewIOSMethods(prop, method);
+          };
+        } else {
+          method = Bridge.iosLegacyMethod(prop);
+        }
+
+        CheckoutBridge['on' + prop] = method;
+      });
+
     CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
   },
 
@@ -119,7 +90,7 @@ export function initIframe() {
       if (typeof data === 'string') {
         data = _Obj.parse(data);
       }
-      window.handleMessage(data);
+      handleMessage(data);
     } catch (err) {
       // roll('message: ' + data, err, 'warn');
     }
@@ -127,7 +98,7 @@ export function initIframe() {
 
   window |> _El.on('message', parseMessage);
 
-  const qpmap = getQueryParams();
+  const qpmap = _.getQueryParams();
   const platform = qpmap.platform;
 
   if (platform) {
@@ -140,8 +111,7 @@ export function initIframe() {
     }
   }
 
-  /* TODO: add platform specific exists */
-  if (Bridge.checkout.exists() && Bridge.checkout.platform === 'android') {
+  if (Bridge.hasCheckoutBridge()) {
     delete Track.props.referer;
     Track.props.platform = 'mobile_sdk';
 
