@@ -535,29 +535,6 @@ function Session(options) {
   this.attemptCount = 0;
   this.listeners = [];
   this.bits = [];
-
-  var themeMeta = this.r.themeMeta;
-
-  var themeColor = themeMeta.color,
-    colorVariations = Color.getColorVariations(themeColor),
-    hoverStateColor = Color.getHoverStateColor(
-      themeColor,
-      colorVariations.backgroundColor,
-      RAZORPAY_HOVER_COLOR
-    ),
-    activeStateColor = Color.getActiveStateColor(
-      themeColor,
-      colorVariations.backgroundColor,
-      RAZORPAY_HOVER_COLOR
-    ),
-    secondaryHighlightColor = hoverStateColor;
-
-  themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
-
-  themeMeta.secondaryHighlightColor = secondaryHighlightColor;
-  themeMeta.hoverStateColor = hoverStateColor;
-  themeMeta.activeStateColor = activeStateColor;
-  themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
 }
 
 Session.prototype = {
@@ -711,12 +688,13 @@ Session.prototype = {
         }
       }
       var div = document.createElement('div');
+      var styleEl = this.renderCss();
       div.innerHTML = templates.modal(this);
       this.el = div.firstChild;
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
 
-      this.el.appendChild(this.renderCss());
+      this.el.appendChild(styleEl);
 
       this.body = $('#body');
 
@@ -1156,7 +1134,7 @@ Session.prototype = {
   },
 
   renderCss: function() {
-    var div = this.el;
+    var div = document.createElement('div');
     var style = document.createElement('style');
     style.type = 'text/css';
     try {
@@ -1168,17 +1146,46 @@ Session.prototype = {
         getter()['theme.color'] = '';
       }
 
+      this.setTheme();
+
       var rules = templates.theme(getter, this.themeMeta);
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {
         style.appendChild(document.createTextNode(rules));
       }
-      div.style.color = '';
     } catch (e) {
       roll('renderCss', e);
     }
     return style;
+  },
+
+  setTheme: function() {
+    // update r.themeMeta based on prefs color
+    this.r.postInit();
+
+    var themeMeta = this.r.themeMeta;
+
+    var themeColor = themeMeta.color,
+      colorVariations = Color.getColorVariations(themeColor),
+      hoverStateColor = Color.getHoverStateColor(
+        themeColor,
+        colorVariations.backgroundColor,
+        RAZORPAY_HOVER_COLOR
+      ),
+      activeStateColor = Color.getActiveStateColor(
+        themeColor,
+        colorVariations.backgroundColor,
+        RAZORPAY_HOVER_COLOR
+      ),
+      secondaryHighlightColor = hoverStateColor;
+
+    themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
+
+    themeMeta.secondaryHighlightColor = secondaryHighlightColor;
+    themeMeta.hoverStateColor = hoverStateColor;
+    themeMeta.activeStateColor = activeStateColor;
+    themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
   },
 
   applyFont: function(anchor, retryCount) {

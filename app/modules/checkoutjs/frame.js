@@ -324,12 +324,11 @@ CheckoutFrame.prototype = {
   },
 
   onmessage: function(e) {
-    var data;
-    try {
-      data = _Obj.parse(e.data);
-    } catch (err) {
+    var data = _Obj.parse(e.data);
+    if (!data) {
       return;
     }
+
     var event = data.event;
     var rzp = this.rzp;
     // source check
