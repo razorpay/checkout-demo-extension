@@ -1,5 +1,6 @@
 import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
+import * as SessionManager from 'sessionmanager';
 import { makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
 

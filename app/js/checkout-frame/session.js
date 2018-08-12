@@ -849,7 +849,7 @@ Session.prototype = {
     try {
       var pollUrl, pendingPaymentTimestamp;
       pendingPaymentTimestamp = StorageBridge.getString(
-        Checkout.PENDING_PAYMENT_TS
+        Constants.PENDING_PAYMENT_TS
       );
       pendingPaymentTimestamp = parseInt(pendingPaymentTimestamp, 10) || 0;
 
@@ -867,13 +867,13 @@ Session.prototype = {
         if (
           isActivityRecreated &&
           now() - pendingPaymentTimestamp <=
-            Checkout.MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
+            Constants.MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
         ) {
-          pollUrl = StorageBridge.getString(Checkout.UPI_POLL_URL);
+          pollUrl = StorageBridge.getString(Constants.UPI_POLL_URL);
         } else {
           var params = {};
-          params[Checkout.UPI_POLL_URL] = '';
-          params[Checkout.PENDING_PAYMENT_TS] = '0';
+          params[Constants.UPI_POLL_URL] = '';
+          params[Constants.PENDING_PAYMENT_TS] = '0';
           this.setParamsInStorage(params);
         }
       }
@@ -2501,8 +2501,8 @@ Session.prototype = {
     this.isResumedPayment = false;
 
     var params = {};
-    params[Checkout.UPI_POLL_URL] = '';
-    params[Checkout.PENDING_PAYMENT_TS] = '0';
+    params[Constants.UPI_POLL_URL] = '';
+    params[Constants.PENDING_PAYMENT_TS] = '0';
     this.setParamsInStorage(params);
 
     abortAjax(this.ajax);
@@ -2828,8 +2828,8 @@ Session.prototype = {
 
       this.r.on('payment.upi.coproto_response', function(request) {
         var params = {};
-        params[Checkout.UPI_POLL_URL] = request.url;
-        params[Checkout.PENDING_PAYMENT_TS] = now() + '';
+        params[Constants.UPI_POLL_URL] = request.url;
+        params[Constants.PENDING_PAYMENT_TS] = now() + '';
         that.setParamsInStorage(params);
       });
 

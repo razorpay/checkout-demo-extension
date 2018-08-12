@@ -1,5 +1,6 @@
 import { handleMessage } from 'checkoutframe/index';
 import * as Bridge from 'bridge';
+import Razorpay from 'common/Razorpay';
 import { ownerWindow } from 'common/constants';
 import Track from 'tracker';
 
