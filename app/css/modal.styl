@@ -126,10 +126,6 @@ html {
     background: #fcfcfc;
   }
 
-  input[type=radio]:checked + label .offer-info {
-    opacity: 1;
-  }
-
   .item {
     display: block;
     margin: 0px -12px;
@@ -146,10 +142,6 @@ html {
     &:last-child label {
       border-bottom-color: $bc;
       border-radius: 0 0 $br $br;
-    }
-
-    &.has-offer::after {
-      z-index: 0;
     }
 
     &.active {
@@ -734,6 +726,184 @@ $outline = #ddd;
   z-index: 4;
 }
 
+#offers-container {
+
+  width: 100%;
+  height: $topbarh;
+  line-height: $topbarh;
+  position: relative;
+  z-index: -1;
+  box-sizing: border-box;
+  transform: none;
+  transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
+
+  .left-align {
+
+    float: left;
+  }
+
+  .right-align {
+
+    float: right;
+  }
+
+  .offers-content {
+
+    height: 100%;
+
+    .offers-title {
+
+      height: 100%;
+      cursor: pointer;
+
+      .select-offer, .selected-offer {
+
+        height: 100%;
+        overflow: hidden;
+
+        svg {
+
+          display: inline-block;
+          height: 1em;
+          width: auto;
+          margin-right: 8px;
+          fill: currentColor;
+        }
+
+        > span {
+
+          line-height: $topbarh;
+          
+          * {
+
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .selected-offer {
+
+        display: none;
+      }
+
+      &.applied {
+
+        .selected-offer {
+
+          display: block;
+        }
+
+        .select-offer {
+
+          display: none;
+        }
+      }
+    }
+
+    .offers-title, .offers-list-title, .offers-list {
+
+      padding: 0 $p;
+    }
+
+    .offers-list-container {
+
+      background-color: #F7F7F7;
+      height: $bodyh + $footerh + 1px;
+      transform: translate(0, -100%);
+      position: relative;
+      top:  $footerh + 1px;
+      transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
+      padding-bottom: $footerh;
+      box-sizing: border-box;
+
+      .offers-list-title {
+
+        color: rgba(51, 51, 51, 0.6);
+        overflow: hidden;
+        cursor: pointer;
+        
+        &:after {
+
+          content: "\e601";
+          display: block;
+          float: right;
+          font-size: 20px;
+        }
+      }
+
+      button.apply-offer {
+
+        display: none;
+      }
+
+      &.selected button.apply-offer {
+
+        display: block;
+      }
+
+      ul.offers-list {
+
+        margin: 0;
+        padding: 0 8px;
+        list-style-type: none;
+        
+        > li.offer {
+
+          display: block;
+          border: 1px solid #E6E7E8;
+          border-radius: 1px;
+          padding: 0 16px;
+          background-color: #fff;
+          margin: 0;
+
+          .offer-title {
+
+            overflow: hidden;
+          }
+
+          .offer-details, .remove-offer {
+
+            display: none;
+          }
+
+          &.selected .offer-details, &.applied .remove-offer {
+
+            display: block;
+          }
+        }
+      }
+
+      button.apply-offer {
+
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        border-radius: 0;
+      }
+    }
+  } 
+}
+
+#body.has-offers {
+
+  #offers-container {
+
+    /* need 99 z-index due to pay button in card screen */
+    z-index: 99;
+    display: block;
+    transform: translate(0, -100%);
+  }
+
+  .tab-content {
+
+    &#form-wallet , &#form-card {
+
+      bottom: $topbarh;
+    }
+  }
+}
+
 #form-common {
   padding: 20px 0 0;
   top: 0;
@@ -961,52 +1131,6 @@ $outline = #ddd;
   right: 0;
   border-radius: 0 0 $br $br;
   background: #fff;
-}
-
-#card-offer {
-  position: absolute;
-  bottom: 20px;
-  pointer-events: none;
-  font-size:12px;
-}
-
-.offer {
-  position: absolute;
-  top: 16px;
-  right: 12px;
-  line-height: 20px;
-  padding: 0 6px;
-  font-size: 12px;
-  color: #60B442;
-  background: rgba(112,190,83,0.06);
-  border: 1px solid #70BE53;
-  border-radius: 2px;
-}
-
-.offer-info {
-  margin-top: 6px;
-  font-size: 13px;
-  transition: 0.3s opacity;
-  line-height: 19px;
-  opacity: 0;
-  &.active {
-    display: block;
-  }
-
-  ul {
-    margin: 24px 0 0 0;
-    padding: 0 0 0 32px;
-  }
-
-  li {
-    margin-left: 10px;
-    &:first-child {
-      list-style: none;
-      margin-left: 8px;
-      margin-bottom: 4px;
-      font-weight: bold;
-    }
-  }
 }
 
 .recurring-message, .callout {

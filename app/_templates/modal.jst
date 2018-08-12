@@ -2,7 +2,6 @@
 var o = _.get;
 var ecod = o('ecod');
 var address = o('address');
-var cardOffer = _.offers.card;
 var method = _.methods;
 var wallet = method.wallet;
 var banks = method.emandate || method.netbanking;
@@ -228,16 +227,6 @@ var upi_apps = _.upi_intents_data;
                       `??`
                         Only Visa and Mastercard Credit Cards are supported for this payment.
                       `?`
-                    `?`
-                  </div>
-                `?`
-                `?cardOffer`
-                  <div class="pad" id="card-offer">
-                    `?cardOffer.name`
-                      <div class="text-btn"><strong>`=cardOffer.name`</strong></div>
-                    `?`
-                    `?cardOffer.display_text`
-                      `=cardOffer.display_text`
                     `?`
                   </div>
                 `?`
@@ -536,10 +525,7 @@ var upi_apps = _.upi_intents_data;
                     `?`
                     <div class="list collapsable">
                       `~wallet:i:w`
-                      `
-                        var hasOffer = _.offers.wallet[w.name];
-                      `
-                        <div class="wallet item radio-item `=hasOffer?'has-offer':''`">
+                        <div class="wallet item radio-item">
 
                           <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
                           <label for="wallet-radio-`=w.name`" class="radio-label">
@@ -547,12 +533,6 @@ var upi_apps = _.upi_intents_data;
                             <img style="display:none" src="`=w.sq`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
                             <div class="placeholder"></div>
                             <span class="title">`=w.title`</span>
-                            `?hasOffer`
-                              <span class="offer">`=hasOffer.name`</span>
-                              <div class="offer-info">
-                                `=hasOffer.display_text`
-                              </div>
-                            `?`
                           </label>
                         </div>
                       `~`
@@ -699,6 +679,7 @@ var upi_apps = _.upi_intents_data;
               </label>
             </div>
             `?`
+            <div id="offers-container"></div>
             <button id="footer" type="submit" class="button">
               <span class="pay-btn">`?o('amount')`PAY &nbsp;`=amount``??`Authenticate`?`</span>
               <span class="otp-btn">Verify</span>

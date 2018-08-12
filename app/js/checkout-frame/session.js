@@ -969,6 +969,36 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
+    // TODO: Remove test data
+
+    preferences.offers = [
+      {
+        id: 'offer_ANZoaxsOww2X53',
+        name: 'Super Potato',
+        payment_method: 'card',
+        issuer: 'UTIB',
+        original_amount: 10000,
+        amount: 10000,
+      },
+      {
+        id: 'offer_ANZoaxsOww2X53',
+        name: 'Super Potato',
+        payment_method: 'wallet',
+        issuer: 'UTIB',
+        original_amount: 10000,
+        amount: 10000,
+      },
+    ];
+
+    if (isArray(preferences.offers) && preferences.offers.length > 0) {
+      this.offers = initOffers(
+        document.querySelector('#offers-container'),
+        preferences.offers,
+        {},
+        this.handleOfferSelection.bind(this)
+      );
+    }
+
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
     }
@@ -1881,8 +1911,56 @@ Session.prototype = {
       showPaybtn = false;
     }
     this.body.toggleClass('sub', showPaybtn);
-  },
 
+    return this.offers && this.displayOffers(screen);
+  },
+  displayOffers: function(screen) {
+    this.offers.removeOffer();
+    this.offers.applyFilter({ payment_method: screen });
+
+    $('#body').toggleClass('has-offers', this.offers.visibleOffers.length > 0);
+  },
+  handleOfferSelection: function(offer) {
+    // handle FE validations
+    return;
+
+    var screen = this.screen;
+
+    if (screen === 'wallet') {
+    } else if (screen === 'card') {
+      var savedCards = this.customer.tokens && this.customer.tokens.items;
+
+      if (this.savedCardScreen && savedCards && savedCards.length > 0) {
+        var matchingCardIndex;
+
+        savedCards.every(function(item, index) {
+          var card = item.card;
+
+          if (!card) {
+            return true;
+          }
+
+          if (
+            offer.issuer === card.issuer &&
+            (!offer.payment_network || offer.payment_network === card.network)
+          ) {
+            matchingCardIndex = index;
+            return false;
+          }
+
+          return true;
+        });
+
+        if (typeof matchingCardIndex === void 0) {
+          var cvv = qs('#saved-cards-container .saved-cvv')[matchingCardIndex];
+
+          if (cvv) {
+            cvv.focus();
+          }
+        }
+      }
+    }
+  },
   back: function(confirmedCancel) {
     var tab = '';
     var self = this;

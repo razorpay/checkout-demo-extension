@@ -90,7 +90,7 @@ color: `=c`;
   color: `=highlightColor`;
 }
 
-#topbar, #partial-back {
+#topbar, #partial-back, #offers-container {
   background-color: `=secondaryHighlightColor` !important;
 }
 
@@ -147,4 +147,19 @@ color: `=c`;
 
 .copytoclipboard--container.copied .copytoclipboard--btn {
   color: `=c`;
+}
+
+.offers-list-title:after {
+
+  color: `=highlightColor`;
+}
+
+ul.offers-list > li.offer.selected, ul.offers-list > li.offer.selected .checkbox {
+
+  border-color: `=highlightColor` !important;
+}
+
+ul.offers-list > li.offer.selected .checkbox {
+
+  background-color: `=highlightColor`;
 }
