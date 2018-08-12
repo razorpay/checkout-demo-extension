@@ -21,9 +21,6 @@ var preferences = window.preferences,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams;
 
-/*TODO: customer module for ES6 */
-// getCustomer = noop;
-
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
@@ -1351,8 +1348,6 @@ Session.prototype = {
       options.amount = 100 * amountValue;
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
-      /* TODO: Let session set payment methods once merchant.js is migrated */
-      /*setPaymentMethods(this);*/
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
@@ -2904,20 +2899,6 @@ Session.prototype = {
 
     this.emi_options = emiOptions;
   },
-
-  /*  setWallets: function () {
-    var preferences = this.preferences;
-    var prefWallets = this.preferences.methods.wallets || {};
-    var wallets = {}
-
-    each(Wallet.wallet, function(i, wallet){
-      if (prefWallets[wallet.code]) {
-        wallets[wallet.code] = wallet
-      }
-    })
-
-    this.methods.wallet = {};
-  },*/
 
   setPaymentMethods: function(preferences) {
     var recurring = this.recurring;

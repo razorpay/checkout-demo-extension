@@ -188,6 +188,12 @@ function addMagicProps(r, properties) {
   }
 }
 
+Track.parseAnalyticsData = data => {
+  each(data, function(key, val) {
+    trackingProps[key] = val;
+  });
+};
+
 Track.makeUid = makeUid;
 Track.common = getCommonTrackingData;
 Track.props = trackingProps;

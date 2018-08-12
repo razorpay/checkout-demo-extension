@@ -1,9 +1,7 @@
+import Track from 'tracker';
+
 let sessions = {};
 export const getSession = (id = Track.id) => {
-  /**
-   * TODO: once all modules are moved to ES6 import track instead of using
-   * global Track.
-   */
   return sessions[id];
 };
 

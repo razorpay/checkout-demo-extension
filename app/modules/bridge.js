@@ -199,7 +199,6 @@ window.handleOTP = function(otp) {
  * @param  {Object} data The data returned by UPI intent activity
  */
 window.upiIntentResponse = function(data) {
-  /* TODO: use session manager here */
   var session = getSession();
 
   if (session.r._payment && session.upi_intents_data) {
@@ -233,7 +232,6 @@ window.upiIntentResponse = function(data) {
  *                             Android prompts for closing checkout in that case
  */
 window.backPressed = function(callback) {
-  /* TODO: session manager */
   var session = getSession();
 
   var pollUrl = storage.call('getString', UPI_POLL_URL);

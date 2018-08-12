@@ -146,7 +146,7 @@ export const handleMessage = function(message) {
 
   try {
     if (isNonNullObject(CheckoutBridge)) {
-      CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
+      CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
       CheckoutBridge.sendExtraAnalyticsData = e => {};
     }
   } catch (e) {}
