@@ -63,7 +63,13 @@ offerProto.remove = function() {
   this.$el.className = this.$el.className.replace(appliedClass, '');
 };
 
-function initOffers($container, offersData, filter, onApplyOffer) {
+function initOffers(
+  $container,
+  offersData,
+  filter,
+  onApplyOffer,
+  onRemoveOffer
+) {
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
     $offersTitle = $el.querySelector('.offers-title'),
@@ -161,6 +167,16 @@ function initOffers($container, offersData, filter, onApplyOffer) {
       (selectedOffer = offer).select();
     },
     removeOffer: function removeOffer() {
+      if (selectedOffer) {
+        $offersListCont.className = $offersListCont.className.replace(
+          selectedClass,
+          ''
+        );
+
+        selectedOffer.deselect();
+        selectedOffer = null;
+      }
+
       if (appliedOffer) {
         $offersTitle.className = $offersTitle.className.replace(
           appliedClass,
@@ -169,15 +185,8 @@ function initOffers($container, offersData, filter, onApplyOffer) {
 
         appliedOffer.remove();
         appliedOffer = null;
-      }
 
-      if (selectedOffer) {
-        $offersListCont.className = $offersListCont.className.replace(
-          selectedClass,
-          ''
-        );
-
-        selectedOffer = null;
+        return onRemoveOffer && onRemoveOffer();
       }
     },
   };

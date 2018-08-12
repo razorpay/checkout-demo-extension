@@ -978,7 +978,7 @@ Session.prototype = {
         payment_method: 'card',
         issuer: 'UTIB',
         original_amount: 10000,
-        amount: 10000,
+        amount: 1000,
       },
       {
         id: 'offer_ANZoaxsOww2X53',
@@ -995,7 +995,8 @@ Session.prototype = {
         document.querySelector('#offers-container'),
         preferences.offers,
         {},
-        this.handleOfferSelection.bind(this)
+        this.handleOfferSelection.bind(this),
+        this.handleOfferRemoval.bind(this)
       );
     }
 
@@ -1912,15 +1913,29 @@ Session.prototype = {
     }
     this.body.toggleClass('sub', showPaybtn);
 
-    return this.offers && this.displayOffers(screen);
+    return this.offers && this.renderOffers(screen);
   },
-  displayOffers: function(screen) {
-    this.offers.removeOffer();
+  renderOffers: function(screen) {
+    // reset offers UI
+    if (this.offers.appliedOffer) {
+      this.offers.removeOffer();
+    }
+
+    if (!screen) {
+      // if its home screen , just hide offers , do not re-render
+      this.offers.display(false);
+      return $('#body').removeClass('has-offers');
+    }
+
     this.offers.applyFilter({ payment_method: screen });
 
     $('#body').toggleClass('has-offers', this.offers.visibleOffers.length > 0);
   },
   handleOfferSelection: function(offer) {
+    if (offer.original_amount > offer.amount) {
+      this.showDiscount(offer);
+    }
+
     // handle FE validations
     return;
 
@@ -1960,6 +1975,36 @@ Session.prototype = {
         }
       }
     }
+  },
+  handleOfferRemoval: function() {
+    this.hideDiscount();
+  },
+  showDiscount: function(offer) {
+    $('#content').addClass('has-discount');
+
+    var discountAmount = offer.amount,
+      discountFigure = this.formatAmount(discountAmount),
+      displayCurrency = this.r.get('display_currency');
+
+    if (displayCurrency) {
+      // TODO: handle display_amount case as in modal.jst
+      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
+    } else if (this.r.get('currency') === 'INR') {
+      discountAmount =
+        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
+    } else {
+      discountAmount = '$' + discountFigure;
+    }
+
+    //TODO: optimise queries
+    $('#amount .discount')[0].innerHTML = discountAmount;
+    $('#footer .discount')[0].innerHTML = discountAmount;
+  },
+  hideDiscount: function() {
+    $('#content').removeClass('has-discount');
+    //TODO: optimise queries
+    $('#amount .discount').html('');
+    $('#footer .discount').html('');
   },
   back: function(confirmedCancel) {
     var tab = '';

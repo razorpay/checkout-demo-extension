@@ -416,6 +416,36 @@ i {
 #content {
   text-align: left;
   white-space: normal;
+
+  &.has-discount {
+
+    #header { 
+
+      .discount {
+
+        display: inline-block;
+      }
+
+      .original-amount {
+
+        font-size: 0.6em;
+        text-decoration: line-through;
+      }
+    }
+
+    #footer {
+    
+      .original-amount {
+
+        display: none;
+      }
+
+      .discount {
+
+        display: inline-block;
+      }
+    }
+  }
 }
 
 #header {
@@ -436,6 +466,19 @@ i {
     top: 0;
     position: absolute;
     background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2));
+  }
+
+  .discount {
+
+    display: none;
+  }
+}
+
+#footer {
+
+  .discount {
+
+    display: none;
   }
 }
 
