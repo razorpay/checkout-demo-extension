@@ -273,6 +273,8 @@ emandateView.prototype = {
   },
 
   openUIDAI: function() {
+    /* getQueryParams is defined in session.js */
+    var qpmap = getQueryParams();
     var isSupportedSDK = qpmap.platform && !isUnsupportedSDK();
 
     if (isSupportedSDK) {
@@ -356,6 +358,8 @@ emandateView.prototype = {
  * Android SDKs without callNativeIntent
  */
 function isUnsupportedSDK() {
+  /* getQueryParams is defined in session.js */
+  var qpmap = getQueryParams();
   if (qpmap.platform) {
     return !(CheckoutBridge && CheckoutBridge.callNativeIntent);
   }
