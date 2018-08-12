@@ -20,7 +20,7 @@ var walletsDesc = _.walletsDesc;
 var bank = _.tpvBank || {};
 var emi_options = _.emi_options;
 
-var aadhaarNumber = o('prefill.aadhaar[number]');
+var aadhaarVid = o('prefill.aadhaar[vid]');
 var accountName = o('prefill.bank_account[name]');
 
 var amount;
@@ -105,6 +105,10 @@ var upi_apps = _.upi_intents_data;
           `?`
         </div>
         <div id="body"`?_.tpvBank` class="sub"`?`>
+          <div id="curtain">
+            <div id="curtain-container-parent"></div>
+            <div id="curtain-overlay"></div>
+          </div>
           <div id="messages"></div>
           <div id="partial-back" class="theme-secondary-highlight"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar" class="theme-secondary-highlight">
@@ -197,10 +201,10 @@ var upi_apps = _.upi_intents_data;
                           <div class="text-uppercase">`=bank.ifsc`</div>
                         </div>
                       `?`
-                      `?aadhaarNumber`
+                      `?aadhaarVid`
                         <div class="account-details clearfix">
-                          <div>Aadhaar</div>
-                          <div>`=aadhaarNumber`</div>
+                          <div>Aadhaar VID</div>
+                          <div>`=aadhaarVid`</div>
                         </div>
                       `?`
                     </div>
@@ -708,4 +712,5 @@ var upi_apps = _.upi_intents_data;
       </div>
     </div>
   </div>
+  <a href="https://resident.uidai.gov.in/web/resident/vidgeneration" target="_blank" id="aadhaar_vid_link" class="hidden"></a>
 </div>

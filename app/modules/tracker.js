@@ -98,6 +98,7 @@ export default function Track(r, event, data) {
     var options = {};
     var properties = {
       options,
+      es6: true,
     };
 
     if (data) {
@@ -153,13 +154,23 @@ export default function Track(r, event, data) {
       ],
     };
 
+    /**
+     * We are doing encodeURIComponent → unescape here to remove all the
+     * non-latin characters to latin
+     */
     try {
       fetch.post({
         url: 'https://lumberjack.razorpay.com/v1/track',
         data: {
           key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
           // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
-          data: trackingPayload |> _Obj.stringify |> btoa |> encodeURIComponent,
+          data:
+            trackingPayload
+            |> _Obj.stringify
+            |> encodeURIComponent
+            |> unescape
+            |> btoa
+            |> encodeURIComponent,
         },
       });
     } catch (e) {}
@@ -198,3 +209,7 @@ Track.makeUid = makeUid;
 Track.common = getCommonTrackingData;
 Track.props = trackingProps;
 Track.id = _uid;
+Track.updateUid = uid => {
+  _uid = uid;
+  Track.id = uid;
+};

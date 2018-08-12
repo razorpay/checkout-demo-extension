@@ -110,7 +110,7 @@ Customer.prototype = {
         }
         qpmap.device_token = data.device_token;
 
-        _session_id = data.session_id;
+        fetch.setSessionId(data.session_id);
 
         if (qpmap.device_token) {
           invoke('setDeviceToken', CheckoutBridge, qpmap.device_token);
@@ -152,7 +152,7 @@ Customer.prototype = {
     };
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
 
-    _session_id = null;
+    fetch.setSessionId(null);
 
     fetch(ajaxOpts);
   },

@@ -1,0 +1,32 @@
+.copytoclipboard--container
+
+  .copytoclipboard--text,
+  .copytoclipboard--btn
+    font-size: 14px;
+    padding: 8px 8px;
+    transition: all 0.15s linear;
+
+  .copytoclipboard--text
+    border: 1px dashed #E4E4EA;
+    border-right: none;
+    border-radius: 2px 0 0 2px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+  .copytoclipboard--btn
+    float: right
+    border: 1px solid #E4E4EA;
+    border-radius: 0 2px 2px 0;
+    padding-bottom: 9px;
+
+    .copytoclipboard--label
+      margin-left: 4px;
+
+  &:not(.copied)
+    .copytoclipboard--check
+      display: none;
+
+  &.copied
+    .copytoclipboard--icon
+      display: none

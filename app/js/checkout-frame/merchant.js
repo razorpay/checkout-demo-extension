@@ -221,7 +221,7 @@ var emi_options = (sessProto.emi_options = {
     },
 
     UTIB: {
-      patt: /4((07438|05995|50506|64118|71864|6111[678]|71863|51457|3083[2-4])00|074390[03]|111460[0-6]|182120[12]|365600[01]|514560[04]|7186(00[013]|10[012]|30[12]))|5(24((178|240|508|512)00|1781[01])|5934([12]00|00[01])|305620[0245])/,
+      patt: /4((05995|6111[678]|3083[2-4])00|0743903|111460[0-7]|182120[12]|(514570|365600|641180)[01]|514560[04]|7186(00[013]|[13]0[012]))|5(24((178|240|508|512)00|1781[01])|5934(100|20[02]|00[01])|305620[0245678])/,
       name: 'Axis Bank',
       plans: {
         3: 12,
@@ -841,6 +841,10 @@ window.handleOTP = function(otp) {
 window.upiIntentResponse = function(data) {
   var session = getSession();
 
+  if (session.recurring) {
+    return;
+  }
+
   if (session.r._payment && session.upi_intents_data) {
     session.r.emit('payment.upi.intent_response', data);
   } else if (session.activity_recreated) {
@@ -923,7 +927,9 @@ window.handleMessage = function(message) {
     if (oldSession) {
       invoke('saveAndClose', oldSession);
     }
+
     session.id = _uid = id;
+    Track.updateUid(_uid);
     sessions[_uid] = session;
   }
 

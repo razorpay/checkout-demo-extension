@@ -26,14 +26,11 @@ class NetbankingButton extends CheckoutFrameTest {
 
     await page.click('#netb-banks .radio-label');
     await delay(100);
-    await page.click('.pay-btn');
 
-    let data = await this.paymentResult();
-    if (data.razorpay_payment_id) {
-      this.pass();
-    } else {
-      this.fail();
-    }
+    let attempt = this.newAttempt();
+    await page.click('.pay-btn');
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }
 
@@ -43,13 +40,10 @@ class NetbankingDropdown extends CheckoutFrameTest {
 
     await page.select('#bank-select', 'HDFC');
     await delay(100);
-    await page.click('.pay-btn');
 
-    let data = await this.paymentResult();
-    if (data.razorpay_payment_id) {
-      this.pass();
-    } else {
-      this.fail();
-    }
+    let attempt = this.newAttempt();
+    await page.click('.pay-btn');
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

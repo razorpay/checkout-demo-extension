@@ -22,12 +22,10 @@ class UpiCollect extends CheckoutFrameTest {
     let { page } = this;
     await page.type('#vpa', 'pranav@razorpay');
     await delay(100);
+
+    let attempt = this.newAttempt();
     await page.click('.pay-btn');
-    let data = await this.paymentResult();
-    if (data.razorpay_payment_id) {
-      this.pass();
-    } else {
-      this.fail();
-    }
+    await attempt.succeed();
+    attempt.assertSuccess();
   }
 }

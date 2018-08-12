@@ -97,7 +97,7 @@ export function rzpError(description, field) {
 }
 
 export function throwMessage(message) {
-  throw message;
+  throw new Error(message);
 }
 
 export const isBase64Image = src => /data:image\/[^;]+;base64/.test(src);

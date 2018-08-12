@@ -11,6 +11,7 @@ import Callout from 'callout';
 import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
+import * as Curtain from 'components/curtain';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -55,4 +56,6 @@ export default {
   Customer,
   getCustomer,
   sanitizeTokens,
+
+  Curtain,
 };
