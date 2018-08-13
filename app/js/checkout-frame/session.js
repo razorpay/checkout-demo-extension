@@ -420,10 +420,15 @@ function errorHandler(response) {
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
-    this.showLoadError(
-      message || 'There was an error in handling your request',
-      true
-    );
+    if (message && message.indexOf('OFFER_MISMATCH') === 0) {
+      hideOverlayMessage();
+      this.offers.showError();
+    } else {
+      this.showLoadError(
+        message || 'There was an error in handling your request',
+        true
+      );
+    }
   }
   $('#fd-hide').focus();
 }
@@ -985,27 +990,6 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
-    // TODO: Remove test data
-
-    preferences.offers = [
-      {
-        id: 'offer_ANZoaxsOww2X53',
-        name: 'Super Potato',
-        payment_method: 'card',
-        issuer: 'UTIB',
-        original_amount: 10000,
-        amount: 1000,
-      },
-      {
-        id: 'offer_ANZoaxsOww2X53',
-        name: 'Super Potato',
-        payment_method: 'wallet',
-        issuer: 'UTIB',
-        original_amount: 10000,
-        amount: 10000,
-      },
-    ];
-
     if (isArray(preferences.offers) && preferences.offers.length > 0) {
       // TODO: convert args to kwargs
       this.offers = initOffers(
@@ -1016,6 +1000,10 @@ Session.prototype = {
         this.handleOfferRemoval.bind(this),
         this.formatAmountWithCurrency.bind(this)
       );
+
+      if (this.screen) {
+        this.renderOffers(this.screen);
+      }
     }
 
     if (!this.tab && !this.get('prefill.contact')) {
@@ -1947,7 +1935,7 @@ Session.prototype = {
 
     this.offers.applyFilter({ payment_method: screen });
 
-    $('#body').toggleClass('has-offers', this.offers.visibleOffers.length > 0);
+    $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
   },
   handleOfferSelection: function(offer) {
     if (offer.original_amount > offer.amount) {
@@ -2783,6 +2771,10 @@ Session.prototype = {
     if (data['_[flow]'] === 'tez') {
       request.tez = true;
       data['_[flow]'] = 'intent';
+    }
+
+    if (this.offers && this.offers.appliedOffer) {
+      data.offer_id = this.offers.appliedOffer.id;
     }
 
     Razorpay.sendMessage({

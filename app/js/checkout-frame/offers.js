@@ -9,12 +9,20 @@ var createNode = function(html) {
 };
 
 function Offer(data, options) {
-  var that = this,
-    $el = (this.$el = createNode(templates.offer(data))),
-    $offerTitle = $el.querySelector('.offer-title'),
-    $removeOffer = $el.querySelector('.remove-offer');
+  var that = this;
 
   this.data = data;
+  this.discount = data.original_amount - data.amount;
+
+  var $el = (this.$el = createNode(
+      templates.offer({
+        name: data.name,
+        description: data.display_text,
+        discount: this.discount > 0 && options.formatAmount(this.discount),
+      })
+    )),
+    $offerTitle = $el.querySelector('.offer-title'),
+    $removeOffer = $el.querySelector('.remove-offer');
 
   $offerTitle.onclick = function() {
     options.onOfferSelection(that);
@@ -87,10 +95,16 @@ function initOffers(
     $offersListCont = $el.querySelector('.offers-list-container'),
     $offersListTitle = $offersListCont.querySelector('.offers-list-title'),
     $offersList = $offersListCont.querySelector('.offers-list'),
-    $applyOffer = $offersListCont.querySelector('.apply-offer');
+    $applyOffer = $offersListCont.querySelector('.apply-offer'),
+    $offersError = $el.querySelector('.offers-error'),
+    $offersErrorTitle = $offersError.querySelector('.error-offer-title'),
+    $offersErrorAmounts = $offersError.querySelectorAll('.total-amount'),
+    $offersErrorCancel = $offersError.querySelector('.text-btn.cancel'),
+    $offersErrorPay = $offersError.querySelector('.text-btn.pay');
 
   var appliedOffer,
     selectedOffer,
+    visibleOffers,
     shouldShowOfferList = false;
 
   function showOfferList() {
@@ -107,26 +121,28 @@ function initOffers(
     return shouldShowOfferList ? showOfferList() : hideOfferList();
   }
 
+  function hideOfferError() {
+    $offersError.remove();
+  }
+
   var offers = {
-    visibleOffers: offersData.length,
     applyFilter: function applyFilter(criteria) {
       $offersList.innerHTML = '';
 
-      var visibleOffers = Object.keys(criteria || {}).reduce(function(
-        offers,
-        key
-      ) {
-        return offers.reduce(function(filteredOffers, offer) {
-          return (
-            criteria[key] === offer.data[key] &&
-              ($offersList.appendChild(offer.$el), filteredOffers.push(offer)),
-            filteredOffers
-          );
-        }, []);
-      },
-      this.offers.slice());
+      visibleOffers = Object.keys(criteria || {}).reduce(
+        function(offers, key) {
+          return offers.reduce(function(filteredOffers, offer) {
+            return (
+              criteria[key] === offer.data[key] &&
+                ($offersList.appendChild(offer.$el),
+                filteredOffers.push(offer)),
+              filteredOffers
+            );
+          }, []);
+        },
 
-      this.visibleOffers = visibleOffers;
+        this.offers.slice()
+      );
       this.display(visibleOffers.length !== 0);
     },
     display: function display(shouldDisplay) {
@@ -138,12 +154,12 @@ function initOffers(
         return isAttached && $container.removeChild($el);
       }
 
-      var numVisibleOffers = this.visibleOffers.length;
+      var numVisibleOffers = visibleOffers.length;
 
       $numOffers.innerText =
         numVisibleOffers + ' Offer' + (numVisibleOffers > 1 ? 's' : '');
 
-      if (appliedOffer && this.visibleOffers.indexOf(appliedOffer) < 0) {
+      if (appliedOffer && visibleOffers.indexOf(appliedOffer) < 0) {
         this.removeOffer();
       }
 
@@ -156,6 +172,8 @@ function initOffers(
 
       if (!appliedOffer) {
         $offersTitle.className = $offersTitle.className + appliedClass;
+      } else {
+        appliedOffer.remove();
       }
 
       var offer = (appliedOffer = selectedOffer),
@@ -206,21 +224,47 @@ function initOffers(
         return onRemoveOffer && onRemoveOffer();
       }
     },
+    showError: function showError(offerData) {
+      offerData = offerData || appliedOffer.data;
+
+      var title = offerData.name,
+        totalAmount = formatAmount(offerData.original_amount);
+
+      $offersErrorTitle.innerText = title;
+      each($offersErrorAmounts, function(index, $amount) {
+        $amount.innerHTML = totalAmount;
+      });
+
+      $el.appendChild($offersError);
+    },
   };
 
-  Object.defineProperty(offers, 'appliedOffer', {
-    get: function() {
-      return appliedOffer;
+  Object.defineProperties(offers, {
+    appliedOffer: {
+      get: function() {
+        return appliedOffer && appliedOffer.data;
+      },
+    },
+    numVisibleOffers: {
+      get: function() {
+        return visibleOffers.length;
+      },
     },
   });
 
   hideOfferList();
+  hideOfferError();
 
   // TODO: need to change to addEventlistner style
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;
   $applyOffer.onclick = offers.applyOffer.bind(offers);
+  $offersErrorCancel.onclick = hideOfferError;
+  $offersErrorPay.onclick = function() {
+    offers.removeOffer();
+    hideOfferError();
+  };
 
-  offers.offers = offersData.map(function(offer) {
+  visibleOffers = offers.offers = offersData.map(function(offer) {
     return new Offer(offer, {
       onOfferSelection: function(offer) {
         offers.selectOffer(offer);
@@ -229,6 +273,7 @@ function initOffers(
         offers.removeOffer();
         toggleOfferList();
       },
+      formatAmount: formatAmount,
     });
   });
 

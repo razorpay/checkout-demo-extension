@@ -771,6 +771,7 @@ $outline = #ddd;
 
 #offers-container {
 
+  display: none;
   width: 100%;
   height: $topbarh;
   line-height: $topbarh;
@@ -911,6 +912,8 @@ $outline = #ddd;
         margin: 0;
         padding: 0 8px;
         list-style-type: none;
+        height: $bodyh - $topbarh;
+        overflow-y: auto;
         
         > li.offer {
 
@@ -920,20 +923,59 @@ $outline = #ddd;
           padding: 0 16px;
           background-color: #fff;
           margin: 0;
+          cursor: pointer;
+          border-top-width: 0;
+
+          &:first-child, &.selected {
+
+            border-top-width: 1px;
+          }
 
           .offer-title {
 
             overflow: hidden;
           }
 
-          .offer-details, .remove-offer {
+          .offer-details {
+
+            line-height: 1.5rem;
+
+            &.no-desc .remove-offer {
+
+              margin-top: 0;
+            }
+          }
+
+          .offer-details, &.selected .offer-details.no-desc, .remove-offer {
 
             display: none;
           }
 
-          &.selected .offer-details, &.applied .remove-offer {
+          .remove-offer {
+
+            margin-top: 16px;
+          }
+
+          &.selected .offer-details,
+          &.selected.applied .offer-details.no-desc,
+          &.applied .remove-offer {
 
             display: block;
+          }
+
+          .discount-details {
+
+            color: rgb(112,190,83);
+          }
+
+          &.selected {
+
+            .offer-details {
+
+              border-top: 1px solid #E6E7E8;
+              padding-top: 12px;
+              margin-bottom: 16px;
+            }
           }
         }
       }
@@ -944,9 +986,63 @@ $outline = #ddd;
         width: 100%;
         bottom: 0;
         left: 0;
-        border-radius: 0;
+        border-radius: 0 0 3px 3px;
       }
     }
+  
+    .offers-error {
+
+      top: $footerh;
+      height: $bodyh + $footerh;
+      overflow: hidden;
+      background-color: rgba(0,0,0,0.3);
+      position: relative;
+      transform: translate(0, -100%);
+      border-radius: 0 0 3px 3px;
+      color: #717171;
+      
+      .offers-error-content {
+
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        padding: 0 $p;
+        position: absolute;
+        background-color: #fff;
+        box-sizing: border-box;
+
+        .error-desc {
+
+          margin: 16px 0;
+        }
+
+        .error-title, .error-actionables {
+
+           font-size: 14px;
+         }
+
+        .error-title {
+
+          font-size: 14px;
+          border-bottom: 1px solid #F3F3F3;
+        }
+
+        .error-actionables, .error-desc {
+
+          line-height: 1.5rem;
+        }
+
+        .error-actionables {
+
+          margin-bottom: 16px;
+
+          .pay {
+
+            margin-left: $p;
+          }
+        }
+      }
+    }  
   } 
 }
 
