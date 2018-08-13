@@ -798,28 +798,49 @@ $outline = #ddd;
 
       height: 100%;
       cursor: pointer;
+      position: relative;
+
+      svg {
+
+        display: inline-block;
+        height: 16px;
+        width: auto;
+        margin-right: 8px;
+        fill: currentColor;
+        position: absolute;
+        top: 50%;
+        transform: translate(0, -50%);
+      }
 
       .select-offer, .selected-offer {
 
         height: 100%;
         overflow: hidden;
-
-        svg {
-
-          display: inline-block;
-          height: 1em;
-          width: auto;
-          margin-right: 8px;
-          fill: currentColor;
-        }
+        padding-left: 1.57em;
 
         > span {
 
-          line-height: $topbarh;
+          line-height: $topbarh - 1px;
           
-          * {
+          &.toggle {
 
-            vertical-align: middle;
+            display: block;
+            height: $topbarh - 1px; 
+            position: relative;
+            padding-right: 15px;
+
+            &:after {
+
+              content: "\e601";
+              display: block;
+              font-size: 20px;
+              line-height: 1em;
+              position: absolute;
+              top: 50%;
+              right: 0;
+              transform: translate(0, -50%) rotate(180deg);
+              margin-top: 5px;
+            }
           }
         }
       }
@@ -858,6 +879,7 @@ $outline = #ddd;
       transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
       padding-bottom: $footerh;
       box-sizing: border-box;
+      border-radius: 0 0 3px 3px;
 
       .offers-list-title {
 

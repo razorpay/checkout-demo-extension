@@ -545,7 +545,23 @@ Session.prototype = {
       .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
       .replace('.00', '');
   },
+  formatAmountWithCurrency: function(amount) {
+    var discountAmount = amount,
+      discountFigure = this.formatAmount(discountAmount),
+      displayCurrency = this.r.get('display_currency');
 
+    if (displayCurrency) {
+      // TODO: handle display_amount case as in modal.jst
+      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
+    } else if (this.r.get('currency') === 'INR') {
+      discountAmount =
+        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
+    } else {
+      discountAmount = '$' + discountFigure;
+    }
+
+    return discountAmount;
+  },
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -991,12 +1007,14 @@ Session.prototype = {
     ];
 
     if (isArray(preferences.offers) && preferences.offers.length > 0) {
+      // TODO: convert args to kwargs
       this.offers = initOffers(
         document.querySelector('#offers-container'),
         preferences.offers,
         {},
         this.handleOfferSelection.bind(this),
-        this.handleOfferRemoval.bind(this)
+        this.handleOfferRemoval.bind(this),
+        this.formatAmountWithCurrency.bind(this)
       );
     }
 
@@ -1982,19 +2000,7 @@ Session.prototype = {
   showDiscount: function(offer) {
     $('#content').addClass('has-discount');
 
-    var discountAmount = offer.amount,
-      discountFigure = this.formatAmount(discountAmount),
-      displayCurrency = this.r.get('display_currency');
-
-    if (displayCurrency) {
-      // TODO: handle display_amount case as in modal.jst
-      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
-    } else if (this.r.get('currency') === 'INR') {
-      discountAmount =
-        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
-    } else {
-      discountAmount = '$' + discountFigure;
-    }
+    var discountAmount = this.formatAmountWithCurrency(offer.amount);
 
     //TODO: optimise queries
     $('#amount .discount')[0].innerHTML = discountAmount;

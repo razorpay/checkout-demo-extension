@@ -1,6 +1,7 @@
 var dummyDiv = document.createElement('div');
 var selectedClass = ' selected',
-  appliedClass = ' applied';
+  appliedClass = ' applied',
+  discountClass = ' has-discount';
 
 var createNode = function(html) {
   dummyDiv.innerHTML = html;
@@ -68,13 +69,20 @@ function initOffers(
   offersData,
   filter,
   onApplyOffer,
-  onRemoveOffer
+  onRemoveOffer,
+  formatAmount
 ) {
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
     $offersTitle = $el.querySelector('.offers-title'),
     $selectedOfferTitle = $offersTitle.querySelector(
       '.selected-offer .offer-title'
+    ),
+    $selectedOfferDiscount = $offersTitle.querySelector(
+      '.selected-offer .offer-title .discount'
+    ),
+    $selectedOfferDiscountAmount = $selectedOfferDiscount.querySelector(
+      '.discount-amount'
     ),
     $offersListCont = $el.querySelector('.offers-list-container'),
     $offersListTitle = $offersListCont.querySelector('.offers-list-title'),
@@ -150,9 +158,18 @@ function initOffers(
         $offersTitle.className = $offersTitle.className + appliedClass;
       }
 
-      var offer = (appliedOffer = selectedOffer);
+      var offer = (appliedOffer = selectedOffer),
+        discountAmount = offer.data.original_amount - offer.data.amount;
+
+      if (!discountAmount) {
+        $selectedOfferDiscountAmount.innerText = '';
+        $selectedOfferDiscount.remove();
+      } else {
+        $selectedOfferDiscountAmount.innerHTML = formatAmount(discountAmount);
+        $selectedOfferTitle.appendChild($selectedOfferDiscount);
+      }
+
       offer.apply();
-      $selectedOfferTitle.innerText = offer.data.name;
       toggleOfferList();
 
       return onApplyOffer && onApplyOffer(appliedOffer.data);
