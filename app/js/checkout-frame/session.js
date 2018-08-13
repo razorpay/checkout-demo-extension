@@ -1945,6 +1945,7 @@ Session.prototype = {
     // handle FE validations
     return;
 
+    /*
     var screen = this.screen;
 
     if (screen === 'wallet') {
@@ -1980,7 +1981,7 @@ Session.prototype = {
           }
         }
       }
-    }
+    }*/
   },
   handleOfferRemoval: function() {
     this.hideDiscount();
