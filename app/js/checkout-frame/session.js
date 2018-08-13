@@ -2729,6 +2729,7 @@ Session.prototype = {
     if (this.r._payment) {
       return;
     }
+
     var data = this.payload;
     var that = this;
     var request = {
@@ -2776,6 +2777,9 @@ Session.prototype = {
 
     if (this.offers && this.offers.appliedOffer) {
       data.offer_id = this.offers.appliedOffer.id;
+      this.r.display_amount = this.offers.appliedOffer.amount;
+    } else {
+      delete this.r.display_amount;
     }
 
     Razorpay.sendMessage({
