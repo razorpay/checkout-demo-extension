@@ -78,7 +78,8 @@ function initOffers(
   filter,
   onApplyOffer,
   onRemoveOffer,
-  formatAmount
+  formatAmount,
+  $root
 ) {
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
@@ -92,11 +93,11 @@ function initOffers(
     $selectedOfferDiscountAmount = $selectedOfferDiscount.querySelector(
       '.discount-amount'
     ),
-    $offersListCont = $el.querySelector('.offers-list-container'),
+    $offersListCont = createNode(templates.offerslist()),
     $offersListTitle = $offersListCont.querySelector('.offers-list-title'),
     $offersList = $offersListCont.querySelector('.offers-list'),
     $applyOffer = $offersListCont.querySelector('.apply-offer'),
-    $offersError = $el.querySelector('.offers-error'),
+    $offersError = createNode(templates.offererror()),
     $offersErrorTitle = $offersError.querySelector('.error-offer-title'),
     $offersErrorAmounts = $offersError.querySelectorAll('.total-amount'),
     $offersErrorCancel = $offersError.querySelector('.text-btn.cancel'),
@@ -109,7 +110,7 @@ function initOffers(
     shouldShowOfferList = false;
 
   function showOfferList() {
-    $el.appendChild($offersListCont);
+    $root.appendChild($offersListCont);
   }
 
   function hideOfferList() {
@@ -232,7 +233,7 @@ function initOffers(
         $amount.innerHTML = totalAmount;
       });
 
-      $el.appendChild($offersError);
+      $root.appendChild($offersError);
     },
   };
 
@@ -242,15 +243,17 @@ function initOffers(
         return appliedOffer && appliedOffer.data;
       },
     },
+    selectedOffer: {
+      get: function() {
+        return selectedOffer && selectedOffer.data;
+      },
+    },
     numVisibleOffers: {
       get: function() {
         return visibleOffers.length;
       },
     },
   });
-
-  hideOfferList();
-  hideOfferError();
 
   // TODO: need to change to addEventlistner style
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;

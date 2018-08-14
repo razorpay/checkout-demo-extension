@@ -118,9 +118,13 @@ color: `=c`;
   border-color: `=highlightColor`;
 }
 
-.mobile:not(.ip) #body[screen="wallet"],
-.mobile:not(.ip) #body[screen="upi"] {
+.mobile:not(.ip) #body[screen] {
   height: `=bodyHeight`px;
+}
+
+.mobile:not(.ip) #body[screen] .offers-list-container {
+  height: `=bodyHeight`px;
+  top: 0;
 }
 
 .input-radio input[type=radio]:focus:not(:checked) + label .radio-display {

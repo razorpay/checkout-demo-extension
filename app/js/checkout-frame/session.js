@@ -998,7 +998,8 @@ Session.prototype = {
         {},
         this.handleOfferSelection.bind(this),
         this.handleOfferRemoval.bind(this),
-        this.formatAmountWithCurrency.bind(this)
+        this.formatAmountWithCurrency.bind(this),
+        $('#body')[0]
       );
 
       if (this.screen) {
@@ -1923,7 +1924,7 @@ Session.prototype = {
   },
   renderOffers: function(screen) {
     // reset offers UI
-    if (this.offers.appliedOffer) {
+    if (this.offers.appliedOffer || this.offers.selectedOffer) {
       this.offers.removeOffer();
     }
 
