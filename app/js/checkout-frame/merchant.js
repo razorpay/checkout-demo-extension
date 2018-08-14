@@ -507,7 +507,7 @@ function setPaymentMethods(session) {
   }
 
   wallets.sort(function(walletA, walletB) {
-    return walletB.custom;
+    return walletB.custom ? 1 : -1;
   });
 
   methods.wallet = wallets;
