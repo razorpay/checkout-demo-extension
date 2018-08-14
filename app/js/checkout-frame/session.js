@@ -982,6 +982,7 @@ Session.prototype = {
       this.cardOffer =
         preferences.offers &&
         preferences.offers.length > 0 &&
+        preferences.offers[0].payment_method === 'card' &&
         preferences.offers[0];
     }
 
