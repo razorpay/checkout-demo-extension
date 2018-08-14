@@ -986,7 +986,17 @@ window.handleMessage = function(message) {
   try {
     if (isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = noop;
+      CheckoutBridge.sendExtraAnalyticsData = function(e) {
+        discreet.setShieldParams(e);
+      };
+
+      if (iosCheckoutBridgeNew) {
+        iosCheckoutBridgeNew.postMessage({
+          action: 'requestExtraAnalyticsData',
+        });
+      } else if (CheckoutBridge.requestExtraAnalyticsData) {
+        CheckoutBridge.requestExtraAnalyticsData();
+      }
     }
   } catch (e) {}
 };

@@ -12,6 +12,7 @@ import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
 import * as Curtain from 'components/curtain';
+import { setShieldParams } from 'payment/validator';
 
 export default {
   RazorpayConfig,
@@ -20,6 +21,7 @@ export default {
   fetch,
   Track,
   UPIUtils,
+  setShieldParams,
   Tez,
   Color,
   _PaymentMethodIcons,
