@@ -978,6 +978,13 @@ Session.prototype = {
 
     this.setTpvBanks();
 
+    if (preferences.force_offer) {
+      this.cardOffer =
+        preferences.offers &&
+        preferences.offers.length > 0 &&
+        preferences.offers[0];
+    }
+
     this.getEl();
     this.setFormatting();
     this.setEmandate();
@@ -990,12 +997,11 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
-    if (preferences.force_offer) {
-      this.cardOffer =
-        preferences.offers &&
-        preferences.offers.length > 0 &&
-        preferences.offers[0];
-    } else if (isArray(preferences.offers) && preferences.offers.length > 0) {
+    if (
+      !preferences.force_offer &&
+      isArray(preferences.offers) &&
+      preferences.offers.length > 0
+    ) {
       // TODO: convert args to kwargs
       this.offers = initOffers(
         document.querySelector('#offers-container'),
