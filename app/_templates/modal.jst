@@ -3,6 +3,7 @@ var o = _.get;
 var ecod = o('ecod');
 var address = o('address');
 var method = _.methods;
+var cardOffer = _.cardOffer;
 var wallet = method.wallet;
 var banks = method.emandate || method.netbanking;
 var icons = _.themeMeta.icons;
@@ -230,6 +231,16 @@ var upi_apps = _.upi_intents_data;
                       `??`
                         Only Visa and Mastercard Credit Cards are supported for this payment.
                       `?`
+                    `?`
+                  </div>
+                `?`
+                `?cardOffer`
+                  <div class="pad" id="card-offer">
+                    `?cardOffer.name`
+                      <div class="text-btn"><strong>`=cardOffer.name`</strong></div>
+                    `?`
+                    `?cardOffer.display_text`
+                      `=cardOffer.display_text`
                     `?`
                   </div>
                 `?`
