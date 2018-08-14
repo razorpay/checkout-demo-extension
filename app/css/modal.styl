@@ -1107,6 +1107,10 @@ $outline = #ddd;
   }
 }
 
+#form-wallet, #form-upi {
+  overflow: auto;
+}
+
 #card-offer {
   position: absolute;
   bottom: 20px;
@@ -1114,8 +1118,45 @@ $outline = #ddd;
   font-size:12px;
 }
 
-#form-wallet, #form-upi {
-  overflow: auto;
+#wallets {
+  input[type=radio]:checked + label .offer-info {
+    opacity: 1;
+  }
+  .offer {
+    position: absolute;
+    top: 16px;
+    right: 12px;
+    line-height: 20px;
+    padding: 0 6px;
+    font-size: 12px;
+    color: #60B442;
+    background: rgba(112,190,83,0.06);
+    border: 1px solid #70BE53;
+    border-radius: 2px;
+  }
+   .offer-info {
+    margin-top: 6px;
+    font-size: 13px;
+    transition: 0.3s opacity;
+    line-height: 19px;
+    opacity: 0;
+    &.active {
+      display: block;
+    }
+     ul {
+      margin: 24px 0 0 0;
+      padding: 0 0 0 32px;
+    }
+     li {
+      margin-left: 10px;
+      &:first-child {
+        list-style: none;
+        margin-left: 8px;
+        margin-bottom: 4px;
+        font-weight: bold;
+      }
+    }
+  }
 }
 
 #footer {

@@ -539,6 +539,9 @@ var upi_apps = _.upi_intents_data;
                     `?`
                     <div class="list collapsable">
                       `~wallet:i:w`
+                      `
+                        var hasOffer = _.walletOffer && _.walletOffer.issuer === w.name && _.walletOffer;
+                      `
                         <div class="wallet item radio-item">
 
                           <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
@@ -547,6 +550,12 @@ var upi_apps = _.upi_intents_data;
                             <img style="display:none" src="`=w.sq`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
                             <div class="placeholder"></div>
                             <span class="title">`=w.title`</span>
+                            `?hasOffer`
+                              <span class="offer">`=hasOffer.name`</span>
+                              <div class="offer-info">
+                                `=hasOffer.display_text`
+                              </div>
+                            `?`
                           </label>
                         </div>
                       `~`

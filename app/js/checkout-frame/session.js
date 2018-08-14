@@ -978,12 +978,15 @@ Session.prototype = {
 
     this.setTpvBanks();
 
-    if (preferences.force_offer) {
-      this.cardOffer =
-        preferences.offers &&
-        preferences.offers.length > 0 &&
-        preferences.offers[0].payment_method === 'card' &&
-        preferences.offers[0];
+    if (
+      preferences.force_offer &&
+      preferences.offers &&
+      preferences.offers.length > 0 &&
+      ['card', 'wallet'].indexOf(preferences.offers[0].payment_method) >= 0
+    ) {
+      var forcedOfferPaymentMethod = preferences.offers[0].payment_method;
+
+      this[forcedOfferPaymentMethod + 'Offer'] = preferences.offers[0];
     }
 
     this.getEl();
