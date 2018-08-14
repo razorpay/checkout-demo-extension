@@ -994,7 +994,7 @@ Session.prototype = {
       // TODO: convert args to kwargs
       this.offers = initOffers(
         document.querySelector('#offers-container'),
-        preferences.offers,
+        preferences.offers || [],
         {},
         this.handleOfferSelection.bind(this),
         this.handleOfferRemoval.bind(this),
@@ -1942,14 +1942,19 @@ Session.prototype = {
       this.showDiscount(offer);
     }
 
-    // handle FE validations
-    return;
-
-    /*
-    var screen = this.screen;
+    var screen = this.screen,
+      issuer = offer.issuer;
 
     if (screen === 'wallet') {
+      $('#wallet-radio-' + issuer).click();
+    } else if (screen === 'netbanking') {
+      if (issuer) {
+        $('#bank-select').val(issuer);
+        this.switchBank({ target: { value: issuer } });
+      }
     } else if (screen === 'card') {
+      //TODO: WIP try to see if the card exists in the saved cards and focus
+      /*
       var savedCards = this.customer.tokens && this.customer.tokens.items;
 
       if (this.savedCardScreen && savedCards && savedCards.length > 0) {
@@ -1981,7 +1986,8 @@ Session.prototype = {
           }
         }
       }
-    }*/
+      */
+    }
   },
   handleOfferRemoval: function() {
     this.hideDiscount();

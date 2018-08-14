@@ -104,6 +104,7 @@ function initOffers(
 
   var appliedOffer,
     selectedOffer,
+    allOffers,
     visibleOffers,
     shouldShowOfferList = false;
 
@@ -116,9 +117,9 @@ function initOffers(
   }
 
   function toggleOfferList() {
-    shouldShowOfferList = !shouldShowOfferList;
-
-    return shouldShowOfferList ? showOfferList() : hideOfferList();
+    return (shouldShowOfferList = !shouldShowOfferList)
+      ? showOfferList()
+      : hideOfferList();
   }
 
   function hideOfferError() {
@@ -129,20 +130,16 @@ function initOffers(
     applyFilter: function applyFilter(criteria) {
       $offersList.innerHTML = '';
 
-      visibleOffers = Object.keys(criteria || {}).reduce(
-        function(offers, key) {
-          return offers.reduce(function(filteredOffers, offer) {
-            return (
-              criteria[key] === offer.data[key] &&
-                ($offersList.appendChild(offer.$el),
-                filteredOffers.push(offer)),
-              filteredOffers
-            );
-          }, []);
-        },
+      visibleOffers = Object.keys(criteria || {}).reduce(function(offers, key) {
+        return offers.reduce(function(filteredOffers, offer) {
+          return (
+            criteria[key] === offer.data[key] &&
+              ($offersList.appendChild(offer.$el), filteredOffers.push(offer)),
+            filteredOffers
+          );
+        }, []);
+      }, allOffers);
 
-        this.offers.slice()
-      );
       this.display(visibleOffers.length !== 0);
     },
     display: function display(shouldDisplay) {
@@ -177,7 +174,7 @@ function initOffers(
       }
 
       var offer = (appliedOffer = selectedOffer),
-        discountAmount = offer.data.original_amount - offer.data.amount;
+        discountAmount = offer.discount;
 
       if (!discountAmount) {
         $selectedOfferDiscountAmount.innerText = '';
@@ -264,7 +261,7 @@ function initOffers(
     hideOfferError();
   };
 
-  visibleOffers = offers.offers = offersData.map(function(offer) {
+  allOffers = visibleOffers = offersData.map(function(offer) {
     return new Offer(offer, {
       onOfferSelection: function(offer) {
         offers.selectOffer(offer);

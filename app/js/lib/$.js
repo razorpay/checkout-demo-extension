@@ -297,6 +297,21 @@ $.prototype = {
     }
     return this;
   },
+  click: function() {
+    var $el = this[0];
+
+    if (!$el) {
+      return;
+    }
+
+    if (isFunction($el.click)) {
+      return $el.click();
+    }
+
+    var eventObj = document.createEvent('MouseEvents');
+    eventObj.initEvent('click', true, true);
+    $el.dispatchEvent(eventObj);
+  },
 };
 
 function smoothScrollTo(y) {
