@@ -1,5 +1,5 @@
 import getFingerprint from 'fingerprint';
-import { flattenProp, flatten } from 'common/options';
+import { flattenProp } from 'common/options';
 import Track from 'tracker';
 
 /* cotains mapping of sdk keys to shield key names */
