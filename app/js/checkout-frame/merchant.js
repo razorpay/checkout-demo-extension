@@ -506,6 +506,10 @@ function setPaymentMethods(session) {
     methods.count++;
   }
 
+  wallets.sort(function(walletA, walletB) {
+    return walletB.custom;
+  });
+
   methods.wallet = wallets;
 }
 
