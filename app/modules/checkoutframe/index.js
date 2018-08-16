@@ -132,7 +132,10 @@ export const handleMessage = function(message) {
     if (oldSession) {
       invoke('saveAndClose', oldSession);
     }
-    session.id = Track.id = id;
+
+    session.id = id;
+    Track.updateUid(id);
+
     SessionManager.setSession(session);
   }
 
