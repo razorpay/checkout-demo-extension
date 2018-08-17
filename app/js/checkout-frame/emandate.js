@@ -20,8 +20,12 @@ function emandateView(session) {
     bank_ifsc: session.get('prefill.bank_account[ifsc]'),
     /* auth_type that the merchant wants to enforce */
     auth_type: session.get('prefill.auth_type'),
-    /* aadhaar is the 12 digit aadhaar number of the user */
+    /* aadhaar VID is the 16 digit aadhaar number of the user */
     aadhaar: session.get('prefill.aadhaar[vid]'),
+    /* auth mode can be otp/fp */
+    auth_mode: session.get('prefill.auth_mode'),
+    /* account type can be savings/current */
+    account_type: session.get('prefill.account_type'),
   };
 
   this.opts = {
@@ -143,7 +147,15 @@ emandateView.prototype = {
     $('#emandate-options .netbanking').addClass('disabled');
     $('#emandate-options .aadhaar').addClass('disabled');
 
-    if (authTypes.indexOf('netbanking') > -1) {
+    /**
+     * Netbanking is allowed only if
+     * 1. netbanking is an auth type, AND
+     * 2. auth_mode and account_type are NOT set in prefill
+     */
+    if (
+      authTypes.indexOf('netbanking') > -1 &&
+      !(this.prefill.auth_mode || this.prefill.account_type)
+    ) {
       $('#emandate-options .netbanking').removeClass('disabled');
     }
 
