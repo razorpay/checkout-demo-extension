@@ -781,11 +781,34 @@ $outline = #ddd;
   box-sizing: border-box;
   transform: none;
   transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
+  border-top: 1px solid #ebedf0;
 
   .offers-content {
 
     position: relative;
     height: 100%;
+
+    .single-offer-text {
+
+      display: none;
+      max-width: 250px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    &.single-offer {
+
+      .multi-offer-el {
+
+        display: none;
+      }
+
+      .single-offer-text {
+
+        display: inline-block;
+      }
+    }
 
     .offers-title {
 
@@ -813,7 +836,9 @@ $outline = #ddd;
 
         > span {
 
-          line-height: $topbarh - 1px;
+          line-height: 1;
+          display: inline-block;
+          padding-top: 15px;
           
           &.toggle {
 
@@ -821,6 +846,7 @@ $outline = #ddd;
             height: $topbarh - 1px; 
             position: relative;
             padding-right: 15px;
+            box-sizing: border-box;
 
             &:after {
 
@@ -869,6 +895,219 @@ $outline = #ddd;
   } 
 }
 
+.offers-list-container, .offers-error {
+
+  z-index: 99;
+}
+
+.offers-list-container {
+
+  background-color: #F7F7F7;
+  height: $bodyh + $footerh;
+  transform: translate(0, -100%);
+  position: relative;
+  top:  $footerh + 1px;
+  transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
+  padding-top: $topbarh;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+  border-radius: 0 0 3px 3px;
+  line-height: $topbarh;
+
+  &.selected {
+
+    padding-bottom: $footerh;
+  }
+
+  .offers-list-title {
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0 $p;
+    color: rgba(51, 51, 51, 0.6);
+    overflow: hidden;
+    cursor: pointer;
+    box-sizing: border-box;
+    
+    &:after {
+
+      content: "\e601";
+      display: block;
+      float: right;
+      font-size: 20px;
+    }
+  }
+
+  button.apply-offer {
+
+    display: none;
+  }
+
+  &.selected button.apply-offer {
+
+    display: block;
+  }
+
+  ul.offers-list {
+
+    margin: 0;
+    padding: 0 8px;
+    list-style-type: none;
+    height: 100%;
+    overflow-y: auto;
+    
+    > li.offer {
+
+      display: block;
+      border: 1px solid #E6E7E8;
+      border-radius: 1px;
+      padding: 0 16px;
+      background-color: #fff;
+      margin: 0;
+      cursor: pointer;
+      border-top-width: 0;     
+      position: relative;   
+
+      &:first-child, &.selected {
+
+        border-top-width: 1px;
+      }
+
+      .offer-title {
+
+        overflow: hidden;
+
+        .checkbox {
+
+          vertical-align: middle;
+        }
+      }
+
+      .offer-details {
+
+        line-height: 1.5rem;
+
+        &.no-desc .remove-offer {
+
+          margin-top: 0;
+        }
+      }
+
+      .offer-details, &.selected .offer-details.no-desc, .remove-offer {
+
+        display: none;
+      }
+
+      .remove-offer {
+
+        margin-top: 16px;
+      }
+
+      &.selected .offer-details,
+      &.selected.applied .offer-details.no-desc,
+      &.applied .remove-offer {
+
+        display: block;
+      }
+
+      .discount-details {
+
+        color: rgb(112,190,83);
+        margin-bottom: 2px;
+      }
+
+      &.selected {
+
+        top: -1px;
+
+        &:first-child {
+
+          top: 0;
+        }
+
+        .offer-details {
+
+          border-top: 1px solid #E6E7E8;
+          padding-top: 8px;
+          margin-bottom: 16px;
+        }
+
+        .offer-title .checkbox:after {
+
+          border-color: #fff;
+        }
+      }
+    }
+  }
+
+  button.apply-offer {
+
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-radius: 0 0 3px 3px;
+    font-weight: normal;
+  }
+}
+
+.offers-error {
+
+  top: $footerh;
+  height: $bodyh + $footerh;
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.3);
+  position: relative;
+  transform: translate(0, -100%);
+  border-radius: 0 0 3px 3px;
+  color: #717171;
+  line-height: $topbarh;
+  
+  .offers-error-content {
+
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 0 $p;
+    position: absolute;
+    background-color: #fff;
+    box-sizing: border-box;
+
+    .error-desc {
+
+      margin: 16px 0;
+    }
+
+    .error-title, .error-actionables {
+
+       font-size: 14px;
+     }
+
+    .error-title {
+
+      font-size: 14px;
+      border-bottom: 1px solid #F3F3F3;
+    }
+
+    .error-actionables, .error-desc {
+
+      line-height: 1.5rem;
+    }
+
+    .error-actionables {
+
+      margin-bottom: 16px;
+
+      .pay {
+
+        margin-left: $p;
+      }
+    }
+  }
+}
+
 #body.has-offers {
 
   .left-align {
@@ -881,7 +1120,7 @@ $outline = #ddd;
     float: right;
   }
 
-  #offers-container, .offers-list-container, .offers-error {
+  #offers-container {
 
     /* need 99 z-index due to pay button in card screen */
     z-index: 99;   
@@ -891,7 +1130,19 @@ $outline = #ddd;
 
     bottom: -$topbarh;
     display: block;
-    transform: translate(0, -100%);
+    margin-top: -2px;
+    background-color: #fff;
+    border-radius: 0 0 3px 3px;
+  }
+
+  &[screen] {
+
+    #offers-container {
+   
+      transform: translate(0, -100%);
+      margin-top: 0;
+      border-radius: 0;
+    }
   }
 
   .tab-content {
@@ -899,199 +1150,6 @@ $outline = #ddd;
     &#form-wallet , &#form-card {
 
       bottom: $topbarh;
-    }
-  }
-
-  .offers-list-container {
-
-    background-color: #F7F7F7;
-    height: $bodyh + $footerh;
-    transform: translate(0, -100%);
-    position: relative;
-    top:  $footerh + 1px;
-    transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
-    padding-top: $topbarh;
-    padding-bottom: $footerh;
-    box-sizing: border-box;
-    border-radius: 0 0 3px 3px;
-    line-height: $topbarh;
-
-    .offers-list-title {
-
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 0 $p;
-      color: rgba(51, 51, 51, 0.6);
-      overflow: hidden;
-      cursor: pointer;
-      box-sizing: border-box;
-      
-      &:after {
-
-        content: "\e601";
-        display: block;
-        float: right;
-        font-size: 20px;
-      }
-    }
-
-    button.apply-offer {
-
-      display: none;
-    }
-
-    &.selected button.apply-offer {
-
-      display: block;
-    }
-
-    ul.offers-list {
-
-      margin: 0;
-      padding: 0 8px;
-      list-style-type: none;
-      height: 100%;
-      overflow-y: auto;
-      
-      > li.offer {
-
-        display: block;
-        border: 1px solid #E6E7E8;
-        border-radius: 1px;
-        padding: 0 16px;
-        background-color: #fff;
-        margin: 0;
-        cursor: pointer;
-        border-top-width: 0;     
-        position: relative;   
-
-        &:first-child, &.selected {
-
-          border-top-width: 1px;
-        }
-
-        .offer-title {
-
-          overflow: hidden;
-        }
-
-        .offer-details {
-
-          line-height: 1.5rem;
-
-          &.no-desc .remove-offer {
-
-            margin-top: 0;
-          }
-        }
-
-        .offer-details, &.selected .offer-details.no-desc, .remove-offer {
-
-          display: none;
-        }
-
-        .remove-offer {
-
-          margin-top: 16px;
-        }
-
-        &.selected .offer-details,
-        &.selected.applied .offer-details.no-desc,
-        &.applied .remove-offer {
-
-          display: block;
-        }
-
-        .discount-details {
-
-          color: rgb(112,190,83);
-          margin-bottom: 2px;
-        }
-
-        &.selected {
-
-          top: -1px;
-
-          &:first-child {
-
-            top: 0;
-          }
-
-          .offer-details {
-
-            border-top: 1px solid #E6E7E8;
-            padding-top: 8px;
-            margin-bottom: 16px;
-          }
-        }
-      }
-    }
-
-    button.apply-offer {
-
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-      left: 0;
-      border-radius: 0 0 3px 3px;
-      font-weight: normal;
-    }
-  }
-
-  .offers-error {
-
-    top: $footerh;
-    height: $bodyh + $footerh;
-    overflow: hidden;
-    background-color: rgba(0,0,0,0.3);
-    position: relative;
-    transform: translate(0, -100%);
-    border-radius: 0 0 3px 3px;
-    color: #717171;
-    line-height: $topbarh;
-    
-    .offers-error-content {
-
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      padding: 0 $p;
-      position: absolute;
-      background-color: #fff;
-      box-sizing: border-box;
-
-      .error-desc {
-
-        margin: 16px 0;
-      }
-
-      .error-title, .error-actionables {
-
-         font-size: 14px;
-       }
-
-      .error-title {
-
-        font-size: 14px;
-        border-bottom: 1px solid #F3F3F3;
-      }
-
-      .error-actionables, .error-desc {
-
-        line-height: 1.5rem;
-      }
-
-      .error-actionables {
-
-        margin-bottom: 16px;
-
-        .pay {
-
-          margin-left: $p;
-        }
-      }
     }
   }
 }
