@@ -235,8 +235,6 @@ function initOffers(
 
         appliedOffer.remove();
         appliedOffer = null;
-
-        return onRemoveOffer && onRemoveOffer();
       }
     },
     showError: function showError(offerData) {
@@ -284,6 +282,7 @@ function initOffers(
   $offersErrorPay.onclick = function() {
     offers.removeOffer();
     hideOfferError();
+    return onRemoveOffer && onRemoveOffer();
   };
 
   allOffers = visibleOffers = offersData.map(function(offer) {
