@@ -183,7 +183,7 @@ function initOffers(
 
       return !isAttached && shouldDisplay && $container.appendChild($el);
     },
-    applyOffer: function(shouldNotToggleOffersList) {
+    applyOffer: function() {
       if (appliedOffer === selectedOffer) {
         return toggleOfferList();
       }
@@ -206,12 +206,6 @@ function initOffers(
       }
 
       offer.apply();
-
-      if (!shouldNotToggleOffersList) {
-        toggleOfferList();
-      }
-
-      return onApplyOffer && onApplyOffer(appliedOffer);
     },
     selectOffer: function selectOffer(offer) {
       if (selectedOffer) {
@@ -282,6 +276,9 @@ function initOffers(
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;
   $applyOffer.onclick = function() {
     offers.applyOffer();
+
+    toggleOfferList();
+    return onApplyOffer && onApplyOffer(appliedOffer);
   };
   $offersErrorCancel.onclick = hideOfferError;
   $offersErrorPay.onclick = function() {

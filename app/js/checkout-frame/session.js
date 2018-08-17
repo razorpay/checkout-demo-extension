@@ -1950,7 +1950,7 @@ Session.prototype = {
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
-      this.offers.applyOffer(true);
+      this.offers.applyOffer();
       this.preSelectedOffer = null;
     }
 
