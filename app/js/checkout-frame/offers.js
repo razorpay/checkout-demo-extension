@@ -185,7 +185,7 @@ function initOffers(
     },
     applyOffer: function() {
       if (appliedOffer === selectedOffer) {
-        return toggleOfferList();
+        return;
       }
 
       if (!appliedOffer) {
