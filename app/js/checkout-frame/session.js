@@ -420,10 +420,15 @@ function errorHandler(response) {
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
-    this.showLoadError(
-      message || 'There was an error in handling your request',
-      true
-    );
+    if (message && message.indexOf('OFFER_MISMATCH') === 0) {
+      hideOverlayMessage();
+      this.offers.showError();
+    } else {
+      this.showLoadError(
+        message || 'There was an error in handling your request',
+        true
+      );
+    }
   }
   $('#fd-hide').focus();
 }
@@ -545,7 +550,23 @@ Session.prototype = {
       .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
       .replace('.00', '');
   },
+  formatAmountWithCurrency: function(amount) {
+    var discountAmount = amount,
+      discountFigure = this.formatAmount(discountAmount),
+      displayCurrency = this.r.get('display_currency');
 
+    if (displayCurrency) {
+      // TODO: handle display_amount case as in modal.jst
+      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
+    } else if (this.r.get('currency') === 'INR') {
+      discountAmount =
+        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
+    } else {
+      discountAmount = '$' + discountFigure;
+    }
+
+    return discountAmount;
+  },
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -957,6 +978,17 @@ Session.prototype = {
 
     this.setTpvBanks();
 
+    if (
+      preferences.force_offer &&
+      preferences.offers &&
+      preferences.offers.length > 0 &&
+      ['card', 'wallet'].indexOf(preferences.offers[0].payment_method) >= 0
+    ) {
+      var forcedOfferPaymentMethod = preferences.offers[0].payment_method;
+
+      this[forcedOfferPaymentMethod + 'Offer'] = preferences.offers[0];
+    }
+
     this.getEl();
     this.setFormatting();
     this.setEmandate();
@@ -968,6 +1000,27 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     errorHandler.call(this, this.params);
+
+    if (
+      !preferences.force_offer &&
+      isArray(preferences.offers) &&
+      preferences.offers.length > 0
+    ) {
+      // TODO: convert args to kwargs
+      this.offers = initOffers(
+        document.querySelector('#offers-container'),
+        preferences.offers || [],
+        {},
+        this.handleOfferSelection.bind(this),
+        this.handleOfferRemoval.bind(this),
+        this.formatAmountWithCurrency.bind(this),
+        $('#body')[0]
+      );
+
+      if (this.screen) {
+        this.renderOffers(this.screen);
+      }
+    }
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
@@ -1881,8 +1934,95 @@ Session.prototype = {
       showPaybtn = false;
     }
     this.body.toggleClass('sub', showPaybtn);
-  },
 
+    return this.offers && this.renderOffers(screen);
+  },
+  renderOffers: function(screen) {
+    // reset offers UI
+    if (this.offers.appliedOffer || this.offers.selectedOffer) {
+      this.offers.removeOffer();
+    }
+
+    if (!screen) {
+      // if its home screen , just hide offers , do not re-render
+      this.offers.display(false);
+      return $('#body').removeClass('has-offers');
+    }
+
+    this.offers.applyFilter({ payment_method: screen });
+
+    $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
+  },
+  handleOfferSelection: function(offer) {
+    if (offer.original_amount > offer.amount) {
+      this.showDiscount(offer);
+    }
+
+    var screen = this.screen,
+      issuer = offer.issuer;
+
+    if (screen === 'wallet') {
+      $('#wallet-radio-' + issuer).click();
+    } else if (screen === 'netbanking') {
+      if (issuer) {
+        $('#bank-select').val(issuer);
+        this.switchBank({ target: { value: issuer } });
+      }
+    } else if (screen === 'card') {
+      //TODO: WIP try to see if the card exists in the saved cards and focus
+      /*
+      var savedCards = this.customer.tokens && this.customer.tokens.items;
+
+      if (this.savedCardScreen && savedCards && savedCards.length > 0) {
+        var matchingCardIndex;
+
+        savedCards.every(function(item, index) {
+          var card = item.card;
+
+          if (!card) {
+            return true;
+          }
+
+          if (
+            offer.issuer === card.issuer &&
+            (!offer.payment_network || offer.payment_network === card.network)
+          ) {
+            matchingCardIndex = index;
+            return false;
+          }
+
+          return true;
+        });
+
+        if (typeof matchingCardIndex === void 0) {
+          var cvv = qs('#saved-cards-container .saved-cvv')[matchingCardIndex];
+
+          if (cvv) {
+            cvv.focus();
+          }
+        }
+      }
+      */
+    }
+  },
+  handleOfferRemoval: function() {
+    this.hideDiscount();
+  },
+  showDiscount: function(offer) {
+    $('#content').addClass('has-discount');
+
+    var discountAmount = this.formatAmountWithCurrency(offer.amount);
+
+    //TODO: optimise queries
+    $('#amount .discount')[0].innerHTML = discountAmount;
+    $('#footer .discount')[0].innerHTML = discountAmount;
+  },
+  hideDiscount: function() {
+    $('#content').removeClass('has-discount');
+    //TODO: optimise queries
+    $('#amount .discount').html('');
+    $('#footer .discount').html('');
+  },
   back: function(confirmedCancel) {
     var tab = '';
     var self = this;
@@ -2613,6 +2753,7 @@ Session.prototype = {
     if (this.r._payment) {
       return;
     }
+
     var data = this.payload;
     var that = this;
     var request = {
@@ -2656,6 +2797,13 @@ Session.prototype = {
     if (data['_[flow]'] === 'tez') {
       request.tez = true;
       data['_[flow]'] = 'intent';
+    }
+
+    if (this.offers && this.offers.appliedOffer) {
+      data.offer_id = this.offers.appliedOffer.id;
+      this.r.display_amount = this.offers.appliedOffer.amount;
+    } else {
+      delete this.r.display_amount;
     }
 
     Razorpay.sendMessage({

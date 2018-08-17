@@ -507,7 +507,7 @@ function setPaymentMethods(session) {
   }
 
   wallets.sort(function(walletA, walletB) {
-    return walletB.custom || session.offers.wallet[walletB.name] ? 1 : -1;
+    return walletB.custom ? 1 : -1;
   });
 
   methods.wallet = wallets;
@@ -554,19 +554,6 @@ function showModal(session) {
   if (CheckoutBridge) {
     invoke('setMerchantOptions', CheckoutBridge, JSON.stringify(options));
   }
-
-  var offers = preferences.offers;
-  session.offers = {
-    wallet: {},
-  };
-  each(offers, function(index, offer) {
-    var payment_method = offer.payment_method;
-    if (payment_method === 'card') {
-      session.offers.card = offer;
-    } else if (payment_method === 'wallet') {
-      session.offers.wallet[offer.issuer || offer.payment_network] = offer;
-    }
-  });
 
   var customer;
   var session_options = session.get();

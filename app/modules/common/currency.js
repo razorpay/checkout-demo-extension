@@ -197,7 +197,10 @@ export function displayAmount(razorpay) {
   if (displayCurrency) {
     return formatAmount(get('display_amount'), displayCurrency);
   }
-  return formatAmount(get('amount'), get('currency'));
+  return formatAmount(
+    razorpay.display_amount || get('amount'),
+    get('currency')
+  );
 }
 
 export const getDecimalAmount = amount =>

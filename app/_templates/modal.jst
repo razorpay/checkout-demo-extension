@@ -2,8 +2,8 @@
 var o = _.get;
 var ecod = o('ecod');
 var address = o('address');
-var cardOffer = _.offers.card;
 var method = _.methods;
+var cardOffer = _.cardOffer;
 var wallet = method.wallet;
 var banks = method.emandate || method.netbanking;
 var icons = _.themeMeta.icons;
@@ -93,7 +93,10 @@ var upi_apps = _.upi_intents_data;
             `?`
             <div id="merchant-desc">`=html(o('description').trim())`</div>
             `?o('amount')`
-              <div id="amount">`=amount`</div>
+              <div id="amount">
+                <span class="discount"></span>
+                <span class="original-amount">`=amount`&nbsp;&nbsp;</span>
+              </div>
             `?`
           </div>
           `? o('theme.branding') === 'payzapp'`
@@ -537,9 +540,9 @@ var upi_apps = _.upi_intents_data;
                     <div class="list collapsable">
                       `~wallet:i:w`
                       `
-                        var hasOffer = _.offers.wallet[w.name];
+                        var hasOffer = _.walletOffer && _.walletOffer.issuer === w.name && _.walletOffer;
                       `
-                        <div class="wallet item radio-item `=hasOffer?'has-offer':''`">
+                        <div class="wallet item radio-item">
 
                           <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
                           <label for="wallet-radio-`=w.name`" class="radio-label">
@@ -699,8 +702,9 @@ var upi_apps = _.upi_intents_data;
               </label>
             </div>
             `?`
+            <div id="offers-container"></div>
             <button id="footer" type="submit" class="button">
-              <span class="pay-btn">`?o('amount')`PAY &nbsp;`=amount``??`Authenticate`?`</span>
+              <span class="pay-btn">`?o('amount')`PAY &nbsp;<span class="original-amount">`=amount`</span><span class="discount"></span>`??`Authenticate`?`</span>
               <span class="otp-btn">Verify</span>
             </button>
             `?o('theme.branding')`
