@@ -1,7 +1,8 @@
 var dummyDiv = document.createElement('div');
 var selectedClass = ' selected',
   appliedClass = ' applied',
-  discountClass = ' has-discount';
+  discountClass = ' has-discount',
+  singleOfferClass = 'single-offer';
 
 var createNode = function(html) {
   dummyDiv.innerHTML = html;
@@ -84,6 +85,7 @@ function initOffers(
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
     $offersTitle = $el.querySelector('.offers-title'),
+    $singleOfferText = $offersTitle.querySelector('.single-offer-text-content'),
     $selectedOfferTitle = $offersTitle.querySelector(
       '.selected-offer .offer-title'
     ),
@@ -127,19 +129,30 @@ function initOffers(
     $offersError.remove();
   }
 
+  function appendOffer(offer) {
+    $offersList.appendChild(offer.$el);
+    return offer;
+  }
+
   var offers = {
     applyFilter: function applyFilter(criteria) {
+      var criteriaKeys = Object.keys(criteria || {});
+
       $offersList.innerHTML = '';
 
-      visibleOffers = Object.keys(criteria || {}).reduce(function(offers, key) {
-        return offers.reduce(function(filteredOffers, offer) {
-          return (
-            criteria[key] === offer.data[key] &&
-              ($offersList.appendChild(offer.$el), filteredOffers.push(offer)),
-            filteredOffers
-          );
-        }, []);
-      }, allOffers);
+      if (criteriaKeys.length > 0) {
+        visibleOffers = criteriaKeys.reduce(function(offers, key) {
+          return offers.reduce(function(filteredOffers, offer) {
+            return (
+              criteria[key] === offer.data[key] &&
+                (appendOffer(offer), filteredOffers.push(offer)),
+              filteredOffers
+            );
+          }, []);
+        }, allOffers);
+      } else {
+        visibleOffers = allOffers.map(appendOffer);
+      }
 
       this.display(visibleOffers.length !== 0);
     },
@@ -154,8 +167,15 @@ function initOffers(
 
       var numVisibleOffers = visibleOffers.length;
 
-      $numOffers.innerText =
-        numVisibleOffers + ' Offer' + (numVisibleOffers > 1 ? 's' : '');
+      if (numVisibleOffers > 1) {
+        $($el).removeClass(singleOfferClass);
+        $numOffers.innerText =
+          numVisibleOffers + ' Offer' + (numVisibleOffers > 1 ? 's' : '');
+      } else {
+        $($el).addClass(singleOfferClass);
+        $singleOfferText.innerText = visibleOffers[0].data.name;
+        this.selectOffer(visibleOffers[0]);
+      }
 
       if (appliedOffer && visibleOffers.indexOf(appliedOffer) < 0) {
         this.removeOffer();
@@ -165,7 +185,7 @@ function initOffers(
     },
     applyOffer: function() {
       if (appliedOffer === selectedOffer) {
-        return toggleOfferList();
+        return;
       }
 
       if (!appliedOffer) {
@@ -186,9 +206,6 @@ function initOffers(
       }
 
       offer.apply();
-      toggleOfferList();
-
-      return onApplyOffer && onApplyOffer(appliedOffer.data);
     },
     selectOffer: function selectOffer(offer) {
       if (selectedOffer) {
@@ -218,8 +235,6 @@ function initOffers(
 
         appliedOffer.remove();
         appliedOffer = null;
-
-        return onRemoveOffer && onRemoveOffer();
       }
     },
     showError: function showError(offerData) {
@@ -257,11 +272,17 @@ function initOffers(
 
   // TODO: need to change to addEventlistner style
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;
-  $applyOffer.onclick = offers.applyOffer.bind(offers);
+  $applyOffer.onclick = function() {
+    offers.applyOffer();
+
+    toggleOfferList();
+    return onApplyOffer && onApplyOffer(appliedOffer);
+  };
   $offersErrorCancel.onclick = hideOfferError;
   $offersErrorPay.onclick = function() {
     offers.removeOffer();
     hideOfferError();
+    return onRemoveOffer && onRemoveOffer();
   };
 
   allOffers = visibleOffers = offersData.map(function(offer) {

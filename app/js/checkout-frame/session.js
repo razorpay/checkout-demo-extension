@@ -1017,9 +1017,7 @@ Session.prototype = {
         $('#body')[0]
       );
 
-      if (this.screen) {
-        this.renderOffers(this.screen);
-      }
+      this.renderOffers(this.screen);
     }
 
     if (!this.tab && !this.get('prefill.contact')) {
@@ -1894,6 +1892,11 @@ Session.prototype = {
       return;
     }
 
+    // Back button is pressed before going to card page page
+    if (this.screen === 'otp' && screen !== 'card') {
+      this.preSelectedOffer = null;
+    }
+
     this.screen = screen;
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
@@ -1938,28 +1941,44 @@ Session.prototype = {
     return this.offers && this.renderOffers(screen);
   },
   renderOffers: function(screen) {
+    if (['', 'card', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0) {
+      $('#body').removeClass('has-offers');
+      return this.offers.display(false);
+    }
+
     // reset offers UI
     if (this.offers.appliedOffer || this.offers.selectedOffer) {
       this.offers.removeOffer();
     }
 
-    if (!screen) {
-      // if its home screen , just hide offers , do not re-render
-      this.offers.display(false);
-      return $('#body').removeClass('has-offers');
-    }
+    this.offers.applyFilter((screen && { payment_method: screen }) || {});
 
-    this.offers.applyFilter({ payment_method: screen });
+    if (this.preSelectedOffer) {
+      this.offers.selectOffer(this.preSelectedOffer);
+      this.offers.applyOffer();
+      this.preSelectedOffer = null;
+    }
 
     $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
   },
-  handleOfferSelection: function(offer) {
+  handleOfferSelection: function(offer, screen) {
+    var offerInstance = offer;
+
+    offer = offer.data;
+
     if (offer.original_amount > offer.amount) {
       this.showDiscount(offer);
     }
 
-    var screen = this.screen,
-      issuer = offer.issuer;
+    screen = screen || this.screen;
+
+    if (!screen) {
+      this.preSelectedOffer = offerInstance;
+      this.switchTab(offer.payment_method);
+      return this.handleOfferSelection(offerInstance, offer.payment_method);
+    }
+
+    var issuer = offer.issuer;
 
     if (screen === 'wallet') {
       $('#wallet-radio-' + issuer).click();
