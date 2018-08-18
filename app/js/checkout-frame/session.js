@@ -958,6 +958,8 @@ Session.prototype = {
   },
 
   render: function(options) {
+    var that = this;
+
     options = options || {};
 
     // make true to enable mweb-intent
@@ -1001,23 +1003,35 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
-    if (
-      !preferences.force_offer &&
-      isArray(preferences.offers) &&
-      preferences.offers.length > 0
-    ) {
-      // TODO: convert args to kwargs
-      this.offers = initOffers(
-        document.querySelector('#offers-container'),
-        preferences.offers || [],
-        {},
-        this.handleOfferSelection.bind(this),
-        this.handleOfferRemoval.bind(this),
-        this.formatAmountWithCurrency.bind(this),
-        $('#body')[0]
-      );
+    if (!preferences.force_offer && isArray(preferences.offers)) {
+      var eligibleOffers = preferences.offers.filter(function(offer) {
+        var method = offer.payment_method,
+          enabledMethods = that.methods,
+          isMethodEnabled =
+            method !== 'wallet'
+              ? enabledMethods[method]
+              : isArray(enabledMethods.wallet) &&
+                enabledMethods.wallet.filter(function(item) {
+                  return item.name === offer.issuer;
+                })[0];
 
-      this.renderOffers(this.screen);
+        return isMethodEnabled;
+      });
+
+      if (eligibleOffers.length > 0) {
+        // TODO: convert args to kwargs
+        this.offers = initOffers(
+          document.querySelector('#offers-container'),
+          eligibleOffers,
+          {},
+          this.handleOfferSelection.bind(this),
+          this.handleOfferRemoval.bind(this),
+          this.formatAmountWithCurrency.bind(this),
+          $('#body')[0]
+        );
+
+        this.renderOffers(this.screen);
+      }
     }
 
     if (!this.tab && !this.get('prefill.contact')) {
@@ -1895,6 +1909,7 @@ Session.prototype = {
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
+      this.handleOfferRemoval();
     }
 
     this.screen = screen;

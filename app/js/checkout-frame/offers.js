@@ -206,6 +206,8 @@ function initOffers(
       }
 
       offer.apply();
+
+      return true;
     },
     selectOffer: function selectOffer(offer) {
       if (selectedOffer) {
@@ -273,10 +275,11 @@ function initOffers(
   // TODO: need to change to addEventlistner style
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;
   $applyOffer.onclick = function() {
-    offers.applyOffer();
+    var isOfferApplied = offers.applyOffer();
 
     toggleOfferList();
-    return onApplyOffer && onApplyOffer(appliedOffer);
+
+    return isOfferApplied && onApplyOffer && onApplyOffer(appliedOffer);
   };
   $offersErrorCancel.onclick = hideOfferError;
   $offersErrorPay.onclick = function() {
