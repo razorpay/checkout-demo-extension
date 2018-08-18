@@ -1909,6 +1909,7 @@ Session.prototype = {
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
+      this.handleOfferRemoval();
     }
 
     this.screen = screen;
