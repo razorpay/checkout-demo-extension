@@ -114,6 +114,8 @@ var responseTypes = {
           this.checkRedirect();
         }
       });
+    } else {
+      this.checkRedirect();
     }
   },
 
