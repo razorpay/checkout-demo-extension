@@ -919,22 +919,16 @@ Session.prototype = {
 
   setWhatsappIcon: function() {
     var intentsData = this.upi_intents_data;
-    var whatsappObj, paytmObj;
+    var whatsappObj;
 
     if (isArray(intentsData)) {
       whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
-      paytmObj = findBy(intentsData, 'package_name', 'net.one97.paytm');
     }
 
     if (whatsappObj) {
       if (!whatsappObj.app_icon) {
         whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
       }
-      whatsappObj.app_name = 'WhatsApp UPI';
-    }
-
-    if (paytmObj) {
-      paytmObj.app_name = 'Paytm UPI';
     }
   },
 
@@ -974,6 +968,18 @@ Session.prototype = {
 
     if (this.upi_intents_data) {
       this.setWhatsappIcon();
+
+      /**
+       * We need to show "(Recommended)" string alongside the app name
+       * when there is only 1 preferred app, and 1 or more other apps.
+       */
+      var count = discreet.UPIUtils.getNumberOfAppsByCategory(
+        this.upi_intents_data
+      );
+
+      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+        this.showRecommendedUPIApp = true;
+      }
     }
 
     this.isOpen = true;
@@ -1063,6 +1069,11 @@ Session.prototype = {
         target: gel('card_number'),
         isPrefilled: true,
       });
+    }
+
+    // Look for new UPI apps.
+    if (this.all_upi_intents_data) {
+      discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
     }
   },
 
@@ -1416,6 +1427,80 @@ Session.prototype = {
     $(this.el).addClass('show-methods');
   },
 
+  /**
+   * Asks for second factor of confirmation for UPI intent.
+   */
+  askUPI2FPermission: function(packageName) {
+    var self = this;
+    var app = discreet.UPIUtils.getAppByPackageName(packageName);
+    var UPISecondFactorConsent = {};
+
+    try {
+      UPISecondFactorConsent = JSON.parse(
+        StorageBridge.getString('rzp_upi_2f_consent')
+      );
+    } catch (readErr) {}
+
+    var hide = function() {
+      var checked = $('#upi-apps input:checked');
+
+      if (checked[0]) {
+        checked[0].checked = false;
+      }
+
+      self.track('upi_2f_consent', {
+        package_name: packageName,
+        consent: false,
+      });
+
+      $('#body').toggleClass('sub', false);
+    };
+
+    this.track('upi_2f_shown', {
+      package_name: packageName,
+    });
+
+    Confirm.show({
+      position: 'middle',
+      message:
+        'To make a UPI payment, you need to have a UPI ID linked to your bank account.',
+      heading:
+        'Are you registered for UPI on ' +
+        (app.name || app.app_name || 'this app') +
+        '?',
+      layout: 'rtl',
+      positiveBtnTxt: 'Yes, Proceed',
+      negativeBtnTxt: 'No, Go Back',
+      onHide: hide,
+      onNegativeClick: hide,
+      onPositiveClick: function() {
+        UPISecondFactorConsent[packageName] = true;
+        self.shouldAskUPI2FPermission = false;
+
+        try {
+          StorageBridge.setString(
+            'rzp_upi_2f_consent',
+            JSON.stringify(UPISecondFactorConsent)
+          );
+        } catch (saveErr) {}
+
+        self.track('upi_2f_consent', {
+          package_name: packageName,
+          consent: true,
+        });
+
+        // Show overlay manually because it gets hidden.
+        var $overlay = $('#overlay');
+        setTimeout(function() {
+          $overlay.css('display', 'block');
+          $overlay.addClass(shownClass);
+        }, 300);
+
+        self.preSubmit.call(self);
+      },
+    });
+  },
+
   bindEvents: function() {
     var self = this;
     var thisEl = this.el;
@@ -1620,7 +1705,34 @@ Session.prototype = {
       });
 
       this.on('change', '#form-upi', function(e) {
+        var packageName = e.target.value;
+        var UPISecondFactorConsent = {};
+
+        try {
+          UPISecondFactorConsent = JSON.parse(
+            StorageBridge.getString('rzp_upi_2f_consent')
+          );
+        } catch (readErr) {}
+
+        if (
+          discreet.UPIUtils.isSecondFactorApp(packageName) &&
+          !UPISecondFactorConsent[packageName]
+        ) {
+          self.shouldAskUPI2FPermission = true;
+        } else {
+          self.shouldAskUPI2FPermission = false;
+        }
+
         $('#body').toggleClass('sub', e.target.value);
+
+        self.track('upi_app_selected', {
+          package_name: packageName,
+          showRecommended: Boolean(self.showRecommendedUPIApp),
+          recommended: Boolean(
+            self.showRecommendedUPIApp &&
+              discreet.UPIUtils.isPreferredApp(packageName)
+          ),
+        });
       });
     }
 
@@ -2825,6 +2937,10 @@ Session.prototype = {
 
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
+      if (this.shouldAskUPI2FPermission) {
+        this.askUPI2FPermission(data.upi_app);
+        return;
+      }
       data['_[flow]'] = 'intent';
     }
 

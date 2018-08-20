@@ -18,6 +18,7 @@ export const map = arrayCall('map');
 export const filter = arrayCall('filter');
 export const indexOf = arrayCall('indexOf');
 export const join = arrayCall('join');
+export const sort = arrayCall('sort');
 export const contains = _.curry2(
   (array, member) => indexOf(array, member) >= 0
 );

@@ -1,3 +1,11 @@
+const defaultOptions = {
+  position: 'top',
+  onHide: () => {},
+  layout: 'ltr',
+  onPositiveClick: _Func.noop,
+  onNegativeClick: _Func.noop,
+};
+
 var listeners = [];
 
 function on(event, sel, listener) {
@@ -11,7 +19,15 @@ function unbind() {
   listeners = [];
 }
 
-export function hide() {
+let hideCallback;
+
+export let isConfirmShown = false;
+
+export function hide(invokeCallback = false) {
+  if (!isConfirmShown) {
+    return;
+  }
+
   if (!$('#error-message').hasClass(shownClass)) {
     $('#overlay').removeClass(shownClass);
     setTimeout(() => {
@@ -22,9 +38,17 @@ export function hide() {
   setTimeout(() => {
     $('#confirmation-dialog').removeClass(shownClass);
   }, 300);
+
+  isConfirmShown = false;
+
+  if (invokeCallback && hideCallback) {
+    hideCallback();
+  }
 }
 
 export function show(options) {
+  options = _Obj.extend(defaultOptions, options);
+
   if (listeners.length) {
     unbind();
   }
@@ -32,8 +56,6 @@ export function show(options) {
   var $confirmationDialog = $('#confirmation-dialog');
   var $overlay = $('#overlay');
   $confirmationDialog[0].innerHTML = templates.confirm(options);
-  options.onPositiveClick = options.onPositiveClick || _Func.noop;
-  options.onNegativeClick = options.onNegativeClick || _Func.noop;
 
   on('click', '.confirm-container #positiveBtn', () => {
     hide();
@@ -48,8 +70,12 @@ export function show(options) {
   $overlay.addClass(shownClass);
 
   $confirmationDialog.addClass(shownClass);
+  $confirmationDialog.addClass('confirm-position-' + options.position);
 
   setTimeout(() => {
     $confirmationDialog.addClass('animate');
   }, 10);
+
+  isConfirmShown = true;
+  hideCallback = options.onHide;
 }

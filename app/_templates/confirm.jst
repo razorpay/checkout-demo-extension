@@ -6,11 +6,20 @@
     `=_.message`
   </div>
   <div class="confirm-buttons">
-    <div id='positiveBtn' class="text-btn">
-      `=_.positiveBtnTxt || 'Ok'`
-    </div>
-    <div id='negativeBtn' class="text-btn">
-      `=_.negativeBtnTxt || 'Cancel'`
-    </div>
+    `?_.layout === 'ltr'`
+      <div id='positiveBtn' class="text-btn">
+        `=_.positiveBtnTxt || 'Ok'`
+      </div>
+      <div id='negativeBtn' class="text-btn">
+        `=_.negativeBtnTxt || 'Cancel'`
+      </div>
+    `??`
+      <div id='negativeBtn' class="text-btn">
+        `=_.negativeBtnTxt || 'Cancel'`
+      </div>
+      <div id='positiveBtn' class="text-btn">
+        `=_.positiveBtnTxt || 'Ok'`
+      </div>
+    `?`
   </div>
 </div>

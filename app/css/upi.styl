@@ -20,6 +20,42 @@
       right: 6px;
     }
 
+    .only-when-checked {
+      color: rgba(81,89,120,0.54);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .title {
+      em {
+        color: rgba(81,89,120,0.54);
+      }
+    }
+
+    .radio-item {
+      input:not(:checked) {
+        &+ label {
+          .only-when-checked {
+            display: none;
+          }
+        }
+      }
+
+      input:checked {
+        &+ label {
+          .title,
+          .placeholder {
+            vertical-align: top;
+          }
+        }
+      }
+
+      .title,
+      .placeholder {
+        display: inline-block;
+      }
+    }
+
     i {
       position: absolute;
       display: block;

@@ -575,7 +575,15 @@ var upi_apps = _.upi_intents_data;
                               <span class="checkbox"></span>
                               <img style="display: none" src="`=a.app_icon`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
                               <div class="placeholder"></div>
-                              <span class="title">`=a.app_name`</span>
+                              <span class="title">
+                                <div>
+                                  `=a.app_name`
+                                  `?i == 0 && _.showRecommendedUPIApp`
+                                    <em>(Recommended)</em>
+                                  `?`
+                                </div>
+                                <div class="only-when-checked">You need to have a registered UPI ID</div>
+                              </span>
                             </label>
                           </div>
                         `~`
