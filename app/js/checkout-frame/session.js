@@ -1015,6 +1015,7 @@ Session.prototype = {
         'amount' in forcedOffer &&
         forcedOffer.amount !== forcedOffer.original_amount
       ) {
+        this.forcedDiscountOffer = forcedOffer;
         this.showDiscount(forcedOffer);
       }
     } else if (hasOffers) {
@@ -2957,9 +2958,12 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (this.offers && this.offers.appliedOffer) {
-      data.offer_id = this.offers.appliedOffer.id;
-      this.r.display_amount = this.offers.appliedOffer.amount;
+    var appliedOffer =
+      this.forcedDiscountOffer || (this.offers && this.offers.appliedOffer);
+
+    if (appliedOffer) {
+      data.offer_id = appliedOffer.id;
+      this.r.display_amount = appliedOffer.amount;
     } else {
       delete this.r.display_amount;
     }
