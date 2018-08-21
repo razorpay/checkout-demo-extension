@@ -549,8 +549,26 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
 };
 
 /**
- * Method to check if Tez is installed on device.
+ * Method to check if an on-device payment method exists.
+ * @param {String} method
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
-razorpayProto.checkForTez = Tez.check;
+razorpayProto.checkForOnDevicePaymentMethod = function(
+  method = '',
+  successCallback = _Func.noop,
+  errorCallback = _Func.noop
+) {
+  method = method.toLowerCase();
+
+  switch (method) {
+    case 'tez': {
+      Tez.check(successCallback, errorCallback);
+      break;
+    }
+
+    default: {
+      errorCallback();
+    }
+  }
+};
