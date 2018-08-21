@@ -986,15 +986,15 @@ Session.prototype = {
 
     this.setTpvBanks();
 
-    if (
-      preferences.force_offer &&
-      preferences.offers &&
-      preferences.offers.length > 0 &&
-      ['card', 'wallet'].indexOf(preferences.offers[0].payment_method) >= 0
-    ) {
-      var forcedOfferPaymentMethod = preferences.offers[0].payment_method;
+    var hasOffers = isArray(preferences.offers),
+      forcedOffer =
+        hasOffers && preferences.force_offer && preferences.offers[0];
 
-      this[forcedOfferPaymentMethod + 'Offer'] = preferences.offers[0];
+    if (forcedOffer) {
+      if (['card', 'wallet'].indexOf(forcedOffer.payment_method) >= 0) {
+        // need this while preparing the template
+        this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
+      }
     }
 
     this.getEl();
@@ -1009,7 +1009,15 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
-    if (!preferences.force_offer && isArray(preferences.offers)) {
+    if (forcedOffer) {
+      if (
+        'original_amount' in forcedOffer &&
+        'amount' in forcedOffer &&
+        forcedOffer.amount !== forcedOffer.original_amount
+      ) {
+        this.showDiscount(forcedOffer);
+      }
+    } else if (hasOffers) {
       var eligibleOffers = preferences.offers.filter(function(offer) {
         var method = offer.payment_method,
           enabledMethods = that.methods,
