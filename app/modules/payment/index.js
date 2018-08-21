@@ -20,6 +20,7 @@ import Razorpay, {
   makeUrl,
 } from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
+import * as Tez from 'tez';
 
 const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
 const RAZORPAY_COLOR = '#528FF0';
@@ -546,3 +547,10 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     },
   });
 };
+
+/**
+ * Method to check if Tez is installed on device.
+ * @param {Function} successCallback
+ * @param {Function} errorCallback
+ */
+razorpayProto.checkForTez = Tez.check;

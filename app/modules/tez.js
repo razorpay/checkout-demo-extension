@@ -10,13 +10,15 @@ export const check = (successCallback, errorCallback) => {
     new PaymentRequest([{ supportedMethods: 'https://tez.google.com/pay' }], {
       total: {
         label: '_',
-        amount: { currency: 'INR', value: 0 }
-      }
+        amount: { currency: 'INR', value: 0 },
+      },
     })
       .canMakePayment()
       .then(isAvailable => {
         if (isAvailable) {
           successCallback();
+        } else {
+          errorCallback();
         }
       })
       /* jshint ignore:start */
@@ -42,8 +44,8 @@ export const pay = (data, successCallback, errorCallback) => {
   const supportedInstruments = [
     {
       supportedMethods: ['https://tez.google.com/pay'],
-      data: instrumentData
-    }
+      data: instrumentData,
+    },
   ];
 
   const details = {
@@ -51,9 +53,9 @@ export const pay = (data, successCallback, errorCallback) => {
       label: 'Payment',
       amount: {
         currency: 'INR',
-        value: parseFloat(instrumentData.am).toFixed(2)
-      }
-    }
+        value: parseFloat(instrumentData.am).toFixed(2),
+      },
+    },
   };
 
   try {
