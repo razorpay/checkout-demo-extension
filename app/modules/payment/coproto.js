@@ -224,7 +224,10 @@ var responseTypes = {
     }
   },
 
-  otp: function(request) {
+  otp: function(request, fullResponse) {
+    if (request.method === 'direct') {
+      return responseTypes.first.call(this, request, responseTypes);
+    }
     this.otpurl = request.url;
     this.emit('otp.required');
   },
