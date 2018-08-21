@@ -1120,7 +1120,7 @@ Session.prototype = {
 
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
-      this.emandateView = new emandateView(this);
+      this.emandateView = new discreet.emandateView(this);
     }
   },
 

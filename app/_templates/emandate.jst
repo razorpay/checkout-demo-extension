@@ -29,7 +29,7 @@ var bank_account = _.prefill.bank_account,
       </div>
       <div class="payment-option item aadhaar" tab="emandate-aadhaar">
         <label>
-          <i class="theme">&#xe60a;</i>
+          <i class="theme">&#xe713;</i>
           Aadhaar
           <span class="desc">via Aadhaar linked mobile OTP</span>
         </label>
@@ -80,6 +80,13 @@ var bank_account = _.prefill.bank_account,
         <input class="input" name="aadhaar[vid]" type="text" id="adhr-acc-aadhaar" value="`=aadhaar`" readonly required pattern="^[0-9 ]{19}$" maxlength="19" spellcheck="false" autocorrect="off" autocapitalize="off">
       </div>
     `?`
+    <label for="emandate-aadhaar-linked-check" id="emandate-aadhaar-linked-check-label">
+      <input type="checkbox" class='checkbox--square' id="emandate-aadhaar-linked-check" required>
+      <span class="checkbox"></span>
+      <div class="checkbox-content">
+        I agree that the above details are correct and my Aadhaar is linked to this bank account
+      </span>
+    </div>
     `?auth_mode`
       <input name="auth_mode" type="hidden" value="`=auth_mode`" />
     `?`
