@@ -131,8 +131,8 @@ function makeEmiDropdown(emiObj, session, isOption) {
         length +
         '">' +
         length +
-        'month EMI ' +
-        (rate ? '@' + rate + '%' : '') +
+        ' month EMI ' +
+        (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
         Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
         ' per month)</' +
@@ -1123,7 +1123,7 @@ Session.prototype = {
   setEMI: function() {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
-      this.emi = new emiView(this);
+      this.emi = new discreet.emiView(this);
     }
   },
 

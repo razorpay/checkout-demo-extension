@@ -11,6 +11,7 @@ import Callout from 'callout';
 import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
+import emiView from 'checkoutframe/emi';
 import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
@@ -34,6 +35,7 @@ export default {
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrontOtp,
+  emiView,
   emandateView,
   Curtain,
 };
