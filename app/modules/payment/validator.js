@@ -2,6 +2,36 @@ import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
 
+/* cotains mapping of sdk keys to shield key names */
+const sdkToShieldMap = {
+  'network.cellular_network_type': 'cellular_network_type',
+  'network.connectivity_type': 'data_network_type',
+  locale: 'locale',
+  'os.name': 'os',
+};
+
+let shieldParams = {};
+
+export const setShieldParams = params => {
+  params = _Obj.clone(params);
+
+  /* flatten SDK object, single level */
+  params
+    |> _Obj.loop((value, key) => {
+      if (typeof value === 'object') {
+        flattenProp(params, key, '.');
+      }
+    });
+
+  params
+    |> _Obj.loop((value, key) => {
+      let newKey = sdkToShieldMap[key];
+      if (newKey) {
+        shieldParams[newKey] = value;
+      }
+    });
+};
+
 export const formatPayment = function(payment) {
   var data = payment.data;
 
@@ -55,6 +85,11 @@ export const formatPayment = function(payment) {
   }
 
   data['_[shield][tz]'] = -new Date().getTimezoneOffset();
+
+  shieldParams
+    |> _Obj.loop((value, key) => {
+      data[`_[shield][${key}]`] = value;
+    });
 
   // flatten notes, card
   // notes.abc -> notes[abc]

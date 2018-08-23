@@ -11,7 +11,10 @@ import Callout from 'callout';
 import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
+import emiView from 'checkoutframe/emi';
+import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
+import { setShieldParams } from 'payment/validator';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -32,6 +35,7 @@ export default {
   fetch,
   Track,
   UPIUtils,
+  setShieldParams,
   Tez,
   Color,
   _PaymentMethodIcons,
@@ -57,5 +61,7 @@ export default {
   getCustomer,
   sanitizeTokens,
 
+  emiView,
+  emandateView,
   Curtain,
 };

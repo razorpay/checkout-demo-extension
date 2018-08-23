@@ -866,7 +866,9 @@ window.backPressed = function(callback) {
     session.hideErrorMessage();
   }
 
-  if (
+  if (Confirm.isConfirmShown) {
+    Confirm.hide(true);
+  } else if (
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
@@ -934,7 +936,10 @@ window.handleMessage = function(message) {
   }
 
   if (message.upi_intents_data && message.upi_intents_data.length) {
-    session.upi_intents_data = message.upi_intents_data;
+    session.all_upi_intents_data = message.upi_intents_data;
+    session.upi_intents_data = discreet.UPIUtils.getSortedApps(
+      message.upi_intents_data
+    );
   }
 
   session.sdk_popup = message.sdk_popup;
@@ -973,7 +978,17 @@ window.handleMessage = function(message) {
   try {
     if (isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = noop;
+      CheckoutBridge.sendExtraAnalyticsData = function(e) {
+        discreet.setShieldParams(e);
+      };
+
+      if (iosCheckoutBridgeNew) {
+        iosCheckoutBridgeNew.postMessage({
+          action: 'requestExtraAnalyticsData',
+        });
+      } else if (CheckoutBridge.requestExtraAnalyticsData) {
+        CheckoutBridge.requestExtraAnalyticsData();
+      }
     }
   } catch (e) {}
 };

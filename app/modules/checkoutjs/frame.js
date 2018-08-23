@@ -263,7 +263,7 @@ CheckoutFrame.prototype = {
         eventPairs.orientationchange = merchantMarkup.orientationchange;
 
         if (!this.rzp.get('parent')) {
-          eventPairs.scroll = merchantMarkup.scroll;
+          // eventPairs.scroll = merchantMarkup.scroll;
           eventPairs.resize = merchantMarkup.resize;
         }
       }

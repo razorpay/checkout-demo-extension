@@ -151,8 +151,8 @@ function makeEmiDropdown(emiObj, session, isOption) {
         length +
         '">' +
         length +
-        'month EMI ' +
-        (rate ? '@' + rate + '%' : '') +
+        ' month EMI ' +
+        (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
         Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
         ' per month)</' +
@@ -958,22 +958,16 @@ Session.prototype = {
 
   setWhatsappIcon: function() {
     var intentsData = this.upi_intents_data;
-    var whatsappObj, paytmObj;
+    var whatsappObj;
 
     if (isArray(intentsData)) {
       whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
-      paytmObj = findBy(intentsData, 'package_name', 'net.one97.paytm');
     }
 
     if (whatsappObj) {
       if (!whatsappObj.app_icon) {
         whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
       }
-      whatsappObj.app_name = 'WhatsApp UPI';
-    }
-
-    if (paytmObj) {
-      paytmObj.app_name = 'Paytm UPI';
     }
   },
 
@@ -997,6 +991,8 @@ Session.prototype = {
   },
 
   render: function(options) {
+    var that = this;
+
     options = options || {};
 
     // make true to enable mweb-intent
@@ -1011,21 +1007,33 @@ Session.prototype = {
 
     if (this.upi_intents_data) {
       this.setWhatsappIcon();
+
+      /**
+       * We need to show "(Recommended)" string alongside the app name
+       * when there is only 1 preferred app, and 1 or more other apps.
+       */
+      var count = discreet.UPIUtils.getNumberOfAppsByCategory(
+        this.upi_intents_data
+      );
+
+      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+        this.showRecommendedUPIApp = true;
+      }
     }
 
     this.isOpen = true;
 
     this.setTpvBanks();
 
-    if (
-      preferences.force_offer &&
-      preferences.offers &&
-      preferences.offers.length > 0 &&
-      ['card', 'wallet'].indexOf(preferences.offers[0].payment_method) >= 0
-    ) {
-      var forcedOfferPaymentMethod = preferences.offers[0].payment_method;
+    var hasOffers = isArray(preferences.offers),
+      forcedOffer =
+        hasOffers && preferences.force_offer && preferences.offers[0];
 
-      this[forcedOfferPaymentMethod + 'Offer'] = preferences.offers[0];
+    if (forcedOffer) {
+      if (['card', 'wallet'].indexOf(forcedOffer.payment_method) >= 0) {
+        // need this while preparing the template
+        this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
+      }
     }
 
     this.getEl();
@@ -1040,23 +1048,44 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
-    if (
-      !preferences.force_offer &&
-      isArray(preferences.offers) &&
-      preferences.offers.length > 0
-    ) {
-      // TODO: convert args to kwargs
-      this.offers = initOffers(
-        document.querySelector('#offers-container'),
-        preferences.offers || [],
-        {},
-        this.handleOfferSelection.bind(this),
-        this.handleOfferRemoval.bind(this),
-        this.formatAmountWithCurrency.bind(this),
-        $('#body')[0]
-      );
+    if (forcedOffer) {
+      if (
+        'original_amount' in forcedOffer &&
+        'amount' in forcedOffer &&
+        forcedOffer.amount !== forcedOffer.original_amount
+      ) {
+        this.forcedDiscountOffer = forcedOffer;
+        this.showDiscount(forcedOffer);
+      }
+    } else if (hasOffers) {
+      var eligibleOffers = preferences.offers.filter(function(offer) {
+        var method = offer.payment_method,
+          enabledMethods = that.methods,
+          isMethodEnabled =
+            method !== 'wallet'
+              ? enabledMethods[method]
+              : isArray(enabledMethods.wallet) &&
+                enabledMethods.wallet.filter(function(item) {
+                  return item.name === offer.issuer;
+                })[0];
 
-      this.renderOffers(this.screen);
+        return isMethodEnabled;
+      });
+
+      if (eligibleOffers.length > 0) {
+        // TODO: convert args to kwargs
+        this.offers = initOffers(
+          document.querySelector('#offers-container'),
+          eligibleOffers,
+          {},
+          this.handleOfferSelection.bind(this),
+          this.handleOfferRemoval.bind(this),
+          this.formatAmountWithCurrency.bind(this),
+          $('#body')[0]
+        );
+
+        this.renderOffers(this.screen);
+      }
     }
 
     if (!this.tab && !this.get('prefill.contact')) {
@@ -1088,6 +1117,11 @@ Session.prototype = {
         target: gel('card_number'),
         isPrefilled: true,
       });
+    }
+
+    // Look for new UPI apps.
+    if (this.all_upi_intents_data) {
+      discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
     }
   },
 
@@ -1128,13 +1162,13 @@ Session.prototype = {
   setEMI: function() {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
-      this.emi = new emiView(this);
+      this.emi = new discreet.emiView(this);
     }
   },
 
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
-      this.emandateView = new emandateView(this);
+      this.emandateView = new discreet.emandateView(this);
     }
   },
 
@@ -1440,6 +1474,80 @@ Session.prototype = {
     $(this.el).addClass('show-methods');
   },
 
+  /**
+   * Asks for second factor of confirmation for UPI intent.
+   */
+  askUPI2FPermission: function(packageName) {
+    var self = this;
+    var app = discreet.UPIUtils.getAppByPackageName(packageName);
+    var UPISecondFactorConsent = {};
+
+    try {
+      UPISecondFactorConsent = JSON.parse(
+        StorageBridge.getString('rzp_upi_2f_consent')
+      );
+    } catch (readErr) {}
+
+    var hide = function() {
+      var checked = $('#upi-apps input:checked');
+
+      if (checked[0]) {
+        checked[0].checked = false;
+      }
+
+      self.track('upi_2f_consent', {
+        package_name: packageName,
+        consent: false,
+      });
+
+      $('#body').toggleClass('sub', false);
+    };
+
+    this.track('upi_2f_shown', {
+      package_name: packageName,
+    });
+
+    Confirm.show({
+      position: 'middle',
+      message:
+        'To make a UPI payment, you need to have a UPI ID linked to your bank account.',
+      heading:
+        'Are you registered for UPI on ' +
+        (app.name || app.app_name || 'this app') +
+        '?',
+      layout: 'rtl',
+      positiveBtnTxt: 'Yes, Proceed',
+      negativeBtnTxt: 'No, Go Back',
+      onHide: hide,
+      onNegativeClick: hide,
+      onPositiveClick: function() {
+        UPISecondFactorConsent[packageName] = true;
+        self.shouldAskUPI2FPermission = false;
+
+        try {
+          StorageBridge.setString(
+            'rzp_upi_2f_consent',
+            JSON.stringify(UPISecondFactorConsent)
+          );
+        } catch (saveErr) {}
+
+        self.track('upi_2f_consent', {
+          package_name: packageName,
+          consent: true,
+        });
+
+        // Show overlay manually because it gets hidden.
+        var $overlay = $('#overlay');
+        setTimeout(function() {
+          $overlay.css('display', 'block');
+          $overlay.addClass(shownClass);
+        }, 300);
+
+        self.preSubmit.call(self);
+      },
+    });
+  },
+
   bindEvents: function() {
     var self = this;
     var emi_options = this.emi_options;
@@ -1645,7 +1753,34 @@ Session.prototype = {
       });
 
       this.on('change', '#form-upi', function(e) {
+        var packageName = e.target.value;
+        var UPISecondFactorConsent = {};
+
+        try {
+          UPISecondFactorConsent = JSON.parse(
+            StorageBridge.getString('rzp_upi_2f_consent')
+          );
+        } catch (readErr) {}
+
+        if (
+          discreet.UPIUtils.isSecondFactorApp(packageName) &&
+          !UPISecondFactorConsent[packageName]
+        ) {
+          self.shouldAskUPI2FPermission = true;
+        } else {
+          self.shouldAskUPI2FPermission = false;
+        }
+
         $('#body').toggleClass('sub', e.target.value);
+
+        self.track('upi_app_selected', {
+          package_name: packageName,
+          showRecommended: Boolean(self.showRecommendedUPIApp),
+          recommended: Boolean(
+            self.showRecommendedUPIApp &&
+              discreet.UPIUtils.isPreferredApp(packageName)
+          ),
+        });
       });
     }
 
@@ -1934,6 +2069,7 @@ Session.prototype = {
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
+      this.handleOfferRemoval();
     }
 
     this.screen = screen;
@@ -2851,6 +2987,10 @@ Session.prototype = {
 
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
+      if (this.shouldAskUPI2FPermission) {
+        this.askUPI2FPermission(data.upi_app);
+        return;
+      }
       data['_[flow]'] = 'intent';
     }
 
@@ -2859,9 +2999,12 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (this.offers && this.offers.appliedOffer) {
-      data.offer_id = this.offers.appliedOffer.id;
-      this.r.display_amount = this.offers.appliedOffer.amount;
+    var appliedOffer =
+      this.forcedDiscountOffer || (this.offers && this.offers.appliedOffer);
+
+    if (appliedOffer) {
+      data.offer_id = appliedOffer.id;
+      this.r.display_amount = appliedOffer.amount;
     } else {
       delete this.r.display_amount;
     }

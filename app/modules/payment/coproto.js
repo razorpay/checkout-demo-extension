@@ -114,6 +114,20 @@ var responseTypes = {
           this.checkRedirect();
         }
       });
+    } else {
+      if (this.sdk_popup) {
+        return global.CheckoutBridge.invokePopup(
+          _Obj.stringify({
+            focus: true,
+            magic: false,
+            otpelf: true,
+            url: `javascript: submitForm('${request.url}', ${_Obj.stringify(
+              request.content
+            )}, '${request.method}')`,
+          })
+        );
+      }
+      this.checkRedirect();
     }
   },
 
@@ -226,7 +240,10 @@ var responseTypes = {
     }
   },
 
-  otp: function(request) {
+  otp: function(request, fullResponse) {
+    if (request.method === 'direct') {
+      return responseTypes.first.call(this, request, responseTypes);
+    }
     this.otpurl = request.url;
     this.emit('otp.required');
   },

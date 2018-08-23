@@ -41,7 +41,7 @@ export function submitForm(action, data, method, target) {
     }
   } else {
     let attr = { action, method };
-    if (action) {
+    if (target) {
       attr.target = target;
     }
     _El.create('form')
