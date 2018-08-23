@@ -3,6 +3,8 @@ var bank_account = _.prefill.bank_account,
     bank_name = _.prefill.bank_name,
     bank_ifsc = _.prefill.bank_ifsc,
     aadhaar = _.prefill.aadhaar,
+    auth_mode = _.prefill.auth_mode,
+    account_type = _.prefill.account_type,
     ifsc_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$',
     bank = _.prefill.bank;
 `
@@ -77,6 +79,12 @@ var bank_account = _.prefill.bank_account,
         <label>Aadhaar Virtual ID</label>
         <input class="input" name="aadhaar[vid]" type="text" id="adhr-acc-aadhaar" value="`=aadhaar`" readonly required pattern="^[0-9 ]{19}$" maxlength="19" spellcheck="false" autocorrect="off" autocapitalize="off">
       </div>
+    `?`
+    `?auth_mode`
+      <input name="auth_mode" type="hidden" value="`=auth_mode`" />
+    `?`
+    `?account_type`
+      <input name="auth_mode" type="hidden" value="`=account_type`" />
     `?`
   </div>
   </div>

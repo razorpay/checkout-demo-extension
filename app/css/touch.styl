@@ -37,6 +37,32 @@ $mobile-view() {
         position: fixed;
       }
     }
+
+    &.has-offers {
+
+      #offers-container {
+
+        bottom: 0;
+      }
+
+      &.sub {
+
+        #offers-container {
+        
+          bottom: $footerh - $topbarh;
+        }
+      }
+
+      .offers-list-container {
+
+        height: $bodyhmobile + $footerh;
+      }
+
+      .offers-error {
+
+        height: $bodyhmobile + $footerh;
+      }
+    }
   }
 
   #overlay,

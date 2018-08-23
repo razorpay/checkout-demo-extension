@@ -90,7 +90,7 @@ color: `=c`;
   color: `=highlightColor`;
 }
 
-#topbar, #partial-back {
+#topbar, #partial-back, #offers-container .offers-content {
   background-color: `=secondaryHighlightColor` !important;
 }
 
@@ -118,9 +118,12 @@ color: `=c`;
   border-color: `=highlightColor`;
 }
 
-.mobile:not(.ip) #body[screen="wallet"],
-.mobile:not(.ip) #body[screen="upi"] {
-  height: `=bodyHeight`px;
+.mobile #body, .mobile #body .offers-list-container {
+  height: `=bodyHeight`px !important;
+}
+
+.mobile #body .offers-list-container {
+  top: 0;
 }
 
 .input-radio input[type=radio]:focus:not(:checked) + label .radio-display {
@@ -147,4 +150,24 @@ color: `=c`;
 
 .copytoclipboard--container.copied .copytoclipboard--btn {
   color: `=c`;
+}
+
+.offers-list-title:after, .offers-title .toggle:after {
+
+  color: `=highlightColor`;
+}
+
+ul.offers-list > li.offer.selected, ul.offers-list > li.offer.selected .checkbox {
+
+  border-color: `=highlightColor` !important;
+}
+
+ul.offers-list > li.offer.selected .checkbox {
+
+  background-color: `=highlightColor`;
+} 
+
+svg.offer-icon path {
+
+  fill: `=highlightColor`;
 }
