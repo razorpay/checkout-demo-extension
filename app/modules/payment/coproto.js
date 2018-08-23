@@ -24,6 +24,10 @@ export const processPaymentCreate = function(response) {
   payment.payment_id = response.payment_id;
   payment.magicCoproto = response.magic || false;
 
+  if (r.get('key') !== 'rzp_live_ChO9QOhE7BH1aD' && payment.magicCoproto) {
+    payment.isMagicPayment = payment.isMagicPayment && Math.random() < 0.5;
+  }
+
   Track(r, 'ajax_response', response);
 
   var popup = payment.popup;
@@ -111,6 +115,18 @@ var responseTypes = {
         }
       });
     } else {
+      if (this.sdk_popup) {
+        return global.CheckoutBridge.invokePopup(
+          _Obj.stringify({
+            focus: true,
+            magic: false,
+            otpelf: true,
+            url: `javascript: submitForm('${request.url}', ${_Obj.stringify(
+              request.content
+            )}, '${request.method}')`,
+          })
+        );
+      }
       this.checkRedirect();
     }
   },
