@@ -15,12 +15,12 @@ export const RazorpayDefaults = {
   redirect: false,
   description: '',
   customer_id: '',
-  recurring: false,
+  recurring: null,
   preferred_recurring: false,
   signature: '',
   retry: true,
   target: '',
-  subscription_card_change: false,
+  subscription_card_change: null,
   display_currency: '',
   display_amount: '',
   recurring_token: {
@@ -39,9 +39,9 @@ function base_set(flatObj, defObj, objKey, objVal) {
     objVal = Number(objVal);
   } else if (defaultType === 'boolean') {
     if (_.isString(objVal)) {
-      if (objVal === 'true') {
+      if (objVal === 'true' || objVal === '1') {
         objVal = true;
-      } else if (objVal === 'false') {
+      } else if (objVal === 'false' || objVal === '0') {
         objVal = false;
       }
     } else if (_.isNumber(objVal)) {
