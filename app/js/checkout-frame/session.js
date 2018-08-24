@@ -951,29 +951,6 @@ Session.prototype = {
     );
   },
 
-  setResizeHandler: function() {
-    /*
-     * This is a temporary solution to the body height problem,
-     * it's hacky and bad.
-     * TODO: remove it while revamp
-     */
-
-    if ($(this.el).hasClass('mobile')) {
-      var resize = discreet.debounce(function() {
-        each(
-          $$('.mobile #body, .mobile #body .offers-list-container'),
-          function(i, elem) {
-            var bodyHeight = window.innerHeight - $('#header').height() - 1;
-            $(elem).css('height', bodyHeight + 'px');
-          }
-        );
-      }, 300);
-
-      this.resizeHandler = $(window).on('resize', resize);
-      resize();
-    }
-  },
-
   render: function(options) {
     var that = this;
 
@@ -1030,7 +1007,6 @@ Session.prototype = {
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
-    this.setResizeHandler();
     errorHandler.call(this, this.params);
 
     if (forcedOffer) {
@@ -3166,10 +3142,6 @@ Session.prototype = {
     if (this.prefCall) {
       this.prefCall.abort();
       this.prefCall = null;
-    }
-
-    if (this.resizeHandler) {
-      this.resizeHandler();
     }
 
     if (this.isOpen) {
