@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
+var isIE = /MSIE |Trident\//.test(ua);
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -682,6 +683,10 @@ Session.prototype = {
 
     if (this.emandate) {
       classes.push('emandate');
+    }
+
+    if (isIE) {
+      classes.push('noanim');
     }
 
     return classes.join(' ');
