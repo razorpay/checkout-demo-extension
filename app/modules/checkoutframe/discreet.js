@@ -22,7 +22,6 @@ export default {
   makePrefParams,
   fetch,
   Track,
-  debounce: _Func.debounce,
   UPIUtils,
   setShieldParams,
   Tez,
