@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
+var AmazonpayBridge = window.AmazonpayBridge;
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -2980,6 +2981,14 @@ Session.prototype = {
 
       if (!walletObj || walletObj.custom) {
         return;
+      }
+
+      /* invoke amazonpay sdk via our SDK */
+      if (this.hasAmazopaySdk && wallet === 'amazonpay') {
+        if (AmazonpayBridge && AmazonpayBridge.processPayment) {
+          this.showLoadError();
+          return AmazonpayBridge.processPayment(JSON.stringify(this.payload));
+        }
       }
     }
 

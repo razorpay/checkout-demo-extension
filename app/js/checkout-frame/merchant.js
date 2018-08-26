@@ -942,6 +942,10 @@ window.handleMessage = function(message) {
     );
   }
 
+  if (isNonNullObject(message.sdk_methods)) {
+    session.hasAmazopaySdk = message.sdk_methods;
+  }
+
   session.sdk_popup = message.sdk_popup;
 
   session.magic = message.magic;
