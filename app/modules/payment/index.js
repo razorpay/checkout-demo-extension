@@ -20,7 +20,6 @@ import Razorpay, {
   makeUrl,
 } from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
-import * as Tez from 'tez';
 
 const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
 const RAZORPAY_COLOR = '#528FF0';
@@ -542,29 +541,4 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
       callback(flowCache.card[iin]);
     },
   });
-};
-
-/**
- * Method to check if an on-device payment method exists.
- * @param {String} method
- * @param {Function} successCallback
- * @param {Function} errorCallback
- */
-razorpayProto.checkForOnDevicePaymentMethod = function(
-  method = '',
-  successCallback = _Func.noop,
-  errorCallback = _Func.noop
-) {
-  method = method.toLowerCase();
-
-  switch (method) {
-    case 'tez': {
-      Tez.check(successCallback, errorCallback);
-      break;
-    }
-
-    default: {
-      errorCallback();
-    }
-  }
 };
