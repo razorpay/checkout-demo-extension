@@ -46,7 +46,8 @@ var activeStateColor = themeMeta.activeStateColor;
   display: inline-block;
   height: 0.75em;
   vertical-align: top;
-  max-width: 26px;
+  /* take care with max-width in IE11 */
+  max-width: 38px;
 }
 
 #header{
