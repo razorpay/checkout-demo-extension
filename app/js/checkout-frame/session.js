@@ -2095,6 +2095,7 @@ Session.prototype = {
     // reset offers UI
     if (this.offers.appliedOffer || this.offers.selectedOffer) {
       this.offers.removeOffer();
+      this.handleOfferRemoval();
     }
 
     this.offers.applyFilter((screen && { payment_method: screen }) || {});
