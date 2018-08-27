@@ -276,9 +276,7 @@ function initOffers(
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;
   $applyOffer.onclick = function() {
     var isOfferApplied = offers.applyOffer();
-
     toggleOfferList();
-
     return isOfferApplied && onApplyOffer && onApplyOffer(appliedOffer);
   };
   $offersErrorCancel.onclick = hideOfferError;
@@ -296,6 +294,7 @@ function initOffers(
       onOfferRemoval: function() {
         offers.removeOffer();
         toggleOfferList();
+        return onRemoveOffer && onRemoveOffer();
       },
       formatAmount: formatAmount,
     });
