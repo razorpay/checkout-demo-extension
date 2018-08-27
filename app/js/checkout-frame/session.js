@@ -131,8 +131,8 @@ function makeEmiDropdown(emiObj, session, isOption) {
         length +
         '">' +
         length +
-        'month EMI ' +
-        (rate ? '@' + rate + '%' : '') +
+        ' month EMI ' +
+        (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
         Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
         ' per month)</' +
@@ -986,15 +986,15 @@ Session.prototype = {
 
     this.setTpvBanks();
 
-    if (
-      preferences.force_offer &&
-      preferences.offers &&
-      preferences.offers.length > 0 &&
-      ['card', 'wallet'].indexOf(preferences.offers[0].payment_method) >= 0
-    ) {
-      var forcedOfferPaymentMethod = preferences.offers[0].payment_method;
+    var hasOffers = isArray(preferences.offers),
+      forcedOffer =
+        hasOffers && preferences.force_offer && preferences.offers[0];
 
-      this[forcedOfferPaymentMethod + 'Offer'] = preferences.offers[0];
+    if (forcedOffer) {
+      if (['card', 'wallet'].indexOf(forcedOffer.payment_method) >= 0) {
+        // need this while preparing the template
+        this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
+      }
     }
 
     this.getEl();
@@ -1009,7 +1009,16 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
-    if (!preferences.force_offer && isArray(preferences.offers)) {
+    if (forcedOffer) {
+      if (
+        'original_amount' in forcedOffer &&
+        'amount' in forcedOffer &&
+        forcedOffer.amount !== forcedOffer.original_amount
+      ) {
+        this.forcedDiscountOffer = forcedOffer;
+        this.showDiscount(forcedOffer);
+      }
+    } else if (hasOffers) {
       var eligibleOffers = preferences.offers.filter(function(offer) {
         var method = offer.payment_method,
           enabledMethods = that.methods,
@@ -1114,7 +1123,7 @@ Session.prototype = {
   setEMI: function() {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
-      this.emi = new emiView(this);
+      this.emi = new discreet.emiView(this);
     }
   },
 
@@ -2949,9 +2958,12 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (this.offers && this.offers.appliedOffer) {
-      data.offer_id = this.offers.appliedOffer.id;
-      this.r.display_amount = this.offers.appliedOffer.amount;
+    var appliedOffer =
+      this.forcedDiscountOffer || (this.offers && this.offers.appliedOffer);
+
+    if (appliedOffer) {
+      data.offer_id = appliedOffer.id;
+      this.r.display_amount = appliedOffer.amount;
     } else {
       delete this.r.display_amount;
     }

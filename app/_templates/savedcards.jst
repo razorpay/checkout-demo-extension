@@ -48,7 +48,7 @@
             <select class="input" name="emi_duration" `?emiMode`required`?`>
               <option selected value="" >Select EMI Plan</option>
               `~plans.plans:dur:rate`
-              <option value='`=dur`'>`=dur` month EMI @`=rate`% ( ₹`=Razorpay.emi.calculator(_.amount, dur, rate)/100` per month )</option>
+              <option value='`=dur`'>`=dur` month EMI @ `=rate`% ( ₹`=Razorpay.emi.calculator(_.amount, dur, rate)/100` per month )</option>
               `~`
             </select>
           </div></div>

@@ -46,6 +46,7 @@ var activeStateColor = themeMeta.activeStateColor;
   display: inline-block;
   height: 0.75em;
   vertical-align: top;
+  max-width: 26px;
 }
 
 #header{
@@ -118,10 +119,6 @@ color: `=c`;
   border-color: `=highlightColor`;
 }
 
-.mobile #body, .mobile #body .offers-list-container {
-  height: `=bodyHeight`px !important;
-}
-
 .mobile #body .offers-list-container {
   top: 0;
 }
@@ -165,7 +162,7 @@ ul.offers-list > li.offer.selected, ul.offers-list > li.offer.selected .checkbox
 ul.offers-list > li.offer.selected .checkbox {
 
   background-color: `=highlightColor`;
-} 
+}
 
 svg.offer-icon path {
 
