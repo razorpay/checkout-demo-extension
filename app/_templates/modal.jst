@@ -618,15 +618,6 @@ var upi_apps = _.upi_intents_data;
                             <span class="checkbox"></span>
                           </label>
                         </div>
-                        <div id="upi-tez" class="item" checked>
-                          <input id="radio-tez" type="radio" name="_[flow]" value="tez"/>
-                          <label for="radio-tez">
-                            <i class="tez-icon"></i>
-                            <div class="title">Google Tez</div>
-                            <div class="subtitle">Installed on your device</div>
-                            <span class="checkbox"></span>
-                          </label>
-                        </div>
                         `?`
                         <div id="upi-directpay" class="item">
                           <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `? (!upi_intent && !_.isMobileBrowser)`checked`?`/>
@@ -641,6 +632,15 @@ var upi_apps = _.upi_intents_data;
                             `?_.isMobileBrowser`
                             <span class="checkbox"></span>
                             `?`
+                          </label>
+                        </div>
+                        <div id="upi-tez" class="item" checked>
+                          <input id="radio-tez" type="radio" name="_[flow]" value="tez"/>
+                          <label for="radio-tez">
+                            <i class="tez-icon"></i>
+                            <div class="title">Google Tez</div>
+                            <div class="subtitle">Installed on your device</div>
+                            <span class="checkbox"></span>
                           </label>
                         </div>
                       </div>

@@ -938,20 +938,30 @@ Session.prototype = {
   },
 
   checkTez: function() {
-    if (!this.isMobileBrowser) {
+    var self = this;
+
+    /**
+     * Tez exists only on Android, and outside of WebViews.
+     *
+     * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
+     */
+    if (window.CheckoutBridge || !discreet.androidBrowser) {
       return;
     }
 
-    var self = this;
+    if (!Tez.checkKey(self.get('key'))) {
+      return;
+    }
 
     Tez.check(
       function() {
         /* This is success callback */
         $('#upi-tez').css('display', 'block');
+        self.track('tez_visible');
       },
       function(e) {
         /* This is error callback */
-        self.track('tez_error', e);
+        // self.track('tez_error', e);
       }
     );
   },
@@ -960,11 +970,6 @@ Session.prototype = {
     var that = this;
 
     options = options || {};
-
-    // make true to enable mweb-intent
-
-    this.isMobileBrowser =
-      ua_android_browser && this.get('key') === 'rzp_live_izcpsDPjM13eLY';
 
     if (options.forceRender) {
       this.forceRender = true;
