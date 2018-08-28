@@ -87,7 +87,10 @@ export const formatPayment = function(payment) {
 
   if (payment.tez) {
     if (!payment.r.tezPossible) {
-      payment.r.emit('payment.error', _.rzpError('Tez is not available'));
+      return payment.r.emit(
+        'payment.error',
+        _.rzpError('Tez is not available')
+      );
     }
     data['_[flow]'] = 'intent';
   }
