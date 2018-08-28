@@ -99,6 +99,8 @@ export default function Payment(data, params, r) {
 
   this.magicPossible = this.isMagicPayment;
 
+  this.isAmazonpayPayment = params.amazonpay;
+
   this.isDebitPin =
     data &&
     data.auth_type &&
@@ -202,6 +204,12 @@ Payment.prototype = {
   generate: function(data) {
     this.data = _Obj.clone(data || this.data);
     formatPayment(this);
+
+    if (this.isAmazonpayPayment) {
+      return _Func.debounce(() => {
+        this.emit('amazonpay.process', this.data);
+      })();
+    }
 
     if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
       this.r.set('redirect', true);

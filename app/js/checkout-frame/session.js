@@ -5,7 +5,6 @@ var ua = navigator.userAgent;
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
-var PaymentBridge = window.PaymentBridge;
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -2983,12 +2982,8 @@ Session.prototype = {
         return;
       }
 
-      /* invoke amazonpay sdk via our SDK */
       if (this.hasAmazopaySdk && wallet === 'amazonpay') {
-        if (PaymentBridge && PaymentBridge.processPayment) {
-          this.showLoadError();
-          return PaymentBridge.processPayment(JSON.stringify(this.payload));
-        }
+        request.amazonpay = true;
       }
     }
 
@@ -3056,6 +3051,16 @@ Session.prototype = {
         });
       }
     });
+
+    if (request.amazonpay) {
+      payment.on('payment.amazonpay.process', function(data) {
+        /* invoke amazonpay sdk via our SDK */
+        if (CheckoutBridge && CheckoutBridge.processPayment) {
+          that.showLoadError();
+          CheckoutBridge.processPayment(JSON.stringify(data));
+        }
+      });
+    }
 
     if (request.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
