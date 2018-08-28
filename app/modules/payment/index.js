@@ -422,7 +422,12 @@ var razorpayProto = Razorpay.prototype;
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
-razorpayProto.isTezAvailable = Tez.check;
+razorpayProto.isTezAvailable = function(success, error) {
+  Tez.check(() => {
+    this.tezPossible = true;
+    success();
+  }, error);
+};
 
 razorpayProto.postInit = function() {
   var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
