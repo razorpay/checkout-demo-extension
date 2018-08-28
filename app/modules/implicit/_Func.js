@@ -49,7 +49,9 @@ export const debounce = (func, wait) => {
     } else {
       timerId = null;
       result = func.apply(context, args);
-      if (!timerId) context = args = null;
+      if (!timerId) {
+        context = args = null;
+      }
     }
   };
 
@@ -57,7 +59,9 @@ export const debounce = (func, wait) => {
     context = this;
     args = arguments;
     timerFn = _.timer();
-    if (!timerId) timerId = _.timeout(later, wait);
+    if (!timerId) {
+      timerId = _.timeout(later, wait);
+    }
     return result;
   };
 };
