@@ -85,6 +85,10 @@ export const formatPayment = function(payment) {
     data['_[source]'] = 'checkoutjs';
   }
 
+  if (payment.tez) {
+    data['_[flow]'] = 'intent';
+  }
+
   let fingerprint = getFingerprint();
   if (fingerprint) {
     data['_[shield][fhash]'] = fingerprint;
