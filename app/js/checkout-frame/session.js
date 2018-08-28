@@ -2040,7 +2040,6 @@ Session.prototype = {
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
-      this.handleOfferRemoval();
     }
 
     this.screen = screen;
@@ -2095,12 +2094,16 @@ Session.prototype = {
     // reset offers UI
     if (this.offers.appliedOffer || this.offers.selectedOffer) {
       this.offers.removeOffer();
+      // Explicitly call this because we removed the offer explicitly
+      this.handleOfferRemoval();
     }
 
     this.offers.applyFilter((screen && { payment_method: screen }) || {});
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
+      // Explicitly call this because we selected the offer explicitly
+      this.handleOfferSelection(this.preSelectedOffer, screen);
       this.offers.applyOffer();
       this.preSelectedOffer = null;
     }
