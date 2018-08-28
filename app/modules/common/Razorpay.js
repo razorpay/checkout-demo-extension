@@ -2,7 +2,6 @@ import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
 import { displayCurrencies } from 'common/currency';
-import * as Tez from 'tez';
 
 export const RazorpayConfig = {
   api: 'https://api.razorpay.com/',
@@ -292,13 +291,6 @@ Razorpay.configure = function(overrides) {
     }
   });
 };
-
-/**
- * Method to check if an Tez is installed on Device
- * @param {Function} successCallback
- * @param {Function} errorCallback
- */
-Razorpay.isTezAvailable = Tez.check;
 
 Razorpay.defaults = RazorpayDefaults;
 global.Razorpay = Razorpay;

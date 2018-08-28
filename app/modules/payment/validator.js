@@ -85,6 +85,16 @@ export const formatPayment = function(payment) {
     data['_[source]'] = 'checkoutjs';
   }
 
+  if (payment.tez) {
+    if (!payment.r.tezPossible) {
+      return payment.r.emit(
+        'payment.error',
+        _.rzpError('Tez is not available')
+      );
+    }
+    data['_[flow]'] = 'intent';
+  }
+
   let fingerprint = getFingerprint();
   if (fingerprint) {
     data['_[shield][fhash]'] = fingerprint;
