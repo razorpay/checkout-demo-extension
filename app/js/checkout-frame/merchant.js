@@ -543,6 +543,7 @@ function fetchPrefsAndShowModal(session) {
       });
     }
     preferences = response;
+    session.r.set('preferences', preferences);
     showModal(session);
   });
 }
