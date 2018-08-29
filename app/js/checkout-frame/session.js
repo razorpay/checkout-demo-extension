@@ -1589,7 +1589,9 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.click('.payment-option', function(e) {
-      this.switchTab(e.currentTarget.getAttribute('tab') || '');
+      if (!$(e.currentTarget).hasClass('disabled')) {
+        this.switchTab(e.currentTarget.getAttribute('tab') || '');
+      }
     });
     this.on('submit', '#form', this.preSubmit);
     this.click('#otp-action', this.back);
