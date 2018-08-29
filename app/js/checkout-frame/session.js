@@ -25,6 +25,7 @@ var preferences = window.preferences,
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
+var isIE = /MSIE |Trident\//.test(ua);
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -721,6 +722,10 @@ Session.prototype = {
       classes.push('emandate');
     }
 
+    if (isIE) {
+      classes.push('noanim');
+    }
+
     return classes.join(' ');
   },
 
@@ -972,20 +977,30 @@ Session.prototype = {
   },
 
   checkTez: function() {
-    if (!this.isMobileBrowser) {
+    var self = this;
+
+    /**
+     * Tez exists only on Android, and outside of WebViews.
+     *
+     * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
+     */
+    if (window.CheckoutBridge || !discreet.androidBrowser) {
       return;
     }
 
-    var self = this;
+    if (!Tez.checkKey(self.get('key'))) {
+      return;
+    }
 
     Tez.check(
       function() {
         /* This is success callback */
         $('#upi-tez').css('display', 'block');
+        self.track('tez_visible');
       },
       function(e) {
         /* This is error callback */
-        self.track('tez_error', e);
+        // self.track('tez_error', e);
       }
     );
   },
@@ -994,11 +1009,6 @@ Session.prototype = {
     var that = this;
 
     options = options || {};
-
-    // make true to enable mweb-intent
-
-    this.isMobileBrowser =
-      ua_android_browser && this.get('key') === 'rzp_live_izcpsDPjM13eLY';
 
     if (options.forceRender) {
       this.forceRender = true;
@@ -1618,7 +1628,9 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.click('.payment-option', function(e) {
-      this.switchTab(e.currentTarget.getAttribute('tab') || '');
+      if (!$(e.currentTarget).hasClass('disabled')) {
+        this.switchTab(e.currentTarget.getAttribute('tab') || '');
+      }
     });
     this.on('submit', '#form', this.preSubmit);
     this.click('#otp-action', this.back);
@@ -2069,7 +2081,6 @@ Session.prototype = {
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
-      this.handleOfferRemoval();
     }
 
     this.screen = screen;
@@ -2124,12 +2135,16 @@ Session.prototype = {
     // reset offers UI
     if (this.offers.appliedOffer || this.offers.selectedOffer) {
       this.offers.removeOffer();
+      // Explicitly call this because we removed the offer explicitly
+      this.handleOfferRemoval();
     }
 
     this.offers.applyFilter((screen && { payment_method: screen }) || {});
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
+      // Explicitly call this because we selected the offer explicitly
+      this.handleOfferSelection(this.preSelectedOffer, screen);
       this.offers.applyOffer();
       this.preSelectedOffer = null;
     }

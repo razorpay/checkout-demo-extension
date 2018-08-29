@@ -31,6 +31,8 @@ $mobile-view() {
 
   #body {
     height: $bodyhmobile;
+    height: calc(100% - 129px);
+    height: calc(100vh - 129px);
     min-height: $bodyhmobile;
     &.emi-focus {
       #footer {
@@ -48,14 +50,14 @@ $mobile-view() {
       &.sub {
 
         #offers-container {
-        
           bottom: $footerh - $topbarh;
         }
       }
 
       .offers-list-container {
-
         height: $bodyhmobile + $footerh;
+        height: calc(100% - 129px + $footerh);
+        height: calc(100vh - 129px + $footerh);
       }
 
       .offers-error {
@@ -204,6 +206,7 @@ $mobile-view() {
 .noanim {
   * {
     transition: none !important;
+    animation: none !important;
   }
 }
 

@@ -157,6 +157,18 @@ emandateView.prototype = {
       authTypes = this.session.emandateBanks[bankCode].auth_types;
     }
 
+    /**
+     * Netbanking is allowed only if
+     * 1. netbanking is an auth type, AND
+     * 2. auth_mode and account_type are NOT set in prefill
+     */
+    if (
+      authTypes.indexOf('netbanking') > -1 &&
+      (this.prefill.auth_mode || this.prefill.account_type)
+    ) {
+      authTypes.splice(authTypes.indexOf('netbanking'), 1);
+    }
+
     return authTypes;
   },
 

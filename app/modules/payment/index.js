@@ -21,6 +21,8 @@ import Razorpay, {
 } from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
 
+import * as Tez from 'tez';
+
 const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -126,6 +128,7 @@ export default function Payment(data, params, r) {
   this.tez = params.tez;
 
   this.powerwallet =
+    params.tez ||
     params.powerwallet ||
     (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
   this.message = params.message;
@@ -310,7 +313,7 @@ Payment.prototype = {
       return;
     }
 
-    if (!isRazorpayFrame && data.method === 'upi') {
+    if (!this.powerwallet && !isRazorpayFrame && data.method === 'upi') {
       return;
     }
 
@@ -413,6 +416,18 @@ function makeRedirectUrl(fees) {
 Razorpay.setFormatter = FormatDelegator;
 
 var razorpayProto = Razorpay.prototype;
+
+/**
+ * Method to check if an Tez is installed on Device
+ * @param {Function} successCallback
+ * @param {Function} errorCallback
+ */
+razorpayProto.isTezAvailable = function(success, error) {
+  Tez.check(() => {
+    this.tezPossible = true;
+    success();
+  }, error);
+};
 
 razorpayProto.postInit = function() {
   var themeColor = this.get('theme.color') || RAZORPAY_COLOR;

@@ -55,6 +55,7 @@ export const formatPayment = function(payment) {
       'payment_link_id',
       'customer_id',
       'recurring',
+      'preferred_recurring',
       'subscription_card_change',
       'recurring_token.max_amount',
       'recurring_token.expire_by',
@@ -63,6 +64,11 @@ export const formatPayment = function(payment) {
       if (!(field in data)) {
         var val = getOption(field);
         if (val) {
+          // send boolean value true as 1
+          // 0 wouldn't react this line
+          if (_.isBoolean(val)) {
+            val = 1;
+          }
           data[field.replace(/\.(\w+)/g, '[$1]')] = val;
         }
       }
@@ -77,6 +83,16 @@ export const formatPayment = function(payment) {
   // api needs this flag to decide between redirect/otp
   if (payment.powerwallet && data.method === 'wallet') {
     data['_[source]'] = 'checkoutjs';
+  }
+
+  if (payment.tez) {
+    if (!payment.r.tezPossible) {
+      return payment.r.emit(
+        'payment.error',
+        _.rzpError('Tez is not available')
+      );
+    }
+    data['_[flow]'] = 'intent';
   }
 
   let fingerprint = getFingerprint();
