@@ -175,7 +175,12 @@ function setNotes(options) {
 }
 
 RazorProto.isLiveMode = function() {
-  return /^rzp_l/.test(this.get('key'));
+  var preferences = window.preferences;
+
+  return (
+    (!preferences && /^rzp_l/.test(this.get('key'))) ||
+    (preferences && preferences.mode === 'live')
+  );
 };
 
 function isValidAmount(amt) {

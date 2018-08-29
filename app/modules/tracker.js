@@ -77,15 +77,9 @@ function getCommonTrackingData(r) {
 }
 
 export default function Track(r, event, data) {
-  var preferences = window.preferences;
-
-  if (
-    (!preferences && !r.isLiveMode()) ||
-    (preferences && preferences.mode !== 'live')
-  ) {
+  if (!r.isLiveMode()) {
     return;
   }
-
   // defer makes tracking async
   setTimeout(function() {
     // convert error to plain object
