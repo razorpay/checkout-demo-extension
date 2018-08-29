@@ -80,7 +80,8 @@ function initOffers(
   onApplyOffer,
   onRemoveOffer,
   formatAmount,
-  $root
+  $root,
+  track
 ) {
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
@@ -277,10 +278,15 @@ function initOffers(
   $applyOffer.onclick = function() {
     var isOfferApplied = offers.applyOffer();
     toggleOfferList();
+    track('offer_applied', appliedOffer.data);
     return isOfferApplied && onApplyOffer && onApplyOffer(appliedOffer);
   };
-  $offersErrorCancel.onclick = hideOfferError;
+  $offersErrorCancel.onclick = function() {
+    track('offer_retry', appliedOffer.data);
+    hideOfferError();
+  };
   $offersErrorPay.onclick = function() {
+    track('offer_removed_from_retry_screen', appliedOffer.data);
     offers.removeOffer();
     hideOfferError();
     return onRemoveOffer && onRemoveOffer();
@@ -292,6 +298,7 @@ function initOffers(
         offers.selectOffer(offer);
       },
       onOfferRemoval: function() {
+        track('offer_removed', offer);
         offers.removeOffer();
         toggleOfferList();
         return onRemoveOffer && onRemoveOffer();
