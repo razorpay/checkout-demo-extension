@@ -41,8 +41,6 @@ export default function emiView(session) {
 
   if (amount >= 5000 * 100) {
     const help = _Doc.querySelector('#elem-emi .help');
-
-    opts.banks.AMEX = opts.other_banks.AMEX;
     help
       |> _El.setContents(
         help.innerHTML.replace(' & Axis Bank', ', Axis & AMEX')

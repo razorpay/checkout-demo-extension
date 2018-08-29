@@ -1,3 +1,5 @@
+import { getSession } from 'sessionmanager';
+
 const UPI_APPS = {
   /**
    * Preferred apps.

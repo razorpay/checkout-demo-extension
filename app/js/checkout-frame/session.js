@@ -12,8 +12,8 @@ var preferences = window.preferences,
   getDownBanks = Bank.getDownBanks,
   getPreferredBanks = Bank.getPreferredBanks,
   freqWallets = Wallet.wallets,
-  contactPattern = Constants.contactPattern,
-  emailPattern = Constants.emailPattern,
+  contactPattern = Constants.CONTACT_PATTERN,
+  emailPattern = Constants.EMAIL_PATTERN,
   ua_Android = discreet.androidBrowser,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
@@ -679,12 +679,12 @@ Session.prototype = {
       var amazonPay = 'amazonpay';
 
       this.methods.wallet.sort(function(item1, item2) {
-        return item1.name === amazonPay ? -1 : item2.name === amazonPay ? 1 : 0;
+        return item1.code === amazonPay ? -1 : item2.code === amazonPay ? 1 : 0;
       });
 
       var walletsLen = this.methods.wallet.length,
         walletNames = this.methods.wallet.slice(0, 2).map(function(item) {
-          return item.title;
+          return item.name;
         });
 
       this.walletsDesc =
@@ -1076,7 +1076,7 @@ Session.prototype = {
               ? enabledMethods[method]
               : isArray(enabledMethods.wallet) &&
                 enabledMethods.wallet.filter(function(item) {
-                  return item.name === offer.issuer;
+                  return item.code === offer.issuer;
                 })[0];
 
         return isMethodEnabled;
@@ -3480,7 +3480,7 @@ Session.prototype = {
     }
 
     wallets.sort(function(walletA, walletB) {
-      return walletB.custom || self.offers.wallet[walletB.name] ? 1 : -1;
+      return walletB.custom || self.offersList.wallet[walletB.code] ? 1 : -1;
     });
 
     methods.wallet = wallets;
@@ -3503,7 +3503,7 @@ Session.prototype = {
       }
     });
 
-    this.offers = modifiedOffers;
+    this.offersList = modifiedOffers;
   },
 
   setPreferences: function(prefs) {
@@ -3523,7 +3523,6 @@ Session.prototype = {
       invoice = (this.invoice = preferences.invoice),
       subscription = (this.subscription = preferences.subscription),
       options = preferences.options;
-
     this.setOffers(preferences);
 
     /* Set magic from preferences */
@@ -3761,3 +3760,9 @@ function updateTimer(timeoutEl, closeAt) {
       ' minutes';
   };
 }
+
+/*
+ * Call initIframe() after the session class is defined.
+ */
+
+discreet.initIframe();

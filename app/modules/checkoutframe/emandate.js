@@ -1,4 +1,5 @@
-import { getQueryParams, Track } from 'checkoutframe/discreet';
+import Track from 'tracker';
+import { getSession } from 'sessionmanager';
 
 const emandateTabTitles = {
   'emandate-bank': 'Bank',
@@ -348,8 +349,7 @@ emandateView.prototype = {
   },
 
   openUIDAI: function() {
-    /* getQueryParams is defined in session.js */
-    const qpmap = getQueryParams();
+    const qpmap = _.getQueryParams();
     const isSupportedSDK = qpmap.platform && !isUnsupportedSDK();
 
     if (isSupportedSDK) {
@@ -432,8 +432,7 @@ emandateView.prototype = {
  * Android SDKs without callNativeIntent
  */
 function isUnsupportedSDK() {
-  /* getQueryParams is defined in session.js */
-  var qpmap = getQueryParams();
+  var qpmap = _.getQueryParams();
   if (qpmap.platform) {
     return !(CheckoutBridge && CheckoutBridge.callNativeIntent);
   }

@@ -26,8 +26,6 @@ import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 
-initIframe();
-
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -47,6 +45,8 @@ export default {
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrontOtp,
+
+  initIframe,
 
   Constants,
   Bank,
