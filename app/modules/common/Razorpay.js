@@ -175,9 +175,7 @@ function setNotes(options) {
 }
 
 RazorProto.isLiveMode = function() {
-  var preferences =
-    _Str.startsWith(window.location.href, RazorpayConfig.api) &&
-    this.preferences;
+  var preferences = this.preferences;
 
   return (
     (!preferences && /^rzp_l/.test(this.get('key'))) ||
