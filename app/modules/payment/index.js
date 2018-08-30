@@ -104,9 +104,17 @@ export default function Payment(data, params, r) {
   this.isDebitPin =
     data &&
     data.auth_type &&
-    (data.auth_type === '3ds' || data.auth_type === 'pin');
+    (data.auth_type === 'c3ds' || data.auth_type === 'pin');
   if (this.isDebitPin) {
     this.debitPinAuthType = data.auth_type;
+
+    /**
+     * Deleting this from data manually because c3ds is just for Checkout,
+     * API takes 3DS, which is the default anyway.
+     */
+    if (data.auth_type === 'c3ds') {
+      delete data.auth_type;
+    }
   }
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
