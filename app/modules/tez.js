@@ -1,4 +1,4 @@
-var PaymentRequest = window.PaymentRequest;
+var PaymentRequest = global.PaymentRequest;
 
 const allowed_keys = [
   'rzp_live_izcpsDPjM13eLY', // razorpay
@@ -21,6 +21,8 @@ const allowed_keys = [
 
 export const checkKey = key => allowed_keys.indexOf(key) !== -1;
 
+const googlePaySupportedMethods = ['https://googlepay.google.com/pay'];
+
 export const check = (successCallback, errorCallback) => {
   errorCallback = errorCallback || (() => {});
   try {
@@ -28,7 +30,7 @@ export const check = (successCallback, errorCallback) => {
      * PaymentRequest API is only available in the modern browsers which
      * have Promise API.
      */
-    new PaymentRequest([{ supportedMethods: 'https://tez.google.com/pay' }], {
+    new PaymentRequest([{ supportedMethods: googlePaySupportedMethods }], {
       total: {
         label: '_',
         amount: { currency: 'INR', value: 0 },
@@ -64,7 +66,7 @@ export const pay = (data, successCallback, errorCallback) => {
   instrumentData.url = 'https://razorpay.com';
   const supportedInstruments = [
     {
-      supportedMethods: ['https://tez.google.com/pay'],
+      supportedMethods: googlePaySupportedMethods,
       data: instrumentData,
     },
   ];
