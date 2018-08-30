@@ -3030,7 +3030,6 @@ Session.prototype = {
       data.contact &&
       data.email
     ) {
-      request.powerwallet = true;
       this.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp =
@@ -3082,7 +3081,7 @@ Session.prototype = {
       }
     });
 
-    if (request.powerwallet) {
+    if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on(

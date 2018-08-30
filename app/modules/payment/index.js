@@ -128,14 +128,22 @@ export default function Payment(data, params, r) {
   this.fees = params.fees;
   this.tez = params.tez;
 
+  // data needs to be present. abscence of data = placeholder popup in payment paused state
+  // If fees is there, we need to show fee view in poupup
+  // If contact or email are missing, we need to ask for it in popup
   this.powerwallet =
-    params.tez ||
-    params.powerwallet ||
-    (data &&
-      data.method === 'wallet' &&
-      data.wallet &&
-      isPowerWallet(data.wallet)) ||
-    (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
+    data &&
+    !params.fees &&
+    data.contact &&
+    data.email &&
+    // tez invokes intent, popup not needed
+    (params.tez ||
+      // only apply powerwallet for checkout-js. popup for razorpayjs
+      (isRazorpayFrame &&
+        // display popup for conventional wallets
+        ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
+          // no popup for upi
+          data.method === 'upi')));
   this.message = params.message;
 
   this.tryPopup();
@@ -318,13 +326,6 @@ Payment.prototype = {
       return;
     }
 
-    /**
-     * Handles powerwallets for razorpay.js
-     */
-    if (!isRazorpayFrame && this.powerwallet) {
-      return;
-    }
-
     if (!this.powerwallet && !isRazorpayFrame && data.method === 'upi') {
       return;
     }
@@ -393,7 +394,7 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return !(this.r.get('redirect') || (this.powerwallet && isRazorpayFrame));
+    return !(this.r.get('redirect') || this.powerwallet);
   },
 
   tryPopup: function() {
