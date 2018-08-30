@@ -191,10 +191,12 @@ var responseTypes = {
     };
 
     var ra = () =>
-      fetch({
-        url: request.url,
-        callback: response => this.complete(response),
-      }).till(response => response && response.status);
+      fetch
+        .jsonp({
+          url: request.url,
+          callback: response => this.complete(response),
+        })
+        .till(response => response && response.status);
 
     this.emit('upi.coproto_response', request);
 
