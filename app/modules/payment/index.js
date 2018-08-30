@@ -24,7 +24,7 @@ import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
 
-const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
+const isRazorpayFrame = _Str.startsWith(RazorpayConfig.api, location.origin);
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
@@ -144,6 +144,7 @@ export default function Payment(data, params, r) {
         ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
           // no popup for upi
           data.method === 'upi')));
+
   this.message = params.message;
 
   this.tryPopup();
@@ -323,6 +324,14 @@ Payment.prototype = {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.fees) {
+      return;
+    }
+
+    // type: otp is not handled on razorpayjs
+    // which is sent for some of the wallets, unidentifiable from
+    // checkout side before making the payment
+    // so not making ajax call for any wallet
+    if (!isRazorpayFrame && data.method === 'wallet') {
       return;
     }
 
