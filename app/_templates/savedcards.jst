@@ -33,7 +33,7 @@
       var cvv_digits = network === 'amex' ? 4 : 3;
 
       var flows = card.flows || [];
-      var debitPin = Boolean(flows.pin);
+      var debitPin = !recurring && Boolean(flows.pin);
     `
     <div tabIndex="0" class="saved-card left-card`?!i` checked`?`"`?plans` emi bank='`=bank`'`?``?network==='maestro'` maestro`?` token=`=item.token` `?debitPin`pin`?`>
       <div class="help up">EMI is not available on this card</div>
