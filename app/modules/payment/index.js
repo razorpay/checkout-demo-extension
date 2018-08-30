@@ -20,6 +20,7 @@ import Razorpay, {
   makeUrl,
 } from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
+import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
 
@@ -130,6 +131,10 @@ export default function Payment(data, params, r) {
   this.powerwallet =
     params.tez ||
     params.powerwallet ||
+    (data &&
+      data.method === 'wallet' &&
+      data.wallet &&
+      isPowerWallet(data.wallet)) ||
     (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
   this.message = params.message;
 
@@ -313,6 +318,13 @@ Payment.prototype = {
       return;
     }
 
+    /**
+     * Handles powerwallets for razorpay.js
+     */
+    if (!isRazorpayFrame && this.powerwallet) {
+      return;
+    }
+
     if (!this.powerwallet && !isRazorpayFrame && data.method === 'upi') {
       return;
     }
@@ -381,7 +393,7 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return !(this.r.get('redirect') || this.powerwallet);
+    return !(this.r.get('redirect') || (this.powerwallet && isRazorpayFrame));
   },
 
   tryPopup: function() {

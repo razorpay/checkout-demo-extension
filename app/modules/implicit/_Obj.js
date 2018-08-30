@@ -36,7 +36,7 @@ export const loop = _.curry2((o, iteratee) => {
 export const map = _.curry2((o, iteratee) =>
   _Arr.reduce(
     keys(o),
-    (obj, key) => set(obj, key, iteratee(o[key], key, o)),
+    (obj, key) => setProp(obj, key, iteratee(o[key], key, o)),
     {}
   )
 );

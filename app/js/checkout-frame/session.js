@@ -3025,10 +3025,7 @@ Session.prototype = {
     }
 
     if (
-      (wallet === 'mobikwik' ||
-        wallet === 'payumoney' ||
-        wallet === 'freecharge' ||
-        wallet === 'olamoney') &&
+      discreet.WalletUtils.isPowerWallet(wallet) &&
       !request.fees &&
       data.contact &&
       data.email
