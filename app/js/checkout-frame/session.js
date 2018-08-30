@@ -2419,7 +2419,7 @@ Session.prototype = {
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
           emi: this.methods.emi,
-          recurring: this.get('recurring'),
+          recurring: this.recurring,
         });
       }
     }
@@ -3232,7 +3232,7 @@ Session.prototype = {
 
     this.flowIIN = iin;
 
-    if (this.get('recurring')) {
+    if (this.recurring) {
       return;
     }
 
