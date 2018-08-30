@@ -24,7 +24,10 @@ import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
 
-const isRazorpayFrame = _Str.startsWith(RazorpayConfig.api, location.origin);
+const isRazorpayFrame = _Str.startsWith(
+  RazorpayConfig.api,
+  `${location.protocol}//${location.hostname}`
+);
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
