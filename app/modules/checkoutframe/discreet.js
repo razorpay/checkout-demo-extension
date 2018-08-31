@@ -15,6 +15,7 @@ import emiView from 'checkoutframe/emi';
 import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
+import { commonBanks } from 'common/bank';
 
 export default {
   RazorpayConfig,
@@ -38,4 +39,5 @@ export default {
   emiView,
   emandateView,
   Curtain,
+  commonBanks,
 };

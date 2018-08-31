@@ -1,8 +1,9 @@
-// const cdnUrl = RazorpayConfig.cdn
-const cdnUrl = '';
-const prefix = cdnUrl + 'bank/';
+import { RazorpayConfig } from 'common/Razorpay';
 
-export const getBankLogo = code => prefix + code.slice(0, 4) + '.gif';
+const prefix = 'bank/';
+
+export const getBankLogo = code =>
+  RazorpayConfig.cdn + prefix + code.slice(0, 4) + '.gif';
 
 const _commonBanks = [
   ['ICIC_C', 'ICICI Corporate'],
@@ -19,12 +20,13 @@ const _commonBanks = [
   ['IOBA', 'IOB'],
   ['FDRL', 'Federal'],
   ['CORP', 'Corporate'],
+  ['IDFB', 'IDFC'],
 ];
 
 export const commonBanks = _Arr.map(_commonBanks, banks => ({
-  name: banks[1],
+  title: banks[1],
   code: banks[0],
-  logo: getBankLogo(banks[0]),
+  image: getBankLogo(banks[0]),
 }));
 
 const emiBanks = [

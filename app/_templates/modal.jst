@@ -448,7 +448,10 @@ var upi_apps = _.upi_intents_data;
                   `var count = 0, max = 3, total = 0;`
                   <div id="netb-banks" class="clear grid count-3">
                     `
-                    for(var b in _.netbanks){
+                    for(var i in _.netbanks){
+
+                      var b = _.netbanks[i].code;
+
                       if (!banks[b]) {
                         continue;
                       }
@@ -465,8 +468,8 @@ var upi_apps = _.upi_intents_data;
                         <input class="bank-radio" id="bank-radio-`=b`" type="radio" name="bank" value="`=b`">
                         <label for="bank-radio-`=b`" class="radio-label mfix">
                           <div class="mchild l-`=count` item-inner">
-                            <img src="`=_.netbanks[b].image`">
-                            <div>`=_.netbanks[b].title`</div>
+                            <img src="`=_.netbanks[i].image`">
+                            <div>`=_.netbanks[i].title`</div>
                           </div>
                         </label>
                       </div>

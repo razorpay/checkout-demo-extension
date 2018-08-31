@@ -6,7 +6,7 @@ RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {
-  netbanking: true,
+  netbanking: null,
   card: true,
   wallet: null,
   emi: true,
