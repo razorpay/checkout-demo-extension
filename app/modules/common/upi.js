@@ -29,6 +29,7 @@ const UPI_APPS = {
       name: 'WhatsApp',
       app_name: 'WhatsApp UPI',
       package_name: 'com.whatsapp',
+      app_icon: 'https://cdn.razorpay.com/checkout/whatsapp.png',
     },
     {
       name: 'WhatsApp Business',

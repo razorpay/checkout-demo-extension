@@ -923,21 +923,6 @@ Session.prototype = {
     });
   },
 
-  setWhatsappIcon: function() {
-    var intentsData = this.upi_intents_data;
-    var whatsappObj;
-
-    if (isArray(intentsData)) {
-      whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
-    }
-
-    if (whatsappObj) {
-      if (!whatsappObj.app_icon) {
-        whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
-      }
-    }
-  },
-
   checkTez: function() {
     var self = this;
 
@@ -978,8 +963,6 @@ Session.prototype = {
     }
 
     if (this.upi_intents_data) {
-      this.setWhatsappIcon();
-
       /**
        * We need to show "(Recommended)" string alongside the app name
        * when there is only 1 preferred app, and 1 or more other apps.
