@@ -22,21 +22,14 @@ export const defineIosBridge = () => {
   return (window.CheckoutBridge = CB);
 };
 
-export const getNewIosBridge = () => {
-  return ((window.webkit || {}).messageHandlers || {}).CheckoutBridge;
-};
+export const getNewIosBridge = () =>
+  ((window.webkit || {}).messageHandlers || {}).CheckoutBridge;
 
-export const hasNewIosBridge = () => {
-  return Boolean(getNewIosBridge());
-};
+export const hasNewIosBridge = () => Boolean(getNewIosBridge());
 
-export const getCheckoutBridge = () => {
-  return window.CheckoutBridge;
-};
+export const getCheckoutBridge = () => window.CheckoutBridge;
 
-export const hasCheckoutBridge = () => {
-  return Boolean(getCheckoutBridge());
-};
+export const hasCheckoutBridge = () => Boolean(getCheckoutBridge());
 
 export const iosLegacyMethod = method => {
   return function(data) {
@@ -59,7 +52,7 @@ export const iosLegacyMethod = method => {
  * Generic Bridge interface for all the bridges and platforms.
  * Bridge interface is not to be used for legacy iOS SDKs
  * @param {String} bridgeName is taken as input
- */
+ **/
 function Bridge(bridgeName) {
   this.name = bridgeName;
   this._exists = false;
@@ -112,6 +105,19 @@ Bridge.prototype = {
     return false;
   },
 
+  /**
+   * This is used to call Android's bridges.
+   *
+   * Note: it won't be able to invoke CheckoutBridge for iOS because the
+   * CheckoutBridge is instantiated on iOS after the bridge `init` is called.
+   * So, according to the Bridge it does not exist for iOS, call it manually
+   * for iOS similar to notifyBridge method.
+   *
+   * @param  {String}    methodName name of the method to be invoked
+   * @param  {Array}     params     method params
+   * @return {Any}                  the value returned by the bridge method.
+   *                                Nothing is returned in default cases.
+   **/
   callAndroid: function(methodName, ...params) {
     params =
       params
@@ -124,6 +130,14 @@ Bridge.prototype = {
     }
   },
 
+  /**
+   * This is used to call iOS's bridges.
+   *
+   * @param  {String}    methodName name of the method to be invoked
+   * @param  {Array}     params     method params
+   * @return {Any}                  the value returned by the bridge method.
+   *                                Nothing is returned in default cases.
+   **/
   callIos: function(methodName, ...params) {
     const method = this.get(methodName);
     if (method) {
@@ -136,6 +150,14 @@ Bridge.prototype = {
     }
   },
 
+  /**
+   * Generic method that calls the appropriate bridge for the current platform.
+   *
+   * @param  {String}    methodName name of the method to be invoked
+   * @param  {Array}     params     method params
+   * @return {Any}                  the value returned by the bridge method.
+   *                                Nothing is returned in default cases.
+   **/
   call: function(methodName, ...params) {
     const method = this.get(methodName);
 
