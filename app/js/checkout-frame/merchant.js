@@ -287,25 +287,37 @@ function setPreferredBanks(session) {
     Array.isArray(bankOptions.order) &&
     bankOptions.order.length > 0
   ) {
-    var order = bankOptions.order;
+    var order = bankOptions.order,
+      // Indexing to avoid search
+      bankCodeIndexMap = netbanks.reduce(function(map, bank, index) {
+        map[bank.code] = index;
+        return map;
+      }, {});
 
-    netbanks.sort(function(bank1, bank2) {
-      var bank1Index = order.indexOf(bank1.code),
-        bank2Index = order.indexOf(bank2.code);
-
-      if (bank1Index === bank2Index) {
-        return 0;
+    order.forEach(function(bankCode, expectedIndex) {
+      if (!(bankCode in bankCodeIndexMap)) {
+        return;
       }
 
-      if (bank2Index === -1) {
-        return -1;
+      var currentIndex = bankCodeIndexMap[bankCode];
+
+      if (currentIndex === expectedIndex) {
+        return;
       }
 
-      if (bank1Index === -1) {
-        return 1;
-      }
+      var bankItem = netbanks[currentIndex];
 
-      return bank1Index - bank2Index;
+      netbanks.splice(currentIndex, 1);
+      netbanks.splice(expectedIndex, 0, bankItem);
+
+      var startIndex = Math.min(currentIndex, expectedIndex),
+        endIndex = Math.max(currentIndex, expectedIndex);
+
+      // re-indexing only the part thats changed
+      while (startIndex <= endIndex) {
+        bankCodeIndexMap[netbanks[startIndex].code] = startIndex;
+        startIndex += 1;
+      }
     });
   }
 
