@@ -146,13 +146,36 @@ var responseTypes = {
     Tez.pay(
       fullResponse.data,
       instrument => {
+        Track(this.r, 'tez_pay_response', {
+          instrument,
+        });
+
         this.emit('upi.intent_response', {
           response: instrument.details,
         });
       },
       error => {
-        if (error.code && error.code === error.ABORT_ERR) {
-          this.emit('upi.intent_response', {});
+        if (error.code) {
+          if (
+            [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
+          ) {
+            this.emit('upi.intent_response', {});
+          }
+
+          // Since the method is not supported, remove it.
+          if (error.code === error.NOT_SUPPORTED_ERR) {
+            const tezRadio = _Doc.querySelector('#upi-tez');
+            const directPayRadio = _Doc.querySelector('#radio-directpay');
+
+            if (tezRadio) {
+              _El.setStyle(tezRadio, 'display', 'none');
+              tezRadio.checked = false;
+            }
+
+            if (directPayRadio) {
+              directPayRadio.checked = true;
+            }
+          }
         }
 
         Track(this.r, 'tez_error', error);
@@ -168,10 +191,12 @@ var responseTypes = {
     };
 
     var ra = () =>
-      fetch({
-        url: request.url,
-        callback: response => this.complete(response),
-      }).till(response => response && response.status);
+      fetch
+        .jsonp({
+          url: request.url,
+          callback: response => this.complete(response),
+        })
+        .till(response => response && response.status);
 
     this.emit('upi.coproto_response', request);
 

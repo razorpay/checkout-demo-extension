@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
+var isIE = /MSIE |Trident\//.test(ua);
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -423,6 +424,7 @@ function errorHandler(response) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
       hideOverlayMessage();
       this.offers.showError();
+      this.track('offer_mismatch', this.offers.appliedOffer);
     } else {
       this.showLoadError(
         message || 'There was an error in handling your request',
@@ -684,6 +686,10 @@ Session.prototype = {
       classes.push('emandate');
     }
 
+    if (isIE) {
+      classes.push('noanim');
+    }
+
     return classes.join(' ');
   },
 
@@ -917,36 +923,31 @@ Session.prototype = {
     });
   },
 
-  setWhatsappIcon: function() {
-    var intentsData = this.upi_intents_data;
-    var whatsappObj;
-
-    if (isArray(intentsData)) {
-      whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
-    }
-
-    if (whatsappObj) {
-      if (!whatsappObj.app_icon) {
-        whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
-      }
-    }
-  },
-
   checkTez: function() {
-    if (!this.isMobileBrowser) {
+    var self = this;
+
+    /**
+     * Tez exists only on Android, and outside of WebViews.
+     *
+     * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
+     */
+    if (window.CheckoutBridge || !discreet.androidBrowser) {
       return;
     }
 
-    var self = this;
+    if (!Tez.checkKey(self.get('key'))) {
+      return;
+    }
 
     Tez.check(
       function() {
         /* This is success callback */
         $('#upi-tez').css('display', 'block');
+        self.track('tez_visible');
       },
       function(e) {
         /* This is error callback */
-        self.track('tez_error', e);
+        // self.track('tez_error', e);
       }
     );
   },
@@ -956,19 +957,12 @@ Session.prototype = {
 
     options = options || {};
 
-    // make true to enable mweb-intent
-
-    this.isMobileBrowser =
-      ua_android_browser && this.get('key') === 'rzp_live_izcpsDPjM13eLY';
-
     if (options.forceRender) {
       this.forceRender = true;
       this.close();
     }
 
     if (this.upi_intents_data) {
-      this.setWhatsappIcon();
-
       /**
        * We need to show "(Recommended)" string alongside the app name
        * when there is only 1 preferred app, and 1 or more other apps.
@@ -995,6 +989,8 @@ Session.prototype = {
         // need this while preparing the template
         this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
       }
+
+      this.track('offer_is_forced', forcedOffer);
     }
 
     this.getEl();
@@ -1017,6 +1013,7 @@ Session.prototype = {
       ) {
         this.forcedDiscountOffer = forcedOffer;
         this.showDiscount(forcedOffer);
+        this.track('offer_is_forced_with_discount', forcedOffer);
       }
     } else if (hasOffers) {
       var eligibleOffers = preferences.offers.filter(function(offer) {
@@ -1033,19 +1030,36 @@ Session.prototype = {
         return isMethodEnabled;
       });
 
+      var $offersContainer = $('#body #offers-container'),
+        $offersTitle;
+
       if (eligibleOffers.length > 0) {
         // TODO: convert args to kwargs
         this.offers = initOffers(
-          document.querySelector('#offers-container'),
+          $offersContainer[0],
           eligibleOffers,
           {},
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
           this.formatAmountWithCurrency.bind(this),
-          $('#body')[0]
+          $('#body')[0],
+          this.track.bind(this)
         );
 
         this.renderOffers(this.screen);
+
+        $offersContainer.on('click', function(e) {
+          $offersTitle = $offersTitle || this.querySelector('.offers-title');
+
+          if (!$offersTitle || !$offersTitle.contains(e.target)) {
+            return;
+          }
+
+          that.track(
+            'offers_list_view_on_' + (that.screen || 'home') + '_screen',
+            that.offers.appliedOffer
+          );
+        });
       }
     }
 
@@ -1113,9 +1127,7 @@ Session.prototype = {
             : banks[bankCode],
         code: bankCode,
         account_number: accountNumber,
-        image:
-          (this.netbanks[bankCode] && this.netbanks[bankCode].image) ||
-          'https://cdn.razorpay.com/' + bankCode + '.gif',
+        image: 'https://cdn.razorpay.com/' + bankCode + '.gif',
       };
     }
   },
@@ -1579,7 +1591,9 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.click('.payment-option', function(e) {
-      this.switchTab(e.currentTarget.getAttribute('tab') || '');
+      if (!$(e.currentTarget).hasClass('disabled')) {
+        this.switchTab(e.currentTarget.getAttribute('tab') || '');
+      }
     });
     this.on('submit', '#form', this.preSubmit);
     this.click('#otp-action', this.back);
@@ -2030,7 +2044,6 @@ Session.prototype = {
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
-      this.handleOfferRemoval();
     }
 
     this.screen = screen;
@@ -2085,12 +2098,16 @@ Session.prototype = {
     // reset offers UI
     if (this.offers.appliedOffer || this.offers.selectedOffer) {
       this.offers.removeOffer();
+      // Explicitly call this because we removed the offer explicitly
+      this.handleOfferRemoval();
     }
 
     this.offers.applyFilter((screen && { payment_method: screen }) || {});
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
+      // Explicitly call this because we selected the offer explicitly
+      this.handleOfferSelection(this.preSelectedOffer, screen);
       this.offers.applyOffer();
       this.preSelectedOffer = null;
     }
@@ -2383,6 +2400,7 @@ Session.prototype = {
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
           emi: this.methods.emi,
+          recurring: this.recurring,
         });
       }
     }
@@ -2964,6 +2982,7 @@ Session.prototype = {
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
+      this.track('offer_applied_with_payment', appliedOffer);
     } else {
       delete this.r.display_amount;
     }
@@ -2992,15 +3011,11 @@ Session.prototype = {
     }
 
     if (
-      (wallet === 'mobikwik' ||
-        wallet === 'payumoney' ||
-        wallet === 'freecharge' ||
-        wallet === 'olamoney') &&
+      discreet.WalletUtils.isPowerWallet(wallet) &&
       !request.fees &&
       data.contact &&
       data.email
     ) {
-      request.powerwallet = true;
       this.powerwallet = true;
       $('#otp-sec').html('Resend OTP');
       tab_titles.otp =
@@ -3062,7 +3077,7 @@ Session.prototype = {
       });
     }
 
-    if (request.powerwallet) {
+    if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', debounceAskOTP);
       this.r.on(
@@ -3208,7 +3223,7 @@ Session.prototype = {
 
     this.flowIIN = iin;
 
-    if (this.get('recurring')) {
+    if (this.recurring) {
       return;
     }
 

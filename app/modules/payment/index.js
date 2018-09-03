@@ -20,8 +20,14 @@ import Razorpay, {
   makeUrl,
 } from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
+import { isPowerWallet } from 'common/wallet';
 
-const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
+import * as Tez from 'tez';
+
+const isRazorpayFrame = _Str.startsWith(
+  RazorpayConfig.api,
+  `${location.protocol}//${location.hostname}`
+);
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
@@ -104,9 +110,17 @@ export default function Payment(data, params, r) {
   this.isDebitPin =
     data &&
     data.auth_type &&
-    (data.auth_type === '3ds' || data.auth_type === 'pin');
+    (data.auth_type === 'c3ds' || data.auth_type === 'pin');
   if (this.isDebitPin) {
     this.debitPinAuthType = data.auth_type;
+
+    /**
+     * Deleting this from data manually because c3ds is just for Checkout,
+     * API takes 3DS, which is the default anyway.
+     */
+    if (data.auth_type === 'c3ds') {
+      delete data.auth_type;
+    }
   }
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
@@ -127,9 +141,23 @@ export default function Payment(data, params, r) {
   this.fees = params.fees;
   this.tez = params.tez;
 
+  // data needs to be present. abscence of data = placeholder popup in payment paused state
+  // If fees is there, we need to show fee view in poupup
+  // If contact or email are missing, we need to ask for it in popup
   this.powerwallet =
-    params.powerwallet ||
-    (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
+    data &&
+    !params.fees &&
+    data.contact &&
+    data.email &&
+    // tez invokes intent, popup not needed
+    (params.tez ||
+      // only apply powerwallet for checkout-js. popup for razorpayjs
+      (isRazorpayFrame &&
+        // display popup for conventional wallets
+        ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
+          // no popup for upi
+          data.method === 'upi')));
+
   this.message = params.message;
 
   this.tryPopup();
@@ -318,7 +346,15 @@ Payment.prototype = {
       return;
     }
 
-    if (!isRazorpayFrame && data.method === 'upi') {
+    // type: otp is not handled on razorpayjs
+    // which is sent for some of the wallets, unidentifiable from
+    // checkout side before making the payment
+    // so not making ajax call for any wallet
+    if (!isRazorpayFrame && data.method === 'wallet') {
+      return;
+    }
+
+    if (!this.powerwallet && !isRazorpayFrame && data.method === 'upi') {
       return;
     }
 
@@ -421,6 +457,18 @@ function makeRedirectUrl(fees) {
 Razorpay.setFormatter = FormatDelegator;
 
 var razorpayProto = Razorpay.prototype;
+
+/**
+ * Method to check if an Tez is installed on Device
+ * @param {Function} successCallback
+ * @param {Function} errorCallback
+ */
+razorpayProto.isTezAvailable = function(success, error) {
+  Tez.check(() => {
+    this.tezPossible = true;
+    success();
+  }, error);
+};
 
 razorpayProto.postInit = function() {
   var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
