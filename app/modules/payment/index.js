@@ -20,10 +20,14 @@ import Razorpay, {
   makeUrl,
 } from 'common/Razorpay';
 import { internetExplorer, iOS } from 'common/useragent';
+import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
 
-const isRazorpayFrame = _Str.startsWith(location.href, RazorpayConfig.api);
+const isRazorpayFrame = _Str.startsWith(
+  RazorpayConfig.api,
+  `${location.protocol}//${location.hostname}`
+);
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
@@ -135,10 +139,23 @@ export default function Payment(data, params, r) {
   this.fees = params.fees;
   this.tez = params.tez;
 
+  // data needs to be present. abscence of data = placeholder popup in payment paused state
+  // If fees is there, we need to show fee view in poupup
+  // If contact or email are missing, we need to ask for it in popup
   this.powerwallet =
-    params.tez ||
-    params.powerwallet ||
-    (data && data.method === 'upi' && !params.fees && isRazorpayFrame);
+    data &&
+    !params.fees &&
+    data.contact &&
+    data.email &&
+    // tez invokes intent, popup not needed
+    (params.tez ||
+      // only apply powerwallet for checkout-js. popup for razorpayjs
+      (isRazorpayFrame &&
+        // display popup for conventional wallets
+        ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
+          // no popup for upi
+          data.method === 'upi')));
+
   this.message = params.message;
 
   this.tryPopup();
@@ -318,6 +335,14 @@ Payment.prototype = {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.fees) {
+      return;
+    }
+
+    // type: otp is not handled on razorpayjs
+    // which is sent for some of the wallets, unidentifiable from
+    // checkout side before making the payment
+    // so not making ajax call for any wallet
+    if (!isRazorpayFrame && data.method === 'wallet') {
       return;
     }
 

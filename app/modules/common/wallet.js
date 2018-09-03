@@ -24,14 +24,14 @@ const otpLengths = {
   freecharge: 4,
 };
 
-const powerWallets = ['mobikwik', 'freecharge', 'olamoney'];
+const powerWallets = ['mobikwik', 'freecharge', 'olamoney', 'payumoney'];
 
 const wallets = _Obj.map(names, (name, code) => ({
-  power: powerWallets.indexOf(walletCode) !== -1,
+  power: powerWallets.indexOf(code) !== -1,
   name,
   logo: prefix + code + '.png',
   sqLogo: sqPrefix + code + '.png',
 }));
 
-export const isPowerWallet = code => wallets[code].powerwallet;
+export const isPowerWallet = code => wallets[code] && wallets[code].power;
 export const getWallet = code => wallets[code];
