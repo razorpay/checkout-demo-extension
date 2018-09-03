@@ -173,9 +173,9 @@ emandateView.prototype = {
   setBank: function(bankCode) {
     const backgroundImage =
       'background-image: url(' +
-      (netbanks[bankCode]
-        ? netbanks[bankCode].image
-        : 'https://cdn.razorpay.com/bank/' + bankCode + '.gif') +
+      'https://cdn.razorpay.com/bank/' +
+      bankCode +
+      '.gif' +
       ')';
 
     this.bank = bankCode;
