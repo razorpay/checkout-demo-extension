@@ -280,35 +280,41 @@ function setPreferredBanks(session) {
     return;
   }
 
-  var bankList = netbanks.slice();
-  var order = bankOptions && bankOptions.order;
-
-  if (isArray(order)) {
-    var orderLength = order.length;
-
-    if (orderLength) {
-      orderLength += 1;
-      // Indexing to avoid search
-      var orderIndexMap = order.reduce(function(map, bank, index) {
-        map[bank] = index + 1;
-        return map;
-      }, {});
-
-      bankList.sort(function(a, b) {
-        var bIndex = orderIndexMap[b.code] || orderLength;
-        var aIndex = orderIndexMap[a.code] || orderLength;
-
-        return aIndex - bIndex;
-      });
-    }
-  }
-
   // this will filter out banks which are not available
   // also, in case both BANK and BANK_C are present, it'll
   // ensure only BANK_C goes in
-  bankList = bankList.filter(function(b) {
+  var bankList = netbanks.filter(function(b) {
     return availBanks[b.code] && !availBanks[b.code + '_C'];
   });
+
+  var order = bankOptions && bankOptions.order;
+
+  if (isArray(order)) {
+    // Indexing to avoid search
+    var bankIndexMap = bankList.reduce(function(map, bank, index) {
+      map[bank.code] = bank;
+      return map;
+    }, {});
+
+    bankList = order
+      // convert strings given in order to bank object
+      .map(function(b) {
+        return bankIndexMap[b];
+      })
+
+      // add rest of the preferred banks
+      .concat(bankList)
+
+      // remove empty and duplicated banks
+      .filter(function(bankObj) {
+        var bankVal = bankObj && bankIndexMap[bankObj.code];
+        if (bankVal) {
+          // remove from index to avoid repetition
+          bankIndexMap[bankObj.code] = false;
+          return bankVal;
+        }
+      });
+  }
 
   session.netbanks = bankList;
 }
