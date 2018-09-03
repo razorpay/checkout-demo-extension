@@ -273,7 +273,6 @@ function notifyBridge(message) {
 }
 
 function setPreferredBanks(session) {
-  var bankList = netbanks.slice();
   var availBanks = session.methods.netbanking,
     bankOptions = session.get('method.netbanking');
 
@@ -281,36 +280,35 @@ function setPreferredBanks(session) {
     return;
   }
 
-  if (
-    bankOptions &&
-    bankOptions.order &&
-    Array.isArray(bankOptions.order) &&
-    bankOptions.order.length > 0
-  ) {
-    var order = bankOptions.order,
+  var bankList = netbanks.slice();
+  var order = bankOptions && bankOptions.order;
+
+  if (isArray(order)) {
+    var orderLength = order.length;
+
+    if (orderLength) {
+      orderLength += 1;
       // Indexing to avoid search
-      bankCodeIndexMap = bankList.reduce(function(map, bank, index) {
-        map[bank.code] = index;
+      var orderIndexMap = order.reduce(function(map, bank, index) {
+        map[bank] = index + 1;
         return map;
-      }, {}),
-      numSortedBanks = 0;
+      }, {});
 
-    order.forEach(function(bankCode, expectedIndex) {
-      if (
-        !(bankCode in bankCodeIndexMap) ||
-        !(bankCode in availBanks) ||
-        availBanks[bankCode + '_C']
-      ) {
-        return;
-      }
+      bankList.sort(function(a, b) {
+        var bIndex = orderIndexMap[b.code] || orderLength;
+        var aIndex = orderIndexMap[a.code] || orderLength;
 
-      var currentIndex = bankCodeIndexMap[bankCode],
-        bankItem = bankList[currentIndex];
-
-      bankList.splice(currentIndex, 1);
-      bankList.splice(numSortedBanks++, 0, bankItem);
-    });
+        return aIndex - bIndex;
+      });
+    }
   }
+
+  // this will filter out banks which are not available
+  // also, in case both BANK and BANK_C are present, it'll
+  // ensure only BANK_C goes in
+  bankList = bankList.filter(function(b) {
+    return availBanks[b.code] && !availBanks[b.code + '_C'];
+  });
 
   session.netbanks = bankList;
 }
