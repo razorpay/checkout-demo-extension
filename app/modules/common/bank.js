@@ -24,9 +24,9 @@ const _commonBanks = [
 ];
 
 export const commonBanks = _Arr.map(_commonBanks, banks => ({
-  title: banks[1],
+  name: banks[1],
   code: banks[0],
-  image: getBankLogo(banks[0]),
+  logo: getBankLogo(banks[0]),
 }));
 
 const emiBanks = [

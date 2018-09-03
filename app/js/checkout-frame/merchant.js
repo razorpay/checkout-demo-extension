@@ -273,7 +273,7 @@ function notifyBridge(message) {
 }
 
 function setPreferredBanks(session) {
-  var bankList = [];
+  var bankList = netbanks.slice();
   var availBanks = session.methods.netbanking,
     bankOptions = session.get('method.netbanking');
 
@@ -289,45 +289,28 @@ function setPreferredBanks(session) {
   ) {
     var order = bankOptions.order,
       // Indexing to avoid search
-      bankCodeIndexMap = netbanks.reduce(function(map, bank, index) {
+      bankCodeIndexMap = bankList.reduce(function(map, bank, index) {
         map[bank.code] = index;
         return map;
-      }, {});
+      }, {}),
+      numSortedBanks = 0;
 
     order.forEach(function(bankCode, expectedIndex) {
-      if (!(bankCode in bankCodeIndexMap)) {
+      if (
+        !(bankCode in bankCodeIndexMap) ||
+        !(bankCode in availBanks) ||
+        availBanks[bankCode + '_C']
+      ) {
         return;
       }
 
-      var currentIndex = bankCodeIndexMap[bankCode];
+      var currentIndex = bankCodeIndexMap[bankCode],
+        bankItem = bankList[currentIndex];
 
-      if (currentIndex === expectedIndex) {
-        return;
-      }
-
-      var bankItem = netbanks[currentIndex];
-
-      netbanks.splice(currentIndex, 1);
-      netbanks.splice(expectedIndex, 0, bankItem);
-
-      var startIndex = Math.min(currentIndex, expectedIndex),
-        endIndex = Math.max(currentIndex, expectedIndex);
-
-      // re-indexing only the part thats changed
-      while (startIndex <= endIndex) {
-        bankCodeIndexMap[netbanks[startIndex].code] = startIndex;
-        startIndex += 1;
-      }
+      bankList.splice(currentIndex, 1);
+      bankList.splice(numSortedBanks++, 0, bankItem);
     });
   }
-
-  each(netbanks, function(i, obj) {
-    var bankCode = obj.code;
-
-    if (availBanks[bankCode] && !availBanks[bankCode + '_C']) {
-      bankList.push(obj);
-    }
-  });
 
   session.netbanks = bankList;
 }
