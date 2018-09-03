@@ -206,9 +206,9 @@ Payment.prototype = {
     formatPayment(this);
 
     if (this.isAmazonpayPayment) {
-      return _Func.debounce(() => {
+      return window.setTimeout(() => {
         this.emit('amazonpay.process', this.data);
-      })();
+      }, 100);
     }
 
     if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
