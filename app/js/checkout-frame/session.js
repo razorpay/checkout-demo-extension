@@ -923,21 +923,6 @@ Session.prototype = {
     });
   },
 
-  setWhatsappIcon: function() {
-    var intentsData = this.upi_intents_data;
-    var whatsappObj;
-
-    if (isArray(intentsData)) {
-      whatsappObj = findBy(intentsData, 'package_name', 'com.whatsapp');
-    }
-
-    if (whatsappObj) {
-      if (!whatsappObj.app_icon) {
-        whatsappObj.app_icon = 'https://cdn.razorpay.com/checkout/whatsapp.png';
-      }
-    }
-  },
-
   checkTez: function() {
     var self = this;
 
@@ -978,8 +963,6 @@ Session.prototype = {
     }
 
     if (this.upi_intents_data) {
-      this.setWhatsappIcon();
-
       /**
        * We need to show "(Recommended)" string alongside the app name
        * when there is only 1 preferred app, and 1 or more other apps.
@@ -1144,9 +1127,7 @@ Session.prototype = {
             : banks[bankCode],
         code: bankCode,
         account_number: accountNumber,
-        image:
-          (this.netbanks[bankCode] && this.netbanks[bankCode].image) ||
-          'https://cdn.razorpay.com/' + bankCode + '.gif',
+        image: 'https://cdn.razorpay.com/' + bankCode + '.gif',
       };
     }
   },
@@ -2419,6 +2400,7 @@ Session.prototype = {
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
           emi: this.methods.emi,
+          recurring: this.recurring,
         });
       }
     }
@@ -3227,7 +3209,7 @@ Session.prototype = {
 
     this.flowIIN = iin;
 
-    if (this.get('recurring')) {
+    if (this.recurring) {
       return;
     }
 

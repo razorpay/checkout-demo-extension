@@ -16,6 +16,7 @@ import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as WalletUtils from 'common/wallet';
+import { commonBanks } from 'common/bank';
 
 export default {
   RazorpayConfig,
@@ -40,4 +41,5 @@ export default {
   emandateView,
   Curtain,
   WalletUtils,
+  commonBanks,
 };

@@ -11,6 +11,7 @@ const UPI_APPS = {
       package_name: 'com.phonepe.app',
     },
     {
+      app_name: 'Google Pay (Tez)',
       package_name: 'com.google.android.apps.nbu.paisa.user',
     },
   ],
@@ -29,6 +30,7 @@ const UPI_APPS = {
       name: 'WhatsApp',
       app_name: 'WhatsApp UPI',
       package_name: 'com.whatsapp',
+      app_icon: 'https://cdn.razorpay.com/checkout/whatsapp.png',
     },
     {
       name: 'WhatsApp Business',
