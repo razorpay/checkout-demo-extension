@@ -1,6 +1,7 @@
 var PaymentRequest = global.PaymentRequest;
 
 const allowed_keys = [
+  'rzp_test_1DP5mmOlF5G5ag',
   'rzp_live_izcpsDPjM13eLY', // razorpay
   'rzp_live_Vxe5F7uRkCXkXp', // rapido
   'rzp_live_uot7iROpZmbKeI', // freshtohome
@@ -21,7 +22,10 @@ const allowed_keys = [
 
 export const checkKey = key => allowed_keys.indexOf(key) !== -1;
 
-const googlePaySupportedMethods = ['https://googlepay.google.com/pay'];
+const googlePaySupportedMethods = [
+  'https://tez.google.com/pay',
+  'https://googlepay.google.com/pay',
+];
 
 export const check = (successCallback, errorCallback) => {
   errorCallback = errorCallback || (() => {});
