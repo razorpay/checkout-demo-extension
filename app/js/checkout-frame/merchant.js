@@ -276,6 +276,9 @@ function setPreferredBanks(session) {
   var availBanks = session.methods.netbanking,
     bankOptions = session.get('method.netbanking');
 
+  /* set netbanks for eMandate */
+  session.netbanks = netbanks;
+
   if (!availBanks) {
     return;
   }
