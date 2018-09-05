@@ -10,7 +10,7 @@ export default function popupTemplate(_) {
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
   var title = get('name') || get('description') || 'Redirecting...';
-  var amount = displayAmount(_.r);
+  var amount = displayAmount(_.r, _.data.amount);
 
   var image = get('image');
   image = image ? `<div id="logo"><img src="${image}"/></div>` : '';
