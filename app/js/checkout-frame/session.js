@@ -2407,6 +2407,12 @@ Session.prototype = {
     var customer = this.customer;
     var tokens = customer && customer.tokens && customer.tokens.count;
     var cardTab = $('#form-card');
+    var delegator = this.delegator;
+
+    if (!delegator) {
+      delegator = this.delegator = Razorpay.setFormatter(this.el);
+    }
+
     if (tokens) {
       if ($$('.saved-card').length !== customer.tokens.items.length) {
         try {
@@ -2431,6 +2437,10 @@ Session.prototype = {
     this.savedCardScreen = tokens;
     this.toggleSavedCards(!!tokens);
     $('#form-card').toggleClass('has-cards', tokens);
+
+    each($$('.saved-cvv'), function(i, input) {
+      delegator.add('number', input);
+    });
   },
 
   toggleSavedCards: function(saveScreen) {

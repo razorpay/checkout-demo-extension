@@ -40,7 +40,7 @@
       <div class='cardtype' cardtype='`=network`'></div>
       <div class="saved-inner">
         <span class='saved-number'>`=card.last4`</span>
-        <input class='saved-cvv cvv-input' type='tel' placeholder='CVV' inputmode='numeric' maxlength='`=cvv_digits`' required pattern='[0-9]{3,4}'>
+        <input class='saved-cvv cvv-input' type='tel' placeholder='CVV' inputmode='numeric' maxlength='`=cvv_digits`' required pattern='^[0-9]{`=cvv_digits`}$'>
         `?plans`
           <div class="elem-wrap"><div class="elem select elem-savedcards-emi">
             <div class="help up">Please select the EMI duration</div>
