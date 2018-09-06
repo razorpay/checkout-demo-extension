@@ -2,6 +2,7 @@ const babel = require('rollup-plugin-babel');
 const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
+const svelte = require('rollup-plugin-svelte');
 const stylus = require('stylus');
 const autoprefixer = require('autoprefixer-stylus');
 const fs = require('fs');
@@ -77,8 +78,29 @@ module.exports = [
     paths: ['app/modules'],
   }),
 
+  svelte({
+    extensions: ['.js', '.html', '.svelte'],
+
+    skipIntroByDefault: true,
+    nestedTransitions: true,
+
+    /* TODO: enable run-time checks when not in production */
+    dev: false,
+
+    include: 'app/modules/**/*.html',
+    css: css => {
+      css.write('app/dist/v1/css/bundle.css');
+    },
+  }),
+
   babel({
-    include: ['app/modules/**/*.js', 'app/templates/**/*.jst'],
+    include: [
+      'app/modules/**/*.html',
+      'app/modules/**/*.js',
+      'node_modules/rollup_plugin_svelte/**/*.js',
+      'node_modules/svelte/**/*.js',
+      'app/templates/**/*.jst',
+    ],
 
     plugins: [
       '@babel/transform-arrow-functions',
