@@ -613,12 +613,17 @@ function showModalWithSession(session) {
 
   if (order && order.bank && get('callback_url') && order.method !== 'upi') {
     options.redirect = true;
-    return session.r.createPayment({
-      contact: get('prefill.contact') || '9999999999',
-      email: get('prefill.email') || 'void@razorpay.com',
-      bank: order.bank,
-      method: 'netbanking',
-    });
+    return session.r.createPayment(
+      {
+        contact: get('prefill.contact') || '9999999999',
+        email: get('prefill.email') || 'void@razorpay.com',
+        bank: order.bank,
+        method: 'netbanking',
+      },
+      {
+        fees: preferences.fee_bearer,
+      }
+    );
   }
   setPaymentMethods(session);
   if (!session.methods.count) {
