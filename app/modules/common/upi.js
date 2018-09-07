@@ -232,7 +232,10 @@ export const parseUPIIntentResponse = intentResponse => {
  * @return {Boolean}
  */
 export const didUPIIntentSucceed = parsedResponse =>
-  Boolean(parsedResponse.txnId);
+  Boolean(parsedResponse.txnId) ||
+  (parsedResponse.Status || parsedResponse.status || '')
+    .toLowerCase()
+    .indexOf('suc') === 0;
 
 /**
  * Returns a list containing the package names of all apps passed to the list.
