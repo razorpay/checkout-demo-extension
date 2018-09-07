@@ -3073,6 +3073,11 @@ Session.prototype = {
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
           CheckoutBridge.processPayment(JSON.stringify(data));
+        } else if (iosCheckoutBridgeNew) {
+          iosCheckoutBridgeNew.postMessage({
+            action: 'processPayment',
+            body: data,
+          });
         }
       });
     }
