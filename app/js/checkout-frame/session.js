@@ -3308,8 +3308,6 @@ Session.prototype = {
 
     /* TODO: remove common min and use bank specific min_amounts */
     emiOptions.min = 3000 * 100 - 1; /* min 3k */
-    emiOptions.amex_min = 5000 * 100 - 1; /* min 5k */
-    emiOptions.selected = 'KKBK'; /* default bank to select in EMI plans view */
 
     this.emi_options = emiOptions;
   },

@@ -1,4 +1,6 @@
 /* global templates, showOverlay, hideEmi */
+import EmiView from 'svelte/emi.html';
+import { AMEX_EMI_MIN } from 'common/constants';
 
 function selectEMIBank(e) {
   const { target } = e;
@@ -10,7 +12,9 @@ function selectEMIBank(e) {
     const active = parent.querySelector('.active');
 
     input.checked = Boolean(duration);
-    active |> _El.removeClass('active');
+    if (active) {
+      active |> _El.removeClass('active');
+    }
     target |> _El.addClass('active');
 
     setTimeout(() => {
@@ -40,9 +44,12 @@ function showEMIDropdown() {
 export default function emiView(session) {
   const opts = session.emi_options;
   const amount = (opts.amount = session.get('amount'));
+  this.amount = amount;
 
-  if (amount >= 5000 * 100) {
+  if (amount >= AMEX_EMI_MIN) {
     const help = _Doc.querySelector('#elem-emi .help');
+
+    /* TODO: improve bank name listing */
     help
       |> _El.setContents(
         help.innerHTML.replace(' & Axis Bank', ', Axis & AMEX')
@@ -57,17 +64,22 @@ export default function emiView(session) {
 }
 
 emiView.prototype = {
-  render: function() {
+  render() {
     const wrap = _Doc.querySelector('#emi-wrap');
 
     this.unbind();
-    wrap |> _El.setContents(templates.emi(this.opts));
-    this.bind();
-  },
+    let defaultBank = _Obj.keys(this.opts.banks)[0];
 
-  onchange: function(e) {
-    this.opts.selected = e.target.value;
-    this.render();
+    this.view = new EmiView({
+      target: wrap,
+      data: {
+        selected: defaultBank,
+        banks: this.opts.banks,
+        amount: this.amount,
+      },
+    });
+
+    this.bind();
   },
 
   on: function(event, sel, listener) {
@@ -76,7 +88,7 @@ emiView.prototype = {
     this.listeners.push(el |> _El.on(event, listener));
   },
 
-  bind: function() {
+  bind() {
     this.on(
       'click',
       '#emi-check-label',
@@ -109,11 +121,6 @@ emiView.prototype = {
       // TODO: Update showOverlay once session.js is refactored.
       showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
     });
-
-    // TODO: Update hideEmi once session.js is refactored.
-    this.on('click', '#emi-close', hideEmi);
-
-    this.on('change', '#emi-bank-select', _Func.bind(this.onchange, this));
   },
 
   unbind: function() {
