@@ -22,10 +22,7 @@ const allowed_keys = [
 
 export const checkKey = key => allowed_keys.indexOf(key) !== -1;
 
-const googlePaySupportedMethods = [
-  'https://tez.google.com/pay',
-  'https://googlepay.google.com/pay',
-];
+const googlePaySupportedMethods = ['https://tez.google.com/pay'];
 
 export const check = (successCallback, errorCallback) => {
   errorCallback = errorCallback || (() => {});
