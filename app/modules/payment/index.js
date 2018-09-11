@@ -233,7 +233,16 @@ Payment.prototype = {
     this.data = _Obj.clone(data || this.data);
     formatPayment(this);
 
+    let setCompleteHandler = _ => {
+      this.complete
+        |> _Func.bind(this)
+        |> _Obj.setPropOf(window, 'onComplete')
+        |> pollPaymentData;
+    };
+
     if (this.isAmazonpayPayment) {
+      setCompleteHandler();
+
       return window.setTimeout(() => {
         this.emit('amazonpay.process', this.data);
       }, 100);
@@ -257,10 +266,7 @@ Payment.prototype = {
 
     // adding listeners
     if ((isRazorpayFrame && !this.powerwallet) || this.isMagicPayment) {
-      this.complete
-        |> _Func.bind(this)
-        |> _Obj.setPropOf(window, 'onComplete')
-        |> pollPaymentData;
+      setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
   },
