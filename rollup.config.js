@@ -1,4 +1,5 @@
-let plugins = require('./rollup.plugins');
+const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
+const plugins = getPlugins({ src: 'app/modules' }).concat(stylus);
 
 const modules = {
   'entry/razorpay': 'Razorpay',
@@ -9,6 +10,7 @@ const modules = {
 
 function getOptions(module) {
   return {
+    ...rollupCommon,
     input: `app/modules/${module}.js`,
     output: {
       file: `app/js/generated/${module}.js`,
@@ -17,12 +19,6 @@ function getOptions(module) {
       name: modules[module],
     },
     plugins,
-
-    // https://github.com/rollup/rollup-watch/issues/22
-    watch: {
-      exclude: 'node_modules/**',
-      clearScreen: false,
-    },
   };
 }
 

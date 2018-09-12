@@ -13,11 +13,6 @@ const through = require('through2').obj;
 const runSequence = require('run-sequence');
 const { execSync } = require('child_process');
 
-const rollup = require('rollup');
-const rollupConfig = require('./rollup.config');
-
-const { pure_funcs } = require('./scripts/console-commands');
-
 const jshint = require('jshint').JSHINT;
 const jshintStylish = require('jshint-stylish').reporter;
 
@@ -111,7 +106,17 @@ gulp.task('uglify', done => {
 
     fileContents = uglify(fileContents, {
       compress: {
-        pure_funcs,
+        pure_funcs: [
+          'console.log',
+          'console.info',
+          'console.warn',
+          'console.error',
+          'console.time',
+          'console.timeEnd',
+          'console.table',
+          'console.assert',
+          'console.trace',
+        ],
         global_defs: {
           DEBUG_ENV: process.env.NODE_ENV !== 'production',
         },
@@ -170,19 +175,6 @@ gulp.task(
     gulp.watch(paths.templates, gulp.series('compileTemplates'));
     gulp.watch(paths.js, gulp.series('usemin'));
     gulp.watch(assetPath('*.html'), gulp.series('usemin'));
-
-    let watcher = rollup.watch(rollupConfig);
-    watcher.on('event', e => {
-      switch (e.code) {
-        case 'BUNDLE_END':
-          console.log(`${path.basename(e.input)}: ${e.duration}ms`);
-          joinJs();
-          break;
-        case 'ERROR':
-        case 'FATAL':
-          console.error('\x1b[31m', e.error.toString(), '\x1b[0m');
-      }
-    });
   })
 );
 

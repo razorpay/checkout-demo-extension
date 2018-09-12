@@ -70,15 +70,15 @@ export const getCardSpacing = maxLen => {
 };
 
 export const luhnCheck = num => {
-  let odd = true;
   let sum = 0;
   let digits = String(num)
     .split('')
     .reverse();
+
   for (var i = 0; i < digits.length; i++) {
     let digit = digits[i];
     digit = parseInt(digit, 10);
-    if ((odd = !odd)) {
+    if (!i) {
       digit *= 2;
     }
     if (digit > 9) {
@@ -86,5 +86,6 @@ export const luhnCheck = num => {
     }
     sum += digit;
   }
+
   return sum % 10 === 0;
 };

@@ -64,7 +64,7 @@ export default function Razorpay(overrides) {
     var message = e.message;
     if (!this.get || !this.isLiveMode()) {
       if (_.isNonNullObject(overrides) && !overrides.parent) {
-        alert(message);
+        global.alert(message);
       }
     }
     _.throwMessage(message);
@@ -269,7 +269,7 @@ export const optionValidations = {
   },
 
   display_amount: function(amount) {
-    amount = String(amount).replace(/([^0-9\.])/g, '');
+    amount = String(amount).replace(/([^0-9.])/g, '');
     if (!amount && amount !== Razorpay.defaults.display_amount) {
       return '';
     }

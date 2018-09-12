@@ -255,7 +255,7 @@ RazorProto.open = needBody(function() {
   if (!frame.el.contentWindow) {
     frame.close();
     frame.afterClose();
-    alert(
+    global.alert(
       'This browser is not supported.\nPlease try payment in another browser.'
     );
   }

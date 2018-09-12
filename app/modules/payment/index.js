@@ -8,7 +8,6 @@ import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 import * as strings from 'common/strings';
 
-import fetch from 'implicit/fetch';
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
