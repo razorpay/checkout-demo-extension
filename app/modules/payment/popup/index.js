@@ -100,7 +100,9 @@ Popup.prototype = {
     clearInterval(this.interval);
     _Arr.loop(this.listeners, l => l());
     this.listeners = [];
-    this.window.close();
+    if (this.window) {
+      this.window.close();
+    }
   },
 
   /**
