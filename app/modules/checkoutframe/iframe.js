@@ -11,7 +11,11 @@ import Track from 'tracker';
  */
 function handleNewIOSMethods(method, data) {
   var color = {
-    theme: hexToRgb(preferences.options.theme.color) || null,
+    /**
+     * Currently can't set theme color as it's not available onload
+     * TODO: Set color in whenever available after discussing with iOS team
+     **/
+    theme: null,
     navShow: { red: 0, green: 0, blue: 0, alpha: 0.5 },
     navHide: { red: 1, green: 1, blue: 1, alpha: 1 },
   };
@@ -58,7 +62,7 @@ const platformSpecific = {
 
         if (Bridge.hasNewIosBridge()) {
           method = data => {
-            handleNewIOSMethods(prop, method);
+            handleNewIOSMethods(prop, data);
           };
         } else {
           method = Bridge.iosLegacyMethod(prop);
