@@ -88,7 +88,7 @@ export const getBankFromCard = cardNum => {
   }
 };
 
-export const getPreferredBanks = netbanks => {
+export const getPreferredBanks = (preferences, netbanks) => {
   var bankObj = {};
   var availBanks = preferences.methods.netbanking;
   if (!availBanks) {

@@ -3443,7 +3443,7 @@ Session.prototype = {
     } else {
       methods.count = 1;
       this.down = getDownBanks(preferences);
-      this.netbanks = getPreferredBanks(this.methods.netbanking);
+      this.netbanks = getPreferredBanks(preferences, this.methods.netbanking);
     }
 
     if (methods.card) {
