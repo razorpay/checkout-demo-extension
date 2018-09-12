@@ -140,12 +140,17 @@ Bridge.prototype = {
    **/
   callIos: function(methodName, ...params) {
     const method = this.get(methodName);
+
     if (method) {
       try {
-        return method.apply(this.bridge, {
-          action: methodName,
-          body: params[0],
-        });
+        let dataObject = { action: methodName };
+
+        let parameters = params[0];
+        if (parameters) {
+          dataObject.body = parameters;
+        }
+
+        return method.call(this.bridge, dataObject);
       } catch (e) {}
     }
   },
