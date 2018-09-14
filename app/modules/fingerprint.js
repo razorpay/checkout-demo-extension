@@ -1,4 +1,5 @@
 let fingerPrint = '';
+const screen = global.screen;
 
 function getFingerprint() {
   var components = [
@@ -31,7 +32,7 @@ function getFingerprint() {
 
     screen.width * screen.height,
 
-    window.devicePixelRatio
+    global.devicePixelRatio,
   ];
 
   sha(components.join());
@@ -39,17 +40,17 @@ function getFingerprint() {
 
 function sha(str) {
   // We transform the string into an arraybuffer.
-  var buffer = new TextEncoder('utf-8').encode(str);
+  var buffer = new global.TextEncoder('utf-8').encode(str);
 
   // doesn't work on "http"
-  return window.crypto.subtle
+  return global.crypto.subtle
     .digest('SHA-1', buffer)
     .then(hash => (fingerPrint = hex(hash)));
 }
 
 function hex(buffer) {
   var hexCodes = [];
-  var view = new DataView(buffer);
+  var view = new global.DataView(buffer);
   for (var i = 0; i < view.byteLength; i += 4) {
     // Using getUint32 reduces the number of iterations needed (we process 4 bytes each time)
     var value = view.getUint32(i);

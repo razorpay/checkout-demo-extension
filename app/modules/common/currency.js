@@ -205,14 +205,14 @@ export function formatAmount(amount, currency) {
   return formatNumber(amount / divisor, currency, numDecimals);
 }
 
-export function displayAmount(razorpay) {
+export function displayAmount(razorpay, payloadAmount) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   if (displayCurrency) {
     return formatNumber(get('display_amount'), displayCurrency);
   }
   return formatAmount(
-    razorpay.display_amount || get('amount'),
+    razorpay.display_amount || payloadAmount || get('amount'),
     get('currency')
   );
 }

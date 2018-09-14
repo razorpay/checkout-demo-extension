@@ -627,12 +627,13 @@ i {
 
 #partial-back {
   padding: 0 24px;
+  z-index: 3;
 }
 
 #topbar, #partial-back {
   display: none;
   cursor: pointer;
-  background: $bg;
+  background: #fff;
   line-height: $topbarh;
   border-bottom: 1px solid $bc;
   transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
@@ -646,6 +647,18 @@ i {
   img {
     display: block;
     padding-top: 15px;
+  }
+
+  &:before {
+
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: -1;
   }
 }
 
