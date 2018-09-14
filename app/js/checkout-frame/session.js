@@ -2833,11 +2833,11 @@ Session.prototype = {
         'bank',
         'bank_account[name]',
         'bank_account[account_number]',
+        'bank_account[account_type]',
         'bank_account[ifsc]',
         'aadhaar[vid]',
         'auth_type',
         'auth_mode',
-        'account_type',
       ];
 
       each(opts, function(key, val) {
