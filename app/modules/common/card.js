@@ -78,7 +78,7 @@ export const luhnCheck = num => {
   for (var i = 0; i < digits.length; i++) {
     let digit = digits[i];
     digit = parseInt(digit, 10);
-    if (!i) {
+    if (i % 2) {
       digit *= 2;
     }
     if (digit > 9) {
