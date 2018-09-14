@@ -562,6 +562,7 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+  this.tab_titles = tab_titles;
 
   each(message, function(key, val) {
     if (key !== 'options') {
