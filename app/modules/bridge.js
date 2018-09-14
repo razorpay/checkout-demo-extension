@@ -1,6 +1,7 @@
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
+
 import Track from 'tracker';
 
 /* Our primary bridge is CheckoutBridge */
@@ -32,16 +33,20 @@ export const getCheckoutBridge = () => window.CheckoutBridge;
 export const hasCheckoutBridge = () => Boolean(getCheckoutBridge());
 
 export const iosLegacyMethod = method => {
+  let CheckoutBridge = getCheckoutBridge();
+  let doc = _Doc.documentElement;
+
   return function(data) {
     /* setting up js → ios communication by loading custom protocol inside
      * hidden iframe */
-    var iF = document.createElement('iframe');
+    var iF = _El.create('iframe');
     var src = 'razorpay://on' + method;
     if (data) {
       src += '?' + CheckoutBridge.index;
       CheckoutBridge.map[++CheckoutBridge.index] = data;
     }
     iF.setAttribute('src', src);
+
     doc.appendChild(iF);
     iF.parentNode.removeChild(iF);
     iF = null;
@@ -178,23 +183,46 @@ export const storage = new Bridge('StorageBridge');
 
 /**
  * This method is used to notify events to the SDK bridges
- * This function is only called if CheckoutBridgeExists
+ * This function is only called if CheckoutBridge exists
  * @param  {object} message to be sent to bridge
  */
 export const notifyBridge = message => {
+  /*
+   * Use CheckoutBridge here and not instance of Bridge.
+   * checkout instance of Bridge is instantiated at the time of first execution
+   * of code. At that time only native CheckoutBridge exists (for Android).
+   *
+   * The mock CheckoutBridge that we create for iOS does not exist at the time
+   * of first execution.
+   *
+   * We want to keep mock CheckoutBridge for iOS separate from checkout
+   * instance of the Bridge. This is due to legacy reasons.
+   */
   let CheckoutBridge = getCheckoutBridge();
+
+  if (!CheckoutBridge) {
+    return;
+  }
 
   if (message && message.event) {
     let bridgeMethod = `on${message.event}`;
-    let data = message.data;
-    if (!isString(data)) {
-      if (!data) {
-        /* TODO: replace invoke */
-        return invoke(bridgeMethod, CheckoutBridge);
-      }
-      data = stringify(data);
+    var method = CheckoutBridge[bridgeMethod];
+
+    if (!_.isFunction(method)) {
+      return;
     }
-    invoke(bridgeMethod, CheckoutBridge, data);
+
+    let data = message.data;
+    if (!_.isString(data)) {
+      if (!data) {
+        if (method) {
+          return method.call(CheckoutBridge);
+        }
+      }
+      data = _Obj.stringify(data);
+    }
+
+    method.call(CheckoutBridge, data);
   }
 };
 
@@ -213,10 +241,11 @@ window.handleOTP = function(otp) {
   otp = matches ? matches[0] : '';
   otp = String(otp).replace(/\D/g, '');
   var session = getSession();
-  var otpEl = gel('otp');
-  if (session && otpEl && !otpEl.vealue) {
+  var otpEl = _Doc.querySelector('#otp');
+  if (session && otpEl && !otpEl.value) {
     otpEl.value = otp;
-    $('#otp-elem').removeClass('invalid');
+
+    _Doc.querySelector('#otp-elem') |> _El.removeClass('invalid');
   }
 };
 
@@ -254,11 +283,12 @@ window.upiIntentResponse = function(data) {
  * pressed by user. Checkout will handle the back button action if the user is
  * on a sub screen. Checkout will give a callback to android in case that there
  * no action that can be done on back button click.
- * @param  {Function} callback This function is called when there is no back
- *                             button action to be done on checkout side.
- *                             Android prompts for closing checkout in that case
+ * @param  {String} callback This function is called when there is no back
+ *                           button action to be done on checkout side.
+ *                           Android prompts for closing checkout in that case
  */
 window.backPressed = function(callback) {
+  let CheckoutBridge = getCheckoutBridge();
   var session = getSession();
 
   var pollUrl = storage.call('getString', UPI_POLL_URL);
@@ -273,6 +303,8 @@ window.backPressed = function(callback) {
   ) {
     session.back();
   } else {
-    invoke(callback, CheckoutBridge);
+    if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
+      CheckoutBridge[callback]();
+    }
   }
 };
