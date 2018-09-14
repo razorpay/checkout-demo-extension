@@ -1,3 +1,5 @@
+/* global templates, showOverlay, hideEmi */
+
 function selectEMIBank(e) {
   const { target } = e;
 
@@ -105,7 +107,7 @@ emiView.prototype = {
 
     this.on('click', '#view-emi-plans', function() {
       // TODO: Update showOverlay once session.js is refactored.
-      showOverlay($('#emi-wrap'));
+      showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
     });
 
     // TODO: Update hideEmi once session.js is refactored.
@@ -115,9 +117,9 @@ emiView.prototype = {
   },
 
   unbind: function() {
-    // TODO: Update invokeEach once refactored.
-    invokeEach(this.listeners);
-
+    _Arr.loop(this.listeners, function(delistener) {
+      delistener();
+    });
     this.listeners = [];
   },
 };
