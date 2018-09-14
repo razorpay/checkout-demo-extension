@@ -2,9 +2,15 @@ import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
 import Track from 'tracker';
 import * as Bridge from 'bridge';
+import strings from 'common/strings';
+
+/* global errorHandler */
 
 let customers = {};
 let qpmap = _.getQueryParams();
+
+/* TODO: check with pranav if _session_is being used somewhere */
+let _session_id;
 
 export const getCustomer = contact => {
   // indian contact without +91
@@ -67,7 +73,7 @@ Customer.prototype = {
     this.tokens = data.tokens;
 
     if (!session.local) {
-      $('#top-right').addClass('logged');
+      _Doc.querySelector('#top-right') |> _El.addClass('logged');
     }
   },
 
@@ -135,7 +141,7 @@ Customer.prototype = {
           if (data.error.field) {
             errorHandler.call(getSession(), data);
           } else {
-            callback(discreet.wrongOtpMsg);
+            callback(strings.wrontOtp);
           }
         } else {
           callback();

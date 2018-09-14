@@ -57,6 +57,11 @@ export const TAB_TITLES = {
   ecod: 'Pay by Link',
 };
 
+/* .shown has display: none from iOS ad-blocker
+ * using दृश्य, which will never be seen by tim cook
+ */
+export const SHOWN_CLASS = 'drishy';
+
 export const CONTACT_PATTERN = /^\+?[0-9]{8,15}$/;
 export const EMAIL_PATTERN = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
