@@ -1167,7 +1167,7 @@ Session.prototype = {
             : banks[bankCode],
         code: bankCode,
         account_number: accountNumber,
-        image: `https://cdn.razorpay.com/bank/${bankCode}.gif`,
+        image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
       };
     }
   },

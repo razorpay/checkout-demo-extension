@@ -4,10 +4,7 @@ import { RazorpayConfig } from 'common/Razorpay';
 const cdnUrl = RazorpayConfig.cdn;
 const prefix = cdnUrl + 'bank/';
 
-const prefix = 'bank/';
-
-export const getBankLogo = code =>
-  RazorpayConfig.cdn + prefix + code.slice(0, 4) + '.gif';
+export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
 
 const _commonBanks = [
   ['ICIC_C', 'ICICI Corporate'],
@@ -93,8 +90,9 @@ export const getBankFromCard = cardNum => {
 };
 
 export const getPreferredBanks = (preferences, netbanks) => {
-  var bankObj = {};
-  var availBanks = preferences.methods.netbanking;
+  const availBanks = preferences.methods.netbanking;
+  let bankObj = {};
+
   if (!availBanks) {
     return;
   }
@@ -111,12 +109,11 @@ export const getPreferredBanks = (preferences, netbanks) => {
 };
 
 export const getDownBanks = preferences => {
-  var downObj = [];
-  var downtime = preferences.downtime;
+  const downtime = preferences.downtime;
+  let downList = [];
+
   if (downtime) {
-    each(downtime.netbanking, function(i, o) {
-      downObj = downObj.concat(o.issuer);
-    });
+    downList = _Arr.map(downtime.netbanking || [], o => o.issuer);
   }
-  return downObj;
+  return downList;
 };

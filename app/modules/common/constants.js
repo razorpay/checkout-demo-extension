@@ -70,5 +70,5 @@ export const PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
 export const MINUTES_TO_WAIT_FOR_PENDING_PAYMENT = 10;
 
 export const cookieDisabled = !navigator.cookieEnabled;
-export const isIframe = window !== parent;
-export const ownerWindow = isIframe ? parent : opener;
+export const isIframe = global !== global.parent;
+export const ownerWindow = isIframe ? global.parent : global.opener;

@@ -2,7 +2,7 @@ import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
 import Track from 'tracker';
 import * as Bridge from 'bridge';
-import strings from 'common/strings';
+import * as strings from 'common/strings';
 
 /* global errorHandler */
 

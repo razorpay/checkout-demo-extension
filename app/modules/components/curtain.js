@@ -1,3 +1,5 @@
+/* global templates */
+
 const defaultOptions = {
   heading: '',
   showClose: true,
@@ -13,7 +15,7 @@ function on(event, sel, listener) {
 }
 
 function unbind() {
-  invokeEach(listeners);
+  _Arr.callAll(listeners);
   listeners = [];
 }
 

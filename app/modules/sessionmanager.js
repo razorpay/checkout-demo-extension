@@ -1,5 +1,7 @@
 import Track from 'tracker';
 
+/* global Session */
+
 let sessions = {};
 export const getSession = (id = Track.id) => {
   return sessions[id];
