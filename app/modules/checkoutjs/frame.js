@@ -2,6 +2,8 @@ import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
 import { iPhone } from 'common/useragent';
 
+const { screen, innerHeight, scrollTo, pageYOffset } = global;
+
 const ua_iPhone = iPhone;
 var doc, head, docStyle;
 
@@ -79,7 +81,7 @@ function sanitizeImage(options) {
         (location.port ? ':' + location.port : '');
       var relUrl = '';
       if (image[0] !== '/') {
-        relUrl += location.pathname.replace(/[^\/]*$/g, '');
+        relUrl += location.pathname.replace(/[^/]*$/g, '');
         if (relUrl[0] !== '/') {
           relUrl = '/' + relUrl;
         }
@@ -429,13 +431,13 @@ CheckoutFrame.prototype = {
 
   onfailure: function(data) {
     this.ondismiss();
-    alert('Payment Failed.\n' + data.error.description);
+    global.alert('Payment Failed.\n' + data.error.description);
     this.onhidden();
   },
 
   onfault: function(message) {
     this.rzp.close();
-    alert('Oops! Something went wrong.\n' + message);
+    global.alert('Oops! Something went wrong.\n' + message);
     this.afterClose();
   },
 

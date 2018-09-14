@@ -416,7 +416,7 @@ var upi_apps = _.upi_intents_data;
                     <div class="flow-selection-container">
                       <label>Complete Payment Using</label>
                       <div class="flow input-radio">
-                        <input type="radio" name="auth_type" id="flow-3ds" value="3ds" checked>
+                        <input type="radio" name="auth_type" id="flow-3ds" value="c3ds" checked>
                         <label for="flow-3ds">
                           <div class="radio-display"></div>
                           <div class="label-content">OTP / Password</div>
@@ -449,7 +449,10 @@ var upi_apps = _.upi_intents_data;
                   `var count = 0, max = 3, total = 0;`
                   <div id="netb-banks" class="clear grid count-3">
                     `
-                    for(var b in _.netbanks){
+                    for(var i in _.netbanks){
+
+                      var b = _.netbanks[i].code;
+
                       if (!banks[b]) {
                         continue;
                       }
@@ -639,7 +642,7 @@ var upi_apps = _.upi_intents_data;
                           <input id="radio-tez" type="radio" name="_[flow]" value="tez"/>
                           <label for="radio-tez">
                             <i class="tez-icon"></i>
-                            <div class="title">Google Tez</div>
+                            <div class="title">Google Pay (Tez)</div>
                             <div class="subtitle">Installed on your device</div>
                             <span class="checkbox"></span>
                           </label>

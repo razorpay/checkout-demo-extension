@@ -15,6 +15,8 @@ import emiView from 'checkoutframe/emi';
 import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
+import * as WalletUtils from 'common/wallet';
+import { commonBanks } from 'common/bank';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -64,4 +66,6 @@ export default {
   emiView,
   emandateView,
   Curtain,
+  WalletUtils,
+  commonBanks,
 };

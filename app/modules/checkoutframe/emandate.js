@@ -19,6 +19,8 @@ export default function emandateView(session) {
     bank_account: session.get('prefill.bank_account[account_number]'),
     /* bank_name is the name of the account holder */
     bank_name: session.get('prefill.bank_account[name]'),
+    /* account type can be savings/current */
+    account_type: session.get('prefill.bank_account[account_type]'),
     /* bank_ifsc is the ifsc code for user's bank account */
     bank_ifsc: session.get('prefill.bank_account[ifsc]'),
     /* auth_type that the merchant wants to enforce */
@@ -27,8 +29,6 @@ export default function emandateView(session) {
     aadhaar: session.get('prefill.aadhaar[vid]'),
     /* auth mode can be otp/fp */
     auth_mode: session.get('prefill.auth_mode'),
-    /* account type can be savings/current */
-    account_type: session.get('prefill.account_type'),
   };
 
   this.opts = {
@@ -175,12 +175,7 @@ emandateView.prototype = {
 
   setBank: function(bankCode) {
     const netbanks = this.session.netbanks;
-    const backgroundImage =
-      'background-image: url(' +
-      (netbanks[bankCode]
-        ? netbanks[bankCode].logo
-        : 'https://cdn.razorpay.com/bank/' + bankCode + '.gif') +
-      ')';
+    const backgroundImage = `background-image: url(https://cdn.razorpay.com/bank/${bankCode}.gif)`;
 
     this.bank = bankCode;
 

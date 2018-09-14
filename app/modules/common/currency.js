@@ -164,10 +164,13 @@ export const displayCurrencies = {
   ZWL: 'Z$',
 };
 
+const getNumDecimalsOfCurrency = function(currency) {
+  return currency === 'JPY' ? 0 : 2;
+};
+
 const formats = {
   INR: function(amount) {
-    return (amount / 100)
-      .toFixed(2)
+    return String(amount)
       .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
       .replace('.00', '');
   },
@@ -178,27 +181,38 @@ const formats = {
 };
 
 const defaultFormat = function(amount) {
-  return (amount / 100)
-    .toFixed(2)
+  return String(amount)
     .replace(/(.{1,3})(?=(...)+(\...)$)/g, '$1,')
     .replace('.00', '');
 };
 
-export function formatAmount(amount, currency) {
+const formatNumber = function(number, currency, numDecimals) {
+  numDecimals =
+    numDecimals === void 0 ? getNumDecimalsOfCurrency(currency) : numDecimals;
+
   return (
     (currencies[currency] || displayCurrencies[currency]) +
-    (formats[currency] || defaultFormat)(amount)
+    (formats[currency] || defaultFormat)(
+      numDecimals ? Number(number).toFixed(numDecimals) : number
+    )
   );
+};
+
+export function formatAmount(amount, currency) {
+  const numDecimals = getNumDecimalsOfCurrency(currency),
+    divisor = Math.pow(10, numDecimals);
+
+  return formatNumber(amount / divisor, currency, numDecimals);
 }
 
-export function displayAmount(razorpay) {
+export function displayAmount(razorpay, payloadAmount) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   if (displayCurrency) {
-    return formatAmount(get('display_amount'), displayCurrency);
+    return formatNumber(get('display_amount'), displayCurrency);
   }
   return formatAmount(
-    razorpay.display_amount || get('amount'),
+    razorpay.display_amount || payloadAmount || get('amount'),
     get('currency')
   );
 }

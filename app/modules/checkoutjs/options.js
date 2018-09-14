@@ -6,7 +6,7 @@ RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {
-  netbanking: true,
+  netbanking: null,
   card: true,
   wallet: null,
   emi: true,
@@ -30,11 +30,11 @@ RazorpayDefaults.prefill = {
   bank: '',
   'bank_account[name]': '',
   'bank_account[account_number]': '',
+  'bank_account[account_type]': '',
   'bank_account[ifsc]': '',
   'aadhaar[vid]': '',
   auth_type: '',
   auth_mode: '',
-  account_type: '',
 };
 
 RazorpayDefaults.features = {

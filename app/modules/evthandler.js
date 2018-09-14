@@ -47,7 +47,7 @@ EvtHandler.prototype = {
     }
 
     // if el is not specified, i.e. number of args is 2 or 3
-    if (!(el instanceof Element)) {
+    if (!_.isElement(el)) {
       useCapture = el;
       el = this.el;
     }

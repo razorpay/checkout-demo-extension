@@ -9,7 +9,12 @@ const { execSync } = require('child_process');
 const { Collector, Reporter } = require('istanbul');
 const coverage = require('rollup-plugin-coverage');
 const puppeteer = require('puppeteer');
-const rollupPlugins = require('./rollup.plugins');
+const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
+const rollupPlugins = getPlugins({
+  src: 'app/modules',
+  lint: false,
+  watch: false,
+}).concat(stylus);
 
 const coveragePlugin = coverage({
   preserveComments: true,
@@ -38,7 +43,7 @@ Promise.all(
   glob('test/*/*.js').map(
     input =>
       new Promise((resolve, reject) => {
-        rollup({ input, plugins })
+        rollup({ input, plugins, ...rollupCommon })
           .then(bundle =>
             bundle.generate({
               format: 'iife',

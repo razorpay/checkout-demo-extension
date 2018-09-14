@@ -25,7 +25,7 @@ const otpLengths = {
   freecharge: 4,
 };
 
-const powerWallets = ['mobikwik', 'freecharge', 'olamoney'];
+const powerWallets = ['mobikwik', 'freecharge', 'olamoney', 'payumoney'];
 
 export const wallets = _Obj.map(list, (details, code) => ({
   power: powerWallets.indexOf(code) !== -1,
@@ -36,5 +36,5 @@ export const wallets = _Obj.map(list, (details, code) => ({
   sqLogo: sqPrefix + code + '.png',
 }));
 
-export const isPowerWallet = code => wallets[code].powerwallet;
+export const isPowerWallet = code => wallets[code] && wallets[code].power;
 export const getWallet = code => wallets[code];

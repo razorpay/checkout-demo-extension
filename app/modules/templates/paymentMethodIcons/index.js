@@ -20,7 +20,7 @@ function getIconFn(iconName) {
       return wallet;
   }
 }
-i;
+
 export const getIcon = (
   iconName,
   { foregroundColor = '#072654', backgroundColor = '#3F71D7' }
