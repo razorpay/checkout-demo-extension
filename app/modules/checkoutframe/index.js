@@ -18,7 +18,7 @@ var CheckoutBridge = window.CheckoutBridge;
 const validUID = id => {
   /* check only for iFrame because we trust our SDKs */
   if (isIframe && !CheckoutBridge) {
-    if (!isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)) {
+    if (!_.isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)) {
       return false;
     }
   }
@@ -33,8 +33,8 @@ Razorpay.sendMessage = function(message) {
   if (ownerWindow) {
     message.source = 'frame';
     message.id = Track.id;
-    if (isNonNullObject(message)) {
-      message = stringify(message);
+    if (_.isNonNullObject(message)) {
+      message = _Obj.stringify(message);
     }
     ownerWindow.postMessage(message, '*');
   }
@@ -76,12 +76,12 @@ const optionsTransformer = {
   addPreviousData: (o, message) => {
     var data = message.data;
     if (data) {
-      if (isString(data)) {
+      if (_.isString(data)) {
         try {
           data = JSON.parse(data);
         } catch (e) {}
       }
-      if (isNonNullObject(data)) {
+      if (_.isNonNullObject(data)) {
         o.data = data;
       }
     }
@@ -129,8 +129,8 @@ export const handleMessage = function(message) {
       return Razorpay.sendMessage({ event: 'fault', data: e.message });
     }
     var oldSession = SessionManager.getSession();
-    if (oldSession) {
-      invoke('saveAndClose', oldSession);
+    if (oldSession && _.isFunction(oldSession.saveAndClose)) {
+      oldSession.saveAndClose();
     }
 
     session.id = id;
@@ -149,7 +149,7 @@ export const handleMessage = function(message) {
   }
 
   try {
-    if (isNonNullObject(CheckoutBridge)) {
+    if (_.isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
       CheckoutBridge.sendExtraAnalyticsData = e => {};
     }

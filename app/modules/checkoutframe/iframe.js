@@ -127,7 +127,7 @@ export function initIframe() {
   }
 
   if (qpmap.message) {
-    parseMessage({ data: atob(qpmap.message) });
+    parseMessage({ data: global.atob(qpmap.message) });
   }
 
   Razorpay.sendMessage({ event: 'load' });
