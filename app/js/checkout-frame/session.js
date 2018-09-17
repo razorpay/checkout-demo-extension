@@ -3000,6 +3000,10 @@ Session.prototype = {
       if (!walletObj || walletObj.custom) {
         return;
       }
+
+      if (this.hasAmazopaySdk && wallet === 'amazonpay') {
+        request.amazonpay = true;
+      }
     }
 
     if (this.modal) {
@@ -3062,6 +3066,21 @@ Session.prototype = {
         });
       }
     });
+
+    if (request.amazonpay) {
+      payment.on('payment.amazonpay.process', function(data) {
+        /* invoke amazonpay sdk via our SDK */
+        if (CheckoutBridge && CheckoutBridge.processPayment) {
+          that.showLoadError();
+          CheckoutBridge.processPayment(JSON.stringify(data));
+        } else if (iosCheckoutBridgeNew) {
+          iosCheckoutBridgeNew.postMessage({
+            action: 'processPayment',
+            body: data,
+          });
+        }
+      });
+    }
 
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());

@@ -919,6 +919,10 @@ window.handleMessage = function(message) {
     );
   }
 
+  if (isNonNullObject(message.external_sdks)) {
+    session.hasAmazopaySdk = message.external_sdks.amazonpay;
+  }
+
   session.sdk_popup = message.sdk_popup;
 
   session.magic = message.magic;
