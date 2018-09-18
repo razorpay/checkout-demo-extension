@@ -3295,10 +3295,10 @@ Session.prototype = {
         each(prefEmiOptions[bank.code], function(j, plan) {
           emiBank.plans[plan.duration] = plan.interest;
         });
-      }
 
-      if (prefEmiOptions[bank.code]) {
-        emiBanks[bank.code] = emiBank;
+        if (prefEmiOptions[bank.code]) {
+          emiBanks[bank.code] = emiBank;
+        }
       }
     });
 
