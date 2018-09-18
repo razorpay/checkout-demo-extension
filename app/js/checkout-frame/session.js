@@ -3444,7 +3444,10 @@ Session.prototype = {
     } else {
       methods.count = 1;
       this.down = getDownBanks(preferences);
-      this.netbanks = getPreferredBanks(preferences, this.methods.netbanking);
+      this.netbanks = getPreferredBanks(
+        preferences,
+        this.get('method.netbanking')
+      );
     }
 
     if (methods.card) {
@@ -3508,6 +3511,8 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    /* TODO: try to make a separate module for preferences */
+    this.r.preferences = prefs;
     this.preferences = prefs;
     preferences = prefs;
 
@@ -3613,7 +3618,11 @@ Session.prototype = {
       }
     }
 
-    /* Set redirect mode if TPV and callback_url exists */
+    /*
+     * Set redirect mode if TPV and callback_url exists
+     *
+     * TODO: move this to payment
+     */
     if (
       order &&
       order.bank &&
@@ -3621,12 +3630,17 @@ Session.prototype = {
       order.method !== 'upi'
     ) {
       session_options.redirect = true;
-      return this.r.createPayment({
-        contact: this.get('prefill.contact') || '9999999999',
-        email: this.get('prefill.email') || 'void@razorpay.com',
-        bank: order.bank,
-        method: 'netbanking',
-      });
+      return this.r.createPayment(
+        {
+          contact: this.get('prefill.contact') || '9999999999',
+          email: this.get('prefill.email') || 'void@razorpay.com',
+          bank: order.bank,
+          method: 'netbanking',
+        },
+        {
+          fee: preferences.fee_bearer,
+        }
+      );
     }
 
     /* set payment methods on the basis of preferences */

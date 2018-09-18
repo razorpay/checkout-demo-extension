@@ -89,23 +89,48 @@ export const getBankFromCard = cardNum => {
   }
 };
 
-export const getPreferredBanks = (preferences, netbanks) => {
+export const getPreferredBanks = (preferences, bankOptions) => {
   const availBanks = preferences.methods.netbanking;
-  let bankObj = {};
+  const order = bankOptions && bankOptions.order;
 
   if (!availBanks) {
     return;
   }
 
-  commonBanks
-    |> _Arr.reduce((accumulator, currBank) => {
-      if (availBanks[currBank.code] && !availBanks[`${currBank.code}_C`]) {
-        accumulator[currBank.code] = currBank;
-      }
-      return accumulator;
-    }, bankObj);
+  let bankList =
+    commonBanks
+    |> _Arr.filter(currBank => {
+      return availBanks[currBank.code] && !availBanks[`${currBank.code}_C`];
+    });
 
-  return bankObj;
+  if (_.isArray(order)) {
+    /* Indexing to avoid search */
+    var bankIndexMap = bankList.reduce(function(map, bank, index) {
+      map[bank.code] = bank;
+      return map;
+    }, {});
+
+    bankList = order
+      /* convert strings given in order to bank object */
+      .map(function(b) {
+        return bankIndexMap[b];
+      })
+
+      /* add rest of the preferred banks */
+      .concat(bankList)
+
+      /* remove empty and duplicated banks */
+      .filter(function(bankObj) {
+        var bankVal = bankObj && bankIndexMap[bankObj.code];
+        if (bankVal) {
+          /* remove from index to avoid repetition */
+          bankIndexMap[bankObj.code] = false;
+          return bankVal;
+        }
+      });
+  }
+
+  return bankList;
 };
 
 export const getDownBanks = preferences => {
