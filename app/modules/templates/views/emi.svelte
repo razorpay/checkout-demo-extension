@@ -29,6 +29,7 @@
 
 <script>
   import Razorpay from 'common/Razorpay';
+  /* global hideEmi */
 
   export default {
     computed: {

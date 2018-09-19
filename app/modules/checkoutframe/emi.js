@@ -1,5 +1,5 @@
 /* global templates, showOverlay, hideEmi */
-import EmiView from 'svelte/emi.html';
+import EmiView from 'templates/views/emi.svelte';
 import { AMEX_EMI_MIN } from 'common/constants';
 
 function selectEMIBank(e) {
