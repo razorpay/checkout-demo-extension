@@ -2,7 +2,7 @@ import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
 import { iPhone } from 'common/useragent';
 
-const { screen, innerHeight, scrollTo, pageYOffset } = global;
+const { screen, scrollTo } = global;
 
 const ua_iPhone = iPhone;
 var doc, head, docStyle;
@@ -19,7 +19,7 @@ var merchantMarkup = {
   },
 
   resize: function() {
-    var height = innerHeight || screen.height;
+    var height = global.innerHeight || screen.height;
     CheckoutFrame.container.style.position =
       height < 450 ? 'absolute' : 'fixed';
     this.el.style.height = Math.max(height, containerHeight) + 'px';
@@ -27,12 +27,12 @@ var merchantMarkup = {
 
   // scroll manually in iPhone
   scroll: function() {
-    if (typeof window.pageYOffset !== 'number') {
+    if (typeof global.pageYOffset !== 'number') {
       return;
     }
-    if (innerHeight < containerHeight) {
-      var maxY = containerHeight - innerHeight;
-      if (pageYOffset > maxY + 120) {
+    if (global.innerHeight < containerHeight) {
+      var maxY = containerHeight - global.innerHeight;
+      if (global.pageYOffset > maxY + 120) {
         _Doc.smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
@@ -310,7 +310,7 @@ CheckoutFrame.prototype = {
     docStyle.overflow = 'hidden';
 
     if (ua_iPhone) {
-      merchantMarkup.oldY = pageYOffset;
+      merchantMarkup.oldY = global.pageYOffset;
       global.scrollTo(0, 0);
       merchantMarkup.orientationchange.call(this);
     }
