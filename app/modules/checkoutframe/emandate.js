@@ -1,3 +1,10 @@
+import Track from 'tracker';
+import { getSession } from 'sessionmanager';
+import { getCheckoutBridge } from 'bridge';
+import * as Curtain from 'components/curtain';
+
+/* global templates, fillData */
+
 const emandateTabTitles = {
   'emandate-bank': 'Bank',
   'emandate-netbanking': 'Netbanking',
@@ -56,8 +63,8 @@ emandateView.prototype = {
   },
 
   on: function(event, selector, listener, capture) {
-    const $el = _Doc.querySelector(selector);
-    this.listeners.push($el |> _El.on(event, listener, capture));
+    const el = _Doc.querySelector(selector);
+    this.listeners.push(el |> _El.on(event, listener, capture));
   },
 
   inputRadioChanged: function(e) {
@@ -93,14 +100,20 @@ emandateView.prototype = {
       .add('ifsc', _Doc.querySelector('#adhr-acc-ifsc'))
       .on('change', function() {
         if (this.isValid() && this.el.value.length === this.caretPosition) {
-          invoke('focus', _Doc.querySelector('#adhr-acc-name'), null, 0);
+          let field = _Doc.querySelector('#adhr-acc-name');
+          if (field && _.isFunction(field.focus)) {
+            field.focus();
+          }
         }
       });
     delegator.nb_ifsc = delegator
       .add('ifsc', _Doc.querySelector('#nb-acc-ifsc'))
       .on('change', function() {
         if (this.isValid() && this.el.value.length === this.caretPosition) {
-          invoke('focus', _Doc.querySelector('#nb-acc-name'), null, 0);
+          let field = _Doc.querySelector('#nb-acc-name');
+          if (field && _.isFunction(field.focus)) {
+            field.focus();
+          }
         }
       });
     delegator.aadhaar = delegator.add(
@@ -119,8 +132,9 @@ emandateView.prototype = {
   },
 
   unbind: function() {
-    // TODO: Replace invokeEach once refactored.
-    invokeEach(this.listeners);
+    _Arr.loop(this.listeners, function(delistener) {
+      delistener();
+    });
     this.listeners = [];
   },
 
@@ -171,12 +185,8 @@ emandateView.prototype = {
   },
 
   setBank: function(bankCode) {
-    const backgroundImage =
-      'background-image: url(' +
-      'https://cdn.razorpay.com/bank/' +
-      bankCode +
-      '.gif' +
-      ')';
+    const netbanks = this.session.netbanks;
+    const backgroundImage = `background-image: url(https://cdn.razorpay.com/bank/${bankCode}.gif)`;
 
     this.bank = bankCode;
 
@@ -197,7 +207,8 @@ emandateView.prototype = {
       authTypes.indexOf('netbanking') > -1 &&
       !(this.prefill.auth_mode || this.prefill.account_type)
     ) {
-      $('#emandate-options .netbanking').removeClass('disabled');
+      _Doc.querySelector('#emandate-options .netbanking')
+        |> _El.removeClass('disabled');
     }
 
     if (authTypes.indexOf('aadhaar') > -1) {
@@ -225,7 +236,7 @@ emandateView.prototype = {
 
   setTabTitles: function() {
     _Obj.loop(emandateTabTitles, (v, k) => {
-      tab_titles[k] = v;
+      this.session.tab_titles[k] = v;
     });
   },
 
@@ -345,10 +356,14 @@ emandateView.prototype = {
   },
 
   openUIDAI: function() {
+    const qpmap = _.getQueryParams();
     const isSupportedSDK = qpmap.platform && !isUnsupportedSDK();
+    const CheckoutBridge = getCheckoutBridge();
 
     if (isSupportedSDK) {
       Track(this.session.r, 'emandate_aadhaar_uidai_link_intent');
+
+      /* TODO: use bridge module */
       CheckoutBridge.callNativeIntent(
         _Doc.querySelector('#aadhaar_vid_link').href
       );
@@ -392,7 +407,7 @@ emandateView.prototype = {
           this.on(
             'change',
             '#emandate-aadhaar-radios',
-            bind(this.inputRadioChanged, this),
+            e => this.inputRadioChanged(e),
             true
           );
         }
@@ -427,6 +442,8 @@ emandateView.prototype = {
  * Android SDKs without callNativeIntent
  */
 function isUnsupportedSDK() {
+  const qpmap = _.getQueryParams();
+  const CheckoutBridge = getCheckoutBridge();
   if (qpmap.platform) {
     return !(CheckoutBridge && CheckoutBridge.callNativeIntent);
   }

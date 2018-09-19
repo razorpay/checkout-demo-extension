@@ -18,6 +18,7 @@ var invoice = _.invoice;
 var walletsDesc = _.walletsDesc;
 
 var bank = _.tpvBank || {};
+var emi_options = _.emi_options;
 
 var aadhaarVid = o('prefill.aadhaar[vid]');
 var accountName = o('prefill.bank_account[name]');
@@ -176,8 +177,8 @@ var upi_apps = _.upi_intents_data;
                   `?_.tpvBank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
-                        `?bank.image`
-                          <img src="`=bank.image`">
+                        `?bank.logo`
+                          <img src="`=bank.logo`">
                         `?`
                         `?bank.name`
                           `=bank.name`
@@ -273,7 +274,7 @@ var upi_apps = _.upi_intents_data;
                             `?_.recurring_card_text`
                               `=_.recurring_card_text`
                             `??`
-                              Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?preferences.methods.amex`, Amex`?`
+                              Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?_.preferences.methods.amex`, Amex`?`
                             `?`
                           </span>
                         </label>
@@ -337,7 +338,7 @@ var upi_apps = _.upi_intents_data;
                       <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
-                        `?o('amount')>emi_options.amex_min&&preferences.methods.amex`
+                        `?o('amount')>emi_options.amex_min&&_.preferences.methods.amex`
                           <option value="AMEX">American Express</option>
                         `?`
                         `~emi_options.banks:code:bank`
@@ -449,7 +450,6 @@ var upi_apps = _.upi_intents_data;
                   <div id="netb-banks" class="clear grid count-3">
                     `
                     for(var i in _.netbanks){
-
                       var b = _.netbanks[i].code;
 
                       if (!banks[b]) {
@@ -543,16 +543,16 @@ var upi_apps = _.upi_intents_data;
                     <div class="list collapsable">
                       `~wallet:i:w`
                       `
-                        var hasOffer = _.walletOffer && _.walletOffer.issuer === w.name && _.walletOffer;
+                        var hasOffer = _.walletOffer && _.walletOffer.issuer === w.code && _.walletOffer;
                       `
                         <div class="wallet item radio-item">
 
-                          <input type="radio" name="wallet" value="`=w.name`" id="wallet-radio-`=w.name`">
-                          <label for="wallet-radio-`=w.name`" class="radio-label">
+                          <input type="radio" name="wallet" value="`=w.code`" id="wallet-radio-`=w.code`">
+                          <label for="wallet-radio-`=w.code`" class="radio-label">
                             <span class="checkbox"></span>
-                            <img style="display:none" src="`=w.sq`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
+                            <img style="display:none" src="`=w.sqLogo`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
                             <div class="placeholder"></div>
-                            <span class="title">`=w.title`</span>
+                            <span class="title">`=w.name`</span>
                             `?hasOffer`
                               <span class="offer">`=hasOffer.name`</span>
                               <div class="offer-info">
@@ -658,7 +658,7 @@ var upi_apps = _.upi_intents_data;
                   <div style="margin: 10px 0; padding: 10px 0">
                     <div id='ecod-resend' class='text-btn' style='float: right'>Resend Link</div>
                     <span style='border-bottom: 1px dashed #ddd'>`=invoice.url`</span>
-                    `?epos_share_link`
+                    `?_.epos_share_link`
                       <a id="share-link" class="btn"
                         href="rzp://rzp.io/invoice/share/`=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)`">
                         Share Link
