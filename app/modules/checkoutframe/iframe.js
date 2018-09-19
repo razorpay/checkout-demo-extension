@@ -93,12 +93,10 @@ export function initIframe() {
 
     try {
       if (typeof data === 'string') {
-        data = _Obj.parse(data);
+        data = _Obj.parse(data) || {};
       }
       handleMessage(data);
-    } catch (err) {
-      // roll('message: ' + data, err, 'warn');
-    }
+    } catch (err) {}
   };
 
   window |> _El.on('message', parseMessage);

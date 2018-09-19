@@ -2,6 +2,7 @@ import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
 import * as SessionManager from 'sessionmanager';
 import { makePrefParams } from 'common/Razorpay';
+import { getSortedApps } from 'common/upi';
 import Track from 'tracker';
 
 import {
@@ -67,9 +68,16 @@ const optionsTransformer = {
     }
   },
 
+  addExternalSdks: (o, message) => {
+    if (_.isNonNullObject(message.external_sdks)) {
+      o.hasAmazonpaySdk = message.external_sdks.amazonpay;
+    }
+  },
+
   addUpiIntentsData: (o, message) => {
     if (message.upi_intents_data && message.upi_intents_data.length) {
-      o.upi_intents_data = message.upi_intents_data;
+      o.all_upi_intents_data = message.upi_intents_data;
+      o.upi_intents_data = getSortedApps(message.upi_intents_data);
     }
   },
 

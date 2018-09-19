@@ -61,7 +61,7 @@ export function show(options) {
 
   var confirmationDialog = _Doc.querySelector('#confirmation-dialog');
   var overlay = _Doc.querySelector('#overlay');
-  confirmationDialog[0].innerHTML = templates.confirm(options);
+  _El.setContents(confirmationDialog, templates.confirm(options));
 
   on('click', '.confirm-container #positiveBtn', () => {
     hide();
