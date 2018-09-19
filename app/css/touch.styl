@@ -63,6 +63,7 @@ $mobile-view() {
       }
 
       .offers-list-container {
+        top: 0;
         height: $bodyhmobile + $footerh;
         height: calc(100% - 129px);
         height: calc(100vh - 129px);
@@ -230,15 +231,5 @@ $mobile-view() {
   }
   .grid label {
     height: 73px;
-  }
-}
-
-/**
- * Workaround for iOS Safari issue where window.innerHeight does not work as expected.
- */
-.ip {
-  #body[screen="wallet"],
-  #body[screen="upi"] {
-    height: calc(100vh - 180px);
   }
 }
