@@ -1,6 +1,7 @@
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
+import * as Confirm from 'confirm';
 
 import Track from 'tracker';
 
@@ -297,7 +298,9 @@ window.backPressed = function(callback) {
     session.hideErrorMessage();
   }
 
-  if (
+  if (Confirm.isConfirmShown) {
+    Confirm.hide(true);
+  } else if (
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
