@@ -67,6 +67,12 @@ const optionsTransformer = {
     }
   },
 
+  addExternalSdks: (o, message) => {
+    if (_.isNonNullObject(message.external_sdks)) {
+      o.hasAmazonpaySdk = message.external_sdks.amazonpay;
+    }
+  },
+
   addUpiIntentsData: (o, message) => {
     if (message.upi_intents_data && message.upi_intents_data.length) {
       o.upi_intents_data = message.upi_intents_data;

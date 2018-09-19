@@ -3043,7 +3043,7 @@ Session.prototype = {
         return;
       }
 
-      if (this.hasAmazopaySdk && wallet === 'amazonpay') {
+      if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
         request.amazonpay = true;
       }
     }
@@ -3108,6 +3108,8 @@ Session.prototype = {
         });
       }
     });
+
+    var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
     if (request.amazonpay) {
       payment.on('payment.amazonpay.process', function(data) {
