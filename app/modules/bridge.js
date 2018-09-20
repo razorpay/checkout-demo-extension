@@ -171,10 +171,11 @@ Bridge.prototype = {
    **/
   call: function(methodName, ...params) {
     const method = this.get(methodName);
+    params = [methodName].concat(params);
 
     if (method) {
-      this.callAndroid.apply(this, methodName, params);
-      this.callIos.apply(this, methodName, params);
+      this.callAndroid.apply(this, params);
+      this.callIos.apply(this, params);
     }
   },
 };

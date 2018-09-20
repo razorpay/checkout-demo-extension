@@ -576,6 +576,8 @@ function Session(message) {
     $(doc).addClass('embedded');
   }
 
+  this.states = Constants.STATES;
+
   /* The count of payments attempted */
   this.attemptCount = 0;
   this.listeners = [];
@@ -3632,6 +3634,7 @@ Session.prototype = {
       order.method !== 'upi'
     ) {
       session_options.redirect = true;
+      this.tpvRedirect = true;
       return this.r.createPayment(
         {
           contact: this.get('prefill.contact') || '9999999999',
@@ -3728,6 +3731,11 @@ Session.prototype = {
         'setMerchantOptions',
         JSON.stringify(preferences.options)
       );
+
+      if (self.tpvRedirect) {
+        return;
+      }
+
       callback(preferences);
     });
 
