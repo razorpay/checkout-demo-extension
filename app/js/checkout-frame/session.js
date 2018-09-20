@@ -444,7 +444,7 @@ function errorHandler(response) {
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
       hideOverlayMessage();
-      this.offers.showError();
+      this.showOffersError();
       this.track('offer_mismatch', this.offers.appliedOffer);
     } else {
       this.showLoadError(
@@ -1729,6 +1729,19 @@ Session.prototype = {
           },
           true
         );
+
+        this.on('click', '#wallets [name="wallet"]', function(e) {
+          if (!this.validateOffers(e.target.value)) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            this.showOffersError(function(removeOffer) {
+              return removeOffer && e.target.click();
+            });
+
+            return;
+          }
+        });
       } catch (e) {}
     }
 
@@ -2500,6 +2513,14 @@ Session.prototype = {
       .toggleClass('vis', indexOf(this.down, val) !== -1)
       .$('.text')
       .html((this.methods.netbanking || this.methods.emandate)[val]);
+  },
+
+  validateOffers: function(selectedVal, selectedEl) {
+    if (!this.offers || !this.offers.appliedOffer) {
+      return true;
+    }
+
+    return this.offers.appliedOffer.issuer === selectedVal;
   },
 
   selectBankRadio: function(e) {
@@ -3510,6 +3531,21 @@ Session.prototype = {
 
       this.track('offer_is_forced', forcedOffer);
     }
+  },
+
+  showOffersError: function(cb) {
+    var methodDescription = '',
+      screen = this.screen;
+
+    if (screen === 'netbanking') {
+      methodDescription = 'Bank';
+    } else if (screen === 'upi') {
+      methodDescription = 'VPA';
+    } else {
+      methodDescription = titleCase(this.screen);
+    }
+
+    this.offers.showError(methodDescription, cb);
   },
 
   setPreferences: function(prefs) {
