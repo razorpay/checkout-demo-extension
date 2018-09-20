@@ -361,3 +361,11 @@ function hexToRgb(hex, alpha) {
       }
     : null;
 }
+
+function titleCase(str) {
+  if (!str) {
+    return str;
+  }
+
+  return str[0].toUpperCase() + str.slice(1);
+}
