@@ -576,6 +576,8 @@ function Session(message) {
     $(doc).addClass('embedded');
   }
 
+  this.states = Constants.STATES;
+
   /* The count of payments attempted */
   this.attemptCount = 0;
   this.listeners = [];
