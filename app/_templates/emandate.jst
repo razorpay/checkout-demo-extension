@@ -3,7 +3,6 @@ var bank_account = _.prefill.bank_account,
     bank_name = _.prefill.bank_name,
     bank_ifsc = _.prefill.bank_ifsc,
     aadhaar = _.prefill.aadhaar,
-    auth_mode = _.prefill.auth_mode,
     account_type = _.prefill.account_type,
     ifsc_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$',
     bank = _.prefill.bank;
@@ -87,9 +86,6 @@ var bank_account = _.prefill.bank_account,
         I agree that the above details are correct and my Aadhaar is linked to this bank account
       </span>
     </div>
-    `?auth_mode`
-      <input name="auth_mode" type="hidden" value="`=auth_mode`" />
-    `?`
     `?account_type`
       <input name="bank_account[account_type]" type="hidden" value="`=account_type`" />
     `?`
