@@ -1019,20 +1019,6 @@ Session.prototype = {
     this.isOpen = true;
 
     this.setTpvBanks();
-
-    var hasOffers = isArray(preferences.offers),
-      forcedOffer =
-        hasOffers && preferences.force_offer && preferences.offers[0];
-
-    if (forcedOffer) {
-      if (['card', 'wallet'].indexOf(forcedOffer.payment_method) >= 0) {
-        // need this while preparing the template
-        this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
-      }
-
-      this.track('offer_is_forced', forcedOffer);
-    }
-
     this.getEl();
     this.setFormatting();
     this.setEmandate();
@@ -1045,13 +1031,15 @@ Session.prototype = {
     this.bindEvents();
     errorHandler.call(this, this.params);
 
+    var hasOffers = this.hasOffers,
+      forcedOffer = this.forcedOffer;
+
     if (forcedOffer) {
       if (
         'original_amount' in forcedOffer &&
         'amount' in forcedOffer &&
         forcedOffer.amount !== forcedOffer.original_amount
       ) {
-        this.forcedDiscountOffer = forcedOffer;
         this.showDiscount(forcedOffer);
         this.track('offer_is_forced_with_discount', forcedOffer);
       }
@@ -3018,7 +3006,7 @@ Session.prototype = {
     }
 
     var appliedOffer =
-      this.forcedDiscountOffer || (this.offers && this.offers.appliedOffer);
+      this.forcedOffer || (this.offers && this.offers.appliedOffer);
 
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
@@ -3347,7 +3335,6 @@ Session.prototype = {
     var methods = (this.methods = {
       count: 0,
     });
-
     /* Set recurring payment methods*/
     if (recurring) {
       availMethods = availMethods.recurring;
@@ -3504,30 +3491,25 @@ Session.prototype = {
     }
 
     wallets.sort(function(walletA, walletB) {
-      return walletB.custom || self.offersList.wallet[walletB.code] ? 1 : -1;
+      return walletB.custom ? 1 : -1;
     });
 
     methods.wallet = wallets;
   },
 
   setOffers: function(preferences) {
-    var offers = preferences.offers;
+    var hasOffers = (this.hasOffers = isArray(preferences.offers)),
+      forcedOffer = (this.forcedOffer =
+        hasOffers && preferences.force_offer && preferences.offers[0]);
 
-    /* we restructure offers object for checkout */
-    var modifiedOffers = {
-      wallet: {},
-    };
-
-    each(offers, function(index, offer) {
-      var payment_method = offer.payment_method;
-      if (payment_method === 'card') {
-        modifiedOffers.card = offer;
-      } else if (payment_method === 'wallet') {
-        modifiedOffers.wallet[offer.issuer || offer.payment_network] = offer;
+    if (forcedOffer) {
+      if (['card', 'wallet'].indexOf(forcedOffer.payment_method) >= 0) {
+        // need this while preparing the template
+        this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
       }
-    });
 
-    this.offersList = modifiedOffers;
+      this.track('offer_is_forced', forcedOffer);
+    }
   },
 
   setPreferences: function(prefs) {
