@@ -122,6 +122,10 @@ export default function Payment(data, params, r) {
     }
   }
 
+  if (typeof data.auth_type === 'undefined' && this.isMagicPayment) {
+    data.auth_type = '3ds';
+  }
+
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
   trackNewPayment(data, params, r);
 
