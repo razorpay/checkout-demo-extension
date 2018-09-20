@@ -31,8 +31,6 @@ export default function emandateView(session) {
     auth_type: session.get('prefill.auth_type'),
     /* aadhaar VID is the 16 digit aadhaar number of the user */
     aadhaar: session.get('prefill.aadhaar[vid]'),
-    /* auth mode can be otp/fp */
-    auth_mode: session.get('prefill.auth_mode'),
   };
 
   this.opts = {
@@ -172,12 +170,9 @@ emandateView.prototype = {
     /**
      * Netbanking is allowed only if
      * 1. netbanking is an auth type, AND
-     * 2. auth_mode and account_type are NOT set in prefill
+     * 2. account_type is NOT set in prefill
      */
-    if (
-      authTypes.indexOf('netbanking') > -1 &&
-      (this.prefill.auth_mode || this.prefill.account_type)
-    ) {
+    if (authTypes.indexOf('netbanking') > -1 && this.prefill.account_type) {
       authTypes.splice(authTypes.indexOf('netbanking'), 1);
     }
 
@@ -201,12 +196,9 @@ emandateView.prototype = {
     /**
      * Netbanking is allowed only if
      * 1. netbanking is an auth type, AND
-     * 2. auth_mode and account_type are NOT set in prefill
+     * 2. account_type is NOT set in prefill
      */
-    if (
-      authTypes.indexOf('netbanking') > -1 &&
-      !(this.prefill.auth_mode || this.prefill.account_type)
-    ) {
+    if (authTypes.indexOf('netbanking') > -1 && !this.prefill.account_type) {
       _Doc.querySelector('#emandate-options .netbanking')
         |> _El.removeClass('disabled');
     }

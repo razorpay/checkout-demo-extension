@@ -2878,7 +2878,6 @@ Session.prototype = {
         'bank_account[ifsc]',
         'aadhaar[vid]',
         'auth_type',
-        'auth_mode',
       ];
 
       each(opts, function(key, val) {
