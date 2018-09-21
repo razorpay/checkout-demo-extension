@@ -76,7 +76,7 @@ function getCommonTrackingData(r) {
   return props;
 }
 
-export default function Track(r, event, data) {
+export default function Track(r, event, data, beacon) {
   if (!r.isLiveMode()) {
     return;
   }
@@ -154,25 +154,33 @@ export default function Track(r, event, data) {
       ],
     };
 
+    const useBeacon = beacon && _Obj.hasProp(navigator, 'sendBeacon');
+
     /**
      * We are doing encodeURIComponent → unescape here to remove all the
      * non-latin characters to latin
      */
+    const postData = {
+      url: 'https://lumberjack.razorpay.com/v1/track',
+      data: {
+        key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
+        // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
+        data:
+          trackingPayload
+          |> _Obj.stringify
+          |> encodeURIComponent
+          |> unescape
+          |> btoa
+          |> encodeURIComponent,
+      },
+    };
+
     try {
-      fetch.post({
-        url: 'https://lumberjack.razorpay.com/v1/track',
-        data: {
-          key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
-          // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
-          data:
-            trackingPayload
-            |> _Obj.stringify
-            |> encodeURIComponent
-            |> unescape
-            |> btoa
-            |> encodeURIComponent,
-        },
-      });
+      if (useBeacon) {
+        navigator.sendBeacon(postData.url, _Obj.stringify(postData.data));
+      } else {
+        fetch.post(postData);
+      }
     } catch (e) {}
   });
 }

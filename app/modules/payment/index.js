@@ -87,10 +87,15 @@ function getTrackingData(data) {
 }
 
 function trackNewPayment(data, params, r) {
-  Track(r, 'submit', {
-    data: getTrackingData(data),
-    params: params,
-  });
+  Track(
+    r,
+    'submit',
+    {
+      data: getTrackingData(data),
+      params: params,
+    },
+    true
+  );
 }
 
 export default function Payment(data, params, r) {
