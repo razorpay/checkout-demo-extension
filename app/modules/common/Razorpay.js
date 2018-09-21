@@ -1,3 +1,4 @@
+import Analytics from 'analytics';
 import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
@@ -54,6 +55,7 @@ export default function Razorpay(overrides) {
   }
   Eventer.call(this);
   this.id = Track.makeUid();
+  Analytics.setR(this);
 
   var options;
   try {
