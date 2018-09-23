@@ -3245,8 +3245,9 @@ Session.prototype = {
       invokeOnEach('off', this.bits);
       this.listeners = [];
       this.bits = [];
-
-      this.modal.destroy();
+      if (this.modal) {
+        this.modal.destroy();
+      }
       $(this.el).remove();
 
       this.tab = this.screen = '';
@@ -3260,6 +3261,7 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
+      this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
     }
   },
