@@ -1956,12 +1956,31 @@ Session.prototype = {
       // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
       try {
         // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
-        if (
-          el_cvv &&
-          typeof getComputedStyle(el_expiry)['-webkit-text-security'] ===
-            'string'
-        ) {
-          el_cvv.type = 'tel';
+        if (el_cvv) {
+          /**
+           * -webkit-text-security is supported from IE9.
+           * input[type=tel] is supported from IE10.
+           *
+           * If <IE9, use type=password
+           * If <IE10, use type=number (-webkit-text-security will still be applied)
+           */
+
+          /**
+           * Check for <IE10. input[type=tel] will be converted to input[type=text] automatically on <IE10.
+           */
+          if (el_cvv.type === 'text') {
+            el_cvv.type = 'number';
+          }
+
+          /**
+           * Check for <IE9. Masking-input-using-CSS isn't available so we change the type to password.
+           */
+          if (
+            typeof getComputedStyle(el_expiry)['-webkit-text-security'] ===
+            'undefined'
+          ) {
+            el_cvv.type = 'password';
+          }
         }
       } catch (e) {}
 
@@ -2481,6 +2500,12 @@ Session.prototype = {
     var customer = this.customer;
     var tokens = customer && customer.tokens && customer.tokens.count;
     var cardTab = $('#form-card');
+    var delegator = this.delegator;
+
+    if (!delegator) {
+      delegator = this.delegator = Razorpay.setFormatter(this.el);
+    }
+
     if (tokens) {
       if ($$('.saved-card').length !== customer.tokens.items.length) {
         try {
@@ -2506,6 +2531,10 @@ Session.prototype = {
     this.savedCardScreen = tokens;
     this.toggleSavedCards(!!tokens);
     $('#form-card').toggleClass('has-cards', tokens);
+
+    each($$('.saved-cvv'), function(i, input) {
+      delegator.add('number', input);
+    });
   },
 
   toggleSavedCards: function(saveScreen) {
