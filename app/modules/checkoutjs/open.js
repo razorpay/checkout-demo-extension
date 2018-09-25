@@ -249,6 +249,8 @@ RazorProto.onNew = function(event, callback) {
 };
 
 RazorProto.open = needBody(function() {
+  this.openedAt = Date.now();
+
   var frame = (this.checkoutFrame = getPreloadedFrame(this));
   Track(this, 'open');
 

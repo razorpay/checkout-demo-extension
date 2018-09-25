@@ -1,5 +1,6 @@
 import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
+import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
 import { makePrefParams } from 'common/Razorpay';
 import { getSortedApps } from 'common/upi';
@@ -125,6 +126,10 @@ export const handleMessage = function(message) {
   var id = message.id || Track.id;
   var session = SessionManager.getSession(id);
   var options = message.options;
+
+  if (message.openedAt) {
+    Analytics.setMeta('open', message.openedAt);
+  }
 
   if (!session) {
     if (!options) {

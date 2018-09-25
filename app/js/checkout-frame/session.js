@@ -1128,6 +1128,11 @@ Session.prototype = {
     if (this.all_upi_intents_data) {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
     }
+
+    Analytics.track('complete', {
+      type: AnalyticsTypes.RENDER,
+    });
+    Analytics.setMeta('render', Date.now());
   },
 
   setTpvBanks: function() {
@@ -1419,6 +1424,13 @@ Session.prototype = {
   },
 
   resendOTP: function() {
+    Analytics.track('otp:resend', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.tab === 'wallet',
+      },
+    });
+
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
@@ -1621,6 +1633,14 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.click('.payment-option', function(e) {
+      Analytics.track('payment_method:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          disabled: $(e.currentTarget).hasClass('disabled'),
+          method: e.currentTarget.getAttribute('tab') || '',
+        },
+      });
+
       if (!$(e.currentTarget).hasClass('disabled')) {
         this.switchTab(e.currentTarget.getAttribute('tab') || '');
       }
@@ -1725,6 +1745,15 @@ Session.prototype = {
               }
             } else {
               var value = e.target.value;
+
+              Analytics.track('wallet:select', {
+                type: AnalyticsTypes.BEHAV,
+                data: {
+                  wallet: value,
+                  power: discreet.WalletUtils.isPowerWallet(value),
+                },
+              });
+
               $('#body').toggleClass('sub', value);
               $('#wallets').removeClass('invalid');
             }
@@ -2103,6 +2132,14 @@ Session.prototype = {
       return;
     }
 
+    Analytics.track('screen:switch', {
+      data: {
+        from: this.screen,
+        to: screen,
+      },
+    });
+    Analytics.setMeta('screen', screen);
+
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
@@ -2261,6 +2298,10 @@ Session.prototype = {
     var tab = '';
     var self = this;
 
+    Analytics.track('back', {
+      type: AnalyticsTypes.BEHAV,
+    });
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
@@ -2313,6 +2354,15 @@ Session.prototype = {
         return;
       }
     }
+
+    Analytics.track('tab:switch', {
+      data: {
+        from: this.tab,
+        to: tab,
+      },
+    });
+    Analytics.setMeta('tab', tab);
+
     if (tab) {
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
@@ -2492,6 +2542,13 @@ Session.prototype = {
     var saveClass = 'saved-cards';
     if (typeof saveScreen !== 'boolean') {
       saveScreen = !tabCard.hasClass(saveClass);
+
+      Analytics.track('saved_cards:toggle', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          from: tabCard.hasClass(saveClass) ? 'saved' : 'new',
+        },
+      });
     }
 
     $('#elem-emi').removeClass('hidden');
@@ -2517,6 +2574,14 @@ Session.prototype = {
 
   switchBank: function(e) {
     var val = e.target.value;
+
+    Analytics.track('bank:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        bank: val,
+      },
+    });
+
     this.checkDown(val);
     this.checkBankRadio(val);
     this.proceedAutomaticallyAfterSelectingBank();
@@ -2559,6 +2624,14 @@ Session.prototype = {
       Razorpay.sendMessage({ event: 'blur' });
     }
     var val = e.target.value;
+
+    Analytics.track('bank:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        bank: val,
+      },
+    });
+
     this.checkDown(val);
     var select = gel('bank-select');
     select.value = val;
@@ -2791,6 +2864,14 @@ Session.prototype = {
     if (this.checkInvalid('#form-otp')) {
       return;
     }
+
+    this.track('otp:submit', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.tab === 'wallet',
+      },
+    });
+
     this.showLoadError('Verifying OTP');
     var otp = gel('otp').value.replace(/\D/g, '');
 
