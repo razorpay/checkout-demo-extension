@@ -416,7 +416,7 @@ emandateView.prototype = {
         }
 
         this.on('mouseover', '.emandate-education-text .has-tooltip', () => {
-          this.track('aadhaar:tooltip_viewed', AnalyticsTypes.BEHAV);
+          this.track('aadhaar:tooltip:view', AnalyticsTypes.BEHAV);
         });
 
         this.on('click', '#emandate-aadhaar-radios', e => {
