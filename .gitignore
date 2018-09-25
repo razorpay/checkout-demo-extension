@@ -1,7 +1,6 @@
 # outputs
 /app/dist
 /app/js/generated
-/app/css/generated
 /app/modules/generated
 /app/templates
 /coverage
