@@ -1,5 +1,5 @@
-import Track from 'tracker';
-import { getSession } from 'sessionmanager';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 import { getCheckoutBridge } from 'bridge';
 import * as Curtain from 'components/curtain';
 
@@ -123,9 +123,20 @@ emandateView.prototype = {
     this.on('change', '#emandate-aadhaar-linked-check-label', e => {
       const checked = e.target.checked;
 
-      Track(this.session.r, 'emandate_aadhaar_linked_checkbox_change', {
-        checked,
-      });
+      this.track(
+        'aadhaar:linked_checkbox:change',
+        {
+          checked,
+        },
+        AnalyticsTypes.BEHAV
+      );
+    });
+  },
+
+  track: function(name, data = {}, type) {
+    Analytics.track(`emandate:${name}`, {
+      type,
+      data,
     });
   },
 
@@ -353,14 +364,14 @@ emandateView.prototype = {
     const CheckoutBridge = getCheckoutBridge();
 
     if (isSupportedSDK) {
-      Track(this.session.r, 'emandate_aadhaar_uidai_link_intent');
+      this.track('aadhaar:uidai_link_intent');
 
       /* TODO: use bridge module */
       CheckoutBridge.callNativeIntent(
         _Doc.querySelector('#aadhaar_vid_link').href
       );
     } else {
-      Track(this.session.r, 'emandate_aadhaar_uidai_link_native');
+      this.track('aadhaar:uidai_link_native');
       _Doc.querySelector('#aadhaar_vid_link').click();
     }
   },
@@ -391,7 +402,7 @@ emandateView.prototype = {
           );
 
           this.on('click', '#emandate-uidai-copy .copytoclipboard--btn', () => {
-            Track(this.session.r, 'aadhar_vid_link_copied');
+            this.track('aadhaar:vid_link_copied', AnalyticsTypes.BEHAV);
           });
         } else {
           this.session.setPayButtonText('Create Aadhaar VID');
@@ -405,14 +416,18 @@ emandateView.prototype = {
         }
 
         this.on('mouseover', '.emandate-education-text .has-tooltip', () => {
-          Track(this.session.r, 'emandate_aadhaar_tooltip_viewed');
+          this.track('aadhaar:tooltip_viewed', AnalyticsTypes.BEHAV);
         });
 
         this.on('click', '#emandate-aadhaar-radios', e => {
           if (e.target.nodeName.toLowerCase() === 'input') {
-            Track(this.session.r, 'emandate_aadhaar_radio_change', {
-              value: e.target.value,
-            });
+            this.track(
+              'aadhaar:vid_radios:change',
+              {
+                value: e.target.value,
+              },
+              AnalyticsTypes.BEHAV
+            );
           }
         });
       },
@@ -424,7 +439,7 @@ emandateView.prototype = {
 
     this.session.setPayButtonText('Next');
 
-    Track(this.session.r, 'emandate_aadhaar_curtain_closed');
+    this.track('aadhaar:curtain:close', AnalyticsTypes.BEHAV);
   },
 };
 
