@@ -5,7 +5,7 @@
 
 <style>
   .something {
-    background: red;
+    background: yellow;
 
     input {
       display: block;
