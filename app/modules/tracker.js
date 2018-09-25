@@ -199,6 +199,17 @@ function addMagicProps(r, properties) {
   }
 }
 
+Track.parseAnalyticsData = data => {
+  if (!_.isNonNullObject(data)) {
+    return;
+  }
+
+  data
+    |> _Obj.loop((key, val) => {
+      trackingProps[key] = val;
+    });
+};
+
 Track.makeUid = makeUid;
 Track.common = getCommonTrackingData;
 Track.props = trackingProps;

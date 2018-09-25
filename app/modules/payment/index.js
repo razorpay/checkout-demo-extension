@@ -104,6 +104,8 @@ export default function Payment(data, params, r) {
 
   this.magicPossible = this.isMagicPayment;
 
+  this.isAmazonpayPayment = params.amazonpay;
+
   this.isDebitPin =
     data &&
     data.auth_type &&
@@ -118,6 +120,10 @@ export default function Payment(data, params, r) {
     if (data.auth_type === 'c3ds') {
       delete data.auth_type;
     }
+  }
+
+  if (typeof data.auth_type === 'undefined' && this.isMagicPayment) {
+    data.auth_type = '3ds';
   }
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
@@ -230,6 +236,21 @@ Payment.prototype = {
     this.data = _Obj.clone(data || this.data);
     formatPayment(this);
 
+    let setCompleteHandler = _ => {
+      this.complete
+        |> _Func.bind(this)
+        |> _Obj.setPropOf(window, 'onComplete')
+        |> pollPaymentData;
+    };
+
+    if (this.isAmazonpayPayment) {
+      setCompleteHandler();
+
+      return window.setTimeout(() => {
+        this.emit('amazonpay.process', this.data);
+      }, 100);
+    }
+
     if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
       this.r.set('redirect', true);
     }
@@ -248,10 +269,7 @@ Payment.prototype = {
 
     // adding listeners
     if ((isRazorpayFrame && !this.powerwallet) || this.isMagicPayment) {
-      this.complete
-        |> _Func.bind(this)
-        |> _Obj.setPropOf(window, 'onComplete')
-        |> pollPaymentData;
+      setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
   },

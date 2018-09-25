@@ -18,6 +18,16 @@ import { setShieldParams } from 'payment/validator';
 import * as WalletUtils from 'common/wallet';
 import { commonBanks } from 'common/bank';
 
+/* Required for merchant.js migration */
+import * as Constants from 'common/constants';
+import * as Bank from 'common/bank';
+import * as Wallet from 'common/wallet';
+import * as SessionManager from 'sessionmanager';
+import * as Checkout from 'checkoutframe/index';
+import { initIframe } from 'checkoutframe/iframe';
+import * as Bridge from 'bridge';
+import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -37,6 +47,22 @@ export default {
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrontOtp,
+
+  initIframe,
+
+  Constants,
+  Bank,
+  Wallet,
+  SessionManager,
+  Checkout,
+  Bridge,
+
+  getQueryParams: _.getQueryParams,
+
+  Customer,
+  getCustomer,
+  sanitizeTokens,
+
   emiView,
   emandateView,
   Curtain,

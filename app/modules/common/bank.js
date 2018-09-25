@@ -1,9 +1,10 @@
 import { RazorpayConfig } from 'common/Razorpay';
 
-const prefix = 'bank/';
+// const cdnUrl = '';
+const cdnUrl = RazorpayConfig.cdn;
+const prefix = cdnUrl + 'bank/';
 
-export const getBankLogo = code =>
-  RazorpayConfig.cdn + prefix + code.slice(0, 4) + '.gif';
+export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
 
 const _commonBanks = [
   ['ICIC_C', 'ICICI Corporate'],
@@ -29,7 +30,7 @@ export const commonBanks = _Arr.map(_commonBanks, banks => ({
   logo: getBankLogo(banks[0]),
 }));
 
-const emiBanks = [
+export const emiBanks = [
   {
     code: 'KKBK',
     name: 'Kotak Mahindra Bank',
@@ -58,7 +59,7 @@ const emiBanks = [
   {
     code: 'ICIC',
     name: 'ICICI Bank',
-    patt: /^4(37551|50172|61133|62986|70573|74846|0(2368|5533|765(1|9))|2322(6|7)|20580|477(46|47|58)|44341)|5(17(637|653|719)|24(193|376)|(23951|25996|52418|47467|45207|40282))/,
+    patt: /^4(37551|50172|61133|62986|70573|74846|0(2368|5533|7(352|65(1|9)))|2322(6|7)|20580|477(46|47|58)|44341)|5(17(637|653|719)|24(193|376)|(23951|25996|52418|47467|45207|40282))/,
   },
   {
     code: 'SCBL',
@@ -86,4 +87,58 @@ export const getBankFromCard = cardNum => {
       logo: getBankLogo(bankObj.code),
     };
   }
+};
+
+export const getPreferredBanks = (preferences, bankOptions) => {
+  const availBanks = preferences.methods.netbanking;
+  const order = bankOptions && bankOptions.order;
+
+  if (!availBanks) {
+    return;
+  }
+
+  let bankList =
+    commonBanks
+    |> _Arr.filter(currBank => {
+      return availBanks[currBank.code] && !availBanks[`${currBank.code}_C`];
+    });
+
+  if (_.isArray(order)) {
+    /* Indexing to avoid search */
+    var bankIndexMap = bankList.reduce(function(map, bank, index) {
+      map[bank.code] = bank;
+      return map;
+    }, {});
+
+    bankList = order
+      /* convert strings given in order to bank object */
+      .map(function(b) {
+        return bankIndexMap[b];
+      })
+
+      /* add rest of the preferred banks */
+      .concat(bankList)
+
+      /* remove empty and duplicated banks */
+      .filter(function(bankObj) {
+        var bankVal = bankObj && bankIndexMap[bankObj.code];
+        if (bankVal) {
+          /* remove from index to avoid repetition */
+          bankIndexMap[bankObj.code] = false;
+          return bankVal;
+        }
+      });
+  }
+
+  return bankList;
+};
+
+export const getDownBanks = preferences => {
+  const downtime = preferences.downtime;
+  let downList = [];
+
+  if (downtime) {
+    downList = _Arr.map(downtime.netbanking || [], o => o.issuer);
+  }
+  return downList;
 };

@@ -1,3 +1,6 @@
+import { SHOWN_CLASS } from 'common/constants';
+/* global templates */
+
 const defaultOptions = {
   position: 'top',
   onHide: () => {},
@@ -9,13 +12,15 @@ const defaultOptions = {
 var listeners = [];
 
 function on(event, sel, listener) {
-  var $el = $(sel);
-  /* $el.on return a function to removeEventListener */
-  listeners.push($el.on(event, listener));
+  var el = _Doc.querySelector(sel);
+  /* _El.on returns a function to removeEventListener */
+  listeners.push(el |> _El.on(event, listener));
 }
 
 function unbind() {
-  invokeEach(listeners);
+  _Arr.loop(listeners, function(delistener) {
+    delistener();
+  });
   listeners = [];
 }
 
@@ -28,15 +33,16 @@ export function hide(invokeCallback = false) {
     return;
   }
 
-  if (!$('#error-message').hasClass(shownClass)) {
-    $('#overlay').removeClass(shownClass);
+  if (!_El.hasClass(_Doc.querySelector('#error-message'), SHOWN_CLASS)) {
+    _Doc.querySelector('#overlay') |> _El.removeClass(SHOWN_CLASS);
     setTimeout(() => {
-      $('#overlay').css('display', '');
+      _Doc.querySelector('#overlay') |> _El.setStyle('display', '');
     }, 300);
   }
-  $('#confirmation-dialog').removeClass('animate');
+
+  _Doc.querySelector('#confirmation-dialog') |> _El.removeClass('animate');
   setTimeout(() => {
-    $('#confirmation-dialog').removeClass(shownClass);
+    _Doc.querySelector('#confirmation-dialog') |> _El.removeClass(SHOWN_CLASS);
   }, 300);
 
   isConfirmShown = false;
@@ -53,9 +59,9 @@ export function show(options) {
     unbind();
   }
 
-  var $confirmationDialog = $('#confirmation-dialog');
-  var $overlay = $('#overlay');
-  $confirmationDialog[0].innerHTML = templates.confirm(options);
+  var confirmationDialog = _Doc.querySelector('#confirmation-dialog');
+  var overlay = _Doc.querySelector('#overlay');
+  _El.setContents(confirmationDialog, templates.confirm(options));
 
   on('click', '.confirm-container #positiveBtn', () => {
     hide();
@@ -66,14 +72,14 @@ export function show(options) {
     options.onNegativeClick();
   });
 
-  $overlay.css('display', 'block');
-  $overlay.addClass(shownClass);
+  _El.setStyle(overlay, 'display', 'block');
+  _El.addClass(overlay, SHOWN_CLASS);
 
-  $confirmationDialog.addClass(shownClass);
-  $confirmationDialog.addClass('confirm-position-' + options.position);
+  _El.addClass(confirmationDialog, SHOWN_CLASS);
+  _El.addClass(confirmationDialog, 'confirm-position-' + options.position);
 
   setTimeout(() => {
-    $confirmationDialog.addClass('animate');
+    _El.addClass(confirmationDialog, 'animate');
   }, 10);
 
   isConfirmShown = true;

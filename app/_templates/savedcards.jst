@@ -9,6 +9,7 @@
     'unknown': 'unknown'
   };
   var emiMode = _.emi_mode;
+  var emi_options = _.emi_options;
 `
 `~_.tokens.items:i:item`
   `?item.card`
@@ -21,7 +22,6 @@
 
       if (network === 'amex') {
         bank = 'AMEX';
-        banks = emi_options.other_banks;
         min_amount = emi_options.amex_min;
       }
 

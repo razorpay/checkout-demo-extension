@@ -14,6 +14,12 @@ var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var ua_android_browser = discreet.androidBrowser;
+var Constants = discreet.Constants;
+var Bank = discreet.Bank;
+var Wallet = discreet.Wallet;
+var SessionManager = discreet.SessionManager;
+var Checkout = discreet.Checkout;
+var Bridge = discreet.Bridge;
 var Curtain = discreet.Curtain;
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
@@ -21,7 +27,7 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
     return;
   }
 
-  Track(getSession().r, 'js_error', {
+  Track(SessionManager.getSession().r, 'js_error', {
     message: errorMsg,
     line: lineNumber,
     col: column,
