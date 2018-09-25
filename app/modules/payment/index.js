@@ -127,7 +127,7 @@ export default function Payment(data, params, r) {
     }
   }
 
-  if (typeof data.auth_type === 'undefined' && this.isMagicPayment) {
+  if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
     data.auth_type = '3ds';
   }
 
