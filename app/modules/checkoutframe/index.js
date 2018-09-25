@@ -127,8 +127,8 @@ export const handleMessage = function(message) {
   var session = SessionManager.getSession(id);
   var options = message.options;
 
-  if (message.openedAt) {
-    Analytics.setMeta('open', message.openedAt);
+  if (message.metadata && message.metadata.openedAt) {
+    Analytics.setMeta('open', message.metadata.openedAt);
   }
 
   if (!session) {

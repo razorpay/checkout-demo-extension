@@ -228,8 +228,11 @@ CheckoutFrame.prototype = {
       referer: location.href,
       options: options,
       id: rzp.id,
-      openedAt: rzp.openedAt,
     };
+
+    if (rzp.metadata) {
+      response.metadata = rzp.metadata;
+    }
 
     _Obj.loop(rzp.modal.options, function(option, i) {
       options['modal.' + i] = option;
