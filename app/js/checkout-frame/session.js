@@ -3944,4 +3944,3 @@ function updateTimer(timeoutEl, closeAt) {
  */
 
 discreet.initIframe();
-('');
