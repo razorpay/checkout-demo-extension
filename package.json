@@ -55,7 +55,6 @@
     "rollup-plugin-includepaths": "^0.2.3",
     "rollup-plugin-inject": "^2.0.0",
     "rollup-plugin-svelte": "^4.3.0",
-    "run-sequence": "^2.2.1",
     "stylus": "^0.54.5",
     "svelte": "^2.13.2",
     "tap-difflet": "^0.7.1",

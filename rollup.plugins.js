@@ -49,7 +49,7 @@ fs.writeFileSync(
       .join(';')
 );
 
-const stylusProcessor = (content, id) =>
+const stylusProcessor = (content, id, module = true) =>
   new Promise((resolve, reject) => {
     var stylusOptions = {
       filename: id,
@@ -68,7 +68,9 @@ const stylusProcessor = (content, id) =>
       if (err) {
         return reject(err);
       }
-      code = `export default ${JSON.stringify(code)};`;
+      if (module) {
+        code = `export default ${JSON.stringify(code)};`;
+      }
       resolve({ code, map: { mappings: '' } });
     });
   });
@@ -84,12 +86,18 @@ module.exports = [
     skipIntroByDefault: true,
     nestedTransitions: true,
 
+    preprocess: {
+      style: ({ content, filename }) => {
+        return stylusProcessor(content, filename, false);
+      },
+    },
+
     /* TODO: enable run-time checks when not in production */
     dev: false,
 
     include: 'app/modules/**/*.html',
     css: css => {
-      css.write('app/dist/v1/css/bundle.css');
+      css.write('app/css/generated/svelte.styl');
     },
   }),
 
@@ -97,7 +105,6 @@ module.exports = [
     include: [
       'app/modules/**/*.html',
       'app/modules/**/*.js',
-      'node_modules/rollup_plugin_svelte/**/*.js',
       'node_modules/svelte/**/*.js',
       'app/templates/**/*.jst',
     ],
