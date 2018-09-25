@@ -1,1 +1,2 @@
-export let BEHAV = 'behav';
+export const BEHAV = 'behav';
+export const RENDER = 'render';

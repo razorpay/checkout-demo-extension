@@ -1,6 +1,8 @@
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
 import Track from 'tracker';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as strings from 'common/strings';
 
@@ -168,6 +170,13 @@ Customer.prototype = {
   },
 
   logout: function(this_device, callback) {
+    Analytics.track('logout', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        all: !this_device,
+      },
+    });
+
     let ajaxOpts = {
       url: makeAuthUrl(this.r, 'apps/logout'),
       method: 'delete',
