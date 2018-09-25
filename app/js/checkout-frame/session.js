@@ -3638,9 +3638,14 @@ Session.prototype = {
         hasOffers && preferences.force_offer && preferences.offers[0]);
 
     if (forcedOffer) {
-      if (['card', 'wallet'].indexOf(forcedOffer.payment_method) >= 0) {
+      var paymentMethod =
+        forcedOffer.payment_method === 'emi'
+          ? 'card'
+          : forcedOffer.payment_method;
+
+      if (['card', 'wallet'].indexOf(paymentMethod) >= 0) {
         // need this while preparing the template
-        this[forcedOffer.payment_method + 'Offer'] = preferences.offers[0];
+        this[paymentMethod + 'Offer'] = preferences.offers[0];
       }
 
       this.track('offer_is_forced', forcedOffer);
