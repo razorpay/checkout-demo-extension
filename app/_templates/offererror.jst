@@ -1,14 +1,21 @@
+`
+  var offerData = _.offer.data,
+      formattedAmount = _.formatAmount(offerData.original_amount);
+`
+
 <div class="offers-error">
   <div class="offers-error-content">
     <div class="error-title">
       OFFER NOT APPLICABLE
     </div>
     <div class="error-desc">
-      The offer “<span class="error-offer-title"></span>” is not applicable. Do you want to continue and <b>pay <span class="total-amount"></span></span> ?
+      The offer <b>“`=_.offer.data.name`”</b>`?_.offer.discount` is not applicable`?_.methodDescription` on this `=_.methodDescription``?`. Do you want to continue and <b>pay `=formattedAmount`</b> ?`??` will no longer be applicable.`?`
     </div>
     <div class="error-actionables">
-      <span class="cancel text-btn">RETRY</span>
-      <span class="pay text-btn">YES, PAY <span class="total-amount"></span></span>
+      <span class="cancel text-btn">GO BACK</span>
+      <span class="pay text-btn">
+        `?_.offer.discount`YES, PAY `=formattedAmount``??`OKAY`?`
+      </span>
     </div>
   </div>
 </div>

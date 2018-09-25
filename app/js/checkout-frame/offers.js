@@ -100,11 +100,10 @@ function initOffers(
     $offersListTitle = $offersListCont.querySelector('.offers-list-title'),
     $offersList = $offersListCont.querySelector('.offers-list'),
     $applyOffer = $offersListCont.querySelector('.apply-offer'),
-    $offersError = createNode(templates.offererror()),
-    $offersErrorTitle = $offersError.querySelector('.error-offer-title'),
-    $offersErrorAmounts = $offersError.querySelectorAll('.total-amount'),
-    $offersErrorCancel = $offersError.querySelector('.text-btn.cancel'),
-    $offersErrorPay = $offersError.querySelector('.text-btn.pay');
+    $offersError = null,
+    $offersErrorCancel = null,
+    $offersErrorPay = null,
+    offersErrorResolutionCb = null;
 
   var appliedOffer,
     selectedOffer,
@@ -113,6 +112,11 @@ function initOffers(
     shouldShowOfferList = false;
 
   function showOfferList() {
+    if (visibleOffers.length === 1) {
+      // select first offer automatically if there is only one offer
+      offers.selectOffer(visibleOffers[0]);
+    }
+
     $root.appendChild($offersListCont);
   }
 
@@ -127,7 +131,12 @@ function initOffers(
   }
 
   function hideOfferError() {
+    if (!$offersError) {
+      return;
+    }
+
     $offersError.remove();
+    $offersError = $offersErrorPay = $offersErrorCancel = null;
   }
 
   function appendOffer(offer) {
@@ -175,7 +184,6 @@ function initOffers(
       } else {
         $($el).addClass(singleOfferClass);
         $singleOfferText.innerText = visibleOffers[0].data.name;
-        this.selectOffer(visibleOffers[0]);
       }
 
       if (appliedOffer && visibleOffers.indexOf(appliedOffer) < 0) {
@@ -240,18 +248,19 @@ function initOffers(
         appliedOffer = null;
       }
     },
-    showError: function showError(offerData) {
-      offerData = offerData || appliedOffer.data;
+    showError: function showError(methodDescription, cb) {
+      $offersError = createNode(
+        templates.offererror({
+          offer: appliedOffer,
+          methodDescription: methodDescription,
+          formatAmount: formatAmount,
+        })
+      );
 
-      var title = offerData.name,
-        totalAmount = formatAmount(offerData.original_amount);
-
-      $offersErrorTitle.innerText = title;
-      each($offersErrorAmounts, function(index, $amount) {
-        $amount.innerHTML = totalAmount;
-      });
-
+      ($offersErrorCancel = $offersError.querySelector('.text-btn.cancel')),
+        ($offersErrorPay = $offersError.querySelector('.text-btn.pay'));
       $root.appendChild($offersError);
+      offersErrorResolutionCb = cb;
     },
   };
 
@@ -281,16 +290,33 @@ function initOffers(
     track('offer_applied', appliedOffer.data);
     return isOfferApplied && onApplyOffer && onApplyOffer(appliedOffer);
   };
-  $offersErrorCancel.onclick = function() {
-    track('offer_retry', appliedOffer.data);
-    hideOfferError();
-  };
-  $offersErrorPay.onclick = function() {
-    track('offer_removed_from_retry_screen', appliedOffer.data);
-    offers.removeOffer();
-    hideOfferError();
-    return onRemoveOffer && onRemoveOffer();
-  };
+
+  $root.addEventListener('click', function(e) {
+    if (!$offersError) {
+      return;
+    }
+
+    var $target = e.target,
+      isOfferRemoved = false;
+
+    if ($offersErrorPay.contains($target)) {
+      isOfferRemoved = true;
+      track('offer_removed_from_retry_screen', appliedOffer.data);
+      offers.removeOffer();
+      hideOfferError();
+      if (onRemoveOffer) {
+        onRemoveOffer();
+      }
+    } else if ($offersErrorCancel.contains($target)) {
+      track('offer_retry', appliedOffer.data);
+      hideOfferError();
+    }
+
+    if (offersErrorResolutionCb) {
+      offersErrorResolutionCb(isOfferRemoved);
+      offersErrorResolutionCb = null;
+    }
+  });
 
   allOffers = visibleOffers = offersData.map(function(offer) {
     return new Offer(offer, {

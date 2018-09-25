@@ -444,7 +444,7 @@ function errorHandler(response) {
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
       hideOverlayMessage();
-      this.offers.showError();
+      this.showOffersError();
       this.track('offer_mismatch', this.offers.appliedOffer);
     } else {
       this.showLoadError(
@@ -1731,6 +1731,19 @@ Session.prototype = {
           },
           true
         );
+
+        this.on('click', '#wallets [name="wallet"]', function(e) {
+          if (!this.validateOffers(e.target.value)) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            this.showOffersError(function(removeOffer) {
+              return removeOffer && e.target.click();
+            });
+
+            return;
+          }
+        });
       } catch (e) {}
     }
 
@@ -2504,6 +2517,14 @@ Session.prototype = {
       .html((this.methods.netbanking || this.methods.emandate)[val]);
   },
 
+  validateOffers: function(selectedVal, selectedEl) {
+    if (!this.offers || !this.offers.appliedOffer) {
+      return true;
+    }
+
+    return this.offers.appliedOffer.issuer === selectedVal;
+  },
+
   selectBankRadio: function(e) {
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
@@ -3224,8 +3245,9 @@ Session.prototype = {
       invokeOnEach('off', this.bits);
       this.listeners = [];
       this.bits = [];
-
-      this.modal.destroy();
+      if (this.modal) {
+        this.modal.destroy();
+      }
       $(this.el).remove();
 
       this.tab = this.screen = '';
@@ -3239,6 +3261,7 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
+      this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
     }
   },
@@ -3512,6 +3535,21 @@ Session.prototype = {
 
       this.track('offer_is_forced', forcedOffer);
     }
+  },
+
+  showOffersError: function(cb) {
+    var methodDescription = '',
+      screen = this.screen;
+
+    if (screen === 'netbanking') {
+      methodDescription = 'Bank';
+    } else if (screen === 'upi') {
+      methodDescription = 'VPA';
+    } else {
+      methodDescription = titleCase(this.screen);
+    }
+
+    this.offers.showError(methodDescription, cb);
   },
 
   setPreferences: function(prefs) {
