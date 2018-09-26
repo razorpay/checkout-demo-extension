@@ -127,6 +127,7 @@ export default function Payment(data, params, r) {
     }
   }
 
+  // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
   if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
     data.auth_type = '3ds';
   }
