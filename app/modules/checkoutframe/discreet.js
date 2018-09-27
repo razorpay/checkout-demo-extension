@@ -72,4 +72,5 @@ export default {
   Curtain,
   WalletUtils,
   commonBanks,
+  timer: _.timer,
 };

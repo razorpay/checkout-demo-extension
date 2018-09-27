@@ -128,7 +128,7 @@ export const handleMessage = function(message) {
   var options = message.options;
 
   if (message.metadata && message.metadata.openedAt) {
-    Analytics.setMeta('open', message.metadata.openedAt);
+    Analytics.setMeta('timeSince.open', _.timer());
   }
 
   if (!session) {
