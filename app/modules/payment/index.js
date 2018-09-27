@@ -105,7 +105,10 @@ export default function Payment(data, params, r) {
   this.magic = params.magic;
 
   this.isMagicPayment =
-    this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
+    this.sdk_popup &&
+    this.magic &&
+    /^(card|emi)$/.test(data.method) &&
+    !params.fees;
 
   this.magicPossible = this.isMagicPayment;
 
