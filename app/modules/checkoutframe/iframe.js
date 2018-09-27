@@ -82,6 +82,8 @@ const platformSpecific = {
   },
 };
 
+const flush = () => Razorpay.sendMessage({ event: 'flush' });
+
 export function initIframe() {
   const parseMessage = e => {
     /* not concerned about adding/removing listeners,
@@ -100,6 +102,8 @@ export function initIframe() {
   };
 
   window |> _El.on('message', parseMessage);
+  window |> _El.on('beforeunload', flush);
+  window |> _El.on('blur', flush);
 
   const qpmap = _.getQueryParams();
   const platform = qpmap.platform;
