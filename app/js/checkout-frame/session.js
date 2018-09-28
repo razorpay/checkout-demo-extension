@@ -981,7 +981,7 @@ Session.prototype = {
     var $upiForm = $('#form-upi'),
       $tezUPIForm = $('#upi-tez');
 
-    $upiForm.addClass('collapsible').addClass('show-tez');
+    $upiForm.addClass('show-tez');
 
     Tez.check(function() {
       self.tezMode = 'mobile';
