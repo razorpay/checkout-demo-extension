@@ -969,29 +969,33 @@ Session.prototype = {
     var self = this;
 
     /**
-     * Tez exists only on Android, and outside of WebViews.
-     *
      * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
      */
-    if (window.CheckoutBridge || !discreet.androidBrowser) {
+
+    if (window.CheckoutBridge || !Tez.checkKey(self.get('key'))) {
       return;
     }
 
-    if (!Tez.checkKey(self.get('key'))) {
-      return;
-    }
+    this.tezMode = 'desktop';
 
-    Tez.check(
-      function() {
-        /* This is success callback */
-        $('#upi-tez').css('display', 'block');
-        self.track('tez_visible');
-      },
-      function(e) {
-        /* This is error callback */
-        // self.track('tez_error', e);
-      }
-    );
+    var $upiForm = $('#form-upi'),
+      $tezUPIForm = $('#upi-tez');
+
+    $upiForm.addClass('collapsible').addClass('show-tez');
+
+    Tez.check(function() {
+      self.tezMode = 'mobile';
+      /* This is success callback */
+      $tezUPIForm.removeClass('tez-desktop');
+      $tezUPIForm.addClass('tez-mweb');
+
+      // removing desktop elements to avoid form validations on empty inputs
+      each($tezUPIForm.find('.desktop-only'), function(i, item) {
+        item.remove();
+      });
+
+      self.track('tez_mweb_visible');
+    });
   },
 
   render: function(options) {
@@ -1880,6 +1884,11 @@ Session.prototype = {
       selectElementText(e.target);
     });
     this.on('click', '#body', 'copytoclipboard--btn', copyToClipboardListener);
+
+    this.on('click', '#form-upi.collapsible .item', function(e) {
+      $('#form-upi.collapsible .item.expanded').removeClass('expanded');
+      $(e.currentTarget).addClass('expanded');
+    });
   },
 
   /**
@@ -2769,7 +2778,16 @@ Session.prototype = {
           delete data.upi_app;
         }
         if (data['_[flow]'] !== 'directpay') {
-          delete data.vpa;
+          if (data['_[flow]'] === 'tez' && this.tezMode === 'desktop') {
+            data.vpa = data.tez_username + '@' + data.tez_bank;
+          } else {
+            delete data.vpa;
+          }
+        }
+
+        if ('tez_username' in data) {
+          delete data.tez_username;
+          delete data.tez_bank;
         }
       }
     }
@@ -3134,8 +3152,13 @@ Session.prototype = {
     }
 
     if (data['_[flow]'] === 'tez') {
-      request.tez = true;
-      data['_[flow]'] = 'intent';
+      if (this.tezMode === 'desktop') {
+        data['_[flow]'] = 'directpay';
+        this.track('tez_payment_collect_request');
+      } else {
+        request.tez = true;
+        data['_[flow]'] = 'intent';
+      }
     }
 
     var appliedOffer =
