@@ -145,6 +145,13 @@ export default function Track(r, event, data, beacon) {
 
     var trackingPayload = {
       context: context,
+      addons: [
+        {
+          name: 'ua_parser',
+          input_key: 'user_agent',
+          output_key: 'user_agent_parsed',
+        },
+      ],
       events: [
         {
           event,
