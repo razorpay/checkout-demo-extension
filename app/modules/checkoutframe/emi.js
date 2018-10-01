@@ -39,7 +39,7 @@ function showEMIDropdown() {
 
 export default function emiView(session) {
   const opts = session.emi_options;
-  const amount = (opts.amount = session.get('amount'));
+  const amount = (opts.amount = session.getDiscountedAmount());
 
   if (amount >= 5000 * 100) {
     const help = _Doc.querySelector('#elem-emi .help');

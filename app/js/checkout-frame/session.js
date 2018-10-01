@@ -155,7 +155,8 @@ function makeEmiDropdown(emiObj, session, isOption) {
         ' month EMI ' +
         (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
-        Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
+        Razorpay.emi.calculator(session.getDiscountedAmount(), length, rate) /
+          100 +
         ' per month)</' +
         (isOption ? 'option>' : 'div>');
     });
@@ -2522,10 +2523,13 @@ Session.prototype = {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
+
+        var amount = this.getDiscountedAmount();
+
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
-          amount: this.get('amount'),
+          amount: amount,
           emi: this.methods.emi,
           emi_options: this.emi_options,
           recurring: this.recurring,
@@ -3161,8 +3165,7 @@ Session.prototype = {
       }
     }
 
-    var appliedOffer =
-      this.forcedOffer || (this.offers && this.offers.appliedOffer);
+    var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
@@ -3673,6 +3676,16 @@ Session.prototype = {
 
       this.track('offer_is_forced', forcedOffer);
     }
+  },
+
+  getAppliedOffer: function() {
+    return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+  },
+
+  getDiscountedAmount: function() {
+    var appliedOffer = this.getAppliedOffer();
+
+    return (appliedOffer && appliedOffer.amount) || this.get('amount');
   },
 
   showOffersError: function(cb) {
