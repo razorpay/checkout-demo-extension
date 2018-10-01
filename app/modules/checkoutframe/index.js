@@ -116,6 +116,38 @@ function transformOptions(message) {
   return response;
 }
 
+/**
+ * Set meta for Analytics.
+ * @param {Object} message
+ */
+const setMeta = message => {
+  if (message.metadata && message.metadata.openedAt) {
+    Analytics.setMeta('open', message.metadata.openedAt);
+  }
+
+  if (
+    _Obj.hasProp(navigator, 'language') ||
+    _Obj.hasProp(navigator, 'userLanguage')
+  ) {
+    Analytics.setMeta(
+      'navigator.language',
+      navigator.language || navigator.userLanguage
+    );
+  }
+
+  if (_Obj.hasProp(navigator.connection)) {
+    const { effectiveType, type } = navigator.connection;
+
+    if (effectiveType) {
+      Analytics.setMeta('network.effectiveType', effectiveType);
+    }
+
+    if (type) {
+      Analytics.setMeta('network.type', type);
+    }
+  }
+};
+
 export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
@@ -127,9 +159,7 @@ export const handleMessage = function(message) {
   var session = SessionManager.getSession(id);
   var options = message.options;
 
-  if (message.metadata && message.metadata.openedAt) {
-    Analytics.setMeta('open', message.metadata.openedAt);
-  }
+  setMeta(message);
 
   if (!session) {
     if (!options) {
