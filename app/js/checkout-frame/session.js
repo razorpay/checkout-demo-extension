@@ -444,9 +444,18 @@ function errorHandler(response) {
 
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
-      hideOverlayMessage();
-      this.showOffersError();
-      this.track('offer_mismatch', this.offers.appliedOffer);
+      // show offers UI error only when offers ui is initialized
+      if (this.offers) {
+        hideOverlayMessage();
+        this.showOffersError();
+      } else {
+        this.showLoadError(
+          'The Offer you selected is not applicable on this Payment Method',
+          true
+        );
+      }
+
+      this.track('offer_mismatch', this.getAppliedOffer());
     } else {
       this.showLoadError(
         message || 'There was an error in handling your request',
