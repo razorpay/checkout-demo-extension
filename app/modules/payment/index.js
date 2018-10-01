@@ -102,7 +102,7 @@ export default function Payment(data, params, r) {
   this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
-  this.magic = false; //params.magic;
+  this.magic = params.magic;
 
   this.isMagicPayment =
     this.sdk_popup &&
