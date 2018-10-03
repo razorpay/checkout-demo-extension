@@ -94,6 +94,16 @@ function trackNewPayment(data, params, r) {
     params.saved_card.mode = r.preferences.global ? 'global' : 'local';
   }
 
+  if (data.method && data.method === 'upi') {
+    if (!params.upi) {
+      params.upi = {};
+    }
+
+    if (data.vpa && data.vpa.indexOf('@')) {
+      params.upi.handle = data.vpa.split('@')[1];
+    }
+  }
+
   Track(
     r,
     'submit',
