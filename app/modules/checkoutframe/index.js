@@ -120,11 +120,17 @@ function transformOptions(message) {
  * Set meta for Analytics.
  * @param {Object} message
  */
-const setMeta = message => {
+const setAnalyticsMeta = message => {
+  /**
+   * Set time-related properties.
+   */
   if (message.metadata && message.metadata.openedAt) {
     Analytics.setMeta('open', message.metadata.openedAt);
   }
 
+  /**
+   * Set language-related properties.
+   */
   if (
     _Obj.hasProp(navigator, 'language') ||
     _Obj.hasProp(navigator, 'userLanguage')
@@ -135,6 +141,9 @@ const setMeta = message => {
     );
   }
 
+  /**
+   * Set network-related properties.
+   */
   if (_Obj.hasProp(navigator.connection)) {
     const { effectiveType, type } = navigator.connection;
 
@@ -159,7 +168,7 @@ export const handleMessage = function(message) {
   var session = SessionManager.getSession(id);
   var options = message.options;
 
-  setMeta(message);
+  setAnalyticsMeta(message);
 
   if (!session) {
     if (!options) {
