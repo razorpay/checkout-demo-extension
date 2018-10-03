@@ -121,6 +121,8 @@ function transformOptions(message) {
  * @param {Object} message
  */
 const setMeta = message => {
+  const qpmap = _.getQueryParams();
+
   if (message.metadata && message.metadata.openedAt) {
     Analytics.setMeta('open', message.metadata.openedAt);
   }
@@ -144,6 +146,17 @@ const setMeta = message => {
 
     if (type) {
       Analytics.setMeta('network.type', type);
+    }
+  }
+
+  /**
+   * Set SDK details.
+   */
+  if (qpmap.platform && _Arr.contains(['android', 'ios'], qpmap.platform)) {
+    Analytics.setMeta('sdk.platform', qpmap.platform);
+
+    if (qpmap.version) {
+      Analytics.setMeta('sdk.version', qpmap.version);
     }
   }
 };
