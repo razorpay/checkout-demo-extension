@@ -76,7 +76,79 @@ function getCommonTrackingData(r) {
   return props;
 }
 
-export default function Track(r, event, data, beacon) {
+const EVT_Q = [];
+let EVT_CTX;
+
+const pushToEventQ = evt => EVT_Q.push(evt);
+const setEventContext = ctx => {
+  EVT_CTX = ctx;
+};
+
+/**
+ * Flushes all the events in queue.
+ */
+const flushEvents = () => {
+  if (!EVT_Q.length) {
+    return;
+  }
+
+  // Use sendBeacon if supported.
+  const useBeacon = _Obj.hasProp(navigator, 'sendBeacon');
+
+  const trackingPayload = {
+    context: EVT_CTX,
+    addons: [
+      {
+        name: 'ua_parser',
+        input_key: 'user_agent',
+        output_key: 'user_agent_parsed',
+      },
+    ],
+    events: EVT_Q.splice(0, EVT_Q.length),
+  };
+
+  /**
+   * We are doing encodeURIComponent → unescape here to remove all the
+   * non-latin characters to latin
+   */
+  const postData = {
+    url: 'https://lumberjack.razorpay.com/v1/track',
+    data: {
+      key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
+      // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
+      data:
+        trackingPayload
+        |> _Obj.stringify
+        |> encodeURIComponent
+        |> unescape
+        |> btoa
+        |> encodeURIComponent,
+    },
+  };
+
+  try {
+    if (useBeacon) {
+      navigator.sendBeacon(postData.url, _Obj.stringify(postData.data));
+    } else {
+      fetch.post(postData);
+    }
+  } catch (e) {}
+};
+
+// Keep flushing at regular intervals. 🚽
+const FLUSH_INTERVAL_DURATION = 1000;
+const FLUSH_INTERVAL = setInterval(() => {
+  flushEvents();
+}, FLUSH_INTERVAL_DURATION);
+
+/**
+ *
+ * @param {Razorpay} r
+ * @param {String} event
+ * @param {Object} data
+ * @param {Boolean} immediately Whether to send this event immediately.
+ */
+export default function Track(r, event, data, immediately) {
   if (!r.isLiveMode()) {
     return;
   }
@@ -143,52 +215,17 @@ export default function Track(r, event, data, beacon) {
       properties.local_order_id = _uid;
     }
 
-    var trackingPayload = {
-      context: context,
-      addons: [
-        {
-          name: 'ua_parser',
-          input_key: 'user_agent',
-          output_key: 'user_agent_parsed',
-        },
-      ],
-      events: [
-        {
-          event,
-          properties,
-          timestamp: _.now(),
-        },
-      ],
-    };
+    pushToEventQ({
+      event,
+      properties,
+      timestamp: _.now(),
+    });
 
-    const useBeacon = beacon && _Obj.hasProp(navigator, 'sendBeacon');
+    setEventContext(context);
 
-    /**
-     * We are doing encodeURIComponent → unescape here to remove all the
-     * non-latin characters to latin
-     */
-    const postData = {
-      url: 'https://lumberjack.razorpay.com/v1/track',
-      data: {
-        key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
-        // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
-        data:
-          trackingPayload
-          |> _Obj.stringify
-          |> encodeURIComponent
-          |> unescape
-          |> btoa
-          |> encodeURIComponent,
-      },
-    };
-
-    try {
-      if (useBeacon) {
-        navigator.sendBeacon(postData.url, _Obj.stringify(postData.data));
-      } else {
-        fetch.post(postData);
-      }
-    } catch (e) {}
+    if (immediately) {
+      flushEvents();
+    }
   });
 }
 
@@ -233,3 +270,4 @@ Track.updateUid = uid => {
   _uid = uid;
   Track.id = uid;
 };
+Track.flush = flushEvents;
