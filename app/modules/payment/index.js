@@ -87,6 +87,13 @@ function getTrackingData(data) {
 }
 
 function trackNewPayment(data, params, r) {
+  if (data.token) {
+    if (!params.saved_card) {
+      params.saved_card = {};
+    }
+    params.saved_card.mode = r.preferences.global ? 'global' : 'local';
+  }
+
   Track(
     r,
     'submit',
