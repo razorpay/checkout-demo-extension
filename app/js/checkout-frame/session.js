@@ -391,6 +391,7 @@ function errorHandler(response) {
   this.magic = false;
 
   this.track('error', response);
+  Analytics.setMeta('payment.failed', true);
   Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
   if (this.modal) {
@@ -464,6 +465,8 @@ function cancelHandler(response) {
 
   /* don't attempt magic if failed for the first time */
   this.magic = false;
+
+  Analytics.setMeta('payment.cancelled', true);
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
