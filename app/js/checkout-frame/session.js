@@ -3708,10 +3708,10 @@ Session.prototype = {
       offerNetwork = (offer.payment_network || '').toLowerCase();
 
     if (issuer === 'amex') {
-      return offerNetwork === 'all' || offerNetwork === issuer;
+      return !offerNetwork || offerNetwork === issuer;
     }
 
-    return offerIssuer === 'all' || offerIssuer === issuer;
+    return !offerIssuer || offerIssuer === issuer;
   },
 
   getDiscountedAmount: function() {
