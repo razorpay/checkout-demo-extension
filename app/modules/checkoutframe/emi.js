@@ -39,9 +39,16 @@ function showEMIDropdown() {
 
 export default function emiView(session) {
   const opts = session.emi_options;
-  const amount = (opts.amount = session.getDiscountedAmount());
+  const amount = (opts.amount = session.get('amount')),
+    offer = session.getAppliedOffer(),
+    discountedAmount = session.getDiscountedAmount();
 
-  if (amount >= 5000 * 100) {
+  if (
+    amount >= 5000 * 100 &&
+    (!offer ||
+      offer.payment_network.toLowerCase() !== 'amex' ||
+      discountedAmount >= 5000)
+  ) {
     const help = _Doc.querySelector('#elem-emi .help');
     help
       |> _El.setContents(
@@ -50,6 +57,9 @@ export default function emiView(session) {
   } else {
     delete opts.banks.AMEX;
   }
+
+  opts.discountedAmount = discountedAmount;
+  opts.offer = offer;
 
   this.opts = opts;
   this.listeners = [];

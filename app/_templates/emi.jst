@@ -1,3 +1,16 @@
+`
+  var bank = _.banks[_.selected],
+      amount = _.amount,
+      offer = _.offer;
+
+  if (
+    offer &&
+    (offer.issuer || offer.payment_network || "").toLowerCase() === bank.code.toLowerCase()
+  ) {
+
+    amount = _.discountedAmount;  
+  }
+`
 <div id="emi-inner" class="mchild">
   <div class="row em select">
     <div class="col">Select Bank:</div>
@@ -14,10 +27,10 @@
     <div class="col">Monthly Installments</div>
     <div class="col">Total Money</div>
   </strong>
-  `~_.banks[_.selected].plans:i:plan`
+  `~bank.plans:i:plan`
     <div class="row emi-option">
       <div class="col">`=i` Months</div>
-      `var inst = Razorpay.emi.calculator(_.amount, i, plan);`
+      `var inst = Razorpay.emi.calculator(amount, i, plan);`
       <div class="col">`=plan`%</div>
       <div class="col">₹ `=inst/100`</div>
       <div class="col">₹ `=inst*i/100`</div>

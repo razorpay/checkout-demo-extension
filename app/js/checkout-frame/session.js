@@ -140,6 +140,20 @@ function copyToClipboardListener(e) {
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
+  var appliedOffer = session.getAppliedOffer(),
+    amount = session.get('amount');
+
+  if (
+    appliedOffer &&
+    (
+      appliedOffer.issuer ||
+      appliedOffer.payment_network ||
+      ''
+    ).toLowerCase() === emiObj.code.toLowerCase()
+  ) {
+    amount = session.getDiscountedAmount();
+  }
+
   var h = '';
   var isSubvented =
     preferences.methods.emi_subvention === 'merchant' ? true : false;
@@ -155,8 +169,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
         ' month EMI ' +
         (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
-        Razorpay.emi.calculator(session.getDiscountedAmount(), length, rate) /
-          100 +
+        Razorpay.emi.calculator(amount, length, rate) / 100 +
         ' per month)</' +
         (isOption ? 'option>' : 'div>');
     });
@@ -2533,12 +2546,12 @@ Session.prototype = {
           });
         } catch (e) {}
 
-        var amount = this.getDiscountedAmount();
-
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
-          amount: amount,
+          amount: this.get('amount'),
+          discountedAmount: this.getDiscountedAmount(),
+          offer: this.getAppliedOffer(),
           emi: this.methods.emi,
           emi_options: this.emi_options,
           recurring: this.recurring,
@@ -3466,6 +3479,7 @@ Session.prototype = {
       var emiBank = {
         name: bank.name,
         patt: bank.patt,
+        code: bank.code,
         plans: {},
       };
 
