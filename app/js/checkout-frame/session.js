@@ -140,17 +140,9 @@ function copyToClipboardListener(e) {
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
-  var appliedOffer = session.getAppliedOffer(),
-    amount = session.get('amount');
+  var amount = session.get('amount');
 
-  if (
-    appliedOffer &&
-    (
-      appliedOffer.issuer ||
-      appliedOffer.payment_network ||
-      ''
-    ).toLowerCase() === emiObj.code.toLowerCase()
-  ) {
+  if (session.isOfferApplicableOnIssuer(emiObj.code)) {
     amount = session.getDiscountedAmount();
   }
 
@@ -2550,8 +2542,7 @@ Session.prototype = {
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
-          discountedAmount: this.getDiscountedAmount(),
-          offer: this.getAppliedOffer(),
+          session: this,
           emi: this.methods.emi,
           emi_options: this.emi_options,
           recurring: this.recurring,
@@ -3703,6 +3694,24 @@ Session.prototype = {
 
   getAppliedOffer: function() {
     return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+  },
+
+  isOfferApplicableOnIssuer: function(issuer, offer) {
+    issuer = issuer.toLowerCase();
+    offer = offer || this.getAppliedOffer();
+
+    if (!offer) {
+      return false;
+    }
+
+    var offerIssuer = (offer.issuer || '').toLowerCase(),
+      offerNetwork = (offer.payment_network || '').toLowerCase();
+
+    if (issuer === 'amex') {
+      return offerNetwork === 'all' || offerNetwork === issuer;
+    }
+
+    return offerIssuer === 'all' || offerIssuer === issuer;
   },
 
   getDiscountedAmount: function() {

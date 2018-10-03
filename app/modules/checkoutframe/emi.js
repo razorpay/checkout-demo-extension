@@ -45,9 +45,8 @@ export default function emiView(session) {
 
   if (
     amount >= 5000 * 100 &&
-    (!offer ||
-      offer.payment_network.toLowerCase() !== 'amex' ||
-      discountedAmount >= 5000)
+    (!session.isOfferApplicableOnIssuer('amex', offer) ||
+      discountedAmount >= 5000 * 100)
   ) {
     const help = _Doc.querySelector('#elem-emi .help');
     help
@@ -58,8 +57,8 @@ export default function emiView(session) {
     delete opts.banks.AMEX;
   }
 
+  opts.session = session;
   opts.discountedAmount = discountedAmount;
-  opts.offer = offer;
 
   this.opts = opts;
   this.listeners = [];

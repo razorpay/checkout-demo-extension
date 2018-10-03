@@ -1,14 +1,11 @@
 `
   var bank = _.banks[_.selected],
       amount = _.amount,
-      offer = _.offer;
+      session = _.session;
 
-  if (
-    offer &&
-    (offer.issuer || offer.payment_network || "").toLowerCase() === bank.code.toLowerCase()
-  ) {
+  if (session.isOfferApplicableOnIssuer(bank.code)) {
 
-    amount = _.discountedAmount;  
+    amount = _.discountedAmount;
   }
 `
 <div id="emi-inner" class="mchild">
