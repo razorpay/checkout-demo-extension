@@ -140,6 +140,12 @@ function copyToClipboardListener(e) {
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
+  var amount = session.get('amount');
+
+  if (session.isOfferApplicableOnIssuer(emiObj.code)) {
+    amount = session.getDiscountedAmount();
+  }
+
   var h = '';
   var isSubvented =
     preferences.methods.emi_subvention === 'merchant' ? true : false;
@@ -155,7 +161,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
         ' month EMI ' +
         (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
-        Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
+        Razorpay.emi.calculator(amount, length, rate) / 100 +
         ' per month)</' +
         (isOption ? 'option>' : 'div>');
     });
@@ -443,9 +449,18 @@ function errorHandler(response) {
 
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
-      hideOverlayMessage();
-      this.showOffersError();
-      this.track('offer_mismatch', this.offers.appliedOffer);
+      // show offers UI error only when offers ui is initialized
+      if (this.offers) {
+        hideOverlayMessage();
+        this.showOffersError();
+      } else {
+        this.showLoadError(
+          'The Offer you selected is not applicable on this Payment Method',
+          true
+        );
+      }
+
+      this.track('offer_mismatch', this.getAppliedOffer());
     } else {
       this.showLoadError(
         message || 'There was an error in handling your request',
@@ -2524,10 +2539,12 @@ Session.prototype = {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
+
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
+          session: this,
           emi: this.methods.emi,
           emi_options: this.emi_options,
           recurring: this.recurring,
@@ -3163,8 +3180,7 @@ Session.prototype = {
       }
     }
 
-    var appliedOffer =
-      this.forcedOffer || (this.offers && this.offers.appliedOffer);
+    var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
@@ -3456,6 +3472,7 @@ Session.prototype = {
       var emiBank = {
         name: bank.name,
         patt: bank.patt,
+        code: bank.code,
         plans: {},
       };
 
@@ -3675,6 +3692,34 @@ Session.prototype = {
 
       this.track('offer_is_forced', forcedOffer);
     }
+  },
+
+  getAppliedOffer: function() {
+    return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+  },
+
+  isOfferApplicableOnIssuer: function(issuer, offer) {
+    issuer = issuer.toLowerCase();
+    offer = offer || this.getAppliedOffer();
+
+    if (!offer) {
+      return false;
+    }
+
+    var offerIssuer = (offer.issuer || '').toLowerCase(),
+      offerNetwork = (offer.payment_network || '').toLowerCase();
+
+    if (issuer === 'amex') {
+      return !offerNetwork || offerNetwork === issuer;
+    }
+
+    return !offerIssuer || offerIssuer === issuer;
+  },
+
+  getDiscountedAmount: function() {
+    var appliedOffer = this.getAppliedOffer();
+
+    return (appliedOffer && appliedOffer.amount) || this.get('amount');
   },
 
   showOffersError: function(cb) {

@@ -131,9 +131,10 @@ Formatter.rules = {
   expiry: {
     pretty: function(value, shouldTrim) {
       value = value
-        .replace(/^([2-9])$/, '0$1')
-        .replace(/^1[3-9]$/, '1')
-        .replace(/(.{2})/, '$1 / ')
+        .replace(/^([2-9])$/, '0$1') // Pad with zero if a single digit
+        .replace(/^1[3-9]$/, '1') // If > 13, remove units place
+        .replace(/(.{2})/, '$1 / ') // Add " / " after month
+        .replace(/^(.{5})\d{2}(\d{2})$/, '$1$2') // Convert "mm / yyyy" to "mm / yy"
         .slice(0, 7);
 
       if (shouldTrim) {

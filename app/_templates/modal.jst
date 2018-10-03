@@ -338,7 +338,7 @@ var upi_apps = _.upi_intents_data;
                       <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
-                        `?o('amount')>emi_options.amex_min&&_.preferences.methods.amex`
+                        `?(_.isOfferApplicableOnIssuer("amex") ? _.getDiscountedAmount() : o('amount'))>emi_options.amex_min&&_.preferences.methods.amex`
                           <option value="AMEX">American Express</option>
                         `?`
                         `~emi_options.banks:code:bank`
