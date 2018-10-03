@@ -338,7 +338,7 @@ var upi_apps = _.upi_intents_data;
                       <span class="help">Please select an EMI plan</span>
                       <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
-                        `?o('amount')>emi_options.amex_min&&_.preferences.methods.amex`
+                        `?(_.isOfferApplicableOnIssuer("amex") ? _.getDiscountedAmount() : o('amount'))>emi_options.amex_min&&_.preferences.methods.amex`
                           <option value="AMEX">American Express</option>
                         `?`
                         `~emi_options.banks:code:bank`
@@ -567,7 +567,7 @@ var upi_apps = _.upi_intents_data;
                 </div>
               `?`
               `?method.upi`
-                <div class="tab-content showable screen pad" id="form-upi">
+                <div class="tab-content showable screen pad collapsible" id="form-upi">
                     `?upi_intent`
                     <div id="upi-apps">
                       <div class="list">
@@ -622,28 +622,46 @@ var upi_apps = _.upi_intents_data;
                           </label>
                         </div>
                         `?`
-                        <div id="upi-directpay" class="item">
+                        <div id="upi-directpay" class="item expanded">
                           <input id="radio-directpay" type="radio" name="_[flow]" value="directpay" `? (!upi_intent && !_.isMobileBrowser)`checked`?`/>
                           <label for="radio-directpay">
                             <i class="theme-highlight">&#xe70e;</i>
                             <div class="title">UPI Address</div>
-                            <div class="subtitle">You will receive a collect request</div>
-                            <div class="elem-wrap"><div class="elem">
+                            <div class="subtitle collapsed-only"><img src="https://cdn.razorpay.com/brand/sample_upi_apps.png" class="upi-apps-img"/> and others</div>
+                            <div class="subtitle collapsible-content">You will receive a collect request</div>
+                            <span class="checkbox"></span>
+                            <div class="elem-wrap collect-form  collapsible-content"><div class="elem">
                               <input autocomplete="upi-vpa" class="input" id="vpa" name="vpa" placeholder="Enter UPI address" required pattern=".+@.+" value="`=attr(o('prefill.vpa'))`">
                               <div class="help">Please enter a valid VPA of the form username@bank</div>
                             </div></div>
-                            `?_.isMobileBrowser`
-                            <span class="checkbox"></span>
-                            `?`
                           </label>
                         </div>
-                        <div id="upi-tez" class="item" checked>
+                        <div id="upi-tez" class="item tez-desktop" checked>
                           <input id="radio-tez" type="radio" name="_[flow]" value="tez"/>
                           <label for="radio-tez">
                             <i class="tez-icon"></i>
                             <div class="title">Google Pay (Tez)</div>
-                            <div class="subtitle">Installed on your device</div>
+                            <div class="subtitle collapsible-content mweb-only">Installed on your device</div>
+                            <div class="subtitle collapsible-content desktop-only">You will receive a payment request</div>
                             <span class="checkbox"></span>
+                            <div class="collapsible-content desktop-only">
+                              <div class="elem-wrap collect-form">
+                                <div class="elem">
+                                  <input autocomplete="tez-username" class="input" id="tez-username" name="tez_username" placeholder="Enter UPI ID" required pattern=".+" value="">
+                                  <div class="help">Please enter a valid handle</div>
+                                </div>
+                                <div class="elem at-separator">@</div>
+                                <div class="elem">
+                                  <select name="tez_bank" required class="input">
+                                    <option value="">Select Bank</option>
+                                    <option value="okhdfcbank">okhdfcbank</option>
+                                    <option value="okicici">okicici</option>
+                                    <option value="oksbi">oksbi</option>
+                                    <option value="okaxis">okaxis</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
                           </label>
                         </div>
                       </div>

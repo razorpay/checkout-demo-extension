@@ -108,17 +108,129 @@
       }
     }
   }
+
+  &.collapsible {
+
+    .item {
+
+      &#upi-tez {
+
+        .title {
+
+          line-height: 30px;
+        }
+
+        label > i {
+
+          top: 50%;
+          transform: translate(0, -50%);
+        }
+      }
+
+      .collapsed-only {
+
+        display: block;
+      }
+
+      .collapsible-content {
+
+        display: none;
+      }
+
+      &.expanded {
+
+        &#upi-tez {
+
+          .title {
+
+            line-height: inherit;
+          }
+
+          label > i {
+
+            top: 18px;
+            transform: none;
+          }
+        }
+
+        .collapsed-only {
+
+          display: none;
+        }
+
+        .collapsible-content {
+
+          display: block;
+        }
+      }
+    }
+  }
+
+  &.show-tez {
+
+    #upi-tez{
+
+      display: block;
+    }
+
+    .checkbox {
+
+      display: inline-block;
+    }
+  }
+
+  .checkbox {
+
+    display: none;
+  }
+
+  .upi-apps-img {
+
+    display: inline-block;
+    vertical-align: middle;
+    height: 20px;
+    width: auto;
+    margin-right: 4px;
+  }
 }
 
 #upi-tez{
   display: none;
+
   .tez-icon {
     background-repeat: norepeat;
     background-size: contain;
-    background-image: url('https://cdn.razorpay.com/checkout/gpay.png');
-    width: 28px;
-    height: 28px;
-    margin-left: -6px;
+    background-image: url('https://cdn.razorpay.com/static/assets/gpay_btn.png');
+    width: 34px;
+    height: 34px;
+    margin-left: -9px;
+  }
+
+  &.tez-mweb .desktop-only, &.tez-desktop .mweb-only {
+
+    display: none !important;
+  }
+
+  .collect-form {
+
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
+
+    div.elem {
+
+      display: table-cell;
+      width: 50%;
+      box-sizing: border-box;
+
+      &.at-separator {
+
+        width: 1px;
+        padding: 0 8px;
+        color: rgba(64,70,101,0.7);
+        border-bottom: none;
+      }
+    }
   }
 }
 #body.upi-noapp {

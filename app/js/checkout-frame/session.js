@@ -140,6 +140,12 @@ function copyToClipboardListener(e) {
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
+  var amount = session.get('amount');
+
+  if (session.isOfferApplicableOnIssuer(emiObj.code)) {
+    amount = session.getDiscountedAmount();
+  }
+
   var h = '';
   var isSubvented =
     preferences.methods.emi_subvention === 'merchant' ? true : false;
@@ -155,7 +161,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
         ' month EMI ' +
         (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
-        Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
+        Razorpay.emi.calculator(amount, length, rate) / 100 +
         ' per month)</' +
         (isOption ? 'option>' : 'div>');
     });
@@ -443,9 +449,18 @@ function errorHandler(response) {
 
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
-      hideOverlayMessage();
-      this.showOffersError();
-      this.track('offer_mismatch', this.offers.appliedOffer);
+      // show offers UI error only when offers ui is initialized
+      if (this.offers) {
+        hideOverlayMessage();
+        this.showOffersError();
+      } else {
+        this.showLoadError(
+          'The Offer you selected is not applicable on this Payment Method',
+          true
+        );
+      }
+
+      this.track('offer_mismatch', this.getAppliedOffer());
     } else {
       this.showLoadError(
         message || 'There was an error in handling your request',
@@ -969,29 +984,33 @@ Session.prototype = {
     var self = this;
 
     /**
-     * Tez exists only on Android, and outside of WebViews.
-     *
      * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
      */
-    if (window.CheckoutBridge || !discreet.androidBrowser) {
+
+    if (window.CheckoutBridge || !Tez.checkKey(self.get('key'))) {
       return;
     }
 
-    if (!Tez.checkKey(self.get('key'))) {
-      return;
-    }
+    this.tezMode = 'desktop';
 
-    Tez.check(
-      function() {
-        /* This is success callback */
-        $('#upi-tez').css('display', 'block');
-        self.track('tez_visible');
-      },
-      function(e) {
-        /* This is error callback */
-        // self.track('tez_error', e);
-      }
-    );
+    var $upiForm = $('#form-upi'),
+      $tezUPIForm = $('#upi-tez');
+
+    $upiForm.addClass('show-tez');
+
+    Tez.check(function() {
+      self.tezMode = 'mobile';
+      /* This is success callback */
+      $tezUPIForm.removeClass('tez-desktop');
+      $tezUPIForm.addClass('tez-mweb');
+
+      // removing desktop elements to avoid form validations on empty inputs
+      each($tezUPIForm.find('.desktop-only'), function(i, item) {
+        item.remove();
+      });
+
+      self.track('tez_mweb_visible');
+    });
   },
 
   render: function(options) {
@@ -1880,6 +1899,11 @@ Session.prototype = {
       selectElementText(e.target);
     });
     this.on('click', '#body', 'copytoclipboard--btn', copyToClipboardListener);
+
+    this.on('click', '#form-upi.collapsible .item', function(e) {
+      $('#form-upi.collapsible .item.expanded').removeClass('expanded');
+      $(e.currentTarget).addClass('expanded');
+    });
   },
 
   /**
@@ -2515,10 +2539,12 @@ Session.prototype = {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
+
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
+          session: this,
           emi: this.methods.emi,
           emi_options: this.emi_options,
           recurring: this.recurring,
@@ -2771,7 +2797,16 @@ Session.prototype = {
           delete data.upi_app;
         }
         if (data['_[flow]'] !== 'directpay') {
-          delete data.vpa;
+          if (data['_[flow]'] === 'tez' && this.tezMode === 'desktop') {
+            data.vpa = data.tez_username + '@' + data.tez_bank;
+          } else {
+            delete data.vpa;
+          }
+        }
+
+        if ('tez_username' in data) {
+          delete data.tez_username;
+          delete data.tez_bank;
         }
       }
     }
@@ -3136,12 +3171,16 @@ Session.prototype = {
     }
 
     if (data['_[flow]'] === 'tez') {
-      request.tez = true;
-      data['_[flow]'] = 'intent';
+      if (this.tezMode === 'desktop') {
+        data['_[flow]'] = 'directpay';
+        this.track('tez_payment_collect_request');
+      } else {
+        request.tez = true;
+        data['_[flow]'] = 'intent';
+      }
     }
 
-    var appliedOffer =
-      this.forcedOffer || (this.offers && this.offers.appliedOffer);
+    var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
@@ -3433,6 +3472,7 @@ Session.prototype = {
       var emiBank = {
         name: bank.name,
         patt: bank.patt,
+        code: bank.code,
         plans: {},
       };
 
@@ -3652,6 +3692,34 @@ Session.prototype = {
 
       this.track('offer_is_forced', forcedOffer);
     }
+  },
+
+  getAppliedOffer: function() {
+    return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+  },
+
+  isOfferApplicableOnIssuer: function(issuer, offer) {
+    issuer = issuer.toLowerCase();
+    offer = offer || this.getAppliedOffer();
+
+    if (!offer) {
+      return false;
+    }
+
+    var offerIssuer = (offer.issuer || '').toLowerCase(),
+      offerNetwork = (offer.payment_network || '').toLowerCase();
+
+    if (issuer === 'amex') {
+      return !offerNetwork || offerNetwork === issuer;
+    }
+
+    return !offerIssuer || offerIssuer === issuer;
+  },
+
+  getDiscountedAmount: function() {
+    var appliedOffer = this.getAppliedOffer();
+
+    return (appliedOffer && appliedOffer.amount) || this.get('amount');
   },
 
   showOffersError: function(cb) {
