@@ -3749,6 +3749,7 @@ Session.prototype = {
 
       if (saved_customer.tokens) {
         customer.logged = true;
+        Analytics.setMeta('loggedIn', true);
       }
 
       customer.customer_id = saved_customer.customer_id;
