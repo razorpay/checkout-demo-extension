@@ -83,16 +83,18 @@ export function flatten(obj, defObj) {
 
 const flatKeys = {};
 export default function Options(options) {
-  _Obj.loop(RazorpayDefaults, function(val, key) {
+  const RzpDefaults = _Obj.extend({}, RazorpayDefaults);
+
+  _Obj.loop(RzpDefaults, function(val, key) {
     if (_.isNonNullObject(val)) {
       flatKeys[key] = true;
       _Obj.loop(val, function(subVal, subKey) {
-        RazorpayDefaults[key + '.' + subKey] = subVal;
+        RzpDefaults[key + '.' + subKey] = subVal;
       });
-      delete RazorpayDefaults[key];
+      delete RzpDefaults[key];
     }
   });
-  options = flatten(options, RazorpayDefaults);
+  options = flatten(options, RzpDefaults);
   var callback_url = options.callback_url;
   if (callback_url && shouldRedirect) {
     options.redirect = true;
@@ -101,7 +103,7 @@ export default function Options(options) {
     if (!arguments.length) {
       return options;
     }
-    return key in options ? options[key] : RazorpayDefaults[key];
+    return key in options ? options[key] : RzpDefaults[key];
   };
 
   this.set = function(key, val) {
