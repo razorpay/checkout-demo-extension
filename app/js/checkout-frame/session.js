@@ -1151,7 +1151,7 @@ Session.prototype = {
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
     });
-    Analytics.setMeta('render', Date.now());
+    Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
   setTpvBanks: function() {
@@ -2163,6 +2163,7 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('screen', screen);
+    Analytics.setMeta('timeSince.screen', discreet.timer());
 
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
@@ -2386,6 +2387,7 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('tab', tab);
+    Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab) {
       if (tab === 'credit_card' || tab === 'debit_card') {
