@@ -125,7 +125,10 @@ const setAnalyticsMeta = message => {
    * Set time-related properties.
    */
   if (message.metadata && message.metadata.openedAt) {
-    Analytics.setMeta('open', message.metadata.openedAt);
+    Analytics.setMeta(
+      'timeSince.open',
+      () => Date.now() - message.metadata.openedAt
+    );
   }
 
   /**
