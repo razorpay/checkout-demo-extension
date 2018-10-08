@@ -3368,7 +3368,8 @@ Session.prototype = {
     if (this.screen === 'card') {
       setEmiBank(data, this.savedCardScreen);
       if (this.recurring) {
-        data.recurring = 1;
+        var recurringValue = this.get('recurring');
+        data.recurring = isString(recurringValue) ? recurringValue : 1;
       }
     }
 
