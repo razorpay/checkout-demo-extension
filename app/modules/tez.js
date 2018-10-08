@@ -18,6 +18,8 @@ const allowed_keys = [
   'rzp_live_XY9x0GfgAKrxfh', // pizzahut
   'rzp_live_w0ZAHP9naLomp1', // seniority
   'rzp_live_9dlWORqkx1U7KF', // perpule
+  'rzp_live_ePMZk1A48Q5MXF', // Mayur, Inc.
+  'rzp_live_VedxbYjkA7XjKh', // ICICI Lombard
 ];
 
 export const checkKey = key => allowed_keys.indexOf(key) !== -1;
