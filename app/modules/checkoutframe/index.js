@@ -116,6 +116,50 @@ function transformOptions(message) {
   return response;
 }
 
+/**
+ * Set meta for Analytics.
+ * @param {Object} message
+ */
+const setAnalyticsMeta = message => {
+  /**
+   * Set time-related properties.
+   */
+  if (message.metadata && message.metadata.openedAt) {
+    Analytics.setMeta(
+      'timeSince.open',
+      () => Date.now() - message.metadata.openedAt
+    );
+  }
+
+  /**
+   * Set language-related properties.
+   */
+  if (
+    _Obj.hasProp(navigator, 'language') ||
+    _Obj.hasProp(navigator, 'userLanguage')
+  ) {
+    Analytics.setMeta(
+      'navigator.language',
+      navigator.language || navigator.userLanguage
+    );
+  }
+
+  /**
+   * Set network-related properties.
+   */
+  if (_Obj.hasProp(navigator.connection)) {
+    const { effectiveType, type } = navigator.connection;
+
+    if (effectiveType) {
+      Analytics.setMeta('network.effectiveType', effectiveType);
+    }
+
+    if (type) {
+      Analytics.setMeta('network.type', type);
+    }
+  }
+};
+
 export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
@@ -127,9 +171,7 @@ export const handleMessage = function(message) {
   var session = SessionManager.getSession(id);
   var options = message.options;
 
-  if (message.metadata && message.metadata.openedAt) {
-    Analytics.setMeta('timeSince.open', _.timer());
-  }
+  setAnalyticsMeta(message);
 
   if (!session) {
     if (!options) {

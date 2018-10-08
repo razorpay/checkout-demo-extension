@@ -97,6 +97,13 @@ const flushEvents = () => {
 
   const trackingPayload = {
     context: EVT_CTX,
+    addons: [
+      {
+        name: 'ua_parser',
+        input_key: 'user_agent',
+        output_key: 'user_agent_parsed',
+      },
+    ],
     events: EVT_Q.splice(0, EVT_Q.length),
   };
 
