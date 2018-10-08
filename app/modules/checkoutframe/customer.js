@@ -77,6 +77,8 @@ Customer.prototype = {
     if (!session.local) {
       _Doc.querySelector('#top-right') |> _El.addClass('logged');
     }
+
+    Analytics.setMeta('loggedIn', true);
   },
 
   // NOTE: status check api also sends otp if customer exist
@@ -187,6 +189,7 @@ Customer.prototype = {
 
     _session_id = null;
 
+    Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);
   },
 };
