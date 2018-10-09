@@ -87,20 +87,26 @@ function getTrackingData(data) {
 }
 
 function trackNewPayment(data, params, r) {
+  /**
+   * Set whether saved card is global or local.
+   */
   if (data.token) {
-    if (!params.saved_card) {
+    if (!_.isNonNullObject(params.saved_card)) {
       params.saved_card = {};
     }
     params.saved_card.mode = r.preferences.global ? 'global' : 'local';
   }
 
+  /**
+   * Set @xyz part of VPA.
+   */
   if (data.method && data.method === 'upi') {
-    if (!params.upi) {
+    if (!_.isNonNullObject(params.upi)) {
       params.upi = {};
     }
 
-    if (data.vpa && data.vpa.indexOf('@')) {
-      params.upi.handle = data.vpa.split('@')[1];
+    if (data.vpa && _Str.contains(data.vpa, '@')) {
+      params.upi.provider = data.vpa.split('@')[1];
     }
   }
 
