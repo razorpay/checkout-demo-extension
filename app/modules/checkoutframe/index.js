@@ -147,15 +147,11 @@ const setAnalyticsMeta = message => {
   /**
    * Set network-related properties.
    */
-  if (_Obj.hasProp(navigator.connection)) {
+  if (_Obj.hasProp(navigator, 'connection')) {
     const { effectiveType, type } = navigator.connection;
 
-    if (effectiveType) {
-      Analytics.setMeta('network.effectiveType', effectiveType);
-    }
-
-    if (type) {
-      Analytics.setMeta('network.type', type);
+    if (effectiveType || type) {
+      Analytics.setMeta('network.type', effectiveType || type);
     }
   }
 };
