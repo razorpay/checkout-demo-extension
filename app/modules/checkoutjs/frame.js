@@ -258,6 +258,8 @@ CheckoutFrame.prototype = {
     if (ua_iPhone) {
       scrollTo(0, merchantMarkup.oldY);
     }
+
+    Track.flush();
   },
 
   bind: function() {
@@ -351,7 +353,7 @@ CheckoutFrame.prototype = {
     this['on' + event](data);
 
     if (event === 'dismiss' || event === 'fault') {
-      Track(rzp, event, data);
+      Track(rzp, event, data, true);
     }
   },
 
@@ -378,10 +380,14 @@ CheckoutFrame.prototype = {
   },
 
   onredirect: function(data) {
+    Track.flush();
+
     _Doc.redirect(data);
   },
 
   onsubmit: function(data) {
+    Track.flush();
+
     if (data.method === 'wallet') {
       // check if it was one of the external wallets
       var rzp = this.rzp;
@@ -406,6 +412,7 @@ CheckoutFrame.prototype = {
   },
 
   onhidden: function() {
+    Track.flush();
     this.afterClose();
     let hidden = this.rzp.get('modal.onhidden');
     if (_.isFunction(hidden)) {
@@ -418,7 +425,7 @@ CheckoutFrame.prototype = {
     this.close();
     var rzp = this.rzp;
     var handler = rzp.get('handler');
-    Track(rzp, 'checkout_success', data);
+    Track(rzp, 'checkout_success', data, true);
     if (_.isFunction(handler)) {
       setTimeout(function() {
         handler.call(rzp, data);
@@ -427,6 +434,8 @@ CheckoutFrame.prototype = {
   },
 
   onpaymenterror: function(data) {
+    Track.flush();
+
     try {
       this.rzp.emit('payment.error', data);
       this.rzp.emit('payment.failed', data);
@@ -440,6 +449,7 @@ CheckoutFrame.prototype = {
   },
 
   onfault: function(message) {
+    Track.flush();
     this.rzp.close();
     global.alert('Oops! Something went wrong.\n' + message);
     this.afterClose();
@@ -447,5 +457,9 @@ CheckoutFrame.prototype = {
 
   afterClose: function() {
     CheckoutFrame.container.style.display = 'none';
+  },
+
+  onflush: function(e) {
+    Track.flush();
   },
 };

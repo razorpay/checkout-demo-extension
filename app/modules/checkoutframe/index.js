@@ -120,13 +120,22 @@ function transformOptions(message) {
  * Set meta for Analytics.
  * @param {Object} message
  */
-const setMeta = message => {
+const setAnalyticsMeta = message => {
   const qpmap = _.getQueryParams();
 
+  /**
+   * Set time-related properties.
+   */
   if (message.metadata && message.metadata.openedAt) {
-    Analytics.setMeta('open', message.metadata.openedAt);
+    Analytics.setMeta(
+      'timeSince.open',
+      () => Date.now() - message.metadata.openedAt
+    );
   }
 
+  /**
+   * Set language-related properties.
+   */
   if (
     _Obj.hasProp(navigator, 'language') ||
     _Obj.hasProp(navigator, 'userLanguage')
@@ -137,15 +146,14 @@ const setMeta = message => {
     );
   }
 
-  if (_Obj.hasProp(navigator.connection)) {
+  /**
+   * Set network-related properties.
+   */
+  if (_Obj.hasProp(navigator, 'connection')) {
     const { effectiveType, type } = navigator.connection;
 
-    if (effectiveType) {
-      Analytics.setMeta('network.effectiveType', effectiveType);
-    }
-
-    if (type) {
-      Analytics.setMeta('network.type', type);
+    if (effectiveType || type) {
+      Analytics.setMeta('network.type', effectiveType || type);
     }
   }
 
@@ -172,7 +180,7 @@ export const handleMessage = function(message) {
   var session = SessionManager.getSession(id);
   var options = message.options;
 
-  setMeta(message);
+  setAnalyticsMeta(message);
 
   if (!session) {
     if (!options) {
