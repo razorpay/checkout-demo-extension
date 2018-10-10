@@ -34,6 +34,14 @@ $mobile-view() {
     height: calc(100% - 129px);
     height: calc(100vh - 129px);
     min-height: $bodyhmobile;
+
+    // Reduce height by 24px if timeout banner is shown
+    &.has-timeout {
+      height: $bodyhmobile - 24px;
+      height: calc(100% - 153px);
+      height: calc(100vh - 153px);
+    }
+
     &.emi-focus {
       #footer {
         position: fixed;
