@@ -1119,6 +1119,7 @@ Session.prototype = {
     if (this.closeAt) {
       var timeLeft = this.closeAt - now();
       var timeoutEl = $('#timeout').show()[0];
+      $('#body').addClass('has-timeout');
       var timerFn = updateTimer(timeoutEl, this.closeAt);
       timerFn();
       if (this.isMobile) {
