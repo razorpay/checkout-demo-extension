@@ -90,7 +90,7 @@ function trackNewPayment(data = {}, params, r) {
   /**
    * Set whether saved card is global or local.
    */
-  if (data.token) {
+  if (data.token && r && r.preferences) {
     if (!_.isNonNullObject(params.saved_card)) {
       params.saved_card = {};
     }
@@ -100,12 +100,12 @@ function trackNewPayment(data = {}, params, r) {
   /**
    * Set @xyz part of VPA.
    */
-  if (data.method && data.method === 'upi') {
+  if (data.method && data.method === 'upi' && data.vpa) {
     if (!_.isNonNullObject(params.upi)) {
       params.upi = {};
     }
 
-    if (data.vpa && _Str.contains(data.vpa, '@')) {
+    if (_Str.contains(data.vpa, '@')) {
       params.upi.provider = data.vpa.split('@')[1];
     }
   }
