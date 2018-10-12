@@ -174,7 +174,25 @@ var upi_apps = _.upi_intents_data;
                     </select>
                   </div></div>
                   `?`
-                  `?_.tpvBank`
+                  `?_.multiTpv`
+                    <div class="multi-tpv input-radio centered">
+                      <div class="multi-tpv-header">Pay Using</div>
+                      <input checked type="radio" name="method" id="multitpv-netb" value="netbanking">
+                      <label for="multitpv-netb">
+                        <i><img src="https://cdn.razorpay.com/bank/`=bank.code`.gif"></i>
+                        <div class="radio-display"></div>
+                        <div class="label-content">A/C: `=bank.account_number`</div>
+                        <span>`=bank.name`</span>
+                      </label>
+                      <input type="radio" name="method" id="multitpv-upi" value="upi">
+                      <label for="multitpv-upi">
+                        <i>`=icons.upi`</i>
+                        <div class="radio-display"></div>
+                        <div class="label-content">UPI Payment</div>
+                        <span>`=bank.name` Account `=bank.account_number`</span>
+                      </label>
+                    </div>
+                  `??_.tpvBank`
                     <div class="customer-bank-details">
                       <div class="bank-name">
                         `?bank.logo`

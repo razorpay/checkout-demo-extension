@@ -827,7 +827,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !((this.order && this.order.bank) || this.emandateTpv)) {
+    if (tab && !(this.order && this.order.bank)) {
       this.switchTab(tab);
     }
 
@@ -1170,6 +1170,9 @@ Session.prototype = {
     if (this.order && this.order.bank) {
       bankCode = this.order.bank;
       accountNumber = this.order.account_number;
+      if (!this.order.method && this.methods.upi && this.methods.netbanking) {
+        this.multiTpv = true;
+      }
     }
 
     var banks = this.methods.netbanking;
@@ -2998,7 +3001,7 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
 
-    if (!this.tab && !(this.order || this.emandateTpv)) {
+    if (!this.tab && !this.order) {
       return;
     }
 
@@ -3019,44 +3022,8 @@ Session.prototype = {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
-
-      data.method = this.order.method || 'netbanking';
+      data.method = this.order.method || data.method || 'netbanking';
       data.bank = this.order.bank;
-    } else if (this.emandateTpv) {
-      if (this.checkInvalid('#pad-common')) {
-        return;
-      }
-      data.method = 'emandate';
-      var opts = this.get();
-
-      var emandateFields = [
-        'bank',
-        'bank_account[name]',
-        'bank_account[account_number]',
-        'bank_account[account_type]',
-        'bank_account[ifsc]',
-        'aadhaar[vid]',
-        'auth_type',
-      ];
-
-      each(opts, function(key, val) {
-        if (/^prefill\./.test(key)) {
-          var keyString = key.replace(/^prefill\./, '');
-
-          if (keyString && indexOf(emandateFields, keyString) > -1) {
-            data[keyString] = val;
-          }
-        }
-      });
-
-      var emandatePref = this.methods.emandate;
-
-      try {
-        var auth_types = this.emandateBanks[data.bank].auth_types;
-        if (!data.auth_type && auth_types.length === 1) {
-          data.auth_type = auth_types[0];
-        }
-      } catch (err) {}
     } else if (screen) {
       if (screen === 'card') {
         var formattingDelegator = this.delegator;
@@ -3321,7 +3288,7 @@ Session.prototype = {
           setOtpText(insufficient_text);
         }, this)
       );
-    } else if (data.method === 'upi') {
+    } else if (data.method === 'upi' && !this.multiTpv) {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
