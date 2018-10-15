@@ -35,9 +35,12 @@ const Analytics = () => ({
    *  @prop {String} type
    *  @prop {Object} data
    *  @prop {Razorpay} r
-   *  @prop {Boolean} beacon
+   *  @prop {Boolean} immediately
    */
-  track: function(name, { type, data = {}, r = rInstance, beacon = false }) {
+  track: function(
+    name,
+    { type, data = {}, r = rInstance, immediately = false }
+  ) {
     let calculatedMeta = calculateMeta(META);
 
     // If data.meta exists, add it to calculatedMeta.
@@ -52,7 +55,7 @@ const Analytics = () => ({
       name = `${type}:${name}`;
     }
 
-    Track(r, name, data, beacon);
+    Track(r, name, data, immediately);
   },
 
   /**

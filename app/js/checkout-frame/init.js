@@ -29,10 +29,14 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
     return;
   }
 
-  Track(SessionManager.getSession().r, 'js_error', {
-    message: errorMsg,
-    line: lineNumber,
-    col: column,
-    stack: errorObj && errorObj.stack,
+  Analytics.track('js_error', {
+    r: SessionManager.getSession().r,
+    data: {
+      message: errorMsg,
+      line: lineNumber,
+      col: column,
+      stack: errorObj && errorObj.stack,
+    },
+    immediately: true,
   });
 };

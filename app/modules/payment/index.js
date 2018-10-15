@@ -22,6 +22,7 @@ import { internetExplorer, iOS } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
+import Analytics from 'analytics';
 
 const isRazorpayFrame = _Str.startsWith(
   RazorpayConfig.api,
@@ -55,7 +56,10 @@ function onPaymentCancel(metaParam) {
         url: url,
         callback: response => {
           if (response.razorpay_payment_id) {
-            Track(razorpay, 'cancel_success', response);
+            Analytics.track('cancel_success', {
+              data: response,
+              r: razorpay,
+            });
           } else {
             response = cancelError;
           }
@@ -71,7 +75,10 @@ function onPaymentCancel(metaParam) {
       eventData.auth_type = this.debitPinAuthType;
     }
 
-    Track(razorpay, 'cancel', eventData);
+    Analytics.track('cancel', {
+      data: eventData,
+      r: razorpay,
+    });
   }
 }
 
@@ -110,15 +117,14 @@ function trackNewPayment(data = {}, params, r) {
     }
   }
 
-  Track(
-    r,
-    'submit',
-    {
+  Analytics.track('submit', {
+    data: {
       data: getTrackingData(data),
       params: params,
     },
-    true
-  );
+    r,
+    immediately: true,
+  });
 }
 
 export default function Payment(data, params, r) {
@@ -229,7 +235,9 @@ Payment.prototype = {
     }
 
     if (this.isMagicPayment) {
-      Track(this.r, 'magic_open_popup');
+      Analytics.track('magic_open_popup', {
+        r: this.r,
+      });
       window.CheckoutBridge.invokePopup(
         _Obj.stringify({
           content: popupTemplate(this),
@@ -330,11 +338,11 @@ Payment.prototype = {
 
     if (data.razorpay_payment_id) {
       // Track
-      Track(
-        this.r,
-        'oncomplete',
-        _Obj.clone(data) |> _Obj.setProp('auth_type', this.debitPinAuthType)
-      );
+      Analytics.track('oncomplete', {
+        r: this.r,
+        data:
+          _Obj.clone(data) |> _Obj.setProp('auth_type', this.debitPinAuthType),
+      });
       this.emit('success', data);
     } else {
       var errorObj = data.error;
