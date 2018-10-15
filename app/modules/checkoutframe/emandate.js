@@ -402,7 +402,7 @@ emandateView.prototype = {
           );
 
           this.on('click', '#emandate-uidai-copy .copytoclipboard--btn', () => {
-            this.track('aadhaar:vid_link_copied', AnalyticsTypes.BEHAV);
+            this.track('aadhaar:vid_link:copy', AnalyticsTypes.BEHAV);
           });
         } else {
           this.session.setPayButtonText('Create Aadhaar VID');
