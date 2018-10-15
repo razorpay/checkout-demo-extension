@@ -52,7 +52,7 @@ const Analytics = () => ({
       name = `${type}:${name}`;
     }
 
-    Track(rInstance, name, data, beacon);
+    Track(r, name, data, beacon);
   },
 
   /**

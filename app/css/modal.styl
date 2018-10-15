@@ -418,7 +418,7 @@ i {
 
   &.has-discount {
 
-    #header { 
+    #header {
 
       .discount {
 
@@ -433,7 +433,7 @@ i {
     }
 
     #footer {
-    
+
       .original-amount {
 
         display: none;
@@ -851,11 +851,11 @@ $outline = #ddd;
           line-height: 1;
           display: inline-block;
           padding-top: 15px;
-          
+
           &.toggle {
 
             display: block;
-            height: $topbarh - 1px; 
+            height: $topbarh - 1px;
             position: relative;
             padding-right: 15px;
             box-sizing: border-box;
@@ -903,8 +903,8 @@ $outline = #ddd;
     .offers-title {
 
       padding: 0 $p;
-    }  
-  } 
+    }
+  }
 }
 
 .offers-list-container, .offers-error {
@@ -942,7 +942,7 @@ $outline = #ddd;
     overflow: hidden;
     cursor: pointer;
     box-sizing: border-box;
-    
+
     &:after {
 
       content: "\e601";
@@ -969,7 +969,7 @@ $outline = #ddd;
     list-style-type: none;
     height: 100%;
     overflow-y: auto;
-    
+
     > li.offer {
 
       display: block;
@@ -979,8 +979,8 @@ $outline = #ddd;
       background-color: #fff;
       margin: 0;
       cursor: pointer;
-      border-top-width: 0;     
-      position: relative;   
+      border-top-width: 0;
+      position: relative;
 
       &:first-child, &.selected {
 
@@ -1076,7 +1076,7 @@ $outline = #ddd;
   border-radius: 0 0 3px 3px;
   color: #717171;
   line-height: $topbarh;
-  
+
   .offers-error-content {
 
     left: 0;
@@ -1135,8 +1135,8 @@ $outline = #ddd;
   #offers-container {
 
     /* need 99 z-index due to pay button in card screen */
-    z-index: 99;   
-  } 
+    z-index: 99;
+  }
 
   #offers-container {
 
@@ -1149,7 +1149,7 @@ $outline = #ddd;
   &[screen] {
 
     #offers-container {
-   
+
       transform: translate(0, -100%);
       margin-top: 0;
       border-radius: 0;
@@ -1667,3 +1667,33 @@ $outline = #ddd;
     border: 0;
   }
 }
+
+.multi-tpv
+  .legend
+    text-align: left
+  :checked + label
+    z-index: 1
+  label
+    display: block
+    border: 1px solid #eee
+    padding: 8px 12px
+    margin-top: -1px
+    .label-content
+      font-weight: bold
+      padding-bottom: 0
+  svg, img
+    width: 22px
+    height: 22px
+    float: left
+    margin: 8px 14px 0 0
+  .radio-display
+    right: 12px
+  span
+    font-size: 12px
+    color: #666
+
+.multi-tpv-header
+  font-size: 12px
+  text-transform: uppercase
+  letter-spacing: 0.25px
+  margin-bottom: 5px
