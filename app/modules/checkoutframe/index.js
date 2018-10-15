@@ -121,6 +121,8 @@ function transformOptions(message) {
  * @param {Object} message
  */
 const setAnalyticsMeta = message => {
+  const qpmap = _.getQueryParams();
+
   /**
    * Set time-related properties.
    */
@@ -152,6 +154,17 @@ const setAnalyticsMeta = message => {
 
     if (effectiveType || type) {
       Analytics.setMeta('network.type', effectiveType || type);
+    }
+  }
+
+  /**
+   * Set SDK details.
+   */
+  if (qpmap.platform && _Arr.contains(['android', 'ios'], qpmap.platform)) {
+    Analytics.setMeta('sdk.platform', qpmap.platform);
+
+    if (qpmap.version) {
+      Analytics.setMeta('sdk.version', qpmap.version);
     }
   }
 };
