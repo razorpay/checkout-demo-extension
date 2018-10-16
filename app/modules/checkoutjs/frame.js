@@ -1,6 +1,7 @@
 import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
 import { iPhone } from 'common/useragent';
+import Analytics from 'analytics';
 
 const { screen, scrollTo } = global;
 
