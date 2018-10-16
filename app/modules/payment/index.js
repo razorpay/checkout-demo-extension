@@ -399,9 +399,6 @@ Payment.prototype = {
       return;
     }
 
-    if (data.method === 'emandate') {
-      return;
-    }
     // iphone background ajax route
     if (!this.powerwallet && iOS) {
       return;
