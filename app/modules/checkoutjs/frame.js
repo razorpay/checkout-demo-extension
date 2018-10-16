@@ -1,6 +1,7 @@
 import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
 import { iPhone } from 'common/useragent';
+import Analytics from 'analytics';
 
 const { screen, scrollTo } = global;
 
@@ -353,7 +354,11 @@ CheckoutFrame.prototype = {
     this['on' + event](data);
 
     if (event === 'dismiss' || event === 'fault') {
-      Track(rzp, event, data, true);
+      Analytics.track(event, {
+        data,
+        r: rzp,
+        immediately: true,
+      });
     }
   },
 
@@ -425,7 +430,11 @@ CheckoutFrame.prototype = {
     this.close();
     var rzp = this.rzp;
     var handler = rzp.get('handler');
-    Track(rzp, 'checkout_success', data, true);
+    Analytics.track('checkout_success', {
+      r: rzp,
+      data,
+      immediately: true,
+    });
     if (_.isFunction(handler)) {
       setTimeout(function() {
         handler.call(rzp, data);
