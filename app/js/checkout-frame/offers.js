@@ -304,6 +304,7 @@ function initOffers(
     if ($offersErrorPay.contains($target)) {
       isOfferRemoved = true;
       Analytics.track('offers:retry_screen:remove', {
+        type: AnalyticsTypes.BEHAV,
         data: appliedOffer.data,
       });
       offers.removeOffer();
