@@ -39,7 +39,7 @@ const Analytics = () => ({
    */
   track: function(
     name,
-    { type, data = {}, r = rInstance, immediately = false }
+    { type, data = {}, r = rInstance, immediately = false } = {}
   ) {
     let calculatedMeta = calculateMeta(META);
 
