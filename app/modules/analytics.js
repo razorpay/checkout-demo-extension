@@ -43,6 +43,12 @@ const Analytics = () => ({
   ) {
     let calculatedMeta = calculateMeta(META);
 
+    if (!_.isObject(data)) {
+      data = {
+        data,
+      };
+    }
+
     // If data.meta exists, add it to calculatedMeta.
     if (data.meta && _.isNonNullObject(data.meta)) {
       calculatedMeta = _Obj.extend(calculatedMeta, data.meta);

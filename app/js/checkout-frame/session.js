@@ -396,7 +396,9 @@ function errorHandler(response) {
   /* don't attempt magic if failed for the first time */
   this.magic = false;
 
-  this.track('error', response);
+  Analytics.track('error', {
+    data: response,
+  });
   Analytics.setMeta('payment.failed', true);
   Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
@@ -461,7 +463,9 @@ function errorHandler(response) {
         );
       }
 
-      this.track('offer_mismatch', this.getAppliedOffer());
+      Analytics.track('offers:mismatch', {
+        data: this.getAppliedOffer(),
+      });
     } else {
       this.showLoadError(
         message || 'There was an error in handling your request',
@@ -1012,7 +1016,7 @@ Session.prototype = {
         item.remove();
       });
 
-      self.track('tez_mweb_visible');
+      Analytics.track('tez:mweb:visible');
     });
   },
 
@@ -1065,7 +1069,9 @@ Session.prototype = {
         forcedOffer.amount !== forcedOffer.original_amount
       ) {
         this.showDiscount(forcedOffer);
-        this.track('offer_is_forced_with_discount', forcedOffer);
+        Analytics.track('offers:forced_with_discount', {
+          data: forcedOffer,
+        });
       }
     } else if (hasOffers) {
       var eligibleOffers = preferences.offers.filter(function(offer) {
@@ -1106,9 +1112,11 @@ Session.prototype = {
             return;
           }
 
-          that.track(
-            'offers_list_view_on_' + (that.screen || 'home') + '_screen',
-            that.offers.appliedOffer
+          Analytics.track(
+            'offers:list_view:screen:' + (that.screen || 'home'),
+            {
+              data: that.offers.appliedOffer,
+            }
           );
         });
       }
@@ -1465,7 +1473,11 @@ Session.prototype = {
   },
 
   secAction: function() {
-    this.track('skipped_save', { while_submitting: !!payload });
+    Analytics.track('saved_cards:skip', {
+      data: {
+        while_submitting: !!payload,
+      },
+    });
     $('#save').attr('checked', 0);
     this.wants_skip = true;
     var payload = this.payload;
@@ -1535,16 +1547,22 @@ Session.prototype = {
         checked[0].checked = false;
       }
 
-      self.track('upi_2f_consent', {
-        package_name: packageName,
-        consent: false,
+      Analytics.track('upi:2f:consent:dismiss', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          package_name: packageName,
+          consent: false,
+        },
       });
 
       $('#body').toggleClass('sub', false);
     };
 
-    this.track('upi_2f_shown', {
-      package_name: packageName,
+    Analytics.track('upi:2f:consent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        package_name: packageName,
+      },
     });
 
     Confirm.show({
@@ -1571,9 +1589,12 @@ Session.prototype = {
           );
         } catch (saveErr) {}
 
-        self.track('upi_2f_consent', {
-          package_name: packageName,
-          consent: true,
+        Analytics.track('upi:2f:consent:agree', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            package_name: packageName,
+            consent: true,
+          },
         });
 
         // Show overlay manually because it gets hidden.
@@ -1690,7 +1711,12 @@ Session.prototype = {
       var saveTick = qs('#save');
       if (saveTick) {
         this.on('change', '#save', function(e) {
-          this.track('change_save', { active: e.target.checked });
+          Analytics.track('card:save:change', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              active: e.target.checked,
+            },
+          });
         });
       }
 
@@ -1845,13 +1871,16 @@ Session.prototype = {
 
         $('#body').toggleClass('sub', e.target.value);
 
-        self.track('upi_app_selected', {
-          package_name: packageName,
-          showRecommended: Boolean(self.showRecommendedUPIApp),
-          recommended: Boolean(
-            self.showRecommendedUPIApp &&
-              discreet.UPIUtils.isPreferredApp(packageName)
-          ),
+        Analytics.track('upi:app:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            package_name: packageName,
+            showRecommended: Boolean(self.showRecommendedUPIApp),
+            recommended: Boolean(
+              self.showRecommendedUPIApp &&
+                discreet.UPIUtils.isPreferredApp(packageName)
+            ),
+          },
         });
       });
     }
@@ -2908,7 +2937,7 @@ Session.prototype = {
       return;
     }
 
-    this.track('otp:submit', {
+    Analytics.track('otp:submit', {
       type: AnalyticsTypes.BEHAV,
       data: {
         wallet: this.tab === 'wallet',
@@ -3143,7 +3172,7 @@ Session.prototype = {
     if (data['_[flow]'] === 'tez') {
       if (this.tezMode === 'desktop') {
         data['_[flow]'] = 'directpay';
-        this.track('tez_payment_collect_request');
+        Analytics.track('tez:collect_request');
       } else {
         request.tez = true;
         data['_[flow]'] = 'intent';
@@ -3155,7 +3184,9 @@ Session.prototype = {
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
-      this.track('offer_applied_with_payment', appliedOffer);
+      Analytics.track('offers:applied_with_payment', {
+        data: appliedOffer,
+      });
     } else {
       delete this.r.display_amount;
     }
@@ -3661,7 +3692,9 @@ Session.prototype = {
         this[paymentMethod + 'Offer'] = preferences.offers[0];
       }
 
-      this.track('offer_is_forced', forcedOffer);
+      Analytics.track('offers:forced', {
+        data: forcedOffer,
+      });
     }
   },
 
