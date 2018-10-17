@@ -313,7 +313,7 @@ function initOffers(
         onRemoveOffer();
       }
     } else if ($offersErrorCancel.contains($target)) {
-      Analytis.track('offers:retry', {
+      Analytics.track('offers:retry', {
         type: Analytics.BEHAV,
         data: appliedOffer.data,
       });
