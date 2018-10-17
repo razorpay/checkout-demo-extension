@@ -1,5 +1,4 @@
-import { getSession } from 'sessionmanager';
-import Track from 'tracker';
+import Analytics from 'analytics';
 
 const UPI_APPS = {
   /**
@@ -381,9 +380,11 @@ export const findAndReportNewApps = allApps => {
       usablePackages.indexOf(app.package_name) < 0 &&
       blacklistedPackages.indexOf(app.package_name) < 0
     ) {
-      Track(getSession().r, 'unreported_upi_app', {
-        app_name: app.app_name,
-        package_name: app.package_name,
+      Analytics.track('upi:unreported_app', {
+        data: {
+          app_name: app.app_name,
+          package_name: app.package_name,
+        },
       });
     }
   });
