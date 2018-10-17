@@ -80,8 +80,7 @@ function initOffers(
   onApplyOffer,
   onRemoveOffer,
   formatAmount,
-  $root,
-  track
+  $root
 ) {
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
@@ -287,7 +286,10 @@ function initOffers(
   $applyOffer.onclick = function() {
     var isOfferApplied = offers.applyOffer();
     toggleOfferList();
-    track('offer_applied', appliedOffer.data);
+    Analytics.track('offers:apply', {
+      type: AnalyticsTypes.BEHAV,
+      data: appliedOffer.data,
+    });
     return isOfferApplied && onApplyOffer && onApplyOffer(appliedOffer);
   };
 
@@ -301,14 +303,19 @@ function initOffers(
 
     if ($offersErrorPay.contains($target)) {
       isOfferRemoved = true;
-      track('offer_removed_from_retry_screen', appliedOffer.data);
+      Analytics.track('offers:retry_screen:remove', {
+        data: appliedOffer.data,
+      });
       offers.removeOffer();
       hideOfferError();
       if (onRemoveOffer) {
         onRemoveOffer();
       }
     } else if ($offersErrorCancel.contains($target)) {
-      track('offer_retry', appliedOffer.data);
+      Analytis.track('offers:retry', {
+        type: Analytics.BEHAV,
+        data: appliedOffer.data,
+      });
       hideOfferError();
     }
 
@@ -324,7 +331,10 @@ function initOffers(
         offers.selectOffer(offer);
       },
       onOfferRemoval: function() {
-        track('offer_removed', offer);
+        Analytics.track('offers:remove', {
+          type: AnalyticsTypes.BEHAV,
+          data: offer,
+        });
         offers.removeOffer();
         toggleOfferList();
         return onRemoveOffer && onRemoveOffer();
