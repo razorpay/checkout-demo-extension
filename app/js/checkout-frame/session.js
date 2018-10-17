@@ -1100,8 +1100,7 @@ Session.prototype = {
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
           this.formatAmountWithCurrency.bind(this),
-          $('#body')[0],
-          this.track.bind(this)
+          $('#body')[0]
         );
 
         this.renderOffers(this.screen);
