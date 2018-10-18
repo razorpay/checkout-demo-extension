@@ -55,7 +55,6 @@ export const formatPayment = function(payment) {
       'payment_link_id',
       'customer_id',
       'recurring',
-      'preferred_recurring',
       'subscription_card_change',
       'recurring_token.max_amount',
       'recurring_token.expire_by',

@@ -1,6 +1,8 @@
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
 import Track from 'tracker';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as strings from 'common/strings';
 
@@ -75,6 +77,8 @@ Customer.prototype = {
     if (!session.local) {
       _Doc.querySelector('#top-right') |> _El.addClass('logged');
     }
+
+    Analytics.setMeta('loggedIn', true);
   },
 
   // NOTE: status check api also sends otp if customer exist
@@ -168,6 +172,13 @@ Customer.prototype = {
   },
 
   logout: function(this_device, callback) {
+    Analytics.track('logout', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        all: !this_device,
+      },
+    });
+
     let ajaxOpts = {
       url: makeAuthUrl(this.r, 'apps/logout'),
       method: 'delete',
@@ -178,6 +189,7 @@ Customer.prototype = {
 
     _session_id = null;
 
+    Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);
   },
 };

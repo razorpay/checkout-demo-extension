@@ -43,10 +43,16 @@ function showEMIDropdown() {
 
 export default function emiView(session) {
   const opts = session.emi_options;
-  const amount = (opts.amount = session.get('amount'));
-  this.amount = amount;
 
-  if (amount >= AMEX_EMI_MIN) {
+  const amount = (opts.amount = session.get('amount')),
+    offer = session.getAppliedOffer(),
+    discountedAmount = session.getDiscountedAmount();
+
+  if (
+    amount > AMEX_EMI_MIN &&
+    (!session.isOfferApplicableOnIssuer('amex', offer) ||
+      discountedAmount > AMEX_EMI_MIN)
+  ) {
     const help = _Doc.querySelector('#elem-emi .help');
 
     /* TODO: improve bank name listing */
@@ -57,6 +63,9 @@ export default function emiView(session) {
   } else {
     delete opts.banks.AMEX;
   }
+
+  opts.session = session;
+  opts.discountedAmount = discountedAmount;
 
   this.opts = opts;
   this.listeners = [];

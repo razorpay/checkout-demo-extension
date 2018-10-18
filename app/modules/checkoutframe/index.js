@@ -1,5 +1,6 @@
 import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
+import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
 import { makePrefParams } from 'common/Razorpay';
 import { getSortedApps } from 'common/upi';
@@ -115,6 +116,59 @@ function transformOptions(message) {
   return response;
 }
 
+/**
+ * Set meta for Analytics.
+ * @param {Object} message
+ */
+const setAnalyticsMeta = message => {
+  const qpmap = _.getQueryParams();
+
+  /**
+   * Set time-related properties.
+   */
+  if (message.metadata && message.metadata.openedAt) {
+    Analytics.setMeta(
+      'timeSince.open',
+      () => Date.now() - message.metadata.openedAt
+    );
+  }
+
+  /**
+   * Set language-related properties.
+   */
+  if (
+    _Obj.hasProp(navigator, 'language') ||
+    _Obj.hasProp(navigator, 'userLanguage')
+  ) {
+    Analytics.setMeta(
+      'navigator.language',
+      navigator.language || navigator.userLanguage
+    );
+  }
+
+  /**
+   * Set network-related properties.
+   */
+  if (_Obj.hasProp(navigator, 'connection')) {
+    const { effectiveType, type } = navigator.connection;
+
+    if (effectiveType || type) {
+      Analytics.setMeta('network.type', effectiveType || type);
+    }
+  }
+
+  /**
+   * Set SDK details.
+   */
+  if (qpmap.platform && _Arr.contains(['android', 'ios'], qpmap.platform)) {
+    Analytics.setMeta('sdk.platform', qpmap.platform);
+
+    if (qpmap.version) {
+      Analytics.setMeta('sdk.version', qpmap.version);
+    }
+  }
+};
+
 export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
@@ -125,6 +179,8 @@ export const handleMessage = function(message) {
   var id = message.id || Track.id;
   var session = SessionManager.getSession(id);
   var options = message.options;
+
+  setAnalyticsMeta(message);
 
   if (!session) {
     if (!options) {

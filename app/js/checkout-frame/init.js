@@ -6,6 +6,8 @@ var makeAuthUrl = discreet.makeAuthUrl;
 var makePrefParams = discreet.makePrefParams;
 var fetch = discreet.fetch;
 var Track = discreet.Track;
+var Analytics = discreet.Analytics;
+var AnalyticsTypes = discreet.AnalyticsTypes;
 var UPIUtils = discreet.UPIUtils;
 var Tez = discreet.Tez;
 var Color = discreet.Color;
@@ -27,10 +29,14 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
     return;
   }
 
-  Track(SessionManager.getSession().r, 'js_error', {
-    message: errorMsg,
-    line: lineNumber,
-    col: column,
-    stack: errorObj && errorObj.stack,
+  Analytics.track('js_error', {
+    r: SessionManager.getSession().r,
+    data: {
+      message: errorMsg,
+      line: lineNumber,
+      col: column,
+      stack: errorObj && errorObj.stack,
+    },
+    immediately: true,
   });
 };

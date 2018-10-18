@@ -2,6 +2,8 @@ import 'entry/checkout-frame';
 import { RazorpayConfig, makeAuthUrl, makePrefParams } from 'common/Razorpay';
 
 import Track from 'tracker';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
 import * as Tez from 'tez';
 import * as Color from 'lib/color';
@@ -34,6 +36,8 @@ export default {
   makePrefParams,
   fetch,
   Track,
+  Analytics,
+  AnalyticsTypes,
   UPIUtils,
   setShieldParams,
   Tez,
@@ -68,4 +72,5 @@ export default {
   Curtain,
   WalletUtils,
   commonBanks,
+  timer: _.timer,
 };

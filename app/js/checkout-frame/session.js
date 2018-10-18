@@ -140,6 +140,12 @@ function copyToClipboardListener(e) {
 }
 
 function makeEmiDropdown(emiObj, session, isOption) {
+  var amount = session.get('amount');
+
+  if (session.isOfferApplicableOnIssuer(emiObj.code)) {
+    amount = session.getDiscountedAmount();
+  }
+
   var h = '';
   var isSubvented =
     preferences.methods.emi_subvention === 'merchant' ? true : false;
@@ -155,7 +161,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
         ' month EMI ' +
         (rate ? '@ ' + rate + '%' : '') +
         ' (₹ ' +
-        Razorpay.emi.calculator(session.get('amount'), length, rate) / 100 +
+        Razorpay.emi.calculator(amount, length, rate) / 100 +
         ' per month)</' +
         (isOption ? 'option>' : 'div>');
     });
@@ -390,7 +396,10 @@ function errorHandler(response) {
   /* don't attempt magic if failed for the first time */
   this.magic = false;
 
-  this.track('error', response);
+  Analytics.track('error', {
+    data: response,
+  });
+  Analytics.setMeta('payment.failed', true);
   Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
   if (this.modal) {
@@ -443,9 +452,20 @@ function errorHandler(response) {
 
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
-      hideOverlayMessage();
-      this.showOffersError();
-      this.track('offer_mismatch', this.offers.appliedOffer);
+      // show offers UI error only when offers ui is initialized
+      if (this.offers) {
+        hideOverlayMessage();
+        this.showOffersError();
+      } else {
+        this.showLoadError(
+          'The Offer you selected is not applicable on this Payment Method',
+          true
+        );
+      }
+
+      Analytics.track('offers:mismatch', {
+        data: this.getAppliedOffer(),
+      });
     } else {
       this.showLoadError(
         message || 'There was an error in handling your request',
@@ -464,6 +484,8 @@ function cancelHandler(response) {
 
   /* don't attempt magic if failed for the first time */
   this.magic = false;
+
+  Analytics.setMeta('payment.cancelled', true);
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     this.showLoadError('Payment did not complete.', true);
@@ -812,7 +834,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !((this.order && this.order.bank) || this.emandateTpv)) {
+    if (tab && !(this.order && this.order.bank)) {
       this.switchTab(tab);
     }
 
@@ -969,29 +991,33 @@ Session.prototype = {
     var self = this;
 
     /**
-     * Tez exists only on Android, and outside of WebViews.
-     *
      * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
      */
-    if (window.CheckoutBridge || !discreet.androidBrowser) {
+
+    if (window.CheckoutBridge || !Tez.checkKey(self.get('key'))) {
       return;
     }
 
-    if (!Tez.checkKey(self.get('key'))) {
-      return;
-    }
+    this.tezMode = 'desktop';
 
-    Tez.check(
-      function() {
-        /* This is success callback */
-        $('#upi-tez').css('display', 'block');
-        self.track('tez_visible');
-      },
-      function(e) {
-        /* This is error callback */
-        // self.track('tez_error', e);
-      }
-    );
+    var $upiForm = $('#form-upi'),
+      $tezUPIForm = $('#upi-tez');
+
+    $upiForm.addClass('show-tez');
+
+    Tez.check(function() {
+      self.tezMode = 'mobile';
+      /* This is success callback */
+      $tezUPIForm.removeClass('tez-desktop');
+      $tezUPIForm.addClass('tez-mweb');
+
+      // removing desktop elements to avoid form validations on empty inputs
+      each($tezUPIForm.find('.desktop-only'), function(i, item) {
+        item.remove();
+      });
+
+      Analytics.track('tez:mweb:visible');
+    });
   },
 
   render: function(options) {
@@ -1043,7 +1069,9 @@ Session.prototype = {
         forcedOffer.amount !== forcedOffer.original_amount
       ) {
         this.showDiscount(forcedOffer);
-        this.track('offer_is_forced_with_discount', forcedOffer);
+        Analytics.track('offers:forced_with_discount', {
+          data: forcedOffer,
+        });
       }
     } else if (hasOffers) {
       var eligibleOffers = preferences.offers.filter(function(offer) {
@@ -1072,8 +1100,7 @@ Session.prototype = {
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
           this.formatAmountWithCurrency.bind(this),
-          $('#body')[0],
-          this.track.bind(this)
+          $('#body')[0]
         );
 
         this.renderOffers(this.screen);
@@ -1085,9 +1112,11 @@ Session.prototype = {
             return;
           }
 
-          that.track(
-            'offers_list_view_on_' + (that.screen || 'home') + '_screen',
-            that.offers.appliedOffer
+          Analytics.track(
+            'offers:list_view:screen:' + (that.screen || 'home'),
+            {
+              data: that.offers.appliedOffer,
+            }
           );
         });
       }
@@ -1100,6 +1129,7 @@ Session.prototype = {
     if (this.closeAt) {
       var timeLeft = this.closeAt - now();
       var timeoutEl = $('#timeout').show()[0];
+      $('#body').addClass('has-timeout');
       var timerFn = updateTimer(timeoutEl, this.closeAt);
       timerFn();
       if (this.isMobile) {
@@ -1128,6 +1158,11 @@ Session.prototype = {
     if (this.all_upi_intents_data) {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
     }
+
+    Analytics.track('complete', {
+      type: AnalyticsTypes.RENDER,
+    });
+    Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
   setTpvBanks: function() {
@@ -1145,6 +1180,9 @@ Session.prototype = {
     if (this.order && this.order.bank) {
       bankCode = this.order.bank;
       accountNumber = this.order.account_number;
+      if (!this.order.method && this.methods.upi && this.methods.netbanking) {
+        this.multiTpv = true;
+      }
     }
 
     var banks = this.methods.netbanking;
@@ -1419,6 +1457,13 @@ Session.prototype = {
   },
 
   resendOTP: function() {
+    Analytics.track('otp:resend', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.tab === 'wallet',
+      },
+    });
+
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
@@ -1428,7 +1473,11 @@ Session.prototype = {
   },
 
   secAction: function() {
-    this.track('skipped_save', { while_submitting: !!payload });
+    Analytics.track('saved_cards:skip', {
+      data: {
+        while_submitting: !!payload,
+      },
+    });
     $('#save').attr('checked', 0);
     this.wants_skip = true;
     var payload = this.payload;
@@ -1498,16 +1547,22 @@ Session.prototype = {
         checked[0].checked = false;
       }
 
-      self.track('upi_2f_consent', {
-        package_name: packageName,
-        consent: false,
+      Analytics.track('upi:2f:consent:dismiss', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          package_name: packageName,
+          consent: false,
+        },
       });
 
       $('#body').toggleClass('sub', false);
     };
 
-    this.track('upi_2f_shown', {
-      package_name: packageName,
+    Analytics.track('upi:2f:consent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        package_name: packageName,
+      },
     });
 
     Confirm.show({
@@ -1534,9 +1589,12 @@ Session.prototype = {
           );
         } catch (saveErr) {}
 
-        self.track('upi_2f_consent', {
-          package_name: packageName,
-          consent: true,
+        Analytics.track('upi:2f:consent:agree', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            package_name: packageName,
+            consent: true,
+          },
         });
 
         // Show overlay manually because it gets hidden.
@@ -1621,6 +1679,14 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.click('.payment-option', function(e) {
+      Analytics.track('payment_method:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          disabled: $(e.currentTarget).hasClass('disabled'),
+          method: e.currentTarget.getAttribute('tab') || '',
+        },
+      });
+
       if (!$(e.currentTarget).hasClass('disabled')) {
         this.switchTab(e.currentTarget.getAttribute('tab') || '');
       }
@@ -1645,7 +1711,12 @@ Session.prototype = {
       var saveTick = qs('#save');
       if (saveTick) {
         this.on('change', '#save', function(e) {
-          this.track('change_save', { active: e.target.checked });
+          Analytics.track('card:save:change', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              active: e.target.checked,
+            },
+          });
         });
       }
 
@@ -1725,6 +1796,15 @@ Session.prototype = {
               }
             } else {
               var value = e.target.value;
+
+              Analytics.track('wallet:select', {
+                type: AnalyticsTypes.BEHAV,
+                data: {
+                  wallet: value,
+                  power: discreet.WalletUtils.isPowerWallet(value),
+                },
+              });
+
               $('#body').toggleClass('sub', value);
               $('#wallets').removeClass('invalid');
             }
@@ -1791,13 +1871,16 @@ Session.prototype = {
 
         $('#body').toggleClass('sub', e.target.value);
 
-        self.track('upi_app_selected', {
-          package_name: packageName,
-          showRecommended: Boolean(self.showRecommendedUPIApp),
-          recommended: Boolean(
-            self.showRecommendedUPIApp &&
-              discreet.UPIUtils.isPreferredApp(packageName)
-          ),
+        Analytics.track('upi:app:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            package_name: packageName,
+            showRecommended: Boolean(self.showRecommendedUPIApp),
+            recommended: Boolean(
+              self.showRecommendedUPIApp &&
+                discreet.UPIUtils.isPreferredApp(packageName)
+            ),
+          },
         });
       });
     }
@@ -1851,6 +1934,11 @@ Session.prototype = {
       selectElementText(e.target);
     });
     this.on('click', '#body', 'copytoclipboard--btn', copyToClipboardListener);
+
+    this.on('click', '#form-upi.collapsible .item', function(e) {
+      $('#form-upi.collapsible .item.expanded').removeClass('expanded');
+      $(e.currentTarget).addClass('expanded');
+    });
   },
 
   /**
@@ -2103,6 +2191,15 @@ Session.prototype = {
       return;
     }
 
+    Analytics.track('screen:switch', {
+      data: {
+        from: this.screen,
+        to: screen,
+      },
+    });
+    Analytics.setMeta('screen', screen);
+    Analytics.setMeta('timeSince.screen', discreet.timer());
+
     // Back button is pressed before going to card page page
     if (this.screen === 'otp' && screen !== 'card') {
       this.preSelectedOffer = null;
@@ -2261,6 +2358,10 @@ Session.prototype = {
     var tab = '';
     var self = this;
 
+    Analytics.track('back', {
+      type: AnalyticsTypes.BEHAV,
+    });
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
@@ -2313,6 +2414,16 @@ Session.prototype = {
         return;
       }
     }
+
+    Analytics.track('tab:switch', {
+      data: {
+        from: this.tab,
+        to: tab,
+      },
+    });
+    Analytics.setMeta('tab', tab);
+    Analytics.setMeta('timeSince.tab', discreet.timer());
+
     if (tab) {
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
@@ -2463,10 +2574,12 @@ Session.prototype = {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
+
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
+          session: this,
           emi: this.methods.emi,
           emi_options: this.emi_options,
           recurring: this.recurring,
@@ -2492,6 +2605,13 @@ Session.prototype = {
     var saveClass = 'saved-cards';
     if (typeof saveScreen !== 'boolean') {
       saveScreen = !tabCard.hasClass(saveClass);
+
+      Analytics.track('saved_cards:toggle', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          from: tabCard.hasClass(saveClass) ? 'saved' : 'new',
+        },
+      });
     }
 
     $('#elem-emi').removeClass('hidden');
@@ -2517,6 +2637,14 @@ Session.prototype = {
 
   switchBank: function(e) {
     var val = e.target.value;
+
+    Analytics.track('bank:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        bank: val,
+      },
+    });
+
     this.checkDown(val);
     this.checkBankRadio(val);
     this.proceedAutomaticallyAfterSelectingBank();
@@ -2559,6 +2687,14 @@ Session.prototype = {
       Razorpay.sendMessage({ event: 'blur' });
     }
     var val = e.target.value;
+
+    Analytics.track('bank:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        bank: val,
+      },
+    });
+
     this.checkDown(val);
     var select = gel('bank-select');
     select.value = val;
@@ -2696,7 +2832,16 @@ Session.prototype = {
           delete data.upi_app;
         }
         if (data['_[flow]'] !== 'directpay') {
-          delete data.vpa;
+          if (data['_[flow]'] === 'tez' && this.tezMode === 'desktop') {
+            data.vpa = data.tez_username + '@' + data.tez_bank;
+          } else {
+            delete data.vpa;
+          }
+        }
+
+        if ('tez_username' in data) {
+          delete data.tez_username;
+          delete data.tez_bank;
         }
       }
     }
@@ -2791,6 +2936,14 @@ Session.prototype = {
     if (this.checkInvalid('#form-otp')) {
       return;
     }
+
+    Analytics.track('otp:submit', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.tab === 'wallet',
+      },
+    });
+
     this.showLoadError('Verifying OTP');
     var otp = gel('otp').value.replace(/\D/g, '');
 
@@ -2879,7 +3032,7 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
 
-    if (!this.tab && !(this.order || this.emandateTpv)) {
+    if (!this.tab && !this.order) {
       return;
     }
 
@@ -2900,44 +3053,8 @@ Session.prototype = {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
-
-      data.method = this.order.method || 'netbanking';
+      data.method = this.order.method || data.method || 'netbanking';
       data.bank = this.order.bank;
-    } else if (this.emandateTpv) {
-      if (this.checkInvalid('#pad-common')) {
-        return;
-      }
-      data.method = 'emandate';
-      var opts = this.get();
-
-      var emandateFields = [
-        'bank',
-        'bank_account[name]',
-        'bank_account[account_number]',
-        'bank_account[account_type]',
-        'bank_account[ifsc]',
-        'aadhaar[vid]',
-        'auth_type',
-      ];
-
-      each(opts, function(key, val) {
-        if (/^prefill\./.test(key)) {
-          var keyString = key.replace(/^prefill\./, '');
-
-          if (keyString && indexOf(emandateFields, keyString) > -1) {
-            data[keyString] = val;
-          }
-        }
-      });
-
-      var emandatePref = this.methods.emandate;
-
-      try {
-        var auth_types = this.emandateBanks[data.bank].auth_types;
-        if (!data.auth_type && auth_types.length === 1) {
-          data.auth_type = auth_types[0];
-        }
-      } catch (err) {}
     } else if (screen) {
       if (screen === 'card') {
         var formattingDelegator = this.delegator;
@@ -3053,17 +3170,23 @@ Session.prototype = {
     }
 
     if (data['_[flow]'] === 'tez') {
-      request.tez = true;
-      data['_[flow]'] = 'intent';
+      if (this.tezMode === 'desktop') {
+        data['_[flow]'] = 'directpay';
+        Analytics.track('tez:collect_request');
+      } else {
+        request.tez = true;
+        data['_[flow]'] = 'intent';
+      }
     }
 
-    var appliedOffer =
-      this.forcedOffer || (this.offers && this.offers.appliedOffer);
+    var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
-      this.track('offer_applied_with_payment', appliedOffer);
+      Analytics.track('offers:applied_with_payment', {
+        data: appliedOffer,
+      });
     } else {
       delete this.r.display_amount;
     }
@@ -3198,7 +3321,7 @@ Session.prototype = {
           setOtpText(insufficient_text);
         }, this)
       );
-    } else if (data.method === 'upi') {
+    } else if (data.method === 'upi' && !this.multiTpv) {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
@@ -3246,7 +3369,8 @@ Session.prototype = {
     if (this.screen === 'card') {
       setEmiBank(data, this.savedCardScreen);
       if (this.recurring) {
-        data.recurring = 1;
+        var recurringValue = this.get('recurring');
+        data.recurring = isString(recurringValue) ? recurringValue : 1;
       }
     }
 
@@ -3350,6 +3474,7 @@ Session.prototype = {
       var emiBank = {
         name: bank.name,
         patt: bank.patt,
+        code: bank.code,
         plans: {},
       };
 
@@ -3565,8 +3690,38 @@ Session.prototype = {
         this[paymentMethod + 'Offer'] = preferences.offers[0];
       }
 
-      this.track('offer_is_forced', forcedOffer);
+      Analytics.track('offers:forced', {
+        data: forcedOffer,
+      });
     }
+  },
+
+  getAppliedOffer: function() {
+    return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+  },
+
+  isOfferApplicableOnIssuer: function(issuer, offer) {
+    issuer = issuer.toLowerCase();
+    offer = offer || this.getAppliedOffer();
+
+    if (!offer) {
+      return false;
+    }
+
+    var offerIssuer = (offer.issuer || '').toLowerCase(),
+      offerNetwork = (offer.payment_network || '').toLowerCase();
+
+    if (issuer === 'amex') {
+      return !offerNetwork || offerNetwork === issuer;
+    }
+
+    return !offerIssuer || offerIssuer === issuer;
+  },
+
+  getDiscountedAmount: function() {
+    var appliedOffer = this.getAppliedOffer();
+
+    return (appliedOffer && appliedOffer.amount) || this.get('amount');
   },
 
   showOffersError: function(cb) {
@@ -3643,6 +3798,7 @@ Session.prototype = {
 
       if (saved_customer.tokens) {
         customer.logged = true;
+        Analytics.setMeta('loggedIn', true);
       }
 
       customer.customer_id = saved_customer.customer_id;

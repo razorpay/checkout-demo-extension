@@ -22,6 +22,7 @@ import { internetExplorer, iOS } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
+import Analytics from 'analytics';
 
 const isRazorpayFrame = _Str.startsWith(
   RazorpayConfig.api,
@@ -55,7 +56,10 @@ function onPaymentCancel(metaParam) {
         url: url,
         callback: response => {
           if (response.razorpay_payment_id) {
-            Track(razorpay, 'cancel_success', response);
+            Analytics.track('cancel_success', {
+              data: response,
+              r: razorpay,
+            });
           } else {
             response = cancelError;
           }
@@ -71,7 +75,10 @@ function onPaymentCancel(metaParam) {
       eventData.auth_type = this.debitPinAuthType;
     }
 
-    Track(razorpay, 'cancel', eventData);
+    Analytics.track('cancel', {
+      data: eventData,
+      r: razorpay,
+    });
   }
 }
 
@@ -86,10 +93,37 @@ function getTrackingData(data) {
   );
 }
 
-function trackNewPayment(data, params, r) {
-  Track(r, 'submit', {
-    data: getTrackingData(data),
-    params: params,
+function trackNewPayment(data = {}, params, r) {
+  /**
+   * Set whether saved card is global or local.
+   */
+  if (data.token && r && r.preferences) {
+    if (!_.isNonNullObject(params.saved_card)) {
+      params.saved_card = {};
+    }
+    params.saved_card.mode = r.preferences.global ? 'global' : 'local';
+  }
+
+  /**
+   * Set @xyz part of VPA.
+   */
+  if (data.method && data.method === 'upi' && data.vpa) {
+    if (!_.isNonNullObject(params.upi)) {
+      params.upi = {};
+    }
+
+    if (_Str.contains(data.vpa, '@')) {
+      params.upi.provider = data.vpa.split('@')[1];
+    }
+  }
+
+  Analytics.track('submit', {
+    data: {
+      data: getTrackingData(data),
+      params: params,
+    },
+    r,
+    immediately: true,
   });
 }
 
@@ -100,7 +134,10 @@ export default function Payment(data, params, r) {
   this.magic = params.magic;
 
   this.isMagicPayment =
-    this.sdk_popup && this.magic && /^(card|emi)$/.test(data.method);
+    this.sdk_popup &&
+    this.magic &&
+    /^(card|emi)$/.test(data.method) &&
+    !params.fees;
 
   this.magicPossible = this.isMagicPayment;
 
@@ -122,7 +159,8 @@ export default function Payment(data, params, r) {
     }
   }
 
-  if (typeof data.auth_type === 'undefined' && this.isMagicPayment) {
+  // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
+  if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
     data.auth_type = '3ds';
   }
 
@@ -197,7 +235,9 @@ Payment.prototype = {
     }
 
     if (this.isMagicPayment) {
-      Track(this.r, 'magic_open_popup');
+      Analytics.track('magic_open_popup', {
+        r: this.r,
+      });
       window.CheckoutBridge.invokePopup(
         _Obj.stringify({
           content: popupTemplate(this),
@@ -298,11 +338,11 @@ Payment.prototype = {
 
     if (data.razorpay_payment_id) {
       // Track
-      Track(
-        this.r,
-        'oncomplete',
-        _Obj.clone(data) |> _Obj.setProp('auth_type', this.debitPinAuthType)
-      );
+      Analytics.track('oncomplete', {
+        r: this.r,
+        data:
+          _Obj.clone(data) |> _Obj.setProp('auth_type', this.debitPinAuthType),
+      });
       this.emit('success', data);
     } else {
       var errorObj = data.error;
@@ -367,9 +407,6 @@ Payment.prototype = {
       return;
     }
 
-    if (data.method === 'emandate') {
-      return;
-    }
     // iphone background ajax route
     if (!this.powerwallet && iOS) {
       return;

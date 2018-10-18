@@ -16,7 +16,6 @@ export const RazorpayDefaults = {
   description: '',
   customer_id: '',
   recurring: null,
-  preferred_recurring: false,
   signature: '',
   retry: true,
   target: '',
@@ -84,7 +83,7 @@ export function flatten(obj, defObj) {
 const flatKeys = {};
 export default function Options(options) {
   _Obj.loop(RazorpayDefaults, function(val, key) {
-    if (_.isNonNullObject(val)) {
+    if (_.isNonNullObject(val) && !_.isEmptyObject(val)) {
       flatKeys[key] = true;
       _Obj.loop(val, function(subVal, subKey) {
         RazorpayDefaults[key + '.' + subKey] = subVal;

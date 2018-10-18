@@ -12,10 +12,12 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.phonepe.app',
+      app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
     },
     {
       app_name: 'Google Pay (Tez)',
       package_name: 'com.google.android.apps.nbu.paisa.user',
+      app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
     },
   ],
 

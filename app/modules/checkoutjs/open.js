@@ -249,6 +249,11 @@ RazorProto.onNew = function(event, callback) {
 };
 
 RazorProto.open = needBody(function() {
+  if (!this.metadata) {
+    this.metadata = {};
+  }
+  this.metadata.openedAt = Date.now();
+
   var frame = (this.checkoutFrame = getPreloadedFrame(this));
   Track(this, 'open');
 
