@@ -31,11 +31,10 @@
 
 <script>
   import Razorpay from 'common/Razorpay';
-  import Checkbox from 'templates/views/ui/Checkbox.svelte';
   /* global hideEmi */
 
   export default {
-    components: { Checkbox },
+    components: { Checkbox : "templates/views/ui/Checkbox.svelte" },
     computed: {
       plans: data => {
         let plans = (data.banks[data.selected] || {}).plans || {};
