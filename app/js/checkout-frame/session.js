@@ -2491,8 +2491,21 @@ Session.prototype = {
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function() {
-        // customer status check also sends otp if customer exists
-        if (self.recurring || (customer.saved && !customer.logged)) {
+        /**
+         * 1. If this is a recurring payment and customer doesn't have saved cards,
+         *    create and ask for OTP.
+         * 2. If customer has saved cards and is not logged in, ask for OTP.
+         * 3. If customer doesn't have saved cards, show cards screen.
+         */
+        if (self.recurring && !customer.saved && !customer.logged) {
+          self.customer.createOTP(
+            askOTP(
+              'Enter OTP sent on ' +
+                getPhone() +
+                '<br>to save your Card for future payments'
+            )
+          );
+        } else if (customer.saved && !customer.logged) {
           askOTP();
         } else {
           self.showCards();
