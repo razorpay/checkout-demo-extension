@@ -1,7 +1,5 @@
 <div id="emi-inner" class="mchild">
   <div class="row em select">
-    <Checkbox label="hello" checked={true} id="hello"/>
-    <Checkbox label="hi" checked={true}/>
     <div class="col">Select Bank:</div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value='selected'>
@@ -34,8 +32,16 @@
   /* global hideEmi */
 
   export default {
-    components: { Checkbox : "templates/views/ui/Checkbox.svelte" },
     computed: {
+      amount: data => {
+        let session = data.session;
+        let selectedBank = (data.banks[data.selected] || {}).code;
+        if (session.isOfferApplicableOnIssuer(selectedBank)) {
+          return session.getDiscountedAmount();
+        } else {
+          return session.get('amount');
+        }
+      },
       plans: data => {
         let plans = (data.banks[data.selected] || {}).plans || {};
         return _Obj.map(plans, (plan, duration) => {
@@ -43,15 +49,16 @@
           return {
             duration: duration,
             rate: plan,
-            monthly: installment / 100,
-            total: (installment * duration) / 100,
+            monthly: (installment / 100).toFixed(2),
+            total: (installment * duration / 100).toFixed(2),
           };
         });
       },
     },
     methods: {
       hide: _ => {
-        /* TODO: defined in session, update once session is ported to ES6 */ hideEmi();
+        /* TODO: defined in session, update once session is ported to ES6 */
+        hideEmi();
       },
     },
   };

@@ -84,7 +84,7 @@ emiView.prototype = {
       data: {
         selected: defaultBank,
         banks: this.opts.banks,
-        amount: this.amount,
+        session: this.opts.session,
       },
     });
 
