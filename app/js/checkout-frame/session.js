@@ -2586,6 +2586,19 @@ Session.prototype = {
           });
         } catch (e) {}
 
+        var savedCardsCount = customer.tokens.items.filter(function(item) {
+          return item.method === 'card';
+        }).length;
+
+        Analytics.setMeta('has.savedCards', true);
+        Analytics.setMeta('count.savedCards', savedCardsCount);
+        Analytics.track('saved_cards', {
+          type: AnalyticsTypes.RENDER,
+          data: {
+            count: savedCardsCount,
+          },
+        });
+
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
@@ -2981,6 +2994,9 @@ Session.prototype = {
           this.showLoadError();
         } else {
           this.r.emit('payment.error', discreet.error(msg));
+          Analytics.track('behav:otp:incorrect', {
+            wallet: this.tab === 'wallet',
+          });
           askOTP(msg);
         }
       };
@@ -2990,6 +3006,9 @@ Session.prototype = {
         if (self.customer.logged) {
           self.showCardTab();
         } else {
+          Analytics.track('behav:otp:incorrect', {
+            wallet: self.tab === 'wallet',
+          });
           askOTP(msg);
         }
       };
