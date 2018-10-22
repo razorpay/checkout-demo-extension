@@ -8,7 +8,7 @@ export const processOtpResponse = function(response) {
   var error = response.error;
   if (error) {
     if (error.action === 'RETRY') {
-      return this.emit('otp.required', strings.wrontOtp);
+      return this.emit('otp.required', strings.wrongOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }
