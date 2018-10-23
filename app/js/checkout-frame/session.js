@@ -639,18 +639,6 @@ Session.prototype = {
     Track(this.r, event, extra);
   },
 
-  trackDebitPin: function(event, extra) {
-    if (extra) {
-      extra.default_auth_type = defaultAuthTypeRadioVal;
-    } else {
-      extra = {
-        default_auth_type: defaultAuthTypeRadioVal,
-      };
-    }
-
-    Track(this.r, event, extra);
-  },
-
   getClasses: function() {
     var classes = [];
     if (
@@ -1474,6 +1462,7 @@ Session.prototype = {
 
   secAction: function() {
     Analytics.track('saved_cards:skip', {
+      type: AnalyticsTypes.BEHAV,
       data: {
         while_submitting: !!payload,
       },
@@ -1923,8 +1912,12 @@ Session.prototype = {
 
       // Check for name.
       if (target.name && target.name.indexOf('auth_type') === 0) {
-        self.trackDebitPin('flow_option_changed', {
-          flow: target.value || null,
+        Analytics.track('atmpin:flows:change', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            default_auth_type: defaultAuthTypeRadioVal,
+            flow: target.value || null,
+          },
         });
       }
     });
@@ -2498,8 +2491,21 @@ Session.prototype = {
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function() {
-        // customer status check also sends otp if customer exists
-        if (self.recurring || (customer.saved && !customer.logged)) {
+        /**
+         * 1. If this is a recurring payment and customer doesn't have saved cards,
+         *    create and ask for OTP.
+         * 2. If customer has saved cards and is not logged in, ask for OTP.
+         * 3. If customer doesn't have saved cards, show cards screen.
+         */
+        if (self.recurring && !customer.saved && !customer.logged) {
+          self.customer.createOTP(
+            askOTP(
+              'Enter OTP sent on ' +
+                getPhone() +
+                '<br>to save your Card for future payments'
+            )
+          );
+        } else if (customer.saved && !customer.logged) {
           askOTP();
         } else {
           self.showCards();
@@ -2553,7 +2559,12 @@ Session.prototype = {
     }
 
     if ($savedCard.$('.flow-selection-container')[0]) {
-      this.trackDebitPin('saved_card_with_flows_selected');
+      Analytics.track('atmpin:saved_card:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          default_auth_type: defaultAuthTypeRadioVal,
+        },
+      });
     }
   },
 
@@ -3452,9 +3463,12 @@ Session.prototype = {
     }
 
     this.r.getCardFlows(iin, function(flows) {
-      self.trackDebitPin('flow_opts_fetched', {
-        iin: iin,
-        prefilled_card: isPrefilledCardNumber || null,
+      Analytics.track('card_flows:fetched', {
+        data: {
+          iin: iin,
+          prefilled_card: isPrefilledCardNumber || null,
+          default_auth_type: defaultAuthTypeRadioVal,
+        },
       });
 
       // Sanity-check
@@ -3463,9 +3477,13 @@ Session.prototype = {
       }
 
       if (flows && flows.pin) {
-        self.trackDebitPin('flow_opts_shown', {
-          iin: iin,
-          prefilled_card: isPrefilledCardNumber || null,
+        Analytics.track('atmpin:flows', {
+          type: AnalyticsTypes.RENDER,
+          data: {
+            iin: iin,
+            prefilled_card: isPrefilledCardNumber || null,
+            default_auth_type: defaultAuthTypeRadioVal,
+          },
         });
         showFlowRadioButtons(true);
       } else {
