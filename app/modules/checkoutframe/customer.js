@@ -142,7 +142,7 @@ Customer.prototype = {
           if (data.error.field) {
             errorHandler.call(getSession(), data);
           } else {
-            callback(strings.wrontOtp);
+            callback(strings.wrongOtp);
           }
         } else {
           callback();
