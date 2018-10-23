@@ -2590,14 +2590,16 @@ Session.prototype = {
           return item.method === 'card';
         }).length;
 
-        Analytics.setMeta('has.savedCards', true);
-        Analytics.setMeta('count.savedCards', savedCardsCount);
-        Analytics.track('saved_cards', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            count: savedCardsCount,
-          },
-        });
+        if (savedCardsCount) {
+          Analytics.setMeta('has.savedCards', true);
+          Analytics.setMeta('count.savedCards', savedCardsCount);
+          Analytics.track('saved_cards', {
+            type: AnalyticsTypes.RENDER,
+            data: {
+              count: savedCardsCount,
+            },
+          });
+        }
 
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
