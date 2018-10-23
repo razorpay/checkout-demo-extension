@@ -70,11 +70,6 @@ function onPaymentCancel(metaParam) {
       this.complete(cancelError);
     }
 
-    // Set auth_type in case of Debit + PIN.
-    if (this.isDebitPin) {
-      eventData.auth_type = this.debitPinAuthType;
-    }
-
     Analytics.track('cancel', {
       data: eventData,
       r: razorpay,
@@ -142,22 +137,6 @@ export default function Payment(data, params, r) {
   this.magicPossible = this.isMagicPayment;
 
   this.isAmazonpayPayment = params.amazonpay;
-
-  this.isDebitPin =
-    data &&
-    data.auth_type &&
-    (data.auth_type === 'c3ds' || data.auth_type === 'pin');
-  if (this.isDebitPin) {
-    this.debitPinAuthType = data.auth_type;
-
-    /**
-     * Deleting this from data manually because c3ds is just for Checkout,
-     * API takes 3DS, which is the default anyway.
-     */
-    if (data.auth_type === 'c3ds') {
-      delete data.auth_type;
-    }
-  }
 
   // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
   if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
@@ -340,8 +319,7 @@ Payment.prototype = {
       // Track
       Analytics.track('oncomplete', {
         r: this.r,
-        data:
-          _Obj.clone(data) |> _Obj.setProp('auth_type', this.debitPinAuthType),
+        data: _Obj.clone(data),
       });
       this.emit('success', data);
     } else {
