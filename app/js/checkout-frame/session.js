@@ -3081,6 +3081,15 @@ Session.prototype = {
 
     this.refresh();
     var data = (this.payload = this.getPayload());
+
+    if (data.auth_type && data.auth_type === 'c3ds') {
+      /**
+       * Deleting this from data manually because c3ds is just for Checkout,
+       * API takes 3DS, which is the default anyway.
+       */
+      delete data.auth_type;
+    }
+
     if (this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
