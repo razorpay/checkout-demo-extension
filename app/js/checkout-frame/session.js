@@ -2462,16 +2462,8 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function(tab) {
+  toggleEMIRequiredAttrib: function(tab) {
     var isEmiTab = tab === 'emi';
-    $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
-
-    if (!isEmiTab) {
-      $('#emi-bank')
-        .parent()
-        .removeClass('invalid');
-      $('#elem-emi .elem').removeClass('invalid');
-    }
 
     /**
      * If theme.emi_mode is true, and this is the EMI tab,
@@ -2487,7 +2479,28 @@ Session.prototype = {
       ) {
         $(node).attr('required', isEmiTab);
       });
+
+      /**
+       * Set each invalid saved-card w/ EMI as valid.
+       */
+      each($$('.elem-savedcards-emi'), function(index, node) {
+        toggleInvalid($(node), true);
+      });
     }
+  },
+
+  showCardTab: function(tab) {
+    var isEmiTab = tab === 'emi';
+    $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
+
+    if (!isEmiTab) {
+      $('#emi-bank')
+        .parent()
+        .removeClass('invalid');
+      $('#elem-emi .elem').removeClass('invalid');
+    }
+
+    this.toggleEMIRequiredAttrib(tab);
 
     $('#otp-elem').removeClass('fourdigit');
     $('#otp').attr('maxlength', 6);
@@ -2626,6 +2639,8 @@ Session.prototype = {
           emi_options: this.emi_options,
           recurring: this.recurring,
         });
+
+        this.toggleEMIRequiredAttrib(this.tab);
       }
     }
 
