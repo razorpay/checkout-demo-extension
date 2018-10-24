@@ -2473,6 +2473,22 @@ Session.prototype = {
       $('#elem-emi .elem').removeClass('invalid');
     }
 
+    /**
+     * If theme.emi_mode is true, and this is the EMI tab,
+     * we would want the emi_duration select element to be required
+     * as you cannot proceed without it.
+     *
+     * If this is the regular cards tab, the select should not be a required field.
+     */
+    if (this.get('theme.emi_mode')) {
+      each($$('.elem-savedcards-emi select[name=emi_duration]'), function(
+        index,
+        node
+      ) {
+        $(node).attr('required', isEmiTab);
+      });
+    }
+
     $('#otp-elem').removeClass('fourdigit');
     $('#otp').attr('maxlength', 6);
 
