@@ -343,7 +343,7 @@ emandateView.prototype = {
     }
 
     if (screen === 'emandate-aadhaar') {
-      data['auth_type'] = 'aadhaar';
+      data['auth_type'] = this.prefill.auth_type || 'aadhaar';
     } else if (screen === 'emandate-netbanking') {
       data['auth_type'] = 'netbanking';
     }
