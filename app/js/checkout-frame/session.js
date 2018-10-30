@@ -2527,13 +2527,13 @@ Session.prototype = {
          * 3. If customer doesn't have saved cards, show cards screen.
          */
         if (self.recurring && !customer.saved && !customer.logged) {
-          self.customer.createOTP(
+          self.customer.createOTP(function() {
             askOTP(
               'Enter OTP sent on ' +
                 getPhone() +
                 '<br>to save your Card for future payments'
-            )
-          );
+            );
+          });
         } else if (customer.saved && !customer.logged) {
           askOTP();
         } else {
