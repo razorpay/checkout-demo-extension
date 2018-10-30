@@ -162,7 +162,12 @@ emandateView.prototype = {
       this.setBank(this.prefill.bank);
 
       if (this.prefill.auth_type) {
-        landingScreen = 'emandate-' + this.prefill.auth_type;
+        let screenToShow = this.prefill.auth_type;
+
+        if (_Str.startsWith(screenToShow, 'aadhaar')) {
+          screenToShow = 'aadhaar';
+        }
+        landingScreen = 'emandate-' + screenToShow;
       }
 
       return landingScreen;
