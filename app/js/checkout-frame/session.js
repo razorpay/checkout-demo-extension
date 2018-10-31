@@ -987,10 +987,15 @@ Session.prototype = {
       this.preferences.features &&
       this.preferences.features.google_pay;
 
-    if (
-      !hasFeature &&
-      (window.CheckoutBridge || !Tez.checkKey(self.get('key')))
-    ) {
+    if (this.preferences.fee_bearer) {
+      return;
+    }
+
+    if (window.CheckoutBridge) {
+      return;
+    }
+
+    if (!(hasFeature || Tez.checkKey(self.get('key')))) {
       return;
     }
 
