@@ -1,7 +1,7 @@
 var PaymentRequest = global.PaymentRequest;
 
 const allowed_keys = [
-  'rzp_test_1DP5mmOlF5G5ag',
+  // 'rzp_test_1DP5mmOlF5G5ag',
   'rzp_live_izcpsDPjM13eLY', // razorpay
   'rzp_live_Vxe5F7uRkCXkXp', // rapido
   'rzp_live_uot7iROpZmbKeI', // freshtohome

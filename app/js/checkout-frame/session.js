@@ -982,7 +982,15 @@ Session.prototype = {
      * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
      */
 
-    if (window.CheckoutBridge || !Tez.checkKey(self.get('key'))) {
+    var hasFeature =
+      this.preferences &&
+      this.preferences.features &&
+      this.preferences.features.google_pay;
+
+    if (
+      !hasFeature &&
+      (window.CheckoutBridge || !Tez.checkKey(self.get('key')))
+    ) {
       return;
     }
 
