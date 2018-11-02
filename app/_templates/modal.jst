@@ -30,7 +30,7 @@ if(o('display_currency'))
 else if (o('currency')==='INR')
   amount = "&#x20B9;<span class='amount-figure'>" + amount_figure + "</span>";
 else
-  amount = "$" + amount_figure;
+  amount = discreet.currencies[o('currency')] + amount_figure;
 
 var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));

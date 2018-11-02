@@ -617,7 +617,8 @@ Session.prototype = {
   formatAmountWithCurrency: function(amount) {
     var discountAmount = amount,
       discountFigure = this.formatAmount(discountAmount),
-      displayCurrency = this.r.get('display_currency');
+      displayCurrency = this.r.get('display_currency'),
+      currency = this.r.get('currency');
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
@@ -626,7 +627,7 @@ Session.prototype = {
       discountAmount =
         "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
     } else {
-      discountAmount = '$' + discountFigure;
+      discountAmount = discreet.currencies[currency] + discountFigure;
     }
 
     return discountAmount;
