@@ -639,18 +639,6 @@ Session.prototype = {
     Track(this.r, event, extra);
   },
 
-  trackDebitPin: function(event, extra) {
-    if (extra) {
-      extra.default_auth_type = defaultAuthTypeRadioVal;
-    } else {
-      extra = {
-        default_auth_type: defaultAuthTypeRadioVal,
-      };
-    }
-
-    Track(this.r, event, extra);
-  },
-
   getClasses: function() {
     var classes = [];
     if (
@@ -994,20 +982,35 @@ Session.prototype = {
      * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
      */
 
-    if (window.CheckoutBridge || !Tez.checkKey(self.get('key'))) {
+    var hasFeature =
+      this.preferences &&
+      this.preferences.features &&
+      this.preferences.features.google_pay;
+
+    if (this.preferences.fee_bearer) {
+      return;
+    }
+
+    if (window.CheckoutBridge) {
+      return;
+    }
+
+    if (!(hasFeature || Tez.checkKey(self.get('key')))) {
       return;
     }
 
     this.tezMode = 'desktop';
 
     var $upiForm = $('#form-upi'),
-      $tezUPIForm = $('#upi-tez');
+      $tezUPIForm = $('#upi-tez'),
+      $upiDirectpay = $('#upi-directpay');
 
-    $upiForm.addClass('show-tez');
+    $upiDirectpay.addClass('tez-first');
 
     Tez.check(function() {
       self.tezMode = 'mobile';
       /* This is success callback */
+      $upiForm.addClass('show-tez');
       $tezUPIForm.removeClass('tez-desktop');
       $tezUPIForm.addClass('tez-mweb');
 
@@ -1474,6 +1477,7 @@ Session.prototype = {
 
   secAction: function() {
     Analytics.track('saved_cards:skip', {
+      type: AnalyticsTypes.BEHAV,
       data: {
         while_submitting: !!payload,
       },
@@ -1923,8 +1927,12 @@ Session.prototype = {
 
       // Check for name.
       if (target.name && target.name.indexOf('auth_type') === 0) {
-        self.trackDebitPin('flow_option_changed', {
-          flow: target.value || null,
+        Analytics.track('atmpin:flows:change', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            default_auth_type: defaultAuthTypeRadioVal,
+            flow: target.value || null,
+          },
         });
       }
     });
@@ -2469,6 +2477,33 @@ Session.prototype = {
     }
   },
 
+  toggleEMIRequiredAttrib: function(tab) {
+    var isEmiTab = tab === 'emi';
+
+    /**
+     * If theme.emi_mode is true, and this is the EMI tab,
+     * we would want the emi_duration select element to be required
+     * as you cannot proceed without it.
+     *
+     * If this is the regular cards tab, the select should not be a required field.
+     */
+    if (this.get('theme.emi_mode')) {
+      each($$('.elem-savedcards-emi select[name=emi_duration]'), function(
+        index,
+        node
+      ) {
+        $(node).attr('required', isEmiTab);
+      });
+
+      /**
+       * Set each invalid saved-card w/ EMI as valid.
+       */
+      each($$('.elem-savedcards-emi'), function(index, node) {
+        toggleInvalid($(node), true);
+      });
+    }
+  },
+
   showCardTab: function(tab) {
     var isEmiTab = tab === 'emi';
     $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
@@ -2479,6 +2514,8 @@ Session.prototype = {
         .removeClass('invalid');
       $('#elem-emi .elem').removeClass('invalid');
     }
+
+    this.toggleEMIRequiredAttrib(tab);
 
     $('#otp-elem').removeClass('fourdigit');
     $('#otp').attr('maxlength', 6);
@@ -2498,8 +2535,21 @@ Session.prototype = {
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true);
       customer.checkStatus(function() {
-        // customer status check also sends otp if customer exists
-        if (self.recurring || (customer.saved && !customer.logged)) {
+        /**
+         * 1. If this is a recurring payment and customer doesn't have saved cards,
+         *    create and ask for OTP.
+         * 2. If customer has saved cards and is not logged in, ask for OTP.
+         * 3. If customer doesn't have saved cards, show cards screen.
+         */
+        if (self.recurring && !customer.saved && !customer.logged) {
+          self.customer.createOTP(function() {
+            askOTP(
+              'Enter OTP sent on ' +
+                getPhone() +
+                '<br>to save your Card for future payments'
+            );
+          });
+        } else if (customer.saved && !customer.logged) {
           askOTP();
         } else {
           self.showCards();
@@ -2553,7 +2603,12 @@ Session.prototype = {
     }
 
     if ($savedCard.$('.flow-selection-container')[0]) {
-      this.trackDebitPin('saved_card_with_flows_selected');
+      Analytics.track('atmpin:saved_card:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          default_auth_type: defaultAuthTypeRadioVal,
+        },
+      });
     }
   },
 
@@ -2575,6 +2630,21 @@ Session.prototype = {
           });
         } catch (e) {}
 
+        var savedCardsCount = customer.tokens.items.filter(function(item) {
+          return item.method === 'card';
+        }).length;
+
+        if (savedCardsCount) {
+          Analytics.setMeta('has.savedCards', true);
+          Analytics.setMeta('count.savedCards', savedCardsCount);
+          Analytics.track('saved_cards', {
+            type: AnalyticsTypes.RENDER,
+            data: {
+              count: savedCardsCount,
+            },
+          });
+        }
+
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
           emi_mode: this.get('theme.emi_mode'),
@@ -2584,6 +2654,8 @@ Session.prototype = {
           emi_options: this.emi_options,
           recurring: this.recurring,
         });
+
+        this.toggleEMIRequiredAttrib(this.tab);
       }
     }
 
@@ -2970,6 +3042,9 @@ Session.prototype = {
           this.showLoadError();
         } else {
           this.r.emit('payment.error', discreet.error(msg));
+          Analytics.track('behav:otp:incorrect', {
+            wallet: this.tab === 'wallet',
+          });
           askOTP(msg);
         }
       };
@@ -2979,6 +3054,9 @@ Session.prototype = {
         if (self.customer.logged) {
           self.showCardTab();
         } else {
+          Analytics.track('behav:otp:incorrect', {
+            wallet: self.tab === 'wallet',
+          });
           askOTP(msg);
         }
       };
@@ -3049,6 +3127,15 @@ Session.prototype = {
 
     this.refresh();
     var data = (this.payload = this.getPayload());
+
+    if (data.auth_type && data.auth_type === 'c3ds') {
+      /**
+       * Deleting this from data manually because c3ds is just for Checkout,
+       * API takes 3DS, which is the default anyway.
+       */
+      delete data.auth_type;
+    }
+
     if (this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
@@ -3443,9 +3530,12 @@ Session.prototype = {
     }
 
     this.r.getCardFlows(iin, function(flows) {
-      self.trackDebitPin('flow_opts_fetched', {
-        iin: iin,
-        prefilled_card: isPrefilledCardNumber || null,
+      Analytics.track('card_flows:fetched', {
+        data: {
+          iin: iin,
+          prefilled_card: isPrefilledCardNumber || null,
+          default_auth_type: defaultAuthTypeRadioVal,
+        },
       });
 
       // Sanity-check
@@ -3454,9 +3544,13 @@ Session.prototype = {
       }
 
       if (flows && flows.pin) {
-        self.trackDebitPin('flow_opts_shown', {
-          iin: iin,
-          prefilled_card: isPrefilledCardNumber || null,
+        Analytics.track('atmpin:flows', {
+          type: AnalyticsTypes.RENDER,
+          data: {
+            iin: iin,
+            prefilled_card: isPrefilledCardNumber || null,
+            default_auth_type: defaultAuthTypeRadioVal,
+          },
         });
         showFlowRadioButtons(true);
       } else {

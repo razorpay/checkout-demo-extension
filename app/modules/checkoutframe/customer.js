@@ -11,9 +11,6 @@ import * as strings from 'common/strings';
 let customers = {};
 let qpmap = _.getQueryParams();
 
-/* TODO: check with pranav if _session_is being used somewhere */
-let _session_id;
-
 export const getCustomer = contact => {
   // indian contact without +91
   let indianContact;
@@ -135,7 +132,7 @@ Customer.prototype = {
         }
         qpmap.device_token = data.device_token;
 
-        _session_id = data.session_id;
+        fetch.setSessionId(data.session_id);
 
         if (qpmap.device_token) {
           Bridge.checkout.callAndroid('setDeviceToken', qpmap.device_token);
@@ -145,7 +142,7 @@ Customer.prototype = {
           if (data.error.field) {
             errorHandler.call(getSession(), data);
           } else {
-            callback(strings.wrontOtp);
+            callback(strings.wrongOtp);
           }
         } else {
           callback();
@@ -187,7 +184,7 @@ Customer.prototype = {
 
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
 
-    _session_id = null;
+    fetch.setSessionId(null);
 
     Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);
