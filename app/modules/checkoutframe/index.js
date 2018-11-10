@@ -198,6 +198,7 @@ export const handleMessage = function(message) {
     }
 
     session.id = id;
+    session.r.id = id;
     Track.updateUid(id);
 
     SessionManager.setSession(session);
