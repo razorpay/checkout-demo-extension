@@ -1003,15 +1003,13 @@ Session.prototype = {
     this.tezMode = 'desktop';
 
     var $upiForm = $('#form-upi'),
-      $tezUPIForm = $('#upi-tez'),
-      $upiDirectpay = $('#upi-directpay');
+      $tezUPIForm = $('#upi-tez');
 
-    $upiDirectpay.addClass('tez-first');
+    $upiForm.addClass('show-tez');
 
     Tez.check(function() {
       self.tezMode = 'mobile';
       /* This is success callback */
-      $upiForm.addClass('show-tez');
       $tezUPIForm.removeClass('tez-desktop');
       $tezUPIForm.addClass('tez-mweb');
 
