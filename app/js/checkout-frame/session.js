@@ -3137,7 +3137,7 @@ Session.prototype = {
       delete data.auth_type;
     }
 
-    if (this.order && this.order.bank) {
+    if (!this.recurring && this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
