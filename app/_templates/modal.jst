@@ -659,11 +659,11 @@ var upi_apps = _.upi_intents_data;
                               <div class="subtitle">
                                 <div class='upi-app bhim'></div>
                                 <div class='upi-app phonepe'></div>
-                                <div class='upi-app gpay'></div>
+                                <div class='upi-app gpay hide-on-tez'></div>
                                 <div class='upi-app whatsapp'></div>
                                 <div class='upi-app paytm'></div>
                               </div>
-                              <div class="subtitle">Pay using your UPI ID from apps like BHIM, PhonePe, Google Pay (Tez) etc.</div>
+                              <div class="subtitle">Pay using your UPI ID from apps like BHIM, PhonePe, <span class="hide-on-tez">Google Pay (Tez), </span>etc.</div>
                             </div>
                             <span class="checkbox"></span>
                             <div class="elem-wrap collect-form  collapsible-content"><div class="elem">
@@ -678,9 +678,9 @@ var upi_apps = _.upi_intents_data;
                             <i class="tez-icon"></i>
                             <div class="title">Google Pay (Tez)</div>
                             <div class="subtitle collapsible-content mweb-only">Installed on your device</div>
-                            <!-- <div class="subtitle collapsible-content desktop-only">You will receive a payment request</div> -->
+                            <div class="subtitle collapsible-content desktop-only">You will receive a payment request</div>
                             <span class="checkbox"></span>
-                            <!-- <div class="collapsible-content desktop-only">
+                            <div class="collapsible-content desktop-only">
                               <div class="elem-wrap collect-form">
                                 <div class="elem">
                                   <input autocomplete="tez-username" class="input" id="tez-username" name="tez_username" placeholder="Enter UPI ID" required pattern=".+" value="">
@@ -697,7 +697,7 @@ var upi_apps = _.upi_intents_data;
                                   </select>
                                 </div>
                               </div>
-                            </div> -->
+                            </div>
                           </label>
                         </div>
                       </div>
