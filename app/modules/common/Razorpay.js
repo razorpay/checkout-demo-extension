@@ -2,7 +2,7 @@ import Analytics from 'analytics';
 import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
-import { displayCurrencies } from 'common/currency';
+import { supportedCurrencies, displayCurrencies } from 'common/currency';
 
 export const RazorpayConfig = {
   api: 'https://api.razorpay.com/',
@@ -256,8 +256,8 @@ export const optionValidations = {
   },
 
   currency: function(currency) {
-    if (currency !== 'INR' && currency !== 'USD') {
-      return 'INR and USD are the only supported values for currency field.';
+    if (!_Arr.contains(supportedCurrencies, currency)) {
+      return 'The provided currency is not currently supported';
     }
   },
 
