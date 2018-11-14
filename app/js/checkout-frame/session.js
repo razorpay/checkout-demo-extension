@@ -644,7 +644,8 @@ Session.prototype = {
   formatAmountWithCurrency: function(amount) {
     var discountAmount = amount,
       discountFigure = this.formatAmount(discountAmount),
-      displayCurrency = this.r.get('display_currency');
+      displayCurrency = this.r.get('display_currency'),
+      currency = this.r.get('currency');
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
@@ -653,7 +654,7 @@ Session.prototype = {
       discountAmount =
         "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
     } else {
-      discountAmount = '$' + discountFigure;
+      discountAmount = discreet.currencies[currency] + discountFigure;
     }
 
     return discountAmount;
@@ -1029,15 +1030,13 @@ Session.prototype = {
     this.tezMode = 'desktop';
 
     var $upiForm = $('#form-upi'),
-      $tezUPIForm = $('#upi-tez'),
-      $upiDirectpay = $('#upi-directpay');
+      $tezUPIForm = $('#upi-tez');
 
-    $upiDirectpay.addClass('tez-first');
+    $upiForm.addClass('show-tez');
 
     Tez.check(function() {
       self.tezMode = 'mobile';
       /* This is success callback */
-      $upiForm.addClass('show-tez');
       $tezUPIForm.removeClass('tez-desktop');
       $tezUPIForm.addClass('tez-mweb');
 
@@ -3165,7 +3164,7 @@ Session.prototype = {
       delete data.auth_type;
     }
 
-    if (this.order && this.order.bank) {
+    if (!this.recurring && this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
