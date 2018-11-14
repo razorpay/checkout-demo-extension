@@ -1,6 +1,8 @@
-/* global templates, showOverlay, hideEmi */
+/* global templates, showOverlay, hideEmi, Event */
 import EmiView from 'templates/views/emi.svelte';
+import Razorpay from 'common/Razorpay';
 import { AMEX_EMI_MIN } from 'common/constants';
+import * as OptionsList from 'components/OptionsList';
 
 function selectEMIBank(e) {
   const { target } = e;
@@ -64,7 +66,7 @@ export default function emiView(session) {
     delete opts.banks.AMEX;
   }
 
-  opts.session = session;
+  this.session = session;
   opts.discountedAmount = discountedAmount;
 
   this.opts = opts;
@@ -84,7 +86,7 @@ emiView.prototype = {
       data: {
         selected: defaultBank,
         banks: this.opts.banks,
-        session: this.opts.session,
+        session: this.session,
       },
     });
 
@@ -98,15 +100,130 @@ emiView.prototype = {
   },
 
   bind() {
-    this.on(
-      'click',
-      '#emi-check-label',
-      function(e) {
-        showEMIDropdown();
-        return e.stopPropagation();
-      },
-      true
-    );
+    let session = this.session;
+
+    this.on('change', '#emi-bank', e => {
+      let bank = e.target.value;
+      let text = '';
+
+      if (bank) {
+        text = this.opts.banks[bank].name;
+      } else {
+        text =
+          _Doc.querySelector('#emi-bank-parent')
+          |> _El.getAttribute('data-default');
+
+        _Doc.querySelector('#emi-duration').value = '';
+        _Doc.querySelector('#emi-plans .text')
+          |> _El.setContents(
+            _Doc.querySelector('#emi-plans') |> _El.getAttribute('data-default')
+          );
+      }
+
+      _Doc.querySelector('#emi-bank-parent .text') |> _El.setContents(text);
+    });
+
+    this.on('click', '#emi-bank-parent', e => {
+      let listItems = [];
+      let amount = session.get('amount');
+      let prevBank = _Doc.querySelector('#emi-bank').value;
+
+      this.opts.banks
+        |> _Obj.loop((bankObj, bankCode) => {
+          if (bankCode === 'AMEX') {
+            if (amount > AMEX_EMI_MIN) {
+              listItems.push({ text: bankObj.name, value: bankCode });
+            }
+          } else if (amount) {
+            listItems.push({ text: bankObj.name, value: bankCode });
+          }
+        });
+
+      listItems.push({ text: 'Pay without EMI', value: '' });
+
+      OptionsList.show({
+        target: _Doc.querySelector('#options-wrap'),
+        data: {
+          listItems: listItems,
+        },
+        onSelect: value => {
+          if (value) {
+            if (
+              _Doc.querySelector('#card_number').value.length > 6 &&
+              prevBank !== value
+            ) {
+              _Doc.querySelector('#card_number').value = '';
+
+              _Doc.querySelector('#emi-duration').value = '';
+              _Doc.querySelector('#emi-plans .text')
+                |> _El.setContents(
+                  _Doc.querySelector('#emi-plans')
+                    |> _El.getAttribute('data-default')
+                );
+            }
+          }
+
+          _Doc.querySelector('#emi-bank').value = value;
+          _Doc.querySelector('#emi-bank').dispatchEvent(new Event('change'));
+        },
+      });
+    });
+
+    this.on('click', '#emi-plans', e => {
+      let emiBank = _Doc.querySelector('#emi-bank').value;
+      let amount = session.get('amount');
+      let emiText = plan => {
+        let amountPerMonth = Razorpay.emi.calculator(
+          amount,
+          plan.duration,
+          plan.interest
+        );
+        amountPerMonth = (amountPerMonth / 100).toFixed(2);
+
+        return `${plan.duration} Months (₹${amountPerMonth}/month) @ <b>${
+          plan.interest
+        }%</b>`;
+      };
+
+      if (emiBank) {
+        var plans = this.opts.banks[emiBank].plans;
+
+        let listItems =
+          plans
+          |> _Obj.reduce((accumulator, plan, duration) => {
+            accumulator.push({
+              text: emiText(plan),
+              value: duration,
+            });
+            return accumulator;
+          }, []);
+
+        listItems.push({
+          text: 'Pay without EMI',
+          value: '',
+        });
+
+        OptionsList.show({
+          target: _Doc.querySelector('#options-wrap'),
+          data: {
+            listItems: listItems,
+          },
+          onSelect: value => {
+            var text = '';
+            if (value) {
+              text = emiText(plans[value]);
+            } else {
+              text =
+                _Doc.querySelector('#emi-plans')
+                |> _El.getAttribute('data-default');
+            }
+
+            _Doc.querySelector('#emi-duration').value = value;
+            _Doc.querySelector('#emi-plans .text') |> _El.setContents(text);
+          },
+        });
+      }
+    });
 
     this.on(
       'click',
@@ -119,12 +236,12 @@ emiView.prototype = {
       true
     );
 
-    this.on('click', '#emi-select', function(e) {
-      hideEMIDropdown();
-      return e.stopPropagation();
-    });
+    // this.on('click', '#emi-select', function(e) {
+    //   hideEMIDropdown();
+    //   return e.stopPropagation();
+    // });
 
-    this.on('mousedown', '#emi-select', selectEMIBank);
+    // this.on('mousedown', '#emi-select', selectEMIBank);
 
     this.on('click', '#view-emi-plans', function() {
       // TODO: Update showOverlay once session.js is refactored.

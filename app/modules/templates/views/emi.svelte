@@ -45,10 +45,14 @@
       plans: data => {
         let plans = (data.banks[data.selected] || {}).plans || {};
         return _Obj.map(plans, (plan, duration) => {
-          let installment = Razorpay.emi.calculator(data.amount, duration, plan);
+          let installment = Razorpay.emi.calculator(
+            data.amount,
+            duration,
+            plan.interest
+          );
           return {
             duration: duration,
-            rate: plan,
+            rate: plan.interest,
             monthly: (installment / 100).toFixed(2),
             total: (installment * duration / 100).toFixed(2),
           };

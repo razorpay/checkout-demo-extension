@@ -19,7 +19,8 @@ var preferences = window.preferences,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
   sanitizeTokens = discreet.sanitizeTokens,
-  getQueryParams = discreet.getQueryParams;
+  getQueryParams = discreet.getQueryParams,
+  OptionsList = discreet.OptionsList;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -142,9 +143,37 @@ function copyToClipboardListener(e) {
 function makeEmiDropdown(emiObj, session, isOption) {
   var amount = session.get('amount');
 
-  if (session.isOfferApplicableOnIssuer(emiObj.code)) {
-    amount = session.getDiscountedAmount();
-  }
+  /* TODO: handle default choice, amex for 4k & emi_only tab */
+
+  /**
+   * TODO: List down cases for card/emi
+   * Cases:
+   * - Forced Offer
+   *   - Non-applicable plans are not even shown by checkout.
+   *   - `NO COST EMI` badge to be shown?
+   *   - Issuer is known
+   *     - Dont show other issuers.
+   *     - Saved cards only show the cards by that issuer.
+   *   - Method is known
+   *     - If emi, show separate EMI tab and disable card.
+   *     - If card, disable emi and show card tab.
+   * - Non-forced offer
+   *   - EMI plans list show `NO COST EMI` badge.
+   *   - Single Issuer
+   *     - Prioritize issuer & Add Card button says `Add ${issuer} Card`.
+   *   - Multiple issuer
+   *     - Show all offers & Add Card button remains the same.
+   *   - Show if No cost EMI applied.
+   *   - Show if No cost EMI applicable (in the offers drawer)
+   *   - Ask for double confirmation on switching issuer (first change on
+   *     card number in case of new cards).
+   */
+
+  emiObj = emiObj || {};
+
+  // if (session.isOfferApplicableOnIssuer(emiObj.code)) {
+  //   amount = session.getDiscountedAmount();
+  // }
 
   var h = '';
   var isSubvented =
@@ -171,7 +200,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
 
 function unsetEmiBank() {
   $('#emi-plans-wrap .active').removeClass('active');
-  $('#emi-check-label input[type=checkbox]')[0].checked = false;
+  // $('#emi-check-label input[type=checkbox]')[0].checked = false;
 }
 
 function setEmiBank(data, savedCardScreen) {
@@ -234,17 +263,15 @@ function onSixDigits(e) {
     toggleNoCvv(false);
   }
 
-  var emi_parent = $('#emi-check-label').toggleClass('disabled', !emiObj);
-
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
-    if (!$('#emi-plans-wrap .option')[0]) {
-      gel('emi-plans-wrap').innerHTML = makeEmiDropdown(emiObj, this);
-    }
+    $('#emi-bank').val(emiObj.code);
   } else {
-    emi_parent.find('input[type=checkbox]')[0].checked = false;
-    $(emi_parent.find('.active')[0]).removeClass('active');
+    $('#emi-bank').val('');
   }
+
+  gel('emi-bank').dispatchEvent(new Event('change'));
+
   noCvvToggle({ target: nocvvCheck });
 
   var elem_emi = $('#elem-emi');
@@ -1724,13 +1751,13 @@ Session.prototype = {
         });
       }
 
-      this.on('change', '#emi-bank', function(e) {
-        $('#elem-emi select')[0].innerHTML = makeEmiDropdown(
-          emi_options.banks[e.target.value],
-          this,
-          true
-        );
-      });
+      // this.on('change', '#emi-bank', function(e) {
+      //   $('#elem-emi select')[0].innerHTML = makeEmiDropdown(
+      //     emi_options.banks[e.target.value],
+      //     this,
+      //     true
+      //   );
+      // });
 
       // saved cards events
       this.click('#show-add-card', this.toggleSavedCards);
@@ -1913,6 +1940,8 @@ Session.prototype = {
       if ($('#confirmation-dialog').hasClass('animate')) {
         return;
       }
+
+      OptionsList.hide();
 
       this.hideErrorMessage(e);
     });
@@ -2506,7 +2535,7 @@ Session.prototype = {
 
   showCardTab: function(tab) {
     var isEmiTab = tab === 'emi';
-    $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
+    // $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
 
     if (!isEmiTab) {
       $('#emi-bank')
@@ -3574,7 +3603,7 @@ Session.prototype = {
 
       if (prefEmiOptions) {
         each(prefEmiOptions[bank.code], function(j, plan) {
-          emiBank.plans[plan.duration] = plan.interest;
+          emiBank.plans[plan.duration] = plan;
         });
 
         if (prefEmiOptions[bank.code]) {
