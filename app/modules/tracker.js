@@ -189,7 +189,6 @@ export default function Track(r, event, data, immediately) {
       'display_currency',
       'display_amount',
       'redirect',
-      'parent',
     ];
 
     _Obj.loop(r.get(), function(value, key) {
