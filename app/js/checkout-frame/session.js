@@ -2303,7 +2303,7 @@ Session.prototype = {
       this.handleOfferRemoval();
     }
 
-    let paymentMethod = screen;
+    var paymentMethod = screen;
 
     if (
       (screen === 'card' || screen === 'emi') &&
@@ -2776,7 +2776,7 @@ Session.prototype = {
                 data: {
                   listItems: listItems,
                 },
-                onSelect: value => {
+                onSelect: function(value) {
                   var text = '';
                   if (value) {
                     var plan = plans[value];
