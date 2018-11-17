@@ -326,8 +326,32 @@ i {
 .selector {
   padding-bottom: 6px;
   cursor: pointer;
+  white-space: nowrap;
+  padding-right: 10px;
+  box-sizing: border-box;
+
+  &:hover, &.focused {
+    &::after {
+      transform: scale(1);
+    }
+  }
+
   input {
     display: none;
+  }
+
+  .overflow-parent {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .help {
+    white-space: normal;
+  }
+
+  .text, i, .overflow-parent {
+    pointer-events: none;
   }
 }
 
@@ -337,6 +361,24 @@ i {
   max-height: 320px;
   overflow: hidden;
   overflow-y: auto;
+  background: #fff;
+
+  .badge {
+    position: absolute;
+    display: block;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 8px;
+    border: 1px solid #70BE53;
+    border-radius: 2px;
+    background-color: #F7FBF5;
+    color: #70BE53;
+    font-size: 10px;
+    padding: 0 3px;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
 
 
   .option {
@@ -349,6 +391,7 @@ i {
     color: #333333;
     cursor: pointer;
     text-align: left;
+    position: relative;
 
     &:first-child {
       border-top: 0;
@@ -357,14 +400,9 @@ i {
 }
 
 #emi-plans {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-  box-sizing: border-box;
-
   .help {
     min-width: 240px;
+    max-width: 280px;
   }
 }
 
@@ -1199,20 +1237,30 @@ $outline = #ddd;
   }
 
   #offers-container {
-
     bottom: -($topbarh) + 2px
     display: block;
     background-color: #fff;
     border-radius: 0 0 3px 3px;
+
+    &.count-5 {
+      bottom: -($topbarh) - 98px + 2px;
+    }
   }
 
+
+
   &[screen] {
-
     #offers-container {
-
       transform: translate(0, -100%);
       margin-top: 0;
       border-radius: 0;
+      bottom: -44px;
+    }
+  }
+
+  &[tab=emi] {
+    #form-card.saved-cards #saved-cards-container {
+      max-height: 238px;
     }
   }
 
@@ -1221,6 +1269,10 @@ $outline = #ddd;
     &#form-wallet , &#form-card, &#form-upi {
 
       bottom: $topbarh;
+    }
+
+    &.saved-cards #saved-cards-container {
+      max-height: 188px;
     }
   }
 }
@@ -1369,7 +1421,7 @@ $outline = #ddd;
   }
 
   #emi-bank-parent {
-    // display: none;
+    display: none;
   }
 }
 
@@ -1402,26 +1454,12 @@ $outline = #ddd;
   height: 374px;
 
   #form-card {
-    .elem-wrap {
-      height: 62px;
-    }
     #emi-bank-parent {
       display: block;
-      padding: 0;
     }
   }
   #elem-emi {
-    margin: 19px 0;
     display: block;
-    .first {
-      display: none;
-    }
-    .select {
-      position: absolute;
-      margin-top: -13px;
-      left: 0;
-      right: 98px;
-    }
   }
   .save-enabled #add-card-container {
     height: 248px;

@@ -147,6 +147,10 @@ function makeEmiDropdown(emiObj, session, isOption) {
 
   /**
    * TODO: List down cases for card/emi
+   *
+   * - Handle backdrop interactions
+   * - Hint text
+   *
    * Cases:
    * - Forced Offer
    *   - Non-applicable plans are not even shown by checkout.
@@ -199,24 +203,22 @@ function makeEmiDropdown(emiObj, session, isOption) {
 }
 
 function unsetEmiBank() {
-  $('#emi-plans-wrap .active').removeClass('active');
-  // $('#emi-check-label input[type=checkbox]')[0].checked = false;
+  $('#emi-plans .text')[0].innerHTML = $('#emi-plans').attr('data-default');
+  $('#emi-duration').val('');
 }
 
 function setEmiBank(data, savedCardScreen) {
   if (savedCardScreen) {
-    var savedEmi = $(
-      '#saved-cards-container .checked select[name=emi_duration]'
-    )[0];
+    var savedEmi = $('#saved-cards-container .checked input.emi_duration')[0];
     if (savedEmi && savedEmi.value) {
       data.method = 'emi';
       data.emi_duration = savedEmi.value;
     }
   } else {
-    var activeEmiPlan = $('#emi-plans-wrap .active')[0];
+    var activeEmiPlan = $('#emi-duration').val();
     if (activeEmiPlan) {
       data.method = 'emi';
-      data.emi_duration = activeEmiPlan.getAttribute('value');
+      data.emi_duration = activeEmiPlan;
     }
   }
 }
@@ -266,11 +268,13 @@ function onSixDigits(e) {
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
     $('#emi-bank').val(emiObj.code);
-  } else {
+  } else if (trimmedVal.length >= 6) {
     $('#emi-bank').val('');
   }
 
-  gel('emi-bank').dispatchEvent(new Event('change'));
+  if (trimmedVal.length >= 6) {
+    gel('emi-bank').dispatchEvent(new Event('change'));
+  }
 
   noCvvToggle({ target: nocvvCheck });
 
@@ -2282,10 +2286,12 @@ Session.prototype = {
     }
     this.body.toggleClass('sub', showPaybtn);
 
-    return this.offers && this.renderOffers(screen);
+    return this.offers && this.renderOffers(this.tab);
   },
   renderOffers: function(screen) {
-    if (['', 'card', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0) {
+    if (
+      ['', 'card', 'emi', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0
+    ) {
       $('#body').removeClass('has-offers');
       return this.offers.display(false);
     }
@@ -2297,7 +2303,18 @@ Session.prototype = {
       this.handleOfferRemoval();
     }
 
-    this.offers.applyFilter((screen && { payment_method: screen }) || {});
+    let paymentMethod = screen;
+
+    if (
+      (screen === 'card' || screen === 'emi') &&
+      this.get('amount') >= 300000
+    ) {
+      paymentMethod = ['card', 'emi'];
+    }
+
+    this.offers.applyFilter(
+      (screen && { payment_method: paymentMethod }) || {}
+    );
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
@@ -2309,6 +2326,7 @@ Session.prototype = {
 
     $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
   },
+
   handleOfferSelection: function(offer, screen) {
     var offerInstance = offer;
 
@@ -2516,7 +2534,7 @@ Session.prototype = {
      * If this is the regular cards tab, the select should not be a required field.
      */
     if (this.get('theme.emi_mode')) {
-      each($$('.elem-savedcards-emi select[name=emi_duration]'), function(
+      each($$('.elem-savedcards-emi input.emi_duration'), function(
         index,
         node
       ) {
@@ -2623,10 +2641,23 @@ Session.prototype = {
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
     var cardtype = $savedCard.$('.cardtype').attr('cardtype');
-    if (
-      !e.target ||
-      e.target !== $savedCard.find('select[name="emi_duration"]')[0]
-    ) {
+    var bank = $savedCard.attr('bank');
+    var plans = (this.emi_options.banks[bank] || {}).plans;
+
+    var $dropdown = $savedCard.$('.elem-savedcards-emi');
+    var $emiDuration = $dropdown.$('input.emi_duration');
+    var $text = $dropdown.$('.text');
+
+    if (this.offers && !this.offers.offerSelectedByDrawer) {
+      this.offers.removeOffer();
+    }
+
+    if ($emiDuration[0]) {
+      $emiDuration.val('');
+      $text[0].innerHTML = $dropdown.attr('data-default');
+    }
+
+    if (!e.target || e.target !== $savedCard.find('.elem-savedcards-emi')[0]) {
       $savedCard.$('.saved-cvv').focus();
     }
 
@@ -2645,6 +2676,9 @@ Session.prototype = {
     var tokens = customer && customer.tokens && customer.tokens.count;
     var cardTab = $('#form-card');
     var delegator = this.delegator;
+    var emiOptions = this.emi_options;
+    var amount = this.get('amount');
+    var self = this;
 
     if (!delegator) {
       delegator = this.delegator = Razorpay.setFormatter(this.el);
@@ -2683,6 +2717,90 @@ Session.prototype = {
           recurring: this.recurring,
         });
 
+        this.on(
+          'click',
+          '#saved-cards-container',
+          'elem-savedcards-emi',
+          function(e) {
+            var dropdown = e.target;
+            var $dropdown = $(dropdown);
+            var bank = $dropdown.attr('data-bank');
+            var plans = (emiOptions.banks[bank] || {}).plans;
+            var listItems = [];
+            var appliedOffer = self.offers && self.offers.offerSelectedByDrawer;
+            var emiText = function(plan) {
+              var amountPerMonth = Razorpay.emi.calculator(
+                amount,
+                plan.duration,
+                plan.interest
+              );
+
+              amountPerMonth = (amountPerMonth / 100).toFixed(2);
+
+              return (
+                plan.duration +
+                ' Months (₹' +
+                amountPerMonth +
+                '/month) @ <b>' +
+                plan.interest +
+                '%</b>'
+              );
+            };
+
+            if (plans) {
+              each(plans, function(duration, plan) {
+                if (
+                  !appliedOffer ||
+                  (appliedOffer &&
+                    appliedOffer.id &&
+                    appliedOffer.id === plan.offer_id)
+                ) {
+                  listItems.push({
+                    text: emiText(plan),
+                    value: duration,
+                    badge:
+                      plan.subvention === 'merchant' ? 'No cost EMI' : false,
+                  });
+                }
+              });
+
+              if (this.tab === 'card') {
+                listItems.push({
+                  text: 'Pay without EMI',
+                  value: '',
+                });
+              }
+
+              discreet.OptionsList.show({
+                target: gel('options-wrap'),
+                data: {
+                  listItems: listItems,
+                },
+                onSelect: value => {
+                  var text = '';
+                  if (value) {
+                    var plan = plans[value];
+                    text = emiText(plan);
+
+                    if (plan.offer_id) {
+                      self.offers.selectOfferById(plan.offer_id);
+                    } else {
+                      if (self.offers && self.offers.appliedOffer) {
+                        self.offers.removeOffer();
+                      }
+                    }
+                  } else {
+                    text = $dropdown.attr('data-default');
+                  }
+
+                  $dropdown.$('.emi_duration').val(value);
+                  $dropdown.$('.text')[0].innerHTML = text;
+                },
+              });
+            }
+          }
+        );
+
         this.toggleEMIRequiredAttrib(this.tab);
       }
     }
@@ -2703,6 +2821,15 @@ Session.prototype = {
   toggleSavedCards: function(saveScreen) {
     var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
+
+    if (
+      this.offers &&
+      !this.offers.offerSelectedByDrawer &&
+      this.offers.appliedOffer
+    ) {
+      this.offers.removeOffer();
+    }
+
     if (typeof saveScreen !== 'boolean') {
       saveScreen = !tabCard.hasClass(saveClass);
 
@@ -2915,7 +3042,7 @@ Session.prototype = {
           }
         } else {
           if (tab === 'emi') {
-            data.emi_duration = $('#elem-emi .input').val();
+            data.emi_duration = $('#emi-duration').val();
           }
           var cardNumberKey = 'card[number]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
@@ -3208,6 +3335,10 @@ Session.prototype = {
               return $('.checked .saved-cvv').focus();
             }
           }
+        }
+
+        if (data.emi_duration) {
+          data.method = 'emi';
         }
       } else if (/^emandate/.test(screen)) {
         if (this.screen === 'emandate') {

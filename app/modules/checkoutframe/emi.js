@@ -112,7 +112,9 @@ emiView.prototype = {
         text =
           _Doc.querySelector('#emi-bank-parent')
           |> _El.getAttribute('data-default');
+      }
 
+      if (this.prevBank !== bank) {
         _Doc.querySelector('#emi-duration').value = '';
         _Doc.querySelector('#emi-plans .text')
           |> _El.setContents(
@@ -121,6 +123,8 @@ emiView.prototype = {
       }
 
       _Doc.querySelector('#emi-bank-parent .text') |> _El.setContents(text);
+
+      this.prevBank = bank;
     });
 
     this.on('click', '#emi-bank-parent', e => {
@@ -139,7 +143,13 @@ emiView.prototype = {
           }
         });
 
-      listItems.push({ text: 'Pay without EMI', value: '' });
+      if (this.session.tab === 'card') {
+        listItems.push({ text: 'Pay without EMI', value: '' });
+      }
+
+      if (listItems.length === 0) {
+        return;
+      }
 
       OptionsList.show({
         target: _Doc.querySelector('#options-wrap'),
@@ -186,22 +196,37 @@ emiView.prototype = {
       };
 
       if (emiBank) {
-        var plans = this.opts.banks[emiBank].plans;
-
+        let plans = this.opts.banks[emiBank].plans;
+        let appliedOffer =
+          this.session.offers && this.session.offers.offerSelectedByDrawer;
         let listItems =
           plans
           |> _Obj.reduce((accumulator, plan, duration) => {
-            accumulator.push({
-              text: emiText(plan),
-              value: duration,
-            });
+            if (
+              !appliedOffer ||
+              (appliedOffer &&
+                appliedOffer.id &&
+                appliedOffer.id === plan.offer_id)
+            ) {
+              accumulator.push({
+                text: emiText(plan),
+                value: duration,
+                badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
+              });
+            }
             return accumulator;
           }, []);
 
-        listItems.push({
-          text: 'Pay without EMI',
-          value: '',
-        });
+        if (this.session.tab === 'card') {
+          listItems.push({
+            text: 'Pay without EMI',
+            value: '',
+          });
+        }
+
+        if (listItems.length === 0) {
+          return;
+        }
 
         OptionsList.show({
           target: _Doc.querySelector('#options-wrap'),
@@ -209,13 +234,30 @@ emiView.prototype = {
             listItems: listItems,
           },
           onSelect: value => {
-            var text = '';
+            let text = '';
+            let removeOffer = false;
             if (value) {
-              text = emiText(plans[value]);
+              var plan = plans[value];
+              text = emiText(plan);
+
+              if (plan.offer_id) {
+                this.session.offers.selectOfferById(plan.offer_id);
+              } else {
+                removeOffer = true;
+              }
             } else {
+              removeOffer = true;
               text =
                 _Doc.querySelector('#emi-plans')
                 |> _El.getAttribute('data-default');
+            }
+
+            if (
+              removeOffer &&
+              this.session.offers &&
+              this.session.offers.appliedOffer
+            ) {
+              this.session.offers.removeOffer();
             }
 
             _Doc.querySelector('#emi-duration').value = value;

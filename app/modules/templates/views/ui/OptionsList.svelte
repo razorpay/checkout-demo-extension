@@ -2,7 +2,10 @@
 <div class="options-list" transition:fade>
   {#each listItems as item}
   <div class="option" on:click="selectOption(item.value)">
-    {@html item.text }
+    <span>{@html item.text}</span>
+    {#if item.badge}
+      <div class="badge">{item.badge}</div>
+    {/if}
   </div>
   {/each}
 </div>
@@ -25,6 +28,7 @@ export default {
     return {
       listItems: [],
       visible: true,
+      badge: false
     };
   },
   methods: {
