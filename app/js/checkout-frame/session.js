@@ -154,7 +154,7 @@ function makeEmiDropdown(emiObj, session, isOption) {
    * Cases:
    * - Forced Offer
    *   - Non-applicable plans are not even shown by checkout.
-   *   - `NO COST EMI` badge to be shown?
+   *   + `NO COST EMI` badge to be shown?
    *   - Issuer is known
    *     - Dont show other issuers.
    *     - Saved cards only show the cards by that issuer.
@@ -162,14 +162,12 @@ function makeEmiDropdown(emiObj, session, isOption) {
    *     - If emi, show separate EMI tab and disable card.
    *     - If card, disable emi and show card tab.
    * - Non-forced offer
-   *   - EMI plans list show `NO COST EMI` badge.
+   *   + EMI plans list show `NO COST EMI` badge.
    *   - Single Issuer
    *     - Prioritize issuer & Add Card button says `Add ${issuer} Card`.
-   *   - Multiple issuer
-   *     - Show all offers & Add Card button remains the same.
-   *   - Show if No cost EMI applied.
-   *   - Show if No cost EMI applicable (in the offers drawer)
-   *   - Ask for double confirmation on switching issuer (first change on
+   *   + Show if No cost EMI applied.
+   *   + Show if No cost EMI applicable (in the offers drawer)
+   *   ? Ask for double confirmation on switching issuer (first change on
    *     card number in case of new cards).
    */
 
@@ -388,7 +386,10 @@ function hideEmi() {
 
 function hideOverlayMessage() {
   if (!hideEmi()) {
-    if ($('#confirmation-dialog').hasClass('animate')) {
+    if (
+      $('#confirmation-dialog').hasClass('animate') ||
+      gel('options-wrap').children.length
+    ) {
       makeHidden(gel('error-message'));
     } else {
       hideOverlay($('#error-message'));
@@ -1689,6 +1690,26 @@ Session.prototype = {
       true
     );
 
+    this.on(
+      'focus',
+      '#body',
+      'selector',
+      function(e) {
+        $(e.target).addClass('focused');
+      },
+      true
+    );
+
+    this.on(
+      'blur',
+      '#body',
+      'selector',
+      function(e) {
+        $(e.target).removeClass('focused');
+      },
+      true
+    );
+
     /**
      * Listener used for UPI Intent flow.
      * 1. Scrolls the App List to the bottom (to make the error tooltip visible)
@@ -1917,6 +1938,99 @@ Session.prototype = {
           },
         });
       });
+    }
+
+    if (enabledMethods.card || enabledMethods.emi) {
+      this.on(
+        'click',
+        '#saved-cards-container',
+        'elem-savedcards-emi',
+        function(e) {
+          var dropdown = e.target;
+          var $dropdown = $(dropdown);
+          var bank = $dropdown.attr('data-bank');
+          var plans = (emi_options.banks[bank] || {}).plans;
+          var listItems = [];
+          var amount = this.get('amount');
+          var appliedOffer = self.offers && self.offers.offerSelectedByDrawer;
+
+          if (this.isOfferApplicableOnIssuer(bank)) {
+            amount = this.getDiscountedAmount();
+          }
+
+          var emiText = function(plan) {
+            var amountPerMonth = Razorpay.emi.calculator(
+              amount,
+              plan.duration,
+              plan.interest
+            );
+
+            amountPerMonth = (amountPerMonth / 100).toFixed(2);
+
+            return (
+              plan.duration +
+              ' Months (₹' +
+              amountPerMonth +
+              '/month) @ <b>' +
+              plan.interest +
+              '%</b>'
+            );
+          };
+
+          if (plans) {
+            each(plans, function(duration, plan) {
+              if (
+                !appliedOffer ||
+                (appliedOffer &&
+                  appliedOffer.id &&
+                  appliedOffer.id === plan.offer_id)
+              ) {
+                listItems.push({
+                  text: emiText(plan),
+                  value: duration,
+                  badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
+                });
+              }
+            });
+
+            if (this.tab === 'card') {
+              listItems.push({
+                text: 'Pay without EMI',
+                value: '',
+              });
+            }
+
+            discreet.OptionsList.show({
+              target: gel('options-wrap'),
+              data: {
+                listItems: listItems,
+              },
+              onSelect: function(value) {
+                var text = '';
+                if (value) {
+                  var plan = plans[value];
+                  text = emiText(plan);
+
+                  if (plan.offer_id) {
+                    if (self.offers) {
+                      self.offers.selectOfferById(plan.offer_id);
+                    }
+                  } else {
+                    if (self.offers && self.offers.appliedOffer) {
+                      self.offers.removeOffer();
+                    }
+                  }
+                } else {
+                  text = $dropdown.attr('data-default');
+                }
+
+                $dropdown.$('.emi_duration').val(value);
+                $dropdown.$('.text')[0].innerHTML = text;
+              },
+            });
+          }
+        }
+      );
     }
 
     if (this.get('ecod')) {
@@ -2329,6 +2443,7 @@ Session.prototype = {
 
   handleOfferSelection: function(offer, screen) {
     var offerInstance = offer;
+    var emiBanks = this.emi_options.banks;
 
     offer = offer.data;
 
@@ -2336,7 +2451,47 @@ Session.prototype = {
       this.showDiscount(offer);
     }
 
+    var savedCards =
+      this.customer && this.customer.tokens && this.customer.tokens.items;
+
     screen = screen || this.screen;
+
+    if (savedCards && savedCards.length > 0) {
+      var filteredTokens = [];
+      each(savedCards, function(index, token) {
+        var card = token.card;
+        if (card && offer.payment_method === 'emi' && offer.emi_subvention) {
+          /* Merchant subvention EMI */
+          var bank = card.issuer;
+          var emiBank = emiBanks[bank];
+
+          if (bank && emiBank) {
+            var plans = emiBank.plans;
+            if (typeof plans !== 'object') {
+              return;
+            }
+
+            var hasOffer = false;
+
+            each(plans, function(duration, plan) {
+              if (plan.offer_id === offer.id) {
+                hasOffer = true;
+                return;
+              }
+            });
+
+            if (hasOffer) {
+              filteredTokens.push(token);
+            }
+          }
+        }
+      });
+      this.setSavedCards({
+        entity: 'collection',
+        count: filteredTokens.length,
+        items: filteredTokens,
+      });
+    }
 
     if (!screen) {
       this.preSelectedOffer = offerInstance;
@@ -2355,7 +2510,6 @@ Session.prototype = {
       }
     } else if (screen === 'card') {
       //TODO: WIP try to see if the card exists in the saved cards and focus
-      /*
       var savedCards = this.customer.tokens && this.customer.tokens.items;
 
       if (this.savedCardScreen && savedCards && savedCards.length > 0) {
@@ -2387,11 +2541,14 @@ Session.prototype = {
           }
         }
       }
-      */
     }
   },
   handleOfferRemoval: function() {
     this.hideDiscount();
+
+    if (this.customer && this.customer.tokens && this.customer.tokens.count) {
+      this.setSavedCards(this.customer.tokens);
+    }
   },
   showDiscount: function(offer) {
     $('#content').addClass('has-discount');
@@ -2671,13 +2828,13 @@ Session.prototype = {
     }
   },
 
-  setSavedCards: function() {
+  setSavedCards: function(providedTokens) {
     var customer = this.customer;
-    var tokens = customer && customer.tokens && customer.tokens.count;
+    var tokens =
+      (providedTokens && providedTokens.count) ||
+      (customer && customer.tokens && customer.tokens.count);
     var cardTab = $('#form-card');
     var delegator = this.delegator;
-    var emiOptions = this.emi_options;
-    var amount = this.get('amount');
     var self = this;
 
     if (!delegator) {
@@ -2685,14 +2842,18 @@ Session.prototype = {
     }
 
     if (tokens) {
-      if ($$('.saved-card').length !== customer.tokens.items.length) {
+      var tokensList = providedTokens || customer.tokens;
+      if (
+        providedTokens ||
+        $$('.saved-card').length !== tokensList.items.length
+      ) {
         try {
-          customer.tokens.items.sort(function(a, b) {
+          tokensList.items.sort(function(a, b) {
             return b.card && !!b.card.emi;
           });
         } catch (e) {}
 
-        var savedCardsCount = customer.tokens.items.filter(function(item) {
+        var savedCardsCount = tokensList.items.filter(function(item) {
           return item.method === 'card';
         }).length;
 
@@ -2708,7 +2869,7 @@ Session.prototype = {
         }
 
         gel('saved-cards-container').innerHTML = templates.savedcards({
-          tokens: customer.tokens,
+          tokens: tokensList,
           emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
           session: this,
@@ -2716,90 +2877,6 @@ Session.prototype = {
           emi_options: this.emi_options,
           recurring: this.recurring,
         });
-
-        this.on(
-          'click',
-          '#saved-cards-container',
-          'elem-savedcards-emi',
-          function(e) {
-            var dropdown = e.target;
-            var $dropdown = $(dropdown);
-            var bank = $dropdown.attr('data-bank');
-            var plans = (emiOptions.banks[bank] || {}).plans;
-            var listItems = [];
-            var appliedOffer = self.offers && self.offers.offerSelectedByDrawer;
-            var emiText = function(plan) {
-              var amountPerMonth = Razorpay.emi.calculator(
-                amount,
-                plan.duration,
-                plan.interest
-              );
-
-              amountPerMonth = (amountPerMonth / 100).toFixed(2);
-
-              return (
-                plan.duration +
-                ' Months (₹' +
-                amountPerMonth +
-                '/month) @ <b>' +
-                plan.interest +
-                '%</b>'
-              );
-            };
-
-            if (plans) {
-              each(plans, function(duration, plan) {
-                if (
-                  !appliedOffer ||
-                  (appliedOffer &&
-                    appliedOffer.id &&
-                    appliedOffer.id === plan.offer_id)
-                ) {
-                  listItems.push({
-                    text: emiText(plan),
-                    value: duration,
-                    badge:
-                      plan.subvention === 'merchant' ? 'No cost EMI' : false,
-                  });
-                }
-              });
-
-              if (this.tab === 'card') {
-                listItems.push({
-                  text: 'Pay without EMI',
-                  value: '',
-                });
-              }
-
-              discreet.OptionsList.show({
-                target: gel('options-wrap'),
-                data: {
-                  listItems: listItems,
-                },
-                onSelect: function(value) {
-                  var text = '';
-                  if (value) {
-                    var plan = plans[value];
-                    text = emiText(plan);
-
-                    if (plan.offer_id) {
-                      self.offers.selectOfferById(plan.offer_id);
-                    } else {
-                      if (self.offers && self.offers.appliedOffer) {
-                        self.offers.removeOffer();
-                      }
-                    }
-                  } else {
-                    text = $dropdown.attr('data-default');
-                  }
-
-                  $dropdown.$('.emi_duration').val(value);
-                  $dropdown.$('.text')[0].innerHTML = text;
-                },
-              });
-            }
-          }
-        );
 
         this.toggleEMIRequiredAttrib(this.tab);
       }
@@ -2970,6 +3047,8 @@ Session.prototype = {
       var invalidInput = $(invalids[0]).find('.input')[0];
       if (invalidInput) {
         invalidInput.focus();
+      } else if ($(invalids[0]).hasClass('selector')) {
+        $(invalids[0]).focus();
       }
 
       each(invalids, function(i, field) {
@@ -3042,12 +3121,42 @@ Session.prototype = {
           }
         } else {
           if (tab === 'emi') {
-            data.emi_duration = $('#emi-duration').val();
+            var emiDuration = $('#emi-duration').val();
+            if (emiDuration) {
+              data.emi_duration = emiDuration;
+            } else {
+              if ($('#emi-bank').val()) {
+                $('#emi-plans .help').html('Please select an EMI Plan');
+              } else {
+                $('#emi-plans .help').html(Constants.EMI_HELP_TEXT);
+              }
+              $('#emi-plans')
+                .addClass('invalid')
+                .addClass('mature');
+            }
           }
           var cardNumberKey = 'card[number]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
         }
         if (!data.emi_duration) {
+          if (
+            this.offers &&
+            this.offers.offerSelectedByDrawer &&
+            this.offers.offerSelectedByDrawer.payment_method === 'emi'
+          ) {
+            $('#emi-plans .help').html(
+              'Offer is only applicable on EMI, ' +
+                'please select an EMI Plan to continue.'
+            );
+            $('#emi-plans')
+              .addClass('invalid')
+              .addClass('mature');
+          } else if (tab === 'card') {
+            $('#emi-plans')
+              .removeClass('invalid')
+              .removeClass('mature');
+          }
+
           data.method = 'card';
           delete data.emi_duration;
         }

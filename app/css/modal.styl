@@ -348,6 +348,20 @@ i {
 
   .help {
     white-space: normal;
+
+    &.up {
+      margin-bottom: 12px
+    }
+  }
+
+  &.disabled {
+    .text.theme-highlight {
+      color: #858585;
+    }
+  }
+
+  &.invalid.mature:not(.focused) .text {
+    color: $danger;
   }
 
   .text, i, .overflow-parent {

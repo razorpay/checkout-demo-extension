@@ -69,8 +69,12 @@ export const UPI_POLL_URL = 'rzp_upi_payment_poll_url';
 export const PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
 export const MINUTES_TO_WAIT_FOR_PENDING_PAYMENT = 10;
 
-export const AMEX_EMI_MIN = 5000 * 100 - 1;
-
 export const cookieDisabled = !navigator.cookieEnabled;
 export const isIframe = global !== global.parent;
 export const ownerWindow = isIframe ? global.parent : global.opener;
+
+export const AMEX_EMI_MIN = 5000 * 100 - 1;
+export const EMI_HELP_TEXT =
+  'EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, ' +
+  'Standard Chartered and Axis Bank Credit Cards. Enter your credit card ' +
+  'to avail.';

@@ -1,7 +1,7 @@
 /* global templates, showOverlay, hideEmi, Event */
 import EmiView from 'templates/views/emi.svelte';
 import Razorpay from 'common/Razorpay';
-import { AMEX_EMI_MIN } from 'common/constants';
+import { AMEX_EMI_MIN, EMI_HELP_TEXT } from 'common/constants';
 import * as OptionsList from 'components/OptionsList';
 
 function selectEMIBank(e) {
@@ -108,10 +108,12 @@ emiView.prototype = {
 
       if (bank) {
         text = this.opts.banks[bank].name;
+        _Doc.querySelector('#emi-plans') |> _El.removeClass('disabled');
       } else {
         text =
           _Doc.querySelector('#emi-bank-parent')
           |> _El.getAttribute('data-default');
+        _Doc.querySelector('#emi-plans') |> _El.addClass('disabled');
       }
 
       if (this.prevBank !== bank) {
@@ -135,7 +137,11 @@ emiView.prototype = {
       this.opts.banks
         |> _Obj.loop((bankObj, bankCode) => {
           if (bankCode === 'AMEX') {
-            if (amount > AMEX_EMI_MIN) {
+            if (
+              (session.isOfferApplicableOnIssuer('amex')
+                ? session.getDiscountedAmount()
+                : amount) > AMEX_EMI_MIN
+            ) {
               listItems.push({ text: bankObj.name, value: bankCode });
             }
           } else if (amount) {
@@ -143,12 +149,15 @@ emiView.prototype = {
           }
         });
 
-      if (this.session.tab === 'card') {
-        listItems.push({ text: 'Pay without EMI', value: '' });
+      if (listItems.length === 0) {
+        e.target |> _El.addClass('mature invalid');
+        return;
+      } else {
+        e.target |> _El.removeClass('invalid');
       }
 
-      if (listItems.length === 0) {
-        return;
+      if (session.tab === 'card') {
+        listItems.push({ text: 'Pay without EMI', value: '' });
       }
 
       OptionsList.show({
@@ -182,6 +191,7 @@ emiView.prototype = {
     this.on('click', '#emi-plans', e => {
       let emiBank = _Doc.querySelector('#emi-bank').value;
       let amount = session.get('amount');
+
       let emiText = plan => {
         let amountPerMonth = Razorpay.emi.calculator(
           amount,
@@ -197,8 +207,13 @@ emiView.prototype = {
 
       if (emiBank) {
         let plans = this.opts.banks[emiBank].plans;
+
+        if (session.isOfferApplicableOnIssuer(emiBank)) {
+          amount = session.getDiscountedAmount();
+        }
+
         let appliedOffer =
-          this.session.offers && this.session.offers.offerSelectedByDrawer;
+          session.offers && session.offers.offerSelectedByDrawer;
         let listItems =
           plans
           |> _Obj.reduce((accumulator, plan, duration) => {
@@ -217,15 +232,31 @@ emiView.prototype = {
             return accumulator;
           }, []);
 
-        if (this.session.tab === 'card') {
+        if (listItems.length === 0) {
+          if (appliedOffer) {
+            _Doc.querySelector('#emi-plans .help')
+              |> _El.setContents(
+                'Entered card number is not applicable for the selected offer'
+              );
+          } else {
+            _Doc.querySelector('#emi-plans .help')
+              |> _El.setContents(EMI_HELP_TEXT);
+          }
+          if (session.tab === 'emi') {
+            e.target |> _El.addClass('mature invalid');
+          } else {
+            e.target |> _El.addClass('mature');
+          }
+          return;
+        } else {
+          e.target |> _El.removeClass('invalid') |> _El.removeClass('mature');
+        }
+
+        if (!appliedOffer && session.tab === 'card') {
           listItems.push({
             text: 'Pay without EMI',
             value: '',
           });
-        }
-
-        if (listItems.length === 0) {
-          return;
         }
 
         OptionsList.show({
@@ -241,7 +272,7 @@ emiView.prototype = {
               text = emiText(plan);
 
               if (plan.offer_id) {
-                this.session.offers.selectOfferById(plan.offer_id);
+                session.offers.selectOfferById(plan.offer_id);
               } else {
                 removeOffer = true;
               }
@@ -252,18 +283,18 @@ emiView.prototype = {
                 |> _El.getAttribute('data-default');
             }
 
-            if (
-              removeOffer &&
-              this.session.offers &&
-              this.session.offers.appliedOffer
-            ) {
-              this.session.offers.removeOffer();
+            if (removeOffer && session.offers && session.offers.appliedOffer) {
+              session.offers.removeOffer();
             }
 
             _Doc.querySelector('#emi-duration').value = value;
             _Doc.querySelector('#emi-plans .text') |> _El.setContents(text);
           },
         });
+      } else {
+        _Doc.querySelector('#emi-plans .help')
+          |> _El.setContents(EMI_HELP_TEXT);
+        e.target |> _El.addClass('mature');
       }
     });
 
