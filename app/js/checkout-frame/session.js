@@ -2025,6 +2025,7 @@ Session.prototype = {
                 }
 
                 $dropdown.$('.emi_duration').val(value);
+                $dropdown.removeClass('mature').removeClass('invalid');
                 $dropdown.$('.text')[0].innerHTML = text;
               },
             });
@@ -2509,6 +2510,18 @@ Session.prototype = {
         this.switchBank({ target: { value: issuer } });
       }
     } else if (screen === 'card') {
+      var emiDuration = $('#emi-duration').val();
+      var bank = $('#emi-bank').val();
+      var emiBank = emiBanks[bank];
+
+      if (emiDuration && emiBank && typeof emiBank.plans === 'object') {
+        var plan = emiBank.plans[emiDuration];
+        if (plan && offer.id && plan.offer_id !== offer.id) {
+          $('#emi-duration').val('');
+          $('#emi-plans .text').html($('#emi-plans').attr('data-default'));
+        }
+      }
+
       //TODO: WIP try to see if the card exists in the saved cards and focus
       var savedCards = this.customer.tokens && this.customer.tokens.items;
 
@@ -3110,6 +3123,10 @@ Session.prototype = {
       if (this.screen === 'card') {
         if (this.savedCardScreen) {
           var $checkedCard = $('.saved-card.checked');
+          var $emiPlans = $checkedCard.$('.elem-savedcards-emi');
+          var $emiDuration = $checkedCard.$('.emi_duration');
+          var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
+          appliedOffer = appliedOffer || {};
           data.token = $checkedCard.attr('token');
           data['card[cvv]'] = $checkedCard.$('.saved-cvv').val();
 
@@ -3118,6 +3135,18 @@ Session.prototype = {
           authType = authType[0] && authType.val();
           if (authType) {
             data['auth_type'] = authType;
+          }
+
+          if (
+            (tab === 'emi' || appliedOffer.payment_method === 'emi') &&
+            !$emiDuration.val()
+          ) {
+            $emiPlans
+              .addClass('mature')
+              .addClass('invalid')
+              .focus();
+          } else {
+            $emiPlans.removeClass('mature').removeClass('invalid');
           }
         } else {
           if (tab === 'emi') {

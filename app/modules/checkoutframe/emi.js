@@ -183,6 +183,9 @@ emiView.prototype = {
           }
 
           _Doc.querySelector('#emi-bank').value = value;
+          _Doc.querySelector('#emi-bank')
+            |> _El.removeClass('mature')
+            |> _El.removeClass('invalid');
           _Doc.querySelector('#emi-bank').dispatchEvent(new Event('change'));
         },
       });
@@ -288,6 +291,9 @@ emiView.prototype = {
             }
 
             _Doc.querySelector('#emi-duration').value = value;
+            _Doc.querySelector('#emi-plans')
+              |> _El.removeClass('mature')
+              |> _El.removeClass('invalid');
             _Doc.querySelector('#emi-plans .text') |> _El.setContents(text);
           },
         });
