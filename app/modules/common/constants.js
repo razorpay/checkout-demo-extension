@@ -47,6 +47,7 @@ export const STATES = {
  */
 export const TAB_TITLES = {
   card: 'Card',
+  cardless_emi: 'EMI',
   credit_card: 'Credit Card',
   debit_card: 'Debit Card',
   ecod: 'Pay by Link',
