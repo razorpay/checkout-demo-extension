@@ -1807,7 +1807,7 @@ Session.prototype = {
                 type: AnalyticsTypes.BEHAV,
                 data: {
                   wallet: value,
-                  power: discreet.WalletUtils.isPowerWallet(value),
+                  power: discreet.Wallet.isPowerWallet(value),
                 },
               });
 
@@ -3304,7 +3304,7 @@ Session.prototype = {
     }
 
     if (
-      discreet.WalletUtils.isPowerWallet(wallet) &&
+      discreet.Wallet.isPowerWallet(wallet) &&
       !request.fees &&
       data.contact &&
       data.email

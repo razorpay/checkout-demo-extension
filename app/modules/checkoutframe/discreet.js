@@ -17,13 +17,13 @@ import emiView from 'checkoutframe/emi';
 import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
-import * as WalletUtils from 'common/wallet';
 import { commonBanks } from 'common/bank';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
 import * as Bank from 'common/bank';
 import * as Wallet from 'common/wallet';
+import * as CardlessEmi from 'common/cardlessemi';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import { initIframe } from 'checkoutframe/iframe';
@@ -57,6 +57,7 @@ export default {
   Constants,
   Bank,
   Wallet,
+  CardlessEmi,
   SessionManager,
   Checkout,
   Bridge,
@@ -70,7 +71,6 @@ export default {
   emiView,
   emandateView,
   Curtain,
-  WalletUtils,
   commonBanks,
   timer: _.timer,
 };
