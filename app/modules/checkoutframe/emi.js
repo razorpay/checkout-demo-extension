@@ -268,7 +268,12 @@ emiView.prototype = {
                 |> _El.getAttribute('data-default');
             }
 
-            if (removeOffer && session.offers && session.offers.appliedOffer) {
+            if (
+              removeOffer &&
+              session.offers &&
+              session.offers.appliedOffer &&
+              session.offers.appliedOffer.emi_subvention
+            ) {
               session.offers.removeOffer();
             }
 

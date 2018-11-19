@@ -1949,7 +1949,11 @@ Session.prototype = {
                       self.offers.selectOfferById(plan.offer_id);
                     }
                   } else {
-                    if (self.offers && self.offers.appliedOffer) {
+                    if (
+                      self.offers &&
+                      self.offers.appliedOffer &&
+                      self.offers.appliedOffer.emi_subvention
+                    ) {
                       self.offers.removeOffer();
                     }
                   }
