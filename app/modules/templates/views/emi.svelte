@@ -36,7 +36,7 @@
       amount: data => {
         let session = data.session;
         let selectedBank = (data.banks[data.selected] || {}).code;
-        if (session.isOfferApplicableOnIssuer(selectedBank)) {
+        if (selectedBank && session.isOfferApplicableOnIssuer(selectedBank)) {
           return session.getDiscountedAmount();
         } else {
           return session.get('amount');
