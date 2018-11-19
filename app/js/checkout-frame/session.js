@@ -1913,6 +1913,7 @@ Session.prototype = {
             each(plans, function(duration, plan) {
               if (
                 !appliedOffer ||
+                (appliedOffer && !appliedOffer.emi_subvention) ||
                 (appliedOffer &&
                   appliedOffer.id &&
                   appliedOffer.id === plan.offer_id)
@@ -2417,6 +2418,8 @@ Session.prototype = {
               filteredTokens.push(token);
             }
           }
+        } else {
+          filteredTokens.push(token);
         }
       });
       this.setSavedCards({
@@ -2448,7 +2451,12 @@ Session.prototype = {
 
       if (emiDuration && emiBank && typeof emiBank.plans === 'object') {
         var plan = emiBank.plans[emiDuration];
-        if (plan && offer.id && plan.offer_id !== offer.id) {
+        if (
+          plan &&
+          offer.id &&
+          offer.emi_subvention &&
+          plan.offer_id !== offer.id
+        ) {
           $('#emi-duration').val('');
           $('#emi-plans .text').html($('#emi-plans').attr('data-default'));
         }
