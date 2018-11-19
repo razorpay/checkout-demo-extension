@@ -275,7 +275,9 @@ emiView.prototype = {
               text = emiText(plan);
 
               if (plan.offer_id) {
-                session.offers.selectOfferById(plan.offer_id);
+                if (session.offers) {
+                  session.offers.selectOfferById(plan.offer_id);
+                }
               } else {
                 removeOffer = true;
               }
