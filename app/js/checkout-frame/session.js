@@ -3970,6 +3970,20 @@ Session.prototype = {
     }
 
     /**
+     * If forced offer has method EMI
+     * - Show only EMI Screen
+     * - Trigger oneMethod
+     */
+
+    if (this.forcedOffer) {
+      var paymentMethod = this.forcedOffer.payment_method;
+      if (paymentMethod === 'emi') {
+        delete methods.card;
+        methods.count = 1;
+      }
+    }
+
+    /**
      *  disable UPI if:
      * - amount > 1 Lac
      * - Recurring payment
