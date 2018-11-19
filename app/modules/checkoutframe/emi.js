@@ -201,6 +201,7 @@ emiView.prototype = {
           |> _Obj.reduce((accumulator, plan, duration) => {
             if (
               !appliedOffer ||
+              (appliedOffer && !appliedOffer.emi_subvention) ||
               (appliedOffer &&
                 appliedOffer.id &&
                 appliedOffer.id === plan.offer_id)
