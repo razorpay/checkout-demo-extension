@@ -140,66 +140,6 @@ function copyToClipboardListener(e) {
   } catch (err) {}
 }
 
-function makeEmiDropdown(emiObj, session, isOption) {
-  var amount = session.get('amount');
-
-  /* TODO: handle default choice, amex for 4k & emi_only tab */
-
-  /**
-   * TODO: List down cases for card/emi
-   *
-   * - Handle backdrop interactions
-   * - Hint text
-   *
-   * Cases:
-   * - Forced Offer
-   *   - Non-applicable plans are not even shown by checkout.
-   *   + `NO COST EMI` badge to be shown?
-   *   - Issuer is known
-   *     - Dont show other issuers.
-   *     - Saved cards only show the cards by that issuer.
-   *   - Method is known
-   *     - If emi, show separate EMI tab and disable card.
-   *     - If card, disable emi and show card tab.
-   * - Non-forced offer
-   *   + EMI plans list show `NO COST EMI` badge.
-   *   - Single Issuer
-   *     - Prioritize issuer & Add Card button says `Add ${issuer} Card`.
-   *   + Show if No cost EMI applied.
-   *   + Show if No cost EMI applicable (in the offers drawer)
-   *   ? Ask for double confirmation on switching issuer (first change on
-   *     card number in case of new cards).
-   */
-
-  emiObj = emiObj || {};
-
-  // if (session.isOfferApplicableOnIssuer(emiObj.code)) {
-  //   amount = session.getDiscountedAmount();
-  // }
-
-  var h = '';
-  var isSubvented =
-    preferences.methods.emi_subvention === 'merchant' ? true : false;
-  if (emiObj.plans) {
-    each(emiObj.plans, function(length, rate) {
-      rate = isSubvented ? 0 : rate;
-      h +=
-        (isOption ? '<option' : '<div class="option"') +
-        ' value="' +
-        length +
-        '">' +
-        length +
-        ' month EMI ' +
-        (rate ? '@ ' + rate + '%' : '') +
-        ' (₹ ' +
-        Razorpay.emi.calculator(amount, length, rate) / 100 +
-        ' per month)</' +
-        (isOption ? 'option>' : 'div>');
-    });
-  }
-  return h;
-}
-
 function unsetEmiBank() {
   $('#emi-plans .text')[0].innerHTML = $('#emi-plans').attr('data-default');
   $('#emi-duration').val('');
@@ -1775,14 +1715,6 @@ Session.prototype = {
         });
       }
 
-      // this.on('change', '#emi-bank', function(e) {
-      //   $('#elem-emi select')[0].innerHTML = makeEmiDropdown(
-      //     emi_options.banks[e.target.value],
-      //     this,
-      //     true
-      //   );
-      // });
-
       // saved cards events
       this.click('#show-add-card', this.toggleSavedCards);
       this.click('#show-saved-cards', this.toggleSavedCards);
@@ -2722,7 +2654,6 @@ Session.prototype = {
 
   showCardTab: function(tab) {
     var isEmiTab = tab === 'emi';
-    // $('#elem-emi select')[0].required = $('#emi-bank')[0].required = isEmiTab;
 
     if (!isEmiTab) {
       $('#emi-bank')

@@ -4,27 +4,6 @@ import Razorpay from 'common/Razorpay';
 import { AMEX_EMI_MIN, EMI_HELP_TEXT } from 'common/constants';
 import * as OptionsList from 'components/OptionsList';
 
-function selectEMIBank(e) {
-  const { target } = e;
-
-  if (target |> _El.hasClass('option')) {
-    const duration = target |> _El.getAttribute('value');
-    const parent = _Doc.querySelector('#emi-check-label');
-    const input = parent.querySelector('input[type=checkbox]');
-    const active = parent.querySelector('.active');
-
-    input.checked = Boolean(duration);
-    if (active) {
-      active |> _El.removeClass('active');
-    }
-    target |> _El.addClass('active');
-
-    setTimeout(() => {
-      parent.blur();
-    });
-  }
-}
-
 function hideEMIDropdown() {
   const body = _Doc.querySelector('#body');
   const parent = _Doc.querySelector('#emi-check-label');
@@ -316,13 +295,6 @@ emiView.prototype = {
       },
       true
     );
-
-    // this.on('click', '#emi-select', function(e) {
-    //   hideEMIDropdown();
-    //   return e.stopPropagation();
-    // });
-
-    // this.on('mousedown', '#emi-select', selectEMIBank);
 
     this.on('click', '#view-emi-plans', function() {
       // TODO: Update showOverlay once session.js is refactored.
