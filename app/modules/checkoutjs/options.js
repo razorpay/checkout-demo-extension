@@ -8,6 +8,7 @@ RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {
   netbanking: null,
   card: true,
+  cardless_emi: null,
   wallet: null,
   emi: true,
   upi: true,
@@ -17,6 +18,7 @@ RazorpayDefaults.method = {
 RazorpayDefaults.prefill = {
   amount: '',
   wallet: '',
+  provider: '',
   method: '',
   name: '',
   contact: '',
@@ -70,6 +72,5 @@ RazorpayDefaults.theme = {
   close_method_back: false,
   hide_topbar: false,
   branding: '',
-  emi_mode: false,
   debit_card: false,
 };

@@ -46,15 +46,16 @@ export const STATES = {
  * Move to `checkout/constants` if and when we create it.
  */
 export const TAB_TITLES = {
-  debit_card: 'Debit Card',
+  card: 'Card',
+  cardless_emi: 'EMI',
   credit_card: 'Credit Card',
+  debit_card: 'Debit Card',
+  ecod: 'Pay by Link',
   emandate: 'Bank Account',
   emi: 'EMI',
-  card: 'Card',
   netbanking: 'Netbanking',
-  wallet: 'Wallet',
   upi: 'UPI',
-  ecod: 'Pay by Link',
+  wallet: 'Wallet',
 };
 
 /* .shown has display: none from iOS ad-blocker
