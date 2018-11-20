@@ -173,7 +173,7 @@ emiView.prototype = {
             event = document.createEvent('Event');
             event.initEvent('change', true, true);
           }
-          _Doc.querySelector('#emi-bank').dispatchEvent(new Event('change'));
+          _Doc.querySelector('#emi-bank').dispatchEvent(event);
         },
       });
     });
