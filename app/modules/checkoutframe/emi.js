@@ -165,7 +165,15 @@ emiView.prototype = {
           _Doc.querySelector('#emi-bank')
             |> _El.removeClass('mature')
             |> _El.removeClass('invalid');
-          _Doc.querySelector('#emi-bank').dispatchEvent(new Event('change'));
+
+          let event;
+          if (typeof Event === 'function') {
+            event = new Event('change');
+          } else {
+            event = document.createEvent('Event');
+            event.initEvent('change', true, true);
+          }
+          _Doc.querySelector('#emi-bank').dispatchEvent(event);
         },
       });
     });
