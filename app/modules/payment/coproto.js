@@ -29,7 +29,7 @@ export const processPaymentCreate = function(response) {
   var popup = payment.popup;
 
   // race between popup close poll and ajaxCallback. don't continue if payment has been canceled
-  if (popup && popup.checkClose()) {
+  if (popup && popup.checkClose && popup.checkClose()) {
     return; // return if it's already closed
     // otherwise subsequesnt code may lead to redirection in main window
   }

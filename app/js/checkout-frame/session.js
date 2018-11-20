@@ -3580,6 +3580,10 @@ Session.prototype = {
       $('#otp').attr('maxlength', 6);
     }
 
+    if (data.method === 'card') {
+      request.iframe = true;
+    }
+
     var payment = this.r.createPayment(data, request);
     payment
       .on('payment.success', bind(successHandler, this))

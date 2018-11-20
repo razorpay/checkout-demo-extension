@@ -11,6 +11,7 @@ import * as strings from 'common/strings';
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
+import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
@@ -123,6 +124,7 @@ function trackNewPayment(data = {}, params, r) {
 }
 
 export default function Payment(data, params, r) {
+  this.iframe = params.iframe;
   this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
@@ -427,7 +429,11 @@ Payment.prototype = {
   },
 
   makePopup: function() {
-    var popup = new Popup('', 'popup_' + Track.id);
+    let Medium = Popup;
+    if (this.iframe) {
+      Medium = Iframe;
+    }
+    var popup = new Medium('', 'popup_' + Track.id);
     if ((popup && !popup.window) || popup.window.closed !== false) {
       popup.close();
       popup = null;
