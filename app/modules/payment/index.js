@@ -377,7 +377,10 @@ Payment.prototype = {
     // which is sent for some of the wallets, unidentifiable from
     // checkout side before making the payment
     // so not making ajax call for any wallet
-    if (!isRazorpayFrame && data.method === 'wallet') {
+    if (
+      !isRazorpayFrame &&
+      _Arr.contains(['wallet', 'cardless_emi'], data.method)
+    ) {
       return;
     }
 
