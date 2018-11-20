@@ -2,6 +2,7 @@ const babel = require('rollup-plugin-babel');
 const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
+const svelte = require('rollup-plugin-svelte');
 const stylus = require('stylus');
 const autoprefixer = require('autoprefixer-stylus');
 const fs = require('fs');
@@ -48,7 +49,7 @@ fs.writeFileSync(
       .join(';')
 );
 
-const stylusProcessor = (content, id) =>
+const stylusProcessor = (content, id, module = true) =>
   new Promise((resolve, reject) => {
     var stylusOptions = {
       filename: id,
@@ -67,7 +68,9 @@ const stylusProcessor = (content, id) =>
       if (err) {
         return reject(err);
       }
-      code = `export default ${JSON.stringify(code)};`;
+      if (module) {
+        code = `export default ${JSON.stringify(code)};`;
+      }
       resolve({ code, map: { mappings: '' } });
     });
   });
@@ -77,8 +80,34 @@ module.exports = [
     paths: ['app/modules'],
   }),
 
+  svelte({
+    extensions: ['.js', '.html', '.svelte'],
+
+    skipIntroByDefault: true,
+    nestedTransitions: true,
+
+    preprocess: {
+      style: ({ content, filename }) => {
+        return stylusProcessor(content, filename, false);
+      },
+    },
+
+    /* TODO: enable run-time checks when not in production */
+    dev: false,
+
+    include: 'app/modules/**/*.html',
+    css: css => {
+      css.write('app/css/generated/svelte.styl');
+    },
+  }),
+
   babel({
-    include: ['app/modules/**/*.js', 'app/templates/**/*.jst'],
+    include: [
+      'app/modules/**/*.html',
+      'app/modules/**/*.js',
+      'node_modules/svelte/**/*.js',
+      'app/templates/**/*.jst',
+    ],
 
     plugins: [
       '@babel/transform-arrow-functions',

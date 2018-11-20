@@ -54,6 +54,7 @@ var upi_apps = _.upi_intents_data;
       <div id="overlay" class="showable"></div>
       <div id="confirmation-dialog" class="showable"></div>
       <div id="emi-wrap" class="showable mfix"></div>
+      <div id="options-wrap"></div>
       <div id="error-message" class="showable">
         <div id="fd-t"></div>
         <div class="spin"><div></div></div>
@@ -351,10 +352,15 @@ var upi_apps = _.upi_intents_data;
                   <div id="show-add-card" class="text-btn left-card">Add another card</div>
                   <div class="pad">
                   <div id="add-card-container">
-                    <div class="elem select">
+                    <div class="elem selector" id="emi-bank-parent" data-default="Select Bank"
+                    tabindex="0">
                       <i class="select-arrow">&#xe601;</i>
-                      <span class="help">Please select an EMI plan</span>
-                      <select id="emi-bank" class="input">
+                      <span class="help">Please select a Bank</span>
+                      <div class="overflow-parent">
+                        <span class="text theme-highlight">Select Bank</span>
+                      </div>
+                      <input id="emi-bank" type="hidden" value="" />
+                      <!-- <select id="emi-bank" class="input">
                         <option selected value="">Select Bank</option>
                         `?(_.isOfferApplicableOnIssuer("amex") ? _.getDiscountedAmount() : o('amount'))>emi_options.amex_min&&_.preferences.methods.amex`
                           <option value="AMEX">American Express</option>
@@ -362,7 +368,7 @@ var upi_apps = _.upi_intents_data;
                         `~emi_options.banks:code:bank`
                           <option value="`=code`">`=bank.name`</option>
                         `~`
-                      </select>
+                      </select> -->
                     </div>
                     <div class="card-fields">
                       <div class="elem-wrap two-third"><div class="elem" id="elem-card">
@@ -393,13 +399,17 @@ var upi_apps = _.upi_intents_data;
                     </div>
                     <div class="clear"></div>
                     <div id="elem-emi" class="double">
-                      <div class="elem select">
+                      <div class="elem selector first emi-plans disabled"
+                        data-default="Select an EMI Plan" id='emi-plans'
+                        tabindex='0'>
+                        <span class="help up">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, Standard Chartered and Axis Bank Credit Cards. Enter your credit card to avail.</span>
                         <i class="select-arrow">&#xe601;</i>
-                        <select class="input">
-                          <option value="" selected>Enter Plan</option>
-                        </select>
+                        <input type="hidden" name="emi_duration" id='emi-duration'>
+                        <div class="overflow-parent">
+                          <span class="text theme-highlight">Select an EMI Plan</span>
+                        </div>
                       </div>
-                      <div class="first disabled dropdown-parent" id="emi-check-label">
+                      <!-- <div class="first disabled dropdown-parent" id="emi-check-label">
                         <input type="checkbox" class="checkbox--square">
                         <span class="checkbox"></span>
                         Pay with EMI
@@ -408,7 +418,7 @@ var upi_apps = _.upi_intents_data;
                           <div class="option" value="">Pay without EMI</div>
                         </div>
                         <span class="help dropdown">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, Standard Chartered and Axis Bank Credit Cards. Enter your credit card to avail.</span>
-                      </div>
+                      </div> -->
                       <div class="second">
                         <span id="view-emi-plans" class="link">
                           <a>View EMI Plans</a>
@@ -767,7 +777,7 @@ var upi_apps = _.upi_intents_data;
               </label>
             </div>
             `?`
-            <div id="offers-container"></div>
+            <div id="offers-container" `?method.count>4`class='count-5'`?`></div>
             <button id="footer" type="submit" class="button">
               <span class="pay-btn">`?o('amount')`PAY &nbsp;<span class="original-amount">`=amount`</span><span class="discount"></span>`??`Authenticate`?`</span>
               <span class="otp-btn">Verify</span>

@@ -309,6 +309,117 @@ i {
   display: block;
 }
 
+#options-wrap {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 12px;
+  right: 12px;
+  z-index: 100;
+}
+
+#emi-bank-parent {
+  padding-top: 12px;
+  margin-top: 10px;
+}
+
+.selector {
+  padding-bottom: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  padding-right: 10px;
+  box-sizing: border-box;
+
+  &:hover, &.focused {
+    &::after {
+      transform: scale(1);
+    }
+  }
+
+  input {
+    display: none;
+  }
+
+  .overflow-parent {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .help {
+    white-space: normal;
+
+    &.up {
+      margin-bottom: 12px
+    }
+  }
+
+  &.disabled {
+    .text.theme-highlight {
+      color: #858585;
+    }
+  }
+
+  &.invalid.mature:not(.focused) .text {
+    color: $danger;
+  }
+
+  .text, i, .overflow-parent {
+    pointer-events: none;
+  }
+}
+
+.options-list {
+  border-radius: 2px;
+  box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);
+  max-height: 320px;
+  overflow: hidden;
+  overflow-y: auto;
+  background: #fff;
+
+  .badge {
+    position: absolute;
+    display: block;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 8px;
+    border: 1px solid #70BE53;
+    border-radius: 2px;
+    background-color: #F7FBF5;
+    color: #70BE53;
+    font-size: 10px;
+    padding: 0 3px;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+
+  .option {
+    border-top: 1px solid #E6E7E8;
+    transition: 0.2s background;
+    background: #fff;
+    padding: 12px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333333;
+    cursor: pointer;
+    text-align: left;
+    position: relative;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+}
+
+#emi-plans {
+  .help {
+    min-width: 240px;
+    max-width: 280px;
+  }
+}
+
 #container {
   margin: 0 auto;
   height: 100%;
@@ -576,6 +687,7 @@ i {
   height: $bodyh;
   background: #fff;
   backface-visibility: none;
+  transition: 0.3s height;
 
   &.emi-focus {
     position: relative;
@@ -1000,6 +1112,8 @@ $outline = #ddd;
       .offer-details {
 
         line-height: 1.5rem;
+        font-size: 13px;
+        color: #666666;
 
         &.no-desc .remove-offer {
 
@@ -1139,20 +1253,30 @@ $outline = #ddd;
   }
 
   #offers-container {
-
     bottom: -($topbarh) + 2px
     display: block;
     background-color: #fff;
     border-radius: 0 0 3px 3px;
+
+    &.count-5 {
+      bottom: -($topbarh) - 98px + 2px;
+    }
   }
 
+
+
   &[screen] {
-
     #offers-container {
-
       transform: translate(0, -100%);
       margin-top: 0;
       border-radius: 0;
+      bottom: -44px;
+    }
+  }
+
+  &[tab=emi] {
+    #form-card.saved-cards #saved-cards-container {
+      max-height: 238px;
     }
   }
 
@@ -1161,6 +1285,10 @@ $outline = #ddd;
     &#form-wallet , &#form-card, &#form-upi {
 
       bottom: $topbarh;
+    }
+
+    &.saved-cards #saved-cards-container {
+      max-height: 188px;
     }
   }
 }
@@ -1307,7 +1435,8 @@ $outline = #ddd;
     display: initial;
     font-size: 16px;
   }
-  .select {
+
+  #emi-bank-parent {
     display: none;
   }
 }
@@ -1341,27 +1470,12 @@ $outline = #ddd;
   height: 374px;
 
   #form-card {
-    .elem-wrap {
-      height: 62px;
-    }
-    .select {
+    #emi-bank-parent {
       display: block;
-      padding: 0;
-      margin-top: 14px;
     }
   }
   #elem-emi {
-    margin: 19px 0;
     display: block;
-    .first {
-      display: none;
-    }
-    .select {
-      position: absolute;
-      margin-top: -13px;
-      left: 0;
-      right: 98px;
-    }
   }
   .save-enabled #add-card-container {
     height: 248px;

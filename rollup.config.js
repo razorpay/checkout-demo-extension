@@ -1,5 +1,8 @@
 const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
-const plugins = getPlugins({ src: 'app/modules' }).concat(stylus);
+const plugins = getPlugins({
+  src: 'app/modules/',
+  svelteCssPath: 'app/css/generated/',
+}).concat(stylus);
 
 const modules = {
   'entry/razorpay': 'Razorpay',
