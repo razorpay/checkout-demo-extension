@@ -1135,6 +1135,9 @@ Session.prototype = {
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
+      data: {
+        embedded: this.embedded,
+      },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
