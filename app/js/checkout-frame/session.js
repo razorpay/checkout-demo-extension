@@ -711,9 +711,6 @@ Session.prototype = {
     if (this.methods.emi) {
       tab_titles.card = 'Card';
       classes.push('emi-method');
-      if (this.methods.count >= 5) {
-        $('#body').addClass('long');
-      }
     }
 
     if (getter('ecod')) {
@@ -1059,6 +1056,11 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     errorHandler.call(this, this.params);
+
+    // Update the payment options grid layout.
+    if (this.methods.count >= 5) {
+      $('#body').addClass('long');
+    }
 
     var hasOffers = this.hasOffers,
       forcedOffer = this.forcedOffer;
