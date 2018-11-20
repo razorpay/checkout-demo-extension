@@ -211,15 +211,15 @@ function onSixDigits(e) {
   }
 
   if (trimmedVal.length >= 6) {
-    var event;
+    var emiBankChangeEvent;
     if (typeof Event === 'function') {
-      event = new Event('change');
+      emiBankChangeEvent = new Event('change');
     } else {
-      event = document.createEvent('Event');
-      event.initEvent('change', true, true);
+      emiBankChangeEvent = document.createEvent('Event');
+      emiBankChangeEvent.initEvent('change', true, true);
     }
 
-    gel('emi-bank').dispatchEvent(event);
+    gel('emi-bank').dispatchEvent(emiBankChangeEvent);
   }
 
   noCvvToggle({ target: nocvvCheck });
