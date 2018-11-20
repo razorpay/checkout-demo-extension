@@ -708,11 +708,10 @@ Session.prototype = {
           : walletNames.join(', ') + ' & More';
     }
 
-    if (getter('theme.emi_mode')) {
+    if (this.methods.emi) {
       tab_titles.card = 'Card';
-      this.emiMethod = true;
       classes.push('emi-method');
-      if (this.methods.count === 5) {
+      if (this.methods.count >= 5) {
         $('#body').addClass('long');
       }
     }
@@ -2483,27 +2482,25 @@ Session.prototype = {
     var isEmiTab = tab === 'emi';
 
     /**
-     * If theme.emi_mode is true, and this is the EMI tab,
+     * If this is the EMI tab,
      * we would want the emi_duration select element to be required
      * as you cannot proceed without it.
      *
      * If this is the regular cards tab, the select should not be a required field.
      */
-    if (this.get('theme.emi_mode')) {
-      each($$('.elem-savedcards-emi select[name=emi_duration]'), function(
-        index,
-        node
-      ) {
-        $(node).attr('required', isEmiTab);
-      });
+    each($$('.elem-savedcards-emi select[name=emi_duration]'), function(
+      index,
+      node
+    ) {
+      $(node).attr('required', isEmiTab);
+    });
 
-      /**
-       * Set each invalid saved-card w/ EMI as valid.
-       */
-      each($$('.elem-savedcards-emi'), function(index, node) {
-        toggleInvalid($(node), true);
-      });
-    }
+    /**
+     * Set each invalid saved-card w/ EMI as valid.
+     */
+    each($$('.elem-savedcards-emi'), function(index, node) {
+      toggleInvalid($(node), true);
+    });
   },
 
   showCardTab: function(tab) {
@@ -2649,7 +2646,6 @@ Session.prototype = {
 
         gel('saved-cards-container').innerHTML = templates.savedcards({
           tokens: customer.tokens,
-          emi_mode: this.get('theme.emi_mode'),
           amount: this.get('amount'),
           session: this,
           emi: this.methods.emi,
@@ -3652,12 +3648,11 @@ Session.prototype = {
      * - Non INR payment
      * - Recurring payment
      * - EMI not enabled
-     * - Card not enabled
+     * - Neither of Card or Cardless EMI are enabled
      * - amount is less than EMI threshold
      */
-    var emiMethod = this.get('theme.emi_mode');
     if (
-      !((emiMethod && methods.emi) || methods.card) ||
+      !(methods.card || methods.cardless_emi) ||
       recurring ||
       international ||
       amount <= emi_options.min
@@ -3665,15 +3660,10 @@ Session.prototype = {
       methods.emi = false;
     }
 
-    /* set tab_titles for card method */
-    if (methods.emi && !emiMethod) {
-      tab_titles.card = 'Card/EMI';
+    if (availMethods.debit_card && !availMethods.credit_card) {
+      tab_titles.card = tab_titles.debit_card;
     } else {
-      if (availMethods.debit_card && !availMethods.credit_card) {
-        tab_titles.card = tab_titles.debit_card;
-      } else {
-        tab_titles.card = 'Card';
-      }
+      tab_titles.card = 'Card';
     }
 
     /**
@@ -3736,7 +3726,7 @@ Session.prototype = {
       methods.count++;
     }
 
-    if (emiMethod) {
+    if (methods.emi) {
       methods.count++;
     }
 

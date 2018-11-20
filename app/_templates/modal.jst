@@ -266,7 +266,7 @@ var upi_apps = _.upi_intents_data;
                 <div`?_.tpvBank` class="showable"`?`>
                   <div class="legend">Select a payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
-                    `?o('theme.emi_mode')`
+                    `?method.emi`
                     <div class="payment-option item" tab="emi"><label><i>&#xe60d;</i>`=_.tab_titles.emi`</label></div>
                     `?`
                     `?method.card`
