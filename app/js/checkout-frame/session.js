@@ -2293,7 +2293,7 @@ Session.prototype = {
     Analytics.setMeta('timeSince.screen', discreet.timer());
 
     // Back button is pressed before going to card page page
-    if (this.screen === 'otp' && screen !== 'card') {
+    if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
       this.preSelectedOffer = null;
     }
 
@@ -2373,7 +2373,11 @@ Session.prototype = {
       // Explicitly call this because we selected the offer explicitly
       this.handleOfferSelection(this.preSelectedOffer, screen);
       this.offers.applyOffer();
-      this.preSelectedOffer = null;
+
+      /* Don't set preSelectedOffer to null if it's on card OTP screen  */
+      if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
+        this.preSelectedOffer = null;
+      }
     }
 
     $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
@@ -2525,6 +2529,7 @@ Session.prototype = {
   back: function(confirmedCancel) {
     var tab = '';
     var self = this;
+    this.preSelectedOffer = null;
 
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
