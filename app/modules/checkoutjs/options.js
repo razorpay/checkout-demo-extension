@@ -72,6 +72,5 @@ RazorpayDefaults.theme = {
   close_method_back: false,
   hide_topbar: false,
   branding: '',
-  emi_mode: false, // Useless since we separated EMI into a payment method.
   debit_card: false,
 };
