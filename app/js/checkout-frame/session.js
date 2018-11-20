@@ -211,7 +211,15 @@ function onSixDigits(e) {
   }
 
   if (trimmedVal.length >= 6) {
-    gel('emi-bank').dispatchEvent(new Event('change'));
+    var event;
+    if (typeof Event === 'function') {
+      event = new Event('change');
+    } else {
+      event = document.createEvent('Event');
+      event.initEvent('change', true, true);
+    }
+
+    gel('emi-bank').dispatchEvent(event);
   }
 
   noCvvToggle({ target: nocvvCheck });
