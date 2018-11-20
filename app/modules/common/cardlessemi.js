@@ -2,8 +2,8 @@ import { RazorpayConfig } from 'common/Razorpay';
 
 const cdnUrl = RazorpayConfig.cdn;
 
-const prefix = cdnUrl + 'emi/';
-const sqPrefix = cdnUrl + 'emi-sq/';
+const prefix = cdnUrl + 'cardless_emi/';
+const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
 const list = {
   zestmoney: ['Zest Money'],
