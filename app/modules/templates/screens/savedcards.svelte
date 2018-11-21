@@ -6,7 +6,7 @@
 
 <script>
   import SavedCard from 'templates/views/savedcard.svelte';
-  import * as Network from 'common/network';
+  import * as Card from 'common/card';
 
   export default {
     components: {
@@ -31,7 +31,7 @@
             network
           } = card;
 
-          let networkCode = Network.findCodeByNetworkName(network);
+          let networkCode = Card.findCodeByNetworkName(network);
 
           if (networkCode === 'amex') {
             bank = 'AMEX';
