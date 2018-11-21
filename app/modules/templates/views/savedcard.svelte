@@ -1,6 +1,7 @@
 <div
   tabIndex="0"
-  class={'saved-card left-card' + (checked ? 'checked': '')}
+  class="saved-card left-card"
+  class:checked
   {...attributes}
 >
   <div class="help up">EMI is not available on this card</div>
