@@ -1,7 +1,7 @@
 import SavedCardsScreen from 'templates/screens/savedcards.svelte';
 
 export default function setView(params) {
-  params.tokens = _Obj.clone(params.tokens);
+  params.data = _Obj.clone(params.data);
 
   _Obj.extend(this, params);
 

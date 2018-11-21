@@ -2842,7 +2842,6 @@ Session.prototype = {
             emi: this.methods.emi,
             emiOptions: this.emi_options,
             recurring: this.recurring,
-            session: this,
             tokens: tokensList,
 
             target: gel('saved-cards-container'),
