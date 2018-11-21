@@ -25,7 +25,7 @@ setView.prototype = {
   },
 
   transformTokens() {
-    this.tokens.items = this.tokens.items.filter(token => token.card);
+    this.tokens.items = _Arr.filter(this.tokens.items, token => token.card);
     this.tokens.count = this.tokens.items.count;
   },
 };
