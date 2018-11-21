@@ -5,7 +5,6 @@ export default function setView(params) {
 
   _Obj.extend(this, params);
 
-  this.transformTokens();
   this.render();
 }
 
@@ -15,17 +14,8 @@ setView.prototype = {
       target: this.target,
 
       data: {
-        amount: this.amount,
-        emi: this.emi,
-        emiOptions: this.emiOptions,
-        recurring: this.recurring,
-        tokens: this.tokens.items,
+        cards: this.cards,
       },
     });
-  },
-
-  transformTokens() {
-    this.tokens.items = _Arr.filter(this.tokens.items, token => token.card);
-    this.tokens.count = this.tokens.items.count;
   },
 };

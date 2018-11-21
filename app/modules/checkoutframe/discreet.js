@@ -26,6 +26,7 @@ import * as Constants from 'common/constants';
 import * as Bank from 'common/bank';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
+import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import { initIframe } from 'checkoutframe/iframe';
@@ -60,6 +61,7 @@ export default {
   Bank,
   Wallet,
   CardlessEmi,
+  Token,
   SessionManager,
   Checkout,
   Bridge,

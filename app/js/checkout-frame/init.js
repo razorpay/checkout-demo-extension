@@ -20,6 +20,7 @@ var Constants = discreet.Constants;
 var Bank = discreet.Bank;
 var Wallet = discreet.Wallet;
 var CardlessEmi = discreet.CardlessEmi;
+var Token = discreet.Token;
 var SessionManager = discreet.SessionManager;
 var Checkout = discreet.Checkout;
 var Bridge = discreet.Bridge;

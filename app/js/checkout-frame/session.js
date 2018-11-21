@@ -2838,11 +2838,13 @@ Session.prototype = {
 
         if (!this.savedCardsView) {
           this.savedCardsView = new discreet.SavedCardsView({
-            amount: this.get('amount'),
-            emi: this.methods.emi,
-            emiOptions: this.emi_options,
-            recurring: this.recurring,
-            tokens: tokensList,
+            cards: Token.transformForSavedCards({
+              amount: this.get('amount'),
+              emi: this.methods.emi,
+              emiOptions: this.emi_options,
+              recurring: this.recurring,
+              tokens: tokensList.items,
+            }),
 
             target: gel('saved-cards-container'),
           });
