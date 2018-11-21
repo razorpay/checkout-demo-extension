@@ -14,6 +14,7 @@ import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
 import emiView from 'checkoutframe/emi';
+import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
@@ -71,6 +72,8 @@ export default {
 
   emiView,
   emandateView,
+  SavedCardsView,
+
   Curtain,
   OptionsList,
   commonBanks,

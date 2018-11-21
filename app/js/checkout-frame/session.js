@@ -2836,14 +2836,18 @@ Session.prototype = {
           });
         }
 
-        gel('saved-cards-container').innerHTML = templates.savedcards({
-          tokens: tokensList,
-          amount: this.get('amount'),
-          session: this,
-          emi: this.methods.emi,
-          emi_options: this.emi_options,
-          recurring: this.recurring,
-        });
+        if (!this.savedCardsView) {
+          this.savedCardsView = new discreet.SavedCardsView({
+            amount: this.get('amount'),
+            emi: this.methods.emi,
+            emiOptions: this.emi_options,
+            recurring: this.recurring,
+            session: this,
+            tokens: tokensList,
+
+            target: gel('saved-cards-container'),
+          });
+        }
 
         this.toggleEMIRequiredAttrib(this.tab);
       }
