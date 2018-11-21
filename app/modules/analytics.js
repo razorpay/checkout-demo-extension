@@ -43,7 +43,9 @@ const Analytics = () => ({
   ) {
     let calculatedMeta = calculateMeta(META);
 
-    if (!_.isObject(data)) {
+    if (_.isNonNullObject(data)) {
+      data = _Obj.clone(data);
+    } else {
       data = {
         data,
       };

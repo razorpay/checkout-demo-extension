@@ -152,9 +152,15 @@ function initOffers(
       if (criteriaKeys.length > 0) {
         visibleOffers = criteriaKeys.reduce(function(offers, key) {
           return offers.reduce(function(filteredOffers, offer) {
+            var criteriaCheck = false;
+            if (Array.isArray(criteria[key])) {
+              criteriaCheck = criteria[key].indexOf(offer.data[key]) > -1;
+            } else {
+              criteriaCheck = criteria[key] === offer.data[key];
+            }
+
             return (
-              criteria[key] === offer.data[key] &&
-                (appendOffer(offer), filteredOffers.push(offer)),
+              criteriaCheck && (appendOffer(offer), filteredOffers.push(offer)),
               filteredOffers
             );
           }, []);
@@ -217,11 +223,33 @@ function initOffers(
 
       return true;
     },
-    selectOffer: function selectOffer(offer) {
+
+    selectOfferById: function selectOfferById(offerId) {
+      var matchedOffers = [];
+      if (Array.isArray(visibleOffers)) {
+        matchedOffers = visibleOffers.filter(function(offer) {
+          return offer.data.id === offerId;
+        });
+      }
+
+      this.selectOffer(matchedOffers[0], true);
+
+      if (matchedOffers.length === 1) {
+        this.applyOffer();
+      } else if (matchedOffers.length > 1) {
+        toggleOfferList();
+      }
+    },
+
+    selectOffer: function selectOffer(offer, programaticallySelected) {
       if (selectedOffer) {
         selectedOffer.deselect();
       } else {
         $offersListCont.className = $offersListCont.className + selectedClass;
+      }
+
+      if (!programaticallySelected) {
+        this.offerSelectedByDrawer = offer.data;
       }
 
       (selectedOffer = offer).select();
@@ -232,6 +260,8 @@ function initOffers(
           selectedClass,
           ''
         );
+
+        this.offerSelectedByDrawer = null;
 
         selectedOffer.deselect();
         selectedOffer = null;

@@ -43,16 +43,24 @@
         <span class='saved-number'>`=card.last4`</span>
         <input class='saved-cvv cvv-input' type='tel' placeholder='CVV' inputmode='numeric' maxlength='`=cvv_digits`' required pattern='^[0-9]{`=cvv_digits`}$'>
         `?plans`
-          <div class="elem-wrap"><div class="elem select elem-savedcards-emi">
+          <div class="elem selector elem-savedcards-emi"
+            data-bank='`=bank`'
+            data-default="Select an EMI Plan"
+            tabindex="0">
             <div class="help up">Please select the EMI duration</div>
             <i class="select-arrow">&#xe601;</i>
-            <select class="input" name="emi_duration">
+            <div class="overflow-parent">
+              <span class="text theme-highlight">Select an EMI Plan</span>
+            </div>
+            <input type="hidden" class="emi_duration">
+
+            <!-- <select class="input" name="emi_duration">
               <option selected value="" >Select EMI Plan</option>
               `~plans.plans:dur:rate`
               <option value='`=dur`'>`=dur` month EMI @ `=rate`% ( ₹`=Razorpay.emi.calculator((session.isOfferApplicableOnIssuer(bank) ? session.getDiscountedAmount() : amount), dur, rate)/100` per month )</option>
               `~`
-            </select>
-          </div></div>
+            </select> -->
+          </div>
         `?`
         `?network === 'maestro'`
           <label for="nocvv-`=item.token`" class="maestro-cvv">
