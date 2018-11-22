@@ -1028,6 +1028,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.setEmandate();
+    this.setCardlessEmi();
     this.checkTez();
     this.fillData();
     this.setEMI();
@@ -1196,6 +1197,36 @@ Session.prototype = {
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
       this.emandateView = new discreet.emandateView(this);
+    }
+  },
+
+  setCardlessEmi: function() {
+    if (this.methods.cardless_emi) {
+      this.cardlessEmiView = new discreet.cardlessEmiView({
+        target: gel('cardless_emi-wrapper'),
+        providers: [
+          {
+            data: {
+              code: 'zestmoney',
+            },
+            icon: '',
+            title: 'ZestMoney',
+          },
+          {
+            data: {
+              code: 'earlysalary',
+            },
+            icon: '',
+            title: 'EarlySalary',
+          },
+        ],
+
+        on: {
+          select: function(event) {
+            console.log(event.option);
+          },
+        },
+      });
     }
   },
 
