@@ -1,4 +1,4 @@
-<div class="flow input-radio">
+<div class={containerClass}>
   <input
     type="radio"
     {checked}
