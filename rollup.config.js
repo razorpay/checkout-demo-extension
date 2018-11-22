@@ -1,6 +1,6 @@
 const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
 const plugins = getPlugins({
-  src: 'app/modules/',
+  src: ['app/modules/', 'node_modules/'],
   svelteCssPath: 'app/css/generated/',
 }).concat(stylus);
 
