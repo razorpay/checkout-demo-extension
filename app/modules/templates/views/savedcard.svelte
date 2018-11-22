@@ -30,26 +30,33 @@
   </div>
   {#if card.debitPin}
     <div class="elem-wrap flow-selection-container">
-      <div class="flow input-radio">
-        <input type="radio" name={`auth_type-${card.token}`} id={`flow-3ds-${card.token}`} value="c3ds" class="auth_type_radio" checked>
-        <label for={`flow-3ds-${card.token}`}>
-          <div class="radio-display"></div>
-          <div class="label-content">Pay using <strong>OTP / Password </strong></div>
-        </label>
-      </div>
-      <div class="flow input-radio">
-        <input type="radio" name={`auth_type-${card.token}`} id={`flow-pin-${card.token}`} value="pin" class="auth_type_radio">
-        <label for={`flow-pin-${card.token}`}>
-          <div class="radio-display"></div>
-          <div class="label-content">Pay using <strong>ATM PIN</strong></div>
-        </label>
-      </div>
+      <Radio
+        checked={true}
+        containerClass="flow"
+        id={`flow-3ds-${card.token}`}
+        inputClass="auth_type_radio"
+        label="Pay using <strong>OTP / Password </strong>"
+        name={`auth_type-${card.token}`}
+        value="c3ds"
+      />
+      <Radio
+        contaierClass="flow"
+        id={`flow-pin-${card.token}`}
+        inputClass="auth_type_radio"
+        label="Pay using <strong>ATM PIN</strong>"
+        name={`auth_type-${card.token}`}
+        value="pin"
+      />
     </div>
   {/if}
 </div>
 
 <script>
   export default {
+    components: {
+      Radio: 'templates/views/ui/Radio.svelte',
+    },
+
     computed: {
       attributes: ({ card }) => {
         const {
