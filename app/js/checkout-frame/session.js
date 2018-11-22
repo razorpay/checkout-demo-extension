@@ -481,15 +481,15 @@ function getPhone() {
   return gel('contact').value;
 }
 
-function setOtpText(text) {
-  gel('otp-prompt').innerHTML = text;
+function setOtpText(view, text) {
+  view.setText(text);
 }
 
 function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(text) {
+function askOTP(view, text) {
   var qpmap = getQueryParams();
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
@@ -503,10 +503,14 @@ function askOTP(text) {
   if (isNonNullObject(text)) {
     text = text.error && text.error.description;
   }
-  $('#otp').val('');
-  $('#form-otp')
-    .removeClass('loading')
-    .removeClass('action');
+
+  view.updateScreen({
+    loading: false,
+    action: false,
+    otp: '',
+    allowSkip: true,
+  });
+
   $('#body').addClass('sub');
   if (!text) {
     var thisSession = SessionManager.getSession();
@@ -521,11 +525,11 @@ function askOTP(text) {
       text = 'An OTP has been sent on<br>' + getPhone();
     }
   }
-  setOtpText(text);
+  setOtpText(view, text);
 }
 
-function debounceAskOTP(msg) {
-  debounce(askOTP, 750)(msg);
+function debounceAskOTP(view, msg) {
+  debounce(askOTP, 750)(view, msg);
 }
 
 // this === Session
@@ -1028,6 +1032,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.setEmandate();
+    this.setOtpScreen();
     this.checkTez();
     this.fillData();
     this.setEMI();
@@ -1196,6 +1201,24 @@ Session.prototype = {
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
       this.emandateView = new discreet.emandateView(this);
+    }
+  },
+
+  setOtpScreen: function() {
+    if (!this.otpView) {
+      this.otpView = new discreet.otpView({
+        target: gel('otp-screen-wrapper'),
+
+        on: {
+          chooseMethod: bind(function() {
+            this.switchTab();
+          }, this),
+          addFunds: bind(this.addFunds, this),
+          resend: bind(this.resendOTP, this),
+          retry: bind(this.back, this),
+          secondary: bind(this.secAction, this),
+        },
+      });
     }
   },
 
@@ -1454,7 +1477,10 @@ Session.prototype = {
     if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
-      this.customer.createOTP(debounceAskOTP);
+      var self = this;
+      this.customer.createOTP(function() {
+        debounceAskOTP(self.otpView);
+      });
     }
   },
 
@@ -1480,12 +1506,13 @@ Session.prototype = {
   },
 
   addFunds: function(event) {
-    setOtpText('Loading...');
-    $('#add-funds').removeClass('show');
-    $('#form-otp')
-      .removeClass('action')
-      .addClass('loading')
-      .css('display', 'block');
+    setOtpText(this.otpView, 'Loading...');
+    this.otpView.updateScreen({
+      action: false,
+      loading: true,
+      addFunds: false,
+    });
+    $('#form-otp').css('display', 'block');
     this.r.topupWallet();
   },
 
@@ -1699,13 +1726,6 @@ Session.prototype = {
       }
     });
     this.on('submit', '#form', this.preSubmit);
-    this.click('#otp-action', this.back);
-    this.click('#otp-resend', this.resendOTP);
-    this.click('#otp-sec', this.secAction);
-    this.click('#add-funds-action', this.addFunds);
-    this.click('#choose-payment-method', function() {
-      this.switchTab();
-    });
 
     var enabledMethods = this.methods;
     if (enabledMethods.card || enabledMethods.emi) {
@@ -2688,8 +2708,10 @@ Session.prototype = {
 
     this.toggleEMIRequiredAttrib(tab);
 
-    $('#otp-elem').removeClass('fourdigit');
-    $('#otp').attr('maxlength', 6);
+    this.otpView.updateScreen({
+      fourdigit: false,
+      maxlength: 6,
+    });
 
     var self = this;
     var customer = self.customer;
@@ -2701,7 +2723,9 @@ Session.prototype = {
     }
 
     tab_titles.otp = tab_titles.card;
-    $('#otp-sec').html('Skip saved cards');
+    this.otpView.updateScreen({
+      skipText: null,
+    });
 
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true);
@@ -2715,13 +2739,14 @@ Session.prototype = {
         if (self.recurring && !customer.saved && !customer.logged) {
           self.customer.createOTP(function() {
             askOTP(
+              self.otpView,
               'Enter OTP sent on ' +
                 getPhone() +
                 '<br>to save your Card for future payments'
             );
           });
         } else if (customer.saved && !customer.logged) {
-          askOTP();
+          askOTP(self.otpView);
         } else {
           self.showCards();
         }
@@ -3195,7 +3220,7 @@ Session.prototype = {
 
   showLoadError: function(text, error) {
     var actionState;
-    var loadingState = 'addClass';
+    var loadingState = true;
     if (error) {
       if (
         (this.screen === 'upi' || this.get('ecod')) &&
@@ -3207,9 +3232,9 @@ Session.prototype = {
         return this.hideErrorMessage();
       }
       actionState = loadingState;
-      loadingState = 'removeClass';
+      loadingState = false;
     } else {
-      actionState = 'removeClass';
+      actionState = false;
     }
 
     if (!text) {
@@ -3218,19 +3243,28 @@ Session.prototype = {
 
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
-      setOtpText(text);
-      var formOtp = $('#form-otp');
-      formOtp[actionState]('action');
-      formOtp[loadingState]('loading');
+      setOtpText(this.otpView, text);
+
+      this.otpView.updateScreen({
+        action: actionState,
+        loading: loadingState,
+      });
     } else {
       $('#fd-t').html(text);
-      showOverlay($('#error-message')[loadingState]('loading'));
+      showOverlay(
+        $('#error-message')[loadingState ? 'addClass' : 'removeClass'](
+          'loading'
+        )
+      );
     }
   },
 
   commenceOTP: function(text, partial) {
     this.setScreen('otp');
-    $('#add-funds').removeClass('show');
+
+    this.otpView.updateScreen({
+      addFunds: false,
+    });
 
     invoke(
       function() {
@@ -3292,7 +3326,7 @@ Session.prototype = {
           Analytics.track('behav:otp:incorrect', {
             wallet: this.tab === 'wallet',
           });
-          askOTP(msg);
+          askOTP(this.otpView, msg);
         }
       };
     } else {
@@ -3304,7 +3338,7 @@ Session.prototype = {
           Analytics.track('behav:otp:incorrect', {
             wallet: self.tab === 'wallet',
           });
-          askOTP(msg);
+          askOTP(this.otpView, msg);
         }
       };
     }
@@ -3472,9 +3506,11 @@ Session.prototype = {
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
       if (this.screen === 'card') {
-        $('#otp-sec').html('Skip saving card');
+        this.otpView.updateScreen({
+          skipText: 'Skip saving card',
+        });
         this.commenceOTP(strings.otpsend);
-        debounceAskOTP();
+        debounceAskOTP(this.otpView);
         return this.customer.createOTP();
       } else {
         request.message = 'Verifying OTP...';
@@ -3559,7 +3595,10 @@ Session.prototype = {
       data.email
     ) {
       this.powerwallet = true;
-      $('#otp-sec').html('Resend OTP');
+      this.otpView.updateScreen({
+        skipText: 'Resend OTP', // TODO
+        allowSkip: false,
+      });
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
@@ -3568,11 +3607,15 @@ Session.prototype = {
     }
 
     if (wallet === 'freecharge') {
-      $('#otp-elem').addClass('fourdigit');
-      $('#otp').attr('maxlength', 4);
+      this.otpView.updateScreen({
+        fourdigit: true,
+        maxlength: 4,
+      });
     } else {
-      $('#otp-elem').removeClass('fourdigit');
-      $('#otp').attr('maxlength', 6);
+      this.otpView.updateScreen({
+        fourdigit: false,
+        maxlength: 6,
+      });
     }
 
     var payment = this.r.createPayment(data, request);
@@ -3628,7 +3671,9 @@ Session.prototype = {
 
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
-      this.r.on('payment.otp.required', debounceAskOTP);
+      this.r.on('payment.otp.required', function() {
+        debounceAskOTP(that.otpView);
+      });
       this.r.on(
         'payment.wallet.topup',
         bind(function() {
@@ -3654,9 +3699,12 @@ Session.prototype = {
               );
             }
           }
-          $('#form-otp').removeClass('loading');
-          $('#add-funds').addClass('show');
-          setOtpText(insufficient_text);
+
+          this.otpView.updateScreen({
+            loading: false,
+            addFunds: true,
+          });
+          setOtpText(this.otpView, insufficient_text);
         }, this)
       );
     } else if (data.method === 'upi' && !this.multiTpv) {

@@ -731,32 +731,7 @@ var upi_apps = _.upi_intents_data;
                   </div>
                 </div>
               `?`
-              <div id="form-otp" class="tab-content showable screen">
-                <div id='otp-prompt'></div>
-                <div id="add-funds" class="add-funds">
-                  <div id="add-funds-action" class="btn">Add Funds</div>
-
-                  <div class="text-center" style="margin-top: 20px;">
-                    <a id="choose-payment-method" class="link">Try different payment method</a>
-                  </div>
-                </div>
-
-                <div id="otp-section">
-                  <div id="otp-action" class="btn">Retry</div>
-                  <div id="otp-elem">
-                    <div class="help">Please enter the OTP</div>
-                    <input type="tel" class="input" name="otp" id="otp" maxlength="6" autocomplete="off" required>
-                  </div>
-                </div>
-
-                <div class="spin"><div></div></div>
-                <div class="spin spin2"><div></div></div>
-                <div id="otp-sec-outer">
-                  <a id="otp-resend" class="link">Resend OTP</a>
-                  `?!_.recurring`<a id="otp-sec" class="link">Skip Saved Cards</a>`?`
-                </div>
-              </div>
-
+              <div id="otp-screen-wrapper"></div>
               `?_.magic`
                 <div id="magic-wrapper">
                 </div>
