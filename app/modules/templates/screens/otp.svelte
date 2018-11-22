@@ -10,15 +10,15 @@
     class="add-funds"
     class:show="$screenData[SCREEN].addFunds"
   >
-    <div id="add-funds-action" class="btn" on:click="addFunds(event)">Add Funds</div>
+    <div id="add-funds-action" class="btn" on:click="invoke('addFunds', event)">Add Funds</div>
 
     <div class="text-center" style="margin-top: 20px;">
-      <a id="choose-payment-method" class="link" on:click="chooseMethod(event)">Try different payment method</a>
+      <a id="choose-payment-method" class="link" on:click="invoke('chooseMethod', event)">Try different payment method</a>
     </div>
   </div>
 
   <div id="otp-section">
-    <div id="otp-action" class="btn" on:click="retry(event)">Retry</div>
+    <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
     <div
       id="otp-elem"
       class:fourdigit="$screenData[SCREEN].fourdigit"
@@ -31,11 +31,11 @@
   <div class="spin"><div></div></div>
   <div class="spin spin2"><div></div></div>
   <div id="otp-sec-outer">
-    <a id="otp-resend" class="link" on:click="resend(event)">Resend OTP</a>
+    <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
     {#if $screenData[SCREEN].allowSkip}
-      <a id="otp-sec" class="link" on:click="secondary(event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
+      <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
     {:elseif $screenData[SCREEN].allowBack}
-      <a id="otp-sec" class="link" on:click="secondary(event)">Go Back</a>
+      <a id="otp-sec" class="link" on:click="invoke('secondary', event)">Go Back</a>
     {/if}
   </div>
 </div>
@@ -52,45 +52,17 @@
     },
 
     methods: {
-      chooseMethod: function (event) {
+      invoke: function (type, event) {
         const {
-          chooseMethod
-        } = this.get().on;
+          on
+        } = this.get();
 
-        chooseMethod(event);
+        const method = on[type];
+
+        if (method) {
+          method(event);
+        }
       },
-
-      addFunds: function (event) {
-        const {
-          addFunds
-        } = this.get().on;
-
-        addFunds(event);
-      },
-
-      resend: function (event) {
-        const {
-          resend
-        } = this.get().on;
-
-        resend(event);
-      },
-
-      retry: function (event) {
-        const {
-          retry
-        } = this.get().on;
-
-        retry(event);
-      },
-
-      secondary: function (event) {
-        const {
-          secondary
-        } = this.get().on;
-
-        secondary(event);
-      }
     }
   }
 </script>
