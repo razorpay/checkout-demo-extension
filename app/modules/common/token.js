@@ -14,10 +14,11 @@ export const transformForSavedCards = ({
   amount,
   emi,
   emiOptions,
+  filter = () => true,
   recurring,
   tokens,
 }) => {
-  tokens = _Arr.filter(_Obj.clone(tokens), token => token.card);
+  tokens = _Arr.filter(filter(_Obj.clone(tokens)), token => token.card);
 
   let { banks: allBanks, min: minimumAmount } = emiOptions;
 
