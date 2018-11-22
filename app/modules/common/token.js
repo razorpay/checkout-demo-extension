@@ -14,7 +14,7 @@ export const transformForSavedCards = ({
   amount,
   emi,
   emiOptions,
-  filter = () => true,
+  filter = _ => _,
   recurring,
   tokens,
 }) => {
