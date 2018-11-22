@@ -1,4 +1,5 @@
 import * as Card from 'common/card';
+import { AMEX_EMI_MIN } from 'common/constants';
 
 /**
  * @param {Object}
@@ -29,7 +30,7 @@ export const transformForSavedCards = ({
 
     if (networkCode === 'amex') {
       bank = 'AMEX';
-      minimumAmount = emiOptions.amex_min;
+      minimumAmount = AMEX_EMI_MIN;
     }
 
     card.networkCode = networkCode;
