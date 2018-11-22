@@ -46,6 +46,11 @@ RazorpayDefaults.readonly = {
   name: false,
 };
 
+RazorpayDefaults.hidden = {
+  contact: false,
+  email: false,
+};
+
 RazorpayDefaults.modal = {
   confirm_close: false,
   ondismiss: _Func.noop,

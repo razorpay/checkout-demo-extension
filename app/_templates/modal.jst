@@ -36,6 +36,9 @@ var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
 var prefill_name = attr(o('prefill.name'));
 
+var contact_hidden = o('hidden.contact') && _.optional.contact;
+var email_hidden = o('hidden.email') && _.optional.email;
+
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
 var name_readonly = o('readonly.name') && prefill_name;
@@ -129,13 +132,13 @@ var upi_apps = _.upi_intents_data;
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
                 <div class="pad partial-payment-block" id="pad-common">
-                  <div class="elem-wrap"><div class="elem elem-contact`?contact_readonly` readonly`?`">
+                  <div class="elem-wrap`?contact_hidden` invisible`?`"><div class="elem elem-contact`?contact_readonly` readonly`?`">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
                     <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
                   </div></div>
-                  <div class="elem-wrap" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
+                  <div class="elem-wrap`?email_hidden` invisible`?`" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
                     <label>Email`?_.optional.email` (Optional)`?`</label>
