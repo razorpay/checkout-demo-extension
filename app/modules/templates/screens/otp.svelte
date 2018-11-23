@@ -21,7 +21,7 @@
     <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
     <div
       id="otp-elem"
-      class:fourdigit="$screenData[SCREEN].fourdigit"
+      style="width: {inputWidth};"
     >
       <div class="help">Please enter the OTP</div>
       <input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="off" required>
@@ -43,6 +43,24 @@
 <script>
 
   export default {
+    computed: {
+      inputWidth: function ({ $screenData, SCREEN }) {
+        const {
+          maxlength
+        } = $screenData[SCREEN];
+
+        /**
+         * Base width (Mandatory): 19px
+         * Each dash: 14px
+         * Each space between two dashes: 10px
+         *
+         * There are maxlength-1 spaces and maxlength dashes.
+         */
+
+        return `${19 + (maxlength - 1) * 10 + maxlength * 14}px`;
+      }
+    },
+
     data: function () {
       return {
         SCREEN: 'otp',

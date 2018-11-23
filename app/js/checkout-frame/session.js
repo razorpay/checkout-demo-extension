@@ -2709,7 +2709,6 @@ Session.prototype = {
     this.toggleEMIRequiredAttrib(tab);
 
     this.otpView.updateScreen({
-      fourdigit: false,
       maxlength: 6,
     });
 
@@ -3608,12 +3607,10 @@ Session.prototype = {
 
     if (wallet === 'freecharge') {
       this.otpView.updateScreen({
-        fourdigit: true,
         maxlength: 4,
       });
     } else {
       this.otpView.updateScreen({
-        fourdigit: false,
         maxlength: 6,
       });
     }
