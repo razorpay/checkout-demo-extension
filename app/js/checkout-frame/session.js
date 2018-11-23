@@ -1478,8 +1478,8 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
-      this.customer.createOTP(function() {
-        debounceAskOTP(self.otpView);
+      this.customer.createOTP(function(message) {
+        debounceAskOTP(self.otpView, message);
       });
     }
   },
@@ -3297,7 +3297,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = gel('otp').value.replace(/\D/g, '');
+    var otp = discreet.Store.get().screenData.otp.otp;
 
     if (this.tab === 'wallet') {
       return this.r.submitOTP(otp);
@@ -3668,8 +3668,8 @@ Session.prototype = {
 
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
-      this.r.on('payment.otp.required', function() {
-        debounceAskOTP(that.otpView);
+      this.r.on('payment.otp.required', function(message) {
+        debounceAskOTP(that.otpView, message);
       });
       this.r.on(
         'payment.wallet.topup',

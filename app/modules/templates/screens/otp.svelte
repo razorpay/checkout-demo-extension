@@ -2,7 +2,6 @@
   id="form-otp"
   class="tab-content showable screen"
   class:loading="$screenData[SCREEN].loading"
-  class:active="$screenData[SCREEN].active"
 >
   <div id='otp-prompt'>{@html $screenData[SCREEN].text}</div>
 
@@ -20,30 +19,38 @@
   {/if}
 
   <div id="otp-section">
-    <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
+    {#if $screenData[SCREEN].action}
+      <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
+    {/if}
+
     <div
       id="otp-elem"
       style="width: {inputWidth};"
+
+      class:hidden="!showInput"
     >
       <div class="help">Please enter the OTP</div>
-      <input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="off" required>
+      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="off" required>
     </div>
   </div>
 
   <div class="spin"><div></div></div>
   <div class="spin spin2"><div></div></div>
-  <div id="otp-sec-outer">
-    <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
-    {#if $screenData[SCREEN].allowSkip}
-      <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
-    {:elseif $screenData[SCREEN].allowBack}
-      <a id="otp-sec" class="link" on:click="invoke('secondary', event)">Go Back</a>
-    {/if}
-  </div>
+    <div
+      id="otp-sec-outer"
+
+      class:hidden="!showInput"
+    >
+      <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
+      {#if $screenData[SCREEN].allowSkip}
+        <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
+      {:elseif $screenData[SCREEN].allowBack}
+        <a id="otp-sec" class="link" on:click="invoke('secondary', event)">Go Back</a>
+      {/if}
+    </div>
 </div>
 
 <script>
-
   export default {
     computed: {
       inputWidth: function ({ $screenData, SCREEN }) {
@@ -60,7 +67,16 @@
          */
 
         return `${19 + (maxlength - 1) * 10 + maxlength * 14}px`;
-      }
+      },
+
+      showInput: function ({ $screenData, SCREEN }) {
+        const {
+          action,
+          loading
+        } = $screenData[SCREEN];
+
+        return !(action || loading);
+      },
     },
 
     data: function () {
@@ -83,6 +99,6 @@
           method(event);
         }
       },
-    }
+    },
   }
 </script>
