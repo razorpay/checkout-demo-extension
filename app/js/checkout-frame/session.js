@@ -1206,6 +1206,14 @@ Session.prototype = {
         target: gel('emi-options-wrapper'),
         providers: [
           {
+            arrowText: 'Access Cards',
+            data: {
+              code: 'cards',
+            },
+            icon: '',
+            title: 'EMI on Cards',
+          },
+          {
             data: {
               code: 'zestmoney',
             },
