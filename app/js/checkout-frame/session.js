@@ -42,9 +42,6 @@ var strings = {
 
 var fontTimeout;
 
-// Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
-var defaultAuthTypeRadioVal = '3ds';
-
 /* this === session */
 function handleRelayFn(relayObj) {
   var self = this;
@@ -2014,25 +2011,6 @@ Session.prototype = {
     });
     this.click('#fd-hide', this.hideErrorMessage);
 
-    // Debit + PIN flow change.
-    this.on('change', '#body', 'auth_type_radio', function(e) {
-      var target = e.target;
-      if (!target) {
-        return;
-      }
-
-      // Check for name.
-      if (target.name && target.name.indexOf('auth_type') === 0) {
-        Analytics.track('atmpin:flows:change', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            default_auth_type: defaultAuthTypeRadioVal,
-            flow: target.value || null,
-          },
-        });
-      }
-    });
-
     // Copy to clipboard text.
     this.on('click', '#body', 'copytoclipboard--text', function(e) {
       selectElementText(e.target);
@@ -2790,7 +2768,7 @@ Session.prototype = {
       Analytics.track('atmpin:saved_card:select', {
         type: AnalyticsTypes.BEHAV,
         data: {
-          default_auth_type: defaultAuthTypeRadioVal,
+          default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
         },
       });
     }
@@ -3790,7 +3768,7 @@ Session.prototype = {
         data: {
           iin: iin,
           prefilled_card: isPrefilledCardNumber || null,
-          default_auth_type: defaultAuthTypeRadioVal,
+          default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
         },
       });
 
@@ -3805,7 +3783,7 @@ Session.prototype = {
           data: {
             iin: iin,
             prefilled_card: isPrefilledCardNumber || null,
-            default_auth_type: defaultAuthTypeRadioVal,
+            default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
           },
         });
         showFlowRadioButtons(true);

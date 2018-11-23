@@ -1,8 +1,7 @@
-<div class={containerClass}>
+<div class={classes}>
   <input
     type="radio"
     {checked}
-    class={inputClass}
     {id}
     {name}
     {value}
@@ -20,17 +19,15 @@
     data: function () {
       return {
         checked: false,
-        containerClass: '',
+        classes: '',
         id: '',
-        inputClass: '',
         name: '',
         value: '',
       };
     },
 
     computed: {
-      containerClass: ({ containerClass }) => `input-radio ${containerClass}`,
-      inputClass: ({ inputClass }) => ``
+      classes: ({ classes }) => `input-radio ${classes}`,
     }
   }
 </script>

@@ -38,6 +38,8 @@
         label="Pay using <strong>OTP / Password </strong>"
         name={`auth_type-${card.token}`}
         value="c3ds"
+
+        on:change="trackAtmRadio(event)"
       />
       <Radio
         contaierClass="flow"
@@ -46,12 +48,18 @@
         label="Pay using <strong>ATM PIN</strong>"
         name={`auth_type-${card.token}`}
         value="pin"
+
+        on:change="trackAtmRadio(event)"
       />
     </div>
   {/if}
 </div>
 
 <script>
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
+
   export default {
     components: {
       Radio: 'templates/views/ui/Radio.svelte',
@@ -93,6 +101,18 @@
       },
 
       cardEntity: ({ card }) => card.card,
+    },
+
+    methods: {
+      trackAtmRadio: function (event) {
+        Analytics.track('atmpin:flows:change', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            default_auth_type: DEFAULT_AUTH_TYPE_RADIO,
+            flow: event.target.value || null,
+          },
+        });
+      }
     }
   }
 </script>
