@@ -9,7 +9,7 @@ const cardProvider = {
   title: 'EMI on Cards',
 };
 
-export default function cardlessEmiView({ on, providers, target }) {
+export default function emiOptionsView({ on, providers, target }) {
   this.providers = [cardProvider].concat(providers);
   this.target = target;
   this.on = on;
@@ -17,7 +17,7 @@ export default function cardlessEmiView({ on, providers, target }) {
   this.render();
 }
 
-cardlessEmiView.prototype = {
+emiOptionsView.prototype = {
   render() {
     this.view = new CardlessEMIScreen({
       target: this.target,

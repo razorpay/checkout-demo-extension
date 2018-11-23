@@ -1202,8 +1202,8 @@ Session.prototype = {
 
   setCardlessEmi: function() {
     if (this.methods.cardless_emi) {
-      this.cardlessEmiView = new discreet.cardlessEmiView({
-        target: gel('cardless_emi-wrapper'),
+      this.emiOptionsView = new discreet.emiOptionsView({
+        target: gel('emi-options-wrapper'),
         providers: [
           {
             data: {
