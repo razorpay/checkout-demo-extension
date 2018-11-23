@@ -83,20 +83,16 @@
 }
 
 .add-funds {
-  display: none;
   text-align: center;
 
   .btn {
     display: inline-block;
   }
 
-  &.show {
-    display: block;
-    & + #otp-section {
-      display: none;
-    }
-    & ~ #otp-sec-outer {
-      display: none;
-    }
+  & + #otp-section {
+    display: none;
+  }
+  & ~ #otp-sec-outer {
+    display: none;
   }
 }

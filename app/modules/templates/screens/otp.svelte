@@ -5,17 +5,19 @@
   class:active="$screenData[SCREEN].active"
 >
   <div id='otp-prompt'>{@html $screenData[SCREEN].text}</div>
-  <div
-    id="add-funds"
-    class="add-funds"
-    class:show="$screenData[SCREEN].addFunds"
-  >
-    <div id="add-funds-action" class="btn" on:click="invoke('addFunds', event)">Add Funds</div>
 
-    <div class="text-center" style="margin-top: 20px;">
-      <a id="choose-payment-method" class="link" on:click="invoke('chooseMethod', event)">Try different payment method</a>
+  {#if $screenData[SCREEN].addFunds}
+    <div
+      id="add-funds"
+      class="add-funds"
+    >
+      <div id="add-funds-action" class="btn" on:click="invoke('addFunds', event)">Add Funds</div>
+
+      <div class="text-center" style="margin-top: 20px;">
+        <a id="choose-payment-method" class="link" on:click="invoke('chooseMethod', event)">Try different payment method</a>
+      </div>
     </div>
-  </div>
+  {/if}
 
   <div id="otp-section">
     <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
