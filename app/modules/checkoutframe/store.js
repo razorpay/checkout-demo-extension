@@ -6,6 +6,7 @@ import { Store } from 'svelte/store.js';
  */
 const SCREENS = {
   OTP: 'otp',
+  SAVED_CARDS: 'saved_cards',
 };
 
 /**

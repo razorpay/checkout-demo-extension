@@ -2622,6 +2622,11 @@ Session.prototype = {
       }
       this.customer = getCustomer(contact);
       if (this.customer.logged && !this.local) {
+        // Save tokens
+        if (this.customer.tokens && this.customer.tokens.items) {
+          this.transformAndSaveTokens(this.customer.tokens.items);
+        }
+
         $('#top-right').addClass('logged');
       }
       $('#user').html(contact);
@@ -2797,6 +2802,22 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Transform tokens and save them in Store.
+   *
+   * @param {Array} tokens
+   */
+  transformAndSaveTokens: function(tokens) {
+    StoreHelpers.setCustomerData({
+      tokens: Token.transform(tokens, {
+        amount: this.get('amount'),
+        emi: this.methods.emi,
+        emiOptions: this.emi_options,
+        recurring: this.recurring,
+      }),
+    });
+  },
+
   setSavedCards: function(providedTokens) {
     var customer = this.customer;
     var tokens =
@@ -2838,14 +2859,7 @@ Session.prototype = {
         }
 
         if (!this.savedCardsView) {
-          StoreHelpers.setCustomerData({
-            tokens: Token.transform(tokensList.items, {
-              amount: this.get('amount'),
-              emi: this.methods.emi,
-              emiOptions: this.emi_options,
-              recurring: this.recurring,
-            }),
-          });
+          this.transformAndSaveTokens(tokensList.items);
 
           this.savedCardsView = new discreet.SavedCardsView({
             target: gel('saved-cards-container'),

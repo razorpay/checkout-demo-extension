@@ -1,6 +1,6 @@
 {#each cards as card}
   <SavedCard
-    {card}
+    {...card}
   />
 {/each}
 

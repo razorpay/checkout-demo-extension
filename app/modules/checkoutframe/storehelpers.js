@@ -29,13 +29,41 @@ export const getCustomerData = () => Store.get().Customer;
  * @return {Object} Token
  */
 export const addTokenData = (tokenId, data) => {
-  const { tokens = [] } = getCustomerData();
+  const { tokens } = getCustomerData();
+
+  if (!tokens) {
+    return;
+  }
 
   let token = _Arr.find(tokens, token => token.id === tokenId);
 
-  if (token) {
-    _Obj.loop(data, (val, key) => _Obj.setProp(token, key, val));
+  if (!token) {
+    return;
   }
 
+  if (token) {
+    _Obj.extend(token, data);
+  }
+
+  const Customer = getCustomerData();
+  Customer.tokens = tokens;
+  Store.set({
+    Customer,
+  });
+
   return token;
+};
+
+export const getScreenData = screen => Store.get().screenData[screen];
+
+export const setScreenData = (screen, data) => {
+  const { screenData } = Store.get();
+
+  screenData[screen] = _Obj.extend(screenData[screen], data);
+
+  Store.set({
+    screenData,
+  });
+
+  return screenData[screen];
 };

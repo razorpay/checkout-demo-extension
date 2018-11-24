@@ -1,16 +1,23 @@
 <div
   tabIndex="0"
   class="saved-card left-card"
-  class:checked
   {...attributes}
 >
   <div class="help up">EMI is not available on this card</div>
-  <div class="cardtype" cardtype={cardEntity.networkCode}></div>
+  <div class="cardtype" cardtype={card.networkCode}></div>
   <div class="saved-inner">
-    <span class="saved-number">{cardEntity.last4}</span>
-    <input class="saved-cvv cvv-input" type="tel" placeholder="CVV" inputmode="numeric" maxlength={card.cvvDigits} required pattern={`[0-9]{${card.cvvDigits}}`} />
-    {#if card.plans}
-      <div class="elem selector elem-savedcards-emi" data-bank={cardEntity.issuer} data-default="Select an EMI Plan" tabindex="0">
+    <span class="saved-number">{card.last4}</span>
+    <input
+      class="saved-cvv cvv-input"
+      inputmode="numeric"
+      maxlength={cvvDigits}
+      pattern={`[0-9]{${cvvDigits}}`}
+      placeholder="CVV"
+      required
+      type="tel"
+    />
+    {#if plans}
+      <div class="elem selector elem-savedcards-emi" data-bank={issuer} data-default="Select an EMI Plan" tabindex="0">
         <div class="help up">Please select the EMI duration</div>
         <i class="select-arrow">&#xe601;</i>
         <div class="overflow-parent">
@@ -20,33 +27,33 @@
       </div>
     {/if}
 
-    {#if cardEntity.networkCode === 'maestro'}
-      <label for={`nocvv-${card.token}`} class="maestro-cvv">
-        <input class="nocvv-checkbox" type="checkbox" id={`nocvv-${card.token}`} />
+    {#if card.networkCode === 'maestro'}
+      <label for={`nocvv-${token}`} class="maestro-cvv">
+        <input class="nocvv-checkbox" type="checkbox" id={`nocvv-${token}`} />
         <span class="checkout"></span>
         My Maestro Card doesn't have Expiry/CVV
       </label>
     {/if}
   </div>
-  {#if card.debitPin}
+  {#if debitPin}
     <div class="elem-wrap flow-selection-container">
       <Radio
         checked={true}
         containerClass="flow"
-        id={`flow-3ds-${card.token}`}
+        id={`flow-3ds-${token}`}
         inputClass="auth_type_radio"
         label="Pay using <strong>OTP / Password </strong>"
-        name={`auth_type-${card.token}`}
+        name={`auth_type-${token}`}
         value="c3ds"
 
         on:change="trackAtmRadio(event)"
       />
       <Radio
         contaierClass="flow"
-        id={`flow-pin-${card.token}`}
+        id={`flow-pin-${token}`}
         inputClass="auth_type_radio"
         label="Pay using <strong>ATM PIN</strong>"
-        name={`auth_type-${card.token}`}
+        name={`auth_type-${token}`}
         value="pin"
 
         on:change="trackAtmRadio(event)"
@@ -66,19 +73,11 @@
     },
 
     computed: {
-      attributes: ({ card }) => {
-        const {
-          card: cardEntity,
-          debitPin,
-          network,
-          plans,
-          token,
-        } = card;
-
+      attributes: ({ card, debitPin, network, plans, token }) => {
         const {
           issuer: bank,
           networkCode,
-        } = cardEntity;
+        } = card;
 
         const attribs = {
           token,
@@ -99,8 +98,6 @@
 
         return attribs;
       },
-
-      cardEntity: ({ card }) => card.card,
     },
 
     methods: {
@@ -112,7 +109,7 @@
             flow: event.target.value || null,
           },
         });
-      }
+      },
     }
   }
 </script>
