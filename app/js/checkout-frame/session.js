@@ -1512,7 +1512,6 @@ Session.prototype = {
       loading: true,
       addFunds: false,
     });
-    $('#form-otp').css('display', 'block');
     this.r.topupWallet();
   },
 
