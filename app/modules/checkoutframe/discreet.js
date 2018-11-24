@@ -16,6 +16,7 @@ import { androidBrowser } from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
+import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
@@ -32,6 +33,7 @@ import * as Checkout from 'checkoutframe/index';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+import Store from 'checkoutframe/store';
 
 export default {
   RazorpayConfig,
@@ -65,6 +67,7 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+  Store,
 
   getQueryParams: _.getQueryParams,
 
@@ -76,6 +79,7 @@ export default {
   emandateView,
   SavedCardsView,
 
+  otpView,
   Curtain,
   OptionsList,
   commonBanks,
