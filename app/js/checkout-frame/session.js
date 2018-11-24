@@ -2838,15 +2838,16 @@ Session.prototype = {
         }
 
         if (!this.savedCardsView) {
-          this.savedCardsView = new discreet.SavedCardsView({
-            cards: Token.transformForSavedCards({
+          StoreHelpers.setCustomerData({
+            tokens: Token.transform(tokensList.items, {
               amount: this.get('amount'),
               emi: this.methods.emi,
               emiOptions: this.emi_options,
               recurring: this.recurring,
-              tokens: tokensList.items,
             }),
+          });
 
+          this.savedCardsView = new discreet.SavedCardsView({
             target: gel('saved-cards-container'),
           });
         }

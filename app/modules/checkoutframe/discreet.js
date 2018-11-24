@@ -34,6 +34,7 @@ import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutframe/store';
+import * as StoreHelpers from 'checkoutframe/storehelpers';
 
 export default {
   RazorpayConfig,
@@ -68,6 +69,7 @@ export default {
   Checkout,
   Bridge,
   Store,
+  StoreHelpers,
 
   getQueryParams: _.getQueryParams,
 

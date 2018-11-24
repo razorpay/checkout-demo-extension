@@ -25,6 +25,8 @@ var SessionManager = discreet.SessionManager;
 var Checkout = discreet.Checkout;
 var Bridge = discreet.Bridge;
 var Curtain = discreet.Curtain;
+var Store = discreet.Store;
+var StoreHelpers = discreet.StoreHelpers;
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
   if (isString(url) && url.indexOf('https://checkout.razorpay.com')) {
