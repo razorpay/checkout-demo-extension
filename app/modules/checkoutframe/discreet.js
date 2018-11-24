@@ -15,6 +15,7 @@ import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import emandateView from 'checkoutframe/emandate';
+import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
@@ -73,6 +74,7 @@ export default {
 
   emiView,
   emandateView,
+  otpView,
   Curtain,
   OptionsList,
   commonBanks,
