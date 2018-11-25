@@ -1,6 +1,8 @@
 {#each cards as card}
   <SavedCard
     {...card}
+
+    on:viewPlans="onViewPlans(event)"
   />
 {/each}
 
@@ -10,22 +12,25 @@
 
   export default {
     computed: {
-      cards: ({ $Customer }) => {
-        const {
-          tokens
-        } = $Customer;
-
-        if (!tokens) {
-          return [];
-        }
-
-        // TODO: Also check for current payment method.
-        return tokens.filter(token => token.method === 'card');
+      cards: ({ cards }) => {
+        return cards.filter(token => token.method === 'card');
       },
     },
 
     components: {
       SavedCard,
+    },
+
+    methods: {
+      onViewPlans: function (event) {
+        const {
+          on = {}
+        } = this.get();
+
+        if (on.viewPlans) {
+          on.viewPlans(event);
+        }
+      }
     },
   }
 </script>
