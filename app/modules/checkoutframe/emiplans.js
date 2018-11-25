@@ -13,7 +13,14 @@ export default function emiPlansView(session) {
 }
 
 emiPlansView.prototype = {
-  setPlans: function({ plans, onSelect, onBack, onViewAll, onPayWithoutEmi }) {
+  setPlans: function({
+    plans,
+    onSelect,
+    onBack,
+    actions = {},
+    onViewAll,
+    onPayWithoutEmi,
+  }) {
     const EMI_Plans_Wrapper = _Doc.querySelector(TARGET_QS);
 
     deleteContentsOfElem(EMI_Plans_Wrapper);
@@ -21,6 +28,7 @@ emiPlansView.prototype = {
     const on = {
       select: plan => {
         this.selectedPlan = plan;
+        _Doc.querySelector('#body') |> _El.addClass('sub');
       },
       viewAll: onViewAll,
       payWithoutEmi: onPayWithoutEmi,
@@ -32,6 +40,7 @@ emiPlansView.prototype = {
       data: {
         on,
         plans,
+        actions,
       },
     });
 
