@@ -2808,19 +2808,9 @@ Session.prototype = {
 
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
-    var cardtype = $savedCard.$('.cardtype').attr('cardtype');
-    var bank = $savedCard.attr('bank');
-    var plans = (this.emi_options.banks[bank] || {}).plans;
-
-    var $dropdown = $savedCard.$('.elem-savedcards-emi');
-    var $emiDuration = $dropdown.$('input.emi_duration');
 
     if (this.offers && !this.offers.offerSelectedByDrawer) {
       this.offers.removeOffer();
-    }
-
-    if ($emiDuration[0]) {
-      $emiDuration.val('');
     }
 
     if ($savedCard.$('.flow-selection-container')[0]) {
@@ -3749,7 +3739,7 @@ Session.prototype = {
             /**
              * For when EMI duration is missing.
              */
-            if (!this.emiPlansForNewCard) {
+            if (!data.token && !this.emiPlansForNewCard) {
               this.shake();
               return $('#card_number').focus();
             }
