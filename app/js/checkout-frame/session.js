@@ -2044,7 +2044,6 @@ Session.prototype = {
         } else if ($target.$('.emi-pay-without:not(.hidden)')[0]) {
           self.setScreen('card');
           self.switchTab('card');
-          self.toggleSavedCards(false);
         } else if ($target.$('.emi-plan-unavailable:not(.hidden)')[0]) {
           self.setScreen('card');
           self.switchTab('card');
@@ -3092,6 +3091,28 @@ Session.prototype = {
           });
 
           this.savedCardsRendered = true;
+
+          var totalSavedCards = this.transformedTokens.filter(function(token) {
+            return token.method === 'card';
+          }).length;
+
+          if (totalSavedCards) {
+            var selectorsForSavedCardText = [
+              '#form-card .saved-card-pay-without-emi',
+              '#add-card-container .emi-pay-without',
+            ];
+            each(selectorsForSavedCardText, function(index, selector) {
+              var stripEl = $(selector);
+              if (stripEl[0]) {
+                var emiTextEl = stripEl.$('.emi-plans-text');
+                var existingEmiText = emiTextEl.html();
+
+                emiTextEl.html(
+                  existingEmiText + ' (' + totalSavedCards + ' cards available)'
+                );
+              }
+            });
+          }
         }
       }
     }
