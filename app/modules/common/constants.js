@@ -53,6 +53,7 @@ export const TAB_TITLES = {
   ecod: 'Pay by Link',
   emandate: 'Bank Account',
   emi: 'EMI',
+  emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
   upi: 'UPI',
   wallet: 'Wallet',

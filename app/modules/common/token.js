@@ -1,45 +1,66 @@
 import * as Card from 'common/card';
 import { AMEX_EMI_MIN } from 'common/constants';
 
-/**
- * @param {Object}
- *  @prop {Number} amount
- *  @prop {Boolean} emi Whether or not EMI method is enabled.
- *  @prop {Object} emiOptions emi_options from preferences
- *  @prop {Array<Object>} tokens
- *
- * @return {Array<Object>}
- */
-export const transformForSavedCards = ({
-  amount,
-  emi,
-  emiOptions,
-  filter = _ => _,
-  recurring,
-  tokens,
-}) => {
-  tokens = _Arr.filter(filter(_Obj.clone(tokens)), token => token.card);
-
-  let { banks: allBanks, min: minimumAmount } = emiOptions;
-
-  _Arr.loop(tokens, item => {
-    const { card } = item;
-
+const transformerByMethod = {
+  /**
+   * @param {Object} token
+   * @param {Object} data
+   *  @prop {Number} amount
+   *  @prop {Boolean} emi
+   *  @prop {Object} emiOptions
+   *  @prop {Boolean} recurring
+   *
+   * @return {Object}
+   */
+  card: (token, { amount, emi, emiOptions, recurring }) => {
+    const { card } = token;
+    let { banks: allBanks, min: minimumAmount } = emiOptions;
     let { flows = [], issuer: bank, network } = card;
-
     let networkCode = Card.findCodeByNetworkName(network);
 
     if (networkCode === 'amex') {
       bank = 'AMEX';
       minimumAmount = AMEX_EMI_MIN;
     }
-
     card.networkCode = networkCode;
 
-    item.plans =
-      bank && emi && card.emi && amount > minimumAmount && allBanks[bank];
-    item.cvvDigits = networkCode === 'amex' ? 4 : 3;
-    item.debitPin = !recurring && Boolean(flows.pin);
+    token.plans =
+      bank &&
+      emi &&
+      card.emi &&
+      amount > minimumAmount &&
+      allBanks[bank] &&
+      allBanks[bank].plans;
+
+    token.cvv = '';
+    token.cvvDigits = networkCode === 'amex' ? 4 : 3;
+
+    token.debitPin = !recurring && Boolean(flows.pin);
+
+    return token;
+  },
+};
+
+/**
+ * @param {Array} tokens
+ * @param {Object} data
+ *  @prop {Number} amount
+ *  @prop {Boolean} emi
+ *  @prop {Object} emiOptions
+ *  @prop {Boolean} recurring
+ *
+ * @return {Array}
+ */
+export const transform = (tokens, { amount, emi, emiOptions, recurring }) => {
+  _Arr.loop(tokens, token => {
+    if (token.method && transformerByMethod[token.method]) {
+      token = transformerByMethod[token.method](token, {
+        amount,
+        emi,
+        emiOptions,
+        recurring,
+      });
+    }
   });
 
   return tokens;

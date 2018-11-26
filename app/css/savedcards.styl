@@ -77,7 +77,7 @@ $cardpl = 70px;
       z-index: 2;
       pointer-events: all;
 
-      &[emi].checked, &[maestro].checked {
+      &[maestro].checked {
         max-height: $cardHeights['open'];
 
         .elem-savedcards-emi {
@@ -110,7 +110,8 @@ $cardpl = 70px;
         }
       }
     }
-    .saved-inner{
+    .saved-inner,
+    .saved-outer {
       opacity: 1;
     }
     .cardtype {
@@ -136,16 +137,6 @@ $cardpl = 70px;
     #saved-cards-container,
     #show-saved-cards {
       display: block;
-    }
-  }
-}
-
-#body[tab=emi] #form-card.saved-cards {
-  .saved-card {
-    &:not([emi]) {
-      .saved-inner, .cardtype {
-        opacity: 0.3;
-      }
     }
   }
 }
@@ -403,7 +394,47 @@ $cardpl = 70px;
   background-position: 80%;
 }
 
+// New styles for Svelte component begin here
+
 .saved-cards
   #add-card-container
     input
       display: none !important
+
+.saved-card
+  padding: 0 24px;
+
+  .saved-inner
+    padding-left: 48px;
+
+  .saved-outer
+    padding: 12px 0;
+    opacity: 0;
+    border-top 1px solid #E6E7E8;
+
+#body[tab=emi]
+  .saved-card
+    &:not([emi])
+      display: none;
+
+    &[emi]
+      &.checked.emi-selected
+        max-height: $cardHeights['open']
+
+    .emi-plan-unselected
+      display: none;
+
+  #form-card
+    &.no-emi-cards
+      #show-saved-cards,
+      #saved-cards-container
+        display: none;
+
+#body[tab=card]
+  .saved-card
+    &[emi]
+      &.checked
+        max-height: $cardHeights['open']
+
+    .emi-plan-selected
+      display: none;

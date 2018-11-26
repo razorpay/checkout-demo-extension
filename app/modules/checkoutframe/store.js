@@ -6,6 +6,7 @@ import { Store } from 'svelte/store.js';
  */
 const SCREENS = {
   OTP: 'otp',
+  SAVED_CARDS: 'saved_cards',
 };
 
 /**
@@ -22,12 +23,15 @@ const DEFAULT_SCREEN_DATA = {
 /**
  * Default data for the store.
  */
-const defaultStoreData = {};
+const defaultStoreData = {
+  screenData: {},
+
+  Customer: {},
+};
 
 /**
  * Add default data for each screen.
  */
-defaultStoreData.screenData = {};
 _Obj.loop(SCREENS, screen => {
   defaultStoreData.screenData[screen] = DEFAULT_SCREEN_DATA[screen] || {};
 });

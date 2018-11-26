@@ -1,14 +1,18 @@
 import card from './card';
+import emi from './emi';
 import netbanking from './netbanking';
 import upi from './upi';
 import wallet from './wallet';
 
-const availPaymentMethods = ['card', 'netbanking', 'upi', 'wallet'];
+const availPaymentMethods = ['card', 'emi', 'netbanking', 'upi', 'wallet'];
 
 function getIconFn(iconName) {
   switch (iconName) {
     case 'card':
       return card;
+
+    case 'emi':
+      return emi;
 
     case 'netbanking':
       return netbanking;

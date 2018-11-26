@@ -124,3 +124,65 @@
   }
 }
 
+.emi-plans-trigger
+  cursor: pointer;
+
+.emi-plans-info-container
+  position: relative;
+
+  .emi-plans-text
+    color: #757575;
+    font-size: 14px;
+    line-height: 16px;
+    padding-right: 110px;
+
+    &.no-action
+      padding-right: 12px;
+
+  .emi-plans-action
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 14px;
+    line-height: 16px;
+    padding-right 12px;
+
+    &:after
+      content: '\e604';
+      transform: rotate(180deg);
+      font-size: 8px;
+      position: absolute;
+      top: 1px;
+      right: 0;
+
+#add-card-container
+  .emi-plans-info-container
+    background-color: transparent;
+
+    margin: 18px -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+
+    &:not(.details-visible)
+      display: none;
+
+    .emi-plans-action
+      top: 12px;
+      right: 24px;
+
+#form-card
+  .saved-card-pay-without-emi
+    padding: 12px 24px;
+    margin-top: 56px;
+    margin-bottom: 32px;
+
+    .emi-plans-action
+        top: 12px;
+        right: 24px;
+
+#body[tab=card]
+  .saved-card-pay-without-emi
+    display: none;
+
+  #view-emi-plans
+    display: none;

@@ -1,21 +1,27 @@
+import Store from 'checkoutframe/store';
 import SavedCardsScreen from 'templates/screens/savedcards.svelte';
 
-export default function setView(params) {
-  params.data = _Obj.clone(params.data);
+const TARGET_QS = '#saved-cards-container';
 
-  _Obj.extend(this, params);
+const deleteContentsOfElem = node => {
+  while (node.hasChildNodes()) {
+    node.removeChild(node.firstChild);
+  }
+};
 
-  this.render();
+export default function savedCardsView(session) {
+  this.session = session;
 }
 
-setView.prototype = {
-  render() {
-    this.view = new SavedCardsScreen({
-      target: this.target,
+savedCardsView.prototype = {
+  setCards: function(data = {}) {
+    const target = _Doc.querySelector(TARGET_QS);
 
-      data: {
-        cards: this.cards,
-      },
+    deleteContentsOfElem(target);
+
+    new SavedCardsScreen({
+      target,
+      data: data,
     });
   },
 };
