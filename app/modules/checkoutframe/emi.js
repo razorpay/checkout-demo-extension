@@ -100,6 +100,11 @@ emiView.prototype = {
       },
       true
     );
+
+    this.on('click', '#view-emi-plans', function() {
+      // TODO: Update showOverlay once session.js is refactored.
+      showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
+    });
   },
 
   unbind: function() {
