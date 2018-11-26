@@ -32,7 +32,6 @@ const transformerByMethod = {
       allBanks[bank] &&
       allBanks[bank].plans;
 
-    token.cvv = '';
     token.cvvDigits = networkCode === 'amex' ? 4 : 3;
 
     token.debitPin = !recurring && Boolean(flows.pin);
