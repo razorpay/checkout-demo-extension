@@ -61,13 +61,7 @@
           plans
         } = this.get();
 
-        const {
-          select
-        } = on;
-
-        if (select) {
-          select(plans[index]);
-        }
+        this.invoke('select', plans[index]);
       },
 
       invoke: function (type, event) {

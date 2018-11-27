@@ -2969,43 +2969,47 @@ Session.prototype = {
 
         self.emiPlansView.setPlans({
           plans: emiPlans,
-          onBack: bind(function() {
-            self.setScreen('card');
-            return true;
-          }),
-          onSelect: function(value) {
-            var plan = plans[value];
-            var text = getEmiText(amount, plan).short || '';
+          on: {
+            back: bind(function() {
+              self.setScreen('card');
 
-            self.processOffersOnEmiPlanSelection(plan);
+              return true;
+            }),
 
-            $('#emi_duration').val(value);
-            $trigger.$(
-              '.emi-plan-selected .emi-plans-text'
-            )[0].innerHTML = text;
+            payWithoutEmi: function() {
+              self.processOffersOnEmiPlanSelection();
 
-            self.switchTab('emi');
-            self.toggleSavedCards(false);
+              $('#emi_duration').val('');
 
-            self.preSubmit();
+              self.switchTab('card');
+              self.setScreen('card');
+              self.toggleSavedCards(false);
+            },
+
+            select: function(value) {
+              var plan = plans[value];
+              var text = getEmiText(amount, plan).short || '';
+
+              self.processOffersOnEmiPlanSelection(plan);
+
+              $('#emi_duration').val(value);
+              $trigger.$(
+                '.emi-plan-selected .emi-plans-text'
+              )[0].innerHTML = text;
+
+              self.switchTab('emi');
+              self.toggleSavedCards(false);
+
+              self.preSubmit();
+            },
+
+            viewAll: viewAllPlans,
           },
 
           actions: {
             viewAll: true,
             payWithoutEmi: self.methods.card,
           },
-
-          onPayWithoutEmi: function() {
-            self.processOffersOnEmiPlanSelection();
-
-            $('#emi_duration').val('');
-
-            self.switchTab('card');
-            self.setScreen('card');
-            self.toggleSavedCards(false);
-          },
-
-          onViewAll: viewAllPlans,
         });
 
         self.setScreen('emiplans');
@@ -3025,46 +3029,50 @@ Session.prototype = {
 
         self.emiPlansView.setPlans({
           plans: emiPlans,
-          onBack: function() {
-            self.showCards();
-            return true;
-          },
-          onSelect: function(value) {
-            var plan = plans[value];
-            var text = getEmiText(amount, plan).short || '';
+          on: {
+            back: function() {
+              self.showCards();
 
-            self.processOffersOnEmiPlanSelection(plan);
+              return true;
+            },
 
-            $trigger.$('.emi_duration').val(value);
-            $trigger.$(
-              '.emi-plan-selected .emi-plans-text'
-            )[0].innerHTML = text;
-            toggleEmiPlanDetails($trigger.parent().parent(), true);
+            payWithoutEmi: function() {
+              self.processOffersOnEmiPlanSelection();
 
-            self.switchTab('emi');
-            self.setScreen('card');
-            self.toggleSavedCards(true);
+              $trigger.$('.emi_duration').val('');
+              toggleEmiPlanDetails($trigger.parent().parent(), false);
 
-            self.preSubmit();
+              self.switchTab('card');
+              self.setScreen('card');
+              self.toggleSavedCards(true);
+            },
+
+            select: function(value) {
+              var plan = plans[value];
+              var text = getEmiText(amount, plan).short || '';
+
+              self.processOffersOnEmiPlanSelection(plan);
+
+              $trigger.$('.emi_duration').val(value);
+              $trigger.$(
+                '.emi-plan-selected .emi-plans-text'
+              )[0].innerHTML = text;
+              toggleEmiPlanDetails($trigger.parent().parent(), true);
+
+              self.switchTab('emi');
+              self.setScreen('card');
+              self.toggleSavedCards(true);
+
+              self.preSubmit();
+            },
+
+            viewAll: viewAllPlans,
           },
 
           actions: {
             viewAll: true,
             payWithoutEmi: self.methods.card,
           },
-
-          onPayWithoutEmi: function() {
-            self.processOffersOnEmiPlanSelection();
-
-            $trigger.$('.emi_duration').val('');
-            toggleEmiPlanDetails($trigger.parent().parent(), false);
-
-            self.switchTab('card');
-            self.setScreen('card');
-            self.toggleSavedCards(true);
-          },
-
-          onViewAll: viewAllPlans,
         });
 
         self.setScreen('emiplans');
@@ -3784,12 +3792,21 @@ Session.prototype = {
             /**
              * For when EMI duration is missing.
              */
+
+            /**
+             * If this is a new card and no EMI plans are available,
+             * this is a validation error.
+             */
             if (!data.token && !this.emiPlansForNewCard) {
               this.shake();
               return $('#card_number').focus();
             }
 
             if (!data.emi_duration) {
+              /**
+               * If this is a saved ard and no EMI duration is selected,
+               * show the EMI plans.
+               */
               if (data.token) {
                 this.showEmiPlans('saved')({
                   currentTarget: $(
@@ -3797,6 +3814,10 @@ Session.prototype = {
                   )[0],
                 });
               } else {
+              /**
+               * If this is a new card and no EMI duration is selected,
+               * show the EMI plans.
+               */
                 this.showEmiPlans('new')({
                   delegateTarget: $(
                     '#add-card-container .emi-plans-trigger'
@@ -3807,8 +3828,10 @@ Session.prototype = {
               return;
             }
 
+            // Set method explicitly.
             data.method = 'emi';
           } else {
+            // This is no the EMI tab, delete duration if it exists.
             delete data.emi_duration;
           }
         }
