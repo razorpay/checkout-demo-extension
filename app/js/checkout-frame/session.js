@@ -116,10 +116,10 @@ function fillData(container, returnObj) {
  * 1. If saved cards screen, show if selected saved card does not have a plan selected.
  * 2. If new card screen, show if no emi plan is selected.
  */
-function setEmiPlansCta(tab) {
+function setEmiPlansCta(screen, tab) {
   var show = false;
 
-  if (tab === 'emi') {
+  if (screen === 'card' && tab === 'emi') {
     var isSavedScreen = $('#form-card').hasClass('saved-cards');
     var emiDuration = $('#emi_duration').val();
 
@@ -2394,6 +2394,8 @@ Session.prototype = {
       gel('tab-title').innerHTML = screenTitle;
     }
 
+    setEmiPlansCta(screen, this.tab);
+
     if (screen === this.screen) {
       return;
     }
@@ -2748,7 +2750,7 @@ Session.prototype = {
     if (tab === 'card' || tab === 'emi') {
       this.showCardTab(tab);
 
-      setEmiPlansCta(tab);
+      setEmiPlansCta(this.screen, tab);
     } else {
       this.setScreen(tab);
       if (ua_iPhone) {
@@ -2852,7 +2854,7 @@ Session.prototype = {
       this.offers.removeOffer();
     }
 
-    setEmiPlansCta(this.tab);
+    setEmiPlansCta(this.screen, this.tab);
 
     if ($savedCard.$('.flow-selection-container')[0]) {
       Analytics.track('atmpin:saved_card:select', {
@@ -3225,7 +3227,7 @@ Session.prototype = {
     this.savedCardScreen = saveScreen;
     tabCard.toggleClass(saveClass, saveScreen);
 
-    setEmiPlansCta(this.tab);
+    setEmiPlansCta(this.screen, this.tab);
   },
 
   switchBank: function(e) {
