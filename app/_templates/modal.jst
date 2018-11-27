@@ -339,6 +339,15 @@ var upi_apps = _.upi_intents_data;
                       </label>
                     </div>
                     `?`
+                    `?method.qr`
+                    <div class="payment-option item" tab="qr">
+                      <label>
+                        <i>`=icons.upi`</i>
+                        `=_.tab_titles.qr`
+                        <span class="desc">Pay by scanning UPI QR Code</span>
+                      </label>
+                    </div>
+                    `?`
                   </div>
                   <div class="clear"></div>
                 </div>
@@ -716,6 +725,10 @@ var upi_apps = _.upi_intents_data;
                       </div>
                     </div>
                     `?`
+                </div>
+              `?`
+              `?method.qr`
+                <div class="tab-content showable screen pad" id="form-qr">
                 </div>
               `?`
               `?ecod && invoice`

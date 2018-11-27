@@ -3861,6 +3861,7 @@ Session.prototype = {
 
     var methods = (this.methods = {
       count: 0,
+      qr: true,
     });
     /* Set recurring payment methods*/
     if (recurring) {
