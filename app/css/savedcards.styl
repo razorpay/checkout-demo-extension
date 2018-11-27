@@ -2,10 +2,12 @@
 
 $cardHeights = {
   default: 46px,
-  open: 92px,
-  debitPin: 110px,
-  debitPinMaestro: 142px
+  emi: 92px,
+  debitPin: 120px,
+  maestro: 96px,
 };
+$emiStripHeight = 26px;
+$maestroHeight = 32px;
 $savedcontainerh = 220px;
 $cardpl = 70px;
 
@@ -65,20 +67,18 @@ $cardpl = 70px;
 
     .maestro-cvv {
       display: block;
-      margin-left: -46px;
       font-size: 13px;
       line-height: 32px;
     }
 
     .saved-card {
-      height: $cardHeights['open'];
+      height: $cardHeights['emi'];
       max-height: $cardHeights['default'];
       overflow: hidden;
       z-index: 2;
       pointer-events: all;
 
       &[maestro].checked {
-        max-height: $cardHeights['open'];
 
         .elem-savedcards-emi {
           display: block;
@@ -87,20 +87,13 @@ $cardpl = 70px;
 
       &[pin] {
         &.checked {
-          height: $cardHeights['debitPin'];
-          max-height: $cardHeights['debitPin'];
           overflow: hidden;
+
           .flow-selection-container {
             display: block;
           }
-
-          &[maestro] {
-            height: $cardHeights['debitPinMaestro'];
-            max-height: $cardHeights['debitPinMaestro'];
-          }
         }
       }
-
       &.checked {
         background: #eff0f1;
         border-color: $bc;
@@ -213,7 +206,6 @@ $cardpl = 70px;
 
   .elem-wrap {
     height: auto;
-    margin-left: -44px;
   }
 
   .elem-savedcards-emi {
@@ -412,14 +404,17 @@ $cardpl = 70px;
     opacity: 0;
     border-top 1px solid #E6E7E8;
 
+.saved-card
+  &[emi]
+    &.checked
+      &:not(.emi-selected)
+        .emi-plan-selected
+          display: none;
+
 #body[tab=emi]
   .saved-card
     &:not([emi])
       display: none;
-
-    &[emi]
-      &.checked.emi-selected
-        max-height: $cardHeights['open']
 
     .emi-plan-unselected
       display: none;
@@ -432,9 +427,98 @@ $cardpl = 70px;
 
 #body[tab=card]
   .saved-card
-    &[emi]
-      &.checked
-        max-height: $cardHeights['open']
-
     .emi-plan-selected
       display: none;
+
+#body[tab=card]
+  .saved-card
+    &.checkeed
+      &[pin],
+      &[maestro]
+        .emi-plans-info-container
+          margin-bottom: 12px;
+
+#body[tab=card]
+  #form-card
+    .saved-card
+      &.checked
+        &[emi]
+          height: $cardHeights['emi'];
+          max-height: $cardHeights['emi'];
+        &[pin]
+          height: $cardHeights['debitPin'];
+          max-height: $cardHeights['debitPin'];
+        &[maestro]
+          height: $cardHeights['maestro'];
+          max-height: $cardHeights['maestro'];
+
+        &[emi]
+          &[pin]
+            height: $cardHeights['debitPin'] + $emiStripHeight;
+            max-height: $cardHeights['debitPin'] + $emiStripHeight;
+        &[emi]
+          &[maestro]
+            height: $cardHeights['emi'] + $maestroHeight;
+            max-height: $cardHeights['emi'] + $maestroHeight;
+
+
+        &[pin]
+          &[maestro]
+            height: $cardHeights['debitPin'] + $maestroHeight;
+            max-height: $cardHeights['debitPin'] + $maestroHeight;
+
+        &[emi]
+          &[pin]
+            &[maestro]
+              height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
+              max-height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
+
+        &[emi]
+          &[pin],
+          &[maestro]
+            .emi-plans-info-container
+              margin-bottom: 12px;
+
+#body[tab=emi]
+  #form-card
+    .saved-card
+      &.checked
+        &[emi]
+          height: $cardHeights['default'];
+          max-height: $cardHeights['default'];
+
+          &.emi-selected
+            height: $cardHeights['emi'];
+            max-height: $cardHeights['emi'];
+
+        &[emi]
+          &[pin]
+            height: $cardHeights['debitPin'];
+            max-height: $cardHeights['debitPin'];
+
+            &.emi-selected
+              height: $cardHeights['debitPin'] + $emiStripHeight;
+              max-height: $cardHeights['debitPin'] + $emiStripHeight;
+
+        &[emi]
+          &[maestro]
+            height: $cardHeights['maestro'];
+            max-height: $cardHeights['maestro'];
+
+            &.emi-selected
+              height: $cardHeights['emi'] + $maestroHeight;
+              max-height: $cardHeights['emi'] + $maestroHeight;
+
+        &[emi]
+          &[pin]
+            &[maestro]
+              height: $cardHeights['debitPin'] + $maestroHeight;
+              max-height: $cardHeights['debitPin'] + $maestroHeight;
+
+              &.emi-selected
+                height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
+                max-height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
+
+        &.emi-selected
+          .emi-plans-info-container
+            margin-bottom: 12px;
