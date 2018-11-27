@@ -441,7 +441,7 @@ function hideOverlayMessage() {
  * Get the text to show to EMI plan.
  *
  * @param {Number} amount
- * @param {Objec} plan
+ * @param {Object} plan
  *
  * @return {Object}
  */
@@ -2720,12 +2720,9 @@ Session.prototype = {
       maxlength: 6,
     });
 
-    showAppropriateEmiDetailsForNewCard(
-      this.tab,
-      this.emiPlansForNewCard,
-      $('#card_number').val().length,
-      this.methods
-    );
+    onSixDigits.call(this, {
+      target: gel('card_number'),
+    });
 
     var self = this;
     var customer = self.customer;
