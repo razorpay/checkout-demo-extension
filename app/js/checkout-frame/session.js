@@ -107,6 +107,44 @@ function fillData(container, returnObj) {
 }
 
 /**
+ * Set the "View EMI Plans" CTA as the Pay Button
+ * if all the criteria are met.
+ *
+ * Criteria:
+ * Mandatory: tab=emi
+ *
+ * 1. If saved cards screen, show if selected saved card does not have a plan selected.
+ * 2. If new card screen, show if no emi plan is selected.
+ */
+function setEmiPlansCta(tab) {
+  var show = false;
+
+  if (tab === 'emi') {
+    var isSavedScreen = $('#form-card').hasClass('saved-cards');
+    var emiDuration = $('#emi_duration').val();
+
+    if (isSavedScreen) {
+      var savedCard = $('.saved-card.checked');
+
+      if (savedCard[0]) {
+        var emiDurationField = savedCard.$('.emi_duration');
+
+        if (emiDurationField[0]) {
+          if (!emiDurationField.val()) {
+            show = true;
+          }
+        }
+      }
+    } else if (!emiDuration) {
+      show = true;
+    }
+  }
+
+  $('.plans-btn').toggleClass('invisible', !show);
+  $('.pay-btn').toggleClass('invisible', show);
+}
+
+/**
  * Get the saved card elemnnt that should be selected
  * when the saved cards screen is shown.
  */
@@ -2709,6 +2747,8 @@ Session.prototype = {
 
     if (tab === 'card' || tab === 'emi') {
       this.showCardTab(tab);
+
+      setEmiPlansCta(tab);
     } else {
       this.setScreen(tab);
       if (ua_iPhone) {
@@ -2811,6 +2851,8 @@ Session.prototype = {
     if (this.offers && !this.offers.offerSelectedByDrawer) {
       this.offers.removeOffer();
     }
+
+    setEmiPlansCta(this.tab);
 
     if ($savedCard.$('.flow-selection-container')[0]) {
       Analytics.track('atmpin:saved_card:select', {
@@ -3182,6 +3224,8 @@ Session.prototype = {
 
     this.savedCardScreen = saveScreen;
     tabCard.toggleClass(saveClass, saveScreen);
+
+    setEmiPlansCta(this.tab);
   },
 
   switchBank: function(e) {
