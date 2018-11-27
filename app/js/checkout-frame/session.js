@@ -2347,7 +2347,9 @@ Session.prototype = {
   setScreen: function(screen) {
     if (screen) {
       var screenTitle =
-        this.tab === 'emi' ? 'EMI' : tab_titles[this.cardTab || screen];
+        this.tab === 'emi'
+          ? tab_titles[this.tab]
+          : tab_titles[this.cardTab || screen];
 
       screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
 
