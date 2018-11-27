@@ -359,7 +359,7 @@ var upi_apps = _.upi_intents_data;
                   <div id="saved-cards-container"></div>
                   <div id="show-add-card" class="text-btn left-card">Add another card</div>
                   `?method.card`
-                    <div class="strip emi-plans-info-container emi-plans-trigger saved-card-pay-without-emi">
+                    <div class="strip emi-plans-info-container emi-plans-trigger saved-card-pay-without-emi hidden">
                       <div class="emi-plans-text no-action">Pay without EMI</div>
                       <div class="emi-plans-action theme-highlight"></div>
                     </div>
@@ -394,13 +394,14 @@ var upi_apps = _.upi_intents_data;
                       </div></div>
                     </div>
                     <div class="clear"></div>
-                    `?!_.recurring && o('remember_customer')`
-                    <div id="should-save-card" class="double">
-                      <label class="first" for="save" tabIndex="0">
-                        <input type="checkbox" class="checkbox--square" id="save" name="save" value="1" checked>
-                        <span class="checkbox"></span>
-                        Remember Card
-                      </label>
+                    <div class="double">
+                      `?!_.recurring && o('remember_customer')`
+                        <label class="first" id="should-save-card" for="save" tabIndex="0">
+                          <input type="checkbox" class="checkbox--square" id="save" name="save" value="1" checked>
+                          <span class="checkbox"></span>
+                          Remember Card
+                        </label>
+                      `?`
                       <div class="second">
                         <span id="view-emi-plans" class="link">
                           <a>View all EMI Plans</a>
@@ -408,7 +409,6 @@ var upi_apps = _.upi_intents_data;
                       </div>
                       <div class="clear"></div>
                     </div>
-                    `?`
                     <div id="elem-emi">
                       <input type="hidden" id="emi_bank">
                       <div class="strip emi-plans-info-container emi-plans-trigger">
