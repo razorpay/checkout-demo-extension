@@ -4247,11 +4247,11 @@ Session.prototype = {
      * - Non INR payment
      * - Recurring payment
      * - EMI not enabled
-     * - Neither of Card or Cardless EMI are enabled
+     * - Neither of Card or EMI or Cardless EMI are enabled
      * - amount is less than EMI threshold
      */
     if (
-      !(methods.card || methods.cardless_emi) ||
+      !(methods.emi || methods.card || methods.cardless_emi) ||
       recurring ||
       international ||
       amount <= emi_options.min
