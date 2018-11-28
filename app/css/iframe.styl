@@ -1,0 +1,34 @@
+.payment-frame {
+  overflow: hidden;
+  background: #fff;
+  border: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 101;
+  width: 100%;
+  height: calc(100% + 55px);
+  border-radius: 4px;
+
+  iframe {
+    height: calc(100% - 55px);
+    border: 0
+    margin: 0;
+    width: 100%;
+  }
+}
+
+.iframe-title {
+  line-height: 55px;
+  padding: 0 16px;
+  text-align: right;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+}
+
+.iframe-close {
+  float: left;
+  cursor: pointer;
+  margin-left: -12px;
+  padding: 0 16px
+}

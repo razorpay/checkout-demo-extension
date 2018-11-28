@@ -1,12 +1,33 @@
-export default function Iframe(src, name) {
+import { displayAmount } from 'common/currency';
+
+const frameHtml = amount => `<div class='iframe-title'>
+<b class='iframe-close'>&#xe604;</b>
+Paying <b class='iframe-amount'>${amount}</b>
+</div>
+<iframe></iframe>`;
+
+export default function Iframe(src, name, payment) {
+  this.name = name;
+  this.payment = payment;
   this.el =
-    _El.create('iframe')
-    |> _El.appendTo(_Doc.body)
+    _El.create('div')
+    |> _El.setContents(
+      frameHtml(displayAmount(payment.r, payment.r.get('amount')))
+    )
+    |> _El.appendTo(_Doc.querySelector('#modal-inner'))
     |> _El.addClass('payment-frame');
 
-  this.window = this.el.contentWindow |> _Obj.setProp('name', name);
+  this.window =
+    this.el.querySelector('iframe').contentWindow |> _Obj.setProp('name', name);
 
-  this.listeners = [];
+  const closeListener =
+    _Doc.querySelector('.iframe-close')
+    |> _El.on('click', () => {
+      if (global.confirm('Do you want to cancel this payment?')) {
+        this.payment.emit('cancel');
+      }
+    });
+  this.listeners = [closeListener];
 }
 
 Iframe.prototype = {

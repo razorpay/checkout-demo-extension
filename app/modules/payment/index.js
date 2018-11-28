@@ -433,7 +433,7 @@ Payment.prototype = {
     if (this.iframe) {
       Medium = Iframe;
     }
-    var popup = new Medium('', 'popup_' + Track.id);
+    var popup = new Medium('', 'popup_' + Track.id, this);
     if ((popup && !popup.window) || popup.window.closed !== false) {
       popup.close();
       popup = null;
