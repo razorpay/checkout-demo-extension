@@ -351,6 +351,7 @@ function overlayVisible() {
 
 // this === Session
 function errorHandler(response) {
+  this.headless = null;
   if (isString(response)) {
     try {
       response = JSON.parse(response);
@@ -511,11 +512,15 @@ function askOTP(text) {
   if (!text) {
     var thisSession = SessionManager.getSession();
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
-      text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
-      if (thisSession.payload) {
-        text += 'save your card';
+      if (thisSession.headless) {
+        text = 'Enter OTP to complete the payment';
       } else {
-        text += 'access Saved Cards';
+        text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
+        if (thisSession.payload) {
+          text += 'save your card';
+        } else {
+          text += 'access Saved Cards';
+        }
       }
     } else {
       text = 'An OTP has been sent on<br>' + getPhone();
@@ -2318,7 +2323,9 @@ Session.prototype = {
 
       screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
 
-      gel('tab-title').innerHTML = screenTitle;
+      if (screenTitle) {
+        gel('tab-title').innerHTML = screenTitle;
+      }
       makeVisible('#topbar');
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
@@ -3557,6 +3564,14 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
+    if (data.method === 'card') {
+      this.headless = true;
+      this.setScreen('otp');
+      this.r.on('payment.otp.required', debounceAskOTP);
+      request.iframe = true;
+      this.r.emit('payment.otp.required');
+    }
+
     if (
       discreet.WalletUtils.isPowerWallet(wallet) &&
       !request.fees &&
@@ -3578,10 +3593,6 @@ Session.prototype = {
     } else {
       $('#otp-elem').removeClass('fourdigit');
       $('#otp').attr('maxlength', 6);
-    }
-
-    if (data.method === 'card') {
-      request.iframe = true;
     }
 
     var payment = this.r.createPayment(data, request);
