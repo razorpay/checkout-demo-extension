@@ -23,6 +23,7 @@ var accountName = o('prefill.bank_account[name]');
 
 var amount;
 var amount_figure = _.formatAmount(o('amount'));
+var firstPaymentMinAmount = _.formatAmount(order.first_payment_min_amount);
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else if (o('currency')==='INR')
@@ -152,6 +153,14 @@ var upi_apps = _.upi_intents_data;
                     <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
                     <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
                   </div></div>
+
+                  `?(order.partial_payment && !!order.first_payment_min_amount)`
+                    <div class="minimum-amount-select">
+                      <label class="partial-label" for="minimum-amount-select">Minimum Payable amount (₹`=html(firstPaymentMinAmount)`)</label>
+                      <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
+                      <label class="checkbox" for="minimum-amount-select"></label>
+                    </div>
+                  `?`
                   <label class="subtitle subtitle--help">Pay some amount now and remaining later.</label>
 
                   `?`
