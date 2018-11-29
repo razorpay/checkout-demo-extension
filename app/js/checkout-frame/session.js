@@ -2651,11 +2651,17 @@ Session.prototype = {
       $('#wallets input:checked').prop('checked', false);
       $(this.el).addClass('notopbar');
       tab = 'wallet';
-    } else if (this.screen === 'otp' && this.tab !== 'card') {
+    } else if (
+      this.screen === 'otp' &&
+      (this.tab !== 'card' && this.tab !== 'emi')
+    ) {
       tab = this.tab;
-    } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
+    } else if (
+      (this.tab === 'card' || this.tab === 'emi') &&
+      /^magic/.test(this.screen)
+    ) {
       if (confirmedCancel === true) {
-        tab = 'card';
+        tab = this.tab;
         this.clearRequest();
       } else {
         return Confirm.show({
@@ -3814,10 +3820,10 @@ Session.prototype = {
                   )[0],
                 });
               } else {
-              /**
-               * If this is a new card and no EMI duration is selected,
-               * show the EMI plans.
-               */
+                /**
+                 * If this is a new card and no EMI duration is selected,
+                 * show the EMI plans.
+                 */
                 this.showEmiPlans('new')({
                   delegateTarget: $(
                     '#add-card-container .emi-plans-trigger'
