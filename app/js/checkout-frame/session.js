@@ -3111,9 +3111,8 @@ Session.prototype = {
           });
         } catch (e) {}
 
-        var savedCardsCount = tokensList.items.filter(function(item) {
-          return item.method === 'card';
-        }).length;
+        var savedCardsCount = discreet.Token.getSavedCards(tokensList.items)
+          .length;
 
         if (savedCardsCount) {
           Analytics.setMeta('has.savedCards', true);
@@ -3138,9 +3137,9 @@ Session.prototype = {
 
           this.savedCardsRendered = true;
 
-          var totalSavedCards = this.transformedTokens.filter(function(token) {
-            return token.method === 'card';
-          }).length;
+          var totalSavedCards = discreet.Token.getSavedCards(
+            this.transformedTokens
+          ).length;
 
           if (totalSavedCards) {
             var selectorsForSavedCardText = [
