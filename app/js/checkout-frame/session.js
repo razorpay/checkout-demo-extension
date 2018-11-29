@@ -2079,12 +2079,16 @@ Session.prototype = {
         } else if ($target.$('.emi-plan-selected:not(.hidden)')[0]) {
           self.showEmiPlans('new')(e);
         } else if ($target.$('.emi-pay-without:not(.hidden)')[0]) {
-          self.setScreen('card');
-          self.switchTab('card');
+          if (enabledMethods.card) {
+            self.setScreen('card');
+            self.switchTab('card');
+          }
         } else if ($target.$('.emi-plan-unavailable:not(.hidden)')[0]) {
-          self.setScreen('card');
-          self.switchTab('card');
-          self.toggleSavedCards(false);
+          if (enabledMethods.card) {
+            self.setScreen('card');
+            self.switchTab('card');
+            self.toggleSavedCards(false);
+          }
         }
       });
 
