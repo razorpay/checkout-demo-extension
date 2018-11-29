@@ -3814,7 +3814,7 @@ Session.prototype = {
               if (data.token) {
                 this.showEmiPlans('saved')({
                   currentTarget: $(
-                    '.saved-card[token=' + data.token + '] .emi-plans-trigger'
+                    '.saved-card[token="' + data.token + '"] .emi-plans-trigger'
                   )[0],
                 });
               } else {
