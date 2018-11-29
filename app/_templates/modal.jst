@@ -274,6 +274,15 @@ var upi_apps = _.upi_intents_data;
                         <label>
                           <i>`=icons.emi`</i>
                           `=_.tab_titles.emi`
+                          <span class="desc">
+                            `?method.cardless_emi && method.emi`
+                              Cards, ZestMoney, & More
+                            `??method.emi`
+                              EMI via Credit & Debit Cards
+                            `??method.cardless_emi`
+                              EMI via ZestMoney & More
+                            `?`
+                          </span>
                         </label>
                       </div>
                     `?`
