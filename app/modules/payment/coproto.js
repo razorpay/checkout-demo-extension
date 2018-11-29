@@ -18,6 +18,13 @@ export const processOtpResponse = function(response) {
 };
 
 export const processPaymentCreate = function(response) {
+  response = {
+    type: 'otp',
+    payment_id: 'pay_123',
+    next: ['resend_otp'],
+    request: {},
+    redirect_url: 'https://google.com',
+  };
   var payment = this;
   var r = payment.r;
 
@@ -266,6 +273,7 @@ var responseTypes = {
       return responseTypes.first.call(this, request, responseTypes);
     }
     this.otpurl = request.url;
+    this.gotoBankUrl = fullResponse.redirect_url;
     this.emit('otp.required');
   },
 

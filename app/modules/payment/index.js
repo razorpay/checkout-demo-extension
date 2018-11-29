@@ -428,6 +428,11 @@ Payment.prototype = {
     }
   },
 
+  gotoBank: function() {
+    this.popup.el.style.display = 'block';
+    this.popup.window.location.href = this.gotoBankUrl;
+  },
+
   makePopup: function() {
     let Medium = Popup;
     if (this.iframe) {
