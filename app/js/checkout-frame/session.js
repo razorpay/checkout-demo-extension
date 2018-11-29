@@ -330,9 +330,7 @@ function onSixDigits(e) {
 
   if (emiObj) {
     $('#expiry-cvv').removeClass('hidden');
-    $('#emi_bank').val(emiObj.code);
   } else {
-    $('#emi_bank').val('');
     $('#emi_duration').val('');
   }
 
@@ -351,8 +349,6 @@ function onSixDigits(e) {
       emiBankChangeEvent = document.createEvent('Event');
       emiBankChangeEvent.initEvent('change', true, true);
     }
-
-    gel('emi_bank').dispatchEvent(emiBankChangeEvent);
   }
 
   noCvvToggle({ target: nocvvCheck });
@@ -2565,7 +2561,7 @@ Session.prototype = {
       }
     } else if (screen === 'card') {
       var emiDuration = $('#emi_duration').val();
-      var bank = $('#emi_bank').val();
+      var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
       var emiBank = emiBanks[bank];
 
       if (emiDuration && emiBank && typeof emiBank.plans === 'object') {
@@ -2965,7 +2961,7 @@ Session.prototype = {
       return function(e) {
         var trigger = e.delegateTarget;
         var $trigger = $(trigger);
-        var bank = $('#emi_bank').val();
+        var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var plans = (emi_options.banks[bank] || {}).plans;
         var emiPlans = self.getEmiPlans(bank);
 
@@ -3448,7 +3444,7 @@ Session.prototype = {
             if (emiDuration) {
               data.emi_duration = emiDuration;
             } else {
-              if ($('#emi_bank').val()) {
+              if ($('#emi_duration').val()) {
                 $('#emi-plans .help').html('Please select an EMI Plan');
               } else {
                 $('#emi-plans .help').html(Constants.EMI_HELP_TEXT);
