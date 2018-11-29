@@ -463,7 +463,10 @@ function hideEmi() {
 
 function hideOverlayMessage() {
   if (!hideEmi()) {
-    if ($('#confirmation-dialog').hasClass('animate')) {
+    if (
+      $('#confirmation-dialog').hasClass('animate') ||
+      gel('options-wrap').children.length
+    ) {
       makeHidden(gel('error-message'));
     } else {
       hideOverlay($('#error-message'));
