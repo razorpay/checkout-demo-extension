@@ -8,10 +8,6 @@ export default function emiPlansView(session) {
 
 emiPlansView.prototype = {
   setPlans: function({ plans, actions = {}, on = {} }) {
-    const target = _Doc.querySelector(TARGET_QS);
-
-    _El.clearContents(target);
-
     this.onSelect = on.select || _Func.noop;
     this.back = on.back || _Func.noop;
 
@@ -20,15 +16,22 @@ emiPlansView.prototype = {
       _Doc.querySelector('#body') |> _El.addClass('sub');
     };
 
-    new EMIPlansView({
-      target,
+    const data = {
+      on,
+      plans,
+      actions,
+      expanded: -1,
+    };
 
-      data: {
-        on,
-        plans,
-        actions,
-      },
-    });
+    if (!this.view) {
+      const target = _Doc.querySelector(TARGET_QS);
+      this.view = new EMIPlansView({
+        target,
+        data,
+      });
+    } else {
+      this.view.set(data);
+    }
   },
 
   submit: function() {
