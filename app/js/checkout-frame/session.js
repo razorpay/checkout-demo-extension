@@ -351,7 +351,6 @@ function overlayVisible() {
 
 // this === Session
 function errorHandler(response) {
-  this.headless = null;
   if (isString(response)) {
     try {
       response = JSON.parse(response);
@@ -1457,6 +1456,7 @@ Session.prototype = {
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
+    } else if (this.iframe) {
     } else {
       this.customer.createOTP(debounceAskOTP);
     }
@@ -2560,11 +2560,14 @@ Session.prototype = {
       tab = 'wallet';
     } else if (this.screen === 'otp' && this.tab !== 'card') {
       tab = this.tab;
-    } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
+    } else if (this.tab === 'card') {
       if (confirmedCancel === true) {
         tab = 'card';
         this.clearRequest();
-      } else {
+      } else if (
+        /^magic/.test(this.screen) ||
+        (this.headless && this.r._payment)
+      ) {
         return Confirm.show({
           message:
             'Your payment is ongoing. ' +
@@ -2576,6 +2579,8 @@ Session.prototype = {
             self.back(true);
           },
         });
+      } else if (this.headless && this.screen === 'otp') {
+        tab = 'card';
       }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {
@@ -3206,6 +3211,9 @@ Session.prototype = {
   },
 
   showLoadError: function(text, error) {
+    if (this.headless && this.screen === 'card') {
+      return;
+    }
     var actionState;
     var loadingState = 'addClass';
     if (error) {
@@ -3292,7 +3300,6 @@ Session.prototype = {
       }
       callback = function(msg) {
         if (this.customer.logged) {
-          this.setScreen('card');
           if (isRedirect) {
             this.submit();
           } else {
@@ -3356,6 +3363,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    this.headless = false;
     if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
       return this.extraNext();
     }
@@ -3488,7 +3496,7 @@ Session.prototype = {
         this.commenceOTP(strings.otpsend);
         debounceAskOTP();
         return this.customer.createOTP();
-      } else {
+      } else if (!this.headless) {
         request.message = 'Verifying OTP...';
         request.paused = true;
       }
@@ -3565,11 +3573,15 @@ Session.prototype = {
     }
 
     if (data.method === 'card') {
-      this.headless = true;
-      this.setScreen('otp');
-      this.r.on('payment.otp.required', debounceAskOTP);
-      request.iframe = true;
-      this.r.emit('payment.otp.required');
+      if (this.delegator.card.type === 'visa') {
+        this.headless = true;
+        this.setScreen('otp');
+        this.r.on('payment.otp.required', askOTP);
+        request.iframe = true;
+        setTimeout(() => {
+          this.r.emit('payment.otp.required');
+        }, 100);
+      }
     }
 
     if (
@@ -3597,9 +3609,9 @@ Session.prototype = {
 
     var payment = this.r.createPayment(data, request);
     payment
-      .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this))
-      .on('payment.cancel', bind(cancelHandler, this));
+      .once('payment.success', bind(successHandler, this))
+      .once('payment.error', bind(errorHandler, this))
+      .once('payment.cancel', bind(cancelHandler, this));
 
     this.attemptCount++;
 
@@ -3713,11 +3725,13 @@ Session.prototype = {
         );
       });
     } else {
-      sub_link.html('Go to payment');
-      this.r.on(
-        'payment.cancel',
-        bind('showLoadError', this, discreet.cancelMsg, true)
-      );
+      if (!this.headless) {
+        sub_link.html('Go to payment');
+        this.r.on(
+          'payment.cancel',
+          bind('showLoadError', this, discreet.cancelMsg, true)
+        );
+      }
     }
   },
 
