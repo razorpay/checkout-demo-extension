@@ -37,7 +37,7 @@
       {#if card.networkCode === 'maestro'}
         <label for={`nocvv-${token}`} class="maestro-cvv">
           <input class="nocvv-checkbox" type="checkbox" id={`nocvv-${token}`} />
-          <span class="checkout"></span>
+          <span class="checkbox"></span>
           My Maestro Card doesn't have Expiry/CVV
         </label>
       {/if}
