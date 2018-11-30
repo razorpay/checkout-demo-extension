@@ -2852,11 +2852,6 @@ Session.prototype = {
       $savedCard.$('.saved-cvv').focus();
     }
 
-    // If it's the same card, do nothing.
-    if (e.delegateTarget === $('#saved-cards-container .checked')[0]) {
-      return;
-    }
-
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
 
@@ -2865,7 +2860,7 @@ Session.prototype = {
     }
 
     // If EMI is supported on saved card
-    if ($savedCard.$('.emi-plans-trigger')[0]) {
+    if (this.tab === 'emi' && $savedCard.$('.emi-plans-trigger')[0]) {
       var $trigger = $savedCard.$('.emi-plans-trigger');
       var issuer = $trigger.attr('data-bank');
       var duration = $savedCard.$('.emi_duration').val();
