@@ -57,6 +57,7 @@ var upi_apps = _.upi_intents_data;
       <div id="overlay" class="showable"></div>
       <div id="confirmation-dialog" class="showable"></div>
       <div id="emi-wrap" class="showable mfix"></div>
+      <div id="options-wrap"></div>
       <div id="error-message" class="showable">
         <div id="fd-t"></div>
         <div class="spin"><div></div></div>
@@ -274,6 +275,15 @@ var upi_apps = _.upi_intents_data;
                         <label>
                           <i>`=icons.emi`</i>
                           `=_.tab_titles.emi`
+                          <span class="desc">
+                            `?method.cardless_emi && method.emi`
+                              Cards, ZestMoney, & More
+                            `??method.emi`
+                              EMI via Credit & Debit Cards
+                            `??method.cardless_emi`
+                              EMI via ZestMoney & More
+                            `?`
+                          </span>
                         </label>
                       </div>
                     `?`
@@ -410,9 +420,10 @@ var upi_apps = _.upi_intents_data;
                       <div class="clear"></div>
                     </div>
                     <div id="elem-emi">
-                      <input type="hidden" id="emi_bank">
                       <div class="strip emi-plans-info-container emi-plans-trigger">
                         <div class="emi-plan-unavailable hidden">
+                          <span class="help">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, Standard Chartered and Axis Bank
+                            Credit Cards. Enter your credit card to avail.</span>
                           <div class="emi-plans-text">EMI unavailable on this card</div>
                           `?method.card`
                           <div class="emi-plans-action theme-highlight">Pay without EMI</div>

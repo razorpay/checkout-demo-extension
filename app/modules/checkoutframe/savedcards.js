@@ -8,13 +8,15 @@ export default function savedCardsView(session) {
 
 savedCardsView.prototype = {
   setCards: function(data = {}) {
-    const target = _Doc.querySelector(TARGET_QS);
+    if (!this.view) {
+      const target = _Doc.querySelector(TARGET_QS);
 
-    _El.clearContents(target);
-
-    new SavedCardsScreen({
-      target,
-      data: data,
-    });
+      this.view = new SavedCardsScreen({
+        target,
+        data: data,
+      });
+    } else {
+      this.view.set(data);
+    }
   },
 };

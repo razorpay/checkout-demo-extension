@@ -64,3 +64,13 @@ export const transform = (tokens, { amount, emi, emiOptions, recurring }) => {
 
   return tokens;
 };
+
+/**
+ * Filter out all the saved cards from tokens.
+ *
+ * @param {Array} tokens
+ *
+ * @return {Array}
+ */
+export const getSavedCards = tokens =>
+  _Arr.filter(tokens, token => token.method === 'card');
