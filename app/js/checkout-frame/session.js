@@ -2082,12 +2082,14 @@ Session.prototype = {
           if (enabledMethods.card) {
             self.setScreen('card');
             self.switchTab('card');
+            self.offers && self.renderOffers(this.tab);
           }
         } else if ($target.$('.emi-plan-unavailable:not(.hidden)')[0]) {
           if (enabledMethods.card) {
             self.setScreen('card');
             self.switchTab('card');
             self.toggleSavedCards(false);
+            self.offers && self.renderOffers(this.tab);
           }
         }
       });
