@@ -2971,11 +2971,15 @@ Session.prototype = {
         var $trigger = $(trigger);
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var plans = (emi_options.banks[bank] || {}).plans;
-        var emiPlans = self.getEmiPlans(bank);
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
+        } else {
+          self.offers.removeOffer();
+          self.preSelectedOffer = null;
         }
+
+        var emiPlans = self.getEmiPlans(bank);
 
         var prevTab = self.tab;
         var prevScreen = self.screen;
