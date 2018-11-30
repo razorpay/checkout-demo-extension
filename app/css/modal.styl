@@ -415,13 +415,6 @@ i {
   }
 }
 
-#emi-plans {
-  .help {
-    min-width: 240px;
-    max-width: 280px;
-  }
-}
-
 #container {
   margin: 0 auto;
   height: 100%;
@@ -1449,8 +1442,10 @@ $outline = #ddd;
   height: 374px;
 
   &.has-offers {
-    #offers-container {
-      bottom: -($topbarh) - 10px
+    &:not([screen]) {
+      #offers-container {
+        bottom: -($topbarh) - 10px
+      }
     }
 
     .offers-list-container {

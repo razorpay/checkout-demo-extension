@@ -2471,13 +2471,6 @@ Session.prototype = {
 
     var paymentMethod = screen;
 
-    if (
-      (screen === 'card' || screen === 'emi') &&
-      this.get('amount') >= 300000
-    ) {
-      paymentMethod = ['card', 'emi'];
-    }
-
     this.offers.applyFilter(
       (screen && { payment_method: paymentMethod }) || {}
     );
@@ -2566,7 +2559,7 @@ Session.prototype = {
         $('#bank-select').val(issuer);
         this.switchBank({ target: { value: issuer } });
       }
-    } else if (screen === 'card') {
+    } else if (screen === 'emi') {
       var emiDuration = $('#emi_duration').val();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
       var emiBank = emiBanks[bank];
@@ -2580,7 +2573,6 @@ Session.prototype = {
           plan.offer_id !== offer.id
         ) {
           $('#emi_duration').val('');
-          $('#emi-plans .text').html($('#emi-plans').attr('data-default'));
         }
       }
 
@@ -2976,11 +2968,15 @@ Session.prototype = {
           amount = self.getDiscountedAmount();
         }
 
+        var prevTab = self.tab;
+        var prevScreen = self.screen;
+
         self.emiPlansView.setPlans({
           plans: emiPlans,
           on: {
             back: bind(function() {
-              self.setScreen('card');
+              self.switchTab(prevTab);
+              self.setScreen(prevScreen);
 
               return true;
             }),
@@ -3021,7 +3017,7 @@ Session.prototype = {
           },
         });
 
-        self.setScreen('emiplans');
+        self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
     } else if (type === 'saved') {
@@ -3036,11 +3032,15 @@ Session.prototype = {
           amount = self.getDiscountedAmount();
         }
 
+        var prevTab = self.tab;
+        var prevScreen = self.screen;
+
         self.emiPlansView.setPlans({
           plans: emiPlans,
           on: {
             back: function() {
-              self.showCards();
+              self.switchTab(prevTab);
+              self.setScreen(prevScreen);
 
               return true;
             },
@@ -3084,7 +3084,7 @@ Session.prototype = {
           },
         });
 
-        self.setScreen('emiplans');
+        self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
     }
@@ -3449,39 +3449,12 @@ Session.prototype = {
             var emiDuration = $('#emi_duration').val();
             if (emiDuration) {
               data.emi_duration = emiDuration;
-            } else {
-              if ($('#emi_duration').val()) {
-                $('#emi-plans .help').html('Please select an EMI Plan');
-              } else {
-                $('#emi-plans .help').html(Constants.EMI_HELP_TEXT);
-              }
-              $('#emi-plans')
-                .addClass('invalid')
-                .addClass('mature');
             }
           }
           var cardNumberKey = 'card[number]';
           data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
         }
         if (!data.emi_duration) {
-          if (
-            this.offers &&
-            this.offers.offerSelectedByDrawer &&
-            this.offers.offerSelectedByDrawer.payment_method === 'emi'
-          ) {
-            $('#emi-plans .help').html(
-              'Offer is only applicable on EMI, ' +
-                'please select an EMI Plan to continue.'
-            );
-            $('#emi-plans')
-              .addClass('invalid')
-              .addClass('mature');
-          } else if (tab === 'card') {
-            $('#emi-plans')
-              .removeClass('invalid')
-              .removeClass('mature');
-          }
-
           data.method = 'card';
           delete data.emi_duration;
         }
@@ -4458,12 +4431,9 @@ Session.prototype = {
         hasOffers && preferences.force_offer && preferences.offers[0]);
 
     if (forcedOffer) {
-      var paymentMethod =
-        forcedOffer.payment_method === 'emi'
-          ? 'card'
-          : forcedOffer.payment_method;
+      var paymentMethod = forcedOffer.payment_method;
 
-      if (['card', 'wallet'].indexOf(paymentMethod) >= 0) {
+      if (['emi', 'card', 'wallet'].indexOf(paymentMethod) >= 0) {
         // need this while preparing the template
         this[paymentMethod + 'Offer'] = preferences.offers[0];
       }
