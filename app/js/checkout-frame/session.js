@@ -2641,7 +2641,6 @@ Session.prototype = {
   back: function(confirmedCancel) {
     var tab = '';
     var self = this;
-    this.preSelectedOffer = null;
 
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
@@ -2699,6 +2698,7 @@ Session.prototype = {
       this.clearRequest();
     }
 
+    this.preSelectedOffer = null;
     this.switchTab(tab);
   },
 
@@ -2934,7 +2934,7 @@ Session.prototype = {
   processOffersOnEmiPlanSelection: function(plan) {
     if (plan && plan.offer_id) {
       if (this.offers) {
-        this.offers.selectOfferById(plan.offer_id);
+        this.preSelectedOffer = this.offers.selectOfferById(plan.offer_id);
       }
     } else {
       if (
@@ -3023,6 +3023,12 @@ Session.prototype = {
           },
         });
 
+        if (self.offers) {
+          if (!self.offers.selectedOffer && !self.offers.appliedOffer) {
+            self.preSelectedOffer = null;
+          }
+        }
+
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
@@ -3089,6 +3095,12 @@ Session.prototype = {
             payWithoutEmi: self.methods.card,
           },
         });
+
+        if (self.offers) {
+          if (!self.offers.selectedOffer && !self.offers.appliedOffer) {
+            self.preSelectedOffer = null;
+          }
+        }
 
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
