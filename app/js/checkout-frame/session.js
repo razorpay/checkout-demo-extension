@@ -2074,6 +2074,8 @@ Session.prototype = {
       this.on('click', '#add-card-container', 'emi-plans-trigger', function(e) {
         var $target = $(e.delegateTarget);
 
+        self.preSelectedOffer = null;
+
         if ($target.$('.emi-plan-unselected:not(.hidden)')[0]) {
           self.showEmiPlans('new')(e);
         } else if ($target.$('.emi-plan-selected:not(.hidden)')[0]) {
@@ -2095,6 +2097,7 @@ Session.prototype = {
       });
 
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
+        this.preSelectedOffer = null;
         self.switchTab('card');
       });
     }
