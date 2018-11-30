@@ -2352,6 +2352,7 @@ Session.prototype = {
 
     var showPaybtn = screen;
     if (
+      screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
         this.upi_intents_data &&
