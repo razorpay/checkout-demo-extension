@@ -1,8 +1,14 @@
 <div class="qr-container">
   {#if loading}
     Generating QR Code...
+    <div class="loading">
+      <div class="spin"><div></div></div>
+      <div class="spin spin2"><div></div></div>
+    </div>
   {:else}
+    <div class="qr-message">
     Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
+    </div>
   {/if}
   {#if qrImage}
     <div class="qr-image">
@@ -11,11 +17,18 @@
   {/if}
 </div>
 <style>
+.loading {
+  margin-top: 20px;
+}
 .qr-container {
   text-align: center;
   padding: 15px 0;
 }
+.qr-message + .qr-image {
+  display: block;
+}
 .qr-image {
+  display: none;
   position: relative;
   overflow: hidden;
   width: 160px;
