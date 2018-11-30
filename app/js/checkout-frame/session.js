@@ -2864,6 +2864,28 @@ Session.prototype = {
       this.offers.removeOffer();
     }
 
+    // If EMI is supported on saved card
+    if ($savedCard.$('.emi-plans-trigger')[0]) {
+      var $trigger = $savedCard.$('.emi-plans-trigger');
+      var issuer = $trigger.attr('data-bank');
+      var duration = $savedCard.$('.emi_duration').val();
+
+      // Set offer in case it is applicable.
+      if (issuer && duration) {
+        var emi_options = this.emi_options;
+        var plans = (emi_options.banks[issuer] || {}).plans;
+
+        if (plans && plans[duration] && plans[duration].offer_id) {
+          this.offers.selectOfferById(plans[duration].offer_id);
+        }
+      }
+
+      // Add class manually in case svelte rerendered.
+      if (duration) {
+        $savedCard.addClass('emi-selected');
+      }
+    }
+
     setEmiPlansCta(this.screen, this.tab);
 
     if ($savedCard.$('.flow-selection-container')[0]) {
