@@ -55,7 +55,7 @@ export const TAB_TITLES = {
   wallet: 'Wallet',
   upi: 'UPI',
   ecod: 'Pay by Link',
-  qr: 'QR Code',
+  qr: 'UPI QR',
 };
 
 /* .shown has display: none from iOS ad-blocker

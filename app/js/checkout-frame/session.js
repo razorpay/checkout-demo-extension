@@ -2294,6 +2294,19 @@ Session.prototype = {
       return;
     }
 
+    if (screen === 'qr') {
+      this.currentScreen = new discreet.QRScreen({
+        target: qs('#form-qr'),
+        data: {
+          paymentData: this.getFormData(),
+          r: this.r,
+          onSuccess: bind(successHandler, this),
+        },
+      });
+    } else if (this.currentScreen) {
+      this.currentScreen.destroy();
+    }
+
     Analytics.track('screen:switch', {
       data: {
         from: this.screen,
@@ -3680,9 +3693,9 @@ Session.prototype = {
         that.showLoadError('Select UPI App in your device', false);
       });
 
-      this.r.on('payment.upi.coproto_response', function(request) {
+      this.r.on('payment.upi.coproto_response', function(response) {
         var params = {};
-        params[Constants.UPI_POLL_URL] = request.url;
+        params[Constants.UPI_POLL_URL] = response.request.url;
         params[Constants.PENDING_PAYMENT_TS] = now() + '';
         that.setParamsInStorage(params);
       });
