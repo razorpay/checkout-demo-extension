@@ -2455,6 +2455,10 @@ Session.prototype = {
     return this.offers && this.renderOffers(this.tab);
   },
   renderOffers: function(screen) {
+    if (screen === 'emiplans') {
+      screen = 'emi';
+    }
+
     if (
       ['', 'card', 'emi', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0
     ) {
@@ -2982,20 +2986,18 @@ Session.prototype = {
             }),
 
             payWithoutEmi: function() {
-              self.processOffersOnEmiPlanSelection();
-
               $('#emi_duration').val('');
 
               self.switchTab('card');
               self.setScreen('card');
               self.toggleSavedCards(false);
+
+              self.processOffersOnEmiPlanSelection();
             },
 
             select: function(value) {
               var plan = plans[value];
               var text = getEmiText(amount, plan).short || '';
-
-              self.processOffersOnEmiPlanSelection(plan);
 
               $('#emi_duration').val(value);
               $trigger.$(
@@ -3004,6 +3006,8 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.toggleSavedCards(false);
+
+              self.processOffersOnEmiPlanSelection(plan);
 
               self.preSubmit();
             },
@@ -3046,21 +3050,19 @@ Session.prototype = {
             },
 
             payWithoutEmi: function() {
-              self.processOffersOnEmiPlanSelection();
-
               $trigger.$('.emi_duration').val('');
               toggleEmiPlanDetails($trigger.parent().parent(), false);
 
               self.switchTab('card');
               self.setScreen('card');
               self.toggleSavedCards(true);
+
+              self.processOffersOnEmiPlanSelection();
             },
 
             select: function(value) {
               var plan = plans[value];
               var text = getEmiText(amount, plan).short || '';
-
-              self.processOffersOnEmiPlanSelection(plan);
 
               $trigger.$('.emi_duration').val(value);
               $trigger.$(
@@ -3071,6 +3073,8 @@ Session.prototype = {
               self.switchTab('emi');
               self.setScreen('card');
               self.toggleSavedCards(true);
+
+              self.processOffersOnEmiPlanSelection(plan);
 
               self.preSubmit();
             },
