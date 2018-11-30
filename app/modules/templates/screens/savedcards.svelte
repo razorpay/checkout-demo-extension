@@ -11,12 +11,6 @@
   import * as Card from 'common/card';
 
   export default {
-    computed: {
-      cards: ({ cards }) => {
-        return cards.filter(token => token.method === 'card');
-      },
-    },
-
     components: {
       SavedCard,
     },

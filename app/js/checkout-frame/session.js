@@ -3150,39 +3150,32 @@ Session.prototype = {
           });
         }
 
-        if (!this.savedCardsRendered) {
-          this.transformedTokens = this.transformTokens(tokensList.items);
+        this.transformedTokens = this.transformTokens(tokensList.items);
 
-          this.savedCardsView.setCards({
-            cards: this.transformedTokens,
-            on: {
-              viewPlans: this.showEmiPlans('saved'),
-            },
+        this.savedCardsView.setCards({
+          cards: this.transformedTokens,
+          on: {
+            viewPlans: this.showEmiPlans('saved'),
+          },
+        });
+
+        var totalSavedCards = discreet.Token.getSavedCards(
+          this.transformedTokens
+        ).length;
+
+        if (totalSavedCards) {
+          var selectorsForSavedCardText = [
+            '#form-card .saved-card-pay-without-emi',
+            '#add-card-container .emi-pay-without',
+          ];
+          each(selectorsForSavedCardText, function(index, selector) {
+            var stripEl = $(selector);
+            if (stripEl[0]) {
+              var emiTextEl = stripEl.$('.emi-plans-text .count-text');
+
+              emiTextEl.html(' (' + totalSavedCards + ' cards available)');
+            }
           });
-
-          this.savedCardsRendered = true;
-
-          var totalSavedCards = discreet.Token.getSavedCards(
-            this.transformedTokens
-          ).length;
-
-          if (totalSavedCards) {
-            var selectorsForSavedCardText = [
-              '#form-card .saved-card-pay-without-emi',
-              '#add-card-container .emi-pay-without',
-            ];
-            each(selectorsForSavedCardText, function(index, selector) {
-              var stripEl = $(selector);
-              if (stripEl[0]) {
-                var emiTextEl = stripEl.$('.emi-plans-text');
-                var existingEmiText = emiTextEl.html();
-
-                emiTextEl.html(
-                  existingEmiText + ' (' + totalSavedCards + ' cards available)'
-                );
-              }
-            });
-          }
         }
       }
     }
