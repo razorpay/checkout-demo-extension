@@ -14,7 +14,9 @@ import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
 import { androidBrowser } from 'common/useragent';
 import emiView from 'checkoutframe/emi';
+import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
+import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
@@ -26,6 +28,7 @@ import * as Constants from 'common/constants';
 import * as Bank from 'common/bank';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
+import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import { initIframe } from 'checkoutframe/iframe';
@@ -61,6 +64,7 @@ export default {
   Bank,
   Wallet,
   CardlessEmi,
+  Token,
   SessionManager,
   Checkout,
   Bridge,
@@ -74,6 +78,9 @@ export default {
 
   emiView,
   emandateView,
+  emiPlansView,
+  SavedCardsView,
+
   otpView,
   Curtain,
   OptionsList,

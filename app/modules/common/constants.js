@@ -53,6 +53,7 @@ export const TAB_TITLES = {
   ecod: 'Pay by Link',
   emandate: 'Bank Account',
   emi: 'EMI',
+  emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
   upi: 'UPI',
   wallet: 'Wallet',
@@ -79,3 +80,6 @@ export const EMI_HELP_TEXT =
   'EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, ' +
   'Standard Chartered and Axis Bank Credit Cards. Enter your credit card ' +
   'to avail.';
+
+// Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
+export const DEFAULT_AUTH_TYPE_RADIO = '3ds';
