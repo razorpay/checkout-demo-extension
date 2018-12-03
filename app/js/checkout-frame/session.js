@@ -692,9 +692,10 @@ Session.prototype = {
       tab_titles.card = 'Card';
       this.emiMethod = true;
       classes.push('emi-method');
-      if (this.methods.count === 5) {
-        $('#body').addClass('long');
-      }
+    }
+
+    if (this.methods.count >= 5) {
+      $('#body').addClass('long');
     }
 
     if (getter('ecod')) {
@@ -3872,11 +3873,13 @@ Session.prototype = {
     var passedWallets = this.get('method.wallet');
     var self = this;
     var emi_options = this.emi_options;
+    var qrEnabled = this.get('method.qr');
 
     var methods = (this.methods = {
-      count: 0,
-      qr: true,
+      count: !!qrEnabled,
+      qr: qrEnabled,
     });
+
     /* Set recurring payment methods*/
     if (recurring) {
       availMethods = availMethods.recurring;
@@ -3953,7 +3956,7 @@ Session.prototype = {
       var paymentMethod = this.forcedOffer.payment_method;
       if (paymentMethod === 'emi') {
         delete methods.card;
-        methods.count = 1;
+        methods.count++;
       }
     }
 
@@ -4005,7 +4008,7 @@ Session.prototype = {
     ) {
       methods[bankMethod] = false;
     } else {
-      methods.count = 1;
+      methods.count++;
       this.down = getDownBanks(preferences);
       this.netbanks = getPreferredBanks(
         preferences,
