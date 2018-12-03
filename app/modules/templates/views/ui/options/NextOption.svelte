@@ -1,10 +1,14 @@
 <Option
-  attributes={attributes}
   {data}
   type="next-option"
 
   on:select="select(event)"
 >
+  {#if icon}
+    <div class="option-icon">
+      <img src={icon} alt={title}>
+    </div>
+  {/if}
   <div class="option-title">{title}</div>
   {#if arrowText}
     <div class="option-arrow-text theme-highlight">{arrowText}</div>
@@ -17,21 +21,8 @@
       Option: 'templates/views/ui/options/Option.svelte',
     },
 
-    computed: {
-      attributes: function ({ icon }) {
-        const attribs = {};
-
-        if (icon) {
-          attribs.style = `background-image: url('${icon}');`;
-        }
-
-        return attribs;
-      }
-    },
-
     data: function () {
       return {
-        icon: null,
         arrowText: null,
       };
     },
