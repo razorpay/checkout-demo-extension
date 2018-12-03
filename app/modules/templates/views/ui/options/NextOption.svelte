@@ -9,7 +9,7 @@
       <img src={icon} alt={title}>
     </div>
   {/if}
-  <div class="option-title">{title}</div>
+  <div class="option-title"><slot></slot></div>
   {#if arrowText}
     <div class="option-arrow-text theme-highlight">{arrowText}</div>
   {/if}

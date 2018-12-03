@@ -9,7 +9,9 @@
         {...provider}
 
         on:select="select(event)"
-      />
+      >
+        {provider.title}
+      </NextOption>
     {/each}
   </div>
 </div>
