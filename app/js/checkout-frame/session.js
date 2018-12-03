@@ -2615,6 +2615,17 @@ Session.prototype = {
       } else {
         this.cardTab = null;
       }
+
+      Razorpay.sendMessage({
+        event: 'event',
+        data: {
+          event: 'method_selection',
+          data: {
+            method: tab,
+          },
+        },
+      });
+
       var contact = getPhone();
       if (
         (!contact && !this.optional.contact) ||

@@ -382,6 +382,11 @@ CheckoutFrame.prototype = {
       loader |> _El.detach;
       loader = null;
     }
+    this.rzp.emit('render');
+  },
+
+  onevent: function(data) {
+    this.rzp.emit(data.event, data.data);
   },
 
   onredirect: function(data) {
@@ -393,9 +398,10 @@ CheckoutFrame.prototype = {
   onsubmit: function(data) {
     Track.flush();
 
+    var rzp = this.rzp;
+
+    // check if it was one of the external wallets
     if (data.method === 'wallet') {
-      // check if it was one of the external wallets
-      var rzp = this.rzp;
       _Arr.loop(rzp.get('external.wallets'), function(walletName) {
         if (walletName === data.wallet) {
           try {
@@ -406,6 +412,9 @@ CheckoutFrame.prototype = {
         }
       });
     }
+    rzp.emit('payment.submit', {
+      method: data.method,
+    });
   },
 
   ondismiss: function(data) {
