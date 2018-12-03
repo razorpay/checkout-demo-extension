@@ -1373,9 +1373,13 @@ Session.prototype = {
   },
 
   setCardlessEmi: function() {
+    var self = this;
+
     if (this.methods.cardless_emi) {
-      this.emiOptionsView = new discreet.emiOptionsView({
-        target: gel('emi-options-wrapper'),
+      this.emiOptionsView = new discreet.emiOptionsView(this);
+
+      // TODO: Make dynamic.
+      this.emiOptionsView.setOptions({
         providers: [
           {
             arrowText: 'Access Cards',
@@ -1389,20 +1393,26 @@ Session.prototype = {
             data: {
               code: 'zestmoney',
             },
-            icon: '',
+            icon: 'http://logo.clearbit.com/razorpay.com',
             title: 'ZestMoney',
           },
           {
             data: {
               code: 'earlysalary',
             },
-            icon: '',
+            icon: 'http://logo.clearbit.com/razorpay.com',
             title: 'EarlySalary',
           },
         ],
 
         on: {
           select: function(event) {
+            // User selected EMI on Cards
+            if (event.option.code === 'cards') {
+              self.switchTab('emi');
+              return;
+            }
+
             console.log(event.option);
           },
         },
@@ -4766,6 +4776,13 @@ Session.prototype = {
           data: response.error.description,
         });
       }
+
+      // TODO: Remove
+      response.methods.cardless_emi = {
+        zestmoney: true,
+        earlysalary: true,
+      };
+
       var preferences = response;
       self.setPreferences(preferences);
 

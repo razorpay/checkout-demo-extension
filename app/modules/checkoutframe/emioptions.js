@@ -1,20 +1,20 @@
 import CardlessEMIScreen from 'templates/screens/cardlessemi.svelte';
 
-export default function emiOptionsView(params) {
-  this.target = params.target;
-  delete params.target;
+const TARGET_QS = '#emi-options-wrapper';
 
-  this.data = params;
-
-  this.render();
+export default function emiOptionsView(session) {
+  this.session = session;
 }
 
 emiOptionsView.prototype = {
-  render() {
-    this.view = new CardlessEMIScreen({
-      target: this.target,
-
-      data: this.data,
-    });
+  setOptions: function(data) {
+    if (!this.view) {
+      this.view = new CardlessEMIScreen({
+        target: _Doc.querySelector(TARGET_QS),
+        data,
+      });
+    } else {
+      this.view.set(data);
+    }
   },
 };
