@@ -2870,7 +2870,12 @@ Session.prototype = {
         var emi_options = this.emi_options;
         var plans = (emi_options.banks[issuer] || {}).plans;
 
-        if (plans && plans[duration] && plans[duration].offer_id) {
+        if (
+          plans &&
+          plans[duration] &&
+          plans[duration].offer_id &&
+          this.offers
+        ) {
           this.offers.selectOfferById(plans[duration].offer_id);
         }
       }
@@ -2992,8 +2997,10 @@ Session.prototype = {
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
         } else {
-          self.offers.removeOffer();
-          self.preSelectedOffer = null;
+          if (self.offers) {
+            self.offers.removeOffer();
+            self.preSelectedOffer = null;
+          }
         }
 
         var emiPlans = self.getEmiPlans(bank);
