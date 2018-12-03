@@ -117,11 +117,17 @@ Customer.prototype = {
     });
   },
 
-  submitOTP: function(data, callback) {
+  submitOTP: function(data, callback, queryParams) {
     let user = this;
 
     data.contact = this.contact;
-    let url = makeAuthUrl(this.r, 'otp/verify');
+    let url = 'otp/verify';
+
+    if (queryParams) {
+      url = `${url}?${_.obj2query(queryParams)}`;
+    }
+
+    url = makeAuthUrl(this.r, url);
 
     if (qpmap.platform === 'android' && qpmap.version && qpmap.library) {
       data['_[platform]'] = 'android';
@@ -151,7 +157,7 @@ Customer.prototype = {
             callback(strings.wrongOtp);
           }
         } else {
-          callback();
+          callback(undefined, data);
         }
       },
     });
