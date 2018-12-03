@@ -2074,10 +2074,7 @@ Session.prototype = {
       this.on('click', '#add-card-container', 'emi-plans-trigger', function(e) {
         var $target = $(e.delegateTarget);
 
-        if (self.offers) {
-          self.preSelectedOffer = null;
-          self.offers.removeOffer();
-        }
+        self.removeAndCleanupOffers();
 
         if ($target.$('.emi-plan-unselected:not(.hidden)')[0]) {
           self.showEmiPlans('new')(e);
@@ -2100,10 +2097,7 @@ Session.prototype = {
       });
 
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
-        if (this.offers) {
-          this.preSelectedOffer = null;
-          this.offers.removeOffer();
-        }
+        self.removeAndCleanupOffers();
 
         self.switchTab('card');
       });
@@ -3004,10 +2998,7 @@ Session.prototype = {
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
         } else {
-          if (self.offers) {
-            self.offers.removeOffer();
-            self.preSelectedOffer = null;
-          }
+          self.removeAndCleanupOffers();
         }
 
         var emiPlans = self.getEmiPlans(bank);
@@ -3081,10 +3072,7 @@ Session.prototype = {
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
         } else {
-          if (self.offers) {
-            self.offers.removeOffer();
-            self.preSelectedOffer = null;
-          }
+          self.removeAndCleanupOffers();
         }
 
         var prevTab = self.tab;
@@ -3148,6 +3136,14 @@ Session.prototype = {
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
+    }
+  },
+
+  removeAndCleanupOffers: function() {
+    if (this.offers) {
+      this.preSelectedOffer = null;
+      this.offers.removeOffer();
+      this.hideDiscount();
     }
   },
 
