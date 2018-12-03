@@ -2097,7 +2097,11 @@ Session.prototype = {
       });
 
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
-        this.preSelectedOffer = null;
+        if (this.offers) {
+          this.preSelectedOffer = null;
+          this.offers.removeOffer();
+        }
+
         self.switchTab('card');
       });
     }
