@@ -91,6 +91,14 @@ function handleRelayFn(relayObj) {
   }
 }
 
+/**
+ * Temp store for Cardless EMI.
+ * Will move to Svelte Store upon migration.
+ */
+var CardlessEmiStore = {
+  plans: {},
+};
+
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
@@ -1406,17 +1414,62 @@ Session.prototype = {
 
         on: {
           select: function(event) {
+            var providerCode = event.option.code;
+
             // User selected EMI on Cards
-            if (event.option.code === 'cards') {
+            if (providerCode === 'cards') {
               self.switchTab('emi');
               return;
             }
 
-            console.log(event.option);
+            CardlessEmiStore.providerCode = providerCode;
+
+            self.getCardlessEmiPlans();
           },
         },
       });
     }
+  },
+
+  getCardlessEmiPlans: function() {
+    var providerCode = CardlessEmiStore.providerCode;
+
+    var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
+    var self = this;
+
+    tab_titles.otp = cardlessEmiProviderObj.name;
+    this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
+    this.customer.createOTP(
+      function(response) {
+        if (!response.success) {
+          self.showLoadError(
+            'Could not find a ' +
+              cardlessEmiProviderObj.name +
+              ' account associated with ' +
+              getPhone(),
+            true
+          );
+          return;
+        }
+
+        askOTP(
+          self.otpView,
+          'Enter the OTP sent on ' +
+            getPhone() +
+            '<br>' +
+            ' to get EMI plans for' +
+            cardlessEmiProviderObj.name
+        );
+
+        self.otpView.updateScreen({
+          allowSkip: false,
+        });
+      },
+      {
+        provider: providerCode,
+        amount: self.get('amount'),
+      }
+    );
   },
 
   setOtpScreen: function() {
@@ -1689,7 +1742,9 @@ Session.prototype = {
     });
 
     this.showLoadError(strings.otpsend + getPhone());
-    if (this.tab === 'wallet') {
+    if (this.tab === 'cardless_emi') {
+      this.getCardlessEmiPlans();
+    } else if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;

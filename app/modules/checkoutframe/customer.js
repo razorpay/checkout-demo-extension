@@ -101,9 +101,15 @@ Customer.prototype = {
     });
   },
 
-  createOTP: function(callback) {
+  createOTP: function(callback, queryParams) {
+    let url = 'otp/create';
+
+    if (queryParams) {
+      url = `${url}?${_.obj2query(queryParams)}`;
+    }
+
     fetch.post({
-      url: makeAuthUrl(this.r, 'otp/create'),
+      url: makeAuthUrl(this.r, url),
       data: {
         contact: this.contact,
       },
