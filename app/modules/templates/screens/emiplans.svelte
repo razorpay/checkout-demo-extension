@@ -26,6 +26,13 @@
       <div class="actionlink theme-highlight" on:click="invoke('payWithoutEmi', event)">Pay without EMI</div>
     {/if}
   </div>
+  {#if actions.showAgreement && expanded >= 0}
+    <div class="callout drishy" on:click="invoke('viewAgreement', event)">
+      <span>&#x2139;</span>
+      By clicking on Pay, you agree to the terms of our
+      <div class="theme-highlight">Loan Agreement</div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -46,7 +53,8 @@
 
     data: function () {
       return {
-        expanded: -1
+        expanded: -1,
+        curtainShown: false,
       };
     },
 
