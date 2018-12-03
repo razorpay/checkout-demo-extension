@@ -1382,7 +1382,6 @@ Session.prototype = {
       this.emiOptionsView.setOptions({
         providers: [
           {
-            arrowText: 'Access Cards',
             data: {
               code: 'cards',
             },
@@ -2491,6 +2490,7 @@ Session.prototype = {
 
     var showPaybtn = screen;
     if (
+      screen === 'cardless_emi' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
         this.upi_intents_data &&
