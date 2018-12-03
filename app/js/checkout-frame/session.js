@@ -1401,12 +1401,12 @@ Session.prototype = {
         });
       }
 
-      each(this.methods.cardless_emi, function(provider) {
+      each(this.methods.cardless_emi, function (provider) {
         var providerObj = discreet.CardlessEmi.getProvider(provider);
 
         providers.push({
           data: {
-            code: provider,
+            code: provider
           },
           icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + provider + '.svg',
           title: providerObj.name,
@@ -1498,7 +1498,7 @@ Session.prototype = {
         showAgreement: CardlessEmiStore.providerCode === 'zestmoney',
       },
 
-      amount: this.get(amount),
+      amount: this.get('amount'),
 
       loanUrl: CardlessEmiStore.loanUrls[providerCode],
 
