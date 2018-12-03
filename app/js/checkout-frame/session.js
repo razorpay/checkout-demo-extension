@@ -2074,7 +2074,10 @@ Session.prototype = {
       this.on('click', '#add-card-container', 'emi-plans-trigger', function(e) {
         var $target = $(e.delegateTarget);
 
-        self.preSelectedOffer = null;
+        if (self.offers) {
+          self.preSelectedOffer = null;
+          self.offers.removeOffer();
+        }
 
         if ($target.$('.emi-plan-unselected:not(.hidden)')[0]) {
           self.showEmiPlans('new')(e);
@@ -3077,6 +3080,11 @@ Session.prototype = {
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
+        } else {
+          if (self.offers) {
+            self.offers.removeOffer();
+            self.preSelectedOffer = null;
+          }
         }
 
         var prevTab = self.tab;
