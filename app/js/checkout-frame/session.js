@@ -2554,6 +2554,7 @@ Session.prototype = {
   },
   back: function(confirmedCancel) {
     var tab = '';
+    var thisTab = this.tab;
     var self = this;
     this.preSelectedOffer = null;
 
@@ -2561,29 +2562,40 @@ Session.prototype = {
       type: AnalyticsTypes.BEHAV,
     });
 
+    var confirm = function() {
+      Confirm.show({
+        message:
+          'Your payment is ongoing. ' +
+          'Are you sure you want to cancel the payment?',
+        heading: 'Cancel Payment?',
+        positiveBtnTxt: 'Yes, cancel',
+        negativeBtnTxt: 'No',
+        onPositiveClick: function() {
+          self.back(true);
+        },
+      });
+    };
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
       $(this.el).addClass('notopbar');
       tab = 'wallet';
-    } else if (this.screen === 'otp' && this.tab !== 'card') {
-      tab = this.tab;
-    } else if (this.tab === 'card' && /^magic/.test(this.screen)) {
+    } else if (this.screen === 'otp' && thisTab !== 'card') {
+      tab = thisTab;
+    } else if (
+      thisTab === 'qr' ||
+      (thisTab === 'card' && /^magic/.test(this.screen))
+    ) {
       if (confirmedCancel === true) {
-        tab = 'card';
+        if (thisTab === 'qr') {
+          tab = '';
+        } else {
+          tab = 'card';
+        }
         this.clearRequest();
       } else {
-        return Confirm.show({
-          message:
-            'Your payment is ongoing. ' +
-            'Are you sure you want to cancel the payment?',
-          heading: 'Cancel Payment?',
-          positiveBtnTxt: 'Yes, cancel',
-          negativeBtnTxt: 'No',
-          onPositiveClick: function() {
-            self.back(true);
-          },
-        });
+        return confirm();
       }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {

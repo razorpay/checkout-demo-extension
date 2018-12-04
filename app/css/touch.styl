@@ -33,6 +33,7 @@ $mobile-view() {
     height: $bodyhmobile;
     height: calc(100% - 129px);
     height: calc(100vh - 129px);
+    padding-bottom: 0;
     min-height: $bodyhmobile;
 
     // Reduce height by 24px if timeout banner is shown
@@ -122,6 +123,7 @@ $mobile-view() {
   }
 
   #modal {
+    display: block;
     background: #fff;
     width: 100%;
     max-width: $max-width;
