@@ -54,7 +54,6 @@
     data: function () {
       return {
         expanded: -1,
-        curtainShown: false,
       };
     },
 

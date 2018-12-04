@@ -60,8 +60,6 @@ const fetchAgreements = (provider, loanUrl, plans, amount) => {
         AGREEMENT_STORE[provider][plan.value] = AGREEMENT_HELPER.parseResponse[
           provider
         ](response);
-
-        console.log(AGREEMENT_STORE);
       },
     });
   });
