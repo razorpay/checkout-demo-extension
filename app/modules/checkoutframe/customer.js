@@ -146,26 +146,6 @@ Customer.prototype = {
       url: url,
       data: data,
       callback: function(data) {
-        // data = {
-        //   emi_plans: [
-        //     {
-        //       entity: 'emi_plan',
-        //       duration: 3, // in months, the primary identifier
-        //       interest: 13,
-        //       currency: 'INR',
-        //       amount_per_month: 500000,
-        //     },
-        //     {
-        //       entity: 'emi_plan',
-        //       duration: 6, //in months
-        //       interest: 12,
-        //       currency: 'INR',
-        //       amount_per_month: 500000,
-        //     },
-        //   ],
-        //   // loan_agreement: “< link - to - loan - agreement - here >”,
-        // };
-
         if (data.success) {
           user.mark_logged(data);
         }
