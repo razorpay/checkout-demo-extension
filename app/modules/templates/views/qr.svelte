@@ -25,7 +25,7 @@
 </div>
 <style>
 :global(#body[tab=qr]) {
-  padding-bottom: 50px;
+  height: 374px;
 }
 .loading {
   margin-top: 20px;

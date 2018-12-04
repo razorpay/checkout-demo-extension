@@ -314,6 +314,7 @@ function showOverlay($with) {
   if ($with) {
     makeVisible($with[0]);
   }
+  $('#overlay').toggleClass('sub', $('#body').hasClass('sub'));
 }
 
 function hideOverlay($with) {
@@ -695,7 +696,7 @@ Session.prototype = {
     }
 
     if (this.methods.count >= 5) {
-      $('#body').addClass('long');
+      classes.push('long');
     }
 
     if (getter('ecod')) {

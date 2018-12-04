@@ -5,11 +5,14 @@
   display: none;
   top: 0;
   left: 0;
+  bottom: 0;
   width: 100%;
-  bottom: - $footerh;
   z-index: 100;
   border-radius: $br;
   background: rgba(0, 0, 0, 0.3);
+  &.sub {
+    bottom: - $footerh;
+  }
 }
 
 #error-message {
