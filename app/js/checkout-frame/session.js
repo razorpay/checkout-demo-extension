@@ -1432,6 +1432,14 @@ Session.prototype = {
 
             CardlessEmiStore.providerCode = providerCode;
 
+            /**
+             * TODO:
+             * If contact is optional,
+             * OR fees is enabled
+             *
+             * then open popup.
+             */
+
             self.showCardlessEmiPlans();
           },
         },
@@ -1539,9 +1547,9 @@ Session.prototype = {
 
     tab_titles.otp = cardlessEmiProviderObj.name;
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
-    this.customer.createOTP(
+    this.customer.checkStatus(
       function(response) {
-        if (!response.success) {
+        if (!response.saved) {
           self.showLoadError(
             'Could not find a ' +
               cardlessEmiProviderObj.name +

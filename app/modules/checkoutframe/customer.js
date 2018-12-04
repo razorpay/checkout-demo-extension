@@ -79,9 +79,16 @@ Customer.prototype = {
   },
 
   // NOTE: status check api also sends otp if customer exist
-  checkStatus: function(callback) {
+  checkStatus: function(callback, queryParams) {
     let customer = this;
-    let url = makeAuthUrl(this.r, 'customers/status/' + this.contact);
+    let url = 'customers/status/' + this.contact;
+
+    if (queryParams) {
+      url = `${url}?${_.obj2query(queryParams)}`;
+    }
+
+    url = makeAuthUrl(this.r, url);
+
     url += '&_[platform]=' + Track.props.platform;
 
     var device_token = qpmap.device_token;
@@ -96,7 +103,7 @@ Customer.prototype = {
         if (data.tokens) {
           customer.mark_logged(data);
         }
-        callback();
+        callback(data);
       },
     });
   },
@@ -139,6 +146,26 @@ Customer.prototype = {
       url: url,
       data: data,
       callback: function(data) {
+        // data = {
+        //   emi_plans: [
+        //     {
+        //       entity: 'emi_plan',
+        //       duration: 3, // in months, the primary identifier
+        //       interest: 13,
+        //       currency: 'INR',
+        //       amount_per_month: 500000,
+        //     },
+        //     {
+        //       entity: 'emi_plan',
+        //       duration: 6, //in months
+        //       interest: 12,
+        //       currency: 'INR',
+        //       amount_per_month: 500000,
+        //     },
+        //   ],
+        //   // loan_agreement: “< link - to - loan - agreement - here >”,
+        // };
+
         if (data.success) {
           user.mark_logged(data);
         }
