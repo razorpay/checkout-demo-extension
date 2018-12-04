@@ -239,6 +239,10 @@ function initOffers(
       } else if (matchedOffers.length > 1) {
         toggleOfferList();
       }
+
+      if (matchedOffers.length === 1) {
+        return matchedOffers[0];
+      }
     },
 
     selectOffer: function selectOffer(offer, programaticallySelected) {
