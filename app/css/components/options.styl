@@ -1,0 +1,52 @@
+.options
+  border-radius: 2px;
+  max-height: 320px;
+  overflow: hidden;
+  overflow-y: auto;
+  background: #fff;
+  margin-left: -12px;
+  margin-right: -12px;
+
+  .option
+    border: 1px solid #E6E7E8;
+    border-bottom: none;
+    transition: 0.2s background;
+    background: #fff;
+    padding: 12px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333333;
+    cursor: pointer;
+    text-align: left;
+    position: relative;
+
+    .option-icon
+      position: absolute;
+      left: 16px;
+
+      img
+        height: 20px;
+        width: auto;
+
+    &:last-child
+      border-bottom: 1px solid #E6E7E8;
+
+    &.next-option
+      padding-left: 48px;
+      padding-right: 32px;
+
+      &:after
+        content: '\e604';
+        transform: rotate(180deg);
+        font-size: 10px;
+        position: absolute;
+        right: 16px;
+        top: 14px;
+
+      .option-title,
+      .option-arrow-text
+        display: inline-block;
+        vertical-align: top;
+
+      .option-arrow-text
+        float: right;

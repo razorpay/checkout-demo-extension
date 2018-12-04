@@ -42,8 +42,13 @@ var activeStateColor = themeMeta.activeStateColor;
   color: `=highlightColor`;
 }
 
-.options-list .option:hover {
+.options-list .option:hover,
+.options .option:hover {
   background: `=hoverStateColor`;
+}
+
+.options .next-option:after {
+  color: `=highlightColor`;
 }
 
 #payment-options i svg {

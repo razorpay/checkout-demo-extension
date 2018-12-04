@@ -52,6 +52,7 @@ var upi_apps = _.upi_intents_data;
   <div id="backdrop"></div>
   <div id="timeout"></div>
   <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank">&#xe608;</a></i>
+  <div id="tnc-wrap"></div>
   <div id="modal" class="mchild">
     <div id="modal-inner">
       <div id="overlay" class="showable"></div>
@@ -270,23 +271,6 @@ var upi_apps = _.upi_intents_data;
                 <div`?_.tpvBank` class="showable"`?`>
                   <div class="legend">Select a payment method</div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
-                    `?method.emi`
-                      <div class="payment-option item" tab="emi">
-                        <label>
-                          <i>`=icons.emi`</i>
-                          `=_.tab_titles.emi`
-                          <span class="desc">
-                            `?method.cardless_emi && method.emi`
-                              Cards, ZestMoney, & More
-                            `??method.emi`
-                              EMI via Credit & Debit Cards
-                            `??method.cardless_emi`
-                              EMI via ZestMoney & More
-                            `?`
-                          </span>
-                        </label>
-                      </div>
-                    `?`
                     `?method.card`
                       `?o('theme.debit_card')`
                       <div class="payment-option item" tab="credit_card">
@@ -352,6 +336,23 @@ var upi_apps = _.upi_intents_data;
                         <span class="desc">Instant payment using UPI App</span>
                       </label>
                     </div>
+                    `?`
+                    `?method.emi`
+                      <div class="payment-option item" tab="`?method.cardless_emi`cardless_emi`??`emi`?`">
+                        <label>
+                          <i>`=icons.emi`</i>
+                          `=_.tab_titles.emi`
+                          <span class="desc">
+                            `?method.cardless_emi && method.emi`
+                            Cards, ZestMoney, & More
+                            `??method.emi`
+                            EMI via Credit & Debit Cards
+                            `??method.cardless_emi`
+                            EMI via ZestMoney & More
+                            `?`
+                          </span>
+                        </label>
+                      </div>
                     `?`
                   </div>
                   <div class="clear"></div>
@@ -750,6 +751,10 @@ var upi_apps = _.upi_intents_data;
               `?`
               `?method.emandate`
                 <div id="emandate-wrapper">
+                </div>
+              `?`
+              `?method.cardless_emi`
+                <div id="emi-options-wrapper">
                 </div>
               `?`
             </div>

@@ -79,9 +79,16 @@ Customer.prototype = {
   },
 
   // NOTE: status check api also sends otp if customer exist
-  checkStatus: function(callback) {
+  checkStatus: function(callback, queryParams) {
     let customer = this;
-    let url = makeAuthUrl(this.r, 'customers/status/' + this.contact);
+    let url = 'customers/status/' + this.contact;
+
+    if (queryParams) {
+      url = `${url}?${_.obj2query(queryParams)}`;
+    }
+
+    url = makeAuthUrl(this.r, url);
+
     url += '&_[platform]=' + Track.props.platform;
 
     var device_token = qpmap.device_token;
@@ -96,14 +103,20 @@ Customer.prototype = {
         if (data.tokens) {
           customer.mark_logged(data);
         }
-        callback();
+        callback(data);
       },
     });
   },
 
-  createOTP: function(callback) {
+  createOTP: function(callback, queryParams) {
+    let url = 'otp/create';
+
+    if (queryParams) {
+      url = `${url}?${_.obj2query(queryParams)}`;
+    }
+
     fetch.post({
-      url: makeAuthUrl(this.r, 'otp/create'),
+      url: makeAuthUrl(this.r, url),
       data: {
         contact: this.contact,
       },
@@ -111,11 +124,17 @@ Customer.prototype = {
     });
   },
 
-  submitOTP: function(data, callback) {
+  submitOTP: function(data, callback, queryParams) {
     let user = this;
 
     data.contact = this.contact;
-    let url = makeAuthUrl(this.r, 'otp/verify');
+    let url = 'otp/verify';
+
+    if (queryParams) {
+      url = `${url}?${_.obj2query(queryParams)}`;
+    }
+
+    url = makeAuthUrl(this.r, url);
 
     if (qpmap.platform === 'android' && qpmap.version && qpmap.library) {
       data['_[platform]'] = 'android';
@@ -145,7 +164,7 @@ Customer.prototype = {
             callback(strings.wrongOtp);
           }
         } else {
-          callback();
+          callback(undefined, data);
         }
       },
     });

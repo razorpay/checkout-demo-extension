@@ -91,6 +91,17 @@ function handleRelayFn(relayObj) {
   }
 }
 
+/**
+ * Temp store for Cardless EMI.
+ * Will move to Svelte Store upon migration.
+ */
+var CardlessEmiStore = {
+  plans: {},
+  duration: {},
+  loanUrls: {},
+  ott: {},
+};
+
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
@@ -1190,6 +1201,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.setEmandate();
+    this.setCardlessEmi();
     this.setSavedCardsView();
     this.setOtpScreen();
     this.checkTez();
@@ -1369,6 +1381,197 @@ Session.prototype = {
     if (this.emandate && this.methods.emandate) {
       this.emandateView = new discreet.emandateView(this);
     }
+  },
+
+  setCardlessEmi: function() {
+    var self = this;
+
+    if (this.methods.cardless_emi) {
+      this.emiOptionsView = new discreet.emiOptionsView(this);
+
+      var providers = [];
+
+      if (this.methods.emi) {
+        providers.push({
+          data: {
+            code: 'cards',
+          },
+          icon: 'https://cdn.razorpay.com/cardless_emi-sq/cards.svg',
+          title: 'EMI on Cards',
+        });
+      }
+
+      each(this.methods.cardless_emi, function(provider) {
+        var providerObj = discreet.CardlessEmi.getProvider(provider);
+
+        providers.push({
+          data: {
+            code: provider,
+          },
+          icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + provider + '.svg',
+          title: providerObj.name,
+        });
+      });
+
+      this.emiOptionsView.setOptions({
+        providers: providers,
+
+        on: {
+          select: function(event) {
+            var providerCode = event.option.code;
+
+            // User selected EMI on Cards
+            if (providerCode === 'cards') {
+              self.switchTab('emi');
+              return;
+            }
+
+            $('#form-cardless_emi input[name=emi_duration').val('');
+            $('#form-cardless_emi input[name=provider]').val('');
+            $('#form-cardless_emi input[name=ott]').val('');
+
+            CardlessEmiStore.providerCode = providerCode;
+
+            $('#form-cardless_emi input[name=provider]').val(providerCode);
+
+            self.preSubmit();
+          },
+        },
+      });
+    }
+  },
+
+  makeCardlessEmiDetailText: function(duration, monthly) {
+    return (
+      '<ul>' +
+      '<li>Monthly Installment: ₹' +
+      this.formatAmount(monthly) +
+      '</li>' +
+      '<li>Total Amount: ₹' +
+      this.formatAmount(duration * monthly) +
+      ' (₹' +
+      this.formatAmount(monthly) +
+      ' x ' +
+      duration +
+      ')' +
+      '</li>' +
+      '</ul>'
+    );
+  },
+
+  getCardlessEmiPlans: function() {
+    var self = this;
+    var providerCode = CardlessEmiStore.providerCode;
+    var plans = CardlessEmiStore.plans[providerCode];
+
+    var plansList = [];
+
+    each(plans, function(index, p) {
+      plansList.push({
+        text:
+          p.duration +
+          ' Months @ ₹' +
+          self.formatAmount(p.amount_per_month) +
+          '/mo',
+        value: p.duration,
+        detail: self.makeCardlessEmiDetailText(p.duration, p.amount_per_month),
+      });
+    });
+
+    return plansList;
+  },
+
+  showCardlessEmiPlans: function() {
+    var self = this;
+    var providerCode = CardlessEmiStore.providerCode;
+    var plans = CardlessEmiStore.plans[providerCode];
+
+    if (!plans) {
+      this.fetchCardlessEmiPlans();
+      return;
+    }
+
+    var plansList = this.getCardlessEmiPlans(plans);
+
+    this.emiPlansView.setPlans({
+      plans: plansList,
+
+      actions: {
+        showAgreement: CardlessEmiStore.providerCode === 'zestmoney',
+      },
+
+      amount: this.get('amount'),
+
+      loanUrl: CardlessEmiStore.loanUrls[providerCode],
+
+      provider: CardlessEmiStore.providerCode,
+
+      on: {
+        back: bind(function() {
+          self.switchTab('cardless_emi');
+
+          return true;
+        }),
+
+        select: function(value) {
+          $('#form-cardless_emi input[name=emi_duration').val(value);
+          $('#form-cardless_emi input[name=provider]').val(
+            CardlessEmiStore.providerCode
+          );
+          $('#form-cardless_emi input[name=ott]').val(
+            CardlessEmiStore.ott[CardlessEmiStore.providerCode]
+          );
+
+          self.preSubmit();
+        },
+      },
+    });
+
+    this.setScreen('emiplans');
+  },
+
+  fetchCardlessEmiPlans: function(params) {
+    if (!params) {
+      params = {};
+    }
+
+    var providerCode = CardlessEmiStore.providerCode;
+    var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
+    var self = this;
+
+    tab_titles.otp = cardlessEmiProviderObj.name;
+    this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
+    this.customer.checkStatus(
+      function(response) {
+        if (!response.saved) {
+          self.showLoadError(
+            'Could not find a ' +
+              cardlessEmiProviderObj.name +
+              ' account associated with ' +
+              getPhone(),
+            true
+          );
+          return;
+        }
+
+        var otpMessage =
+          'Enter the OTP sent on ' +
+          getPhone() +
+          '<br>' +
+          ' to get EMI plans for' +
+          cardlessEmiProviderObj.name;
+
+        askOTP(self.otpView, otpMessage);
+
+        self.otpView.updateScreen({
+          allowSkip: false,
+        });
+      },
+      {
+        provider: providerCode,
+        amount: self.get('amount'),
+      }
+    );
   },
 
   setOtpScreen: function() {
@@ -1641,7 +1844,9 @@ Session.prototype = {
     });
 
     this.showLoadError(strings.otpsend + getPhone());
-    if (this.tab === 'wallet') {
+    if (this.tab === 'cardless_emi') {
+      this.fetchCardlessEmiPlans();
+    } else if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
@@ -2448,6 +2653,7 @@ Session.prototype = {
 
     var showPaybtn = screen;
     if (
+      screen === 'cardless_emi' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
         this.upi_intents_data &&
@@ -3644,6 +3850,8 @@ Session.prototype = {
       return this.r.submitOTP(otp);
     }
 
+    var queryParams;
+
     // card tab only past this
     var callback;
     // card filled by logged out user + remember me
@@ -3682,13 +3890,33 @@ Session.prototype = {
         }
       };
     }
-    this.customer.submitOTP(
-      {
-        otp: otp,
-        email: gel('email').value,
-      },
-      bind(callback, this)
-    );
+
+    var submitPayload = {
+      otp: otp,
+      email: gel('email').value,
+    };
+
+    if (this.tab === 'cardless_emi') {
+      queryParams = {
+        provider: CardlessEmiStore.providerCode,
+        method: 'cardless_emi',
+      };
+
+      callback = function(msg, data) {
+        if (msg) {
+          this.fetchCardlessEmiPlans();
+        } else {
+          CardlessEmiStore.plans[CardlessEmiStore.providerCode] =
+            data.emi_plans;
+          CardlessEmiStore.loanUrls[CardlessEmiStore.providerCode] =
+            data.loan_url;
+          CardlessEmiStore.ott[CardlessEmiStore.providerCode] = data.ott;
+          this.showCardlessEmiPlans();
+        }
+      };
+    }
+
+    this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
   },
 
   clearRequest: function(extra) {
@@ -3874,7 +4102,9 @@ Session.prototype = {
         }
         return this.emandateView.submit(data);
       } else if (/^emiplans/.test(screen)) {
-        return this.emiPlansView.submit();
+        if (!(data.method === 'cardless_emi' && data.emi_duration)) {
+          return this.emiPlansView.submit();
+        }
       }
 
       // perform the actual validation
@@ -3965,6 +4195,21 @@ Session.prototype = {
       });
     } else {
       delete this.r.display_amount;
+    }
+
+    if (data.method === 'cardless_emi') {
+      if (data.contact && !data.emi_duration) {
+        this.showCardlessEmiPlans();
+        return;
+      }
+
+      /**
+       * If contact is optional, we want to open a popup and take ott and emi_duration there.
+       */
+      if (!data.contact) {
+        delete data.ott;
+        delete data.emi_duration;
+      }
     }
 
     Razorpay.sendMessage({
@@ -4747,6 +4992,7 @@ Session.prototype = {
           data: response.error.description,
         });
       }
+
       var preferences = response;
       self.setPreferences(preferences);
 
