@@ -1401,12 +1401,12 @@ Session.prototype = {
         });
       }
 
-      each(this.methods.cardless_emi, function (provider) {
+      each(this.methods.cardless_emi, function(provider) {
         var providerObj = discreet.CardlessEmi.getProvider(provider);
 
         providers.push({
           data: {
-            code: provider
+            code: provider,
           },
           icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + provider + '.svg',
           title: providerObj.name,
@@ -1432,15 +1432,9 @@ Session.prototype = {
 
             CardlessEmiStore.providerCode = providerCode;
 
-            /**
-             * TODO:
-             * If contact is optional,
-             * OR fees is enabled
-             *
-             * then open popup.
-             */
+            $('#form-cardless_emi input[name=provider]').val(providerCode);
 
-            self.showCardlessEmiPlans();
+            self.preSubmit();
           },
         },
       });
@@ -4178,6 +4172,21 @@ Session.prototype = {
       });
     } else {
       delete this.r.display_amount;
+    }
+
+    if (data.method === 'cardless_emi') {
+      if (data.contact && !data.emi_duration) {
+        this.showCardlessEmiPlans();
+        return;
+      }
+
+      /**
+       * If contact is optional, we want to open a popup and take ott and emi_duration there.
+       */
+      if (!data.contact) {
+        delete data.ott;
+        delete data.emi_duration;
+      }
     }
 
     Razorpay.sendMessage({
