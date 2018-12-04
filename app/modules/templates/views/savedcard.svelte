@@ -22,11 +22,11 @@
     <div class="saved-outer">
       {#if plans}
         <div class="emi-plans-info-container emi-plans-trigger" data-bank={card.issuer} on:click="fire('viewPlans', event)">
-          <div class="emi-plan-unselected">
+          <div class="emi-plan-unselected emi-icon-multiple-cards">
             <div class="emi-plans-text">EMI Available</div>
             <div class="emi-plans-action theme-highlight">Pay with EMI</div>
           </div>
-          <div class="emi-plan-selected">
+          <div class="emi-plan-selected emi-icon-multiple-cards">
             <div class="emi-plans-text"></div>
             <div class="emi-plans-action theme-highlight">Edit</div>
           </div>
