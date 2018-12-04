@@ -302,7 +302,7 @@ window.backPressed = function(callback) {
 
   if (Confirm.isConfirmShown) {
     Confirm.hide(true);
-  } else if (TermsCurtain.isVisible) {
+  } else if (TermsCurtain.isVisible()) {
     TermsCurtain.hide();
   } else if (
     session.tab &&
