@@ -2300,7 +2300,7 @@ Session.prototype = {
         target: qs('#form-qr'),
         data: {
           paymentData: this.getFormData(),
-          r: this.r,
+          session: this,
           onSuccess: bind(successHandler, this),
         },
       });

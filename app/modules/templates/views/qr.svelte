@@ -1,4 +1,4 @@
-<div class="qr-container">
+<div class="container">
   {#if loading}
     Generating QR Code...
     <div class="loading">
@@ -6,7 +6,7 @@
       <div class="spin spin2"><div></div></div>
     </div>
   {:else}
-    <div class="qr-message">
+    <div class="message" style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
     Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
     </div>
   {/if}
@@ -15,16 +15,31 @@
       <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
     </div>
   {/if}
+  {#if !loading}
+    <div class="refresh">
+      Payment complete but page not updated yet?
+      <br />
+      <span class="qr-action" on:click="checkStatus()">Refresh now</span>
+    </div>
+  {/if}
 </div>
 <style>
+:global(#body[tab=qr]) {
+  padding-bottom: 50px;
+}
 .loading {
   margin-top: 20px;
 }
-.qr-container {
+.container {
   text-align: center;
   padding: 15px 0;
 }
-.qr-message + .qr-image {
+.message {
+  background: no-repeat center bottom;
+  background-size: 116px;
+  padding-bottom: 32px;
+}
+.message + .qr-image {
   display: block;
 }
 .qr-image {
@@ -32,7 +47,7 @@
   position: relative;
   overflow: hidden;
   width: 160px;
-  margin: 10px auto 0;
+  margin: 10px auto;
 }
 .qr-image:after {
   position: absolute;
@@ -50,7 +65,8 @@
   right: 1px;
   top: 1px;
   bottom: 1px;
-  border: 1px solid;
+  border-width: 1px;
+  border-style: solid;
   content: '';
 }
 img {
@@ -61,14 +77,21 @@ img {
   display: block;
   position: relative;
 }
+.refresh {
+  color: #999;
+  line-height: 22px;
+}
 </style>
 <script>
+  import { RazorpayConfig } from 'common/Razorpay';
+
   export default {
     oncreate() {
-      const { r, paymentData, onSuccess } = this.get();
+      const { session, paymentData, onSuccess } = this.get();
+      this.session = session;
       paymentData.method = 'upi';
       paymentData['_[flow]'] = 'intent';
-      this.r = r.createPayment(paymentData)
+      session.r.createPayment(paymentData)
         .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))
         .on('payment.success', onSuccess)
     },
@@ -79,6 +102,7 @@ img {
 
     data() {
       return {
+        RazorpayConfig,
         loading: true,
         qrImage: null
       }
@@ -90,7 +114,11 @@ img {
           data.qr_code_url || data.intent_url
         )}&choe=UTF-8&chld=L|0`;
         this.set({ qrImage });
-        this.r.emit('payment.upi.intent_success_response');
+        this.session.r.emit('payment.upi.intent_success_response');
+      },
+
+      checkStatus() {
+        this.session.showLoadError('Checking payment status...');
       }
     }
   }

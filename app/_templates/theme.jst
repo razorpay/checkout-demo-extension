@@ -10,6 +10,13 @@ var hoverStateColor = themeMeta.hoverStateColor;
 var activeStateColor = themeMeta.activeStateColor;
 `
 
+.qr-action {
+  color: `=c`;
+  border-bottom: 1px solid `=c`;
+  padding: 3px 1px;
+  cursor: pointer;
+}
+
 `?_('theme.upi_only')`
 #payment-options div:nth-child(-n+3){
   pointer-events: none;
@@ -28,7 +35,7 @@ var activeStateColor = themeMeta.activeStateColor;
   border-bottom-color: `=highlightColor`;
 }
 
-.spin div, .link, .multi-tpv :checked + label, .qr-image:before
+.spin div, .link, .multi-tpv :checked + label
 {
   border-color: `=highlightColor`!important;
 }
@@ -141,6 +148,7 @@ color: `=c`;
   fill: `=c`;
 }
 
+.qr-image:before,
 .copytoclipboard--container.copied .copytoclipboard--text,
 .copytoclipboard--container.copied .copytoclipboard--btn {
   border-color: `=c`;
