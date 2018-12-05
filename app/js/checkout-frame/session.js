@@ -2959,6 +2959,17 @@ Session.prototype = {
       } else {
         this.cardTab = null;
       }
+
+      Razorpay.sendMessage({
+        event: 'event',
+        data: {
+          event: 'method_selection',
+          data: {
+            method: tab,
+          },
+        },
+      });
+
       var contact = getPhone();
       if (
         (!contact && !this.optional.contact) ||
@@ -4572,7 +4583,7 @@ Session.prototype = {
     var qrEnabled = this.get('method.qr');
 
     var methods = (this.methods = {
-      count: !!qrEnabled,
+      count: Number(!!qrEnabled),
       qr: qrEnabled,
     });
 
