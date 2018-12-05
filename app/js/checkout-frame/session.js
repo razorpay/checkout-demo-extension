@@ -3252,6 +3252,7 @@ Session.prototype = {
             back: bind(function() {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
+              self.toggleSavedCards(false);
 
               return true;
             }),
