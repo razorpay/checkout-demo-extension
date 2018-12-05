@@ -130,8 +130,9 @@ function fillData(container, returnObj) {
 function setEmiPlansCta(screen, tab) {
   var type = 'pay';
 
-  var isSavedScreen = $('#form-card').hasClass('saved-cards');
-  var emiDuration = $('#emi_duration').val();
+  var isSavedScreen =
+    $('#form-card')[0] && $('#form-card').hasClass('saved-cards');
+  var emiDuration = $('#emi_duration')[0] && $('#emi_duration').val();
   var savedCard = $('.saved-card.checked');
 
   if (screen === 'card' && tab === 'emi') {
