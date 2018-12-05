@@ -8,7 +8,7 @@ const AGREEMENT_HELPER = {
   createUrl: {
     zestmoney: (url, amount, duration) =>
       `${url}${_.obj2query({
-        bucket_amount: amount,
+        basket_amount: amount,
         emi_duration: duration,
       })}`,
   },
