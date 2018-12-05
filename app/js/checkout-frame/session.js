@@ -454,6 +454,7 @@ function showOverlay($with) {
   if ($with) {
     makeVisible($with[0]);
   }
+  $('#overlay').toggleClass('sub', $('#body').hasClass('sub'));
 }
 
 function hideOverlay($with) {
@@ -866,6 +867,10 @@ Session.prototype = {
       classes.push('emi-method');
     }
 
+    if (this.methods.count >= 5) {
+      classes.push('long');
+    }
+
     if (getter('ecod')) {
       classes.push('ecod');
     }
@@ -1212,11 +1217,6 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     errorHandler.call(this, this.params);
-
-    // Update the payment options grid layout.
-    if (this.methods.count >= 5) {
-      $('#body').addClass('long');
-    }
 
     var hasOffers = this.hasOffers,
       forcedOffer = this.forcedOffer;
@@ -2614,6 +2614,19 @@ Session.prototype = {
       return;
     }
 
+    if (screen === 'qr') {
+      this.currentScreen = new discreet.QRScreen({
+        target: qs('#form-qr'),
+        data: {
+          paymentData: this.getFormData(),
+          session: this,
+          onSuccess: bind(successHandler, this),
+        },
+      });
+    } else if (this.currentScreen) {
+      this.currentScreen.destroy();
+    }
+
     Analytics.track('screen:switch', {
       data: {
         from: this.screen,
@@ -2654,6 +2667,7 @@ Session.prototype = {
     var showPaybtn = screen;
     if (
       screen === 'cardless_emi' ||
+      screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
         this.upi_intents_data &&
@@ -2850,11 +2864,26 @@ Session.prototype = {
   },
   back: function(confirmedCancel) {
     var tab = '';
+    var thisTab = this.tab;
     var self = this;
 
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
     });
+
+    var confirm = function() {
+      Confirm.show({
+        message:
+          'Your payment is ongoing. ' +
+          'Are you sure you want to cancel the payment?',
+        heading: 'Cancel Payment?',
+        positiveBtnTxt: 'Yes, cancel',
+        negativeBtnTxt: 'No',
+        onPositiveClick: function() {
+          self.back(true);
+        },
+      });
+    };
 
     if (this.get('ecod')) {
       $('#footer').hide();
@@ -2863,28 +2892,22 @@ Session.prototype = {
       tab = 'wallet';
     } else if (
       this.screen === 'otp' &&
-      (this.tab !== 'card' && this.tab !== 'emi')
+      (thisTab !== 'card' && thisTab !== 'emi')
     ) {
-      tab = this.tab;
+      tab = thisTab;
     } else if (
-      (this.tab === 'card' || this.tab === 'emi') &&
-      /^magic/.test(this.screen)
+      thisTab === 'qr' ||
+      ((thisTab === 'card' || thisTab === 'emi') && /^magic/.test(this.screen))
     ) {
       if (confirmedCancel === true) {
-        tab = this.tab;
+        if (thisTab === 'qr') {
+          tab = '';
+        } else {
+          tab = thisTab;
+        }
         this.clearRequest();
       } else {
-        return Confirm.show({
-          message:
-            'Your payment is ongoing. ' +
-            'Are you sure you want to cancel the payment?',
-          heading: 'Cancel Payment?',
-          positiveBtnTxt: 'Yes, cancel',
-          negativeBtnTxt: 'No',
-          onPositiveClick: function() {
-            self.back(true);
-          },
-        });
+        return confirm();
       }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {
@@ -4368,9 +4391,9 @@ Session.prototype = {
         that.showLoadError('Select UPI App in your device', false);
       });
 
-      this.r.on('payment.upi.coproto_response', function(request) {
+      this.r.on('payment.upi.coproto_response', function(response) {
         var params = {};
-        params[Constants.UPI_POLL_URL] = request.url;
+        params[Constants.UPI_POLL_URL] = response.request.url;
         params[Constants.PENDING_PAYMENT_TS] = now() + '';
         that.setParamsInStorage(params);
       });
@@ -4546,10 +4569,13 @@ Session.prototype = {
     var passedWallets = this.get('method.wallet');
     var self = this;
     var emi_options = this.emi_options;
+    var qrEnabled = this.get('method.qr');
 
     var methods = (this.methods = {
-      count: 0,
+      count: !!qrEnabled,
+      qr: qrEnabled,
     });
+
     /* Set recurring payment methods*/
     if (recurring) {
       availMethods = availMethods.recurring;
@@ -4620,7 +4646,7 @@ Session.prototype = {
       var paymentMethod = this.forcedOffer.payment_method;
       if (paymentMethod === 'emi') {
         delete methods.card;
-        methods.count = 1;
+        methods.count++;
       }
     }
 
@@ -4672,7 +4698,7 @@ Session.prototype = {
     ) {
       methods[bankMethod] = false;
     } else {
-      methods.count = 1;
+      methods.count++;
       this.down = getDownBanks(preferences);
       this.netbanks = getPreferredBanks(
         preferences,

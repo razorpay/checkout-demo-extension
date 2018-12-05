@@ -37,6 +37,8 @@ import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutframe/store';
 
+import QRScreen from 'templates/views/qr.svelte';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -88,4 +90,5 @@ export default {
   OptionsList,
   commonBanks,
   timer: _.timer,
+  QRScreen,
 };
