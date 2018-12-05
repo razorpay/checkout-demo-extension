@@ -128,31 +128,57 @@ function fillData(container, returnObj) {
  * 2. If new card screen, show if no emi plan is selected.
  */
 function setEmiPlansCta(screen, tab) {
-  var show = false;
+  var type = 'pay';
+
+  var isSavedScreen = $('#form-card').hasClass('saved-cards');
+  var emiDuration = $('#emi_duration').val();
+  var savedCard = $('.saved-card.checked');
 
   if (screen === 'card' && tab === 'emi') {
-    var isSavedScreen = $('#form-card').hasClass('saved-cards');
-    var emiDuration = $('#emi_duration').val();
-
     if (isSavedScreen) {
-      var savedCard = $('.saved-card.checked');
-
       if (savedCard[0]) {
         var emiDurationField = savedCard.$('.emi_duration');
 
         if (emiDurationField[0]) {
           if (!emiDurationField.val()) {
-            show = true;
+            type = 'show';
           }
         }
       }
     } else if (!emiDuration) {
-      show = true;
+      type = 'show';
+    }
+  } else if (screen === 'emiplans') {
+    if (isSavedScreen) {
+      var savedCard = $('.saved-card.checked');
+
+      if (savedCard[0]) {
+        if (!savedCard.$('.saved-cvv').val()) {
+          type = 'select';
+        }
+      }
+    } else {
+      type = 'pay';
     }
   }
 
-  $('.plans-btn').toggleClass('invisible', !show);
-  $('.pay-btn').toggleClass('invisible', show);
+  $('.select-plan-btn').addClass('invisible');
+  $('.view-plans-btn').addClass('invisible');
+  $('.pay-btn').addClass('invisible');
+
+  switch (type) {
+    case 'pay':
+      $('.pay-btn').removeClass('invisible');
+      break;
+
+    case 'show':
+      $('.view-plans-btn').removeClass('invisible');
+      break;
+
+    case 'select':
+      $('.select-plan-btn').removeClass('invisible');
+      break;
+  }
 }
 
 /**
@@ -3246,6 +3272,7 @@ Session.prototype = {
 
               self.processOffersOnEmiPlanSelection(plan);
 
+              $('.select-plan-btn').addClass('invisible');
               self.preSubmit();
             },
 
@@ -3274,6 +3301,8 @@ Session.prototype = {
         var bank = $trigger.attr('data-bank');
         var plans = (emi_options.banks[bank] || {}).plans;
         var emiPlans = self.getEmiPlans(bank);
+        var $savedCard = $('.saved-card.checked');
+        var savedCvv = $savedCard.$('.saved-cvv').val();
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
@@ -3321,7 +3350,14 @@ Session.prototype = {
 
               self.processOffersOnEmiPlanSelection(plan);
 
-              self.preSubmit();
+              if (savedCvv) {
+                self.preSubmit();
+              } else {
+                $('.select-plan-btn').addClass('invisible');
+                self.switchTab('emi');
+                self.setScreen('card');
+                self.toggleSavedCards(true);
+              }
             },
 
             viewAll: viewAllPlans,
@@ -3373,8 +3409,17 @@ Session.prototype = {
         $$('.saved-card').length !== tokensList.items.length
       ) {
         try {
+          // Keep EMI cards at the end
           tokensList.items.sort(function(a, b) {
-            return b.card && !!b.card.emi;
+            if (a.card && b.card) {
+              if (a.card.emi && b.card.emi) {
+                return 0;
+              } else if (a.card.emi) {
+                return 1;
+              } else if (b.card.emi) {
+                return -1;
+              }
+            }
           });
         } catch (e) {}
 
