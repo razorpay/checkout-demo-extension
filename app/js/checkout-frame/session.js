@@ -1570,14 +1570,18 @@ Session.prototype = {
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
       function(response) {
-        if (!response.saved) {
-          self.showLoadError(
+        if (!response.saved || (response.error && response.error.description)) {
+          var errorDesc =
             'Could not find a ' +
-              cardlessEmiProviderObj.name +
-              ' account associated with ' +
-              getPhone(),
-            true
-          );
+            cardlessEmiProviderObj.name +
+            ' account associated with ' +
+            getPhone();
+
+          if (response.error && response.error.description) {
+            errorDesc = response.error.description;
+          }
+
+          self.showLoadError(errorDesc, true);
           return;
         }
 
