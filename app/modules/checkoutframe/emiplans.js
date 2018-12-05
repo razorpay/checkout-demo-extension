@@ -7,7 +7,7 @@ const AGREEMENT_STORE = {};
 const AGREEMENT_HELPER = {
   createUrl: {
     zestmoney: (url, amount, duration) =>
-      `${url}${_.obj2query({
+      `${url.replace('http://', 'https://')}${_.obj2query({
         basket_amount: amount,
         emi_duration: duration,
       })}`,
