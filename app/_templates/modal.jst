@@ -422,10 +422,10 @@ var upi_apps = _.upi_intents_data;
                     </div>
                     <div id="elem-emi">
                       <div class="strip emi-plans-info-container emi-plans-trigger">
-                        <div class="emi-plan-unavailable hidden">
+                        <div class="emi-plan-unavailable hidden emi-icon-multiple-cards">
                           <span class="help">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, Standard Chartered and Axis Bank
                             Credit Cards. Enter your credit card to avail.</span>
-                          <div class="emi-plans-text">EMI unavailable on this card</div>
+                          <div class="emi-plans-text">EMI unavailable</div>
                           `?method.card`
                           <div class="emi-plans-action theme-highlight">Pay without EMI</div>
                           `?`
@@ -773,7 +773,8 @@ var upi_apps = _.upi_intents_data;
             <button id="footer" type="submit" class="button">
               <span class="pay-btn">`?o('amount')`PAY &nbsp;<span class="original-amount">`=amount`</span><span class="discount"></span>`??`Authenticate`?`</span>
               <span class="otp-btn">Verify</span>
-              <span class="plans-btn invisible">View EMI Plans</span>
+              <span class="view-plans-btn invisible">View EMI Plans</span>
+              <span class="select-plan-btn invisible">Select EMI Plan</span>
             </button>
             `?o('theme.branding')`
               <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">
