@@ -55,6 +55,7 @@ export const TAB_TITLES = {
   emi: 'EMI',
   emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
+  qr: 'UPI QR',
   upi: 'UPI',
   wallet: 'Wallet',
 };

@@ -302,6 +302,9 @@ magicView.prototype = {
       window.otpPermissionCallback = callback.bind(this);
 
       CheckoutBridge.requestOtpPermission();
+    } else {
+      // Call callback if CheckoutBridge.requestOtpPermission is not found.
+      callback({ granted: false });
     }
   },
 

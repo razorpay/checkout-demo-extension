@@ -682,7 +682,7 @@ i {
   height: $bodyh;
   background: #fff;
   backface-visibility: none;
-  transition: 0.3s height;
+  // transition: 0.3s height;
 
   &.emi-focus {
     position: relative;
@@ -886,6 +886,7 @@ $outline = #ddd;
   bottom: 0;
   background: #fff;
   z-index: 4;
+  border-radius: 3px;
 }
 
 #offers-container {
@@ -1435,29 +1436,6 @@ $outline = #ddd;
 .emi-method {
   #powered-by {
     bottom: 30px;
-  }
-}
-
-#body.long {
-  height: 374px;
-
-  &.has-offers {
-
-    .offers-list-container {
-      height: $bodyh + $footerh + 38px;
-    }
-  }
-
-  #payment-options {
-    label {
-      height: 77px;
-    }
-    i {
-      margin: -12px 0 -6px;
-    }
-    .item:last-child {
-      width: calc(33.33% - 1px);
-    }
   }
 }
 
