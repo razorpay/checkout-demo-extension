@@ -12,6 +12,7 @@ RazorpayDefaults.method = {
   emi: true,
   upi: true,
   upi_intent: null,
+  qr: false,
 };
 
 RazorpayDefaults.prefill = {
