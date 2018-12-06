@@ -3,6 +3,15 @@
 #form-otp {
   padding-top: 40px;
   text-align: center;
+
+  #timeout {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #FFF7E0;
+    padding: 12px 0;
+    border-top: 1px solid #e6e6e6;
+  }
 }
 
 #otp-action {
@@ -50,9 +59,9 @@
   width: 100%;
   left: 0;
   text-align: center;
-  a {
+  a:not(.hidden) {
     display: inline-block;
-    & + a {
+    + a {
       margin-left: 90px;
     }
   }

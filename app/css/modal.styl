@@ -1,11 +1,21 @@
 @require 'common';
 
+.headless-bank {
+  height: 20px;
+  padding-top: 13px !important;
+}
+
 #timeout {
   display: none;
   background: #F6E58D;
   padding: 4px 0;
   font-size: 13px;
   color: #2D3436;
+  i {
+    margin: 0 5px 0 12px;
+    font-size: 18px;
+    vertical-align: middle;
+  }
 }
 
 .clear {
@@ -433,7 +443,7 @@ i {
     #modal {
       opacity: 1;
       transform: none;
-      transition: 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
+      transition: 0.2s, 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
 
     &.rerender #modal {
@@ -504,6 +514,7 @@ i {
 }
 
 #modal {
+  border-radius: 3px;
   box-sizing: border-box;
   display: inline-block;
   transition: 0.3s ease-in;

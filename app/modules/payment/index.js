@@ -11,6 +11,7 @@ import * as strings from 'common/strings';
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
+import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
@@ -88,7 +89,10 @@ function getTrackingData(data) {
   );
 }
 
-function trackNewPayment(data = {}, params, r) {
+function trackNewPayment(data, params, r) {
+  if (!data) {
+    data = {};
+  }
   /**
    * Set whether saved card is global or local.
    */
@@ -123,6 +127,7 @@ function trackNewPayment(data = {}, params, r) {
 }
 
 export default function Payment(data, params, r) {
+  this.iframe = params.iframe;
   this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
@@ -426,8 +431,18 @@ Payment.prototype = {
     }
   },
 
+  gotoBank: function() {
+    this.popup.write(popupTemplate(this));
+    _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
+    this.popup.show();
+  },
+
   makePopup: function() {
-    var popup = new Popup('', 'popup_' + Track.id);
+    let Medium = Popup;
+    if (this.iframe) {
+      Medium = Iframe;
+    }
+    var popup = new Medium('', 'popup_' + Track.id, this);
     if ((popup && !popup.window) || popup.window.closed !== false) {
       popup.close();
       popup = null;

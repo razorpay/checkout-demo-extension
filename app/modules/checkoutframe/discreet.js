@@ -22,7 +22,8 @@ import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
-import { commonBanks } from 'common/bank';
+import * as WalletUtils from 'common/wallet';
+import { commonBanks, getFullBankLogo } from 'common/bank';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -91,4 +92,5 @@ export default {
   commonBanks,
   timer: _.timer,
   QRScreen,
+  getFullBankLogo,
 };

@@ -4,6 +4,8 @@ RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
 RazorpayDefaults.ecod = false;
 
+RazorpayDefaults.flashcheckout = false;
+
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {
   netbanking: null,
