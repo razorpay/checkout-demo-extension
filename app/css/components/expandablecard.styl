@@ -1,0 +1,60 @@
+.expandable-card
+  border: 1px solid #E6E7E8;
+  padding: 16px;
+  border-radius: 1px;
+  cursor: pointer;
+  position: relative;
+
+  .expandable-card-title
+    color: #333333;
+    font-size: 14px;
+    line-height: 16px;
+
+  .expandable-card-detail
+    color: #757575;
+    font-size: 13px;
+    line-height: 16px;
+    border-top: 1px solid transparent;
+    max-height: 0px;
+    transition: all 0.15s ease-in-out;
+    overflow: hidden;
+
+    ul
+      padding-left: 18px;
+      margin: 0;
+
+.expandable-card--expanded
+  .expandable-card-title
+    margin-bottom: 16px;
+
+  .expandable-card-detail
+    border-top-color: #E6E7E8;
+    max-height: 32px;
+    padding-top: 16px;
+
+.expandable-card-list
+  .expandable-card
+
+    &:not(:first-child)
+      &:not(.expandable-card--expanded)
+        border-top-color: transparent;
+
+.expandable-card--has-badge
+  .expandable-card-title
+    padding-right: 72px;
+
+  .badge
+    position: absolute;
+    display: block;
+    right: 0;
+    top: 24px;
+    transform: translateY(-50%);
+    margin-right: 8px;
+    border: 1px solid #70BE53;
+    border-radius: 2px;
+    background-color: #F7FBF5;
+    color: #70BE53;
+    font-size: 10px;
+    padding: 0 3px;
+    text-transform: uppercase;
+    pointer-events: none;

@@ -46,16 +46,18 @@ export const STATES = {
  * Move to `checkout/constants` if and when we create it.
  */
 export const TAB_TITLES = {
-  debit_card: 'Debit Card',
+  card: 'Card',
+  cardless_emi: 'EMI',
   credit_card: 'Credit Card',
+  debit_card: 'Debit Card',
+  ecod: 'Pay by Link',
   emandate: 'Bank Account',
   emi: 'EMI',
-  card: 'Card',
+  emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
-  wallet: 'Wallet',
-  upi: 'UPI',
-  ecod: 'Pay by Link',
   qr: 'UPI QR',
+  upi: 'UPI',
+  wallet: 'Wallet',
 };
 
 /* .shown has display: none from iOS ad-blocker
@@ -79,3 +81,6 @@ export const EMI_HELP_TEXT =
   'EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, ' +
   'Standard Chartered and Axis Bank Credit Cards. Enter your credit card ' +
   'to avail.';
+
+// Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
+export const DEFAULT_AUTH_TYPE_RADIO = '3ds';

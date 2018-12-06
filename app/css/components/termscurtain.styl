@@ -1,0 +1,105 @@
+.tnc-curtain
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  text-align: left;
+  font-family: "lato", ubuntu, helvetica, sans-serif;
+
+  &:not(.shown)
+    pointer-events: none;
+    z-index: 0;
+
+  &.shown
+    z-index: 3;
+
+    .tnc-container-bg
+      background-color: rgba(0, 0, 0, 0.3);
+
+    .tnc-container
+      opacity: 1;
+
+  .tnc-container-bg
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    transition: 0.15s ease-in-out;
+
+  .tnc-container
+    opacity: 0;
+
+    overflow: hidden;
+
+    height: 90%;
+    max-height: 420px;
+    width: 90%;
+    max-width: 560px;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    background-color: white;
+    box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);
+    border-radius: 2px;
+
+    &>div
+      padding: 12px 24px;
+
+    .tnc-header
+      padding-right: 32px;
+      padding-top: 24px;
+      padding-bottom: 24px;
+
+      color: #535A78;
+      font-size: 14px;
+      line-height: 18px;
+      font-weight: 600;
+      text-transform: uppercase;
+
+      position: relative;
+
+      span:not(.tnc-close)
+        vertical-align: middle;
+        display: inline-block;
+
+      .tnc-provider-image
+        margin-left: 8px;
+        padding: 0px 12px;
+        border-left: 1px solid #d7e7fe;
+
+        img
+          max-height: 20px;
+          width: auto;
+          display: inline-block;
+          vertical-align: top;
+
+      .tnc-close
+        cursor: pointer;
+        position: absolute;
+        right: 24px;
+        font-size: 18px;
+
+    .separator
+      padding: 0;
+      margin: 0 24px;
+      background-color: #d7e7fe;
+      height: 1px;
+
+    .tnc-contents
+      white-space: pre-line;
+      overflow: scroll;
+      height: calc(100% - 70px);
+      font-size: 14px;
+      line-height: 18px;
+      color: #646D8B;
+
+#container.mobile
+  .tnc-container
+    height: 100%;
+    width: 100%;
+    max-height: unset;
+    max-width: unset;

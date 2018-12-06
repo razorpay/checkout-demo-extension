@@ -43,7 +43,7 @@ export function makeAuthUrl(r, url) {
       if (account_id) {
         value += '&account_id=' + account_id;
       }
-      return url + '?' + prop + '=' + value;
+      return url + (url.indexOf('?') >= 0 ? '&' : '?') + prop + '=' + value;
     }
   }
   return url;
