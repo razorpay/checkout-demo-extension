@@ -3,8 +3,10 @@ import { RazorpayConfig } from 'common/Razorpay';
 // const cdnUrl = '';
 const cdnUrl = RazorpayConfig.cdn;
 const prefix = cdnUrl + 'bank/';
+const fullPrefix = cdnUrl + 'bank-lg/';
 
 export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
+export const getFullBankLogo = code => `${fullPrefix}${code.slice(0, 4)}.svg`;
 
 const _commonBanks = [
   ['ICIC_C', 'ICICI Corporate'],

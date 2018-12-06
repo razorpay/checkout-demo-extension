@@ -3,6 +3,7 @@ import * as strings from 'common/strings';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
+import { RazorpayConfig } from 'common/Razorpay';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -18,13 +19,6 @@ export const processOtpResponse = function(response) {
 };
 
 export const processPaymentCreate = function(response) {
-  response = {
-    type: 'otp',
-    payment_id: 'pay_123',
-    next: ['resend_otp'],
-    request: {},
-    redirect_url: 'https://google.com',
-  };
   var payment = this;
   var r = payment.r;
 
@@ -99,6 +93,9 @@ var responseTypes = {
 
       global.CheckoutBridge.invokePopup(_Obj.stringify(popupOptions));
     } else if (popup) {
+      if (this.iframe) {
+        popup.el |> _El.setDisplay('block');
+      }
       if (direct) {
         // direct is true for payzapp
         popup.write(content);
@@ -271,12 +268,12 @@ var responseTypes = {
   },
 
   otp: function(request, fullResponse) {
-    if (request.method === 'direct') {
+    if (!this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
-    this.otpurl = request.url;
-    this.gotoBankUrl = fullResponse.redirect_url;
-    this.emit('otp.required');
+    this.otpurl = fullResponse.submit_url;
+    this.gotoBankUrl = fullResponse.redirect;
+    this.emit('otp.required', fullResponse);
   },
 
   // prettier-ignore
