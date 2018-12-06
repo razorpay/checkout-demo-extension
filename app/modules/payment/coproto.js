@@ -201,22 +201,24 @@ var responseTypes = {
         })
         .till(response => response && response.status);
 
-    this.emit('upi.coproto_response', request);
-
     var intent_url = (fullResponse.data || {}).intent_url;
 
-    this.on('upi.intent_response', data => {
-      const didIntentSucceed =
-        data |> parseUPIIntentResponse |> didUPIIntentSucceed;
-
-      if (didIntentSucceed) {
+    this.on('upi.intent_success_response', data => {
+      if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
-      } else {
-        return this.emit('cancel', upiBackCancel);
       }
-
       this.ajax = ra();
     });
+
+    this.on('upi.intent_response', data => {
+      if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
+        this.emit('upi.intent_success_response', data);
+      } else {
+        this.emit('cancel', upiBackCancel);
+      }
+    });
+
+    this.emit('upi.coproto_response', fullResponse);
 
     var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
