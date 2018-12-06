@@ -271,9 +271,14 @@ var responseTypes = {
     if (!this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
-    this.otpurl = fullResponse.submit_url;
-    this.gotoBankUrl = fullResponse.redirect;
-    this.emit('otp.required', fullResponse);
+    if (this.data.method === 'wallet') {
+      this.otpurl = request.url;
+      this.emit('otp.required');
+    } else {
+      this.otpurl = fullResponse.submit_url;
+      this.gotoBankUrl = fullResponse.redirect;
+      this.emit('otp.required', fullResponse);
+    }
   },
 
   // prettier-ignore
