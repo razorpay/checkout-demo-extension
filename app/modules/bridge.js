@@ -2,6 +2,7 @@ import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
 import * as Confirm from 'confirm';
+import * as TermsCurtain from 'checkoutframe/termscurtain';
 
 import Track from 'tracker';
 
@@ -301,6 +302,8 @@ window.backPressed = function(callback) {
 
   if (Confirm.isConfirmShown) {
     Confirm.hide(true);
+  } else if (TermsCurtain.isVisible()) {
+    TermsCurtain.hide();
   } else if (
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))

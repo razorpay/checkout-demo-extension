@@ -49,8 +49,13 @@ var activeStateColor = themeMeta.activeStateColor;
   color: `=highlightColor`;
 }
 
-.options-list .option:hover {
+.options-list .option:hover,
+.options .option:hover {
   background: `=hoverStateColor`;
+}
+
+.options .next-option:after {
+  color: `=highlightColor`;
 }
 
 #payment-options i svg {
@@ -176,4 +181,8 @@ ul.offers-list > li.offer.selected .checkbox {
 svg.offer-icon path {
 
   fill: `=highlightColor`;
+}
+
+.expandable-card--expanded {
+  border-color: `=highlightColor`;
 }

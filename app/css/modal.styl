@@ -61,6 +61,13 @@ html {
   box-sizing: border-box;
 }
 
+.vertical-pad
+  padding-bottom: 12px;
+
+.has-offers
+  .vertical-pad
+    padding-bottom: 44px;
+
 #wallets, #upi-apps {
   position: relative;
   padding: 12px 0;
@@ -318,11 +325,6 @@ i {
   z-index: 100;
 }
 
-#emi-bank-parent {
-  padding-top: 12px;
-  margin-top: 10px;
-}
-
 .selector {
   padding-bottom: 6px;
   cursor: pointer;
@@ -410,13 +412,6 @@ i {
     &:first-child {
       border-top: 0;
     }
-  }
-}
-
-#emi-plans {
-  .help {
-    min-width: 240px;
-    max-width: 280px;
   }
 }
 
@@ -1305,7 +1300,7 @@ $outline = #ddd;
   }
 }
 
-#form-wallet, #form-upi {
+#form-wallet, #form-upi, #form-emiplans {
   overflow: auto;
 }
 
@@ -1436,30 +1431,11 @@ $outline = #ddd;
     display: initial;
     font-size: 16px;
   }
-
-  #emi-bank-parent {
-    display: none;
-  }
 }
 
 .emi-method {
   #powered-by {
     bottom: 30px;
-  }
-}
-
-#container.long:not(.no-details) #body {
-  height: 374px;
-  #payment-options {
-    label {
-      height: 77px;
-    }
-    i {
-      margin: -12px 0 -6px;
-    }
-    .item:last-child {
-      width: calc(33.33% - 1px);
-    }
   }
 }
 
@@ -1470,11 +1446,6 @@ $outline = #ddd;
 #body[tab=emi] {
   height: 374px;
 
-  #form-card {
-    #emi-bank-parent {
-      display: block;
-    }
-  }
   #elem-emi {
     display: block;
   }
@@ -1707,6 +1678,7 @@ $outline = #ddd;
         font-size: 32px;
         margin: 2px 16px;
         line-height: 30px;
+        min-width: 27px;
       }
       &+.item {
         border-top: 1px solid $bc;
