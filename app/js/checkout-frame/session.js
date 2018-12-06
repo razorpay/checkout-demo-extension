@@ -2994,7 +2994,6 @@ Session.prototype = {
           this.headless = false;
           tab = thisTab;
         }
-        this.showCancelMessage = false;
         this.clearRequest();
       } else {
         return confirm();
@@ -4431,9 +4430,9 @@ Session.prototype = {
 
     var payment = this.r.createPayment(data, request);
     payment
-      .once('payment.success', bind(successHandler, this))
-      .once('payment.error', bind(errorHandler, this))
-      .once('payment.cancel', bind(cancelHandler, this));
+      .on('payment.success', bind(successHandler, this))
+      .on('payment.error', bind(errorHandler, this))
+      .on('payment.cancel', bind(cancelHandler, this));
 
     this.attemptCount++;
 
