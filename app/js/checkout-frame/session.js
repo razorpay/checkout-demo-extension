@@ -2715,6 +2715,7 @@ Session.prototype = {
       });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
+      this.currentScreen = null;
     }
 
     Analytics.track('screen:switch', {
@@ -2987,7 +2988,7 @@ Session.prototype = {
     ) {
       tab = thisTab;
     } else if (
-      thisTab === 'qr' ||
+      (thisTab === 'qr' && this.r._payment) ||
       (this.headless && payment) ||
       ((thisTab === 'card' || thisTab === 'emi') && /^magic/.test(this.screen))
     ) {

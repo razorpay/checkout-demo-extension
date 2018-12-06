@@ -5,6 +5,12 @@
       <div class="spin"><div></div></div>
       <div class="spin spin2"><div></div></div>
     </div>
+  {:elseif error}
+    <div class="error">
+      {error}
+      <br />
+      <div class="btn" on:click="session.back()">Retry</div>
+    </div>
   {:else}
     <div class="message" style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
     Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
@@ -82,6 +88,16 @@ img {
   color: #999;
   line-height: 22px;
 }
+.error {
+  margin-top: 20px;
+}
+.error + .refresh {
+  display: none;
+}
+.btn {
+  display: inline-block;
+  margin-top: 20px;
+}
 </style>
 <script>
   import { RazorpayConfig } from 'common/Razorpay';
@@ -95,17 +111,15 @@ img {
       session.r.createPayment(paymentData)
         .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))
         .on('payment.success', onSuccess)
-    },
-
-    ondestroy() {
-      // this.payment.
+        .on('payment.error', _Func.bind(this.onError, this))
     },
 
     data() {
       return {
         RazorpayConfig,
         loading: true,
-        qrImage: null
+        qrImage: null,
+        error: null
       }
     },
 
@@ -120,6 +134,10 @@ img {
 
       checkStatus() {
         this.session.showLoadError('Checking payment status...');
+      },
+
+      onError(data) {
+        this.set({ error: data.error.description, loading: false });
       }
     }
   }
