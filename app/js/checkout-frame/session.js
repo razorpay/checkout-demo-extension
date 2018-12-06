@@ -1913,6 +1913,7 @@ Session.prototype = {
   resendOTP: function() {
     if (this.headless) {
       this.showLoadError('Resending OTP');
+      this.hideTimer();
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
     Analytics.track('otp:resend', {
@@ -5216,7 +5217,7 @@ function updateTimer(timeoutEl, closeAt) {
   return function() {
     var timeLeft = Math.floor((closeAt - now()) / 1000);
     timeoutEl.innerHTML =
-      'Payment will expire in ' +
+      '<i>&#x2139;</i>This page will timeout in ' +
       Math.floor(timeLeft / 60) +
       ':' +
       ('0' + (timeLeft % 60)).slice(-2) +
