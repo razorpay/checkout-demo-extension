@@ -94,7 +94,7 @@ var responseTypes = {
       global.CheckoutBridge.invokePopup(_Obj.stringify(popupOptions));
     } else if (popup) {
       if (this.iframe) {
-        popup.el |> _El.setDisplay('block');
+        popup.show();
       }
       if (direct) {
         // direct is true for payzapp

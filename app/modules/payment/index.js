@@ -430,7 +430,8 @@ Payment.prototype = {
 
   gotoBank: function() {
     this.popup.el.style.display = 'block';
-    this.popup.window.location.href = this.gotoBankUrl;
+    this.popup.write(popupTemplate(this));
+    _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
   },
 
   makePopup: function() {

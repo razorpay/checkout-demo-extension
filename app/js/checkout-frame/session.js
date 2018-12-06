@@ -366,10 +366,14 @@ function errorHandler(response) {
   var error = response.error;
   var message = error.description;
 
-  if (this.powerwallet && message === discreet.cancelMsg) {
-    // prevent payment canceled error
-    this.powerwallet = null;
-    return;
+  if (message === discreet.cancelMsg) {
+    if (this.powerwallet) {
+      // prevent payment canceled error
+      this.powerwallet = null;
+      return;
+    } else if (this.get('ftx_experiments') && this.tab === 'card') {
+      return;
+    }
   }
 
   this.clearRequest();
@@ -1505,6 +1509,7 @@ Session.prototype = {
 
   secAction: function() {
     if (this.headless && this.r._payment) {
+      this.hideTimer();
       return this.r._payment.gotoBank();
     }
     Analytics.track('saved_cards:skip', {
@@ -2604,6 +2609,7 @@ Session.prototype = {
   },
   back: function(confirmedCancel) {
     var tab = '';
+    var payment = this.r._payment;
     var thisTab = this.tab;
     var self = this;
     this.preSelectedOffer = null;
@@ -2635,7 +2641,7 @@ Session.prototype = {
       tab = thisTab;
     } else if (
       thisTab === 'qr' ||
-      (this.headless && this.r._payment) ||
+      (this.headless && payment) ||
       (thisTab === 'card' && /^magic/.test(this.screen))
     ) {
       if (confirmedCancel === true) {
@@ -2645,6 +2651,7 @@ Session.prototype = {
           this.headless = false;
           tab = 'card';
         }
+        this.showCancelMessage = false;
         this.clearRequest();
       } else {
         return confirm();

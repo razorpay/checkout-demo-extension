@@ -46,4 +46,8 @@ Iframe.prototype = {
     this.listeners = [];
     this.el |> _El.detach;
   },
+
+  show: function() {
+    this.el |> _El.setDisplay('block');
+  },
 };

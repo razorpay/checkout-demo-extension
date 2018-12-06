@@ -38,6 +38,7 @@
   background: no-repeat center bottom;
   background-size: 116px;
   padding-bottom: 32px;
+  line-height: 1.6;
 }
 .message + .qr-image {
   display: block;
