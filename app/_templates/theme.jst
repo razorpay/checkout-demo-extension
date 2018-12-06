@@ -25,7 +25,7 @@ var activeStateColor = themeMeta.activeStateColor;
 }
 `?`
 
-.button, .btn, .submit-button, .loader::after, .iframe-title
+.button, .btn, .submit-button, .loader::after
 {
   background: `=c`;
   color: `=textColor`;
@@ -108,10 +108,12 @@ color: `=c`;
   color: `=highlightColor`;
 }
 
+.iframe-title,
 #topbar:before, #partial-back:before, #offers-container .offers-content {
   background-color: `=secondaryHighlightColor` !important;
 }
 
+.iframe-title,
 .grid label:hover {
   background-color: `=hoverStateColor` !important;
 }
@@ -154,6 +156,7 @@ color: `=c`;
 }
 
 .qr-image:before,
+.iframe-title,
 .copytoclipboard--container.copied .copytoclipboard--text,
 .copytoclipboard--container.copied .copytoclipboard--btn {
   border-color: `=c`;

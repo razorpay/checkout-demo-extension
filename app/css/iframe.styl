@@ -1,3 +1,22 @@
+#modal-inner {
+  background: #fff;
+  border-radius: 3px;
+  height: 100%;
+}
+#modal.iframe-active {
+  width: auto;
+  width: 70vh !important;
+  height: 80vh !important;
+  max-width: 1440px;
+  max-height: 1060px;
+  #content {
+    display: none;
+  }
+  iframe, .payment-frame {
+    opacity: 1;
+  }
+}
+
 .payment-frame {
   overflow: hidden;
   background: #fff;
@@ -7,11 +26,15 @@
   left: 0;
   z-index: 101;
   width: 100%;
-  height: calc(100% + 55px);
-  border-radius: 4px;
-  display: none;
+  height: 100%;
+  border-radius: 3px;
+  opacity: 0;
+  transition: 0.3s;
 
   iframe {
+    opacity: 0;
+    transition: 0.3s;
+    transition-delay: 0.5s;
     height: calc(100% - 55px);
     border: 0
     margin: 0;
@@ -22,9 +45,10 @@
 .iframe-title {
   line-height: 55px;
   padding: 0 16px;
-  text-align: right;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   font-size: 16px;
+  border-top: 6px solid;
+  text-align: left;
+  box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05) inset;
 }
 
 .iframe-close {
@@ -32,4 +56,12 @@
   cursor: pointer;
   margin-left: -12px;
   padding: 0 16px
+}
+
+.iframe-amount {
+  float: right;
+  &:before {
+    content: 'Pay ';
+    font-weight: normal;
+  }
 }

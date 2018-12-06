@@ -567,7 +567,7 @@ function errorHandler(response) {
       // prevent payment canceled error
       this.powerwallet = null;
       return;
-    } else if (this.get('ftx_experiments') && this.tab === 'card') {
+    } else if (this.get('release') && this.tab === 'card') {
       return;
     }
   }
@@ -4390,10 +4390,10 @@ Session.prototype = {
     if (data.method === 'card') {
       var cardType = this.delegator.card.type;
       var headlessCards = cardType === 'mastercard' || cardType === 'visa';
-      if (this.get('ftx_experiments') && headlessCards) {
+      if (this.get('release') && headlessCards) {
         this.headless = true;
         this.setScreen('otp');
-        $('#otp-sec').html('Go to bank page');
+        $('#otp-sec').html("Complete on bank's page");
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
