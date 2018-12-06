@@ -4715,7 +4715,7 @@ Session.prototype = {
     var passedWallets = this.get('method.wallet');
     var self = this;
     var emi_options = this.emi_options;
-    var qrEnabled = this.get('method.qr');
+    var qrEnabled = this.get('method.qr') || this.get('flashcheckout');
 
     var methods = (this.methods = {
       count: Number(!!qrEnabled),

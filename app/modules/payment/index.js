@@ -89,7 +89,10 @@ function getTrackingData(data) {
   );
 }
 
-function trackNewPayment(data = {}, params, r) {
+function trackNewPayment(data, params, r) {
+  if (!data) {
+    data = {};
+  }
   /**
    * Set whether saved card is global or local.
    */
