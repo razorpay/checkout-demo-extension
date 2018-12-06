@@ -567,7 +567,7 @@ function errorHandler(response) {
       // prevent payment canceled error
       this.powerwallet = null;
       return;
-    } else if (this.get('release') && this.tab === 'card') {
+    } else if (this.get('flashcheckout') && this.tab === 'card') {
       return;
     }
   }
@@ -2694,6 +2694,10 @@ Session.prototype = {
       }
     }
 
+    if (screen !== 'otp') {
+      this.headless = false;
+    }
+
     setEmiPlansCta(screen, this.tab);
 
     if (screen === this.screen) {
@@ -2991,7 +2995,6 @@ Session.prototype = {
         if (thisTab === 'qr') {
           tab = '';
         } else {
-          this.headless = false;
           tab = thisTab;
         }
         this.clearRequest();
@@ -4389,7 +4392,7 @@ Session.prototype = {
     if (data.method === 'card') {
       var cardType = this.delegator.card.type;
       var headlessCards = cardType === 'mastercard' || cardType === 'visa';
-      if (this.get('release') && headlessCards) {
+      if (this.get('flashcheckout') && headlessCards) {
         this.headless = true;
         this.setScreen('otp');
         $('#otp-sec').html("Complete on bank's page");

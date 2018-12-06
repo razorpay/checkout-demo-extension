@@ -60,6 +60,7 @@ Iframe.prototype = {
   },
 
   show: function() {
+    this.el |> _El.setDisplay('block');
     const modalEl = _Doc.querySelector('#modal');
     const bbox = modalEl |> _El.bbox;
 

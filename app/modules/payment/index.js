@@ -429,9 +429,9 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
-    this.popup.el.style.display = 'block';
     this.popup.write(popupTemplate(this));
     _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
+    this.popup.show();
   },
 
   makePopup: function() {

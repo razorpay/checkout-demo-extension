@@ -4,7 +4,7 @@ RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
 RazorpayDefaults.ecod = false;
 
-RazorpayDefaults.release = '';
+RazorpayDefaults.flashcheckout = false;
 
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.method = {
