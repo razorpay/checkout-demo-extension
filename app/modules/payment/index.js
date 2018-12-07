@@ -126,12 +126,13 @@ function trackNewPayment(data, params, r) {
   });
 }
 
-export default function Payment(data, params, r) {
+export default function Payment(data, params = {}, r) {
   this.iframe = params.iframe;
   this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
   this.magic = params.magic;
+  this.optional = params.optional || {};
 
   this.isMagicPayment =
     this.sdk_popup &&
@@ -173,7 +174,7 @@ export default function Payment(data, params, r) {
     data &&
     !params.fees &&
     data.contact &&
-    (params.optional.email || data.email) &&
+    (this.optional.email || data.email) &&
     // tez invokes intent, popup not needed
     (params.tez ||
       // only apply powerwallet for checkout-js. popup for razorpayjs
