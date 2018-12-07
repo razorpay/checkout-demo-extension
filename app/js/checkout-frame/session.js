@@ -4395,6 +4395,7 @@ Session.prototype = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
       magic: this.magic,
+      optional: this.optional || {},
     };
 
     if (!this.screen && this.methodsList) {
