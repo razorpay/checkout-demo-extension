@@ -1874,7 +1874,7 @@ Session.prototype = {
     if (this.r._payment || this.isResumedPayment) {
       if (confirmedCancel === true) {
         return this.clearRequest();
-      } else if (this.r._payment.isMagicPayment) {
+      } else if (this.r._payment && this.r._payment.isMagicPayment) {
         return Confirm.show({
           message:
             'Your payment is ongoing. ' +
