@@ -173,7 +173,7 @@ export default function Payment(data, params, r) {
     data &&
     !params.fees &&
     data.contact &&
-    data.email &&
+    (params.optional.email || data.email) &&
     // tez invokes intent, popup not needed
     (params.tez ||
       // only apply powerwallet for checkout-js. popup for razorpayjs
