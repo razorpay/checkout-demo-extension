@@ -28,6 +28,10 @@ otpView.prototype = {
     });
   },
 
+  destroy() {
+    this.view.destroy();
+  },
+
   updateScreen(updateProps) {
     const store = Store.get();
 

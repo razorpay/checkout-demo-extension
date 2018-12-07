@@ -21,13 +21,6 @@
       <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
     </div>
   {/if}
-  {#if !loading}
-    <div class="refresh">
-      Payment complete but page not updated yet?
-      <br />
-      <span class="qr-action" on:click="checkStatus()">Refresh now</span>
-    </div>
-  {/if}
 </div>
 <style>
 :global(#body[tab=qr]) {

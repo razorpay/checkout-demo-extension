@@ -7,6 +7,8 @@ RazorpayDefaults.ecod = false;
 RazorpayDefaults.flashcheckout = false;
 
 RazorpayDefaults.remember_customer = false;
+RazorpayDefaults.personalization = false;
+
 RazorpayDefaults.method = {
   netbanking: null,
   card: true,

@@ -3,6 +3,7 @@ import emi from './emi';
 import netbanking from './netbanking';
 import upi from './upi';
 import wallet from './wallet';
+import othermethods from './othermethods';
 import qr from './qr';
 
 const availPaymentMethods = [
@@ -11,6 +12,7 @@ const availPaymentMethods = [
   'netbanking',
   'upi',
   'wallet',
+  'othermethods',
   'qr',
 ];
 
@@ -30,6 +32,9 @@ function getIconFn(iconName) {
 
     case 'wallet':
       return wallet;
+
+    case 'othermethods':
+      return othermethods;
 
     case 'qr':
       return qr;

@@ -51,7 +51,7 @@ function onPaymentCancel(metaParam) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
       if (_.isNonNullObject(metaParam)) {
-        url += _.obj2query(metaParam);
+        url += '&' + _.obj2query(metaParam);
       }
       fetch({
         url: url,
@@ -394,7 +394,7 @@ Payment.prototype = {
     }
 
     // iphone background ajax route
-    if (!this.powerwallet && iOS) {
+    if (!this.iframe && !this.powerwallet && iOS) {
       return;
     }
 
@@ -427,6 +427,9 @@ Payment.prototype = {
           data[key] = val.replace(/\n/g, ' ');
         }
       });
+      if (this.iframe) {
+        this.popup.show();
+      }
       _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
     }
   },

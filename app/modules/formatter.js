@@ -198,6 +198,10 @@ Formatter.rules = {
       }
       return returnVal;
     },
+
+    isValid: function() {
+      return /^\+?[0-9]{8,15}$/.test(this.value);
+    },
   },
 };
 

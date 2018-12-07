@@ -22,6 +22,8 @@ import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
+import * as P13n from 'checkoutframe/personalization';
+import MethodsList from 'components/MethodsList';
 import * as WalletUtils from 'common/wallet';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 
@@ -72,6 +74,8 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+  P13n,
+  MethodsList,
   Store,
 
   getQueryParams: _.getQueryParams,

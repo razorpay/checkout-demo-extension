@@ -229,41 +229,6 @@ var responseTypes = {
       if (this.tez) {
         return responseTypes['tez'].call(this, request, fullResponse);
       }
-
-      // Start Timeout
-      var drawerTimeout = setTimeout(() => {
-        /**
-         * If upi app selection drawer not happened (technically,
-         * checkout is not blurred until 3 sec)
-         */
-        this.emit('cancel', {
-          '_[method]': 'upi',
-          '_[flow]': 'intent',
-          '_[reason]': 'UPI_INTENT_WEB_NO_APPS',
-        });
-        this.emit('upi.noapp');
-      }, 3000);
-
-      var blurHandler = () => {
-        /**
-         * If upi app selection drawer opened before 3 sec, clear timeout
-         */
-        clearTimeout(drawerTimeout);
-        this.emit('upi.selectapp');
-      };
-
-      var focHandler = () => {
-        this.emit('upi.pending', { flow: 'upi-intent' });
-
-        window.removeEventListener('blur', blurHandler);
-        window.removeEventListener('focus', focHandler);
-        ra();
-      };
-
-      window.addEventListener('blur', blurHandler);
-      window.addEventListener('focus', focHandler);
-
-      window.location = fullResponse.data.intent_url;
     }
   },
 
@@ -286,3 +251,40 @@ var responseTypes = {
     _Doc.redirect(request);
   }
 };
+
+function mwebIntent(payment) {
+  // Start Timeout
+  var drawerTimeout = setTimeout(() => {
+    /**
+     * If upi app selection drawer not happened (technically,
+     * checkout is not blurred until 3 sec)
+     */
+    this.emit('cancel', {
+      '_[method]': 'upi',
+      '_[flow]': 'intent',
+      '_[reason]': 'UPI_INTENT_WEB_NO_APPS',
+    });
+    this.emit('upi.noapp');
+  }, 3000);
+
+  var blurHandler = () => {
+    /**
+     * If upi app selection drawer opened before 3 sec, clear timeout
+     */
+    clearTimeout(drawerTimeout);
+    this.emit('upi.selectapp');
+  };
+
+  var focHandler = () => {
+    this.emit('upi.pending', { flow: 'upi-intent' });
+
+    global.removeEventListener('blur', blurHandler);
+    global.removeEventListener('focus', focHandler);
+    ra();
+  };
+
+  global.addEventListener('blur', blurHandler);
+  global.addEventListener('focus', focHandler);
+
+  global.location = fullResponse.data.intent_url;
+}

@@ -1,15 +1,15 @@
 <Option
   {data}
-  type="next-option {type}"
+  type={type}
 
-  on:select="select(event)"
+  on:select="fire('select', event)"
 >
   {#if icon}
     <OptionIcon icon={icon} />
   {/if}
   <div class="option-title"><slot></slot></div>
-  {#if arrowText}
-    <div class="option-arrow-text theme-highlight">{arrowText}</div>
+  {#if showRadio}
+    <Radio checked={selected}/>
   {/if}
 </Option>
 
@@ -18,23 +18,23 @@
     components: {
       Option: 'templates/views/ui/options/Option.svelte',
       OptionIcon: 'templates/views/ui/options/OptionIcon.svelte',
+      Radio: 'templates/views/ui/Radio.svelte',
+    },
+
+    computed: {
+      type: function({selected}) {
+        let activeClass = selected ? ' selected': '';
+
+        return `radio-option${activeClass}`;
+      }
     },
 
     data: function () {
       return {
-        arrowText: null,
         icon: null,
-        data: {},
-        type: '',
+        showRadio: true,
+        selected: false,
       };
-    },
-
-    methods: {
-      select: function (e) {
-        e.option = this.get().data;
-
-        this.fire('select', e);
-      }
     },
   }
 </script>

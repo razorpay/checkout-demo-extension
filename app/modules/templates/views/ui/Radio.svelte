@@ -23,6 +23,7 @@
         id: '',
         name: '',
         value: '',
+        label: '',
       };
     },
 

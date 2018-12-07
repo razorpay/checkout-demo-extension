@@ -270,6 +270,8 @@ var upi_apps = _.upi_intents_data;
                 `?`
                 <div`?_.tpvBank` class="showable"`?`>
                   <div class="legend">Select a payment method</div>
+                  <div id="methods-list"></div>
+                  <div id="other-methods"></div>
                   <div id="payment-options" class="grid clear count-`=method.count`">
                     `?method.card`
                       `?o('theme.debit_card')`
@@ -359,7 +361,7 @@ var upi_apps = _.upi_intents_data;
                         <label>
                           <i>`=icons.qr`</i>
                           `=_.tab_titles.qr`
-                          <span class="desc">Pay by scanning UPI QR Code</span>
+                          <span class="desc">Pay by scanning QR Code</span>
                         </label>
                       </div>
                     `?`

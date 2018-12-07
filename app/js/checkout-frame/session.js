@@ -672,6 +672,7 @@ function cancelHandler(response) {
     this.showLoadError('Payment did not complete.', true);
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
+    this.screen &&
     this.screen !== 'card'
   ) {
     this.switchTab('card');
@@ -759,6 +760,10 @@ function debounceAskOTP(view, msg) {
 
 // this === Session
 function successHandler(response) {
+  if (this.methodsList) {
+    P13n.recordSuccess(this.customer || getCustomer(this.payload.contact));
+  }
+
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
@@ -1271,6 +1276,7 @@ Session.prototype = {
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
+    this.setP13n();
     errorHandler.call(this, this.params);
 
     var hasOffers = this.hasOffers,
@@ -1368,6 +1374,37 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
+  },
+
+  setP13n: function() {
+    if (this.get('flashcheckout') && this.get().personalization !== false) {
+      this.set('personalization', true);
+    }
+
+    if (!this.get('personalization')) {
+      return;
+    }
+
+    if (
+      this.hasOffers ||
+      this.oneMethod ||
+      this.optional.contact ||
+      this.extraFields ||
+      this.tpvBank ||
+      this.upiTpv ||
+      this.multiTpv
+    ) {
+      return;
+    }
+
+    if (!this.methodsList) {
+      this.methodsList = new discreet.MethodsList({
+        target: '#methods-list',
+        data: {
+          session: this,
+        },
+      });
+    }
   },
 
   showTimer: function(cb) {
@@ -1968,6 +2005,7 @@ Session.prototype = {
       loading: true,
       addFunds: false,
     });
+    this.powerwallet = false;
     this.r.topupWallet();
   },
 
@@ -2433,6 +2471,15 @@ Session.prototype = {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
     });
+
+    if (gel('methods-list')) {
+      this.on('click', '#methods-list', 'option', function(e) {
+        var $cvvEl = $(e.delegateTarget).$('.cvv-input');
+        if ($cvvEl) {
+          $cvvEl.focus();
+        }
+      });
+    }
   },
 
   /**
@@ -2660,7 +2707,22 @@ Session.prototype = {
       delegator.contact = delegator
         .add('phone', contactEl)
         .on('change', function() {
+          var instruments = [];
           self.input(this.el);
+
+          if (!self.methodsList) {
+            return;
+          }
+
+          if (this.isValid()) {
+            instruments = P13n.listInstruments(getCustomer(this.value)) || [];
+          }
+
+          self.methodsList.set({
+            instruments: instruments,
+            customer: getCustomer(this.value),
+            tpvBank: this.tpvBank,
+          });
         });
     }
     delegator.otp = delegator
@@ -3034,6 +3096,9 @@ Session.prototype = {
     // initial screen
     if (!this.tab) {
       if (this.checkInvalid('#pad-common')) {
+        if (this.methodsList) {
+          this.methodsList.hideOtherMethods();
+        }
         return;
       }
     }
@@ -3101,6 +3166,13 @@ Session.prototype = {
       this.setScreen(tab);
       if (ua_iPhone) {
         Razorpay.sendMessage({ event: 'blur' });
+      }
+    }
+
+    if (!tab && this.methodsList) {
+      var selectedInstrument = this.methodsList.getSelectedInstrument();
+      if (selectedInstrument) {
+        $('#body').addClass('sub');
       }
     }
   },
@@ -4088,6 +4160,7 @@ Session.prototype = {
     this.destroyMagic();
 
     this.isResumedPayment = false;
+    this.doneByP13n = false;
 
     var params = {};
     params[Constants.UPI_POLL_URL] = '';
@@ -4115,7 +4188,7 @@ Session.prototype = {
     var screen = this.screen;
     var tab = this.tab;
 
-    if (!this.tab && !this.order) {
+    if (!this.tab && !this.order && !this.methodsList) {
       return;
     }
 
@@ -4272,6 +4345,39 @@ Session.prototype = {
       }
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
+    } else if (this.methodsList) {
+      if (this.checkInvalid('#pad-common')) {
+        return;
+      }
+
+      /*
+       * - If there's no method in methods-list, then dont' let it pass
+       * - If even 1 method is in the list and none of them is selected don't
+       *   let it pass.
+       */
+      if (!$('#methods-list .option')[0]) {
+        return;
+      } else if (!$('#methods-list .option.selected')[0]) {
+        return;
+      }
+
+      var selectedInstrument = this.methodsList.getSelectedInstrument();
+      if (selectedInstrument && selectedInstrument.method === 'card') {
+        /*
+         * Add cvv to data from the currently selected method (p13n)
+         * TODO: figure out a better way to do this.
+         */
+        var $cvvEl = $('#methods-list .option.selected .cvv-input');
+
+        if ($cvvEl) {
+          if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
+            data['card[cvv]'] = $cvvEl.val();
+          } else {
+            $cvvEl.focus();
+            return this.shake();
+          }
+        }
+      }
     } else {
       return;
     }
@@ -4290,6 +4396,20 @@ Session.prototype = {
       sdk_popup: this.sdk_popup,
       magic: this.magic,
     };
+
+    if (!this.screen && this.methodsList) {
+      var selectedInstrument = this.methodsList.getSelectedInstrument();
+      this.doneByP13n = P13n.handleInstrument(data, selectedInstrument);
+
+      /* TODO: the following code is the hack for ftx, fix it properly */
+      if (this.doneByP13n) {
+        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
+          this.switchTab(selectedInstrument.method);
+        }
+        this.tab = selectedInstrument.method;
+      }
+    }
+
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
       if (this.screen === 'card') {
@@ -4391,16 +4511,29 @@ Session.prototype = {
     }
 
     if (data.method === 'card') {
-      var cardType = this.delegator.card.type;
-      var headlessCards = cardType === 'mastercard' || cardType === 'visa';
-      if (this.get('flashcheckout') && headlessCards) {
-        this.headless = true;
-        this.setScreen('otp');
-        $('#otp-sec').html("Complete on bank's page");
-        this.r.on('payment.otp.required', function(data) {
-          askOTP(that.otpView, data);
-        });
-        request.iframe = true;
+      if (this.get('flashcheckout')) {
+        var cardType;
+        if (data.token) {
+          if (this.transformedTokens) {
+            this.transformedTokens.forEach(function(t) {
+              if (t.token === data.token) {
+                cardType = t.card.networkCode;
+              }
+            });
+          }
+        } else {
+          cardType = this.delegator.card.type;
+        }
+
+        if (cardType === 'mastercard' || cardType === 'visa') {
+          this.headless = true;
+          this.setScreen('otp');
+          $('#otp-sec').html("Complete on bank's page");
+          this.r.on('payment.otp.required', function(data) {
+            askOTP(that.otpView, data);
+          });
+          request.iframe = true;
+        }
       }
     }
 
@@ -4430,6 +4563,10 @@ Session.prototype = {
       this.otpView.updateScreen({
         maxlength: 6,
       });
+    }
+
+    if (this.methodsList) {
+      P13n.processInstrument(data, this);
     }
 
     var payment = this.r.createPayment(data, request);
@@ -4594,6 +4731,14 @@ Session.prototype = {
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
+      if (this.methodsList) {
+        this.methodsList.destroy();
+      }
+
+      if (this.otpView) {
+        this.otpView.destroy();
+      }
+
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
@@ -4613,7 +4758,8 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.modal = this.emi = this.el = this.card = null;
+      this.methodsList = this.modal = this.emi = this.el = this.card = null;
+      this.otpView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
     }
