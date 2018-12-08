@@ -4407,7 +4407,6 @@ Session.prototype = {
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
         }
-        this.tab = selectedInstrument.method;
       }
     }
 
