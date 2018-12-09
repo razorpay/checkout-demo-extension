@@ -2147,7 +2147,8 @@ Session.prototype = {
     if (
       self.order &&
       self.order.partial_payment &&
-      self.order.first_payment_min_amount
+      self.order.first_payment_min_amount &&
+      Number(self.order.amount_paid) === 0
     ) {
       this.on('change', '#minimum-amount-select', function(e) {
         var el_amount = gel('amount-value');
@@ -2674,10 +2675,16 @@ Session.prototype = {
         .on('change', function() {
           var optionEle = $('#minimum-amount-select')[0];
 
-          var firstPaymentMinAmount =
-            self.order && self.order.partial_payment
-              ? self.order.first_payment_min_amount
-              : null;
+          var firstPaymentMinAmount;
+          if (
+            self.order &&
+            self.order.partial_payment &&
+            self.order.first_payment_min_amount &&
+            Number(self.order.amount_paid) === 0
+          ) {
+            firstPaymentMinAmount = self.order.first_payment_min_amount;
+          }
+
           if (
             optionEle &&
             firstPaymentMinAmount &&

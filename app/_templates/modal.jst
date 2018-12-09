@@ -154,7 +154,7 @@ var upi_apps = _.upi_intents_data;
                     <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
                   </div></div>
 
-                  `?(order.partial_payment && !!order.first_payment_min_amount)`
+                  `?(order.partial_payment && !!order.first_payment_min_amount && Number(order.amount_paid) === 0)`
                     <div class="minimum-amount-select">
                       <label class="partial-label" for="minimum-amount-select">EMI Amount (₹`=html(firstPaymentMinAmount)`)</label>
                       <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
@@ -162,7 +162,7 @@ var upi_apps = _.upi_intents_data;
                     </div>
                   `?`
 
-                  `?(order.partial_payment && !order.first_payment_min_amount)`
+                  `?(order.partial_payment && (!order.first_payment_min_amount || Number(order.amount_paid) !== 0))`
                     <label class="subtitle subtitle--help">Pay some amount now and remaining later.</label>
                   `?`
 
