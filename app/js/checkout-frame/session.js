@@ -4957,12 +4957,14 @@ Session.prototype = {
     }
 
     /**
-     * methods.cardless_emi will be [] when there are no providers enabled.
+     * Disable Cardless EMI on amounts < 3000 INR
      */
     if (amount < 300000) {
       methods.cardless_emi = null;
-    }
-    if (methods.cardless_emi instanceof Array) {
+    } else if (methods.cardless_emi instanceof Array) {
+    /**
+     * methods.cardless_emi will be [] when there are no providers enabled.
+     */
       if (methods.cardless_emi.length === 0) {
         methods.cardless_emi = null;
       }
