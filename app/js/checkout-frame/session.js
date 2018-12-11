@@ -5312,6 +5312,11 @@ Session.prototype = {
       }
 
       var preferences = response;
+
+      try {
+        delete preferences.methods.cardless_emi;
+      } catch (deleteErr) {}
+
       self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
