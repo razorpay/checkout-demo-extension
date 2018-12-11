@@ -1651,6 +1651,10 @@ Session.prototype = {
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
       function(response) {
+        if (self.screen !== 'otp' && self.tab !== 'cardless_emi') {
+          return;
+        }
+
         if (!response.saved || (response.error && response.error.description)) {
           var errorDesc =
             'Could not find a ' +
@@ -4953,6 +4957,20 @@ Session.prototype = {
     }
 
     /**
+     * Disable Cardless EMI on amounts < 3000 INR
+     */
+    if (amount < 300000) {
+      methods.cardless_emi = null;
+    } else if (methods.cardless_emi instanceof Array) {
+    /**
+     * methods.cardless_emi will be [] when there are no providers enabled.
+     */
+      if (methods.cardless_emi.length === 0) {
+        methods.cardless_emi = null;
+      }
+    }
+
+    /**
      * disable wallets if:
      * - amount > 20k
      * - Wallets not enabled by backend
@@ -5312,6 +5330,7 @@ Session.prototype = {
       }
 
       var preferences = response;
+
       self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
