@@ -4953,6 +4953,15 @@ Session.prototype = {
     }
 
     /**
+     * methods.cardless_emi will be [] when there are no providers enabled.
+     */
+    if (methods.cardless_emi instanceof Array) {
+      if (methods.cardless_emi.length === 0) {
+        methods.cardless_emi = null;
+      }
+    }
+
+    /**
      * disable wallets if:
      * - amount > 20k
      * - Wallets not enabled by backend
@@ -5312,10 +5321,6 @@ Session.prototype = {
       }
 
       var preferences = response;
-
-      try {
-        delete preferences.methods.cardless_emi;
-      } catch (deleteErr) {}
 
       self.setPreferences(preferences);
 
