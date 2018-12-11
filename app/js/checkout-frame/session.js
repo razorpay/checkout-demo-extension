@@ -1651,6 +1651,10 @@ Session.prototype = {
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
       function(response) {
+        if (self.screen !== 'otp' && self.tab !== 'cardless_emi') {
+          return;
+        }
+
         if (!response.saved || (response.error && response.error.description)) {
           var errorDesc =
             'Could not find a ' +
