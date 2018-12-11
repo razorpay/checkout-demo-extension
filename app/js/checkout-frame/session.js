@@ -4959,6 +4959,9 @@ Session.prototype = {
     /**
      * methods.cardless_emi will be [] when there are no providers enabled.
      */
+    if (amount < 300000) {
+      methods.cardless_emi = null;
+    }
     if (methods.cardless_emi instanceof Array) {
       if (methods.cardless_emi.length === 0) {
         methods.cardless_emi = null;
