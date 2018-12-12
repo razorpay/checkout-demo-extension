@@ -105,6 +105,10 @@ var CardlessEmiStore = {
 function initIosQuirks() {
   if (discreet.UserAgent.iPhone && discreet.UserAgent.Safari) {
     window.addEventListener('resize', function() {
+      if (window.innerHeight > 550) {
+        return;
+      }
+
       // Shift footer
       if (window.screen.height - window.innerHeight >= 64) {
         $('#footer').addClass('shift-ios');
