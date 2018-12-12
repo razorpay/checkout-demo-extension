@@ -99,17 +99,6 @@ Formatter.rules = {
     raw: alphanumericRaw,
   },
 
-  aadhaar: {
-    pretty: function(value, shouldTrim) {
-      let len = 16;
-      let prettyValue = value.slice(0, len).replace(/(.{4})/g, '$1 ');
-      if (shouldTrim || value.length >= len) {
-        prettyValue = prettyValue.trim();
-      }
-      return prettyValue;
-    },
-  },
-
   ifsc: {
     raw: alphanumericRaw,
     pretty: function(value, shouldTrim) {

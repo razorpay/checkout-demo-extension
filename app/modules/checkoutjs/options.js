@@ -39,7 +39,6 @@ RazorpayDefaults.prefill = {
   'bank_account[account_number]': '',
   'bank_account[account_type]': '',
   'bank_account[ifsc]': '',
-  'aadhaar[vid]': '',
   auth_type: '',
 };
 
