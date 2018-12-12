@@ -4235,10 +4235,6 @@ Session.prototype = {
           return this.switchTab('upi');
         }
 
-        if (data.bank) {
-          delete data.bank;
-        }
-
         if (this.checkInvalid('#form-upi input:checked + label')) {
           return;
         }
