@@ -3179,10 +3179,6 @@ Session.prototype = {
         $('#body').addClass('sub');
       }
     }
-
-    if (!tab && this.multiTpv) {
-      $('#body').addClass('sub');
-    }
   },
 
   showCardTab: function(tab) {
@@ -4185,7 +4181,6 @@ Session.prototype = {
     if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
       return this.extraNext();
     }
-
     if (this.oneMethod && !this.tab) {
       setTimeout(function() {
         window.scrollTo(0, 100);
@@ -4229,16 +4224,6 @@ Session.prototype = {
       }
       data.method = this.order.method || data.method || 'netbanking';
       data.bank = this.order.bank;
-
-      if (data.method === 'upi' && this.multiTpv) {
-        if (tab !== 'upi') {
-          return this.switchTab('upi');
-        }
-
-        if (this.checkInvalid('#form-upi input:checked + label')) {
-          return;
-        }
-      }
     } else if (screen) {
       if (screen === 'card') {
         var formattingDelegator = this.delegator;
@@ -4400,7 +4385,6 @@ Session.prototype = {
     } else {
       return;
     }
-
     this.submit();
   },
 
