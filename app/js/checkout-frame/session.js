@@ -14,7 +14,7 @@ var preferences = window.preferences,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_PATTERN,
   emailPattern = Constants.EMAIL_PATTERN,
-  ua_Android = discreet.androidBrowser,
+  ua_Android = discreet.UserAgent.androidBrowser,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
@@ -101,6 +101,20 @@ var CardlessEmiStore = {
   loanUrls: {},
   ott: {},
 };
+
+function initIosQuirks() {
+  if (discreet.UserAgent.iPhone && discreet.UserAgent.Safari) {
+    window.addEventListener('resize', function() {
+      console.log(window.screen.height, window.innerHeight);
+      // Shift footer
+      if (window.screen.height - window.innerHeight >= 64) {
+        $('#footer').addClass('shift-ios');
+      } else {
+        $('#footer').removeClass('shift-ios');
+      }
+    });
+  }
+}
 
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
@@ -1277,6 +1291,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setP13n();
+    initIosQuirks();
     errorHandler.call(this, this.params);
 
     var hasOffers = this.hasOffers,
@@ -4962,9 +4977,9 @@ Session.prototype = {
     if (amount < 300000) {
       methods.cardless_emi = null;
     } else if (methods.cardless_emi instanceof Array) {
-    /**
-     * methods.cardless_emi will be [] when there are no providers enabled.
-     */
+      /**
+       * methods.cardless_emi will be [] when there are no providers enabled.
+       */
       if (methods.cardless_emi.length === 0) {
         methods.cardless_emi = null;
       }
