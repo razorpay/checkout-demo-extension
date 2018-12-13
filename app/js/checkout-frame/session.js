@@ -681,6 +681,8 @@ function askOTP(view, text) {
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
   var $resendBtn = $('#otp-resend').removeClass('hidden');
+  var thisSession = SessionManager.getSession();
+
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
@@ -698,12 +700,12 @@ function askOTP(view, text) {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: true,
+    allowSkip: !Boolean(thisSession.get('recurring')),
   });
 
   $('#body').addClass('sub');
+
   if (!text) {
-    var thisSession = SessionManager.getSession();
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless) {
         text = 'Enter OTP to complete the payment';
@@ -737,6 +739,7 @@ function askOTP(view, text) {
       text = 'An OTP has been sent on<br>' + getPhone();
     }
   }
+
   setOtpText(view, text);
 }
 
