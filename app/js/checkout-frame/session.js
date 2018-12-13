@@ -5038,7 +5038,7 @@ Session.prototype = {
       methods.count++;
     }
 
-    if (methods.emi) {
+    if (methods.emi || methods.cardless_emi) {
       methods.count++;
     }
 
