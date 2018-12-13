@@ -12,7 +12,7 @@ import * as Confirm from 'confirm';
 import Callout from 'callout';
 import { getDecimalAmount, displayCurrencies } from 'common/currency';
 import * as strings from 'common/strings';
-import { androidBrowser } from 'common/useragent';
+import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
@@ -59,7 +59,6 @@ export default {
   Callout,
   getDecimalAmount,
   currencies: displayCurrencies,
-  androidBrowser,
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrongOtp,
@@ -77,6 +76,7 @@ export default {
   P13n,
   MethodsList,
   Store,
+  UserAgent,
 
   getQueryParams: _.getQueryParams,
 
