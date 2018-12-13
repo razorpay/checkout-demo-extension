@@ -24,6 +24,7 @@ const _commonBanks = [
   ['FDRL', 'Federal'],
   ['CORP', 'Corporate'],
   ['IDFB', 'IDFC'],
+  ['INDB', 'IndusInd'],
 ];
 
 export const commonBanks = _Arr.map(_commonBanks, banks => ({
