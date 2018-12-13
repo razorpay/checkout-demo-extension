@@ -2,40 +2,10 @@
 var bank_account = _.prefill.bank_account,
     bank_name = _.prefill.bank_name,
     bank_ifsc = _.prefill.bank_ifsc,
-    aadhaar = _.prefill.aadhaar,
-    account_type = _.prefill.account_type,
     ifsc_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$',
     bank = _.prefill.bank;
 `
 <div id="emandate-inner">
-  <div id="form-emandate-bank" class="tab-content showable screen">
-    <div id="emandate-bank">
-      <div class="bank-icon"></div>
-      <div class="bank-name"></div>
-      `?!bank`
-        <div class="btn-change-bank">Change Bank</div>
-      `?`
-    </div>
-
-    <div class="legend">Authenticate using</div>
-    <div id="emandate-options" class="grid clear count-2">
-      <div class="payment-option item netbanking" tab="emandate-netbanking">
-        <label>
-          <i class="theme">&#xe60a;</i>
-          Netbanking
-          <span class="desc">via Netbanking login</span>
-        </label>
-      </div>
-      <div class="payment-option item aadhaar" tab="emandate-aadhaar">
-        <label>
-          <i class="theme">&#xe713;</i>
-          Aadhaar
-          <span class="desc">via Aadhaar linked mobile OTP</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
   <div id="form-emandate-netbanking" class="tab-content showable screen pad">
     <div class="elem-wrap" id="elem-wrap-nb-acc-no"><div class="elem elem-nb-acc-no`?bank_account` readonly`?`">
       <div class="bank-icon"></div>
@@ -53,42 +23,5 @@ var bank_account = _.prefill.bank_account,
       <label>Account Holder Name</label>
       <input class="input" name="bank_account[name]" type="text" id="nb-acc-name" value="`=bank_name`"`?bank_name` readonly`?` required pattern="^[a-zA-Z. 0-9\']{1,100}$" maxlength="100" spellcheck="false" autocorrect="off" autocapitalize="off">
     </div></div>
-  </div>
-
-  <div id="form-emandate-aadhaar" class="tab-content showable screen pad">
-      <div class="elem-wrap" id="elem-wrap-adhr-acc-no"><div class="elem elem-adhr-acc-no`?bank_account` readonly`?`">
-      <div class="bank-icon"></div>
-      <div class="help">Please enter a valid Account Number</div>
-      <label>Bank account Number</label>
-      <input class="input" name="bank_account[account_number]" type="text" id="adhr-acc-no" value="`=bank_account`"`?bank_account` readonly`?` required pattern="^[a-zA-Z0-9]{4,20}$" maxlength="20" spellcheck="false" autocorrect="off" autocapitalize="off">
-    </div></div>
-    <div class="elem-wrap" id="elem-wrap-adhr-acc-ifsc"><div class="elem elem-adhr-acc-ifsc`?bank_ifsc` readonly`?`">
-      <div class="help">Please enter a valid IFSC</div>
-      <label>IFSC</label>
-      <input class="input" name="bank_account[ifsc]" type="text" id="adhr-acc-ifsc" value="`=bank_ifsc`"`?bank_ifsc` readonly`?` required pattern="`=ifsc_pattern`" maxlength="11" spellcheck="false" autocorrect="off" autocapitalize="off">
-    </div></div>
-    <div class="elem-wrap" id="elem-wrap-adhr-acc-name"><div class="elem elem-adhr-acc-name`?bank_name` readonly`?`">
-      <div class="help">Please enter a valid Name as per your account</div>
-      <label>Account Holder Name</label>
-      <input class="input" name="bank_account[name]" type="text" id="adhr-acc-name" value="`=bank_name`"`?bank_name` readonly`?` required pattern="^[a-zA-Z. 0-9\']{1,100}$" maxlength="100" spellcheck="false" autocorrect="off" autocapitalize="off">
-    </div></div>
-    `?aadhaar && false`
-      <div class="elem-wrap" id="elem-wrap-adhr-acc-aadhaar"><div class="elem elem-adhr-acc-aadhaar readonly">
-        <div class="help">Please enter a valid Aadhaar VID</div>
-        <label>Aadhaar Virtual ID</label>
-        <input class="input" name="aadhaar[vid]" type="text" id="adhr-acc-aadhaar" value="`=aadhaar`" readonly required pattern="^[0-9 ]{19}$" maxlength="19" spellcheck="false" autocorrect="off" autocapitalize="off">
-      </div>
-    `?`
-    <label for="emandate-aadhaar-linked-check" id="emandate-aadhaar-linked-check-label">
-      <input type="checkbox" class='checkbox--square' id="emandate-aadhaar-linked-check" required>
-      <span class="checkbox"></span>
-      <div class="checkbox-content">
-        I agree that the above details are correct and my Aadhaar is linked to this bank account
-      </span>
-    </div>
-    `?account_type`
-      <input name="bank_account[account_type]" type="hidden" value="`=account_type`" />
-    `?`
-  </div>
   </div>
 </div>

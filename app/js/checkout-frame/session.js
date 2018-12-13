@@ -292,37 +292,6 @@ function showAppropriateEmiDetailsForNewCard(
   }
 }
 
-function selectElementText(el) {
-  var win = window;
-  var doc = win.document,
-    sel,
-    range;
-  if (win.getSelection && doc.createRange) {
-    sel = win.getSelection();
-    range = doc.createRange();
-    range.selectNodeContents(el);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else if (doc.body.createTextRange) {
-    range = doc.body.createTextRange();
-    range.moveToElementText(el);
-    range.select();
-  }
-}
-
-function copyToClipboardListener(e) {
-  var btn = e.delegateTarget;
-  var parent = btn.parentNode;
-  var text = $(parent).find('.copytoclipboard--text')[0];
-
-  selectElementText(text);
-  try {
-    document.execCommand('copy');
-    $(parent).addClass('copied');
-    $(parent).find('.copytoclipboard--label')[0].innerHTML = 'Copied';
-  } catch (err) {}
-}
-
 function setEmiBank(data, savedCardScreen) {
   if (savedCardScreen) {
     var savedEmi = $('#saved-cards-container .checked input.emi_duration')[0];
@@ -2483,12 +2452,6 @@ Session.prototype = {
     });
     this.click('#fd-hide', this.hideErrorMessage);
 
-    // Copy to clipboard text.
-    this.on('click', '#body', 'copytoclipboard--text', function(e) {
-      selectElementText(e.target);
-    });
-    this.on('click', '#body', 'copytoclipboard--btn', copyToClipboardListener);
-
     this.on('click', '#form-upi.collapsible .item', function(e) {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
@@ -3835,7 +3798,7 @@ Session.prototype = {
         return;
       }
 
-      return this.emandateView.showBankOptions($('#bank-select').val());
+      return this.emandateView.showBankDetailsForm($('#bank-select').val());
     }
   },
 
