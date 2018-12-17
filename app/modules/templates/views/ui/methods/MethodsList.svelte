@@ -73,15 +73,13 @@
       >
         Other Methods
       </NextOption>
-      {#each ['card', 'netbanking', 'wallet', 'upi', 'emi', 'qr'] as method}
-        {#if session.methods[method]}
-          <NextOption
-            data={{method}} on:select='fire("methodSelected", event)'
-            icon={session.themeMeta.icons[method]}
-          >
-            {session.tab_titles[method]}
-          </NextOption>
-        {/if}
+      {#each AVAILABLE_METHODS as method}
+        <NextOption
+          data={{method}} on:select='fire("methodSelected", event)'
+          icon={session.themeMeta.icons[method]}
+        >
+          {session.tab_titles[method]}
+        </NextOption>
       {/each}
     </div>
   </div>

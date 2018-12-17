@@ -1,8 +1,53 @@
 import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
 import { doesAppExist } from 'common/upi';
 
+const REPLACE_METHODS = {
+  emi: 'cardless_emi',
+};
+
+const AVAILABLE_METHODS = [
+  'card',
+  'netbanking',
+  'wallet',
+  'upi',
+  'emi',
+  'cardless_emi',
+  'qr',
+];
+
+/**
+ * Get the available methods.
+ *
+ * @param {Object} methods
+ *
+ * @return {Array}
+ */
+const getAvailableMethods = methods => {
+  const AVAIL_METHODS = _Arr.filter(
+    AVAILABLE_METHODS,
+    method => methods[method]
+  );
+
+  _Obj.loop(REPLACE_METHODS, (newMethod, originalMethod) => {
+    const containsOriginal = _Arr.contains(AVAIL_METHODS, originalMethod);
+    const containsNew = _Arr.contains(AVAIL_METHODS, newMethod);
+
+    if (containsOriginal && containsNew) {
+      // Delete new
+      AVAIL_METHODS.splice(_Arr.indexOf(AVAIL_METHODS, newMethod), 1);
+    } else if (!containsOriginal && containsNew) {
+      // Replace new with original
+      AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, newMethod)] = originalMethod;
+    }
+  });
+
+  return AVAIL_METHODS;
+};
+
 export default class MethodsList {
   constructor({ target, data }) {
+    data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
+
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
       data,
@@ -55,6 +100,17 @@ export default class MethodsList {
 
     this.view.on('methodSelected', e => {
       let data = e.data;
+
+      /**
+       * Replace the method if replaceable.
+       */
+      if (
+        REPLACE_METHODS[data.method] &&
+        this.data.session.methods[REPLACE_METHODS[data.method]]
+      ) {
+        data.method = REPLACE_METHODS[data.method];
+      }
+
       this.data.session.switchTab(data.method);
     });
   }
