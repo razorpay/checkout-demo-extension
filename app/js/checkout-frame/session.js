@@ -1533,7 +1533,7 @@ Session.prototype = {
               return;
             }
 
-            $('#form-cardless_emi input[name=emi_duration').val('');
+            $('#form-cardless_emi input[name=emi_duration]').val('');
             $('#form-cardless_emi input[name=provider]').val('');
             $('#form-cardless_emi input[name=ott]').val('');
 
@@ -1621,7 +1621,7 @@ Session.prototype = {
         }),
 
         select: function(value) {
-          $('#form-cardless_emi input[name=emi_duration').val(value);
+          $('#form-cardless_emi input[name=emi_duration]').val(value);
           $('#form-cardless_emi input[name=provider]').val(
             CardlessEmiStore.providerCode
           );
