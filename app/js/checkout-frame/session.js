@@ -655,6 +655,10 @@ function cancelHandler(response) {
   Analytics.setMeta('payment.cancelled', true);
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
+    if (this.r._payment && this.r._payment.upi_app) {
+      discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
+    }
+
     this.showLoadError('Payment did not complete.', true);
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
@@ -1151,6 +1155,11 @@ Session.prototype = {
 
         var abortPaymentOnUPIIntentFailure = function() {
           self.ajax.abort();
+
+          if (self.r._payment && self.r._payment.upi_app) {
+            discreet.UPIUtils.trackUPIIntentFailure(self.r._payment.upi_app);
+          }
+
           self.showLoadError('Payment did not complete.', true);
           self.clearRequest({
             '_[method]': 'upi',
