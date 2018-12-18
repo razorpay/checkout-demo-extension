@@ -1,8 +1,44 @@
 import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
 import { doesAppExist } from 'common/upi';
 
+const AVAILABLE_METHODS = [
+  'card',
+  'netbanking',
+  'wallet',
+  'upi',
+  'emi',
+  'cardless_emi',
+  'qr',
+];
+
+/**
+ * Get the available methods.
+ *
+ * @param {Object} methods
+ *
+ * @return {Array}
+ */
+const getAvailableMethods = methods => {
+  let AVAIL_METHODS = _Arr.filter(AVAILABLE_METHODS, method => methods[method]);
+
+  /**
+   * Cardless EMI and EMI are the same payment option.
+   */
+  if (_Arr.contains(AVAIL_METHODS, 'cardless_emi')) {
+    if (_Arr.contains(AVAIL_METHODS, 'emi')) {
+      AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'cardless_emi');
+    } else {
+      AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, 'cardless_emi')] = 'emi';
+    }
+  }
+
+  return AVAIL_METHODS;
+};
+
 export default class MethodsList {
   constructor({ target, data }) {
+    data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
+
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
       data,
@@ -54,8 +90,16 @@ export default class MethodsList {
     });
 
     this.view.on('methodSelected', e => {
-      let data = e.data;
-      this.data.session.switchTab(data.method);
+      let { method } = e.data;
+
+      /**
+       * Replace the method if replaceable.
+       */
+      if (method === 'emi' && this.data.session.methods.cardless_emi) {
+        method = 'cardless_emi';
+      }
+
+      this.data.session.switchTab(method);
     });
   }
 
