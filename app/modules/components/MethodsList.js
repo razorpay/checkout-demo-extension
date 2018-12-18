@@ -29,7 +29,7 @@ const getAvailableMethods = methods => {
    */
   if (_Arr.contains(AVAIL_METHODS, 'cardless_emi')) {
     if (_Arr.contains(AVAIL_METHODS, 'emi')) {
-      AVAIL_METHODS.splice(_Arr.indexOf(AVAIL_METHODS, 'cardless_emi'));
+      AVAIL_METHODS.splice(_Arr.indexOf(AVAIL_METHODS, 'cardless_emi'), 1);
     } else {
       AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, 'cardless_emi')] = 'emi';
     }
