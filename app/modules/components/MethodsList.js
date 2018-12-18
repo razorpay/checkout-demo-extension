@@ -19,17 +19,14 @@ const AVAILABLE_METHODS = [
  * @return {Array}
  */
 const getAvailableMethods = methods => {
-  const AVAIL_METHODS = _Arr.filter(
-    AVAILABLE_METHODS,
-    method => methods[method]
-  );
+  let AVAIL_METHODS = _Arr.filter(AVAILABLE_METHODS, method => methods[method]);
 
   /**
    * Cardless EMI and EMI are the same payment option.
    */
   if (_Arr.contains(AVAIL_METHODS, 'cardless_emi')) {
     if (_Arr.contains(AVAIL_METHODS, 'emi')) {
-      AVAIL_METHODS.splice(_Arr.indexOf(AVAIL_METHODS, 'cardless_emi'), 1);
+      AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'cardless_emi');
     } else {
       AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, 'cardless_emi')] = 'emi';
     }
