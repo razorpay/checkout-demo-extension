@@ -52,15 +52,17 @@
           <div class="subtitle n-auto">Authenticate your card payment by entering the One Time Password. <a class="theme show-payment-page">View Bank Page.</a></div>
           <div class="elem-wrap n-auto"><div class="elem">
             <div class="help">Please enter a valid OTP</div>
-            <input class="input" id="magic-otp" name="otp" type="tel" required pattern="^[0-9]{4,8}$" maxlength="8">
+            <input class="input" id="magic-otp" name="otp" type="tel" required pattern="^[0-9]{4,8}$" maxlength="8" placeholder="Enter OTP here">
           </div></div>
           <div id="magic-otp-data" class="auto clear">
             <div id="magic-otp-placeholder"></div>
             <div id="magic-bank"></div>
           </div>
         </div>
-        <h3 id='enter-otp' class="text-btn adjoined auto">Enter OTP manually</h3>
-        <h3 id="autoread-otp" class="text-btn adjoined n-auto">Auto read OTP</h3>
+        `?_.isAutoOTPReadSupported`
+          <h3 id='enter-otp' class="text-btn adjoined auto">Enter OTP manually</h3>
+          <h3 id="autoread-otp" class="text-btn adjoined n-auto">Auto read OTP</h3>
+        `?`
       </div>
     </div>
   </div>
