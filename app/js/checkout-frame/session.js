@@ -2817,6 +2817,7 @@ Session.prototype = {
     var showPaybtn = screen;
     if (
       screen === 'cardless_emi' ||
+      (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
@@ -3071,6 +3072,13 @@ Session.prototype = {
       if (this.emiPlansView.back()) {
         return;
       }
+    }
+    if (
+      this.screen === 'card' &&
+      this.tab === 'emi' &&
+      this.methods.cardless_emi
+    ) {
+      tab = 'cardless_emi';
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
