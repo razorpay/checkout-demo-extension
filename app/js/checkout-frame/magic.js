@@ -10,6 +10,7 @@ var TOAST_LONG = 1;
 function magicView(session) {
   this.session = session;
   this.opts = {
+    isAutoOTPReadSupported: isAutoOTPReadSupported(),
     session: session,
   };
   this.render();
@@ -21,6 +22,17 @@ function magicView(session) {
   };
 
   this.supportedBanks = ['unknown', 'HDFC'];
+}
+
+/**
+ * Says whether or not OTP auto-reading is supported.
+ * We removed auto OTP reading in our Android SDK since version 1.5.1
+ * because of a change in Google's SMS permissions policy.
+ *
+ * @return {Boolean}
+ */
+function isAutoOTPReadSupported() {
+  return CheckoutBridge && CheckoutBridge.requestOtpPermission;
 }
 
 magicView.prototype = {
@@ -297,7 +309,7 @@ magicView.prototype = {
   },
 
   requestOtpPermission: function(callback) {
-    if (CheckoutBridge && CheckoutBridge.requestOtpPermission) {
+    if (isAutoOTPReadSupported()) {
       this.track('request_otp_permission');
       window.otpPermissionCallback = callback.bind(this);
 
@@ -336,8 +348,6 @@ magicView.prototype = {
     }
 
     this.resetLoader();
-
-    $('#body').removeClass('sub');
 
     if (this.otpData) {
       this.otpParsed(this.otpData);
@@ -459,6 +469,8 @@ magicView.prototype = {
   },
 
   showWaitingScreen: function() {
+    $('#body').removeClass('sub');
+
     if ($('#form-magic-otp').hasClass('waiting')) {
       return;
     }
