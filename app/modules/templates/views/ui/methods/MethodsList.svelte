@@ -5,18 +5,18 @@
     Loading your preferred methods
   </div>
   <div class="options" in:fade="{delay: 1500}" out:fade>
-    {#each instrumentsData as instrument}
+    {#each instrumentsData as instrument, index}
       {#if instrument.nextOption}
         <NextOption
           data={{method: instrument.method}}
-          on:select='fire("methodSelected", event)'
+          on:select="methodSelected(event, index)"
           icon={instrument.icon}
         >
           {instrument.text}
         </NextOption>
       {:else}
         <RadioOption
-          on:select="select(event)"
+          on:select="select(event, index)"
           data='{instrument}'
           selected={instrument.id === selected}
           showRadio={instrument.method !== 'card'}
@@ -135,6 +135,8 @@
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
   import { findCodeByNetworkName } from 'common/card';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -331,7 +333,28 @@
       };
     },
     methods: {
-      select: function(e) {
+      trackMethodSelection: function (data = {}) {
+        Analytics.track('p13:method:select', {
+          type: AnalyticsTypes.BEHAV,
+          data,
+        });
+      },
+
+      methodSelected: function (e, index) {
+        this.trackMethodSelection({
+          data: e.data,
+          index,
+        });
+
+        this.fire('methodSelected', e);
+      },
+
+      select: function(e, index) {
+        this.trackMethodSelection({
+          data: e.data,
+          index
+        });
+
         this.set({ selected: e.data.id });
         this.fire('select', e.data);
       },

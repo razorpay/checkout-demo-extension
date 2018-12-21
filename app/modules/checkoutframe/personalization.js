@@ -3,6 +3,8 @@
 import { getCustomer } from 'checkoutframe/customer';
 import { getSortedApps } from 'common/upi';
 import Track from 'tracker';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
 
@@ -187,6 +189,12 @@ export const recordSuccess = customer => {
 
   if (instrument) {
     instrument.success = true;
+
+    Analytics.track('p13n:instrument:success', {
+      data: {
+        instrument,
+      },
+    });
   }
 
   currentUid = null;
@@ -231,6 +239,12 @@ export const listInstruments = customer => {
     currentCustomer,
     (a, b) => (a.score > b.score ? -1 : ~~(a.score < b.score))
   );
+
+  Analytics.track('p13n:instruments:list', {
+    data: {
+      length: currentCustomer.length,
+    },
+  });
 
   return currentCustomer;
 };

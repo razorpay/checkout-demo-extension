@@ -1,5 +1,7 @@
 import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
 import { doesAppExist } from 'common/upi';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 const AVAILABLE_METHODS = [
   'card',
@@ -69,6 +71,10 @@ export default class MethodsList {
         showOtherMethods: true,
       });
 
+      Analytics.track('p13n:methods:show', {
+        type: AnalyticsTypes.BEHAV,
+      });
+
       _Doc.querySelector('#body') |> _El.removeClass('sub');
       _Doc.querySelector('#methods-list') |> _El.setStyle('position', 'static');
     });
@@ -76,6 +82,10 @@ export default class MethodsList {
     this.view.on('hideMethods', e => {
       this.view.set({
         showOtherMethods: false,
+      });
+
+      Analytics.track('p13n:methods:hide', {
+        type: AnalyticsTypes.BEHAV,
       });
 
       if (this.view.get().selected) {
@@ -150,6 +160,9 @@ export default class MethodsList {
     }
 
     if (data.instruments && data.instruments.length) {
+      Analytics.track('p13n:instruments:set', {
+        count: data.instruments.length,
+      });
       this.animationTimeout = global.setTimeout(() => {
         _Doc.querySelector('#payment-options') |> _El.addClass('hidden');
 
