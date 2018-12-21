@@ -3072,8 +3072,13 @@ Session.prototype = {
       if (this.emiPlansView.back()) {
         return;
       }
-    }
-    if (
+    } else if (
+    /**
+     * If back is pressed from the Card EMI screen,
+     * and cardless EMI is available as a payment method,
+     * take to the Cardless EMI list screen,
+     * which also has the Pay using Card EMI option.
+     */
       this.screen === 'card' &&
       this.tab === 'emi' &&
       this.methods.cardless_emi
