@@ -471,8 +471,8 @@ CheckoutFrame.prototype = {
 
     if (_.isString(data)) {
       message = data;
-    } else if (_.isObject(data) && data.message) {
-      message = data.message;
+    } else if (_.isObject(data) && (data.message || data.description)) {
+      message = data.message || data.description;
     }
 
     Track.flush();
@@ -482,7 +482,13 @@ CheckoutFrame.prototype = {
     const redirect = this.rzp.get('redirect') || shouldRedirect;
 
     if (redirect && callbackUrl) {
-      _Doc.submitForm(callbackUrl, data, 'post');
+      _Doc.submitForm(
+        callbackUrl,
+        {
+          error: data,
+        },
+        'post'
+      );
     } else {
       global.alert('Oops! Something went wrong.\n' + message);
     }
