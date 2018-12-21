@@ -3073,12 +3073,12 @@ Session.prototype = {
         return;
       }
     } else if (
-    /**
-     * If back is pressed from the Card EMI screen,
-     * and cardless EMI is available as a payment method,
-     * take to the Cardless EMI list screen,
-     * which also has the Pay using Card EMI option.
-     */
+      /**
+       * If back is pressed from the Card EMI screen,
+       * and cardless EMI is available as a payment method,
+       * take to the Cardless EMI list screen,
+       * which also has the Pay using Card EMI option.
+       */
       this.screen === 'card' &&
       this.tab === 'emi' &&
       this.methods.cardless_emi
@@ -5344,7 +5344,7 @@ Session.prototype = {
       if (response.error) {
         return Razorpay.sendMessage({
           event: 'fault',
-          data: response.error.description,
+          data: response.error,
         });
       }
 
