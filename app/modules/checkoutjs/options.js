@@ -9,6 +9,8 @@ RazorpayDefaults.flashcheckout = false;
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.personalization = false;
 
+RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
+
 RazorpayDefaults.method = {
   netbanking: null,
   card: true,

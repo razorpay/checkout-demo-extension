@@ -2121,6 +2121,7 @@ Session.prototype = {
 
     this.on('change', '#partial-select-partial', function(e) {
       var parentEle = $('#amount-value').parent();
+      var optionEle = $('.minimum-amount-select');
 
       if (!e.target.checked) {
         var amount = this.order.amount_due;
@@ -2142,6 +2143,39 @@ Session.prototype = {
         parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
       }
     });
+
+    if (
+      self.order &&
+      self.order.partial_payment &&
+      self.order.first_payment_min_amount &&
+      Number(self.order.amount_paid) === 0
+    ) {
+      this.on('change', '#minimum-amount-select', function(e) {
+        var el_amount = gel('amount-value');
+
+        if (!el_amount) {
+          return;
+        }
+
+        var amount;
+        if (!e.target.checked) {
+          amount = '';
+          el_amount.focus();
+        } else {
+          amount = self.formatAmount(self.order.first_payment_min_amount);
+        }
+
+        el_amount.value = amount;
+
+        if ('createEvent' in document) {
+          var evt = document.createEvent('HTMLEvents');
+          evt.initEvent('change', false, true);
+          el_amount.dispatchEvent(evt);
+        } else {
+          el_amount.fireEvent('onchange');
+        }
+      });
+    }
 
     this.click('#next-button', 'extraNext');
 
@@ -2639,13 +2673,36 @@ Session.prototype = {
       delegator.amount = delegator
         .add('amount', el_amount)
         .on('change', function() {
+          var optionEle = $('#minimum-amount-select')[0];
+
+          var firstPaymentMinAmount;
+          if (
+            self.order &&
+            self.order.partial_payment &&
+            self.order.first_payment_min_amount &&
+            Number(self.order.amount_paid) === 0
+          ) {
+            firstPaymentMinAmount = self.order.first_payment_min_amount;
+          }
+
+          if (
+            optionEle &&
+            firstPaymentMinAmount &&
+            Number(self.formatAmount(firstPaymentMinAmount)) !==
+              Number(this.value)
+          ) {
+            optionEle.checked = false;
+          }
+
           self.input(el_amount);
           var value = this.value * 100;
-          var maxAmount = self.order.partial_payment
-            ? self.order.amount_due
-            : self.order.amount;
+          var maxAmount =
+            self.order && self.order.partial_payment
+              ? self.order.amount_due
+              : self.order.amount;
 
-          var isValid = 100 <= value && value <= maxAmount;
+          var minAmount = firstPaymentMinAmount || 100;
+          var isValid = minAmount <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
 
           var amountDue = self.order.amount_due;
@@ -2678,8 +2735,10 @@ Session.prototype = {
                 );
               } else if (value > self.order.amount_due) {
                 helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
-              } else if (value < 100) {
-                helpEle.html('Minimum payable amount is ₹' + 1);
+              } else if (value < minAmount) {
+                helpEle.html(
+                  'Minimum payable amount is ₹' + self.formatAmount(minAmount)
+                );
               }
             }
 
