@@ -849,15 +849,7 @@ Session.prototype = {
 
   getClasses: function() {
     var classes = [];
-    if (
-      window.innerWidth < 450 ||
-      shouldFixFixed ||
-      (window.matchMedia &&
-        matchMedia(
-          '@media (max-device-height: 450px),(max-device-width: 450px)'
-        ).matches)
-    ) {
-      this.isMobile = true;
+    if (this.isMobile) {
       classes.push('mobile');
     }
 
@@ -4887,8 +4879,7 @@ Session.prototype = {
     var qrEnabled = this.get('method.qr') || this.get('flashcheckout');
 
     var methods = (this.methods = {
-      count: Number(!!qrEnabled),
-      qr: qrEnabled,
+      count: 0,
     });
 
     /* Set recurring payment methods*/
@@ -5033,6 +5024,18 @@ Session.prototype = {
         preferences,
         this.get('method.netbanking')
       );
+    }
+
+    /**
+     * disable QR if
+     * - running on mobile
+     * - UPI is disabled
+     */
+    if (this.isMobile || !methods.upi) {
+      methods.qr = false;
+    } else if (qrEnabled) {
+      methods.qr = true;
+      methods.count++;
     }
 
     if (methods.card) {
@@ -5331,6 +5334,14 @@ Session.prototype = {
     if (this.isOpen) {
       return;
     }
+
+    this.isMobile =
+      window.innerWidth < 450 ||
+      shouldFixFixed ||
+      (window.matchMedia &&
+        matchMedia(
+          '@media (max-device-height: 450px),(max-device-width: 450px)'
+        ).matches);
 
     this.isOpen = true;
 
