@@ -849,7 +849,15 @@ Session.prototype = {
 
   getClasses: function() {
     var classes = [];
-    if (this.isMobile) {
+    if (
+      window.innerWidth < 450 ||
+      shouldFixFixed ||
+      (window.matchMedia &&
+        matchMedia(
+          '@media (max-device-height: 450px),(max-device-width: 450px)'
+        ).matches)
+    ) {
+      this.isMobile = true;
       classes.push('mobile');
     }
 
@@ -4941,7 +4949,8 @@ Session.prototype = {
       this.get('method.upi');
 
     var methods = (this.methods = {
-      count: 0,
+      count: Number(!!qrEnabled),
+      qr: qrEnabled,
     });
 
     /* Set recurring payment methods*/
@@ -5086,18 +5095,6 @@ Session.prototype = {
         preferences,
         this.get('method.netbanking')
       );
-    }
-
-    /**
-     * disable QR if
-     * - running on mobile
-     * - UPI is disabled
-     */
-    if (this.isMobile || !methods.upi) {
-      methods.qr = false;
-    } else if (qrEnabled) {
-      methods.qr = true;
-      methods.count++;
     }
 
     if (methods.card) {
@@ -5396,14 +5393,6 @@ Session.prototype = {
     if (this.isOpen) {
       return;
     }
-
-    this.isMobile =
-      window.innerWidth < 450 ||
-      shouldFixFixed ||
-      (window.matchMedia &&
-        matchMedia(
-          '@media (max-device-height: 450px),(max-device-width: 450px)'
-        ).matches);
 
     this.isOpen = true;
 
