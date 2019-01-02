@@ -704,7 +704,7 @@ function askOTP(view, text) {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: !Boolean(thisSession.get('recurring')),
+    allowSkip: !Boolean(thisSession.recurring),
   });
 
   $('#body').addClass('sub');
@@ -3289,7 +3289,7 @@ Session.prototype = {
               self.otpView,
               'Enter OTP sent on ' +
                 getPhone() +
-                '<br>to save your Card for future payments'
+                '<br>to save your card for future payments'
             );
           });
         } else if (customer.saved && !customer.logged) {
