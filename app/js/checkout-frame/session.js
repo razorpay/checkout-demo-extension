@@ -1685,7 +1685,8 @@ Session.prototype = {
       {
         provider: providerCode,
         amount: self.get('amount'),
-      }
+      },
+      getPhone()
     );
   },
 

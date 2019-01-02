@@ -85,9 +85,9 @@ Customer.prototype = {
   },
 
   // NOTE: status check api also sends otp if customer exist
-  checkStatus: function(callback, queryParams) {
+  checkStatus: function(callback, queryParams, contact) {
     let customer = this;
-    let url = 'customers/status/' + this.contact;
+    let url = 'customers/status/' + (this.contact || contact);
 
     if (queryParams) {
       url = `${url}?${_.obj2query(queryParams)}`;
