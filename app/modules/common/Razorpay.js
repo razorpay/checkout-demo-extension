@@ -79,9 +79,9 @@ export default function Razorpay(overrides) {
   ) {
     options.set('flashcheckout', true);
   }
-  if (options.get('flashcheckout')) {
-    options.set('method.qr', true);
-  }
+
+  /* Enable QR for all by default */
+  options.set('method.qr', true);
 
   if (
     backendEntityIds.every(function(prop) {
