@@ -11,7 +11,7 @@ import * as strings from 'common/strings';
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
-import Iframe from 'payment/iframe';
+import Redir from 'payment/redir';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
@@ -237,7 +237,7 @@ Payment.prototype = {
   checkRedirect: function() {
     var getOption = this.r.get;
 
-    if (getOption('redirect')) {
+    if (!this.iframe && getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
@@ -436,15 +436,13 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
-    this.popup.write(popupTemplate(this));
     _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
-    this.popup.show();
   },
 
   makePopup: function() {
     let Medium = Popup;
     if (this.iframe) {
-      Medium = Iframe;
+      Medium = Redir;
     }
     var popup = new Medium('', 'popup_' + Track.id, this);
     if ((popup && !popup.window) || popup.window.closed !== false) {
@@ -468,7 +466,7 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return !(this.r.get('redirect') || this.powerwallet);
+    return this.iframe || !(this.r.get('redirect') || this.powerwallet);
   },
 
   tryPopup: function() {

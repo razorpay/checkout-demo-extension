@@ -554,7 +554,7 @@ function errorHandler(response) {
       // prevent payment canceled error
       this.powerwallet = null;
       return;
-    } else if (this.get('flashcheckout') && this.tab === 'card') {
+    } else if (this.nativeotp && this.tab === 'card') {
       return;
     }
   }
@@ -792,6 +792,7 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+  this.nativeotp = !!this.nativeOtpPossible();
   this.tab_titles = tab_titles;
 
   each(message, function(key, val) {
@@ -815,6 +816,12 @@ function Session(message) {
 }
 
 Session.prototype = {
+  nativeOtpPossible: function() {
+    var optionPresent = this.get('nativeotp') || this.get('flashcheckout');
+    var redirectionPossible = this.get('redirect') || this.get('callback_url');
+    return optionPresent && redirectionPossible;
+  },
+
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     return (amount / 100)
@@ -4587,7 +4594,7 @@ Session.prototype = {
     }
 
     if (data.method === 'card') {
-      if (this.get('flashcheckout')) {
+      if (this.nativeotp) {
         var cardType;
         if (data.token) {
           if (this.transformedTokens) {
@@ -4608,6 +4615,7 @@ Session.prototype = {
           this.r.on('payment.otp.required', function(data) {
             askOTP(that.otpView, data);
           });
+          data.callback_url = this.get('callback_url');
           request.iframe = true;
         }
       }

@@ -33,6 +33,6 @@ const mobileQuery =
   '@media (max-device-height: 450px),(max-device-width: 450px)';
 
 export const isMobile =
-  global.innerWidth < 450 ||
+  (global.innerWidth && global.innerWidth < 450) ||
   shouldFixFixed ||
   global.matchMedia(mobileQuery).matches;
