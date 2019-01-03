@@ -252,7 +252,7 @@ var responseTypes = {
   }
 };
 
-function mwebIntent(payment) {
+function mwebIntent(payment, ra, fullResponse) {
   // Start Timeout
   var drawerTimeout = setTimeout(() => {
     /**

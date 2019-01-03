@@ -101,6 +101,7 @@ img {
       this.session = session;
       paymentData.method = 'upi';
       paymentData['_[flow]'] = 'intent';
+      paymentData['_[upiqr]'] = '1';
       session.r.createPayment(paymentData)
         .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))
         .on('payment.success', onSuccess)

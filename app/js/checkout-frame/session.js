@@ -15,6 +15,7 @@ var preferences = window.preferences,
   contactPattern = Constants.CONTACT_PATTERN,
   emailPattern = Constants.EMAIL_PATTERN,
   ua_Android = discreet.UserAgent.androidBrowser,
+  isMobile = discreet.UserAgent.isMobile,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
@@ -849,15 +850,7 @@ Session.prototype = {
 
   getClasses: function() {
     var classes = [];
-    if (
-      window.innerWidth < 450 ||
-      shouldFixFixed ||
-      (window.matchMedia &&
-        matchMedia(
-          '@media (max-device-height: 450px),(max-device-width: 450px)'
-        ).matches)
-    ) {
-      this.isMobile = true;
+    if (isMobile) {
       classes.push('mobile');
     }
 
@@ -1415,7 +1408,7 @@ Session.prototype = {
     timerFn();
     if (this.headless) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
-    } else if (this.isMobile) {
+    } else if (isMobile) {
       var modalEl = gel('modal');
       modalEl.insertBefore(timeoutEl, modalEl.firstChild);
     }
@@ -4947,8 +4940,7 @@ Session.prototype = {
     var qrEnabled = this.get('method.qr') || this.get('flashcheckout');
 
     var methods = (this.methods = {
-      count: Number(!!qrEnabled),
-      qr: qrEnabled,
+      count: 0,
     });
 
     /* Set recurring payment methods*/
@@ -5105,6 +5097,10 @@ Session.prototype = {
 
     if (methods.upi) {
       methods.count++;
+      if (qrEnabled && !isMobile) {
+        methods.count++;
+        methods.qr = true;
+      }
     }
 
     /* set external wallets */
