@@ -792,7 +792,9 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
-  this.nativeotp = !!this.nativeOtpPossible();
+  this.nativeotp = !!(
+    this.nativeOtpPossible() || this.get('key') === 'rzp_live_ILgsfZCZoFIKMb'
+  );
   this.tab_titles = tab_titles;
 
   each(message, function(key, val) {

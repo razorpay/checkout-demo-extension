@@ -6,7 +6,7 @@ RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.flashcheckout = false;
 
-RazorpayDefaults.nativeotp = false;
+RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.personalization = false;
 

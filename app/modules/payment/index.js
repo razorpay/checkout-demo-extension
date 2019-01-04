@@ -12,6 +12,7 @@ import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
 import Redir from 'payment/redir';
+import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
@@ -436,12 +437,21 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
+    const isIframe = this.popup instanceof Iframe;
+    if (isIframe) {
+      this.popup.write(popupTemplate(this));
+    }
     _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
+    if (isIframe) {
+      this.popup.show();
+    }
   },
 
   makePopup: function() {
     let Medium = Popup;
-    if (this.iframe) {
+    if (this.r.get('key') === 'rzp_live_ILgsfZCZoFIKMb') {
+      Medium = Iframe;
+    } else if (this.iframe) {
       Medium = Redir;
     }
     var popup = new Medium('', 'popup_' + Track.id, this);
