@@ -449,10 +449,12 @@ Payment.prototype = {
 
   makePopup: function() {
     let Medium = Popup;
-    if (this.r.get('key') === 'rzp_live_ILgsfZCZoFIKMb') {
-      Medium = Iframe;
-    } else if (this.iframe) {
-      Medium = Redir;
+    if (this.iframe) {
+      if (this.r.get('key') === 'rzp_live_ILgsfZCZoFIKMb') {
+        Medium = Iframe;
+      } else {
+        Medium = Redir;
+      }
     }
     var popup = new Medium('', 'popup_' + Track.id, this);
     if ((popup && !popup.window) || popup.window.closed !== false) {

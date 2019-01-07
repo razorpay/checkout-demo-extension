@@ -4624,7 +4624,9 @@ Session.prototype = {
           this.r.on('payment.otp.required', function(data) {
             askOTP(that.otpView, data);
           });
-          data.callback_url = this.get('callback_url');
+          if (this.get('callback_url')) {
+            data.callback_url = this.get('callback_url');
+          }
           request.iframe = true;
         }
       }
@@ -4954,7 +4956,9 @@ Session.prototype = {
     var passedWallets = this.get('method.wallet');
     var self = this;
     var emi_options = this.emi_options;
-    var qrEnabled = this.get('method.qr') || this.get('flashcheckout');
+    var qrEnabled =
+      !preferences.fee_bearer &&
+      (this.get('method.qr') || this.get('flashcheckout'));
 
     var methods = (this.methods = {
       count: 0,
