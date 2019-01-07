@@ -94,6 +94,7 @@ img {
 </style>
 <script>
   import { RazorpayConfig } from 'common/Razorpay';
+  import { processInstrument } from 'checkoutframe/personalization';
 
   export default {
     oncreate() {
@@ -102,6 +103,9 @@ img {
       paymentData.method = 'upi';
       paymentData['_[flow]'] = 'intent';
       paymentData['_[upiqr]'] = '1';
+
+      processInstrument(paymentData);
+
       session.r.createPayment(paymentData)
         .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))
         .on('payment.success', onSuccess)

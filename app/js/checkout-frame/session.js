@@ -29,6 +29,31 @@ var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
 
+function shouldEnableP13n(keyId) {
+  return (
+    [
+      'rzp_live_CMOStW2MDu3YAb',
+      'rzp_live_0G7qbsSMraayiC',
+      'rzp_live_aqFFdPUY2P7k5K',
+      'rzp_live_1uqYsWi9XAL5S6',
+      'rzp_live_FF1pxU2yzDz5LJ',
+      'rzp_live_ahK9UxJUcnp6eu',
+      'rzp_live_nbFIyWp9PWCqNl',
+      'rzp_live_jgiTw3mUHE6lIS',
+      'rzp_live_DPkrSwIZpl6CuH',
+      'rzp_live_IAz4L4z9zxUUvk',
+      'rzp_live_q3M6JUn27Nmqqt',
+      'rzp_live_14c9GVGPiOYejV',
+      'rzp_live_4NeEyLZf2m10Ry',
+      'rzp_live_N3vJDYzcAuUJhm',
+      'rzp_live_50mGoVXSUxsyMa',
+
+      /* Razorpay key */
+      'rzp_live_ILgsfZCZoFIKMb',
+    ].indexOf(keyId) > -1
+  );
+}
+
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -1378,7 +1403,10 @@ Session.prototype = {
   },
 
   setP13n: function() {
-    if (this.get('flashcheckout') && this.get().personalization !== false) {
+    if (
+      (shouldEnableP13n(this.get('key')) || this.get('flashcheckout')) &&
+      this.get().personalization !== false
+    ) {
       this.set('personalization', true);
     }
 
@@ -1403,6 +1431,7 @@ Session.prototype = {
         target: '#methods-list',
         data: {
           session: this,
+          animate: false,
         },
       });
     }
@@ -2781,6 +2810,7 @@ Session.prototype = {
             instruments: instruments,
             customer: getCustomer(this.value),
             tpvBank: this.tpvBank,
+            animate: true,
           });
         });
     }
@@ -4491,6 +4521,11 @@ Session.prototype = {
       if (this.doneByP13n) {
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
+        } else if (
+          selectedInstrument.method === 'upi' &&
+          selectedInstrument['_[upiqr]'] === '1'
+        ) {
+          return this.switchTab('qr');
         }
       }
     }
