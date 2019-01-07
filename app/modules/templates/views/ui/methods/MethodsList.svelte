@@ -257,6 +257,12 @@
               icon = wallet.sqLogo;
               break;
             case 'upi':
+              if (instrument['_[upiqr]'] === '1') {
+                text = `QR`;
+                icon = session.themeMeta.icons['qr'];
+                break;
+              }
+
               var flow = instrument['_[flow]'];
               if (flow === 'intent') {
                 text = `UPI - ${trimText(

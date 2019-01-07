@@ -4493,6 +4493,11 @@ Session.prototype = {
       if (this.doneByP13n) {
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
+        } else if (
+          selectedInstrument.method === 'upi' &&
+          selectedInstrument['_[upiqr]'] === '1'
+        ) {
+          return this.switchTab('qr');
         }
       }
     }
