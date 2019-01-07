@@ -1,5 +1,6 @@
 import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
 import { doesAppExist } from 'common/upi';
+import { isMobile } from 'common/useragent';
 
 const AVAILABLE_METHODS = [
   'card',
@@ -117,7 +118,7 @@ export default class MethodsList {
 
     data = _Obj.clone(data);
     let noOfInstruments = 2;
-    if (this.data.session.isMobile) {
+    if (isMobile) {
       noOfInstruments = 3;
     }
 
