@@ -173,14 +173,31 @@
           return val;
         };
 
+        if (!this.get().animate) {
+          return {
+            delay: 0,
+            duration: 0,
+            css: t => `opacity: 0; transform: translateY(${FINAL_VALUE}px);`,
+          }
+        }
+
         return {
           delay,
           duration,
           css: t => `opacity: 1; transform: translateY(${timing(t)}px);`,
         };
       },
+
       fade: (node, { delay = 0, duration = 200 }) => {
         const o = +global.getComputedStyle(node).opacity;
+
+        if (!this.get().animate) {
+          return {
+            delay: 0,
+            duration: 0,
+            css: t => `opacity: 1`,
+          }
+        }
 
         return {
           delay,
@@ -328,6 +345,7 @@
         session: null,
         customer: {},
         showOtherMethods: false,
+        animate: false
       };
     },
     methods: {

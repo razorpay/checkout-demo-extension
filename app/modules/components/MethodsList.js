@@ -44,6 +44,8 @@ export default class MethodsList {
       data,
     });
 
+    this.animateNext = data.animate;
+
     this.data = data;
     this.addListeners();
     this.hasLongClass =
@@ -142,6 +144,14 @@ export default class MethodsList {
     data.selected = null;
     this.selectedInstrument = null;
 
+    var delay = 1500;
+
+    if (this.animateNext === false) {
+      delay = 0;
+      data.animate = false;
+      this.animateNext = true;
+    }
+
     this.view.set(data);
 
     /* handles the race condition */
@@ -160,7 +170,7 @@ export default class MethodsList {
         if (this.view.get().selected) {
           _Doc.querySelector('#body') |> _El.addClass('sub');
         }
-      }, 1500);
+      }, delay);
     } else {
       _Doc.querySelector('#payment-options') |> _El.removeClass('hidden');
       _Doc.querySelector('#body') |> _El.removeClass('sub');

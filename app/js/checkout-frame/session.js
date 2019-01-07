@@ -1403,6 +1403,7 @@ Session.prototype = {
         target: '#methods-list',
         data: {
           session: this,
+          animate: false,
         },
       });
     }
@@ -2781,6 +2782,7 @@ Session.prototype = {
             instruments: instruments,
             customer: getCustomer(this.value),
             tpvBank: this.tpvBank,
+            animate: true,
           });
         });
     }
