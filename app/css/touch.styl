@@ -33,7 +33,7 @@ $mobile-view() {
     padding-bottom: 56px;
   }
 
-  #body {
+  #container #modal #body {
     height: $bodyhmobile;
     height: calc(100% - 129px);
     height: calc(100vh - 129px);
@@ -128,13 +128,14 @@ $mobile-view() {
   #modal {
     background: #fff;
     width: 100%;
-    max-width: $max-width;
+    max-width: 100%;
     min-height: 100%;
     margin: 0 auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     transform: translateY(7%);
     overflow: hidden;
     &.iframe-active {
+      min-width: 0;
       width: 100% !important;
       height: 100% !important;
     }

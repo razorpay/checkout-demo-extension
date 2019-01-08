@@ -18,7 +18,7 @@ const INSTRUMENT_PROPS = {
   card: 'token',
   wallet: 'wallet',
   netbanking: 'bank',
-  upi: ['_[flow]', 'vpa', 'upi_app'],
+  upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]'],
 };
 
 const set = (key, data) => {

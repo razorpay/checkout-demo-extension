@@ -49,6 +49,9 @@ export const processCoproto = function(response) {
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
+    if (this.iframe && this.popup) {
+      this.popup.writable = 1;
+    }
     var func = responseTypes[response.type];
     var isFunction = _.isFunction(func);
     if (isFunction) {
@@ -104,7 +107,7 @@ var responseTypes = {
           request.url,
           request.content,
           request.method,
-          popup.window.name
+          popup.name
         );
       }
       // popup blocking addons close popup once we set a url
@@ -252,7 +255,7 @@ var responseTypes = {
   }
 };
 
-function mwebIntent(payment) {
+function mwebIntent(payment, ra, fullResponse) {
   // Start Timeout
   var drawerTimeout = setTimeout(() => {
     /**

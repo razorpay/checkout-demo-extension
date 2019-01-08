@@ -190,7 +190,7 @@ export const handleMessage = function(message) {
     try {
       session = SessionManager.createSession(transformedOptions, id);
     } catch (e) {
-      return Razorpay.sendMessage({ event: 'fault', data: e.message });
+      return Razorpay.sendMessage({ event: 'fault', data: e });
     }
     var oldSession = SessionManager.getSession();
     if (oldSession && _.isFunction(oldSession.saveAndClose)) {

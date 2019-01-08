@@ -15,6 +15,7 @@ var preferences = window.preferences,
   contactPattern = Constants.CONTACT_PATTERN,
   emailPattern = Constants.EMAIL_PATTERN,
   ua_Android = discreet.UserAgent.androidBrowser,
+  isMobile = discreet.UserAgent.isMobile,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
@@ -27,6 +28,31 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
+
+function shouldEnableP13n(keyId) {
+  return (
+    [
+      'rzp_live_CMOStW2MDu3YAb',
+      'rzp_live_0G7qbsSMraayiC',
+      'rzp_live_aqFFdPUY2P7k5K',
+      'rzp_live_1uqYsWi9XAL5S6',
+      'rzp_live_FF1pxU2yzDz5LJ',
+      'rzp_live_ahK9UxJUcnp6eu',
+      'rzp_live_nbFIyWp9PWCqNl',
+      'rzp_live_jgiTw3mUHE6lIS',
+      'rzp_live_DPkrSwIZpl6CuH',
+      'rzp_live_IAz4L4z9zxUUvk',
+      'rzp_live_q3M6JUn27Nmqqt',
+      'rzp_live_14c9GVGPiOYejV',
+      'rzp_live_4NeEyLZf2m10Ry',
+      'rzp_live_N3vJDYzcAuUJhm',
+      'rzp_live_50mGoVXSUxsyMa',
+
+      /* Razorpay key */
+      'rzp_live_ILgsfZCZoFIKMb',
+    ].indexOf(keyId) > -1
+  );
+}
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -553,7 +579,7 @@ function errorHandler(response) {
       // prevent payment canceled error
       this.powerwallet = null;
       return;
-    } else if (this.get('flashcheckout') && this.tab === 'card') {
+    } else if (this.nativeotp && this.tab === 'card') {
       return;
     }
   }
@@ -704,7 +730,7 @@ function askOTP(view, text) {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: !Boolean(thisSession.get('recurring')),
+    allowSkip: !Boolean(thisSession.recurring),
   });
 
   $('#body').addClass('sub');
@@ -791,6 +817,9 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+  this.nativeotp = !!(
+    this.nativeOtpPossible() || this.get('key') === 'rzp_live_ILgsfZCZoFIKMb'
+  );
   this.tab_titles = tab_titles;
 
   each(message, function(key, val) {
@@ -814,6 +843,12 @@ function Session(message) {
 }
 
 Session.prototype = {
+  nativeOtpPossible: function() {
+    var optionPresent = this.get('nativeotp') || this.get('flashcheckout');
+    var redirectionPossible = this.get('redirect') || this.get('callback_url');
+    return optionPresent && redirectionPossible;
+  },
+
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     return (amount / 100)
@@ -849,15 +884,7 @@ Session.prototype = {
 
   getClasses: function() {
     var classes = [];
-    if (
-      window.innerWidth < 450 ||
-      shouldFixFixed ||
-      (window.matchMedia &&
-        matchMedia(
-          '@media (max-device-height: 450px),(max-device-width: 450px)'
-        ).matches)
-    ) {
-      this.isMobile = true;
+    if (isMobile) {
       classes.push('mobile');
     }
 
@@ -1376,7 +1403,10 @@ Session.prototype = {
   },
 
   setP13n: function() {
-    if (this.get('flashcheckout') && this.get().personalization !== false) {
+    if (
+      (shouldEnableP13n(this.get('key')) || this.get('flashcheckout')) &&
+      this.get().personalization !== false
+    ) {
       this.set('personalization', true);
     }
 
@@ -1401,6 +1431,7 @@ Session.prototype = {
         target: '#methods-list',
         data: {
           session: this,
+          animate: false,
         },
       });
 
@@ -1417,7 +1448,7 @@ Session.prototype = {
     timerFn();
     if (this.headless) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
-    } else if (this.isMobile) {
+    } else if (isMobile) {
       var modalEl = gel('modal');
       modalEl.insertBefore(timeoutEl, modalEl.firstChild);
     }
@@ -1687,7 +1718,8 @@ Session.prototype = {
       {
         provider: providerCode,
         amount: self.get('amount'),
-      }
+      },
+      getPhone()
     );
   },
 
@@ -2131,6 +2163,7 @@ Session.prototype = {
 
     this.on('change', '#partial-select-partial', function(e) {
       var parentEle = $('#amount-value').parent();
+      var optionEle = $('.minimum-amount-select');
 
       if (!e.target.checked) {
         var amount = this.order.amount_due;
@@ -2152,6 +2185,39 @@ Session.prototype = {
         parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
       }
     });
+
+    if (
+      self.order &&
+      self.order.partial_payment &&
+      self.order.first_payment_min_amount &&
+      Number(self.order.amount_paid) === 0
+    ) {
+      this.on('change', '#minimum-amount-select', function(e) {
+        var el_amount = gel('amount-value');
+
+        if (!el_amount) {
+          return;
+        }
+
+        var amount;
+        if (!e.target.checked) {
+          amount = '';
+          el_amount.focus();
+        } else {
+          amount = self.formatAmount(self.order.first_payment_min_amount);
+        }
+
+        el_amount.value = amount;
+
+        if ('createEvent' in document) {
+          var evt = document.createEvent('HTMLEvents');
+          evt.initEvent('change', false, true);
+          el_amount.dispatchEvent(evt);
+        } else {
+          el_amount.fireEvent('onchange');
+        }
+      });
+    }
 
     this.click('#next-button', 'extraNext');
 
@@ -2649,13 +2715,36 @@ Session.prototype = {
       delegator.amount = delegator
         .add('amount', el_amount)
         .on('change', function() {
+          var optionEle = $('#minimum-amount-select')[0];
+
+          var firstPaymentMinAmount;
+          if (
+            self.order &&
+            self.order.partial_payment &&
+            self.order.first_payment_min_amount &&
+            Number(self.order.amount_paid) === 0
+          ) {
+            firstPaymentMinAmount = self.order.first_payment_min_amount;
+          }
+
+          if (
+            optionEle &&
+            firstPaymentMinAmount &&
+            Number(self.formatAmount(firstPaymentMinAmount)) !==
+              Number(this.value)
+          ) {
+            optionEle.checked = false;
+          }
+
           self.input(el_amount);
           var value = this.value * 100;
-          var maxAmount = self.order.partial_payment
-            ? self.order.amount_due
-            : self.order.amount;
+          var maxAmount =
+            self.order && self.order.partial_payment
+              ? self.order.amount_due
+              : self.order.amount;
 
-          var isValid = 100 <= value && value <= maxAmount;
+          var minAmount = firstPaymentMinAmount || 100;
+          var isValid = minAmount <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
 
           var amountDue = self.order.amount_due;
@@ -2688,8 +2777,10 @@ Session.prototype = {
                 );
               } else if (value > self.order.amount_due) {
                 helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
-              } else if (value < 100) {
-                helpEle.html('Minimum payable amount is ₹' + 1);
+              } else if (value < minAmount) {
+                helpEle.html(
+                  'Minimum payable amount is ₹' + self.formatAmount(minAmount)
+                );
               }
             }
 
@@ -2733,6 +2824,7 @@ Session.prototype = {
             instruments: instruments,
             customer: getCustomer(this.value),
             tpvBank: this.tpvBank,
+            animate: true,
           });
         });
     }
@@ -3086,8 +3178,13 @@ Session.prototype = {
       if (this.emiPlansView.back()) {
         return;
       }
-    }
-    if (
+    } else if (
+      /**
+       * If back is pressed from the Card EMI screen,
+       * and cardless EMI is available as a payment method,
+       * take to the Cardless EMI list screen,
+       * which also has the Pay using Card EMI option.
+       */
       this.screen === 'card' &&
       this.tab === 'emi' &&
       this.methods.cardless_emi
@@ -3238,7 +3335,7 @@ Session.prototype = {
               self.otpView,
               'Enter OTP sent on ' +
                 getPhone() +
-                '<br>to save your Card for future payments'
+                '<br>to save your card for future payments'
             );
           });
         } else if (customer.saved && !customer.logged) {
@@ -4440,6 +4537,11 @@ Session.prototype = {
         Analytics.setMeta('doneByP13n', true);
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
+        } else if (
+          selectedInstrument.method === 'upi' &&
+          selectedInstrument['_[upiqr]'] === '1'
+        ) {
+          return this.switchTab('qr');
         }
       }
     }
@@ -4545,7 +4647,7 @@ Session.prototype = {
     }
 
     if (data.method === 'card') {
-      if (this.get('flashcheckout')) {
+      if (this.nativeotp) {
         var cardType;
         if (data.token) {
           if (this.transformedTokens) {
@@ -4566,6 +4668,9 @@ Session.prototype = {
           this.r.on('payment.otp.required', function(data) {
             askOTP(that.otpView, data);
           });
+          if (this.get('callback_url')) {
+            data.callback_url = this.get('callback_url');
+          }
           request.iframe = true;
         }
       }
@@ -4895,11 +5000,12 @@ Session.prototype = {
     var passedWallets = this.get('method.wallet');
     var self = this;
     var emi_options = this.emi_options;
-    var qrEnabled = this.get('method.qr') || this.get('flashcheckout');
+    var qrEnabled =
+      !preferences.fee_bearer &&
+      (this.get('method.qr') || this.get('flashcheckout'));
 
     var methods = (this.methods = {
-      count: Number(!!qrEnabled),
-      qr: qrEnabled,
+      count: 0,
     });
 
     /* Set recurring payment methods*/
@@ -5056,6 +5162,10 @@ Session.prototype = {
 
     if (methods.upi) {
       methods.count++;
+      if (qrEnabled && !isMobile) {
+        methods.count++;
+        methods.qr = true;
+      }
     }
 
     /* set external wallets */
@@ -5355,7 +5465,7 @@ Session.prototype = {
       if (response.error) {
         return Razorpay.sendMessage({
           event: 'fault',
-          data: response.error.description,
+          data: response.error,
         });
       }
 

@@ -2,6 +2,7 @@ import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
 import { doesAppExist } from 'common/upi';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { isMobile } from 'common/useragent';
 
 const AVAILABLE_METHODS = [
   'card',
@@ -45,6 +46,8 @@ export default class MethodsList {
       target: _Doc.querySelector(target),
       data,
     });
+
+    this.animateNext = data.animate;
 
     this.data = data;
     this.addListeners();
@@ -125,7 +128,7 @@ export default class MethodsList {
 
     data = _Obj.clone(data);
     let noOfInstruments = 2;
-    if (this.data.session.isMobile) {
+    if (isMobile) {
       noOfInstruments = 3;
     }
 
@@ -137,6 +140,10 @@ export default class MethodsList {
     /* Filter out any app that's in user's list but not currently installed */
     data.instruments = _Arr.filter(data.instruments, instrument => {
       if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
+        if (instrument['_[upiqr]'] === '1' && !isMobile) {
+          return true;
+        }
+
         if (
           doesAppExist(instrument.upi_app, this.data.session.upi_intents_data)
         ) {
@@ -151,6 +158,14 @@ export default class MethodsList {
     data.instruments = _Arr.slice(data.instruments, 0, noOfInstruments);
     data.selected = null;
     this.selectedInstrument = null;
+
+    var delay = 1500;
+
+    if (this.animateNext === false) {
+      delay = 0;
+      data.animate = false;
+      this.animateNext = true;
+    }
 
     this.view.set(data);
 
@@ -173,7 +188,7 @@ export default class MethodsList {
         if (this.view.get().selected) {
           _Doc.querySelector('#body') |> _El.addClass('sub');
         }
-      }, 1500);
+      }, delay);
     } else {
       _Doc.querySelector('#payment-options') |> _El.removeClass('hidden');
       _Doc.querySelector('#body') |> _El.removeClass('sub');

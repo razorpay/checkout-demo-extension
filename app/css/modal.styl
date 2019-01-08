@@ -1728,11 +1728,20 @@ $outline = #ddd;
     }
   }
 }
-
-#partial-select-partial + .checkbox {
+#partial-select-partial + .checkbox,
+#minimum-amount-select + .checkbox {
   float: left;
   top: 1px;
   margin-right: 8px;
+}
+
+.minimum-amount-select {
+  margin: 12px 0 10px 26px;
+  display: none;
+}
+
+#partial-select-partial:checked + .checkbox + .elem-wrap + .minimum-amount-select {
+  display: block;
 }
 
 #partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {

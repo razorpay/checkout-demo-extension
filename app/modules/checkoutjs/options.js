@@ -6,8 +6,11 @@ RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.flashcheckout = false;
 
+RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.personalization = false;
+
+RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
 
 RazorpayDefaults.method = {
   netbanking: null,
@@ -17,7 +20,7 @@ RazorpayDefaults.method = {
   emi: true,
   upi: true,
   upi_intent: null,
-  qr: false,
+  qr: true,
 };
 
 RazorpayDefaults.prefill = {
