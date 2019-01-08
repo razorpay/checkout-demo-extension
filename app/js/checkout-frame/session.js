@@ -748,14 +748,20 @@ function askOTP(view, text) {
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
             $resendBtn.addClass('hidden');
           }
-          thisSession.closeAt = now() + 3 * 60 * 1000;
-          thisSession.showTimer(function() {
-            thisSession.hideTimer();
-            thisSession.back(true);
-            setTimeout(function() {
-              thisSession.showLoadError('Payment was not completed on time', 1);
-            }, 300);
-          });
+
+          if (!thisSession.get('timeout')) {
+            thisSession.closeAt = now() + 3 * 60 * 1000;
+            thisSession.showTimer(function() {
+              thisSession.hideTimer();
+              thisSession.back(true);
+              setTimeout(function() {
+                thisSession.showLoadError(
+                  'Payment was not completed on time',
+                  1
+                );
+              }, 300);
+            });
+          }
         }
       } else {
         text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
@@ -1446,7 +1452,7 @@ Session.prototype = {
     $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if (this.headless) {
+    if (this.headless && !this.get('timeout')) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
     } else if (isMobile) {
       var modalEl = gel('modal');
@@ -1987,7 +1993,9 @@ Session.prototype = {
   resendOTP: function() {
     if (this.headless) {
       this.showLoadError('Resending OTP');
-      this.hideTimer();
+      if (!this.get('timeout')) {
+        this.hideTimer();
+      }
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
     Analytics.track('otp:resend', {
@@ -2012,7 +2020,9 @@ Session.prototype = {
 
   secAction: function() {
     if (this.headless && this.r._payment) {
-      this.hideTimer();
+      if (!this.get('timeout')) {
+        this.hideTimer();
+      }
       return this.r._payment.gotoBank();
     }
     Analytics.track('saved_cards:skip', {
@@ -4263,7 +4273,7 @@ Session.prototype = {
   },
 
   clearRequest: function(extra) {
-    if (this.closeAt) {
+    if (!this.get('timeout') && this.closeAt) {
       this.hideTimer();
       this.closeAt = null;
     }
