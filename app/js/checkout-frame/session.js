@@ -1434,6 +1434,8 @@ Session.prototype = {
           animate: false,
         },
       });
+
+      Analytics.track('p13n:set');
     }
   },
 
@@ -2798,12 +2800,24 @@ Session.prototype = {
           var instruments = [];
           self.input(this.el);
 
+          Analytics.removeMeta('p13n');
+
           if (!self.methodsList) {
             return;
           }
 
           if (this.isValid()) {
             instruments = P13n.listInstruments(getCustomer(this.value)) || [];
+
+            if (instruments.length) {
+              Analytics.track('p13:instruments:fetch', {
+                data: {
+                  length: instruments.length,
+                },
+              });
+
+              Analytics.setMeta('p13n', true);
+            }
           }
 
           self.methodsList.set({
@@ -4267,6 +4281,7 @@ Session.prototype = {
 
     this.isResumedPayment = false;
     this.doneByP13n = false;
+    Analytics.removeMeta('doneByP13n');
 
     var params = {};
     params[Constants.UPI_POLL_URL] = '';
@@ -4519,6 +4534,7 @@ Session.prototype = {
 
       /* TODO: the following code is the hack for ftx, fix it properly */
       if (this.doneByP13n) {
+        Analytics.setMeta('doneByP13n', true);
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
         } else if (
