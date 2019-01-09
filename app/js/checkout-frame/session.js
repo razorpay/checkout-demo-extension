@@ -580,6 +580,7 @@ function errorHandler(response) {
       this.powerwallet = null;
       return;
     } else if (this.nativeotp && this.tab === 'card') {
+      Analytics.removeMeta('headless');
       return;
     }
   }
@@ -679,6 +680,7 @@ function cancelHandler(response) {
   this.magic = false;
 
   Analytics.setMeta('payment.cancelled', true);
+  Analytics.removeMeta('headless');
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     if (this.r._payment && this.r._payment.upi_app) {
@@ -739,6 +741,7 @@ function askOTP(view, text) {
   if (!text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless || isMagicPayment) {
+        Analytics.track('headless:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata && origText.metadata.issuer) {
@@ -761,6 +764,7 @@ function askOTP(view, text) {
               thisSession.hideTimer();
               thisSession.back(true);
               setTimeout(function() {
+                Analytics.track('headless:timeout');
                 thisSession.showLoadError(
                   'Payment was not completed on time',
                   1
@@ -2001,12 +2005,19 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+    var isMagicPayment = this.r._payment && this.r._payment.isMagicPayment;
 
     if (isMagicPayment) {
       return this.magicView.resendOtp();
     }
 
+    Analytics.track('otp:resend', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.tab === 'wallet',
+        headless: this.headless,
+      },
+    });
     if (this.headless) {
       this.showLoadError('Resending OTP');
       if (!this.get('timeout')) {
@@ -2014,12 +2025,6 @@ Session.prototype = {
       }
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
-    Analytics.track('otp:resend', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        wallet: this.tab === 'wallet',
-      },
-    });
 
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'cardless_emi') {
@@ -2044,6 +2049,10 @@ Session.prototype = {
 
     if (this.headless && this.r._payment) {
       if (!this.get('timeout')) {
+        Analytics.track('headless:gotobank', {
+          type: AnalyticsTypes.BEHAV,
+          immediately: true,
+        });
         this.hideTimer();
       }
       return this.r._payment.gotoBank();
@@ -4700,6 +4709,7 @@ Session.prototype = {
 
         if (!this.magic && (cardType === 'mastercard' || cardType === 'visa')) {
           this.headless = true;
+          Analytics.track('headless:attempt');
           this.setScreen('otp');
           $('#otp-sec').html("Complete on bank's page");
           this.r.on('payment.otp.required', function(data) {
@@ -4709,6 +4719,7 @@ Session.prototype = {
             data.callback_url = this.get('callback_url');
           }
           request.iframe = true;
+          Analytics.track('iframe:attempt');
         }
       }
     }

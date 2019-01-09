@@ -4,6 +4,7 @@ import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import { RazorpayConfig } from 'common/Razorpay';
+import Analytics from 'analytics';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -243,6 +244,7 @@ var responseTypes = {
       this.otpurl = request.url;
       this.emit('otp.required');
     } else {
+      Analytics.setMeta('headless', true);
       this.otpurl = fullResponse.submit_url;
       this.gotoBankUrl = fullResponse.redirect;
       this.emit('otp.required', fullResponse);
