@@ -214,6 +214,11 @@ $mobile-view() {
 
   #form-otp #timeout {
     position: fixed;
+    bottom: 0;
+    transition: 0.3s bottom;
+  }
+
+  #body.sub #form-otp #timeout {
     bottom: $footerh;
   }
 }

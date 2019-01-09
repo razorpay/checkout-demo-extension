@@ -13,6 +13,7 @@ const SCREENS = {
  */
 const DEFAULT_SCREEN_DATA = {
   [SCREENS.OTP]: {
+    allowResend: true,
     allowSkip: true,
     maxlength: 6,
     otp: '',

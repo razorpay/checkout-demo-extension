@@ -710,8 +710,8 @@ function elfShowOTP(otp, sender, bank) {
 function askOTP(view, text) {
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
-  var $resendBtn = $('#otp-resend').removeClass('hidden');
   var thisSession = SessionManager.getSession();
+  var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
 
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
@@ -731,13 +731,14 @@ function askOTP(view, text) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
+    allowResend: true,
   });
 
   $('#body').addClass('sub');
 
   if (!text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
-      if (thisSession.headless) {
+      if (thisSession.headless || isMagicPayment) {
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata && origText.metadata.issuer) {
@@ -746,9 +747,14 @@ function askOTP(view, text) {
               '<img class="headless-bank" src="' + bankLogo + '">';
           }
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
-            $resendBtn.addClass('hidden');
+            view.updateScreen({
+              allowResend: false,
+            });
           }
 
+          view.updateScreen({
+            skipText: "Complete on bank's page",
+          });
           if (!thisSession.get('timeout')) {
             thisSession.closeAt = now() + 3 * 60 * 1000;
             thisSession.showTimer(function() {
@@ -1309,6 +1315,7 @@ Session.prototype = {
     this.bindEvents();
     this.setP13n();
     initIosQuirks();
+
     errorHandler.call(this, this.params);
 
     var hasOffers = this.hasOffers,
@@ -1446,13 +1453,15 @@ Session.prototype = {
   },
 
   showTimer: function(cb) {
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
     this.hideTimer();
     var timeLeft = this.closeAt - now();
     var timeoutEl = $('#timeout').show()[0];
     $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if (this.headless && !this.get('timeout')) {
+    if (this.headless || isMagicPayment && !this.get('timeout')) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
     } else if (isMobile) {
       var modalEl = gel('modal');
@@ -1749,10 +1758,11 @@ Session.prototype = {
 
   setMagic: function() {
     if (!this.magicView && this.magic) {
+      var MagicView = discreet.MagicView;
       $(this.el).addClass('magic');
-      this.magicView = new magicView(this);
-      this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION, {
-        timeout: TIMEOUT_MAGIC_NO_ACTION,
+      this.magicView = new MagicView(this);
+      this.magicView.setTimeout(Constants.TIMEOUT_MAGIC_NO_ACTION, {
+        timeout: Constants.TIMEOUT_MAGIC_NO_ACTION,
         type: 'magic_no_action',
       });
     }
@@ -1991,6 +2001,12 @@ Session.prototype = {
   },
 
   resendOTP: function() {
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
+    if (isMagicPayment) {
+      return this.magicView.resendOtp();
+    }
+
     if (this.headless) {
       this.showLoadError('Resending OTP');
       if (!this.get('timeout')) {
@@ -2019,6 +2035,13 @@ Session.prototype = {
   },
 
   secAction: function() {
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
+    if (isMagicPayment) {
+      this.hideTimer();
+      return this.magicView.cancelMagic();
+    }
+
     if (this.headless && this.r._payment) {
       if (!this.get('timeout')) {
         this.hideTimer();
@@ -3153,6 +3176,8 @@ Session.prototype = {
       });
     };
 
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
@@ -3166,7 +3191,8 @@ Session.prototype = {
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
       (this.headless && payment) ||
-      ((thisTab === 'card' || thisTab === 'emi') && /^magic/.test(this.screen))
+      ((thisTab === 'card' || thisTab === 'emi') &&
+        (/^magic/.test(this.screen) || isMagicPayment))
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
@@ -4318,20 +4344,21 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
     if (!this.tab && !this.order && !this.methodsList) {
       return;
     }
 
-    if (screen === 'otp') {
-      return this.onOtpSubmit();
-    }
-
-    if (/^magic/.test(screen)) {
+    if (/^magic/.test(screen) || isMagicPayment) {
       var magicData = {};
       fillData('#form-' + screen, magicData);
       this.magicView.submit(screen, magicData);
       return;
+    }
+
+    if (screen === 'otp') {
+      return this.onOtpSubmit();
     }
 
     this.refresh();
@@ -4671,7 +4698,7 @@ Session.prototype = {
           cardType = this.delegator.card.type;
         }
 
-        if (cardType === 'mastercard' || cardType === 'visa') {
+        if (!this.magic && (cardType === 'mastercard' || cardType === 'visa')) {
           this.headless = true;
           this.setScreen('otp');
           $('#otp-sec').html("Complete on bank's page");

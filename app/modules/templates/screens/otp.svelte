@@ -41,7 +41,9 @@
 
       class:hidden="!showInput"
     >
-      <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
+      {#if $screenData[SCREEN].allowResend}
+        <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
+      {/if}
       {#if $screenData[SCREEN].allowSkip}
         <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
       {:elseif $screenData[SCREEN].allowBack}

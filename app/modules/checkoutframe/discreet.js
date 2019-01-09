@@ -41,6 +41,7 @@ import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutframe/store';
 
 import QRScreen from 'templates/views/qr.svelte';
+import MagicView from 'checkoutframe/magic';
 
 export default {
   RazorpayConfig,
@@ -97,4 +98,6 @@ export default {
   timer: _.timer,
   QRScreen,
   getFullBankLogo,
+
+  MagicView,
 };
