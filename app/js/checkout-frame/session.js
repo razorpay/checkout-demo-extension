@@ -30,28 +30,7 @@ var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
 
 function shouldEnableP13n(keyId) {
-  return (
-    [
-      'rzp_live_CMOStW2MDu3YAb',
-      'rzp_live_0G7qbsSMraayiC',
-      'rzp_live_aqFFdPUY2P7k5K',
-      'rzp_live_1uqYsWi9XAL5S6',
-      'rzp_live_FF1pxU2yzDz5LJ',
-      'rzp_live_ahK9UxJUcnp6eu',
-      'rzp_live_nbFIyWp9PWCqNl',
-      'rzp_live_jgiTw3mUHE6lIS',
-      'rzp_live_DPkrSwIZpl6CuH',
-      'rzp_live_IAz4L4z9zxUUvk',
-      'rzp_live_q3M6JUn27Nmqqt',
-      'rzp_live_14c9GVGPiOYejV',
-      'rzp_live_4NeEyLZf2m10Ry',
-      'rzp_live_N3vJDYzcAuUJhm',
-      'rzp_live_50mGoVXSUxsyMa',
-
-      /* Razorpay key */
-      'rzp_live_ILgsfZCZoFIKMb',
-    ].indexOf(keyId) > -1
-  );
+  return /^rzp_live_[0-9]/.test(keyId);
 }
 
 // .shown has display: none from iOS ad-blocker
@@ -1465,7 +1444,7 @@ Session.prototype = {
     $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if (this.headless || isMagicPayment && !this.get('timeout')) {
+    if ((this.headless || isMagicPayment) && !this.get('timeout')) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
     } else if (isMobile) {
       var modalEl = gel('modal');
