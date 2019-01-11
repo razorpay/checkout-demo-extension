@@ -104,7 +104,9 @@ img {
       paymentData['_[flow]'] = 'intent';
       paymentData['_[upiqr]'] = '1';
 
-      processInstrument(paymentData);
+      if (session.methodsList) {
+        processInstrument(paymentData);
+      }
 
       session.r.createPayment(paymentData)
         .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))

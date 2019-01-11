@@ -5028,6 +5028,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var qrEnabled =
+      !this.optional.contact &&
       !preferences.fee_bearer &&
       (this.get('method.qr') || this.get('flashcheckout'));
 

@@ -47,7 +47,7 @@ const get = key => {
  * @returns {integer | string}
  */
 
-const hashFnv32a = (str, asString = true, seed = 0xdeadc0de) => {
+const hashFnv32a = (str = '', asString = true, seed = 0xdeadc0de) => {
   let i,
     l,
     hval = seed;
