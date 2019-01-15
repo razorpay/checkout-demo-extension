@@ -110,6 +110,11 @@ export const processInstrument = (data, extraData) => {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
         let token = _Arr.find(cards, card => card.token === methodData.token);
+
+        if (!token) {
+          return;
+        }
+
         let cardDetails = token.card;
 
         methodData.token_id = token.id;
