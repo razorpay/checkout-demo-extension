@@ -30,6 +30,10 @@ var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
 
 function shouldEnableP13n(keyId) {
+  if (keyId === 'rzp_live_Oeieme2CjQmyTQ') {
+    return true;
+  }
+
   return /^rzp_live_[0-9]/.test(keyId);
 }
 
