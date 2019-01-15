@@ -5042,7 +5042,7 @@ Session.prototype = {
 
     /* Set recurring payment methods*/
     if (recurring) {
-      availMethods = availMethods.recurring;
+      availMethods = availMethods.recurring || {};
       var banks = {};
 
       /* emandate recurring */
@@ -5325,7 +5325,8 @@ Session.prototype = {
 
     /* In case of recurring set recurring as filter in saved cards */
     if (
-      session_options['prefill.method'] === 'emandate' ||
+      (session_options['prefill.method'] === 'emandate' &&
+        (preferences.methods || {}).recurring) ||
       preferences.subscription ||
       session_options.recurring
     ) {
