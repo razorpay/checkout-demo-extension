@@ -121,6 +121,7 @@ export default class MethodsList {
   }
 
   set(data) {
+    let session = this.data.session;
     if (!data.instruments && data.customer) {
       /* Just setting customer here (login/logout), rest does not change */
       return this.view.set(data);
@@ -134,7 +135,7 @@ export default class MethodsList {
 
     /* Only allow for available methods */
     data.instruments = _Arr.filter(data.instruments, ({ method }) => {
-      return this.data.session.methods[method];
+      return session.methods[method];
     });
 
     /* Filter out any app that's in user's list but not currently installed */
@@ -144,9 +145,7 @@ export default class MethodsList {
           return true;
         }
 
-        if (
-          doesAppExist(instrument.upi_app, this.data.session.upi_intents_data)
-        ) {
+        if (doesAppExist(instrument.upi_app, session.upi_intents_data)) {
           return true;
         }
         return false;
@@ -172,6 +171,10 @@ export default class MethodsList {
     /* handles the race condition */
     if (this.animationTimeout) {
       global.clearTimeout(this.animationTimeout);
+    }
+
+    if (session.tab) {
+      return;
     }
 
     if (data.instruments && data.instruments.length) {
