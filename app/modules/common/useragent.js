@@ -29,8 +29,8 @@ if (chromeVersion) {
 
 export const androidBrowser = android && (chromeVersion || check(/firefox/)); // Chrome or firefox on Android
 
-const mobileQuery =
-  '@media (max-device-height: 450px),(max-device-width: 450px)';
+export const mobileQuery =
+  '(max-device-height: 450px),(max-device-width: 450px)';
 
 export const isMobile =
   (global.innerWidth && global.innerWidth < 450) ||

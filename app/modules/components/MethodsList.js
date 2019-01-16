@@ -173,10 +173,6 @@ export default class MethodsList {
       global.clearTimeout(this.animationTimeout);
     }
 
-    if (session.tab) {
-      return;
-    }
-
     if (data.instruments && data.instruments.length) {
       Analytics.track('p13n:instruments:set', {
         count: data.instruments.length,
@@ -192,6 +188,8 @@ export default class MethodsList {
           _Doc.querySelector('#body') |> _El.addClass('sub');
         }
       }, delay);
+    } else if (session.tab) {
+      return;
     } else {
       _Doc.querySelector('#payment-options') |> _El.removeClass('hidden');
       _Doc.querySelector('#body') |> _El.removeClass('sub');

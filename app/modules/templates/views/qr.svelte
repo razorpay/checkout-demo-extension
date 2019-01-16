@@ -108,7 +108,7 @@ img {
         processInstrument(paymentData);
       }
 
-      session.r.createPayment(paymentData)
+      session.r.createPayment(paymentData, { upiqr: true, optional: session.optional })
         .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))
         .on('payment.success', onSuccess)
         .on('payment.error', _Func.bind(this.onError, this))

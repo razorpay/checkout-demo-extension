@@ -5034,7 +5034,8 @@ Session.prototype = {
     var qrEnabled =
       !this.optional.contact &&
       !preferences.fee_bearer &&
-      (this.get('method.qr') || this.get('flashcheckout'));
+      (this.get('method.qr') || this.get('flashcheckout')) &&
+      !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {
       count: 0,
@@ -5194,7 +5195,7 @@ Session.prototype = {
 
     if (methods.upi) {
       methods.count++;
-      if (qrEnabled && !isMobile) {
+      if (qrEnabled) {
         methods.count++;
         methods.qr = true;
       }

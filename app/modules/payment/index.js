@@ -178,6 +178,7 @@ export default function Payment(data, params = {}, r) {
     (this.optional.email || data.email) &&
     // tez invokes intent, popup not needed
     (params.tez ||
+      params.upiqr ||
       // only apply powerwallet for checkout-js. popup for razorpayjs
       (isRazorpayFrame &&
         // display popup for conventional wallets
