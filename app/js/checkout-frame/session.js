@@ -916,10 +916,10 @@ Session.prototype = {
       setter('address', true);
     }
 
-    if (IRCTC_KEYS.indexOf(key) !== -1) {
+    if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
-      this.irctc = true;
+      classes.push('long');
       this.r.set('theme.image_frame', false);
     }
 
@@ -1226,6 +1226,8 @@ Session.prototype = {
       this.preferences.features &&
       this.preferences.features.google_pay;
 
+    this.tezMode = 'desktop';
+
     if (this.preferences.fee_bearer) {
       return;
     }
@@ -1237,8 +1239,6 @@ Session.prototype = {
     if (!(hasFeature || Tez.checkKey(self.get('key')))) {
       return;
     }
-
-    this.tezMode = 'desktop';
 
     var $upiForm = $('#form-upi'),
       $tezUPIForm = $('#upi-tez');
@@ -2888,6 +2888,25 @@ Session.prototype = {
       this.headless = false;
     }
 
+    if (this.separateTez) {
+      var tez = false;
+      if (screen === 'tez') {
+        tez = true;
+        screen = 'upi';
+      }
+
+      $('#upi-directpay .checkbox').css('display', 'none');
+      $('#upi-tez .checkbox').css('display', 'none');
+
+      gel('radio-tez').checked = tez;
+      $('#upi-tez').css('display', tez ? 'block' : 'none');
+      $('#upi-tez').toggleClass('expanded', tez);
+
+      gel('radio-directpay').checked = !tez;
+      $('#upi-directpay').toggleClass('expanded', !tez);
+      $('#upi-directpay').css('display', !tez ? 'block' : 'none');
+    }
+
     setEmiPlansCta(screen, this.tab);
 
     if (screen === this.screen) {
@@ -3999,6 +4018,10 @@ Session.prototype = {
     if (form === 'emandate') {
       form = 'netbanking';
     }
+
+    if (form === 'tez') {
+      form = 'upi';
+    }
     return '#form-' + form;
   },
 
@@ -4083,6 +4106,10 @@ Session.prototype = {
           data.method = 'card';
           delete data.emi_duration;
         }
+      }
+
+      if (data.method === 'tez') {
+        data.method = 'upi';
       }
 
       if (this.screen === 'upi') {
@@ -5199,6 +5226,11 @@ Session.prototype = {
         methods.count++;
         methods.qr = true;
       }
+
+      if (this.separateTez) {
+        methods.count++;
+        methods.tez = true;
+      }
     }
 
     /* set external wallets */
@@ -5425,6 +5457,11 @@ Session.prototype = {
           fee: preferences.fee_bearer,
         }
       );
+    }
+
+    if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
+      this.irctc = true;
+      this.separateTez = true;
     }
 
     /* set payment methods on the basis of preferences */
