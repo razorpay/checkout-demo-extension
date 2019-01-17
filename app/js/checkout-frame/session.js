@@ -2889,22 +2889,24 @@ Session.prototype = {
     }
 
     if (this.separateTez) {
-      var tez = false;
-      if (screen === 'tez') {
-        tez = true;
-        screen = 'upi';
+      if (screen === 'tez' || screen === 'upi') {
+        var tez = false;
+        if (screen === 'tez') {
+          tez = true;
+          screen = 'upi';
+        }
+
+        $('#upi-directpay .checkbox').css('display', 'none');
+        $('#upi-tez .checkbox').css('display', 'none');
+
+        gel('radio-tez').checked = tez;
+        $('#upi-tez').css('display', tez ? 'block' : 'none');
+        $('#upi-tez').toggleClass('expanded', tez);
+
+        gel('radio-directpay').checked = !tez;
+        $('#upi-directpay').toggleClass('expanded', !tez);
+        $('#upi-directpay').css('display', !tez ? 'block' : 'none');
       }
-
-      $('#upi-directpay .checkbox').css('display', 'none');
-      $('#upi-tez .checkbox').css('display', 'none');
-
-      gel('radio-tez').checked = tez;
-      $('#upi-tez').css('display', tez ? 'block' : 'none');
-      $('#upi-tez').toggleClass('expanded', tez);
-
-      gel('radio-directpay').checked = !tez;
-      $('#upi-directpay').toggleClass('expanded', !tez);
-      $('#upi-directpay').css('display', !tez ? 'block' : 'none');
     }
 
     setEmiPlansCta(screen, this.tab);
