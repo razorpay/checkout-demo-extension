@@ -916,6 +916,10 @@ Session.prototype = {
       setter('address', true);
     }
 
+    if (preferences.order && preferences.order.partial_payment) {
+      classes.push('partial');
+    }
+
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
@@ -2186,17 +2190,24 @@ Session.prototype = {
       $(thisEl).removeClass('show-methods');
     });
 
-    this.on('change', '#partial-select-partial', function(e) {
+    this.on('change', 'input[name=partial_payment]', function(e) {
       var parentEle = $('#amount-value').parent();
       var optionEle = $('.minimum-amount-select');
+      var value = e.target.value;
 
-      if (!e.target.checked) {
+      if (!e.target.checked || value === 'pay_full') {
         var amount = this.order.amount_due;
         $('#amount-value').val(this.getDecimalAmount(amount));
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
         this.get().amount = amount;
         $('#amount .amount-figure').html(this.formatAmount(amount));
+
+        var minAmountField = gel('minimum-amount-select');
+
+        if (minAmountField) {
+          minAmountField.checked = false;
+        }
 
         var infoEle = $('.partial-payment-block .subtitle--help');
         /* Reset text in info element */
@@ -4391,6 +4402,10 @@ Session.prototype = {
        * API takes 3DS, which is the default anyway.
        */
       delete data.auth_type;
+    }
+
+    if (data.partial_payment) {
+      delete data.partial_payment;
     }
 
     if (!this.recurring && this.order && this.order.bank) {

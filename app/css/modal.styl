@@ -111,7 +111,7 @@ html {
 .list {
   margin-bottom: 12px;
 
-  & .checkbox {
+  & .checkbox:not(.inner-checkbox) {
     border-radius: 50%;
 
     &::after {
@@ -139,7 +139,7 @@ html {
     margin: 0 12px 0 5px;
   }
 
-  :checked + label .checkbox::after {
+  :checked + label .checkbox:not(.inner-checkbox)::after {
     border-color: #fff
   }
 
@@ -191,6 +191,41 @@ html {
     input[type=radio]:checked + label {
       max-height: 360px;
     }
+  }
+}
+
+#partial-list {
+  .collapsable-content {
+    display: none;
+  }
+
+  #partial-radio {
+    label {
+      overflow: initial;
+    }
+  }
+
+  input[type=radio]:checked,
+  input[type=checkbox]:checked {
+    & + label {
+      max-height: 360px;
+
+      .collapsable-content {
+        display: block;
+      }
+    }
+  }
+
+  .minimum-amount-select {
+    label {
+      border: 0;
+      padding: 0;
+      background: none !important;
+    }
+  }
+
+  .subtitle {
+    margin-top: 0;
   }
 }
 
@@ -1661,7 +1696,7 @@ $outline = #ddd;
   margin-bottom: 21px;
 }
 
-#container.no-details, #container.extra.show-methods {
+#container.no-details:not(.partial), #container.extra.show-methods {
   #pad-common + div {
     display: block;
   }
@@ -1678,6 +1713,19 @@ $outline = #ddd;
   }
   .legend {
     text-align: left;
+  }
+}
+
+#container.no-details.partial {
+  #pad-common > .elem-wrap {
+    display: none;
+  }
+  #form-common {
+    padding-top: 4px;
+
+    .legend {
+      margin: 5px 0 0;
+    }
   }
 }
 
@@ -1728,6 +1776,7 @@ $outline = #ddd;
   }
 }
 
+
 #container.emandate {
   #payment-options, #emandate-options {
     label {
@@ -1742,7 +1791,7 @@ $outline = #ddd;
     }
   }
 }
-#partial-select-partial + .checkbox,
+
 #minimum-amount-select + .checkbox {
   float: left;
   top: 1px;
@@ -1754,7 +1803,7 @@ $outline = #ddd;
   display: none;
 }
 
-#partial-select-partial:checked + .checkbox + .elem-wrap + .minimum-amount-select {
+#partial-select-partial:checked + label .minimum-amount-select {
   display: block;
 }
 

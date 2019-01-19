@@ -145,28 +145,46 @@ var upi_apps = _.upi_intents_data;
                     <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
                   </div></div>
                   `?order.partial_payment`
-                  <br>
-                  <label class="partial-label" for="partial-select-partial">Make payment in parts</label>
-                  <input type="checkbox" class="checkbox--square" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
-                  <label class="checkbox" for="partial-select-partial"></label>
-                  <div class="elem-wrap" id="elem-wrap-amount" style="height: auto"><div class="elem elem-amount">
-                    <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
-                    <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
-                  </div></div>
+                  `?_.optional.contact && _.optional.email`
+                  <div class="legend">Select a payment type</div>
+                  `?`
 
-                  `?(order.partial_payment && !!order.first_payment_min_amount && Number(order.amount_paid) === 0)`
-                    <div class="minimum-amount-select">
-                      <label class="partial-label" for="minimum-amount-select">
-                        `=html(o('min_amount_label') || 'Minimum Due Amount')` (₹`=html(firstPaymentMinAmount)`)
+                  <div id='partial-list' class="list collapsable">
+                    `?_.optional.contact && _.optional.email`
+                    <div class="item">
+                      <input type="radio" name="partial_payment" value="pay_full" id="partial-full">
+                      <label for="partial-full">
+                        <span class="checkbox"></span>
+                        Pay in full
                       </label>
-                      <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
-                      <label class="checkbox" for="minimum-amount-select"></label>
                     </div>
-                  `?`
+                    `?`
+                    <div id="partial-radio" class="item">
+                      <input type="`?_.optional.contact && _.optional.email`radio`??`checkbox`?`" name="partial_payment" value="pay_parts" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
+                      <label for="partial-select-partial">
+                        <span class="checkbox"></span>
+                        Make payment in parts
+                        <div class="elem-wrap collapsable-content" id="elem-wrap-amount" style="height: 38px"><div class="elem elem-amount">
+                          <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
+                          <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
+                        </div></div>
 
-                  `?(order.partial_payment && (!order.first_payment_min_amount || Number(order.amount_paid) !== 0))`
-                    <label class="subtitle subtitle--help">Pay some amount now and remaining later.</label>
-                  `?`
+                        `?(order.partial_payment && !!order.first_payment_min_amount && Number(order.amount_paid) === 0)`
+                          <div class="minimum-amount-select">
+                            <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
+                            <div class="checkbox inner-checkbox" for="minimum-amount-select"></div>
+                            <label class="partial-label" for="minimum-amount-select">
+                              `=html(o('min_amount_label') || 'Minimum Due Amount')` (₹`=html(firstPaymentMinAmount)`)
+                            </label>
+                          </div>
+                        `?`
+
+                        `?(order.partial_payment && (!order.first_payment_min_amount || Number(order.amount_paid) !== 0))`
+                          <div class="subtitle subtitle--help">Pay some amount now and remaining later.</div>
+                        `?`
+                      </label>
+                    </div>
+                  </div>
 
                   `?`
                   `?address&&!order.partial_payment`
