@@ -51,6 +51,12 @@ var adminApi = makeAPIFactory(api.adminRequest);
 
 api.createOrder = publicApi('orders', { currency: 'INR', amount: 100 });
 
+api.createPartialInvoice = publicApi('invoices', {
+  partial_payment: 1,
+  line_items: [{ name: 'book', amount: 10 * 100 }],
+  customer: { contact: '8888888888' },
+});
+
 api.createOffer = function() {
   return adminApi('offers', {
     ends_at: 2147483646,
