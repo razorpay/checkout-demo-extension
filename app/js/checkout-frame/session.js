@@ -828,6 +828,7 @@ function Session(message) {
   });
 
   this.ua_Android = ua_Android;
+  this.isMobile = isMobile;
 
   if (this.embedded) {
     $(doc).addClass('embedded');
