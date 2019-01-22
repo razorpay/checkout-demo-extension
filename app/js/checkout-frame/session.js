@@ -1250,7 +1250,7 @@ Session.prototype = {
 
     $upiForm.addClass('show-tez');
 
-    Tez.check(function() {
+    this.r.isTezAvailable(function() {
       self.tezMode = 'mobile';
       /* This is success callback */
       $tezUPIForm.removeClass('tez-desktop');
