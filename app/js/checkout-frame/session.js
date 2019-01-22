@@ -34,7 +34,7 @@ function shouldEnableP13n(keyId) {
     return true;
   }
 
-  return /^rzp_live_[0-9]/.test(keyId);
+  return /^rzp_live_[0-9a-z]/.test(keyId);
 }
 
 // .shown has display: none from iOS ad-blocker
