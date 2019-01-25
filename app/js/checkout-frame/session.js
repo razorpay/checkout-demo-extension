@@ -3037,7 +3037,7 @@ Session.prototype = {
 
     // Pre-select offer if there is only one visible offer
     var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer) {
+    if (defaultOffer && screen) {
       this.preSelectedOffer = defaultOffer;
     }
 
