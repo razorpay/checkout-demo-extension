@@ -3330,7 +3330,7 @@ Session.prototype = {
 
       var contact = getPhone();
       if (
-        (!contact && !this.optional.contact) ||
+        (!contact && !getStore('optional').contact) ||
         this.get('method.' + tab) === false
       ) {
         return;
