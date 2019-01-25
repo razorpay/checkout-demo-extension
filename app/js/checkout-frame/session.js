@@ -3031,6 +3031,12 @@ Session.prototype = {
       (screen && { payment_method: paymentMethod }) || {}
     );
 
+    // Pre-select offer if there is only one visible offer
+    var defaultOffer = this.offers.defaultOffer;
+    if (defaultOffer) {
+      this.preSelectedOffer = defaultOffer;
+    }
+
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
