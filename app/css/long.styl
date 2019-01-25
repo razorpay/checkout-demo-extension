@@ -19,7 +19,7 @@
     #form-common
       padding-top: 4px;
 
-  &:not(.no-details, .extra)
+  &:not(.no-details):not(.extra)
     #body
       #payment-options
         label
@@ -29,3 +29,7 @@
           margin: -12px 0 -6px;
         .tez-icon
           margin: -9px auto 0 auto;
+
+#container.x-long
+  #body
+    height: 421px;

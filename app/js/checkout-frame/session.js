@@ -2095,9 +2095,16 @@ Session.prototype = {
       options.amount = 100 * amountValue;
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
+      this.setPaymentMethods(this.preferences);
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
+    if (this.methods.count >= 4) {
+      $(this.el).addClass('long');
+    }
+    if (this.methods.count >= 5) {
+      $(this.el).addClass('x-long');
+    }
   },
 
   /**
@@ -2214,6 +2221,10 @@ Session.prototype = {
         /* Reset text in info element */
         if (infoEle) {
           infoEle.html('Pay some amount now and remaining later.');
+        }
+        /* Hide keyboard */
+        if (document.activeElement) {
+          document.activeElement.blur();
         }
       } else {
         $('#amount-value').val(null);

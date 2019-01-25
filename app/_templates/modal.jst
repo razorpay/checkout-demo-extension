@@ -165,7 +165,7 @@ var upi_apps = _.upi_intents_data;
                         <span class="checkbox"></span>
                         Make payment in parts
                         <div class="elem-wrap collapsable-content" id="elem-wrap-amount" style="height: 38px"><div class="elem elem-amount">
-                          <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
+                          <input class="input" name="amount" type="tel" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
                           <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
                         </div></div>
 
