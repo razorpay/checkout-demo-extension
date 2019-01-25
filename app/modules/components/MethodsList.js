@@ -22,7 +22,13 @@ const AVAILABLE_METHODS = [
  * @return {Array}
  */
 const getAvailableMethods = methods => {
-  let AVAIL_METHODS = _Arr.filter(AVAILABLE_METHODS, method => methods[method]);
+  let AVAIL_METHODS = _Arr.filter(
+    AVAILABLE_METHODS,
+    method =>
+      _.isArray(methods[method])
+        ? Boolean(methods[method].length)
+        : methods[method]
+  );
 
   /**
    * Cardless EMI and EMI are the same payment option.
