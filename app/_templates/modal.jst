@@ -1,4 +1,7 @@
 `
+var getStore = arguments[1];
+var optional = getStore('optional');
+var contactEmailOptional = getStore('contactEmailOptional');
 var o = _.get;
 var ecod = o('ecod');
 var address = o('address');
@@ -35,8 +38,8 @@ var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
 var prefill_name = attr(o('prefill.name'));
 
-var contact_hidden = o('hidden.contact') && _.optional.contact;
-var email_hidden = o('hidden.email') && _.optional.email;
+var contact_hidden = o('hidden.contact') && optional.contact;
+var email_hidden = o('hidden.email') && optional.email;
 
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
@@ -119,7 +122,7 @@ var upi_apps = _.upi_intents_data;
           <div id="messages"></div>
           <div id="partial-back" class="theme-secondary-highlight"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar" class="theme-secondary-highlight">
-            <div id="top-right">
+            <div id="top-right" class="`?optional.contact`hidden`?`">
               <div id="user"></div>
               <div id='profile'><li>Log out</li><li>Log out from all devices</li></div>
             </div>
@@ -136,21 +139,21 @@ var upi_apps = _.upi_intents_data;
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
+                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
                   </div></div>
                   <div class="elem-wrap`?email_hidden` invisible`?`" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
-                    <label>Email`?_.optional.email` (Optional)`?`</label>
-                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
+                    <label>Email`?optional.email` (Optional)`?`</label>
+                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
                   </div></div>
                   `?order.partial_payment`
-                  `?_.optional.contact && _.optional.email`
+                  `?contactEmailOptional`
                   <div class="legend">Select a payment type</div>
                   `?`
 
                   <div id='partial-list' class="list collapsable">
-                    `?_.optional.contact && _.optional.email`
+                    `?contactEmailOptional`
                     <div class="item">
                       <input type="radio" name="partial_payment" value="pay_full" id="partial-full">
                       <label for="partial-full">
@@ -160,7 +163,7 @@ var upi_apps = _.upi_intents_data;
                     </div>
                     `?`
                     <div id="partial-radio" class="item">
-                      <input type="`?_.optional.contact && _.optional.email`radio`??`checkbox`?`" name="partial_payment" value="pay_parts" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
+                      <input type="`?contactEmailOptional`radio`??`checkbox`?`" name="partial_payment" value="pay_parts" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
                       <label for="partial-select-partial">
                         <span class="checkbox"></span>
                         Make payment in parts
@@ -251,7 +254,7 @@ var upi_apps = _.upi_intents_data;
                           <div>`=accountName`</div>
                         </div>
                       `?`
-                      `?_.optional.contact && _.optional.email && bank.ifsc`
+                      `?contactEmailOptional && bank.ifsc`
                         <div class="account-details clearfix">
                           <div>IFSC code</div>
                           <div class="text-uppercase">`=bank.ifsc`</div>

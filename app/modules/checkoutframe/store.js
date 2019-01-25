@@ -25,6 +25,10 @@ const DEFAULT_SCREEN_DATA = {
  */
 const defaultStoreData = {
   screenData: {},
+  preferences: {},
+
+  // which view should currently be shown
+  screen: '',
 };
 
 /**
@@ -35,5 +39,33 @@ _Obj.loop(SCREENS, screen => {
 });
 
 const store = new Store(defaultStoreData);
+
+store.compute(
+  'isPartialPayment',
+  ['preferences'],
+  preferences => preferences.order && preferences.order.partial_payment
+);
+
+store.compute('optional', ['preferences'], preferences => {
+  const optionalObj = {};
+  const optionalArray = preferences.optional;
+  if (optionalArray) {
+    optionalObj.contact = optionalArray |> _Arr.contains('contact');
+    optionalObj.email = optionalArray |> _Arr.contains('email');
+  }
+  return optionalObj;
+});
+
+store.compute('contactEmailOptional', ['optional'], optional => {
+  return optional.contact && optional.email;
+});
+
+store.compute(
+  'verticalMethods',
+  ['contactEmailOptional', 'isPartialPayment'],
+  (contactEmailOptional, isPartialPayment) => {
+    return contactEmailOptional || isPartialPayment;
+  }
+);
 
 export default store;

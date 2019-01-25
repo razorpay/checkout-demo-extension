@@ -29,6 +29,14 @@ var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
 
+function getStore(prop) {
+  return discreet.Store.get()[prop];
+}
+
+function gotoAmountScreen() {
+  discreet.Store.set({ screen: 'amount' });
+}
+
 function shouldEnableP13n(keyId) {
   if (keyId === 'rzp_live_Oeieme2CjQmyTQ') {
     return true;
@@ -909,7 +917,7 @@ Session.prototype = {
 
     var key = getter('key');
     if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      if (preferences.order && preferences.order.partial_payment) {
+      if (getStore('isPartialPayment')) {
         classes.push('extra');
       } else {
         classes.push('address extra');
@@ -917,8 +925,12 @@ Session.prototype = {
       setter('address', true);
     }
 
-    if (preferences.order && preferences.order.partial_payment) {
+    if (getStore('isPartialPayment')) {
       classes.push('partial');
+    }
+
+    if (getStore('contactEmailOptional')) {
+      classes.push('no-details');
     }
 
     if (this.irctc) {
@@ -967,7 +979,7 @@ Session.prototype = {
       classes.push('ip');
     }
 
-    if (this.extraFields) {
+    if (getStore('isPartialPayment')) {
       classes.push('extra');
     }
 
@@ -985,12 +997,8 @@ Session.prototype = {
   getEl: function() {
     var r = this.r;
     if (!this.el) {
-      if (
-        this.order &&
-        this.order.partial_payment &&
-        !r.get('prefill.amount')
-      ) {
-        this.extraFields = true;
+      if (getStore('isPartialPayment')) {
+        gotoAmountScreen();
       }
 
       var classes = this.getClasses();
@@ -1005,7 +1013,7 @@ Session.prototype = {
       }
       var div = document.createElement('div');
       var styleEl = this.renderCss();
-      div.innerHTML = templates.modal(this);
+      div.innerHTML = templates.modal(this, getStore);
       this.el = div.firstChild;
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
@@ -1038,7 +1046,7 @@ Session.prototype = {
     var tab = oldMethod || this.get('prefill.method');
 
     if (tab) {
-      var optional = this.optional;
+      var optional = getStore('optional');
       var prefill = {
         email: this.get('prefill.email'),
         contact: this.get('prefill.contact'),
@@ -1422,8 +1430,8 @@ Session.prototype = {
     if (
       this.hasOffers ||
       this.oneMethod ||
-      this.optional.contact ||
-      this.extraFields ||
+      getStore('optional').contact ||
+      getStore('isPartialPayment') ||
       this.tpvBank ||
       this.upiTpv ||
       this.multiTpv
@@ -1810,12 +1818,6 @@ Session.prototype = {
   },
 
   improvisePaymentOptions: function() {
-    if (this.optional.contact) {
-      if (this.optional.email) {
-        $(this.el).addClass('no-details');
-      }
-      $('#top-right').hide();
-    }
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
@@ -2099,6 +2101,7 @@ Session.prototype = {
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
+    discreet.Store.set({ screen: '' });
     if (this.methods.count >= 4) {
       $(this.el).addClass('long');
     }
@@ -2196,6 +2199,7 @@ Session.prototype = {
     var thisEl = this.el;
     this.click('#partial-back', function() {
       $(thisEl).removeClass('show-methods');
+      gotoAmountScreen();
     });
 
     this.on('change', 'input[name=partial_payment]', function(e) {
@@ -4065,21 +4069,19 @@ Session.prototype = {
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
 
-    var optional = this.optional;
+    var optional = getStore('optional');
 
-    if (optional) {
-      if (
-        optional.contact &&
-        !(prefillContact && contactPattern.test(prefillContact))
-      ) {
-        delete data.contact;
-      } else if (data.contact) {
-        data.contact = data.contact.replace(/\ /g, '');
-      }
+    if (
+      optional.contact &&
+      !(prefillContact && contactPattern.test(prefillContact))
+    ) {
+      delete data.contact;
+    } else if (data.contact) {
+      data.contact = data.contact.replace(/\ /g, '');
+    }
 
-      if (optional.email && !(prefillEmail && emailPattern.test(data.email))) {
-        delete data.email;
-      }
+    if (optional.email && !(prefillEmail && emailPattern.test(data.email))) {
+      delete data.email;
     }
 
     if (tab) {
@@ -4381,7 +4383,8 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
+    var storeScreen = getStore('screen');
+    if (storeScreen === 'amount') {
       return this.extraNext();
     }
     if (this.oneMethod && !this.tab) {
@@ -4616,7 +4619,7 @@ Session.prototype = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
       magic: this.magic,
-      optional: this.optional || {},
+      optional: getStore('optional'),
     };
 
     if (!this.screen && this.methodsList) {
@@ -5094,8 +5097,8 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var qrEnabled =
-      !(preferences.order && preferences.order.partial_payment) &&
-      !this.optional.contact &&
+      !getStore('isPartialPayment') &&
+      !getStore('optional').contact &&
       !preferences.fee_bearer &&
       (this.get('method.qr') || this.get('flashcheckout')) &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
@@ -5360,6 +5363,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    discreet.Store.set({ preferences: prefs });
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
@@ -5435,14 +5439,11 @@ Session.prototype = {
       session_options.remember_customer = false;
     }
 
-    /* set optional fields */
-    this.optional = arr2obj(preferences.optional);
-
     /* disable cardsaving if cookies disabled or optional contact with no
      * prefill */
     if (
       cookieDisabled ||
-      (this.optional.contact && !session_options['prefill.contact'])
+      (getStore('optional').contact && !session_options['prefill.contact'])
     ) {
       options.remember_customer = false;
     }
@@ -5453,20 +5454,14 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    /* Amount in case of partial payments */
-    var prefillAmount = session_options['prefill.amount'];
-    if (prefillAmount) {
-      session_options.amount = Number(Math.floor(prefillAmount));
-    } else {
-      if (order && order.amount) {
-        session_options.amount = order.partial_payment
-          ? order.amount_due
-          : order.amount;
-      } else if (invoice && invoice.amount) {
-        session_options.amount = invoice.amount;
-      } else if (subscription && subscription.amount) {
-        session_options.amount = subscription.amount;
-      }
+    if (order && order.amount) {
+      session_options.amount = order.partial_payment
+        ? order.amount_due
+        : order.amount;
+    } else if (invoice && invoice.amount) {
+      session_options.amount = invoice.amount;
+    } else if (subscription && subscription.amount) {
+      session_options.amount = subscription.amount;
     }
 
     /*
