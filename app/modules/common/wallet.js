@@ -12,7 +12,7 @@ const list = {
   freecharge: ['Freecharge', 18],
   airtelmoney: ['Airtel Money', 32],
   jiomoney: ['JioMoney', 68],
-  olamoney: ['Ola Money', 22],
+  olamoney: ['Ola Money (Postpaid + Wallet)', 22],
   mobikwik: ['Mobikwik', 20],
   payumoney: ['PayUMoney', 18],
   payzapp: ['PayZapp', 24],
