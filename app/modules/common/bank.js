@@ -103,7 +103,10 @@ export const getPreferredBanks = (preferences, bankOptions) => {
   let bankList =
     commonBanks
     |> _Arr.filter(currBank => {
-      return availBanks[currBank.code] && !availBanks[`${currBank.code}_C`];
+      return (
+        availBanks[currBank.code] &&
+        !availBanks[currBank.code |> _Str.slice(0, -2)]
+      );
     });
 
   if (_.isArray(order)) {
