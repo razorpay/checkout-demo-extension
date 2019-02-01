@@ -1284,16 +1284,23 @@ Session.prototype = {
     }
 
     if (this.upi_intents_data) {
-      /**
-       * We need to show "(Recommended)" string alongside the app name
-       * when there is only 1 preferred app, and 1 or more other apps.
-       */
-      var count = discreet.UPIUtils.getNumberOfAppsByCategory(
-        this.upi_intents_data
-      );
+      /* disable intent if fee_bearer */
 
-      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
-        this.showRecommendedUPIApp = true;
+      if (this.preferences.fee_bearer) {
+        delete this.upi_intents_data;
+        delete this.all_upi_intents_data;
+      } else {
+        /**
+         * We need to show "(Recommended)" string alongside the app name
+         * when there is only 1 preferred app, and 1 or more other apps.
+         */
+        var count = discreet.UPIUtils.getNumberOfAppsByCategory(
+          this.upi_intents_data
+        );
+
+        if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+          this.showRecommendedUPIApp = true;
+        }
       }
     }
 
