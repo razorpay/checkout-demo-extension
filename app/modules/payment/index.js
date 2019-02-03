@@ -227,7 +227,7 @@ Payment.prototype = {
       });
       window.CheckoutBridge.invokePopup(
         _Obj.stringify({
-          content: popupTemplate(this),
+          content: encodeURIComponent(popupTemplate(this)),
           focus: false,
         })
       );
