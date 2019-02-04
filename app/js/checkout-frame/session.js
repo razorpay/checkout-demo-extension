@@ -5392,7 +5392,7 @@ Session.prototype = {
     this.setOffers(preferences);
 
     /* Set magic from preferences */
-    this.magic = this.magic && preferences.magic;
+    this.magic = false; //this.magic && preferences.magic;
 
     /* set empty customer in case of local card saving */
     if (preferences.global === false) {
