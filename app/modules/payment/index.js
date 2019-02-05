@@ -14,6 +14,7 @@ import Popup from 'payment/popup';
 import Redir from 'payment/redir';
 import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
+import { formatAmount } from 'common/currency';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
   RazorpayConfig,
@@ -603,6 +604,55 @@ razorpayProto.topupWallet = function() {
         processCoproto.call(payment, response);
       }
     },
+  });
+};
+
+razorpayProto.createFees = function(data, onSuccess, onError) {
+  fetch.post({
+    url: makeUrl('payments/create/fees'),
+    data: data,
+    headers: {
+      Authorization: 'Basic ' + btoa(this.get('key') + ':'),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    callback: function(response) {
+      if (response.error) {
+        onError(response);
+      } else {
+        const displayFees = response.display;
+        const array = [];
+        const fees = Object.keys(displayFees);
+
+        for (let i = 0; i < fees.length; i++) {
+          const fee = fees[i];
+          let title = '';
+          switch (fee) {
+            case 'originalAmount':
+              title = 'Amount';
+              break;
+            case 'razorpay_fee':
+              title = 'Gateway Charges';
+              break;
+            case 'tax':
+              title = 'GST on Gateway Charges';
+              break;
+          }
+          if (title) {
+            array.push([
+              title,
+              formatAmount(displayFees[fee] * 100, 'INR')
+            ]);
+          }
+        }
+
+        array.push([
+          'Total Charges',
+          formatAmount(displayFees.amount * 100, 'INR')
+        ]);
+
+        onSuccess(response, array);
+      }
+    }
   });
 };
 

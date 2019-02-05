@@ -5111,8 +5111,6 @@ Session.prototype = {
     var qrEnabled =
       !getStore('isPartialPayment') &&
       !getStore('optional').contact &&
-      !preferences.fee_bearer &&
-      this.get('method.qr') &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {
