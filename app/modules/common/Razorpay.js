@@ -72,14 +72,6 @@ export default function Razorpay(overrides) {
     _.throwMessage(message);
   }
 
-  /* Set flashcheckout for demo key */
-  if (
-    options.get('key') === 'rzp_live_ILgsfZCZoFIKMb' &&
-    overrides.flashcheckout !== false
-  ) {
-    options.set('flashcheckout', true);
-  }
-
   if (
     backendEntityIds.every(function(prop) {
       return !options.get(prop);

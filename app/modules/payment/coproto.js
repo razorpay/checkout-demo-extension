@@ -8,13 +8,14 @@ import Analytics from 'analytics';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
+  Track(this.r, 'otp_response', response);
   if (error) {
     if (error.action === 'RETRY') {
       return this.emit('otp.required', strings.wrongOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }
-    this.complete(response);
+    return this.complete(response);
   }
   processCoproto.call(this, response);
 };

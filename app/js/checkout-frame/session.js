@@ -38,7 +38,10 @@ function gotoAmountScreen() {
 }
 
 function shouldEnableP13n(keyId) {
-  if (keyId === 'rzp_live_Oeieme2CjQmyTQ') {
+  if (
+    keyId === 'rzp_live_Oeieme2CjQmyTQ' ||
+    keyId === 'rzp_live_ILgsfZCZoFIKMb'
+  ) {
     return true;
   }
 
@@ -824,9 +827,6 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
-  this.nativeotp = !!(
-    this.nativeOtpPossible() || this.get('key') === 'rzp_live_ILgsfZCZoFIKMb'
-  );
   this.tab_titles = tab_titles;
 
   each(message, function(key, val) {
@@ -852,9 +852,15 @@ function Session(message) {
 
 Session.prototype = {
   nativeOtpPossible: function() {
-    var optionPresent = this.get('nativeotp') || this.get('flashcheckout');
-    var redirectionPossible = this.get('redirect') || this.get('callback_url');
-    return optionPresent && redirectionPossible;
+    var optionPresent = this.get('nativeotp');
+    var randomness = Math.random() < 0.3;
+
+    var key = this.get('key');
+    if (key === 'rzp_live_ILgsfZCZoFIKMb') {
+      return true;
+    }
+
+    return optionPresent && key && /[a-z]/.test(key.slice(-1)) && randomness;
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -1424,7 +1430,7 @@ Session.prototype = {
 
   setP13n: function() {
     if (
-      (shouldEnableP13n(this.get('key')) || this.get('flashcheckout')) &&
+      shouldEnableP13n(this.get('key')) &&
       this.get().personalization !== false
     ) {
       this.set('personalization', true);
@@ -4748,6 +4754,7 @@ Session.prototype = {
     }
 
     if (data.method === 'card') {
+      this.nativeotp = !!this.nativeOtpPossible();
       if (this.nativeotp) {
         var cardType;
         if (data.token) {
@@ -4770,9 +4777,7 @@ Session.prototype = {
           this.r.on('payment.otp.required', function(data) {
             askOTP(that.otpView, data);
           });
-          if (this.get('callback_url')) {
-            data.callback_url = this.get('callback_url');
-          }
+
           request.iframe = true;
           Analytics.track('iframe:attempt');
         }
@@ -5107,7 +5112,7 @@ Session.prototype = {
       !getStore('isPartialPayment') &&
       !getStore('optional').contact &&
       !preferences.fee_bearer &&
-      (this.get('method.qr') || this.get('flashcheckout')) &&
+      this.get('method.qr') &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {

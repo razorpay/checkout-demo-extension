@@ -340,6 +340,9 @@ Payment.prototype = {
         }
         data = _.rzpError('Payment failed');
       }
+      if (data.xhr) {
+        Analytics.track('ajax_error', data);
+      }
       this.emit('error', data);
     }
 
@@ -451,11 +454,7 @@ Payment.prototype = {
   makePopup: function() {
     let Medium = Popup;
     if (this.iframe) {
-      if (this.r.get('key') === 'rzp_live_ILgsfZCZoFIKMb') {
-        Medium = Iframe;
-      } else {
-        Medium = Redir;
-      }
+      Medium = Iframe;
     }
     var popup = new Medium('', 'popup_' + Track.id, this);
     if ((popup && !popup.window) || popup.window.closed !== false) {
