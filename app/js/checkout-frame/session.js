@@ -5110,7 +5110,6 @@ Session.prototype = {
     var emi_options = this.emi_options;
     var qrEnabled =
       !getStore('isPartialPayment') &&
-      !getStore('optional').contact &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {

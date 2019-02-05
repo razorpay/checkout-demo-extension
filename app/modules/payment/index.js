@@ -173,19 +173,19 @@ export default function Payment(data, params = {}, r) {
   // If fees is there, we need to show fee view in poupup
   // If contact or email are missing, we need to ask for it in popup
   this.powerwallet =
-    data &&
-    !params.fees &&
-    data.contact &&
-    (this.optional.email || data.email) &&
-    // tez invokes intent, popup not needed
-    (params.tez ||
-      params.upiqr ||
-      // only apply powerwallet for checkout-js. popup for razorpayjs
-      (isRazorpayFrame &&
-        // display popup for conventional wallets
-        ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
-          // no popup for upi
-          data.method === 'upi')));
+    params.upiqr ||
+    (data &&
+      !params.fees &&
+      data.contact &&
+      (this.optional.email || data.email) &&
+      // tez invokes intent, popup not needed
+      (params.tez ||
+        // only apply powerwallet for checkout-js. popup for razorpayjs
+        (isRazorpayFrame &&
+          // display popup for conventional wallets
+          ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
+            // no popup for upi
+            data.method === 'upi'))));
 
   this.message = params.message;
 
@@ -638,21 +638,18 @@ razorpayProto.createFees = function(data, onSuccess, onError) {
               break;
           }
           if (title) {
-            array.push([
-              title,
-              formatAmount(displayFees[fee] * 100, 'INR')
-            ]);
+            array.push([title, formatAmount(displayFees[fee] * 100, 'INR')]);
           }
         }
 
         array.push([
           'Total Charges',
-          formatAmount(displayFees.amount * 100, 'INR')
+          formatAmount(displayFees.amount * 100, 'INR'),
         ]);
 
         onSuccess(response, array);
       }
-    }
+    },
   });
 };
 
