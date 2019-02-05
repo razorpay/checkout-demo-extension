@@ -853,14 +853,14 @@ function Session(message) {
 Session.prototype = {
   nativeOtpPossible: function() {
     var optionPresent = this.get('nativeotp');
-    var randomness = Math.random() < 0.3;
+    var randomness = Math.random() < 0.5;
 
     var key = this.get('key');
     if (key === 'rzp_live_ILgsfZCZoFIKMb') {
       return true;
     }
 
-    return optionPresent && key && /[a-z]/.test(key.slice(-1)) && randomness;
+    return optionPresent && key && /[a-z0-9]/.test(key.slice(-1)) && randomness;
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -4769,7 +4769,7 @@ Session.prototype = {
           cardType = this.delegator.card.type;
         }
 
-        if (!this.magic && (cardType === 'mastercard' || cardType === 'visa')) {
+        if (cardType === 'mastercard') {
           this.headless = true;
           Analytics.track('headless:attempt');
           this.setScreen('otp');
