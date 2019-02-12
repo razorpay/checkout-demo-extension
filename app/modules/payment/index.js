@@ -21,7 +21,7 @@ import Razorpay, {
   makeAuthUrl,
   makeUrl,
 } from 'common/Razorpay';
-import { internetExplorer, iOS } from 'common/useragent';
+import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
@@ -169,24 +169,49 @@ export default function Payment(data, params = {}, r) {
   this.fees = params.fees;
   this.tez = params.tez;
 
-  // data needs to be present. abscence of data = placeholder popup in payment paused state
-  // If fees is there, we need to show fee view in poupup
-  // If contact or email are missing, we need to ask for it in popup
-  this.powerwallet =
-    params.upiqr ||
-    (data &&
-      !params.fees &&
-      data.contact &&
-      (this.optional.email || data.email) &&
-      // tez invokes intent, popup not needed
-      (params.tez ||
-        // only apply powerwallet for checkout-js. popup for razorpayjs
-        (isRazorpayFrame &&
-          // display popup for conventional wallets
-          ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
-            // no popup for upi
-            data.method === 'upi'))));
+  var avoidPopup = false;
 
+  /**
+   * Avoid Popup if:
+   * - Payment is made by Payment Request API (`params.tez` here)
+   * - UPI QR or UPI is chosen inside checkout form
+   * - PowerWallet is chosen & contact details are provided inside checkout form
+   *
+   * Enforce Popup if:
+   * - Merchant is on customer fee bearer model
+   */
+  if (params.tez) {
+    avoidPopup = true;
+  } else if (isRazorpayFrame) {
+    /**
+     * data needs to be present. absence of data = placeholder popup in
+     * payment paused state
+     */
+    if (data) {
+      if (data.method === 'wallet' && isPowerWallet(data.wallet)) {
+        /* If contact or email are missing, we need to ask for it in popup */
+        if (data.contact && (this.optional.email || data.email)) {
+          avoidPopup = true;
+        }
+      }
+
+      if (data.method === 'upi') {
+        avoidPopup = true;
+      }
+
+      /* If fees is there, we need to show fee view in poupup */
+      if (params.fees) {
+        avoidPopup = false;
+      }
+
+      /* avoid popup for UPI QR anyway, fee bearer screen handled for this */
+      if (params.upiqr) {
+        avoidPopup = true;
+      }
+    }
+  }
+
+  this.avoidPopup = avoidPopup;
   this.message = params.message;
 
   this.tryPopup();
@@ -248,7 +273,7 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (!this.powerwallet || (data.method === 'upi' && !isRazorpayFrame)) {
+      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame)) {
         _Doc.redirect({
           url: makeRedirectUrl(this.fees),
           content: data,
@@ -296,7 +321,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if ((isRazorpayFrame && !this.powerwallet) || this.isMagicPayment) {
+    if ((isRazorpayFrame && !this.avoidPopup) || this.isMagicPayment) {
       setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
@@ -396,12 +421,12 @@ Payment.prototype = {
       return;
     }
 
-    if (!this.powerwallet && !isRazorpayFrame && data.method === 'upi') {
+    if (!this.avoidPopup && !isRazorpayFrame && data.method === 'upi') {
       return;
     }
 
     // iphone background ajax route
-    if (!this.iframe && !this.powerwallet && iOS) {
+    if (!this.iframe && !this.avoidPopup && ajaxRouteNotSupported) {
       return;
     }
 
@@ -479,7 +504,7 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return this.iframe || !(this.r.get('redirect') || this.powerwallet);
+    return this.iframe || !(this.r.get('redirect') || this.avoidPopup);
   },
 
   tryPopup: function() {
