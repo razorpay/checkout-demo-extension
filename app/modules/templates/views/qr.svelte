@@ -140,12 +140,12 @@ img {
         RazorpayConfig,
         loading: true,
         qrImage: null,
-        error: null
-      }
+        error: null,
+      };
     },
 
     methods: {
-      handleResponse({data}) {
+      handleResponse({ data }) {
         const qrImage = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(
           data.qr_code_url || data.intent_url
         )}&choe=UTF-8&chld=L|0`;
@@ -169,7 +169,7 @@ img {
 
         this.set({
           feeBreakup,
-          loading: false
+          loading: false,
         });
       },
 
@@ -177,20 +177,27 @@ img {
         this.set({
           feeBreakup: false,
           loading: true,
-          loadingMessage: 'Generating QR Code...'
+          loadingMessage: 'Generating QR Code...',
         });
 
         const { session, paymentData, onSuccess } = this.get();
 
         if (session.methodsList) {
           processInstrument(paymentData);
-         }
+        }
 
-        session.r.createPayment(paymentData, { upiqr: true, optional: session.optional })
-          .on('payment.upi.coproto_response', _Func.bind(this.handleResponse, this))
+        session.r
+          .createPayment(paymentData, {
+            upiqr: true,
+            optional: session.optional,
+          })
+          .on(
+            'payment.upi.coproto_response',
+            _Func.bind(this.handleResponse, this)
+          )
           .on('payment.success', onSuccess)
           .on('payment.error', _Func.bind(this.onError, this));
       },
-    }
-  }
+    },
+  };
 </script>

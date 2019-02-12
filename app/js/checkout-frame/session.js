@@ -2069,7 +2069,7 @@ Session.prototype = {
     });
     $('#save').attr('checked', 0);
     this.wants_skip = true;
-    if (payload && payload.method === 'card') {
+    if (payload) {
       delete payload.save;
       delete payload.app_token;
       this.submit();
@@ -4382,6 +4382,8 @@ Session.prototype = {
 
     this.isResumedPayment = false;
     this.doneByP13n = false;
+    this.payload = null;
+
     Analytics.removeMeta('doneByP13n');
 
     var params = {};
