@@ -2060,6 +2060,7 @@ Session.prototype = {
       }
       return this.r._payment.gotoBank();
     }
+    var payload = this.payload;
     Analytics.track('saved_cards:skip', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2068,8 +2069,7 @@ Session.prototype = {
     });
     $('#save').attr('checked', 0);
     this.wants_skip = true;
-    var payload = this.payload;
-    if (payload) {
+    if (payload && payload.method === 'card') {
       delete payload.save;
       delete payload.app_token;
       this.submit();
