@@ -105,7 +105,7 @@ img {
       paymentData['_[flow]'] = 'intent';
       paymentData['_[upiqr]'] = '1';
 
-      if (session.methodsList) {
+      if (session.p13n) {
         processInstrument(paymentData);
       }
 

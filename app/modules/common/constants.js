@@ -91,3 +91,14 @@ export const STRINGS = {
   process: 'Your payment is being processed',
   redirect: 'Redirecting to Bank page',
 };
+
+/* Being used for filtering actual methods from methods object */
+export const AVAILABLE_METHODS = [
+  'card',
+  'netbanking',
+  'wallet',
+  'upi',
+  'emi',
+  'cardless_emi',
+  'qr',
+];
