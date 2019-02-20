@@ -24,7 +24,7 @@
           <span class="help">Please enter name on your card</span>
           <label>Card Holder's Name</label>
           <i>&#xe602;</i>
-          <input class="input" type="text" name="card[name]" required value={prefill.name} pattern={"^[a-zA-Z. 0-9\']{1,100}$"} readonly={readonly.name}>
+          <input class="input" type="text" name="card[name]" required value={prefill.name} pattern={"^[a-zA-Z. 0-9'-]{1,100}$"} readonly={readonly.name}>
         </div>
       </div>
     </div>
