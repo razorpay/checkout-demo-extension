@@ -1563,6 +1563,15 @@ Session.prototype = {
         providers.push(
           discreet.CardlessEmi.createProvider('cards', 'EMI on Cards')
         );
+
+        if (this.emi_options.banks['BAJAJ']) {
+          providers.push(
+            discreet.CardlessEmi.createProvider(
+              'bajaj',
+              this.emi_options.banks['BAJAJ'].name
+            )
+          );
+        }
       }
 
       each(this.methods.cardless_emi, function(provider) {

@@ -6,6 +6,7 @@ const prefix = cdnUrl + 'cardless_emi/';
 const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
 const list = {
+  bajaj: ['Bajaj Finserv'],
   earlysalary: ['EarlySalary'],
   zestmoney: ['ZestMoney'],
 };
