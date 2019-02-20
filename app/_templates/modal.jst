@@ -442,7 +442,7 @@ var upi_apps = _.upi_intents_data;
                         <span class="help">Please enter name on your card</span>
                         <label>Card Holder's Name</label>
                         <i>&#xe602;</i>
-                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$" `?name_readonly`readonly`?`>
+                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9'-]{1,100}$" `?name_readonly`readonly`?`>
                       </div></div>
                       <div class="elem-wrap third"><div class="elem elem-cvv mature">
                         <label>CVV</label>
