@@ -198,11 +198,20 @@ function setEmiPlansCta(screen, tab) {
     } else {
       type = 'pay';
     }
+  } else if (screen === 'emi' && tab === 'emiplans') {
+    type = 'emi';
   }
 
-  $('.select-plan-btn').addClass('invisible');
-  $('.view-plans-btn').addClass('invisible');
-  $('.pay-btn').addClass('invisible');
+  var classes = [
+    '.select-plan-btn',
+    '.view-plans-btn',
+    '.pay-btn',
+    '.enter-card-details',
+  ];
+
+  each(classes, function(index, className) {
+    $(className).addClass('invisible');
+  });
 
   switch (type) {
     case 'pay':
@@ -215,6 +224,10 @@ function setEmiPlansCta(screen, tab) {
 
     case 'select':
       $('.select-plan-btn').removeClass('invisible');
+      break;
+
+    case 'emi':
+      $('.enter-card-details').removeClass('invisible');
       break;
   }
 }
@@ -1319,6 +1332,7 @@ Session.prototype = {
     this.setCardlessEmi();
     this.setSavedCardsView();
     this.setOtpScreen();
+    this.setEmiScreen();
     this.checkTez();
     this.fillData();
     this.setEMI();
@@ -1595,6 +1609,12 @@ Session.prototype = {
               return;
             }
 
+            if (providerCode === 'bajaj') {
+              self.emiPlansForNewCard = self.emi_options.banks['BAJAJ'];
+              self.showEmiPlans('bajaj')();
+              return;
+            }
+
             $('#form-cardless_emi input[name=emi_duration]').val('');
             $('#form-cardless_emi input[name=provider]').val('');
             $('#form-cardless_emi input[name=ott]').val('');
@@ -1608,6 +1628,18 @@ Session.prototype = {
         },
       });
     }
+  },
+
+  setEmiScreen: function() {
+    var session = this;
+
+    this.emiScreenView = new discreet.emiScreenView({
+      data: {
+        session: session,
+      },
+    });
+
+    this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
   },
 
   makeCardlessEmiDetailText: function(duration, monthly) {
@@ -3274,6 +3306,8 @@ Session.prototype = {
       if (this.emiPlansView.back()) {
         return;
       }
+    } else if (/^emi$/.test(this.screen)) {
+      tab = 'cardless_emi';
     } else if (
       /**
        * If back is pressed from the Card EMI screen,
@@ -3370,7 +3404,7 @@ Session.prototype = {
       send_ecod_link.call(this);
     }
 
-    if (tab === 'card' || tab === 'emi') {
+    if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
       this.showCardTab(tab);
 
       setEmiPlansCta(this.screen, tab);
@@ -3770,6 +3804,69 @@ Session.prototype = {
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
+    } else if (type === 'bajaj') {
+      return function() {
+        var bank = 'BAJAJ';
+        var plans = emi_options.banks[bank].plans;
+        var emiPlans = [];
+
+        each(plans, function(index, p) {
+          var amount_per_month = (
+            (amount * (1 + p.interest / 100)) /
+            p.duration
+          ).toFixed(0);
+
+          emiPlans.push({
+            text:
+              p.duration +
+              ' Months @ ₹' +
+              self.formatAmount(amount_per_month) +
+              '/mo',
+            value: p.duration,
+            detail: self.makeCardlessEmiDetailText(
+              p.duration,
+              amount_per_month
+            ),
+          });
+        });
+
+        var prevTab = self.tab;
+        var prevScreen = self.screen;
+
+        self.emiPlansView.setPlans({
+          plans: emiPlans,
+          on: {
+            back: function() {
+              self.switchTab(prevTab);
+              self.setScreen(prevScreen);
+
+              return true;
+            },
+
+            select: function(value) {
+              var plan = plans[value];
+              var text = getEmiText(amount, plan).short || '';
+
+              self.emiScreenView.setPlan({
+                duration: plan.duration,
+                text: text,
+              });
+
+              self.setScreen('emi');
+              self.switchTab('emi');
+            },
+
+            actions: {
+              viewAll: false,
+              payWithoutEmi: false,
+            },
+          },
+        });
+
+        self.switchTab('emiplans');
+        $('#body').removeClass('sub');
+        setEmiPlansCta('emi', 'emiplans');
+      };
     }
   },
 
@@ -4061,7 +4158,15 @@ Session.prototype = {
   getActiveForm: function() {
     var form = this.tab || 'common';
     if (form === 'card' || form === 'emi') {
-      var whichCardTab = this.savedCardScreen ? 'saved-cards' : 'add-card';
+      var whichCardTab = 'add-card';
+      if (this.savedCardScreen) {
+        whichCardTab = 'saved-cards';
+      }
+
+      if (form === 'emi' && this.screen === 'emi') {
+        whichCardTab = 'add-emi';
+      }
+
       return '#' + whichCardTab + '-container';
     }
     if (form === 'emandate') {
@@ -4987,6 +5092,10 @@ Session.prototype = {
 
       if (this.otpView) {
         this.otpView.destroy();
+      }
+
+      if (this.emiScreenView) {
+        this.emiScreenView.destroy();
       }
 
       try {
