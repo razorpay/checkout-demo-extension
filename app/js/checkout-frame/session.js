@@ -1610,7 +1610,6 @@ Session.prototype = {
             }
 
             if (providerCode === 'bajaj') {
-              self.emiPlansForNewCard = self.emi_options.banks['BAJAJ'];
               self.showEmiPlans('bajaj')();
               return;
             }
@@ -5693,6 +5692,10 @@ Session.prototype = {
       }
 
       var preferences = response;
+
+      preferences.methods.emi_plans.BAJAJ = preferences.methods.emi_plans.ICIC; // TODO
+      preferences.methods.emi_options.BAJAJ =
+        preferences.methods.emi_options.ICIC; // TODO
 
       self.setPreferences(preferences);
 
