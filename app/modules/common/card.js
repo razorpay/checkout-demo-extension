@@ -5,6 +5,7 @@ const networks = {
   mastercard: 'MasterCard',
   rupay: 'RuPay',
   visa: 'Visa',
+  bajaj: 'Bajaj Finserv',
   unknown: 'unknown',
 };
 
@@ -71,6 +72,10 @@ const cardPatterns = [
   {
     name: 'jcb',
     regex: /^35/,
+  },
+  {
+    name: 'bajaj',
+    regex: /^203040/,
   },
 ];
 
