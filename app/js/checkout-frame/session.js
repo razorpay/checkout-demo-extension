@@ -1560,25 +1560,17 @@ Session.prototype = {
       var providers = [];
 
       if (this.methods.emi) {
-        providers.push({
-          data: {
-            code: 'cards',
-          },
-          icon: 'https://cdn.razorpay.com/cardless_emi-sq/cards.svg',
-          title: 'EMI on Cards',
-        });
+        providers.push(
+          discreet.CardlessEmi.createProvider('cards', 'EMI on Cards')
+        );
       }
 
       each(this.methods.cardless_emi, function(provider) {
         var providerObj = discreet.CardlessEmi.getProvider(provider);
 
-        providers.push({
-          data: {
-            code: provider,
-          },
-          icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + provider + '.svg',
-          title: providerObj.name,
-        });
+        providers.push(
+          discreet.CardlessEmi.createProvider(provider, providerObj.name)
+        );
       });
 
       this.emiOptionsView.setOptions({
