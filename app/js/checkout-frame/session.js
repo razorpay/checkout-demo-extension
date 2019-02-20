@@ -5693,10 +5693,6 @@ Session.prototype = {
 
       var preferences = response;
 
-      preferences.methods.emi_plans.BAJAJ = preferences.methods.emi_plans.ICIC; // TODO
-      preferences.methods.emi_options.BAJAJ =
-        preferences.methods.emi_options.ICIC; // TODO
-
       self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
