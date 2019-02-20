@@ -17,6 +17,7 @@ import emiView from 'checkoutframe/emi';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
 import emiOptionsView from 'checkoutframe/emioptions';
+import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
@@ -88,6 +89,7 @@ export default {
   emiView,
   emandateView,
   emiOptionsView,
+  emiScreenView,
   emiPlansView,
   SavedCardsView,
 

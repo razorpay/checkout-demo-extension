@@ -425,7 +425,7 @@ var upi_apps = _.upi_intents_data;
                   <div class="pad">
                   <div id="add-card-container">
                   <div class="card-fields">
-                      <div class="elem-wrap two-third"><div class="elem" id="elem-card">
+                      <div class="elem-wrap two-third"><div class="elem elem-card" id="elem-card">
                         <div class="cardtype"></div>
                         <label>Card Number</label>
                         <i>&#xe605;</i>
@@ -530,6 +530,9 @@ var upi_apps = _.upi_intents_data;
                     </div>
                   `?`
                 </div>
+              `?`
+              `?method.emi && _.emi_options.banks['BAJAJ']`
+                <div class="tab-content showable screen" id="form-emi"></div>
               `?`
               `?banks`
                 <div class="tab-content showable screen" id="form-netbanking">
