@@ -1332,7 +1332,6 @@ Session.prototype = {
     this.setCardlessEmi();
     this.setSavedCardsView();
     this.setOtpScreen();
-    this.setEmiScreen();
     this.checkTez();
     this.fillData();
     this.setEMI();
@@ -1341,6 +1340,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setP13n();
+    this.setEmiScreen();
     initIosQuirks();
 
     errorHandler.call(this, this.params);
@@ -1631,6 +1631,17 @@ Session.prototype = {
 
   setEmiScreen: function() {
     var session = this;
+
+    if (
+      !(
+        session.methods.emi &&
+        session.emi_options &&
+        session.emi_options.banks &&
+        session.emi_options.banks['BAJAJ']
+      )
+    ) {
+      return;
+    }
 
     this.emiScreenView = new discreet.emiScreenView({
       data: {
