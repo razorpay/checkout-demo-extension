@@ -97,7 +97,7 @@ RazorProto.onNew = function(event, callback) {
           this.prefs = response;
           this.methods = response.methods;
         }
-        callback(this.prefs);
+        callback(this.prefs, response);
       });
     }
   }
