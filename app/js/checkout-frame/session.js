@@ -123,19 +123,30 @@ var CardlessEmiStore = {
 };
 
 function initIosQuirks() {
-  if (discreet.UserAgent.iPhone && discreet.UserAgent.Safari) {
-    window.addEventListener('resize', function() {
-      if (window.innerHeight > 550) {
-        return;
-      }
-
-      // Shift footer
-      if (window.screen.height - window.innerHeight >= 64) {
+  if (discreet.UserAgent.iPhone) {
+    /**
+     * Shift the pay button if the height is low.
+     */
+    setTimeout(function() {
+      if (window.innerHeight <= 512) {
         $('#footer').addClass('shift-ios');
-      } else {
-        $('#footer').removeClass('shift-ios');
       }
-    });
+    }, 1000);
+
+    if (discreet.UserAgent.Safari) {
+      window.addEventListener('resize', function() {
+        if (window.innerHeight > 550) {
+          return;
+        }
+
+        // Shift pay button
+        if (window.screen.height - window.innerHeight >= 56) {
+          $('#footer').addClass('shift-ios');
+        } else {
+          $('#footer').removeClass('shift-ios');
+        }
+      });
+    }
   }
 }
 
