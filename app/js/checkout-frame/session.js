@@ -5476,10 +5476,16 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    if (order && order.amount) {
-      session_options.amount = order.partial_payment
-        ? order.amount_due
-        : order.amount;
+    if (order) {
+      if (order.amount) {
+        session_options.amount = order.partial_payment
+          ? order.amount_due
+          : order.amount;
+      }
+
+      if (order.currency) {
+        session_options.currency = order.currency;
+      }
     } else if (invoice && invoice.amount) {
       session_options.amount = invoice.amount;
     } else if (subscription && subscription.amount) {
