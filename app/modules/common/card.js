@@ -87,6 +87,7 @@ const cardLengths = {
 };
 
 export const getCardType = cardNumber => {
+  cardNumber = cardNumber.replace(/\D/g, '');
   let cardType = '';
   _Arr.loop(cardPatterns, card => {
     if (card.regex.test(cardNumber)) {

@@ -31,6 +31,7 @@ import { commonBanks, getFullBankLogo } from 'common/bank';
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
 import * as Bank from 'common/bank';
+import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
 import * as Token from 'common/token';
@@ -69,6 +70,7 @@ export default {
 
   Constants,
   Bank,
+  Card,
   Wallet,
   CardlessEmi,
   Token,
