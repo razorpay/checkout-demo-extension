@@ -166,6 +166,58 @@ function fillData(container, returnObj) {
 }
 
 /**
+ * Returns a bank code with suffixes(_C, _R) removed.
+ * @param {String} bankCode
+ */
+function normalizeBankCode(bankCode) {
+  return bankCode.replace(/_[CR]$/, '');
+}
+
+/**
+ * Returns the code for retail option corresponding to `bankCode`. Looks for
+ * {bankCode} and {bankCode}_R in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+function getRetailOption(bankCode, banks) {
+  var normalizedBankCode = normalizeBankCode(bankCode);
+  var retailBankCode = normalizedBankCode + '_R';
+  if (banks[normalizedBankCode]) {
+    return normalizedBankCode;
+  }
+  return banks[retailBankCode] && retailBankCode;
+}
+
+/**
+ * Returns the code for corporate option corresponding to `bankCode`. Looks for
+ * {bankCode}_C in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+function getCorporateOption(bankCode, banks) {
+  var normalizedBankCode = normalizeBankCode(bankCode);
+  var corporateBankCode = normalizedBankCode + '_C';
+  return banks[corporateBankCode] && corporateBankCode;
+}
+
+/**
+ * Fills the corporate/retail radio button labels with bank names
+ * @param {String} corporateBankName the label for corporate radio
+ * @param {String} retailBankName the label for retail radio
+ */
+function fillBankRadios(corporateBankName, retailBankName) {
+  $('.nb-selection-container label[for=nb_type_retail] .label-content').html(
+    retailBankName
+  );
+
+  $('.nb-selection-container label[for=nb_type_corporate] .label-content').html(
+    corporateBankName
+  );
+}
+
+/**
  * Set the "View EMI Plans" CTA as the Pay Button
  * if all the criteria are met.
  *
@@ -2621,6 +2673,28 @@ Session.prototype = {
         }
       });
     }
+
+    var enabledBanks = this.getEnabledBanks();
+    this.on('click', '.nb-type', function(event) {
+      var selectedBank = $('#bank-select').val();
+      var bankToSet;
+
+      // Uncheck other radios
+      this.clearNetbankingRadio();
+
+      // Check clicked radio
+      event.target.checked = true;
+
+      if (event.target.value === 'corporate') {
+        bankToSet = getCorporateOption(selectedBank, enabledBanks);
+      } else {
+        bankToSet = getRetailOption(selectedBank, enabledBanks);
+      }
+
+      if (bankToSet) {
+        this.setSelectedBank(bankToSet);
+      }
+    });
   },
 
   /**
@@ -3950,18 +4024,48 @@ Session.prototype = {
   },
 
   switchBank: function(e) {
-    var val = e.target.value;
+    var bankCode = e.target.value;
 
     Analytics.track('bank:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        bank: val,
+        bank: bankCode,
       },
     });
 
-    this.checkDown(val);
-    this.checkBankRadio(val);
+    var enabledBanks = this.getEnabledBanks();
+
+    var bankRadioToCheck = bankCode;
+
+    // If both corporate and retail options are available, check retail.
+    if (this.hasMultipleOptions(bankCode)) {
+      bankRadioToCheck = getRetailOption(bankCode, enabledBanks);
+    }
+
+    // Show radio only on netbanking, and not on emandate
+    if (this.screen === 'netbanking') {
+      this.showCorporateNetbankingRadio(bankCode);
+    }
+
+    this.checkDown(bankCode);
+    this.checkBankRadio(bankRadioToCheck);
     this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  /**
+   * Checks whether the given bank has multiple options (Corporate, Retail)
+   * @param bankCode
+   */
+  hasMultipleOptions: function(bankCode) {
+    var enabledBanks = this.getEnabledBanks();
+    var normalizedBankCode = normalizeBankCode(bankCode);
+    // Some retail banks have the suffix _R, while others don't. So we look for
+    // codes both with and without the suffix.
+    var hasRetail =
+      enabledBanks[normalizedBankCode] ||
+      enabledBanks[normalizedBankCode + '_R'];
+    var hasCorporate = enabledBanks[normalizedBankCode + '_C'];
+    return hasRetail && hasCorporate;
   },
 
   /**
@@ -4000,20 +4104,80 @@ Session.prototype = {
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
     }
-    var val = e.target.value;
+    var bankCode = e.target.value;
 
     Analytics.track('bank:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        bank: val,
+        bank: bankCode,
       },
     });
 
-    this.checkDown(val);
-    var select = gel('bank-select');
-    select.value = val;
-    this.input(select);
+    // Show radio only on netbanking, and not on emandate
+    if (this.screen === 'netbanking') {
+      this.showCorporateNetbankingRadio(bankCode);
+    }
+
+    this.checkDown(bankCode);
+    this.setSelectedBank(bankCode);
     this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  getEnabledBanks: function() {
+    if (this.screen === 'emandate') {
+      return this.methods.emandate || {};
+    }
+    return this.methods.netbanking || {};
+  },
+
+  setSelectedBank: function(bank) {
+    var select = gel('bank-select');
+    select.value = bank;
+    this.input(select);
+  },
+
+  /**
+   * Unchecks all radio buttons for netbanking type selection.
+   */
+  clearNetbankingRadio: function() {
+    each($$('.nb-type'), function(index, el) {
+      el.checked = false;
+    });
+  },
+
+  /**
+   * Shows Corporate/Retail netbanking selection radio buttons on
+   * netbanking screen, only if both options are enabled for the given bank code.
+   * @param {String} bankCode
+   */
+  showCorporateNetbankingRadio: function(bankCode) {
+    var $nbSelectionContainer = $('.nb-selection-container');
+    var enabledBanks = this.getEnabledBanks();
+    var retailBankCode = getRetailOption(bankCode, enabledBanks);
+    var corporateBankCode = getCorporateOption(bankCode, enabledBanks);
+
+    if (this.hasMultipleOptions(bankCode)) {
+      fillBankRadios(
+        enabledBanks[corporateBankCode],
+        enabledBanks[retailBankCode]
+      );
+
+      $nbSelectionContainer.addClass(shownClass);
+
+      // Uncheck all radios
+      this.clearNetbankingRadio();
+
+      // If the selected bank is corporate, i.e. the bank code ends in _C select
+      // the corporate radio option
+      if (/_C$/.test(bankCode)) {
+        $nbSelectionContainer.$('#nb_type_corporate').prop('checked', true);
+      } else {
+        // Else, select the retail radio option
+        $nbSelectionContainer.$('#nb_type_retail').prop('checked', true);
+      }
+    } else {
+      $nbSelectionContainer.removeClass(shownClass);
+    }
   },
 
   /**
