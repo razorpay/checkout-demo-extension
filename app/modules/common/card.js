@@ -1,3 +1,5 @@
+import { RazorpayConfig } from 'common/Razorpay';
+
 const networks = {
   amex: 'American Express',
   diners: 'Diners Club',
@@ -8,6 +10,11 @@ const networks = {
   bajaj: 'Bajaj Finserv',
   unknown: 'unknown',
 };
+
+const cdnUrl = RazorpayConfig.cdn;
+const fullPrefix = cdnUrl + 'acs/network/';
+
+export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
 
 /**
  * @param {String} name {eg: MasterCard}

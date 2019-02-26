@@ -790,10 +790,20 @@ function askOTP(view, text) {
         Analytics.track('headless:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
-          if (origText.metadata && origText.metadata.issuer) {
-            var bankLogo = discreet.getFullBankLogo(origText.metadata.issuer);
-            qs('#tab-title').innerHTML =
-              '<img class="headless-bank" src="' + bankLogo + '">';
+          if (origText.metadata) {
+            var bankLogo;
+            if (origText.metadata.issuer) {
+              bankLogo = discreet.getFullBankLogo(origText.metadata.issuer);
+            } else if (origText.metadata.network) {
+              bankLogo = discreet.Card.getFullNetworkLogo(
+                origText.metadata.network
+              );
+            }
+
+            if (bankLogo) {
+              qs('#tab-title').innerHTML =
+                '<img class="headless-bank" src="' + bankLogo + '">';
+            }
           }
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
             view.updateScreen({
@@ -804,6 +814,12 @@ function askOTP(view, text) {
           view.updateScreen({
             skipText: "Complete on bank's page",
           });
+          if (thisSession.headless && !origText.redirect) {
+            view.updateScreen({
+              allowSkip: false,
+            });
+          }
+
           if (!thisSession.get('timeout')) {
             thisSession.closeAt = now() + 3 * 60 * 1000;
             thisSession.showTimer(function() {
