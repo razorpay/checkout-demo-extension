@@ -174,7 +174,7 @@ function getCardTypeFromPayload(payload, tokens) {
   if (payload.token) {
     if (tokens) {
       tokens.forEach(function(t) {
-        if (t.token === data.token) {
+        if (t.token === payload.token) {
           cardType = t.card.networkCode;
         }
       });
