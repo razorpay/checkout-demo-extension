@@ -122,6 +122,12 @@ var CardlessEmiStore = {
   ott: {},
 };
 
+/**
+ * Store for what tab and screen
+ * should be shown when back is pressed.
+ */
+var BackStore = null;
+
 function initIosQuirks() {
   if (discreet.UserAgent.iPhone && discreet.UserAgent.Safari) {
     window.addEventListener('resize', function() {
@@ -152,6 +158,32 @@ function fillData(container, returnObj) {
       returnObj[el.name] = el.value;
     }
   });
+}
+
+/**
+ * Returns the cardType from payload
+ *
+ * @param {Object} payload
+ * @param {Array} tokens
+ *
+ * @return {String} cardType
+ */
+function getCardTypeFromPayload(payload, tokens) {
+  var cardType = '';
+
+  if (payload.token) {
+    if (tokens) {
+      tokens.forEach(function(t) {
+        if (t.token === data.token) {
+          cardType = t.card.networkCode;
+        }
+      });
+    }
+  } else {
+    cardType = discreet.Card.getCardType(payload['card[number]']);
+  }
+
+  return cardType;
 }
 
 /**
@@ -700,7 +732,14 @@ function cancelHandler(response) {
     this.screen &&
     this.screen !== 'card'
   ) {
-    this.switchTab('card');
+    if (
+      getCardTypeFromPayload(this.payload, this.transformedTokens) === 'bajaj'
+    ) {
+      this.setScreen('emi');
+      this.switchTab('emi');
+    } else {
+      this.switchTab('card');
+    }
   }
 }
 
@@ -3307,7 +3346,11 @@ Session.prototype = {
         return confirm();
       }
     } else if (this.headless) {
-      tab = 'card';
+      if (BackStore) {
+        tab = BackStore.tab;
+      } else {
+        tab = 'card';
+      }
     } else if (/^emandate/.test(this.screen)) {
       if (this.emandateView.back()) {
         return;
@@ -3344,8 +3387,14 @@ Session.prototype = {
       this.clearRequest();
     }
 
+    if (BackStore && BackStore.screen) {
+      this.setScreen(BackStore.screen);
+    }
+
     this.preSelectedOffer = null;
     this.switchTab(tab);
+
+    BackStore = null;
   },
 
   switchTab: function(tab) {
@@ -4871,34 +4920,37 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
 
-    if (data.method === 'card') {
+    if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.nativeOtpPossible();
-      if (this.nativeotp) {
-        var cardType;
-        if (data.token) {
-          if (this.transformedTokens) {
-            this.transformedTokens.forEach(function(t) {
-              if (t.token === data.token) {
-                cardType = t.card.networkCode;
-              }
-            });
-          }
-        } else {
-          cardType = this.delegator.card.type;
-        }
 
-        if (cardType === 'mastercard') {
-          this.headless = true;
-          Analytics.track('headless:attempt');
-          this.setScreen('otp');
-          $('#otp-sec').html("Complete on bank's page");
-          this.r.on('payment.otp.required', function(data) {
-            askOTP(that.otpView, data);
-          });
-
-          request.iframe = true;
-          Analytics.track('iframe:attempt');
+      var cardType = getCardTypeFromPayload(data, this.transformedTokens);
+      var shouldUseNativeOTP = false;
+      if (data.method === 'card') {
+        if (this.nativeotp && cardType === 'mastercard') {
+          shouldUseNativeOTP = true;
         }
+      } else if (data.method === 'emi') {
+        if (cardType === 'bajaj') {
+          shouldUseNativeOTP = true;
+
+          BackStore = {
+            tab: 'emi',
+            screen: 'emi',
+          };
+        }
+      }
+
+      if (shouldUseNativeOTP) {
+        this.headless = true;
+        Analytics.track('headless:attempt');
+        this.setScreen('otp');
+        $('#otp-sec').html("Complete on bank's page");
+        this.r.on('payment.otp.required', function(data) {
+          askOTP(that.otpView, data);
+        });
+
+        request.iframe = true;
+        Analytics.track('iframe:attempt');
       }
     }
 
