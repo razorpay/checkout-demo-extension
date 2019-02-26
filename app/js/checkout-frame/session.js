@@ -928,10 +928,10 @@ Session.prototype = {
 
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
-    return (amount / 100)
-      .toFixed(2)
-      .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
-      .replace('.00', '');
+    var displayCurrency = this.r.get('display_currency');
+    var currency = this.r.get('currency');
+
+    return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
   formatAmountWithCurrency: function(amount) {
     var discountAmount = amount,
@@ -942,9 +942,6 @@ Session.prototype = {
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
       discountAmount = discreet.currencies[displayCurrency] + discountAmount;
-    } else if (this.r.get('currency') === 'INR') {
-      discountAmount =
-        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
     } else {
       discountAmount = discreet.currencies[currency] + discountFigure;
     }
@@ -954,6 +951,17 @@ Session.prototype = {
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
+
+  /**
+   * Update the amount in header.
+   *
+   * @param {Number} amount
+   */
+  updateAmountInHeader: function(amount) {
+    $('#amount .original-amount').rawHtml(
+      this.formatAmountWithCurrency(amount)
+    );
+  },
 
   track: function(event, extra) {
     Track(this.r, event, extra);
@@ -2166,9 +2174,7 @@ Session.prototype = {
     var partialEl = gel('amount-value');
     if (partialEl) {
       var amountValue = partialEl.value;
-      each($$('.amount-figure'), function(i, el) {
-        $(el).html(amountValue);
-      });
+      this.updateAmountInHeader(amountValue);
       var options = this.get();
       options.amount = 100 * amountValue;
       options['prefill.contact'] = gel('contact').value;
@@ -2289,7 +2295,7 @@ Session.prototype = {
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
         this.get().amount = amount;
-        $('#amount .amount-figure').html(this.formatAmount(amount));
+        this.updateAmountInHeader(amount);
 
         var minAmountField = gel('minimum-amount-select');
 
@@ -2898,38 +2904,39 @@ Session.prototype = {
           toggleInvalid($(this.el.parentNode), isValid);
 
           var amountDue = self.order.amount_due;
-          var amountDueFormatted = self.formatAmount(amountDue);
+          var amountDueFormatted = self.formatAmountWithCurrency(amountDue);
 
           var infoEle = $('.partial-payment-block .subtitle--help');
 
           if (isValid) {
-            $('#amount .amount-figure').html(self.formatAmount(value));
+            self.updateAmountInHeader(value);
 
             // Update the remaining amount being changed
             if (value && gel('partial-select-partial').checked && infoEle) {
-              infoEle.html(
-                'Pay remaining ₹' +
-                  self.formatAmount(amountDue - value) +
+              infoEle.rawHtml(
+                'Pay remaining ' +
+                  self.formatAmountWithCurrency(amountDue - value) +
                   ' later.'
               );
             }
           } else {
             var helpEle = $('#amount-value + .help');
 
-            $('#amount .amount-figure').html(amountDueFormatted); // Update amount is header
+            self.updateAmountInHeader(amountDue);
 
             /* Update tooltip error */
             if (helpEle) {
               if (!value) {
                 // Reset error on no value
-                helpEle.html(
-                  'Please enter a valid amount upto ₹' + amountDueFormatted
+                helpEle.rawHtml(
+                  'Please enter a valid amount upto ' + amountDueFormatted
                 );
               } else if (value > self.order.amount_due) {
-                helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
+                helpEle.rawHtml('Amount cannot exceed ' + amountDueFormatted);
               } else if (value < minAmount) {
-                helpEle.html(
-                  'Minimum payable amount is ₹' + self.formatAmount(minAmount)
+                helpEle.rawHtml(
+                  'Minimum payable amount is ' +
+                    self.formatAmountWithCurrency(minAmount)
                 );
               }
             }

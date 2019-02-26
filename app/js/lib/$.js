@@ -271,6 +271,16 @@ $.prototype = {
     return this[0].innerHTML;
   },
 
+  rawHtml: function(html) {
+    if (arguments.length) {
+      if (this[0]) {
+        this[0].innerHTML = html;
+      }
+      return this;
+    }
+    return this[0].innerHTML;
+  },
+
   focus: function() {
     if (this[0]) {
       try {
