@@ -5332,7 +5332,15 @@ Session.prototype = {
        * methods.cardless_emi will be [] when there are no providers enabled.
        */
       if (methods.cardless_emi.length === 0) {
-        methods.cardless_emi = null;
+        /**
+         * Set cardless emi to [] (enabled) if:
+         * - Emi is enabled
+         * - Cardless EMI is false
+         * - Bajaj Finserv plans are present
+         */
+        if (!(methods.emi && emi_options.banks['BAJAJ'])) {
+          methods.cardless_emi = null;
+        }
       }
     }
 
