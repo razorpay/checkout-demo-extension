@@ -5142,7 +5142,6 @@ Session.prototype = {
         this.headless = true;
         Analytics.track('headless:attempt');
         this.setScreen('otp');
-        $('#otp-sec').html("Complete on bank's page");
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
