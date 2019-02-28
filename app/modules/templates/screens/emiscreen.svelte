@@ -64,7 +64,7 @@
       session.delegator
         .add('card', emi_el_card)
         .on('network', function () {
-          var type = this.type;
+          const type = this.type;
 
           // card icon element
           this.el.parentNode
@@ -72,7 +72,11 @@
             .setAttribute('cardtype', type);
         })
         .on('change', function () {
-          var isValid = this.isValid();
+          let isValid = this.isValid();
+
+          if (this.type !== 'bajaj') {
+            isValid = false;
+          }
 
           // set validity classes
           if (isValid) {
