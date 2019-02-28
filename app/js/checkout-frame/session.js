@@ -3454,7 +3454,7 @@ Session.prototype = {
         return confirm();
       }
     } else if (this.headless) {
-      if (BackStore) {
+      if (BackStore && BackStore.tab) {
         tab = BackStore.tab;
       } else {
         tab = 'card';
