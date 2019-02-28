@@ -129,19 +129,30 @@ var CardlessEmiStore = {
 var BackStore = null;
 
 function initIosQuirks() {
-  if (discreet.UserAgent.iPhone && discreet.UserAgent.Safari) {
-    window.addEventListener('resize', function() {
-      if (window.innerHeight > 550) {
-        return;
-      }
-
-      // Shift footer
-      if (window.screen.height - window.innerHeight >= 64) {
+  if (discreet.UserAgent.iPhone) {
+    /**
+     * Shift the pay button if the height is low.
+     */
+    setTimeout(function() {
+      if (window.innerHeight <= 512) {
         $('#footer').addClass('shift-ios');
-      } else {
-        $('#footer').removeClass('shift-ios');
       }
-    });
+    }, 1000);
+
+    if (discreet.UserAgent.Safari) {
+      window.addEventListener('resize', function() {
+        if (window.innerHeight > 550) {
+          return;
+        }
+
+        // Shift pay button
+        if (window.screen.height - window.innerHeight >= 56) {
+          $('#footer').addClass('shift-ios');
+        } else {
+          $('#footer').removeClass('shift-ios');
+        }
+      });
+    }
   }
 }
 
@@ -184,6 +195,58 @@ function getCardTypeFromPayload(payload, tokens) {
   }
 
   return cardType;
+}
+
+/*
+ * Returns a bank code with suffixes(_C, _R) removed.
+ * @param {String} bankCode
+ */
+function normalizeBankCode(bankCode) {
+  return bankCode.replace(/_[CR]$/, '');
+}
+
+/**
+ * Returns the code for retail option corresponding to `bankCode`. Looks for
+ * {bankCode} and {bankCode}_R in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+function getRetailOption(bankCode, banks) {
+  var normalizedBankCode = normalizeBankCode(bankCode);
+  var retailBankCode = normalizedBankCode + '_R';
+  if (banks[normalizedBankCode]) {
+    return normalizedBankCode;
+  }
+  return banks[retailBankCode] && retailBankCode;
+}
+
+/**
+ * Returns the code for corporate option corresponding to `bankCode`. Looks for
+ * {bankCode}_C in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+function getCorporateOption(bankCode, banks) {
+  var normalizedBankCode = normalizeBankCode(bankCode);
+  var corporateBankCode = normalizedBankCode + '_C';
+  return banks[corporateBankCode] && corporateBankCode;
+}
+
+/**
+ * Fills the corporate/retail radio button labels with bank names
+ * @param {String} corporateBankName the label for corporate radio
+ * @param {String} retailBankName the label for retail radio
+ */
+function fillBankRadios(corporateBankName, retailBankName) {
+  $('.nb-selection-container label[for=nb_type_retail] .label-content').html(
+    retailBankName
+  );
+
+  $('.nb-selection-container label[for=nb_type_corporate] .label-content').html(
+    corporateBankName
+  );
 }
 
 /**
@@ -933,10 +996,10 @@ Session.prototype = {
 
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
-    return (amount / 100)
-      .toFixed(2)
-      .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
-      .replace('.00', '');
+    var displayCurrency = this.r.get('display_currency');
+    var currency = this.r.get('currency');
+
+    return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
   formatAmountWithCurrency: function(amount) {
     var discountAmount = amount,
@@ -947,9 +1010,6 @@ Session.prototype = {
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
       discountAmount = discreet.currencies[displayCurrency] + discountAmount;
-    } else if (this.r.get('currency') === 'INR') {
-      discountAmount =
-        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
     } else {
       discountAmount = discreet.currencies[currency] + discountFigure;
     }
@@ -959,6 +1019,17 @@ Session.prototype = {
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
+
+  /**
+   * Update the amount in header.
+   *
+   * @param {Number} amount
+   */
+  updateAmountInHeader: function(amount) {
+    $('#amount .original-amount').rawHtml(
+      this.formatAmountWithCurrency(amount)
+    );
+  },
 
   track: function(event, extra) {
     Track(this.r, event, extra);
@@ -2201,9 +2272,7 @@ Session.prototype = {
     var partialEl = gel('amount-value');
     if (partialEl) {
       var amountValue = partialEl.value;
-      each($$('.amount-figure'), function(i, el) {
-        $(el).html(amountValue);
-      });
+      this.updateAmountInHeader(amountValue);
       var options = this.get();
       options.amount = 100 * amountValue;
       options['prefill.contact'] = gel('contact').value;
@@ -2324,7 +2393,7 @@ Session.prototype = {
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
         this.get().amount = amount;
-        $('#amount .amount-figure').html(this.formatAmount(amount));
+        this.updateAmountInHeader(amount);
 
         var minAmountField = gel('minimum-amount-select');
 
@@ -2708,6 +2777,28 @@ Session.prototype = {
         }
       });
     }
+
+    var enabledBanks = this.getEnabledBanks();
+    this.on('click', '.nb-type', function(event) {
+      var selectedBank = $('#bank-select').val();
+      var bankToSet;
+
+      // Uncheck other radios
+      this.clearNetbankingRadio();
+
+      // Check clicked radio
+      event.target.checked = true;
+
+      if (event.target.value === 'corporate') {
+        bankToSet = getCorporateOption(selectedBank, enabledBanks);
+      } else {
+        bankToSet = getRetailOption(selectedBank, enabledBanks);
+      }
+
+      if (bankToSet) {
+        this.setSelectedBank(bankToSet);
+      }
+    });
   },
 
   /**
@@ -2911,38 +3002,39 @@ Session.prototype = {
           toggleInvalid($(this.el.parentNode), isValid);
 
           var amountDue = self.order.amount_due;
-          var amountDueFormatted = self.formatAmount(amountDue);
+          var amountDueFormatted = self.formatAmountWithCurrency(amountDue);
 
           var infoEle = $('.partial-payment-block .subtitle--help');
 
           if (isValid) {
-            $('#amount .amount-figure').html(self.formatAmount(value));
+            self.updateAmountInHeader(value);
 
             // Update the remaining amount being changed
             if (value && gel('partial-select-partial').checked && infoEle) {
-              infoEle.html(
-                'Pay remaining ₹' +
-                  self.formatAmount(amountDue - value) +
+              infoEle.rawHtml(
+                'Pay remaining ' +
+                  self.formatAmountWithCurrency(amountDue - value) +
                   ' later.'
               );
             }
           } else {
             var helpEle = $('#amount-value + .help');
 
-            $('#amount .amount-figure').html(amountDueFormatted); // Update amount is header
+            self.updateAmountInHeader(amountDue);
 
             /* Update tooltip error */
             if (helpEle) {
               if (!value) {
                 // Reset error on no value
-                helpEle.html(
-                  'Please enter a valid amount upto ₹' + amountDueFormatted
+                helpEle.rawHtml(
+                  'Please enter a valid amount upto ' + amountDueFormatted
                 );
               } else if (value > self.order.amount_due) {
-                helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
+                helpEle.rawHtml('Amount cannot exceed ' + amountDueFormatted);
               } else if (value < minAmount) {
-                helpEle.html(
-                  'Minimum payable amount is ₹' + self.formatAmount(minAmount)
+                helpEle.rawHtml(
+                  'Minimum payable amount is ' +
+                    self.formatAmountWithCurrency(minAmount)
                 );
               }
             }
@@ -4112,18 +4204,48 @@ Session.prototype = {
   },
 
   switchBank: function(e) {
-    var val = e.target.value;
+    var bankCode = e.target.value;
 
     Analytics.track('bank:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        bank: val,
+        bank: bankCode,
       },
     });
 
-    this.checkDown(val);
-    this.checkBankRadio(val);
+    var enabledBanks = this.getEnabledBanks();
+
+    var bankRadioToCheck = bankCode;
+
+    // If both corporate and retail options are available, check retail.
+    if (this.hasMultipleOptions(bankCode)) {
+      bankRadioToCheck = getRetailOption(bankCode, enabledBanks);
+    }
+
+    // Show radio only on netbanking, and not on emandate
+    if (this.screen === 'netbanking') {
+      this.showCorporateNetbankingRadio(bankCode);
+    }
+
+    this.checkDown(bankCode);
+    this.checkBankRadio(bankRadioToCheck);
     this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  /**
+   * Checks whether the given bank has multiple options (Corporate, Retail)
+   * @param bankCode
+   */
+  hasMultipleOptions: function(bankCode) {
+    var enabledBanks = this.getEnabledBanks();
+    var normalizedBankCode = normalizeBankCode(bankCode);
+    // Some retail banks have the suffix _R, while others don't. So we look for
+    // codes both with and without the suffix.
+    var hasRetail =
+      enabledBanks[normalizedBankCode] ||
+      enabledBanks[normalizedBankCode + '_R'];
+    var hasCorporate = enabledBanks[normalizedBankCode + '_C'];
+    return hasRetail && hasCorporate;
   },
 
   /**
@@ -4162,20 +4284,80 @@ Session.prototype = {
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
     }
-    var val = e.target.value;
+    var bankCode = e.target.value;
 
     Analytics.track('bank:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        bank: val,
+        bank: bankCode,
       },
     });
 
-    this.checkDown(val);
-    var select = gel('bank-select');
-    select.value = val;
-    this.input(select);
+    // Show radio only on netbanking, and not on emandate
+    if (this.screen === 'netbanking') {
+      this.showCorporateNetbankingRadio(bankCode);
+    }
+
+    this.checkDown(bankCode);
+    this.setSelectedBank(bankCode);
     this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  getEnabledBanks: function() {
+    if (this.screen === 'emandate') {
+      return this.methods.emandate || {};
+    }
+    return this.methods.netbanking || {};
+  },
+
+  setSelectedBank: function(bank) {
+    var select = gel('bank-select');
+    select.value = bank;
+    this.input(select);
+  },
+
+  /**
+   * Unchecks all radio buttons for netbanking type selection.
+   */
+  clearNetbankingRadio: function() {
+    each($$('.nb-type'), function(index, el) {
+      el.checked = false;
+    });
+  },
+
+  /**
+   * Shows Corporate/Retail netbanking selection radio buttons on
+   * netbanking screen, only if both options are enabled for the given bank code.
+   * @param {String} bankCode
+   */
+  showCorporateNetbankingRadio: function(bankCode) {
+    var $nbSelectionContainer = $('.nb-selection-container');
+    var enabledBanks = this.getEnabledBanks();
+    var retailBankCode = getRetailOption(bankCode, enabledBanks);
+    var corporateBankCode = getCorporateOption(bankCode, enabledBanks);
+
+    if (this.hasMultipleOptions(bankCode)) {
+      fillBankRadios(
+        enabledBanks[corporateBankCode],
+        enabledBanks[retailBankCode]
+      );
+
+      $nbSelectionContainer.addClass(shownClass);
+
+      // Uncheck all radios
+      this.clearNetbankingRadio();
+
+      // If the selected bank is corporate, i.e. the bank code ends in _C select
+      // the corporate radio option
+      if (/_C$/.test(bankCode)) {
+        $nbSelectionContainer.$('#nb_type_corporate').prop('checked', true);
+      } else {
+        // Else, select the retail radio option
+        $nbSelectionContainer.$('#nb_type_retail').prop('checked', true);
+      }
+    } else {
+      $nbSelectionContainer.removeClass(shownClass);
+    }
   },
 
   /**
@@ -5661,10 +5843,16 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    if (order && order.amount) {
-      session_options.amount = order.partial_payment
-        ? order.amount_due
-        : order.amount;
+    if (order) {
+      if (order.amount) {
+        session_options.amount = order.partial_payment
+          ? order.amount_due
+          : order.amount;
+      }
+
+      if (order.currency) {
+        session_options.currency = order.currency;
+      }
     } else if (invoice && invoice.amount) {
       session_options.amount = invoice.amount;
     } else if (subscription && subscription.amount) {

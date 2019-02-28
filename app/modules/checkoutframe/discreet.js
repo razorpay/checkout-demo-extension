@@ -10,7 +10,7 @@ import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
-import { getDecimalAmount, displayCurrencies } from 'common/currency';
+import * as Currency from 'common/currency';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
@@ -60,8 +60,9 @@ export default {
   _PaymentMethodIcons,
   Confirm,
   Callout,
-  getDecimalAmount,
-  currencies: displayCurrencies,
+  Currency,
+  getDecimalAmount: Currency.getDecimalAmount,
+  currencies: Currency.displayCurrencies,
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrongOtp,
