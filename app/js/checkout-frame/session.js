@@ -766,7 +766,7 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, text) {
+function askOTP(view, text, shouldLimitResend) {
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
@@ -790,7 +790,7 @@ function askOTP(view, text) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
-    allowResend: true,
+    allowResend: shouldLimitResend ? discreet.OtpService.canSendOtp() : true,
   });
 
   $('#body').addClass('sub');
@@ -846,8 +846,8 @@ function askOTP(view, text) {
   setOtpText(view, text);
 }
 
-function debounceAskOTP(view, msg) {
-  debounce(askOTP, 750)(view, msg);
+function debounceAskOTP(view, msg, shouldLimitResend) {
+  debounce(askOTP, 750)(view, msg, shouldLimitResend);
 }
 
 // this === Session
@@ -1808,7 +1808,7 @@ Session.prototype = {
           ' to get EMI plans for' +
           cardlessEmiProviderObj.name;
 
-        askOTP(self.otpView, otpMessage);
+        askOTP(self.otpView, otpMessage, true);
 
         self.otpView.updateScreen({
           allowSkip: false,
@@ -2108,7 +2108,7 @@ Session.prototype = {
     } else {
       var self = this;
       this.customer.createOTP(function(message) {
-        debounceAskOTP(self.otpView, message);
+        debounceAskOTP(self.otpView, message, true);
       });
     }
   },
@@ -3522,11 +3522,12 @@ Session.prototype = {
               self.otpView,
               'Enter OTP sent on ' +
                 getPhone() +
-                '<br>to save your card for future payments'
+                '<br>to save your card for future payments',
+              true
             );
           });
         } else if (customer.saved && !customer.logged) {
-          askOTP(self.otpView);
+          askOTP(self.otpView, undefined, true);
         } else {
           self.showCards();
         }
@@ -4500,7 +4501,7 @@ Session.prototype = {
           Analytics.track('behav:otp:incorrect', {
             wallet: this.tab === 'wallet',
           });
-          askOTP(this.otpView, msg);
+          askOTP(this.otpView, msg, true);
         }
       };
     } else {
@@ -4512,7 +4513,7 @@ Session.prototype = {
           Analytics.track('behav:otp:incorrect', {
             wallet: self.tab === 'wallet',
           });
-          askOTP(this.otpView, msg);
+          askOTP(this.otpView, msg, true);
         }
       };
     }
@@ -4844,7 +4845,7 @@ Session.prototype = {
           skipText: 'Skip saving card',
         });
         this.commenceOTP(strings.otpsend);
-        debounceAskOTP(this.otpView);
+        debounceAskOTP(this.otpView, undefined, true);
         return this.customer.createOTP();
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';

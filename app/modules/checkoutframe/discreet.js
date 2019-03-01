@@ -11,6 +11,7 @@ import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
 import * as Currency from 'common/currency';
+import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
@@ -59,6 +60,7 @@ export default {
   Confirm,
   Callout,
   Currency,
+  OtpService,
   getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
