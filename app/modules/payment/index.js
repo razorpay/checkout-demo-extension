@@ -11,15 +11,17 @@ import * as strings from 'common/strings';
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
+import Redir from 'payment/redir';
 import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
+import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
   RazorpayConfig,
   makeAuthUrl,
   makeUrl,
 } from 'common/Razorpay';
-import { internetExplorer, iOS } from 'common/useragent';
+import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 
 import * as Tez from 'tez';
@@ -167,23 +169,49 @@ export default function Payment(data, params = {}, r) {
   this.fees = params.fees;
   this.tez = params.tez;
 
-  // data needs to be present. abscence of data = placeholder popup in payment paused state
-  // If fees is there, we need to show fee view in poupup
-  // If contact or email are missing, we need to ask for it in popup
-  this.powerwallet =
-    data &&
-    !params.fees &&
-    data.contact &&
-    (this.optional.email || data.email) &&
-    // tez invokes intent, popup not needed
-    (params.tez ||
-      // only apply powerwallet for checkout-js. popup for razorpayjs
-      (isRazorpayFrame &&
-        // display popup for conventional wallets
-        ((data.method === 'wallet' && isPowerWallet(data.wallet)) ||
-          // no popup for upi
-          data.method === 'upi')));
+  var avoidPopup = false;
 
+  /**
+   * Avoid Popup if:
+   * - Payment is made by Payment Request API (`params.tez` here)
+   * - UPI QR or UPI is chosen inside checkout form
+   * - PowerWallet is chosen & contact details are provided inside checkout form
+   *
+   * Enforce Popup if:
+   * - Merchant is on customer fee bearer model
+   */
+  if (params.tez) {
+    avoidPopup = true;
+  } else if (isRazorpayFrame) {
+    /**
+     * data needs to be present. absence of data = placeholder popup in
+     * payment paused state
+     */
+    if (data) {
+      if (data.method === 'wallet' && isPowerWallet(data.wallet)) {
+        /* If contact or email are missing, we need to ask for it in popup */
+        if (data.contact && (this.optional.email || data.email)) {
+          avoidPopup = true;
+        }
+      }
+
+      if (data.method === 'upi') {
+        avoidPopup = true;
+      }
+
+      /* If fees is there, we need to show fee view in poupup */
+      if (params.fees) {
+        avoidPopup = false;
+      }
+
+      /* avoid popup for UPI QR anyway, fee bearer screen handled for this */
+      if (params.upiqr) {
+        avoidPopup = true;
+      }
+    }
+  }
+
+  this.avoidPopup = avoidPopup;
   this.message = params.message;
 
   this.tryPopup();
@@ -225,7 +253,7 @@ Payment.prototype = {
       });
       window.CheckoutBridge.invokePopup(
         _Obj.stringify({
-          content: popupTemplate(this),
+          content: encodeURIComponent(popupTemplate(this)),
           focus: false,
         })
       );
@@ -237,7 +265,7 @@ Payment.prototype = {
   checkRedirect: function() {
     var getOption = this.r.get;
 
-    if (getOption('redirect')) {
+    if (!this.iframe && getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
       var callback_url = getOption('callback_url');
@@ -245,7 +273,7 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (!this.powerwallet || (data.method === 'upi' && !isRazorpayFrame)) {
+      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame)) {
         _Doc.redirect({
           url: makeRedirectUrl(this.fees),
           content: data,
@@ -293,7 +321,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if ((isRazorpayFrame && !this.powerwallet) || this.isMagicPayment) {
+    if ((isRazorpayFrame && !this.avoidPopup) || this.isMagicPayment) {
       setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
@@ -337,6 +365,9 @@ Payment.prototype = {
           }
         }
         data = _.rzpError('Payment failed');
+      }
+      if (data.xhr) {
+        Analytics.track('ajax_error', data);
       }
       this.emit('error', data);
     }
@@ -390,12 +421,12 @@ Payment.prototype = {
       return;
     }
 
-    if (!this.powerwallet && !isRazorpayFrame && data.method === 'upi') {
+    if (!this.avoidPopup && !isRazorpayFrame && data.method === 'upi') {
       return;
     }
 
     // iphone background ajax route
-    if (!this.iframe && !this.powerwallet && iOS) {
+    if (!this.iframe && !this.avoidPopup && ajaxRouteNotSupported) {
       return;
     }
 
@@ -436,9 +467,14 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
-    this.popup.write(popupTemplate(this));
+    const isIframe = this.popup instanceof Iframe;
+    if (isIframe) {
+      this.popup.write(popupTemplate(this));
+    }
     _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
-    this.popup.show();
+    if (isIframe) {
+      this.popup.show();
+    }
   },
 
   makePopup: function() {
@@ -468,7 +504,7 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return !(this.r.get('redirect') || this.powerwallet);
+    return this.iframe || !(this.r.get('redirect') || this.avoidPopup);
   },
 
   tryPopup: function() {
@@ -591,6 +627,55 @@ razorpayProto.topupWallet = function() {
         });
       } else {
         processCoproto.call(payment, response);
+      }
+    },
+  });
+};
+
+razorpayProto.createFees = function(data, onSuccess, onError) {
+  fetch.post({
+    url: makeUrl('payments/create/fees'),
+    data: data,
+    headers: {
+      Authorization: 'Basic ' + btoa(this.get('key') + ':'),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    callback: function(response) {
+      if (response.error) {
+        onError(response);
+      } else {
+        const displayFees = response.display;
+        const array = [];
+        const fees = Object.keys(displayFees);
+
+        for (let i = 0; i < fees.length; i++) {
+          const fee = fees[i];
+          let title = '';
+          switch (fee) {
+            case 'originalAmount':
+              title = 'Amount';
+              break;
+            case 'razorpay_fee':
+              title = 'Gateway Charges';
+              break;
+            case 'tax':
+              title = 'GST on Gateway Charges';
+              break;
+          }
+          if (title) {
+            array.push([
+              title,
+              formatAmountWithSymbol(displayFees[fee] * 100, 'INR'),
+            ]);
+          }
+        }
+
+        array.push([
+          'Total Charges',
+          formatAmountWithSymbol(displayFees.amount * 100, 'INR'),
+        ]);
+
+        onSuccess(response, array);
       }
     },
   });

@@ -1,12 +1,59 @@
 import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
 import { doesAppExist } from 'common/upi';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
+import { isMobile } from 'common/useragent';
+
+const AVAILABLE_METHODS = [
+  'card',
+  'netbanking',
+  'wallet',
+  'upi',
+  'emi',
+  'cardless_emi',
+  'qr',
+];
+
+/**
+ * Get the available methods.
+ *
+ * @param {Object} methods
+ *
+ * @return {Array}
+ */
+const getAvailableMethods = methods => {
+  let AVAIL_METHODS = _Arr.filter(
+    AVAILABLE_METHODS,
+    method =>
+      _.isArray(methods[method])
+        ? Boolean(methods[method].length)
+        : methods[method]
+  );
+
+  /**
+   * Cardless EMI and EMI are the same payment option.
+   */
+  if (_Arr.contains(AVAIL_METHODS, 'cardless_emi')) {
+    if (_Arr.contains(AVAIL_METHODS, 'emi')) {
+      AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'cardless_emi');
+    } else {
+      AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, 'cardless_emi')] = 'emi';
+    }
+  }
+
+  return AVAIL_METHODS;
+};
 
 export default class MethodsList {
   constructor({ target, data }) {
+    data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
+
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
       data,
     });
+
+    this.animateNext = data.animate;
 
     this.data = data;
     this.addListeners();
@@ -33,6 +80,10 @@ export default class MethodsList {
         showOtherMethods: true,
       });
 
+      Analytics.track('p13n:methods:show', {
+        type: AnalyticsTypes.BEHAV,
+      });
+
       _Doc.querySelector('#body') |> _El.removeClass('sub');
       _Doc.querySelector('#methods-list') |> _El.setStyle('position', 'static');
     });
@@ -40,6 +91,10 @@ export default class MethodsList {
     this.view.on('hideMethods', e => {
       this.view.set({
         showOtherMethods: false,
+      });
+
+      Analytics.track('p13n:methods:hide', {
+        type: AnalyticsTypes.BEHAV,
       });
 
       if (this.view.get().selected) {
@@ -54,8 +109,16 @@ export default class MethodsList {
     });
 
     this.view.on('methodSelected', e => {
-      let data = e.data;
-      this.data.session.switchTab(data.method);
+      let { method } = e.data;
+
+      /**
+       * Replace the method if replaceable.
+       */
+      if (method === 'emi' && this.data.session.methods.cardless_emi) {
+        method = 'cardless_emi';
+      }
+
+      this.data.session.switchTab(method);
     });
   }
 
@@ -64,6 +127,7 @@ export default class MethodsList {
   }
 
   set(data) {
+    let session = this.data.session;
     if (!data.instruments && data.customer) {
       /* Just setting customer here (login/logout), rest does not change */
       return this.view.set(data);
@@ -71,21 +135,23 @@ export default class MethodsList {
 
     data = _Obj.clone(data);
     let noOfInstruments = 2;
-    if (this.data.session.isMobile) {
+    if (isMobile) {
       noOfInstruments = 3;
     }
 
     /* Only allow for available methods */
     data.instruments = _Arr.filter(data.instruments, ({ method }) => {
-      return this.data.session.methods[method];
+      return session.methods[method];
     });
 
     /* Filter out any app that's in user's list but not currently installed */
     data.instruments = _Arr.filter(data.instruments, instrument => {
       if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
-        if (
-          doesAppExist(instrument.upi_app, this.data.session.upi_intents_data)
-        ) {
+        if (instrument['_[upiqr]'] === '1' && !isMobile) {
+          return true;
+        }
+
+        if (doesAppExist(instrument.upi_app, session.upi_intents_data)) {
           return true;
         }
         return false;
@@ -98,6 +164,14 @@ export default class MethodsList {
     data.selected = null;
     this.selectedInstrument = null;
 
+    var delay = 1500;
+
+    if (this.animateNext === false) {
+      delay = 0;
+      data.animate = false;
+      this.animateNext = true;
+    }
+
     this.view.set(data);
 
     /* handles the race condition */
@@ -106,6 +180,9 @@ export default class MethodsList {
     }
 
     if (data.instruments && data.instruments.length) {
+      Analytics.track('p13n:instruments:set', {
+        count: data.instruments.length,
+      });
       this.animationTimeout = global.setTimeout(() => {
         _Doc.querySelector('#payment-options') |> _El.addClass('hidden');
 
@@ -116,7 +193,9 @@ export default class MethodsList {
         if (this.view.get().selected) {
           _Doc.querySelector('#body') |> _El.addClass('sub');
         }
-      }, 1500);
+      }, delay);
+    } else if (session.tab) {
+      return;
     } else {
       _Doc.querySelector('#payment-options') |> _El.removeClass('hidden');
       _Doc.querySelector('#body') |> _El.removeClass('sub');

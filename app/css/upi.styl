@@ -243,17 +243,18 @@
   }
 }
 
+.tez-icon {
+  background-repeat: norepeat;
+  background-size: contain;
+  background-image: url('https://cdn.razorpay.com/checkout/gpay.png');
+  width: 34px;
+  height: 34px;
+  margin-left: -9px;
+}
+
+
 #upi-tez{
   display: none;
-
-  .tez-icon {
-    background-repeat: norepeat;
-    background-size: contain;
-    background-image: url('https://cdn.razorpay.com/checkout/gpay.png');
-    width: 34px;
-    height: 34px;
-    margin-left: -9px;
-  }
 
   &.tez-mweb .desktop-only, &.tez-desktop .mweb-only {
 
@@ -342,3 +343,22 @@
     display: block;
   }
 }
+
+.fees-container
+  margin: 0 auto
+  .fee
+    padding: 8px 0
+    width: 100%
+    &:last-of-type
+      border-top: 1px solid #ebedf0
+      font-weight: bold
+      margin-top: 12px
+      padding-top: 12px
+    .fee-title
+      display: inline-block;
+      text-align: left;
+      width: calc(50% - 2px);
+    .fee-amount
+      display: inline-block;
+      text-align: right;
+      width: calc(50% - 2px);

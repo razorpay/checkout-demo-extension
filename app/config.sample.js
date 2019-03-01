@@ -7,6 +7,6 @@ Razorpay = {
     frame: '/checkout.html',
 
     // path for view/checkout to load js from
-    js: 'http://checkout.pronav.in/dist/'
-  }
-}
+    js: 'http://checkout.pronav.in/dist/',
+  },
+};

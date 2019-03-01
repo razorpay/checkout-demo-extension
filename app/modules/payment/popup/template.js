@@ -6,11 +6,11 @@ const cancelError = _Obj.stringify(_.rzpError(cancelMsg));
 
 export default function popupTemplate(_) {
   var get = _.r.get;
-  var method = _.data.method === 'wallet' ? 'wallet' : 'bank';
+  var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
   var title = get('name') || get('description') || 'Redirecting...';
-  var amount = displayAmount(_.r, _.data.amount);
+  var amount = displayAmount(_.r, _.data && _.data.amount);
 
   var image = get('image');
   image = image ? `<div id="logo"><img src="${image}"/></div>` : '';

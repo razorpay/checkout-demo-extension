@@ -10,9 +10,9 @@ import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
-import { getDecimalAmount, displayCurrencies } from 'common/currency';
+import * as Currency from 'common/currency';
 import * as strings from 'common/strings';
-import { androidBrowser } from 'common/useragent';
+import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
@@ -41,6 +41,7 @@ import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutframe/store';
 
 import QRScreen from 'templates/views/qr.svelte';
+import MagicView from 'checkoutframe/magic';
 
 export default {
   RazorpayConfig,
@@ -57,9 +58,9 @@ export default {
   _PaymentMethodIcons,
   Confirm,
   Callout,
-  getDecimalAmount,
-  currencies: displayCurrencies,
-  androidBrowser,
+  Currency,
+  getDecimalAmount: Currency.getDecimalAmount,
+  currencies: Currency.displayCurrencies,
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrongOtp,
@@ -77,6 +78,7 @@ export default {
   P13n,
   MethodsList,
   Store,
+  UserAgent,
 
   getQueryParams: _.getQueryParams,
 
@@ -97,4 +99,6 @@ export default {
   timer: _.timer,
   QRScreen,
   getFullBankLogo,
+
+  MagicView,
 };

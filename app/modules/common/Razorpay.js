@@ -2,7 +2,12 @@ import Analytics from 'analytics';
 import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
-import { supportedCurrencies, displayCurrencies } from 'common/currency';
+import {
+  supportedCurrencies,
+  displayCurrencies,
+  getCurrencyConfig,
+  formatAmountWithSymbol,
+} from 'common/currency';
 
 export const RazorpayConfig = {
   api: 'https://api.razorpay.com/',
@@ -72,17 +77,6 @@ export default function Razorpay(overrides) {
     _.throwMessage(message);
   }
 
-  /* Set flashcheckout for demo key */
-  if (
-    options.get('key') === 'rzp_live_ILgsfZCZoFIKMb' &&
-    overrides.flashcheckout !== false
-  ) {
-    options.set('flashcheckout', true);
-  }
-  if (options.get('flashcheckout')) {
-    options.set('method.qr', true);
-  }
-
   if (
     backendEntityIds.every(function(prop) {
       return !options.get(prop);
@@ -108,7 +102,7 @@ RazorProto.onNew = function(event, callback) {
           this.prefs = response;
           this.methods = response.methods;
         }
-        callback(this.prefs);
+        callback(this.prefs, response);
       });
     }
   }
@@ -196,13 +190,13 @@ RazorProto.isLiveMode = function() {
   );
 };
 
-function isValidAmount(amt) {
+function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {
     return false;
   }
   amt = parseInt(amt, 10);
 
-  return amt >= 100;
+  return amt >= min;
 }
 
 export function makePrefParams(rzp) {
@@ -261,8 +255,26 @@ export const optionValidations = {
   },
 
   amount: function(amount, options) {
-    if (!isValidAmount(amount) && !options.recurring) {
-      return 'should be passed in integer paise. Minimum value is 100 paise, i.e. ₹ 1';
+    const currency = options.display_currency || options.currency || 'INR';
+    const config = getCurrencyConfig(currency);
+    const minimum = config.minimum;
+
+    /**
+     * If decimals > 0, use minor units (eg. paise for INR)
+     * If decimals = 0, use major units (eg. rupee for INR)
+     */
+    let units = '';
+    if (config.decimals && config.minor) {
+      units = ` ${config.minor}`;
+    } else if (config.major) {
+      units = ` ${config.major}`;
+    }
+
+    if (!isValidAmount(amount, minimum) && !options.recurring) {
+      return `should be passed in integer${units}. Minimum value is ${minimum}${units}, i.e. ${formatAmountWithSymbol(
+        minimum,
+        currency
+      )}`;
     }
   },
 

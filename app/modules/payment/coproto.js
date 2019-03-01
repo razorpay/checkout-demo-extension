@@ -4,16 +4,18 @@ import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import { RazorpayConfig } from 'common/Razorpay';
+import Analytics from 'analytics';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
+  Track(this.r, 'otp_response', response);
   if (error) {
     if (error.action === 'RETRY') {
       return this.emit('otp.required', strings.wrongOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }
-    this.complete(response);
+    return this.complete(response);
   }
   processCoproto.call(this, response);
 };
@@ -49,6 +51,9 @@ export const processCoproto = function(response) {
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
+    if (this.iframe && this.popup) {
+      this.popup.writable = 1;
+    }
     var func = responseTypes[response.type];
     var isFunction = _.isFunction(func);
     if (isFunction) {
@@ -104,7 +109,7 @@ var responseTypes = {
           request.url,
           request.content,
           request.method,
-          popup.window.name
+          popup.name
         );
       }
       // popup blocking addons close popup once we set a url
@@ -240,6 +245,7 @@ var responseTypes = {
       this.otpurl = request.url;
       this.emit('otp.required');
     } else {
+      Analytics.setMeta('headless', true);
       this.otpurl = fullResponse.submit_url;
       this.gotoBankUrl = fullResponse.redirect;
       this.emit('otp.required', fullResponse);
@@ -252,7 +258,7 @@ var responseTypes = {
   }
 };
 
-function mwebIntent(payment) {
+function mwebIntent(payment, ra, fullResponse) {
   // Start Timeout
   var drawerTimeout = setTimeout(() => {
     /**

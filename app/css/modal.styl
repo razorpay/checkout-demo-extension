@@ -50,6 +50,8 @@ html {
   height: 100%;
   margin: 0;
   -webkit-overflow-scrolling: touch;
+  width: 240px;
+  min-width: 100%;
 }
 
 .double {
@@ -97,10 +99,19 @@ html {
   }
 }
 
+.list, .options {
+  .title {
+    color: #0C1753;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 600;
+  }
+}
+
 .list {
   margin-bottom: 12px;
 
-  & .checkbox {
+  & .checkbox:not(.inner-checkbox) {
     border-radius: 50%;
 
     &::after {
@@ -128,14 +139,7 @@ html {
     margin: 0 12px 0 5px;
   }
 
-  .title {
-    color: #0C1753;
-    font-size: 14px;
-    line-height: 18px;
-    font-weight: 600;
-  }
-
-  :checked + label .checkbox::after {
+  :checked + label .checkbox:not(.inner-checkbox)::after {
     border-color: #fff
   }
 
@@ -187,6 +191,41 @@ html {
     input[type=radio]:checked + label {
       max-height: 360px;
     }
+  }
+}
+
+#partial-list {
+  .collapsable-content {
+    display: none;
+  }
+
+  #partial-radio {
+    label {
+      overflow: initial;
+    }
+  }
+
+  input[type=radio]:checked,
+  input[type=checkbox]:checked {
+    & + label {
+      max-height: 360px;
+
+      .collapsable-content {
+        display: block;
+      }
+    }
+  }
+
+  .minimum-amount-select {
+    label {
+      border: 0;
+      padding: 0;
+      background: none !important;
+    }
+  }
+
+  .subtitle {
+    margin-top: 0;
   }
 }
 
@@ -248,6 +287,30 @@ html {
 
 #netb-banks .item {
   overflow: hidden;
+}
+
+.nb-selection-container {
+
+  padding-bottom: 12px;
+  transition: .3s opacity;
+
+  &.showable {
+    height: 0;
+    display: block;
+    opacity: 0;
+  }
+
+  &.showable.drishy {
+    height: auto;
+    position: static;
+    opacity: 1;
+  }
+
+  & > label {
+    display: block;
+    padding-bottom: 4px;
+  }
+
 }
 
 .link {
@@ -656,7 +719,6 @@ i {
 }
 
 #merchant-desc {
-  white-space: pre;
   text-overflow: ellipsis;
   overflow: hidden;
   opacity: 0.8;
@@ -956,16 +1018,12 @@ $outline = #ddd;
       cursor: pointer;
       position: relative;
 
-      svg {
+      > span.offer-icon {
 
-        display: inline-block;
-        height: 16px;
-        width: auto;
-        margin-right: 8px;
-        fill: currentColor;
         position: absolute;
-        top: 50%;
-        transform: translate(0, -50%);
+        font-size: 20px;
+        transform: translate(-4px, 21px);
+        line-height: 0
       }
 
       .select-offer, .selected-offer {
@@ -1462,6 +1520,20 @@ $outline = #ddd;
   }
 }
 
+#container {
+
+  #body[tab=netbanking] {
+    height: 374px;
+  }
+
+  #body[tab=emandate] {
+    .nb-selection-container {
+      display: none;
+    }
+  }
+
+}
+
 #body[screen=card] #footer {
   z-index: 98;
 }
@@ -1658,7 +1730,7 @@ $outline = #ddd;
   margin-bottom: 21px;
 }
 
-#container.no-details, #container.extra.show-methods {
+#container.no-details:not(.partial), #container.extra.show-methods {
   #pad-common + div {
     display: block;
   }
@@ -1676,6 +1748,24 @@ $outline = #ddd;
   .legend {
     text-align: left;
   }
+}
+
+#container.no-details.partial {
+  #pad-common > .elem-wrap {
+    display: none;
+  }
+  #form-common {
+    padding-top: 4px;
+
+    .legend {
+      margin: 5px 0 0;
+    }
+  }
+}
+
+#container #payment-options .payment-option.item .tez-icon {
+  margin: -9px auto 0 auto;
+  font-size: 32px;
 }
 
 #container.emandate, #container.no-details, #container.extra.show-methods {
@@ -1707,12 +1797,19 @@ $outline = #ddd;
         line-height: 30px;
         min-width: 27px;
       }
+      .tez-icon {
+        width: 32px
+        height: 32px;
+        margin-top: -2px;
+        margin-left: 12px;
+      }
       &+.item {
         border-top: 1px solid $bc;
       }
     }
   }
 }
+
 
 #container.emandate {
   #payment-options, #emandate-options {
@@ -1729,10 +1826,19 @@ $outline = #ddd;
   }
 }
 
-#partial-select-partial + .checkbox {
+#minimum-amount-select + .checkbox {
   float: left;
   top: 1px;
   margin-right: 8px;
+}
+
+.minimum-amount-select {
+  margin: 12px 0 10px 26px;
+  display: none;
+}
+
+#partial-select-partial:checked + label .minimum-amount-select {
+  display: block;
 }
 
 #partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {

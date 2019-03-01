@@ -6,16 +6,10 @@
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
   <script src="config.js"></script>
+  <script src="api.js"></script>
   <!-- build:js checkout.js -->
-  <script src="js/generated/entry/checkout.js"></script><!--coverage-->
-  <!-- test scripts
-  <script src="../test/unit/base.js"></script>
-  <script src="../test/unit/checkout/open.js"></script>
-  <script src="../test/unit/checkout/automatic-checkout.js"></script>
-  <script src="../test/unit/checkout/iframe-dom.js"></script>
-  -->
+  <script src="js/generated/entry/checkout.js"></script>
   <!-- endbuild -->
-
 </head>
 <body>
   <div id="x" style='height: 90vh; background: #fff; color: #fff'>
@@ -34,26 +28,34 @@
     }
 
     var options = {
-      // 'key': 'rzp_live_ILgsfZCZoFIKMb',
-      'key': 'rzp_test_1DP5mmOlF5G5ag',
-      // 'key': 'rzp_live_gC8obGlwaRlyui',
-      'amount': 6000*100,
-      'name': searchParams.get("name") || 'Innerchef',
-      'description': searchParams.get("description") || 'JEE Main & Advanced',
-      'image': 'http://i.imgur.com/n5tjHFD.png',
-      'handler': function (transaction){
-        alert("You have successfully purchased " + options.description);
-      },
-      'method': {
+      // key: 'rzp_live_ILgsfZCZoFIKMb',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+
+      name: searchParams.get('name') || 'Innerchef',
+      description: searchParams.get('description') || 'JEE Main & Advanced',
+      image: 'http://i.imgur.com/n5tjHFD.png',
+
+      amount: 6000 * 100,
+
+      // order_id: api.createOrder(),
+
+      // callback_url: 'http://google.com',
+      // redirect: true,
+
+      // display_amount: '12.23',
+      // display_currency: 'SGD',
+
+      handler: function(o) { alert(JSON.stringify(o, null, 2)) },
+
+      method: {
         netbanking: true,
-        // wallet: {
-        //   paytm: false
-        // },
         card: true
       },
-      'theme': {
-        color: searchParams.get("color")
+
+      theme: {
+        color: searchParams.get('color')
       },
+
       // parent: '#x',
       remember_customer: true,
       external: {
@@ -62,26 +64,18 @@
           console.log(this, data);
         }
       },
-      // callback_url: 'http://google.com',
-      // redirect: true,
-      // display_amount: '12.23',
-      // display_currency: 'SGD',
-      'prefill': {
-        'name': 'Harshil \"Mathur',
-        'email': 'harshil@razorpay.com',
-        'contact': '18002700323',
+
+      prefill: {
+        name: 'Harshil \"Mathur',
+        email: 'harshil@razorpay.com',
+        contact: '8888888888',
         'card[number]': '4111 1111 1111 1111',
         'card[expiry]': '11 / 23',
-      },
-      // customer_id: 'cust_5rZjWeKfUdrIfG',
-      // recurring: false,
-      // order_id: 'order_5ZfJcdMfBYoZ3n',
-      notes: {
-        'address': 'Hello World'
+        'card[cvv]': '123'
       },
       modal: {
-        ondismiss: function(){console.log(1)},
-        onhidden: function(){console.log(2)}
+        ondismiss: function(){ console.log(1) },
+        onhidden: function(){ console.log(2) }
       }
     }
     var rzp1 = new Razorpay(options);

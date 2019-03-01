@@ -80,7 +80,7 @@ export const formatPayment = function(payment) {
   }
 
   // api needs this flag to decide between redirect/otp
-  if (payment.powerwallet && data.method === 'wallet') {
+  if (payment.avoidPopup && data.method === 'wallet') {
     data['_[source]'] = 'checkoutjs';
   }
 

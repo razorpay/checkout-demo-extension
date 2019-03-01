@@ -1,4 +1,7 @@
 `
+var getStore = arguments[1];
+var optional = getStore('optional');
+var contactEmailOptional = getStore('contactEmailOptional');
 var o = _.get;
 var ecod = o('ecod');
 var address = o('address');
@@ -19,25 +22,22 @@ var walletsDesc = _.walletsDesc;
 
 var bank = _.tpvBank || {};
 var emi_options = _.emi_options;
-
-var aadhaarVid = o('prefill.aadhaar[vid]');
 var accountName = o('prefill.bank_account[name]');
 
 var amount;
-var amount_figure = _.formatAmount(o('amount'));
+var amount_figure = _.formatAmountWithCurrency(o('amount'));
+var firstPaymentMinAmount = _.formatAmountWithCurrency(order.first_payment_min_amount);
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
-else if (o('currency')==='INR')
-  amount = "&#x20B9;<span class='amount-figure'>" + amount_figure + "</span>";
 else
-  amount = discreet.currencies[o('currency')] + amount_figure;
+  amount = amount_figure;
 
 var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
 var prefill_name = attr(o('prefill.name'));
 
-var contact_hidden = o('hidden.contact') && _.optional.contact;
-var email_hidden = o('hidden.email') && _.optional.email;
+var contact_hidden = o('hidden.contact') && optional.contact;
+var email_hidden = o('hidden.email') && optional.email;
 
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
@@ -120,7 +120,7 @@ var upi_apps = _.upi_intents_data;
           <div id="messages"></div>
           <div id="partial-back" class="theme-secondary-highlight"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar" class="theme-secondary-highlight">
-            <div id="top-right">
+            <div id="top-right" class="`?optional.contact`hidden`?`">
               <div id="user"></div>
               <div id='profile'><li>Log out</li><li>Log out from all devices</li></div>
             </div>
@@ -137,24 +137,55 @@ var upi_apps = _.upi_intents_data;
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!_.optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
+                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
                   </div></div>
                   <div class="elem-wrap`?email_hidden` invisible`?`" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
                     <i>&#xe603;</i>
                     <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
-                    <label>Email`?_.optional.email` (Optional)`?`</label>
-                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!_.optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
+                    <label>Email`?optional.email` (Optional)`?`</label>
+                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
                   </div></div>
                   `?order.partial_payment`
-                  <br>
-                  <label class="partial-label" for="partial-select-partial">Make payment in parts</label>
-                  <input type="checkbox" class="checkbox--square" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
-                  <label class="checkbox" for="partial-select-partial"></label>
-                  <div class="elem-wrap" id="elem-wrap-amount" style="height: auto"><div class="elem elem-amount">
-                    <input class="input" name="amount" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
-                    <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
-                  </div></div>
-                  <label class="subtitle subtitle--help">Pay some amount now and remaining later.</label>
+                  `?contactEmailOptional`
+                  <div class="legend">Select a payment type</div>
+                  `?`
+
+                  <div id='partial-list' class="list collapsable">
+                    `?contactEmailOptional`
+                    <div class="item">
+                      <input type="radio" name="partial_payment" value="pay_full" id="partial-full">
+                      <label for="partial-full">
+                        <span class="checkbox"></span>
+                        Pay in full
+                      </label>
+                    </div>
+                    `?`
+                    <div id="partial-radio" class="item">
+                      <input type="`?contactEmailOptional`radio`??`checkbox`?`" name="partial_payment" value="pay_parts" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
+                      <label for="partial-select-partial">
+                        <span class="checkbox"></span>
+                        Make payment in parts
+                        <div class="elem-wrap collapsable-content" id="elem-wrap-amount" style="height: 38px"><div class="elem elem-amount">
+                          <input class="input" name="amount" type="tel" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
+                          <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
+                        </div></div>
+
+                        `?(order.partial_payment && !!order.first_payment_min_amount && Number(order.amount_paid) === 0)`
+                          <div class="minimum-amount-select">
+                            <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
+                            <div class="checkbox inner-checkbox" for="minimum-amount-select"></div>
+                            <label class="partial-label" for="minimum-amount-select">
+                              `=html(o('min_amount_label') || 'Minimum Amount Due')` (`=html(firstPaymentMinAmount)`)
+                            </label>
+                          </div>
+                        `?`
+
+                        `?(order.partial_payment && (!order.first_payment_min_amount || Number(order.amount_paid) !== 0))`
+                          <div class="subtitle subtitle--help">Pay some amount now and remaining later.</div>
+                        `?`
+                      </label>
+                    </div>
+                  </div>
 
                   `?`
                   `?address&&!order.partial_payment`
@@ -221,16 +252,10 @@ var upi_apps = _.upi_intents_data;
                           <div>`=accountName`</div>
                         </div>
                       `?`
-                      `?_.optional.contact && _.optional.email && bank.ifsc`
+                      `?contactEmailOptional && bank.ifsc`
                         <div class="account-details clearfix">
                           <div>IFSC code</div>
                           <div class="text-uppercase">`=bank.ifsc`</div>
-                        </div>
-                      `?`
-                      `?aadhaarVid`
-                        <div class="account-details clearfix">
-                          <div>Aadhaar VID</div>
-                          <div>`=aadhaarVid`</div>
                         </div>
                       `?`
                     </div>
@@ -339,6 +364,15 @@ var upi_apps = _.upi_intents_data;
                       </label>
                     </div>
                     `?`
+                    `?method.tez`
+                    <div class="payment-option item" tab="tez">
+                      <label>
+                        <i class="tez-icon"></i>
+                        `=_.tab_titles.tez`
+                        <span class="desc">Instant payment using Google Pay App</span>
+                      </label>
+                    </div>
+                    `?`
                     `?method.emi || method.cardless_emi`
                       <div class="payment-option item" tab="`?method.cardless_emi`cardless_emi`??`emi`?`">
                         <label>
@@ -406,7 +440,7 @@ var upi_apps = _.upi_intents_data;
                         <span class="help">Please enter name on your card</span>
                         <label>Card Holder's Name</label>
                         <i>&#xe602;</i>
-                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$" `?name_readonly`readonly`?`>
+                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9'-]{1,100}$" `?name_readonly`readonly`?`>
                       </div></div>
                       <div class="elem-wrap third"><div class="elem elem-cvv mature">
                         <label>CVV</label>
@@ -539,6 +573,24 @@ var upi_apps = _.upi_intents_data;
                         `~`
                       </select>
                     </div></div>
+                    <div class="nb-selection-container showable pad">
+                      <label>Complete Payment Using</label>
+                      <div class="input-radio">
+                        <input type="radio" id="nb_type_retail" value="retail" class="nb-type">
+                        <label for="nb_type_retail">
+                          <div class="radio-display"></div>
+                          <div class="label-content">Retail</div>
+                        </label>
+                      </div>
+
+                      <div class="input-radio">
+                        <input type="radio" id="nb_type_corporate" value="corporate" class="nb-type">
+                        <label for="nb_type_corporate">
+                          <div class="radio-display"></div>
+                          <div class="label-content">Corporate</div>
+                        </label>
+                      </div>
+                    </div>
                     <div class="down">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.351 6.493c-.08-.801.55-1.493 1.351-1.493s1.431.692 1.351 1.493l-.801 8.01c-.029.282-.266.497-.55.497s-.521-.215-.55-.498l-.801-8.009zm1.351 12.757c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
                       <span class="text">
@@ -751,7 +803,7 @@ var upi_apps = _.upi_intents_data;
                     <span style='border-bottom: 1px dashed #ddd'>`=invoice.url`</span>
                     `?_.epos_share_link`
                       <a id="share-link" class="btn"
-                        href="rzp://rzp.io/invoice/share/`=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)`">
+                        href="rzp://rzp.io/invoice/share/`=encodeURIComponent('Razorpay has requested payment of ' + amount_figure + '. Open following link to pay:\n' + invoice.url)`">
                         Share Link
                       </a>
                     `?`
@@ -799,5 +851,4 @@ var upi_apps = _.upi_intents_data;
       </div>
     </div>
   </div>
-  <a href="https://resident.uidai.gov.in/web/resident/vidgeneration" target="_blank" id="aadhaar_vid_link" class="hidden"></a>
 </div>

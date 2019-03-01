@@ -7,6 +7,7 @@ module.exports = {
       options: {
         key: 'm1key',
         remember_customer: false,
+        nativeotp: false,
       },
     }),
 };

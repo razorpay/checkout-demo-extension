@@ -33,13 +33,10 @@ otpView.prototype = {
   },
 
   updateScreen(updateProps) {
-    const store = Store.get();
+    const screenData = Store.get().screenData;
 
-    store.screenData[SCREEN] = _Obj.extend(
-      store.screenData[SCREEN],
-      updateProps
-    );
+    screenData[SCREEN] = _Obj.extend(screenData[SCREEN], updateProps);
 
-    Store.set(store);
+    Store.set({ screenData });
   },
 };

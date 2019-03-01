@@ -1,9 +1,11 @@
 import { displayAmount } from 'common/currency';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 const CLASS_IFRAME_ACTIVE = 'iframe-active';
 
 const frameHtml = (amount, title) => `<div class='iframe-title'>
-<b class='iframe-close'>&#xe604;</b> ${title}
+<b class='iframe-close'>&#xe604;</b> ${title || 'Payment'}
 <b class='iframe-amount'>${amount}</b>
 </div>
 <iframe></iframe>`;
@@ -24,12 +26,17 @@ export default function Iframe(src, name, payment) {
     )
     |> _El.appendTo(_Doc.querySelector('#modal-inner'));
 
+  Analytics.track('iframe:create');
+
   this.window =
     this.el.querySelector('iframe').contentWindow |> _Obj.setProp('name', name);
 
   const closeListener =
     _Doc.querySelector('.iframe-close')
     |> _El.on('click', () => {
+      Analytics.track('iframe:cancel:click', {
+        type: AnalyticsTypes.BEHAV,
+      });
       if (global.confirm('Do you want to cancel this payment?')) {
         this.close();
         this.payment.emit('cancel');
@@ -56,6 +63,9 @@ Iframe.prototype = {
       this.listeners = [];
       this.el |> _El.detach;
       _Doc.querySelector('#modal') |> _El.removeClass(CLASS_IFRAME_ACTIVE);
+
+      Analytics.track('iframe:close');
+      Analytics.removeMeta('iframe', false);
     }
   },
 
@@ -72,5 +82,8 @@ Iframe.prototype = {
 
     modalEl |> _El.offsetHeight;
     modalEl |> _El.addClass(CLASS_IFRAME_ACTIVE);
+
+    Analytics.track('iframe:show');
+    Analytics.setMeta('iframe', true);
   },
 };

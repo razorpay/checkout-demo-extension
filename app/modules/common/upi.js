@@ -409,3 +409,16 @@ export const getNumberOfAppsByCategory = allApps => {
 
   return count;
 };
+
+/**
+ * Track failure of UPI intent.
+ *
+ * @param {String} packageName
+ */
+export const trackUPIIntentFailure = packageName => {
+  Analytics.track('upi:app:intent:cancel', {
+    data: {
+      package_name: packageName,
+    },
+  });
+};

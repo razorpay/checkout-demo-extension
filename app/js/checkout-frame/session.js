@@ -14,7 +14,8 @@ var preferences = window.preferences,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_PATTERN,
   emailPattern = Constants.EMAIL_PATTERN,
-  ua_Android = discreet.androidBrowser,
+  ua_Android = discreet.UserAgent.androidBrowser,
+  isMobile = discreet.UserAgent.isMobile,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
@@ -27,6 +28,25 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
+
+function getStore(prop) {
+  return discreet.Store.get()[prop];
+}
+
+function gotoAmountScreen() {
+  discreet.Store.set({ screen: 'amount' });
+}
+
+function shouldEnableP13n(keyId) {
+  if (
+    keyId === 'rzp_live_Oeieme2CjQmyTQ' ||
+    keyId === 'rzp_live_ILgsfZCZoFIKMb'
+  ) {
+    return true;
+  }
+
+  return /^rzp_live_[0-9a-z]/.test(keyId);
+}
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -102,6 +122,34 @@ var CardlessEmiStore = {
   ott: {},
 };
 
+function initIosQuirks() {
+  if (discreet.UserAgent.iPhone) {
+    /**
+     * Shift the pay button if the height is low.
+     */
+    setTimeout(function() {
+      if (window.innerHeight <= 512) {
+        $('#footer').addClass('shift-ios');
+      }
+    }, 1000);
+
+    if (discreet.UserAgent.Safari) {
+      window.addEventListener('resize', function() {
+        if (window.innerHeight > 550) {
+          return;
+        }
+
+        // Shift pay button
+        if (window.screen.height - window.innerHeight >= 56) {
+          $('#footer').addClass('shift-ios');
+        } else {
+          $('#footer').removeClass('shift-ios');
+        }
+      });
+    }
+  }
+}
+
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
 }
@@ -115,6 +163,58 @@ function fillData(container, returnObj) {
       returnObj[el.name] = el.value;
     }
   });
+}
+
+/**
+ * Returns a bank code with suffixes(_C, _R) removed.
+ * @param {String} bankCode
+ */
+function normalizeBankCode(bankCode) {
+  return bankCode.replace(/_[CR]$/, '');
+}
+
+/**
+ * Returns the code for retail option corresponding to `bankCode`. Looks for
+ * {bankCode} and {bankCode}_R in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+function getRetailOption(bankCode, banks) {
+  var normalizedBankCode = normalizeBankCode(bankCode);
+  var retailBankCode = normalizedBankCode + '_R';
+  if (banks[normalizedBankCode]) {
+    return normalizedBankCode;
+  }
+  return banks[retailBankCode] && retailBankCode;
+}
+
+/**
+ * Returns the code for corporate option corresponding to `bankCode`. Looks for
+ * {bankCode}_C in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+function getCorporateOption(bankCode, banks) {
+  var normalizedBankCode = normalizeBankCode(bankCode);
+  var corporateBankCode = normalizedBankCode + '_C';
+  return banks[corporateBankCode] && corporateBankCode;
+}
+
+/**
+ * Fills the corporate/retail radio button labels with bank names
+ * @param {String} corporateBankName the label for corporate radio
+ * @param {String} retailBankName the label for retail radio
+ */
+function fillBankRadios(corporateBankName, retailBankName) {
+  $('.nb-selection-container label[for=nb_type_retail] .label-content').html(
+    retailBankName
+  );
+
+  $('.nb-selection-container label[for=nb_type_corporate] .label-content').html(
+    corporateBankName
+  );
 }
 
 /**
@@ -273,37 +373,6 @@ function showAppropriateEmiDetailsForNewCard(
       emiPlanDetailsContainer.removeClass('details-visible');
     }
   }
-}
-
-function selectElementText(el) {
-  var win = window;
-  var doc = win.document,
-    sel,
-    range;
-  if (win.getSelection && doc.createRange) {
-    sel = win.getSelection();
-    range = doc.createRange();
-    range.selectNodeContents(el);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else if (doc.body.createTextRange) {
-    range = doc.body.createTextRange();
-    range.moveToElementText(el);
-    range.select();
-  }
-}
-
-function copyToClipboardListener(e) {
-  var btn = e.delegateTarget;
-  var parent = btn.parentNode;
-  var text = $(parent).find('.copytoclipboard--text')[0];
-
-  selectElementText(text);
-  try {
-    document.execCommand('copy');
-    $(parent).addClass('copied');
-    $(parent).find('.copytoclipboard--label')[0].innerHTML = 'Copied';
-  } catch (err) {}
 }
 
 function setEmiBank(data, savedCardScreen) {
@@ -567,7 +636,8 @@ function errorHandler(response) {
       // prevent payment canceled error
       this.powerwallet = null;
       return;
-    } else if (this.get('flashcheckout') && this.tab === 'card') {
+    } else if (this.nativeotp && this.tab === 'card') {
+      Analytics.removeMeta('headless');
       return;
     }
   }
@@ -667,8 +737,13 @@ function cancelHandler(response) {
   this.magic = false;
 
   Analytics.setMeta('payment.cancelled', true);
+  Analytics.removeMeta('headless');
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
+    if (this.r._payment && this.r._payment.upi_app) {
+      discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
+    }
+
     this.showLoadError('Payment did not complete.', true);
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
@@ -694,7 +769,9 @@ function elfShowOTP(otp, sender, bank) {
 function askOTP(view, text) {
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
-  var $resendBtn = $('#otp-resend').removeClass('hidden');
+  var thisSession = SessionManager.getSession();
+  var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
+
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
@@ -712,14 +789,16 @@ function askOTP(view, text) {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: true,
+    allowSkip: !Boolean(thisSession.recurring),
+    allowResend: true,
   });
 
   $('#body').addClass('sub');
+
   if (!text) {
-    var thisSession = SessionManager.getSession();
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
-      if (thisSession.headless) {
+      if (thisSession.headless || isMagicPayment) {
+        Analytics.track('headless:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata && origText.metadata.issuer) {
@@ -728,16 +807,28 @@ function askOTP(view, text) {
               '<img class="headless-bank" src="' + bankLogo + '">';
           }
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
-            $resendBtn.addClass('hidden');
+            view.updateScreen({
+              allowResend: false,
+            });
           }
-          thisSession.closeAt = now() + 3 * 60 * 1000;
-          thisSession.showTimer(function() {
-            thisSession.hideTimer();
-            thisSession.back(true);
-            setTimeout(function() {
-              thisSession.showLoadError('Payment was not completed on time', 1);
-            }, 300);
+
+          view.updateScreen({
+            skipText: "Complete on bank's page",
           });
+          if (!thisSession.get('timeout')) {
+            thisSession.closeAt = now() + 3 * 60 * 1000;
+            thisSession.showTimer(function() {
+              thisSession.hideTimer();
+              thisSession.back(true);
+              setTimeout(function() {
+                Analytics.track('headless:timeout');
+                thisSession.showLoadError(
+                  'Payment was not completed on time',
+                  1
+                );
+              }, 300);
+            });
+          }
         }
       } else {
         text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
@@ -751,6 +842,7 @@ function askOTP(view, text) {
       text = 'An OTP has been sent on<br>' + getPhone();
     }
   }
+
   setOtpText(view, text);
 }
 
@@ -807,6 +899,7 @@ function Session(message) {
   });
 
   this.ua_Android = ua_Android;
+  this.isMobile = isMobile;
 
   if (this.embedded) {
     $(doc).addClass('embedded');
@@ -821,12 +914,24 @@ function Session(message) {
 }
 
 Session.prototype = {
+  nativeOtpPossible: function() {
+    var optionPresent = this.get('nativeotp');
+    var randomness = Math.random() < 0.5;
+
+    var key = this.get('key');
+    if (key === 'rzp_live_ILgsfZCZoFIKMb') {
+      return true;
+    }
+
+    return optionPresent && key && /[a-z0-9]/.test(key.slice(-1)) && randomness;
+  },
+
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
-    return (amount / 100)
-      .toFixed(2)
-      .replace(/(.{1,2})(?=.(..)+(\...)$)/g, '$1,')
-      .replace('.00', '');
+    var displayCurrency = this.r.get('display_currency');
+    var currency = this.r.get('currency');
+
+    return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
   formatAmountWithCurrency: function(amount) {
     var discountAmount = amount,
@@ -837,9 +942,6 @@ Session.prototype = {
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
       discountAmount = discreet.currencies[displayCurrency] + discountAmount;
-    } else if (this.r.get('currency') === 'INR') {
-      discountAmount =
-        "&#x20B9;<span class='amount-figure'>" + discountFigure + '</span>';
     } else {
       discountAmount = discreet.currencies[currency] + discountFigure;
     }
@@ -850,21 +952,24 @@ Session.prototype = {
   data: emo,
   params: emo,
 
+  /**
+   * Update the amount in header.
+   *
+   * @param {Number} amount
+   */
+  updateAmountInHeader: function(amount) {
+    $('#amount .original-amount').rawHtml(
+      this.formatAmountWithCurrency(amount)
+    );
+  },
+
   track: function(event, extra) {
     Track(this.r, event, extra);
   },
 
   getClasses: function() {
     var classes = [];
-    if (
-      window.innerWidth < 450 ||
-      shouldFixFixed ||
-      (window.matchMedia &&
-        matchMedia(
-          '@media (max-device-height: 450px),(max-device-width: 450px)'
-        ).matches)
-    ) {
-      this.isMobile = true;
+    if (isMobile) {
       classes.push('mobile');
     }
 
@@ -889,7 +994,7 @@ Session.prototype = {
 
     var key = getter('key');
     if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      if (preferences.order && preferences.order.partial_payment) {
+      if (getStore('isPartialPayment')) {
         classes.push('extra');
       } else {
         classes.push('address extra');
@@ -897,10 +1002,18 @@ Session.prototype = {
       setter('address', true);
     }
 
-    if (IRCTC_KEYS.indexOf(key) !== -1) {
+    if (getStore('isPartialPayment')) {
+      classes.push('partial');
+    }
+
+    if (getStore('contactEmailOptional')) {
+      classes.push('no-details');
+    }
+
+    if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
-      this.irctc = true;
+      classes.push('long');
       this.r.set('theme.image_frame', false);
     }
 
@@ -943,7 +1056,7 @@ Session.prototype = {
       classes.push('ip');
     }
 
-    if (this.extraFields) {
+    if (getStore('isPartialPayment')) {
       classes.push('extra');
     }
 
@@ -961,12 +1074,8 @@ Session.prototype = {
   getEl: function() {
     var r = this.r;
     if (!this.el) {
-      if (
-        this.order &&
-        this.order.partial_payment &&
-        !r.get('prefill.amount')
-      ) {
-        this.extraFields = true;
+      if (getStore('isPartialPayment')) {
+        gotoAmountScreen();
       }
 
       var classes = this.getClasses();
@@ -981,7 +1090,7 @@ Session.prototype = {
       }
       var div = document.createElement('div');
       var styleEl = this.renderCss();
-      div.innerHTML = templates.modal(this);
+      div.innerHTML = templates.modal(this, getStore);
       this.el = div.firstChild;
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
@@ -1014,7 +1123,7 @@ Session.prototype = {
     var tab = oldMethod || this.get('prefill.method');
 
     if (tab) {
-      var optional = this.optional;
+      var optional = getStore('optional');
       var prefill = {
         email: this.get('prefill.email'),
         contact: this.get('prefill.contact'),
@@ -1162,6 +1271,11 @@ Session.prototype = {
 
         var abortPaymentOnUPIIntentFailure = function() {
           self.ajax.abort();
+
+          if (self.r._payment && self.r._payment.upi_app) {
+            discreet.UPIUtils.trackUPIIntentFailure(self.r._payment.upi_app);
+          }
+
           self.showLoadError('Payment did not complete.', true);
           self.clearRequest({
             '_[method]': 'upi',
@@ -1202,6 +1316,8 @@ Session.prototype = {
       this.preferences.features &&
       this.preferences.features.google_pay;
 
+    this.tezMode = 'desktop';
+
     if (this.preferences.fee_bearer) {
       return;
     }
@@ -1214,14 +1330,12 @@ Session.prototype = {
       return;
     }
 
-    this.tezMode = 'desktop';
-
     var $upiForm = $('#form-upi'),
       $tezUPIForm = $('#upi-tez');
 
     $upiForm.addClass('show-tez');
 
-    Tez.check(function() {
+    this.r.isTezAvailable(function() {
       self.tezMode = 'mobile';
       /* This is success callback */
       $tezUPIForm.removeClass('tez-desktop');
@@ -1247,16 +1361,23 @@ Session.prototype = {
     }
 
     if (this.upi_intents_data) {
-      /**
-       * We need to show "(Recommended)" string alongside the app name
-       * when there is only 1 preferred app, and 1 or more other apps.
-       */
-      var count = discreet.UPIUtils.getNumberOfAppsByCategory(
-        this.upi_intents_data
-      );
+      /* disable intent if fee_bearer */
 
-      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
-        this.showRecommendedUPIApp = true;
+      if (this.preferences.fee_bearer) {
+        delete this.upi_intents_data;
+        delete this.all_upi_intents_data;
+      } else {
+        /**
+         * We need to show "(Recommended)" string alongside the app name
+         * when there is only 1 preferred app, and 1 or more other apps.
+         */
+        var count = discreet.UPIUtils.getNumberOfAppsByCategory(
+          this.upi_intents_data
+        );
+
+        if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+          this.showRecommendedUPIApp = true;
+        }
       }
     }
 
@@ -1277,6 +1398,8 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setP13n();
+    initIosQuirks();
+
     errorHandler.call(this, this.params);
 
     var hasOffers = this.hasOffers,
@@ -1377,7 +1500,10 @@ Session.prototype = {
   },
 
   setP13n: function() {
-    if (this.get('flashcheckout') && this.get().personalization !== false) {
+    if (
+      shouldEnableP13n(this.get('key')) &&
+      this.get().personalization !== false
+    ) {
       this.set('personalization', true);
     }
 
@@ -1388,8 +1514,8 @@ Session.prototype = {
     if (
       this.hasOffers ||
       this.oneMethod ||
-      this.optional.contact ||
-      this.extraFields ||
+      getStore('optional').contact ||
+      getStore('isPartialPayment') ||
       this.tpvBank ||
       this.upiTpv ||
       this.multiTpv
@@ -1402,21 +1528,26 @@ Session.prototype = {
         target: '#methods-list',
         data: {
           session: this,
+          animate: false,
         },
       });
+
+      Analytics.track('p13n:set');
     }
   },
 
   showTimer: function(cb) {
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
     this.hideTimer();
     var timeLeft = this.closeAt - now();
     var timeoutEl = $('#timeout').show()[0];
     $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if (this.headless) {
+    if ((this.headless || isMagicPayment) && !this.get('timeout')) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
-    } else if (this.isMobile) {
+    } else if (isMobile) {
       var modalEl = gel('modal');
       modalEl.insertBefore(timeoutEl, modalEl.firstChild);
     }
@@ -1541,7 +1672,7 @@ Session.prototype = {
               return;
             }
 
-            $('#form-cardless_emi input[name=emi_duration').val('');
+            $('#form-cardless_emi input[name=emi_duration]').val('');
             $('#form-cardless_emi input[name=provider]').val('');
             $('#form-cardless_emi input[name=ott]').val('');
 
@@ -1635,7 +1766,7 @@ Session.prototype = {
         }),
 
         select: function(value) {
-          $('#form-cardless_emi input[name=emi_duration').val(value);
+          $('#form-cardless_emi input[name=emi_duration]').val(value);
           $('#form-cardless_emi input[name=provider]').val(
             CardlessEmiStore.providerCode
           );
@@ -1710,7 +1841,8 @@ Session.prototype = {
       {
         provider: providerCode,
         amount: self.get('amount'),
-      }
+      },
+      getPhone()
     );
 
     Analytics.track('cardless_emi:plans:fetch:start', {
@@ -1740,10 +1872,11 @@ Session.prototype = {
 
   setMagic: function() {
     if (!this.magicView && this.magic) {
+      var MagicView = discreet.MagicView;
       $(this.el).addClass('magic');
-      this.magicView = new magicView(this);
-      this.magicView.setTimeout(TIMEOUT_MAGIC_NO_ACTION, {
-        timeout: TIMEOUT_MAGIC_NO_ACTION,
+      this.magicView = new MagicView(this);
+      this.magicView.setTimeout(Constants.TIMEOUT_MAGIC_NO_ACTION, {
+        timeout: Constants.TIMEOUT_MAGIC_NO_ACTION,
         type: 'magic_no_action',
       });
     }
@@ -1799,12 +1932,6 @@ Session.prototype = {
   },
 
   improvisePaymentOptions: function() {
-    if (this.optional.contact) {
-      if (this.optional.email) {
-        $(this.el).addClass('no-details');
-      }
-      $('#top-right').hide();
-    }
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
@@ -1982,17 +2109,26 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    if (this.headless) {
-      this.showLoadError('Resending OTP');
-      this.hideTimer();
-      return this.r.resendOTP(this.r.emitter('payment.otp.required'));
+    var isMagicPayment = this.r._payment && this.r._payment.isMagicPayment;
+
+    if (isMagicPayment) {
+      return this.magicView.resendOtp();
     }
+
     Analytics.track('otp:resend', {
       type: AnalyticsTypes.BEHAV,
       data: {
         wallet: this.tab === 'wallet',
+        headless: this.headless,
       },
     });
+    if (this.headless) {
+      this.showLoadError('Resending OTP');
+      if (!this.get('timeout')) {
+        this.hideTimer();
+      }
+      return this.r.resendOTP(this.r.emitter('payment.otp.required'));
+    }
 
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'cardless_emi') {
@@ -2008,10 +2144,24 @@ Session.prototype = {
   },
 
   secAction: function() {
-    if (this.headless && this.r._payment) {
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
+    if (isMagicPayment) {
       this.hideTimer();
+      return this.magicView.cancelMagic();
+    }
+
+    if (this.headless && this.r._payment) {
+      if (!this.get('timeout')) {
+        Analytics.track('headless:gotobank', {
+          type: AnalyticsTypes.BEHAV,
+          immediately: true,
+        });
+        this.hideTimer();
+      }
       return this.r._payment.gotoBank();
     }
+    var payload = this.payload;
     Analytics.track('saved_cards:skip', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2020,7 +2170,6 @@ Session.prototype = {
     });
     $('#save').attr('checked', 0);
     this.wants_skip = true;
-    var payload = this.payload;
     if (payload) {
       delete payload.save;
       delete payload.app_token;
@@ -2055,16 +2204,22 @@ Session.prototype = {
     var partialEl = gel('amount-value');
     if (partialEl) {
       var amountValue = partialEl.value;
-      each($$('.amount-figure'), function(i, el) {
-        $(el).html(amountValue);
-      });
+      this.updateAmountInHeader(amountValue);
       var options = this.get();
       options.amount = 100 * amountValue;
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
+      this.setPaymentMethods(this.preferences);
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
+    discreet.Store.set({ screen: '' });
+    if (this.methods.count >= 4) {
+      $(this.el).addClass('long');
+    }
+    if (this.methods.count >= 5) {
+      $(this.el).addClass('x-long');
+    }
   },
 
   /**
@@ -2156,23 +2311,36 @@ Session.prototype = {
     var thisEl = this.el;
     this.click('#partial-back', function() {
       $(thisEl).removeClass('show-methods');
+      gotoAmountScreen();
     });
 
-    this.on('change', '#partial-select-partial', function(e) {
+    this.on('change', 'input[name=partial_payment]', function(e) {
       var parentEle = $('#amount-value').parent();
+      var optionEle = $('.minimum-amount-select');
+      var value = e.target.value;
 
-      if (!e.target.checked) {
+      if (!e.target.checked || value === 'pay_full') {
         var amount = this.order.amount_due;
         $('#amount-value').val(this.getDecimalAmount(amount));
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
         this.get().amount = amount;
-        $('#amount .amount-figure').html(this.formatAmount(amount));
+        this.updateAmountInHeader(amount);
+
+        var minAmountField = gel('minimum-amount-select');
+
+        if (minAmountField) {
+          minAmountField.checked = false;
+        }
 
         var infoEle = $('.partial-payment-block .subtitle--help');
         /* Reset text in info element */
         if (infoEle) {
           infoEle.html('Pay some amount now and remaining later.');
+        }
+        /* Hide keyboard */
+        if (document.activeElement) {
+          document.activeElement.blur();
         }
       } else {
         $('#amount-value').val(null);
@@ -2181,6 +2349,39 @@ Session.prototype = {
         parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
       }
     });
+
+    if (
+      self.order &&
+      self.order.partial_payment &&
+      self.order.first_payment_min_amount &&
+      Number(self.order.amount_paid) === 0
+    ) {
+      this.on('change', '#minimum-amount-select', function(e) {
+        var el_amount = gel('amount-value');
+
+        if (!el_amount) {
+          return;
+        }
+
+        var amount;
+        if (!e.target.checked) {
+          amount = '';
+          el_amount.focus();
+        } else {
+          amount = self.formatAmount(self.order.first_payment_min_amount);
+        }
+
+        el_amount.value = amount;
+
+        if ('createEvent' in document) {
+          var evt = document.createEvent('HTMLEvents');
+          evt.initEvent('change', false, true);
+          el_amount.dispatchEvent(evt);
+        } else {
+          el_amount.fireEvent('onchange');
+        }
+      });
+    }
 
     this.click('#next-button', 'extraNext');
 
@@ -2510,12 +2711,6 @@ Session.prototype = {
     });
     this.click('#fd-hide', this.hideErrorMessage);
 
-    // Copy to clipboard text.
-    this.on('click', '#body', 'copytoclipboard--text', function(e) {
-      selectElementText(e.target);
-    });
-    this.on('click', '#body', 'copytoclipboard--btn', copyToClipboardListener);
-
     this.on('click', '#form-upi.collapsible .item', function(e) {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
@@ -2529,6 +2724,28 @@ Session.prototype = {
         }
       });
     }
+
+    var enabledBanks = this.getEnabledBanks();
+    this.on('click', '.nb-type', function(event) {
+      var selectedBank = $('#bank-select').val();
+      var bankToSet;
+
+      // Uncheck other radios
+      this.clearNetbankingRadio();
+
+      // Check clicked radio
+      event.target.checked = true;
+
+      if (event.target.value === 'corporate') {
+        bankToSet = getCorporateOption(selectedBank, enabledBanks);
+      } else {
+        bankToSet = getRetailOption(selectedBank, enabledBanks);
+      }
+
+      if (bankToSet) {
+        this.setSelectedBank(bankToSet);
+      }
+    });
   },
 
   /**
@@ -2699,47 +2916,73 @@ Session.prototype = {
       delegator.amount = delegator
         .add('amount', el_amount)
         .on('change', function() {
+          var optionEle = $('#minimum-amount-select')[0];
+
+          var firstPaymentMinAmount;
+          if (
+            self.order &&
+            self.order.partial_payment &&
+            self.order.first_payment_min_amount &&
+            Number(self.order.amount_paid) === 0
+          ) {
+            firstPaymentMinAmount = self.order.first_payment_min_amount;
+          }
+
+          if (
+            optionEle &&
+            firstPaymentMinAmount &&
+            Number(self.formatAmount(firstPaymentMinAmount)) !==
+              Number(this.value)
+          ) {
+            optionEle.checked = false;
+          }
+
           self.input(el_amount);
           var value = this.value * 100;
-          var maxAmount = self.order.partial_payment
-            ? self.order.amount_due
-            : self.order.amount;
+          var maxAmount =
+            self.order && self.order.partial_payment
+              ? self.order.amount_due
+              : self.order.amount;
 
-          var isValid = 100 <= value && value <= maxAmount;
+          var minAmount = firstPaymentMinAmount || 100;
+          var isValid = minAmount <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
 
           var amountDue = self.order.amount_due;
-          var amountDueFormatted = self.formatAmount(amountDue);
+          var amountDueFormatted = self.formatAmountWithCurrency(amountDue);
 
           var infoEle = $('.partial-payment-block .subtitle--help');
 
           if (isValid) {
-            $('#amount .amount-figure').html(self.formatAmount(value));
+            self.updateAmountInHeader(value);
 
             // Update the remaining amount being changed
             if (value && gel('partial-select-partial').checked && infoEle) {
-              infoEle.html(
-                'Pay remaining ₹' +
-                  self.formatAmount(amountDue - value) +
+              infoEle.rawHtml(
+                'Pay remaining ' +
+                  self.formatAmountWithCurrency(amountDue - value) +
                   ' later.'
               );
             }
           } else {
             var helpEle = $('#amount-value + .help');
 
-            $('#amount .amount-figure').html(amountDueFormatted); // Update amount is header
+            self.updateAmountInHeader(amountDue);
 
             /* Update tooltip error */
             if (helpEle) {
               if (!value) {
                 // Reset error on no value
-                helpEle.html(
-                  'Please enter a valid amount upto ₹' + amountDueFormatted
+                helpEle.rawHtml(
+                  'Please enter a valid amount upto ' + amountDueFormatted
                 );
               } else if (value > self.order.amount_due) {
-                helpEle.html('Amount cannot exceed ₹' + amountDueFormatted);
-              } else if (value < 100) {
-                helpEle.html('Minimum payable amount is ₹' + 1);
+                helpEle.rawHtml('Amount cannot exceed ' + amountDueFormatted);
+              } else if (value < minAmount) {
+                helpEle.rawHtml(
+                  'Minimum payable amount is ' +
+                    self.formatAmountWithCurrency(minAmount)
+                );
               }
             }
 
@@ -2759,18 +3002,31 @@ Session.prototype = {
           var instruments = [];
           self.input(this.el);
 
+          Analytics.removeMeta('p13n');
+
           if (!self.methodsList) {
             return;
           }
 
           if (this.isValid()) {
             instruments = P13n.listInstruments(getCustomer(this.value)) || [];
+
+            if (instruments.length) {
+              Analytics.track('p13:instruments:fetch', {
+                data: {
+                  length: instruments.length,
+                },
+              });
+
+              Analytics.setMeta('p13n', true);
+            }
           }
 
           self.methodsList.set({
             instruments: instruments,
             customer: getCustomer(this.value),
             tpvBank: this.tpvBank,
+            animate: true,
           });
         });
     }
@@ -2807,6 +3063,27 @@ Session.prototype = {
 
     if (screen !== 'otp') {
       this.headless = false;
+    }
+
+    if (this.separateTez) {
+      if (screen === 'tez' || screen === 'upi') {
+        var tez = false;
+        if (screen === 'tez') {
+          tez = true;
+          screen = 'upi';
+        }
+
+        $('#upi-directpay .checkbox').css('display', 'none');
+        $('#upi-tez .checkbox').css('display', 'none');
+
+        gel('radio-tez').checked = tez;
+        $('#upi-tez').css('display', tez ? 'block' : 'none');
+        $('#upi-tez').toggleClass('expanded', tez);
+
+        gel('radio-directpay').checked = !tez;
+        $('#upi-directpay').toggleClass('expanded', !tez);
+        $('#upi-directpay').css('display', !tez ? 'block' : 'none');
+      }
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -2869,6 +3146,7 @@ Session.prototype = {
     var showPaybtn = screen;
     if (
       screen === 'cardless_emi' ||
+      (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'upi' &&
@@ -2906,6 +3184,12 @@ Session.prototype = {
     this.offers.applyFilter(
       (screen && { payment_method: paymentMethod }) || {}
     );
+
+    // Pre-select offer if there is only one visible offer
+    var defaultOffer = this.offers.defaultOffer;
+    if (defaultOffer && screen) {
+      this.preSelectedOffer = defaultOffer;
+    }
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
@@ -3088,6 +3372,8 @@ Session.prototype = {
       });
     };
 
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
+
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
@@ -3101,7 +3387,8 @@ Session.prototype = {
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
       (this.headless && payment) ||
-      ((thisTab === 'card' || thisTab === 'emi') && /^magic/.test(this.screen))
+      ((thisTab === 'card' || thisTab === 'emi') &&
+        (/^magic/.test(this.screen) || isMagicPayment))
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
@@ -3123,6 +3410,18 @@ Session.prototype = {
       if (this.emiPlansView.back()) {
         return;
       }
+    } else if (
+      /**
+       * If back is pressed from the Card EMI screen,
+       * and cardless EMI is available as a payment method,
+       * take to the Cardless EMI list screen,
+       * which also has the Pay using Card EMI option.
+       */
+      this.screen === 'card' &&
+      this.tab === 'emi' &&
+      this.methods.cardless_emi
+    ) {
+      tab = 'cardless_emi';
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -3181,7 +3480,7 @@ Session.prototype = {
 
       var contact = getPhone();
       if (
-        (!contact && !this.optional.contact) ||
+        (!contact && !getStore('optional').contact) ||
         this.get('method.' + tab) === false
       ) {
         return;
@@ -3224,6 +3523,10 @@ Session.prototype = {
         $('#body').addClass('sub');
       }
     }
+
+    if (!tab && this.multiTpv) {
+      $('#body').addClass('sub');
+    }
   },
 
   showCardTab: function(tab) {
@@ -3264,7 +3567,7 @@ Session.prototype = {
               self.otpView,
               'Enter OTP sent on ' +
                 getPhone() +
-                '<br>to save your Card for future payments'
+                '<br>to save your card for future payments'
             );
           });
         } else if (customer.saved && !customer.logged) {
@@ -3815,18 +4118,48 @@ Session.prototype = {
   },
 
   switchBank: function(e) {
-    var val = e.target.value;
+    var bankCode = e.target.value;
 
     Analytics.track('bank:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        bank: val,
+        bank: bankCode,
       },
     });
 
-    this.checkDown(val);
-    this.checkBankRadio(val);
+    var enabledBanks = this.getEnabledBanks();
+
+    var bankRadioToCheck = bankCode;
+
+    // If both corporate and retail options are available, check retail.
+    if (this.hasMultipleOptions(bankCode)) {
+      bankRadioToCheck = getRetailOption(bankCode, enabledBanks);
+    }
+
+    // Show radio only on netbanking, and not on emandate
+    if (this.screen === 'netbanking') {
+      this.showCorporateNetbankingRadio(bankCode);
+    }
+
+    this.checkDown(bankCode);
+    this.checkBankRadio(bankRadioToCheck);
     this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  /**
+   * Checks whether the given bank has multiple options (Corporate, Retail)
+   * @param bankCode
+   */
+  hasMultipleOptions: function(bankCode) {
+    var enabledBanks = this.getEnabledBanks();
+    var normalizedBankCode = normalizeBankCode(bankCode);
+    // Some retail banks have the suffix _R, while others don't. So we look for
+    // codes both with and without the suffix.
+    var hasRetail =
+      enabledBanks[normalizedBankCode] ||
+      enabledBanks[normalizedBankCode + '_R'];
+    var hasCorporate = enabledBanks[normalizedBankCode + '_C'];
+    return hasRetail && hasCorporate;
   },
 
   /**
@@ -3865,20 +4198,80 @@ Session.prototype = {
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
     }
-    var val = e.target.value;
+    var bankCode = e.target.value;
 
     Analytics.track('bank:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        bank: val,
+        bank: bankCode,
       },
     });
 
-    this.checkDown(val);
-    var select = gel('bank-select');
-    select.value = val;
-    this.input(select);
+    // Show radio only on netbanking, and not on emandate
+    if (this.screen === 'netbanking') {
+      this.showCorporateNetbankingRadio(bankCode);
+    }
+
+    this.checkDown(bankCode);
+    this.setSelectedBank(bankCode);
     this.proceedAutomaticallyAfterSelectingBank();
+  },
+
+  getEnabledBanks: function() {
+    if (this.screen === 'emandate') {
+      return this.methods.emandate || {};
+    }
+    return this.methods.netbanking || {};
+  },
+
+  setSelectedBank: function(bank) {
+    var select = gel('bank-select');
+    select.value = bank;
+    this.input(select);
+  },
+
+  /**
+   * Unchecks all radio buttons for netbanking type selection.
+   */
+  clearNetbankingRadio: function() {
+    each($$('.nb-type'), function(index, el) {
+      el.checked = false;
+    });
+  },
+
+  /**
+   * Shows Corporate/Retail netbanking selection radio buttons on
+   * netbanking screen, only if both options are enabled for the given bank code.
+   * @param {String} bankCode
+   */
+  showCorporateNetbankingRadio: function(bankCode) {
+    var $nbSelectionContainer = $('.nb-selection-container');
+    var enabledBanks = this.getEnabledBanks();
+    var retailBankCode = getRetailOption(bankCode, enabledBanks);
+    var corporateBankCode = getCorporateOption(bankCode, enabledBanks);
+
+    if (this.hasMultipleOptions(bankCode)) {
+      fillBankRadios(
+        enabledBanks[corporateBankCode],
+        enabledBanks[retailBankCode]
+      );
+
+      $nbSelectionContainer.addClass(shownClass);
+
+      // Uncheck all radios
+      this.clearNetbankingRadio();
+
+      // If the selected bank is corporate, i.e. the bank code ends in _C select
+      // the corporate radio option
+      if (/_C$/.test(bankCode)) {
+        $nbSelectionContainer.$('#nb_type_corporate').prop('checked', true);
+      } else {
+        // Else, select the retail radio option
+        $nbSelectionContainer.$('#nb_type_retail').prop('checked', true);
+      }
+    } else {
+      $nbSelectionContainer.removeClass(shownClass);
+    }
   },
 
   /**
@@ -3904,7 +4297,7 @@ Session.prototype = {
         return;
       }
 
-      return this.emandateView.showBankOptions($('#bank-select').val());
+      return this.emandateView.showBankDetailsForm($('#bank-select').val());
     }
   },
 
@@ -3942,6 +4335,10 @@ Session.prototype = {
     if (form === 'emandate') {
       form = 'netbanking';
     }
+
+    if (form === 'tez') {
+      form = 'upi';
+    }
     return '#form-' + form;
   },
 
@@ -3954,21 +4351,19 @@ Session.prototype = {
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
 
-    var optional = this.optional;
+    var optional = getStore('optional');
 
-    if (optional) {
-      if (
-        optional.contact &&
-        !(prefillContact && contactPattern.test(prefillContact))
-      ) {
-        delete data.contact;
-      } else if (data.contact) {
-        data.contact = data.contact.replace(/\ /g, '');
-      }
+    if (
+      optional.contact &&
+      !(prefillContact && contactPattern.test(prefillContact))
+    ) {
+      delete data.contact;
+    } else if (data.contact) {
+      data.contact = data.contact.replace(/\ /g, '');
+    }
 
-      if (optional.email && !(prefillEmail && emailPattern.test(data.email))) {
-        delete data.email;
-      }
+    if (optional.email && !(prefillEmail && emailPattern.test(data.email))) {
+      delete data.email;
     }
 
     if (tab) {
@@ -4026,6 +4421,10 @@ Session.prototype = {
           data.method = 'card';
           delete data.emi_duration;
         }
+      }
+
+      if (data.method === 'tez') {
+        data.method = 'upi';
       }
 
       if (this.screen === 'upi') {
@@ -4234,7 +4633,7 @@ Session.prototype = {
   },
 
   clearRequest: function(extra) {
-    if (this.closeAt) {
+    if (!this.get('timeout') && this.closeAt) {
       this.hideTimer();
       this.closeAt = null;
     }
@@ -4252,6 +4651,9 @@ Session.prototype = {
 
     this.isResumedPayment = false;
     this.doneByP13n = false;
+    this.payload = null;
+
+    Analytics.removeMeta('doneByP13n');
 
     var params = {};
     params[Constants.UPI_POLL_URL] = '';
@@ -4265,7 +4667,8 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    if (this.extraFields && !$(this.el).hasClass('show-methods') && !this.tab) {
+    var storeScreen = getStore('screen');
+    if (storeScreen === 'amount') {
       return this.extraNext();
     }
     if (this.oneMethod && !this.tab) {
@@ -4278,20 +4681,21 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
+    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
     if (!this.tab && !this.order && !this.methodsList) {
       return;
     }
 
-    if (screen === 'otp') {
-      return this.onOtpSubmit();
-    }
-
-    if (/^magic/.test(screen)) {
+    if (/^magic/.test(screen) || isMagicPayment) {
       var magicData = {};
       fillData('#form-' + screen, magicData);
       this.magicView.submit(screen, magicData);
       return;
+    }
+
+    if (screen === 'otp') {
+      return this.onOtpSubmit();
     }
 
     this.refresh();
@@ -4305,12 +4709,25 @@ Session.prototype = {
       delete data.auth_type;
     }
 
+    if (data.partial_payment) {
+      delete data.partial_payment;
+    }
+
     if (!this.recurring && this.order && this.order.bank) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
       data.bank = this.order.bank;
+
+      if (data.method === 'upi' && this.multiTpv) {
+        if (tab !== 'upi') {
+          return this.switchTab('upi');
+        }
+        if (this.checkInvalid('#form-upi input:checked + label')) {
+          return;
+        }
+      }
     } else if (screen) {
       if (screen === 'card') {
         var formattingDelegator = this.delegator;
@@ -4486,7 +4903,7 @@ Session.prototype = {
       fees: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
       magic: this.magic,
-      optional: this.optional || {},
+      optional: getStore('optional'),
     };
 
     if (!this.screen && this.methodsList) {
@@ -4495,8 +4912,14 @@ Session.prototype = {
 
       /* TODO: the following code is the hack for ftx, fix it properly */
       if (this.doneByP13n) {
+        Analytics.setMeta('doneByP13n', true);
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
+        } else if (
+          selectedInstrument.method === 'upi' &&
+          selectedInstrument['_[upiqr]'] === '1'
+        ) {
+          return this.switchTab('qr');
         }
       }
     }
@@ -4602,7 +5025,8 @@ Session.prototype = {
     }
 
     if (data.method === 'card') {
-      if (this.get('flashcheckout')) {
+      this.nativeotp = !!this.nativeOtpPossible();
+      if (this.nativeotp) {
         var cardType;
         if (data.token) {
           if (this.transformedTokens) {
@@ -4616,14 +5040,17 @@ Session.prototype = {
           cardType = this.delegator.card.type;
         }
 
-        if (cardType === 'mastercard' || cardType === 'visa') {
+        if (cardType === 'mastercard') {
           this.headless = true;
+          Analytics.track('headless:attempt');
           this.setScreen('otp');
           $('#otp-sec').html("Complete on bank's page");
           this.r.on('payment.otp.required', function(data) {
             askOTP(that.otpView, data);
           });
+
           request.iframe = true;
+          Analytics.track('iframe:attempt');
         }
       }
     }
@@ -4952,16 +5379,17 @@ Session.prototype = {
     var passedWallets = this.get('method.wallet');
     var self = this;
     var emi_options = this.emi_options;
-    var qrEnabled = this.get('method.qr') || this.get('flashcheckout');
+    var qrEnabled =
+      !getStore('isPartialPayment') &&
+      !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {
-      count: Number(!!qrEnabled),
-      qr: qrEnabled,
+      count: 0,
     });
 
     /* Set recurring payment methods*/
     if (recurring) {
-      availMethods = availMethods.recurring;
+      availMethods = availMethods.recurring || {};
       var banks = {};
 
       /* emandate recurring */
@@ -5107,12 +5535,21 @@ Session.prototype = {
       methods.count++;
     }
 
-    if (methods.emi) {
+    if (methods.emi || methods.cardless_emi) {
       methods.count++;
     }
 
     if (methods.upi) {
       methods.count++;
+      if (qrEnabled) {
+        methods.count++;
+        methods.qr = true;
+      }
+
+      if (this.separateTez) {
+        methods.count++;
+        methods.tez = true;
+      }
     }
 
     /* set external wallets */
@@ -5206,6 +5643,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    discreet.Store.set({ preferences: prefs });
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
@@ -5227,7 +5665,7 @@ Session.prototype = {
     this.setOffers(preferences);
 
     /* Set magic from preferences */
-    this.magic = this.magic && preferences.magic;
+    this.magic = false; //this.magic && preferences.magic;
 
     /* set empty customer in case of local card saving */
     if (preferences.global === false) {
@@ -5240,7 +5678,8 @@ Session.prototype = {
 
     /* In case of recurring set recurring as filter in saved cards */
     if (
-      session_options['prefill.method'] === 'emandate' ||
+      (session_options['prefill.method'] === 'emandate' &&
+        (preferences.methods || {}).recurring) ||
       preferences.subscription ||
       session_options.recurring
     ) {
@@ -5280,14 +5719,11 @@ Session.prototype = {
       session_options.remember_customer = false;
     }
 
-    /* set optional fields */
-    this.optional = arr2obj(preferences.optional);
-
     /* disable cardsaving if cookies disabled or optional contact with no
      * prefill */
     if (
       cookieDisabled ||
-      (this.optional.contact && !session_options['prefill.contact'])
+      (getStore('optional').contact && !session_options['prefill.contact'])
     ) {
       options.remember_customer = false;
     }
@@ -5298,20 +5734,20 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    /* Amount in case of partial payments */
-    var prefillAmount = session_options['prefill.amount'];
-    if (prefillAmount) {
-      session_options.amount = Number(Math.floor(prefillAmount));
-    } else {
-      if (order && order.amount) {
+    if (order) {
+      if (order.amount) {
         session_options.amount = order.partial_payment
           ? order.amount_due
           : order.amount;
-      } else if (invoice && invoice.amount) {
-        session_options.amount = invoice.amount;
-      } else if (subscription && subscription.amount) {
-        session_options.amount = subscription.amount;
       }
+
+      if (order.currency) {
+        session_options.currency = order.currency;
+      }
+    } else if (invoice && invoice.amount) {
+      session_options.amount = invoice.amount;
+    } else if (subscription && subscription.amount) {
+      session_options.amount = subscription.amount;
     }
 
     /*
@@ -5338,6 +5774,11 @@ Session.prototype = {
           fee: preferences.fee_bearer,
         }
       );
+    }
+
+    if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
+      this.irctc = true;
+      this.separateTez = true;
     }
 
     /* set payment methods on the basis of preferences */
@@ -5412,7 +5853,7 @@ Session.prototype = {
       if (response.error) {
         return Razorpay.sendMessage({
           event: 'fault',
-          data: response.error.description,
+          data: response.error,
         });
       }
 

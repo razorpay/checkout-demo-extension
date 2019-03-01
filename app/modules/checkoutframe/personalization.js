@@ -3,6 +3,8 @@
 import { getCustomer } from 'checkoutframe/customer';
 import { getSortedApps } from 'common/upi';
 import Track from 'tracker';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
 
@@ -16,7 +18,7 @@ const INSTRUMENT_PROPS = {
   card: 'token',
   wallet: 'wallet',
   netbanking: 'bank',
-  upi: ['_[flow]', 'vpa', 'upi_app'],
+  upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]'],
 };
 
 const set = (key, data) => {
@@ -45,7 +47,7 @@ const get = key => {
  * @returns {integer | string}
  */
 
-const hashFnv32a = (str, asString = true, seed = 0xdeadc0de) => {
+const hashFnv32a = (str = '', asString = true, seed = 0xdeadc0de) => {
   let i,
     l,
     hval = seed;
@@ -108,6 +110,11 @@ export const processInstrument = (data, extraData) => {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
         let token = _Arr.find(cards, card => card.token === methodData.token);
+
+        if (!token) {
+          return;
+        }
+
         let cardDetails = token.card;
 
         methodData.token_id = token.id;
@@ -187,6 +194,12 @@ export const recordSuccess = customer => {
 
   if (instrument) {
     instrument.success = true;
+
+    Analytics.track('p13n:instrument:success', {
+      data: {
+        instrument,
+      },
+    });
   }
 
   currentUid = null;
@@ -231,6 +244,12 @@ export const listInstruments = customer => {
     currentCustomer,
     (a, b) => (a.score > b.score ? -1 : ~~(a.score < b.score))
   );
+
+  Analytics.track('p13n:instruments:list', {
+    data: {
+      length: currentCustomer.length,
+    },
+  });
 
   return currentCustomer;
 };

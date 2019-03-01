@@ -1,6 +1,6 @@
 import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
-import { iPhone } from 'common/useragent';
+import { iPhone, shouldRedirect } from 'common/useragent';
 import Analytics from 'analytics';
 
 const { screen, scrollTo } = global;
@@ -466,10 +466,32 @@ CheckoutFrame.prototype = {
     this.onhidden();
   },
 
-  onfault: function(message) {
+  onfault: function(data) {
+    let message = 'Something went wrong.';
+
+    if (_.isString(data)) {
+      message = data;
+    } else if (_.isObject(data) && (data.message || data.description)) {
+      message = data.message || data.description;
+    }
+
     Track.flush();
     this.rzp.close();
-    global.alert('Oops! Something went wrong.\n' + message);
+
+    const callbackUrl = this.rzp.get('callback_url');
+    const redirect = this.rzp.get('redirect') || shouldRedirect;
+
+    if (redirect && callbackUrl) {
+      _Doc.submitForm(
+        callbackUrl,
+        {
+          error: data,
+        },
+        'post'
+      );
+    } else {
+      global.alert('Oops! Something went wrong.\n' + message);
+    }
     this.afterClose();
   },
 

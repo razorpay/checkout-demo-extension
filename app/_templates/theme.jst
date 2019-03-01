@@ -141,7 +141,7 @@ color: `=c`;
   border-color: `=highlightColor` !important;
 }
 
-.list :checked+label .checkbox {
+.list :checked+label .checkbox:not(.inner-checkbox) {
   background: `=highlightColor`;
   border-color: `=highlightColor`;
 }
@@ -159,19 +159,9 @@ color: `=c`;
   border-top: 2px solid `=c`;
 }
 
-.aadhaar_vid--steps .step-icon path:last-child {
-  fill: `=c`;
-}
-
 .qr-image:before,
-.iframe-title,
-.copytoclipboard--container.copied .copytoclipboard--text,
-.copytoclipboard--container.copied .copytoclipboard--btn {
+.iframe-title {
   border-color: `=c`;
-}
-
-.copytoclipboard--container.copied .copytoclipboard--btn {
-  color: `=c`;
 }
 
 .offers-list-title:after, .offers-title .toggle:after {

@@ -6,9 +6,7 @@ import * as Curtain from 'components/curtain';
 /* global templates, fillData */
 
 const emandateTabTitles = {
-  'emandate-bank': 'Bank',
   'emandate-netbanking': 'Netbanking',
-  'emandate-aadhaar': 'Aadhaar',
 };
 
 export default function emandateView(session) {
@@ -27,10 +25,6 @@ export default function emandateView(session) {
     account_type: session.get('prefill.bank_account[account_type]'),
     /* bank_ifsc is the ifsc code for user's bank account */
     bank_ifsc: session.get('prefill.bank_account[ifsc]'),
-    /* auth_type that the merchant wants to enforce */
-    auth_type: session.get('prefill.auth_type'),
-    /* aadhaar VID is the 16 digit aadhaar number of the user */
-    aadhaar: session.get('prefill.aadhaar[vid]'),
   };
 
   this.opts = {
@@ -65,45 +59,14 @@ emandateView.prototype = {
     this.listeners.push(el |> _El.on(event, listener, capture));
   },
 
-  inputRadioChanged: function(e) {
-    const val = e.target.value;
-
-    if (val === 'yes') {
-      this.session.setPayButtonText('Proceed');
-    } else if (val === 'no') {
-      this.session.setPayButtonText('Create Aadhaar VID');
-    }
-  },
-
   bind: function() {
     const delegator = this.session.delegator;
 
-    if (!this.session.get('prefill.bank')) {
-      this.on('click', '#emandate-bank .btn-change-bank', () => {
-        this.session.deselectBank();
-        this.setScreen('emandate');
-        this.history = ['emandate'];
-      });
-    }
-
-    delegator.adhr_acc_no = delegator.add(
-      'alphanumeric',
-      _Doc.querySelector('#adhr-acc-no')
-    );
     delegator.nb_acc_no = delegator.add(
       'alphanumeric',
       _Doc.querySelector('#nb-acc-no')
     );
-    delegator.adhr_ifsc = delegator
-      .add('ifsc', _Doc.querySelector('#adhr-acc-ifsc'))
-      .on('change', function() {
-        if (this.isValid() && this.el.value.length === this.caretPosition) {
-          let field = _Doc.querySelector('#adhr-acc-name');
-          if (field && _.isFunction(field.focus)) {
-            field.focus();
-          }
-        }
-      });
+
     delegator.nb_ifsc = delegator
       .add('ifsc', _Doc.querySelector('#nb-acc-ifsc'))
       .on('change', function() {
@@ -114,23 +77,6 @@ emandateView.prototype = {
           }
         }
       });
-    delegator.aadhaar = delegator.add(
-      'aadhaar',
-      _Doc.querySelector('#adhr-acc-aadhaar')
-    );
-
-    // Fire events for the aadhaar-linked-to-bank-account checkbox
-    this.on('change', '#emandate-aadhaar-linked-check-label', e => {
-      const checked = e.target.checked;
-
-      this.track(
-        'aadhaar:linked_checkbox:change',
-        {
-          checked,
-        },
-        AnalyticsTypes.BEHAV
-      );
-    });
   },
 
   track: function(name, data = {}, type) {
@@ -155,22 +101,10 @@ emandateView.prototype = {
 
   determineLandingScreen: function() {
     if (this.prefill.bank && this.banks[this.prefill.bank]) {
-      let landingScreen = 'emandate-bank';
-
       _Doc.querySelector('#bank-select').value = this.prefill.bank;
-
       this.setBank(this.prefill.bank);
 
-      if (this.prefill.auth_type) {
-        let screenToShow = this.prefill.auth_type;
-
-        if (_Str.startsWith(screenToShow, 'aadhaar')) {
-          screenToShow = 'aadhaar';
-        }
-        landingScreen = 'emandate-' + screenToShow;
-      }
-
-      return landingScreen;
+      return 'emandate-netbanking';
     }
     return false;
   },
@@ -203,43 +137,14 @@ emandateView.prototype = {
 
     const authTypes = this.getAuthTypes(bankCode);
 
-    _El.addClass(
-      _Doc.querySelector('#emandate-options .netbanking'),
-      'disabled'
-    );
-    _El.addClass(_Doc.querySelector('#emandate-options .aadhaar'), 'disabled');
-
-    /**
-     * Netbanking is allowed only if
-     * 1. netbanking is an auth type, AND
-     * 2. account_type is NOT set in prefill
-     */
-    if (authTypes.indexOf('netbanking') > -1 && !this.prefill.account_type) {
-      _Doc.querySelector('#emandate-options .netbanking')
-        |> _El.removeClass('disabled');
-    }
-
-    if (authTypes.indexOf('aadhaar') > -1) {
-      _El.removeClass(
-        _Doc.querySelector('#emandate-options .aadhaar'),
-        'disabled'
-      );
-    }
-
     _Arr.loop(_Doc.querySelectorAll('#emandate-inner .bank-icon'), elem => {
       _El.setAttribute(elem, 'style', backgroundImage);
     });
-
-    _El.setAttribute(_Doc.querySelector('#emandate-bank'), 'bank', bankCode);
-    _El.setContents(
-      _Doc.querySelector('#emandate-bank .bank-name'),
-      this.banks[bankCode]
-    );
   },
 
-  showBankOptions: function(bankCode) {
+  showBankDetailsForm: function(bankCode) {
     this.setBank(bankCode);
-    this.showTab('emandate-bank');
+    this.showTab('emandate-netbanking');
   },
 
   setTabTitles: function() {
@@ -251,38 +156,23 @@ emandateView.prototype = {
   setScreen: function(screen) {
     this.session.setScreen(screen);
 
-    if (screen === 'emandate-bank' || screen === 'emandate') {
+    if (screen === 'emandate') {
       this.session.body.removeClass('sub');
     } else {
       this.session.body.addClass('sub');
     }
-
-    // if (screen === 'emandate-aadhaar') {
-    //   this.originalPayBtnText = _Doc.querySelector('.pay-btn').innerHTML;
-
-    //   if (this.session.get('prefill.aadhaar[vid]')) {
-    //     this.session.setPayButtonText('Proceed');
-    //   } else {
-    //     this.session.setPayButtonText('Next');
-    //   }
-    // } else if (this.originalPayBtnText) {
-    //   this.session.setPayButtonText(this.originalPayBtnText);
-    // }
   },
 
   showTab: function(tab) {
     const landingScreen = this.determineLandingScreen();
 
-    if (tab === 'emandate' && landingScreen) {
+    if (landingScreen) {
       tab = landingScreen;
     }
 
     const authTypes = this.getAuthTypes();
 
-    if (
-      (tab === 'emandate-netbanking' && authTypes.indexOf('netbanking') < 0) ||
-      (tab === 'emandate-aadhaar' && authTypes.indexOf('aadhaar') < 0)
-    ) {
+    if (tab === 'emandate-netbanking' && authTypes.indexOf('netbanking') < 0) {
       return false;
     }
 
@@ -317,148 +207,12 @@ emandateView.prototype = {
       return;
     }
 
-    // if (screen === 'emandate-aadhaar') {
-    //   if (!this.session.get('prefill.aadhaar[vid]')) {
-    //     if (this.curtainVisible && gel('emandate-aadhaar-radio-no')) {
-    //       if (gel('emandate-aadhaar-radio-no').checked) {
-    //         this.openUIDAI();
-    //         gel('emandate-aadhaar-radio-no').checked = false;
-    //         gel('emandate-aadhaar-radio-yes').checked = true;
-    //         this.session.setPayButtonText('Proceed');
-    //         return;
-    //       }
-    //     } else if (!this.curtainVisible) {
-    //       this.showCurtain();
-    //       return;
-    //     }
-    //   }
-    // }
-
     fillData(formSelector, data);
 
-    delete data['emandate-aadhaar-radio'];
-
-    if (data['aadhaar[vid]']) {
-      data['aadhaar[vid]'] = data['aadhaar[vid]'].replace(/ /g, '');
-    }
-
-    if (screen === 'emandate-aadhaar') {
-      data['auth_type'] = this.prefill.auth_type || 'aadhaar';
-    } else if (screen === 'emandate-netbanking') {
+    if (!data['auth_type']) {
       data['auth_type'] = 'netbanking';
-    }
-
-    /**
-     * If the auth type is Aadhaar,
-     * proceed only if the checkbox is checked by the user.
-     */
-    if (data['auth_type'] === 'aadhaar') {
-      const checkbox = _Doc.querySelector('#emandate-aadhaar-linked-check');
-      if (checkbox && !checkbox.checked) {
-        this.session.shake();
-        return;
-      }
     }
 
     this.session.submit();
   },
-
-  openUIDAI: function() {
-    const qpmap = _.getQueryParams();
-    const isSupportedSDK = qpmap.platform && !isUnsupportedSDK();
-    const CheckoutBridge = getCheckoutBridge();
-
-    if (isSupportedSDK) {
-      this.track('aadhaar:uidai_link_intent');
-
-      /* TODO: use bridge module */
-      CheckoutBridge.callNativeIntent(
-        _Doc.querySelector('#aadhaar_vid_link').href
-      );
-    } else {
-      this.track('aadhaar:uidai_link_native');
-      _Doc.querySelector('#aadhaar_vid_link').click();
-    }
-  },
-
-  showCurtain: function() {
-    const showSDKView = isUnsupportedSDK();
-
-    Curtain.show({
-      content: templates.contents_aadhaar_vid({
-        showSDKView: showSDKView,
-      }),
-      onClose: () => {
-        this.hideCurtain();
-      },
-      onShow: () => {
-        this.curtainVisible = true;
-
-        if (showSDKView) {
-          this.session.setPayButtonText('Proceed');
-
-          _El.setContents(
-            _Doc.querySelector('#emandate-uidai-copy'),
-            templates.copytoclipboard({
-              content:
-                'https://resident.uidai.gov.in/web/resident/vidgeneration',
-              btnText: 'Copy Link',
-            })
-          );
-
-          this.on('click', '#emandate-uidai-copy .copytoclipboard--btn', () => {
-            this.track('aadhaar:vid_link:copy', AnalyticsTypes.BEHAV);
-          });
-        } else {
-          this.session.setPayButtonText('Create Aadhaar VID');
-
-          this.on(
-            'change',
-            '#emandate-aadhaar-radios',
-            e => this.inputRadioChanged(e),
-            true
-          );
-        }
-
-        this.on('mouseover', '.emandate-education-text .has-tooltip', () => {
-          this.track('aadhaar:tooltip:view', AnalyticsTypes.BEHAV);
-        });
-
-        this.on('click', '#emandate-aadhaar-radios', e => {
-          if (e.target.nodeName.toLowerCase() === 'input') {
-            this.track(
-              'aadhaar:vid_radios:change',
-              {
-                value: e.target.value,
-              },
-              AnalyticsTypes.BEHAV
-            );
-          }
-        });
-      },
-    });
-  },
-
-  hideCurtain: function() {
-    this.curtainVisible = false;
-
-    this.session.setPayButtonText('Next');
-
-    this.track('aadhaar:curtain:close', AnalyticsTypes.BEHAV);
-  },
 };
-
-/**
- * Unsupported SDKs are
- * all iOS SDKs and
- * Android SDKs without callNativeIntent
- */
-function isUnsupportedSDK() {
-  const qpmap = _.getQueryParams();
-  const CheckoutBridge = getCheckoutBridge();
-  if (qpmap.platform) {
-    return !(CheckoutBridge && CheckoutBridge.callNativeIntent);
-  }
-
-  return false;
-}

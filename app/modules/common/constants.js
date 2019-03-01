@@ -57,6 +57,7 @@ export const TAB_TITLES = {
   netbanking: 'Netbanking',
   qr: 'QR',
   upi: 'UPI',
+  tez: 'Google Pay',
   wallet: 'Wallet',
 };
 
@@ -84,3 +85,9 @@ export const EMI_HELP_TEXT =
 
 // Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
 export const DEFAULT_AUTH_TYPE_RADIO = '3ds';
+export const TIMEOUT_MAGIC_NO_ACTION = 30000;
+
+export const STRINGS = {
+  process: 'Your payment is being processed',
+  redirect: 'Redirecting to Bank page',
+};

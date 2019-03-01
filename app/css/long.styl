@@ -9,8 +9,17 @@
 
   #form-common .legend
     margin: 9px 24px;
+  &.no-details
+    #form-common .legend
+      margin: 5px 0 0;
+    #payment-options.count-6 label
+      height: 52px;
+      padding: 10px 0;
+  &.no-details.partial
+    #form-common
+      padding-top: 4px;
 
-  &:not(.no-details)
+  &:not(.no-details):not(.extra)
     #body
       #payment-options
         label
@@ -18,3 +27,9 @@
 
         i
           margin: -12px 0 -6px;
+        .tez-icon
+          margin: -9px auto 0 auto;
+
+#container.x-long
+  #body
+    height: 421px;
