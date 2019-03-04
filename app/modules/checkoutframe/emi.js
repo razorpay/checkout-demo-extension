@@ -73,7 +73,7 @@ emiView.prototype = {
       // TODO: Update showOverlay once session.js is refactored.
       showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
 
-      Analytics.track('emi:plans:all:view', {
+      Analytics.track('emi:plans:view:all', {
         type: AnalyticsTypes.BEHAV,
       });
     });

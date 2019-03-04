@@ -3752,11 +3752,11 @@ Session.prototype = {
     };
 
     var viewAllPlans = function(tab) {
-      trackEmi('emi:plans:all:view', {
-        from: tab,
-      });
-
       return function() {
+        trackEmi('emi:plans:view:all', {
+          from: tab,
+        });
+
         showOverlay($('#emi-wrap'));
       };
     };
