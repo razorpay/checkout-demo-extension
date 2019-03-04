@@ -1,6 +1,8 @@
 /* global templates, showOverlay, hideEmi, Event */
 import EmiView from 'templates/views/emi.svelte';
 import { AMEX_EMI_MIN } from 'common/constants';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 function hideEMIDropdown() {
   const body = _Doc.querySelector('#body');
@@ -70,6 +72,10 @@ emiView.prototype = {
     this.on('click', '#view-emi-plans', function() {
       // TODO: Update showOverlay once session.js is refactored.
       showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
+
+      Analytics.track('emi:plans:view:all', {
+        type: AnalyticsTypes.BEHAV,
+      });
     });
   },
 
