@@ -71,6 +71,10 @@ var responseTypes = {
     var popup = this.popup;
     var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
 
+    if (this.data && this.data.wallet === 'amazonpay') {
+      request.content = {};
+    }
+
     if (this.isMagicPayment) {
       if (coprotoMagic) {
         this.emit('magic.init');
