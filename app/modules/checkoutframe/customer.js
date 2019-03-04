@@ -5,6 +5,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as strings from 'common/strings';
+import * as OtpService from 'common/otpservice';
 
 /* global errorHandler */
 
@@ -106,10 +107,16 @@ Customer.prototype = {
       url: url,
       callback: function(data) {
         customer.saved = !!data.saved;
+
+        if (customer.saved) {
+          OtpService.markOtpSent();
+        }
+
         if (data.tokens) {
           customer.mark_logged(data);
         }
-        callback(data);
+
+        callback && callback(data);
       },
     });
   },
@@ -126,7 +133,10 @@ Customer.prototype = {
       data: {
         contact: this.contact,
       },
-      callback: callback,
+      callback: function(data) {
+        OtpService.markOtpSent();
+        callback && callback(data);
+      },
     });
   },
 
