@@ -818,7 +818,7 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, text) {
+function askOTP(view, text, shouldLimitResend) {
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
@@ -842,7 +842,7 @@ function askOTP(view, text) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
-    allowResend: true,
+    allowResend: shouldLimitResend ? discreet.OtpService.canSendOtp() : true,
   });
 
   $('#body').addClass('sub');
@@ -914,8 +914,8 @@ function askOTP(view, text) {
   setOtpText(view, text);
 }
 
-function debounceAskOTP(view, msg) {
-  debounce(askOTP, 750)(view, msg);
+function debounceAskOTP(view, msg, shouldLimitResend) {
+  debounce(askOTP, 750)(view, msg, shouldLimitResend);
 }
 
 // this === Session
@@ -1729,6 +1729,13 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.option.code;
 
+            Analytics.track('cardless_emi:provider:select', {
+              type: AnalyticsTypes.BEHAV,
+              data: {
+                provider: providerCode,
+              },
+            });
+
             // User selected EMI on Cards
             if (providerCode === 'cards') {
               self.switchTab('emi');
@@ -1828,6 +1835,12 @@ Session.prototype = {
       return;
     }
 
+    Analytics.track('cardless_emi:plans:view', {
+      data: {
+        provider: providerCode,
+      },
+    });
+
     var plansList = this.getCardlessEmiPlans(plans);
 
     this.emiPlansView.setPlans({
@@ -1858,6 +1871,14 @@ Session.prototype = {
           $('#form-cardless_emi input[name=ott]').val(
             CardlessEmiStore.ott[CardlessEmiStore.providerCode]
           );
+
+          Analytics.track('cardless_emi:plan:select', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              provider: providerCode,
+              value: value,
+            },
+          });
 
           self.preSubmit();
         },
@@ -1896,6 +1917,9 @@ Session.prototype = {
           }
 
           self.showLoadError(errorDesc, true);
+
+          Analytics.track('cardless_emi:plans:fetch:error');
+
           return;
         }
 
@@ -1906,7 +1930,7 @@ Session.prototype = {
           ' to get EMI plans for' +
           cardlessEmiProviderObj.name;
 
-        askOTP(self.otpView, otpMessage);
+        askOTP(self.otpView, otpMessage, true);
 
         self.otpView.updateScreen({
           allowSkip: false,
@@ -1918,6 +1942,12 @@ Session.prototype = {
       },
       getPhone()
     );
+
+    Analytics.track('cardless_emi:plans:fetch:start', {
+      data: {
+        provider: providerCode,
+      },
+    });
   },
 
   setOtpScreen: function() {
@@ -2206,7 +2236,7 @@ Session.prototype = {
     } else {
       var self = this;
       this.customer.createOTP(function(message) {
-        debounceAskOTP(self.otpView, message);
+        debounceAskOTP(self.otpView, message, true);
       });
     }
   },
@@ -2703,18 +2733,26 @@ Session.prototype = {
     if (enabledMethods.emi) {
       this.on('click', '#add-card-container', 'emi-plans-trigger', function(e) {
         var $target = $(e.delegateTarget);
+        var eventName = 'emi:plans:';
+        var eventData = {
+          from: self.tab,
+        };
 
         self.removeAndCleanupOffers();
 
         if ($target.$('.emi-plan-unselected:not(.hidden)')[0]) {
           self.showEmiPlans('new')(e);
+          eventName += 'view';
         } else if ($target.$('.emi-plan-selected:not(.hidden)')[0]) {
           self.showEmiPlans('new')(e);
+          eventName += 'edit';
         } else if ($target.$('.emi-pay-without:not(.hidden)')[0]) {
           if (enabledMethods.card) {
             self.setScreen('card');
             self.switchTab('card');
             self.offers && self.renderOffers(this.tab);
+
+            eventName = 'emi:pay_without';
           }
         } else if ($target.$('.emi-plan-unavailable:not(.hidden)')[0]) {
           if (enabledMethods.card) {
@@ -2722,8 +2760,15 @@ Session.prototype = {
             self.switchTab('card');
             self.toggleSavedCards(false);
             self.offers && self.renderOffers(this.tab);
+
+            eventName = 'emi:pay_without';
           }
         }
+
+        Analytics.track(eventName, {
+          type: AnalyticsTypes.BEHAV,
+          data: eventData,
+        });
       });
 
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
@@ -3632,11 +3677,12 @@ Session.prototype = {
               self.otpView,
               'Enter OTP sent on ' +
                 getPhone() +
-                '<br>to save your card for future payments'
+                '<br>to save your card for future payments',
+              true
             );
           });
         } else if (customer.saved && !customer.logged) {
-          askOTP(self.otpView);
+          askOTP(self.otpView, undefined, true);
         } else {
           self.showCards();
         }
@@ -3808,8 +3854,22 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var amount = this.get('amount');
-    var viewAllPlans = function() {
-      showOverlay($('#emi-wrap'));
+
+    var trackEmi = function(name, data) {
+      Analytics.track(name, {
+        type: AnalyticsTypes.BEHAV,
+        data: data,
+      });
+    };
+
+    var viewAllPlans = function(tab) {
+      return function() {
+        trackEmi('emi:plans:view:all', {
+          from: tab,
+        });
+
+        showOverlay($('#emi-wrap'));
+      };
     };
 
     if (type === 'new') {
@@ -3842,6 +3902,10 @@ Session.prototype = {
             }),
 
             payWithoutEmi: function() {
+              trackEmi('emi:pay_without', {
+                from: prevTab,
+              });
+
               $('#emi_duration').val('');
 
               self.switchTab('card');
@@ -3855,6 +3919,11 @@ Session.prototype = {
               var plan = plans[value];
               var text = getEmiText(amount, plan).short || '';
 
+              trackEmi('emi:plan:select', {
+                from: prevTab,
+                value: value,
+              });
+
               $('#emi_duration').val(value);
               $trigger.$(
                 '.emi-plan-selected .emi-plans-text'
@@ -3866,10 +3935,11 @@ Session.prototype = {
               self.processOffersOnEmiPlanSelection(plan);
 
               $('.select-plan-btn').addClass('invisible');
+
               self.preSubmit();
             },
 
-            viewAll: viewAllPlans,
+            viewAll: viewAllPlans(prevTab),
           },
 
           actions: {
@@ -3917,6 +3987,10 @@ Session.prototype = {
             },
 
             payWithoutEmi: function() {
+              trackEmi('emi:pay_without', {
+                from: prevTab,
+              });
+
               $trigger.$('.emi_duration').val('');
               toggleEmiPlanDetails($trigger.parent().parent(), false);
 
@@ -3930,6 +4004,11 @@ Session.prototype = {
             select: function(value) {
               var plan = plans[value];
               var text = getEmiText(amount, plan).short || '';
+
+              trackEmi('emi:plan:select', {
+                from: prevTab,
+                value: value,
+              });
 
               $trigger.$('.emi_duration').val(value);
               $trigger.$(
@@ -3953,7 +4032,7 @@ Session.prototype = {
               }
             },
 
-            viewAll: viewAllPlans,
+            viewAll: viewAllPlans(prevTab),
           },
 
           actions: {
@@ -4098,7 +4177,16 @@ Session.prototype = {
         this.savedCardsView.setCards({
           cards: this.transformedTokens,
           on: {
-            viewPlans: this.showEmiPlans('saved'),
+            viewPlans: function(e) {
+              Analytics.track('saved_card:emi:plans:view', {
+                type: AnalyticsTypes.BEHAV,
+                data: {
+                  from: self.tab,
+                },
+              });
+
+              self.showEmiPlans('saved')(e);
+            },
           },
         });
 
@@ -4681,7 +4769,7 @@ Session.prototype = {
           Analytics.track('behav:otp:incorrect', {
             wallet: this.tab === 'wallet',
           });
-          askOTP(this.otpView, msg);
+          askOTP(this.otpView, msg, true);
         }
       };
     } else {
@@ -4693,7 +4781,7 @@ Session.prototype = {
           Analytics.track('behav:otp:incorrect', {
             wallet: self.tab === 'wallet',
           });
-          askOTP(this.otpView, msg);
+          askOTP(this.otpView, msg, true);
         }
       };
     }
@@ -5025,7 +5113,7 @@ Session.prototype = {
           skipText: 'Skip saving card',
         });
         this.commenceOTP(strings.otpsend);
-        debounceAskOTP(this.otpView);
+        debounceAskOTP(this.otpView, undefined, true);
         return this.customer.createOTP();
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';
