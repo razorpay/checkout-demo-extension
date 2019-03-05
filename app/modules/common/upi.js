@@ -156,6 +156,9 @@ const UPI_APPS = {
     {
       package_name: 'com.SIBMobile',
     },
+    {
+      package_name: 'com.truecaller',
+    },
   ],
 
   /**
@@ -168,9 +171,6 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.myairtelapp',
-    },
-    {
-      package_name: 'com.truecaller',
     },
     {
       package_name: 'com.paytmmall',
