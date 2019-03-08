@@ -1,3 +1,5 @@
+import { RazorpayConfig } from 'common/Razorpay';
+
 const networks = {
   amex: 'American Express',
   diners: 'Diners Club',
@@ -5,8 +7,14 @@ const networks = {
   mastercard: 'MasterCard',
   rupay: 'RuPay',
   visa: 'Visa',
+  bajaj: 'Bajaj Finserv',
   unknown: 'unknown',
 };
+
+const cdnUrl = RazorpayConfig.cdn;
+const fullPrefix = cdnUrl + 'acs/network/';
+
+export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
 
 /**
  * @param {String} name {eg: MasterCard}
@@ -72,6 +80,10 @@ const cardPatterns = [
     name: 'jcb',
     regex: /^35/,
   },
+  {
+    name: 'bajaj',
+    regex: /^203040/,
+  },
 ];
 
 const cardLengths = {
@@ -82,6 +94,7 @@ const cardLengths = {
 };
 
 export const getCardType = cardNumber => {
+  cardNumber = cardNumber.replace(/\D/g, '');
   let cardType = '';
   _Arr.loop(cardPatterns, card => {
     if (card.regex.test(cardNumber)) {

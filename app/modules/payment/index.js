@@ -14,7 +14,7 @@ import Popup from 'payment/popup';
 import Redir from 'payment/redir';
 import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
-import { formatAmount } from 'common/currency';
+import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
   RazorpayConfig,
@@ -663,13 +663,16 @@ razorpayProto.createFees = function(data, onSuccess, onError) {
               break;
           }
           if (title) {
-            array.push([title, formatAmount(displayFees[fee] * 100, 'INR')]);
+            array.push([
+              title,
+              formatAmountWithSymbol(displayFees[fee] * 100, 'INR'),
+            ]);
           }
         }
 
         array.push([
           'Total Charges',
-          formatAmount(displayFees.amount * 100, 'INR'),
+          formatAmountWithSymbol(displayFees.amount * 100, 'INR'),
         ]);
 
         onSuccess(response, array);

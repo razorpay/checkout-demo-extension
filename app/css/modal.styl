@@ -289,6 +289,30 @@ html {
   overflow: hidden;
 }
 
+.nb-selection-container {
+
+  padding-bottom: 12px;
+  transition: .3s opacity;
+
+  &.showable {
+    height: 0;
+    display: block;
+    opacity: 0;
+  }
+
+  &.showable.drishy {
+    height: auto;
+    position: static;
+    opacity: 1;
+  }
+
+  & > label {
+    display: block;
+    padding-bottom: 4px;
+  }
+
+}
+
 .link {
   padding: 3px 1px;
   cursor: pointer;
@@ -1479,7 +1503,8 @@ $outline = #ddd;
   }
 }
 
-#form-card {
+#form-card,
+#form-emi {
   i:not(.select-arrow) {
     display: none;
   }
@@ -1494,6 +1519,20 @@ $outline = #ddd;
   #powered-by {
     bottom: 30px;
   }
+}
+
+#container {
+
+  #body[tab=netbanking] {
+    height: 374px;
+  }
+
+  #body[tab=emandate] {
+    .nb-selection-container {
+      display: none;
+    }
+  }
+
 }
 
 #body[screen=card] #footer {

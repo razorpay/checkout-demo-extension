@@ -1,5 +1,7 @@
 import EMIPlansView from 'templates/screens/emiplans.svelte';
 import * as TermsCurtain from 'checkoutframe/termscurtain.js';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 const TARGET_QS = '#emi-plan-screen-wrapper';
 const AGREEMENT_STORE = {};
@@ -16,8 +18,20 @@ const AGREEMENT_HELPER = {
   parseResponse: {
     zestmoney: response => {
       if (typeof response !== 'string') {
+        Analytics.track('cardless_emi:terms:fetch:error', {
+          data: {
+            response,
+          },
+        });
+
         return 'An error occurred while fetching the loan agreement.';
       }
+
+      Analytics.track('cardless_emi:terms:fetch:success', {
+        data: {
+          response,
+        },
+      });
 
       return response;
     },
@@ -34,6 +48,14 @@ const viewAgreement = (provider, duration) => {
   try {
     terms = AGREEMENT_STORE[provider][duration];
   } catch (e) {}
+
+  Analytics.track('cardless_emi:terms:show', {
+    type: AnalyticsTypes.BEHAV,
+    data: {
+      duration,
+      provider,
+    },
+  });
 
   TermsCurtain.show({
     heading: 'Loan Agreement',
@@ -82,6 +104,13 @@ emiPlansView.prototype = {
     this.back = on.back || _Func.noop;
 
     on.select = plan => {
+      Analytics.track('emi:plan:choose', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          value: plan.value,
+        },
+      });
+
       this.selectedPlan = plan;
       _Doc.querySelector('#body') |> _El.addClass('sub');
     };
