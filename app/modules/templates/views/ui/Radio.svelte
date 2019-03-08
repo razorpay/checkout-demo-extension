@@ -15,8 +15,10 @@
 </div>
 
 <script>
+  import Track from 'tracker.js';
+
   export default {
-    data: function () {
+    data: function() {
       return {
         checked: false,
         classes: '',
@@ -28,9 +30,8 @@
     },
 
     computed: {
-      identifier: ({ id }) =>
-        id ? id : `id_${Math.random().toString(36).substr(2, 10)}`,
+      identifier: ({ id }) => (id ? id : `id_${Track.makeUid()}`),
       classes: ({ classes }) => `input-radio ${classes}`,
-    }
-  }
+    },
+  };
 </script>

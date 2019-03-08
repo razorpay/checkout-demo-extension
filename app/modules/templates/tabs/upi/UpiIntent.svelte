@@ -151,7 +151,6 @@
 </style>
 
 <script>
-  import { fade } from 'lib/svelte-transitions';
   import { getSession } from 'sessionmanager';
 
   export default {
@@ -161,8 +160,6 @@
         showAll: false,
       };
     },
-
-    transitions: { fade },
 
     computed: {
       showableApps: ({ apps, showAll }) => {

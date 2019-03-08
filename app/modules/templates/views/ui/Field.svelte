@@ -2,6 +2,7 @@
   <input
     class='input'
     ref:input
+    id={identifier}
     {type}
     {name}
     {value}
@@ -29,10 +30,12 @@
 
 <script>
   import { getSession } from 'sessionmanager';
+  import Track from 'tracker.js';
 
   export default {
     data() {
       return {
+        id:'',
         type: 'text',
         value: null,
         invalid: false,
@@ -42,8 +45,8 @@
         helpText: '',
         placeholder: '',
         pattern: '.*',
-        autocomplete: 'off'
-      }
+        autocomplete: 'off',
+      };
     },
 
     actions: {
@@ -59,8 +62,12 @@
 
         _Obj.loop(data.on, (callback, event) => {
           formatterObj.on(event, callback);
-        })
-      }
+        });
+      },
+    },
+
+    computed: {
+      identifier: ({ id }) => (id ? id : `id_${Track.makeUid()}`),
     },
 
     methods: {
@@ -71,7 +78,7 @@
 
       getValue() {
         return this.refs.input.value;
-      }
-    }
-  }
+      },
+    },
+  };
 </script>

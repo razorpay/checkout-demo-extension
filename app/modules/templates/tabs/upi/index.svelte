@@ -35,6 +35,7 @@
                 <Field
                   type="text"
                   name="vpa"
+                  id='vpa'
                   ref:vpaField
                   placeholder="Enter UPI ID"
                   helpText="Please enter a valid handle"
@@ -67,6 +68,7 @@
               <Field
                 type="text"
                 name="vpa"
+                id="vpa"
                 ref:vpaField
                 placeholder="Enter your UPI Address"
                 helpText="Please enter a valid VPA of the form username@bank"
@@ -171,7 +173,6 @@
 </style>
 
 <script>
-  import { fade } from 'lib/svelte-transitions';
   import { getSession } from 'sessionmanager.js';
   import * as Tez from 'tez.js';
   import * as Bridge from 'bridge.js';
@@ -268,8 +269,6 @@
         useWebPaymentsApi: false,
       };
     },
-
-    transitions: { fade },
 
     computed: {
       selectedAppData: ({ topUpiApps, selectedApp }) =>
