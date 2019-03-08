@@ -1109,9 +1109,17 @@ export function displayAmount(razorpay, payloadAmount) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   if (displayCurrency) {
+    let displayAmount = parseFloat(get('display_amount'));
+
+    // Since display amount is in major, we need to convert it into minor.
+    displayAmount *= Math.pow(10, getCurrencyConfig(displayCurrency).decimals);
+
+    // Remove any trailing decimals that remain after converting to minor.
+    displayAmount = displayAmount.toFixed(0);
+
     return (
       displayCurrencies[displayCurrency] +
-      formatAmount(get('display_amount'), displayCurrency)
+      formatAmount(displayAmount, displayCurrency)
     );
   }
   return formatAmountWithSymbol(
