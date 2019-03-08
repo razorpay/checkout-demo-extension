@@ -70,7 +70,7 @@
                 ref:vpaField
                 placeholder="Enter your UPI Address"
                 helpText="Please enter a valid VPA of the form username@bank"
-                value={vpa}
+                value={selectedApp === null ? vpa : ''}
                 pattern={pattern}
                 required={true}
                 formatter={{
@@ -287,6 +287,7 @@
 
     oncreate() {
       const session = getSession();
+
       checkTez(
         /* Use Tez */
         () => {
