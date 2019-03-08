@@ -1,14 +1,14 @@
 <div class={classes}>
   <input
     type="radio"
+    id={identifier}
     {checked}
-    {id}
     {name}
     {value}
 
     on:change="fire('change', event)"
   >
-  <label for={id}>
+  <label for={identifier}>
     <div class="radio-display"></div>
     <div class="label-content">{@html label}</div>
   </label>
@@ -28,6 +28,8 @@
     },
 
     computed: {
+      identifier: ({ id }) =>
+        id ? id : `id_${Math.random().toString(36).substr(2, 10)}`,
       classes: ({ classes }) => `input-radio ${classes}`,
     }
   }

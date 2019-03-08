@@ -1233,52 +1233,6 @@ Session.prototype = {
     });
   },
 
-  checkTez: function() {
-    var self = this;
-
-    /**
-     * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
-     */
-
-    var hasFeature =
-      this.preferences &&
-      this.preferences.features &&
-      this.preferences.features.google_pay;
-
-    this.tezMode = 'desktop';
-
-    if (this.preferences.fee_bearer) {
-      return;
-    }
-
-    if (window.CheckoutBridge) {
-      return;
-    }
-
-    if (!(hasFeature || Tez.checkKey(self.get('key')))) {
-      return;
-    }
-
-    var $upiForm = $('#form-upi'),
-      $tezUPIForm = $('#upi-tez');
-
-    $upiForm.addClass('show-tez');
-
-    this.r.isTezAvailable(function() {
-      self.tezMode = 'mobile';
-      /* This is success callback */
-      $tezUPIForm.removeClass('tez-desktop');
-      $tezUPIForm.addClass('tez-mweb');
-
-      // removing desktop elements to avoid form validations on empty inputs
-      each($tezUPIForm.find('.desktop-only'), function(i, item) {
-        item.remove();
-      });
-
-      Analytics.track('tez:mweb:visible');
-    });
-  },
-
   render: function(options) {
     var that = this;
 
@@ -1315,11 +1269,7 @@ Session.prototype = {
     this.setTpvBanks();
     this.getEl();
     this.setFormatting();
-    this.setEmandate();
-    this.setCardlessEmi();
-    this.setSavedCardsView();
-    this.setOtpScreen();
-    this.checkTez();
+    this.setSvelteComponents();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
@@ -1463,6 +1413,23 @@ Session.prototype = {
 
       Analytics.track('p13n:set');
     }
+  },
+
+  setUpiTab: function() {
+    this.upiTab = new discreet.UpiTab({
+      target: gel('upi-svelte-wrap'),
+      data: {
+        methods: this.methods,
+      },
+    });
+  },
+
+  setSvelteComponents: function() {
+    this.setEmandate();
+    this.setCardlessEmi();
+    this.setSavedCardsView();
+    this.setOtpScreen();
+    this.setUpiTab();
   },
 
   showTimer: function(cb) {
@@ -2497,40 +2464,6 @@ Session.prototype = {
       this.on('click', '#vpa', function() {
         $('#upi-directpay label')[0].dispatchEvent(new MouseEvent('click'));
       });
-
-      this.on('change', '#form-upi', function(e) {
-        var packageName = e.target.value;
-        var UPISecondFactorConsent = {};
-
-        try {
-          UPISecondFactorConsent = JSON.parse(
-            StorageBridge.getString('rzp_upi_2f_consent')
-          );
-        } catch (readErr) {}
-
-        if (
-          discreet.UPIUtils.isSecondFactorApp(packageName) &&
-          !UPISecondFactorConsent[packageName]
-        ) {
-          self.shouldAskUPI2FPermission = true;
-        } else {
-          self.shouldAskUPI2FPermission = false;
-        }
-
-        $('#body').toggleClass('sub', e.target.value);
-
-        Analytics.track('upi:app:select', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            package_name: packageName,
-            showRecommended: Boolean(self.showRecommendedUPIApp),
-            recommended: Boolean(
-              self.showRecommendedUPIApp &&
-                discreet.UPIUtils.isPreferredApp(packageName)
-            ),
-          },
-        });
-      });
     }
 
     if (enabledMethods.emi) {
@@ -2610,6 +2543,39 @@ Session.prototype = {
         }
       });
     }
+  },
+
+  onUpiAppSelect: function(packageName) {
+    var UPISecondFactorConsent = {};
+
+    try {
+      UPISecondFactorConsent = JSON.parse(
+        StorageBridge.getString('rzp_upi_2f_consent')
+      );
+    } catch (readErr) {}
+
+    if (
+      discreet.UPIUtils.isSecondFactorApp(packageName) &&
+      !UPISecondFactorConsent[packageName]
+    ) {
+      this.shouldAskUPI2FPermission = true;
+    } else {
+      this.shouldAskUPI2FPermission = false;
+    }
+
+    $('#body').toggleClass('sub', packageName);
+
+    Analytics.track('upi:app:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        package_name: packageName,
+        showRecommended: Boolean(this.showRecommendedUPIApp),
+        recommended: Boolean(
+          this.showRecommendedUPIApp &&
+            discreet.UPIUtils.isPreferredApp(packageName)
+        ),
+      },
+    });
   },
 
   /**
@@ -3020,6 +2986,12 @@ Session.prototype = {
       showPaybtn = false;
     }
     this.body.toggleClass('sub', showPaybtn);
+
+    if (screen === 'upi') {
+      if (typeof this.upiTab.get().selectedApp === 'undefined') {
+        $('#body').removeClass('sub');
+      }
+    }
 
     return this.offers && this.renderOffers(this.tab);
   },
@@ -4099,7 +4071,11 @@ Session.prototype = {
 
     if (tab) {
       data.method = tab;
-      fillData(this.getActiveForm(), data);
+      var activeForm = this.getActiveForm();
+
+      if (activeForm !== '#form-upi') {
+        fillData(activeForm, data);
+      }
 
       // Delete all the auth_type-* keys
       each(data, function(key, val) {
@@ -4154,27 +4130,13 @@ Session.prototype = {
         }
       }
 
-      if (data.method === 'tez') {
-        data.method = 'upi';
-      }
-
       if (this.screen === 'upi') {
-        if (data.upi_app && data.upi_app === 'directpay') {
-          data['_[flow]'] = 'directpay';
-          delete data.upi_app;
-        }
-        if (data['_[flow]'] !== 'directpay') {
-          if (data['_[flow]'] === 'tez' && this.tezMode === 'desktop') {
-            data.vpa = data.tez_username + '@' + data.tez_bank;
-          } else {
-            delete data.vpa;
-          }
-        }
+        /* All tabs should be responsible for their subdata */
+        var upiData = this.upiTab.getPayload();
 
-        if ('tez_username' in data) {
-          delete data.tez_username;
-          delete data.tez_bank;
-        }
+        each(upiData, function(key, value) {
+          data[key] = value;
+        });
       }
     }
     return data;
@@ -4576,7 +4538,17 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        if (this.checkInvalid('#form-upi input:checked + label')) {
+        var formSelector = '#form-upi';
+
+        if (data['_[flow]'] === 'intent') {
+          if (data.vpa) {
+            formSelector = '#svelte-collect-in-intent';
+          } else {
+            formSelector = '#svelte-upi-apps-list';
+          }
+        }
+
+        if (this.checkInvalid(formSelector)) {
           return;
         }
       } else if (this.checkInvalid()) {
@@ -4696,13 +4668,8 @@ Session.prototype = {
     }
 
     if (data['_[flow]'] === 'tez') {
-      if (this.tezMode === 'desktop') {
-        data['_[flow]'] = 'directpay';
-        Analytics.track('tez:collect_request');
-      } else {
-        request.tez = true;
-        data['_[flow]'] = 'intent';
-      }
+      request.tez = true;
+      data['_[flow]'] = 'intent';
     }
 
     var appliedOffer = this.getAppliedOffer();
@@ -4988,6 +4955,10 @@ Session.prototype = {
         this.otpView.destroy();
       }
 
+      if (this.upiTab) {
+        this.upiTab.destroy();
+      }
+
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
@@ -5008,7 +4979,7 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
-      this.otpView = null;
+      this.upiTab = this.otpView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
     }

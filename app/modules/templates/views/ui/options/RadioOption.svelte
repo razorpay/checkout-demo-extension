@@ -1,6 +1,6 @@
 <Option
   {data}
-  type={type}
+  {type}
 
   on:select="fire('select', event)"
 >
@@ -9,7 +9,11 @@
   {/if}
   <div class="option-title"><slot></slot></div>
   {#if showRadio}
-    <Radio checked={selected}/>
+    <Radio
+      checked={selected}
+      {name}
+      {value}
+    />
   {/if}
 </Option>
 
