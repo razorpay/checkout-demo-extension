@@ -5087,7 +5087,7 @@ Session.prototype = {
     var that = this;
     var session = this;
     var request = {
-      feesRedirect: preferences.fee_bearer && !('fee' in data),
+      feesRedirect: preferences.fee_bearer,
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
@@ -5280,6 +5280,10 @@ Session.prototype = {
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
           session.payload.fee = bearer.fee;
+
+          // Don't redirect to fees route now
+          session.feesRedirect = false;
+
           session.submit();
         });
 
