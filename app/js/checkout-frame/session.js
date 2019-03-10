@@ -605,6 +605,16 @@ function hideOverlay($with) {
   }
 }
 
+/**
+ * Hides all elements with .overlay or #overlay
+ */
+function hideAllOverlay() {
+  makeHidden('#overlay');
+  each($$('.overlay'), function(i, el) {
+    makeHidden(el);
+  });
+}
+
 function hideEmi() {
   var emic = $('#emi-wrap');
   var wasShown = emic.hasClass(shownClass);
@@ -622,7 +632,7 @@ function hideOverlayMessage() {
     ) {
       makeHidden(gel('error-message'));
     } else {
-      hideOverlay($('#error-message'));
+      hideAllOverlay();
     }
   }
 }
@@ -1429,23 +1439,16 @@ Session.prototype = {
     }
 
     if (this.upi_intents_data) {
-      /* disable intent if fee_bearer */
+      /**
+       * We need to show "(Recommended)" string alongside the app name
+       * when there is only 1 preferred app, and 1 or more other apps.
+       */
+      var count = discreet.UPIUtils.getNumberOfAppsByCategory(
+        this.upi_intents_data
+      );
 
-      if (this.preferences.fee_bearer) {
-        delete this.upi_intents_data;
-        delete this.all_upi_intents_data;
-      } else {
-        /**
-         * We need to show "(Recommended)" string alongside the app name
-         * when there is only 1 preferred app, and 1 or more other apps.
-         */
-        var count = discreet.UPIUtils.getNumberOfAppsByCategory(
-          this.upi_intents_data
-        );
-
-        if (count.preferred === 1 && this.upi_intents_data.length > 1) {
-          this.showRecommendedUPIApp = true;
-        }
+      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+        this.showRecommendedUPIApp = true;
       }
     }
 
@@ -4849,6 +4852,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    var session = this;
     var storeScreen = getStore('screen');
     if (storeScreen === 'amount') {
       return this.extraNext();
@@ -5081,8 +5085,9 @@ Session.prototype = {
 
     var data = this.payload;
     var that = this;
+    var session = this;
     var request = {
-      fees: preferences.fee_bearer,
+      feesRedirect: preferences.fee_bearer && !('fee' in data),
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
@@ -5239,9 +5244,54 @@ Session.prototype = {
       }
     }
 
+    if (preferences.fee_bearer) {
+      var isFeeMissing = !('fee' in data);
+
+      /**
+       * Check here if 'fee' is set in payload,
+       * If it is present then we have shown the fee breakup to the user,
+       * and we have accounted for additional fees,
+       * so no changes in payload are required.
+       * Otherwise, show the fee breakup.
+       */
+      if (isFeeMissing) {
+        var paymentData = clone(this.payload);
+
+        // Create fees route in API doesn't like this.
+        delete paymentData.upi_app;
+
+        if (this.feeBearerView) {
+          this.feeBearerView.fetchFees(paymentData, session);
+          showOverlay($('#fee-wrap'));
+          return;
+        }
+
+        this.feeBearerView = new discreet.FeeBearerView({
+          target: gel('fee-wrap'),
+          data: {
+            session: this,
+            paymentData: paymentData,
+          },
+        });
+        // When user clicks "Continue" in Fee Breakup View
+        this.feeBearerView.on('continue', function(bearer) {
+          makeHidden('#fee-wrap');
+
+          // Set the updated amount & fee
+          session.payload.amount = bearer.amount;
+          session.payload.fee = bearer.fee;
+          session.submit();
+        });
+
+        showOverlay($('#fee-wrap'));
+
+        return; // Return because we need to show the fee breakup.
+      }
+    }
+
     if (
       discreet.Wallet.isPowerWallet(wallet) &&
-      !request.fees &&
+      !request.feesRedirect &&
       data.contact &&
       data.email
     ) {
