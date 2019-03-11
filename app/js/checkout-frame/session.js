@@ -2253,6 +2253,7 @@ Session.prototype = {
         });
         this.hideTimer();
       }
+      this.showLoadError('Waiting for payment to complete on bank page');
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -5232,8 +5233,9 @@ Session.prototype = {
           askOTP(that.otpView, data);
         });
 
-        request.iframe = true;
-        Analytics.track('iframe:attempt');
+        request.nativeotp = true;
+        request.iframe = false;
+        // Analytics.track('iframe:attempt');
       }
     }
 
