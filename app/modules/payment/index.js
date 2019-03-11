@@ -27,7 +27,7 @@ import { isPowerWallet } from 'common/wallet';
 import * as Tez from 'tez';
 import Analytics from 'analytics';
 
-const isRazorpayFrame = true || _Str.startsWith(
+const isRazorpayFrame = _Str.startsWith(
   RazorpayConfig.api,
   `${location.protocol}//${location.hostname}`
 );
