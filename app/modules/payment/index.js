@@ -509,25 +509,20 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    const iframe = this.iframe;
-    const nativeotp = this.nativeotp;
-    const redirect = this.r.get('redirect');
-    const avoidPopup = this.avoidPopup;
-
-    if (iframe) {
+    if (this.iframe) {
       return true;
     }
 
-    if (!nativeotp) {
-      return true;
+    if (this.nativeotp) {
+      return false;
     }
 
-    if (!redirect) {
-      return true;
+    if (this.r.get('redirect')) {
+      return false;
     }
 
-    if (!avoidPopup) {
-      return true;
+    if (this.avoidPopup) {
+      return false;
     }
 
     return false;
