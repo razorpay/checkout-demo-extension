@@ -27,7 +27,7 @@ import { isPowerWallet } from 'common/wallet';
 import * as Tez from 'tez';
 import Analytics from 'analytics';
 
-const isRazorpayFrame = _Str.startsWith(
+const isRazorpayFrame = true || _Str.startsWith(
   RazorpayConfig.api,
   `${location.protocol}//${location.hostname}`
 );
@@ -517,15 +517,7 @@ Payment.prototype = {
       return false;
     }
 
-    if (!this.r.get('redirect')) {
-      return true;
-    }
-
-    if (!this.avoidPopup) {
-      return true;
-    }
-
-    return false;
+    return !(this.r.get('redirect') || this.avoidPopup);
   },
 
   tryPopup: function() {
