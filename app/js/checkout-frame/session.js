@@ -5239,8 +5239,9 @@ Session.prototype = {
           askOTP(that.otpView, data);
         });
 
-        request.iframe = true;
-        Analytics.track('iframe:attempt');
+        request.nativeotp = true;
+        request.iframe = false;
+        // Analytics.track('iframe:attempt');
       }
     }
 
