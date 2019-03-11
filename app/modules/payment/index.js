@@ -517,12 +517,12 @@ Payment.prototype = {
       return false;
     }
 
-    if (this.r.get('redirect')) {
-      return false;
+    if (!this.r.get('redirect')) {
+      return true;
     }
 
-    if (this.avoidPopup) {
-      return false;
+    if (!this.avoidPopup) {
+      return true;
     }
 
     return false;
