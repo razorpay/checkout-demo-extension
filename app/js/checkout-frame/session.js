@@ -2260,6 +2260,7 @@ Session.prototype = {
         });
         this.hideTimer();
       }
+      this.showLoadError('Waiting for payment to complete on bank page');
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
