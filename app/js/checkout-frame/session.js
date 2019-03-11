@@ -38,14 +38,7 @@ function gotoAmountScreen() {
 }
 
 function shouldEnableP13n(keyId) {
-  if (
-    keyId === 'rzp_live_Oeieme2CjQmyTQ' ||
-    keyId === 'rzp_live_ILgsfZCZoFIKMb'
-  ) {
-    return true;
-  }
-
-  return /^rzp_live_[0-9a-z]/.test(keyId);
+  return true;
 }
 
 // .shown has display: none from iOS ad-blocker
