@@ -183,31 +183,31 @@
   const topUpiApps = [
     {
       text: 'BHIM',
-      icon: 'https://cdn.razorpay.com/checkout/bhim.svg',
+      icon: 'https://cdn.razorpay.com/app/bhim.svg',
       id: 'bhim',
       psp: 'upi',
     },
     {
       text: 'Google Pay',
-      icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      icon: 'https://cdn.razorpay.com/app/googlepay.svg',
       id: 'gpay',
       psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
     },
     {
       text: 'WhatsApp',
-      icon: 'https://cdn.razorpay.com/checkout/whatsapp.png',
+      icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
       id: 'whatsapp',
       psp: 'icici',
     },
     {
       text: 'Paytm',
-      icon: 'https://cdn.razorpay.com/checkout/paytm.svg',
+      icon: 'https://cdn.razorpay.com/app/paytm.svg',
       id: 'paytm',
       psp: 'paytm',
     },
     {
       text: 'PhonePe',
-      icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
+      icon: 'https://cdn.razorpay.com/app/phonepe.svg',
       id: 'phonepe',
       psp: 'ybl',
     },
