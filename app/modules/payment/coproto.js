@@ -242,7 +242,7 @@ var responseTypes = {
   },
 
   otp: function(request, fullResponse) {
-    if (!this.nativeotp && !this.iframe && request.method === 'direct') {
+    if (!this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
     if (this.data.method === 'wallet') {

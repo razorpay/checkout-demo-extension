@@ -307,6 +307,20 @@ $.prototype = {
     }
     return this;
   },
+
+  scrollIntoView: function() {
+    if (this[0]) {
+      var el = this[0];
+      try {
+        if (!isElementCompletelyVisible(el)) {
+          bringIntoView(el);
+        }
+      } catch (e) {}
+    }
+
+    return this;
+  },
+
   click: function() {
     var $el = this[0];
 
@@ -323,6 +337,44 @@ $.prototype = {
     $el.dispatchEvent(eventObj);
   },
 };
+
+/**
+ * Brings a DOMNode into the view by scrolling
+ * parents until it's in the view.
+ * @param {DOMNode} el
+ */
+function bringIntoView(el) {
+  var scrollTop;
+  var parent = el.offsetParent || el.parentElement;
+
+  while (parent && !isElementCompletelyVisible(el)) {
+    if (
+      parent.id === 'modal' ||
+      parent.style.overflow === 'hidden' ||
+      parent.style.overflowY === 'hidden'
+    ) {
+      // Don't scroll div#modal as well as any element that cannot be scrolled back into position by the user.
+      parent = parent.offsetParent || parent.parentElement;
+
+      continue;
+    }
+
+    scrollTop = el.getBoundingClientRect().y - parent.getBoundingClientRect().y;
+
+    parent.scroll(0, scrollTop);
+
+    parent = parent.offsetParent || parent.parentElement;
+  }
+}
+
+function isElementCompletelyVisible(el) {
+  var rect = el.getBoundingClientRect();
+
+  return (
+    rect.top + rect.height <= window.innerHeight &&
+    rect.left + rect.width <= window.innerWidth
+  );
+}
 
 function smoothScrollTo(y) {
   smoothScrollBy(y - pageYOffset);
