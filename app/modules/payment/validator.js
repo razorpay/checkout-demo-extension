@@ -33,28 +33,15 @@ export const setShieldParams = params => {
 };
 
 export const formatPayment = function(payment) {
-  let params =
-    ['feesRedirect', 'tez', 'avoidPopup']
-    |> _Arr.reduce((allParams, param) => {
-      if (param in payment) {
-        allParams[param] = payment[param];
-      }
-      return allParams;
-    }, {});
-
-  payment.data = formatPayload(payment.data, payment.r, params);
-};
-
-export const formatPayload = function(payload, razorpayInstance, params = {}) {
-  var data = _Obj.clone(payload);
+  var data = payment.data;
 
   // Set view for fees.
-  if (params.feesRedirect) {
+  if (payment.fees) {
     data.view = 'html';
   }
 
   // fill data from options if empty
-  var getOption = razorpayInstance.get;
+  var getOption = payment.r.get;
   _Arr.loop(
     [
       'amount',
@@ -93,13 +80,13 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   }
 
   // api needs this flag to decide between redirect/otp
-  if (params.avoidPopup && data.method === 'wallet') {
+  if (payment.avoidPopup && data.method === 'wallet') {
     data['_[source]'] = 'checkoutjs';
   }
 
-  if (params.tez) {
-    if (!razorpayInstance.tezPossible) {
-      return razorpayInstance.emit(
+  if (payment.tez) {
+    if (!payment.r.tezPossible) {
+      return payment.r.emit(
         'payment.error',
         _.rzpError('Tez is not available')
       );
@@ -135,6 +122,4 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   data._ = Track.common();
   // make it flat
   flattenProp(data, '_', '[]');
-
-  return data;
 };
