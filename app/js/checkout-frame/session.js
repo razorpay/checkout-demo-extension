@@ -5211,7 +5211,9 @@ Session.prototype = {
       var cardType = getCardTypeFromPayload(data, this.transformedTokens);
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
-        if (this.nativeotp && cardType === 'mastercard') {
+        // Card Networks that support both Headless & Iframe
+        var supportedCardType = ['mastercard', 'visa'];
+        if (this.nativeotp && supportedCardType.indexOf(cardType) > -1) {
           shouldUseNativeOTP = true;
         }
       } else if (data.method === 'emi') {
