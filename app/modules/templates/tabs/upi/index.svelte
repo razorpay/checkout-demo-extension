@@ -289,13 +289,9 @@
 
       checkTez(
         /* Use Tez */
-        () => {
-          this.set({ useWebPaymentsApi: true})
-        },
+        () => this.set({ useWebPaymentsApi: true }),
         /* Don't use Tez */
-        () => {
-          this.set({ useWebPaymentsApi: false})
-        }
+        () =>this.set({ useWebPaymentsApi: false })
       );
 
       /* TODO: improve handling of `prefill.vpa` */
@@ -303,12 +299,14 @@
         this.set({
           selectedApp: null,
           vpa: session.get('prefill.vpa'),
-        })
+        });
       }
     },
 
     onstate({ changed, current }) {
-      if (changed.selectedApp) {
+      const session = getSession();
+
+      if (changed.selectedApp && session.tab === 'upi') {
         /* TODO: bad practice, remove asap */
         if (current.selectedApp === undefined) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
@@ -345,7 +343,7 @@
             if (selectedApp === 'gpay' && useWebPaymentsApi) {
               data = {
                 '_[flow]': 'tez',
-              }
+              };
             } else {
               data = {
                 vpa: `${vpa}@${pspHandle}`,

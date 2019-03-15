@@ -1556,12 +1556,18 @@ Session.prototype = {
   },
 
   setUpiTab: function() {
-    this.upiTab = new discreet.UpiTab({
-      target: gel('upi-svelte-wrap'),
-      data: {
-        methods: this.methods,
-      },
-    });
+    /**
+     * This is being handled in Tab component as well,
+     * condition won't be needed here once all ported to svelte
+     */
+    if (this.methods.upi) {
+      this.upiTab = new discreet.UpiTab({
+        target: gel('upi-svelte-wrap'),
+        data: {
+          methods: this.methods,
+        },
+      });
+    }
   },
 
   setSvelteComponents: function() {
@@ -2302,12 +2308,6 @@ Session.prototype = {
     } catch (readErr) {}
 
     var hide = function() {
-      var checked = $('#upi-apps input:checked');
-
-      if (checked[0]) {
-        checked[0].checked = false;
-      }
-
       Analytics.track('upi:2f:consent:dismiss', {
         type: AnalyticsTypes.BEHAV,
         data: {
@@ -2315,8 +2315,6 @@ Session.prototype = {
           consent: false,
         },
       });
-
-      $('#body').toggleClass('sub', false);
     };
 
     Analytics.track('upi:2f:consent', {
