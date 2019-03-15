@@ -1,30 +1,40 @@
 <div class="container">
-  {#if view === 'fee'}
-    <FeeBearer
-      {session}
-      {paymentData}
-      on:continue="createPaymentWithFees(event)"
-    />
-  {:elseif view === 'qr'}
-    {#if loading}
-      <AsyncLoading message="Generating QR Code..."/>
-    {:else}
-        <div class="message" style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
-        Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
-        </div>
-        {#if qrImage}
-          <div class="qr-image">
-            <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
-          </div>
-        {/if}
-     {/if}
-  {:elseif view === 'error'}
-    <div class="error mchild">
-      <div class="error-text">{error}</div>
-      <br />
-      <div class="btn" on:click="init()">Retry</div>
+  {#if loading}
+    {loadingMessage}
+    <div class="loading">
+      <div class="spin"><div></div></div>
+      <div class="spin spin2"><div></div></div>
     </div>
+  {:elseif error}
+    <div class="error">
+      {error}
+      <br />
+      <div class="btn" on:click="session.back()">Retry</div>
+    </div>
+  {:elseif feeBreakup}
+    Fees Breakup
+    <br/>
+    <div class="fees-container">
+    {#each feeBreakup as fee}
+      <div class="fee">
+        <div class="fee-title">{fee[0]}</div>
+        <div class="fee-amount">{fee[1]}</div>
+      </div>
+    {/each}
+    </div>
+    <div class="btn" on:click="createPayment()">Continue</div>
+  {:else}
+      <div class="message" style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
+      Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
+      </div>
+      {#if qrImage}
+        <div class="qr-image">
+          <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
+        </div>
+      {/if}
   {/if}
+
+
 </div>
 <style>
 :global(#body[tab=qr]) {
@@ -103,40 +113,38 @@ img {
 
   export default {
     oncreate() {
-      this.init();
-    },
+      const { session, paymentData } = this.get();
 
-    components: {
-      AsyncLoading: 'templates/views/ui/AsyncLoading.svelte',
-      FeeBearer: 'templates/views/feebearer.svelte',
+      this.session = session;
+      paymentData.method = 'upi';
+      paymentData['_[flow]'] = 'intent';
+      paymentData['_[upiqr]'] = '1';
+
+      if (session.preferences.fee_bearer) {
+        this.set({ loading: true, loadingMessage: 'Please wait...' });
+
+        paymentData.amount = session.get('amount');
+        paymentData.currency = session.get('currency');
+
+        const displayFeeBreakup = _Func.bind(this.displayFeeBreakup, this);
+        const onError = _Func.bind(this.onError, this);
+
+        session.r.createFees(paymentData, displayFeeBreakup, onError);
+      } else {
+        this.createPayment();
+      }
     },
 
     data() {
       return {
         RazorpayConfig,
-        loading: false,
+        loading: true,
         qrImage: null,
         error: null,
-        view: 'qr'
-      }
+      };
     },
 
     methods: {
-      init() {
-        const { session, paymentData } = this.get();
-
-        this.session = session;
-        paymentData.method = 'upi';
-        paymentData['_[flow]'] = 'intent';
-        paymentData['_[upiqr]'] = '1';
-
-        if (session.preferences.fee_bearer) {
-          this.set({ view: 'fee', session, paymentData });
-        } else {
-          this.createPayment();
-        }
-      },
-
       handleResponse({ data }) {
         const qrImage = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(
           data.qr_code_url || data.intent_url
@@ -150,26 +158,26 @@ img {
       },
 
       onError(data) {
-        this.set({
-          view: 'error',
-          error: data.error.description,
-          loading: false
-        });
+        this.set({ error: data.error.description, loading: false });
       },
 
-      createPaymentWithFees(bearer) {
+      displayFeeBreakup(response, feeBreakup) {
         const { paymentData } = this.get();
 
-        paymentData.amount = bearer.amount;
-        paymentData.fee = bearer.fee;
+        paymentData.amount = response.input.amount;
+        paymentData.fee = response.input.fee;
 
-        this.createPayment();
+        this.set({
+          feeBreakup,
+          loading: false,
+        });
       },
 
       createPayment() {
         this.set({
-          view: 'qr',
-          loading: true
+          feeBreakup: false,
+          loading: true,
+          loadingMessage: 'Generating QR Code...',
         });
 
         const { session, paymentData, onSuccess } = this.get();
