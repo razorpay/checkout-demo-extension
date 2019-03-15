@@ -5496,7 +5496,9 @@ Session.prototype = {
       }
 
       if (flows) {
-        if (!this.recurring) {
+        if (self.recurring) {
+          toggleInvalid($('#elem-card'), flows.recurring);
+        } else {
           if (flows.pin) {
             Analytics.track('atmpin:flows', {
               type: AnalyticsTypes.RENDER,
