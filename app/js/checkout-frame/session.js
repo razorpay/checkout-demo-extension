@@ -5483,10 +5483,6 @@ Session.prototype = {
 
     this.flowIIN = iin;
 
-    if (this.recurring) {
-      return;
-    }
-
     this.r.getCardFlows(iin, function(flows) {
       Analytics.track('card_flows:fetched', {
         data: {
