@@ -1479,28 +1479,14 @@ Session.prototype = {
         });
       }
     } else if (hasOffers) {
-      var eligibleOffers = preferences.offers.filter(function(offer) {
-        var method = offer.payment_method,
-          enabledMethods = that.methods,
-          isMethodEnabled =
-            method !== 'wallet'
-              ? enabledMethods[method]
-              : isArray(enabledMethods.wallet) &&
-                enabledMethods.wallet.filter(function(item) {
-                  return item.code === offer.issuer;
-                })[0];
-
-        return isMethodEnabled;
-      });
-
       var $offersContainer = $('#body #offers-container'),
         $offersTitle;
 
-      if (eligibleOffers.length > 0) {
+      if (this.eligibleOffers.length > 0) {
         // TODO: convert args to kwargs
         this.offers = initOffers(
           $offersContainer[0],
-          eligibleOffers,
+          this.eligibleOffers,
           {},
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
@@ -3257,7 +3243,15 @@ Session.prototype = {
     }
 
     if (
-      ['', 'card', 'emi', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0
+      [
+        '',
+        'card',
+        'emi',
+        'netbanking',
+        'wallet',
+        'upi',
+        'cardless_emi',
+      ].indexOf(screen) < 0
     ) {
       $('#body').removeClass('has-offers');
       return this.offers.display(false);
@@ -5152,7 +5146,16 @@ Session.prototype = {
     var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
-      data.offer_id = appliedOffer.id;
+      // Set offer ID based on offer type
+      switch (appliedOffer.type) {
+        case 'api':
+          data.offer_id = appliedOffer.id;
+          break;
+
+        case 'local':
+          data['notes[offer_id]'] = appliedOffer.id;
+          break;
+      }
       this.r.display_amount = appliedOffer.amount;
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
@@ -5634,8 +5637,13 @@ Session.prototype = {
      * - Trigger oneMethod
      */
 
-    if (this.forcedOffer) {
-      var paymentMethod = this.forcedOffer.payment_method;
+    var forcedOffer =
+      this.forcedOffer ||
+      discreet.Offers.getForcedOffer({
+        preferences: preferences,
+      });
+    if (forcedOffer) {
+      var paymentMethod = forcedOffer.payment_method;
       if (paymentMethod === 'emi') {
         delete methods.card;
         methods.count++;
@@ -5770,12 +5778,18 @@ Session.prototype = {
   },
 
   setOffers: function(preferences) {
-    var hasOffers = (this.hasOffers = isArray(preferences.offers)),
-      forcedOffer = (this.forcedOffer =
-        hasOffers && preferences.force_offer && preferences.offers[0]);
+    var allOffers = discreet.Offers.createOffers({
+      preferences: preferences,
+      session: this,
+    });
 
-    if (forcedOffer) {
-      var paymentMethod = forcedOffer.payment_method;
+    this.eligibleOffers = allOffers.offers;
+
+    this.hasOffers = allOffers.offers.length > 0;
+    this.forcedOffer = allOffers.forcedOffer;
+
+    if (this.forcedOffer) {
+      var paymentMethod = this.forcedOffer.payment_method;
 
       if (['emi', 'card', 'wallet'].indexOf(paymentMethod) >= 0) {
         // need this while preparing the template
@@ -5783,7 +5797,7 @@ Session.prototype = {
       }
 
       Analytics.track('offers:forced', {
-        data: forcedOffer,
+        data: this.forcedOffer,
       });
     }
   },
@@ -5851,7 +5865,6 @@ Session.prototype = {
       invoice = (this.invoice = preferences.invoice),
       subscription = (this.subscription = preferences.subscription),
       options = preferences.options;
-    this.setOffers(preferences);
 
     /* Set magic from preferences */
     this.magic = false; //this.magic && preferences.magic;
@@ -5972,6 +5985,7 @@ Session.prototype = {
 
     /* set payment methods on the basis of preferences */
     this.setPaymentMethods(preferences);
+    this.setOffers(preferences);
   },
 
   showModal: function(preferences) {
