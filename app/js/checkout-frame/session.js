@@ -1670,6 +1670,41 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProvider: function(providerCode) {
+    Analytics.track('cardless_emi:provider:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    // User selected EMI on Cards
+    if (providerCode === 'cards') {
+      this.switchTab('emi');
+      return;
+    }
+
+    if (providerCode === 'bajaj') {
+      this.showEmiPlans('bajaj')();
+      return;
+    }
+
+    $('#form-cardless_emi input[name=emi_duration]').val('');
+    $('#form-cardless_emi input[name=provider]').val('');
+    $('#form-cardless_emi input[name=ott]').val('');
+
+    CardlessEmiStore.providerCode = providerCode;
+
+    $('#form-cardless_emi input[name=provider]').val(providerCode);
+
+    this.preSubmit();
+  },
+
   setCardlessEmi: function() {
     var self = this;
 
@@ -1708,33 +1743,7 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.option.code;
 
-            Analytics.track('cardless_emi:provider:select', {
-              type: AnalyticsTypes.BEHAV,
-              data: {
-                provider: providerCode,
-              },
-            });
-
-            // User selected EMI on Cards
-            if (providerCode === 'cards') {
-              self.switchTab('emi');
-              return;
-            }
-
-            if (providerCode === 'bajaj') {
-              self.showEmiPlans('bajaj')();
-              return;
-            }
-
-            $('#form-cardless_emi input[name=emi_duration]').val('');
-            $('#form-cardless_emi input[name=provider]').val('');
-            $('#form-cardless_emi input[name=ott]').val('');
-
-            CardlessEmiStore.providerCode = providerCode;
-
-            $('#form-cardless_emi input[name=provider]').val(providerCode);
-
-            self.preSubmit();
+            self.selectCardlessEmiProvider(providerCode);
           },
         },
       });
