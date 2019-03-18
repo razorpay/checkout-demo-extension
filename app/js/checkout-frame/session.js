@@ -21,6 +21,7 @@ var preferences = window.preferences,
   Customer = discreet.Customer,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
+  Store = discreet.Store,
   OptionsList = discreet.OptionsList;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -30,11 +31,11 @@ var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
 
 function getStore(prop) {
-  return discreet.Store.get()[prop];
+  return Store.get()[prop];
 }
 
 function gotoAmountScreen() {
-  discreet.Store.set({ screen: 'amount' });
+  Store.set({ screen: 'amount' });
 }
 
 function shouldEnableP13n(keyId) {
@@ -2284,7 +2285,7 @@ Session.prototype = {
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
-    discreet.Store.set({ screen: '' });
+    Store.set({ screen: '' });
     if (this.methods.count >= 4) {
       $(this.el).addClass('long');
     }
@@ -3211,9 +3212,6 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'upi' &&
-        this.upi_intents_data &&
-        !$('#form-upi .item :checked')[0]) ||
       (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
     ) {
       showPaybtn = false;
@@ -3221,7 +3219,15 @@ Session.prototype = {
     this.body.toggleClass('sub', showPaybtn);
 
     if (screen === 'upi') {
-      if (typeof this.upiTab.get().selectedApp === 'undefined') {
+      var isIntentFlow = this.upiTab.get().intent;
+
+      if (isIntentFlow) {
+        var data = this.upiTab.getPayload();
+
+        if (data['_[flow]'] === 'intent' && !data.upi_app) {
+          $('#body').removeClass('sub');
+        }
+      } else if (typeof this.upiTab.get().selectedApp === 'undefined') {
         $('#body').removeClass('sub');
       }
     }
@@ -4700,7 +4706,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = discreet.Store.get().screenData.otp.otp;
+    var otp = Store.get().screenData.otp.otp;
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -5808,7 +5814,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    discreet.Store.set({ preferences: prefs });
+    Store.set({ preferences: prefs });
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
