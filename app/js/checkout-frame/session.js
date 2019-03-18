@@ -3237,9 +3237,9 @@ Session.prototype = {
 
     return this.offers && this.renderOffers(this.tab);
   },
-  renderOffers: function(screen) {
-    if (screen === 'emiplans') {
-      screen = 'emi';
+  renderOffers: function(tab) {
+    if (tab === 'emiplans') {
+      tab = 'emi';
     }
 
     if (
@@ -3251,7 +3251,7 @@ Session.prototype = {
         'wallet',
         'upi',
         'cardless_emi',
-      ].indexOf(screen) < 0
+      ].indexOf(tab) < 0
     ) {
       $('#body').removeClass('has-offers');
       return this.offers.display(false);
@@ -3264,26 +3264,24 @@ Session.prototype = {
       this.handleOfferRemoval();
     }
 
-    var paymentMethod = screen;
+    var paymentMethod = tab;
 
-    this.offers.applyFilter(
-      (screen && { payment_method: paymentMethod }) || {}
-    );
+    this.offers.applyFilter((tab && { payment_method: paymentMethod }) || {});
 
     // Pre-select offer if there is only one visible offer
     var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer && screen) {
+    if (defaultOffer && tab) {
       this.preSelectedOffer = defaultOffer;
     }
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
-      this.handleOfferSelection(this.preSelectedOffer, screen);
+      this.handleOfferSelection(this.preSelectedOffer, tab);
       this.offers.applyOffer();
 
       /* Don't set preSelectedOffer to null if it's on card OTP screen  */
-      if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
+      if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
         this.preSelectedOffer = null;
       }
     }
