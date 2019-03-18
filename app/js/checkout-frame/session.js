@@ -3275,12 +3275,32 @@ Session.prototype = {
 
     var paymentMethod = tab;
 
-    this.offers.applyFilter((tab && { payment_method: paymentMethod }) || {});
+    var filters = (tab && { payment_method: paymentMethod }) || {};
+
+    /**
+     * For every Cardless EMI screen other than
+     * the Cardless EMI homescreen,
+     * set the provider in the filters.
+     *
+     * Side-effect: We won't be able to show
+     * provider-less offers for Cardless EMI
+     * until Offers code is refactored.
+     */
+    if (tab === 'cardless_emi') {
+      if (this.screen !== 'cardless_emi') {
+        filters.provider = CardlessEmiStore.providerCode;
+      }
+    }
+
+    this.offers.applyFilter(filters);
 
     // Pre-select offer if there is only one visible offer
     var defaultOffer = this.offers.defaultOffer;
     if (defaultOffer && tab) {
-      this.preSelectedOffer = defaultOffer;
+      // Don't preselect offer for Cardless EMI homescreen.
+      if (!(tab === 'cardless_emi' && this.screen === 'cardless_emi')) {
+        this.preSelectedOffer = defaultOffer;
+      }
     }
 
     if (this.preSelectedOffer) {
@@ -3415,6 +3435,12 @@ Session.prototype = {
             cvv.focus();
           }
         }
+      }
+    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
+      var provider = offer.provider;
+
+      if (provider) {
+        this.selectCardlessEmiProvider(provider);
       }
     }
   },
