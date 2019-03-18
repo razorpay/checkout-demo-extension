@@ -80,7 +80,7 @@
                 }}
               />
               {#if pspHandle}
-                <div ref:pspName>@ {pspHandle}</div>
+                <div ref:pspName>@{pspHandle}</div>
               {/if}
             </div>
           {/if}
@@ -369,17 +369,20 @@
       },
 
       onUpiAppSelection(id) {
-        const session = getSession();
         this.set({ selectedApp: id });
         const { selectedAppData } = this.get();
-
-        this.set({ pspHandle: selectedAppData ? selectedAppData.psp : '' });
+        let pattern = '';
 
         if (id === null) {
-          this.set({ pattern: '.+@.+' });
+          pattern = '.+@.+';
         } else {
-          this.set({ pattern: '.+' });
+          pattern = '.+';
         }
+
+        this.set({
+          pspHandle: selectedAppData ? selectedAppData.psp : '',
+          pattern,
+        });
       },
 
       /* VPA card specific code */
