@@ -5564,6 +5564,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var qrEnabled =
+      this.get('method.qr') &&
       !getStore('isPartialPayment') &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
