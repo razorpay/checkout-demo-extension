@@ -3,13 +3,13 @@
     {#each showableApps as app, i}
       <RadioOption
         data={app}
-        icon={app.icon}
+        icon={app.app_icon}
+        iconPlaceholder='.placeholder'
         selected={app.package_name === selected}
         on:select="onAppSelect(event)"
         name='upi_app'
         value={app.package_name}
       >
-        <OptionIcon icon={app.app_icon} />
         <div ref:title>
           {app.app_name}
           {#if i === 0 && showRecommendedUPIApp}
@@ -67,6 +67,13 @@
     :global(.radio-option),
     :global(.next-option) {
       padding: 18px 40px 18px 60px;
+    }
+
+    :global(.placeholder) {
+      margin: 0;
+      width: 24px;
+      height: @width;
+      transform: scale(1.1);
     }
 
     :global(.options) {
