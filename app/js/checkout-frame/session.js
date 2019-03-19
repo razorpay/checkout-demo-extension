@@ -3298,7 +3298,9 @@ Session.prototype = {
      *
      * `tab` being '' means we are on the homescreen.
      */
-    filters.homescreen = tab === '';
+    if (tab === '') {
+      filters.homescreen = tab === '';
+    }
 
     this.offers.applyFilter(filters);
 
