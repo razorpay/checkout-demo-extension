@@ -1670,6 +1670,41 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProvider: function(providerCode) {
+    Analytics.track('cardless_emi:provider:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    // User selected EMI on Cards
+    if (providerCode === 'cards') {
+      this.switchTab('emi');
+      return;
+    }
+
+    if (providerCode === 'bajaj') {
+      this.showEmiPlans('bajaj')();
+      return;
+    }
+
+    $('#form-cardless_emi input[name=emi_duration]').val('');
+    $('#form-cardless_emi input[name=provider]').val('');
+    $('#form-cardless_emi input[name=ott]').val('');
+
+    CardlessEmiStore.providerCode = providerCode;
+
+    $('#form-cardless_emi input[name=provider]').val(providerCode);
+
+    this.preSubmit();
+  },
+
   setCardlessEmi: function() {
     var self = this;
 
@@ -1708,33 +1743,7 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.option.code;
 
-            Analytics.track('cardless_emi:provider:select', {
-              type: AnalyticsTypes.BEHAV,
-              data: {
-                provider: providerCode,
-              },
-            });
-
-            // User selected EMI on Cards
-            if (providerCode === 'cards') {
-              self.switchTab('emi');
-              return;
-            }
-
-            if (providerCode === 'bajaj') {
-              self.showEmiPlans('bajaj')();
-              return;
-            }
-
-            $('#form-cardless_emi input[name=emi_duration]').val('');
-            $('#form-cardless_emi input[name=provider]').val('');
-            $('#form-cardless_emi input[name=ott]').val('');
-
-            CardlessEmiStore.providerCode = providerCode;
-
-            $('#form-cardless_emi input[name=provider]').val(providerCode);
-
-            self.preSubmit();
+            self.selectCardlessEmiProvider(providerCode);
           },
         },
       });
@@ -3237,9 +3246,9 @@ Session.prototype = {
 
     return this.offers && this.renderOffers(this.tab);
   },
-  renderOffers: function(screen) {
-    if (screen === 'emiplans') {
-      screen = 'emi';
+  renderOffers: function(tab) {
+    if (tab === 'emiplans') {
+      tab = 'emi';
     }
 
     if (
@@ -3251,7 +3260,7 @@ Session.prototype = {
         'wallet',
         'upi',
         'cardless_emi',
-      ].indexOf(screen) < 0
+      ].indexOf(tab) < 0
     ) {
       $('#body').removeClass('has-offers');
       return this.offers.display(false);
@@ -3264,26 +3273,54 @@ Session.prototype = {
       this.handleOfferRemoval();
     }
 
-    var paymentMethod = screen;
+    var paymentMethod = tab;
 
-    this.offers.applyFilter(
-      (screen && { payment_method: paymentMethod }) || {}
-    );
+    var filters = (tab && { payment_method: paymentMethod }) || {};
+
+    /**
+     * For every Cardless EMI screen other than
+     * the Cardless EMI homescreen,
+     * set the provider in the filters.
+     *
+     * Side-effect: We won't be able to show
+     * provider-less offers for Cardless EMI
+     * until Offers code is refactored.
+     */
+    if (tab === 'cardless_emi') {
+      if (this.screen !== 'cardless_emi') {
+        filters.provider = CardlessEmiStore.providerCode;
+      }
+    }
+
+    /**
+     * Offers have a 'homescreen' attribute that tells
+     * whether or not we want to show that offer on the homescreen.
+     *
+     * `tab` being '' means we are on the homescreen.
+     */
+    if (tab === '') {
+      filters.homescreen = tab === '';
+    }
+
+    this.offers.applyFilter(filters);
 
     // Pre-select offer if there is only one visible offer
     var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer && screen) {
-      this.preSelectedOffer = defaultOffer;
+    if (defaultOffer && tab) {
+      // Don't preselect offer for Cardless EMI homescreen.
+      if (!(tab === 'cardless_emi' && this.screen === 'cardless_emi')) {
+        this.preSelectedOffer = defaultOffer;
+      }
     }
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
-      this.handleOfferSelection(this.preSelectedOffer, screen);
+      this.handleOfferSelection(this.preSelectedOffer, tab);
       this.offers.applyOffer();
 
       /* Don't set preSelectedOffer to null if it's on card OTP screen  */
-      if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
+      if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
         this.preSelectedOffer = null;
       }
     }
@@ -3408,6 +3445,12 @@ Session.prototype = {
             cvv.focus();
           }
         }
+      }
+    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
+      var provider = offer.provider;
+
+      if (provider) {
+        this.selectCardlessEmiProvider(provider);
       }
     }
   },
