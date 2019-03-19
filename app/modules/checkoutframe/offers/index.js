@@ -1,33 +1,34 @@
 import GlobalOffers from './global';
 
 /**
- * @param {String} type Type of offer
- * @param {Array} offers List of offers
- *
- * @return {Array}
+ * Default data that should be present in all offers.
  */
-const addTypeToOffers = (type, offers) =>
-  offers.map(offer => {
-    offer.type = type;
-
-    return offer;
-  });
+const defaultDataForOffer = {
+  homescreen: true,
+};
 
 /**
- * Adds homescreen key if missing to offers
+ * Fill data in an offer.
+ * @param {Object} offer Offer
+ * @param {Object} data Extra data to be filled, apart from the default data
+ *
+ * @return {Object}
+ */
+const fillMissingDataInOffer = (offer, data = {}) =>
+  ({}
+  |> _Obj.extend(defaultDataForOffer)
+  |> _Obj.extend(data)
+  |> _Obj.extend(offer));
+
+/**
+ * Fill data in all offers in a list.
  * @param {Array} offers List of offers
- * @param {Boolean} defaultValue Default value in case key is missing
+ * @param {Object} data Extra data to be filled, apart from the default data
  *
  * @return {Array}
  */
-const addHomescreenToOffers = (offers, defaultValue = true) =>
-  offers.map(offer => {
-    if (typeof offer.homescreen !== 'boolean') {
-      offer.homescreen = defaultValue;
-    }
-
-    return offer;
-  });
+const fillMissingDataInOffers = (offers, data) =>
+  offers.map(offer => fillMissingDataInOffer(offer, data));
 
 /**
  * Get local offers.
@@ -36,7 +37,9 @@ const addHomescreenToOffers = (offers, defaultValue = true) =>
  * @return {Array} offers Local offers
  */
 const getLocalOffers = opts => {
-  return [];
+  return fillMissingDataInOffers([], {
+    type: 'local',
+  });
 };
 
 /**
@@ -46,11 +49,13 @@ const getLocalOffers = opts => {
  * @return {Array} offers Eligible global offers
  */
 const getGlobalOffers = opts =>
-  addTypeToOffers(
-    'global',
+  fillMissingDataInOffers(
     GlobalOffers
       |> _Arr.filter(globalOffer => globalOffer.isEligible(opts))
-      |> _Arr.map(eligibleOffer => eligibleOffer.offer)
+      |> _Arr.map(eligibleOffer => eligibleOffer.offer),
+    {
+      type: 'global',
+    }
   );
 
 /**
@@ -60,7 +65,9 @@ const getGlobalOffers = opts =>
  * @return {Array} offers Offers from API
  */
 const getApiOffers = ({ preferences }) =>
-  addTypeToOffers('api', preferences.offers || []);
+  fillMissingDataInOffers(preferences.offers || [], {
+    type: 'api',
+  });
 
 /**
  * Checks if offer is eligible.
@@ -122,11 +129,9 @@ export const createOffers = opts => {
   const localOffers = getLocalOffers(opts);
 
   // Concat all offers and check for eligibility
-  let allOffers =
+  const allOffers =
     [].concat(apiOffers, globalOffers, localOffers)
     |> _Arr.filter(offer => isOfferEligible(offer, opts));
-
-  allOffers = addHomescreenToOffers(allOffers);
 
   return {
     offers: allOffers,
