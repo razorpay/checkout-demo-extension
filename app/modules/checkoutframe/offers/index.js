@@ -14,6 +14,22 @@ const addTypeToOffers = (type, offers) =>
   });
 
 /**
+ * Adds homescreen key if missing to offers
+ * @param {Array} offers List of offers
+ * @param {Boolean} defaultValue Default value in case key is missing
+ *
+ * @return {Array}
+ */
+const addHomescreenToOffers = (offers, defaultValue = true) =>
+  offers.map(offer => {
+    if (typeof offer.homescreen !== 'boolean') {
+      offer.homescreen = defaultValue;
+    }
+
+    return offer;
+  });
+
+/**
  * Get local offers.
  * @param {Object} opts Options
  *
@@ -106,9 +122,11 @@ export const createOffers = opts => {
   const localOffers = getLocalOffers(opts);
 
   // Concat all offers and check for eligibility
-  const allOffers =
+  let allOffers =
     [].concat(apiOffers, globalOffers, localOffers)
     |> _Arr.filter(offer => isOfferEligible(offer, opts));
+
+  allOffers = addHomescreenToOffers(allOffers);
 
   return {
     offers: allOffers,

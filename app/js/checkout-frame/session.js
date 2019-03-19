@@ -3292,6 +3292,14 @@ Session.prototype = {
       }
     }
 
+    /**
+     * Offers have a 'homescreen' attribute that tells
+     * whether or not we want to show that offer on the homescreen.
+     *
+     * `tab` being '' means we are on the homescreen.
+     */
+    filters.homescreen = tab === '';
+
     this.offers.applyFilter(filters);
 
     // Pre-select offer if there is only one visible offer
