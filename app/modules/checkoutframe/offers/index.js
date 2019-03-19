@@ -5,6 +5,7 @@ import GlobalOffers from './global';
  */
 const defaultDataForOffer = {
   homescreen: true,
+  removable: true,
 };
 
 /**
