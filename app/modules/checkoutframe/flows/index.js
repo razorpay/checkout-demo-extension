@@ -77,8 +77,6 @@ export function performCardFlowActions(cardNumber) {
   const isRecurring = session.recurring;
 
   session.r.getCardFlows(iin, flows => {
-    flows.pin = true;
-
     Analytics.track('card:flows:fetched', {
       data: {
         iin,
