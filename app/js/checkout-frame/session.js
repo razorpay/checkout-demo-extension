@@ -444,9 +444,6 @@ function onSixDigits(e) {
   var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
   var trimmedVal = val.replace(/[\ ]/g, '');
-  var exactSixDigits = trimmedVal.length === 6;
-  var lessThanSixDigits = trimmedVal.length < 6;
-  var moreThanSixDigits = trimmedVal.length > 6;
 
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
@@ -507,18 +504,12 @@ function onSixDigits(e) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
   }
 
-  // Debit + PIN stuff.
-  if (exactSixDigits || moreThanSixDigits) {
-    /**
-     * Don't check for flows if the card number
-     * was reduced from 7 digits to 6 digits.
-     */
-    if (trimmedVal.slice(0, 6) !== this.flowIIN) {
-      this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
-    }
-  } else if (lessThanSixDigits) {
+  // Flows
+  if (trimmedVal.length >= 6) {
+    this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
+  } else {
     this.flowIIN = null;
-    showFlowRadioButtons(false);
+    showFlowRadioButtons(false); // Debit + PIN
   }
 }
 
