@@ -2,6 +2,7 @@ import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
+import { Formatter } from 'formatter';
 
 const VISIBLE_CLASS = 'drishy';
 const INVALID_CLASS = 'invalid';
@@ -96,8 +97,13 @@ export function performCardFlowActions(cardNumber) {
 
     if (isRecurring) {
       const cardElem = _Doc.querySelector('#elem-card');
+      const cardInput = _Doc.querySelector(
+        '#elem-card input[name="card[number]"]'
+      );
+      const isValid =
+        flows.recurring && Formatter.rules.card.isValid.call(cardInput);
 
-      if (flows.recurring) {
+      if (isValid) {
         _El.removeClass(cardElem, INVALID_CLASS);
       } else {
         _El.addClass(cardElem, INVALID_CLASS);
