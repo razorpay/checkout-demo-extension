@@ -39,6 +39,7 @@ import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
+import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -86,6 +87,7 @@ export default {
   Store,
   UserAgent,
   Offers,
+  Flows,
 
   getQueryParams: _.getQueryParams,
 
