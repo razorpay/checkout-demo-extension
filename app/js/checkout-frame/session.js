@@ -444,9 +444,6 @@ function onSixDigits(e) {
   var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
   var trimmedVal = val.replace(/[\ ]/g, '');
-  var exactSixDigits = trimmedVal.length === 6;
-  var lessThanSixDigits = trimmedVal.length < 6;
-  var moreThanSixDigits = trimmedVal.length > 6;
 
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
