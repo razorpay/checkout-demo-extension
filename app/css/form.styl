@@ -108,7 +108,8 @@ label[for] {
   }
 }
 
-#elem-card .amex-error {
+#elem-card .amex-error,
+#elem-card .recurring-card-error {
   display: none;
 }
 
@@ -117,6 +118,15 @@ label[for] {
     display: none;
   }
   &.focused.invalid.mature .amex-error {
+    display: block;
+  }
+}
+
+#elem-card.recurring {
+  .help {
+    display: none;
+  }
+  &.focused.invalid.mature .recurring-card-error {
     display: block;
   }
 }

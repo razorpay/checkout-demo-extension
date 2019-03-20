@@ -5518,23 +5518,17 @@ Session.prototype = {
   },
 
   checkFlows: function(iin, isPrefilledCardNumber) {
-    // Hide and uncheck checkboxes.
-    showFlowRadioButtons(false);
-
-    if (this.recurring) {
-      return;
+    if (!this.recurring) {
+      // Hide and uncheck checkboxes.
+      showFlowRadioButtons(false);
     }
 
     var self = this;
 
     this.flowIIN = iin;
 
-    if (this.recurring) {
-      return;
-    }
-
     this.r.getCardFlows(iin, function(flows) {
-      Analytics.track('card_flows:fetched', {
+      Analytics.track('card:flows:fetched', {
         data: {
           iin: iin,
           prefilled_card: isPrefilledCardNumber || null,
@@ -5547,18 +5541,25 @@ Session.prototype = {
         return;
       }
 
-      if (flows && flows.pin) {
-        Analytics.track('atmpin:flows', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            iin: iin,
-            prefilled_card: isPrefilledCardNumber || null,
-            default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-          },
-        });
-        showFlowRadioButtons(true);
-      } else {
-        showFlowRadioButtons(false);
+      if (flows) {
+        if (self.recurring) {
+          toggleInvalid($('#elem-card'), flows.recurring);
+        } else {
+          if (flows.pin) {
+            Analytics.track('atmpin:flows', {
+              type: AnalyticsTypes.RENDER,
+              data: {
+                iin: iin,
+                prefilled_card: isPrefilledCardNumber || null,
+                default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
+              },
+            });
+
+            showFlowRadioButtons(true);
+          } else {
+            showFlowRadioButtons(false);
+          }
+        }
       }
     });
   },
