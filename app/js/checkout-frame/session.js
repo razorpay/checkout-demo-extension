@@ -503,8 +503,6 @@ function onSixDigits(e) {
   } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
   }
-
-  discreet.Flows.performCardFlowActions(trimmedVal);
 }
 
 function noCvvToggle(e) {
@@ -1476,15 +1474,6 @@ Session.prototype = {
       this.showTimer(function() {
         that.dismissReason = 'timeout';
         that.modal.hide();
-      });
-    }
-
-    // Debit + PIN stuff
-    var cardNumber = this.get('prefill.card[number]');
-    if (cardNumber) {
-      onSixDigits.call(this, {
-        target: gel('card_number'),
-        isPrefilled: true,
       });
     }
 
@@ -2933,6 +2922,8 @@ Session.prototype = {
               invoke('focus', el_expiry, null, 0);
             }
           }
+
+          discreet.Flows.performCardFlowActions(this.value);
         });
 
       delegator.expiry = delegator
