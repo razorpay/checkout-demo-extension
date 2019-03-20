@@ -6,7 +6,7 @@ import * as AnalyticsTypes from 'analytics-types';
 
 const bankOverrides = {
   SBIN: {
-    name: 'SBI Credit Card EMI',
+    name: 'SBI Credit Card',
   },
 };
 
