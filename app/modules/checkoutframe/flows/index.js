@@ -58,7 +58,7 @@ export function performCardFlowActions(cardNumber) {
   }
 
   // Get IIN from card number
-  const iin = cardNumber.replace(/[ ]/g, '').slice(0, 6);
+  const iin = cardNumber.replace(/\D/g, '').slice(0, 6);
 
   if (iin.length < 6) {
     CURRENT_IIN = null;
