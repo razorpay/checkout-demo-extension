@@ -1,10 +1,9 @@
 import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
+import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
 
-const VISIBLE_CLASS = 'drishy';
 const INVALID_CLASS = 'invalid';
 
 /**
@@ -21,7 +20,7 @@ function setDebitPinRadiosVisibility(visible) {
 
   if (visible) {
     // Show container
-    _El.addClass(container, VISIBLE_CLASS);
+    _El.addClass(container, SHOWN_CLASS);
 
     // Get default radio
     const defaultRadio = _Doc.querySelector(
@@ -34,7 +33,7 @@ function setDebitPinRadiosVisibility(visible) {
     }
   } else {
     // Hide container
-    _El.removeClass(container, VISIBLE_CLASS);
+    _El.removeClass(container, SHOWN_CLASS);
 
     // Uncheck values
     if (checkedRadio) {
