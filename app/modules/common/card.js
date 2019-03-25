@@ -17,6 +17,14 @@ const fullPrefix = cdnUrl + 'acs/network/';
 export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
 
 /**
+ * Returns the IIN of the card.
+ * @param {String} cardNumber
+ *
+ * @return {String}
+ */
+export const getIin = cardNumber => cardNumber.replace(/\D/g, '').slice(0, 6);
+
+/**
  * @param {String} name {eg: MasterCard}
  *
  * @return {String} {eg: mastercard}
