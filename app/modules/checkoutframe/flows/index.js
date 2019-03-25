@@ -65,7 +65,10 @@ function setCardValidity(isValid) {
      * Focus on expiry elem if we have the entire card number
      * and the cursor is at the end of the input field.
      */
-    if (cardInput.value.length === caretPosition) {
+    if (
+      cardInput.value.length === caretPosition &&
+      document.activeElement === cardInput
+    ) {
       if (cardType !== 'maestro') {
         cardExpiry.focus();
       }
@@ -82,45 +85,24 @@ let CURRENT_IIN;
  * and validate the card input.
  * @param {String} cardNumber Card number
  */
-export function performCardFlowActionsAndValidate(cardNumber) {
-  // Sanity
-  if (!cardNumber) {
-    return;
-  }
-
+export function performCardFlowActionsAndValidate(cardNumber = '') {
   // Get IIN from card number
   const iin = cardNumber.replace(/\D/g, '').slice(0, 6);
 
-  if (iin.length < 6) {
-    CURRENT_IIN = null;
-    hideDebitPinRadios();
-    return;
-  }
+  CURRENT_IIN = iin;
 
-  // If IIN has not changed, do nothing.
-  if (CURRENT_IIN !== iin) {
-    CURRENT_IIN = iin;
+  if (iin.length < 6 || CURRENT_IIN !== iin) {
     hideDebitPinRadios();
   }
 
   const session = getSession();
   const isRecurring = session.recurring;
 
-  session.r.getCardFlows(iin, flows => {
-    Analytics.track('card:flows:fetched', {
-      data: {
-        iin,
-        default_auth_type: DEFAULT_AUTH_TYPE_RADIO,
-      },
-    });
+  const flowChecker = (flows = {}) => {
+    const isIinSame = CURRENT_IIN === iin;
 
     // If we got a new IIN before a response, abort.
-    if (CURRENT_IIN !== iin) {
-      return;
-    }
-
-    // Sanity check
-    if (!flows) {
+    if (!isIinSame) {
       return;
     }
 
@@ -134,22 +116,25 @@ export function performCardFlowActionsAndValidate(cardNumber) {
       type: cardType,
     });
 
-    if (isRecurring) {
-      isValid = isValid && flows.recurring;
-    } else {
-      // Debit-PIN is not supposed to work in case of recurring
-      if (flows.pin) {
-        Analytics.track('atmpin:flows', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            iin: iin,
-            default_auth_type: DEFAULT_AUTH_TYPE_RADIO,
-          },
-        });
-
-        showDebitPinRadios();
+    // Perform actual-flow checking only if the IIN has changed.
+    if (!isIinSame) {
+      if (isRecurring) {
+        isValid = isValid && flows.recurring;
       } else {
-        hideDebitPinRadios();
+        // Debit-PIN is not supposed to work in case of recurring
+        if (flows.pin) {
+          Analytics.track('atmpin:flows', {
+            type: AnalyticsTypes.RENDER,
+            data: {
+              iin: iin,
+              default_auth_type: DEFAULT_AUTH_TYPE_RADIO,
+            },
+          });
+
+          showDebitPinRadios();
+        } else {
+          hideDebitPinRadios();
+        }
       }
     }
 
@@ -158,5 +143,11 @@ export function performCardFlowActionsAndValidate(cardNumber) {
     }
 
     setCardValidity(isValid);
-  });
+  };
+
+  if (iin.length >= 6) {
+    session.r.getCardFlows(iin, flowChecker);
+  } else {
+    flowChecker();
+  }
 }
