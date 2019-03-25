@@ -503,44 +503,6 @@ function onSixDigits(e) {
   } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
   }
-
-  // Flows
-  if (trimmedVal.length >= 6) {
-    this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
-  } else {
-    this.flowIIN = null;
-    showFlowRadioButtons(false); // Debit + PIN
-  }
-}
-
-/**
- * Toggles the ATM radio buttons on new card screen.
- * @param {Boolean} show
- */
-function showFlowRadioButtons(show) {
-  if (show) {
-    // Unhide
-    $('#add-card-container .flow-selection-container').addClass('drishy');
-
-    // Check default
-    var radio = $('#add-card-container .flow.input-radio #flow-3ds');
-
-    if (radio[0]) {
-      radio[0].checked = true;
-    }
-  } else {
-    // Uncheck values
-    var checked = $(
-      '#add-card-container .flow.input-radio input[type=radio]:checked'
-    );
-
-    if (checked[0]) {
-      checked[0].checked = false;
-    }
-
-    // Hide
-    $('#add-card-container .flow-selection-container').removeClass('drishy');
-  }
 }
 
 function noCvvToggle(e) {
@@ -1512,15 +1474,6 @@ Session.prototype = {
       this.showTimer(function() {
         that.dismissReason = 'timeout';
         that.modal.hide();
-      });
-    }
-
-    // Debit + PIN stuff
-    var cardNumber = this.get('prefill.card[number]');
-    if (cardNumber) {
-      onSixDigits.call(this, {
-        target: gel('card_number'),
-        isPrefilled: true,
       });
     }
 
@@ -2969,6 +2922,8 @@ Session.prototype = {
               invoke('focus', el_expiry, null, 0);
             }
           }
+
+          discreet.Flows.performCardFlowActions(this.value);
         });
 
       delegator.expiry = delegator
@@ -5506,53 +5461,6 @@ Session.prototype = {
       this.data = this.getFormData();
       this.close();
     }
-  },
-
-  checkFlows: function(iin, isPrefilledCardNumber) {
-    if (!this.recurring) {
-      // Hide and uncheck checkboxes.
-      showFlowRadioButtons(false);
-    }
-
-    var self = this;
-
-    this.flowIIN = iin;
-
-    this.r.getCardFlows(iin, function(flows) {
-      Analytics.track('card:flows:fetched', {
-        data: {
-          iin: iin,
-          prefilled_card: isPrefilledCardNumber || null,
-          default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-        },
-      });
-
-      // Sanity-check
-      if (self.flowIIN !== iin) {
-        return;
-      }
-
-      if (flows) {
-        if (self.recurring) {
-          toggleInvalid($('#elem-card'), flows.recurring);
-        } else {
-          if (flows.pin) {
-            Analytics.track('atmpin:flows', {
-              type: AnalyticsTypes.RENDER,
-              data: {
-                iin: iin,
-                prefilled_card: isPrefilledCardNumber || null,
-                default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-              },
-            });
-
-            showFlowRadioButtons(true);
-          } else {
-            showFlowRadioButtons(false);
-          }
-        }
-      }
-    });
   },
 
   setEmiOptions: function() {
