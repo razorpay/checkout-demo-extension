@@ -2906,31 +2906,7 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(),
-            type = this.type;
-
-          if (!preferences.methods.amex && type === 'amex') {
-            isValid = false;
-          }
-
-          discreet.Flows.performCardFlowActions(this.value);
-
-          /**
-           * Validity checks for recurring are done by Flows.performCardFlowActions
-           */
-          if (self.recurring) {
-            return;
-          }
-
-          // set validity classes
-          toggleInvalid($(this.el.parentNode), isValid);
-
-          // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.el.value.length === this.caretPosition) {
-            if (this.type !== 'maestro') {
-              invoke('focus', el_expiry, null, 0);
-            }
-          }
+          discreet.Flows.performCardFlowActionsAndValidate(this.value);
         });
 
       delegator.expiry = delegator

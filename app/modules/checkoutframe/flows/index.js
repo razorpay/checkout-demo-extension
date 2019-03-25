@@ -45,13 +45,44 @@ function setDebitPinRadiosVisibility(visible) {
 const showDebitPinRadios = () => setDebitPinRadiosVisibility(true);
 const hideDebitPinRadios = () => setDebitPinRadiosVisibility(false);
 
+/**
+ * Sets classes and performs actions depending
+ * on the validity of the card.
+ * @param {Boolean} isValid
+ */
+function setCardValidity(isValid) {
+  const session = getSession();
+  const cardElem = _Doc.querySelector('#elem-card');
+  const cardInput = _Doc.querySelector('#elem-card input[name="card[number]"]');
+  const cardExpiry = _Doc.querySelector('#card_expiry');
+  const cardType = getCardType(cardInput.value);
+  const caretPosition = session.delegator.card.caretPosition; // TODO: Find a better way to get this value
+
+  if (isValid) {
+    _El.removeClass(cardElem, INVALID_CLASS);
+
+    /**
+     * Focus on expiry elem if we have the entire card number
+     * and the cursor is at the end of the input field.
+     */
+    if (cardInput.value.length === caretPosition) {
+      if (cardType !== 'maestro') {
+        cardExpiry.focus();
+      }
+    }
+  } else {
+    _El.addClass(cardElem, INVALID_CLASS);
+  }
+}
+
 let CURRENT_IIN;
 
 /**
- * Checks and performs actions related to card flows.
+ * Checks and performs actions related to card flows
+ * and validate the card input.
  * @param {String} cardNumber Card number
  */
-export function performCardFlowActions(cardNumber) {
+export function performCardFlowActionsAndValidate(cardNumber) {
   // Sanity
   if (!cardNumber) {
     return;
@@ -93,41 +124,18 @@ export function performCardFlowActions(cardNumber) {
       return;
     }
 
+    const cardInput = _Doc.querySelector(
+      '#elem-card input[name="card[number]"]'
+    );
+    const cardType = getCardType(cardInput.value);
+
+    let isValid = Formatter.rules.card.isValid.call({
+      value: cardNumber,
+      type: cardType,
+    });
+
     if (isRecurring) {
-      const cardElem = _Doc.querySelector('#elem-card');
-      const cardInput = _Doc.querySelector(
-        '#elem-card input[name="card[number]"]'
-      );
-      const cardExpiry = _Doc.querySelector('#card_expiry');
-      const cardType = getCardType(cardInput.value);
-      const caretPosition = session.delegator.card.caretPosition; // TODO: Find a better way to get this value
-
-      let isValid =
-        flows.recurring &&
-        Formatter.rules.card.isValid.call({
-          value: cardNumber,
-          type: cardType,
-        });
-
-      if (!session.preferences.methods.amex && cardType === 'amex') {
-        isValid = false;
-      }
-
-      if (isValid) {
-        _El.removeClass(cardElem, INVALID_CLASS);
-
-        /**
-         * Focus on expiry elem if we have the entire card number
-         * and the cursor is at the end of the input field.
-         */
-        if (cardInput.value.length === caretPosition) {
-          if (cardType !== 'maestro') {
-            cardExpiry.focus();
-          }
-        }
-      } else {
-        _El.addClass(cardElem, INVALID_CLASS);
-      }
+      isValid = isValid && flows.recurring;
     } else {
       // Debit-PIN is not supposed to work in case of recurring
       if (flows.pin) {
@@ -144,5 +152,11 @@ export function performCardFlowActions(cardNumber) {
         hideDebitPinRadios();
       }
     }
+
+    if (!session.preferences.methods.amex && cardType === 'amex') {
+      isValid = false;
+    }
+
+    setCardValidity(isValid);
   });
 }
