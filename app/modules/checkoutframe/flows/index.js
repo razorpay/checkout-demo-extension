@@ -3,6 +3,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
+import { getCardType, getCardMaxLen } from 'common/card';
 
 const INVALID_CLASS = 'invalid';
 
@@ -66,12 +67,10 @@ export function performCardFlowActions(cardNumber) {
   }
 
   // If IIN has not changed, do nothing.
-  if (CURRENT_IIN === iin) {
-    return;
+  if (CURRENT_IIN !== iin) {
+    CURRENT_IIN = iin;
+    hideDebitPinRadios();
   }
-
-  CURRENT_IIN = iin;
-  hideDebitPinRadios();
 
   const session = getSession();
   const isRecurring = session.recurring;
@@ -99,11 +98,33 @@ export function performCardFlowActions(cardNumber) {
       const cardInput = _Doc.querySelector(
         '#elem-card input[name="card[number]"]'
       );
-      const isValid =
-        flows.recurring && Formatter.rules.card.isValid.call(cardInput);
+      const cardExpiry = _Doc.querySelector('#card_expiry');
+      const cardType = getCardType(cardInput.value);
+      const caretPosition = session.delegator.card.caretPosition; // TODO: Find a better way to get this value
+
+      let isValid =
+        flows.recurring &&
+        Formatter.rules.card.isValid.call({
+          value: cardNumber,
+          type: cardType,
+        });
+
+      if (!session.preferences.methods.amex && cardType === 'amex') {
+        isValid = false;
+      }
 
       if (isValid) {
         _El.removeClass(cardElem, INVALID_CLASS);
+
+        /**
+         * Focus on expiry elem if we have the entire card number
+         * and the cursor is at the end of the input field.
+         */
+        if (cardInput.value.length === caretPosition) {
+          if (cardType !== 'maestro') {
+            cardExpiry.focus();
+          }
+        }
       } else {
         _El.addClass(cardElem, INVALID_CLASS);
       }

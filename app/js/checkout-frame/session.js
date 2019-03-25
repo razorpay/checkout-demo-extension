@@ -2913,6 +2913,15 @@ Session.prototype = {
             isValid = false;
           }
 
+          discreet.Flows.performCardFlowActions(this.value);
+
+          /**
+           * Validity checks for recurring are done by Flows.performCardFlowActions
+           */
+          if (self.recurring) {
+            return;
+          }
+
           // set validity classes
           toggleInvalid($(this.el.parentNode), isValid);
 
@@ -2922,8 +2931,6 @@ Session.prototype = {
               invoke('focus', el_expiry, null, 0);
             }
           }
-
-          discreet.Flows.performCardFlowActions(this.value);
         });
 
       delegator.expiry = delegator
