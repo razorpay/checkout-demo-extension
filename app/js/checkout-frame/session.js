@@ -2906,7 +2906,11 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          discreet.Flows.performCardFlowActionsAndValidate(this.value);
+          discreet.Flows.performCardFlowActionsAndValidate(
+            gel('elem-card'),
+            this.el,
+            gel('card_expiry')
+          );
         });
 
       delegator.expiry = delegator

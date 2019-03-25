@@ -1,9 +1,7 @@
 import { getSession } from 'sessionmanager';
-import Analytics from 'analytics';
-import * as AnalyticsTypes from 'analytics-types';
 import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
-import { getCardType, getCardMaxLen } from 'common/card';
+import { getCardType, getIin } from 'common/card';
 
 const INVALID_CLASS = 'invalid';
 
@@ -49,13 +47,19 @@ const hideDebitPinRadios = () => setDebitPinRadiosVisibility(false);
  * Sets classes and performs actions depending
  * on the validity of the card.
  * @param {Boolean} isValid
+ * @param {DOMNode} cardElem #elem-card or similar
+ * @param {DOMNode} cardInput <input> for card number
+ * @param {DOMNode} cardExpiry Expiry <input> on which to focus if card is valid
  */
-function setCardValidity(isValid) {
+function setCardValidity(
+  isValid,
+  cardElem,
+  cardInput = cardElem.querySelector('input[name="card[number]"]'),
+  cardExpiry
+) {
   const session = getSession();
-  const cardElem = _Doc.querySelector('#elem-card');
-  const cardInput = _Doc.querySelector('#elem-card input[name="card[number]"]');
-  const cardExpiry = _Doc.querySelector('#card_expiry');
-  const cardType = getCardType(cardInput.value);
+  const cardNumber = cardInput.value.replace(/\D/g, '');
+  const cardType = getCardType(cardNumber);
   const caretPosition = session.delegator.card.caretPosition; // TODO: Find a better way to get this value
 
   if (isValid) {
@@ -70,7 +74,7 @@ function setCardValidity(isValid) {
       document.activeElement === cardInput
     ) {
       if (cardType !== 'maestro') {
-        cardExpiry.focus();
+        cardExpiry && cardExpiry.focus();
       }
     }
   } else {
@@ -78,76 +82,87 @@ function setCardValidity(isValid) {
   }
 }
 
-let CURRENT_IIN;
-
-/**
- * Checks and performs actions related to card flows
- * and validate the card input.
- * @param {String} cardNumber Card number
- */
-export function performCardFlowActionsAndValidate(cardNumber = '') {
-  // Get IIN from card number
-  const iin = cardNumber.replace(/\D/g, '').slice(0, 6);
-
-  CURRENT_IIN = iin;
-
-  if (iin.length < 6 || CURRENT_IIN !== iin) {
-    hideDebitPinRadios();
-  }
-
-  const session = getSession();
-  const isRecurring = session.recurring;
-
-  const flowChecker = (flows = {}) => {
-    const isIinSame = CURRENT_IIN === iin;
-
-    // If we got a new IIN before a response, abort.
-    if (!isIinSame) {
-      return;
-    }
-
-    const cardInput = _Doc.querySelector(
-      '#elem-card input[name="card[number]"]'
-    );
-    const cardType = getCardType(cardInput.value);
+const cardValidator = {
+  /**
+   * Validate the card number.
+   * @param {DOMNode} cardInput <input> for card number
+   *
+   * @return {Boolean}
+   */
+  sync: function(cardInput) {
+    const cardNumber = cardInput.value.replace(/\D/g, '');
+    const session = getSession();
+    const cardType = getCardType(cardNumber);
 
     let isValid = Formatter.rules.card.isValid.call({
       value: cardNumber,
       type: cardType,
     });
 
-    // Perform actual-flow checking only if the IIN has changed.
-    if (!isIinSame) {
-      if (isRecurring) {
-        isValid = isValid && flows.recurring;
-      } else {
-        // Debit-PIN is not supposed to work in case of recurring
-        if (flows.pin) {
-          Analytics.track('atmpin:flows', {
-            type: AnalyticsTypes.RENDER,
-            data: {
-              iin: iin,
-              default_auth_type: DEFAULT_AUTH_TYPE_RADIO,
-            },
-          });
-
-          showDebitPinRadios();
-        } else {
-          hideDebitPinRadios();
-        }
-      }
-    }
-
     if (!session.preferences.methods.amex && cardType === 'amex') {
       isValid = false;
     }
 
-    setCardValidity(isValid);
+    return isValid;
+  },
+};
+
+/**
+ * Checks and performs actions related to card flows
+ * and validate the card input.
+ * @param cardElem {DOMNode} #elem-card or similar
+ * @param cardInput (DOMNode) <input /> of card number
+ * @param {DOMNode} cardExpiry Expiry <input> on which to focus if card is valid
+ */
+export function performCardFlowActionsAndValidate(
+  cardElem,
+  cardInput,
+  cardExpiry
+) {
+  // Perform sync validation initially
+  setCardValidity(
+    cardValidator.sync(cardInput),
+    cardElem,
+    cardInput,
+    cardExpiry
+  );
+
+  const cardNumber = cardInput.value;
+  const iin = getIin(cardNumber);
+  const session = getSession();
+  const isRecurring = session.recurring;
+
+  const flowChecker = (flows = {}) => {
+    const cardNumber = cardInput.value.replace(/\D/g, '');
+    const isIinSame = getIin(cardNumber) === iin;
+
+    // If the card number was changed before response, do nothing
+    if (!isIinSame) {
+      return;
+    }
+
+    let isValid = cardValidator.sync(cardInput);
+
+    // Perform actual-flow checking only if the IIN has changed.
+    if (isRecurring) {
+      isValid = isValid && flows.recurring;
+    } else {
+      // Debit-PIN is not supposed to work in case of recurring
+      if (flows.pin) {
+        showDebitPinRadios();
+      } else {
+        hideDebitPinRadios();
+      }
+    }
+
+    setCardValidity(isValid, cardElem, cardInput, cardExpiry);
   };
+
+  if (iin.length < 6) {
+    hideDebitPinRadios();
+  }
 
   if (iin.length >= 6) {
     session.r.getCardFlows(iin, flowChecker);
-  } else {
-    flowChecker();
   }
 }
