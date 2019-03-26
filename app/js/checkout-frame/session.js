@@ -2906,24 +2906,11 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(),
-            type = this.type;
-
-          if (!preferences.methods.amex && type === 'amex') {
-            isValid = false;
-          }
-
-          // set validity classes
-          toggleInvalid($(this.el.parentNode), isValid);
-
-          // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.el.value.length === this.caretPosition) {
-            if (this.type !== 'maestro') {
-              invoke('focus', el_expiry, null, 0);
-            }
-          }
-
-          discreet.Flows.performCardFlowActions(this.value);
+          discreet.Flows.performCardFlowActionsAndValidate(
+            gel('elem-card'),
+            this.el,
+            gel('card_expiry')
+          );
         });
 
       delegator.expiry = delegator
