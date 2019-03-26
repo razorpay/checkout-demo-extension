@@ -17,12 +17,20 @@ const fullPrefix = cdnUrl + 'acs/network/';
 export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
 
 /**
+ * Strips everything but digits.
+ * @param {String} cardNumber
+ *
+ * @return {String}
+ */
+export const getCardDigits = cardNumber => cardNumber.replace(/\D/g, '');
+
+/**
  * Returns the IIN of the card.
  * @param {String} cardNumber
  *
  * @return {String}
  */
-export const getIin = cardNumber => cardNumber.replace(/\D/g, '').slice(0, 6);
+export const getIin = cardNumber => getCardDigits(cardNumber).slice(0, 6);
 
 /**
  * @param {String} name {eg: MasterCard}

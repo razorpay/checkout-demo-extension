@@ -1,7 +1,7 @@
 import { getSession } from 'sessionmanager';
 import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
-import { getCardType, getIin } from 'common/card';
+import { getCardType, getIin, getCardDigits } from 'common/card';
 
 const INVALID_CLASS = 'invalid';
 
@@ -58,7 +58,7 @@ function setCardValidity(
   cardExpiry
 ) {
   const session = getSession();
-  const cardNumber = cardInput.value.replace(/\D/g, '');
+  const cardNumber = getCardDigits(cardInput.value);
   const cardType = getCardType(cardNumber);
   const caretPosition = session.delegator.card.caretPosition; // TODO: Find a better way to get this value
 
@@ -90,7 +90,7 @@ const cardValidator = {
    * @return {Boolean}
    */
   sync: function(cardInput) {
-    const cardNumber = cardInput.value.replace(/\D/g, '');
+    const cardNumber = getCardDigits(cardInput.value);
     const session = getSession();
     const cardType = getCardType(cardNumber);
 
@@ -127,13 +127,13 @@ export function performCardFlowActionsAndValidate(
     cardExpiry
   );
 
-  const cardNumber = cardInput.value;
+  const cardNumber = getCardDigits(cardInput.value);
   const iin = getIin(cardNumber);
   const session = getSession();
   const isRecurring = session.recurring;
 
   const flowChecker = (flows = {}) => {
-    const cardNumber = cardInput.value.replace(/\D/g, '');
+    const cardNumber = getCardDigits(cardInput.value);
     const isIinSame = getIin(cardNumber) === iin;
 
     // If the card number was changed before response, do nothing
