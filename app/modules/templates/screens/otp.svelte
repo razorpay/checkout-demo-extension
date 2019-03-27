@@ -89,6 +89,12 @@
       };
     },
 
+    onupdate ({ changed, current, previous }) {
+      if (changed.showInput === true) {
+        this.refs.input.focus();
+      }
+    },
+
     methods: {
       invoke: function (type, event) {
         const {
