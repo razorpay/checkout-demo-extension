@@ -130,6 +130,8 @@ function trackNewPayment(data, params, r) {
 
 export default function Payment(data, params = {}, r) {
   this.iframe = params.iframe;
+  this.nativeotp = params.nativeotp;
+
   this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
@@ -467,6 +469,9 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
+    if (!this.popup) {
+      this.makePopup();
+    }
     const isIframe = this.popup instanceof Iframe;
     if (isIframe) {
       this.popup.write(popupTemplate(this));
@@ -504,7 +509,15 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return this.iframe || !(this.r.get('redirect') || this.avoidPopup);
+    if (this.iframe) {
+      return true;
+    }
+
+    if (this.nativeotp) {
+      return false;
+    }
+
+    return !(this.r.get('redirect') || this.avoidPopup);
   },
 
   tryPopup: function() {
