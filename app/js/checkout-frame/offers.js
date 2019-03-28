@@ -20,6 +20,7 @@ function Offer(data, options) {
         name: data.name,
         description: data.display_text,
         discount: this.discount > 0 && options.formatAmount(this.discount),
+        removable: data.removable,
       })
     )),
     $offerTitle = $el.querySelector('.offer-title'),
@@ -29,9 +30,11 @@ function Offer(data, options) {
     options.onOfferSelection(that);
   };
 
-  $removeOffer.onclick = function() {
-    options.onOfferRemoval();
-  };
+  if ($removeOffer) {
+    $removeOffer.onclick = function() {
+      options.onOfferRemoval();
+    };
+  }
 }
 
 var offerProto = Offer.prototype;

@@ -39,14 +39,7 @@ function gotoAmountScreen() {
 }
 
 function shouldEnableP13n(keyId) {
-  if (
-    keyId === 'rzp_live_Oeieme2CjQmyTQ' ||
-    keyId === 'rzp_live_ILgsfZCZoFIKMb'
-  ) {
-    return true;
-  }
-
-  return /^rzp_live_[0-9a-z]/.test(keyId);
+  return true;
 }
 
 // .shown has display: none from iOS ad-blocker
@@ -452,9 +445,6 @@ function onSixDigits(e) {
   var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
   var trimmedVal = val.replace(/[\ ]/g, '');
-  var exactSixDigits = trimmedVal.length === 6;
-  var lessThanSixDigits = trimmedVal.length < 6;
-  var moreThanSixDigits = trimmedVal.length > 6;
 
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
@@ -513,50 +503,6 @@ function onSixDigits(e) {
     elem_emi.addClass(hiddenClass);
   } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
-  }
-
-  // Debit + PIN stuff.
-  if (exactSixDigits || moreThanSixDigits) {
-    /**
-     * Don't check for flows if the card number
-     * was reduced from 7 digits to 6 digits.
-     */
-    if (trimmedVal.slice(0, 6) !== this.flowIIN) {
-      this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
-    }
-  } else if (lessThanSixDigits) {
-    this.flowIIN = null;
-    showFlowRadioButtons(false);
-  }
-}
-
-/**
- * Toggles the ATM radio buttons on new card screen.
- * @param {Boolean} show
- */
-function showFlowRadioButtons(show) {
-  if (show) {
-    // Unhide
-    $('#add-card-container .flow-selection-container').addClass('drishy');
-
-    // Check default
-    var radio = $('#add-card-container .flow.input-radio #flow-3ds');
-
-    if (radio[0]) {
-      radio[0].checked = true;
-    }
-  } else {
-    // Uncheck values
-    var checked = $(
-      '#add-card-container .flow.input-radio input[type=radio]:checked'
-    );
-
-    if (checked[0]) {
-      checked[0].checked = false;
-    }
-
-    // Hide
-    $('#add-card-container .flow-selection-container').removeClass('drishy');
   }
 }
 
@@ -1437,28 +1383,14 @@ Session.prototype = {
         });
       }
     } else if (hasOffers) {
-      var eligibleOffers = preferences.offers.filter(function(offer) {
-        var method = offer.payment_method,
-          enabledMethods = that.methods,
-          isMethodEnabled =
-            method !== 'wallet'
-              ? enabledMethods[method]
-              : isArray(enabledMethods.wallet) &&
-                enabledMethods.wallet.filter(function(item) {
-                  return item.code === offer.issuer;
-                })[0];
-
-        return isMethodEnabled;
-      });
-
       var $offersContainer = $('#body #offers-container'),
         $offersTitle;
 
-      if (eligibleOffers.length > 0) {
+      if (this.eligibleOffers.length > 0) {
         // TODO: convert args to kwargs
         this.offers = initOffers(
           $offersContainer[0],
-          eligibleOffers,
+          this.eligibleOffers,
           {},
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
@@ -1493,15 +1425,6 @@ Session.prototype = {
       this.showTimer(function() {
         that.dismissReason = 'timeout';
         that.modal.hide();
-      });
-    }
-
-    // Debit + PIN stuff
-    var cardNumber = this.get('prefill.card[number]');
-    if (cardNumber) {
-      onSixDigits.call(this, {
-        target: gel('card_number'),
-        isPrefilled: true,
       });
     }
 
@@ -1665,6 +1588,41 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProvider: function(providerCode) {
+    Analytics.track('cardless_emi:provider:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    // User selected EMI on Cards
+    if (providerCode === 'cards') {
+      this.switchTab('emi');
+      return;
+    }
+
+    if (providerCode === 'bajaj') {
+      this.showEmiPlans('bajaj')();
+      return;
+    }
+
+    $('#form-cardless_emi input[name=emi_duration]').val('');
+    $('#form-cardless_emi input[name=provider]').val('');
+    $('#form-cardless_emi input[name=ott]').val('');
+
+    CardlessEmiStore.providerCode = providerCode;
+
+    $('#form-cardless_emi input[name=provider]').val(providerCode);
+
+    this.preSubmit();
+  },
+
   setCardlessEmi: function() {
     var self = this;
 
@@ -1703,33 +1661,7 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.option.code;
 
-            Analytics.track('cardless_emi:provider:select', {
-              type: AnalyticsTypes.BEHAV,
-              data: {
-                provider: providerCode,
-              },
-            });
-
-            // User selected EMI on Cards
-            if (providerCode === 'cards') {
-              self.switchTab('emi');
-              return;
-            }
-
-            if (providerCode === 'bajaj') {
-              self.showEmiPlans('bajaj')();
-              return;
-            }
-
-            $('#form-cardless_emi input[name=emi_duration]').val('');
-            $('#form-cardless_emi input[name=provider]').val('');
-            $('#form-cardless_emi input[name=ott]').val('');
-
-            CardlessEmiStore.providerCode = providerCode;
-
-            $('#form-cardless_emi input[name=provider]').val(providerCode);
-
-            self.preSubmit();
+            self.selectCardlessEmiProvider(providerCode);
           },
         },
       });
@@ -2231,6 +2163,7 @@ Session.prototype = {
         });
         this.hideTimer();
       }
+      this.showLoadError('Waiting for payment to complete on bank page');
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -2939,22 +2872,11 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(),
-            type = this.type;
-
-          if (!preferences.methods.amex && type === 'amex') {
-            isValid = false;
-          }
-
-          // set validity classes
-          toggleInvalid($(this.el.parentNode), isValid);
-
-          // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.el.value.length === this.caretPosition) {
-            if (this.type !== 'maestro') {
-              invoke('focus', el_expiry, null, 0);
-            }
-          }
+          discreet.Flows.performCardFlowActionsAndValidate(
+            gel('elem-card'),
+            this.el,
+            gel('card_expiry')
+          );
         });
 
       delegator.expiry = delegator
@@ -3234,13 +3156,21 @@ Session.prototype = {
 
     return this.offers && this.renderOffers(this.tab);
   },
-  renderOffers: function(screen) {
-    if (screen === 'emiplans') {
-      screen = 'emi';
+  renderOffers: function(tab) {
+    if (tab === 'emiplans') {
+      tab = 'emi';
     }
 
     if (
-      ['', 'card', 'emi', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0
+      [
+        '',
+        'card',
+        'emi',
+        'netbanking',
+        'wallet',
+        'upi',
+        'cardless_emi',
+      ].indexOf(tab) < 0
     ) {
       $('#body').removeClass('has-offers');
       return this.offers.display(false);
@@ -3253,26 +3183,54 @@ Session.prototype = {
       this.handleOfferRemoval();
     }
 
-    var paymentMethod = screen;
+    var paymentMethod = tab;
 
-    this.offers.applyFilter(
-      (screen && { payment_method: paymentMethod }) || {}
-    );
+    var filters = (tab && { payment_method: paymentMethod }) || {};
+
+    /**
+     * For every Cardless EMI screen other than
+     * the Cardless EMI homescreen,
+     * set the provider in the filters.
+     *
+     * Side-effect: We won't be able to show
+     * provider-less offers for Cardless EMI
+     * until Offers code is refactored.
+     */
+    if (tab === 'cardless_emi') {
+      if (this.screen !== 'cardless_emi') {
+        filters.provider = CardlessEmiStore.providerCode;
+      }
+    }
+
+    /**
+     * Offers have a 'homescreen' attribute that tells
+     * whether or not we want to show that offer on the homescreen.
+     *
+     * `tab` being '' means we are on the homescreen.
+     */
+    if (tab === '') {
+      filters.homescreen = tab === '';
+    }
+
+    this.offers.applyFilter(filters);
 
     // Pre-select offer if there is only one visible offer
     var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer && screen) {
-      this.preSelectedOffer = defaultOffer;
+    if (defaultOffer && tab) {
+      // Don't preselect offer for Cardless EMI homescreen.
+      if (!(tab === 'cardless_emi' && this.screen === 'cardless_emi')) {
+        this.preSelectedOffer = defaultOffer;
+      }
     }
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
-      this.handleOfferSelection(this.preSelectedOffer, screen);
+      this.handleOfferSelection(this.preSelectedOffer, tab);
       this.offers.applyOffer();
 
       /* Don't set preSelectedOffer to null if it's on card OTP screen  */
-      if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
+      if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
         this.preSelectedOffer = null;
       }
     }
@@ -3397,6 +3355,12 @@ Session.prototype = {
             cvv.focus();
           }
         }
+      }
+    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
+      var provider = offer.provider;
+
+      if (provider) {
+        this.selectCardlessEmiProvider(provider);
       }
     }
   },
@@ -5130,7 +5094,16 @@ Session.prototype = {
     var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
-      data.offer_id = appliedOffer.id;
+      // Set offer ID based on offer type
+      switch (appliedOffer.type) {
+        case 'api':
+          data.offer_id = appliedOffer.id;
+          break;
+
+        case 'local':
+          data['notes[offer_id]'] = appliedOffer.id;
+          break;
+      }
       this.r.display_amount = appliedOffer.amount;
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
@@ -5183,7 +5156,9 @@ Session.prototype = {
       var cardType = getCardTypeFromPayload(data, this.transformedTokens);
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
-        if (this.nativeotp && cardType === 'mastercard') {
+        // Card Networks that support both Headless & Iframe
+        var supportedCardType = ['mastercard', 'visa'];
+        if (this.nativeotp && supportedCardType.indexOf(cardType) > -1) {
           shouldUseNativeOTP = true;
         }
       } else if (data.method === 'emi') {
@@ -5205,6 +5180,7 @@ Session.prototype = {
           askOTP(that.otpView, data);
         });
 
+        request.nativeotp = true;
         request.iframe = true;
         Analytics.track('iframe:attempt');
       }
@@ -5453,52 +5429,6 @@ Session.prototype = {
     }
   },
 
-  checkFlows: function(iin, isPrefilledCardNumber) {
-    // Hide and uncheck checkboxes.
-    showFlowRadioButtons(false);
-
-    if (this.recurring) {
-      return;
-    }
-
-    var self = this;
-
-    this.flowIIN = iin;
-
-    if (this.recurring) {
-      return;
-    }
-
-    this.r.getCardFlows(iin, function(flows) {
-      Analytics.track('card_flows:fetched', {
-        data: {
-          iin: iin,
-          prefilled_card: isPrefilledCardNumber || null,
-          default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-        },
-      });
-
-      // Sanity-check
-      if (self.flowIIN !== iin) {
-        return;
-      }
-
-      if (flows && flows.pin) {
-        Analytics.track('atmpin:flows', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            iin: iin,
-            prefilled_card: isPrefilledCardNumber || null,
-            default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-          },
-        });
-        showFlowRadioButtons(true);
-      } else {
-        showFlowRadioButtons(false);
-      }
-    });
-  },
-
   setEmiOptions: function() {
     var emiBanks = {};
     var preferences = this.preferences;
@@ -5543,6 +5473,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var qrEnabled =
+      this.get('method.qr') &&
       !getStore('isPartialPayment') &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
@@ -5616,8 +5547,13 @@ Session.prototype = {
      * - Trigger oneMethod
      */
 
-    if (this.forcedOffer) {
-      var paymentMethod = this.forcedOffer.payment_method;
+    var forcedOffer =
+      this.forcedOffer ||
+      discreet.Offers.getForcedOffer({
+        preferences: preferences,
+      });
+    if (forcedOffer) {
+      var paymentMethod = forcedOffer.payment_method;
       if (paymentMethod === 'emi') {
         delete methods.card;
         methods.count++;
@@ -5752,12 +5688,18 @@ Session.prototype = {
   },
 
   setOffers: function(preferences) {
-    var hasOffers = (this.hasOffers = isArray(preferences.offers)),
-      forcedOffer = (this.forcedOffer =
-        hasOffers && preferences.force_offer && preferences.offers[0]);
+    var allOffers = discreet.Offers.createOffers({
+      preferences: preferences,
+      session: this,
+    });
 
-    if (forcedOffer) {
-      var paymentMethod = forcedOffer.payment_method;
+    this.eligibleOffers = allOffers.offers;
+
+    this.hasOffers = allOffers.offers.length > 0;
+    this.forcedOffer = allOffers.forcedOffer;
+
+    if (this.forcedOffer) {
+      var paymentMethod = this.forcedOffer.payment_method;
 
       if (['emi', 'card', 'wallet'].indexOf(paymentMethod) >= 0) {
         // need this while preparing the template
@@ -5765,7 +5707,7 @@ Session.prototype = {
       }
 
       Analytics.track('offers:forced', {
-        data: forcedOffer,
+        data: this.forcedOffer,
       });
     }
   },
@@ -5833,7 +5775,6 @@ Session.prototype = {
       invoice = (this.invoice = preferences.invoice),
       subscription = (this.subscription = preferences.subscription),
       options = preferences.options;
-    this.setOffers(preferences);
 
     /* Set magic from preferences */
     this.magic = false; //this.magic && preferences.magic;
@@ -5954,6 +5895,7 @@ Session.prototype = {
 
     /* set payment methods on the basis of preferences */
     this.setPaymentMethods(preferences);
+    this.setOffers(preferences);
   },
 
   showModal: function(preferences) {

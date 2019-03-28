@@ -30,7 +30,7 @@
       class:hidden="!showInput"
     >
       <div class="help">Please enter the OTP</div>
-      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="off" required>
+      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="one-time-code" required>
     </div>
   </div>
 
@@ -87,6 +87,12 @@
 
         on: {}
       };
+    },
+
+    onupdate ({ changed, current, previous }) {
+      if (changed.showInput === true) {
+        this.refs.input.focus();
+      }
     },
 
     methods: {

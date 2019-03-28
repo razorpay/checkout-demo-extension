@@ -294,6 +294,7 @@ export const optionValidations = {
   },
 
   display_amount: function(amount) {
+    // TODO: display_amount is only valid when display_currency is present. Add a check for this.
     amount = String(amount).replace(/([^0-9.])/g, '');
     if (!amount && amount !== Razorpay.defaults.display_amount) {
       return '';
