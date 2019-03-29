@@ -3,6 +3,10 @@ import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
 import { getCardType, getIin, getCardDigits } from 'common/card';
 import { getCardFlowsFromCache } from 'payment';
+import {
+  isCardNetworkInPaymentOneOf,
+  networks as CardNetworks,
+} from 'common/card';
 
 const INVALID_CLASS = 'invalid';
 
@@ -51,13 +55,25 @@ function getFlowsForPayment(paymentData, tokens = []) {
 
 /**
  * Tells whether or not Native OTP is possible for the card payment.
+ *
+ * OTP flow needs to enabled and the card has to be either
+ * a MasterCard or a Visa.
+ *
  * @param {Object} paymentData Data that will be used for payment creation
  * @param {Array} tokens List of tokens
  *
  * @return {Boolean}
  */
 export function isNativeOtpPossibleForCardPayment(paymentData, tokens) {
-  return getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
+  const flowPresent =
+    getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
+  const validNetwork = isCardNetworkInPaymentOneOf(
+    paymentData,
+    [CardNetworks.mastercard, CardNetworks.visa],
+    tokens
+  );
+
+  return flowPresent && validNetwork;
 }
 
 /**
