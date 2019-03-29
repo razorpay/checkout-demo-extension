@@ -37,12 +37,15 @@
   }
 
   /* TODO: add a generic icon class in Icon component and reuse it */
-  div :global(img, svg) {
-    position: absolute;
-    height: 24px;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
+  div {
+    :global(img),
+    :global(svg) {
+      position: absolute;
+      height: 24px;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 </style>
 

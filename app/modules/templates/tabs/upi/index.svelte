@@ -279,7 +279,7 @@
       showRecommendedUPIApp: data => getSession().showRecommendedUPIApp,
 
       intent: data => {
-        let intentApps = getSession().all_upi_intents_data;
+        let intentApps = getSession().upi_intents_data;
         return intentApps && _.lengthOf(intentApps) > 0;
       },
     },
