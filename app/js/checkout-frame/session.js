@@ -928,6 +928,10 @@ function Session(message) {
 }
 
 Session.prototype = {
+  shouldUseNativeOTP: function() {
+    return this.get('nativeotp') && this.r.isLiveMode();
+  },
+
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
@@ -5168,7 +5172,7 @@ Session.prototype = {
     }
 
     if (data.method === 'card' || data.method === 'emi') {
-      this.nativeotp = !!this.get('nativeotp');
+      this.nativeotp = !!this.shouldUseNativeOTP();
 
       var cardType = getCardTypeFromPayload(data, this.transformedTokens);
       var shouldUseNativeOTP = false;
