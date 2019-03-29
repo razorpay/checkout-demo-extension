@@ -6,33 +6,60 @@ import { getCardFlowsFromCache } from 'payment';
 
 const INVALID_CLASS = 'invalid';
 
+const Flows = {
+  pin: 'pin',
+  otp: 'otp',
+  recurring: 'recurring',
+};
+
 /**
- * Tells whether or not Native OTP is possible for the payment.
- * @param {Object} paymentData Data that will be used for payment creation
- * @param {Array} tokens List of tokens
+ * @param {Object} flows
+ * @param {String} flow
  *
  * @return {Boolean}
  */
-export function isNativeOtpPossibleForPayment(paymentData, tokens = []) {
+function isFlowApplicable(flows, flow) {
+  return flows[flow];
+}
+
+/**
+ * Get the flows applicable for the payment.
+ * @param {Object} paymentData
+ * @param {Array} tokens
+ *
+ * @return {Object}
+ */
+function getFlowsForPayment(paymentData, tokens = []) {
+  // Cards
   const cardNumber = paymentData['card[number]'];
   const token = paymentData['token'];
 
   if (token) {
     const cardToken = tokens.find(t => t.token === token);
 
-    return Boolean(
-      cardToken &&
-        cardToken.card &&
-        cardToken.card.flows &&
-        cardToken.card.flows.otp
-    );
+    if (cardToken && cardToken.card && cardToken.card.flows) {
+      return cardToken.card.flows;
+    }
   } else if (cardNumber) {
-    const flows = getCardFlowsFromCache(cardNumber);
+    const flows = getCardFlowsFromCache(cardNumber) || flows;
 
-    return Boolean(flows && flows.otp);
+    if (flows) {
+      return flows;
+    }
   }
 
-  return false;
+  return {};
+}
+
+/**
+ * Tells whether or not Native OTP is possible for the card payment.
+ * @param {Object} paymentData Data that will be used for payment creation
+ * @param {Array} tokens List of tokens
+ *
+ * @return {Boolean}
+ */
+export function isNativeOtpPossibleForCardPayment(paymentData, tokens) {
+  return isFlowApplicable(getFlowsForPayment(paymentData, tokens), Flows.otp);
 }
 
 /**
@@ -175,10 +202,10 @@ export function performCardFlowActionsAndValidate(
 
     // Perform actual-flow checking only if the IIN has changed.
     if (isRecurring) {
-      isValid = isValid && flows.recurring;
+      isValid = isValid && isFlowApplicable(flows, Flows.recurring);
     } else {
       // Debit-PIN is not supposed to work in case of recurring
-      if (flows.pin) {
+      if (isFlowApplicable(flows, Flows.pin)) {
         showDebitPinRadios();
       } else {
         hideDebitPinRadios();

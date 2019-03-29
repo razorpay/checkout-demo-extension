@@ -5179,7 +5179,7 @@ Session.prototype = {
       if (data.method === 'card') {
         if (
           this.nativeotp &&
-          discreet.Flows.isNativeOtpPossibleForPayment(
+          discreet.Flows.isNativeOtpPossibleForCardPayment(
             data,
             this.transformedTokens
           )
