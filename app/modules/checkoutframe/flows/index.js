@@ -18,9 +18,7 @@ const Flows = {
  *
  * @return {Boolean}
  */
-function isFlowApplicable(flows, flow) {
-  return flows[flow];
-}
+const isFlowApplicable = _.curry2((flows, flow) => Boolean(flows[flow]));
 
 /**
  * Get the flows applicable for the payment.
@@ -59,7 +57,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
  * @return {Boolean}
  */
 export function isNativeOtpPossibleForCardPayment(paymentData, tokens) {
-  return isFlowApplicable(getFlowsForPayment(paymentData, tokens), Flows.otp);
+  return getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.otp);
 }
 
 /**
