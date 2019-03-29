@@ -37,7 +37,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
   const token = paymentData['token'];
 
   if (token) {
-    const cardToken = tokens.find(t => t.token === token);
+    const cardToken = _Arr.find(tokens, t => t.token === token);
 
     if (cardToken && cardToken.card && cardToken.card.flows) {
       return cardToken.card.flows;

@@ -171,7 +171,7 @@ export function isCardNetworkInPaymentOneOf(
   let network = '';
 
   if (token) {
-    const cardToken = tokens.find(t => t.token === token);
+    const cardToken = _Arr.find(tokens, t => t.token === token);
 
     if (cardToken && cardToken.card && cardToken.card.network) {
       network = cardToken.card.network;
