@@ -2,8 +2,38 @@ import { getSession } from 'sessionmanager';
 import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
 import { getCardType, getIin, getCardDigits } from 'common/card';
+import { getCardFlowsFromCache } from 'payment';
 
 const INVALID_CLASS = 'invalid';
+
+/**
+ * Tells whether or not Native OTP is possible for the payment.
+ * @param {Object} paymentData Data that will be used for payment creation
+ * @param {Array} tokens List of tokens
+ *
+ * @return {Boolean}
+ */
+export function isNativeOtpPossibleForPayment(paymentData, tokens = []) {
+  const cardNumber = paymentData['card[number]'];
+  const token = paymentData['token'];
+
+  if (token) {
+    const cardToken = tokens.find(t => t.token === token);
+
+    return Boolean(
+      cardToken &&
+        cardToken.card &&
+        cardToken.card.flows &&
+        cardToken.card.flows.otp
+    );
+  } else if (cardNumber) {
+    const flows = getCardFlowsFromCache(cardNumber);
+
+    return Boolean(flows && flows.otp);
+  }
+
+  return false;
+}
 
 /**
  * Sets the visibility of ATM-PIN radio buttons on new card screen.
