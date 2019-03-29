@@ -929,15 +929,7 @@ function Session(message) {
 
 Session.prototype = {
   nativeOtpPossible: function() {
-    var optionPresent = this.get('nativeotp');
-    var randomness = Math.random() < 0.5;
-
-    var key = this.get('key');
-    if (key === 'rzp_live_ILgsfZCZoFIKMb') {
-      return true;
-    }
-
-    return optionPresent && key && /[a-z0-9]/.test(key.slice(-1)) && randomness;
+    return this.get('nativeotp');
   },
 
   getDecimalAmount: getDecimalAmount,
