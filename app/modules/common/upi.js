@@ -1,3 +1,5 @@
+/* global CheckoutBridge */
+
 import Analytics from 'analytics';
 
 const UPI_APPS = {

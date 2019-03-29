@@ -928,16 +928,8 @@ function Session(message) {
 }
 
 Session.prototype = {
-  nativeOtpPossible: function() {
-    var optionPresent = this.get('nativeotp');
-    var randomness = Math.random() < 0.5;
-
-    var key = this.get('key');
-    if (key === 'rzp_live_ILgsfZCZoFIKMb') {
-      return true;
-    }
-
-    return optionPresent && key && /[a-z0-9]/.test(key.slice(-1)) && randomness;
+  shouldUseNativeOTP: function() {
+    return this.get('nativeotp') && this.r.isLiveMode();
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -5180,14 +5172,18 @@ Session.prototype = {
     }
 
     if (data.method === 'card' || data.method === 'emi') {
-      this.nativeotp = !!this.nativeOtpPossible();
+      this.nativeotp = !!this.shouldUseNativeOTP();
 
       var cardType = getCardTypeFromPayload(data, this.transformedTokens);
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
-        // Card Networks that support both Headless & Iframe
-        var supportedCardType = ['mastercard', 'visa'];
-        if (this.nativeotp && supportedCardType.indexOf(cardType) > -1) {
+        if (
+          this.nativeotp &&
+          discreet.Flows.shouldUseNativeOtpForCardPayment(
+            data,
+            this.transformedTokens
+          )
+        ) {
           shouldUseNativeOTP = true;
         }
       } else if (data.method === 'emi') {
