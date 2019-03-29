@@ -43,7 +43,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
       return cardToken.card.flows;
     }
   } else if (cardNumber) {
-    const flows = getCardFlowsFromCache(cardNumber) || flows;
+    const flows = getCardFlowsFromCache(cardNumber);
 
     if (flows) {
       return flows;
@@ -67,11 +67,16 @@ function getFlowsForPayment(paymentData, tokens = []) {
 export function shouldUseNativeOtpForCardPayment(paymentData, tokens) {
   const flowPresent =
     getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
-  const validNetwork = isCardNetworkInPaymentOneOf(
-    paymentData,
-    [CardNetworks.mastercard, CardNetworks.visa],
-    tokens
-  );
+
+  let validNetwork = false;
+
+  if (flowPresent) {
+    validNetwork = isCardNetworkInPaymentOneOf(
+      paymentData,
+      [CardNetworks.mastercard, CardNetworks.visa],
+      tokens
+    );
+  }
 
   return flowPresent && validNetwork;
 }
