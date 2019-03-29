@@ -576,6 +576,8 @@ function hideOverlayMessage() {
 /**
  * Get the text to show to EMI plan.
  *
+ * this = session
+ *
  * @param {Number} amount
  * @param {Object} plan
  *
@@ -588,17 +590,19 @@ function getEmiText(amount, plan) {
     plan.interest
   );
 
-  amountPerMonth = (amountPerMonth / 100).toFixed(2);
-
   return {
     info:
       plan.duration +
-      ' Months (₹' +
-      amountPerMonth +
+      ' Months (' +
+      this.formatAmountWithCurrency(amountPerMonth) +
       '/mo) @ ' +
       plan.interest +
       '%',
-    short: plan.duration + ' Months (₹' + amountPerMonth + '/mo)',
+    short:
+      plan.duration +
+      ' Months (' +
+      this.formatAmountWithCurrency(amountPerMonth) +
+      '/mo)',
   };
 }
 
@@ -1712,13 +1716,13 @@ Session.prototype = {
   makeCardlessEmiDetailText: function(duration, monthly) {
     return (
       '<ul>' +
-      '<li>Monthly Installment: ₹' +
-      this.formatAmount(monthly) +
+      '<li>Monthly Installment: ' +
+      this.formatAmountWithCurrency(monthly) +
       '</li>' +
-      '<li>Total Amount: ₹' +
-      this.formatAmount(duration * monthly) +
-      ' (₹' +
-      this.formatAmount(monthly) +
+      '<li>Total Amount: ' +
+      this.formatAmountWithCurrency(duration * monthly) +
+      ' (' +
+      this.formatAmountWithCurrency(monthly) +
       ' x ' +
       duration +
       ')' +
@@ -1738,8 +1742,8 @@ Session.prototype = {
       plansList.push({
         text:
           p.duration +
-          ' Months @ ₹' +
-          self.formatAmount(p.amount_per_month) +
+          ' Months @ ' +
+          self.formatAmountWithCurrency(p.amount_per_month) +
           '/mo',
         value: p.duration,
         detail: self.makeCardlessEmiDetailText(p.duration, p.amount_per_month),
@@ -3752,6 +3756,7 @@ Session.prototype = {
     var listItems = [];
     var amount = this.get('amount');
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
+    var that = this;
 
     if (this.isOfferApplicableOnIssuer(bank)) {
       amount = this.getDiscountedAmount();
@@ -3764,12 +3769,12 @@ Session.prototype = {
         (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
       ) {
         listItems.push({
-          text: getEmiText(amount, plan).info,
+          text: getEmiText.call(that, amount, plan).info,
           value: duration,
           badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
           detail:
-            'Full amount of ₹' +
-            (amount / 100).toFixed(2) +
+            'Full amount of ' +
+            that.formatAmountWithCurrency(amount) +
             ' will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
         });
       }
@@ -4021,8 +4026,8 @@ Session.prototype = {
           emiPlans.push({
             text:
               p.duration +
-              ' Months @ ₹' +
-              self.formatAmount(amount_per_month) +
+              ' Months @ ' +
+              self.formatAmountWithCurrency(amount_per_month) +
               '/mo',
             value: p.duration,
             detail: self.makeCardlessEmiDetailText(
