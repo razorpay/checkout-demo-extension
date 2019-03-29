@@ -928,10 +928,6 @@ function Session(message) {
 }
 
 Session.prototype = {
-  nativeOtpPossible: function() {
-    return this.get('nativeotp');
-  },
-
   getDecimalAmount: getDecimalAmount,
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
@@ -5172,14 +5168,14 @@ Session.prototype = {
     }
 
     if (data.method === 'card' || data.method === 'emi') {
-      this.nativeotp = !!this.nativeOtpPossible();
+      this.nativeotp = !!this.get('nativeotp');
 
       var cardType = getCardTypeFromPayload(data, this.transformedTokens);
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
         if (
           this.nativeotp &&
-          discreet.Flows.isNativeOtpPossibleForCardPayment(
+          discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
             this.transformedTokens
           )

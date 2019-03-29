@@ -54,7 +54,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
 }
 
 /**
- * Tells whether or not Native OTP is possible for the card payment.
+ * Tells whether or not Native OTP is to be used for the card payment.
  *
  * OTP flow needs to enabled and the card has to be either
  * a MasterCard or a Visa.
@@ -64,7 +64,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
  *
  * @return {Boolean}
  */
-export function isNativeOtpPossibleForCardPayment(paymentData, tokens) {
+export function shouldUseNativeOtpForCardPayment(paymentData, tokens) {
   const flowPresent =
     getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
   const validNetwork = isCardNetworkInPaymentOneOf(
