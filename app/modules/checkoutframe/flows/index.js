@@ -7,9 +7,9 @@ import { getCardFlowsFromCache } from 'payment';
 const INVALID_CLASS = 'invalid';
 
 const Flows = {
-  pin: 'pin',
-  otp: 'otp',
-  recurring: 'recurring',
+  PIN: 'pin',
+  OTP: 'otp',
+  RECURRING: 'recurring',
 };
 
 /**
@@ -57,7 +57,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
  * @return {Boolean}
  */
 export function isNativeOtpPossibleForCardPayment(paymentData, tokens) {
-  return getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.otp);
+  return getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
 }
 
 /**
@@ -200,10 +200,10 @@ export function performCardFlowActionsAndValidate(
 
     // Perform actual-flow checking only if the IIN has changed.
     if (isRecurring) {
-      isValid = isValid && isFlowApplicable(flows, Flows.recurring);
+      isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
     } else {
       // Debit-PIN is not supposed to work in case of recurring
-      if (isFlowApplicable(flows, Flows.pin)) {
+      if (isFlowApplicable(flows, Flows.PIN)) {
         showDebitPinRadios();
       } else {
         hideDebitPinRadios();
