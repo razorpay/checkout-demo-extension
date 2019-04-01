@@ -6,9 +6,7 @@
       {showRecommendedUPIApp}
     />
   {:else}
-    {#if selectedApp === undefined ||
-      (selectedApp === 'gpay' && useWebPaymentsApi)
-    }
+    {#if selectedApp === undefined || isTezSelected}
       <div class="legend left">Select a UPI app</div>
       <Grid items={topUpiApps}
         on:select="onUpiAppSelection(event)"
@@ -25,69 +23,67 @@
         </span>
         <div ref:changeBtn on:click="onUpiAppSelection()">change</div>
       </Card>
-      {#if !(selectedApp === 'gpay' && useWebPaymentsApi)}
-        <div class="legend left" style="margin-top: 18px">
-          Enter your UPI ID
-        </div>
-        <Card on:click="cardClicked(event)">
-          {#if selectedApp === 'gpay'}
-            <div id="upi-tez">
-              <div class="elem-wrap collect-form">
-                <!-- TODO: remove all non svelte css for this -->
-                <Field
-                  type="text"
-                  name="vpa"
-                  id='vpa'
-                  ref:vpaField
-                  placeholder="Enter UPI ID"
-                  helpText="Please enter a valid handle"
-                  pattern=".+"
-                  required={true}
-                  formatter={{
-                    type: 'vpa'
-                  }}
-                />
-                <div class="elem at-separator">@</div>
-                <div class="elem">
-                  <select
-                    required
-                    class="input"
-                    name="tez_bank"
-                    bind:value="pspHandle">
-                    <option value="">Select Bank</option>
-                    <option value="okhdfcbank">okhdfcbank</option>
-                    <option value="okicici">okicici</option>
-                    <option value="oksbi">oksbi</option>
-                    <option value="okaxis">okaxis</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          {:else}
-            <div id='vpa-wrap' class={selectedAppData.id}>
-              <!-- TODO: use formatter for validation once all fields
-                are moved to `Field` -->
+      <div class="legend left" style="margin-top: 18px">
+        Enter your UPI ID
+      </div>
+      <Card on:click="cardClicked(event)">
+        {#if selectedApp === 'gpay'}
+          <div id="upi-tez">
+            <div class="elem-wrap collect-form">
+              <!-- TODO: remove all non svelte css for this -->
               <Field
                 type="text"
                 name="vpa"
-                id="vpa"
+                id='vpa'
                 ref:vpaField
-                placeholder="Enter your UPI Address"
-                helpText="Please enter a valid VPA of the form username@bank"
-                value={selectedApp === null ? vpa : ''}
-                pattern={pattern}
+                placeholder="Enter UPI ID"
+                helpText="Please enter a valid handle"
+                pattern=".+"
                 required={true}
                 formatter={{
                   type: 'vpa'
                 }}
               />
-              {#if pspHandle}
-                <div ref:pspName>@{pspHandle}</div>
-              {/if}
+              <div class="elem at-separator">@</div>
+              <div class="elem">
+                <select
+                  required
+                  class="input"
+                  name="tez_bank"
+                  bind:value="pspHandle">
+                  <option value="">Select Bank</option>
+                  <option value="okhdfcbank">okhdfcbank</option>
+                  <option value="okicici">okicici</option>
+                  <option value="oksbi">oksbi</option>
+                  <option value="okaxis">okaxis</option>
+                </select>
+              </div>
             </div>
-          {/if}
-        </Card>
-      {/if}
+          </div>
+        {:else}
+          <div id='vpa-wrap' class={selectedAppData.id}>
+            <!-- TODO: use formatter for validation once all fields
+              are moved to `Field` -->
+            <Field
+              type="text"
+              name="vpa"
+              id="vpa"
+              ref:vpaField
+              placeholder="Enter your UPI Address"
+              helpText="Please enter a valid VPA of the form username@bank"
+              value={selectedApp === null ? vpa : ''}
+              pattern={pattern}
+              required={true}
+              formatter={{
+                type: 'vpa'
+              }}
+            />
+            {#if pspHandle}
+              <div ref:pspName>@{pspHandle}</div>
+            {/if}
+          </div>
+        {/if}
+      </Card>
     {/if}
   {/if}
 </Tab>
@@ -284,6 +280,10 @@
         let intentApps = getSession().upi_intents_data;
         return intentApps && _.lengthOf(intentApps) > 0;
       },
+
+      /* Will be true if Tez for web payments API is selected */
+      isTezSelected: ({ selectedApp, useWebPaymentsApi }) =>
+        selectedApp === 'gpay' && useWebPaymentsApi,
     },
 
     oncreate() {
@@ -307,13 +307,11 @@
 
     onstate({ changed, current }) {
       const session = getSession();
-      const { useWebPaymentsApi } = this.get();
 
       if (changed.selectedApp && session.tab === 'upi') {
         /* TODO: bad practice, remove asap */
         if (
-          current.selectedApp === undefined ||
-          (current.selectedApp === 'gpay' && useWebPaymentsApi)
+          current.selectedApp === undefined || current.isTezSelected
         ) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
@@ -332,7 +330,7 @@
           selectedApp,
           intent,
           pspHandle,
-          useWebPaymentsApi
+          isTezSelected
         } = this.get();
 
         let vpa = '';
@@ -346,7 +344,7 @@
           data = this.refs.intentView.getPayload();
         } else {
           if (selectedApp) {
-            if (selectedApp === 'gpay' && useWebPaymentsApi) {
+            if (isTezSelected) {
               data = {
                 '_[flow]': 'tez',
               };
@@ -379,9 +377,9 @@
         let pattern = '';
 
         this.set({ selectedApp: id });
-        const { selectedAppData, useWebPaymentsApi } = this.get();
+        const { selectedAppData, isTezSelected } = this.get();
 
-        if (id === 'gpay' && useWebPaymentsApi) {
+        if (isTezSelected) {
           return session.preSubmit();
         }
 
