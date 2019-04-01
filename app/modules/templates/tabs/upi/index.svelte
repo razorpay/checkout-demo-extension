@@ -6,7 +6,9 @@
       {showRecommendedUPIApp}
     />
   {:else}
-    {#if selectedApp === undefined}
+    {#if selectedApp === undefined ||
+      (selectedApp === 'gpay' && useWebPaymentsApi)
+    }
       <div class="legend left">Select a UPI app</div>
       <Grid items={topUpiApps}
         on:select="onUpiAppSelection(event)"
@@ -245,7 +247,7 @@
       return errorCallback();
     }
 
-    session.r.isTezAvailable(successCallback);
+    session.r.isTezAvailable(successCallback, errorCallback);
   };
 
   export default {
@@ -305,10 +307,14 @@
 
     onstate({ changed, current }) {
       const session = getSession();
+      const { useWebPaymentsApi } = this.get();
 
       if (changed.selectedApp && session.tab === 'upi') {
         /* TODO: bad practice, remove asap */
-        if (current.selectedApp === undefined) {
+        if (
+          current.selectedApp === undefined ||
+          (current.selectedApp === 'gpay' && useWebPaymentsApi)
+        ) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
           _El.addClass(_Doc.querySelector('#body'), 'sub');
@@ -332,7 +338,7 @@
         let vpa = '';
         let data = {};
 
-        if (typeof this.refs.vpaField !== 'undefined') {
+        if (this.refs.vpaField) {
           vpa = this.refs.vpaField.getValue();
         }
 
@@ -369,9 +375,15 @@
       },
 
       onUpiAppSelection(id) {
-        this.set({ selectedApp: id });
-        const { selectedAppData } = this.get();
+        const session = getSession();
         let pattern = '';
+
+        this.set({ selectedApp: id });
+        const { selectedAppData, useWebPaymentsApi } = this.get();
+
+        if (id === 'gpay' && useWebPaymentsApi) {
+          return session.preSubmit();
+        }
 
         if (id === null) {
           pattern = '.+@.+';
