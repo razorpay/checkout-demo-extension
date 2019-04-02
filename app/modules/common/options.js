@@ -21,7 +21,7 @@ export const RazorpayDefaults = {
   target: '',
   subscription_card_change: null,
   display_currency: '',
-  display_amount: '',
+  display_amount: '', // This is in majors. Eg: display_currency = USD and display_amount = 50 => $50.
   recurring_token: {
     max_amount: 0,
     expire_by: 0,

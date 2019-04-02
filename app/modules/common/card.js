@@ -1,12 +1,36 @@
-const networks = {
+import { RazorpayConfig } from 'common/Razorpay';
+
+export const networks = {
   amex: 'American Express',
   diners: 'Diners Club',
   maestro: 'Maestro',
   mastercard: 'MasterCard',
   rupay: 'RuPay',
   visa: 'Visa',
+  bajaj: 'Bajaj Finserv',
   unknown: 'unknown',
 };
+
+const cdnUrl = RazorpayConfig.cdn;
+const fullPrefix = cdnUrl + 'acs/network/';
+
+export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
+
+/**
+ * Strips everything but digits.
+ * @param {String} cardNumber
+ *
+ * @return {String}
+ */
+export const getCardDigits = cardNumber => cardNumber.replace(/\D/g, '');
+
+/**
+ * Returns the IIN of the card.
+ * @param {String} cardNumber
+ *
+ * @return {String}
+ */
+export const getIin = cardNumber => getCardDigits(cardNumber).slice(0, 6);
 
 /**
  * @param {String} name {eg: MasterCard}
@@ -72,6 +96,10 @@ const cardPatterns = [
     name: 'jcb',
     regex: /^35/,
   },
+  {
+    name: 'bajaj',
+    regex: /^203040/,
+  },
 ];
 
 const cardLengths = {
@@ -82,6 +110,7 @@ const cardLengths = {
 };
 
 export const getCardType = cardNumber => {
+  cardNumber = cardNumber.replace(/\D/g, '');
   let cardType = '';
   _Arr.loop(cardPatterns, card => {
     if (card.regex.test(cardNumber)) {
@@ -125,3 +154,41 @@ export const luhnCheck = num => {
 
   return sum % 10 === 0;
 };
+
+/**
+ * Checks if the card network in payment is one among the list provided.
+ * @param {Object} paymentData
+ * @param {Array} listOfNetworks
+ * @param {*} tokens
+ */
+export function isCardNetworkInPaymentOneOf(
+  paymentData,
+  listOfNetworks,
+  tokens = []
+) {
+  const cardNumber = paymentData['card[number]'];
+  const token = paymentData['token'];
+  let network = '';
+
+  if (token) {
+    const cardToken = _Arr.find(tokens, t => t.token === token);
+
+    if (cardToken && cardToken.card && cardToken.card.network) {
+      network = cardToken.card.network;
+    }
+  } else if (cardNumber) {
+    network = getCardType(cardNumber);
+  } else {
+    // Not a card payment
+    return false;
+  }
+
+  network = network.toLowerCase();
+
+  return Boolean(
+    _Arr.find(
+      listOfNetworks,
+      listNetwork => listNetwork.toLowerCase() === network
+    )
+  );
+}

@@ -8,13 +8,14 @@ import Analytics from 'analytics';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
+  Track(this.r, 'otp_response', response);
   if (error) {
     if (error.action === 'RETRY') {
       return this.emit('otp.required', strings.wrongOtp);
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }
-    this.complete(response);
+    return this.complete(response);
   }
   processCoproto.call(this, response);
 };
@@ -69,6 +70,10 @@ var responseTypes = {
     var content = request.content;
     var popup = this.popup;
     var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
+
+    if (this.data && this.data.wallet === 'amazonpay') {
+      request.content = {};
+    }
 
     if (this.isMagicPayment) {
       if (coprotoMagic) {
@@ -237,7 +242,7 @@ var responseTypes = {
   },
 
   otp: function(request, fullResponse) {
-    if (!this.iframe && request.method === 'direct') {
+    if (!this.nativeotp && !this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
     if (this.data.method === 'wallet') {

@@ -10,13 +10,15 @@ import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
-import { getDecimalAmount, displayCurrencies } from 'common/currency';
+import * as Currency from 'common/currency';
+import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
 import emiOptionsView from 'checkoutframe/emioptions';
+import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
@@ -30,11 +32,14 @@ import { commonBanks, getFullBankLogo } from 'common/bank';
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
 import * as Bank from 'common/bank';
+import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
+import * as Offers from 'checkoutframe/offers';
+import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -58,8 +63,10 @@ export default {
   _PaymentMethodIcons,
   Confirm,
   Callout,
-  getDecimalAmount,
-  currencies: displayCurrencies,
+  Currency,
+  OtpService,
+  getDecimalAmount: Currency.getDecimalAmount,
+  currencies: Currency.displayCurrencies,
   error: _.rzpError,
   cancelMsg: strings.cancelMsg,
   wrongOtpMsg: strings.wrongOtp,
@@ -68,6 +75,7 @@ export default {
 
   Constants,
   Bank,
+  Card,
   Wallet,
   CardlessEmi,
   Token,
@@ -78,6 +86,8 @@ export default {
   MethodsList,
   Store,
   UserAgent,
+  Offers,
+  Flows,
 
   getQueryParams: _.getQueryParams,
 
@@ -88,6 +98,7 @@ export default {
   emiView,
   emandateView,
   emiOptionsView,
+  emiScreenView,
   emiPlansView,
   SavedCardsView,
 

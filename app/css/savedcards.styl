@@ -326,7 +326,7 @@ $cardpl = 70px;
   }
 }
 
-#elem-card {
+.elem-card {
   .cardtype {
     position: absolute;
     right: 0;
@@ -360,6 +360,12 @@ $cardpl = 70px;
   margin: 5px 0 0 -2px;
   background-position: -20%;
   display: block;
+}
+
+[cardtype=bajaj]::before, .networkicon.bajaj {
+  background: no-repeat url('https://cdn.razorpay.com/cardless_emi-sq/bajaj.svg');
+  background-position: 100%;
+  background-size: contain;
 }
 
 [cardtype=visa]::before, .networkicon.visa {

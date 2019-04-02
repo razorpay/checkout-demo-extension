@@ -5,7 +5,7 @@ import * as AnalyticsTypes from 'analytics-types';
 const CLASS_IFRAME_ACTIVE = 'iframe-active';
 
 const frameHtml = (amount, title) => `<div class='iframe-title'>
-<b class='iframe-close'>&#xe604;</b> ${title}
+<b class='iframe-close'>&#xe604;</b> ${title || 'Payment'}
 <b class='iframe-amount'>${amount}</b>
 </div>
 <iframe></iframe>`;

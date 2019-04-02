@@ -28,21 +28,19 @@
   "scripts": {
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "./rollup.test.js | tap-difflet; npm run build && node ./blackbox",
-    "build": "rollup -c --environment prod && gulp && lintOutput app/js/generated/entry",
-    "start": "rollup -cw & gulp watch; kill -9 $!"
+    "build": "$ rollup -c --environment prod && gulp && lintOutput app/js/generated/entry",
+    "start": "$ rollup -cw & gulp watch; kill -9 $!"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
   },
   "dependencies": {
-    "@babel/core": "^7.0.1",
     "chai": "^4.1.2",
     "chalk": "^2.4.1",
     "fastify": "^1.11.2",
     "fastify-formbody": "^2.0.1",
     "fastify-static": "^0.14.0",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#c58bdc4",
-    "glob": "^7.1.3",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#da2d8d3",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
@@ -50,14 +48,8 @@
     "jshint": "2.9.5",
     "jshint-stylish": "^2.2.1",
     "puppeteer": "1.5.0",
-    "rollup": "^0.67.3",
     "rollup-plugin-coverage": "^0.1.4",
-    "rollup-plugin-includepaths": "^0.2.3",
-    "rollup-plugin-inject": "^2.0.0",
-    "rollup-plugin-svelte": "^4.3.0",
     "run-sequence": "^2.2.1",
-    "stylus": "^0.54.5",
-    "svelte": "^2.16.0",
     "tap-difflet": "^0.7.1",
     "testdouble": "^3.8.1",
     "through": "^2.3.8",
@@ -66,7 +58,7 @@
   "private": "true",
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
-    "prettier": "^1.14.2",
+    "prettier": "^1.16.4",
     "pretty-quick": "^1.6.0"
   },
   "husky": {

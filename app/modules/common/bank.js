@@ -25,6 +25,7 @@ const _commonBanks = [
   ['CORP', 'Corporate'],
   ['IDFB', 'IDFC'],
   ['INDB', 'IndusInd'],
+  ['VIJB', 'Vijaya Bank'],
 ];
 
 export const commonBanks = _Arr.map(_commonBanks, banks => ({
@@ -78,6 +79,16 @@ export const emiBanks = [
     code: 'AMEX',
     name: 'American Express',
     patt: /^37(693|9397|98(6[1-3,7-9]|7[0-2,6-8]))/,
+  },
+  {
+    code: 'SBIN',
+    name: 'State Bank of India',
+    patt: /^((4(0((474|969)5|3(009|250)|066[67])|3(1(75[47]|459)|358[78]|7748|8105)|6(874[23]|0214|1119)|5(257[24]|9247)|20739|72642)|5(1(0(1(28|35)|223)|(262|725)2)|2(4((24|31)7|182)|6468|8734)|36298|47359)))/,
+  },
+  {
+    code: 'BAJAJ',
+    name: 'Bajaj Finserv',
+    patt: /^203040/,
   },
 ];
 

@@ -1,3 +1,5 @@
+/* global CheckoutBridge */
+
 import Analytics from 'analytics';
 
 const UPI_APPS = {
@@ -156,6 +158,10 @@ const UPI_APPS = {
     {
       package_name: 'com.SIBMobile',
     },
+    {
+      package_name: 'com.truecaller',
+      verify_registration: true,
+    },
   ],
 
   /**
@@ -168,9 +174,6 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.myairtelapp',
-    },
-    {
-      package_name: 'com.truecaller',
     },
     {
       package_name: 'com.paytmmall',
@@ -336,8 +339,26 @@ export const getAppByPackageName = packageName => {
 export const getSortedApps = allApps => {
   allApps = _Obj.clone(allApps);
 
+  const isAppInstalled = package_name =>
+    allApps.some(app => app.package_name === package_name);
+
   // Get list of package names
-  const usableApps = getUsableApps();
+  let usableApps = getUsableApps();
+
+  // Filter out apps which are installed, but the user isn't registered on them.
+  // The check is only performed if verify_registration is true for the app.
+  // See UPI_APPS.whitelist.
+  if (CheckoutBridge && CheckoutBridge.isUserRegisteredOnUPI) {
+    usableApps = _Arr.filter(usableApps, app => {
+      // Only check for user registration if app is installed.
+      if (app.verify_registration && isAppInstalled(app.package_name)) {
+        return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
+      }
+
+      return true;
+    });
+  }
+
   const usablePackages = _Arr.map(usableApps, app => app.package_name);
 
   // Remove blacklisted apps
@@ -350,7 +371,7 @@ export const getSortedApps = allApps => {
   _Arr.sort(
     allApps,
     (a, b) =>
-      usablePackages.indexOf(a.package_name) >
+      usablePackages.indexOf(a.package_name) -
       usablePackages.indexOf(b.package_name)
   );
 

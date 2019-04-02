@@ -25,14 +25,12 @@ var emi_options = _.emi_options;
 var accountName = o('prefill.bank_account[name]');
 
 var amount;
-var amount_figure = _.formatAmount(o('amount'));
-var firstPaymentMinAmount = _.formatAmount(order.first_payment_min_amount);
+var amount_figure = _.formatAmountWithCurrency(o('amount'));
+var firstPaymentMinAmount = _.formatAmountWithCurrency(order.first_payment_min_amount);
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
-else if (o('currency')==='INR')
-  amount = "&#x20B9;<span class='amount-figure'>" + amount_figure + "</span>";
 else
-  amount = discreet.currencies[o('currency')] + amount_figure;
+  amount = amount_figure;
 
 var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
@@ -177,7 +175,7 @@ var upi_apps = _.upi_intents_data;
                             <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
                             <div class="checkbox inner-checkbox" for="minimum-amount-select"></div>
                             <label class="partial-label" for="minimum-amount-select">
-                              `=html(o('min_amount_label') || 'Minimum Due Amount')` (₹`=html(firstPaymentMinAmount)`)
+                              `=html(o('min_amount_label') || 'Minimum Amount Due')` (`=html(firstPaymentMinAmount)`)
                             </label>
                           </div>
                         `?`
@@ -321,12 +319,13 @@ var upi_apps = _.upi_intents_data;
                   <div class="pad">
                   <div id="add-card-container">
                   <div class="card-fields">
-                      <div class="elem-wrap two-third"><div class="elem" id="elem-card">
+                      <div class="elem-wrap two-third"><div class="elem elem-card `?_.recurring`recurring`?`" id="elem-card">
                         <div class="cardtype"></div>
                         <label>Card Number</label>
                         <i>&#xe605;</i>
                         <span class="help">Please enter a valid card number</span>
                         <span class="help amex-error">Amex cards are not supported for this transaction</span>
+                        <span class="help recurring-card-error">Card does not support automatic recurring payments</span>
                         <input class="input" type="tel" id="card_number" name="card[number]" autocomplete="off" maxlength="19" value="`=attr(o('prefill.card[number]'))`">
                       </div></div>
                       <div class="elem-wrap third"><div class="elem elem-expiry">
@@ -338,7 +337,7 @@ var upi_apps = _.upi_intents_data;
                         <span class="help">Please enter name on your card</span>
                         <label>Card Holder's Name</label>
                         <i>&#xe602;</i>
-                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9\']{1,100}$" `?name_readonly`readonly`?`>
+                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9'-]{1,100}$" `?name_readonly`readonly`?`>
                       </div></div>
                       <div class="elem-wrap third"><div class="elem elem-cvv mature">
                         <label>CVV</label>
@@ -427,6 +426,9 @@ var upi_apps = _.upi_intents_data;
                   `?`
                 </div>
               `?`
+              `?method.emi && _.emi_options.banks['BAJAJ']`
+                <div class="tab-content showable screen" id="form-emi"></div>
+              `?`
               `?banks`
                 <div class="tab-content showable screen" id="form-netbanking">
                   `var count = 0, max = 3, total = 0;`
@@ -471,6 +473,24 @@ var upi_apps = _.upi_intents_data;
                         `~`
                       </select>
                     </div></div>
+                    <div class="nb-selection-container showable pad">
+                      <label>Complete Payment Using</label>
+                      <div class="input-radio">
+                        <input type="radio" id="nb_type_retail" value="retail" class="nb-type">
+                        <label for="nb_type_retail">
+                          <div class="radio-display"></div>
+                          <div class="label-content">Retail</div>
+                        </label>
+                      </div>
+
+                      <div class="input-radio">
+                        <input type="radio" id="nb_type_corporate" value="corporate" class="nb-type">
+                        <label for="nb_type_corporate">
+                          <div class="radio-display"></div>
+                          <div class="label-content">Corporate</div>
+                        </label>
+                      </div>
+                    </div>
                     <div class="down">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.351 6.493c-.08-.801.55-1.493 1.351-1.493s1.431.692 1.351 1.493l-.801 8.01c-.029.282-.266.497-.55.497s-.521-.215-.55-.498l-.801-8.009zm1.351 12.757c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
                       <span class="text">
@@ -683,7 +703,7 @@ var upi_apps = _.upi_intents_data;
                     <span style='border-bottom: 1px dashed #ddd'>`=invoice.url`</span>
                     `?_.epos_share_link`
                       <a id="share-link" class="btn"
-                        href="rzp://rzp.io/invoice/share/`=encodeURIComponent('Razorpay has requested payment of ₹' + amount_figure + '. Open following link to pay:\n' + invoice.url)`">
+                        href="rzp://rzp.io/invoice/share/`=encodeURIComponent('Razorpay has requested payment of ' + amount_figure + '. Open following link to pay:\n' + invoice.url)`">
                         Share Link
                       </a>
                     `?`
@@ -722,6 +742,7 @@ var upi_apps = _.upi_intents_data;
               <span class="otp-btn">Verify</span>
               <span class="view-plans-btn invisible">View EMI Plans</span>
               <span class="select-plan-btn invisible">Select EMI Plan</span>
+              <span class="enter-card-details invisible">Enter Card Details</span>
             </button>
             `?o('theme.branding')`
               <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">

@@ -62,7 +62,7 @@ class Layout extends CheckoutTest {
 
     const $header = await $container.$('#header');
 
-    const $amount = await $header.$('#amount .amount-figure'),
+    const $amount = await $header.$('#amount .original-amount'),
       amountIsVisible = await el.isVisible($amount);
 
     assert(amountIsVisible, 'Amount is not visible');

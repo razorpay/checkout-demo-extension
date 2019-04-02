@@ -137,7 +137,13 @@ export default class MethodsList {
     }
 
     /* Only allow for available methods */
-    data.instruments = _Arr.filter(data.instruments, ({ method }) => {
+    data.instruments = _Arr.filter(data.instruments, data => {
+      let { method } = data;
+
+      if (data['_[upiqr]']) {
+        method = 'qr';
+      }
+
       return session.methods[method];
     });
 
