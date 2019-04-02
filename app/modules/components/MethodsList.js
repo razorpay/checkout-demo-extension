@@ -106,13 +106,6 @@ export default class MethodsList {
     const onMethodSelected = e => {
       let { method } = e.data;
 
-      /**
-       * Replace the method if replaceable.
-       */
-      if (method === 'emi' && this.data.session.methods.cardless_emi) {
-        method = 'cardless_emi';
-      }
-
       this.data.session.switchTab(method);
     };
 
