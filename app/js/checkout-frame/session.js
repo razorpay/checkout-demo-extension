@@ -3549,6 +3549,12 @@ Session.prototype = {
       return this.emandateView.showTab(tab);
     }
 
+    if (tab === '' && this.tab === 'upi') {
+      if (this.upiTab.onBack()) {
+        return;
+      }
+    }
+
     this.body.attr('tab', tab);
     this.tab = tab;
 

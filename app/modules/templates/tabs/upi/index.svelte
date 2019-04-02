@@ -372,6 +372,24 @@
         return data;
       },
 
+      onBack() {
+        const {
+          intent,
+          selectedApp,
+        } = this.get();
+
+        if (!intent) {
+          if (selectedApp !== undefined) {
+            this.set({ selectedApp: undefined });
+            return true;
+          } else {
+            return false;
+          }
+        }
+
+        return false;
+      },
+
       onUpiAppSelection(id) {
         const session = getSession();
         let pattern = '';
