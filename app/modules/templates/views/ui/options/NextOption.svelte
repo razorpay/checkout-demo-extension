@@ -1,5 +1,6 @@
 <Option
   {data}
+  {attributes}
   type="next-option {type}"
 
   on:select="select(event)"

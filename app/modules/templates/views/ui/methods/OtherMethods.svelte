@@ -25,6 +25,7 @@
         <NextOption
           data={{method}} on:select='fire("methodSelected", event)'
           icon={session.themeMeta.icons[method]}
+          attributes={{tab: method}}
         >
           {session.tab_titles[method]}
         </NextOption>
