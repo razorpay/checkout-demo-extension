@@ -376,9 +376,15 @@
         const {
           intent,
           selectedApp,
+          isTezSelected,
         } = this.get();
 
         if (!intent) {
+          if (isTezSelected) {
+            this.set({ selectedApp: undefined });
+            return false;
+          }
+
           if (selectedApp !== undefined) {
             this.set({ selectedApp: undefined });
             return true;
