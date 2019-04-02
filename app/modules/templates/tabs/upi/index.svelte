@@ -26,7 +26,7 @@
       <div class="legend left" style="margin-top: 18px">
         Enter your UPI ID
       </div>
-      <Card on:click="cardClicked(event)">
+      <Card selected={true} on:click="focusVpa(event)">
         {#if selectedApp === 'gpay'}
           <div id="upi-tez">
             <div class="elem-wrap collect-form">
@@ -136,7 +136,7 @@
   }
 
   ref:pspName {
-    color: #797979;
+    color: #424242;
     position: absolute;
     top: 12px;
     right: 12px;
@@ -417,10 +417,12 @@
           pspHandle: selectedAppData ? selectedAppData.psp : '',
           pattern,
         });
+
+        this.focusVpa();
       },
 
       /* VPA card specific code */
-      cardClicked(event) {
+      focusVpa(event) {
         if (!this.get()['focused']) {
           this.refs.vpaField.focus();
         }

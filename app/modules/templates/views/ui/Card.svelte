@@ -1,4 +1,4 @@
-<div ref:card on:click="fire('click', event)">
+<div ref:card class:theme-border="selected" on:click="fire('click', event)">
   <slot></slot>
 </div>
 
@@ -15,3 +15,13 @@
     position: relative;
   }
 </style>
+
+<script>
+  export default {
+    data() {
+      return {
+        selected: false
+      }
+    }
+  }
+</script>
