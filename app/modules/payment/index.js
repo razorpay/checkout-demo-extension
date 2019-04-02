@@ -702,6 +702,24 @@ var flowCache = {
 };
 
 /**
+ * Fetches card flows from cache.
+ * @param {String} cardNumber
+ *
+ * @return {Object/undefined}
+ */
+export function getCardFlowsFromCache(cardNumber = '') {
+  cardNumber = cardNumber.replace(/\D/g, '');
+
+  if (cardNumber.length < 6) {
+    return;
+  }
+
+  const iin = cardNumber.slice(0, 6);
+
+  return flowCache.card[iin];
+}
+
+/**
  * Gets the flows associated with a card.
  * @param {string} cardNumber
  * @param {Function} callback
@@ -711,18 +729,19 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
   cardNumber = cardNumber.replace(/\D/g, '');
 
   if (cardNumber.length < 6) {
-    callback([]);
+    callback({});
     return;
   }
-
-  var iin = cardNumber.slice(0, 6);
 
   // Check cache.
-  if (flowCache.card[iin]) {
-    callback(flowCache.card[iin]);
+  const fromCache = getCardFlowsFromCache(cardNumber);
+
+  if (fromCache) {
+    callback(fromCache);
     return;
   }
 
+  const iin = cardNumber.slice(0, 6);
   let url = makeAuthUrl(this, 'payment/flows');
 
   // append IIN and source as query to flows route

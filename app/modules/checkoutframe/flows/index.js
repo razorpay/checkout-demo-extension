@@ -2,8 +2,84 @@ import { getSession } from 'sessionmanager';
 import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
 import { getCardType, getIin, getCardDigits } from 'common/card';
+import { getCardFlowsFromCache } from 'payment';
+import {
+  isCardNetworkInPaymentOneOf,
+  networks as CardNetworks,
+} from 'common/card';
 
 const INVALID_CLASS = 'invalid';
+
+const Flows = {
+  PIN: 'pin',
+  OTP: 'otp',
+  RECURRING: 'recurring',
+};
+
+/**
+ * @param {Object} flows
+ * @param {String} flow
+ *
+ * @return {Boolean}
+ */
+const isFlowApplicable = _.curry2((flows, flow) => Boolean(flows[flow]));
+
+/**
+ * Get the flows applicable for the payment.
+ * @param {Object} paymentData
+ * @param {Array} tokens
+ *
+ * @return {Object}
+ */
+function getFlowsForPayment(paymentData, tokens = []) {
+  // Cards
+  const cardNumber = paymentData['card[number]'];
+  const token = paymentData['token'];
+
+  if (token) {
+    const cardToken = _Arr.find(tokens, t => t.token === token);
+
+    if (cardToken && cardToken.card && cardToken.card.flows) {
+      return cardToken.card.flows;
+    }
+  } else if (cardNumber) {
+    const flows = getCardFlowsFromCache(cardNumber);
+
+    if (flows) {
+      return flows;
+    }
+  }
+
+  return {};
+}
+
+/**
+ * Tells whether or not Native OTP is to be used for the card payment.
+ *
+ * OTP flow needs to enabled and the card has to be either
+ * a MasterCard or a Visa.
+ *
+ * @param {Object} paymentData Data that will be used for payment creation
+ * @param {Array} tokens List of tokens
+ *
+ * @return {Boolean}
+ */
+export function shouldUseNativeOtpForCardPayment(paymentData, tokens) {
+  const flowPresent =
+    getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
+
+  let validNetwork = false;
+
+  if (flowPresent) {
+    validNetwork = isCardNetworkInPaymentOneOf(
+      paymentData,
+      [CardNetworks.mastercard, CardNetworks.visa],
+      tokens
+    );
+  }
+
+  return flowPresent && validNetwork;
+}
 
 /**
  * Sets the visibility of ATM-PIN radio buttons on new card screen.
@@ -145,10 +221,10 @@ export function performCardFlowActionsAndValidate(
 
     // Perform actual-flow checking only if the IIN has changed.
     if (isRecurring) {
-      isValid = isValid && flows.recurring;
+      isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
     } else {
       // Debit-PIN is not supposed to work in case of recurring
-      if (flows.pin) {
+      if (isFlowApplicable(flows, Flows.PIN)) {
         showDebitPinRadios();
       } else {
         hideDebitPinRadios();

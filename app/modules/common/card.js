@@ -1,6 +1,6 @@
 import { RazorpayConfig } from 'common/Razorpay';
 
-const networks = {
+export const networks = {
   amex: 'American Express',
   diners: 'Diners Club',
   maestro: 'Maestro',
@@ -154,3 +154,41 @@ export const luhnCheck = num => {
 
   return sum % 10 === 0;
 };
+
+/**
+ * Checks if the card network in payment is one among the list provided.
+ * @param {Object} paymentData
+ * @param {Array} listOfNetworks
+ * @param {*} tokens
+ */
+export function isCardNetworkInPaymentOneOf(
+  paymentData,
+  listOfNetworks,
+  tokens = []
+) {
+  const cardNumber = paymentData['card[number]'];
+  const token = paymentData['token'];
+  let network = '';
+
+  if (token) {
+    const cardToken = _Arr.find(tokens, t => t.token === token);
+
+    if (cardToken && cardToken.card && cardToken.card.network) {
+      network = cardToken.card.network;
+    }
+  } else if (cardNumber) {
+    network = getCardType(cardNumber);
+  } else {
+    // Not a card payment
+    return false;
+  }
+
+  network = network.toLowerCase();
+
+  return Boolean(
+    _Arr.find(
+      listOfNetworks,
+      listNetwork => listNetwork.toLowerCase() === network
+    )
+  );
+}

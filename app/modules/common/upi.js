@@ -1,3 +1,5 @@
+/* global CheckoutBridge */
+
 import Analytics from 'analytics';
 
 const UPI_APPS = {
@@ -369,7 +371,7 @@ export const getSortedApps = allApps => {
   _Arr.sort(
     allApps,
     (a, b) =>
-      usablePackages.indexOf(a.package_name) >
+      usablePackages.indexOf(a.package_name) -
       usablePackages.indexOf(b.package_name)
   );
 
