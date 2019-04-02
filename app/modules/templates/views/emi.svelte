@@ -20,8 +20,8 @@
   <div class="row emi-option">
     <div class="col">{plan.duration} Months</div>
     <div class="col">{plan.rate}%</div>
-    <div class="col">₹ {plan.monthly}</div>
-    <div class="col">₹ {plan.total}</div>
+    <div class="col">{plan.monthly}</div>
+    <div class="col">{plan.total}</div>
   </div>
   {/each}
   <div id="emi-close" class="close" on:click="hide()">×</div>
@@ -43,6 +43,7 @@
         }
       },
       plans: data => {
+        const session = data.session;
         let plans = (data.banks[data.selected] || {}).plans || {};
         return _Obj.map(plans, (plan, duration) => {
           let installment = Razorpay.emi.calculator(
@@ -53,8 +54,8 @@
           return {
             duration: duration,
             rate: plan.interest,
-            monthly: (installment / 100).toFixed(2),
-            total: (installment * duration / 100).toFixed(2),
+            monthly: session.formatAmountWithCurrency(installment),
+            total: session.formatAmountWithCurrency(installment * duration),
           };
         });
       },
