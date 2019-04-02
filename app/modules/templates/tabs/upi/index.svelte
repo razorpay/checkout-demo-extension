@@ -69,7 +69,7 @@
               name="vpa"
               id="vpa"
               ref:vpaField
-              placeholder="Enter your UPI Address"
+              placeholder={selectedApp ? "" : "Enter your UPI Address"}
               helpText="Please enter a valid VPA of the form username@bank"
               value={selectedApp === null ? vpa : ''}
               pattern={pattern}
