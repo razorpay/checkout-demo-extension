@@ -5753,7 +5753,11 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    discreet.Store.set({ preferences: prefs });
+    Store.set({
+      preferences: prefs,
+      downtimes: discreet.Downtimes.getDowntimes(prefs),
+    });
+
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
