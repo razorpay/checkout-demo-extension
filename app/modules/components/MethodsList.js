@@ -22,13 +22,14 @@ const getAvailableMethods = methods => {
 
   /**
    * Cardless EMI and EMI are the same payment option.
+   * When we click EMI, it should take to Cardless EMI if
+   * cardless_emi is an available method.
    */
-  if (_Arr.contains(AVAIL_METHODS, 'cardless_emi')) {
-    if (_Arr.contains(AVAIL_METHODS, 'emi')) {
-      AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'cardless_emi');
-    } else {
-      AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, 'cardless_emi')] = 'emi';
-    }
+  if (
+    _Arr.contains(AVAIL_METHODS, 'cardless_emi') &&
+    _Arr.contains(AVAIL_METHODS, 'emi')
+  ) {
+    AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'emi');
   }
 
   return AVAIL_METHODS;
