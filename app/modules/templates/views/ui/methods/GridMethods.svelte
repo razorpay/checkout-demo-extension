@@ -1,9 +1,9 @@
 <div id="payment-options" class="grid clear count-{methods.length}">
   {#each methods as method}
     <GridMethod
-      method={method}
+      {...method}
 
-      on:click="selectMethod(method.method, event)"
+      on:select="selectMethod(event)"
     />
   {/each}
 </div>
@@ -67,9 +67,13 @@
       },
     },
     methods: {
-      selectMethod: (method = '', event) => {
+      selectMethod: (event) => {
+        const {
+          down,
+          method = '',
+        } = event.data;
+
         const target = event.currentTarget;
-        let down = _El.getAttribute(target, 'down') === 'true';
         let disabled = _El.hasClass(target, 'disabled');
 
         Analytics.track('payment_method:select', {

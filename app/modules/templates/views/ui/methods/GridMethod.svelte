@@ -1,17 +1,17 @@
 <div
   class="payment-option item"
-  down={method.down}
-  tab="{method.method}"
+  down={down}
+  tab="{method}"
 
-  class:has-tooltip="method.down"
+  class:has-tooltip="down"
 
-  on:click="fire('click', event)"
+  on:click="selectMethod(event)"
 >
 
   <label>
-    <i>{@html method.icon}</i>
-    <span class="title">{method.title}</span>
-    {#if method.down}
+    <i>{@html icon}</i>
+    <span class="title">{title}</span>
+    {#if down}
       <span class="downtime">
         i
         <Tooltip
@@ -19,11 +19,11 @@
           class="downtime-tooltip"
           align={['top']}
         >
-          {method.downMessage}
+          {downMessage}
         </Tooltip>
       </span>
     {/if}
-    <span class="desc">{method.description}</span>
+    <span class="desc">{description}</span>
   </label>
 </div>
 
@@ -32,5 +32,21 @@
     components: {
       Tooltip: 'templates/views/ui/Tooltip.svelte',
     },
+
+    methods: {
+      selectMethod: function (event) {
+        const {
+          down,
+          method,
+        } = this.get();
+
+        event.data = {
+          down,
+          method,
+        };
+
+        this.fire('select', event);
+      }
+    }
   }
 </script>
