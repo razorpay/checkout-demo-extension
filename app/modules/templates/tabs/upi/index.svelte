@@ -423,7 +423,7 @@
 
       /* VPA card specific code */
       focusVpa(event) {
-        if (!this.get()['focused']) {
+        if (!this.get()['focused'] && this.refs.vpaField) {
           this.refs.vpaField.focus();
         }
       },

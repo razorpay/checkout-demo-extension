@@ -3029,6 +3029,7 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
+    var isTezScreen = false;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3046,25 +3047,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    if (this.separateTez) {
-      if (screen === 'tez' || screen === 'upi') {
-        var tez = false;
-        if (screen === 'tez') {
-          tez = true;
-          screen = 'upi';
-        }
-
-        $('#upi-directpay .checkbox').css('display', 'none');
-        $('#upi-tez .checkbox').css('display', 'none');
-
-        gel('radio-tez').checked = tez;
-        $('#upi-tez').css('display', tez ? 'block' : 'none');
-        $('#upi-tez').toggleClass('expanded', tez);
-
-        gel('radio-directpay').checked = !tez;
-        $('#upi-directpay').toggleClass('expanded', !tez);
-        $('#upi-directpay').css('display', !tez ? 'block' : 'none');
-      }
+    if (screen === 'tez' && this.separateTez) {
+      screen = 'upi';
+      isTezScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3148,6 +3133,11 @@ Session.prototype = {
       } else if (typeof this.upiTab.get().selectedApp === 'undefined') {
         $('#body').removeClass('sub');
       }
+    }
+
+    if (isTezScreen) {
+      this.upiTab.set({ selectedApp: 'gpay' });
+      this.upiTab.onUpiAppSelection('gpay');
     }
 
     return this.offers && this.renderOffers(this.tab);
