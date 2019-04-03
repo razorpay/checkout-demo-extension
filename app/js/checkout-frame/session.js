@@ -576,15 +576,12 @@ function hideOverlayMessage() {
 
 /**
  * Get the text to show to EMI plan.
- *
- * this = session
- *
  * @param {Number} amount
  * @param {Object} plan
  *
  * @return {Object}
  */
-function getEmiText(amount, plan) {
+function getEmiText(session, amount, plan) {
   var amountPerMonth = Razorpay.emi.calculator(
     amount,
     plan.duration,
@@ -595,14 +592,14 @@ function getEmiText(amount, plan) {
     info:
       plan.duration +
       ' Months (' +
-      this.formatAmountWithCurrency(amountPerMonth) +
+      session.formatAmountWithCurrency(amountPerMonth) +
       '/mo) @ ' +
       plan.interest +
       '%',
     short:
       plan.duration +
       ' Months (' +
-      this.formatAmountWithCurrency(amountPerMonth) +
+      session.formatAmountWithCurrency(amountPerMonth) +
       '/mo)',
   };
 }
@@ -3741,7 +3738,7 @@ Session.prototype = {
         (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
       ) {
         listItems.push({
-          text: getEmiText.call(that, amount, plan).info,
+          text: getEmiText(that, amount, plan).info,
           value: duration,
           badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
           detail:
@@ -3850,7 +3847,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(amount, plan).short || '';
+              var text = getEmiText(self, amount, plan).short || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -3936,7 +3933,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(amount, plan).short || '';
+              var text = getEmiText(self, amount, plan).short || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -4024,7 +4021,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(amount, plan).short || '';
+              var text = getEmiText(self, amount, plan).short || '';
 
               self.emiScreenView.setPlan({
                 duration: plan.duration,
