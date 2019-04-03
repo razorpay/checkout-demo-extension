@@ -150,7 +150,27 @@ export const getPreferredBanks = (preferences, bankOptions) => {
   return bankList;
 };
 
+/**
+ * Returns the list of banks that have a downtime.
+ * @param {Object} preferences
+ *
+ * @return {Array}
+ */
 export const getDownBanks = preferences => {
+  /*
+    "downtime": {
+      "netbanking": [
+        {
+          "issuer": [
+            "CIUB"
+          ],
+          "severity": "high",
+          "begin": 1554061550
+        }
+      ]
+    }
+  */
+
   const downtime = preferences.downtime;
   let downList = [];
 
