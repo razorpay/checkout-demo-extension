@@ -21,6 +21,8 @@
           selected={instrument.id === selected}
           showRadio={instrument.method !== 'card'}
           icon={instrument.icon}
+          name='p13n_method'
+          value={instrument.id}
         >
           {instrument.text}
           {#if instrument.method === 'card'}
