@@ -1,89 +1,88 @@
 $background = rgba(0,0,0,0.8);
 
+.tooltip
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.15s ease-in;
+  display: block;
+  position: absolute;
+  background-color: $background;
+  border-radius: 3px;
+  color: #fff;
+  padding: 12px;
+  pointer-events: none;
+  width: 50vw;
+  max-width: 300px;
+
+  &::before
+    content: '';
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid transparent;
+    border-right: 5px solid $background;
+
+  &.tooltip-right
+    margin: -7px 0 0 22px;
+    transform: translateY(-50%);
+    &::before
+      top: 50%;
+      left: -5px;
+      transform: translateY(-50%);
+
+  &.tooltip-left
+    margin: -7px 0px 0px -8px;
+    transform: translateX(-100%) translateY(-50%);
+    &::before
+      top: 50%;
+      right: -5px;
+      transform: translateY(-50%) rotate(180deg);
+
+  &.tooltip-top
+    margin: 8px 0 0 0;
+    transform: translateX(-50%) translateY(-150%);
+    &::before
+      top: calc(100% + 2px);
+      left: calc(50% + 5px);
+      transform: translateY(-50%) rotate(270deg);
+
+  &.tooltip-bottom
+    margin: 8px 0 0 0;
+    transform: translateX(-50%);
+    &::before
+      top: -2px;
+      left: calc(50% + 5px);
+      transform: translateY(-50%) rotate(90deg);
+
+  &.tooltip-bottom.tooltip-left
+    transform: translateX(-100%);
+    margin: 8px 0 0 16px;
+    &::before
+      left: calc(100% - 12px);
+
+  &.tooltip-bottom.tooltip-right
+    transform: none;
+    margin: 8px 0px 0 -4px;
+    &::before
+      left: 8px;
+
+  &.tooltip-top.tooltip-left
+    transform: translateX(-100%) translateY(-150%);
+    margin: 4px 0 0 16px;
+    &::before
+      left: calc(100% - 12px);
+
+  &.tooltip-top.tooltip-right
+    margin: 4px 0 0 -4px;
+    transform: translateY(-150%)
+    &::before
+      left: 8px;
+
 .has-tooltip
   position: relative;
   cursor: pointer;
-
-  .tooltip
-    opacity: 0;
-    z-index: 1;
-    transition: opacity 0.15s ease-in;
-    display: block;
-    position: absolute;
-    background-color: $background;
-    border-radius: 3px;
-    color: #fff;
-    padding: 12px;
-    pointer-events: none;
-    width: 50vw;
-    max-width: 300px;
-
-    &::before
-      content: '';
-      display: block;
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-bottom: 5px solid transparent;
-      border-top: 5px solid transparent;
-      border-right: 5px solid $background;
-
-    &.tooltip-right
-      margin: -7px 0 0 22px;
-      transform: translateY(-50%);
-      &::before
-        top: 50%;
-        left: -5px;
-        transform: translateY(-50%);
-
-    &.tooltip-left
-      margin: -7px 0px 0px -8px;
-      transform: translateX(-100%) translateY(-50%);
-      &::before
-        top: 50%;
-        right: -5px;
-        transform: translateY(-50%) rotate(180deg);
-
-    &.tooltip-top
-      margin: 8px 0 0 0;
-      transform: translateX(-50%) translateY(-150%);
-      &::before
-        top: calc(100% + 2px);
-        left: calc(50% + 5px);
-        transform: translateY(-50%) rotate(270deg);
-
-    &.tooltip-bottom
-      margin: 8px 0 0 0;
-      transform: translateX(-50%);
-      &::before
-        top: -2px;
-        left: calc(50% + 5px);
-        transform: translateY(-50%) rotate(90deg);
-
-    &.tooltip-bottom.tooltip-left
-      transform: translateX(-100%);
-      margin: 8px 0 0 16px;
-      &::before
-        left: calc(100% - 12px);
-
-    &.tooltip-bottom.tooltip-right
-      transform: none;
-      margin: 8px 0px 0 -4px;
-      &::before
-        left: 8px;
-
-    &.tooltip-top.tooltip-left
-      transform: translateX(-100%) translateY(-150%);
-      margin: 4px 0 0 16px;
-      &::before
-        left: calc(100% - 12px);
-
-    &.tooltip-top.tooltip-right
-      margin: 4px 0 0 -4px;
-      transform: translateY(-150%)
-      &::before
-        left: 8px;
-
   a
     color: inherit;
 
