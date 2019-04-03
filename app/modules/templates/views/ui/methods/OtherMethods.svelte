@@ -1,7 +1,7 @@
 {#if visible}
   <div transition:otherMethods class="othermethods">
     <div class="legend">Select a payment method</div>
-    <div class="options pad">
+    <div class="options pad" id="list-options">
       {#if instruments && instruments.length && false}
         <!-- Hide this for now -->
         <NextOption on:select='fire("hideMethods")'
@@ -21,14 +21,12 @@
       >
         Other Methods
       </NextOption>
-      {#each AVAILABLE_METHODS as method}
-        <NextOption
-          data={{method}} on:select='fire("methodSelected", event)'
-          icon={session.themeMeta.icons[method]}
-          attributes={{tab: method}}
-        >
-          {session.tab_titles[method]}
-        </NextOption>
+      {#each methods as method}
+        <ListMethod
+          {...method}
+
+          on:select="fire('methodSelected', event)"
+        />
       {/each}
     </div>
   </div>
@@ -50,8 +48,12 @@
 </style>
 
 <script>
+  import Store from 'checkoutframe/store';
+  import { getMethodDowntimeDescription } from 'checkoutframe/downtimes';
+
   export default {
     components: {
+      ListMethod: 'templates/views/ui/methods/ListMethod.svelte',
       NextOption: 'templates/views/ui/options/NextOption.svelte',
     },
 
@@ -82,6 +84,27 @@
           },
         };
       }
+    },
+
+    computed: {
+      methods: function ({ AVAILABLE_METHODS, session }) {
+        const downtimes = Store.get().downtimes || {};
+        const down = downtimes.disabled || [];
+
+        const methods = _Arr.map(AVAILABLE_METHODS, method => {
+          return {
+            method,
+            down: _Arr.contains(down, method),
+            downMessage: getMethodDowntimeDescription(method, {
+              availableMethods: AVAILABLE_METHODS,
+            }),
+            icon: session.themeMeta.icons[method],
+            title: session.tab_titles[method],
+          };
+        })
+
+        return methods;
+      },
     },
 
     data: () => {
