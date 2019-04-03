@@ -4591,7 +4591,7 @@ Session.prototype = {
         (this.screen === 'upi' || this.get('ecod')) &&
         text === discreet.cancelMsg
       ) {
-        if (this.payload['_[flow]'] === 'intent') {
+        if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
         }
         return this.hideErrorMessage();
