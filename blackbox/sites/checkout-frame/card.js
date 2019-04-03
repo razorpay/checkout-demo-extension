@@ -8,6 +8,7 @@ module.exports = {
         key: 'm1key',
         remember_customer: false,
         nativeotp: false,
+        personalization: false,
       },
     }),
 };
@@ -17,7 +18,7 @@ class NewCard extends CheckoutFrameTest {
     let { page } = this;
     await page.type('#contact', '9999999999');
     await page.type('#email', 'void@razorpay.com');
-    await delay(3000); // Wait for methods list to show up
+    // await delay(3000); // Wait for methods list to show up
     await page.click(
       '.payment-option[tab=card] label, .othermethods .options .option.next-option[tab=card]'
     ); // Selectors for p13n's method list as well as the basic grid.
