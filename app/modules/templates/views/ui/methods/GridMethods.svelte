@@ -3,7 +3,7 @@
     <GridMethod
       method={method}
 
-      on:click="switchTab(method.method)"
+      on:click="selectMethod(method.method, event)"
     />
   {/each}
 </div>
@@ -12,6 +12,8 @@
   import { getSession } from 'sessionmanager';
   import Store from 'checkoutframe/store';
   import { getMethodDescription } from 'checkoutframe/paymentmethods';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   export default {
     components: {
@@ -51,8 +53,8 @@
               method,
               icon: icon,
               title: session.tab_titles[method],
-              down: isDown,
               description,
+              down: isDown,
             });
           }
         });
@@ -61,7 +63,25 @@
       },
     },
     methods: {
-      switchTab: tab => getSession().switchTab(tab),
+      selectMethod: (method = '', event) => {
+        const target = event.currentTarget;
+        let down = _El.getAttribute(target, 'down') === 'true';
+        let disabled = _El.hasClass(target, 'disabled');
+
+        Analytics.track('payment_method:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            disabled,
+            method,
+          },
+        });
+
+        if (down || disabled) {
+          return;
+        }
+
+        getSession().switchTab(method);
+      }
     },
   };
 </script>
