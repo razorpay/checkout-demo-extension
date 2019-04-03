@@ -12,6 +12,7 @@
   import { getSession } from 'sessionmanager';
   import Store from 'checkoutframe/store';
   import { getMethodDescription } from 'checkoutframe/paymentmethods';
+  import { getMethodDowntimeDescription } from 'checkoutframe/downtimes';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
@@ -55,6 +56,9 @@
               title: session.tab_titles[method],
               description,
               down: isDown,
+              downMessage: getMethodDowntimeDescription(method, {
+                availableMethods: AVAIL_METHODS,
+              }),
             });
           }
         });

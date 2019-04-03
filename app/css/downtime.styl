@@ -1,0 +1,44 @@
+$opacity = 0.3;
+$bg-color = #f7f7f7;
+
+.payment-option[down=true]
+  background-color: $bg-color;
+
+  i
+    &:first-child
+      opacity: $opacity;
+  .title
+    opacity: $opacity;
+  .desc
+    opacity: $opacity;
+
+  .downtime
+    line-height: 1em;
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+    text-align: center;
+    width: 1em;
+    height: 1em;
+
+    .downtime-tooltip
+      font-size: 12px;
+      width: 200px;
+      pointer-events: none;
+      text-align: left;
+
+#container.no-details
+  .payment-option[down=true]
+    .downtime
+      top: unset;
+      right: unset;
+      position: relative;
+      display: inline-block;
+      margin-left: 8px;
+
+      .downtime-tooltip
+        width: 180px;
+        padding: 8px 12px;
