@@ -1,5 +1,5 @@
 <div
-  class={classes}
+  class={optionClasses}
   {...attributes}
 
   on:click="select(event)"
@@ -17,7 +17,7 @@
     },
 
     computed: {
-      classes: ({ type, classes = []}) => {
+      optionClasses: ({ type, classes }) => {
         return `option ${type} ${classes.join(' ')}`;
       }
     },

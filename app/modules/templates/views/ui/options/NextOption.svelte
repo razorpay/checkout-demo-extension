@@ -24,6 +24,8 @@
 
     data: function () {
       return {
+        attributes: {},
+        classes: [],
         arrowText: null,
         icon: null,
         data: {},
