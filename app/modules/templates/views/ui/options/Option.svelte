@@ -1,5 +1,5 @@
 <div
-  class={type}
+  class={classes}
   {...attributes}
 
   on:click="select(event)"
@@ -10,13 +10,16 @@
   export default {
     data: function () {
       return {
+        classes: [],
         data: {},
         attributes: {}
       };
     },
 
     computed: {
-      type: ({ type }) => `option ${type}`,
+      classes: ({ type, classes = []}) => {
+        return `option ${type} ${classes.join(' ')}`;
+      }
     },
 
     methods: {
