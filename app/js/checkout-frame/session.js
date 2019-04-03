@@ -1033,16 +1033,6 @@ Session.prototype = {
       this.methods.wallet.sort(function(item1, item2) {
         return item1.code === amazonPay ? -1 : item2.code === amazonPay ? 1 : 0;
       });
-
-      var walletsLen = this.methods.wallet.length,
-        walletNames = this.methods.wallet.slice(0, 2).map(function(item) {
-          return item.name;
-        });
-
-      this.walletsDesc =
-        walletsLen <= 2
-          ? walletNames.join(' and ')
-          : walletNames.join(', ') + ' & More';
     }
 
     if (this.methods.emi) {

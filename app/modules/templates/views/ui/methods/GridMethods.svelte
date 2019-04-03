@@ -4,7 +4,7 @@
       on:click="switchTab(method.method)">
       <label>
         <i>{@html method.icon}</i> {method.title}
-        <!-- <span class="desc"> EMI via Credit & Debit Cards </span> -->
+        <span class="desc">{method.description}</span>
       </label>
     </div>
   {/each}
@@ -12,6 +12,7 @@
 
 <script>
   import { getSession } from 'sessionmanager';
+  import { getMethodDescription } from 'checkoutframe/paymentmethods';
 
   export default {
     computed: {
@@ -34,11 +35,15 @@
               icon = icons['card'];
             }
 
+            const description = getMethodDescription(method, {
+              session,
+            });
+
             retMethods.push({
               method,
               icon: icon,
               title: session.tab_titles[method],
-              /* TODO: add descriptions for each tab */
+              description,
             });
           }
         });
