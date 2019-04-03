@@ -9,7 +9,7 @@
     <div class="error">
       {error}
       <br />
-      <div class="btn" on:click="session.back()">Retry</div>
+      <div class="btn" on:click="sessionBack()">Retry</div>
     </div>
   {:elseif feeBreakup}
     Fees Breakup
@@ -171,6 +171,14 @@ img {
           feeBreakup,
           loading: false,
         });
+      },
+
+      sessionBack() {
+        const {
+          session
+        } = this.get();
+
+        session.back();
       },
 
       createPayment() {
