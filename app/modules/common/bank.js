@@ -155,7 +155,12 @@ export const getDownBanks = preferences => {
   let downList = [];
 
   if (downtime) {
-    downList = _Arr.map(downtime.netbanking || [], o => o.issuer);
+    _Arr.loop(_Arr.map(downtime.netbanking || [], o => o.issuer), downBanks => {
+      downList = downList.concat(downBanks);
+    });
   }
+
+  // TODO: Remove duplicate entries from downList
+
   return downList;
 };
