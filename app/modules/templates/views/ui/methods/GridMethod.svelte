@@ -8,7 +8,7 @@
   <label>
     <i>{@html method.icon}</i>
     <span class="title">{method.title}</span>
-    <!-- <span class="desc"> EMI via Credit & Debit Cards </span> -->
+    <span class="desc">{method.description}</span>
   </label>
 </div>
 

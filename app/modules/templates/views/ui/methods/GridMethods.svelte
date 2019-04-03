@@ -11,6 +11,7 @@
 <script>
   import { getSession } from 'sessionmanager';
   import Store from 'checkoutframe/store';
+  import { getMethodDescription } from 'checkoutframe/paymentmethods';
 
   export default {
     components: {
@@ -42,12 +43,16 @@
               isDown = _Arr.contains(down, 'card');
             }
 
+            const description = getMethodDescription(method, {
+              session,
+            });
+
             retMethods.push({
               method,
               icon: icon,
               title: session.tab_titles[method],
               down: isDown,
-              /* TODO: add descriptions for each tab */
+              description,
             });
           }
         });
