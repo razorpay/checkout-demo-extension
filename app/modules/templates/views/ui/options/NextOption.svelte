@@ -27,6 +27,7 @@
         icon: null,
         data: {},
         type: '',
+        attributes: {},
       };
     },
 

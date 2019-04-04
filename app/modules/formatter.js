@@ -99,6 +99,28 @@ Formatter.rules = {
     raw: alphanumericRaw,
   },
 
+  vpa: {
+    raw: function(value) {
+      /* TODO: make vpa raw stronger and better fitting */
+
+      let returnVal = value.replace(/[\s]/, '');
+      let splittedVpa = returnVal.split('@');
+      let psp = splittedVpa[1];
+
+      if (psp) {
+        return `${splittedVpa[0]}@${psp
+          .replace(/[^a-zA-Z]/g, '')
+          .toLowerCase()}`;
+      } else {
+        return returnVal;
+      }
+    },
+
+    isValid: function() {
+      return /^[^\s@]+@[a-z]{3,}$/i.test(this.value);
+    },
+  },
+
   ifsc: {
     raw: alphanumericRaw,
     pretty: function(value, shouldTrim) {
