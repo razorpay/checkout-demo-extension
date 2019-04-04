@@ -26,7 +26,7 @@
       <div class="legend left" style="margin-top: 18px">
         Enter your UPI ID
       </div>
-      <Card selected={true} on:click="focusVpa(event)">
+      <Card selected={true} on:click="handleCardClick(event)">
         {#if selectedApp === 'gpay'}
           <div id="upi-tez">
             <div class="elem-wrap collect-form">
@@ -50,6 +50,8 @@
                   required
                   class="input"
                   name="tez_bank"
+                  ref:googlePayPspHandle
+                  on:change="googlePayPspHandleChange(event)"
                   bind:value="pspHandle">
                   <option value="">Select Bank</option>
                   <option value="okhdfcbank">okhdfcbank</option>
@@ -426,6 +428,30 @@
         if (!this.get()['focused'] && this.refs.vpaField) {
           this.refs.vpaField.focus();
         }
+      },
+
+      /**
+       * Called when the UPI address card is clicked.
+       */
+      handleCardClick: function (event) {
+        const target = event && event.target;
+        const {
+          googlePayPspHandle
+        } = this.refs;
+
+        // Don't focus on VPA input if the dropdown elem was clicked.
+        if (target === googlePayPspHandle) {
+          return;
+        }
+
+        this.focusVpa(event);
+      },
+
+      /**
+       * Called when the Google Pay PSP is selected from the dropdown.
+       */
+      googlePayPspHandleChange (event) {
+        this.focusVpa(event);
       },
     },
   };
