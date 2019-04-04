@@ -451,6 +451,7 @@
        * Called when the Google Pay PSP is selected from the dropdown.
        */
       googlePayPspHandleChange (event) {
+        // TODO: Focus only if vpa is invalid.
         this.focusVpa(event);
       },
     },
