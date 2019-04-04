@@ -3,23 +3,6 @@ import { internetExplorer } from 'common/useragent';
 /* global DOMTokenList */
 
 /**
- * Object.entries polyfill
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
- *
- */
-if (!Object.entries) {
-  Object.entries = function(obj) {
-    var ownProps = Object.keys(obj),
-      i = ownProps.length,
-      resArray = new Array(i); // preallocate the Array
-    while (i--) {
-      resArray[i] = [ownProps[i], obj[ownProps[i]]];
-    }
-    return resArray;
-  };
-}
-
-/**
  * Because classList.toggle is broken in IE10 and IE11.
  * https://caniuse.com/#feat=classlist
  */
