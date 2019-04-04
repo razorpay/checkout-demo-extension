@@ -49,7 +49,7 @@
 
 <script>
   import Store from 'checkoutframe/store';
-  import { getMethodDowntimeDescription } from 'checkoutframe/downtimes';
+  import { getMethodDowntimeDescription } from 'checkoutframe/paymentmethods';
 
   export default {
     components: {

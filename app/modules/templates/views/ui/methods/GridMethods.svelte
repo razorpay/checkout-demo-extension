@@ -11,8 +11,7 @@
 <script>
   import { getSession } from 'sessionmanager';
   import Store from 'checkoutframe/store';
-  import { getMethodDescription } from 'checkoutframe/paymentmethods';
-  import { getMethodDowntimeDescription } from 'checkoutframe/downtimes';
+  import { getMethodDescription, getMethodDowntimeDescription } from 'checkoutframe/paymentmethods';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 

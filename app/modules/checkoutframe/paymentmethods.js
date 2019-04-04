@@ -113,3 +113,67 @@ export function getMethodDescription(method, props) {
 
   return fn(props);
 }
+
+/**
+ * Returns the downtime description for the given method.
+ * @param {String} method
+ * @param {Object} param1
+ *  @prop {Array} availableMethods
+ */
+export function getMethodDowntimeDescription(method, { availableMethods }) {
+  let prefix = method[0].toUpperCase() + method.slice(1);
+
+  switch (method) {
+    case 'card':
+    case 'credit_card':
+    case 'debit_card':
+      prefix = 'Cards';
+      break;
+
+    case 'netbanking':
+    case 'emandate':
+      prefix = 'Netbanking';
+      break;
+
+    case 'emi':
+    case 'cardless_emi':
+      prefix = 'EMI';
+      break;
+
+    case 'qr':
+      prefix = 'QR';
+      break;
+
+    case 'upi':
+      prefix = 'UPI';
+      break;
+
+    case 'wallet':
+      prefix = 'Wallets';
+      break;
+
+    case 'tez':
+      prefix = 'Google Pay';
+      break;
+  }
+
+  const sentences = [];
+  const pluralPrefix = prefix[prefix.length - 1].toLowerCase() === 's';
+
+  sentences.push(
+    `${prefix} ${
+      pluralPrefix ? 'are' : 'is'
+    } facing temporary issues right now.`
+  );
+
+  // If there's another method available, ask user to select it.
+  if (
+    availableMethods &&
+    availableMethods.length &&
+    availableMethods.length > 1
+  ) {
+    sentences.push('Please select another method.');
+  }
+
+  return sentences.join(' ');
+}
