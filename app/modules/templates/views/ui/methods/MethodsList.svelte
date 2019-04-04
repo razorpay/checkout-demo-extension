@@ -1,66 +1,83 @@
 {#if loading}
-<div ref:loader class="pad" transition:fade>
-  <div class="small legend"><div class="loading-icon"></div>Loading payment methods for you...</div>
-  <Loader />
-</div>
-{:elseif !disableP13n && instrumentsData.length}
-<!--   <div class="methods-loader" in:loader>
-    <div class="loading-icon">
+  <div ref:loader class="pad" transition:fade>
+    <div class="small legend">
+      <div class="loading-icon"></div>Loading payment methods for you...
     </div>
-    Loading your preferred methods
-  </div> -->
-<div ref:preferred class="options" transition:fade>
-  <div class="legend">Select a payment method</div>
-  {#each instrumentsData as instrument, index}
-	{#if instrument.nextOption}
-	<NextOption data={{method: instrument.method}} on:select="methodSelected(event, index)" icon={instrument.icon}>
-		{instrument.text}
-	</NextOption>
-	{:else}
-	<RadioOption on:select="select(event, index)" data='{instrument}' selected={instrument.id===selected} showRadio={instrument.method
-	 !=='card' } icon={instrument.icon}>
-		{instrument.text}
-		{#if instrument.method === 'card'}
-		<input class="cvv-input" inputmode="numeric" maxlength={instrument.cvvDigits} pattern={`[0-9]{${instrument.cvvDigits}}`}
-		 placeholder="CVV" required type="tel" />
-		{/if}
-	</RadioOption>
-	{/if}
-	{/each}
-	<NextOption on:select='fire("showMethods")' type='other-methods up-arrow' icon={session.themeMeta.icons['othermethods']}>
-		<span class="option-title">Other Methods</span>
-		<span style="display: inline-block;
-        font-size: 12px; color: #757575; margin-left: 2px">
-			| Cards, Wallets, UPI etc.
-		</span>
-	</NextOption>
-</div>
-{:elseif showMessage}
-<div transition:fade>
-  <div class="small legend" style="text-transform: none"><i>&#x2139; </i> Enter Phone number to pay using</div>
-  <div class="pad">
-  {#each showcaseMethods as method}
-    {#if method === 'and'}
-      and
-    {:elseif method === 'more'}
-      <span style="margin-left: -4px"> and more</span>
-    {:else}
-      <div class="showcase-method">
-        <div class="method-icon">{@html session.themeMeta.icons[method]}</div>
-        {session.tab_titles[method]}
-      </div>
-    {/if}
-  {/each}
+    <Loader />
   </div>
-
-</div>
+{:elseif !disableP13n && instrumentsData.length}
+  <div ref:preferred class="options" transition:fade>
+    <div class="legend">Select a payment method</div>
+    {#each instrumentsData as instrument, index}
+      {#if instrument.nextOption}
+        <NextOption data={{method: instrument.method}}
+          on:select="methodSelected(event, index)"
+          icon={instrument.icon}
+        >
+          {instrument.text}
+        </NextOption>
+      {:else}
+        <RadioOption
+          on:select="select(event, index)"
+          data='{instrument}'
+          selected={instrument.id === selected}
+          showRadio={instrument.method !== 'card'}
+          icon={instrument.icon}
+          name='p13n_method'
+          value={instrument.id}
+        >
+          {instrument.text}
+          {#if instrument.method === 'card'}
+            <input
+              class="cvv-input"
+              inputmode="numeric"
+              maxlength={instrument.cvvDigits}
+              pattern={`[0-9]{${instrument.cvvDigits}}`}
+              placeholder="CVV"
+              required
+              type="tel"
+            />
+          {/if}
+        </RadioOption>
+      {/if}
+    {/each}
+    <NextOption
+      on:select='fire("showMethods")'
+      type='other-methods up-arrow'
+      icon={session.themeMeta.icons['othermethods']}
+    >
+      <span class="option-title">Other Methods</span>
+      <span style="display: inline-block;
+          font-size: 12px; color: #757575; margin-left: 2px">
+        | Cards, Wallets, UPI etc.
+      </span>
+    </NextOption>
+  </div>
+{:elseif showMessage}
+  <div transition:fade>
+    <div class="small legend" style="text-transform: none"><i>&#x2139; </i> Enter Phone number to pay using</div>
+    <div class="pad">
+    {#each showcaseMethods as method}
+      {#if method === 'and'}
+        and
+      {:elseif method === 'more'}
+        <span style="margin-left: -4px"> and more</span>
+      {:else}
+        <div class="showcase-method">
+          <div class="method-icon">{@html session.themeMeta.icons[method]}</div>
+          {session.tab_titles[method]}
+        </div>
+      {/if}
+    {/each}
+    </div>
+  </div>
 {:else}
-<!-- TODO: create separate list methods (used in partial payments
-       and optional contacts) in future -->
-<div ref:grid transition:fade>
-  <div class="legend">Select a payment method</div>
-	<GridMethods session={session} avail_methods={AVAILABLE_METHODS} />
-</div>
+  <!-- TODO: create separate list methods (used in partial payments
+         and optional contacts) in future -->
+  <div ref:grid transition:fade>
+    <div class="legend">Select a payment method</div>
+    <GridMethods session={session} avail_methods={AVAILABLE_METHODS} />
+  </div>
 {/if}
 
 <style>

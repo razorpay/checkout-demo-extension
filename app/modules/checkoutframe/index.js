@@ -76,6 +76,7 @@ const optionsTransformer = {
   },
 
   addUpiIntentsData: (o, message) => {
+    /* TODO: update better names for these variables */
     if (message.upi_intents_data && message.upi_intents_data.length) {
       o.all_upi_intents_data = message.upi_intents_data;
       o.upi_intents_data = getSortedApps(message.upi_intents_data);

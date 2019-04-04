@@ -48,6 +48,7 @@ import Store from 'checkoutframe/store';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
+import UpiTab from 'templates/tabs/upi/index.svelte';
 
 export default {
   RazorpayConfig,
@@ -113,4 +114,5 @@ export default {
   getFullBankLogo,
 
   MagicView,
+  UpiTab,
 };

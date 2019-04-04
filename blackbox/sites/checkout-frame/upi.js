@@ -20,6 +20,7 @@ module.exports = {
 class UpiCollect extends CheckoutFrameTest {
   async render() {
     let { page } = this;
+    await page.click('#form-upi .svelte-ref-item:last-child');
     await page.type('#vpa', 'pranav@razorpay');
     await delay(100);
 
