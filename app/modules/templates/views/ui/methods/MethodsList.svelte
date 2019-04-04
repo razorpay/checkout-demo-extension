@@ -9,49 +9,49 @@
   <div ref:preferred class="options" transition:fade>
     <div class="legend">Select a payment method</div>
     {#each instrumentsData as instrument, index}
-    	{#if instrument.nextOption}
-      	<NextOption data={{method: instrument.method}}
+      {#if instrument.nextOption}
+        <NextOption data={{method: instrument.method}}
           on:select="methodSelected(event, index)"
           icon={instrument.icon}
         >
-      		{instrument.text}
-      	</NextOption>
-    	{:else}
-      	<RadioOption
+          {instrument.text}
+        </NextOption>
+      {:else}
+        <RadioOption
           on:select="select(event, index)"
           data='{instrument}'
-          selected={instrument.id===selected}
-          showRadio={instrument.method !=='card' }
+          selected={instrument.id === selected}
+          showRadio={instrument.method !== 'card'}
           icon={instrument.icon}
           name='p13n_method'
           value={instrument.id}
         >
-      		{instrument.text}
-      		{#if instrument.method === 'card'}
-      		  <input
+          {instrument.text}
+          {#if instrument.method === 'card'}
+            <input
               class="cvv-input"
               inputmode="numeric"
               maxlength={instrument.cvvDigits}
               pattern={`[0-9]{${instrument.cvvDigits}}`}
-      		    placeholder="CVV"
+              placeholder="CVV"
               required
               type="tel"
             />
-      		{/if}
-      	</RadioOption>
-    	{/if}
-  	{/each}
-  	<NextOption
+          {/if}
+        </RadioOption>
+      {/if}
+    {/each}
+    <NextOption
       on:select='fire("showMethods")'
       type='other-methods up-arrow'
       icon={session.themeMeta.icons['othermethods']}
     >
-  		<span class="option-title">Other Methods</span>
-  		<span style="display: inline-block;
+      <span class="option-title">Other Methods</span>
+      <span style="display: inline-block;
           font-size: 12px; color: #757575; margin-left: 2px">
-  			| Cards, Wallets, UPI etc.
-  		</span>
-  	</NextOption>
+        | Cards, Wallets, UPI etc.
+      </span>
+    </NextOption>
   </div>
 {:elseif showMessage}
   <div transition:fade>
@@ -76,7 +76,7 @@
          and optional contacts) in future -->
   <div ref:grid transition:fade>
     <div class="legend">Select a payment method</div>
-  	<GridMethods session={session} avail_methods={AVAILABLE_METHODS} />
+    <GridMethods session={session} avail_methods={AVAILABLE_METHODS} />
   </div>
 {/if}
 
