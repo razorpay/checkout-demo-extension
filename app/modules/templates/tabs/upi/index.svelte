@@ -86,6 +86,15 @@
       </Card>
     {/if}
   {/if}
+
+  {#if down}
+    <Callout
+      showIcon={false}
+      classes={['downtime-callout']}
+    >
+      <strong>UPI</strong> is experiencing low success rates.
+    </Callout>
+  {/if}
 </Tab>
 
 <style>
@@ -174,6 +183,7 @@
   import { getSession } from 'sessionmanager.js';
   import * as Tez from 'tez.js';
   import * as Bridge from 'bridge.js';
+  import Store from 'checkoutframe/store';
 
   const otherAppsIcon =
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
@@ -254,6 +264,7 @@
       Card: 'templates/views/ui/Card.svelte',
       Field: 'templates/views/ui/Field.svelte',
       Icon: 'templates/views/ui/Icon.svelte',
+      Callout: 'templates/views/ui/Callout.svelte',
     },
 
     data() {
@@ -265,6 +276,7 @@
         pattern: '.+',
         selectedApp: undefined,
         useWebPaymentsApi: false,
+        down: false,
       };
     },
 
@@ -301,6 +313,13 @@
         this.set({
           selectedApp: null,
           vpa: session.get('prefill.vpa'),
+        });
+      }
+
+      const downtimes = Store.get().downtimes || {};
+      if (downtimes.upi && downtimes.upi.length) {
+        this.set({
+          down: true,
         });
       }
     },
