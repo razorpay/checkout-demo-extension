@@ -34,7 +34,14 @@
       {/if}
   {/if}
 
-
+  {#if down}
+    <Callout
+      showIcon={false}
+      classes={['downtime-callout']}
+    >
+      <strong>QR</strong> is experiencing low success rates.
+    </Callout>
+  {/if}
 </div>
 <style>
 :global(#body[tab=qr]) {
@@ -112,6 +119,10 @@ img {
   import Store from 'checkoutframe/store';
 
   export default {
+    components: {
+      Callout: 'templates/views/ui/Callout.svelte',
+    },
+
     oncreate() {
       const { session, paymentData } = this.get();
 
@@ -137,6 +148,13 @@ img {
       } else {
         this.createPayment();
       }
+
+      const downtimes = Store.get().downtimes || {};
+      if (downtimes.qr && downtimes.qr.length) {
+        this.set({
+          down: true,
+        });
+      }
     },
 
     data() {
@@ -145,6 +163,7 @@ img {
         loading: true,
         qrImage: null,
         error: null,
+        down: false,
       };
     },
 
