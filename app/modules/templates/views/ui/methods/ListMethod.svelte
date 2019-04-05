@@ -9,7 +9,6 @@
   <span class="title">{title}</span>
   {#if down}
     <span class="downtime">
-      i
       <Tooltip
         bindTo="#list-options"
         class="downtime-tooltip"

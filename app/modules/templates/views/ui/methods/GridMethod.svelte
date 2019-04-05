@@ -13,7 +13,6 @@
     <span class="title">{title}</span>
     {#if down}
       <span class="downtime">
-        i
         <Tooltip
           bindTo="#payment-options"
           class="downtime-tooltip"
