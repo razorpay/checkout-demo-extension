@@ -176,6 +176,7 @@
   import { getSession } from 'sessionmanager.js';
   import * as Tez from 'tez.js';
   import * as Bridge from 'bridge.js';
+  import { VPA_REGEX } from 'common/constants.js';
 
   const otherAppsIcon =
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
@@ -351,8 +352,14 @@
                 '_[flow]': 'tez',
               };
             } else {
+              let vpaToSubmit = vpa;
+
+              if (!VPA_REGEX.test(vpa)) {
+                vpaToSubmit = `${vpa}@${pspHandle}`;
+              }
+
               data = {
-                vpa: `${vpa}@${pspHandle}`,
+                vpa: vpaToSubmit,
               };
             }
           } else {
