@@ -41,7 +41,7 @@ $background = rgba(0,0,0,0.8);
       transform: translateY(-50%) rotate(180deg);
 
   &.tooltip-top
-    margin: 8px 0 0 0;
+    margin: 8px 0 0 -2px;
     transform: translateX(-50%) translateY(-150%);
     &::before
       top: calc(100% + 2px);
@@ -49,7 +49,7 @@ $background = rgba(0,0,0,0.8);
       transform: translateY(-50%) rotate(270deg);
 
   &.tooltip-bottom
-    margin: 8px 0 0 0;
+    margin: 8px 0 0 -2px;
     transform: translateX(-50%);
     &::before
       top: -2px;
@@ -70,12 +70,12 @@ $background = rgba(0,0,0,0.8);
 
   &.tooltip-top.tooltip-left
     transform: translateX(-100%) translateY(-150%);
-    margin: 4px 0 0 16px;
+    margin: 8px 0 0 16px;
     &::before
       left: calc(100% - 12px);
 
   &.tooltip-top.tooltip-right
-    margin: 4px 0 0 -4px;
+    margin: 8px 0 0 -4px;
     transform: translateY(-150%)
     &::before
       left: 8px;
