@@ -1,4 +1,6 @@
 $background = rgba(0,0,0,0.8);
+$tooltipDistance = 8px;
+$caretShift = 16px;
 
 .tooltip
   opacity: 0;
@@ -20,65 +22,94 @@ $background = rgba(0,0,0,0.8);
     position: absolute;
     width: 0;
     height: 0;
-    border-bottom: 5px solid transparent;
-    border-top: 5px solid transparent;
-    border-right: 5px solid $background;
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid transparent;
+    border-right: 6px solid $background;
 
+  // Done
   &.tooltip-right
-    margin: -7px 0 0 22px;
+    margin: 0;
     transform: translateY(-50%);
+    top: 50%;
+    left "calc(100% + %s)" % $tooltipDistance;
     &::before
       top: 50%;
-      left: -5px;
+      left: -6px;
       transform: translateY(-50%);
 
+  // Done
   &.tooltip-left
-    margin: -7px 0px 0px -8px;
-    transform: translateX(-100%) translateY(-50%);
+    margin: 0;
+    transform: translateY(-50%);
+    top: 50%;
+    right "calc(100% + %s)" % $tooltipDistance;
     &::before
       top: 50%;
-      right: -5px;
+      right: -6px;
       transform: translateY(-50%) rotate(180deg);
 
+  // Done
   &.tooltip-top
-    margin: 8px 0 0 -2px;
-    transform: translateX(-50%) translateY(-150%);
+    margin: -($tooltipDistance) 0 0 0;
+    transform: translateX(-50%) translateY(-100%);
+    left "calc(50% - %s)" % $tooltipDistance;
     &::before
-      top: calc(100% + 2px);
+      top: calc(100% + 3px);
       left: calc(50% + 5px);
       transform: translateY(-50%) rotate(270deg);
 
+  // Done
   &.tooltip-bottom
-    margin: 8px 0 0 -2px;
+    margin "calc(100% + %s) 0 0 0" % $tooltipDistance;
     transform: translateX(-50%);
+    left "calc(50% - %s)" % $tooltipDistance;
     &::before
-      top: -2px;
+      top: -3px;
       left: calc(50% + 5px);
       transform: translateY(-50%) rotate(90deg);
 
+  // Done
   &.tooltip-bottom.tooltip-left
+    top: unset;
+    bottom: unset;
+    right: unset;
+    left: 100%;
     transform: translateX(-100%);
-    margin: 8px 0 0 16px;
+    margin "calc(100% + %s) 0 0 calc(-50% + %s + %s)" % ($tooltipDistance $tooltipDistance ($caretShift / 4 + 1));
     &::before
-      left: calc(100% - 12px);
+      left "calc(100% - %s)" % $caretShift;
 
+  // Done
   &.tooltip-bottom.tooltip-right
+    top: unset;
+    bottom: unset;
+    right: unset;
+    left: unset;
     transform: none;
-    margin: 8px 0px 0 -4px;
+    margin "calc(100% + %s) 0 0 calc(50% - %s - %s)" % ($tooltipDistance $tooltipDistance ($caretShift / 4 - 1));
     &::before
-      left: 8px;
+      left: ($caretShift / 2);
 
+  // Done
   &.tooltip-top.tooltip-left
-    transform: translateX(-100%) translateY(-150%);
-    margin: 8px 0 0 16px;
+    top: unset;
+    bottom: unset;
+    right: unset;
+    left: 100%;
+    transform: translateX(-100%) translateY(-100%);
+    margin "-%s 0 0 calc(-50% + %s + %s)" % ($tooltipDistance $tooltipDistance ($caretShift / 4 + 1));
     &::before
-      left: calc(100% - 12px);
+      left "calc(100% - %s)" % $caretShift;
 
   &.tooltip-top.tooltip-right
-    margin: 8px 0 0 -4px;
-    transform: translateY(-150%)
+    top: unset;
+    bottom: unset;
+    right: unset;
+    left: unset;
+    transform: translateY(-100%);
+    margin "-%s 0 0 calc(50% - %s - %s)" % ($tooltipDistance $tooltipDistance ($caretShift / 4 - 1));
     &::before
-      left: 8px;
+      left: ($caretShift / 2);
 
 .has-tooltip
   position: relative;
