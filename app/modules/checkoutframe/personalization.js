@@ -2,6 +2,7 @@
 
 import { getCustomer } from 'checkoutframe/customer';
 import { getSortedApps } from 'common/upi';
+import { VPA_REGEX } from 'common/constants';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
@@ -65,6 +66,31 @@ const hashFnv32a = (str = '', asString = true, seed = 0xdeadc0de) => {
 };
 
 let currentUid = null;
+
+/**
+ * Filters out some instruments before listing down instruments for display
+ *
+ * @param  {Array} instruments is the list of instruments to be filtered.
+ * @return {Array} filtered our instruments
+ */
+const fiterInstruments = instruments => {
+  return (
+    instruments
+    |> _Arr.filter(instrument => {
+      switch (instrument.method) {
+        case 'upi':
+          if (instrument.vpa) {
+            if (!VPA_REGEX.test(instrument.vpa)) {
+              return false;
+            }
+          }
+          break;
+      }
+
+      return true;
+    })
+  );
+};
 
 /**
  * Used to add the instrument to the list of user's instruments along with
@@ -222,6 +248,8 @@ export const listInstruments = customer => {
     return;
   }
 
+  currentCustomer = fiterInstruments(currentCustomer);
+
   _Arr.loop(currentCustomer, item => {
     let timeSincePayment = _.now() - item.timestamp;
     let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
@@ -240,9 +268,8 @@ export const listInstruments = customer => {
       (tsScore + countScore) / 2.0 + 0.2 * C * (tsScore - countScore);
   });
 
-  _Arr.sort(
-    currentCustomer,
-    (a, b) => (a.score > b.score ? -1 : ~~(a.score < b.score))
+  _Arr.sort(currentCustomer, (a, b) =>
+    a.score > b.score ? -1 : ~~(a.score < b.score)
   );
 
   Analytics.track('p13n:instruments:list', {
