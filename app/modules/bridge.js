@@ -1,3 +1,5 @@
+/* global confirm */
+
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
@@ -285,6 +287,35 @@ window.upiIntentResponse = function(data) {
 };
 
 /**
+ * Tells whether or not we should handle back presses.
+ *
+ * @return {Boolean}
+ */
+function shouldHandleBackPresses() {
+  let CheckoutBridge = getCheckoutBridge();
+  let session = getSession();
+
+  if (CheckoutBridge || !window.history || !session.get('modal.handleback')) {
+    return false;
+  }
+
+  return true;
+}
+
+function confirmClose() {
+  return confirm('Ongoing payment. Press OK to abort payment.');
+}
+
+function closeModal() {
+  const session = getSession();
+
+  if (session.get('modal.confirm_close') && !confirmClose()) {
+    return;
+  }
+  session.hide();
+}
+
+/**
  * window.backPressed is called by Android SDK everytime android backbutton is
  * pressed by user. Checkout will handle the back button action if the user is
  * on a sub screen. Checkout will give a callback to android in case that there
@@ -293,11 +324,11 @@ window.upiIntentResponse = function(data) {
  *                           button action to be done on checkout side.
  *                           Android prompts for closing checkout in that case
  */
-window.backPressed = function(callback) {
+function backPressed(callback) {
   let CheckoutBridge = getCheckoutBridge();
-  var session = getSession();
+  let session = getSession();
 
-  var pollUrl = storage.call('getString', UPI_POLL_URL);
+  let pollUrl = storage.call('getString', UPI_POLL_URL);
 
   if (pollUrl) {
     session.hideErrorMessage();
@@ -315,6 +346,44 @@ window.backPressed = function(callback) {
   } else {
     if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();
+    } else {
+      closeModal();
     }
   }
-};
+}
+
+window.backPressed = backPressed;
+
+/**
+ * Adds a hash to the URL.
+ */
+function addDummyHash() {
+  window.history.pushState(null, null, '#_');
+}
+
+function isModalVisible() {
+  const session = getSession();
+  return session && session.modal && session.modal.isShown;
+}
+
+export function setHistoryAndListenForBackPresses() {
+  if (!shouldHandleBackPresses()) {
+    return;
+  }
+
+  addDummyHash();
+
+  window.addEventListener('popstate', function() {
+    let session = getSession();
+
+    if (!isModalVisible()) {
+      return;
+    }
+
+    backPressed();
+
+    if (isModalVisible()) {
+      addDummyHash();
+    }
+  });
+}

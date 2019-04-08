@@ -1359,6 +1359,9 @@ Session.prototype = {
     this.setEmiScreen();
     initIosQuirks();
 
+    /* Start listening for back presses */
+    discreet.Bridge.setHistoryAndListenForBackPresses();
+
     errorHandler.call(this, this.params);
 
     var hasOffers = this.hasOffers,
