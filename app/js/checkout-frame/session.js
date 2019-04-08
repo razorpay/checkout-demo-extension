@@ -1154,7 +1154,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(this.order && this.order.bank)) {
+    if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
     }
 
