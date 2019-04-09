@@ -1340,6 +1340,8 @@ Session.prototype = {
         if (count.preferred === 1 && this.upi_intents_data.length > 1) {
           this.showRecommendedUPIApp = true;
         }
+
+        discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
       }
     }
 
