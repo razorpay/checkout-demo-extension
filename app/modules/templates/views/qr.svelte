@@ -166,6 +166,14 @@ img {
         this.createPayment();
       },
 
+      sessionBack() {
+        const {
+          session
+        } = this.get();
+
+        session.back();
+      },
+
       createPayment() {
         this.set({
           view: 'qr',

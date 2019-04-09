@@ -91,3 +91,6 @@ export const STRINGS = {
   process: 'Your payment is being processed',
   redirect: 'Redirecting to Bank page',
 };
+
+/* VPA regex, copied from API */
+export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-zA-Z]+$/;

@@ -130,6 +130,8 @@ function trackNewPayment(data, params, r) {
 
 export default function Payment(data, params = {}, r) {
   this.iframe = params.iframe;
+  this.nativeotp = params.nativeotp;
+
   this._time = _.now();
 
   this.sdk_popup = params.sdk_popup;
@@ -467,6 +469,9 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
+    if (!this.popup) {
+      this.makePopup();
+    }
     const isIframe = this.popup instanceof Iframe;
     if (isIframe) {
       this.popup.write(popupTemplate(this));
@@ -504,7 +509,15 @@ Payment.prototype = {
   },
 
   shouldPopup: function() {
-    return this.iframe || !(this.r.get('redirect') || this.avoidPopup);
+    if (this.iframe) {
+      return true;
+    }
+
+    if (this.nativeotp) {
+      return false;
+    }
+
+    return !(this.r.get('redirect') || this.avoidPopup);
   },
 
   tryPopup: function() {
@@ -656,6 +669,24 @@ var flowCache = {
 };
 
 /**
+ * Fetches card flows from cache.
+ * @param {String} cardNumber
+ *
+ * @return {Object/undefined}
+ */
+export function getCardFlowsFromCache(cardNumber = '') {
+  cardNumber = cardNumber.replace(/\D/g, '');
+
+  if (cardNumber.length < 6) {
+    return;
+  }
+
+  const iin = cardNumber.slice(0, 6);
+
+  return flowCache.card[iin];
+}
+
+/**
  * Gets the flows associated with a card.
  * @param {string} cardNumber
  * @param {Function} callback
@@ -665,18 +696,19 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
   cardNumber = cardNumber.replace(/\D/g, '');
 
   if (cardNumber.length < 6) {
-    callback([]);
+    callback({});
     return;
   }
-
-  var iin = cardNumber.slice(0, 6);
 
   // Check cache.
-  if (flowCache.card[iin]) {
-    callback(flowCache.card[iin]);
+  const fromCache = getCardFlowsFromCache(cardNumber);
+
+  if (fromCache) {
+    callback(fromCache);
     return;
   }
 
+  const iin = cardNumber.slice(0, 6);
   let url = makeAuthUrl(this, 'payment/flows');
 
   // append IIN and source as query to flows route

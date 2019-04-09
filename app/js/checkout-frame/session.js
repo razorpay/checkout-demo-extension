@@ -21,6 +21,7 @@ var preferences = window.preferences,
   Customer = discreet.Customer,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
+  Store = discreet.Store,
   OptionsList = discreet.OptionsList;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -30,22 +31,15 @@ var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
 
 function getStore(prop) {
-  return discreet.Store.get()[prop];
+  return Store.get()[prop];
 }
 
 function gotoAmountScreen() {
-  discreet.Store.set({ screen: 'amount' });
+  Store.set({ screen: 'amount' });
 }
 
 function shouldEnableP13n(keyId) {
-  if (
-    keyId === 'rzp_live_Oeieme2CjQmyTQ' ||
-    keyId === 'rzp_live_ILgsfZCZoFIKMb'
-  ) {
-    return true;
-  }
-
-  return /^rzp_live_[0-9a-z]/.test(keyId);
+  return true;
 }
 
 // .shown has display: none from iOS ad-blocker
@@ -451,9 +445,6 @@ function onSixDigits(e) {
   var isMaestro = /^maestro/.test(cardType);
   var sixDigits = val.length > 5;
   var trimmedVal = val.replace(/[\ ]/g, '');
-  var exactSixDigits = trimmedVal.length === 6;
-  var lessThanSixDigits = trimmedVal.length < 6;
-  var moreThanSixDigits = trimmedVal.length > 6;
 
   $(el.parentNode).toggleClass('six', sixDigits);
   var emiObj;
@@ -512,50 +503,6 @@ function onSixDigits(e) {
     elem_emi.addClass(hiddenClass);
   } else if (elem_emi.hasClass(hiddenClass)) {
     invoke('removeClass', elem_emi, hiddenClass, 200);
-  }
-
-  // Debit + PIN stuff.
-  if (exactSixDigits || moreThanSixDigits) {
-    /**
-     * Don't check for flows if the card number
-     * was reduced from 7 digits to 6 digits.
-     */
-    if (trimmedVal.slice(0, 6) !== this.flowIIN) {
-      this.checkFlows(trimmedVal.slice(0, 6), e.isPrefilled);
-    }
-  } else if (lessThanSixDigits) {
-    this.flowIIN = null;
-    showFlowRadioButtons(false);
-  }
-}
-
-/**
- * Toggles the ATM radio buttons on new card screen.
- * @param {Boolean} show
- */
-function showFlowRadioButtons(show) {
-  if (show) {
-    // Unhide
-    $('#add-card-container .flow-selection-container').addClass('drishy');
-
-    // Check default
-    var radio = $('#add-card-container .flow.input-radio #flow-3ds');
-
-    if (radio[0]) {
-      radio[0].checked = true;
-    }
-  } else {
-    // Uncheck values
-    var checked = $(
-      '#add-card-container .flow.input-radio input[type=radio]:checked'
-    );
-
-    if (checked[0]) {
-      checked[0].checked = false;
-    }
-
-    // Hide
-    $('#add-card-container .flow-selection-container').removeClass('drishy');
   }
 }
 
@@ -639,30 +586,31 @@ function hideOverlayMessage() {
 
 /**
  * Get the text to show to EMI plan.
- *
  * @param {Number} amount
  * @param {Object} plan
  *
  * @return {Object}
  */
-function getEmiText(amount, plan) {
+function getEmiText(session, amount, plan) {
   var amountPerMonth = Razorpay.emi.calculator(
     amount,
     plan.duration,
     plan.interest
   );
 
-  amountPerMonth = (amountPerMonth / 100).toFixed(2);
-
   return {
     info:
       plan.duration +
-      ' Months (₹' +
-      amountPerMonth +
+      ' Months (' +
+      session.formatAmountWithCurrency(amountPerMonth) +
       '/mo) @ ' +
       plan.interest +
       '%',
-    short: plan.duration + ' Months (₹' + amountPerMonth + '/mo)',
+    short:
+      plan.duration +
+      ' Months (' +
+      session.formatAmountWithCurrency(amountPerMonth) +
+      '/mo)',
   };
 }
 
@@ -992,16 +940,8 @@ function Session(message) {
 }
 
 Session.prototype = {
-  nativeOtpPossible: function() {
-    var optionPresent = this.get('nativeotp');
-    var randomness = Math.random() < 0.5;
-
-    var key = this.get('key');
-    if (key === 'rzp_live_ILgsfZCZoFIKMb') {
-      return true;
-    }
-
-    return optionPresent && key && /[a-z0-9]/.test(key.slice(-1)) && randomness;
+  shouldUseNativeOTP: function() {
+    return this.get('nativeotp') && this.r.isLiveMode();
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -1224,7 +1164,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(this.order && this.order.bank)) {
+    if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
     }
 
@@ -1382,52 +1322,6 @@ Session.prototype = {
     });
   },
 
-  checkTez: function() {
-    var self = this;
-
-    /**
-     * TODO: Replace window.CheckoutBridge check with isSDK check or similar.
-     */
-
-    var hasFeature =
-      this.preferences &&
-      this.preferences.features &&
-      this.preferences.features.google_pay;
-
-    this.tezMode = 'desktop';
-
-    if (this.preferences.fee_bearer) {
-      return;
-    }
-
-    if (window.CheckoutBridge) {
-      return;
-    }
-
-    if (!(hasFeature || Tez.checkKey(self.get('key')))) {
-      return;
-    }
-
-    var $upiForm = $('#form-upi'),
-      $tezUPIForm = $('#upi-tez');
-
-    $upiForm.addClass('show-tez');
-
-    this.r.isTezAvailable(function() {
-      self.tezMode = 'mobile';
-      /* This is success callback */
-      $tezUPIForm.removeClass('tez-desktop');
-      $tezUPIForm.addClass('tez-mweb');
-
-      // removing desktop elements to avoid form validations on empty inputs
-      each($tezUPIForm.find('.desktop-only'), function(i, item) {
-        item.remove();
-      });
-
-      Analytics.track('tez:mweb:visible');
-    });
-  },
-
   render: function(options) {
     var that = this;
 
@@ -1457,11 +1351,7 @@ Session.prototype = {
     this.setTpvBanks();
     this.getEl();
     this.setFormatting();
-    this.setEmandate();
-    this.setCardlessEmi();
-    this.setSavedCardsView();
-    this.setOtpScreen();
-    this.checkTez();
+    this.setSvelteComponents();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
@@ -1489,28 +1379,14 @@ Session.prototype = {
         });
       }
     } else if (hasOffers) {
-      var eligibleOffers = preferences.offers.filter(function(offer) {
-        var method = offer.payment_method,
-          enabledMethods = that.methods,
-          isMethodEnabled =
-            method !== 'wallet'
-              ? enabledMethods[method]
-              : isArray(enabledMethods.wallet) &&
-                enabledMethods.wallet.filter(function(item) {
-                  return item.code === offer.issuer;
-                })[0];
-
-        return isMethodEnabled;
-      });
-
       var $offersContainer = $('#body #offers-container'),
         $offersTitle;
 
-      if (eligibleOffers.length > 0) {
+      if (this.eligibleOffers.length > 0) {
         // TODO: convert args to kwargs
         this.offers = initOffers(
           $offersContainer[0],
-          eligibleOffers,
+          this.eligibleOffers,
           {},
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
@@ -1545,15 +1421,6 @@ Session.prototype = {
       this.showTimer(function() {
         that.dismissReason = 'timeout';
         that.modal.hide();
-      });
-    }
-
-    // Debit + PIN stuff
-    var cardNumber = this.get('prefill.card[number]');
-    if (cardNumber) {
-      onSixDigits.call(this, {
-        target: gel('card_number'),
-        isPrefilled: true,
       });
     }
 
@@ -1606,6 +1473,29 @@ Session.prototype = {
 
       Analytics.track('p13n:set');
     }
+  },
+
+  setUpiTab: function() {
+    /**
+     * This is being handled in Tab component as well,
+     * condition won't be needed here once all ported to svelte
+     */
+    if (this.methods.upi) {
+      this.upiTab = new discreet.UpiTab({
+        target: gel('upi-svelte-wrap'),
+        data: {
+          methods: this.methods,
+        },
+      });
+    }
+  },
+
+  setSvelteComponents: function() {
+    this.setEmandate();
+    this.setCardlessEmi();
+    this.setSavedCardsView();
+    this.setOtpScreen();
+    this.setUpiTab();
   },
 
   showTimer: function(cb) {
@@ -1694,6 +1584,41 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProvider: function(providerCode) {
+    Analytics.track('cardless_emi:provider:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    // User selected EMI on Cards
+    if (providerCode === 'cards') {
+      this.switchTab('emi');
+      return;
+    }
+
+    if (providerCode === 'bajaj') {
+      this.showEmiPlans('bajaj')();
+      return;
+    }
+
+    $('#form-cardless_emi input[name=emi_duration]').val('');
+    $('#form-cardless_emi input[name=provider]').val('');
+    $('#form-cardless_emi input[name=ott]').val('');
+
+    CardlessEmiStore.providerCode = providerCode;
+
+    $('#form-cardless_emi input[name=provider]').val(providerCode);
+
+    this.preSubmit();
+  },
+
   setCardlessEmi: function() {
     var self = this;
 
@@ -1732,33 +1657,7 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.option.code;
 
-            Analytics.track('cardless_emi:provider:select', {
-              type: AnalyticsTypes.BEHAV,
-              data: {
-                provider: providerCode,
-              },
-            });
-
-            // User selected EMI on Cards
-            if (providerCode === 'cards') {
-              self.switchTab('emi');
-              return;
-            }
-
-            if (providerCode === 'bajaj') {
-              self.showEmiPlans('bajaj')();
-              return;
-            }
-
-            $('#form-cardless_emi input[name=emi_duration]').val('');
-            $('#form-cardless_emi input[name=provider]').val('');
-            $('#form-cardless_emi input[name=ott]').val('');
-
-            CardlessEmiStore.providerCode = providerCode;
-
-            $('#form-cardless_emi input[name=provider]').val(providerCode);
-
-            self.preSubmit();
+            self.selectCardlessEmiProvider(providerCode);
           },
         },
       });
@@ -1791,13 +1690,13 @@ Session.prototype = {
   makeCardlessEmiDetailText: function(duration, monthly) {
     return (
       '<ul>' +
-      '<li>Monthly Installment: ₹' +
-      this.formatAmount(monthly) +
+      '<li>Monthly Installment: ' +
+      this.formatAmountWithCurrency(monthly) +
       '</li>' +
-      '<li>Total Amount: ₹' +
-      this.formatAmount(duration * monthly) +
-      ' (₹' +
-      this.formatAmount(monthly) +
+      '<li>Total Amount: ' +
+      this.formatAmountWithCurrency(duration * monthly) +
+      ' (' +
+      this.formatAmountWithCurrency(monthly) +
       ' x ' +
       duration +
       ')' +
@@ -1817,8 +1716,8 @@ Session.prototype = {
       plansList.push({
         text:
           p.duration +
-          ' Months @ ₹' +
-          self.formatAmount(p.amount_per_month) +
+          ' Months @ ' +
+          self.formatAmountWithCurrency(p.amount_per_month) +
           '/mo',
         value: p.duration,
         detail: self.makeCardlessEmiDetailText(p.duration, p.amount_per_month),
@@ -2260,6 +2159,7 @@ Session.prototype = {
         });
         this.hideTimer();
       }
+      this.showLoadError('Waiting for payment to complete on bank page');
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -2314,7 +2214,7 @@ Session.prototype = {
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
-    discreet.Store.set({ screen: '' });
+    Store.set({ screen: '' });
     if (this.methods.count >= 4) {
       $(this.el).addClass('long');
     }
@@ -2338,12 +2238,6 @@ Session.prototype = {
     } catch (readErr) {}
 
     var hide = function() {
-      var checked = $('#upi-apps input:checked');
-
-      if (checked[0]) {
-        checked[0].checked = false;
-      }
-
       Analytics.track('upi:2f:consent:dismiss', {
         type: AnalyticsTypes.BEHAV,
         data: {
@@ -2351,8 +2245,6 @@ Session.prototype = {
           consent: false,
         },
       });
-
-      $('#body').toggleClass('sub', false);
     };
 
     Analytics.track('upi:2f:consent', {
@@ -2689,48 +2581,6 @@ Session.prototype = {
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
       });
-
-      this.on('click', '#upi-directpay', function() {
-        $('#vpa').focus();
-      });
-
-      this.on('click', '#vpa', function() {
-        $('#upi-directpay label')[0].dispatchEvent(new MouseEvent('click'));
-      });
-
-      this.on('change', '#form-upi', function(e) {
-        var packageName = e.target.value;
-        var UPISecondFactorConsent = {};
-
-        try {
-          UPISecondFactorConsent = JSON.parse(
-            StorageBridge.getString('rzp_upi_2f_consent')
-          );
-        } catch (readErr) {}
-
-        if (
-          discreet.UPIUtils.isSecondFactorApp(packageName) &&
-          !UPISecondFactorConsent[packageName]
-        ) {
-          self.shouldAskUPI2FPermission = true;
-        } else {
-          self.shouldAskUPI2FPermission = false;
-        }
-
-        $('#body').toggleClass('sub', e.target.value);
-
-        Analytics.track('upi:app:select', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            package_name: packageName,
-            showRecommended: Boolean(self.showRecommendedUPIApp),
-            recommended: Boolean(
-              self.showRecommendedUPIApp &&
-                discreet.UPIUtils.isPreferredApp(packageName)
-            ),
-          },
-        });
-      });
     }
 
     if (enabledMethods.emi) {
@@ -2846,6 +2696,39 @@ Session.prototype = {
       if (bankToSet) {
         this.setSelectedBank(bankToSet);
       }
+    });
+  },
+
+  onUpiAppSelect: function(packageName) {
+    var UPISecondFactorConsent = {};
+
+    try {
+      UPISecondFactorConsent = JSON.parse(
+        StorageBridge.getString('rzp_upi_2f_consent')
+      );
+    } catch (readErr) {}
+
+    if (
+      discreet.UPIUtils.isSecondFactorApp(packageName) &&
+      !UPISecondFactorConsent[packageName]
+    ) {
+      this.shouldAskUPI2FPermission = true;
+    } else {
+      this.shouldAskUPI2FPermission = false;
+    }
+
+    $('#body').toggleClass('sub', packageName);
+
+    Analytics.track('upi:app:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        package_name: packageName,
+        showRecommended: Boolean(this.showRecommendedUPIApp),
+        recommended: Boolean(
+          this.showRecommendedUPIApp &&
+            discreet.UPIUtils.isPreferredApp(packageName)
+        ),
+      },
     });
   },
 
@@ -2977,22 +2860,11 @@ Session.prototype = {
             .setAttribute('cardtype', type);
         })
         .on('change', function() {
-          var isValid = this.isValid(),
-            type = this.type;
-
-          if (!preferences.methods.amex && type === 'amex') {
-            isValid = false;
-          }
-
-          // set validity classes
-          toggleInvalid($(this.el.parentNode), isValid);
-
-          // adding maxLen change because some cards may have multiple kind of valid lengths
-          if (isValid && this.el.value.length === this.caretPosition) {
-            if (this.type !== 'maestro') {
-              invoke('focus', el_expiry, null, 0);
-            }
-          }
+          discreet.Flows.performCardFlowActionsAndValidate(
+            gel('elem-card'),
+            this.el,
+            gel('card_expiry')
+          );
         });
 
       delegator.expiry = delegator
@@ -3149,6 +3021,7 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
+    var isTezScreen = false;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3166,25 +3039,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    if (this.separateTez) {
-      if (screen === 'tez' || screen === 'upi') {
-        var tez = false;
-        if (screen === 'tez') {
-          tez = true;
-          screen = 'upi';
-        }
-
-        $('#upi-directpay .checkbox').css('display', 'none');
-        $('#upi-tez .checkbox').css('display', 'none');
-
-        gel('radio-tez').checked = tez;
-        $('#upi-tez').css('display', tez ? 'block' : 'none');
-        $('#upi-tez').toggleClass('expanded', tez);
-
-        gel('radio-directpay').checked = !tez;
-        $('#upi-directpay').toggleClass('expanded', !tez);
-        $('#upi-directpay').css('display', !tez ? 'block' : 'none');
-      }
+    if (screen === 'tez' && this.separateTez) {
+      screen = 'upi';
+      isTezScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3250,24 +3107,48 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'upi' &&
-        this.upi_intents_data &&
-        !$('#form-upi .item :checked')[0]) ||
       (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
     ) {
       showPaybtn = false;
     }
     this.body.toggleClass('sub', showPaybtn);
 
+    if (screen === 'upi') {
+      var isIntentFlow = this.upiTab.get().intent;
+
+      if (isIntentFlow) {
+        var data = this.upiTab.getPayload();
+
+        if (data['_[flow]'] === 'intent' && !data.upi_app) {
+          $('#body').removeClass('sub');
+        }
+      } else if (typeof this.upiTab.get().selectedApp === 'undefined') {
+        $('#body').removeClass('sub');
+      }
+    }
+
+    if (isTezScreen) {
+      this.upiTab.set({ selectedApp: 'gpay' });
+      this.upiTab.onUpiAppSelection('gpay');
+    }
+
     return this.offers && this.renderOffers(this.tab);
   },
-  renderOffers: function(screen) {
-    if (screen === 'emiplans') {
-      screen = 'emi';
+  renderOffers: function(tab) {
+    if (tab === 'emiplans') {
+      tab = 'emi';
     }
 
     if (
-      ['', 'card', 'emi', 'netbanking', 'wallet', 'upi'].indexOf(screen) < 0
+      [
+        '',
+        'card',
+        'emi',
+        'netbanking',
+        'wallet',
+        'upi',
+        'cardless_emi',
+      ].indexOf(tab) < 0
     ) {
       $('#body').removeClass('has-offers');
       return this.offers.display(false);
@@ -3280,26 +3161,54 @@ Session.prototype = {
       this.handleOfferRemoval();
     }
 
-    var paymentMethod = screen;
+    var paymentMethod = tab;
 
-    this.offers.applyFilter(
-      (screen && { payment_method: paymentMethod }) || {}
-    );
+    var filters = (tab && { payment_method: paymentMethod }) || {};
+
+    /**
+     * For every Cardless EMI screen other than
+     * the Cardless EMI homescreen,
+     * set the provider in the filters.
+     *
+     * Side-effect: We won't be able to show
+     * provider-less offers for Cardless EMI
+     * until Offers code is refactored.
+     */
+    if (tab === 'cardless_emi') {
+      if (this.screen !== 'cardless_emi') {
+        filters.provider = CardlessEmiStore.providerCode;
+      }
+    }
+
+    /**
+     * Offers have a 'homescreen' attribute that tells
+     * whether or not we want to show that offer on the homescreen.
+     *
+     * `tab` being '' means we are on the homescreen.
+     */
+    if (tab === '') {
+      filters.homescreen = tab === '';
+    }
+
+    this.offers.applyFilter(filters);
 
     // Pre-select offer if there is only one visible offer
     var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer && screen) {
-      this.preSelectedOffer = defaultOffer;
+    if (defaultOffer && tab) {
+      // Don't preselect offer for Cardless EMI homescreen.
+      if (!(tab === 'cardless_emi' && this.screen === 'cardless_emi')) {
+        this.preSelectedOffer = defaultOffer;
+      }
     }
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
-      this.handleOfferSelection(this.preSelectedOffer, screen);
+      this.handleOfferSelection(this.preSelectedOffer, tab);
       this.offers.applyOffer();
 
       /* Don't set preSelectedOffer to null if it's on card OTP screen  */
-      if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
+      if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
         this.preSelectedOffer = null;
       }
     }
@@ -3424,6 +3333,12 @@ Session.prototype = {
             cvv.focus();
           }
         }
+      }
+    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
+      var provider = offer.provider;
+
+      if (provider) {
+        this.selectCardlessEmiProvider(provider);
       }
     }
   },
@@ -3610,6 +3525,12 @@ Session.prototype = {
 
     if (/^emandate/.test(tab)) {
       return this.emandateView.showTab(tab);
+    }
+
+    if (tab === '' && this.tab === 'upi') {
+      if (this.upiTab.onBack()) {
+        return;
+      }
     }
 
     this.body.attr('tab', tab);
@@ -3799,6 +3720,7 @@ Session.prototype = {
     var listItems = [];
     var amount = this.get('amount');
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
+    var that = this;
 
     if (this.isOfferApplicableOnIssuer(bank)) {
       amount = this.getDiscountedAmount();
@@ -3811,12 +3733,12 @@ Session.prototype = {
         (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
       ) {
         listItems.push({
-          text: getEmiText(amount, plan).info,
+          text: getEmiText(that, amount, plan).info,
           value: duration,
           badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
           detail:
-            'Full amount of ₹' +
-            (amount / 100).toFixed(2) +
+            'Full amount of ' +
+            that.formatAmountWithCurrency(amount) +
             ' will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
         });
       }
@@ -3920,7 +3842,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(amount, plan).short || '';
+              var text = getEmiText(self, amount, plan).short || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -4006,7 +3928,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(amount, plan).short || '';
+              var text = getEmiText(self, amount, plan).short || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -4068,8 +3990,8 @@ Session.prototype = {
           emiPlans.push({
             text:
               p.duration +
-              ' Months @ ₹' +
-              self.formatAmount(amount_per_month) +
+              ' Months @ ' +
+              self.formatAmountWithCurrency(amount_per_month) +
               '/mo',
             value: p.duration,
             detail: self.makeCardlessEmiDetailText(
@@ -4094,7 +4016,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(amount, plan).short || '';
+              var text = getEmiText(self, amount, plan).short || '';
 
               self.emiScreenView.setPlan({
                 duration: plan.duration,
@@ -4553,7 +4475,11 @@ Session.prototype = {
 
     if (tab) {
       data.method = tab;
-      fillData(this.getActiveForm(), data);
+      var activeForm = this.getActiveForm();
+
+      if (activeForm !== '#form-upi') {
+        fillData(activeForm, data);
+      }
 
       // Delete all the auth_type-* keys
       each(data, function(key, val) {
@@ -4608,27 +4534,13 @@ Session.prototype = {
         }
       }
 
-      if (data.method === 'tez') {
-        data.method = 'upi';
-      }
-
       if (this.screen === 'upi') {
-        if (data.upi_app && data.upi_app === 'directpay') {
-          data['_[flow]'] = 'directpay';
-          delete data.upi_app;
-        }
-        if (data['_[flow]'] !== 'directpay') {
-          if (data['_[flow]'] === 'tez' && this.tezMode === 'desktop') {
-            data.vpa = data.tez_username + '@' + data.tez_bank;
-          } else {
-            delete data.vpa;
-          }
-        }
+        /* All tabs should be responsible for their subdata */
+        var upiData = this.upiTab.getPayload();
 
-        if ('tez_username' in data) {
-          delete data.tez_username;
-          delete data.tez_bank;
-        }
+        each(upiData, function(key, value) {
+          data[key] = value;
+        });
       }
     }
     return data;
@@ -4671,7 +4583,7 @@ Session.prototype = {
         (this.screen === 'upi' || this.get('ecod')) &&
         text === discreet.cancelMsg
       ) {
-        if (this.payload['_[flow]'] === 'intent') {
+        if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
         }
         return this.hideErrorMessage();
@@ -4743,7 +4655,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = discreet.Store.get().screenData.otp.otp;
+    var otp = Store.get().screenData.otp.otp;
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -5031,7 +4943,17 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        if (this.checkInvalid('#form-upi input:checked + label')) {
+        var formSelector = '#form-upi';
+
+        if (data['_[flow]'] === 'intent') {
+          if (data.vpa) {
+            formSelector = '#svelte-collect-in-intent';
+          } else {
+            formSelector = '#svelte-upi-apps-list';
+          }
+        }
+
+        if (this.checkInvalid(formSelector)) {
           return;
         }
       } else if (this.checkInvalid()) {
@@ -5152,19 +5074,23 @@ Session.prototype = {
     }
 
     if (data['_[flow]'] === 'tez') {
-      if (this.tezMode === 'desktop') {
-        data['_[flow]'] = 'directpay';
-        Analytics.track('tez:collect_request');
-      } else {
-        request.tez = true;
-        data['_[flow]'] = 'intent';
-      }
+      request.tez = true;
+      data['_[flow]'] = 'intent';
     }
 
     var appliedOffer = this.getAppliedOffer();
 
     if (appliedOffer) {
-      data.offer_id = appliedOffer.id;
+      // Set offer ID based on offer type
+      switch (appliedOffer.type) {
+        case 'api':
+          data.offer_id = appliedOffer.id;
+          break;
+
+        case 'local':
+          data['notes[offer_id]'] = appliedOffer.id;
+          break;
+      }
       this.r.display_amount = appliedOffer.amount;
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
@@ -5212,12 +5138,18 @@ Session.prototype = {
     }
 
     if (data.method === 'card' || data.method === 'emi') {
-      this.nativeotp = !!this.nativeOtpPossible();
+      this.nativeotp = !!this.shouldUseNativeOTP();
 
       var cardType = getCardTypeFromPayload(data, this.transformedTokens);
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
-        if (this.nativeotp && cardType === 'mastercard') {
+        if (
+          this.nativeotp &&
+          discreet.Flows.shouldUseNativeOtpForCardPayment(
+            data,
+            this.transformedTokens
+          )
+        ) {
           shouldUseNativeOTP = true;
         }
       } else if (data.method === 'emi') {
@@ -5239,6 +5171,7 @@ Session.prototype = {
           askOTP(that.otpView, data);
         });
 
+        request.nativeotp = true;
         request.iframe = true;
         Analytics.track('iframe:attempt');
       }
@@ -5495,6 +5428,10 @@ Session.prototype = {
         this.otpView.destroy();
       }
 
+      if (this.upiTab) {
+        this.upiTab.destroy();
+      }
+
       if (this.emiScreenView) {
         this.emiScreenView.destroy();
       }
@@ -5519,7 +5456,7 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
-      this.otpView = null;
+      this.upiTab = this.otpView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
     }
@@ -5530,52 +5467,6 @@ Session.prototype = {
       this.data = this.getFormData();
       this.close();
     }
-  },
-
-  checkFlows: function(iin, isPrefilledCardNumber) {
-    // Hide and uncheck checkboxes.
-    showFlowRadioButtons(false);
-
-    if (this.recurring) {
-      return;
-    }
-
-    var self = this;
-
-    this.flowIIN = iin;
-
-    if (this.recurring) {
-      return;
-    }
-
-    this.r.getCardFlows(iin, function(flows) {
-      Analytics.track('card_flows:fetched', {
-        data: {
-          iin: iin,
-          prefilled_card: isPrefilledCardNumber || null,
-          default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-        },
-      });
-
-      // Sanity-check
-      if (self.flowIIN !== iin) {
-        return;
-      }
-
-      if (flows && flows.pin) {
-        Analytics.track('atmpin:flows', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            iin: iin,
-            prefilled_card: isPrefilledCardNumber || null,
-            default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-          },
-        });
-        showFlowRadioButtons(true);
-      } else {
-        showFlowRadioButtons(false);
-      }
-    });
   },
 
   setEmiOptions: function() {
@@ -5622,6 +5513,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var qrEnabled =
+      this.get('method.qr') &&
       !getStore('isPartialPayment') &&
       !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
@@ -5695,8 +5587,13 @@ Session.prototype = {
      * - Trigger oneMethod
      */
 
-    if (this.forcedOffer) {
-      var paymentMethod = this.forcedOffer.payment_method;
+    var forcedOffer =
+      this.forcedOffer ||
+      discreet.Offers.getForcedOffer({
+        preferences: preferences,
+      });
+    if (forcedOffer) {
+      var paymentMethod = forcedOffer.payment_method;
       if (paymentMethod === 'emi') {
         delete methods.card;
         methods.count++;
@@ -5831,12 +5728,18 @@ Session.prototype = {
   },
 
   setOffers: function(preferences) {
-    var hasOffers = (this.hasOffers = isArray(preferences.offers)),
-      forcedOffer = (this.forcedOffer =
-        hasOffers && preferences.force_offer && preferences.offers[0]);
+    var allOffers = discreet.Offers.createOffers({
+      preferences: preferences,
+      session: this,
+    });
 
-    if (forcedOffer) {
-      var paymentMethod = forcedOffer.payment_method;
+    this.eligibleOffers = allOffers.offers;
+
+    this.hasOffers = allOffers.offers.length > 0;
+    this.forcedOffer = allOffers.forcedOffer;
+
+    if (this.forcedOffer) {
+      var paymentMethod = this.forcedOffer.payment_method;
 
       if (['emi', 'card', 'wallet'].indexOf(paymentMethod) >= 0) {
         // need this while preparing the template
@@ -5844,7 +5747,7 @@ Session.prototype = {
       }
 
       Analytics.track('offers:forced', {
-        data: forcedOffer,
+        data: this.forcedOffer,
       });
     }
   },
@@ -5893,7 +5796,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    discreet.Store.set({ preferences: prefs });
+    Store.set({ preferences: prefs });
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
@@ -5912,7 +5815,6 @@ Session.prototype = {
       invoice = (this.invoice = preferences.invoice),
       subscription = (this.subscription = preferences.subscription),
       options = preferences.options;
-    this.setOffers(preferences);
 
     /* Set magic from preferences */
     this.magic = false; //this.magic && preferences.magic;
@@ -6033,6 +5935,7 @@ Session.prototype = {
 
     /* set payment methods on the basis of preferences */
     this.setPaymentMethods(preferences);
+    this.setOffers(preferences);
   },
 
   showModal: function(preferences) {

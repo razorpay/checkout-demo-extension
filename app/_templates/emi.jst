@@ -29,8 +29,8 @@
       <div class="col">`=i` Months</div>
       `var inst = Razorpay.emi.calculator(amount, i, plan);`
       <div class="col">`=plan`%</div>
-      <div class="col">₹ `=inst/100`</div>
-      <div class="col">₹ `=inst*i/100`</div>
+      <div class="col">`=session.formatAmountWithCurrency(inst)`</div>
+      <div class="col">`=session.formatAmountWithCurrency(inst*i)`</div>
     </div>
   `~`
   <div id="emi-close" class="close">×</div>

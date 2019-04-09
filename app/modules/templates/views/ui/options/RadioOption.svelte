@@ -1,15 +1,19 @@
 <Option
   {data}
-  type={type}
+  {type}
 
   on:select="fire('select', event)"
 >
-  {#if icon}
-    <OptionIcon icon={icon} />
+  {#if icon || iconPlaceholder}
+    <OptionIcon icon={icon} placeholder={iconPlaceholder} />
   {/if}
   <div class="option-title"><slot></slot></div>
   {#if showRadio}
-    <Radio checked={selected}/>
+    <Radio
+      checked={selected}
+      {name}
+      {value}
+    />
   {/if}
 </Option>
 
@@ -34,6 +38,7 @@
         icon: null,
         showRadio: true,
         selected: false,
+        iconPlaceholder: '',
       };
     },
   }

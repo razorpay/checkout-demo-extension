@@ -22,12 +22,10 @@ const AVAILABLE_METHODS = [
  * @return {Array}
  */
 const getAvailableMethods = methods => {
-  let AVAIL_METHODS = _Arr.filter(
-    AVAILABLE_METHODS,
-    method =>
-      _.isArray(methods[method])
-        ? Boolean(methods[method].length)
-        : methods[method]
+  let AVAIL_METHODS = _Arr.filter(AVAILABLE_METHODS, method =>
+    _.isArray(methods[method])
+      ? Boolean(methods[method].length)
+      : methods[method]
   );
 
   /**
@@ -140,7 +138,13 @@ export default class MethodsList {
     }
 
     /* Only allow for available methods */
-    data.instruments = _Arr.filter(data.instruments, ({ method }) => {
+    data.instruments = _Arr.filter(data.instruments, data => {
+      let { method } = data;
+
+      if (data['_[upiqr]']) {
+        method = 'qr';
+      }
+
       return session.methods[method];
     });
 

@@ -39,6 +39,8 @@ import * as CardlessEmi from 'common/cardlessemi';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
+import * as Offers from 'checkoutframe/offers';
+import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -46,6 +48,7 @@ import Store from 'checkoutframe/store';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
+import UpiTab from 'templates/tabs/upi/index.svelte';
 
 export default {
   RazorpayConfig,
@@ -85,6 +88,8 @@ export default {
   MethodsList,
   Store,
   UserAgent,
+  Offers,
+  Flows,
 
   getQueryParams: _.getQueryParams,
 
@@ -110,4 +115,5 @@ export default {
   getFullBankLogo,
 
   MagicView,
+  UpiTab,
 };
