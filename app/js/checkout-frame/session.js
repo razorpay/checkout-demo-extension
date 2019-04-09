@@ -4569,6 +4569,7 @@ Session.prototype = {
       hideOverlayMessage();
       this.modal.hide();
       this.savedCardScreen = undefined;
+      discreet.Bridge.stopListeningForBackPresses();
     }
   },
 

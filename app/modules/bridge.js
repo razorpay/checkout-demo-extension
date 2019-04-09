@@ -366,6 +366,18 @@ function isModalVisible() {
   return session && session.modal && session.modal.isShown;
 }
 
+function backHandlerForWeb() {
+  if (!isModalVisible()) {
+    return;
+  }
+
+  backPressed();
+
+  if (isModalVisible()) {
+    addDummyHash();
+  }
+}
+
 export function setHistoryAndListenForBackPresses() {
   if (!shouldHandleBackPresses()) {
     return;
@@ -373,17 +385,9 @@ export function setHistoryAndListenForBackPresses() {
 
   addDummyHash();
 
-  window.addEventListener('popstate', function() {
-    let session = getSession();
+  window.addEventListener('popstate', backHandlerForWeb);
+}
 
-    if (!isModalVisible()) {
-      return;
-    }
-
-    backPressed();
-
-    if (isModalVisible()) {
-      addDummyHash();
-    }
-  });
+export function stopListeningForBackPresses() {
+  window.removeEventListener('popstate', backHandlerForWeb);
 }
