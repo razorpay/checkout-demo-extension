@@ -206,7 +206,8 @@ export function performCardFlowActionsAndValidate(
   const cardNumber = getCardDigits(cardInput.value);
   const iin = getIin(cardNumber);
   const session = getSession();
-  const isRecurring = session.recurring;
+  const isStrictlyRecurring =
+    session.recurring && session.get('recurring') !== 'preferred';
 
   const flowChecker = (flows = {}) => {
     const cardNumber = getCardDigits(cardInput.value);
@@ -220,7 +221,7 @@ export function performCardFlowActionsAndValidate(
     let isValid = cardValidator.sync(cardInput);
 
     // Perform actual-flow checking only if the IIN has changed.
-    if (isRecurring) {
+    if (isStrictlyRecurring) {
       isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
     } else {
       // Debit-PIN is not supposed to work in case of recurring
