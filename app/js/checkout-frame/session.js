@@ -4642,6 +4642,67 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Show fees UI if `fee` is missing in payload and return whether the UI was
+   * shown or not.
+   *
+   * It will internally create an instance of `FeeBearerView` if not created
+   * and use the existing instance if already created.
+   *
+   * @return {Boolean} Whether or not the UI was shown
+   */
+  showFeesUi: function() {
+    var session = this;
+    var data = session.payload;
+    var isFeeMissing = !('fee' in data);
+
+    /**
+     * Check here if 'fee' is set in payload,
+     * If it is present then we have shown the fee breakup to the user,
+     * and we have accounted for additional fees,
+     * so no changes in payload are required.
+     * Otherwise, show the fee breakup.
+     */
+    if (isFeeMissing) {
+      var paymentData = clone(this.payload);
+
+      // Create fees route in API doesn't like this.
+      delete paymentData.upi_app;
+
+      if (this.feeBearerView) {
+        this.feeBearerView.fetchFees(paymentData, session);
+      } else {
+        this.feeBearerView = new discreet.FeeBearerView({
+          target: gel('fee-wrap'),
+          data: {
+            session: this,
+            paymentData: paymentData,
+          },
+        });
+
+        // When user clicks "Continue" in Fee Breakup View
+        this.feeBearerView.on('continue', function(bearer) {
+          makeHidden('#fee-wrap');
+
+          // Set the updated amount & fee
+          session.payload.amount = bearer.amount;
+          session.payload.fee = bearer.fee;
+
+          // Don't redirect to fees route now
+          session.feesRedirect = false;
+
+          session.submit();
+        });
+      }
+
+      showOverlay($('#fee-wrap'));
+
+      return true;
+    }
+
+    return false;
+  },
+
   onOtpSubmit: function() {
     if (this.checkInvalid('#form-otp')) {
       return;
@@ -5177,53 +5238,8 @@ Session.prototype = {
       }
     }
 
-    if (preferences.fee_bearer) {
-      var isFeeMissing = !('fee' in data);
-
-      /**
-       * Check here if 'fee' is set in payload,
-       * If it is present then we have shown the fee breakup to the user,
-       * and we have accounted for additional fees,
-       * so no changes in payload are required.
-       * Otherwise, show the fee breakup.
-       */
-      if (isFeeMissing) {
-        var paymentData = clone(this.payload);
-
-        // Create fees route in API doesn't like this.
-        delete paymentData.upi_app;
-
-        if (this.feeBearerView) {
-          this.feeBearerView.fetchFees(paymentData, session);
-          showOverlay($('#fee-wrap'));
-          return;
-        }
-
-        this.feeBearerView = new discreet.FeeBearerView({
-          target: gel('fee-wrap'),
-          data: {
-            session: this,
-            paymentData: paymentData,
-          },
-        });
-        // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.on('continue', function(bearer) {
-          makeHidden('#fee-wrap');
-
-          // Set the updated amount & fee
-          session.payload.amount = bearer.amount;
-          session.payload.fee = bearer.fee;
-
-          // Don't redirect to fees route now
-          session.feesRedirect = false;
-
-          session.submit();
-        });
-
-        showOverlay($('#fee-wrap'));
-
-        return; // Return because we need to show the fee breakup.
-      }
+    if (preferences.fee_bearer && this.showFeesUi()) {
+      return;
     }
 
     if (
