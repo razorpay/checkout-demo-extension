@@ -5009,7 +5009,7 @@ Session.prototype = {
     var that = this;
     var session = this;
     var request = {
-      feesRedirect: preferences.fee_bearer,
+      feesRedirect: preferences.fee_bearer && !('fee' in data),
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
