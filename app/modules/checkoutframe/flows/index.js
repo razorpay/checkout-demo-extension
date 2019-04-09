@@ -220,7 +220,6 @@ export function performCardFlowActionsAndValidate(
 
     let isValid = cardValidator.sync(cardInput);
 
-    // Perform actual-flow checking only if the IIN has changed.
     if (isStrictlyRecurring) {
       isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
     } else {
