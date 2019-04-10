@@ -3,7 +3,7 @@
     <div class="col">Select Bank:</div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value='selected'>
-      {#each Object.entries(banks) as [i, bank]}
+      {#each banksList as [i, bank]}
         <option value="{i}">{bank.name}</option>
       {/each}
     </select>
@@ -16,7 +16,7 @@
   </strong>
   <div>
   </div>
-  {#each Object.entries(plans) as [duration, plan]}
+  {#each plans as [duration, plan]}
   <div class="row emi-option">
     <div class="col">{plan.duration} Months</div>
     <div class="col">{plan.rate}%</div>
@@ -42,10 +42,13 @@
           return session.get('amount');
         }
       },
+
+      banksList: ({ banks = {} }) => _Obj.entries(banks),
+
       plans: data => {
         const session = data.session;
         let plans = (data.banks[data.selected] || {}).plans || {};
-        return _Obj.map(plans, (plan, duration) => {
+        plans = _Obj.map(plans, (plan, duration) => {
           let installment = Razorpay.emi.calculator(
             data.amount,
             duration,
@@ -58,6 +61,8 @@
             total: session.formatAmountWithCurrency(installment * duration),
           };
         });
+
+        return _Obj.entries(plans);
       },
     },
     methods: {
