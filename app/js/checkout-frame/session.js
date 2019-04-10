@@ -1804,16 +1804,26 @@ Session.prototype = {
           return;
         }
 
-        if (!response.saved || (response.error && response.error.description)) {
+        if (response.error && response.error.description) {
+          self.showLoadError(response.error.description, true);
+          Analytics.track('cardless_emi:plans:fetch:error');
+          return;
+        }
+
+        if (response.success && response.emi_plans) {
+          CardlessEmiStore.plans[providerCode] = response.emi_plans;
+          self.showCardlessEmiPlans();
+          return;
+        }
+
+        // Maybe we should remove this condition.
+        // TODO: Check with Aagosh.
+        if (!response.saved) {
           var errorDesc =
             'Could not find a ' +
             cardlessEmiProviderObj.name +
             ' account associated with ' +
             getPhone();
-
-          if (response.error && response.error.description) {
-            errorDesc = response.error.description;
-          }
 
           self.showLoadError(errorDesc, true);
 
