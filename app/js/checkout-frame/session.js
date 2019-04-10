@@ -3451,7 +3451,7 @@ Session.prototype = {
       tab = '';
     }
 
-    if (tab === 'wallet' && this.screen === 'otp') {
+    if (tab === 'wallet' && this.screen === 'otp' && this.r._payment) {
       if (!confirmClose()) {
         return;
       }
