@@ -5110,6 +5110,10 @@ Session.prototype = {
         return;
       }
 
+      if (data.provider === 'flexmoney') {
+        delete data.ott;
+      }
+
       /**
        * If contact is optional, we want to open a popup and take ott and emi_duration there.
        */
