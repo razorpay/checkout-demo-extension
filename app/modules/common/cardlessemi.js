@@ -9,6 +9,7 @@ const list = {
   bajaj: ['Bajaj Finserv'],
   earlysalary: ['EarlySalary'],
   zestmoney: ['ZestMoney'],
+  flexmoney: ['InstaCred'],
 };
 
 /**
