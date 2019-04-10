@@ -4682,8 +4682,7 @@ Session.prototype = {
 
         // When user clicks "Continue" in Fee Breakup View
         this.feeBearerView.on('continue', function(bearer) {
-          makeHidden('#fee-wrap');
-          hideOverlay();
+          hideOverlay($('#fee-wrap'));
 
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
