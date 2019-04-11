@@ -392,6 +392,10 @@ function backHandlerForWeb() {
 
   backPressed();
 
+  /**
+   * The modal may have closed.
+   * Check if it's open before adding a hash.
+   */
   if (isModalVisible()) {
     addDummyHash();
   }
