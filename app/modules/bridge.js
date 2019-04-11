@@ -2,7 +2,7 @@
 
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
-import { UPI_POLL_URL } from 'common/constants';
+import { UPI_POLL_URL, SHOWN_CLASS } from 'common/constants';
 import * as Confirm from 'confirm';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Store from 'checkoutframe/store';
@@ -348,7 +348,20 @@ function backPressed(callback) {
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
-    session.back();
+    const overlay = _Doc.querySelector('#overlay');
+    /**
+     * When the overlay is visible, there's some message
+     * that's being shown to the user in a pop up.
+     *
+     * TODO: Use an overlay manager for this check when implmeneted.
+     */
+    const isOverlayVisible = overlay && _El.hasClass(overlay, SHOWN_CLASS);
+
+    if (isOverlayVisible) {
+      session.hideErrorMessage();
+    } else {
+      session.back();
+    }
   } else {
     if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();
