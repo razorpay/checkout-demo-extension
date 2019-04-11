@@ -420,6 +420,13 @@ function isModalVisible() {
 
 function backHandlerForWeb() {
   if (!isModalVisible()) {
+    // If still fetching the preferences, abort.
+    const session = getSession();
+
+    if (session.isOpen) {
+      session.closeAndDismiss();
+    }
+
     return;
   }
 
