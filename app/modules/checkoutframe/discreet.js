@@ -43,7 +43,8 @@ import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
-import Store from 'checkoutframe/store';
+import Store from 'checkoutstore';
+import PreferencesStore from 'checkoutstore/preferences.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
@@ -85,10 +86,12 @@ export default {
   Bridge,
   P13n,
   MethodsList,
-  Store,
   UserAgent,
   Offers,
   Flows,
+
+  Store,
+  PreferencesStore,
 
   getQueryParams: _.getQueryParams,
 

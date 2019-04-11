@@ -3,7 +3,7 @@ import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
 import * as Confirm from 'confirm';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
-import Store from 'checkoutframe/store';
+import OtpScreenStore from 'checkoutstore/screens/otp';
 
 import Track from 'tracker';
 
@@ -247,9 +247,9 @@ window.handleOTP = function(otp) {
   var session = getSession();
   var otpEl = _Doc.querySelector('#otp');
   if (session && otpEl && !otpEl.value) {
-    let screenData = Store.get().screenData;
-    screenData.otp.otp = otp;
-    Store.set({ screenData });
+    OtpScreenStore.set({
+      otp,
+    });
 
     _Doc.querySelector('#otp-elem') |> _El.removeClass('invalid');
   }

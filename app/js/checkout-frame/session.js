@@ -22,6 +22,7 @@ var preferences = window.preferences,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
+  PreferencesStore = discreet.PreferencesStore,
   OptionsList = discreet.OptionsList;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -4652,7 +4653,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = Store.get().screenData.otp.otp;
+    var otp = Store.get().screens.otp.otp;
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -5742,7 +5743,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    Store.set({ preferences: prefs });
+    PreferencesStore.set(prefs);
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;

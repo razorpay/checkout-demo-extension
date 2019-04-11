@@ -1,11 +1,11 @@
 <div
   id="form-otp"
   class="tab-content showable screen"
-  class:loading="$screenData[SCREEN].loading"
+  class:loading="$loading"
 >
-  <div id='otp-prompt'>{@html $screenData[SCREEN].text}</div>
+  <div id='otp-prompt'>{@html $text}</div>
 
-  {#if $screenData[SCREEN].addFunds}
+  {#if $addFunds}
     <div
       id="add-funds"
       class="add-funds"
@@ -19,7 +19,7 @@
   {/if}
 
   <div id="otp-section">
-    {#if $screenData[SCREEN].action}
+    {#if $action}
       <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
     {/if}
 
@@ -30,7 +30,7 @@
       class:hidden="!showInput"
     >
       <div class="help">Please enter the OTP</div>
-      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="one-time-code" required>
+      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$otp maxlength={$maxlength || 6} autocomplete="one-time-code" required>
     </div>
   </div>
 
@@ -41,25 +41,25 @@
 
       class:hidden="!showInput"
     >
-      {#if $screenData[SCREEN].allowResend}
+      {#if $allowResend}
         <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
       {/if}
-      {#if $screenData[SCREEN].allowSkip}
-        <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
-      {:elseif $screenData[SCREEN].allowBack}
+      {#if $allowSkip}
+        <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$skipText || 'Skip Saved Cards'}</a>
+      {:elseif $allowBack}
         <a id="otp-sec" class="link" on:click="invoke('secondary', event)">Go Back</a>
       {/if}
     </div>
 </div>
 
 <script>
-  export default {
-    computed: {
-      inputWidth: function ({ $screenData, SCREEN }) {
-        const {
-          maxlength
-        } = $screenData[SCREEN];
+  import OtpScreenStore from 'checkoutstore/screens/otp';
 
+  export default {
+    store: () => OtpScreenStore,
+
+    computed: {
+      inputWidth: function ({ $maxlength }) {
         /**
          * Base width (Mandatory): 19px
          * Each dash: 14px
@@ -68,23 +68,16 @@
          * There are maxlength-1 spaces and maxlength dashes.
          */
 
-        return `${19 + (maxlength - 1) * 10 + maxlength * 14}px`;
+        return `${19 + ($maxlength - 1) * 10 + $maxlength * 14}px`;
       },
 
-      showInput: function ({ $screenData, SCREEN }) {
-        const {
-          action,
-          loading
-        } = $screenData[SCREEN];
-
-        return !(action || loading);
+      showInput: function ({ $action, $loading }) {
+        return !($action || $loading);
       },
     },
 
     data: function () {
       return {
-        SCREEN: 'otp',
-
         on: {}
       };
     },
