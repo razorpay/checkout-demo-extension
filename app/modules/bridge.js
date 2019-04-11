@@ -302,17 +302,24 @@ function shouldHandleBackPresses() {
   return true;
 }
 
-function confirmClose() {
-  return confirm('Ongoing payment. Press OK to abort payment.');
-}
-
 function closeModal() {
   const session = getSession();
 
-  if (session.get('modal.confirm_close') && !confirmClose()) {
-    return;
+  if (session.get('modal.confirm_close')) {
+    Confirm.show({
+      message:
+        'Your payment is ongoing. ' +
+        'Are you sure you want to cancel the payment?',
+      heading: 'Cancel Payment?',
+      positiveBtnTxt: 'Yes, cancel',
+      negativeBtnTxt: 'No',
+      onPositiveClick: function() {
+        session.hide();
+      },
+    });
+  } else {
+    session.hide();
   }
-  session.hide();
 }
 
 /**
