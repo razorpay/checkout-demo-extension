@@ -8,6 +8,7 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Store from 'checkoutframe/store';
 
 import Track from 'tracker';
+import { confirmCancelMsg } from 'common/strings';
 
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
@@ -307,9 +308,7 @@ function closeModal() {
 
   if (session.get('modal.confirm_close')) {
     Confirm.show({
-      message:
-        'Your payment is ongoing. ' +
-        'Are you sure you want to cancel the payment?',
+      message: confirmCancelMsg,
       heading: 'Cancel Payment?',
       positiveBtnTxt: 'Yes, cancel',
       negativeBtnTxt: 'No',
