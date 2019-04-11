@@ -1340,8 +1340,6 @@ Session.prototype = {
         if (count.preferred === 1 && this.upi_intents_data.length > 1) {
           this.showRecommendedUPIApp = true;
         }
-
-        discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
       }
     }
 
@@ -1426,6 +1424,10 @@ Session.prototype = {
     // Look for new UPI apps.
     if (this.all_upi_intents_data) {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
+    }
+
+    if (this.upi_intents_data) {
+      discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
     }
 
     Analytics.track('complete', {
