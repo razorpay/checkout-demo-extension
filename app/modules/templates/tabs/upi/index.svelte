@@ -296,7 +296,7 @@
         /* Use Tez */
         () => this.set({ useWebPaymentsApi: true }),
         /* Don't use Tez */
-        () =>this.set({ useWebPaymentsApi: false })
+        () => this.set({ useWebPaymentsApi: false })
       );
 
       /* TODO: improve handling of `prefill.vpa` */
@@ -311,11 +311,12 @@
     onstate({ changed, current }) {
       const session = getSession();
 
-      if (changed.selectedApp && session.tab === 'upi') {
+      if (
+        changed.selectedApp &&
+        (session.tab === 'upi' || session.tab === 'tez')
+      ) {
         /* TODO: bad practice, remove asap */
-        if (
-          current.selectedApp === undefined || current.isTezSelected
-        ) {
+        if (current.selectedApp === undefined || current.isTezSelected) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
           _El.addClass(_Doc.querySelector('#body'), 'sub');
@@ -440,11 +441,9 @@
       /**
        * Called when the UPI address card is clicked.
        */
-      handleCardClick: function (event) {
+      handleCardClick: function(event) {
         const target = event && event.target;
-        const {
-          googlePayPspHandle
-        } = this.refs;
+        const { googlePayPspHandle } = this.refs;
 
         // Don't focus on VPA input if the dropdown elem was clicked.
         if (target === googlePayPspHandle) {
@@ -457,7 +456,7 @@
       /**
        * Called when the Google Pay PSP is selected from the dropdown.
        */
-      googlePayPspHandleChange (event) {
+      googlePayPspHandleChange(event) {
         // TODO: Focus only if vpa is invalid.
         this.focusVpa(event);
       },
