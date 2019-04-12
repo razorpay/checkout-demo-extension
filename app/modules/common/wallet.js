@@ -17,7 +17,7 @@ const list = {
   payumoney: ['PayUMoney', 18],
   payzapp: ['PayZapp', 24],
   citrus: ['Citrus Wallet', 32],
-  mpesa: ['Vodafone mPesa', 50],
+  // mpesa: ['Vodafone mPesa', 50],
   sbibuddy: ['SBI Buddy', 22],
 };
 

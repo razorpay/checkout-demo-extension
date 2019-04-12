@@ -1144,7 +1144,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(this.order && this.order.bank)) {
+    if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
     }
 
@@ -2544,14 +2544,6 @@ Session.prototype = {
       });
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
-      });
-
-      this.on('click', '#upi-directpay', function() {
-        $('#vpa').focus();
-      });
-
-      this.on('click', '#vpa', function() {
-        $('#upi-directpay label')[0].dispatchEvent(new MouseEvent('click'));
       });
     }
 
