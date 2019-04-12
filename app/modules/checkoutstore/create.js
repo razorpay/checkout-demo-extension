@@ -18,7 +18,7 @@ Store.prototype.update = function update(fn) {
 
   fn(state);
 
-  this.set(state);
+  Store.prototype.set.call(this, state);
 };
 
 /**
@@ -41,14 +41,14 @@ export function createStore(state, options) {
  *
  * @return {Store} parent
  */
-export function assignSubstore(parent, store, name) {
+function assignSubstore(parent, store, name) {
   store.on('state', ({ current }) => {
-    parent.set({
+    Store.prototype.set.call(parent, {
       [name]: current,
     });
   });
 
-  parent.set({
+  Store.prototype.set.call(parent, {
     [name]: store.get(),
   });
 
@@ -67,6 +67,8 @@ export function composeStore(stores) {
   _Obj.loop(stores, (store, name) => {
     assignSubstore(parent, store, name);
   });
+
+  parent.set = undefined;
 
   return parent;
 }
