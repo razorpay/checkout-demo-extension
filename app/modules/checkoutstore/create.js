@@ -1,4 +1,25 @@
-import { Store } from 'svelte/store.js';
+import { Store as SvelteStore } from 'svelte/store.js';
+
+export function Store(state, options) {
+  SvelteStore.call(this, state, options);
+}
+
+Store.prototype = Object.create(SvelteStore.prototype);
+
+/**
+ * Allows updating the store by passing a function
+ * that manipulates the data.
+ * Inspired by immer.
+ *
+ * @param {Function} fn
+ */
+Store.prototype.update = function update(fn) {
+  const state = _Obj.clone(this.get());
+
+  fn(state);
+
+  this.set(state);
+};
 
 /**
  * Creates a store.
