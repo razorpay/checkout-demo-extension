@@ -354,7 +354,6 @@ export const getSortedApps = allApps => {
       if (app.verify_registration && isAppInstalled(app.package_name)) {
         return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
       }
-
       return true;
     });
   }
@@ -442,4 +441,15 @@ export const trackUPIIntentFailure = packageName => {
       package_name: packageName,
     },
   });
+};
+
+/**
+ * Track app visibility in UPI intent apps list.
+ * Only Truecaller is tracked for now.
+ * @param {Array} allApps
+ */
+export const trackAppImpressions = allApps => {
+  if (_Arr.find(allApps, app => app.package_name === 'com.truecaller')) {
+    Analytics.track('upi:app:truecaller:show');
+  }
 };

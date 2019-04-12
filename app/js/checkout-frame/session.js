@@ -1426,6 +1426,10 @@ Session.prototype = {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
     }
 
+    if (this.upi_intents_data) {
+      discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
