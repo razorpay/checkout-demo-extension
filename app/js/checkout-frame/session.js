@@ -552,16 +552,6 @@ function hideOverlay($with) {
   }
 }
 
-/**
- * Hides all elements with .overlay or #overlay
- */
-function hideAllOverlay() {
-  makeHidden('#overlay');
-  each($$('.overlay'), function(i, el) {
-    makeHidden(el);
-  });
-}
-
 function hideEmi() {
   var emic = $('#emi-wrap');
   var wasShown = emic.hasClass(shownClass);
@@ -579,7 +569,7 @@ function hideOverlayMessage() {
     ) {
       makeHidden(gel('error-message'));
     } else {
-      hideAllOverlay();
+      hideOverlay($('#error-message'));
     }
   }
 }
