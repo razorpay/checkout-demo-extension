@@ -1,21 +1,13 @@
 import { composeStore } from 'checkoutstore/create';
 import Screens from 'checkoutstore/screens';
 import Preferences from 'checkoutstore/preferences.js';
+import SessionStore from 'checkoutstore/session.js';
 
 const CheckoutStore = composeStore({
-  screens: Screens,
   preferences: Preferences,
+  screens: Screens,
+  session: SessionStore,
 });
-
-/**
- * Default data for the store.
- */
-const defaultStoreData = {
-  // which view should currently be shown
-  screen: '',
-};
-
-CheckoutStore.set(defaultStoreData);
 
 CheckoutStore.compute(
   'isPartialPayment',

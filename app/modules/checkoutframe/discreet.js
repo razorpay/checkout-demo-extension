@@ -43,8 +43,10 @@ import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+
 import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
+import SessionStore from 'checkoutstore/session.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
@@ -92,6 +94,7 @@ export default {
 
   Store,
   PreferencesStore,
+  SessionStore,
 
   getQueryParams: _.getQueryParams,
 

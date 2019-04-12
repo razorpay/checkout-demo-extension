@@ -23,6 +23,7 @@ var preferences = window.preferences,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
   PreferencesStore = discreet.PreferencesStore,
+  SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -36,7 +37,7 @@ function getStore(prop) {
 }
 
 function gotoAmountScreen() {
-  Store.set({ screen: 'amount' });
+  SessionStore.set({ screen: 'amount' });
 }
 
 function shouldEnableP13n(keyId) {
@@ -2212,7 +2213,7 @@ Session.prototype = {
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
-    Store.set({ screen: '' });
+    SessionStore.set({ screen: '' });
     if (this.methods.count >= 4) {
       $(this.el).addClass('long');
     }
@@ -4762,7 +4763,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    var storeScreen = getStore('screen');
+    var storeScreen = SessionStore.get().screen;
     if (storeScreen === 'amount') {
       return this.extraNext();
     }
