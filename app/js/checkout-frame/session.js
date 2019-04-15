@@ -1800,7 +1800,11 @@ Session.prototype = {
     var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
     var self = this;
 
-    tab_titles.otp = cardlessEmiProviderObj.name;
+    tab_titles.otp =
+      '<img src="' +
+      cardlessEmiProviderObj.logo +
+      '" class="cardless_emi-images">';
+
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
       function(response) {

@@ -850,6 +850,21 @@ i {
     background-color: transparent;
     z-index: -1;
   }
+
+  .cardless_emi-images {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0;
+    max-height: 18px;
+
+    $image_gutter_half = 4px;
+
+    &:not(:first-child) {
+      margin-left: $image_gutter_half;
+      padding-left: $image_gutter_half;
+      border-left: 1px solid $bc;
+    }
+  }
 }
 
 #top-right {
