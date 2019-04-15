@@ -103,6 +103,10 @@
     margin-right: 4px;
   }
 
+  .method-icon :global(svg) {
+    height: 16px;
+  }
+
   .showcase-method {
     font-size: 14px;
     margin: 0 8px;
