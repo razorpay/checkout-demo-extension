@@ -114,7 +114,24 @@ var CardlessEmiStore = {
   duration: {},
   loanUrls: {},
   ott: {},
+  lenderBranding: {},
 };
+
+function createCardlessEmiImage(src) {
+  return '<img src="' + src + '" class="cardless_emi-topbar-image">';
+}
+
+function createCardlessEmiTopbarImages(providerCode) {
+  var provider = discreet.CardlessEmi.getProvider(providerCode);
+  var html = createCardlessEmiImage(provider.logo);
+  var lender = CardlessEmiStore.lenderBranding[providerCode];
+
+  if (lender) {
+    html += createCardlessEmiImage(lender);
+  }
+
+  return html;
+}
 
 /**
  * Store for what tab and screen
@@ -1704,6 +1721,8 @@ Session.prototype = {
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
 
+    tab_titles.emiplans = createCardlessEmiTopbarImages(providerCode);
+
     if (!plans) {
       this.fetchCardlessEmiPlans();
       return;
@@ -1771,10 +1790,8 @@ Session.prototype = {
     var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
     var self = this;
 
-    tab_titles.otp =
-      '<img src="' +
-      cardlessEmiProviderObj.logo +
-      '" class="cardless_emi-images">';
+    var topbarImages = createCardlessEmiTopbarImages(providerCode);
+    tab_titles.otp = topbarImages;
 
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
@@ -1791,6 +1808,10 @@ Session.prototype = {
 
         if (response.success && response.emi_plans) {
           CardlessEmiStore.plans[providerCode] = response.emi_plans;
+
+          CardlessEmiStore.lenderBranding[providerCode] =
+            response.lender_branding_url;
+
           self.showCardlessEmiPlans();
           return;
         }
@@ -3759,6 +3780,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var amount = this.get('amount');
+    var tabTitle = 'EMI Plans';
 
     var trackEmi = function(name, data) {
       Analytics.track(name, {
@@ -3779,6 +3801,8 @@ Session.prototype = {
 
     if (type === 'new') {
       return function(e) {
+        tab_titles.emiplans = tabTitle;
+
         var trigger = e.delegateTarget;
         var $trigger = $(trigger);
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
@@ -3864,6 +3888,8 @@ Session.prototype = {
       };
     } else if (type === 'saved') {
       return function(e) {
+        tab_titles.emiplans = tabTitle;
+
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
@@ -3957,6 +3983,8 @@ Session.prototype = {
       };
     } else if (type === 'bajaj') {
       return function() {
+        tab_titles.emiplans = tabTitle;
+
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
         var emiPlans = [];
@@ -4687,8 +4715,10 @@ Session.prototype = {
     };
 
     if (this.tab === 'cardless_emi') {
+      var providerCode = CardlessEmiStore.providerCode;
+
       queryParams = {
-        provider: CardlessEmiStore.providerCode,
+        provider: providerCode,
         method: 'cardless_emi',
       };
 
@@ -4696,11 +4726,12 @@ Session.prototype = {
         if (msg) {
           this.fetchCardlessEmiPlans();
         } else {
-          CardlessEmiStore.plans[CardlessEmiStore.providerCode] =
-            data.emi_plans;
-          CardlessEmiStore.loanUrls[CardlessEmiStore.providerCode] =
-            data.loan_url;
-          CardlessEmiStore.ott[CardlessEmiStore.providerCode] = data.ott;
+          CardlessEmiStore.plans[providerCode] = data.emi_plans;
+          CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
+          CardlessEmiStore.ott[providerCode] = data.ott;
+          CardlessEmiStore.lenderBranding[providerCode] =
+            data.lender_branding_url;
+
           this.showCardlessEmiPlans();
         }
       };
