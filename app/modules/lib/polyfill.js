@@ -74,7 +74,9 @@ function overrideInsertRule() {
       rule = rule.replace('@keyframes', '@-webkit-keyframes');
     }
 
-    originalInsertRule.call(this, rule, index);
+    try {
+      originalInsertRule.call(this, rule, index);
+    } catch (err) {}
   };
 }
 overrideInsertRule();
