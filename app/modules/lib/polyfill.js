@@ -1,4 +1,6 @@
 import { internetExplorer } from 'common/useragent';
+import Analytics from 'analytics';
+import { getSession } from 'sessionmanager';
 
 /* global DOMTokenList, CSSStyleSheet */
 
@@ -27,6 +29,20 @@ if (internetExplorer && DOMTokenList) {
  * Svelte uses `@keyframes` insertion.
  * https://github.com/sveltejs/svelte/issues/2358
  */
+function trackInsertRuleOverrides() {
+  const interval = setInterval(() => {
+    const session = getSession();
+
+    if (!session || !session.r) {
+      return;
+    }
+
+    Analytics.track('polyfill:insert_override');
+
+    clearInterval(interval);
+  }, 500);
+}
+
 function overrideInsertRule() {
   if (!(CSSStyleSheet && CSSStyleSheet.prototype.insertRule)) {
     return;
@@ -41,6 +57,8 @@ function overrideInsertRule() {
     style.sheet.insertRule('@keyframes _ {}');
   } catch (err) {
     shouldPrefixKeyframes = true;
+
+    trackInsertRuleOverrides();
   }
 
   document.body.removeChild(style);
