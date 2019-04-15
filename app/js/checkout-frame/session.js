@@ -545,21 +545,40 @@ function showOverlay($with) {
   $('#overlay').toggleClass('sub', $('#body').hasClass('sub'));
 }
 
+function overlayInUse() {
+  return $$('.overlay.' + shownClass).length;
+}
+
+/**
+ * Hides #overlay only if:
+ * Some other element with .overlay is not visible
+ */
+function hideOverlaySafely($with) {
+  if ($with) {
+    makeHidden($with[0]);
+  }
+  var overlay = $('#overlay');
+  if (overlay[0]) {
+    // Remove shown class to start transition.
+    overlay.removeClass(shownClass);
+    setTimeout(function () {
+      if (overlayInUse()) {
+        // Don't hide overlay
+        // Undo adding shown class
+        overlay.addClass(shownClass);
+      } else {
+        // Hide overlay
+        overlay.hide();
+      }
+    }, 200);
+  }
+}
+
 function hideOverlay($with) {
   makeHidden('#overlay');
   if ($with) {
     makeHidden($with[0]);
   }
-}
-
-/**
- * Hides all elements with .overlay or #overlay
- */
-function hideAllOverlay() {
-  makeHidden('#overlay');
-  each($$('.overlay'), function(i, el) {
-    makeHidden(el);
-  });
 }
 
 function hideEmi() {
@@ -579,7 +598,7 @@ function hideOverlayMessage() {
     ) {
       makeHidden(gel('error-message'));
     } else {
-      hideAllOverlay();
+      hideOverlay($('#error-message'));
     }
   }
 }
@@ -4682,7 +4701,7 @@ Session.prototype = {
 
         // When user clicks "Continue" in Fee Breakup View
         this.feeBearerView.on('continue', function(bearer) {
-          hideOverlay($('#fee-wrap'));
+          hideOverlaySafely($('#fee-wrap'));
 
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
