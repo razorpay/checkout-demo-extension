@@ -53,6 +53,7 @@
       onError(response) {
         const { session } = this.get();
         session.showLoadError(response.error.description, response.error);
+        this.fire('error', response.error.description);
       },
 
       fetchFees(paymentData, session) {

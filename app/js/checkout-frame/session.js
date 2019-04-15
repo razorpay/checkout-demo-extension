@@ -4712,6 +4712,10 @@ Session.prototype = {
 
           session.submit();
         });
+
+        this.feeBearerView.on('error', function () {
+          makeHidden('#fee-wrap');
+        })
       }
 
       showOverlay($('#fee-wrap'));
