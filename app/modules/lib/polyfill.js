@@ -1,6 +1,6 @@
 import { internetExplorer } from 'common/useragent';
 
-/* global DOMTokenList */
+/* global DOMTokenList, CSSStyleSheet */
 
 /**
  * Because classList.toggle is broken in IE10 and IE11.
@@ -18,3 +18,45 @@ if (internetExplorer && DOMTokenList) {
     );
   };
 }
+
+/**
+ * Wrap CSSStyleSheet.insertRule execution within try-catch
+ * since it throws an error on `@keyframes` insertion on browser
+ * versions that require a prefixed `@keyframes` declaration.
+
+ * Svelte uses `@keyframes` insertion.
+ * https://github.com/sveltejs/svelte/issues/2358
+ */
+function overrideInsertRule() {
+  if (!(CSSStyleSheet && CSSStyleSheet.prototype.insertRule)) {
+    return;
+  }
+
+  const style = document.createElement('style');
+  let shouldPrefixKeyframes = false;
+
+  document.body.appendChild(style);
+
+  try {
+    style.sheet.insertRule('@keyframes _ {}');
+  } catch (err) {
+    shouldPrefixKeyframes = true;
+  }
+
+  document.body.removeChild(style);
+
+  if (!shouldPrefixKeyframes) {
+    return;
+  }
+
+  const originalInsertRule = CSSStyleSheet.prototype.insertRule;
+
+  CSSStyleSheet.prototype.insertRule = function(rule, index) {
+    if (rule.indexOf('@keyframes') === 0) {
+      rule = rule.replace('@keyframes', '@-webkit-keyframes');
+    }
+
+    originalInsertRule.call(this, rule, index);
+  };
+}
+overrideInsertRule();
