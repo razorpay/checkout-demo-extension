@@ -196,9 +196,11 @@
         session.set('personalization', true);
       }
 
+      const hasOffersOnHomescreen = session.hasOffers && _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+
       if (
         !session.get('personalization') ||
-        session.hasOffers ||
+        hasOffersOnHomescreen ||
         session.oneMethod ||
         getStore('optional').contact ||
         getStore('isPartialPayment') ||
