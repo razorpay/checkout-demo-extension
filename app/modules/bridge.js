@@ -330,12 +330,13 @@ function closeModal() {
  */
 function isP13nListOpen(session) {
   try {
-    const {
-      showOtherMethods,
-      instrumentsData,
-    } = session.methodsList.view.get();
+    const { instrumentsData } = session.methodsList.view.get();
 
-    return showOtherMethods && instrumentsData.length;
+    const {
+      visible: otherMethodsVisible,
+    } = session.methodsList.otherMethodsView.get();
+
+    return otherMethodsVisible && instrumentsData.length;
   } catch (e) {}
 
   return false;
@@ -348,7 +349,7 @@ function isP13nListOpen(session) {
  */
 function hideP13nList(session) {
   try {
-    session.methodsList.view.fire('hideMethods');
+    session.methodsList.otherMethodsView.fire('hideMethods');
   } catch (e) {}
 }
 
