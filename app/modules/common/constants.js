@@ -102,3 +102,6 @@ export const AVAILABLE_METHODS = [
   'cardless_emi',
   'qr',
 ];
+
+/* VPA regex, copied from API */
+export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-zA-Z]+$/;

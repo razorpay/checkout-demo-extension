@@ -1144,7 +1144,7 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(this.order && this.order.bank)) {
+    if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
     }
 
@@ -1414,6 +1414,10 @@ Session.prototype = {
     // Look for new UPI apps.
     if (this.all_upi_intents_data) {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
+    }
+
+    if (this.upi_intents_data) {
+      discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
     }
 
     Analytics.track('complete', {
@@ -2531,14 +2535,6 @@ Session.prototype = {
       });
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
-      });
-
-      this.on('click', '#upi-directpay', function() {
-        $('#vpa').focus();
-      });
-
-      this.on('click', '#vpa', function() {
-        $('#upi-directpay label')[0].dispatchEvent(new MouseEvent('click'));
       });
     }
 

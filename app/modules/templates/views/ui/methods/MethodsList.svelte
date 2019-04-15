@@ -103,6 +103,10 @@
     margin-right: 4px;
   }
 
+  .method-icon :global(svg) {
+    height: 16px;
+  }
+
   .showcase-method {
     font-size: 14px;
     margin: 0 8px;
@@ -196,9 +200,11 @@
         session.set('personalization', true);
       }
 
+      const hasOffersOnHomescreen = session.hasOffers && _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+
       if (
         !session.get('personalization') ||
-        session.hasOffers ||
+        hasOffersOnHomescreen ||
         session.oneMethod ||
         getStore('optional').contact ||
         getStore('isPartialPayment') ||

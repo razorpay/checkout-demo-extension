@@ -57,7 +57,11 @@ const DESCRIPTIONS = {
 
     if (cardlessEmiProviders && _.isNonNullObject(cardlessEmiProviders)) {
       _Obj.loop(cardlessEmiProviders, (_, code) => {
-        providers.push(getCardlessEmiProvider(code).name);
+        const cardlessEmiProviderObj = getCardlessEmiProvider(code);
+
+        if (cardlessEmiProviderObj) {
+          providers.push(cardlessEmiProviderObj.name);
+        }
       });
     }
 

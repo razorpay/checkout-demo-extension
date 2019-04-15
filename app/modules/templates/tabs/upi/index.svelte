@@ -26,7 +26,7 @@
       <div class="legend left" style="margin-top: 18px">
         Enter your UPI ID
       </div>
-      <Card selected={true} on:click="focusVpa(event)">
+      <Card selected={true} on:click="handleCardClick(event)">
         {#if selectedApp === 'gpay'}
           <div id="upi-tez">
             <div class="elem-wrap collect-form">
@@ -50,6 +50,8 @@
                   required
                   class="input"
                   name="tez_bank"
+                  ref:googlePayPspHandle
+                  on:change="googlePayPspHandleChange(event)"
                   bind:value="pspHandle">
                   <option value="">Select Bank</option>
                   <option value="okhdfcbank">okhdfcbank</option>
@@ -184,6 +186,7 @@
   import * as Tez from 'tez.js';
   import * as Bridge from 'bridge.js';
   import Store from 'checkoutframe/store';
+  import { VPA_REGEX } from 'common/constants.js';
 
   const otherAppsIcon =
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
@@ -305,7 +308,7 @@
         /* Use Tez */
         () => this.set({ useWebPaymentsApi: true }),
         /* Don't use Tez */
-        () =>this.set({ useWebPaymentsApi: false })
+        () => this.set({ useWebPaymentsApi: false })
       );
 
       /* TODO: improve handling of `prefill.vpa` */
@@ -327,11 +330,12 @@
     onstate({ changed, current }) {
       const session = getSession();
 
-      if (changed.selectedApp && session.tab === 'upi') {
+      if (
+        changed.selectedApp &&
+        (session.tab === 'upi' || session.tab === 'tez')
+      ) {
         /* TODO: bad practice, remove asap */
-        if (
-          current.selectedApp === undefined || current.isTezSelected
-        ) {
+        if (current.selectedApp === undefined || current.isTezSelected) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
           _El.addClass(_Doc.querySelector('#body'), 'sub');
@@ -368,8 +372,14 @@
                 '_[flow]': 'tez',
               };
             } else {
+              let vpaToSubmit = vpa;
+
+              if (!VPA_REGEX.test(vpa)) {
+                vpaToSubmit = `${vpa}@${pspHandle}`;
+              }
+
               data = {
-                vpa: `${vpa}@${pspHandle}`,
+                vpa: vpaToSubmit,
               };
             }
           } else {
@@ -445,6 +455,29 @@
         if (!this.get()['focused'] && this.refs.vpaField) {
           this.refs.vpaField.focus();
         }
+      },
+
+      /**
+       * Called when the UPI address card is clicked.
+       */
+      handleCardClick: function(event) {
+        const target = event && event.target;
+        const { googlePayPspHandle } = this.refs;
+
+        // Don't focus on VPA input if the dropdown elem was clicked.
+        if (target === googlePayPspHandle) {
+          return;
+        }
+
+        this.focusVpa(event);
+      },
+
+      /**
+       * Called when the Google Pay PSP is selected from the dropdown.
+       */
+      googlePayPspHandleChange(event) {
+        // TODO: Focus only if vpa is invalid.
+        this.focusVpa(event);
       },
     },
   };
