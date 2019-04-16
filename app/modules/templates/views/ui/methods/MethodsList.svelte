@@ -1,16 +1,14 @@
-{#if loading}
-  <div ref:loader class="pad" transition:fade>
-    <div class="small legend">
-      <div class="loading-icon"></div>Loading payment methods for you...
+{#if instrumentsData.length}
+  <div class="methods-loader" in:loader>
+    <div class="loading-icon">
     </div>
-    <Loader />
+    Loading your preferred methods
   </div>
-{:elseif !disableP13n && instrumentsData.length}
-  <div ref:preferred class="options" transition:fade>
-    <div class="legend">Select a payment method</div>
+  <div class="options" in:fade="{delay: 1500}" out:fade>
     {#each instrumentsData as instrument, index}
       {#if instrument.nextOption}
-        <NextOption data={{method: instrument.method}}
+        <NextOption
+          data={{method: instrument.method}}
           on:select="methodSelected(event, index)"
           icon={instrument.icon}
         >
@@ -41,128 +39,100 @@
         </RadioOption>
       {/if}
     {/each}
-    <NextOption
-      on:select='fire("showMethods")'
+    <NextOption on:select='fire("showMethods")'
       type='other-methods up-arrow'
       icon={session.themeMeta.icons['othermethods']}
     >
       <span class="option-title">Other Methods</span>
       <span style="display: inline-block;
-          font-size: 12px; color: #757575; margin-left: 2px">
+        font-size: 12px; color: #757575; margin-left: 2px">
         | Cards, Wallets, UPI etc.
       </span>
     </NextOption>
   </div>
-{:elseif showMessage}
-  <div transition:fade>
-    <div class="small legend" style="text-transform: none"><i>&#x2139; </i> Enter Phone number to pay using</div>
-    <div class="pad">
-    {#each showcaseMethods as method}
-      {#if method === 'and'}
-        and
-      {:elseif method === 'more'}
-        <span style="margin-left: -4px"> and more</span>
-      {:else}
-        <div class="showcase-method">
-          <div class="method-icon">{@html session.themeMeta.icons[method]}</div>
-          {session.tab_titles[method]}
-        </div>
-      {/if}
-    {/each}
-    </div>
-  </div>
-{:else}
-  <!-- TODO: create separate list methods (used in partial payments
-         and optional contacts) in future -->
-  <div ref:grid transition:fade>
+{/if}
+
+{#if showOtherMethods}
+  <div transition:otherMethods class="othermethods">
     <div class="legend">Select a payment method</div>
-    <GridMethods session={session} avail_methods={AVAILABLE_METHODS} />
+    <div class="options">
+      {#if instrumentsData && instrumentsData.length && false}
+        <!-- Hide this for now -->
+        <NextOption on:select='fire("hideMethods")'
+          type='down-arrow'
+          arrowText='Show'
+          icon={"&#xe714;"}
+        >
+          <span style="color:#858585">
+            My Preferred Methods ({instrumentsData.length})
+          </span>
+        </NextOption>
+      {/if}
+      <NextOption on:select='fire("hideMethods")'
+        type='dark down-arrow'
+        arrowText='Hide'
+        icon={session.themeMeta.icons['othermethods']}
+      >
+        Other Methods
+      </NextOption>
+      {#each AVAILABLE_METHODS as method}
+        <NextOption
+          data={{method}} on:select='fire("methodSelected", event)'
+          icon={session.themeMeta.icons[method]}
+        >
+          {session.tab_titles[method]}
+        </NextOption>
+      {/each}
+    </div>
   </div>
 {/if}
 
 <style>
-  .loading-icon {
-    width: 12px;
-    height: 12px;
-    position: absolute;
-    left: -20px;
-    top: 13px;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMiAxMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI0IC0zNDgpIiBmaWxsPSIjMDcyNjU0Ij4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOCAzMzEpIj4KPHBhdGggZD0ibTI1Ljc3NiAxOC42MjQgMS41NjgtMS41Njh2NC42ODhoLTQuNjg4bDIuMTYtMi4xNmMtMC4zNzMzNC0wLjM3MzM0LTAuODAyNjYtMC42NjQtMS4yODgtMC44NzJzLTAuOTk0NjYtMC4zMTItMS41MjgtMC4zMTJjLTAuNzI1MzQgMC0xLjM5NDcgMC4xNzg2Ni0yLjAwOCAwLjUzNnMtMS4wOTg3IDAuODQyNjYtMS40NTYgMS40NTYtMC41MzYgMS4yODI3LTAuNTM2IDIuMDA4IDAuMTc4NjYgMS4zOTQ3IDAuNTM2IDIuMDA4IDAuODQyNjYgMS4wOTg3IDEuNDU2IDEuNDU2IDEuMjgyNyAwLjUzNiAyLjAwOCAwLjUzNmMwLjg2NCAwIDEuNjQyNy0wLjI0NTMzIDIuMzM2LTAuNzM2czEuMTczMy0xLjEzMDcgMS40NC0xLjkyaDEuMzc2Yy0wLjE5MiAwLjc2OC0wLjUzODY2IDEuNDUzMy0xLjA0IDIuMDU2cy0xLjA5ODcgMS4wNzQ3LTEuNzkyIDEuNDE2Yy0wLjcyNTM0IDAuMzUyLTEuNDk4NyAwLjUyOC0yLjMyIDAuNTI4LTAuOTYgMC0xLjg1Ni0wLjI0NTMzLTIuNjg4LTAuNzM2LTAuOC0wLjQ2OTM0LTEuNDM0Ny0xLjEwOTMtMS45MDQtMS45Mi0wLjQ4LTAuODIxMzQtMC43Mi0xLjcxNzMtMC43Mi0yLjY4OHMwLjI0LTEuODY2NyAwLjcyLTIuNjg4YzAuNDY5MzQtMC44MTA2NyAxLjEwNC0xLjQ1MDcgMS45MDQtMS45MiAwLjgzMi0wLjQ5MDY3IDEuNzI4LTAuNzM2IDIuNjg4LTAuNzM2IDAuNzI1MzQgMCAxLjQxMzMgMC4xMzg2NyAyLjA2NCAwLjQxNnMxLjIyMTMgMC42NjEzMyAxLjcxMiAxLjE1MnoiLz4KPC9nPgo8L2c+CjwvZz4KPC9zdmc+Cg==');
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-
-  .method-icon, .showcase-method, .and-more {
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 20px;
-  }
-
-  .method-icon {
-    width: 20px;
-    margin-right: 4px;
-  }
-
-  .method-icon :global(svg) {
-    height: 16px;
-  }
-
-  .showcase-method {
+  .methods-loader {
+    height: 44px;
+    line-height: 44px;
+    border: 1px solid #E6E7E8;
+    box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);;
+    background-color: #F7F7F7;
+    color: #858585;
     font-size: 14px;
-    margin: 0 8px;
-    position: relative;
+    padding-left: 48px;
+    right: 12px;
+    left: 12px;
+    top: 0;
+    position: absolute;
+    transform: translateY(-44px);
+    opacity: 0;
+    pointer-events: none;
 
-    &::before {
-      content: '';
-      width: 4px;
-      height: 4px;
-      border-radius: 3px;
-      background: #d8d8d8;
+    .loading-icon {
+      width: 12px;
+      height: 12px;
       position: absolute;
-      top: 8px;
-      left: -10px;
+      left: 20px;
+      top: 17px;
+      animation: 1s rotate infinite linear;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMiAxMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI0IC0zNDgpIiBmaWxsPSIjMDcyNjU0Ij4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOCAzMzEpIj4KPHBhdGggZD0ibTI1Ljc3NiAxOC42MjQgMS41NjgtMS41Njh2NC42ODhoLTQuNjg4bDIuMTYtMi4xNmMtMC4zNzMzNC0wLjM3MzM0LTAuODAyNjYtMC42NjQtMS4yODgtMC44NzJzLTAuOTk0NjYtMC4zMTItMS41MjgtMC4zMTJjLTAuNzI1MzQgMC0xLjM5NDcgMC4xNzg2Ni0yLjAwOCAwLjUzNnMtMS4wOTg3IDAuODQyNjYtMS40NTYgMS40NTYtMC41MzYgMS4yODI3LTAuNTM2IDIuMDA4IDAuMTc4NjYgMS4zOTQ3IDAuNTM2IDIuMDA4IDAuODQyNjYgMS4wOTg3IDEuNDU2IDEuNDU2IDEuMjgyNyAwLjUzNiAyLjAwOCAwLjUzNmMwLjg2NCAwIDEuNjQyNy0wLjI0NTMzIDIuMzM2LTAuNzM2czEuMTczMy0xLjEzMDcgMS40NC0xLjkyaDEuMzc2Yy0wLjE5MiAwLjc2OC0wLjUzODY2IDEuNDUzMy0xLjA0IDIuMDU2cy0xLjA5ODcgMS4wNzQ3LTEuNzkyIDEuNDE2Yy0wLjcyNTM0IDAuMzUyLTEuNDk4NyAwLjUyOC0yLjMyIDAuNTI4LTAuOTYgMC0xLjg1Ni0wLjI0NTMzLTIuNjg4LTAuNzM2LTAuOC0wLjQ2OTM0LTEuNDM0Ny0xLjEwOTMtMS45MDQtMS45Mi0wLjQ4LTAuODIxMzQtMC43Mi0xLjcxNzMtMC43Mi0yLjY4OHMwLjI0LTEuODY2NyAwLjcyLTIuNjg4YzAuNDY5MzQtMC44MTA2NyAxLjEwNC0xLjQ1MDcgMS45MDQtMS45MiAwLjgzMi0wLjQ5MDY3IDEuNzI4LTAuNzM2IDIuNjg4LTAuNzM2IDAuNzI1MzQgMCAxLjQxMzMgMC4xMzg2NyAyLjA2NCAwLjQxNnMxLjIyMTMgMC42NjEzMyAxLjcxMiAxLjE1MnoiLz4KPC9nPgo8L2c+CjwvZz4KPC9zdmc+Cg==');
+      background-repeat: no-repeat;
+      background-size: contain;
     }
   }
 
-  .showcase-method, .and-more {
-    &:first-child {
-      margin-left: 0;
-      &::before {
-        display: none;
-      }
-    }
-
-    &:last-child {
-      margin-right: 0;
-      &::before {
-        display: none;
-      }
-    }
-  }
-
-  .legend.small {
-    font-size: 14px
-    color: #474747;
-    opacity: 1;
-    text-transform: none;
-  }
-
-  ref:preferred,
-  ref:grid,
-  ref:loader {
+  .othermethods {
     position: absolute;
     top: 0;
-    right: 0;
     left: 0;
-  }
-
-  ref:preferred .legend {
-    margin: 9px 12px !important;
+    right: 0;
+    bottom: 0;
+    z-index: 9;
+    background: #ffffff;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 0 0 12px 0;
   }
 </style>
 
 <script>
-  /* globals getStore, shouldEnableP13n */
   import { getSession } from 'sessionmanager';
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
@@ -186,77 +156,42 @@
     components: {
       RadioOption: 'templates/views/ui/options/RadioOption.svelte',
       NextOption: 'templates/views/ui/options/NextOption.svelte',
-      GridMethods: 'templates/views/ui/methods/GridMethods.svelte',
-      Loader: 'templates/views/ui/methods/Loader.svelte',
-    },
-
-    oncreate() {
-      const session = getSession();
-
-      if ((shouldEnableP13n(session.get('key')) ||
-        session.get('flashcheckout')) &&
-        session.get().personalization !== false
-      ) {
-        session.set('personalization', true);
-      }
-
-      const hasOffersOnHomescreen = session.hasOffers && _Arr.any(session.eligibleOffers, offer => offer.homescreen);
-
-      if (
-        !session.get('personalization') ||
-        hasOffersOnHomescreen ||
-        session.oneMethod ||
-        getStore('optional').contact ||
-        getStore('isPartialPayment') ||
-        session.tpvBank ||
-        session.upiTpv ||
-        session.multiTpv
-      ) {
-        /* disableP13n is both, the template prop and the class prop */
-        this.disableP13n = true;
-        session.p13n = false;
-      } else {
-        session.p13n = true;
-      }
-    },
-
-    ondestroy() {
-      global.clearTimeout(this.loaderTimeout);
-      this.loaderTimeout = null;
-    },
-
-    onstate({ changed, current }) {
-      const contact = current.customer.contact || '';
-
-      const timing = x => 0.9991521 + 69093410000 * Math.exp(-3.069087 * x);
-
-      if (this.disableP13n) {
-        return this.set({
-          loading: false,
-          showMessage: false,
-          disableP13n: true,
-        });
-      }
-
-      if (changed.customer) {
-        if (this.loaderTimeout) {
-          global.clearTimeout(this.loaderTimeout);
-          this.loaderTimeout = null;
-        }
-
-        if (contact.length >= 8) {
-          this.set({ loading: current.animate, showMessage: false });
-
-          this.loaderTimeout = global.setTimeout(() => {
-            this.set({ loading: false });
-          }, timing(contact.length) * 1000);
-        } else if (contact.length < 8) {
-          this.set({ showMessage: true, loading: false });
-        }
-      }
     },
 
     transitions: {
+      loader: (node, { delay = 0, duration = 1700 }) => {
+        const o = +global.getComputedStyle(node).opacity;
+        const ANIM_DURATION = 200;
+        const FINAL_VALUE = -44;
+
+        const timing = t => {
+          let val = FINAL_VALUE;
+          if (t * duration <= ANIM_DURATION) {
+            val = (FINAL_VALUE * t * duration) / ANIM_DURATION;
+          } else if (t * duration >= duration - ANIM_DURATION) {
+            val =
+              FINAL_VALUE *
+              (1 - (t * duration - (duration - ANIM_DURATION)) / ANIM_DURATION);
+          }
+
+          return val;
+        };
+
+        if (!this.get().animate) {
+          return {
+            delay: 0,
+            duration: 0,
+            css: t => `opacity: 0; transform: translateY(${FINAL_VALUE}px);`,
+          }
+        }
+
+        return {
+          delay,
+          duration,
+          css: t => `opacity: 1; transform: translateY(${timing(t)}px);`,
+        };
+      },
+
       fade: (node, { delay = 0, duration = 200 }) => {
         const o = +global.getComputedStyle(node).opacity;
 
@@ -265,13 +200,40 @@
             delay: 0,
             duration: 0,
             css: t => `opacity: 1`,
-          };
+          }
         }
 
         return {
           delay,
           duration,
-          css: t => `opacity: ${t * o};`,
+          css: t => `opacity: ${t * o}`,
+        };
+      },
+
+      otherMethods: (node, { delay = 0, duration = 200 }) => {
+        const o = +global.getComputedStyle(node).opacity;
+        const circIn = t => {
+          return 1.0 - Math.sqrt(1.0 - t * t);
+        };
+
+        const opacity = t => {
+          let x = t * 3 * o;
+
+          if (x > 1) {
+            x = 1;
+          }
+
+          return x;
+        };
+
+        return {
+          delay,
+          duration,
+          css: t => {
+            t = circIn(t);
+            return `opacity: ${opacity(t)}; top: ${240 *
+              (1 - t)}px; overflow: hidden; position: absolute`;
+          },
         };
       },
     },
@@ -327,10 +289,7 @@
             case 'card':
               if (customer) {
                 var cards = (customer.tokens || {}).items || [];
-                var tokenObj = _Arr.find(
-                  cards,
-                  x => x.id === instrument.token_id
-                );
+                var tokenObj = _Arr.find(cards, x => x.id === instrument.token_id);
 
                 if (!tokenObj && !instrument.issuer) {
                   /* If we know nothing about the card and user logged out */
@@ -387,27 +346,6 @@
 
         return instruments;
       },
-
-      showcaseMethods: ({ AVAILABLE_METHODS }) => {
-        let methods;
-
-        let length = _.lengthOf(AVAILABLE_METHODS);
-        let hasMore = length > 3;
-
-        methods = _Arr.slice(
-          AVAILABLE_METHODS,
-          0,
-          hasMore ? 3 : _.lengthOf(AVAILABLE_METHODS) - 1
-        );
-
-        if (hasMore) {
-          methods.push('more');
-        } else {
-          methods.push('and', AVAILABLE_METHODS[length - 1]);
-        }
-
-        return methods;
-      },
     },
 
     data: () => {
@@ -417,21 +355,18 @@
         session: null,
         customer: {},
         showOtherMethods: false,
-        animate: false,
-        loading: false,
-        showMessage: true,
-        disableP13n: false,
+        animate: false
       };
     },
     methods: {
-      trackMethodSelection: function(data = {}) {
+      trackMethodSelection: function (data = {}) {
         Analytics.track('p13:method:select', {
           type: AnalyticsTypes.BEHAV,
           data,
         });
       },
 
-      methodSelected: function(e, index) {
+      methodSelected: function (e, index) {
         this.trackMethodSelection({
           data: e.data,
           index,
@@ -443,7 +378,7 @@
       select: function(e, index) {
         this.trackMethodSelection({
           data: e.data,
-          index,
+          index
         });
 
         this.set({ selected: e.data.id });

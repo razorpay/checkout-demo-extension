@@ -1,6 +1,5 @@
 <Option
   {data}
-  {attributes}
   type="next-option {type}"
 
   on:select="select(event)"
@@ -27,7 +26,6 @@
         icon: null,
         data: {},
         type: '',
-        attributes: {},
       };
     },
 
