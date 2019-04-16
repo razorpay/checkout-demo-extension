@@ -1,18 +1,10 @@
 import MethodsListView from 'templates/views/ui/methods/MethodsList.svelte';
+import OtherMethodsView from 'templates/views/ui/methods/OtherMethods.svelte';
 import { doesAppExist } from 'common/upi';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
-
-const AVAILABLE_METHODS = [
-  'card',
-  'netbanking',
-  'wallet',
-  'upi',
-  'emi',
-  'cardless_emi',
-  'qr',
-];
+import { AVAILABLE_METHODS } from 'common/constants';
 
 /**
  * Get the available methods.
@@ -30,13 +22,14 @@ const getAvailableMethods = methods => {
 
   /**
    * Cardless EMI and EMI are the same payment option.
+   * When we click EMI, it should take to Cardless EMI if
+   * cardless_emi is an available method.
    */
-  if (_Arr.contains(AVAIL_METHODS, 'cardless_emi')) {
-    if (_Arr.contains(AVAIL_METHODS, 'emi')) {
-      AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'cardless_emi');
-    } else {
-      AVAIL_METHODS[_Arr.indexOf(AVAIL_METHODS, 'cardless_emi')] = 'emi';
-    }
+  if (
+    _Arr.contains(AVAIL_METHODS, 'cardless_emi') &&
+    _Arr.contains(AVAIL_METHODS, 'emi')
+  ) {
+    AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'emi');
   }
 
   return AVAIL_METHODS;
@@ -44,11 +37,22 @@ const getAvailableMethods = methods => {
 
 export default class MethodsList {
   constructor({ target, data }) {
+    const session = data.session;
     data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
 
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
       data,
+    });
+
+    this.otherMethodsView = new OtherMethodsView({
+      target: _Doc.querySelector('#other-methods'),
+      data,
+    });
+
+    /* This is to set default screen in the view */
+    this.view.set({
+      showMessage: session.p13n,
     });
 
     this.animateNext = data.animate;
@@ -74,8 +78,8 @@ export default class MethodsList {
     });
 
     this.view.on('showMethods', e => {
-      this.view.set({
-        showOtherMethods: true,
+      this.otherMethodsView.set({
+        visible: true,
       });
 
       Analytics.track('p13n:methods:show', {
@@ -83,12 +87,11 @@ export default class MethodsList {
       });
 
       _Doc.querySelector('#body') |> _El.removeClass('sub');
-      _Doc.querySelector('#methods-list') |> _El.setStyle('position', 'static');
     });
 
-    this.view.on('hideMethods', e => {
-      this.view.set({
-        showOtherMethods: false,
+    this.otherMethodsView.on('hideMethods', e => {
+      this.otherMethodsView.set({
+        visible: false,
       });
 
       Analytics.track('p13n:methods:hide', {
@@ -98,26 +101,16 @@ export default class MethodsList {
       if (this.view.get().selected) {
         _Doc.querySelector('#body') |> _El.addClass('sub');
       }
-
-      setTimeout(
-        _ =>
-          _Doc.querySelector('#methods-list') |> _El.setAttribute('style', ''),
-        200
-      );
     });
 
-    this.view.on('methodSelected', e => {
+    const onMethodSelected = e => {
       let { method } = e.data;
 
-      /**
-       * Replace the method if replaceable.
-       */
-      if (method === 'emi' && this.data.session.methods.cardless_emi) {
-        method = 'cardless_emi';
-      }
-
       this.data.session.switchTab(method);
-    });
+    };
+
+    this.view.on('methodSelected', onMethodSelected);
+    this.otherMethodsView.on('methodSelected', onMethodSelected);
   }
 
   destroy() {
@@ -177,36 +170,6 @@ export default class MethodsList {
     }
 
     this.view.set(data);
-
-    /* handles the race condition */
-    if (this.animationTimeout) {
-      global.clearTimeout(this.animationTimeout);
-    }
-
-    if (data.instruments && data.instruments.length) {
-      Analytics.track('p13n:instruments:set', {
-        count: data.instruments.length,
-      });
-      this.animationTimeout = global.setTimeout(() => {
-        _Doc.querySelector('#payment-options') |> _El.addClass('hidden');
-
-        if (!this.hasLongClass) {
-          _Doc.querySelector('#container') |> _El.addClass('long');
-        }
-
-        if (this.view.get().selected) {
-          _Doc.querySelector('#body') |> _El.addClass('sub');
-        }
-      }, delay);
-    } else if (session.tab) {
-      return;
-    } else {
-      _Doc.querySelector('#payment-options') |> _El.removeClass('hidden');
-      _Doc.querySelector('#body') |> _El.removeClass('sub');
-
-      if (!this.hasLongClass) {
-        _Doc.querySelector('#container') |> _El.removeClass('long');
-      }
-    }
+    this.otherMethodsView.set(data);
   }
 }
