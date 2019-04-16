@@ -2936,7 +2936,7 @@ Session.prototype = {
     }
 
     var contactEl = gel('contact');
-    if (contactEl && !contactEl.readOnly) {
+    if (contactEl) {
       delegator.contact = delegator
         .add('phone', contactEl)
         .on('change', function() {
