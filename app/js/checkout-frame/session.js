@@ -1816,8 +1816,7 @@ Session.prototype = {
           return;
         }
 
-        // Maybe we should remove this condition.
-        // TODO: Check with Aagosh.
+        // TODO: Remove this condition if event is not being fired.
         if (!response.saved) {
           var errorDesc =
             'Could not find a ' +
