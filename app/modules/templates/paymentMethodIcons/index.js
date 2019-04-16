@@ -14,7 +14,6 @@ const availPaymentMethods = [
   'wallet',
   'othermethods',
   'qr',
-  'cardless_emi',
 ];
 
 function getIconFn(iconName) {
@@ -23,7 +22,6 @@ function getIconFn(iconName) {
       return card;
 
     case 'emi':
-    case 'cardless_emi':
       return emi;
 
     case 'netbanking':
