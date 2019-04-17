@@ -23,7 +23,7 @@ import Razorpay, {
 } from 'common/Razorpay';
 import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
-
+import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
 
@@ -559,15 +559,34 @@ Razorpay.setFormatter = FormatDelegator;
 var razorpayProto = Razorpay.prototype;
 
 /**
+ * Method to check if a payment adapter is present.
+ * @param {String} adapter
+ * @param {Object} data
+ *
+ * @return {Promise}
+ */
+razorpayProto.checkPaymentAdapter = function(adapter, data) {
+  return checkPaymentAdapter(adapter, data).then(_ => {
+    if (!this.paymentAdapters) {
+      this.paymentAdapters = {};
+    }
+
+    this.paymentAdapters[adapter] = true;
+
+    return Promise.resolve(_);
+  });
+};
+
+/**
+ * [LEGACY]
  * Method to check if Tez is installed on Device
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
 razorpayProto.isTezAvailable = function(success, error) {
-  GPay.check(() => {
-    this.tezPossible = true;
-    success();
-  }, error);
+  this.checkPaymentAdapter('gpay')
+    .then(success)
+    .catch(error);
 };
 
 razorpayProto.postInit = function() {
