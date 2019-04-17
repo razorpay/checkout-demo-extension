@@ -378,6 +378,8 @@
           }
         }
 
+        data.method = 'upi';
+
         return data;
       },
 
