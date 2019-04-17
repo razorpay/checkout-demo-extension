@@ -590,8 +590,17 @@ function hideEmi() {
   return wasShown;
 }
 
+function hideFeeWrap() {
+  var feeWrap = $('#fee-wrap');
+  var wasShown = feeWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(feeWrap);
+  }
+  return wasShown;
+}
+
 function hideOverlayMessage() {
-  if (!hideEmi()) {
+  if (!hideEmi() && !hideFeeWrap()) {
     if (
       $('#confirmation-dialog').hasClass('animate') ||
       gel('options-wrap').children.length
