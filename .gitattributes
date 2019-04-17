@@ -1,1 +1,2 @@
 /test/tape.js binary
+*.svelte linguist-language=html
