@@ -24,7 +24,7 @@ import Razorpay, {
 import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 
-import * as Tez from 'tez';
+import * as GPay from 'gpay';
 import Analytics from 'analytics';
 
 const isRazorpayFrame = _Str.startsWith(
@@ -559,12 +559,12 @@ Razorpay.setFormatter = FormatDelegator;
 var razorpayProto = Razorpay.prototype;
 
 /**
- * Method to check if an Tez is installed on Device
+ * Method to check if Tez is installed on Device
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
 razorpayProto.isTezAvailable = function(success, error) {
-  Tez.check(() => {
+  GPay.check(() => {
     this.tezPossible = true;
     success();
   }, error);

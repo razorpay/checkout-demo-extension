@@ -57,7 +57,7 @@ export const TAB_TITLES = {
   netbanking: 'Netbanking',
   qr: 'QR',
   upi: 'UPI',
-  tez: 'Google Pay',
+  gpay: 'Google Pay',
   wallet: 'Wallet',
 };
 

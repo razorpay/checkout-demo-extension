@@ -1,4 +1,4 @@
-import * as Tez from 'tez';
+import * as GPay from 'gpay';
 import * as strings from 'common/strings';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
@@ -152,7 +152,7 @@ var responseTypes = {
   },
 
   tez: function(coprotoRequest, fullResponse) {
-    Tez.pay(
+    GPay.pay(
       fullResponse.data,
       instrument => {
         Track(this.r, 'tez_pay_response', {
@@ -173,12 +173,12 @@ var responseTypes = {
 
           // Since the method is not supported, remove it.
           if (error.code === error.NOT_SUPPORTED_ERR) {
-            const tezRadio = _Doc.querySelector('#upi-tez');
+            const gpayRadio = _Doc.querySelector('#upi-gpay');
             const directPayRadio = _Doc.querySelector('#radio-directpay');
 
-            if (tezRadio) {
-              _El.setStyle(tezRadio, 'display', 'none');
-              tezRadio.checked = false;
+            if (gpayRadio) {
+              _El.setStyle(gpayRadio, 'display', 'none');
+              gpayRadio.checked = false;
             }
 
             if (directPayRadio) {

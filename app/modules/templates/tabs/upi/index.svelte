@@ -6,7 +6,7 @@
       {showRecommendedUPIApp}
     />
   {:else}
-    {#if selectedApp === undefined || isTezSelected}
+    {#if selectedApp === undefined || isGPaySelected}
       <div class="legend left">Select a UPI app</div>
       <Grid items={topUpiApps}
         on:select="onUpiAppSelection(event)"
@@ -28,7 +28,7 @@
       </div>
       <Card selected={true} on:click="handleCardClick(event)">
         {#if selectedApp === 'gpay'}
-          <div id="upi-tez">
+          <div id="upi-gpay">
             <div class="elem-wrap collect-form">
               <!-- TODO: remove all non svelte css for this -->
               <Field
@@ -49,7 +49,7 @@
                 <select
                   required
                   class="input"
-                  name="tez_bank"
+                  name="gpay_bank"
                   ref:googlePayPspHandle
                   on:change="googlePayPspHandleChange(event)"
                   bind:value="pspHandle">
@@ -146,7 +146,7 @@
     z-index: 1;
   }
 
-  #upi-tez {
+  #upi-gpay {
     display: block;
   }
 
@@ -174,7 +174,7 @@
 
 <script>
   import { getSession } from 'sessionmanager.js';
-  import * as Tez from 'tez.js';
+  import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
   import { VPA_REGEX } from 'common/constants.js';
 
@@ -220,7 +220,7 @@
     },
   ];
 
-  const checkTez = function(
+  const checkGPay = function(
     successCallback = () => {},
     errorCallback = () => {}
   ) {
@@ -242,7 +242,7 @@
     }
 
     /* disable it if it's not enabled for a specific merchant */
-    if (!(hasFeature || Tez.checkKey(session.get('key')))) {
+    if (!(hasFeature || GPay.checkKey(session.get('key')))) {
       return errorCallback();
     }
 
@@ -284,18 +284,18 @@
         return intentApps && _.lengthOf(intentApps) > 0;
       },
 
-      /* Will be true if Tez for web payments API is selected */
-      isTezSelected: ({ selectedApp, useWebPaymentsApi }) =>
+      /* Will be true if Google Pay for web payments API is selected */
+      isGPaySelected: ({ selectedApp, useWebPaymentsApi }) =>
         selectedApp === 'gpay' && useWebPaymentsApi,
     },
 
     oncreate() {
       const session = getSession();
 
-      checkTez(
-        /* Use Tez */
+      checkGPay(
+        /* Use Google Pay */
         () => this.set({ useWebPaymentsApi: true }),
-        /* Don't use Tez */
+        /* Don't use Google Pay */
         () => this.set({ useWebPaymentsApi: false })
       );
 
@@ -313,10 +313,10 @@
 
       if (
         changed.selectedApp &&
-        (session.tab === 'upi' || session.tab === 'tez')
+        (session.tab === 'upi' || session.tab === 'gpay')
       ) {
         /* TODO: bad practice, remove asap */
-        if (current.selectedApp === undefined || current.isTezSelected) {
+        if (current.selectedApp === undefined || current.isGPaySelected) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
           _El.addClass(_Doc.querySelector('#body'), 'sub');
@@ -334,7 +334,7 @@
           selectedApp,
           intent,
           pspHandle,
-          isTezSelected
+          isGPaySelected
         } = this.get();
 
         let vpa = '';
@@ -348,7 +348,7 @@
           data = this.refs.intentView.getPayload();
         } else {
           if (selectedApp) {
-            if (isTezSelected) {
+            if (isGPaySelected) {
               data = {
                 '_[flow]': 'tez',
               };
@@ -386,11 +386,11 @@
         const {
           intent,
           selectedApp,
-          isTezSelected,
+          isGPaySelected,
         } = this.get();
 
         if (!intent) {
-          if (isTezSelected) {
+          if (isGPaySelected) {
             this.set({ selectedApp: undefined });
             return false;
           }
@@ -411,9 +411,9 @@
         let pattern = '';
 
         this.set({ selectedApp: id });
-        const { selectedAppData, isTezSelected } = this.get();
+        const { selectedAppData, isGPaySelected } = this.get();
 
-        if (isTezSelected) {
+        if (isGPaySelected) {
           return session.preSubmit();
         }
 

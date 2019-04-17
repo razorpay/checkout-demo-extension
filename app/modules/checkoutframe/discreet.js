@@ -5,7 +5,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
-import * as Tez from 'tez';
+import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
@@ -59,7 +59,7 @@ export default {
   AnalyticsTypes,
   UPIUtils,
   setShieldParams,
-  Tez,
+  GPay,
   Color,
   _PaymentMethodIcons,
   Confirm,
