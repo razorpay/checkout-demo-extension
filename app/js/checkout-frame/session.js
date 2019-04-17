@@ -2983,7 +2983,7 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isGpayScreen = false;
+    var isGPayScreen = false;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3001,9 +3001,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    if (screen === 'gpay' && this.separateGpay) {
+    if (screen === 'gpay' && this.separateGPay) {
       screen = 'upi';
-      isGpayScreen = true;
+      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3089,7 +3089,7 @@ Session.prototype = {
       }
     }
 
-    if (isGpayScreen) {
+    if (isGPayScreen) {
       this.upiTab.set({ selectedApp: 'gpay' });
       this.upiTab.onUpiAppSelection('gpay');
     }
@@ -5604,7 +5604,7 @@ Session.prototype = {
         methods.qr = true;
       }
 
-      if (this.separateGpay) {
+      if (this.separateGPay) {
         methods.count++;
         methods.gpay = true;
       }
@@ -5841,7 +5841,7 @@ Session.prototype = {
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
       this.irctc = true;
-      this.separateGpay = true;
+      this.separateGPay = true;
     }
 
     /* set payment methods on the basis of preferences */
