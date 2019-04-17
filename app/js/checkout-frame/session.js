@@ -561,7 +561,7 @@ function hideOverlaySafely($with) {
   if (overlay[0]) {
     // Remove shown class to start transition.
     overlay.removeClass(shownClass);
-    setTimeout(function () {
+    setTimeout(function() {
       if (overlayInUse()) {
         // Don't hide overlay
         // Undo adding shown class
@@ -3146,9 +3146,17 @@ Session.prototype = {
       }
     }
 
-    if (isTezScreen) {
-      this.upiTab.set({ selectedApp: 'gpay' });
-      this.upiTab.onUpiAppSelection('gpay');
+    if (this.upiTab) {
+      if (isTezScreen) {
+        this.upiTab.set({ selectedApp: 'gpay' });
+        this.upiTab.onUpiAppSelection('gpay');
+      }
+
+      /**
+       * TODO: when more tabs are ported to Svelte, move current `tab` state to
+       *       Store
+       */
+      this.upiTab.set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);
@@ -4713,9 +4721,9 @@ Session.prototype = {
           session.submit();
         });
 
-        this.feeBearerView.on('error', function () {
+        this.feeBearerView.on('error', function() {
           makeHidden('#fee-wrap');
-        })
+        });
       }
 
       showOverlay($('#fee-wrap'));
