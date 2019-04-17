@@ -174,7 +174,7 @@ export default function Payment(data, params = {}, r) {
   }
 
   this.fees = params.fees;
-  this.gpay = params.gpay || params.tez;
+  this.gpay = params.gpay || params.tez; // params.tez is legacy
 
   var avoidPopup = false;
 
