@@ -350,7 +350,7 @@
           if (selectedApp) {
             if (isGPaySelected) {
               data = {
-                '_[flow]': 'tez',
+                '_[flow]': 'gpay',
               };
             } else {
               let vpaToSubmit = vpa;

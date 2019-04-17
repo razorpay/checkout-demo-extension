@@ -151,11 +151,11 @@ var responseTypes = {
     this.emit('upi.pending', fullResponse.data);
   },
 
-  tez: function(coprotoRequest, fullResponse) {
+  gpay: function(coprotoRequest, fullResponse) {
     GPay.pay(
       fullResponse.data,
       instrument => {
-        Track(this.r, 'tez_pay_response', {
+        Track(this.r, 'gpay_pay_response', {
           instrument,
         });
 
@@ -187,7 +187,7 @@ var responseTypes = {
           }
         }
 
-        Track(this.r, 'tez_error', error);
+        Track(this.r, 'gpay_error', error);
       }
     );
   },
@@ -235,8 +235,8 @@ var responseTypes = {
         CheckoutBridge.callNativeIntent(intent_url);
       }
     } else if (androidBrowser) {
-      if (this.tez) {
-        return responseTypes['tez'].call(this, request, fullResponse);
+      if (this.gpay) {
+        return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
   },

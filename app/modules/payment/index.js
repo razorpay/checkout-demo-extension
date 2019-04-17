@@ -174,20 +174,20 @@ export default function Payment(data, params = {}, r) {
   }
 
   this.fees = params.fees;
-  this.tez = params.tez;
+  this.gpay = params.gpay || params.tez;
 
   var avoidPopup = false;
 
   /**
    * Avoid Popup if:
-   * - Payment is made by Payment Request API (`params.tez` here)
+   * - Payment is made by Payment Request API (`params.gpay` or `params.tez` here)
    * - UPI QR or UPI is chosen inside checkout form
    * - PowerWallet is chosen & contact details are provided inside checkout form
    *
    * Enforce Popup if:
    * - Merchant is on customer fee bearer model
    */
-  if (params.tez) {
+  if (this.gpay) {
     avoidPopup = true;
   } else if (isRazorpayFrame) {
     /**

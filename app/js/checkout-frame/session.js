@@ -5033,8 +5033,8 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (data['_[flow]'] === 'tez') {
-      request.tez = true;
+    if (data['_[flow]'] === 'gpay') {
+      request.gpay = true;
       data['_[flow]'] = 'intent';
     }
 

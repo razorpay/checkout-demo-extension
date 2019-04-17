@@ -84,11 +84,11 @@ export const formatPayment = function(payment) {
     data['_[source]'] = 'checkoutjs';
   }
 
-  if (payment.tez) {
-    if (!payment.r.tezPossible) {
+  if (payment.tez || payment.gpay) {
+    if (!(payment.r.paymentAdapters && payment.r.paymentAdapters.gpay)) {
       return payment.r.emit(
         'payment.error',
-        _.rzpError('Tez is not available')
+        _.rzpError('GPay is not available')
       );
     }
     data['_[flow]'] = 'intent';
