@@ -1646,6 +1646,10 @@ Session.prototype = {
       each(this.methods.cardless_emi, function(provider) {
         var providerObj = discreet.CardlessEmi.getProvider(provider);
 
+        if (!providerObj) {
+          return;
+        }
+
         providers.push(
           discreet.CardlessEmi.createProvider(provider, providerObj.name)
         );
