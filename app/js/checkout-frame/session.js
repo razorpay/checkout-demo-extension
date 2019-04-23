@@ -1457,6 +1457,10 @@ Session.prototype = {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
     }
 
+    if (this.upi_intents_data) {
+      discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
@@ -1672,6 +1676,10 @@ Session.prototype = {
 
       each(this.methods.cardless_emi, function(provider) {
         var providerObj = discreet.CardlessEmi.getProvider(provider);
+
+        if (!providerObj) {
+          return;
+        }
 
         providers.push(
           discreet.CardlessEmi.createProvider(provider, providerObj.name)

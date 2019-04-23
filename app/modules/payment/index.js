@@ -34,6 +34,8 @@ const isRazorpayFrame = _Str.startsWith(
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
+let createdPaymentsCount = 0;
+
 function clearPollingInterval(force) {
   if (force || pollingInterval) {
     cookie.unset('onComplete');
@@ -122,6 +124,7 @@ function trackNewPayment(data, params, r) {
     data: {
       data: getTrackingData(data),
       params: params,
+      count: createdPaymentsCount,
     },
     r,
     immediately: true,
@@ -129,6 +132,8 @@ function trackNewPayment(data, params, r) {
 }
 
 export default function Payment(data, params = {}, r) {
+  createdPaymentsCount++;
+
   this.iframe = params.iframe;
   this.nativeotp = params.nativeotp;
 
