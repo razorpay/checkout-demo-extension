@@ -1,6 +1,6 @@
 import { internetExplorer } from 'common/useragent';
 
-/* global DOMTokenList */
+/* global DOMTokenList, Element, CharacterData, DocumentType */
 
 /**
  * Because classList.toggle is broken in IE10 and IE11.
@@ -18,3 +18,28 @@ if (internetExplorer && DOMTokenList) {
     );
   };
 }
+
+/**
+ * Element.remove polyfill
+ */
+(function() {
+  _Arr.loop(
+    [Element.prototype, CharacterData.prototype, DocumentType.prototype],
+    item => {
+      if (item.hasOwnProperty('remove')) {
+        return;
+      }
+
+      Object.defineProperty(item, 'remove', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: function remove() {
+          if (this.parentNode) {
+            this.parentNode.removeChild(this);
+          }
+        },
+      });
+    }
+  );
+})();
