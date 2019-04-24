@@ -566,14 +566,14 @@ var razorpayProto = Razorpay.prototype;
  * @return {Promise}
  */
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
-  return checkPaymentAdapter(adapter, data).then(_ => {
+  return checkPaymentAdapter(adapter, data).then(success => {
     if (!this.paymentAdapters) {
       this.paymentAdapters = {};
     }
 
     this.paymentAdapters[adapter] = true;
 
-    return Promise.resolve(_);
+    return Promise.resolve(success);
   });
 };
 
