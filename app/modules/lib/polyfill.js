@@ -2,7 +2,7 @@ import { internetExplorer } from 'common/useragent';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 
-/* global DOMTokenList, Element, CharacterData, DocumentType */
+/* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType */
 
 /**
  * Because classList.toggle is broken in IE10 and IE11.
