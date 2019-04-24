@@ -432,7 +432,7 @@
       },
 
       trackEducationClick: function() {
-        Analytics.track('p13:education:clicked', {
+        Analytics.track('p13:education:click', {
           type: AnalyticsTypes.BEHAV
         });
       },
