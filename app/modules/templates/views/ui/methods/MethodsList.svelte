@@ -54,7 +54,7 @@
     </NextOption>
   </div>
 {:elseif showMessage}
-  <div transition:fade>
+  <div transition:fade on:click="trackEducationClick()">
     <div class="small legend" style="text-transform: none"><i>&#x2139; </i> Enter Phone number to pay using</div>
     <div class="pad">
     {#each showcaseMethods as method}
@@ -428,6 +428,12 @@
         Analytics.track('p13:method:select', {
           type: AnalyticsTypes.BEHAV,
           data,
+        });
+      },
+
+      trackEducationClick: function() {
+        Analytics.track('p13:education:clicked', {
+          type: AnalyticsTypes.BEHAV
         });
       },
 
