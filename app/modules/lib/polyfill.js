@@ -2,7 +2,7 @@ import { internetExplorer } from 'common/useragent';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 
-/* global DOMTokenList, CSSStyleSheet */
+/* global DOMTokenList, Element, CharacterData, DocumentType */
 
 /**
  * Because classList.toggle is broken in IE10 and IE11.
@@ -80,3 +80,28 @@ function overrideInsertRule() {
   };
 }
 overrideInsertRule();
+
+/**
+ * Element.remove polyfill
+ */
+(function() {
+  _Arr.loop(
+    [Element.prototype, CharacterData.prototype, DocumentType.prototype],
+    item => {
+      if (item.hasOwnProperty('remove')) {
+        return;
+      }
+
+      Object.defineProperty(item, 'remove', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: function remove() {
+          if (this.parentNode) {
+            this.parentNode.removeChild(this);
+          }
+        },
+      });
+    }
+  );
+})();
