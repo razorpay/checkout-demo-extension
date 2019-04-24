@@ -584,13 +584,9 @@ razorpayProto.checkPaymentAdapter = function(adapter, data) {
  * @param {Function} errorCallback
  */
 razorpayProto.isTezAvailable = function(success, error) {
-  try {
-    this.checkPaymentAdapter('gpay')
-      .then(success)
-      .catch(error);
-  } catch (err) {
-    error();
-  }
+  this.checkPaymentAdapter('gpay')
+    .then(success)
+    .catch(error);
 };
 
 razorpayProto.postInit = function() {

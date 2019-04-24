@@ -220,10 +220,7 @@
     },
   ];
 
-  const checkGPay = function(
-    successCallback = () => {},
-    errorCallback = () => {}
-  ) {
+  const checkGPay = () => {
     var session = getSession();
 
     var hasFeature =
@@ -233,20 +230,20 @@
 
     /* disable Web payments API for fee_bearer for now */
     if (session.preferences.fee_bearer) {
-      return errorCallback();
+      return Promise.reject();
     }
 
     /* disable Web payments API for Android SDK as we have intent there */
     if (Bridge.checkout.exists()) {
-      return errorCallback();
+      return Promise.reject();
     }
 
     /* disable it if it's not enabled for a specific merchant */
     if (!(hasFeature || GPay.checkKey(session.get('key')))) {
-      return errorCallback();
+      return Promise.reject();
     }
 
-    session.r.isTezAvailable(successCallback, errorCallback);
+    return session.r.checkPaymentAdapter('gpay');
   };
 
   export default {
@@ -292,12 +289,12 @@
     oncreate() {
       const session = getSession();
 
-      checkGPay(
+      checkGPay()
         /* Use Google Pay */
-        () => this.set({ useWebPaymentsApi: true }),
+        .then(() => this.set({ useWebPaymentsApi: true }))
         /* Don't use Google Pay */
-        () => this.set({ useWebPaymentsApi: false })
-      );
+        .catch(() => this.set({ useWebPaymentsApi: false }));
+
 
       /* TODO: improve handling of `prefill.vpa` */
       if (session.get('prefill.vpa')) {
