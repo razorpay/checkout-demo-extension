@@ -55,13 +55,13 @@
   </div>
 {:elseif showMessage}
   <div transition:fade on:click="trackEducationClick()">
-    <div class="small legend" style="text-transform: none"><i>&#x2139; </i> Enter Phone number to pay using</div>
-    <div class="pad">
+    <div class="small legend" ref:promptTitle>Enter Phone number to pay using</div>
+    <div class="pad" style="line-height: 22px;">
     {#each showcaseMethods as method}
       {#if method === 'and'}
         and
       {:elseif method === 'more'}
-        <span style="margin-left: -4px"> and more</span>
+        <span style="margin-left: -8px"> and more</span>
       {:else}
         <div class="showcase-method">
           <div class="method-icon">{@html session.themeMeta.icons[method]}</div>
@@ -94,22 +94,22 @@
 
   .method-icon, .showcase-method, .and-more {
     display: inline-block;
-    vertical-align: middle;
     line-height: 20px;
   }
 
   .method-icon {
     width: 20px;
-    margin-right: 4px;
+    margin-right: 2px;
   }
 
   .method-icon :global(svg) {
     height: 16px;
+    margin-bottom: -2px;
   }
 
   .showcase-method {
     font-size: 14px;
-    margin: 0 8px;
+    margin: 0 12px;
     position: relative;
 
     &::before {
@@ -120,7 +120,7 @@
       background: #d8d8d8;
       position: absolute;
       top: 8px;
-      left: -10px;
+      left: -14px;
     }
   }
 
@@ -154,6 +154,12 @@
     top: 0;
     right: 0;
     left: 0;
+  }
+
+  ref:promptTitle {
+    text-transform: none;
+    color: #757575;
+    margin-bottom: 4px !important;
   }
 
   ref:preferred .legend {
