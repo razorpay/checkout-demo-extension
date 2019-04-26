@@ -216,7 +216,8 @@
         getStore('isPartialPayment') ||
         session.tpvBank ||
         session.upiTpv ||
-        session.multiTpv
+        session.multiTpv ||
+        session.local
       ) {
         /* disableP13n is both, the template prop and the class prop */
         this.disableP13n = true;
