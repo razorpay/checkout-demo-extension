@@ -2210,7 +2210,7 @@ Session.prototype = {
       var amountValue = partialEl.value;
       this.updateAmountInHeader(amountValue);
       var options = this.get();
-      options.amount = 100 * amountValue;
+      options.amount = parseInt((amountValue * 100).toFixed(2));
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
       this.setPaymentMethods(this.preferences);
