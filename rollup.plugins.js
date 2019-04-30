@@ -19,6 +19,8 @@ let injects = {
   _Obj: ['implicit/_Obj', '*'],
   _El: ['implicit/_El', '*'],
   _Doc: ['implicit/_Doc', '*'],
+
+  BUILD_NUMBER: process.env.BUILD_NUMBER,
 };
 
 fs.writeFileSync(

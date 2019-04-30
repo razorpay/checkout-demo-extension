@@ -217,6 +217,10 @@ export default function Track(r, event, data, immediately) {
       properties.local_order_id = _uid;
     }
 
+    if (BUILD_NUMBER) {
+      properties.BUILD_NUMBER = BUILD_NUMBER;
+    }
+
     pushToEventQ({
       event,
       properties,
