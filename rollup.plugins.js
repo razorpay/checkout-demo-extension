@@ -3,7 +3,6 @@ const include = require('rollup-plugin-includepaths');
 const { aliases } = require('./scripts/console-commands');
 const inject = require('rollup-plugin-inject');
 const svelte = require('rollup-plugin-svelte');
-const replace = require('rollup-plugin-replace');
 const stylus = require('stylus');
 const autoprefixer = require('autoprefixer-stylus');
 const fs = require('fs');
@@ -20,10 +19,6 @@ let injects = {
   _Obj: ['implicit/_Obj', '*'],
   _El: ['implicit/_El', '*'],
   _Doc: ['implicit/_Doc', '*'],
-};
-
-const toReplace = {
-  BUILD_NUMBER: process.env.BUILD_NUMBER,
 };
 
 fs.writeFileSync(
@@ -138,8 +133,6 @@ module.exports = [
       ],
     ],
   }),
-
-  replace(toReplace),
 
   inject(injects),
 
