@@ -562,6 +562,35 @@ function showOverlay($with) {
   $('#overlay').toggleClass('sub', $('#body').hasClass('sub'));
 }
 
+function overlayInUse() {
+  return $$('.overlay.' + shownClass).length;
+}
+
+/**
+ * Hides #overlay only if:
+ * Some other element with .overlay is not visible
+ */
+function hideOverlaySafely($with) {
+  if ($with) {
+    makeHidden($with[0]);
+  }
+  var overlay = $('#overlay');
+  if (overlay[0]) {
+    // Remove shown class to start transition.
+    overlay.removeClass(shownClass);
+    setTimeout(function() {
+      if (overlayInUse()) {
+        // Don't hide overlay
+        // Undo adding shown class
+        overlay.addClass(shownClass);
+      } else {
+        // Hide overlay
+        overlay.hide();
+      }
+    }, 200);
+  }
+}
+
 function hideOverlay($with) {
   makeHidden('#overlay');
   if ($with) {
@@ -578,8 +607,17 @@ function hideEmi() {
   return wasShown;
 }
 
+function hideFeeWrap() {
+  var feeWrap = $('#fee-wrap');
+  var wasShown = feeWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(feeWrap);
+  }
+  return wasShown;
+}
+
 function hideOverlayMessage() {
-  if (!hideEmi()) {
+  if (!hideEmi() && !hideFeeWrap()) {
     if (
       $('#confirmation-dialog').hasClass('animate') ||
       gel('options-wrap').children.length
@@ -1330,23 +1368,16 @@ Session.prototype = {
     }
 
     if (this.upi_intents_data) {
-      /* disable intent if fee_bearer */
+      /**
+       * We need to show "(Recommended)" string alongside the app name
+       * when there is only 1 preferred app, and 1 or more other apps.
+       */
+      var count = discreet.UPIUtils.getNumberOfAppsByCategory(
+        this.upi_intents_data
+      );
 
-      if (this.preferences.fee_bearer) {
-        delete this.upi_intents_data;
-        delete this.all_upi_intents_data;
-      } else {
-        /**
-         * We need to show "(Recommended)" string alongside the app name
-         * when there is only 1 preferred app, and 1 or more other apps.
-         */
-        var count = discreet.UPIUtils.getNumberOfAppsByCategory(
-          this.upi_intents_data
-        );
-
-        if (count.preferred === 1 && this.upi_intents_data.length > 1) {
-          this.showRecommendedUPIApp = true;
-        }
+      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+        this.showRecommendedUPIApp = true;
       }
     }
 
@@ -2213,7 +2244,7 @@ Session.prototype = {
       var amountValue = partialEl.value;
       this.updateAmountInHeader(amountValue);
       var options = this.get();
-      options.amount = 100 * amountValue;
+      options.amount = parseInt((amountValue * 100).toFixed(2));
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
       this.setPaymentMethods(this.preferences);
@@ -2974,7 +3005,7 @@ Session.prototype = {
     }
 
     var contactEl = gel('contact');
-    if (contactEl && !contactEl.readOnly) {
+    if (contactEl) {
       delegator.contact = delegator
         .add('phone', contactEl)
         .on('change', function() {
@@ -3127,9 +3158,17 @@ Session.prototype = {
       }
     }
 
-    if (isTezScreen) {
-      this.upiTab.set({ selectedApp: 'gpay' });
-      this.upiTab.onUpiAppSelection('gpay');
+    if (this.upiTab) {
+      if (isTezScreen) {
+        this.upiTab.set({ selectedApp: 'gpay' });
+        this.upiTab.onUpiAppSelection('gpay');
+      }
+
+      /**
+       * TODO: when more tabs are ported to Svelte, move current `tab` state to
+       *       Store
+       */
+      this.upiTab.set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);
@@ -3451,7 +3490,7 @@ Session.prototype = {
       tab = '';
     }
 
-    if (tab === 'wallet' && this.screen === 'otp') {
+    if (tab === 'wallet' && this.screen === 'otp' && this.r._payment) {
       if (!confirmClose()) {
         return;
       }
@@ -4649,6 +4688,71 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Show fees UI if `fee` is missing in payload and return whether the UI was
+   * shown or not.
+   *
+   * It will internally create an instance of `FeeBearerView` if not created
+   * and use the existing instance if already created.
+   *
+   * @return {Boolean} Whether or not the UI was shown
+   */
+  showFeesUi: function() {
+    var session = this;
+    var data = session.payload;
+    var isFeeMissing = !('fee' in data);
+
+    /**
+     * Check here if 'fee' is set in payload,
+     * If it is present then we have shown the fee breakup to the user,
+     * and we have accounted for additional fees,
+     * so no changes in payload are required.
+     * Otherwise, show the fee breakup.
+     */
+    if (isFeeMissing) {
+      var paymentData = clone(this.payload);
+
+      // Create fees route in API doesn't like this.
+      delete paymentData.upi_app;
+
+      if (this.feeBearerView) {
+        this.feeBearerView.fetchFees(paymentData, session);
+      } else {
+        this.feeBearerView = new discreet.FeeBearerView({
+          target: gel('fee-wrap'),
+          data: {
+            session: this,
+            paymentData: paymentData,
+          },
+        });
+
+        // When user clicks "Continue" in Fee Breakup View
+        this.feeBearerView.on('continue', function(bearer) {
+          hideOverlaySafely($('#fee-wrap'));
+
+          // Set the updated amount & fee
+          session.payload.amount = bearer.amount;
+          session.payload.fee = bearer.fee;
+
+          // Don't redirect to fees route now
+          session.feesRedirect = false;
+
+          session.submit();
+        });
+
+        this.feeBearerView.on('error', function() {
+          makeHidden('#fee-wrap');
+        });
+      }
+
+      showOverlay($('#fee-wrap'));
+
+      return true;
+    }
+
+    return false;
+  },
+
   onOtpSubmit: function() {
     if (this.checkInvalid('#form-otp')) {
       return;
@@ -4774,6 +4878,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    var session = this;
     var storeScreen = getStore('screen');
     if (storeScreen === 'amount') {
       return this.extraNext();
@@ -5016,8 +5121,9 @@ Session.prototype = {
 
     var data = this.payload;
     var that = this;
+    var session = this;
     var request = {
-      fees: preferences.fee_bearer,
+      feesRedirect: preferences.fee_bearer && !('fee' in data),
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
@@ -5189,9 +5295,13 @@ Session.prototype = {
       }
     }
 
+    if (preferences.fee_bearer && this.showFeesUi()) {
+      return;
+    }
+
     if (
       discreet.Wallet.isPowerWallet(wallet) &&
-      !request.fees &&
+      !request.feesRedirect &&
       data.contact &&
       data.email
     ) {

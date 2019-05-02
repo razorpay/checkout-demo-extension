@@ -1,6 +1,7 @@
 /* global CheckoutBridge */
 
 import Analytics from 'analytics';
+export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
 
 const UPI_APPS = {
   /**
@@ -17,7 +18,7 @@ const UPI_APPS = {
     },
     {
       app_name: 'Google Pay (Tez)',
-      package_name: 'com.google.android.apps.nbu.paisa.user',
+      package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
     },
   ],
