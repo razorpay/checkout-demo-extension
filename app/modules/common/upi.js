@@ -163,6 +163,9 @@ const UPI_APPS = {
       package_name: 'com.truecaller',
       verify_registration: true,
     },
+    {
+      package_name: 'in.amazon.mShop.android.shopping',
+    },
   ],
 
   /**
