@@ -380,16 +380,21 @@ function backPressed(callback) {
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
-    const overlay = _Doc.querySelector('#overlay');
     /**
-     * When the overlay is visible, there's some message
+     * When an overlay is visible, there's some message
      * that's being shown to the user in a pop up.
      *
-     * TODO: Use an overlay manager for this check when implmeneted.
+     * TODO: Use an overlay manager for this check when implemented.
      */
-    const isOverlayVisible = overlay && _El.hasClass(overlay, SHOWN_CLASS);
+    const overlays = [
+      _Doc.querySelector('#fee-wrap'),
+      _Doc.querySelector('#overlay'),
+    ];
+    const visibleOverlays = _Arr.filter(overlays, overlay => {
+      return overlay && _El.hasClass(overlay, SHOWN_CLASS);
+    });
 
-    if (isOverlayVisible) {
+    if (visibleOverlays.length) {
       session.hideErrorMessage();
     } else {
       session.back();
