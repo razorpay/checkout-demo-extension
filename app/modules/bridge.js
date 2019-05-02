@@ -413,10 +413,10 @@ function backPressed(callback) {
 window.backPressed = backPressed;
 
 /**
- * Adds a hash to the URL.
+ * Adds a dummy state to the page history.
  */
-function addDummyHash() {
-  window.history.pushState(null, null, '#_');
+function addDummyState() {
+  window.history.pushState({}, null, '');
 }
 
 function isModalVisible() {
@@ -440,10 +440,10 @@ function backHandlerForWeb() {
 
   /**
    * The modal may have closed.
-   * Check if it's open before adding a hash.
+   * Check if it's open before adding a history state.
    */
   if (isModalVisible()) {
-    addDummyHash();
+    addDummyState();
   }
 }
 
@@ -452,7 +452,7 @@ export function setHistoryAndListenForBackPresses() {
     return;
   }
 
-  addDummyHash();
+  addDummyState();
 
   window.addEventListener('popstate', backHandlerForWeb);
 }
