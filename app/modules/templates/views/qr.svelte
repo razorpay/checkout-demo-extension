@@ -1,37 +1,29 @@
 <div class="container">
-  {#if loading}
-    {loadingMessage}
-    <div class="loading">
-      <div class="spin"><div></div></div>
-      <div class="spin spin2"><div></div></div>
-    </div>
-  {:elseif error}
-    <div class="error">
-      {error}
-      <br />
-      <div class="btn" on:click="sessionBack()">Retry</div>
-    </div>
-  {:elseif feeBreakup}
-    Fees Breakup
-    <br/>
-    <div class="fees-container">
-    {#each feeBreakup as fee}
-      <div class="fee">
-        <div class="fee-title">{fee[0]}</div>
-        <div class="fee-amount">{fee[1]}</div>
-      </div>
-    {/each}
-    </div>
-    <div class="btn" on:click="createPayment()">Continue</div>
-  {:else}
-      <div class="message" style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
-      Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
-      </div>
-      {#if qrImage}
-        <div class="qr-image">
-          <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
+  {#if view === 'fee'}
+    <FeeBearer
+      {session}
+      {paymentData}
+      on:continue="createPaymentWithFees(event)"
+    />
+  {:elseif view === 'qr'}
+    {#if loading}
+      <AsyncLoading message="Generating QR Code..."/>
+    {:else}
+        <div class="message" style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
+        Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.
         </div>
-      {/if}
+        {#if qrImage}
+          <div class="qr-image">
+            <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
+          </div>
+        {/if}
+     {/if}
+  {:elseif view === 'error'}
+    <div class="error mchild">
+      <div class="error-text">{error}</div>
+      <br />
+      <div class="btn" on:click="init()">Retry</div>
+    </div>
   {/if}
 
   {#if down}
@@ -121,53 +113,52 @@ img {
   export default {
     components: {
       Callout: 'templates/views/ui/Callout.svelte',
+      AsyncLoading: 'templates/views/ui/AsyncLoading.svelte',
+      FeeBearer: 'templates/views/feebearer.svelte',
     },
 
     oncreate() {
-      const { session, paymentData } = this.get();
-
-      this.session = session;
-      paymentData.method = 'upi';
-      paymentData['_[flow]'] = 'intent';
-      paymentData['_[upiqr]'] = '1';
-
-      if (session.p13n) {
-        processInstrument(paymentData);
-      }
-
-      if (session.preferences.fee_bearer) {
-        this.set({ loading: true, loadingMessage: 'Please wait...' });
-
-        paymentData.amount = session.get('amount');
-        paymentData.currency = session.get('currency');
-
-        const displayFeeBreakup = _Func.bind(this.displayFeeBreakup, this);
-        const onError = _Func.bind(this.onError, this);
-
-        session.r.createFees(paymentData, displayFeeBreakup, onError);
-      } else {
-        this.createPayment();
-      }
-
-      const downtimes = Store.get().downtimes || {};
-      if (downtimes.qr && downtimes.qr.length) {
-        this.set({
-          down: true,
-        });
-      }
+      this.init();
     },
 
     data() {
       return {
         RazorpayConfig,
-        loading: true,
+        loading: false,
         qrImage: null,
         error: null,
+        view: 'qr',
         down: false,
-      };
+      }
     },
 
     methods: {
+      init() {
+        const { session, paymentData } = this.get();
+
+        this.session = session;
+        paymentData.method = 'upi';
+        paymentData['_[flow]'] = 'intent';
+        paymentData['_[upiqr]'] = '1';
+
+        if (session.p13n) {
+          processInstrument(paymentData);
+        }
+
+        if (session.preferences.fee_bearer) {
+          this.set({ view: 'fee', session, paymentData });
+        } else {
+          this.createPayment();
+        }
+
+        const downtimes = Store.get().downtimes || {};
+        if (downtimes.qr && downtimes.qr.length) {
+          this.set({
+            down: true,
+          });
+        }
+      },
+
       handleResponse({ data }) {
         const qrImage = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(
           data.qr_code_url || data.intent_url
@@ -181,19 +172,20 @@ img {
       },
 
       onError(data) {
-        this.set({ error: data.error.description, loading: false });
+        this.set({
+          view: 'error',
+          error: data.error.description,
+          loading: false
+        });
       },
 
-      displayFeeBreakup(response, feeBreakup) {
+      createPaymentWithFees(bearer) {
         const { paymentData } = this.get();
 
-        paymentData.amount = response.input.amount;
-        paymentData.fee = response.input.fee;
+        paymentData.amount = bearer.amount;
+        paymentData.fee = bearer.fee;
 
-        this.set({
-          feeBreakup,
-          loading: false,
-        });
+        this.createPayment();
       },
 
       sessionBack() {
@@ -206,9 +198,8 @@ img {
 
       createPayment() {
         this.set({
-          feeBreakup: false,
-          loading: true,
-          loadingMessage: 'Generating QR Code...',
+          view: 'qr',
+          loading: true
         });
 
         const { session, paymentData, onSuccess } = this.get();

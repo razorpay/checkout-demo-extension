@@ -33,15 +33,28 @@ export const setShieldParams = params => {
 };
 
 export const formatPayment = function(payment) {
-  var data = payment.data;
+  let params =
+    ['feesRedirect', 'tez', 'avoidPopup']
+    |> _Arr.reduce((allParams, param) => {
+      if (param in payment) {
+        allParams[param] = payment[param];
+      }
+      return allParams;
+    }, {});
+
+  payment.data = formatPayload(payment.data, payment.r, params);
+};
+
+export const formatPayload = function(payload, razorpayInstance, params = {}) {
+  var data = _Obj.clone(payload);
 
   // Set view for fees.
-  if (payment.fees) {
+  if (params.feesRedirect) {
     data.view = 'html';
   }
 
   // fill data from options if empty
-  var getOption = payment.r.get;
+  var getOption = razorpayInstance.get;
   _Arr.loop(
     [
       'amount',
@@ -80,13 +93,13 @@ export const formatPayment = function(payment) {
   }
 
   // api needs this flag to decide between redirect/otp
-  if (payment.avoidPopup && data.method === 'wallet') {
+  if (params.avoidPopup && data.method === 'wallet') {
     data['_[source]'] = 'checkoutjs';
   }
 
-  if (payment.tez) {
-    if (!payment.r.tezPossible) {
-      return payment.r.emit(
+  if (params.tez) {
+    if (!razorpayInstance.tezPossible) {
+      return razorpayInstance.emit(
         'payment.error',
         _.rzpError('Tez is not available')
       );
@@ -122,4 +135,6 @@ export const formatPayment = function(payment) {
   data._ = Track.common();
   // make it flat
   flattenProp(data, '_', '[]');
+
+  return data;
 };
