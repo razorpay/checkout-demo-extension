@@ -405,7 +405,9 @@ function backPressed(callback) {
     } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();
     } else {
-      closeModal();
+      if (session.get('theme.close_button')) {
+        closeModal();
+      }
     }
   }
 }
