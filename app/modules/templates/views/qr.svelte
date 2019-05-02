@@ -130,6 +130,10 @@ img {
         paymentData['_[flow]'] = 'intent';
         paymentData['_[upiqr]'] = '1';
 
+        if (session.p13n) {
+          processInstrument(paymentData);
+        }
+
         if (session.preferences.fee_bearer) {
           this.set({ view: 'fee', session, paymentData });
         } else {

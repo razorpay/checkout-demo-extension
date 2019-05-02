@@ -92,5 +92,16 @@ export const STRINGS = {
   redirect: 'Redirecting to Bank page',
 };
 
+/* Being used for filtering actual methods from methods object */
+export const AVAILABLE_METHODS = [
+  'card',
+  'netbanking',
+  'wallet',
+  'upi',
+  'emi',
+  'cardless_emi',
+  'qr',
+];
+
 /* VPA regex, copied from API */
 export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-zA-Z]+$/;

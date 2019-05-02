@@ -906,7 +906,7 @@ function debounceAskOTP(view, msg, shouldLimitResend) {
 
 // this === Session
 function successHandler(response) {
-  if (this.methodsList) {
+  if (this.p13n) {
     P13n.recordSuccess(this.customer || getCustomer(this.payload.contact));
   }
 
@@ -1069,16 +1069,6 @@ Session.prototype = {
       this.methods.wallet.sort(function(item1, item2) {
         return item1.code === amazonPay ? -1 : item2.code === amazonPay ? 1 : 0;
       });
-
-      var walletsLen = this.methods.wallet.length,
-        walletNames = this.methods.wallet.slice(0, 2).map(function(item) {
-          return item.name;
-        });
-
-      this.walletsDesc =
-        walletsLen <= 2
-          ? walletNames.join(' and ')
-          : walletNames.join(', ') + ' & More';
     }
 
     if (this.methods.emi) {
@@ -1378,6 +1368,7 @@ Session.prototype = {
 
     this.setTpvBanks();
     this.getEl();
+    this.setMethodsList();
     this.setFormatting();
     this.setSvelteComponents();
     this.fillData();
@@ -1386,7 +1377,6 @@ Session.prototype = {
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
-    this.setP13n();
     this.setEmiScreen();
     initIosQuirks();
 
@@ -1470,30 +1460,7 @@ Session.prototype = {
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
-  setP13n: function() {
-    if (
-      shouldEnableP13n(this.get('key')) &&
-      this.get().personalization !== false
-    ) {
-      this.set('personalization', true);
-    }
-
-    if (!this.get('personalization')) {
-      return;
-    }
-
-    if (
-      this.hasOffers ||
-      this.oneMethod ||
-      getStore('optional').contact ||
-      getStore('isPartialPayment') ||
-      this.tpvBank ||
-      this.upiTpv ||
-      this.multiTpv
-    ) {
-      return;
-    }
-
+  setMethodsList: function() {
     if (!this.methodsList) {
       this.methodsList = new discreet.MethodsList({
         target: '#methods-list',
@@ -3004,18 +2971,12 @@ Session.prototype = {
     }
 
     var contactEl = gel('contact');
-    if (contactEl && !contactEl.readOnly) {
+    if (contactEl) {
       delegator.contact = delegator
         .add('phone', contactEl)
         .on('change', function() {
           var instruments = [];
           self.input(this.el);
-
-          Analytics.removeMeta('p13n');
-
-          if (!self.methodsList) {
-            return;
-          }
 
           if (this.isValid()) {
             instruments = P13n.listInstruments(getCustomer(this.value)) || [];
@@ -3516,7 +3477,7 @@ Session.prototype = {
     // initial screen
     if (!this.tab) {
       if (this.checkInvalid('#pad-common')) {
-        if (this.methodsList) {
+        if (this.methodsList && this.p13n) {
           this.methodsList.hideOtherMethods();
         }
         return;
@@ -3595,7 +3556,7 @@ Session.prototype = {
       }
     }
 
-    if (!tab && this.methodsList) {
+    if (!tab && this.methodsList && this.p13n) {
       var selectedInstrument = this.methodsList.getSelectedInstrument();
       if (selectedInstrument) {
         $('#body').addClass('sub');
@@ -4890,7 +4851,7 @@ Session.prototype = {
     var tab = this.tab;
     var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
-    if (!this.tab && !this.order && !this.methodsList) {
+    if (!this.tab && !this.order && !this.p13n) {
       return;
     }
 
@@ -5070,7 +5031,7 @@ Session.prototype = {
       }
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
-    } else if (this.methodsList) {
+    } else if (this.p13n) {
       if (this.checkInvalid('#pad-common')) {
         return;
       }
@@ -5124,7 +5085,7 @@ Session.prototype = {
       optional: getStore('optional'),
     };
 
-    if (!this.screen && this.methodsList) {
+    if (!this.screen && this.methodsList && this.p13n) {
       var selectedInstrument = this.methodsList.getSelectedInstrument();
       this.doneByP13n = P13n.handleInstrument(data, selectedInstrument);
 
@@ -5318,7 +5279,7 @@ Session.prototype = {
       });
     }
 
-    if (this.methodsList) {
+    if (this.p13n) {
       P13n.processInstrument(data, this);
     }
 

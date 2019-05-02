@@ -18,7 +18,6 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
 var invoice = _.invoice;
-var walletsDesc = _.walletsDesc;
 
 var bank = _.tpvBank || {};
 var emi_options = _.emi_options;
@@ -295,112 +294,8 @@ var upi_apps = _.upi_intents_data;
                   </div>
                 `?`
                 <div`?_.tpvBank` class="showable"`?`>
-                  <div class="legend">Select a payment method</div>
                   <div id="methods-list"></div>
                   <div id="other-methods"></div>
-                  <div id="payment-options" class="grid clear count-`=method.count`">
-                    `?method.card`
-                      `?o('theme.debit_card')`
-                      <div class="payment-option item" tab="credit_card">
-                        <label>
-                          <i>`=icons.card`</i>
-                          `=_.tab_titles.credit_card`
-                        </label>
-                      </div>
-                      <div class="payment-option item" tab="debit_card">
-                        <label>
-                          <i>`=icons.card`</i>
-                          `=_.tab_titles.debit_card`
-                        </label>
-                      </div>
-                      `??`
-                      <div class="payment-option item" tab="card">
-                        <label>
-                          <i>`=icons.card`</i>
-                          `=_.tab_titles.card`
-                          <span class="desc">
-                            `?_.recurring_card_text`
-                              `=_.recurring_card_text`
-                            `??`
-                              Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?_.preferences.methods.amex`, Amex`?`
-                            `?`
-                          </span>
-                        </label>
-                      </div>
-                      `?`
-                    `?`
-                    `?method.netbanking`
-                    <div class="payment-option item" tab="netbanking">
-                      <label>
-                        <i>`=icons.netbanking`</i>
-                        `=_.tab_titles.netbanking`
-                        <span class="desc">All Indian banks</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.emandate`
-                    <div class="payment-option item" tab="emandate">
-                      <label>
-                        <i>`=icons.netbanking`</i>
-                        `=_.tab_titles.emandate`
-                        <span class="desc">Pay with Netbanking</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?wallet.length`
-                    <div class="payment-option item" tab="wallet">
-                      <label>
-                        <i>`=icons.wallet`</i>
-                        `=_.tab_titles.wallet`
-                        <span class="desc">`=walletsDesc`</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.upi`
-                    <div class="payment-option item" tab="upi">
-                      <label>
-                        <i>`=icons.upi`</i>
-                        `=_.tab_titles.upi`
-                        <span class="desc">Instant payment using UPI App</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.tez`
-                    <div class="payment-option item" tab="tez">
-                      <label>
-                        <i class="tez-icon"></i>
-                        `=_.tab_titles.tez`
-                        <span class="desc">Instant payment using Google Pay App</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.emi || method.cardless_emi`
-                      <div class="payment-option item" tab="`?method.cardless_emi`cardless_emi`??`emi`?`">
-                        <label>
-                          <i>`=icons.emi`</i>
-                          `=_.tab_titles.emi`
-                          <span class="desc">
-                            `?method.cardless_emi && method.emi`
-                            Cards, ZestMoney, & More
-                            `??method.emi`
-                            EMI via Credit & Debit Cards
-                            `??method.cardless_emi`
-                            EMI via ZestMoney & More
-                            `?`
-                          </span>
-                        </label>
-                      </div>
-                    `?`
-                    `?method.qr`
-                      <div class="payment-option item" tab="qr">
-                        <label>
-                          <i>`=icons.qr`</i>
-                          `=_.tab_titles.qr`
-                          <span class="desc">Pay by scanning QR Code</span>
-                        </label>
-                      </div>
-                    `?`
-                  </div>
                   <div class="clear"></div>
                 </div>
               </div>
