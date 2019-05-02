@@ -13,7 +13,7 @@ import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
 import Redir from 'payment/redir';
 import Iframe from 'payment/iframe';
-import { formatPayment } from 'payment/validator';
+import { formatPayment, formatPayload } from 'payment/validator';
 import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
 import Razorpay, {
@@ -147,7 +147,7 @@ export default function Payment(data, params = {}, r) {
     this.sdk_popup &&
     this.magic &&
     /^(card|emi)$/.test(data.method) &&
-    !params.fees;
+    !params.feesRedirect;
 
   this.magicPossible = this.isMagicPayment;
 
@@ -173,7 +173,7 @@ export default function Payment(data, params = {}, r) {
     delete data.upi_app;
   }
 
-  this.fees = params.fees;
+  this.feesRedirect = params.feesRedirect;
   this.gpay = params.gpay || params.tez; // params.tez is legacy
 
   var avoidPopup = false;
@@ -207,7 +207,7 @@ export default function Payment(data, params = {}, r) {
       }
 
       /* If fees is there, we need to show fee view in poupup */
-      if (params.fees) {
+      if (params.feesRedirect) {
         avoidPopup = false;
       }
 
@@ -282,7 +282,7 @@ Payment.prototype = {
 
       if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame)) {
         _Doc.redirect({
-          url: makeRedirectUrl(this.fees),
+          url: makeRedirectUrl(this.feesRedirect),
           content: data,
           method: 'post',
           target: getOption('target'),
@@ -413,7 +413,7 @@ Payment.prototype = {
   tryAjax: function() {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
-    if (this.fees) {
+    if (this.feesRedirect) {
       return;
     }
 
@@ -669,54 +669,21 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-razorpayProto.createFees = function(data, onSuccess, onError) {
+export function createFees(data, razorpayInstance, onSuccess, onError) {
+  data = formatPayload(data, razorpayInstance);
+
   fetch.post({
-    url: makeUrl('payments/create/fees'),
-    data: data,
-    headers: {
-      Authorization: 'Basic ' + btoa(this.get('key') + ':'),
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    url: makeUrl('payments/create/fees?key_id=' + razorpayInstance.get('key')),
+    data,
     callback: function(response) {
       if (response.error) {
-        onError(response);
+        return onError(response);
       } else {
-        const displayFees = response.display;
-        const array = [];
-        const fees = Object.keys(displayFees);
-
-        for (let i = 0; i < fees.length; i++) {
-          const fee = fees[i];
-          let title = '';
-          switch (fee) {
-            case 'originalAmount':
-              title = 'Amount';
-              break;
-            case 'razorpay_fee':
-              title = 'Gateway Charges';
-              break;
-            case 'tax':
-              title = 'GST on Gateway Charges';
-              break;
-          }
-          if (title) {
-            array.push([
-              title,
-              formatAmountWithSymbol(displayFees[fee] * 100, 'INR'),
-            ]);
-          }
-        }
-
-        array.push([
-          'Total Charges',
-          formatAmountWithSymbol(displayFees.amount * 100, 'INR'),
-        ]);
-
-        onSuccess(response, array);
+        return onSuccess(response);
       }
     },
   });
-};
+}
 
 /**
  * Cache store for flows.
