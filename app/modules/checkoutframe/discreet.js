@@ -116,4 +116,9 @@ export default {
 
   MagicView,
   UpiTab,
+
+  _Arr,
+  _Obj,
+  _Func,
+  _,
 };

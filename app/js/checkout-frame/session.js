@@ -22,7 +22,11 @@ var preferences = window.preferences,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
-  OptionsList = discreet.OptionsList;
+  OptionsList = discreet.OptionsList,
+  _Arr = discreet._Arr,
+  _Func = discreet._Func,
+  _ = discreet._,
+  _Obj = discreet._Obj;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
