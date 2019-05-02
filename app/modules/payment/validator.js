@@ -34,7 +34,7 @@ export const setShieldParams = params => {
 
 export const formatPayment = function(payment) {
   let params =
-    ['feesRedirect', 'tez', 'avoidPopup']
+    ['feesRedirect', 'tez', 'gpay', 'avoidPopup']
     |> _Arr.reduce((allParams, param) => {
       if (param in payment) {
         allParams[param] = payment[param];

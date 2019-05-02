@@ -327,12 +327,12 @@
       if (changed.tab) {
         /**
          * For separate Gpay tab, if it is intent app and app does not exist,
-         * fallback to older tez UI
+         * fallback to older GPay UI
          **/
         let { selectedApp, intent, tab, intentApps } = current;
 
         if (selectedApp === 'gpay') {
-          if (tab === 'tez') {
+          if (tab === 'gpay') {
             this.set({ preferIntent: doesAppExist(
               GOOGLE_PAY_PACKAGE_NAME,
               intentApps
