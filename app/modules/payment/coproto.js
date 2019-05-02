@@ -5,6 +5,7 @@ import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import { RazorpayConfig } from 'common/Razorpay';
 import Analytics from 'analytics';
+import { getSession } from 'sessionmanager';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -173,16 +174,13 @@ var responseTypes = {
 
           // Since the method is not supported, remove it.
           if (error.code === error.NOT_SUPPORTED_ERR) {
-            const gpayRadio = _Doc.querySelector('#upi-gpay');
-            const directPayRadio = _Doc.querySelector('#radio-directpay');
+            const session = getSession();
 
-            if (gpayRadio) {
-              _El.setStyle(gpayRadio, 'display', 'none');
-              gpayRadio.checked = false;
-            }
-
-            if (directPayRadio) {
-              directPayRadio.checked = true;
+            if (session && session.upiTab) {
+              session.upiTab.set({
+                useWebPaymentsApi: false,
+                selectedApp: 'gpay',
+              });
             }
           }
         }
