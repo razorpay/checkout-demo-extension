@@ -3,6 +3,7 @@
     <UpiIntent
       ref:intentView
       apps={intentApps}
+      {selectedApp}
       {showRecommendedUPIApp}
     />
   {:else}
@@ -177,6 +178,7 @@
   import * as Tez from 'tez.js';
   import * as Bridge from 'bridge.js';
   import { VPA_REGEX } from 'common/constants.js';
+  import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
 
   const otherAppsIcon =
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
@@ -262,10 +264,12 @@
     data() {
       return {
         vpa: '',
+        tab: 'upi',
         topUpiApps,
         otherAppsIcon,
         pspHandle: '',
         pattern: '.+',
+        preferIntent: true,
         selectedApp: undefined,
         useWebPaymentsApi: false,
       };
@@ -279,9 +283,9 @@
 
       showRecommendedUPIApp: data => getSession().showRecommendedUPIApp,
 
-      intent: data => {
+      intent: ({ preferIntent }) => {
         let intentApps = getSession().upi_intents_data;
-        return intentApps && _.lengthOf(intentApps) > 0;
+        return preferIntent && intentApps && _.lengthOf(intentApps) > 0;
       },
 
       /* Will be true if Tez for web payments API is selected */
@@ -296,7 +300,7 @@
         /* Use Tez */
         () => this.set({ useWebPaymentsApi: true }),
         /* Don't use Tez */
-        () =>this.set({ useWebPaymentsApi: false })
+        () => this.set({ useWebPaymentsApi: false })
       );
 
       /* TODO: improve handling of `prefill.vpa` */
@@ -311,16 +315,37 @@
     onstate({ changed, current }) {
       const session = getSession();
 
-      if (changed.selectedApp && session.tab === 'upi') {
+      if (
+        changed.selectedApp &&
+        (session.tab === 'upi' || session.tab === 'tez')
+      ) {
         /* TODO: bad practice, remove asap */
-        if (
-          current.selectedApp === undefined || current.isTezSelected
-        ) {
+        if (current.selectedApp === undefined || current.isTezSelected) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
           _El.addClass(_Doc.querySelector('#body'), 'sub');
         }
       }
+
+      if (changed.tab) {
+        /**
+         * For separate Gpay tab, if it is intent app and app does not exist,
+         * fallback to older tez UI
+         **/
+        let { selectedApp, intent, tab, intentApps } = current;
+
+        if (selectedApp === 'gpay') {
+          if (tab === 'tez') {
+            this.set({ preferIntent: doesAppExist(
+              GOOGLE_PAY_PACKAGE_NAME,
+              intentApps
+            )});
+          } else if (tab === 'upi') {
+            this.set({ preferIntent: true });
+          }
+        }
+      }
+
     },
 
     methods: {
@@ -377,6 +402,8 @@
             data['_[flow]'] = 'directpay';
           }
         }
+
+        data.method = 'upi';
 
         return data;
       },
@@ -440,11 +467,9 @@
       /**
        * Called when the UPI address card is clicked.
        */
-      handleCardClick: function (event) {
+      handleCardClick: function(event) {
         const target = event && event.target;
-        const {
-          googlePayPspHandle
-        } = this.refs;
+        const { googlePayPspHandle } = this.refs;
 
         // Don't focus on VPA input if the dropdown elem was clicked.
         if (target === googlePayPspHandle) {
@@ -457,7 +482,7 @@
       /**
        * Called when the Google Pay PSP is selected from the dropdown.
        */
-      googlePayPspHandleChange (event) {
+      googlePayPspHandleChange(event) {
         // TODO: Focus only if vpa is invalid.
         this.focusVpa(event);
       },

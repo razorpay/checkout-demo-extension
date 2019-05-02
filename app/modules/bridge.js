@@ -1,6 +1,6 @@
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
-import { UPI_POLL_URL } from 'common/constants';
+import { UPI_POLL_URL, SHOWN_CLASS } from 'common/constants';
 import * as Confirm from 'confirm';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import OtpScreenStore from 'checkoutstore/screens/otp';
@@ -311,7 +311,16 @@ window.backPressed = function(callback) {
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
-    session.back();
+    const overlays = [_Doc.querySelector('#fee-wrap')];
+    const visibleOverlays = _Arr.filter(overlays, overlay => {
+      return overlay && _El.hasClass(overlay, SHOWN_CLASS);
+    });
+
+    if (visibleOverlays.length) {
+      session.hideErrorMessage();
+    } else {
+      session.back();
+    }
   } else {
     if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();

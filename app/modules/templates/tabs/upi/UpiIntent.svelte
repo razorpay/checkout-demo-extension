@@ -159,6 +159,7 @@
 
 <script>
   import { getSession } from 'sessionmanager';
+  import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 
   export default {
     data() {
@@ -166,6 +167,15 @@
         selected: null,
         showAll: false,
       };
+    },
+
+    onstate({ changed, current }) {
+      /* selectedApp is passed by parent for preselecting app */
+      if (changed.selectedApp && current.selectedApp === 'gpay') {
+        this.onAppSelect({
+          data: { package_name: GOOGLE_PAY_PACKAGE_NAME }
+        });
+      }
     },
 
     computed: {
