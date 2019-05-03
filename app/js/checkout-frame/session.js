@@ -1726,22 +1726,38 @@ Session.prototype = {
   },
 
   getCardlessEmiPlans: function() {
-    var self = this;
+    var session = this;
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
 
     var plansList = [];
 
     each(plans, function(index, p) {
-      plansList.push({
+      var plan = {
         text:
           p.duration +
           ' Months @ ' +
-          self.formatAmountWithCurrency(p.amount_per_month) +
+          session.formatAmountWithCurrency(p.amount_per_month) +
           '/mo',
         value: p.duration,
-        detail: self.makeCardlessEmiDetailText(p.duration, p.amount_per_month),
-      });
+        detail: session.makeCardlessEmiDetailText(
+          p.duration,
+          p.amount_per_month
+        ),
+      };
+
+      // TODO: Make this better: move this to Svelte or some utils.
+      if (providerCode === 'flexmoney') {
+        plan.text =
+          p.duration +
+          ' Months (' +
+          session.formatAmountWithCurrency(p.amount_per_month) +
+          '/mo) @ ' +
+          p.interest +
+          '%';
+      }
+
+      plansList.push(plan);
     });
 
     return plansList;
