@@ -869,7 +869,7 @@ i {
     display: inline-block;
     vertical-align: middle;
     padding: 0;
-    max-height: 18px;
+    max-height: 14px;
     max-width: 30%;
 
     $image_gutter_half = 4px;
@@ -878,6 +878,10 @@ i {
       margin-left: $image_gutter_half;
       padding-left: $image_gutter_half;
       border-left: 1px solid $bc;
+    }
+
+    @media(max-width:420px) {
+      max-width: 25%;
     }
   }
 }
