@@ -20,6 +20,7 @@ const UPI_APPS = {
       app_name: 'Google Pay (Tez)',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      verify_registration: true,
     },
   ],
 
@@ -162,6 +163,9 @@ const UPI_APPS = {
     {
       package_name: 'com.truecaller',
       verify_registration: true,
+    },
+    {
+      package_name: 'in.amazon.mShop.android.shopping',
     },
   ],
 
