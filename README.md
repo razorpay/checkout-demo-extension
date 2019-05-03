@@ -30,32 +30,35 @@ Format: `key`, `merchant_id`
 | Contact optional         | `rzp_test_FWEjUCmU2aT5x6`, `C3f0WIVPfpzFQY` | `rzp_test_wWHBq3b8ESXpmB`, `C3f2I0QjbSUDjU` |
 
 # Whitelisting new IINs for EMI Banks
+
 **How to add new IINs in future?**
 
 1. Generate a list of existing IINs using existing regex in [bank.js](https://github.com/razorpay/checkout/blob/master/app/modules/common/bank.js#L37) (See step 10 for list generation)
-1. Append new IINs in that.
-1. Make a simple Regex using:
+2. Append new IINs in that.
+3. Make a simple Regex using:
 
-    ``
-      simpleRegex = '(' + out.join('|') + ')'
-    ``
-1. Go to `https://myregextester.com`
-1. Paste `simpleRegex` in match pattern & list of IINs in the "Source Text" field.
-1. Check these: 
+   `simpleRegex = '(' + out.join('|') + ')'`
 
-    ![image](https://user-images.githubusercontent.com/11299391/57135808-56e13f80-6dc8-11e9-87eb-b6778da27c02.png)
-1. Click Submit.
-1. You'll see optimized Regex in `Optimized Match Pattern:`
-    
-    ![image](https://user-images.githubusercontent.com/11299391/57135853-75dfd180-6dc8-11e9-86a9-b54bd8ca8b1b.png)
-1. Remove all `:?` (non-capturing symbols) from the regex.
-1. Generating/Verifying all IINs against a RegExp:
-    1.  Open console, set your new regex: 
-    
-        `r = /^(37(9(8(6[123789]|7[012678])|397)|693))/`
-    1. Set out: 
-    
-        `out = Array(1000000).fill(null).map((_, i) => String(i).padStart(6, '0')).filter(i => r.test(i));`
+4. Go to `https://myregextester.com`
+5. Paste `simpleRegex` in match pattern & list of IINs in the "Source Text" field.
+6. Check these:
+
+   ![image](https://user-images.githubusercontent.com/11299391/57135808-56e13f80-6dc8-11e9-87eb-b6778da27c02.png)
+
+7. Click Submit.
+8. You'll see optimized Regex in `Optimized Match Pattern:`
+
+   ![image](https://user-images.githubusercontent.com/11299391/57135853-75dfd180-6dc8-11e9-86a9-b54bd8ca8b1b.png)
+
+9. Remove all `:?` (non-capturing symbols) from the regex.
+10. Generating/Verifying all IINs against a RegExp:
+
+    1. Open console, set your new regex:
+
+       `r = /^(37(9(8(6[123789]|7[012678])|397)|693))/`
+
+    2. Set out:
+
+       `out = Array(1000000).fill(null).map((_, i) => String(i).padStart(6, '0')).filter(i => r.test(i));`
 
     You'll get an array of all IINs that match your new regex.
-
