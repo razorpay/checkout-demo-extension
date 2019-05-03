@@ -10,6 +10,8 @@ import Store from 'checkoutframe/store';
 import Track from 'tracker';
 import { confirmCancelMsg } from 'common/strings';
 
+import * as AnalyticsTypes from 'analytics-types';
+
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
   let CB = {
@@ -371,6 +373,10 @@ function backPressed(callback) {
   if (pollUrl) {
     session.hideErrorMessage();
   }
+
+  session.track('navigate:back', {
+    type: AnalyticsTypes.BEHAV,
+  });
 
   if (Confirm.isConfirmShown) {
     Confirm.hide(true);
