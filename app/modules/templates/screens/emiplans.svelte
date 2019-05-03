@@ -3,11 +3,9 @@
 
   <div class="emi-plans-list expandable-card-list">
     {#each plans as plan, index}
-      <ExpandableCard
-        badge={plan.badge}
-        detail={plan.detail}
+      <EmiPlanCard
+        plan={plan}
         expanded={index === expanded}
-        title={plan.text}
 
         on:click="expand(index)"
       />
@@ -44,7 +42,7 @@
 <script>
   export default {
     components: {
-      ExpandableCard: 'templates/views/ui/ExpandableCard.svelte',
+      EmiPlanCard: 'templates/tabs/emiplans/emiplancard.svelte'
     },
 
     computed: {
