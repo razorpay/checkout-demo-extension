@@ -98,6 +98,7 @@ export const AVAILABLE_METHODS = [
   'netbanking',
   'wallet',
   'upi',
+  'tez',
   'emi',
   'cardless_emi',
   'qr',
