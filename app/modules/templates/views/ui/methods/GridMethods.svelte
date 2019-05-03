@@ -4,8 +4,8 @@
       on:click="switchTab(method.method)">
       <label>
         <!-- TODO: use Icon component -->
-        {#if method.method === 'tez'}
-          <i class="tez-icon"> </i>
+        {#if method.method === 'gpay'}
+          <i class="gpay-icon"> </i>
         {:else}
           <i>{@html method.icon}</i>
         {/if}
