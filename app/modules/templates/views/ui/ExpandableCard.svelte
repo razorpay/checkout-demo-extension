@@ -6,12 +6,14 @@
   <div
     class="expandable-card-title"
   >
-    {@html title}
+    <slot name="title"></slot>
     {#if badge}
       <div class="badge">{badge}</div>
     {/if}
   </div>
-  <div class="expandable-card-detail">{@html detail}</div>
+  <div class="expandable-card-detail">
+    <slot name="detail"></slot>
+  </div>
 </div>
 
 <script>
