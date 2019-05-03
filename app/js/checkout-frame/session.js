@@ -2040,9 +2040,7 @@ Session.prototype = {
         return this.clearRequest();
       } else if (this.r._payment && this.r._payment.isMagicPayment) {
         return Confirm.show({
-          message:
-            'Your payment is ongoing. ' +
-            'Are you sure you want to cancel the payment?',
+          message: discreet.confirmCancelMsg,
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
@@ -3381,9 +3379,7 @@ Session.prototype = {
 
     var confirm = function() {
       Confirm.show({
-        message:
-          'Your payment is ongoing. ' +
-          'Are you sure you want to cancel the payment?',
+        message: discreet.confirmCancelMsg,
         heading: 'Cancel Payment?',
         positiveBtnTxt: 'Yes, cancel',
         negativeBtnTxt: 'No',
@@ -4574,6 +4570,7 @@ Session.prototype = {
       hideOverlayMessage();
       this.modal.hide();
       this.savedCardScreen = undefined;
+      discreet.Bridge.stopListeningForBackPresses();
     }
   },
 
@@ -5494,6 +5491,14 @@ Session.prototype = {
     }
   },
 
+  closeAndDismiss: function() {
+    this.saveAndClose();
+    Razorpay.sendMessage({
+      event: 'dismiss',
+      data: this.dismissReason,
+    });
+  },
+
   setEmiOptions: function() {
     var emiBanks = {};
     var preferences = this.preferences;
@@ -6051,6 +6056,9 @@ Session.prototype = {
 
       callback(preferences);
     });
+
+    /* Start listening for back presses */
+    discreet.Bridge.setHistoryAndListenForBackPresses();
 
     return this.prefCall;
   },
