@@ -3,7 +3,13 @@
     <div class="payment-option item" tab="{method.method}"
       on:click="switchTab(method.method)">
       <label>
-        <i>{@html method.icon}</i> {method.title}
+        <!-- TODO: use Icon component -->
+        {#if method.method === 'tez'}
+          <i class="tez-icon"> </i>
+        {:else}
+          <i>{@html method.icon}</i>
+        {/if}
+         {method.title}
         <span class="desc">{method.description}</span>
       </label>
     </div>
