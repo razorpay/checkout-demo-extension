@@ -6054,12 +6054,6 @@ Session.prototype = {
 
       var preferences = response;
 
-      preferences.subscription = {
-        amount: 1000,
-        currency: 'USD',
-        type: 1,
-      };
-
       self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
