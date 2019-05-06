@@ -5919,7 +5919,7 @@ Session.prototype = {
     var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
       item
     ) {
-      item && item.amount;
+      return item && item.amount;
     })[0];
 
     if (itemWithAmount) {
@@ -6048,6 +6048,12 @@ Session.prototype = {
       }
 
       var preferences = response;
+
+      preferences.subscription = {
+        amount: 1000,
+        currency: 'USD',
+        type: 1,
+      };
 
       self.setPreferences(preferences);
 
