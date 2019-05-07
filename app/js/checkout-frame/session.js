@@ -24,7 +24,11 @@ var preferences = window.preferences,
   Store = discreet.Store,
   PreferencesStore = discreet.PreferencesStore,
   SessionStore = discreet.SessionStore,
-  OptionsList = discreet.OptionsList;
+  OptionsList = discreet.OptionsList,
+  _Arr = discreet._Arr,
+  _Func = discreet._Func,
+  _ = discreet._,
+  _Obj = discreet._Obj;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -5919,20 +5923,28 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    if (order) {
-      if (order.amount) {
-        session_options.amount = order.partial_payment
-          ? order.amount_due
-          : order.amount;
-      }
+    // Get amount
+    var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
+      item
+    ) {
+      return item && item.amount;
+    })[0];
 
-      if (order.currency) {
-        session_options.currency = order.currency;
-      }
-    } else if (invoice && invoice.amount) {
-      session_options.amount = invoice.amount;
-    } else if (subscription && subscription.amount) {
-      session_options.amount = subscription.amount;
+    if (itemWithAmount) {
+      session_options.amount = itemWithAmount.partial_payment
+        ? itemWithAmount.amount_due
+        : itemWithAmount.amount;
+    }
+
+    // Get currency
+    var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
+      item
+    ) {
+      return item && item.currency;
+    })[0];
+
+    if (itemWithCurrency) {
+      session_options.currency = itemWithCurrency.currency;
     }
 
     /*
