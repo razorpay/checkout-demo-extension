@@ -12,13 +12,20 @@ Store.prototype = Object.create(SvelteStore.prototype);
  * Inspired by immer.
  *
  * @param {Function} fn
+ *
+ * @return {Boolean} Whether or not the store was set.
  */
 Store.prototype.update = function update(fn) {
   const state = _Obj.clone(this.get());
+  const modified = fn(state);
 
-  fn(state);
+  if (modified) {
+    Store.prototype.set.call(this, state);
 
-  Store.prototype.set.call(this, state);
+    return true;
+  }
+
+  return false;
 };
 
 /**
