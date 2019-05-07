@@ -73,7 +73,9 @@ export default {
   getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
+
   cancelMsg: strings.cancelMsg,
+  confirmCancelMsg: strings.confirmCancelMsg,
   wrongOtpMsg: strings.wrongOtp,
 
   initIframe,
