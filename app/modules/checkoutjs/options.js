@@ -65,7 +65,7 @@ RazorpayDefaults.modal = {
   escape: true,
   animation: true,
   backdropclose: false,
-  handleback: false,
+  handleback: true,
 };
 
 RazorpayDefaults.external = {
