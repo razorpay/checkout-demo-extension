@@ -6,6 +6,9 @@
       <EmiPlanCard
         plan={plan}
         expanded={index === expanded}
+        session={session}
+        amount={amount}
+        provider={provider}
 
         on:click="expand(index)"
       />
@@ -52,6 +55,7 @@
     data: function () {
       return {
         expanded: -1,
+        provider: null,
       };
     },
 
