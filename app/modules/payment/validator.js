@@ -34,7 +34,7 @@ export const setShieldParams = params => {
 
 export const formatPayment = function(payment) {
   let params =
-    ['feesRedirect', 'tez', 'avoidPopup']
+    ['feesRedirect', 'tez', 'gpay', 'avoidPopup']
     |> _Arr.reduce((allParams, param) => {
       if (param in payment) {
         allParams[param] = payment[param];
@@ -97,11 +97,16 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
     data['_[source]'] = 'checkoutjs';
   }
 
-  if (params.tez) {
-    if (!razorpayInstance.tezPossible) {
+  if (params.tez || params.gpay) {
+    if (
+      !(
+        razorpayInstance.paymentAdapters &&
+        razorpayInstance.paymentAdapters.gpay
+      )
+    ) {
       return razorpayInstance.emit(
         'payment.error',
-        _.rzpError('Tez is not available')
+        _.rzpError('GPay is not available')
       );
     }
     data['_[flow]'] = 'intent';

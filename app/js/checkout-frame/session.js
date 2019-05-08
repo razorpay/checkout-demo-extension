@@ -22,7 +22,11 @@ var preferences = window.preferences,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
-  OptionsList = discreet.OptionsList;
+  OptionsList = discreet.OptionsList,
+  _Arr = discreet._Arr,
+  _Func = discreet._Func,
+  _ = discreet._,
+  _Obj = discreet._Obj;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -2090,9 +2094,7 @@ Session.prototype = {
         return this.clearRequest();
       } else if (this.r._payment && this.r._payment.isMagicPayment) {
         return Confirm.show({
-          message:
-            'Your payment is ongoing. ' +
-            'Are you sure you want to cancel the payment?',
+          message: discreet.confirmCancelMsg,
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
@@ -3068,7 +3070,7 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isTezScreen = false;
+    var isGPayScreen = false;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3086,9 +3088,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    if (screen === 'tez' && this.separateTez) {
+    if (screen === 'gpay' && this.separateGPay) {
       screen = 'upi';
-      isTezScreen = true;
+      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3175,7 +3177,7 @@ Session.prototype = {
     }
 
     if (this.upiTab) {
-      if (isTezScreen) {
+      if (isGPayScreen) {
         this.upiTab.set({ selectedApp: 'gpay' });
         this.upiTab.onUpiAppSelection('gpay');
       }
@@ -3431,9 +3433,7 @@ Session.prototype = {
 
     var confirm = function() {
       Confirm.show({
-        message:
-          'Your payment is ongoing. ' +
-          'Are you sure you want to cancel the payment?',
+        message: discreet.confirmCancelMsg,
         heading: 'Cancel Payment?',
         positiveBtnTxt: 'Yes, cancel',
         negativeBtnTxt: 'No',
@@ -4505,7 +4505,7 @@ Session.prototype = {
       form = 'netbanking';
     }
 
-    if (form === 'tez') {
+    if (form === 'gpay') {
       form = 'upi';
     }
     return '#form-' + form;
@@ -4631,6 +4631,7 @@ Session.prototype = {
       hideOverlayMessage();
       this.modal.hide();
       this.savedCardScreen = undefined;
+      discreet.Bridge.stopListeningForBackPresses();
     }
   },
 
@@ -5203,8 +5204,8 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (data['_[flow]'] === 'tez') {
-      request.tez = true;
+    if (data['_[flow]'] === 'gpay') {
+      request.gpay = true;
       data['_[flow]'] = 'intent';
     }
 
@@ -5558,6 +5559,14 @@ Session.prototype = {
     }
   },
 
+  closeAndDismiss: function() {
+    this.saveAndClose();
+    Razorpay.sendMessage({
+      event: 'dismiss',
+      data: this.dismissReason,
+    });
+  },
+
   setEmiOptions: function() {
     var emiBanks = {};
     var preferences = this.preferences;
@@ -5782,9 +5791,9 @@ Session.prototype = {
         methods.qr = true;
       }
 
-      if (this.separateTez) {
+      if (this.separateGPay) {
         methods.count++;
-        methods.tez = true;
+        methods.gpay = true;
       }
     }
 
@@ -5975,20 +5984,28 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    if (order) {
-      if (order.amount) {
-        session_options.amount = order.partial_payment
-          ? order.amount_due
-          : order.amount;
-      }
+    // Get amount
+    var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
+      item
+    ) {
+      return item && item.amount;
+    })[0];
 
-      if (order.currency) {
-        session_options.currency = order.currency;
-      }
-    } else if (invoice && invoice.amount) {
-      session_options.amount = invoice.amount;
-    } else if (subscription && subscription.amount) {
-      session_options.amount = subscription.amount;
+    if (itemWithAmount) {
+      session_options.amount = itemWithAmount.partial_payment
+        ? itemWithAmount.amount_due
+        : itemWithAmount.amount;
+    }
+
+    // Get currency
+    var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
+      item
+    ) {
+      return item && item.currency;
+    })[0];
+
+    if (itemWithCurrency) {
+      session_options.currency = itemWithCurrency.currency;
     }
 
     /*
@@ -6019,7 +6036,7 @@ Session.prototype = {
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
       this.irctc = true;
-      this.separateTez = true;
+      this.separateGPay = true;
     }
 
     /* set payment methods on the basis of preferences */
@@ -6115,6 +6132,9 @@ Session.prototype = {
 
       callback(preferences);
     });
+
+    /* Start listening for back presses */
+    discreet.Bridge.setHistoryAndListenForBackPresses();
 
     return this.prefCall;
   },

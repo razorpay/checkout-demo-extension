@@ -1,3 +1,5 @@
+/* global confirm */
+
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL, SHOWN_CLASS } from 'common/constants';
@@ -6,6 +8,9 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Store from 'checkoutframe/store';
 
 import Track from 'tracker';
+import { confirmCancelMsg } from 'common/strings';
+
+import * as AnalyticsTypes from 'analytics-types';
 
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
@@ -285,6 +290,72 @@ window.upiIntentResponse = function(data) {
 };
 
 /**
+ * Tells whether or not we should handle back presses.
+ *
+ * @return {Boolean}
+ */
+function shouldHandleBackPresses() {
+  let CheckoutBridge = getCheckoutBridge();
+  let session = getSession();
+
+  if (CheckoutBridge || !window.history || !session.get('modal.handleback')) {
+    return false;
+  }
+
+  return true;
+}
+
+function closeModal() {
+  const session = getSession();
+
+  if (session.get('modal.confirm_close')) {
+    Confirm.show({
+      message: confirmCancelMsg,
+      heading: 'Cancel Payment?',
+      positiveBtnTxt: 'Yes, cancel',
+      negativeBtnTxt: 'No',
+      onPositiveClick: function() {
+        session.hide();
+      },
+    });
+  } else {
+    session.hide();
+  }
+}
+
+/**
+ * Checks if the Other Methods list
+ * of p13n is open.
+ * @param {Session} session
+ *
+ * @return {Boolean}
+ */
+function isP13nListOpen(session) {
+  try {
+    const { instrumentsData } = session.methodsList.view.get();
+
+    const {
+      visible: otherMethodsVisible,
+    } = session.methodsList.otherMethodsView.get();
+
+    return otherMethodsVisible && instrumentsData.length;
+  } catch (e) {}
+
+  return false;
+}
+
+/**
+ * Hides the Other Methods list
+ * of p13n.
+ * @param {Session} session
+ */
+function hideP13nList(session) {
+  try {
+    session.methodsList.otherMethodsView.fire('hideMethods');
+  } catch (e) {}
+}
+
+/**
  * window.backPressed is called by Android SDK everytime android backbutton is
  * pressed by user. Checkout will handle the back button action if the user is
  * on a sub screen. Checkout will give a callback to android in case that there
@@ -293,15 +364,19 @@ window.upiIntentResponse = function(data) {
  *                           button action to be done on checkout side.
  *                           Android prompts for closing checkout in that case
  */
-window.backPressed = function(callback) {
+function backPressed(callback) {
   let CheckoutBridge = getCheckoutBridge();
-  var session = getSession();
+  let session = getSession();
 
-  var pollUrl = storage.call('getString', UPI_POLL_URL);
+  let pollUrl = storage.call('getString', UPI_POLL_URL);
 
   if (pollUrl) {
     session.hideErrorMessage();
   }
+
+  session.track('navigate:back', {
+    type: AnalyticsTypes.BEHAV,
+  });
 
   if (Confirm.isConfirmShown) {
     Confirm.hide(true);
@@ -311,7 +386,16 @@ window.backPressed = function(callback) {
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
-    const overlays = [_Doc.querySelector('#fee-wrap')];
+    /**
+     * When an overlay is visible, there's some message
+     * that's being shown to the user in a pop up.
+     *
+     * TODO: Use an overlay manager for this check when implemented.
+     */
+    const overlays = [
+      _Doc.querySelector('#fee-wrap'),
+      _Doc.querySelector('#overlay'),
+    ];
     const visibleOverlays = _Arr.filter(overlays, overlay => {
       return overlay && _El.hasClass(overlay, SHOWN_CLASS);
     });
@@ -322,8 +406,65 @@ window.backPressed = function(callback) {
       session.back();
     }
   } else {
-    if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
+    if (isP13nListOpen(session)) {
+      hideP13nList(session);
+    } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();
+    } else {
+      if (session.get('theme.close_button')) {
+        closeModal();
+      }
     }
   }
-};
+}
+
+window.backPressed = backPressed;
+
+/**
+ * Adds a dummy state to the page history.
+ */
+function addDummyState() {
+  window.history.pushState({}, null, '');
+}
+
+function isModalVisible() {
+  const session = getSession();
+  return session && session.modal && session.modal.isShown;
+}
+
+function backHandlerForWeb() {
+  if (!isModalVisible()) {
+    // If still fetching the preferences, abort.
+    const session = getSession();
+
+    if (session.isOpen) {
+      session.closeAndDismiss();
+    }
+
+    return;
+  }
+
+  backPressed();
+
+  /**
+   * The modal may have closed.
+   * Check if it's open before adding a history state.
+   */
+  if (isModalVisible()) {
+    addDummyState();
+  }
+}
+
+export function setHistoryAndListenForBackPresses() {
+  if (!shouldHandleBackPresses()) {
+    return;
+  }
+
+  addDummyState();
+
+  window.addEventListener('popstate', backHandlerForWeb);
+}
+
+export function stopListeningForBackPresses() {
+  window.removeEventListener('popstate', backHandlerForWeb);
+}
