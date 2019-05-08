@@ -3020,7 +3020,7 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isTezScreen = false;
+    var isGPayScreen = false;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3038,9 +3038,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    if (screen === 'tez' && this.separateTez) {
+    if (screen === 'gpay' && this.separateGPay) {
       screen = 'upi';
-      isTezScreen = true;
+      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3127,7 +3127,7 @@ Session.prototype = {
     }
 
     if (this.upiTab) {
-      if (isTezScreen) {
+      if (isGPayScreen) {
         this.upiTab.set({ selectedApp: 'gpay' });
         this.upiTab.onUpiAppSelection('gpay');
       }
@@ -4448,7 +4448,7 @@ Session.prototype = {
       form = 'netbanking';
     }
 
-    if (form === 'tez') {
+    if (form === 'gpay') {
       form = 'upi';
     }
     return '#form-' + form;
@@ -5144,8 +5144,8 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (data['_[flow]'] === 'tez') {
-      request.tez = true;
+    if (data['_[flow]'] === 'gpay') {
+      request.gpay = true;
       data['_[flow]'] = 'intent';
     }
 
@@ -5727,9 +5727,9 @@ Session.prototype = {
         methods.qr = true;
       }
 
-      if (this.separateTez) {
+      if (this.separateGPay) {
         methods.count++;
-        methods.tez = true;
+        methods.gpay = true;
       }
     }
 
@@ -5972,7 +5972,7 @@ Session.prototype = {
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
       this.irctc = true;
-      this.separateTez = true;
+      this.separateGPay = true;
     }
 
     /* set payment methods on the basis of preferences */

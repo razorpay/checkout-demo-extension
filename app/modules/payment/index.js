@@ -23,8 +23,8 @@ import Razorpay, {
 } from 'common/Razorpay';
 import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
-
-import * as Tez from 'tez';
+import { checkPaymentAdapter } from 'payment/adapters';
+import * as GPay from 'gpay';
 import Analytics from 'analytics';
 
 const isRazorpayFrame = _Str.startsWith(
@@ -174,20 +174,20 @@ export default function Payment(data, params = {}, r) {
   }
 
   this.feesRedirect = params.feesRedirect;
-  this.tez = params.tez;
+  this.gpay = params.gpay || params.tez; // params.tez is legacy
 
   var avoidPopup = false;
 
   /**
    * Avoid Popup if:
-   * - Payment is made by Payment Request API (`params.tez` here)
+   * - Payment is made by Payment Request API (`params.gpay` or `params.tez` here)
    * - UPI QR or UPI is chosen inside checkout form
    * - PowerWallet is chosen & contact details are provided inside checkout form
    *
    * Enforce Popup if:
    * - Merchant is on customer fee bearer model
    */
-  if (params.tez) {
+  if (this.gpay) {
     avoidPopup = true;
   } else if (isRazorpayFrame) {
     /**
@@ -559,15 +559,34 @@ Razorpay.setFormatter = FormatDelegator;
 var razorpayProto = Razorpay.prototype;
 
 /**
- * Method to check if an Tez is installed on Device
+ * Method to check if a payment adapter is present.
+ * @param {String} adapter
+ * @param {Object} data
+ *
+ * @return {Promise}
+ */
+razorpayProto.checkPaymentAdapter = function(adapter, data) {
+  return checkPaymentAdapter(adapter, data).then(success => {
+    if (!this.paymentAdapters) {
+      this.paymentAdapters = {};
+    }
+
+    this.paymentAdapters[adapter] = true;
+
+    return Promise.resolve(success);
+  });
+};
+
+/**
+ * [LEGACY]
+ * Method to check if Tez is installed on Device
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
 razorpayProto.isTezAvailable = function(success, error) {
-  Tez.check(() => {
-    this.tezPossible = true;
-    success();
-  }, error);
+  this.checkPaymentAdapter('gpay')
+    .then(success)
+    .catch(error);
 };
 
 razorpayProto.postInit = function() {
