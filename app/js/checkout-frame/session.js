@@ -5358,6 +5358,16 @@ Session.prototype = {
       }
     }
 
+    if (data.method === 'upi') {
+      if (
+        this.hasGooglePaySdk &&
+        data.upi_app === 'com.google.android.apps.nbu.paisa.user'
+      ) {
+        alert('google pay sdk');
+        request.googlepay = true;
+      }
+    }
+
     if (this.modal) {
       this.modal.options.backdropclose = false;
     }
@@ -5479,8 +5489,8 @@ Session.prototype = {
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
-    if (request.amazonpay) {
-      payment.on('payment.amazonpay.process', function(data) {
+    if (request.amazonpay || request.googlepay) {
+      payment.on('payment.externalsdk.process', function(data) {
         /* invoke amazonpay sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();

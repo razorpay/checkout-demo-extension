@@ -151,7 +151,7 @@ export default function Payment(data, params = {}, r) {
 
   this.magicPossible = this.isMagicPayment;
 
-  this.isAmazonpayPayment = params.amazonpay;
+  this.isExternalSdkPayment = params.amazonpay || params.googlepay;
 
   // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
   if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
@@ -303,11 +303,11 @@ Payment.prototype = {
         |> pollPaymentData;
     };
 
-    if (this.isAmazonpayPayment) {
+    if (this.isExternalSdkPayment) {
       setCompleteHandler();
 
       return window.setTimeout(() => {
-        this.emit('amazonpay.process', this.data);
+        this.emit('externalsdk.process', this.data);
       }, 100);
     }
 
