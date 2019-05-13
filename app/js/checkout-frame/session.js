@@ -648,6 +648,28 @@ function getEmiText(session, amount, plan) {
   };
 }
 
+/**
+ * Makes the container long if not already long.
+ *
+ * @return {Boolean} madeLong?
+ */
+function makeContainerLong() {
+  var LONG_CLASSES = ['long', 'x-long'];
+  var container = $('#container');
+
+  var isAlreadyLong = _Arr.any(LONG_CLASSES, function(className) {
+    return container.hasClass(className);
+  });
+
+  if (isAlreadyLong) {
+    return false;
+  }
+
+  container.addClass(LONG_CLASSES[0]);
+
+  return true;
+}
+
 function overlayVisible() {
   return $('#overlay').hasClass(shownClass);
 }
@@ -2993,6 +3015,16 @@ Session.prototype = {
               });
 
               Analytics.setMeta('p13n', true);
+
+              /**
+               * If the number of payment methods available
+               * are few, the container may not be long
+               * already.
+               *
+               * Make the container long if we are going
+               * to use p13n.
+               */
+              makeContainerLong();
             }
           }
 
