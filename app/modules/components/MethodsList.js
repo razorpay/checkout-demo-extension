@@ -161,6 +161,11 @@ export default class MethodsList {
     data.selected = null;
     this.selectedInstrument = null;
 
+    if (session.screen === '') {
+      // Hide pay button since no instrument is selected
+      _Doc.querySelector('#body') |> _El.removeClass('sub');
+    }
+
     var delay = 1500;
 
     if (this.animateNext === false) {
