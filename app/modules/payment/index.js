@@ -612,6 +612,27 @@ razorpayProto.createPayment = function(data, params) {
   return this;
 };
 
+razorpayProto.verifyVpa = function(vpa) {
+  const url = makeUrl('payment/validate/account?key_id=' + this.get('key'));
+
+  return new Promise((resolve, reject) => {
+    const response = fetch.post({
+      url,
+      data: {
+        entity: 'vpa',
+        value: vpa,
+      },
+      callback: function(response) {
+        if (response.success) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      },
+    });
+  });
+};
+
 razorpayProto.focus = function() {
   try {
     this._payment.popup.window.focus();

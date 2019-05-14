@@ -5106,7 +5106,24 @@ Session.prototype = {
     this.submit();
   },
 
-  submit: function() {
+  verifyVpaAndContinue: function(data, params) {
+    var self = this;
+    self.showLoadError('Verifying your VPA');
+
+    self.r
+      .verifyVpa(data.vpa)
+      .then(function() {
+        self.submit(true);
+      })
+      .catch(function() {
+        self.showLoadError(
+          'Invalid VPA, please try again with correct VPA',
+          true
+        );
+      });
+  },
+
+  submit: function(vpaVerified) {
     if (this.r._payment) {
       return;
     }
@@ -5317,6 +5334,10 @@ Session.prototype = {
 
     if (this.p13n) {
       P13n.processInstrument(data, this);
+    }
+
+    if (data.vpa && !vpaVerified) {
+      return this.verifyVpaAndContinue(data, request);
     }
 
     var payment = this.r.createPayment(data, request);
