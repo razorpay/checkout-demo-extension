@@ -5113,7 +5113,9 @@ Session.prototype = {
     self.r
       .verifyVpa(data.vpa)
       .then(function() {
-        self.submit(true);
+        self.submit({
+          vpaVerified: true,
+        });
       })
       .catch(function() {
         self.showLoadError(
@@ -5124,10 +5126,11 @@ Session.prototype = {
   },
 
   submit: function(props) {
-  	if (!props) {
-  		props = {};
-  	}
-	var vpaVerified = props.vpaVerified;
+    if (!props) {
+      props = {};
+    }
+    var vpaVerified = props.vpaVerified;
+
     if (this.r._payment) {
       return;
     }
