@@ -5123,7 +5123,11 @@ Session.prototype = {
       });
   },
 
-  submit: function(vpaVerified) {
+  submit: function(props) {
+  	if (!props) {
+  		props = {};
+  	}
+	var vpaVerified = props.vpaVerified;
     if (this.r._payment) {
       return;
     }
