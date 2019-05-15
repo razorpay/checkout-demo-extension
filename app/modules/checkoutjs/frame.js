@@ -420,7 +420,7 @@ CheckoutFrame.prototype = {
   ondismiss: function(data) {
     this.close();
     let dismiss = this.rzp.get('modal.ondismiss');
-    if (_.isFunction) {
+    if (_.isFunction(dismiss)) {
       setTimeout(() => dismiss(data));
     }
   },
