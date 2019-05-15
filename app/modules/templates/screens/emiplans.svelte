@@ -44,7 +44,7 @@
       classes={['emi-branding-callout']}
       showIcon={false}
     >
-      <span>Lending Partner</span>&nbsp;<img src={branding} alt={provider} />
+      <img src={branding} alt={provider} />
     </Callout>
   {/if}
 </div>
@@ -109,15 +109,8 @@
 
   :global(.emi-branding-callout)
     padding-left: 12px !important;
-    span
-      position: relative;
-      left: unset;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 12px;
+    background: white !important;
     img
-      display: inline-block;
-      vertical-align: middle;
       max-height: 24px;
 
   .has-callout
