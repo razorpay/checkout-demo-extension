@@ -95,6 +95,7 @@ emiPlansView.prototype = {
     provider,
     amount,
     loanUrl,
+    branding,
   }) {
     if (loanUrl) {
       fetchAgreements(provider, loanUrl, plans, amount);
@@ -126,6 +127,7 @@ emiPlansView.prototype = {
       session: this.session,
       amount,
       provider,
+      branding,
     };
 
     if (!this.view) {

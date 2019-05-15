@@ -127,14 +127,8 @@ function createCardlessEmiImage(src) {
 
 function createCardlessEmiTopbarImages(providerCode) {
   var provider = discreet.CardlessEmi.getProvider(providerCode);
-  var html = createCardlessEmiImage(provider.logo);
-  var lender = CardlessEmiStore.lenderBranding[providerCode];
 
-  if (lender) {
-    html += createCardlessEmiImage(lender);
-  }
-
-  return html;
+  return createCardlessEmiImage(provider.logo);
 }
 
 /**
@@ -1760,6 +1754,9 @@ Session.prototype = {
       loanUrl: CardlessEmiStore.loanUrls[providerCode],
 
       provider: CardlessEmiStore.providerCode,
+
+      // TODO: This should be picked up from Store
+      branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
         back: bind(function() {
