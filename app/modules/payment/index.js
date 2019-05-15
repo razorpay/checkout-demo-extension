@@ -613,7 +613,7 @@ razorpayProto.createPayment = function(data, params) {
 };
 
 razorpayProto.verifyVpa = function(vpa) {
-  const url = makeUrl('payment/validate/account?key_id=' + this.get('key'));
+  const url = makeUrl('payments/validate/account?key_id=' + this.get('key'));
 
   return new Promise((resolve, reject) => {
     const response = fetch.post({
