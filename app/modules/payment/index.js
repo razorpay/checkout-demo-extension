@@ -612,7 +612,7 @@ razorpayProto.createPayment = function(data, params) {
   return this;
 };
 
-razorpayProto.verifyVpa = function(vpa) {
+razorpayProto.verifyVpa = function(vpa = '') {
   const url = makeUrl('payments/validate/account?key_id=' + this.get('key'));
 
   return new Promise((resolve, reject) => {
