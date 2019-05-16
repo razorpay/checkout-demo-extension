@@ -11,7 +11,7 @@
     {/if}
   </div>
   <div slot="detail">
-    {#if cardEmi}
+    {#if isCardEmi}
       Full amount of {formattedAmount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.
     {:else}
       <ul>
@@ -37,8 +37,8 @@
         plan.interest
       ),
       badge: ({ plan }) => plan.subvention === 'merchant' ? 'No cost EMI' : false,
-      cardEmi: ({ provider }) => !provider,
-      showInterest: ({ provider, cardEmi }) => !cardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider),
+      isCardEmi: ({ provider }) => !provider,
+      showInterest: ({ provider, isCardEmi }) => !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider),
 
       formattedAmount: ({ amount, session }) => session.formatAmountWithCurrency(amount),
       formattedAmountPerMonth: ({ amountPerMonth, session }) => session.formatAmountWithCurrency(amountPerMonth),
