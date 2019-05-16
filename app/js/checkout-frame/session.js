@@ -120,7 +120,18 @@ var CardlessEmiStore = {
   duration: {},
   loanUrls: {},
   ott: {},
+  lenderBranding: {},
 };
+
+function createCardlessEmiImage(src) {
+  return '<img src="' + src + '" class="cardless_emi-topbar-image">';
+}
+
+function createCardlessEmiTopbarImages(providerCode) {
+  var provider = discreet.CardlessEmi.getProvider(providerCode);
+
+  return createCardlessEmiImage(provider.logo);
+}
 
 /**
  * Store for what tab and screen
@@ -632,20 +643,12 @@ function getEmiText(session, amount, plan) {
     plan.interest
   );
 
-  return {
-    info:
-      plan.duration +
-      ' Months (' +
-      session.formatAmountWithCurrency(amountPerMonth) +
-      '/mo) @ ' +
-      plan.interest +
-      '%',
-    short:
-      plan.duration +
-      ' Months (' +
-      session.formatAmountWithCurrency(amountPerMonth) +
-      '/mo)',
-  };
+  return (
+    plan.duration +
+    ' Months (' +
+    session.formatAmountWithCurrency(amountPerMonth) +
+    '/mo)'
+  );
 }
 
 /**
@@ -1737,31 +1740,18 @@ Session.prototype = {
   },
 
   getCardlessEmiPlans: function() {
-    var self = this;
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
 
-    var plansList = [];
-
-    each(plans, function(index, p) {
-      plansList.push({
-        text:
-          p.duration +
-          ' Months @ ' +
-          self.formatAmountWithCurrency(p.amount_per_month) +
-          '/mo',
-        value: p.duration,
-        detail: self.makeCardlessEmiDetailText(p.duration, p.amount_per_month),
-      });
-    });
-
-    return plansList;
+    return plans;
   },
 
   showCardlessEmiPlans: function() {
     var self = this;
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
+
+    tab_titles.emiplans = createCardlessEmiTopbarImages(providerCode);
 
     if (!plans) {
       this.fetchCardlessEmiPlans();
@@ -1788,6 +1778,9 @@ Session.prototype = {
       loanUrl: CardlessEmiStore.loanUrls[providerCode],
 
       provider: CardlessEmiStore.providerCode,
+
+      // TODO: This should be picked up from Store
+      branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
         back: bind(function() {
@@ -1830,7 +1823,9 @@ Session.prototype = {
     var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
     var self = this;
 
-    tab_titles.otp = cardlessEmiProviderObj.name;
+    var topbarImages = createCardlessEmiTopbarImages(providerCode);
+    tab_titles.otp = topbarImages;
+
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
       function(response) {
@@ -1838,16 +1833,29 @@ Session.prototype = {
           return;
         }
 
-        if (!response.saved || (response.error && response.error.description)) {
+        if (response.error && response.error.description) {
+          self.showLoadError(response.error.description, true);
+          Analytics.track('cardless_emi:plans:fetch:error');
+          return;
+        }
+
+        if (response.success && response.emi_plans) {
+          CardlessEmiStore.plans[providerCode] = response.emi_plans;
+
+          CardlessEmiStore.lenderBranding[providerCode] =
+            response.lender_branding_url;
+
+          self.showCardlessEmiPlans();
+          return;
+        }
+
+        // TODO: Remove this condition if event is not being fired.
+        if (!response.saved) {
           var errorDesc =
             'Could not find a ' +
             cardlessEmiProviderObj.name +
             ' account associated with ' +
             getPhone();
-
-          if (response.error && response.error.description) {
-            errorDesc = response.error.description;
-          }
 
           self.showLoadError(errorDesc, true);
 
@@ -3756,34 +3764,28 @@ Session.prototype = {
   getEmiPlans: function(bank) {
     var emi_options = this.emi_options;
     var plans = (emi_options.banks[bank] || {}).plans;
-    var listItems = [];
-    var amount = this.get('amount');
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
-    var that = this;
 
-    if (this.isOfferApplicableOnIssuer(bank)) {
-      amount = this.getDiscountedAmount();
-    }
-
-    each(plans, function(duration, plan) {
+    var emiPlans = [];
+    _Obj.loop(plans, function(plan, duration) {
       if (
         !appliedOffer ||
         (appliedOffer && !appliedOffer.emi_subvention) ||
         (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
       ) {
-        listItems.push({
-          text: getEmiText(that, amount, plan).info,
-          value: duration,
-          badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
-          detail:
-            'Full amount of ' +
-            that.formatAmountWithCurrency(amount) +
-            ' will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
-        });
+        emiPlans.push(
+          _Obj.extend(
+            {
+              duration: duration,
+              nocost: plan.subvention === 'merchant',
+            },
+            plan
+          )
+        );
       }
     });
 
-    return listItems;
+    return emiPlans;
   },
 
   /**
@@ -3818,6 +3820,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var amount = this.get('amount');
+    var tabTitle = 'EMI Plans';
 
     var trackEmi = function(name, data) {
       Analytics.track(name, {
@@ -3838,6 +3841,8 @@ Session.prototype = {
 
     if (type === 'new') {
       return function(e) {
+        tab_titles.emiplans = tabTitle;
+
         var trigger = e.delegateTarget;
         var $trigger = $(trigger);
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
@@ -3855,6 +3860,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          amount: amount,
           plans: emiPlans,
           on: {
             back: bind(function() {
@@ -3881,7 +3887,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(self, amount, plan).short || '';
+              var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -3923,6 +3929,8 @@ Session.prototype = {
       };
     } else if (type === 'saved') {
       return function(e) {
+        tab_titles.emiplans = tabTitle;
+
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
@@ -3941,6 +3949,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          amount: amount,
           plans: emiPlans,
           on: {
             back: function() {
@@ -3967,7 +3976,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(self, amount, plan).short || '';
+              var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -4016,9 +4025,17 @@ Session.prototype = {
       };
     } else if (type === 'bajaj') {
       return function() {
+        tab_titles.emiplans = tabTitle;
+
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
         var emiPlans = [];
+
+        if (self.isOfferApplicableOnIssuer(bank)) {
+          amount = self.getDiscountedAmount();
+        } else {
+          self.removeAndCleanupOffers();
+        }
 
         each(plans, function(index, p) {
           var amount_per_month = (
@@ -4044,6 +4061,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          amount: amount,
           plans: emiPlans,
           on: {
             back: function() {
@@ -4055,7 +4073,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(self, amount, plan).short || '';
+              var text = getEmiText(self, amount, plan) || '';
 
               self.emiScreenView.setPlan({
                 duration: plan.duration,
@@ -4812,8 +4830,10 @@ Session.prototype = {
     };
 
     if (this.tab === 'cardless_emi') {
+      var providerCode = CardlessEmiStore.providerCode;
+
       queryParams = {
-        provider: CardlessEmiStore.providerCode,
+        provider: providerCode,
         method: 'cardless_emi',
       };
 
@@ -4821,11 +4841,12 @@ Session.prototype = {
         if (msg) {
           this.fetchCardlessEmiPlans();
         } else {
-          CardlessEmiStore.plans[CardlessEmiStore.providerCode] =
-            data.emi_plans;
-          CardlessEmiStore.loanUrls[CardlessEmiStore.providerCode] =
-            data.loan_url;
-          CardlessEmiStore.ott[CardlessEmiStore.providerCode] = data.ott;
+          CardlessEmiStore.plans[providerCode] = data.emi_plans;
+          CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
+          CardlessEmiStore.ott[providerCode] = data.ott;
+          CardlessEmiStore.lenderBranding[providerCode] =
+            data.lender_branding_url;
+
           this.showCardlessEmiPlans();
         }
       };
@@ -5030,7 +5051,7 @@ Session.prototype = {
             // Set method explicitly.
             data.method = 'emi';
           } else {
-            // This is no the EMI tab, delete duration if it exists.
+            // This is not the EMI tab, delete duration if it exists.
             delete data.emi_duration;
           }
         }
@@ -5209,6 +5230,10 @@ Session.prototype = {
       if (data.contact && !data.emi_duration) {
         this.showCardlessEmiPlans();
         return;
+      }
+
+      if (data.provider === 'flexmoney') {
+        delete data.ott;
       }
 
       /**

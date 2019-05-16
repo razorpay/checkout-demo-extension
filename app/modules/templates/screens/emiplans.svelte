@@ -1,13 +1,18 @@
-<div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
+<div
+  id="form-emiplans"
+  class="tab-content showable screen pad vertical-pad"
+  class:has-callout={hasCallout}
+>
   <h3>Select an EMI Plan</h3>
 
   <div class="emi-plans-list expandable-card-list">
     {#each plans as plan, index}
-      <ExpandableCard
-        badge={plan.badge}
-        detail={plan.detail}
+      <EmiPlanCard
+        plan={plan}
         expanded={index === expanded}
-        title={plan.text}
+        session={session}
+        amount={amount}
+        provider={provider}
 
         on:click="expand(index)"
       />
@@ -33,27 +38,39 @@
       <span class="theme-highlight">Loan Agreement</span>
     </div>
   {/if}
-</div>
 
-<style>
-  .actionlink-container {
-    margin: 12px 0;
-  }
-</style>
+  {#if branding}
+    <Callout
+      classes={['emi-branding-callout']}
+      showIcon={false}
+    >
+      <img src={branding} alt={provider} />
+    </Callout>
+  {/if}
+</div>
 
 <script>
   export default {
     components: {
-      ExpandableCard: 'templates/views/ui/ExpandableCard.svelte',
+      Callout: 'templates/views/ui/Callout.svelte',
+      EmiPlanCard: 'templates/tabs/emiplans/emiplancard.svelte'
     },
 
     computed: {
       showActions: ({ actions }) => actions && _Obj.keys(actions).length,
+      hasCallout: ({ branding, actions, expanded }) => {
+        const hasBranding = Boolean(branding);
+        const hasAgreement = actions.showAgreement && expanded >= 0;
+
+        return hasBranding || hasAgreement;
+      },
     },
 
     data: function () {
       return {
         expanded: -1,
+        provider: null,
+        branding: null,
       };
     },
 
@@ -83,3 +100,24 @@
     },
   }
 </script>
+
+
+<style>
+  .actionlink-container {
+    margin: 12px 0;
+  }
+
+  :global(.emi-branding-callout)
+    padding-left: 12px !important;
+    background: white !important;
+    img
+      max-height: 24px;
+
+  .has-callout
+    padding-bottom: 64px;
+
+  :global(.mobile)
+    .has-callout
+      padding-bottom: 120px;
+
+</style>
