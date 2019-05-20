@@ -6050,7 +6050,7 @@ Session.prototype = {
   },
 
   showModal: function(preferences) {
-    var qpmap = getQueryParams();
+    var qpmap = _Obj.unflatten(getQueryParams());
 
     if (!this.methods.count) {
       var message = 'No appropriate payment method found.';
