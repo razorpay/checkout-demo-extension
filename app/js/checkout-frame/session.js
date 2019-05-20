@@ -5557,11 +5557,15 @@ Session.prototype = {
   },
 
   closeAndDismiss: function() {
+    var wasShown = this.modal.isShown;
     this.saveAndClose();
-    Razorpay.sendMessage({
-      event: 'dismiss',
-      data: this.dismissReason,
-    });
+
+    if (wasShown) {
+      Razorpay.sendMessage({
+        event: 'dismiss',
+        data: this.dismissReason,
+      });
+    }
   },
 
   setEmiOptions: function() {
