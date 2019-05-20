@@ -5557,7 +5557,7 @@ Session.prototype = {
   },
 
   closeAndDismiss: function() {
-    var wasShown = this.modal.isShown;
+    var wasShown = this.modal && this.modal.isShown;
     this.saveAndClose();
 
     if (wasShown) {
