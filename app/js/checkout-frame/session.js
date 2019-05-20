@@ -938,7 +938,7 @@ function debounceAskOTP(view, msg, shouldLimitResend) {
 // this === Session
 function successHandler(response) {
   if (this.p13n) {
-    P13n.recordSuccess(this.customer || getCustomer(this.payload.contact));
+    P13n.recordSuccess(this.customer || this.getCustomer(this.payload.contact));
   }
 
   this.clearRequest();
@@ -3013,7 +3013,8 @@ Session.prototype = {
           self.input(this.el);
 
           if (this.isValid()) {
-            instruments = P13n.listInstruments(getCustomer(this.value)) || [];
+            instruments =
+              P13n.listInstruments(self.getCustomer(this.value)) || [];
 
             if (instruments.length) {
               Analytics.track('p13:instruments:fetch', {
@@ -3038,7 +3039,7 @@ Session.prototype = {
 
           self.methodsList.set({
             instruments: instruments,
-            customer: getCustomer(this.value),
+            customer: self.getCustomer(this.value),
             tpvBank: this.tpvBank,
             animate: true,
           });
@@ -3560,7 +3561,7 @@ Session.prototype = {
       ) {
         return;
       }
-      this.customer = getCustomer(contact);
+      this.customer = this.getCustomer(contact);
       if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
       }
@@ -5889,6 +5890,10 @@ Session.prototype = {
     this.offers.showError(methodDescription, cb);
   },
 
+  getCustomer: function() {
+    return getCustomer.apply(null, arguments);
+  },
+
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
     /* TODO: try to make a separate module for preferences */
@@ -5917,7 +5922,7 @@ Session.prototype = {
     if (preferences.global === false) {
       this.local = true;
       customer = new Customer('');
-      getCustomer = function() {
+      this.getCustomer = function() {
         return customer;
       };
     }
@@ -5943,7 +5948,7 @@ Session.prototype = {
         session_options['prefill.email'] = saved_customer.email;
       }
 
-      customer = getCustomer(saved_customer.contact);
+      customer = this.getCustomer(saved_customer.contact);
       sanitizeTokens(saved_customer.tokens, filters);
       customer.tokens = saved_customer.tokens;
 
