@@ -1,10 +1,10 @@
 <div id="payment-options" class="grid clear count-{methods.length}">
   {#each methods as method}
-    <GridMethod
-      {...method}
-
-      on:select="selectMethod(event)"
-    />
+    <div class="payment-option item" tab="{method.method}"
+      on:click="switchTab(method.method)">
+      <label>
+      </label>
+    </div>
   {/each}
 </div>
 

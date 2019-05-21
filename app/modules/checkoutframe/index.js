@@ -175,10 +175,17 @@ export const handleMessage = function(message) {
     return;
   }
 
-  let transformedOptions = transformOptions(message);
-
   var id = message.id || Track.id;
   var session = SessionManager.getSession(id);
+
+  if (message.event === 'close') {
+    if (session) {
+      session.closeAndDismiss();
+    }
+    return;
+  }
+
+  let transformedOptions = transformOptions(message);
   var options = message.options;
 
   setAnalyticsMeta(message);
@@ -210,8 +217,6 @@ export const handleMessage = function(message) {
     session.fetchPrefs(preferences => {
       session.showModal(preferences);
     });
-  } else if (message.event === 'close') {
-    session.hide();
   }
 
   try {

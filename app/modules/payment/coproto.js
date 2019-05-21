@@ -1,10 +1,11 @@
-import * as Tez from 'tez';
+import * as GPay from 'gpay';
 import * as strings from 'common/strings';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import { RazorpayConfig } from 'common/Razorpay';
 import Analytics from 'analytics';
+import { getSession } from 'sessionmanager';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -151,11 +152,11 @@ var responseTypes = {
     this.emit('upi.pending', fullResponse.data);
   },
 
-  tez: function(coprotoRequest, fullResponse) {
-    Tez.pay(
+  gpay: function(coprotoRequest, fullResponse) {
+    GPay.pay(
       fullResponse.data,
       instrument => {
-        Track(this.r, 'tez_pay_response', {
+        Track(this.r, 'gpay_pay_response', {
           instrument,
         });
 
@@ -173,21 +174,18 @@ var responseTypes = {
 
           // Since the method is not supported, remove it.
           if (error.code === error.NOT_SUPPORTED_ERR) {
-            const tezRadio = _Doc.querySelector('#upi-tez');
-            const directPayRadio = _Doc.querySelector('#radio-directpay');
+            const session = getSession();
 
-            if (tezRadio) {
-              _El.setStyle(tezRadio, 'display', 'none');
-              tezRadio.checked = false;
-            }
-
-            if (directPayRadio) {
-              directPayRadio.checked = true;
+            if (session && session.upiTab) {
+              session.upiTab.set({
+                useWebPaymentsApi: false,
+                selectedApp: 'gpay',
+              });
             }
           }
         }
 
-        Track(this.r, 'tez_error', error);
+        Track(this.r, 'gpay_error', error);
       }
     );
   },
@@ -235,8 +233,8 @@ var responseTypes = {
         CheckoutBridge.callNativeIntent(intent_url);
       }
     } else if (androidBrowser) {
-      if (this.tez) {
-        return responseTypes['tez'].call(this, request, fullResponse);
+      if (this.gpay) {
+        return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
   },

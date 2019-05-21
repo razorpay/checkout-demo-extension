@@ -2,7 +2,7 @@ import { internetExplorer } from 'common/useragent';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 
-/* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType */
+/* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType, CSSStyleDeclaration */
 
 /**
  * Because classList.toggle is broken in IE10 and IE11.
@@ -78,6 +78,13 @@ function overrideInsertRule() {
       originalInsertRule.call(this, rule, index);
     } catch (err) {}
   };
+
+  if (!CSSStyleDeclaration.prototype.webkitAnimation) {
+    CSSStyleDeclaration.prototype.webkitAnimation = '';
+  }
+
+  CSSStyleDeclaration.prototype.animation =
+    CSSStyleDeclaration.prototype.webkitAnimation;
 }
 overrideInsertRule();
 

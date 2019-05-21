@@ -108,7 +108,6 @@ img {
 <script>
   import { RazorpayConfig } from 'common/Razorpay';
   import { processInstrument } from 'checkoutframe/personalization';
-  import Store from 'checkoutframe/store';
 
   export default {
     components: {

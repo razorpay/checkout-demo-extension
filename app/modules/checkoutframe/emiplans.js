@@ -72,16 +72,16 @@ const fetchAgreements = (provider, loanUrl, plans, amount) => {
 
   _Arr.loop(plans, plan => {
     fetch({
-      url: AGREEMENT_HELPER.createUrl[provider](loanUrl, amount, plan.value),
+      url: AGREEMENT_HELPER.createUrl[provider](loanUrl, amount, plan.duration),
 
       callback: function(response) {
         if (!AGREEMENT_STORE[provider]) {
           AGREEMENT_STORE[provider] = {};
         }
 
-        AGREEMENT_STORE[provider][plan.value] = AGREEMENT_HELPER.parseResponse[
-          provider
-        ](response);
+        AGREEMENT_STORE[provider][
+          plan.duration
+        ] = AGREEMENT_HELPER.parseResponse[provider](response);
       },
     });
   });
@@ -95,6 +95,7 @@ emiPlansView.prototype = {
     provider,
     amount,
     loanUrl,
+    branding,
   }) {
     if (loanUrl) {
       fetchAgreements(provider, loanUrl, plans, amount);
@@ -107,7 +108,7 @@ emiPlansView.prototype = {
       Analytics.track('emi:plan:choose', {
         type: AnalyticsTypes.BEHAV,
         data: {
-          value: plan.value,
+          value: plan.duration,
         },
       });
 
@@ -115,13 +116,18 @@ emiPlansView.prototype = {
       _Doc.querySelector('#body') |> _El.addClass('sub');
     };
 
-    on.viewAgreement = () => viewAgreement(provider, this.selectedPlan.value);
+    on.viewAgreement = () =>
+      viewAgreement(provider, this.selectedPlan.duration);
 
     const data = {
       on,
       plans,
       actions,
       expanded: -1,
+      session: this.session,
+      amount,
+      provider,
+      branding,
     };
 
     if (!this.view) {
@@ -136,6 +142,6 @@ emiPlansView.prototype = {
   },
 
   submit: function() {
-    this.onSelect(this.selectedPlan.value);
+    this.onSelect(this.selectedPlan.duration);
   },
 };

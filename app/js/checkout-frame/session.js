@@ -22,7 +22,14 @@ var preferences = window.preferences,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
-  OptionsList = discreet.OptionsList;
+  PreferencesStore = discreet.PreferencesStore,
+  DowntimesStore = discreet.DowntimesStore,
+  SessionStore = discreet.SessionStore,
+  OptionsList = discreet.OptionsList,
+  _Arr = discreet._Arr,
+  _Func = discreet._Func,
+  _ = discreet._,
+  _Obj = discreet._Obj;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -35,7 +42,7 @@ function getStore(prop) {
 }
 
 function gotoAmountScreen() {
-  Store.set({ screen: 'amount' });
+  SessionStore.set({ screen: 'amount' });
 }
 
 function shouldEnableP13n(keyId) {
@@ -114,7 +121,18 @@ var CardlessEmiStore = {
   duration: {},
   loanUrls: {},
   ott: {},
+  lenderBranding: {},
 };
+
+function createCardlessEmiImage(src) {
+  return '<img src="' + src + '" class="cardless_emi-topbar-image">';
+}
+
+function createCardlessEmiTopbarImages(providerCode) {
+  var provider = discreet.CardlessEmi.getProvider(providerCode);
+
+  return createCardlessEmiImage(provider.logo);
+}
 
 /**
  * Store for what tab and screen
@@ -626,20 +644,34 @@ function getEmiText(session, amount, plan) {
     plan.interest
   );
 
-  return {
-    info:
-      plan.duration +
-      ' Months (' +
-      session.formatAmountWithCurrency(amountPerMonth) +
-      '/mo) @ ' +
-      plan.interest +
-      '%',
-    short:
-      plan.duration +
-      ' Months (' +
-      session.formatAmountWithCurrency(amountPerMonth) +
-      '/mo)',
-  };
+  return (
+    plan.duration +
+    ' Months (' +
+    session.formatAmountWithCurrency(amountPerMonth) +
+    '/mo)'
+  );
+}
+
+/**
+ * Makes the container long if not already long.
+ *
+ * @return {Boolean} madeLong?
+ */
+function makeContainerLong() {
+  var LONG_CLASSES = ['long', 'x-long'];
+  var container = $('#container');
+
+  var isAlreadyLong = _Arr.any(LONG_CLASSES, function(className) {
+    return container.hasClass(className);
+  });
+
+  if (isAlreadyLong) {
+    return false;
+  }
+
+  container.addClass(LONG_CLASSES[0]);
+
+  return true;
 }
 
 function overlayVisible() {
@@ -907,7 +939,7 @@ function debounceAskOTP(view, msg, shouldLimitResend) {
 // this === Session
 function successHandler(response) {
   if (this.p13n) {
-    P13n.recordSuccess(this.customer || getCustomer(this.payload.contact));
+    P13n.recordSuccess(this.customer || this.getCustomer(this.payload.contact));
   }
 
   this.clearRequest();
@@ -1709,31 +1741,18 @@ Session.prototype = {
   },
 
   getCardlessEmiPlans: function() {
-    var self = this;
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
 
-    var plansList = [];
-
-    each(plans, function(index, p) {
-      plansList.push({
-        text:
-          p.duration +
-          ' Months @ ' +
-          self.formatAmountWithCurrency(p.amount_per_month) +
-          '/mo',
-        value: p.duration,
-        detail: self.makeCardlessEmiDetailText(p.duration, p.amount_per_month),
-      });
-    });
-
-    return plansList;
+    return plans;
   },
 
   showCardlessEmiPlans: function() {
     var self = this;
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
+
+    tab_titles.emiplans = createCardlessEmiTopbarImages(providerCode);
 
     if (!plans) {
       this.fetchCardlessEmiPlans();
@@ -1760,6 +1779,9 @@ Session.prototype = {
       loanUrl: CardlessEmiStore.loanUrls[providerCode],
 
       provider: CardlessEmiStore.providerCode,
+
+      // TODO: This should be picked up from Store
+      branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
         back: bind(function() {
@@ -1802,7 +1824,9 @@ Session.prototype = {
     var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
     var self = this;
 
-    tab_titles.otp = cardlessEmiProviderObj.name;
+    var topbarImages = createCardlessEmiTopbarImages(providerCode);
+    tab_titles.otp = topbarImages;
+
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
     this.customer.checkStatus(
       function(response) {
@@ -1810,16 +1834,29 @@ Session.prototype = {
           return;
         }
 
-        if (!response.saved || (response.error && response.error.description)) {
+        if (response.error && response.error.description) {
+          self.showLoadError(response.error.description, true);
+          Analytics.track('cardless_emi:plans:fetch:error');
+          return;
+        }
+
+        if (response.success && response.emi_plans) {
+          CardlessEmiStore.plans[providerCode] = response.emi_plans;
+
+          CardlessEmiStore.lenderBranding[providerCode] =
+            response.lender_branding_url;
+
+          self.showCardlessEmiPlans();
+          return;
+        }
+
+        // TODO: Remove this condition if event is not being fired.
+        if (!response.saved) {
           var errorDesc =
             'Could not find a ' +
             cardlessEmiProviderObj.name +
             ' account associated with ' +
             getPhone();
-
-          if (response.error && response.error.description) {
-            errorDesc = response.error.description;
-          }
 
           self.showLoadError(errorDesc, true);
 
@@ -2040,9 +2077,7 @@ Session.prototype = {
         return this.clearRequest();
       } else if (this.r._payment && this.r._payment.isMagicPayment) {
         return Confirm.show({
-          message:
-            'Your payment is ongoing. ' +
-            'Are you sure you want to cancel the payment?',
+          message: discreet.confirmCancelMsg,
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
@@ -2217,7 +2252,7 @@ Session.prototype = {
       this.render({ forceRender: true });
     }
     $(this.el).addClass('show-methods');
-    Store.set({ screen: '' });
+    SessionStore.set({ screen: '' });
     if (this.methods.count >= 4) {
       $(this.el).addClass('long');
     }
@@ -2966,7 +3001,8 @@ Session.prototype = {
           self.input(this.el);
 
           if (this.isValid()) {
-            instruments = P13n.listInstruments(getCustomer(this.value)) || [];
+            instruments =
+              P13n.listInstruments(self.getCustomer(this.value)) || [];
 
             if (instruments.length) {
               Analytics.track('p13:instruments:fetch', {
@@ -2976,12 +3012,22 @@ Session.prototype = {
               });
 
               Analytics.setMeta('p13n', true);
+
+              /**
+               * If the number of payment methods available
+               * are few, the container may not be long
+               * already.
+               *
+               * Make the container long if we are going
+               * to use p13n.
+               */
+              makeContainerLong();
             }
           }
 
           self.methodsList.set({
             instruments: instruments,
-            customer: getCustomer(this.value),
+            customer: self.getCustomer(this.value),
             tpvBank: this.tpvBank,
             animate: true,
           });
@@ -3005,7 +3051,7 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isTezScreen = false;
+    var isGPayScreen = false;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3023,9 +3069,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    if (screen === 'tez' && this.separateTez) {
+    if (screen === 'gpay' && this.separateGPay) {
       screen = 'upi';
-      isTezScreen = true;
+      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3112,7 +3158,7 @@ Session.prototype = {
     }
 
     if (this.upiTab) {
-      if (isTezScreen) {
+      if (isGPayScreen) {
         this.upiTab.set({ selectedApp: 'gpay' });
         this.upiTab.onUpiAppSelection('gpay');
       }
@@ -3368,9 +3414,7 @@ Session.prototype = {
 
     var confirm = function() {
       Confirm.show({
-        message:
-          'Your payment is ongoing. ' +
-          'Are you sure you want to cancel the payment?',
+        message: discreet.confirmCancelMsg,
         heading: 'Cancel Payment?',
         positiveBtnTxt: 'Yes, cancel',
         negativeBtnTxt: 'No',
@@ -3505,7 +3549,7 @@ Session.prototype = {
       ) {
         return;
       }
-      this.customer = getCustomer(contact);
+      this.customer = this.getCustomer(contact);
       if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
       }
@@ -3709,34 +3753,28 @@ Session.prototype = {
   getEmiPlans: function(bank) {
     var emi_options = this.emi_options;
     var plans = (emi_options.banks[bank] || {}).plans;
-    var listItems = [];
-    var amount = this.get('amount');
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
-    var that = this;
 
-    if (this.isOfferApplicableOnIssuer(bank)) {
-      amount = this.getDiscountedAmount();
-    }
-
-    each(plans, function(duration, plan) {
+    var emiPlans = [];
+    _Obj.loop(plans, function(plan, duration) {
       if (
         !appliedOffer ||
         (appliedOffer && !appliedOffer.emi_subvention) ||
         (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
       ) {
-        listItems.push({
-          text: getEmiText(that, amount, plan).info,
-          value: duration,
-          badge: plan.subvention === 'merchant' ? 'No cost EMI' : false,
-          detail:
-            'Full amount of ' +
-            that.formatAmountWithCurrency(amount) +
-            ' will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
-        });
+        emiPlans.push(
+          _Obj.extend(
+            {
+              duration: duration,
+              nocost: plan.subvention === 'merchant',
+            },
+            plan
+          )
+        );
       }
     });
 
-    return listItems;
+    return emiPlans;
   },
 
   /**
@@ -3771,6 +3809,7 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var amount = this.get('amount');
+    var tabTitle = 'EMI Plans';
 
     var trackEmi = function(name, data) {
       Analytics.track(name, {
@@ -3791,6 +3830,8 @@ Session.prototype = {
 
     if (type === 'new') {
       return function(e) {
+        tab_titles.emiplans = tabTitle;
+
         var trigger = e.delegateTarget;
         var $trigger = $(trigger);
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
@@ -3808,6 +3849,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          amount: amount,
           plans: emiPlans,
           on: {
             back: bind(function() {
@@ -3834,7 +3876,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(self, amount, plan).short || '';
+              var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -3876,6 +3918,8 @@ Session.prototype = {
       };
     } else if (type === 'saved') {
       return function(e) {
+        tab_titles.emiplans = tabTitle;
+
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
@@ -3894,6 +3938,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          amount: amount,
           plans: emiPlans,
           on: {
             back: function() {
@@ -3920,7 +3965,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(self, amount, plan).short || '';
+              var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
@@ -3969,9 +4014,17 @@ Session.prototype = {
       };
     } else if (type === 'bajaj') {
       return function() {
+        tab_titles.emiplans = tabTitle;
+
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
         var emiPlans = [];
+
+        if (self.isOfferApplicableOnIssuer(bank)) {
+          amount = self.getDiscountedAmount();
+        } else {
+          self.removeAndCleanupOffers();
+        }
 
         each(plans, function(index, p) {
           var amount_per_month = (
@@ -3997,6 +4050,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          amount: amount,
           plans: emiPlans,
           on: {
             back: function() {
@@ -4008,7 +4062,7 @@ Session.prototype = {
 
             select: function(value) {
               var plan = plans[value];
-              var text = getEmiText(self, amount, plan).short || '';
+              var text = getEmiText(self, amount, plan) || '';
 
               self.emiScreenView.setPlan({
                 duration: plan.duration,
@@ -4435,7 +4489,7 @@ Session.prototype = {
       form = 'netbanking';
     }
 
-    if (form === 'tez') {
+    if (form === 'gpay') {
       form = 'upi';
     }
     return '#form-' + form;
@@ -4561,6 +4615,7 @@ Session.prototype = {
       hideOverlayMessage();
       this.modal.hide();
       this.savedCardScreen = undefined;
+      discreet.Bridge.stopListeningForBackPresses();
     }
   },
 
@@ -4712,7 +4767,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = Store.get().screenData.otp.otp;
+    var otp = Store.get().screens.otp.otp;
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -4764,8 +4819,10 @@ Session.prototype = {
     };
 
     if (this.tab === 'cardless_emi') {
+      var providerCode = CardlessEmiStore.providerCode;
+
       queryParams = {
-        provider: CardlessEmiStore.providerCode,
+        provider: providerCode,
         method: 'cardless_emi',
       };
 
@@ -4773,11 +4830,12 @@ Session.prototype = {
         if (msg) {
           this.fetchCardlessEmiPlans();
         } else {
-          CardlessEmiStore.plans[CardlessEmiStore.providerCode] =
-            data.emi_plans;
-          CardlessEmiStore.loanUrls[CardlessEmiStore.providerCode] =
-            data.loan_url;
-          CardlessEmiStore.ott[CardlessEmiStore.providerCode] = data.ott;
+          CardlessEmiStore.plans[providerCode] = data.emi_plans;
+          CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
+          CardlessEmiStore.ott[providerCode] = data.ott;
+          CardlessEmiStore.lenderBranding[providerCode] =
+            data.lender_branding_url;
+
           this.showCardlessEmiPlans();
         }
       };
@@ -4822,7 +4880,8 @@ Session.prototype = {
 
   preSubmit: function(e) {
     var session = this;
-    var storeScreen = getStore('screen');
+    var storeScreen = SessionStore.get().screen;
+
     if (storeScreen === 'amount') {
       return this.extraNext();
     }
@@ -4981,7 +5040,7 @@ Session.prototype = {
             // Set method explicitly.
             data.method = 'emi';
           } else {
-            // This is no the EMI tab, delete duration if it exists.
+            // This is not the EMI tab, delete duration if it exists.
             delete data.emi_duration;
           }
         }
@@ -5130,8 +5189,8 @@ Session.prototype = {
       data['_[flow]'] = 'intent';
     }
 
-    if (data['_[flow]'] === 'tez') {
-      request.tez = true;
+    if (data['_[flow]'] === 'gpay') {
+      request.gpay = true;
       data['_[flow]'] = 'intent';
     }
 
@@ -5160,6 +5219,10 @@ Session.prototype = {
       if (data.contact && !data.emi_duration) {
         this.showCardlessEmiPlans();
         return;
+      }
+
+      if (data.provider === 'flexmoney') {
+        delete data.ott;
       }
 
       /**
@@ -5481,6 +5544,18 @@ Session.prototype = {
     }
   },
 
+  closeAndDismiss: function() {
+    var wasShown = this.modal && this.modal.isShown;
+    this.saveAndClose();
+
+    if (wasShown) {
+      Razorpay.sendMessage({
+        event: 'dismiss',
+        data: this.dismissReason,
+      });
+    }
+  },
+
   setEmiOptions: function() {
     var emiBanks = {};
     var preferences = this.preferences;
@@ -5705,9 +5780,9 @@ Session.prototype = {
         methods.qr = true;
       }
 
-      if (this.separateTez) {
+      if (this.separateGPay) {
         methods.count++;
-        methods.tez = true;
+        methods.gpay = true;
       }
     }
 
@@ -5807,12 +5882,13 @@ Session.prototype = {
     this.offers.showError(methodDescription, cb);
   },
 
-  setPreferences: function(prefs) {
-    Store.set({
-      preferences: prefs,
-      downtimes: discreet.Downtimes.getDowntimes(prefs),
-    });
+  getCustomer: function() {
+    return getCustomer.apply(null, arguments);
+  },
 
+  setPreferences: function(prefs) {
+    PreferencesStore.set(prefs);
+    DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
@@ -5839,7 +5915,7 @@ Session.prototype = {
     if (preferences.global === false) {
       this.local = true;
       customer = new Customer('');
-      getCustomer = function() {
+      this.getCustomer = function() {
         return customer;
       };
     }
@@ -5865,7 +5941,7 @@ Session.prototype = {
         session_options['prefill.email'] = saved_customer.email;
       }
 
-      customer = getCustomer(saved_customer.contact);
+      customer = this.getCustomer(saved_customer.contact);
       sanitizeTokens(saved_customer.tokens, filters);
       customer.tokens = saved_customer.tokens;
 
@@ -5902,20 +5978,28 @@ Session.prototype = {
     /* Apply options overrides from preferences */
     Razorpay.configure(options);
 
-    if (order) {
-      if (order.amount) {
-        session_options.amount = order.partial_payment
-          ? order.amount_due
-          : order.amount;
-      }
+    // Get amount
+    var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
+      item
+    ) {
+      return item && item.amount;
+    })[0];
 
-      if (order.currency) {
-        session_options.currency = order.currency;
-      }
-    } else if (invoice && invoice.amount) {
-      session_options.amount = invoice.amount;
-    } else if (subscription && subscription.amount) {
-      session_options.amount = subscription.amount;
+    if (itemWithAmount) {
+      session_options.amount = itemWithAmount.partial_payment
+        ? itemWithAmount.amount_due
+        : itemWithAmount.amount;
+    }
+
+    // Get currency
+    var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
+      item
+    ) {
+      return item && item.currency;
+    })[0];
+
+    if (itemWithCurrency) {
+      session_options.currency = itemWithCurrency.currency;
     }
 
     /*
@@ -5946,7 +6030,7 @@ Session.prototype = {
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
       this.irctc = true;
-      this.separateTez = true;
+      this.separateGPay = true;
     }
 
     /* set payment methods on the basis of preferences */
@@ -5955,7 +6039,7 @@ Session.prototype = {
   },
 
   showModal: function(preferences) {
-    var qpmap = getQueryParams();
+    var qpmap = _Obj.unflatten(getQueryParams());
 
     if (!this.methods.count) {
       var message = 'No appropriate payment method found.';
@@ -6042,6 +6126,9 @@ Session.prototype = {
 
       callback(preferences);
     });
+
+    /* Start listening for back presses */
+    discreet.Bridge.setHistoryAndListenForBackPresses();
 
     return this.prefCall;
   },

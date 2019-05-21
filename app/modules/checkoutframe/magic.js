@@ -5,7 +5,7 @@ import * as Bridge from 'bridge';
 import { STRINGS, TIMEOUT_MAGIC_NO_ACTION } from 'common/constants';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
-import store from 'checkoutframe/store';
+import OtpScreenStore from 'checkoutstore/screens/otp';
 
 /* Constants */
 const TIMEOUT_CLEAR = -1;
@@ -175,7 +175,7 @@ export default class Magic {
      * In case of choice page, the magic will take us to the otp page
      * and then call handleRelay `page_resolved` with `type` as `otp`
      */
-    if (data.otp && !store.get().screenData.otp.otp) {
+    if (data.otp && !OtpScreenStore.get().otp) {
       this.session.otpView.updateScreen({
         otp: data.otp,
       });

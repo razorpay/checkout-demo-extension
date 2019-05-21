@@ -57,7 +57,7 @@ export const TAB_TITLES = {
   netbanking: 'Netbanking',
   qr: 'QR',
   upi: 'UPI',
-  tez: 'Google Pay',
+  gpay: 'Google Pay',
   wallet: 'Wallet',
 };
 
@@ -98,6 +98,7 @@ export const AVAILABLE_METHODS = [
   'netbanking',
   'wallet',
   'upi',
+  'gpay',
   'emi',
   'cardless_emi',
   'qr',
@@ -105,3 +106,5 @@ export const AVAILABLE_METHODS = [
 
 /* VPA regex, copied from API */
 export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-zA-Z]+$/;
+
+export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';

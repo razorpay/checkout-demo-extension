@@ -7,7 +7,7 @@
       {showRecommendedUPIApp}
     />
   {:else}
-    {#if selectedApp === undefined || isTezSelected}
+    {#if selectedApp === undefined || isGPaySelected}
       <div class="legend left">Select a UPI app</div>
       <Grid items={topUpiApps}
         on:select="onUpiAppSelection(event)"
@@ -29,7 +29,7 @@
       </div>
       <Card selected={true} on:click="handleCardClick(event)">
         {#if selectedApp === 'gpay'}
-          <div id="upi-tez">
+          <div id="upi-gpay">
             <div class="elem-wrap collect-form">
               <!-- TODO: remove all non svelte css for this -->
               <Field
@@ -50,7 +50,7 @@
                 <select
                   required
                   class="input"
-                  name="tez_bank"
+                  name="gpay_bank"
                   ref:googlePayPspHandle
                   on:change="googlePayPspHandleChange(event)"
                   bind:value="pspHandle">
@@ -156,7 +156,7 @@
     z-index: 1;
   }
 
-  #upi-tez {
+  #upi-gpay {
     display: block;
   }
 
@@ -184,7 +184,7 @@
 
 <script>
   import { getSession } from 'sessionmanager.js';
-  import * as Tez from 'tez.js';
+  import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
   import Store from 'checkoutframe/store';
   import { VPA_REGEX } from 'common/constants.js';
@@ -232,10 +232,7 @@
     },
   ];
 
-  const checkTez = function(
-    successCallback = () => {},
-    errorCallback = () => {}
-  ) {
+  const checkGPay = () => {
     var session = getSession();
 
     var hasFeature =
@@ -245,20 +242,20 @@
 
     /* disable Web payments API for fee_bearer for now */
     if (session.preferences.fee_bearer) {
-      return errorCallback();
+      return Promise.reject();
     }
 
     /* disable Web payments API for Android SDK as we have intent there */
     if (Bridge.checkout.exists()) {
-      return errorCallback();
+      return Promise.reject();
     }
 
     /* disable it if it's not enabled for a specific merchant */
-    if (!(hasFeature || Tez.checkKey(session.get('key')))) {
-      return errorCallback();
+    if (!(hasFeature || GPay.checkKey(session.get('key')))) {
+      return Promise.reject();
     }
 
-    session.r.isTezAvailable(successCallback, errorCallback);
+    return session.r.checkPaymentAdapter('gpay');
   };
 
   export default {
@@ -300,20 +297,20 @@
         return preferIntent && intentApps && _.lengthOf(intentApps) > 0;
       },
 
-      /* Will be true if Tez for web payments API is selected */
-      isTezSelected: ({ selectedApp, useWebPaymentsApi }) =>
+      /* Will be true if Google Pay for web payments API is selected */
+      isGPaySelected: ({ selectedApp, useWebPaymentsApi }) =>
         selectedApp === 'gpay' && useWebPaymentsApi,
     },
 
     oncreate() {
       const session = getSession();
 
-      checkTez(
-        /* Use Tez */
-        () => this.set({ useWebPaymentsApi: true }),
-        /* Don't use Tez */
-        () => this.set({ useWebPaymentsApi: false })
-      );
+      checkGPay()
+        /* Use Google Pay */
+        .then(() => this.set({ useWebPaymentsApi: true }))
+        /* Don't use Google Pay */
+        .catch(() => this.set({ useWebPaymentsApi: false }));
+
 
       /* TODO: improve handling of `prefill.vpa` */
       if (session.get('prefill.vpa')) {
@@ -336,10 +333,10 @@
 
       if (
         changed.selectedApp &&
-        (session.tab === 'upi' || session.tab === 'tez')
+        (session.tab === 'upi' || session.tab === 'gpay')
       ) {
         /* TODO: bad practice, remove asap */
-        if (current.selectedApp === undefined || current.isTezSelected) {
+        if (current.selectedApp === undefined || current.isGPaySelected) {
           _El.removeClass(_Doc.querySelector('#body'), 'sub');
         } else {
           _El.addClass(_Doc.querySelector('#body'), 'sub');
@@ -349,12 +346,12 @@
       if (changed.tab) {
         /**
          * For separate Gpay tab, if it is intent app and app does not exist,
-         * fallback to older tez UI
+         * fallback to older GPay UI
          **/
         let { selectedApp, intent, tab, intentApps } = current;
 
         if (selectedApp === 'gpay') {
-          if (tab === 'tez') {
+          if (tab === 'gpay') {
             this.set({ preferIntent: doesAppExist(
               GOOGLE_PAY_PACKAGE_NAME,
               intentApps
@@ -377,7 +374,7 @@
           selectedApp,
           intent,
           pspHandle,
-          isTezSelected
+          isGPaySelected
         } = this.get();
 
         let vpa = '';
@@ -391,9 +388,9 @@
           data = this.refs.intentView.getPayload();
         } else {
           if (selectedApp) {
-            if (isTezSelected) {
+            if (isGPaySelected) {
               data = {
-                '_[flow]': 'tez',
+                '_[flow]': 'gpay',
               };
             } else {
               let vpaToSubmit = vpa;
@@ -431,11 +428,11 @@
         const {
           intent,
           selectedApp,
-          isTezSelected,
+          isGPaySelected,
         } = this.get();
 
         if (!intent) {
-          if (isTezSelected) {
+          if (isGPaySelected) {
             this.set({ selectedApp: undefined });
             return false;
           }
@@ -456,9 +453,9 @@
         let pattern = '';
 
         this.set({ selectedApp: id });
-        const { selectedAppData, isTezSelected } = this.get();
+        const { selectedAppData, isGPaySelected } = this.get();
 
-        if (isTezSelected) {
+        if (isGPaySelected) {
           return session.preSubmit();
         }
 

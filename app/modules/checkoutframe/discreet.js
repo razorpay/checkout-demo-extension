@@ -5,7 +5,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
-import * as Tez from 'tez';
+import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
@@ -45,7 +45,10 @@ import * as Downtimes from 'checkoutframe/downtimes';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
-import Store from 'checkoutframe/store';
+
+import Store from 'checkoutstore';
+import PreferencesStore from 'checkoutstore/preferences.js';
+import SessionStore from 'checkoutstore/session.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
@@ -61,7 +64,7 @@ export default {
   AnalyticsTypes,
   UPIUtils,
   setShieldParams,
-  Tez,
+  GPay,
   Color,
   _PaymentMethodIcons,
   Confirm,
@@ -71,7 +74,9 @@ export default {
   getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
+
   cancelMsg: strings.cancelMsg,
+  confirmCancelMsg: strings.confirmCancelMsg,
   wrongOtpMsg: strings.wrongOtp,
 
   initIframe,
@@ -87,11 +92,14 @@ export default {
   Bridge,
   P13n,
   MethodsList,
-  Store,
   UserAgent,
   Offers,
   Flows,
   Downtimes,
+
+  Store,
+  PreferencesStore,
+  SessionStore,
 
   getQueryParams: _.getQueryParams,
 
@@ -118,4 +126,9 @@ export default {
 
   MagicView,
   UpiTab,
+
+  _Arr,
+  _Obj,
+  _Func,
+  _,
 };

@@ -9,6 +9,7 @@ const list = {
   bajaj: ['Bajaj Finserv'],
   earlysalary: ['EarlySalary'],
   zestmoney: ['ZestMoney'],
+  flexmoney: ['InstaCred Cardless EMI'],
 };
 
 /**
@@ -29,8 +30,8 @@ export const createProvider = (code, title) => ({
 export const providers = _Obj.map(list, (details, code) => ({
   name: details[0],
   code,
-  logo: prefix + code + '.png',
-  sqLogo: sqPrefix + code + '.png',
+  logo: prefix + code + '.svg',
+  sqLogo: sqPrefix + code + '.svg',
 }));
 
 export const getProvider = code => providers[code];
