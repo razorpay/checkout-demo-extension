@@ -50,7 +50,7 @@ function getDisabledMethods(downtimes) {
 
 const DOWNTIME_METHOD_COPY_MAP = {
   qr: 'upi',
-  tez: 'upi',
+  gpay: 'upi',
 };
 
 /**

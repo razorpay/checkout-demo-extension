@@ -156,7 +156,7 @@ export function getMethodDowntimeDescription(method, { availableMethods }) {
       prefix = 'Wallets';
       break;
 
-    case 'tez':
+    case 'gpay':
       prefix = 'Google Pay';
       break;
   }
