@@ -6,6 +6,7 @@ import { VPA_REGEX } from 'common/constants';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import DowntimesStore from 'checkoutstore/downtimes.js';
 
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
 
@@ -73,10 +74,17 @@ let currentUid = null;
  * @param  {Array} instruments is the list of instruments to be filtered.
  * @return {Array} filtered our instruments
  */
-const fiterInstruments = instruments => {
+const filterInstruments = instruments => {
+  const { disabled: disabledMethods = [] } = DowntimesStore.get();
+
   return (
     instruments
     |> _Arr.filter(instrument => {
+      // Remove instruments for which there is a downtime
+      if (_Arr.contains(disabledMethods, instrument.method)) {
+        return false;
+      }
+
       switch (instrument.method) {
         case 'upi':
           if (instrument.vpa) {
@@ -248,7 +256,7 @@ export const listInstruments = customer => {
     return;
   }
 
-  currentCustomer = fiterInstruments(currentCustomer);
+  currentCustomer = filterInstruments(currentCustomer);
 
   _Arr.loop(currentCustomer, item => {
     let timeSincePayment = _.now() - item.timestamp;
