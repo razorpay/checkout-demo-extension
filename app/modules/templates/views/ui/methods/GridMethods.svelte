@@ -57,6 +57,7 @@
               down: isDown,
               downMessage: getMethodDowntimeDescription(method, {
                 availableMethods: AVAIL_METHODS,
+                downMethods: downtimes.disabled,
               }),
             });
           }

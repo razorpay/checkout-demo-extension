@@ -119,63 +119,68 @@ export function getMethodDescription(method, props) {
 }
 
 /**
+ * Returns the prefix for the given method.
+ * @param {String} method
+ * @return {String}
+ */
+function getMethodPrefix(method) {
+  switch (method) {
+    case 'card':
+    case 'credit_card':
+    case 'debit_card':
+      return 'Cards';
+
+    case 'netbanking':
+    case 'emandate':
+      return 'Netbanking';
+
+    case 'emi':
+    case 'cardless_emi':
+      return 'EMI';
+
+    case 'qr':
+      return 'QR';
+
+    case 'upi':
+      return 'UPI';
+
+    case 'wallet':
+      return 'Wallets';
+
+    case 'gpay':
+      return 'Google Pay';
+
+    default:
+      return method[0].toUpperCase() + method.slice(1);
+  }
+}
+
+/**
  * Returns the downtime description for the given method.
  * @param {String} method
  * @param {Object} param1
  *  @prop {Array} availableMethods
  */
-export function getMethodDowntimeDescription(method, { availableMethods }) {
-  let prefix = method[0].toUpperCase() + method.slice(1);
+export function getMethodDowntimeDescription(
+  method,
+  { availableMethods, downMethods = [] }
+) {
+  const prefix = getMethodPrefix(method);
+  const pluralPrefix = /s$/i.test(prefix);
+  const isOrAre = pluralPrefix ? 'are' : 'is';
 
-  switch (method) {
-    case 'card':
-    case 'credit_card':
-    case 'debit_card':
-      prefix = 'Cards';
-      break;
+  const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];
 
-    case 'netbanking':
-    case 'emandate':
-      prefix = 'Netbanking';
-      break;
-
-    case 'emi':
-    case 'cardless_emi':
-      prefix = 'EMI';
-      break;
-
-    case 'qr':
-      prefix = 'QR';
-      break;
-
-    case 'upi':
-      prefix = 'UPI';
-      break;
-
-    case 'wallet':
-      prefix = 'Wallets';
-      break;
-
-    case 'gpay':
-      prefix = 'Google Pay';
-      break;
-  }
-
-  const sentences = [];
-  const pluralPrefix = prefix[prefix.length - 1].toLowerCase() === 's';
-
-  sentences.push(
-    `${prefix} ${
-      pluralPrefix ? 'are' : 'is'
-    } facing temporary issues right now.`
+  // Check if there's another method available that is not down.
+  const isAnotherMethodAvailable = Boolean(
+    _Arr.filter(
+      availableMethods,
+      enabledMethod => !_Arr.contains(downMethods, enabledMethod)
+    ).length
   );
 
   // If there's another method available, ask user to select it.
-  if (
-    availableMethods &&
-    availableMethods.length &&
-    availableMethods.length > 1
-  ) {
+  if (isAnotherMethodAvailable) {
     sentences.push('Please select another method.');
   }
 

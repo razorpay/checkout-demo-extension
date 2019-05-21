@@ -97,6 +97,7 @@
             down: _Arr.contains(down, method),
             downMessage: getMethodDowntimeDescription(method, {
               availableMethods: AVAILABLE_METHODS,
+              downMethods: downtimes.disabled,
             }),
             icon: session.themeMeta.icons[method],
             title: session.tab_titles[method],

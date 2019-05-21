@@ -90,14 +90,14 @@ export function getDowntimes(preferences) {
     return downtimes;
   }
 
-  _Arr.loop(_Obj.clone(preferences.downtimes.items), downtime => {
+  _Arr.loop(preferences.downtimes.items, downtime => {
     const { method } = downtime;
 
     if (!downtimes[method]) {
       downtimes[method] = [];
     }
 
-    downtimes[method].push(downtime);
+    downtimes[method].push(_Obj.clone(downtime));
   });
 
   downtimes = copyMethodsIfNeeded(downtimes);
