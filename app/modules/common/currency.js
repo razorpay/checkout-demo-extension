@@ -1,3 +1,9 @@
+/*
+* REMOVE THIS IMPORT STATEMENT AFTER INTEGRATING API
+* Using hard-coded list of currencies for min_value
+*/
+import currenciesList from './currenciesList';
+
 /**
  * Remove decimals from the amount if decimals are zeroes.
  * @param {String} decimals Number of decimal digits
@@ -777,6 +783,16 @@ const currenciesConfig = {
     minor: 'ngwee',
   },
 };
+
+/**
+* REMOVE THIS AFTER INTEGRATING API
+* Adding min_value from hard-coded list of currencies
+*/
+Object.keys(currenciesConfig).forEach(key => {
+  if(currenciesList[key]) {
+    currenciesConfig[key].min_value = currenciesList[key].min_value;
+  }
+});
 
 /**
  * @param {String} currency
