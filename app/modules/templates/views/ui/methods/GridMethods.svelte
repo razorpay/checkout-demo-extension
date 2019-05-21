@@ -10,7 +10,7 @@
 
 <script>
   import { getSession } from 'sessionmanager';
-  import Store from 'checkoutframe/store';
+  import DowntimesStore from 'checkoutstore/downtimes.js';
   import { getMethodDescription, getMethodDowntimeDescription } from 'checkoutframe/paymentmethods';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -28,7 +28,7 @@
         let AVAIL_METHODS = _Obj.clone(avail_methods);
         let retMethods = [];
 
-        const downtimes = Store.get().downtimes || {};
+        const downtimes = DowntimesStore.get() || {};
         const down = downtimes.disabled || [];
 
         if (o('theme.debit_card')) {

@@ -49,6 +49,7 @@ import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
 import SessionStore from 'checkoutstore/session.js';
+import DowntimesStore from 'checkoutstore/downtimes.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
@@ -99,6 +100,7 @@ export default {
 
   Store,
   PreferencesStore,
+  DowntimesStore,
   SessionStore,
 
   getQueryParams: _.getQueryParams,
