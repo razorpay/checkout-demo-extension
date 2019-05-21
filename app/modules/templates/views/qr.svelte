@@ -108,6 +108,7 @@ img {
 <script>
   import { RazorpayConfig } from 'common/Razorpay';
   import { processInstrument } from 'checkoutframe/personalization';
+  import DowntimesStore from 'checkoutstore/downtimes.js';
 
   export default {
     components: {
@@ -150,7 +151,7 @@ img {
           this.createPayment();
         }
 
-        const downtimes = Store.get().downtimes || {};
+        const downtimes = DowntimesStore.get();
         if (downtimes.qr && downtimes.qr.length) {
           this.set({
             down: true,
