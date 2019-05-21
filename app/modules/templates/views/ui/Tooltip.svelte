@@ -94,7 +94,13 @@
     _Arr.loop(ALL_DIRECTIONS, direction => _El.removeClass(tooltip, `tooltip-${direction}`));
 
     // Align tooltip to provided directions.
-    _Arr.loop(directions, direction => _El.addClass(tooltip, `tooltip-${direction}`));
+    _Arr.loop(directions, direction => {
+      if (!direction) {
+        return;
+      }
+
+      _El.addClass(tooltip, `tooltip-${direction}`)
+    });
   }
 
   /**
@@ -117,7 +123,7 @@
    *
    * @param {DOMNode} parent Container to which tooltip should be kept bounded to.
    * @param {DOMNode} tooltip
-   * @param {Array} align List of directions
+   * @param {Array} directions List of directions
    *
    * @return {Array}
    */
@@ -150,7 +156,7 @@
       const opposite = OPPOSITE_AXIS[flipped];
 
       // Flip just the overflowing direction
-      directionsList.push([flipped, _Arr.remove(_Obj.clone(directions), overflowIn[0])]);
+      directionsList.push([flipped].concat(_Arr.remove(_Obj.clone(directions), overflowIn[0])));
 
       // Flip the entire direction
       directionsList.push([flipped]);
