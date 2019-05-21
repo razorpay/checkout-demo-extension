@@ -22,11 +22,14 @@ function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
 const DISABLE_METHOD = {
   upi: disableBasedOnSeverityOrScheduled(['high'], true),
   qr: disableBasedOnSeverityOrScheduled(['high'], true),
+  gpay: disableBasedOnSeverityOrScheduled(['high'], true),
 };
 
 /**
  * Gets the list of methods to be disabled.
  * @param {Object} downtimes
+ *  @key {String} method
+ *  @value {Array} downtimes Downtimes of the method
  *
  * @return {Array}
  */
