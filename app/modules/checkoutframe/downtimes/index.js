@@ -36,14 +36,19 @@ const DISABLE_METHOD = {
 function getDisabledMethods(downtimes) {
   const disabled = [];
 
+  // Loop through all methods
   _Obj.loop(downtimes, (methodDowntimes, method) => {
+    // If we don't have a function to eval downtime for the method, do nothing
     if (!DISABLE_METHOD[method]) {
       return;
     }
 
-    if (
+    // Check if the method's downtime checker function eval to true for any of the downtimes for the method
+    const isMethodDown = Boolean(
       _Arr.find(methodDowntimes, downtime => DISABLE_METHOD[method](downtime))
-    ) {
+    );
+
+    if (isMethodDown) {
       disabled.push(method);
     }
   });
