@@ -186,7 +186,7 @@
   import { getSession } from 'sessionmanager.js';
   import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
-  import Store from 'checkoutframe/store';
+  import DowntimesStore from 'checkoutstore/downtimes.js';
   import { VPA_REGEX } from 'common/constants.js';
   import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
 
@@ -320,7 +320,7 @@
         });
       }
 
-      const downtimes = Store.get().downtimes || {};
+      const downtimes = DowntimesStore.get() || {};
       if (downtimes.upi && downtimes.upi.length) {
         this.set({
           down: true,

@@ -9,7 +9,11 @@
 >
 
   <label>
-    <i>{@html icon}</i>
+    {#if method === 'gpay'}
+      <i class="gpay-icon"> </i>
+    {:else}
+      <i>{@html icon}</i>
+    {/if}
     <span class="title">{title}</span>
     {#if down}
       <span class="downtime">

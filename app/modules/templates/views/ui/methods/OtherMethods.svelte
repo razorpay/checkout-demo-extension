@@ -48,7 +48,7 @@
 </style>
 
 <script>
-  import Store from 'checkoutframe/store';
+  import DowntimesStore from 'checkoutstore/downtimes.js';
   import { getMethodDowntimeDescription } from 'checkoutframe/paymentmethods';
 
   export default {
@@ -88,7 +88,7 @@
 
     computed: {
       methods: function ({ AVAILABLE_METHODS, session }) {
-        const downtimes = Store.get().downtimes || {};
+        const downtimes = DowntimesStore.get() || {};
         const down = downtimes.disabled || [];
 
         const methods = _Arr.map(AVAILABLE_METHODS, method => {
