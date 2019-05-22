@@ -862,17 +862,6 @@ const currenciesConfig = {
     minor: 'ngwee',
   },
 };
-
-/**
- * REMOVE THIS AFTER INTEGRATING API
- * Adding min_value from hard-coded list of currencies
- */
-Object.keys(currenciesConfig).forEach(key => {
-  if (currenciesList[key]) {
-    currenciesConfig[key].min_value = currenciesList[key].min_value;
-  }
-});
-
 /**
  * @param {String} currency
  * @return {Object} config
@@ -1142,6 +1131,26 @@ export const displayCurrencies = {
 };
 
 /**
+ * REMOVE THIS AFTER INTEGRATING API
+ * Adding min_value from hard-coded list of currencies
+ */
+_Obj.loop(currenciesList, (val, key) => {
+  if (currenciesConfig[key]) {
+    currenciesConfig[key].minimum = currenciesList[key].min_value;
+  }
+});
+
+/**
+ * REMOVE THIS AFTER INTEGRATING API
+ * Adding symbol from hard-coded list of currencies
+ */
+_Obj.loop(currenciesList, (val, key) => {
+  if (displayCurrencies[key]) {
+    displayCurrencies[key] = currenciesList[key].symbol;
+  }
+});
+
+/**
  * 1. Add default currency's attribs
  *    to rest of the currencies
  *    as default attribs.
@@ -1163,6 +1172,16 @@ _Obj.loop(displayCurrencies, (symbol, currency) => {
     currenciesConfig[currency].symbol = displayCurrencies[currency];
   }
 });
+
+/**
+ * TODO
+ * Once we start getting currencies from
+ * preferences, we would augment the currencies
+ * config with the new details, and hence
+ * instead of exporting a `const currencies` here,
+ * we should be exporting `getCurrencies`
+ * which would return the current state of `currencies`.
+ */
 
 export const currencies = _Arr.reduce(
   supportedCurrencies,
