@@ -1,7 +1,7 @@
 /*
-* REMOVE THIS IMPORT STATEMENT AFTER INTEGRATING API
-* Using hard-coded list of currencies for min_value
-*/
+ * REMOVE THIS IMPORT STATEMENT AFTER INTEGRATING API
+ * Using hard-coded list of currencies for min_value
+ */
 import currenciesList from './currenciesList';
 
 /**
@@ -107,6 +107,7 @@ const currenciesConfig = {
 
   AED: {
     minor: 'fil',
+    minimum: 10,
   },
 
   AFN: {
@@ -115,10 +116,12 @@ const currenciesConfig = {
 
   ALL: {
     minor: 'qindarka',
+    minimum: 221,
   },
 
   AMD: {
     minor: 'luma',
+    minimum: 975,
   },
 
   ANG: {
@@ -132,6 +135,7 @@ const currenciesConfig = {
   ARS: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'centavo',
+    minimum: 80,
   },
 
   AUD: {
@@ -142,6 +146,7 @@ const currenciesConfig = {
 
   AWG: {
     minor: 'cent',
+    minimum: 10,
   },
 
   AZN: {
@@ -154,10 +159,12 @@ const currenciesConfig = {
 
   BBD: {
     minor: 'cent',
+    minimum: 10,
   },
 
   BDT: {
     minor: 'paisa',
+    minimum: 168,
   },
 
   BGN: {
@@ -177,14 +184,17 @@ const currenciesConfig = {
 
   BMD: {
     minor: 'cent',
+    minimum: 10,
   },
 
   BND: {
     minor: 'sen',
+    minimum: 10,
   },
 
   BOB: {
     minor: 'centavo',
+    minimum: 14,
   },
 
   BRL: {
@@ -195,6 +205,7 @@ const currenciesConfig = {
 
   BSD: {
     minor: 'cent',
+    minimum: 10,
   },
 
   BTN: {
@@ -203,6 +214,7 @@ const currenciesConfig = {
 
   BWP: {
     minor: 'thebe',
+    minimum: 22,
   },
 
   BYR: {
@@ -212,6 +224,7 @@ const currenciesConfig = {
 
   BZD: {
     minor: 'cent',
+    minimum: 10,
   },
 
   CAD: {
@@ -238,16 +251,19 @@ const currenciesConfig = {
 
   CNY: {
     minor: 'jiao',
+    minimum: 14,
   },
 
   COP: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'centavo',
+    minimum: 1000,
   },
 
   CRC: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'centimo',
+    minimum: 1000,
   },
 
   CUC: {
@@ -256,6 +272,7 @@ const currenciesConfig = {
 
   CUP: {
     minor: 'centavo',
+    minimum: 53,
   },
 
   CVE: {
@@ -265,6 +282,7 @@ const currenciesConfig = {
   CZK: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'haler',
+    minimum: 46,
   },
 
   DJF: {
@@ -280,14 +298,17 @@ const currenciesConfig = {
 
   DOP: {
     minor: 'centavo',
+    minimum: 102,
   },
 
   DZD: {
     minor: 'centime',
+    minimum: 239,
   },
 
   EGP: {
     minor: 'piaster',
+    minimum: 35,
   },
 
   ERN: {
@@ -296,6 +317,7 @@ const currenciesConfig = {
 
   ETB: {
     minor: 'cent',
+    minimum: 57,
   },
 
   EUR: {
@@ -305,6 +327,7 @@ const currenciesConfig = {
 
   FJD: {
     minor: 'cent',
+    minimum: 10,
   },
 
   FKP: {
@@ -322,6 +345,7 @@ const currenciesConfig = {
 
   GIP: {
     minor: 'pence',
+    minimum: 10,
   },
 
   GMD: {
@@ -330,10 +354,12 @@ const currenciesConfig = {
 
   GTQ: {
     minor: 'centavo',
+    minimum: 16,
   },
 
   GYD: {
     minor: 'cent',
+    minimum: 418,
   },
 
   HKD: {
@@ -343,30 +369,36 @@ const currenciesConfig = {
 
   HNL: {
     minor: 'centavo',
+    minimum: 49,
   },
 
   HRK: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'lipa',
+    minimum: 14,
   },
 
   HTG: {
     minor: 'centime',
+    minimum: 167,
   },
 
   HUF: {
     decimals: 0,
     format: CURRENCY_FORMATTERS.none,
     major: 'forint',
+    minimum: 555,
   },
 
   IDR: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'sen',
+    minimum: 1000,
   },
 
   ILS: {
     minor: 'agorot',
+    minimum: 10,
   },
 
   INR: {
@@ -392,6 +424,7 @@ const currenciesConfig = {
 
   JMD: {
     minor: 'cent',
+    minimum: 250,
   },
 
   JOD: {
@@ -407,14 +440,17 @@ const currenciesConfig = {
 
   KES: {
     minor: 'cent',
+    minimum: 201,
   },
 
   KGS: {
     minor: 'tyyn',
+    minimum: 140,
   },
 
   KHR: {
     minor: 'sen',
+    minimum: 1000,
   },
 
   KMF: {
@@ -440,31 +476,38 @@ const currenciesConfig = {
 
   KYD: {
     minor: 'cent',
+    minimum: 10,
   },
 
   KZT: {
     minor: 'tiyn',
+    minimum: 759,
   },
 
   LAK: {
     minor: 'at',
+    minimum: 1000,
   },
 
   LBP: {
     format: CURRENCY_FORMATTERS.threespaceseparator,
     minor: 'piastre',
+    minimum: 1000,
   },
 
   LKR: {
     minor: 'cent',
+    minimum: 358,
   },
 
   LRD: {
     minor: 'cent',
+    minimum: 325,
   },
 
   LSL: {
     minor: 'lisente',
+    minimum: 29,
   },
 
   LTL: {
@@ -483,10 +526,12 @@ const currenciesConfig = {
 
   MAD: {
     minor: 'centime',
+    minimum: 20,
   },
 
   MDL: {
     minor: 'ban',
+    minimum: 35,
   },
 
   MGA: {
@@ -500,14 +545,17 @@ const currenciesConfig = {
 
   MMK: {
     minor: 'pya',
+    minimum: 1000,
   },
 
   MNT: {
     minor: 'mongo',
+    minimum: 1000,
   },
 
   MOP: {
     minor: 'avo',
+    minimum: 17,
   },
 
   MRO: {
@@ -516,23 +564,27 @@ const currenciesConfig = {
 
   MUR: {
     minor: 'cent',
+    minimum: 70,
   },
 
   MVR: {
     minor: 'lari',
+    minimum: 31,
   },
 
   MWK: {
     minor: 'tambala',
+    minimum: 1000,
   },
 
   MXN: {
-    minimum: 1000,
     minor: 'centavo',
+    minimum: 39,
   },
 
   MYR: {
     minor: 'sen',
+    minimum: 10,
   },
 
   MZN: {
@@ -542,14 +594,17 @@ const currenciesConfig = {
 
   NAD: {
     minor: 'cent',
+    minimum: 29,
   },
 
   NGN: {
     minor: 'kobo',
+    minimum: 723,
   },
 
   NIO: {
     minor: 'centavo',
+    minimum: 66,
   },
 
   NOK: {
@@ -560,6 +615,7 @@ const currenciesConfig = {
 
   NPR: {
     minor: 'paise',
+    minimum: 221,
   },
 
   NZD: {
@@ -578,18 +634,22 @@ const currenciesConfig = {
 
   PEN: {
     minor: 'centimo',
+    minimum: 10,
   },
 
   PGK: {
     minor: 'toea',
+    minimum: 10,
   },
 
   PHP: {
     minor: 'centavo',
+    minimum: 106,
   },
 
   PKR: {
     minor: 'paisa',
+    minimum: 227,
   },
 
   PLN: {
@@ -605,6 +665,7 @@ const currenciesConfig = {
 
   QAR: {
     minor: 'dirham',
+    minimum: 10,
   },
 
   RON: {
@@ -615,6 +676,7 @@ const currenciesConfig = {
   RUB: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'kopeck',
+    minimum: 130,
   },
 
   RWF: {
@@ -625,6 +687,7 @@ const currenciesConfig = {
 
   SAR: {
     minor: 'halalat',
+    minimum: 10,
   },
 
   SBD: {
@@ -633,6 +696,7 @@ const currenciesConfig = {
 
   SCR: {
     minor: 'cent',
+    minimum: 28,
   },
 
   SEK: {
@@ -652,10 +716,12 @@ const currenciesConfig = {
 
   SLL: {
     minor: 'cent',
+    minimum: 1000,
   },
 
   SOS: {
     minor: 'centesimi',
+    minimum: 1000,
   },
 
   SRD: {
@@ -666,8 +732,13 @@ const currenciesConfig = {
     minor: 'centimo',
   },
 
+  SSP: {
+    minor: 'piaster',
+  },
+
   SVC: {
     minor: 'centavo',
+    minimum: 18,
   },
 
   SYP: {
@@ -677,10 +748,12 @@ const currenciesConfig = {
   SZL: {
     format: CURRENCY_FORMATTERS.szl,
     minor: 'cent',
+    minimum: 29,
   },
 
   THB: {
     minor: 'satang',
+    minimum: 64,
   },
 
   TJS: {
@@ -706,6 +779,7 @@ const currenciesConfig = {
 
   TTD: {
     minor: 'cent',
+    minimum: 14,
   },
 
   TWD: {
@@ -714,6 +788,7 @@ const currenciesConfig = {
 
   TZS: {
     minor: 'cent',
+    minimum: 1000,
   },
 
   UAH: {
@@ -733,10 +808,12 @@ const currenciesConfig = {
   UYU: {
     format: CURRENCY_FORMATTERS.threecommadecimal,
     minor: 'centé',
+    minimum: 67,
   },
 
   UZS: {
     minor: 'tiyin',
+    minimum: 1000,
   },
 
   VND: {
@@ -772,11 +849,13 @@ const currenciesConfig = {
 
   YER: {
     minor: 'fil',
+    minimum: 501,
   },
 
   ZAR: {
     format: CURRENCY_FORMATTERS.threespaceseparator,
     minor: 'cent',
+    minimum: 29,
   },
 
   ZMK: {
@@ -785,11 +864,11 @@ const currenciesConfig = {
 };
 
 /**
-* REMOVE THIS AFTER INTEGRATING API
-* Adding min_value from hard-coded list of currencies
-*/
+ * REMOVE THIS AFTER INTEGRATING API
+ * Adding min_value from hard-coded list of currencies
+ */
 Object.keys(currenciesConfig).forEach(key => {
-  if(currenciesList[key]) {
+  if (currenciesList[key]) {
     currenciesConfig[key].min_value = currenciesList[key].min_value;
   }
 });
