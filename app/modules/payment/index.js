@@ -623,7 +623,7 @@ razorpayProto.verifyVpa = function(vpa = '') {
         value: vpa,
       },
       callback: function(response) {
-        if (response.success) {
+        if (response.success || response.error) {
           resolve(response);
         } else {
           reject(response);

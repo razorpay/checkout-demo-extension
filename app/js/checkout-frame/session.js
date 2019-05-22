@@ -957,6 +957,8 @@ function cancel_upi(session) {
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 
+var ACKO_KEY = 'rzp_live_U70ERBEHvnv45C';
+
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -5343,7 +5345,8 @@ Session.prototype = {
       P13n.processInstrument(data, this);
     }
 
-    if (data.vpa && !vpaVerified) {
+    /* VPA verification */
+    if (this.get('key') === ACKO_KEY && data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
 
