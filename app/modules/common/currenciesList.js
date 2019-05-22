@@ -393,7 +393,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 1000,
     min_auth_value: 100,
-    symbol: 'ل.ل.‎',
+    symbol: '&#1604;.&#1604;.',
     name: 'Lebanese Pound',
   },
   LKR: {

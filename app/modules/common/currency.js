@@ -1045,7 +1045,7 @@ export const displayCurrencies = {
   KYD: '$',
   KZT: '₸',
   LAK: '₭',
-  LBP: 'ل.ل.‎',
+  LBP: '&#1604;.&#1604;.',
   LD: 'ل.د',
   LKR: 'රු',
   LRD: 'L$',
