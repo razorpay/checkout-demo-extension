@@ -1216,7 +1216,7 @@ export function formatAmount(amount, currency) {
  * @return {String}
  */
 export function formatAmountWithSymbol(amount, currency) {
-  return displayCurrencies[currency] + formatAmount(amount, currency);
+  return `${displayCurrencies[currency]} ${formatAmount(amount, currency)}`;
 }
 
 export function displayAmount(razorpay, payloadAmount) {
