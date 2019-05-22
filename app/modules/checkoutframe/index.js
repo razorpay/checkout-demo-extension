@@ -214,8 +214,17 @@ export const handleMessage = function(message) {
 
   if (message.event === 'open' || options) {
     /* always fetch preferences, disregard backend printed one. */
-    session.fetchPrefs(preferences => {
-      session.showModal(preferences);
+    session.fetchPrefs(({ preferences, validation }) => {
+      const { error } = validation;
+
+      if (error) {
+        return Razorpay.sendMessage({
+          event: 'fault',
+          data: error,
+        });
+      } else {
+        session.showModal(preferences);
+      }
     });
   }
 
