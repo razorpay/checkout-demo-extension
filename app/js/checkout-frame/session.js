@@ -1018,9 +1018,10 @@ Session.prototype = {
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
-      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
+      discountAmount =
+        discreet.currencies[displayCurrency] + ' ' + discountAmount;
     } else {
-      discountAmount = discreet.currencies[currency] + discountFigure;
+      discountAmount = discreet.currencies[currency] + ' ' + discountFigure;
     }
 
     return discountAmount;
