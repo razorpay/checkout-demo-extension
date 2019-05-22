@@ -1,5 +1,10 @@
 import 'entry/checkout-frame';
-import { RazorpayConfig, makeAuthUrl, makePrefParams } from 'common/Razorpay';
+import {
+  RazorpayConfig,
+  makeAuthUrl,
+  makePrefParams,
+  validateOverrides,
+} from 'common/Razorpay';
 
 import Track from 'tracker';
 import Analytics from 'analytics';
@@ -56,6 +61,7 @@ import UpiTab from 'templates/tabs/upi/index.svelte';
 export default {
   RazorpayConfig,
   makeAuthUrl,
+  validateOverrides,
   makePrefParams,
   fetch,
   Track,

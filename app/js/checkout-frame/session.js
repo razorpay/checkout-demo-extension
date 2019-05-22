@@ -6045,9 +6045,19 @@ Session.prototype = {
       this.separateGPay = true;
     }
 
+    try {
+      discreet.validateOverrides(this);
+    } catch (e) {
+      return {
+        error: e.message,
+      };
+    }
+
     /* set payment methods on the basis of preferences */
     this.setPaymentMethods(preferences);
     this.setOffers(preferences);
+
+    return {};
   },
 
   showModal: function(preferences) {
@@ -6124,7 +6134,7 @@ Session.prototype = {
 
       var preferences = response;
 
-      self.setPreferences(preferences);
+      var validation = self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
       Bridge.checkout.callAndroid(
@@ -6136,7 +6146,10 @@ Session.prototype = {
         return;
       }
 
-      callback(preferences);
+      callback({
+        preferences: preferences,
+        validation: validation,
+      });
     });
 
     /* Start listening for back presses */
