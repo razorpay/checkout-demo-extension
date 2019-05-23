@@ -1019,9 +1019,10 @@ Session.prototype = {
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
-      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
+      discountAmount =
+        discreet.currencies[displayCurrency] + ' ' + discountAmount;
     } else {
-      discountAmount = discreet.currencies[currency] + discountFigure;
+      discountAmount = discreet.currencies[currency] + ' ' + discountFigure;
     }
 
     return discountAmount;
@@ -1836,7 +1837,11 @@ Session.prototype = {
 
         if (response.error && response.error.description) {
           self.showLoadError(response.error.description, true);
-          Analytics.track('cardless_emi:plans:fetch:error');
+          Analytics.track('cardless_emi:plans:fetch:error', {
+            data: {
+              provider: providerCode,
+            },
+          });
           return;
         }
 
@@ -1860,7 +1865,11 @@ Session.prototype = {
 
           self.showLoadError(errorDesc, true);
 
-          Analytics.track('cardless_emi:plans:fetch:error');
+          Analytics.track('cardless_emi:plans:fetch:error', {
+            data: {
+              provider: providerCode,
+            },
+          });
 
           return;
         }
