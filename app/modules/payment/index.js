@@ -617,7 +617,7 @@ razorpayProto.createPayment = function(data, params) {
  */
 let vpaCache = {};
 
-razorpayProto.verifyVpa = function(vpa = '') {
+razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
   const url = makeUrl('payments/validate/account?key_id=' + this.get('key'));
   const cachedVpaResponse = vpaCache[vpa];
 
@@ -634,7 +634,9 @@ razorpayProto.verifyVpa = function(vpa = '') {
      * set a timeout of 10s, if the API is taking > 10s to resolove;
      * attempt payment regardless of verification
      */
-    global.setTimeout(resolve, 10000);
+    if (timeout) {
+      global.setTimeout(resolve, timeout);
+    }
 
     const response = fetch.post({
       url,

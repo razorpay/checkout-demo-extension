@@ -5113,7 +5113,7 @@ Session.prototype = {
     self.showLoadError('Verifying your VPA');
 
     self.r
-      .verifyVpa(data.vpa)
+      .verifyVpa(data.vpa, 10000)
       .then(function() {
         self.submit({
           vpaVerified: true,
