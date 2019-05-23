@@ -40,7 +40,8 @@ function isDeviceLandscape() {
  */
 function decreaseWebViewHeightForAndroidTablets() {
   const fixedFromVersion = '1.5.7';
-  const maxHeight = 528;
+  const webViewDefaultHeight = 600;
+  const osElements = 72;
 
   const { platform, version, library } = _.getQueryParams();
 
@@ -49,11 +50,12 @@ function decreaseWebViewHeightForAndroidTablets() {
     library === 'checkoutjs' &&
     compareSemver(version, fixedFromVersion) < 0;
 
-  const isDeviceHeightExtra = () => global.screen.height > maxHeight;
+  const isDeviceHeightExtra = () =>
+    global.screen.height + osElements >= webViewDefaultHeight;
 
   const reduceHeight = () => {
     const html = _Doc.querySelector('html');
-    _El.setStyle(html, 'max-height', `${maxHeight}px`);
+    _El.setStyle(html, 'max-height', `${global.screen.height - osElements}px`);
   };
   const unsetHeight = () => {
     const html = _Doc.querySelector('html');
