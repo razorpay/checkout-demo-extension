@@ -172,11 +172,9 @@ export function getMethodDowntimeDescription(
   const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];
 
   // Check if there's another method available that is not down.
-  const isAnotherMethodAvailable = Boolean(
-    _Arr.filter(
-      availableMethods,
-      enabledMethod => !_Arr.contains(downMethods, enabledMethod)
-    ).length
+  const isAnotherMethodAvailable = _Arr.any(
+    availableMethods,
+    enabledMethod => !_Arr.contains(downMethods, enabledMethod)
   );
 
   // If there's another method available, ask user to select it.
