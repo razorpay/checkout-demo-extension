@@ -5113,6 +5113,10 @@ Session.prototype = {
     self.showLoadError('Verifying your VPA');
 
     self.r
+      /**
+       * set a timeout of 10s, if the API is taking > 10s to resolove;
+       * attempt payment regardless of verification
+       */
       .verifyVpa(data.vpa, 10000)
       .then(function() {
         self.submit({

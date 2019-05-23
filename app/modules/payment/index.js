@@ -630,10 +630,6 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
   }
 
   return new Promise((resolve, reject) => {
-    /**
-     * set a timeout of 10s, if the API is taking > 10s to resolove;
-     * attempt payment regardless of verification
-     */
     if (timeout) {
       global.setTimeout(resolve, timeout);
     }
