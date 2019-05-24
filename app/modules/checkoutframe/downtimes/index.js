@@ -84,21 +84,15 @@ function copyMethodsIfNeeded(downtimes) {
  * @return {Object}
  */
 export function getDowntimes(preferences) {
-  let downtimes = {};
+  let downtimes = {
+    disabled: [],
+  };
 
-  if (!preferences || !preferences.downtimes || !preferences.downtimes.count) {
+  if (!preferences || !preferences.downtime) {
     return downtimes;
   }
 
-  _Arr.loop(preferences.downtimes.items, downtime => {
-    const { method } = downtime;
-
-    if (!downtimes[method]) {
-      downtimes[method] = [];
-    }
-
-    downtimes[method].push(_Obj.clone(downtime));
-  });
+  downtimes = _Obj.clone(preferences.downtime);
 
   downtimes = copyMethodsIfNeeded(downtimes);
   downtimes.disabled = getDisabledMethods(downtimes);
