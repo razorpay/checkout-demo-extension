@@ -961,6 +961,8 @@ function cancel_upi(session) {
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 
+var ACKO_KEY = 'rzp_live_U70ERBEHvnv45C';
+
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -5125,7 +5127,35 @@ Session.prototype = {
     this.submit();
   },
 
-  submit: function() {
+  verifyVpaAndContinue: function(data, params) {
+    var self = this;
+    self.showLoadError('Verifying your VPA');
+
+    self.r
+      /**
+       * set a timeout of 10s, if the API is taking > 10s to resolove;
+       * attempt payment regardless of verification
+       */
+      .verifyVpa(data.vpa, 10000)
+      .then(function() {
+        self.submit({
+          vpaVerified: true,
+        });
+      })
+      .catch(function() {
+        self.showLoadError(
+          'Invalid VPA, please try again with correct VPA',
+          true
+        );
+      });
+  },
+
+  submit: function(props) {
+    if (!props) {
+      props = {};
+    }
+    var vpaVerified = props.vpaVerified;
+
     if (this.r._payment) {
       return;
     }
@@ -5340,6 +5370,11 @@ Session.prototype = {
 
     if (this.p13n) {
       P13n.processInstrument(data, this);
+    }
+
+    /* VPA verification */
+    if (this.get('key') === ACKO_KEY && data.vpa && !vpaVerified) {
+      return this.verifyVpaAndContinue(data, request);
     }
 
     var payment = this.r.createPayment(data, request);

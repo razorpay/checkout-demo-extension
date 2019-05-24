@@ -32,6 +32,22 @@ const getPreferences = async (request, reply) => {
   };
 };
 
+const validateAccount = async (request, reply) => {
+  let { body } = request;
+
+  if (body.entity === 'vpa') {
+    return {
+      vpa: body.vpa,
+      success: true,
+      customer_name: 'Test user',
+    };
+  } else {
+    return {
+      success: true,
+    };
+  }
+};
+
 const getStatus = async request => {
   if (payment.method === 'upi') {
     if (!payment.statusHit) {
@@ -84,6 +100,7 @@ const routes = [
   ['post', 'payments/create/ajax', wait],
   ['post', 'payments/create/checkout', waitHtml],
   ['post', 'payments/:payment_id/otp_submit', wait],
+  ['post', 'payments/validate/account', validateAccount],
   ['get', 'gateway/mocksharp/:payment_id', withNext(waitHtml)],
 ];
 
