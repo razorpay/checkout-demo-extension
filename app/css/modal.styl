@@ -1271,7 +1271,7 @@ $outline = #ddd;
 .offers-error {
 
   bottom: 0;
-  height: $bodyh + $footerh;
+  height: $bodyh + $footerh + $topbarh;
   overflow: hidden;
   background-color: rgba(0,0,0,0.3);
   position: relative;
@@ -1320,6 +1320,12 @@ $outline = #ddd;
         margin-left: $p;
       }
     }
+  }
+}
+
+.sub {
+  .offers-error {
+    bottom: - $footerh;
   }
 }
 

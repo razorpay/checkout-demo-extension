@@ -357,7 +357,7 @@ function initOffers(
     } else if ($offersErrorCancel.contains($target)) {
       Analytics.track('offers:retry', {
         type: Analytics.BEHAV,
-        data: appliedOffer.data,
+        data: appliedOffer && appliedOffer.data,
       });
       hideOfferError();
     }
