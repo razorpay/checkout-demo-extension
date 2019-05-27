@@ -79,12 +79,14 @@ function overrideInsertRule() {
     } catch (err) {}
   };
 
-  if (!CSSStyleDeclaration.prototype.webkitAnimation) {
-    CSSStyleDeclaration.prototype.webkitAnimation = '';
-  }
+  try {
+    if (!CSSStyleDeclaration.prototype.webkitAnimation) {
+      CSSStyleDeclaration.prototype.webkitAnimation = '';
+    }
 
-  CSSStyleDeclaration.prototype.animation =
-    CSSStyleDeclaration.prototype.webkitAnimation;
+    CSSStyleDeclaration.prototype.animation =
+      CSSStyleDeclaration.prototype.webkitAnimation;
+  } catch (e) {}
 }
 overrideInsertRule();
 
