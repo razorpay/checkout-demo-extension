@@ -28,7 +28,8 @@ var preferences = window.preferences,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
-  _Obj = discreet._Obj;
+  _Obj = discreet._Obj,
+  Hacks = discreet.Hacks;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -138,34 +139,6 @@ function createCardlessEmiTopbarImages(providerCode) {
  * should be shown when back is pressed.
  */
 var BackStore = null;
-
-function initIosQuirks() {
-  if (discreet.UserAgent.iPhone) {
-    /**
-     * Shift the pay button if the height is low.
-     */
-    setTimeout(function() {
-      if (window.innerHeight <= 512) {
-        $('#footer').addClass('shift-ios');
-      }
-    }, 1000);
-
-    if (discreet.UserAgent.Safari) {
-      window.addEventListener('resize', function() {
-        if (window.innerHeight > 550) {
-          return;
-        }
-
-        // Shift pay button
-        if (window.screen.height - window.innerHeight >= 56) {
-          $('#footer').addClass('shift-ios');
-        } else {
-          $('#footer').removeClass('shift-ios');
-        }
-      });
-    }
-  }
-}
 
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
@@ -1412,7 +1385,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-    initIosQuirks();
+    Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
 

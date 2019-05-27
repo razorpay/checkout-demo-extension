@@ -58,6 +58,8 @@ import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 
+import * as Hacks from 'checkoutframe/hacks';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -130,6 +132,8 @@ export default {
 
   MagicView,
   UpiTab,
+
+  Hacks,
 
   _Arr,
   _Obj,
