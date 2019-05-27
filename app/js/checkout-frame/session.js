@@ -5211,6 +5211,7 @@ Session.prototype = {
         return;
       }
       data['_[flow]'] = 'intent';
+      data['_[app]'] = data.upi_app;
     }
 
     if (data['_[flow]'] === 'gpay') {
