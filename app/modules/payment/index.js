@@ -171,8 +171,6 @@ export default function Payment(data, params = {}, r) {
   if (data && data.upi_app) {
     this.upi_app = data.upi_app;
     delete data.upi_app;
-
-    data['_[app]'] = this.upi_app;
   }
 
   this.feesRedirect = params.feesRedirect;
