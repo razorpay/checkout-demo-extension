@@ -3493,7 +3493,7 @@ Session.prototype = {
     if (!this.tab) {
       if (this.checkInvalid('#pad-common')) {
         if (this.methodsList && this.p13n) {
-          this.methodsList.hideOtherMethods();
+          this.methodsList.otherMethodsView.fire('hideMethods');
         }
         return;
       }
