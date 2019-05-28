@@ -163,7 +163,7 @@ function base_configure(overrides) {
   }
 
   var options = new CheckoutOptions(overrides);
-  validateOverrides(options);
+  validateOverrides(options, ['amount']);
   setNotes(options);
   return options;
 }
@@ -302,16 +302,26 @@ export const optionValidations = {
   },
 };
 
-function validateOverrides(options) {
+export function validateOverrides(options, skip = []) {
+  let valid = true;
+
   options = options.get();
+
   _Obj.loop(optionValidations, function(validation, key) {
+    if (_Arr.contains(skip, key)) {
+      return;
+    }
+
     if (key in options) {
       let errorMessage = validation(options[key], options);
       if (errorMessage) {
+        valid = false;
         _.throwMessage('Invalid ' + key + ' (' + errorMessage + ')');
       }
     }
   });
+
+  return valid;
 }
 
 Razorpay.configure = function(overrides) {

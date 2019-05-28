@@ -1,5 +1,10 @@
 import 'entry/checkout-frame';
-import { RazorpayConfig, makeAuthUrl, makePrefParams } from 'common/Razorpay';
+import {
+  RazorpayConfig,
+  makeAuthUrl,
+  makePrefParams,
+  validateOverrides,
+} from 'common/Razorpay';
 
 import Track from 'tracker';
 import Analytics from 'analytics';
@@ -55,9 +60,12 @@ import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 
+import * as Hacks from 'checkoutframe/hacks';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
+  validateOverrides,
   makePrefParams,
   fetch,
   Track,
@@ -128,6 +136,8 @@ export default {
 
   MagicView,
   UpiTab,
+
+  Hacks,
 
   _Arr,
   _Obj,
