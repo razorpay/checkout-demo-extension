@@ -117,3 +117,70 @@ export function getMethodDescription(method, props) {
 
   return fn(props);
 }
+
+/**
+ * Returns the prefix for the given method.
+ * @param {String} method
+ * @return {String}
+ */
+function getMethodPrefix(method) {
+  switch (method) {
+    case 'card':
+    case 'credit_card':
+    case 'debit_card':
+      return 'Cards';
+
+    case 'netbanking':
+    case 'emandate':
+      return 'Netbanking';
+
+    case 'emi':
+    case 'cardless_emi':
+      return 'EMI';
+
+    case 'qr':
+      return 'QR';
+
+    case 'upi':
+      return 'UPI';
+
+    case 'wallet':
+      return 'Wallets';
+
+    case 'gpay':
+      return 'Google Pay';
+
+    default:
+      return method[0].toUpperCase() + method.slice(1);
+  }
+}
+
+/**
+ * Returns the downtime description for the given method.
+ * @param {String} method
+ * @param {Object} param1
+ *  @prop {Array} availableMethods
+ */
+export function getMethodDowntimeDescription(
+  method,
+  { availableMethods, downMethods = [] }
+) {
+  const prefix = getMethodPrefix(method);
+  const pluralPrefix = /s$/i.test(prefix);
+  const isOrAre = pluralPrefix ? 'are' : 'is';
+
+  const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];
+
+  // Check if there's another method available that is not down.
+  const isAnotherMethodAvailable = _Arr.any(
+    availableMethods,
+    enabledMethod => !_Arr.contains(downMethods, enabledMethod)
+  );
+
+  // If there's another method available, ask user to select it.
+  if (isAnotherMethodAvailable) {
+    sentences.push('Please select another method.');
+  }
+
+  return sentences.join(' ');
+}

@@ -23,6 +23,7 @@ var preferences = window.preferences,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
   PreferencesStore = discreet.PreferencesStore,
+  DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
   _Arr = discreet._Arr,
@@ -2454,19 +2455,6 @@ Session.prototype = {
       });
     }
     this.click('#top-left', this.back);
-    this.click('.payment-option', function(e) {
-      Analytics.track('payment_method:select', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          disabled: $(e.currentTarget).hasClass('disabled'),
-          method: e.currentTarget.getAttribute('tab') || '',
-        },
-      });
-
-      if (!$(e.currentTarget).hasClass('disabled')) {
-        this.switchTab(e.currentTarget.getAttribute('tab') || '');
-      }
-    });
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
@@ -5918,6 +5906,7 @@ Session.prototype = {
 
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
+    DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;

@@ -1,6 +1,7 @@
 <Option
   {data}
   {attributes}
+  {classes}
   type="next-option {type}"
 
   on:select="select(event)"
@@ -23,11 +24,12 @@
 
     data: function () {
       return {
+        attributes: {},
+        classes: [],
         arrowText: null,
         icon: null,
         data: {},
         type: '',
-        attributes: {},
       };
     },
 

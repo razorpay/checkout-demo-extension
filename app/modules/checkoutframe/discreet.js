@@ -46,6 +46,7 @@ import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
+import * as Downtimes from 'checkoutframe/downtimes';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -53,6 +54,7 @@ import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
 import SessionStore from 'checkoutstore/session.js';
+import DowntimesStore from 'checkoutstore/downtimes.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
@@ -102,9 +104,11 @@ export default {
   UserAgent,
   Offers,
   Flows,
+  Downtimes,
 
   Store,
   PreferencesStore,
+  DowntimesStore,
   SessionStore,
 
   getQueryParams: _.getQueryParams,
