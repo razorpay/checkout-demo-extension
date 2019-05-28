@@ -203,10 +203,29 @@ export function makePrefParams(rzp) {
   if (rzp) {
     var getter = rzp.get;
     var params = {};
+
+    /**
+     * Set Key
+     */
     var key_id = getter('key');
     if (key_id) {
       params.key_id = key_id;
     }
+
+    /**
+     * Set currency
+     */
+    const currency = [getter('currency')];
+
+    const display_currency = getter('display_currency');
+    const display_amount = getter('display_amount');
+
+    // Display currency is only valid when a display amount is present
+    if (display_currency && `${display_amount}`.length) {
+      currency.push(display_currency);
+    }
+
+    params.currency = currency;
 
     _Arr.loop(
       [
