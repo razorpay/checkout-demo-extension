@@ -104,7 +104,11 @@ export default class MethodsList {
     });
 
     const onMethodSelected = e => {
-      let { method } = e.data;
+      let { method, down } = e.data;
+
+      if (down) {
+        return;
+      }
 
       this.data.session.switchTab(method);
     };

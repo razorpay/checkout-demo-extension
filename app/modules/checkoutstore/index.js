@@ -2,11 +2,13 @@ import { composeStore } from 'checkoutstore/create';
 import Screens from 'checkoutstore/screens';
 import Preferences from 'checkoutstore/preferences.js';
 import SessionStore from 'checkoutstore/session.js';
+import DowntimesStore from 'checkoutstore/downtimes.js';
 
 const CheckoutStore = composeStore({
   preferences: Preferences,
   screens: Screens,
   session: SessionStore,
+  downtimes: DowntimesStore,
 });
 
 CheckoutStore.compute(

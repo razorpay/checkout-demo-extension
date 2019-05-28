@@ -21,6 +21,7 @@ const AGREEMENT_HELPER = {
         Analytics.track('cardless_emi:terms:fetch:error', {
           data: {
             response,
+            provider: 'zestmoney',
           },
         });
 
@@ -30,6 +31,7 @@ const AGREEMENT_HELPER = {
       Analytics.track('cardless_emi:terms:fetch:success', {
         data: {
           response,
+          provider: 'zestmoney',
         },
       });
 

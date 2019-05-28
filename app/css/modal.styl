@@ -847,6 +847,9 @@ i {
   img {
     display: block;
     padding-top: 15px;
+    width: auto;
+    max-height: 20px;
+    max-width: 40%;
   }
 
   &:before {
@@ -1267,8 +1270,8 @@ $outline = #ddd;
 
 .offers-error {
 
-  top: $footerh;
-  height: $bodyh + $footerh;
+  bottom: 0;
+  height: $bodyh + $footerh + $topbarh;
   overflow: hidden;
   background-color: rgba(0,0,0,0.3);
   position: relative;
@@ -1317,6 +1320,12 @@ $outline = #ddd;
         margin-left: $p;
       }
     }
+  }
+}
+
+.sub {
+  .offers-error {
+    bottom: - $footerh;
   }
 }
 

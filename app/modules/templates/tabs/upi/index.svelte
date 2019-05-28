@@ -89,6 +89,15 @@
       </Card>
     {/if}
   {/if}
+
+  {#if down}
+    <Callout
+      showIcon={false}
+      classes={['downtime-callout']}
+    >
+      <strong>UPI</strong> is experiencing low success rates.
+    </Callout>
+  {/if}
 </Tab>
 
 <style>
@@ -177,6 +186,7 @@
   import { getSession } from 'sessionmanager.js';
   import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
+  import DowntimesStore from 'checkoutstore/downtimes.js';
   import { VPA_REGEX } from 'common/constants.js';
   import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
 
@@ -256,6 +266,7 @@
       Card: 'templates/views/ui/Card.svelte',
       Field: 'templates/views/ui/Field.svelte',
       Icon: 'templates/views/ui/Icon.svelte',
+      Callout: 'templates/views/ui/Callout.svelte',
     },
 
     data() {
@@ -269,6 +280,7 @@
         preferIntent: true,
         selectedApp: undefined,
         useWebPaymentsApi: false,
+        down: false,
       };
     },
 
@@ -305,6 +317,13 @@
         this.set({
           selectedApp: null,
           vpa: session.get('prefill.vpa'),
+        });
+      }
+
+      const downtimes = DowntimesStore.get() || {};
+      if (downtimes.upi && downtimes.upi.length) {
+        this.set({
+          down: true,
         });
       }
     },

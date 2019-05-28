@@ -25,6 +25,15 @@
       <div class="btn" on:click="init()">Retry</div>
     </div>
   {/if}
+
+  {#if down}
+    <Callout
+      showIcon={false}
+      classes={['downtime-callout']}
+    >
+      <strong>QR</strong> is experiencing low success rates.
+    </Callout>
+  {/if}
 </div>
 <style>
 :global(#body[tab=qr]) {
@@ -99,15 +108,17 @@ img {
 <script>
   import { RazorpayConfig } from 'common/Razorpay';
   import { processInstrument } from 'checkoutframe/personalization';
+  import DowntimesStore from 'checkoutstore/downtimes.js';
 
   export default {
-    oncreate() {
-      this.init();
-    },
-
     components: {
+      Callout: 'templates/views/ui/Callout.svelte',
       AsyncLoading: 'templates/views/ui/AsyncLoading.svelte',
       FeeBearer: 'templates/views/feebearer.svelte',
+    },
+
+    oncreate() {
+      this.init();
     },
 
     data() {
@@ -116,7 +127,8 @@ img {
         loading: false,
         qrImage: null,
         error: null,
-        view: 'qr'
+        view: 'qr',
+        down: false,
       }
     },
 
@@ -137,6 +149,13 @@ img {
           this.set({ view: 'fee', session, paymentData });
         } else {
           this.createPayment();
+        }
+
+        const downtimes = DowntimesStore.get();
+        if (downtimes.qr && downtimes.qr.length) {
+          this.set({
+            down: true,
+          });
         }
       },
 

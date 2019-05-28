@@ -1,5 +1,10 @@
 import 'entry/checkout-frame';
-import { RazorpayConfig, makeAuthUrl, makePrefParams } from 'common/Razorpay';
+import {
+  RazorpayConfig,
+  makeAuthUrl,
+  makePrefParams,
+  validateOverrides,
+} from 'common/Razorpay';
 
 import Track from 'tracker';
 import Analytics from 'analytics';
@@ -41,6 +46,7 @@ import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
+import * as Downtimes from 'checkoutframe/downtimes';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -48,14 +54,18 @@ import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
 import SessionStore from 'checkoutstore/session.js';
+import DowntimesStore from 'checkoutstore/downtimes.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 
+import * as Hacks from 'checkoutframe/hacks';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
+  validateOverrides,
   makePrefParams,
   fetch,
   Track,
@@ -94,9 +104,11 @@ export default {
   UserAgent,
   Offers,
   Flows,
+  Downtimes,
 
   Store,
   PreferencesStore,
+  DowntimesStore,
   SessionStore,
 
   getQueryParams: _.getQueryParams,
@@ -124,6 +136,8 @@ export default {
 
   MagicView,
   UpiTab,
+
+  Hacks,
 
   _Arr,
   _Obj,

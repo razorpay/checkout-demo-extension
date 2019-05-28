@@ -612,6 +612,50 @@ razorpayProto.createPayment = function(data, params) {
   return this;
 };
 
+/**
+ * Cache for attempted VPAs.
+ */
+let vpaCache = {};
+
+razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
+  const url = makeUrl('payments/validate/account?key_id=' + this.get('key'));
+  const cachedVpaResponse = vpaCache[vpa];
+
+  if (cachedVpaResponse) {
+    if (cachedVpaResponse.success) {
+      return Promise.resolve(cachedVpaResponse);
+    } else {
+      return Promise.reject(cachedVpaResponse);
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    if (timeout) {
+      global.setTimeout(resolve, timeout);
+    }
+
+    const response = fetch.post({
+      url,
+      data: {
+        entity: 'vpa',
+        value: vpa,
+      },
+      callback: function(response) {
+        if (response.success || response.error) {
+          if (response.success) {
+            vpaCache[vpa] = response;
+          }
+
+          resolve(response);
+        } else {
+          vpaCache[vpa] = response;
+          reject(response);
+        }
+      },
+    });
+  });
+};
+
 razorpayProto.focus = function() {
   try {
     this._payment.popup.window.focus();

@@ -23,12 +23,14 @@ var preferences = window.preferences,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
   PreferencesStore = discreet.PreferencesStore,
+  DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
-  _Obj = discreet._Obj;
+  _Obj = discreet._Obj,
+  Hacks = discreet.Hacks;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -138,34 +140,6 @@ function createCardlessEmiTopbarImages(providerCode) {
  * should be shown when back is pressed.
  */
 var BackStore = null;
-
-function initIosQuirks() {
-  if (discreet.UserAgent.iPhone) {
-    /**
-     * Shift the pay button if the height is low.
-     */
-    setTimeout(function() {
-      if (window.innerHeight <= 512) {
-        $('#footer').addClass('shift-ios');
-      }
-    }, 1000);
-
-    if (discreet.UserAgent.Safari) {
-      window.addEventListener('resize', function() {
-        if (window.innerHeight > 550) {
-          return;
-        }
-
-        // Shift pay button
-        if (window.screen.height - window.innerHeight >= 56) {
-          $('#footer').addClass('shift-ios');
-        } else {
-          $('#footer').removeClass('shift-ios');
-        }
-      });
-    }
-  }
-}
 
 function confirmClose() {
   return confirm('Ongoing payment. Press OK to abort payment.');
@@ -960,6 +934,8 @@ function cancel_upi(session) {
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 
+var ACKO_KEY = 'rzp_live_U70ERBEHvnv45C';
+
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -1018,9 +994,10 @@ Session.prototype = {
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
-      discountAmount = discreet.currencies[displayCurrency] + discountAmount;
+      discountAmount =
+        discreet.currencies[displayCurrency] + ' ' + discountAmount;
     } else {
-      discountAmount = discreet.currencies[currency] + discountFigure;
+      discountAmount = discreet.currencies[currency] + ' ' + discountFigure;
     }
 
     return discountAmount;
@@ -1409,7 +1386,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-    initIosQuirks();
+    Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
 
@@ -1835,7 +1812,11 @@ Session.prototype = {
 
         if (response.error && response.error.description) {
           self.showLoadError(response.error.description, true);
-          Analytics.track('cardless_emi:plans:fetch:error');
+          Analytics.track('cardless_emi:plans:fetch:error', {
+            data: {
+              provider: providerCode,
+            },
+          });
           return;
         }
 
@@ -1859,7 +1840,11 @@ Session.prototype = {
 
           self.showLoadError(errorDesc, true);
 
-          Analytics.track('cardless_emi:plans:fetch:error');
+          Analytics.track('cardless_emi:plans:fetch:error', {
+            data: {
+              provider: providerCode,
+            },
+          });
 
           return;
         }
@@ -2470,19 +2455,6 @@ Session.prototype = {
       });
     }
     this.click('#top-left', this.back);
-    this.click('.payment-option', function(e) {
-      Analytics.track('payment_method:select', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          disabled: $(e.currentTarget).hasClass('disabled'),
-          method: e.currentTarget.getAttribute('tab') || '',
-        },
-      });
-
-      if (!$(e.currentTarget).hasClass('disabled')) {
-        this.switchTab(e.currentTarget.getAttribute('tab') || '');
-      }
-    });
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
@@ -3521,7 +3493,7 @@ Session.prototype = {
     if (!this.tab) {
       if (this.checkInvalid('#pad-common')) {
         if (this.methodsList && this.p13n) {
-          this.methodsList.hideOtherMethods();
+          this.methodsList.otherMethodsView.fire('hideMethods');
         }
         return;
       }
@@ -5128,7 +5100,35 @@ Session.prototype = {
     this.submit();
   },
 
-  submit: function() {
+  verifyVpaAndContinue: function(data, params) {
+    var self = this;
+    self.showLoadError('Verifying your VPA');
+
+    self.r
+      /**
+       * set a timeout of 10s, if the API is taking > 10s to resolove;
+       * attempt payment regardless of verification
+       */
+      .verifyVpa(data.vpa, 10000)
+      .then(function() {
+        self.submit({
+          vpaVerified: true,
+        });
+      })
+      .catch(function() {
+        self.showLoadError(
+          'Invalid VPA, please try again with correct VPA',
+          true
+        );
+      });
+  },
+
+  submit: function(props) {
+    if (!props) {
+      props = {};
+    }
+    var vpaVerified = props.vpaVerified;
+
     if (this.r._payment) {
       return;
     }
@@ -5199,6 +5199,7 @@ Session.prototype = {
         return;
       }
       data['_[flow]'] = 'intent';
+      data['_[app]'] = data.upi_app;
     }
 
     if (data['_[flow]'] === 'gpay') {
@@ -5343,6 +5344,11 @@ Session.prototype = {
 
     if (this.p13n) {
       P13n.processInstrument(data, this);
+    }
+
+    /* VPA verification */
+    if (this.get('key') === ACKO_KEY && data.vpa && !vpaVerified) {
+      return this.verifyVpaAndContinue(data, request);
     }
 
     var payment = this.r.createPayment(data, request);
@@ -5900,6 +5906,7 @@ Session.prototype = {
 
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
+    DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
@@ -6044,9 +6051,19 @@ Session.prototype = {
       this.separateGPay = true;
     }
 
+    try {
+      discreet.validateOverrides(this);
+    } catch (e) {
+      return {
+        error: e.message,
+      };
+    }
+
     /* set payment methods on the basis of preferences */
     this.setPaymentMethods(preferences);
     this.setOffers(preferences);
+
+    return {};
   },
 
   showModal: function(preferences) {
@@ -6123,7 +6140,7 @@ Session.prototype = {
 
       var preferences = response;
 
-      self.setPreferences(preferences);
+      var validation = self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
       Bridge.checkout.callAndroid(
@@ -6135,7 +6152,10 @@ Session.prototype = {
         return;
       }
 
-      callback(preferences);
+      callback({
+        preferences: preferences,
+        validation: validation,
+      });
     });
 
     /* Start listening for back presses */
