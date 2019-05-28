@@ -43,7 +43,7 @@
     "url": "https://github.com/razorpay/checkout/issues"
   },
   "dependencies": {
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "chalk": "^2.4.1",
     "fastify": "^1.11.2",
     "fastify-formbody": "^2.0.1",
