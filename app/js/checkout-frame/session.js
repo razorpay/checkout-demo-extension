@@ -2324,6 +2324,14 @@ Session.prototype = {
     var self = this;
     var emi_options = this.emi_options;
     var thisEl = this.el;
+
+    // cultgear.com bug: no events register unless
+    // https://stackoverflow.com/questions/41869122/touch-events-within-iframe-are-not-working-on-ios
+    document.addEventListener('touchstart', noop);
+    this.listeners.push(function() {
+      document.removeEventListener('touchstart', noop);
+    });
+
     this.click('#partial-back', function() {
       $(thisEl).removeClass('show-methods');
       gotoAmountScreen();
