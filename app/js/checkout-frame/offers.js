@@ -347,7 +347,7 @@ function initOffers(
       isOfferRemoved = true;
       Analytics.track('offers:retry_screen:remove', {
         type: AnalyticsTypes.BEHAV,
-        data: appliedOffer.data,
+        data: appliedOffer && appliedOffer.data,
       });
       offers.removeOffer();
       hideOfferError();
