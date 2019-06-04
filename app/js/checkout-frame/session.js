@@ -939,6 +939,8 @@ var VPA_VALIDATION_MERCHANTS = [
   'rzp_live_U70ERBEHvnv45C' /* Acko Key */,
   'rzp_live_aSBQCECmmDTldx',
   'rzp_live_HdXPyDx4Ea6U8Q',
+  'rzp_live_USOzRto8cqRWYo', // Treebo
+  'rzp_live_XKUqpBiWMQvaqf', // Treebo
 ];
 
 var IRCTC_KEYS = [
