@@ -2234,9 +2234,14 @@ Session.prototype = {
     var partialEl = gel('amount-value');
     if (partialEl) {
       var amountValue = partialEl.value;
-      this.updateAmountInHeader(amountValue);
       var options = this.get();
-      options.amount = parseInt((amountValue * 100).toFixed(2));
+      var currency = this.get('currency');
+      var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
+
+      this.updateAmountInHeader(amountValue);
+      options.amount = parseInt(
+        (amountValue * 100).toFixed(currencyConfig.decimals)
+      );
       options['prefill.contact'] = gel('contact').value;
       options['prefill.email'] = gel('email').value;
       this.setPaymentMethods(this.preferences);
@@ -2351,7 +2356,6 @@ Session.prototype = {
 
       if (!e.target.checked || value === 'pay_full') {
         var amount = this.order.amount_due;
-        $('#amount-value').val(this.getDecimalAmount(amount));
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
         this.get().amount = amount;
@@ -2373,7 +2377,6 @@ Session.prototype = {
           document.activeElement.blur();
         }
       } else {
-        $('#amount-value').val(null);
         $('#amount-value').focus();
 
         parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
@@ -2938,7 +2941,10 @@ Session.prototype = {
           var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
 
           self.input(el_amount);
-          var value = this.value * Math.pow(10, currencyConfig.decimals);
+          var multiplier = Math.pow(10, currencyConfig.decimals);
+          var value = parseInt(
+            (this.value * multiplier).toFixed(currencyConfig.decimals)
+          );
           var maxAmount =
             self.order && self.order.partial_payment
               ? self.order.amount_due
