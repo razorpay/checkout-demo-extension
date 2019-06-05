@@ -2934,14 +2934,17 @@ Session.prototype = {
             optionEle.checked = false;
           }
 
+          var currency = self.get('currency');
+          var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
+
           self.input(el_amount);
-          var value = this.value * 100;
+          var value = this.value * Math.pow(10, currencyConfig.decimals);
           var maxAmount =
             self.order && self.order.partial_payment
               ? self.order.amount_due
               : self.order.amount;
 
-          var minAmount = firstPaymentMinAmount || 100;
+          var minAmount = firstPaymentMinAmount || currencyConfig.minimum;
           var isValid = minAmount <= value && value <= maxAmount;
           toggleInvalid($(this.el.parentNode), isValid);
 
