@@ -2356,6 +2356,7 @@ Session.prototype = {
 
       if (!e.target.checked || value === 'pay_full') {
         var amount = this.order.amount_due;
+        $('#amount-value').val(this.getDecimalAmount(amount));
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
         this.get().amount = amount;
@@ -2377,6 +2378,7 @@ Session.prototype = {
           document.activeElement.blur();
         }
       } else {
+        $('#amount-value').val(null);
         $('#amount-value').focus();
 
         parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
