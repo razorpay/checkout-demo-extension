@@ -2212,6 +2212,13 @@ Session.prototype = {
   },
 
   addFunds: function(event) {
+    Analytics.track('wallet:balance:add', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.payload && this.payload.wallet,
+      },
+    });
+
     setOtpText(this.otpView, 'Loading...');
     this.otpView.updateScreen({
       action: false,
@@ -5441,6 +5448,12 @@ Session.prototype = {
       this.r.on(
         'payment.wallet.topup',
         bind(function() {
+          Analytics.track('wallet:balance:insufficient', {
+            data: {
+              wallet: this.payload && this.payload.wallet,
+            },
+          });
+
           var insufficient_text = 'Insufficient balance in your wallet';
           if (this.get('ecod')) {
             this.back();
