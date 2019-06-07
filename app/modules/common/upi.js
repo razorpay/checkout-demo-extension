@@ -35,12 +35,6 @@ const UPI_APPS = {
       package_name: 'net.one97.paytm',
     },
     {
-      name: 'WhatsApp',
-      app_name: 'WhatsApp UPI',
-      package_name: 'com.whatsapp',
-      app_icon: 'https://cdn.razorpay.com/checkout/whatsapp.png',
-    },
-    {
       name: 'WhatsApp Business',
       app_name: 'WhatsApp Business UPI',
       package_name: 'com.whatsapp.w4b',
@@ -174,6 +168,9 @@ const UPI_APPS = {
    * Apps that listen for UPI intent but are evil.
    */
   blacklist: [
+    {
+      package_name: 'com.whatsapp',
+    },
     {
       package_name: 'com.olacabs.customer',
     },
