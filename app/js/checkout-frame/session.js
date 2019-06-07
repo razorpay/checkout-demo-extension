@@ -2751,6 +2751,7 @@ Session.prototype = {
     Analytics.track('upi:app:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
+        flow: 'intent',
         package_name: packageName,
         showRecommended: Boolean(this.showRecommendedUPIApp),
         recommended: Boolean(

@@ -189,6 +189,8 @@
   import DowntimesStore from 'checkoutstore/downtimes.js';
   import { VPA_REGEX } from 'common/constants.js';
   import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const otherAppsIcon =
     'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
@@ -451,6 +453,20 @@
       onUpiAppSelection(id) {
         const session = getSession();
         let pattern = '';
+
+        if (typeof id !== 'undefined') {
+          /**
+           * `id` is undefined when the user wants to switch app
+           * and it is null when the user select "other apps"
+           */
+          Analytics.track('upi:app:select', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              flow: 'collect',
+              app: id,
+            },
+          });
+        }
 
         this.set({ selectedApp: id });
         const { selectedAppData, isGPaySelected } = this.get();
