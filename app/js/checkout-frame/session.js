@@ -3522,6 +3522,41 @@ Session.prototype = {
     BackStore = null;
   },
 
+  switchTabAnalytics: function(tab) {
+    if (tab === 'upi') {
+      var upiData = this.upiTab.get();
+
+      if (upiData.intent) {
+        /**
+         * If intent, track UPI apps installed and eligible
+         */
+        Analytics.track('upi:intent', {
+          type: AnalyticsTypes.RENDER,
+          data: {
+            count: {
+              eligible: _.lengthOf(upiData.intentApps),
+              all: _.lengthOf(upiData.allIntentApps),
+            },
+            list: {
+              eligible: _Arr.join(
+                _Arr.map(upiData.intentApps, function(app) {
+                  return app.package_name;
+                }),
+                ','
+              ),
+              all: _Arr.join(
+                _Arr.map(upiData.allIntentApps, function(app) {
+                  return app.package_name;
+                }),
+                ','
+              ),
+            },
+          },
+        });
+      }
+    }
+  },
+
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
@@ -3543,6 +3578,8 @@ Session.prototype = {
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab) {
+      this.switchTabAnalytics(tab);
+
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
         tab = 'card';

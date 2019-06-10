@@ -290,7 +290,8 @@
       selectedAppData: ({ topUpiApps, selectedApp }) =>
         _Arr.find(topUpiApps, item => item.id === selectedApp),
 
-      intentApps: data => getSession().upi_intents_data,
+      allIntentApps: data => getSession().all_upi_intents_data, // All intent apps installed
+      intentApps: data => getSession().upi_intents_data, // Intent apps that can be used (after blacklist and validation)
 
       showRecommendedUPIApp: data => getSession().showRecommendedUPIApp,
 
