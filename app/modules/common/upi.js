@@ -155,10 +155,6 @@ const UPI_APPS = {
       package_name: 'com.SIBMobile',
     },
     {
-      package_name: 'com.truecaller',
-      verify_registration: true,
-    },
-    {
       package_name: 'in.amazon.mShop.android.shopping',
     },
   ],
@@ -170,6 +166,9 @@ const UPI_APPS = {
   blacklist: [
     {
       package_name: 'com.whatsapp',
+    },
+    {
+      package_name: 'com.truecaller',
     },
     {
       package_name: 'com.olacabs.customer',
