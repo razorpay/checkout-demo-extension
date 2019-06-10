@@ -20,9 +20,9 @@ function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
 }
 
 const DISABLE_METHOD = {
-  upi: disableBasedOnSeverityOrScheduled(['high'], true),
-  qr: disableBasedOnSeverityOrScheduled(['high'], true),
-  gpay: disableBasedOnSeverityOrScheduled(['high'], true),
+  // upi: disableBasedOnSeverityOrScheduled(['high'], true),
+  // qr: disableBasedOnSeverityOrScheduled(['high'], true),
+  // gpay: disableBasedOnSeverityOrScheduled(['high'], true),
 };
 
 /**
