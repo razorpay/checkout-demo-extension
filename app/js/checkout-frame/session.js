@@ -934,15 +934,6 @@ function cancel_upi(session) {
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
 
-var VPA_VALIDATION_MERCHANTS = [
-  'rzp_live_ILgsfZCZoFIKMb' /* Razorpay demo key */,
-  'rzp_live_U70ERBEHvnv45C' /* Acko Key */,
-  'rzp_live_aSBQCECmmDTldx',
-  'rzp_live_HdXPyDx4Ea6U8Q',
-  'rzp_live_USOzRto8cqRWYo', // Treebo
-  'rzp_live_XKUqpBiWMQvaqf', // Treebo
-];
-
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -5373,11 +5364,7 @@ Session.prototype = {
     }
 
     /* VPA verification */
-    if (
-      _Arr.contains(VPA_VALIDATION_MERCHANTS, this.get('key')) &&
-      data.vpa &&
-      !vpaVerified
-    ) {
+    if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
 
