@@ -30,6 +30,7 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _El = discreet._El,
   Hacks = discreet.Hacks;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -3050,7 +3051,47 @@ Session.prototype = {
             animate: true,
           });
         });
+
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = discreet.Formatter.rules.phone.isValid.call(this);
+
+        Analytics.track('contact:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(contactEl);
     }
+
+    var emailEl = gel('email');
+    if (emailEl) {
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = emailPattern.test(value);
+
+        Analytics.track('email:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(emailEl);
+    }
+
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {
