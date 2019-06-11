@@ -760,7 +760,30 @@ function errorHandler(response) {
       );
     }
   }
-  $('#fd-hide').focus();
+
+  checkIfCorpNetbanking(this, message);
+}
+
+function checkIfCorpNetbanking(session, message) {
+  // If error code exists and matches the string, removed the retry button
+  // and replaces it with ok button, which closes checkout.
+  if (
+    message ===
+    'Payment is pending authorization. Request for authorization from approver.'
+  ) {
+    session.isCorporateBanking = true;
+    $('#fd-hide').remove();
+    var okButton = document.createElement('button');
+    okButton.id = 'fd-ok';
+    okButton.className = 'btn';
+    okButton.innerText = 'OK';
+    $('#error-message').append(okButton);
+    $('#fd-ok').on('click', function() {
+      session.hide();
+    });
+  } else {
+    $('#fd-hide').focus();
+  }
 }
 
 /* bound with session */
@@ -2075,6 +2098,13 @@ Session.prototype = {
         return;
       }
     }
+
+    // Prevents the overlay from closing and not allowing the user to
+    // attempt payment again incase of corporate netbanking.
+    if (this.isCorporateBanking) {
+      return;
+    }
+
     hideOverlayMessage();
   },
 
@@ -5620,6 +5650,7 @@ Session.prototype = {
       this.upiTab = this.otpView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
+      this.isCorporateBanking = null;
     }
   },
 

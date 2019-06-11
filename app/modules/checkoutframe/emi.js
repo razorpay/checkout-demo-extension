@@ -28,20 +28,6 @@ function useBankOverrides(allBanks) {
   return banks;
 }
 
-function hideEMIDropdown() {
-  const body = _Doc.querySelector('#body');
-
-  if (body |> _El.hasClass('emi-focus')) {
-    body |> _El.removeClass('emi-focus');
-  }
-}
-
-function showEMIDropdown() {
-  const body = _Doc.querySelector('#body');
-
-  body |> _El.addClass('emi-focus');
-}
-
 export default function emiView(session) {
   const opts = session.emi_options;
 
