@@ -11,7 +11,8 @@
     {placeholder}
     {pattern}
     use:formatter="formatter"
-    on:focus:"fire('focus',event)"
+    on:focus="fire('focus', event)"
+    on:blur="fire('blur', event)"
   />
   {#if helpText}
     <div class="help">{helpText}</div>
@@ -74,6 +75,11 @@
       /* focus trigger for the input field */
       focus() {
         this.refs.input.focus();
+      },
+
+      /* blur trigger for the input field */
+      blur() {
+        this.refs.input.blur();
       },
 
       getValue() {
