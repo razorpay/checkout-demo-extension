@@ -2203,6 +2203,13 @@ Session.prototype = {
   },
 
   addFunds: function(event) {
+    Analytics.track('wallet:balance:add', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.payload && this.payload.wallet,
+      },
+    });
+
     setOtpText(this.otpView, 'Loading...');
     this.otpView.updateScreen({
       action: false,
@@ -2742,6 +2749,7 @@ Session.prototype = {
     Analytics.track('upi:app:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
+        flow: 'intent',
         package_name: packageName,
         showRecommended: Boolean(this.showRecommendedUPIApp),
         recommended: Boolean(
@@ -3505,6 +3513,41 @@ Session.prototype = {
     BackStore = null;
   },
 
+  switchTabAnalytics: function(tab) {
+    if (tab === 'upi') {
+      var upiData = this.upiTab.get();
+
+      if (upiData.intent) {
+        /**
+         * If intent, track UPI apps installed and eligible
+         */
+        Analytics.track('upi:intent', {
+          type: AnalyticsTypes.RENDER,
+          data: {
+            count: {
+              eligible: _.lengthOf(upiData.intentApps),
+              all: _.lengthOf(upiData.allIntentApps),
+            },
+            list: {
+              eligible: _Arr.join(
+                _Arr.map(upiData.intentApps, function(app) {
+                  return app.package_name;
+                }),
+                ','
+              ),
+              all: _Arr.join(
+                _Arr.map(upiData.allIntentApps, function(app) {
+                  return app.package_name;
+                }),
+                ','
+              ),
+            },
+          },
+        });
+      }
+    }
+  },
+
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
@@ -3526,6 +3569,8 @@ Session.prototype = {
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab) {
+      this.switchTabAnalytics(tab);
+
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
         tab = 'card';
@@ -5427,6 +5472,12 @@ Session.prototype = {
       this.r.on(
         'payment.wallet.topup',
         bind(function() {
+          Analytics.track('wallet:balance:insufficient', {
+            data: {
+              wallet: this.payload && this.payload.wallet,
+            },
+          });
+
           var insufficient_text = 'Insufficient balance in your wallet';
           if (this.get('ecod')) {
             this.back();
