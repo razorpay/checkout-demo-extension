@@ -88,14 +88,14 @@ export function getDowntimes(preferences) {
     disabled: [],
   };
 
-  if (!preferences || !preferences.downtime) {
-    return downtimes;
-  }
+  // if (!preferences || !preferences.downtime) {
+  //   return downtimes;
+  // }
 
-  downtimes = _Obj.clone(preferences.downtime);
+  // downtimes = _Obj.clone(preferences.downtime);
 
-  downtimes = copyMethodsIfNeeded(downtimes);
-  downtimes.disabled = getDisabledMethods(downtimes);
+  // downtimes = copyMethodsIfNeeded(downtimes);
+  // downtimes.disabled = getDisabledMethods(downtimes);
 
   return downtimes;
 }
