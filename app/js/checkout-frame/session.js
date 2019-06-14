@@ -673,7 +673,7 @@ function errorHandler(response) {
       this.powerwallet = null;
       return;
     } else if (this.nativeotp && this.tab === 'card') {
-      Analytics.removeMeta('headless');
+      this.markHeadlessFailed();
       return;
     }
   }
@@ -796,7 +796,7 @@ function cancelHandler(response) {
   this.magic = false;
 
   Analytics.setMeta('payment.cancelled', true);
-  Analytics.removeMeta('headless');
+  this.markHeadlessFailed();
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     if (this.r._payment && this.r._payment.upi_app) {
@@ -870,13 +870,18 @@ function askOTP(view, text, shouldLimitResend) {
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
+            var metadata = origText.metadata;
+            thisSession.headlessMetadata = metadata;
+
+            discreet.OtpService.markOtpSent(
+              metadata.issuer || metadata.network
+            );
+
             var bankLogo;
-            if (origText.metadata.issuer) {
-              bankLogo = discreet.getFullBankLogo(origText.metadata.issuer);
-            } else if (origText.metadata.network) {
-              bankLogo = discreet.Card.getFullNetworkLogo(
-                origText.metadata.network
-              );
+            if (metadata.issuer) {
+              bankLogo = discreet.getFullBankLogo(metadata.issuer);
+            } else if (metadata.network) {
+              bankLogo = discreet.Card.getFullNetworkLogo(metadata.network);
             }
 
             if (bankLogo) {
@@ -2174,11 +2179,19 @@ Session.prototype = {
         headless: this.headless,
       },
     });
+
     if (this.headless) {
       this.showLoadError('Resending OTP');
       if (!this.get('timeout')) {
         this.hideTimer();
       }
+
+      if (this.headlessMetadata) {
+        var metadata = this.headlessMetadata;
+
+        discreet.OtpService.markOtpSent(metadata.issuer || metadata.network);
+      }
+
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
 
@@ -6003,6 +6016,21 @@ Session.prototype = {
 
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
+  },
+
+  /**
+   * Mark headless as failed and perform cleanup
+   */
+  markHeadlessFailed: function() {
+    Analytics.removeMeta('headless');
+    this.headless = false;
+
+    if (this.headlessMetadata) {
+      var metadata = this.headlessMetadata;
+      discreet.OtpService.resetCount(metadata.issuer || metadata.network);
+
+      this.headlessMetadata = null;
+    }
   },
 
   setPreferences: function(prefs) {
