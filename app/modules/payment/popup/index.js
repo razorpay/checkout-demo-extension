@@ -116,6 +116,19 @@ Popup.prototype = {
       if (forceClosed || this.window.closed !== false) {
         // UC browser makes it undefined instead of true
         setTimeout(() => {
+
+          // Find out what's `t` when we get t.onClose is not a function error.
+          if (this && typeof this.onClose !== 'function') {
+            var properties = {
+              culprit: {
+                constructor: this.constructor && this.constructor.name,
+                keys: (typeof this === 'object') && Object.keys(this).slice(0, 10),
+                isWindow: window === this
+              }
+            };
+            throw new Error('Loop culprit details: ' + JSON.stringify(properties));
+          }
+
           this.onClose();
         }, 100);
         this.close();
