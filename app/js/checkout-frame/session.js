@@ -26,6 +26,7 @@ var preferences = window.preferences,
   DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
+  UPIUtils = discreet.UPIUtils,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
@@ -5371,9 +5372,8 @@ Session.prototype = {
     if (data.method === 'upi') {
       if (
         this.hasGooglePaySdk &&
-        data.upi_app === 'com.google.android.apps.nbu.paisa.user'
+        data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
       ) {
-        alert('google pay sdk');
         request.googlepay = true;
       }
     }
