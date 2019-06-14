@@ -839,6 +839,16 @@ function askOTP(view, text, shouldLimitResend) {
   var thisSession = SessionManager.getSession();
   var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
 
+  // Track if OTP was invalid
+  if (origText === discreet.wrongOtpMsg) {
+    Analytics.track('otp:invalid', {
+      data: {
+        wallet: thisSession.tab === 'wallet',
+        headless: thisSession.headless,
+      },
+    });
+  }
+
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
