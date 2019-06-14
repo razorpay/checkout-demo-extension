@@ -1001,6 +1001,7 @@ Session.prototype = {
   },
 
   getDecimalAmount: getDecimalAmount,
+
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
@@ -1040,6 +1041,15 @@ Session.prototype = {
 
   track: function(event, extra) {
     Track(this.r, event, extra);
+  },
+
+  /**
+   * Returns the Payment instance for the current payment.
+   *
+   * @return {Payment}
+   */
+  getPayment: function() {
+    return this.r._payment;
   },
 
   getClasses: function() {
