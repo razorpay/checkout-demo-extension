@@ -2175,6 +2175,11 @@ Session.prototype = {
     var otpProvider;
 
     if (!this.r._payment) {
+      /**
+       * If we're resending the OTP without any payment being created,
+       * it's a Razorpay OTP.
+       * Used for Saved Cards, Cardless EMI.
+       */
       otpProvider = 'razorpay';
     } else if (this.headless && this.headlessMetadata) {
       otpProvider =
