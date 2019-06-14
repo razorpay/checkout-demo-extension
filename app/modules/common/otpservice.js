@@ -29,7 +29,7 @@ export const markOtpSent = provider => {
 
   const lastSentAt = LAST_OTP_SENT_AT[provider];
   const expiresAfter = OTP_EXPIRES_AFTER[provider];
-  const otpLimit = OTP_LIMIT[provider];
+  const otpLimit = OTP_LIMIT[provider] || Infinity;
   let otpsSent = OTPS_SENT[provider] || 0;
 
   // Has the OTP expired by now?
@@ -66,7 +66,7 @@ export const canSendOtp = provider => {
 
   const lastSentAt = LAST_OTP_SENT_AT[provider];
   const expiresAfter = OTP_EXPIRES_AFTER[provider];
-  const otpLimit = OTP_LIMIT[provider];
+  const otpLimit = OTP_LIMIT[provider] || Infinity;
   let otpsSent = OTPS_SENT[provider] || 0;
 
   // Has the OTP expired by now?
