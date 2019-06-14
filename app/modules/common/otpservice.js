@@ -98,3 +98,17 @@ export const resetCount = provider => {
   OTPS_SENT[provider] = 0;
   LAST_OTP_SENT_AT[provider] = undefined;
 };
+
+/**
+ * Returns the count of OTPs sent so far.
+ * @param {string} provider
+ *
+ * @returns {number} count
+ */
+export const getCount = provider => {
+  if (!provider) {
+    return 0;
+  }
+
+  return OTPS_SENT[provider] || 0;
+};
