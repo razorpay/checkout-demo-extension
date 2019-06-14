@@ -7,6 +7,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import DowntimesStore from 'checkoutstore/downtimes.js';
+import { isMobile } from 'common/useragent';
 
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
 
@@ -280,9 +281,12 @@ export const listInstruments = customer => {
     a.score > b.score ? -1 : ~~(a.score < b.score)
   );
 
+  const listOfInstrumentsToBeShown = isMobile ? 3 : 2;
+
   Analytics.track('p13n:instruments:list', {
     data: {
       length: currentCustomer.length,
+      shown: Math.min(currentCustomer.length, listOfInstrumentsToBeShown),
     },
   });
 

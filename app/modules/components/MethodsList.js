@@ -129,6 +129,11 @@ export default class MethodsList {
     }
 
     data = _Obj.clone(data);
+
+    /**
+     * This count is also being sent with the
+     * p13n:instruments:list event.
+     */
     let noOfInstruments = 2;
     if (isMobile) {
       noOfInstruments = 3;
