@@ -30,6 +30,7 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _Doc = discreet._Doc,
   Hacks = discreet.Hacks;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -2251,8 +2252,9 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    var commonInvalid = $('#pad-common .invalid');
-    if (commonInvalid[0]) {
+    if (!this.commonValid(true)) {
+      var commonInvalid = $('#pad-common .invalid');
+
       return commonInvalid
         .addClass('mature')
         .$('.input')
@@ -3578,10 +3580,38 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Says if the fields on the homepage are valid or not.
+   * @param {boolean} trackInvalid Should we sent an Analytics event?
+   *
+   * @returns {boolean} valid
+   */
+  commonValid: function(trackInvalid) {
+    var valid = !this.checkInvalid('#pad-common');
+
+    if (trackInvalid) {
+      var fields = _Doc.querySelectorAll('#pad-common .invalid input'); // Assuming there are only input fields for now
+
+      var invalidFields = {};
+
+      _Arr.loop(fields, function(field) {
+        invalidFields[field.name] = true;
+      });
+
+      Analytics.track('homescreen:fields:invalid', {
+        data: {
+          fields: invalidFields,
+        },
+      });
+    }
+
+    return valid;
+  },
+
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.commonValid(true)) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
         }
@@ -5004,7 +5034,7 @@ Session.prototype = {
     }
 
     if (!this.recurring && this.order && this.order.bank) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.commonValid()) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
@@ -5154,7 +5184,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (this.p13n) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.commonValid()) {
         return;
       }
 

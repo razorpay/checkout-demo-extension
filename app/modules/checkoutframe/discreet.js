@@ -140,7 +140,8 @@ export default {
   Hacks,
 
   _Arr,
-  _Obj,
+  _Doc,
   _Func,
+  _Obj,
   _,
 };
