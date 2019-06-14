@@ -1,51 +1,79 @@
-const RZP_OTP_EXP_TIME = 300000; // API expires an OTP after 5 minutes
-const MAX_OTP_LIMIT = 4; // One OTP sent + 3 retries
+const OTP_EXPIRES_AFTER = {
+  razorpay: 30000, // API expires an OTP after 5 minutes
+};
 
-let numberOfOtpsSent = 0;
-let lastOtpSentAt;
+const OTP_LIMIT = {
+  razorpay: 4, // One OTP sent + 3 retries
+};
+
+const OTPS_SENT = {
+  razorpay: 0,
+};
+
+const LAST_OTP_SENT_AT = {
+  razorpay: undefined,
+};
 
 /**
  * Marks the sending of an OTP.
+ * @param {string} provider
  *
- * @return {Boolean} Whether or not any more OTPs can be sent.
+ * @returns {boolean} Whether or not any more OTPs can be sent.
  */
-export const markOtpSent = () => {
+export const markOtpSent = provider => {
+  if (!provider) {
+    return;
+  }
+
   const now = Date.now();
 
+  const lastSentAt = LAST_OTP_SENT_AT[provider];
+  const expiresAfter = OTP_EXPIRES_AFTER[provider];
+  const otpLimit = OTP_LIMIT[provider];
+  let otpsSent = OTPS_SENT[provider] || 0;
+
   // Has the OTP on API expired by now?
-  const hasOtpExpired = lastOtpSentAt
-    ? now - lastOtpSentAt >= RZP_OTP_EXP_TIME
-    : false;
+  const hasOtpExpired = lastSentAt ? now - lastSentAt >= expiresAfter : false;
 
   // If OTP has expired, this is the first OTP.
   if (hasOtpExpired) {
-    numberOfOtpsSent = 1;
+    otpsSent = 1;
   } else {
-    numberOfOtpsSent++;
+    otpsSent++;
   }
 
-  lastOtpSentAt = now;
+  OTPS_SENT[provider] = otpsSent;
+  LAST_OTP_SENT_AT[provider] = now;
 
-  return numberOfOtpsSent < MAX_OTP_LIMIT;
+  return otpsSent < otpLimit;
 };
 
 /**
  * Check whether or not we can sent more OTPs.
+ * @param {string} provider
  *
- * @return {Boolean}
+ * @returns {boolean}
  */
-export const canSendOtp = () => {
+export const canSendOtp = provider => {
+  if (!provider) {
+    return;
+  }
+
   const now = Date.now();
+
+  const lastSentAt = LAST_OTP_SENT_AT[provider];
+  const expiresAfter = OTP_EXPIRES_AFTER[provider];
+  const otpLimit = OTP_LIMIT[provider];
+  let otpsSent = OTPS_SENT[provider] || 0;
+
   // Has the OTP on API expired by now?
-  const hasOtpExpired = lastOtpSentAt
-    ? now - lastOtpSentAt >= RZP_OTP_EXP_TIME
-    : false;
+  const hasOtpExpired = lastSentAt ? now - lastSentAt >= expiresAfter : false;
 
   if (hasOtpExpired) {
     return true;
   }
 
-  if (numberOfOtpsSent < MAX_OTP_LIMIT) {
+  if (otpsSent < otpLimit) {
     return true;
   }
 

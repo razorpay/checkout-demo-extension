@@ -856,7 +856,9 @@ function askOTP(view, text, shouldLimitResend) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
-    allowResend: shouldLimitResend ? discreet.OtpService.canSendOtp() : true,
+    allowResend: shouldLimitResend
+      ? discreet.OtpService.canSendOtp('razorpay')
+      : true,
   });
 
   $('#body').addClass('sub');
