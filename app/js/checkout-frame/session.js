@@ -2172,12 +2172,28 @@ Session.prototype = {
       return this.magicView.resendOtp();
     }
 
+    var otpProvider;
+
+    if (!this.r._payment) {
+      otpProvider = 'razorpay';
+    } else if (this.headless && this.headlessMetadata) {
+      otpProvider =
+        this.headlessMetadata.issuer || this.headlessMetadata.network;
+    }
+
+    var otpSentCount = discreet.OtpService.getCount(otpProvider);
+    var resendEventData = {
+      wallet: this.tab === 'wallet',
+      headless: this.headless,
+    };
+
+    if (otpSentCount) {
+      resendEventData.count = otpSentCount;
+    }
+
     Analytics.track('otp:resend', {
       type: AnalyticsTypes.BEHAV,
-      data: {
-        wallet: this.tab === 'wallet',
-        headless: this.headless,
-      },
+      data: resendEventData,
     });
 
     if (this.headless) {
