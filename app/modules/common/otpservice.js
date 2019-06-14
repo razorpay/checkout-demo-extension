@@ -32,8 +32,11 @@ export const markOtpSent = provider => {
   const otpLimit = OTP_LIMIT[provider];
   let otpsSent = OTPS_SENT[provider] || 0;
 
-  // Has the OTP on API expired by now?
-  const hasOtpExpired = lastSentAt ? now - lastSentAt >= expiresAfter : false;
+  // Has the OTP expired by now?
+  let hasOtpExpired = false;
+  if (lastSentAt && expiresAfter) {
+    hasOtpExpired = Boolean(now - lastSentAt >= expiresAfter);
+  }
 
   // If OTP has expired, this is the first OTP.
   if (hasOtpExpired) {
@@ -49,7 +52,7 @@ export const markOtpSent = provider => {
 };
 
 /**
- * Check whether or not we can sent more OTPs.
+ * Check whether or not we can send more OTPs.
  * @param {string} provider
  *
  * @returns {boolean}
@@ -66,8 +69,11 @@ export const canSendOtp = provider => {
   const otpLimit = OTP_LIMIT[provider];
   let otpsSent = OTPS_SENT[provider] || 0;
 
-  // Has the OTP on API expired by now?
-  const hasOtpExpired = lastSentAt ? now - lastSentAt >= expiresAfter : false;
+  // Has the OTP expired by now?
+  let hasOtpExpired = false;
+  if (lastSentAt && expiresAfter) {
+    hasOtpExpired = Boolean(now - lastSentAt >= expiresAfter);
+  }
 
   if (hasOtpExpired) {
     return true;
@@ -78,4 +84,17 @@ export const canSendOtp = provider => {
   }
 
   return false;
+};
+
+/**
+ * Resets the OTP count for the provider.
+ * @param {string} provider
+ */
+export const resetCount = provider => {
+  if (!provider) {
+    return;
+  }
+
+  OTPS_SENT[provider] = 0;
+  LAST_OTP_SENT_AT[provider] = undefined;
 };
