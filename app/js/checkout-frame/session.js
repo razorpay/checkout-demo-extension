@@ -5689,6 +5689,7 @@ Session.prototype = {
         patt: bank.patt,
         code: bank.code,
         plans: {},
+        min_amount: Infinity,
       };
 
       if (eligibleEmiOptions) {
@@ -5697,6 +5698,10 @@ Session.prototype = {
         });
 
         if (eligibleEmiOptions[bank.code]) {
+          emiBank.min_amount = discreet.EmiUtils.getMinimumAmount(
+            eligibleEmiOptions[bank.code]
+          );
+
           emiBanks[bank.code] = emiBank;
         }
       }

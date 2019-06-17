@@ -1,5 +1,4 @@
 import * as Card from 'common/card';
-import { AMEX_EMI_MIN } from 'common/constants';
 
 const transformerByMethod = {
   /**
