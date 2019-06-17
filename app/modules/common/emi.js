@@ -18,3 +18,21 @@ export function getEligibleBanksBasedOnMinAmount(amount, banks) {
 
   return eligible;
 }
+
+/**
+ * Returns the lowest minimum amount from the list of plans
+ * @param {Array} plans List of plans
+ *
+ * @returns {number}
+ */
+export function getMinimumAmount(plans = []) {
+  let minimum = Infinity;
+
+  _Arr.loop(plans, plan => {
+    if (plan.min_amount < minimum) {
+      minimum = plan.min_amount;
+    }
+  });
+
+  return minimum;
+}
