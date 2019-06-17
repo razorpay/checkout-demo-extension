@@ -10,6 +10,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
+import * as EmiUtils from 'common/emi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
@@ -72,6 +73,7 @@ export default {
   Analytics,
   AnalyticsTypes,
   UPIUtils,
+  EmiUtils,
   setShieldParams,
   GPay,
   Color,
