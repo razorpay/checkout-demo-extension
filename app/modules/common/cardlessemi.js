@@ -35,11 +35,39 @@ export const createProvider = (code, title) => ({
   title,
 });
 
-export const providers = _Obj.map(config, (details, code) => ({
-  name: details.name,
-  code,
-  logo: prefix + code + '.svg',
-  sqLogo: sqPrefix + code + '.svg',
-}));
+// Generate provider config
+const defaultConfig = {
+  min_amount: 300000,
+};
+
+const providers = _Obj.map(config, (details, code) => {
+  return (
+    {}
+    |> _Obj.extend(defaultConfig)
+    |> _Obj.extend({
+      code,
+      logo: prefix + code + '.svg',
+      sqLogo: sqPrefix + code + '.svg',
+    })
+    |> _Obj.extend(details)
+  );
+});
 
 export const getProvider = code => providers[code];
+
+/**
+ * Extends the config of the given with the updated config
+ * @param {string} provider Provider code
+ * @param {Object} updatedConfig Config to update
+ *
+ * @return {Object} New config of the provider
+ */
+export const extendConfig = (provider, updatedConfig) => {
+  if (!providers[provider]) {
+    return;
+  }
+
+  providers[provider] = _Obj.extend(providers[provider], updatedConfig);
+
+  return providers[provider];
+};
