@@ -5711,9 +5711,6 @@ Session.prototype = {
       banks: emiBanks,
     };
 
-    /* TODO: remove common min and use bank specific min_amounts */
-    emiOptions.min = 3000 * 100 - 1; /* min 3k */
-
     this.emi_options = emiOptions;
   },
 
