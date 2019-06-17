@@ -5677,6 +5677,11 @@ Session.prototype = {
     var emiBanks = {};
     var preferences = this.preferences;
     var prefEmiOptions = preferences.methods.emi_options;
+    var amount = this.get('amount');
+    var eligibleEmiOptions = discreet.EmiUtils.getEligibleBanksBasedOnMinAmount(
+      amount,
+      prefEmiOptions
+    );
 
     each(Bank.emiBanks, function(i, bank) {
       var emiBank = {
@@ -5686,12 +5691,12 @@ Session.prototype = {
         plans: {},
       };
 
-      if (prefEmiOptions) {
-        each(prefEmiOptions[bank.code], function(j, plan) {
+      if (eligibleEmiOptions) {
+        each(eligibleEmiOptions[bank.code], function(j, plan) {
           emiBank.plans[plan.duration] = plan;
         });
 
-        if (prefEmiOptions[bank.code]) {
+        if (eligibleEmiOptions[bank.code]) {
           emiBanks[bank.code] = emiBank;
         }
       }
@@ -5768,13 +5773,13 @@ Session.prototype = {
      * - Recurring payment
      * - EMI not enabled
      * - Neither of Card or EMI or Cardless EMI are enabled
-     * - amount is less than EMI threshold
+     * - No EMI banks are present
      */
     if (
       !(methods.emi || methods.card || methods.cardless_emi) ||
       recurring ||
       international ||
-      amount <= emi_options.min
+      _.lengthOf(_Obj.keys(emi_options)) === 0
     ) {
       methods.emi = false;
     }
