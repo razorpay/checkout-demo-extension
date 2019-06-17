@@ -5,11 +5,19 @@ const cdnUrl = RazorpayConfig.cdn;
 const prefix = cdnUrl + 'cardless_emi/';
 const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
-const list = {
-  bajaj: ['Bajaj Finserv'],
-  earlysalary: ['EarlySalary'],
-  zestmoney: ['ZestMoney'],
-  flexmoney: ['InstaCred Cardless EMI'],
+const config = {
+  bajaj: {
+    name: 'Bajaj Finserv',
+  },
+  earlysalary: {
+    name: 'EarlySalary',
+  },
+  zestmoney: {
+    name: 'ZestMoney',
+  },
+  flexmoney: {
+    name: 'InstaCred Cardless EMI',
+  },
 };
 
 /**
@@ -27,8 +35,8 @@ export const createProvider = (code, title) => ({
   title,
 });
 
-export const providers = _Obj.map(list, (details, code) => ({
-  name: details[0],
+export const providers = _Obj.map(config, (details, code) => ({
+  name: details.name,
   code,
   logo: prefix + code + '.svg',
   sqLogo: sqPrefix + code + '.svg',
