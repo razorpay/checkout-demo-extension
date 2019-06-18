@@ -19,6 +19,7 @@ const transformerByMethod = {
     let networkCode = Card.findCodeByNetworkName(network);
 
     if (networkCode === 'amex') {
+      token.card.issuer = 'AMEX'; // Set issuer explicitly
       bank = 'AMEX';
       minimumAmount = AMEX_EMI_MIN;
     }
