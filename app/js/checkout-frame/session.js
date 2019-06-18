@@ -5375,6 +5375,7 @@ Session.prototype = {
         data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
       ) {
         request.googlepay = true;
+        request['_[flow]'] = 'intent';
       }
     }
 
@@ -5504,7 +5505,8 @@ Session.prototype = {
         /* invoke amazonpay sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
-          CheckoutBridge.processPayment(JSON.stringify(data));
+          var payload = JSON.stringify(_Obj.unflatten(data));
+          CheckoutBridge.processPayment(payload);
         } else if (iosCheckoutBridgeNew) {
           iosCheckoutBridgeNew.postMessage({
             action: 'processPayment',
