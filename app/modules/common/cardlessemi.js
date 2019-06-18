@@ -71,3 +71,26 @@ export const extendConfig = (provider, updatedConfig) => {
 
   return providers[provider];
 };
+
+/**
+ * Returns the eligible Cardless EMI providers
+ * @param {number} amount
+ * @param {Object} enabledProviders Providers enabled from API
+ *
+ * @returns {Object}
+ */
+export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
+  const eligible = {};
+
+  if (!enabledProviders) {
+    return eligible;
+  }
+
+  _Obj.loop(enabledProviders, (enabled, provider) => {
+    if (providers[provider] && providers[provider].min_amount <= amount) {
+      eligible[provider] = true;
+    }
+  });
+
+  return eligible;
+}

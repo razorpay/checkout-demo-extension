@@ -1658,15 +1658,6 @@ Session.prototype = {
 
       if (this.methods.emi) {
         providers.push(CardlessEmi.createProvider('cards', 'EMI on Cards'));
-
-        if (this.emi_options.banks['BAJAJ']) {
-          providers.push(
-            CardlessEmi.createProvider(
-              'bajaj',
-              this.emi_options.banks['BAJAJ'].name
-            )
-          );
-        }
       }
 
       each(this.methods.cardless_emi, function(provider) {
@@ -5787,27 +5778,33 @@ Session.prototype = {
       methods.upi = false;
     }
 
-    /**
-     * Disable Cardless EMI on amounts < 3000 INR
-     */
-    if (amount < 300000) {
-      methods.cardless_emi = null;
-    } else if (methods.cardless_emi instanceof Array) {
-      /**
-       * methods.cardless_emi will be [] when there are no providers enabled.
-       */
-      if (methods.cardless_emi.length === 0) {
-        /**
-         * Set cardless emi to [] (enabled) if:
-         * - Emi is enabled
-         * - Cardless EMI is false
-         * - Bajaj Finserv plans are present
-         */
-        if (!(methods.emi && emi_options.banks['BAJAJ'])) {
-          methods.cardless_emi = null;
-        }
+    if (emi_options.banks['BAJAJ']) {
+      if (!methods.cardless_emi || _.isArray(methods.cardless_emi)) {
+        methods.cardless_emi = {
+          bajaj: true,
+        };
+      } else {
+        methods.cardless_emi.bajaj = true;
       }
     }
+
+    /**
+     * Get eligible cardless EMI providers
+     */
+    methods.cardless_emi = CardlessEmi.getEligibleProvidersBasedOnMinAmount(
+      amount,
+      methods.cardless_emi
+    );
+    if (_Obj.isEmpty(methods.cardless_emi)) {
+      methods.cardless_emi = null;
+    }
+
+    /**
+     * If merchant wanted cardless EMI to be disabled,
+     * but Bajaj Finserv was enabled,
+     * it would need to be enabled again.
+     */
+    this.set('method.cardless_emi', methods.cardless_emi);
 
     /**
      * disable wallets if:
