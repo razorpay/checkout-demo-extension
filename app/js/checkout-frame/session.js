@@ -30,7 +30,8 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
-  Hacks = discreet.Hacks;
+  Hacks = discreet.Hacks,
+  CardlessEmi = discreet.CardlessEmi;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -130,7 +131,7 @@ function createCardlessEmiImage(src) {
 }
 
 function createCardlessEmiTopbarImages(providerCode) {
-  var provider = discreet.CardlessEmi.getProvider(providerCode);
+  var provider = CardlessEmi.getProvider(providerCode);
 
   return createCardlessEmiImage(provider.logo);
 }
@@ -1656,13 +1657,11 @@ Session.prototype = {
       var providers = [];
 
       if (this.methods.emi) {
-        providers.push(
-          discreet.CardlessEmi.createProvider('cards', 'EMI on Cards')
-        );
+        providers.push(CardlessEmi.createProvider('cards', 'EMI on Cards'));
 
         if (this.emi_options.banks['BAJAJ']) {
           providers.push(
-            discreet.CardlessEmi.createProvider(
+            CardlessEmi.createProvider(
               'bajaj',
               this.emi_options.banks['BAJAJ'].name
             )
@@ -1671,15 +1670,13 @@ Session.prototype = {
       }
 
       each(this.methods.cardless_emi, function(provider) {
-        var providerObj = discreet.CardlessEmi.getProvider(provider);
+        var providerObj = CardlessEmi.getProvider(provider);
 
         if (!providerObj) {
           return;
         }
 
-        providers.push(
-          discreet.CardlessEmi.createProvider(provider, providerObj.name)
-        );
+        providers.push(CardlessEmi.createProvider(provider, providerObj.name));
       });
 
       this.emiOptionsView.setOptions({
@@ -1800,7 +1797,7 @@ Session.prototype = {
     }
 
     var providerCode = CardlessEmiStore.providerCode;
-    var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
+    var cardlessEmiProviderObj = CardlessEmi.getProvider(providerCode);
     var self = this;
 
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
@@ -5672,6 +5669,13 @@ Session.prototype = {
     var emiOptions = {
       banks: emiBanks,
     };
+
+    // Minimum amount for BAJAJ is sent from API
+    if (emiOptions.banks['BAJAJ']) {
+      CardlessEmi.extendConfig('bajaj', {
+        min_amount: emiOptions.banks['BAJAJ'].min_amount,
+      });
+    }
 
     this.emi_options = emiOptions;
   },
