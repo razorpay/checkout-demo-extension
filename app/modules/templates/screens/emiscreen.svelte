@@ -35,6 +35,12 @@
   You need to have a <strong>Bajaj Finserv issued card</strong> to continue.
 </div>
 
+<style>
+  .emi-plans-info-container .emi-plan-selected .emi-plans-text {
+    padding-right: 48px;
+  }
+</style>
+
 <script>
   export default {
     data () {
