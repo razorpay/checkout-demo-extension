@@ -3903,13 +3903,6 @@ Session.prototype = {
 
         var emiPlans = self.getEmiPlans(bank);
 
-        if (!emiPlans.length) {
-          gel('card_number').focus();
-          self.shake();
-
-          return;
-        }
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3992,13 +3985,6 @@ Session.prototype = {
         var emiPlans = self.getEmiPlans(bank);
         var $savedCard = $('.saved-card.checked');
         var savedCvv = $savedCard.$('.saved-cvv').val();
-
-        if (!emiPlans.length) {
-          self.shake();
-          $savedCard.$('.saved-cvv').focus();
-
-          return;
-        }
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
@@ -4091,11 +4077,6 @@ Session.prototype = {
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
         var emiPlans = self.getEmiPlans(bank);
-
-        if (!emiPlans.length) {
-          self.shake();
-          return;
-        }
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
