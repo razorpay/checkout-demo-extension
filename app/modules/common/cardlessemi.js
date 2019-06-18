@@ -14,6 +14,7 @@ const config = {
   },
   zestmoney: {
     name: 'ZestMoney',
+    min_amount: 90000,
   },
   flexmoney: {
     name: 'InstaCred Cardless EMI',
