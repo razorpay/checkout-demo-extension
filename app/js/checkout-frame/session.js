@@ -5730,15 +5730,14 @@ Session.prototype = {
      * disable EMI if:
      * - Non INR payment
      * - Recurring payment
-     * - EMI not enabled
-     * - Neither of Card or EMI or Cardless EMI are enabled
      * - No EMI banks are present
+     * - Either of Card or EMI methods are disabled
      */
     if (
-      !(methods.emi || methods.card || methods.cardless_emi) ||
-      recurring ||
       international ||
-      _.lengthOf(_Obj.keys(emi_options)) === 0
+      recurring ||
+      _.lengthOf(_Obj.keys(emi_options)) === 0 ||
+      !(methods.emi || methods.card)
     ) {
       methods.emi = false;
     }
