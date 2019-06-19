@@ -85,3 +85,8 @@ RazorpayDefaults.theme = {
   branding: '',
   debit_card: false,
 };
+
+RazorpayDefaults._ = {
+  integration: null, // Used for passing the integration mode. eg.: flutter, woocommerce
+  integration_version: null, // USed for passing the integration version. eg.: 1.0.2
+};

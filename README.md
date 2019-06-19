@@ -39,7 +39,7 @@ Format: `key`, `merchant_id`
 
    `simpleRegex = '(' + out.join('|') + ')'`
 
-4. Go to `https://myregextester.com`
+4. Go to [https://myregextester.com](https://myregextester.com)
 5. Paste `simpleRegex` in match pattern & list of IINs in the "Source Text" field.
 6. Check these:
 

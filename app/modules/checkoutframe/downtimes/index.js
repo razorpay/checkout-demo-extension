@@ -20,9 +20,9 @@ function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
 }
 
 const DISABLE_METHOD = {
-  upi: disableBasedOnSeverityOrScheduled(['high'], true),
-  qr: disableBasedOnSeverityOrScheduled(['high'], true),
-  gpay: disableBasedOnSeverityOrScheduled(['high'], true),
+  // upi: disableBasedOnSeverityOrScheduled(['high'], true),
+  // qr: disableBasedOnSeverityOrScheduled(['high'], true),
+  // gpay: disableBasedOnSeverityOrScheduled(['high'], true),
 };
 
 /**
@@ -88,14 +88,14 @@ export function getDowntimes(preferences) {
     disabled: [],
   };
 
-  if (!preferences || !preferences.downtime) {
-    return downtimes;
-  }
+  // if (!preferences || !preferences.downtime) {
+  //   return downtimes;
+  // }
 
-  downtimes = _Obj.clone(preferences.downtime);
+  // downtimes = _Obj.clone(preferences.downtime);
 
-  downtimes = copyMethodsIfNeeded(downtimes);
-  downtimes.disabled = getDisabledMethods(downtimes);
+  // downtimes = copyMethodsIfNeeded(downtimes);
+  // downtimes.disabled = getDisabledMethods(downtimes);
 
   return downtimes;
 }

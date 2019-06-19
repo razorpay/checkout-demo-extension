@@ -761,7 +761,30 @@ function errorHandler(response) {
       );
     }
   }
-  $('#fd-hide').focus();
+
+  checkIfCorpNetbanking(this, message);
+}
+
+function checkIfCorpNetbanking(session, message) {
+  // If error code exists and matches the string, removed the retry button
+  // and replaces it with ok button, which closes checkout.
+  if (
+    message ===
+    'Payment is pending authorization. Request for authorization from approver.'
+  ) {
+    session.isCorporateBanking = true;
+    $('#fd-hide').remove();
+    var okButton = document.createElement('button');
+    okButton.id = 'fd-ok';
+    okButton.className = 'btn';
+    okButton.innerText = 'OK';
+    $('#error-message').append(okButton);
+    $('#fd-ok').on('click', function() {
+      session.hide();
+    });
+  } else {
+    $('#fd-hide').focus();
+  }
 }
 
 /* bound with session */
@@ -934,15 +957,6 @@ function cancel_upi(session) {
 
 var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
 var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
-
-var VPA_VALIDATION_MERCHANTS = [
-  'rzp_live_ILgsfZCZoFIKMb' /* Razorpay demo key */,
-  'rzp_live_U70ERBEHvnv45C' /* Acko Key */,
-  'rzp_live_aSBQCECmmDTldx',
-  'rzp_live_HdXPyDx4Ea6U8Q',
-  'rzp_live_USOzRto8cqRWYo', // Treebo
-  'rzp_live_XKUqpBiWMQvaqf', // Treebo
-];
 
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -1706,24 +1720,6 @@ Session.prototype = {
     this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
   },
 
-  makeCardlessEmiDetailText: function(duration, monthly) {
-    return (
-      '<ul>' +
-      '<li>Monthly Installment: ' +
-      this.formatAmountWithCurrency(monthly) +
-      '</li>' +
-      '<li>Total Amount: ' +
-      this.formatAmountWithCurrency(duration * monthly) +
-      ' (' +
-      this.formatAmountWithCurrency(monthly) +
-      ' x ' +
-      duration +
-      ')' +
-      '</li>' +
-      '</ul>'
-    );
-  },
-
   getCardlessEmiPlans: function() {
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
@@ -2085,6 +2081,13 @@ Session.prototype = {
         return;
       }
     }
+
+    // Prevents the overlay from closing and not allowing the user to
+    // attempt payment again incase of corporate netbanking.
+    if (this.isCorporateBanking) {
+      return;
+    }
+
     hideOverlayMessage();
   },
 
@@ -4114,33 +4117,13 @@ Session.prototype = {
 
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
-        var emiPlans = [];
+        var emiPlans = self.getEmiPlans(bank);
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
         } else {
           self.removeAndCleanupOffers();
         }
-
-        each(plans, function(index, p) {
-          var amount_per_month = (
-            (amount * (1 + p.interest / 100)) /
-            p.duration
-          ).toFixed(0);
-
-          emiPlans.push({
-            text:
-              p.duration +
-              ' Months @ ' +
-              self.formatAmountWithCurrency(amount_per_month) +
-              '/mo',
-            value: p.duration,
-            detail: self.makeCardlessEmiDetailText(
-              p.duration,
-              amount_per_month
-            ),
-          });
-        });
 
         var prevTab = self.tab;
         var prevScreen = self.screen;
@@ -5459,11 +5442,7 @@ Session.prototype = {
     }
 
     /* VPA verification */
-    if (
-      _Arr.contains(VPA_VALIDATION_MERCHANTS, this.get('key')) &&
-      data.vpa &&
-      !vpaVerified
-    ) {
+    if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
 
@@ -5674,6 +5653,7 @@ Session.prototype = {
       this.upiTab = this.otpView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
+      this.isCorporateBanking = null;
     }
   },
 
