@@ -124,7 +124,10 @@ Popup.prototype = {
               culprit: {
                 _constructor: this.constructor && this.constructor.name,
                 keys:
-                  typeof this === 'object' && Object.keys(this).slice(0, 10),
+                  typeof this === 'object' &&
+                  Object.keys(this)
+                    .slice(0, 10)
+                    .join(','),
                 isWindow: window === this,
               },
             };
