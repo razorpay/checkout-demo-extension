@@ -606,14 +606,12 @@
       trackHandleSelection(event) {
         const {
           selectedApp,
+          pspHandle
         } = this.get();
         const vpa = this.getFullVpa();
 
-        if (!vpa) {
-          return;
-        }
-
-        const valid = isVpaValid(vpa);
+        const valid = vpa ? isVpaValid(vpa) : false;
+        const handle = event.target.value;
 
         Analytics.track('vpa:handle:select', {
           type: AnalyticsTypes.BEHAV,
@@ -621,6 +619,7 @@
             app: selectedApp,
             value: vpa,
             valid,
+            handle,
           }
         });
       }
