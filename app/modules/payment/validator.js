@@ -112,6 +112,16 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
     data['_[flow]'] = 'intent';
   }
 
+  // Add integration details if present
+  if (razorpayInstance.get('_.integration')) {
+    data['_[integration]'] = razorpayInstance.get('_.integration');
+  }
+  if (razorpayInstance.get('_.integration_version')) {
+    data['_[integration_version]'] = razorpayInstance.get(
+      '_.integration_version'
+    );
+  }
+
   let fingerprint = getFingerprint();
   if (fingerprint) {
     data['_[shield][fhash]'] = fingerprint;
