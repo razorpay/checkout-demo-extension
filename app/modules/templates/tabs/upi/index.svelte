@@ -44,6 +44,8 @@
                 formatter={{
                   type: 'vpa'
                 }}
+
+                on:blur="trackVpaEntry(event)"
               />
               <div class="elem at-separator">@</div>
               <div class="elem">
@@ -80,6 +82,8 @@
               formatter={{
                 type: 'vpa'
               }}
+
+              on:blur="trackVpaEntry(event)"
             />
             {#if pspHandle}
               <div ref:pspName>@{pspHandle}</div>
@@ -260,6 +264,10 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
+  function isVpaValid (vpa) {
+    return VPA_REGEX.test(vpa);
+  }
+
   export default {
     components: {
       UpiIntent: './UpiIntent.svelte',
@@ -364,7 +372,6 @@
           }
         }
       }
-
     },
 
     methods: {
@@ -379,6 +386,23 @@
           pspHandle,
           isGPaySelected
         } = this.get();
+
+        /**
+         * getPayload is called when the users presses Pay.
+         *
+         * "blur" is not fired on vpaField input element
+         * if the form is submitted directly by pressing Enter.
+         *
+         * Hence, we try to force a blur in order to perform
+         * analytics tracking.
+         *
+         * "blur" is not fired in case the element is not
+         * already focused on, so this would be fine if the
+         * user decides to manually press the pay button.
+         */
+        if (this.refs.vpaField) {
+          this.refs.vpaField.blur();
+        }
 
         let vpa = '';
         let data = {};
@@ -398,7 +422,7 @@
             } else {
               let vpaToSubmit = vpa;
 
-              if (!VPA_REGEX.test(vpa)) {
+              if (!isVpaValid(vpa)) {
                 vpaToSubmit = `${vpa}@${pspHandle}`;
               }
 
@@ -518,7 +542,87 @@
       googlePayPspHandleChange(event) {
         // TODO: Focus only if vpa is invalid.
         this.focusVpa(event);
+
+        // Should be added to <select> but Svelte does not allow multiple duplicate attributes
+        this.trackHandleSelection(event);
       },
+
+      /**
+       * Returns the full VPA,
+       * with the selected or prefilled PSP
+       *
+       * @returns {string}
+       */
+      getFullVpa() {
+        let {
+          pspHandle,
+        } = this.get();
+        let vpa = this.refs.vpaField.getValue();
+
+        if (!vpa) {
+          return '';
+        }
+
+        const valid = isVpaValid(vpa);
+        const isSingleHandle = pspHandle && !_.isArray(pspHandle);
+
+        if (!valid && isSingleHandle) {
+          vpa = `${vpa}@${pspHandle}`;
+        }
+
+        return vpa;
+      },
+
+      /**
+       * Track the entry of a VPA.
+       * Fired when the input field is blurred.
+       */
+      trackVpaEntry(event) {
+        const {
+          selectedApp
+        } = this.get();
+        const vpa = this.getFullVpa();
+
+        if (!vpa) {
+          return;
+        }
+
+        const valid = isVpaValid(vpa);
+
+        Analytics.track('vpa:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            app: selectedApp,
+            value: vpa,
+            valid,
+          }
+        });
+      },
+
+      /**
+       * Track the selection of a PSP handle from a dropdown.
+       * Fired on selection.
+       */
+      trackHandleSelection(event) {
+        const {
+          selectedApp,
+          pspHandle
+        } = this.get();
+        const vpa = this.getFullVpa();
+
+        const valid = vpa ? isVpaValid(vpa) : false;
+        const handle = event.target.value;
+
+        Analytics.track('vpa:handle:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            app: selectedApp,
+            value: vpa,
+            valid,
+            handle,
+          }
+        });
+      }
     },
   };
 </script>
