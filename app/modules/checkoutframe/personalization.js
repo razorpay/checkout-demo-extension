@@ -316,3 +316,28 @@ export const handleInstrument = (data, instrument) => {
 
   return gotSome;
 };
+
+/**
+ * Filters out instruments and returns only those
+ * that can be used for this payment.
+ * @param {Array} instruments List of instruments
+ * @param {Object} availableMethods Available methods
+ *
+ * @returns {Array}
+ */
+export function filterInstrumentsForAvailableMethods(
+  instruments,
+  availableMethods
+) {
+  // TODO: Move Downtime logic to this function
+
+  _Arr.filter(instruments, instrument => {
+    let { method } = instrument;
+
+    if (instrument['_[upiqr]']) {
+      method = 'qr';
+    }
+
+    return availableMethods[method];
+  });
+}
