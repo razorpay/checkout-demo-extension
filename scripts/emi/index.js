@@ -52,7 +52,7 @@ const getOptimizedRegex = regex =>
 
 getOptimizedRegex(baseRegex)
   .then(({ regex }) => {
-    const regexString = `^${regex.replace(/\?\:/g, '')}`;
+    const regexString = `^${regex.replace(/\?\:/g, '').replace(/\\d/g, '')}`;
 
     regex = new RegExp(regexString);
 
