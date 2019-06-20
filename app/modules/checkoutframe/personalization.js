@@ -325,7 +325,7 @@ export const handleInstrument = (data, instrument) => {
  * Format:
  * function (instrument: Object, availableMethods: Object): boolean
  */
-const FILTER = {
+const FILTERS = {
   wallet: (instrument, availableMethods) => {
     const { wallet: wallets } = availableMethods;
 
@@ -376,8 +376,8 @@ export function filterInstrumentsForAvailableMethods(
     }
 
     if (availableMethods[method]) {
-      if (FILTER[method]) {
-        return FILTER[method](instrument, availableMethods);
+      if (FILTERS[method]) {
+        return FILTERS[method](instrument, availableMethods);
       }
 
       return true;
