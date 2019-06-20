@@ -109,9 +109,19 @@ function shiftIosPayButtonOnSmallerHeights() {
   }
 }
 
+function getIosPayBtnInView() {
+  if (UserAgent.iPhone) {
+    setTimeout(() => {
+      const header = _Doc.querySelector('#header');
+      _El.addClass(header, 'ios-paybtn-bug');
+    });
+  }
+}
+
 export function initPreRenderHacks() {}
 
 export function initPostRenderHacks() {
   shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
+  getIosPayBtnInView();
 }
