@@ -1,5 +1,6 @@
 const BINs = require('./bins');
 const https = require('https');
+const chai = require('chai');
 
 const Banks = Object.keys(BINs);
 const bank = process.argv[2];
@@ -32,7 +33,7 @@ const getOptimizedRegex = regex =>
 
     const req = https.request(options, res => {
       if (res.statusCode !== 200) {
-        return reject(res);
+        return reject(res.statusCode);
       }
 
       res.on('data', d => {
@@ -49,6 +50,28 @@ const getOptimizedRegex = regex =>
     req.end();
   });
 
-getOptimizedRegex(baseRegex).then(({ regex }) => {
-  console.log(`/^${regex.replace(/\?\:/g, '')}/`);
-});
+getOptimizedRegex(baseRegex)
+  .then(({ regex }) => {
+    const regexString = `^${regex.replace(/\?\:/g, '')}`;
+
+    regex = new RegExp(regexString);
+
+    const length = bankBins[0].length;
+    const supported = Array(Math.pow(10, length))
+      .fill(null)
+      .map((_, i) => String(i).padStart(length, '0'))
+      .filter(i => regex.test(i));
+
+    supported.sort();
+    bankBins.sort();
+
+    try {
+      chai.assert.deepEqual(supported, bankBins);
+      console.log(regexString);
+    } catch (err) {
+      console.log('Generated regex does not match all BINs');
+    }
+  })
+  .catch(err => {
+    console.log('Failed to fetch regex', err);
+  });
