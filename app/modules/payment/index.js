@@ -651,8 +651,16 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
   return new Promise((resolve, reject) => {
     let timeoutId;
+    let responded = false;
+
     if (timeout) {
       timeoutId = setTimeout(() => {
+        if (responded) {
+          return;
+        }
+
+        responded = true;
+
         Analytics.track('validate:vpa:timeout', {
           data: eventData,
         });
@@ -669,6 +677,12 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
       },
       callback: function(response) {
         clearInterval(timeoutId);
+
+        if (responded) {
+          return;
+        }
+
+        responded = true;
 
         if (response.success || response.error) {
           if (response.success) {
