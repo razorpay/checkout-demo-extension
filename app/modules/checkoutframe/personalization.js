@@ -318,6 +318,43 @@ export const handleInstrument = (data, instrument) => {
 };
 
 /**
+ * Map of filter fn for each method
+ * that says whether or not a given instrument
+ * should be allowed.
+ *
+ * Format:
+ * function (instrument: Object, availableMethods: Object): boolean
+ */
+const FILTER = {
+  wallet: (instrument, availableMethods) => {
+    const { wallet: wallets } = availableMethods;
+
+    if (!wallets) {
+      return false;
+    }
+
+    const enabledWallet = _Arr.any(
+      wallets,
+      wallet => wallet.code === instrument.wallet
+    );
+
+    return enabledWallet;
+  },
+
+  netbanking: (instrument, availableMethods) => {
+    const { bank } = instrument;
+
+    const { netbanking } = availableMethods;
+
+    if (!netbanking) {
+      return;
+    }
+
+    return Boolean(netbanking[bank]);
+  },
+};
+
+/**
  * Filters out instruments and returns only those
  * that can be used for this payment.
  * @param {Array} instruments List of instruments
@@ -331,13 +368,23 @@ export function filterInstrumentsForAvailableMethods(
 ) {
   // TODO: Move Downtime logic to this function
 
-  _Arr.filter(instruments, instrument => {
+  const allowed = _Arr.filter(instruments, instrument => {
     let { method } = instrument;
 
     if (instrument['_[upiqr]']) {
       method = 'qr';
     }
 
-    return availableMethods[method];
+    if (availableMethods[method]) {
+      if (FILTER[method]) {
+        return FILTER[method](instrument, availableMethods);
+      }
+
+      return true;
+    }
+
+    return false;
   });
+
+  return allowed;
 }
