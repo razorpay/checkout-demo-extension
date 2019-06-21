@@ -29,11 +29,11 @@ Format: `key`, `merchant_id`
 | Email optional           | `rzp_test_DvDrkPcFCkPd8S`, `C3ecol1Jvw7XpN` | `rzp_test_aiMriDRpaBThmc`, `C3eyAbbHaNI4r8` |
 | Contact optional         | `rzp_test_FWEjUCmU2aT5x6`, `C3f0WIVPfpzFQY` | `rzp_test_wWHBq3b8ESXpmB`, `C3f2I0QjbSUDjU` |
 
-# Adding new IINs for EMI Banks
+# Adding/removing new IINs for EMI Banks
 
 ### Semi-automated
 
-1. Add BIN to [`scripts/emi/bin.js`](scripts/emi/bin.js), ensure that it is in a numerically sorted order.
+1. Add/remove BIN to/from [`scripts/emi/bin.js`](scripts/emi/bin.js), ensure that it is in a numerically sorted order.
 2. `cd scripts/emi`
 3. `node index.js <bank_code>`
 4. Copy the regex and paste it in [`app/modules/common/bank.js`](app/modules/common/bank.js)
