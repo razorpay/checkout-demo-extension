@@ -113,14 +113,17 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   }
 
   // Add integration details if present
-  if (razorpayInstance.get('_.integration')) {
-    data['_[integration]'] = razorpayInstance.get('_.integration');
-  }
-  if (razorpayInstance.get('_.integration_version')) {
-    data['_[integration_version]'] = razorpayInstance.get(
-      '_.integration_version'
-    );
-  }
+  const integrationKeys = [
+    'integration',
+    'integration_version',
+    'integration_parent_version',
+  ];
+  _Arr.loop(integrationKeys, key => {
+    const value = razorpayInstance.get(`_.${key}`);
+    if (value) {
+      data[`_[${key}]`] = value;
+    }
+  });
 
   let fingerprint = getFingerprint();
   if (fingerprint) {
