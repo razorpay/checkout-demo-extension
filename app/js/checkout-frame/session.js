@@ -2476,6 +2476,11 @@ Session.prototype = {
       }
     });
 
+    this.on('focus', '#card_number', e => {
+      console.log(e);
+      i.scrollIntoView();
+    });
+
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
         if (this.get('modal.confirm_close') && !confirmClose()) {

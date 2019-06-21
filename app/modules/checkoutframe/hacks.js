@@ -108,14 +108,15 @@ function shiftIosPayButtonOnSmallerHeights() {
     }
   }
 }
-
 function getIosPayBtnInView() {
-  if (UserAgent.iPhone) {
-    setTimeout(() => {
-      const header = _Doc.querySelector('#header');
-      _El.addClass(header, 'ios-paybtn-bug');
-    });
-  }
+  // if (UserAgent.iPhone) {
+  setTimeout(() => {
+    const header = document.querySelector('#header');
+    const formCommon = document.querySelector('#form-common');
+    _El.addClass(header, 'ios-paybtn-bug');
+    _El.addClass(formCommon, 'ios-paybtn-bug');
+  });
+  // }
 }
 
 export function initPreRenderHacks() {}
