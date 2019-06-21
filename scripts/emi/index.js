@@ -1,4 +1,5 @@
 const BINs = require('./bins');
+const querystring = require('querystring');
 const https = require('https');
 const chai = require('chai');
 
@@ -15,19 +16,40 @@ if (!bank || !BINs[bank]) {
 const bankBins = BINs[bank];
 const baseRegex = `(${bankBins.join('|')})`;
 
+function findOptimizedRegexFromHtml(body) {
+  body = body.replace(/\n/g, ''); // Replace line-breaks
+
+  const REGEX_REGEX = /<u>Optimized Match Pattern\:<\/u><br \/><span style="color:#000066;">(.*?)<br /;
+  const matches = body.match(REGEX_REGEX);
+
+  const found = matches[1];
+
+  if (!found) {
+    return;
+  }
+
+  return found.replace(/<wbr>/g, '');
+}
+
 const getOptimizedRegex = regex =>
   new Promise((resolve, reject) => {
     const data = {
-      regex,
+      match: regex,
+      cb_showarray: 'yes',
+      cb_optimize: 'yes',
+      'cb_lang[]5': 'js',
+      dd_oper: 'match_all',
+      dd_delim: '/',
+      submit: 'Submit',
     };
 
     const options = {
-      hostname: 'myregextester-api.netlify.com',
+      hostname: 'myregextester.com',
       port: 443,
-      path: `/optimize?key=${REGEXTESTER_KEY}`,
+      path: `/index.php`,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
     };
 
@@ -36,17 +58,28 @@ const getOptimizedRegex = regex =>
         return reject(res.statusCode);
       }
 
-      res.on('data', d => {
-        try {
-          const json = JSON.parse(d.toString('utf8'));
-          resolve(json);
-        } catch (err) {
-          reject(err);
+      let chunks = [];
+
+      res.on('data', chunk => {
+        chunks.push(chunk);
+      });
+
+      res.on('end', () => {
+        const body = Buffer.concat(chunks);
+        const html = body.toString();
+        const foundRegex = findOptimizedRegexFromHtml(html);
+
+        if (foundRegex) {
+          resolve({
+            regex: foundRegex,
+          });
+        } else {
+          reject();
         }
       });
     });
 
-    req.write(JSON.stringify(data));
+    req.write(querystring.stringify(data));
     req.end();
   });
 
