@@ -618,13 +618,28 @@ razorpayProto.createPayment = function(data, params) {
 let vpaCache = {};
 
 razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
-  const url = makeUrl('payments/validate/account?key_id=' + this.get('key'));
-  const cachedVpaResponse = vpaCache[vpa];
-
   const eventData = {
     vpa,
     timeout,
   };
+
+  // Temporarily bypass if keyless merchant
+  /**
+   * TODO: Might also need to remove invalid VPAs from preferred
+   * methods as well after this is fixed
+   */
+  if (!this.get('key')) {
+    Analytics.track('validate:vpa:bypass', {
+      data: eventData,
+    });
+
+    return Promise.resolve({
+      success: true,
+    });
+  }
+
+  const url = makeAuthUrl(this, 'payments/validate/account');
+  const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
     const cachedEventData = _Obj.extend(
