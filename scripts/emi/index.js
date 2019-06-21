@@ -19,8 +19,8 @@ const baseRegex = `(${bankBins.join('|')})`;
 function findOptimizedRegexFromHtml(body) {
   body = body.replace(/\n/g, ''); // Replace line-breaks
 
-  const REGEX_REGEX = /<u>Optimized Match Pattern\:<\/u><br \/><span style="color:#000066;">(.*?)<br /;
-  const matches = body.match(REGEX_REGEX);
+  const OPTIMIZED_PATTERN_REGEX = /<u>Optimized Match Pattern\:<\/u><br \/><span style="color:#000066;">(.*?)<br /;
+  const matches = body.match(OPTIMIZED_PATTERN_REGEX);
 
   const found = matches[1];
 
