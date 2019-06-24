@@ -37,7 +37,7 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
-
+var isIos = /iPhone/.test(ua) || /iPad/.test(ua);
 function getStore(prop) {
   return Store.get()[prop];
 }
@@ -2488,9 +2488,9 @@ Session.prototype = {
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
-    const isLandscape = global.screen.width > global.screen.height;
+    // const isLandscape = window.screen.width > window.screen.height;
 
-    if (ua_iPhone && isLandscape) {
+    if (isIos) {
       this.on('focus', '#card_name', function() {
         this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
         this.el.querySelector('#should-save-card').style.transform =
