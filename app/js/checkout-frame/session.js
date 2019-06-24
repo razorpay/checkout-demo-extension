@@ -2488,7 +2488,6 @@ Session.prototype = {
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
-    // const isLandscape = window.screen.width > window.screen.height;
 
     if (isIos) {
       this.on('focus', '#card_name', function() {
