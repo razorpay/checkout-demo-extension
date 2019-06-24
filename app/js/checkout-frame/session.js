@@ -2488,6 +2488,36 @@ Session.prototype = {
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
+    const isLandscape = global.screen.width > global.screen.height;
+    if (ua_iPhone && isLandscape) {
+      this.on('focus', '#card_name', function() {
+        this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
+        this.el.querySelector('#should-save-card').style.transform =
+          'translateY(-10px)';
+      });
+      this.on('blur', '#card_name', function() {
+        this.el.querySelector('#footer').style.transform = 'translateY(0)';
+        this.el.querySelector('#should-save-card').style.transform =
+          'translateY(0)';
+      });
+      this.on('focus', '#card_cvv', function() {
+        this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
+        this.el.querySelector('#should-save-card').style.transform =
+          'translateY(-10px)';
+      });
+      this.on('blur', '#card_cvv', function() {
+        this.el.querySelector('#footer').style.transform = 'translateY(0)';
+        this.el.querySelector('#should-save-card').style.transform =
+          'translateY(0)';
+      });
+
+      this.on('focus', '#vpa', function() {
+        this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
+      });
+      this.on('blur', '#vpa', function() {
+        this.el.querySelector('#footer').style.transform = 'translateY(0)';
+      });
+    }
     if (enabledMethods.card || enabledMethods.emi) {
       this.on('keyup', '#card_number', onSixDigits);
       // Also listen for paste.
