@@ -768,7 +768,7 @@ export function createFees(data, razorpayInstance, onSuccess, onError) {
   data = formatPayload(data, razorpayInstance);
 
   fetch.post({
-    url: makeUrl('payments/create/fees?key_id=' + razorpayInstance.get('key')),
+    url: makeUrl('payments/create/fees'),
     data,
     callback: function(response) {
       if (response.error) {
