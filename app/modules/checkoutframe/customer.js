@@ -109,7 +109,7 @@ Customer.prototype = {
         customer.saved = !!data.saved;
 
         if (customer.saved) {
-          OtpService.markOtpSent();
+          OtpService.markOtpSent('razorpay');
         }
 
         if (data.tokens) {
@@ -134,7 +134,7 @@ Customer.prototype = {
         contact: this.contact,
       },
       callback: function(data) {
-        OtpService.markOtpSent();
+        OtpService.markOtpSent('razorpay');
         callback && callback(data);
       },
     });

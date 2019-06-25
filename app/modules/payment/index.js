@@ -802,7 +802,18 @@ export function getCardFlowsFromCache(cardNumber = '') {
 
   const iin = cardNumber.slice(0, 6);
 
-  return flowCache.card[iin];
+  const flows = flowCache.card[iin];
+
+  if (flows) {
+    Analytics.track('flows:card:fetch:success', {
+      data: {
+        iin,
+        cache: true,
+      },
+    });
+  }
+
+  return flows;
 }
 
 /**
@@ -836,11 +847,35 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     '_[source]': Track.props.library,
   });
 
+  Analytics.track('flows:card:fetch:start', {
+    data: {
+      iin,
+    },
+  });
+
   fetch.jsonp({
     url,
     callback: flows => {
+      if (flows.error) {
+        Analytics.track('flows:card:fetch:failure', {
+          data: {
+            iin,
+            error: flows.error,
+          },
+        });
+
+        return;
+      }
+
       // Add to cache.
       flowCache.card[iin] = flows;
+
+      Analytics.track('flows:card:fetch:success', {
+        data: {
+          iin,
+          flows,
+        },
+      });
 
       // Invoke callback.
       callback(flowCache.card[iin]);
