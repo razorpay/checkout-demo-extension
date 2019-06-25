@@ -30,6 +30,7 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _El = discreet._El,
   Hacks = discreet.Hacks;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -1726,24 +1727,6 @@ Session.prototype = {
     this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
   },
 
-  makeCardlessEmiDetailText: function(duration, monthly) {
-    return (
-      '<ul>' +
-      '<li>Monthly Installment: ' +
-      this.formatAmountWithCurrency(monthly) +
-      '</li>' +
-      '<li>Total Amount: ' +
-      this.formatAmountWithCurrency(duration * monthly) +
-      ' (' +
-      this.formatAmountWithCurrency(monthly) +
-      ' x ' +
-      duration +
-      ')' +
-      '</li>' +
-      '</ul>'
-    );
-  },
-
   getCardlessEmiPlans: function() {
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
@@ -3107,7 +3090,47 @@ Session.prototype = {
             animate: true,
           });
         });
+
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = discreet.Formatter.rules.phone.isValid.call(this);
+
+        Analytics.track('contact:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(contactEl);
     }
+
+    var emailEl = gel('email');
+    if (emailEl) {
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = emailPattern.test(value);
+
+        Analytics.track('email:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(emailEl);
+    }
+
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {
@@ -4130,33 +4153,13 @@ Session.prototype = {
 
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
-        var emiPlans = [];
+        var emiPlans = self.getEmiPlans(bank);
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
         } else {
           self.removeAndCleanupOffers();
         }
-
-        each(plans, function(index, p) {
-          var amount_per_month = (
-            (amount * (1 + p.interest / 100)) /
-            p.duration
-          ).toFixed(0);
-
-          emiPlans.push({
-            text:
-              p.duration +
-              ' Months @ ' +
-              self.formatAmountWithCurrency(amount_per_month) +
-              '/mo',
-            value: p.duration,
-            detail: self.makeCardlessEmiDetailText(
-              p.duration,
-              amount_per_month
-            ),
-          });
-        });
 
         var prevTab = self.tab;
         var prevScreen = self.screen;

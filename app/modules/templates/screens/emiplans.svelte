@@ -3,7 +3,14 @@
   class="tab-content showable screen pad vertical-pad"
   class:has-callout={hasCallout}
 >
-  <h3>Select an EMI Plan</h3>
+  {#if plans.length}
+    <h3>Select an EMI Plan</h3>
+  {:else}
+    <div class="sanitized">
+      <h3>There is a mismatch between the selected offer and entered card details.</h3>
+      <h3>Please go back and select a different offer or card.</h3>
+    </div>
+  {/if}
 
   <div class="emi-plans-list expandable-card-list">
     {#each plans as plan, index}
@@ -120,4 +127,8 @@
     .has-callout
       padding-bottom: 120px;
 
+
+  .sanitized h3
+    text-transform: none;
+    color: black;
 </style>

@@ -50,6 +50,7 @@ import * as Downtimes from 'checkoutframe/downtimes';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+import { Formatter } from 'formatter';
 
 import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
@@ -83,6 +84,7 @@ export default {
   getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
+  Formatter,
 
   cancelMsg: strings.cancelMsg,
   confirmCancelMsg: strings.confirmCancelMsg,
@@ -140,7 +142,8 @@ export default {
   Hacks,
 
   _Arr,
-  _Obj,
+  _El,
   _Func,
+  _Obj,
   _,
 };
