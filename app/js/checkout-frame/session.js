@@ -3058,7 +3058,9 @@ Session.prototype = {
           var instruments = [];
           self.input(this.el);
 
-          if (this.isValid()) {
+          var shouldUseP13n = self.p13n;
+
+          if (this.isValid() && shouldUseP13n) {
             instruments =
               P13n.listInstruments(self.getCustomer(this.value)) || [];
 
