@@ -5932,8 +5932,14 @@ Session.prototype = {
     if (methods.upi) {
       methods.count++;
       if (qrEnabled) {
-        methods.count++;
         methods.qr = true;
+
+        /**
+         * Do not increase the count since we don't
+         * want to show QR in intial list of
+         * payment options anymore.
+         */
+        // methods.count++;
       }
 
       if (this.separateGPay) {
