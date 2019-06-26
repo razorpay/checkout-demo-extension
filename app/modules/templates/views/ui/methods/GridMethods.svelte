@@ -11,7 +11,7 @@
 <script>
   import { getSession } from 'sessionmanager';
   import DowntimesStore from 'checkoutstore/downtimes.js';
-  import { getMethodDescription, getMethodDowntimeDescription } from 'checkoutframe/paymentmethods';
+  import { getMethodDescription, getMethodDowntimeDescription, getMethodNameForPaymentIcon } from 'checkoutframe/paymentmethods';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
@@ -52,7 +52,9 @@
             retMethods.push({
               method,
               icon: icon,
-              title: session.tab_titles[method],
+              title: getMethodNameForPaymentIcon(method, {
+                session
+              }),
               description,
               down: isDown,
               downMessage: getMethodDowntimeDescription(method, {
