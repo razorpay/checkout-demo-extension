@@ -75,6 +75,12 @@ function decreaseWebViewHeightForAndroidTablets() {
   }
 }
 
+function autoScrollHeader() {
+  if (!UserAgent.iPhone) {
+    setTimeout(() => window.scrollTo(0, 100));
+  }
+}
+
 /**
  * On iPhone with smaller heights (iPhone 5S),
  * the pay button is not visible on the web.
@@ -85,7 +91,7 @@ function shiftIosPayButtonOnSmallerHeights() {
   if (UserAgent.iPhone) {
     setTimeout(() => {
       const footer = _Doc.querySelector('#footer');
-      if (global.innerHeight <= 512) {
+      if (global.innerHeight <= 512 && isDeviceLandscape()) {
         _El.addClass(footer, 'shift-ios');
       }
     }, 1000);
@@ -125,4 +131,5 @@ export function initPostRenderHacks() {
   shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
   getIosPayBtnInView();
+  autoScrollHeader();
 }
