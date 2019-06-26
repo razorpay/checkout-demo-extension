@@ -76,7 +76,7 @@ function decreaseWebViewHeightForAndroidTablets() {
 }
 
 function autoScrollHeader() {
-  if (!UserAgent.iPhone) {
+  if (UserAgent.android) {
     setTimeout(() => window.scrollTo(0, 100));
   }
 }
@@ -114,15 +114,15 @@ function shiftIosPayButtonOnSmallerHeights() {
     }
   }
 }
-function getIosPayBtnInView() {
-  // if (UserAgent.iPhone) {
-  setTimeout(() => {
-    const header = document.querySelector('#header');
-    const formCommon = document.querySelector('#form-common');
-    _El.addClass(header, 'ios-paybtn-bug');
-    _El.addClass(formCommon, 'ios-paybtn-bug');
-  });
-  // }
+function reduceUnneededPadding() {
+  if (isDeviceLandscape()) {
+    setTimeout(() => {
+      const header = document.querySelector('#header');
+      const formCommon = document.querySelector('#form-common');
+      _El.addClass(header, 'ios-paybtn-bug');
+      _El.addClass(formCommon, 'ios-paybtn-bug');
+    });
+  }
 }
 
 export function initPreRenderHacks() {}
@@ -130,6 +130,6 @@ export function initPreRenderHacks() {}
 export function initPostRenderHacks() {
   shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
-  getIosPayBtnInView();
+  reduceUnneededPadding();
   autoScrollHeader();
 }
