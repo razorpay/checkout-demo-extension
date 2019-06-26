@@ -94,6 +94,18 @@
     {/if}
   {/if}
 
+  {#if qrEnabled}
+    <div class="legend left">Or, Pay using QR</div>
+    <div class="options" ref:qrButton>
+      <NextOption
+        icon={qrIcon}
+      >
+        <div>Show QR Code</div>
+        <div class="desc">Scan the QR code using your UPI app</div>
+      </NextOption>
+    </div>
+  {/if}
+
   {#if down}
     <Callout
       showIcon={false}
@@ -128,6 +140,30 @@
     }
   }
 
+  /**
+   * Styles of "Show QR" button
+   */
+  ref:qrButton :global(.option) {
+    background-color: #fcfcfc;
+
+    &:hover {
+      background-color: #efefef;
+    }
+
+    &.next-option {
+      &:after {
+        color: #D6D6D6;
+      }
+    }
+  }
+  ref:qrButton :global(.option .option-title) {
+    color: #0D2366;
+    line-height: 16px;
+  }
+  ref:qrButton :global(.option .option-title .desc) {
+    color: rgba(81, 89, 120, 0.7);
+    font-size: 11px;
+  }
 
   ref:changeBtn {
     position: absolute;
@@ -277,6 +313,7 @@
       Field: 'templates/views/ui/Field.svelte',
       Icon: 'templates/views/ui/Icon.svelte',
       Callout: 'templates/views/ui/Callout.svelte',
+      NextOption: 'templates/views/ui/options/NextOption.svelte',
     },
 
     data() {
@@ -291,6 +328,7 @@
         selectedApp: undefined,
         useWebPaymentsApi: false,
         down: false,
+        qrEnabled: false,
       };
     },
 
@@ -337,6 +375,11 @@
           down: true,
         });
       }
+
+      this.set({
+        qrEnabled: session.methods.qr,
+        qrIcon: getSession().themeMeta.icons.qr,
+      });
     },
 
     onstate({ changed, current }) {
