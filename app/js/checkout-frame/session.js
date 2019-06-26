@@ -2805,7 +2805,7 @@ Session.prototype = {
 
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
-    setTimeout(() => {
+    setTimeout(function() {
       $(e.target).scrollIntoView();
     }, 2000);
     if (ua_iPhone) {
