@@ -164,7 +164,7 @@ function getMethodPrefix(method) {
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentIcon(method, { session }) {
+export function getMethodNameForPaymentOption(method, { session }) {
   switch (method) {
     case 'upi':
       if (session.methods.qr) {
