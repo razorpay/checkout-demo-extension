@@ -99,6 +99,8 @@
     <div class="options" id="showQr">
       <NextOption
         icon={qrIcon}
+
+         on:select="selectQrMethod(event)"
       >
         <div>Show QR Code</div>
         <div class="desc">Scan the QR code using your UPI app</div>
@@ -393,6 +395,23 @@
     },
 
     methods: {
+      /**
+       * Does the equivalent of
+       * selecting the QR payment method
+       */
+      selectQrMethod () {
+        const session = getSession();
+
+        Analytics.track('payment_method:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            method: 'qr',
+          },
+        });
+
+        session.switchTab('qr');
+      },
+
       /**
        * This function will be invoked externally via session on
        * payment form submission
