@@ -388,3 +388,25 @@
       display: inline-block;
       text-align: right;
       width: calc(50% - 2px);
+
+/**
+ * Styles of "Show QR" button
+ */
+#showQr
+  .option
+    background-color: #fcfcfc;
+
+    &:hover
+      background-color: #efefef;
+
+    &.next-option
+      &:after
+        color: #D6D6D6;
+
+    .option-title
+      color: #0D2366;
+      line-height: 16px;
+
+      .desc
+        color: rgba(81, 89, 120, 0.7);
+        font-size: 11px;

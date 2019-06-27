@@ -96,7 +96,7 @@
 
   {#if qrEnabled}
     <div class="legend left">Or, Pay using QR</div>
-    <div class="options" ref:qrButton>
+    <div class="options" id="showQr">
       <NextOption
         icon={qrIcon}
       >
@@ -138,31 +138,6 @@
     &.paytm :global(.elem) {
       padding-right: 64px;
     }
-  }
-
-  /**
-   * Styles of "Show QR" button
-   */
-  ref:qrButton :global(.option) {
-    background-color: #fcfcfc;
-
-    &:hover {
-      background-color: #efefef;
-    }
-
-    &.next-option {
-      &:after {
-        color: #D6D6D6;
-      }
-    }
-  }
-  ref:qrButton :global(.option .option-title) {
-    color: #0D2366;
-    line-height: 16px;
-  }
-  ref:qrButton :global(.option .option-title .desc) {
-    color: rgba(81, 89, 120, 0.7);
-    font-size: 11px;
   }
 
   ref:changeBtn {
