@@ -99,8 +99,13 @@
     <div class="options" id="showQr">
       <NextOption
         icon={qrIcon}
+        tabindex="0"
+        attributes={{
+          role: 'button',
+          'aria-label': 'Show QR Code - Scan the QR code using your UPI app'
+        }}
 
-         on:select="selectQrMethod(event)"
+        on:select="selectQrMethod(event)"
       >
         <div>Show QR Code</div>
         <div class="desc">Scan the QR code using your UPI app</div>
