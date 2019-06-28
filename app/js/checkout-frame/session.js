@@ -5648,7 +5648,7 @@ Session.prototype = {
         });
 
         if (eligibleEmiOptions[bank.code]) {
-          emiBank.min_amount = discreet.EmiUtils.getMinimumAmount(
+          emiBank.min_amount = discreet.EmiUtils.getMinimumAmountFromPlans(
             eligibleEmiOptions[bank.code]
           );
 
