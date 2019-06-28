@@ -122,7 +122,6 @@ function shiftIosPayButtonOnSmallerHeights() {
 }
 function reduceUnneededPadding() {
   const isLandscape = window.innerWidth > window.innerHeight;
-  console.log(isLandscape, 'is aland');
   if (isLandscape) {
     setTimeout(() => {
       const header = _Doc.querySelector('#header');
