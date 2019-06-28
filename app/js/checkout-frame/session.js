@@ -5778,6 +5778,10 @@ Session.prototype = {
     }
 
     if (emi_options.banks['BAJAJ']) {
+      /**
+       * methods.cardless_emi will be undefined in case cardless EMI is not enabled.
+       * methods.cardless_emi will be [] in case no provider is enabled.
+       */
       if (!methods.cardless_emi || _.isArray(methods.cardless_emi)) {
         methods.cardless_emi = {
           bajaj: true,
