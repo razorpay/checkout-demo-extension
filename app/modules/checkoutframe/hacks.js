@@ -76,7 +76,7 @@ function decreaseWebViewHeightForAndroidTablets() {
 }
 
 function autoScrollHeader() {
-  if (UserAgent.android) {
+  if (isDeviceLandscape() && UserAgent.android) {
     setTimeout(() => window.scrollTo(0, 100));
   }
 }
