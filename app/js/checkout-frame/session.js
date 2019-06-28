@@ -30,6 +30,7 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _El = discreet._El,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi;
 
@@ -674,7 +675,7 @@ function errorHandler(response) {
       this.powerwallet = null;
       return;
     } else if (this.nativeotp && this.tab === 'card') {
-      Analytics.removeMeta('headless');
+      this.markHeadlessFailed();
       return;
     }
   }
@@ -797,7 +798,7 @@ function cancelHandler(response) {
   this.magic = false;
 
   Analytics.setMeta('payment.cancelled', true);
-  Analytics.removeMeta('headless');
+  this.markHeadlessFailed();
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     if (this.r._payment && this.r._payment.upi_app) {
@@ -857,7 +858,9 @@ function askOTP(view, text, shouldLimitResend) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
-    allowResend: shouldLimitResend ? discreet.OtpService.canSendOtp() : true,
+    allowResend: shouldLimitResend
+      ? discreet.OtpService.canSendOtp('razorpay')
+      : true,
   });
 
   $('#body').addClass('sub');
@@ -869,13 +872,18 @@ function askOTP(view, text, shouldLimitResend) {
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
+            var metadata = origText.metadata;
+            thisSession.headlessMetadata = metadata;
+
+            discreet.OtpService.markOtpSent(
+              metadata.issuer || metadata.network
+            );
+
             var bankLogo;
-            if (origText.metadata.issuer) {
-              bankLogo = discreet.getFullBankLogo(origText.metadata.issuer);
-            } else if (origText.metadata.network) {
-              bankLogo = discreet.Card.getFullNetworkLogo(
-                origText.metadata.network
-              );
+            if (metadata.issuer) {
+              bankLogo = discreet.getFullBankLogo(metadata.issuer);
+            } else if (metadata.network) {
+              bankLogo = discreet.Card.getFullNetworkLogo(metadata.network);
             }
 
             if (bankLogo) {
@@ -2135,18 +2143,47 @@ Session.prototype = {
       return this.magicView.resendOtp();
     }
 
+    var otpProvider;
+
+    if (!this.r._payment) {
+      /**
+       * If we're resending the OTP without any payment being created,
+       * it's a Razorpay OTP.
+       * Used for Saved Cards, Cardless EMI.
+       */
+      otpProvider = 'razorpay';
+    } else if (this.headless && this.headlessMetadata) {
+      otpProvider =
+        this.headlessMetadata.issuer || this.headlessMetadata.network;
+    }
+
+    var otpSentCount = discreet.OtpService.getCount(otpProvider);
+    var resendEventData = {
+      wallet: this.tab === 'wallet',
+      headless: this.headless,
+    };
+
+    if (otpSentCount) {
+      resendEventData.count = otpSentCount;
+    }
+
     Analytics.track('otp:resend', {
       type: AnalyticsTypes.BEHAV,
-      data: {
-        wallet: this.tab === 'wallet',
-        headless: this.headless,
-      },
+      data: resendEventData,
     });
+
     if (this.headless) {
       this.showLoadError('Resending OTP');
       if (!this.get('timeout')) {
         this.hideTimer();
       }
+
+      if (this.headlessMetadata) {
+        var metadata = this.headlessMetadata;
+
+        discreet.OtpService.markOtpSent(metadata.issuer || metadata.network);
+      }
+
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
 
@@ -3041,7 +3078,47 @@ Session.prototype = {
             animate: true,
           });
         });
+
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = discreet.Formatter.rules.phone.isValid.call(this);
+
+        Analytics.track('contact:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(contactEl);
     }
+
+    var emailEl = gel('email');
+    if (emailEl) {
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = emailPattern.test(value);
+
+        Analytics.track('email:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(emailEl);
+    }
+
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {
@@ -5974,6 +6051,21 @@ Session.prototype = {
 
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
+  },
+
+  /**
+   * Mark headless as failed and perform cleanup
+   */
+  markHeadlessFailed: function() {
+    Analytics.removeMeta('headless');
+    this.headless = false;
+
+    if (this.headlessMetadata) {
+      var metadata = this.headlessMetadata;
+      discreet.OtpService.resetCount(metadata.issuer || metadata.network);
+
+      this.headlessMetadata = null;
+    }
   },
 
   setPreferences: function(prefs) {

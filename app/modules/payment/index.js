@@ -618,20 +618,55 @@ razorpayProto.createPayment = function(data, params) {
 let vpaCache = {};
 
 razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
-  const url = makeUrl('payments/validate/account?key_id=' + this.get('key'));
+  const eventData = {
+    vpa,
+    timeout,
+  };
+
+  const url = makeAuthUrl(this, 'payments/validate/account');
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
+    const cachedEventData = _Obj.extend(
+      {
+        cache: true,
+      },
+      eventData
+    );
+
     if (cachedVpaResponse.success) {
+      Analytics.track('validate:vpa:valid', {
+        data: cachedEventData,
+      });
+
       return Promise.resolve(cachedVpaResponse);
     } else {
+      Analytics.track('validate:vpa:invalid', {
+        data: cachedEventData,
+      });
+
       return Promise.reject(cachedVpaResponse);
     }
   }
 
   return new Promise((resolve, reject) => {
+    let timeoutId;
+    let responded = false;
+
     if (timeout) {
-      global.setTimeout(resolve, timeout);
+      timeoutId = setTimeout(() => {
+        if (responded) {
+          return;
+        }
+
+        responded = true;
+
+        Analytics.track('validate:vpa:timeout', {
+          data: eventData,
+        });
+
+        resolve();
+      }, timeout);
     }
 
     const response = fetch.post({
@@ -641,14 +676,30 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
         value: vpa,
       },
       callback: function(response) {
+        clearInterval(timeoutId);
+
+        if (responded) {
+          return;
+        }
+
+        responded = true;
+
         if (response.success || response.error) {
           if (response.success) {
             vpaCache[vpa] = response;
           }
 
+          Analytics.track('validate:vpa:valid', {
+            data: eventData,
+          });
+
           resolve(response);
         } else {
           vpaCache[vpa] = response;
+
+          Analytics.track('validate:vpa:invalid', {
+            data: eventData,
+          });
           reject(response);
         }
       },
@@ -717,7 +768,7 @@ export function createFees(data, razorpayInstance, onSuccess, onError) {
   data = formatPayload(data, razorpayInstance);
 
   fetch.post({
-    url: makeUrl('payments/create/fees?key_id=' + razorpayInstance.get('key')),
+    url: makeUrl('payments/create/fees'),
     data,
     callback: function(response) {
       if (response.error) {
@@ -751,7 +802,18 @@ export function getCardFlowsFromCache(cardNumber = '') {
 
   const iin = cardNumber.slice(0, 6);
 
-  return flowCache.card[iin];
+  const flows = flowCache.card[iin];
+
+  if (flows) {
+    Analytics.track('flows:card:fetch:success', {
+      data: {
+        iin,
+        cache: true,
+      },
+    });
+  }
+
+  return flows;
 }
 
 /**
@@ -785,11 +847,35 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     '_[source]': Track.props.library,
   });
 
+  Analytics.track('flows:card:fetch:start', {
+    data: {
+      iin,
+    },
+  });
+
   fetch.jsonp({
     url,
     callback: flows => {
+      if (flows.error) {
+        Analytics.track('flows:card:fetch:failure', {
+          data: {
+            iin,
+            error: flows.error,
+          },
+        });
+
+        return;
+      }
+
       // Add to cache.
       flowCache.card[iin] = flows;
+
+      Analytics.track('flows:card:fetch:success', {
+        data: {
+          iin,
+          flows,
+        },
+      });
 
       // Invoke callback.
       callback(flowCache.card[iin]);
