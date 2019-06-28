@@ -76,8 +76,14 @@ function decreaseWebViewHeightForAndroidTablets() {
 }
 
 function autoScrollHeader() {
-  if (isDeviceLandscape() && UserAgent.android) {
-    setTimeout(() => window.scrollTo(0, 100));
+  const isLandscape = window.innerWidth > window.innerHeight;
+  if (isLandscape) {
+    if (UserAgent.iOS) {
+      setTimeout(() => window.ownerWindow.scroll(0, 100));
+    }
+    if (UserAgent.android) {
+      setTimeout(() => window.scroll(0, 100));
+    }
   }
 }
 
@@ -115,10 +121,12 @@ function shiftIosPayButtonOnSmallerHeights() {
   }
 }
 function reduceUnneededPadding() {
-  if (isDeviceLandscape()) {
+  const isLandscape = window.innerWidth > window.innerHeight;
+  console.log(isLandscape, 'is aland');
+  if (isLandscape) {
     setTimeout(() => {
-      const header = document.querySelector('#header');
-      const formCommon = document.querySelector('#form-common');
+      const header = _Doc.querySelector('#header');
+      const formCommon = _Doc.querySelector('#form-common');
       _El.addClass(header, 'ios-paybtn-bug');
       _El.addClass(formCommon, 'ios-paybtn-bug');
     });
