@@ -2805,9 +2805,10 @@ Session.prototype = {
 
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
+    // console.log('focussing')
     setTimeout(function() {
       $(e.target).scrollIntoView();
-    }, 2000);
+    }, 1000);
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'focus' });
     }
