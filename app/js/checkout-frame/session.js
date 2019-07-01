@@ -5813,7 +5813,7 @@ Session.prototype = {
     if (
       international ||
       recurring ||
-      _.lengthOf(_Obj.keys(emi_options.banks)) === 0 ||
+      _Obj.isEmpty(emi_options.banks) ||
       !(methods.emi || methods.card)
     ) {
       methods.emi = false;
