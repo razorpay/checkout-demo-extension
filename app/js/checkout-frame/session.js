@@ -3542,7 +3542,7 @@ Session.prototype = {
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
-          tab = '';
+          tab = 'upi';
         } else {
           tab = thisTab;
         }
