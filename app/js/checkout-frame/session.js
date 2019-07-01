@@ -3058,7 +3058,9 @@ Session.prototype = {
           var instruments = [];
           self.input(this.el);
 
-          if (this.isValid()) {
+          var shouldUseP13n = self.p13n;
+
+          if (this.isValid() && shouldUseP13n) {
             instruments =
               P13n.listInstruments(self.getCustomer(this.value)) || [];
 
@@ -5932,8 +5934,14 @@ Session.prototype = {
     if (methods.upi) {
       methods.count++;
       if (qrEnabled) {
-        methods.count++;
         methods.qr = true;
+
+        /**
+         * Do not increase the count since we don't
+         * want to show QR in intial list of
+         * payment options anymore.
+         */
+        // methods.count++;
       }
 
       if (this.separateGPay) {

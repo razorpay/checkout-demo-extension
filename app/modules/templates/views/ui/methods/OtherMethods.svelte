@@ -49,7 +49,7 @@
 
 <script>
   import DowntimesStore from 'checkoutstore/downtimes.js';
-  import { getMethodDowntimeDescription } from 'checkoutframe/paymentmethods';
+  import { getMethodDowntimeDescription, getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
   export default {
     components: {
@@ -100,7 +100,9 @@
               downMethods: downtimes.disabled,
             }),
             icon: session.themeMeta.icons[method],
-            title: session.tab_titles[method],
+            title: getMethodNameForPaymentOption(method, {
+              session
+            }),
           };
         })
 

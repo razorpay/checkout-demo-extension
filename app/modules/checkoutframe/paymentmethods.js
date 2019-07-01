@@ -156,6 +156,29 @@ function getMethodPrefix(method) {
 }
 
 /**
+ * Returns the name for the payment method.
+ * Used for showing the name with payment icon
+ * @param {string} method
+ * @param {Object} extra
+ *  @prop {Session} session
+ *
+ * @returns {string}
+ */
+export function getMethodNameForPaymentOption(method, { session }) {
+  switch (method) {
+    case 'upi':
+      if (session.methods.qr) {
+        return 'UPI / QR';
+      }
+
+      return session.tab_titles.upi;
+
+    default:
+      return session.tab_titles[method];
+  }
+}
+
+/**
  * Returns the downtime description for the given method.
  * @param {String} method
  * @param {Object} param1
