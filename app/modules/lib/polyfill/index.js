@@ -114,3 +114,14 @@ overrideInsertRule();
     }
   );
 })();
+
+if (!window.performance || !window.performance.now) {
+  (window.performance || (window.performance = {})).now = function() {
+    return Date.now() - offset;
+  };
+
+  var offset =
+    (window.performance.timing || (window.performance.timing = {}))
+      .navigatorStart ||
+    (window.performance.timing.navigationStart = Date.now());
+}
