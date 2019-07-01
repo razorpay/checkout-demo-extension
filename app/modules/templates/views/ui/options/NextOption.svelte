@@ -2,6 +2,7 @@
   {data}
   {attributes}
   {classes}
+  {tabindex}
   type="next-option {type}"
 
   on:select="select(event)"
@@ -30,6 +31,7 @@
         icon: null,
         data: {},
         type: '',
+        tabindex: -1,
       };
     },
 

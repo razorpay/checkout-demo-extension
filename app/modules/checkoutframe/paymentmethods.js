@@ -139,7 +139,7 @@ function getMethodPrefix(method) {
       return 'EMI';
 
     case 'qr':
-      return 'QR';
+      return 'UPI QR';
 
     case 'upi':
       return 'UPI';

@@ -3544,7 +3544,7 @@ Session.prototype = {
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
-          tab = '';
+          tab = 'upi';
         } else {
           tab = thisTab;
         }
@@ -4697,7 +4697,7 @@ Session.prototype = {
         }
       }
 
-      if (this.screen === 'upi') {
+      if (this.screen === 'upi' && this.tab !== 'qr') {
         /* All tabs should be responsible for their subdata */
         var upiData = this.upiTab.getPayload();
 
