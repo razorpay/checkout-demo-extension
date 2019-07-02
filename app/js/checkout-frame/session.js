@@ -2269,7 +2269,7 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    if (!this.commonValid(true)) {
+    if (!this.checkCommonValidAndTrackIfInvalid()) {
       var commonInvalid = $('#pad-common .invalid');
 
       return commonInvalid
@@ -3638,15 +3638,26 @@ Session.prototype = {
   },
 
   /**
-   * Says if the fields on the homepage are valid or not.
-   * @param {boolean} trackInvalid Should we sent an Analytics event?
+   * Checks if the fields on the homepage are valid or not.
    *
    * @returns {boolean} valid
    */
-  commonValid: function(trackInvalid) {
+  checkCommonValid: function() {
     var valid = !this.checkInvalid('#pad-common');
 
-    if (trackInvalid) {
+    return valid;
+  },
+
+  /**
+   * Checks if fields are invalid.
+   * And if they are invalid, tracks them.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValidAndTrackIfInvalid: function() {
+    var valid = this.checkCommonValid();
+
+    if (!valid) {
       var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
 
       var invalidFields = {};
@@ -3668,7 +3679,7 @@ Session.prototype = {
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
-      if (!this.commonValid(true)) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
         }
@@ -5071,7 +5082,7 @@ Session.prototype = {
     }
 
     if (!this.recurring && this.order && this.order.bank) {
-      if (!this.commonValid()) {
+      if (!this.checkCommonValid()) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
@@ -5221,7 +5232,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (this.p13n) {
-      if (!this.commonValid()) {
+      if (!this.checkCommonValid()) {
         return;
       }
 
