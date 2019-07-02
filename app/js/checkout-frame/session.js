@@ -5505,8 +5505,7 @@ Session.prototype = {
         /* invoke amazonpay sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
-          var payload = JSON.stringify(_Obj.unflatten(data));
-          CheckoutBridge.processPayment(payload);
+          CheckoutBridge.processPayment(JSON.stringify(data));
         } else if (iosCheckoutBridgeNew) {
           iosCheckoutBridgeNew.postMessage({
             action: 'processPayment',
