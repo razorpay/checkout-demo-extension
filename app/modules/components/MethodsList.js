@@ -5,6 +5,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
+import { filterInstrumentsForAvailableMethods } from 'checkoutframe/personalization';
 
 /**
  * Get the available methods.
@@ -140,15 +141,10 @@ export default class MethodsList {
     }
 
     /* Only allow for available methods */
-    data.instruments = _Arr.filter(data.instruments, data => {
-      let { method } = data;
-
-      if (data['_[upiqr]']) {
-        method = 'qr';
-      }
-
-      return session.methods[method];
-    });
+    data.instruments = filterInstrumentsForAvailableMethods(
+      data.instruments,
+      session.methods
+    );
 
     /* Filter out any app that's in user's list but not currently installed */
     data.instruments = _Arr.filter(data.instruments, instrument => {

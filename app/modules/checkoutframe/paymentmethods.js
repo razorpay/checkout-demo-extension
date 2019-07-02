@@ -65,11 +65,6 @@ const DESCRIPTIONS = {
       });
     }
 
-    // Bajaj Finserv shows up in the Cardless EMI screen.
-    if (session.emi_options.banks['BAJAJ']) {
-      providers.push(getCardlessEmiProvider('bajaj').name);
-    }
-
     const text = generateTextFromList(providers, 2);
 
     if (cardEmi) {

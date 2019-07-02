@@ -5,11 +5,20 @@ const cdnUrl = RazorpayConfig.cdn;
 const prefix = cdnUrl + 'cardless_emi/';
 const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
-const list = {
-  bajaj: ['Bajaj Finserv'],
-  earlysalary: ['EarlySalary'],
-  zestmoney: ['ZestMoney'],
-  flexmoney: ['InstaCred Cardless EMI'],
+const config = {
+  bajaj: {
+    name: 'Bajaj Finserv',
+  },
+  earlysalary: {
+    name: 'EarlySalary',
+  },
+  zestmoney: {
+    name: 'ZestMoney',
+    min_amount: 90000,
+  },
+  flexmoney: {
+    name: 'InstaCred Cardless EMI',
+  },
 };
 
 /**
@@ -27,11 +36,62 @@ export const createProvider = (code, title) => ({
   title,
 });
 
-export const providers = _Obj.map(list, (details, code) => ({
-  name: details[0],
-  code,
-  logo: prefix + code + '.svg',
-  sqLogo: sqPrefix + code + '.svg',
-}));
+// Generate provider config
+const defaultConfig = {
+  min_amount: 300000,
+};
+
+const providers = _Obj.map(config, (details, code) => {
+  return (
+    {}
+    |> _Obj.extend(defaultConfig)
+    |> _Obj.extend({
+      code,
+      logo: prefix + code + '.svg',
+      sqLogo: sqPrefix + code + '.svg',
+    })
+    |> _Obj.extend(details)
+  );
+});
 
 export const getProvider = code => providers[code];
+
+/**
+ * Extends the config of the given with the updated config
+ * @param {string} provider Provider code
+ * @param {Object} updatedConfig Config to update
+ *
+ * @return {Object} New config of the provider
+ */
+export const extendConfig = (provider, updatedConfig) => {
+  if (!providers[provider]) {
+    return;
+  }
+
+  providers[provider] = _Obj.extend(providers[provider], updatedConfig);
+
+  return providers[provider];
+};
+
+/**
+ * Returns the eligible Cardless EMI providers
+ * @param {number} amount
+ * @param {Object} enabledProviders Providers enabled from API
+ *
+ * @returns {Object}
+ */
+export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
+  const eligible = {};
+
+  if (!enabledProviders) {
+    return eligible;
+  }
+
+  _Obj.loop(enabledProviders, (enabled, provider) => {
+    if (providers[provider] && providers[provider].min_amount <= amount) {
+      eligible[provider] = true;
+    }
+  });
+
+  return eligible;
+}

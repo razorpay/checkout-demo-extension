@@ -31,7 +31,9 @@ var preferences = window.preferences,
   _ = discreet._,
   _Obj = discreet._Obj,
   _Doc = discreet._Doc,
-  Hacks = discreet.Hacks;
+  _El = discreet._El,
+  Hacks = discreet.Hacks,
+  CardlessEmi = discreet.CardlessEmi;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -131,7 +133,7 @@ function createCardlessEmiImage(src) {
 }
 
 function createCardlessEmiTopbarImages(providerCode) {
-  var provider = discreet.CardlessEmi.getProvider(providerCode);
+  var provider = CardlessEmi.getProvider(providerCode);
 
   return createCardlessEmiImage(provider.logo);
 }
@@ -674,7 +676,7 @@ function errorHandler(response) {
       this.powerwallet = null;
       return;
     } else if (this.nativeotp && this.tab === 'card') {
-      Analytics.removeMeta('headless');
+      this.markHeadlessFailed();
       return;
     }
   }
@@ -797,7 +799,7 @@ function cancelHandler(response) {
   this.magic = false;
 
   Analytics.setMeta('payment.cancelled', true);
-  Analytics.removeMeta('headless');
+  this.markHeadlessFailed();
 
   if (this.payload.method === 'upi' && this.payload['_[flow]'] === 'intent') {
     if (this.r._payment && this.r._payment.upi_app) {
@@ -867,7 +869,9 @@ function askOTP(view, text, shouldLimitResend) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
-    allowResend: shouldLimitResend ? discreet.OtpService.canSendOtp() : true,
+    allowResend: shouldLimitResend
+      ? discreet.OtpService.canSendOtp('razorpay')
+      : true,
   });
 
   $('#body').addClass('sub');
@@ -879,13 +883,18 @@ function askOTP(view, text, shouldLimitResend) {
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
+            var metadata = origText.metadata;
+            thisSession.headlessMetadata = metadata;
+
+            discreet.OtpService.markOtpSent(
+              metadata.issuer || metadata.network
+            );
+
             var bankLogo;
-            if (origText.metadata.issuer) {
-              bankLogo = discreet.getFullBankLogo(origText.metadata.issuer);
-            } else if (origText.metadata.network) {
-              bankLogo = discreet.Card.getFullNetworkLogo(
-                origText.metadata.network
-              );
+            if (metadata.issuer) {
+              bankLogo = discreet.getFullBankLogo(metadata.issuer);
+            } else if (metadata.network) {
+              bankLogo = discreet.Card.getFullNetworkLogo(metadata.network);
             }
 
             if (bankLogo) {
@@ -1667,30 +1676,17 @@ Session.prototype = {
       var providers = [];
 
       if (this.methods.emi) {
-        providers.push(
-          discreet.CardlessEmi.createProvider('cards', 'EMI on Cards')
-        );
-
-        if (this.emi_options.banks['BAJAJ']) {
-          providers.push(
-            discreet.CardlessEmi.createProvider(
-              'bajaj',
-              this.emi_options.banks['BAJAJ'].name
-            )
-          );
-        }
+        providers.push(CardlessEmi.createProvider('cards', 'EMI on Cards'));
       }
 
       each(this.methods.cardless_emi, function(provider) {
-        var providerObj = discreet.CardlessEmi.getProvider(provider);
+        var providerObj = CardlessEmi.getProvider(provider);
 
         if (!providerObj) {
           return;
         }
 
-        providers.push(
-          discreet.CardlessEmi.createProvider(provider, providerObj.name)
-        );
+        providers.push(CardlessEmi.createProvider(provider, providerObj.name));
       });
 
       this.emiOptionsView.setOptions({
@@ -1728,24 +1724,6 @@ Session.prototype = {
     });
 
     this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
-  },
-
-  makeCardlessEmiDetailText: function(duration, monthly) {
-    return (
-      '<ul>' +
-      '<li>Monthly Installment: ' +
-      this.formatAmountWithCurrency(monthly) +
-      '</li>' +
-      '<li>Total Amount: ' +
-      this.formatAmountWithCurrency(duration * monthly) +
-      ' (' +
-      this.formatAmountWithCurrency(monthly) +
-      ' x ' +
-      duration +
-      ')' +
-      '</li>' +
-      '</ul>'
-    );
   },
 
   getCardlessEmiPlans: function() {
@@ -1829,7 +1807,7 @@ Session.prototype = {
     }
 
     var providerCode = CardlessEmiStore.providerCode;
-    var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
+    var cardlessEmiProviderObj = CardlessEmi.getProvider(providerCode);
     var self = this;
 
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
@@ -2176,18 +2154,47 @@ Session.prototype = {
       return this.magicView.resendOtp();
     }
 
+    var otpProvider;
+
+    if (!this.r._payment) {
+      /**
+       * If we're resending the OTP without any payment being created,
+       * it's a Razorpay OTP.
+       * Used for Saved Cards, Cardless EMI.
+       */
+      otpProvider = 'razorpay';
+    } else if (this.headless && this.headlessMetadata) {
+      otpProvider =
+        this.headlessMetadata.issuer || this.headlessMetadata.network;
+    }
+
+    var otpSentCount = discreet.OtpService.getCount(otpProvider);
+    var resendEventData = {
+      wallet: this.tab === 'wallet',
+      headless: this.headless,
+    };
+
+    if (otpSentCount) {
+      resendEventData.count = otpSentCount;
+    }
+
     Analytics.track('otp:resend', {
       type: AnalyticsTypes.BEHAV,
-      data: {
-        wallet: this.tab === 'wallet',
-        headless: this.headless,
-      },
+      data: resendEventData,
     });
+
     if (this.headless) {
       this.showLoadError('Resending OTP');
       if (!this.get('timeout')) {
         this.hideTimer();
       }
+
+      if (this.headlessMetadata) {
+        var metadata = this.headlessMetadata;
+
+        discreet.OtpService.markOtpSent(metadata.issuer || metadata.network);
+      }
+
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
 
@@ -3083,7 +3090,47 @@ Session.prototype = {
             animate: true,
           });
         });
+
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = discreet.Formatter.rules.phone.isValid.call(this);
+
+        Analytics.track('contact:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(contactEl);
     }
+
+    var emailEl = gel('email');
+    if (emailEl) {
+      _El.on('blur', function() {
+        var value = this.value;
+
+        if (!value) {
+          return;
+        }
+
+        var valid = emailPattern.test(value);
+
+        Analytics.track('email:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid: valid,
+            value: value,
+          },
+        });
+      })(emailEl);
+    }
+
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {
@@ -4134,33 +4181,13 @@ Session.prototype = {
 
         var bank = 'BAJAJ';
         var plans = emi_options.banks[bank].plans;
-        var emiPlans = [];
+        var emiPlans = self.getEmiPlans(bank);
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
         } else {
           self.removeAndCleanupOffers();
         }
-
-        each(plans, function(index, p) {
-          var amount_per_month = (
-            (amount * (1 + p.interest / 100)) /
-            p.duration
-          ).toFixed(0);
-
-          emiPlans.push({
-            text:
-              p.duration +
-              ' Months @ ' +
-              self.formatAmountWithCurrency(amount_per_month) +
-              '/mo',
-            value: p.duration,
-            detail: self.makeCardlessEmiDetailText(
-              p.duration,
-              amount_per_month
-            ),
-          });
-        });
 
         var prevTab = self.tab;
         var prevScreen = self.screen;
@@ -5717,6 +5744,11 @@ Session.prototype = {
     var emiBanks = {};
     var preferences = this.preferences;
     var prefEmiOptions = preferences.methods.emi_options;
+    var amount = this.get('amount');
+    var eligibleEmiOptions = discreet.EmiUtils.getEligibleBanksBasedOnMinAmount(
+      amount,
+      prefEmiOptions
+    );
 
     each(Bank.emiBanks, function(i, bank) {
       var emiBank = {
@@ -5724,14 +5756,19 @@ Session.prototype = {
         patt: bank.patt,
         code: bank.code,
         plans: {},
+        min_amount: Infinity,
       };
 
-      if (prefEmiOptions) {
-        each(prefEmiOptions[bank.code], function(j, plan) {
+      if (eligibleEmiOptions) {
+        each(eligibleEmiOptions[bank.code], function(j, plan) {
           emiBank.plans[plan.duration] = plan;
         });
 
-        if (prefEmiOptions[bank.code]) {
+        if (eligibleEmiOptions[bank.code]) {
+          emiBank.min_amount = discreet.EmiUtils.getMinimumAmountFromPlans(
+            eligibleEmiOptions[bank.code]
+          );
+
           emiBanks[bank.code] = emiBank;
         }
       }
@@ -5741,8 +5778,12 @@ Session.prototype = {
       banks: emiBanks,
     };
 
-    /* TODO: remove common min and use bank specific min_amounts */
-    emiOptions.min = 3000 * 100 - 1; /* min 3k */
+    // Minimum amount for BAJAJ is sent from API
+    if (emiOptions.banks['BAJAJ']) {
+      CardlessEmi.extendConfig('bajaj', {
+        min_amount: emiOptions.banks['BAJAJ'].min_amount,
+      });
+    }
 
     this.emi_options = emiOptions;
   },
@@ -5806,15 +5847,14 @@ Session.prototype = {
      * disable EMI if:
      * - Non INR payment
      * - Recurring payment
-     * - EMI not enabled
-     * - Neither of Card or EMI or Cardless EMI are enabled
-     * - amount is less than EMI threshold
+     * - No EMI banks are present
+     * - Either of Card or EMI methods are disabled
      */
     if (
-      !(methods.emi || methods.card || methods.cardless_emi) ||
-      recurring ||
       international ||
-      amount <= emi_options.min
+      recurring ||
+      _Obj.isEmpty(emi_options.banks) ||
+      !(methods.emi || methods.card)
     ) {
       methods.emi = false;
     }
@@ -5854,27 +5894,37 @@ Session.prototype = {
       methods.upi = false;
     }
 
-    /**
-     * Disable Cardless EMI on amounts < 3000 INR
-     */
-    if (amount < 300000) {
-      methods.cardless_emi = null;
-    } else if (methods.cardless_emi instanceof Array) {
+    if (emi_options.banks['BAJAJ']) {
       /**
-       * methods.cardless_emi will be [] when there are no providers enabled.
+       * methods.cardless_emi will be undefined in case cardless EMI is not enabled.
+       * methods.cardless_emi will be [] in case no provider is enabled.
        */
-      if (methods.cardless_emi.length === 0) {
-        /**
-         * Set cardless emi to [] (enabled) if:
-         * - Emi is enabled
-         * - Cardless EMI is false
-         * - Bajaj Finserv plans are present
-         */
-        if (!(methods.emi && emi_options.banks['BAJAJ'])) {
-          methods.cardless_emi = null;
-        }
+      if (!methods.cardless_emi || _.isArray(methods.cardless_emi)) {
+        methods.cardless_emi = {
+          bajaj: true,
+        };
+      } else {
+        methods.cardless_emi.bajaj = true;
       }
     }
+
+    /**
+     * Get eligible cardless EMI providers
+     */
+    methods.cardless_emi = CardlessEmi.getEligibleProvidersBasedOnMinAmount(
+      amount,
+      methods.cardless_emi
+    );
+    if (_Obj.isEmpty(methods.cardless_emi)) {
+      methods.cardless_emi = null;
+    }
+
+    /**
+     * If merchant wanted cardless EMI to be disabled,
+     * but Bajaj Finserv was enabled,
+     * it would need to be enabled again.
+     */
+    this.set('method.cardless_emi', methods.cardless_emi);
 
     /**
      * disable wallets if:
@@ -6041,6 +6091,21 @@ Session.prototype = {
 
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
+  },
+
+  /**
+   * Mark headless as failed and perform cleanup
+   */
+  markHeadlessFailed: function() {
+    Analytics.removeMeta('headless');
+    this.headless = false;
+
+    if (this.headlessMetadata) {
+      var metadata = this.headlessMetadata;
+      discreet.OtpService.resetCount(metadata.issuer || metadata.network);
+
+      this.headlessMetadata = null;
+    }
   },
 
   setPreferences: function(prefs) {
