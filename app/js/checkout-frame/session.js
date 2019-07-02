@@ -3647,7 +3647,7 @@ Session.prototype = {
     var valid = !this.checkInvalid('#pad-common');
 
     if (trackInvalid) {
-      var fields = _Doc.querySelectorAll('#pad-common .invalid input'); // Assuming there are only input fields for now
+      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
 
       var invalidFields = {};
 
