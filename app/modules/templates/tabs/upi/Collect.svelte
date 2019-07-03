@@ -56,8 +56,17 @@ export default {
     Card: 'templates/views/ui/Card.svelte',
   },
 
+  data() {
+    return {
+      focusOnCreate: false
+    }
+  },
+
   oncreate() {
-    this.focus();
+    const { focusOnCreate } = this.get();
+    if (focusOnCreate) {
+      this.focus();
+    }
   },
 
   methods: {

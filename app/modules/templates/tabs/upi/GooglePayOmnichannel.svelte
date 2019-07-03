@@ -1,8 +1,9 @@
-<div class="legend left" style="margin-top: 18px">
+<div class="legend left">
   Enter your Mobile Number
 </div>
+
 <div id="upi-gpay">
-  <Card selected="{true}" on:click>
+  <Card selected="{true}" on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field
         type="text"
@@ -15,19 +16,43 @@
         formatter={{
           type: 'number'
         }}
+        maxlength="{10}"
         on:blur
       />
     </div>
   </Card>
 </div>
-<p class="left">
-  You will receive a notification from the Google Pay app.
-</p>
+
+{#if error}
+  <p class="error">
+    Please ensure the same number is linked to the Google Pay account.
+  </p>
+{:else}
+  <p class="info">
+    You will receive a notification from Razorpay, in the Google Pay app.
+  </p>
+{/if}
 
 <style>
   #upi-gpay {
     display: block;
   }
+
+  .legend {
+    margin-top: 18px;
+  }
+
+  .info {
+    font-size: 12px;
+    color: rgb(117, 117, 117);
+  }
+
+  .error {
+    font-size: 12px;
+    margin-top: 18px;
+    color: red;
+  }
+
 </style>
 
 <script>
@@ -40,7 +65,8 @@ export default {
 
   data() {
     return {
-      focusOnCreate: false
+      focusOnCreate: false,
+      error: false
     }
   },
 
@@ -53,29 +79,16 @@ export default {
 
   methods: {
     handleCardClick(event) {
-      const target = event && event.target;
-      const { googlePayPspHandle } = this.refs;
-
-      // Don't focus on VPA input if the dropdown elem was clicked.
-      if (target === googlePayPspHandle) {
-        return;
-      }
-
-      this.refs.vpaField.focus();
+      this.refs.phoneField.focus();
     },
-    handlePspChange(event) {
-      this.focus();
-      this.fire('handleChange', event.target.value)
-    },
-    getVpa() {
-      const { pspHandle } = this.get();
-      return `${this.refs.vpaField.getValue()}@${pspHandle}`;
+    getPhone() {
+      return this.refs.phoneField.getValue();
     },
     focus() {
-      this.refs.vpaField.focus();
+      this.refs.phoneField.focus();
     },
     blur() {
-      this.refs.vpaField.blur();
+      this.refs.phoneField.blur();
     }
   },
 

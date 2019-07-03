@@ -1,6 +1,7 @@
 <div class="legend left" style="margin-top: 18px">
   Enter your UPI ID
 </div>
+
 <div id="upi-gpay">
   <Card selected="{true}" on:click="handleCardClick(event)">
     <div class="elem-wrap collect-form">
@@ -54,7 +55,10 @@ export default {
   },
 
   oncreate() {
-    this.focus();
+    const { focusOnCreate } = this.get();
+    if (focusOnCreate) {
+      this.focus();
+    }
   },
 
   methods: {

@@ -26,11 +26,13 @@
       </Card>
       {#if selectedApp === 'gpay'}
         {#if useOmnichannel}
-          <GooglePayOmnichannel />
+          <GooglePayOmnichannel ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
         {/if}
-        <GooglePayCollect {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandle(event)" />
+        {#if retryOmnichannel || !useOmnichannel}
+          <GooglePayCollect {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
+        {/if}
       {:else}
-        <Collect appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" />
+        <Collect appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" focusOnCreate/>
       {/if}
     {/if}
   {/if}
@@ -114,14 +116,14 @@
 </style>
 
 <script>
-  import { getSession } from 'sessionmanager.js';
+  import {getSession} from 'sessionmanager.js';
   import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
   import DowntimesStore from 'checkoutstore/downtimes.js';
-  import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
+  import {doesAppExist, GOOGLE_PAY_PACKAGE_NAME} from 'common/upi.js';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { VPA_REGEX } from 'common/constants.js';
+  import {VPA_REGEX} from 'common/constants.js';
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
@@ -228,6 +230,7 @@
         selectedApp: undefined,
         useWebPaymentsApi: false,
         useOmnichannel: false,
+        retryOmnichannel: false,
         down: false,
       };
     },
@@ -326,7 +329,9 @@
         const {
           selectedApp,
           intent,
-          isGPaySelected
+          isGPaySelected,
+          useOmnichannel,
+          retryOmnichannel,
         } = this.get();
 
         /**
@@ -346,7 +351,6 @@
           this.refs.vpaField.blur();
         }
 
-        let vpa = this.refs.vpaField.getVpa();
         let data = {};
 
         if (intent) {
@@ -356,9 +360,17 @@
             data = {
               '_[flow]': 'gpay',
             };
+          } else if (useOmnichannel) {
+            if (!retryOmnichannel) {
+              data['_[flow]'] = intent;
+              data.contact = this.refs.omnichannelField.getPhone();
+              data.upi_provider = 'google_pay';
+            } else {
+              // TODO: decide which flow to use if retry
+            }
           } else {
             data = {
-              vpa,
+              vpa: this.getFullVpa()
             };
           }
 
@@ -366,9 +378,10 @@
            * TODO: discuss with vivek whether to continue sending
            * directpay for collect requests
            */
-          if (!data['_[flow]']) {
+          if (!data['_[flow]'] && !useOmnichannel) {
             data['_[flow]'] = 'directpay';
           }
+          // TODO: set flow for omnichannel?
         }
 
         data.method = 'upi';
@@ -419,29 +432,24 @@
         }
 
         this.set({ selectedApp: id });
-        const { selectedAppData, isGPaySelected } = this.get();
+        const { isGPaySelected } = this.get();
 
         if (isGPaySelected) {
           return session.preSubmit();
         }
-
-        if (id === null) {
-          pattern = '.+@.+';
-        } else {
-          pattern = '.+';
-        }
-
-        this.set({
-          pattern,
-        });
 
         this.focusVpa();
       },
 
       /* VPA card specific code */
       focusVpa(event) {
-        if (!this.get()['focused'] && this.refs.vpaField) {
-          this.refs.vpaField.focus();
+        const { focused, useOmnichannel } = this.get();
+        if (!focused && this.refs.vpaField) {
+          if (useOmnichannel) {
+            this.refs.omnichannelField.focus();
+          } else {
+            this.refs.vpaField.focus();
+          }
         }
       },
 
@@ -459,24 +467,10 @@
        * @returns {string}
        */
       getFullVpa() {
-        let {
-          pspHandle,
-        } = this.get();
-        let vpa = this.refs.vpaField.getVpa();
-
-        if (!vpa) {
-          return '';
+        if (this.refs.vpaField) {
+          return this.refs.vpaField.getVpa();
         }
-
-        const valid = isVpaValid(vpa);
-
-        const isSingleHandle = pspHandle && !_.isArray(pspHandle);
-
-        if (!valid && isSingleHandle) {
-          vpa = `${vpa}@${pspHandle}`;
-        }
-
-        return vpa;
+        return '';
       },
 
       /**
