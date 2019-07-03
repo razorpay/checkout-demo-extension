@@ -10,6 +10,7 @@ const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 function getPaymentOptionsTests(browser) {
   const qrEnabled = UpiQrPaymentOptionTest.test(browser, {
     options: {
+      personalization: false,
       key: 'm1key',
       remember_customer: false,
       prefill: {
@@ -21,6 +22,7 @@ function getPaymentOptionsTests(browser) {
 
   const qrDisabled = UpiQrPaymentOptionTest.test(browser, {
     options: {
+      personalization: false,
       key: 'm1key',
       remember_customer: false,
       prefill: {
