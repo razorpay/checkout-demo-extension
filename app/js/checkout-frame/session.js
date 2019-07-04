@@ -59,6 +59,7 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
+  gpay_omni: 'Verifying mobile number with Google Pay..',
   redirect: 'Redirecting to Bank page',
   acs_load_delay: 'Seems like your bank page is taking time to load.',
   otp_resent: 'OTP resent',
@@ -4747,8 +4748,9 @@ Session.prototype = {
     if (!text) {
       text = strings.process;
     }
-
-    if (this.preferences.features.googlepay_omnichannel) {
+    // omni channel
+    if (this.preferences.features.google_omnichannel) {
+      text = strings.gpay_omni;
       $('.omni').show();
     } else {
       $('.omni').hide();
@@ -4988,7 +4990,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    debugger;
+    // debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5372,7 +5374,7 @@ Session.prototype = {
         delete data.emi_duration;
       }
     }
-
+    // debugger;
     Razorpay.sendMessage({
       event: 'submit',
       data: data,
