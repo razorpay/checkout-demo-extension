@@ -2504,6 +2504,7 @@ Session.prototype = {
 
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
+        console.log('closing');
         if (this.get('modal.confirm_close') && !confirmClose()) {
           return;
         }
@@ -4752,6 +4753,10 @@ Session.prototype = {
     if (this.preferences.features.google_omnichannel) {
       text = strings.gpay_omni;
       $('.omni').show();
+      $('#overlay-close').click(() => {
+        console.log('closing now');
+        hideOverlay();
+      });
     } else {
       $('.omni').hide();
     }
