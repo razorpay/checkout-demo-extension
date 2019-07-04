@@ -240,7 +240,6 @@
 
   const checkGPay = () => {
     var session = getSession();
-
     var hasFeature =
       session.preferences &&
       session.preferences.features &&
