@@ -317,13 +317,40 @@ function setEmiPlansCta(screen, tab) {
 /**
  * Get the saved card elemnnt that should be selected
  * when the saved cards screen is shown.
+ * @param {string} tab
+ * @param {string} token
+ *
+ * @returns {Element}
  */
-function getSelectableSavedCardElement(tab) {
-  if (tab === 'emi') {
-    return qs('.saved-card.checked[emi]') || qs('.saved-card[emi]');
-  } else {
-    return qs('.saved-card.checked') || qs('.saved-card');
+function getSelectableSavedCardElement(tab, token) {
+  var selectors = {
+    checked: '.saved-card.checked',
+    saved: '.saved-card',
+    token: '.saved-card',
+  };
+
+  // Add token to selectors
+  if (token) {
+    selectors.token += '[token=' + token + ']';
   }
+
+  var emiSelector = tab === 'emi' ? '[emi]' : '';
+
+  // Add EMI selector to selectors
+  selectors = _Obj.map(selectors, function(value) {
+    return value + emiSelector;
+  });
+
+  var validSelector = _Arr.find(
+    [selectors.checked, selectors.token, selectors.saved],
+    function(selector) {
+      return qs(selector);
+    }
+  );
+
+  var elem = qs(validSelector);
+
+  return elem;
 }
 
 /**
@@ -3815,6 +3842,8 @@ Session.prototype = {
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
 
+    this.selectedSavedCardToken = $savedCard.attr('token');
+
     if (this.offers && !this.offers.offerSelectedByDrawer) {
       this.offers.removeOffer();
     }
@@ -4291,7 +4320,10 @@ Session.prototype = {
       }
     }
 
-    var selectableSavedCard = getSelectableSavedCardElement(this.tab);
+    var selectableSavedCard = getSelectableSavedCardElement(
+      this.tab,
+      this.selectedSavedCardToken
+    );
     if (tokens && selectableSavedCard) {
       this.setSavedCard({ delegateTarget: selectableSavedCard });
     }
@@ -4348,7 +4380,10 @@ Session.prototype = {
 
     if (saveScreen) {
       this.setSavedCard({
-        delegateTarget: getSelectableSavedCardElement(this.tab),
+        delegateTarget: getSelectableSavedCardElement(
+          this.tab,
+          this.selectedSavedCardToken
+        ),
       });
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
