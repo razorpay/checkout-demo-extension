@@ -331,7 +331,7 @@ function getSelectableSavedCardElement(tab, token) {
 
   // Add token to selectors
   if (token) {
-    selectors.token += '[token=' + token + ']';
+    selectors.token += '[token="' + token + '"]';
   }
 
   var emiSelector = tab === 'emi' ? '[emi]' : '';
