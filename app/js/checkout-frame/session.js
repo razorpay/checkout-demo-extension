@@ -3797,6 +3797,8 @@ Session.prototype = {
   },
 
   setSavedCard: function(e) {
+    // TODO: Return from here if we are selecting the same selected card
+
     var $savedCard = $(e.delegateTarget);
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
