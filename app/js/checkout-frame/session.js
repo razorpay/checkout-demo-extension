@@ -4748,6 +4748,12 @@ Session.prototype = {
       text = strings.process;
     }
 
+    if (this.preferences.features.googlepay_omnichannel) {
+      $('.omni').show();
+    } else {
+      $('.omni').hide();
+    }
+
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       setOtpText(this.otpView, text);
@@ -4982,6 +4988,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
