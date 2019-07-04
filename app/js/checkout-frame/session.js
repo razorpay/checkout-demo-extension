@@ -6084,8 +6084,6 @@ Session.prototype = {
 
     this.tab_titles = tab_titles;
 
-    this.setEmiOptions();
-
     var self = this,
       customer,
       saved_customer = preferences.customer,
@@ -6189,6 +6187,9 @@ Session.prototype = {
     if (itemWithCurrency) {
       session_options.currency = itemWithCurrency.currency;
     }
+
+    // Amount and currency have been updated, set EMI options
+    this.setEmiOptions();
 
     /*
      * Set redirect mode if TPV and callback_url exists
