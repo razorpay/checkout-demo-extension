@@ -1091,7 +1091,11 @@ Session.prototype = {
     }
 
     if (getStore('contactEmailOptional')) {
-      classes.push('no-details');
+      if (this.tpvBank) {
+        classes.push('tpv-no-details');
+      } else {
+        classes.push('no-details');
+      }
     }
 
     if (this.irctc) {
