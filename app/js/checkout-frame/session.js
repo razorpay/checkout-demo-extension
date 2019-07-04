@@ -6069,6 +6069,9 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    // TODO: remove mock
+    prefs.features.google_omnichannel = true;
+    //
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     /* TODO: try to make a separate module for preferences */
