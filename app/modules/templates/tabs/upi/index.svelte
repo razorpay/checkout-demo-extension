@@ -442,9 +442,9 @@
 
       /* VPA card specific code */
       focusVpa(event) {
-        const { focused, useOmnichannel } = this.get();
+        const { focused, useOmnichannel, selectedApp } = this.get();
         if (!focused && this.refs.vpaField) {
-          if (useOmnichannel) {
+          if (useOmnichannel && selectedApp === 'gpay') {
             this.refs.omnichannelField.focus();
           } else {
             this.refs.vpaField.focus();
