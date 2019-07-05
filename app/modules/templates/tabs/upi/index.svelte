@@ -94,7 +94,7 @@
     {/if}
   {/if}
 
-  {#if qrEnabled}
+  {#if shouldShowQr}
     <div class="legend left">Or, Pay using QR</div>
     <div class="options" id="showQr">
       <NextOption
@@ -331,6 +331,12 @@
       /* Will be true if Google Pay for web payments API is selected */
       isGPaySelected: ({ selectedApp, useWebPaymentsApi }) =>
         selectedApp === 'gpay' && useWebPaymentsApi,
+
+      /**
+       * Show "Show QR" button only if QR is enabled and an app has not been selected.
+       * selectedApp === null when "Other Apps" is selected
+       */
+      shouldShowQr: ({ qrEnabled, selectedApp }) => qrEnabled && !selectedApp && selectedApp !== null,
     },
 
     oncreate() {
