@@ -444,7 +444,6 @@ Payment.prototype = {
     // else make ajax request
 
     var razorpayInstance = this.r;
-
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
       data,

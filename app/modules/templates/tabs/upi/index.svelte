@@ -351,7 +351,6 @@
         }
 
         let data = {};
-
         if (intent) {
           data = this.refs.intentView.getPayload();
         } else {
@@ -359,11 +358,11 @@
             data = {
               '_[flow]': 'gpay',
             };
-          } else if (useOmnichannel) {
+          } else if (useOmnichannel && selectedApp === 'gpay') {
             if (!retryOmnichannel) {
-              data['_[flow]'] = intent;
+              data['_[flow]'] = 'intent';
               data.contact = this.refs.omnichannelField.getPhone();
-              data.upi_provider = 'google_pay';
+              // data.upi_provider = 'google_pay';
             } else {
               // TODO: decide which flow to use if retry
             }
@@ -387,7 +386,9 @@
 
         return data;
       },
-
+    setRetryOmniChannel:function(status){
+    this.set({retryOmnichannel:status});
+    },
       onBack() {
         const {
           intent,

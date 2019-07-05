@@ -2727,6 +2727,7 @@ Session.prototype = {
       this.hideErrorMessage(e);
     });
     this.click('#fd-hide', this.hideErrorMessage);
+    this.click('#overlay-close', this.hideErrorMessage);
 
     this.on('click', '#form-upi.collapsible .item', function(e) {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
@@ -4599,7 +4600,9 @@ Session.prototype = {
     }
     return '#form-' + form;
   },
-
+  retryOmniChannel: function(response) {
+    console.log('retrying');
+  },
   getFormData: function() {
     var tab = this.tab;
     var data = {};
@@ -4723,7 +4726,17 @@ Session.prototype = {
       discreet.Bridge.stopListeningForBackPresses();
     }
   },
-
+  showOmniChannelUi: function(text) {
+    if (this.preferences.features.google_omnichannel) {
+      setTimeout(function() {
+        $('#error-message .link').html('');
+      }, 100);
+      $('.omni').show();
+    } else {
+      $('.omni').hide();
+    }
+    this.showLoadError(text, false);
+  },
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -4748,17 +4761,6 @@ Session.prototype = {
 
     if (!text) {
       text = strings.process;
-    }
-    // omni channel
-    if (this.preferences.features.google_omnichannel) {
-      text = strings.gpay_omni;
-      $('.omni').show();
-      $('#overlay-close').click(() => {
-        console.log('closing now');
-        hideOverlay();
-      });
-    } else {
-      $('.omni').hide();
     }
 
     if (this.screen === 'otp') {
@@ -4995,7 +4997,6 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    // debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5379,7 +5380,7 @@ Session.prototype = {
         delete data.emi_duration;
       }
     }
-    // debugger;
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data,
@@ -5482,6 +5483,13 @@ Session.prototype = {
     /* VPA verification */
     if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
+    }
+
+    if (
+      this.preferences.features.google_omnichannel &&
+      this.upiTab.get().selectedApp == 'gpay'
+    ) {
+      this.showOmniChannelUi(strings.gpay_omni);
     }
 
     var payment = this.r.createPayment(data, request);
@@ -5611,6 +5619,10 @@ Session.prototype = {
         that.showLoadError(
           "Please accept the request from Razorpay's VPA on your UPI app"
         );
+      });
+
+      this.r.on('omni.retry', function(data) {
+        console.log(data, 'data');
       });
     } else {
       if (!this.headless) {

@@ -55,6 +55,8 @@ export const processCoproto = function(response) {
     if (this.iframe && this.popup) {
       this.popup.writable = 1;
     }
+    response.type = 'respawn';
+    // for testing
     var func = responseTypes[response.type];
     var isFunction = _.isFunction(func);
     if (isFunction) {
@@ -189,8 +191,14 @@ var responseTypes = {
       }
     );
   },
-
   intent: function(request, fullResponse) {
+    const session = getSession();
+    if (
+      session.preferences.features.google_omnichannel &&
+      session.upiTab.get().selectedApp === 'gpay'
+    ) {
+      session.showOmniChannelUi(strings.OmniNotification);
+    }
     var upiBackCancel = {
       '_[method]': 'upi',
       '_[flow]': 'intent',
@@ -208,6 +216,7 @@ var responseTypes = {
     var intent_url = (fullResponse.data || {}).intent_url;
 
     this.on('upi.intent_success_response', data => {
+      console.log(data, 'dataa');
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
@@ -237,6 +246,13 @@ var responseTypes = {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
+  },
+  respawn: function(request, fullResponse) {
+    const session = getSession();
+    session.upiTab.setRetryOmniChannel({
+      isRetry: true,
+    });
+    session.retryOmniChannel(fullResponse);
   },
 
   otp: function(request, fullResponse) {
