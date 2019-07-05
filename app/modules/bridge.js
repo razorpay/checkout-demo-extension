@@ -294,7 +294,7 @@ window.upiIntentResponse = function(data) {
  * window.externalSDKResponse is called when a plugin wants to communicate with
  * Checkout.
  */
-window.externalSDKResponse = function(response) {
+window.externalSDKResponse = function(response = {}) {
   if (response.provider === 'GOOGLE_PAY') {
     handleGooglePaySDKResponse(response.data);
   }
