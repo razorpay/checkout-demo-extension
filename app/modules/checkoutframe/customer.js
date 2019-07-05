@@ -103,6 +103,8 @@ Customer.prototype = {
       url += '&device_token=' + device_token;
     }
 
+    return callback({ saved: true }); // TODO: unmock response
+
     fetch({
       url: url,
       callback: function(data) {

@@ -32,7 +32,9 @@ var preferences = window.preferences,
   _Obj = discreet._Obj,
   _El = discreet._El,
   Hacks = discreet.Hacks,
-  CardlessEmi = discreet.CardlessEmi;
+  CardlessEmi = discreet.CardlessEmi,
+  PayLater = discreet.PayLater;
+  PayLaterView = discreet.PayLaterView;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -116,10 +118,18 @@ function handleRelayFn(relayObj) {
 }
 
 /**
- * Temp store for Cardless EMI.
+ * Temp stores for Cardless EMI & PayLater.
  * Will move to Svelte Store upon migration.
  */
 var CardlessEmiStore = {
+  plans: {},
+  duration: {},
+  loanUrls: {},
+  ott: {},
+  lenderBranding: {},
+};
+
+var PayLaterStore = {
   plans: {},
   duration: {},
   loanUrls: {},
@@ -135,6 +145,17 @@ function createCardlessEmiTopbarImages(providerCode) {
   var provider = CardlessEmi.getProvider(providerCode);
 
   return createCardlessEmiImage(provider.logo);
+}
+
+// TODO: Refactor and merge with Cardless EMI method
+function createPayLaterImage(src) {
+  return '<img src="' + src + '" class="paylater-topbar-image">';
+}
+
+function createPayLaterTopbarImages(providerCode) {
+  var provider = PayLater.getProvider(providerCode);
+
+  return createPayLaterImage(provider.logo);
 }
 
 /**
@@ -1530,6 +1551,7 @@ Session.prototype = {
   setSvelteComponents: function() {
     this.setEmandate();
     this.setCardlessEmi();
+    this.setPayLater();
     this.setSavedCardsView();
     this.setOtpScreen();
     this.setUpiTab();
@@ -1686,6 +1708,60 @@ Session.prototype = {
             var providerCode = event.option.code;
 
             self.selectCardlessEmiProvider(providerCode);
+          },
+        },
+      });
+    }
+  },
+
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectPayLaterProvider: function(providerCode) {
+    Analytics.track('paylater:provider:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    $('#form-paylater input[name=provider]').val('');
+    $('#form-paylater input[name=ott]').val('');
+
+    PayLaterStore.providerCode = providerCode;
+
+    $('#form-paylater input[name=provider]').val(providerCode);
+
+    this.preSubmit(); // TODO: do you need this?
+  },
+
+  setPayLater: function() {
+    var self = this;
+
+    if (this.methods.paylater) {
+      this.payLaterView = new discreet.PayLaterView(this);
+
+      var providers = [];
+
+      each(this.methods.paylater, function(provider) {
+        var providerObj = PayLater.getProvider(provider);
+
+        if (!providerObj) {
+          return;
+        }
+
+        providers.push(PayLater.createProvider(provider, providerObj.name));
+      });
+
+      this.payLaterView.setOptions({
+        providers: providers,
+
+        on: {
+          select: function(event) {
+            var providerCode = event.option.code;
+            self.selectPayLaterProvider(providerCode);
           },
         },
       });
@@ -1854,6 +1930,91 @@ Session.prototype = {
           '<br>' +
           ' to get EMI plans for' +
           cardlessEmiProviderObj.name;
+
+        askOTP(self.otpView, otpMessage, true);
+
+        self.otpView.updateScreen({
+          allowSkip: false,
+        });
+      },
+      {
+        provider: providerCode,
+        amount: self.get('amount'),
+      },
+      getPhone()
+    );
+
+    Analytics.track('cardless_emi:plans:fetch:start', {
+      data: {
+        provider: providerCode,
+      },
+    });
+  },
+
+  fetchPayLaterPlans: function(params) {
+    if (!params) {
+      params = {};
+    }
+
+    var providerCode = PayLaterStore.providerCode;
+    var payLaterProviderObj = PayLater.getProvider(providerCode);
+    var self = this;
+
+    var topbarImages = createPayLaterTopbarImages(providerCode);
+    tab_titles.otp = topbarImages;
+
+    this.commenceOTP(payLaterProviderObj.name + ' account', true);
+    this.customer.checkStatus(
+      function(response) {
+        if (self.screen !== 'otp' && self.tab !== 'paylater') {
+          return;
+        }
+
+        if (response.error && response.error.description) {
+          self.showLoadError(response.error.description, true);
+          Analytics.track('paylater:plans:fetch:error', {
+            data: {
+              provider: providerCode,
+            },
+          });
+          return;
+        }
+
+        if (response.success && response.emi_plans) {
+          CardlessEmiStore.plans[providerCode] = response.emi_plans;
+
+          CardlessEmiStore.lenderBranding[providerCode] =
+            response.lender_branding_url;
+
+          self.showCardlessEmiPlans();
+          return;
+        }
+
+        // TODO: Remove this condition if event is not being fired.
+        if (!response.saved) {
+          var errorDesc =
+            'Could not find a ' +
+            payLaterProviderObj.name +
+            ' account associated with ' +
+            getPhone();
+
+          self.showLoadError(errorDesc, true);
+
+          Analytics.track('cardless_emi:plans:fetch:error', {
+            data: {
+              provider: providerCode,
+            },
+          });
+
+          return;
+        }
+
+        var otpMessage =
+          'Enter the OTP sent on ' +
+          getPhone() +
+          '<br>' +
+          ' to get EMI plans for' +
+          payLaterProviderObj.name;
 
         askOTP(self.otpView, otpMessage, true);
 
@@ -4944,6 +5105,25 @@ Session.prototype = {
       };
     }
 
+    if (this.tab === 'paylater') {
+      var providerCode = PayLaterStore.providerCode;
+
+      queryParams = {
+        provider: providerCode,
+        method: 'paylater',
+      };
+
+      callback = function(msg, data) {
+        alert('session.js:5022');
+        if (msg) {
+          this.fetchCardlessEmiPlans();
+        } else {
+          PayLaterStore.ott[providerCode] = data.ott;
+          this.showCardlessEmiPlans();
+        }
+      };
+    }
+
     this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
   },
 
@@ -5363,6 +5543,13 @@ Session.prototype = {
       if (!data.contact) {
         delete data.ott;
         delete data.emi_duration;
+      }
+    }
+    if (data.method === 'paylater') {
+      if (data.contact) {
+        this.fetchPayLaterPlans();
+        alert('yo!');
+        return;
       }
     }
 
@@ -6303,6 +6490,9 @@ Session.prototype = {
       }
 
       var preferences = response;
+
+      // TODO: Remove hardcoded method override
+      // preferences.methods.paylater = { epaylater: true };
 
       var validation = self.setPreferences(preferences);
 
