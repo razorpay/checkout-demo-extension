@@ -55,6 +55,7 @@ export const TAB_TITLES = {
   emi: 'EMI',
   emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
+  paylater: 'Pay Later',
   qr: 'QR',
   upi: 'UPI',
   gpay: 'Google Pay',
@@ -101,6 +102,7 @@ export const AVAILABLE_METHODS = [
   'emi',
   'cardless_emi',
   'qr',
+  'paylater'
 ];
 
 /* VPA regex, copied from API */
