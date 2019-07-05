@@ -30,8 +30,10 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _Doc = discreet._Doc,
   _El = discreet._El,
-  Hacks = discreet.Hacks;
+  Hacks = discreet.Hacks,
+  CardlessEmi = discreet.CardlessEmi;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -131,7 +133,7 @@ function createCardlessEmiImage(src) {
 }
 
 function createCardlessEmiTopbarImages(providerCode) {
-  var provider = discreet.CardlessEmi.getProvider(providerCode);
+  var provider = CardlessEmi.getProvider(providerCode);
 
   return createCardlessEmiImage(provider.logo);
 }
@@ -316,13 +318,40 @@ function setEmiPlansCta(screen, tab) {
 /**
  * Get the saved card elemnnt that should be selected
  * when the saved cards screen is shown.
+ * @param {string} tab
+ * @param {string} token
+ *
+ * @returns {Element}
  */
-function getSelectableSavedCardElement(tab) {
-  if (tab === 'emi') {
-    return qs('.saved-card.checked[emi]') || qs('.saved-card[emi]');
-  } else {
-    return qs('.saved-card.checked') || qs('.saved-card');
+function getSelectableSavedCardElement(tab, token) {
+  var selectors = {
+    checked: '.saved-card.checked',
+    saved: '.saved-card',
+    token: '.saved-card',
+  };
+
+  // Add token to selectors
+  if (token) {
+    selectors.token += '[token="' + token + '"]';
   }
+
+  var emiSelector = tab === 'emi' ? '[emi]' : '';
+
+  // Add EMI selector to selectors
+  selectors = _Obj.map(selectors, function(value) {
+    return value + emiSelector;
+  });
+
+  var validSelector = _Arr.find(
+    [selectors.checked, selectors.token, selectors.saved],
+    function(selector) {
+      return qs(selector);
+    }
+  );
+
+  var elem = qs(validSelector);
+
+  return elem;
 }
 
 /**
@@ -839,6 +868,16 @@ function askOTP(view, text, shouldLimitResend) {
   var thisSession = SessionManager.getSession();
   var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
 
+  // Track if OTP was invalid
+  if (origText === discreet.wrongOtpMsg) {
+    Analytics.track('otp:invalid', {
+      data: {
+        wallet: thisSession.tab === 'wallet',
+        headless: thisSession.headless,
+      },
+    });
+  }
+
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
@@ -1090,7 +1129,11 @@ Session.prototype = {
     }
 
     if (getStore('contactEmailOptional')) {
-      classes.push('no-details');
+      if (this.tpvBank) {
+        classes.push('tpv-no-details');
+      } else {
+        classes.push('no-details');
+      }
     }
 
     if (this.irctc) {
@@ -1664,30 +1707,17 @@ Session.prototype = {
       var providers = [];
 
       if (this.methods.emi) {
-        providers.push(
-          discreet.CardlessEmi.createProvider('cards', 'EMI on Cards')
-        );
-
-        if (this.emi_options.banks['BAJAJ']) {
-          providers.push(
-            discreet.CardlessEmi.createProvider(
-              'bajaj',
-              this.emi_options.banks['BAJAJ'].name
-            )
-          );
-        }
+        providers.push(CardlessEmi.createProvider('cards', 'EMI on Cards'));
       }
 
       each(this.methods.cardless_emi, function(provider) {
-        var providerObj = discreet.CardlessEmi.getProvider(provider);
+        var providerObj = CardlessEmi.getProvider(provider);
 
         if (!providerObj) {
           return;
         }
 
-        providers.push(
-          discreet.CardlessEmi.createProvider(provider, providerObj.name)
-        );
+        providers.push(CardlessEmi.createProvider(provider, providerObj.name));
       });
 
       this.emiOptionsView.setOptions({
@@ -1808,7 +1838,7 @@ Session.prototype = {
     }
 
     var providerCode = CardlessEmiStore.providerCode;
-    var cardlessEmiProviderObj = discreet.CardlessEmi.getProvider(providerCode);
+    var cardlessEmiProviderObj = CardlessEmi.getProvider(providerCode);
     var self = this;
 
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
@@ -2270,8 +2300,9 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    var commonInvalid = $('#pad-common .invalid');
-    if (commonInvalid[0]) {
+    if (!this.checkCommonValidAndTrackIfInvalid()) {
+      var commonInvalid = $('#pad-common .invalid');
+
       return commonInvalid
         .addClass('mature')
         .$('.input')
@@ -3639,10 +3670,49 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Checks if the fields on the homepage are valid or not.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValid: function() {
+    var valid = !this.checkInvalid('#pad-common');
+
+    return valid;
+  },
+
+  /**
+   * Checks if fields are invalid.
+   * And if they are invalid, tracks them.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValidAndTrackIfInvalid: function() {
+    var valid = this.checkCommonValid();
+
+    if (!valid) {
+      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+
+      var invalidFields = {};
+
+      _Arr.loop(fields, function(field) {
+        invalidFields[field.name] = true;
+      });
+
+      Analytics.track('homescreen:fields:invalid', {
+        data: {
+          fields: invalidFields,
+        },
+      });
+    }
+
+    return valid;
+  },
+
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
         }
@@ -3811,6 +3881,8 @@ Session.prototype = {
   },
 
   setSavedCard: function(e) {
+    // TODO: Return from here if we are selecting the same selected card
+
     var $savedCard = $(e.delegateTarget);
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
@@ -3822,6 +3894,8 @@ Session.prototype = {
 
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
+
+    this.selectedSavedCardToken = $savedCard.attr('token');
 
     if (this.offers && !this.offers.offerSelectedByDrawer) {
       this.offers.removeOffer();
@@ -4299,7 +4373,10 @@ Session.prototype = {
       }
     }
 
-    var selectableSavedCard = getSelectableSavedCardElement(this.tab);
+    var selectableSavedCard = getSelectableSavedCardElement(
+      this.tab,
+      this.selectedSavedCardToken
+    );
     if (tokens && selectableSavedCard) {
       this.setSavedCard({ delegateTarget: selectableSavedCard });
     }
@@ -4356,7 +4433,10 @@ Session.prototype = {
 
     if (saveScreen) {
       this.setSavedCard({
-        delegateTarget: getSelectableSavedCardElement(this.tab),
+        delegateTarget: getSelectableSavedCardElement(
+          this.tab,
+          this.selectedSavedCardToken
+        ),
       });
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
@@ -5045,7 +5125,7 @@ Session.prototype = {
     }
 
     if (!this.recurring && this.order && this.order.bank) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
@@ -5195,7 +5275,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (this.p13n) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
 
@@ -5718,6 +5798,11 @@ Session.prototype = {
     var emiBanks = {};
     var preferences = this.preferences;
     var prefEmiOptions = preferences.methods.emi_options;
+    var amount = this.get('amount');
+    var eligibleEmiOptions = discreet.EmiUtils.getEligibleBanksBasedOnMinAmount(
+      amount,
+      prefEmiOptions
+    );
 
     each(Bank.emiBanks, function(i, bank) {
       var emiBank = {
@@ -5725,14 +5810,19 @@ Session.prototype = {
         patt: bank.patt,
         code: bank.code,
         plans: {},
+        min_amount: Infinity,
       };
 
-      if (prefEmiOptions) {
-        each(prefEmiOptions[bank.code], function(j, plan) {
+      if (eligibleEmiOptions) {
+        each(eligibleEmiOptions[bank.code], function(j, plan) {
           emiBank.plans[plan.duration] = plan;
         });
 
-        if (prefEmiOptions[bank.code]) {
+        if (eligibleEmiOptions[bank.code]) {
+          emiBank.min_amount = discreet.EmiUtils.getMinimumAmountFromPlans(
+            eligibleEmiOptions[bank.code]
+          );
+
           emiBanks[bank.code] = emiBank;
         }
       }
@@ -5742,8 +5832,12 @@ Session.prototype = {
       banks: emiBanks,
     };
 
-    /* TODO: remove common min and use bank specific min_amounts */
-    emiOptions.min = 3000 * 100 - 1; /* min 3k */
+    // Minimum amount for BAJAJ is sent from API
+    if (emiOptions.banks['BAJAJ']) {
+      CardlessEmi.extendConfig('bajaj', {
+        min_amount: emiOptions.banks['BAJAJ'].min_amount,
+      });
+    }
 
     this.emi_options = emiOptions;
   },
@@ -5807,15 +5901,14 @@ Session.prototype = {
      * disable EMI if:
      * - Non INR payment
      * - Recurring payment
-     * - EMI not enabled
-     * - Neither of Card or EMI or Cardless EMI are enabled
-     * - amount is less than EMI threshold
+     * - No EMI banks are present
+     * - Either of Card or EMI methods are disabled
      */
     if (
-      !(methods.emi || methods.card || methods.cardless_emi) ||
-      recurring ||
       international ||
-      amount <= emi_options.min
+      recurring ||
+      _Obj.isEmpty(emi_options.banks) ||
+      !(methods.emi || methods.card)
     ) {
       methods.emi = false;
     }
@@ -5855,27 +5948,37 @@ Session.prototype = {
       methods.upi = false;
     }
 
-    /**
-     * Disable Cardless EMI on amounts < 3000 INR
-     */
-    if (amount < 300000) {
-      methods.cardless_emi = null;
-    } else if (methods.cardless_emi instanceof Array) {
+    if (emi_options.banks['BAJAJ']) {
       /**
-       * methods.cardless_emi will be [] when there are no providers enabled.
+       * methods.cardless_emi will be undefined in case cardless EMI is not enabled.
+       * methods.cardless_emi will be [] in case no provider is enabled.
        */
-      if (methods.cardless_emi.length === 0) {
-        /**
-         * Set cardless emi to [] (enabled) if:
-         * - Emi is enabled
-         * - Cardless EMI is false
-         * - Bajaj Finserv plans are present
-         */
-        if (!(methods.emi && emi_options.banks['BAJAJ'])) {
-          methods.cardless_emi = null;
-        }
+      if (!methods.cardless_emi || _.isArray(methods.cardless_emi)) {
+        methods.cardless_emi = {
+          bajaj: true,
+        };
+      } else {
+        methods.cardless_emi.bajaj = true;
       }
     }
+
+    /**
+     * Get eligible cardless EMI providers
+     */
+    methods.cardless_emi = CardlessEmi.getEligibleProvidersBasedOnMinAmount(
+      amount,
+      methods.cardless_emi
+    );
+    if (_Obj.isEmpty(methods.cardless_emi)) {
+      methods.cardless_emi = null;
+    }
+
+    /**
+     * If merchant wanted cardless EMI to be disabled,
+     * but Bajaj Finserv was enabled,
+     * it would need to be enabled again.
+     */
+    this.set('method.cardless_emi', methods.cardless_emi);
 
     /**
      * disable wallets if:
@@ -6075,8 +6178,6 @@ Session.prototype = {
 
     this.tab_titles = tab_titles;
 
-    this.setEmiOptions();
-
     var self = this,
       customer,
       saved_customer = preferences.customer,
@@ -6180,6 +6281,9 @@ Session.prototype = {
     if (itemWithCurrency) {
       session_options.currency = itemWithCurrency.currency;
     }
+
+    // Amount and currency have been updated, set EMI options
+    this.setEmiOptions();
 
     /*
      * Set redirect mode if TPV and callback_url exists

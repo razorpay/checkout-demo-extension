@@ -1,6 +1,5 @@
 /* global templates, showOverlay, hideEmi, Event */
 import EmiView from 'templates/views/emi.svelte';
-import { AMEX_EMI_MIN } from 'common/constants';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 
@@ -37,9 +36,9 @@ export default function emiView(session) {
 
   if (
     !(
-      amount > AMEX_EMI_MIN &&
+      opts.banks.AMEX &&
       (!session.isOfferApplicableOnIssuer('amex', offer) ||
-        discountedAmount > AMEX_EMI_MIN)
+        discountedAmount > opts.banks.AMEX.min_amount)
     )
   ) {
     delete opts.banks.AMEX;

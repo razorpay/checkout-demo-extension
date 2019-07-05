@@ -1,5 +1,4 @@
 import * as Card from 'common/card';
-import { AMEX_EMI_MIN } from 'common/constants';
 
 const transformerByMethod = {
   /**
@@ -14,24 +13,18 @@ const transformerByMethod = {
    */
   card: (token, { amount, emi, emiOptions, recurring }) => {
     const { card } = token;
-    let { banks: allBanks, min: minimumAmount } = emiOptions;
+    let { banks: allBanks } = emiOptions;
     let { flows = [], issuer: bank, network } = card;
     let networkCode = Card.findCodeByNetworkName(network);
 
     if (networkCode === 'amex') {
       token.card.issuer = 'AMEX'; // Set issuer explicitly
       bank = 'AMEX';
-      minimumAmount = AMEX_EMI_MIN;
     }
     card.networkCode = networkCode;
 
     token.plans =
-      bank &&
-      emi &&
-      card.emi &&
-      amount > minimumAmount &&
-      allBanks[bank] &&
-      allBanks[bank].plans;
+      bank && emi && card.emi && allBanks[bank] && allBanks[bank].plans;
 
     token.cvvDigits = networkCode === 'amex' ? 4 : 3;
 

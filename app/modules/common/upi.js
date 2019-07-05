@@ -157,6 +157,9 @@ const UPI_APPS = {
     {
       package_name: 'in.amazon.mShop.android.shopping',
     },
+    {
+      package_name: 'com.mipay.wallet.in',
+    },
   ],
 
   /**
