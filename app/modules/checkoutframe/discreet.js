@@ -144,6 +144,7 @@ export default {
   Hacks,
 
   _Arr,
+  _Doc,
   _El,
   _Func,
   _Obj,

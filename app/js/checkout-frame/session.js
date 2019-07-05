@@ -30,6 +30,7 @@ var preferences = window.preferences,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _Doc = discreet._Doc,
   _El = discreet._El,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi;
@@ -866,6 +867,16 @@ function askOTP(view, text, shouldLimitResend) {
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
   var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
+
+  // Track if OTP was invalid
+  if (origText === discreet.wrongOtpMsg) {
+    Analytics.track('otp:invalid', {
+      data: {
+        wallet: thisSession.tab === 'wallet',
+        headless: thisSession.headless,
+      },
+    });
+  }
 
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
@@ -2289,8 +2300,9 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    var commonInvalid = $('#pad-common .invalid');
-    if (commonInvalid[0]) {
+    if (!this.checkCommonValidAndTrackIfInvalid()) {
+      var commonInvalid = $('#pad-common .invalid');
+
       return commonInvalid
         .addClass('mature')
         .$('.input')
@@ -3656,10 +3668,49 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Checks if the fields on the homepage are valid or not.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValid: function() {
+    var valid = !this.checkInvalid('#pad-common');
+
+    return valid;
+  },
+
+  /**
+   * Checks if fields are invalid.
+   * And if they are invalid, tracks them.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValidAndTrackIfInvalid: function() {
+    var valid = this.checkCommonValid();
+
+    if (!valid) {
+      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+
+      var invalidFields = {};
+
+      _Arr.loop(fields, function(field) {
+        invalidFields[field.name] = true;
+      });
+
+      Analytics.track('homescreen:fields:invalid', {
+        data: {
+          fields: invalidFields,
+        },
+      });
+    }
+
+    return valid;
+  },
+
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
         }
@@ -5072,7 +5123,7 @@ Session.prototype = {
     }
 
     if (!this.recurring && this.order && this.order.bank) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
@@ -5222,7 +5273,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (this.p13n) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
 

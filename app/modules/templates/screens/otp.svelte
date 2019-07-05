@@ -30,7 +30,7 @@
       class:hidden="!showInput"
     >
       <div class="help">Please enter the OTP</div>
-      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$otp maxlength={$maxlength || 6} autocomplete="one-time-code" required>
+      <input ref:input on:blur="trackInput(event)" type="tel" class="input" name="otp" id="otp" bind:value=$otp maxlength={$maxlength || 6} autocomplete="one-time-code" required>
     </div>
   </div>
 
@@ -54,6 +54,9 @@
 
 <script>
   import OtpScreenStore from 'checkoutstore/screens/otp';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { getSession } from 'sessionmanager';
 
   export default {
     store: () => OtpScreenStore,
@@ -100,6 +103,24 @@
           method(event);
         }
       },
+
+      trackInput: function (event) {
+        const {
+          otp
+        } = OtpScreenStore.get();
+
+        const session = getSession();
+
+        if (otp) {
+          Analytics.track('otp:input', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              wallet: session.tab === 'wallet',
+              headless: session.headless
+            }
+          });
+        }
+      }
     },
   }
 </script>
