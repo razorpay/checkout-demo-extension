@@ -1739,33 +1739,34 @@ Session.prototype = {
 
   setPayLater: function() {
     var self = this;
+    var isPayLaterEnabled = this.methods.paylater && Object.keys(this.methods.paylater).length;
 
-    if (this.methods.paylater) {
-      this.payLaterView = new discreet.PayLaterView(this);
+    if (!isPayLaterEnabled) return;
 
-      var providers = [];
+    this.payLaterView = new discreet.PayLaterView(this);
 
-      each(this.methods.paylater, function(provider) {
-        var providerObj = PayLater.getProvider(provider);
+    var providers = [];
 
-        if (!providerObj) {
-          return;
-        }
+    each(this.methods.paylater, function(provider) {
+      var providerObj = PayLater.getProvider(provider);
 
-        providers.push(PayLater.createProvider(provider, providerObj.name));
-      });
+      if (!providerObj) {
+        return;
+      }
 
-      this.payLaterView.setOptions({
-        providers: providers,
+      providers.push(PayLater.createProvider(provider, providerObj.name));
+    });
 
-        on: {
-          select: function(event) {
-            var providerCode = event.option.code;
-            self.selectPayLaterProvider(providerCode);
-          },
+    this.payLaterView.setOptions({
+      providers: providers,
+
+      on: {
+        select: function(event) {
+          var providerCode = event.option.code;
+          self.selectPayLaterProvider(providerCode);
         },
-      });
-    }
+      },
+    });
   },
 
   setEmiScreen: function() {
@@ -1951,6 +1952,33 @@ Session.prototype = {
     });
   },
 
+  showPayLaterPlans: function() {
+    var self = this;
+    var providerCode = PayLaterStore.providerCode;
+
+    Analytics.track('paylater:plans:view', {
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    $('#form-paylater input[name=provider]').val(
+      PayLaterStore.providerCode
+    );
+    $('#form-paylater input[name=ott]').val(
+      PayLaterStore.ott[PayLaterStore.providerCode]
+    );
+
+    Analytics.track('paylater:plan:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode
+      },
+    });
+    // TODO: Add +91 in contact if required
+    self.preSubmit();
+  },
+
   fetchPayLaterPlans: function(params) {
     if (!params) {
       params = {};
@@ -1977,16 +2005,6 @@ Session.prototype = {
               provider: providerCode,
             },
           });
-          return;
-        }
-
-        if (response.success && response.emi_plans) {
-          CardlessEmiStore.plans[providerCode] = response.emi_plans;
-
-          CardlessEmiStore.lenderBranding[providerCode] =
-            response.lender_branding_url;
-
-          self.showCardlessEmiPlans();
           return;
         }
 
@@ -2025,11 +2043,12 @@ Session.prototype = {
       {
         provider: providerCode,
         amount: self.get('amount'),
+        method: 'paylater'
       },
       getPhone()
     );
 
-    Analytics.track('cardless_emi:plans:fetch:start', {
+    Analytics.track('paylater:plans:fetch:start', {
       data: {
         provider: providerCode,
       },
@@ -5114,12 +5133,13 @@ Session.prototype = {
       };
 
       callback = function(msg, data) {
-        alert('session.js:5022');
         if (msg) {
-          this.fetchCardlessEmiPlans();
+          this.fetchPayLaterPlans();
         } else {
           PayLaterStore.ott[providerCode] = data.ott;
-          this.showCardlessEmiPlans();
+          PayLaterStore.contact = data.contact;
+          this.switchTab('paylater');
+          this.showPayLaterPlans();
         }
       };
     }
@@ -5545,10 +5565,10 @@ Session.prototype = {
         delete data.emi_duration;
       }
     }
+
     if (data.method === 'paylater') {
-      if (data.contact) {
+      if (data.contact && !data.ott) {
         this.fetchPayLaterPlans();
-        alert('yo!');
         return;
       }
     }
