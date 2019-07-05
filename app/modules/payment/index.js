@@ -151,8 +151,9 @@ export default function Payment(data, params = {}, r) {
 
   this.magicPossible = this.isMagicPayment;
 
-  this.isExternalAmazonPayPayment = params.external.amazonpay;
-  this.isExternalGooglePayPayment = params.external.gpay;
+  const external = params.external || {};
+  this.isExternalAmazonPayPayment = external.amazonpay;
+  this.isExternalGooglePayPayment = external.gpay;
 
   // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
   if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
