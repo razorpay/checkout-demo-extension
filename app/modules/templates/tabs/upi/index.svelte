@@ -94,6 +94,25 @@
     {/if}
   {/if}
 
+  {#if qrEnabled}
+    <div class="legend left">Or, Pay using QR</div>
+    <div class="options" id="showQr">
+      <NextOption
+        icon={qrIcon}
+        tabindex="0"
+        attributes={{
+          role: 'button',
+          'aria-label': 'Show QR Code - Scan the QR code using your UPI app'
+        }}
+
+        on:select="selectQrMethod(event)"
+      >
+        <div>Show QR Code</div>
+        <div class="desc">Scan the QR code using your UPI app</div>
+      </NextOption>
+    </div>
+  {/if}
+
   {#if down}
     <Callout
       showIcon={false}
@@ -127,7 +146,6 @@
       padding-right: 64px;
     }
   }
-
 
   ref:changeBtn {
     position: absolute;
@@ -277,6 +295,7 @@
       Field: 'templates/views/ui/Field.svelte',
       Icon: 'templates/views/ui/Icon.svelte',
       Callout: 'templates/views/ui/Callout.svelte',
+      NextOption: 'templates/views/ui/options/NextOption.svelte',
     },
 
     data() {
@@ -291,6 +310,7 @@
         selectedApp: undefined,
         useWebPaymentsApi: false,
         down: false,
+        qrEnabled: false,
       };
     },
 
@@ -337,6 +357,11 @@
           down: true,
         });
       }
+
+      this.set({
+        qrEnabled: session.methods.qr,
+        qrIcon: getSession().themeMeta.icons.qr,
+      });
     },
 
     onstate({ changed, current }) {
@@ -375,6 +400,23 @@
     },
 
     methods: {
+      /**
+       * Does the equivalent of
+       * selecting the QR payment method
+       */
+      selectQrMethod () {
+        const session = getSession();
+
+        Analytics.track('payment_method:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            method: 'qr',
+          },
+        });
+
+        session.switchTab('qr');
+      },
+
       /**
        * This function will be invoked externally via session on
        * payment form submission

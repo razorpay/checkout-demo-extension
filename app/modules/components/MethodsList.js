@@ -33,6 +33,12 @@ const getAvailableMethods = methods => {
     AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'emi');
   }
 
+  /**
+   * We do not want to show QR in the primary list
+   * of payment options anymore
+   */
+  AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'qr');
+
   return AVAIL_METHODS;
 };
 

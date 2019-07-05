@@ -307,7 +307,7 @@
               break;
             case 'upi':
               if (instrument['_[upiqr]'] === '1') {
-                text = `QR`;
+                text = `UPI QR`;
                 icon = session.themeMeta.icons['qr'];
                 break;
               }
