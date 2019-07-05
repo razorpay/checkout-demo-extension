@@ -5244,6 +5244,7 @@ Session.prototype = {
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
+      external: {},
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
@@ -5365,7 +5366,7 @@ Session.prototype = {
       }
 
       if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
-        request.amazonpay = true;
+        request.external.amazonpay = true;
       }
     }
 
@@ -5374,7 +5375,7 @@ Session.prototype = {
         this.hasGooglePaySdk &&
         data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
       ) {
-        request.googlepay = true;
+        request.external.gpay = true;
         request['_[flow]'] = 'intent';
       }
     }
@@ -5500,9 +5501,9 @@ Session.prototype = {
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
-    if (request.amazonpay || request.googlepay) {
+    if (request.external.amazonpay || request.external.gpay) {
       payment.on('payment.externalsdk.process', function(data) {
-        /* invoke amazonpay sdk via our SDK */
+        /* invoke external sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
           CheckoutBridge.processPayment(JSON.stringify(data));
