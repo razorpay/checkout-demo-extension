@@ -249,9 +249,7 @@ var responseTypes = {
   },
   respawn: function(request, fullResponse) {
     const session = getSession();
-    session.upiTab.setRetryOmniChannel({
-      isRetry: true,
-    });
+    session.upiTab.setRetryOmniChannel(true);
     session.retryOmniChannel(fullResponse);
   },
 

@@ -1,5 +1,5 @@
 <div class="legend left" style="margin-top: 18px">
-  Enter your UPI ID
+ Or Enter your UPI ID
 </div>
 
 <div id="upi-gpay">

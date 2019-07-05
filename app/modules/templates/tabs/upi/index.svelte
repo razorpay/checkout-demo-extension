@@ -364,6 +364,7 @@
               data.contact = this.refs.omnichannelField.getPhone();
               // data.upi_provider = 'google_pay';
             } else {
+              data.vpa = this.getFullVpa();
               // TODO: decide which flow to use if retry
             }
           } else {

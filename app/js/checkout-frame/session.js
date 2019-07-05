@@ -4601,7 +4601,7 @@ Session.prototype = {
     return '#form-' + form;
   },
   retryOmniChannel: function(response) {
-    console.log('retrying');
+    hideOverlayMessage();
   },
   getFormData: function() {
     var tab = this.tab;
@@ -6095,7 +6095,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    // TODO: remove mock
+    // TODO: remove mock.. only for testing
     prefs.features.google_omnichannel = true;
     //
     PreferencesStore.set(prefs);
