@@ -55,6 +55,7 @@ export const processCoproto = function(response) {
     if (this.iframe && this.popup) {
       this.popup.writable = 1;
     }
+
     response.type = 'respawn';
     // for testing
     var func = responseTypes[response.type];

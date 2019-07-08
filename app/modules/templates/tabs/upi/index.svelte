@@ -26,10 +26,10 @@
       </Card>
       {#if selectedApp === 'gpay'}
         {#if useOmnichannel}
-          <GooglePayOmnichannel ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
+          <GooglePayOmnichannel retry={retryOmnichannel} ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
         {/if}
         {#if retryOmnichannel || !useOmnichannel}
-          <GooglePayCollect {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
+          <GooglePayCollect retry={retryOmnichannel} {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
         {/if}
       {:else}
         <Collect appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" focusOnCreate/>
@@ -364,6 +364,9 @@
               data.contact = this.refs.omnichannelField.getPhone();
               // data.upi_provider = 'google_pay';
             } else {
+              var session=getSession();
+              var omniSelected=session.upiTab.get().omniSelected;
+              console.log(omniSelected,'omniSelected',session)
               data.vpa = this.getFullVpa();
               // TODO: decide which flow to use if retry
             }
