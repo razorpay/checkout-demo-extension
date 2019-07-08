@@ -1716,7 +1716,7 @@ Session.prototype = {
 
   /**
    * Equivalent of clicking a provider option from the
-   * Cardless EMI homescreen.
+   * PayLater homescreen.
    * @param {String} providerCode Code for the provider
    */
   selectPayLaterProvider: function(providerCode) {
