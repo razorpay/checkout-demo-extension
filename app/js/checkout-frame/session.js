@@ -1739,7 +1739,7 @@ Session.prototype = {
 
   setPayLater: function() {
     var self = this;
-    var isPayLaterEnabled = this.methods.paylater && _Obj.length(this.methods.paylater);
+    var isPayLaterEnabled = this.methods.paylater && !_Obj.isEmpty(this.methods.paylater);
 
     if (!isPayLaterEnabled) {
       return;
