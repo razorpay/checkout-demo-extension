@@ -7,7 +7,7 @@
     <h3>Select an EMI Plan</h3>
   {:else}
     <div class="sanitized">
-      <h3>There is a mismatch betwen the selected offer and entered card details.</h3>
+      <h3>There is a mismatch between the selected offer and entered card details.</h3>
       <h3>Please go back and select a different offer or card.</h3>
     </div>
   {/if}

@@ -29,18 +29,25 @@ Format: `key`, `merchant_id`
 | Email optional           | `rzp_test_DvDrkPcFCkPd8S`, `C3ecol1Jvw7XpN` | `rzp_test_aiMriDRpaBThmc`, `C3eyAbbHaNI4r8` |
 | Contact optional         | `rzp_test_FWEjUCmU2aT5x6`, `C3f0WIVPfpzFQY` | `rzp_test_wWHBq3b8ESXpmB`, `C3f2I0QjbSUDjU` |
 
-# Whitelisting new IINs for EMI Banks
+# Adding/removing new BINs for EMI Banks
 
-**How to add new IINs in future?**
+### Semi-automated
 
-1. Generate a list of existing IINs using existing regex in [bank.js](https://github.com/razorpay/checkout/blob/master/app/modules/common/bank.js#L37) (See step 10 for list generation)
-2. Append new IINs in that.
+1. Add/remove BIN to/from [`scripts/emi/bin.js`](scripts/emi/bin.js), ensure that it is in a numerically sorted order.
+2. `cd scripts/emi`
+3. `node index.js <bank_code>`
+4. Copy the regex and paste it in [`app/modules/common/bank.js`](app/modules/common/bank.js)
+
+### Manual
+
+1. Generate a list of existing BINs using existing regex in [bank.js](https://github.com/razorpay/checkout/blob/master/app/modules/common/bank.js#L37) (See step 10 for list generation)
+2. Append new BINs in that.
 3. Make a simple Regex using:
 
    `simpleRegex = '(' + out.join('|') + ')'`
 
 4. Go to [https://myregextester.com](https://myregextester.com)
-5. Paste `simpleRegex` in match pattern & list of IINs in the "Source Text" field.
+5. Paste `simpleRegex` in match pattern & list of BINs in the "Source Text" field.
 6. Check these:
 
    ![image](https://user-images.githubusercontent.com/11299391/57135808-56e13f80-6dc8-11e9-87eb-b6778da27c02.png)
@@ -51,7 +58,7 @@ Format: `key`, `merchant_id`
    ![image](https://user-images.githubusercontent.com/11299391/57135853-75dfd180-6dc8-11e9-86a9-b54bd8ca8b1b.png)
 
 9. Remove all `:?` (non-capturing symbols) from the regex.
-10. Generating/Verifying all IINs against a RegExp:
+10. Generating/Verifying all BINs against a RegExp:
 
     1. Open console, set your new regex:
 
@@ -61,4 +68,4 @@ Format: `key`, `merchant_id`
 
        `out = Array(1000000).fill(null).map((_, i) => String(i).padStart(6, '0')).filter(i => r.test(i));`
 
-    You'll get an array of all IINs that match your new regex.
+    You'll get an array of all BINs that match your new regex.

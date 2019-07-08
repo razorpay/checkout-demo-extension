@@ -10,6 +10,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
+import * as EmiUtils from 'common/emi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
@@ -50,6 +51,7 @@ import * as Downtimes from 'checkoutframe/downtimes';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+import { Formatter } from 'formatter';
 
 import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
@@ -72,6 +74,7 @@ export default {
   Analytics,
   AnalyticsTypes,
   UPIUtils,
+  EmiUtils,
   setShieldParams,
   GPay,
   Color,
@@ -83,6 +86,7 @@ export default {
   getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
+  Formatter,
 
   cancelMsg: strings.cancelMsg,
   confirmCancelMsg: strings.confirmCancelMsg,
@@ -140,7 +144,8 @@ export default {
   Hacks,
 
   _Arr,
-  _Obj,
+  _El,
   _Func,
+  _Obj,
   _,
 };
