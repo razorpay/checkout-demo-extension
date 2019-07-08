@@ -1958,12 +1958,6 @@ Session.prototype = {
     var self = this;
     var providerCode = PayLaterStore.providerCode;
 
-    Analytics.track('paylater:plans:view', {
-      data: {
-        provider: providerCode,
-      },
-    });
-
     $('#form-paylater input[name=provider]').val(
       PayLaterStore.providerCode
     );
@@ -1971,13 +1965,13 @@ Session.prototype = {
       PayLaterStore.ott[PayLaterStore.providerCode]
     );
 
-    Analytics.track('paylater:plan:select', {
+    Analytics.track('paylater:provider:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
         provider: providerCode
       },
     });
-    // TODO: Add +91 in contact if required
+
     self.preSubmit();
   },
 
@@ -2000,13 +1994,16 @@ Session.prototype = {
           return;
         }
 
-        if (response.error && response.error.description) {
-          self.showLoadError(response.error.description, true);
-          Analytics.track('paylater:plans:fetch:error', {
+        if (response.error || !response.saved) {
+          Analytics.track('paylater:status:error', {
             data: {
               provider: providerCode,
             },
           });
+        }
+
+        if (response.error && response.error.description) {
+          self.showLoadError(response.error.description, true);
           return;
         }
 
@@ -2019,13 +2016,6 @@ Session.prototype = {
             getPhone();
 
           self.showLoadError(errorDesc, true);
-
-          Analytics.track('cardless_emi:plans:fetch:error', {
-            data: {
-              provider: providerCode,
-            },
-          });
-
           return;
         }
 
@@ -2033,7 +2023,7 @@ Session.prototype = {
           'Enter the OTP sent on ' +
           getPhone() +
           '<br>' +
-          ' to get EMI plans for' +
+          ' to continue with ' +
           payLaterProviderObj.name;
 
         askOTP(self.otpView, otpMessage, true);
@@ -2049,12 +2039,6 @@ Session.prototype = {
       },
       getPhone()
     );
-
-    Analytics.track('paylater:plans:fetch:start', {
-      data: {
-        provider: providerCode,
-      },
-    });
   },
 
   setOtpScreen: function() {
