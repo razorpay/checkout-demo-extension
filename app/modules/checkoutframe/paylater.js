@@ -9,7 +9,6 @@ export default function PayLaterView(session) {
 PayLaterView.prototype = {
   setOptions: function(data) {
     const {
-      providers = {},
       on = {}
     } = data;
 

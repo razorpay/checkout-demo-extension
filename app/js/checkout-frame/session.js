@@ -33,7 +33,7 @@ var preferences = window.preferences,
   _El = discreet._El,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi,
-  PayLater = discreet.PayLater;
+  PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -1743,7 +1743,7 @@ Session.prototype = {
 
     if (!isPayLaterEnabled) return;
 
-    this.payLaterView = new discreet.PayLaterView(this);
+    this.payLaterView = new PayLaterView(this);
 
     var providers = [];
 
