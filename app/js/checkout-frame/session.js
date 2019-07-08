@@ -3401,6 +3401,7 @@ Session.prototype = {
     if (
       screen === 'cardless_emi' ||
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
+      (screen === 'paylater') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
@@ -5567,9 +5568,17 @@ Session.prototype = {
     }
 
     if (data.method === 'paylater') {
-      if (data.contact && !data.ott) {
-        this.fetchPayLaterPlans();
-        return;
+      if (data.contact) {
+        if (!data.ott) {
+          this.fetchPayLaterPlans();
+          return;
+        } else {
+          // If contact & ott are available, then this is the final submit() call,
+          // If the contact doesn't start with +91, then make it.
+          if (!(data.contact.match(/^\+91/))) {
+            data.contact = '+91' + data.contact;
+          }
+        }
       }
     }
 
