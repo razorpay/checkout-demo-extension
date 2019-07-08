@@ -26,6 +26,7 @@ var preferences = window.preferences,
   DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
+  UPIUtils = discreet.UPIUtils,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
@@ -1048,6 +1049,7 @@ Session.prototype = {
   },
 
   getDecimalAmount: getDecimalAmount,
+
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
@@ -1087,6 +1089,15 @@ Session.prototype = {
 
   track: function(event, extra) {
     Track(this.r, event, extra);
+  },
+
+  /**
+   * Returns the Payment instance for the current payment.
+   *
+   * @return {Payment}
+   */
+  getPayment: function() {
+    return this.r._payment;
   },
 
   getClasses: function() {
@@ -5354,6 +5365,7 @@ Session.prototype = {
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
+      external: {},
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
@@ -5475,7 +5487,17 @@ Session.prototype = {
       }
 
       if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
-        request.amazonpay = true;
+        request.external.amazonpay = true;
+      }
+    }
+
+    if (data.method === 'upi') {
+      if (
+        this.hasGooglePaySdk &&
+        data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
+      ) {
+        request.external.gpay = true;
+        request['_[flow]'] = 'intent';
       }
     }
 
@@ -5600,9 +5622,9 @@ Session.prototype = {
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
-    if (request.amazonpay) {
-      payment.on('payment.amazonpay.process', function(data) {
-        /* invoke amazonpay sdk via our SDK */
+    if (request.external.amazonpay || request.external.gpay) {
+      payment.on('payment.externalsdk.process', function(data) {
+        /* invoke external sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
           CheckoutBridge.processPayment(JSON.stringify(data));
