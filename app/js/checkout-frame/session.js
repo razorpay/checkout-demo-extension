@@ -1741,7 +1741,9 @@ Session.prototype = {
     var self = this;
     var isPayLaterEnabled = this.methods.paylater && _Obj.length(this.methods.paylater);
 
-    if (!isPayLaterEnabled) return;
+    if (!isPayLaterEnabled) {
+      return;
+    }
 
     this.payLaterView = new PayLaterView(this);
 
