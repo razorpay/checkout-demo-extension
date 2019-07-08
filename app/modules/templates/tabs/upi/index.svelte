@@ -364,10 +364,18 @@
               data.contact = this.refs.omnichannelField.getPhone();
               // data.upi_provider = 'google_pay';
             } else {
-              var session=getSession();
-              var omniSelected=session.upiTab.get().omniSelected;
-              console.log(omniSelected,'omniSelected',session)
+              var omniSelected= this.get().omniSelected;
+              if(omniSelected==='vpa')
+              {
               data.vpa = this.getFullVpa();
+              data['_[flow]'] = 'directpay';
+              }
+              if(omniSelected=='phone')
+              {
+                data['_[flow]'] = 'intent';
+                data.contact = this.refs.omnichannelField.getPhone();
+                data.upi_provider = 'google_pay';
+              }
               // TODO: decide which flow to use if retry
             }
           } else {

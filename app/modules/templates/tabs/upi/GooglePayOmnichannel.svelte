@@ -3,7 +3,7 @@
 </div>
 
 <div id="upi-gpay">
-  <Card checked={checked} radioValue={retry?'phone':null} selected="{true}" on:click="focus()">
+  <Card {checked} radioValue={retry?'phone':null} selected="{true}" on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field
         type="text"
@@ -11,6 +11,7 @@
         id='phone'
         ref:phoneField
         placeholder=""
+        disabled={checked}
         helpText="Please enter a valid phone number"
         required={true}
         formatter={{
@@ -18,7 +19,7 @@
         }}
         maxlength="{10}"
         on:blur
-        on:focus=focusRadio(true)
+        on:focus
     />
     </div>
   </Card>
@@ -69,7 +70,7 @@ export default {
       focusOnCreate: false,
       error: false,
       retry:false,
-      checked:false
+      checked:true
     }
   },
 
@@ -81,10 +82,6 @@ export default {
   },
 
   methods: {
-    focusRadio(c){
-      console.log('focussing')
-      this.checked=c
-    },
     handleCardClick(event) {
       this.refs.phoneField.focus();
     },

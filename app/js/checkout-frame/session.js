@@ -4727,6 +4727,9 @@ Session.prototype = {
     }
   },
   showOmniChannelUi: function(text) {
+    this.upiTab.set({
+      omniSelected: 'vpa',
+    });
     if (this.preferences.features.google_omnichannel) {
       setTimeout(function() {
         $('#error-message .link').html('');
@@ -5177,6 +5180,7 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
+        debugger;
         var formSelector = '#form-upi';
 
         if (data['_[flow]'] === 'intent') {

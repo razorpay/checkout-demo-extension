@@ -3,7 +3,7 @@
 </div>
 
 <div id="upi-gpay">
-  <Card checked={checked} radioValue={retry?'vpa':null} selected="{true}" on:click="handleCardClick(event)">
+  <Card {checked} radioValue={retry?'vpa':null} selected="{true}" on:click="handleCardClick(event)">
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
       <Field
@@ -19,7 +19,7 @@
           type: 'vpa'
         }}
         on:blur
-        on:focus=focusRadio(true)
+        on:focus
       />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
@@ -57,7 +57,7 @@ export default {
   data() {
     return {
       retry:false,
-      checked:true
+      checked:false
     }
   },
 
@@ -69,10 +69,6 @@ export default {
   },
 
   methods: {
-    focusRadio(c){
-      console.log('focussing')
-      this.checked=c
-    },
     handleCardClick(event) {
       const target = event && event.target;
       const { googlePayPspHandle } = this.refs;

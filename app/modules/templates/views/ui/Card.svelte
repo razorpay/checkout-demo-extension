@@ -4,6 +4,7 @@
   <input
     on:change="radioChange(event)"
     {checked}
+    ref:radioInp
     value="{radioValue}"
     type="radio"
     name="isSelected"
@@ -32,11 +33,12 @@
       return {
         selected: false,
         radioValue: null,
-        checked: false,
+        checked: null,
       };
     },
     methods: {
       radioChange(e) {
+        console.log('changed');
         var session = getSession();
         var checked = e.target.checked;
         var val = e.target.value;
