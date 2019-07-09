@@ -5159,7 +5159,7 @@ Session.prototype = {
             PayLaterStore.otpVerified = true;
             PayLaterStore.ott[providerCode] = data.ott;
             PayLaterStore.contact = data.contact;
-            this.switchTab("paylater");
+            this.switchTab('paylater');
             this.submitPayLater();
           }
         }
