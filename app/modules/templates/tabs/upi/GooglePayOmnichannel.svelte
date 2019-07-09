@@ -6,12 +6,11 @@
   <Card selected on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField placeholder=""
-       helpText="Please enter a valid phone number"
-      required={true} formatter={{ type: 'number' }} maxlength="{10}"
-      on:blur="blur()" on:focus="focus()" />
+      helpText="Please enter a valid phone number" required={true} formatter={{
+      type: 'number' }} maxlength="{10}" on:blur="blur()" on:focus="focus()" />
     </div>
-    {#if retry} <input on:change="radioChange(event)" {checked} ref:radioInp
-    value={retry?'phone':null} type="radio" name="isSelected"
+    {#if retry} <input on:change="radioChange(event)" {checked}
+    ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
     style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
     /> {/if}
   </Card>
@@ -83,7 +82,9 @@
       },
       focus() {
         this.refs.phoneField.focus();
-        // this.set({ checked: true });
+        if (this.refs.radioInpPhone) {
+          this.refs.radioInpPhone.checked = true;
+        }
       },
       blur() {
         this.refs.phoneField.blur();

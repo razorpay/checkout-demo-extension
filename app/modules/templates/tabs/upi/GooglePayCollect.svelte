@@ -26,8 +26,8 @@
           <option value="okaxis">okaxis</option>
         </select>
       </div>
-      {#if retry} <input on:change="radioChange(event)" {checked} ref:radioInp
-      value={retry?'vpa':null} type="radio" name="isSelected"
+      {#if retry} <input on:change="radioChange(event)" {checked}
+      ref:radioInpVpa value={retry?'vpa':null} type="radio" name="isSelected"
       style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
       /> {/if}
     </div>
@@ -79,7 +79,7 @@
         this.focus();
         var session = getSession();
         // if (session.upiTab.get().omniSelected === 'vpa') {
-          this.fire('handleChange', event.target.value);
+        this.fire('handleChange', event.target.value);
         // }
       },
       getVpa() {
@@ -88,7 +88,9 @@
       },
       focus() {
         this.refs.vpaField.focus();
-        // this.set({ checked: true });
+        if (this.refs.radioInpVpa) {
+          this.refs.radioInpVpa.checked = true;
+        }
       },
       blur() {
         this.refs.vpaField.blur();
