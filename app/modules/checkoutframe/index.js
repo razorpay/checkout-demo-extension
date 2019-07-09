@@ -78,7 +78,7 @@ const optionsTransformer = {
         Analytics.track('externalsdk:googlepay:reported');
       }
       if (amazonpay) {
-        Analytics.track('externalsdk:googlepay:reported');
+        Analytics.track('externalsdk:amazonpay:reported');
       }
     }
   },
