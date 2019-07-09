@@ -1,6 +1,6 @@
 <div ref:card class:theme-border="selected" on:click="fire('click', event)">
   <slot></slot>
-  {#if radioValue}
+  <!-- {#if radioValue}
   <input
     on:change="radioChange(event)"
     {checked}
@@ -10,7 +10,7 @@
     name="isSelected"
     style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
   />
-  {/if}
+  {/if} -->
 </div>
 
 <style>
@@ -27,7 +27,6 @@
 </style>
 
 <script>
-  import { getSession } from 'sessionmanager.js';
   export default {
     data() {
       return {
@@ -37,15 +36,6 @@
       };
     },
     methods: {
-      radioChange(e) {
-        console.log('changed');
-        var session = getSession();
-        var checked = e.target.checked;
-        var val = e.target.value;
-        session.upiTab.set({
-          omniSelected: val,
-        });
-      },
     },
   };
 </script>

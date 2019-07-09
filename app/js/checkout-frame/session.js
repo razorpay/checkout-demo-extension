@@ -4728,7 +4728,7 @@ Session.prototype = {
   },
   showOmniChannelUi: function(text) {
     this.upiTab.set({
-      omniSelected: 'vpa',
+      omniSelected: 'phone',
     });
     if (this.preferences.features.google_omnichannel) {
       setTimeout(function() {
@@ -5000,6 +5000,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    // debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5180,7 +5181,6 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        debugger;
         var formSelector = '#form-upi';
 
         if (data['_[flow]'] === 'intent') {

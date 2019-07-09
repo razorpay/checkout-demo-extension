@@ -3,36 +3,29 @@
 </div>
 
 <div id="upi-gpay">
-  <Card {checked} radioValue={retry?'phone':null} selected="{true}" on:click="focus()">
+  <Card selected on:click="focus()">
     <div class="elem-wrap collect-form">
-      <Field
-        type="text"
-        name="phone"
-        id='phone'
-        ref:phoneField
-        placeholder=""
-        disabled={checked}
-        helpText="Please enter a valid phone number"
-        required={true}
-        formatter={{
-          type: 'number'
-        }}
-        maxlength="{10}"
-        on:blur
-        on:focus
-    />
+      <Field type="text" name="phone" id='phone' ref:phoneField placeholder=""
+      helpText="Please enter a valid phone number" required={true} formatter={{
+      type: 'number' }} maxlength="{10}" on:blur="blur()" on:focus="focus()" />
     </div>
+    {#if retry} <input on:change="radioChange(event)" {checked} ref:radioInp
+    value={retry?'phone':null} type="radio" name="isSelected"
+    style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
+    /> {/if}
   </Card>
 </div>
 
-{#if error}
-  <p class="error">
-    Please ensure the same number is linked to the Google Pay account.
-  </p>
+{#if (isFocussed)}
+ {#if (error)}
+<p class="error">
+  Please ensure the same number is linked to the Google Pay account.
+</p>
 {:else}
-  <p class="info">
-    You will receive a notification from Razorpay, in the Google Pay app.
-  </p>
+<p class="info">
+  You will receive a notification from Razorpay, in the Google Pay app.
+</p>
+{/if}
 {/if}
 
 <style>
@@ -54,49 +47,60 @@
     margin-top: 18px;
     color: red;
   }
-
 </style>
 
 <script>
+  import { getSession } from 'sessionmanager.js';
 
-export default {
-  components: {
-    Field: 'templates/views/ui/Field.svelte',
-    Card: 'templates/views/ui/Card.svelte',
-  },
-
-  data() {
-    return {
-      focusOnCreate: false,
-      error: false,
-      retry:false,
-      checked:true
-    }
-  },
-
-  oncreate() {
-    const { focusOnCreate } = this.get();
-    if (focusOnCreate) {
-      this.focus();
-    }
-  },
-
-  methods: {
-    handleCardClick(event) {
-      this.refs.phoneField.focus();
+  export default {
+    components: {
+      Field: 'templates/views/ui/Field.svelte',
+      Card: 'templates/views/ui/Card.svelte',
     },
-    getPhone() {
-      return this.refs.phoneField.getValue();
-    },
-    focus() {
-      this.refs.phoneField.focus();
-    },
-    blur() {
-      this.refs.phoneField.blur();
-    }
-  },
 
-}
+    data() {
+      return {
+        focusOnCreate: false,
+        error: false,
+        selected: true,
+        isFocussed: true,
+        retry: false,
+        checked: true,
+      };
+    },
 
+    oncreate() {
+      const { focusOnCreate } = this.get();
+      if (focusOnCreate) {
+        this.focus();
+      }
+    },
+
+    methods: {
+      handleCardClick(event) {
+        this.refs.phoneField.focus();
+      },
+      getPhone() {
+        return this.refs.phoneField.getValue();
+      },
+      focus() {
+        this.refs.phoneField.focus();
+        this.set({ isFocussed: true });
+      },
+      blur() {
+        this.refs.phoneField.blur();
+        this.set({ isFocussed: false });
+      },
+      radioChange(e) {
+        var session = getSession();
+        var checked = e.target.checked;
+        this.set({ checked: checked });
+        // console.log('changed', this.checked);
+        var val = e.target.value;
+        session.upiTab.set({
+          omniSelected: val,
+        });
+      },
+    },
+  };
 </script>
-
