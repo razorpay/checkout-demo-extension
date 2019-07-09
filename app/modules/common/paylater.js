@@ -22,8 +22,7 @@ export const createProvider = (code, title) => ({
   data: {
     code,
   },
-  // icon: 'https://cdn.razorpay.com/paylater-sq/' + code + '.svg',
-  icon: 'https://www.epaylater.in/assets/LogoWithCircle.svg', // TODO: upload logo on cdn
+  icon: 'https://cdn.razorpay.com/paylater-sq/' + code + '.svg',
   title,
 });
 
