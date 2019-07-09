@@ -77,7 +77,10 @@
       },
       handlePspChange(event) {
         this.focus();
-        this.fire('handleChange', event.target.value);
+        var session = getSession();
+        // if (session.upiTab.get().omniSelected === 'vpa') {
+          this.fire('handleChange', event.target.value);
+        // }
       },
       getVpa() {
         const { pspHandle } = this.get();
@@ -94,7 +97,6 @@
         var session = getSession();
         var checked = e.target.checked;
         this.set({ checked: checked });
-        // console.log('changed', this.checked);
         var val = e.target.value;
         session.upiTab.set({
           omniSelected: val,

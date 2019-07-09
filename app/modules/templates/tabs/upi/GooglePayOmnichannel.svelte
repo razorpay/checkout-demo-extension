@@ -6,8 +6,9 @@
   <Card selected on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField placeholder=""
-      helpText="Please enter a valid phone number" required={true} formatter={{
-      type: 'number' }} maxlength="{10}" on:blur="blur()" on:focus="focus()" />
+       helpText="Please enter a valid phone number"
+      required={true} formatter={{ type: 'number' }} maxlength="{10}"
+      on:blur="blur()" on:focus="focus()" />
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked} ref:radioInp
     value={retry?'phone':null} type="radio" name="isSelected"
@@ -16,8 +17,7 @@
   </Card>
 </div>
 
-{#if (isFocussed)}
- {#if (error)}
+{#if error}
 <p class="error">
   Please ensure the same number is linked to the Google Pay account.
 </p>
@@ -25,7 +25,6 @@
 <p class="info">
   You will receive a notification from Razorpay, in the Google Pay app.
 </p>
-{/if}
 {/if}
 
 <style>
@@ -63,7 +62,6 @@
         focusOnCreate: false,
         error: false,
         selected: true,
-        isFocussed: true,
         retry: false,
         checked: true,
       };
@@ -85,17 +83,15 @@
       },
       focus() {
         this.refs.phoneField.focus();
-        this.set({ isFocussed: true });
+        // this.set({ checked: true });
       },
       blur() {
         this.refs.phoneField.blur();
-        this.set({ isFocussed: false });
       },
       radioChange(e) {
         var session = getSession();
         var checked = e.target.checked;
         this.set({ checked: checked });
-        // console.log('changed', this.checked);
         var val = e.target.value;
         session.upiTab.set({
           omniSelected: val,
