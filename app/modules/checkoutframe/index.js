@@ -71,8 +71,15 @@ const optionsTransformer = {
 
   addExternalSdks: (o, message) => {
     if (_.isNonNullObject(message.external_sdks)) {
-      o.hasAmazonpaySdk = message.external_sdks.amazonpay;
-      o.hasGooglePaySdk = message.external_sdks.googlepay;
+      const { googlepay, amazonpay } = message.external_sdks;
+      o.hasAmazonpaySdk = amazonpay;
+      o.hasGooglePaySdk = googlepay;
+      if (googlepay) {
+        Analytics.track('externalsdk:googlepay:reported');
+      }
+      if (amazonpay) {
+        Analytics.track('externalsdk:googlepay:reported');
+      }
     }
   },
 
