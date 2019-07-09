@@ -1727,14 +1727,14 @@ Session.prototype = {
       },
     });
 
-    $('#form-paylater input[name=provider]').val('');
     $('#form-paylater input[name=ott]').val('');
-
-    PayLaterStore.providerCode = providerCode;
-
     $('#form-paylater input[name=provider]').val(providerCode);
 
-    this.preSubmit(); // TODO: do you need this?
+    PayLaterStore.providerCode = providerCode;
+    PayLaterStore.userRegistered = false;
+    PayLaterStore.otpVerified = false;
+
+    this.preSubmit();
   },
 
   setPayLater: function() {
@@ -1954,10 +1954,110 @@ Session.prototype = {
     });
   },
 
-  showPayLaterPlans: function() {
-    var self = this;
-    var providerCode = PayLaterStore.providerCode;
+  checkCustomerStatus: function (params, callback) {
+    var provider = params.provider;
+    var data = params.data;
+    var phone = params.contact;
 
+    this.customer.checkStatus(function (response) {
+      if (_Obj.hasOwnProp(response, 'saved')) {
+        if (response.saved) {
+          callback();
+        } else {
+          var error =
+            'Could not find a ' +
+            provider +
+            ' account associated with ' +
+            phone;
+
+          callback(error);
+        }
+        return;
+      }
+
+      if (response.error && response.error.description) {
+        callback(response.error.description);
+        return;
+      }
+
+      callback('Something went wrong.');
+    }, data, phone);
+  },
+
+  askPayLaterOtp: function (action) {
+    var providerCode = PayLaterStore.providerCode;
+    var payLaterProviderObj = PayLater.getProvider(providerCode);
+    var self = this;
+
+    var topbarImages = createPayLaterTopbarImages(providerCode);
+    if (tab_titles.otp !== topbarImages) {
+      tab_titles.otp = topbarImages;
+    }
+
+    var params = {
+      provider: payLaterProviderObj.name,
+      data: {
+        provider: providerCode,
+        amount: self.get('amount'),
+        method: 'paylater'
+      },
+      contact: getPhone()
+    };
+
+    if (action === 'incorrect') {
+      debugger;
+      self.otpView.setText(discreet.wrongOtpMsg);
+      return;
+    } else if (action === 'resend') {
+      this.commenceOTP('Resending OTP...');
+    } else if (action === 'verify') {
+      this.commenceOTP('Verifying OTP...');
+    } else {
+      this.commenceOTP(payLaterProviderObj.name + ' account', true);
+    }
+
+    this.checkCustomerStatus(params, function(error) {
+      if (error) {
+        PayLaterStore.userRegistered = false;
+        self.showLoadError(error, true);
+        return;
+      }
+
+      PayLaterStore.userRegistered = true;
+
+      var otpMessage =
+        'Enter the OTP sent on ' +
+        getPhone() +
+        '<br>' +
+        ' to continue with ' +
+        payLaterProviderObj.name;
+
+      if (action === 'resend') {
+        otpMessage = 'OTP has been resent successfully.';
+      }
+
+      askOTP(self.otpView, otpMessage, true);
+      self.otpView.updateScreen({
+        allowSkip: false
+      });
+    });
+
+  },
+
+  submitPayLater: function() {
+    // Step 1: Check if user is registered on the given provider.
+    if (!PayLaterStore.userRegistered) {
+      this.askPayLaterOtp();
+      return;
+    }
+
+    // Step 2: Ask for OTP
+    if (!PayLaterStore.otpVerified) {
+      this.askPayLaterOtp('verify');
+      return;
+    }
+
+    // Step 3: Set ProviderCode & OTT in the form
     $('#form-paylater input[name=provider]').val(
       PayLaterStore.providerCode
     );
@@ -1965,80 +2065,8 @@ Session.prototype = {
       PayLaterStore.ott[PayLaterStore.providerCode]
     );
 
-    Analytics.track('paylater:provider:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        provider: providerCode
-      },
-    });
-
-    self.preSubmit();
-  },
-
-  fetchPayLaterPlans: function(params) {
-    if (!params) {
-      params = {};
-    }
-
-    var providerCode = PayLaterStore.providerCode;
-    var payLaterProviderObj = PayLater.getProvider(providerCode);
-    var self = this;
-
-    var topbarImages = createPayLaterTopbarImages(providerCode);
-    tab_titles.otp = topbarImages;
-
-    this.commenceOTP(payLaterProviderObj.name + ' account', true);
-    this.customer.checkStatus(
-      function(response) {
-        if (self.screen !== 'otp' && self.tab !== 'paylater') {
-          return;
-        }
-
-        if (response.error || !response.saved) {
-          Analytics.track('paylater:status:error', {
-            data: {
-              provider: providerCode,
-            },
-          });
-        }
-
-        if (response.error && response.error.description) {
-          self.showLoadError(response.error.description, true);
-          return;
-        }
-
-        // TODO: Remove this condition if event is not being fired.
-        if (!response.saved) {
-          var errorDesc =
-            'Could not find a ' +
-            payLaterProviderObj.name +
-            ' account associated with ' +
-            getPhone();
-
-          self.showLoadError(errorDesc, true);
-          return;
-        }
-
-        var otpMessage =
-          'Enter the OTP sent on ' +
-          getPhone() +
-          '<br>' +
-          ' to continue with ' +
-          payLaterProviderObj.name;
-
-        askOTP(self.otpView, otpMessage, true);
-
-        self.otpView.updateScreen({
-          allowSkip: false,
-        });
-      },
-      {
-        provider: providerCode,
-        amount: self.get('amount'),
-        method: 'paylater'
-      },
-      getPhone()
-    );
+    // Step 4: Submit
+    this.preSubmit();
   },
 
   setOtpScreen: function() {
@@ -2356,6 +2384,8 @@ Session.prototype = {
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'cardless_emi') {
       this.fetchCardlessEmiPlans();
+    } else if (this.tab === 'paylater') {
+      this.askPayLaterOtp('resend');
     } else if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
@@ -5120,15 +5150,21 @@ Session.prototype = {
       };
 
       callback = function(msg, data) {
+        this.otpView.updateScreen({ loading: false });
+        $('#body').addClass('sub');
         if (msg) {
-          this.fetchPayLaterPlans();
+          this.askPayLaterOtp('incorrect');
         } else {
-          PayLaterStore.ott[providerCode] = data.ott;
-          PayLaterStore.contact = data.contact;
-          this.switchTab('paylater');
-          this.showPayLaterPlans();
+          if (data.ott) {
+            PayLaterStore.otpVerified = true;
+            PayLaterStore.ott[providerCode] = data.ott;
+            PayLaterStore.contact = data.contact;
+            this.switchTab("paylater");
+            this.submitPayLater();
+          }
         }
       };
+      this.commenceOTP('Verifying OTP...');
     }
 
     this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
@@ -5556,14 +5592,13 @@ Session.prototype = {
     if (data.method === 'paylater') {
       if (data.contact) {
         if (!data.ott) {
-          this.fetchPayLaterPlans();
+          this.submitPayLater();
           return;
-        } else {
-          // If contact & ott are available, then this is the final submit() call,
-          // If the contact doesn't start with +91, then make it.
-          if (!(data.contact.match(/^\+91/))) {
-            data.contact = '+91' + data.contact;
-          }
+        }
+        // If contact & ott are available, then this is the final submit() call,
+        // If the contact doesn't start with +91, then make it.
+        if (!(data.contact.match(/^\+91/))) {
+          data.contact = "+91" + data.contact;
         }
       }
     }
