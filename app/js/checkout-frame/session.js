@@ -2005,7 +2005,6 @@ Session.prototype = {
     };
 
     if (action === 'incorrect') {
-      debugger;
       self.otpView.setText(discreet.wrongOtpMsg);
       return;
     } else if (action === 'resend') {
