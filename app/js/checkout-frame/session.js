@@ -4983,9 +4983,9 @@ Session.prototype = {
 
     if (text) {
       if (partial) {
-        text = 'Looking for ' + text + ' associated with ';
+        text = 'Looking for ' + text + ' associated with ' + getPhone();
       }
-      this.showLoadError(text + getPhone());
+      this.showLoadError(text);
     }
   },
 
