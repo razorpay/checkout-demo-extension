@@ -6541,9 +6541,6 @@ Session.prototype = {
 
       var preferences = response;
 
-      // TODO: Remove hardcoded method override
-      // preferences.methods.paylater = { epaylater: true };
-
       var validation = self.setPreferences(preferences);
 
       /* pass preferences options to SDK */
