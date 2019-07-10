@@ -1,4 +1,5 @@
 import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
+import { getProvider as getPayLaterProvider } from 'common/paylater';
 
 /**
  * Returns the text with commas or "and" as the separator.
@@ -78,6 +79,24 @@ const DESCRIPTIONS = {
   emandate: () => 'Pay with Netbanking',
   emi: () => 'EMI via Credit & Debit Cards',
   netbanking: () => 'All Indian banks',
+  paylater: ({ session }) => {
+    const providers = [];
+    const paylaterProviders = session.methods.paylater;
+
+    if (paylaterProviders && _.isNonNullObject(paylaterProviders)) {
+      _Obj.loop(paylaterProviders, (_, code) => {
+        const paylaterProviderObj = getPayLaterProvider(code);
+
+        if (paylaterProviderObj) {
+          providers.push(paylaterProviderObj.name);
+        }
+      });
+    }
+
+    const text = generateTextFromList(providers, 2);
+
+    return `Pay later using ${text}`;
+  },
   qr: () => 'Pay by scanning QR Code',
   gpay: () => 'Instant payment using Google Pay App',
   upi: () => 'Instant payment using UPI App',
@@ -132,6 +151,9 @@ function getMethodPrefix(method) {
     case 'emi':
     case 'cardless_emi':
       return 'EMI';
+
+    case 'paylater':
+      return 'PayLater';
 
     case 'qr':
       return 'QR';
