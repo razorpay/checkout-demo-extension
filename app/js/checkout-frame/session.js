@@ -6126,9 +6126,10 @@ Session.prototype = {
      * Disable PayLater if either:
      * - Empty array
      * - Contact is optional
+     * TODO: Allow this for prefill and logged in users.
      */
     if (_Obj.isEmpty(methods.paylater) || getStore('optional').contact) {
-      methods.paylater = null;
+     methods.paylater = null;
     }
 
     /**
