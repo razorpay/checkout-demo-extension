@@ -75,10 +75,14 @@ const optionsTransformer = {
       o.hasAmazonpaySdk = amazonpay;
       o.hasGooglePaySdk = googlepay;
       if (googlepay) {
-        Analytics.track('externalsdk:googlepay:reported');
+        Analytics.track('externalsdk:reported', {
+          provider: 'googlepay',
+        });
       }
       if (amazonpay) {
-        Analytics.track('externalsdk:googlepay:reported');
+        Analytics.track('externalsdk:reported', {
+          provider: 'amazonpay',
+        });
       }
     }
   },
