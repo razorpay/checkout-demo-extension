@@ -5,12 +5,14 @@
 <div id="upi-gpay">
   <Card selected on:click="focus()">
     <div class="elem-wrap collect-form">
-      <Field type="text" name="phone" id='phone' ref:phoneField placeholder="Enter Mobile Number"
-      helpText="Please enter a valid phone number" required={true} formatter={{
-      type: 'number' }} maxlength="{10}" on:blur="blur()" on:focus="focus()" />
+      <Field type="text" name="phone" id='phone' ref:phoneField
+      placeholder="Enter Mobile Number" helpText="Please enter a valid phone
+      number" required={true} formatter={{ type: 'number' }} maxlength="{10}"
+      on:blur="blur()" on:focus="focus()" />
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked}
-    ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
+    ref:radioInpPhone value={retry?'phone':null} type="radio"
+    on:blur="radioBlur()" name="isSelected"
     style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
     /> {/if}
   </Card>
@@ -94,6 +96,9 @@
       },
       blur() {
         this.refs.phoneField.blur();
+      },
+      radioBlur() {
+        console.log('blurred');
       },
       radioChange(e) {
         var session = getSession();
