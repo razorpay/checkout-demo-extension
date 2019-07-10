@@ -23,9 +23,5 @@ PayLaterView.prototype = {
     } else {
       this.view.set(data);
     }
-  },
-
-  submit: function() {
-    this.onSelect(this.selectedPlan);
   }
 };
