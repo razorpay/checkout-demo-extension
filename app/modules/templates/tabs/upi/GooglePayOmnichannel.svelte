@@ -5,7 +5,7 @@
 <div id="upi-gpay">
   <Card selected on:click="focus()">
     <div class="elem-wrap collect-form">
-      <Field type="text" name="phone" id='phone' ref:phoneField placeholder=""
+      <Field type="text" name="phone" id='phone' ref:phoneField placeholder="Enter Mobile Number"
       helpText="Please enter a valid phone number" required={true} formatter={{
       type: 'number' }} maxlength="{10}" on:blur="blur()" on:focus="focus()" />
     </div>
@@ -84,6 +84,12 @@
         this.refs.phoneField.focus();
         if (this.refs.radioInpPhone) {
           this.refs.radioInpPhone.checked = true;
+          this.radioChange({
+            target: {
+              checked: true,
+              value: 'phone',
+            },
+          });
         }
       },
       blur() {

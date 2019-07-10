@@ -90,6 +90,12 @@
         this.refs.vpaField.focus();
         if (this.refs.radioInpVpa) {
           this.refs.radioInpVpa.checked = true;
+          this.radioChange({
+            target: {
+              checked: true,
+              value: 'vpa',
+            },
+          });
         }
       },
       blur() {

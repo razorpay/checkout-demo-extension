@@ -1,16 +1,5 @@
 <div ref:card class:theme-border="selected" on:click="fire('click', event)">
   <slot></slot>
-  <!-- {#if radioValue}
-  <input
-    on:change="radioChange(event)"
-    {checked}
-    ref:radioInp
-    value="{radioValue}"
-    type="radio"
-    name="isSelected"
-    style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
-  />
-  {/if} -->
 </div>
 
 <style>
