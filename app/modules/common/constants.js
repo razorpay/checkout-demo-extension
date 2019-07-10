@@ -56,7 +56,7 @@ export const TAB_TITLES = {
   emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
   paylater: 'Pay Later',
-  qr: 'QR',
+  qr: 'UPI QR',
   upi: 'UPI',
   gpay: 'Google Pay',
   wallet: 'Wallet',

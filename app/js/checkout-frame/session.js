@@ -26,10 +26,12 @@ var preferences = window.preferences,
   DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
+  UPIUtils = discreet.UPIUtils,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _Doc = discreet._Doc,
   _El = discreet._El,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi,
@@ -338,13 +340,40 @@ function setEmiPlansCta(screen, tab) {
 /**
  * Get the saved card elemnnt that should be selected
  * when the saved cards screen is shown.
+ * @param {string} tab
+ * @param {string} token
+ *
+ * @returns {Element}
  */
-function getSelectableSavedCardElement(tab) {
-  if (tab === 'emi') {
-    return qs('.saved-card.checked[emi]') || qs('.saved-card[emi]');
-  } else {
-    return qs('.saved-card.checked') || qs('.saved-card');
+function getSelectableSavedCardElement(tab, token) {
+  var selectors = {
+    checked: '.saved-card.checked',
+    saved: '.saved-card',
+    token: '.saved-card',
+  };
+
+  // Add token to selectors
+  if (token) {
+    selectors.token += '[token="' + token + '"]';
   }
+
+  var emiSelector = tab === 'emi' ? '[emi]' : '';
+
+  // Add EMI selector to selectors
+  selectors = _Obj.map(selectors, function(value) {
+    return value + emiSelector;
+  });
+
+  var validSelector = _Arr.find(
+    [selectors.checked, selectors.token, selectors.saved],
+    function(selector) {
+      return qs(selector);
+    }
+  );
+
+  var elem = qs(validSelector);
+
+  return elem;
 }
 
 /**
@@ -861,6 +890,16 @@ function askOTP(view, text, shouldLimitResend) {
   var thisSession = SessionManager.getSession();
   var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
 
+  // Track if OTP was invalid
+  if (origText === discreet.wrongOtpMsg) {
+    Analytics.track('otp:invalid', {
+      data: {
+        wallet: thisSession.tab === 'wallet',
+        headless: thisSession.headless,
+      },
+    });
+  }
+
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
       window.OTPElf.showOTP = elfShowOTP;
@@ -1031,6 +1070,7 @@ Session.prototype = {
   },
 
   getDecimalAmount: getDecimalAmount,
+
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
@@ -1070,6 +1110,15 @@ Session.prototype = {
 
   track: function(event, extra) {
     Track(this.r, event, extra);
+  },
+
+  /**
+   * Returns the Payment instance for the current payment.
+   *
+   * @return {Payment}
+   */
+  getPayment: function() {
+    return this.r._payment;
   },
 
   getClasses: function() {
@@ -1112,7 +1161,11 @@ Session.prototype = {
     }
 
     if (getStore('contactEmailOptional')) {
-      classes.push('no-details');
+      if (this.tpvBank) {
+        classes.push('tpv-no-details');
+      } else {
+        classes.push('no-details');
+      }
     }
 
     if (this.irctc) {
@@ -2453,8 +2506,9 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    var commonInvalid = $('#pad-common .invalid');
-    if (commonInvalid[0]) {
+    if (!this.checkCommonValidAndTrackIfInvalid()) {
+      var commonInvalid = $('#pad-common .invalid');
+
       return commonInvalid
         .addClass('mature')
         .$('.input')
@@ -3241,7 +3295,9 @@ Session.prototype = {
           var instruments = [];
           self.input(this.el);
 
-          if (this.isValid()) {
+          var shouldUseP13n = self.p13n;
+
+          if (this.isValid() && shouldUseP13n) {
             instruments =
               P13n.listInstruments(self.getCustomer(this.value)) || [];
 
@@ -3726,7 +3782,7 @@ Session.prototype = {
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
-          tab = '';
+          tab = 'upi';
         } else {
           tab = thisTab;
         }
@@ -3821,10 +3877,49 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Checks if the fields on the homepage are valid or not.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValid: function() {
+    var valid = !this.checkInvalid('#pad-common');
+
+    return valid;
+  },
+
+  /**
+   * Checks if fields are invalid.
+   * And if they are invalid, tracks them.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValidAndTrackIfInvalid: function() {
+    var valid = this.checkCommonValid();
+
+    if (!valid) {
+      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+
+      var invalidFields = {};
+
+      _Arr.loop(fields, function(field) {
+        invalidFields[field.name] = true;
+      });
+
+      Analytics.track('homescreen:fields:invalid', {
+        data: {
+          fields: invalidFields,
+        },
+      });
+    }
+
+    return valid;
+  },
+
   switchTab: function(tab) {
     // initial screen
     if (!this.tab) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
         }
@@ -3993,6 +4088,8 @@ Session.prototype = {
   },
 
   setSavedCard: function(e) {
+    // TODO: Return from here if we are selecting the same selected card
+
     var $savedCard = $(e.delegateTarget);
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
@@ -4004,6 +4101,8 @@ Session.prototype = {
 
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
+
+    this.selectedSavedCardToken = $savedCard.attr('token');
 
     if (this.offers && !this.offers.offerSelectedByDrawer) {
       this.offers.removeOffer();
@@ -4481,7 +4580,10 @@ Session.prototype = {
       }
     }
 
-    var selectableSavedCard = getSelectableSavedCardElement(this.tab);
+    var selectableSavedCard = getSelectableSavedCardElement(
+      this.tab,
+      this.selectedSavedCardToken
+    );
     if (tokens && selectableSavedCard) {
       this.setSavedCard({ delegateTarget: selectableSavedCard });
     }
@@ -4538,7 +4640,10 @@ Session.prototype = {
 
     if (saveScreen) {
       this.setSavedCard({
-        delegateTarget: getSelectableSavedCardElement(this.tab),
+        delegateTarget: getSelectableSavedCardElement(
+          this.tab,
+          this.selectedSavedCardToken
+        ),
       });
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
@@ -4879,7 +4984,7 @@ Session.prototype = {
         }
       }
 
-      if (this.screen === 'upi') {
+      if (this.screen === 'upi' && this.tab !== 'qr') {
         /* All tabs should be responsible for their subdata */
         var upiData = this.upiTab.getPayload();
 
@@ -5253,7 +5358,7 @@ Session.prototype = {
     }
 
     if (!this.recurring && this.order && this.order.bank) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
@@ -5403,7 +5508,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (this.p13n) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
 
@@ -5482,6 +5587,7 @@ Session.prototype = {
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
+      external: {},
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
@@ -5617,7 +5723,17 @@ Session.prototype = {
       }
 
       if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
-        request.amazonpay = true;
+        request.external.amazonpay = true;
+      }
+    }
+
+    if (data.method === 'upi') {
+      if (
+        this.hasGooglePaySdk &&
+        data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
+      ) {
+        request.external.gpay = true;
+        request['_[flow]'] = 'intent';
       }
     }
 
@@ -5742,9 +5858,9 @@ Session.prototype = {
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
-    if (request.amazonpay) {
-      payment.on('payment.amazonpay.process', function(data) {
-        /* invoke amazonpay sdk via our SDK */
+    if (request.external.amazonpay || request.external.gpay) {
+      payment.on('payment.externalsdk.process', function(data) {
+        /* invoke external sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
           CheckoutBridge.processPayment(JSON.stringify(data));
@@ -6189,8 +6305,14 @@ Session.prototype = {
     if (methods.upi) {
       methods.count++;
       if (qrEnabled) {
-        methods.count++;
         methods.qr = true;
+
+        /**
+         * Do not increase the count since we don't
+         * want to show QR in intial list of
+         * payment options anymore.
+         */
+        // methods.count++;
       }
 
       if (this.separateGPay) {
@@ -6324,8 +6446,6 @@ Session.prototype = {
 
     this.tab_titles = tab_titles;
 
-    this.setEmiOptions();
-
     var self = this,
       customer,
       saved_customer = preferences.customer,
@@ -6429,6 +6549,9 @@ Session.prototype = {
     if (itemWithCurrency) {
       session_options.currency = itemWithCurrency.currency;
     }
+
+    // Amount and currency have been updated, set EMI options
+    this.setEmiOptions();
 
     /*
      * Set redirect mode if TPV and callback_url exists

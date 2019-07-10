@@ -156,7 +156,7 @@ function getMethodPrefix(method) {
       return 'PayLater';
 
     case 'qr':
-      return 'QR';
+      return 'UPI QR';
 
     case 'upi':
       return 'UPI';
@@ -169,6 +169,29 @@ function getMethodPrefix(method) {
 
     default:
       return method[0].toUpperCase() + method.slice(1);
+  }
+}
+
+/**
+ * Returns the name for the payment method.
+ * Used for showing the name with payment icon
+ * @param {string} method
+ * @param {Object} extra
+ *  @prop {Session} session
+ *
+ * @returns {string}
+ */
+export function getMethodNameForPaymentOption(method, { session }) {
+  switch (method) {
+    case 'upi':
+      if (session.methods.qr) {
+        return 'UPI / QR';
+      }
+
+      return session.tab_titles.upi;
+
+    default:
+      return session.tab_titles[method];
   }
 }
 

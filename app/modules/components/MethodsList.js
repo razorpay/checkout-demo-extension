@@ -33,6 +33,12 @@ const getAvailableMethods = methods => {
     AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'emi');
   }
 
+  /**
+   * We do not want to show QR in the primary list
+   * of payment options anymore
+   */
+  AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'qr');
+
   return AVAIL_METHODS;
 };
 
@@ -130,6 +136,11 @@ export default class MethodsList {
     }
 
     data = _Obj.clone(data);
+
+    /**
+     * This count is also being sent with the
+     * p13n:instruments:list event.
+     */
     let noOfInstruments = 2;
     if (isMobile) {
       noOfInstruments = 3;

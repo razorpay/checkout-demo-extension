@@ -10,7 +10,7 @@ class TestBase {
     const page = await browser.newPage();
     await page.goto(apiUrl + '../static/index.html');
 
-    let p = new this(page);
+    let p = new this(page, message);
 
     await page.exposeFunction('__pptr_oncomplete', data => {
       if (!p.currentAttempt) {
@@ -85,8 +85,9 @@ class TestBase {
     this.log(chalk.green(message));
   }
 
-  constructor(page) {
+  constructor(page, message) {
     this.page = page;
+    this.message = message;
     this.id = visits++;
     TestBase.allTests[this.id] = this;
     this.apiUrl = `${apiUrl}${this.id}/`;
