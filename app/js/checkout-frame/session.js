@@ -6123,6 +6123,15 @@ Session.prototype = {
     this.set('method.cardless_emi', methods.cardless_emi);
 
     /**
+     * Disable PayLater if either:
+     * - Empty array
+     * - Contact is optional
+     */
+    if (_Obj.isEmpty(methods.paylater) || getStore('optional').contact) {
+      methods.paylater = null;
+    }
+
+    /**
      * disable wallets if:
      * - amount > 20k
      * - Wallets not enabled by backend
