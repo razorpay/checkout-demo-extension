@@ -208,6 +208,10 @@ export default function Payment(data, params = {}, r) {
         avoidPopup = true;
       }
 
+      if (data.method === 'paylater') {
+        avoidPopup = true;
+      }
+
       /* If fees is there, we need to show fee view in poupup */
       if (params.feesRedirect) {
         avoidPopup = false;
