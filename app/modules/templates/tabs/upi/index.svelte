@@ -384,7 +384,6 @@
               '_[flow]': 'gpay',
             };
           } else if (useOmnichannel && selectedApp === 'gpay') {
-            debugger;
             if (!retryOmnichannel) {
               data['_[flow]'] = 'intent';
               data.contact = this.refs.omnichannelField.getPhone();
@@ -392,8 +391,8 @@
               var omniSelected= this.get().omniSelected;
               if(omniSelected==='vpa')
               {
-              data.vpa = this.getFullVpa();
               data['_[flow]'] = 'directpay';
+              data.vpa = this.getFullVpa();
               }
               if(omniSelected=='phone')
               {

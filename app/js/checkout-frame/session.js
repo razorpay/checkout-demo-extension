@@ -5000,7 +5000,6 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    // debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
