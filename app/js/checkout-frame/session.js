@@ -6099,6 +6099,7 @@ Session.prototype = {
 
   setPreferences: function(prefs) {
     // TODO: remove mock.. only for testing
+    prefs.features = {};
     prefs.features.google_omnichannel = true;
     //
     PreferencesStore.set(prefs);

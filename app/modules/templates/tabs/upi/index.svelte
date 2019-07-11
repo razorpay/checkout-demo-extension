@@ -350,6 +350,7 @@
         }
       },
       getPayload() {
+        debugger;
         const {
           selectedApp,
           intent,
