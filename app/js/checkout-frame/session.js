@@ -4602,6 +4602,9 @@ Session.prototype = {
   },
   retryOmniChannel: function(response) {
     hideOverlayMessage();
+    errorHandler.call(this, {
+      error: 'Error!',
+    });
   },
   getFormData: function() {
     var tab = this.tab;

@@ -350,7 +350,6 @@
         }
       },
       getPayload() {
-        debugger;
         const {
           selectedApp,
           intent,
@@ -388,7 +387,8 @@
             if (!retryOmnichannel) {
               data['_[flow]'] = 'intent';
               data.contact = this.refs.omnichannelField.getPhone();
-            } else {
+              data.upi_provider = 'google_pay';
+               } else {
               var omniSelected= this.get().omniSelected;
               if(omniSelected==='vpa')
               {

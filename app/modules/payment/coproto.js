@@ -56,7 +56,7 @@ export const processCoproto = function(response) {
       this.popup.writable = 1;
     }
 
-    // response.type = 'respawn';
+    response.type = 'respawn';
     // for testing
     var func = responseTypes[response.type];
     var isFunction = _.isFunction(func);
