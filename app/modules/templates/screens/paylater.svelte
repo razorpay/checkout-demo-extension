@@ -5,6 +5,7 @@
   <div class="options">
     {#each providers as provider}
       <NextOption
+        classes={[ provider.data.code ]}
         {...provider}
 
         on:select="select(event)"

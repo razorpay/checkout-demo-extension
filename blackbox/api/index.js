@@ -102,6 +102,8 @@ const routes = [
   ['post', 'payments/:payment_id/otp_submit', wait],
   ['post', 'payments/validate/account', validateAccount],
   ['get', 'gateway/mocksharp/:payment_id', withNext(waitHtml)],
+  ['get', 'customers/status/:contact', wait],
+  ['post', 'otp/verify', wait],
 ];
 
 const prefix = '/api/:visit/v1/';
