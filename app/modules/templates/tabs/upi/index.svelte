@@ -26,10 +26,10 @@
       </Card>
       {#if selectedApp === 'gpay'}
         {#if useOmnichannel}
-          <GooglePayOmnichannel retry={retryOmnichannel} ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
+          <GooglePayOmnichannel {radio} on:radiochange="radioCheck('phone')" retry={retryOmnichannel} ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
         {/if}
         {#if retryOmnichannel || !useOmnichannel}
-          <GooglePayCollect retry={retryOmnichannel} {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
+          <GooglePayCollect {radio} on:radiochange="radioCheck('vpa')" retry={retryOmnichannel} {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
         {/if}
       {:else}
         <Collect appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" focusOnCreate/>
@@ -223,6 +223,10 @@
         vpa: '',
         tab: 'upi',
         topUpiApps,
+        radio:{
+          phone:true,
+          vpa:false
+        },
         otherAppsIcon,
         pattern: '.+',
         preferIntent: true,
@@ -324,6 +328,27 @@
        * This function will be invoked externally via session on
        * payment form submission
        */
+      radioCheck(type){
+        // console.log(type,'type');
+        if(type=='phone')
+        {
+          this.set({
+            radio:{
+              phone:true,
+              vpa:false
+            }
+          })
+        }
+        else
+        {
+          this.set({
+            radio:{
+              phone:false,
+              vpa:true
+            }
+          })
+        }
+      },
       getPayload() {
         const {
           selectedApp,
@@ -359,10 +384,10 @@
               '_[flow]': 'gpay',
             };
           } else if (useOmnichannel && selectedApp === 'gpay') {
+            debugger;
             if (!retryOmnichannel) {
               data['_[flow]'] = 'intent';
               data.contact = this.refs.omnichannelField.getPhone();
-              // data.upi_provider = 'google_pay';
             } else {
               var omniSelected= this.get().omniSelected;
               if(omniSelected==='vpa')

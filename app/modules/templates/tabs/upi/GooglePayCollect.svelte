@@ -51,6 +51,10 @@
     data() {
       return {
         retry: false,
+        radio: {
+          phone: true,
+          vpa: false,
+        },
         selected: true,
         checked: false,
       };
@@ -102,6 +106,7 @@
         this.refs.vpaField.blur();
       },
       radioChange(e) {
+        this.fire('radiochange');
         var session = getSession();
         var checked = e.target.checked;
         this.set({ checked: checked });

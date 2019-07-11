@@ -22,6 +22,7 @@ export const processOtpResponse = function(response) {
 };
 
 export const processPaymentCreate = function(response) {
+  debugger;
   var payment = this;
   var r = payment.r;
 

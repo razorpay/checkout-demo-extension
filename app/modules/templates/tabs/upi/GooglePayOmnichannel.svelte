@@ -11,14 +11,13 @@
       on:blur="blur()" on:focus="focus()" />
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked}
-    ref:radioInpPhone value={retry?'phone':null} type="radio"
-    on:blur="radioBlur()" name="isSelected"
+    ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
     style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
     /> {/if}
   </Card>
 </div>
 
-{#if error}
+{#if radio.phone} {#if error}
 <p class="error">
   Please ensure the same number is linked to the Google Pay account.
 </p>
@@ -26,7 +25,7 @@
 <p class="info">
   You will receive a notification from Razorpay, in the Google Pay app.
 </p>
-{/if}
+{/if} {/if}
 
 <style>
   #upi-gpay {
@@ -63,6 +62,10 @@
         focusOnCreate: false,
         error: false,
         selected: true,
+        radio: {
+          phone: true,
+          vpa: false,
+        },
         retry: false,
         checked: true,
       };
@@ -97,10 +100,8 @@
       blur() {
         this.refs.phoneField.blur();
       },
-      radioBlur() {
-        console.log('blurred');
-      },
       radioChange(e) {
+        this.fire('radiochange');
         var session = getSession();
         var checked = e.target.checked;
         this.set({ checked: checked });
