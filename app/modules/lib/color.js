@@ -9,6 +9,42 @@
 const canvas = _El.create('canvas'),
   ctx = canvas.getContext('2d');
 
+// canvas.getImageData().data returns a Uint8Array with length 4 (r,g,b,a),
+// However, in Brave Browser, if device recognition is blocked,
+// the length of this array will be zero.
+const canvasFingerprintingBlocked = ctx.getImageData(0, 0, 1, 1).data.length === 0;
+
+const getPixelDataFallback = color => {
+  const d = document.createElement('div');
+  d.style.color = color;
+  document.body.appendChild(d);
+  const computedColor = window.getComputedStyle(d).color;
+  document.body.removeChild(d);
+  return stringToColor(computedColor);
+};
+
+const getPixelData = color => {
+  if (canvasFingerprintingBlocked) {
+    return getPixelDataFallback(color);
+  }
+  // reset background to white
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, 1, 1);
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 1, 1);
+
+  const pixelData = ctx.getImageData(0, 0, 1, 1).data,
+    { 0: red, 1: green, 2: blue } = pixelData,
+    alpha = pixelData[3] / 255;
+
+  return {
+    red,
+    green,
+    blue,
+    alpha,
+  };
+};
+
 /**
  * Converts an RGB color value to HSV. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSV_color_space.
@@ -108,24 +144,7 @@ export const getColorProperties = (colorCache => {
       return colorCache[color];
     }
 
-    // reset background to white
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, 1, 1);
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, 1, 1);
-
-    const pixelData = ctx.getImageData(0, 0, 1, 1).data,
-      { 0: red, 1: green, 2: blue } = pixelData,
-      alpha = pixelData[3] / 255;
-
-    const colorProps = {
-      red,
-      green,
-      blue,
-      alpha,
-    };
-
-    return (colorCache[color] = colorProps);
+    return (colorCache[color] = getPixelData(color));
   };
 })({});
 
@@ -179,6 +198,22 @@ const getColorString = (red, green, blue, alpha) => {
   return `rgba(${Math.round(red)}, ${Math.round(green)}, ${Math.round(
     blue
   )}, ${alpha})`;
+};
+
+// Convert "rgba(255, 255, 255, 1)" to an object.
+const stringToColor = string => {
+  const color = {
+    red: 0, green: 0, blue: 0, alpha: 1
+  };
+  if (string && string.length > 4) {
+    const rgb = string.match(/\d+/g);
+    if (rgb.length === 3) {
+      color.red = rgb[0];
+      color.green = rgb[1];
+      color.blue = rgb[2];
+    }
+  }
+  return color;
 };
 
 export const transparentify = (color, alphaPercentage = 0) => {
