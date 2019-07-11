@@ -1,4 +1,4 @@
-<div class="tab-content showable screen pad collapsible" id="form-paylater">
+<Tab method="paylater">
   <input type="hidden" name="provider">
   <input type="hidden" name="ott">
   <h3>Select an Option</h3>
@@ -13,11 +13,12 @@
       </NextOption>
     {/each}
   </div>
-</div>
+</Tab>
 
 <script>
   export default {
     components: {
+      Tab: 'templates/tabs/Tab.svelte',
       NextOption: 'templates/views/ui/options/NextOption.svelte',
     },
 
