@@ -5041,15 +5041,6 @@ Session.prototype = {
       delete data.auth_type;
     }
 
-    if (
-      this.preferences.features.google_omnichannel &&
-      this.upiTab.get().selectedApp == 'gpay'
-    ) {
-      $('.omni').show();
-    } else {
-      $('.omni').hide();
-    }
-
     if (data.partial_payment) {
       delete data.partial_payment;
     }
@@ -5183,7 +5174,6 @@ Session.prototype = {
           return this.emiPlansView.submit();
         }
       }
-      debugger;
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
@@ -5191,8 +5181,12 @@ Session.prototype = {
         if (data['_[flow]'] === 'intent') {
           if (data.vpa) {
             formSelector = '#svelte-collect-in-intent';
-          } else if (data.contact) {
-            formSelector = '#upi_gpay';
+          } else if (
+            !(data.contact && this.upiTab.omniSelected === 'contact')
+          ) {
+            formSelector = '#upi-gpay-contact';
+          } else if (!(data.vpa && this.upiTab.omniSelected === 'vpa')) {
+            formSelector = '#upi-gpay-vpa';
           } else {
             formSelector = '#svelte-upi-apps-list';
           }
@@ -5200,6 +5194,15 @@ Session.prototype = {
 
         if (this.checkInvalid(formSelector)) {
           return;
+        }
+
+        if (
+          this.preferences.features.google_omnichannel &&
+          this.upiTab.get().selectedApp == 'gpay'
+        ) {
+          $('.omni').show();
+        } else {
+          $('.omni').hide();
         }
       } else if (this.checkInvalid()) {
         return;

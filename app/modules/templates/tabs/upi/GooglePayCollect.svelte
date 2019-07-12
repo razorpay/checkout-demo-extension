@@ -2,7 +2,7 @@
   Or Enter your UPI ID
 </div>
 
-<div id="upi-gpay">
+<div id="upi-gpay-vpa">
   <Card {selected} on:click="handleCardClick(event)">
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
@@ -35,7 +35,7 @@
 </div>
 
 <style>
-  #upi-gpay {
+  #upi-gpay-contact,#upi-gpay-vpa {
     display: block;
   }
 </style>

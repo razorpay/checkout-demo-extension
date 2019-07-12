@@ -29,7 +29,7 @@
 {/if} {/if}
 
 <style>
-  #upi-gpay {
+  #upi-gpay-contact,#upi-gpay-vpa {
     display: block;
   }
 
