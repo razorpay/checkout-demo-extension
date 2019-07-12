@@ -5046,7 +5046,6 @@ Session.prototype = {
       this.upiTab.get().selectedApp == 'gpay'
     ) {
       $('.omni').show();
-      this.showOmniChannelUi(strings.gpay_omni);
     } else {
       $('.omni').hide();
     }
@@ -5184,7 +5183,7 @@ Session.prototype = {
           return this.emiPlansView.submit();
         }
       }
-
+      debugger;
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
@@ -5192,11 +5191,13 @@ Session.prototype = {
         if (data['_[flow]'] === 'intent') {
           if (data.vpa) {
             formSelector = '#svelte-collect-in-intent';
+          } else if (data.contact) {
+            formSelector = '#upi_gpay';
           } else {
             formSelector = '#svelte-upi-apps-list';
           }
         }
-        debugger;
+
         if (this.checkInvalid(formSelector)) {
           return;
         }
@@ -5494,17 +5495,12 @@ Session.prototype = {
     if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
-    // debugger;
-    // if (
-    //   this.preferences.features.google_omnichannel &&
-    //   this.upiTab.get().selectedApp == 'gpay'
-    // ) {
-    //   $('.omni').show();
-    //   this.showOmniChannelUi(strings.gpay_omni);
-    // }
-    // else{
-    //   $('.omni').hide();
-    // }
+    if (
+      this.preferences.features.google_omnichannel &&
+      this.upiTab.get().selectedApp == 'gpay'
+    ) {
+      this.showOmniChannelUi(strings.gpay_omni);
+    }
 
     var payment = this.r.createPayment(data, request);
     payment

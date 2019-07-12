@@ -2,7 +2,7 @@
   Enter your Mobile Number
 </div>
 
-<div id="upi-gpay">
+<div id="upi-gpay-contact">
   <Card selected on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField
