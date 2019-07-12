@@ -250,8 +250,7 @@ var responseTypes = {
   },
   respawn: function(request, fullResponse) {
     const session = getSession();
-    session.upiTab.setRetryOmniChannel(true);
-    session.retryOmniChannel(fullResponse);
+    session.retryOmniChannelRespawn(fullResponse);
   },
 
   otp: function(request, fullResponse) {

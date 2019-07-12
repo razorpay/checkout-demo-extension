@@ -4600,11 +4600,9 @@ Session.prototype = {
     }
     return '#form-' + form;
   },
-  retryOmniChannel: function(response) {
-    hideOverlayMessage();
-    errorHandler.call(this, {
-      error: 'Error!',
-    });
+  retryOmniChannelRespawn: function(response) {
+    this.upiTab.setRetryOmniChannel(true);
+    this.hideErrorMessage(true);
   },
   getFormData: function() {
     var tab = this.tab;
@@ -4733,14 +4731,10 @@ Session.prototype = {
     this.upiTab.set({
       omniSelected: 'phone',
     });
-    if (this.preferences.features.google_omnichannel) {
-      setTimeout(function() {
-        $('#error-message .link').html('');
-      }, 100);
-      $('.omni').show();
-    } else {
-      $('.omni').hide();
-    }
+    setTimeout(function() {
+      $('#error-message .link').html('');
+    }, 100);
+    $('.omni').show();
     this.showLoadError(text, false);
   },
   showLoadError: function(text, error) {
@@ -5047,6 +5041,16 @@ Session.prototype = {
       delete data.auth_type;
     }
 
+    if (
+      this.preferences.features.google_omnichannel &&
+      this.upiTab.get().selectedApp == 'gpay'
+    ) {
+      $('.omni').show();
+      this.showOmniChannelUi(strings.gpay_omni);
+    } else {
+      $('.omni').hide();
+    }
+
     if (data.partial_payment) {
       delete data.partial_payment;
     }
@@ -5192,7 +5196,7 @@ Session.prototype = {
             formSelector = '#svelte-upi-apps-list';
           }
         }
-
+        debugger;
         if (this.checkInvalid(formSelector)) {
           return;
         }
@@ -5490,13 +5494,17 @@ Session.prototype = {
     if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
-
-    if (
-      this.preferences.features.google_omnichannel &&
-      this.upiTab.get().selectedApp == 'gpay'
-    ) {
-      this.showOmniChannelUi(strings.gpay_omni);
-    }
+    // debugger;
+    // if (
+    //   this.preferences.features.google_omnichannel &&
+    //   this.upiTab.get().selectedApp == 'gpay'
+    // ) {
+    //   $('.omni').show();
+    //   this.showOmniChannelUi(strings.gpay_omni);
+    // }
+    // else{
+    //   $('.omni').hide();
+    // }
 
     var payment = this.r.createPayment(data, request);
     payment

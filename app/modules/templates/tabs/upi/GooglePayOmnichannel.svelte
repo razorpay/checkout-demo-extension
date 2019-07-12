@@ -12,6 +12,7 @@
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked}
     ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
+    helpText="Please enter a valid handle"
     style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
     /> {/if}
   </Card>

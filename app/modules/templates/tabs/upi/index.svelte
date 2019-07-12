@@ -387,7 +387,7 @@
             if (!retryOmnichannel) {
               data['_[flow]'] = 'intent';
               data.contact = this.refs.omnichannelField.getPhone();
-              data.upi_provider = 'google_pay';
+              // data.upi_provider = 'google_pay';
                } else {
               var omniSelected= this.get().omniSelected;
               if(omniSelected==='vpa')
@@ -399,7 +399,7 @@
               {
                 data['_[flow]'] = 'intent';
                 data.contact = this.refs.omnichannelField.getPhone();
-                data.upi_provider = 'google_pay';
+                // data.upi_provider = 'google_pay';
               }
               console.log(omniSelected,'omniSelected')
               // TODO: decide which flow to use if retry
