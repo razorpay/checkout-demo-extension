@@ -1,4 +1,4 @@
-<div id="form-payouts" class="tab-content showable screen">
+<Tab method="payouts" overrideMethodCheck="{true}" pad="{false}">
 
 <div class="title">
   <h3>Select an account</h3>
@@ -98,11 +98,11 @@
 </div>
 {/if}
 
-</div>
+</Tab>
 
 <style>
 
-#form-payouts {
+:global(#form-payouts) {
   overflow: auto;
   top: 0;
 }
@@ -211,7 +211,8 @@ export default {
 
   components: {
     NextOption: 'templates/views/ui/options/NextOption.svelte',
-    RadioOption: 'templates/views/ui/options/RadioOption.svelte'
+    RadioOption: 'templates/views/ui/options/RadioOption.svelte',
+    Tab: 'templates/tabs/Tab.svelte',
   },
 
   data() {
