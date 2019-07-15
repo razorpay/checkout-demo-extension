@@ -2084,6 +2084,7 @@ Session.prototype = {
       return;
     }
 
+    $('#overlay-close').hide();
     hideOverlayMessage();
   },
 
@@ -4735,6 +4736,7 @@ Session.prototype = {
       $('#error-message .link').html('');
     }, 100);
     $('.omni').show();
+    $('#overlay-close').show();
     this.showLoadError(text, false);
   },
   showLoadError: function(text, error) {
@@ -5266,7 +5268,6 @@ Session.prototype = {
 
   verifyVpaAndContinue: function(data, params) {
     var self = this;
-    debugger;
     self.showLoadError('Verifying your VPA');
     $('#overlay-close').hide();
     self.r
