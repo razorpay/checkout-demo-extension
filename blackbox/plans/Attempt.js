@@ -3,13 +3,14 @@ const { delay } = require('../util');
 let attempts = 0;
 
 class Attempt {
-  promisePending(action) {
-    return new Promise(resolve => this.setPending(action, resolve));
+  promisePending(action, request) {
+    return new Promise(resolve => this.setPending(action, resolve, request));
   }
 
-  setPending(action, resolve) {
+  setPending(action, resolve, request) {
     // console.log(action + ' set');
     this.pending[action] = resolve;
+    this.request[action] = request;
   }
 
   call(action, data) {
@@ -18,10 +19,15 @@ class Attempt {
     if (cb) {
       // console.log('reply called')
       this.pending[action] = null;
+      this.request[action] = null;
       cb(data);
     } else {
       this.fail(`No ${action} action to perform`);
     }
+  }
+
+  getRequest(action = 'reply') {
+    return this.request[action];
   }
 
   reply(data) {
@@ -45,6 +51,7 @@ class Attempt {
     this.id = String(attempts++);
     this.paymentId = 'pay_' + test.id + '_' + this.id;
     this.pending = {};
+    this.request = {};
     this.setState('new attempt ' + this.paymentId);
   }
 
