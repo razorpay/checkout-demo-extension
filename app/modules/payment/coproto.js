@@ -49,14 +49,14 @@ export const processPaymentCreate = function(response) {
 
 // returns true if coproto handled
 export const processCoproto = function(response) {
-  debugger;
+  // debugger;
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
     if (this.iframe && this.popup) {
       this.popup.writable = 1;
     }
-
+    // debugger;
     response.type = 'respawn';
     // for testing
     var func = responseTypes[response.type];

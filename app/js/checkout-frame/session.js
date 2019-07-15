@@ -5266,8 +5266,9 @@ Session.prototype = {
 
   verifyVpaAndContinue: function(data, params) {
     var self = this;
+    debugger;
     self.showLoadError('Verifying your VPA');
-
+    $('#overlay-close').hide();
     self.r
       /**
        * set a timeout of 10s, if the API is taking > 10s to resolove;
@@ -5275,6 +5276,7 @@ Session.prototype = {
        */
       .verifyVpa(data.vpa, 10000)
       .then(function() {
+        $('#overlay-close').show();
         self.submit({
           vpaVerified: true,
         });
