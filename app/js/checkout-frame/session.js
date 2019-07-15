@@ -1855,7 +1855,7 @@ Session.prototype = {
     $('#top-right').addClass('hidden');
 
     // TODO: find a better way of changing pay btn text
-    this.payoutsView.on('accountSelected', function(account) {
+    this.payoutsView.on('selectaccount', function(account) {
       $('.pay-btn').addClass('invisible');
       $('.confirm-account').removeClass('invisible');
       $('#body').addClass('sub');

@@ -224,7 +224,7 @@ export default {
   methods: {
     select(instrument) {
       this.set({ selectedInstrument: instrument });
-      this.fire('accountSelected', instrument);
+      this.fire('selectaccount', instrument);
     }
   },
 
