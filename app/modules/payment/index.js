@@ -315,17 +315,6 @@ Payment.prototype = {
     if (isExternalSDKPayment) {
       setCompleteHandler();
 
-      var provider;
-      if (this.isExternalAmazonPayPayment) {
-        provider = 'amazonpay';
-      } else if (this.isExternalGooglePayPayment) {
-        provider = 'googlepay';
-      }
-
-      Analytics.track('externalsdk:called', {
-        provider: provider,
-      });
-
       return window.setTimeout(() => {
         this.emit('externalsdk.process', this.data);
       }, 100);
