@@ -4997,6 +4997,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    // debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5176,19 +5177,34 @@ Session.prototype = {
       }
       // perform the actual validation
       if (screen === 'upi') {
+        // debugger;
         var formSelector = '#form-upi';
+        const omniSelected = this.upiTab.get().omniSelected;
 
         if (data['_[flow]'] === 'intent') {
-          if (data.vpa) {
+          if (!omniSelected) {
             formSelector = '#svelte-collect-in-intent';
-          } else if (
-            !(data.contact && this.upiTab.omniSelected === 'contact')
-          ) {
-            formSelector = '#upi-gpay-contact';
-          } else if (!(data.vpa && this.upiTab.omniSelected === 'vpa')) {
-            formSelector = '#upi-gpay-vpa';
           } else {
-            formSelector = '#svelte-upi-apps-list';
+            if (omniSelected === 'vpa') {
+              formSelector = '#upi-gpay-vpa';
+            }
+
+            if (omniSelected === 'phone') {
+              formSelector = '#upi-gpay-phone';
+            }
+          }
+        }
+
+        if (
+          data['_[flow]'] === 'directpay' &&
+          this.upiTab.get().selectedApp === 'gpay'
+        ) {
+          if (omniSelected === 'vpa') {
+            formSelector = '#upi-gpay-vpa';
+          }
+
+          if (omniSelected === 'phone') {
+            formSelector = '#upi-gpay-phone';
           }
         }
 
