@@ -31,7 +31,7 @@
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('addUpi')">
-    <div class="icon icon-left"></div>
+    <div class="icon icon-left">+</div>
     Add UPI ID
   </div>
 </div>
@@ -65,7 +65,7 @@
   </div>
   <div class="instrument-add" on:click="fire('addBank')">
     <div class="icon icon-left">+</div>
-    Add bank account
+    Add Bank Account
   </div>
 </div>
 {/if}
