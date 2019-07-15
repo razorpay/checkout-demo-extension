@@ -250,6 +250,7 @@ function fillBankRadios(corporateBankName, retailBankName) {
  * 2. If new card screen, show if no emi plan is selected.
  */
 function setEmiPlansCta(screen, tab) {
+  var session = SessionManager.getSession();
   var type = 'pay';
 
   var isSavedScreen =
@@ -285,6 +286,8 @@ function setEmiPlansCta(screen, tab) {
     }
   } else if (screen === 'emi' && tab === 'emiplans') {
     type = 'emi';
+  } else if (session.isPayout) {
+    type = 'add-upi';
   }
 
   var classes = [
@@ -292,6 +295,7 @@ function setEmiPlansCta(screen, tab) {
     '.view-plans-btn',
     '.pay-btn',
     '.enter-card-details',
+    '.confirm-account',
   ];
 
   each(classes, function(index, className) {
@@ -313,6 +317,10 @@ function setEmiPlansCta(screen, tab) {
 
     case 'emi':
       $('.enter-card-details').removeClass('invisible');
+      break;
+
+    case 'add-upi':
+      $('.confirm-account').removeClass('invisible');
       break;
   }
 }
@@ -1776,7 +1784,6 @@ Session.prototype = {
       return;
     }
 
-    debugger;
     var accounts = this.preferences.fund_accounts.records;
 
     var upiAccounts = _Arr.filter(accounts, function(account) {
@@ -1806,22 +1813,15 @@ Session.prototype = {
 
     $('#top-right').addClass('hidden');
 
-    // TODO: find a better way of changing pay btn text
     this.payoutsView.on('accountSelected', function(account) {
-      $('.pay-btn').addClass('invisible');
-      $('.confirm-account').removeClass('invisible');
       $('#body').addClass('sub');
     });
 
     this.payoutsView.on('addUpi', function() {
-      $('.pay-btn').addClass('invisible');
-      $('.confirm-account').removeClass('invisible');
       session.switchTab('upi');
     });
 
     this.payoutsView.on('addBank', function() {
-      $('.pay-btn').addClass('invisible');
-      $('.confirm-account').removeClass('invisible');
       session.switchTab('payout_account');
     });
 
@@ -3323,7 +3323,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen && (!this.isPayout || screen !== 'payouts')) {
+    if (screen && !(this.isPayout && screen === 'payouts')) {
       makeVisible('#topbar');
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
@@ -3348,12 +3348,16 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'magic-choice' &&
-        !$('#form-magic-choice .item :checked')[0]) ||
-      screen === 'payouts'
+      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
     ) {
       showPaybtn = false;
     }
+
+    if (screen === 'payouts') {
+      var selectedInstrument = this.payoutsView.getSelectedInstrument();
+      showPaybtn = Boolean(selectedInstrument);
+    }
+
     this.body.toggleClass('sub', showPaybtn);
 
     if (screen === 'upi') {
