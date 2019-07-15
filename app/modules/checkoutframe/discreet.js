@@ -48,6 +48,7 @@ import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import * as Downtimes from 'checkoutframe/downtimes';
+import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -112,6 +113,7 @@ export default {
   Offers,
   Flows,
   Downtimes,
+  Payouts,
 
   Store,
   PreferencesStore,

@@ -3,7 +3,7 @@
   name="instrument"
   {reverse}
   {selected}
-  value="account.id"
+  value="account.fund_account_id"
 
   on:select="fire('select', account)">
   <slot></slot>
