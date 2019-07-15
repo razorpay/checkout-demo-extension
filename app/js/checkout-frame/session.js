@@ -5514,10 +5514,10 @@ Session.prototype = {
     if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
-    if (
+    var isOmni =
       this.preferences.features.google_omnichannel &&
-      this.upiTab.get().selectedApp == 'gpay'
-    ) {
+      this.upiTab.get().selectedApp == 'gpay';
+    if (isOmni) {
       this.showOmniChannelUi(strings.gpay_omni);
     }
 

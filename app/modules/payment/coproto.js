@@ -49,6 +49,7 @@ export const processPaymentCreate = function(response) {
 
 // returns true if coproto handled
 export const processCoproto = function(response) {
+  debugger;
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
@@ -194,10 +195,10 @@ var responseTypes = {
   },
   intent: function(request, fullResponse) {
     const session = getSession();
-    if (
+    var isOmni =
       session.preferences.features.google_omnichannel &&
-      session.upiTab.get().selectedApp === 'gpay'
-    ) {
+      session.upiTab.get().selectedApp === 'gpay';
+    if (isOmni) {
       session.showOmniChannelUi(strings.OmniNotification);
     }
     var upiBackCancel = {
