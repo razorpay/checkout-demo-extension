@@ -1813,7 +1813,7 @@ Session.prototype = {
 
     $('#top-right').addClass('hidden');
 
-    this.payoutsView.on('accountSelected', function(account) {
+    this.payoutsView.on('selectaccount', function(account) {
       $('#body').addClass('sub');
     });
 
@@ -3255,6 +3255,10 @@ Session.prototype = {
   setScreen: function(screen) {
     var isGPayScreen = false;
 
+    /**
+     * `screen` being empty means that we want to go to the homescreen.
+     * In the case of Payouts, "payouts" is the homescreen.
+     */
     if (!screen && this.isPayout) {
       screen = 'payouts';
     }
