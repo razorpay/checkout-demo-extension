@@ -1,4 +1,4 @@
-<div id="form-payouts" class="tab-content showable screen">
+<Tab method="payouts" overrideMethodCheck="{true}" pad="{false}">
 
 <div class="title">
   <h3>Select an account</h3>
@@ -20,13 +20,18 @@
   </div>
   <div class="options">
     {#each upiAccounts as account}
-      <RadioOption data="{account}" selected="{selectedInstrument.fund_account_id === account.fund_account_id}" on:select="select(account)" reverse name="instrument" value="account.fund_account_id">
+      <PayoutInstrument
+        {account}
+        selected="{selectedInstrument.fund_account_id === account.fund_account_id}"
+
+        on:select="select(account)"
+      >
         <div class="instrument-name">{account.vpa.address}</div>
-      </RadioOption>
+      </PayoutInstrument>
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('addUpi')">
-    <div class="icon icon-left"></div>
+    <div class="icon icon-left">+</div>
     Add UPI ID
   </div>
 </div>
@@ -47,15 +52,20 @@
   </div>
   <div class="options">
     {#each bankAccounts as account}
-      <RadioOption data="{account}" selected="{selectedInstrument.fund_account_id === account.fund_account_id}" on:select="select(account)" reverse name="instrument" value="account.fund_account_id">
+      <PayoutInstrument
+        {account}
+        selected="{selectedInstrument.fund_account_id === account.fund_account_id}"
+
+        on:select="select(account)"
+      >
         <div class="instrument-name">A/c No. {account.bank_account.account_number}</div>
         <div class="instrument-info">IFSC: {account.bank_account.ifsc}, {account.bank_account.name}</div>
-      </RadioOption>
+      </PayoutInstrument>
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('addBank')">
     <div class="icon icon-left">+</div>
-    Add bank account
+    Add Bank Account
   </div>
 </div>
 {/if}
@@ -98,11 +108,11 @@
 </div>
 {/if}
 
-</div>
+</Tab>
 
 <style>
 
-#form-payouts {
+:global(#form-payouts) {
   overflow: auto;
   top: 0;
 }
@@ -211,7 +221,8 @@ export default {
 
   components: {
     NextOption: 'templates/views/ui/options/NextOption.svelte',
-    RadioOption: 'templates/views/ui/options/RadioOption.svelte'
+    PayoutInstrument: 'templates/views/ui/PayoutInstrument.svelte',
+    Tab: 'templates/tabs/Tab.svelte',
   },
 
   data() {
@@ -223,7 +234,7 @@ export default {
   methods: {
     select(instrument) {
       this.set({ selectedInstrument: instrument });
-      this.fire('accountSelected', instrument);
+      this.fire('selectaccount', instrument);
     }
   },
 

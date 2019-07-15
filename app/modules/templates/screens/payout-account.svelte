@@ -1,4 +1,4 @@
-<div id="form-payout_account" class="tab-content showable screen">
+<Tab method="payout_account" overrideMethodCheck="{true}" pad="{false}">
 
   <div class="fields-container">
 
@@ -44,7 +44,7 @@
 
   </div>
 
-</div>
+</Tab>
 
 <style>
 
@@ -59,7 +59,8 @@
 export default {
 
   components: {
-    Field: 'templates/views/ui/Field.svelte'
+    Field: 'templates/views/ui/Field.svelte',
+    Tab: 'templates/tabs/Tab.svelte',
   },
 
 }

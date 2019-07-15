@@ -1776,7 +1776,6 @@ Session.prototype = {
       return;
     }
 
-    debugger;
     var accounts = this.preferences.fund_accounts.records;
 
     var upiAccounts = _Arr.filter(accounts, function(account) {
@@ -1807,7 +1806,7 @@ Session.prototype = {
     $('#top-right').addClass('hidden');
 
     // TODO: find a better way of changing pay btn text
-    this.payoutsView.on('accountSelected', function(account) {
+    this.payoutsView.on('selectaccount', function(account) {
       $('.pay-btn').addClass('invisible');
       $('.confirm-account').removeClass('invisible');
       $('#body').addClass('sub');
@@ -3255,6 +3254,10 @@ Session.prototype = {
   setScreen: function(screen) {
     var isGPayScreen = false;
 
+    /**
+     * `screen` being empty means that we want to go to the homescreen.
+     * In the case of Payouts, "payouts" is the homescreen.
+     */
     if (!screen && this.isPayout) {
       screen = 'payouts';
     }
