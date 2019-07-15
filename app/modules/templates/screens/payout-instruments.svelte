@@ -20,9 +20,14 @@
   </div>
   <div class="options">
     {#each upiAccounts as account}
-      <RadioOption data="{account}" selected="{selectedInstrument.id === account.id}" on:select="select(account)" reverse name="instrument" value="account.id">
+      <PayoutInstrument
+        account
+        selected="{selectedInstrument.id === account.id}"
+
+        on:select="select(account)"
+      >
         <div class="instrument-name">{account.vpa.address}</div>
-      </RadioOption>
+      </PayoutInstrument>
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('addUpi')">
@@ -47,10 +52,15 @@
   </div>
   <div class="options">
     {#each bankAccounts as account}
-      <RadioOption data="{account}" selected="{selectedInstrument.id === account.id}" on:select="select(account)" reverse name="instrument" value="account.id">
+      <PayoutInstrument
+        account
+        selected="{selectedInstrument.id === account.id}"
+
+        on:select="select(account)"
+      >
         <div class="instrument-name">A/c No. {account.bank_account.account_number}</div>
         <div class="instrument-info">IFSC: {account.bank_account.ifsc}, {account.bank_account.name}</div>
-      </RadioOption>
+      </PayoutInstrument>
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('addBank')">
@@ -211,7 +221,7 @@ export default {
 
   components: {
     NextOption: 'templates/views/ui/options/NextOption.svelte',
-    RadioOption: 'templates/views/ui/options/RadioOption.svelte',
+    PayoutInstrument: 'templates/views/ui/PayoutInstrument.svelte',
     Tab: 'templates/tabs/Tab.svelte',
   },
 
