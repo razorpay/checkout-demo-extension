@@ -62,6 +62,9 @@ import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 
+import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
+import PayoutAccount from 'templates/screens/payout-account.svelte';
+
 import * as Hacks from 'checkoutframe/hacks';
 
 export default {
@@ -129,6 +132,8 @@ export default {
   SavedCardsView,
 
   FeeBearerView,
+  PayoutsInstruments,
+  PayoutAccount,
 
   otpView,
   Curtain,

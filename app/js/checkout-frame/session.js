@@ -1586,6 +1586,7 @@ Session.prototype = {
     this.setSavedCardsView();
     this.setOtpScreen();
     this.setUpiTab();
+    this.setPayoutsScreen();
   },
 
   showTimer: function(cb) {
@@ -1766,6 +1767,113 @@ Session.prototype = {
     });
 
     this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
+  },
+
+  setPayoutsScreen: function() {
+    var session = this;
+    if (!this.isPayout) {
+      return;
+    }
+    var accounts = [
+      {
+        id: 'fa_00000000000001',
+        entity: 'fund_account',
+        contact_id: 'cont_00000000000001',
+        account_type: 'bank_account',
+        bank_account: {
+          ifsc: 'HDFC0000053',
+          bank_name: 'HDFC Bank',
+          name: 'Gaurav Kumar',
+          account_number: '765432123456789',
+        },
+        active: false,
+        batch_id: null,
+        created_at: 1545312598,
+      },
+      {
+        id: 'fa_00000000000002',
+        entity: 'fund_account',
+        contact_id: 'cont_00000000000001',
+        account_type: 'vpa',
+        vpa: { address: 'gauravkumar@upi' },
+        active: true,
+        batch_id: null,
+        created_at: 1545313478,
+      },
+      {
+        id: 'fa_00000000000003',
+        entity: 'fund_account',
+        contact_id: 'cont_00000000000001',
+        account_type: 'bank_account',
+        bank_account: {
+          ifsc: 'HDFC0000053',
+          bank_name: 'HDFC Bank',
+          name: 'Vivek Anand',
+          account_number: '765432123456789',
+        },
+        active: false,
+        batch_id: null,
+        created_at: 1545312598,
+      },
+      {
+        id: 'fa_00000000000004',
+        entity: 'fund_account',
+        contact_id: 'cont_00000000000001',
+        account_type: 'vpa',
+        vpa: { address: '94272394068@upi' },
+        active: true,
+        batch_id: null,
+        created_at: 1545313478,
+      },
+    ];
+
+    var upiAccounts = _Arr.filter(accounts, function(account) {
+      return account.account_type === 'vpa';
+    });
+
+    var bankAccounts = _Arr.filter(accounts, function(account) {
+      return account.account_type === 'bank_account';
+    });
+
+    this.payoutsView = new discreet.PayoutsInstruments({
+      target: gel('payouts-svelte-wrap'),
+      data: {
+        session: session,
+        amount: this.formatAmountWithCurrency(this.get('amount')),
+        upiAccounts: upiAccounts,
+        bankAccounts: bankAccounts,
+      },
+    });
+
+    this.payoutsAccountView = new discreet.PayoutAccount({
+      target: gel('payout-account-svelte-wrap'),
+      data: {
+        session: session,
+      },
+    });
+
+    $('#top-right').addClass('hidden');
+
+    // TODO: find a better way of changing pay btn text
+    this.payoutsView.on('accountSelected', function(account) {
+      $('.pay-btn').addClass('invisible');
+      $('.confirm-account').removeClass('invisible');
+      $('#body').addClass('sub');
+    });
+
+    this.payoutsView.on('addUpi', function() {
+      $('.pay-btn').addClass('invisible');
+      $('.confirm-account').removeClass('invisible');
+      session.switchTab('upi');
+    });
+
+    this.payoutsView.on('addBank', function() {
+      $('.pay-btn').addClass('invisible');
+      $('.confirm-account').removeClass('invisible');
+      session.switchTab('payout_account');
+    });
+
+    this.switchTab('payouts');
   },
 
   getCardlessEmiPlans: function() {
@@ -3194,6 +3302,11 @@ Session.prototype = {
 
   setScreen: function(screen) {
     var isGPayScreen = false;
+
+    if (!screen && this.isPayout) {
+      screen = 'payouts';
+    }
+
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3201,6 +3314,10 @@ Session.prototype = {
           : tab_titles[this.cardTab || screen];
 
       screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
+
+      if (screen === 'upi' && this.isPayout) {
+        screenTitle = tab_titles.payout_upi;
+      }
 
       if (screenTitle) {
         gel('tab-title').innerHTML = screenTitle;
@@ -3254,7 +3371,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen) {
+    if (screen && (!this.isPayout || screen !== 'payouts')) {
       makeVisible('#topbar');
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
@@ -3279,7 +3396,9 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
+      (screen === 'magic-choice' &&
+        !$('#form-magic-choice .item :checked')[0]) ||
+      screen === 'payouts'
     ) {
       showPaybtn = false;
     }
@@ -3737,6 +3856,7 @@ Session.prototype = {
         to: tab,
       },
     });
+
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
@@ -6221,6 +6341,8 @@ Session.prototype = {
         return customer;
       };
     }
+
+    this.isPayout = this.get('prefill.method') === 'payout';
 
     /* In case of recurring set recurring as filter in saved cards */
     if (

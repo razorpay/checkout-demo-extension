@@ -336,7 +336,10 @@
        * Show "Show QR" button only if QR is enabled and an app has not been selected.
        * selectedApp === null when "Other Apps" is selected
        */
-      shouldShowQr: ({ qrEnabled, selectedApp }) => qrEnabled && !selectedApp && selectedApp !== null,
+      shouldShowQr: ({ qrEnabled, selectedApp }) => {
+        const session = getSession();
+        return qrEnabled && !selectedApp && selectedApp !== null && !session.isPayout;
+      },
     },
 
     oncreate() {
