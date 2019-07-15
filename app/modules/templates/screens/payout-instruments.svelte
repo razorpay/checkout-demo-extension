@@ -20,7 +20,7 @@
   </div>
   <div class="options">
     {#each upiAccounts as account}
-      <RadioOption data="{account}" selected="{selectedInstrument.id === account.id}" on:select="select(account)" reverse name="instrument" value="account.id">
+      <RadioOption data="{account}" selected="{selectedInstrument.fund_account_id === account.fund_account_id}" on:select="select(account)" reverse name="instrument" value="account.fund_account_id">
         <div class="instrument-name">{account.vpa.address}</div>
       </RadioOption>
     {/each}
@@ -47,7 +47,7 @@
   </div>
   <div class="options">
     {#each bankAccounts as account}
-      <RadioOption data="{account}" selected="{selectedInstrument.id === account.id}" on:select="select(account)" reverse name="instrument" value="account.id">
+      <RadioOption data="{account}" selected="{selectedInstrument.fund_account_id === account.fund_account_id}" on:select="select(account)" reverse name="instrument" value="account.fund_account_id">
         <div class="instrument-name">A/c No. {account.bank_account.account_number}</div>
         <div class="instrument-info">IFSC: {account.bank_account.ifsc}, {account.bank_account.name}</div>
       </RadioOption>

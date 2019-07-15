@@ -27,6 +27,7 @@ var preferences = window.preferences,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
   UPIUtils = discreet.UPIUtils,
+  Payouts = discreet.Payouts,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
@@ -1774,58 +1775,9 @@ Session.prototype = {
     if (!this.isPayout) {
       return;
     }
-    var accounts = [
-      {
-        id: 'fa_00000000000001',
-        entity: 'fund_account',
-        contact_id: 'cont_00000000000001',
-        account_type: 'bank_account',
-        bank_account: {
-          ifsc: 'HDFC0000053',
-          bank_name: 'HDFC Bank',
-          name: 'Gaurav Kumar',
-          account_number: '765432123456789',
-        },
-        active: false,
-        batch_id: null,
-        created_at: 1545312598,
-      },
-      {
-        id: 'fa_00000000000002',
-        entity: 'fund_account',
-        contact_id: 'cont_00000000000001',
-        account_type: 'vpa',
-        vpa: { address: 'gauravkumar@upi' },
-        active: true,
-        batch_id: null,
-        created_at: 1545313478,
-      },
-      {
-        id: 'fa_00000000000003',
-        entity: 'fund_account',
-        contact_id: 'cont_00000000000001',
-        account_type: 'bank_account',
-        bank_account: {
-          ifsc: 'HDFC0000053',
-          bank_name: 'HDFC Bank',
-          name: 'Vivek Anand',
-          account_number: '765432123456789',
-        },
-        active: false,
-        batch_id: null,
-        created_at: 1545312598,
-      },
-      {
-        id: 'fa_00000000000004',
-        entity: 'fund_account',
-        contact_id: 'cont_00000000000001',
-        account_type: 'vpa',
-        vpa: { address: '94272394068@upi' },
-        active: true,
-        batch_id: null,
-        created_at: 1545313478,
-      },
-    ];
+
+    debugger;
+    var accounts = this.preferences.fund_accounts.records;
 
     var upiAccounts = _Arr.filter(accounts, function(account) {
       return account.account_type === 'vpa';
@@ -6342,7 +6294,7 @@ Session.prototype = {
       };
     }
 
-    this.isPayout = this.get('prefill.method') === 'payout';
+    this.isPayout = Boolean(this.get('payout'));
 
     /* In case of recurring set recurring as filter in saved cards */
     if (
@@ -6561,16 +6513,40 @@ Session.prototype = {
         return;
       }
 
-      callback({
-        preferences: preferences,
-        validation: validation,
-      });
+      if (self.isPayout) {
+        self.fetchFundAccounts().then(function(fundAccounts) {
+          preferences.fund_accounts = fundAccounts;
+          callback({
+            preferences: preferences,
+            validation: validation,
+          });
+        });
+      } else {
+        callback({
+          preferences: preferences,
+          validation: validation,
+        });
+      }
     });
 
     /* Start listening for back presses */
     discreet.Bridge.setHistoryAndListenForBackPresses();
 
     return this.prefCall;
+  },
+
+  fetchFundAccounts: function() {
+    return Payouts.fetchFundAccounts(this.get('contact_id')).then(function(
+      response
+    ) {
+      if (response.error) {
+        return Razorpay.sendMessage({
+          event: 'fault',
+          data: response.error,
+        });
+      }
+      return response;
+    });
   },
 };
 
