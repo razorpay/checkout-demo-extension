@@ -35,7 +35,7 @@
       <div class="actionlink theme-highlight" on:click="invoke('viewAll', event)">View all EMI Plans</div>
     {/if}
     {#if actions.payWithoutEmi}
-      <div class="actionlink theme-highlight" on:click="invoke('payWithoutEmi', event)">Pay without EMI</div>
+      <div class="actionlink theme-highlight" on:click="invoke('payWithoutEmi', event)">Pay entire amount</div>
     {/if}
   </div>
   {#if actions.showAgreement && expanded >= 0}

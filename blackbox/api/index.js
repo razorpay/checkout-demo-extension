@@ -75,7 +75,7 @@ const callbackHtml = data => {
   return `<script>opener.postMessage('${data}','*')</script>`;
 };
 
-const wait = request => request.attempt.promisePending('reply');
+const wait = request => request.attempt.promisePending('reply', request);
 
 const waitHtml = async (request, reply) => {
   if (request.body && request.body.callback_url) {
