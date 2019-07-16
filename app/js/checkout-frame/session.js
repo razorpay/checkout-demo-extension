@@ -5677,7 +5677,7 @@ Session.prototype = {
         var selectedAccount = this.payoutsView.getSelectedInstrument();
         Razorpay.sendMessage({
           event: 'complete',
-          data: { id: selectedAccount.fund_account_id },
+          data: { razorpay_fund_account_id: selectedAccount.fund_account_id },
         });
         session.hide();
       } else {
@@ -5687,7 +5687,7 @@ Session.prototype = {
         Payouts.createFundAccount(this.get('contact_id'), data).then(function(
           account
         ) {
-          Razorpay.sendMessage({ event: 'complete', data: { id: account.id } });
+          Razorpay.sendMessage({ event: 'complete', data: { razorpay_fund_account_id: account.id } });
           session.hide();
         });
       }
