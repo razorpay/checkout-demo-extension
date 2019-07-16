@@ -1,12 +1,19 @@
-const API_URL = 'https://api.razorpay.com/v1/';
+import { makeAuthUrl, makeUrl } from 'common/Razorpay';
+import { getSession } from 'sessionmanager';
+
+const _headers = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+};
+
+const mock = false;
 
 const FETCH_MOCK_RESPONSE = {
-  contact_id: 'cont_BSQxC46dCKUs97',
-  contact_name: 'John Doe',
-  records: [
+  id: 'cont_BSQxC46dCKUs97',
+  name: 'John Doe',
+  fund_accounts: [
     {
       account_type: 'bank_account',
-      fund_account_id: 'fa_00000000000002',
+      id: 'fa_00000000000002',
       bank_account: {
         name: 'John Doe',
         ifsc: 'SBIN0007105',
@@ -16,7 +23,7 @@ const FETCH_MOCK_RESPONSE = {
     },
     {
       account_type: 'vpa',
-      fund_account_id: 'fa_00000000000003',
+      id: 'fa_00000000000003',
       vpa: {
         address: 'john*****@upi',
       },
@@ -25,40 +32,57 @@ const FETCH_MOCK_RESPONSE = {
 };
 
 const SAVE_MOCK_RESPONSE = {
-  id: 'fa_00000000000001',
-  entity: 'fund_account',
-  contact_id: 'cont_00000000000001',
-  account_type: 'card',
-  card: {
-    name: 'Gaurav Kumar',
-    last4: '6789',
-    network: 'Visa',
-    type: 'credit',
-    issuer: 'HDFC',
+  id: 'fa_CuLw0crMkC5eeb',
+  account_type: 'bank_account',
+  bank_account: {
+    ifsc: 'SBIN0000012',
+    bank_name: 'State Bank of India',
+    name: 'Test',
+    account_number: 'X2345',
   },
-  active: true,
-  batch_id: null,
-  created_at: 1543650891,
 };
 
-// TODO use makeAuthUrl
 export function fetchFundAccounts(contactId) {
-  return Promise.resolve(FETCH_MOCK_RESPONSE);
-  // return new Promise(resolve => fetch({
-  //   url: API_URL + `/contacts/${contactId}/public`,
-  //   resolve
-  // }));
+  const { r } = getSession();
+  if (mock) {
+    return new Promise(resolve => {
+      setTimeout(_ => resolve(FETCH_MOCK_RESPONSE), 2000);
+    });
+  }
+  return new Promise((resolve, reject) =>
+    fetch({
+      url: makeAuthUrl(r, `contacts/${contactId}/public`),
+      callback: function(result) {
+        if (result.error) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      },
+    })
+  );
 }
 
-// TODO use makeAuthUrl
-export function createFundAccount(contactId, fundAccount) {
-  return Promise.resolve(SAVE_MOCK_RESPONSE);
-  // return new Promise(resolve => fetch({
-  //   url: API_URL + '/fund_accounts/public',
-  //   data: {
-  //     contact_id: contactId,
-  //     ...fundAccount
-  //   },
-  //   resolve
-  // }));
+export function createFundAccount(fundAccount) {
+  const { r } = getSession();
+  if (mock) {
+    return new Promise(resolve => {
+      setTimeout(_ => resolve(SAVE_MOCK_RESPONSE), 2000);
+    });
+  }
+  return new Promise((resolve, reject) =>
+    fetch({
+      url: makeAuthUrl(r, 'fund_accounts/public'),
+      headers: _headers,
+      method: 'post',
+      data: fundAccount,
+      callback: function(result) {
+        if (result.error) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
+      },
+    })
+  );
 }

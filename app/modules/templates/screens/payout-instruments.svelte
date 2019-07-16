@@ -19,10 +19,10 @@
     </span>
   </div>
   <div class="options">
-    {#each upiAccounts as account (account.fund_account_id)}
+    {#each upiAccounts as account (account.id)}
       <PayoutInstrument
         {account}
-        selected="{selectedInstrument && selectedInstrument.fund_account_id === account.fund_account_id}"
+        selected="{selectedInstrument && selectedInstrument.id === account.id}"
 
         on:select="select(account)"
       >
@@ -51,10 +51,10 @@
     </span>
   </div>
   <div class="options">
-    {#each bankAccounts as account (account.fund_account_id)}
+    {#each bankAccounts as account (account.id)}
       <PayoutInstrument
         {account}
-        selected="{selectedInstrument && selectedInstrument.fund_account_id === account.fund_account_id}"
+        selected="{selectedInstrument && selectedInstrument.id === account.id}"
 
         on:select="select(account)"
       >

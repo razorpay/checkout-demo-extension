@@ -1784,7 +1784,7 @@ Session.prototype = {
       return;
     }
 
-    var accounts = this.preferences.fund_accounts.records;
+    var accounts = this.preferences.fund_accounts;
 
     var upiAccounts = _Arr.filter(accounts, function(account) {
       return account.account_type === 'vpa';
@@ -5645,8 +5645,10 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
-    } else {
+    } else if (!this.isPayout) {
       this.showLoadError();
+    } else {
+      this.showLoadError('Processing...');
     }
 
     if (wallet === 'freecharge') {
@@ -5671,25 +5673,32 @@ Session.prototype = {
     if (this.isPayout) {
       if (this.screen === 'payouts') {
         /**
-         * If we are on the payouts screen when the submission happened, it means
-         * that the user selected an existing fund account.
+         * If we are on the payouts screen when the submission happened, it
+         * means that the user selected an existing fund account.
          */
         var selectedAccount = this.payoutsView.getSelectedInstrument();
         Razorpay.sendMessage({
           event: 'complete',
-          data: { razorpay_fund_account_id: selectedAccount.fund_account_id },
+          data: { razorpay_fund_account_id: selectedAccount.id },
         });
         session.hide();
       } else {
         /**
-         * If we are not on the payouts screen, create the fund account using the payload.
+         * If we are not on the payouts screen, create the fund account using
+         * the payload.
          */
-        Payouts.createFundAccount(this.get('contact_id'), data).then(function(
-          account
-        ) {
-          Razorpay.sendMessage({ event: 'complete', data: { razorpay_fund_account_id: account.id } });
-          session.hide();
-        });
+        Payouts.createFundAccount(data)
+          .then(function(account) {
+            Razorpay.sendMessage({
+              event: 'complete',
+              data: { razorpay_fund_account_id: account.id },
+            });
+            session.hide();
+          })
+          .catch(function(response) {
+            Razorpay.sendMessage({ event: 'fault', data: response.error });
+            session.hide();
+          });
       }
       return;
     }
@@ -5840,7 +5849,9 @@ Session.prototype = {
       return {
         contact_id: this.get('contact_id'),
         account_type: 'vpa',
-        vpa: data.vpa,
+        vpa: {
+          address: data.vpa,
+        },
       };
     }
 
@@ -6570,13 +6581,21 @@ Session.prototype = {
       }
 
       if (self.isPayout) {
-        self.fetchFundAccounts().then(function(fundAccounts) {
-          preferences.fund_accounts = fundAccounts;
-          callback({
-            preferences: preferences,
-            validation: validation,
+        self
+          .fetchFundAccounts()
+          .then(function(response) {
+            preferences.fund_accounts = response.fund_accounts;
+            callback({
+              preferences: preferences,
+              validation: validation,
+            });
+          })
+          .catch(function(response) {
+            return Razorpay.sendMessage({
+              event: 'fault',
+              data: response.error,
+            });
           });
-        });
       } else {
         callback({
           preferences: preferences,
@@ -6592,17 +6611,7 @@ Session.prototype = {
   },
 
   fetchFundAccounts: function() {
-    return Payouts.fetchFundAccounts(this.get('contact_id')).then(function(
-      response
-    ) {
-      if (response.error) {
-        return Razorpay.sendMessage({
-          event: 'fault',
-          data: response.error,
-        });
-      }
-      return response;
-    });
+    return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 };
 
