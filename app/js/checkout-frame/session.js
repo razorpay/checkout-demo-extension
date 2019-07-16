@@ -2963,7 +2963,7 @@ Session.prototype = {
 
   refresh: function() {
     var self = this;
-    each($$('.input'), function(i, el) {
+    each($$('.input:not(.no-refresh)'), function(i, el) {
       self.input(el);
     });
   },
