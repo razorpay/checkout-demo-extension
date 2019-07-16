@@ -237,6 +237,7 @@ export function makePrefParams(rzp) {
         'recurring',
         'subscription_card_change',
         'account_id',
+        'contact_id',
       ],
       function(key) {
         var value = getter(key);
