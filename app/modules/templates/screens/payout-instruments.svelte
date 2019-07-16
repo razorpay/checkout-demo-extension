@@ -22,7 +22,7 @@
     {#each upiAccounts as account}
       <PayoutInstrument
         {account}
-        selected="{selectedInstrument.fund_account_id === account.fund_account_id}"
+        selected="{selectedInstrument && selectedInstrument.fund_account_id === account.fund_account_id}"
 
         on:select="select(account)"
       >

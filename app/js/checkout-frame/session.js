@@ -5666,6 +5666,32 @@ Session.prototype = {
       return this.verifyVpaAndContinue(data, request);
     }
 
+    if (this.isPayout) {
+      if (this.screen === 'payouts') {
+        /**
+         * If we are on the payouts screen when the submission happened, it means
+         * that the user selected an existing fund account.
+         */
+        var selectedAccount = this.payoutsView.getSelectedInstrument();
+        Razorpay.sendMessage({
+          event: 'complete',
+          data: { id: selectedAccount.fund_account_id },
+        });
+        session.hide();
+      } else {
+        /**
+         * If we are not on the payouts screen, create the fund account using the payload.
+         */
+        Payouts.createFundAccount(this.get('contact_id'), data).then(function(
+          account
+        ) {
+          Razorpay.sendMessage({ event: 'complete', data: { id: account.id } });
+          session.hide();
+        });
+      }
+      return;
+    }
+
     var payment = this.r.createPayment(data, request);
     payment
       .on('payment.success', bind(successHandler, this))
@@ -5807,6 +5833,26 @@ Session.prototype = {
 
   getPayload: function() {
     var data = this.getFormData();
+
+    if (this.isPayout && this.screen === 'upi') {
+      return {
+        contact_id: this.get('contact_id'),
+        account_type: 'vpa',
+        vpa: data.vpa,
+      };
+    }
+
+    if (this.isPayout && this.screen === 'payout_account') {
+      return {
+        contact_id: this.get('contact_id'),
+        account_type: 'bank_account',
+        bank_account: {
+          name: data.name,
+          ifsc: data.ifsc,
+          account_number: data.account_number,
+        },
+      };
+    }
 
     if (this.screen === 'card' && this.tab === 'emi') {
       setEmiBank(data, this.savedCardScreen);
