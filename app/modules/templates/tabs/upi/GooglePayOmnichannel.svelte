@@ -8,6 +8,7 @@
       <Field type="text" name="phone" id='phone' ref:phoneField
       placeholder="Enter Mobile Number" helpText="Please enter a valid phone
       number" required={true} formatter={{ type: 'number' }} maxlength="{10}"
+      value={contact}
       on:blur="blur()" on:focus="focus()" />
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked}
@@ -62,6 +63,7 @@
       return {
         focusOnCreate: false,
         error: false,
+        contact:null,
         selected: true,
         radio: {
           phone: true,
@@ -73,6 +75,9 @@
     },
 
     oncreate() {
+      this.set({
+        contact:getSession().customer.contact
+      })
       const { focusOnCreate } = this.get();
       if (focusOnCreate) {
         this.focus();

@@ -428,13 +428,6 @@
     this.set({retryOmnichannel:status});
     },
       onBack() {
-        debugger;
-       this.set({
-            radio:{
-              phone:false,
-              vpa:false
-            }
-          })
         const {
           intent,
           selectedApp,
