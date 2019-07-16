@@ -3,11 +3,10 @@
 </div>
 
 <div id="upi-gpay-vpa">
-  <Card {selected} on:click="handleCardClick(event)">
+  <Card selected={radio.vpa} on:click="handleCardClick(event)">
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
-      <Field type="text" name="vpa" id='vpa' ref:vpaField placeholder="Enter UPI
-      ID" helpText="Please enter a valid handle" pattern=".+" required={true}
+      <Field type="text" name="vpa" id='vpa' ref:vpaField placeholder="Enter UPI ID" helpText="Please enter a valid handle" pattern=".+" required={true}
       formatter={{ type: 'vpa' }} on:blur="blur()" on:focus="focus()" />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">

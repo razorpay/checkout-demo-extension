@@ -3,7 +3,7 @@
 </div>
 
 <div id="upi-gpay-phone">
-  <Card selected on:click="focus()">
+  <Card selected={radio.phone} on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField
       placeholder="Enter Mobile Number" helpText="Please enter a valid phone
