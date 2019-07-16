@@ -8,8 +8,12 @@
       id='account_number'
       placeholder="Account number"
       helpText="Please enter a valid account number"
-      pattern=".+"
+      pattern={"^[a-zA-Z0-9]{4,20}$"}
+      maxlength="20"
       required={true}
+      ref:accountNumberField
+
+      on:blur="validateConfirmAccount()"
     />
 
     <Field
@@ -17,9 +21,14 @@
       name="account_number_confirm"
       id='account_number_confirm'
       placeholder="Re-enter account number"
-      helpText="Please enter a valid account number"
-      pattern=".+"
+      helpText="Please confirm the account number"
+      pattern={"^[a-zA-Z0-9]{4,20}$"}
+      maxlength="20"
       required={true}
+      ref:confirmAccountNumberField
+      refresh="{false}"
+
+      on:blur="validateConfirmAccount()"
     />
 
     <Field
@@ -28,7 +37,8 @@
       id='ifsc'
       placeholder="IFSC"
       helpText="Please enter a valid IFSC"
-      pattern=".+"
+      pattern={"^[a-zA-Z]{4}[a-zA-Z0-9]{7}$"}
+      maxlength="11"
       required={true}
     />
 
@@ -38,7 +48,8 @@
       id='name'
       placeholder="Account holder name"
       helpText="Please enter a valid account name"
-      pattern=".+"
+      pattern={"^[a-zA-Z. 0-9\']{1,100}$"}
+      maxlength="100"
       required={true}
     />
 
@@ -58,10 +69,26 @@
 
 export default {
 
+  data() {
+    return {
+      confirmInvalid: false
+    }
+  },
+
   components: {
     Field: 'templates/views/ui/Field.svelte',
     Tab: 'templates/tabs/Tab.svelte',
   },
+
+  methods: {
+    validateConfirmAccount() {
+      const value = this.refs.accountNumberField.getValue();
+      const confirmValue = this.refs.confirmAccountNumberField.getValue();
+      if (value !== confirmValue) {
+        this.refs.confirmAccountNumberField.refs.wrap.classList.add('invalid');
+      }
+    }
+  }
 
 }
 
