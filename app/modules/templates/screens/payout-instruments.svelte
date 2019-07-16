@@ -31,7 +31,7 @@
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('add', { method: 'upi' })">
-    <div class="icon icon-left">+</div>
+    <div class="icon icon-left icon-add">+</div>
     Add UPI ID
   </div>
 </div>
@@ -64,7 +64,7 @@
     {/each}
   </div>
   <div class="instrument-add" on:click="fire('add', { method: 'bank' })">
-    <div class="icon icon-left">+</div>
+    <div class="icon icon-left icon-add">+</div>
     Add Bank Account
   </div>
 </div>
@@ -149,12 +149,20 @@
   top: 12px;
 }
 
+.icon.icon-add {
+  font-size: 20px;
+  left: 18px;
+  top: 7px;
+}
+
 .instrument-header .header-text {
   padding-top: 4px;
   text-transform: uppercase;
+  font-weight: bold;
 }
 
-.instrument, .instrument-add {
+.instrument-add {
+  font-weight: bold;
   border-top: 1px solid #e6e7e8;
   cursor: pointer;
 }
