@@ -1817,12 +1817,14 @@ Session.prototype = {
       $('#body').addClass('sub');
     });
 
-    this.payoutsView.on('addUpi', function() {
-      session.switchTab('upi');
-    });
+    this.payoutsView.on('add', function(event) {
+      var method = event.method;
 
-    this.payoutsView.on('addBank', function() {
-      session.switchTab('payout_account');
+      if (method === 'upi') {
+        session.switchTab('upi');
+      } else if (method === 'bank') {
+        session.switchTab('payout_account');
+      }
     });
 
     this.switchTab('payouts');

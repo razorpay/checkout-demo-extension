@@ -19,7 +19,7 @@
     </span>
   </div>
   <div class="options">
-    {#each upiAccounts as account}
+    {#each upiAccounts as account (account.fund_account_id)}
       <PayoutInstrument
         {account}
         selected="{selectedInstrument && selectedInstrument.fund_account_id === account.fund_account_id}"
@@ -30,7 +30,7 @@
       </PayoutInstrument>
     {/each}
   </div>
-  <div class="instrument-add" on:click="fire('addUpi')">
+  <div class="instrument-add" on:click="fire('add', { method: 'upi' })">
     <div class="icon icon-left">+</div>
     Add UPI ID
   </div>
@@ -51,7 +51,7 @@
     </span>
   </div>
   <div class="options">
-    {#each bankAccounts as account}
+    {#each bankAccounts as account (account.fund_account_id)}
       <PayoutInstrument
         {account}
         selected="{selectedInstrument && selectedInstrument.fund_account_id === account.fund_account_id}"
@@ -63,7 +63,7 @@
       </PayoutInstrument>
     {/each}
   </div>
-  <div class="instrument-add" on:click="fire('addBank')">
+  <div class="instrument-add" on:click="fire('add', { method: 'bank' })">
     <div class="icon icon-left">+</div>
     Add Bank Account
   </div>
@@ -80,7 +80,7 @@
       role: 'button',
       'aria-label': 'Add a UPI ID'
     }}
-    on:select="fire('addUpi')"
+    on:select="fire('add', { method: 'upi' })"
   >
     <div>UPI</div>
     <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
@@ -99,7 +99,7 @@
       role: 'button',
       'aria-label': 'Add a UPI ID'
     }}
-    on:select="fire('addBank')"
+    on:select="fire('add', { method: 'bank' })"
     >
     <div>BANK</div>
     <div class="desc">Add a Bank Account</div>
