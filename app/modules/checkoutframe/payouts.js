@@ -6,7 +6,7 @@ const FETCH_MOCK_RESPONSE = {
   records: [
     {
       account_type: 'bank_account',
-      fund_account_id: 'fa_00000001',
+      fund_account_id: 'fa_00000000000002',
       bank_account: {
         name: 'John Doe',
         ifsc: 'SBIN0007105',
@@ -16,7 +16,7 @@ const FETCH_MOCK_RESPONSE = {
     },
     {
       account_type: 'vpa',
-      fund_account_id: 'fa_00000002',
+      fund_account_id: 'fa_00000000000003',
       vpa: {
         address: 'john*****@upi',
       },
@@ -42,7 +42,7 @@ const SAVE_MOCK_RESPONSE = {
 };
 
 // TODO use makeAuthUrl
-export function fetchFundAccounts(contactId, callback) {
+export function fetchFundAccounts(contactId) {
   return Promise.resolve(FETCH_MOCK_RESPONSE);
   // return new Promise(resolve => fetch({
   //   url: API_URL + `/contacts/${contactId}/public`,
@@ -51,7 +51,7 @@ export function fetchFundAccounts(contactId, callback) {
 }
 
 // TODO use makeAuthUrl
-export function saveFundAccount(contactId, fundAccount, callback) {
+export function createFundAccount(contactId, fundAccount) {
   return Promise.resolve(SAVE_MOCK_RESPONSE);
   // return new Promise(resolve => fetch({
   //   url: API_URL + '/fund_accounts/public',
