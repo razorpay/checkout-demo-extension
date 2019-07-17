@@ -320,6 +320,12 @@ export const optionValidations = {
       return '';
     }
   },
+
+  payout: function(payout, options) {
+    if (payout && !options.contact_id) {
+      return 'contact_id is required for a Payout';
+    }
+  },
 };
 
 export function validateOverrides(options, skip = []) {
