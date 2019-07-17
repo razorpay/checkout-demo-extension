@@ -217,7 +217,8 @@
         session.tpvBank ||
         session.upiTpv ||
         session.multiTpv ||
-        session.local
+        session.local ||
+        session.isPayout
       ) {
         /* disableP13n is both, the template prop and the class prop */
         this.disableP13n = true;

@@ -5687,11 +5687,10 @@ Session.prototype = {
          * means that the user selected an existing fund account.
          */
         var selectedAccount = this.payoutsView.getSelectedInstrument();
-        Razorpay.sendMessage({
-          event: 'complete',
-          data: { razorpay_fund_account_id: selectedAccount.id },
+
+        successHandler.call(session, {
+          razorpay_fund_account_id: selectedAccount.id,
         });
-        session.hide();
       } else {
         /**
          * If we are not on the payouts screen, create the fund account using
@@ -5699,16 +5698,11 @@ Session.prototype = {
          */
         Payouts.createFundAccount(data)
           .then(function(account) {
-            Razorpay.sendMessage({
-              event: 'complete',
-              data: { razorpay_fund_account_id: account.id },
+            successHandler.call(session, {
+              razorpay_fund_account_id: account.id,
             });
-            session.hide();
           })
-          .catch(function(response) {
-            Razorpay.sendMessage({ event: 'fault', data: response.error });
-            session.hide();
-          });
+          .catch(bind(errorHandler, this));
       }
       return;
     }
@@ -6375,6 +6369,9 @@ Session.prototype = {
 
     if (this.isPayout) {
       Analytics.setMeta('payout', true);
+
+      // We are disabling retries for payouts for now.
+      this.set('retry', false);
     }
 
     /* In case of recurring set recurring as filter in saved cards */
