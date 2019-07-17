@@ -5410,12 +5410,22 @@ Session.prototype = {
     var self = this;
     self.showLoadError('Verifying your VPA');
 
+    var vpa = data.vpa;
+
+    /**
+     * Payouts has a different payload format. Extract vpa from payload if it
+     * a payout.
+     */
+    if (this.isPayout) {
+      vpa = data.vpa.address;
+    }
+
     self.r
       /**
        * set a timeout of 10s, if the API is taking > 10s to resolove;
        * attempt payment regardless of verification
        */
-      .verifyVpa(data.vpa, 10000)
+      .verifyVpa(vpa, 10000)
       .then(function() {
         self.submit({
           vpaVerified: true,
