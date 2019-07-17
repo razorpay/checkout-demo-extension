@@ -5,7 +5,10 @@
   <div class="options">
     {#each providers as provider}
       <NextOption
-        classes={[ provider.data.code ]}
+        attributes={{
+          'data-paylater': provider.data.code
+        }}
+        tabindex={0}
         {...provider}
 
         on:select="select(event)"
