@@ -729,6 +729,21 @@ function errorHandler(response) {
   Analytics.setMeta('payment.failed', true);
   Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
+  /**
+   * If retry is disabled, Checkout will be 'dismiss'ed.
+   * Set the dismiss reason.
+   *
+   * This will work because the user won't be able
+   * to dismiss it after this point.
+   * If the user were able to dismiss it, we'd
+   * have to clear this somehow.
+   */
+  if (!this.get('retry')) {
+    this.dismissReason = {
+      error: error,
+    };
+  }
+
   if (this.modal) {
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
