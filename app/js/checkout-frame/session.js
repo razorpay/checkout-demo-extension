@@ -3817,8 +3817,11 @@ Session.prototype = {
   },
 
   switchTab: function(tab) {
-    // initial screen
-    if (!this.tab) {
+    /**
+     * Validate fields on common screen. Do not do this for payouts as payouts
+     * tab itself is the initial screen, and we want to switch to it unconditionally.
+     */
+    if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
@@ -3858,8 +3861,11 @@ Session.prototype = {
       });
 
       var contact = getPhone();
+      /**
+       * Validate contact only if it isn't a payout.
+       */
       if (
-        (!contact && !getStore('optional').contact) ||
+        (!contact && !getStore('optional').contact && !this.isPayout) ||
         this.get('method.' + tab) === false
       ) {
         return;
