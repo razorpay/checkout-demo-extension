@@ -3,13 +3,12 @@
 </div>
 
 <div id="upi-gpay-phone">
-  <Card selected={radio.phone} on:click="focus()">
+  <Card selected="{radio.phone}" on:click="focus()">
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField
       placeholder="Enter Mobile Number" helpText="Please enter a valid phone
       number" required={true} formatter={{ type: 'number' }} maxlength="{10}"
-      value={contact}
-      on:blur="blur()" on:focus="focus()" />
+      value={contact} on:blur="blur()" on:focus="focus()" />
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked}
     ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
@@ -30,7 +29,8 @@
 {/if} {/if}
 
 <style>
-  #upi-gpay-phone,#upi-gpay-vpa {
+  #upi-gpay-phone,
+  #upi-gpay-vpa {
     display: block;
   }
 
@@ -63,7 +63,7 @@
       return {
         focusOnCreate: false,
         error: false,
-        contact:null,
+        contact: null,
         selected: true,
         radio: {
           phone: true,
@@ -76,8 +76,8 @@
 
     oncreate() {
       this.set({
-        contact:getSession().customer.contact
-      })
+        contact: getSession().customer.contact.replace('+91', ''),
+      });
       const { focusOnCreate } = this.get();
       if (focusOnCreate) {
         this.focus();

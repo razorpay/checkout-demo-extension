@@ -5519,7 +5519,8 @@ Session.prototype = {
     }
     var isOmni =
       this.preferences.features.google_omnichannel &&
-      this.upiTab.get().selectedApp == 'gpay';
+      this.upiTab.get().selectedApp == 'gpay' &&
+      !this.upiTab.get().retryOmnichannel;
     if (isOmni) {
       this.showOmniChannelUi(strings.gpay_omni);
     }
