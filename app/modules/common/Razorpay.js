@@ -30,7 +30,7 @@ const backendEntityIds = [
   'invoice_id',
   'subscription_id',
   'payment_link_id',
-  // 'contact_id', // To be uncommented after contact_id is respected by Preferences API
+  'contact_id',
 ];
 
 export function makeAuthUrl(r, url) {
@@ -323,8 +323,14 @@ export const optionValidations = {
   },
 
   payout: function(payout, options) {
-    if (payout && !options.contact_id) {
-      return 'contact_id is required for a Payout';
+    if (payout) {
+      if (!options.key) {
+        return 'key is required for a Payout';
+      }
+
+      if (!options.contact_id) {
+        return 'contact_id is required for a Payout';
+      }
     }
   },
 };
