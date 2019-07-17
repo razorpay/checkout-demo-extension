@@ -18,7 +18,7 @@ module.exports = {
 
 class PayLater extends CheckoutFrameTest {
   async render() {
-    let attempt = this.attempt = this.newAttempt();
+    let attempt = (this.attempt = this.newAttempt());
 
     await this.selectProvider('epaylater');
     await this.enterOtp('123456');
@@ -28,7 +28,7 @@ class PayLater extends CheckoutFrameTest {
   async selectProvider(providerCode) {
     const { page, attempt } = this;
 
-    const selector = `#form-paylater .option.${providerCode}`;
+    const selector = `#form-paylater .option[data-paylater="${providerCode}"]`;
 
     await page.waitForSelector(selector, { visible: true });
 
@@ -51,13 +51,12 @@ class PayLater extends CheckoutFrameTest {
     await page.waitForSelector('#otp-prompt', { visible: true });
     await delay(100);
 
+    let { body: otpVerifyRequestBody } = attempt.getRequest();
 
-    let { body: otpVerifyRequestBody  } = attempt.getRequest();
-
-    assertObject(otpVerifyRequestBody,{
+    assertObject(otpVerifyRequestBody, {
       contact: '',
       email: '',
-      otp: ''
+      otp: '',
     });
 
     await attempt.reply({ contact: '9999', ott: 'sd2783' });
@@ -81,8 +80,8 @@ class PayLater extends CheckoutFrameTest {
       currency: '',
       key_id: '',
       _: {
-        checkout_id: 'CsTpeFvRnElRNc'
-      }
+        checkout_id: 'CsTpeFvRnElRNc',
+      },
     });
 
     await attempt.succeed();
