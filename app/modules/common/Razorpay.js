@@ -30,6 +30,7 @@ const backendEntityIds = [
   'invoice_id',
   'subscription_id',
   'payment_link_id',
+  // 'contact_id', // To be uncommented after contact_id is respected by Preferences API
 ];
 
 export function makeAuthUrl(r, url) {
