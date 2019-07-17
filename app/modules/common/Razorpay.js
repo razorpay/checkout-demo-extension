@@ -30,6 +30,7 @@ const backendEntityIds = [
   'invoice_id',
   'subscription_id',
   'payment_link_id',
+  'contact_id',
 ];
 
 export function makeAuthUrl(r, url) {
@@ -237,6 +238,7 @@ export function makePrefParams(rzp) {
         'recurring',
         'subscription_card_change',
         'account_id',
+        'contact_id',
       ],
       function(key) {
         var value = getter(key);
@@ -317,6 +319,18 @@ export const optionValidations = {
     amount = String(amount).replace(/([^0-9.])/g, '');
     if (!amount && amount !== Razorpay.defaults.display_amount) {
       return '';
+    }
+  },
+
+  payout: function(payout, options) {
+    if (payout) {
+      if (!options.key) {
+        return 'key is required for a Payout';
+      }
+
+      if (!options.contact_id) {
+        return 'contact_id is required for a Payout';
+      }
     }
   },
 };

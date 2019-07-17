@@ -1,6 +1,8 @@
 <Option
   {data}
-  {type}
+  {classes}
+  {reverse}
+  type="radio-option"
 
   on:select="fire('select', event)"
 >
@@ -26,10 +28,14 @@
     },
 
     computed: {
-      type: function({selected}) {
-        let activeClass = selected ? ' selected': '';
+      classes: function({selected}) {
+        const allClasses = [];
 
-        return `radio-option${activeClass}`;
+        if (selected) {
+          allClasses.push('selected');
+        }
+
+        return allClasses;
       }
     },
 
@@ -39,6 +45,7 @@
         showRadio: true,
         selected: false,
         iconPlaceholder: '',
+        reverse: false
       };
     },
   }

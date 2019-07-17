@@ -59,6 +59,8 @@ export const TAB_TITLES = {
   upi: 'UPI',
   gpay: 'Google Pay',
   wallet: 'Wallet',
+  payout_account: 'Add Bank Account',
+  payout_upi: 'Add UPI ID',
 };
 
 /* .shown has display: none from iOS ad-blocker

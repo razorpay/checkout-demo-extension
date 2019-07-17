@@ -269,6 +269,11 @@
       return Promise.reject();
     }
 
+    // We're not using Web Payments API for Payouts
+    if (session.isPayout) {
+      return Promise.reject();
+    }
+
     /* disable Web payments API for Android SDK as we have intent there */
     if (Bridge.checkout.exists()) {
       return Promise.reject();
@@ -325,7 +330,10 @@
 
       intent: ({ preferIntent }) => {
         let intentApps = getSession().upi_intents_data;
-        return preferIntent && intentApps && _.lengthOf(intentApps) > 0;
+        // We'll not use intent for Payouts
+        const { isPayout } = getSession();
+
+        return !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0;
       },
 
       /* Will be true if Google Pay for web payments API is selected */
@@ -336,7 +344,10 @@
        * Show "Show QR" button only if QR is enabled and an app has not been selected.
        * selectedApp === null when "Other Apps" is selected
        */
-      shouldShowQr: ({ qrEnabled, selectedApp }) => qrEnabled && !selectedApp && selectedApp !== null,
+      shouldShowQr: ({ qrEnabled, selectedApp }) => {
+        const session = getSession();
+        return qrEnabled && !selectedApp && selectedApp !== null && !session.isPayout;
+      },
     },
 
     oncreate() {

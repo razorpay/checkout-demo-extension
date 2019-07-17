@@ -18,12 +18,23 @@
         data: {},
         attributes: {},
         tabindex: -1,
+        reverse: false
       };
     },
 
     computed: {
-      optionClasses: ({ type, classes }) => {
-        return `option ${type} ${classes.join(' ')}`;
+      optionClasses: ({ type, classes, reverse }) => {
+        const defaultClasses = ['option'];
+
+        if (type) {
+          defaultClasses.push(type);
+        }
+
+        if (reverse) {
+          defaultClasses.push('reverse');
+        }
+
+        return defaultClasses.concat(classes).join(' ');
       }
     },
 
