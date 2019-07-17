@@ -6373,6 +6373,10 @@ Session.prototype = {
 
     this.isPayout = Boolean(this.get('payout'));
 
+    if (this.isPayout) {
+      Analytics.setMeta('payout', true);
+    }
+
     /* In case of recurring set recurring as filter in saved cards */
     if (
       (session_options['prefill.method'] === 'emandate' &&
