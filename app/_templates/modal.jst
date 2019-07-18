@@ -50,7 +50,7 @@ var upi_apps = _.upi_intents_data;
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
   <div id="timeout"></div>
-  <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank">&#xe608;</a></i>
+  <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank" tabindex="-1">&#xe608;</a></i>
   <div id="tnc-wrap"></div>
   <div id="modal" class="mchild">
     <div id="modal-inner">
@@ -133,7 +133,7 @@ var upi_apps = _.upi_intents_data;
             <div id="form-fields">
               <div id="form-common" class="showable drishy screen">
                 <div class="pad partial-payment-block" id="pad-common">
-                  <div class="elem-wrap`?contact_hidden` invisible`?`"><div class="elem elem-contact`?contact_readonly` readonly`?`">
+                  <div class="elem-wrap`?contact_hidden` invisible`?`" id="elem-wrap-contact"><div class="elem elem-contact`?contact_readonly` readonly`?`">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
@@ -312,7 +312,7 @@ var upi_apps = _.upi_intents_data;
                   <div id="show-add-card" class="text-btn left-card">Add another card</div>
                   `?method.card`
                     <div class="strip emi-plans-info-container emi-plans-trigger saved-card-pay-without-emi hidden emi-icon-single-card">
-                      <div class="emi-plans-text no-action">Pay without EMI<span class="count-text"></span></div>
+                      <div class="emi-plans-text no-action">Pay entire amount<span class="count-text"></span></div>
                       <div class="emi-plans-action theme-highlight"></div>
                     </div>
                   `?`
@@ -369,7 +369,7 @@ var upi_apps = _.upi_intents_data;
                             Credit Cards. Enter your credit card to avail.</span>
                           <div class="emi-plans-text">EMI unavailable</div>
                           `?method.card`
-                          <div class="emi-plans-action theme-highlight">Pay without EMI</div>
+                          <div class="emi-plans-action theme-highlight">Pay entire amount</div>
                           `?`
                         </div>
                         <div class="emi-plan-selected hidden emi-icon-multiple-cards">
@@ -384,7 +384,7 @@ var upi_apps = _.upi_intents_data;
                         `?`
                         `?method.card`
                           <div class="emi-pay-without hidden emi-icon-single-card">
-                            <div class="emi-plans-text no-action">Pay without EMI<span class="count-text"></span></div>
+                            <div class="emi-plans-text no-action">Pay entire amount<span class="count-text"></span></div>
                             <div class="emi-plans-action theme-highlight"></div>
                           </div>
                         `?`
@@ -572,6 +572,10 @@ var upi_apps = _.upi_intents_data;
               <!-- UPI method -->
               <div id='upi-svelte-wrap'>
               </div>
+              <div id='payouts-svelte-wrap'>
+              </div>
+              <div id='payout-account-svelte-wrap'>
+              </div>
               `?method.qr`
                 <div class="tab-content showable screen pad" id="form-qr">
                 </div>
@@ -625,6 +629,7 @@ var upi_apps = _.upi_intents_data;
               <span class="view-plans-btn invisible">View EMI Plans</span>
               <span class="select-plan-btn invisible">Select EMI Plan</span>
               <span class="enter-card-details invisible">Enter Card Details</span>
+              <span class="confirm-account invisible">Confirm Account</span>
             </button>
             `?o('theme.branding')`
               <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">

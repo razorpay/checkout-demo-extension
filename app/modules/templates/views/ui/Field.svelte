@@ -13,6 +13,8 @@
     use:formatter="formatter"
     on:focus="fire('focus', event)"
     on:blur="fire('blur', event)"
+
+    class:no-refresh="!refresh"
   />
   {#if helpText}
     <div class="help">{helpText}</div>
@@ -42,6 +44,7 @@
         invalid: false,
         focused: false,
         required: false,
+        refresh: true,
         formatter: null,
         helpText: '',
         placeholder: '',

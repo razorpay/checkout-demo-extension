@@ -77,6 +77,7 @@ function getCommonTrackingData(r) {
 }
 
 const EVT_Q = [];
+let PENDING_EVT_Q = [];
 let EVT_CTX;
 
 const pushToEventQ = evt => EVT_Q.push(evt);
@@ -149,6 +150,10 @@ const FLUSH_INTERVAL = setInterval(() => {
  * @param {Boolean} immediately Whether to send this event immediately.
  */
 export default function Track(r, event, data, immediately) {
+  if (!r) {
+    PENDING_EVT_Q.push([event, data, immediately]);
+    return;
+  }
   if (!r.isLiveMode()) {
     return;
   }
@@ -261,6 +266,16 @@ function addMagicProps(r, properties) {
     }
   }
 }
+
+Track.dispatchPendingEvents = r => {
+  if (!r) {
+    return;
+  }
+  const track = Track.bind(Track, r);
+  PENDING_EVT_Q.splice(0, PENDING_EVT_Q.length).forEach(e => {
+    track.apply(Track, e);
+  });
+};
 
 Track.parseAnalyticsData = data => {
   if (!_.isNonNullObject(data)) {

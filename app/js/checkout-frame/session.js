@@ -26,10 +26,13 @@ var preferences = window.preferences,
   DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
   OptionsList = discreet.OptionsList,
+  UPIUtils = discreet.UPIUtils,
+  Payouts = discreet.Payouts,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
+  _Doc = discreet._Doc,
   _El = discreet._El,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi;
@@ -247,6 +250,7 @@ function fillBankRadios(corporateBankName, retailBankName) {
  * 2. If new card screen, show if no emi plan is selected.
  */
 function setEmiPlansCta(screen, tab) {
+  var session = SessionManager.getSession();
   var type = 'pay';
 
   var isSavedScreen =
@@ -282,6 +286,8 @@ function setEmiPlansCta(screen, tab) {
     }
   } else if (screen === 'emi' && tab === 'emiplans') {
     type = 'emi';
+  } else if (session.isPayout) {
+    type = 'add-upi';
   }
 
   var classes = [
@@ -289,6 +295,7 @@ function setEmiPlansCta(screen, tab) {
     '.view-plans-btn',
     '.pay-btn',
     '.enter-card-details',
+    '.confirm-account',
   ];
 
   each(classes, function(index, className) {
@@ -311,19 +318,50 @@ function setEmiPlansCta(screen, tab) {
     case 'emi':
       $('.enter-card-details').removeClass('invisible');
       break;
+
+    case 'add-upi':
+      $('.confirm-account').removeClass('invisible');
+      break;
   }
 }
 
 /**
  * Get the saved card elemnnt that should be selected
  * when the saved cards screen is shown.
+ * @param {string} tab
+ * @param {string} token
+ *
+ * @returns {Element}
  */
-function getSelectableSavedCardElement(tab) {
-  if (tab === 'emi') {
-    return qs('.saved-card.checked[emi]') || qs('.saved-card[emi]');
-  } else {
-    return qs('.saved-card.checked') || qs('.saved-card');
+function getSelectableSavedCardElement(tab, token) {
+  var selectors = {
+    checked: '.saved-card.checked',
+    saved: '.saved-card',
+    token: '.saved-card',
+  };
+
+  // Add token to selectors
+  if (token) {
+    selectors.token += '[token="' + token + '"]';
   }
+
+  var emiSelector = tab === 'emi' ? '[emi]' : '';
+
+  // Add EMI selector to selectors
+  selectors = _Obj.map(selectors, function(value) {
+    return value + emiSelector;
+  });
+
+  var validSelector = _Arr.find(
+    [selectors.checked, selectors.token, selectors.saved],
+    function(selector) {
+      return qs(selector);
+    }
+  );
+
+  var elem = qs(validSelector);
+
+  return elem;
 }
 
 /**
@@ -691,6 +729,21 @@ function errorHandler(response) {
   Analytics.setMeta('payment.failed', true);
   Razorpay.sendMessage({ event: 'paymenterror', data: { error: error } });
 
+  /**
+   * If retry is disabled, Checkout will be 'dismiss'ed.
+   * Set the dismiss reason.
+   *
+   * This will work because the user won't be able
+   * to dismiss it after this point.
+   * If the user were able to dismiss it, we'd
+   * have to clear this somehow.
+   */
+  if (!this.get('retry')) {
+    this.dismissReason = {
+      error: error,
+    };
+  }
+
   if (this.modal) {
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
@@ -839,6 +892,16 @@ function askOTP(view, text, shouldLimitResend) {
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
   var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
+
+  // Track if OTP was invalid
+  if (origText === discreet.wrongOtpMsg) {
+    Analytics.track('otp:invalid', {
+      data: {
+        wallet: thisSession.tab === 'wallet',
+        headless: thisSession.headless,
+      },
+    });
+  }
 
   if (qpmap.platform === 'android') {
     if (window.OTPElf) {
@@ -1010,6 +1073,7 @@ Session.prototype = {
   },
 
   getDecimalAmount: getDecimalAmount,
+
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
@@ -1049,6 +1113,15 @@ Session.prototype = {
 
   track: function(event, extra) {
     Track(this.r, event, extra);
+  },
+
+  /**
+   * Returns the Payment instance for the current payment.
+   *
+   * @return {Payment}
+   */
+  getPayment: function() {
+    return this.r._payment;
   },
 
   getClasses: function() {
@@ -1091,7 +1164,11 @@ Session.prototype = {
     }
 
     if (getStore('contactEmailOptional')) {
-      classes.push('no-details');
+      if (this.tpvBank) {
+        classes.push('tpv-no-details');
+      } else {
+        classes.push('no-details');
+      }
     }
 
     if (this.irctc) {
@@ -1533,6 +1610,7 @@ Session.prototype = {
     this.setSavedCardsView();
     this.setOtpScreen();
     this.setUpiTab();
+    this.setPayoutsScreen();
   },
 
   showTimer: function(cb) {
@@ -1713,6 +1791,58 @@ Session.prototype = {
     });
 
     this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
+  },
+
+  setPayoutsScreen: function() {
+    var session = this;
+    if (!this.isPayout) {
+      return;
+    }
+
+    var accounts = this.preferences.fund_accounts;
+
+    var upiAccounts = _Arr.filter(accounts, function(account) {
+      return account.account_type === 'vpa';
+    });
+
+    var bankAccounts = _Arr.filter(accounts, function(account) {
+      return account.account_type === 'bank_account';
+    });
+
+    this.payoutsView = new discreet.PayoutsInstruments({
+      target: gel('payouts-svelte-wrap'),
+      data: {
+        session: session,
+        amount: this.formatAmountWithCurrency(this.get('amount')),
+        upiAccounts: upiAccounts,
+        bankAccounts: bankAccounts,
+      },
+    });
+
+    this.payoutsAccountView = new discreet.PayoutAccount({
+      target: gel('payout-account-svelte-wrap'),
+      data: {
+        session: session,
+      },
+    });
+
+    $('#top-right').addClass('hidden');
+
+    this.payoutsView.on('selectaccount', function(account) {
+      $('#body').addClass('sub');
+    });
+
+    this.payoutsView.on('add', function(event) {
+      var method = event.method;
+
+      if (method === 'upi') {
+        session.switchTab('upi');
+      } else if (method === 'bank') {
+        session.switchTab('payout_account');
+      }
+    });
+
+    this.switchTab('payouts');
   },
 
   getCardlessEmiPlans: function() {
@@ -2258,8 +2388,9 @@ Session.prototype = {
   },
 
   extraNext: function() {
-    var commonInvalid = $('#pad-common .invalid');
-    if (commonInvalid[0]) {
+    if (!this.checkCommonValidAndTrackIfInvalid()) {
+      var commonInvalid = $('#pad-common .invalid');
+
       return commonInvalid
         .addClass('mature')
         .$('.input')
@@ -2876,7 +3007,7 @@ Session.prototype = {
 
   refresh: function() {
     var self = this;
-    each($$('.input'), function(i, el) {
+    each($$('.input:not(.no-refresh)'), function(i, el) {
       self.input(el);
     });
   },
@@ -3073,7 +3204,9 @@ Session.prototype = {
           var instruments = [];
           self.input(this.el);
 
-          if (this.isValid()) {
+          var shouldUseP13n = self.p13n;
+
+          if (this.isValid() && shouldUseP13n) {
             instruments =
               P13n.listInstruments(self.getCustomer(this.value)) || [];
 
@@ -3165,6 +3298,15 @@ Session.prototype = {
 
   setScreen: function(screen) {
     var isGPayScreen = false;
+
+    /**
+     * `screen` being empty means that we want to go to the homescreen.
+     * In the case of Payouts, "payouts" is the homescreen.
+     */
+    if (!screen && this.isPayout) {
+      screen = 'payouts';
+    }
+
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3172,6 +3314,10 @@ Session.prototype = {
           : tab_titles[this.cardTab || screen];
 
       screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
+
+      if (screen === 'upi' && this.isPayout) {
+        screenTitle = tab_titles.payout_upi;
+      }
 
       if (screenTitle) {
         gel('tab-title').innerHTML = screenTitle;
@@ -3225,7 +3371,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen) {
+    if (screen && !(this.isPayout && screen === 'payouts')) {
       makeVisible('#topbar');
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
@@ -3254,6 +3400,12 @@ Session.prototype = {
     ) {
       showPaybtn = false;
     }
+
+    if (screen === 'payouts') {
+      var selectedInstrument = this.payoutsView.getSelectedInstrument();
+      showPaybtn = Boolean(selectedInstrument);
+    }
+
     this.body.toggleClass('sub', showPaybtn);
 
     if (screen === 'upi') {
@@ -3557,7 +3709,7 @@ Session.prototype = {
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
-          tab = '';
+          tab = 'upi';
         } else {
           tab = thisTab;
         }
@@ -3652,10 +3804,52 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Checks if the fields on the homepage are valid or not.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValid: function() {
+    var valid = !this.checkInvalid('#pad-common');
+
+    return valid;
+  },
+
+  /**
+   * Checks if fields are invalid.
+   * And if they are invalid, tracks them.
+   *
+   * @returns {boolean} valid
+   */
+  checkCommonValidAndTrackIfInvalid: function() {
+    var valid = this.checkCommonValid();
+
+    if (!valid) {
+      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+
+      var invalidFields = {};
+
+      _Arr.loop(fields, function(field) {
+        invalidFields[field.name] = true;
+      });
+
+      Analytics.track('homescreen:fields:invalid', {
+        data: {
+          fields: invalidFields,
+        },
+      });
+    }
+
+    return valid;
+  },
+
   switchTab: function(tab) {
-    // initial screen
-    if (!this.tab) {
-      if (this.checkInvalid('#pad-common')) {
+    /**
+     * Validate fields on common screen. Do not do this for payouts as payouts
+     * tab itself is the initial screen, and we want to switch to it unconditionally.
+     */
+    if (!this.tab && !this.isPayout) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
           this.methodsList.otherMethodsView.fire('hideMethods');
         }
@@ -3669,6 +3863,7 @@ Session.prototype = {
         to: tab,
       },
     });
+
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
@@ -3693,8 +3888,11 @@ Session.prototype = {
       });
 
       var contact = getPhone();
+      /**
+       * Validate contact only if it isn't a payout.
+       */
       if (
-        (!contact && !getStore('optional').contact) ||
+        (!contact && !getStore('optional').contact && !this.isPayout) ||
         this.get('method.' + tab) === false
       ) {
         return;
@@ -3824,6 +4022,8 @@ Session.prototype = {
   },
 
   setSavedCard: function(e) {
+    // TODO: Return from here if we are selecting the same selected card
+
     var $savedCard = $(e.delegateTarget);
     if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
       return;
@@ -3835,6 +4035,8 @@ Session.prototype = {
 
     $('#saved-cards-container .checked').removeClass('checked');
     $savedCard.addClass('checked');
+
+    this.selectedSavedCardToken = $savedCard.attr('token');
 
     if (this.offers && !this.offers.offerSelectedByDrawer) {
       this.offers.removeOffer();
@@ -4312,7 +4514,10 @@ Session.prototype = {
       }
     }
 
-    var selectableSavedCard = getSelectableSavedCardElement(this.tab);
+    var selectableSavedCard = getSelectableSavedCardElement(
+      this.tab,
+      this.selectedSavedCardToken
+    );
     if (tokens && selectableSavedCard) {
       this.setSavedCard({ delegateTarget: selectableSavedCard });
     }
@@ -4369,7 +4574,10 @@ Session.prototype = {
 
     if (saveScreen) {
       this.setSavedCard({
-        delegateTarget: getSelectableSavedCardElement(this.tab),
+        delegateTarget: getSelectableSavedCardElement(
+          this.tab,
+          this.selectedSavedCardToken
+        ),
       });
       invoke('addClass', $savedContainer, 'scroll', 300);
     } else {
@@ -4710,7 +4918,7 @@ Session.prototype = {
         }
       }
 
-      if (this.screen === 'upi') {
+      if (this.screen === 'upi' && this.tab !== 'qr') {
         /* All tabs should be responsible for their subdata */
         var upiData = this.upiTab.getPayload();
 
@@ -5058,7 +5266,7 @@ Session.prototype = {
     }
 
     if (!this.recurring && this.order && this.order.bank) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
       data.method = this.order.method || data.method || 'netbanking';
@@ -5208,7 +5416,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (this.p13n) {
-      if (this.checkInvalid('#pad-common')) {
+      if (!this.checkCommonValid()) {
         return;
       }
 
@@ -5250,12 +5458,22 @@ Session.prototype = {
     var self = this;
     self.showLoadError('Verifying your VPA');
 
+    var vpa = data.vpa;
+
+    /**
+     * Payouts has a different payload format. Extract vpa from payload if it
+     * a payout.
+     */
+    if (this.isPayout) {
+      vpa = data.vpa.address;
+    }
+
     self.r
       /**
        * set a timeout of 10s, if the API is taking > 10s to resolove;
        * attempt payment regardless of verification
        */
-      .verifyVpa(data.vpa, 10000)
+      .verifyVpa(vpa, 10000)
       .then(function() {
         self.submit({
           vpaVerified: true,
@@ -5287,6 +5505,7 @@ Session.prototype = {
       sdk_popup: this.sdk_popup,
       magic: this.magic,
       optional: getStore('optional'),
+      external: {},
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
@@ -5408,7 +5627,17 @@ Session.prototype = {
       }
 
       if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
-        request.amazonpay = true;
+        request.external.amazonpay = true;
+      }
+    }
+
+    if (data.method === 'upi') {
+      if (
+        this.hasGooglePaySdk &&
+        data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
+      ) {
+        request.external.gpay = true;
+        request['_[flow]'] = 'intent';
       }
     }
 
@@ -5474,8 +5703,10 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
-    } else {
+    } else if (!this.isPayout) {
       this.showLoadError();
+    } else {
+      this.showLoadError('Processing...');
     }
 
     if (wallet === 'freecharge') {
@@ -5495,6 +5726,33 @@ Session.prototype = {
     /* VPA verification */
     if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
+    }
+
+    if (this.isPayout) {
+      if (this.screen === 'payouts') {
+        /**
+         * If we are on the payouts screen when the submission happened, it
+         * means that the user selected an existing fund account.
+         */
+        var selectedAccount = this.payoutsView.getSelectedInstrument();
+
+        successHandler.call(session, {
+          razorpay_fund_account_id: selectedAccount.id,
+        });
+      } else {
+        /**
+         * If we are not on the payouts screen, create the fund account using
+         * the payload.
+         */
+        Payouts.createFundAccount(data)
+          .then(function(account) {
+            successHandler.call(session, {
+              razorpay_fund_account_id: account.id,
+            });
+          })
+          .catch(bind(errorHandler, this));
+      }
+      return;
     }
 
     var payment = this.r.createPayment(data, request);
@@ -5533,9 +5791,9 @@ Session.prototype = {
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
-    if (request.amazonpay) {
-      payment.on('payment.amazonpay.process', function(data) {
-        /* invoke amazonpay sdk via our SDK */
+    if (request.external.amazonpay || request.external.gpay) {
+      payment.on('payment.externalsdk.process', function(data) {
+        /* invoke external sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
           CheckoutBridge.processPayment(JSON.stringify(data));
@@ -5638,6 +5896,28 @@ Session.prototype = {
 
   getPayload: function() {
     var data = this.getFormData();
+
+    if (this.isPayout && this.screen === 'upi') {
+      return {
+        contact_id: this.get('contact_id'),
+        account_type: 'vpa',
+        vpa: {
+          address: data.vpa,
+        },
+      };
+    }
+
+    if (this.isPayout && this.screen === 'payout_account') {
+      return {
+        contact_id: this.get('contact_id'),
+        account_type: 'bank_account',
+        bank_account: {
+          name: data.name,
+          ifsc: data.ifsc,
+          account_number: data.account_number,
+        },
+      };
+    }
 
     if (this.screen === 'card' && this.tab === 'emi') {
       setEmiBank(data, this.savedCardScreen);
@@ -5970,8 +6250,14 @@ Session.prototype = {
     if (methods.upi) {
       methods.count++;
       if (qrEnabled) {
-        methods.count++;
         methods.qr = true;
+
+        /**
+         * Do not increase the count since we don't
+         * want to show QR in intial list of
+         * payment options anymore.
+         */
+        // methods.count++;
       }
 
       if (this.separateGPay) {
@@ -6105,8 +6391,6 @@ Session.prototype = {
 
     this.tab_titles = tab_titles;
 
-    this.setEmiOptions();
-
     var self = this,
       customer,
       saved_customer = preferences.customer,
@@ -6127,6 +6411,15 @@ Session.prototype = {
       this.getCustomer = function() {
         return customer;
       };
+    }
+
+    this.isPayout = Boolean(this.get('payout'));
+
+    if (this.isPayout) {
+      Analytics.setMeta('payout', true);
+
+      // We are disabling retries for payouts for now.
+      this.set('retry', false);
     }
 
     /* In case of recurring set recurring as filter in saved cards */
@@ -6210,6 +6503,9 @@ Session.prototype = {
     if (itemWithCurrency) {
       session_options.currency = itemWithCurrency.currency;
     }
+
+    // Amount and currency have been updated, set EMI options
+    this.setEmiOptions();
 
     /*
      * Set redirect mode if TPV and callback_url exists
@@ -6343,16 +6639,38 @@ Session.prototype = {
         return;
       }
 
-      callback({
-        preferences: preferences,
-        validation: validation,
-      });
+      if (self.isPayout) {
+        self
+          .fetchFundAccounts()
+          .then(function(response) {
+            preferences.fund_accounts = response.fund_accounts;
+            callback({
+              preferences: preferences,
+              validation: validation,
+            });
+          })
+          .catch(function(response) {
+            return Razorpay.sendMessage({
+              event: 'fault',
+              data: response.error,
+            });
+          });
+      } else {
+        callback({
+          preferences: preferences,
+          validation: validation,
+        });
+      }
     });
 
     /* Start listening for back presses */
     discreet.Bridge.setHistoryAndListenForBackPresses();
 
     return this.prefCall;
+  },
+
+  fetchFundAccounts: function() {
+    return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 };
 

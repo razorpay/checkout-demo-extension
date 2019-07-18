@@ -56,18 +56,20 @@
 
       &:after
         content: '\e604';
-        transform: rotate(180deg);
         font-size: 10px;
         position: absolute;
         right: 16px;
-        top: 14px;
+        top: 50%;
+        transform: translateY(-50%) rotate(180deg);
+        margin-top: 0.2em;
 
       &.up-arrow::after
-        transform: rotate(90deg);
+        transform: translateY(-50%) rotate(90deg);
+        margin-top: 0;
 
       &.down-arrow::after
-        transform: rotate(270deg);
-        top: 10px;
+        transform: translateY(-50%) rotate(270deg);
+        margin-top: 0;
 
       .option-title,
       .option-arrow-text
@@ -108,3 +110,12 @@
         padding: 5px;
         width: 26px;
         border-bottom: 1px solid #ccc;
+
+    &.radio-option.reverse
+      padding-left: 16px;
+      padding-right: 48px;
+
+      .input-radio
+        float: left;
+        margin-top: -2px;
+        margin-right: 4px;

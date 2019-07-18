@@ -48,6 +48,7 @@ import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import * as Downtimes from 'checkoutframe/downtimes';
+import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -61,6 +62,9 @@ import DowntimesStore from 'checkoutstore/downtimes.js';
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
+
+import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
+import PayoutAccount from 'templates/screens/payout-account.svelte';
 
 import * as Hacks from 'checkoutframe/hacks';
 
@@ -109,6 +113,7 @@ export default {
   Offers,
   Flows,
   Downtimes,
+  Payouts,
 
   Store,
   PreferencesStore,
@@ -129,6 +134,8 @@ export default {
   SavedCardsView,
 
   FeeBearerView,
+  PayoutsInstruments,
+  PayoutAccount,
 
   otpView,
   Curtain,
@@ -144,6 +151,7 @@ export default {
   Hacks,
 
   _Arr,
+  _Doc,
   _El,
   _Func,
   _Obj,

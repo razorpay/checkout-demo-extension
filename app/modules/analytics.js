@@ -27,6 +27,7 @@ const Analytics = () => ({
    */
   setR: function(r) {
     rInstance = r;
+    Track.dispatchPendingEvents(r);
   },
 
   /**

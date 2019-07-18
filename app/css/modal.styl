@@ -1759,6 +1759,12 @@ $outline = #ddd;
   margin-bottom: 21px;
 }
 
+#container.tpv-no-details {
+  #elem-wrap-contact, #elem-wrap-email {
+    display: none;
+  }
+}
+
 #container.no-details:not(.partial), #container.extra.show-methods {
   #pad-common + div {
     display: block;
@@ -1947,3 +1953,6 @@ $outline = #ddd;
   text-transform: uppercase
   letter-spacing: 0.25px
   margin-bottom: 5px
+
+#payouts-svelte-wrap
+  overflow: auto;
