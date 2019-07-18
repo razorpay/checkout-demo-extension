@@ -39,7 +39,7 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
-var isIos = /iPhone/.test(ua) || /iPad/.test(ua);
+var isIos = discreet.UserAgent.iOS;
 function getStore(prop) {
   return Store.get()[prop];
 }
@@ -2830,7 +2830,6 @@ Session.prototype = {
 
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
-    // console.log('focussing')
     setTimeout(function() {
       $(e.target).scrollIntoView();
     }, 1000);
