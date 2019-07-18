@@ -23,10 +23,45 @@ function compareSemver(a, b) {
 }
 
 /**
+ * Returns the device orientation.
+ *
+ * @returns {string}
+ */
+function getOrientation() {
+  let angle;
+
+  // Try getting it from the screen object
+  if (_Obj.hasProp(window.screen, 'orientation')) {
+    angle = Math.abs(window.screen.orientation.angle || 0);
+  }
+
+  // If window.screen.orientation is not supported, try getting it from window
+  if (_.isType(angle, 'undefined') && _Obj.hasProp(window, 'orientation')) {
+    angle = Math.abs(window.orientation || 0);
+  }
+
+  const isLandscape = angle === 90 || angle === 270;
+  const orientation = isLandscape ? 'landscape' : 'portrait';
+
+  return orientation;
+}
+
+/**
+ * Tells whether or not the device is in portrait mode.
+ *
+ * @returns {boolean}
+ */
+function isDevicePortrait() {
+  return getOrientation() === 'portrait';
+}
+
+/**
  * Tells whether or not the device is in landscape mode.
+ *
+ * @returns {boolean}
  */
 function isDeviceLandscape() {
-  return global.screen.width > global.screen.height;
+  return getOrientation() === 'landscape';
 }
 
 /**
@@ -104,7 +139,7 @@ function shiftIosPayButtonOnSmallerHeights() {
   if (UserAgent.iPhone) {
     setTimeout(() => {
       const footer = _Doc.querySelector('#footer');
-      if (global.innerHeight <= 512 && isDeviceLandscape()) {
+      if (!isDeviceLandscape() && global.innerHeight <= 512) {
         _El.addClass(footer, 'shift-ios');
       }
     }, 1000);
@@ -118,7 +153,10 @@ function shiftIosPayButtonOnSmallerHeights() {
         const footer = _Doc.querySelector('#footer');
 
         // Shift pay button
-        if (global.screen.height - global.innerHeight >= 56) {
+        if (
+          !isDeviceLandscape() &&
+          global.screen.height - global.innerHeight >= 56
+        ) {
           _El.addClass(footer, 'shift-ios');
         } else {
           _El.removeClass(footer, 'shift-ios');
