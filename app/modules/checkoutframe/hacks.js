@@ -127,14 +127,21 @@ function shiftIosPayButtonOnSmallerHeights() {
     }
   }
 }
-function reduceUnneededPadding() {
-  const isLandscape = window.innerWidth > window.innerHeight;
+
+/**
+ * Removes extra padding in landscape mode
+ */
+function reduceUnneededPaddingIfLandscape() {
+  const isLandscape = isDeviceLandscape();
+
   if (isLandscape) {
     setTimeout(() => {
       const header = _Doc.querySelector('#header');
       const formCommon = _Doc.querySelector('#form-common');
-      _El.addClass(header, 'ios-paybtn-bug');
-      _El.addClass(formCommon, 'ios-paybtn-bug');
+      const iosPayFixClassName = 'ios-paybtn-landscape-fix';
+
+      _El.addClass(header, iosPayFixClassName);
+      _El.addClass(formCommon, iosPayFixClassName);
     });
   }
 }
@@ -144,6 +151,6 @@ export function initPreRenderHacks() {}
 export function initPostRenderHacks() {
   shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
-  reduceUnneededPadding();
+  reduceUnneededPaddingIfLandscape();
   autoScrollHeaderIfLandscape();
 }
