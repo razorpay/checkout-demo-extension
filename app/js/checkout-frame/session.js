@@ -42,7 +42,7 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
-var isIos = discreet.UserAgent.iOS;
+
 function getStore(prop) {
   return Store.get()[prop];
 }
@@ -2645,7 +2645,7 @@ Session.prototype = {
 
     var enabledMethods = this.methods;
 
-    if (isIos) {
+    if (discreet.UserAgent.iOS) {
       this.on('focus', '#card_name', function() {
         this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
         this.el.querySelector('#should-save-card').style.transform =
