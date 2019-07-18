@@ -31,13 +31,13 @@ export function getDeviceOrientation() {
   let angle;
 
   // Try getting it from the screen object
-  if (_Obj.hasProp(window.screen, 'orientation')) {
-    angle = Math.abs(window.screen.orientation.angle || 0);
+  if (_Obj.hasProp(global.screen, 'orientation')) {
+    angle = Math.abs(global.screen.orientation.angle || 0);
   }
 
   // If window.screen.orientation is not supported, try getting it from window
-  if (_.isType(angle, 'undefined') && _Obj.hasProp(window, 'orientation')) {
-    angle = Math.abs(window.orientation || 0);
+  if (_.isType(angle, 'undefined') && _Obj.hasProp(global, 'orientation')) {
+    angle = Math.abs(global.orientation || 0);
   }
 
   const isLandscape = angle === 90 || angle === 270;
@@ -121,10 +121,10 @@ function autoScrollHeaderIfLandscape() {
 
   if (isLandscape) {
     if (UserAgent.iOS) {
-      setTimeout(() => window.ownerWindow.scroll(0, 100));
+      setTimeout(() => global.ownerWindow.scroll(0, 100));
     }
     if (UserAgent.android) {
-      setTimeout(() => window.scroll(0, 100));
+      setTimeout(() => global.scroll(0, 100));
     }
   }
 }
