@@ -40,6 +40,11 @@ export function getDeviceOrientation() {
     angle = Math.abs(global.orientation || 0);
   }
 
+  // As a last resort, rely on screen height and width
+  if (_.isType(angle, 'undefined')) {
+    angle = global.screen.width > global.screen.height ? 90 : 0;
+  }
+
   const isLandscape = angle === 90 || angle === 270;
   const orientation = isLandscape ? 'landscape' : 'portrait';
 
