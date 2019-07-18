@@ -22,6 +22,9 @@ function compareSemver(a, b) {
   return 0;
 }
 
+/**
+ * Tells whether or not the device is in landscape mode.
+ */
 function isDeviceLandscape() {
   return global.screen.width > global.screen.height;
 }
@@ -75,8 +78,12 @@ function decreaseWebViewHeightForAndroidTablets() {
   }
 }
 
-function autoScrollHeader() {
-  const isLandscape = window.innerWidth > window.innerHeight;
+/**
+ * Scrolls the header in landscape mode.
+ */
+function autoScrollHeaderIfLandscape() {
+  const isLandscape = isDeviceLandscape();
+
   if (isLandscape) {
     if (UserAgent.iOS) {
       setTimeout(() => window.ownerWindow.scroll(0, 100));
@@ -138,5 +145,5 @@ export function initPostRenderHacks() {
   shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
   reduceUnneededPadding();
-  autoScrollHeader();
+  autoScrollHeaderIfLandscape();
 }
