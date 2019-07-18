@@ -27,7 +27,7 @@ function compareSemver(a, b) {
  *
  * @returns {string}
  */
-function getOrientation() {
+export function getDeviceOrientation() {
   let angle;
 
   // Try getting it from the screen object
@@ -51,8 +51,8 @@ function getOrientation() {
  *
  * @returns {boolean}
  */
-function isDevicePortrait() {
-  return getOrientation() === 'portrait';
+export function isDevicePortrait() {
+  return getDeviceOrientation() === 'portrait';
 }
 
 /**
@@ -60,8 +60,8 @@ function isDevicePortrait() {
  *
  * @returns {boolean}
  */
-function isDeviceLandscape() {
-  return getOrientation() === 'landscape';
+export function isDeviceLandscape() {
+  return getDeviceOrientation() === 'landscape';
 }
 
 /**

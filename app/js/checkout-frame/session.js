@@ -2645,30 +2645,46 @@ Session.prototype = {
 
     var enabledMethods = this.methods;
 
-    if (discreet.UserAgent.iOS) {
-      this.on('focus', '#card_name', function() {
-        this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
-        this.el.querySelector('#should-save-card').style.transform =
-          'translateY(-10px)';
-      });
-      this.on('blur', '#card_name', function() {
-        this.el.querySelector('#footer').style.transform = 'translateY(0)';
-        this.el.querySelector('#should-save-card').style.transform =
-          'translateY(0)';
-      });
-      this.on('focus', '#card_cvv', function() {
-        this.el.querySelector('#footer').style.transform = 'translateY(-92px)';
-        this.el.querySelector('#should-save-card').style.transform =
-          'translateY(-10px)';
-      });
-      this.on('blur', '#card_cvv', function() {
-        this.el.querySelector('#footer').style.transform = 'translateY(0)';
-        this.el.querySelector('#should-save-card').style.transform =
-          'translateY(0)';
-      });
-    }
-
     if (enabledMethods.card || enabledMethods.emi) {
+      /**
+       * On iOS, unlike Android, the height of the browser
+       * does not change when the keyboard is open. 🙄
+       * On Android, the footer CTA shifts because the browser
+       * resizes.
+       * To simulate the same on iOS, we shift footer and some elements
+       * on the card screen.
+       *
+       * This _has_ to be fixed in v4, so we'll remove it then.
+       */
+      if (discreet.UserAgent.iOS) {
+        this.on('focus', '#card_name', function() {
+          if (Hacks.isDeviceLandscape()) {
+            this.el.querySelector('#footer').style.transform =
+              'translateY(-92px)';
+            this.el.querySelector('#should-save-card').style.transform =
+              'translateY(-10px)';
+          }
+        });
+        this.on('blur', '#card_name', function() {
+          this.el.querySelector('#footer').style.transform = 'translateY(0)';
+          this.el.querySelector('#should-save-card').style.transform =
+            'translateY(0)';
+        });
+        this.on('focus', '#card_cvv', function() {
+          if (Hacks.isDeviceLandscape()) {
+            this.el.querySelector('#footer').style.transform =
+              'translateY(-92px)';
+            this.el.querySelector('#should-save-card').style.transform =
+              'translateY(-10px)';
+          }
+        });
+        this.on('blur', '#card_cvv', function() {
+          this.el.querySelector('#footer').style.transform = 'translateY(0)';
+          this.el.querySelector('#should-save-card').style.transform =
+            'translateY(0)';
+        });
+      }
+
       this.on('keyup', '#card_number', onSixDigits);
       // Also listen for paste.
       this.on('blur', '#card_number', onSixDigits);
