@@ -27,7 +27,7 @@
       </div>
       {#if retry} <input on:change="radioChange(event)" {checked}
       ref:radioInpVpa value={retry?'vpa':null} type="radio" name="isSelected"
-      style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
+      style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;display:none;"
       /> {/if}
     </div>
   </Card>

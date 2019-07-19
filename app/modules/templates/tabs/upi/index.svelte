@@ -26,7 +26,7 @@
       </Card>
       {#if selectedApp === 'gpay'}
         {#if useOmnichannel}
-          <GooglePayOmnichannel {radio} on:radiochange="radioCheck('phone')" retry={retryOmnichannel} ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
+          <GooglePayOmnichannel {isFirst} {radio} on:radiochange="radioCheck('phone')" retry={retryOmnichannel} ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
         {/if}
         {#if retryOmnichannel || !useOmnichannel}
           <GooglePayCollect {radio} on:radiochange="radioCheck('vpa')" retry={retryOmnichannel} {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
@@ -222,6 +222,7 @@
       return {
         vpa: '',
         tab: 'upi',
+        isFirst:true,
         topUpiApps,
         radio:{
           phone:true,
@@ -428,6 +429,9 @@
     this.set({retryOmnichannel:status});
     },
       onBack() {
+        this.set({
+          isFirst:false
+        })
         const {
           intent,
           selectedApp,

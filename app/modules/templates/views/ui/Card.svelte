@@ -1,4 +1,4 @@
-<div ref:card class:theme-border="selected" on:click="fire('click', event)">
+<div ref:card class:theme-border="selected" class:error-border="error" on:click="fire('click', event)">
   <slot></slot>
 </div>
 
@@ -21,10 +21,10 @@
       return {
         selected: false,
         radioValue: null,
+        error: false,
         checked: null,
       };
     },
-    methods: {
-    },
+    methods: {},
   };
 </script>

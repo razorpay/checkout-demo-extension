@@ -3,7 +3,11 @@
 </div>
 
 <div id="upi-gpay-phone">
-  <Card selected="{radio.phone}" on:click="focus()">
+  <Card
+    selected="{radio.phone}"
+    on:click="focus()"
+    error={radio.phone&&error&&isFirst}
+  >
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField
       placeholder="Enter Mobile Number" helpText="Please enter a valid phone
@@ -13,13 +17,13 @@
     {#if retry} <input on:change="radioChange(event)" {checked}
     ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
     helpText="Please enter a valid handle"
-    style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;"
+    style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;display:none;"
     /> {/if}
   </Card>
 </div>
 
 {#if radio.phone} {#if error}
-<p class="error">
+<p class:regular="!isFirst" class:error="isFirst">
   Please ensure the same number is linked to the Google Pay account.
 </p>
 {:else}
@@ -63,6 +67,7 @@
       return {
         focusOnCreate: false,
         error: false,
+        isFirst: true,
         contact: null,
         selected: true,
         radio: {
