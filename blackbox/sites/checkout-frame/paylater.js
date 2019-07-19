@@ -3,8 +3,19 @@ const CheckoutFrameTest = require('../../plans/CheckoutFrameTest');
 
 module.exports = {
   timeout: 15,
-  test: browser =>
-    PayLater.test(browser, {
+  test: browser => {
+    const regularTest = PayLater.test(browser, {
+      options: {
+        key: 'm1key',
+        prefill: {
+          contact: '9999999999',
+          email: 'void@razorpay.com',
+        },
+        personalization: false,
+      },
+    });
+
+    const prefilledTest = PayLaterPrefill.test(browser, {
       options: {
         key: 'm1key',
         prefill: {
@@ -13,16 +24,28 @@ module.exports = {
           method: 'paylater',
         },
       },
-    }),
+    });
+
+    return Promise.all([prefilledTest, regularTest]);
+  },
 };
 
-class PayLater extends CheckoutFrameTest {
+class PayLaterBase extends CheckoutFrameTest {
   async render() {
     let attempt = (this.attempt = this.newAttempt());
 
     await this.selectProvider('epaylater');
     await this.enterOtp('123456');
     await this.handlePaymentAjax();
+  }
+
+  async selectGridMethod() {
+    const { page } = this;
+
+    const selector = '.payment-option[tab=paylater]';
+
+    await page.click(selector);
+    await delay(100);
   }
 
   async selectProvider(providerCode) {
@@ -86,5 +109,23 @@ class PayLater extends CheckoutFrameTest {
 
     await attempt.succeed();
     attempt.assertSuccess();
+  }
+}
+
+class PayLaterPrefill extends PayLaterBase {}
+
+class PayLater extends PayLaterBase {
+  async render() {
+    const { message } = this;
+    const { options } = message;
+
+    const useP13n = options.personalization;
+
+    // TODO: P13n test
+    if (!useP13n) {
+      await this.selectGridMethod();
+    }
+
+    await super.render();
   }
 }
