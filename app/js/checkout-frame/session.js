@@ -35,7 +35,9 @@ var preferences = window.preferences,
   _Doc = discreet._Doc,
   _El = discreet._El,
   Hacks = discreet.Hacks,
-  CardlessEmi = discreet.CardlessEmi;
+  CardlessEmi = discreet.CardlessEmi,
+  PayLater = discreet.PayLater,
+  PayLaterView = discreet.PayLaterView;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -119,10 +121,18 @@ function handleRelayFn(relayObj) {
 }
 
 /**
- * Temp store for Cardless EMI.
+ * Temp stores for Cardless EMI & PayLater.
  * Will move to Svelte Store upon migration.
  */
 var CardlessEmiStore = {
+  plans: {},
+  duration: {},
+  loanUrls: {},
+  ott: {},
+  lenderBranding: {},
+};
+
+var PayLaterStore = {
   plans: {},
   duration: {},
   loanUrls: {},
@@ -138,6 +148,17 @@ function createCardlessEmiTopbarImages(providerCode) {
   var provider = CardlessEmi.getProvider(providerCode);
 
   return createCardlessEmiImage(provider.logo);
+}
+
+// TODO: Refactor and merge with Cardless EMI method
+function createPayLaterImage(src) {
+  return '<img src="' + src + '" class="paylater-topbar-image">';
+}
+
+function createPayLaterTopbarImages(providerCode) {
+  var provider = PayLater.getProvider(providerCode);
+
+  return createPayLaterImage(provider.logo);
 }
 
 /**
@@ -1607,6 +1628,7 @@ Session.prototype = {
   setSvelteComponents: function() {
     this.setEmandate();
     this.setCardlessEmi();
+    this.setPayLater();
     this.setSavedCardsView();
     this.setOtpScreen();
     this.setUpiTab();
@@ -1768,6 +1790,63 @@ Session.prototype = {
         },
       });
     }
+  },
+
+  /**
+   * Equivalent of clicking a provider option from the
+   * PayLater homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectPayLaterProvider: function(providerCode) {
+    Analytics.track('paylater:provider:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        provider: providerCode,
+      },
+    });
+
+    $('#form-paylater input[name=ott]').val('');
+    $('#form-paylater input[name=provider]').val(providerCode);
+
+    PayLaterStore.providerCode = providerCode;
+    PayLaterStore.userRegistered = false;
+    PayLaterStore.otpVerified = false;
+
+    this.preSubmit();
+  },
+
+  setPayLater: function() {
+    var self = this;
+    var isPayLaterEnabled = this.methods.paylater && !_Obj.isEmpty(this.methods.paylater);
+
+    if (!isPayLaterEnabled) {
+      return;
+    }
+
+    this.payLaterView = new PayLaterView(this);
+
+    var providers = [];
+
+    each(this.methods.paylater, function(provider) {
+      var providerObj = PayLater.getProvider(provider);
+
+      if (!providerObj) {
+        return;
+      }
+
+      providers.push(PayLater.createProvider(provider, providerObj.name));
+    });
+
+    this.payLaterView.setOptions({
+      providers: providers,
+
+      on: {
+        select: function(event) {
+          var providerCode = event.option.code;
+          self.selectPayLaterProvider(providerCode);
+        },
+      },
+    });
   },
 
   setEmiScreen: function() {
@@ -2003,6 +2082,120 @@ Session.prototype = {
         provider: providerCode,
       },
     });
+  },
+
+  checkCustomerStatus: function (params, callback) {
+    var provider = params.provider;
+    var data = params.data;
+    var phone = params.contact;
+
+    this.customer.checkStatus(function (response) {
+      if (_Obj.hasOwnProp(response, 'saved')) {
+        if (response.saved) {
+          callback();
+        } else {
+          var error =
+            'Could not find a ' +
+            provider +
+            ' account associated with ' +
+            phone;
+
+          callback(error);
+        }
+        return;
+      }
+
+      if (response.error && response.error.description) {
+        callback(response.error.description);
+        return;
+      }
+
+      callback('Something went wrong.');
+    }, data, phone);
+  },
+
+  askPayLaterOtp: function (action) {
+    var providerCode = PayLaterStore.providerCode;
+    var payLaterProviderObj = PayLater.getProvider(providerCode);
+    var self = this;
+
+    var topbarImages = createPayLaterTopbarImages(providerCode);
+    if (tab_titles.otp !== topbarImages) {
+      tab_titles.otp = topbarImages;
+    }
+
+    var params = {
+      provider: payLaterProviderObj.name,
+      data: {
+        provider: providerCode,
+        amount: self.get('amount'),
+        method: 'paylater'
+      },
+      contact: getPhone()
+    };
+
+    if (action === 'incorrect') {
+      self.otpView.setText(discreet.wrongOtpMsg);
+      return;
+    } else if (action === 'resend') {
+      this.commenceOTP('Resending OTP...');
+    } else if (action === 'verify') {
+      this.commenceOTP('Verifying OTP...');
+    } else {
+      this.commenceOTP(payLaterProviderObj.name + ' account', true);
+    }
+
+    this.checkCustomerStatus(params, function(error) {
+      if (error) {
+        PayLaterStore.userRegistered = false;
+        self.showLoadError(error, true);
+        return;
+      }
+
+      PayLaterStore.userRegistered = true;
+
+      var otpMessage =
+        'Enter the OTP sent on ' +
+        getPhone() +
+        '<br>' +
+        ' to continue with ' +
+        payLaterProviderObj.name;
+
+      if (action === 'resend') {
+        otpMessage = 'OTP has been resent successfully.';
+      }
+
+      askOTP(self.otpView, otpMessage, true);
+      self.otpView.updateScreen({
+        allowSkip: false
+      });
+    });
+
+  },
+
+  submitPayLater: function() {
+    // Step 1: Check if user is registered on the given provider.
+    if (!PayLaterStore.userRegistered) {
+      this.askPayLaterOtp();
+      return;
+    }
+
+    // Step 2: Ask for OTP
+    if (!PayLaterStore.otpVerified) {
+      this.askPayLaterOtp('verify');
+      return;
+    }
+
+    // Step 3: Set ProviderCode & OTT in the form
+    $('#form-paylater input[name=provider]').val(
+      PayLaterStore.providerCode
+    );
+    $('#form-paylater input[name=ott]').val(
+      PayLaterStore.ott[PayLaterStore.providerCode]
+    );
+
+    // Step 4: Submit
+    this.preSubmit();
   },
 
   setOtpScreen: function() {
@@ -2320,6 +2513,8 @@ Session.prototype = {
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'cardless_emi') {
       this.fetchCardlessEmiPlans();
+    } else if (this.tab === 'paylater') {
+      this.askPayLaterOtp('resend');
     } else if (this.tab === 'wallet') {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
@@ -3367,6 +3562,7 @@ Session.prototype = {
     if (
       screen === 'cardless_emi' ||
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
+      (screen === 'paylater') ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
@@ -4994,9 +5190,9 @@ Session.prototype = {
 
     if (text) {
       if (partial) {
-        text = 'Looking for ' + text + ' associated with ';
+        text = 'Looking for ' + text + ' associated with ' + getPhone();
       }
-      this.showLoadError(text + getPhone());
+      this.showLoadError(text);
     }
   },
 
@@ -5150,6 +5346,32 @@ Session.prototype = {
           this.showCardlessEmiPlans();
         }
       };
+    }
+
+    if (this.tab === 'paylater') {
+      var providerCode = PayLaterStore.providerCode;
+
+      queryParams = {
+        provider: providerCode,
+        method: 'paylater',
+      };
+
+      callback = function(msg, data) {
+        this.otpView.updateScreen({ loading: false });
+        $('#body').addClass('sub');
+        if (msg) {
+          this.askPayLaterOtp('incorrect');
+        } else {
+          if (data.ott) {
+            PayLaterStore.otpVerified = true;
+            PayLaterStore.ott[providerCode] = data.ott;
+            PayLaterStore.contact = data.contact;
+            this.switchTab('paylater');
+            this.submitPayLater();
+          }
+        }
+      };
+      this.commenceOTP('Verifying OTP...');
     }
 
     this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
@@ -5582,6 +5804,20 @@ Session.prototype = {
       if (!data.contact) {
         delete data.ott;
         delete data.emi_duration;
+      }
+    }
+
+    if (data.method === 'paylater') {
+      if (data.contact) {
+        if (!data.ott) {
+          this.submitPayLater();
+          return;
+        }
+        // If contact & ott are available, then this is the final submit() call,
+        // If the contact doesn't start with +91, then make it.
+        if (!(data.contact.match(/^\+91/))) {
+          data.contact = "+91" + data.contact;
+        }
       }
     }
 
@@ -6165,6 +6401,16 @@ Session.prototype = {
      * it would need to be enabled again.
      */
     this.set('method.cardless_emi', methods.cardless_emi);
+
+    /**
+     * Disable PayLater if either:
+     * - Empty array
+     * - Contact is optional
+     * TODO: Allow this for prefill and logged in users.
+     */
+    if (_Obj.isEmpty(methods.paylater) || getStore('optional').contact) {
+     methods.paylater = null;
+    }
 
     /**
      * disable wallets if:

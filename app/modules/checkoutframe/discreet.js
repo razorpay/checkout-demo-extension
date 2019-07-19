@@ -28,6 +28,7 @@ import emiOptionsView from 'checkoutframe/emioptions';
 import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
+import PayLaterView from 'checkoutframe/paylater';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
@@ -42,6 +43,7 @@ import * as Bank from 'common/bank';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
+import * as PayLater from 'common/paylater';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
@@ -103,6 +105,7 @@ export default {
   Card,
   Wallet,
   CardlessEmi,
+  PayLater,
   Token,
   SessionManager,
   Checkout,
@@ -138,6 +141,7 @@ export default {
   PayoutAccount,
 
   otpView,
+  PayLaterView,
   Curtain,
   OptionsList,
   commonBanks,

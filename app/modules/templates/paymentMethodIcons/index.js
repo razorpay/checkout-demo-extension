@@ -5,6 +5,7 @@ import upi from './upi';
 import wallet from './wallet';
 import othermethods from './othermethods';
 import qr from './qr';
+import paylater from './paylater';
 
 const availPaymentMethods = [
   'card',
@@ -15,6 +16,7 @@ const availPaymentMethods = [
   'othermethods',
   'qr',
   'cardless_emi',
+  'paylater'
 ];
 
 function getIconFn(iconName) {
@@ -40,6 +42,9 @@ function getIconFn(iconName) {
 
     case 'qr':
       return qr;
+
+    case 'paylater':
+      return paylater;
   }
 }
 
