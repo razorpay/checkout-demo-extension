@@ -143,6 +143,8 @@ export default function Payment(data, params = {}, r) {
   this.magic = params.magic;
   this.optional = params.optional || {};
 
+  params.feesRedirect = params.fees || params.feesRedirect; // params.fees has to be present for backward compatibility
+
   this.isMagicPayment =
     this.sdk_popup &&
     this.magic &&
@@ -430,9 +432,12 @@ Payment.prototype = {
     // which is sent for some of the wallets, unidentifiable from
     // checkout side before making the payment
     // so not making ajax call for any wallet
+    const popupForMethods = ['cardless_emi'];
+    const paymentThroughPowerWallet =
+      data.method === 'wallet' && isPowerWallet(data.wallet);
     if (
-      !isRazorpayFrame &&
-      _Arr.contains(['wallet', 'cardless_emi'], data.method)
+      !isRazorpayFrame && // razorpay.js
+      (_Arr.contains(popupForMethods, data.method) || paymentThroughPowerWallet)
     ) {
       return;
     }
