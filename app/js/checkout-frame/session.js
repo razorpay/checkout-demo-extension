@@ -3606,11 +3606,19 @@ Session.prototype = {
 
     return this.offers && this.renderOffers(this.tab);
   },
+
+  /**
+   * Renders offers
+   * @param {string} tab
+   */
   renderOffers: function(tab) {
+    // EMI plans should have the same offers as EMI
+    // TODO: Fix for Cardless EMI
     if (tab === 'emiplans') {
       tab = 'emi';
     }
 
+    // Allow offers only on certain tabs
     if (
       [
         '',
@@ -3688,12 +3696,18 @@ Session.prototype = {
     $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
   },
 
+  /**
+   * Handles offer selection
+   * @param {Offer} offer
+   * @param {string} screen
+   */
   handleOfferSelection: function(offer, screen) {
     var offerInstance = offer;
     var emiBanks = this.emi_options.banks;
 
     offer = offer.data;
 
+    // Show discount if needed
     if (offer.original_amount > offer.amount) {
       this.showDiscount(offer);
     }
@@ -3703,6 +3717,7 @@ Session.prototype = {
 
     screen = screen || this.screen;
 
+    // Show only those cards on which the offer is eligible
     if (savedCards && savedCards.length > 0) {
       var filteredTokens = [];
       each(savedCards, function(index, token) {
@@ -3742,6 +3757,7 @@ Session.prototype = {
       });
     }
 
+    // Go to the offer's method if we're on homescreen
     if (!screen) {
       this.preSelectedOffer = offerInstance;
       this.switchTab(offer.payment_method);
@@ -3751,8 +3767,10 @@ Session.prototype = {
     var issuer = offer.issuer;
 
     if (screen === 'wallet') {
+      // Select wallet
       $('#wallet-radio-' + issuer).click();
     } else if (screen === 'netbanking') {
+      // Select bank
       if (issuer) {
         $('#bank-select').val(issuer);
         this.switchBank({ target: { value: issuer } });
@@ -3770,6 +3788,7 @@ Session.prototype = {
           offer.emi_subvention &&
           plan.offer_id !== offer.id
         ) {
+          // Clear duration
           $('#emi_duration').val('');
         }
       }
@@ -3814,6 +3833,10 @@ Session.prototype = {
       }
     }
   },
+
+  /**
+   * Removes offer
+   */
   handleOfferRemoval: function() {
     this.hideDiscount();
 
@@ -3821,6 +3844,11 @@ Session.prototype = {
       this.setSavedCards(this.customer.tokens);
     }
   },
+
+  /**
+   * Show the discount amount.
+   * @param {Offer} offer
+   */
   showDiscount: function(offer) {
     $('#content').addClass('has-discount');
 
@@ -4266,10 +4294,9 @@ Session.prototype = {
 
   /**
    * Returns the EMI plans for a given bank.
-   *
    * @param {String} bank
    *
-   * @return {Array}
+   * @returns {Array}
    */
   getEmiPlans: function(bank) {
     var emi_options = this.emi_options;
@@ -4588,6 +4615,9 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Removes offers and cleans up all the corresponding variables
+   */
   removeAndCleanupOffers: function() {
     if (this.offers) {
       this.preSelectedOffer = null;
@@ -4718,6 +4748,11 @@ Session.prototype = {
     var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
 
+    /**
+     * If offer was auto-applied from the
+     * emi plans screen.
+     * TODO: Validate this.
+     */
     if (
       this.offers &&
       !this.offers.offerSelectedByDrawer &&
@@ -4838,6 +4873,13 @@ Session.prototype = {
       .html((this.methods.netbanking || this.methods.emandate)[val]);
   },
 
+  /**
+   * Validates that the issuer of the offer is same as the selected value
+   * @param {string} selectedVal
+   * @param {Element} selectedEl
+   *
+   * @returns {boolean}
+   */
   validateOffers: function(selectedVal, selectedEl) {
     if (!this.offers || !this.offers.appliedOffer) {
       return true;
@@ -6513,6 +6555,10 @@ Session.prototype = {
     methods.wallet = wallets;
   },
 
+  /**
+   * Sets offers for this session
+   * @param {Object} preferences
+   */
   setOffers: function(preferences) {
     var allOffers = discreet.Offers.createOffers({
       preferences: preferences,
@@ -6538,10 +6584,23 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Returns the currently applied offer
+   *
+   * @returns {Offer}
+   */
   getAppliedOffer: function() {
     return this.forcedOffer || (this.offers && this.offers.appliedOffer);
   },
 
+  /**
+   * Says whether or not the offer is applicable
+   * on the provided offer.
+   * @param {string} issuer
+   * @param {Offer} offer
+   *
+   * @return {boolean}
+   */
   isOfferApplicableOnIssuer: function(issuer, offer) {
     issuer = issuer.toLowerCase();
     offer = offer || this.getAppliedOffer();
@@ -6560,12 +6619,22 @@ Session.prototype = {
     return !offerIssuer || offerIssuer === issuer;
   },
 
+  /**
+   * Returns the discounted amount if there's
+   * an amount with the offer applied.
+   *
+   * @returns {Number}
+   */
   getDiscountedAmount: function() {
     var appliedOffer = this.getAppliedOffer();
 
     return (appliedOffer && appliedOffer.amount) || this.get('amount');
   },
 
+  /**
+   * Show an error with the offer.
+   * @param {Function} cb callback
+   */
   showOffersError: function(cb) {
     var methodDescription = '',
       screen = this.screen;
@@ -6767,6 +6836,8 @@ Session.prototype = {
 
     /* set payment methods on the basis of preferences */
     this.setPaymentMethods(preferences);
+
+    // Set Offers
     this.setOffers(preferences);
 
     return {};
