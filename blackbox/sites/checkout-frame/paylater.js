@@ -15,18 +15,20 @@ module.exports = {
       },
     });
 
-    const prefilledTest = PayLaterPrefill.test(browser, {
-      options: {
-        key: 'm1key',
-        prefill: {
-          contact: '9999999999',
-          email: 'void@razorpay.com',
-          method: 'paylater',
-        },
-      },
-    });
+    return regularTest;
 
-    return Promise.all([prefilledTest, regularTest]);
+    // const prefilledTest = PayLaterPrefill.test(browser, {
+    //   options: {
+    //     key: 'm1key',
+    //     prefill: {
+    //       contact: '9999999999',
+    //       email: 'void@razorpay.com',
+    //       method: 'paylater',
+    //     },
+    //   },
+    // });
+
+    // return Promise.all([prefilledTest, regularTest]);
   },
 };
 
