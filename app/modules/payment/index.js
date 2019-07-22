@@ -428,10 +428,12 @@ Payment.prototype = {
       return;
     }
 
-    // type: otp is not handled on razorpayjs
-    // which is sent for some of the wallets, unidentifiable from
-    // checkout side before making the payment
-    // so not making ajax call for any wallet
+    /**
+     * type: otp is not handled on razorpayjs
+     * which is sent for some of the wallets, unidentifiable from
+     * checkout side before making the payment
+     * so not making ajax call for power wallets
+     */
     const popupForMethods = ['cardless_emi'];
     const paymentThroughPowerWallet =
       data.method === 'wallet' && isPowerWallet(data.wallet);
