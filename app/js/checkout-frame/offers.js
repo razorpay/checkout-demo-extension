@@ -9,12 +9,18 @@ var createNode = function(html) {
   return dummyDiv.firstChild;
 };
 
+/**
+ * Creates an Offer entity and adds it to the DOM.
+ * @param {Object} data Offer data
+ * @param {Object} options Options containing callbacks and helpers
+ */
 function Offer(data, options) {
   var that = this;
 
   this.data = data;
   this.discount = data.original_amount - data.amount;
 
+  // Create DOM elements and get references to them
   var $el = (this.$el = createNode(
       templates.offer({
         name: data.name,
@@ -26,10 +32,12 @@ function Offer(data, options) {
     $offerTitle = $el.querySelector('.offer-title'),
     $removeOffer = $el.querySelector('.remove-offer');
 
+  // Add click listener
   $offerTitle.onclick = function() {
     options.onOfferSelection(that);
   };
 
+  // Add remove listener if removal is allowed
   if ($removeOffer) {
     $removeOffer.onclick = function() {
       options.onOfferRemoval();
@@ -39,6 +47,9 @@ function Offer(data, options) {
 
 var offerProto = Offer.prototype;
 
+/**
+ * Invoked when an offer is selected.
+ */
 offerProto.select = function() {
   if (this.isSelected) {
     return;
@@ -48,6 +59,9 @@ offerProto.select = function() {
   this.$el.className = this.$el.className + selectedClass;
 };
 
+/**
+ * Invoked when an offer is deselected.
+ */
 offerProto.deselect = function() {
   if (!this.isSelected) {
     return;
@@ -57,6 +71,9 @@ offerProto.deselect = function() {
   this.$el.className = this.$el.className.replace(selectedClass, '');
 };
 
+/**
+ * Invoked when an offer is applied.
+ */
 offerProto.apply = function() {
   if (this.isApplied) {
     return;
@@ -66,6 +83,10 @@ offerProto.apply = function() {
   this.$el.className = this.$el.className + appliedClass;
 };
 
+/**
+ * Invoked when an offer is removed.
+ * Offer is deselected an unapplied.
+ */
 offerProto.remove = function() {
   if (!this.isApplied) {
     return;
@@ -76,6 +97,16 @@ offerProto.remove = function() {
   this.$el.className = this.$el.className.replace(appliedClass, '');
 };
 
+/**
+ * Initializes Offers
+ * @param {Element} $container Reference to the container elem
+ * @param {Array<Object>} offersData List of offers
+ * @param {Object} filter Filters
+ * @param {Function} onApplyOffer Callback for when an offer is applied
+ * @param {Function} onRemoveOffer Callback for when an offer is removed
+ * @param {Function} formatAmount Function to format amount
+ * @param {Element} $root Root element onto which we attach classes
+ */
 function initOffers(
   $container,
   offersData,
@@ -85,6 +116,7 @@ function initOffers(
   formatAmount,
   $root
 ) {
+  // Create offers strip and get references
   var $el = createNode(templates.offers()),
     $numOffers = $el.querySelector('.num-offers'),
     $offersTitle = $el.querySelector('.offers-title'),
@@ -97,12 +129,15 @@ function initOffers(
     ),
     $selectedOfferDiscountAmount = $selectedOfferDiscount.querySelector(
       '.discount-amount'
-    ),
-    $offersListCont = createNode(templates.offerslist()),
+    );
+
+  // Create offers list and get references
+  var $offersListCont = createNode(templates.offerslist()),
     $offersListTitle = $offersListCont.querySelector('.offers-list-title'),
     $offersList = $offersListCont.querySelector('.offers-list'),
-    $applyOffer = $offersListCont.querySelector('.apply-offer'),
-    $offersError = null,
+    $applyOffer = $offersListCont.querySelector('.apply-offer');
+
+  var $offersError = null,
     $offersErrorCancel = null,
     $offersErrorPay = null,
     offersErrorResolutionCb = null;
@@ -113,6 +148,10 @@ function initOffers(
     visibleOffers,
     shouldShowOfferList = false;
 
+  /**
+   * Append offers list to DOM
+   * and select the offer if there's only one offer
+   */
   function showOfferList() {
     if (visibleOffers.length === 1) {
       // select first offer automatically if there is only one offer
@@ -122,16 +161,25 @@ function initOffers(
     $root.appendChild($offersListCont);
   }
 
+  /**
+   * Remove offers list from DOM
+   */
   function hideOfferList() {
     $offersListCont.remove();
   }
 
+  /**
+   * Toggle the offers list
+   */
   function toggleOfferList() {
     return (shouldShowOfferList = !shouldShowOfferList)
       ? showOfferList()
       : hideOfferList();
   }
 
+  /**
+   * Remove any error that might be present.
+   */
   function hideOfferError() {
     if (!$offersError) {
       return;
@@ -141,17 +189,26 @@ function initOffers(
     $offersError = $offersErrorPay = $offersErrorCancel = null;
   }
 
+  /**
+   * Append given offer to the list of offers in DOM
+   * @param {Offer} offer Instance of Offer
+   */
   function appendOffer(offer) {
     $offersList.appendChild(offer.$el);
     return offer;
   }
 
   var offers = {
+    /**
+     * Apply filters on the offers
+     * and display offers.
+     */
     applyFilter: function applyFilter(criteria) {
       var criteriaKeys = Object.keys(criteria || {});
 
       $offersList.innerHTML = '';
 
+      // If there's a criteria, filter
       if (criteriaKeys.length > 0) {
         visibleOffers = criteriaKeys.reduce(function(offers, key) {
           return offers.reduce(function(filteredOffers, offer) {
@@ -174,6 +231,11 @@ function initOffers(
 
       this.display(visibleOffers.length !== 0);
     },
+
+    /**
+     * Display or hide Offers based on the param passed
+     * @param {Boolean} shouldDisplay
+     */
     display: function display(shouldDisplay) {
       var isAttached = !!$el.parentElement;
 
@@ -200,6 +262,10 @@ function initOffers(
 
       return !isAttached && shouldDisplay && $container.appendChild($el);
     },
+
+    /**
+     * Applies the selected offer.
+     */
     applyOffer: function() {
       if (appliedOffer === selectedOffer) {
         return;
@@ -227,6 +293,10 @@ function initOffers(
       return true;
     },
 
+    /**
+     * Selects and applies the offer matching the given ID
+     * @param {Number} offerId
+     */
     selectOfferById: function selectOfferById(offerId) {
       var matchedOffers = [];
       if (Array.isArray(visibleOffers)) {
@@ -248,6 +318,11 @@ function initOffers(
       }
     },
 
+    /**
+     * Selects an Offer
+     * @param {Offer} offer
+     * @param {Boolean} programaticallySelected
+     */
     selectOffer: function selectOffer(offer, programaticallySelected) {
       if (selectedOffer) {
         selectedOffer.deselect();
@@ -261,6 +336,10 @@ function initOffers(
 
       (selectedOffer = offer).select();
     },
+
+    /**
+     * Removes the selected offer.
+     */
     removeOffer: function removeOffer() {
       if (selectedOffer) {
         $offersListCont.className = $offersListCont.className.replace(
@@ -284,6 +363,12 @@ function initOffers(
         appliedOffer = null;
       }
     },
+
+    /**
+     * Shows an error
+     * @param {string} methodDescription
+     * @param {Function} cb Callback to be executed when the error is removed
+     */
     showError: function showError(methodDescription, cb) {
       $offersError = createNode(
         templates.offererror({
@@ -301,21 +386,44 @@ function initOffers(
   };
 
   Object.defineProperties(offers, {
+    /**
+     * Returns the applied offer's data, not the Offer instance
+     *
+     * @returns {Object}
+     */
     appliedOffer: {
       get: function() {
         return appliedOffer && appliedOffer.data;
       },
     },
+
+    /**
+     * Returns the selected offer's data, not the Offer instance
+     *
+     * @returns {Object}
+     */
     selectedOffer: {
       get: function() {
         return selectedOffer && selectedOffer.data;
       },
     },
+
+    /**
+     * Returns the number of visible offers
+     *
+     * @returns {Number}
+     */
     numVisibleOffers: {
       get: function() {
         return visibleOffers.length;
       },
     },
+
+    /**
+     * If there's only one offer, returns it.
+     *
+     * @returns {Offer|Object}
+     */
     defaultOffer: {
       get: function() {
         return visibleOffers.length === 1 && visibleOffers[0];
@@ -324,7 +432,10 @@ function initOffers(
   });
 
   // TODO: need to change to addEventlistner style
+  // Toggle offers list upon clicking the title
   $offersTitle.onclick = $offersListTitle.onclick = toggleOfferList;
+
+  // Apply an offer
   $applyOffer.onclick = function() {
     var isOfferApplied = offers.applyOffer();
     toggleOfferList();
@@ -343,6 +454,10 @@ function initOffers(
     var $target = e.target,
       isOfferRemoved = false;
 
+    /**
+     * Logic around user wanting to remove the offer
+     * or retry in case there's an error.
+     */
     if ($offersErrorPay.contains($target)) {
       isOfferRemoved = true;
       Analytics.track('offers:retry_screen:remove', {
