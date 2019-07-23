@@ -121,7 +121,7 @@
 }
 
 .instrument-group {
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(61, 64, 72, 0.06);
   margin: 12px;
 }
 
@@ -218,7 +218,7 @@ p {
 
 .add-option {
   margin: 16px;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(61, 64, 72, 0.06);
 }
 
 .desc {
