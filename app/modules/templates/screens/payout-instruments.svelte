@@ -126,18 +126,19 @@
 }
 
 .instrument-header, .instrument-add {
-  padding: 12px 60px 12px 40px;
+  padding: 14px 60px 16px 40px;
   position: relative;
 }
 
 .instrument-header {
   border: 1px solid #e6e7e8;
+  border-bottom: none;
   position: relative;
 }
 
 .instrument-add {
   border: 1px solid #e6e7e8;
-  border-top: none;
+  padding: 12px 60px 14px 40px !important;
 }
 
 .icon-left {
@@ -161,15 +162,13 @@ ref:nbIcon {
 }
 
 .instrument-header .header-text {
-  padding-top: 4px;
   text-transform: uppercase;
-  font-weight: bold;
+  color: #072654;
 }
 
 .instrument-add {
-  font-weight: bold;
-  border-top: 1px solid #e6e7e8;
   cursor: pointer;
+  color: #072654;
 }
 
 .instrument-info {
@@ -214,6 +213,7 @@ p {
 
 .options {
   margin: 0;
+  max-height: unset;
 }
 
 .add-option {
