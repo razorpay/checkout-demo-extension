@@ -2350,6 +2350,7 @@ Session.prototype = {
     themeMeta.secondaryHighlightColor = secondaryHighlightColor;
     themeMeta.hoverStateColor = hoverStateColor;
     themeMeta.activeStateColor = activeStateColor;
+    themeMeta.backgroundColor = colorVariations.backgroundColor;
     themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
   },
 
