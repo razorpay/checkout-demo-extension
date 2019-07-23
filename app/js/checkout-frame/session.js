@@ -1817,7 +1817,8 @@ Session.prototype = {
 
   setPayLater: function() {
     var self = this;
-    var isPayLaterEnabled = this.methods.paylater && !_Obj.isEmpty(this.methods.paylater);
+    var isPayLaterEnabled =
+      this.methods.paylater && !_Obj.isEmpty(this.methods.paylater);
 
     if (!isPayLaterEnabled) {
       return;
@@ -2084,37 +2085,41 @@ Session.prototype = {
     });
   },
 
-  checkCustomerStatus: function (params, callback) {
+  checkCustomerStatus: function(params, callback) {
     var provider = params.provider;
     var data = params.data;
     var phone = params.contact;
 
-    this.customer.checkStatus(function (response) {
-      if (_Obj.hasOwnProp(response, 'saved')) {
-        if (response.saved) {
-          callback();
-        } else {
-          var error =
-            'Could not find a ' +
-            provider +
-            ' account associated with ' +
-            phone;
+    this.customer.checkStatus(
+      function(response) {
+        if (_Obj.hasOwnProp(response, 'saved')) {
+          if (response.saved) {
+            callback();
+          } else {
+            var error =
+              'Could not find a ' +
+              provider +
+              ' account associated with ' +
+              phone;
 
-          callback(error);
+            callback(error);
+          }
+          return;
         }
-        return;
-      }
 
-      if (response.error && response.error.description) {
-        callback(response.error.description);
-        return;
-      }
+        if (response.error && response.error.description) {
+          callback(response.error.description);
+          return;
+        }
 
-      callback('Something went wrong.');
-    }, data, phone);
+        callback('Something went wrong.');
+      },
+      data,
+      phone
+    );
   },
 
-  askPayLaterOtp: function (action) {
+  askPayLaterOtp: function(action) {
     var providerCode = PayLaterStore.providerCode;
     var payLaterProviderObj = PayLater.getProvider(providerCode);
     var self = this;
@@ -2129,9 +2134,9 @@ Session.prototype = {
       data: {
         provider: providerCode,
         amount: self.get('amount'),
-        method: 'paylater'
+        method: 'paylater',
       },
-      contact: getPhone()
+      contact: getPhone(),
     };
 
     if (action === 'incorrect') {
@@ -2167,10 +2172,9 @@ Session.prototype = {
 
       askOTP(self.otpView, otpMessage, true);
       self.otpView.updateScreen({
-        allowSkip: false
+        allowSkip: false,
       });
     });
-
   },
 
   submitPayLater: function() {
@@ -2187,9 +2191,7 @@ Session.prototype = {
     }
 
     // Step 3: Set ProviderCode & OTT in the form
-    $('#form-paylater input[name=provider]').val(
-      PayLaterStore.providerCode
-    );
+    $('#form-paylater input[name=provider]').val(PayLaterStore.providerCode);
     $('#form-paylater input[name=ott]').val(
       PayLaterStore.ott[PayLaterStore.providerCode]
     );
@@ -2348,6 +2350,7 @@ Session.prototype = {
     themeMeta.secondaryHighlightColor = secondaryHighlightColor;
     themeMeta.hoverStateColor = hoverStateColor;
     themeMeta.activeStateColor = activeStateColor;
+    themeMeta.backgroundColor = colorVariations.backgroundColor;
     themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
   },
 
@@ -3562,7 +3565,7 @@ Session.prototype = {
     if (
       screen === 'cardless_emi' ||
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
-      (screen === 'paylater') ||
+      screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
@@ -5857,8 +5860,8 @@ Session.prototype = {
         }
         // If contact & ott are available, then this is the final submit() call,
         // If the contact doesn't start with +91, then make it.
-        if (!(data.contact.match(/^\+91/))) {
-          data.contact = "+91" + data.contact;
+        if (!data.contact.match(/^\+91/)) {
+          data.contact = '+91' + data.contact;
         }
       }
     }
@@ -6451,7 +6454,7 @@ Session.prototype = {
      * TODO: Allow this for prefill and logged in users.
      */
     if (_Obj.isEmpty(methods.paylater) || getStore('optional').contact) {
-     methods.paylater = null;
+      methods.paylater = null;
     }
 
     /**
