@@ -281,7 +281,7 @@ export const listInstruments = customer => {
     a.score > b.score ? -1 : ~~(a.score < b.score)
   );
 
-  const listOfInstrumentsToBeShown = isMobile ? 3 : 2;
+  const listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
 
   Analytics.track('p13n:instruments:list', {
     data: {

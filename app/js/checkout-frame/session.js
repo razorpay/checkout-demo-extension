@@ -1147,7 +1147,7 @@ Session.prototype = {
 
   getClasses: function() {
     var classes = [];
-    if (isMobile) {
+    if (isMobile()) {
       classes.push('mobile');
     }
 
@@ -1646,7 +1646,7 @@ Session.prototype = {
     timerFn();
     if ((this.headless || isMagicPayment) && !this.get('timeout')) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
-    } else if (isMobile) {
+    } else if (isMobile()) {
       var modalEl = gel('modal');
       modalEl.insertBefore(timeoutEl, modalEl.firstChild);
     }

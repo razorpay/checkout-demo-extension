@@ -39,10 +39,21 @@ export const androidBrowser = android && (chromeVersion || firefox); // Chrome o
 export const mobileQuery =
   '(max-device-height: 450px),(max-device-width: 450px)';
 
-export const isMobile =
-  (global.innerWidth && global.innerWidth < 450) ||
-  shouldFixFixed ||
-  global.matchMedia(mobileQuery).matches;
+/**
+ * Says whether or not we're on mobile.
+ *
+ * This is a function instead of a constant because
+ * Firefox gives innerWidth as 0 on page load.
+ *
+ * @returns {boolean}
+ */
+export const isMobile = () => {
+  return (
+    (global.innerWidth && global.innerWidth < 450) ||
+    shouldFixFixed ||
+    global.matchMedia(mobileQuery).matches
+  );
+};
 
 export const stockAndroidBrowser = android && !chrome && !firefox;
 
