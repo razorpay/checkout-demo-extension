@@ -704,7 +704,9 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
          * Consider VPA to be invalid only if API says it is invalid
          * response.error would exist even if it's a network error
          */
-        const isVpaInvalid = response.error && response.error.field === 'vpa';
+        const isVpaInvalid =
+          response.success === false ||
+          (response.error && response.error.field === 'vpa');
 
         if (isVpaInvalid) {
           vpaCache[vpa] = response;
@@ -715,6 +717,11 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
           reject(response);
         } else {
+          /**
+           * We can enter this flow for a failed n/w request as well
+           * as for a success
+           * but we should cache only if it is a success
+           */
           if (response.success) {
             vpaCache[vpa] = response;
           }
