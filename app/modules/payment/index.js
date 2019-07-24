@@ -700,7 +700,21 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
         responded = true;
 
-        if (response.success || response.error) {
+        /**
+         * Consider VPA to be invalid only if API says it is invalid
+         * response.error would exist even if it's a network error
+         */
+        const isVpaInvalid = response.error && response.error.field === 'vpa';
+
+        if (isVpaInvalid) {
+          vpaCache[vpa] = response;
+
+          Analytics.track('validate:vpa:invalid', {
+            data: eventData,
+          });
+
+          reject(response);
+        } else {
           if (response.success) {
             vpaCache[vpa] = response;
           }
@@ -710,13 +724,6 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
           });
 
           resolve(response);
-        } else {
-          vpaCache[vpa] = response;
-
-          Analytics.track('validate:vpa:invalid', {
-            data: eventData,
-          });
-          reject(response);
         }
       },
     });
