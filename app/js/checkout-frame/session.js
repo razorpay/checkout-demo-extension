@@ -5181,7 +5181,7 @@ Session.prototype = {
       if (screen === 'upi') {
         // debugger;
         var formSelector = '#form-upi';
-        const omniSelected = this.upiTab.get().omniSelected;
+        var omniSelected = this.upiTab.get().omniSelected;
 
         if (data['_[flow]'] === 'intent') {
           if (!omniSelected) {
