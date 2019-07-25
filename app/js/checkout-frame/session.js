@@ -5215,8 +5215,9 @@ Session.prototype = {
         }
 
         if (
+          this.preferences.features &&
           this.preferences.features.google_omnichannel &&
-          this.upiTab.get().selectedApp == 'gpay'
+          this.upiTab.get().selectedApp === 'gpay'
         ) {
           $('.omni').show();
         } else {
@@ -5518,8 +5519,9 @@ Session.prototype = {
       return this.verifyVpaAndContinue(data, request);
     }
     var isOmni =
+      this.preferences.features &&
       this.preferences.features.google_omnichannel &&
-      this.upiTab.get().selectedApp == 'gpay' &&
+      this.upiTab.get().selectedApp === 'gpay' &&
       !this.upiTab.get().retryOmnichannel;
     if (isOmni) {
       this.showOmniChannelUi(strings.gpay_omni);
