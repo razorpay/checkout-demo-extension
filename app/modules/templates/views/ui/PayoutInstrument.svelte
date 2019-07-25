@@ -18,7 +18,8 @@ export default {
 
   data: () => ({
     selected: false,
-    reverse: true
+    reverse: true,
+    icon: undefined
   })
 }
 </script>
