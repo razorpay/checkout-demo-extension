@@ -205,6 +205,48 @@ const UPI_APPS = {
  */
 const UPI_APPS_ORDER = ['preferred', 'secondfactor', 'whitelist'];
 
+export const otherAppsIcon =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
+
+export const topUpiApps = [
+  {
+    text: 'BHIM',
+    icon: 'https://cdn.razorpay.com/app/bhim.svg',
+    id: 'bhim',
+    psp: 'upi',
+  },
+  {
+    text: 'Google Pay',
+    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+    id: 'gpay',
+    psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+  },
+  {
+    text: 'WhatsApp',
+    icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
+    id: 'whatsapp',
+    psp: 'icici',
+  },
+  {
+    text: 'Paytm',
+    icon: 'https://cdn.razorpay.com/app/paytm.svg',
+    id: 'paytm',
+    psp: 'paytm',
+  },
+  {
+    text: 'PhonePe',
+    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+    id: 'phonepe',
+    psp: 'ybl',
+  },
+  {
+    text: 'Other Apps',
+    icon: otherAppsIcon,
+    id: null,
+    psp: '',
+  },
+];
+
 /**
  * Parses the response from UPI Intent.
  * @param {Object} intentResponse Reponse from Intent.
