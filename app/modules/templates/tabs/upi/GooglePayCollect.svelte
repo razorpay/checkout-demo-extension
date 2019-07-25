@@ -1,5 +1,5 @@
 <div class="legend left" style="margin-top: 18px">
-  Or Enter your UPI ID
+  {retry?'Or':''} Enter your UPI ID
 </div>
 
 <div id="upi-gpay-vpa">
