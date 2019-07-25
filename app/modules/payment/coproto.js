@@ -268,6 +268,10 @@ var responseTypes = {
   // prettier-ignore
   'return': function(request) {
     _Doc.redirect(request);
+  },
+
+  respawn: function(request) {
+    _Doc.redirect(request);
   }
 };
 
