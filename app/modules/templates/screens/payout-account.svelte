@@ -41,7 +41,6 @@
       id='ifsc'
       placeholder="IFSC"
       helpText="Please enter a valid IFSC"
-      pattern={"^[a-zA-Z]{4}[a-zA-Z0-9]{7}$"}
       maxlength="11"
       required={true}
       formatter={{
