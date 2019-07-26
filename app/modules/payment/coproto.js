@@ -196,7 +196,7 @@ var responseTypes = {
   intent: function(request, fullResponse) {
     const session = getSession();
     var isOmni =
-      session.preferences.features.google_omnichannel &&
+      session.preferences.features.google_pay_omnichannel &&
       session.upiTab.get().selectedApp === 'gpay';
     if (isOmni) {
       session.showOmniChannelUi(strings.OmniNotification);

@@ -18,7 +18,7 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
 var preferences=_.preferences;
-var gpay_omni=preferences.features&&preferences.features.google_omnichannel;
+var gpay_omni=preferences.features&&preferences.features.google_pay_omnichannel;
 var invoice = _.invoice;
 
 var bank = _.tpvBank || {};

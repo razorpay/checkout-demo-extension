@@ -5216,7 +5216,7 @@ Session.prototype = {
 
         if (
           this.preferences.features &&
-          this.preferences.features.google_omnichannel &&
+          this.preferences.features.google_pay_omnichannel &&
           this.upiTab.get().selectedApp === 'gpay'
         ) {
           $('.omni').show();
@@ -5520,7 +5520,7 @@ Session.prototype = {
     }
     var isOmni =
       this.preferences.features &&
-      this.preferences.features.google_omnichannel &&
+      this.preferences.features.google_pay_omnichannel &&
       this.upiTab.get().selectedApp === 'gpay' &&
       !this.upiTab.get().retryOmnichannel;
     if (isOmni) {
@@ -6131,8 +6131,8 @@ Session.prototype = {
 
   setPreferences: function(prefs) {
     // TODO: remove mock.. only for testing
-    prefs.features = {};
-    prefs.features.google_pay_omnichannel = true;
+    // prefs.features = {};
+    // prefs.features.google_pay_omnichannel = true;
     // removing for testing in production
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));

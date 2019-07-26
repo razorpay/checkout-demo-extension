@@ -201,7 +201,7 @@
 
     return session.preferences &&
       session.preferences.features &&
-      session.preferences.features.google_omnichannel;
+      session.preferences.features.google_pay_omnichannel;
   };
 
   export default {
