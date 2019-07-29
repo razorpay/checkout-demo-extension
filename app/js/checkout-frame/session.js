@@ -5867,6 +5867,11 @@ Session.prototype = {
       }
     }
 
+    /* VPA verification */
+    if (data.vpa && !vpaVerified) {
+      return this.verifyVpaAndContinue(data, request);
+    }
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data,
@@ -5976,11 +5981,6 @@ Session.prototype = {
 
     if (this.p13n) {
       P13n.processInstrument(data, this);
-    }
-
-    /* VPA verification */
-    if (data.vpa && !vpaVerified) {
-      return this.verifyVpaAndContinue(data, request);
     }
 
     if (this.isPayout) {
