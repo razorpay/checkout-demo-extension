@@ -301,7 +301,12 @@ Payment.prototype = {
   },
 
   generate: function(data) {
-    this.data = _Obj.clone(data || this.data);
+    // Append `data` to `this.data`
+    this.data = _Obj.extend(
+      _Obj.clone(this.data || {}),
+      _Obj.clone(data || {})
+    );
+
     formatPayment(this);
 
     let setCompleteHandler = _ => {
