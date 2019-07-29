@@ -5746,6 +5746,7 @@ Session.prototype = {
       magic: this.magic,
       optional: getStore('optional'),
       external: {},
+      paused: this.get().paused,
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
