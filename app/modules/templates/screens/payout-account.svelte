@@ -8,10 +8,12 @@
       id='account_number'
       placeholder="Account number"
       helpText="Please enter a valid account number"
-      pattern={"^[a-zA-Z0-9]{4,20}$"}
       maxlength="20"
       required={true}
       ref:accountNumberField
+      formatter={{
+        type: 'number'
+      }}
 
       on:blur="validateConfirmAccount()"
     />
@@ -22,11 +24,13 @@
       id='account_number_confirm'
       placeholder="Re-enter account number"
       helpText="Please confirm the account number"
-      pattern={"^[a-zA-Z0-9]{4,20}$"}
       maxlength="20"
       required={true}
       ref:confirmAccountNumberField
       refresh="{false}"
+      formatter={{
+        type: 'number'
+      }}
 
       on:blur="validateConfirmAccount()"
     />
@@ -37,9 +41,11 @@
       id='ifsc'
       placeholder="IFSC"
       helpText="Please enter a valid IFSC"
-      pattern={"^[a-zA-Z]{4}[a-zA-Z0-9]{7}$"}
       maxlength="11"
       required={true}
+      formatter={{
+        type: 'ifsc'
+      }}
     />
 
     <Field
