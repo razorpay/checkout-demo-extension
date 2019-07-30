@@ -308,7 +308,7 @@ function setEmiPlansCta(screen, tab) {
   } else if (screen === 'emi' && tab === 'emiplans') {
     type = 'emi';
   } else if (session.isPayout) {
-    type = 'add-upi';
+    type = 'confirm-account';
   }
 
   var classes = [
@@ -340,7 +340,7 @@ function setEmiPlansCta(screen, tab) {
       $('.enter-card-details').removeClass('invisible');
       break;
 
-    case 'add-upi':
+    case 'confirm-account':
       $('.confirm-account').removeClass('invisible');
       break;
   }
