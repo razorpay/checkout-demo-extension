@@ -10,7 +10,8 @@
   >
     <div class="elem-wrap collect-form">
       <Field type="text" name="phone" id='phone' ref:phoneField
-      placeholder="Enter Mobile Number" formatter={{ type: 'number' }} maxlength="{10}"
+      placeholder="Enter Mobile Number" formatter={{ type: 'number' }}
+      required={true} helpText="Please enter a valid contact no." maxlength="{10}"
       value={contact} on:blur="blur()" on:focus="focus()" />
     </div>
     {#if retry} <input on:change="radioChange(event)" {checked}

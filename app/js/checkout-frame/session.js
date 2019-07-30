@@ -5528,7 +5528,7 @@ Session.prototype = {
       !this.upiTab.get().retryOmnichannel;
     if (isOmni) {
       this.showOmniChannelUi(strings.gpay_omni);
-      this.r.on('payment.error', response => {
+      this.r.on('payment.error', function(response) {
         console.log(response.error);
         if (response.error.code === 'BAD_REQUEST_ERROR') {
           this.retryOmniChannelRespawn();
