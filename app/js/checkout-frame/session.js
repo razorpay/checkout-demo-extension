@@ -1889,6 +1889,9 @@ Session.prototype = {
       return account.account_type === 'bank_account';
     });
 
+    Analytics.setMeta('count.accounts.upi', upiAccounts.length);
+    Analytics.setMeta('count.accounts.bank', bankAccounts.length);
+
     this.payoutsView = new discreet.PayoutsInstruments({
       target: gel('payouts-svelte-wrap'),
       data: {
@@ -1910,6 +1913,7 @@ Session.prototype = {
 
     this.payoutsView.on('selectaccount', function(account) {
       $('#body').addClass('sub');
+      Analytics.track('payout:account:select', account);
     });
 
     this.payoutsView.on('add', function(event) {
@@ -5983,12 +5987,27 @@ Session.prototype = {
     }
 
     if (this.isPayout) {
+      Analytics.track('payout:create:start');
+
       if (this.screen === 'payouts') {
         /**
          * If we are on the payouts screen when the submission happened, it
          * means that the user selected an existing fund account.
          */
         var selectedAccount = this.payoutsView.getSelectedInstrument();
+
+        Analytics.track('submit', {
+          data: {
+            account: Payouts.makeTrackingDataFromAccount(selectedAccount),
+            existing: true,
+          },
+          immediately: true,
+        });
+
+        Analytics.track('payout:create:success', {
+          data: Payouts.makeTrackingDataFromAccount(selectedAccount),
+          immediately: true,
+        });
 
         successHandler.call(session, {
           razorpay_fund_account_id: selectedAccount.id,
@@ -5998,8 +6017,24 @@ Session.prototype = {
          * If we are not on the payouts screen, create the fund account using
          * the payload.
          */
+
+        Analytics.track('submit', {
+          data: {
+            existing: false,
+          },
+          immediately: true,
+        });
+
         Payouts.createFundAccount(data)
           .then(function(account) {
+            Analytics.track('payout:create:success', {
+              data: {
+                account: Payouts.makeTrackingDataFromAccount(account),
+                existing: false,
+              },
+              immediately: true,
+            });
+
             successHandler.call(session, {
               razorpay_fund_account_id: account.id,
             });
