@@ -51,11 +51,27 @@ export function createFundAccount(fundAccount) {
 }
 
 /**
- * Removes sensitive data from fund account
+ * Masks sensitive data from fund account
  * @param account
  */
 export function makeTrackingDataFromAccount(account) {
   const copy = _Obj.clone(account);
-  delete copy.bank_account;
+  if (copy.bank_account) {
+    const { account_number } = copy.bank_account;
+    copy.bank_account.account_number = maskAccountNumber(account_number);
+  }
   return copy;
+}
+
+/**
+ * Masks account number
+ * @param accountNumber {string} the account number to be masked
+ * @return {string}
+ */
+function maskAccountNumber(accountNumber) {
+  return (
+    Array(accountNumber.length - 4)
+      .fill('X')
+      .join('') + accountNumber.slice(-4)
+  );
 }
