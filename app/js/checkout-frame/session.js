@@ -6020,6 +6020,7 @@ Session.prototype = {
 
         Analytics.track('submit', {
           data: {
+            account: Payouts.makeTrackingDataFromAccount(data),
             existing: false,
           },
           immediately: true,
