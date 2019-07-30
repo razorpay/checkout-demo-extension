@@ -169,7 +169,6 @@ var responseTypes = {
         });
       },
       error => {
-        console.log(error, 'error');
         if (error.code) {
           if (
             [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0

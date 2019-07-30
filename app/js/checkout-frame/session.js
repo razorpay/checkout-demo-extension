@@ -4734,7 +4734,6 @@ Session.prototype = {
     });
     setTimeout(function() {
       $('#error-message .link').html('');
-      $('#fd-t').style.paddingBottom = '10px';
     }, 100);
     $('.omni').show();
     $('#overlay-close').show();
@@ -5529,6 +5528,12 @@ Session.prototype = {
       !this.upiTab.get().retryOmnichannel;
     if (isOmni) {
       this.showOmniChannelUi(strings.gpay_omni);
+      this.r.on('payment.error', response => {
+        console.log(response.error);
+        if (response.error.code === 'BAD_REQUEST_ERROR') {
+          this.retryOmniChannelRespawn();
+        }
+      });
     }
 
     var payment = this.r.createPayment(data, request);

@@ -32,7 +32,7 @@
           <GooglePayCollect {radio} on:radiochange="radioCheck('vpa')" retry={retryOmnichannel} {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
         {/if}
       {:else}
-        <Collect appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" focusOnCreate/>
+        <Collect {vpa} appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" focusOnCreate/>
       {/if}
     {/if}
   {/if}
