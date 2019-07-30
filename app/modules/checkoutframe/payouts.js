@@ -5,6 +5,11 @@ const _headers = {
   'Content-Type': 'application/x-www-form-urlencoded',
 };
 
+/**
+ * Fetches all the accounts for a given contact_id
+ * @param contactId {string}
+ * @return {Promise<Object>}
+ */
 export function fetchFundAccounts(contactId) {
   const { r } = getSession();
   return new Promise((resolve, reject) =>
@@ -21,6 +26,11 @@ export function fetchFundAccounts(contactId) {
   );
 }
 
+/**
+ * Creates a fund account.
+ * @param fundAccount {Object} The fund account to be created.
+ * @return {Promise<Object>}
+ */
 export function createFundAccount(fundAccount) {
   const { r } = getSession();
   return new Promise((resolve, reject) =>
