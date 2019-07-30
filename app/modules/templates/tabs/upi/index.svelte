@@ -143,7 +143,6 @@
   import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME, topUpiApps, otherAppsIcon } from 'common/upi.js';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import {VPA_REGEX} from 'common/constants.js';
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
