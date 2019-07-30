@@ -5872,6 +5872,10 @@ Session.prototype = {
       return this.verifyVpaAndContinue(data, request);
     }
 
+    if (preferences.fee_bearer && this.showFeesUi()) {
+      return;
+    }
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data,
@@ -5943,10 +5947,6 @@ Session.prototype = {
         request.iframe = true;
         Analytics.track('iframe:attempt');
       }
-    }
-
-    if (preferences.fee_bearer && this.showFeesUi()) {
-      return;
     }
 
     if (
