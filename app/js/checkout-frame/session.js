@@ -4734,6 +4734,7 @@ Session.prototype = {
     });
     setTimeout(function() {
       $('#error-message .link').html('');
+      $('#fd-t').style.paddingBottom = '10px';
     }, 100);
     $('.omni').show();
     $('#overlay-close').show();
@@ -5413,6 +5414,9 @@ Session.prototype = {
         delete data.ott;
         delete data.emi_duration;
       }
+    }
+    if (!data.contact) {
+      delete data.contact;
     }
 
     Razorpay.sendMessage({
