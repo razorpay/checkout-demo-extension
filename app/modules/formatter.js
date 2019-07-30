@@ -176,7 +176,7 @@ Formatter.rules = {
   number: {
     raw: function(value) {
       let returnVal = value.replace(/\D/g, '');
-      if (this.el.maxLength) {
+      if (this.el.maxLength > 0) {
         returnVal = _Str.slice(returnVal, 0, this.el.maxLength);
       }
       return returnVal;

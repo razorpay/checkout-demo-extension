@@ -193,7 +193,7 @@ img {
           session
         } = this.get();
 
-        session.back();
+        session.switchTab('upi');
       },
 
       createPayment() {

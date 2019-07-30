@@ -33,6 +33,12 @@ const getAvailableMethods = methods => {
     AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'emi');
   }
 
+  /**
+   * We do not want to show QR in the primary list
+   * of payment options anymore
+   */
+  AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'qr');
+
   return AVAIL_METHODS;
 };
 
@@ -130,8 +136,13 @@ export default class MethodsList {
     }
 
     data = _Obj.clone(data);
+
+    /**
+     * This count is also being sent with the
+     * p13n:instruments:list event.
+     */
     let noOfInstruments = 2;
-    if (isMobile) {
+    if (isMobile()) {
       noOfInstruments = 3;
     }
 
@@ -144,7 +155,7 @@ export default class MethodsList {
     /* Filter out any app that's in user's list but not currently installed */
     data.instruments = _Arr.filter(data.instruments, instrument => {
       if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
-        if (instrument['_[upiqr]'] === '1' && !isMobile) {
+        if (instrument['_[upiqr]'] === '1' && !isMobile()) {
           return true;
         }
 

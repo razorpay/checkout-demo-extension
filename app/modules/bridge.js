@@ -11,6 +11,7 @@ import Track from 'tracker';
 import { confirmCancelMsg } from 'common/strings';
 
 import * as AnalyticsTypes from 'analytics-types';
+import { processPaymentCreate } from 'payment/coproto';
 
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
@@ -288,6 +289,27 @@ window.upiIntentResponse = function(data) {
     }
   }
 };
+
+/**
+ * window.externalSDKResponse is called when a plugin wants to communicate with
+ * Checkout.
+ */
+window.externalSDKResponse = function(response = {}) {
+  if (response.provider === 'GOOGLE_PAY') {
+    handleGooglePaySDKResponse(response.data);
+  }
+};
+
+/**
+ * Handles Google Pay plugin response from Android SDK.
+ * @param data the data sent from plugin
+ */
+function handleGooglePaySDKResponse(data) {
+  const payment = getSession().getPayment();
+  if (payment) {
+    processPaymentCreate.call(payment, data.apiResponse);
+  }
+}
 
 /**
  * Tells whether or not we should handle back presses.

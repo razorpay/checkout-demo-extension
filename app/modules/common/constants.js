@@ -55,10 +55,13 @@ export const TAB_TITLES = {
   emi: 'EMI',
   emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
-  qr: 'QR',
+  paylater: 'Pay Later',
+  qr: 'UPI QR',
   upi: 'UPI',
   gpay: 'Google Pay',
   wallet: 'Wallet',
+  payout_account: 'Add Bank Account',
+  payout_upi: 'Add UPI ID',
 };
 
 /* .shown has display: none from iOS ad-blocker
@@ -101,6 +104,7 @@ export const AVAILABLE_METHODS = [
   'emi',
   'cardless_emi',
   'qr',
+  'paylater',
 ];
 
 /* VPA regex, copied from API */

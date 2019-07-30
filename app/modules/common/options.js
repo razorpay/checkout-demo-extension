@@ -16,6 +16,8 @@ export const RazorpayDefaults = {
   description: '',
   customer_id: '',
   recurring: null,
+  payout: null,
+  contact_id: '',
   signature: '',
   retry: true,
   target: '',

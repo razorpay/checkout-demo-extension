@@ -144,6 +144,8 @@ export default function Payment(data, params = {}, r) {
   this.magic = params.magic;
   this.optional = params.optional || {};
 
+  params.feesRedirect = params.fees || params.feesRedirect; // params.fees has to be present for backward compatibility
+
   this.isMagicPayment =
     this.sdk_popup &&
     this.magic &&
@@ -152,7 +154,9 @@ export default function Payment(data, params = {}, r) {
 
   this.magicPossible = this.isMagicPayment;
 
-  this.isAmazonpayPayment = params.amazonpay;
+  const external = params.external || {};
+  this.isExternalAmazonPayPayment = external.amazonpay;
+  this.isExternalGooglePayPayment = external.gpay;
 
   // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
   if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
@@ -204,6 +208,10 @@ export default function Payment(data, params = {}, r) {
       }
 
       if (data.method === 'upi') {
+        avoidPopup = true;
+      }
+
+      if (data.method === 'paylater') {
         avoidPopup = true;
       }
 
@@ -304,11 +312,14 @@ Payment.prototype = {
         |> pollPaymentData;
     };
 
-    if (this.isAmazonpayPayment) {
+    const isExternalSDKPayment =
+      this.isExternalAmazonPayPayment || this.isExternalGooglePayPayment;
+
+    if (isExternalSDKPayment) {
       setCompleteHandler();
 
       return window.setTimeout(() => {
-        this.emit('amazonpay.process', this.data);
+        this.emit('externalsdk.process', this.data);
       }, 100);
     }
 
@@ -418,13 +429,18 @@ Payment.prototype = {
       return;
     }
 
-    // type: otp is not handled on razorpayjs
-    // which is sent for some of the wallets, unidentifiable from
-    // checkout side before making the payment
-    // so not making ajax call for any wallet
+    /**
+     * type: otp is not handled on razorpayjs
+     * which is sent for some of the wallets, unidentifiable from
+     * checkout side before making the payment
+     * so not making ajax call for power wallets
+     */
+    const popupForMethods = ['cardless_emi'];
+    const paymentThroughPowerWallet =
+      data.method === 'wallet' && isPowerWallet(data.wallet);
     if (
-      !isRazorpayFrame &&
-      _Arr.contains(['wallet', 'cardless_emi'], data.method)
+      !isRazorpayFrame && // razorpay.js
+      (_Arr.contains(popupForMethods, data.method) || paymentThroughPowerWallet)
     ) {
       return;
     }
@@ -684,7 +700,28 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
         responded = true;
 
-        if (response.success || response.error) {
+        /**
+         * Consider VPA to be invalid only if API says it is invalid
+         * response.error would exist even if it's a network error
+         */
+        const isVpaInvalid =
+          response.success === false ||
+          (response.error && response.error.field === 'vpa');
+
+        if (isVpaInvalid) {
+          vpaCache[vpa] = response;
+
+          Analytics.track('validate:vpa:invalid', {
+            data: eventData,
+          });
+
+          reject(response);
+        } else {
+          /**
+           * We can enter this flow for a failed n/w request as well
+           * as for a success
+           * but we should cache only if it is a success
+           */
           if (response.success) {
             vpaCache[vpa] = response;
           }
@@ -694,13 +731,6 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
           });
 
           resolve(response);
-        } else {
-          vpaCache[vpa] = response;
-
-          Analytics.track('validate:vpa:invalid', {
-            data: eventData,
-          });
-          reject(response);
         }
       },
     });

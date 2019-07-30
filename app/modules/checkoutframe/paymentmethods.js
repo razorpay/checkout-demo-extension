@@ -1,4 +1,5 @@
 import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
+import { getProvider as getPayLaterProvider } from 'common/paylater';
 
 /**
  * Returns the text with commas or "and" as the separator.
@@ -78,6 +79,24 @@ const DESCRIPTIONS = {
   emandate: () => 'Pay with Netbanking',
   emi: () => 'EMI via Credit & Debit Cards',
   netbanking: () => 'All Indian banks',
+  paylater: ({ session }) => {
+    const providers = [];
+    const paylaterProviders = session.methods.paylater;
+
+    if (paylaterProviders && _.isNonNullObject(paylaterProviders)) {
+      _Obj.loop(paylaterProviders, (_, code) => {
+        const paylaterProviderObj = getPayLaterProvider(code);
+
+        if (paylaterProviderObj) {
+          providers.push(paylaterProviderObj.name);
+        }
+      });
+    }
+
+    const text = generateTextFromList(providers, 2);
+
+    return `Pay later using ${text}`;
+  },
   qr: () => 'Pay by scanning QR Code',
   gpay: () => 'Instant payment using Google Pay App',
   upi: () => 'Instant payment using UPI App',
@@ -133,8 +152,11 @@ function getMethodPrefix(method) {
     case 'cardless_emi':
       return 'EMI';
 
+    case 'paylater':
+      return 'PayLater';
+
     case 'qr':
-      return 'QR';
+      return 'UPI QR';
 
     case 'upi':
       return 'UPI';
@@ -147,6 +169,29 @@ function getMethodPrefix(method) {
 
     default:
       return method[0].toUpperCase() + method.slice(1);
+  }
+}
+
+/**
+ * Returns the name for the payment method.
+ * Used for showing the name with payment icon
+ * @param {string} method
+ * @param {Object} extra
+ *  @prop {Session} session
+ *
+ * @returns {string}
+ */
+export function getMethodNameForPaymentOption(method, { session }) {
+  switch (method) {
+    case 'upi':
+      if (session.methods.qr) {
+        return 'UPI / QR';
+      }
+
+      return session.tab_titles.upi;
+
+    default:
+      return session.tab_titles[method];
   }
 }
 

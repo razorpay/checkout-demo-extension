@@ -28,6 +28,7 @@ import emiOptionsView from 'checkoutframe/emioptions';
 import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
+import PayLaterView from 'checkoutframe/paylater';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
@@ -42,12 +43,14 @@ import * as Bank from 'common/bank';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
+import * as PayLater from 'common/paylater';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import * as Downtimes from 'checkoutframe/downtimes';
+import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -61,6 +64,9 @@ import DowntimesStore from 'checkoutstore/downtimes.js';
 import QRScreen from 'templates/views/qr.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
+
+import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
+import PayoutAccount from 'templates/screens/payout-account.svelte';
 
 import * as Hacks from 'checkoutframe/hacks';
 
@@ -99,6 +105,7 @@ export default {
   Card,
   Wallet,
   CardlessEmi,
+  PayLater,
   Token,
   SessionManager,
   Checkout,
@@ -109,6 +116,7 @@ export default {
   Offers,
   Flows,
   Downtimes,
+  Payouts,
 
   Store,
   PreferencesStore,
@@ -129,8 +137,11 @@ export default {
   SavedCardsView,
 
   FeeBearerView,
+  PayoutsInstruments,
+  PayoutAccount,
 
   otpView,
+  PayLaterView,
   Curtain,
   OptionsList,
   commonBanks,
@@ -144,6 +155,7 @@ export default {
   Hacks,
 
   _Arr,
+  _Doc,
   _El,
   _Func,
   _Obj,

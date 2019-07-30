@@ -156,6 +156,17 @@ var responseTypes = {
     this.emit('upi.pending', fullResponse.data);
   },
 
+  gpay_inapp: function(request) {
+    this.ajax = fetch
+      .jsonp({
+        url: request.url,
+        callback: response => this.complete(response),
+      })
+      .till(response => response && response.status);
+
+    this.emit('upi.pending', { flow: 'upi-intent' });
+  },
+
   gpay: function(coprotoRequest, fullResponse) {
     GPay.pay(
       fullResponse.data,

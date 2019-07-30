@@ -37,6 +37,25 @@
     {/if}
   {/if}
 
+  {#if shouldShowQr}
+    <div class="legend left">Or, Pay using QR</div>
+    <div class="options" id="showQr">
+      <NextOption
+        icon={qrIcon}
+        tabindex="0"
+        attributes={{
+          role: 'button',
+          'aria-label': 'Show QR Code - Scan the QR code using your UPI app'
+        }}
+
+        on:select="selectQrMethod(event)"
+      >
+        <div>Show QR Code</div>
+        <div class="desc">Scan the QR code using your UPI app</div>
+      </NextOption>
+    </div>
+  {/if}
+
   {#if down}
     <Callout
       showIcon={false}
@@ -120,7 +139,8 @@
   import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
   import DowntimesStore from 'checkoutstore/downtimes.js';
-  import {doesAppExist, GOOGLE_PAY_PACKAGE_NAME} from 'common/upi.js';
+  import { VPA_REGEX } from 'common/constants.js';
+  import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME, topUpiApps, otherAppsIcon } from 'common/upi.js';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import {VPA_REGEX} from 'common/constants.js';
@@ -128,48 +148,6 @@
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
   }
-
-  const otherAppsIcon =
-    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
-
-  const topUpiApps = [
-    {
-      text: 'BHIM',
-      icon: 'https://cdn.razorpay.com/app/bhim.svg',
-      id: 'bhim',
-      psp: 'upi',
-    },
-    {
-      text: 'Google Pay',
-      icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-      id: 'gpay',
-      psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-    },
-    {
-      text: 'WhatsApp',
-      icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
-      id: 'whatsapp',
-      psp: 'icici',
-    },
-    {
-      text: 'Paytm',
-      icon: 'https://cdn.razorpay.com/app/paytm.svg',
-      id: 'paytm',
-      psp: 'paytm',
-    },
-    {
-      text: 'PhonePe',
-      icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-      id: 'phonepe',
-      psp: 'ybl',
-    },
-    {
-      text: 'Other Apps',
-      icon: otherAppsIcon,
-      id: null,
-      psp: '',
-    },
-  ];
 
   const checkGPay = () => {
     var session = getSession();
@@ -180,6 +158,11 @@
 
     /* disable Web payments API for fee_bearer for now */
     if (session.preferences.fee_bearer) {
+      return Promise.reject();
+    }
+
+    // We're not using Web Payments API for Payouts
+    if (session.isPayout) {
       return Promise.reject();
     }
 
@@ -215,7 +198,8 @@
       Callout: 'templates/views/ui/Callout.svelte',
       Collect: './Collect.svelte',
       GooglePayCollect: './GooglePayCollect.svelte',
-      GooglePayOmnichannel: './GooglePayOmnichannel.svelte'
+      GooglePayOmnichannel: './GooglePayOmnichannel.svelte',
+      NextOption: 'templates/views/ui/options/NextOption.svelte',
     },
 
     data() {
@@ -236,6 +220,7 @@
         useOmnichannel: false,
         retryOmnichannel: false,
         down: false,
+        qrEnabled: false,
       };
     },
 
@@ -250,14 +235,25 @@
 
       intent: ({ preferIntent }) => {
         let intentApps = getSession().upi_intents_data;
-        return preferIntent && intentApps && _.lengthOf(intentApps) > 0;
+        // We'll not use intent for Payouts
+        const { isPayout } = getSession();
+
+        return !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0;
       },
 
       /* Will be true if Google Pay for web payments API is selected */
       isGPaySelected: ({ selectedApp, useWebPaymentsApi }) =>
         selectedApp === 'gpay' && useWebPaymentsApi,
 
-      pspHandle: ({ selectedAppData }) => selectedAppData ? selectedAppData.psp : ''
+      pspHandle: ({ selectedAppData }) => selectedAppData ? selectedAppData.psp : '',
+      /**
+       * Show "Show QR" button only if QR is enabled and an app has not been selected.
+       * selectedApp === null when "Other Apps" is selected
+       */
+      shouldShowQr: ({ qrEnabled, selectedApp }) => {
+        const session = getSession();
+        return qrEnabled && !selectedApp && selectedApp !== null && !session.isPayout;
+      },
     },
 
     oncreate() {
@@ -287,6 +283,11 @@
           down: true,
         });
       }
+
+      this.set({
+        qrEnabled: session.methods.qr,
+        qrIcon: getSession().themeMeta.icons.qr,
+      });
     },
 
     onstate({ changed, current }) {
@@ -325,6 +326,23 @@
     },
 
     methods: {
+      /**
+       * Does the equivalent of
+       * selecting the QR payment method
+       */
+      selectQrMethod () {
+        const session = getSession();
+
+        Analytics.track('payment_method:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            method: 'qr',
+          },
+        });
+
+        session.switchTab('qr');
+      },
+
       /**
        * This function will be invoked externally via session on
        * payment form submission

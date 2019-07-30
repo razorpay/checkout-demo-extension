@@ -75,7 +75,7 @@ const callbackHtml = data => {
   return `<script>opener.postMessage('${data}','*')</script>`;
 };
 
-const wait = request => request.attempt.promisePending('reply');
+const wait = request => request.attempt.promisePending('reply', request);
 
 const waitHtml = async (request, reply) => {
   if (request.body && request.body.callback_url) {
@@ -102,6 +102,8 @@ const routes = [
   ['post', 'payments/:payment_id/otp_submit', wait],
   ['post', 'payments/validate/account', validateAccount],
   ['get', 'gateway/mocksharp/:payment_id', withNext(waitHtml)],
+  ['get', 'customers/status/:contact', wait],
+  ['post', 'otp/verify', wait],
 ];
 
 const prefix = '/api/:visit/v1/';

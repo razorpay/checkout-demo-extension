@@ -7,6 +7,7 @@ var textColor = themeMeta.textColor;
 var highlightColor = themeMeta.highlightColor;
 var secondaryHighlightColor = themeMeta.secondaryHighlightColor;
 var hoverStateColor = themeMeta.hoverStateColor;
+var backgroundColor = themeMeta.backgroundColor;
 var activeStateColor = themeMeta.activeStateColor;
 `
 
@@ -50,12 +51,17 @@ var activeStateColor = themeMeta.activeStateColor;
 }
 
 .options-list .option:hover,
-.options .option:hover {
+.options .option:hover,
+.options .option:focus {
   background: `=hoverStateColor`;
 }
 
 .options .next-option:after {
   color: `=highlightColor`;
+}
+
+.options .next-option.secondary-color:after {
+  color: `=backgroundColor`;
 }
 
 #payment-options i svg {

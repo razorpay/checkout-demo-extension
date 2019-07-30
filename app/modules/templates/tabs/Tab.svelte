@@ -1,5 +1,5 @@
 {#if methodSupported}
-  <div class="tab-content showable screen pad" id='form-{method}'>
+  <div class="tab-content showable screen" id='form-{method}' class:pad>
     <slot></slot>
   </div>
 {/if}
@@ -9,7 +9,12 @@
 
   export default {
     computed: {
-      methodSupported: ({ method }) => getSession().methods[method]
-    }
+      methodSupported: ({ method, overrideMethodCheck }) => overrideMethodCheck || getSession().methods[method]
+    },
+
+    data: () => ({
+      overrideMethodCheck: false,
+      pad: true,
+    })
   }
 </script>

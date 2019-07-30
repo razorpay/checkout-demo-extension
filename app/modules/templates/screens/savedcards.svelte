@@ -1,4 +1,4 @@
-{#each cards as card}
+{#each cards as card (card.id)}
   <SavedCard
     {...card}
 

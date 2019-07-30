@@ -217,7 +217,8 @@
         session.tpvBank ||
         session.upiTpv ||
         session.multiTpv ||
-        session.local
+        session.local ||
+        session.isPayout
       ) {
         /* disableP13n is both, the template prop and the class prop */
         this.disableP13n = true;
@@ -307,7 +308,7 @@
               break;
             case 'upi':
               if (instrument['_[upiqr]'] === '1') {
-                text = `QR`;
+                text = `UPI QR`;
                 icon = session.themeMeta.icons['qr'];
                 break;
               }
