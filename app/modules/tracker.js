@@ -195,6 +195,7 @@ export default function Track(r, event, data, immediately) {
       'display_amount',
       'redirect',
       'readonly',
+      'contact_id',
     ];
 
     _Obj.loop(r.get(), function(value, key) {

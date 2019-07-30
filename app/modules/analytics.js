@@ -69,7 +69,7 @@ const Analytics = () => ({
 
   /**
    * @param {String} key
-   * @param {Any} val
+   * @param {*} val
    */
   setMeta: function(key, val) {
     _Obj.setProp(META, key, val);
