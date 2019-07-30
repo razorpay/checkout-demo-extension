@@ -5797,6 +5797,21 @@ Session.prototype = {
       }
     }
 
+    /**
+     * Wallets might need to go through intent flow too
+     * TODO: Add a feature check here
+     */
+    if (data.method === 'wallet') {
+      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
+        data.wallet,
+        this.upi_intents_data
+      );
+
+      if (shouldTurnWalletToIntent) {
+        data['_[flow]'] = 'intent';
+      }
+    }
+
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
       if (this.shouldAskUPI2FPermission) {

@@ -39,3 +39,22 @@ export const wallets = _Obj.map(list, (details, code) => ({
 
 export const isPowerWallet = code => wallets[code] && wallets[code].power;
 export const getWallet = code => wallets[code];
+
+const walletToIntent = {
+  phonepe: 'com.phonepe.app',
+};
+
+/**
+ * We want to turn some wallets into intent.
+ * @param {string} wallet Selected wallet
+ * @param {Array<Object>} apps List of available apps
+ */
+export const shouldTurnWalletToIntent = (wallet, apps = []) => {
+  const walletPackage = walletToIntent[wallet];
+
+  if (walletPackage) {
+    return _Arr.any(apps, app => app.package_name === walletPackage);
+  }
+
+  return false;
+};
