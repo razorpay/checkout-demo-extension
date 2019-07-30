@@ -49,3 +49,13 @@ export function createFundAccount(fundAccount) {
     })
   );
 }
+
+/**
+ * Removes sensitive data from fund account
+ * @param account
+ */
+export function makeTrackingDataFromAccount(account) {
+  const copy = _Obj.clone(account);
+  delete copy.bank_account;
+  return copy;
+}
