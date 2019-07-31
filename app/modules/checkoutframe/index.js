@@ -186,6 +186,16 @@ export const handleMessage = function(message) {
     return;
   }
 
+  /**
+   * Emit `payment.resume`
+   */
+  if (message.event === 'resume') {
+    if (session) {
+      session.r.emit('payment.resume', message.data);
+    }
+    return;
+  }
+
   let transformedOptions = transformOptions(message);
   var options = message.options;
 

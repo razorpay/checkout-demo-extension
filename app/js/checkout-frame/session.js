@@ -5750,6 +5750,7 @@ Session.prototype = {
       magic: this.magic,
       optional: getStore('optional'),
       external: {},
+      paused: this.get().paused,
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
@@ -5870,6 +5871,15 @@ Session.prototype = {
       }
     }
 
+    /* VPA verification */
+    if (data.vpa && !vpaVerified) {
+      return this.verifyVpaAndContinue(data, request);
+    }
+
+    if (preferences.fee_bearer && this.showFeesUi()) {
+      return;
+    }
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data,
@@ -5943,10 +5953,6 @@ Session.prototype = {
       }
     }
 
-    if (preferences.fee_bearer && this.showFeesUi()) {
-      return;
-    }
-
     if (
       discreet.Wallet.isPowerWallet(wallet) &&
       !request.feesRedirect &&
@@ -5979,11 +5985,6 @@ Session.prototype = {
 
     if (this.p13n) {
       P13n.processInstrument(data, this);
-    }
-
-    /* VPA verification */
-    if (data.vpa && !vpaVerified) {
-      return this.verifyVpaAndContinue(data, request);
     }
 
     if (this.isPayout) {

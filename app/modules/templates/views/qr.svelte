@@ -208,10 +208,21 @@ img {
           processInstrument(paymentData);
         }
 
+        /**
+         * TODO:
+         * We should call session.submit from here
+         * and let it handle fees and other eventing stuff
+         */
+        global.Razorpay.sendMessage({
+          event: 'submit',
+          data: paymentData,
+        });
+
         session.r
           .createPayment(paymentData, {
             upiqr: true,
             optional: session.optional,
+            paused: session.get().paused,
           })
           .on(
             'payment.upi.coproto_response',
