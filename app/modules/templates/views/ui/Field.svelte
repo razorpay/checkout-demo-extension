@@ -54,9 +54,9 @@
       };
     },
 
-    onupdate({ changed }) {
+    onupdate({ changed, current }) {
       if (changed.maxlength) {
-        const { maxlength } = this.get();
+        const { maxlength } = current;
         this.setMaxLength(maxlength);
       }
     },
