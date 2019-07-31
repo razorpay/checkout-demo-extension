@@ -268,6 +268,12 @@ var responseTypes = {
   // prettier-ignore
   'return': function(request) {
     _Doc.redirect(request);
+  },
+
+  respawn: function (request, fullResponse) {
+    // TODO: Check if Google OmniChannel
+    // By default, use first coproto.
+    return responseTypes.first.call(this, request, fullResponse);
   }
 };
 
