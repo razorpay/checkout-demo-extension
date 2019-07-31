@@ -2497,7 +2497,26 @@ Session.prototype = {
       },
     });
   },
-
+  fixLandscapeBug: function() {
+    function shiftUp() {
+      if (Hacks.isDeviceLandscape()) {
+        this.el.querySelector('#footer').style.transform = 'translateY(-144px)';
+        this.el.querySelector('#should-save-card').style.transform =
+          'translateY(-10px)';
+      }
+    }
+    function shiftDown() {
+      this.el.querySelector('#footer').style.transform = 'translateY(0)';
+      this.el.querySelector('#should-save-card').style.transform =
+        'translateY(0)';
+    }
+    if (discreet.UserAgent.iOS) {
+      this.on('focus', '#card_name', shiftUp);
+      this.on('blur', '#card_name', shiftDown);
+      this.on('focus', '#card_cvv', shiftUp);
+      this.on('blur', '#card_cvv', shiftDown);
+    }
+  },
   bindEvents: function() {
     var self = this;
     var emi_options = this.emi_options;
@@ -2656,34 +2675,7 @@ Session.prototype = {
        *
        * This _has_ to be fixed in v4, so we'll remove it then.
        */
-      if (discreet.UserAgent.iOS) {
-        this.on('focus', '#card_name', function() {
-          if (Hacks.isDeviceLandscape()) {
-            this.el.querySelector('#footer').style.transform =
-              'translateY(-92px)';
-            this.el.querySelector('#should-save-card').style.transform =
-              'translateY(-10px)';
-          }
-        });
-        this.on('blur', '#card_name', function() {
-          this.el.querySelector('#footer').style.transform = 'translateY(0)';
-          this.el.querySelector('#should-save-card').style.transform =
-            'translateY(0)';
-        });
-        this.on('focus', '#card_cvv', function() {
-          if (Hacks.isDeviceLandscape()) {
-            this.el.querySelector('#footer').style.transform =
-              'translateY(-92px)';
-            this.el.querySelector('#should-save-card').style.transform =
-              'translateY(-10px)';
-          }
-        });
-        this.on('blur', '#card_cvv', function() {
-          this.el.querySelector('#footer').style.transform = 'translateY(0)';
-          this.el.querySelector('#should-save-card').style.transform =
-            'translateY(0)';
-        });
-      }
+      this.fixLandscapeBug();
 
       this.on('keyup', '#card_number', onSixDigits);
       // Also listen for paste.
