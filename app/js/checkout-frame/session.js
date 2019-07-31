@@ -5868,9 +5868,6 @@ Session.prototype = {
         if (!data.contact.match(/^\+91/)) {
           data.contact = '+91' + data.contact;
         }
-      } else {
-        delete data.contact;
-        delete data.ott;
       }
     }
 
@@ -6490,9 +6487,10 @@ Session.prototype = {
     /**
      * Disable PayLater if either:
      * - Empty array
+     * - Contact is optional
      * TODO: Allow this for prefill and logged in users.
      */
-    if (_Obj.isEmpty(methods.paylater)) {
+    if (_Obj.isEmpty(methods.paylater) || getStore('optional').contact) {
       methods.paylater = null;
     }
 
