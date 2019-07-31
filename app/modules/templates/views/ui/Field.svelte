@@ -10,7 +10,6 @@
     {autocomplete}
     {placeholder}
     {pattern}
-    {maxlength}
 
     use:formatter="formatter"
     on:focus="fire('focus', event)"
@@ -53,6 +52,15 @@
         pattern: '.*',
         autocomplete: 'off',
       };
+    },
+
+    onupdate() {
+      const { maxlength } = this.get();
+      const { input } = this.refs;
+
+      if (maxlength) {
+        input.maxLength = maxlength
+      }
     },
 
     actions: {
