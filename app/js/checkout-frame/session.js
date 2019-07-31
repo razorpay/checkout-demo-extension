@@ -6034,6 +6034,7 @@ Session.prototype = {
     if (data.vpa && !vpaVerified) {
       return this.verifyVpaAndContinue(data, request);
     }
+    var session = this;
     var isOmni =
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
@@ -6044,7 +6045,7 @@ Session.prototype = {
       this.r.on('payment.error', function(response) {
         console.log(response.error);
         if (response.error.code === 'BAD_REQUEST_ERROR') {
-          this.retryOmniChannelRespawn();
+          session.retryOmniChannelRespawn();
         }
       });
     }
