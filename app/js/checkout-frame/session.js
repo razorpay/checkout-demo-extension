@@ -1566,6 +1566,12 @@ Session.prototype = {
       discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
     }
 
+    // Analytics related to orientation
+    Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    window.addEventListener('orientationchange', function() {
+      Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    });
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
