@@ -54,12 +54,10 @@
       };
     },
 
-    onupdate() {
-      const { maxlength } = this.get();
-      const { input } = this.refs;
-
-      if (maxlength) {
-        input.maxLength = maxlength
+    onupdate({ changed }) {
+      if (changed.maxlength) {
+        const { maxlength } = this.get();
+        this.setMaxLength(maxlength);
       }
     },
 
@@ -98,6 +96,14 @@
       getValue() {
         return this.refs.input.value;
       },
+
+      setMaxLength(length) {
+        const { input } = this.refs;
+
+        if (length) {
+          input.maxLength = length
+        }
+      }
     },
   };
 </script>
