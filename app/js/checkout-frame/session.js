@@ -2506,15 +2506,21 @@ Session.prototype = {
   fixLandscapeBug: function() {
     function shiftUp() {
       if (Hacks.isDeviceLandscape()) {
-        this.el.querySelector('#footer').style.transform = 'translateY(-144px)';
-        this.el.querySelector('#should-save-card').style.transform =
-          'translateY(-10px)';
+        $(this.el.querySelector('#footer'))
+          .removeClass('shift-footer-down')
+          .addClass('shift-footer-up');
+        $(this.el.querySelector('#should-save-card'))
+          .removeClass('shift-ssc-down')
+          .addClass('shift-ssc-up');
       }
     }
     function shiftDown() {
-      this.el.querySelector('#footer').style.transform = 'translateY(0)';
-      this.el.querySelector('#should-save-card').style.transform =
-        'translateY(0)';
+      $(this.el.querySelector('#footer'))
+        .removeClass('shift-footer-up')
+        .addClass('shift-footer-down');
+      $(this.el.querySelector('#should-save-card'))
+        .removeClass('shift-ssc-up')
+        .addClass('shift-ssc-down');
     }
     if (discreet.UserAgent.iOS) {
       this.on('focus', '#card_name', shiftUp);
