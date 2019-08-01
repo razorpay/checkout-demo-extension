@@ -2838,7 +2838,6 @@ Session.prototype = {
 
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
-        console.log('closing');
         if (this.get('modal.confirm_close') && !confirmClose()) {
           return;
         }
@@ -5478,7 +5477,6 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    // debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5658,7 +5656,6 @@ Session.prototype = {
       }
       // perform the actual validation
       if (screen === 'upi') {
-        // debugger;
         var formSelector = '#form-upi';
         var omniSelected = this.upiTab.get().omniSelected;
 
@@ -6230,10 +6227,6 @@ Session.prototype = {
           "Please accept the request from Razorpay's VPA on your UPI app"
         );
       });
-
-      this.r.on('omni.retry', function(data) {
-        console.log(data, 'data');
-      });
     } else {
       if (!this.headless) {
         sub_link.html('Go to payment');
@@ -6769,13 +6762,8 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    // TODO: remove mock.. only for testing
-    // prefs.features = {};
-    // prefs.features.google_pay_omnichannel = true;
-    // removing for testing in production
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
-    /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
     preferences = prefs;

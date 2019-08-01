@@ -135,7 +135,7 @@
 </style>
 
 <script>
-  import {getSession} from 'sessionmanager.js';
+  import { getSession } from 'sessionmanager.js';
   import * as GPay from 'gpay.js';
   import * as Bridge from 'bridge.js';
   import DowntimesStore from 'checkoutstore/downtimes.js';
@@ -205,11 +205,11 @@
       return {
         vpa: '',
         tab: 'upi',
-        isFirst:true,
+        isFirst: true,
         topUpiApps,
-        radio:{
-          phone:true,
-          vpa:false
+        radio: {
+          phone: true,
+          vpa: false
         },
         otherAppsIcon,
         pattern: '.+',
@@ -313,10 +313,12 @@
 
         if (selectedApp === 'gpay') {
           if (tab === 'gpay') {
-            this.set({ preferIntent: doesAppExist(
-              GOOGLE_PAY_PACKAGE_NAME,
-              intentApps
-            )});
+            this.set({
+              preferIntent: doesAppExist(
+                GOOGLE_PAY_PACKAGE_NAME,
+                intentApps
+              )
+            });
           } else if (tab === 'upi') {
             this.set({ preferIntent: true });
           }
@@ -329,7 +331,7 @@
        * Does the equivalent of
        * selecting the QR payment method
        */
-      selectQrMethod () {
+      selectQrMethod() {
         const session = getSession();
 
         Analytics.track('payment_method:select', {
@@ -346,23 +348,21 @@
        * This function will be invoked externally via session on
        * payment form submission
        */
-      radioCheck(type){
+      radioCheck(type) {
         // console.log(type,'type');
-        if(type=='phone')
-        {
+        if (type == 'phone') {
           this.set({
-            radio:{
-              phone:true,
-              vpa:false
+            radio: {
+              phone: true,
+              vpa: false
             }
           })
         }
-        else
-        {
+        else {
           this.set({
-            radio:{
-              phone:false,
-              vpa:true
+            radio: {
+              phone: false,
+              vpa: true
             }
           })
         }
@@ -401,25 +401,24 @@
             data = {
               '_[flow]': 'gpay',
             };
-          } else if (useOmnichannel && selectedApp === 'gpay') {
+          }
+          else if (useOmnichannel && selectedApp === 'gpay') {
             if (!retryOmnichannel) {
               data['_[flow]'] = 'intent';
               data.contact = this.refs.omnichannelField.getPhone();
               data.upi_provider = 'google_pay';
-               } else {
-              var omniSelected= this.get().omniSelected;
-              if(omniSelected==='vpa')
-              {
-              data['_[flow]'] = 'directpay';
-              data.vpa = this.getFullVpa();
+            } else {
+              var omniSelected = this.get().omniSelected;
+              if (omniSelected === 'vpa') {
+                data['_[flow]'] = 'directpay';
+                data.vpa = this.getFullVpa();
               }
-              if(omniSelected=='phone')
-              {
+              if (omniSelected == 'phone') {
                 data['_[flow]'] = 'intent';
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';
               }
-              console.log(omniSelected,'omniSelected')
+              console.log(omniSelected, 'omniSelected')
               // TODO: decide which flow to use if retry
             }
           } else {
@@ -442,12 +441,12 @@
 
         return data;
       },
-    setRetryOmniChannel:function(status){
-    this.set({retryOmnichannel:status});
-    },
+      setRetryOmniChannel: function (status) {
+        this.set({ retryOmnichannel: status });
+      },
       onBack() {
         this.set({
-          isFirst:false
+          isFirst: false
         })
         const {
           intent,
@@ -515,7 +514,7 @@
       /**
        * Called when the UPI address card is clicked.
        */
-      handleCardClick: function(event) {
+      handleCardClick: function (event) {
         this.focusVpa(event);
       },
 
