@@ -260,10 +260,6 @@ var responseTypes = {
       }
     }
   },
-  respawn: function(request, fullResponse) {
-    const session = getSession();
-    session.retryOmniChannelRespawn(fullResponse);
-  },
 
   otp: function(request, fullResponse) {
     if (!this.nativeotp && !this.iframe && request.method === 'direct') {
@@ -286,6 +282,13 @@ var responseTypes = {
   },
 
   respawn: function(request, fullResponse) {
+    const session = getSession();
+    var isOmni =
+      session.preferences.features.google_pay_omnichannel &&
+      session.upiTab.get().selectedApp === 'gpay';
+    if (isOmni) {
+      session.retryOmniChannelRespawn(fullResponse);
+    }
     // TODO: Check if Google OmniChannel
     // By default, use first coproto.
     return responseTypes.first.call(this, request, fullResponse);
