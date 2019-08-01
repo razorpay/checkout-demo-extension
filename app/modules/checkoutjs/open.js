@@ -272,6 +272,22 @@ RazorProto.open = needBody(function() {
   return this;
 });
 
+/**
+ * Resumes the payment.
+ * Invokes `payment.resume` on the frame.
+ * @param {Object} data
+ */
+RazorProto.resume = function(data) {
+  const frame = this.checkoutFrame;
+
+  if (frame) {
+    frame.postMessage({
+      event: 'resume',
+      data,
+    });
+  }
+};
+
 RazorProto.close = function() {
   var frame = this.checkoutFrame;
   if (frame) {

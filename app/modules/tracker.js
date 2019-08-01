@@ -195,6 +195,7 @@ export default function Track(r, event, data, immediately) {
       'display_amount',
       'redirect',
       'readonly',
+      'contact_id',
     ];
 
     _Obj.loop(r.get(), function(value, key) {
@@ -216,13 +217,15 @@ export default function Track(r, event, data, immediately) {
       options.image = 'base64';
     }
 
+    const externalWallets = r.get('external.wallets') || [];
+
     /**
      * Lumberjack doesn't support arrays well, so convert `external.wallets`
      * to object
      */
 
     options.external_wallets =
-      r.get('external.wallets')
+      externalWallets
       |> _Arr.reduce((acc, wallet) => acc |> _Obj.setProp(wallet, true), {});
 
     addMagicProps(r, properties);

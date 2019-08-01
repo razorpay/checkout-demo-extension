@@ -3,7 +3,8 @@
   name="instrument"
   {reverse}
   {selected}
-  value="{account.fund_account_id}"
+  value="{account.id}"
+  {icon}
 
   on:select="fire('select', account)">
   <slot></slot>
@@ -17,7 +18,8 @@ export default {
 
   data: () => ({
     selected: false,
-    reverse: true
+    reverse: true,
+    icon: undefined
   })
 }
 </script>
