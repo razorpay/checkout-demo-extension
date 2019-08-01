@@ -432,7 +432,7 @@
            * TODO: discuss with vivek whether to continue sending
            * directpay for collect requests
            */
-          if (!data['_[flow]'] && !useOmnichannel) {
+          if (!data['_[flow]']) {
             data['_[flow]'] = 'directpay';
           }
           // TODO: set flow for omnichannel?
