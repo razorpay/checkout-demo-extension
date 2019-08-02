@@ -2505,14 +2505,12 @@ Session.prototype = {
   },
   fixLandscapeBug: function() {
     function shiftUp() {
-      if (Hacks.isDeviceLandscape()) {
-        $(this.el.querySelector('#footer'))
-          .removeClass('shift-footer-down')
-          .addClass('shift-footer-up');
-        $(this.el.querySelector('#should-save-card'))
-          .removeClass('shift-ssc-down')
-          .addClass('shift-ssc-up');
-      }
+      $(this.el.querySelector('#footer'))
+        .removeClass('shift-footer-down')
+        .addClass('shift-footer-up');
+      $(this.el.querySelector('#should-save-card'))
+        .removeClass('shift-ssc-down')
+        .addClass('shift-ssc-up');
     }
     function shiftDown() {
       $(this.el.querySelector('#footer'))
@@ -2687,7 +2685,9 @@ Session.prototype = {
        *
        * This _has_ to be fixed in v4, so we'll remove it then.
        */
-      this.fixLandscapeBug();
+      if (Hacks.isDeviceLandscape()) {
+        this.fixLandscapeBug();
+      }
 
       this.on('keyup', '#card_number', onSixDigits);
       // Also listen for paste.
