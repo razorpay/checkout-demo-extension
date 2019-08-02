@@ -1,5 +1,10 @@
 import * as UserAgent from 'common/useragent';
 
+const Orientation = {
+  LANDSCAPE: 'landscape',
+  PORTRAIT: 'portrait',
+};
+
 /**
  * Compares versions.
  * https://github.com/substack/semver-compare/blob/master/index.js
@@ -46,7 +51,9 @@ export function getDeviceOrientation() {
   }
 
   const isLandscape = angle === 90 || angle === 270;
-  const orientation = isLandscape ? 'landscape' : 'portrait';
+  const orientation = isLandscape
+    ? Orientation.LANDSCAPE
+    : Orientation.PORTRAIT;
 
   return orientation;
 }
@@ -57,7 +64,7 @@ export function getDeviceOrientation() {
  * @returns {boolean}
  */
 export function isDevicePortrait() {
-  return getDeviceOrientation() === 'portrait';
+  return getDeviceOrientation() === Orientation.PORTRAIT;
 }
 
 /**
@@ -66,7 +73,7 @@ export function isDevicePortrait() {
  * @returns {boolean}
  */
 export function isDeviceLandscape() {
-  return getDeviceOrientation() === 'landscape';
+  return getDeviceOrientation() === Orientation.LANDSCAPE;
 }
 
 /**
