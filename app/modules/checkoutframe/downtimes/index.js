@@ -20,9 +20,9 @@ function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
 }
 
 const DISABLE_METHOD = {
-  // upi: disableBasedOnSeverityOrScheduled(['high'], true),
-  // qr: disableBasedOnSeverityOrScheduled(['high'], true),
-  // gpay: disableBasedOnSeverityOrScheduled(['high'], true),
+  upi: disableBasedOnSeverityOrScheduled(['high'], true),
+  qr: disableBasedOnSeverityOrScheduled(['high'], true),
+  gpay: disableBasedOnSeverityOrScheduled(['high'], true),
 };
 
 /**
@@ -78,6 +78,29 @@ function copyMethodsIfNeeded(downtimes) {
 }
 
 /**
+ * Takes a list of downtimes
+ * and groups them by the method.
+ * @param {Array<Object>} allDowntimes
+ *
+ * @returns {Object<method, Array>} downtimes
+ */
+function groupDowntimesByMethod(allDowntimes) {
+  const downtimes = {};
+
+  _Arr.loop(allDowntimes, downtime => {
+    const { method } = downtime;
+
+    if (!_Obj.hasProp(downtimes, method)) {
+      downtimes[method] = [];
+    }
+
+    downtimes[method].push(downtime);
+  });
+
+  return downtimes;
+}
+
+/**
  * Get downtimes from preferences.
  * @param {Object} preferences
  *
@@ -88,14 +111,19 @@ export function getDowntimes(preferences) {
     disabled: [],
   };
 
-  // if (!preferences || !preferences.downtime) {
-  //   return downtimes;
-  // }
+  const hasDowntimes =
+    preferences &&
+    preferences.payment_downtime &&
+    preferences.payment_downtime.items &&
+    preferences.payment_downtime.items.length;
+  if (!hasDowntimes) {
+    return downtimes;
+  }
 
-  // downtimes = _Obj.clone(preferences.downtime);
-
-  // downtimes = copyMethodsIfNeeded(downtimes);
-  // downtimes.disabled = getDisabledMethods(downtimes);
+  downtimes =
+    groupDowntimesByMethod(preferences.payment_downtime.items)
+    |> copyMethodsIfNeeded;
+  downtimes.disabled = getDisabledMethods(downtimes);
 
   return downtimes;
 }

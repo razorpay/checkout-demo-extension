@@ -31,7 +31,7 @@
       showIcon={false}
       classes={['downtime-callout']}
     >
-      <strong>QR</strong> is experiencing low success rates.
+      <strong>UPI QR</strong> is experiencing low success rates.
     </Callout>
   {/if}
 </div>
