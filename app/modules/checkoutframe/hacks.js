@@ -1,5 +1,10 @@
 import * as UserAgent from 'common/useragent';
 
+const Orientation = {
+  LANDSCAPE: 'landscape',
+  PORTRAIT: 'portrait',
+};
+
 /**
  * Compares versions.
  * https://github.com/substack/semver-compare/blob/master/index.js
@@ -22,8 +27,53 @@ function compareSemver(a, b) {
   return 0;
 }
 
-function isDeviceLandscape() {
-  return global.screen.width > global.screen.height;
+/**
+ * Returns the device orientation.
+ *
+ * @returns {string}
+ */
+export function getDeviceOrientation() {
+  let angle;
+
+  // Try getting it from the screen object
+  if (_Obj.hasProp(global.screen, 'orientation')) {
+    angle = Math.abs(global.screen.orientation.angle || 0);
+  }
+
+  // If window.screen.orientation is not supported, try getting it from window
+  if (_.isType(angle, 'undefined') && _Obj.hasProp(global, 'orientation')) {
+    angle = Math.abs(global.orientation || 0);
+  }
+
+  // As a last resort, rely on screen height and width
+  if (_.isType(angle, 'undefined')) {
+    angle = global.screen.width > global.screen.height ? 90 : 0;
+  }
+
+  const isLandscape = angle === 90 || angle === 270;
+  const orientation = isLandscape
+    ? Orientation.LANDSCAPE
+    : Orientation.PORTRAIT;
+
+  return orientation;
+}
+
+/**
+ * Tells whether or not the device is in portrait mode.
+ *
+ * @returns {boolean}
+ */
+export function isDevicePortrait() {
+  return getDeviceOrientation() === Orientation.PORTRAIT;
+}
+
+/**
+ * Tells whether or not the device is in landscape mode.
+ *
+ * @returns {boolean}
+ */
+export function isDeviceLandscape() {
+  return getDeviceOrientation() === Orientation.LANDSCAPE;
 }
 
 /**
@@ -76,6 +126,22 @@ function decreaseWebViewHeightForAndroidTablets() {
 }
 
 /**
+ * Scrolls the header in landscape mode.
+ */
+function autoScrollHeaderIfLandscape() {
+  const isLandscape = isDeviceLandscape();
+
+  if (isLandscape) {
+    if (UserAgent.iOS) {
+      setTimeout(() => global.ownerWindow.scroll(0, 100));
+    }
+    if (UserAgent.android) {
+      setTimeout(() => global.scroll(0, 100));
+    }
+  }
+}
+
+/**
  * On iPhone with smaller heights (iPhone 5S),
  * the pay button is not visible on the web.
  *
@@ -85,7 +151,7 @@ function shiftIosPayButtonOnSmallerHeights() {
   if (UserAgent.iPhone) {
     setTimeout(() => {
       const footer = _Doc.querySelector('#footer');
-      if (global.innerHeight <= 512) {
+      if (!isDeviceLandscape() && global.innerHeight <= 512) {
         _El.addClass(footer, 'shift-ios');
       }
     }, 1000);
@@ -99,7 +165,10 @@ function shiftIosPayButtonOnSmallerHeights() {
         const footer = _Doc.querySelector('#footer');
 
         // Shift pay button
-        if (global.screen.height - global.innerHeight >= 56) {
+        if (
+          !isDeviceLandscape() &&
+          global.screen.height - global.innerHeight >= 56
+        ) {
           _El.addClass(footer, 'shift-ios');
         } else {
           _El.removeClass(footer, 'shift-ios');
@@ -109,9 +178,29 @@ function shiftIosPayButtonOnSmallerHeights() {
   }
 }
 
+/**
+ * Removes extra padding in landscape mode
+ */
+function reduceUnneededPaddingIfLandscape() {
+  const isLandscape = isDeviceLandscape();
+
+  if (isLandscape) {
+    setTimeout(() => {
+      const header = _Doc.querySelector('#header');
+      const formCommon = _Doc.querySelector('#form-common');
+      const iosPayFixClassName = 'ios-paybtn-landscape-fix';
+
+      _El.addClass(header, iosPayFixClassName);
+      _El.addClass(formCommon, iosPayFixClassName);
+    });
+  }
+}
+
 export function initPreRenderHacks() {}
 
 export function initPostRenderHacks() {
   shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
+  reduceUnneededPaddingIfLandscape();
+  autoScrollHeaderIfLandscape();
 }

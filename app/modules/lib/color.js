@@ -12,7 +12,8 @@ const canvas = _El.create('canvas'),
 // canvas.getImageData().data returns a Uint8Array with length 4 (r,g,b,a),
 // However, in Brave Browser, if device recognition is blocked,
 // the length of this array will be zero.
-const canvasFingerprintingBlocked = ctx.getImageData(0, 0, 1, 1).data.length === 0;
+const canvasFingerprintingBlocked =
+  ctx.getImageData(0, 0, 1, 1).data.length === 0;
 
 const getPixelDataFallback = color => {
   const d = document.createElement('div');
@@ -203,7 +204,10 @@ const getColorString = (red, green, blue, alpha) => {
 // Convert "rgba(255, 255, 255, 1)" to an object.
 const stringToColor = string => {
   const color = {
-    red: 0, green: 0, blue: 0, alpha: 1
+    red: 0,
+    green: 0,
+    blue: 0,
+    alpha: 1,
   };
   if (string && string.length > 4) {
     const rgb = string.match(/\d+/g);
