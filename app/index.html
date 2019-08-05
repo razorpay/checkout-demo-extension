@@ -25,38 +25,28 @@
       if (window.URLSearchParams) {
         searchParams = new URLSearchParams(location.search);
       }
-
       var options = {
         // key: 'rzp_live_ILgsfZCZoFIKMb',
         key: 'rzp_test_1DP5mmOlF5G5ag',
-
         name: searchParams.get('name') || 'Innerchef',
         description: searchParams.get('description') || 'JEE Main & Advanced',
         image: 'http://i.imgur.com/n5tjHFD.png',
-
         amount: 6000 * 100,
-
         // order_id: api.createOrder(),
-
         // callback_url: 'http://google.com',
         // redirect: true,
-
         // display_amount: '12.23',
         // display_currency: 'SGD',
-
         handler: function(o) {
           alert(JSON.stringify(o, null, 2));
         },
-
         method: {
           netbanking: true,
           card: true,
         },
-
         theme: {
           color: searchParams.get('color'),
         },
-
         // parent: '#x',
         remember_customer: true,
         external: {
@@ -65,7 +55,6 @@
             console.log(this, data);
           },
         },
-
         prefill: {
           name: 'Harshil "Mathur',
           email: 'harshil@razorpay.com',
@@ -84,11 +73,9 @@
         },
       };
       var rzp1 = new Razorpay(options);
-
       rzp1.on('payment.error', function(data) {
         console.log(data);
       });
-
       document.getElementById('rzp-button1').onclick = function(e) {
         rzp1.open();
         e.preventDefault();
