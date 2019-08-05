@@ -94,9 +94,7 @@ function groupDowntimesByMethod(allDowntimes) {
       downtimes[method] = [];
     }
 
-    if (_.isArray(downtimes[method])) {
-      downtimes[method].push(downtime);
-    }
+    downtimes[method].push(downtime);
   });
 
   return downtimes;
