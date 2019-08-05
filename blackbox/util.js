@@ -8,7 +8,7 @@ module.exports = {
     },
   },
   apiUrl: 'http://localhost:3000/api/',
-  assertObject: function (input, expected) {
+  assertObject: function(input, expected) {
     const expectedKeys = Object.getOwnPropertyNames(expected);
     for (const key of expectedKeys) {
       if (!input.hasOwnProperty(key)) {
@@ -24,5 +24,5 @@ module.exports = {
     }
 
     return true;
-  }
+  },
 };
