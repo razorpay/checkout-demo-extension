@@ -171,7 +171,7 @@
     }
 
     /* disable it if it's not enabled for a specific merchant */
-    if (!(hasFeature || GPay.checkKey(session.get('key')))) {
+    if (!hasFeature) {
       return Promise.reject();
     }
 
