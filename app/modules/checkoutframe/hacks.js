@@ -8,6 +8,7 @@ import * as UserAgent from 'common/useragent';
  *
  * @return {Integer}
  */
+
 function compareSemver(a, b) {
   var pa = a.split('.');
   var pb = b.split('.');
