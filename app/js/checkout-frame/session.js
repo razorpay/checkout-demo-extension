@@ -5860,7 +5860,7 @@ Session.prototype = {
       );
 
       if (shouldTurnWalletToIntent) {
-        data['_[flow]'] = 'intent';
+        data.upi_app = discreet.Wallet.getAppForWallet(data.wallet);
       }
     }
 

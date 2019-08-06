@@ -58,3 +58,11 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
 
   return false;
 };
+
+/**
+ * Returns the app corresponding to the wallet
+ * @param {string} wallet
+ *
+ * @returns {string}
+ */
+export const getAppForWallet = wallet => walletToIntent[wallet];
