@@ -121,7 +121,8 @@ export function getDowntimes(preferences) {
   }
 
   downtimes =
-    groupDowntimesByMethod(preferences.payment_downtime.items)
+    preferences.payment_downtime.items
+    |> groupDowntimesByMethod
     |> copyMethodsIfNeeded;
   downtimes.disabled = getDisabledMethods(downtimes);
 
