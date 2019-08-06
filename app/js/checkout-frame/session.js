@@ -308,7 +308,7 @@ function setEmiPlansCta(screen, tab) {
   } else if (screen === 'emi' && tab === 'emiplans') {
     type = 'emi';
   } else if (session.isPayout) {
-    type = 'add-upi';
+    type = 'confirm-account';
   }
 
   var classes = [
@@ -340,7 +340,7 @@ function setEmiPlansCta(screen, tab) {
       $('.enter-card-details').removeClass('invisible');
       break;
 
-    case 'add-upi':
+    case 'confirm-account':
       $('.confirm-account').removeClass('invisible');
       break;
   }
@@ -1587,6 +1587,12 @@ Session.prototype = {
       discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
     }
 
+    // Analytics related to orientation
+    Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    window.addEventListener('orientationchange', function() {
+      Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    });
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
@@ -1889,6 +1895,9 @@ Session.prototype = {
       return account.account_type === 'bank_account';
     });
 
+    Analytics.setMeta('count.accounts.upi', upiAccounts.length);
+    Analytics.setMeta('count.accounts.bank', bankAccounts.length);
+
     this.payoutsView = new discreet.PayoutsInstruments({
       target: gel('payouts-svelte-wrap'),
       data: {
@@ -1910,6 +1919,7 @@ Session.prototype = {
 
     this.payoutsView.on('selectaccount', function(account) {
       $('#body').addClass('sub');
+      Analytics.track('payout:account:select', account);
     });
 
     this.payoutsView.on('add', function(event) {
@@ -2695,7 +2705,30 @@ Session.prototype = {
       },
     });
   },
-
+  fixLandscapeBug: function() {
+    function shiftUp() {
+      $(this.el.querySelector('#footer'))
+        .removeClass('shift-footer-down')
+        .addClass('shift-footer-up');
+      $(this.el.querySelector('#should-save-card'))
+        .removeClass('shift-ssc-down')
+        .addClass('shift-ssc-up');
+    }
+    function shiftDown() {
+      $(this.el.querySelector('#footer'))
+        .removeClass('shift-footer-up')
+        .addClass('shift-footer-down');
+      $(this.el.querySelector('#should-save-card'))
+        .removeClass('shift-ssc-up')
+        .addClass('shift-ssc-down');
+    }
+    if (discreet.UserAgent.iOS) {
+      this.on('focus', '#card_name', shiftUp);
+      this.on('blur', '#card_name', shiftDown);
+      this.on('focus', '#card_cvv', shiftUp);
+      this.on('blur', '#card_cvv', shiftDown);
+    }
+  },
   bindEvents: function() {
     var self = this;
     var emi_options = this.emi_options;
@@ -2842,7 +2875,22 @@ Session.prototype = {
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
+
     if (enabledMethods.card || enabledMethods.emi) {
+      /**
+       * On iOS, unlike Android, the height of the browser
+       * does not change when the keyboard is open. 🙄
+       * On Android, the footer CTA shifts because the browser
+       * resizes.
+       * To simulate the same on iOS, we shift footer and some elements
+       * on the card screen.
+       *
+       * This _has_ to be fixed in v4, so we'll remove it then.
+       */
+      if (Hacks.isDeviceLandscape()) {
+        this.fixLandscapeBug();
+      }
+
       this.on('keyup', '#card_number', onSixDigits);
       // Also listen for paste.
       this.on('blur', '#card_number', onSixDigits);
@@ -3135,6 +3183,9 @@ Session.prototype = {
 
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
+    setTimeout(function() {
+      $(e.target).scrollIntoView();
+    }, 1000);
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'focus' });
     }
@@ -5746,6 +5797,7 @@ Session.prototype = {
       magic: this.magic,
       optional: getStore('optional'),
       external: {},
+      paused: this.get().paused,
     };
 
     if (!this.screen && this.methodsList && this.p13n) {
@@ -5878,7 +5930,19 @@ Session.prototype = {
         if (!data.contact.match(/^\+91/)) {
           data.contact = '+91' + data.contact;
         }
+      } else {
+        delete data.contact;
+        delete data.ott;
       }
+    }
+
+    /* VPA verification */
+    if (data.vpa && !vpaVerified) {
+      return this.verifyVpaAndContinue(data, request);
+    }
+
+    if (preferences.fee_bearer && this.showFeesUi()) {
+      return;
     }
 
     Razorpay.sendMessage({
@@ -5954,10 +6018,6 @@ Session.prototype = {
       }
     }
 
-    if (preferences.fee_bearer && this.showFeesUi()) {
-      return;
-    }
-
     if (
       discreet.Wallet.isPowerWallet(wallet) &&
       !request.feesRedirect &&
@@ -5992,18 +6052,28 @@ Session.prototype = {
       P13n.processInstrument(data, this);
     }
 
-    /* VPA verification */
-    if (data.vpa && !vpaVerified) {
-      return this.verifyVpaAndContinue(data, request);
-    }
-
     if (this.isPayout) {
+      Analytics.track('payout:create:start');
+
       if (this.screen === 'payouts') {
         /**
          * If we are on the payouts screen when the submission happened, it
          * means that the user selected an existing fund account.
          */
         var selectedAccount = this.payoutsView.getSelectedInstrument();
+
+        Analytics.track('submit', {
+          data: {
+            account: Payouts.makeTrackingDataFromAccount(selectedAccount),
+            existing: true,
+          },
+          immediately: true,
+        });
+
+        Analytics.track('payout:create:success', {
+          data: Payouts.makeTrackingDataFromAccount(selectedAccount),
+          immediately: true,
+        });
 
         successHandler.call(session, {
           razorpay_fund_account_id: selectedAccount.id,
@@ -6013,8 +6083,25 @@ Session.prototype = {
          * If we are not on the payouts screen, create the fund account using
          * the payload.
          */
+
+        Analytics.track('submit', {
+          data: {
+            account: Payouts.makeTrackingDataFromAccount(data),
+            existing: false,
+          },
+          immediately: true,
+        });
+
         Payouts.createFundAccount(data)
           .then(function(account) {
+            Analytics.track('payout:create:success', {
+              data: {
+                account: Payouts.makeTrackingDataFromAccount(account),
+                existing: false,
+              },
+              immediately: true,
+            });
+
             successHandler.call(session, {
               razorpay_fund_account_id: account.id,
             });
@@ -6465,10 +6552,9 @@ Session.prototype = {
     /**
      * Disable PayLater if either:
      * - Empty array
-     * - Contact is optional
      * TODO: Allow this for prefill and logged in users.
      */
-    if (_Obj.isEmpty(methods.paylater) || getStore('optional').contact) {
+    if (_Obj.isEmpty(methods.paylater)) {
       methods.paylater = null;
     }
 

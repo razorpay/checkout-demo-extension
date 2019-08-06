@@ -10,7 +10,6 @@
     {autocomplete}
     {placeholder}
     {pattern}
-    {maxlength}
 
     use:formatter="formatter"
     on:focus="fire('focus', event)"
@@ -55,6 +54,13 @@
       };
     },
 
+    onupdate({ changed, current }) {
+      if (changed.maxlength) {
+        const { maxlength } = current;
+        this.setMaxLength(maxlength);
+      }
+    },
+
     actions: {
       formatter(node, data) {
         const session = getSession();
@@ -90,6 +96,14 @@
       getValue() {
         return this.refs.input.value;
       },
+
+      setMaxLength(length) {
+        const { input } = this.refs;
+
+        if (length) {
+          input.maxLength = length
+        }
+      }
     },
   };
 </script>
