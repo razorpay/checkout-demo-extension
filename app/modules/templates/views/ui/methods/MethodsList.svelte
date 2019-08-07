@@ -57,7 +57,7 @@
         icon={session.themeMeta.icons['othermethods']}
       >
         <span class="option-title">Other Methods</span>
-        <span style="display: inline-block;
+        <span style="display: inline;
             font-size: 12px; color: #757575; margin-left: 2px">
           | {otherMethodsDetail}
         </span>
@@ -480,6 +480,38 @@
       },
 
       showOtherMethodsDirectly: ({ AVAILABLE_METHODS }) => AVAILABLE_METHODS.length === 1,
+
+      /**
+       * String generated dynamically based on the
+       * methods available
+       *
+       * eg: "Cards, Wallets, UPI, .etc"
+       */
+      otherMethodsDetail: ({ AVAILABLE_METHODS }) => {
+        const preferred = ['card', 'wallet', 'upi'];
+
+        let available = _Arr.filter(preferred, method => _Arr.contains(AVAILABLE_METHODS, method));
+
+        /**
+         * If none of the preffered methods
+         * are available,
+         * use the first method
+         */
+        if (!available.length) {
+          available = AVAILABLE_METHODS.slice(0, 1);
+        }
+
+        const names = _Arr.map(available, getMethodPrefix);
+
+        let string = names.join(', ');
+
+        // Add ".etc" if there are methods we didn't mention already
+        if (AVAILABLE_METHODS.length > available.length) {
+          string += ', etc.';
+        }
+
+        return string;
+      }
     },
 
     data: () => {
