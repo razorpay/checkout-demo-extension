@@ -6758,6 +6758,30 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Sets some prefill values from preferences.
+   * Modifies `options` in place, not a pure func.
+   * @param {Object} preferences
+   * @param {Object} options
+   */
+  setPrefillFromPreferences: function(preferences, options) {
+    var order = preferences.order;
+
+    // emandate
+    if (order && order.bank_account) {
+      _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
+        if (order.bank_account[key]) {
+          options['prefill.bank_account[' + key + ']'] =
+            order.bank_account[key];
+        }
+      });
+
+      if (order.bank) {
+        options['prefill.bank'] = order.bank;
+      }
+    }
+  },
+
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
@@ -6789,6 +6813,8 @@ Session.prototype = {
         return customer;
       };
     }
+
+    this.setPrefillFromPreferences(preferences, session_options);
 
     this.isPayout = Boolean(this.get('payout'));
 
