@@ -6402,7 +6402,7 @@ Session.prototype = {
 
   setPaymentMethods: function(preferences) {
     var recurring = this.recurring;
-    var international = this.get('currency') !== 'INR';
+    var international = this.international;
     var availMethods = preferences.methods;
     var amount = this.get('amount');
     var bankMethod = 'netbanking';
@@ -6846,6 +6846,9 @@ Session.prototype = {
       // We are disabling retries for payouts for now.
       this.set('retry', false);
     }
+
+    // Non-INR payments are considered
+    this.international = this.get('currency') !== 'INR';
 
     /* In case of recurring set recurring as filter in saved cards */
     if (
