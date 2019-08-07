@@ -20,7 +20,7 @@
     },
 
     computed: {
-      allClasses: ({ classes = [] }) => ['callout'].concat(classes).join(' '),
+      allClasses: ({ classes }) => ['callout'].concat(classes || []).join(' '),
     },
   }
 </script>

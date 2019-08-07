@@ -43,7 +43,7 @@
         }
       },
 
-      banksList: ({ banks = {} }) => _Obj.entries(banks),
+      banksList: ({ banks }) => _Obj.entries(banks || {}),
 
       plans: data => {
         const session = data.session;
@@ -66,7 +66,7 @@
       },
     },
     methods: {
-      hide: _ => {
+      hide: function() {
         /* TODO: defined in session, update once session is ported to ES6 */
         hideEmi();
       },

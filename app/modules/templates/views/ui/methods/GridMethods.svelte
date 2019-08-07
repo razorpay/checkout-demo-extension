@@ -69,8 +69,11 @@
       },
     },
     methods: {
-      selectMethod: event => {
-        const { down, method = '' } = event.data;
+      selectMethod: function(event) {
+        const {
+          down,
+          method = '',
+        } = event.data;
 
         const target = event.currentTarget;
         let disabled = _El.hasClass(target, 'disabled');
