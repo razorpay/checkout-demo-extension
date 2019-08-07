@@ -199,13 +199,15 @@ export default function Payment(data, params = {}, r) {
      * payment paused state
      */
     if (data) {
-      if (data.method === 'wallet') {
-        if (isPowerWallet(data.wallet) || data['_[flow]'] === 'intent') {
-          /* If contact or email are missing, we need to ask for it in popup */
-          if (data.contact && (this.optional.email || data.email)) {
-            avoidPopup = true;
-          }
+      if (data.method === 'wallet' && isPowerWallet(data.wallet)) {
+        /* If contact or email are missing, we need to ask for it in popup */
+        if (data.contact && (this.optional.email || data.email)) {
+          avoidPopup = true;
         }
+      }
+
+      if (data.method === 'wallet' && data['_[flow]'] === 'intent') {
+        avoidPopup = true;
       }
 
       if (data.method === 'upi') {
