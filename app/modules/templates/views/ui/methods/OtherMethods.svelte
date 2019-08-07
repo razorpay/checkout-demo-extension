@@ -1,7 +1,9 @@
 {#if visible}
-  <div transition:otherMethods class="othermethods">
-    <div class="legend">Select a payment method</div>
-    <div class="options pad" id="list-options">
+  <div transition:otherMethods class="othermethods" class:standalone>
+    {#if !standalone}
+      <div class="legend">Select a payment method</div>
+    {/if}
+    <div class="options" class:pad="!standalone" id="list-options">
       {#if instruments && instruments.length && false}
         <!-- Hide this for now -->
         <NextOption on:select='fire("hideMethods")'
@@ -14,13 +16,15 @@
           </span>
         </NextOption>
       {/if}
-      <NextOption on:select='fire("hideMethods")'
-        type='dark down-arrow'
-        arrowText='Hide'
-        icon={session.themeMeta.icons['othermethods']}
-      >
-        Other Methods
-      </NextOption>
+      {#if !standalone}
+        <NextOption on:select='fire("hideMethods")'
+          type='dark down-arrow'
+          arrowText='Hide'
+          icon={session.themeMeta.icons['othermethods']}
+        >
+          Other Methods
+        </NextOption>
+      {/if}
       {#each methods as method}
         <ListMethod
           {...method}
@@ -33,7 +37,8 @@
 {/if}
 
 <style>
-  .othermethods {
+
+  .othermethods:not(.standalone) {
     position: absolute;
     top: 0;
     left: 0;
@@ -44,6 +49,10 @@
     overflow: hidden;
     overflow-y: auto;
     padding: 0 0 12px 0;
+  }
+
+  .standalone #list-options {
+    margin: 0;
   }
 </style>
 
