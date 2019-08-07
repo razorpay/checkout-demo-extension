@@ -97,6 +97,7 @@ const DESCRIPTIONS = {
 
     return `Pay later using ${text}`;
   },
+  paypal: () => 'Pay using PayPal wallet',
   qr: () => 'Pay by scanning QR Code',
   gpay: () => 'Instant payment using Google Pay App',
   upi: () => 'Instant payment using UPI App',
@@ -161,6 +162,9 @@ export function getMethodPrefix(method) {
 
     case 'paylater':
       return 'PayLater';
+
+    case 'paypal':
+      return 'PayPal';
 
     case 'qr':
       return 'UPI QR';

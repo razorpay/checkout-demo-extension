@@ -6,6 +6,7 @@ import wallet from './wallet';
 import othermethods from './othermethods';
 import qr from './qr';
 import paylater from './paylater';
+import paypal from './paypal';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -37,6 +38,9 @@ function getIconFn(iconName) {
 
     case 'paylater':
       return paylater;
+
+    case 'paypal':
+      return paypal;
   }
 }
 
