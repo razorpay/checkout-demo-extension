@@ -102,6 +102,49 @@ const filterInstruments = instruments => {
 };
 
 /**
+ * Creates an instrument.
+ * Only used to create PayPal instrument at runtime.
+ * Not ready yet to be used everywhere.
+ */
+export function _createInstrumentForImmediateUse(data, extraData) {
+  let methodData = {};
+  let extractable = INSTRUMENT_PROPS[data.method];
+
+  if (!extractable) {
+    return;
+  }
+
+  if (!_.isArray(extractable)) {
+    extractable = [extractable];
+  }
+
+  extractable.push('method');
+
+  _Arr.loop(extractable, item => {
+    if (typeof data[item] !== 'undefined') {
+      methodData[item] = data[item];
+    }
+  });
+
+  if (data.upi_app) {
+    let app = _Arr.find(
+      extraData.upi_intents_data,
+      app => app.package_name === data.upi_app
+    );
+    methodData.app_name = app.app_name;
+    methodData.app_icon = app.app_icon;
+  }
+
+  methodData.id = Track.makeUid();
+
+  methodData.timestamp = _.now();
+  methodData.success = false;
+  methodData.frequency = 1;
+
+  return methodData;
+}
+
+/**
  * Used to add the instrument to the list of user's instruments along with
  * other metadata
  * @param  {Object} data payment creation data
