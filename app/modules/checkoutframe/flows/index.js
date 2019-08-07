@@ -78,7 +78,8 @@ export function shouldUseNativeOtpForCardPayment(paymentData, tokens) {
     );
   }
 
-  return flowPresent && validNetwork;
+  // return flowPresent && validNetwork;
+  return false;
 }
 
 /**
