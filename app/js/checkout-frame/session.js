@@ -6554,6 +6554,8 @@ Session.prototype = {
       methods.paylater = null;
     }
 
+    var isPayPalAvailable = Boolean(methods.wallet && methods.wallet.paypal);
+
     /**
      * disable wallets if:
      * - amount > 20k
@@ -6577,6 +6579,15 @@ Session.prototype = {
           delete methods.wallet[wallet];
         }
       });
+    }
+
+    /**
+     * PayPal wallet becomes a method
+     * for international payments
+     */
+    if (international && isPayPalAvailable) {
+      methods.paypal = true;
+      methods.count++;
     }
 
     /* Emandate only works on amount of 0 as of now */
