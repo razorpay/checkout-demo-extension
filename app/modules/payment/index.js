@@ -210,7 +210,11 @@ export default function Payment(data, params = {}, r) {
         avoidPopup = true;
       }
 
-      if (data.method === 'paylater') {
+      /**
+       * Show popup if:
+       * - Contact is missing
+       */
+      if (data.method === 'paylater' && data.contact) {
         avoidPopup = true;
       }
 
