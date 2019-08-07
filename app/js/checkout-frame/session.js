@@ -5822,6 +5822,11 @@ Session.prototype = {
       }
     }
 
+    if (data.method === 'paypal') {
+      data.method = 'wallet';
+      data.wallet = 'paypal';
+    }
+
     // ask user to verify phone number if not logged in and wants to save card
     if (data.save && !this.customer.logged) {
       if (this.screen === 'card') {
