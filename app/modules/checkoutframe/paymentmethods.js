@@ -115,6 +115,13 @@ const DESCRIPTIONS = {
 };
 
 /**
+ * Returns an array of all supported methods
+ *
+ * @returns {Array<string>}
+ */
+export const getAllMethods = () => _Obj.keys(DESCRIPTIONS);
+
+/**
  * Returns the method description.
  * @param {String} method
  * @param {Object} props

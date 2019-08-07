@@ -7,17 +7,9 @@ import othermethods from './othermethods';
 import qr from './qr';
 import paylater from './paylater';
 
-const availPaymentMethods = [
-  'card',
-  'emi',
-  'netbanking',
-  'upi',
-  'wallet',
-  'othermethods',
-  'qr',
-  'cardless_emi',
-  'paylater'
-];
+import { getAllMethods } from 'checkoutframe/paymentmethods';
+
+const availPaymentMethods = getAllMethods().concat(['othermethods']);
 
 function getIconFn(iconName) {
   switch (iconName) {
