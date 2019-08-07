@@ -1,5 +1,6 @@
 import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
 import { getProvider as getPayLaterProvider } from 'common/paylater';
+import { AVAILABLE_METHODS } from 'common/constants';
 
 /**
  * Returns the text with commas or "and" as the separator.
@@ -120,7 +121,7 @@ const DESCRIPTIONS = {
  *
  * @returns {Array<string>}
  */
-export const getAllMethods = () => _Obj.keys(DESCRIPTIONS);
+export const getAllMethods = () => AVAILABLE_METHODS;
 
 /**
  * Returns the method description.
