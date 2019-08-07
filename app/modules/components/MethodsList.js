@@ -164,14 +164,19 @@ export default class MethodsList {
      * For international + paypal,
      * paypal should show up as one
      * of the preferred methods
-     * for UI-related reasons
+     * for UI-related reasons,
+     * but at the end
      */
     if (session.international && session.methods.paypal) {
-      data.instruments = [
-        _createInstrumentForImmediateUse({
-          method: 'paypal',
-        }),
-      ].concat(data.instruments);
+      data.instruments =
+        data.instruments
+        |> _Arr.insertAt(
+          _createInstrumentForImmediateUse({
+            method: 'paypal',
+          }),
+          noOfInstruments - 1
+        )
+        |> _Arr.filter(Boolean);
     }
 
     /* Filter out any app that's in user's list but not currently installed */
