@@ -158,6 +158,10 @@
     text-transform: none;
   }
 
+  :global(.no-details) #methods-list .options {
+    margin: 0;
+  }
+
   ref:preferred,
   ref:grid,
   ref:loader {
@@ -187,6 +191,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
+  import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -327,6 +332,10 @@
           let text = '';
           let icon = '';
           switch (instrument.method) {
+            case 'paypal':
+              text = 'PayPal';
+              icon = session.themeMeta.icons.paypal;
+              break;
             case 'netbanking':
               text = `Netbanking - ${trimText(banks[instrument.bank], 18)} `;
               icon = getBankLogo(instrument.bank);

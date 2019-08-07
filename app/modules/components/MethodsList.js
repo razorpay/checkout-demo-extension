@@ -5,7 +5,10 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
-import { filterInstrumentsForAvailableMethods } from 'checkoutframe/personalization';
+import {
+  filterInstrumentsForAvailableMethods,
+  _createInstrumentForImmediateUse,
+} from 'checkoutframe/personalization';
 
 /**
  * Get the available methods.
@@ -156,6 +159,20 @@ export default class MethodsList {
       data.instruments,
       session.methods
     );
+
+    /**
+     * For international + paypal,
+     * paypal should show up as one
+     * of the preferred methods
+     * for UI-related reasons
+     */
+    if (session.international && session.methods.paypal) {
+      data.instruments = [
+        _createInstrumentForImmediateUse({
+          method: 'paypal',
+        }),
+      ].concat(data.instruments);
+    }
 
     /* Filter out any app that's in user's list but not currently installed */
     data.instruments = _Arr.filter(data.instruments, instrument => {

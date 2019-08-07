@@ -22,6 +22,7 @@ const INSTRUMENT_PROPS = {
   wallet: 'wallet',
   netbanking: 'bank',
   upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]'],
+  paypal: [],
 };
 
 const set = (key, data) => {
