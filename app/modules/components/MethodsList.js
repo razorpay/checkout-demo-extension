@@ -47,6 +47,11 @@ export default class MethodsList {
     const session = data.session;
     data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
 
+    // We do not want to show PayPal in the list in case of international
+    if (data.session.international) {
+      data.AVAILABLE_METHODS = _Arr.remove(data.AVAILABLE_METHODS, 'paypal');
+    }
+
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
       data,
