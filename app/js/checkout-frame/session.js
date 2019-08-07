@@ -6501,6 +6501,7 @@ Session.prototype = {
      * - amount > 1 Lac
      * - Recurring payment
      * - Non INR payment
+     * - international
      */
     if (amount > 1e7 || recurring || international) {
       methods.upi = false;
@@ -6527,7 +6528,12 @@ Session.prototype = {
       amount,
       methods.cardless_emi
     );
-    if (_Obj.isEmpty(methods.cardless_emi)) {
+    /**
+     * Disable Cardless EMI if
+     * - no providers
+     * - international
+     */
+    if (_Obj.isEmpty(methods.cardless_emi) || international) {
       methods.cardless_emi = null;
     }
 
@@ -6541,9 +6547,10 @@ Session.prototype = {
     /**
      * Disable PayLater if either:
      * - Empty array
+     * - international
      * TODO: Allow this for prefill and logged in users.
      */
-    if (_Obj.isEmpty(methods.paylater)) {
+    if (_Obj.isEmpty(methods.paylater) || international) {
       methods.paylater = null;
     }
 
@@ -6553,7 +6560,7 @@ Session.prototype = {
      * - Wallets not enabled by backend
      * - Recurring payment
      * - Non INR payment
-     *
+     * - international
      * Also, enable/disable wallets on the basis of merchant options
      */
     if (
