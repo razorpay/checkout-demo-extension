@@ -3521,14 +3521,6 @@ Session.prototype = {
   setScreen: function(screen) {
     var isGPayScreen = false;
 
-    /**
-     * `screen` being empty means that we want to go to the homescreen.
-     * In the case of Payouts, "payouts" is the homescreen.
-     */
-    if (!screen && this.isPayout) {
-      screen = 'payouts';
-    }
-
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -4106,6 +4098,14 @@ Session.prototype = {
         }
         return;
       }
+    }
+
+    /**
+     * `tab` being empty means that we want to go to the homescreen.
+     * In the case of Payouts, "payouts" is the homescreen.
+     */
+    if (!tab && this.isPayout) {
+      tab = 'payouts';
     }
 
     Analytics.track('tab:switch', {
