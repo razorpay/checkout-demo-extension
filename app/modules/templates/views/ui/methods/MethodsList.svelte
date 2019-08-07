@@ -49,7 +49,7 @@
       <span class="option-title">Other Methods</span>
       <span style="display: inline-block;
           font-size: 12px; color: #757575; margin-left: 2px">
-        | Cards, Wallets, UPI etc.
+        | {otherMethodsDetail}
       </span>
     </NextOption>
   </div>
@@ -175,6 +175,7 @@
   import { findCodeByNetworkName } from 'common/card';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getMethodPrefix } from 'checkoutframe/paymentmethods';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -416,6 +417,38 @@
 
         return methods;
       },
+
+      /**
+       * String generated dynamically based on the
+       * methods available
+       *
+       * eg: "Cards, Wallets, UPI, .etc"
+       */
+      otherMethodsDetail: ({ AVAILABLE_METHODS }) => {
+        const preferred = ['card', 'wallet', 'upi'];
+
+        let available = _Arr.filter(preferred, method => _Arr.contains(AVAILABLE_METHODS, method));
+
+        /**
+         * If none of the preffered methods
+         * are available,
+         * use the first method
+         */
+        if (!available.length) {
+          available = AVAILABLE_METHODS.slice(0, 1);
+        }
+
+        const names = _Arr.map(available, getMethodPrefix);
+
+        let string = names.join(', ');
+
+        // Add ".etc" if there are methods we didn't mention already
+        if (AVAILABLE_METHODS.length > available.length) {
+          string += ', etc.';
+        }
+
+        return string;
+      }
     },
 
     data: () => {
