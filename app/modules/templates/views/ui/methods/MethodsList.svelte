@@ -41,17 +41,28 @@
         </RadioOption>
       {/if}
     {/each}
-    <NextOption
-      on:select='fire("showMethods")'
-      type='other-methods up-arrow'
-      icon={session.themeMeta.icons['othermethods']}
-    >
-      <span class="option-title">Other Methods</span>
-      <span style="display: inline-block;
-          font-size: 12px; color: #757575; margin-left: 2px">
-        | {otherMethodsDetail}
-      </span>
-    </NextOption>
+    {#if showOtherMethodsDirectly}
+      <OtherMethodsList
+        standalone={true}
+        visible={true}
+        {AVAILABLE_METHODS}
+        {session}
+
+        on:methodSelected="fire('methodSelected', event)"
+      />
+    {:else}
+      <NextOption
+        on:select='fire("showMethods")'
+        type='other-methods up-arrow'
+        icon={session.themeMeta.icons['othermethods']}
+      >
+        <span class="option-title">Other Methods</span>
+        <span style="display: inline-block;
+            font-size: 12px; color: #757575; margin-left: 2px">
+          | {otherMethodsDetail}
+        </span>
+      </NextOption>
+    {/if}
   </div>
 {:elseif showMessage}
   <div transition:fade on:click="trackEducationClick()">
@@ -195,6 +206,7 @@
       NextOption: 'templates/views/ui/options/NextOption.svelte',
       GridMethods: 'templates/views/ui/methods/GridMethods.svelte',
       Loader: 'templates/views/ui/methods/Loader.svelte',
+      OtherMethodsList: 'templates/views/ui/methods/OtherMethods.svelte',
     },
 
     oncreate() {
@@ -448,7 +460,9 @@
         }
 
         return string;
-      }
+      },
+
+      showOtherMethodsDirectly: ({ AVAILABLE_METHODS }) => AVAILABLE_METHODS.length === 1,
     },
 
     data: () => {
@@ -457,7 +471,6 @@
         selected: null,
         session: null,
         customer: {},
-        showOtherMethods: false,
         animate: false,
         loading: false,
         showMessage: true,
