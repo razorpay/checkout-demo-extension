@@ -203,7 +203,7 @@ export default function Track(r, event, data, immediately) {
       var rootKey = keySplit[0];
       if (trackingOptions.indexOf(rootKey) !== -1) {
         if (keySplit.length > 1) {
-          if (!trackingOptions.hasOwnProperty(rootKey)) {
+          if (!options.hasOwnProperty(rootKey)) {
             options[rootKey] = {};
           }
           options[rootKey][keySplit[1]] = value;
