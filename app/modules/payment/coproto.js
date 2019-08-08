@@ -49,16 +49,12 @@ export const processPaymentCreate = function(response) {
 
 // returns true if coproto handled
 export const processCoproto = function(response) {
-  // debugger;
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
     if (this.iframe && this.popup) {
       this.popup.writable = 1;
     }
-    // debugger;
-    // response.type = 'respawn';
-    // for testing
     var func = responseTypes[response.type];
     var isFunction = _.isFunction(func);
     if (isFunction) {
@@ -229,7 +225,6 @@ var responseTypes = {
     var intent_url = (fullResponse.data || {}).intent_url;
 
     this.on('upi.intent_success_response', data => {
-      console.log(data, 'dataa');
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }

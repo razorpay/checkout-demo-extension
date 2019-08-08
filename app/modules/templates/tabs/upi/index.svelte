@@ -413,7 +413,7 @@
                 data['_[flow]'] = 'directpay';
                 data.vpa = this.getFullVpa();
               }
-              if (omniSelected == 'phone') {
+              else if (omniSelected == 'phone') {
                 data['_[flow]'] = 'intent';
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';

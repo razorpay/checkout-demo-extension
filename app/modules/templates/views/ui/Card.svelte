@@ -21,7 +21,6 @@
       return {
         selected: false,
         error: false,
-        checked: null,
       };
     },
     methods: {},
