@@ -1,5 +1,5 @@
 {#if methodSupported}
-  <div class="tab-content showable screen" id='form-{method}' class:pad>
+  <div class="tab-content showable screen" id='form-{method}' class:pad {down}>
     <slot></slot>
   </div>
 {/if}
@@ -15,6 +15,7 @@
     data: () => ({
       overrideMethodCheck: false,
       pad: true,
+      down: false,
     })
   }
 </script>
