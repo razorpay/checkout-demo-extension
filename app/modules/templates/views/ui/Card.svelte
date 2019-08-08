@@ -20,7 +20,6 @@
     data() {
       return {
         selected: false,
-        radioValue: null,
         error: false,
         checked: null,
       };
