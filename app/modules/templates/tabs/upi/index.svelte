@@ -1,4 +1,4 @@
-<Tab method="upi">
+<Tab method="upi" {down}>
   {#if intent}
     <UpiIntent
       ref:intentView
@@ -67,6 +67,10 @@
 </Tab>
 
 <style>
+  :global(#form-upi[down=true]) {
+    padding-bottom: 48px;
+  }
+
   .legend {
     margin: 12px 0 8px 0;
     padding: 0;

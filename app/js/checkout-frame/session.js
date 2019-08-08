@@ -1588,6 +1588,12 @@ Session.prototype = {
       discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
     }
 
+    // Analytics related to orientation
+    Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    window.addEventListener('orientationchange', function() {
+      Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    });
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
@@ -2701,7 +2707,30 @@ Session.prototype = {
       },
     });
   },
-
+  fixLandscapeBug: function() {
+    function shiftUp() {
+      $(this.el.querySelector('#footer'))
+        .removeClass('shift-footer-down')
+        .addClass('shift-footer-up');
+      $(this.el.querySelector('#should-save-card'))
+        .removeClass('shift-ssc-down')
+        .addClass('shift-ssc-up');
+    }
+    function shiftDown() {
+      $(this.el.querySelector('#footer'))
+        .removeClass('shift-footer-up')
+        .addClass('shift-footer-down');
+      $(this.el.querySelector('#should-save-card'))
+        .removeClass('shift-ssc-up')
+        .addClass('shift-ssc-down');
+    }
+    if (discreet.UserAgent.iOS) {
+      this.on('focus', '#card_name', shiftUp);
+      this.on('blur', '#card_name', shiftDown);
+      this.on('focus', '#card_cvv', shiftUp);
+      this.on('blur', '#card_cvv', shiftDown);
+    }
+  },
   bindEvents: function() {
     var self = this;
     var emi_options = this.emi_options;
@@ -2848,7 +2877,22 @@ Session.prototype = {
     this.on('submit', '#form', this.preSubmit);
 
     var enabledMethods = this.methods;
+
     if (enabledMethods.card || enabledMethods.emi) {
+      /**
+       * On iOS, unlike Android, the height of the browser
+       * does not change when the keyboard is open. 🙄
+       * On Android, the footer CTA shifts because the browser
+       * resizes.
+       * To simulate the same on iOS, we shift footer and some elements
+       * on the card screen.
+       *
+       * This _has_ to be fixed in v4, so we'll remove it then.
+       */
+      if (Hacks.isDeviceLandscape()) {
+        this.fixLandscapeBug();
+      }
+
       this.on('keyup', '#card_number', onSixDigits);
       // Also listen for paste.
       this.on('blur', '#card_number', onSixDigits);
@@ -3142,6 +3186,9 @@ Session.prototype = {
 
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
+    setTimeout(function() {
+      $(e.target).scrollIntoView();
+    }, 1000);
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'focus' });
     }
@@ -3476,14 +3523,6 @@ Session.prototype = {
 
   setScreen: function(screen) {
     var isGPayScreen = false;
-
-    /**
-     * `screen` being empty means that we want to go to the homescreen.
-     * In the case of Payouts, "payouts" is the homescreen.
-     */
-    if (!screen && this.isPayout) {
-      screen = 'payouts';
-    }
 
     if (screen) {
       var screenTitle =
@@ -4062,6 +4101,14 @@ Session.prototype = {
         }
         return;
       }
+    }
+
+    /**
+     * `tab` being empty means that we want to go to the homescreen.
+     * In the case of Payouts, "payouts" is the homescreen.
+     */
+    if (!tab && this.isPayout) {
+      tab = 'payouts';
     }
 
     Analytics.track('tab:switch', {
@@ -6761,6 +6808,30 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Sets some prefill values from preferences.
+   * Modifies `options` in place, not a pure func.
+   * @param {Object} preferences
+   * @param {Object} options
+   */
+  setPrefillFromPreferences: function(preferences, options) {
+    var order = preferences.order;
+
+    // emandate
+    if (order && order.bank_account) {
+      _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
+        if (order.bank_account[key]) {
+          options['prefill.bank_account[' + key + ']'] =
+            order.bank_account[key];
+        }
+      });
+
+      if (order.bank) {
+        options['prefill.bank'] = order.bank;
+      }
+    }
+  },
+
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
@@ -6791,6 +6862,8 @@ Session.prototype = {
         return customer;
       };
     }
+
+    this.setPrefillFromPreferences(preferences, session_options);
 
     this.isPayout = Boolean(this.get('payout'));
 
