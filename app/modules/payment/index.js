@@ -178,7 +178,9 @@ export default function Payment(data, params = {}, r) {
   }
 
   this.feesRedirect = params.feesRedirect;
-  this.gpay = params.gpay || params.tez; // params.tez is legacy
+  this.microapps = params.microapps;
+  this.gpay =
+    params.gpay || params.tez || (this.microapps && this.microapps.gpay); // params.tez is legacy
 
   var avoidPopup = false;
 
