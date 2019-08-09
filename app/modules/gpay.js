@@ -111,3 +111,56 @@ export const payWithPaymentRequestApi = (
     errorCallback(e);
   }
 };
+
+/**
+ * Transforms the intent URL to a payload for microapps.
+ * @param {string} paymentId
+ * @param {string} intentUrl
+ *
+ * @returns {Object}
+ */
+function transformIntentForMicroappPayload(paymentId, intentUrl) {
+  const intentParams = _.query2obj(intentUrl.split('?')[1]);
+
+  const payload = {
+    apiVersion: 2,
+    apiVersionMinor: 0,
+    allowedPaymentMethods: [
+      {
+        type: 'UPI',
+        parameters: {
+          payeeVpa: intentParams.pa,
+          payeeName: intentParams.pn,
+          mcc: intentParams.mc,
+          transactionReferenceId: intentParams.tr,
+          transactionId: paymentId,
+        },
+        tokenizationSpecification: {
+          type: 'DIRECT',
+        },
+      },
+    ],
+    transactionInfo: {
+      countryCode: 'IN',
+      totalPriceStatus: 'final',
+      totalPrice: intentParams.am,
+      currencyCode: intentParams.cu,
+      transactionNote: intentParams.tn,
+    },
+  };
+
+  return payload;
+}
+
+/**
+ * Creates a payment with the microapps API
+ * @param {string} paymentId
+ * @param {string} intentUrl
+ *
+ * @return {Promise}
+ */
+export function payWithMicroapp(paymentId, intentUrl) {
+  const payload = transformIntentForMicroappPayload(paymentId, intentUrl);
+
+  return global.microapps.requestPayment(payload);
+}
