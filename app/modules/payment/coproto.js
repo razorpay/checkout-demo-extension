@@ -163,42 +163,45 @@ var responseTypes = {
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
-  gpay: function(coprotoRequest, fullResponse) {
-    GPay.pay(
-      fullResponse.data,
-      instrument => {
-        Track(this.r, 'gpay_pay_response', {
-          instrument,
-        });
+  gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
+    if (type === 'payment_request') {
+      GPay.payWithPaymentRequestApi(
+        fullResponse.data,
+        instrument => {
+          Track(this.r, 'gpay_pay_response', {
+            instrument,
+          });
 
-        this.emit('upi.intent_response', {
-          response: instrument.details,
-        });
-      },
-      error => {
-        if (error.code) {
-          if (
-            [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
-          ) {
-            this.emit('upi.intent_response', {});
-          }
+          this.emit('upi.intent_response', {
+            response: instrument.details,
+          });
+        },
+        error => {
+          if (error.code) {
+            if (
+              [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
+              0
+            ) {
+              this.emit('upi.intent_response', {});
+            }
 
-          // Since the method is not supported, remove it.
-          if (error.code === error.NOT_SUPPORTED_ERR) {
-            const session = getSession();
+            // Since the method is not supported, remove it.
+            if (error.code === error.NOT_SUPPORTED_ERR) {
+              const session = getSession();
 
-            if (session && session.upiTab) {
-              session.upiTab.set({
-                useWebPaymentsApi: false,
-                selectedApp: 'gpay',
-              });
+              if (session && session.upiTab) {
+                session.upiTab.set({
+                  useWebPaymentsApi: false,
+                  selectedApp: 'gpay',
+                });
+              }
             }
           }
-        }
 
-        Track(this.r, 'gpay_error', error);
-      }
-    );
+          Track(this.r, 'gpay_error', error);
+        }
+      );
+    }
   },
 
   intent: function(request, fullResponse) {
@@ -270,11 +273,11 @@ var responseTypes = {
     _Doc.redirect(request);
   },
 
-  respawn: function (request, fullResponse) {
+  respawn: function(request, fullResponse) {
     // TODO: Check if Google OmniChannel
     // By default, use first coproto.
     return responseTypes.first.call(this, request, fullResponse);
-  }
+  },
 };
 
 function mwebIntent(payment, ra, fullResponse) {

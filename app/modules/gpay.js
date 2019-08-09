@@ -12,7 +12,7 @@ const CHECK_ERROR = {
  * Returns a Promise that resolves if Google Pay is present.
  * @return {Promise}
  */
-export function check() {
+export function checkPaymentRequestApi() {
   return new Promise((resolve, reject) => {
     try {
       /**
@@ -62,7 +62,11 @@ export function checkMicroapp() {
   });
 }
 
-export const pay = (data, successCallback, errorCallback) => {
+export const payWithPaymentRequestApi = (
+  data,
+  successCallback,
+  errorCallback
+) => {
   var instrumentData = {};
   errorCallback = errorCallback || (() => {});
 
