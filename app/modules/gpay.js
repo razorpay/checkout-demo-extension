@@ -44,6 +44,24 @@ export function check() {
   });
 }
 
+/**
+ * Checks if Google Pay microapps API is available
+ *
+ * @returns {Promise}
+ */
+export function checkMicroapp() {
+  return new Promise((resolve, reject) => {
+    if (
+      _Obj.hasProp(global, 'microapps') &&
+      _Obj.hasProp(global.microapps, 'requestPayment')
+    ) {
+      return resolve();
+    }
+
+    return reject(CHECK_ERROR);
+  });
+}
+
 export const pay = (data, successCallback, errorCallback) => {
   var instrumentData = {};
   errorCallback = errorCallback || (() => {});

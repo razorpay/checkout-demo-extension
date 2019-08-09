@@ -1,8 +1,9 @@
-import { check as checkGPay } from 'gpay';
+import { check as checkGPay, checkMicroapp } from 'gpay';
 import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
 
 const ADAPTER_CHECKERS = {
   gpay: checkGPay,
+  'microapps.gpay': checkMicroapp,
 };
 
 /**
