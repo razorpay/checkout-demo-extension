@@ -201,6 +201,17 @@ var responseTypes = {
           Track(this.r, 'gpay_error', error);
         }
       );
+    } else if (type === 'microapp') {
+      GPay.payWithMicroapp(
+        fullResponse.payment_id,
+        fullResponse.data.intent_url
+      )
+        .then(response => {
+          // TODO
+        })
+        .catch(err => {
+          // TODO
+        });
     }
   },
 
@@ -248,6 +259,15 @@ var responseTypes = {
       }
     } else if (androidBrowser) {
       if (this.gpay) {
+        if (this.microapps && this.microapps.gpay) {
+          return responseTypes['gpay'].call(
+            this,
+            request,
+            fullResponse,
+            'microapp'
+          );
+        }
+
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
