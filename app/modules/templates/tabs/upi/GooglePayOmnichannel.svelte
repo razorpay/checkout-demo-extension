@@ -6,23 +6,35 @@
   <Card
     selected="{radio.phone}"
     on:click="focus()"
-    error={radio.phone&&error&&isFirst}
+    error="{radio.phone && error && isFirst}"
   >
     <div class="elem-wrap collect-form">
-      <Field type="text" name="phone" id='phone' ref:phoneField
-      placeholder="Enter Mobile Number" formatter={{ type: 'number' }}
-      required={true} helpText="Please enter a valid contact no." maxlength="{10}"
-      value={contact} on:blur="blur()" on:focus="focus()" />
+      <Field 
+      type="text" 
+      name="phone" 
+      id='phone' 
+      ref:phoneField
+      placeholder="Enter Mobile Number" 
+      formatter={{ type: 'number' }}
+      required={true} 
+      helpText="Please enter a valid contact no."
+      maxlength="{10}" 
+      value={contact} 
+      on:blur="blur()" 
+      on:focus="focus()" />
     </div>
-    {#if retry} <input on:change="radioChange(event)" {checked}
+    {#if retry} 
+    <input on:change="radioChange(event)" {checked}
     ref:radioInpPhone value={retry?'phone':null} type="radio" name="isSelected"
     helpText="Please enter a valid handle"
-    style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;display:none;"
-    /> {/if}
+    id="pay-radio"
+    /> 
+    {/if}
   </Card>
 </div>
 
-{#if radio.phone} {#if error}
+{#if radio.phone} 
+{#if error}
 <p class:regular="!isFirst" class:error="isFirst">
   Please ensure the same number is linked to the Google Pay account.
 </p>
@@ -30,7 +42,8 @@
 <p class="info">
   You will receive a notification from Razorpay, in the Google Pay app.
 </p>
-{/if} {/if}
+{/if} 
+{/if}
 
 <style>
   #upi-gpay-phone,
@@ -113,10 +126,10 @@
       },
       radioChange(e) {
         this.fire('radiochange');
-        var session = getSession();
-        var checked = e.target.checked;
+        const session = getSession();
+        const checked = e.target.checked;
         this.set({ checked: checked });
-        var val = e.target.value;
+        const val = e.target.value;
         session.upiTab.set({
           omniSelected: val,
         });

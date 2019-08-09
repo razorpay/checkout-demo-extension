@@ -153,8 +153,8 @@
   }
 
   const checkGPay = () => {
-    var session = getSession();
-    var hasFeature =
+    const session = getSession();
+    const hasFeature =
       session.preferences &&
       session.preferences.features &&
       session.preferences.features.google_pay;
@@ -183,7 +183,7 @@
   };
 
   const checkOmnichannel = () => {
-    var session = getSession();
+    const session = getSession();
 
     return session.preferences &&
       session.preferences.features &&
@@ -412,7 +412,7 @@
               data.contact = this.refs.omnichannelField.getPhone();
               data.upi_provider = 'google_pay';
             } else {
-              var omniSelected = this.get().omniSelected;
+              const omniSelected = this.get().omniSelected;
               if (omniSelected === 'vpa') {
                 data['_[flow]'] = 'directpay';
                 data.vpa = this.getFullVpa();
@@ -422,7 +422,6 @@
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';
               }
-              console.log(omniSelected, 'omniSelected')
               // TODO: decide which flow to use if retry
             }
           } else {

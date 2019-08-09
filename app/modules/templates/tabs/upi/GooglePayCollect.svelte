@@ -1,13 +1,23 @@
 <div class="legend left" style="margin-top: 18px">
-  {retry?'Or':''} Enter your UPI ID
+  {retry ? 'Or' : ''} Enter your UPI ID
 </div>
 
 <div id="upi-gpay-vpa">
-  <Card selected={radio.vpa} on:click="handleCardClick(event)">
+  <Card 
+  selected="{radio.vpa}" 
+  on:click="handleCardClick(event)">
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
-      <Field type="text" name="vpa" id='vpa' ref:vpaField placeholder="Enter UPI ID" helpText="Please enter a valid handle" pattern=".+" required={true}
-      formatter={{ type: 'vpa' }} on:blur="blur()" on:focus="focus()" />
+      <Field type="text" 
+      name="vpa" 
+      id='vpa' 
+      ref:vpaField
+       placeholder="Enter UPI ID" 
+       helpText="Please enter a valid handle" 
+       pattern=".+" 
+       required={true}
+      formatter={{ type: 'vpa' }} on:blur="blur()" 
+      on:focus="focus()" />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
         <select
@@ -27,14 +37,15 @@
       </div>
       {#if retry} <input on:change="radioChange(event)" {checked}
       ref:radioInpVpa value={retry?'vpa':null} type="radio" name="isSelected"
-      style="position:absolute;right:8px;top:25px;display:inline;cursor:pointer;font-size:20px;display:none;"
+      class="radio-change"
       /> {/if}
     </div>
   </Card>
 </div>
 
 <style>
-  #upi-gpay-contact,#upi-gpay-vpa {
+  #upi-gpay-contact,
+  #upi-gpay-vpa {
     display: block;
   }
 </style>
@@ -80,10 +91,8 @@
       },
       handlePspChange(event) {
         this.focus();
-        var session = getSession();
-        // if (session.upiTab.get().omniSelected === 'vpa') {
+        const session = getSession();
         this.fire('handleChange', event.target.value);
-        // }
       },
       getVpa() {
         const { pspHandle } = this.get();
@@ -106,10 +115,10 @@
       },
       radioChange(e) {
         this.fire('radiochange');
-        var session = getSession();
-        var checked = e.target.checked;
+        const session = getSession();
+        const checked = e.target.checked;
         this.set({ checked: checked });
-        var val = e.target.value;
+        const val = e.target.value;
         session.upiTab.set({
           omniSelected: val,
         });
