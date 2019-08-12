@@ -211,10 +211,16 @@ var responseTypes = {
         fullResponse.data.intent_url
       )
         .then(response => {
-          // TODO
+          Analytics.track('gpay_pay_response', {
+            data: response.paymentMethodData,
+          });
+          this.emit('upi.intent_success_response', response.paymentMethodData);
         })
-        .catch(err => {
-          // TODO
+        .catch(error => {
+          Analytics.track('gpay_error', {
+            data: error,
+          });
+          this.emit('cancel', upiBackCancel);
         });
     }
   },
