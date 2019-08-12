@@ -18,7 +18,6 @@
       <div class="help">Please select a bank</div>
       <select id="bank-select" name="bank" required="" class="input" pattern="[\w]+" bind:value=selectedBankCode>
         <option selected="selected" value="">Select a different Bank</option>
-        <!-- TODO: check for Object.entries polyfill -->
         {#each Object.entries(banks) as [code, name]}
           <option value={code}>{name}</option>
         {/each}
