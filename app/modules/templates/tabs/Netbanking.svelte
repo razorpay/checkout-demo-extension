@@ -79,7 +79,6 @@ function hasMultipleOptions(bankCode, banks) {
   return hasRetail && hasCorporate;
 }
 
-
 /**
  * Returns the code for retail option corresponding to `bankCode`. Looks for
  * {bankCode} and {bankCode}_R in `banks`.
@@ -173,7 +172,7 @@ export default {
     }
   },
 
-  onstate({ changed, current }) {
+  onupdate({ changed, current }) {
     if (changed.selectedBankCode) {
       const { selectedBankCode } = current;
       if (ua_iPhone) {
