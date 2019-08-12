@@ -1582,6 +1582,7 @@ Session.prototype = {
   },
 
   setNetbankingTab: function() {
+    // TODO: pass method (emandate/netbanking) as well to remove overrideMethodCheck
     if (this.methods.netbanking || this.methods.emandate) {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
@@ -1591,7 +1592,7 @@ Session.prototype = {
           recurring: this.recurring,
         },
       });
-      // Add listener only if emandate
+      // Add listener for proceeding automatically only if emandate
       if (this.methods.emandate) {
         this.netbankingTab.on(
           'bankSelected',
