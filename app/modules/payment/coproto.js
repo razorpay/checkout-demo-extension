@@ -1,6 +1,10 @@
 import * as GPay from 'gpay';
 import * as strings from 'common/strings';
-import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
+import {
+  parseUPIIntentResponse,
+  didUPIIntentSucceed,
+  upiBackCancel,
+} from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import { RazorpayConfig } from 'common/Razorpay';
@@ -216,12 +220,6 @@ var responseTypes = {
   },
 
   intent: function(request, fullResponse) {
-    var upiBackCancel = {
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-    };
-
     var ra = () =>
       fetch
         .jsonp({

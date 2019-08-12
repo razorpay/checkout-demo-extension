@@ -499,3 +499,9 @@ export const trackAppImpressions = allApps => {
     Analytics.track('upi:app:truecaller:show');
   }
 };
+
+export const upiBackCancel = {
+  '_[method]': 'upi',
+  '_[flow]': 'intent',
+  '_[reason]': 'UPI_INTENT_BACK_BUTTON',
+};
