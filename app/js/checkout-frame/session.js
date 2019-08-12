@@ -6336,12 +6336,25 @@ Session.prototype = {
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
+      // TODO: refactor this into cleanupSvelteComponents.
       if (this.methodsList) {
         this.methodsList.destroy();
       }
 
       if (this.otpView) {
         this.otpView.destroy();
+      }
+
+      if (this.payoutsView) {
+        this.payoutsView.destroy();
+      }
+
+      if (this.payoutsAccountView) {
+        this.payoutsAccountView.destroy();
+      }
+
+      if (this.netbankingTab) {
+        this.netbankingTab.destroy();
       }
 
       if (this.upiTab) {
@@ -6372,7 +6385,8 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
-      this.upiTab = this.otpView = null;
+      this.payoutsView = this.payoutsAccountView = null;
+      this.upiTab = this.otpView = this.netbankingTab = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;
