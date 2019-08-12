@@ -1,4 +1,5 @@
 <Tab method="netbanking" pad={false} overrideMethodCheck>
+
   <div id="netb-banks" class="clear grid count-3">
     {#each netbanks.slice(0, maxGridCount) as bank}
       <div class="netb-bank item radio-item">
@@ -12,6 +13,7 @@
       </div>
     {/each}
   </div>
+
   <div class="elem-wrap pad">
     <div id="nb-elem" class="elem select invalid">
       <i class="select-arrow"></i>
@@ -188,10 +190,14 @@ export default {
   },
 
   computed: {
+
     showCorporateRadio: ({ selectedBankCode, banks, recurring }) =>
         !recurring && hasMultipleOptions(selectedBankCode, banks),
+
     corporateSelected: ({ selectedBankCode }) => isCorporateCode(selectedBankCode),
+
     maxGridCount: ({ recurring }) => recurring ? 3 : 6,
+
     // TODO: downtime ( see Session#checkDown )
   }
 
