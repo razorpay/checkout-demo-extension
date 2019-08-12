@@ -4878,6 +4878,7 @@ Session.prototype = {
    * proceed automatically if some conditions are met.
    */
   proceedAutomaticallyAfterSelectingBank: function(bank) {
+    // TODO: see if this check can be removed
     if ($(this.el).hasClass('emandate') && this.emandateView) {
       if (this.checkInvalid()) {
         return;
