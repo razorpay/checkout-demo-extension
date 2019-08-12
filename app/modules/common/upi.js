@@ -249,7 +249,7 @@ export const topUpiApps = [
 
 /**
  * Parses the response from UPI Intent.
- * @param {Object} intentResponse Reponse from Intent.
+ * @param {Object} intentResponse Response from Intent.
  *
  * @return {Object}
  */
