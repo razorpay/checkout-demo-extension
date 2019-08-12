@@ -18,7 +18,7 @@
     <div id="nb-elem" class="elem select invalid">
       <i class="select-arrow"></i>
       <div class="help">Please select a bank</div>
-      <select id="bank-select" name="bank" required="" class="input" pattern="[\w]+" bind:value=selectedBankCode>
+      <select id="bank-select" name="bank" required class="input" pattern="[\w]+" bind:value=selectedBankCode>
         <option selected="selected" value="">Select a different Bank</option>
         {#each Object.entries(banks) as [code, name]}
           <option value={code}>{name}</option>
