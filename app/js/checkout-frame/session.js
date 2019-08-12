@@ -207,58 +207,6 @@ function getCardTypeFromPayload(payload, tokens) {
   return cardType;
 }
 
-/*
- * Returns a bank code with suffixes(_C, _R) removed.
- * @param {String} bankCode
- */
-function normalizeBankCode(bankCode) {
-  return bankCode.replace(/_[CR]$/, '');
-}
-
-/**
- * Returns the code for retail option corresponding to `bankCode`. Looks for
- * {bankCode} and {bankCode}_R in `banks`.
- * Returns false if no option is present.
- * @param {String} bankCode
- * @param {Object} banks
- */
-function getRetailOption(bankCode, banks) {
-  var normalizedBankCode = normalizeBankCode(bankCode);
-  var retailBankCode = normalizedBankCode + '_R';
-  if (banks[normalizedBankCode]) {
-    return normalizedBankCode;
-  }
-  return banks[retailBankCode] && retailBankCode;
-}
-
-/**
- * Returns the code for corporate option corresponding to `bankCode`. Looks for
- * {bankCode}_C in `banks`.
- * Returns false if no option is present.
- * @param {String} bankCode
- * @param {Object} banks
- */
-function getCorporateOption(bankCode, banks) {
-  var normalizedBankCode = normalizeBankCode(bankCode);
-  var corporateBankCode = normalizedBankCode + '_C';
-  return banks[corporateBankCode] && corporateBankCode;
-}
-
-/**
- * Fills the corporate/retail radio button labels with bank names
- * @param {String} corporateBankName the label for corporate radio
- * @param {String} retailBankName the label for retail radio
- */
-function fillBankRadios(corporateBankName, retailBankName) {
-  $('.nb-selection-container label[for=nb_type_retail] .label-content').html(
-    retailBankName
-  );
-
-  $('.nb-selection-container label[for=nb_type_corporate] .label-content').html(
-    corporateBankName
-  );
-}
-
 /**
  * Set the "View EMI Plans" CTA as the Pay Button
  * if all the criteria are met.
@@ -1633,7 +1581,28 @@ Session.prototype = {
     }
   },
 
+  setNetbankingTab: function() {
+    if (this.methods.netbanking || this.methods.emandate) {
+      this.netbankingTab = new discreet.NetbankingTab({
+        target: gel('netbanking-svelte-wrap'),
+        data: {
+          netbanks: this.netbanks,
+          banks: this.methods.emandate || this.methods.netbanking,
+          recurring: this.recurring,
+        },
+      });
+      // Add listener only if emandate
+      if (this.methods.emandate) {
+        this.netbankingTab.on(
+          'bankSelected',
+          this.proceedAutomaticallyAfterSelectingBank.bind(this)
+        );
+      }
+    }
+  },
+
   setSvelteComponents: function() {
+    this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
@@ -2964,10 +2933,6 @@ Session.prototype = {
         true
       );
     });
-    if (enabledMethods.netbanking || enabledMethods.emandate) {
-      this.on('change', '#bank-select', this.switchBank);
-      this.on('change', '#netb-banks', this.selectBankRadio, true);
-    }
     if (enabledMethods.wallet) {
       try {
         this.on(
@@ -3130,28 +3095,6 @@ Session.prototype = {
         }
       });
     }
-
-    var enabledBanks = this.getEnabledBanks();
-    this.on('click', '.nb-type', function(event) {
-      var selectedBank = $('#bank-select').val();
-      var bankToSet;
-
-      // Uncheck other radios
-      this.clearNetbankingRadio();
-
-      // Check clicked radio
-      event.target.checked = true;
-
-      if (event.target.value === 'corporate') {
-        bankToSet = getCorporateOption(selectedBank, enabledBanks);
-      } else {
-        bankToSet = getRetailOption(selectedBank, enabledBanks);
-      }
-
-      if (bankToSet) {
-        this.setSelectedBank(bankToSet);
-      }
-    });
   },
 
   onUpiAppSelect: function(packageName) {
@@ -3843,8 +3786,8 @@ Session.prototype = {
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
-        $('#bank-select').val(issuer);
-        this.switchBank({ target: { value: issuer } });
+        // TODO test this after port to svelte
+        this.netbankingTab.setSelectedBank(issuer);
       }
     } else if (screen === 'emi') {
       var emiDuration = $('#emi_duration').val();
@@ -4892,68 +4835,6 @@ Session.prototype = {
     setEmiPlansCta(this.screen, this.tab);
   },
 
-  switchBank: function(e) {
-    var bankCode = e.target.value;
-
-    Analytics.track('bank:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        bank: bankCode,
-      },
-    });
-
-    var enabledBanks = this.getEnabledBanks();
-
-    var bankRadioToCheck = bankCode;
-
-    // If both corporate and retail options are available, check retail.
-    if (this.hasMultipleOptions(bankCode)) {
-      bankRadioToCheck = getRetailOption(bankCode, enabledBanks);
-    }
-
-    // Show radio only on netbanking, and not on emandate
-    if (this.screen === 'netbanking') {
-      this.showCorporateNetbankingRadio(bankCode);
-    }
-
-    this.checkDown(bankCode);
-    this.checkBankRadio(bankRadioToCheck);
-    this.proceedAutomaticallyAfterSelectingBank();
-  },
-
-  /**
-   * Checks whether the given bank has multiple options (Corporate, Retail)
-   * @param bankCode
-   */
-  hasMultipleOptions: function(bankCode) {
-    var enabledBanks = this.getEnabledBanks();
-    var normalizedBankCode = normalizeBankCode(bankCode);
-    // Some retail banks have the suffix _R, while others don't. So we look for
-    // codes both with and without the suffix.
-    var hasRetail =
-      enabledBanks[normalizedBankCode] ||
-      enabledBanks[normalizedBankCode + '_R'];
-    var hasCorporate = enabledBanks[normalizedBankCode + '_C'];
-    return hasRetail && hasCorporate;
-  },
-
-  /**
-   * Checks the bank radio corresponding to the value.
-   * @param {String} val
-   */
-  checkBankRadio: function(val) {
-    each($$('#netb-banks input'), function(i, radio) {
-      $(radio.parentNode).removeClass('active');
-      if (radio.value === val) {
-        $(radio.parentNode).addClass('active');
-        radio.checked = true;
-      } else if (radio.checked) {
-        $(radio.parentNode).removeClass('active');
-        radio.checked = false;
-      }
-    });
-  },
-
   checkDown: function(val) {
     $('.down')
       .toggleClass('vis', indexOf(this.down, val) !== -1)
@@ -4976,40 +4857,11 @@ Session.prototype = {
     return this.offers.appliedOffer.issuer === selectedVal;
   },
 
-  selectBankRadio: function(e) {
-    if (ua_iPhone) {
-      Razorpay.sendMessage({ event: 'blur' });
-    }
-    var bankCode = e.target.value;
-
-    Analytics.track('bank:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        bank: bankCode,
-      },
-    });
-
-    // Show radio only on netbanking, and not on emandate
-    if (this.screen === 'netbanking') {
-      this.showCorporateNetbankingRadio(bankCode);
-    }
-
-    this.checkDown(bankCode);
-    this.setSelectedBank(bankCode);
-    this.proceedAutomaticallyAfterSelectingBank();
-  },
-
   getEnabledBanks: function() {
     if (this.screen === 'emandate') {
       return this.methods.emandate || {};
     }
     return this.methods.netbanking || {};
-  },
-
-  setSelectedBank: function(bank) {
-    var select = gel('bank-select');
-    select.value = bank;
-    this.input(select);
   },
 
   /**
@@ -5022,64 +4874,16 @@ Session.prototype = {
   },
 
   /**
-   * Shows Corporate/Retail netbanking selection radio buttons on
-   * netbanking screen, only if both options are enabled for the given bank code.
-   * @param {String} bankCode
-   */
-  showCorporateNetbankingRadio: function(bankCode) {
-    var $nbSelectionContainer = $('.nb-selection-container');
-    var enabledBanks = this.getEnabledBanks();
-    var retailBankCode = getRetailOption(bankCode, enabledBanks);
-    var corporateBankCode = getCorporateOption(bankCode, enabledBanks);
-
-    if (this.hasMultipleOptions(bankCode)) {
-      fillBankRadios(
-        enabledBanks[corporateBankCode],
-        enabledBanks[retailBankCode]
-      );
-
-      $nbSelectionContainer.addClass(shownClass);
-
-      // Uncheck all radios
-      this.clearNetbankingRadio();
-
-      // If the selected bank is corporate, i.e. the bank code ends in _C select
-      // the corporate radio option
-      if (/_C$/.test(bankCode)) {
-        $nbSelectionContainer.$('#nb_type_corporate').prop('checked', true);
-      } else {
-        // Else, select the retail radio option
-        $nbSelectionContainer.$('#nb_type_retail').prop('checked', true);
-      }
-    } else {
-      $nbSelectionContainer.removeClass(shownClass);
-    }
-  },
-
-  /**
-   * Deselects bank.
-   */
-  deselectBank: function(e) {
-    var select = gel('bank-select');
-
-    if (select) {
-      select.value = '';
-    }
-
-    this.checkBankRadio('');
-  },
-
-  /**
    * Once the bank is selected in the banks list,
    * proceed automatically if some conditions are met.
    */
-  proceedAutomaticallyAfterSelectingBank: function() {
+  proceedAutomaticallyAfterSelectingBank: function(bank) {
     if ($(this.el).hasClass('emandate') && this.emandateView) {
       if (this.checkInvalid()) {
         return;
       }
 
-      return this.emandateView.showBankDetailsForm($('#bank-select').val());
+      return this.emandateView.showBankDetailsForm(bank.code);
     }
   },
 

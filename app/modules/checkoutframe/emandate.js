@@ -193,7 +193,8 @@ emandateView.prototype = {
     this.setScreen(newScreen);
 
     if (newScreen === 'emandate') {
-      this.session.deselectBank();
+      // TODO test this since netbanking was ported to svelte
+      this.session.netbankingTab.deselectBank();
     }
 
     return true;
