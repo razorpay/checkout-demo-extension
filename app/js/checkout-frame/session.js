@@ -4857,22 +4857,6 @@ Session.prototype = {
     return this.offers.appliedOffer.issuer === selectedVal;
   },
 
-  getEnabledBanks: function() {
-    if (this.screen === 'emandate') {
-      return this.methods.emandate || {};
-    }
-    return this.methods.netbanking || {};
-  },
-
-  /**
-   * Unchecks all radio buttons for netbanking type selection.
-   */
-  clearNetbankingRadio: function() {
-    each($$('.nb-type'), function(index, el) {
-      el.checked = false;
-    });
-  },
-
   /**
    * Once the bank is selected in the banks list,
    * proceed automatically if some conditions are met.
