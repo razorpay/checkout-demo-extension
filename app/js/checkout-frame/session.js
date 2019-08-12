@@ -5581,7 +5581,8 @@ Session.prototype = {
       } else if (/^emandate/.test(screen)) {
         if (this.screen === 'emandate') {
           screen = 'netbanking';
-          data.bank = $('#bank-select').val();
+          // TODO test this after porting netbanking
+          data.bank = this.netbankingTab.getSelectedBank();
           data.method = 'emandate';
         }
         return this.emandateView.submit(data);
