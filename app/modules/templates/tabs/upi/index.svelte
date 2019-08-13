@@ -182,13 +182,13 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  // const checkOmnichannel = () => {
-  //   const session = getSession();
+  const checkOmnichannel = () => {
+    const session = getSession();
 
-  //   return session.preferences &&
-  //     session.preferences.features &&
-  //     session.preferences.features.google_pay_omnichannel;
-  // };
+    return session.preferences &&
+      session.preferences.features &&
+      session.preferences.features.google_pay_omnichannel;
+  };
 
   export default {
     components: {
@@ -228,9 +228,9 @@
     },
 
     computed: {
-      checkOmnichannel:()=>{
-    const session = getSession();
-    return session.preferences &&
+      checkOmnichannel: ({ topUpiApps, selectedApp }) => {
+      const session = getSession();
+      return session.preferences &&
       session.preferences.features &&
       session.preferences.features.google_pay_omnichannel;
       },
@@ -273,7 +273,7 @@
         .then(() => this.set({ useWebPaymentsApi: true }))
         /* Don't use Google Pay */
         .catch(() => this.set({ useWebPaymentsApi: false }));
-    console.log(checkOmnichannel,'checkOmnichannel')
+
       this.set({
         useOmnichannel: checkOmnichannel
       });
