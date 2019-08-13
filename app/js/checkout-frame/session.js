@@ -5766,9 +5766,13 @@ Session.prototype = {
        */
       .verifyVpa(vpa, 10000)
       .then(function() {
-        self.submit({
-          vpaVerified: true,
-        });
+        hideOverlaySafely($('#error-message'));
+
+        setTimeout(function() {
+          self.submit({
+            vpaVerified: true,
+          });
+        }, 200);
       })
       .catch(function() {
         self.showLoadError(
