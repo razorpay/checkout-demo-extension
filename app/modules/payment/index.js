@@ -182,6 +182,10 @@ export default function Payment(data, params = {}, r) {
   this.gpay =
     params.gpay || params.tez || (this.microapps && this.microapps.gpay); // params.tez is legacy
 
+  if (this.microapps && this.microapps.gpay) {
+    Analytics.setMeta('microapps.gpay', true);
+  }
+
   var avoidPopup = false;
 
   /**
