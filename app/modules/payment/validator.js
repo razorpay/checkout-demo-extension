@@ -101,7 +101,8 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
     if (
       !(
         razorpayInstance.paymentAdapters &&
-        razorpayInstance.paymentAdapters.gpay
+        (razorpayInstance.paymentAdapters.gpay ||
+          razorpayInstance.paymentAdapters['microapps.gpay'])
       )
     ) {
       return razorpayInstance.emit(
