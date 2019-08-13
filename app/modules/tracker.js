@@ -203,7 +203,7 @@ export default function Track(r, event, data, immediately) {
       var rootKey = keySplit[0];
       if (trackingOptions.indexOf(rootKey) !== -1) {
         if (keySplit.length > 1) {
-          if (!trackingOptions.hasOwnProperty(rootKey)) {
+          if (!options.hasOwnProperty(rootKey)) {
             options[rootKey] = {};
           }
           options[rootKey][keySplit[1]] = value;
@@ -212,6 +212,15 @@ export default function Track(r, event, data, immediately) {
         }
       }
     });
+
+    // Mask prefilled card details
+    if (_Obj.hasProp(options, 'prefill')) {
+      _Arr.loop(['card[number]', 'card[cvv]', 'card[expiry]'], key => {
+        if (_Obj.hasProp(options.prefill, key)) {
+          options.prefill[key] = true;
+        }
+      });
+    }
 
     if (options.image && _.isBase64Image(options.image)) {
       options.image = 'base64';

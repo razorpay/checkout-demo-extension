@@ -137,7 +137,7 @@ export function getMethodDescription(method, props) {
  * @param {String} method
  * @return {String}
  */
-function getMethodPrefix(method) {
+export function getMethodPrefix(method) {
   switch (method) {
     case 'card':
     case 'credit_card':
