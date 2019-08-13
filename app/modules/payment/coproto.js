@@ -202,9 +202,7 @@ var responseTypes = {
   },
   intent: function(request, fullResponse) {
     const session = getSession();
-    var isOmni =
-      session.preferences.features.google_pay_omnichannel &&
-      session.upiTab.get().selectedApp === 'gpay';
+    var isOmni = session.isOmni();
     if (isOmni) {
       session.showOmniChannelUi(strings.OmniNotification);
     }
@@ -272,15 +270,13 @@ var responseTypes = {
   },
 
   // prettier-ignore
-  'return': function(request) {
+  'return': function (request) {
     _Doc.redirect(request);
   },
 
   respawn: function(request, fullResponse) {
     const session = getSession();
-    var isOmni =
-      session.preferences.features.google_pay_omnichannel &&
-      session.upiTab.get().selectedApp === 'gpay';
+    var isOmni = session.isOmni();
     if (isOmni) {
       session.retryOmniChannelRespawn(fullResponse);
     }
