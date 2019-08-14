@@ -4,29 +4,33 @@
 
 <div id="upi-gpay-vpa" class="upi-gpay">
   <Card
-  selected="{radio.vpa}"
-  on:click="handleCardClick(event)">
+    {selected}
+    on:click="handleCardClick(event)"
+  >
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
       <Field type="text"
-      name="vpa"
-      id='vpa'
-      ref:vpaField
-       placeholder="Enter UPI ID"
-       helpText="Please enter a valid handle"
-       pattern=".+"
-       required={true}
-      formatter={{ type: 'vpa' }} on:blur="blur()"
-      on:focus="focus()" />
+        formatter={{ type: 'vpa' }} on:blur="blur()"
+        helpText="Please enter a valid handle"
+        id='vpa'
+        name="vpa"
+        pattern=".+"
+        placeholder="Enter UPI ID"
+        required={true}
+
+        on:focus="focus()"
+        ref:vpaField
+      />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
         <select
-          required
           class="input"
           name="gpay_bank"
+          required
+
+          on:change="handlePspChange(event)"
           ref:googlePayPspHandle
           bind:value="pspHandle"
-          on:change="handlePspChange(event)"
         >
           <option value="">Select Bank</option>
           <option value="okhdfcbank">okhdfcbank</option>
@@ -35,12 +39,6 @@
           <option value="okaxis">okaxis</option>
         </select>
       </div>
-      {#if retry}
-      <input on:change="radioChange(event)" {checked}
-      ref:radioInpVpa value={retry?'vpa':null} type="radio" name="isSelected"
-      class="radio-change"
-      />
-      {/if}
     </div>
   </Card>
 </div>
@@ -63,10 +61,6 @@
     data() {
       return {
         retry: false,
-        radio: {
-          phone: true,
-          vpa: false,
-        },
         selected: true,
         checked: false,
       };
@@ -89,6 +83,10 @@
           return;
         }
 
+        this.fire('select', {
+          type: 'vpa'
+        });
+
         this.refs.vpaField.focus();
       },
       handlePspChange(event) {
@@ -102,29 +100,9 @@
       },
       focus() {
         this.refs.vpaField.focus();
-        if (this.refs.radioInpVpa) {
-          this.refs.radioInpVpa.checked = true;
-          this.radioChange({
-            target: {
-              checked: true,
-              value: 'vpa',
-            },
-          });
-        }
       },
       blur() {
         this.refs.vpaField.blur();
-      },
-      radioChange(e) {
-        this.fire('radiochange');
-        const session = getSession();
-        const checked = e.target.checked;
-        this.set({ checked: checked });
-        const val = e.target.value;
-        session.upiTab.set({
-          omniSelected: val,
-        });
-        // console.log(session.upiTab.get().omniSelected,'omniSelected',val)
       },
     },
   };

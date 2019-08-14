@@ -4,9 +4,9 @@
 
 <div id="upi-gpay-phone" class="upi-gpay">
   <Card
-    selected="{radio.phone}"
-    on:click="focus()"
-    error="{radio.phone && error && isFirst}"
+    {selected}
+    on:click="handleCardClick()"
+    error="{selected && error && isFirst}"
   >
     <div class="elem-wrap collect-form">
       <Field
@@ -24,24 +24,10 @@
         on:focus="focus()"
       />
     </div>
-    {#if retry}
-    <input
-      helpText="Please enter a valid handle"
-      id="pay-radio"
-      name="isSelected"
-      type="radio"
-      value={retry ? 'phone' : null}
-
-      {checked}
-
-      on:change="radioChange(event)"
-      ref:radioInpPhone
-    />
-    {/if}
   </Card>
 </div>
 
-{#if radio.phone}
+{#if selected}
   {#if error}
     <p class:regular="!isFirst" class:error="isFirst">
       Please ensure the same number is linked to the Google Pay account.
@@ -91,10 +77,6 @@
         isFirst: true,
         contact: null,
         selected: true,
-        radio: {
-          phone: true,
-          vpa: false,
-        },
         retry: false,
         checked: true,
       };
@@ -112,37 +94,21 @@
 
     methods: {
       handleCardClick(event) {
-        this.refs.phoneField.focus();
+        this.fire('select', {
+          type: 'phone'
+        });
+
+        this.focus();
       },
       getPhone() {
         return this.refs.phoneField.getValue();
       },
       focus() {
         this.refs.phoneField.focus();
-        if (this.refs.radioInpPhone) {
-          this.refs.radioInpPhone.checked = true;
-          this.radioChange({
-            target: {
-              checked: true,
-              value: 'phone',
-            },
-          });
-        }
       },
       blur() {
         this.refs.phoneField.blur();
       },
-      radioChange(e) {
-        this.fire('radiochange');
-        const session = getSession();
-        const checked = e.target.checked;
-        this.set({ checked: checked });
-        const val = e.target.value;
-        session.upiTab.set({
-          omniSelected: val,
-        });
-          // console.log(session.upiTab.get().omniSelected,'omniSelected',val)
-    },
     },
   };
 </script>

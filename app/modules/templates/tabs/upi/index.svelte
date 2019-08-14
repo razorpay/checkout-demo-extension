@@ -30,10 +30,10 @@
             error="{retryOmnichannel}"
             focusOnCreate={true}
             {isFirst}
-            {radio}
             retry={retryOmnichannel}
+            selected="{omnichannelType === 'phone'}"
 
-            on:radiochange="radioCheck('phone')"
+            on:select="setOmnichannelType(event)"
             ref:omnichannelField
           />
         {/if}
@@ -41,12 +41,12 @@
           <GooglePayCollect
             focusOnCreate="{!retryOmnichannel}"
             {pspHandle}
-            {radio}
             retry={retryOmnichannel}
+            selected="{omnichannelType === 'vpa'}"
 
             on:blur="trackVpaEntry(event)"
             on:handleChange="trackHandleSelection(event)"
-            on:radiochange="radioCheck('vpa')"
+            on:select="setOmnichannelType(event)"
             ref:vpaField
           />
         {/if}
@@ -237,19 +237,16 @@
       return {
         vpa: '',
         tab: 'upi',
-        isFirst: true,
+        isFirst: true, // Has the user come to this screen for the first time?
         topUpiApps,
-        radio: {
-          phone: true,
-          vpa: false
-        },
+        omnichannelType: 'phone',
         otherAppsIcon,
         pattern: '.+',
         preferIntent: true,
         selectedApp: undefined,
         useWebPaymentsApi: false,
         useOmnichannel: false,
-        retryOmnichannel: false,
+        retryOmnichannel: false, // Should we show collect flow on Omnichannel as well?
         down: false,
         qrEnabled: false,
       };
@@ -289,14 +286,15 @@
 
     oncreate() {
       const session = getSession();
-      var isOmni=session.preferences && session.preferences.features && session.preferences.features.google_pay_omnichannel
+      const isOmnichannel = session.preferences && session.preferences.features && session.preferences.features.google_pay_omnichannel;
+
       checkGPay()
         /* Use Google Pay */
         .then(() => this.set({ useWebPaymentsApi: true }))
         /* Don't use Google Pay */
         .catch(() => this.set({ useWebPaymentsApi: false }));
       this.set({
-        useOmnichannel: isOmni
+        useOmnichannel: isOmnichannel
       });
 
       /* TODO: improve handling of `prefill.vpa` */
@@ -379,24 +377,18 @@
        * This function will be invoked externally via session on
        * payment form submission
        */
-      radioCheck(type) {
-        if (type === 'phone') {
-          this.set({
-            radio: {
-              phone: true,
-              vpa: false
-            }
-          })
-        }
-        else {
-          this.set({
-            radio: {
-              phone: false,
-              vpa: true
-            }
-          })
-        }
+      setOmnichannelType(event) {
+        const {
+          type
+        } = event;
+
+        console.log({ type });
+
+        this.set({
+          omnichannelType: type
+        });
       },
+
       getPayload() {
         const {
           selectedApp,
