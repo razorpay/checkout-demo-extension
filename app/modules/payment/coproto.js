@@ -226,9 +226,9 @@ var responseTypes = {
   },
   intent: function(request, fullResponse) {
     const session = getSession();
-    var isOmni = session.isOmni();
-    if (isOmni) {
-      session.showOmniChannelUi(strings.OmniNotification);
+    var isOmnichannel = session.isOmnichannel();
+    if (isOmnichannel) {
+      session.showOmnichannelUi(strings.OmnichannelNotification);
     }
 
     var ra = () =>
@@ -304,9 +304,9 @@ var responseTypes = {
 
   respawn: function(request, fullResponse) {
     const session = getSession();
-    var isOmni = session.isOmni();
-    if (isOmni) {
-      session.retryOmniChannelRespawn(fullResponse);
+    var isOmnichannel = session.isOmnichannel();
+    if (isOmnichannel) {
+      session.retryOmnichannelRespawn(fullResponse);
     }
     // TODO: Check if Google OmniChannel
     // By default, use first coproto.

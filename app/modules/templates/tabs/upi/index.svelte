@@ -417,12 +417,12 @@
               data.contact = this.refs.omnichannelField.getPhone();
               data.upi_provider = 'google_pay';
             } else {
-              const omniSelected = this.get().omniSelected;
-              if (omniSelected === 'vpa') {
+              const omnichannelSelected = this.get().omnichannelSelected;
+              if (omnichannelSelected === 'vpa') {
                 data['_[flow]'] = 'directpay';
                 data.vpa = this.getFullVpa();
               }
-              else if (omniSelected == 'phone') {
+              else if (omnichannelSelected == 'phone') {
                 data['_[flow]'] = 'intent';
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';
@@ -449,7 +449,7 @@
 
         return data;
       },
-      setRetryOmniChannel: function (status) {
+      setRetryOmnichannel: function (status) {
         this.set({ retryOmnichannel: status });
       },
       onBack() {

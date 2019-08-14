@@ -139,7 +139,7 @@
         this.set({ checked: checked });
         const val = e.target.value;
         session.upiTab.set({
-          omniSelected: val,
+          omnichannelSelected: val,
         });
       },
     },

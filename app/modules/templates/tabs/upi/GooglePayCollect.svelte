@@ -3,20 +3,20 @@
 </div>
 
 <div id="upi-gpay-vpa" class="upi-gpay">
-  <Card 
-  selected="{radio.vpa}" 
+  <Card
+  selected="{radio.vpa}"
   on:click="handleCardClick(event)">
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
-      <Field type="text" 
-      name="vpa" 
-      id='vpa' 
+      <Field type="text"
+      name="vpa"
+      id='vpa'
       ref:vpaField
-       placeholder="Enter UPI ID" 
-       helpText="Please enter a valid handle" 
-       pattern=".+" 
+       placeholder="Enter UPI ID"
+       helpText="Please enter a valid handle"
+       pattern=".+"
        required={true}
-      formatter={{ type: 'vpa' }} on:blur="blur()" 
+      formatter={{ type: 'vpa' }} on:blur="blur()"
       on:focus="focus()" />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
@@ -35,11 +35,11 @@
           <option value="okaxis">okaxis</option>
         </select>
       </div>
-      {#if retry} 
+      {#if retry}
       <input on:change="radioChange(event)" {checked}
       ref:radioInpVpa value={retry?'vpa':null} type="radio" name="isSelected"
       class="radio-change"
-      /> 
+      />
       {/if}
     </div>
   </Card>
@@ -122,7 +122,7 @@
         this.set({ checked: checked });
         const val = e.target.value;
         session.upiTab.set({
-          omniSelected: val,
+          omnichannelSelected: val,
         });
       },
     },

@@ -64,7 +64,7 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
-  gpay_omni: 'Verifying mobile number with Google Pay..',
+  gpay_omnichannel: 'Verifying mobile number with Google Pay..',
   redirect: 'Redirecting to Bank page',
   acs_load_delay: 'Seems like your bank page is taking time to load.',
   otp_resent: 'OTP resent',
@@ -5096,8 +5096,8 @@ Session.prototype = {
     }
     return '#form-' + form;
   },
-  retryOmniChannelRespawn: function(response) {
-    this.upiTab.setRetryOmniChannel(true);
+  retryOmnichannelRespawn: function(response) {
+    this.upiTab.setRetryOmnichannel(true);
     this.hideErrorMessage(true);
   },
   getFormData: function() {
@@ -5223,14 +5223,14 @@ Session.prototype = {
       discreet.Bridge.stopListeningForBackPresses();
     }
   },
-  showOmniChannelUi: function(text) {
+  showOmnichannelUi: function(text) {
     this.upiTab.set({
-      omniSelected: 'phone',
+      omnichannelSelected: 'phone',
     });
     setTimeout(function() {
       $('#error-message .link').html('');
     }, 100);
-    $('.omni').show();
+    $('.omnichannel').show();
     $('#overlay-close').show();
     this.showLoadError(text, false);
   },
@@ -5700,17 +5700,17 @@ Session.prototype = {
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
-        var omniSelected = this.upiTab.get().omniSelected;
+        var omnichannelSelected = this.upiTab.get().omnichannelSelected;
 
         if (data['_[flow]'] === 'intent') {
-          if (!omniSelected) {
+          if (!omnichannelSelected) {
             formSelector = '#svelte-collect-in-intent';
           } else {
-            if (omniSelected === 'vpa') {
+            if (omnichannelSelected === 'vpa') {
               formSelector = '#upi-gpay-vpa';
             }
 
-            if (omniSelected === 'phone') {
+            if (omnichannelSelected === 'phone') {
               formSelector = '#upi-gpay-phone';
             }
           }
@@ -5720,11 +5720,11 @@ Session.prototype = {
           data['_[flow]'] === 'directpay' &&
           this.upiTab.get().selectedApp === 'gpay'
         ) {
-          if (omniSelected === 'vpa') {
+          if (omnichannelSelected === 'vpa') {
             formSelector = '#upi-gpay-vpa';
           }
 
-          if (omniSelected === 'phone') {
+          if (omnichannelSelected === 'phone') {
             formSelector = '#upi-gpay-phone';
           }
         }
@@ -5738,9 +5738,9 @@ Session.prototype = {
           this.preferences.features.google_pay_omnichannel &&
           this.upiTab.get().selectedApp === 'gpay'
         ) {
-          $('.omni').show();
+          $('.omnichannel').show();
         } else {
-          $('.omni').hide();
+          $('.omnichannel').hide();
         }
       } else if (this.checkInvalid()) {
         return;
@@ -6791,11 +6791,12 @@ Session.prototype = {
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
   },
-  isOmni: function() {
-    var isOmni =
+  isOmnichannel: function() {
+    var isOmnichannel =
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab.get().selectedApp === 'gpay';
-    return isOmni;
+
+    return isOmnichannel;
   },
 
   /**
