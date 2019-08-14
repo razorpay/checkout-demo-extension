@@ -193,7 +193,8 @@ export default {
 
     maxGridCount: ({ recurring }) => recurring ? 3 : 6,
 
-    allBanks: ({ banks }) => _Obj.entries(banks).map(([code, name]) => ({ code, name })),
+    allBanks: ({ banks }) => _Obj.entries(banks)
+        .map((entry) => ({ code: entry[0], name: entry[1] })),
 
     // TODO: downtime ( see Session#checkDown )
   }
