@@ -124,6 +124,7 @@
         session.upiTab.set({
           omnichannelSelected: val,
         });
+        console.log(session.upiTab.get().omniSelected,'omniSelected')
       },
     },
   };

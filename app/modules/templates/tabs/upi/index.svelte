@@ -228,12 +228,6 @@
     },
 
     computed: {
-      checkOmnichannel: ({ topUpiApps, selectedApp }) => {
-      const session = getSession();
-      return session.preferences &&
-      session.preferences.features &&
-      session.preferences.features.google_pay_omnichannel;
-      },
       selectedAppData: ({ topUpiApps, selectedApp }) =>
         _Arr.find(topUpiApps, item => item.id === selectedApp),
 
@@ -267,15 +261,14 @@
 
     oncreate() {
       const session = getSession();
-
+      var isOmni=session.preferences && session.preferences.features && session.preferences.features.google_pay_omnichannel
       checkGPay()
         /* Use Google Pay */
         .then(() => this.set({ useWebPaymentsApi: true }))
         /* Don't use Google Pay */
         .catch(() => this.set({ useWebPaymentsApi: false }));
-
       this.set({
-        useOmnichannel: checkOmnichannel
+        useOmnichannel: isOmni
       });
 
       /* TODO: improve handling of `prefill.vpa` */

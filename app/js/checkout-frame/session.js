@@ -5096,9 +5096,11 @@ Session.prototype = {
     }
     return '#form-' + form;
   },
-  retryOmnichannelRespawn: function(response) {
-    this.upiTab.setRetryOmnichannel(true);
-    this.hideErrorMessage(true);
+  retryOmniChannelRespawn: function() {
+    this.upiTab.set({
+      omniSelected: 'phone',
+    });
+    this.upiTab.setRetryOmniChannel(true);
   },
   getFormData: function() {
     var tab = this.tab;
@@ -5223,10 +5225,11 @@ Session.prototype = {
       discreet.Bridge.stopListeningForBackPresses();
     }
   },
-  showOmnichannelUi: function(text) {
+  showOmniChannelUi: function(text) {
     this.upiTab.set({
       omnichannelSelected: 'phone',
     });
+    console.log(this.upiTab.get().omniSelected, 'omniSelected');
     setTimeout(function() {
       $('#error-message .link').html('');
     }, 100);
@@ -5254,6 +5257,11 @@ Session.prototype = {
       loadingState = false;
     } else {
       actionState = false;
+    }
+
+    var isOmni = this.isOmni();
+    if (isOmni) {
+      this.retryOmniChannelRespawn();
     }
 
     if (!text) {
@@ -5520,6 +5528,7 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
+    debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5698,6 +5707,7 @@ Session.prototype = {
         }
       }
       // perform the actual validation
+      // debugger;
       if (screen === 'upi') {
         var formSelector = '#form-upi';
         var omnichannelSelected = this.upiTab.get().omnichannelSelected;
@@ -5715,7 +5725,6 @@ Session.prototype = {
             }
           }
         }
-
         if (
           data['_[flow]'] === 'directpay' &&
           this.upiTab.get().selectedApp === 'gpay'
@@ -5727,6 +5736,12 @@ Session.prototype = {
           if (omnichannelSelected === 'phone') {
             formSelector = '#upi-gpay-phone';
           }
+        }
+        if (
+          data['_[flow]'] === 'intent' &&
+          this.upiTab.get().selectedApp === 'gpay'
+        ) {
+          formSelector = '#upi-gpay-phone';
         }
 
         if (this.checkInvalid(formSelector)) {
@@ -5790,7 +5805,7 @@ Session.prototype = {
     var self = this;
     self.showLoadError('Verifying your VPA');
     $('#overlay-close').hide();
-    $('.link').hide();
+    // $('.link').hide();
     var vpa = data.vpa;
 
     /**
@@ -6791,8 +6806,8 @@ Session.prototype = {
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
   },
-  isOmnichannel: function() {
-    var isOmnichannel =
+  isOmni: function() {
+    var isOmni =
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab.get().selectedApp === 'gpay';
 
