@@ -5100,7 +5100,7 @@ Session.prototype = {
     this.upiTab.set({
       omniSelected: 'phone',
     });
-    this.upiTab.setRetryOmniChannel(true);
+    this.upiTab.setOmnichannelAsRetried();
   },
   getFormData: function() {
     var tab = this.tab;
@@ -5227,9 +5227,8 @@ Session.prototype = {
   },
   showOmniChannelUi: function(text) {
     this.upiTab.set({
-      omnichannelSelected: 'phone',
+      omnichannelType: 'phone',
     });
-    console.log(this.upiTab.get().omniSelected, 'omniSelected');
     setTimeout(function() {
       $('#error-message .link').html('');
     }, 100);
@@ -5709,17 +5708,17 @@ Session.prototype = {
       // debugger;
       if (screen === 'upi') {
         var formSelector = '#form-upi';
-        var omnichannelSelected = this.upiTab.get().omnichannelSelected;
+        var omnichannelType = this.upiTab.get().omnichannelType;
 
         if (data['_[flow]'] === 'intent') {
-          if (!omnichannelSelected) {
+          if (!omnichannelType) {
             formSelector = '#svelte-collect-in-intent';
           } else {
-            if (omnichannelSelected === 'vpa') {
+            if (omnichannelType === 'vpa') {
               formSelector = '#upi-gpay-vpa';
             }
 
-            if (omnichannelSelected === 'phone') {
+            if (omnichannelType === 'phone') {
               formSelector = '#upi-gpay-phone';
             }
           }
@@ -5728,11 +5727,11 @@ Session.prototype = {
           data['_[flow]'] === 'directpay' &&
           this.upiTab.get().selectedApp === 'gpay'
         ) {
-          if (omnichannelSelected === 'vpa') {
+          if (omnichannelType === 'vpa') {
             formSelector = '#upi-gpay-vpa';
           }
 
-          if (omnichannelSelected === 'phone') {
+          if (omnichannelType === 'phone') {
             formSelector = '#upi-gpay-phone';
           }
         }

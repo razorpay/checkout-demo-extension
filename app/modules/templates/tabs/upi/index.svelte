@@ -430,12 +430,12 @@
               data.contact = this.refs.omnichannelField.getPhone();
               data.upi_provider = 'google_pay';
             } else {
-              const omnichannelSelected = this.get().omnichannelSelected;
-              if (omnichannelSelected === 'vpa') {
+              const omnichannelType = this.get().omnichannelType;
+              if (omnichannelType === 'vpa') {
                 data['_[flow]'] = 'directpay';
                 data.vpa = this.getFullVpa();
               }
-              else if (omnichannelSelected === 'phone') {
+              else if (omnichannelType === 'phone') {
                 data['_[flow]'] = 'intent';
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';
@@ -462,13 +462,15 @@
 
         return data;
       },
-      setRetryOmniChannel: function (status) {
-        this.set({ retryOmnichannel: status });
+      setOmnichannelAsRetried: function () {
+        this.set({ retryOmnichannel: true });
       },
       onBack() {
+        // User has gone back, set isFirst as false
         this.set({
           isFirst: false
-        })
+        });
+
         const {
           intent,
           selectedApp,
@@ -523,6 +525,7 @@
       /* VPA card specific code */
       focusVpa(event) {
         const { focused, useOmnichannel, selectedApp } = this.get();
+
         if (!focused && this.refs.vpaField) {
           if (useOmnichannel && selectedApp === 'gpay') {
             this.refs.omnichannelField.focus();
