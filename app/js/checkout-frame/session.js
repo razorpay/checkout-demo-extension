@@ -5227,7 +5227,8 @@ Session.prototype = {
       discreet.Bridge.stopListeningForBackPresses();
     }
   },
-  showOmniChannelUi: function(text) {
+
+  showOmnichannelLoader: function(text) {
     this.upiTab.set({
       omnichannelType: 'phone',
     });
@@ -5235,10 +5236,13 @@ Session.prototype = {
     setTimeout(function() {
       $('#error-message .link').html('');
     }, 100);
+
     $('.omnichannel').show();
     $('#overlay-close').show();
+
     this.showLoadError(text, false);
   },
+
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -6085,7 +6089,7 @@ Session.prototype = {
     } else if (!this.isPayout) {
       var isOmnichannel = this.isOmnichannel();
       if (isOmnichannel) {
-        this.showOmniChannelUi(strings.OmnichannelNotification);
+        this.showOmnichannelLoader(strings.OmnichannelNotification);
       } else {
         this.showLoadError();
       }
