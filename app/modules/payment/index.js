@@ -28,7 +28,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 
 const isRazorpayFrame =
-  // true ||
+  true ||
   _Str.startsWith(
     RazorpayConfig.api,
     `${location.protocol}//${location.hostname}`

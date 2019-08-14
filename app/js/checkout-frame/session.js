@@ -5794,7 +5794,7 @@ Session.prototype = {
     var self = this;
     self.showLoadError('Verifying your VPA');
     $('#overlay-close').hide();
-
+    $('.link').hide();
     var vpa = data.vpa;
 
     /**
@@ -5814,7 +5814,6 @@ Session.prototype = {
       .then(function() {
         $('#overlay-close').show();
         hideOverlaySafely($('#error-message'));
-
         setTimeout(function() {
           self.submit({
             vpaVerified: true,
