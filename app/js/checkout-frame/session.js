@@ -5711,8 +5711,8 @@ Session.prototype = {
           return this.emiPlansView.submit();
         }
       }
+
       // perform the actual validation
-      // debugger;
       if (screen === 'upi') {
         var formSelector = '#form-upi';
         var omnichannelType = this.upiTab.get().omnichannelType;
@@ -5730,6 +5730,7 @@ Session.prototype = {
             }
           }
         }
+
         if (
           data['_[flow]'] === 'directpay' &&
           this.upiTab.get().selectedApp === 'gpay'
@@ -5741,12 +5742,6 @@ Session.prototype = {
           if (omnichannelType === 'phone') {
             formSelector = '#upi-gpay-phone';
           }
-        }
-        if (
-          data['_[flow]'] === 'intent' &&
-          this.upiTab.get().selectedApp === 'gpay'
-        ) {
-          formSelector = '#upi-gpay-phone';
         }
 
         if (this.checkInvalid(formSelector)) {
@@ -5810,7 +5805,7 @@ Session.prototype = {
     var self = this;
     self.showLoadError('Verifying your VPA');
     $('#overlay-close').hide();
-    // $('.link').hide();
+
     var vpa = data.vpa;
 
     /**
@@ -5969,6 +5964,7 @@ Session.prototype = {
         delete data.emi_duration;
       }
     }
+
     if (!data.contact) {
       delete data.contact;
     }
@@ -6086,13 +6082,10 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
+    } else if (this.isOmnichannel()) {
+      this.showOmnichannelLoader(strings.OmnichannelNotification);
     } else if (!this.isPayout) {
-      var isOmnichannel = this.isOmnichannel();
-      if (isOmnichannel) {
-        this.showOmnichannelLoader(strings.OmnichannelNotification);
-      } else {
-        this.showLoadError();
-      }
+      this.showLoadError();
     } else {
       this.showLoadError('Processing...');
     }
