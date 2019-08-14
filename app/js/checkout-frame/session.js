@@ -5259,8 +5259,8 @@ Session.prototype = {
       actionState = false;
     }
 
-    var isOmni = this.isOmni();
-    if (isOmni) {
+    var isOmnichannel = this.isOmnichannel();
+    if (isOmnichannel) {
       this.retryOmniChannelRespawn();
     }
 
@@ -5528,7 +5528,6 @@ Session.prototype = {
   },
 
   preSubmit: function(e) {
-    debugger;
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -6082,7 +6081,12 @@ Session.prototype = {
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
     } else if (!this.isPayout) {
-      this.showLoadError();
+      var isOmnichannel = this.isOmnichannel();
+      if (isOmnichannel) {
+        this.showOmniChannelUi(strings.OmnichannelNotification);
+      } else {
+        this.showLoadError();
+      }
     } else {
       this.showLoadError('Processing...');
     }
@@ -6806,12 +6810,13 @@ Session.prototype = {
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
   },
-  isOmni: function() {
+  isOmnichannel: function() {
     var isOmni =
+      this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab.get().selectedApp === 'gpay';
 
-    return isOmnichannel;
+    return isOmni;
   },
 
   /**

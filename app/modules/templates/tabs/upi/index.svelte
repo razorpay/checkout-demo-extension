@@ -442,7 +442,7 @@
 
         return data;
       },
-      setRetryOmnichannel: function (status) {
+      setRetryOmniChannel: function (status) {
         this.set({ retryOmnichannel: status });
       },
       onBack() {

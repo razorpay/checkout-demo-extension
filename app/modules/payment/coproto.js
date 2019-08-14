@@ -225,12 +225,7 @@ var responseTypes = {
     }
   },
   intent: function(request, fullResponse) {
-    // debugger;
     const session = getSession();
-    var isOmnichannel = session.isOmnichannel();
-    if (isOmnichannel) {
-      session.showOmnichannelUi(strings.OmnichannelNotification);
-    }
 
     var ra = () =>
       fetch

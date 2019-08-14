@@ -122,9 +122,9 @@
         this.set({ checked: checked });
         const val = e.target.value;
         session.upiTab.set({
-          omnichannelSelected: val,
+          omniSelected: val,
         });
-        console.log(session.upiTab.get().omniSelected,'omniSelected')
+        // console.log(session.upiTab.get().omniSelected,'omniSelected',val)
       },
     },
   };
