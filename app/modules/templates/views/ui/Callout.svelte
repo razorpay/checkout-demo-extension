@@ -3,7 +3,7 @@
   class:drishy={visible}
 >
   {#if showIcon}
-    <span>&#x2139;</span>&nbsp;
+    <span>&#x2139;</span>
   {/if}
   <slot></slot>
 </div>
