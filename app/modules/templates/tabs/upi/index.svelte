@@ -380,7 +380,7 @@
        * payment form submission
        */
       radioCheck(type) {
-        if (type == 'phone') {
+        if (type === 'phone') {
           this.set({
             radio: {
               phone: true,
@@ -443,7 +443,7 @@
                 data['_[flow]'] = 'directpay';
                 data.vpa = this.getFullVpa();
               }
-              else if (omnichannelSelected == 'phone') {
+              else if (omnichannelSelected === 'phone') {
                 data['_[flow]'] = 'intent';
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';
