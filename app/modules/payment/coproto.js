@@ -230,11 +230,6 @@ var responseTypes = {
     if (isOmni) {
       session.showOmniChannelUi(strings.OmniNotification);
     }
-    var upiBackCancel = {
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-    };
 
     var ra = () =>
       fetch

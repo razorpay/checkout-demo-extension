@@ -1450,11 +1450,7 @@ Session.prototype = {
           }
 
           self.showLoadError('Payment did not complete.', true);
-          self.clearRequest({
-            '_[method]': 'upi',
-            '_[flow]': 'intent',
-            '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-          });
+          self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
         // Show error and clear request when back is pressed from PSP UPI App
