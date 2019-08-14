@@ -2,7 +2,7 @@
   {retry ? 'Or' : ''} Enter your UPI ID
 </div>
 
-<div id="upi-gpay-vpa">
+<div id="upi-gpay-vpa" class="upi-gpay">
   <Card 
   selected="{radio.vpa}" 
   on:click="handleCardClick(event)">

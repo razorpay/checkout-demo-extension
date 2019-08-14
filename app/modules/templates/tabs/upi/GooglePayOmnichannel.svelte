@@ -2,7 +2,7 @@
   Enter your Mobile Number
 </div>
 
-<div id="upi-gpay-phone">
+<div id="upi-gpay-phone" class="upi-gpay">
   <Card
     selected="{radio.phone}"
     on:click="focus()"
