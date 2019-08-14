@@ -5813,9 +5813,6 @@ Session.prototype = {
       .verifyVpa(vpa, 10000)
       .then(function() {
         $('#overlay-close').show();
-        // self.submit({
-        //   vpaVerified: true,
-        // });
         hideOverlaySafely($('#error-message'));
 
         setTimeout(function() {
