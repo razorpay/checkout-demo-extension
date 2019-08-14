@@ -29,7 +29,7 @@
 </Card>
 
 <style>
-  ref:pspname {
+  ref:pspName {
     color: #424242;
     position: absolute;
     top: 12px;
