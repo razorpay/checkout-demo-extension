@@ -225,8 +225,6 @@ var responseTypes = {
     }
   },
   intent: function(request, fullResponse) {
-    const session = getSession();
-
     var ra = () =>
       fetch
         .jsonp({
