@@ -46,7 +46,7 @@
 </div>
 
 <style>
-  #upi-gpay-contact,
+  #upi-gpay-phone,
   #upi-gpay-vpa {
     display: block;
   }
