@@ -1,22 +1,29 @@
 <div class="legend left" style="margin-top: 18px">
   Enter your UPI ID
 </div>
-<Card selected="{true}" 
-on:click="handleCardClick(event)">
+<Card
+  {selected}
+  on:click="handleCardClick(event)"
+>
   <div id="vpa-wrap" class="{appId}">
     <!-- TODO: use formatter for validation once all fields
       are moved to `Field` -->
-    <Field 
-    type="text" 
-    name="vpa" 
-    id="vpa"
-     ref:vpaField 
-     placeholder={selectedApp? "" : "Enter your UPI Address"} 
-     helpText="Please enter a valid VPA of theform username@bank" 
-     value={selectedApp === null ? vpa : ''}
-    pattern={pattern} required={true} formatter={{ type: 'vpa' }} on:blur />
+    <Field
+      formatter={{ type: 'vpa' }}
+      helpText="Please enter a valid VPA of theform username@bank"
+      id="vpa"
+      name="vpa"
+      pattern={pattern}
+      placeholder={selectedApp? "" : "Enter your UPI Address"}
+      required={true}
+      type="text"
+      value={selectedApp === null ? vpa : ''}
+
+      on:blur
+      ref:vpaField
+    />
     {#if pspHandle}
-    <div ref:pspName>@{pspHandle}</div>
+      <div ref:pspName>@{pspHandle}</div>
     {/if}
   </div>
 </Card>
@@ -51,6 +58,7 @@ on:click="handleCardClick(event)">
     data() {
       return {
         focusOnCreate: false,
+        selected: true,
       };
     },
 
