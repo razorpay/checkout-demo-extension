@@ -1,16 +1,13 @@
 <Tab method="netbanking" pad={false} overrideMethodCheck>
 
   <div id="netb-banks" class="clear grid count-3">
-    {#each netbanks.slice(0, maxGridCount) as bank}
-      <div class="netb-bank item radio-item">
-        <input class="bank-radio" id="bank-radio-{bank.code}" type="radio" name="bank" value={bank.code} bind:group=selectedBankCode>
-        <label for="bank-radio-{bank.code}" class="radio-label mfix">
-          <div class="mchild item-inner">
-            <img src="https://cdn.razorpay.com/bank/{bank.code}.gif">
-            <div>{bank.name}</div>
-          </div>
-        </label>
-      </div>
+    {#each netbanks.slice(0, maxGridCount) as { name, code }}
+      <GridItem
+        {name}
+        {code}
+
+        bind:group=selectedBankCode
+      />
     {/each}
   </div>
 
@@ -61,8 +58,6 @@
 
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-
-import Tab from 'templates/tabs/Tab.svelte';
 
 /**
  * Checks whether the given bank has multiple options (Corporate, Retail)
@@ -133,7 +128,8 @@ const ua_iPhone = /iPhone/.test(ua);
 export default {
 
   components: {
-    Tab
+    Tab: 'templates/tabs/Tab.svelte',
+    GridItem: 'templates/tabs/netbanking/GridItem.svelte'
   },
 
   data() {
