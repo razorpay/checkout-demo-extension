@@ -10,7 +10,7 @@
   >
   <label for="bank-radio-{code}" class="radio-label mfix">
     <div class="mchild item-inner">
-      <img src="https://cdn.razorpay.com/bank/{code}.gif">
+      <img alt="{name} Logo" src="https://cdn.razorpay.com/bank/{code}.gif">
       <div>{name}</div>
     </div>
   </label>
