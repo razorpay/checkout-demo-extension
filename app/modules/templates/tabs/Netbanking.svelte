@@ -20,8 +20,8 @@
       <div class="help">Please select a bank</div>
       <select id="bank-select" name="bank" required class="input" pattern="[\w]+" bind:value=selectedBankCode>
         <option selected="selected" value="">Select a different Bank</option>
-        {#each Object.entries(banks) as [code, name]}
-          <option value={code}>{name}</option>
+        {#each allBanks as bank}
+          <option value={bank.code}>{bank.name}</option>
         {/each}
       </select>
     </div>
@@ -196,6 +196,8 @@ export default {
     corporateSelected: ({ selectedBankCode }) => isCorporateCode(selectedBankCode),
 
     maxGridCount: ({ recurring }) => recurring ? 3 : 6,
+
+    allBanks: ({ banks }) => _Obj.entries(banks).map(([code, name]) => ({ code, name })),
 
     // TODO: downtime ( see Session#checkDown )
   }
