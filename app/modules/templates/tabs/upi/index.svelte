@@ -26,13 +26,41 @@
       </Card>
       {#if selectedApp === 'gpay'}
         {#if useOmnichannel}
-          <GooglePayOmnichannel {isFirst} {radio} on:radiochange="radioCheck('phone')" retry={retryOmnichannel} ref:omnichannelField focusOnCreate error="{retryOmnichannel}"/>
+          <GooglePayOmnichannel
+            error="{retryOmnichannel}"
+            focusOnCreate={true}
+            {isFirst}
+            {radio}
+            retry={retryOmnichannel}
+
+            on:radiochange="radioCheck('phone')"
+            ref:omnichannelField
+          />
         {/if}
         {#if retryOmnichannel || !useOmnichannel}
-          <GooglePayCollect {radio} on:radiochange="radioCheck('vpa')" retry={retryOmnichannel} {pspHandle} ref:vpaField on:blur="trackVpaEntry(event)" on:handleChange="trackHandleSelection(event)" focusOnCreate="{!retryOmnichannel}"/>
+          <GooglePayCollect
+            focusOnCreate="{!retryOmnichannel}"
+            {pspHandle}
+            {radio}
+            retry={retryOmnichannel}
+
+            on:blur="trackVpaEntry(event)"
+            on:handleChange="trackHandleSelection(event)"
+            on:radiochange="radioCheck('vpa')"
+            ref:vpaField
+          />
         {/if}
       {:else}
-        <Collect {vpa} appId="{selectedAppData.id}" ref:vpaField {pspHandle} {selectedApp} on:blur="trackVpaEntry(event)" focusOnCreate/>
+        <Collect
+          appId="{selectedAppData.id}"
+          focusOnCreate={true}
+          {pspHandle}
+          {selectedApp}
+          {vpa}
+
+          on:blur="trackVpaEntry(event)"
+          ref:vpaField
+        />
       {/if}
     {/if}
   {/if}
