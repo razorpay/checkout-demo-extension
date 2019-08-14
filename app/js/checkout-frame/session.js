@@ -5096,12 +5096,14 @@ Session.prototype = {
     }
     return '#form-' + form;
   },
-  retryOmniChannelRespawn: function() {
+
+  retryWithOmnichannel: function() {
     this.upiTab.set({
-      omniSelected: 'phone',
+      omnichannelType: 'phone',
     });
     this.upiTab.setOmnichannelAsRetried();
   },
+
   getFormData: function() {
     var tab = this.tab;
     var data = {};
@@ -5229,6 +5231,7 @@ Session.prototype = {
     this.upiTab.set({
       omnichannelType: 'phone',
     });
+
     setTimeout(function() {
       $('#error-message .link').html('');
     }, 100);
@@ -5259,8 +5262,8 @@ Session.prototype = {
     }
 
     var isOmnichannel = this.isOmnichannel();
-    if (isOmnichannel) {
-      this.retryOmniChannelRespawn();
+    if (isOmnichannel && error) {
+      this.retryWithOmnichannel();
     }
 
     if (!text) {
