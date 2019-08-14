@@ -213,9 +213,16 @@
   const checkOmnichannel = () => {
     const session = getSession();
 
-    return session.preferences &&
+    const hasFeature = session.preferences &&
       session.preferences.features &&
-      session.preferences.features.google_pay_omnichannel;
+      session.preferences.features.google_pay_omnichannel
+
+    // Do not use omnichannel for Payouts
+    if (session.isPayout) {
+      return false;
+    }
+
+    return hasFeature;
   };
 
   export default {
@@ -286,15 +293,15 @@
 
     oncreate() {
       const session = getSession();
-      const isOmnichannel = session.preferences && session.preferences.features && session.preferences.features.google_pay_omnichannel;
 
       checkGPay()
         /* Use Google Pay */
         .then(() => this.set({ useWebPaymentsApi: true }))
         /* Don't use Google Pay */
         .catch(() => this.set({ useWebPaymentsApi: false }));
+
       this.set({
-        useOmnichannel: isOmnichannel
+        useOmnichannel: checkOmnichannel()
       });
 
       /* TODO: improve handling of `prefill.vpa` */
