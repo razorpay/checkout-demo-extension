@@ -144,26 +144,6 @@
     }
   }
 
-  .radio-change {
-    position: absolute;
-    right: 8px;
-    top: 25px;
-    display: inline;
-    cursor: pointer;
-    font-size: 20px;
-    display: none;
-  }
-
-  #pay-radio {
-    position: absolute;
-    right: 8px;
-    top: 25px;
-    display: inline;
-    cursor: pointer;
-    font-size: 20px;
-    display: none;
-  }
-
   &.collapsible {
     .item {
       .upi-gpay {
@@ -186,7 +166,7 @@
       }
 
       &.expanded {
-        #upi-gpay-phone, #upi-gpay-vpa {
+        .upi-gpay {
           .title {
             line-height: inherit;
           }
@@ -213,7 +193,7 @@
       display: none;
     }
 
-    #upi-gpay-phone, #upi-gpay-vpa {
+    .upi-gpay {
       display: block;
     }
 
@@ -262,7 +242,7 @@
   margin-left: -9px;
 }
 
-#upi-gpay-phone, #upi-gpay-vpa {
+.upi-gpay {
   display: none;
 
   &.gpay-mweb .desktop-only, &.gpay-desktop .mweb-only {

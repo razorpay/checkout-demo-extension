@@ -40,8 +40,7 @@
 {/if}
 
 <style>
-  #upi-gpay-phone,
-  #upi-gpay-vpa {
+  .upi-gpay {
     display: block;
   }
 
