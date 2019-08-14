@@ -56,6 +56,7 @@
 
 <script>
 
+import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 
