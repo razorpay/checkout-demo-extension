@@ -45,10 +45,9 @@
   {/if}
 
   {#if recurring}
-    <div class="pad recurring-message">
-      <span>&#x2139;</span>
+    <Callout>
       Future payments from your bank account will be charged automatically.
-    </div>
+    </Callout>
   {/if}
 
 </Tab>
@@ -130,7 +129,8 @@ export default {
 
   components: {
     Tab: 'templates/tabs/Tab.svelte',
-    GridItem: 'templates/tabs/netbanking/GridItem.svelte'
+    GridItem: 'templates/tabs/netbanking/GridItem.svelte',
+    Callout: 'templates/views/ui/Callout.svelte'
   },
 
   data() {
