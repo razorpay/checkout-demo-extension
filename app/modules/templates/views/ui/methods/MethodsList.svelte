@@ -183,7 +183,7 @@
 </style>
 
 <script>
-  /* globals getStore, shouldEnableP13n */
+  /* globals getStore */
   import { getSession } from 'sessionmanager';
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
@@ -223,9 +223,8 @@
        */
       const isInternationalPayPal = session.international && session.methods.paypal;
 
-      if (((shouldEnableP13n(session.get('key')) ||
-        session.get('flashcheckout')) &&
-        session.get().personalization !== false)
+      if (
+        session.get().personalization !== false
         || isInternationalPayPal
       ) {
         session.set('personalization', true);
