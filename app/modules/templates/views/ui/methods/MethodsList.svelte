@@ -176,7 +176,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
-  import PreferencesStore from 'checkoutstore/preferences.js';
+  import PreferencesStore from 'checkoutstore/preferences';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {

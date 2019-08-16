@@ -209,12 +209,12 @@
 </style>
 
 <script>
-  import { getSession } from 'sessionmanager.js';
-  import * as GPay from 'gpay.js';
-  import * as Bridge from 'bridge.js';
-  import DowntimesStore from 'checkoutstore/downtimes.js';
-  import { VPA_REGEX } from 'common/constants.js';
-  import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME, topUpiApps, otherAppsIcon } from 'common/upi.js';
+  import { getSession } from 'sessionmanager';
+  import * as GPay from 'gpay';
+  import * as Bridge from 'bridge';
+  import DowntimesStore from 'checkoutstore/downtimes';
+  import { VPA_REGEX } from 'common/constants';
+  import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME, topUpiApps, otherAppsIcon } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 

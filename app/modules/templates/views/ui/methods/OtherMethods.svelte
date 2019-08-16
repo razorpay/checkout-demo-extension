@@ -48,7 +48,7 @@
 </style>
 
 <script>
-  import DowntimesStore from 'checkoutstore/downtimes.js';
+  import DowntimesStore from 'checkoutstore/downtimes';
   import { getMethodDowntimeDescription, getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
   export default {

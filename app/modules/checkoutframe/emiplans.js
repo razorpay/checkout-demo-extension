@@ -1,5 +1,5 @@
 import EMIPlansView from 'templates/screens/emiplans.svelte';
-import * as TermsCurtain from 'checkoutframe/termscurtain.js';
+import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 
