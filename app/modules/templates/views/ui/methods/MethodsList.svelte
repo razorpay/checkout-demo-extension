@@ -57,7 +57,7 @@
         icon={session.themeMeta.icons['othermethods']}
       >
         <span class="option-title">Other Methods</span>
-        <span style="display: inline;
+        <span style="display: inline-block;
             font-size: 12px; color: #757575; margin-left: 2px">
           | {otherMethodsDetail}
         </span>
