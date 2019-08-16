@@ -168,6 +168,14 @@ export default class MethodsList {
      * but at the end
      */
     if (session.international && session.methods.paypal) {
+      /**
+       * If merchant doesn't want p13n,
+       * data.instruments should contain only PayPal
+       */
+      if (session.get().personalization === false) {
+        data.instruments = [];
+      }
+
       data.instruments =
         data.instruments
         |> _Arr.insertAt(
