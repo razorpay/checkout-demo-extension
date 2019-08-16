@@ -460,7 +460,7 @@
        * String generated dynamically based on the
        * methods available
        *
-       * eg: "Cards, Wallets, UPI, .etc"
+       * eg: "Cards, Wallets, UPI, etc."
        */
       otherMethodsDetail: ({ AVAILABLE_METHODS }) => {
         const preferred = ['card', 'wallet', 'upi'];
