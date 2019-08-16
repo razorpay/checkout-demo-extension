@@ -108,7 +108,12 @@ const filterInstruments = instruments => {
  * Not ready yet to be used everywhere.
  */
 export function _createInstrumentForImmediateUse(data, extraData) {
-  let methodData = {};
+  let methodData = {
+    frequency: 1,
+    id: Track.makeUid(),
+    success: false,
+    timestamp: _.now(),
+  };
   let extractable = INSTRUMENT_PROPS[data.method];
 
   if (!extractable) {
@@ -135,12 +140,6 @@ export function _createInstrumentForImmediateUse(data, extraData) {
     methodData.app_name = app.app_name;
     methodData.app_icon = app.app_icon;
   }
-
-  methodData.id = Track.makeUid();
-
-  methodData.timestamp = _.now();
-  methodData.success = false;
-  methodData.frequency = 1;
 
   return methodData;
 }
