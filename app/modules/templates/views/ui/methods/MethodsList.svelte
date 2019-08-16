@@ -176,6 +176,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
+  import PreferencesStore from 'checkoutstore/preferences.js';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -303,7 +304,8 @@
       instrumentsData: ({ instruments, customer }) => {
         let session = getSession();
         let methods = session.methods;
-        let banks = methods.netbanking;
+        let banks = PreferencesStore.get().methods.netbanking;
+
         if (!methods) {
           return;
         }
