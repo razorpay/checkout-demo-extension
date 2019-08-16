@@ -93,16 +93,19 @@
 
     methods: {
       handleCardClick(event) {
+        this.signalSelect();
+        this.focus();
+      },
+      signalSelect() {
         this.fire('select', {
           type: 'phone'
         });
-
-        this.focus();
       },
       getPhone() {
         return this.refs.phoneField.getValue();
       },
       focus() {
+        this.signalSelect();
         this.refs.phoneField.focus();
       },
       blur() {

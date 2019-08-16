@@ -82,12 +82,16 @@
           return;
         }
 
+        this.signalSelect();
+        this.refs.vpaField.focus();
+      },
+
+      signalSelect () {
         this.fire('select', {
           type: 'vpa'
         });
-
-        this.refs.vpaField.focus();
       },
+
       handlePspChange(event) {
         this.focus();
         const session = getSession();
@@ -98,6 +102,7 @@
         return `${this.refs.vpaField.getValue()}@${pspHandle}`;
       },
       focus() {
+        this.signalSelect();
         this.refs.vpaField.focus();
       },
       blur() {
