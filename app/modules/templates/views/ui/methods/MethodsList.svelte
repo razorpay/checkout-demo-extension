@@ -189,6 +189,20 @@
     return `${text.substring(0, till - 3)}...`;
   };
 
+  /**
+   * Turns word into capital-case
+   * @param {string} word
+   *
+   * @returns {string}
+   */
+  function ucFirstWord (word) {
+    if (word.length) {
+      return `${word[0].toUpperCase()}${word.slice(1)}`;
+    }
+
+    return word;
+  }
+
   export default {
     components: {
       RadioOption: 'templates/views/ui/options/RadioOption.svelte',
@@ -350,10 +364,13 @@
                 } else if (!tokenObj && instrument.issuer) {
                   /* If user logged out after making payent with savedcard */
 
-                  text = `Use your ${trimText(
-                    (banks[instrument.issuer] || '').replace(/ Bank$/, ''),
+                  const bankName = banks && banks[instrument.issuer];
+                  const bankText = bankName && trimText(
+                    bankName.replace(/ Bank$/, ''),
                     instrument.type ? 14 : 19
-                  )} ${instrument.type || ''} card`;
+                  );
+
+                  text = `Use your${bankName ? ` ${bankText}`: ''} ${ucFirstWord(instrument.type || '')} card`;
 
                   if (instrument.network && instrument.network !== 'unknown') {
                     icon = `.networkicon.${findCodeByNetworkName(
@@ -371,10 +388,13 @@
                 var networkCode = findCodeByNetworkName(card.network);
                 instrument.token = tokenObj.token;
 
-                text = `${trimText(
-                  (banks[card.issuer] || '').replace(/ Bank$/, ''),
-                  card.type ? 14 : 19
-                )} ${card.type || ''} card - ${card.last4}`;
+                const bankName = banks && banks[instrument.issuer];
+                const bankText = bankName && trimText(
+                  bankName.replace(/ Bank$/, ''),
+                  instrument.type ? 14 : 19
+                );
+
+                text = `${bankName ? `${bankText} `: ''}${ucFirstWord(card.type || '')} card - ${card.last4}`;
 
                 instrument.cvvDigits = networkCode === 'amex' ? 4 : 3;
 
