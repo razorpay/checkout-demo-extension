@@ -390,10 +390,10 @@
                 var networkCode = findCodeByNetworkName(card.network);
                 instrument.token = tokenObj.token;
 
-                const bankName = banks && banks[instrument.issuer];
+                const bankName = banks && banks[card.issuer];
                 const bankText = bankName && trimText(
                   bankName.replace(/ Bank$/, ''),
-                  instrument.type ? 14 : 19
+                  card.type ? 14 : 19
                 );
 
                 text = `${bankName ? `${bankText} `: ''}${ucFirstWord(card.type || '')} card - ${card.last4}`;
