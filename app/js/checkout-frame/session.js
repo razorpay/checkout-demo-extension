@@ -53,10 +53,6 @@ function gotoAmountScreen() {
   SessionStore.set({ screen: 'amount' });
 }
 
-function shouldEnableP13n(keyId) {
-  return true;
-}
-
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -5820,6 +5816,11 @@ Session.prototype = {
           return this.switchTab('qr');
         }
       }
+    }
+
+    if (data.method === 'paypal') {
+      data.method = 'wallet';
+      data.wallet = 'paypal';
     }
 
     // ask user to verify phone number if not logged in and wants to save card

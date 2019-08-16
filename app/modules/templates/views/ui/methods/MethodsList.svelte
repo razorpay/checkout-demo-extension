@@ -158,6 +158,10 @@
     text-transform: none;
   }
 
+  :global(.no-details) #methods-list .options {
+    margin: 0;
+  }
+
   ref:preferred,
   ref:grid,
   ref:loader {
@@ -179,7 +183,7 @@
 </style>
 
 <script>
-  /* globals getStore, shouldEnableP13n */
+  /* globals getStore */
   import { getSession } from 'sessionmanager';
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
@@ -187,6 +191,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
+  import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -212,17 +217,22 @@
     oncreate() {
       const session = getSession();
 
-      if ((shouldEnableP13n(session.get('key')) ||
-        session.get('flashcheckout')) &&
+      /**
+       * Force p13n for international+paypal
+       * since the UI uses p13n UI
+       */
+      const isInternationalPayPal = session.international && session.methods.paypal;
+
+      if (
         session.get().personalization !== false
+        || isInternationalPayPal
       ) {
         session.set('personalization', true);
       }
 
       const hasOffersOnHomescreen = session.hasOffers && _Arr.any(session.eligibleOffers, offer => offer.homescreen);
 
-      if (
-        !session.get('personalization') ||
+      let shouldDisableP13n = !session.get('personalization') ||
         hasOffersOnHomescreen ||
         session.oneMethod ||
         getStore('optional').contact ||
@@ -231,7 +241,18 @@
         session.upiTpv ||
         session.multiTpv ||
         session.local ||
-        session.isPayout
+        session.isPayout;
+
+      /**
+       * Force p13n for international+paypal
+       * since the UI uses p13n UI
+       */
+      if (isInternationalPayPal) {
+        shouldDisableP13n = false;
+      }
+
+      if (
+        shouldDisableP13n
       ) {
         /* disableP13n is both, the template prop and the class prop */
         this.disableP13n = true;
@@ -310,6 +331,10 @@
           let text = '';
           let icon = '';
           switch (instrument.method) {
+            case 'paypal':
+              text = 'PayPal';
+              icon = session.themeMeta.icons.paypal;
+              break;
             case 'netbanking':
               text = `Netbanking - ${trimText(banks[instrument.bank], 18)} `;
               icon = getBankLogo(instrument.bank);
@@ -434,7 +459,7 @@
        * String generated dynamically based on the
        * methods available
        *
-       * eg: "Cards, Wallets, UPI, .etc"
+       * eg: "Cards, Wallets, UPI, etc."
        */
       otherMethodsDetail: ({ AVAILABLE_METHODS }) => {
         const preferred = ['card', 'wallet', 'upi'];
