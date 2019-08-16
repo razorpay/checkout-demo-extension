@@ -196,7 +196,7 @@
    *
    * @returns {string}
    */
-  function ucFirstWord (word) {
+  function capitalizeWord (word) {
     if (word.length) {
       return `${word[0].toUpperCase()}${word.slice(1)}`;
     }
@@ -372,7 +372,7 @@
                     instrument.type ? 14 : 19
                   );
 
-                  text = `Use your${bankName ? ` ${bankText}`: ''} ${ucFirstWord(instrument.type || '')} card`;
+                  text = `Use your${bankName ? ` ${bankText}`: ''} ${capitalizeWord(instrument.type || '')} card`;
 
                   if (instrument.network && instrument.network !== 'unknown') {
                     icon = `.networkicon.${findCodeByNetworkName(
@@ -396,7 +396,7 @@
                   card.type ? 14 : 19
                 );
 
-                text = `${bankName ? `${bankText} `: ''}${ucFirstWord(card.type || '')} card - ${card.last4}`;
+                text = `${bankName ? `${bankText} `: ''}${capitalizeWord(card.type || '')} card - ${card.last4}`;
 
                 instrument.cvvDigits = networkCode === 'amex' ? 4 : 3;
 
