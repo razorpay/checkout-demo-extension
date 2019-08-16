@@ -149,9 +149,9 @@ export default class MethodsList {
      * This count is also being sent with the
      * p13n:instruments:list event.
      */
-    let noOfInstruments = 2;
+    let noOfInstrumentsToShow = 2;
     if (isMobile()) {
-      noOfInstruments = 3;
+      noOfInstrumentsToShow = 3;
     }
 
     /* Only allow for available methods */
@@ -182,7 +182,7 @@ export default class MethodsList {
           _createInstrumentForImmediateUse({
             method: 'paypal',
           }),
-          noOfInstruments - 1
+          noOfInstrumentsToShow - 1
         )
         |> _Arr.filter(Boolean);
     }
@@ -203,7 +203,7 @@ export default class MethodsList {
       return true;
     });
 
-    data.instruments = _Arr.slice(data.instruments, 0, noOfInstruments);
+    data.instruments = _Arr.slice(data.instruments, 0, noOfInstrumentsToShow);
     data.selected = null;
     this.selectedInstrument = null;
 
