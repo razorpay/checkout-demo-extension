@@ -447,7 +447,6 @@
                 data.contact = this.refs.omnichannelField.getPhone();
                 data.upi_provider = 'google_pay';
               }
-              // TODO: decide which flow to use if retry
             }
           } else {
             data = {
@@ -462,7 +461,6 @@
           if (!data['_[flow]']) {
             data['_[flow]'] = 'directpay';
           }
-          // TODO: set flow for omnichannel?
         }
 
         data.method = 'upi';
