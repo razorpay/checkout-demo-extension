@@ -58,6 +58,7 @@
 import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { iPhone } from 'common/useragent';
 
 /**
  * Checks whether the given bank has multiple options (Corporate, Retail)
@@ -121,10 +122,6 @@ function isCorporateCode(bankCode) {
   return /_C$/.test(bankCode);
 }
 
-// TODO check if this can be obtained from useragent.js
-const ua = navigator.userAgent;
-const ua_iPhone = /iPhone/.test(ua);
-
 export default {
 
   components: {
@@ -172,7 +169,7 @@ export default {
   onupdate({ changed, current }) {
     if (changed.selectedBankCode) {
       const { selectedBankCode } = current;
-      if (ua_iPhone) {
+      if (iPhone) {
         Razorpay.sendMessage({ event: 'blur' });
       }
       Analytics.track('bank:select', {
@@ -181,6 +178,7 @@ export default {
           bank: selectedBankCode,
         },
       });
+
       this.fire('bankSelected', { code: selectedBankCode });
     }
   },
