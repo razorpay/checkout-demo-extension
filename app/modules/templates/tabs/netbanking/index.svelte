@@ -25,7 +25,7 @@
         bind:value=selectedBankCode
       >
         <option selected="selected" value="">Select a different Bank</option>
-        {#each allBanks as bank}
+        {#each banksArr as bank}
           <option value={bank.code}>{bank.name}</option>
         {/each}
       </select>
@@ -202,7 +202,7 @@ export default {
 
     maxGridCount: ({ recurring }) => recurring ? 3 : 6,
 
-    allBanks: ({ banks }) => _Obj.entries(banks)
+    banksArr: ({ banks }) => _Obj.entries(banks)
         .map((entry) => ({ code: entry[0], name: entry[1] })),
 
     // TODO: downtime ( see Session#checkDown )
