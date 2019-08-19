@@ -103,7 +103,6 @@ emandateView.prototype = {
     if (this.prefill.bank && this.banks[this.prefill.bank]) {
       // TODO test this after port to svelte
       this.session.netbankingTab.setSelectedBank(this.prefill.bank);
-      // _Doc.querySelector('#bank-select').value = this.prefill.bank;
       this.setBank(this.prefill.bank);
 
       return 'emandate-netbanking';
