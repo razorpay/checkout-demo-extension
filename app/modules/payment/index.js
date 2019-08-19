@@ -683,6 +683,7 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
   return new Promise((resolve, reject) => {
     let timeoutId;
     let responded = false;
+    const timer = _.now();
 
     Analytics.track('validate:vpa:init', {
       data: eventData,
@@ -695,6 +696,7 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
         }
 
         responded = true;
+        eventData.time = timer();
 
         Analytics.track('validate:vpa:timeout', {
           data: eventData,
@@ -718,6 +720,7 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
         }
 
         responded = true;
+        eventData.time = timer();
 
         /**
          * Consider VPA to be invalid only if API says it is invalid
