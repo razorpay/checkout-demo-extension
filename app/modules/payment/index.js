@@ -684,6 +684,10 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
     let timeoutId;
     let responded = false;
 
+    Analytics.track('validate:vpa:init', {
+      data: eventData,
+    });
+
     if (timeout) {
       timeoutId = setTimeout(() => {
         if (responded) {
