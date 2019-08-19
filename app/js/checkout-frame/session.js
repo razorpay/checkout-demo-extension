@@ -1582,18 +1582,26 @@ Session.prototype = {
   },
 
   setNetbankingTab: function() {
-    // TODO: pass method (emandate/netbanking) as well to remove overrideMethodCheck
-    if (this.methods.netbanking || this.methods.emandate) {
+    var method;
+    if (this.methods.emandate) {
+      method = 'emandate';
+    } else if (this.methods.netbanking) {
+      method = 'netbanking';
+    }
+
+    if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
         data: {
           netbanks: this.netbanks,
           banks: this.methods.emandate || this.methods.netbanking,
+          down: this.down,
           recurring: this.recurring,
+          method: method,
         },
       });
       // Add listener for proceeding automatically only if emandate
-      if (this.methods.emandate) {
+      if (method === 'emandate') {
         this.netbankingTab.on(
           'bankSelected',
           this.proceedAutomaticallyAfterSelectingBank.bind(this)
