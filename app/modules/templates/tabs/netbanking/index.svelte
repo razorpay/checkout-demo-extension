@@ -16,14 +16,19 @@
     <div id="nb-elem" class="elem select" class:invalid>
       <i class="select-arrow"></i>
       <div class="help">Please select a bank</div>
+      <!-- TODO: add input class to select when Session#on is fixed -->
       <select
         id="bank-select"
         name="bank"
         required
-        class="input no-refresh"
+        class="no-refresh"
         pattern="[\w]+"
 
         bind:value=selectedBankCode
+
+        use:focus
+        use:blur
+        use:input
       >
         <option selected="selected" value="">Select a different Bank</option>
         {#each banksArr as bank}
@@ -70,6 +75,26 @@
 
 </Tab>
 
+<style>
+
+/* TODO: this is a workaround for preventing Session#on registering event listeners on the select element. Use the
+    styles from .input once it is fixed. */
+#bank-select {
+  transition: .3s;
+  font-size: inherit;
+  border: none;
+  outline: none;
+  background: none;
+  display: block;
+  width: 100%;
+  line-height: 19px;
+  padding: 28px 0 7px 0;
+  margin: 0;
+  position: relative;
+  color: inherit;
+}
+
+</style>
 
 <script>
 
@@ -77,6 +102,8 @@ import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { iPhone } from 'common/useragent';
+
+import * as InputActions from 'actions/input';
 
 /**
  * Checks whether the given bank has multiple options (Corporate, Retail)
@@ -201,6 +228,31 @@ export default {
         this.fire('bankSelected', { code: selectedBankCode });
       }
     }
+  },
+
+  actions: {
+
+    focus(node) {
+      node.addEventListener('focus', InputActions.focus);
+      return {
+        destroy: _ => node.removeEventListener('focus', InputActions.focus)
+      }
+    },
+
+    blur(node) {
+      node.addEventListener('blur', InputActions.blur);
+      return {
+        destroy: _ => node.removeEventListener('blur', InputActions.blur)
+      }
+    },
+
+    input(node) {
+      node.addEventListener('input', InputActions.input);
+      return {
+        destroy: _ => node.removeEventListener('input', InputActions.input)
+      }
+    }
+
   },
 
   computed: {
