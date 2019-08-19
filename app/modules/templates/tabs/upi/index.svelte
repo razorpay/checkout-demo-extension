@@ -389,8 +389,6 @@
           type
         } = event;
 
-        console.log({ type });
-
         this.set({
           omnichannelType: type
         });

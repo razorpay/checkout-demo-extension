@@ -27,10 +27,12 @@ import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
 
-const isRazorpayFrame = _Str.startsWith(
-  RazorpayConfig.api,
-  `${location.protocol}//${location.hostname}`
-);
+const isRazorpayFrame =
+  true ||
+  _Str.startsWith(
+    RazorpayConfig.api,
+    `${location.protocol}//${location.hostname}`
+  );
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
