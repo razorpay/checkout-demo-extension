@@ -20,8 +20,8 @@
         helpText="Please enter a valid contact no."
         maxlength="{10}"
         value={contact}
-        on:blur="blur()"
-        on:focus="focus()"
+        on:blur="blur(event)"
+        on:focus="focus(event)"
       />
     </div>
   </Card>
@@ -104,12 +104,14 @@
       getPhone() {
         return this.refs.phoneField.getValue();
       },
-      focus() {
+      focus(event) {
         this.signalSelect();
         this.refs.phoneField.focus();
+        this.fire('focus', event);
       },
-      blur() {
+      blur(event) {
         this.refs.phoneField.blur();
+        this.fire('blur', event);
       },
     },
   };
