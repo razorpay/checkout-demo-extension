@@ -12,14 +12,14 @@
   </div>
 
   <div class="elem-wrap pad">
-    <div id="nb-elem" class="elem select invalid">
+    <div id="nb-elem" class="elem select" class:invalid="!selectedBankCode">
       <i class="select-arrow"></i>
       <div class="help">Please select a bank</div>
       <select
         id="bank-select"
         name="bank"
         required
-        class="input"
+        class="input no-refresh"
         pattern="[\w]+"
 
         bind:value=selectedBankCode
@@ -187,7 +187,9 @@ export default {
         },
       });
 
-      this.fire('bankSelected', { code: selectedBankCode });
+      if (selectedBankCode) {
+        this.fire('bankSelected', { code: selectedBankCode });
+      }
     }
   },
 
