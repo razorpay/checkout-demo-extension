@@ -1,3 +1,4 @@
+<!-- TODO: remove override after fixing method check -->
 <Tab method="netbanking" pad={false} overrideMethodCheck>
 
   <div id="netb-banks" class="clear grid count-3">
@@ -12,7 +13,7 @@
   </div>
 
   <div class="elem-wrap pad">
-    <div id="nb-elem" class="elem select" class:invalid="!selectedBankCode">
+    <div id="nb-elem" class="elem select" class:invalid>
       <i class="select-arrow"></i>
       <div class="help">Please select a bank</div>
       <select
@@ -204,6 +205,9 @@ export default {
 
     banksArr: ({ banks }) => _Obj.entries(banks)
         .map((entry) => ({ code: entry[0], name: entry[1] })),
+
+    // Do not show invalid for emandate as the screen changes as soon as bank is selected.
+    invalid: ({ method, selectedBankCode }) => method !== 'emandate' && !selectedBankCode
 
     // TODO: downtime ( see Session#checkDown )
   }
