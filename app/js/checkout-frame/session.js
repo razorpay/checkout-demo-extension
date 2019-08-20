@@ -5515,6 +5515,11 @@ Session.prototype = {
         window.scrollTo(0, 100);
       });
 
+      /**
+       * PayPal as a one-method submits
+       * directly from the homescreen.
+       * Do not switch the tab for it.
+       */
       if (this.oneMethod !== 'paypal') {
         return this.switchTab(this.oneMethod);
       }
@@ -5744,12 +5749,12 @@ Session.prototype = {
         }
       }
     } else if (
-      !(
-        data.method === 'wallet' &&
-        data.wallet === 'paypal' &&
-        this.oneMethod === 'paypal'
-      )
+      data.method === 'wallet' &&
+      data.wallet === 'paypal' &&
+      this.oneMethod === 'paypal'
     ) {
+      // Do not return
+    } else {
       return;
     }
 
@@ -6292,8 +6297,7 @@ Session.prototype = {
     data.amount = this.get('amount');
 
     if (this.oneMethod && this.oneMethod === 'paypal') {
-      data.method = 'wallet';
-      data.wallet = 'paypal';
+      data.method = 'paypal';
     }
 
     return data;
