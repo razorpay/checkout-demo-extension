@@ -183,8 +183,9 @@ function shiftIosPayButtonOnSmallerHeights() {
  */
 function reduceUnneededPaddingIfLandscape() {
   const isLandscape = isDeviceLandscape();
+  const isMobile = UserAgent.isMobile();
 
-  if (isLandscape) {
+  if (isLandscape && isMobile) {
     setTimeout(() => {
       const header = _Doc.querySelector('#header');
       const formCommon = _Doc.querySelector('#form-common');
