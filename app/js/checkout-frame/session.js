@@ -2289,14 +2289,14 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet'].some(function(
-        methodName
-      ) {
-        if (self.methods[methodName]) {
-          self.setOneMethod(methodName);
-          return true;
+      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet', 'paypal'].some(
+        function(methodName) {
+          if (self.methods[methodName]) {
+            self.setOneMethod(methodName);
+            return true;
+          }
         }
-      });
+      );
     }
 
     if (this.upiTpv) {
@@ -5514,7 +5514,10 @@ Session.prototype = {
       setTimeout(function() {
         window.scrollTo(0, 100);
       });
-      return this.switchTab(this.oneMethod);
+
+      if (this.oneMethod !== 'paypal') {
+        return this.switchTab(this.oneMethod);
+      }
     }
 
     preventDefault(e);
@@ -5522,7 +5525,12 @@ Session.prototype = {
     var tab = this.tab;
     var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
-    if (!this.tab && !this.order && !this.p13n) {
+    if (
+      !this.tab &&
+      !this.order &&
+      !this.p13n &&
+      !(this.oneMethod && this.oneMethod === 'paypal')
+    ) {
       return;
     }
 
@@ -5735,9 +5743,16 @@ Session.prototype = {
           }
         }
       }
-    } else {
+    } else if (
+      !(
+        data.method === 'wallet' &&
+        data.wallet === 'paypal' &&
+        this.oneMethod === 'paypal'
+      )
+    ) {
       return;
     }
+
     this.submit();
   },
 
@@ -6275,6 +6290,12 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+
+    if (this.oneMethod && this.oneMethod === 'paypal') {
+      data.method = 'wallet';
+      data.wallet = 'paypal';
+    }
+
     return data;
   },
 
@@ -7061,6 +7082,7 @@ Session.prototype = {
       }
 
       var preferences = response;
+      preferences.methods.wallet.paypal = true;
 
       var validation = self.setPreferences(preferences);
 
