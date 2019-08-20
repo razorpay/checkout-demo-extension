@@ -151,20 +151,30 @@ function shiftIosPayButtonOnSmallerHeights() {
   if (UserAgent.iPhone) {
     setTimeout(() => {
       const footer = _Doc.querySelector('#footer');
-      if (!isDeviceLandscape() && global.innerHeight <= 512) {
+      /**
+       * On Portrait mode,
+       * if the device is short,
+       * shift the pay button.
+       */
+      if (!isDeviceLandscape() && global.screen.height <= 568) {
         _El.addClass(footer, 'shift-ios');
       }
     }, 1000);
 
-    if (UserAgent.Safari) {
+    if (UserAgent.iPhone) {
       global.addEventListener('resize', () => {
-        if (global.innerHeight > 550) {
+        // Device isn't very short. Return.
+        if (global.screen.height > 568) {
           return;
         }
 
         const footer = _Doc.querySelector('#footer');
 
-        // Shift pay button
+        /**
+         * If portrait,
+         * and DOM height does not overflow,
+         * shift Pay button
+         */
         if (
           !isDeviceLandscape() &&
           global.screen.height - global.innerHeight >= 56
