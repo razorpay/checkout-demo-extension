@@ -211,7 +211,7 @@ Formatter.rules = {
     },
 
     isValid: function(value) {
-      if (!value && this) {
+      if (!value) {
         value = this.value;
       }
 
