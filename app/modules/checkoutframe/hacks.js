@@ -141,6 +141,8 @@ function autoScrollHeaderIfLandscape() {
   }
 }
 
+const SHORTEST_IPHONE_HEIGHT = 568; // iPhone 5S
+
 /**
  * On iPhone with smaller heights (iPhone 5S),
  * the pay button is not visible on the web.
@@ -156,7 +158,10 @@ function shiftIosPayButtonOnSmallerHeights() {
        * if the device is short,
        * shift the pay button.
        */
-      if (!isDeviceLandscape() && global.screen.height <= 568) {
+      if (
+        !isDeviceLandscape() &&
+        global.screen.height <= SHORTEST_IPHONE_HEIGHT
+      ) {
         _El.addClass(footer, 'shift-ios');
       }
     }, 1000);
@@ -164,7 +169,7 @@ function shiftIosPayButtonOnSmallerHeights() {
     if (UserAgent.iPhone) {
       global.addEventListener('resize', () => {
         // Device isn't very short. Return.
-        if (global.screen.height > 568) {
+        if (global.screen.height > SHORTEST_IPHONE_HEIGHT) {
           return;
         }
 
