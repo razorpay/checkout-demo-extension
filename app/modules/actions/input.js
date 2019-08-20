@@ -2,7 +2,7 @@
 import { iPhone } from 'common/useragent';
 import Razorpay from 'common/Razorpay';
 
-export function focus(event) {
+function onFocus(event) {
   $(event.target.parentNode).addClass('focused');
   setTimeout(function() {
     $(event.target).scrollIntoView();
@@ -12,7 +12,7 @@ export function focus(event) {
   }
 }
 
-export function blur(event) {
+function onBlur(event) {
   $(event.target.parentNode)
     .removeClass('focused')
     .addClass('mature');
@@ -21,7 +21,7 @@ export function blur(event) {
   }
 }
 
-export function input(event) {
+function onInput(event) {
   const el = event.target;
   const value = el.value;
   const required = isString(el.getAttribute('required'));
@@ -46,4 +46,25 @@ export function input(event) {
     }
   }
   toggleInvalid($parent, valid);
+}
+
+export function focus(node) {
+  node.addEventListener('focus', onFocus);
+  return {
+    destroy: _ => node.removeEventListener('focus', onFocus),
+  };
+}
+
+export function blur(node) {
+  node.addEventListener('blur', onBlur);
+  return {
+    destroy: _ => node.removeEventListener('blur', onBlur),
+  };
+}
+
+export function input(node) {
+  node.addEventListener('input', onInput);
+  return {
+    destroy: _ => node.removeEventListener('blur', onInput),
+  };
 }
