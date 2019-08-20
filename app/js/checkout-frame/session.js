@@ -6665,6 +6665,10 @@ Session.prototype = {
     });
 
     methods.wallet = wallets;
+
+    if (_.isArray(methods.wallet) && methods.wallet.length === 0) {
+      methods.wallet = null;
+    }
   },
 
   /**
