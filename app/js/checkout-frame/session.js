@@ -5748,11 +5748,7 @@ Session.prototype = {
           }
         }
       }
-    } else if (
-      data.method === 'wallet' &&
-      data.wallet === 'paypal' &&
-      this.oneMethod === 'paypal'
-    ) {
+    } else if (data.method === 'paypal' && this.oneMethod === 'paypal') {
       // Do not return
     } else {
       return;
