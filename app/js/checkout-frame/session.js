@@ -7082,7 +7082,6 @@ Session.prototype = {
       }
 
       var preferences = response;
-      preferences.methods.wallet.paypal = true;
 
       var validation = self.setPreferences(preferences);
 
