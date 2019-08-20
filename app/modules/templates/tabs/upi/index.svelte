@@ -33,6 +33,7 @@
             retry={retryOmnichannel}
             selected="{omnichannelType === 'phone'}"
 
+            on:blur="trackOmnichannelEntry(event)"
             on:select="setOmnichannelType(event)"
             ref:omnichannelField
           />
@@ -175,6 +176,7 @@
   import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME, topUpiApps, otherAppsIcon } from 'common/upi.js';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { Formatter } from 'formatter';
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
@@ -220,6 +222,12 @@
     // Do not use omnichannel for Payouts
     if (session.isPayout) {
       return false;
+    }
+
+    if (hasFeature) {
+      Analytics.track('omnichannel', {
+        type: AnalyticsTypes.RENDER
+      });
     }
 
     return hasFeature;
@@ -389,6 +397,13 @@
           type
         } = event;
 
+        Analytics.track('omnichannel:type:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            type,
+          }
+        });
+
         this.set({
           omnichannelType: type
         });
@@ -466,7 +481,13 @@
         return data;
       },
       setOmnichannelAsRetried: function () {
-        this.set({ retryOmnichannel: true });
+        Analytics.track('omnichannel:retry:click', {
+          type: AnalyticsTypes.BEHAV,
+        })
+
+        this.set({
+          retryOmnichannel: true
+        });
       },
       onBack() {
         // User has gone back, set isFirst as false
@@ -605,6 +626,27 @@
             handle,
           }
         });
+      },
+
+      /**
+       * Tracks entry of Omnichannel number
+       * @param {Event} event
+       */
+      trackOmnichannelEntry(event) {
+        const contact = this.refs.omnichannelField.getPhone();
+        let valid = false;
+
+        if (contact) {
+          valid = Formatter.rules.phone.isValid(contact);
+        }
+
+        Analytics.track('omnichannel:fill', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            valid,
+            value: this.refs.omnichannelField.getPhone(),
+          }
+        })
       }
     },
   };
