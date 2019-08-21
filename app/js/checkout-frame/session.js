@@ -1589,6 +1589,8 @@ Session.prototype = {
       method = 'netbanking';
     }
 
+    var prefilledbank = this.get('prefill.bank') || '';
+
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
@@ -1598,6 +1600,7 @@ Session.prototype = {
           down: this.down,
           recurring: this.recurring,
           method: method,
+          selectedBankCode: prefilledbank,
         },
       });
       // Add listener for proceeding automatically only if emandate
@@ -5577,6 +5580,7 @@ Session.prototype = {
         if (this.screen === 'emandate') {
           screen = 'netbanking';
           // TODO test this after porting netbanking
+          debugger;
           data.bank = this.netbankingTab.getSelectedBank();
           data.method = 'emandate';
         }
