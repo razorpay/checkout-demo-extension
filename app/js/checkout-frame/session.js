@@ -3168,6 +3168,10 @@ Session.prototype = {
   },
 
   input: function(el) {
+    if (_El.hasClass(el, 'no-validate')) {
+      return;
+    }
+
     var value = el.value;
     var required = isString(el.getAttribute('required'));
     var pattern = el.getAttribute('pattern');
