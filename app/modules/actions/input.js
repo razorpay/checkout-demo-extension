@@ -2,10 +2,12 @@
 import { iPhone } from 'common/useragent';
 import Razorpay from 'common/Razorpay';
 
+import { scrollIntoView } from 'lib/utils';
+
 function onFocus(event) {
-  $(event.target.parentNode).addClass('focused');
+  _El.addClass(event.target.parentNode, 'focused');
   setTimeout(function() {
-    $(event.target).scrollIntoView();
+    scrollIntoView(event.target);
   }, 1000);
   if (iPhone) {
     Razorpay.sendMessage({ event: 'focus' });
@@ -13,9 +15,9 @@ function onFocus(event) {
 }
 
 function onBlur(event) {
-  $(event.target.parentNode)
-    .removeClass('focused')
-    .addClass('mature');
+  const parent = event.target.parentNode;
+  _El.removeClass(parent, 'focused');
+  _El.addClass(parent, 'mature');
   if (iPhone) {
     Razorpay.sendMessage({ event: 'blur' });
   }
@@ -24,17 +26,18 @@ function onBlur(event) {
 function onInput(event) {
   const el = event.target;
   const value = el.value;
-  const required = isString(el.getAttribute('required'));
+  const required = _.isString(el.getAttribute('required'));
   const pattern = el.getAttribute('pattern');
-  const $parent = $(el.parentNode);
+  const parent = el.parentNode;
 
-  $parent.toggleClass('filled', value);
+  _El.keepClass(parent, 'filled', value);
 
   // validity check past this
   if (!(required || pattern)) {
     return;
   }
-  var valid = true;
+
+  let valid = true;
   if (required && !value) {
     valid = false;
   }
@@ -45,7 +48,7 @@ function onInput(event) {
       valid = new RegExp(pattern).test(value);
     }
   }
-  toggleInvalid($parent, valid);
+  _El.keepClass(parent, 'invalid', !valid);
 }
 
 export function focus(node) {
