@@ -10,6 +10,11 @@ export function scrollIntoView(el) {
   } catch (e) {}
 }
 
+/**
+ * Checks if the element is completely visible in the viewport.
+ * @param el {Element}
+ * @return {boolean}
+ */
 function isElementCompletelyVisible(el) {
   const rect = el.getBoundingClientRect();
 
