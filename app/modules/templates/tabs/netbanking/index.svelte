@@ -21,7 +21,7 @@
         id="bank-select"
         name="bank"
         required
-        class="no-refresh"
+        class="input no-refresh no-validate"
         pattern="[\w]+"
 
         bind:value=selectedBankCode
@@ -74,27 +74,6 @@
   {/if}
 
 </Tab>
-
-<style>
-
-/* TODO: this is a workaround for preventing Session#on registering event listeners on the select element. Use the
-    styles from .input once it is fixed. */
-#bank-select {
-  transition: .3s;
-  font-size: inherit;
-  border: none;
-  outline: none;
-  background: none;
-  display: block;
-  width: 100%;
-  line-height: 19px;
-  padding: 28px 0 7px 0;
-  margin: 0;
-  position: relative;
-  color: inherit;
-}
-
-</style>
 
 <script>
 
