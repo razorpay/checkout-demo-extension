@@ -166,7 +166,8 @@ Formatter.rules = {
         let currentTime = new Date();
         let currentYear = currentTime.getFullYear() - 2000;
         if (currentYear === yearValue) {
-          return parseInt(this.value.slice(0, 2), 10) >= currentTime.getMonth();
+          let currentMonth = parseInt(this.value.slice(0, 2), 10);
+          return currentMonth >= currentTime.getMonth() + 1;
         }
         return yearValue > currentYear;
       }
