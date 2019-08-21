@@ -8,6 +8,7 @@ export function scrollIntoView(el) {
       bringIntoView(el);
     }
   } catch (e) {}
+  return el;
 }
 
 /**
@@ -51,4 +52,6 @@ function bringIntoView(el) {
 
     parent = parent.offsetParent || parent.parentElement;
   }
+
+  return el;
 }
