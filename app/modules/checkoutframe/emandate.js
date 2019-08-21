@@ -101,7 +101,6 @@ emandateView.prototype = {
 
   determineLandingScreen: function() {
     if (this.prefill.bank && this.banks[this.prefill.bank]) {
-      // TODO test this after port to svelte
       this.session.netbankingTab.setSelectedBank(this.prefill.bank);
       this.setBank(this.prefill.bank);
 

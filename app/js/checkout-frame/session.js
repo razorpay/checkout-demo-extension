@@ -5578,9 +5578,8 @@ Session.prototype = {
         }
       } else if (/^emandate/.test(screen)) {
         if (this.screen === 'emandate') {
+          // TODO: looks like dead code, see if this can be removed
           screen = 'netbanking';
-          // TODO test this after porting netbanking
-          debugger;
           data.bank = this.netbankingTab.getSelectedBank();
           data.method = 'emandate';
         }
