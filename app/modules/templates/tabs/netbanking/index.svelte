@@ -39,7 +39,7 @@
   </div>
 
   {#if showCorporateRadio}
-    <div class="pad">
+    <div class="pad" ref:radioContainer>
       <label>Complete Payment Using</label>
       <div class="input-radio">
         <input type="radio" id="nb_type_retail" value="retail" checked={!corporateSelected} on:click=setRetailOption()>
@@ -74,6 +74,18 @@
   {/if}
 
 </Tab>
+
+<style>
+
+ref:radioContainer {
+  margin-top: -6px;
+}
+
+.input-radio:first-of-type {
+  margin-top: 4px;
+}
+
+</style>
 
 <script>
 
