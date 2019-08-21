@@ -31,8 +31,8 @@ function isElementCompletelyVisible(el) {
  * @param {Node} el
  */
 function bringIntoView(el) {
-  var scrollTop;
-  var parent = el.offsetParent || el.parentElement;
+  let scrollTop;
+  let parent = el.offsetParent || el.parentElement;
 
   while (parent && !isElementCompletelyVisible(el)) {
     if (
