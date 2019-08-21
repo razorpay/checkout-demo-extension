@@ -2887,7 +2887,7 @@ Session.prototype = {
        *
        * This _has_ to be fixed in v4, so we'll remove it then.
        */
-      if (Hacks.isDeviceLandscape()) {
+      if (Hacks.isDeviceLandscape() && isMobile()) {
         this.fixLandscapeBug();
       }
 
