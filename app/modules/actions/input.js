@@ -1,4 +1,3 @@
-/* global $, isString, toggleInvalid */
 import { iPhone } from 'common/useragent';
 import Razorpay from 'common/Razorpay';
 
