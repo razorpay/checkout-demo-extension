@@ -1,5 +1,16 @@
-import { createStore } from 'checkoutstore/create';
+/**
+ * Svelte store mimic for Session.
+ */
+function Session() {
+  let sessionState = {
+    screen: '',
+  };
 
-export default createStore({
-  screen: '', // which view should currently be shown
-});
+  this.set = state => {
+    sessionState = state;
+  };
+
+  this.get = () => sessionState;
+}
+
+export default new Session();

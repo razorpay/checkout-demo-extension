@@ -1,3 +1,14 @@
-import { createStore } from 'checkoutstore/create';
+/**
+ * Svelte store mimic for Downtime
+ */
+function Downtimes() {
+  let downtimeState = {};
 
-export default createStore();
+  this.set = state => {
+    downtimeState = state;
+  };
+
+  this.get = () => downtimeState;
+}
+
+export default new Downtimes();

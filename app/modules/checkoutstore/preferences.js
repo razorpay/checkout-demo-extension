@@ -1,3 +1,14 @@
-import { createStore } from 'checkoutstore/create';
+/**
+ * Svelte store mimic for Preference.
+ */
+function Preferences() {
+  let preferenceState = {};
 
-export default createStore();
+  this.set = state => {
+    preferenceState = state;
+  };
+
+  this.get = () => preferenceState;
+}
+
+export default new Preferences();

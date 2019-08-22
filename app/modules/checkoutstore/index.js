@@ -1,42 +1,32 @@
-import { composeStore } from 'checkoutstore/create';
-import Screens from 'checkoutstore/screens';
 import Preferences from 'checkoutstore/preferences.js';
-import SessionStore from 'checkoutstore/session.js';
-import DowntimesStore from 'checkoutstore/downtimes.js';
+import Downtimes from 'checkoutstore/downtimes.js';
 
-const CheckoutStore = composeStore({
-  preferences: Preferences,
-  screens: Screens,
-  session: SessionStore,
-  downtimes: DowntimesStore,
-});
+function CheckoutStore() {
+  let checkoutStoreState = {};
 
-CheckoutStore.compute(
-  'isPartialPayment',
-  ['preferences'],
-  preferences => preferences.order && preferences.order.partial_payment
-);
+  this.set = state => {
+    checkoutStoreState = state;
+  };
 
-CheckoutStore.compute('optional', ['preferences'], preferences => {
-  const optionalObj = {};
-  const optionalArray = preferences.optional;
-  if (optionalArray) {
-    optionalObj.contact = optionalArray |> _Arr.contains('contact');
-    optionalObj.email = optionalArray |> _Arr.contains('email');
-  }
-  return optionalObj;
-});
+  this.get = function() {
+    let preferences = Preferences.get();
+    let downtimes = Downtimes.get();
+    let optionalObj = {};
+    let optionalArray = preferences.optional;
 
-CheckoutStore.compute('contactEmailOptional', ['optional'], optional => {
-  return optional.contact && optional.email;
-});
+    if (optionalArray) {
+      optionalObj.contact = optionalArray |> _Arr.contains('contact');
+      optionalObj.email = optionalArray |> _Arr.contains('email');
+    }
 
-CheckoutStore.compute(
-  'verticalMethods',
-  ['contactEmailOptional', 'isPartialPayment'],
-  (contactEmailOptional, isPartialPayment) => {
-    return contactEmailOptional || isPartialPayment;
-  }
-);
+    checkoutStoreState.optional = optionalObj;
+    checkoutStoreState.preferences = preferences;
+    checkoutStoreState.downtimes = downtimes;
+    checkoutStoreState.isPartialPayment =
+      preferences.order && preferences.order.partial_payment;
 
-export default CheckoutStore;
+    return checkoutStoreState;
+  };
+}
+
+export default new CheckoutStore();
