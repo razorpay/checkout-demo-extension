@@ -39,7 +39,7 @@
   </div>
 
   {#if showCorporateRadio}
-    <div class="pad" ref:radioContainer>
+    <div class="pad" ref:radioContainer transition:fade="{duration: 100}">
       <label>Complete Payment Using</label>
       <div class="input-radio">
         <input type="radio" id="nb_type_retail" value="retail" checked={!corporateSelected} on:click=setRetailOption()>
@@ -103,6 +103,8 @@ import {
   isCorporateCode
 } from 'common/bank';
 
+import { fade } from 'lib/svelte-transitions';
+
 export default {
 
   components: {
@@ -118,6 +120,10 @@ export default {
       corporateOption: '',
       retailOption: ''
     }
+  },
+
+  transitions: {
+    fade
   },
 
   methods: {
