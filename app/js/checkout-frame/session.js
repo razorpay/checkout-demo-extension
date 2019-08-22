@@ -6888,27 +6888,28 @@ Session.prototype = {
     Razorpay.configure(options);
 
     // Get amount
-    var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
-      item
+    var entityWithAmount = _Arr.filter([order, invoice, subscription], function(
+      entity
     ) {
-      return item && _Obj.hasProp(item, 'amount');
+      return entity && _Obj.hasProp(entity, 'amount');
     })[0];
 
-    if (itemWithAmount) {
-      session_options.amount = itemWithAmount.partial_payment
-        ? itemWithAmount.amount_due
-        : itemWithAmount.amount;
+    if (entityWithAmount) {
+      session_options.amount = entityWithAmount.partial_payment
+        ? entityWithAmount.amount_due
+        : entityWithAmount.amount;
     }
 
     // Get currency
-    var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
-      item
-    ) {
-      return item && _Obj.hasProp(item, 'currency');
-    })[0];
+    var entityWithCurrency = _Arr.filter(
+      [order, invoice, subscription],
+      function(entity) {
+        return entity && _Obj.hasProp(entity, 'currency');
+      }
+    )[0];
 
-    if (itemWithCurrency) {
-      session_options.currency = itemWithCurrency.currency;
+    if (entityWithCurrency) {
+      session_options.currency = entityWithCurrency.currency;
     }
 
     // Amount and currency have been updated, set EMI options
