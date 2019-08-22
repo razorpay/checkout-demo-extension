@@ -5754,12 +5754,14 @@ Session.prototype = {
       props = {};
     }
     var vpaVerified = props.vpaVerified;
+    var data = this.payload;
 
     if (this.r._payment) {
-      return;
+      if (data.method !== 'cardless_emi') {
+        return;
+      }
     }
 
-    var data = this.payload;
     var that = this;
     var session = this;
     var request = {
