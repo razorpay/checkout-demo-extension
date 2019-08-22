@@ -3678,7 +3678,9 @@ Session.prototype = {
     var defaultOffer = this.offers.defaultOffer;
     if (defaultOffer && tab) {
       // Don't preselect offer for Cardless EMI homescreen.
-      if (!(tab === 'cardless_emi' && this.screen === 'cardless_emi')) {
+      if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
+        this.preSelectedOffer = null;
+      } else {
         this.preSelectedOffer = defaultOffer;
       }
     }
