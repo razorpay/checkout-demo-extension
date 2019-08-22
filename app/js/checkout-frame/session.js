@@ -6891,7 +6891,7 @@ Session.prototype = {
     var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
       item
     ) {
-      return item && item.amount;
+      return item && _Obj.hasProp(item, 'amount');
     })[0];
 
     if (itemWithAmount) {
@@ -6904,7 +6904,7 @@ Session.prototype = {
     var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
       item
     ) {
-      return item && item.currency;
+      return item && _Obj.hasProp(item, 'currency');
     })[0];
 
     if (itemWithCurrency) {
