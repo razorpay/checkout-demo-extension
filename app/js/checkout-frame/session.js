@@ -5859,22 +5859,57 @@ Session.prototype = {
     }
 
     if (data.method === 'cardless_emi') {
-      if (data.contact && !data.emi_duration) {
-        this.showCardlessEmiPlans();
-        return;
-      }
+      if (this.r._payment) {
+        if (data.contact && !data.emi_duration) {
+          this.showCardlessEmiPlans();
+          return;
+        }
 
-      if (data.provider === 'flexmoney') {
-        delete data.ott;
-      }
+        if (data.provider === 'flexmoney') {
+          delete data.ott;
+        }
 
-      /**
-       * If contact is optional, we want to open a popup and take ott and emi_duration there.
-       */
-      if (!data.contact) {
+        /**
+         * If contact is optional, we want to open a popup and take ott and emi_duration there.
+         */
+        if (!data.contact) {
+          delete data.ott;
+          delete data.emi_duration;
+        }
+      } else {
         delete data.ott;
         delete data.emi_duration;
       }
+
+      this.r.on('payment.process', function(paymentData) {
+        var request = paymentData.request;
+        var response = paymentData.response;
+
+        var content = request.content;
+        var method = content && content.method;
+        var provider = content && content.provider;
+        var emi_duration = content && content.emi_duration;
+
+        // Abort if not Cardless EMI
+        if (method !== 'cardless_emi') {
+          return;
+        }
+
+        // TODO: Verify this flow
+        if (response.emi_plans) {
+          CardlessEmiStore.plans[provider] = response.emi_plans;
+
+          CardlessEmiStore.lenderBranding[provider] =
+            response.lender_branding_url;
+        }
+
+        // TODO: Increase OTP sent count
+
+        if (!emi_duration) {
+          hideOverlayMessage();
+          return session.showCardlessEmiPlans();
+        }
+      });
     }
 
     if (data.method === 'paylater') {
