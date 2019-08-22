@@ -1980,10 +1980,16 @@ Session.prototype = {
 
       on: {
         back: bind(function() {
-          self.switchTab('cardless_emi');
+          var payment = this.r._payment;
+          
+          if (payment && confirmClose()) {
+            this.clearRequest();
+          }
+
+          this.switchTab('cardless_emi');
 
           return true;
-        }),
+        }, this),
 
         select: function(value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
@@ -3995,7 +4001,11 @@ Session.prototype = {
       tab = '';
     }
 
-    if (tab === 'wallet' && this.screen === 'otp' && this.r._payment) {
+    var walletOtpPage =
+      tab === 'wallet' && this.screen === 'otp' && this.r._payment;
+    var cardlessEmiOtpPage =
+      tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
+    if (walletOtpPage || cardlessEmiOtpPage) {
       if (!confirmClose()) {
         return;
       }
