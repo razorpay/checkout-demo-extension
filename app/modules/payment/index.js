@@ -715,6 +715,13 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
       callback: function(response) {
         clearInterval(timeoutId);
 
+        // Track that we got a response
+        Analytics.track('validate:vpa:response', {
+          data: {
+            time: timer(),
+          },
+        });
+
         if (responded) {
           return;
         }
