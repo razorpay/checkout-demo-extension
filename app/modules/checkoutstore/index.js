@@ -18,7 +18,6 @@ function CheckoutStore() {
       optionalObj.contact = optionalArray |> _Arr.contains('contact');
       optionalObj.email = optionalArray |> _Arr.contains('email');
     }
-
     checkoutStoreState.optional = optionalObj;
     checkoutStoreState.preferences = preferences;
     checkoutStoreState.downtimes = downtimes;
