@@ -6932,7 +6932,8 @@ Session.prototype = {
           contact: this.get('prefill.contact') || '9999999999',
           email: this.get('prefill.email') || 'void@razorpay.com',
           bank: order.bank,
-          method: 'netbanking',
+          method: this.recurring ? 'emandate' : 'netbanking',
+          amount: session_options.amount,
         },
         {
           fee: preferences.fee_bearer,
