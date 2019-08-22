@@ -5757,7 +5757,27 @@ Session.prototype = {
     var data = this.payload;
 
     if (this.r._payment) {
-      if (data.method !== 'cardless_emi') {
+      /**
+       * For Cardless EMI, payments are created at the first step,
+       * before the user gets to select a plan.
+       * Thus, we would need to submit again after the
+       * user has created a plan, even though the payment
+       * is already created.
+       *
+       * This does not happen for any other method.
+       */
+      if (data.method === 'cardless_emi') {
+        data.payment_id = this.r._payment.payment_id;
+
+        /**
+         * If emi_duration is present, this is the final
+         * payment submit request.
+         * Clear existing payments.
+         */
+        if (data.emi_duration) {
+          this.r._payment.clear();
+        }
+      } else {
         return;
       }
     }
@@ -5859,7 +5879,7 @@ Session.prototype = {
     }
 
     if (data.method === 'cardless_emi') {
-      if (this.r._payment) {
+      if (data.payment_id) {
         if (data.contact && !data.emi_duration) {
           this.showCardlessEmiPlans();
           return;
