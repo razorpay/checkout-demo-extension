@@ -2486,8 +2486,11 @@ Session.prototype = {
     }
 
     var otpProvider;
+    var paymentExists = Boolean(this.r._payment);
+    var isCardlessEmiPayment =
+      this.payload && this.payload.method === 'cardless_emi';
 
-    if (!this.r._payment) {
+    if (!paymentExists || isCardlessEmiPayment) {
       /**
        * If we're resending the OTP without any payment being created,
        * it's a Razorpay OTP.
