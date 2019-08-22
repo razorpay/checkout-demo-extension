@@ -1981,7 +1981,7 @@ Session.prototype = {
       on: {
         back: bind(function() {
           var payment = this.r._payment;
-          
+
           if (payment && confirmClose()) {
             this.clearRequest();
           }
@@ -2029,75 +2029,22 @@ Session.prototype = {
     tab_titles.otp = topbarImages;
 
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
-    this.customer.checkStatus(
-      function(response) {
-        if (self.screen !== 'otp' && self.tab !== 'cardless_emi') {
-          return;
-        }
 
-        if (response.error && response.error.description) {
-          self.showLoadError(response.error.description, true);
-          Analytics.track('cardless_emi:plans:fetch:error', {
-            data: {
-              provider: providerCode,
-            },
-          });
-          return;
-        }
+    if (this.screen !== 'otp' && this.tab !== 'cardless_emi') {
+      return;
+    }
 
-        if (response.success && response.emi_plans) {
-          CardlessEmiStore.plans[providerCode] = response.emi_plans;
+    var otpMessage =
+      'Enter the OTP sent on ' +
+      getPhone() +
+      '<br>' +
+      ' to get EMI plans for' +
+      cardlessEmiProviderObj.name;
 
-          CardlessEmiStore.lenderBranding[providerCode] =
-            response.lender_branding_url;
+    askOTP(self.otpView, otpMessage, true);
 
-          self.showCardlessEmiPlans();
-          return;
-        }
-
-        // TODO: Remove this condition if event is not being fired.
-        if (!response.saved) {
-          var errorDesc =
-            'Could not find a ' +
-            cardlessEmiProviderObj.name +
-            ' account associated with ' +
-            getPhone();
-
-          self.showLoadError(errorDesc, true);
-
-          Analytics.track('cardless_emi:plans:fetch:error', {
-            data: {
-              provider: providerCode,
-            },
-          });
-
-          return;
-        }
-
-        var otpMessage =
-          'Enter the OTP sent on ' +
-          getPhone() +
-          '<br>' +
-          ' to get EMI plans for' +
-          cardlessEmiProviderObj.name;
-
-        askOTP(self.otpView, otpMessage, true);
-
-        self.otpView.updateScreen({
-          allowSkip: false,
-        });
-      },
-      {
-        provider: providerCode,
-        amount: self.get('amount'),
-      },
-      getPhone()
-    );
-
-    Analytics.track('cardless_emi:plans:fetch:start', {
-      data: {
-        provider: providerCode,
-      },
+    self.otpView.updateScreen({
+      allowSkip: false,
     });
   },
 
@@ -5390,43 +5337,47 @@ Session.prototype = {
     }
 
     var queryParams;
-
-    // card tab only past this
     var callback;
-    // card filled by logged out user + remember me
-    if (this.payload) {
-      var isRedirect = this.get('redirect');
-      if (!isRedirect) {
-        this.submit();
-      }
-      callback = function(msg) {
-        if (this.customer.logged) {
-          if (isRedirect) {
-            this.submit();
+
+    var isCardlessEmi = this.payload && this.payload.method !== 'cardless_emi';
+
+    if (!isCardlessEmi) {
+      // card tab only past this
+      // card filled by logged out user + remember me
+      if (this.payload) {
+        var isRedirect = this.get('redirect');
+        if (!isRedirect) {
+          this.submit();
+        }
+        callback = function(msg) {
+          if (this.customer.logged) {
+            if (isRedirect) {
+              this.submit();
+            } else {
+              this.r.emit('payment.resume');
+            }
+            this.showLoadError();
           } else {
-            this.r.emit('payment.resume');
+            this.r.emit('payment.error', discreet.error(msg));
+            Analytics.track('behav:otp:incorrect', {
+              wallet: this.tab === 'wallet',
+            });
+            askOTP(this.otpView, msg, true);
           }
-          this.showLoadError();
-        } else {
-          this.r.emit('payment.error', discreet.error(msg));
-          Analytics.track('behav:otp:incorrect', {
-            wallet: this.tab === 'wallet',
-          });
-          askOTP(this.otpView, msg, true);
-        }
-      };
-    } else {
-      var self = this;
-      callback = function(msg) {
-        if (self.customer.logged) {
-          self.showCardTab();
-        } else {
-          Analytics.track('behav:otp:incorrect', {
-            wallet: self.tab === 'wallet',
-          });
-          askOTP(this.otpView, msg, true);
-        }
-      };
+        };
+      } else {
+        var self = this;
+        callback = function(msg) {
+          if (self.customer.logged) {
+            self.showCardTab();
+          } else {
+            Analytics.track('behav:otp:incorrect', {
+              wallet: self.tab === 'wallet',
+            });
+            askOTP(this.otpView, msg, true);
+          }
+        };
+      }
     }
 
     var submitPayload = {
@@ -5437,10 +5388,11 @@ Session.prototype = {
     if (this.tab === 'cardless_emi') {
       var providerCode = CardlessEmiStore.providerCode;
 
-      queryParams = {
+      submitPayload = _Obj.extend(submitPayload, {
         provider: providerCode,
         method: 'cardless_emi',
-      };
+        payment_id: this.r._payment.payment_id,
+      });
 
       callback = function(msg, data) {
         if (msg) {
