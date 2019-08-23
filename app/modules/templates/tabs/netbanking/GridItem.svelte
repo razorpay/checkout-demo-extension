@@ -1,4 +1,4 @@
-<div class="netb-bank item radio-item" id="bank-item-{code}" down={Boolean(downtime)}>
+<div class="netb-bank item radio-item" id="bank-item-{code}" down={Boolean(downtime)} class:has-tooltip="downtime">
   <input
     class="bank-radio"
     id="bank-radio-{code}"
@@ -16,9 +16,10 @@
     {#if downtime}
       <span class="downtime">
         <Tooltip
-          bindTo="#bank-item-{code}"
+          bindTo="#netb-banks"
           class="downtime-tooltip"
           align={['bottom']}
+          alignOnHover="true"
         >
           Down
         </Tooltip>
@@ -26,6 +27,12 @@
     {/if}
   </label>
 </div>
+
+<style>
+  .netb-bank {
+    overflow: visible;
+  }
+</style>
 
 <script>
 
