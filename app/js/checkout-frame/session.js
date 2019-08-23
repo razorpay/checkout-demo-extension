@@ -6888,27 +6888,28 @@ Session.prototype = {
     Razorpay.configure(options);
 
     // Get amount
-    var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
-      item
+    var entityWithAmount = _Arr.filter([order, invoice, subscription], function(
+      entity
     ) {
-      return item && item.amount;
+      return entity && _Obj.hasProp(entity, 'amount');
     })[0];
 
-    if (itemWithAmount) {
-      session_options.amount = itemWithAmount.partial_payment
-        ? itemWithAmount.amount_due
-        : itemWithAmount.amount;
+    if (entityWithAmount) {
+      session_options.amount = entityWithAmount.partial_payment
+        ? entityWithAmount.amount_due
+        : entityWithAmount.amount;
     }
 
     // Get currency
-    var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
-      item
-    ) {
-      return item && item.currency;
-    })[0];
+    var entityWithCurrency = _Arr.filter(
+      [order, invoice, subscription],
+      function(entity) {
+        return entity && _Obj.hasProp(entity, 'currency');
+      }
+    )[0];
 
-    if (itemWithCurrency) {
-      session_options.currency = itemWithCurrency.currency;
+    if (entityWithCurrency) {
+      session_options.currency = entityWithCurrency.currency;
     }
 
     // Amount and currency have been updated, set EMI options
@@ -6927,17 +6928,26 @@ Session.prototype = {
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
-      return this.r.createPayment(
-        {
-          contact: this.get('prefill.contact') || '9999999999',
-          email: this.get('prefill.email') || 'void@razorpay.com',
-          bank: order.bank,
-          method: 'netbanking',
-        },
-        {
-          fee: preferences.fee_bearer,
-        }
-      );
+
+      var paymentPayload = {
+        contact: this.get('prefill.contact') || '9999999999',
+        email: this.get('prefill.email') || 'void@razorpay.com',
+        bank: order.bank,
+        amount: session_options.amount,
+      };
+
+      if (this.recurring) {
+        var recurringValue = this.get('recurring');
+        paymentPayload.recurring = isString(recurringValue)
+          ? recurringValue
+          : 1;
+      } else {
+        paymentPayload.method = 'netbanking';
+      }
+
+      return this.r.createPayment(paymentPayload, {
+        fee: preferences.fee_bearer,
+      });
     }
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
