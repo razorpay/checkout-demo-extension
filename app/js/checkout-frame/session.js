@@ -5923,6 +5923,10 @@ Session.prototype = {
     }
 
     if (data.method === 'cardless_emi') {
+      if (data.provider === 'flexmoney') {
+        delete data.ott;
+      }
+
       if (data.payment_id) {
         if (data.contact && !data.emi_duration) {
           this.showCardlessEmiPlans();
