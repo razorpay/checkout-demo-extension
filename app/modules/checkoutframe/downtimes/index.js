@@ -116,6 +116,7 @@ export function getDowntimes(preferences) {
     preferences.payment_downtime &&
     preferences.payment_downtime.items &&
     preferences.payment_downtime.items.length;
+
   if (!hasDowntimes) {
     return downtimes;
   }
@@ -124,7 +125,15 @@ export function getDowntimes(preferences) {
     preferences.payment_downtime.items
     |> groupDowntimesByMethod
     |> copyMethodsIfNeeded;
+
   downtimes.disabled = getDisabledMethods(downtimes);
 
   return downtimes;
+}
+
+export function groupNetbankingDowntimesByBank(downtimes = []) {
+  return downtimes.reduce((acc, downtime) => {
+    acc[downtime.instrument.bank] = downtime;
+    return acc;
+  }, {});
 }
