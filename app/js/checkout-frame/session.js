@@ -6928,18 +6928,26 @@ Session.prototype = {
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
-      return this.r.createPayment(
-        {
-          contact: this.get('prefill.contact') || '9999999999',
-          email: this.get('prefill.email') || 'void@razorpay.com',
-          bank: order.bank,
-          method: this.recurring ? 'emandate' : 'netbanking',
-          amount: session_options.amount,
-        },
-        {
-          fee: preferences.fee_bearer,
-        }
-      );
+
+      var paymentPayload = {
+        contact: this.get('prefill.contact') || '9999999999',
+        email: this.get('prefill.email') || 'void@razorpay.com',
+        bank: order.bank,
+        amount: session_options.amount,
+      };
+
+      if (this.recurring) {
+        var recurringValue = this.get('recurring');
+        paymentPayload.recurring = isString(recurringValue)
+          ? recurringValue
+          : 1;
+      } else {
+        paymentPayload.method = 'netbanking';
+      }
+
+      return this.r.createPayment(paymentPayload, {
+        fee: preferences.fee_bearer,
+      });
     }
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {
