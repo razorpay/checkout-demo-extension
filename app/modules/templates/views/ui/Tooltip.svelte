@@ -190,10 +190,11 @@
   export default {
     data: function () {
       return {
-        bindTo: '#body',
-        autoAlign: true,
-        align: ['right'],
-        shown: false,
+        bindTo: '#body', // Where should the alignment be bound to?
+        autoAlign: true, // Should align automatically after mounting?
+        align: ['right'], // Default alignment directions
+        shown: false, // Is it shown?
+        alignOnHover: false, // Should we align again when parent is hovered on?
       }
     },
 
@@ -239,6 +240,67 @@
         });
 
         this.setAlignmentClasses();
+      },
+
+      /**
+       * Returns the first parent with 'has-tooltip' class
+       *
+       * @returns {Element}
+       */
+      getHoverParent: function () {
+        let parent = this.refs.tooltip;
+
+        while (!_El.hasClass(parent, 'has-tooltip')) {
+          parent = _El.parent(parent);
+        }
+
+        return parent;
+      },
+
+      /**
+       * Adds alignment listener on hover parent.
+       */
+      addAlignmentListenerFromHoverParent: function () {
+        const {
+          alignOnHover,
+        } = this.get();
+
+        if (!alignOnHover) {
+          return;
+        }
+
+        let hoverParent = this.getHoverParent();
+
+        if (!hoverParent) {
+          return;
+        }
+
+        const boundAlign = this.setBounds.bind(this);
+
+        hoverParent.addEventListener('mouseover', boundAlign);
+
+        this.set({
+          boundAlign,
+          hoverParent,
+        });
+      },
+
+      /**
+       * Removes alignment listener on hover parent.
+       */
+      removeAlignmentListenerFromHoverParent: function () {
+        const {
+          alignOnHover,
+          boundAlign,
+          hoverParent
+        } = this.get();
+
+        if (!alignOnHover || !hoverParent || !boundAlign) {
+          return;
+        }
+
+        // TODO: Check if 'mouseover' suffices for mobile
+        hoverParent.removeEventListener('mouseover', boundAlign);
       }
     },
 
@@ -246,7 +308,12 @@
       setTimeout(() => {
         this.setAlignmentClasses();
         this.setBounds();
+        this.addAlignmentListenerFromHoverParent();
       });
-    }
+    },
+
+    ondestroy: function () {
+      this.removeAlignmentListenerFromHoverParent();
+    },
   }
 </script>
