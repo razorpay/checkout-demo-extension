@@ -1,11 +1,11 @@
 <!-- TODO: remove override after fixing method check -->
 <Tab method="netbanking" pad={false} overrideMethodCheck>
-
   <div id="netb-banks" class="clear grid count-3">
     {#each netbanks.slice(0, maxGridCount) as { name, code }}
       <GridItem
         {name}
         {code}
+        downtime={downtimes[code]}
 
         bind:group=selectedBankCode
       />
@@ -16,7 +16,6 @@
     <div id="nb-elem" class="elem select" class:invalid>
       <i class="select-arrow"></i>
       <div class="help">Please select a bank</div>
-      <!-- TODO: add input class to select when Session#on is fixed -->
       <select
         id="bank-select"
         name="bank"
@@ -30,7 +29,7 @@
         use:blur
         use:input
       >
-        <option selected="selected" value="">Select a different Bank</option>
+        <option value="">Select a different Bank</option>
         {#each banksArr as bank}
           <option value={bank.code}>{bank.name}</option>
         {/each}
@@ -58,12 +57,14 @@
     </div>
   {/if}
 
+  <!-- Show recurring message for recurring payments -->
   {#if recurring}
     <Callout>
       Future payments from your bank account will be charged automatically.
     </Callout>
   {/if}
 
+  <!-- Show downtime message if the selected bank is down -->
   {#if showDown}
     <div class="down">
       <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 24 24">
@@ -94,6 +95,9 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { iPhone } from 'common/useragent';
 
+import DowntimesStore from 'checkoutstore/downtimes';
+import { groupNetbankingDowntimesByBank } from 'checkoutframe/downtimes';
+
 import * as InputActions from 'actions/input';
 
 import {
@@ -118,7 +122,8 @@ export default {
       selectedBankCode: '',
       showCorporateRadio: false,
       corporateOption: '',
-      retailOption: ''
+      retailOption: '',
+      downtimes: {}
     }
   },
 
@@ -159,17 +164,34 @@ export default {
       if (iPhone) {
         Razorpay.sendMessage({ event: 'blur' });
       }
-      Analytics.track('bank:select', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          bank: selectedBankCode,
-        },
-      });
 
       if (selectedBankCode) {
+        Analytics.track('bank:select', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            bank: selectedBankCode,
+          },
+        });
         this.fire('bankSelected', { code: selectedBankCode });
       }
     }
+  },
+
+  oncreate() {
+    const { banksArr } = this.get();
+
+
+    const downtimes = DowntimesStore.get();
+    const netbankingDowntimes = groupNetbankingDowntimesByBank(downtimes.netbanking);
+
+    this.set({ downtimes: netbankingDowntimes });
+
+    // If there is only one bank available, select it
+    if (banksArr.length === 1) {
+      this.setSelectedBank(banksArr[0].code);
+    }
+
+
   },
 
   actions: {
@@ -185,15 +207,16 @@ export default {
 
     corporateSelected: ({ selectedBankCode }) => isCorporateCode(selectedBankCode),
 
+    // For eMandate, we show only the top 3 banks.
     maxGridCount: ({ recurring }) => recurring ? 3 : 6,
 
-    banksArr: ({ banks }) => _Obj.entries(banks)
-        .map((entry) => ({ code: entry[0], name: entry[1] })),
+    banksArr: ({ banks, downtimes }) => _Obj.entries(banks)
+        .map((entry) => ({ code: entry[0], name: entry[1], downtime: downtimes[entry[0]] })),
 
-    // Do not show invalid for emandate as the screen changes as soon as bank is selected.
-    invalid: ({ method, selectedBankCode }) => method !== 'emandate' && !selectedBankCode,
+    // // Do not show invalid for emandate as the screen changes as soon as bank is selected.
+    invalid: ({ method, selectedBankCode }) => !selectedBankCode,
 
-    showDown: ({ down, selectedBankCode }) => down && down.indexOf(selectedBankCode) !== -1
+    showDown: ({ down, selectedBankCode }) => down && down.indexOf(selectedBankCode) !== -1,
 
   }
 
