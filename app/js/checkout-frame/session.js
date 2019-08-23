@@ -130,6 +130,7 @@ var CardlessEmiStore = {
   loanUrls: {},
   ott: {},
   lenderBranding: {},
+  urls: {},
 };
 
 var PayLaterStore = {
@@ -2034,18 +2035,34 @@ Session.prototype = {
       return;
     }
 
-    var otpMessage =
-      'Enter the OTP sent on ' +
-      getPhone() +
-      '<br>' +
-      ' to get EMI plans for' +
-      cardlessEmiProviderObj.name;
+    var callback = function() {
+      var otpMessage =
+        'Enter the OTP sent on ' +
+        getPhone() +
+        '<br>' +
+        ' to get EMI plans for' +
+        cardlessEmiProviderObj.name;
 
-    askOTP(self.otpView, otpMessage, true);
+      askOTP(self.otpView, otpMessage, true);
 
-    self.otpView.updateScreen({
-      allowSkip: false,
-    });
+      self.otpView.updateScreen({
+        allowSkip: false,
+      });
+    };
+
+    var resend = params.resend;
+    var resendUrl =
+      CardlessEmiStore.urls[providerCode] &&
+      CardlessEmiStore.urls[providerCode].resend_otp;
+
+    if (resend && resendUrl) {
+      fetch({
+        url: resendUrl,
+        callback: callback,
+      });
+    } else {
+      callback();
+    }
   },
 
   checkCustomerStatus: function(params, callback) {
@@ -2481,7 +2498,9 @@ Session.prototype = {
 
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'cardless_emi') {
-      this.fetchCardlessEmiPlans();
+      this.fetchCardlessEmiPlans({
+        resend: true,
+      });
     } else if (this.tab === 'paylater') {
       this.askPayLaterOtp('resend');
     } else if (this.tab === 'wallet') {
@@ -5921,6 +5940,16 @@ Session.prototype = {
 
           CardlessEmiStore.lenderBranding[provider] =
             response.lender_branding_url;
+        }
+
+        // Store the Resend URL
+        if (response.resend_url) {
+          // Init empty store if one doesn't exist
+          if (!CardlessEmiStore.urls[provider]) {
+            CardlessEmiStore.urls[provider] = {};
+          }
+
+          CardlessEmiStore.urls[provider].resend_otp = response.resend_url;
         }
 
         // TODO: Increase OTP sent count
