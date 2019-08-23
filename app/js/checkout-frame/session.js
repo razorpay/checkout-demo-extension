@@ -741,6 +741,8 @@ function errorHandler(response) {
     }
   }
 
+  var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
+
   this.clearRequest();
 
   /* don't attempt magic if failed for the first time */
@@ -813,6 +815,10 @@ function errorHandler(response) {
 
   if (/^magic*/.test(this.screen)) {
     this.switchTab('card');
+  }
+
+  if (isCardlessEmi) {
+    this.switchTab('cardless_emi');
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
@@ -5953,7 +5959,7 @@ Session.prototype = {
           return;
         }
 
-        // TODO: Verify this flow
+        // Handle receiving emi_plans in the pilot payment create request
         if (response.emi_plans) {
           CardlessEmiStore.plans[provider] = response.emi_plans;
 
