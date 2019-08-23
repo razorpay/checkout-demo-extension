@@ -2043,6 +2043,7 @@ Session.prototype = {
       askOTP(self.otpView, otpMessage, true);
 
       self.otpView.updateScreen({
+        allowResend: OtpService.canSendOtp('razorpay'),
         allowSkip: false,
       });
     };
@@ -2053,10 +2054,19 @@ Session.prototype = {
       CardlessEmiStore.urls[providerCode].resend_otp;
 
     if (resend && resendUrl) {
+      Analytics.track('otp:resend', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          cardless_emi: providerCode,
+        },
+      });
+
       fetch({
         url: resendUrl,
         callback: callback,
       });
+
+      OtpService.markOtpSent('razorpay');
     } else {
       callback();
     }
@@ -5949,7 +5959,8 @@ Session.prototype = {
           CardlessEmiStore.urls[provider].resend_otp = response.resend_url;
         }
 
-        // TODO: Increase OTP sent count
+        // Increase OTP sent count
+        OtpService.markOtpSent('razorpay');
 
         if (!emi_duration) {
           hideOverlayMessage();
