@@ -37,7 +37,8 @@ var preferences = window.preferences,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi,
   PayLater = discreet.PayLater,
-  PayLaterView = discreet.PayLaterView;
+  PayLaterView = discreet.PayLaterView,
+  OtpService = discreet.OtpService;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -943,9 +944,7 @@ function askOTP(view, text, shouldLimitResend) {
     action: false,
     otp: '',
     allowSkip: !Boolean(thisSession.recurring),
-    allowResend: shouldLimitResend
-      ? discreet.OtpService.canSendOtp('razorpay')
-      : true,
+    allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   });
 
   $('#body').addClass('sub');
@@ -960,9 +959,7 @@ function askOTP(view, text, shouldLimitResend) {
             var metadata = origText.metadata;
             thisSession.headlessMetadata = metadata;
 
-            discreet.OtpService.markOtpSent(
-              metadata.issuer || metadata.network
-            );
+            OtpService.markOtpSent(metadata.issuer || metadata.network);
 
             var bankLogo;
             if (metadata.issuer) {
@@ -2466,7 +2463,7 @@ Session.prototype = {
         this.headlessMetadata.issuer || this.headlessMetadata.network;
     }
 
-    var otpSentCount = discreet.OtpService.getCount(otpProvider);
+    var otpSentCount = OtpService.getCount(otpProvider);
     var resendEventData = {
       wallet: this.tab === 'wallet',
       headless: this.headless,
@@ -2490,7 +2487,7 @@ Session.prototype = {
       if (this.headlessMetadata) {
         var metadata = this.headlessMetadata;
 
-        discreet.OtpService.markOtpSent(metadata.issuer || metadata.network);
+        OtpService.markOtpSent(metadata.issuer || metadata.network);
       }
 
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
@@ -6809,7 +6806,7 @@ Session.prototype = {
 
     if (this.headlessMetadata) {
       var metadata = this.headlessMetadata;
-      discreet.OtpService.resetCount(metadata.issuer || metadata.network);
+      OtpService.resetCount(metadata.issuer || metadata.network);
 
       this.headlessMetadata = null;
     }
