@@ -5511,6 +5511,10 @@ Session.prototype = {
 
     this.destroyMagic();
 
+    if (this.payload && this.payload.method === 'cardless_emi') {
+      this.resetCardlessEmiStoreForProvider(this.payload.provider);
+    }
+
     this.isResumedPayment = false;
     this.doneByP13n = false;
     this.payload = null;
@@ -5526,6 +5530,21 @@ Session.prototype = {
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
+  },
+
+  /**
+   * Removes items from the CardlessEmiStore
+   * corresponding to the given provider.
+   * @param {string} provider
+   */
+  resetCardlessEmiStoreForProvider: function(provider) {
+    if (!provider) {
+      return;
+    }
+
+    _Obj.loop(CardlessEmiStore, function(value, key) {
+      delete value[provider];
+    });
   },
 
   preSubmit: function(e) {
