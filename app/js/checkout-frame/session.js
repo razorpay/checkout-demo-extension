@@ -741,8 +741,6 @@ function errorHandler(response) {
     }
   }
 
-  var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
-
   this.clearRequest();
 
   /* don't attempt magic if failed for the first time */
@@ -815,10 +813,6 @@ function errorHandler(response) {
 
   if (/^magic*/.test(this.screen)) {
     this.switchTab('card');
-  }
-
-  if (isCardlessEmi) {
-    this.switchTab('cardless_emi');
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
@@ -6232,6 +6226,16 @@ Session.prototype = {
           });
         }
       });
+    }
+
+    /**
+     * For Cardless EMI payments,
+     * if this is the final payment request,
+     * take the user back to the cardless EMI screen
+     * from the plans screen
+     */
+    if (data.method === 'cardless_emi' && data.emi_duration) {
+      this.switchTab('cardless_emi');
     }
 
     if (this.powerwallet) {
