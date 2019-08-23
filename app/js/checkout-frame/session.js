@@ -5379,6 +5379,9 @@ Session.prototype = {
         }
         callback = function(msg) {
           if (this.customer.logged) {
+            // OTP verification successful
+            OtpService.resetCount('razorpay');
+
             if (isRedirect) {
               this.submit();
             } else {
@@ -5397,6 +5400,9 @@ Session.prototype = {
         var self = this;
         callback = function(msg) {
           if (self.customer.logged) {
+            // OTP verification successful
+            OtpService.resetCount('razorpay');
+
             self.showCardTab();
           } else {
             Analytics.track('behav:otp:incorrect', {
@@ -5426,6 +5432,9 @@ Session.prototype = {
         if (msg) {
           this.fetchCardlessEmiPlans();
         } else {
+          // OTP verification successful
+          OtpService.resetCount('razorpay');
+
           CardlessEmiStore.plans[providerCode] = data.emi_plans;
           CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
           CardlessEmiStore.ott[providerCode] = data.ott;
@@ -5452,6 +5461,9 @@ Session.prototype = {
           this.askPayLaterOtp('incorrect');
         } else {
           if (data.ott) {
+            // OTP verification successful
+            OtpService.resetCount('razorpay');
+
             PayLaterStore.otpVerified = true;
             PayLaterStore.ott[providerCode] = data.ott;
             PayLaterStore.contact = data.contact;
