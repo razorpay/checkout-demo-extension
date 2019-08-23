@@ -910,7 +910,11 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, text, shouldLimitResend) {
+function askOTP(view, text, shouldLimitResend, screenProps) {
+  if (!screenProps) {
+    screenProps = {};
+  }
+
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
@@ -939,13 +943,20 @@ function askOTP(view, text, shouldLimitResend) {
     text = text.error && text.error.description;
   }
 
-  view.updateScreen({
-    loading: false,
-    action: false,
-    otp: '',
-    allowSkip: !Boolean(thisSession.recurring),
-    allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-  });
+  view.updateScreen(
+    _Obj.extend(
+      {
+        loading: false,
+        action: false,
+        otp: '',
+        allowSkip: !Boolean(thisSession.recurring),
+        allowResend: shouldLimitResend
+          ? OtpService.canSendOtp('razorpay')
+          : true,
+      },
+      screenProps
+    )
+  );
 
   $('#body').addClass('sub');
 
@@ -1019,8 +1030,8 @@ function askOTP(view, text, shouldLimitResend) {
   setOtpText(view, text);
 }
 
-function debounceAskOTP(view, msg, shouldLimitResend) {
-  debounce(askOTP, 750)(view, msg, shouldLimitResend);
+function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
+  debounce(askOTP, 750)(view, msg, shouldLimitResend, screenProps);
 }
 
 // this === Session
@@ -2023,6 +2034,8 @@ Session.prototype = {
     var cardlessEmiProviderObj = CardlessEmi.getProvider(providerCode);
     var self = this;
 
+    var incorrectOtp = params.incorrect;
+
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
     tab_titles.otp = topbarImages;
 
@@ -2040,10 +2053,11 @@ Session.prototype = {
         ' to get EMI plans for' +
         cardlessEmiProviderObj.name;
 
-      askOTP(self.otpView, otpMessage, true);
+      if (incorrectOtp) {
+        otpMessage = discreet.wrongOtpMsg;
+      }
 
-      self.otpView.updateScreen({
-        allowResend: OtpService.canSendOtp('razorpay'),
+      debounceAskOTP(self.otpView, otpMessage, true, {
         allowSkip: false,
       });
     };
@@ -5367,7 +5381,7 @@ Session.prototype = {
     var queryParams;
     var callback;
 
-    var isCardlessEmi = this.payload && this.payload.method !== 'cardless_emi';
+    var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
 
     if (!isCardlessEmi) {
       // card tab only past this
@@ -5430,7 +5444,9 @@ Session.prototype = {
 
       callback = function(msg, data) {
         if (msg) {
-          this.fetchCardlessEmiPlans();
+          this.fetchCardlessEmiPlans({
+            incorrect: true,
+          });
         } else {
           // OTP verification successful
           OtpService.resetCount('razorpay');
