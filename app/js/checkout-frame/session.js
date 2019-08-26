@@ -1992,7 +1992,9 @@ Session.prototype = {
           var payment = this.r._payment;
 
           if (payment && confirmClose()) {
-            this.clearRequest();
+            this.clearRequest({
+              '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
+            });
           }
 
           this.switchTab('cardless_emi');
@@ -4001,7 +4003,12 @@ Session.prototype = {
       if (!confirmClose()) {
         return;
       }
-      this.clearRequest();
+
+      if (cardlessEmiOtpPage) {
+        this.clearRequest({
+          '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+        });
+      }
     }
 
     if (BackStore && BackStore.screen) {
