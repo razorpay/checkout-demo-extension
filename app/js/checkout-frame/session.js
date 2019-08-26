@@ -6936,6 +6936,10 @@ Session.prototype = {
         amount: session_options.amount,
       };
 
+      if (order.method) {
+        paymentPayload.method = order.method;
+      }
+
       if (this.recurring) {
         var recurringValue = this.get('recurring');
         paymentPayload.recurring = isString(recurringValue)
