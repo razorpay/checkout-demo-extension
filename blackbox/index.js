@@ -1,63 +1,52 @@
-require('./api');
+const argv = require('fe/argv');
+const puppeteer = require('puppeteer-core');
 const glob = require('glob').sync;
-const puppeteer = require('puppeteer');
-const path = require('path');
-const chalk = require('chalk');
-const { targets } = require('./api/payments');
 
-// wait this many seconds for each test
-const globalTimeout = 10;
+// number of tests to run in parallel
+const concurrency = argv.concurrency || 10;
 
-// currently running tests;
+// if extra CLI arg is passed, run in single test mode. skip other tests
+const singleTest = argv._[0];
+const tests = glob(singleTest || 'blackbox/tests/**/*.js', { absolute: true });
+
+// number of running tests at any point
 let running = 0;
+
+// number of completed tests at any point
 let fulfilled = 0;
-
-const concurrency = 10;
-
-let singleTest = process.argv[2];
-
-if (singleTest) {
-  tests = [__dirname + '/sites/' + singleTest + '.js'];
-} else {
-  tests = glob(__dirname + '/sites/**/*.js');
-}
 
 puppeteer
   .launch({
     executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
     args: ['--no-sandbox'],
     headless: !singleTest,
-    // devtools: true,
+    // devtools: argv.devtools,
   })
   .then(browser => {
-    const run = async site => {
-      let suite = require(site);
-      let testTimeout = suite.timeout || globalTimeout;
-      let timeout = setTimeout(() => {
-        console.error(
-          `${path.basename(site)} not completed in ${testTimeout}s`
-        );
-        if (!singleTest) {
-          process.exit(1);
-        }
-      }, testTimeout * 1000);
-
-      let test = suite.test(browser);
-      return test
-        .then(() => {
-          fulfilled++;
-          clearTimeout(timeout);
-        })
+    /**
+     * @param  {String} path to test file
+     * @return {Promise} when test is done running
+     */
+    async function run(path) {
+      let page;
+      // use default opened page for first test
+      // for others, open incognito so as to not affect localStorage and cookies
+      if (running === 1) {
+        page = (await browser.pages())[0];
+      } else {
+        const context = await browser.createIncognitoBrowserContext();
+        page = await context.newPage();
+      }
+      require(path)(page, path)
+        .then(() => fulfilled++)
         .catch(error => {
           console.error(error);
           !singleTest && process.exit(1);
         });
-    };
-
-    while (running < concurrency && running < tests.length) {
-      runNext();
     }
 
+    // run one test on top of queue, wait for its completion and recurse
+    // exit process if queue is empty
     async function runNext() {
       await run(tests[running++]);
       if (running < tests.length) {
@@ -66,5 +55,10 @@ puppeteer
       if (fulfilled === tests.length) {
         process.exit(0);
       }
+    }
+
+    // start concurrent tests
+    while (running < concurrency && running < tests.length) {
+      runNext();
     }
   });
