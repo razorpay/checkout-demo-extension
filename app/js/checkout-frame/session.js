@@ -4255,6 +4255,10 @@ Session.prototype = {
       }
     }
 
+    if (tab === 'nach') {
+      this.nachScreen.onShown();
+    }
+
     if (!tab && this.multiTpv) {
       $('#body').addClass('sub');
     }
