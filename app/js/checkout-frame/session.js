@@ -652,6 +652,17 @@ function hideFeeWrap() {
 
 function hideOverlayMessage() {
   if (!hideEmi() && !hideFeeWrap()) {
+    var session = SessionManager.getSession();
+    var shouldHide = true;
+
+    if (session.tab === 'nach') {
+      shouldHide = session.nachScreen.shouldHideOverlay();
+    }
+
+    if (!shouldHide) {
+      return;
+    }
+
     if (
       $('#confirmation-dialog').hasClass('animate') ||
       gel('options-wrap').children.length
