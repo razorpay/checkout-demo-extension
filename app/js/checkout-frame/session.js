@@ -1641,6 +1641,7 @@ Session.prototype = {
     this.setOtpScreen();
     this.setUpiTab();
     this.setPayoutsScreen();
+    this.setNach();
   },
 
   showTimer: function(cb) {
@@ -1821,6 +1822,22 @@ Session.prototype = {
     PayLaterStore.otpVerified = false;
 
     this.preSubmit();
+  },
+
+  /**
+   * Adds the Nach screen to DOM
+   */
+  setNach: function() {
+    var isNachEnabled = this.methods.nach;
+
+    if (isNachEnabled) {
+      this.nachScreen = new discreet.NachScreen({
+        target: gel('nach-wrap'),
+        data: {
+          session: this,
+        },
+      });
+    }
   },
 
   setPayLater: function() {
@@ -6561,6 +6578,10 @@ Session.prototype = {
         this.emiScreenView.destroy();
       }
 
+      if (this.nachScreen) {
+        this.nachScreen.destroy();
+      }
+
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
@@ -7378,6 +7399,8 @@ Session.prototype = {
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
+
+  hideOverlayMessage: hideOverlayMessage,
 };
 
 function commenceECOD(session) {
