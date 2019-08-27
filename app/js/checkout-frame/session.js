@@ -5982,7 +5982,16 @@ Session.prototype = {
       }
     }
 
-    var that = this;
+    var shouldContinue = true;
+
+    if (this.tab === 'nach') {
+      shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (!shouldContinue) {
+      return;
+    }
+
     var session = this;
     var request = {
       feesRedirect: preferences.fee_bearer && !('fee' in data),
