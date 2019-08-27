@@ -23,10 +23,10 @@ module.exports = [
   // Google Pay Omnichannel
   {
     key_id: 'm_gpay_omnichannel_disabled',
-    preferences: gpay_omnichannel_prefs.without_feature,
+    preferences: gpay_omnichannel_prefs.withoutFeature,
   },
   {
     key_id: 'm_gpay_omnichannel_enabled',
-    preferences: gpay_omnichannel_prefs.with_feature,
+    preferences: gpay_omnichannel_prefs.withFeature,
   },
 ];

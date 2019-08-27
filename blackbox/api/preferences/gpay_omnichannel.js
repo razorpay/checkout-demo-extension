@@ -1,4 +1,4 @@
-const without_feature = {
+const withoutFeature = {
   options: {
     theme: {
       color: '#528FF0',
@@ -33,13 +33,14 @@ const without_feature = {
   global: true,
 };
 
-const with_feature = JSON.parse(JSON.stringify(without_feature));
-
-with_feature.features = {
-  google_pay_omnichannel: true,
+const withFeature = {
+  ...withoutFeature,
+  features: {
+    google_pay_omnichannel: true,
+  },
 };
 
 module.exports = {
-  with_feature,
-  without_feature,
+  withFeature,
+  withoutFeature,
 };
