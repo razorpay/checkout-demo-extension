@@ -218,14 +218,14 @@
       const session = getSession();
 
       /**
-       * Force p13n for international+paypal
+       * Force p13n for international card+paypal
        * since the UI uses p13n UI
        */
-      const isInternationalPayPal = session.international && session.methods.paypal;
+      const isInternationalCardAndPayPal = session.international && session.methods.paypal && session.methods.count > 1;
 
       if (
         session.get().personalization !== false
-        || isInternationalPayPal
+        || isInternationalCardAndPayPal
       ) {
         session.set('personalization', true);
       }
@@ -234,7 +234,7 @@
 
       let shouldDisableP13n = !session.get('personalization') ||
         hasOffersOnHomescreen ||
-        session.oneMethod ||
+        session.methods.count === 1 ||
         getStore('optional').contact ||
         getStore('isPartialPayment') ||
         session.tpvBank ||
@@ -244,10 +244,10 @@
         session.isPayout;
 
       /**
-       * Force p13n for international+paypal
+       * Force p13n for international card+paypal
        * since the UI uses p13n UI
        */
-      if (isInternationalPayPal) {
+      if (isInternationalCardAndPayPal) {
         shouldDisableP13n = false;
       }
 
