@@ -1839,7 +1839,7 @@ Session.prototype = {
    * Adds the Nach screen to DOM
    */
   setNach: function() {
-    var isNachEnabled = this.methods.nach;
+    var isNachEnabled = this.nach;
 
     if (isNachEnabled) {
       this.nachScreen = new discreet.NachScreen({
@@ -2310,7 +2310,7 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet', 'paypal'].some(
+      ['card', 'emi', 'netbanking', 'emandate', 'nach', 'upi', 'wallet', 'paypal'].some(
         function(methodName) {
           if (self.methods[methodName]) {
             self.setOneMethod(methodName);
@@ -4041,6 +4041,10 @@ Session.prototype = {
       this.methods.cardless_emi
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'nach') {
+      if (this.nachScreen.onBack()) {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -6745,6 +6749,19 @@ Session.prototype = {
         if (!amount) {
           delete availMethods.card;
         }
+      }
+
+      /* paper nach */
+      if (
+        availMethods.nach &&
+        preferences.order &&
+        preferences.order.method === 'nach'
+      ) {
+        availMethods = {
+          nach: true,
+          count: 1,
+        };
+        this.nach = true;
       }
     }
 

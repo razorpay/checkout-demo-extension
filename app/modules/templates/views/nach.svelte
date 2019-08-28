@@ -86,6 +86,23 @@
       },
 
       /**
+       * Session calls this to ask if tab will handle back
+       * 
+       * @returns {boolean} will tab handle back
+       */
+      onBack: function () {
+        const footerButtons = {
+          attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
+          pay: _Doc.querySelector('#footer .pay-btn'),
+        };
+
+        _El.addClass(footerButtons.attachNachForm, 'invisible');
+        _El.removeClass(footerButtons.pay, 'invisible');
+
+        return false;
+      },
+
+      /**
        * Session calls this to detemine if overlay should be hidden
        * 
        * @returns {Boolean} should the overlay be hidden?
