@@ -1,5 +1,5 @@
 <Tab method="nach" overrideMethodCheck="true">
-  <input type="file" ref:file class="hidden" on:change="selectFile(event)" />
+  <input type="file" ref:file class="hidden" on:input="selectFile(event)" accept="{ALLOWED_EXTS.concat(['.svg']).join(',')}" />
 
   <p>Please upload a clear and legible copy of your signed NACH form</p>
 
@@ -18,7 +18,7 @@
     >
       <ol>
         <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
-        <li>Only JPG, PNG, PDF files with size less than 6MB are allowed</li>
+        <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE} MB are allowed</li>
       </ol>
     </Callout>
   {/if}
@@ -46,6 +46,45 @@
 
 
 <script>
+  const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.pdf'];
+  const ALLOWED_MAX_SIZE = 6;
+
+  /**
+   * Tells if a filename has a valid extension
+   * @param {string} filename
+   * @param {Array<string>} extensions
+   * 
+   * @returns {boolean}
+   */
+  function hasValidExtension (filename, extensions) {
+    return _Arr.any(extensions, extension => filename.indexOf(extension) === filename.length - extension.length);
+  }
+
+  /**
+   * Validates the uploaded file
+   * @param {File} file
+   * 
+   * @returns {Object} error
+   */
+  function validateUpload (file) {
+    const filename = file.name;
+    const size = file.size;
+
+    if (!hasValidExtension(filename, ALLOWED_EXTS)) {
+      return {
+        main: 'File type not supported',
+        description: `The uploaded file type is not supported. Only ${_Arr.map(ALLOWED_EXTS, x => x.toUpperCase()).join(', ')} files are allowed.`
+      };
+    }
+
+    if (size / 1024 / 1024 > ALLOWED_MAX_SIZE) {
+      return {
+        main: 'File size is too large',
+        description: `Please upload a smaller file. The uploaded file is larger than ${ALLOWED_MAX_SIZE} MB`
+      }
+    }
+  }
+
   export default {
     components: {
       Attachment: 'templates/views/ui/Attachment.svelte',
@@ -58,11 +97,23 @@
     },
 
     data: () => ({
+      ALLOWED_EXTS,
+      ALLOWED_MAX_SIZE,
+
       file: null,
       uploading: false,
     }),
 
     methods: {
+      /**
+       * Clears the error
+       */
+      clearError: function () {
+        this.set({
+          error: null
+        });
+      },
+
       /**
        * Session calls this method when it switches to "nach" tab
        */
@@ -73,6 +124,7 @@
         };
 
         const {
+          error,
           session,
           uploading,
           view,
@@ -109,24 +161,34 @@
        */
       shouldHideOverlay: function () {
         const {
+          error,
           file,
+          uploading
         } = this.get();
 
-        if (file) {
-          return true;
-        } else {
+        // If we are still upload, ask for confirmation
+        if (uploading) {
           const cancel = global.confirm('Are you sure you want to stop uploading your NACH form?');
 
           if (cancel) {
             // TODO: Abort AJAX
 
             this.set({
-              file: null,
+              uploading: false,
             });
+
+            this.reset();
           }
 
           return cancel;
         }
+
+        // If there was an error, reset the UI
+        if (error) {
+          this.reset();
+        }
+
+        return true;
       },
 
       /**
@@ -135,6 +197,14 @@
       removeFile: function () {
         this.refs.file.value = '';
         this.refs.file.dispatchEvent(new global.Event('change'));
+      },
+
+      /**
+       * Performs cleanup and resets the UI
+       */
+      reset: function () {
+        this.removeFile();
+        this.clearError();
       },
 
       /**
@@ -161,6 +231,28 @@
       },
 
       /**
+       * Sets the error in state
+       * and shows it in the overlay
+       */
+      showError: function (error) {
+        const {
+          session
+        } = this.get();
+
+        this.set({
+          error,
+          uploading: false,
+        });
+
+        session.hideOverlayMessage();
+
+        // Wait for overlay to be hidden before showing it again
+        setTimeout(() => {
+          session.showLoadError(error.description, true);
+        }, 300);
+      },
+
+      /**
        * Invoked when a file is selected
        * @param {Event} event
        */
@@ -181,13 +273,37 @@
 
         session.showLoadError('Attaching your NACH form');
 
-        // TODO: AJAX
+        // Validate
+        const error = validateUpload(event.currentTarget.files[0]);
+
+        this.set({
+          uploading: true
+        });
+
         setTimeout(() => {
-          this.set({
-            file: true,
-          });
-          session.hideOverlayMessage();
-        }, 3000);
+          const {
+            uploading
+          } = this.get();
+
+          // Abort if user has requested to stop processing
+          if (!uploading) {
+            return;
+          }
+
+          if (error) {
+            this.showError(error);
+          } else {
+            // TODO: AJAX
+            setTimeout(() => {
+              this.set({
+                file: true,
+                uploading: false,
+              });
+
+              session.hideOverlayMessage();
+            }, 3000);
+          }
+        }, 1000);
       },
     }
   }
