@@ -6,7 +6,6 @@
 <style>
   ref:card {
     display: block;
-    margin: 4px -12px;
     background: #fcfcfc;
     border: 1px solid #ebedf0;
     border-radius: 1px;
