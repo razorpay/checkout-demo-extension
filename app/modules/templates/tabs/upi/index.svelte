@@ -1,4 +1,5 @@
-<Tab method="upi" {down}>
+<Tab method="upi" {down} pad={false}>
+  <div ref:screenContent>
   {#if intent}
     <UpiIntent
       ref:intentView
@@ -112,6 +113,7 @@
       </NextOption>
     </div>
   {/if}
+  </div>
 
   {#if down}
     <Callout
@@ -125,12 +127,11 @@
 
 <style>
   :global(#form-upi[down=true]) {
-    padding-bottom: 48px;
+    padding-bottom: 37px;
   }
 
   .legend {
-    margin: 12px 0 8px 0;
-    padding: 0;
+    padding: 12px 0 8px 12px;
   }
 
   #vpa-wrap{
@@ -180,6 +181,13 @@
     right: 12px;
     line-height: 40px;
     z-index: 1;
+  }
+
+  ref:screenContent {
+    padding: 0 12px 12px 12px;
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
   }
 
   #upi-gpay {
