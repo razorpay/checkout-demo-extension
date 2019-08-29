@@ -56,6 +56,7 @@ export const TAB_TITLES = {
   emiplans: 'EMI Plans',
   netbanking: 'Netbanking',
   paylater: 'Pay Later',
+  paypal: 'PayPal',
   qr: 'UPI QR',
   upi: 'UPI',
   gpay: 'Google Pay',
@@ -106,6 +107,7 @@ export const AVAILABLE_METHODS = [
   'cardless_emi',
   'qr',
   'paylater',
+  'paypal',
   'bank_transfer',
 ];
 

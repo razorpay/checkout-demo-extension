@@ -53,10 +53,6 @@ function gotoAmountScreen() {
   SessionStore.set({ screen: 'amount' });
 }
 
-function shouldEnableP13n(keyId) {
-  return true;
-}
-
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -2293,14 +2289,14 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet'].some(function(
-        methodName
-      ) {
-        if (self.methods[methodName]) {
-          self.setOneMethod(methodName);
-          return true;
+      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet', 'paypal'].some(
+        function(methodName) {
+          if (self.methods[methodName]) {
+            self.setOneMethod(methodName);
+            return true;
+          }
         }
-      });
+      );
     }
 
     if (this.upiTpv) {
@@ -5527,7 +5523,15 @@ Session.prototype = {
       setTimeout(function() {
         window.scrollTo(0, 100);
       });
-      return this.switchTab(this.oneMethod);
+
+      /**
+       * PayPal as a one-method submits
+       * directly from the homescreen.
+       * Do not switch the tab for it.
+       */
+      if (this.oneMethod !== 'paypal') {
+        return this.switchTab(this.oneMethod);
+      }
     }
 
     preventDefault(e);
@@ -5535,7 +5539,12 @@ Session.prototype = {
     var tab = this.tab;
     var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
-    if (!this.tab && !this.order && !this.p13n) {
+    if (
+      !this.tab &&
+      !this.order &&
+      !this.p13n &&
+      !(this.oneMethod && this.oneMethod === 'paypal')
+    ) {
       return;
     }
 
@@ -5748,9 +5757,12 @@ Session.prototype = {
           }
         }
       }
+    } else if (data.method === 'paypal' && this.oneMethod === 'paypal') {
+      // Do not return
     } else {
       return;
     }
+
     this.submit();
   },
 
@@ -5829,6 +5841,11 @@ Session.prototype = {
           return this.switchTab('qr');
         }
       }
+    }
+
+    if (data.method === 'paypal') {
+      data.method = 'wallet';
+      data.wallet = 'paypal';
     }
 
     // ask user to verify phone number if not logged in and wants to save card
@@ -6283,6 +6300,11 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+
+    if (this.oneMethod && this.oneMethod === 'paypal') {
+      data.method = 'paypal';
+    }
+
     return data;
   },
 
@@ -6411,7 +6433,7 @@ Session.prototype = {
 
   setPaymentMethods: function(preferences) {
     var recurring = this.recurring;
-    var international = this.get('currency') !== 'INR';
+    var international = this.international;
     var availMethods = preferences.methods;
     var amount = this.get('amount');
     var bankMethod = 'netbanking';
@@ -6510,6 +6532,7 @@ Session.prototype = {
      * - amount > 1 Lac
      * - Recurring payment
      * - Non INR payment
+     * - international
      */
     if (amount > 1e7 || recurring || international) {
       methods.upi = false;
@@ -6536,7 +6559,12 @@ Session.prototype = {
       amount,
       methods.cardless_emi
     );
-    if (_Obj.isEmpty(methods.cardless_emi)) {
+    /**
+     * Disable Cardless EMI if
+     * - no providers
+     * - international
+     */
+    if (_Obj.isEmpty(methods.cardless_emi) || international) {
       methods.cardless_emi = null;
     }
 
@@ -6550,11 +6578,14 @@ Session.prototype = {
     /**
      * Disable PayLater if either:
      * - Empty array
+     * - international
      * TODO: Allow this for prefill and logged in users.
      */
-    if (_Obj.isEmpty(methods.paylater)) {
+    if (_Obj.isEmpty(methods.paylater) || international) {
       methods.paylater = null;
     }
+
+    var isPayPalAvailable = Boolean(methods.wallet && methods.wallet.paypal);
 
     /**
      * disable wallets if:
@@ -6562,7 +6593,7 @@ Session.prototype = {
      * - Wallets not enabled by backend
      * - Recurring payment
      * - Non INR payment
-     *
+     * - international
      * Also, enable/disable wallets on the basis of merchant options
      */
     if (
@@ -6579,6 +6610,15 @@ Session.prototype = {
           delete methods.wallet[wallet];
         }
       });
+    }
+
+    /**
+     * PayPal wallet becomes a method
+     * for international payments
+     */
+    if (international && isPayPalAvailable) {
+      methods.paypal = true;
+      methods.count++;
     }
 
     /* Emandate only works on amount of 0 as of now */
@@ -6663,6 +6703,10 @@ Session.prototype = {
     });
 
     methods.wallet = wallets;
+
+    if (_.isArray(methods.wallet) && methods.wallet.length === 0) {
+      methods.wallet = null;
+    }
   },
 
   /**
@@ -6845,6 +6889,9 @@ Session.prototype = {
       // We are disabling retries for payouts for now.
       this.set('retry', false);
     }
+
+    // Non-INR payments are considered
+    this.international = this.get('currency') !== 'INR';
 
     /* In case of recurring set recurring as filter in saved cards */
     if (

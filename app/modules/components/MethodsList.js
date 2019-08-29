@@ -5,7 +5,10 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
-import { filterInstrumentsForAvailableMethods } from 'checkoutframe/personalization';
+import {
+  filterInstrumentsForAvailableMethods,
+  _createInstrumentForImmediateUse,
+} from 'checkoutframe/personalization';
 
 /**
  * Get the available methods.
@@ -46,6 +49,11 @@ export default class MethodsList {
   constructor({ target, data }) {
     const session = data.session;
     data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
+
+    // We do not want to show PayPal in the list in case of international
+    if (data.session.international) {
+      data.AVAILABLE_METHODS = _Arr.remove(data.AVAILABLE_METHODS, 'paypal');
+    }
 
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
@@ -141,9 +149,9 @@ export default class MethodsList {
      * This count is also being sent with the
      * p13n:instruments:list event.
      */
-    let noOfInstruments = 2;
+    let noOfInstrumentsToShow = 2;
     if (isMobile()) {
-      noOfInstruments = 3;
+      noOfInstrumentsToShow = 3;
     }
 
     /* Only allow for available methods */
@@ -151,6 +159,33 @@ export default class MethodsList {
       data.instruments,
       session.methods
     );
+
+    /**
+     * For international + paypal,
+     * paypal should show up as one
+     * of the preferred methods
+     * for UI-related reasons,
+     * but at the end
+     */
+    if (session.international && session.methods.paypal) {
+      /**
+       * If merchant doesn't want p13n,
+       * data.instruments should contain only PayPal
+       */
+      if (session.get().personalization === false) {
+        data.instruments = [];
+      }
+
+      data.instruments =
+        data.instruments
+        |> _Arr.insertAt(
+          _createInstrumentForImmediateUse({
+            method: 'paypal',
+          }),
+          noOfInstrumentsToShow - 1
+        )
+        |> _Arr.filter(Boolean);
+    }
 
     /* Filter out any app that's in user's list but not currently installed */
     data.instruments = _Arr.filter(data.instruments, instrument => {
@@ -168,7 +203,7 @@ export default class MethodsList {
       return true;
     });
 
-    data.instruments = _Arr.slice(data.instruments, 0, noOfInstruments);
+    data.instruments = _Arr.slice(data.instruments, 0, noOfInstrumentsToShow);
     data.selected = null;
     this.selectedInstrument = null;
 
