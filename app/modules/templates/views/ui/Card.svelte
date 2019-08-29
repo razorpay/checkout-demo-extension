@@ -1,16 +1,14 @@
-<div ref:card class:theme-border="selected" on:click="fire('click', event)">
+<div ref:card class:theme-border="selected" class:error-border="error" on:click="fire('click', event)">
   <slot></slot>
 </div>
-
 
 <style>
   ref:card {
     display: block;
-    margin: 4px -12px;
     background: #fcfcfc;
     border: 1px solid #ebedf0;
     border-radius: 1px;
-    box-shadow: 4px 4px 4px 0 rgba(0,0,0,0.04);
+    box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.04);
     padding: 12px;
     position: relative;
   }
@@ -20,8 +18,10 @@
   export default {
     data() {
       return {
-        selected: false
-      }
-    }
-  }
+        selected: false,
+        error: false,
+      };
+    },
+    methods: {},
+  };
 </script>

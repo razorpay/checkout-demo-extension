@@ -1,5 +1,6 @@
 import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
 import { getProvider as getPayLaterProvider } from 'common/paylater';
+import { AVAILABLE_METHODS } from 'common/constants';
 
 /**
  * Returns the text with commas or "and" as the separator.
@@ -97,6 +98,7 @@ const DESCRIPTIONS = {
 
     return `Pay later using ${text}`;
   },
+  paypal: () => 'Pay using PayPal wallet',
   qr: () => 'Pay by scanning QR Code',
   gpay: () => 'Instant payment using Google Pay App',
   upi: () => 'Instant payment using UPI App',
@@ -113,6 +115,13 @@ const DESCRIPTIONS = {
     }
   },
 };
+
+/**
+ * Returns an array of all supported methods
+ *
+ * @returns {Array<string>}
+ */
+export const getAllMethods = () => AVAILABLE_METHODS;
 
 /**
  * Returns the method description.
@@ -154,6 +163,9 @@ export function getMethodPrefix(method) {
 
     case 'paylater':
       return 'PayLater';
+
+    case 'paypal':
+      return 'PayPal';
 
     case 'qr':
       return 'UPI QR';

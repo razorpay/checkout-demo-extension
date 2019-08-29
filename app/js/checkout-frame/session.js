@@ -54,10 +54,6 @@ function gotoAmountScreen() {
   SessionStore.set({ screen: 'amount' });
 }
 
-function shouldEnableP13n(keyId) {
-  return true;
-}
-
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -65,6 +61,7 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
+  gpay_omnichannel: 'Verifying mobile number with Google Pay..',
   redirect: 'Redirecting to Bank page',
   acs_load_delay: 'Seems like your bank page is taking time to load.',
   otp_resent: 'OTP resent',
@@ -1458,11 +1455,7 @@ Session.prototype = {
           }
 
           self.showLoadError('Payment did not complete.', true);
-          self.clearRequest({
-            '_[method]': 'upi',
-            '_[flow]': 'intent',
-            '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-          });
+          self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
         // Show error and clear request when back is pressed from PSP UPI App
@@ -2286,14 +2279,14 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet'].some(function(
-        methodName
-      ) {
-        if (self.methods[methodName]) {
-          self.setOneMethod(methodName);
-          return true;
+      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet', 'paypal'].some(
+        function(methodName) {
+          if (self.methods[methodName]) {
+            self.setOneMethod(methodName);
+            return true;
+          }
         }
-      });
+      );
     }
 
     if (this.upiTpv) {
@@ -2412,6 +2405,7 @@ Session.prototype = {
       return;
     }
 
+    $('#overlay-close').hide();
     hideOverlayMessage();
   },
 
@@ -3100,6 +3094,7 @@ Session.prototype = {
       this.hideErrorMessage(e);
     });
     this.click('#fd-hide', this.hideErrorMessage);
+    this.click('#overlay-close', this.hideErrorMessage);
 
     this.on('click', '#form-upi.collapsible .item', function(e) {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
@@ -3560,6 +3555,13 @@ Session.prototype = {
           onSuccess: bind(successHandler, this),
         },
       });
+    } else if (screen === 'bank_transfer') {
+      this.currentScreen = new discreet.BankTransferScreen({
+        target: qs('#bank-transfer-svelte-wrap'),
+        data: {
+          session: this,
+        },
+      });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
       this.currentScreen = null;
@@ -3609,7 +3611,9 @@ Session.prototype = {
       screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
+      (screen === 'magic-choice' &&
+        !$('#form-magic-choice .item :checked')[0]) ||
+      screen === 'bank_transfer'
     ) {
       showPaybtn = false;
     }
@@ -5107,6 +5111,10 @@ Session.prototype = {
     return '#form-' + form;
   },
 
+  retryWithOmnichannel: function() {
+    this.upiTab.setOmnichannelAsRetried();
+  },
+
   getFormData: function() {
     var tab = this.tab;
     var data = {};
@@ -5227,6 +5235,17 @@ Session.prototype = {
     }
   },
 
+  showOmnichannelLoader: function(text) {
+    setTimeout(function() {
+      $('#error-message .link').html('');
+    }, 100);
+
+    $('.omnichannel').show();
+    $('#overlay-close').show();
+
+    this.showLoadError(text, false);
+  },
+
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -5247,6 +5266,11 @@ Session.prototype = {
       loadingState = false;
     } else {
       actionState = false;
+    }
+
+    var isOmnichannel = this.isOmnichannel();
+    if (isOmnichannel && error) {
+      this.retryWithOmnichannel();
     }
 
     if (!text) {
@@ -5561,7 +5585,15 @@ Session.prototype = {
       setTimeout(function() {
         window.scrollTo(0, 100);
       });
-      return this.switchTab(this.oneMethod);
+
+      /**
+       * PayPal as a one-method submits
+       * directly from the homescreen.
+       * Do not switch the tab for it.
+       */
+      if (this.oneMethod !== 'paypal') {
+        return this.switchTab(this.oneMethod);
+      }
     }
 
     preventDefault(e);
@@ -5569,7 +5601,12 @@ Session.prototype = {
     var tab = this.tab;
     var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
-    if (!this.tab && !this.order && !this.p13n) {
+    if (
+      !this.tab &&
+      !this.order &&
+      !this.p13n &&
+      !(this.oneMethod && this.oneMethod === 'paypal')
+    ) {
       return;
     }
 
@@ -5732,17 +5769,47 @@ Session.prototype = {
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
+        var omnichannelType = this.upiTab.get().omnichannelType;
 
         if (data['_[flow]'] === 'intent') {
-          if (data.vpa) {
+          if (!omnichannelType) {
             formSelector = '#svelte-collect-in-intent';
           } else {
-            formSelector = '#svelte-upi-apps-list';
+            if (omnichannelType === 'vpa') {
+              formSelector = '#upi-gpay-vpa';
+            }
+
+            if (omnichannelType === 'phone') {
+              formSelector = '#upi-gpay-phone';
+            }
+          }
+        }
+
+        if (
+          data['_[flow]'] === 'directpay' &&
+          this.upiTab.get().selectedApp === 'gpay'
+        ) {
+          if (omnichannelType === 'vpa') {
+            formSelector = '#upi-gpay-vpa';
+          }
+
+          if (omnichannelType === 'phone') {
+            formSelector = '#upi-gpay-phone';
           }
         }
 
         if (this.checkInvalid(formSelector)) {
           return;
+        }
+
+        if (
+          this.preferences.features &&
+          this.preferences.features.google_pay_omnichannel &&
+          this.upiTab.get().selectedApp === 'gpay'
+        ) {
+          $('.omnichannel').show();
+        } else {
+          $('.omnichannel').hide();
         }
       } else if (this.checkInvalid()) {
         return;
@@ -5782,15 +5849,19 @@ Session.prototype = {
           }
         }
       }
+    } else if (data.method === 'paypal' && this.oneMethod === 'paypal') {
+      // Do not return
     } else {
       return;
     }
+
     this.submit();
   },
 
   verifyVpaAndContinue: function(data, params) {
     var self = this;
     self.showLoadError('Verifying your VPA');
+    $('#overlay-close').hide();
 
     var vpa = data.vpa;
 
@@ -5809,8 +5880,8 @@ Session.prototype = {
        */
       .verifyVpa(vpa, 10000)
       .then(function() {
+        $('#overlay-close').show();
         hideOverlaySafely($('#error-message'));
-
         setTimeout(function() {
           self.submit({
             vpaVerified: true,
@@ -5885,6 +5956,11 @@ Session.prototype = {
           return this.switchTab('qr');
         }
       }
+    }
+
+    if (data.method === 'paypal') {
+      data.method = 'wallet';
+      data.wallet = 'paypal';
     }
 
     // ask user to verify phone number if not logged in and wants to save card
@@ -6019,6 +6095,10 @@ Session.prototype = {
       });
     }
 
+    if (!data.contact) {
+      delete data.contact;
+    }
+
     if (data.method === 'paylater') {
       if (data.contact) {
         if (!data.ott) {
@@ -6132,6 +6212,8 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
+    } else if (this.isOmnichannel()) {
+      this.showOmnichannelLoader(strings.OmnichannelNotification);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -6395,6 +6477,11 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+
+    if (this.oneMethod && this.oneMethod === 'paypal') {
+      data.method = 'paypal';
+    }
+
     return data;
   },
 
@@ -6549,7 +6636,7 @@ Session.prototype = {
 
   setPaymentMethods: function(preferences) {
     var recurring = this.recurring;
-    var international = this.get('currency') !== 'INR';
+    var international = this.international;
     var availMethods = preferences.methods;
     var amount = this.get('amount');
     var bankMethod = 'netbanking';
@@ -6648,6 +6735,7 @@ Session.prototype = {
      * - amount > 1 Lac
      * - Recurring payment
      * - Non INR payment
+     * - international
      */
     if (amount > 1e7 || recurring || international) {
       methods.upi = false;
@@ -6674,7 +6762,12 @@ Session.prototype = {
       amount,
       methods.cardless_emi
     );
-    if (_Obj.isEmpty(methods.cardless_emi)) {
+    /**
+     * Disable Cardless EMI if
+     * - no providers
+     * - international
+     */
+    if (_Obj.isEmpty(methods.cardless_emi) || international) {
       methods.cardless_emi = null;
     }
 
@@ -6688,11 +6781,14 @@ Session.prototype = {
     /**
      * Disable PayLater if either:
      * - Empty array
+     * - international
      * TODO: Allow this for prefill and logged in users.
      */
-    if (_Obj.isEmpty(methods.paylater)) {
+    if (_Obj.isEmpty(methods.paylater) || international) {
       methods.paylater = null;
     }
+
+    var isPayPalAvailable = Boolean(methods.wallet && methods.wallet.paypal);
 
     /**
      * disable wallets if:
@@ -6700,7 +6796,7 @@ Session.prototype = {
      * - Wallets not enabled by backend
      * - Recurring payment
      * - Non INR payment
-     *
+     * - international
      * Also, enable/disable wallets on the basis of merchant options
      */
     if (
@@ -6717,6 +6813,15 @@ Session.prototype = {
           delete methods.wallet[wallet];
         }
       });
+    }
+
+    /**
+     * PayPal wallet becomes a method
+     * for international payments
+     */
+    if (international && isPayPalAvailable) {
+      methods.paypal = true;
+      methods.count++;
     }
 
     /* Emandate only works on amount of 0 as of now */
@@ -6738,6 +6843,14 @@ Session.prototype = {
         preferences,
         this.get('method.netbanking')
       );
+    }
+
+    if (methods.bank_transfer) {
+      if (this.get('order_id')) {
+        methods.count++;
+      } else {
+        methods.bank_transfer = false;
+      }
     }
 
     if (methods.card) {
@@ -6793,6 +6906,10 @@ Session.prototype = {
     });
 
     methods.wallet = wallets;
+
+    if (_.isArray(methods.wallet) && methods.wallet.length === 0) {
+      methods.wallet = null;
+    }
   },
 
   /**
@@ -6893,6 +7010,14 @@ Session.prototype = {
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
   },
+  isOmnichannel: function() {
+    var isOmni =
+      this.preferences.features &&
+      this.preferences.features.google_pay_omnichannel &&
+      this.upiTab.get().selectedApp === 'gpay';
+
+    return isOmni;
+  },
 
   /**
    * Mark headless as failed and perform cleanup
@@ -6936,7 +7061,6 @@ Session.prototype = {
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
-    /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
     preferences = prefs;
@@ -6975,6 +7099,9 @@ Session.prototype = {
       // We are disabling retries for payouts for now.
       this.set('retry', false);
     }
+
+    // Non-INR payments are considered
+    this.international = this.get('currency') !== 'INR';
 
     /* In case of recurring set recurring as filter in saved cards */
     if (
@@ -7082,6 +7209,10 @@ Session.prototype = {
         bank: order.bank,
         amount: session_options.amount,
       };
+
+      if (order.method) {
+        paymentPayload.method = order.method;
+      }
 
       if (this.recurring) {
         var recurringValue = this.get('recurring');
