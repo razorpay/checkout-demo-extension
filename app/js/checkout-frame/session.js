@@ -3562,6 +3562,13 @@ Session.prototype = {
           onSuccess: bind(successHandler, this),
         },
       });
+    } else if (screen === 'bank_transfer') {
+      this.currentScreen = new discreet.BankTransferScreen({
+        target: qs('#bank-transfer-svelte-wrap'),
+        data: {
+          session: this,
+        },
+      });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
       this.currentScreen = null;
@@ -3611,7 +3618,9 @@ Session.prototype = {
       screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
+      (screen === 'magic-choice' &&
+        !$('#form-magic-choice .item :checked')[0]) ||
+      screen === 'bank_transfer'
     ) {
       showPaybtn = false;
     }
@@ -6591,6 +6600,14 @@ Session.prototype = {
         preferences,
         this.get('method.netbanking')
       );
+    }
+
+    if (methods.bank_transfer) {
+      if (this.get('order_id')) {
+        methods.count++;
+      } else {
+        methods.bank_transfer = false;
+      }
     }
 
     if (methods.card) {

@@ -20,6 +20,7 @@ RazorpayDefaults.method = {
   upi: true,
   upi_intent: null,
   qr: true,
+  bank_transfer: true,
 };
 
 RazorpayDefaults.prefill = {
