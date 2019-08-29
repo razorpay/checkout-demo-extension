@@ -62,6 +62,7 @@ import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
 
 import QRScreen from 'templates/views/qr.svelte';
+import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 
@@ -147,6 +148,7 @@ export default {
   commonBanks,
   timer: _.timer,
   QRScreen,
+  BankTransferScreen,
   getFullBankLogo,
 
   MagicView,

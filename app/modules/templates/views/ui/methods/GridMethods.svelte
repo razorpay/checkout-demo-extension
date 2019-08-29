@@ -1,10 +1,6 @@
 <div id="payment-options" class="grid clear count-{methods.length}">
   {#each methods as method}
-    <GridMethod
-      {...method}
-
-      on:select="selectMethod(event)"
-    />
+  <GridMethod {...method} on:select="selectMethod(event)" />
   {/each}
 </div>
 
@@ -14,7 +10,7 @@
   import {
     getMethodDescription,
     getMethodDowntimeDescription,
-    getMethodNameForPaymentOption
+    getMethodNameForPaymentOption,
   } from 'checkoutframe/paymentmethods';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -57,7 +53,7 @@
               method,
               icon: icon,
               title: getMethodNameForPaymentOption(method, {
-                session
+                session,
               }),
               description,
               down: isDown,
@@ -73,11 +69,8 @@
       },
     },
     methods: {
-      selectMethod: (event) => {
-        const {
-          down,
-          method = '',
-        } = event.data;
+      selectMethod: event => {
+        const { down, method = '' } = event.data;
 
         const target = event.currentTarget;
         let disabled = _El.hasClass(target, 'disabled');
@@ -95,7 +88,7 @@
         }
 
         getSession().switchTab(method);
-      }
+      },
     },
   };
 </script>

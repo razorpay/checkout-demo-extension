@@ -6,18 +6,12 @@ import wallet from './wallet';
 import othermethods from './othermethods';
 import qr from './qr';
 import paylater from './paylater';
+import paypal from './paypal';
+import bank_transfer from './bank_transfer';
 
-const availPaymentMethods = [
-  'card',
-  'emi',
-  'netbanking',
-  'upi',
-  'wallet',
-  'othermethods',
-  'qr',
-  'cardless_emi',
-  'paylater'
-];
+import { getAllMethods } from 'checkoutframe/paymentmethods';
+
+const availPaymentMethods = getAllMethods().concat(['othermethods']);
 
 function getIconFn(iconName) {
   switch (iconName) {
@@ -45,6 +39,12 @@ function getIconFn(iconName) {
 
     case 'paylater':
       return paylater;
+
+    case 'paypal':
+      return paypal;
+
+    case 'bank_transfer':
+      return bank_transfer;
   }
 }
 
