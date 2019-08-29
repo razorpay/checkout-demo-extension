@@ -48,6 +48,9 @@
   </div>
 </Tab>
 <style>
+  .loading {
+    text-align: center;
+  }
   .bank_transfer-container {
     padding: 15px 0;
     font-size: 13px;
