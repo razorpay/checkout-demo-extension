@@ -5107,9 +5107,6 @@ Session.prototype = {
   },
 
   retryWithOmnichannel: function() {
-    this.upiTab.set({
-      omnichannelType: 'phone',
-    });
     this.upiTab.setOmnichannelAsRetried();
   },
 
@@ -5238,10 +5235,6 @@ Session.prototype = {
   },
 
   showOmnichannelLoader: function(text) {
-    this.upiTab.set({
-      omnichannelType: 'phone',
-    });
-
     setTimeout(function() {
       $('#error-message .link').html('');
     }, 100);
