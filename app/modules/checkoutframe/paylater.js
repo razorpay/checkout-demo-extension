@@ -8,9 +8,7 @@ export default function PayLaterView(session) {
 
 PayLaterView.prototype = {
   setOptions: function(data) {
-    const {
-      on = {}
-    } = data;
+    const { on = {} } = data;
 
     this.onSelect = on.select || _Func.noop;
     this.back = on.back || _Func.noop;
@@ -23,5 +21,5 @@ PayLaterView.prototype = {
     } else {
       this.view.set(data);
     }
-  }
+  },
 };

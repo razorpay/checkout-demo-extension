@@ -17,6 +17,8 @@ var olamoneyWallet = freqWallets.olamoney || {};
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
+var preferences = _.preferences;
+var gpay_omnichannel = preferences.features && preferences.features.google_pay_omnichannel;
 var invoice = _.invoice;
 
 var bank = _.tpvBank || {};
@@ -60,6 +62,10 @@ var upi_apps = _.upi_intents_data;
       <div id="fee-wrap" class="overlay showable mfix"></div>
       <div id="options-wrap"></div>
       <div id="error-message" class="overlay showable">
+      <div class="omnichannel">
+        <img style="width:35px;" src="https://cdn.razorpay.com/app/googlepay.svg">
+        <div id="overlay-close" class="close">×</div>
+      </div>
         <div id="fd-t"></div>
         <div class="spin"><div></div></div>
         <div class="spin spin2"><div></div></div>

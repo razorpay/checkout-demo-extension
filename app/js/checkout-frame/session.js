@@ -60,6 +60,7 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
+  gpay_omnichannel: 'Verifying mobile number with Google Pay..',
   redirect: 'Redirecting to Bank page',
   acs_load_delay: 'Seems like your bank page is taking time to load.',
   otp_resent: 'OTP resent',
@@ -1445,11 +1446,7 @@ Session.prototype = {
           }
 
           self.showLoadError('Payment did not complete.', true);
-          self.clearRequest({
-            '_[method]': 'upi',
-            '_[flow]': 'intent',
-            '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-          });
+          self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
         // Show error and clear request when back is pressed from PSP UPI App
@@ -2415,6 +2412,7 @@ Session.prototype = {
       return;
     }
 
+    $('#overlay-close').hide();
     hideOverlayMessage();
   },
 
@@ -3098,6 +3096,7 @@ Session.prototype = {
       this.hideErrorMessage(e);
     });
     this.click('#fd-hide', this.hideErrorMessage);
+    this.click('#overlay-close', this.hideErrorMessage);
 
     this.on('click', '#form-upi.collapsible .item', function(e) {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
@@ -5103,6 +5102,10 @@ Session.prototype = {
     return '#form-' + form;
   },
 
+  retryWithOmnichannel: function() {
+    this.upiTab.setOmnichannelAsRetried();
+  },
+
   getFormData: function() {
     var tab = this.tab;
     var data = {};
@@ -5227,6 +5230,17 @@ Session.prototype = {
     }
   },
 
+  showOmnichannelLoader: function(text) {
+    setTimeout(function() {
+      $('#error-message .link').html('');
+    }, 100);
+
+    $('.omnichannel').show();
+    $('#overlay-close').show();
+
+    this.showLoadError(text, false);
+  },
+
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -5247,6 +5261,11 @@ Session.prototype = {
       loadingState = false;
     } else {
       actionState = false;
+    }
+
+    var isOmnichannel = this.isOmnichannel();
+    if (isOmnichannel && error) {
+      this.retryWithOmnichannel();
     }
 
     if (!text) {
@@ -5707,17 +5726,47 @@ Session.prototype = {
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
+        var omnichannelType = this.upiTab.get().omnichannelType;
 
         if (data['_[flow]'] === 'intent') {
-          if (data.vpa) {
+          if (!omnichannelType) {
             formSelector = '#svelte-collect-in-intent';
           } else {
-            formSelector = '#svelte-upi-apps-list';
+            if (omnichannelType === 'vpa') {
+              formSelector = '#upi-gpay-vpa';
+            }
+
+            if (omnichannelType === 'phone') {
+              formSelector = '#upi-gpay-phone';
+            }
+          }
+        }
+
+        if (
+          data['_[flow]'] === 'directpay' &&
+          this.upiTab.get().selectedApp === 'gpay'
+        ) {
+          if (omnichannelType === 'vpa') {
+            formSelector = '#upi-gpay-vpa';
+          }
+
+          if (omnichannelType === 'phone') {
+            formSelector = '#upi-gpay-phone';
           }
         }
 
         if (this.checkInvalid(formSelector)) {
           return;
+        }
+
+        if (
+          this.preferences.features &&
+          this.preferences.features.google_pay_omnichannel &&
+          this.upiTab.get().selectedApp === 'gpay'
+        ) {
+          $('.omnichannel').show();
+        } else {
+          $('.omnichannel').hide();
         }
       } else if (this.checkInvalid()) {
         return;
@@ -5769,6 +5818,7 @@ Session.prototype = {
   verifyVpaAndContinue: function(data, params) {
     var self = this;
     self.showLoadError('Verifying your VPA');
+    $('#overlay-close').hide();
 
     var vpa = data.vpa;
 
@@ -5787,8 +5837,8 @@ Session.prototype = {
        */
       .verifyVpa(vpa, 10000)
       .then(function() {
+        $('#overlay-close').show();
         hideOverlaySafely($('#error-message'));
-
         setTimeout(function() {
           self.submit({
             vpaVerified: true,
@@ -5934,6 +5984,10 @@ Session.prototype = {
       }
     }
 
+    if (!data.contact) {
+      delete data.contact;
+    }
+
     if (data.method === 'paylater') {
       if (data.contact) {
         if (!data.ott) {
@@ -6047,6 +6101,8 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
+    } else if (this.isOmnichannel()) {
+      this.showOmnichannelLoader(strings.OmnichannelNotification);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -6807,6 +6863,14 @@ Session.prototype = {
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
   },
+  isOmnichannel: function() {
+    var isOmni =
+      this.preferences.features &&
+      this.preferences.features.google_pay_omnichannel &&
+      this.upiTab.get().selectedApp === 'gpay';
+
+    return isOmni;
+  },
 
   /**
    * Mark headless as failed and perform cleanup
@@ -6850,7 +6914,6 @@ Session.prototype = {
   setPreferences: function(prefs) {
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
-    /* TODO: try to make a separate module for preferences */
     this.r.preferences = prefs;
     this.preferences = prefs;
     preferences = prefs;
