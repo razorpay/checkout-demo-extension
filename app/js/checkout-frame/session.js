@@ -5207,18 +5207,14 @@ Session.prototype = {
   hide: function(confirmedCancel) {
     var self = this;
     if (this.isOpen) {
-      if (
-        confirmedCancel !== true &&
-        this.r._payment &&
-        this.r._payment.isMagicPayment
-      ) {
+      if (confirmedCancel !== true && this.r._payment) {
         return Confirm.show({
           message: 'Your payment is ongoing. Press OK to cancel the payment.',
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
           onPositiveClick: function() {
-            self.close(true);
+            self.hide(true);
           },
         });
       }
