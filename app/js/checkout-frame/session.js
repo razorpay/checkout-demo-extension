@@ -1995,9 +1995,9 @@ Session.prototype = {
             this.clearRequest({
               '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
             });
-          }
 
-          this.switchTab('cardless_emi');
+            this.switchTab('cardless_emi');
+          }
 
           return true;
         }, this),
@@ -5963,10 +5963,6 @@ Session.prototype = {
         if (data.contact && !data.emi_duration) {
           this.showCardlessEmiPlans();
           return;
-        }
-
-        if (data.provider === 'flexmoney') {
-          delete data.ott;
         }
 
         /**
