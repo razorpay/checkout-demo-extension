@@ -2883,7 +2883,7 @@ Session.prototype = {
        *
        * This _has_ to be fixed in v4, so we'll remove it then.
        */
-      if (Hacks.isDeviceLandscape()) {
+      if (Hacks.isDeviceLandscape() && isMobile()) {
         this.fixLandscapeBug();
       }
 
@@ -3558,6 +3558,13 @@ Session.prototype = {
           onSuccess: bind(successHandler, this),
         },
       });
+    } else if (screen === 'bank_transfer') {
+      this.currentScreen = new discreet.BankTransferScreen({
+        target: qs('#bank-transfer-svelte-wrap'),
+        data: {
+          session: this,
+        },
+      });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
       this.currentScreen = null;
@@ -3607,7 +3614,9 @@ Session.prototype = {
       screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'magic-choice' && !$('#form-magic-choice .item :checked')[0])
+      (screen === 'magic-choice' &&
+        !$('#form-magic-choice .item :checked')[0]) ||
+      screen === 'bank_transfer'
     ) {
       showPaybtn = false;
     }
@@ -6633,6 +6642,14 @@ Session.prototype = {
       );
     }
 
+    if (methods.bank_transfer) {
+      if (this.get('order_id')) {
+        methods.count++;
+      } else {
+        methods.bank_transfer = false;
+      }
+    }
+
     if (methods.card) {
       methods.count++;
     }
@@ -6935,27 +6952,28 @@ Session.prototype = {
     Razorpay.configure(options);
 
     // Get amount
-    var itemWithAmount = _Arr.filter([order, invoice, subscription], function(
-      item
+    var entityWithAmount = _Arr.filter([order, invoice, subscription], function(
+      entity
     ) {
-      return item && item.amount;
+      return entity && _Obj.hasProp(entity, 'amount');
     })[0];
 
-    if (itemWithAmount) {
-      session_options.amount = itemWithAmount.partial_payment
-        ? itemWithAmount.amount_due
-        : itemWithAmount.amount;
+    if (entityWithAmount) {
+      session_options.amount = entityWithAmount.partial_payment
+        ? entityWithAmount.amount_due
+        : entityWithAmount.amount;
     }
 
     // Get currency
-    var itemWithCurrency = _Arr.filter([order, invoice, subscription], function(
-      item
-    ) {
-      return item && item.currency;
-    })[0];
+    var entityWithCurrency = _Arr.filter(
+      [order, invoice, subscription],
+      function(entity) {
+        return entity && _Obj.hasProp(entity, 'currency');
+      }
+    )[0];
 
-    if (itemWithCurrency) {
-      session_options.currency = itemWithCurrency.currency;
+    if (entityWithCurrency) {
+      session_options.currency = entityWithCurrency.currency;
     }
 
     // Amount and currency have been updated, set EMI options
@@ -6974,17 +6992,30 @@ Session.prototype = {
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
-      return this.r.createPayment(
-        {
-          contact: this.get('prefill.contact') || '9999999999',
-          email: this.get('prefill.email') || 'void@razorpay.com',
-          bank: order.bank,
-          method: 'netbanking',
-        },
-        {
-          fee: preferences.fee_bearer,
-        }
-      );
+
+      var paymentPayload = {
+        contact: this.get('prefill.contact') || '9999999999',
+        email: this.get('prefill.email') || 'void@razorpay.com',
+        bank: order.bank,
+        amount: session_options.amount,
+      };
+
+      if (order.method) {
+        paymentPayload.method = order.method;
+      }
+
+      if (this.recurring) {
+        var recurringValue = this.get('recurring');
+        paymentPayload.recurring = isString(recurringValue)
+          ? recurringValue
+          : 1;
+      } else {
+        paymentPayload.method = 'netbanking';
+      }
+
+      return this.r.createPayment(paymentPayload, {
+        fee: preferences.fee_bearer,
+      });
     }
 
     if (IRCTC_KEYS.indexOf(this.get('key')) !== -1) {

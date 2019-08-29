@@ -63,6 +63,7 @@ export const TAB_TITLES = {
   wallet: 'Wallet',
   payout_account: 'Add Bank Account',
   payout_upi: 'Add UPI ID',
+  bank_transfer: 'Bank Transfer',
 };
 
 /* .shown has display: none from iOS ad-blocker
@@ -107,6 +108,7 @@ export const AVAILABLE_METHODS = [
   'qr',
   'paylater',
   'paypal',
+  'bank_transfer',
 ];
 
 /* VPA regex, copied from API */

@@ -141,6 +141,8 @@ function autoScrollHeaderIfLandscape() {
   }
 }
 
+const SHORTEST_IPHONE_HEIGHT = 568; // iPhone 5S
+
 /**
  * On iPhone with smaller heights (iPhone 5S),
  * the pay button is not visible on the web.
@@ -151,20 +153,33 @@ function shiftIosPayButtonOnSmallerHeights() {
   if (UserAgent.iPhone) {
     setTimeout(() => {
       const footer = _Doc.querySelector('#footer');
-      if (!isDeviceLandscape() && global.innerHeight <= 512) {
+      /**
+       * On Portrait mode,
+       * if the device is short,
+       * shift the pay button.
+       */
+      if (
+        !isDeviceLandscape() &&
+        global.screen.height <= SHORTEST_IPHONE_HEIGHT
+      ) {
         _El.addClass(footer, 'shift-ios');
       }
     }, 1000);
 
-    if (UserAgent.Safari) {
+    if (UserAgent.iPhone) {
       global.addEventListener('resize', () => {
-        if (global.innerHeight > 550) {
+        // Device isn't very short. Return.
+        if (global.screen.height > SHORTEST_IPHONE_HEIGHT) {
           return;
         }
 
         const footer = _Doc.querySelector('#footer');
 
-        // Shift pay button
+        /**
+         * If portrait,
+         * and DOM height does not overflow,
+         * shift Pay button
+         */
         if (
           !isDeviceLandscape() &&
           global.screen.height - global.innerHeight >= 56
@@ -183,8 +198,9 @@ function shiftIosPayButtonOnSmallerHeights() {
  */
 function reduceUnneededPaddingIfLandscape() {
   const isLandscape = isDeviceLandscape();
+  const isMobile = UserAgent.isMobile();
 
-  if (isLandscape) {
+  if (isLandscape && isMobile) {
     setTimeout(() => {
       const header = _Doc.querySelector('#header');
       const formCommon = _Doc.querySelector('#form-common');

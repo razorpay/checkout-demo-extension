@@ -2,6 +2,7 @@
 
 # Setup Instructions
 
+1. Copy `app/index.sample.html` -> `app/index.html`
 1. copy over `app/config.sample.js` -> `app/config.js` to specify API URL
 1. set up apache vhost using `httpd.sample.conf`. web root is `app` folder.
 1. `npm i`
