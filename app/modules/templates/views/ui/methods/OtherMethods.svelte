@@ -123,7 +123,8 @@
       return {
         visible: false,
         AVAILABLE_METHODS: [],
-        instruments: []
+        instruments: [],
+        standalone: false,
       }
     }
   }
