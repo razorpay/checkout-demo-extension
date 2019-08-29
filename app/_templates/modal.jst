@@ -583,8 +583,10 @@ var upi_apps = _.upi_intents_data;
               <div id='payout-account-svelte-wrap'>
               </div>
               `?method.qr`
-                <div class="tab-content showable screen pad" id="form-qr">
-                </div>
+                <div class="tab-content showable screen pad" id="form-qr"></div>
+              `?`
+              `?method.bank_transfer`
+                <div id='bank-transfer-svelte-wrap'></div>
               `?`
               `?ecod && invoice`
                 <div class="tab-content showable screen pad" id="form-ecod">

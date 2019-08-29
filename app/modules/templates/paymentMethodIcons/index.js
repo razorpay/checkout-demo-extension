@@ -6,6 +6,7 @@ import wallet from './wallet';
 import othermethods from './othermethods';
 import qr from './qr';
 import paylater from './paylater';
+import bank_transfer from './bank_transfer';
 
 const availPaymentMethods = [
   'card',
@@ -17,6 +18,7 @@ const availPaymentMethods = [
   'qr',
   'cardless_emi',
   'paylater',
+  'bank_transfer',
 ];
 
 function getIconFn(iconName) {
@@ -45,6 +47,8 @@ function getIconFn(iconName) {
 
     case 'paylater':
       return paylater;
+    case 'bank_transfer':
+      return bank_transfer;
   }
 }
 
