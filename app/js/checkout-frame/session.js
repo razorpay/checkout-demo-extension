@@ -6402,6 +6402,30 @@ Session.prototype = {
     return data;
   },
 
+  /**
+   * Returns the object to be passed while
+   * cancelling a payment
+   *
+   * @returns {Object}
+   */
+  getCancelReason: function() {
+    var reason;
+
+    if (this.payload && this.payload.method === 'cardless_emi') {
+      reason = {
+        '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+      };
+
+      if (!this.payload.emi_duration) {
+        reason = {
+          '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
+        };
+      }
+    }
+
+    return reason;
+  },
+
   close: function() {
     if (this.prefCall) {
       this.prefCall.abort();
@@ -6409,9 +6433,11 @@ Session.prototype = {
     }
 
     if (this.isOpen) {
+      var cancelReason = this.getCancelReason();
+
       this.hideTimer();
       abortAjax(this.ajax);
-      this.clearRequest();
+      this.clearRequest(cancelReason);
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
