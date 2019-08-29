@@ -25,7 +25,7 @@ module.exports = {
 
 const SELECTORS = {
   UPI_PAYMENT_METHOD: '.payment-option[tab=upi]',
-  GPAY_GRID_ITEM: '#form-upi > .svelte-ref-grid > div:nth-child(2)',
+  GPAY_GRID_ITEM: '#form-upi .svelte-ref-grid > div:nth-child(2)',
   PHONE_ELEM: '#upi-gpay-phone',
   PHONE_INPUT: '#upi-gpay-phone input[name=phone]',
   VPA_ELEM: '#upi-gpay-vpa',
