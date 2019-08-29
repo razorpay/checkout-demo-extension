@@ -37,7 +37,8 @@ var preferences = window.preferences,
   Hacks = discreet.Hacks,
   CardlessEmi = discreet.CardlessEmi,
   PayLater = discreet.PayLater,
-  PayLaterView = discreet.PayLaterView;
+  PayLaterView = discreet.PayLaterView,
+  OtpService = discreet.OtpService;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -127,6 +128,7 @@ var CardlessEmiStore = {
   loanUrls: {},
   ott: {},
   lenderBranding: {},
+  urls: {},
 };
 
 var PayLaterStore = {
@@ -905,7 +907,11 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, text, shouldLimitResend) {
+function askOTP(view, text, shouldLimitResend, screenProps) {
+  if (!screenProps) {
+    screenProps = {};
+  }
+
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
@@ -934,15 +940,20 @@ function askOTP(view, text, shouldLimitResend) {
     text = text.error && text.error.description;
   }
 
-  view.updateScreen({
-    loading: false,
-    action: false,
-    otp: '',
-    allowSkip: !Boolean(thisSession.recurring),
-    allowResend: shouldLimitResend
-      ? discreet.OtpService.canSendOtp('razorpay')
-      : true,
-  });
+  view.updateScreen(
+    _Obj.extend(
+      {
+        loading: false,
+        action: false,
+        otp: '',
+        allowSkip: !Boolean(thisSession.recurring),
+        allowResend: shouldLimitResend
+          ? OtpService.canSendOtp('razorpay')
+          : true,
+      },
+      screenProps
+    )
+  );
 
   $('#body').addClass('sub');
 
@@ -956,9 +967,7 @@ function askOTP(view, text, shouldLimitResend) {
             var metadata = origText.metadata;
             thisSession.headlessMetadata = metadata;
 
-            discreet.OtpService.markOtpSent(
-              metadata.issuer || metadata.network
-            );
+            OtpService.markOtpSent(metadata.issuer || metadata.network);
 
             var bankLogo;
             if (metadata.issuer) {
@@ -1018,8 +1027,8 @@ function askOTP(view, text, shouldLimitResend) {
   setOtpText(view, text);
 }
 
-function debounceAskOTP(view, msg, shouldLimitResend) {
-  debounce(askOTP, 750)(view, msg, shouldLimitResend);
+function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
+  debounce(askOTP, 750)(view, msg, shouldLimitResend, screenProps);
 }
 
 // this === Session
@@ -1973,10 +1982,18 @@ Session.prototype = {
 
       on: {
         back: bind(function() {
-          self.switchTab('cardless_emi');
+          var payment = this.r._payment;
+
+          if (payment && confirmClose()) {
+            this.clearRequest({
+              '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
+            });
+
+            this.switchTab('cardless_emi');
+          }
 
           return true;
-        }),
+        }, this),
 
         select: function(value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
@@ -2012,80 +2029,56 @@ Session.prototype = {
     var cardlessEmiProviderObj = CardlessEmi.getProvider(providerCode);
     var self = this;
 
+    var incorrectOtp = params.incorrect;
+
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
     tab_titles.otp = topbarImages;
 
     this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
-    this.customer.checkStatus(
-      function(response) {
-        if (self.screen !== 'otp' && self.tab !== 'cardless_emi') {
-          return;
-        }
 
-        if (response.error && response.error.description) {
-          self.showLoadError(response.error.description, true);
-          Analytics.track('cardless_emi:plans:fetch:error', {
-            data: {
-              provider: providerCode,
-            },
-          });
-          return;
-        }
+    if (this.screen !== 'otp' && this.tab !== 'cardless_emi') {
+      return;
+    }
 
-        if (response.success && response.emi_plans) {
-          CardlessEmiStore.plans[providerCode] = response.emi_plans;
+    var callback = function() {
+      var otpMessage =
+        'Enter the OTP sent on ' +
+        getPhone() +
+        '<br>' +
+        ' to get EMI plans for' +
+        cardlessEmiProviderObj.name;
 
-          CardlessEmiStore.lenderBranding[providerCode] =
-            response.lender_branding_url;
+      if (incorrectOtp) {
+        otpMessage = discreet.wrongOtpMsg;
+      }
 
-          self.showCardlessEmiPlans();
-          return;
-        }
+      debounceAskOTP(self.otpView, otpMessage, true, {
+        allowSkip: false,
+      });
+    };
 
-        // TODO: Remove this condition if event is not being fired.
-        if (!response.saved) {
-          var errorDesc =
-            'Could not find a ' +
-            cardlessEmiProviderObj.name +
-            ' account associated with ' +
-            getPhone();
+    var resend = params.resend;
+    var resendUrl =
+      CardlessEmiStore.urls[providerCode] &&
+      CardlessEmiStore.urls[providerCode].resend_otp;
 
-          self.showLoadError(errorDesc, true);
+    if (resend && resendUrl) {
+      Analytics.track('otp:resend', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          cardless_emi: providerCode,
+        },
+      });
 
-          Analytics.track('cardless_emi:plans:fetch:error', {
-            data: {
-              provider: providerCode,
-            },
-          });
+      fetch({
+        url: resendUrl,
+        callback: callback,
+      });
 
-          return;
-        }
-
-        var otpMessage =
-          'Enter the OTP sent on ' +
-          getPhone() +
-          '<br>' +
-          ' to get EMI plans for' +
-          cardlessEmiProviderObj.name;
-
-        askOTP(self.otpView, otpMessage, true);
-
-        self.otpView.updateScreen({
-          allowSkip: false,
-        });
-      },
-      {
-        provider: providerCode,
-        amount: self.get('amount'),
-      },
-      getPhone()
-    );
-
-    Analytics.track('cardless_emi:plans:fetch:start', {
-      data: {
-        provider: providerCode,
-      },
-    });
+      OtpService.markOtpSent('razorpay');
+    } else {
+      callback();
+    }
   },
 
   checkCustomerStatus: function(params, callback) {
@@ -2474,8 +2467,11 @@ Session.prototype = {
     }
 
     var otpProvider;
+    var paymentExists = Boolean(this.r._payment);
+    var isCardlessEmiPayment =
+      this.payload && this.payload.method === 'cardless_emi';
 
-    if (!this.r._payment) {
+    if (!paymentExists || isCardlessEmiPayment) {
       /**
        * If we're resending the OTP without any payment being created,
        * it's a Razorpay OTP.
@@ -2487,7 +2483,7 @@ Session.prototype = {
         this.headlessMetadata.issuer || this.headlessMetadata.network;
     }
 
-    var otpSentCount = discreet.OtpService.getCount(otpProvider);
+    var otpSentCount = OtpService.getCount(otpProvider);
     var resendEventData = {
       wallet: this.tab === 'wallet',
       headless: this.headless,
@@ -2511,7 +2507,7 @@ Session.prototype = {
       if (this.headlessMetadata) {
         var metadata = this.headlessMetadata;
 
-        discreet.OtpService.markOtpSent(metadata.issuer || metadata.network);
+        OtpService.markOtpSent(metadata.issuer || metadata.network);
       }
 
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
@@ -2519,7 +2515,9 @@ Session.prototype = {
 
     this.showLoadError(strings.otpsend + getPhone());
     if (this.tab === 'cardless_emi') {
-      this.fetchCardlessEmiPlans();
+      this.fetchCardlessEmiPlans({
+        resend: true,
+      });
     } else if (this.tab === 'paylater') {
       this.askPayLaterOtp('resend');
     } else if (this.tab === 'wallet') {
@@ -3726,7 +3724,9 @@ Session.prototype = {
     var defaultOffer = this.offers.defaultOffer;
     if (defaultOffer && tab) {
       // Don't preselect offer for Cardless EMI homescreen.
-      if (!(tab === 'cardless_emi' && this.screen === 'cardless_emi')) {
+      if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
+        this.preSelectedOffer = null;
+      } else {
         this.preSelectedOffer = defaultOffer;
       }
     }
@@ -3999,11 +3999,20 @@ Session.prototype = {
       tab = '';
     }
 
-    if (tab === 'wallet' && this.screen === 'otp' && this.r._payment) {
+    var walletOtpPage =
+      tab === 'wallet' && this.screen === 'otp' && this.r._payment;
+    var cardlessEmiOtpPage =
+      tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
+    if (walletOtpPage || cardlessEmiOtpPage) {
       if (!confirmClose()) {
         return;
       }
-      this.clearRequest();
+
+      if (cardlessEmiOtpPage) {
+        this.clearRequest({
+          '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+        });
+      }
     }
 
     if (BackStore && BackStore.screen) {
@@ -5206,18 +5215,14 @@ Session.prototype = {
   hide: function(confirmedCancel) {
     var self = this;
     if (this.isOpen) {
-      if (
-        confirmedCancel !== true &&
-        this.r._payment &&
-        this.r._payment.isMagicPayment
-      ) {
+      if (confirmedCancel !== true && this.r._payment) {
         return Confirm.show({
           message: 'Your payment is ongoing. Press OK to cancel the payment.',
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
           onPositiveClick: function() {
-            self.close(true);
+            self.hide(true);
           },
         });
       }
@@ -5401,43 +5406,53 @@ Session.prototype = {
     }
 
     var queryParams;
-
-    // card tab only past this
     var callback;
-    // card filled by logged out user + remember me
-    if (this.payload) {
-      var isRedirect = this.get('redirect');
-      if (!isRedirect) {
-        this.submit();
-      }
-      callback = function(msg) {
-        if (this.customer.logged) {
-          if (isRedirect) {
-            this.submit();
+
+    var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
+
+    if (!isCardlessEmi) {
+      // card tab only past this
+      // card filled by logged out user + remember me
+      if (this.payload) {
+        var isRedirect = this.get('redirect');
+        if (!isRedirect) {
+          this.submit();
+        }
+        callback = function(msg) {
+          if (this.customer.logged) {
+            // OTP verification successful
+            OtpService.resetCount('razorpay');
+
+            if (isRedirect) {
+              this.submit();
+            } else {
+              this.r.emit('payment.resume');
+            }
+            this.showLoadError();
           } else {
-            this.r.emit('payment.resume');
+            this.r.emit('payment.error', discreet.error(msg));
+            Analytics.track('behav:otp:incorrect', {
+              wallet: this.tab === 'wallet',
+            });
+            askOTP(this.otpView, msg, true);
           }
-          this.showLoadError();
-        } else {
-          this.r.emit('payment.error', discreet.error(msg));
-          Analytics.track('behav:otp:incorrect', {
-            wallet: this.tab === 'wallet',
-          });
-          askOTP(this.otpView, msg, true);
-        }
-      };
-    } else {
-      var self = this;
-      callback = function(msg) {
-        if (self.customer.logged) {
-          self.showCardTab();
-        } else {
-          Analytics.track('behav:otp:incorrect', {
-            wallet: self.tab === 'wallet',
-          });
-          askOTP(this.otpView, msg, true);
-        }
-      };
+        };
+      } else {
+        var self = this;
+        callback = function(msg) {
+          if (self.customer.logged) {
+            // OTP verification successful
+            OtpService.resetCount('razorpay');
+
+            self.showCardTab();
+          } else {
+            Analytics.track('behav:otp:incorrect', {
+              wallet: self.tab === 'wallet',
+            });
+            askOTP(this.otpView, msg, true);
+          }
+        };
+      }
     }
 
     var submitPayload = {
@@ -5448,15 +5463,21 @@ Session.prototype = {
     if (this.tab === 'cardless_emi') {
       var providerCode = CardlessEmiStore.providerCode;
 
-      queryParams = {
+      submitPayload = _Obj.extend(submitPayload, {
         provider: providerCode,
         method: 'cardless_emi',
-      };
+        payment_id: this.r._payment.payment_id,
+      });
 
       callback = function(msg, data) {
         if (msg) {
-          this.fetchCardlessEmiPlans();
+          this.fetchCardlessEmiPlans({
+            incorrect: true,
+          });
         } else {
+          // OTP verification successful
+          OtpService.resetCount('razorpay');
+
           CardlessEmiStore.plans[providerCode] = data.emi_plans;
           CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
           CardlessEmiStore.ott[providerCode] = data.ott;
@@ -5483,6 +5504,9 @@ Session.prototype = {
           this.askPayLaterOtp('incorrect');
         } else {
           if (data.ott) {
+            // OTP verification successful
+            OtpService.resetCount('razorpay');
+
             PayLaterStore.otpVerified = true;
             PayLaterStore.ott[providerCode] = data.ott;
             PayLaterStore.contact = data.contact;
@@ -5514,6 +5538,10 @@ Session.prototype = {
 
     this.destroyMagic();
 
+    if (this.payload && this.payload.method === 'cardless_emi') {
+      this.resetCardlessEmiStoreForProvider(this.payload.provider);
+    }
+
     this.isResumedPayment = false;
     this.doneByP13n = false;
     this.payload = null;
@@ -5529,6 +5557,21 @@ Session.prototype = {
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
+  },
+
+  /**
+   * Removes items from the CardlessEmiStore
+   * corresponding to the given provider.
+   * @param {string} provider
+   */
+  resetCardlessEmiStoreForProvider: function(provider) {
+    if (!provider) {
+      return;
+    }
+
+    _Obj.loop(CardlessEmiStore, function(value, key) {
+      delete value[provider];
+    });
   },
 
   preSubmit: function(e) {
@@ -5858,12 +5901,34 @@ Session.prototype = {
       props = {};
     }
     var vpaVerified = props.vpaVerified;
+    var data = this.payload;
 
     if (this.r._payment) {
-      return;
+      /**
+       * For Cardless EMI, payments are created at the first step,
+       * before the user gets to select a plan.
+       * Thus, we would need to submit again after the
+       * user has created a plan, even though the payment
+       * is already created.
+       *
+       * This does not happen for any other method.
+       */
+      if (data.method === 'cardless_emi') {
+        data.payment_id = this.r._payment.payment_id;
+
+        /**
+         * If emi_duration is present, this is the final
+         * payment submit request.
+         * Clear existing payments.
+         */
+        if (data.emi_duration) {
+          this.r._payment.clear();
+        }
+      } else {
+        return;
+      }
     }
 
-    var data = this.payload;
     var that = this;
     var session = this;
     var request = {
@@ -5966,22 +6031,68 @@ Session.prototype = {
     }
 
     if (data.method === 'cardless_emi') {
-      if (data.contact && !data.emi_duration) {
-        this.showCardlessEmiPlans();
-        return;
-      }
-
       if (data.provider === 'flexmoney') {
         delete data.ott;
       }
 
-      /**
-       * If contact is optional, we want to open a popup and take ott and emi_duration there.
-       */
-      if (!data.contact) {
+      if (data.payment_id) {
+        if (data.contact && !data.emi_duration) {
+          this.showCardlessEmiPlans();
+          return;
+        }
+
+        /**
+         * If contact is optional, we want to open a popup and take ott and emi_duration there.
+         */
+        if (!data.contact) {
+          delete data.ott;
+          delete data.emi_duration;
+        }
+      } else {
         delete data.ott;
         delete data.emi_duration;
       }
+
+      this.r.on('payment.process', function(paymentData) {
+        var request = paymentData.request;
+        var response = paymentData.response;
+
+        var content = request.content;
+        var method = content && content.method;
+        var provider = content && content.provider;
+        var emi_duration = content && content.emi_duration;
+
+        // Abort if not Cardless EMI
+        if (method !== 'cardless_emi') {
+          return;
+        }
+
+        // Handle receiving emi_plans in the pilot payment create request
+        if (response.emi_plans) {
+          CardlessEmiStore.plans[provider] = response.emi_plans;
+
+          CardlessEmiStore.lenderBranding[provider] =
+            response.lender_branding_url;
+        }
+
+        // Store the Resend URL
+        if (response.resend_url) {
+          // Init empty store if one doesn't exist
+          if (!CardlessEmiStore.urls[provider]) {
+            CardlessEmiStore.urls[provider] = {};
+          }
+
+          CardlessEmiStore.urls[provider].resend_otp = response.resend_url;
+        }
+
+        // Increase OTP sent count
+        OtpService.markOtpSent('razorpay');
+
+        if (!emi_duration) {
+          hideOverlayMessage();
+          return session.showCardlessEmiPlans();
+        }
+      });
     }
 
     if (!data.contact) {
@@ -6233,6 +6344,16 @@ Session.prototype = {
       });
     }
 
+    /**
+     * For Cardless EMI payments,
+     * if this is the final payment request,
+     * take the user back to the cardless EMI screen
+     * from the plans screen
+     */
+    if (data.method === 'cardless_emi' && data.emi_duration) {
+      this.switchTab('cardless_emi');
+    }
+
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', function(message) {
@@ -6364,6 +6485,30 @@ Session.prototype = {
     return data;
   },
 
+  /**
+   * Returns the object to be passed while
+   * cancelling a payment
+   *
+   * @returns {Object}
+   */
+  getCancelReason: function() {
+    var reason;
+
+    if (this.payload && this.payload.method === 'cardless_emi') {
+      reason = {
+        '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+      };
+
+      if (!this.payload.emi_duration) {
+        reason = {
+          '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
+        };
+      }
+    }
+
+    return reason;
+  },
+
   close: function() {
     if (this.prefCall) {
       this.prefCall.abort();
@@ -6371,9 +6516,11 @@ Session.prototype = {
     }
 
     if (this.isOpen) {
+      var cancelReason = this.getCancelReason();
+
       this.hideTimer();
       abortAjax(this.ajax);
-      this.clearRequest();
+      this.clearRequest(cancelReason);
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
@@ -6881,7 +7028,7 @@ Session.prototype = {
 
     if (this.headlessMetadata) {
       var metadata = this.headlessMetadata;
-      discreet.OtpService.resetCount(metadata.issuer || metadata.network);
+      OtpService.resetCount(metadata.issuer || metadata.network);
 
       this.headlessMetadata = null;
     }

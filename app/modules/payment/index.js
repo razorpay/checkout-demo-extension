@@ -224,6 +224,18 @@ export default function Payment(data, params = {}, r) {
         avoidPopup = true;
       }
 
+      /**
+       * Show Popup for Cardless EMI, if
+       * - Contact is absent.
+       */
+      if (data.method === 'cardless_emi') {
+        if (!data.contact) {
+          avoidPopup = false;
+        } else {
+          avoidPopup = true;
+        }
+      }
+
       /* If fees is there, we need to show fee view in poupup */
       if (params.feesRedirect) {
         avoidPopup = false;

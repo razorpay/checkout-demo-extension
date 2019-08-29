@@ -70,6 +70,14 @@ export const processCoproto = function(response) {
 
 var responseTypes = {
   // this === payment
+
+  cardless_emi: function(request, fullResponse) {
+    this.emit('process', {
+      request,
+      response: fullResponse,
+    });
+  },
+
   first: function(request, fullResponse) {
     var direct = request.method === 'direct';
     var content = request.content;
@@ -297,6 +305,11 @@ var responseTypes = {
   },
 
   respawn: function(request, fullResponse) {
+    // If Cardless EMI, route the coproto
+    if (this.data && this.data.method === 'cardless_emi') {
+      return responseTypes.cardless_emi.call(this, request, fullResponse);
+    }
+
     // By default, use first coproto.
     return responseTypes.first.call(this, request, fullResponse);
   },
