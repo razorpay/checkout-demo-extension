@@ -1,46 +1,84 @@
 <Tab method="upi" {down} pad={false}>
-  <div ref:screenContent>
-  {#if intent}
-    <UpiIntent
-      ref:intentView
-      apps={intentApps}
-      {selectedApp}
-      {showRecommendedUPIApp}
-    />
-  {:else}
-    {#if selectedApp === undefined || isGPaySelected}
-      <div class="legend left">Select a UPI app</div>
-      <Grid items={topUpiApps}
-        on:select="onUpiAppSelection(event)"
-        selected={selectedApp}
+  <Screen>
+    {#if intent}
+      <UpiIntent
+        ref:intentView
+        apps={intentApps}
+        {selectedApp}
+        {showRecommendedUPIApp}
       />
     {:else}
-      <div class="legend left">Selected UPI app</div>
-      <Card>
-        <span ref:iconWrap>
-          <Icon icon={selectedAppData.icon}/>
-        </span>
-        <span>
-          {selectedAppData.text}
-        </span>
-        <div ref:changeBtn on:click="onUpiAppSelection()">change</div>
-      </Card>
-      <div class="legend left" style="margin-top: 18px">
-        Enter your UPI ID
-      </div>
-      <Card selected={true} on:click="handleCardClick(event)">
-        {#if selectedApp === 'gpay'}
-          <div id="upi-gpay">
-            <div class="elem-wrap collect-form">
-              <!-- TODO: remove all non svelte css for this -->
+      {#if selectedApp === undefined || isGPaySelected}
+        <div class="legend left">Select a UPI app</div>
+        <Grid items={topUpiApps}
+          on:select="onUpiAppSelection(event)"
+          selected={selectedApp}
+        />
+      {:else}
+        <div class="legend left">Selected UPI app</div>
+        <Card>
+          <span ref:iconWrap>
+            <Icon icon={selectedAppData.icon}/>
+          </span>
+          <span>
+            {selectedAppData.text}
+          </span>
+          <div ref:changeBtn on:click="onUpiAppSelection()">change</div>
+        </Card>
+        <div class="legend left" style="margin-top: 18px">
+          Enter your UPI ID
+        </div>
+        <Card selected={true} on:click="handleCardClick(event)">
+          {#if selectedApp === 'gpay'}
+            <div id="upi-gpay">
+              <div class="elem-wrap collect-form">
+                <!-- TODO: remove all non svelte css for this -->
+                <Field
+                  type="text"
+                  name="vpa"
+                  id='vpa'
+                  ref:vpaField
+                  placeholder="Enter UPI ID"
+                  helpText="Please enter a valid handle"
+                  pattern=".+"
+                  required={true}
+                  formatter={{
+                    type: 'vpa'
+                  }}
+
+                  on:blur="trackVpaEntry(event)"
+                />
+                <div class="elem at-separator">@</div>
+                <div class="elem">
+                  <select
+                    required
+                    class="input"
+                    name="gpay_bank"
+                    ref:googlePayPspHandle
+                    on:change="googlePayPspHandleChange(event)"
+                    bind:value="pspHandle">
+                    <option value="">Select Bank</option>
+                    <option value="okhdfcbank">okhdfcbank</option>
+                    <option value="okicici">okicici</option>
+                    <option value="oksbi">oksbi</option>
+                    <option value="okaxis">okaxis</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          {:else}
+            <div id='vpa-wrap' class={selectedAppData.id}>
+              <!-- TODO: use formatter for validation once all fields
+                are moved to `Field` -->
               <Field
                 type="text"
                 name="vpa"
-                id='vpa'
+                id="vpa"
                 ref:vpaField
-                placeholder="Enter UPI ID"
-                helpText="Please enter a valid handle"
-                pattern=".+"
+                placeholder={selectedApp ? "" : "Enter your UPI Address"}
+                helpText="Please enter a valid VPA of the form username@bank"
+                value={selectedApp === null ? vpa : ''}
+                pattern={pattern}
                 required={true}
                 formatter={{
                   type: 'vpa'
@@ -48,72 +86,34 @@
 
                 on:blur="trackVpaEntry(event)"
               />
-              <div class="elem at-separator">@</div>
-              <div class="elem">
-                <select
-                  required
-                  class="input"
-                  name="gpay_bank"
-                  ref:googlePayPspHandle
-                  on:change="googlePayPspHandleChange(event)"
-                  bind:value="pspHandle">
-                  <option value="">Select Bank</option>
-                  <option value="okhdfcbank">okhdfcbank</option>
-                  <option value="okicici">okicici</option>
-                  <option value="oksbi">oksbi</option>
-                  <option value="okaxis">okaxis</option>
-                </select>
-              </div>
+              {#if pspHandle}
+                <div ref:pspName>@{pspHandle}</div>
+              {/if}
             </div>
-          </div>
-        {:else}
-          <div id='vpa-wrap' class={selectedAppData.id}>
-            <!-- TODO: use formatter for validation once all fields
-              are moved to `Field` -->
-            <Field
-              type="text"
-              name="vpa"
-              id="vpa"
-              ref:vpaField
-              placeholder={selectedApp ? "" : "Enter your UPI Address"}
-              helpText="Please enter a valid VPA of the form username@bank"
-              value={selectedApp === null ? vpa : ''}
-              pattern={pattern}
-              required={true}
-              formatter={{
-                type: 'vpa'
-              }}
-
-              on:blur="trackVpaEntry(event)"
-            />
-            {#if pspHandle}
-              <div ref:pspName>@{pspHandle}</div>
-            {/if}
-          </div>
-        {/if}
-      </Card>
+          {/if}
+        </Card>
+      {/if}
     {/if}
-  {/if}
 
-  {#if shouldShowQr}
-    <div class="legend left">Or, Pay using QR</div>
-    <div class="options" id="showQr">
-      <NextOption
-        icon={qrIcon}
-        tabindex="0"
-        attributes={{
-          role: 'button',
-          'aria-label': 'Show QR Code - Scan the QR code using your UPI app'
-        }}
+    {#if shouldShowQr}
+      <div class="legend left">Or, Pay using QR</div>
+      <div class="options" id="showQr">
+        <NextOption
+          icon={qrIcon}
+          tabindex="0"
+          attributes={{
+            role: 'button',
+            'aria-label': 'Show QR Code - Scan the QR code using your UPI app'
+          }}
 
-        on:select="selectQrMethod(event)"
-      >
-        <div>Show QR Code</div>
-        <div class="desc">Scan the QR code using your UPI app</div>
-      </NextOption>
-    </div>
-  {/if}
-  </div>
+          on:select="selectQrMethod(event)"
+        >
+          <div>Show QR Code</div>
+          <div class="desc">Scan the QR code using your UPI app</div>
+        </NextOption>
+      </div>
+    {/if}
+  </Screen>
 
   {#if down}
     <Callout
@@ -181,13 +181,6 @@
     right: 12px;
     line-height: 40px;
     z-index: 1;
-  }
-
-  ref:screenContent {
-    padding: 0 12px 12px 12px;
-    height: 100%;
-    overflow: auto;
-    box-sizing: border-box;
   }
 
   #upi-gpay {
@@ -271,6 +264,7 @@
       Icon: 'templates/views/ui/Icon.svelte',
       Callout: 'templates/views/ui/Callout.svelte',
       NextOption: 'templates/views/ui/options/NextOption.svelte',
+      Screen: 'templates/layouts/Screen.svelte',
     },
 
     data() {
