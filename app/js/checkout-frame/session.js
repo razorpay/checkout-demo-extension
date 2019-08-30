@@ -2070,8 +2070,11 @@ Session.prototype = {
         },
       });
 
-      fetch({
+      fetch.post({
         url: resendUrl,
+        data: {
+          contact: getPhone(),
+        },
         callback: callback,
       });
 
