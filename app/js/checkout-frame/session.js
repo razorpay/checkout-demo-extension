@@ -2357,11 +2357,20 @@ Session.prototype = {
     if (anchor.offsetWidth / anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
       this.fontLoaded = true;
+      this.applyBranding();
     } else if (retryCount < 25) {
       var self = this;
       fontTimeout = setTimeout(function() {
         self.applyFont(anchor, ++retryCount);
       }, 120 + retryCount * 50);
+    }
+  },
+
+  applyBranding: function() {
+    var brand_logo = this.get('partnership_logo');
+    if (brand_logo) {
+      $('#powered-by').addClass('branded')[0].innerHTML =
+        'Powered by<br><img src="' + brand_logo + '">';
     }
   },
 
