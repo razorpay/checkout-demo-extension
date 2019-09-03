@@ -2357,7 +2357,7 @@ Session.prototype = {
     if (anchor.offsetWidth / anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
       this.fontLoaded = true;
-      this.applyBranding();
+      this.applyPoweredByBranding();
     } else if (retryCount < 25) {
       var self = this;
       fontTimeout = setTimeout(function() {
@@ -2366,11 +2366,17 @@ Session.prototype = {
     }
   },
 
-  applyBranding: function() {
+  /**
+   * Applies the Powered By branding
+   */
+  applyPoweredByBranding: function() {
     var brand_logo = this.get('partnership_logo');
+
     if (brand_logo) {
-      $('#powered-by').addClass('branded')[0].innerHTML =
-        'Powered by<br><img src="' + brand_logo + '">';
+      var elem = _Doc.querySelector('#powered-by');
+
+      _El.addClass(elem, 'branded');
+      _El.setContents(elem, 'Powered by<br><img src="' + brand_logo + '">');
     }
   },
 
