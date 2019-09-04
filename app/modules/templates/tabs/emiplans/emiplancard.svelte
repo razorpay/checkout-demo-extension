@@ -41,7 +41,7 @@
         plan.duration,
         plan.interest
       ),
-      noCostEmi: ({ plan }) => plan.subvention === 'merchant' ? true : false,
+      noCostEmi: ({ plan }) => plan.subvention === 'merchant',
       badge: ({ noCostEmi }) => noCostEmi ? 'No cost EMI' : false,
       isCardEmi: ({ provider }) => !provider,
       showInterest: ({ provider, isCardEmi }) => !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider),
