@@ -46,12 +46,20 @@ const walletToIntent = {
 };
 
 /**
+ * Returns the app corresponding to the wallet
+ * @param {string} wallet
+ *
+ * @returns {string}
+ */
+export const getAppForWallet = wallet => walletToIntent[wallet];
+
+/**
  * We want to turn some wallets into intent.
  * @param {string} wallet Selected wallet
  * @param {Array<Object>} apps List of available apps
  */
 export const shouldTurnWalletToIntent = (wallet, apps = []) => {
-  const walletPackage = walletToIntent[wallet];
+  const walletPackage = getAppForWallet(wallet);
 
   if (walletPackage) {
     return _Arr.any(apps, app => app.package_name === walletPackage);
@@ -59,11 +67,3 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
 
   return false;
 };
-
-/**
- * Returns the app corresponding to the wallet
- * @param {string} wallet
- *
- * @returns {string}
- */
-export const getAppForWallet = wallet => walletToIntent[wallet];
