@@ -6031,7 +6031,7 @@ Session.prototype = {
         );
 
       if (shouldTurnWalletToIntent) {
-        data.upi_app = discreet.Wallet.getAppForWallet(data.wallet);
+        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
       }
     }
 
