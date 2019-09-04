@@ -19,12 +19,18 @@
         <li>Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration})</li>
       </ul>
     {/if}
+
+    {#if badge === noCostEmi}
+      <p>
+        Note: This excludes GST that will be charged by your bank on your interest component of the EMI
+      </p>
+    {/if}
   </div>
 </ExpandableCard>
 
 <script>
   import Razorpay from 'common/Razorpay';
-
+  const noCostEmi = 'No cost EMI'
   export default {
     components: {
       ExpandableCard: 'templates/views/ui/ExpandableCard.svelte',
@@ -36,7 +42,7 @@
         plan.duration,
         plan.interest
       ),
-      badge: ({ plan }) => plan.subvention === 'merchant' ? 'No cost EMI' : false,
+      badge: ({ plan }) => plan.subvention === 'merchant' ? noCostEmi : false,
       isCardEmi: ({ provider }) => !provider,
       showInterest: ({ provider, isCardEmi }) => !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider),
 
