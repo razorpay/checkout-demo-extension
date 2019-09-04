@@ -7219,30 +7219,18 @@ Session.prototype = {
       order &&
       order.bank &&
       this.get('callback_url') &&
-      order.method !== 'upi'
+      (order.method !== 'upi' && order.method !== 'emandate') // Should these just be a check for order.method=netbanking?
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
 
       var paymentPayload = {
+        amount: session_options.amount,
+        bank: order.bank,
         contact: this.get('prefill.contact') || '9999999999',
         email: this.get('prefill.email') || 'void@razorpay.com',
-        bank: order.bank,
-        amount: session_options.amount,
+        method: 'netbanking',
       };
-
-      if (order.method) {
-        paymentPayload.method = order.method;
-      }
-
-      if (this.recurring) {
-        var recurringValue = this.get('recurring');
-        paymentPayload.recurring = isString(recurringValue)
-          ? recurringValue
-          : 1;
-      } else {
-        paymentPayload.method = 'netbanking';
-      }
 
       return this.r.createPayment(paymentPayload, {
         fee: preferences.fee_bearer,
