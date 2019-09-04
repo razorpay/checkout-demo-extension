@@ -2360,7 +2360,7 @@ Session.prototype = {
     if (anchor.offsetWidth / anchor.offsetHeight > 3) {
       $(this.el).addClass('font-loaded');
       this.fontLoaded = true;
-      this.applyPoweredByBranding();
+      this.applyPartnershipBranding();
     } else if (retryCount < 25) {
       var self = this;
       fontTimeout = setTimeout(function() {
@@ -2370,16 +2370,19 @@ Session.prototype = {
   },
 
   /**
-   * Applies the Powered By branding
+   * Applies the In Partnership With branding
    */
-  applyPoweredByBranding: function() {
+  applyPartnershipBranding: function() {
     var brand_logo = this.get('partnership_logo');
 
     if (brand_logo) {
       var elem = _Doc.querySelector('#powered-by');
 
       _El.addClass(elem, 'branded');
-      _El.setContents(elem, 'Powered by<br><img src="' + brand_logo + '">');
+      _El.setContents(
+        elem,
+        'In partnership with<br><img src="' + brand_logo + '">'
+      );
     }
   },
 
