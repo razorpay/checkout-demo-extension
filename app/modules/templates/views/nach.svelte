@@ -46,14 +46,14 @@
 
 
 <script>
-  const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.pdf'];
+  const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
   const ALLOWED_MAX_SIZE = 6;
 
   /**
    * Tells if a filename has a valid extension
    * @param {string} filename
    * @param {Array<string>} extensions
-   * 
+   *
    * @returns {boolean}
    */
   function hasValidExtension (filename, extensions) {
@@ -63,7 +63,7 @@
   /**
    * Validates the uploaded file
    * @param {File} file
-   * 
+   *
    * @returns {Object} error
    */
   function validateUpload (file) {
@@ -139,7 +139,7 @@
 
       /**
        * Session calls this to ask if tab will handle back
-       * 
+       *
        * @returns {boolean} will tab handle back
        */
       onBack: function () {
@@ -156,7 +156,7 @@
 
       /**
        * Session calls this to detemine if overlay should be hidden
-       * 
+       *
        * @returns {Boolean} should the overlay be hidden?
        */
       shouldHideOverlay: function () {
@@ -209,7 +209,7 @@
 
       /**
        * Session calls this to determine if it should submit
-       * 
+       *
        * @returns {Boolean} Should session submit?
        */
       shouldSubmit: function () {
