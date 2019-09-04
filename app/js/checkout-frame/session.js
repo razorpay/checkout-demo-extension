@@ -7201,7 +7201,7 @@ Session.prototype = {
       order &&
       order.bank &&
       this.get('callback_url') &&
-      order.method !== 'upi'
+      (order.method !== 'upi' && order.method !== 'emandate') // Should these just be a check for order.method=netbanking?
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
