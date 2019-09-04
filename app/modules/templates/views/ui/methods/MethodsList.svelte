@@ -41,17 +41,28 @@
         </RadioOption>
       {/if}
     {/each}
-    <NextOption
-      on:select='fire("showMethods")'
-      type='other-methods up-arrow'
-      icon={session.themeMeta.icons['othermethods']}
-    >
-      <span class="option-title">Other Methods</span>
-      <span style="display: inline-block;
-          font-size: 12px; color: #757575; margin-left: 2px">
-        | Cards, Wallets, UPI etc.
-      </span>
-    </NextOption>
+    {#if showOtherMethodsDirectly}
+      <OtherMethodsList
+        standalone={true}
+        visible={true}
+        {AVAILABLE_METHODS}
+        {session}
+
+        on:methodSelected="fire('methodSelected', event)"
+      />
+    {:else}
+      <NextOption
+        on:select='fire("showMethods")'
+        type='other-methods up-arrow'
+        icon={session.themeMeta.icons['othermethods']}
+      >
+        <span class="option-title">Other Methods</span>
+        <span style="display: inline-block;
+            font-size: 12px; color: #757575; margin-left: 2px">
+          | {otherMethodsDetail}
+        </span>
+      </NextOption>
+    {/if}
   </div>
 {:elseif showMessage}
   <div transition:fade on:click="trackEducationClick()">
@@ -147,6 +158,10 @@
     text-transform: none;
   }
 
+  :global(.no-details) #methods-list .options {
+    margin: 0;
+  }
+
   ref:preferred,
   ref:grid,
   ref:loader {
@@ -168,13 +183,15 @@
 </style>
 
 <script>
-  /* globals getStore, shouldEnableP13n */
+  /* globals getStore */
   import { getSession } from 'sessionmanager';
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
   import { findCodeByNetworkName } from 'common/card';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getMethodPrefix } from 'checkoutframe/paymentmethods';
+  import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -194,31 +211,48 @@
       NextOption: 'templates/views/ui/options/NextOption.svelte',
       GridMethods: 'templates/views/ui/methods/GridMethods.svelte',
       Loader: 'templates/views/ui/methods/Loader.svelte',
+      OtherMethodsList: 'templates/views/ui/methods/OtherMethods.svelte',
     },
 
     oncreate() {
       const session = getSession();
 
-      if ((shouldEnableP13n(session.get('key')) ||
-        session.get('flashcheckout')) &&
+      /**
+       * Force p13n for international card+paypal
+       * since the UI uses p13n UI
+       */
+      const isInternationalCardAndPayPal = session.international && session.methods.paypal && session.methods.count > 1;
+
+      if (
         session.get().personalization !== false
+        || isInternationalCardAndPayPal
       ) {
         session.set('personalization', true);
       }
 
       const hasOffersOnHomescreen = session.hasOffers && _Arr.any(session.eligibleOffers, offer => offer.homescreen);
 
-      if (
-        !session.get('personalization') ||
+      let shouldDisableP13n = !session.get('personalization') ||
         hasOffersOnHomescreen ||
-        session.oneMethod ||
+        session.methods.count === 1 ||
         getStore('optional').contact ||
         getStore('isPartialPayment') ||
         session.tpvBank ||
         session.upiTpv ||
         session.multiTpv ||
         session.local ||
-        session.isPayout
+        session.isPayout;
+
+      /**
+       * Force p13n for international card+paypal
+       * since the UI uses p13n UI
+       */
+      if (isInternationalCardAndPayPal) {
+        shouldDisableP13n = false;
+      }
+
+      if (
+        shouldDisableP13n
       ) {
         /* disableP13n is both, the template prop and the class prop */
         this.disableP13n = true;
@@ -297,6 +331,10 @@
           let text = '';
           let icon = '';
           switch (instrument.method) {
+            case 'paypal':
+              text = 'PayPal';
+              icon = session.themeMeta.icons.paypal;
+              break;
             case 'netbanking':
               text = `Netbanking - ${trimText(banks[instrument.bank], 18)} `;
               icon = getBankLogo(instrument.bank);
@@ -416,6 +454,40 @@
 
         return methods;
       },
+
+      /**
+       * String generated dynamically based on the
+       * methods available
+       *
+       * eg: "Cards, Wallets, UPI, etc."
+       */
+      otherMethodsDetail: ({ AVAILABLE_METHODS }) => {
+        const preferred = ['card', 'wallet', 'upi'];
+
+        let available = _Arr.filter(preferred, method => _Arr.contains(AVAILABLE_METHODS, method));
+
+        /**
+         * If none of the preffered methods
+         * are available,
+         * use the first method
+         */
+        if (!available.length) {
+          available = AVAILABLE_METHODS.slice(0, 1);
+        }
+
+        const names = _Arr.map(available, getMethodPrefix);
+
+        let string = names.join(', ');
+
+        // Add ".etc" if there are methods we didn't mention already
+        if (AVAILABLE_METHODS.length > available.length) {
+          string += ', etc.';
+        }
+
+        return string;
+      },
+
+      showOtherMethodsDirectly: ({ AVAILABLE_METHODS }) => AVAILABLE_METHODS.length === 1,
     },
 
     data: () => {
@@ -424,7 +496,6 @@
         selected: null,
         session: null,
         customer: {},
-        showOtherMethods: false,
         animate: false,
         loading: false,
         showMessage: true,

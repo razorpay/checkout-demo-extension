@@ -144,6 +144,10 @@ emiPlansView.prototype = {
   },
 
   submit: function() {
+    if (!this.selectedPlan) {
+      return;
+    }
+
     this.onSelect(this.selectedPlan.duration);
   },
 };

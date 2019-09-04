@@ -1,6 +1,10 @@
 import * as GPay from 'gpay';
 import * as strings from 'common/strings';
-import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
+import {
+  parseUPIIntentResponse,
+  didUPIIntentSucceed,
+  upiBackCancel,
+} from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import { RazorpayConfig } from 'common/Razorpay';
@@ -66,6 +70,14 @@ export const processCoproto = function(response) {
 
 var responseTypes = {
   // this === payment
+
+  cardless_emi: function(request, fullResponse) {
+    this.emit('process', {
+      request,
+      response: fullResponse,
+    });
+  },
+
   first: function(request, fullResponse) {
     var direct = request.method === 'direct';
     var content = request.content;
@@ -163,51 +175,64 @@ var responseTypes = {
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
-  gpay: function(coprotoRequest, fullResponse) {
-    GPay.pay(
-      fullResponse.data,
-      instrument => {
-        Track(this.r, 'gpay_pay_response', {
-          instrument,
-        });
+  gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
+    if (type === 'payment_request') {
+      GPay.payWithPaymentRequestApi(
+        fullResponse.data,
+        instrument => {
+          Track(this.r, 'gpay_pay_response', {
+            instrument,
+          });
 
-        this.emit('upi.intent_response', {
-          response: instrument.details,
-        });
-      },
-      error => {
-        if (error.code) {
-          if (
-            [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
-          ) {
-            this.emit('upi.intent_response', {});
-          }
+          this.emit('upi.intent_response', {
+            response: instrument.details,
+          });
+        },
+        error => {
+          if (error.code) {
+            if (
+              [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
+              0
+            ) {
+              this.emit('upi.intent_response', {});
+            }
 
-          // Since the method is not supported, remove it.
-          if (error.code === error.NOT_SUPPORTED_ERR) {
-            const session = getSession();
+            // Since the method is not supported, remove it.
+            if (error.code === error.NOT_SUPPORTED_ERR) {
+              const session = getSession();
 
-            if (session && session.upiTab) {
-              session.upiTab.set({
-                useWebPaymentsApi: false,
-                selectedApp: 'gpay',
-              });
+              if (session && session.upiTab) {
+                session.upiTab.set({
+                  useWebPaymentsApi: false,
+                  selectedApp: 'gpay',
+                });
+              }
             }
           }
+
+          Track(this.r, 'gpay_error', error);
         }
-
-        Track(this.r, 'gpay_error', error);
-      }
-    );
+      );
+    } else if (type === 'microapp') {
+      GPay.payWithMicroapp(
+        fullResponse.payment_id,
+        fullResponse.data.intent_url
+      )
+        .then(response => {
+          Analytics.track('gpay_pay_response', {
+            data: response.paymentMethodData,
+          });
+          this.emit('upi.intent_success_response', response.paymentMethodData);
+        })
+        .catch(error => {
+          Analytics.track('gpay_error', {
+            data: error,
+          });
+          this.emit('cancel', upiBackCancel);
+        });
+    }
   },
-
   intent: function(request, fullResponse) {
-    var upiBackCancel = {
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-    };
-
     var ra = () =>
       fetch
         .jsonp({
@@ -245,6 +270,15 @@ var responseTypes = {
       }
     } else if (androidBrowser) {
       if (this.gpay) {
+        if (this.microapps && this.microapps.gpay) {
+          return responseTypes['gpay'].call(
+            this,
+            request,
+            fullResponse,
+            'microapp'
+          );
+        }
+
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
@@ -266,15 +300,19 @@ var responseTypes = {
   },
 
   // prettier-ignore
-  'return': function(request) {
+  'return': function (request) {
     _Doc.redirect(request);
   },
 
-  respawn: function (request, fullResponse) {
-    // TODO: Check if Google OmniChannel
+  respawn: function(request, fullResponse) {
+    // If Cardless EMI, route the coproto
+    if (this.data && this.data.method === 'cardless_emi') {
+      return responseTypes.cardless_emi.call(this, request, fullResponse);
+    }
+
     // By default, use first coproto.
     return responseTypes.first.call(this, request, fullResponse);
-  }
+  },
 };
 
 function mwebIntent(payment, ra, fullResponse) {

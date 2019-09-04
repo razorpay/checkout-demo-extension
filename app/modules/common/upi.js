@@ -249,7 +249,7 @@ export const topUpiApps = [
 
 /**
  * Parses the response from UPI Intent.
- * @param {Object} intentResponse Reponse from Intent.
+ * @param {Object} intentResponse Response from Intent.
  *
  * @return {Object}
  */
@@ -498,4 +498,10 @@ export const trackAppImpressions = allApps => {
   if (_Arr.find(allApps, app => app.package_name === 'com.truecaller')) {
     Analytics.track('upi:app:truecaller:show');
   }
+};
+
+export const upiBackCancel = {
+  '_[method]': 'upi',
+  '_[flow]': 'intent',
+  '_[reason]': 'UPI_INTENT_BACK_BUTTON',
 };

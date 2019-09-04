@@ -8,7 +8,7 @@ const sqPrefix = cdnUrl + 'paylater-sq/';
 const config = {
   epaylater: {
     name: 'ePayLater',
-  }
+  },
 };
 
 /**

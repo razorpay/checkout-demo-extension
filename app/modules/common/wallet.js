@@ -20,6 +20,7 @@ const list = {
   // mpesa: ['Vodafone mPesa', 50],
   sbibuddy: ['SBI Buddy', 22],
   phonepe: ['PhonePe', 20],
+  paypal: ['PayPal', 20],
 };
 
 const otpLengths = {

@@ -12,7 +12,7 @@ const CHECK_ERROR = {
  * Returns a Promise that resolves if Google Pay is present.
  * @return {Promise}
  */
-export function check() {
+export function checkPaymentRequestApi() {
   return new Promise((resolve, reject) => {
     try {
       /**
@@ -44,7 +44,29 @@ export function check() {
   });
 }
 
-export const pay = (data, successCallback, errorCallback) => {
+/**
+ * Checks if Google Pay microapps API is available
+ *
+ * @returns {Promise}
+ */
+export function checkMicroapp() {
+  return new Promise((resolve, reject) => {
+    if (
+      _Obj.hasProp(global, 'microapps') &&
+      _Obj.hasProp(global.microapps, 'requestPayment')
+    ) {
+      return resolve();
+    }
+
+    return reject(CHECK_ERROR);
+  });
+}
+
+export const payWithPaymentRequestApi = (
+  data,
+  successCallback,
+  errorCallback
+) => {
   var instrumentData = {};
   errorCallback = errorCallback || (() => {});
 
@@ -89,3 +111,56 @@ export const pay = (data, successCallback, errorCallback) => {
     errorCallback(e);
   }
 };
+
+/**
+ * Transforms the intent URL to a payload for microapps.
+ * @param {string} paymentId
+ * @param {string} intentUrl
+ *
+ * @returns {Object}
+ */
+function transformIntentForMicroappPayload(paymentId, intentUrl) {
+  const intentParams = _.query2obj(intentUrl.split('?')[1]);
+
+  const payload = {
+    apiVersion: 2,
+    apiVersionMinor: 0,
+    allowedPaymentMethods: [
+      {
+        type: 'UPI',
+        parameters: {
+          payeeVpa: intentParams.pa,
+          payeeName: intentParams.pn,
+          mcc: intentParams.mc,
+          transactionReferenceId: intentParams.tr,
+          transactionId: paymentId,
+        },
+        tokenizationSpecification: {
+          type: 'DIRECT',
+        },
+      },
+    ],
+    transactionInfo: {
+      countryCode: 'IN',
+      totalPriceStatus: 'FINAL',
+      totalPrice: intentParams.am,
+      currencyCode: intentParams.cu,
+      transactionNote: intentParams.tn,
+    },
+  };
+
+  return payload;
+}
+
+/**
+ * Creates a payment with the microapps API
+ * @param {string} paymentId
+ * @param {string} intentUrl
+ *
+ * @return {Promise}
+ */
+export function payWithMicroapp(paymentId, intentUrl) {
+  const payload = transformIntentForMicroappPayload(paymentId, intentUrl);
+
+  return global.microapps.requestPayment(payload);
+}

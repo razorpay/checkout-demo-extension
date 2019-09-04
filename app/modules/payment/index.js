@@ -178,7 +178,13 @@ export default function Payment(data, params = {}, r) {
   }
 
   this.feesRedirect = params.feesRedirect;
-  this.gpay = params.gpay || params.tez; // params.tez is legacy
+  this.microapps = params.microapps;
+  this.gpay =
+    params.gpay || params.tez || (this.microapps && this.microapps.gpay); // params.tez is legacy
+
+  if (this.microapps && this.microapps.gpay) {
+    Analytics.setMeta('microapps.gpay', true);
+  }
 
   var avoidPopup = false;
 
@@ -214,8 +220,24 @@ export default function Payment(data, params = {}, r) {
         avoidPopup = true;
       }
 
-      if (data.method === 'paylater') {
+      /**
+       * Show popup if:
+       * - Contact is missing
+       */
+      if (data.method === 'paylater' && data.contact) {
         avoidPopup = true;
+      }
+
+      /**
+       * Show Popup for Cardless EMI, if
+       * - Contact is absent.
+       */
+      if (data.method === 'cardless_emi') {
+        if (!data.contact) {
+          avoidPopup = false;
+        } else {
+          avoidPopup = true;
+        }
       }
 
       /* If fees is there, we need to show fee view in poupup */
@@ -677,6 +699,11 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
   return new Promise((resolve, reject) => {
     let timeoutId;
     let responded = false;
+    const timer = _.timer();
+
+    Analytics.track('validate:vpa:init', {
+      data: eventData,
+    });
 
     if (timeout) {
       timeoutId = setTimeout(() => {
@@ -685,6 +712,7 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
         }
 
         responded = true;
+        eventData.time = timer();
 
         Analytics.track('validate:vpa:timeout', {
           data: eventData,
@@ -703,11 +731,19 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
       callback: function(response) {
         clearInterval(timeoutId);
 
+        // Track that we got a response
+        Analytics.track('validate:vpa:response', {
+          data: {
+            time: timer(),
+          },
+        });
+
         if (responded) {
           return;
         }
 
         responded = true;
+        eventData.time = timer();
 
         /**
          * Consider VPA to be invalid only if API says it is invalid

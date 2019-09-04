@@ -2,6 +2,7 @@ import { RazorpayDefaults } from 'common/options';
 
 RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
+RazorpayDefaults.partnership_logo = '';
 RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.nativeotp = true;
@@ -20,6 +21,7 @@ RazorpayDefaults.method = {
   upi: true,
   upi_intent: null,
   qr: true,
+  bank_transfer: true,
 };
 
 RazorpayDefaults.prefill = {
