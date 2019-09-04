@@ -6020,10 +6020,15 @@ Session.prototype = {
      * TODO: Add a feature check here
      */
     if (data.method === 'wallet') {
-      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
-        data.wallet,
-        this.upi_intents_data
-      );
+      var hasPhonePeIntentFeature =
+        this.preferences.features && this.preferences.features.phonepe_intent;
+
+      var shouldTurnWalletToIntent =
+        hasPhonePeIntentFeature &&
+        discreet.Wallet.shouldTurnWalletToIntent(
+          data.wallet,
+          this.upi_intents_data
+        );
 
       if (shouldTurnWalletToIntent) {
         data.upi_app = discreet.Wallet.getAppForWallet(data.wallet);
