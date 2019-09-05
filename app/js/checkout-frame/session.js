@@ -1825,9 +1825,9 @@ Session.prototype = {
   },
 
   setBankTransfer: function() {
-    if (this.bank_transfer) {
-      this.bank_transfer = new discreet.BankTransferScreen({
-        target: qs('#bank-transfer-svelte-wrap'),
+    if (this.methods.bank_transfer) {
+      this.bankTransferView = new discreet.BankTransferScreen({
+        target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
         data: {
           session: this,
         },
@@ -4019,7 +4019,7 @@ Session.prototype = {
     ) {
       tab = 'cardless_emi';
     } else if (this.tab === 'bank_transfer') {
-      if (this.bank_transfer.onBack()) {
+      if (this.bankTransferView.onBack()) {
         return;
       }
     } else {
@@ -4237,7 +4237,7 @@ Session.prototype = {
     }
 
     if (tab === 'bank_transfer') {
-      this.bank_transfer.onShown();
+      this.bankTransferView.onShown();
     }
 
     if (!tab && this.multiTpv) {
@@ -5940,7 +5940,7 @@ Session.prototype = {
     var shouldContinue = true;
 
     if (this.tab === 'bank_transfer') {
-      shouldContinue = this.bank_transfer.shouldSubmit();
+      shouldContinue = this.bankTransferView.shouldSubmit();
     }
 
     if (!shouldContinue) {
@@ -6584,6 +6584,10 @@ Session.prototype = {
         this.emiScreenView.destroy();
       }
 
+      if (this.bankTransferView) {
+        this.bankTransferView.destroy();
+      }
+
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
@@ -6724,10 +6728,6 @@ Session.prototype = {
           delete availMethods.card;
         }
       }
-    }
-
-    if (availMethods.bank_transfer) {
-      this.bank_transfer = true;
     }
 
     /* evaluate enabled methods form preferences and merchant options */

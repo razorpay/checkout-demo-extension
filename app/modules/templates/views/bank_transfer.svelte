@@ -1,7 +1,7 @@
 <Tab method="bank_transfer">
   <div class="bank_transfer-container">
     {#if loading}
-      <AsyncLoading message="Getting bank details..." />
+    <AsyncLoading message="Getting bank details..." />
     {:elseif data}
     <div class="bank_transfer-message">
       To complete the transaction, make NEFT / RTGS / IMPS transfer to
@@ -29,7 +29,7 @@
 
       {#if data.close_by}
       <div class="ct-tr ct-note">
-        Note : Please complete the transaction before {data.close_by}.
+        Note: Please complete the transaction before {data.close_by}.
       </div>
       {/if}
     </div>
@@ -114,14 +114,15 @@
         session: null,
       };
     },
-    oncreate() {
-      this.init();
-    },
     methods: {
       init() {
+        if (this.get().data !== null) {
+          this.showCopyButton(true, 'COPY DETAILS');
+          return;
+        }
         this.set({
           loading: true,
-        })
+        });
         const { session } = this.get();
         fetch.post({
           url: makeAuthUrl(
@@ -136,7 +137,7 @@
           return this.set({
             loading: false,
             error: response.error.description,
-          })
+          });
         }
         const { session } = this.get();
         let receivers = response.receivers;
@@ -147,27 +148,19 @@
               response.amount_expected &&
               session.formatAmountWithCurrency(response.amount_expected),
             close_by: response.close_by && timeConverter(response.close_by),
-          }
+          };
           this.set({
             loading: false,
-            data
+            data,
           });
+          this.showCopyButton(true, 'COPY DETAILS');
         }
       },
       /**
        * Session calls this method when it switches to "bank_transfer" tab
        */
       onShown: function() {
-        const footerButtons = {
-          attachBankTransferForm: _Doc.querySelector(
-            '#footer .bank-transfer-copy-details'
-          ),
-          pay: _Doc.querySelector('#footer .pay-btn'),
-          body: _Doc.querySelector('#body'),
-        };
-        _El.addClass(footerButtons.pay, 'invisible');
-        _El.addClass(footerButtons.body, 'sub');
-        _El.removeClass(footerButtons.attachBankTransferForm, 'invisible');
+        this.init();
       },
 
       /**
@@ -176,15 +169,7 @@
        * @returns {boolean} will tab handle back
        */
       onBack: function() {
-        const footerButtons = {
-          attachBankTransferForm: _Doc.querySelector(
-            '#footer .bank-transfer-copy-details'
-          ),
-          pay: _Doc.querySelector('#footer .pay-btn'),
-        };
-        _El.addClass(footerButtons.attachBankTransferForm, 'invisible');
-        _El.removeClass(footerButtons.pay, 'invisible');
-        footerButtons.attachBankTransferForm.innerText = 'COPY DETAILS';
+        this.showCopyButton(false, '');
         return false;
       },
 
@@ -194,9 +179,32 @@
        * @returns {Boolean} Should session submit?
        */
       shouldSubmit: function() {
+        const footerButtons = {
+          copyDetails: _Doc.querySelector(
+            '#footer .bank-transfer-copy-details'
+          ),
+        };
         copyToClipboard('.neft-details', this.refs.neftDetails.innerText);
-        _Doc.querySelector('#footer .bank-transfer-copy-details').innerText = 'COPIED';
+        this.showCopyButton(true, 'COPIED');
         return false;
+      },
+      showCopyButton: function(show, text) {
+        const footerButtons = {
+          copyDetails: _Doc.querySelector(
+            '#footer .bank-transfer-copy-details'
+          ),
+          pay: _Doc.querySelector('#footer .pay-btn'),
+          body: _Doc.querySelector('#body'),
+        };
+        if (show) {
+          _El.addClass(footerButtons.pay, 'invisible');
+          _El.addClass(footerButtons.body, 'sub');
+          _El.removeClass(footerButtons.copyDetails, 'invisible');
+          _El.setContents(footerButtons.copyDetails, text);
+        } else {
+          _El.addClass(footerButtons.copyDetails, 'invisible');
+          _El.removeClass(footerButtons.pay, 'invisible');
+        }
       },
     },
   };
