@@ -6828,7 +6828,7 @@ Session.prototype = {
       international
     ) {
       methods.wallet = {};
-    } else if (typeof passedWallets === 'object') {
+    } else if (typeof passedWallets === 'object' && methods.wallet) {
       each(passedWallets, function(wallet, enabled) {
         if (enabled === false) {
           delete methods.wallet[wallet];
