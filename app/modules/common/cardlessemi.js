@@ -98,4 +98,14 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
   return eligible;
 }
 
-export const isProviderHeadless = provider => getProvider(provider).headless;
+/**
+ * Tells if the provider is headless.
+ * @param {string} provider Provider Code
+ *
+ * @returns {boolean}
+ */
+export const isProviderHeadless = provider => {
+  const { headless } = getProvider(provider) || {};
+
+  return Boolean(headless);
+};
