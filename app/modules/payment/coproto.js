@@ -233,9 +233,7 @@ var responseTypes = {
     }
   },
   intent: function(request, fullResponse) {
-    let transactionReferenceId;
-
-    var ra = () =>
+    var ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({
           url: request.url,
@@ -254,14 +252,10 @@ var responseTypes = {
 
     this.on('upi.intent_success_response', data => {
       if (data) {
-        // If this is a Google Pay microapps payment, we'd receive the transactionReferenceId
-        if (data.transactionReferenceId) {
-          transactionReferenceId = data.transactionReferenceId;
-        }
-
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-      this.ajax = ra();
+
+      this.ajax = ra(data);
     });
 
     this.on('upi.intent_response', data => {
