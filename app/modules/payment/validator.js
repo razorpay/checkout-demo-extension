@@ -1,6 +1,7 @@
 import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
@@ -111,6 +112,7 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
       );
     }
     data['_[flow]'] = 'intent';
+    data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
   }
 
   // Add integration details if present
