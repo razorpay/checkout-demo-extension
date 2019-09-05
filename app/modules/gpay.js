@@ -171,6 +171,6 @@ export function payWithMicroapp(paymentId, intentUrl) {
       response.paymentMethodData.transactionReferenceId = transactionReferenceId;
     }
 
-    return Promise.resolve(response);
+    return response;
   });
 }
