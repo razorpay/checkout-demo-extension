@@ -369,6 +369,8 @@
           if (error) {
             this.showError(error);
           } else {
+            session.showLoadError('Uploading your NACH form');
+
             const [ uploadRequest, abortUpload ] = uploadDocument(session.r, file);
 
             this.set({
