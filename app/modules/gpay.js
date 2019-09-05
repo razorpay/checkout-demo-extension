@@ -161,6 +161,16 @@ function transformIntentForMicroappPayload(paymentId, intentUrl) {
  */
 export function payWithMicroapp(paymentId, intentUrl) {
   const payload = transformIntentForMicroappPayload(paymentId, intentUrl);
+  const {
+    transactionReferenceId,
+  } = payload.allowedPaymentMethods[0].parameters;
 
-  return global.microapps.requestPayment(payload);
+  return global.microapps.requestPayment(payload).then(response => {
+    // Add Transaction reference ID in the response.
+    if (response.paymentMethodData) {
+      response.paymentMethodData.transactionReferenceId = transactionReferenceId;
+    }
+
+    return Promise.resolve(response);
+  });
 }

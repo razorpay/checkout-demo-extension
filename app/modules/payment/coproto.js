@@ -233,11 +233,20 @@ var responseTypes = {
     }
   },
   intent: function(request, fullResponse) {
+    let transactionReferenceId;
+
     var ra = () =>
       fetch
         .jsonp({
           url: request.url,
-          callback: response => this.complete(response),
+          callback: response => {
+            // transactionReferenceId is required for Google Pay microapps payments
+            if (transactionReferenceId) {
+              response.transaction_reference = transactionReferenceId; // This is snake_case to maintain convention
+            }
+
+            this.complete(response);
+          },
         })
         .till(response => response && response.status);
 
@@ -245,6 +254,11 @@ var responseTypes = {
 
     this.on('upi.intent_success_response', data => {
       if (data) {
+        // If this is a Google Pay microapps payment, we'd receive the transactionReferenceId
+        if (data.transactionReferenceId) {
+          transactionReferenceId = data.transactionReferenceId;
+        }
+
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
       this.ajax = ra();
