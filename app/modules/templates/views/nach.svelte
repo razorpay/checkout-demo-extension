@@ -48,6 +48,8 @@
 
 
 <script>
+  import { makeAuthUrl } from 'common/Razorpay';
+
   const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
   const ALLOWED_MAX_SIZE = 6;
 
@@ -87,6 +89,60 @@
     }
   }
 
+  /**
+   * Uploads the NACH document
+   * @param {Razorpay} razorpay
+   * @param {File} file
+   * 
+   * @returns {[Promise, Function]} [promise, abort]
+   */
+  function uploadDocument (razorpay, file) {
+    let ajax;
+
+    // Aborts the upload request
+    function abort () {
+      if (ajax) {
+        ajax.abort();
+        ajax = null;
+      }
+    }
+
+    // Promise that gets fulfilled when upload n/w request is complete
+    const promise = new Promise((resolve, reject) => {
+      const url = makeAuthUrl(razorpay, 'token.registration/paper_mandate/authenticate');
+      const data = new FormData();
+      const order_id = razorpay.get('order_id');
+      const auth_link_id = razorpay.get('auth_link_id');
+
+      data.append('form_uploaded', file);
+
+      if (order_id) {
+        data.append('order_id', order_id);
+      }
+
+      if (auth_link_id) {
+        data.append('auth_link_id', auth_link_id);
+      }
+
+      ajax = fetch({
+        data,
+        url,
+        method: 'POST',
+        callback: response => {
+          ajax = null;
+
+          if (response.error) {
+            return reject(response);
+          }
+
+          return resolve(response);
+        }
+      });
+    });
+
+    return [promise, abort];
+  }
+
   export default {
     components: {
       Attachment: 'templates/views/ui/Attachment.svelte',
@@ -103,11 +159,24 @@
       ALLOWED_EXTS,
       ALLOWED_MAX_SIZE,
 
-      file: null,
-      uploading: false,
+      abortUpload: () => {}, // Fn to abort the upload request
+      file: null, // File that is uploaded
+      uploading: false, // Are we currently uploading?
     }),
 
     methods: {
+      /**
+       * Aborts the upload request
+       */
+      abortUpload: function () {
+        const {
+          abortUpload
+        } = this.get();
+
+        abortUpload();
+        this.reset();
+      },
+
       /**
        * Clears the error
        */
@@ -174,7 +243,7 @@
           const cancel = global.confirm('Are you sure you want to stop uploading your NACH form?');
 
           if (cancel) {
-            // TODO: Abort AJAX
+            this.abortUpload();
 
             this.set({
               uploading: false,
@@ -208,6 +277,9 @@
       reset: function () {
         this.removeFile();
         this.clearError();
+        this.set({
+          uploading: false,
+        });
       },
 
       /**
@@ -277,7 +349,8 @@
         session.showLoadError('Attaching your NACH form');
 
         // Validate
-        const error = validateUpload(event.currentTarget.files[0]);
+        const file = event.currentTarget.files[0];
+        const error = validateUpload(file);
 
         this.set({
           uploading: true
@@ -296,15 +369,24 @@
           if (error) {
             this.showError(error);
           } else {
-            // TODO: AJAX
-            setTimeout(() => {
-              this.set({
-                file: true,
-                uploading: false,
-              });
+            const [ uploadRequest, abortUpload ] = uploadDocument(session.r, file);
 
-              session.hideOverlayMessage();
-            }, 3000);
+            this.set({
+              abortUpload,
+            });
+
+            uploadRequest
+              .then(response => {
+                this.set({
+                  file: true,
+                  uploading: false,
+                });
+
+                session.hideOverlayMessage();
+              })
+              .catch(({ error }) => {
+                this.showError(error);
+              });
           }
         }, 1000);
       },
