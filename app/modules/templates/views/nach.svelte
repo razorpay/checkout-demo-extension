@@ -70,7 +70,7 @@
    *
    * @returns {Object} error
    */
-  function validateUpload (file) {
+  function validateFile (file) {
     const filename = file.name;
     const size = file.size;
 
@@ -350,7 +350,7 @@
 
         // Validate
         const file = event.currentTarget.files[0];
-        const error = validateUpload(file);
+        const error = validateFile(file);
 
         this.set({
           uploading: true
