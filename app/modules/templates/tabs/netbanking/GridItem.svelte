@@ -1,10 +1,17 @@
-<div class="netb-bank item radio-item" id="bank-item-{code}" down={Boolean(downtime)} class:has-tooltip="downtime">
+<div
+  class="netb-bank item radio-item has-tooltip"
+  id="bank-item-{code}"
+  class:disabled
+  down={disabled}
+  class:has-tooltip="downtime"
+>
   <input
     class="bank-radio"
     id="bank-radio-{code}"
     type="radio"
     name="bank"
     value={code}
+    {disabled}
 
     bind:group
   >
@@ -21,7 +28,7 @@
           align={['bottom']}
           alignOnHover="true"
         >
-          Down
+          {fullName} accounts are facing temporary issues right now. Please select another bank.
         </Tooltip>
       </span>
     {/if}
@@ -29,9 +36,19 @@
 </div>
 
 <style>
-  .netb-bank {
-    overflow: visible;
-  }
+
+.netb-bank {
+  overflow: visible;
+}
+
+.netb-bank.disabled {
+  cursor: default;
+}
+
+.netb-bank.disabled .item-inner {
+  opacity: 0.3;
+}
+
 </style>
 
 <script>
@@ -40,6 +57,11 @@ export default {
 
   components: {
     Tooltip: 'templates/views/ui/Tooltip.svelte',
+  },
+
+  computed: {
+    disabled: ({ downtime }) => downtime &&
+        _Arr.contains(['high', 'scheduled'], downtime.severity) // TODO refactor into a function
   }
 
 }
