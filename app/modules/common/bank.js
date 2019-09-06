@@ -108,8 +108,7 @@ export const getBankFromCard = cardNum => {
   }
 };
 
-export const getPreferredBanks = (preferences, bankOptions) => {
-  const availBanks = preferences.methods.netbanking;
+export const getPreferredBanks = (availBanks, bankOptions) => {
   const order = bankOptions && bankOptions.order;
 
   if (!availBanks) {
