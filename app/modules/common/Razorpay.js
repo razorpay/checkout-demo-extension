@@ -29,6 +29,7 @@ const backendEntityIds = [
   'order_id',
   'invoice_id',
   'subscription_id',
+  'auth_link_id',
   'payment_link_id',
   'contact_id',
 ];
@@ -235,6 +236,7 @@ export function makePrefParams(rzp) {
         'invoice_id',
         'payment_link_id',
         'subscription_id',
+        'auth_link_id',
         'recurring',
         'subscription_card_change',
         'account_id',

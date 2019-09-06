@@ -66,6 +66,7 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
       'account_id',
       'notes',
       'subscription_id',
+      'auth_link_id',
       'payment_link_id',
       'customer_id',
       'recurring',
