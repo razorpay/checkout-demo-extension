@@ -4,7 +4,7 @@ import Downtimes from 'checkoutstore/downtimes.js';
 const defaultState = {};
 
 function CheckoutStore(base) {
-  let checkoutStoreState = _Obj.clone(defaultState);
+  let checkoutStoreState = {};
 
   this.set = state => {
     checkoutStoreState =
@@ -12,6 +12,7 @@ function CheckoutStore(base) {
   };
 
   this.get = function() {
+    const storeState = _Obj.extend({}, checkoutStoreState);
     const preferences = Preferences.get();
     const downtimes = Downtimes.get();
     const optionalFields = {};
@@ -22,13 +23,13 @@ function CheckoutStore(base) {
       optionalFields.email = optionalFieldsList |> _Arr.contains('email');
     }
 
-    checkoutStoreState.optional = optionalFields;
-    checkoutStoreState.preferences = preferences;
-    checkoutStoreState.downtimes = downtimes;
-    checkoutStoreState.isPartialPayment =
+    storeState.optional = optionalFields;
+    storeState.preferences = preferences;
+    storeState.downtimes = downtimes;
+    storeState.isPartialPayment =
       preferences.order && preferences.order.partial_payment;
 
-    return checkoutStoreState;
+    return storeState;
   };
 
   this.set(base);

@@ -1,13 +1,13 @@
 const defaultState = {};
 
 function Downtimes(base) {
-  let downtimeState = _Obj.clone(defaultState);
+  let downtimeState = {};
 
   this.set = state => {
     downtimeState = {} |> _Obj.extend(state) |> _Obj.extend(downtimeState);
   };
 
-  this.get = () => downtimeState;
+  this.get = () => _Obj.extend({}, downtimeState);
 
   this.set(base);
 }

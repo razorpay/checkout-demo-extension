@@ -1,13 +1,13 @@
 const defaultState = {};
 
 function Preferences(base) {
-  let preferenceState = _Obj.clone(defaultState);
+  let preferenceState = {};
 
   this.set = state => {
     preferenceState = {} |> _Obj.extend(state) |> _Obj.extend(preferenceState);
   };
 
-  this.get = () => preferenceState;
+  this.get = () => _Obj.extend({}, preferenceState);
 
   this.set(base);
 }
