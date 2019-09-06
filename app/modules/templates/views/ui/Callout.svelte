@@ -16,11 +16,12 @@
         showIcon: true,
         classes: [],
         icon: '&#x2139',
+        type: 'warning'
       };
     },
 
     computed: {
-      allClasses: ({ classes = [] }) => ['callout'].concat(classes).join(' '),
+      allClasses: ({ classes = [], type }) => ['callout', type].concat(classes).join(' '),
     },
   }
 </script>
