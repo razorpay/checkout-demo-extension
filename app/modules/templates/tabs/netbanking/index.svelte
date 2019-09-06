@@ -1,16 +1,22 @@
 <!-- TODO: remove override after fixing method check -->
-<Tab method="netbanking" pad={false} overrideMethodCheck>
-  <div id="netb-banks" class="clear grid count-3">
-    {#each netbanks.slice(0, maxGridCount) as { name, code }}
-      <GridItem
-        {name}
-        {code}
-        downtime={downtimes[code]}
+<Tab method="netbanking"
+  pad={false}
+  overrideMethodCheck
+  hasMessage={selectedBankDowntime}
+>
+  <div ref:screenContent>
+    <div id="netb-banks" class="clear grid count-3">
+      {#each netbanks as { name, code }}
+        <GridItem
+          {name}
+          {code}
+          fullName={banks[code]}
+          downtime={downtimes[code]}
 
-        bind:group=selectedBankCode
-      />
-    {/each}
-  </div>
+          bind:group=selectedBankCode
+        />
+      {/each}
+    </div>
 
   <div class="elem-wrap pad">
     <div id="nb-elem" class="elem select" class:invalid>
