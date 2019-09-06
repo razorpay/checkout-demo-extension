@@ -18,6 +18,7 @@ const config = {
   },
   flexmoney: {
     name: 'InstaCred Cardless EMI',
+    headless: false,
   },
 };
 
@@ -39,6 +40,7 @@ export const createProvider = (code, title) => ({
 // Generate provider config
 const defaultConfig = {
   min_amount: 300000,
+  headless: true, // Like PowerWallet, we have a direct integration with them and do not need to open a popup
 };
 
 const providers = _Obj.map(config, (details, code) => {
@@ -95,3 +97,15 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
 
   return eligible;
 }
+
+/**
+ * Tells if the provider is headless.
+ * @param {string} provider Provider Code
+ *
+ * @returns {boolean}
+ */
+export const isProviderHeadless = provider => {
+  const { headless } = getProvider(provider) || {};
+
+  return Boolean(headless);
+};

@@ -6154,8 +6154,8 @@ Session.prototype = {
         }
 
         // Handle receiving emi_plans in the pilot payment create request
-        if (response.emi_plans) {
-          CardlessEmiStore.plans[provider] = response.emi_plans;
+        if (response.emi_plans && response.emi_plans[provider]) {
+          CardlessEmiStore.plans[provider] = response.emi_plans[provider];
 
           CardlessEmiStore.lenderBranding[provider] =
             response.lender_branding_url;
