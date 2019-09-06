@@ -140,7 +140,10 @@
       });
     });
 
-    return [promise, abort];
+    return {
+      abort,
+      promise,
+    };
   }
 
   /**
@@ -436,7 +439,7 @@
           } else {
             session.showLoadError('Uploading your NACH form');
 
-            const [ uploadRequest, abortUpload ] = uploadDocument(session.r, file);
+            const { promise: uploadRequest, abort: abortUpload } = uploadDocument(session.r, file);
 
             this.set({
               abortUpload,

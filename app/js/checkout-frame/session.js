@@ -2310,14 +2310,21 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'emandate', 'nach', 'upi', 'wallet', 'paypal'].some(
-        function(methodName) {
-          if (self.methods[methodName]) {
-            self.setOneMethod(methodName);
-            return true;
-          }
+      [
+        'card',
+        'emi',
+        'netbanking',
+        'emandate',
+        'nach',
+        'upi',
+        'wallet',
+        'paypal',
+      ].some(function(methodName) {
+        if (self.methods[methodName]) {
+          self.setOneMethod(methodName);
+          return true;
         }
-      );
+      });
     }
 
     if (this.upiTpv) {
@@ -5985,6 +5992,8 @@ Session.prototype = {
         return;
       }
     }
+
+    var that = this;
 
     var shouldContinue = true;
 
