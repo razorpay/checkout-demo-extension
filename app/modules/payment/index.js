@@ -248,6 +248,15 @@ export default function Payment(data, params = {}, r) {
         }
       }
 
+      /**
+       * We do not want to show the popup
+       * if the user is trying to make a
+       * Paper Nach submission
+       */
+      if (data.method === 'nach') {
+        avoidPopup = true;
+      }
+
       /* If fees is there, we need to show fee view in poupup */
       if (params.feesRedirect) {
         avoidPopup = false;
