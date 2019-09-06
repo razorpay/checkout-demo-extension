@@ -4188,6 +4188,10 @@ Session.prototype = {
     if (!tab && this.multiTpv) {
       $('#body').addClass('sub');
     }
+
+    if (tab === 'netbanking') {
+      this.netbankingTab.onSwitch();
+    }
   },
 
   showCardTab: function(tab) {
