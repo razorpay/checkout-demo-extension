@@ -132,8 +132,12 @@ export function getDowntimes(preferences) {
 }
 
 export function groupNetbankingDowntimesByBank(downtimes = []) {
-  return downtimes.reduce((acc, downtime) => {
-    acc[downtime.instrument.bank] = downtime;
-    return acc;
-  }, {});
+  return _Arr.reduce(
+    downtimes,
+    (acc, downtime) => {
+      acc[downtime.instrument.bank] = downtime;
+      return acc;
+    },
+    {}
+  );
 }
