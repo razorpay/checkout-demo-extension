@@ -234,11 +234,6 @@ export default {
     const netbankingDowntimes = groupNetbankingDowntimesByBank(downtimes.netbanking);
 
     this.set({ downtimes: netbankingDowntimes });
-
-    // If there is only one bank available, select it
-    if (banksArr.length === 1) {
-      this.setSelectedBank(banksArr[0].code);
-    }
   },
 
   actions: {
