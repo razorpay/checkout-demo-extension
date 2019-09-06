@@ -10,7 +10,6 @@ var preferences = window.preferences,
   _uid = Track.id,
   tab_titles = Constants.TAB_TITLES,
   getDownBanks = Bank.getDownBanks,
-  getPreferredBanks = Bank.getPreferredBanks,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_PATTERN,
   emailPattern = Constants.EMAIL_PATTERN,
@@ -1595,14 +1594,14 @@ Session.prototype = {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
         data: {
-          netbanks: this.netbanks,
+          bankOptions: this.get('method.netbanking'),
           banks: this.methods.emandate || this.methods.netbanking,
-          down: this.down,
           recurring: this.recurring,
           method: method,
           selectedBankCode: prefilledbank,
         },
       });
+
       // Add listener for proceeding automatically only if emandate
       if (method === 'emandate') {
         this.netbankingTab.on(
@@ -6676,11 +6675,6 @@ Session.prototype = {
       methods[bankMethod] = false;
     } else {
       methods.count++;
-      this.down = getDownBanks(preferences);
-      this.netbanks = getPreferredBanks(
-        preferences,
-        this.get('method.netbanking')
-      );
     }
 
     if (methods.bank_transfer) {
