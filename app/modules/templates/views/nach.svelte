@@ -131,7 +131,7 @@
         callback: response => {
           ajax = null;
 
-          if (response.error) {
+          if (response.error || response.success === false) {
             return reject(response);
           }
 
@@ -141,6 +141,71 @@
     });
 
     return [promise, abort];
+  }
+
+  /**
+   * Turns a word to capitalcase
+   * @param {string} word
+   * 
+   * @returns {string} Word
+   */
+  function capitalCase (word) {
+    return `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`;
+  }
+
+  /**
+   * Turns underscore-separated words to a group of words
+   * @param {string} word group_of_words
+   * 
+   * @returns {string} group of words
+   */
+  function underscoreToWords (word) {
+    return _Arr.join(_Arr.map(word.split('_'), capitalCase), ' ');
+  }
+
+  /**
+   * Generates error for a group of fields
+   * @param {string} name Error name
+   * @param {Array<string>} fields
+   * 
+   * @returns {string} error text
+   */
+  function generateErrorGroup(name, fields) {
+    let text = `The following fields have the error "${underscoreToWords(name)}": `;
+    text += _Arr.join(_Arr.map(fields, underscoreToWords), ', ');
+
+    return text;
+  }
+
+  /**
+   * Generates the error object from API response.
+   * @param {Object} response
+   * 
+   * @return {Object|undefined} error
+   */
+  function generateError (response) {
+    if (response.success === false) {
+      // Error with the details in the image
+      
+      const errorText = [];
+
+      _Obj.loop(response.errors, (fields, name) => errorText.push(generateErrorGroup(name, fields)));
+
+      const description = errorText[0];
+      
+      if (description) {
+        return {
+          description,
+        };
+      }
+    } else if (response.error) {
+      // Generic API error
+      return response.error;
+    }
+
+    return {
+      description: 'Something went wrong'
+    };
   }
 
   export default {
@@ -386,8 +451,10 @@
 
                 session.hideOverlayMessage();
               })
-              .catch(({ error }) => {
-                this.showError(error);
+              .catch(response => {
+                const generatedError = generateError(response);
+
+                this.showError(generatedError);
               });
           }
         }, 1000);
