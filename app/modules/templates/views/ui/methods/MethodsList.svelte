@@ -183,7 +183,6 @@
 </style>
 
 <script>
-  /* globals getStore */
   import { getSession } from 'sessionmanager';
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
@@ -192,6 +191,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
   import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
+  import CheckoutStore from 'checkoutstore';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -235,8 +235,8 @@
       let shouldDisableP13n = !session.get('personalization') ||
         hasOffersOnHomescreen ||
         session.methods.count === 1 ||
-        getStore('optional').contact ||
-        getStore('isPartialPayment') ||
+        CheckoutStore.get().optional.contact ||
+        CheckoutStore.get().isPartialPayment ||
         session.tpvBank ||
         session.upiTpv ||
         session.multiTpv ||
