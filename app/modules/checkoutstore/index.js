@@ -3,11 +3,12 @@ import Downtimes from 'checkoutstore/downtimes.js';
 
 const defaultState = {};
 
-function CheckoutStore() {
+function CheckoutStore(base) {
   let checkoutStoreState = _Obj.clone(defaultState);
 
   this.set = state => {
-    checkoutStoreState = _Obj.extend(checkoutStoreState, state);
+    checkoutStoreState =
+      {} |> _Obj.extend(state) |> _Obj.extend(checkoutStoreState);
   };
 
   this.get = function() {
@@ -29,6 +30,8 @@ function CheckoutStore() {
 
     return checkoutStoreState;
   };
+
+  this.set(base);
 }
 
-export default new CheckoutStore();
+export default new CheckoutStore(defaultState);
