@@ -431,7 +431,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               `?method.emi && _.emi_options.banks['BAJAJ']`
                 <div class="tab-content showable screen" id="form-emi"></div>
               `?`
-              `?wallet.length || ecod`
+              `?(wallet && wallet.length) || ecod`
                 <div class="tab-content showable screen pad" id="form-wallet">
                   `?ecod`
                   <div class="legend" id="ecod-label">Select payment method</div>
