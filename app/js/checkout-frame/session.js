@@ -1653,6 +1653,7 @@ Session.prototype = {
     this.setUpiTab();
     this.setPayoutsScreen();
     this.setNach();
+    this.setBankTransfer();
   },
 
   showTimer: function(cb) {
@@ -1843,7 +1844,18 @@ Session.prototype = {
 
     if (isNachEnabled) {
       this.nachScreen = new discreet.NachScreen({
-        target: gel('nach-wrap'),
+        target: _Doc.querySelector('#nach-wrap'),
+        data: {
+          session: this,
+        },
+      });
+    }
+  },
+
+  setBankTransfer: function() {
+    if (this.methods.bank_transfer) {
+      this.bankTransferView = new discreet.BankTransferScreen({
+        target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
         data: {
           session: this,
         },
@@ -3611,13 +3623,6 @@ Session.prototype = {
           onSuccess: bind(successHandler, this),
         },
       });
-    } else if (screen === 'bank_transfer') {
-      this.currentScreen = new discreet.BankTransferScreen({
-        target: qs('#bank-transfer-svelte-wrap'),
-        data: {
-          session: this,
-        },
-      });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
       this.currentScreen = null;
@@ -4052,6 +4057,10 @@ Session.prototype = {
       if (this.nachScreen.onBack()) {
         return;
       }
+    } else if (this.tab === 'bank_transfer') {
+      if (this.bankTransferView.onBack()) {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -4268,6 +4277,10 @@ Session.prototype = {
 
     if (tab === 'nach') {
       this.nachScreen.onShown();
+    }
+
+    if (tab === 'bank_transfer') {
+      this.bankTransferView.onShown();
     }
 
     if (!tab && this.multiTpv) {
@@ -6001,6 +6014,10 @@ Session.prototype = {
       shouldContinue = this.nachScreen.shouldSubmit();
     }
 
+    if (this.tab === 'bank_transfer') {
+      shouldContinue = this.bankTransferView.shouldSubmit();
+    }
+
     if (!shouldContinue) {
       return;
     }
@@ -6637,6 +6654,10 @@ Session.prototype = {
 
       if (this.nachScreen) {
         this.nachScreen.destroy();
+      }
+
+      if (this.bankTransferView) {
+        this.bankTransferView.destroy();
       }
 
       try {
