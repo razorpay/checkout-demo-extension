@@ -232,6 +232,16 @@
       uploading: false, // Are we currently uploading?
     }),
 
+    onstate: function ({ changed, current }) {
+      // When file is attached/removed, the CTA needs to be updated to reflect it.
+      if (changed.file) {
+        const CTA = _Doc.querySelector('#footer .attach-nach-form');
+        const text = current.file ? 'Submit' : 'Attach NACH form';
+
+        _El.setContents(CTA, text);
+      }
+    },
+
     methods: {
       /**
        * Aborts the upload request
@@ -263,18 +273,8 @@
           pay: _Doc.querySelector('#footer .pay-btn'),
         };
 
-        const {
-          error,
-          session,
-          uploading,
-          view,
-        } = this.get();
-
         _El.addClass(footerButtons.pay, 'invisible');
-
-        if (view === 'upload' && !uploading) {
-          _El.removeClass(footerButtons.attachNachForm, 'invisible');
-        }
+        _El.removeClass(footerButtons.attachNachForm, 'invisible');
       },
 
       /**
@@ -363,10 +363,6 @@
 
         if (!file) {
           this.refs.file.click();
-          return false;
-        }
-
-        if (view === 'upload') {
           return false;
         }
 
