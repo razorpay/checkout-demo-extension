@@ -60,6 +60,7 @@ import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences.js';
 import SessionStore from 'checkoutstore/session.js';
 import DowntimesStore from 'checkoutstore/downtimes.js';
+import OTPScreenStore from 'checkoutstore/screens/otp.js';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
@@ -123,6 +124,7 @@ export default {
   PreferencesStore,
   DowntimesStore,
   SessionStore,
+  OTPScreenStore,
 
   getQueryParams: _.getQueryParams,
 

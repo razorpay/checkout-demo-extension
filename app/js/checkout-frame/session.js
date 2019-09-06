@@ -5420,7 +5420,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = Store.get().screens.otp.otp;
+    var otp = discreet.OTPScreenStore.get().otp;
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
