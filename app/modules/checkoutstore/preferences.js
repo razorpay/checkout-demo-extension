@@ -1,11 +1,10 @@
-/**
- * Svelte store mimic for Preference.
- */
+const defaultState = {};
+
 function Preferences() {
-  let preferenceState = {};
+  let preferenceState = _Obj.clone(defaultState);
 
   this.set = state => {
-    preferenceState = state;
+    preferenceState = _Obj.extend(preferenceState, state);
   };
 
   this.get = () => preferenceState;

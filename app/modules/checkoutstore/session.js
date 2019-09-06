@@ -1,13 +1,10 @@
-/**
- * Svelte store mimic for Session.
- */
+const defaultState = {};
+
 function Session() {
-  let sessionState = {
-    screen: '',
-  };
+  let sessionState = _Obj.clone(defaultState);
 
   this.set = state => {
-    sessionState = state;
+    sessionState = _Obj.extend(sessionState, state);
   };
 
   this.get = () => sessionState;

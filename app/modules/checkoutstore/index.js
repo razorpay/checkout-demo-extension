@@ -1,24 +1,27 @@
 import Preferences from 'checkoutstore/preferences.js';
 import Downtimes from 'checkoutstore/downtimes.js';
 
+const defaultState = {};
+
 function CheckoutStore() {
-  let checkoutStoreState = {};
+  let checkoutStoreState = _Obj.clone(defaultState);
 
   this.set = state => {
-    checkoutStoreState = state;
+    checkoutStoreState = _Obj.extend(checkoutStoreState, state);
   };
 
   this.get = function() {
-    let preferences = Preferences.get();
-    let downtimes = Downtimes.get();
-    let optionalObj = {};
-    let optionalArray = preferences.optional;
+    const preferences = Preferences.get();
+    const downtimes = Downtimes.get();
+    const optionalFields = {};
+    const optionalFieldsList = preferences.optional || [];
 
-    if (optionalArray) {
-      optionalObj.contact = optionalArray |> _Arr.contains('contact');
-      optionalObj.email = optionalArray |> _Arr.contains('email');
+    if (optionalFieldsList) {
+      optionalFields.contact = optionalFieldsList |> _Arr.contains('contact');
+      optionalFields.email = optionalFieldsList |> _Arr.contains('email');
     }
-    checkoutStoreState.optional = optionalObj;
+
+    checkoutStoreState.optional = optionalFields;
     checkoutStoreState.preferences = preferences;
     checkoutStoreState.downtimes = downtimes;
     checkoutStoreState.isPartialPayment =

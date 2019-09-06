@@ -1,11 +1,10 @@
-/**
- * Svelte store mimic for Downtime
- */
+const defaultState = {};
+
 function Downtimes() {
-  let downtimeState = {};
+  let downtimeState = _Obj.clone(defaultState);
 
   this.set = state => {
-    downtimeState = state;
+    downtimeState = _Obj.extend(downtimeState, state);
   };
 
   this.get = () => downtimeState;
