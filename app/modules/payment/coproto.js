@@ -214,10 +214,7 @@ var responseTypes = {
         }
       );
     } else if (type === 'microapp') {
-      GPay.payWithMicroapp(
-        fullResponse.payment_id,
-        fullResponse.data.intent_url
-      )
+      GPay.payWithMicroapp(fullResponse.data.intent_url)
         .then(response => {
           Analytics.track('gpay_pay_response', {
             data: response.paymentMethodData,
