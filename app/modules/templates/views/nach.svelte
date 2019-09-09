@@ -84,7 +84,7 @@
     if (size / 1024 / 1024 > ALLOWED_MAX_SIZE) {
       return {
         main: 'File size is too large',
-        description: `Please upload a smaller file. The uploaded file is larger than ${ALLOWED_MAX_SIZE} MB`
+        description: `Please upload a smaller file. The uploaded file is larger than ${ALLOWED_MAX_SIZE} MB.`
       }
     }
   }
@@ -157,13 +157,14 @@
   }
 
   /**
-   * Turns underscore-separated words to a group of words
-   * @param {string} word group_of_words
+   * Turns an entity name to a group of words,
+   * Splits by underscores and periods.
+   * @param {string} word foo_bar.baz
    * 
-   * @returns {string} group of words
+   * @returns {string} Foo Bar Baz
    */
-  function underscoreToWords (word) {
-    return _Arr.join(_Arr.map(word.split('_'), capitalCase), ' ');
+  function entityToWords (word) {
+    return _Arr.join(_Arr.map(word.split(/_|\./g), capitalCase), ' ');
   }
 
   /**
@@ -174,8 +175,8 @@
    * @returns {string} error text
    */
   function generateErrorGroup(name, fields) {
-    let text = `The following fields have the error "${underscoreToWords(name)}": `;
-    text += _Arr.join(_Arr.map(fields, underscoreToWords), ', ');
+    let text = `The following fields have the error "${entityToWords(name)}": `;
+    text += _Arr.join(_Arr.map(fields, entityToWords), ', ');
 
     return text;
   }
