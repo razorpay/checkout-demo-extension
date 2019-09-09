@@ -7,8 +7,7 @@ function CheckoutStore(base) {
   let checkoutStoreState = {};
 
   this.set = state => {
-    checkoutStoreState =
-      {} |> _Obj.extend(state) |> _Obj.extend(checkoutStoreState);
+    checkoutStoreState |> _Obj.extend({} |> _Obj.extend(state));
   };
 
   this.get = function() {
@@ -24,10 +23,16 @@ function CheckoutStore(base) {
     }
 
     storeState.optional = optionalFields;
-    storeState.preferences = preferences;
-    storeState.downtimes = downtimes;
     storeState.isPartialPayment =
       preferences.order && preferences.order.partial_payment;
+
+    storeState.contactEmailOptional =
+      storeState.optional.contact && storeState.optional.email;
+    storeState.verticalMethods =
+      storeState.contactEmailOptional || storeState.isPartialPayment;
+
+    storeState.preferences = preferences;
+    storeState.downtimes = downtimes;
 
     return storeState;
   };

@@ -4,7 +4,7 @@ function Preferences(base) {
   let preferenceState = {};
 
   this.set = state => {
-    preferenceState = {} |> _Obj.extend(state) |> _Obj.extend(preferenceState);
+    preferenceState |> _Obj.extend({} |> _Obj.extend(state));
   };
 
   this.get = () => _Obj.extend({}, preferenceState);

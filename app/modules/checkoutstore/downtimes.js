@@ -4,7 +4,7 @@ function Downtimes(base) {
   let downtimeState = {};
 
   this.set = state => {
-    downtimeState = {} |> _Obj.extend(state) |> _Obj.extend(downtimeState);
+    downtimeState |> _Obj.extend({} |> _Obj.extend(state));
   };
 
   this.get = () => _Obj.extend({}, downtimeState);
