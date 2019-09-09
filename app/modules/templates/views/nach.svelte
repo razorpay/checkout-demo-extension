@@ -51,7 +51,7 @@
   import { makeAuthUrl } from 'common/Razorpay';
 
   const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
-  const ALLOWED_MAX_SIZE = 6;
+  const ALLOWED_MAX_SIZE = 5;
 
   /**
    * Tells if a filename has a valid extension
