@@ -1,5 +1,5 @@
-import Preferences from 'checkoutstore/preferences.js';
-import Downtimes from 'checkoutstore/downtimes.js';
+import Preferences from 'checkoutstore/preferences';
+import Downtimes from 'checkoutstore/downtimes';
 
 const defaultState = {};
 

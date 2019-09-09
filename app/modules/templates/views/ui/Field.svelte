@@ -34,7 +34,7 @@
 
 <script>
   import { getSession } from 'sessionmanager';
-  import Track from 'tracker.js';
+  import Track from 'tracker';
 
   export default {
     data() {

@@ -1641,6 +1641,7 @@ Session.prototype = {
     this.setOtpScreen();
     this.setUpiTab();
     this.setPayoutsScreen();
+    this.setBankTransfer();
   },
 
   showTimer: function(cb) {
@@ -1821,6 +1822,17 @@ Session.prototype = {
     PayLaterStore.otpVerified = false;
 
     this.preSubmit();
+  },
+
+  setBankTransfer: function() {
+    if (this.methods.bank_transfer) {
+      this.bankTransferView = new discreet.BankTransferScreen({
+        target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
+        data: {
+          session: this,
+        },
+      });
+    }
   },
 
   setPayLater: function() {
@@ -3576,13 +3588,6 @@ Session.prototype = {
           onSuccess: bind(successHandler, this),
         },
       });
-    } else if (screen === 'bank_transfer') {
-      this.currentScreen = new discreet.BankTransferScreen({
-        target: qs('#bank-transfer-svelte-wrap'),
-        data: {
-          session: this,
-        },
-      });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
       this.currentScreen = null;
@@ -4013,6 +4018,10 @@ Session.prototype = {
       this.methods.cardless_emi
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'bank_transfer') {
+      if (this.bankTransferView.onBack()) {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -4225,6 +4234,10 @@ Session.prototype = {
       if (selectedInstrument) {
         $('#body').addClass('sub');
       }
+    }
+
+    if (tab === 'bank_transfer') {
+      this.bankTransferView.onShown();
     }
 
     if (!tab && this.multiTpv) {
@@ -5924,6 +5937,16 @@ Session.prototype = {
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
 
+    var shouldContinue = true;
+
+    if (this.tab === 'bank_transfer') {
+      shouldContinue = this.bankTransferView.shouldSubmit();
+    }
+
+    if (!shouldContinue) {
+      return;
+    }
+
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
@@ -6579,6 +6602,10 @@ Session.prototype = {
 
       if (this.emiScreenView) {
         this.emiScreenView.destroy();
+      }
+
+      if (this.bankTransferView) {
+        this.bankTransferView.destroy();
       }
 
       try {
