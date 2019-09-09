@@ -237,7 +237,7 @@
       // When file is attached/removed, the CTA needs to be updated to reflect it.
       if (changed.file) {
         const CTA = _Doc.querySelector('#footer .attach-nach-form');
-        const text = current.file ? 'Submit' : 'Attach NACH form';
+        const text = current.file ? 'Submit' : 'Upload NACH form';
 
         _El.setContents(CTA, text);
       }
