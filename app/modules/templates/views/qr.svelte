@@ -108,7 +108,7 @@ img {
 <script>
   import { RazorpayConfig } from 'common/Razorpay';
   import { processInstrument } from 'checkoutframe/personalization';
-  import DowntimesStore from 'checkoutstore/downtimes.js';
+  import DowntimesStore from 'checkoutstore/downtimes';
 
   export default {
     components: {

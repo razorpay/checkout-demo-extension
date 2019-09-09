@@ -1,8 +1,8 @@
 import { composeStore } from 'checkoutstore/create';
 import Screens from 'checkoutstore/screens';
-import Preferences from 'checkoutstore/preferences.js';
-import SessionStore from 'checkoutstore/session.js';
-import DowntimesStore from 'checkoutstore/downtimes.js';
+import Preferences from 'checkoutstore/preferences';
+import SessionStore from 'checkoutstore/session';
+import DowntimesStore from 'checkoutstore/downtimes';
 
 const CheckoutStore = composeStore({
   preferences: Preferences,

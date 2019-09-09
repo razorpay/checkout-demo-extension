@@ -57,9 +57,9 @@ import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import { Formatter } from 'formatter';
 
 import Store from 'checkoutstore';
-import PreferencesStore from 'checkoutstore/preferences.js';
-import SessionStore from 'checkoutstore/session.js';
-import DowntimesStore from 'checkoutstore/downtimes.js';
+import PreferencesStore from 'checkoutstore/preferences';
+import SessionStore from 'checkoutstore/session';
+import DowntimesStore from 'checkoutstore/downtimes';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
