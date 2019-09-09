@@ -157,56 +157,52 @@
   /**
    * Turns an entity name to a group of words,
    * Splits by underscores and periods.
-   * @param {string} word foo_bar.baz
+   * @param {string} word foo_bar.bar_baz
    * 
    * @returns {string} Foo Bar Baz
    */
   function entityToWords (word) {
-    return _Arr.join(_Arr.map(word.split(/_|\./g), capitalCase), ' ');
-  }
+    const words = _Arr.map(word.split(/_|\./g), capitalCase);
 
-  /**
-   * Generates error for a group of fields
-   * @param {string} name Error name
-   * @param {Array<string>} fields
-   * 
-   * @returns {string} error text
-   */
-  function generateErrorGroup(name, fields) {
-    let text = `The following fields have the error "${entityToWords(name)}": `;
-    text += _Arr.join(_Arr.map(fields, entityToWords), ', ');
+    let prev;
+    
+    const filtered = _Arr.filter(words, word => {
+      const sameAsLast = word === prev;
 
-    return text;
+      prev = word;
+
+      return !sameAsLast;
+    });
+
+    return _Arr.join(filtered, ' ');
   }
 
   /**
    * Generates the error object from API response.
    * @param {Object} response
    * 
-   * @return {Object|undefined} error
+   * @return {Object} error
    */
   function generateError (response) {
+    let description = 'We couldn\'t process your file. Please upload an image with better quality.';
+
     if (response.success === false) {
       // Error with the details in the image
-      
-      const errorText = [];
 
-      _Obj.loop(response.errors, (fields, name) => errorText.push(generateErrorGroup(name, fields)));
-
-      const description = errorText[0];
-      
-      if (description) {
-        return {
-          description,
-        };
+      if (response.errors.not_matching) {
+        description = `We could not read the following details on the NACH form: ${_Arr.join(_Arr.map(response.errors.not_matching, entityToWords), ', ')}. Please upload an image with better quality.`
       }
+
+      return {
+        description,
+      };
     } else if (response.error) {
       // Generic API error
       return response.error;
     }
 
     return {
-      description: 'Something went wrong'
+      description
     };
   }
 
