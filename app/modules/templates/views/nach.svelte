@@ -1,5 +1,5 @@
-<Tab method="nach" overrideMethodCheck="true" pad="{false}">
-  <Screen>
+<Tab method="nach" overrideMethodCheck="true" pad={false}>
+  <Screen padTwice={true}>
     <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.concat(['.svg']).join(',')}" />
 
     <p>Please upload a clear and legible copy of your signed NACH form</p>
@@ -39,7 +39,7 @@
     text-align: center;
 
     svg {
-      max-width: 75%;
+      max-height: 114px;
     }
   }
 </style>
