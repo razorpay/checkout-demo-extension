@@ -1,4 +1,4 @@
-<Tab method="nach" overrideMethodCheck="true">
+<Tab method="nach" overrideMethodCheck="true" pad="{false}">
   <Screen>
     <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.concat(['.svg']).join(',')}" />
 
@@ -11,25 +11,23 @@
     {:elseif file && file.name}
       <Attachment on:remove="reset(event)">{file.name}</Attachment>
     {/if}
-  </Screen>
 
-  {#if view === 'upload'}
-    <Callout
-      showIcon={false}
-      classes={['nach-callout']}
-    >
-      <ol>
-        <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
-        <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE} MB are allowed</li>
-      </ol>
-    </Callout>
-  {/if}
+    {#if view === 'upload'}
+      <Note
+        classes={['nach-note']}
+      >
+        <ol>
+          <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
+          <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE} MB are allowed</li>
+        </ol>
+      </Note>
+    {/if}
+  </Screen>
 </Tab>
 
-
 <style>
-  :global(.nach-callout) {
-    padding-left: 12px !important;
+  :global(.nach-note) {
+    margin: 12px 0;
 
     ol {
       padding-left: 12px;
@@ -41,7 +39,7 @@
     text-align: center;
 
     svg {
-      max-width: 90%;
+      max-width: 75%;
     }
   }
 </style>
@@ -215,7 +213,7 @@
   export default {
     components: {
       Attachment: 'templates/views/ui/Attachment.svelte',
-      Callout: 'templates/views/ui/Callout.svelte',
+      Note: 'templates/views/ui/Note.svelte',
       Tab: 'templates/tabs/Tab.svelte',
       Screen: 'templates/layouts/Screen.svelte',
     },
