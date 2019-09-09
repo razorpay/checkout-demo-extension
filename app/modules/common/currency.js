@@ -1219,7 +1219,7 @@ export function formatAmountWithSymbol(amount, currency) {
   return `${displayCurrencies[currency]} ${formatAmount(amount, currency)}`;
 }
 
-export function displayAmount(razorpay, payloadAmount) {
+export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   if (displayCurrency) {
@@ -1238,7 +1238,7 @@ export function displayAmount(razorpay, payloadAmount) {
   }
   return formatAmountWithSymbol(
     razorpay.display_amount || payloadAmount || get('amount'),
-    get('currency')
+    payloadCurrency || get('currency')
   );
 }
 
