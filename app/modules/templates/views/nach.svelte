@@ -228,6 +228,7 @@
 
       abortUpload: () => {}, // Fn to abort the upload request
       file: null, // File that is uploaded
+      uploaded: false, // Have we uploaded the file?
       uploading: false, // Are we currently uploading?
     }),
 
@@ -345,6 +346,7 @@
         this.removeFile();
         this.clearError();
         this.set({
+          uploaded: false,
           uploading: false,
         });
       },
@@ -356,16 +358,26 @@
        */
       shouldSubmit: function () {
         const {
+          uploaded,
           file,
-          view,
         } = this.get();
 
-        if (!file) {
-          this.refs.file.click();
-          return false;
-        }
+        setTimeout(() => {
+          // If we have already uploaded the file, we should just submit and do nothing
+          if (!uploaded) {
+            if (file) {
+              // If file is selected, start uploading
+              this.upload();
+            } else {
+              // Select file
+              this.refs.file.click();
+              return false;
+            }
+          }
+        });
 
-        return true;
+        // If file is uploaded, we let Session do its thing
+        return uploaded;
       },
 
       /**
@@ -416,7 +428,7 @@
         const error = validateFile(file);
 
         this.set({
-          uploading: true
+          uploading: true,
         });
 
         setTimeout(() => {
@@ -432,31 +444,55 @@
           if (error) {
             this.showError(error);
           } else {
-            session.showLoadError('Uploading your NACH form');
-
-            const { promise: uploadRequest, abort: abortUpload } = uploadDocument(session.r, file);
-
             this.set({
-              abortUpload,
+              file,
+              uploading: false,
             });
 
-            uploadRequest
-              .then(response => {
-                this.set({
-                  file,
-                  uploading: false,
-                });
-
-                session.hideOverlayMessage();
-              })
-              .catch(response => {
-                const generatedError = generateError(response);
-
-                this.showError(generatedError);
-              });
+            session.hideOverlayMessage();
           }
         }, 1000);
       },
+
+      /**
+       * Uploads the file.
+       */
+      upload: function () {
+        const {
+          file,
+          session,
+        } = this.get();
+
+        this.set({
+          uploading: true,
+        });
+
+        session.showLoadError('Uploading your NACH form');
+
+        const { promise: uploadRequest, abort: abortUpload } = uploadDocument(session.r, file);
+
+        this.set({
+          abortUpload,
+        });
+
+        uploadRequest
+          .then(response => {
+            this.set({
+              uploaded: true,
+              uploading: false,
+            });
+
+            session.hideOverlayMessage();
+
+            // Let Session do its thing
+            session.preSubmit();
+          })
+          .catch(response => {
+            const generatedError = generateError(response);
+
+            this.showError(generatedError);
+          });
+      }
     }
   }
 </script>
