@@ -1,7 +1,7 @@
 import { makeAuthUrl } from 'common/Razorpay';
 
 export const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
-export const ALLOWED_MAX_SIZE = 5;
+export const ALLOWED_MAX_SIZE_IN_MB = 5;
 
 /**
  * Tells if a filename has a valid extension
@@ -57,23 +57,21 @@ function entityToWords(word) {
  *
  * @returns {Object} error
  */
-export function validateFile(file) {
+export function getValidityError(file) {
   const filename = file.name;
   const size = file.size;
 
   if (!hasValidExtension(filename, ALLOWED_EXTS)) {
     return {
-      main: 'File type not supported',
       description: `The uploaded file type is not supported. Only ${_Arr
         .map(ALLOWED_EXTS, x => x.toUpperCase())
         .join(', ')} files are allowed.`,
     };
   }
 
-  if (size / 1024 / 1024 > ALLOWED_MAX_SIZE) {
+  if (size / 1024 / 1024 > ALLOWED_MAX_SIZE_IN_MB) {
     return {
-      main: 'File size is too large',
-      description: `Please upload a smaller file. The uploaded file is larger than ${ALLOWED_MAX_SIZE} MB.`,
+      description: `Please upload a smaller file. The uploaded file is larger than ${ALLOWED_MAX_SIZE_IN_MB} MB.`,
     };
   }
 }

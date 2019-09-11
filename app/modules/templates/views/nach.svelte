@@ -19,7 +19,7 @@
         >
           <ol>
             <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
-            <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE} MB are allowed</li>
+            <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed</li>
           </ol>
         </Note>
       {/if}
@@ -50,11 +50,11 @@
 <script>
   import {
     ALLOWED_EXTS,
-    ALLOWED_MAX_SIZE,
+    ALLOWED_MAX_SIZE_IN_MB,
 
     generateError,
+    getValidityError,
     uploadDocument,
-    validateFile,
   } from 'checkoutframe/nach';
 
   export default {
@@ -72,7 +72,7 @@
 
     data: () => ({
       ALLOWED_EXTS,
-      ALLOWED_MAX_SIZE,
+      ALLOWED_MAX_SIZE_IN_MB,
 
       abortUpload: () => {}, // Fn to abort the upload request
       file: null, // File that is uploaded
@@ -273,7 +273,7 @@
 
         // Validate
         const file = event.currentTarget.files[0];
-        const error = validateFile(file);
+        const error = getValidityError(file);
 
         this.set({
           uploading: true,
