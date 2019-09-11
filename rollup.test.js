@@ -31,11 +31,11 @@ const distDir = 'app/dist/test';
 
 execSync('mkdir -p ' + distDir);
 
-const template = _ => `<meta charset='utf-8'>
+const template = bundleName => `<meta charset='utf-8'>
 <script src="../../../node_modules/testdouble/dist/testdouble.js"></script>
 <script src="../../../test/tape.js"></script>
 <script>test.onFinish(testDone)</script>
-<script src="${testCount}.js"></script>`;
+<script src="${bundleName}.js"></script>`;
 
 let plugins = rollupPlugins.concat(coveragePlugin);
 
@@ -50,12 +50,18 @@ Promise.all(
               name: 'test',
             })
           )
-          .then(async ({ code }) => {
+          .then(async resp => {
+            const { code } = resp.output[0];
+            const bundleName = input
+              .split('.')
+              .slice(0, -1)
+              .join('.')
+              .replace(/\//g, '.');
+
             testCount++;
-            var localCount = testCount;
-            let prePath = `${distDir}/${testCount}.`;
-            writeFileSync(prePath + 'js', code);
-            writeFileSync(prePath + 'html', template());
+            let prePath = `${distDir}/${bundleName}`;
+            writeFileSync(prePath + '.js', code);
+            writeFileSync(prePath + '.html', template(bundleName));
 
             const browser = await puppeteer.launch({
               executablePath: env.CHROME_BIN || '/usr/bin/chromium',
@@ -74,9 +80,7 @@ Promise.all(
               browser.close();
               resolve(cov && JSON.parse(cov));
             });
-            await page.goto(
-              `file://${__dirname}/${distDir}/${localCount}.html`
-            );
+            await page.goto(`file://${__dirname}/${prePath}.html`);
           });
       })
   )
