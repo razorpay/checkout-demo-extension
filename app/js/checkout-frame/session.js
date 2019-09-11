@@ -6957,9 +6957,17 @@ Session.prototype = {
       methods.count++;
     }
 
-    /* Emandate only works on amount of 0 as of now */
-    if (amount > 0 && methods.emandate) {
-      methods.emandate = false;
+    /**
+     * Emandate and Paper Nach only work on amount of 0
+     */
+    if (amount > 0) {
+      if (methods.emandate) {
+        methods.emandate = false;
+      }
+
+      if (methods.nach) {
+        methods.nach = false;
+      }
     }
 
     /* enable or disable netbanking tab on the basis of preferences */
