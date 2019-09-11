@@ -52,11 +52,16 @@ Promise.all(
           )
           .then(async resp => {
             const { code } = resp.output[0];
+
+            /**
+             * input = "test/common/card.js"
+             * bundleName = "test.common.card"
+             */
             const bundleName = input
               .split('.')
-              .slice(0, -1)
+              .slice(0, -1) // Remove "".js"
               .join('.')
-              .replace(/\//g, '.');
+              .replace(/\//g, '.'); // Turn slashes into dots
 
             testCount++;
             let prePath = `${distDir}/${bundleName}`;
