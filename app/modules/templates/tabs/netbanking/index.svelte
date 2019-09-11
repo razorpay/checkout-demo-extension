@@ -202,7 +202,9 @@ export default {
     },
     hidePayButtonIfSevereDowntime() {
       const { isHighSeverityDowntime, session } = this.get();
-      session.body.toggleClass('sub', !isHighSeverityDowntime);
+      if (isHighSeverityDowntime) {
+        session.body.removeClass('sub');
+      }
     }
   },
 
