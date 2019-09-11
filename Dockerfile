@@ -1,6 +1,6 @@
 FROM pronav/chrome:checkout as builder
 
-COPY . /checkout_build 
+COPY . /checkout_build
 
 WORKDIR /checkout_build
 
