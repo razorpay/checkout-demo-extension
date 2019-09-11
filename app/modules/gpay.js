@@ -114,12 +114,11 @@ export const payWithPaymentRequestApi = (
 
 /**
  * Transforms the intent URL to a payload for microapps.
- * @param {string} paymentId
  * @param {string} intentUrl
  *
  * @returns {Object}
  */
-function transformIntentForMicroappPayload(paymentId, intentUrl) {
+function transformIntentForMicroappPayload(intentUrl) {
   const intentParams = _.query2obj(intentUrl.split('?')[1]);
 
   const payload = {
@@ -133,7 +132,6 @@ function transformIntentForMicroappPayload(paymentId, intentUrl) {
           payeeName: intentParams.pn,
           mcc: intentParams.mc,
           transactionReferenceId: intentParams.tr,
-          transactionId: paymentId,
         },
         tokenizationSpecification: {
           type: 'DIRECT',
@@ -154,13 +152,12 @@ function transformIntentForMicroappPayload(paymentId, intentUrl) {
 
 /**
  * Creates a payment with the microapps API
- * @param {string} paymentId
  * @param {string} intentUrl
  *
  * @return {Promise}
  */
-export function payWithMicroapp(paymentId, intentUrl) {
-  const payload = transformIntentForMicroappPayload(paymentId, intentUrl);
+export function payWithMicroapp(intentUrl) {
+  const payload = transformIntentForMicroappPayload(intentUrl);
   const {
     transactionReferenceId,
   } = payload.allowedPaymentMethods[0].parameters;

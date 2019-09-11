@@ -183,7 +183,6 @@
 </style>
 
 <script>
-  /* globals getStore */
   import { getSession } from 'sessionmanager';
   import { getWallet } from 'common/wallet';
   import { getBankLogo } from 'common/bank';
@@ -191,7 +190,8 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
-  import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
+  import CheckoutStore from 'checkoutstore';
+  import PreferencesStore from 'checkoutstore/preferences';
 
   const trimText = (text, till) => {
     if (!_.isString(text)) {
@@ -204,6 +204,20 @@
 
     return `${text.substring(0, till - 3)}...`;
   };
+
+  /**
+   * Turns word into capital-case
+   * @param {string} word
+   *
+   * @returns {string}
+   */
+  function capitalizeWord (word) {
+    if (word.length) {
+      return `${word[0].toUpperCase()}${word.slice(1)}`;
+    }
+
+    return word;
+  }
 
   export default {
     components: {
@@ -235,8 +249,8 @@
       let shouldDisableP13n = !session.get('personalization') ||
         hasOffersOnHomescreen ||
         session.methods.count === 1 ||
-        getStore('optional').contact ||
-        getStore('isPartialPayment') ||
+        CheckoutStore.get().optional.contact ||
+        CheckoutStore.get().isPartialPayment ||
         session.tpvBank ||
         session.upiTpv ||
         session.multiTpv ||
@@ -322,7 +336,8 @@
       instrumentsData: ({ instruments, customer }) => {
         let session = getSession();
         let methods = session.methods;
-        let banks = methods.netbanking;
+        let banks = PreferencesStore.get().methods.netbanking;
+
         if (!methods) {
           return;
         }
@@ -387,10 +402,13 @@
                 } else if (!tokenObj && instrument.issuer) {
                   /* If user logged out after making payent with savedcard */
 
-                  text = `Use your ${trimText(
-                    (banks[instrument.issuer] || '').replace(/ Bank$/, ''),
+                  const bankName = banks && banks[instrument.issuer];
+                  const bankText = bankName && trimText(
+                    bankName.replace(/ Bank$/, ''),
                     instrument.type ? 14 : 19
-                  )} ${instrument.type || ''} card`;
+                  );
+
+                  text = `Use your${bankName ? ` ${bankText}`: ''} ${capitalizeWord(instrument.type || '')} card`;
 
                   if (instrument.network && instrument.network !== 'unknown') {
                     icon = `.networkicon.${findCodeByNetworkName(
@@ -408,10 +426,13 @@
                 var networkCode = findCodeByNetworkName(card.network);
                 instrument.token = tokenObj.token;
 
-                text = `${trimText(
-                  (banks[card.issuer] || '').replace(/ Bank$/, ''),
+                const bankName = banks && banks[card.issuer];
+                const bankText = bankName && trimText(
+                  bankName.replace(/ Bank$/, ''),
                   card.type ? 14 : 19
-                )} ${card.type || ''} card - ${card.last4}`;
+                );
+
+                text = `${bankName ? `${bankText} `: ''}${capitalizeWord(card.type || '')} card - ${card.last4}`;
 
                 instrument.cvvDigits = networkCode === 'amex' ? 4 : 3;
 

@@ -40,7 +40,7 @@
 </style>
 
 <script>
-  import { VPA_REGEX } from 'common/constants.js';
+  import { VPA_REGEX } from 'common/constants';
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);

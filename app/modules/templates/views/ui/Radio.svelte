@@ -15,7 +15,7 @@
 </div>
 
 <script>
-  import Track from 'tracker.js';
+  import Track from 'tracker';
 
   export default {
     data: function() {

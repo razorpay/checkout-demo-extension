@@ -6,7 +6,7 @@
 
 <script>
   import { getSession } from 'sessionmanager';
-  import DowntimesStore from 'checkoutstore/downtimes.js';
+  import DowntimesStore from 'checkoutstore/downtimes';
   import {
     getMethodDescription,
     getMethodDowntimeDescription,

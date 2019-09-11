@@ -10,7 +10,11 @@ export default function popupTemplate(_) {
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
   var title = get('name') || get('description') || 'Redirecting...';
-  var amount = displayAmount(_.r, _.data && _.data.amount);
+  var amount = displayAmount(
+    _.r,
+    _.data && _.data.amount,
+    _.data && _.data.currency
+  );
 
   var image = get('image');
   image = image ? `<div id="logo"><img src="${image}"/></div>` : '';
@@ -66,7 +70,7 @@ setTimeout(function(){
   };
 },1e4)
 ${_.sdk_popup &&
-    `function submitForm(action, data, method) {
+  `function submitForm(action, data, method) {
   if (method === 'get') { return window.location = action }
   var form = document.forms[0];
   form.setAttribute('action', action);
