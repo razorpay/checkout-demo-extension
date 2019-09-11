@@ -98,7 +98,7 @@
 <script>
   import { makeAuthUrl } from 'common/Razorpay';
   import { timeConverter } from 'common/formatDate';
-  import { copyToClipboard } from 'common/clipboard.js';
+  import { copyToClipboard } from 'common/clipboard';
 
   export default {
     components: {

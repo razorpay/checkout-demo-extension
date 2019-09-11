@@ -1,42 +1,43 @@
-import { composeStore } from 'checkoutstore/create';
-import Screens from 'checkoutstore/screens';
 import Preferences from 'checkoutstore/preferences';
-import SessionStore from 'checkoutstore/session';
-import DowntimesStore from 'checkoutstore/downtimes';
+import Downtimes from 'checkoutstore/downtimes';
 
-const CheckoutStore = composeStore({
-  preferences: Preferences,
-  screens: Screens,
-  session: SessionStore,
-  downtimes: DowntimesStore,
-});
+const defaultState = {};
 
-CheckoutStore.compute(
-  'isPartialPayment',
-  ['preferences'],
-  preferences => preferences.order && preferences.order.partial_payment
-);
+function CheckoutStore(base) {
+  let checkoutStoreState = {};
 
-CheckoutStore.compute('optional', ['preferences'], preferences => {
-  const optionalObj = {};
-  const optionalArray = preferences.optional;
-  if (optionalArray) {
-    optionalObj.contact = optionalArray |> _Arr.contains('contact');
-    optionalObj.email = optionalArray |> _Arr.contains('email');
-  }
-  return optionalObj;
-});
+  this.set = state => {
+    checkoutStoreState |> _Obj.extend({} |> _Obj.extend(state));
+  };
 
-CheckoutStore.compute('contactEmailOptional', ['optional'], optional => {
-  return optional.contact && optional.email;
-});
+  this.get = function() {
+    const storeState = _Obj.extend({}, checkoutStoreState);
+    const preferences = Preferences.get();
+    const downtimes = Downtimes.get();
+    const optionalFields = {};
+    const optionalFieldsList = preferences.optional || [];
 
-CheckoutStore.compute(
-  'verticalMethods',
-  ['contactEmailOptional', 'isPartialPayment'],
-  (contactEmailOptional, isPartialPayment) => {
-    return contactEmailOptional || isPartialPayment;
-  }
-);
+    if (optionalFieldsList) {
+      optionalFields.contact = optionalFieldsList |> _Arr.contains('contact');
+      optionalFields.email = optionalFieldsList |> _Arr.contains('email');
+    }
 
-export default CheckoutStore;
+    storeState.optional = optionalFields;
+    storeState.isPartialPayment =
+      preferences.order && preferences.order.partial_payment;
+
+    storeState.contactEmailOptional =
+      storeState.optional.contact && storeState.optional.email;
+    storeState.verticalMethods =
+      storeState.contactEmailOptional || storeState.isPartialPayment;
+
+    storeState.preferences = preferences;
+    storeState.downtimes = downtimes;
+
+    return storeState;
+  };
+
+  this.set(base);
+}
+
+export default new CheckoutStore(defaultState);

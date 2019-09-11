@@ -1,7 +1,7 @@
 import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
-import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
