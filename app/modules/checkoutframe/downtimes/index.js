@@ -10,7 +10,10 @@
  *
  *  @return {Boolean}
  */
-function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
+export function disableBasedOnSeverityOrScheduled(
+  severity = [],
+  scheduled = true
+) {
   return function disable(downtime) {
     return (
       _Arr.contains(severity, downtime.severity) ||

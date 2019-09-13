@@ -132,7 +132,10 @@ import * as AnalyticsTypes from 'analytics-types';
 import { iPhone } from 'common/useragent';
 
 import DowntimesStore from 'checkoutstore/downtimes';
-import { groupNetbankingDowntimesByBank } from 'checkoutframe/downtimes';
+import {
+  groupNetbankingDowntimesByBank,
+  disableBasedOnSeverityOrScheduled
+} from 'checkoutframe/downtimes';
 
 import { getPreferredBanks } from 'common/bank';
 import { getSession } from 'sessionmanager';
@@ -257,19 +260,16 @@ export default {
     banksArr: ({ banks, downtimes }) => _Obj.entries(banks)
         .map((entry) => ({ code: entry[0], name: entry[1], downtime: downtimes[entry[0]] })),
 
-    // Do not show invalid for emandate as the screen changes as soon as bank is selected. // TODO: Fix this
+    // Do not show invalid for emandate as the screen changes as soon as bank is selected.
     invalid: ({ method, selectedBankCode }) => method !== 'emandate' && !selectedBankCode,
-
-    showDown: ({ down, selectedBankCode }) => down && down.indexOf(selectedBankCode) !== -1,
 
     selectedBankDowntime: ({ downtimes, selectedBankCode }) => downtimes && downtimes[selectedBankCode],
 
     netbanks: ({ banks, bankOptions, maxGridCount }) => getPreferredBanks(banks, bankOptions).slice(0, maxGridCount),
 
     // Hide pay button only if the selected bank's downtime severity is high or scheduled.
-    // TODO: figure out a better way of doing this. (i.e. return computed object from downtime module)
     isHighSeverityDowntime: ({ selectedBankDowntime }) => selectedBankDowntime
-         && _Arr.contains(['high', 'scheduled'], selectedBankDowntime.severity)
+         && disableBasedOnSeverityOrScheduled(['high', true])(selectedBankDowntime)
 
   }
 

@@ -53,6 +53,8 @@
 
 <script>
 
+import { disableBasedOnSeverityOrScheduled } from 'checkoutframe/downtimes';
+
 export default {
 
   components: {
@@ -60,8 +62,7 @@ export default {
   },
 
   computed: {
-    disabled: ({ downtime }) => downtime &&
-        _Arr.contains(['high', 'scheduled'], downtime.severity) // TODO refactor into a function
+    disabled: ({ downtime }) => downtime && disableBasedOnSeverityOrScheduled(['high', true])(downtime)
   }
 
 }
