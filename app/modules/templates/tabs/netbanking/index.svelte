@@ -234,12 +234,12 @@ export default {
   },
 
   oncreate() {
-    const { banksArr } = this.get();
-
-    const downtimes = DowntimesStore.get();
-    const netbankingDowntimes = groupNetbankingDowntimesByBank(downtimes.netbanking);
-
-    this.set({ downtimes: netbankingDowntimes });
+    const { method } = this.get();
+    if (method === 'netbanking') {
+      const downtimes = DowntimesStore.get();
+      const netbankingDowntimes = groupNetbankingDowntimesByBank(downtimes.netbanking);
+      this.set({ downtimes: netbankingDowntimes });
+    }
   },
 
   actions: {
