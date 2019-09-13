@@ -92,6 +92,7 @@
     <Downtime
       issuer={banks[selectedBankCode]}
       isHighSeverity={isHighSeverityDowntime}
+      method="netbanking"
     />
   {/if}
 

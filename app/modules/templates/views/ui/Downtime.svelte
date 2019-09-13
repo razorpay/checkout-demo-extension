@@ -9,8 +9,10 @@
 <script>
 
 const DowntimeMessages = {
-  error: ' accounts are temporarily unavailable right now. Please select another bank.',
-  warning: ' accounts are experiencing low success rates.'
+  netbanking: {
+    error: ' accounts are temporarily unavailable right now. Please select another bank.',
+    warning: ' accounts are experiencing low success rates.'
+  }
 };
 
 export default {
@@ -21,7 +23,7 @@ export default {
 
   computed: {
     calloutType: ({ isHighSeverity }) => isHighSeverity ? 'error' : 'warning',
-    message: ({ calloutType }) => DowntimeMessages[calloutType]
+    message: ({ method, calloutType }) => DowntimeMessages[method][calloutType]
   }
 
 }
