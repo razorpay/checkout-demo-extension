@@ -3801,7 +3801,6 @@ Session.prototype = {
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
-        // TODO test this after port to svelte
         this.netbankingTab.setSelectedBank(issuer);
       }
     } else if (screen === 'emi') {
