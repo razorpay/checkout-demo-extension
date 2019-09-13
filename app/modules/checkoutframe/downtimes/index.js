@@ -135,7 +135,9 @@ export function groupNetbankingDowntimesByBank(downtimes = []) {
   return _Arr.reduce(
     downtimes,
     (acc, downtime) => {
-      acc[downtime.instrument.bank] = downtime;
+      if (downtime.instrument && downtime.instrument.bank) {
+        acc[downtime.instrument.bank] = downtime;
+      }
       return acc;
     },
     {}
