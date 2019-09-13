@@ -1,9 +1,9 @@
 <div
   class="netb-bank item radio-item has-tooltip"
-  id="bank-item-{code}"
   class:disabled
-  down={disabled}
   class:has-tooltip="downtime"
+  id="bank-item-{code}"
+  down={disabled}
 >
   <input
     class="bank-radio"
