@@ -134,6 +134,12 @@ export function getDowntimes(preferences) {
   return downtimes;
 }
 
+/**
+ * Groups netbanking downtimes by bank.
+ *
+ * @param {Array<Object>} downtimes netbanking downtimes
+ * @return {Object}
+ */
 export function groupNetbankingDowntimesByBank(downtimes = []) {
   return _Arr.reduce(
     downtimes,
