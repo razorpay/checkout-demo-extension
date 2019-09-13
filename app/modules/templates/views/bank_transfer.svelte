@@ -78,6 +78,8 @@
   }
   .ct-td {
     display: inline-block;
+    width: 50%;
+    vertical-align: text-top;
     text-align: left;
     color: #424242;
   }
@@ -99,6 +101,8 @@
   import { makeAuthUrl } from 'common/Razorpay';
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   export default {
     components: {
@@ -185,6 +189,9 @@
           ),
         };
         copyToClipboard('.neft-details', this.refs.neftDetails.innerText);
+        Analytics.track('bank_transfer:copy:click', {
+          type: AnalyticsTypes.BEHAV,
+        });
         this.showCopyButton(true, 'COPIED');
         return false;
       },
