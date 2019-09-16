@@ -47,7 +47,14 @@ var name_readonly = o('readonly.name') && prefill_name;
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 var upi_intent = _.upi_intents_data && _.methods.upi_intent;
 var upi_apps = _.upi_intents_data;
-var emi_banks_csv = emi_options && emi_options.banks && Object.values(emi_options.banks).map(e=>e.name).join(', ') || "";
+var emi_banks_csv = '';
+if(emi_options && emi_options.banks){
+   var emi_bank_names = [];
+   for(var bank_code in emi_options.banks){
+      emi_bank_names.push(emi_options.banks[bank_code].name);
+   }
+   emi_banks_csv = emi_bank_names.join(', ');
+}
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
