@@ -194,7 +194,7 @@
         autoAlign: true, // Should align automatically after mounting?
         align: ['right'], // Default alignment directions
         shown: false, // Is it shown?
-        alignOnHover: false, // Should we align again when parent is hovered on?
+        alignOnHover: true, // Should we align again when parent is hovered on?
       }
     },
 
