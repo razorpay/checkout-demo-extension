@@ -1,7 +1,7 @@
 <Tab method="nach" overrideMethodCheck="true" pad={false}>
   <Screen>
     <Padded>
-      <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.concat(['.svg']).join(',')}" />
+      <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.join(',')}" />
 
       <p>Please upload a clear and legible copy of your signed NACH form</p>
 
