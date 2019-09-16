@@ -11,11 +11,7 @@ export const ALLOWED_MAX_SIZE_IN_MB = 5;
  * @returns {boolean}
  */
 function hasValidExtension(filename, extensions) {
-  return _Arr.any(
-    extensions,
-    extension =>
-      filename.indexOf(extension) === filename.length - extension.length
-  );
+  return _Arr.any(extensions, extension => _Str.endsWith(filename, extension));
 }
 
 /**
