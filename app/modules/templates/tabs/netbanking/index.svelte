@@ -168,7 +168,8 @@ export default {
       corporateOption: '',
       retailOption: '',
       downtimes: {},
-      session: getSession()
+      session: getSession(),
+      active: false,
     }
   },
 
@@ -184,8 +185,17 @@ export default {
         this.set({ selectedBankCode: corporateOption });
       }
     },
-    onSwitch() {
-      this.hidePayButtonIfSevereDowntime();
+    onShown() {
+      this.set({
+        active: true
+      });
+      this.setPayButtonVisibility();
+    },
+    onBack() {
+      this.set({
+        active: false
+      });
+      this.setPayButtonVisibility();
     },
     setRetailOption() {
       const { selectedBankCode, banks } = this.get();
@@ -204,10 +214,13 @@ export default {
     deselectBank() {
       this.set({ selectedBankCode: '' });
     },
-    hidePayButtonIfSevereDowntime() {
-      const { isHighSeverityDowntime, session } = this.get();
+    setPayButtonVisibility() {
+      // Hide pay button if the selected bank has a severe downtime
+      const { isHighSeverityDowntime, session, active } = this.get();
       if (isHighSeverityDowntime) {
         session.body.removeClass('sub');
+      } else if (active) {
+        session.body.addClass('sub');
       }
     }
   },
@@ -228,7 +241,7 @@ export default {
         });
 
         this.fire('bankSelected', { code: selectedBankCode });
-        this.hidePayButtonIfSevereDowntime();
+        this.setPayButtonVisibility();
       }
     }
   },

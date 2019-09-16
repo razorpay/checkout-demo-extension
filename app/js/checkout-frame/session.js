@@ -3970,6 +3970,10 @@ Session.prototype = {
       this.methods.cardless_emi
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'netbanking') {
+      if (this.netbankingTab.onBack()) {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -4189,7 +4193,7 @@ Session.prototype = {
     }
 
     if (tab === 'netbanking') {
-      this.netbankingTab.onSwitch();
+      this.netbankingTab.onShown();
     }
   },
 
