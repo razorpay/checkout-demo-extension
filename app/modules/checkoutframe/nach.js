@@ -77,7 +77,7 @@ export function getValidityError(file) {
  * @param {Razorpay} razorpay
  * @param {File} file
  *
- * @returns {[Promise, Function]} [promise, abort]
+ * @returns {promise: Promise, abort: Function} [promise, abort]
  */
 export function uploadDocument(razorpay, file) {
   let ajax;
