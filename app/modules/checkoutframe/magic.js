@@ -283,7 +283,7 @@ export default class Magic {
 
     if (screen === 'magic-choice') {
       delete data[''];
-      data.choice = this.view.get().selectedChoice;
+      data.choice = this.view.selectedChoice;
 
       this.track('choice', {
         choice: data['choice'],

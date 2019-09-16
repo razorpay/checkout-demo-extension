@@ -3641,7 +3641,7 @@ Session.prototype = {
     this.body.toggleClass('sub', showPaybtn);
 
     if (screen === 'upi') {
-      var isIntentFlow = this.upiTab.get().intent;
+      var isIntentFlow = this.upiTab.intent;
 
       if (isIntentFlow) {
         var data = this.upiTab.getPayload();
@@ -3649,7 +3649,7 @@ Session.prototype = {
         if (data['_[flow]'] === 'intent' && !data.upi_app) {
           $('#body').removeClass('sub');
         }
-      } else if (typeof this.upiTab.get().selectedApp === 'undefined') {
+      } else if (typeof this.upiTab.selectedApp === 'undefined') {
         $('#body').removeClass('sub');
       }
     }
@@ -4046,7 +4046,7 @@ Session.prototype = {
 
   switchTabAnalytics: function(tab) {
     if (tab === 'upi') {
-      var upiData = this.upiTab.get();
+      var upiData = this.upiTab;
 
       if (upiData.intent) {
         /**
@@ -5791,7 +5791,7 @@ Session.prototype = {
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
-        var omnichannelType = this.upiTab.get().omnichannelType;
+        var omnichannelType = this.upiTab.omnichannelType;
 
         if (data['_[flow]'] === 'intent') {
           if (!omnichannelType) {
@@ -5809,7 +5809,7 @@ Session.prototype = {
 
         if (
           data['_[flow]'] === 'directpay' &&
-          this.upiTab.get().selectedApp === 'gpay'
+          this.upiTab.selectedApp === 'gpay'
         ) {
           if (omnichannelType === 'vpa') {
             formSelector = '#upi-gpay-vpa';
@@ -5827,7 +5827,7 @@ Session.prototype = {
         if (
           this.preferences.features &&
           this.preferences.features.google_pay_omnichannel &&
-          this.upiTab.get().selectedApp === 'gpay'
+          this.upiTab.selectedApp === 'gpay'
         ) {
           $('.omnichannel').show();
         } else {
@@ -7070,7 +7070,7 @@ Session.prototype = {
     var isOmni =
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
-      this.upiTab.get().selectedApp === 'gpay';
+      this.upiTab.selectedApp === 'gpay';
 
     return isOmni;
   },

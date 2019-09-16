@@ -114,7 +114,7 @@ export default class MethodsList {
         type: AnalyticsTypes.BEHAV,
       });
 
-      if (this.view.get().selected) {
+      if (this.view.selected) {
         _Doc.querySelector('#body') |> _El.addClass('sub');
       }
     });

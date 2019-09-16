@@ -352,7 +352,7 @@ function closeModal() {
  */
 function isP13nListOpen(session) {
   try {
-    const { instrumentsData } = session.methodsList.view.get();
+    const { instrumentsData } = session.methodsList.view;
 
     const {
       visible: otherMethodsVisible,

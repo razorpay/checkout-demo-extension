@@ -30,5 +30,5 @@ export const isVisible = () => {
     return false;
   }
 
-  return view.get().visible;
+  return view.visible;
 };
