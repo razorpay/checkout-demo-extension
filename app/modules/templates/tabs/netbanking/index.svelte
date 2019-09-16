@@ -283,7 +283,7 @@ export default {
 
     // Hide pay button only if the selected bank's downtime severity is high or scheduled.
     isHighSeverityDowntime: ({ selectedBankDowntime }) => selectedBankDowntime
-         && disableBasedOnSeverityOrScheduled(['high', true])(selectedBankDowntime)
+         && disableBasedOnSeverityOrScheduled(['high', true])({ downtime: selectedBankDowntime })
 
   }
 

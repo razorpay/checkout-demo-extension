@@ -62,7 +62,7 @@ export default {
   },
 
   computed: {
-    disabled: ({ downtime }) => downtime && disableBasedOnSeverityOrScheduled(['high', true])(downtime)
+    disabled: ({ downtime }) => downtime && disableBasedOnSeverityOrScheduled(['high', true])({ downtime })
   }
 
 }

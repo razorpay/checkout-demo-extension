@@ -14,7 +14,7 @@ export function disableBasedOnSeverityOrScheduled(
   severity = [],
   scheduled = true
 ) {
-  return function disable(downtime) {
+  return function disable({ downtime }) {
     return (
       _Arr.contains(severity, downtime.severity) ||
       downtime.scheduled === scheduled
@@ -26,6 +26,21 @@ const DISABLE_METHOD = {
   upi: disableBasedOnSeverityOrScheduled(['high'], true),
   qr: disableBasedOnSeverityOrScheduled(['high'], true),
   gpay: disableBasedOnSeverityOrScheduled(['high'], true),
+  netbanking: function({ preferences }) {
+    const netbankingObj = preferences.methods.netbanking || {};
+    const banks = _Obj.keys(netbankingObj);
+    const downtimes =
+      (preferences.payment_downtime && preferences.payment_downtime.items) ||
+      [];
+
+    return _Arr.every(banks, bank =>
+      _Arr.any(
+        downtimes,
+        downtime =>
+          downtime.method === 'netbanking' && downtime.instrument.bank === bank
+      )
+    );
+  },
 };
 
 /**
@@ -34,9 +49,11 @@ const DISABLE_METHOD = {
  *  @key {String} method
  *  @value {Array} downtimes Downtimes of the method
  *
+ * @param preferences
+ *
  * @return {Array}
  */
-function getDisabledMethods(downtimes) {
+function getDisabledMethods(downtimes, preferences) {
   const disabled = [];
 
   // Loop through all methods
@@ -48,7 +65,9 @@ function getDisabledMethods(downtimes) {
 
     // Check if the method's downtime checker function eval to true for any of the downtimes for the method
     const isMethodDown = Boolean(
-      _Arr.find(methodDowntimes, downtime => DISABLE_METHOD[method](downtime))
+      _Arr.find(methodDowntimes, downtime =>
+        DISABLE_METHOD[method]({ downtime, preferences })
+      )
     );
 
     if (isMethodDown) {
@@ -129,7 +148,7 @@ export function getDowntimes(preferences) {
     |> groupDowntimesByMethod
     |> copyMethodsIfNeeded;
 
-  downtimes.disabled = getDisabledMethods(downtimes);
+  downtimes.disabled = getDisabledMethods(downtimes, preferences);
 
   return downtimes;
 }
