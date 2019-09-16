@@ -202,7 +202,7 @@ var responseTypes = {
               const session = getSession();
 
               if (session && session.upiTab) {
-                session.upiTab.set({
+                session.upiTab.$set({
                   useWebPaymentsApi: false,
                   selectedApp: 'gpay',
                 });

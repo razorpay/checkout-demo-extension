@@ -1,4 +1,6 @@
-const defaultState = {};
+const defaultState = {
+  disabled: [],
+};
 
 function Downtimes(base) {
   let downtimeState = {};

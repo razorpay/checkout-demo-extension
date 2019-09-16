@@ -1,51 +1,99 @@
-<Tab method="bank_transfer">
-  <div class="bank_transfer-container">
-    {#if loading}
-    <AsyncLoading message="Getting bank details..." />
-    {:elseif data}
-    <div class="bank_transfer-message">
-      To complete the transaction, make NEFT / RTGS / IMPS transfer to
-    </div>
+<script>
+  // Utils imports
+  import { makeAuthUrl } from 'common/Razorpay';
+  import { timeConverter } from 'common/formatDate';
+  import { copyToClipboard } from 'common/clipboard';
+  import { getSession } from 'sessionmanager';
 
-    <div class="neft-details">
-      <div ref:neftDetails>
-        <div class="ct-tr">
-          <span class="ct-th">Account:</span>
-          <span class="ct-td">{data.receiver.account_number}</span>
-        </div>
-        <div class="ct-tr">
-          <span class="ct-th">IFSC:</span>
-          <span class="ct-td">{data.receiver.ifsc}</span>
-        </div>
-        <div class="ct-tr">
-          <span class="ct-th">Beneficiary Name:</span>
-          <span class="ct-td">{data.receiver.name}</span>
-        </div>
-        <div class="ct-tr">
-          <span class="ct-th">Amount Expected:</span>
-          <span class="ct-td">{data.amount}</span>
-        </div>
-      </div>
+  // UI imports
+  import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
+  import Callout from 'templates/views/ui/Callout.svelte';
+  import Tab from 'templates/tabs/Tab.svelte';
 
-      {#if data.close_by}
-      <div class="ct-tr ct-note">
-        Note: Please complete the transaction before {data.close_by}.
-      </div>
-      {/if}
-    </div>
+  // Props
+  export let loading = true;
+  export let data = null;
+  export let error = null;
 
-    <Callout>
-      Do not round-off the amount. Transfer the exact amount for the payment to be successful.
-    </Callout>
-    {:else}
-    <div class="error">
-      <div class="error-text">{error || 'Error'}</div>
-      <br />
-      <div class="btn" on:click="init()">Retry</div>
-    </div>
-    {/if}
-  </div>
-</Tab>
+  // Refs
+  export let neftDetails;
+
+  const session = getSession();
+  const footerButtons = {
+    copyDetails: _Doc.querySelector('#footer .bank-transfer-copy-details'),
+    pay: _Doc.querySelector('#footer .pay-btn'),
+    body: _Doc.querySelector('#body'),
+  };
+
+  export function init() {
+    if (data !== null) {
+      showCopyButton(true, 'COPY DETAILS');
+      return;
+    }
+
+    loading = true;
+
+    fetch.post({
+      url: makeAuthUrl(
+        session.r,
+        `orders/${session.r.get('order_id')}/virtual_accounts`
+      ),
+      callback: getNEFTDetails,
+    });
+  }
+
+  export function getNEFTDetails(response) {
+    if (response.error) {
+      loading = false;
+      error = response.error.description;
+
+      return;
+    }
+
+    let receivers = response.receivers;
+
+    if (receivers && receivers.length !== 0) {
+      data = {
+        receiver: receivers[0],
+        amount:
+          response.amount_expected &&
+          session.formatAmountWithCurrency(response.amount_expected),
+        close_by: response.close_by && timeConverter(response.close_by),
+      };
+
+      loading = false;
+      showCopyButton(true, 'COPY DETAILS');
+    }
+  }
+
+  export function onShown() {
+    init();
+  }
+
+  export function onBack() {
+    showCopyButton(false, '');
+    return false;
+  }
+
+  export function shouldSubmit() {
+    copyToClipboard('.neft-details', neftDetails.innerText);
+    showCopyButton(true, 'COPIED');
+    return false;
+  }
+
+  export function showCopyButton(show, text) {
+    if (show) {
+      _El.addClass(footerButtons.pay, 'invisible');
+      _El.addClass(footerButtons.body, 'sub');
+      _El.removeClass(footerButtons.copyDetails, 'invisible');
+      _El.setContents(footerButtons.copyDetails, text);
+    } else {
+      _El.addClass(footerButtons.copyDetails, 'invisible');
+      _El.removeClass(footerButtons.pay, 'invisible');
+    }
+  }
+</script>
+
 <style>
   .loading {
     text-align: center;
@@ -95,117 +143,52 @@
   }
 </style>
 
-<script>
-  import { makeAuthUrl } from 'common/Razorpay';
-  import { timeConverter } from 'common/formatDate';
-  import { copyToClipboard } from 'common/clipboard';
+<Tab method="bank_transfer">
+  <div class="bank_transfer-container">
+    {#if loading}
+      <AsyncLoading message="Getting bank details..." />
+    {:else if data}
+      <div class="bank_transfer-message">
+        To complete the transaction, make NEFT / RTGS / IMPS transfer to
+      </div>
 
-  export default {
-    components: {
-      AsyncLoading: 'templates/views/ui/AsyncLoading.svelte',
-      Callout: 'templates/views/ui/Callout.svelte',
-      Tab: 'templates/tabs/Tab.svelte',
-    },
-    data() {
-      return {
-        loading: true,
-        data: null,
-        error: null,
-        session: null,
-      };
-    },
-    methods: {
-      init() {
-        if (this.get().data !== null) {
-          this.showCopyButton(true, 'COPY DETAILS');
-          return;
-        }
-        this.set({
-          loading: true,
-        });
-        const { session } = this.get();
-        fetch.post({
-          url: makeAuthUrl(
-            session.r,
-            `orders/${session.r.get('order_id')}/virtual_accounts`
-          ),
-          callback: this.getNEFTDetails.bind(this),
-        });
-      },
-      getNEFTDetails(response) {
-        if (response.error) {
-          return this.set({
-            loading: false,
-            error: response.error.description,
-          });
-        }
-        const { session } = this.get();
-        let receivers = response.receivers;
-        if (receivers && receivers.length !== 0) {
-          const data = {
-            receiver: receivers[0],
-            amount:
-              response.amount_expected &&
-              session.formatAmountWithCurrency(response.amount_expected),
-            close_by: response.close_by && timeConverter(response.close_by),
-          };
-          this.set({
-            loading: false,
-            data,
-          });
-          this.showCopyButton(true, 'COPY DETAILS');
-        }
-      },
-      /**
-       * Session calls this method when it switches to "bank_transfer" tab
-       */
-      onShown: function() {
-        this.init();
-      },
+      <div class="neft-details">
+        <div bind:this={neftDetails}>
+          <div class="ct-tr">
+            <span class="ct-th">Account:</span>
+            <span class="ct-td">{data.receiver.account_number}</span>
+          </div>
+          <div class="ct-tr">
+            <span class="ct-th">IFSC:</span>
+            <span class="ct-td">{data.receiver.ifsc}</span>
+          </div>
+          <div class="ct-tr">
+            <span class="ct-th">Beneficiary Name:</span>
+            <span class="ct-td">{data.receiver.name}</span>
+          </div>
+          <div class="ct-tr">
+            <span class="ct-th">Amount Expected:</span>
+            <span class="ct-td">{data.amount}</span>
+          </div>
+        </div>
 
-      /**
-       * Session calls this to ask if tab will handle back
-       *
-       * @returns {boolean} will tab handle back
-       */
-      onBack: function() {
-        this.showCopyButton(false, '');
-        return false;
-      },
+        {#if data.close_by}
+          <div class="ct-tr ct-note">
+            Note: Please complete the transaction before {data.close_by}.
+          </div>
+        {/if}
+      </div>
 
-      /**
-       * Session calls this to determine if it should submit
-       *
-       * @returns {Boolean} Should session submit?
-       */
-      shouldSubmit: function() {
-        const footerButtons = {
-          copyDetails: _Doc.querySelector(
-            '#footer .bank-transfer-copy-details'
-          ),
-        };
-        copyToClipboard('.neft-details', this.refs.neftDetails.innerText);
-        this.showCopyButton(true, 'COPIED');
-        return false;
-      },
-      showCopyButton: function(show, text) {
-        const footerButtons = {
-          copyDetails: _Doc.querySelector(
-            '#footer .bank-transfer-copy-details'
-          ),
-          pay: _Doc.querySelector('#footer .pay-btn'),
-          body: _Doc.querySelector('#body'),
-        };
-        if (show) {
-          _El.addClass(footerButtons.pay, 'invisible');
-          _El.addClass(footerButtons.body, 'sub');
-          _El.removeClass(footerButtons.copyDetails, 'invisible');
-          _El.setContents(footerButtons.copyDetails, text);
-        } else {
-          _El.addClass(footerButtons.copyDetails, 'invisible');
-          _El.removeClass(footerButtons.pay, 'invisible');
-        }
-      },
-    },
-  };
-</script>
+      <Callout>
+        Do not round-off the amount. Transfer the exact amount for the payment
+        to be successful.
+      </Callout>
+    {:else}
+      <div class="error">
+        <div class="error-text">{error || 'Error'}</div>
+        <br />
+        <div class="btn" on:click={init}>Retry</div>
+      </div>
+    {/if}
+  </div>
+</Tab>

@@ -60,7 +60,7 @@ import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences';
 import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
-import OTPScreenStore from 'checkoutstore/screens/otp';
+import * as OTPScreenStore from 'checkoutstore/screens/otp';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
@@ -71,6 +71,8 @@ import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
 import PayoutAccount from 'templates/screens/payout-account.svelte';
 
 import * as Hacks from 'checkoutframe/hacks';
+
+import { get as storeGetter } from 'svelte/store';
 
 export default {
   RazorpayConfig,
@@ -157,6 +159,7 @@ export default {
   UpiTab,
 
   Hacks,
+  storeGetter,
 
   _Arr,
   _Doc,

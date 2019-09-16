@@ -1608,8 +1608,7 @@ Session.prototype = {
     if (!this.methodsList) {
       this.methodsList = new discreet.MethodsList({
         target: '#methods-list',
-        data: {
-          session: this,
+        props: {
           animate: false,
         },
       });
@@ -1626,7 +1625,7 @@ Session.prototype = {
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
         target: gel('upi-svelte-wrap'),
-        data: {
+        props: {
           methods: this.methods,
         },
       });
@@ -1712,21 +1711,21 @@ Session.prototype = {
   setEMI: function() {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
-      this.emi = new discreet.emiView(this);
+      this.emi = new discreet.emiView();
     }
 
     if (!this.emiPlansView) {
-      this.emiPlansView = new discreet.emiPlansView(this);
+      this.emiPlansView = new discreet.emiPlansView();
     }
   },
 
   setSavedCardsView: function() {
-    this.savedCardsView = new discreet.SavedCardsView(this);
+    this.savedCardsView = new discreet.SavedCardsView();
   },
 
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
-      this.emandateView = new discreet.emandateView(this);
+      this.emandateView = new discreet.emandateView();
     }
   },
 
@@ -1769,7 +1768,7 @@ Session.prototype = {
     var self = this;
 
     if (this.methods.cardless_emi) {
-      this.emiOptionsView = new discreet.emiOptionsView(this);
+      this.emiOptionsView = new discreet.emiOptionsView();
 
       var providers = [];
 
@@ -1828,9 +1827,6 @@ Session.prototype = {
     if (this.methods.bank_transfer) {
       this.bankTransferView = new discreet.BankTransferScreen({
         target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
-        data: {
-          session: this,
-        },
       });
     }
   },
@@ -1844,7 +1840,7 @@ Session.prototype = {
       return;
     }
 
-    this.payLaterView = new PayLaterView(this);
+    this.payLaterView = new PayLaterView();
 
     var providers = [];
 
@@ -1884,11 +1880,7 @@ Session.prototype = {
       return;
     }
 
-    this.emiScreenView = new discreet.emiScreenView({
-      data: {
-        session: session,
-      },
-    });
+    this.emiScreenView = new discreet.emiScreenView();
 
     this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
   },
@@ -1914,8 +1906,7 @@ Session.prototype = {
 
     this.payoutsView = new discreet.PayoutsInstruments({
       target: gel('payouts-svelte-wrap'),
-      data: {
-        session: session,
+      props: {
         amount: this.formatAmountWithCurrency(this.get('amount')),
         upiAccounts: upiAccounts,
         bankAccounts: bankAccounts,
@@ -1924,9 +1915,6 @@ Session.prototype = {
 
     this.payoutsAccountView = new discreet.PayoutAccount({
       target: gel('payout-account-svelte-wrap'),
-      data: {
-        session: session,
-      },
     });
 
     $('#top-right').addClass('hidden');
@@ -2216,14 +2204,16 @@ Session.prototype = {
       this.otpView = new discreet.otpView({
         target: gel('otp-screen-wrapper'),
 
-        on: {
-          chooseMethod: bind(function() {
-            this.switchTab();
-          }, this),
-          addFunds: bind(this.addFunds, this),
-          resend: bind(this.resendOTP, this),
-          retry: bind(this.back, this),
-          secondary: bind(this.secAction, this),
+        props: {
+          on: {
+            chooseMethod: bind(function() {
+              this.switchTab();
+            }, this),
+            addFunds: bind(this.addFunds, this),
+            resend: bind(this.resendOTP, this),
+            retry: bind(this.back, this),
+            secondary: bind(this.secAction, this),
+          },
         },
       });
     }
@@ -2249,7 +2239,7 @@ Session.prototype = {
   destroyMagic: function() {
     if (this.magicView) {
       $(this.el).removeClass('magic');
-      this.magicView.destroy();
+      this.magicView.$destroy();
       delete this.magicView;
     }
 
@@ -3582,14 +3572,13 @@ Session.prototype = {
     if (screen === 'qr') {
       this.currentScreen = new discreet.QRScreen({
         target: qs('#form-qr'),
-        data: {
+        props: {
           paymentData: this.getFormData(),
-          session: this,
           onSuccess: bind(successHandler, this),
         },
       });
     } else if (this.currentScreen) {
-      this.currentScreen.destroy();
+      this.currentScreen.$destroy();
       this.currentScreen = null;
     }
 
@@ -4265,7 +4254,7 @@ Session.prototype = {
 
     tab_titles.otp = tab_titles.card;
     this.otpView.updateScreen({
-      skipText: null,
+      skipText: 'Skip Saved Cards',
     });
 
     if (!customer.logged && !this.wants_skip) {
@@ -5383,12 +5372,11 @@ Session.prototype = {
       delete paymentData.upi_app;
 
       if (this.feeBearerView) {
-        this.feeBearerView.fetchFees(paymentData, session);
+        this.feeBearerView.fetchFees(paymentData);
       } else {
         this.feeBearerView = new discreet.FeeBearerView({
           target: gel('fee-wrap'),
-          data: {
-            session: this,
+          props: {
             paymentData: paymentData,
           },
         });
@@ -5433,7 +5421,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = discreet.OTPScreenStore.get().otp;
+    var otp = discreet.storeGetter(discreet.OTPScreenStore.otp);
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -6589,23 +6577,23 @@ Session.prototype = {
       clearTimeout(fontTimeout);
 
       if (this.methodsList) {
-        this.methodsList.destroy();
+        this.methodsList.$destroy();
       }
 
       if (this.otpView) {
-        this.otpView.destroy();
+        this.otpView.$destroy();
       }
 
       if (this.upiTab) {
-        this.upiTab.destroy();
+        this.upiTab.$destroy();
       }
 
       if (this.emiScreenView) {
-        this.emiScreenView.destroy();
+        this.emiScreenView.$destroy();
       }
 
       if (this.bankTransferView) {
-        this.bankTransferView.destroy();
+        this.bankTransferView.$destroy();
       }
 
       try {

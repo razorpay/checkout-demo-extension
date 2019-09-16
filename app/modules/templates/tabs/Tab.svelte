@@ -1,21 +1,23 @@
-{#if methodSupported}
-  <div class="tab-content showable screen" id='form-{method}' class:pad {down}>
-    <slot></slot>
-  </div>
-{/if}
-
 <script>
+  // Utils imports
   import { getSession } from 'sessionmanager';
 
-  export default {
-    computed: {
-      methodSupported: ({ method, overrideMethodCheck }) => overrideMethodCheck || getSession().methods[method]
-    },
+  // Props
+  export let method;
+  export let overrideMethodCheck = false;
+  export let down = false;
+  export let pad = true;
 
-    data: () => ({
-      overrideMethodCheck: false,
-      pad: true,
-      down: false,
-    })
-  }
+  // Computed
+  export let methodSupported;
+
+  const session = getSession();
+
+  $: methodSupported = overrideMethodCheck || session.methods[method];
 </script>
+
+{#if methodSupported}
+  <div class="tab-content showable screen" id="form-{method}" class:pad {down}>
+    <slot />
+  </div>
+{/if}

@@ -1,17 +1,12 @@
-<div class="option-icon">
-  <Icon icon={icon} {placeholder} />
-</div>
-
 <script>
-  export default {
-    data() {
-      return {
-        placeholder: ''
-      }
-    },
+  // UI imports
+  import Icon from 'templates/views/ui/Icon.svelte';
 
-    components: {
-      Icon: 'templates/views/ui/Icon.svelte'
-    },
-  }
+  // Props
+  export let icon;
+  export let placeholder = '';
 </script>
+
+<div class="option-icon">
+  <Icon {icon} {placeholder} />
+</div>

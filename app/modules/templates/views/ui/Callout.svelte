@@ -1,26 +1,20 @@
-<div
-  class={allClasses}
-  class:drishy={visible}
->
-  {#if showIcon}
-    <span>&#x2139;</span>&nbsp;
-  {/if}
-  <slot></slot>
-</div>
-
 <script>
-  export default {
-    data: function () {
-      return {
-        visible: true,
-        showIcon: true,
-        classes: [],
-        icon: '&#x2139',
-      };
-    },
+  // Props
+  export let classes = [];
+  export let visible = true;
+  export let showIcon = true;
+  export let icon = '&#x2139';
 
-    computed: {
-      allClasses: ({ classes }) => ['callout'].concat(classes || []).join(' '),
-    },
-  }
+  // Computed
+  export let allClasses;
+
+  $: allClasses = ['callout'].concat(classes || []).join(' ');
 </script>
+
+<div class={allClasses} class:drishy={visible}>
+  {#if showIcon}
+    <span>&#x2139;</span>
+    &nbsp;
+  {/if}
+  <slot />
+</div>

@@ -1,21 +1,18 @@
-<div
-  class="tooltip {class} "
-  class:tooltip-shown="shown"
-  ref:tooltip
->
-  <slot></slot>
-</div>
-
 <script>
-  /**
-   * Checks if child is within the bounds of parent.
-   *
-   * @param {DOMNode} parent
-   * @param {DOMNODe} child
-   *
-   * @return {Boolean}
-   */
-  function isWithinBounds (parent, child) {
+  // Svelte imports
+  import { onMount } from 'svelte';
+
+  // Props
+  export let className;
+  export let shown = false;
+  export let bindTo = '#body';
+  export let autoAlign = true;
+  export let align = ['right'];
+
+  // Refs
+  export let tooltip;
+
+  function isWithinBounds(parent, child) {
     const rects = {
       parent: parent.getBoundingClientRect(),
       child: child.getBoundingClientRect(),
@@ -42,13 +39,13 @@
    *
    * @return {Array}
    */
-  function getOverflowingDirections (parent, child) {
+  function getOverflowingDirections(parent, child) {
     const rects = {
       parent: parent.getBoundingClientRect(),
       child: child.getBoundingClientRect(),
     };
 
-    const directions = []
+    const directions = [];
 
     if (rects.parent.top > rects.child.top) {
       directions.push('top');
@@ -91,7 +88,9 @@
    */
   function alignTooltipTo(tooltip, directions) {
     // Remove all directions.
-    _Arr.loop(ALL_DIRECTIONS, direction => _El.removeClass(tooltip, `tooltip-${direction}`));
+    _Arr.loop(ALL_DIRECTIONS, direction =>
+      _El.removeClass(tooltip, `tooltip-${direction}`)
+    );
 
     // Align tooltip to provided directions.
     _Arr.loop(directions, direction => {
@@ -99,7 +98,7 @@
         return;
       }
 
-      _El.addClass(tooltip, `tooltip-${direction}`)
+      _El.addClass(tooltip, `tooltip-${direction}`);
     });
   }
 
@@ -156,7 +155,11 @@
       const opposite = OPPOSITE_AXIS[flipped];
 
       // Flip just the overflowing direction
-      directionsList.push([flipped].concat(_Arr.filter(directions, direction => direction !== overflowIn[0])));
+      directionsList.push(
+        [flipped].concat(
+          _Arr.filter(directions, direction => direction !== overflowIn[0])
+        )
+      );
 
       // Flip the entire direction
       directionsList.push([flipped]);
@@ -187,66 +190,38 @@
     return directions;
   }
 
-  export default {
-    data: function () {
-      return {
-        bindTo: '#body',
-        autoAlign: true,
-        align: ['right'],
-        shown: false,
-      }
-    },
-
-    methods: {
-      /**
-       * Sets the alignment classes.
-       */
-      setAlignmentClasses: function () {
-        const {
-          align
-        } = this.get();
-
-        const {
-          tooltip
-        } = this.refs;
-
-        alignTooltipTo(tooltip, align);
-      },
-
-      /**
-       * Sets the bounds.
-       */
-      setBounds: function () {
-        const {
-          bindTo,
-          autoAlign,
-          align
-        } = this.get();
-
-        if (!autoAlign || !bindTo) {
-          return;
-        }
-
-        const boundingElem = _Doc.querySelector(bindTo);
-        const tooltip = this.refs.tooltip;
-
-        if (!boundingElem || !tooltip) {
-          return;
-        }
-
-        this.set({
-          align: getTooltipAlignedDirections(boundingElem, tooltip, align),
-        });
-
-        this.setAlignmentClasses();
-      }
-    },
-
-    oncreate: function () {
-      setTimeout(() => {
-        this.setAlignmentClasses();
-        this.setBounds();
-      });
-    }
+  export function setAlignmentClasses() {
+    alignTooltipTo(tooltip, align);
   }
+
+  export function setBounds() {
+    if (!autoAlign || !bindTo) {
+      return;
+    }
+
+    const boundingElem = _Doc.querySelector(bindTo);
+
+    if (!boundingElem || !tooltip) {
+      return;
+    }
+
+    align = getTooltipAlignedDirections(boundingElem, tooltip, align);
+
+    setAlignmentClasses();
+  }
+
+  onMount(() => {
+    setTimeout(() => {
+      setAlignmentClasses();
+      setBounds();
+    });
+  });
 </script>
+
+<div
+  class="tooltip {className}
+  "
+  class:tooltip-shown={shown}
+  bind:this={tooltip}>
+  <slot />
+</div>

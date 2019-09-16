@@ -1,9 +1,11 @@
-<div ref:card class:theme-border="selected" class:error-border="error" on:click="fire('click', event)">
-  <slot></slot>
-</div>
+<script>
+  // Props
+  export let selected = false;
+  export let error = false;
+</script>
 
 <style>
-  ref:card {
+  div {
     display: block;
     background: #fcfcfc;
     border: 1px solid #ebedf0;
@@ -14,14 +16,6 @@
   }
 </style>
 
-<script>
-  export default {
-    data() {
-      return {
-        selected: false,
-        error: false,
-      };
-    },
-    methods: {},
-  };
-</script>
+<div class:theme-border={selected} class:error-border={error} on:click>
+  <slot />
+</div>

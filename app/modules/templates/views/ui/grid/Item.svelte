@@ -1,12 +1,19 @@
-<div ref:item on:click="fire('select', event)">
-  <Icon icon={icon} />
-  <div ref:text>
-    {text}
-  </div>
-</div>
+<script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
+  // UI imports
+  import Icon from 'templates/views/ui/Icon.svelte';
+
+  // Props
+  export let icon;
+  export let text;
+
+  const dispatch = createEventDispatcher();
+</script>
 
 <style>
-  ref:item {
+  div:not(.ref-text) {
     order: 0;
     width: 33.33%;
     flex: 1 1 auto;
@@ -27,7 +34,7 @@
     }
   }
 
-  ref:text {
+  div > .ref-text {
     position: absolute;
     bottom: 12px;
     left: 0;
@@ -49,11 +56,7 @@
   }
 </style>
 
-<script>
-  export default {
-    components: {
-      Icon: 'templates/views/ui/Icon.svelte'
-    }
-  }
-
-</script>
+<div on:click={event => dispatch('select', event)}>
+  <Icon {icon} />
+  <div class="ref-text">{text}</div>
+</div>

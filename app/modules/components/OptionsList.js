@@ -10,8 +10,8 @@ const defaultOptions = {
 let view;
 
 function destroy() {
-  if (view && view.destroy) {
-    view.destroy();
+  if (view && view.$destroy) {
+    view.$destroy();
   }
 }
 
@@ -26,19 +26,18 @@ export function hide() {
 
 export function show(options) {
   options = {} |> _Obj.extend(defaultOptions) |> _Obj.extend(options);
-  let { data, target, onSelect } = options;
+  let { props, target, onSelect } = options;
 
   destroy();
 
   view = new OptionsView({
     target: target,
-    data,
-    methods: {
-      onSelect: value => {
-        onSelect.call(null, value);
-        hide();
-      },
-    },
+    props,
+  });
+
+  view.$on('select', value => {
+    onSelect.call(null, value);
+    hide();
   });
 
   makeVisible('#overlay');

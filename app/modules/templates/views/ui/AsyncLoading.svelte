@@ -1,9 +1,7 @@
-<div class="async-loading loading">
-  <div class="message">{message}</div>
-  <div class="spin"><div></div></div>
-  <div class="spin spin2"><div></div></div>
-  <span class="link"></span>
-</div>
+<script>
+  // Props
+  export let message = 'Please wait...';
+</script>
 
 <style>
   .async-loading .message {
@@ -13,15 +11,13 @@
   }
 </style>
 
-<script>
-  export default {
-
-    data: function () {
-      return {
-        message: 'Please wait...'
-      };
-    },
-
-    computed: {}
-  }
-</script>
+<div class="async-loading loading">
+  <div class="message">{message}</div>
+  <div class="spin">
+    <div />
+  </div>
+  <div class="spin spin2">
+    <div />
+  </div>
+  <span class="link" />
+</div>

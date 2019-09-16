@@ -5,7 +5,7 @@ import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL, SHOWN_CLASS } from 'common/constants';
 import * as Confirm from 'confirm';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
-import OtpScreenStore from 'checkoutstore/screens/otp';
+import { otp as $otp } from 'checkoutstore/screens/otp';
 
 import Track from 'tracker';
 import { confirmCancelMsg } from 'common/strings';
@@ -253,9 +253,7 @@ window.handleOTP = function(otp) {
   var session = getSession();
   var otpEl = _Doc.querySelector('#otp');
   if (session && otpEl && !otpEl.value) {
-    OtpScreenStore.set({
-      otp,
-    });
+    $otp.set(otp);
 
     _Doc.querySelector('#otp-elem') |> _El.removeClass('invalid');
   }

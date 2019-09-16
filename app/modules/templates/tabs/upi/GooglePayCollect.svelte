@@ -1,37 +1,102 @@
+<script>
+  // Svelte imports
+  import { createEventDispatcher, onMount } from 'svelte';
+
+  // UI imports
+  import Field from 'templates/views/ui/Field.svelte';
+  import Card from 'templates/views/ui/Card.svelte';
+
+  // Props
+  export let retry = false;
+  export let selected = true;
+  export let pspHandle;
+  export let checked = false;
+  export let focusOnCreate;
+
+  // Refs
+  export let vpaField;
+  export let googlePayPspHandle;
+
+  const dispatch = createEventDispatcher();
+
+  onMount(() => {
+    if (focusOnCreate) {
+      focus();
+    }
+  });
+
+  export function handleCardClick(event) {
+    const target = event && event.target;
+
+    // Don't focus on VPA input if the dropdown elem was clicked.
+    if (target === googlePayPspHandle) {
+      return;
+    }
+
+    signalSelect();
+    vpaField.focus();
+  }
+
+  export function signalSelect() {
+    dispatch('select', {
+      type: 'vpa',
+    });
+  }
+
+  export function handlePspChange(event) {
+    focus();
+    dispatch('handleChange', event.target.value);
+  }
+
+  export function getVpa() {
+    return `${vpaField.getValue()}@${pspHandle}`;
+  }
+
+  export function focus() {
+    signalSelect();
+    vpaField.focus();
+  }
+
+  export function blur() {
+    vpaField.blur();
+  }
+</script>
+
+<style>
+  .upi-gpay {
+    display: block;
+  }
+</style>
+
 <div class="legend left" style="margin-top: 18px">
   {retry ? 'Or' : ''} Enter your UPI ID
 </div>
 
 <div id="upi-gpay-vpa" class="upi-gpay">
-  <Card
-    {selected}
-    on:click="handleCardClick(event)"
-  >
+  <Card {selected} on:click={handleCardClick}>
     <div class="elem-wrap collect-form">
       <!-- TODO: remove all non svelte css for this -->
-      <Field type="text"
-        formatter={{ type: 'vpa' }} on:blur="blur()"
+      <Field
+        type="text"
+        formatter={{ type: 'vpa' }}
+        on:blur={blur}
         helpText="Please enter a valid handle"
-        id='vpa'
+        id="vpa"
         name="vpa"
         pattern=".+"
         placeholder="Enter UPI ID"
         required={true}
-
-        on:focus="focus()"
-        ref:vpaField
-      />
+        on:focus={focus}
+        bind:this={vpaField} />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
         <select
           class="input"
           name="gpay_bank"
           required
-
-          on:change="handlePspChange(event)"
-          ref:googlePayPspHandle
-          bind:value="pspHandle"
-        >
+          on:change={handlePspChange}
+          bind:this={googlePayPspHandle}
+          bind:value={pspHandle}>
           <option value="">Select Bank</option>
           <option value="okhdfcbank">okhdfcbank</option>
           <option value="okicici">okicici</option>
@@ -42,72 +107,3 @@
     </div>
   </Card>
 </div>
-
-<style>
-  .upi-gpay {
-    display: block;
-  }
-</style>
-
-<script>
-  import { getSession } from 'sessionmanager';
-
-  export default {
-    components: {
-      Field: 'templates/views/ui/Field.svelte',
-      Card: 'templates/views/ui/Card.svelte',
-    },
-    data() {
-      return {
-        retry: false,
-        selected: true,
-        checked: false,
-      };
-    },
-
-    oncreate() {
-      const { focusOnCreate } = this.get();
-      if (focusOnCreate) {
-        this.focus();
-      }
-    },
-
-    methods: {
-      handleCardClick(event) {
-        const target = event && event.target;
-        const { googlePayPspHandle } = this.refs;
-
-        // Don't focus on VPA input if the dropdown elem was clicked.
-        if (target === googlePayPspHandle) {
-          return;
-        }
-
-        this.signalSelect();
-        this.refs.vpaField.focus();
-      },
-
-      signalSelect () {
-        this.fire('select', {
-          type: 'vpa'
-        });
-      },
-
-      handlePspChange(event) {
-        this.focus();
-        const session = getSession();
-        this.fire('handleChange', event.target.value);
-      },
-      getVpa() {
-        const { pspHandle } = this.get();
-        return `${this.refs.vpaField.getValue()}@${pspHandle}`;
-      },
-      focus() {
-        this.signalSelect();
-        this.refs.vpaField.focus();
-      },
-      blur() {
-        this.refs.vpaField.blur();
-      },
-    },
-  };
-</script>
