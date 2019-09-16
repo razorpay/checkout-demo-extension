@@ -23,7 +23,7 @@
     {#if downtime}
       <span class="downtime">
         <Tooltip
-          bindTo="#netb-banks"
+          bindTo="#form-netbanking"
           class="downtime-tooltip"
           align={['bottom']}
           alignOnHover="true"
