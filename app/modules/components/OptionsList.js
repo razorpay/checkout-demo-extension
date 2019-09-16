@@ -17,7 +17,7 @@ function destroy() {
 
 export function hide() {
   if (view) {
-    view.set({ visible: false });
+    view.$set({ visible: false });
     if (!(_Doc.querySelector('#emi-wrap') |> _El.hasClass(SHOWN_CLASS))) {
       makeHidden('#overlay');
     }

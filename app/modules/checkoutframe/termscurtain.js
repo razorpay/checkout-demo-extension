@@ -11,7 +11,7 @@ export const show = (props = {}) => {
       props,
     });
   } else {
-    view.set(props);
+    view.$set(props);
   }
 };
 
@@ -20,7 +20,7 @@ export const hide = () => {
     return;
   }
 
-  view.set({
+  view.$set({
     visible: false,
   });
 };

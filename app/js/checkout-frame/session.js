@@ -3469,7 +3469,7 @@ Session.prototype = {
             }
           }
 
-          self.methodsList.set({
+          self.methodsList.$set({
             instruments: instruments,
             customer: self.getCustomer(this.value),
             tpvBank: this.tpvBank,
@@ -3656,7 +3656,7 @@ Session.prototype = {
 
     if (this.upiTab) {
       if (isGPayScreen) {
-        this.upiTab.set({ selectedApp: 'gpay' });
+        this.upiTab.$set({ selectedApp: 'gpay' });
         this.upiTab.onUpiAppSelection('gpay');
       }
 
@@ -3664,7 +3664,7 @@ Session.prototype = {
        * TODO: when more tabs are ported to Svelte, move current `tab` state to
        *       Store
        */
-      this.upiTab.set({ tab: this.tab });
+      this.upiTab.$set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);

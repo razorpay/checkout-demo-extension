@@ -17,7 +17,7 @@ PayLaterView.prototype = {
         props,
       });
     } else {
-      this.view.set(props);
+      this.view.$set(props);
     }
   },
 };

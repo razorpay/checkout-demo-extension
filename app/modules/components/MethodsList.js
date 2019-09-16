@@ -67,7 +67,7 @@ export default class MethodsList {
     });
 
     /* This is to set default screen in the view */
-    this.view.set({
+    this.view.$set({
       showMessage: session.p13n,
     });
 
@@ -94,7 +94,7 @@ export default class MethodsList {
     });
 
     this.view.$on('showMethods', e => {
-      this.otherMethodsView.set({
+      this.otherMethodsView.$set({
         visible: true,
       });
 
@@ -106,7 +106,7 @@ export default class MethodsList {
     });
 
     this.otherMethodsView.$on('hideMethods', e => {
-      this.otherMethodsView.set({
+      this.otherMethodsView.$set({
         visible: false,
       });
 
@@ -141,7 +141,7 @@ export default class MethodsList {
     const session = getSession();
     if (!props.instruments && props.customer) {
       /* Just setting customer here (login/logout), rest does not change */
-      return this.view.set(props);
+      return this.view.$set(props);
     }
 
     props = _Obj.clone(props);
@@ -216,7 +216,7 @@ export default class MethodsList {
       this.animateNext = true;
     }
 
-    this.view.set(props);
-    this.otherMethodsView.set(props);
+    this.view.$set(props);
+    this.otherMethodsView.$set(props);
   }
 }
