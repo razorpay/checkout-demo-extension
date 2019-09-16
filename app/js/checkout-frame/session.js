@@ -4126,7 +4126,7 @@ Session.prototype = {
     if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
-          this.methodsList.otherMethodsView.fire('hideMethods');
+          this.methodsList.otherMethodsView.dispatch('hideMethods');
         }
         return;
       }

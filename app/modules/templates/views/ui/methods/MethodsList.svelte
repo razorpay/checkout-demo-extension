@@ -37,7 +37,7 @@
   export let otherMethodsDetail;
   export let showOtherMethodsDirectly;
 
-  const dispatch = createEventDispatcher();
+  export const dispatch = createEventDispatcher();
   const session = getSession();
   let loaderTimeout;
 

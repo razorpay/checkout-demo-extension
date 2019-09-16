@@ -23,7 +23,7 @@
   // Computed
   export let methods;
 
-  const dispatch = createEventDispatcher();
+  export const dispatch = createEventDispatcher();
   const session = getSession();
 
   const otherMethods = (node, { delay = 0, duration = 200 }) => {
