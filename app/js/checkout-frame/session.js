@@ -653,14 +653,11 @@ function hideFeeWrap() {
 function hideOverlayMessage() {
   if (!hideEmi() && !hideFeeWrap()) {
     var session = SessionManager.getSession();
-    var shouldHide = true;
 
     if (session.tab === 'nach') {
-      shouldHide = session.nachScreen.shouldHideOverlay();
-    }
-
-    if (!shouldHide) {
-      return;
+      if (!session.nachScreen.shouldHideOverlay()) {
+        return;
+      }
     }
 
     if (
