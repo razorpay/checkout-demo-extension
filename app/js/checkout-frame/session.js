@@ -1882,7 +1882,7 @@ Session.prototype = {
 
     this.emiScreenView = new discreet.emiScreenView();
 
-    this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
+    this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
   },
 
   setPayoutsScreen: function() {
@@ -1919,12 +1919,12 @@ Session.prototype = {
 
     $('#top-right').addClass('hidden');
 
-    this.payoutsView.on('selectaccount', function(account) {
+    this.payoutsView.$on('selectaccount', function(account) {
       $('#body').addClass('sub');
       Analytics.track('payout:account:select', account);
     });
 
-    this.payoutsView.on('add', function(event) {
+    this.payoutsView.$on('add', function(event) {
       var method = event.method;
 
       if (method === 'upi') {
@@ -5382,7 +5382,7 @@ Session.prototype = {
         });
 
         // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.on('continue', function(bearer) {
+        this.feeBearerView.$on('continue', function(bearer) {
           hideOverlaySafely($('#fee-wrap'));
 
           // Set the updated amount & fee
@@ -5395,7 +5395,7 @@ Session.prototype = {
           session.submit();
         });
 
-        this.feeBearerView.on('error', function() {
+        this.feeBearerView.$on('error', function() {
           makeHidden('#fee-wrap');
         });
       }

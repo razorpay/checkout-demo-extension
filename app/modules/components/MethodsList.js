@@ -88,12 +88,12 @@ export default class MethodsList {
   }
 
   addListeners() {
-    this.view.on('select', e => {
+    this.view.$on('select', e => {
       _Doc.querySelector('#body') |> _El.addClass('sub');
       this.selectedInstrument = e;
     });
 
-    this.view.on('showMethods', e => {
+    this.view.$on('showMethods', e => {
       this.otherMethodsView.set({
         visible: true,
       });
@@ -105,7 +105,7 @@ export default class MethodsList {
       _Doc.querySelector('#body') |> _El.removeClass('sub');
     });
 
-    this.otherMethodsView.on('hideMethods', e => {
+    this.otherMethodsView.$on('hideMethods', e => {
       this.otherMethodsView.set({
         visible: false,
       });
@@ -129,8 +129,8 @@ export default class MethodsList {
       getSession().switchTab(method);
     };
 
-    this.view.on('methodSelected', onMethodSelected);
-    this.otherMethodsView.on('methodSelected', onMethodSelected);
+    this.view.$on('methodSelected', onMethodSelected);
+    this.otherMethodsView.$on('methodSelected', onMethodSelected);
   }
 
   destroy() {
