@@ -13,9 +13,6 @@ const through = require('through2').obj;
 const runSequence = require('run-sequence');
 const { execSync } = require('child_process');
 
-const jshint = require('jshint').JSHINT;
-const jshintStylish = require('jshint-stylish').reporter;
-
 const distDir = 'app/dist/v1/';
 const cssDistDir = distDir + 'css';
 
@@ -87,22 +84,12 @@ gulp.task('usemin', joinJs);
 
 gulp.task('uglify', done => {
   const strictPrefix = '!function(){"use strict";';
-  const jshintOptions = JSON.parse(fs.readFileSync('.jshintrc').toString());
 
   glob(`${distDir}/**/*.js`).forEach(file => {
     let fileContents = fs.readFileSync(file).toString();
     if (!fileContents.startsWith(strictPrefix)) {
       fileContents = `${strictPrefix}${fileContents}}()`;
     }
-
-    jshint(fileContents, jshintOptions);
-
-    if (jshint.errors.length > 0) {
-      jshintStylish(jshint.errors.map(error => ({ file, error })));
-      throw 'Jshint failed';
-    }
-
-    console.log('Jshint passed for ' + file);
 
     fileContents = uglify(fileContents, {
       compress: {
