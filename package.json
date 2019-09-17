@@ -58,6 +58,7 @@
     "puppeteer": "1.5.0",
     "rollup-plugin-coverage": "^0.1.4",
     "run-sequence": "^2.2.1",
+    "svelte": "^3.12.1",
     "tap-difflet": "^0.7.1",
     "testdouble": "^3.12.4",
     "through": "^2.3.8",
@@ -68,8 +69,7 @@
     "husky": "^1.0.0-rc.14",
     "prettier": "^1.18.2",
     "prettier-plugin-svelte": "^0.7.0",
-    "pretty-quick": "^1.11.1",
-    "svelte": "^3.12.1"
+    "pretty-quick": "^1.11.1"
   },
   "husky": {
     "hooks": {
