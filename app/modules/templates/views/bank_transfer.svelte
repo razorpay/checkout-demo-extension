@@ -1,9 +1,12 @@
 <script>
   // Utils imports
+  import Razorpay from 'common/Razorpay';
   import { makeAuthUrl } from 'common/Razorpay';
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
   import { getSession } from 'sessionmanager';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   // UI imports
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
@@ -32,6 +35,13 @@
     }
 
     loading = true;
+
+    Razorpay.sendMessage({
+      event: 'submit',
+      data: {
+        method: 'bank_transfer'
+      },
+    });
 
     fetch.post({
       url: makeAuthUrl(
@@ -77,6 +87,9 @@
 
   export function shouldSubmit() {
     copyToClipboard('.neft-details', neftDetails.innerText);
+    Analytics.track('bank_transfer:copy:click', {
+      type: AnalyticsTypes.BEHAV,
+    });
     showCopyButton(true, 'COPIED');
     return false;
   }
@@ -126,6 +139,8 @@
   }
   .ct-td {
     display: inline-block;
+    width: 50%;
+    vertical-align: text-top;
     text-align: left;
     color: #424242;
   }

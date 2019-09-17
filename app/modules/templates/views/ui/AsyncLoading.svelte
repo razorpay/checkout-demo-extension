@@ -8,6 +8,7 @@
     white-space: normal;
     padding: 20px 30px;
     line-height: 22px;
+    text-align: center;
   }
 </style>
 

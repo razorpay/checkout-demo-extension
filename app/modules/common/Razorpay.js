@@ -214,7 +214,16 @@ export function makePrefParams(rzp) {
     }
 
     /**
-     * Set currency
+     * Set the list of currencies.
+     *
+     * The first currency in the list should always
+     * be the currency for the payment.
+     * Any currency codes for which we need the
+     * config can start from index 1.
+     * This is needed because API will filter the
+     * gateways and send the available methods
+     * based on the payment currency, which it
+     * expects to always be at index 0.
      */
     const currency = [getter('currency')];
 
