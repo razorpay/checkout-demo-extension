@@ -117,7 +117,7 @@
         class="input"
         name="otp"
         id="otp"
-        bind:value={otp}
+        bind:value={$otp}
         maxlength={$maxlength || 6}
         autocomplete="one-time-code"
         required />
