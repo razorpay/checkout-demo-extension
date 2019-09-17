@@ -1,27 +1,25 @@
 <Tab method="nach" overrideMethodCheck="true" pad={false}>
   <Screen>
-    <Padded>
-      <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.join(',')}" />
+    <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.join(',')}" />
 
-      <p>Please upload a clear and legible copy of your signed NACH form</p>
+    <p>Please upload a clear and legible copy of your signed NACH form</p>
 
-      {#if view === 'upload'}
-        <div ref:illustration>
-          <DocumentIllustration />
-        </div>
-      {:elseif file && file.name}
-        <Attachment on:remove="reset(event)">{file.name}</Attachment>
-      {/if}
+    {#if view === 'upload'}
+      <div ref:illustration>
+        <DocumentIllustration />
+      </div>
+    {:elseif file && file.name}
+      <Attachment on:remove="reset(event)">{file.name}</Attachment>
+    {/if}
 
-      {#if view === 'upload'}
-        <Note>
-          <ol>
-            <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
-            <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed</li>
-          </ol>
-        </Note>
-      {/if}
-    </Padded>
+    {#if view === 'upload'}
+      <Note>
+        <ol>
+          <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
+          <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed</li>
+        </ol>
+      </Note>
+    {/if}
   </Screen>
 </Tab>
 
@@ -47,7 +45,6 @@
       Attachment: 'templates/views/ui/Attachment.svelte',
       DocumentIllustration: 'templates/illustrations/nach/Document.svelte/',
       Note: 'templates/views/ui/Note.svelte',
-      Padded: 'templates/layouts/Padded.svelte',
       Tab: 'templates/tabs/Tab.svelte',
       Screen: 'templates/layouts/Screen.svelte',
     },
