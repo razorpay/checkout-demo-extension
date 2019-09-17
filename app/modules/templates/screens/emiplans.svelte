@@ -43,16 +43,28 @@
     margin: 12px 0;
   }
 
-  :global(.emi-branding-callout)padding-left: 12px !important;
-  background: white !important;
-  imgmax-height: 24px;
+  :global(.emi-branding-callout) {
+    padding-left: 12px !important;
+    background: white !important;
 
-  .has-callout padding-bottom: 64px;
+    img {
+      max-height: 24px;
+    }
+  }
 
-  :global(.mobile).has-calloutpadding-bottom: 120px;
+  .has-callout {
+    padding-bottom: 64px;
+  }
 
-  .sanitized h3 text-transform: none;
-  color: black;
+  :global(.mobile) {
+    .has-callout {
+      padding-bottom: 120px;
+    }
+  }
+  .sanitized h3 {
+    text-transform: none;
+    color: black;
+  }
 </style>
 
 <div
