@@ -14,9 +14,7 @@
       {/if}
 
       {#if view === 'upload'}
-        <Note
-          classes={['nach-note']}
-        >
+        <Note>
           <ol>
             <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
             <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed</li>
@@ -28,15 +26,6 @@
 </Tab>
 
 <style>
-  :global(.nach-note) {
-    margin: 12px 0;
-
-    ol {
-      padding-left: 12px;
-      margin: 0;
-    }
-  }
-
   ref:illustration {
     text-align: center;
   }

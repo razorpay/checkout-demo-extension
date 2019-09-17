@@ -1,11 +1,9 @@
-<div
-  class={allClasses}
->
+<div>
   <slot></slot>
 </div>
 
 <style>
-  .note {
+  div {
     border: 1px solid #F6E1B3;
     border-left-width: 4px;
     border-radius: 2px;
@@ -14,19 +12,11 @@
     background-color: #FFFCF2;
     line-height: 20px;
     font-size: 14px;
+    margin: 12px 0;
+
+    :global(ol) {
+      padding-left: 12px;
+      margin: 0;
+    }
   }
 </style>
-
-<script>
-  export default {
-    data: function () {
-      return {
-        classes: [],
-      };
-    },
-
-    computed: {
-      allClasses: ({ classes = [] }) => ['note'].concat(classes).join(' '),
-    },
-  }
-</script>
