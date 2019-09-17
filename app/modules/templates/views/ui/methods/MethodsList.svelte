@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
-  import { fade } from 'svelte/transitions';
+  import { fade } from 'svelte/transition';
 
   // UI imports
   import RadioOption from 'templates/views/ui/options/RadioOption.svelte';

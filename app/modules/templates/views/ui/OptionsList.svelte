@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
-  import { fade } from 'svelte/transitions';
+  import { fade } from 'svelte/transition';
 
   // Props
   export let visible = true;
