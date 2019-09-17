@@ -27,6 +27,7 @@
 
     svg {
       height: 16px;
+      width: 22px;
     }
   }
 
