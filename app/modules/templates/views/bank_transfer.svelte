@@ -36,11 +36,15 @@
 
     loading = true;
 
+    const submitData = session.getPayload();
+
+    Analytics.track('submit', {
+      data: submitData,
+    });
+
     Razorpay.sendMessage({
       event: 'submit',
-      data: {
-        method: 'bank_transfer'
-      },
+      data: submitData,
     });
 
     fetch.post({
