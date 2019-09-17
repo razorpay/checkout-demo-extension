@@ -163,7 +163,16 @@
        */
       removeFile: function () {
         this.refs.file.value = '';
-        this.refs.file.dispatchEvent(new global.Event('change'));
+
+        let event;
+        if (typeof global.Event === 'function') {
+          event = new global.Event('change');
+        } else {
+          event = document.createEvent('Event');
+          event.initEvent('change', true, true);
+        }
+
+        this.refs.file.dispatchEvent(event);
       },
 
       /**
