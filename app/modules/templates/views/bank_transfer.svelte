@@ -98,6 +98,7 @@
 </style>
 
 <script>
+  import Razorpay from 'common/Razorpay';
   import { makeAuthUrl } from 'common/Razorpay';
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
@@ -128,6 +129,14 @@
           loading: true,
         });
         const { session } = this.get();
+
+        Razorpay.sendMessage({
+          event: 'submit',
+          data: {
+            method: 'bank_transfer'
+          },
+        });
+
         fetch.post({
           url: makeAuthUrl(
             session.r,
