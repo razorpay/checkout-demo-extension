@@ -123,7 +123,7 @@
   });
 
   $: {
-    if (diableP13n) {
+    if (disableP13n) {
       loading = false;
       showMessage = false;
     }
@@ -275,7 +275,7 @@
         instrument.icon = icon;
       });
 
-      instrumentData = instruments;
+      instrumentsData = instruments;
     }
   }
 
