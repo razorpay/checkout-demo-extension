@@ -354,12 +354,12 @@
 
   export function select(e, index) {
     trackMethodSelection({
-      data: e.data,
+      data: e.detail,
       index,
     });
 
-    selected = e.data.id;
-    dispatch('select', e.data);
+    selected = e.detail.id;
+    dispatch('select', e.detail);
   }
 </script>
 

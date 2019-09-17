@@ -52,9 +52,8 @@
     }
   }
 
-  export function select(event) {
-    event.data = data;
-    dispatch('select', event);
+  export function select() {
+    dispatch('select', data);
   }
 </script>
 

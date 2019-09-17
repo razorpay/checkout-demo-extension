@@ -17,10 +17,8 @@
 
   const dispatch = createEventDispatcher();
 
-  export function select(e) {
-    e.option = data;
-
-    dispatch('select', e);
+  export function select() {
+    dispatch('select', data);
   }
 </script>
 
