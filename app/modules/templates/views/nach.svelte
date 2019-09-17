@@ -161,10 +161,6 @@
           if (cancel) {
             this.abortUpload();
 
-            this.set({
-              uploading: false,
-            });
-
             this.reset();
           }
 
