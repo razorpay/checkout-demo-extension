@@ -48,7 +48,7 @@
     showInput = !($action || $loading);
 
     if (showInput && !prevShowInput) {
-      input.focus();
+      input && input.focus();
     }
   }
 
