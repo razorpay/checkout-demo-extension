@@ -77,7 +77,7 @@ Customer.prototype = {
     }
 
     if (session.methodsList) {
-      session.methodsList.$set({
+      session.methodsList.set({
         customer: this,
       });
     }
@@ -223,7 +223,7 @@ Customer.prototype = {
     fetch.setSessionId(null);
 
     if (session.methodsList) {
-      session.methodsList.$set({
+      session.methodsList.set({
         customer: this,
       });
     }

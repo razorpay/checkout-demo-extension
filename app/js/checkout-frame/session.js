@@ -3469,7 +3469,7 @@ Session.prototype = {
             }
           }
 
-          self.methodsList.$set({
+          self.methodsList.set({
             instruments: instruments,
             customer: self.getCustomer(this.value),
             tpvBank: this.tpvBank,
