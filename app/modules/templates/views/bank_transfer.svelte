@@ -78,6 +78,8 @@
   }
   .ct-td {
     display: inline-block;
+    width: 50%;
+    vertical-align: text-top;
     text-align: left;
     color: #424242;
   }
@@ -96,9 +98,12 @@
 </style>
 
 <script>
+  import Razorpay from 'common/Razorpay';
   import { makeAuthUrl } from 'common/Razorpay';
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   export default {
     components: {
@@ -124,6 +129,18 @@
           loading: true,
         });
         const { session } = this.get();
+
+        const submitData = session.getPayload();
+
+        Analytics.track('submit', {
+          data: submitData,
+        });
+
+        Razorpay.sendMessage({
+          event: 'submit',
+          data: submitData,
+        });
+
         fetch.post({
           url: makeAuthUrl(
             session.r,
@@ -185,6 +202,9 @@
           ),
         };
         copyToClipboard('.neft-details', this.refs.neftDetails.innerText);
+        Analytics.track('bank_transfer:copy:click', {
+          type: AnalyticsTypes.BEHAV,
+        });
         this.showCopyButton(true, 'COPIED');
         return false;
       },
