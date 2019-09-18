@@ -2,11 +2,6 @@
 import OptionsView from 'templates/views/ui/OptionsList.svelte';
 import { SHOWN_CLASS } from 'common/constants';
 
-const defaultOptions = {
-  data: {},
-  onSelect: () => {},
-};
-
 let view;
 
 function destroy() {
@@ -25,19 +20,13 @@ export function hide() {
 }
 
 export function show(options) {
-  options = {} |> _Obj.extend(defaultOptions) |> _Obj.extend(options);
-  let { props, target, onSelect } = options;
+  let { props, target } = options;
 
   destroy();
 
   view = new OptionsView({
     target: target,
     props,
-  });
-
-  view.$on('select', value => {
-    onSelect.call(null, value);
-    hide();
   });
 
   makeVisible('#overlay');

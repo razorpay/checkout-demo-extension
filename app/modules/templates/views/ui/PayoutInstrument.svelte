@@ -28,6 +28,6 @@
   {selected}
   value={account.id}
   {icon}
-  on:select={() => dispatch('select', account)}>
+  on:select>
   <slot />
 </RadioOption>

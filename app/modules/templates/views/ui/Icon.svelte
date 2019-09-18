@@ -18,7 +18,7 @@
   });
 
   function loader(node) {
-    node.onload = evt => {
+    node.onload = () => {
       loaded = true;
     };
   }

@@ -28,7 +28,7 @@
     body: _Doc.querySelector('#body'),
   };
 
-  export function init() {
+  function init() {
     if (data !== null) {
       showCopyButton(true, 'COPY DETAILS');
       return;
@@ -56,7 +56,7 @@
     });
   }
 
-  export function getNEFTDetails(response) {
+  function getNEFTDetails(response) {
     if (response.error) {
       loading = false;
       error = response.error.description;
@@ -98,7 +98,7 @@
     return false;
   }
 
-  export function showCopyButton(show, text) {
+  function showCopyButton(show, text) {
     if (show) {
       _El.addClass(footerButtons.pay, 'invisible');
       _El.addClass(footerButtons.body, 'sub');
@@ -165,9 +165,7 @@
 <Tab method="bank_transfer">
   <div class="bank_transfer-container">
     {#if loading}
-      <AsyncLoading>
-        Getting bank details...
-      </AsyncLoading>
+      <AsyncLoading>Getting bank details...</AsyncLoading>
     {:else if data}
       <div class="bank_transfer-message">
         To complete the transaction, make NEFT / RTGS / IMPS transfer to

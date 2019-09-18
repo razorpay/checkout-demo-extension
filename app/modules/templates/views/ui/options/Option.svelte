@@ -32,7 +32,7 @@
     optionClasses = defaultClasses.concat(classes).join(' ');
   }
 
-  export function selectOnKeydown(event) {
+  function selectOnKeydown(event) {
     /**
      * If the element has more focusable elements
      * inside it, pressing space on them will also
@@ -48,7 +48,7 @@
 
     // 13 = Return, 32 = Space
     if (key === 13 || key === 32) {
-      select(event);
+      select();
     }
   }
 

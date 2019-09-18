@@ -198,7 +198,7 @@
   }
 
   export function setOmnichannelType(event) {
-    const { type } = event;
+    const { type } = event.detail;
 
     Analytics.track('omnichannel:type:select', {
       type: AnalyticsTypes.BEHAV,
@@ -300,7 +300,9 @@
     return false;
   }
 
-  export function onUpiAppSelection(id) {
+  export function onUpiAppSelection(event) {
+    const id = event.detail.id;
+
     let pattern = '';
 
     if (typeof id !== 'undefined') {
@@ -326,7 +328,7 @@
     focusVpa();
   }
 
-  export function focusVpa(event) {
+  export function focusVpa() {
     if (!focused && vpaField) {
       if (useOmnichannel && selectedApp === 'gpay') {
         omnichannelField.focus();
@@ -336,10 +338,6 @@
     }
   }
 
-  export function handleCardClick(event) {
-    focusVpa(event);
-  }
-
   export function getFullVpa() {
     if (vpaField) {
       return vpaField.getVpa();
@@ -347,7 +345,7 @@
     return '';
   }
 
-  export function trackVpaEntry(event) {
+  export function trackVpaEntry() {
     const vpa = getFullVpa();
 
     if (!vpa) {
@@ -366,7 +364,9 @@
     });
   }
 
-  export function trackHandleSelection(handle) {
+  export function trackHandleSelection(event) {
+    const handle = event.detail;
+
     const vpa = vpaField.getVpa();
 
     const valid = vpa ? isVpaValid(vpa) : false;
@@ -382,7 +382,7 @@
     });
   }
 
-  export function trackOmnichannelEntry(event) {
+  export function trackOmnichannelEntry() {
     const contact = omnichannelField.getPhone();
     let valid = false;
 

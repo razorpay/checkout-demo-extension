@@ -23,10 +23,14 @@
   // Computed
   export let methods;
 
-  export const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
   const session = getSession();
 
-  const otherMethods = (node, { delay = 0, duration = 200 }) => {
+  export function hideMethods() {
+    dispatch('hideMethods');
+  }
+
+  function otherMethodsTransition(node, { delay = 0, duration = 200 }) {
     const o = +global.getComputedStyle(node).opacity;
     const circIn = t => {
       return 1.0 - Math.sqrt(1.0 - t * t);
@@ -51,7 +55,7 @@
           (1 - t)}px; overflow: hidden; position: absolute`;
       },
     };
-  };
+  }
 
   $: {
     const downtimes = DowntimesStore.get();
@@ -92,7 +96,7 @@
 </style>
 
 {#if visible}
-  <div transition:otherMethods class="othermethods" class:standalone>
+  <div transition:otherMethodsTransition class="othermethods" class:standalone>
     {#if !standalone}
       <div class="legend">Select a payment method</div>
     {/if}
@@ -100,7 +104,7 @@
       {#if instruments && instruments.length && false}
         <!-- Hide this for now -->
         <NextOption
-          on:select={() => dispatch('hideMethods')}
+          on:select={hideMethods}
           type="down-arrow"
           arrowText="Show"
           icon={'&#xe714;'}>
@@ -111,7 +115,7 @@
       {/if}
       {#if !standalone}
         <NextOption
-          on:select={() => dispatch('hideMethods')}
+          on:select={hideMethods}
           type="dark down-arrow"
           arrowText="Hide"
           icon={session.themeMeta.icons['othermethods']}>
@@ -121,7 +125,7 @@
       {#each methods as method}
         <ListMethod
           {...method}
-          on:select={event => dispatch('methodSelected', event)} />
+          on:select={event => dispatch('methodSelected', event.detail)} />
       {/each}
     </div>
   </div>

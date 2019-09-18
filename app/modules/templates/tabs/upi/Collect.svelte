@@ -36,12 +36,6 @@
     }
   });
 
-  export function handleCardClick(event) {
-    const target = event && event.target;
-
-    vpaField.focus();
-  }
-
   export function getVpa() {
     const vpa = vpaField.getValue();
     if (isVpaValid(vpa)) {
@@ -73,7 +67,7 @@
 </style>
 
 <div class="legend left" style="margin-top: 18px">Enter your UPI ID</div>
-<Card {selected} on:click={handleCardClick}>
+<Card {selected} on:click={focus}>
   <div id="vpa-wrap" class={appId}>
     <!-- TODO: use formatter for validation once all fields
       are moved to `Field` -->

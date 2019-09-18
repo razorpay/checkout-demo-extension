@@ -1791,7 +1791,7 @@ Session.prototype = {
 
         on: {
           select: function(event) {
-            var providerCode = event.option.code;
+            var providerCode = event.detail.code;
 
             self.selectCardlessEmiProvider(providerCode);
           },
@@ -1859,7 +1859,7 @@ Session.prototype = {
 
       on: {
         select: function(event) {
-          var providerCode = event.option.code;
+          var providerCode = event.detail.code;
           self.selectPayLaterProvider(providerCode);
         },
       },
@@ -1919,13 +1919,13 @@ Session.prototype = {
 
     $('#top-right').addClass('hidden');
 
-    this.payoutsView.$on('selectaccount', function(account) {
+    this.payoutsView.$on('selectaccount', function(event) {
       $('#body').addClass('sub');
-      Analytics.track('payout:account:select', account);
+      Analytics.track('payout:account:select', event.detail);
     });
 
     this.payoutsView.$on('add', function(event) {
-      var method = event.method;
+      var method = event.detail.method;
 
       if (method === 'upi') {
         session.switchTab('upi');
@@ -1995,7 +1995,9 @@ Session.prototype = {
           return true;
         }, this),
 
-        select: function(value) {
+        select: function(event) {
+          var value = event.detail;
+
           $('#form-cardless_emi input[name=emi_duration]').val(value);
           $('#form-cardless_emi input[name=provider]').val(
             CardlessEmiStore.providerCode
@@ -4126,7 +4128,7 @@ Session.prototype = {
     if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
-          this.methodsList.otherMethodsView.dispatch('hideMethods');
+          this.methodsList.otherMethodsView.hideMethods();
         }
         return;
       }
@@ -4512,7 +4514,8 @@ Session.prototype = {
               self.processOffersOnEmiPlanSelection();
             },
 
-            select: function(value) {
+            select: function(event) {
+              var value = event.detail;
               var plan = plans[value];
               var text = getEmiText(self, amount, plan) || '';
 
@@ -4601,7 +4604,8 @@ Session.prototype = {
               self.processOffersOnEmiPlanSelection();
             },
 
-            select: function(value) {
+            select: function(event) {
+              var value = event.detail;
               var plan = plans[value];
               var text = getEmiText(self, amount, plan) || '';
 
@@ -4678,7 +4682,8 @@ Session.prototype = {
               return true;
             },
 
-            select: function(value) {
+            select: function(event) {
+              var value = event.detail;
               var plan = plans[value];
               var text = getEmiText(self, amount, plan) || '';
 
@@ -4769,7 +4774,7 @@ Session.prototype = {
         this.savedCardsView.setCards({
           cards: this.transformedTokens,
           on: {
-            viewPlans: function(e) {
+            viewPlans: function(event) {
               Analytics.track('saved_card:emi:plans:view', {
                 type: AnalyticsTypes.BEHAV,
                 data: {
@@ -4777,7 +4782,7 @@ Session.prototype = {
                 },
               });
 
-              self.showEmiPlans('saved')(e);
+              self.showEmiPlans('saved')(event);
             },
           },
         });
@@ -5382,7 +5387,9 @@ Session.prototype = {
         });
 
         // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.$on('continue', function(bearer) {
+        this.feeBearerView.$on('continue', function(event) {
+          var bearer = event.detail;
+
           hideOverlaySafely($('#fee-wrap'));
 
           // Set the updated amount & fee

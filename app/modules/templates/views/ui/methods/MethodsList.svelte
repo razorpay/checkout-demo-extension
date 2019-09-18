@@ -173,7 +173,7 @@
             icon = getBankLogo(instrument.bank);
             break;
           case 'wallet':
-            var wallet = getWallet(instrument.wallet);
+            let wallet = getWallet(instrument.wallet);
             text = `Wallet - ${trimText(wallet.name, 18)}`;
             icon = wallet.sqLogo;
             break;
@@ -184,7 +184,7 @@
               break;
             }
 
-            var flow = instrument['_[flow]'];
+            let flow = instrument['_[flow]'];
             if (flow === 'intent') {
               text = `UPI - ${trimText(
                 instrument.app_name.replace(/ UPI$/, ''),
@@ -196,7 +196,7 @@
                 icon = '&#xe70e';
               }
             } else {
-              var vpaSplit = instrument.vpa.split('@');
+              let vpaSplit = instrument.vpa.split('@');
               text = `UPI - ${trimText(vpaSplit[0], 22 - vpaSplit[1].length)}@${
                 vpaSplit[1]
               }`;
@@ -205,8 +205,8 @@
             break;
           case 'card':
             if (customer) {
-              var cards = (customer.tokens || {}).items || [];
-              var tokenObj = _Arr.find(
+              let cards = (customer.tokens || {}).items || [];
+              let tokenObj = _Arr.find(
                 cards,
                 x => x.id === instrument.token_id
               );
@@ -244,8 +244,8 @@
               }
 
               /* User logged in */
-              var card = tokenObj.card || {};
-              var networkCode = findCodeByNetworkName(card.network);
+              let card = tokenObj.card || {};
+              let networkCode = findCodeByNetworkName(card.network);
               instrument.token = tokenObj.token;
 
               const bankName = banks && banks[card.issuer];
@@ -281,7 +281,6 @@
 
   $: {
     let methods;
-
     let length = _.lengthOf(AVAILABLE_METHODS);
     let hasMore = length > 3;
 
@@ -343,23 +342,24 @@
     });
   }
 
-  export function methodSelected(e, index) {
+  export function methodSelected(event, index) {
     trackMethodSelection({
-      data: e.data,
+      data: event.detail,
       index,
     });
 
-    dispatch('methodSelected', e);
+    dispatch('methodSelected', event.detail);
   }
 
-  export function select(e, index) {
+  export function select(event, index) {
     trackMethodSelection({
-      data: e.detail,
+      data: event.detail,
       index,
     });
 
-    selected = e.detail.id;
-    dispatch('select', e.detail);
+    selected = event.detail.id;
+
+    dispatch('select', event.detail);
   }
 </script>
 
@@ -504,7 +504,7 @@
         standalone={true}
         visible={true}
         {AVAILABLE_METHODS}
-        on:methodSelected={event => dispatch('methodSelected', event)} />
+        on:methodSelected />
     {:else}
       <NextOption
         on:select={() => dispatch('showMethods')}

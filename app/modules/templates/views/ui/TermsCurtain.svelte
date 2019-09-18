@@ -17,7 +17,7 @@
     termsText = div.innerText.replace(/\n{3,}/g, '\n\n');
   }
 
-  export function close(e) {
+  export function close() {
     visible = false;
   }
 </script>

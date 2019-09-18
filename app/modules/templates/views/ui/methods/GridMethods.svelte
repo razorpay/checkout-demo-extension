@@ -69,20 +69,16 @@
   }
 
   export function selectMethod(event) {
-    const { down, method = '' } = event.data;
-
-    const target = event.currentTarget;
-    let disabled = _El.hasClass(target, 'disabled');
+    const { down, method = '' } = event.detail;
 
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        disabled,
         method,
       },
     });
 
-    if (down || disabled) {
+    if (down) {
       return;
     }
 

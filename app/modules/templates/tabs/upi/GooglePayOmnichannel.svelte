@@ -49,12 +49,12 @@
   export function focus(event) {
     signalSelect();
     phoneField.focus();
-    dispatch('focus', event);
+    dispatch('focus', event.detail);
   }
 
   export function blur(event) {
     phoneField.blur();
-    dispatch('blur', event);
+    dispatch('blur', event.detail);
   }
 </script>
 

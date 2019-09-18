@@ -28,7 +28,7 @@
     init();
   });
 
-  export function init() {
+  function init() {
     paymentData = _Obj.extend(paymentData, {
       method: 'upi',
       '_[flow]': 'intent',
@@ -51,7 +51,7 @@
     }
   }
 
-  export function handleResponse({ data }) {
+  function handleResponse({ data }) {
     qrImage = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(
       data.qr_code_url || data.intent_url
     )}&choe=UTF-8&chld=L|0`;
@@ -59,28 +59,24 @@
     session.r.emit('payment.upi.intent_success_response');
   }
 
-  export function checkStatus() {
+  function checkStatus() {
     session.showLoadError('Checking payment status...');
   }
 
-  export function onError(data) {
+  function onError(data) {
     view = 'error';
     error = data.error.description;
     loading = false;
   }
 
-  export function createPaymentWithFees(bearer) {
+  function createPaymentWithFees(bearer) {
     paymentData.amount = bearer.amount;
     paymentData.fee = bearer.fee;
 
     createPayment();
   }
 
-  export function sessionBack() {
-    session.switchTab('upi');
-  }
-
-  export function createPayment() {
+  function createPayment() {
     view = 'qr';
     loading = true;
 
@@ -186,9 +182,7 @@
     <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
   {:else if view === 'qr'}
     {#if loading}
-      <AsyncLoading>
-        Generating QR Code...
-      </AsyncLoading>
+      <AsyncLoading>Generating QR Code...</AsyncLoading>
     {:else}
       <div
         class="message"

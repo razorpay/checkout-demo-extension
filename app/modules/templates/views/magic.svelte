@@ -6,8 +6,8 @@
   // Props
   export let selectedChoice = null;
 
-  export function selectChoice(e) {
-    selectedChoice = e.data.value;
+  export function selectChoice(event) {
+    selectedChoice = event.detail.value;
 
     _El.addClass(_Doc.querySelector('#body'), 'sub');
   }

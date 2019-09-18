@@ -14,17 +14,9 @@
   export let downMessage;
 
   // Computed
-  export let attributes;
   export let classes;
 
   const dispatch = createEventDispatcher();
-
-  $: {
-    attributes = {
-      tab: method,
-      down,
-    };
-  }
 
   $: {
     const _classes = [];
@@ -45,7 +37,7 @@
 </script>
 
 <NextOption
-  {attributes}
+  attributes={{ down, tab: method }}
   data={method}
   {icon}
   {classes}

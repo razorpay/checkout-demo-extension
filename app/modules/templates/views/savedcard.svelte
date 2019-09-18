@@ -48,7 +48,7 @@
 
   $: showOuter = card.networkCode === 'maestro' || debitPin || plans;
 
-  export function trackAtmRadio(event) {
+  function trackAtmRadio(event) {
     Analytics.track('atmpin:flows:change', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -79,7 +79,7 @@
         <div
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
-          on:click={event => dispatch('viewPlans', event)}>
+          on:click={event => dispatch('viewPlans', event.detail)}>
           <div class="emi-plan-unselected emi-icon-multiple-cards">
             <div class="emi-plans-text">EMI Available</div>
             <div class="emi-plans-action theme-highlight">Pay with EMI</div>

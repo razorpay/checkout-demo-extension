@@ -8,7 +8,7 @@
   // Computed
   export let allClasses;
 
-  $: allClasses = ['callout'].concat(classes || []).join(' ');
+  $: allClasses = ['callout'].concat(classes).join(' ');
 </script>
 
 <div class={allClasses} class:drishy={visible}>

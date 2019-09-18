@@ -15,13 +15,11 @@
 
   const dispatch = createEventDispatcher();
 
-  export function selectMethod(event) {
-    event.data = {
+  export function selectMethod() {
+    dispatch('select', {
       down,
       method,
-    };
-
-    dispatch('select', event);
+    });
   }
 </script>
 

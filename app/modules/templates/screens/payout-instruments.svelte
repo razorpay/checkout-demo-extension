@@ -24,8 +24,6 @@
   const dispatch = createEventDispatcher();
   const { themeMeta } = getSession();
 
-  // [svelte-upgrade suggestion]
-  // review these functions and remove unnecessary 'export' keywords
   export function select(instrument) {
     selectedInstrument = instrument;
     dispatch('selectaccount', instrument);

@@ -371,7 +371,7 @@ function isP13nListOpen(session) {
  */
 function hideP13nList(session) {
   try {
-    session.methodsList.otherMethodsView.dispatch('hideMethods');
+    session.methodsList.otherMethodsView.hideMethods();
   } catch (e) {}
 }
 
