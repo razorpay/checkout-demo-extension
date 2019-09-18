@@ -45,6 +45,15 @@ var name_readonly = o('readonly.name') && prefill_name;
 
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 
+var emi_banks_csv = '';
+if(emi_options && emi_options.banks){
+   var emi_bank_names = [];
+   for(var bank_code in emi_options.banks){
+      emi_bank_names.push(emi_options.banks[bank_code].name);
+   }
+   emi_banks_csv = emi_bank_names.join(', ');
+}
+
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -367,8 +376,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                     <div id="elem-emi">
                       <div class="strip emi-plans-info-container emi-plans-trigger">
                         <div class="emi-plan-unavailable hidden emi-icon-multiple-cards">
-                          <span class="help">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, Standard Chartered and Axis Bank
-                            Credit Cards. Enter your credit card to avail.</span>
+                          <span class="help">EMI is available on `=emi_banks_csv ` cards. Enter your credit card to avail.</span>
                           <div class="emi-plans-text">EMI unavailable</div>
                           `?method.card`
                           <div class="emi-plans-action theme-highlight">Pay entire amount</div>

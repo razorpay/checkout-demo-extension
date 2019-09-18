@@ -15,6 +15,8 @@ export default function popupTemplate(_) {
     _.data && _.data.amount,
     _.data && _.data.currency
   );
+  var hideAmount =
+    _.data && _.data.method === 'emandate' ? 'display: none;' : '';
 
   var image = get('image');
   image = image ? `<div id="logo"><img src="${image}"/></div>` : '';
@@ -33,7 +35,7 @@ export default function popupTemplate(_) {
 </head><body><div id='bg'></div><div id='cntnt'>
 <div id="hdr">${image}
   <div id='name'>${title}</div>
-  <div id="amt">
+  <div id="amt" style="${hideAmount}">
     <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">PAYING</div>
     <div style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
