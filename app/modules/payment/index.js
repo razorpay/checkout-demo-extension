@@ -28,10 +28,17 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 
-const isRazorpayFrame = _Str.startsWith(
-  RazorpayConfig.api,
-  `${location.protocol}//${location.hostname}`
-);
+/**
+ * Tells if we're being executed from
+ * the same domain as the configured API
+ */
+const isRazorpayFrame = () => {
+  return _Str.startsWith(
+    RazorpayConfig.api,
+    `${location.protocol}//${location.hostname}`
+  );
+};
+
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
@@ -200,7 +207,7 @@ export default function Payment(data, params = {}, r) {
    */
   if (this.gpay) {
     avoidPopup = true;
-  } else if (isRazorpayFrame) {
+  } else if (isRazorpayFrame()) {
     /**
      * data needs to be present. absence of data = placeholder popup in
      * payment paused state
@@ -322,7 +329,7 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame)) {
+      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame())) {
         _Doc.redirect({
           url: makeRedirectUrl(this.feesRedirect),
           content: data,
@@ -378,7 +385,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if ((isRazorpayFrame && !this.avoidPopup) || this.isMagicPayment) {
+    if ((isRazorpayFrame() && !this.avoidPopup) || this.isMagicPayment) {
       setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
@@ -477,13 +484,13 @@ Payment.prototype = {
     const paymentThroughPowerWallet =
       data.method === 'wallet' && isPowerWallet(data.wallet);
     if (
-      !isRazorpayFrame && // razorpay.js
+      !isRazorpayFrame() && // razorpay.js
       (_Arr.contains(popupForMethods, data.method) || paymentThroughPowerWallet)
     ) {
       return;
     }
 
-    if (!this.avoidPopup && !isRazorpayFrame && data.method === 'upi') {
+    if (!this.avoidPopup && !isRazorpayFrame() && data.method === 'upi') {
       return;
     }
 
