@@ -6,8 +6,6 @@
     class:hasMessage
 
     {down}
-
-    ref:tab
   >
     <slot></slot>
   </div>
@@ -15,7 +13,7 @@
 
 <style>
 
-ref:tab.hasMessage {
+.hasMessage {
   padding-bottom: 56px;
 }
 
