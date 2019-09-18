@@ -6978,6 +6978,10 @@ Session.prototype = {
     if (_.isArray(methods.wallet) && methods.wallet.length === 0) {
       methods.wallet = null;
     }
+
+    if (methods.paylater) {
+      methods.count++;
+    }
   },
 
   /**
