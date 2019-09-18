@@ -1,10 +1,10 @@
-<div ref:content>
+<div>
   <slot></slot>
 </div>
 
 <style>
 
-ref:content {
+div {
   padding: 0 12px 12px 12px;
   height: 100%;
   overflow: auto;
