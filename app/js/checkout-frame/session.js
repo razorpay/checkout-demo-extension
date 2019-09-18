@@ -1621,6 +1621,7 @@ Session.prototype = {
     this.setOtpScreen();
     this.setUpiTab();
     this.setPayoutsScreen();
+    this.setBankTransfer();
   },
 
   showTimer: function(cb) {
@@ -1801,6 +1802,17 @@ Session.prototype = {
     PayLaterStore.otpVerified = false;
 
     this.preSubmit();
+  },
+
+  setBankTransfer: function() {
+    if (this.methods.bank_transfer) {
+      this.bankTransferView = new discreet.BankTransferScreen({
+        target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
+        data: {
+          session: this,
+        },
+      });
+    }
   },
 
   setPayLater: function() {
@@ -3534,13 +3546,6 @@ Session.prototype = {
           onSuccess: bind(successHandler, this),
         },
       });
-    } else if (screen === 'bank_transfer') {
-      this.currentScreen = new discreet.BankTransferScreen({
-        target: qs('#bank-transfer-svelte-wrap'),
-        data: {
-          session: this,
-        },
-      });
     } else if (this.currentScreen) {
       this.currentScreen.destroy();
       this.currentScreen = null;
@@ -3974,6 +3979,10 @@ Session.prototype = {
       if (this.netbankingTab.onBack()) {
         return;
       }
+    } else if (this.tab === 'bank_transfer') {
+      if (this.bankTransferView.onBack()) {
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -4186,6 +4195,10 @@ Session.prototype = {
       if (selectedInstrument) {
         $('#body').addClass('sub');
       }
+    }
+
+    if (tab === 'bank_transfer') {
+      this.bankTransferView.onShown();
     }
 
     if (!tab && this.multiTpv) {
@@ -5228,7 +5241,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = Store.get().screens.otp.otp;
+    var otp = discreet.OTPScreenStore.get().otp;
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -5733,6 +5746,16 @@ Session.prototype = {
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
 
+    var shouldContinue = true;
+
+    if (this.tab === 'bank_transfer') {
+      shouldContinue = this.bankTransferView.shouldSubmit();
+    }
+
+    if (!shouldContinue) {
+      return;
+    }
+
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
@@ -5824,6 +5847,26 @@ Session.prototype = {
       }
     }
 
+    /**
+     * Wallets might need to go through intent flow too
+     * TODO: Add a feature check here
+     */
+    if (data.method === 'wallet') {
+      var hasPhonePeIntentFeature =
+        this.preferences.features && this.preferences.features.phonepe_intent;
+
+      var shouldTurnWalletToIntent =
+        hasPhonePeIntentFeature &&
+        discreet.Wallet.shouldTurnWalletToIntent(
+          data.wallet,
+          this.upi_intents_data
+        );
+
+      if (shouldTurnWalletToIntent) {
+        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
+      }
+    }
+
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
       if (this.shouldAskUPI2FPermission) {
@@ -5898,8 +5941,8 @@ Session.prototype = {
         }
 
         // Handle receiving emi_plans in the pilot payment create request
-        if (response.emi_plans) {
-          CardlessEmiStore.plans[provider] = response.emi_plans;
+        if (response.emi_plans && response.emi_plans[provider]) {
+          CardlessEmiStore.plans[provider] = response.emi_plans[provider];
 
           CardlessEmiStore.lenderBranding[provider] =
             response.lender_branding_url;
@@ -6381,6 +6424,10 @@ Session.prototype = {
 
       if (this.emiScreenView) {
         this.emiScreenView.destroy();
+      }
+
+      if (this.bankTransferView) {
+        this.bankTransferView.destroy();
       }
 
       try {

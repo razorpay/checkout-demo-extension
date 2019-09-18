@@ -1,49 +1,48 @@
 <Tab method="bank_transfer">
   <div class="bank_transfer-container">
     {#if loading}
-      <AsyncLoading message="Getting bank details..." />
+    <AsyncLoading message="Getting bank details..." />
     {:elseif data}
-      <div class="bank_transfer-message">
-        To complete the transaction, make NEFT / RTGS / IMPS transfer to
+    <div class="bank_transfer-message">
+      To complete the transaction, make NEFT / RTGS / IMPS transfer to
+    </div>
+
+    <div class="neft-details">
+      <div ref:neftDetails>
+        <div class="ct-tr">
+          <span class="ct-th">Account:</span>
+          <span class="ct-td">{data.receiver.account_number}</span>
+        </div>
+        <div class="ct-tr">
+          <span class="ct-th">IFSC:</span>
+          <span class="ct-td">{data.receiver.ifsc}</span>
+        </div>
+        <div class="ct-tr">
+          <span class="ct-th">Beneficiary Name:</span>
+          <span class="ct-td">{data.receiver.name}</span>
+        </div>
+        <div class="ct-tr">
+          <span class="ct-th">Amount Expected:</span>
+          <span class="ct-td">{data.amount}</span>
+        </div>
       </div>
 
-      <div class="neft-details">
-        <div ref:neftDetails>
-          <div class="ct-tr">
-            <span class="ct-th">Account:</span>
-            <span class="ct-td">{data.receiver.account_number}</span>
-          </div>
-          <div class="ct-tr">
-            <span class="ct-th">IFSC:</span>
-            <span class="ct-td">{data.receiver.ifsc}</span>
-          </div>
-          <div class="ct-tr">
-            <span class="ct-th">Beneficiary Name:</span>
-            <span class="ct-td">{data.receiver.name}</span>
-          </div>
-          <div class="ct-tr">
-            <span class="ct-th">Amount Expected:</span>
-            <span class="ct-td">{data.amount}</span>
-          </div>
-        </div>
-
-        {#if data.close_by}
-        <div class="ct-tr ct-note">
-          Note : Please complete the transaction before {data.close_by}.
-        </div>
-        {/if}
+      {#if data.close_by}
+      <div class="ct-tr ct-note">
+        Note: Please complete the transaction before {data.close_by}.
       </div>
+      {/if}
+    </div>
 
-      <Callout>
-        Do not round-off the amount. Transfer the exact amount for the payment to be
-        successful.
-      </Callout>
+    <Callout>
+      Do not round-off the amount. Transfer the exact amount for the payment to be successful.
+    </Callout>
     {:else}
-      <div class="error">
-        <div class="error-text">{error || 'Error'}</div>
-        <br />
-        <div class="btn" on:click="init()">Retry</div>
-      </div>
+    <div class="error">
+      <div class="error-text">{error || 'Error'}</div>
+      <br />
+      <div class="btn" on:click="init()">Retry</div>
+    </div>
     {/if}
   </div>
 </Tab>
@@ -79,6 +78,8 @@
   }
   .ct-td {
     display: inline-block;
+    width: 50%;
+    vertical-align: text-top;
     text-align: left;
     color: #424242;
   }
@@ -99,29 +100,33 @@
 <script>
   import { makeAuthUrl } from 'common/Razorpay';
   import { timeConverter } from 'common/formatDate';
+  import { copyToClipboard } from 'common/clipboard';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   export default {
     components: {
       AsyncLoading: 'templates/views/ui/AsyncLoading.svelte',
       Callout: 'templates/views/ui/Callout.svelte',
-      Tab: 'templates/tabs/Tab.svelte'
+      Tab: 'templates/tabs/Tab.svelte',
     },
     data() {
       return {
         loading: true,
         data: null,
         error: null,
-        session: null
+        session: null,
       };
-    },
-    oncreate() {
-      this.init();
     },
     methods: {
       init() {
+        if (this.get().data !== null) {
+          this.showCopyButton(true, 'COPY DETAILS');
+          return;
+        }
         this.set({
-          loading: true
-        })
+          loading: true,
+        });
         const { session } = this.get();
         fetch.post({
           url: makeAuthUrl(
@@ -135,8 +140,8 @@
         if (response.error) {
           return this.set({
             loading: false,
-            error: response.error.description
-          })
+            error: response.error.description,
+          });
         }
         const { session } = this.get();
         let receivers = response.receivers;
@@ -147,13 +152,67 @@
               response.amount_expected &&
               session.formatAmountWithCurrency(response.amount_expected),
             close_by: response.close_by && timeConverter(response.close_by),
-          }
+          };
           this.set({
             loading: false,
-            data
+            data,
           });
+          this.showCopyButton(true, 'COPY DETAILS');
         }
-      }
+      },
+      /**
+       * Session calls this method when it switches to "bank_transfer" tab
+       */
+      onShown: function() {
+        this.init();
+      },
+
+      /**
+       * Session calls this to ask if tab will handle back
+       *
+       * @returns {boolean} will tab handle back
+       */
+      onBack: function() {
+        this.showCopyButton(false, '');
+        return false;
+      },
+
+      /**
+       * Session calls this to determine if it should submit
+       *
+       * @returns {Boolean} Should session submit?
+       */
+      shouldSubmit: function() {
+        const footerButtons = {
+          copyDetails: _Doc.querySelector(
+            '#footer .bank-transfer-copy-details'
+          ),
+        };
+        copyToClipboard('.neft-details', this.refs.neftDetails.innerText);
+        Analytics.track('bank_transfer:copy:click', {
+          type: AnalyticsTypes.BEHAV,
+        });
+        this.showCopyButton(true, 'COPIED');
+        return false;
+      },
+      showCopyButton: function(show, text) {
+        const footerButtons = {
+          copyDetails: _Doc.querySelector(
+            '#footer .bank-transfer-copy-details'
+          ),
+          pay: _Doc.querySelector('#footer .pay-btn'),
+          body: _Doc.querySelector('#body'),
+        };
+        if (show) {
+          _El.addClass(footerButtons.pay, 'invisible');
+          _El.addClass(footerButtons.body, 'sub');
+          _El.removeClass(footerButtons.copyDetails, 'invisible');
+          _El.setContents(footerButtons.copyDetails, text);
+        } else {
+          _El.addClass(footerButtons.copyDetails, 'invisible');
+          _El.removeClass(footerButtons.pay, 'invisible');
+        }
+      },
     },
   };
 </script>

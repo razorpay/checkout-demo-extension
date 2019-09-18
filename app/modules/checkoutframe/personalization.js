@@ -6,7 +6,7 @@ import { VPA_REGEX } from 'common/constants';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import DowntimesStore from 'checkoutstore/downtimes.js';
+import DowntimesStore from 'checkoutstore/downtimes';
 import { isMobile } from 'common/useragent';
 
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';

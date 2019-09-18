@@ -26,6 +26,7 @@ import { isPowerWallet } from 'common/wallet';
 import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
+import { isProviderHeadless } from 'common/cardlessemi';
 
 const isRazorpayFrame = _Str.startsWith(
   RazorpayConfig.api,
@@ -205,9 +206,15 @@ export default function Payment(data, params = {}, r) {
      * payment paused state
      */
     if (data) {
-      if (data.method === 'wallet' && isPowerWallet(data.wallet)) {
-        /* If contact or email are missing, we need to ask for it in popup */
-        if (data.contact && (this.optional.email || data.email)) {
+      if (data.method === 'wallet') {
+        if (isPowerWallet(data.wallet)) {
+          /* If contact or email are missing, we need to ask for it in popup */
+          if (data.contact && (this.optional.email || data.email)) {
+            avoidPopup = true;
+          }
+        }
+
+        if (data['_[flow]'] === 'intent') {
           avoidPopup = true;
         }
       }
@@ -227,12 +234,17 @@ export default function Payment(data, params = {}, r) {
       /**
        * Show Popup for Cardless EMI, if
        * - Contact is absent.
+       * - emi_duration is present but provider is not headless
        */
       if (data.method === 'cardless_emi') {
         if (!data.contact) {
           avoidPopup = false;
         } else {
-          avoidPopup = true;
+          if (data.emi_duration) {
+            avoidPopup = isProviderHeadless(data.provider);
+          } else {
+            avoidPopup = true;
+          }
         }
       }
 

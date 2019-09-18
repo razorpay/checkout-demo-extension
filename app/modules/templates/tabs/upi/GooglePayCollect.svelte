@@ -50,7 +50,7 @@
 </style>
 
 <script>
-  import { getSession } from 'sessionmanager.js';
+  import { getSession } from 'sessionmanager';
 
   export default {
     components: {
