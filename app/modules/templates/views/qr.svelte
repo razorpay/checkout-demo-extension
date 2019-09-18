@@ -186,7 +186,9 @@
     <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
   {:else if view === 'qr'}
     {#if loading}
-      <AsyncLoading message="Generating QR Code..." />
+      <AsyncLoading>
+        Generating QR Code...
+      </AsyncLoading>
     {:else}
       <div
         class="message"

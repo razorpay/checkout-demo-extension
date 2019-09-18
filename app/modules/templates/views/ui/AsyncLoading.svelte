@@ -1,8 +1,3 @@
-<script>
-  // Props
-  export let message = 'Please wait...';
-</script>
-
 <style>
   .async-loading .message {
     white-space: normal;
@@ -13,7 +8,9 @@
 </style>
 
 <div class="async-loading loading">
-  <div class="message">{message}</div>
+  <div class="message">
+    <slot></slot>
+  </div>
   <div class="spin">
     <div />
   </div>

@@ -83,7 +83,9 @@
 
 <div class="fee-bearer">
   {#if loading}
-    <AsyncLoading message="Loading fees breakup..." />
+    <AsyncLoading>
+      Loading fees breakup...
+    </AsyncLoading>
   {:else if feeBreakup}
     <b>Fees Breakup</b>
     <br />

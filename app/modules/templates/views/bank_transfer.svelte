@@ -165,7 +165,9 @@
 <Tab method="bank_transfer">
   <div class="bank_transfer-container">
     {#if loading}
-      <AsyncLoading message="Getting bank details..." />
+      <AsyncLoading>
+        Getting bank details...
+      </AsyncLoading>
     {:else if data}
       <div class="bank_transfer-message">
         To complete the transaction, make NEFT / RTGS / IMPS transfer to
