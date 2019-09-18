@@ -20,7 +20,7 @@
       <img alt="{name} Logo" src="https://cdn.razorpay.com/bank/{code}.gif">
       <div>{name}</div>
     </div>
-    {#if downtime}
+    {#if disabled}
       <span class="downtime">
         <Tooltip
           bindTo="#form-netbanking"
