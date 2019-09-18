@@ -89,11 +89,13 @@
 
   <!-- Show downtime message if the selected bank is down -->
   {#if selectedBankDowntime}
-    <Downtime
-      issuer={banks[selectedBankCode]}
-      isHighSeverity={isHighSeverityDowntime}
-      method="netbanking"
-    />
+    <DowntimeCallout isHighSeverity={isHighSeverityDowntime} >
+      {#if isHighSeverityDowntime}
+        <strong>{banks[selectedBankCode]}</strong>  accounts are temporarily unavailable right now. Please select another bank.
+      {:else}
+        <strong>{banks[selectedBankCode]}</strong>  accounts are experiencing low success rates.
+      {/if}
+    </DowntimeCallout>
   {/if}
 
 </Tab>
@@ -158,7 +160,7 @@ export default {
     Tab: 'templates/tabs/Tab.svelte',
     GridItem: 'templates/tabs/netbanking/GridItem.svelte',
     Callout: 'templates/views/ui/Callout.svelte',
-    Downtime: 'templates/views/ui/Downtime.svelte'
+    DowntimeCallout: 'templates/views/ui/DowntimeCallout.svelte'
   },
 
   data() {
