@@ -29,7 +29,7 @@
   const session = getSession();
 
   $: {
-    if (maxlength) {
+    if (maxlength && input) {
       input.maxLength = maxlength;
     }
   }

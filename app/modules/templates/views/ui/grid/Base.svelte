@@ -27,6 +27,6 @@
     <Item
       text={item.text}
       icon={item.icon}
-      on:select={() => dispatch('select', item.id)} />
+      on:select={() => dispatch('select', { id: item.id })} />
   {/each}
 </div>

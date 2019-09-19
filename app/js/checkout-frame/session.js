@@ -3659,7 +3659,11 @@ Session.prototype = {
     if (this.upiTab) {
       if (isGPayScreen) {
         this.upiTab.$set({ selectedApp: 'gpay' });
-        this.upiTab.onUpiAppSelection('gpay');
+        this.upiTab.onUpiAppSelection({
+          detail: {
+            id: 'gpay',
+          },
+        });
       }
 
       /**
