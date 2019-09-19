@@ -7172,9 +7172,6 @@ Session.prototype = {
       this.set('retry', false);
     }
 
-    // Non-INR payments are considered
-    this.international = this.get('currency') !== 'INR';
-
     /* In case of recurring set recurring as filter in saved cards */
     if (
       (session_options['prefill.method'] === 'emandate' &&
@@ -7257,6 +7254,10 @@ Session.prototype = {
     if (entityWithCurrency) {
       session_options.currency = entityWithCurrency.currency;
     }
+
+    // Non-INR payments are considered international
+    this.international =
+      (session_options.currency || this.get('currency')) !== 'INR';
 
     // Amount and currency have been updated, set EMI options
     this.setEmiOptions();
