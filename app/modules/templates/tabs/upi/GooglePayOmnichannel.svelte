@@ -46,10 +46,10 @@
     return phoneField.getValue();
   }
 
-  export function focus(event) {
+  export function focus() {
     signalSelect();
     phoneField.focus();
-    dispatch('focus', event.detail);
+    dispatch('focus');
   }
 
   export function blur(event) {

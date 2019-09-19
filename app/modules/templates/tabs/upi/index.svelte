@@ -151,13 +151,11 @@
 
   $: {
     if (session.tab === 'upi' || session.tab === 'gpay') {
+      /* TODO: bad practice, remove asap */
       if (selectedApp === undefined || isGPaySelected) {
-        /* TODO: bad practice, remove asap */
-        if (selectedApp === undefined || isGPaySelected) {
-          _El.removeClass(_Doc.querySelector('#body'), 'sub');
-        } else {
-          _El.addClass(_Doc.querySelector('#body'), 'sub');
-        }
+        _El.removeClass(_Doc.querySelector('#body'), 'sub');
+      } else {
+        _El.addClass(_Doc.querySelector('#body'), 'sub');
       }
     }
   }
