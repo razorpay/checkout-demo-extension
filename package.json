@@ -36,7 +36,7 @@
   "scripts": {
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "npm run test:unit && npm run build && node ./blackbox",
-    "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
+    "build": "$ rollup -c --environment prod && gulp",
     "start": "$ rollup -cw & $ gulp watch; kill -9 $!"
   },
   "bugs": {
