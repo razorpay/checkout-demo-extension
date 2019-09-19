@@ -273,17 +273,17 @@ var responseTypes = {
       } else {
         CheckoutBridge.callNativeIntent(intent_url);
       }
-    } else if (androidBrowser) {
-      if (this.gpay) {
-        if (this.microapps && this.microapps.gpay) {
-          return responseTypes['gpay'].call(
-            this,
-            request,
-            fullResponse,
-            'microapp'
-          );
-        }
+    } else if (this.gpay) {
+      if (this.microapps && this.microapps.gpay) {
+        return responseTypes['gpay'].call(
+          this,
+          request,
+          fullResponse,
+          'microapp'
+        );
+      }
 
+      if (androidBrowser) {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
