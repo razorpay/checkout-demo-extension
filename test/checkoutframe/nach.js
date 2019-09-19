@@ -102,7 +102,7 @@ test('Module: checkoutframe/nach', t => {
 
       const generatedError = Nach.generateError(apiResponse);
       const expectedDescription =
-        'We could not read the following details on the NACH form: Bank Account Number, Merchant Name, Utility Code, Umrn. Please upload an image with better quality.';
+        'The following details on NACH form do not match our records: Bank Account Number, Merchant Name, Utility Code, Umrn. Please upload an image with better quality.';
 
       t.is(
         generatedError.description,

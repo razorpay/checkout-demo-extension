@@ -146,7 +146,7 @@ export function generateError(response) {
     // Error with the details in the image
 
     if (response.errors.not_matching) {
-      description = `We could not read the following details on the NACH form: ${_Arr.join(
+      description = `The following details on NACH form do not match our records: ${_Arr.join(
         _Arr.map(response.errors.not_matching, entityToWords),
         ', '
       )}. Please upload an image with better quality.`;
