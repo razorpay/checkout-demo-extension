@@ -5752,6 +5752,10 @@ Session.prototype = {
       shouldContinue = this.bankTransferView.shouldSubmit();
     }
 
+    if (this.tab === 'netbanking') {
+      shouldContinue = this.netbankingTab.shouldSubmit();
+    }
+
     if (!shouldContinue) {
       return;
     }

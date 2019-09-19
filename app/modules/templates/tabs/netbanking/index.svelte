@@ -225,6 +225,13 @@ export default {
       } else if (active) {
         session.body.addClass('sub');
       }
+    },
+    /**
+     * Called from session to determine if it should submit when 'Pay' is clicked
+     */
+    shouldSubmit() {
+      const { isHighSeverityDowntime } = this.get();
+      return !isHighSeverityDowntime;
     }
   },
 
