@@ -87,11 +87,12 @@ gulp.task('uglify', done => {
 
   glob(`${distDir}/**/*.js`).forEach(file => {
     let fileContents = fs.readFileSync(file).toString();
+
     if (!fileContents.startsWith(strictPrefix)) {
       fileContents = `${strictPrefix}${fileContents}}()`;
     }
 
-    fileContents = uglify(fileContents, {
+    const uglified = uglify(fileContents, {
       compress: {
         pure_funcs: [
           'console.log',
@@ -108,11 +109,14 @@ gulp.task('uglify', done => {
           DEBUG_ENV: process.env.NODE_ENV !== 'production',
         },
       },
-    }).code;
+    });
 
-    fs.writeFileSync(file, fileContents);
-
-    console.log('uglified ' + file);
+    if (uglified.error) {
+      console.log(uglified.error);
+    } else {
+      fs.writeFileSync(file, uglified.code);
+      console.log('uglified ' + file);
+    }
   });
   done();
 });
