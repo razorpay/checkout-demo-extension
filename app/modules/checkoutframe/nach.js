@@ -156,7 +156,12 @@ export function generateError(response) {
       description,
     };
   } else if (response.error) {
-    // Generic API error
+    const field = response.error.field;
+
+    if (field) {
+      response.error.description += `. Field: ${entityToWords(field)}`;
+    }
+
     return response.error;
   }
 

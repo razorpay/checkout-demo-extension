@@ -128,6 +128,26 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
+    test('If API has an error object with a field in response, returns an updated description with field name', t => {
+      const apiResponse = {
+        error: {
+          code: 'BAD_REQUEST_ERROR',
+          description: 'image is not clear',
+          field: 'bank_account.account_number',
+        },
+      };
+
+      const generatedError = Nach.generateError(apiResponse);
+
+      t.is(
+        generatedError,
+        apiResponse.error,
+        'image is not clear. Field: Bank Account Number'
+      );
+
+      t.end();
+    });
+
     test("If API doesn't have an error and success is not false, returns a generic error", t => {
       const apiResponse = {
         customResponse: {
