@@ -14,6 +14,7 @@
   export let showAll = false;
   export let selected = null;
   export let showRecommendedUPIApp;
+  export let selectedApp;
 
   // Computed
   export let showableApps;

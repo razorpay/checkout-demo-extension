@@ -173,7 +173,7 @@
             icon = getBankLogo(instrument.bank);
             break;
           case 'wallet':
-            let wallet = getWallet(instrument.wallet);
+            var wallet = getWallet(instrument.wallet);
             text = `Wallet - ${trimText(wallet.name, 18)}`;
             icon = wallet.sqLogo;
             break;
@@ -184,7 +184,7 @@
               break;
             }
 
-            let flow = instrument['_[flow]'];
+            var flow = instrument['_[flow]'];
             if (flow === 'intent') {
               text = `UPI - ${trimText(
                 instrument.app_name.replace(/ UPI$/, ''),
@@ -196,7 +196,7 @@
                 icon = '&#xe70e';
               }
             } else {
-              let vpaSplit = instrument.vpa.split('@');
+              var vpaSplit = instrument.vpa.split('@');
               text = `UPI - ${trimText(vpaSplit[0], 22 - vpaSplit[1].length)}@${
                 vpaSplit[1]
               }`;
@@ -205,8 +205,8 @@
             break;
           case 'card':
             if (customer) {
-              let cards = (customer.tokens || {}).items || [];
-              let tokenObj = _Arr.find(
+              var cards = (customer.tokens || {}).items || [];
+              var tokenObj = _Arr.find(
                 cards,
                 x => x.id === instrument.token_id
               );
@@ -244,8 +244,8 @@
               }
 
               /* User logged in */
-              let card = tokenObj.card || {};
-              let networkCode = findCodeByNetworkName(card.network);
+              var card = tokenObj.card || {};
+              var networkCode = findCodeByNetworkName(card.network);
               instrument.token = tokenObj.token;
 
               const bankName = banks && banks[card.issuer];
