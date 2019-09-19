@@ -254,6 +254,12 @@ export default {
         this.setPayButtonVisibility();
       }
     }
+    // If
+    if (changed.corporateSelected) {
+      if (current.showCorporateRadio) {
+        setTimeout(_ => this.refs.radioContainer.scrollIntoView(), 300);
+      }
+    }
   },
 
   oncreate() {
