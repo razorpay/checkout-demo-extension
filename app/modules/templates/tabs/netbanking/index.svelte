@@ -4,7 +4,7 @@
   overrideMethodCheck
   hasMessage={selectedBankDowntime}
 >
-  <div ref:screenContent>
+  <Screen pad={false}>
     <div id="netb-banks" class="clear grid count-3">
       {#each netbanks as { name, code }}
         <GridItem
@@ -78,7 +78,7 @@
         </div>
       </div>
     {/if}
-  </div>
+  </Screen>
 
   <!-- Show recurring message for recurring payments -->
   {#if recurring}
@@ -160,7 +160,8 @@ export default {
     Tab: 'templates/tabs/Tab.svelte',
     GridItem: 'templates/tabs/netbanking/GridItem.svelte',
     Callout: 'templates/views/ui/Callout.svelte',
-    DowntimeCallout: 'templates/views/ui/DowntimeCallout.svelte'
+    DowntimeCallout: 'templates/views/ui/DowntimeCallout.svelte',
+    Screen: 'templates/layouts/Screen.svelte'
   },
 
   data() {
