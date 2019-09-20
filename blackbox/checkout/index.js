@@ -26,7 +26,9 @@ function checkoutRequestHandler(request) {
     case checkoutFont:
       return request.respond({ body: fontContent });
     default:
-      throw `unexpected resource URL while loading checkout-public: ${url}`;
+      throw new Error(
+        `unexpected resource URL while loading checkout-public: ${url}`
+      );
   }
 }
 
@@ -62,14 +64,30 @@ async function passOptions({ page, options }) {
 }
 
 module.exports = {
-  async openCheckout(page, options, preferences) {
+  async openCheckout({ page, options, preferences }) {
     await page.setRequestInterception(true);
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutPublic);
     page.removeListener('request', checkoutRequestHandler);
     page.on('request', cdnRequestHandler);
 
-    const returnObj = { page, ...interceptor(page), options, preferences };
+    const returnObj = {
+      page,
+      options,
+      preferences,
+      ...interceptor(page),
+      popup() {
+        const targets = page.browserContext().targets();
+        switch (targets.length) {
+          case 1:
+            throw new Error('No popup is open');
+          case 2:
+            return targets[1];
+          default:
+            throw new Error(`${targets.length} popups found, expected only 1`);
+        }
+      },
+    };
 
     if (options) await passOptions(returnObj);
     if (preferences) await sendPreferences(returnObj);
