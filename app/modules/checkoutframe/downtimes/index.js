@@ -133,8 +133,12 @@ function getBankActions(downtimes) {
 }
 
 /**
+ * Returns bank names from downtimes after filtering them using predicate
  *
- * @type {Function}
+ * @param {Array<Object>} downtimes
+ * @param {function(downtime: Object, preferences?: Object): boolean} predicate
+ *
+ * @return {Array<string>}
  */
 const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
   const { netbanking: netbankingDowntimes = [] } = downtimes;
