@@ -1974,7 +1974,7 @@ Session.prototype = {
       },
     });
 
-    var plansList = this.getCardlessEmiPlans(plans);
+    var plansList = this.getCardlessEmiPlans();
 
     this.emiPlansView.setPlans({
       plans: plansList,
@@ -7086,6 +7086,7 @@ Session.prototype = {
     var isOmni =
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
+      this.upiTab &&
       this.upiTab.get().selectedApp === 'gpay';
 
     return isOmni;
