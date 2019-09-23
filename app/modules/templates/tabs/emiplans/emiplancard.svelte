@@ -36,11 +36,18 @@
     },
 
     computed: {
-      amountPerMonth: ({ amount, plan }) => Razorpay.emi.calculator(
-        amount,
-        plan.duration,
-        plan.interest
-      ),
+      amountPerMonth: ({ amount, plan }) => {
+        // Don't calculate if amount_per_month exists
+        if (plan.amount_per_month) {
+          return plan.amount_per_month;
+        } else {
+          return Razorpay.emi.calculator(
+            amount,
+            plan.duration,
+            plan.interest
+          );
+        }
+      },
       noCostEmi: ({ plan }) => plan.subvention === 'merchant',
       badge: ({ noCostEmi }) => noCostEmi ? 'No cost EMI' : false,
       isCardEmi: ({ provider }) => !provider,
