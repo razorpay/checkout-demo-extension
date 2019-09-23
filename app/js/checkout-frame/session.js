@@ -1995,9 +1995,7 @@ Session.prototype = {
           return true;
         }, this),
 
-        select: function(event) {
-          var value = event.detail;
-
+        select: function(value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
           $('#form-cardless_emi input[name=provider]').val(
             CardlessEmiStore.providerCode
@@ -4518,8 +4516,7 @@ Session.prototype = {
               self.processOffersOnEmiPlanSelection();
             },
 
-            select: function(event) {
-              var value = event.detail;
+            select: function(value) {
               var plan = plans[value];
               var text = getEmiText(self, amount, plan) || '';
 
@@ -4608,8 +4605,7 @@ Session.prototype = {
               self.processOffersOnEmiPlanSelection();
             },
 
-            select: function(event) {
-              var value = event.detail;
+            select: function(value) {
               var plan = plans[value];
               var text = getEmiText(self, amount, plan) || '';
 
@@ -4686,8 +4682,7 @@ Session.prototype = {
               return true;
             },
 
-            select: function(event) {
-              var value = event.detail;
+            select: function(value) {
               var plan = plans[value];
               var text = getEmiText(self, amount, plan) || '';
 

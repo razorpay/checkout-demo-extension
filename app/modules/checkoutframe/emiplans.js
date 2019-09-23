@@ -104,7 +104,8 @@ emiPlansView.prototype = {
     this.onSelect = on.select || _Func.noop;
     this.back = on.back || _Func.noop;
 
-    on.select = plan => {
+    on.select = event => {
+      const plan = event.detail;
       Analytics.track('emi:plan:choose', {
         type: AnalyticsTypes.BEHAV,
         data: {

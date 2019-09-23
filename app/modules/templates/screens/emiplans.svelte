@@ -28,7 +28,9 @@
   export function expand(index) {
     expanded = index;
 
-    invoke('select', plans[index]);
+    invoke('select', {
+      detail: plans[index],
+    });
   }
 
   export function invoke(type, event) {
