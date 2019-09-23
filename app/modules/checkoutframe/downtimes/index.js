@@ -21,10 +21,23 @@ export function disableBasedOnSeverityOrScheduled(
   };
 }
 
+/**
+ * Checks if the downtime has high severity or is scheduled.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
 const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
   ['high'],
   true
 );
+
+/**
+ * Checks if the downtime has low severity and is not scheduled.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
 const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
 
 const DISABLE_METHOD = {
@@ -72,7 +85,7 @@ const WARN_METHOD = {
 };
 
 /**
- * Gets the list of methods to be disabled.
+ * Gets the list of methods to be disabled and warned.
  * @param {Object} downtimes
  *  @key {String} method
  *  @value {Array} downtimes Downtimes of the method
