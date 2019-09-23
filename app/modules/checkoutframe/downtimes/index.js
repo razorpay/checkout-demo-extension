@@ -5,8 +5,7 @@
  * @param {Array} severity List of severities for which to disable
  * @param {Boolean} scheduled Value of scheduled to disable on
  *
- * @return {Function} Says whether or not to disable method.
- *  @param {Object} downtime
+ * @return {function(downtime: Object): boolean} Says whether or not to disable method.
  *
  *  @return {Boolean}
  */
@@ -14,7 +13,7 @@ export function disableBasedOnSeverityOrScheduled(
   severity = [],
   scheduled = true
 ) {
-  return function disable({ downtime }) {
+  return function disable(downtime) {
     return (
       _Arr.contains(severity, downtime.severity) ||
       downtime.scheduled === scheduled
@@ -22,11 +21,40 @@ export function disableBasedOnSeverityOrScheduled(
   };
 }
 
+const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
+  ['high'],
+  true
+);
+const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
+
 const DISABLE_METHOD = {
-  upi: disableBasedOnSeverityOrScheduled(['high'], true),
-  qr: disableBasedOnSeverityOrScheduled(['high'], true),
-  gpay: disableBasedOnSeverityOrScheduled(['high'], true),
-  netbanking: function({ preferences }) {
+  upi: isHighSeverityOrScheduled,
+  qr: isHighSeverityOrScheduled,
+  gpay: isHighSeverityOrScheduled,
+  netbanking: function(_, preferences) {
+    const netbankingObj = preferences.methods.netbanking || {};
+    const banks = _Obj.keys(netbankingObj);
+    const downtimes =
+      (preferences.payment_downtime && preferences.payment_downtime.items) ||
+      [];
+
+    return _Arr.every(banks, bank =>
+      _Arr.any(
+        downtimes,
+        downtime =>
+          downtime.method === 'netbanking' &&
+          downtime.instrument.bank === bank &&
+          isHighSeverityOrScheduled(downtime)
+      )
+    );
+  },
+};
+
+const WARN_METHOD = {
+  upi: isLowSeverityAndNotScheduled,
+  qr: isLowSeverityAndNotScheduled,
+  gpay: isLowSeverityAndNotScheduled,
+  netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);
     const downtimes =
@@ -51,32 +79,73 @@ const DISABLE_METHOD = {
  *
  * @param preferences
  *
- * @return {Array}
+ * @return {{disable: Array, warn: Array}}
  */
-function getDisabledMethods(downtimes, preferences) {
-  const disabled = [];
+function getMethodActions(downtimes, preferences) {
+  const disable = [];
+  const warn = [];
 
   // Loop through all methods
   _Obj.loop(downtimes, (methodDowntimes, method) => {
-    // If we don't have a function to eval downtime for the method, do nothing
-    if (!DISABLE_METHOD[method]) {
-      return;
-    }
-
     // Check if the method's downtime checker function eval to true for any of the downtimes for the method
     const isMethodDown = Boolean(
-      _Arr.find(methodDowntimes, downtime =>
-        DISABLE_METHOD[method]({ downtime, preferences })
-      )
+      DISABLE_METHOD[method] &&
+        _Arr.find(methodDowntimes, downtime =>
+          DISABLE_METHOD[method](downtime, preferences)
+        )
+    );
+
+    const isMethodWarned = Boolean(
+      WARN_METHOD[method] &&
+        _Arr.find(methodDowntimes, downtime =>
+          WARN_METHOD[method](downtime, preferences)
+        )
     );
 
     if (isMethodDown) {
-      disabled.push(method);
+      disable.push(method);
+    } else if (isMethodWarned) {
+      warn.push(method);
     }
   });
 
-  return disabled;
+  return { disable, warn };
 }
+
+function getBankActions(downtimes) {
+  return {
+    disable: getDisabledBanks(downtimes),
+    warn: getWarnBanks(downtimes),
+  };
+}
+
+/**
+ *
+ * @type {Function}
+ */
+const getBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
+  const { netbanking: netbankingDowntimes = [] } = downtimes;
+  return (
+    (netbankingDowntimes
+    |> _Arr.filter(predicate)
+    |> _Arr.map(downtime => downtime.instrument && downtime.instrument.bank)
+    |> _Arr.filter(Boolean))
+  );
+});
+
+/**
+ * Returns the list of banks to be disabled.
+ * @param downtimes
+ * @return Array<string>
+ */
+const getDisabledBanks = getBankNamesFromDowntimes(isHighSeverityOrScheduled);
+
+/**
+ * Returns the list of banks for which there should be a warning displayed.
+ * @param downtimes
+ * @return {Array<string>}
+ */
+const getWarnBanks = getBankNamesFromDowntimes(isLowSeverityAndNotScheduled);
 
 const DOWNTIME_METHOD_COPY_MAP = {
   qr: 'upi',
@@ -130,7 +199,14 @@ function groupDowntimesByMethod(allDowntimes) {
  */
 export function getDowntimes(preferences) {
   let downtimes = {
-    disabled: [],
+    disable: {
+      methods: [],
+      banks: [],
+    },
+    warn: {
+      methods: [],
+      banks: [],
+    },
   };
 
   const hasDowntimes =
@@ -148,26 +224,16 @@ export function getDowntimes(preferences) {
     |> groupDowntimesByMethod
     |> copyMethodsIfNeeded;
 
-  downtimes.disabled = getDisabledMethods(downtimes, preferences);
+  const downtimeMethodActions = getMethodActions(downtimes, preferences);
+  const downtimeBankActions = getBankActions(downtimes);
+
+  downtimes.disable = {};
+  downtimes.disable.methods = downtimeMethodActions.disable;
+  downtimes.disable.banks = downtimeBankActions.disable;
+
+  downtimes.warn = {};
+  downtimes.warn.methods = downtimeMethodActions.warn;
+  downtimes.warn.banks = downtimeBankActions.warn;
 
   return downtimes;
-}
-
-/**
- * Groups netbanking downtimes by bank.
- *
- * @param {Array<Object>} downtimes netbanking downtimes
- * @return {Object}
- */
-export function groupNetbankingDowntimesByBank(downtimes = []) {
-  return _Arr.reduce(
-    downtimes,
-    (acc, downtime) => {
-      if (downtime.instrument && downtime.instrument.bank) {
-        acc[downtime.instrument.bank] = downtime;
-      }
-      return acc;
-    },
-    {}
-  );
 }

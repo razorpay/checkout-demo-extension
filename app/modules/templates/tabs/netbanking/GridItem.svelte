@@ -1,7 +1,7 @@
 <div
   class="netb-bank item radio-item has-tooltip"
   class:disabled
-  class:has-tooltip="downtime"
+  class:has-tooltip={disabled}
   id="bank-item-{code}"
   down={disabled}
 >
@@ -52,17 +52,11 @@
 
 <script>
 
-import { disableBasedOnSeverityOrScheduled } from 'checkoutframe/downtimes';
-
 export default {
 
   components: {
     Tooltip: 'templates/views/ui/Tooltip.svelte',
   },
-
-  computed: {
-    disabled: ({ downtime }) => downtime && disableBasedOnSeverityOrScheduled(['high', true])({ downtime })
-  }
 
 }
 

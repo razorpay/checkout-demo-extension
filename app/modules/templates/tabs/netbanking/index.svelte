@@ -2,7 +2,7 @@
 <Tab method="netbanking"
   pad={false}
   overrideMethodCheck
-  hasMessage={selectedBankDowntime}
+  hasMessage={selectedBankHasDowntime}
 >
   <Screen pad={false}>
     <div id="netb-banks" class="clear grid count-3">
@@ -11,7 +11,7 @@
           {name}
           {code}
           fullName={banks[code]}
-          downtime={downtimes[code]}
+          disabled={_Arr.contains(downtimes.disable.banks, code)}
 
           bind:group=selectedBankCode
         />
@@ -47,7 +47,7 @@
       <div class="pad"
         ref:radioContainer
         transition:fade="{duration: 100}"
-        class:scrollFix=selectedBankDowntime
+        class:scrollFix=selectedBankHasDowntime
       >
         <label>Complete Payment Using</label>
         <div class="input-radio">
@@ -88,9 +88,9 @@
   {/if}
 
   <!-- Show downtime message if the selected bank is down -->
-  {#if selectedBankDowntime}
-    <DowntimeCallout isHighSeverity={isHighSeverityDowntime} >
-      {#if isHighSeverityDowntime}
+  {#if selectedBankHasDowntime}
+    <DowntimeCallout isHighSeverity={selectedBankDisabled} >
+      {#if selectedBankDisabled}
         <strong>{banks[selectedBankCode]}</strong>  accounts are temporarily unavailable right now. Please select another bank.
       {:else}
         <strong>{banks[selectedBankCode]}</strong>  accounts are experiencing low success rates.
@@ -134,12 +134,6 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { iPhone } from 'common/useragent';
 
-import DowntimesStore from 'checkoutstore/downtimes';
-import {
-  groupNetbankingDowntimesByBank,
-  disableBasedOnSeverityOrScheduled
-} from 'checkoutframe/downtimes';
-
 import { getPreferredBanks } from 'common/bank';
 import { getSession } from 'sessionmanager';
 
@@ -173,11 +167,16 @@ export default {
       downtimes: {},
       session: getSession(),
       active: false,
+      selectedBankHasDowntime: false,
     }
   },
 
   transitions: {
     fade
+  },
+
+  helpers: {
+    _Arr,
   },
 
   methods: {
@@ -218,9 +217,9 @@ export default {
       this.set({ selectedBankCode: '' });
     },
     setPayButtonVisibility() {
-      // Hide pay button if the selected bank has a severe downtime
-      const { isHighSeverityDowntime, session, active } = this.get();
-      if (isHighSeverityDowntime) {
+      // Hide pay button if the selected bank is disabled
+      const { selectedBankDisabled, session, active } = this.get();
+      if (selectedBankDisabled) {
         session.body.removeClass('sub');
       } else if (active) {
         session.body.addClass('sub');
@@ -230,8 +229,8 @@ export default {
      * Called from session to determine if it should submit when 'Pay' is clicked
      */
     shouldSubmit() {
-      const { isHighSeverityDowntime } = this.get();
-      return !isHighSeverityDowntime;
+      const { selectedBankDisabled } = this.get();
+      return !selectedBankDisabled;
     }
   },
 
@@ -262,15 +261,6 @@ export default {
     }
   },
 
-  oncreate() {
-    const { method } = this.get();
-    if (method === 'netbanking') {
-      const downtimes = DowntimesStore.get();
-      const netbankingDowntimes = groupNetbankingDowntimesByBank(downtimes.netbanking);
-      this.set({ downtimes: netbankingDowntimes });
-    }
-  },
-
   actions: {
     focus: InputActions.focus,
     blur: InputActions.blur,
@@ -293,13 +283,15 @@ export default {
     // Do not show invalid for emandate as the screen changes as soon as bank is selected.
     invalid: ({ method, selectedBankCode }) => method !== 'emandate' && !selectedBankCode,
 
-    selectedBankDowntime: ({ downtimes, selectedBankCode }) => downtimes && downtimes[selectedBankCode],
-
     netbanks: ({ banks, bankOptions, maxGridCount }) => getPreferredBanks(banks, bankOptions).slice(0, maxGridCount),
 
-    // Hide pay button only if the selected bank's downtime severity is high or scheduled.
-    isHighSeverityDowntime: ({ selectedBankDowntime }) => selectedBankDowntime
-         && disableBasedOnSeverityOrScheduled(['high', true])({ downtime: selectedBankDowntime })
+    selectedBankDisabled: ({ selectedBankCode, method, downtimes }) =>
+        method === 'netbanking' && _Arr.contains(downtimes.disable.banks, selectedBankCode),
+
+    selectedBankWarn: ({  selectedBankCode, method, downtimes }) =>
+        method === 'netbanking' && _Arr.contains(downtimes.warn.banks, selectedBankCode),
+
+    selectedBankHasDowntime: ({ selectedBankDisabled, selectedBankWarn }) => selectedBankDisabled || selectedBankWarn
 
   }
 

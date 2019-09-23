@@ -1,11 +1,9 @@
 /* Personalization module for user's payment method preferences */
 
 import { getCustomer } from 'checkoutframe/customer';
-import { getSortedApps } from 'common/upi';
 import { VPA_REGEX } from 'common/constants';
 import Track from 'tracker';
 import Analytics from 'analytics';
-import * as AnalyticsTypes from 'analytics-types';
 import DowntimesStore from 'checkoutstore/downtimes';
 import { isMobile } from 'common/useragent';
 
@@ -77,7 +75,9 @@ let currentUid = null;
  * @return {Array} filtered our instruments
  */
 const filterInstruments = instruments => {
-  const { disabled: disabledMethods = [] } = DowntimesStore.get();
+  const {
+    disable: { methods: disabledMethods = [], banks: disabledBanks = [] },
+  } = DowntimesStore.get();
 
   return (
     instruments
@@ -93,6 +93,12 @@ const filterInstruments = instruments => {
             if (!VPA_REGEX.test(instrument.vpa)) {
               return false;
             }
+          }
+          break;
+        case 'netbanking':
+          // If the instrument is netbanking, remove it if it has a severe downtime
+          if (_Arr.contains(disabledBanks, instrument.bank)) {
+            return false;
           }
           break;
       }

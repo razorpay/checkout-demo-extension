@@ -323,7 +323,7 @@
       }
 
       const downtimes = DowntimesStore.get() || {};
-      if (downtimes.upi && downtimes.upi.length) {
+      if (_Arr.contains(downtimes.warn.methods, 'upi')) {
         this.set({
           down: true,
         });

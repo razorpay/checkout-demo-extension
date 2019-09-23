@@ -1599,6 +1599,7 @@ Session.prototype = {
           recurring: this.recurring,
           method: method,
           selectedBankCode: prefilledbank,
+          downtimes: DowntimesStore.get(),
         },
       });
 

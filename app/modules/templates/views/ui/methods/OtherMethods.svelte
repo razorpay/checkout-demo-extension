@@ -98,7 +98,7 @@
     computed: {
       methods: function ({ AVAILABLE_METHODS, session }) {
         const downtimes = DowntimesStore.get() || {};
-        const down = downtimes.disabled || [];
+        const down = downtimes.disable.methods || [];
 
         const methods = _Arr.map(AVAILABLE_METHODS, method => {
           return {
@@ -106,14 +106,14 @@
             down: _Arr.contains(down, method),
             downMessage: getMethodDowntimeDescription(method, {
               availableMethods: AVAILABLE_METHODS,
-              downMethods: downtimes.disabled,
+              downMethods: downtimes.disable,
             }),
             icon: session.themeMeta.icons[method],
             title: getMethodNameForPaymentOption(method, {
               session
             }),
           };
-        })
+        });
 
         return methods;
       },
