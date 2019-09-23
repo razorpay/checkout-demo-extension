@@ -136,13 +136,13 @@ function getBankActions(downtimes) {
  *
  * @type {Function}
  */
-const getBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
+const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
   const { netbanking: netbankingDowntimes = [] } = downtimes;
   return (
-    (netbankingDowntimes
+    netbankingDowntimes
     |> _Arr.filter(predicate)
     |> _Arr.map(downtime => downtime.instrument && downtime.instrument.bank)
-    |> _Arr.filter(Boolean))
+    |> _Arr.filter(Boolean)
   );
 });
 
@@ -151,14 +151,18 @@ const getBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
  * @param downtimes
  * @return Array<string>
  */
-const getDisabledBanks = getBankNamesFromDowntimes(isHighSeverityOrScheduled);
+const getDisabledBanks = getFilteredBankNamesFromDowntimes(
+  isHighSeverityOrScheduled
+);
 
 /**
  * Returns the list of banks for which there should be a warning displayed.
  * @param downtimes
  * @return {Array<string>}
  */
-const getWarnBanks = getBankNamesFromDowntimes(isLowSeverityAndNotScheduled);
+const getWarnBanks = getFilteredBankNamesFromDowntimes(
+  isLowSeverityAndNotScheduled
+);
 
 const DOWNTIME_METHOD_COPY_MAP = {
   qr: 'upi',
