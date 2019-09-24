@@ -39,18 +39,18 @@ module.exports = {
       }
     }
 
-    async function expectRequest(func) {
+    async function expectRequest() {
       await waitForRequest();
       const url = currentRequest.url();
       const parsedURL = URL.parse(url);
-      func({
+      return {
         headers: currentRequest.headers(),
         method: currentRequest.method(),
         body: currentRequest.postData(),
         url,
         URL: parsedURL,
         params: querystring.parse(parsedURL.query),
-      });
+      };
     }
 
     function reset() {

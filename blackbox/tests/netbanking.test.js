@@ -4,7 +4,7 @@ const { delay } = require('../util');
 const assert = require('../assert');
 
 describe('Netbanking tests', () => {
-  test('perform netbaking transaction', async page => {
+  test('perform netbaking transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -22,12 +22,9 @@ describe('Netbanking tests', () => {
     await page.click('#footer');
 
     // context.popup();
+    let req = await context.expectRequest();
 
-    context.expectRequest(req => {
-      assert.equal(req.method, 'GET');
-    });
-
+    expect(req.method).toEqual('POST');
     context.respondJSON({ error: { description: 'some error' } });
-    await page.close();
   });
 });
