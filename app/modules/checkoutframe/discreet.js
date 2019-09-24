@@ -21,7 +21,7 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
-import FeeBearerView from 'checkoutframe/feebearer';
+import FeeBearerView from 'templates/views/feebearer.svelte';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
 import emiOptionsView from 'checkoutframe/emioptions';

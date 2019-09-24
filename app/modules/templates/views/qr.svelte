@@ -69,7 +69,9 @@
     loading = false;
   }
 
-  function createPaymentWithFees(bearer) {
+  function createPaymentWithFees(event) {
+    const bearer = event.detail;
+
     paymentData.amount = bearer.amount;
     paymentData.fee = bearer.fee;
 
