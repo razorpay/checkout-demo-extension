@@ -152,7 +152,7 @@ img {
         }
 
         const downtimes = DowntimesStore.get();
-        if (downtimes.warn.includes('qr')) {
+        if (_Arr.contains(downtimes.warn.methods, 'qr')) {
           this.set({
             down: true,
           });
