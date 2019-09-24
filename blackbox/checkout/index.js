@@ -40,7 +40,9 @@ function checkoutRequestHandler(request) {
  */
 function cdnRequestHandler(request) {
   const url = request.url();
-  if (url.startsWith(lumberjackUrl)) {
+  if (url.startsWith('data')) {
+    request.respond({ body: url });
+  } else if (url.startsWith(lumberjackUrl)) {
     request.respond({ status: 204 });
   } else if (url.startsWith(cdnUrl)) {
     const localPath = 'app/images/' + url.slice(cdnUrl.length);
@@ -84,10 +86,8 @@ module.exports = {
         switch (targets.length) {
           case 1:
             throw new Error('No popup is open');
-          case 2:
-            return targets[1];
           default:
-            throw new Error(`${targets.length} popups found, expected only 1`);
+            return targets[targets.length - 1];
         }
       },
     };

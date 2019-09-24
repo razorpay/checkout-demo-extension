@@ -65,7 +65,7 @@ async function sendPreferences({
 
 module.exports = {
   sendPreferences,
-  makePreferences() {
+  makePreferences(overrides) {
     return {
       methods: {
         ...card,
@@ -74,6 +74,7 @@ module.exports = {
         emi_options,
         recurring,
       },
+      ...overrides,
     };
   },
 };

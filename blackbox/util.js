@@ -20,7 +20,9 @@ module.exports = {
     function shouldIgnore(interceptedRequest) {
       const url = interceptedRequest.url();
       const ignoredUrl =
-        url.startsWith(cdnUrl) || url.startsWith(lumberjackUrl);
+        url.startsWith('data') ||
+        url.startsWith(cdnUrl) ||
+        url.startsWith(lumberjackUrl);
       if (ignoredUrl || (pattern && !pattern.test(url))) return true;
     }
 
@@ -63,6 +65,13 @@ module.exports = {
       reset();
     }
 
+    function failRequest(body) {
+      return respond({
+        status: 400,
+        body: JSON.stringify(body),
+      });
+    }
+
     function respondJSON(body) {
       return respond({
         contentType: 'application/json',
@@ -74,6 +83,6 @@ module.exports = {
       return respond({ body });
     }
 
-    return { expectRequest, respondJSON, respondPlain };
+    return { expectRequest, respondJSON, respondPlain, failRequest };
   },
 };
