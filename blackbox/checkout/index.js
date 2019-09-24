@@ -24,7 +24,10 @@ function checkoutRequestHandler(request) {
     case checkoutJs:
       return request.respond({ body: jsContent });
     case checkoutFont:
-      return request.respond({ body: fontContent });
+      return request.respond({
+        body: fontContent,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+      });
     default:
       throw new Error(
         `unexpected resource URL while loading checkout-public: ${url}`
