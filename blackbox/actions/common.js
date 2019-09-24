@@ -1,17 +1,10 @@
-const { openCheckout } = require('../checkout');
-const common = require('../actions/common');
-const { makePreferences } = require('../actions/preferences');
-const { delay } = require('../util');
-const assert = require('../assert');
-
 module.exports = {
   handleFeeBearer,
 };
 
 async function handleFeeBearer(context, page) {
-  await context.expectRequest(req => {
-    assert.equal(req.method, 'POST');
-  });
+  let req = await context.expectRequest();
+  expect(req.method).toEqual('POST');
   await context.respondJSON({
     input: {
       contact: '9999988888',
@@ -48,28 +41,28 @@ async function handleFeeBearer(context, page) {
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  assert.equal(feeAmount1, expectedfeeAmount1);
+  expect(feeAmount1).toEqual(expectedfeeAmount1);
   feeAmount = feeAmount11[1];
   expectedfeeAmount1 = '₹ 17.40';
   const feeAmount2 = await page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  assert.equal(feeAmount2, expectedfeeAmount1);
+  expect(feeAmount2).toEqual(expectedfeeAmount1);
   feeAmount = feeAmount11[2];
   expectedfeeAmount1 = '₹ 3.14';
   const feeAmount3 = await page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  assert.equal(feeAmount3, expectedfeeAmount1);
+  expect(feeAmount3).toEqual(expectedfeeAmount1);
   feeAmount = feeAmount11[3];
   expectedfeeAmount1 = '₹ 620.54';
   const feeAmount4 = await page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  assert.equal(feeAmount4, expectedfeeAmount1);
+  expect(feeAmount4).toEqual(expectedfeeAmount1);
   const continueButton = await page.$x(
     '//*[@class="btn" and text() = "Continue"]'
   );
