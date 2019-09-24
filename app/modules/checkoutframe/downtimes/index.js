@@ -127,8 +127,8 @@ function getMethodActions(downtimes, preferences) {
 
 function getBankActions(downtimes) {
   return {
-    disable: getDisabledBanks(downtimes),
-    warn: getWarnBanks(downtimes),
+    disable: getDisabledBanks(downtimes) |> removeDuplicateStrings,
+    warn: getWarnBanks(downtimes) |> removeDuplicateStrings,
   };
 }
 
@@ -149,6 +149,22 @@ const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
     |> _Arr.filter(Boolean)
   );
 });
+
+/**
+ * Removes duplicates from a array of strings.
+ * @param {Array<string>} arr
+ * @return {Array<string>}
+ */
+function removeDuplicateStrings(arr) {
+  return (
+    arr
+    |> _Arr.reduce((acc, item) => {
+      acc[item] = true;
+      return acc;
+    }, {})
+    |> _Obj.keys
+  );
+}
 
 /**
  * Returns the list of banks to be disabled.
