@@ -133,6 +133,26 @@ export function uploadDocument(razorpay, file) {
 }
 
 /**
+ * Turns a list of entities to words and generates a comma-separated string.
+ * If limit is provided, only `limit` number of entities are turned to words
+ * and the rest are described as "and ${rest} more".
+ * @param {Array<string>} allEntities List of entities
+ * @param {Number} limit Number of entities to turn to words
+ *
+ * @return {string}
+ */
+function getEntityString(allEntities, limit = Infinity) {
+  const entities = _Arr.map(allEntities.slice(0, limit), entityToWords);
+  const diff = allEntities.length - entities.length;
+
+  if (diff > 0) {
+    entities.push(`and ${diff} more`);
+  }
+
+  return _Arr.join(entities, ', ');
+}
+
+/**
  * Generates the error object from API response.
  * @param {Object} response
  *
@@ -145,10 +165,16 @@ export function generateError(response) {
   if (response.success === false) {
     // Error with the details in the image
 
-    if (response.errors.not_matching) {
-      description = `The following details on NACH form do not match our records: ${_Arr.join(
-        _Arr.map(response.errors.not_matching, entityToWords),
-        ', '
+    // Prioritize visibility errors over validity errors
+    if (response.errors.not_visible) {
+      description = `We could not read the following details on the NACH form: ${getEntityString(
+        response.errors.not_visible,
+        3
+      )}. Please upload an image with better quality.`;
+    } else if (response.errors.not_matching) {
+      description = `The following details on NACH form do not match our records: ${getEntityString(
+        response.errors.not_matching,
+        3
       )}. Please upload an image with better quality.`;
     }
 

@@ -78,7 +78,41 @@ test('Module: checkoutframe/nach', t => {
   });
 
   test('Nach.generateError', t => {
-    test('If success=false, find from not_matching', t => {
+    test('If success=false, find from not_matching with 3 fields', t => {
+      const apiResponse = {
+        success: false,
+        errors: {
+          not_matching: [
+            'bank_account.account_number',
+            'merchant.name',
+            'utility_code',
+          ],
+        },
+        enhanced_image:
+          'https://s3.ap-south-1.amazonaws.com/rzp-nonprod-merchant-assets/paper-mandate/enhanced/ppm_DGrijW74UiQCV2_DGrkwPS6BEqBoQ',
+        extracted_data: [
+          {
+            key: 'bank_account.account_number',
+            expected_value: '1111111111111',
+            extracted_value: '111111111111155H5',
+          },
+        ],
+      };
+
+      const generatedError = Nach.generateError(apiResponse);
+      const expectedDescription =
+        'The following details on NACH form do not match our records: Bank Account Number, Merchant Name, Utility Code. Please upload an image with better quality.';
+
+      t.is(
+        generatedError.description,
+        expectedDescription,
+        'Error description matches'
+      );
+
+      t.end();
+    });
+
+    test('If success=false, find from not_matching with 3+ fields', t => {
       const apiResponse = {
         success: false,
         errors: {
@@ -102,12 +136,120 @@ test('Module: checkoutframe/nach', t => {
 
       const generatedError = Nach.generateError(apiResponse);
       const expectedDescription =
-        'The following details on NACH form do not match our records: Bank Account Number, Merchant Name, Utility Code, Umrn. Please upload an image with better quality.';
+        'The following details on NACH form do not match our records: Bank Account Number, Merchant Name, Utility Code, and 1 more. Please upload an image with better quality.';
 
       t.is(
         generatedError.description,
         expectedDescription,
-        'Description matches'
+        'Error description matches'
+      );
+
+      t.end();
+    });
+
+    test('If success=false, find from not_visible with 3 fields', t => {
+      const apiResponse = {
+        success: false,
+        errors: {
+          not_visible: [
+            'bank_account.account_number',
+            'merchant.name',
+            'utility_code',
+          ],
+        },
+        enhanced_image:
+          'https://s3.ap-south-1.amazonaws.com/rzp-nonprod-merchant-assets/paper-mandate/enhanced/ppm_DGrijW74UiQCV2_DGrkwPS6BEqBoQ',
+        extracted_data: [
+          {
+            key: 'bank_account.account_number',
+            expected_value: '1111111111111',
+            extracted_value: '111111111111155H5',
+          },
+        ],
+      };
+
+      const generatedError = Nach.generateError(apiResponse);
+      const expectedDescription =
+        'We could not read the following details on the NACH form: Bank Account Number, Merchant Name, Utility Code. Please upload an image with better quality.';
+      t.is(
+        generatedError.description,
+        expectedDescription,
+        'Error description matches'
+      );
+
+      t.end();
+    });
+
+    test('If success=false, prefer not_visible over not_matching', t => {
+      const apiResponse = {
+        success: false,
+        errors: {
+          not_visible: [
+            'bank_account.account_number',
+            'merchant.name',
+            'utility_code',
+            'umrn',
+          ],
+          not_matching: [
+            'bank_account.account_number',
+            'merchant.name',
+            'utility_code',
+            'umrn',
+          ],
+        },
+        enhanced_image:
+          'https://s3.ap-south-1.amazonaws.com/rzp-nonprod-merchant-assets/paper-mandate/enhanced/ppm_DGrijW74UiQCV2_DGrkwPS6BEqBoQ',
+        extracted_data: [
+          {
+            key: 'bank_account.account_number',
+            expected_value: '1111111111111',
+            extracted_value: '111111111111155H5',
+          },
+        ],
+      };
+
+      const generatedError = Nach.generateError(apiResponse);
+      const expectedDescription =
+        'We could not read the following details on the NACH form: Bank Account Number, Merchant Name, Utility Code, and 1 more. Please upload an image with better quality.';
+      t.is(
+        generatedError.description,
+        expectedDescription,
+        'Error description matches'
+      );
+
+      t.end();
+    });
+
+    test('If success=false, find from not_matching with 3+ fields', t => {
+      const apiResponse = {
+        success: false,
+        errors: {
+          not_matching: [
+            'bank_account.account_number',
+            'merchant.name',
+            'utility_code',
+            'umrn',
+          ],
+        },
+        enhanced_image:
+          'https://s3.ap-south-1.amazonaws.com/rzp-nonprod-merchant-assets/paper-mandate/enhanced/ppm_DGrijW74UiQCV2_DGrkwPS6BEqBoQ',
+        extracted_data: [
+          {
+            key: 'bank_account.account_number',
+            expected_value: '1111111111111',
+            extracted_value: '111111111111155H5',
+          },
+        ],
+      };
+
+      const generatedError = Nach.generateError(apiResponse);
+      const expectedDescription =
+        'The following details on NACH form do not match our records: Bank Account Number, Merchant Name, Utility Code, and 1 more. Please upload an image with better quality.';
+
+      t.is(
+        generatedError.description,
+        expectedDescription,
+        'Error description matches'
       );
 
       t.end();
