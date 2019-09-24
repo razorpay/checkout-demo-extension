@@ -5,6 +5,9 @@ const assert = require('../assert');
 const { handleFeeBearer } = require('../actions/common');
 
 describe('Netbanking tests', () => {
+  beforeEach(async () => {
+    await jestPuppeteer.resetPage();
+  });
   test('perform netbaking transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -62,6 +65,6 @@ describe('Netbanking tests', () => {
       messageDiv => messageDiv.textContent,
       messageDiv
     );
-    expect(messageText).toEquals(expectedErrorMeassage);
+    expect(messageText).toEqual(expectedErrorMeassage);
   });
 });
