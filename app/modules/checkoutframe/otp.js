@@ -19,7 +19,7 @@ otpView.prototype = {
     });
   },
 
-  destroy() {
+  $destroy() {
     this.view.$destroy();
   },
 

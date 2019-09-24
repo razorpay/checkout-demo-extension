@@ -4,7 +4,7 @@ import { SHOWN_CLASS } from 'common/constants';
 
 let view;
 
-function destroy() {
+function $destroy() {
   if (view && view.$destroy) {
     view.$destroy();
   }
@@ -22,7 +22,7 @@ export function hide() {
 export function show(options) {
   let { props, target } = options;
 
-  destroy();
+  $destroy();
 
   view = new OptionsView({
     target: target,

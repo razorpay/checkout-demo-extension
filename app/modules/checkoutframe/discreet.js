@@ -24,8 +24,6 @@ import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'templates/views/feebearer.svelte';
 import SavedCardsView from 'checkoutframe/savedcards';
 import emandateView from 'checkoutframe/emandate';
-import emiOptionsView from 'checkoutframe/emioptions';
-import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import PayLaterView from 'checkoutframe/paylater';
@@ -66,6 +64,8 @@ import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
+import emiOptionsView from 'templates/screens/cardlessemi.svelte';
+import emiScreenView from 'templates/screens/emiscreen.svelte';
 
 import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
 import PayoutAccount from 'templates/screens/payout-account.svelte';

@@ -37,7 +37,7 @@ export default class Magic {
     });
   }
 
-  destroy() {
+  $destroy() {
     this.clearTimeout();
 
     if (this.resendCallout) {

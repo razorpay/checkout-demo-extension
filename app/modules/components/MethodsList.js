@@ -133,7 +133,7 @@ export default class MethodsList {
     this.otherMethodsView.$on('methodSelected', onMethodSelected);
   }
 
-  destroy() {
+  $destroy() {
     this.view.$destroy();
   }
 

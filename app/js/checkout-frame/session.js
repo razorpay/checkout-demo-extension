@@ -1768,7 +1768,9 @@ Session.prototype = {
     var self = this;
 
     if (this.methods.cardless_emi) {
-      this.emiOptionsView = new discreet.emiOptionsView();
+      this.emiOptionsView = new discreet.emiOptionsView({
+        target: _Doc.querySelector('#emi-options-wrapper'),
+      });
 
       var providers = [];
 
@@ -1786,7 +1788,7 @@ Session.prototype = {
         providers.push(CardlessEmi.createProvider(provider, providerObj.name));
       });
 
-      this.emiOptionsView.setOptions({
+      this.emiOptionsView.$set({
         providers: providers,
 
         on: {
