@@ -13,6 +13,9 @@ const through = require('through2').obj;
 const runSequence = require('run-sequence');
 const { execSync } = require('child_process');
 
+const rollup = require('rollup');
+const rollupConfig = require('./rollup.config.js');
+
 const distDir = 'app/dist/v1/';
 const cssDistDir = distDir + 'css';
 
@@ -80,6 +83,11 @@ function joinJs() {
     .pipe(gulp.dest(distDir));
 }
 
+function cleanDistDir(cb) {
+  execSync(`rm -rf ${distDir}`);
+  cb && cb();
+}
+
 gulp.task('usemin', joinJs);
 
 gulp.task('uglify', done => {
@@ -144,10 +152,7 @@ gulp.task('staticAssets', function() {
 gulp.task(
   'build',
   gulp.series(
-    cb => {
-      execSync(`rm -rf ${distDir}`);
-      cb();
-    },
+    cleanDistDir,
     'css:prod',
     'compileTemplates',
     'compileHTML',
@@ -159,14 +164,26 @@ gulp.task(
   )
 );
 
-gulp.task(
-  'watch',
-  gulp.series('build', function(cb) {
-    gulp.watch(paths.css, gulp.series('css'));
-    gulp.watch(paths.templates, gulp.series('compileTemplates'));
-    gulp.watch(paths.js, gulp.series('usemin'));
-    gulp.watch(assetPath('*.html'), gulp.series('usemin'));
-  })
-);
+gulp.task('watch', cb => {
+  cleanDistDir();
+  gulp.watch(paths.css, gulp.series('css'));
+  gulp.watch(paths.templates, gulp.series('compileTemplates'));
+  gulp.watch(paths.js, gulp.series('usemin'));
+  gulp.watch(assetPath('*.html'), gulp.series('usemin'));
+  rollup.watch(rollupConfig).on('event', event => {
+    switch (event.code) {
+      case 'BUNDLE_START':
+        return console.log('processing ' + event.input);
+      case 'BUNDLE_END':
+        return console.log(
+          'built ' +
+            event.output.map(o => path.relative(__dirname, o)) +
+            ' in ' +
+            event.duration +
+            'ms'
+        );
+    }
+  });
+});
 
 gulp.task('default', gulp.series('build'));
