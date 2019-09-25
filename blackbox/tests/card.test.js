@@ -4,6 +4,10 @@ const { delay } = require('../util');
 const expect = require('chai').expect;
 
 describe('Card tests', () => {
+  beforeEach(async () => {
+    await jestPuppeteer.resetBrowser();
+    await jestPuppeteer.resetPage();
+  });
   test('perform card transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

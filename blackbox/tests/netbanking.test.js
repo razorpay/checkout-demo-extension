@@ -6,8 +6,10 @@ const { handleFeeBearer } = require('../actions/common');
 
 describe('Netbanking tests', () => {
   beforeEach(async () => {
+    await jestPuppeteer.resetBrowser();
     await jestPuppeteer.resetPage();
   });
+
   test('perform netbaking transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

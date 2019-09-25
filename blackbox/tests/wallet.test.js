@@ -5,6 +5,11 @@ const assert = require('../assert');
 const expect = require('chai').expect;
 
 describe('Wallet tests', () => {
+  beforeEach(async () => {
+    await jestPuppeteer.resetBrowser();
+    await jestPuppeteer.resetPage();
+  });
+
   test('Perform wallet transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
