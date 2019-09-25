@@ -8,6 +8,7 @@ describe('Wallet tests', () => {
   beforeEach(async () => {
     await jestPuppeteer.resetBrowser();
     await jestPuppeteer.resetPage();
+    jest.setTimeout(60000);
   });
 
   test('Perform wallet transaction', async () => {
@@ -30,7 +31,7 @@ describe('Wallet tests', () => {
     await delay(1500);
     const payButton = await page.waitForSelector('.pay-btn');
     await payButton.click();
-    await context.expectRequest(req => {});
+    let req = await context.expectRequest();
     await context.respondJSON({
       type: 'otp',
       request: {
@@ -84,6 +85,5 @@ describe('Wallet tests', () => {
     await otpField.type('5555');
     await otpButton.click();
     await context.respondJSON({ razorpay_payment_id: 'pay_123' });
-    await page.close();
   });
 });
