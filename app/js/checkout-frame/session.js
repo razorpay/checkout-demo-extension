@@ -6232,7 +6232,8 @@ Session.prototype = {
           this.nativeotp &&
           discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
-            this.transformedTokens
+            this.transformedTokens,
+            this.get('key')
           )
         ) {
           shouldUseNativeOTP = true;
