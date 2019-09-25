@@ -106,10 +106,6 @@
   overflow: hidden;
 }
 
-ref:screenContent {
-  height: 100%;
-  overflow: auto;
-}
 
 ref:radioContainer {
   margin-top: -6px;
