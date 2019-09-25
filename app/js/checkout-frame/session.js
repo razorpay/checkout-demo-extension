@@ -1589,6 +1589,9 @@ Session.prototype = {
     }
 
     var prefilledbank = this.get('prefill.bank') || '';
+    var selectedBank = this.methods.netbanking[prefilledbank]
+      ? prefilledbank
+      : '';
 
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
@@ -1598,7 +1601,7 @@ Session.prototype = {
           banks: this.methods.emandate || this.methods.netbanking,
           recurring: this.recurring,
           method: method,
-          selectedBankCode: prefilledbank,
+          selectedBankCode: selectedBank,
           downtimes: DowntimesStore.get(),
         },
       });
