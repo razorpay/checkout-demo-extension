@@ -125,6 +125,12 @@ function getMethodActions(downtimes, preferences) {
   return { disable, warn };
 }
 
+/**
+ * Returns the list of banks to be disabled and warned
+ *
+ * @param downtimes
+ * @return {{warn: Array<string>, disable: Array<string>}}
+ */
 function getBankActions(downtimes) {
   return {
     disable: getDisabledBanks(downtimes) |> _Arr.removeDuplicates,
