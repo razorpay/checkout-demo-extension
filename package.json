@@ -37,7 +37,7 @@
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "npm run test:unit && npm run build && node ./blackbox",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
-    "start": "$ rollup -cw & $ gulp watch; kill -9 $!"
+    "start": "$ gulp watch"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
