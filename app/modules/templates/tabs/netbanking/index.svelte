@@ -273,8 +273,10 @@ export default {
     // For eMandate, we show only the top 3 banks.
     maxGridCount: ({ recurring }) => recurring ? 3 : 6,
 
-    banksArr: ({ banks, downtimes }) => _Obj.entries(banks)
-        .map((entry) => ({ code: entry[0], name: entry[1], downtime: downtimes[entry[0]] })),
+    banksArr: ({ banks, downtimes }) => _Arr.map(
+        _Obj.entries(banks),
+        (entry) => ({ code: entry[0], name: entry[1], downtime: downtimes[entry[0]] })
+      ),
 
     // Do not show invalid for emandate as the screen changes as soon as bank is selected.
     invalid: ({ method, selectedBankCode }) => method !== 'emandate' && !selectedBankCode,
