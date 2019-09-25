@@ -87,13 +87,10 @@
     {/if}
   </Screen>
 
-  {#if down}
-    <Callout
-      showIcon={false}
-      classes={['downtime-callout']}
-    >
-      <strong>UPI</strong> is experiencing low success rates.
-    </Callout>
+  {#if down || disabled}
+    <DowntimeCallout isHighSeverity={disabled}>
+      <strong>UPI QR</strong> is experiencing low success rates.
+    </DowntimeCallout>
   {/if}
 </Tab>
 
@@ -242,7 +239,7 @@
       Card: 'templates/views/ui/Card.svelte',
       Field: 'templates/views/ui/Field.svelte',
       Icon: 'templates/views/ui/Icon.svelte',
-      Callout: 'templates/views/ui/Callout.svelte',
+      DowntimeCallout: 'templates/views/ui/DowntimeCallout.svelte',
       Collect: './Collect.svelte',
       GooglePayCollect: './GooglePayCollect.svelte',
       GooglePayOmnichannel: './GooglePayOmnichannel.svelte',
@@ -323,11 +320,10 @@
       }
 
       const downtimes = DowntimesStore.get() || {};
-      if (_Arr.contains(downtimes.warn.methods, 'upi')) {
-        this.set({
-          down: true,
-        });
-      }
+      this.set({
+        down: _Arr.contains(downtimes.warn.methods, 'upi'),
+        disabled: _Arr.contains(downtimes.disable.methods, 'upi')
+      });
 
       this.set({
         qrEnabled: session.methods.qr,
