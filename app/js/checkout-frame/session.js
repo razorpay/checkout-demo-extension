@@ -1720,7 +1720,9 @@ Session.prototype = {
   },
 
   setSavedCardsView: function() {
-    this.savedCardsView = new discreet.SavedCardsView();
+    this.savedCardsView = new discreet.SavedCardsView({
+      target: _Doc.querySelector('#saved-cards-container'),
+    });
   },
 
   setEmandate: function() {
@@ -4772,7 +4774,7 @@ Session.prototype = {
 
         this.transformedTokens = this.transformTokens(tokensList.items);
 
-        this.savedCardsView.setCards({
+        this.savedCardsView.$set({
           cards: this.transformedTokens,
           on: {
             viewPlans: function(event) {
@@ -6604,6 +6606,14 @@ Session.prototype = {
         this.bankTransferView.$destroy();
       }
 
+      if (this.savedCardsView) {
+        this.savedCardsView.$destroy();
+      }
+
+      if (this.feeBearerView) {
+        this.feeBearerView.$destroy();
+      }
+
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
@@ -6625,6 +6635,7 @@ Session.prototype = {
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = null;
+      this.savedCardsView = this.feeBearerView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;

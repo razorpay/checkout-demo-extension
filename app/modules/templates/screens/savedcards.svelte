@@ -4,7 +4,7 @@
   import * as Card from 'common/card';
 
   // Props
-  export let cards;
+  export let cards = [];
   export let on;
 
   export function onViewPlans(event) {
