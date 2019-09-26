@@ -25,7 +25,6 @@ import FeeBearerView from 'templates/views/feebearer.svelte';
 import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
-import PayLaterView from 'checkoutframe/paylater';
 import * as Curtain from 'components/curtain';
 import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
@@ -66,6 +65,7 @@ import UpiTab from 'templates/tabs/upi/index.svelte';
 import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
 import SavedCardsView from 'templates/screens/savedcards.svelte';
+import PayLaterView from 'templates/screens/paylater.svelte';
 
 import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
 import PayoutAccount from 'templates/screens/payout-account.svelte';

@@ -1844,7 +1844,9 @@ Session.prototype = {
       return;
     }
 
-    this.payLaterView = new PayLaterView();
+    this.payLaterView = new PayLaterView({
+      target: _Doc.querySelector('#paylater-wrapper'),
+    });
 
     var providers = [];
 
@@ -1858,7 +1860,7 @@ Session.prototype = {
       providers.push(PayLater.createProvider(provider, providerObj.name));
     });
 
-    this.payLaterView.setOptions({
+    this.payLaterView.$set({
       providers: providers,
 
       on: {
@@ -6616,6 +6618,10 @@ Session.prototype = {
         this.feeBearerView.$destroy();
       }
 
+      if (this.payLaterView) {
+        this.payLaterView.$destroy();
+      }
+
       try {
         this.delegator.destroy();
         invokeEach(this.listeners);
@@ -6637,7 +6643,7 @@ Session.prototype = {
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = null;
-      this.savedCardsView = this.feeBearerView = null;
+      this.savedCardsView = this.feeBearerView = this.payLaterView = null;
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;
