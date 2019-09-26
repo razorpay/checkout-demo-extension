@@ -4,7 +4,7 @@
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
 
   // Props
-  export let providers;
+  export let providers = [];
   export let on;
 
   export function select(event) {
