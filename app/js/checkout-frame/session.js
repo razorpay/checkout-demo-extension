@@ -2440,6 +2440,7 @@ Session.prototype = {
 
     $('#overlay-close').hide();
     hideOverlayMessage();
+    $('.omnichannel').hide(); // Hide the Google Pay logo
   },
 
   shake: function() {
