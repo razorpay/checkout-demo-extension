@@ -60,8 +60,8 @@
     return data;
   }
 
-  export function onAppSelect({ data }) {
-    const packageName = data.package_name;
+  export function onAppSelect({ detail }) {
+    const packageName = detail.package_name;
 
     if (packageName === 'directpay') {
       vpaField.focus();
@@ -69,10 +69,6 @@
 
     session.onUpiAppSelect(packageName);
     selected = packageName;
-  }
-
-  export function showAllApps({ apps }) {
-    showAll = true;
   }
 </script>
 
@@ -198,7 +194,7 @@
     {/each}
 
     {#if apps.length > 5 && !showAll}
-      <NextOption on:select={() => showAllApps(apps)} icon={otherAppsIcon}>
+      <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
         Show other UPI apps
       </NextOption>
     {/if}
