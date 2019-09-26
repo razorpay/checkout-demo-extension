@@ -79,7 +79,7 @@
         <div
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
-          on:click={event => dispatch('viewPlans', event.detail)}>
+          on:click={event => dispatch('viewPlans', event)}>
           <div class="emi-plan-unselected emi-icon-multiple-cards">
             <div class="emi-plans-text">EMI Available</div>
             <div class="emi-plans-action theme-highlight">Pay with EMI</div>

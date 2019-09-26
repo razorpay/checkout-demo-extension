@@ -4789,7 +4789,7 @@ Session.prototype = {
                 },
               });
 
-              self.showEmiPlans('saved')(event);
+              self.showEmiPlans('saved')(event.detail);
             },
           },
         });
