@@ -43,7 +43,7 @@
 
 {#if /^<svg/.test(iconToUse)}
   {@html iconToUse}
-{:else if /^\&.*\;$/.test(iconToUse)}
+{:else if /^&.*;$/.test(iconToUse)}
   <i class="theme">
     {@html iconToUse}
   </i>
