@@ -4068,18 +4068,18 @@ Session.prototype = {
           type: AnalyticsTypes.RENDER,
           data: {
             count: {
-              eligible: _.lengthOf(upiData.intentApps),
-              all: _.lengthOf(upiData.allIntentApps),
+              eligible: _.lengthOf(this.upi_intents_data),
+              all: _.lengthOf(this.all_upi_intents_data),
             },
             list: {
               eligible: _Arr.join(
-                _Arr.map(upiData.intentApps, function(app) {
+                _Arr.map(this.upi_intents_data, function(app) {
                   return app.package_name;
                 }),
                 ','
               ),
               all: _Arr.join(
-                _Arr.map(upiData.allIntentApps, function(app) {
+                _Arr.map(this.all_upi_intents_data, function(app) {
                   return app.package_name;
                 }),
                 ','
