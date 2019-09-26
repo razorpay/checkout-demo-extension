@@ -1884,7 +1884,9 @@ Session.prototype = {
       return;
     }
 
-    this.emiScreenView = new discreet.emiScreenView();
+    this.emiScreenView = new discreet.emiScreenView({
+      target: _Doc.querySelector('#form-emi'),
+    });
 
     this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
   },
