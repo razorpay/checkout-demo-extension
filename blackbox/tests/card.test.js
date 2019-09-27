@@ -196,7 +196,7 @@ describe('Card tests', () => {
   test('perform card transaction with partial payments', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 20000,
       personalization: false,
     };
     const preferences = makePreferences({
@@ -238,6 +238,14 @@ describe('Card tests', () => {
     await cardName.type('Sakshi Jain');
     const cardCvv = await page.waitForSelector('#card_cvv');
     await cardCvv.type('112');
+    const otpField = await page.waitForSelector('#otp');
+    await otpField.type('5555');
+    const orignalAmount = await page.waitForSelector('.original-amount');
+    const otpAmount = await page.evaluate(
+      orignalAmount => orignalAmount.textContent,
+      orignalAmount
+    );
+    expect(otpAmount).to.equal('₹ 100');
     const payButton = await page.waitForSelector('.pay-btn');
     await payButton.click();
 
