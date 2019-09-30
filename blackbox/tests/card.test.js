@@ -98,7 +98,6 @@ describe('Card tests', () => {
     const popupPageNew = await popupNew.page();
     const passButton = await popupPageNew.$('.success');
     await passButton.click();
-    await page.close();
   });
   test('perform card transaction with fee bearer', async () => {
     const options = {
@@ -191,7 +190,6 @@ describe('Card tests', () => {
     const popupPageNew = await popupNew.page();
     const passButton = await popupPageNew.$('.success');
     await passButton.click();
-    await page.close();
   });
   test('perform card transaction with partial payments', async () => {
     const options = {
@@ -307,6 +305,5 @@ describe('Card tests', () => {
     const popupPageNew = await popupNew.page();
     const passButton = await popupPageNew.$('.success');
     await passButton.click();
-    await page.close();
   });
 });
