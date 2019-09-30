@@ -48,7 +48,7 @@
           );
         }
       },
-      noCostEmi: ({ plan, provider }) => plan.subvention === 'merchant' || provider === 'zestmoney' && plan.duration === 3,
+      noCostEmi: ({ plan, provider }) => plan.subvention === 'merchant' || (provider === 'zestmoney' && plan.duration === 3),
       badge: ({ noCostEmi }) => noCostEmi ? 'No cost EMI' : false,
       isCardEmi: ({ provider }) => !provider,
       showInterest: ({ provider, isCardEmi }) => !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider),
