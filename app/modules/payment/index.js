@@ -907,6 +907,13 @@ export function getCardFlowsFromCache(cardNumber = '') {
 }
 
 /**
+ * Store ongoing flow request*
+ */
+var ongoingFlowRequest = {
+  iin: {},
+};
+
+/**
  * Gets the flows associated with a card.
  * @param {string} cardNumber
  * @param {Function} callback
@@ -929,6 +936,12 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
   }
 
   const iin = cardNumber.slice(0, 6);
+
+  if (ongoingFlowRequest.iin[iin]) {
+    return; //early exit
+  }
+  ongoingFlowRequest.iin[iin] = true;
+
   let url = makeAuthUrl(this, 'payment/flows');
 
   // append IIN and source as query to flows route
@@ -946,6 +959,7 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
   fetch.jsonp({
     url,
     callback: flows => {
+      delete ongoingFlowRequest.iin[iin];
       if (flows.error) {
         Analytics.track('flows:card:fetch:failure', {
           data: {
