@@ -6,8 +6,7 @@ WORKDIR /checkout_build
 
 RUN cd /checkout_build \
     && npm install \
-    && npm run test \
-    && npm run build \
+    && NODE_ENV=production npm run test \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
 FROM razorpay/containers:app-nginx-brotli

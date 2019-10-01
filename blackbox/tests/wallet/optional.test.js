@@ -22,6 +22,7 @@ describe('Basic wallet payment', () => {
     await delay(200);
     await page.click('.pay-btn');
 
+    return;
     await context.expectRequest();
     await context.respondJSON({
       type: 'otp',

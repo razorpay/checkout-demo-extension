@@ -9,7 +9,7 @@ describe('Netbanking tests', () => {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
-      timeout: 20,
+      timeout: 10,
     };
 
     const preferences = makePreferences();
@@ -19,7 +19,7 @@ describe('Netbanking tests', () => {
     await page.click('[tab=netbanking]');
     await page.select('#bank-select', 'SBIN');
 
-    await delay(2000);
+    await delay(200);
     await page.click('#footer');
 
     // context.popup();
@@ -27,7 +27,7 @@ describe('Netbanking tests', () => {
 
     expect(req.method).toEqual('POST');
     context.respondJSON({ error: { description: 'some error' } });
-    await delay(15000);
+    await delay(5000);
     expect(await page.$('[name=contact]')).not.toEqual(null);
     await delay(5000);
     expect(await page.$('[name=contact]')).toEqual(null);
