@@ -1,10 +1,9 @@
-const { openCheckout } = require('../checkout');
-const { makePreferences } = require('../actions/preferences');
-const { delay } = require('../util');
-const expect = require('chai').expect;
-const { handleFeeBearer } = require('../actions/common');
+const { openCheckout } = require('../../checkout');
+const { makePreferences } = require('../../actions/preferences');
+const { delay } = require('../../util');
+const { handleFeeBearer } = require('../../actions/common');
 
-describe('Card tests', async () => {
+describe.skip('Card tests', async () => {
   test('perform card transaction', async () => {
     const page = await browser.newPage();
     const options = {
@@ -66,7 +65,7 @@ describe('Card tests', async () => {
       errorMessage => errorMessage.textContent,
       errorMessage
     );
-    expect(text).to.eql('The payment has already been processed');
+    expect(text).toEqual('The payment has already been processed');
     const retryButton = await page.$('#fd-hide');
     await retryButton.click();
     await delay(500);
@@ -158,7 +157,7 @@ describe('Card tests', async () => {
       errorMessage => errorMessage.textContent,
       errorMessage
     );
-    expect(text).to.eql('The payment has already been processed');
+    expect(text).toEqual('The payment has already been processed');
     const retryButton = await page.$('#fd-hide');
     await retryButton.click();
     await delay(500);
@@ -241,7 +240,7 @@ describe('Card tests', async () => {
       orignalAmount => orignalAmount.textContent,
       orignalAmount
     );
-    expect(otpAmount).to.equal('₹ 100');
+    expect(otpAmount).toEqual('₹ 100');
     const payButton = await page.waitForSelector('.pay-btn');
     await payButton.click();
 
@@ -274,7 +273,7 @@ describe('Card tests', async () => {
       errorMessage => errorMessage.textContent,
       errorMessage
     );
-    expect(text).to.eql('The payment has already been processed');
+    expect(text).toEqual('The payment has already been processed');
     const retryButton = await page.$('#fd-hide');
     await retryButton.click();
     await delay(500);
