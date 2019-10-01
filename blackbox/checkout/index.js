@@ -67,19 +67,34 @@ async function passOptions({ page, options }) {
   await passMessage(page, { options });
 }
 
+let interceptorOptions;
 module.exports = {
   async openCheckout({ page, options, preferences }) {
-    await page.setRequestInterception(true);
+    if (interceptorOptions) {
+      // turn off the interceptor
+      interceptorOptions.toggle();
+      page.removeListener('request', cdnRequestHandler);
+    } else {
+      await page.setRequestInterception(true);
+    }
+
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutPublic);
     page.removeListener('request', checkoutRequestHandler);
     page.on('request', cdnRequestHandler);
 
+    if (interceptorOptions) {
+      // turn on interceptor
+      interceptorOptions.toggle();
+    } else {
+      interceptorOptions = interceptor(page);
+    }
+
     const returnObj = {
       page,
       options,
       preferences,
-      ...interceptor(page),
+      ...interceptorOptions,
       popup() {
         const targets = page.browserContext().targets();
         switch (targets.length) {

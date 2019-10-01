@@ -15,10 +15,12 @@ module.exports = {
   interceptor(page, pattern) {
     let resolver;
     let currentRequest = null;
+    let interceptorEnabled = true;
 
     function shouldIgnore(interceptedRequest) {
       const url = interceptedRequest.url();
       const ignoredUrl =
+        !interceptorEnabled ||
         url.startsWith('data') ||
         url.startsWith(cdnUrl) ||
         url.startsWith(lumberjackUrl);
@@ -58,6 +60,10 @@ module.exports = {
       currentRequest = resolver = null;
     }
 
+    function toggle() {
+      interceptorEnabled = !interceptorEnabled;
+    }
+
     async function respond(response) {
       await waitForRequest();
       currentRequest.respond(response);
@@ -82,6 +88,6 @@ module.exports = {
       return respond({ body });
     }
 
-    return { expectRequest, respondJSON, respondPlain, failRequest };
+    return { toggle, expectRequest, respondJSON, respondPlain, failRequest };
   },
 };
