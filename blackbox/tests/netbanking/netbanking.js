@@ -5,12 +5,9 @@ const assert = require('../assert');
 const { handleFeeBearer } = require('../actions/common');
 
 describe('Netbanking tests', () => {
-  beforeEach(async () => {
-    await jestPuppeteer.resetBrowser();
-    await jestPuppeteer.resetPage();
-  });
-
   test('perform netbaking transaction', async () => {
+    const page = await browser.newPage();
+
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -35,6 +32,7 @@ describe('Netbanking tests', () => {
   });
 
   test('perform netbanking transaction with fee bearer', async () => {
+    const page = await browser.newPage();
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 600,

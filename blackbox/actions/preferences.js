@@ -1,5 +1,4 @@
 const { interceptor } = require('../util');
-const assert = require('../assert');
 
 const netbanking = require('../data/banks.json');
 const wallet = require('../data/wallets.json');
@@ -27,36 +26,19 @@ async function sendPreferences({
   preferences,
 }) {
   await expectRequest(({ URL, params }) => {
-    assert.equal(
-      URL.pathname,
-      '/v1/preferences',
-      'preferences route should be v1/preferences'
-    );
+    expect(URL.pathname).toEqual('/v1/preferences');
+
     if (options.key) {
-      assert.equal(
-        options.key,
-        params.key_id,
-        'key_id should be present in preferences request'
-      );
+      expect(options.key).toEqual(params.key_id);
     } else {
-      assert.notOk(
-        params.key_id,
-        `key_id shouldn't be there in preferences request`
-      );
+      expect(params).not.toHaveProperty('key_id');
     }
+
     preferencesParams.forEach(param => {
       if (options[param]) {
-        assert.equal(
-          options[param],
-          params[param],
-          param + ' should be present in preferences request'
-        );
+        expect(options[param]).toEqual(params[param]);
       } else {
-        assert.notProperty(
-          params,
-          param,
-          param + ` shouldn't be there in preferences request`
-        );
+        expect(params).not.toHaveProperty(param);
       }
     });
   });

@@ -2,7 +2,6 @@ const path = require('path');
 const URL = require('url');
 const querystring = require('querystring');
 
-const assert = require('./assert');
 const { testDir, cdnUrl, lumberjackUrl } = require('./const');
 
 module.exports = {
@@ -28,7 +27,7 @@ module.exports = {
 
     page.on('request', interceptedRequest => {
       if (shouldIgnore(interceptedRequest)) return;
-      assert.isNull(currentRequest, 'No multiple ongoing requests');
+      expect(currentRequest).toBeNull();
       currentRequest = interceptedRequest;
       resolver && resolver(currentRequest);
     });

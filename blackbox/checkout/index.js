@@ -1,7 +1,6 @@
 const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl } = require('../const');
 const { interceptor } = require('../util');
-const assert = require('../assert');
 const { sendPreferences } = require('../actions/preferences');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';

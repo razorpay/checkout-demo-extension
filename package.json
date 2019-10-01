@@ -35,7 +35,7 @@
   },
   "scripts": {
     "test:unit": "./rollup.test.js | tap-difflet",
-    "test": "npm run test:unit && npm run build && jest blackbox/tests --runInBand",
+    "test": "npm run test:unit && npm run build && jest blackbox/tests --testTimeout=30000",
     "build": "$ rollup -c --environment prod && gulp && lintOutput app/js/generated/entry",
     "start": "$ rollup -cw & gulp watch; kill -9 $!"
   },
@@ -54,11 +54,9 @@
     "gulp-usemin": "^0.3.29",
     "istanbul": "^0.4.5",
     "jest": "^24.9.0",
-    "jest-puppeteer": "^4.3.0",
     "jshint": "2.10.2",
     "jshint-stylish": "^2.2.1",
     "mocha": "^6.2.0",
-    "module-alias": "^2.2.1",
     "puppeteer-core": "^1.20.0",
     "rollup-plugin-coverage": "^0.1.4",
     "run-sequence": "^2.2.1",
@@ -72,9 +70,6 @@
     "husky": "^1.0.0-rc.14",
     "prettier": "^1.18.2",
     "pretty-quick": "^1.11.1"
-  },
-  "_moduleAliases": {
-    "puppeteer": "node_modules/puppeteer-core"
   },
   "husky": {
     "hooks": {

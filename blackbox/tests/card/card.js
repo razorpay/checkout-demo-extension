@@ -4,12 +4,9 @@ const { delay } = require('../util');
 const expect = require('chai').expect;
 const { handleFeeBearer } = require('../actions/common');
 
-describe('Card tests', () => {
-  beforeEach(async () => {
-    await jestPuppeteer.resetBrowser();
-    await jestPuppeteer.resetPage();
-  });
+describe('Card tests', async () => {
   test('perform card transaction', async () => {
+    const page = await browser.newPage();
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -100,6 +97,7 @@ describe('Card tests', () => {
     await passButton.click();
   });
   test('perform card transaction with fee bearer', async () => {
+    const page = await browser.newPage();
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
