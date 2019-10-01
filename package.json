@@ -35,7 +35,7 @@
   },
   "scripts": {
     "test:unit": "./rollup.test.js | tap-difflet",
-    "test": "npm run test:unit && npm run build && jest --runInBand",
+    "test": "npm run test:unit && npm run build && jest blackbox/tests --runInBand",
     "build": "$ rollup -c --environment prod && gulp && lintOutput app/js/generated/entry",
     "start": "$ rollup -cw & gulp watch; kill -9 $!"
   },
@@ -43,6 +43,7 @@
     "url": "https://github.com/razorpay/checkout/issues"
   },
   "dependencies": {
+    "chai": "^4.2.0",
     "chalk": "^2.4.1",
     "fastify": "^1.11.2",
     "fastify-formbody": "^2.0.1",
@@ -52,9 +53,12 @@
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
     "istanbul": "^0.4.5",
+    "jest": "^24.9.0",
+    "jest-puppeteer": "^4.3.0",
     "jshint": "2.10.2",
     "jshint-stylish": "^2.2.1",
     "mocha": "^6.2.0",
+    "module-alias": "^2.2.1",
     "puppeteer-core": "^1.20.0",
     "rollup-plugin-coverage": "^0.1.4",
     "run-sequence": "^2.2.1",
@@ -65,11 +69,7 @@
   },
   "private": "true",
   "devDependencies": {
-    "chai": "^4.2.0",
     "husky": "^1.0.0-rc.14",
-    "jest": "^24.9.0",
-    "jest-puppeteer": "^4.3.0",
-    "module-alias": "^2.2.1",
     "prettier": "^1.18.2",
     "pretty-quick": "^1.11.1"
   },

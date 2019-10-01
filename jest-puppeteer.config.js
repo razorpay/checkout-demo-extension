@@ -1,10 +1,10 @@
+const isProd = process.env.NODE_ENV === 'production';
+
 module.exports = {
   launch: {
-    headless: true,
-    slowMo: 10,
+    headless: isProd,
+    slowMo: isProd ? 0 : 10,
     timeout: 3000,
-    executablePath:
-      process.env.CHROME_BIN ||
-      `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome`,
+    executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
   },
 };
