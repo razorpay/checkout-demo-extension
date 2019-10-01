@@ -11,7 +11,8 @@ describe('Basic wallet payment', () => {
     };
     const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
-    await page.type('[name=contact]', '9999988888');
+    // await delay(10000);
+    // await page.type('[name=contact]', '9999988888');
     await page.type('[name=email]', 'pro@rzp.com');
 
     await page.click('div[tab=wallet');
@@ -41,14 +42,6 @@ describe('Basic wallet payment', () => {
     await delay(800);
     await page.type('#otp', '5555');
     await delay(1200);
-    await page.click('.otp-btn');
-
-    await context.expectRequest(req => {});
-    await context.failRequest({ error: 'failed' });
-
-    const retryButton = await page.waitForSelector('#otp-action');
-    await retryButton.click();
-    await delay(200);
     await page.click('.otp-btn');
     await context.expectRequest(req => {});
     await context.respondJSON({

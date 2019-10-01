@@ -49,6 +49,7 @@ module.exports = {
   sendPreferences,
   makePreferences(overrides) {
     return {
+      options: {},
       methods: {
         ...card,
         wallet,
