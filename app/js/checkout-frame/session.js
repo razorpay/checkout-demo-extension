@@ -1958,7 +1958,7 @@ Session.prototype = {
       },
     });
 
-    var plansList = this.getCardlessEmiPlans(plans);
+    var plansList = this.getCardlessEmiPlans();
 
     this.emiPlansView.setPlans({
       plans: plansList,
@@ -2424,6 +2424,7 @@ Session.prototype = {
 
     $('#overlay-close').hide();
     hideOverlayMessage();
+    $('.omnichannel').hide(); // Hide the Google Pay logo
   },
 
   shake: function() {
@@ -5860,15 +5861,10 @@ Session.prototype = {
      * TODO: Add a feature check here
      */
     if (data.method === 'wallet') {
-      var hasPhonePeIntentFeature =
-        this.preferences.features && this.preferences.features.phonepe_intent;
-
-      var shouldTurnWalletToIntent =
-        hasPhonePeIntentFeature &&
-        discreet.Wallet.shouldTurnWalletToIntent(
-          data.wallet,
-          this.upi_intents_data
-        );
+      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
+        data.wallet,
+        this.upi_intents_data
+      );
 
       if (shouldTurnWalletToIntent) {
         data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
@@ -6049,7 +6045,8 @@ Session.prototype = {
           this.nativeotp &&
           discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
-            this.transformedTokens
+            this.transformedTokens,
+            this.get('key')
           )
         ) {
           shouldUseNativeOTP = true;
@@ -6804,6 +6801,10 @@ Session.prototype = {
     if (_.isArray(methods.wallet) && methods.wallet.length === 0) {
       methods.wallet = null;
     }
+
+    if (methods.paylater) {
+      methods.count++;
+    }
   },
 
   /**
@@ -6908,6 +6909,7 @@ Session.prototype = {
     var isOmni =
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
+      this.upiTab &&
       this.upiTab.get().selectedApp === 'gpay';
 
     return isOmni;
@@ -6994,9 +6996,6 @@ Session.prototype = {
       this.set('retry', false);
     }
 
-    // Non-INR payments are considered
-    this.international = this.get('currency') !== 'INR';
-
     /* In case of recurring set recurring as filter in saved cards */
     if (
       (session_options['prefill.method'] === 'emandate' &&
@@ -7079,6 +7078,10 @@ Session.prototype = {
     if (entityWithCurrency) {
       session_options.currency = entityWithCurrency.currency;
     }
+
+    // Non-INR payments are considered international
+    this.international =
+      (session_options.currency || this.get('currency')) !== 'INR';
 
     // Amount and currency have been updated, set EMI options
     this.setEmiOptions();
