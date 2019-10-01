@@ -4,23 +4,22 @@ const { delay } = require('../../util');
 const { handleFeeBearer } = require('../../actions/common');
 
 describe('Wallet tests', () => {
-  const options = {
-    key: 'rzp_test_1DP5mmOlF5G5ag',
-    amount: 20000,
-    personalization: false,
-  };
-  const preferences = makePreferences({
-    order: {
+  test('Wallet payment with partial payment', async () => {
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,
-      amount_due: 20000,
-      amount_paid: 0,
-      currency: 'INR',
-      first_payment_min_amount: null,
-      partial_payment: true,
-    },
-  });
-
-  test('Wallet ', async () => {
+      personalization: false,
+    };
+    const preferences = makePreferences({
+      order: {
+        amount: 20000,
+        amount_due: 20000,
+        amount_paid: 0,
+        currency: 'INR',
+        first_payment_min_amount: null,
+        partial_payment: true,
+      },
+    });
     const context = await openCheckout({ page, options, preferences });
     await page.type('[name=contact]', '9999988888');
     await page.type('[name=email]', 'pro@rzp.com');
@@ -61,15 +60,16 @@ describe('Wallet tests', () => {
       wallet: 'freecharge',
       merchant: 'RBL Bank',
     });
-    await delay(200);
+    await delay(800);
     const otpField = await page.waitForSelector('#otp');
     await otpField.type('5555');
+    await delay(800);
     const orignalAmount = await page.waitForSelector('.original-amount');
     const otpAmount = await page.evaluate(
       orignalAmount => orignalAmount.textContent,
       orignalAmount
     );
-    expect(otpAmount).to.equal('₹ 100');
+    expect(otpAmount).toEqual('₹ 100');
     const otpButton = await page.waitForSelector('.otp-btn');
     await otpButton.click();
     await context.expectRequest(req => {});
@@ -98,8 +98,9 @@ describe('Wallet tests', () => {
       wallet: 'freecharge',
       merchant: 'RBL Bank',
     });
-    await delay(200);
+    await delay(800);
     await otpField.type('5555');
+    await delay(800);
     await otpButton.click();
     await context.respondJSON({ razorpay_payment_id: 'pay_123' });
   });

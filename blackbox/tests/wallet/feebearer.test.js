@@ -43,6 +43,7 @@ describe('Wallet + FeeBearer', () => {
 
     await delay(800);
     await page.type('#otp', '5555');
+    await delay(800);
     await page.click('.otp-btn');
 
     await context.expectRequest(req => {});
@@ -71,7 +72,7 @@ describe('Wallet + FeeBearer', () => {
     });
     await delay(800);
     await page.type('#otp', '5555');
-    await delay(200);
+    await delay(800);
     await page.click('.otp-btn');
     await context.respondJSON({ razorpay_payment_id: 'pay_123' });
   });

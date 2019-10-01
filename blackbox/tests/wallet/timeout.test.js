@@ -80,7 +80,7 @@ describe('Wallet tests', () => {
     await otpField.type('5555');
     await delay(1000);
     expect(await page.$('[name=contact]')).not.toEqual(null);
-    await delay(11000);
+    await delay(13000);
     expect(await page.$('[name=contact]')).toEqual(null);
   });
 });
