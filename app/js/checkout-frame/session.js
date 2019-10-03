@@ -1590,9 +1590,7 @@ Session.prototype = {
 
     var prefilledbank = this.get('prefill.bank');
     var selectedBank =
-      prefilledbank && this.methods.netbanking[prefilledbank]
-        ? prefilledbank
-        : '';
+      prefilledbank && this.methods[method][prefilledbank] ? prefilledbank : '';
 
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
