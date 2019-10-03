@@ -7,6 +7,8 @@ const { testDir, cdnUrl, lumberjackUrl } = require('./const');
 module.exports = {
   delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
 
+  visible: el => !!el.getBoundingClientRect().width,
+
   /**
    * @param  {Page} puppeteer page to intercept requests on
    * @param  {RegExp} optional url pattern to match interceptor against
