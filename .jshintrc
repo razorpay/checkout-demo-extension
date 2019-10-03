@@ -4,6 +4,7 @@
 		"innerHeight": true,
 		"pageYOffset": true
 	},
+	"proto": true,
 	"-W001": true,
 	"expr": true,
 	"scripturl": true,
