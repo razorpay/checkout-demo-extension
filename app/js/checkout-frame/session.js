@@ -1588,10 +1588,11 @@ Session.prototype = {
       method = 'netbanking';
     }
 
-    var prefilledbank = this.get('prefill.bank') || '';
-    var selectedBank = this.methods.netbanking[prefilledbank]
-      ? prefilledbank
-      : '';
+    var prefilledbank = this.get('prefill.bank');
+    var selectedBank =
+      prefilledbank && this.methods.netbanking[prefilledbank]
+        ? prefilledbank
+        : '';
 
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
