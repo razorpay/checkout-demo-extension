@@ -28,13 +28,13 @@ async function handleFeeBearer(context, page) {
     display: {
       originalAmount: 600,
       original_amount: 600,
-      fees: 20.539999999999999,
-      razorpay_fee: 17.399999999999999,
-      tax: 3.1400000000000001,
-      amount: 620.53999999999996,
+      fees: 20.54,
+      razorpay_fee: 17.4,
+      tax: 3.14,
+      amount: 620.54,
     },
   });
-  const feeAmount11 = await page.$x('//*[@class = "fee-amount"]');
+  const feeAmount11 = await page.$$('.fee-amount');
   feeAmount = feeAmount11[0];
   expectedfeeAmount1 = '₹ 600';
   const feeAmount1 = await page.evaluate(

@@ -1,7 +1,6 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
 const { delay } = require('../../util');
-const { handleFeeBearer } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
   test('perform netbaking transaction', async () => {

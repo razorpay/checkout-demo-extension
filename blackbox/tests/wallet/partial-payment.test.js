@@ -50,10 +50,7 @@ describe('Wallet tests', () => {
         method: 'post',
         content: { next: ['resend_otp'] },
       },
-      version: 1,
       payment_id: 'pay_DLbzHmbxvcpY9o',
-      gateway:
-        'eyJpdiI6IlNVeTJxS3U4YmRNeU1KblFEY3Z4VFE9PSIsInZhbHVlIjoiZUJWMEJ3OHExaDFNY2xnWjFCbGpQQzN1OENlTXlOOW9iY1IwQSs2WE9aMD0iLCJtYWMiOiIyYWMxNjY5ZGViYTE2NTBlNTkyOTUwYjhhMDcwYzZlOTY3MzE1OTBkZDVkZjk2MDc3NTdlNDE2NmE3MzIzYjM0In0=',
       contact: '+919999999999',
       amount: '51.00',
       formatted_amount: '\u20b9 51',
@@ -88,10 +85,7 @@ describe('Wallet tests', () => {
         method: 'post',
         content: { next: ['resend_otp'] },
       },
-      version: 1,
       payment_id: 'pay_DLbzHmbxvcpY9o',
-      gateway:
-        'eyJpdiI6IlNVeTJxS3U4YmRNeU1KblFEY3Z4VFE9PSIsInZhbHVlIjoiZUJWMEJ3OHExaDFNY2xnWjFCbGpQQzN1OENlTXlOOW9iY1IwQSs2WE9aMD0iLCJtYWMiOiIyYWMxNjY5ZGViYTE2NTBlNTkyOTUwYjhhMDcwYzZlOTY3MzE1OTBkZDVkZjk2MDc3NTdlNDE2NmE3MzIzYjM0In0=',
       contact: '+919999999999',
       amount: '51.00',
       formatted_amount: '\u20b9 51',
