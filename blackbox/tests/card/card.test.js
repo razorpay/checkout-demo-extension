@@ -5,7 +5,6 @@ const { handleFeeBearer } = require('../../actions/common');
 
 describe.skip('Card tests', async () => {
   test('perform card transaction', async () => {
-    const page = await browser.newPage();
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -15,10 +14,9 @@ describe.skip('Card tests', async () => {
     const context = await openCheckout({ page, options, preferences });
     await page.type('[name=contact]', '9999988888');
     await page.type('[name=email]', 'pro@rzp.com');
-    const cardButton = await page.waitForSelector('div[tab="card"');
-    await cardButton.click();
+    await page.click('[tab=card');
 
-    await delay(1500);
+    await delay(200);
     const cardNum = await page.waitForSelector('#card_number');
     await cardNum.type('4111111111111111');
     await context.expectRequest();
@@ -27,13 +25,10 @@ describe.skip('Card tests', async () => {
       iframe: true,
       http_status_code: 200,
     });
-    const cardExp = await page.waitForSelector('#card_expiry');
-    await cardExp.type('12/55');
-    const cardName = await page.waitForSelector('#card_name');
-    await cardName.type('Sakshi Jain');
-    const cardCvv = await page.waitForSelector('#card_cvv');
-    await cardCvv.type('112');
-    const payButton = await page.waitForSelector('.pay-btn');
+    const cardExp = await page.type('#card_expiry', '12/55');
+    const cardName = await page.type('#card_name', 'Sakshi Jain');
+    const cardCvv = await page.type('#card_cvv', '112');
+    const payButton = await page.$('.pay-btn');
     await payButton.click();
 
     await context.expectRequest();
@@ -45,21 +40,16 @@ describe.skip('Card tests', async () => {
         method: 'get',
         content: [],
       },
-      version: 1,
       payment_id: 'pay_DLXKaJEF1T1KxC',
-      gateway:
-        'eyJpdiI6Ijh6TnJENVpmNjROcFVCUjFtR1JjVHc9PSIsInZhbHVlIjoid2J6R2pIVk5nSklrbVZzUStvZGJ2QXJEblVDNXlGZTFWcW1YanE0bGIzVT0iLCJtYWMiOiI4NGMwZWIwNzQzN2JjNWNkNzIxOWE5ZWEzNjFiYjVhNWYxY2VjOGE5MGVlZmE4ZDY3ZjI0ZDY5MWU0NjQxMjdlIn0=',
       amount: '\u20b9 51',
       image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-      magic: false,
     });
-    await delay(1500);
     const popup = context.popup();
 
     const popupPage = await popup.page();
     const failButton = await popupPage.$('.danger');
     await failButton.click();
-    await delay(1500);
+    await delay(200);
     const errorMessage = await page.$('#fd-t');
     const text = await page.evaluate(
       errorMessage => errorMessage.textContent,
@@ -80,21 +70,18 @@ describe.skip('Card tests', async () => {
         method: 'get',
         content: [],
       },
-      version: 1,
       payment_id: 'pay_DLXKaJEF1T1KxC',
-      gateway:
-        'eyJpdiI6Ijh6TnJENVpmNjROcFVCUjFtR1JjVHc9PSIsInZhbHVlIjoid2J6R2pIVk5nSklrbVZzUStvZGJ2QXJEblVDNXlGZTFWcW1YanE0bGIzVT0iLCJtYWMiOiI4NGMwZWIwNzQzN2JjNWNkNzIxOWE5ZWEzNjFiYjVhNWYxY2VjOGE5MGVlZmE4ZDY3ZjI0ZDY5MWU0NjQxMjdlIn0=',
       amount: '\u20b9 51',
       image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
       magic: false,
     });
-    await delay(1500);
     const popupNew = context.popup();
 
     const popupPageNew = await popupNew.page();
     const passButton = await popupPageNew.$('.success');
     await passButton.click();
   });
+
   test('perform card transaction with fee bearer', async () => {
     const page = await browser.newPage();
     const options = {
@@ -137,13 +124,9 @@ describe.skip('Card tests', async () => {
         method: 'get',
         content: [],
       },
-      version: 1,
       payment_id: 'pay_DLXKaJEF1T1KxC',
-      gateway:
-        'eyJpdiI6Ijh6TnJENVpmNjROcFVCUjFtR1JjVHc9PSIsInZhbHVlIjoid2J6R2pIVk5nSklrbVZzUStvZGJ2QXJEblVDNXlGZTFWcW1YanE0bGIzVT0iLCJtYWMiOiI4NGMwZWIwNzQzN2JjNWNkNzIxOWE5ZWEzNjFiYjVhNWYxY2VjOGE5MGVlZmE4ZDY3ZjI0ZDY5MWU0NjQxMjdlIn0=',
       amount: '\u20b9 51',
       image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-      magic: false,
     });
     await delay(1500);
     const popup = context.popup();
@@ -173,13 +156,9 @@ describe.skip('Card tests', async () => {
         method: 'get',
         content: [],
       },
-      version: 1,
       payment_id: 'pay_DLXKaJEF1T1KxC',
-      gateway:
-        'eyJpdiI6Ijh6TnJENVpmNjROcFVCUjFtR1JjVHc9PSIsInZhbHVlIjoid2J6R2pIVk5nSklrbVZzUStvZGJ2QXJEblVDNXlGZTFWcW1YanE0bGIzVT0iLCJtYWMiOiI4NGMwZWIwNzQzN2JjNWNkNzIxOWE5ZWEzNjFiYjVhNWYxY2VjOGE5MGVlZmE4ZDY3ZjI0ZDY5MWU0NjQxMjdlIn0=',
       amount: '\u20b9 51',
       image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-      magic: false,
     });
     await delay(1500);
     const popupNew = context.popup();
@@ -253,13 +232,9 @@ describe.skip('Card tests', async () => {
         method: 'get',
         content: [],
       },
-      version: 1,
       payment_id: 'pay_DLXKaJEF1T1KxC',
-      gateway:
-        'eyJpdiI6Ijh6TnJENVpmNjROcFVCUjFtR1JjVHc9PSIsInZhbHVlIjoid2J6R2pIVk5nSklrbVZzUStvZGJ2QXJEblVDNXlGZTFWcW1YanE0bGIzVT0iLCJtYWMiOiI4NGMwZWIwNzQzN2JjNWNkNzIxOWE5ZWEzNjFiYjVhNWYxY2VjOGE5MGVlZmE4ZDY3ZjI0ZDY5MWU0NjQxMjdlIn0=',
       amount: '\u20b9 51',
       image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-      magic: false,
     });
     await delay(1500);
     const popup = context.popup();
@@ -288,13 +263,9 @@ describe.skip('Card tests', async () => {
         method: 'get',
         content: [],
       },
-      version: 1,
       payment_id: 'pay_DLXKaJEF1T1KxC',
-      gateway:
-        'eyJpdiI6Ijh6TnJENVpmNjROcFVCUjFtR1JjVHc9PSIsInZhbHVlIjoid2J6R2pIVk5nSklrbVZzUStvZGJ2QXJEblVDNXlGZTFWcW1YanE0bGIzVT0iLCJtYWMiOiI4NGMwZWIwNzQzN2JjNWNkNzIxOWE5ZWEzNjFiYjVhNWYxY2VjOGE5MGVlZmE4ZDY3ZjI0ZDY5MWU0NjQxMjdlIn0=',
       amount: '\u20b9 51',
       image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-      magic: false,
     });
     await delay(1500);
     const popupNew = context.popup();
