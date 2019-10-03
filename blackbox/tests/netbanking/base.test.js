@@ -1,6 +1,16 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
+const {
+  assertHomePage,
+  fillUserDetails,
+  assertPaymentMethods,
+  selectPaymentMethod,
+  selectBank,
+  assertNetbankingPage,
+  submit,
+  failRequestwithErrorMessage,
+  verifyErrorMessage,
+} = require('../../actions/common');
 
 describe('Netbanking tests', () => {
   test('perform netbaking transaction', async () => {
@@ -11,17 +21,16 @@ describe('Netbanking tests', () => {
     };
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
-    await page.type('[name=contact]', '9999988888');
-    await page.type('[name=email]', 'pro@rzp.com');
-    await page.click('[tab=netbanking]');
-    await page.select('#bank-select', 'SBIN');
-    await delay(2000);
-    await page.click('#footer');
+    await assertHomePage(context, true, true);
+    await fillUserDetails(context, true);
+    await assertPaymentMethods(context);
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
+    await submit(context);
 
-    // context.popup();
-    let req = await context.expectRequest();
-
-    expect(req.method).toEqual('POST');
-    context.respondJSON({ error: { description: 'some error' } });
+    const expectedErrorMeassage = 'Payment failed';
+    await failRequestwithErrorMessage(context, expectedErrorMeassage);
+    await verifyErrorMessage(context, expectedErrorMeassage);
   });
 });

@@ -1,6 +1,6 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay, visible } = require('../../util');
+const { assertHomePage } = require('../../actions/common');
 
 describe('Basic wallet payment', () => {
   test('Perform wallet transaction', async () => {
@@ -11,7 +11,6 @@ describe('Basic wallet payment', () => {
     };
     const preferences = makePreferences({ optional: ['contact', 'email'] });
     const context = await openCheckout({ page, options, preferences });
-    expect(await page.$eval('[name=contact]', visible)).toEqual(false);
-    expect(await page.$eval('[name=email]', visible)).toEqual(false);
+    await assertHomePage(context, false, false);
   });
 });

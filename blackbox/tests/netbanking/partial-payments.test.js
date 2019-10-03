@@ -1,7 +1,18 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
-const { handleFeeBearer } = require('../../actions/common');
+const {
+  assertHomePage,
+  fillUserDetails,
+  assertPaymentMethods,
+  selectPaymentMethod,
+  assertNetbankingPage,
+  selectBank,
+  submit,
+  handlePartialPayment,
+  verifyPartialAmount,
+  failRequestwithErrorMessage,
+  verifyErrorMessage,
+} = require('../../actions/common');
 
 describe('Netbanking tests', () => {
   test('perform netbanking transaction with partial payments', async () => {
@@ -21,45 +32,19 @@ describe('Netbanking tests', () => {
       },
     });
     const context = await openCheckout({ page, options, preferences });
-    await page.type('[name=contact]', '9999988888');
-    await page.type('[name=email]', 'pro@rzp.com');
+    await assertHomePage(context, true, true);
+    await fillUserDetails(context, true);
+    await handlePartialPayment(context, '100');
+    await assertPaymentMethods(context);
 
-    const makePartialCheckBox = await page.waitForSelector('.checkbox');
-    await makePartialCheckBox.click();
-    const amountValue = await page.waitForSelector('#amount-value');
-    await amountValue.type('100');
-    const nextButton = await page.waitForSelector('#next-button');
-    await nextButton.click();
-    await delay(500);
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
+    await verifyPartialAmount(context, '₹ 100');
+    await submit(context);
 
-    await page.click('[tab=netbanking]');
-    await page.select('#bank-select', 'SBIN');
-    const orignalAmount = await page.waitForSelector('.original-amount');
-    const otpAmount = await page.evaluate(
-      orignalAmount => orignalAmount.textContent,
-      orignalAmount
-    );
-    expect(otpAmount).toEqual('₹ 100');
-
-    await delay(200);
-    await page.click('#footer');
-
-    // await handleFeeBearer(context, page);
-
-    context.popup();
-
-    let req = await context.expectRequest();
-    expect(req.method).toEqual('POST');
-
-    const expectedErrorMeassage = 'some error';
-    await context.respondJSON({
-      error: { description: expectedErrorMeassage },
-    });
-    const messageDiv = await page.waitForSelector('#fd-t');
-    const messageText = await page.evaluate(
-      messageDiv => messageDiv.textContent,
-      messageDiv
-    );
-    expect(messageText).toEqual(expectedErrorMeassage);
+    const expectedErrorMeassage = 'Payment failed';
+    await failRequestwithErrorMessage(context, expectedErrorMeassage);
+    await verifyErrorMessage(context, expectedErrorMeassage);
   });
 });

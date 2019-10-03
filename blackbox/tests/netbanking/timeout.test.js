@@ -1,6 +1,17 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
 const { delay } = require('../../util');
+const {
+  assertHomePage,
+  fillUserDetails,
+  assertPaymentMethods,
+  selectPaymentMethod,
+  selectBank,
+  assertNetbankingPage,
+  submit,
+  handleValidationRequest,
+  verifyTimeout,
+} = require('../../actions/common');
 
 describe('Netbanking tests', () => {
   test('perform netbaking transaction with timeout enabled', async () => {
@@ -13,22 +24,15 @@ describe('Netbanking tests', () => {
 
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
-    await page.type('[name=contact]', '9999988888');
-    await page.type('[name=email]', 'pro@rzp.com');
-    await page.click('[tab=netbanking]');
-    await page.select('#bank-select', 'SBIN');
+    await assertHomePage(context, true, true);
+    await fillUserDetails(context, true);
+    await assertPaymentMethods(context);
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
+    await submit(context);
 
-    await delay(200);
-    await page.click('#footer');
-
-    // context.popup();
-    let req = await context.expectRequest();
-
-    expect(req.method).toEqual('POST');
-    context.respondJSON({ error: { description: 'some error' } });
-    await delay(5000);
-    expect(await page.$('[name=contact]')).not.toEqual(null);
-    await delay(5000);
-    expect(await page.$('[name=contact]')).toEqual(null);
+    await handleValidationRequest(context, 'fail');
+    await verifyTimeout(context, 'netbanking');
   });
 });
