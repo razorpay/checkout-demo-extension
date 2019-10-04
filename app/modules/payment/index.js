@@ -216,7 +216,7 @@ export default function Payment(data, params = {}, r) {
       if (data.method === 'wallet') {
         if (isPowerWallet(data.wallet)) {
           /* If contact or email are missing, we need to ask for it in popup */
-          if (data.contact && (this.optional.email || data.email)) {
+          if (data.contact && data.email) {
             avoidPopup = true;
           }
         }

@@ -14,7 +14,7 @@
         </div>
         {#if qrImage}
           <div class="qr-image">
-            <img alt="QR" src="{qrImage}" on:load="set({ loading: false })" />
+            <img alt="QR" src="{qrImage}" on:load="qrLoaded()" />
           </div>
         {/if}
      {/if}
@@ -109,6 +109,8 @@ img {
   import { RazorpayConfig } from 'common/Razorpay';
   import { processInstrument } from 'checkoutframe/personalization';
   import DowntimesStore from 'checkoutstore/downtimes';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   export default {
     components: {
@@ -231,6 +233,16 @@ img {
           .on('payment.success', onSuccess)
           .on('payment.error', _Func.bind(this.onError, this));
       },
+
+      qrLoaded () {
+        this.set({
+          loading: false
+        });
+
+        Analytics.track('upi:qr', {
+          type: AnalyticsTypes.RENDER
+        });
+      }
     },
   };
 </script>
