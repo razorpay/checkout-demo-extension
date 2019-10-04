@@ -7,7 +7,7 @@
       <slot></slot>
     </div>
     <div class="attachment-remove">
-      <button type="button" on:click="fire('remove', event)">&times;</button>
+      <button type="button" on:click="fire('remove', event)" aria-label="Remove attachment">&times;</button>
     </div>
   </Stack>
 </div>
