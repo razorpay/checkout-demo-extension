@@ -652,6 +652,14 @@ function hideFeeWrap() {
 
 function hideOverlayMessage() {
   if (!hideEmi() && !hideFeeWrap()) {
+    var session = SessionManager.getSession();
+
+    if (session.tab === 'nach') {
+      if (!session.nachScreen.shouldHideOverlay()) {
+        return;
+      }
+    }
+
     if (
       $('#confirmation-dialog').hasClass('animate') ||
       gel('options-wrap').children.length
@@ -1641,6 +1649,7 @@ Session.prototype = {
     this.setOtpScreen();
     this.setUpiTab();
     this.setPayoutsScreen();
+    this.setNach();
     this.setBankTransfer();
   },
 
@@ -1822,6 +1831,22 @@ Session.prototype = {
     PayLaterStore.otpVerified = false;
 
     this.preSubmit();
+  },
+
+  /**
+   * Adds the Nach screen to DOM
+   */
+  setNach: function() {
+    var isNachEnabled = this.nach;
+
+    if (isNachEnabled) {
+      this.nachScreen = new discreet.NachScreen({
+        target: _Doc.querySelector('#nach-wrap'),
+        data: {
+          session: this,
+        },
+      });
+    }
   },
 
   setBankTransfer: function() {
@@ -2294,14 +2319,21 @@ Session.prototype = {
     if (this.methods.count === 1) {
       var self = this;
       /* Please don't change the order, this code is order senstive */
-      ['card', 'emi', 'netbanking', 'emandate', 'upi', 'wallet', 'paypal'].some(
-        function(methodName) {
-          if (self.methods[methodName]) {
-            self.setOneMethod(methodName);
-            return true;
-          }
+      [
+        'card',
+        'emi',
+        'netbanking',
+        'emandate',
+        'nach',
+        'upi',
+        'wallet',
+        'paypal',
+      ].some(function(methodName) {
+        if (self.methods[methodName]) {
+          self.setOneMethod(methodName);
+          return true;
         }
-      );
+      });
     }
 
     if (this.upiTpv) {
@@ -4019,6 +4051,10 @@ Session.prototype = {
       this.methods.cardless_emi
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'nach') {
+      if (this.nachScreen.onBack()) {
+        return;
+      }
     } else if (this.tab === 'bank_transfer') {
       if (this.bankTransferView.onBack()) {
         return;
@@ -4235,6 +4271,10 @@ Session.prototype = {
       if (selectedInstrument) {
         $('#body').addClass('sub');
       }
+    }
+
+    if (tab === 'nach') {
+      this.nachScreen.onShown();
     }
 
     if (tab === 'bank_transfer') {
@@ -5938,16 +5978,6 @@ Session.prototype = {
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
 
-    var shouldContinue = true;
-
-    if (this.tab === 'bank_transfer') {
-      shouldContinue = this.bankTransferView.shouldSubmit();
-    }
-
-    if (!shouldContinue) {
-      return;
-    }
-
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
@@ -5975,6 +6005,21 @@ Session.prototype = {
     }
 
     var that = this;
+
+    var shouldContinue = true;
+
+    if (this.tab === 'nach') {
+      shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (this.tab === 'bank_transfer') {
+      shouldContinue = this.bankTransferView.shouldSubmit();
+    }
+
+    if (!shouldContinue) {
+      return;
+    }
+
     var session = this;
     var request = {
       feesRedirect: preferences.fee_bearer && !('fee' in data),
@@ -6601,6 +6646,10 @@ Session.prototype = {
         this.emiScreenView.destroy();
       }
 
+      if (this.nachScreen) {
+        this.nachScreen.destroy();
+      }
+
       if (this.bankTransferView) {
         this.bankTransferView.destroy();
       }
@@ -6744,6 +6793,19 @@ Session.prototype = {
         if (!amount) {
           delete availMethods.card;
         }
+      }
+
+      /* paper nach */
+      if (
+        availMethods.nach &&
+        preferences.order &&
+        preferences.order.method === 'nach'
+      ) {
+        availMethods = {
+          nach: true,
+          count: 1,
+        };
+        this.nach = true;
       }
     }
 
@@ -6889,9 +6951,17 @@ Session.prototype = {
       methods.count++;
     }
 
-    /* Emandate only works on amount of 0 as of now */
-    if (amount > 0 && methods.emandate) {
-      methods.emandate = false;
+    /**
+     * Emandate and Paper Nach only work on amount of 0
+     */
+    if (amount > 0) {
+      if (methods.emandate) {
+        methods.emandate = false;
+      }
+
+      if (methods.nach) {
+        methods.nach = false;
+      }
     }
 
     /* enable or disable netbanking tab on the basis of preferences */
@@ -7428,6 +7498,8 @@ Session.prototype = {
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
+
+  hideOverlayMessage: hideOverlayMessage,
 };
 
 function commenceECOD(session) {
