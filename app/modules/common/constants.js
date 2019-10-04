@@ -54,6 +54,7 @@ export const TAB_TITLES = {
   emandate: 'Bank Account',
   emi: 'EMI',
   emiplans: 'EMI Plans',
+  nach: 'NACH',
   netbanking: 'Netbanking',
   paylater: 'Pay Later',
   paypal: 'PayPal',
@@ -109,6 +110,7 @@ export const AVAILABLE_METHODS = [
   'paylater',
   'paypal',
   'bank_transfer',
+  'nach',
 ];
 
 /* VPA regex, copied from API */
