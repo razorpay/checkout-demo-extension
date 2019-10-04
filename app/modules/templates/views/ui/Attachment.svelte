@@ -21,8 +21,12 @@
     background-color: #F6FAFF;
   }
 
+  .attachment > :global(.stack) {
+    position: relative;
+    padding-right: 24px;
+  }
+
   .attachment-icon {
-    flex-shrink: 0;
     margin-right: 8px;
 
     svg {
@@ -32,11 +36,13 @@
   }
 
   .attachment-item {
-    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .attachment-remove {
-    flex-shrink: 0;
+    position: absolute;
+    right: 0;
 
     button {
       display: block;
