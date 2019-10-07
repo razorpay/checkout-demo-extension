@@ -1,28 +1,95 @@
+const path = require('path');
+const URL = require('url');
+const querystring = require('querystring');
+
+const { testDir, cdnUrl, lumberjackUrl } = require('./const');
+
 module.exports = {
   delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
-  el: {
-    isVisible: async $el => {
-      const { width, height } = await $el.boundingBox();
 
-      return width && height;
-    },
-  },
-  apiUrl: 'http://localhost:3000/api/',
-  assertObject: function(input, expected) {
-    const expectedKeys = Object.getOwnPropertyNames(expected);
-    for (const key of expectedKeys) {
-      if (!input.hasOwnProperty(key)) {
-        throw new Error(`"${key}" is missing.`);
+  visible: el => !!el.getBoundingClientRect().width,
+
+  /**
+   * @param  {Page} puppeteer page to intercept requests on
+   * @param  {RegExp} optional url pattern to match interceptor against
+   * @return {Object} containg operations to perform on intercepted request
+   */
+  interceptor(page, pattern) {
+    let resolver;
+    let currentRequest = null;
+    let interceptorEnabled = true;
+
+    function shouldIgnore(interceptedRequest) {
+      const url = interceptedRequest.url();
+      const ignoredUrl =
+        !interceptorEnabled ||
+        url.startsWith('data') ||
+        url.startsWith(cdnUrl) ||
+        url.startsWith(lumberjackUrl);
+      if (ignoredUrl || (pattern && !pattern.test(url))) return true;
+    }
+
+    page.on('request', interceptedRequest => {
+      if (shouldIgnore(interceptedRequest)) return;
+      expect(currentRequest).toBeNull();
+      currentRequest = interceptedRequest;
+      resolver && resolver(currentRequest);
+    });
+
+    async function waitForRequest() {
+      if (currentRequest) {
+        return Promise.resolve(currentRequest);
+      } else {
+        return new Promise(resolve => (resolver = resolve));
       }
     }
 
-    const inputKeys = Object.getOwnPropertyNames(input);
-    for (const key of inputKeys) {
-      if (!expected.hasOwnProperty(key)) {
-        throw new Error(`"${key}" is not required/should not be sent.`);
-      }
+    async function expectRequest() {
+      await waitForRequest();
+      const url = currentRequest.url();
+      const parsedURL = URL.parse(url);
+      return {
+        headers: currentRequest.headers(),
+        method: currentRequest.method(),
+        body: currentRequest.postData(),
+        url,
+        URL: parsedURL,
+        params: querystring.parse(parsedURL.query),
+      };
     }
 
-    return true;
+    function reset() {
+      currentRequest = resolver = null;
+    }
+
+    function toggle() {
+      interceptorEnabled = !interceptorEnabled;
+    }
+
+    async function respond(response) {
+      await waitForRequest();
+      currentRequest.respond(response);
+      reset();
+    }
+
+    function failRequest(body) {
+      return respond({
+        status: 400,
+        body: JSON.stringify(body),
+      });
+    }
+
+    function respondJSON(body) {
+      return respond({
+        contentType: 'application/json',
+        body: JSON.stringify(body),
+      });
+    }
+
+    function respondPlain(body) {
+      return respond({ body });
+    }
+
+    return { toggle, expectRequest, respondJSON, respondPlain, failRequest };
   },
 };

@@ -1,0 +1,22 @@
+const NodeEnvironment = require('jest-environment-node');
+const puppeteer = require('puppeteer-core');
+const isProd = process.env.NODE_ENV === 'production';
+
+class PuppeteerEnvironment extends NodeEnvironment {
+  async setup() {
+    const browser = await puppeteer.launch({
+      executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
+      args: ['--no-sandbox'],
+      headless: isProd,
+      // devtools: true,
+    });
+    const pages = await browser.pages();
+    this.global.page = pages[0];
+  }
+
+  async teardown() {
+    await this.global.page.browser().close();
+  }
+}
+
+module.exports = PuppeteerEnvironment;
