@@ -329,14 +329,14 @@
 
   $: showOtherMethodsDirectly = AVAILABLE_METHODS.length === 1;
 
-  export function trackMethodSelection(data = {}) {
+  function trackMethodSelection(data = {}) {
     Analytics.track('p13:method:select', {
       type: AnalyticsTypes.BEHAV,
       data,
     });
   }
 
-  export function trackEducationClick() {
+  function trackEducationClick() {
     Analytics.track('p13n:education:click', {
       type: AnalyticsTypes.BEHAV,
     });

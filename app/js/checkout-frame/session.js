@@ -1624,9 +1624,6 @@ Session.prototype = {
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
         target: gel('upi-svelte-wrap'),
-        props: {
-          methods: this.methods,
-        },
       });
     }
   },

@@ -14,6 +14,7 @@
   export let type = '';
   export let icon = null;
   export let arrowText = null;
+  export let title = '';
 
   const dispatch = createEventDispatcher();
 

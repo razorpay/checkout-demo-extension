@@ -19,6 +19,7 @@
   export let visible = false;
   export let standalone = false;
   export let instruments = [];
+  export let animate = false;
 
   // Computed
   export let methods;

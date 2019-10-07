@@ -33,7 +33,7 @@
   import Screen from 'templates/layouts/Screen.svelte';
 
   // Props
-  export let selectedApp;
+  export let selectedApp = undefined;
   export let preferIntent = true;
   export let useWebPaymentsApi = false;
   export let qrEnabled = false;
@@ -46,7 +46,7 @@
   export let qrIcon;
   export let tab = 'upi';
   export let pattern = '.+';
-  export let focused;
+  export let focused = false;
 
   // Refs
   export let intentView = null;
@@ -54,7 +54,7 @@
   export let vpaField = null;
 
   // Computed
-  export let selectedAppData;
+  export let selectedAppData = null;
   export let intent;
   export let isGPaySelected;
   export let pspHandle;
@@ -122,8 +122,9 @@
   };
 
   $: selectedAppData = _Arr.find(topUpiApps, item => item.id === selectedApp);
-  $: intent =
-    !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0;
+  $: intent = Boolean(
+    !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0
+  );
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
@@ -478,10 +479,7 @@
         {showRecommendedUPIApp} />
     {:else if selectedApp === undefined || isGPaySelected}
       <div class="legend left">Select a UPI app</div>
-      <Grid
-        items={topUpiApps}
-        on:select={onUpiAppSelection}
-        selected={selectedApp} />
+      <Grid items={topUpiApps} on:select={onUpiAppSelection} />
     {:else}
       <div class="legend left">Selected UPI app</div>
       <Card>
