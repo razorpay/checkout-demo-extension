@@ -18,7 +18,7 @@
   export let focusOnCreate = false;
 
   // Refs
-  export let vpaField;
+  export let vpaField = null;
 
   // Computed
   export let pattern;

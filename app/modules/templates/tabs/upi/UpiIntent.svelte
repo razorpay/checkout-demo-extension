@@ -20,7 +20,7 @@
   export let showableApps;
 
   // Refs
-  export let vpaField;
+  export let vpaField = null;
 
   const session = getSession();
   let otherAppsIcon = session.themeMeta.icons.othermethods;

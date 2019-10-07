@@ -19,7 +19,7 @@
   export let error = null;
 
   // Refs
-  export let neftDetails;
+  export let neftDetails = null;
 
   const session = getSession();
   const footerButtons = {

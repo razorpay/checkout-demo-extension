@@ -10,7 +10,7 @@
   export let align = ['right'];
 
   // Refs
-  export let tooltip;
+  export let tooltip = null;
 
   function isWithinBounds(parent, child) {
     const rects = {

@@ -22,7 +22,7 @@
   export let on = {};
 
   // Refs
-  export let input;
+  export let input = null;
 
   // Computed
   export let inputWidth;

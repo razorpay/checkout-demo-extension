@@ -23,8 +23,8 @@
   export let identifier;
 
   // Refs
-  export let wrap;
-  export let input;
+  export let wrap = null;
+  export let input = null;
 
   const session = getSession();
 

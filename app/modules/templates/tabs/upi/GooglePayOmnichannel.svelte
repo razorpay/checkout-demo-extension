@@ -19,7 +19,7 @@
   export let checked = true;
 
   // Refs
-  export let phoneField;
+  export let phoneField = null;
 
   const dispatch = createEventDispatcher();
   const session = getSession();

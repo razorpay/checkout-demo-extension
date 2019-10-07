@@ -49,9 +49,9 @@
   export let focused;
 
   // Refs
-  export let intentView;
-  export let omnichannelField;
-  export let vpaField;
+  export let intentView = null;
+  export let omnichannelField = null;
+  export let vpaField = null;
 
   // Computed
   export let selectedAppData;

@@ -14,8 +14,8 @@
   export let focusOnCreate;
 
   // Refs
-  export let vpaField;
-  export let googlePayPspHandle;
+  export let vpaField = null;
+  export let googlePayPspHandle = null;
 
   const dispatch = createEventDispatcher();
 

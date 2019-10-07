@@ -7,8 +7,8 @@
   export let confirmInvalid = false;
 
   // Refs
-  export let accountNumberField;
-  export let confirmAccountNumberField;
+  export let accountNumberField = null;
+  export let confirmAccountNumberField = null;
 
   export function validateConfirmAccount() {
     const value = accountNumberField.getValue();

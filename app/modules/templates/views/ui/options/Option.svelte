@@ -14,7 +14,7 @@
   export let optionClasses;
 
   // Refs
-  export let container;
+  export let container = null;
 
   const dispatch = createEventDispatcher();
 
