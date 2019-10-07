@@ -26,7 +26,6 @@ import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
-import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import MethodsList from 'components/MethodsList';
@@ -148,7 +147,6 @@ export default {
   otpView,
   PayLaterView,
   Curtain,
-  OptionsList,
   commonBanks,
   timer: _.timer,
   QRScreen,

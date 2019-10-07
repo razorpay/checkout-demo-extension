@@ -25,7 +25,6 @@ var preferences = window.preferences,
   PreferencesStore = discreet.PreferencesStore,
   DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
-  OptionsList = discreet.OptionsList,
   UPIUtils = discreet.UPIUtils,
   Payouts = discreet.Payouts,
   _Arr = discreet._Arr,
@@ -3119,8 +3118,6 @@ Session.prototype = {
       if ($('#confirmation-dialog').hasClass('animate')) {
         return;
       }
-
-      OptionsList.hide();
 
       this.hideErrorMessage(e);
     });
