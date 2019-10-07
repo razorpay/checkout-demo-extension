@@ -1,0 +1,17 @@
+{
+  "card": true,
+  "debit_card": true,
+  "credit_card": true,
+  "prepaid_card": true,
+  "card_networks": {
+    "AMEX": 1,
+    "DICL": 1,
+    "MC": 1,
+    "MAES": 1,
+    "VISA": 1,
+    "JCB": 1,
+    "RUPAY": 1,
+    "BAJAJ": 0
+  },
+  "amex": true
+}
