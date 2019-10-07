@@ -5,7 +5,7 @@
 
   // Props
   export let cards = [];
-  export let on;
+  export let on = {};
 
   export function onViewPlans(event) {
     if (on.viewPlans) {

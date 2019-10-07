@@ -10,7 +10,7 @@
   export let plans;
   export let amount;
   export let provider = null;
-  export let on;
+  export let on = {};
 
   // Computed
   export let showActions;

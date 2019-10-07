@@ -5,7 +5,7 @@
 
   // Props
   export let providers = [];
-  export let on;
+  export let on = {};
 
   export function select(event) {
     const { select = _Func.noop } = on;
