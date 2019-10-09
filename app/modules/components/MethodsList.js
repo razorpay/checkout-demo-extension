@@ -152,7 +152,23 @@ export default class MethodsList {
      */
     let noOfInstrumentsToShow = 2;
     if (isMobile()) {
-      noOfInstrumentsToShow = 3;
+      /**
+       * We want to show 3 insturments on mobile devices, since we have more height.
+       * But, to show 3 instruments, we need to have at least 590px worth of height.
+       * Otherwise the Pay button will overlap the "Other Methods" button.
+       *
+       * So, we'll get the number of instruments to show based on the current screen height.
+       *
+       * This can be removed once switched to a list view of payment methods.
+       */
+
+      if (global.innerHeight >= 590) {
+        noOfInstrumentsToShow = 3;
+      } else if (global.innerHeight >= 545) {
+        noOfInstrumentsToShow = 2;
+      } else {
+        noOfInstrumentsToShow = 1;
+      }
     }
 
     /* Only allow for available methods */

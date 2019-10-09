@@ -12,6 +12,8 @@
   import { processInstrument } from 'checkoutframe/personalization';
   import DowntimesStore from 'checkoutstore/downtimes';
   import { getSession } from 'sessionmanager';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   // Props
   export let view = 'qr';
@@ -76,6 +78,14 @@
     paymentData.fee = bearer.fee;
 
     createPayment();
+  }
+
+  function qrLoaded() {
+    loading = false;
+
+    Analytics.track('upi:qr', {
+      type: AnalyticsTypes.RENDER,
+    });
   }
 
   function createPayment() {
@@ -194,7 +204,7 @@
       </div>
       {#if qrImage}
         <div class="qr-image">
-          <img alt="QR" src={qrImage} on:load={() => (loading = false)} />
+          <img alt="QR" src={qrImage} on:load={qrLoaded} />
         </div>
       {/if}
     {/if}

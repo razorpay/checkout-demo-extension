@@ -1,0 +1,99 @@
+{
+  "card": {
+    "credit": ["MasterCard", "Visa"]
+  },
+  "emandate": {
+    "UTIB": {
+      "auth_types": ["netbanking"],
+      "name": "Axis Bank"
+    },
+    "BARB_R": {
+      "auth_types": ["netbanking"],
+      "name": "Bank of Baroda - Retail Banking"
+    },
+    "MAHB": {
+      "auth_types": ["netbanking"],
+      "name": "Bank of Maharashtra"
+    },
+    "CBIN": {
+      "auth_types": ["netbanking"],
+      "name": "Central Bank of India"
+    },
+    "CIUB": {
+      "auth_types": ["netbanking"],
+      "name": "City Union Bank"
+    },
+    "DEUT": {
+      "auth_types": ["netbanking"],
+      "name": "Deutsche Bank"
+    },
+    "ESFB": {
+      "auth_types": ["netbanking"],
+      "name": "Equitas Small Finance Bank"
+    },
+    "FDRL": {
+      "auth_types": ["netbanking"],
+      "name": "Federal Bank"
+    },
+    "HDFC": {
+      "auth_types": ["netbanking"],
+      "name": "HDFC Bank"
+    },
+    "ICIC": {
+      "auth_types": ["netbanking"],
+      "name": "ICICI Bank"
+    },
+    "IBKL": {
+      "auth_types": ["netbanking"],
+      "name": "IDBI"
+    },
+    "IDFB": {
+      "auth_types": ["netbanking"],
+      "name": "IDFC FIRST Bank"
+    },
+    "IOBA": {
+      "auth_types": ["netbanking"],
+      "name": "Indian Overseas Bank"
+    },
+    "INDB": {
+      "auth_types": ["netbanking"],
+      "name": "Indusind Bank"
+    },
+    "KKBK": {
+      "auth_types": ["netbanking"],
+      "name": "Kotak Mahindra Bank"
+    },
+    "PYTM": {
+      "auth_types": ["netbanking"],
+      "name": "Paytm Payments Bank"
+    },
+    "PUNB_R": {
+      "auth_types": ["netbanking"],
+      "name": "Punjab National Bank - Retail Banking"
+    },
+    "RATN": {
+      "auth_types": ["netbanking"],
+      "name": "RBL Bank"
+    },
+    "SIBL": {
+      "auth_types": ["netbanking"],
+      "name": "South Indian Bank"
+    },
+    "SBIN": {
+      "auth_types": ["netbanking"],
+      "name": "State Bank of India"
+    },
+    "TMBL": {
+      "auth_types": ["netbanking"],
+      "name": "Tamilnadu Mercantile Bank"
+    },
+    "USFB": {
+      "auth_types": ["netbanking"],
+      "name": "Ujjivan Small Finance Bank"
+    },
+    "YESB": {
+      "auth_types": ["netbanking"],
+      "name": "Yes Bank"
+    }
+  }
+}

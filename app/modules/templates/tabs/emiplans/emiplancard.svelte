@@ -24,12 +24,22 @@
 
   const session = getSession();
 
-  $: amountPerMonth = Razorpay.emi.calculator(
-    amount,
-    plan.duration,
-    plan.interest
-  );
-  $: noCostEmi = plan.subvention === 'merchant';
+  // amountPerMonth
+  $: {
+    // Don't calculate if amount_per_month exists
+    if (plan.amount_per_month) {
+      amountPerMonth = plan.amount_per_month;
+    } else {
+      amountPerMonth = Razorpay.emi.calculator(
+        amount,
+        plan.duration,
+        plan.interest
+      );
+    }
+  }
+  $: noCostEmi =
+    plan.subvention === 'merchant' ||
+    (provider === 'zestmoney' && plan.duration === 3);
   $: badge = noCostEmi ? 'No cost EMI' : false;
   $: isCardEmi = !provider;
   $: showInterest =

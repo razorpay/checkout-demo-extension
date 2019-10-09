@@ -160,6 +160,9 @@ const UPI_APPS = {
     {
       package_name: 'com.mipay.wallet.in',
     },
+    {
+      package_name: 'com.dreamplug.androidapp',
+    },
   ],
 
   /**
