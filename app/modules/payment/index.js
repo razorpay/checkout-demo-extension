@@ -927,62 +927,55 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     return;
   }
 
-  // Check cache.
-  const fromCache = getCardFlowsFromCache(cardNumber);
-
-  if (fromCache) {
-    callback(fromCache);
-    return;
-  }
-
   const iin = cardNumber.slice(0, 6);
 
+  let exitClosure = function() {
+    var promise = ongoingFlowRequest.iin[iin];
+    if (callback) {
+      promise.then(callback);
+      promise.catch(callback);
+    }
+    return promise;
+  };
+
   if (ongoingFlowRequest.iin[iin]) {
-    return; //early exit
+    return exitClosure();
   }
-  ongoingFlowRequest.iin[iin] = true;
 
-  let url = makeAuthUrl(this, 'payment/flows');
-
-  // append IIN and source as query to flows route
-  url = _.appendParamsToUrl(url, {
-    iin,
-    '_[source]': Track.props.library,
-  });
-
-  Analytics.track('flows:card:fetch:start', {
-    data: {
+  ongoingFlowRequest.iin[iin] = new Promise((resolve, reject) => {
+    let url = makeAuthUrl(this, 'payment/flows');
+    // append IIN and source as query to flows route
+    url = _.appendParamsToUrl(url, {
       iin,
-    },
-  });
-
-  fetch.jsonp({
-    url,
-    callback: flows => {
-      delete ongoingFlowRequest.iin[iin];
-      if (flows.error) {
-        Analytics.track('flows:card:fetch:failure', {
+      '_[source]': Track.props.library,
+    });
+    fetch.jsonp({
+      url,
+      callback: flows => {
+        if (flows.error) {
+          Analytics.track('flows:card:fetch:failure', {
+            data: {
+              iin,
+              error: flows.error,
+            },
+          });
+          return reject(flows.error);
+        }
+        resolve(flows);
+        Analytics.track('flows:card:fetch:success', {
           data: {
             iin,
-            error: flows.error,
+            flows,
           },
         });
-
-        return;
-      }
-
-      // Add to cache.
-      flowCache.card[iin] = flows;
-
-      Analytics.track('flows:card:fetch:success', {
-        data: {
-          iin,
-          flows,
-        },
-      });
-
-      // Invoke callback.
-      callback(flowCache.card[iin]);
-    },
+      },
+    });
+    Analytics.track('flows:card:fetch:start', {
+      data: {
+        iin,
+      },
+    });
   });
+
+  return exitClosure();
 };
