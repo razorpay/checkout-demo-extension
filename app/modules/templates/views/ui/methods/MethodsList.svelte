@@ -26,9 +26,9 @@
   export let customer = {};
   export let AVAILABLE_METHODS;
   export let loading = false;
-  export let disableP13n = false;
+  export let disableP13n = true;
   export let selected = null;
-  export let showMessage = true;
+  export let showMessage = false;
   export let animate = false;
 
   // Computed
@@ -113,6 +113,7 @@
       disableP13n = true;
       session.p13n = false;
     } else {
+      disableP13n = false;
       session.p13n = true;
     }
   });
@@ -133,7 +134,7 @@
     const contact = customer.contact || '';
     const timing = x => 0.9991521 + 69093410000 * Math.exp(-3.069087 * x);
 
-    if (customer) {
+    if (customer && !disableP13n) {
       if (loaderTimeout) {
         global.clearTimeout(loaderTimeout);
         loaderTimeout = null;
