@@ -216,7 +216,7 @@ export default function Payment(data, params = {}, r) {
       if (data.method === 'wallet') {
         if (isPowerWallet(data.wallet)) {
           /* If contact or email are missing, we need to ask for it in popup */
-          if (data.contact && (this.optional.email || data.email)) {
+          if (data.contact && data.email) {
             avoidPopup = true;
           }
         }
@@ -253,6 +253,15 @@ export default function Payment(data, params = {}, r) {
             avoidPopup = true;
           }
         }
+      }
+
+      /**
+       * We do not want to show the popup
+       * if the user is trying to make a
+       * Paper Nach submission
+       */
+      if (data.method === 'nach') {
+        avoidPopup = true;
       }
 
       /* If fees is there, we need to show fee view in poupup */

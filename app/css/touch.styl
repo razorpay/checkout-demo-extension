@@ -41,7 +41,7 @@ $mobile-view() {
   // #container and &#container is needed because
   // this function applies to a media query (root)
   // as well as .mobile (ampersand)
-  
+
   #body.sub,
   #container.one-method #body:not([tab]),
   &#container.one-method #body:not([tab]) {
@@ -55,7 +55,7 @@ $mobile-view() {
   }
 
   #container #modal #body,
-  &#container #modal #body   {
+  &#container #modal #body {
     height: $bodyhmobile;
     height: calc(100% - 129px);
     height: calc(100vh - 129px);
@@ -75,22 +75,17 @@ $mobile-view() {
     }
 
     &.has-offers {
-
       #offers-container {
-
         bottom: 0;
       }
 
       &[screen] {
-
         #offers-container {
-
           bottom: -($topbarh);
         }
       }
 
       &.sub {
-
         #offers-container {
           bottom: $footerh - $topbarh;
         }
@@ -109,6 +104,18 @@ $mobile-view() {
         // height: $bodyhmobile + $footerh;
         height: 100vh;
       }
+    }
+  }
+
+  // For just one method, there is a CTA on the home screen
+  // But .sub is not present. So, we need to handle the offers strip position separately
+  // However, if there is .sub present on #body, it will be handled by itself
+  // :not([screen]) ensures this is the home screen
+  // :not(.sub) ensures we're not overriding the position for when .sub is present
+  #container.one-method,
+  &#container.one-method {
+    #modal #body.has-offers:not([screen]):not(.sub) #offers-container {
+      bottom: $footerh;
     }
   }
 

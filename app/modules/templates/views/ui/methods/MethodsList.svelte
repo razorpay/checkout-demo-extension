@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
 
   // UI imports
   import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
@@ -26,9 +26,9 @@
   export let customer = {};
   export let AVAILABLE_METHODS;
   export let loading = false;
-  export let disableP13n = false;
+  export let disableP13n = true;
   export let selected = null;
-  export let showMessage = true;
+  export let showMessage = false;
   export let animate = false;
 
   // Computed
@@ -113,6 +113,7 @@
       disableP13n = true;
       session.p13n = false;
     } else {
+      disableP13n = false;
       session.p13n = true;
     }
   });
@@ -133,7 +134,7 @@
     const contact = customer.contact || '';
     const timing = x => 0.9991521 + 69093410000 * Math.exp(-3.069087 * x);
 
-    if (customer) {
+    if (customer && !disableP13n) {
       if (loaderTimeout) {
         global.clearTimeout(loaderTimeout);
         loaderTimeout = null;
@@ -456,7 +457,7 @@
 </style>
 
 {#if loading}
-  <div class="pad ref-loader" transition:fade={{ duration: 200 }}>
+  <div class="pad ref-loader" transition:slide={{ duration: 200 }}>
     <div class="small legend">
       <div class="loading-icon" />
       Loading payment methods for you...
@@ -466,7 +467,7 @@
 {:else if !disableP13n && instrumentsData.length}
   <div
     class="options methodlist-top ref-preferred"
-    transition:fade={{ duration: 200 }}>
+    transition:slide={{ duration: 200 }}>
     <div class="legend">Select a payment method</div>
     {#each instrumentsData as instrument, index}
       {#if instrument.nextOption}
@@ -520,7 +521,7 @@
     {/if}
   </div>
 {:else if showMessage}
-  <div transition:fade={{ duration: 200 }} on:click={trackEducationClick}>
+  <div transition:slide={{ duration: 200 }} on:click={trackEducationClick}>
     <div class="small legend ref-prompttitle">
       Enter Phone number to pay using
     </div>
@@ -544,7 +545,7 @@
 {:else}
   <!-- TODO: create separate list methods (used in partial payments
          and optional contacts) in future -->
-  <div class="ref-grid" transition:fade={{ duration: 200 }}>
+  <div class="ref-grid" transition:slide={{ duration: 200 }}>
     <div class="legend">Select a payment method</div>
     <GridMethods avail_methods={AVAILABLE_METHODS} />
   </div>

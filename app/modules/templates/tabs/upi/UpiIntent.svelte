@@ -172,7 +172,7 @@
 </style>
 
 <div id="upi-apps">
-  <div id="svelte-upi-apps-list" class="options">
+  <div id="svelte-upi-apps-list" class="options options-no-margin">
     {#each showableApps as app, i}
       <RadioOption
         data={app}
@@ -200,7 +200,9 @@
     {/if}
   </div>
 
-  <div id="svelte-collect-in-intent" class="options ref-collect">
+  <div
+    id="svelte-collect-in-intent"
+    class="options options-no-margin ref-collect">
     <RadioOption
       data={{ package_name: 'directpay' }}
       icon={'&#xe70e;'}
