@@ -198,7 +198,7 @@
 
     // Validate
     const inputFile = event.currentTarget.files[0];
-    const error = getValidityError(inputFle);
+    const error = getValidityError(inputFile);
 
     uploading = true;
 
