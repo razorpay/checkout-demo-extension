@@ -930,7 +930,7 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
   const iin = cardNumber.slice(0, 6);
 
   let exitClosure = function() {
-    var promise = ongoingFlowRequest.iin[iin];
+    let promise = ongoingFlowRequest.iin[iin];
     if (callback) {
       promise.then(callback);
       promise.catch(callback);
