@@ -1924,7 +1924,9 @@ Session.prototype = {
       return;
     }
 
-    var accounts = this.preferences.fund_accounts;
+    var accounts =
+      (this.preferences.contact && this.preferences.contact.fund_accounts) ||
+      [];
 
     var upiAccounts = _Arr.filter(accounts, function(account) {
       return account.account_type === 'vpa';
@@ -7465,28 +7467,10 @@ Session.prototype = {
         return;
       }
 
-      if (self.isPayout) {
-        self
-          .fetchFundAccounts()
-          .then(function(response) {
-            preferences.fund_accounts = response.fund_accounts;
-            callback({
-              preferences: preferences,
-              validation: validation,
-            });
-          })
-          .catch(function(response) {
-            return Razorpay.sendMessage({
-              event: 'fault',
-              data: response.error,
-            });
-          });
-      } else {
-        callback({
-          preferences: preferences,
-          validation: validation,
-        });
-      }
+      callback({
+        preferences: preferences,
+        validation: validation,
+      });
     });
 
     /* Start listening for back presses */
