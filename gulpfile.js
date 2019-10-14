@@ -16,6 +16,10 @@ const { execSync } = require('child_process');
 const rollup = require('rollup');
 const rollupConfig = require('./rollup.config.js');
 
+const jshint = require('jshint').JSHINT;
+const jshintStylish = require('jshint-stylish').reporter;
+const jshintOptions = JSON.parse(fs.readFileSync('.jshintrc').toString());
+
 const distDir = 'app/dist/v1/';
 const cssDistDir = distDir + 'css';
 
@@ -99,6 +103,18 @@ gulp.task('uglify', done => {
     if (!fileContents.startsWith(strictPrefix)) {
       fileContents = `${strictPrefix}${fileContents}}()`;
     }
+
+    // Ignore babel errors
+    fileContents = `/* jshint -W021 */ ${fileContents} /* jshint +W021 */`;
+
+    jshint(fileContents, jshintOptions);
+
+    if (jshint.errors.length > 0) {
+      jshintStylish(jshint.errors.map(error => ({ file, error })));
+      throw 'Jshint failed';
+    }
+
+    console.log('Jshint passed for ' + file);
 
     const uglified = uglify(fileContents, {
       compress: {
