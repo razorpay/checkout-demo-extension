@@ -106,6 +106,10 @@ function makeCheckoutUrl(rzp) {
     }
   }
 
+  if (_.random() < 0.15) {
+    url = _.appendParamsToUrl(url, { canary: 1 });
+  }
+
   return url;
 }
 
