@@ -916,6 +916,13 @@ export function getCardFlowsFromCache(cardNumber = '') {
 }
 
 /**
+ * Store ongoing flow request*
+ */
+var ongoingFlowRequest = {
+  iin: {},
+};
+
+/**
  * Gets the flows associated with a card.
  * @param {string} cardNumber
  * @param {Function} callback
@@ -929,55 +936,57 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     return;
   }
 
-  // Check cache.
-  const fromCache = getCardFlowsFromCache(cardNumber);
+  const iin = cardNumber.slice(0, 6);
 
-  if (fromCache) {
-    callback(fromCache);
-    return;
+  let exitClosure = function() {
+    let promise = ongoingFlowRequest.iin[iin];
+    if (callback) {
+      promise.then(callback);
+      promise.catch(callback);
+    }
+    return promise;
+  };
+
+  if (ongoingFlowRequest.iin[iin]) {
+    return exitClosure();
   }
 
-  const iin = cardNumber.slice(0, 6);
-  let url = makeAuthUrl(this, 'payment/flows');
-
-  // append IIN and source as query to flows route
-  url = _.appendParamsToUrl(url, {
-    iin,
-    '_[source]': Track.props.library,
-  });
-
-  Analytics.track('flows:card:fetch:start', {
-    data: {
+  ongoingFlowRequest.iin[iin] = new Promise((resolve, reject) => {
+    let url = makeAuthUrl(this, 'payment/flows');
+    // append IIN and source as query to flows route
+    url = _.appendParamsToUrl(url, {
       iin,
-    },
-  });
-
-  fetch.jsonp({
-    url,
-    callback: flows => {
-      if (flows.error) {
-        Analytics.track('flows:card:fetch:failure', {
+      '_[source]': Track.props.library,
+    });
+    fetch.jsonp({
+      url,
+      callback: flows => {
+        if (flows.error) {
+          Analytics.track('flows:card:fetch:failure', {
+            data: {
+              iin,
+              error: flows.error,
+            },
+          });
+          return reject(flows.error);
+        }
+        // Add to cache.
+        flowCache.card[iin] = flows;
+        resolve(flows);
+        Analytics.track('flows:card:fetch:success', {
           data: {
             iin,
-            error: flows.error,
+            flows,
           },
         });
-
-        return;
-      }
-
-      // Add to cache.
-      flowCache.card[iin] = flows;
-
-      Analytics.track('flows:card:fetch:success', {
-        data: {
-          iin,
-          flows,
-        },
-      });
-
-      // Invoke callback.
-      callback(flowCache.card[iin]);
-    },
+      },
+    });
+    Analytics.track('flows:card:fetch:start', {
+      data: {
+        iin,
+      },
+    });
   });
+
+  return exitClosure();
 };
