@@ -961,6 +961,8 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
           });
           return reject(flows.error);
         }
+        // Add to cache.
+        flowCache.card[iin] = flows;
         resolve(flows);
         Analytics.track('flows:card:fetch:success', {
           data: {
