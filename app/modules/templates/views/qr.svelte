@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   // UI imports
-  import Callout from 'templates/views/ui/Callout.svelte';
+  import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
   import FeeBearer from 'templates/views/feebearer.svelte';
 
@@ -23,6 +23,7 @@
   export let error = null;
   export let down = false;
   export let onSuccess;
+  let disabled = false;
 
   const session = getSession();
 
@@ -48,9 +49,9 @@
     }
 
     const downtimes = DowntimesStore.get();
-    if (downtimes.qr && downtimes.qr.length) {
-      down = true;
-    }
+
+    down = _Arr.contains(downtimes.warn.methods, 'qr');
+    disabled = _Arr.contains(downtimes.disable.methods, 'qr');
   }
 
   function handleResponse({ data }) {
@@ -216,10 +217,10 @@
     </div>
   {/if}
 
-  {#if down}
-    <Callout showIcon={false} classes={['downtime-callout']}>
+  {#if down || disabled}
+    <DowntimeCallout isHighSeverity={disabled}>
       <strong>UPI QR</strong>
       is experiencing low success rates.
-    </Callout>
+    </DowntimeCallout>
   {/if}
 </div>

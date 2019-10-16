@@ -10,7 +10,6 @@ var preferences = window.preferences,
   _uid = Track.id,
   tab_titles = Constants.TAB_TITLES,
   getDownBanks = Bank.getDownBanks,
-  getPreferredBanks = Bank.getPreferredBanks,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_PATTERN,
   emailPattern = Constants.EMAIL_PATTERN,
@@ -204,58 +203,6 @@ function getCardTypeFromPayload(payload, tokens) {
   }
 
   return cardType;
-}
-
-/*
- * Returns a bank code with suffixes(_C, _R) removed.
- * @param {String} bankCode
- */
-function normalizeBankCode(bankCode) {
-  return bankCode.replace(/_[CR]$/, '');
-}
-
-/**
- * Returns the code for retail option corresponding to `bankCode`. Looks for
- * {bankCode} and {bankCode}_R in `banks`.
- * Returns false if no option is present.
- * @param {String} bankCode
- * @param {Object} banks
- */
-function getRetailOption(bankCode, banks) {
-  var normalizedBankCode = normalizeBankCode(bankCode);
-  var retailBankCode = normalizedBankCode + '_R';
-  if (banks[normalizedBankCode]) {
-    return normalizedBankCode;
-  }
-  return banks[retailBankCode] && retailBankCode;
-}
-
-/**
- * Returns the code for corporate option corresponding to `bankCode`. Looks for
- * {bankCode}_C in `banks`.
- * Returns false if no option is present.
- * @param {String} bankCode
- * @param {Object} banks
- */
-function getCorporateOption(bankCode, banks) {
-  var normalizedBankCode = normalizeBankCode(bankCode);
-  var corporateBankCode = normalizedBankCode + '_C';
-  return banks[corporateBankCode] && corporateBankCode;
-}
-
-/**
- * Fills the corporate/retail radio button labels with bank names
- * @param {String} corporateBankName the label for corporate radio
- * @param {String} retailBankName the label for retail radio
- */
-function fillBankRadios(corporateBankName, retailBankName) {
-  $('.nb-selection-container label[for=nb_type_retail] .label-content').html(
-    retailBankName
-  );
-
-  $('.nb-selection-container label[for=nb_type_corporate] .label-content').html(
-    corporateBankName
-  );
 }
 
 /**
@@ -1636,7 +1583,44 @@ Session.prototype = {
     }
   },
 
+  setNetbankingTab: function() {
+    var method;
+
+    if (this.methods.emandate) {
+      method = 'emandate';
+    } else if (this.methods.netbanking) {
+      method = 'netbanking';
+    }
+
+    var prefilledbank = this.get('prefill.bank');
+    var selectedBank =
+      prefilledbank && this.methods[method][prefilledbank] ? prefilledbank : '';
+
+    if (method) {
+      this.netbankingTab = new discreet.NetbankingTab({
+        target: gel('netbanking-svelte-wrap'),
+        props: {
+          bankOptions: this.get('method.netbanking'),
+          banks: this.methods.emandate || this.methods.netbanking,
+          recurring: this.recurring,
+          method: method,
+          selectedBankCode: selectedBank,
+          downtimes: DowntimesStore.get(),
+        },
+      });
+
+      // Add listener for proceeding automatically only if emandate
+      if (method === 'emandate') {
+        this.netbankingTab.$on(
+          'bankSelected',
+          this.proceedAutomaticallyAfterSelectingBank.bind(this)
+        );
+      }
+    }
+  },
+
   setSvelteComponents: function() {
+    this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
@@ -3002,10 +2986,6 @@ Session.prototype = {
         true
       );
     });
-    if (enabledMethods.netbanking || enabledMethods.emandate) {
-      this.on('change', '#bank-select', this.switchBank);
-      this.on('change', '#netb-banks', this.selectBankRadio, true);
-    }
     if (enabledMethods.wallet) {
       try {
         this.on(
@@ -3166,28 +3146,6 @@ Session.prototype = {
         }
       });
     }
-
-    var enabledBanks = this.getEnabledBanks();
-    this.on('click', '.nb-type', function(event) {
-      var selectedBank = $('#bank-select').val();
-      var bankToSet;
-
-      // Uncheck other radios
-      this.clearNetbankingRadio();
-
-      // Check clicked radio
-      event.target.checked = true;
-
-      if (event.target.value === 'corporate') {
-        bankToSet = getCorporateOption(selectedBank, enabledBanks);
-      } else {
-        bankToSet = getRetailOption(selectedBank, enabledBanks);
-      }
-
-      if (bankToSet) {
-        this.setSelectedBank(bankToSet);
-      }
-    });
   },
 
   onUpiAppSelect: function(packageName) {
@@ -3252,6 +3210,10 @@ Session.prototype = {
   },
 
   input: function(el) {
+    if (_El.hasClass(el, 'no-validate')) {
+      return;
+    }
+
     var value = el.value;
     var required = isString(el.getAttribute('required'));
     var pattern = el.getAttribute('pattern');
@@ -3875,8 +3837,7 @@ Session.prototype = {
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
-        $('#bank-select').val(issuer);
-        this.switchBank({ target: { value: issuer } });
+        this.netbankingTab.setSelectedBank(issuer);
       }
     } else if (screen === 'emi') {
       var emiDuration = $('#emi_duration').val();
@@ -4045,6 +4006,10 @@ Session.prototype = {
       this.methods.cardless_emi
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'netbanking') {
+      if (this.netbankingTab.onBack()) {
+        return;
+      }
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -4277,6 +4242,10 @@ Session.prototype = {
 
     if (!tab && this.multiTpv) {
       $('#body').addClass('sub');
+    }
+
+    if (tab === 'netbanking') {
+      this.netbankingTab.onShown();
     }
   },
 
@@ -4940,68 +4909,6 @@ Session.prototype = {
     setEmiPlansCta(this.screen, this.tab);
   },
 
-  switchBank: function(e) {
-    var bankCode = e.target.value;
-
-    Analytics.track('bank:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        bank: bankCode,
-      },
-    });
-
-    var enabledBanks = this.getEnabledBanks();
-
-    var bankRadioToCheck = bankCode;
-
-    // If both corporate and retail options are available, check retail.
-    if (this.hasMultipleOptions(bankCode)) {
-      bankRadioToCheck = getRetailOption(bankCode, enabledBanks);
-    }
-
-    // Show radio only on netbanking, and not on emandate
-    if (this.screen === 'netbanking') {
-      this.showCorporateNetbankingRadio(bankCode);
-    }
-
-    this.checkDown(bankCode);
-    this.checkBankRadio(bankRadioToCheck);
-    this.proceedAutomaticallyAfterSelectingBank();
-  },
-
-  /**
-   * Checks whether the given bank has multiple options (Corporate, Retail)
-   * @param bankCode
-   */
-  hasMultipleOptions: function(bankCode) {
-    var enabledBanks = this.getEnabledBanks();
-    var normalizedBankCode = normalizeBankCode(bankCode);
-    // Some retail banks have the suffix _R, while others don't. So we look for
-    // codes both with and without the suffix.
-    var hasRetail =
-      enabledBanks[normalizedBankCode] ||
-      enabledBanks[normalizedBankCode + '_R'];
-    var hasCorporate = enabledBanks[normalizedBankCode + '_C'];
-    return hasRetail && hasCorporate;
-  },
-
-  /**
-   * Checks the bank radio corresponding to the value.
-   * @param {String} val
-   */
-  checkBankRadio: function(val) {
-    each($$('#netb-banks input'), function(i, radio) {
-      $(radio.parentNode).removeClass('active');
-      if (radio.value === val) {
-        $(radio.parentNode).addClass('active');
-        radio.checked = true;
-      } else if (radio.checked) {
-        $(radio.parentNode).removeClass('active');
-        radio.checked = false;
-      }
-    });
-  },
-
   checkDown: function(val) {
     $('.down')
       .toggleClass('vis', indexOf(this.down, val) !== -1)
@@ -5024,111 +4931,18 @@ Session.prototype = {
     return this.offers.appliedOffer.issuer === selectedVal;
   },
 
-  selectBankRadio: function(e) {
-    if (ua_iPhone) {
-      Razorpay.sendMessage({ event: 'blur' });
-    }
-    var bankCode = e.target.value;
-
-    Analytics.track('bank:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        bank: bankCode,
-      },
-    });
-
-    // Show radio only on netbanking, and not on emandate
-    if (this.screen === 'netbanking') {
-      this.showCorporateNetbankingRadio(bankCode);
-    }
-
-    this.checkDown(bankCode);
-    this.setSelectedBank(bankCode);
-    this.proceedAutomaticallyAfterSelectingBank();
-  },
-
-  getEnabledBanks: function() {
-    if (this.screen === 'emandate') {
-      return this.methods.emandate || {};
-    }
-    return this.methods.netbanking || {};
-  },
-
-  setSelectedBank: function(bank) {
-    var select = gel('bank-select');
-    select.value = bank;
-    this.input(select);
-  },
-
-  /**
-   * Unchecks all radio buttons for netbanking type selection.
-   */
-  clearNetbankingRadio: function() {
-    each($$('.nb-type'), function(index, el) {
-      el.checked = false;
-    });
-  },
-
-  /**
-   * Shows Corporate/Retail netbanking selection radio buttons on
-   * netbanking screen, only if both options are enabled for the given bank code.
-   * @param {String} bankCode
-   */
-  showCorporateNetbankingRadio: function(bankCode) {
-    var $nbSelectionContainer = $('.nb-selection-container');
-    var enabledBanks = this.getEnabledBanks();
-    var retailBankCode = getRetailOption(bankCode, enabledBanks);
-    var corporateBankCode = getCorporateOption(bankCode, enabledBanks);
-
-    if (this.hasMultipleOptions(bankCode)) {
-      fillBankRadios(
-        enabledBanks[corporateBankCode],
-        enabledBanks[retailBankCode]
-      );
-
-      $nbSelectionContainer.addClass(shownClass);
-
-      // Uncheck all radios
-      this.clearNetbankingRadio();
-
-      // If the selected bank is corporate, i.e. the bank code ends in _C select
-      // the corporate radio option
-      if (/_C$/.test(bankCode)) {
-        $nbSelectionContainer.$('#nb_type_corporate').prop('checked', true);
-      } else {
-        // Else, select the retail radio option
-        $nbSelectionContainer.$('#nb_type_retail').prop('checked', true);
-      }
-    } else {
-      $nbSelectionContainer.removeClass(shownClass);
-    }
-  },
-
-  /**
-   * Deselects bank.
-   */
-  deselectBank: function(e) {
-    var select = gel('bank-select');
-
-    if (select) {
-      select.value = '';
-    }
-
-    this.checkBankRadio('');
-  },
-
   /**
    * Once the bank is selected in the banks list,
    * proceed automatically if some conditions are met.
    */
-  proceedAutomaticallyAfterSelectingBank: function() {
-    if ($(this.el).hasClass('emandate') && this.emandateView) {
-      if (this.checkInvalid()) {
-        return;
-      }
+  proceedAutomaticallyAfterSelectingBank: function(event) {
+    var bank = event.detail.bank;
 
-      return this.emandateView.showBankDetailsForm($('#bank-select').val());
+    if (this.checkInvalid()) {
+      return;
     }
+
+    return this.emandateView.showBankDetailsForm(bank.code);
   },
 
   checkInvalid: function(parent) {
@@ -5825,8 +5639,9 @@ Session.prototype = {
         }
       } else if (/^emandate/.test(screen)) {
         if (this.screen === 'emandate') {
+          // TODO: looks like dead code, see if this can be removed
           screen = 'netbanking';
-          data.bank = $('#bank-select').val();
+          data.bank = this.netbankingTab.getSelectedBank();
           data.method = 'emandate';
         }
         return this.emandateView.submit(data);
@@ -6005,6 +5820,10 @@ Session.prototype = {
 
     if (this.tab === 'nach') {
       shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (this.tab === 'netbanking') {
+      shouldContinue = this.netbankingTab.shouldSubmit();
     }
 
     if (this.tab === 'bank_transfer') {
@@ -6625,12 +6444,25 @@ Session.prototype = {
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
+      // TODO: refactor this into cleanupSvelteComponents.
       if (this.methodsList) {
         this.methodsList.$destroy();
       }
 
       if (this.otpView) {
         this.otpView.$destroy();
+      }
+
+      if (this.payoutsView) {
+        this.payoutsView.$destroy();
+      }
+
+      if (this.payoutsAccountView) {
+        this.payoutsAccountView.$destroy();
+      }
+
+      if (this.netbankingTab) {
+        this.netbankingTab.$destroy();
       }
 
       if (this.upiTab) {
@@ -6681,9 +6513,11 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
-      this.upiTab = this.otpView = null;
+      this.upiTab = this.otpView = this.netbankingTab = null;
+      this.payoutsView = this.payoutsAccountView = null;
       this.savedCardsView = this.feeBearerView = this.payLaterView = null;
       this.nachScreen = null;
+
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;
@@ -6982,11 +6816,6 @@ Session.prototype = {
       methods[bankMethod] = false;
     } else {
       methods.count++;
-      this.down = getDownBanks(preferences);
-      this.netbanks = getPreferredBanks(
-        preferences,
-        this.get('method.netbanking')
-      );
     }
 
     if (methods.bank_transfer) {

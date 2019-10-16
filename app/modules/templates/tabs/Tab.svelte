@@ -7,6 +7,7 @@
   export let overrideMethodCheck = false;
   export let down = false;
   export let pad = true;
+  export let hasMessage = false;
 
   // Computed
   export let methodSupported;
@@ -16,8 +17,19 @@
   $: methodSupported = overrideMethodCheck || session.methods[method];
 </script>
 
+<style>
+  .hasMessage {
+    padding-bottom: 56px;
+  }
+</style>
+
 {#if methodSupported}
-  <div class="tab-content showable screen" id="form-{method}" class:pad {down}>
+  <div
+    {down}
+    id="form-{method}"
+    class="tab-content showable screen"
+    class:pad
+    class:hasMessage>
     <slot />
   </div>
 {/if}

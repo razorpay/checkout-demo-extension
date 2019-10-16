@@ -1,16 +1,17 @@
 <script>
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   // Props
   export let className;
-  export let shown = false;
-  export let bindTo = '#body';
-  export let autoAlign = true;
-  export let align = ['right'];
+  export let shown = false; // Is it shown?
+  export let bindTo = '#body'; // Where should the alignment be bound to?
+  export let autoAlign = true; // Should align automatically after mounting?
+  export let align = ['right']; // Default alignment directions
+  export let alignOnHover = true; // Should we align again when parent is hovered on?
 
   // Refs
-  export let tooltip = null;
+  let tooltip = null;
 
   function isWithinBounds(parent, child) {
     const rects = {
@@ -190,11 +191,11 @@
     return directions;
   }
 
-  export function setAlignmentClasses() {
+  function setAlignmentClasses() {
     alignTooltipTo(tooltip, align);
   }
 
-  export function setBounds() {
+  function setBounds() {
     if (!autoAlign || !bindTo) {
       return;
     }
@@ -210,11 +211,65 @@
     setAlignmentClasses();
   }
 
+  /**
+   * Returns the first parent with 'has-tooltip' class
+   *
+   * @returns {Element}
+   */
+  function getHoverParent() {
+    let parent = tooltip;
+
+    while (!_El.hasClass(parent, 'has-tooltip')) {
+      parent = _El.parent(parent);
+    }
+
+    return parent;
+  }
+
+  /**
+   * Adds alignment listener on hover parent.
+   */
+  function addAlignmentListenerFromHoverParent() {
+    if (!alignOnHover) {
+      return;
+    }
+
+    let hoverParent = getHoverParent();
+
+    if (!hoverParent) {
+      return;
+    }
+
+    hoverParent.addEventListener('mouseover', setBounds);
+  }
+
+  /**
+   * Removes alignment listener on hover parent.
+   */
+  function removeAlignmentListenerFromHoverParent() {
+    if (!alignOnHover) {
+      return;
+    }
+
+    let hoverParent = getHoverParent();
+
+    if (!hoverParent) {
+      return;
+    }
+
+    hoverParent.removeEventListener('mouseover', setBounds);
+  }
+
   onMount(() => {
     setTimeout(() => {
       setAlignmentClasses();
       setBounds();
+      addAlignmentListenerFromHoverParent();
     });
+  });
+
+  onDestroy(() => {
+    removeAlignmentListenerFromHoverParent();
   });
 </script>
 

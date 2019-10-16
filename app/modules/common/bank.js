@@ -108,8 +108,7 @@ export const getBankFromCard = cardNum => {
   }
 };
 
-export const getPreferredBanks = (preferences, bankOptions) => {
-  const availBanks = preferences.methods.netbanking;
+export const getPreferredBanks = (availBanks, bankOptions) => {
   const order = bankOptions && bankOptions.order;
 
   if (!availBanks) {
@@ -189,3 +188,64 @@ export const getDownBanks = preferences => {
 
   return downList;
 };
+
+/**
+ * Checks whether the given bank has multiple options (Corporate, Retail)
+ * @param bankCode
+ */
+export function hasMultipleOptions(bankCode, banks) {
+  const normalizedBankCode = normalizeBankCode(bankCode);
+  // Some retail banks have the suffix _R, while others don't. So we look for
+  // codes both with and without the suffix.
+  const hasRetail =
+    banks[normalizedBankCode] || banks[normalizedBankCode + '_R'];
+  const hasCorporate = banks[normalizedBankCode + '_C'];
+  return hasRetail && hasCorporate;
+}
+
+/**
+ * Returns the code for retail option corresponding to `bankCode`. Looks for
+ * {bankCode} and {bankCode}_R in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+export function getRetailOption(bankCode, banks) {
+  const normalizedBankCode = normalizeBankCode(bankCode);
+  const retailBankCode = normalizedBankCode + '_R';
+  if (banks[normalizedBankCode]) {
+    return normalizedBankCode;
+  }
+  return banks[retailBankCode] && retailBankCode;
+}
+
+/**
+ * Returns the code for corporate option corresponding to `bankCode`. Looks for
+ * {bankCode}_C in `banks`.
+ * Returns false if no option is present.
+ * @param {String} bankCode
+ * @param {Object} banks
+ */
+export function getCorporateOption(bankCode, banks) {
+  const normalizedBankCode = normalizeBankCode(bankCode);
+  const corporateBankCode = normalizedBankCode + '_C';
+  return banks[corporateBankCode] && corporateBankCode;
+}
+
+/*
+ * Returns a bank code with suffixes(_C, _R) removed.
+ * @param {String} bankCode
+ */
+export function normalizeBankCode(bankCode) {
+  return bankCode.replace(/_[CR]$/, '');
+}
+
+/**
+ * Checks if the given bank code is for corporate netbanking.
+ *
+ * @param bankCode
+ * @return {boolean}
+ */
+export function isCorporateCode(bankCode) {
+  return /_C$/.test(bankCode);
+}

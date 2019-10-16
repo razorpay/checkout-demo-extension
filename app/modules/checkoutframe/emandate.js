@@ -104,7 +104,7 @@ emandateView.prototype = {
 
   determineLandingScreen: function() {
     if (this.prefill.bank && this.banks[this.prefill.bank]) {
-      _Doc.querySelector('#bank-select').value = this.prefill.bank;
+      this.session.netbankingTab.setSelectedBank(this.prefill.bank);
       this.setBank(this.prefill.bank);
 
       return 'emandate-netbanking';
@@ -196,7 +196,7 @@ emandateView.prototype = {
     this.setScreen(newScreen);
 
     if (newScreen === 'emandate') {
-      this.session.deselectBank();
+      this.session.netbankingTab.deselectBank();
     }
 
     return true;
