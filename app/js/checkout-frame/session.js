@@ -6785,7 +6785,17 @@ Session.prototype = {
         bankMethod = 'emandate';
         this.emandate = true;
         each(availMethods[bankMethod], function(bankCode, bankObj) {
-          banks[bankCode] = bankObj.name;
+          /**
+           * There may be multiple auth types present for each bank
+           * but right now, we'll only support those that have
+           * netbanking as an auth type.
+           */
+          if (
+            bankObj.auth_types &&
+            _Arr.contains(bankObj.auth_types, 'netbanking')
+          ) {
+            banks[bankCode] = bankObj.name;
+          }
         });
         this.emandateBanks = availMethods[bankMethod];
         availMethods[bankMethod] = banks;
