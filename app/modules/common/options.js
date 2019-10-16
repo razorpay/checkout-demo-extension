@@ -9,6 +9,7 @@ export const RazorpayDefaults = {
   order_id: '',
   invoice_id: '',
   subscription_id: '',
+  auth_link_id: '',
   payment_link_id: '',
   notes: null,
   callback_url: '',

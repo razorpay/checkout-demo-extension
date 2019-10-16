@@ -163,6 +163,9 @@ const UPI_APPS = {
     {
       package_name: 'com.dreamplug.androidapp',
     },
+    {
+      package_name: 'in.bajajfinservmarkets.app',
+    },
   ],
 
   /**
