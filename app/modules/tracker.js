@@ -60,14 +60,15 @@ function getCommonTrackingData(r) {
   };
 
   [
-    'integration',
-    'referer',
-    'library',
-    'platform',
-    'platform_version',
-    'os',
-    'os_version',
     'device',
+    'env',
+    'integration',
+    'library',
+    'os_version',
+    'os',
+    'platform_version',
+    'platform',
+    'referer',
   ]
     |> _Arr.loop(
       propName => props |> _Obj.setTruthyProp(propName, trackingProps[propName])
