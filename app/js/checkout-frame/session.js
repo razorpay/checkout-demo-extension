@@ -1709,9 +1709,11 @@ Session.prototype = {
   },
 
   setSavedCardsView: function() {
-    this.savedCardsView = new discreet.SavedCardsView({
-      target: _Doc.querySelector('#saved-cards-container'),
-    });
+    if (this.methods.card || this.methods.emi) {
+      this.savedCardsView = new discreet.SavedCardsView({
+        target: _Doc.querySelector('#saved-cards-container'),
+      });
+    }
   },
 
   setEmandate: function() {
