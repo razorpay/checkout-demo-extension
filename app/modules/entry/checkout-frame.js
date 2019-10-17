@@ -6,7 +6,7 @@ import 'lib/polyfill';
 
 Track.props.library = 'checkoutjs';
 
-if (Boolean(_.query2obj(global.location.search.replace('?', '')).canary)) {
+if (_.getQueryParams(global.location.search).canary) {
   Track.props.env = 'canary';
 }
 
