@@ -126,7 +126,11 @@
         },
       });
 
-      dispatch('bankSelected', { code: bankCode });
+      dispatch('bankSelected', {
+        bank: {
+          code: bankCode
+        }
+      });
       setPayButtonVisibility();
     }
   }
