@@ -111,6 +111,10 @@
     return !selectedBankDisabled;
   }
 
+  function isBankDisabled(code) {
+    return _Arr.contains(downtimes.disable.banks, code);
+  }
+
   $: {
     const bankCode = selectedBankCode;
 
@@ -128,8 +132,8 @@
 
       dispatch('bankSelected', {
         bank: {
-          code: bankCode
-        }
+          code: bankCode,
+        },
       });
       setPayButtonVisibility();
     }
@@ -196,7 +200,7 @@
           {name}
           {code}
           fullName={banks[code]}
-          disabled={_Arr.contains(downtimes.disable.banks, code)}
+          disabled={isBankDisabled(code)}
           bind:group={selectedBankCode} />
       {/each}
     </div>
