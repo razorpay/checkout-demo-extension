@@ -82,10 +82,14 @@
     },
 
     oncreate() {
-      this.set({
-        contact: getSession().customer.contact.replace('+91', ''),
-      });
       const { focusOnCreate } = this.get();
+      const customer = getSession().customer;
+      const contact = customer.contact ? customer.contact.replace('+91', '') : '';
+
+      this.set({
+        contact,
+      });
+      
       if (focusOnCreate) {
         this.focus();
       }
