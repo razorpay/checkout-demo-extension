@@ -1,10 +1,10 @@
 <script>
   // Props
-  export let disabled;
-  export let code;
-  export let group;
-  export let name;
-  export let fullName;
+  export let disabled = false;
+  export let code = '';
+  export let group = null;
+  export let name = '';
+  export let fullName = '';
 
   // UI imports
   import Tooltip from 'templates/views/ui/Tooltip.svelte';
