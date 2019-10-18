@@ -26,13 +26,10 @@
     </div>
   {/if}
 
-  {#if down}
-    <Callout
-      showIcon={false}
-      classes={['downtime-callout']}
-    >
+  {#if down || disabled}
+    <DowntimeCallout isHighSeverity={disabled}>
       <strong>UPI QR</strong> is experiencing low success rates.
-    </Callout>
+    </DowntimeCallout>
   {/if}
 </div>
 <style>
@@ -114,7 +111,7 @@ img {
 
   export default {
     components: {
-      Callout: 'templates/views/ui/Callout.svelte',
+      DowntimeCallout: 'templates/views/ui/DowntimeCallout.svelte',
       AsyncLoading: 'templates/views/ui/AsyncLoading.svelte',
       FeeBearer: 'templates/views/feebearer.svelte',
     },
@@ -131,6 +128,7 @@ img {
         error: null,
         view: 'qr',
         down: false,
+        disabled: false,
       }
     },
 
@@ -154,11 +152,10 @@ img {
         }
 
         const downtimes = DowntimesStore.get();
-        if (downtimes.qr && downtimes.qr.length) {
-          this.set({
-            down: true,
-          });
-        }
+        this.set({
+          down: _Arr.contains(downtimes.warn.methods, 'qr'),
+          disabled: _Arr.contains(downtimes.disable.methods, 'qr')
+        });
       },
 
       handleResponse({ data }) {

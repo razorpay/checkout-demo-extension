@@ -1,6 +1,6 @@
 <div id="payment-options" class="grid clear count-{methods.length}">
   {#each methods as method}
-  <GridMethod {...method} on:select="selectMethod(event)" />
+    <GridMethod {...method} on:select="selectMethod(event)" />
   {/each}
 </div>
 
@@ -29,7 +29,7 @@
         let retMethods = [];
 
         const downtimes = DowntimesStore.get() || {};
-        const down = downtimes.disabled || [];
+        const down = downtimes.disable.methods;
 
         if (o('theme.debit_card')) {
           AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'card');
@@ -59,7 +59,7 @@
               down: isDown,
               downMessage: getMethodDowntimeDescription(method, {
                 availableMethods: AVAIL_METHODS,
-                downMethods: downtimes.disabled,
+                downMethods: downtimes.disable,
               }),
             });
           }
