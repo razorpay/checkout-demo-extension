@@ -65,6 +65,7 @@ import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
 import SavedCardsView from 'templates/screens/savedcards.svelte';
 import PayLaterView from 'templates/screens/paylater.svelte';
+import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
 
 import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
@@ -156,6 +157,7 @@ export default {
 
   MagicView,
   UpiTab,
+  NetbankingTab,
   NachScreen,
 
   Hacks,

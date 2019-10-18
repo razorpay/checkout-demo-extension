@@ -25,7 +25,7 @@
   import Card from 'templates/views/ui/Card.svelte';
   import Field from 'templates/views/ui/Field.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
-  import Callout from 'templates/views/ui/Callout.svelte';
+  import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
@@ -59,6 +59,7 @@
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+  let disabled = false;
 
   const session = getSession();
   const {
@@ -177,9 +178,9 @@
     }
 
     const downtimes = DowntimesStore.get();
-    if (downtimes.upi && downtimes.upi.length) {
-      down = true;
-    }
+
+    down = _Arr.contains(downtimes.warn.methods, 'upi');
+    disabled = _Arr.contains(downtimes.disable.methods, 'upi');
 
     qrEnabled = session.methods.qr;
     qrIcon = session.themeMeta.icons.qr;
@@ -539,10 +540,10 @@
     {/if}
   </Screen>
 
-  {#if down}
-    <Callout showIcon={false} classes={['downtime-callout']}>
+  {#if down || disabled}
+    <DowntimeCallout isHighSeverity={disabled}>
       <strong>UPI</strong>
       is experiencing low success rates.
-    </Callout>
+    </DowntimeCallout>
   {/if}
 </Tab>

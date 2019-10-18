@@ -60,14 +60,14 @@
 
   $: {
     const downtimes = DowntimesStore.get();
-    const down = downtimes.disabled || [];
+    const down = downtimes.disable.methods || [];
 
     methods = _Arr.map(AVAILABLE_METHODS, method => ({
       method,
       down: _Arr.contains(down, method),
       downMessage: getMethodDowntimeDescription(method, {
         availableMethods: AVAILABLE_METHODS,
-        downMethods: downtimes.disabled,
+        downMethods: downtimes.disable,
       }),
       icon: session.themeMeta.icons[method],
       title: getMethodNameForPaymentOption(method, {
