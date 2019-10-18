@@ -3,7 +3,7 @@
   import Callout from 'templates/views/ui/Callout.svelte';
 
   // Props
-  export let isHighSeverity;
+  export let isHighSeverity = false;
 
   // Computed
   let calloutType;
