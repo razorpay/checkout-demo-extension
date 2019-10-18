@@ -166,6 +166,9 @@ const UPI_APPS = {
     {
       package_name: 'in.bajajfinservmarkets.app',
     },
+    {
+      package_name: 'in.bajajfinservmarkets.app.uat',
+    },
   ],
 
   /**

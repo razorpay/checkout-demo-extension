@@ -13,7 +13,7 @@
   export let selected = true;
   export let error = false;
   export let isFirst = true;
-  export let contact = null;
+  export let contact = '';
   export let focusOnCreate = false;
   export let retry = false;
   export let checked = true;
@@ -25,7 +25,10 @@
   const session = getSession();
 
   onMount(() => {
-    contact = session.customer.contact.replace('+91', '');
+    const customer = session.customer;
+
+    contact = customer.contact ? customer.contact.replace('+91', '') : '';
+
     if (focusOnCreate) {
       focus();
     }
