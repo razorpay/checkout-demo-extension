@@ -141,7 +141,7 @@ emandateView.prototype = {
       if (
         this.prefill.auth_type &&
         _Arr.contains(
-          this.getPossibleAuthTypes(prefilledBank),
+          this.getAvailableAuthTypes(prefilledBank),
           prefilledAuthType
         )
       ) {
@@ -155,7 +155,7 @@ emandateView.prototype = {
     return false;
   },
 
-  getPossibleAuthTypes: function(bankCode) {
+  getAvailableAuthTypes: function(bankCode) {
     let authTypes = [];
     bankCode = bankCode || this.bank;
 
@@ -180,8 +180,8 @@ emandateView.prototype = {
 
     this.bank = bankCode;
 
-    const authTypes = this.getPossibleAuthTypes(bankCode);
-    this.setAvailableAuthTypes(authTypes);
+    const authTypes = this.getAvailableAuthTypes(bankCode);
+    this.setAvailableAuthTypesInView(authTypes);
 
     _Arr.loop(_Doc.querySelectorAll('#emandate-inner .bank-icon'), elem => {
       _El.setAttribute(elem, 'style', backgroundImage);
@@ -201,7 +201,7 @@ emandateView.prototype = {
     return this.authType;
   },
 
-  setAvailableAuthTypes: function(authTypes) {
+  setAvailableAuthTypesInView: function(authTypes) {
     _El.keepClass(
       _Doc.querySelector('.auth-option.netbanking'),
       'hidden',
@@ -240,7 +240,7 @@ emandateView.prototype = {
     if (landingScreenShown) {
       return;
     }
-    const authTypes = this.getPossibleAuthTypes();
+    const authTypes = this.getAvailableAuthTypes();
 
     if (tab === 'emandate-netbanking' && authTypes.indexOf('netbanking') < 0) {
       return false;
