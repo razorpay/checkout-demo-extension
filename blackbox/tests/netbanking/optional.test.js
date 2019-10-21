@@ -19,16 +19,7 @@ describe('Netbanking tests', () => {
       amount: 200,
       personalization: false,
     };
-    const preferences = makePreferences({
-      order: {
-        amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
-      },
-    });
+    const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, false);
