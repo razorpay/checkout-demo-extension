@@ -104,9 +104,6 @@ gulp.task('uglify', done => {
       fileContents = `${strictPrefix}${fileContents}}()`;
     }
 
-    // Ignore babel errors
-    fileContents = `/* jshint -W021 */ ${fileContents} /* jshint +W021 */`;
-
     jshint(fileContents, jshintOptions);
 
     if (jshint.errors.length > 0) {

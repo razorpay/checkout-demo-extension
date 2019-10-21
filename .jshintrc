@@ -12,6 +12,8 @@
   },
   "proto": true,
   "-W001": true,
+  "-W021": true,
+  "-W120": true,
   "expr": true,
   "scripturl": true,
   "laxbreak": true,
