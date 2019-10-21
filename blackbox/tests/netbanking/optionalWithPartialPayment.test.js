@@ -10,6 +10,8 @@ const {
   submit,
   failRequestwithErrorMessage,
   verifyErrorMessage,
+  verifyPartialAmount,
+  handlePartialPayment,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -20,6 +22,7 @@ describe('Netbanking tests', () => {
       personalization: false,
     };
     const preferences = makePreferences({
+      optional: ['contact'],
       order: {
         amount: 20000,
         amount_due: 20000,
@@ -32,11 +35,12 @@ describe('Netbanking tests', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, false);
-
+    await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
+    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
 
     const expectedErrorMeassage = 'Payment failed';

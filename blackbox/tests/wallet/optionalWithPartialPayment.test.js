@@ -5,21 +5,22 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectBank,
-  assertNetbankingPage,
+  selectWallet,
+  assertWalletPage,
   submit,
-  failRequestwithErrorMessage,
-  verifyErrorMessage,
+  validateHelpMessage,
+  handlePartialPayment,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction', async () => {
+describe('Basic wallet payment', () => {
+  test('Perform wallet transaction with contact as optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
+      optional: ['contact'],
       order: {
         amount: 20000,
         amount_due: 20000,
@@ -32,15 +33,12 @@ describe('Netbanking tests', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, false);
-
+    await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'netbanking');
-    await assertNetbankingPage(context);
-    await selectBank(context, 'SBIN');
+    await selectPaymentMethod(context, 'wallet');
+    await assertWalletPage(context);
+    await selectWallet(context, 'freecharge');
     await submit(context);
-
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await validateHelpMessage(context, 'Please enter a valid contact number');
   });
 });
