@@ -4204,6 +4204,10 @@ Session.prototype = {
       this.clearRequest();
     }
 
+    if (tab === 'netbanking') {
+      this.netbankingTab.onShown();
+    }
+
     if (/^emandate/.test(tab)) {
       return this.emandateView.showTab(tab);
     }
@@ -4249,10 +4253,6 @@ Session.prototype = {
 
     if (!tab && this.multiTpv) {
       $('#body').addClass('sub');
-    }
-
-    if (tab === 'netbanking') {
-      this.netbankingTab.onShown();
     }
   },
 
