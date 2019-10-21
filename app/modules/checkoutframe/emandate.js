@@ -123,10 +123,21 @@ emandateView.prototype = {
   showLandingScreenIfApplicable: function(tab) {
     const prefilledBank = this.prefill.bank;
     const prefilledAuthType = this.prefill.auth_type;
+
+    /**
+     * 'emandate' refers to the emandate landing screen. If the tab to be
+     * switched to is emandate i.e. the landing screen and bank is prefilled,
+     * we set the bank snd skip the bank selection screen.
+     */
     if (tab === 'emandate' && this.prefill.bank && this.banks[prefilledBank]) {
       this.session.netbankingTab.setSelectedBank(prefilledBank);
       this.setBank(prefilledBank);
 
+      /**
+       * If auth_type is also prefilled and available, we set the auth type, skip
+       * the auth type screen as well and directly switch to the bank details
+       * form.
+       */
       if (
         this.prefill.auth_type &&
         _Arr.contains(
