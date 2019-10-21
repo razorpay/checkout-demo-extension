@@ -5,22 +5,22 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectBank,
-  assertNetbankingPage,
   submit,
-  failRequestwithErrorMessage,
+  enterCardDetails,
+  handleCardValidation,
+  handleMockSuccessOrFailDialog,
   verifyErrorMessage,
+  retryCardTransaction,
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbanking transaction with fee bearer and contact optional', async () => {
+describe('Card tests', () => {
+  test('perform card transaction with customer feebearer enabled and contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 600,
+      amount: 200,
       personalization: false,
     };
-
     const preferences = makePreferences({
       fee_bearer: true,
       optional: ['contact'],
@@ -29,17 +29,17 @@ describe('Netbanking tests', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, false);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'netbanking');
-    await assertNetbankingPage(context);
-    await selectBank(context, 'SBIN');
+    await selectPaymentMethod(context, 'card');
+    await enterCardDetails(context);
     await submit(context);
-
     await handleFeeBearer(context, page);
-
-    context.popup();
-
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await handleCardValidation(context);
+    await handleMockSuccessOrFailDialog(context, 'fail');
+    await verifyErrorMessage(context, 'The payment has already been processed');
+    await retryCardTransaction(context);
+    await submit(context);
+    await handleFeeBearer(context, page);
+    await handleCardValidation(context);
+    await handleMockSuccessOrFailDialog(context, 'pass');
   });
 });

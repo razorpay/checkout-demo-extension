@@ -16,7 +16,7 @@ const {
   retryWalletTransaction,
 } = require('../../actions/common');
 
-describe('Wallet + FeeBearer', () => {
+describe('Wallet Transaction', () => {
   test('Perform wallet transaction with fee bearer', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

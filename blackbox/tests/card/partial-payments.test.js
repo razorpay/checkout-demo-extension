@@ -16,7 +16,7 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction', async () => {
+  test('perform card transaction with partial payment enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,

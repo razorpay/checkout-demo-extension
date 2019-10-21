@@ -11,18 +11,19 @@ const {
   handleMockSuccessOrFailDialog,
   verifyErrorMessage,
   retryCardTransaction,
+  handleFeeBearer,
   verifyTimeout,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with timeout enabled', async () => {
+  test('perform card transaction with timeout and feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
       timeout: 10,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -30,10 +31,11 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
     await submit(context);
+    await handleFeeBearer(context, page);
     await handleCardValidation(context);
     await handleMockSuccessOrFailDialog(context, 'fail');
     await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
-    await verifyTimeout(context, 'card');
+    await verifyTimeout(context, 'netbanking');
   });
 });

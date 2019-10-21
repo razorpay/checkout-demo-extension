@@ -15,7 +15,7 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction', async () => {
+  test('perform card transaction with customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,

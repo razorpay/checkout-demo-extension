@@ -18,7 +18,7 @@ const {
 } = require('../../actions/common');
 
 describe('Wallet tests', () => {
-  test('perform wallet transaction with timeout enabled', async () => {
+  test('perform wallet transaction with timeout and feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
