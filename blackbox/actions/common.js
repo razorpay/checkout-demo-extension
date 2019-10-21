@@ -1,4 +1,9 @@
 const { delay, visible } = require('../util');
+const { readFileSync } = require('fs');
+
+contents = String(
+  readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
+);
 
 module.exports = {
   handleFeeBearer,
@@ -26,6 +31,8 @@ module.exports = {
   handleCardValidation,
   handleMockSuccessOrFailDialog,
   retryCardTransaction,
+  handleCardValidationWithCallback,
+  handleMockSuccessOrFailWithCallback,
 };
 
 async function enterCardDetails(context) {
@@ -79,9 +86,9 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await delay(200);
-  await context.page.click('#footer');
-  // await delay(10000);
+  await delay(300);
+  context.page.click('#footer');
+  await delay(1000);
 }
 
 async function handleCardValidation(context) {
@@ -101,6 +108,11 @@ async function handleCardValidation(context) {
   await delay(1000);
 }
 
+async function handleCardValidationWithCallback(context) {
+  const r = await context.expectRequest();
+  await context.respondPlain(contents);
+}
+
 async function handleMockSuccessOrFailDialog(context, passOrFail) {
   const popup = context.popup();
   const popupPage = await popup.page();
@@ -112,6 +124,24 @@ async function handleMockSuccessOrFailDialog(context, passOrFail) {
     await passButton.click();
   }
   await delay(600);
+}
+
+async function handleMockSuccessOrFailWithCallback(context, passOrFail) {
+  await context.page.waitForNavigation();
+  if (passOrFail == 'fail') {
+    const failButton = await context.page.$('.danger');
+    await failButton.click();
+    const req = await context.expectRequest();
+    expect(req.body).toContain('Payment+failed');
+    expect(req.body).not.toEqual('razorpay_payment_id=pay_123465');
+    await context.respondPlain('11');
+  } else if (passOrFail == 'pass') {
+    const passButton = await context.page.$('.success');
+    await passButton.click();
+    const req = await context.expectRequest();
+    expect(req.body).toEqual('razorpay_payment_id=pay_123465');
+    await context.respondPlain('11');
+  }
 }
 
 async function handleValidationRequest(context, passOrFail) {

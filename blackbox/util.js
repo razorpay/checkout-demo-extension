@@ -23,6 +23,7 @@ module.exports = {
       const url = interceptedRequest.url();
       const ignoredUrl =
         !interceptorEnabled ||
+        url.endsWith('favicon.ico') ||
         url.startsWith('data') ||
         url.startsWith(cdnUrl) ||
         url.startsWith(lumberjackUrl);
