@@ -28,6 +28,6 @@ describe('Wallet payment', () => {
     await assertWalletPage(context);
     await selectWallet(context, 'freecharge');
     await submit(context);
-    await validateHelpMessage(context, 'Please enter a valid contact number');
+    await validateHelpMessage(context, 'The contact field is required.');
   });
 });

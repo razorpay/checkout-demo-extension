@@ -13,7 +13,7 @@ const {
 } = require('../../actions/common');
 
 describe('Wallet payment', () => {
-  test('Perform wallet transaction with contact as optional', async () => {
+  test('Perform wallet transaction with contact as optional and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -30,7 +30,7 @@ describe('Wallet payment', () => {
     await assertWalletPage(context);
     await selectWallet(context, 'freecharge');
     await submit(context);
-    await validateHelpMessage(context, 'Please enter a valid contact number');
+    await validateHelpMessage(context, 'The contact field is required.');
     await verifyTimeout(context, 'wallet');
   });
 });
