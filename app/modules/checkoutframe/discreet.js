@@ -21,16 +21,11 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
-import FeeBearerView from 'checkoutframe/feebearer';
-import SavedCardsView from 'checkoutframe/savedcards';
+import FeeBearerView from 'templates/views/feebearer.svelte';
 import emandateView from 'checkoutframe/emandate';
-import emiOptionsView from 'checkoutframe/emioptions';
-import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
-import PayLaterView from 'checkoutframe/paylater';
 import * as Curtain from 'components/curtain';
-import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import MethodsList from 'components/MethodsList';
@@ -60,12 +55,16 @@ import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences';
 import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
-import OTPScreenStore from 'checkoutstore/screens/otp';
+import * as OTPScreenStore from 'checkoutstore/screens/otp';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
+import emiOptionsView from 'templates/screens/cardlessemi.svelte';
+import emiScreenView from 'templates/screens/emiscreen.svelte';
+import SavedCardsView from 'templates/screens/savedcards.svelte';
+import PayLaterView from 'templates/screens/paylater.svelte';
 import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
 
@@ -73,6 +72,8 @@ import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
 import PayoutAccount from 'templates/screens/payout-account.svelte';
 
 import * as Hacks from 'checkoutframe/hacks';
+
+import { get as storeGetter } from 'svelte/store';
 
 export default {
   RazorpayConfig,
@@ -148,7 +149,6 @@ export default {
   otpView,
   PayLaterView,
   Curtain,
-  OptionsList,
   commonBanks,
   timer: _.timer,
   QRScreen,
@@ -161,6 +161,7 @@ export default {
   NachScreen,
 
   Hacks,
+  storeGetter,
 
   _Arr,
   _Doc,

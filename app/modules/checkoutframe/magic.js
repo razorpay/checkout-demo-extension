@@ -5,7 +5,12 @@ import * as Bridge from 'bridge';
 import { STRINGS, TIMEOUT_MAGIC_NO_ACTION } from 'common/constants';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
-import OtpScreenStore from 'checkoutstore/screens/otp';
+
+import {
+  otp as $otp,
+  allowResend as $allowResend,
+} from 'checkoutstore/screens/otp';
+import { get as storeGetter } from 'svelte/store';
 
 /* Constants */
 const TIMEOUT_CLEAR = -1;
@@ -32,7 +37,7 @@ export default class Magic {
     });
   }
 
-  destroy() {
+  $destroy() {
     this.clearTimeout();
 
     if (this.resendCallout) {
@@ -40,7 +45,7 @@ export default class Magic {
       delete this.resendCallout;
     }
 
-    this.view.destroy();
+    this.view.$destroy();
   }
 
   track(eventName, data) {
@@ -175,10 +180,8 @@ export default class Magic {
      * In case of choice page, the magic will take us to the otp page
      * and then call handleRelay `page_resolved` with `type` as `otp`
      */
-    if (data.otp && !OtpScreenStore.get().otp) {
-      this.session.otpView.updateScreen({
-        otp: data.otp,
-      });
+    if (data.otp && !storeGetter($otp)) {
+      $otp.set(data.otp);
     }
   }
 
@@ -187,9 +190,7 @@ export default class Magic {
 
     if (this.resendCount === 1) {
       if (confirmedCancel === true) {
-        this.session.otpView.updateScreen({
-          allowResend: false,
-        });
+        $allowResend.set(false);
       } else {
         return Confirm.show({
           message: 'This is your last attempt to generate OTP.',
@@ -282,7 +283,7 @@ export default class Magic {
 
     if (screen === 'magic-choice') {
       delete data[''];
-      data.choice = this.view.get().selectedChoice;
+      data.choice = this.view.selectedChoice;
 
       this.track('choice', {
         choice: data['choice'],

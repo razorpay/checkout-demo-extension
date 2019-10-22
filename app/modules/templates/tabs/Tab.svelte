@@ -1,36 +1,35 @@
-{#if methodSupported}
-  <div
-    class="tab-content showable screen"
-    id='form-{method}'
-    class:pad
-    class:hasMessage
-
-    {down}
-  >
-    <slot></slot>
-  </div>
-{/if}
-
-<style>
-
-.hasMessage {
-  padding-bottom: 56px;
-}
-
-</style>
-
 <script>
+  // Utils imports
   import { getSession } from 'sessionmanager';
 
-  export default {
-    computed: {
-      methodSupported: ({ method, overrideMethodCheck }) => overrideMethodCheck || getSession().methods[method]
-    },
+  // Props
+  export let method;
+  export let overrideMethodCheck = false;
+  export let down = false;
+  export let pad = true;
+  export let hasMessage = false;
 
-    data: () => ({
-      overrideMethodCheck: false,
-      pad: true,
-      down: false,
-    })
-  }
+  // Computed
+  export let methodSupported;
+
+  const session = getSession();
+
+  $: methodSupported = overrideMethodCheck || session.methods[method];
 </script>
+
+<style>
+  .hasMessage {
+    padding-bottom: 56px;
+  }
+</style>
+
+{#if methodSupported}
+  <div
+    {down}
+    id="form-{method}"
+    class="tab-content showable screen"
+    class:pad
+    class:hasMessage>
+    <slot />
+  </div>
+{/if}

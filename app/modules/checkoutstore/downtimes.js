@@ -1,4 +1,13 @@
-const defaultState = {};
+const defaultState = {
+  disable: {
+    methods: [],
+    banks: [],
+  },
+  warn: {
+    methods: [],
+    banks: [],
+  },
+};
 
 function Downtimes(base) {
   let downtimeState = {};

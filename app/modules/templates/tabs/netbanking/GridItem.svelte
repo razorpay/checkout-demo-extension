@@ -1,23 +1,46 @@
+<script>
+  // Props
+  export let disabled = false;
+  export let code = '';
+  export let group = null;
+  export let name = '';
+  export let fullName = '';
+
+  // UI imports
+  import Tooltip from 'templates/views/ui/Tooltip.svelte';
+</script>
+
+<style>
+  .netb-bank {
+    overflow: visible;
+  }
+
+  .netb-bank.disabled {
+    cursor: default;
+  }
+
+  .netb-bank.disabled .item-inner {
+    opacity: 0.3;
+  }
+</style>
+
 <div
   class="netb-bank item radio-item has-tooltip"
   class:disabled
   class:has-tooltip={disabled}
-  id="bank-item-{code}"
   down={disabled}
->
+  id="bank-item-{code}">
   <input
+    {disabled}
     class="bank-radio"
     id="bank-radio-{code}"
-    type="radio"
     name="bank"
+    type="radio"
     value={code}
-    {disabled}
-
-    bind:group
-  >
+    bind:group />
   <label for="bank-radio-{code}" class="radio-label mfix">
     <div class="mchild item-inner">
-      <img alt="{name} Logo" src="https://cdn.razorpay.com/bank/{code}.gif">
+      <img alt="{name} Logo" src="https://cdn.razorpay.com/bank/{code}.gif" />
       <div>{name}</div>
     </div>
     {#if disabled}
@@ -25,39 +48,11 @@
         <Tooltip
           bindTo="#form-netbanking"
           class="downtime-tooltip"
-          align={['bottom']}
-        >
-          {fullName} accounts are facing temporary issues right now. Please select another bank.
+          align={['bottom']}>
+          {fullName} accounts are facing temporary issues right now. Please
+          select another bank.
         </Tooltip>
       </span>
     {/if}
   </label>
 </div>
-
-<style>
-
-.netb-bank {
-  overflow: visible;
-}
-
-.netb-bank.disabled {
-  cursor: default;
-}
-
-.netb-bank.disabled .item-inner {
-  opacity: 0.3;
-}
-
-</style>
-
-<script>
-
-export default {
-
-  components: {
-    Tooltip: 'templates/views/ui/Tooltip.svelte',
-  },
-
-}
-
-</script>

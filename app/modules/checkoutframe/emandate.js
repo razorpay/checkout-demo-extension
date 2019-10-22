@@ -2,6 +2,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { getCheckoutBridge } from 'bridge';
 import * as Curtain from 'components/curtain';
+import { getSession } from 'sessionmanager';
 
 /* global templates, fillData */
 
@@ -9,7 +10,9 @@ const emandateTabTitles = {
   'emandate-netbanking': 'Netbanking',
 };
 
-export default function emandateView(session) {
+export default function emandateView() {
+  const session = getSession();
+
   this.history = [];
   this.session = session;
 

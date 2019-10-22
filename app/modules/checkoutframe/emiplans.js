@@ -40,9 +40,7 @@ const AGREEMENT_HELPER = {
   },
 };
 
-export default function emiPlansView(session) {
-  this.session = session;
-}
+export default function emiPlansView() {}
 
 const viewAgreement = (provider, duration) => {
   let terms = 'An error occurred while fetching the loan agreement.';
@@ -106,7 +104,8 @@ emiPlansView.prototype = {
     this.onSelect = on.select || _Func.noop;
     this.back = on.back || _Func.noop;
 
-    on.select = plan => {
+    on.select = event => {
+      const plan = event.detail;
       Analytics.track('emi:plan:choose', {
         type: AnalyticsTypes.BEHAV,
         data: {
@@ -121,12 +120,11 @@ emiPlansView.prototype = {
     on.viewAgreement = () =>
       viewAgreement(provider, this.selectedPlan.duration);
 
-    const data = {
+    const props = {
       on,
       plans,
       actions,
       expanded: -1,
-      session: this.session,
       amount,
       provider,
       branding,
@@ -136,10 +134,10 @@ emiPlansView.prototype = {
       const target = _Doc.querySelector(TARGET_QS);
       this.view = new EMIPlansView({
         target,
-        data,
+        props,
       });
     } else {
-      this.view.set(data);
+      this.view.$set(props);
     }
   },
 

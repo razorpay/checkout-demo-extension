@@ -1,18 +1,18 @@
-<div class="methods-loader">
-  <div class="box"></div>
-  <div class="line"></div>
-  <div class="circle"></div>
-</div>
+<script>
 
+</script>
 
 <style>
   .methods-loader {
     position: relative;
 
-    .box, .line, .circle {
-      top:0;
+    .box,
+    .line,
+    .circle {
+      top: 0;
       position: absolute;
-      background-image: linear-gradient(to right,
+      background-image: linear-gradient(
+        to right,
         #cecece 0%,
         #ffffff 25%,
         #cecece 50%
@@ -48,5 +48,10 @@
       animation-name: methodsLoaderBox;
     }
   }
-
 </style>
+
+<div class="methods-loader">
+  <div class="box" />
+  <div class="line" />
+  <div class="circle" />
+</div>
