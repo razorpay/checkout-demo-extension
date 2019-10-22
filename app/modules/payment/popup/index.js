@@ -112,7 +112,11 @@ Popup.prototype = {
   /**
    * Emits the "close" event.
    */
-  checkClose: function(forceClosed) {
+  checkClose: function(forceClosed, timesInvoked = 0) {
+    if (timesInvoked > 20) {
+      return;
+    }
+
     try {
       if (forceClosed || this.window.closed !== false) {
         // UC browser makes it undefined instead of true
@@ -126,7 +130,7 @@ Popup.prototype = {
       }
     } catch (e) {
       // UC throws error on accessing window if other domain
-      this.checkClose(true);
+      this.checkClose(true, timesInvoked + 1);
     }
   },
 };
