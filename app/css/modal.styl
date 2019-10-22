@@ -301,9 +301,6 @@ body, html {
   }
 }
 
-#netb-banks .item {
-  overflow: hidden;
-}
 
 .nb-selection-container {
   padding-bottom: 12px;
@@ -1652,12 +1649,17 @@ $outline = #ddd;
   font-size: 13px;
   line-height: 20px;
   border-top: 1px solid #f3ebd3;
-  padding-left: 24px + 16px;
+  padding-left: 24px + 20px;
   color: #666;
 
   span {
     position: absolute;
     left: 24px;
+  }
+
+  &.error {
+    background-color: rgb(243, 219, 213);
+    border-color: rgb(243, 182, 160);
   }
 }
 

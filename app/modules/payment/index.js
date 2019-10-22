@@ -416,7 +416,7 @@ Payment.prototype = {
       delete data._time;
     }
 
-    if (data.action === 'TOPUP') {
+    if (data.error && data.error.action === 'TOPUP') {
       return processOtpResponse.call(this, data);
     }
 

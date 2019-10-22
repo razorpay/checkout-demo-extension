@@ -66,6 +66,7 @@ import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
+import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
 
 import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
@@ -156,6 +157,7 @@ export default {
 
   MagicView,
   UpiTab,
+  NetbankingTab,
   NachScreen,
 
   Hacks,

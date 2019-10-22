@@ -1,8 +1,23 @@
 {#if methodSupported}
-  <div class="tab-content showable screen" id='form-{method}' class:pad {down}>
+  <div
+    class="tab-content showable screen"
+    id='form-{method}'
+    class:pad
+    class:hasMessage
+
+    {down}
+  >
     <slot></slot>
   </div>
 {/if}
+
+<style>
+
+.hasMessage {
+  padding-bottom: 56px;
+}
+
+</style>
 
 <script>
   import { getSession } from 'sessionmanager';
