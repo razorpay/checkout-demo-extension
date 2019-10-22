@@ -32,6 +32,13 @@
     optionClasses = defaultClasses.concat(classes).join(' ');
   }
 
+  /**	  
+   * When the element is focused on,	
+   * and the user wants to select it,	
+   * the user will press Space or Enter.	
+   *	
+   * Simulate a "select" event when this happens.	
+   */
   function selectOnKeydown(event) {
     /**
      * If the element has more focusable elements
