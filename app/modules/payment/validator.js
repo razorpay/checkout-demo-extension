@@ -2,6 +2,7 @@ import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { getCardType, luhnCheck } from 'common/card';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
@@ -37,14 +38,24 @@ export const formatPayment = function(payment) {
   let params =
     ['feesRedirect', 'tez', 'gpay', 'avoidPopup']
     |> _Arr.reduce((allParams, param) => {
-      if (param in payment) {
+      if (payment |> _Obj.hasOwnProp(param)) {
         allParams[param] = payment[param];
       }
       return allParams;
     }, {});
 
   payment.data = formatPayload(payment.data, payment.r, params);
+  validateData(payment.data);
 };
+
+function validateData(data) {
+  const cardNum = data |> _Obj.getOwnProp('card[name]');
+  if (cardNum && luhnCheck(cardNum) && getCardType(cardNum)) {
+    _.throwMessage(
+      'Error in integration. Please contact Razorpay for assistance'
+    );
+  }
+}
 
 export const formatPayload = function(payload, razorpayInstance, params = {}) {
   var data = _Obj.clone(payload);
@@ -75,7 +86,7 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
       'recurring_token.expire_by',
     ],
     field => {
-      if (!(field in data)) {
+      if (!(data |> _Obj.hasOwnProp(field))) {
         var val = getOption(field);
         if (val) {
           // send boolean value true as 1
