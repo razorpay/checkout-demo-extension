@@ -114,7 +114,7 @@ async function handleCardValidationWithCallback(context) {
 }
 
 async function handleMockSuccessOrFailDialog(context, passOrFail) {
-  const popup = context.popup();
+  const popup = await context.popup();
   const popupPage = await popup.page();
   if (passOrFail == 'fail') {
     const failButton = await popupPage.$('.danger');
@@ -123,7 +123,7 @@ async function handleMockSuccessOrFailDialog(context, passOrFail) {
     const passButton = await popupPage.$('.success');
     await passButton.click();
   }
-  await delay(600);
+  await delay(800);
 }
 
 async function handleMockSuccessOrFailWithCallback(context, passOrFail) {
