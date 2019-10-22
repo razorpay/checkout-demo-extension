@@ -6,7 +6,7 @@ import * as Curtain from 'components/curtain';
 /* global templates, fillData */
 
 const emandateTabTitles = {
-  'emandate-netbanking': 'Account Details',
+  'emandate-details': 'Account Details',
   'emandate-auth-selection': 'Select Auth',
 };
 
@@ -91,12 +91,12 @@ emandateView.prototype = {
 
     this.on('click', '.auth-option.netbanking', () => {
       this.setAuthType('netbanking');
-      this.setScreen('emandate-netbanking');
+      this.setScreen('emandate-details');
     });
 
     this.on('click', '.auth-option.debitcard', () => {
       this.setAuthType('debitcard');
-      this.setScreen('emandate-netbanking');
+      this.setScreen('emandate-details');
     });
   },
 
@@ -146,7 +146,7 @@ emandateView.prototype = {
         )
       ) {
         this.setAuthType(prefilledAuthType);
-        this.showTab('emandate-netbanking');
+        this.showTab('emandate-details');
       } else {
         this.showTab('emandate-auth-selection');
       }
@@ -228,7 +228,7 @@ emandateView.prototype = {
   setScreen: function(screen) {
     this.session.setScreen(screen);
 
-    if (screen !== 'emandate-netbanking') {
+    if (screen !== 'emandate-details') {
       this.session.body.removeClass('sub');
     } else {
       this.session.body.addClass('sub');
@@ -242,7 +242,7 @@ emandateView.prototype = {
     }
     const authTypes = this.getAvailableAuthTypes();
 
-    if (tab === 'emandate-netbanking' && authTypes.indexOf('netbanking') < 0) {
+    if (tab === 'emandate-details' && authTypes.indexOf('netbanking') < 0) {
       return false;
     }
 
