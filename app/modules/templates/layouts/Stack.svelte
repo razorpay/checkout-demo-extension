@@ -1,26 +1,23 @@
-<div class="stack" class:stack-horizontal="horizontal" class:stack-vertical="vertical">
-  <slot></slot>
-</div>
+<script>
+  // Props
+  export let horizontal = false;
+  export let vertical = false;
+</script>
 
 <style>
   .stack {
     display: flex;
   }
 
-  .stack.stack-horizontal {
+  .stack.horizontal {
     flex-direction: row;
   }
 
-  .stack.stack-vertical {
+  .stack.vertical {
     flex-direction: column;
   }
 </style>
 
-<script>
-  export default {
-    data: () => ({
-      horizontal: false,
-      vertical: false,
-    })
-  }
-</script>
+<div class="stack" class:horizontal class:vertical>
+  <slot />
+</div>

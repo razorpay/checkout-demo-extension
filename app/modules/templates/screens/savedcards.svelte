@@ -1,30 +1,19 @@
-{#each cards as card (card.id)}
-  <SavedCard
-    {...card}
-
-    on:viewPlans="onViewPlans(event)"
-  />
-{/each}
-
 <script>
+  // UI imports
   import SavedCard from 'templates/views/savedcard.svelte';
   import * as Card from 'common/card';
 
-  export default {
-    components: {
-      SavedCard,
-    },
+  // Props
+  export let cards = [];
+  export let on = {};
 
-    methods: {
-      onViewPlans: function (event) {
-        const {
-          on = {}
-        } = this.get();
-
-        if (on.viewPlans) {
-          on.viewPlans(event);
-        }
-      }
-    },
+  export function onViewPlans(event) {
+    if (on.viewPlans) {
+      on.viewPlans(event);
+    }
   }
 </script>
+
+{#each cards as card (card.id)}
+  <SavedCard {...card} on:viewPlans={onViewPlans} />
+{/each}

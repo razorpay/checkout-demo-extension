@@ -34,7 +34,7 @@ Format: `key`, `merchant_id`
 
 ### Semi-automated
 
-1. Add/remove BIN to/from [`scripts/emi/bin.js`](scripts/emi/bin.js), ensure that it is in a numerically sorted order.
+1. Add/remove BIN to/from [`scripts/emi/bins.js`](scripts/emi/bins.js), ensure that it is in a numerically sorted order.
 2. `cd scripts/emi`
 3. `node index.js <bank_code>`
 4. Copy the regex and paste it in [`app/modules/common/bank.js`](app/modules/common/bank.js)

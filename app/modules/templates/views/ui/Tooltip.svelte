@@ -1,21 +1,19 @@
-<div
-  class="tooltip {class} "
-  class:tooltip-shown="shown"
-  ref:tooltip
->
-  <slot></slot>
-</div>
-
 <script>
-  /**
-   * Checks if child is within the bounds of parent.
-   *
-   * @param {DOMNode} parent
-   * @param {DOMNODe} child
-   *
-   * @return {Boolean}
-   */
-  function isWithinBounds (parent, child) {
+  // Svelte imports
+  import { onMount, onDestroy } from 'svelte';
+
+  // Props
+  export let className;
+  export let shown = false; // Is it shown?
+  export let bindTo = '#body'; // Where should the alignment be bound to?
+  export let autoAlign = true; // Should align automatically after mounting?
+  export let align = ['right']; // Default alignment directions
+  export let alignOnHover = true; // Should we align again when parent is hovered on?
+
+  // Refs
+  let tooltip = null;
+
+  function isWithinBounds(parent, child) {
     const rects = {
       parent: parent.getBoundingClientRect(),
       child: child.getBoundingClientRect(),
@@ -42,13 +40,13 @@
    *
    * @return {Array}
    */
-  function getOverflowingDirections (parent, child) {
+  function getOverflowingDirections(parent, child) {
     const rects = {
       parent: parent.getBoundingClientRect(),
       child: child.getBoundingClientRect(),
     };
 
-    const directions = []
+    const directions = [];
 
     if (rects.parent.top > rects.child.top) {
       directions.push('top');
@@ -91,7 +89,9 @@
    */
   function alignTooltipTo(tooltip, directions) {
     // Remove all directions.
-    _Arr.loop(ALL_DIRECTIONS, direction => _El.removeClass(tooltip, `tooltip-${direction}`));
+    _Arr.loop(ALL_DIRECTIONS, direction =>
+      _El.removeClass(tooltip, `tooltip-${direction}`)
+    );
 
     // Align tooltip to provided directions.
     _Arr.loop(directions, direction => {
@@ -99,7 +99,7 @@
         return;
       }
 
-      _El.addClass(tooltip, `tooltip-${direction}`)
+      _El.addClass(tooltip, `tooltip-${direction}`);
     });
   }
 
@@ -156,7 +156,11 @@
       const opposite = OPPOSITE_AXIS[flipped];
 
       // Flip just the overflowing direction
-      directionsList.push([flipped].concat(_Arr.filter(directions, direction => direction !== overflowIn[0])));
+      directionsList.push(
+        [flipped].concat(
+          _Arr.filter(directions, direction => direction !== overflowIn[0])
+        )
+      );
 
       // Flip the entire direction
       directionsList.push([flipped]);
@@ -187,133 +191,91 @@
     return directions;
   }
 
-  export default {
-    data: function () {
-      return {
-        bindTo: '#body', // Where should the alignment be bound to?
-        autoAlign: true, // Should align automatically after mounting?
-        align: ['right'], // Default alignment directions
-        shown: false, // Is it shown?
-        alignOnHover: true, // Should we align again when parent is hovered on?
-      }
-    },
-
-    methods: {
-      /**
-       * Sets the alignment classes.
-       */
-      setAlignmentClasses: function () {
-        const {
-          align
-        } = this.get();
-
-        const {
-          tooltip
-        } = this.refs;
-
-        alignTooltipTo(tooltip, align);
-      },
-
-      /**
-       * Sets the bounds.
-       */
-      setBounds: function () {
-        const {
-          bindTo,
-          autoAlign,
-          align
-        } = this.get();
-
-        if (!autoAlign || !bindTo) {
-          return;
-        }
-
-        const boundingElem = _Doc.querySelector(bindTo);
-        const tooltip = this.refs.tooltip;
-
-        if (!boundingElem || !tooltip) {
-          return;
-        }
-
-        this.set({
-          align: getTooltipAlignedDirections(boundingElem, tooltip, align),
-        });
-
-        this.setAlignmentClasses();
-      },
-
-      /**
-       * Returns the first parent with 'has-tooltip' class
-       *
-       * @returns {Element}
-       */
-      getHoverParent: function () {
-        let parent = this.refs.tooltip;
-
-        while (!_El.hasClass(parent, 'has-tooltip')) {
-          parent = _El.parent(parent);
-        }
-
-        return parent;
-      },
-
-      /**
-       * Adds alignment listener on hover parent.
-       */
-      addAlignmentListenerFromHoverParent: function () {
-        const {
-          alignOnHover,
-        } = this.get();
-
-        if (!alignOnHover) {
-          return;
-        }
-
-        let hoverParent = this.getHoverParent();
-
-        if (!hoverParent) {
-          return;
-        }
-
-        const boundAlign = this.setBounds.bind(this);
-
-        hoverParent.addEventListener('mouseover', boundAlign);
-
-        this.set({
-          boundAlign,
-          hoverParent,
-        });
-      },
-
-      /**
-       * Removes alignment listener on hover parent.
-       */
-      removeAlignmentListenerFromHoverParent: function () {
-        const {
-          alignOnHover,
-          boundAlign,
-          hoverParent
-        } = this.get();
-
-        if (!alignOnHover || !hoverParent || !boundAlign) {
-          return;
-        }
-
-        // TODO: Check if 'mouseover' suffices for mobile
-        hoverParent.removeEventListener('mouseover', boundAlign);
-      }
-    },
-
-    oncreate: function () {
-      setTimeout(() => {
-        this.setAlignmentClasses();
-        this.setBounds();
-        this.addAlignmentListenerFromHoverParent();
-      });
-    },
-
-    ondestroy: function () {
-      this.removeAlignmentListenerFromHoverParent();
-    },
+  function setAlignmentClasses() {
+    alignTooltipTo(tooltip, align);
   }
+
+  function setBounds() {
+    if (!autoAlign || !bindTo) {
+      return;
+    }
+
+    const boundingElem = _Doc.querySelector(bindTo);
+
+    if (!boundingElem || !tooltip) {
+      return;
+    }
+
+    align = getTooltipAlignedDirections(boundingElem, tooltip, align);
+
+    setAlignmentClasses();
+  }
+
+  /**
+   * Returns the first parent with 'has-tooltip' class
+   *
+   * @returns {Element}
+   */
+  function getHoverParent() {
+    let parent = tooltip;
+
+    while (!_El.hasClass(parent, 'has-tooltip')) {
+      parent = _El.parent(parent);
+    }
+
+    return parent;
+  }
+
+  /**
+   * Adds alignment listener on hover parent.
+   */
+  function addAlignmentListenerFromHoverParent() {
+    if (!alignOnHover) {
+      return;
+    }
+
+    let hoverParent = getHoverParent();
+
+    if (!hoverParent) {
+      return;
+    }
+
+    hoverParent.addEventListener('mouseover', setBounds);
+  }
+
+  /**
+   * Removes alignment listener on hover parent.
+   */
+  function removeAlignmentListenerFromHoverParent() {
+    if (!alignOnHover) {
+      return;
+    }
+
+    let hoverParent = getHoverParent();
+
+    if (!hoverParent) {
+      return;
+    }
+
+    hoverParent.removeEventListener('mouseover', setBounds);
+  }
+
+  onMount(() => {
+    setTimeout(() => {
+      setAlignmentClasses();
+      setBounds();
+      addAlignmentListenerFromHoverParent();
+    });
+  });
+
+  onDestroy(() => {
+    removeAlignmentListenerFromHoverParent();
+  });
 </script>
+
+<div
+  class="tooltip {className}"
+  class:tooltip-shown={shown}
+  bind:this={tooltip}>
+  <slot />
+</div>

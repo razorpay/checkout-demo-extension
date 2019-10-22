@@ -130,3 +130,6 @@ overrideInsertRule();
       (window.performance.timing.navigationStart = Date.now());
   }
 })();
+
+import './native';
+import './customelements';

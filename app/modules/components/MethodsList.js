@@ -9,6 +9,7 @@ import {
   filterInstrumentsForAvailableMethods,
   _createInstrumentForImmediateUse,
 } from 'checkoutframe/personalization';
+import { getSession } from 'sessionmanager';
 
 /**
  * Get the available methods.
@@ -46,33 +47,33 @@ const getAvailableMethods = methods => {
 };
 
 export default class MethodsList {
-  constructor({ target, data }) {
-    const session = data.session;
-    data.AVAILABLE_METHODS = getAvailableMethods(data.session.methods);
+  constructor({ target, props }) {
+    const session = getSession();
+    props.AVAILABLE_METHODS = getAvailableMethods(session.methods);
 
     // We do not want to show PayPal in the list in case of international
-    if (data.session.international) {
-      data.AVAILABLE_METHODS = _Arr.remove(data.AVAILABLE_METHODS, 'paypal');
+    if (session.international) {
+      props.AVAILABLE_METHODS = _Arr.remove(props.AVAILABLE_METHODS, 'paypal');
     }
 
     this.view = new MethodsListView({
       target: _Doc.querySelector(target),
-      data,
+      props,
     });
 
     this.otherMethodsView = new OtherMethodsView({
       target: _Doc.querySelector('#other-methods'),
-      data,
+      props,
     });
 
     /* This is to set default screen in the view */
-    this.view.set({
+    this.view.$set({
       showMessage: session.p13n,
     });
 
-    this.animateNext = data.animate;
+    this.animateNext = props.animate;
 
-    this.data = data;
+    this.props = props;
     this.addListeners();
     this.hasLongClass =
       _Doc.querySelector('#container') |> _El.hasClass('long');
@@ -87,13 +88,13 @@ export default class MethodsList {
   }
 
   addListeners() {
-    this.view.on('select', e => {
+    this.view.$on('select', event => {
       _Doc.querySelector('#body') |> _El.addClass('sub');
-      this.selectedInstrument = e;
+      this.selectedInstrument = event.detail;
     });
 
-    this.view.on('showMethods', e => {
-      this.otherMethodsView.set({
+    this.view.$on('showMethods', () => {
+      this.otherMethodsView.$set({
         visible: true,
       });
 
@@ -104,8 +105,8 @@ export default class MethodsList {
       _Doc.querySelector('#body') |> _El.removeClass('sub');
     });
 
-    this.otherMethodsView.on('hideMethods', e => {
-      this.otherMethodsView.set({
+    this.otherMethodsView.$on('hideMethods', () => {
+      this.otherMethodsView.$set({
         visible: false,
       });
 
@@ -113,37 +114,37 @@ export default class MethodsList {
         type: AnalyticsTypes.BEHAV,
       });
 
-      if (this.view.get().selected) {
+      if (this.view.selected) {
         _Doc.querySelector('#body') |> _El.addClass('sub');
       }
     });
 
-    const onMethodSelected = e => {
-      let { method, down } = e.data;
+    const onMethodSelected = event => {
+      let { method, down } = event.detail;
 
       if (down) {
         return;
       }
 
-      this.data.session.switchTab(method);
+      getSession().switchTab(method);
     };
 
-    this.view.on('methodSelected', onMethodSelected);
-    this.otherMethodsView.on('methodSelected', onMethodSelected);
+    this.view.$on('methodSelected', onMethodSelected);
+    this.otherMethodsView.$on('methodSelected', onMethodSelected);
   }
 
-  destroy() {
-    this.view.destroy();
+  $destroy() {
+    this.view.$destroy();
   }
 
-  set(data) {
-    let session = this.data.session;
-    if (!data.instruments && data.customer) {
+  set(props) {
+    const session = getSession();
+    if (!props.instruments && props.customer) {
       /* Just setting customer here (login/logout), rest does not change */
-      return this.view.set(data);
+      return this.view.$set(props);
     }
 
-    data = _Obj.clone(data);
+    props = _Obj.clone(props);
 
     /**
      * This count is also being sent with the
@@ -171,8 +172,8 @@ export default class MethodsList {
     }
 
     /* Only allow for available methods */
-    data.instruments = filterInstrumentsForAvailableMethods(
-      data.instruments,
+    props.instruments = filterInstrumentsForAvailableMethods(
+      props.instruments,
       session.methods
     );
 
@@ -186,14 +187,14 @@ export default class MethodsList {
     if (session.international && session.methods.paypal) {
       /**
        * If merchant doesn't want p13n,
-       * data.instruments should contain only PayPal
+       * props.instruments should contain only PayPal
        */
       if (session.get().personalization === false) {
-        data.instruments = [];
+        props.instruments = [];
       }
 
-      data.instruments =
-        data.instruments
+      props.instruments =
+        props.instruments
         |> _Arr.insertAt(
           _createInstrumentForImmediateUse({
             method: 'paypal',
@@ -204,7 +205,7 @@ export default class MethodsList {
     }
 
     /* Filter out any app that's in user's list but not currently installed */
-    data.instruments = _Arr.filter(data.instruments, instrument => {
+    props.instruments = _Arr.filter(props.instruments, instrument => {
       if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
         if (instrument['_[upiqr]'] === '1' && !isMobile()) {
           return true;
@@ -219,19 +220,19 @@ export default class MethodsList {
       return true;
     });
 
-    data.instruments = _Arr.slice(data.instruments, 0, noOfInstrumentsToShow);
-    data.selected = null;
+    props.instruments = _Arr.slice(props.instruments, 0, noOfInstrumentsToShow);
+    props.selected = null;
     this.selectedInstrument = null;
 
     var delay = 1500;
 
     if (this.animateNext === false) {
       delay = 0;
-      data.animate = false;
+      props.animate = false;
       this.animateNext = true;
     }
 
-    this.view.set(data);
-    this.otherMethodsView.set(data);
+    this.view.$set(props);
+    this.otherMethodsView.$set(props);
   }
 }

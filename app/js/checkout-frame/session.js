@@ -24,7 +24,6 @@ var preferences = window.preferences,
   PreferencesStore = discreet.PreferencesStore,
   DowntimesStore = discreet.DowntimesStore,
   SessionStore = discreet.SessionStore,
-  OptionsList = discreet.OptionsList,
   UPIUtils = discreet.UPIUtils,
   Payouts = discreet.Payouts,
   _Arr = discreet._Arr,
@@ -1563,8 +1562,7 @@ Session.prototype = {
     if (!this.methodsList) {
       this.methodsList = new discreet.MethodsList({
         target: '#methods-list',
-        data: {
-          session: this,
+        props: {
           animate: false,
         },
       });
@@ -1581,15 +1579,13 @@ Session.prototype = {
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
         target: gel('upi-svelte-wrap'),
-        data: {
-          methods: this.methods,
-        },
       });
     }
   },
 
   setNetbankingTab: function() {
     var method;
+
     if (this.methods.emandate) {
       method = 'emandate';
     } else if (this.methods.netbanking) {
@@ -1603,7 +1599,7 @@ Session.prototype = {
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
-        data: {
+        props: {
           bankOptions: this.get('method.netbanking'),
           banks: this.methods.emandate || this.methods.netbanking,
           recurring: this.recurring,
@@ -1615,7 +1611,7 @@ Session.prototype = {
 
       // Add listener for proceeding automatically only if emandate
       if (method === 'emandate') {
-        this.netbankingTab.on(
+        this.netbankingTab.$on(
           'bankSelected',
           this.proceedAutomaticallyAfterSelectingBank.bind(this)
         );
@@ -1704,21 +1700,25 @@ Session.prototype = {
   setEMI: function() {
     if (!this.emi && this.methods.emi) {
       $(this.el).addClass('emi');
-      this.emi = new discreet.emiView(this);
+      this.emi = new discreet.emiView();
     }
 
     if (!this.emiPlansView) {
-      this.emiPlansView = new discreet.emiPlansView(this);
+      this.emiPlansView = new discreet.emiPlansView();
     }
   },
 
   setSavedCardsView: function() {
-    this.savedCardsView = new discreet.SavedCardsView(this);
+    if (this.methods.card || this.methods.emi) {
+      this.savedCardsView = new discreet.SavedCardsView({
+        target: _Doc.querySelector('#saved-cards-container'),
+      });
+    }
   },
 
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
-      this.emandateView = new discreet.emandateView(this);
+      this.emandateView = new discreet.emandateView();
     }
   },
 
@@ -1761,7 +1761,9 @@ Session.prototype = {
     var self = this;
 
     if (this.methods.cardless_emi) {
-      this.emiOptionsView = new discreet.emiOptionsView(this);
+      this.emiOptionsView = new discreet.emiOptionsView({
+        target: _Doc.querySelector('#emi-options-wrapper'),
+      });
 
       var providers = [];
 
@@ -1779,12 +1781,12 @@ Session.prototype = {
         providers.push(CardlessEmi.createProvider(provider, providerObj.name));
       });
 
-      this.emiOptionsView.setOptions({
+      this.emiOptionsView.$set({
         providers: providers,
 
         on: {
           select: function(event) {
-            var providerCode = event.option.code;
+            var providerCode = event.detail.code;
 
             self.selectCardlessEmiProvider(providerCode);
           },
@@ -1825,9 +1827,6 @@ Session.prototype = {
     if (isNachEnabled) {
       this.nachScreen = new discreet.NachScreen({
         target: _Doc.querySelector('#nach-wrap'),
-        data: {
-          session: this,
-        },
       });
     }
   },
@@ -1836,9 +1835,6 @@ Session.prototype = {
     if (this.methods.bank_transfer) {
       this.bankTransferView = new discreet.BankTransferScreen({
         target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
-        data: {
-          session: this,
-        },
       });
     }
   },
@@ -1852,7 +1848,9 @@ Session.prototype = {
       return;
     }
 
-    this.payLaterView = new PayLaterView(this);
+    this.payLaterView = new PayLaterView({
+      target: _Doc.querySelector('#paylater-wrapper'),
+    });
 
     var providers = [];
 
@@ -1866,12 +1864,12 @@ Session.prototype = {
       providers.push(PayLater.createProvider(provider, providerObj.name));
     });
 
-    this.payLaterView.setOptions({
+    this.payLaterView.$set({
       providers: providers,
 
       on: {
         select: function(event) {
-          var providerCode = event.option.code;
+          var providerCode = event.detail.code;
           self.selectPayLaterProvider(providerCode);
         },
       },
@@ -1893,12 +1891,10 @@ Session.prototype = {
     }
 
     this.emiScreenView = new discreet.emiScreenView({
-      data: {
-        session: session,
-      },
+      target: _Doc.querySelector('#form-emi'),
     });
 
-    this.emiScreenView.on('editplan', this.showEmiPlans('bajaj'));
+    this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
   },
 
   setPayoutsScreen: function() {
@@ -1924,8 +1920,7 @@ Session.prototype = {
 
     this.payoutsView = new discreet.PayoutsInstruments({
       target: gel('payouts-svelte-wrap'),
-      data: {
-        session: session,
+      props: {
         amount: this.formatAmountWithCurrency(this.get('amount')),
         upiAccounts: upiAccounts,
         bankAccounts: bankAccounts,
@@ -1934,20 +1929,17 @@ Session.prototype = {
 
     this.payoutsAccountView = new discreet.PayoutAccount({
       target: gel('payout-account-svelte-wrap'),
-      data: {
-        session: session,
-      },
     });
 
     $('#top-right').addClass('hidden');
 
-    this.payoutsView.on('selectaccount', function(account) {
+    this.payoutsView.$on('selectaccount', function(event) {
       $('#body').addClass('sub');
-      Analytics.track('payout:account:select', account);
+      Analytics.track('payout:account:select', event.detail);
     });
 
-    this.payoutsView.on('add', function(event) {
-      var method = event.method;
+    this.payoutsView.$on('add', function(event) {
+      var method = event.detail.method;
 
       if (method === 'upi') {
         session.switchTab('upi');
@@ -2226,14 +2218,16 @@ Session.prototype = {
       this.otpView = new discreet.otpView({
         target: gel('otp-screen-wrapper'),
 
-        on: {
-          chooseMethod: bind(function() {
-            this.switchTab();
-          }, this),
-          addFunds: bind(this.addFunds, this),
-          resend: bind(this.resendOTP, this),
-          retry: bind(this.back, this),
-          secondary: bind(this.secAction, this),
+        props: {
+          on: {
+            chooseMethod: bind(function() {
+              this.switchTab();
+            }, this),
+            addFunds: bind(this.addFunds, this),
+            resend: bind(this.resendOTP, this),
+            retry: bind(this.back, this),
+            secondary: bind(this.secAction, this),
+          },
         },
       });
     }
@@ -2259,7 +2253,7 @@ Session.prototype = {
   destroyMagic: function() {
     if (this.magicView) {
       $(this.el).removeClass('magic');
-      this.magicView.destroy();
+      this.magicView.$destroy();
       delete this.magicView;
     }
 
@@ -3136,8 +3130,6 @@ Session.prototype = {
         return;
       }
 
-      OptionsList.hide();
-
       this.hideErrorMessage(e);
     });
     this.click('#fd-hide', this.hideErrorMessage);
@@ -3578,14 +3570,13 @@ Session.prototype = {
     if (screen === 'qr') {
       this.currentScreen = new discreet.QRScreen({
         target: qs('#form-qr'),
-        data: {
+        props: {
           paymentData: this.getFormData(),
-          session: this,
           onSuccess: bind(successHandler, this),
         },
       });
     } else if (this.currentScreen) {
-      this.currentScreen.destroy();
+      this.currentScreen.$destroy();
       this.currentScreen = null;
     }
 
@@ -3648,7 +3639,7 @@ Session.prototype = {
     this.body.toggleClass('sub', showPaybtn);
 
     if (screen === 'upi') {
-      var isIntentFlow = this.upiTab.get().intent;
+      var isIntentFlow = this.upiTab.intent;
 
       if (isIntentFlow) {
         var data = this.upiTab.getPayload();
@@ -3656,22 +3647,26 @@ Session.prototype = {
         if (data['_[flow]'] === 'intent' && !data.upi_app) {
           $('#body').removeClass('sub');
         }
-      } else if (typeof this.upiTab.get().selectedApp === 'undefined') {
+      } else if (typeof this.upiTab.selectedApp === 'undefined') {
         $('#body').removeClass('sub');
       }
     }
 
     if (this.upiTab) {
       if (isGPayScreen) {
-        this.upiTab.set({ selectedApp: 'gpay' });
-        this.upiTab.onUpiAppSelection('gpay');
+        this.upiTab.$set({ selectedApp: 'gpay' });
+        this.upiTab.onUpiAppSelection({
+          detail: {
+            id: 'gpay',
+          },
+        });
       }
 
       /**
        * TODO: when more tabs are ported to Svelte, move current `tab` state to
        *       Store
        */
-      this.upiTab.set({ tab: this.tab });
+      this.upiTab.$set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);
@@ -4060,7 +4055,7 @@ Session.prototype = {
 
   switchTabAnalytics: function(tab) {
     if (tab === 'upi') {
-      var upiData = this.upiTab.get();
+      var upiData = this.upiTab;
 
       if (upiData.intent) {
         /**
@@ -4070,18 +4065,18 @@ Session.prototype = {
           type: AnalyticsTypes.RENDER,
           data: {
             count: {
-              eligible: _.lengthOf(upiData.intentApps),
-              all: _.lengthOf(upiData.allIntentApps),
+              eligible: _.lengthOf(this.upi_intents_data),
+              all: _.lengthOf(this.all_upi_intents_data),
             },
             list: {
               eligible: _Arr.join(
-                _Arr.map(upiData.intentApps, function(app) {
+                _Arr.map(this.upi_intents_data, function(app) {
                   return app.package_name;
                 }),
                 ','
               ),
               all: _Arr.join(
-                _Arr.map(upiData.allIntentApps, function(app) {
+                _Arr.map(this.all_upi_intents_data, function(app) {
                   return app.package_name;
                 }),
                 ','
@@ -4140,7 +4135,7 @@ Session.prototype = {
     if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         if (this.methodsList && this.p13n) {
-          this.methodsList.otherMethodsView.fire('hideMethods');
+          this.methodsList.otherMethodsView.hideMethods();
         }
         return;
       }
@@ -4276,7 +4271,7 @@ Session.prototype = {
 
     tab_titles.otp = tab_titles.card;
     this.otpView.updateScreen({
-      skipText: null,
+      skipText: 'Skip Saved Cards',
     });
 
     if (!customer.logged && !this.wants_skip) {
@@ -4788,10 +4783,10 @@ Session.prototype = {
 
         this.transformedTokens = this.transformTokens(tokensList.items);
 
-        this.savedCardsView.setCards({
+        this.savedCardsView.$set({
           cards: this.transformedTokens,
           on: {
-            viewPlans: function(e) {
+            viewPlans: function(event) {
               Analytics.track('saved_card:emi:plans:view', {
                 type: AnalyticsTypes.BEHAV,
                 data: {
@@ -4799,7 +4794,7 @@ Session.prototype = {
                 },
               });
 
-              self.showEmiPlans('saved')(e);
+              self.showEmiPlans('saved')(event.detail);
             },
           },
         });
@@ -4942,7 +4937,9 @@ Session.prototype = {
    * Once the bank is selected in the banks list,
    * proceed automatically if some conditions are met.
    */
-  proceedAutomaticallyAfterSelectingBank: function(bank) {
+  proceedAutomaticallyAfterSelectingBank: function(event) {
+    var bank = event.detail.bank;
+
     if (this.checkInvalid()) {
       return;
     }
@@ -5237,18 +5234,19 @@ Session.prototype = {
       delete paymentData.upi_app;
 
       if (this.feeBearerView) {
-        this.feeBearerView.fetchFees(paymentData, session);
+        this.feeBearerView.fetchFees(paymentData);
       } else {
         this.feeBearerView = new discreet.FeeBearerView({
           target: gel('fee-wrap'),
-          data: {
-            session: this,
+          props: {
             paymentData: paymentData,
           },
         });
 
         // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.on('continue', function(bearer) {
+        this.feeBearerView.$on('continue', function(event) {
+          var bearer = event.detail;
+
           hideOverlaySafely($('#fee-wrap'));
 
           // Set the updated amount & fee
@@ -5261,7 +5259,7 @@ Session.prototype = {
           session.submit();
         });
 
-        this.feeBearerView.on('error', function() {
+        this.feeBearerView.$on('error', function() {
           makeHidden('#fee-wrap');
         });
       }
@@ -5287,7 +5285,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = discreet.OTPScreenStore.get().otp;
+    var otp = discreet.storeGetter(discreet.OTPScreenStore.otp);
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -5658,7 +5656,7 @@ Session.prototype = {
       // perform the actual validation
       if (screen === 'upi') {
         var formSelector = '#form-upi';
-        var omnichannelType = this.upiTab.get().omnichannelType;
+        var omnichannelType = this.upiTab.omnichannelType;
 
         if (data['_[flow]'] === 'intent') {
           if (!omnichannelType) {
@@ -5676,7 +5674,7 @@ Session.prototype = {
 
         if (
           data['_[flow]'] === 'directpay' &&
-          this.upiTab.get().selectedApp === 'gpay'
+          this.upiTab.selectedApp === 'gpay'
         ) {
           if (omnichannelType === 'vpa') {
             formSelector = '#upi-gpay-vpa';
@@ -5694,7 +5692,7 @@ Session.prototype = {
         if (
           this.preferences.features &&
           this.preferences.features.google_pay_omnichannel &&
-          this.upiTab.get().selectedApp === 'gpay'
+          this.upiTab.selectedApp === 'gpay'
         ) {
           $('.omnichannel').show();
         } else {
@@ -6450,39 +6448,51 @@ Session.prototype = {
 
       // TODO: refactor this into cleanupSvelteComponents.
       if (this.methodsList) {
-        this.methodsList.destroy();
+        this.methodsList.$destroy();
       }
 
       if (this.otpView) {
-        this.otpView.destroy();
+        this.otpView.$destroy();
       }
 
       if (this.payoutsView) {
-        this.payoutsView.destroy();
+        this.payoutsView.$destroy();
       }
 
       if (this.payoutsAccountView) {
-        this.payoutsAccountView.destroy();
+        this.payoutsAccountView.$destroy();
       }
 
       if (this.netbankingTab) {
-        this.netbankingTab.destroy();
+        this.netbankingTab.$destroy();
       }
 
       if (this.upiTab) {
-        this.upiTab.destroy();
+        this.upiTab.$destroy();
       }
 
       if (this.emiScreenView) {
-        this.emiScreenView.destroy();
+        this.emiScreenView.$destroy();
       }
 
       if (this.nachScreen) {
-        this.nachScreen.destroy();
+        this.nachScreen.$destroy();
       }
 
       if (this.bankTransferView) {
-        this.bankTransferView.destroy();
+        this.bankTransferView.$destroy();
+      }
+
+      if (this.savedCardsView) {
+        this.savedCardsView.$destroy();
+      }
+
+      if (this.feeBearerView) {
+        this.feeBearerView.$destroy();
+      }
+
+      if (this.payLaterView) {
+        this.payLaterView.$destroy();
       }
 
       try {
@@ -6505,8 +6515,11 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.methodsList = this.modal = this.emi = this.el = this.card = null;
-      this.payoutsView = this.payoutsAccountView = null;
       this.upiTab = this.otpView = this.netbankingTab = null;
+      this.payoutsView = this.payoutsAccountView = null;
+      this.savedCardsView = this.feeBearerView = this.payLaterView = null;
+      this.nachScreen = null;
+
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;
@@ -6991,7 +7004,7 @@ Session.prototype = {
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab &&
-      this.upiTab.get().selectedApp === 'gpay';
+      this.upiTab.selectedApp === 'gpay';
 
     return isOmni;
   },

@@ -13,8 +13,12 @@ const through = require('through2').obj;
 const runSequence = require('run-sequence');
 const { execSync } = require('child_process');
 
+const rollup = require('rollup');
+const rollupConfig = require('./rollup.config.js');
+
 const jshint = require('jshint').JSHINT;
 const jshintStylish = require('jshint-stylish').reporter;
+const jshintOptions = JSON.parse(fs.readFileSync('.jshintrc').toString());
 
 const distDir = 'app/dist/v1/';
 const cssDistDir = distDir + 'css';
@@ -83,14 +87,19 @@ function joinJs() {
     .pipe(gulp.dest(distDir));
 }
 
+function cleanDistDir(cb) {
+  execSync(`rm -rf ${distDir}`);
+  cb && cb();
+}
+
 gulp.task('usemin', joinJs);
 
 gulp.task('uglify', done => {
   const strictPrefix = '!function(){"use strict";';
-  const jshintOptions = JSON.parse(fs.readFileSync('.jshintrc').toString());
 
   glob(`${distDir}/**/*.js`).forEach(file => {
     let fileContents = fs.readFileSync(file).toString();
+
     if (!fileContents.startsWith(strictPrefix)) {
       fileContents = `${strictPrefix}${fileContents}}()`;
     }
@@ -104,7 +113,7 @@ gulp.task('uglify', done => {
 
     console.log('Jshint passed for ' + file);
 
-    fileContents = uglify(fileContents, {
+    const uglified = uglify(fileContents, {
       compress: {
         pure_funcs: [
           'console.log',
@@ -121,11 +130,14 @@ gulp.task('uglify', done => {
           DEBUG_ENV: process.env.NODE_ENV !== 'production',
         },
       },
-    }).code;
+    });
 
-    fs.writeFileSync(file, fileContents);
-
-    console.log('uglified ' + file);
+    if (uglified.error) {
+      console.log(uglified.error);
+    } else {
+      fs.writeFileSync(file, uglified.code);
+      console.log('uglified ' + file);
+    }
   });
   done();
 });
@@ -153,10 +165,7 @@ gulp.task('staticAssets', function() {
 gulp.task(
   'build',
   gulp.series(
-    cb => {
-      execSync(`rm -rf ${distDir}`);
-      cb();
-    },
+    cleanDistDir,
     'css:prod',
     'compileTemplates',
     'compileHTML',
@@ -168,14 +177,26 @@ gulp.task(
   )
 );
 
-gulp.task(
-  'watch',
-  gulp.series('build', function(cb) {
-    gulp.watch(paths.css, gulp.series('css'));
-    gulp.watch(paths.templates, gulp.series('compileTemplates'));
-    gulp.watch(paths.js, gulp.series('usemin'));
-    gulp.watch(assetPath('*.html'), gulp.series('usemin'));
-  })
-);
+gulp.task('watch', cb => {
+  cleanDistDir();
+  gulp.watch(paths.css, gulp.series('css'));
+  gulp.watch(paths.templates, gulp.series('compileTemplates'));
+  gulp.watch(paths.js, gulp.series('usemin'));
+  gulp.watch(assetPath('*.html'), gulp.series('usemin'));
+  rollup.watch(rollupConfig).on('event', event => {
+    switch (event.code) {
+      case 'BUNDLE_START':
+        return console.log('processing ' + event.input);
+      case 'BUNDLE_END':
+        return console.log(
+          'built ' +
+            event.output.map(o => path.relative(__dirname, o)) +
+            ' in ' +
+            event.duration +
+            'ms'
+        );
+    }
+  });
+});
 
 gulp.task('default', gulp.series('build'));

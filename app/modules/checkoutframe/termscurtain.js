@@ -2,16 +2,16 @@ import TermsCurtain from 'templates/views/ui/TermsCurtain.svelte';
 const TARGET_QS = '#tnc-wrap';
 let view;
 
-export const show = (data = {}) => {
-  data.visible = true;
+export const show = (props = {}) => {
+  props.visible = true;
 
   if (!view) {
     view = new TermsCurtain({
       target: _Doc.querySelector(TARGET_QS),
-      data,
+      props,
     });
   } else {
-    view.set(data);
+    view.$set(props);
   }
 };
 
@@ -20,7 +20,7 @@ export const hide = () => {
     return;
   }
 
-  view.set({
+  view.$set({
     visible: false,
   });
 };
@@ -30,5 +30,5 @@ export const isVisible = () => {
     return false;
   }
 
-  return view.get().visible;
+  return view.visible;
 };

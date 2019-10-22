@@ -1,13 +1,14 @@
 import { iPhone } from 'common/useragent';
 import Razorpay from 'common/Razorpay';
-
 import { scrollIntoView } from 'lib/utils';
 
 function onFocus(event) {
   _El.addClass(event.target.parentNode, 'focused');
+
   setTimeout(function() {
     scrollIntoView(event.target);
   }, 1000);
+
   if (iPhone) {
     Razorpay.sendMessage({ event: 'focus' });
   }
@@ -15,8 +16,10 @@ function onFocus(event) {
 
 function onBlur(event) {
   const parent = event.target.parentNode;
+
   _El.removeClass(parent, 'focused');
   _El.addClass(parent, 'mature');
+
   if (iPhone) {
     Razorpay.sendMessage({ event: 'blur' });
   }
@@ -37,9 +40,11 @@ function onInput(event) {
   }
 
   let valid = true;
+
   if (required && !value) {
     valid = false;
   }
+
   if (!required && !value) {
     valid = true;
   } else {
@@ -47,26 +52,30 @@ function onInput(event) {
       valid = new RegExp(pattern).test(value);
     }
   }
+
   _El.keepClass(parent, 'invalid', !valid);
 }
 
 export function focus(node) {
   node.addEventListener('focus', onFocus);
+
   return {
-    destroy: _ => node.removeEventListener('focus', onFocus),
+    destroy: () => node.removeEventListener('focus', onFocus),
   };
 }
 
 export function blur(node) {
   node.addEventListener('blur', onBlur);
+
   return {
-    destroy: _ => node.removeEventListener('blur', onBlur),
+    destroy: () => node.removeEventListener('blur', onBlur),
   };
 }
 
 export function input(node) {
   node.addEventListener('input', onInput);
+
   return {
-    destroy: _ => node.removeEventListener('blur', onInput),
+    destroy: () => node.removeEventListener('blur', onInput),
   };
 }
