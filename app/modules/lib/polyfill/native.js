@@ -70,8 +70,8 @@
         var items = Object(arrayLike);
 
         // 3. ReturnIfAbrupt(items).
+        // eslint-disable-next-line eqeqeq
         if (arrayLike == null) {
-          // eslint-disable-line eqeqeq
           throw new TypeError(
             'Array.from requires an array-like object - not null or undefined'
           );

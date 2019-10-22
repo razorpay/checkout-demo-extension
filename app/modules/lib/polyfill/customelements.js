@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* jshint ignore:start */
 
 /**
  * Polyfill for Custom Elements v1
@@ -954,4 +955,5 @@
   window.__CE_installPolyfill = Ja;
 }.call(self));
 
+/* jshint ignore:end */
 /* eslint-enable */
