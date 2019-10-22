@@ -9,16 +9,18 @@ const {
   enterCardDetails,
   handleCardValidationWithCallback,
   handleMockSuccessOrFailWithCallback,
+  verifyTimeout,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform successful card transaction with callback URL', async () => {
+  test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 20000,
       personalization: false,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
+      timeout: 10,
     };
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
@@ -27,8 +29,9 @@ describe('Card tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
-    await submit(context);
-    await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+    // await submit(context);
+    // await handleCardValidationWithCallback(context);
+    await verifyTimeout(context, 'card');
+    // await handleMockSuccessOrFailWithCallback(context, 'pass');
   });
 });

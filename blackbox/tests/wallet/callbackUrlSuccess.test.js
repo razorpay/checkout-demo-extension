@@ -5,14 +5,18 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
+  selectWallet,
+  assertWalletPage,
   submit,
-  enterCardDetails,
+  handleOtpVerification,
+  typeOTPandSubmit,
+  handleValidationRequest,
   handleCardValidationWithCallback,
   handleMockSuccessOrFailWithCallback,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL', async () => {
+describe('Basic wallet payment', () => {
+  test('Perform wallet transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -25,10 +29,14 @@ describe('Card tests', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+    await selectPaymentMethod(context, 'wallet');
+    await assertWalletPage(context);
+    await selectWallet(context, 'freecharge');
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+    await handleOtpVerification(context);
+    await typeOTPandSubmit(context);
+    await handleValidationRequest(context, 'pass');
+    // await handleCardValidationWithCallback(context);
+    // await handleMockSuccessOrFailWithCallback(context, 'pass');
   });
 });
