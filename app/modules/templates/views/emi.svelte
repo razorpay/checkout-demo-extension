@@ -49,7 +49,7 @@
     plans = _Obj.entries(_plans);
   }
 
-  export function hide() {
+  function hide() {
     /* TODO: defined in session, update once session is ported to ES6 */
     hideEmi();
   }
