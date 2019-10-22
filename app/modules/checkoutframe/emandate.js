@@ -242,7 +242,11 @@ emandateView.prototype = {
     }
     const authTypes = this.getAvailableAuthTypes();
 
-    if (tab === 'emandate-details' && authTypes.indexOf('netbanking') < 0) {
+    // Proceed only if selected auth_type is available for the selected bank
+    if (
+      tab === 'emandate-details' &&
+      !_Arr.contains(authTypes, this.getAuthType())
+    ) {
       return false;
     }
 
