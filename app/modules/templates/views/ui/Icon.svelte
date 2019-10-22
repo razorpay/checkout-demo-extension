@@ -6,6 +6,7 @@
   export let icon;
   export let placeholder = '';
   export let loaded = true;
+  export let alt = '';
 
   // Computed
   export let loadableIcon;
@@ -38,7 +39,7 @@
 </script>
 
 {#if loadableIcon && !loaded}
-  <img src={icon} style="display: none;" use:loader />
+  <img src={icon} style="display: none;" {alt} use:loader />
 {/if}
 
 {#if /^<svg/.test(iconToUse)}
@@ -50,5 +51,5 @@
 {:else if /^\./.test(iconToUse)}
   <div class={iconToUse.split('.').join(' ')} />
 {:else}
-  <img src={iconToUse} alt="" />
+  <img src={iconToUse} {alt} />
 {/if}
