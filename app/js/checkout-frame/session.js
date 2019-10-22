@@ -6615,7 +6615,8 @@ Session.prototype = {
            */
           if (
             bankObj.auth_types &&
-            _Arr.contains(bankObj.auth_types, 'netbanking')
+            (_Arr.contains(bankObj.auth_types, 'netbanking') ||
+              _Arr.contains(bankObj.auth_types, 'debitcard'))
           ) {
             banks[bankCode] = bankObj.name;
           }
