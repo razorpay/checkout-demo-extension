@@ -91,12 +91,12 @@ emandateView.prototype = {
 
     this.on('click', '.auth-option.netbanking', () => {
       this.setAuthType('netbanking');
-      this.setScreen('emandate-details');
+      this.showTab('emandate-details');
     });
 
     this.on('click', '.auth-option.debitcard', () => {
       this.setAuthType('debitcard');
-      this.setScreen('emandate-details');
+      this.showTab('emandate-details');
     });
   },
 
