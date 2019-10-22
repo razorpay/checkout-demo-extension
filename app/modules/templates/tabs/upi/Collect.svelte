@@ -1,35 +1,62 @@
-<div class="legend left" style="margin-top: 18px">
-  Enter your UPI ID
-</div>
-<Card
-  {selected}
-  on:click="handleCardClick(event)"
->
-  <div id="vpa-wrap" class="{appId}">
-    <!-- TODO: use formatter for validation once all fields
-      are moved to `Field` -->
-    <Field
-      formatter={{ type: 'vpa' }}
-      helpText="Please enter a valid VPA of theform username@bank"
-      id="vpa"
-      name="vpa"
-      pattern={pattern}
-      placeholder={selectedApp? "" : "Enter your UPI Address"}
-      required={true}
-      type="text"
-      value={selectedApp === null ? vpa : ''}
+<script>
+  // Svelte imports
+  import { onMount } from 'svelte';
 
-      on:blur
-      ref:vpaField
-    />
-    {#if pspHandle}
-      <div ref:pspName>@{pspHandle}</div>
-    {/if}
-  </div>
-</Card>
+  // UI Imports
+  import Field from 'templates/views/ui/Field.svelte';
+  import Card from 'templates/views/ui/Card.svelte';
+
+  // Util imports
+  import { VPA_REGEX } from 'common/constants';
+
+  // Props
+  export let appId;
+  export let selected = true;
+  export let selectedApp;
+  export let vpa;
+  export let pspHandle;
+  export let focusOnCreate = false;
+
+  // Refs
+  export let vpaField = null;
+
+  // Computed
+  export let pattern;
+
+  function isVpaValid(vpa) {
+    return VPA_REGEX.test(vpa);
+  }
+
+  const PATTERN_WITH_HANDLE = '.+@.+';
+  const PATTERN_WITHOUT_HANDLE = '.+';
+
+  onMount(() => {
+    if (focusOnCreate) {
+      focus();
+    }
+  });
+
+  export function getVpa() {
+    const vpa = vpaField.getValue();
+    if (isVpaValid(vpa)) {
+      return vpa;
+    }
+    return `${vpaField.getValue()}@${pspHandle}`;
+  }
+
+  export function blur() {
+    vpaField.blur();
+  }
+
+  export function focus() {
+    vpaField.focus();
+  }
+
+  $: pattern = appId ? PATTERN_WITHOUT_HANDLE : PATTERN_WITH_HANDLE;
+</script>
 
 <style>
-  ref:pspName {
+  .ref-pspName {
     color: #424242;
     position: absolute;
     top: 12px;
@@ -39,67 +66,25 @@
   }
 </style>
 
-<script>
-  import { VPA_REGEX } from 'common/constants';
-
-  function isVpaValid(vpa) {
-    return VPA_REGEX.test(vpa);
-  }
-
-  const PATTERN_WITH_HANDLE = '.+@.+';
-  const PATTERN_WITHOUT_HANDLE = '.+';
-
-  export default {
-    components: {
-      Field: 'templates/views/ui/Field.svelte',
-      Card: 'templates/views/ui/Card.svelte',
-    },
-
-    data() {
-      return {
-        focusOnCreate: false,
-        selected: true,
-      };
-    },
-
-    oncreate() {
-      const { focusOnCreate } = this.get();
-      if (focusOnCreate) {
-        this.focus();
-      }
-    },
-
-    methods: {
-      handleCardClick(event) {
-        const target = event && event.target;
-        const { googlePayPspHandle } = this.refs;
-
-        // Don't focus on VPA input if the dropdown elem was clicked.
-        if (target === googlePayPspHandle) {
-          return;
-        }
-
-        this.refs.vpaField.focus();
-      },
-      getVpa() {
-        const { pspHandle } = this.get();
-        const vpa = this.refs.vpaField.getValue();
-        if (isVpaValid(vpa)) {
-          return vpa;
-        }
-        return `${this.refs.vpaField.getValue()}@${pspHandle}`;
-      },
-      blur() {
-        this.refs.vpaField.blur();
-      },
-      focus() {
-        this.refs.vpaField.focus();
-      },
-    },
-
-    computed: {
-      pattern: ({ appId }) =>
-        appId ? PATTERN_WITHOUT_HANDLE : PATTERN_WITH_HANDLE,
-    },
-  };
-</script>
+<div class="legend left" style="margin-top: 18px">Enter your UPI ID</div>
+<Card {selected} on:click={focus}>
+  <div id="vpa-wrap" class={appId}>
+    <!-- TODO: use formatter for validation once all fields
+      are moved to `Field` -->
+    <Field
+      formatter={{ type: 'vpa' }}
+      helpText="Please enter a valid VPA of the form username@bank"
+      id="vpa"
+      name="vpa"
+      {pattern}
+      placeholder={selectedApp ? '' : 'Enter your UPI Address'}
+      required={true}
+      type="text"
+      value={selectedApp === null ? vpa : ''}
+      on:blur
+      bind:this={vpaField} />
+    {#if pspHandle}
+      <div class="ref-pspName">@{pspHandle}</div>
+    {/if}
+  </div>
+</Card>

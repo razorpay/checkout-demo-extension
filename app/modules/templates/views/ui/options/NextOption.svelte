@@ -1,46 +1,42 @@
+<script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
+  // UI imports
+  import Option from 'templates/views/ui/options/Option.svelte';
+  import OptionIcon from 'templates/views/ui/options/OptionIcon.svelte';
+
+  // Props
+  export let data = {};
+  export let attributes = {};
+  export let classes = [];
+  export let tabindex = -1;
+  export let type = '';
+  export let icon = null;
+  export let arrowText = null;
+  export let title = '';
+
+  const dispatch = createEventDispatcher();
+
+  export function select() {
+    dispatch('select', data);
+  }
+</script>
+
 <Option
   {data}
   {attributes}
   {classes}
   {tabindex}
   type="next-option {type}"
-
-  on:select="select(event)"
->
+  on:select={select}>
   {#if icon}
-    <OptionIcon icon={icon} />
+    <OptionIcon {icon} />
   {/if}
-  <div class="option-title"><slot></slot></div>
+  <div class="option-title">
+    <slot />
+  </div>
   {#if arrowText}
     <div class="option-arrow-text theme-highlight">{arrowText}</div>
   {/if}
 </Option>
-
-<script>
-  export default {
-    components: {
-      Option: 'templates/views/ui/options/Option.svelte',
-      OptionIcon: 'templates/views/ui/options/OptionIcon.svelte',
-    },
-
-    data: function () {
-      return {
-        attributes: {},
-        classes: [],
-        arrowText: null,
-        icon: null,
-        data: {},
-        type: '',
-        tabindex: -1,
-      };
-    },
-
-    methods: {
-      select: function (e) {
-        e.option = this.get().data;
-
-        this.fire('select', e);
-      }
-    },
-  }
-</script>

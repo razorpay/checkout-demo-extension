@@ -1,334 +1,294 @@
-<Tab method="nach" overrideMethodCheck="true" pad={false}>
-  <Screen>
-    <input type="file" ref:file class="hidden" on:change="selectFile(event)" accept="{ALLOWED_EXTS.join(',')}" />
-
-    <p>Please upload a clear and legible copy of your signed NACH form</p>
-
-    {#if view === 'upload'}
-      <div ref:illustration>
-        <DocumentIllustration />
-      </div>
-    {:elseif file && file.name}
-      <Attachment on:remove="reset(event)">{file.name}</Attachment>
-    {/if}
-
-    {#if view === 'upload'}
-      <Note>
-        <ol>
-          <li>The image should not be <strong>cropped</strong> and should not have any <strong>shadows</strong></li>
-          <li>Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed</li>
-        </ol>
-      </Note>
-    {/if}
-  </Screen>
-</Tab>
-
-<style>
-  ref:illustration {
-    text-align: center;
-  }
-</style>
-
-
 <script>
+  // Refs
+  let file;
+
+  // Utils imports
+  import { getSession } from 'sessionmanager';
   import {
     ALLOWED_EXTS,
     ALLOWED_MAX_SIZE_IN_MB,
-
     generateError,
     getValidityError,
     uploadDocument,
   } from 'checkoutframe/nach';
 
-  export default {
-    components: {
-      Attachment: 'templates/views/ui/Attachment.svelte',
-      DocumentIllustration: 'templates/illustrations/nach/Document.svelte/',
-      Note: 'templates/views/ui/Note.svelte',
-      Tab: 'templates/tabs/Tab.svelte',
-      Screen: 'templates/layouts/Screen.svelte',
-    },
+  // UI imports
+  import Attachment from 'templates/views/ui/Attachment.svelte';
+  import DocumentIllustration from 'templates/illustrations/nach/Document.svelte/';
+  import Note from 'templates/views/ui/Note.svelte';
+  import Tab from 'templates/tabs/Tab.svelte';
+  import Screen from 'templates/layouts/Screen.svelte';
 
-    computed: {
-      view: ({ file }) => file ? 'confirm' : 'upload'
-    },
+  let abortUploadRequest = () => {};
+  let uploaded = false;
+  let uploading = false;
+  let error;
 
-    data: () => ({
-      ALLOWED_EXTS,
-      ALLOWED_MAX_SIZE_IN_MB,
+  const session = getSession();
 
-      abortUpload: () => {}, // Fn to abort the upload request
-      file: null, // File that is uploaded
-      uploaded: false, // Have we uploaded the file?
-      uploading: false, // Are we currently uploading?
-    }),
+  // Computed
+  let view;
 
-    onstate: function ({ changed, current }) {
-      // When file is attached/removed, the CTA needs to be updated to reflect it.
-      if (changed.file) {
-        const CTA = _Doc.querySelector('#footer .attach-nach-form');
-        const text = current.file ? 'Submit' : 'Upload NACH form';
+  $: view = file ? 'confirm' : 'upload';
+  $: {
+    if (file) {
+      const CTA = _Doc.querySelector('#footer .attach-nach-form');
+      const text = file ? 'Submit' : 'Upload NACH form';
 
-        _El.setContents(CTA, text);
-      }
-    },
+      _El.setContents(CTA, text);
+    }
+  }
 
-    methods: {
-      /**
-       * Aborts the upload request
-       */
-      abortUpload: function () {
-        const {
-          abortUpload
-        } = this.get();
+  /**
+   * Aborts the upload request
+   */
+  function abortUpload() {
+    abortUploadRequest();
+    reset();
+  }
 
+  /**
+   * Clears the error
+   */
+  function clearError() {
+    error = null;
+  }
+
+  /**
+   * Session calls this method when it switches to "nach" tab
+   */
+  export function onShown() {
+    const footerButtons = {
+      attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
+      pay: _Doc.querySelector('#footer .pay-btn'),
+    };
+
+    _El.addClass(footerButtons.pay, 'invisible');
+    _El.removeClass(footerButtons.attachNachForm, 'invisible');
+  }
+
+  /**
+   * Session calls this to ask if tab will handle back
+   *
+   * @returns {boolean} will tab handle back
+   */
+  export function onBack() {
+    const footerButtons = {
+      attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
+      pay: _Doc.querySelector('#footer .pay-btn'),
+    };
+
+    _El.addClass(footerButtons.attachNachForm, 'invisible');
+    _El.removeClass(footerButtons.pay, 'invisible');
+
+    return false;
+  }
+
+  /**
+   * Session calls this to detemine if overlay should be hidden
+   *
+   * @returns {Boolean} should the overlay be hidden?
+   */
+  export function shouldHideOverlay() {
+    // If we are still upload, ask for confirmation
+    if (uploading) {
+      const cancel = global.confirm(
+        'Are you sure you want to stop uploading your NACH form?'
+      );
+
+      if (cancel) {
         abortUpload();
-        this.reset();
-      },
 
-      /**
-       * Clears the error
-       */
-      clearError: function () {
-        this.set({
-          error: null
-        });
-      },
+        reset();
+      }
 
-      /**
-       * Session calls this method when it switches to "nach" tab
-       */
-      onShown: function () {
-        const footerButtons = {
-          attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
-          pay: _Doc.querySelector('#footer .pay-btn'),
-        };
+      return cancel;
+    }
 
-        _El.addClass(footerButtons.pay, 'invisible');
-        _El.removeClass(footerButtons.attachNachForm, 'invisible');
-      },
+    // If there was an error, reset the UI
+    if (error) {
+      reset();
+    }
 
-      /**
-       * Session calls this to ask if tab will handle back
-       *
-       * @returns {boolean} will tab handle back
-       */
-      onBack: function () {
-        const footerButtons = {
-          attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
-          pay: _Doc.querySelector('#footer .pay-btn'),
-        };
+    return true;
+  }
 
-        _El.addClass(footerButtons.attachNachForm, 'invisible');
-        _El.removeClass(footerButtons.pay, 'invisible');
+  /**
+   * Removes the file
+   */
+  function removeFile() {
+    file.value = '';
 
-        return false;
-      },
+    let event;
+    if (typeof global.Event === 'function') {
+      event = new global.Event('change');
+    } else {
+      event = document.createEvent('Event');
+      event.initEvent('change', true, true);
+    }
 
-      /**
-       * Session calls this to detemine if overlay should be hidden
-       *
-       * @returns {Boolean} should the overlay be hidden?
-       */
-      shouldHideOverlay: function () {
-        const {
-          error,
-          file,
-          uploading
-        } = this.get();
+    file.dispatchEvent(event);
+  }
 
-        // If we are still upload, ask for confirmation
-        if (uploading) {
-          const cancel = global.confirm('Are you sure you want to stop uploading your NACH form?');
+  /**
+   * Performs cleanup and resets the UI
+   */
+  function reset() {
+    removeFile();
+    clearError();
 
-          if (cancel) {
-            this.abortUpload();
+    uploaded = false;
+    uploading = false;
+  }
 
-            this.reset();
-          }
-
-          return cancel;
-        }
-
-        // If there was an error, reset the UI
-        if (error) {
-          this.reset();
-        }
-
-        return true;
-      },
-
-      /**
-       * Removes the file
-       */
-      removeFile: function () {
-        this.refs.file.value = '';
-
-        let event;
-        if (typeof global.Event === 'function') {
-          event = new global.Event('change');
+  /**
+   * Session calls this to determine if it should submit
+   *
+   * @returns {Boolean} Should session submit?
+   */
+  export function shouldSubmit() {
+    setTimeout(() => {
+      // If we have already uploaded the file, we should just submit and do nothing
+      if (!uploaded) {
+        if (file) {
+          // If file is selected, start uploading
+          upload();
         } else {
-          event = document.createEvent('Event');
-          event.initEvent('change', true, true);
+          // Select file
+          file.click();
+          return false;
         }
+      }
+    });
 
-        this.refs.file.dispatchEvent(event);
-      },
+    // If file is uploaded, we let Session do its thing
+    return uploaded;
+  }
 
-      /**
-       * Performs cleanup and resets the UI
-       */
-      reset: function () {
-        this.removeFile();
-        this.clearError();
-        this.set({
-          uploaded: false,
-          uploading: false,
-        });
-      },
+  /**
+   * Sets the error in state
+   * and shows it in the overlay
+   */
+  function showError(error) {
+    error = error;
+    uploading = false;
 
-      /**
-       * Session calls this to determine if it should submit
-       *
-       * @returns {Boolean} Should session submit?
-       */
-      shouldSubmit: function () {
-        const {
-          uploaded,
-          file,
-        } = this.get();
+    session.hideOverlayMessage();
 
-        setTimeout(() => {
-          // If we have already uploaded the file, we should just submit and do nothing
-          if (!uploaded) {
-            if (file) {
-              // If file is selected, start uploading
-              this.upload();
-            } else {
-              // Select file
-              this.refs.file.click();
-              return false;
-            }
-          }
-        });
+    // Wait for overlay to be hidden before showing it again
+    setTimeout(() => {
+      session.showLoadError(error.description, true);
+    }, 300);
+  }
 
-        // If file is uploaded, we let Session do its thing
-        return uploaded;
-      },
+  /**
+   * Invoked when a file is selected
+   * @param {Event} event
+   */
+  function selectFile(event) {
+    const { value } = event.currentTarget;
 
-      /**
-       * Sets the error in state
-       * and shows it in the overlay
-       */
-      showError: function (error) {
-        const {
-          session
-        } = this.get();
+    if (!value) {
+      file = null;
 
-        this.set({
-          error,
-          uploading: false,
-        });
+      return;
+    }
+
+    session.showLoadError('Attaching your NACH form');
+
+    // Validate
+    const inputFile = event.currentTarget.files[0];
+    const error = getValidityError(inputFile);
+
+    uploading = true;
+
+    setTimeout(() => {
+      // Abort if user has requested to stop processing
+      if (!uploading) {
+        return;
+      }
+
+      if (error) {
+        showError(error);
+      } else {
+        file = inputFile;
+        uploading = false;
+
+        session.hideOverlayMessage();
+      }
+    }, 1000);
+  }
+
+  /**
+   * Uploads the file.
+   */
+  function upload() {
+    uploading = true;
+
+    session.showLoadError('Uploading your NACH form');
+
+    const { promise: uploadRequest, abort } = uploadDocument(session.r, file);
+
+    abortUploadRequest = abort;
+
+    uploadRequest
+      .then(response => {
+        uploaded = true;
+        uploading = false;
 
         session.hideOverlayMessage();
 
-        // Wait for overlay to be hidden before showing it again
-        setTimeout(() => {
-          session.showLoadError(error.description, true);
-        }, 300);
-      },
+        // Let Session do its thing
+        session.preSubmit();
+      })
+      .catch(response => {
+        const generatedError = generateError(response);
 
-      /**
-       * Invoked when a file is selected
-       * @param {Event} event
-       */
-      selectFile: function (event) {
-        const { value } = event.currentTarget;
-
-        if (!value) {
-          this.set({
-            file: null
-          });
-
-          return;
-        }
-
-        const {
-          session
-        } = this.get();
-
-        session.showLoadError('Attaching your NACH form');
-
-        // Validate
-        const file = event.currentTarget.files[0];
-        const error = getValidityError(file);
-
-        this.set({
-          uploading: true,
-        });
-
-        setTimeout(() => {
-          const {
-            uploading
-          } = this.get();
-
-          // Abort if user has requested to stop processing
-          if (!uploading) {
-            return;
-          }
-
-          if (error) {
-            this.showError(error);
-          } else {
-            this.set({
-              file,
-              uploading: false,
-            });
-
-            session.hideOverlayMessage();
-          }
-        }, 1000);
-      },
-
-      /**
-       * Uploads the file.
-       */
-      upload: function () {
-        const {
-          file,
-          session,
-        } = this.get();
-
-        this.set({
-          uploading: true,
-        });
-
-        session.showLoadError('Uploading your NACH form');
-
-        const { promise: uploadRequest, abort: abortUpload } = uploadDocument(session.r, file);
-
-        this.set({
-          abortUpload,
-        });
-
-        uploadRequest
-          .then(response => {
-            this.set({
-              uploaded: true,
-              uploading: false,
-            });
-
-            session.hideOverlayMessage();
-
-            // Let Session do its thing
-            session.preSubmit();
-          })
-          .catch(response => {
-            const generatedError = generateError(response);
-
-            this.showError(generatedError);
-          });
-      }
-    }
+        showError(generatedError);
+      });
   }
 </script>
+
+<style>
+  .ref-illustration {
+    text-align: center;
+  }
+</style>
+
+<Tab method="nach" overrideMethodCheck="true" pad={false}>
+  <Screen>
+    <input
+      type="file"
+      bind:this={file}
+      class="hidden"
+      on:change={selectFile}
+      accept={ALLOWED_EXTS.join(',')} />
+
+    <p>Please upload a clear and legible copy of your signed NACH form</p>
+
+    {#if view === 'upload'}
+      <div class="ref-illustration">
+        <DocumentIllustration />
+      </div>
+    {:else if file && file.name}
+      <Attachment on:remove={reset}>{file.name}</Attachment>
+    {/if}
+
+    {#if view === 'upload'}
+      <Note>
+        <ol>
+          <li>
+            The image should not be
+            <strong>cropped</strong>
+            and should not have any
+            <strong>shadows</strong>
+          </li>
+          <li>
+            Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with
+            size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed
+          </li>
+        </ol>
+      </Note>
+    {/if}
+  </Screen>
+</Tab>

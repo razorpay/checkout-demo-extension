@@ -2,6 +2,7 @@
 import EmiView from 'templates/views/emi.svelte';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { getSession } from 'sessionmanager';
 
 const bankOverrides = {
   SBIN: {
@@ -27,7 +28,8 @@ function useBankOverrides(allBanks) {
   return banks;
 }
 
-export default function emiView(session) {
+export default function emiView() {
+  const session = getSession();
   const opts = session.emi_options;
 
   const amount = (opts.amount = session.get('amount')),
@@ -44,7 +46,6 @@ export default function emiView(session) {
     delete opts.banks.AMEX;
   }
 
-  this.session = session;
   opts.discountedAmount = discountedAmount;
 
   this.opts = opts;
@@ -63,10 +64,9 @@ emiView.prototype = {
 
     this.view = new EmiView({
       target: wrap,
-      data: {
+      props: {
         banks,
         selected: defaultBank,
-        session: this.session,
       },
     });
 

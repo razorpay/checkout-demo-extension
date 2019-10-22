@@ -1,23 +1,16 @@
-<Callout
-  type={calloutType}
-  classes={['downtime-callout']}
-  showIcon={false}
->
-  <slot></slot>
-</Callout>
-
 <script>
+  // UI imports
+  import Callout from 'templates/views/ui/Callout.svelte';
 
-export default {
+  // Props
+  export let isHighSeverity = false;
 
-  components: {
-    Callout: 'templates/views/ui/Callout.svelte'
-  },
+  // Computed
+  let calloutType;
 
-  computed: {
-    calloutType: ({ isHighSeverity }) => isHighSeverity ? 'error' : 'warning',
-  }
-
-}
-
+  $: calloutType = isHighSeverity ? 'error' : 'warning';
 </script>
+
+<Callout type={calloutType} classes={['downtime-callout']} showIcon={false}>
+  <slot />
+</Callout>

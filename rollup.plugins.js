@@ -96,10 +96,12 @@ module.exports = [
     /* TODO: enable run-time checks when not in production */
     dev: false,
 
-    include: 'app/modules/**/*.html',
+    include: 'app/modules/**/*.svelte',
     css: css => {
       css.write('app/css/generated/svelte.styl');
     },
+
+    accessors: true,
   }),
 
   babel({
