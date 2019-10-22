@@ -6735,6 +6735,13 @@ Session.prototype = {
       } else {
         methods.cardless_emi.bajaj = true;
       }
+
+      /**
+       * If merchant wanted cardless EMI to be disabled,
+       * but Bajaj Finserv was enabled,
+       * it would need to be enabled again.
+       */
+      this.set('method.cardless_emi', methods.cardless_emi);
     }
 
     /**
@@ -6752,13 +6759,6 @@ Session.prototype = {
     if (_Obj.isEmpty(methods.cardless_emi) || international) {
       methods.cardless_emi = null;
     }
-
-    /**
-     * If merchant wanted cardless EMI to be disabled,
-     * but Bajaj Finserv was enabled,
-     * it would need to be enabled again.
-     */
-    this.set('method.cardless_emi', methods.cardless_emi);
 
     /**
      * Disable PayLater if either:
