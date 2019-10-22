@@ -3,18 +3,19 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
+  handlePartialPayment,
   assertPaymentMethods,
   selectPaymentMethod,
+  selectBank,
+  assertNetbankingPage,
   submit,
-  enterCardDetails,
+  verifyPartialAmount,
   handleCardValidationWithCallback,
   handleMockSuccessOrFailWithCallback,
-  handlePartialPayment,
-  verifyPartialAmount,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and Partial Payments enabled', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbaking transaction with callback url and partial payment enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,
@@ -37,11 +38,12 @@ describe('Card tests', () => {
     await fillUserDetails(context, true);
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+    await handleMockSuccessOrFailWithCallback(context, 'fail');
   });
 });

@@ -7,19 +7,19 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  handleCardValidation,
+  handleMockSuccessOrFailDialog,
+  verifyErrorMessage,
+  retryCardTransaction,
   verifyTimeout,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and timeout enabled', async () => {
+  test('perform keyless card transaction with timeout enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
       timeout: 10,
     };
     const preferences = makePreferences();
@@ -29,6 +29,11 @@ describe('Card tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
+    await submit(context);
+    await handleCardValidation(context);
+    await handleMockSuccessOrFailDialog(context, 'fail');
+    await verifyErrorMessage(context, 'The payment has already been processed');
+    await retryCardTransaction(context);
     await verifyTimeout(context, 'card');
   });
 });

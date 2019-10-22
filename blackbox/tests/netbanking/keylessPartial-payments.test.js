@@ -5,22 +5,21 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
+  assertNetbankingPage,
+  selectBank,
   submit,
-  enterCardDetails,
-  handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
   handlePartialPayment,
   verifyPartialAmount,
+  failRequestwithErrorMessage,
+  verifyErrorMessage,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and Partial Payments enabled', async () => {
+describe('Netbanking tests', () => {
+  test('perform keyless netbanking transaction with partial payments', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
     };
     const preferences = makePreferences({
       order: {
@@ -37,11 +36,15 @@ describe('Card tests', () => {
     await fillUserDetails(context, true);
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+
+    const expectedErrorMeassage = 'Payment failed';
+    await failRequestwithErrorMessage(context, expectedErrorMeassage);
+    await verifyErrorMessage(context, expectedErrorMeassage);
   });
 });

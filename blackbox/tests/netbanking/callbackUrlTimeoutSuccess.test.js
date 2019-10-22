@@ -5,15 +5,13 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  submit,
-  enterCardDetails,
-  handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  selectBank,
+  assertNetbankingPage,
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and timeout enabled', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbaking transaction with callback url and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,
@@ -27,8 +25,9 @@ describe('Card tests', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
-    await verifyTimeout(context, 'card');
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
+    await verifyTimeout(context, 'netbanking');
   });
 });

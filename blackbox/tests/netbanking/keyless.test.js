@@ -8,18 +8,16 @@ const {
   selectBank,
   assertNetbankingPage,
   submit,
-  handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  failRequestwithErrorMessage,
+  verifyErrorMessage,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform netbaking transaction with callback url', async () => {
+  test('perform keyless netbaking transaction', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
     };
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
@@ -30,7 +28,9 @@ describe('Netbanking tests', () => {
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+
+    const expectedErrorMeassage = 'Payment failed';
+    await failRequestwithErrorMessage(context, expectedErrorMeassage);
+    await verifyErrorMessage(context, expectedErrorMeassage);
   });
 });
