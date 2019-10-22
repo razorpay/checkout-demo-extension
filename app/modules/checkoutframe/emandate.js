@@ -228,7 +228,7 @@ emandateView.prototype = {
   setScreen: function(screen) {
     this.session.setScreen(screen);
 
-    if (screen === 'emandate') {
+    if (screen !== 'emandate-netbanking') {
       this.session.body.removeClass('sub');
     } else {
       this.session.body.addClass('sub');
