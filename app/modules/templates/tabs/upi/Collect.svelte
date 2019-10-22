@@ -73,7 +73,7 @@
       are moved to `Field` -->
     <Field
       formatter={{ type: 'vpa' }}
-      helpText="Please enter a valid VPA of theform username@bank"
+      helpText="Please enter a valid VPA of the form username@bank"
       id="vpa"
       name="vpa"
       {pattern}

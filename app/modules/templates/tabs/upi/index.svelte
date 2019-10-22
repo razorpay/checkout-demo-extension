@@ -132,10 +132,6 @@
     qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
 
   $: {
-    /**
-     * For separate Gpay tab, if it is intent app and app does not exist,
-     * fallback to older GPay UI
-     **/
     if (tab) {
       /**
        * For separate Gpay tab, if it is intent app and app does not exist,
