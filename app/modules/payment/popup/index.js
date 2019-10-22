@@ -112,39 +112,25 @@ Popup.prototype = {
   /**
    * Emits the "close" event.
    */
+  checkClose: function(forceClosed, timesInvoked = 0) {
+    if (timesInvoked > 20) {
+      return;
+    }
 
-  checkClose: function(forceClosed) {
     try {
       if (forceClosed || this.window.closed !== false) {
         // UC browser makes it undefined instead of true
         setTimeout(() => {
-          // Find out what's `t` when we get t.onClose is not a function error.
-          if (this && typeof this.onClose !== 'function') {
-            var properties = {
-              culprit: {
-                _constructor: this.constructor && this.constructor.name,
-                keys:
-                  typeof this === 'object' &&
-                  Object.keys(this)
-                    .slice(0, 10)
-                    .join(','),
-                isWindow: window === this,
-              },
-            };
-
-            Analytics.track('error:track', {
-              data: properties,
-            });
+          if (this && typeof this.onClose === 'function') {
+            this.onClose();
           }
-
-          this.onClose();
         }, 100);
         this.close();
         return true;
       }
     } catch (e) {
       // UC throws error on accessing window if other domain
-      this.checkClose(true);
+      this.checkClose(true, timesInvoked + 1);
     }
   },
 };
