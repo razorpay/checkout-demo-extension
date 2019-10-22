@@ -1,5 +1,12 @@
 const defaultState = {
-  disabled: [],
+  disable: {
+    methods: [],
+    banks: [],
+  },
+  warn: {
+    methods: [],
+    banks: [],
+  },
 };
 
 function Downtimes(base) {
