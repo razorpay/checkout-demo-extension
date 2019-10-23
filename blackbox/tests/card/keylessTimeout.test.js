@@ -20,7 +20,7 @@ describe('Card tests', () => {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
-      timeout: 8,
+      timeout: 12,
     };
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
