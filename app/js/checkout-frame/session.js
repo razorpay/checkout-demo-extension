@@ -6918,6 +6918,14 @@ Session.prototype = {
     this.hasOffers = allOffers.offers.length > 0;
     this.forcedOffer = allOffers.forcedOffer;
 
+    if (this.hasOffers) {
+      Analytics.setMeta('hasOffers', true);
+    }
+
+    if (this.forcedOffer) {
+      Analytics.setMeta('forcedOffer', true);
+    }
+
     if (this.forcedOffer) {
       var paymentMethod = this.forcedOffer.payment_method;
 
