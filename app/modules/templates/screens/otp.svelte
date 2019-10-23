@@ -13,10 +13,13 @@
     text,
   } from 'checkoutstore/screens/otp';
 
-  // UI imports
+  // Utils imports
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
+
+  // UI imports
+  import LinkButton from 'components/LinkButton.svelte';
 
   // Props
   export let on = {};
@@ -88,12 +91,11 @@
       </div>
 
       <div class="text-center" style="margin-top: 20px;">
-        <a
+        <LinkButton
           id="choose-payment-method"
-          class="link"
           on:click={event => invoke('chooseMethod', event)}>
           Try different payment method
-        </a>
+        </LinkButton>
       </div>
     </div>
   {/if}
@@ -132,27 +134,18 @@
   </div>
   <div id="otp-sec-outer" class:hidden={!showInput}>
     {#if $allowResend}
-      <a
-        id="otp-resend"
-        class="link"
-        on:click={event => invoke('resend', event)}>
+      <LinkButton id="otp-resend" on:click={event => invoke('resend', event)}>
         Resend OTP
-      </a>
+      </LinkButton>
     {/if}
     {#if $allowSkip}
-      <a
-        id="otp-sec"
-        class="link"
-        on:click={event => invoke('secondary', event)}>
+      <LinkButton id="otp-sec" on:click={event => invoke('secondary', event)}>
         {$skipText}
-      </a>
+      </LinkButton>
     {:else if $allowBack}
-      <a
-        id="otp-sec"
-        class="link"
-        on:click={event => invoke('secondary', event)}>
+      <LinkButton id="otp-sec" on:click={event => invoke('secondary', event)}>
         Go Back
-      </a>
+      </LinkButton>
     {/if}
   </div>
 </div>

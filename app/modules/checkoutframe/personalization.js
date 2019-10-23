@@ -331,11 +331,18 @@ export const listInstruments = customer => {
   );
 
   const listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
+  const preferredMethods = {};
+
+  _Arr.loop(
+    currentCustomer.slice(0, listOfInstrumentsToBeShown),
+    instrument => (preferredMethods[instrument.method] = true)
+  );
 
   Analytics.track('p13n:instruments:list', {
     data: {
       length: currentCustomer.length,
       shown: Math.min(currentCustomer.length, listOfInstrumentsToBeShown),
+      methods: preferredMethods,
     },
   });
 

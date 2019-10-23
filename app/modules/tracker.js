@@ -176,7 +176,6 @@ export default function Track(r, event, data, immediately) {
     var options = {};
     var properties = {
       options,
-      es6: true,
     };
 
     if (data) {

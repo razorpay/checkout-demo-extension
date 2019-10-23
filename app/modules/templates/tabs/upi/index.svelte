@@ -481,7 +481,7 @@
       <div class="legend left">Selected UPI app</div>
       <Card>
         <span class="ref-iconwrap">
-          <Icon icon={selectedAppData.icon} />
+          <Icon icon={selectedAppData.icon} alt={selectedAppData.text} />
         </span>
         <span>{selectedAppData.text}</span>
         <div class="ref-changebtn" on:click={onUpiAppSelection}>change</div>

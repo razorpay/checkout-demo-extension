@@ -57,6 +57,6 @@
 </style>
 
 <div on:click={event => dispatch('select', event.detail)}>
-  <Icon {icon} />
+  <Icon {icon} alt={text} />
   <div class="ref-text">{text}</div>
 </div>
