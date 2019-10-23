@@ -1592,11 +1592,13 @@ Session.prototype = {
       method = 'netbanking';
     }
 
-    var prefilledbank = this.get('prefill.bank');
-    var selectedBank =
-      prefilledbank && this.methods[method][prefilledbank] ? prefilledbank : '';
-
     if (method) {
+      var prefilledbank = this.get('prefill.bank');
+      var selectedBank =
+        prefilledbank && this.methods[method][prefilledbank]
+          ? prefilledbank
+          : '';
+
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
         props: {
