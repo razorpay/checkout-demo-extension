@@ -278,9 +278,9 @@ async function typeOTP(context) {
 
 async function verifyTimeout(context, paymentMode) {
   if (paymentMode == 'netbanking' || paymentMode == 'card') {
-    await delay(5000);
+    await delay(2000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
-    await delay(5000);
+    await delay(8000);
     expect(await context.page.$('#fd-hide')).toEqual(null);
   } else if (paymentMode == 'wallet') {
     await delay(5000);
