@@ -23,12 +23,12 @@ Unit Tests are located in `test/unit` folder. `blackbox/sites` folder contains b
 
 Format: `key`, `merchant_id`
 
-|                          | Fee Bearer: Merchant                        | Fee Bearer: Customer                        |
-| ------------------------ | ------------------------------------------- | ------------------------------------------- |
-| Contact, Email mandatory | `rzp_test_vmE2wuJIilTJ0s`, `C3eQwnbJGfsFP8` | `rzp_test_GSajCRZqUgVOnU`, `C3eojP6wt8Eg6t` |
-| Contact, Email optional  | `rzp_test_T0nKPeet5kTnbj`, `C3eVL7RBENDBuH` | `rzp_test_t4K8kziR0wYxxP`, `C3erKWTHygzR3Q` |
-| Email optional           | `rzp_test_DvDrkPcFCkPd8S`, `C3ecol1Jvw7XpN` | `rzp_test_aiMriDRpaBThmc`, `C3eyAbbHaNI4r8` |
-| Contact optional         | `rzp_test_FWEjUCmU2aT5x6`, `C3f0WIVPfpzFQY` | `rzp_test_wWHBq3b8ESXpmB`, `C3f2I0QjbSUDjU` |
+|                          | Fee Bearer: Merchant                                                                                                     | Fee Bearer: Customer                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Contact, Email mandatory | `rzp_test_VwsqHDsQPoVQi6`:`ChTb7rYever6Gaxsl0p5kHeN`, `C3eQwnbJGfsFP8`, `umang.galaiya+noneandmerc@razorpay.com`         | `rzp_test_BlUXikp98tvz4X`:`2gMzaeeKghLaSAs14H88XDoE`, `C3eojP6wt8Eg6t`, `umang.galaiya+noneandcust@razorpay.com`         |
+| Contact, Email optional  | `rzp_test_QASMVC29cB5AUE`:`PPNJESjJGMZ4znxbjDVFwtJO`, `C3eVL7RBENDBuH`, `umang.galaiya+emailcontactandmerc@razorpay.com` | `rzp_test_HgCXAu6Ope0ezo`:`9ltnZhFUbb5fY8YRQzWofFXO`, `C3erKWTHygzR3Q`, `umang.galaiya+emailcontactandcust@razorpay.com` |
+| Email optional           | `rzp_test_VAOkqOi642vGPu`:`iCATHzCwfW9YymjLHuoyvNND`, `C3ecol1Jvw7XpN`, `umang.galaiya+emailandmerc@razorpay.com`        | `rzp_test_rwcT7PeB3oKbmZ`:`KnyaaoZnQ1QtMwPLohpqYU3m`, `C3eyAbbHaNI4r8`, `umang.galaiya+emailandcust@razorpay.com`        |
+| Contact optional         | `rzp_test_o39NWyo4QjBTFF`:`dYIJWsqDtp32ehrsuvYSCkty`, `C3f0WIVPfpzFQY`, `umang.galaiya+contactandmerc@razorpay.com`      | `rzp_test_w8HHg0qnClyj31`:`xtKzDTnkBpUXQVucKBHNhjAJ`, `C3f2I0QjbSUDjU`, `umang.galaiya+contactandcust@razorpay.com`      |
 
 # Adding/removing new BINs for EMI Banks
 
