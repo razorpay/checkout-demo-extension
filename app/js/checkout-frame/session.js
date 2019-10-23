@@ -6921,7 +6921,7 @@ Session.prototype = {
     }
 
     if (this.forcedOffer) {
-      Analytics.setMeta('forcedOffer', this.forcedOffer);
+      Analytics.setMeta('forcedOffer', true);
     }
 
     if (this.forcedOffer) {
