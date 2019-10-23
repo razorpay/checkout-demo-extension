@@ -2,7 +2,7 @@ const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
 const { assertHomePage } = require('../../actions/common');
 
-describe('Basic wallet payment', () => {
+describe('Wallet payment', () => {
   test('Perform wallet transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

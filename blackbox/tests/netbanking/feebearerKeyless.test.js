@@ -10,25 +10,30 @@ const {
   submit,
   failRequestwithErrorMessage,
   verifyErrorMessage,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform netbaking transaction with contact optional', async () => {
+  test('perform keyless netbanking transaction with fee bearer', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600,
       personalization: false,
     };
-    const preferences = makePreferences({ optional: ['contact'] });
+
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
-
+    await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
     await submit(context);
+
+    await handleFeeBearer(context, page);
+
+    context.popup();
 
     const expectedErrorMeassage = 'Payment failed';
     await failRequestwithErrorMessage(context, expectedErrorMeassage);

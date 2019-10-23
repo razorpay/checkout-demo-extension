@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
 const {
   handleFeeBearer,
   assertHomePage,
@@ -16,17 +15,20 @@ const {
   retryWalletTransaction,
 } = require('../../actions/common');
 
-describe('Wallet Transaction', () => {
-  test('Perform wallet transaction with fee bearer', async () => {
+describe.skip('Wallet transaction', () => {
+  test('Perform wallet transaction with fee bearer with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences({
+      fee_bearer: true,
+      optional: ['contact'],
+    });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'wallet');
     await assertWalletPage(context);

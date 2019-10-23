@@ -13,9 +13,9 @@ const {
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform netbaking transaction with contact optional', async () => {
+  test('perform keyless netbaking transaction with contact optional', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };

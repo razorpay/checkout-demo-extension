@@ -39,7 +39,9 @@ function checkoutRequestHandler(request) {
  */
 function cdnRequestHandler(request) {
   const url = request.url();
-  if (url.startsWith('data')) {
+  if (url.endsWith('favicon.ico')) {
+    request.respond({ status: 204 });
+  } else if (url.startsWith('data')) {
     request.respond({ body: url });
   } else if (url.startsWith(lumberjackUrl)) {
     request.respond({ status: 204 });
