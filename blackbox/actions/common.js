@@ -55,6 +55,7 @@ async function enterCardDetails(context) {
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
+  await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
   const messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
