@@ -8,7 +8,7 @@ const {
   submit,
   enterCardDetails,
   handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  expectMockSuccessWithCallback,
   handlePartialPayment,
   verifyPartialAmount,
 } = require('../../actions/common');
@@ -42,6 +42,6 @@ describe('Card tests', () => {
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+    await expectMockSuccessWithCallback(context);
   });
 });

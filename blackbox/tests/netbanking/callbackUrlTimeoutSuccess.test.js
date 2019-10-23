@@ -18,7 +18,7 @@ describe('Netbanking tests', () => {
       personalization: false,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
-      timeout: 10,
+      timeout: 8,
     };
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });

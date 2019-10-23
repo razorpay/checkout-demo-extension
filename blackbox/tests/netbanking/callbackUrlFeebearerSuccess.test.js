@@ -10,7 +10,7 @@ const {
   submit,
   handleFeeBearer,
   handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  expectMockSuccessWithCallback,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -33,6 +33,6 @@ describe('Netbanking tests', () => {
     await submit(context);
     await handleFeeBearer(context, page);
     await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'fail');
+    await expectMockSuccessWithCallback(context);
   });
 });

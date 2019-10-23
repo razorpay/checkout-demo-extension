@@ -8,7 +8,7 @@ const {
   submit,
   enterCardDetails,
   handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  expectMockSuccessWithCallback,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -29,6 +29,6 @@ describe('Card tests', () => {
     await enterCardDetails(context);
     await submit(context);
     await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'pass');
+    await expectMockSuccessWithCallback(context);
   });
 });

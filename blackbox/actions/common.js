@@ -29,10 +29,14 @@ module.exports = {
   failRequestwithErrorMessage,
   enterCardDetails,
   handleCardValidation,
-  handleMockSuccessOrFailDialog,
+  handleMockFailureDialog,
   retryCardTransaction,
   handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  verifyHighDowntime,
+  verifyLowDowntime,
+  expectMockSuccessWithCallback,
+  expectMockFailureWithCallback,
+  handleMockSuccessDialog,
 };
 
 async function enterCardDetails(context) {
@@ -109,39 +113,44 @@ async function handleCardValidation(context) {
 }
 
 async function handleCardValidationWithCallback(context) {
-  const r = await context.expectRequest();
+  await context.expectRequest();
   await context.respondPlain(contents);
 }
 
-async function handleMockSuccessOrFailDialog(context, passOrFail) {
+async function handleMockFailureDialog(context) {
+  await delay(300);
   const popup = await context.popup();
   const popupPage = await popup.page();
-  if (passOrFail == 'fail') {
-    const failButton = await popupPage.$('.danger');
-    await failButton.click();
-  } else if (passOrFail == 'pass') {
-    const passButton = await popupPage.$('.success');
-    await passButton.click();
-  }
+  const failButton = await popupPage.$('.danger');
+  await failButton.click();
   await delay(800);
 }
 
-async function handleMockSuccessOrFailWithCallback(context, passOrFail) {
+async function handleMockSuccessDialog(context) {
+  const popup = await context.popup();
+  const popupPage = await popup.page();
+  const passButton = await popupPage.$('.success');
+  await passButton.click();
+  await delay(800);
+}
+
+async function expectMockFailureWithCallback(context) {
   await context.page.waitForNavigation();
-  if (passOrFail == 'fail') {
-    const failButton = await context.page.$('.danger');
-    await failButton.click();
-    const req = await context.expectRequest();
-    expect(req.body).toContain('Payment+failed');
-    expect(req.body).not.toEqual('razorpay_payment_id=pay_123465');
-    await context.respondPlain('11');
-  } else if (passOrFail == 'pass') {
-    const passButton = await context.page.$('.success');
-    await passButton.click();
-    const req = await context.expectRequest();
-    expect(req.body).toEqual('razorpay_payment_id=pay_123465');
-    await context.respondPlain('11');
-  }
+  const failButton = await context.page.$('.danger');
+  await failButton.click();
+  const req = await context.expectRequest();
+  expect(req.body).toContain('Payment+failed');
+  expect(req.body).not.toEqual('razorpay_payment_id=pay_123465');
+  await context.respondPlain('11');
+}
+
+async function expectMockSuccessWithCallback(context) {
+  await context.page.waitForNavigation();
+  const passButton = await context.page.$('.success');
+  await passButton.click();
+  const req = await context.expectRequest();
+  expect(req.body).toEqual('razorpay_payment_id=pay_123465');
+  await context.respondPlain('11');
 }
 
 async function handleValidationRequest(context, passOrFail) {
@@ -236,6 +245,25 @@ async function selectWallet(context, walletName) {
 
 async function selectBank(context, bank) {
   await context.page.select('#bank-select', bank);
+}
+
+async function verifyHighDowntime(context, bank) {
+  const toolTip = await context.page.waitForSelector('.downtime .tooltip');
+  const toolTipText = await context.page.evaluate(
+    toolTip => toolTip.textContent,
+    toolTip
+  );
+  expect(toolTipText).toContain(bank);
+}
+
+async function verifyLowDowntime(context, bank) {
+  const warningDiv = await context.page.waitForSelector('.downtime-callout');
+  // console.log(warningDiv);
+  const warningText = await context.page.evaluate(
+    warningDiv => warningDiv.textContent,
+    warningDiv
+  );
+  expect(warningText).toContain(bank);
 }
 
 async function typeOTPandSubmit(context) {

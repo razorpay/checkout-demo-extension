@@ -7,12 +7,8 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  handleCardValidation,
-  handleMockSuccessOrFailDialog,
-  verifyErrorMessage,
-  retryCardTransaction,
   handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  expectMockFailureWithCallback,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -33,6 +29,6 @@ describe('Card tests', () => {
     await enterCardDetails(context);
     await submit(context);
     await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'fail');
+    await expectMockFailureWithCallback(context);
   });
 });

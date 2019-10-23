@@ -8,12 +8,13 @@ const {
   submit,
   enterCardDetails,
   handleCardValidation,
-  handleMockSuccessOrFailDialog,
+  handleMockFailureDialog,
   verifyErrorMessage,
   retryCardTransaction,
   verifyPartialAmount,
   handlePartialPayment,
   handleFeeBearer,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -45,13 +46,13 @@ describe('Card tests', () => {
     await submit(context);
     await handleFeeBearer(context, page);
     await handleCardValidation(context);
-    await handleMockSuccessOrFailDialog(context, 'fail');
+    await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleFeeBearer(context, page);
     await handleCardValidation(context);
-    await handleMockSuccessOrFailDialog(context, 'pass');
+    await handleMockSuccessDialog(context);
   });
 });

@@ -8,7 +8,7 @@ const {
   submit,
   enterCardDetails,
   handleCardValidation,
-  handleMockSuccessOrFailDialog,
+  handleMockFailureDialog,
   verifyErrorMessage,
   retryCardTransaction,
   handleFeeBearer,
@@ -33,7 +33,7 @@ describe('Card tests', () => {
     await submit(context);
     await handleFeeBearer(context, page);
     await handleCardValidation(context);
-    await handleMockSuccessOrFailDialog(context, 'fail');
+    await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
     await verifyTimeout(context, 'netbanking');

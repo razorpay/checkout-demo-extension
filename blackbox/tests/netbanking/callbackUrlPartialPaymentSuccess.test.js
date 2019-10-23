@@ -11,7 +11,7 @@ const {
   submit,
   verifyPartialAmount,
   handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
+  expectMockSuccessWithCallback,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -44,6 +44,6 @@ describe('Netbanking tests', () => {
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleCardValidationWithCallback(context);
-    await handleMockSuccessOrFailWithCallback(context, 'fail');
+    await expectMockSuccessWithCallback(context);
   });
 });

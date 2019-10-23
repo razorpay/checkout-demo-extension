@@ -5,10 +5,7 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  submit,
   enterCardDetails,
-  handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
   verifyTimeout,
 } = require('../../actions/common');
 

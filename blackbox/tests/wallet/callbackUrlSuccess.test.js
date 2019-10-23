@@ -11,8 +11,6 @@ const {
   handleOtpVerification,
   typeOTPandSubmit,
   handleValidationRequest,
-  handleCardValidationWithCallback,
-  handleMockSuccessOrFailWithCallback,
 } = require('../../actions/common');
 
 describe.skip('Basic wallet payment', () => {
@@ -36,7 +34,5 @@ describe.skip('Basic wallet payment', () => {
     await handleOtpVerification(context);
     await typeOTPandSubmit(context);
     await handleValidationRequest(context, 'pass');
-    // await handleCardValidationWithCallback(context);
-    // await handleMockSuccessOrFailWithCallback(context, 'pass');
   });
 });
