@@ -1592,11 +1592,13 @@ Session.prototype = {
       method = 'netbanking';
     }
 
-    var prefilledbank = this.get('prefill.bank');
-    var selectedBank =
-      prefilledbank && this.methods[method][prefilledbank] ? prefilledbank : '';
-
     if (method) {
+      var prefilledbank = this.get('prefill.bank');
+      var selectedBank =
+        prefilledbank && this.methods[method][prefilledbank]
+          ? prefilledbank
+          : '';
+
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('netbanking-svelte-wrap'),
         props: {
@@ -6735,6 +6737,13 @@ Session.prototype = {
       } else {
         methods.cardless_emi.bajaj = true;
       }
+
+      /**
+       * If merchant wanted cardless EMI to be disabled,
+       * but Bajaj Finserv was enabled,
+       * it would need to be enabled again.
+       */
+      this.set('method.cardless_emi', methods.cardless_emi);
     }
 
     /**
@@ -6752,13 +6761,6 @@ Session.prototype = {
     if (_Obj.isEmpty(methods.cardless_emi) || international) {
       methods.cardless_emi = null;
     }
-
-    /**
-     * If merchant wanted cardless EMI to be disabled,
-     * but Bajaj Finserv was enabled,
-     * it would need to be enabled again.
-     */
-    this.set('method.cardless_emi', methods.cardless_emi);
 
     /**
      * Disable PayLater if either:
@@ -6915,6 +6917,14 @@ Session.prototype = {
 
     this.hasOffers = allOffers.offers.length > 0;
     this.forcedOffer = allOffers.forcedOffer;
+
+    if (this.hasOffers) {
+      Analytics.setMeta('hasOffers', true);
+    }
+
+    if (this.forcedOffer) {
+      Analytics.setMeta('forcedOffer', true);
+    }
 
     if (this.forcedOffer) {
       var paymentMethod = this.forcedOffer.payment_method;

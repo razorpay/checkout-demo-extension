@@ -353,10 +353,9 @@ function closeModal() {
 function isP13nListOpen(session) {
   try {
     const { instrumentsData } = session.methodsList.view;
-
     const {
       visible: otherMethodsVisible,
-    } = session.methodsList.otherMethodsView.get();
+    } = session.methodsList.otherMethodsView;
 
     return otherMethodsVisible && instrumentsData.length;
   } catch (e) {}

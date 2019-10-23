@@ -166,7 +166,7 @@
     <div class="instrument-group">
       <div class="instrument-header">
         <div class="icon-left">
-          <Icon icon={themeMeta.icons['upi']} />
+          <Icon icon={themeMeta.icons['upi']} alt="UPI" />
         </div>
         <span class="header-text">Select a UPI ID</span>
       </div>
@@ -193,7 +193,7 @@
     <div class="instrument-group">
       <div class="instrument-header">
         <div class="icon-left ref-nbicon">
-          <Icon icon={themeMeta.icons['netbanking']} />
+          <Icon icon={themeMeta.icons['netbanking']} alt="Netbanking" />
         </div>
         <span class="header-text">Select a Bank Account</span>
       </div>

@@ -8,7 +8,8 @@
     "Set": true,
     "div_nodes": true,
     "div0_nodes": true,
-    "div1_nodes": true
+    "div1_nodes": true,
+    "button_nodes": true
   },
   "proto": true,
   "-W001": true,
