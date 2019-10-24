@@ -18,6 +18,7 @@
   import Note from 'templates/views/ui/Note.svelte';
   import Tab from 'templates/tabs/Tab.svelte';
   import Screen from 'templates/layouts/Screen/index.svelte';
+  import PrimaryScreen from 'templates/layouts/Screen/Primary.svelte';
 
   let abortUploadRequest = () => {};
   let uploaded = false;
@@ -257,38 +258,40 @@
 
 <Tab method="nach" overrideMethodCheck="true" pad={false}>
   <Screen>
-    <input
-      type="file"
-      bind:this={file}
-      class="hidden"
-      on:change={selectFile}
-      accept={ALLOWED_EXTS.join(',')} />
+    <PrimaryScreen>
+      <input
+        type="file"
+        bind:this={file}
+        class="hidden"
+        on:change={selectFile}
+        accept={ALLOWED_EXTS.join(',')} />
 
-    <p>Please upload a clear and legible copy of your signed NACH form</p>
+      <p>Please upload a clear and legible copy of your signed NACH form</p>
 
-    {#if view === 'upload'}
-      <div class="ref-illustration">
-        <DocumentIllustration />
-      </div>
-    {:else if file && file.name}
-      <Attachment on:remove={reset}>{file.name}</Attachment>
-    {/if}
+      {#if view === 'upload'}
+        <div class="ref-illustration">
+          <DocumentIllustration />
+        </div>
+      {:else if file && file.name}
+        <Attachment on:remove={reset}>{file.name}</Attachment>
+      {/if}
 
-    {#if view === 'upload'}
-      <Note>
-        <ol>
-          <li>
-            The image should not be
-            <strong>cropped</strong>
-            and should not have any
-            <strong>shadows</strong>
-          </li>
-          <li>
-            Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files with
-            size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed
-          </li>
-        </ol>
-      </Note>
-    {/if}
+      {#if view === 'upload'}
+        <Note>
+          <ol>
+            <li>
+              The image should not be
+              <strong>cropped</strong>
+              and should not have any
+              <strong>shadows</strong>
+            </li>
+            <li>
+              Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files
+              with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed
+            </li>
+          </ol>
+        </Note>
+      {/if}
+    </PrimaryScreen>
   </Screen>
 </Tab>
