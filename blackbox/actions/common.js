@@ -141,8 +141,14 @@ async function handleMockFailureDialog(context) {
 }
 
 async function handleMockSuccessDialog(context) {
-  const popup = await context.popup();
-  const popupPage = await popup.page();
+  await delay(300);
+  let popup = await context.popup();
+  let popupPage = await popup.page();
+  if (popup == null || popupPage == null) {
+    await delay(400);
+    popup = await context.popup();
+    popupPage = await popup.page();
+  }
   const passButton = await popupPage.$('.success');
   await passButton.click();
   await delay(800);
