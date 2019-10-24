@@ -128,8 +128,13 @@ async function handleCardValidationWithCallback(context) {
 
 async function handleMockFailureDialog(context) {
   await delay(300);
-  const popup = await context.popup();
-  const popupPage = await popup.page();
+  popup = await context.popup();
+  popupPage = await popup.page();
+  if (popup == null || popupPage == null) {
+    await delay(400);
+    popup = await context.popup();
+    popupPage = await popup.page();
+  }
   const failButton = await popupPage.$('.danger');
   await failButton.click();
   await delay(800);
@@ -182,7 +187,7 @@ async function retryWalletTransaction(context) {
 }
 
 async function retryCardTransaction(context) {
-  const retryButton = await context.page.$('#fd-hide');
+  const retryButton = await context.page.waitForSelector('#fd-hide');
   await retryButton.click();
   await delay(500);
 }
